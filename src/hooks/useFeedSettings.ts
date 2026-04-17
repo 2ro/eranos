@@ -9,6 +9,7 @@ import { useCallback, useMemo } from "react";
 
 /** Default sidebar order for fresh installs (system pages only). */
 const DEFAULT_SIDEBAR_ORDER_IDS = [
+  'wallet',
   'feed',
   'notifications',
   'search',
@@ -61,7 +62,7 @@ const REMOVED_SIDEBAR_IDS = new Set<string>([
 ]);
 
 /** IDs that should be visible for all users after the Agora nav refocus migration. */
-const ENSURE_VISIBLE_IDS = ['world', 'badges', 'changelog'] as const;
+const ENSURE_VISIBLE_IDS = ['world', 'badges', 'changelog', 'wallet'] as const;
 
 /**
  * Compute the ordered list of visible sidebar items.
@@ -126,6 +127,13 @@ function computeOrderedItems(
   if (listsIndex >= 0) {
     normalized.splice(listsIndex, 1);
     normalized.push('lists');
+  }
+
+  // Pin Wallet to the very top — Agora promotes the wallet as a primary surface.
+  const walletIndex = normalized.indexOf('wallet');
+  if (walletIndex >= 0) {
+    normalized.splice(walletIndex, 1);
+    normalized.unshift('wallet');
   }
 
   return normalized;

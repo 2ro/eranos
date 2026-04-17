@@ -60,6 +60,7 @@ const SettingsPage = lazy(() => import("./pages/SettingsPage").then(m => ({ defa
 const ThemesPage = lazy(() => import("./pages/ThemesPage").then(m => ({ default: m.ThemesPage })));
 const UserListsPage = lazy(() => import("./pages/UserListsPage").then(m => ({ default: m.UserListsPage })));
 const WalletSettingsPage = lazy(() => import("./pages/WalletSettingsPage").then(m => ({ default: m.WalletSettingsPage })));
+const WalletPage = lazy(() => import("./pages/WalletPage").then(m => ({ default: m.WalletPage })));
 const WorldPage = lazy(() => import("./pages/WorldPage").then(m => ({ default: m.WorldPage })));
 const FollowPage = lazy(() => import("./pages/FollowPage").then(m => ({ default: m.FollowPage })));
 const RemoteLoginSuccessPage = lazy(() => import("./pages/RemoteLoginSuccessPage").then(m => ({ default: m.RemoteLoginSuccessPage })));
@@ -158,6 +159,7 @@ export function AppRouter() {
             />
             <Route path="/themes" element={<ThemesPage />} />
             <Route path="/bookmarks" element={<BookmarksPage />} />
+            <Route path="/wallet" element={<WalletPage />} />
             <Route path="/world" element={<WorldPage />} />
             <Route path="/badges" element={<BadgesPage />} />
             <Route path="/letters" element={<LettersPage />} />

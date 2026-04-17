@@ -21,6 +21,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { useNsecPasteGuard } from "@/hooks/useNsecPasteGuard";
 import type { AppConfig } from "@/contexts/AppContext";
 import { NWCProvider } from "@/contexts/NWCContext";
+import { SparkWalletProvider } from "@/contexts/SparkWalletContext";
 import { PROTOCOL_MODE } from "@/lib/dmConstants";
 import { BuildConfigSchema, type BuildConfig } from "@/lib/schemas";
 import { secureStorage } from "@/lib/secureStorage";
@@ -121,6 +122,7 @@ const hardcodedConfig: AppConfig = {
     followsFeedShowReplies: true,
   },
   sidebarOrder: [
+    "wallet",
     "feed",
     "notifications",
     "search",
@@ -216,6 +218,7 @@ export function App() {
                   <NativeNotifications />
 
                     <NWCProvider>
+                    <SparkWalletProvider>
                     <DMProvider config={dmConfig}>
                       <EmotionDevProvider>
                         <TooltipProvider>
@@ -225,6 +228,7 @@ export function App() {
                         </TooltipProvider>
                       </EmotionDevProvider>
                     </DMProvider>
+                    </SparkWalletProvider>
                   </NWCProvider>
                 </NostrProvider>
               </NostrLoginProvider>

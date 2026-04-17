@@ -30,6 +30,7 @@ import {
   SmilePlus,
   User,
   Vote,
+  WalletMinimal,
 } from "lucide-react";
 import { CardsIcon } from "@/components/icons/CardsIcon";
 import { ChestIcon } from "@/components/icons/ChestIcon";
@@ -94,6 +95,13 @@ export interface SidebarItemDef {
  */
 export const SIDEBAR_ITEMS: SidebarItemDef[] = [
   // System pages
+  {
+    id: "wallet",
+    label: "Wallet",
+    path: "/wallet",
+    icon: WalletMinimal,
+    requiresAuth: true,
+  },
   { id: "feed", label: "Feed", path: "/feed", icon: Megaphone },
   {
     id: "notifications",
