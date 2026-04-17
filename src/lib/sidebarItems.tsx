@@ -1,46 +1,38 @@
 import {
-  Archive,
   Award,
-  BarChart3,
-  Bell,
-  Blocks,
-  BookMarked,
-  Bookmark,
   BookOpen,
-  Bot,
+  Bell,
+  Bookmark,
   CalendarDays,
   Camera,
   Clapperboard,
   Code,
   Earth,
+  Egg,
   Film,
   HelpCircle,
-
+  LifeBuoy,
+  List,
   MessageSquare,
   MessageSquareMore,
+  Megaphone,
   Mic,
   Music,
+  Newspaper,
   Palette,
   PartyPopper,
   Podcast,
-  Egg,
   Repeat2,
-  Scroll,
-  ScrollText,
   Search,
+  ScrollText,
   Settings,
   Smile,
   SmilePlus,
-  Sparkles,
-  TrendingUp,
   User,
+  Vote,
 } from "lucide-react";
 import { CardsIcon } from "@/components/icons/CardsIcon";
 import { ChestIcon } from "@/components/icons/ChestIcon";
-import { PlanetIcon } from "@/components/icons/PlanetIcon";
-import { WikipediaIcon } from "@/components/icons/WikipediaIcon";
-import { BlueskyIcon } from "@/components/icons/BlueskyIcon";
-import { MailboxIcon } from "@/components/icons/MailboxIcon";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -102,7 +94,7 @@ export interface SidebarItemDef {
  */
 export const SIDEBAR_ITEMS: SidebarItemDef[] = [
   // System pages
-  { id: "feed", label: "Feed", path: "/feed", icon: PlanetIcon },
+  { id: "feed", label: "Feed", path: "/feed", icon: Megaphone },
   {
     id: "notifications",
     label: "Notifications",
@@ -111,7 +103,6 @@ export const SIDEBAR_ITEMS: SidebarItemDef[] = [
     requiresAuth: true,
   },
   { id: "search", label: "Search", path: "/search", icon: Search },
-  { id: "trends", label: "Trends", path: "/trends", icon: TrendingUp },
   {
     id: "bookmarks",
     label: "Bookmarks",
@@ -130,51 +121,19 @@ export const SIDEBAR_ITEMS: SidebarItemDef[] = [
     id: "lists",
     label: "Lists",
     path: "/lists",
-    icon: Scroll,
+    icon: List,
     requiresAuth: true,
   },
   { id: "settings", label: "Settings", path: "/settings", icon: Settings },
   { id: "changelog", label: "Changelog", path: "/changelog", icon: ScrollText },
-  {
-    id: "letters",
-    label: "Letters",
-    path: "/letters",
-    icon: MailboxIcon,
-    requiresAuth: true,
-  },
-  {
-    id: "ai-chat",
-    label: "AI Chat",
-    path: "/ai-chat",
-    icon: Bot,
-    requiresAuth: true,
-  },
-  { id: 'blobbi', label: 'Blobbi', path: '/blobbi', icon: Egg, requiresAuth: true },
-  { id: "help", label: "Help", path: "/help", icon: HelpCircle },
+  { id: "help", label: "Help", path: "/help", icon: LifeBuoy },
   // Content types
   { id: "events", label: "Events", path: "/events", icon: CalendarDays },
   { id: "photos", label: "Photos", path: "/photos", icon: Camera },
-  { id: "videos", label: "Videos", path: "/videos", icon: Film },
-  { id: "articles", label: "Articles", path: "/articles", icon: BookOpen },
-  { id: "books", label: "Books", path: "/books", icon: BookMarked },
-  { id: "vines", label: "Divines", path: "/vines", icon: Clapperboard },
-  { id: "music", label: "Music", path: "/music", icon: Music },
-  { id: "podcasts", label: "Podcasts", path: "/podcasts", icon: Podcast },
-
-  { id: "webxdc", label: "Webxdc", path: "/webxdc", icon: Blocks },
-  { id: "themes", label: "Themes", path: "/themes", icon: Sparkles },
-  { id: "polls", label: "Polls", path: "/polls", icon: BarChart3 },
-  { id: "packs", label: "Follow Packs", path: "/packs", icon: PartyPopper },
-  { id: "colors", label: "Color Moments", path: "/colors", icon: Palette },
-  { id: "decks", label: "Magic Decks", path: "/decks", icon: CardsIcon },
-  { id: "treasures", label: "Treasures", path: "/treasures", icon: ChestIcon },
-  { id: "emojis", label: "Emojis", path: "/emojis", icon: SmilePlus },
-  { id: "development", label: "Development", path: "/development", icon: Code },
+  { id: "articles", label: "Articles", path: "/articles", icon: Newspaper },
+  { id: "polls", label: "Polls", path: "/polls", icon: Vote },
   { id: "badges", label: "Badges", path: "/badges", icon: Award },
   { id: "world", label: "World", path: "/world", icon: Earth },
-  { id: "archive", label: "Archive", path: "/archive", icon: Archive },
-  { id: "wikipedia", label: "Wikipedia", path: "/wikipedia", icon: WikipediaIcon },
-  { id: "bluesky", label: "Bluesky", path: "/bluesky", icon: BlueskyIcon },
 ];
 
 /** Set of all known sidebar item IDs for quick lookup. */
@@ -198,6 +157,25 @@ export const CONTENT_KIND_ICONS: Record<string, IconComponent> = {
   ...Object.fromEntries(
     SIDEBAR_ITEMS.filter((s) => s.icon).map((s) => [s.id, s.icon]),
   ),
+  videos: Film,
+  books: BookOpen,
+  vines: Clapperboard,
+  music: Music,
+  podcasts: Podcast,
+  webxdc: Palette,
+  packs: PartyPopper,
+  colors: Palette,
+  decks: CardsIcon,
+  treasures: ChestIcon,
+  emojis: SmilePlus,
+  development: Code,
+  badges: HelpCircle,
+  world: Earth,
+  archive: HelpCircle,
+  wikipedia: HelpCircle,
+  bluesky: HelpCircle,
+  blobbi: Egg,
+  vanish: MessageSquareMore,
 };
 
 // ── Lookups ───────────────────────────────────────────────────────────────────
