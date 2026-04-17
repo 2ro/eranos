@@ -1,4 +1,8 @@
+import { iso31662 } from 'iso-3166';
 import { getSubdivisionName, getSubdivisionWikipediaTitle } from './subdivisions';
+
+/** Authoritative set of ISO 3166-2 subdivision codes for validation. */
+const SUBDIVISION_CODES = new Set(iso31662.map((s) => s.code));
 
 /** ISO 3166-1 alpha-2 country code to country name and flag emoji mapping. */
 export const COUNTRIES: Record<string, { name: string; flag: string }> = {
@@ -319,4 +323,38 @@ export function getCountryInfo(code: string): { name: string; flag: string; subd
   const country = COUNTRIES[upper];
   if (!country) return null;
   return { name: country.name, flag: country.flag };
+}
+
+// ---------------------------------------------------------------------------
+// ISO 3166 validators (used by countryIdentifiers.ts)
+// ---------------------------------------------------------------------------
+
+/**
+ * Check if a code matches the ISO 3166-2 subdivision format
+ * (2-letter country + hyphen + 1-3 alphanumeric chars).
+ */
+export function isSubdivisionFormat(code: string): boolean {
+  return /^[A-Za-z]{2}-[A-Za-z0-9]{1,3}$/.test(code);
+}
+
+/** Validate an ISO 3166-1 alpha-2 country code. */
+export function isValidCountryCode(code: string): boolean {
+  return COUNTRIES[code.toUpperCase()] !== undefined;
+}
+
+/** Validate an ISO 3166-2 subdivision code (e.g. 'US-CA', 'CN-XZ'). */
+export function isValidSubdivisionCode(code: string): boolean {
+  return SUBDIVISION_CODES.has(code.toUpperCase());
+}
+
+/**
+ * Validate that a code is either a valid ISO 3166-1 country code
+ * or a valid ISO 3166-2 subdivision code.
+ */
+export function isValidGeoCode(code: string): boolean {
+  const upper = code.toUpperCase();
+  if (isSubdivisionFormat(upper)) {
+    return isValidSubdivisionCode(upper);
+  }
+  return isValidCountryCode(upper);
 }

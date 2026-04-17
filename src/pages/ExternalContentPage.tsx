@@ -28,6 +28,8 @@ import { ratingToStars } from '@/lib/bookstr';
 import { useAppContext } from '@/hooks/useAppContext';
 import { useWeather, getPrecipitation } from '@/hooks/useWeather';
 import { useComments } from '@/hooks/useComments';
+import { usePaginatedFeed } from '@/hooks/usePaginatedFeed';
+import { useInfiniteScroll } from '@/hooks/useInfiniteScroll';
 import { useBookReviews } from '@/hooks/useBookReviews';
 import { useAuthor } from '@/hooks/useAuthor';
 import { useProfileUrl } from '@/hooks/useProfileUrl';
@@ -181,21 +183,58 @@ export function ExternalContentPage() {
   }, [content]);
 
   const { muteItems } = useMuteList();
-  const { data: commentsData, isLoading: commentsLoading } = useComments(commentRoot, 500);
+
+  // Country pages route through usePaginatedFeed (legacy `geo:` fallback +
+  // cursor pagination + diversity cap); all other external content (URL,
+  // ISBN, unknown) keeps the existing threaded useComments path.
+  const isCountry = content?.type === 'iso3166';
+  const countryCode = isCountry ? content.code : null;
+
+  const { data: commentsData, isLoading: commentsLoading } = useComments(
+    isCountry ? undefined : commentRoot,
+    500,
+  );
+
+  const {
+    data: feedPages,
+    isLoading: feedLoading,
+    hasNextPage,
+    isFetchingNextPage,
+    fetchNextPage,
+  } = usePaginatedFeed({
+    countryCode: isCountry && countryCode ? countryCode : undefined,
+  });
+
+  const { scrollRef } = useInfiniteScroll({
+    hasNextPage: !!hasNextPage,
+    isFetchingNextPage,
+    fetchNextPage,
+    pageCount: feedPages?.pages.length,
+    enabled: isCountry,
+  });
 
   // Build a reply tree: direct replies each paired with their first sub-reply.
   const orderedReplies = useMemo(() => {
+    if (isCountry) {
+      // Country feed: flat list of top-level posts ordered newest-first
+      // (already sorted by usePaginatedFeed). No sub-reply previews.
+      const events = (feedPages?.pages ?? []).flatMap((page) => page.events);
+      const filtered = muteItems.length > 0
+        ? events.filter((e) => !isEventMuted(e, muteItems))
+        : events;
+      return filtered.map((reply) => ({
+        reply,
+        firstSubReply: undefined as import('@nostrify/nostrify').NostrEvent | undefined,
+      }));
+    }
+
     const topLevel = commentsData?.topLevelComments ?? [];
     const filteredTopLevel = muteItems.length > 0
       ? topLevel.filter((r) => !isEventMuted(r, muteItems))
       : topLevel;
 
-    // Country feeds are social feeds (newest-first); other types are threaded conversations (oldest-first)
-    const sorted = [...filteredTopLevel].sort((a, b) =>
-      content?.type === 'iso3166'
-        ? b.created_at - a.created_at
-        : a.created_at - b.created_at
-    );
+    // Other external content types are threaded conversations (oldest-first)
+    const sorted = [...filteredTopLevel].sort((a, b) => a.created_at - b.created_at);
 
     return sorted.map((reply) => {
       const directReplies = commentsData?.getDirectReplies(reply.id) ?? [];
@@ -204,15 +243,13 @@ export function ExternalContentPage() {
         firstSubReply: directReplies[0] as import('@nostrify/nostrify').NostrEvent | undefined,
       };
     });
-  }, [commentsData, muteItems, content?.type]);
+  }, [isCountry, feedPages, commentsData, muteItems]);
+
+  const repliesLoading = isCountry ? feedLoading : commentsLoading;
 
   // FAB opens the comment compose dialog
   const [composeOpen, setComposeOpen] = useState(false);
   const openCompose = useCallback(() => setComposeOpen(true), []);
-
-  // Weather-based precipitation effect for country pages
-  const isCountry = content?.type === 'iso3166';
-  const countryCode = isCountry ? content.code : null;
   const { data: weather } = useWeather(countryCode);
   const precipitation = useMemo(() => {
     if (!weather) return null;
@@ -274,7 +311,7 @@ export function ExternalContentPage() {
           isbn={content.value.replace('isbn:', '')}
           commentRoot={commentRoot}
           orderedReplies={orderedReplies}
-          commentsLoading={commentsLoading}
+          commentsLoading={repliesLoading}
         />
       ) : (
         <>
@@ -283,10 +320,18 @@ export function ExternalContentPage() {
 
           {/* Threaded comments list */}
           <div>
-            {commentsLoading ? (
+            {repliesLoading ? (
               <CommentsSkeleton />
             ) : orderedReplies.length > 0 ? (
-              <FlatThreadedReplyList replies={orderedReplies} />
+              <>
+                <FlatThreadedReplyList replies={orderedReplies} />
+                {/* Infinite-scroll sentinel for country feeds */}
+                {isCountry && hasNextPage && (
+                  <div ref={scrollRef} className="py-6 text-center text-xs text-muted-foreground">
+                    {isFetchingNextPage ? 'Loading more…' : ''}
+                  </div>
+                )}
+              </>
             ) : (
               <CommentsEmptyState />
             )}
