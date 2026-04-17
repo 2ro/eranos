@@ -10,7 +10,6 @@ import {
   CalendarDays,
   ScrollText,
 } from 'lucide-react';
-import { WikipediaIcon } from '@/components/icons/WikipediaIcon';
 import { BlueskyIcon } from '@/components/icons/BlueskyIcon';
 
 // ── Types ─────────────────────────────────────────────────────────────────────
@@ -67,17 +66,6 @@ export const WIDGET_DEFINITIONS: WidgetDefinition[] = [
     maxHeight: 600,
     category: 'discovery',
     href: '/trends',
-  },
-  {
-    id: 'wikipedia',
-    label: 'Wikipedia',
-    description: "Today's featured article from Wikipedia",
-    icon: WikipediaIcon,
-    defaultHeight: 350,
-    minHeight: 200,
-    maxHeight: 600,
-    category: 'discovery',
-    href: '/wikipedia',
   },
   {
     id: 'bluesky',

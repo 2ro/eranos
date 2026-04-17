@@ -17,9 +17,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { useNip05Resolve } from '@/hooks/useNip05Resolve';
 import { useAuthor } from '@/hooks/useAuthor';
 import { useEvent, useAddrEvent, type AddrCoords } from '@/hooks/useEvent';
-import { useWikipediaSearch, type WikipediaSearchResult } from '@/hooks/useWikipediaSearch';
 import { useArchiveSearch, type ArchiveSearchResult } from '@/hooks/useArchiveSearch';
-import { WikipediaIcon } from '@/components/icons/WikipediaIcon';
 import { searchSidebarItems, type SidebarItemDef } from '@/lib/sidebarItems';
 import { cn } from '@/lib/utils';
 
@@ -37,12 +35,10 @@ export function MobileSearchSheet({ open, onClose }: MobileSearchSheetProps) {
 
   const { data: rawProfiles, isFetching, followedPubkeys } = useSearchProfiles(query);
 
-  // Wikipedia & Archive search (async, debounced by their hooks at >=2 chars)
-  const { data: wikipediaResults } = useWikipediaSearch(query);
+  // Archive search (async, debounced by the hook at >=2 chars)
   const { data: archiveResults } = useArchiveSearch(query);
 
   // Take at most 1 result from each external source
-  const wikipediaResult: WikipediaSearchResult | null = wikipediaResults?.[0] ?? null;
   const archiveResult: ArchiveSearchResult | null = archiveResults?.[0] ?? null;
 
   // Country suggestion (local, synchronous)
@@ -81,13 +77,12 @@ export function MobileSearchSheet({ open, onClose }: MobileSearchSheetProps) {
   // Show country at top only for exact matches; otherwise at bottom (after profiles)
   const countryAtTop = hasCountry && (countryMatch.exact || profileCount === 0);
   const hasIdentifier = !!identifierMatch;
-  const hasWikipedia = !!wikipediaResult;
   const hasArchive = !!archiveResult;
   const navItemCount = navItems.length;
 
-  const totalItems = navItemCount + profileCount + (hasCountry ? 1 : 0) + (hasUrlComment ? 1 : 0) + (hasIdentifier ? 1 : 0) + (hasWikipedia ? 1 : 0) + (hasArchive ? 1 : 0);
+  const totalItems = navItemCount + profileCount + (hasCountry ? 1 : 0) + (hasUrlComment ? 1 : 0) + (hasIdentifier ? 1 : 0) + (hasArchive ? 1 : 0);
 
-  // Order: [...navItems, identifier?, commentUrl?, country?(top), ...profiles, country?(bottom), wikipedia?, archive?]
+  // Order: [...navItems, identifier?, commentUrl?, country?(top), ...profiles, country?(bottom), archive?]
   let nextMobileIdx = 0;
   const navItemStartIndex = nextMobileIdx;
   nextMobileIdx += navItemCount;
@@ -98,7 +93,6 @@ export function MobileSearchSheet({ open, onClose }: MobileSearchSheetProps) {
   nextMobileIdx += profileCount;
   const countryBottomIndex = (hasCountry && !countryAtTop) ? nextMobileIdx++ : -1;
   const countryIndex = countryAtTop ? countryTopIndex : countryBottomIndex;
-  const wikipediaIndex = hasWikipedia ? nextMobileIdx++ : -1;
   const archiveIndex = hasArchive ? nextMobileIdx++ : -1;
 
   // Lock body scroll while the search sheet is open.
@@ -166,11 +160,6 @@ export function MobileSearchSheet({ open, onClose }: MobileSearchSheetProps) {
     navigate(item.path);
   }, [navigate, handleClose]);
 
-  const handleSelectWikipedia = useCallback((result: WikipediaSearchResult) => {
-    handleClose();
-    navigate(`/i/${encodeURIComponent(result.url)}`);
-  }, [navigate, handleClose]);
-
   const handleSelectArchive = useCallback((result: ArchiveSearchResult) => {
     handleClose();
     navigate(`/i/${encodeURIComponent(`https://archive.org/details/${result.identifier}`)}`);
@@ -212,8 +201,6 @@ export function MobileSearchSheet({ open, onClose }: MobileSearchSheetProps) {
           handleCommentOnUrl();
         } else if (hasCountry && selectedIndex === countryIndex) {
           handleSelectCountry(countryMatch!.country);
-        } else if (hasWikipedia && selectedIndex === wikipediaIndex) {
-          handleSelectWikipedia(wikipediaResult!);
         } else if (hasArchive && selectedIndex === archiveIndex) {
           handleSelectArchive(archiveResult!);
         } else {
@@ -234,7 +221,7 @@ export function MobileSearchSheet({ open, onClose }: MobileSearchSheetProps) {
     }
   };
 
-  const hasResults = query.trim().length > 0 && (navItemCount > 0 || hasIdentifier || hasUrlComment || hasCountry || hasWikipedia || hasArchive || (profiles && profiles.length > 0));
+  const hasResults = query.trim().length > 0 && (navItemCount > 0 || hasIdentifier || hasUrlComment || hasCountry || hasArchive || (profiles && profiles.length > 0));
 
   if (!open) return null;
 
@@ -295,13 +282,6 @@ export function MobileSearchSheet({ open, onClose }: MobileSearchSheetProps) {
                 country={countryMatch!.country}
                 isSelected={selectedIndex === countryIndex}
                 onClick={handleSelectCountry}
-              />
-            )}
-            {hasWikipedia && (
-              <MobileWikipediaItem
-                result={wikipediaResult!}
-                isSelected={selectedIndex === wikipediaIndex}
-                onClick={handleSelectWikipedia}
               />
             )}
             {hasArchive && (
@@ -813,51 +793,6 @@ function SearchProfileItem({
             : <span className="font-mono text-[11px]">{identifier}</span>
           }
         </div>
-      </div>
-    </button>
-  );
-}
-
-function MobileWikipediaItem({
-  result,
-  isSelected,
-  onClick,
-}: {
-  result: WikipediaSearchResult;
-  isSelected: boolean;
-  onClick: (result: WikipediaSearchResult) => void;
-}) {
-  return (
-    <button
-      data-search-item
-      role="option"
-      aria-selected={isSelected}
-      className={cn(
-        'w-full flex items-center gap-3 px-4 py-3 text-left transition-colors',
-        isSelected ? 'bg-accent text-accent-foreground' : 'hover:bg-secondary/60',
-      )}
-      onClick={() => onClick(result)}
-      onMouseDown={(e) => e.preventDefault()}
-    >
-      <div className="size-9 shrink-0 rounded-full bg-secondary flex items-center justify-center">
-        {result.thumbnail ? (
-          <img
-            src={result.thumbnail}
-            alt=""
-            className="size-9 rounded-full object-cover"
-            onError={(e) => {
-              e.currentTarget.style.display = 'none';
-              (e.currentTarget.nextElementSibling as HTMLElement).style.display = 'flex';
-            }}
-          />
-        ) : null}
-        <div className={cn('items-center justify-center size-9', result.thumbnail ? 'hidden' : 'flex')}>
-          <WikipediaIcon className="size-3.5 text-muted-foreground" />
-        </div>
-      </div>
-      <div className="flex-1 min-w-0">
-        <span className="font-semibold text-sm truncate block">{result.title}</span>
-        <div className="text-xs text-muted-foreground truncate">Wikipedia</div>
       </div>
     </button>
   );

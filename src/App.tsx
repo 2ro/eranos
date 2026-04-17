@@ -159,7 +159,6 @@ const hardcodedConfig: AppConfig = {
   sidebarWidgets: [
     { id: 'trends' },
     { id: 'hot-posts' },
-    { id: 'wikipedia' },
   ],
 };
 

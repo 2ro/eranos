@@ -37,11 +37,9 @@ import { useLinkPreview } from '@/hooks/useLinkPreview';
 import { useLayoutOptions } from '@/contexts/LayoutContext';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useFeedSettings } from '@/hooks/useFeedSettings';
-import { useWikipediaSummary } from '@/hooks/useWikipediaSummary';
 import { useToast } from '@/hooks/useToast';
 import { getDisplayName } from '@/lib/getDisplayName';
 import { timeAgo } from '@/lib/timeAgo';
-import { extractWikipediaTitle } from '@/lib/linkEmbed';
 import { cn } from '@/lib/utils';
 import type { NostrEvent } from '@nostrify/nostrify';
 import type { BookReview } from '@/lib/bookstr';
@@ -169,10 +167,7 @@ export function ExternalContentPage() {
   const linkPreviewUrl = content?.type === 'url' ? content.value : null;
   const { data: linkPreview } = useLinkPreview(linkPreviewUrl);
 
-  // For Wikipedia URLs, use the Wikipedia API for accurate titles.
-  const wikiTitle = useMemo(() => linkPreviewUrl ? extractWikipediaTitle(linkPreviewUrl) : null, [linkPreviewUrl]);
-  const { data: wikiSummary } = useWikipediaSummary(wikiTitle);
-  const resolvedTitle = wikiSummary?.title ?? linkPreview?.title;
+  const resolvedTitle = linkPreview?.title;
 
   const pageTitle = resolvedTitle ?? (content ? headerLabel(content) : 'External Content');
 
@@ -243,10 +238,10 @@ export function ExternalContentPage() {
       {/* Non-sticky transparent header */}
       <div className="flex items-center gap-4 px-4 pt-4 pb-5">
         <Link
-          to={content.type === 'isbn' ? '/books' : wikiTitle ? '/wikipedia' : '/'}
+          to={content.type === 'isbn' ? '/books' : '/'}
           className={cn(
             'p-2 rounded-full hover:bg-secondary transition-colors',
-            content.type !== 'isbn' && !wikiTitle && 'sidebar:hidden',
+            content.type !== 'isbn' && 'sidebar:hidden',
           )}
         >
           <ArrowLeft className="size-5" />

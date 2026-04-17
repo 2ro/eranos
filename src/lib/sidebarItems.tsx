@@ -172,7 +172,6 @@ export const CONTENT_KIND_ICONS: Record<string, IconComponent> = {
   badges: HelpCircle,
   world: Earth,
   archive: HelpCircle,
-  wikipedia: HelpCircle,
   bluesky: HelpCircle,
   blobbi: Egg,
   vanish: MessageSquareMore,

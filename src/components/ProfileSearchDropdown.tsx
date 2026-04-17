@@ -19,9 +19,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { useNip05Resolve } from '@/hooks/useNip05Resolve';
 import { useAuthor } from '@/hooks/useAuthor';
 import { useEvent, useAddrEvent, type AddrCoords } from '@/hooks/useEvent';
-import { useWikipediaSearch, type WikipediaSearchResult } from '@/hooks/useWikipediaSearch';
 import { useArchiveSearch, type ArchiveSearchResult } from '@/hooks/useArchiveSearch';
-import { WikipediaIcon } from '@/components/icons/WikipediaIcon';
 import { searchSidebarItems, type SidebarItemDef } from '@/lib/sidebarItems';
 import { cn } from '@/lib/utils';
 
@@ -57,12 +55,10 @@ export function ProfileSearchDropdown({
 
   const { data: rawProfiles, isFetching, followedPubkeys } = useSearchProfiles(query);
 
-  // Wikipedia & Archive search (async, debounced by their hooks at >=2 chars)
-  const { data: wikipediaResults } = useWikipediaSearch(query);
+  // Archive search (async, debounced by the hook at >=2 chars)
   const { data: archiveResults } = useArchiveSearch(query);
 
   // Take at most 1 result from each external source
-  const wikipediaResult: WikipediaSearchResult | null = wikipediaResults?.[0] ?? null;
   const archiveResult: ArchiveSearchResult | null = archiveResults?.[0] ?? null;
 
   // Country suggestion (local, synchronous) — suppressed when hideCountry is true
@@ -103,11 +99,11 @@ export function ProfileSearchDropdown({
   // Show dropdown when we have results, or when text search is enabled and there's a query
   useEffect(() => {
     if (query.trim().length > 0) {
-      if (enableTextSearch || (profiles && profiles.length > 0) || countryMatch || navItems.length > 0 || wikipediaResult || archiveResult) {
+      if (enableTextSearch || (profiles && profiles.length > 0) || countryMatch || navItems.length > 0 || archiveResult) {
         setOpen(true);
       }
     }
-  }, [profiles, query, enableTextSearch, countryMatch, navItems, wikipediaResult, archiveResult]);
+  }, [profiles, query, enableTextSearch, countryMatch, navItems, archiveResult]);
 
   // Reset selected index when results change
   useEffect(() => {
@@ -145,17 +141,16 @@ export function ProfileSearchDropdown({
     navigate(`/search?q=${encodeURIComponent(query.trim())}`);
   }, [enableTextSearch, query, navigate]);
 
-  // Total selectable items: navItems + identifier? + URL comment? + country?(top) + profiles + country?(bottom) + wikipedia? + archive?
+  // Total selectable items: navItems + identifier? + URL comment? + country?(top) + profiles + country?(bottom) + archive?
   const hasCountry = !!countryMatch;
   const hasUrlComment = queryIsUrl && enableTextSearch;
   const hasIdentifier = !!identifierMatch;
-  const hasWikipedia = !!wikipediaResult;
   const hasArchive = !!archiveResult;
   const navItemCount = navItems.length;
-  const totalItems = navItemCount + profileCount + (hasCountry ? 1 : 0) + (hasUrlComment ? 1 : 0) + (hasIdentifier ? 1 : 0) + (hasWikipedia ? 1 : 0) + (hasArchive ? 1 : 0);
+  const totalItems = navItemCount + profileCount + (hasCountry ? 1 : 0) + (hasUrlComment ? 1 : 0) + (hasIdentifier ? 1 : 0) + (hasArchive ? 1 : 0);
 
   // Map selectedIndex to what it refers to.
-  // Order: [...navItems, identifier?, commentUrl?, country?(top), ...profiles, country?(bottom), wikipedia?, archive?]
+  // Order: [...navItems, identifier?, commentUrl?, country?(top), ...profiles, country?(bottom), archive?]
   let nextIdx = 0;
   const navItemStartIndex = nextIdx;
   nextIdx += navItemCount;
@@ -166,7 +161,6 @@ export function ProfileSearchDropdown({
   nextIdx += profileCount;
   const countryBottomIndex = (hasCountry && !countryAtTop) ? nextIdx++ : -1;
   const countryIndex = countryAtTop ? countryTopIndex : countryBottomIndex;
-  const wikipediaIndex = hasWikipedia ? nextIdx++ : -1;
   const archiveIndex = hasArchive ? nextIdx++ : -1;
 
   const handleCommentOnUrl = useCallback(() => {
@@ -181,13 +175,6 @@ export function ProfileSearchDropdown({
     setOpen(false);
     setQuery('');
     navigate(`/i/iso3166:${country.code}`);
-  }, [navigate]);
-
-  const handleSelectWikipedia = useCallback((result: WikipediaSearchResult) => {
-    setOpen(false);
-    setQuery('');
-    inputRef.current?.blur();
-    navigate(`/i/${encodeURIComponent(result.url)}`);
   }, [navigate]);
 
   const handleSelectArchive = useCallback((result: ArchiveSearchResult) => {
@@ -233,8 +220,6 @@ export function ProfileSearchDropdown({
           handleCommentOnUrl();
         } else if (hasCountry && selectedIndex === countryIndex) {
           handleSelectCountry(countryMatch!.country);
-        } else if (hasWikipedia && selectedIndex === wikipediaIndex) {
-          handleSelectWikipedia(wikipediaResult!);
         } else if (hasArchive && selectedIndex === archiveIndex) {
           handleSelectArchive(archiveResult!);
         } else {
@@ -319,7 +304,7 @@ export function ProfileSearchDropdown({
       </div>
 
       {/* Dropdown results — only when text search is not enabled */}
-      {!enableTextSearch && open && (navItemCount > 0 || hasIdentifier || hasCountry || hasWikipedia || hasArchive || (profiles && profiles.length > 0)) && (
+      {!enableTextSearch && open && (navItemCount > 0 || hasIdentifier || hasCountry || hasArchive || (profiles && profiles.length > 0)) && (
         <div
           ref={listRef}
           role="listbox"
@@ -362,13 +347,6 @@ export function ProfileSearchDropdown({
                 country={countryMatch!.country}
                 isSelected={selectedIndex === countryIndex}
                 onClick={handleSelectCountry}
-              />
-            )}
-            {hasWikipedia && (
-              <WikipediaItem
-                result={wikipediaResult!}
-                isSelected={selectedIndex === wikipediaIndex}
-                onClick={handleSelectWikipedia}
               />
             )}
             {hasArchive && (
@@ -460,15 +438,6 @@ export function ProfileSearchDropdown({
               />
             )}
 
-            {/* Wikipedia result — always after profiles */}
-            {hasWikipedia && (
-              <WikipediaItem
-                result={wikipediaResult!}
-                isSelected={selectedIndex === wikipediaIndex}
-                onClick={handleSelectWikipedia}
-              />
-            )}
-
             {/* Archive result — always after profiles */}
             {hasArchive && (
               <ArchiveItem
@@ -482,7 +451,7 @@ export function ProfileSearchDropdown({
       )}
 
       {/* Empty state — only when text search is not enabled */}
-      {!enableTextSearch && open && query.trim().length > 0 && !isFetching && !hasIdentifier && !hasCountry && !hasWikipedia && !hasArchive && navItemCount === 0 && profiles && profiles.length === 0 && (
+      {!enableTextSearch && open && query.trim().length > 0 && !isFetching && !hasIdentifier && !hasCountry && !hasArchive && navItemCount === 0 && profiles && profiles.length === 0 && (
         <div className="absolute top-full left-0 right-0 mt-1.5 z-50 rounded-xl border border-border bg-popover shadow-lg overflow-hidden animate-in fade-in-0 zoom-in-95 slide-in-from-top-2 duration-150">
           <div className="py-6 text-center text-sm text-muted-foreground">
             No profiles found
@@ -968,51 +937,6 @@ function ProfileItem({
             <span className="truncate font-mono text-[11px]">{identifier}</span>
           )}
         </div>
-      </div>
-    </button>
-  );
-}
-
-function WikipediaItem({
-  result,
-  isSelected,
-  onClick,
-}: {
-  result: WikipediaSearchResult;
-  isSelected: boolean;
-  onClick: (result: WikipediaSearchResult) => void;
-}) {
-  return (
-    <button
-      data-search-item
-      role="option"
-      aria-selected={isSelected}
-      className={cn(
-        'w-full flex items-center gap-3 px-3 py-2.5 text-left transition-colors cursor-pointer',
-        isSelected ? 'bg-accent text-accent-foreground' : 'hover:bg-secondary/60',
-      )}
-      onClick={() => onClick(result)}
-      onMouseDown={(e) => e.preventDefault()}
-    >
-      <div className="size-10 shrink-0 rounded-full bg-secondary flex items-center justify-center">
-        {result.thumbnail ? (
-          <img
-            src={result.thumbnail}
-            alt=""
-            className="size-10 rounded-full object-cover"
-            onError={(e) => {
-              e.currentTarget.style.display = 'none';
-              (e.currentTarget.nextElementSibling as HTMLElement).style.display = 'flex';
-            }}
-          />
-        ) : null}
-        <div className={cn('items-center justify-center size-10', result.thumbnail ? 'hidden' : 'flex')}>
-          <WikipediaIcon className="size-4 text-muted-foreground" />
-        </div>
-      </div>
-      <div className="flex-1 min-w-0">
-        <span className="font-semibold text-sm truncate block">{result.title}</span>
-        <div className="text-xs text-muted-foreground truncate">Wikipedia</div>
       </div>
     </button>
   );
