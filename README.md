@@ -1,24 +1,25 @@
 # Agora
 
-Power to the people. A customizable [Nostr](https://nostr.com/) client that puts identity and community ownership first.
+Power to the people.
+
+Agora is a Nostr client focused on community ownership, expressive identity, and censorship resistance. This repository (`agora-3`) is the Agora-branded app built from the Ditto codebase.
 
 **[agora.spot](https://agora.spot)** | **[Source](https://gitlab.com/soapbox-pub/agora-3)**
 
-## About
+## What This Repo Is
 
-Agora is an open-source, decentralized social media client built on the Nostr protocol. It is designed for people who want expressive, community-first social software without surrendering ownership of identity or data.
-
-Made by [Soapbox](https://soapbox.pub).
+- Agora product identity (name, theme, assets, native IDs)
+- Ditto-derived implementation with broad Nostr feature coverage
+- Configurable deployment defaults via `agora.json`
 
 ## Features
 
-- **Theming** -- 9 built-in theme presets, 19 CSS token properties for full customization, and the ability to publish and share themes as Nostr events
-- **Infinite Content Types** -- Text notes, articles, short-form videos (Divines), live streams, polls, follow packs, color moments, magic decks, geocaching, and Webxdc mini-apps
-- **Lightning Payments** -- Zap posts and profiles with sats via Nostr Wallet Connect (NWC) or WebLN
-- **Private Messaging** -- End-to-end encrypted DMs (NIP-04 and NIP-17)
-- **Comments** -- Comment on anything: posts, URLs, profiles, hashtags, books, and more (NIP-22)
-- **Self-Hosting** -- Builds to static HTML/JS/CSS. Deploy anywhere -- GitHub Pages, Netlify, Vercel, a VPS, or a Raspberry Pi
-- **Mobile** -- Android native app via Capacitor, responsive design for all screen sizes
+- **Community-first social client**: notes, articles, comments, reposts, reactions, and rich event rendering
+- **Theming system**: built-in presets + custom color/font/background themes that can be shared as events
+- **Lightning support**: zaps with Nostr Wallet Connect and WebLN
+- **Private messaging**: NIP-04 and NIP-17 direct messages
+- **Mobile app shell**: Capacitor-powered Android/iOS wrappers
+- **Self-hostable**: static web build + configurable relay and upload infrastructure
 
 ## Getting Started
 
@@ -36,7 +37,7 @@ npm install
 npm run dev
 ```
 
-The dev server starts at `http://localhost:8080`.
+Development server: `http://localhost:8080`
 
 ### Build
 
@@ -44,66 +45,58 @@ The dev server starts at `http://localhost:8080`.
 npm run build
 ```
 
-The built site is output to `dist/`.
+Build output: `dist/`
 
-### Test
-
-Runs type-checking, linting, unit tests, and a production build:
+### Validate
 
 ```sh
 npm test
 ```
 
+This runs type-checking, linting, unit tests, and production build checks.
+
 ## Configuration
 
-Agora is configured through an `agora.json` file at the project root, read at build time. This file is gitignored so each deployment can have its own configuration.
+Build-time config is read from `agora.json` (gitignored by default so each deployment can provide its own values).
 
 ```jsonc
 {
   "theme": "dark",
   "relayMetadata": {
     "relays": [
-      { "url": "wss://relay.agora.spot", "read": true, "write": true }
+      { "url": "wss://relay.ditto.pub", "read": true, "write": true },
+      { "url": "wss://relay.primal.net", "read": true, "write": true },
+      { "url": "wss://relay.damus.io", "read": true, "write": true }
     ]
   },
-  "blossomServers": ["https://blossom.agora.spot"],
-  "feedSettings": {
-    "showPosts": true,
-    "showReposts": true,
-    "showArticles": true
-    // ...and more content type toggles
-  }
+  "blossomServers": [
+    "https://blossom.ditto.pub",
+    "https://blossom.primal.net/"
+  ]
 }
 ```
 
-Configuration is resolved in three layers (highest priority first):
+Configuration priority (highest first):
 
-1. **User settings** stored in localStorage
-2. **Build config** from `agora.json`
-3. **Hardcoded defaults**
+1. User settings (local storage)
+2. Build config (`agora.json`)
+3. Hardcoded app defaults
 
-Use an alternate config file path with: `CONFIG_FILE=./my-config.json npm run build`
+Use a custom config path:
 
-### Custom Branding
-
-For self-hosted instances:
-
-- Replace `public/logo.svg` and `public/logo.png` with your logo
-- Update the app name in `index.html` and `public/manifest.webmanifest`
-- Replace `public/og-image.jpg` for social sharing previews
-- Set default relays and upload servers in `agora.json`
+```sh
+CONFIG_FILE=./my-config.json npm run build
+```
 
 ## Deployment
 
-Agora builds to static files and can be deployed anywhere that serves HTML.
+Agora builds to static files and can be deployed to any static host.
 
-- **GitHub Pages / GitLab Pages** -- Push to `main` and CI auto-deploys
-- **Netlify / Vercel** -- Connect your fork and deploy. A `_redirects` file is included for SPA routing
-- **VPS / Any web server** -- Build and copy `dist/` to your server. Configure SPA routing (e.g., Nginx `try_files $uri $uri/ /index.html`)
+- GitLab/GitHub Pages
+- Netlify/Vercel
+- VPS or any web server with SPA routing fallback
 
-### Android
-
-Build a native Android app with [Capacitor](https://capacitorjs.com/):
+For Android:
 
 ```sh
 npm run build
@@ -114,40 +107,20 @@ npx cap open android
 ## Tech Stack
 
 | Layer | Technology |
-|---|---|
+| --- | --- |
 | Framework | React 18 |
 | Build | Vite |
 | Language | TypeScript |
 | Styling | TailwindCSS 3 + shadcn/ui |
-| Routing | React Router 6 |
+| Routing | React Router |
 | Data | TanStack Query |
 | Nostr | Nostrify + nostr-tools |
 | Mobile | Capacitor |
 | Testing | Vitest + React Testing Library |
 
-## Project Structure
-
-```
-src/
-  components/     UI components (100+), including shadcn/ui primitives
-  hooks/          Custom React hooks (65+)
-  pages/          Page components for each route (30+)
-  contexts/       React context providers
-  lib/            Utilities and shared logic
-  test/           Test setup and helpers
-public/           Static assets, icons, manifest
-```
-
 ## Contributing
 
-We welcome contributions but have high standards. Please read the full [Contributing Guide](CONTRIBUTING.md) before submitting a merge request. The short version:
-
-- **Bug fixes**: One bug, one MR. Keep it small and focused.
-- **New features**: Must link to an existing issue and align with the product vision.
-- **Required**: Live preview URL, before/after screenshots, completed self-review checklist.
-- **Required tools**: Claude Opus 4.6 (or latest frontier model), an AI coding agent with plan mode.
-
-Read the project docs and `AGENTS.md` to understand what Agora is and isn't.
+Read [CONTRIBUTING.md](CONTRIBUTING.md) before opening a merge request.
 
 ## License
 
