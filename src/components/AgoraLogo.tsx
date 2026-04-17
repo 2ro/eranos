@@ -1,6 +1,6 @@
 import { cn } from '@/lib/utils';
 
-interface DittoLogoProps {
+interface AgoraLogoProps {
   className?: string;
   size?: number;
 }
@@ -28,7 +28,7 @@ function LightningBolt({ size }: { size: number }) {
 }
 
 /** Agora badge icon used across app chrome. */
-export function DittoLogo({ className, size = 40 }: DittoLogoProps) {
+export function AgoraLogo({ className, size = 40 }: AgoraLogoProps) {
   const boltSize = Math.max(12, Math.round(size * 0.56));
 
   return (

@@ -1,6 +1,6 @@
 import { useCallback } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { DittoLogo } from '@/components/DittoLogo';
+import { AgoraLogo } from '@/components/AgoraLogo';
 import { BarsStaggeredIcon } from '@/components/icons/BarsStaggeredIcon';
 import { ArcBackground } from '@/components/ArcBackground';
 import { useNavHidden } from '@/contexts/LayoutContext';
@@ -46,7 +46,7 @@ export function MobileTopBar({ onAvatarClick, hasSubHeader }: MobileTopBarProps)
           {/* Center: Agora lockup */}
           <div className="flex-1 flex items-center justify-center">
             <Link to="/" onClick={handleLogoClick} className="flex items-center gap-2">
-              <DittoLogo size={28} />
+              <AgoraLogo size={28} />
               <div className="flex flex-col leading-none">
                 <span className="text-sm font-black tracking-tight text-foreground">ÁGORA</span>
                 <span className="text-[7px] uppercase tracking-wider text-muted-foreground font-semibold">

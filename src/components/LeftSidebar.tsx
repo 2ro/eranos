@@ -8,7 +8,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { getAvatarShape } from '@/lib/avatarShape';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { DittoLogo } from '@/components/DittoLogo';
+import { AgoraLogo } from '@/components/AgoraLogo';
 import { EmojifiedText } from '@/components/CustomEmoji';
 import { ProfileSearchDropdown } from '@/components/ProfileSearchDropdown';
 import { SidebarNavList } from '@/components/SidebarNavItem';
@@ -90,7 +90,7 @@ export function LeftSidebar() {
       <div className="flex items-center px-3 mb-1">
         <Link to="/" onClick={scrollToTopIfCurrent('/')} className="flex items-center gap-2.5">
           <div className="bg-background/85 rounded-full p-0.5">
-            <DittoLogo size={44} />
+            <AgoraLogo size={44} />
           </div>
           <div className="flex flex-col leading-none">
             <span className="text-xl font-black tracking-tight text-foreground">ÁGORA</span>

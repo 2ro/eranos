@@ -25,7 +25,7 @@ import { parsePackEvent } from '@/lib/packUtils';
 import { PackFeedTab, MemberCard, MemberCardSkeleton } from '@/components/FollowPackDetailContent';
 import { genUserName } from '@/lib/genUserName';
 import { ArcBackground, ARC_OVERHANG_PX } from '@/components/ArcBackground';
-import { DittoLogo } from '@/components/DittoLogo';
+import { AgoraLogo } from '@/components/AgoraLogo';
 import { Nip05Badge } from '@/components/Nip05Badge';
 import { SubHeaderBar } from '@/components/SubHeaderBar';
 import { TabButton } from '@/components/TabButton';
@@ -229,7 +229,7 @@ function FollowView({ pubkey }: { pubkey: string }) {
           )}
           <Link to="/" className="absolute top-3 left-3">
             <div className="bg-background/85 rounded-full">
-              <DittoLogo size={48} />
+              <AgoraLogo size={48} />
             </div>
           </Link>
         </div>
@@ -443,7 +443,7 @@ function FollowPackView({ addr, relays }: { addr: AddrCoords; relays?: string[] 
             <Skeleton className="w-full h-full rounded-none" />
             <Link to="/" className="absolute top-3 left-3">
               <div className="bg-background/85 rounded-full">
-                <DittoLogo size={48} />
+                <AgoraLogo size={48} />
               </div>
             </Link>
           </div>
@@ -475,7 +475,7 @@ function FollowPackView({ addr, relays }: { addr: AddrCoords; relays?: string[] 
           )}
           <Link to="/" className="absolute top-3 left-3">
             <div className="bg-background/85 rounded-full">
-              <DittoLogo size={48} />
+              <AgoraLogo size={48} />
             </div>
           </Link>
         </div>
