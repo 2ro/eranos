@@ -103,15 +103,15 @@ export interface ThemeTokens {
  */
 export const builtinThemes: Record<'light' | 'dark', CoreThemeColors> = {
   light: {
-    background: '270 50% 97%',
-    text: '270 25% 12%',
-    primary: '270 65% 55%',
+    background: '0 0% 100%',
+    text: '222 47% 11%',
+    primary: '15 90% 48%',
   },
 
   dark: {
-    background: '228 20% 10%',
-    text: '210 40% 98%',
-    primary: '258 70% 60%',
+    background: '0 0% 10%',
+    text: '0 0% 95%',
+    primary: '15 90% 52%',
   },
 };
 

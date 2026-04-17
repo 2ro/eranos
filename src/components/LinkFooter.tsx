@@ -16,7 +16,7 @@ export function LinkFooter({ onNavigate }: LinkFooterProps) {
     <footer className="mt-auto pt-3 pb-3 -mx-1 sidebar:bg-background/85 sidebar:rounded-xl sidebar:p-3">
       <nav className="flex items-center justify-center gap-0.5 flex-wrap" aria-label="Footer links">
         <a
-          href="https://about.ditto.pub"
+          href="https://agora.spot"
           className={chipClass}
           target="_blank"
           rel="noopener noreferrer"
@@ -26,7 +26,7 @@ export function LinkFooter({ onNavigate }: LinkFooterProps) {
         </a>
 
         <a
-          href="https://about.ditto.pub/docs/"
+          href="https://agora.spot"
           className={chipClass}
           target="_blank"
           rel="noopener noreferrer"
@@ -41,7 +41,7 @@ export function LinkFooter({ onNavigate }: LinkFooterProps) {
         </Link>
 
         <a
-          href="https://gitlab.com/soapbox-pub/ditto"
+          href="https://gitlab.com/soapbox-pub/agora-3"
           className={chipClass}
           target="_blank"
           rel="noopener noreferrer"
@@ -55,15 +55,6 @@ export function LinkFooter({ onNavigate }: LinkFooterProps) {
           Changelog
         </Link>
 
-        <a
-          href="https://shakespeare.diy/clone?url=https%3A%2F%2Fgitlab.com%2Fsoapbox-pub%2Fditto.git"
-          className={chipClass}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <span className="text-xs leading-none" aria-hidden>🎭</span>
-          Edit with Shakespeare
-        </a>
       </nav>
     </footer>
   );

@@ -22,7 +22,7 @@ import { useNsecPasteGuard } from "@/hooks/useNsecPasteGuard";
 import type { AppConfig } from "@/contexts/AppContext";
 import { NWCProvider } from "@/contexts/NWCContext";
 import { PROTOCOL_MODE } from "@/lib/dmConstants";
-import { DittoConfigSchema, type DittoConfig } from "@/lib/schemas";
+import { BuildConfigSchema, type BuildConfig } from "@/lib/schemas";
 import { secureStorage } from "@/lib/secureStorage";
 import { EmotionDevProvider } from "@/blobbi/dev/EmotionDevContext";
 import AppRouter from "./AppRouter";
@@ -48,8 +48,8 @@ const queryClient = new QueryClient({
 
 /** Hardcoded fallback values. Always provides every required field. */
 const hardcodedConfig: AppConfig = {
-  appName: "Ditto",
-  appId: "ditto",
+  appName: "Agora",
+  appId: "agora",
   homePage: "feed",
   client: "naddr1qvzqqqru7cpzq7q6z5ns2hm5c8msyv83qwzxpxe52j8c4d4q5m92wsp9sflelkh9qqzkg6t5w3hswjl4yp",
   magicMouse: false,
@@ -159,29 +159,30 @@ const hardcodedConfig: AppConfig = {
 };
 
 /**
- * Parse and validate build-time ditto.json overrides from the env string.
+ * Parse and validate build-time app config overrides from the env string.
  * Returns an empty object when no config file was provided or validation fails.
  */
-function parseDittoConfig(): DittoConfig {
+function parseBuildConfig(): BuildConfig {
   try {
-    const json = JSON.parse(import.meta.env.DITTO_CONFIG);
+    const encodedConfig = import.meta.env.APP_CONFIG ?? import.meta.env.DITTO_CONFIG;
+    const json = JSON.parse(encodedConfig);
     if (!json) return {};
-    return DittoConfigSchema.parse(json);
+    return BuildConfigSchema.parse(json);
   } catch {
     return {};
   }
 }
 
 /**
- * Merge hardcoded defaults with build-time ditto.json overrides.
+ * Merge hardcoded defaults with build-time config overrides.
  * Deep-merges feedSettings so a partial override doesn't erase defaults.
  * Precedence (handled by AppProvider): user localStorage > build-time > hardcoded.
  */
-const dittoConfig = parseDittoConfig();
+const buildConfig = parseBuildConfig();
 const defaultConfig: AppConfig = {
   ...hardcodedConfig,
-  ...dittoConfig,
-  feedSettings: { ...hardcodedConfig.feedSettings, ...dittoConfig.feedSettings },
+  ...buildConfig,
+  feedSettings: { ...hardcodedConfig.feedSettings, ...buildConfig.feedSettings },
 };
 
 export function App() {

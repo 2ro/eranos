@@ -50,7 +50,7 @@ deploy-nsite:
       nsyte deploy ./dist
       -i
       --sec "$NSITE_NBUNKSEC"
-      --name ditto
+      --name agora
       --relays "wss://relay.ditto.pub,wss://relay.nsite.lol,wss://relay.dreamith.to,wss://relay.primal.net"
       --servers "https://blossom.primal.net,https://blossom.ditto.pub,https://blossom.dreamith.to"
       --fallback "/index.html"
@@ -154,24 +154,24 @@ build-apk:
 
     # Copy APK to a predictable artifact path
     - mkdir -p artifacts
-    - cp android/app/build/outputs/apk/release/app-release.apk "artifacts/Ditto.apk"
-    - cp android/app/build/outputs/bundle/release/app-release.aab "artifacts/Ditto.aab"
+    - cp android/app/build/outputs/apk/release/app-release.apk "artifacts/Agora.apk"
+    - cp android/app/build/outputs/bundle/release/app-release.aab "artifacts/Agora.aab"
     - ls -lh artifacts/
 
     # Upload to Generic Packages registry for a stable public download URL
     - |
       curl --fail --header "JOB-TOKEN: ${CI_JOB_TOKEN}" \
-        --upload-file "artifacts/Ditto.apk" \
-        "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/ditto/${CI_COMMIT_TAG}/Ditto-${CI_COMMIT_TAG}.apk"
+        --upload-file "artifacts/Agora.apk" \
+        "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/agora/${CI_COMMIT_TAG}/Agora-${CI_COMMIT_TAG}.apk"
     - |
       curl --fail --header "JOB-TOKEN: ${CI_JOB_TOKEN}" \
-        --upload-file "artifacts/Ditto.aab" \
-        "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/ditto/${CI_COMMIT_TAG}/Ditto-${CI_COMMIT_TAG}.aab"
+        --upload-file "artifacts/Agora.aab" \
+        "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/agora/${CI_COMMIT_TAG}/Agora-${CI_COMMIT_TAG}.aab"
 
   artifacts:
     paths:
-      - artifacts/Ditto.apk
-      - artifacts/Ditto.aab
+      - artifacts/Agora.apk
+      - artifacts/Agora.aab
     expire_in: 90 days
   cache:
     key: android-gradle
@@ -194,7 +194,7 @@ release:
       VERSION="${CI_COMMIT_TAG#v}"
       RELEASE_NOTES=$(awk "/^## \\[${VERSION}\\]/{found=1; next} /^## \\[/{if(found) exit} found{print}" CHANGELOG.md)
       if [ -z "$RELEASE_NOTES" ]; then
-        RELEASE_NOTES="Ditto ${CI_COMMIT_TAG}"
+        RELEASE_NOTES="Agora ${CI_COMMIT_TAG}"
       fi
     - echo "$RELEASE_NOTES" > release-notes.md
   release:
@@ -203,11 +203,11 @@ release:
     description: './release-notes.md'
     assets:
       links:
-        - name: Ditto-${CI_COMMIT_TAG}.apk
-          url: ${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/ditto/${CI_COMMIT_TAG}/Ditto-${CI_COMMIT_TAG}.apk
+        - name: Agora-${CI_COMMIT_TAG}.apk
+          url: ${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/agora/${CI_COMMIT_TAG}/Agora-${CI_COMMIT_TAG}.apk
           link_type: package
-        - name: Ditto-${CI_COMMIT_TAG}.aab
-          url: ${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/ditto/${CI_COMMIT_TAG}/Ditto-${CI_COMMIT_TAG}.aab
+        - name: Agora-${CI_COMMIT_TAG}.aab
+          url: ${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/agora/${CI_COMMIT_TAG}/Agora-${CI_COMMIT_TAG}.aab
           link_type: package
 
 publish-zapstore:
@@ -230,7 +230,7 @@ publish-zapstore:
     - mkdir -p ~/.config/zsp/bunker-keys
     - echo "$ZAPSTORE_CLIENT_KEY" > ~/.config/zsp/bunker-keys/${BUNKER_PUBKEY}.key
 
-    - APK_PATH="artifacts/Ditto.apk"
+    - APK_PATH="artifacts/Agora.apk"
     - VERSION="${CI_COMMIT_TAG#v}"
     - sed -i "2i release_source:\ ./${APK_PATH}" zapstore.yaml
     - sed -i "2i version:\ ${VERSION}" zapstore.yaml
@@ -252,8 +252,8 @@ publish-google-play:
     # Upload the AAB to Google Play production track
     - >-
       fastlane supply
-      --aab artifacts/Ditto.aab
-      --package_name pub.ditto.app
+      --aab artifacts/Agora.aab
+      --package_name pub.agora.app
       --track production
       --json_key /tmp/play-service-account.json
       --skip_upload_metadata

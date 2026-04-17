@@ -7,10 +7,10 @@ if (keystorePropertiesFile.exists()) {
 }
 
 android {
-    namespace = "pub.ditto.app"
+    namespace = "pub.agora.app"
     compileSdk = rootProject.ext.compileSdkVersion
     defaultConfig {
-        applicationId "pub.ditto.app"
+        applicationId "pub.agora.app"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1

@@ -33,7 +33,7 @@ function parseArgs() {
   const args = process.argv.slice(2);
   const result = {
     relays: [],
-    name: 'Ditto',
+    name: 'Agora',
     timeout: 300, // seconds
   };
 
@@ -54,9 +54,9 @@ function parseArgs() {
 
 Options:
   --relay <url>    Relay URL for NIP-46 communication (repeatable)
-                   Default: wss://relay.ditto.pub
+                   Default: wss://relay.agora.spot
   --name <name>    Application name shown to the signer
-                   Default: Ditto
+                   Default: Agora
   --timeout <sec>  How long to wait for signer approval (seconds)
                    Default: 300 (5 minutes)
   --help, -h       Show this help message
@@ -66,7 +66,7 @@ Options:
   }
 
   if (result.relays.length === 0) {
-    result.relays.push('wss://relay.ditto.pub');
+    result.relays.push('wss://relay.agora.spot');
   }
 
   return result;

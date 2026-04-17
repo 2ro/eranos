@@ -39,10 +39,10 @@ export const FAQ_CATEGORIES: FAQCategory[] = [
     items: [
       {
         id: 'what-is-ditto',
-        question: 'What is Ditto?',
+        question: 'What is Agora?',
         answer: [
-          'Ditto is a social media platform built on Nostr \u2014 a new kind of open, decentralized network. Think of Ditto as the app you\'re using right now to connect with people, post, and discover content.',
-          'Because Ditto is built on Nostr, your account isn\'t locked to this site. You own your identity and can take it to any other Nostr app. Learn more at [soapbox.pub/ditto](https://soapbox.pub/ditto).',
+          'Agora is a social media platform built on Nostr \u2014 a new kind of open, decentralized network. Think of Agora as the app you\'re using right now to connect with people, post, and discover content.',
+          'Because Agora is built on Nostr, your account isn\'t locked to this site. You own your identity and can take it to any other Nostr app.',
         ],
       },
       {
@@ -55,9 +55,9 @@ export const FAQ_CATEGORIES: FAQCategory[] = [
       },
       {
         id: 'login-other-apps',
-        question: 'Can I log into other Nostr apps with my Ditto account?',
+        question: 'Can I log into other Nostr apps with my Agora account?',
         answer: [
-          'Yes! Your Ditto account **is** a Nostr account. You can use the same keys to log into any Nostr app \u2014 Primal, Damus, Amethyst, Coracle, and many more. Your posts, followers, and profile carry over everywhere.',
+          'Yes! Your Agora account **is** a Nostr account. You can use the same keys to log into any Nostr app \u2014 Primal, Damus, Amethyst, Coracle, and many more. Your posts, followers, and profile carry over everywhere.',
           'Explore the full range of Nostr apps at [nostrapps.com](https://nostrapps.com/).',
         ],
       },
@@ -87,9 +87,9 @@ export const FAQ_CATEGORIES: FAQCategory[] = [
       },
       {
         id: 'cost-to-use',
-        question: 'Does Ditto cost anything?',
+        question: 'Does Agora cost anything?',
         answer: [
-          '**Nope!** Ditto is completely free to use. Zaps (tips) are optional and just for fun. There are no premium tiers, no paywalls, no hidden fees.',
+          '**Nope!** Agora is completely free to use. Zaps (tips) are optional and just for fun. There are no premium tiers, no paywalls, no hidden fees.',
         ],
       },
       {
@@ -113,7 +113,7 @@ export const FAQ_CATEGORIES: FAQCategory[] = [
         question: 'Can I download this on the App Store or Google Play?',
         answer: [
           'This site works as a web app right from your browser \u2014 no download needed! You can also "Add to Home Screen" on your phone to get an app-like experience.',
-          'On Android, you can download Ditto from [Zap Store](https://zapstore.dev/apps/pub.ditto.app), a community-driven app store for the Nostr ecosystem. iOS support is planned for the future \u2014 stay tuned!',
+          'On Android, you can download Agora from [Zap Store](https://zapstore.dev/apps/pub.agora.app), a community-driven app store for the Nostr ecosystem. iOS support is planned for the future \u2014 stay tuned!',
         ],
       },
       {
@@ -128,7 +128,7 @@ export const FAQ_CATEGORIES: FAQCategory[] = [
         id: 'nostr-app-store',
         question: 'Is there a Nostr-specific app store?',
         answer: [
-          'Yes! [Zap Store](https://zapstore.dev/) is a community-driven app store built specifically for the Nostr ecosystem. You can discover and download Nostr apps, and the apps are verified by the community rather than a corporation. Ditto is listed there \u2014 [get it on Zap Store](https://zapstore.dev/apps/pub.ditto.app).',
+          'Yes! [Zap Store](https://zapstore.dev/) is a community-driven app store built specifically for the Nostr ecosystem. You can discover and download Nostr apps, and the apps are verified by the community rather than a corporation. Agora is listed there \u2014 [get it on Zap Store](https://zapstore.dev/apps/pub.agora.app).',
           'You can also browse a directory of Nostr apps at [nostrapps.com](https://nostrapps.com/).',
         ],
       },
@@ -298,15 +298,15 @@ export const FAQ_CATEGORIES: FAQCategory[] = [
         question: 'What does "open source" mean, and why does it matter?',
         answer: [
           'Open source means the code that powers this app is publicly available for anyone to read, verify, and improve. There are no hidden algorithms, no secret data collection, and no backdoors.',
-          'Anyone can check exactly what the software does. It\'s the digital equivalent of a restaurant with a glass kitchen \u2014 nothing to hide. You can browse the [Ditto source code](https://gitlab.com/soapbox-pub/ditto) yourself, or if you want to try editing Ditto, you can jump right in with [Shakespeare](https://shakespeare.diy/clone?url=https%3A%2F%2Fgitlab.com%2Fsoapbox-pub%2Fditto.git).',
+          'Anyone can check exactly what the software does. It\'s the digital equivalent of a restaurant with a glass kitchen \u2014 nothing to hide. You can browse the [Agora source code](https://gitlab.com/soapbox-pub/agora-3) yourself.',
         ],
       },
       {
         id: 'self-host',
-        question: 'Can I self-host Ditto?',
+        question: 'Can I self-host Agora?',
         answer: [
-          'Yes! Because Ditto is open source, anyone can run their own instance. You get full control over your server, your data, and your community.',
-          'If you\'re interested, check out the [self-hosting guide](https://about.ditto.pub/self-hosting) to get started.',
+          'Yes! Because Agora is open source, anyone can run their own instance. You get full control over your server, your data, and your community.',
+          'If you\'re interested, check out the project README for self-hosting and deployment steps.',
         ],
       },
       {
@@ -314,7 +314,7 @@ export const FAQ_CATEGORIES: FAQCategory[] = [
         question: 'Who made this?',
         answer: [
           'This platform is built by [Soapbox](https://soapbox.pub), a team of developers who believe social media should be owned by its users, not corporations.',
-          'Soapbox builds open-source tools for the Nostr ecosystem, including Ditto (the server that powers this site). You can learn more about the team and their mission at [soapbox.pub](https://soapbox.pub).',
+          'Soapbox builds open-source tools for the Nostr ecosystem. You can learn more about the team and their mission at [soapbox.pub](https://soapbox.pub).',
         ],
       },
     ],

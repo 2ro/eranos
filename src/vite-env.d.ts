@@ -15,6 +15,8 @@ interface ImportMetaEnv {
   readonly COMMIT_SHA: string;
   /** Git tag for the current commit (e.g., "v2.0.0"). Empty string if untagged (pre-release build). */
   readonly COMMIT_TAG: string;
-  /** Build-time configuration injected from ditto.json as a JSON string. `"null"` when no config file was provided. */
+  /** Build-time configuration injected from agora.json as a JSON string. `"null"` when no config file was provided. */
+  readonly APP_CONFIG: string;
+  /** @deprecated Backwards-compatible alias for APP_CONFIG. */
   readonly DITTO_CONFIG: string;
 }

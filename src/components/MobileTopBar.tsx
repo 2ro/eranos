@@ -43,10 +43,16 @@ export function MobileTopBar({ onAvatarClick, hasSubHeader }: MobileTopBarProps)
             </button>
           </div>
 
-          {/* Center: Ditto logo */}
+          {/* Center: Agora lockup */}
           <div className="flex-1 flex items-center justify-center">
-            <Link to="/" onClick={handleLogoClick}>
+            <Link to="/" onClick={handleLogoClick} className="flex items-center gap-2">
               <DittoLogo size={28} />
+              <div className="flex flex-col leading-none">
+                <span className="text-sm font-black tracking-tight text-foreground">ÁGORA</span>
+                <span className="text-[7px] uppercase tracking-wider text-muted-foreground font-semibold">
+                  Power to the people
+                </span>
+              </div>
             </Link>
           </div>
 

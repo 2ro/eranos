@@ -122,7 +122,7 @@ export function LetterPreferencesSection() {
                 <span className="text-muted-foreground flex-1">
                   Using your{' '}
                   <Link to="/settings" className="text-primary font-medium hover:underline">
-                    Ditto theme
+                    Agora theme
                   </Link>
                   {' '}as stationery
                 </span>

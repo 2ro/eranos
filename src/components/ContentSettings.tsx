@@ -254,7 +254,7 @@ function FeedTabsSection() {
     return stored ? JSON.parse(stored) : null;
   });
 
-  const [showDittoFeed, setShowDittoFeed] = useState(() => {
+  const [showAgoraFeed, setShowAgoraFeed] = useState(() => {
     const stored = localStorage.getItem('ditto:showDittoFeed');
     return stored !== null ? stored === 'true' : true; // Default to true
   });
@@ -269,14 +269,14 @@ function FeedTabsSection() {
     return stored !== null ? stored === 'true' : false; // Default to false
   });
 
-  const handleToggleDittoFeed = async (checked: boolean) => {
-    setShowDittoFeed(checked);
+  const handleToggleAgoraFeed = async (checked: boolean) => {
+    setShowAgoraFeed(checked);
     localStorage.setItem('ditto:showDittoFeed', String(checked));
     toast({
-      title: checked ? 'Ditto feed enabled' : 'Ditto feed disabled',
+      title: checked ? 'Agora feed enabled' : 'Agora feed disabled',
       description: checked
-        ? 'The Ditto feed tab will appear in your navigation'
-        : 'The Ditto feed tab will be hidden',
+        ? 'The Agora feed tab will appear in your navigation'
+        : 'The Agora feed tab will be hidden',
     });
   };
 
@@ -447,12 +447,12 @@ function FeedTabsSection() {
       <div className="border-b border-border">
         <div className="flex items-center justify-between py-3.5 px-3">
           <div className="min-w-0">
-            <Label className="text-sm font-medium">Ditto Feed</Label>
-            <p className="text-xs text-muted-foreground mt-0.5">Show trending and curated content from the Ditto relay</p>
+            <Label className="text-sm font-medium">Agora Feed</Label>
+            <p className="text-xs text-muted-foreground mt-0.5">Show trending and curated content from Agora relays</p>
           </div>
           <Switch
-            checked={showDittoFeed}
-            onCheckedChange={handleToggleDittoFeed}
+            checked={showAgoraFeed}
+            onCheckedChange={handleToggleAgoraFeed}
             className="shrink-0"
           />
         </div>
@@ -508,7 +508,7 @@ function FeedTabsSection() {
         {!community ? (
           <div className="flex gap-2">
             <Input
-              placeholder="ditto.pub"
+              placeholder="agora.spot"
               value={communityDomain}
               onChange={(e) => setCommunityDomain(e.target.value)}
               onKeyDown={(e) => {

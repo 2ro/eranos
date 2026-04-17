@@ -1,13 +1,12 @@
-repository: https://gitlab.com/soapbox-pub/ditto
+repository: https://gitlab.com/soapbox-pub/agora-3
 
-name: Ditto
+name: Agora
 
-summary: Your content. Your vibe. Your rules.
+summary: Power to the people.
 
 description: |
-  Ditto is an open-source Nostr client. Your content. Your vibe. Your rules,
-  and all the other stuff: games, treasure hunts, magic decks, live streams,
-  color moments, and more.
+  Agora is an open-source Nostr client built from the Ditto codebase, focused on
+  customization, creativity, and open social interoperability on Nostr.
 
   Features:
   - Theming — 9 built-in presets, shareable themes
@@ -25,7 +24,7 @@ tags:
 
 license: AGPL-3.0
 
-website: https://ditto.pub
+website: https://agora.spot
 
 icon: ./public/logo.png
 

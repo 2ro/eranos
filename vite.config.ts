@@ -8,15 +8,15 @@ import react from "@vitejs/plugin-react";
 import { visualizer } from "rollup-plugin-visualizer";
 import { defineConfig, loadEnv, type Plugin } from "vite";
 
-import { DittoConfigSchema } from "./src/lib/schemas";
+import { BuildConfigSchema } from "./src/lib/schemas";
 
 /**
- * Load and validate the build-time ditto.json configuration file.
+ * Load and validate the build-time app configuration file.
  * Returns the parsed config object, or `undefined` if the file doesn't exist.
- * Set the CONFIG_FILE env var to override the default path ("./ditto.json").
+ * Set the CONFIG_FILE env var to override the default path ("./agora.json").
  */
-function loadDittoConfig(): object | undefined {
-  const configPath = path.resolve(process.env.CONFIG_FILE ?? "./ditto.json");
+function loadBuildConfig(): object | undefined {
+  const configPath = path.resolve(process.env.CONFIG_FILE ?? "./agora.json");
 
   let raw: string;
   try {
@@ -27,7 +27,7 @@ function loadDittoConfig(): object | undefined {
   }
 
   const json = JSON.parse(raw);
-  const result = DittoConfigSchema.parse(json);
+  const result = BuildConfigSchema.parse(json);
   return result;
 }
 
@@ -61,7 +61,7 @@ function mergePublicDir(externalDir: string): Plugin {
   const resolved = path.resolve(externalDir);
 
   return {
-    name: "ditto:merge-public-dir",
+    name: "agora:merge-public-dir",
 
     configureServer(server) {
       // Serve files from the external public dir before the default public dir.
@@ -94,7 +94,7 @@ function mergePublicDir(externalDir: string): Plugin {
   };
 }
 
-const dittoConfig = loadDittoConfig();
+const buildConfig = loadBuildConfig();
 const publicDir = process.env.PUBLIC_DIR;
 const require = createRequire(import.meta.url);
 const pkg = require("./package.json") as { version: string };
@@ -139,7 +139,8 @@ export default defineConfig(({ mode }) => {
     ...(publicDir ? [mergePublicDir(publicDir)] : []),
   ],
   define: {
-    'import.meta.env.DITTO_CONFIG': JSON.stringify(JSON.stringify(dittoConfig ?? null)),
+    'import.meta.env.APP_CONFIG': JSON.stringify(JSON.stringify(buildConfig ?? null)),
+    'import.meta.env.DITTO_CONFIG': JSON.stringify(JSON.stringify(buildConfig ?? null)),
     'import.meta.env.VERSION': JSON.stringify(pkg.version),
     'import.meta.env.BUILD_DATE': JSON.stringify(new Date().toISOString()),
     'import.meta.env.COMMIT_SHA': JSON.stringify(getCommitSha()),

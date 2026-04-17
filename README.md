@@ -1,12 +1,12 @@
-# Ditto
+# Agora
 
-Your content. Your vibe. Your rules. A fun, customizable [Nostr](https://nostr.com/) client that puts you in control.
+Power to the people. A customizable [Nostr](https://nostr.com/) client that puts identity and community ownership first.
 
-**[ditto.pub](https://ditto.pub)** | **[Docs](https://docs.ditto.pub)** | **[Source](https://gitlab.com/soapbox-pub/ditto)**
+**[agora.spot](https://agora.spot)** | **[Source](https://gitlab.com/soapbox-pub/agora-3)**
 
 ## About
 
-Ditto is an open-source, decentralized social media client built on the Nostr protocol. It's designed for people who want to have fun online without feeding the Big Tech machine. Express yourself with custom themes, Lightning payments, and an ever-growing set of content types -- all while owning your identity and data.
+Agora is an open-source, decentralized social media client built on the Nostr protocol. It is designed for people who want expressive, community-first social software without surrendering ownership of identity or data.
 
 Made by [Soapbox](https://soapbox.pub).
 
@@ -30,8 +30,8 @@ Made by [Soapbox](https://soapbox.pub).
 ### Development
 
 ```sh
-git clone https://gitlab.com/soapbox-pub/ditto.git
-cd ditto
+git clone https://gitlab.com/soapbox-pub/agora-3.git
+cd agora-3
 npm install
 npm run dev
 ```
@@ -56,17 +56,17 @@ npm test
 
 ## Configuration
 
-Ditto is configured through a `ditto.json` file at the project root, read at build time. This file is gitignored so each deployment can have its own configuration.
+Agora is configured through an `agora.json` file at the project root, read at build time. This file is gitignored so each deployment can have its own configuration.
 
 ```jsonc
 {
   "theme": "dark",
   "relayMetadata": {
     "relays": [
-      { "url": "wss://relay.ditto.pub", "read": true, "write": true }
+      { "url": "wss://relay.agora.spot", "read": true, "write": true }
     ]
   },
-  "blossomServers": ["https://blossom.ditto.pub"],
+  "blossomServers": ["https://blossom.agora.spot"],
   "feedSettings": {
     "showPosts": true,
     "showReposts": true,
@@ -79,7 +79,7 @@ Ditto is configured through a `ditto.json` file at the project root, read at bui
 Configuration is resolved in three layers (highest priority first):
 
 1. **User settings** stored in localStorage
-2. **Build config** from `ditto.json`
+2. **Build config** from `agora.json`
 3. **Hardcoded defaults**
 
 Use an alternate config file path with: `CONFIG_FILE=./my-config.json npm run build`
@@ -91,11 +91,11 @@ For self-hosted instances:
 - Replace `public/logo.svg` and `public/logo.png` with your logo
 - Update the app name in `index.html` and `public/manifest.webmanifest`
 - Replace `public/og-image.jpg` for social sharing previews
-- Set default relays and upload servers in `ditto.json`
+- Set default relays and upload servers in `agora.json`
 
 ## Deployment
 
-Ditto builds to static files and can be deployed anywhere that serves HTML.
+Agora builds to static files and can be deployed anywhere that serves HTML.
 
 - **GitHub Pages / GitLab Pages** -- Push to `main` and CI auto-deploys
 - **Netlify / Vercel** -- Connect your fork and deploy. A `_redirects` file is included for SPA routing
@@ -143,11 +143,11 @@ public/           Static assets, icons, manifest
 We welcome contributions but have high standards. Please read the full [Contributing Guide](CONTRIBUTING.md) before submitting a merge request. The short version:
 
 - **Bug fixes**: One bug, one MR. Keep it small and focused.
-- **New features**: Must link to an existing issue and align with the [Ditto Philosophy](https://about.ditto.pub/philosophy).
+- **New features**: Must link to an existing issue and align with the product vision.
 - **Required**: Live preview URL, before/after screenshots, completed self-review checklist.
 - **Required tools**: Claude Opus 4.6 (or latest frontier model), an AI coding agent with plan mode.
 
-Read the [Ditto Philosophy](https://about.ditto.pub/philosophy) to understand what Ditto is and isn't.
+Read the project docs and `AGENTS.md` to understand what Agora is and isn't.
 
 ## License
 

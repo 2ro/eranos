@@ -410,11 +410,11 @@ export function StationeryPicker({ selected, onSelect }: StationeryPickerProps) 
           {isThemesTab && (
             <>
               <DialogHeader>
-                <DialogTitle>Ditto themes</DialogTitle>
+                <DialogTitle>Agora themes</DialogTitle>
               </DialogHeader>
               <div className="space-y-3 text-sm text-muted-foreground">
                 <p>
-                  Ditto themes are UI themes shared by the community. Letters borrows their colors and fonts to style your letter.
+                  Agora themes are UI themes shared by the community. Letters borrow their colors and fonts to style your letter.
                 </p>
                 <p>
                   <Link

@@ -88,9 +88,15 @@ export function LeftSidebar() {
     <aside className="flex flex-col h-screen sticky top-0 py-3 px-4 w-[300px] shrink-0">
       {/* Logo */}
       <div className="flex items-center px-3 mb-1">
-        <Link to="/" onClick={scrollToTopIfCurrent('/')}>
-          <div className="bg-background/85 rounded-full">
-            <DittoLogo size={48} />
+        <Link to="/" onClick={scrollToTopIfCurrent('/')} className="flex items-center gap-2.5">
+          <div className="bg-background/85 rounded-full p-0.5">
+            <DittoLogo size={44} />
+          </div>
+          <div className="flex flex-col leading-none">
+            <span className="text-xl font-black tracking-tight text-foreground">ÁGORA</span>
+            <span className="text-[8px] uppercase tracking-wider text-muted-foreground font-semibold mt-0.5">
+              Power to the people
+            </span>
           </div>
         </Link>
       </div>

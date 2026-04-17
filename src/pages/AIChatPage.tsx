@@ -173,7 +173,7 @@ function useToolExecutor() {
 
 const SYSTEM_PROMPT: ChatMessage = {
   role: 'system',
-  content: `You are Dork, extraordinaire. You are an AI assistant integrated into Ditto, a Nostr social client. You can help users with questions, conversations, and tasks.
+  content: `You are Dork, extraordinaire. You are an AI assistant integrated into Agora, a Nostr social client. You can help users with questions, conversations, and tasks.
 
 You have a set_theme tool that applies a full custom theme. It supports:
 

@@ -180,9 +180,9 @@ export interface SavedFeed {
 }
 
 export interface AppConfig {
-  /** Application display name used in page titles, UI text, and branding. Default: "Ditto". */
+  /** Application display name used in page titles, UI text, and branding. Default: "Agora". */
   appName: string;
-  /** Application identifier used as a prefix for application-specific metadata (NIP-78 d-tags, etc). Default: "ditto". */
+  /** Application identifier used as a prefix for application-specific metadata (NIP-78 d-tags, etc). Default: "agora". */
   appId: string;
   /** Sidebar item ID to display on the homepage ("/"). Default: "feed". */
   homePage: string;
@@ -241,7 +241,7 @@ export interface AppConfig {
   savedFeeds: SavedFeed[];
   /** Image upload quality: "compressed" resizes/optimizes, "original" uploads as-is. Default: "compressed". */
   imageQuality: 'compressed' | 'original';
-  /** Hex pubkey of the curator whose follow list defines the Ditto feed. */
+  /** Hex pubkey of the curator whose follow list defines the curated feed. */
   curatorPubkey?: string;
   /** Wildcard domain used for iframe sandboxing (e.g. "iframe.diy"). Default: "iframe.diy". */
   sandboxDomain: string;

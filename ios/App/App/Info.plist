@@ -7,7 +7,7 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>en</string>
 	<key>CFBundleDisplayName</key>
-        <string>Ditto</string>
+        <string>Agora</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
@@ -48,11 +48,11 @@
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<true/>
 	<key>NSPhotoLibraryUsageDescription</key>
-	<string>Ditto needs access to your photo library to upload images to your posts and profile.</string>
+	<string>Agora needs access to your photo library to upload images to your posts and profile.</string>
 	<key>NSCameraUsageDescription</key>
-	<string>Ditto needs camera access to take photos and videos for your posts.</string>
+	<string>Agora needs camera access to take photos and videos for your posts.</string>
 	<key>NSMicrophoneUsageDescription</key>
-	<string>Ditto needs access to your microphone to record voice messages.</string>
+	<string>Agora needs access to your microphone to record voice messages.</string>
 	<key>ITSAppUsesNonExemptEncryption</key>
 	<false/>
 	<key>UIBackgroundModes</key>
@@ -61,7 +61,7 @@
 	</array>
 	<key>BGTaskSchedulerPermittedIdentifiers</key>
 	<array>
-		<string>pub.ditto.app.notification-refresh</string>
+		<string>pub.agora.app.notification-refresh</string>
 	</array>
 </dict>
 </plist>

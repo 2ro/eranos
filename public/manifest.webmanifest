@@ -1,11 +1,11 @@
 {
-  "name": "Ditto",
-  "short_name": "Ditto",
-  "description": "A carnival, not a platform. Color, whimsy, games, and endless customization — the most fun you've had on the internet in years.",
+  "name": "Agora",
+  "short_name": "Agora",
+  "description": "Power to the people. Organize, create, and connect across the open Nostr network.",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#161b2e",
-  "theme_color": "#7c3aed",
+  "background_color": "#0a0c14",
+  "theme_color": "#e85d3c",
   "icons": [
     {
       "src": "/icon-192.png",

@@ -22,8 +22,8 @@ export function TestApp({ children }: TestAppProps) {
   });
 
   const defaultConfig: AppConfig = {
-    appName: "Ditto",
-    appId: "ditto",
+    appName: "Agora",
+    appId: "agora",
     homePage: "feed",
     theme: "light",
     autoShareTheme: true,

@@ -256,19 +256,24 @@ export const AppConfigSchema = z.object({
   })).optional(),
 });
 
-// ─── DittoConfigSchema (build-time ditto.json) ───────────────────────
+// ─── BuildConfigSchema (build-time app config) ───────────────────────
 
 /**
- * Schema for the build-time `ditto.json` configuration file.
+ * Schema for the build-time app configuration file (`agora.json` by default).
  * Derived from AppConfigSchema with all fields made optional and strict
  * mode enabled so unknown keys are rejected.
  */
-export const DittoConfigSchema = AppConfigSchema
+export const BuildConfigSchema = AppConfigSchema
   .partial()
   .strict();
 
 /** Inferred type for the build-time configuration. */
-export type DittoConfig = z.infer<typeof DittoConfigSchema>;
+export type BuildConfig = z.infer<typeof BuildConfigSchema>;
+
+/** @deprecated Use BuildConfigSchema instead. Kept for backwards compatibility. */
+export const DittoConfigSchema = BuildConfigSchema;
+/** @deprecated Use BuildConfig instead. Kept for backwards compatibility. */
+export type DittoConfig = BuildConfig;
 
 // ─── Content Filter Schemas ──────────────────────────────────────────
 
