@@ -1,11 +1,13 @@
-import { lazy, Suspense, useEffect, useState } from 'react';
+import { lazy, Suspense, useEffect, useMemo, useState } from 'react';
 import { useSeoMeta } from '@unhead/react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useAppContext } from '@/hooks/useAppContext';
 import { useGlobalActivity, useTopCountryHashtags } from '@/hooks/useGlobalActivity';
+import { useEphemeralEvents } from '@/hooks/useEphemeralEvents';
 import { useLayoutOptions } from '@/contexts/LayoutContext';
 import { WorldDiscoveryDrawer } from '@/components/world/WorldDiscoveryDrawer';
 import { WorldDiscoveryPanel } from '@/components/world/WorldDiscoveryPanel';
+import { ChatDialog } from '@/components/chat/ChatDialog';
 
 // Lazy-load the map: react-leaflet + leaflet pull in ~150 KB of JS that we
 // don't want to ship with the rest of the app shell.
@@ -47,6 +49,27 @@ export function WorldPage() {
 
   const { data: activities } = useGlobalActivity();
   const { data: topHashtags } = useTopCountryHashtags();
+  const { data: ephemeralEvents } = useEphemeralEvents();
+  const [activeChatGeohash, setActiveChatGeohash] = useState<string | null>(null);
+
+  // Memoise the per-geohash slice so `ChatDialog` (and its `useChatSession`
+  // effects) get a stable array reference across renders — without this,
+  // every WorldPage re-render would feed a fresh array into ChatDialog,
+  // re-firing every dependent effect and risking ref-callback storms.
+  const chatInitialEvents = useMemo(
+    () =>
+      activeChatGeohash
+        ? ephemeralEvents?.filter((e) => e.geohash === activeChatGeohash) ?? []
+        : [],
+    [activeChatGeohash, ephemeralEvents],
+  );
+
+  // Memoise the activities/hashtags fallbacks too — `new Map()` literals
+  // produce a fresh reference every render, which causes WorldMap's
+  // `activityMarkers` useMemo (and downstream popover refs) to invalidate
+  // even when the underlying data hasn't changed.
+  const safeActivities = useMemo(() => activities ?? new Map<string, number>(), [activities]);
+  const safeTopHashtags = useMemo(() => topHashtags ?? new Map<string, string>(), [topHashtags]);
 
   // `fullBleed: true` is the new reusable preset for edge-to-edge pages —
   // see `LayoutOptions.fullBleed` for the full list of flags it expands to.
@@ -73,7 +96,12 @@ export function WorldPage() {
         }
       >
         <div className="absolute inset-0">
-          <WorldMap activities={activities ?? new Map()} topHashtags={topHashtags ?? new Map()} />
+          <WorldMap
+            activities={safeActivities}
+            topHashtags={safeTopHashtags}
+            ephemeralEvents={ephemeralEvents}
+            onOpenChat={setActiveChatGeohash}
+          />
         </div>
       </Suspense>
 
@@ -83,6 +111,17 @@ export function WorldPage() {
           conditionally rather than CSS-hiding so vaul's drag handlers and
           listeners aren't running on desktop where the drawer is invisible. */}
       {!hasSidebar && <WorldDiscoveryDrawer container={pageEl} activities={activities} />}
+
+      {/* Per-geohash realtime chat. Only mounted while open so the relay
+          subscription tears down cleanly when the dialog closes. */}
+      {activeChatGeohash && (
+        <ChatDialog
+          isOpen={!!activeChatGeohash}
+          onClose={() => setActiveChatGeohash(null)}
+          geohash={activeChatGeohash}
+          initialEvents={chatInitialEvents}
+        />
+      )}
     </div>
   );
 }
