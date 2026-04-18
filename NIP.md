@@ -12,9 +12,10 @@
 
 ### Agora Kinds
 
-| Kind  | Name                 | Description                                           |
-|-------|----------------------|-------------------------------------------------------|
-| 36639 | Activist Action      | Country-scoped activist challenge with a sats bounty  |
+| Kind  | Name                       | Description                                                    |
+|-------|----------------------------|----------------------------------------------------------------|
+| 30385 | Community Stats Snapshot   | Pre-computed per-country / global community leaderboards       |
+| 36639 | Activist Action            | Country-scoped activist challenge with a sats bounty           |
 
 ### Community Kinds
 
@@ -379,6 +380,120 @@ Per country:
 ```
 
 After fetching, clients MUST filter the results down to events whose author is either an admin or an organizer for the event's country.
+
+---
+
+## Kind 30385: Community Stats Snapshot
+
+### Summary
+
+Addressable event kind for **pre-computed community statistics** (per-country and global). A trusted off-app indexer (the "stats bot") publishes one event per scope:
+
+- **Per-country**: `d` tag is `iso3166:XX` (ISO 3166-1 alpha-2 country code).
+- **Global**: `d` tag is `iso3166:ZZ` — `ZZ` is the ISO 3166-1 user-assigned code Agora uses for the cross-country aggregate.
+
+Each event contains aggregate counts (comments, authors, zaps, submissions) and ranked leaderboards (top posters, trending hashtags, top zapped authors, top donors, top actions) across multiple time windows (`7d`, `30d`, `90d`, all-time). Storing pre-computed leaderboards in a single event lets clients render community pages without scanning thousands of underlying events.
+
+### Trust model
+
+Anyone can publish kind 30385, but clients MUST only consume events from trusted authors:
+
+- **Per-country events**: trusted authors are platform admins (`src/lib/admins.ts`) **plus** appointed organizers for that specific country (kind 30078 `agora-organizers`).
+- **Global event** (`iso3166:ZZ`): trusted authors are platform admins only.
+
+When multiple trusted events exist for the same scope, clients pick the most recent by `created_at`.
+
+### Event Structure
+
+```json
+{
+  "kind": 30385,
+  "content": "",
+  "tags": [
+    ["d", "iso3166:US"],
+
+    ["comment_cnt", "12345"],
+    ["comment_cnt_7d", "789"],
+    ["comment_cnt_30d", "3421"],
+    ["comment_cnt_90d", "9876"],
+    ["author_cnt", "543"],
+    ["zap_amount", "123456789"],
+    ["zap_cnt", "1234"],
+    ["submission_cnt", "456"],
+
+    ["top_poster", "<pubkey-hex>", "987"],
+    ["top_poster_7d", "<pubkey-hex>", "42"],
+
+    ["trending_hashtag", "climate", "321"],
+    ["trending_hashtag_7d", "protest", "67"],
+
+    ["top_zapped", "<pubkey-hex>", "<totalSats>", "<postCount>", "<avgSats>", "<zapCount>"],
+    ["top_donor", "<pubkey-hex>", "<totalSats>", "<zapCount>"],
+
+    ["top_action", "36639:<pubkey>:<d-tag>", "Plant a tree", "<submissions>", "<bounty>", "<zapAmountSats>"]
+  ]
+}
+```
+
+### Tag families
+
+All numeric values are unsigned integers serialised as base-10 strings.
+
+#### Aggregate counts (one tag per metric per timeframe)
+
+| Tag base name      | Meaning                                                |
+|--------------------|--------------------------------------------------------|
+| `comment_cnt`      | Number of NIP-22 comments in scope                     |
+| `author_cnt`       | Distinct author pubkeys in scope                       |
+| `zap_amount`       | Total zap amount in **sats**                           |
+| `zap_cnt`          | Number of NIP-57 zap receipts                          |
+| `submission_cnt`   | Submissions to activist actions (kind 36639)           |
+
+Each is published as four tags: bare (`<base>`, all-time), `<base>_7d`, `<base>_30d`, `<base>_90d`.
+
+#### Leaderboards (repeated; one tag per row, ordered by rank)
+
+All-time variants use the bare tag name; windowed variants use the `_7d`, `_30d`, `_90d` suffixes.
+
+| Tag base name        | Positional fields                                                                              |
+|----------------------|-----------------------------------------------------------------------------------------------|
+| `top_poster`         | `[name, pubkeyHex, count]`                                                                    |
+| `trending_hashtag`   | `[name, hashtag, count]`                                                                      |
+| `top_zapped`         | `[name, pubkeyHex, totalSats, postCount, avgSats, zapCount]` (`zapCount` optional, legacy)    |
+| `top_donor`          | `[name, pubkeyHex, totalSats, zapCount]`                                                      |
+| `top_action`         | `[name, "36639:<pubkey>:<d>", title, submissions, bounty, zapAmountSats]`                     |
+
+Clients SHOULD parse defensively — accept missing trailing fields as `0` or omitted to maintain backwards compatibility as the schema evolves.
+
+### Content
+
+Empty string. All data lives in tags so relays can index/filter and clients don't need to parse JSON.
+
+### Discovery
+
+Per-country snapshot:
+
+```json
+{
+  "kinds": [30385],
+  "authors": [<admin and organizer pubkeys>],
+  "#d": ["iso3166:US"],
+  "limit": 10
+}
+```
+
+Global snapshot:
+
+```json
+{
+  "kinds": [30385],
+  "authors": [<admin pubkeys>],
+  "#d": ["iso3166:ZZ"],
+  "limit": 10
+}
+```
+
+After fetching, take the event with the highest `created_at` and parse it. Cache for ~1–2 minutes; the producer typically refreshes on a similar cadence.
 
 ---
 

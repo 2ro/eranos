@@ -4,6 +4,7 @@ import { useSeoMeta } from '@unhead/react';
 import { Earth, Search } from 'lucide-react';
 import { PageHeader } from '@/components/PageHeader';
 import { Input } from '@/components/ui/input';
+import { CommunityStatsPanel } from '@/components/CommunityStatsPanel';
 import { useAppContext } from '@/hooks/useAppContext';
 import { COUNTRIES } from '@/lib/countries';
 
@@ -33,6 +34,12 @@ export function WorldPage() {
     <main className="">
       {/* Header */}
       <PageHeader title="World" icon={<Earth className="size-5" />} backTo="/" />
+
+      {/* Global community stats snapshot (kind 30385, d=iso3166:ZZ).
+          Renders nothing when no trusted snapshot exists. */}
+      <div className="px-4 pb-4">
+        <CommunityStatsPanel />
+      </div>
 
       {/* Search */}
       <div className="px-4 pb-4">

@@ -32,6 +32,7 @@ import { usePaginatedFeed } from '@/hooks/usePaginatedFeed';
 import { useInfiniteScroll } from '@/hooks/useInfiniteScroll';
 import { usePinnedPosts } from '@/hooks/usePinnedPosts';
 import { CountryFeedProvider } from '@/components/CountryFeedProvider';
+import { CommunityStatsPanel } from '@/components/CommunityStatsPanel';
 import { Pin } from 'lucide-react';
 import { NoteCard } from '@/components/NoteCard';
 import { useBookReviews } from '@/hooks/useBookReviews';
@@ -342,6 +343,12 @@ export function ExternalContentPage() {
         <CountryFeedProvider countryCode={countryCode}>
           {/* Inline compose box */}
           <ComposeBox compact replyTo={commentRoot} />
+
+          {/* Community stats snapshot (kind 30385) for this country.
+              Renders nothing when no trusted snapshot exists. */}
+          <div className="px-4 pt-2">
+            <CommunityStatsPanel countryCode={countryCode} />
+          </div>
 
           {/* Pinned posts (curated by country organizers/admins). Skipped on
               ISBN/url/unknown content types — only meaningful for country feeds. */}
