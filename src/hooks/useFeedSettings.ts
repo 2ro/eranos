@@ -20,6 +20,7 @@ const DEFAULT_SIDEBAR_ORDER: string[] = [
   'badges',
   'feed',
   'notifications',
+  'communities',
   'profile',
   'settings',
 ];

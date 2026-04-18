@@ -30,6 +30,7 @@ import {
   Smile,
   SmilePlus,
   User,
+  Users,
   Vote,
   WalletMinimal,
   Zap,
@@ -151,6 +152,7 @@ export const SIDEBAR_ITEMS: SidebarItemDef[] = [
   { id: "articles", label: "Articles", path: "/articles", icon: Newspaper },
   { id: "polls", label: "Polls", path: "/polls", icon: Vote },
   { id: "badges", label: "Badges", path: "/badges", icon: Award },
+  { id: "communities", label: "Communities", path: "/communities", icon: Users },
   { id: "world", label: "World", path: "/world", icon: Earth },
 ];
 
@@ -188,6 +190,7 @@ export const CONTENT_KIND_ICONS: Record<string, IconComponent> = {
   emojis: SmilePlus,
   development: Code,
   badges: HelpCircle,
+  communities: Users,
   world: Earth,
   archive: HelpCircle,
   bluesky: HelpCircle,

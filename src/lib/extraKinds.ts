@@ -352,6 +352,18 @@ export const EXTRA_KINDS: ExtraKindDef[] = [
     sites: [{ url: 'https://following.space', name: 'following.space' }, { url: 'https://following.party', name: 'following.party' }],
   },
   {
+    kind: 34550,
+    id: 'communities',
+    showKey: 'showCommunities',
+    feedKey: 'feedIncludeCommunities',
+    label: 'Communities',
+    description: 'Hierarchical communities with ranked membership (NIP-72)',
+    route: 'communities',
+    addressable: true,
+    section: 'social',
+    blurb: 'Hierarchical communities on Nostr with ranked membership, badge-based authority chains, and moderation. Founded and managed by community creators.',
+  },
+  {
     kind: 62,
     id: 'vanish',
     feedKey: 'feedIncludeVanish',
