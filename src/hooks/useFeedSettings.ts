@@ -13,6 +13,7 @@ const DEFAULT_SIDEBAR_ORDER_IDS = [
   'feed',
   'notifications',
   'search',
+  'verified',
   'events',
   'articles',
   'photos',
@@ -62,7 +63,7 @@ const REMOVED_SIDEBAR_IDS = new Set<string>([
 ]);
 
 /** IDs that should be visible for all users after the Agora nav refocus migration. */
-const ENSURE_VISIBLE_IDS = ['world', 'badges', 'changelog', 'wallet'] as const;
+const ENSURE_VISIBLE_IDS = ['world', 'badges', 'changelog', 'wallet', 'verified'] as const;
 
 /**
  * Compute the ordered list of visible sidebar items.

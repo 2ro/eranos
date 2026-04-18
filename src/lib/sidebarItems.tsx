@@ -1,5 +1,6 @@
 import {
   Award,
+  BadgeCheck,
   BookOpen,
   Bell,
   Bookmark,
@@ -32,6 +33,7 @@ import {
   Vote,
   WalletMinimal,
 } from "lucide-react";
+import { VERIFIED_FOLLOW_PACK_PATH } from "@/lib/agoraDefaults";
 import { CardsIcon } from "@/components/icons/CardsIcon";
 import { ChestIcon } from "@/components/icons/ChestIcon";
 
@@ -111,6 +113,12 @@ export const SIDEBAR_ITEMS: SidebarItemDef[] = [
     requiresAuth: true,
   },
   { id: "search", label: "Search", path: "/search", icon: Search },
+  {
+    id: "verified",
+    label: "Verified",
+    path: VERIFIED_FOLLOW_PACK_PATH,
+    icon: BadgeCheck,
+  },
   {
     id: "bookmarks",
     label: "Bookmarks",

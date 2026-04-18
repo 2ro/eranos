@@ -126,6 +126,7 @@ const hardcodedConfig: AppConfig = {
     "feed",
     "notifications",
     "search",
+    "verified",
     "events",
     "articles",
     "photos",
