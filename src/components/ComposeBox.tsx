@@ -1014,6 +1014,16 @@ export function ComposeBox({
 
     tags.push(['alt', `Poll: ${finalContent}`]);
 
+    // Country-scoped polls: attach NIP-73 iso3166 tags so the poll appears in
+    // the country feed (matches Pathos buildPollTags geo-scoping behavior).
+    if (replyTo instanceof URL && replyTo.protocol === 'iso3166:') {
+      const countryIdentifier = replyTo.toString();
+      tags.push(['I', countryIdentifier]);
+      tags.push(['K', 'iso3166']);
+      tags.push(['i', countryIdentifier]);
+      tags.push(['k', 'iso3166']);
+    }
+
     try {
       await createEvent({ kind: 1068, content: finalContent, tags });
       resetComposeState();
