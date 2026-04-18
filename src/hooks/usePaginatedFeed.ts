@@ -14,6 +14,11 @@ interface UsePaginatedFeedOptions {
 
 const DEFAULT_PAGE_SIZE = 20;
 
+// Canonical write tag is `agora-action`. We also accept `pathos-challenge`
+// and `agora-challenge` as read aliases so legacy events stay visible. Keep
+// in sync with `useChallenges.ts`.
+const CHALLENGE_T_ALIASES = ['agora-action', 'pathos-challenge', 'agora-challenge'];
+
 /**
  * Fetches the activity feed with infinite scrolling pagination.
  * 
@@ -40,7 +45,7 @@ export function usePaginatedFeed({
   const feedRelays = useFeedRelays();
 
   return useInfiniteQuery({
-    queryKey: ['pathos-feed-paginated', countryCode, pageSize],
+    queryKey: ['agora-feed-paginated', countryCode, pageSize],
     queryFn: async ({ pageParam, signal: querySignal }) => {
       const signal = AbortSignal.any([querySignal, AbortSignal.timeout(5000)]);
       const until = pageParam as number | undefined;
@@ -57,13 +62,13 @@ export function usePaginatedFeed({
         const filterValues = getCountryFilterValues(countryCode, true);
         filters.push(
           { kinds: [1111, 1068], '#i': filterValues, limit: pageSize, ...(until && { until }) },
-          { kinds: [36639], '#t': ['agora-challenge'], limit: Math.floor(pageSize / 4), ...(until && { until }) }
+          { kinds: [36639], '#t': CHALLENGE_T_ALIASES, limit: Math.floor(pageSize / 4), ...(until && { until }) }
         );
       } else {
         // Global feed - get top posts from around the world
         filters.push(
           { kinds: [1111, 1068], '#k': ['iso3166', 'geo'], limit: pageSize, ...(until && { until }) },
-          { kinds: [36639], '#t': ['agora-challenge'], limit: Math.floor(pageSize / 4), ...(until && { until }) }
+          { kinds: [36639], '#t': CHALLENGE_T_ALIASES, limit: Math.floor(pageSize / 4), ...(until && { until }) }
         );
       }
       
@@ -176,7 +181,7 @@ export function usePaginatedFeedNewPosts(
   const feedRelays = useFeedRelays();
 
   const query = useInfiniteQuery({
-    queryKey: ['pathos-feed-new-posts', countryCode, since],
+    queryKey: ['agora-feed-new-posts', countryCode, since],
     queryFn: async ({ signal: querySignal }) => {
       if (!since) return { events: [], oldestTimestamp: null, totalFetched: 0 };
 
@@ -191,13 +196,13 @@ export function usePaginatedFeedNewPosts(
         const filterValues = getCountryFilterValues(countryCode, true);
         filters.push(
           { kinds: [1111, 1068], '#i': filterValues, since: sinceTimestamp, limit: 20 },
-          { kinds: [36639], '#t': ['agora-challenge'], since: sinceTimestamp, limit: 5 }
+          { kinds: [36639], '#t': CHALLENGE_T_ALIASES, since: sinceTimestamp, limit: 5 }
         );
       } else {
         // Global feed format (if used without country)
         filters.push(
           { kinds: [1111, 1068], '#k': ['iso3166', 'geo'], since: sinceTimestamp, limit: 20 },
-          { kinds: [36639], '#t': ['agora-challenge'], since: sinceTimestamp, limit: 5 }
+          { kinds: [36639], '#t': CHALLENGE_T_ALIASES, since: sinceTimestamp, limit: 5 }
         );
       }
       
