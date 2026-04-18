@@ -10,6 +10,12 @@
 | 16767 | Active Profile Theme | The user's currently active theme (one per user)      |
 | 16769 | Profile Tabs         | The user's custom profile page tabs (one per user)    |
 
+### Agora Kinds
+
+| Kind  | Name                 | Description                                           |
+|-------|----------------------|-------------------------------------------------------|
+| 36639 | Activist Action      | Country-scoped activist challenge with a sats bounty  |
+
 ### Community Kinds
 
 These event kinds were created by community contributors and are supported by Ditto. Full specifications are maintained by their respective authors.
@@ -285,6 +291,94 @@ After resolution (assuming `$follows` = `["pk1", "pk2"]`):
 - To **clear** all tabs: publish a kind 16769 event with no `tab` tags (only `alt`).
 - Clients MUST filter by `authors: [pubkey]` when querying to prevent spoofing.
 - `var` tags are shared across all `tab` tags in the same event.
+
+---
+
+## Kind 36639: Activist Action
+
+### Summary
+
+Addressable event kind for publishing **activist actions** (called "challenges" internally for backwards compatibility). An action is a country-scoped task — take a photo, make art, gather information, or take direct action — with an optional sats bounty paid out via NIP-57 zaps to the best **submissions**.
+
+Submissions are **NIP-22 comments** (kind 1111) authored under the action's coordinate, ranked by zap totals. There is no separate submission kind; an earlier draft (kind 36640) was deprecated in favor of NIP-22 reuse.
+
+### Trust model
+
+Anyone can publish a kind 36639 event, but clients SHOULD only display actions whose author is either:
+
+1. A platform-level admin (see `src/lib/admins.ts`), or
+2. An organizer for the action's country (see kind 30078 `agora-organizers`).
+
+This authorization model is identical to the per-country pin model — see Kind 30078 in this document for the storage shape.
+
+### Event Structure
+
+```json
+{
+  "kind": 36639,
+  "content": "<long-form description, freeform markdown-ish text>",
+  "tags": [
+    ["d", "plant-a-tree-1729000000000"],
+    ["title", "Plant a tree in your neighborhood"],
+    ["challenge-type", "photo"],
+    ["bounty", "10000"],
+    ["i", "iso3166:US"],
+    ["t", "agora-action"],
+    ["image", "https://example.com/cover.jpg"],
+    ["start", "1729000000"],
+    ["deadline", "1729604800"],
+    ["alt", "Agora activist action: Plant a tree in your neighborhood"]
+  ]
+}
+```
+
+### Tags
+
+| Tag              | Required | Description                                                                                              |
+|------------------|----------|----------------------------------------------------------------------------------------------------------|
+| `d`              | Yes      | Unique identifier (typically slug + timestamp). Forms the addressable coordinate `36639:<pubkey>:<d>`.   |
+| `title`          | Yes      | Short title shown on cards.                                                                              |
+| `challenge-type` | Yes      | One of `photo`, `art`, `info`, `action`. Drives the display icon and submission expectations.            |
+| `bounty`         | Yes      | Bounty in **sats**, as an unsigned integer string. Paid out via zaps to the chosen submission(s).        |
+| `i`              | Yes      | NIP-73 country identifier: `iso3166:XX` (preferred). Legacy `geo:XX` (length 6, country code only) is accepted as a read alias. Optionally combined with a `location` tag fallback. |
+| `t`              | Yes      | Discovery tag. Canonical write value is `agora-action`. Read aliases: `pathos-challenge`, `agora-challenge`. |
+| `image`          | No       | Cover image URL.                                                                                         |
+| `start`          | No       | Unix timestamp when the action becomes active. Defaults to `created_at`.                                 |
+| `deadline`       | No       | Unix timestamp when the action expires. Defaults to `start + 48h`.                                       |
+| `alt`            | Yes      | NIP-31 human-readable fallback. Convention: `"Agora activist action: <title>"`.                          |
+
+### Content
+
+Long-form description of the action. Plain text or light markdown. Clients render this as the action's body on the detail page.
+
+### Submissions
+
+Submissions are kind 1111 NIP-22 comments addressed to the action's coordinate (`["A", "36639:<pubkey>:<d>"]` and `["P", "<pubkey>"]`). Clients SHOULD:
+
+- Sort top-level submissions by **total zap amount** (sum of NIP-57 zap receipts on each submission), descending.
+- Show the bounty as the prize pool that organizers can distribute to top submissions via zaps.
+- Hide submissions with `created_at` after the action's `deadline` for "past" leaderboards (or surface them separately as "late submissions").
+
+### Discovery
+
+Clients querying actions globally:
+
+```json
+{ "kinds": [36639], "#t": ["agora-action", "pathos-challenge", "agora-challenge"], "limit": 50 }
+```
+
+Per country:
+
+```json
+{
+  "kinds": [36639],
+  "#t": ["agora-action", "pathos-challenge", "agora-challenge"],
+  "#i": ["iso3166:US", "geo:US"],
+  "limit": 50
+}
+```
+
+After fetching, clients MUST filter the results down to events whose author is either an admin or an organizer for the event's country.
 
 ---
 

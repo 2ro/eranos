@@ -1,6 +1,6 @@
 import type { FeedSettings } from '@/contexts/AppContext';
 import type { ComponentType } from 'react';
-import { Globe, GitPullRequestArrow, MessageSquareMore, CircleAlert } from 'lucide-react';
+import { Globe, GitPullRequestArrow, MessageSquareMore, CircleAlert, Zap } from 'lucide-react';
 import { RepostIcon } from '@/components/icons/RepostIcon';
 import { CONTENT_KIND_ICONS } from '@/lib/sidebarItems';
 
@@ -550,6 +550,7 @@ const KIND_SPECIFIC_LABELS: Record<number, string> = {
   31990: 'app',
   30063: 'Zapstore release',
   3063: 'Zapstore asset',
+  36639: 'action',
 };
 
 /**
@@ -563,6 +564,7 @@ const KIND_SPECIFIC_ICONS: Partial<Record<number, ComponentType<{ className?: st
   15128: Globe,
   35128: Globe,
   30817: CircleAlert,
+  36639: Zap,
 };
 
 /**

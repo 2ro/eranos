@@ -28,6 +28,7 @@ const ReplyComposeModal = lazy(() => import("@/components/ReplyComposeModal").th
 const HomePage = lazy(() => import("./pages/HomePage").then(m => ({ default: m.HomePage })));
 
 // All other pages: code-split via React.lazy
+const ActionsPage = lazy(() => import("./pages/ActionsPage"));
 const AdvancedSettingsPage = lazy(() => import("./pages/AdvancedSettingsPage").then(m => ({ default: m.AdvancedSettingsPage })));
 const ArticleEditorPage = lazy(() => import("./pages/ArticleEditorPage").then(m => ({ default: m.ArticleEditorPage })));
 const BadgesPage = lazy(() => import("./pages/BadgesPage").then(m => ({ default: m.BadgesPage })));
@@ -176,6 +177,7 @@ export function AppRouter() {
               element={<Navigate to="/lists" replace />}
             />
             <Route path="/i/*" element={<ExternalContentPage />} />
+            <Route path="/actions" element={<ActionsPage />} />
             <Route path="/organizers" element={<OrganizersPage />} />
 
             {/* Callback target for remote signers (e.g. Amber, Primal) after NIP-46 approval */}

@@ -389,3 +389,20 @@ export function getGeoDisplayName(code: string, _lang?: string): string {
   }
   return info.name;
 }
+
+/**
+ * Return the flag emoji for an ISO 3166-1 country code or 3166-2 subdivision
+ * code. Subdivisions resolve to their parent country's flag (no per-region
+ * flag exists in Unicode for arbitrary subdivisions). Unknown codes return
+ * an empty string.
+ */
+export function countryCodeToFlag(code: string): string {
+  const upper = code.toUpperCase();
+  const parentCode = upper.includes('-') ? upper.split('-')[0] : upper;
+  if (!/^[A-Z]{2}$/.test(parentCode)) return '';
+  // Regional indicator symbols start at U+1F1E6 (🇦); A=0x41.
+  return parentCode
+    .split('')
+    .map((c) => String.fromCodePoint(0x1F1E6 + c.charCodeAt(0) - 65))
+    .join('');
+}

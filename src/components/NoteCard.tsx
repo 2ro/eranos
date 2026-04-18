@@ -1786,6 +1786,12 @@ const KIND_HEADER_MAP: Record<number, KindHeaderConfig> = {
     icon: Zap,
     action: "zapped",
   },
+  36639: {
+    icon: Zap,
+    action: (event) => publishedAtAction(event, { created: "posted an", updated: "updated an", fallback: "posted an" }),
+    noun: "action",
+    nounRoute: "/actions",
+  },
   31124: {
     icon: Egg,
     action: (event) => publishedAtAction(event, { created: "created their", updated: "updated their", fallback: "updated their" }),

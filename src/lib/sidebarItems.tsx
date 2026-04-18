@@ -32,6 +32,7 @@ import {
   User,
   Vote,
   WalletMinimal,
+  Zap,
 } from "lucide-react";
 import { VERIFIED_FOLLOW_PACK_PATH } from "@/lib/agoraDefaults";
 import { CardsIcon } from "@/components/icons/CardsIcon";
@@ -144,6 +145,7 @@ export const SIDEBAR_ITEMS: SidebarItemDef[] = [
   { id: "changelog", label: "Changelog", path: "/changelog", icon: ScrollText },
   { id: "help", label: "Help", path: "/help", icon: LifeBuoy },
   // Content types
+  { id: "actions", label: "Actions", path: "/actions", icon: Zap },
   { id: "events", label: "Events", path: "/events", icon: CalendarDays },
   { id: "photos", label: "Photos", path: "/photos", icon: Camera },
   { id: "articles", label: "Articles", path: "/articles", icon: Newspaper },
