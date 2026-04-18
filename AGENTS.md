@@ -1405,13 +1405,12 @@ Run available tools in this priority order:
 2. **Building/Compilation** (Required): Verify the project builds successfully
 3. **Linting** (Recommended): Check code style and catch potential issues
 4. **Tests** (If Available): Run existing test suite
-5. **Git Commit** (Required): Create a commit with your changes when finished
 
 **Minimum Requirements:**
 - Code must type-check without errors
 - Code must build/compile successfully
 - Fix any critical linting errors that would break functionality
-- Create a git commit when your changes are complete
+- **Do NOT commit.** Leave changes uncommitted for the user to review. See the "ABSOLUTE, UNBREAKABLE RULE" at the top of this file.
 
 The validation ensures code quality and catches errors before deployment, regardless of the development environment.
 
