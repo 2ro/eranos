@@ -1529,7 +1529,10 @@ export function ComposeBox({
                   </Tooltip>
                   <PopoverContent side="bottom" align="start" sideOffset={6} className="w-44 p-1.5 rounded-xl border-border shadow-lg">
                     <div className="flex flex-col gap-0.5">
-                      {!replyTo && (
+                      {/* Polls are top-level events (kind 1068), so they only make sense as a
+                          standalone post or rooted on an external-content URL (e.g. iso3166: country
+                          page). Hide for actual event replies (NostrEvent replyTo). */}
+                      {(!replyTo || replyTo instanceof URL) && (
                         <button
                           type="button"
                           onClick={() => { setMode((m) => m === 'poll' ? 'post' : 'poll'); setTrayOpen(false); expand(); }}
