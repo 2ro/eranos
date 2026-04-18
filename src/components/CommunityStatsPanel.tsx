@@ -31,6 +31,12 @@ interface CommunityStatsPanelProps {
   /** ISO 3166 country code. Omit to render the global (`iso3166:ZZ`) snapshot. */
   countryCode?: string;
   className?: string;
+  /**
+   * Render at narrow widths (e.g. inside a 360px sidebar): 2-column tile grid
+   * with full labels, single-column leaderboards. Defaults to `false` (the
+   * roomy multi-column layout used on country pages).
+   */
+  compact?: boolean;
 }
 
 /**
@@ -41,7 +47,7 @@ interface CommunityStatsPanelProps {
  * Renders nothing when no trusted snapshot is available, so it can be safely
  * dropped into any page without producing empty placeholders.
  */
-export function CommunityStatsPanel({ countryCode, className }: CommunityStatsPanelProps) {
+export function CommunityStatsPanel({ countryCode, className, compact = false }: CommunityStatsPanelProps) {
   const isGlobal = !countryCode;
   const country = useTrustedCountryStats(isGlobal ? undefined : countryCode);
   const global = useTrustedGlobalStats();
@@ -55,8 +61,8 @@ export function CommunityStatsPanel({ countryCode, className }: CommunityStatsPa
   return (
     <section className={cn('rounded-2xl border border-border bg-background/40 p-4 space-y-4', className)}>
       <PanelHeader stats={stats} timeframe={tf} onTimeframeChange={setTf} />
-      <AggregateCounts stats={stats} timeframe={tf} />
-      <Leaderboards stats={stats} timeframe={tf} />
+      <AggregateCounts stats={stats} timeframe={tf} compact={compact} />
+      <Leaderboards stats={stats} timeframe={tf} compact={compact} />
     </section>
   );
 }
@@ -94,14 +100,20 @@ function PanelHeader({
 
 // ── Aggregate counts ─────────────────────────────────────────────────────────
 
-function AggregateCounts({ stats, timeframe }: { stats: TrustedCountryStats; timeframe: StatsTimeframe }) {
+function AggregateCounts({
+  stats, timeframe, compact,
+}: {
+  stats: TrustedCountryStats;
+  timeframe: StatsTimeframe;
+  compact: boolean;
+}) {
   const c = stats.counts;
   return (
-    <div className="grid grid-cols-2 sm:grid-cols-5 gap-2">
-      <CountTile icon={MessageSquare} label="Comments"   value={c.commentCnt[timeframe]} />
-      <CountTile icon={Users}         label="Authors"    value={c.authorCnt[timeframe]} />
+    <div className={cn('grid gap-2', compact ? 'grid-cols-2' : 'grid-cols-2 sm:grid-cols-5')}>
+      <CountTile icon={MessageSquare} label="Comments"    value={c.commentCnt[timeframe]} />
+      <CountTile icon={Users}         label="Authors"     value={c.authorCnt[timeframe]} />
       <CountTile icon={Zap}           label="Sats zapped" value={c.zapAmount[timeframe]} />
-      <CountTile icon={HandHeart}     label="Zaps"       value={c.zapCnt[timeframe]} />
+      <CountTile icon={HandHeart}     label="Zaps"        value={c.zapCnt[timeframe]} />
       <CountTile icon={Flame}         label="Submissions" value={c.submissionCnt[timeframe]} />
     </div>
   );
@@ -127,15 +139,21 @@ function CountTile({
 
 // ── Leaderboards ─────────────────────────────────────────────────────────────
 
-function Leaderboards({ stats, timeframe }: { stats: TrustedCountryStats; timeframe: StatsTimeframe }) {
+function Leaderboards({
+  stats, timeframe, compact,
+}: {
+  stats: TrustedCountryStats;
+  timeframe: StatsTimeframe;
+  compact: boolean;
+}) {
   const tfData = stats.byTimeframe[timeframe];
   return (
-    <div className="grid gap-4 md:grid-cols-2">
+    <div className={cn('grid gap-4', compact ? 'grid-cols-1' : 'md:grid-cols-2')}>
       <TopActionsList actions={tfData.topActions} />
       <TopPostersList posters={tfData.topPosters} />
       <TopZappedList contributors={tfData.topContributors} />
       <TopDonorsList donors={tfData.topDonors} />
-      <TrendingHashtagsList tags={tfData.trendingHashtags} className="md:col-span-2" />
+      <TrendingHashtagsList tags={tfData.trendingHashtags} className={compact ? undefined : 'md:col-span-2'} />
     </div>
   );
 }

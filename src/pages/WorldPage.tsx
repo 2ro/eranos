@@ -1,104 +1,88 @@
-import { lazy, Suspense, useMemo, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { lazy, Suspense, useEffect, useState } from 'react';
 import { useSeoMeta } from '@unhead/react';
-import { Earth, Search } from 'lucide-react';
-import { PageHeader } from '@/components/PageHeader';
-import { Input } from '@/components/ui/input';
 import { Skeleton } from '@/components/ui/skeleton';
-import { CommunityStatsPanel } from '@/components/CommunityStatsPanel';
 import { useAppContext } from '@/hooks/useAppContext';
 import { useGlobalActivity, useTopCountryHashtags } from '@/hooks/useGlobalActivity';
-import { COUNTRIES } from '@/lib/countries';
+import { useLayoutOptions } from '@/contexts/LayoutContext';
+import { WorldDiscoveryDrawer } from '@/components/world/WorldDiscoveryDrawer';
+import { WorldDiscoveryPanel } from '@/components/world/WorldDiscoveryPanel';
 
 // Lazy-load the map: react-leaflet + leaflet pull in ~150 KB of JS that we
 // don't want to ship with the rest of the app shell.
 const WorldMap = lazy(() => import('@/components/world/WorldMap'));
 
-const COUNTRY_LIST = Object.entries(COUNTRIES)
-  .map(([code, { name, flag }]) => ({ code, name, flag }))
-  .sort((a, b) => a.name.localeCompare(b.name));
+/**
+ * Match the `sidebar` Tailwind breakpoint (900px). At this width and above
+ * the layout has room for a docked right column (`WorldDiscoveryPanel`);
+ * below it we fall back to the bottom drawer (`WorldDiscoveryDrawer`).
+ *
+ * Hardcoded to avoid pulling Tailwind config into the client bundle, same
+ * approach as `useIsMobile`.
+ */
+const SIDEBAR_MEDIA_QUERY = '(min-width: 900px)';
+
+function useHasSidebar(): boolean {
+  const [hasSidebar, setHasSidebar] = useState(() =>
+    typeof window !== 'undefined' && window.matchMedia(SIDEBAR_MEDIA_QUERY).matches,
+  );
+  useEffect(() => {
+    const mq = window.matchMedia(SIDEBAR_MEDIA_QUERY);
+    const handler = (e: MediaQueryListEvent) => setHasSidebar(e.matches);
+    mq.addEventListener('change', handler);
+    setHasSidebar(mq.matches);
+    return () => mq.removeEventListener('change', handler);
+  }, []);
+  return hasSidebar;
+}
 
 export function WorldPage() {
   const { config } = useAppContext();
-  const [search, setSearch] = useState('');
+  const [pageEl, setPageEl] = useState<HTMLDivElement | null>(null);
+  const hasSidebar = useHasSidebar();
 
   useSeoMeta({
     title: `World | ${config.appName}`,
-    description: 'Browse countries and join the conversation',
+    description: 'Explore community activity around the world',
   });
 
   const { data: activities } = useGlobalActivity();
   const { data: topHashtags } = useTopCountryHashtags();
 
-  const filtered = useMemo(() => {
-    if (!search.trim()) return COUNTRY_LIST;
-    const q = search.trim().toLowerCase();
-    return COUNTRY_LIST.filter(
-      (c) => c.name.toLowerCase().includes(q) || c.code.toLowerCase().includes(q),
-    );
-  }, [search]);
+  // `fullBleed: true` is the new reusable preset for edge-to-edge pages —
+  // see `LayoutOptions.fullBleed` for the full list of flags it expands to.
+  // We override `rightSidebar` with our discovery panel; the panel hides
+  // itself below the sidebar breakpoint via Tailwind's `hidden sidebar:flex`,
+  // and the bottom drawer takes over there.
+  useLayoutOptions({
+    fullBleed: true,
+    rightSidebar: <WorldDiscoveryPanel activities={activities} />,
+  });
 
   return (
-    <main className="">
-      <PageHeader title="World" icon={<Earth className="size-5" />} backTo="/" />
-
-      {/* Global community stats snapshot (kind 30385, d=iso3166:ZZ).
-          Renders nothing when no trusted snapshot exists. */}
-      <div className="px-4 pb-4">
-        <CommunityStatsPanel />
-      </div>
-
-      {/* Interactive map — primary discovery surface. Falls back gracefully
-          when no per-country stats are available yet (renders the basemap
-          alone). Lazy-loaded to keep leaflet out of the main bundle. */}
-      <div className="px-4 pb-4">
-        <div className="relative h-[60vh] min-h-[420px] w-full overflow-hidden rounded-2xl border bg-muted/30 shadow-sm">
-          <Suspense fallback={<Skeleton className="absolute inset-0 rounded-2xl" />}>
-            <WorldMap activities={activities ?? new Map()} topHashtags={topHashtags ?? new Map()} />
-          </Suspense>
+    // h-dvh inside the column fills the full viewport on both mobile (where
+    // the column's negative margin pulls content under the translucent top
+    // bar) and desktop (where there's no top/bottom chrome). The drawer is
+    // portaled inside this wrapper so it inherits the column's horizontal
+    // bounds — no overlap with the docked desktop discovery panel.
+    <div ref={setPageEl} className="relative w-full h-dvh overflow-hidden bg-muted/20">
+      <Suspense
+        fallback={
+          <div className="absolute inset-0">
+            <Skeleton className="h-full w-full rounded-none" />
+          </div>
+        }
+      >
+        <div className="absolute inset-0">
+          <WorldMap activities={activities ?? new Map()} topHashtags={topHashtags ?? new Map()} />
         </div>
-      </div>
+      </Suspense>
 
-      {/* A–Z fallback / search — always available so any country can be reached
-          even when there's no per-country activity to plot on the map. */}
-      <div className="px-4 pb-4">
-        <div className="relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground pointer-events-none" />
-          <Input
-            placeholder="Search countries..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="pl-9"
-          />
-        </div>
-      </div>
-
-      {filtered.length > 0 ? (
-        <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-2 px-4 pb-8">
-          {filtered.map((c) => (
-            <Link
-              key={c.code}
-              to={`/i/iso3166:${c.code}`}
-              className="group flex flex-col items-center gap-1.5 rounded-xl p-3 transition-colors hover:bg-secondary/60"
-            >
-              <span
-                className="text-4xl sm:text-5xl leading-none select-none transition-transform group-hover:scale-110"
-                role="img"
-                aria-label={`Flag of ${c.name}`}
-              >
-                {c.flag}
-              </span>
-              <span className="text-xs text-center font-medium text-muted-foreground group-hover:text-foreground transition-colors line-clamp-2 leading-tight">
-                {c.name}
-              </span>
-            </Link>
-          ))}
-        </div>
-      ) : (
-        <div className="py-16 px-8 text-center">
-          <p className="text-muted-foreground">No countries match "{search}"</p>
-        </div>
-      )}
-    </main>
+      {/* Bottom discovery drawer — only mounted below the sidebar breakpoint.
+          Above it, the docked `WorldDiscoveryPanel` (rendered as the layout's
+          right sidebar) takes over and the drawer is unnecessary. We mount
+          conditionally rather than CSS-hiding so vaul's drag handlers and
+          listeners aren't running on desktop where the drawer is invisible. */}
+      {!hasSidebar && <WorldDiscoveryDrawer container={pageEl} activities={activities} />}
+    </div>
   );
 }

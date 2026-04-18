@@ -441,9 +441,19 @@ function MapSizeController() {
     const t = setTimeout(() => map.invalidateSize(), 100);
     const onResize = () => map.invalidateSize();
     window.addEventListener('resize', onResize);
+
+    // Watch the map's own container — sidebars, drawers, and lazy-loaded
+    // panels can change our width without firing window resize, which
+    // leaves Leaflet computing marker positions against the wrong size and
+    // pushes the bubbles off-screen.
+    const container = map.getContainer();
+    const observer = new ResizeObserver(() => map.invalidateSize());
+    observer.observe(container);
+
     return () => {
       clearTimeout(t);
       window.removeEventListener('resize', onResize);
+      observer.disconnect();
     };
   }, [map]);
   return null;
