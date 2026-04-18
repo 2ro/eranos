@@ -193,7 +193,8 @@
     "goBack": "Go Back",
     "tagline": "Power to the people",
     "action": "Action",
-    "bounty": "Bounty"
+    "bounty": "Bounty",
+    "tryAgain": "Please try again."
   },
   "auth": {
     "login": "Log in",
@@ -298,5 +299,40 @@
     "walletLocked": "Wallet Locked",
     "browserNotSupported": "Browser Not Supported",
     "walletUnavailable": "Wallet Unavailable"
+  },
+  "settings": {
+    "organizers": "Organizers",
+    "signInToManage": "Sign in to manage",
+    "loginRequired": "You need to be signed in to manage organizers."
+  },
+  "organizers": {
+    "appoint": "Appoint Organizer",
+    "appointDesc": "Grant a user permission to pin posts on a specific country feed.",
+    "appointing": "Appointing...",
+    "appointed": "Organizer appointed",
+    "appointedSuccess": "Organizer appointed for {{country}}",
+    "userNpub": "User npub",
+    "country": "Country",
+    "selectCountry": "Select a country",
+    "invalidNpub": "Invalid npub format",
+    "alreadyOrganizer": "This user is already an organizer for that country",
+    "current": "Current Organizers",
+    "noOrganizers": "No organizers appointed yet.",
+    "removed": "Organizer removed",
+    "removedSuccess": "Removed {{name}} from {{country}}",
+    "refreshed": "Refreshed",
+    "refreshedDesc": "Organizer list refreshed from relays.",
+    "adminRequired": "Admin access required",
+    "adminRequiredDesc": "Only platform admins can appoint or remove organizers."
+  },
+  "feed": {
+    "pinPost": "Pin to country feed",
+    "unpinPost": "Unpin from country feed",
+    "pinned": "Pinned",
+    "pinnedPosts": "Pinned Posts",
+    "noPinnedPosts": "No posts pinned yet."
+  },
+  "errors": {
+    "tryAgain": "Please try again."
   }
 }

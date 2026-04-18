@@ -358,3 +358,34 @@ export function isValidGeoCode(code: string): boolean {
   }
   return isValidCountryCode(upper);
 }
+
+// ---------------------------------------------------------------------------
+// Country list / display helpers (Pathos-compat surface)
+// ---------------------------------------------------------------------------
+
+/**
+ * Return the list of ISO 3166-1 countries Agora knows about, sorted
+ * alphabetically by English name. Pathos exposes a localized variant — Agora
+ * is currently English-only so the `lang` argument is ignored. Kept for
+ * call-site compatibility with ports.
+ */
+export function getAllCountries(_lang?: string): { code: string; name: string; flag: string }[] {
+  return Object.entries(COUNTRIES)
+    .map(([code, info]) => ({ code, name: info.name, flag: info.flag }))
+    .sort((a, b) => a.name.localeCompare(b.name));
+}
+
+/**
+ * Resolve an ISO 3166-1 country or 3166-2 subdivision code to a display name,
+ * falling back to the upper-cased code when unknown. Subdivisions return
+ * "Subdivision, Country" when both names are available.
+ */
+export function getGeoDisplayName(code: string, _lang?: string): string {
+  const upper = code.toUpperCase();
+  const info = getCountryInfo(upper);
+  if (!info) return upper;
+  if (info.subdivisionName) {
+    return `${info.subdivisionName}, ${info.name}`;
+  }
+  return info.name;
+}
