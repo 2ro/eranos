@@ -298,26 +298,6 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
 
       {/* ── Community info ── */}
       <div className="px-5 mt-4 space-y-4">
-        {/* Stats row */}
-        <div className="flex items-center gap-3 flex-wrap">
-          <Badge variant="outline" className="gap-1.5">
-            <Users className="size-3.5" />
-            {membership?.totalCount ?? '...'} member{membership?.totalCount !== 1 ? 's' : ''}
-          </Badge>
-          {(communityEvents?.length ?? 0) > 0 && (
-            <Badge variant="outline" className="gap-1.5">
-              <CalendarDays className="size-3.5" />
-              {communityEvents!.length} event{communityEvents!.length !== 1 ? 's' : ''}
-            </Badge>
-          )}
-          {(commentsData?.allComments.length ?? 0) > 0 && (
-            <Badge variant="outline" className="gap-1.5">
-              <MessageCircle className="size-3.5" />
-              {commentsData!.allComments.length} comment{commentsData!.allComments.length !== 1 ? 's' : ''}
-            </Badge>
-          )}
-        </div>
-
         {/* Description */}
         {descriptionText && (
           <p className="text-sm leading-relaxed text-muted-foreground whitespace-pre-wrap">{descriptionText}</p>
