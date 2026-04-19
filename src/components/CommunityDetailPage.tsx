@@ -17,7 +17,6 @@ import { useQuery } from '@tanstack/react-query';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { getAvatarShape } from '@/lib/avatarShape';
 import { Badge } from '@/components/ui/badge';
-import { Card, CardContent } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { ComposeBox } from '@/components/ComposeBox';
@@ -378,17 +377,10 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
             {eventsLoading ? (
               <EventsSkeleton />
             ) : !communityEvents || communityEvents.length === 0 ? (
-              <div className="px-5 py-8">
-                <Card className="border-dashed">
-                  <CardContent className="py-12 px-8 text-center">
-                    <div className="max-w-sm mx-auto space-y-3">
-                      <CalendarDays className="size-10 text-muted-foreground/30 mx-auto" />
-                      <p className="text-muted-foreground text-sm">
-                        No events yet. When calendar events are tagged with this community, they'll appear here.
-                      </p>
-                    </div>
-                  </CardContent>
-                </Card>
+              <div className="py-12 px-8 text-center">
+                <p className="text-muted-foreground text-sm max-w-sm mx-auto">
+                  No events yet. When calendar events are tagged with this community, they'll appear here.
+                </p>
               </div>
             ) : (
               <div>
