@@ -377,10 +377,8 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
             {eventsLoading ? (
               <EventsSkeleton />
             ) : !communityEvents || communityEvents.length === 0 ? (
-              <div className="py-12 px-8 text-center">
-                <p className="text-muted-foreground text-sm max-w-sm mx-auto">
-                  No events yet. When calendar events are tagged with this community, they'll appear here.
-                </p>
+              <div className="py-12 text-center">
+                <p className="text-muted-foreground text-sm">No events yet</p>
               </div>
             ) : (
               <div>
