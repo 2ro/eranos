@@ -1,4 +1,4 @@
-import { useMemo, useCallback, useState } from 'react';
+import { useMemo, useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { nip19 } from 'nostr-tools';
 import {
@@ -17,13 +17,12 @@ import { useQuery } from '@tanstack/react-query';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { getAvatarShape } from '@/lib/avatarShape';
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
+import { ComposeBox } from '@/components/ComposeBox';
 import { NoteCard } from '@/components/NoteCard';
-import { ReplyComposeModal } from '@/components/ReplyComposeModal';
 import { ThreadedReplyList, type ReplyNode } from '@/components/ThreadedReplyList';
 import { useAuthor } from '@/hooks/useAuthor';
 import { useAuthors } from '@/hooks/useAuthors';
@@ -129,7 +128,6 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
   const navigate = useNavigate();
   const { nostr } = useNostr();
   const { toast } = useToast();
-  const [replyOpen, setReplyOpen] = useState(false);
 
   // Parse community definition
   const community = useMemo(() => parseCommunityEvent(event), [event]);
@@ -426,18 +424,7 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
 
           {/* ── Comments tab ── */}
           <TabsContent value="comments" className="mt-0">
-            {/* Compose button */}
-            <div className="px-5 py-3 border-b border-border">
-              <Button
-                variant="outline"
-                size="sm"
-                className="w-full rounded-full"
-                onClick={() => setReplyOpen(true)}
-              >
-                <MessageCircle className="size-4 mr-2" />
-                Write a comment...
-              </Button>
-            </div>
+            <ComposeBox compact replyTo={event} />
 
             {commentsLoading ? (
               <div className="divide-y divide-border">
@@ -452,12 +439,6 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
                 No comments yet. Be the first to comment!
               </div>
             )}
-
-            <ReplyComposeModal
-              event={event}
-              open={replyOpen}
-              onOpenChange={setReplyOpen}
-            />
           </TabsContent>
         </Tabs>
       </div>
