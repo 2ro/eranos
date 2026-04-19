@@ -18,7 +18,6 @@ import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { getAvatarShape } from '@/lib/avatarShape';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
-import { Separator } from '@/components/ui/separator';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { ComposeBox } from '@/components/ComposeBox';
@@ -308,8 +307,6 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
           <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-1">Founded by</p>
           <PersonRow pubkey={event.pubkey} />
         </div>
-
-        <Separator />
 
         {/* ── Tabs ── */}
         <Tabs defaultValue="members" className="-mx-5">
