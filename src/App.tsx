@@ -21,6 +21,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { useNsecPasteGuard } from "@/hooks/useNsecPasteGuard";
 import type { AppConfig } from "@/contexts/AppContext";
 import { NWCProvider } from "@/contexts/NWCContext";
+import { SparkWalletProvider } from "@/contexts/SparkWalletContext";
 import { PROTOCOL_MODE } from "@/lib/dmConstants";
 import { BuildConfigSchema, type BuildConfig } from "@/lib/schemas";
 import { secureStorage } from "@/lib/secureStorage";
@@ -121,21 +122,16 @@ const hardcodedConfig: AppConfig = {
     followsFeedShowReplies: true,
   },
   sidebarOrder: [
-    "feed",
-    "notifications",
-    "search",
-    "events",
-    "articles",
-    "photos",
+    "wallet",
+    "verified",
+    "actions",
     "polls",
-    "bookmarks",
     "world",
     "badges",
-    "changelog",
+    "feed",
+    "notifications",
     "profile",
     "settings",
-    "help",
-    "lists",
   ],
   nip85StatsPubkey:
     "5f68e85ee174102ca8978eef302129f081f03456c884185d5ec1c1224ab633ea",
@@ -216,6 +212,7 @@ export function App() {
                   <NativeNotifications />
 
                     <NWCProvider>
+                    <SparkWalletProvider>
                     <DMProvider config={dmConfig}>
                       <EmotionDevProvider>
                         <TooltipProvider>
@@ -225,6 +222,7 @@ export function App() {
                         </TooltipProvider>
                       </EmotionDevProvider>
                     </DMProvider>
+                    </SparkWalletProvider>
                   </NWCProvider>
                 </NostrProvider>
               </NostrLoginProvider>

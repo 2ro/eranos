@@ -7,128 +7,55 @@ import { useCallback, useMemo } from "react";
 
 // ── Order computation ─────────────────────────────────────────────────────────
 
-/** Default sidebar order for fresh installs (system pages only). */
-const DEFAULT_SIDEBAR_ORDER_IDS = [
-  'feed',
-  'notifications',
-  'search',
-  'events',
-  'articles',
-  'photos',
+/**
+ * Default sidebar order. Everything not in this list lives in the "More…"
+ * dropdown and can be added back via the edit-sidebar UI.
+ */
+const DEFAULT_SIDEBAR_ORDER: string[] = [
+  'wallet',
+  'verified',
+  'actions',
   'polls',
-  'bookmarks',
   'world',
   'badges',
-  'changelog',
+  'feed',
+  'notifications',
   'profile',
   'settings',
-  'help',
-  'lists',
-] as const;
-
-const DEFAULT_SIDEBAR_ORDER = SIDEBAR_ITEMS
-  .filter((s) => DEFAULT_SIDEBAR_ORDER_IDS.includes(s.id as (typeof DEFAULT_SIDEBAR_ORDER_IDS)[number]))
-  .map((s) => s.id);
-
-/** Map of legacy sidebar item IDs to their current replacements. */
-const SIDEBAR_ID_MIGRATIONS: Record<string, string> = {
-  'emoji-packs': 'emojis',
-  'theme': 'themes',
-};
-
-/** IDs removed from the curated Agora sidebar experience. */
-const REMOVED_SIDEBAR_IDS = new Set<string>([
-  'blobbi',
-  'ai-chat',
-  'webxdc',
-  'development',
-  'decks',
-  'treasures',
-  'colors',
-  'bluesky',
-  'wikipedia',
-  'music',
-  'podcasts',
-  'books',
-  'vines',
-  'videos',
-  'trends',
-  'archive',
-  'packs',
-  'emojis',
-  'letters',
-  'themes',
-]);
-
-/** IDs that should be visible for all users after the Agora nav refocus migration. */
-const ENSURE_VISIBLE_IDS = ['world', 'badges', 'changelog'] as const;
+];
 
 /**
  * Compute the ordered list of visible sidebar items.
  *
- * `sidebarOrder` is the source of truth. Items present in the array
- * are shown; items absent are hidden. Unknown IDs are silently dropped.
- * When sidebarOrder is empty (fresh install), produces a default order.
+ * Empty saved order → default. Otherwise the saved order is used verbatim,
+ * with unknown IDs and duplicates dropped and orphan dividers cleaned up.
  */
-function computeOrderedItems(
-  sidebarOrder: string[],
-): string[] {
-  if (sidebarOrder.length === 0) {
-    return DEFAULT_SIDEBAR_ORDER;
-  }
+function computeOrderedItems(sidebarOrder: string[]): string[] {
+  if (sidebarOrder.length === 0) return DEFAULT_SIDEBAR_ORDER;
 
   const ordered: string[] = [];
   const seen = new Set<string>();
 
-  for (let item of sidebarOrder) {
-    // Dividers are allowed multiple times — don't deduplicate them
+  for (const item of sidebarOrder) {
     if (item === SIDEBAR_DIVIDER_ID) {
       ordered.push(item);
       continue;
     }
-
-    // Migrate legacy IDs
-    item = SIDEBAR_ID_MIGRATIONS[item] ?? item;
-
-    // Strictly prune IDs intentionally removed from Agora sidebar.
-    if (REMOVED_SIDEBAR_IDS.has(item)) continue;
-
     if (seen.has(item)) continue;
     seen.add(item);
-
     if (SIDEBAR_ITEM_IDS.has(item) || isNostrUri(item) || isExternalUri(item)) {
       ordered.push(item);
     }
-    // else: unknown entry — skip
   }
 
-  // Remove orphan dividers (at top / duplicated) and trailing divider.
-  const normalized = ordered.filter((id, i) => {
+  // Drop orphan dividers (leading, consecutive, trailing).
+  return ordered.filter((id, i) => {
     if (id !== SIDEBAR_DIVIDER_ID) return true;
-    const hasNonDividerBefore = ordered.slice(0, i).some((prev) => prev !== SIDEBAR_DIVIDER_ID);
-    const previousIsDivider = i > 0 && ordered[i - 1] === SIDEBAR_DIVIDER_ID;
-    return hasNonDividerBefore && !previousIsDivider;
+    if (i === ordered.length - 1) return false;
+    if (i === 0) return false;
+    if (ordered[i - 1] === SIDEBAR_DIVIDER_ID) return false;
+    return true;
   });
-
-  while (normalized.length > 0 && normalized[normalized.length - 1] === SIDEBAR_DIVIDER_ID) {
-    normalized.pop();
-  }
-
-  // Ensure key community surfaces are visible after migrating from older layouts.
-  for (const id of ENSURE_VISIBLE_IDS) {
-    if (SIDEBAR_ITEM_IDS.has(id) && !normalized.includes(id)) {
-      normalized.push(id);
-    }
-  }
-
-  // Keep Lists near the bottom so priority items remain visible higher up.
-  const listsIndex = normalized.indexOf('lists');
-  if (listsIndex >= 0) {
-    normalized.splice(listsIndex, 1);
-    normalized.push('lists');
-  }
-
-  return normalized;
 }
 
 /**

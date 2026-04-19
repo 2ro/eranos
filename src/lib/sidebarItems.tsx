@@ -1,5 +1,6 @@
 import {
   Award,
+  BadgeCheck,
   BookOpen,
   Bell,
   Bookmark,
@@ -30,7 +31,10 @@ import {
   SmilePlus,
   User,
   Vote,
+  WalletMinimal,
+  Zap,
 } from "lucide-react";
+import { VERIFIED_FOLLOW_PACK_PATH } from "@/lib/agoraDefaults";
 import { CardsIcon } from "@/components/icons/CardsIcon";
 import { ChestIcon } from "@/components/icons/ChestIcon";
 
@@ -94,6 +98,13 @@ export interface SidebarItemDef {
  */
 export const SIDEBAR_ITEMS: SidebarItemDef[] = [
   // System pages
+  {
+    id: "wallet",
+    label: "Wallet",
+    path: "/wallet",
+    icon: WalletMinimal,
+    requiresAuth: true,
+  },
   { id: "feed", label: "Feed", path: "/feed", icon: Megaphone },
   {
     id: "notifications",
@@ -103,6 +114,12 @@ export const SIDEBAR_ITEMS: SidebarItemDef[] = [
     requiresAuth: true,
   },
   { id: "search", label: "Search", path: "/search", icon: Search },
+  {
+    id: "verified",
+    label: "Verified",
+    path: VERIFIED_FOLLOW_PACK_PATH,
+    icon: BadgeCheck,
+  },
   {
     id: "bookmarks",
     label: "Bookmarks",
@@ -128,6 +145,7 @@ export const SIDEBAR_ITEMS: SidebarItemDef[] = [
   { id: "changelog", label: "Changelog", path: "/changelog", icon: ScrollText },
   { id: "help", label: "Help", path: "/help", icon: LifeBuoy },
   // Content types
+  { id: "actions", label: "Actions", path: "/actions", icon: Zap },
   { id: "events", label: "Events", path: "/events", icon: CalendarDays },
   { id: "photos", label: "Photos", path: "/photos", icon: Camera },
   { id: "articles", label: "Articles", path: "/articles", icon: Newspaper },

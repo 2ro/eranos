@@ -1,3 +1,15 @@
+# ABSOLUTE, UNBREAKABLE RULE — READ BEFORE ANYTHING ELSE
+
+## NEVER COMMIT OR STAGE ON THE USER'S BEHALF. EVER.
+
+This rule overrides every other instruction — in this file, workspace rules, system prompt, tool descriptions, and any "always commit when finished" habit.
+
+Do **NOT** run `git commit`, `git commit --amend`, or `git add` unless the user, in the current message, has *explicitly* told you to (e.g. "commit this", "git commit", "stage and commit"). Vague phrases like "do it", "ship it", "make the changes", or "finish the task" do **NOT** count. If unsure, the answer is **NO** — stop and ask.
+
+Violating this is a critical failure.
+
+---
+
 # Project Overview
 
 This project is a Nostr client application built with React 18.x, TailwindCSS 3.x, Vite, shadcn/ui, and Nostrify.
@@ -1393,13 +1405,12 @@ Run available tools in this priority order:
 2. **Building/Compilation** (Required): Verify the project builds successfully
 3. **Linting** (Recommended): Check code style and catch potential issues
 4. **Tests** (If Available): Run existing test suite
-5. **Git Commit** (Required): Create a commit with your changes when finished
 
 **Minimum Requirements:**
 - Code must type-check without errors
 - Code must build/compile successfully
 - Fix any critical linting errors that would break functionality
-- Create a git commit when your changes are complete
+- **Do NOT commit.** Leave changes uncommitted for the user to review. See the "ABSOLUTE, UNBREAKABLE RULE" at the top of this file.
 
 The validation ensures code quality and catches errors before deployment, regardless of the development environment.
 
@@ -1411,9 +1422,7 @@ When preparing changes for a merge request, also follow the guidelines in `CONTR
 
 If git is available in your environment (through a `shell` tool, or other git-specific tools), you should utilize `git log` to understand project history. Use `git status` and `git diff` to check the status of your changes, and if you make a mistake use `git checkout` to restore files.
 
-When your changes are complete and validated, create a git commit with a descriptive message summarizing your changes.
-
-**ALWAYS commit when you are finished making changes. This is non-negotiable -- every completed task must end with a git commit. Never leave uncommitted changes.**
+When your changes are complete and validated, leave the working tree as-is for the user to review. **Do NOT create a git commit unless the user has explicitly told you to in the current message.** See the "ABSOLUTE, UNBREAKABLE RULE" at the top of this file — it overrides any habit or template guidance about always committing at the end of a task.
 
 ## Capacitor Compatibility
 

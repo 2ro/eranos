@@ -58,6 +58,24 @@ export interface LayoutOptions {
    * Use for full-screen media pages like vines/reels.
    */
   hideBottomNav?: boolean;
+  /**
+   * Convenience preset for edge-to-edge pages (e.g. /world map). When true,
+   * applies the four flags needed to make the center column extend to the
+   * viewport's right edge:
+   *   - `noMaxWidth: true`              — drop the 600px column cap
+   *   - `noOverscroll: true`            — drop the bottom-overscroll padding
+   *   - `rightSidebar: null`            — remove the default widget sidebar
+   *   - `wrapperClassName: '!max-w-none'` — drop the 1200px outer cap
+   *
+   * Pages can still override any of these by setting them explicitly in the
+   * same `useLayoutOptions` call (e.g. `{ fullBleed: true, rightSidebar: <X /> }`
+   * keeps full-bleed behavior but supplies a custom right column).
+   *
+   * The desktop left sidebar is intentionally *kept* — it's primary
+   * navigation. Use `hideTopBar`/`hideBottomNav` separately if you also
+   * want to hide mobile chrome.
+   */
+  fullBleed?: boolean;
 }
 
 /** All own-property keys of LayoutOptions used for shallow comparison. */
@@ -171,12 +189,28 @@ export function useLayoutOptions(options: LayoutOptions): void {
   const store = useLayoutStore();
   const prev = useRef<LayoutOptions | null>(null);
 
+  // Expand the `fullBleed` preset into its four constituent flags before
+  // storing. We strip `fullBleed` itself from the stored object so MainLayout
+  // (and the LAYOUT_KEYS shallow-comparison) only ever see the canonical
+  // flags. Page-supplied values still win because they spread *after* the
+  // preset defaults.
+  const { fullBleed, ...rest } = options;
+  const expanded: LayoutOptions = fullBleed
+    ? {
+        noMaxWidth: true,
+        noOverscroll: true,
+        rightSidebar: null,
+        wrapperClassName: '!max-w-none',
+        ...rest,
+      }
+    : rest;
+
   // Synchronous write — runs after every commit, before paint.
   // No cleanup; the write is idempotent across re-renders.
   useLayoutEffect(() => {
-    if (!shallowEqualOptions(prev.current, options)) {
-      prev.current = options;
-      store.setOptions(options);
+    if (!shallowEqualOptions(prev.current, expanded)) {
+      prev.current = expanded;
+      store.setOptions(expanded);
     }
   });
 

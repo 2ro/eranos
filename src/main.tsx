@@ -13,6 +13,9 @@ import { ErrorBoundary } from '@/components/ErrorBoundary';
 import App from './App.tsx';
 import './index.css';
 
+// i18next initialization (used by the Spark wallet stack ported from Pathos).
+import './i18n';
+
 import '@fontsource-variable/inter';
 
 // ─── Native status bar theming (Android APK / iOS) ───────────────────────────

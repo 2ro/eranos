@@ -135,6 +135,33 @@
   .vine-slide-height {
     height: 100dvh;
   }
+
+  /* World map height: full viewport minus mobile chrome (top bar, bottom nav,
+     safe-area insets). On desktop where neither chrome is present, fills the
+     full viewport. The bottom nav is preserved on mobile (it's primary nav)
+     and the discovery drawer floats above it. */
+  .world-map-height {
+    height: calc(100dvh - var(--top-bar-height) - var(--safe-area-inset-top, env(safe-area-inset-top, 0px)) - var(--bottom-nav-height) - var(--safe-area-inset-bottom, env(safe-area-inset-bottom, 0px)));
+  }
+  @media (min-width: 900px) {
+    .world-map-height {
+      height: 100dvh;
+    }
+  }
+
+  /* Anchor the world discovery drawer above the mobile bottom nav so the
+     bottom-nav stays usable while the drawer sits in its peek state. On
+     desktop there's no bottom nav, so the drawer anchors to the viewport
+     bottom. Vaul drives translation via [data-vaul-drawer] CSS, so we only
+     adjust the anchor — not the transform. */
+  .world-drawer-anchor {
+    bottom: 0;
+  }
+  @media (max-width: 899px) {
+    .world-drawer-anchor {
+      bottom: calc(var(--bottom-nav-height) + var(--safe-area-inset-bottom, env(safe-area-inset-bottom, 0px)));
+    }
+  }
 }
 
 

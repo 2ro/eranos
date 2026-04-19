@@ -1,3 +1,17 @@
+/**
+ * Resolve a user's display name from Nostr metadata with consistent fallback logic.
+ * Checks display_name first (richer name per NIP-01), then name, then generates a
+ * deterministic pseudonym from the pubkey.
+ *
+ * Prefer this over manually chaining `metadata?.name || genUserName(pubkey)`.
+ */
+export function getDisplayName(
+  metadata: { display_name?: string; name?: string } | undefined,
+  pubkey: string,
+): string {
+  return metadata?.display_name || metadata?.name || genUserName(pubkey);
+}
+
 /** Generate a deterministic user display name based on a string seed. */
 export function genUserName(seed: string | undefined): string {
   if (!seed) return 'Anonymous';

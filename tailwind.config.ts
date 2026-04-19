@@ -119,6 +119,10 @@ export default {
 			'collapsible-up': {
 				from: { height: 'var(--radix-collapsible-content-height)' },
 				to: { height: '0' }
+			},
+			'accent-glow': {
+				'0%, 100%': { opacity: '0.3' },
+				'50%': { opacity: '0.6' }
 			}
 			},
 			animation: {
@@ -128,7 +132,8 @@ export default {
 				'badge-spotlight': 'badge-spotlight 8s linear infinite',
 				'highlight-fade': 'highlight-fade 1.5s ease-out forwards',
 				'collapsible-down': 'collapsible-down 0.2s ease-out',
-				'collapsible-up': 'collapsible-up 0.2s ease-out'
+				'collapsible-up': 'collapsible-up 0.2s ease-out',
+				'accent-glow': 'accent-glow 2s ease-in-out infinite'
 			}
 		}
 	},

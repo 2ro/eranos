@@ -8,6 +8,7 @@ import { useAppContext } from '@/hooks/useAppContext';
 import { IntroImage } from '@/components/IntroImage';
 import { useLayoutOptions } from '@/contexts/LayoutContext';
 import { toast } from '@/hooks/useToast';
+import { isAdmin } from '@/lib/admins';
 
 const RequestToVanishDialog = lazy(() => import('@/components/RequestToVanishDialog').then(m => ({ default: m.RequestToVanishDialog })));
 
@@ -18,6 +19,8 @@ interface SettingsSection {
   illustration?: string;
   path: string;
   requiresAuth?: boolean;
+  /** When true, only shown to platform admins (see `isAdmin` in `@/lib/admins`). */
+  requiresAdmin?: boolean;
 }
 
 const settingsSections: SettingsSection[] = [
@@ -73,6 +76,15 @@ const settingsSections: SettingsSection[] = [
     illustration: '/magic-intro.png',
     path: '/settings/magic',
   },
+  {
+    id: 'organizers',
+    label: 'Organizers',
+    description: 'Appoint country organizers who can pin posts to country feeds',
+    illustration: '/community-intro.png',
+    path: '/organizers',
+    requiresAuth: true,
+    requiresAdmin: true,
+  },
 ];
 
 export function SettingsPage() {
@@ -98,10 +110,13 @@ export function SettingsPage() {
     description: `Manage your ${config.appName} settings`,
   });
 
-  // Magic section only appears in the menu once unlocked
-  const visibleSections = settingsSections.filter(
-    (section) => (!section.requiresAuth || user) && (section.id !== 'magic' || config.magicMouse),
-  );
+  // Magic section only appears once unlocked; admin-only sections gate by isAdmin.
+  const visibleSections = settingsSections.filter((section) => {
+    if (section.requiresAuth && !user) return false;
+    if (section.requiresAdmin && !isAdmin(user?.pubkey)) return false;
+    if (section.id === 'magic' && !config.magicMouse) return false;
+    return true;
+  });
 
   function unlockMagic() {
     if (config.magicMouse) {

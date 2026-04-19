@@ -10,6 +10,15 @@
 | 16767 | Active Profile Theme | The user's currently active theme (one per user)      |
 | 16769 | Profile Tabs         | The user's custom profile page tabs (one per user)    |
 
+### Agora Kinds
+
+| Kind  | Name                       | Description                                                    |
+|-------|----------------------------|----------------------------------------------------------------|
+| 20000 | Ephemeral Geo Chat (public) | Geo-anchored ephemeral chat message (kind 20000, public)      |
+| 20001 | Ephemeral Geo Heartbeat    | Geo-anchored ephemeral presence heartbeat (kind 20001)         |
+| 30385 | Community Stats Snapshot   | Pre-computed per-country / global community leaderboards       |
+| 36639 | Activist Action            | Country-scoped activist challenge with a sats bounty           |
+
 ### Community Kinds
 
 These event kinds were created by community contributors and are supported by Ditto. Full specifications are maintained by their respective authors.
@@ -285,6 +294,268 @@ After resolution (assuming `$follows` = `["pk1", "pk2"]`):
 - To **clear** all tabs: publish a kind 16769 event with no `tab` tags (only `alt`).
 - Clients MUST filter by `authors: [pubkey]` when querying to prevent spoofing.
 - `var` tags are shared across all `tab` tags in the same event.
+
+---
+
+## Kind 36639: Activist Action
+
+### Summary
+
+Addressable event kind for publishing **activist actions** (called "challenges" internally for backwards compatibility). An action is a country-scoped task — take a photo, make art, gather information, or take direct action — with an optional sats bounty paid out via NIP-57 zaps to the best **submissions**.
+
+Submissions are **NIP-22 comments** (kind 1111) authored under the action's coordinate, ranked by zap totals. There is no separate submission kind; an earlier draft (kind 36640) was deprecated in favor of NIP-22 reuse.
+
+### Trust model
+
+Anyone can publish a kind 36639 event, but clients SHOULD only display actions whose author is either:
+
+1. A platform-level admin (see `src/lib/admins.ts`), or
+2. An organizer for the action's country (see kind 30078 `agora-organizers`).
+
+This authorization model is identical to the per-country pin model — see Kind 30078 in this document for the storage shape.
+
+### Event Structure
+
+```json
+{
+  "kind": 36639,
+  "content": "<long-form description, freeform markdown-ish text>",
+  "tags": [
+    ["d", "plant-a-tree-1729000000000"],
+    ["title", "Plant a tree in your neighborhood"],
+    ["challenge-type", "photo"],
+    ["bounty", "10000"],
+    ["i", "iso3166:US"],
+    ["t", "agora-action"],
+    ["image", "https://example.com/cover.jpg"],
+    ["start", "1729000000"],
+    ["deadline", "1729604800"],
+    ["alt", "Agora activist action: Plant a tree in your neighborhood"]
+  ]
+}
+```
+
+### Tags
+
+| Tag              | Required | Description                                                                                              |
+|------------------|----------|----------------------------------------------------------------------------------------------------------|
+| `d`              | Yes      | Unique identifier (typically slug + timestamp). Forms the addressable coordinate `36639:<pubkey>:<d>`.   |
+| `title`          | Yes      | Short title shown on cards.                                                                              |
+| `challenge-type` | Yes      | One of `photo`, `art`, `info`, `action`. Drives the display icon and submission expectations.            |
+| `bounty`         | Yes      | Bounty in **sats**, as an unsigned integer string. Paid out via zaps to the chosen submission(s).        |
+| `i`              | Yes      | NIP-73 country identifier: `iso3166:XX` (preferred). Legacy `geo:XX` (length 6, country code only) is accepted as a read alias. Optionally combined with a `location` tag fallback. |
+| `t`              | Yes      | Discovery tag. Canonical write value is `agora-action`. Read aliases: `pathos-challenge`, `agora-challenge`. |
+| `image`          | No       | Cover image URL.                                                                                         |
+| `start`          | No       | Unix timestamp when the action becomes active. Defaults to `created_at`.                                 |
+| `deadline`       | No       | Unix timestamp when the action expires. Defaults to `start + 48h`.                                       |
+| `alt`            | Yes      | NIP-31 human-readable fallback. Convention: `"Agora activist action: <title>"`.                          |
+
+### Content
+
+Long-form description of the action. Plain text or light markdown. Clients render this as the action's body on the detail page.
+
+### Submissions
+
+Submissions are kind 1111 NIP-22 comments addressed to the action's coordinate (`["A", "36639:<pubkey>:<d>"]` and `["P", "<pubkey>"]`). Clients SHOULD:
+
+- Sort top-level submissions by **total zap amount** (sum of NIP-57 zap receipts on each submission), descending.
+- Show the bounty as the prize pool that organizers can distribute to top submissions via zaps.
+- Hide submissions with `created_at` after the action's `deadline` for "past" leaderboards (or surface them separately as "late submissions").
+
+### Discovery
+
+Clients querying actions globally:
+
+```json
+{ "kinds": [36639], "#t": ["agora-action", "pathos-challenge", "agora-challenge"], "limit": 50 }
+```
+
+Per country:
+
+```json
+{
+  "kinds": [36639],
+  "#t": ["agora-action", "pathos-challenge", "agora-challenge"],
+  "#i": ["iso3166:US", "geo:US"],
+  "limit": 50
+}
+```
+
+After fetching, clients MUST filter the results down to events whose author is either an admin or an organizer for the event's country.
+
+---
+
+## Kind 30385: Community Stats Snapshot
+
+### Summary
+
+Addressable event kind for **pre-computed community statistics** (per-country and global). A trusted off-app indexer (the "stats bot") publishes one event per scope:
+
+- **Per-country**: `d` tag is `iso3166:XX` (ISO 3166-1 alpha-2 country code).
+- **Global**: `d` tag is `iso3166:ZZ` — `ZZ` is the ISO 3166-1 user-assigned code Agora uses for the cross-country aggregate.
+
+Each event contains aggregate counts (comments, authors, zaps, submissions) and ranked leaderboards (top posters, trending hashtags, top zapped authors, top donors, top actions) across multiple time windows (`7d`, `30d`, `90d`, all-time). Storing pre-computed leaderboards in a single event lets clients render community pages without scanning thousands of underlying events.
+
+### Trust model
+
+Anyone can publish kind 30385, but clients MUST only consume events from trusted authors:
+
+- **Per-country events**: trusted authors are platform admins (`src/lib/admins.ts`) **plus** appointed organizers for that specific country (kind 30078 `agora-organizers`).
+- **Global event** (`iso3166:ZZ`): trusted authors are platform admins only.
+
+When multiple trusted events exist for the same scope, clients pick the most recent by `created_at`.
+
+### Event Structure
+
+```json
+{
+  "kind": 30385,
+  "content": "",
+  "tags": [
+    ["d", "iso3166:US"],
+
+    ["comment_cnt", "12345"],
+    ["comment_cnt_7d", "789"],
+    ["comment_cnt_30d", "3421"],
+    ["comment_cnt_90d", "9876"],
+    ["author_cnt", "543"],
+    ["zap_amount", "123456789"],
+    ["zap_cnt", "1234"],
+    ["submission_cnt", "456"],
+
+    ["top_poster", "<pubkey-hex>", "987"],
+    ["top_poster_7d", "<pubkey-hex>", "42"],
+
+    ["trending_hashtag", "climate", "321"],
+    ["trending_hashtag_7d", "protest", "67"],
+
+    ["top_zapped", "<pubkey-hex>", "<totalSats>", "<postCount>", "<avgSats>", "<zapCount>"],
+    ["top_donor", "<pubkey-hex>", "<totalSats>", "<zapCount>"],
+
+    ["top_action", "36639:<pubkey>:<d-tag>", "Plant a tree", "<submissions>", "<bounty>", "<zapAmountSats>"]
+  ]
+}
+```
+
+### Tag families
+
+All numeric values are unsigned integers serialised as base-10 strings.
+
+#### Aggregate counts (one tag per metric per timeframe)
+
+| Tag base name      | Meaning                                                |
+|--------------------|--------------------------------------------------------|
+| `comment_cnt`      | Number of NIP-22 comments in scope                     |
+| `author_cnt`       | Distinct author pubkeys in scope                       |
+| `zap_amount`       | Total zap amount in **sats**                           |
+| `zap_cnt`          | Number of NIP-57 zap receipts                          |
+| `submission_cnt`   | Submissions to activist actions (kind 36639)           |
+
+Each is published as four tags: bare (`<base>`, all-time), `<base>_7d`, `<base>_30d`, `<base>_90d`.
+
+#### Leaderboards (repeated; one tag per row, ordered by rank)
+
+All-time variants use the bare tag name; windowed variants use the `_7d`, `_30d`, `_90d` suffixes.
+
+| Tag base name        | Positional fields                                                                              |
+|----------------------|-----------------------------------------------------------------------------------------------|
+| `top_poster`         | `[name, pubkeyHex, count]`                                                                    |
+| `trending_hashtag`   | `[name, hashtag, count]`                                                                      |
+| `top_zapped`         | `[name, pubkeyHex, totalSats, postCount, avgSats, zapCount]` (`zapCount` optional, legacy)    |
+| `top_donor`          | `[name, pubkeyHex, totalSats, zapCount]`                                                      |
+| `top_action`         | `[name, "36639:<pubkey>:<d>", title, submissions, bounty, zapAmountSats]`                     |
+
+Clients SHOULD parse defensively — accept missing trailing fields as `0` or omitted to maintain backwards compatibility as the schema evolves.
+
+### Content
+
+Empty string. All data lives in tags so relays can index/filter and clients don't need to parse JSON.
+
+### Discovery
+
+Per-country snapshot:
+
+```json
+{
+  "kinds": [30385],
+  "authors": [<admin and organizer pubkeys>],
+  "#d": ["iso3166:US"],
+  "limit": 10
+}
+```
+
+Global snapshot:
+
+```json
+{
+  "kinds": [30385],
+  "authors": [<admin pubkeys>],
+  "#d": ["iso3166:ZZ"],
+  "limit": 10
+}
+```
+
+After fetching, take the event with the highest `created_at` and parse it. Cache for ~1–2 minutes; the producer typically refreshes on a similar cadence.
+
+---
+
+## Kinds 20000 / 20001: Ephemeral Geo Chat
+
+### Summary
+
+Ephemeral events used to power realtime location-anchored chat on the world map. Both kinds live in NIP-01's ephemeral range (`20000 ≤ kind < 30000`), so relays MUST NOT persist them — they are short-lived signals only.
+
+- **Kind 20000** — public chat message. The `content` field carries the message text.
+- **Kind 20001** — presence "heartbeat". Same tag schema, but `content` MAY be empty (the event simply broadcasts that someone is listening at the geohash).
+
+This kind range is shared with the wider Bitchat / geo-chat ecosystem; Agora interoperates with Pathos and other clients producing the same shape.
+
+### Tags
+
+| Tag | Required | Purpose                                                                 |
+|-----|----------|-------------------------------------------------------------------------|
+| `g` | Yes      | Geohash anchoring the message. Any precision is allowed; the dialog filters by exact-match `g` value, while the map clusters by full geohash. |
+| `n` | No       | Display nickname (≤ 16 chars after client-side truncation). Anonymous senders pick a random "ghost" handle; logged-in senders may use their account display name. |
+
+Events without a `g` tag MUST be ignored — they cannot be plotted.
+
+### Identity
+
+There are two valid signing paths:
+
+1. **Real identity** — a logged-in user signs with their existing Nostr key (typically via NIP-07 / NIP-46). Other clients can correlate the chat message with the author's public profile.
+2. **Ephemeral "ghost" identity** — the client generates a fresh in-memory keypair (never persisted) and signs locally. Only the chosen `n` nickname is persisted (in `localStorage`) so the user keeps a stable handle even though the pubkey rotates per session.
+
+Clients SHOULD let logged-in users toggle between modes per-session and SHOULD default to the ghost mode when no account is available.
+
+### Relay Routing
+
+Because ephemeral events are not stored, latency dominates the experience. Clients SHOULD:
+
+1. Always include a baseline of widely-reachable relays (`wss://nos.lol`, `wss://relay.damus.io`, `wss://relay.primal.net`).
+2. Augment with geo-located relays drawn from the [permissionlesstech/georelays](https://github.com/permissionlesstech/georelays) CSV catalogue (`relayUrl,latitude,longitude` per line).
+3. For a specific geohash conversation, prefer the relays nearest the decoded coordinates (Haversine distance, top-N).
+4. For the global map heatmap, take a rotating window (e.g. 8 relays, rotated every 5 minutes) so coverage spreads without saturating any single relay.
+
+### Time Window
+
+Clients SHOULD only surface events from the last hour (`since = now - 3600`). Older ephemeral events are uninteresting for "what's happening right now" and most relays will have dropped them anyway.
+
+### Example
+
+```json
+{
+  "kind": 20000,
+  "created_at": 1734567890,
+  "pubkey": "...",
+  "tags": [
+    ["g", "u4pruydqqvj"],
+    ["n", "stealthranger4242"]
+  ],
+  "content": "anyone in berlin tonight?",
+  "sig": "..."
+}
+```
 
 ---
 

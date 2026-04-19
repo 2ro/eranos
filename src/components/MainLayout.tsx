@@ -106,8 +106,15 @@ function MainLayoutInner() {
               </div>
             )}
           </div>
-          {/* Right sidebar — render page-provided sidebar, or the widget sidebar */}
-          {rightSidebar ?? <Suspense fallback={<div className="w-[300px] shrink-0 hidden xl:block" />}><WidgetSidebar /></Suspense>}
+          {/* Right sidebar — render page-provided sidebar, or the default
+              widget sidebar. `null` (explicit) means "no sidebar"; `undefined`
+              (unset) falls back to the default. We distinguish these because
+              `??` would otherwise treat `null` the same as unset and render
+              the default — which silently breaks pages that intend to be
+              full-bleed (e.g. /world, /messages). */}
+          {rightSidebar === undefined
+            ? <Suspense fallback={<div className="w-[300px] shrink-0 hidden xl:block" />}><WidgetSidebar /></Suspense>
+            : rightSidebar}
         </Suspense>
       </div>
 

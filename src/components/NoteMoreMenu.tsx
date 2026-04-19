@@ -52,6 +52,10 @@ import { useAuthor } from '@/hooks/useAuthor';
 import { useMuteList } from '@/hooks/useMuteList';
 import { useDeleteEvent } from '@/hooks/useDeleteEvent';
 import { useFeedSettings } from '@/hooks/useFeedSettings';
+import { useOrganizers } from '@/hooks/useOrganizers';
+import { usePinnedPosts } from '@/hooks/usePinnedPosts';
+import { useCountryFeed } from '@/contexts/CountryFeedContext';
+import { isAdmin } from '@/lib/admins';
 import { genUserName } from '@/lib/genUserName';
 import { timeAgo } from '@/lib/timeAgo';
 import { toast } from '@/hooks/useToast';
@@ -317,6 +321,24 @@ function NoteMoreMenuContent({ event, open, onOpenChange, onReport, onMention, o
   const { isPinned, togglePin } = usePinnedNotes(user?.pubkey);
   const pinned = isPinned(event.id);
   const isOwnPost = user?.pubkey === event.pubkey;
+
+  // Country-feed pin/unpin context (organizer/admin action). `useCountryFeed`
+  // returns null outside of a country page; we only enable usePinnedPosts when
+  // the viewer is actually authorized to pin so we avoid extra relay traffic
+  // for read-only viewers.
+  const countryFeed = useCountryFeed();
+  const countryCode = countryFeed?.countryCode;
+  const userIsAdmin = !!user && isAdmin(user.pubkey);
+  const { isOrganizer } = useOrganizers();
+  const userIsOrganizerHere =
+    !!user && !!countryCode && isOrganizer(user.pubkey, countryCode);
+  const canPinHere = userIsAdmin || userIsOrganizerHere;
+  const {
+    isPinned: isPinnedInCountry,
+    pinPost,
+    unpinPost,
+  } = usePinnedPosts(canPinHere ? countryCode : undefined);
+  const postIsPinnedInCountry = !!countryCode && isPinnedInCountry(event.id);
   const author = useAuthor(event.pubkey);
   const metadata = author.data?.metadata;
   const avatarShape = getAvatarShape(metadata);
@@ -370,6 +392,33 @@ function NoteMoreMenuContent({ event, open, onOpenChange, onReport, onMention, o
         toast({ title: 'Failed to update pinned posts', variant: 'destructive' });
       },
     });
+    close();
+  };
+
+  const handleToggleCountryPin = () => {
+    if (!countryCode) return;
+    impactLight();
+    const mutation = postIsPinnedInCountry ? unpinPost : pinPost;
+    mutation.mutate(
+      { eventId: event.id, countryCode },
+      {
+        onSuccess: () => {
+          toast({
+            title: postIsPinnedInCountry
+              ? 'Unpinned from country feed'
+              : 'Pinned to country feed',
+          });
+        },
+        onError: () => {
+          toast({
+            title: postIsPinnedInCountry
+              ? 'Failed to unpin from country feed'
+              : 'Failed to pin to country feed',
+            variant: 'destructive',
+          });
+        },
+      },
+    );
     close();
   };
 
@@ -492,6 +541,13 @@ function NoteMoreMenuContent({ event, open, onOpenChange, onReport, onMention, o
               icon={<Pin className={cn("size-5", pinned && "fill-current")} />}
               label={pinned ? 'Unpin from profile' : 'Pin on profile'}
               onClick={handleTogglePin}
+            />
+          )}
+          {canPinHere && (
+            <MenuItem
+              icon={<Pin className={cn('size-5', postIsPinnedInCountry && 'fill-current')} />}
+              label={postIsPinnedInCountry ? 'Unpin from country feed' : 'Pin to country feed'}
+              onClick={handleToggleCountryPin}
             />
           )}
           {isOwnPost && (

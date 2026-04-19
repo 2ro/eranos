@@ -28,6 +28,13 @@ import { ratingToStars } from '@/lib/bookstr';
 import { useAppContext } from '@/hooks/useAppContext';
 import { useWeather, getPrecipitation } from '@/hooks/useWeather';
 import { useComments } from '@/hooks/useComments';
+import { usePaginatedFeed } from '@/hooks/usePaginatedFeed';
+import { useInfiniteScroll } from '@/hooks/useInfiniteScroll';
+import { usePinnedPosts } from '@/hooks/usePinnedPosts';
+import { CountryFeedProvider } from '@/components/CountryFeedProvider';
+import { CommunityStatsPanel } from '@/components/CommunityStatsPanel';
+import { Pin } from 'lucide-react';
+import { NoteCard } from '@/components/NoteCard';
 import { useBookReviews } from '@/hooks/useBookReviews';
 import { useAuthor } from '@/hooks/useAuthor';
 import { useProfileUrl } from '@/hooks/useProfileUrl';
@@ -181,21 +188,79 @@ export function ExternalContentPage() {
   }, [content]);
 
   const { muteItems } = useMuteList();
-  const { data: commentsData, isLoading: commentsLoading } = useComments(commentRoot, 500);
+
+  // Country pages route through usePaginatedFeed (legacy `geo:` fallback +
+  // cursor pagination + diversity cap); all other external content (URL,
+  // ISBN, unknown) keeps the existing threaded useComments path.
+  const isCountry = content?.type === 'iso3166';
+  const countryCode = isCountry ? content.code : null;
+
+  const { data: commentsData, isLoading: commentsLoading } = useComments(
+    isCountry ? undefined : commentRoot,
+    500,
+  );
+
+  const {
+    data: feedPages,
+    isLoading: feedLoading,
+    hasNextPage,
+    isFetchingNextPage,
+    fetchNextPage,
+  } = usePaginatedFeed({
+    countryCode: isCountry && countryCode ? countryCode : undefined,
+  });
+
+  const { scrollRef } = useInfiniteScroll({
+    hasNextPage: !!hasNextPage,
+    isFetchingNextPage,
+    fetchNextPage,
+    pageCount: feedPages?.pages.length,
+    enabled: isCountry,
+  });
+
+  // Country-feed pinned posts (admin/organizer-curated). Fetched only on
+  // country pages; the hook is a no-op when countryCode is undefined.
+  const { pinnedPosts, isLoading: pinnedLoading } = usePinnedPosts(
+    isCountry && countryCode ? countryCode : undefined,
+  );
+  const pinnedIds = useMemo(
+    () => new Set(pinnedPosts.map((p) => p.id)),
+    [pinnedPosts],
+  );
+  const filteredPinnedPosts = useMemo(
+    () =>
+      muteItems.length > 0
+        ? pinnedPosts.filter((e) => !isEventMuted(e, muteItems))
+        : pinnedPosts,
+    [pinnedPosts, muteItems],
+  );
 
   // Build a reply tree: direct replies each paired with their first sub-reply.
   const orderedReplies = useMemo(() => {
+    if (isCountry) {
+      // Country feed: flat list of top-level posts ordered newest-first
+      // (already sorted by usePaginatedFeed). Pinned posts are surfaced in a
+      // dedicated section above, so we drop them from the regular feed list
+      // to avoid duplication. No sub-reply previews.
+      const events = (feedPages?.pages ?? []).flatMap((page) => page.events);
+      const filtered = events.filter((e) => {
+        if (pinnedIds.has(e.id)) return false;
+        if (muteItems.length > 0 && isEventMuted(e, muteItems)) return false;
+        return true;
+      });
+      return filtered.map((reply) => ({
+        reply,
+        firstSubReply: undefined as import('@nostrify/nostrify').NostrEvent | undefined,
+      }));
+    }
+
     const topLevel = commentsData?.topLevelComments ?? [];
     const filteredTopLevel = muteItems.length > 0
       ? topLevel.filter((r) => !isEventMuted(r, muteItems))
       : topLevel;
 
-    // Country feeds are social feeds (newest-first); other types are threaded conversations (oldest-first)
-    const sorted = [...filteredTopLevel].sort((a, b) =>
-      content?.type === 'iso3166'
-        ? b.created_at - a.created_at
-        : a.created_at - b.created_at
-    );
+    // Other external content types are threaded conversations (oldest-first)
+    const sorted = [...filteredTopLevel].sort((a, b) => a.created_at - b.created_at);
 
     return sorted.map((reply) => {
       const directReplies = commentsData?.getDirectReplies(reply.id) ?? [];
@@ -204,15 +269,13 @@ export function ExternalContentPage() {
         firstSubReply: directReplies[0] as import('@nostrify/nostrify').NostrEvent | undefined,
       };
     });
-  }, [commentsData, muteItems, content?.type]);
+  }, [isCountry, feedPages, commentsData, muteItems, pinnedIds]);
+
+  const repliesLoading = isCountry ? feedLoading : commentsLoading;
 
   // FAB opens the comment compose dialog
   const [composeOpen, setComposeOpen] = useState(false);
   const openCompose = useCallback(() => setComposeOpen(true), []);
-
-  // Weather-based precipitation effect for country pages
-  const isCountry = content?.type === 'iso3166';
-  const countryCode = isCountry ? content.code : null;
   const { data: weather } = useWeather(countryCode);
   const precipitation = useMemo(() => {
     if (!weather) return null;
@@ -274,16 +337,65 @@ export function ExternalContentPage() {
           isbn={content.value.replace('isbn:', '')}
           commentRoot={commentRoot}
           orderedReplies={orderedReplies}
-          commentsLoading={commentsLoading}
+          commentsLoading={repliesLoading}
         />
+      ) : isCountry && countryCode ? (
+        <CountryFeedProvider countryCode={countryCode}>
+          {/* Inline compose box */}
+          <ComposeBox compact replyTo={commentRoot} />
+
+          {/* Community stats snapshot (kind 30385) for this country.
+              Renders nothing when no trusted snapshot exists. */}
+          <div className="px-4 pt-2">
+            <CommunityStatsPanel countryCode={countryCode} />
+          </div>
+
+          {/* Pinned posts (curated by country organizers/admins). Skipped on
+              ISBN/url/unknown content types — only meaningful for country feeds. */}
+          {(pinnedLoading || filteredPinnedPosts.length > 0) && (
+            <div>
+              <div className="px-4 pt-4 pb-2 flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                <Pin className="size-3.5" />
+                <span>Pinned</span>
+              </div>
+              {pinnedLoading ? (
+                <CommentsSkeleton />
+              ) : (
+                <div>
+                  {filteredPinnedPosts.map((post) => (
+                    <NoteCard key={post.id} event={post} />
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Recent posts list */}
+          <div>
+            {repliesLoading ? (
+              <CommentsSkeleton />
+            ) : orderedReplies.length > 0 ? (
+              <>
+                <FlatThreadedReplyList replies={orderedReplies} />
+                {hasNextPage && (
+                  <div ref={scrollRef} className="py-6 text-center text-xs text-muted-foreground">
+                    {isFetchingNextPage ? 'Loading more…' : ''}
+                  </div>
+                )}
+              </>
+            ) : filteredPinnedPosts.length === 0 ? (
+              <CommentsEmptyState />
+            ) : null}
+          </div>
+        </CountryFeedProvider>
       ) : (
         <>
           {/* Inline compose box */}
           <ComposeBox compact replyTo={commentRoot} />
 
-          {/* Threaded comments list */}
+          {/* Threaded comments list (URL/unknown content types) */}
           <div>
-            {commentsLoading ? (
+            {repliesLoading ? (
               <CommentsSkeleton />
             ) : orderedReplies.length > 0 ? (
               <FlatThreadedReplyList replies={orderedReplies} />
@@ -291,7 +403,7 @@ export function ExternalContentPage() {
               <CommentsEmptyState />
             )}
           </div>
-         </>
+        </>
       )}
     </main>
   );
