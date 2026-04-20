@@ -1,7 +1,6 @@
-import type { NostrEvent } from '@nostrify/nostrify';
 import { useQueryClient } from '@tanstack/react-query';
 import { useSeoMeta } from '@unhead/react';
-import { Loader2, Users } from 'lucide-react';
+import { Users } from 'lucide-react';
 
 import { CommunityCard } from '@/components/CommunityCard';
 import { FeedEmptyState } from '@/components/FeedEmptyState';
@@ -14,16 +13,14 @@ import { TabButton } from '@/components/TabButton';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useLayoutOptions } from '@/contexts/LayoutContext';
 import { useAppContext } from '@/hooks/useAppContext';
-import { useCommunityFeed } from '@/hooks/useCommunityFeed';
+import { useCommunityActivityFeed } from '@/hooks/useCommunityActivityFeed';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useFeedTab } from '@/hooks/useFeedTab';
-import { useInfiniteScroll } from '@/hooks/useInfiniteScroll';
 import { useMyCommunities } from '@/hooks/useMyCommunities';
-import { deduplicateEvents } from '@/lib/deduplicateEvents';
 
 // ─── Types ─────────────────────────────────────────────────────────────────────
 
-type CommunitiesTab = 'mine' | 'follows';
+type CommunitiesTab = 'activities' | 'mine';
 
 // ─── Skeletons ─────────────────────────────────────────────────────────────────
 
@@ -80,8 +77,8 @@ export function CommunitiesPage() {
   });
 
   const [activeTab, setActiveTab] = useFeedTab<CommunitiesTab>('communities', [
+    'activities',
     'mine',
-    'follows',
   ]);
 
   useSeoMeta({
@@ -93,13 +90,13 @@ export function CommunitiesPage() {
     <main className="pb-16 sidebar:pb-0">
       <PageHeader title="Communities" icon={<Users className="size-5" />} />
 
-      {/* Follows / My Communities tabs */}
+      {/* Activities / My Communities tabs */}
       {user && (
         <SubHeaderBar>
           <TabButton
-            label="Follows"
-            active={activeTab === 'follows'}
-            onClick={() => setActiveTab('follows')}
+            label="Activities"
+            active={activeTab === 'activities'}
+            onClick={() => setActiveTab('activities')}
           />
           <TabButton
             label="My Communities"
@@ -116,10 +113,11 @@ export function CommunitiesPage() {
       {activeTab === 'mine' ? (
         <MyCommunitiesTab />
       ) : (
-        <FollowsFeedTab
+        <ActivitiesTab
           onRefresh={() =>
             queryClient.invalidateQueries({
-              queryKey: ['community-feed', 'follows'],
+              queryKey: ['community-activity-feed'],
+              exact: false,
             })
           }
         />
@@ -188,64 +186,46 @@ function MyCommunitiesContent() {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// Follows Feed Tab
+// Activities Tab
 // ═══════════════════════════════════════════════════════════════════════════════
 
-function FollowsFeedTab({ onRefresh }: { onRefresh: () => Promise<void> }) {
+function ActivitiesTab({ onRefresh }: { onRefresh: () => Promise<void> }) {
   const { user } = useCurrentUser();
-  const feedQuery = useCommunityFeed();
+  const { data: activityEvents, isLoading } = useCommunityActivityFeed();
 
-  const {
-    data: rawData,
-    isPending,
-    isLoading,
-    fetchNextPage,
-    hasNextPage,
-    isFetchingNextPage,
-  } = feedQuery;
-
-  const { scrollRef } = useInfiniteScroll({
-    hasNextPage,
-    isFetchingNextPage,
-    fetchNextPage,
-    pageCount: rawData?.pages?.length,
-  });
-
-  const feedEvents = deduplicateEvents(rawData?.pages as NostrEvent[][]);
-
-  const showSkeleton = isPending || (isLoading && !rawData);
+  if (!user) {
+    return (
+      <div className="py-20 px-8 flex flex-col items-center gap-6 text-center">
+        <div className="p-4 rounded-full bg-primary/10">
+          <Users className="size-8 text-primary" />
+        </div>
+        <div className="space-y-2 max-w-xs">
+          <h2 className="text-xl font-bold">Community activity</h2>
+          <p className="text-muted-foreground text-sm">
+            Log in to see activity from your communities.
+          </p>
+        </div>
+        <LoginArea className="max-w-60" />
+      </div>
+    );
+  }
 
   return (
     <PullToRefresh onRefresh={onRefresh}>
-      {showSkeleton ? (
+      {isLoading ? (
         <div className="divide-y divide-border">
           {Array.from({ length: 5 }).map((_, i) => (
             <NoteCardSkeleton key={i} />
           ))}
         </div>
-      ) : feedEvents.length > 0 ? (
+      ) : activityEvents && activityEvents.length > 0 ? (
         <div>
-          {feedEvents.map((event) => (
+          {activityEvents.map((event) => (
             <NoteCard key={event.id} event={event} />
           ))}
-          {hasNextPage && (
-            <div ref={scrollRef} className="py-4">
-              {isFetchingNextPage && (
-                <div className="flex justify-center">
-                  <Loader2 className="size-5 animate-spin text-muted-foreground" />
-                </div>
-              )}
-            </div>
-          )}
         </div>
       ) : (
-        <FeedEmptyState
-          message={
-            user
-              ? 'No community activity from people you follow yet.'
-              : 'No community activity found yet.'
-          }
-        />
+        <FeedEmptyState message="No activity from your communities yet." />
       )}
     </PullToRefresh>
   );
