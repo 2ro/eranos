@@ -254,6 +254,15 @@ export const AppConfigSchema = z.object({
     id: z.string(),
     height: z.number().optional(),
   })).optional(),
+  messaging: z.object({
+    enabled: z.boolean().optional(),
+    discoveryRelays: z.array(z.string().url()).optional(),
+    relayMode: z.enum(['discovery', 'hybrid', 'strict_outbox']).optional(),
+    renderInlineMedia: z.boolean().optional(),
+    soundEnabled: z.boolean().optional(),
+    soundId: z.string().optional(),
+    devMode: z.boolean().optional(),
+  }).optional(),
 });
 
 // ─── BuildConfigSchema (build-time app config) ───────────────────────
@@ -332,6 +341,15 @@ export const EncryptedSettingsSchema = z.looseObject({
     id: z.string(),
     height: z.number().optional(),
   })).optional(),
+  messaging: z.object({
+    enabled: z.boolean().optional(),
+    discoveryRelays: z.array(z.string().url()).optional(),
+    relayMode: z.enum(['discovery', 'hybrid', 'strict_outbox']).optional(),
+    renderInlineMedia: z.boolean().optional(),
+    soundEnabled: z.boolean().optional(),
+    soundId: z.string().optional(),
+    devMode: z.boolean().optional(),
+  }).optional(),
   homePage: z.string().optional(),
   showGlobalFeed: z.boolean().optional(),
   showCommunityFeed: z.boolean().optional(),
