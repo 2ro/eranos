@@ -50,7 +50,7 @@ cp .env.example .env
 docker compose up --build
 ```
 
-Proxy URL: `http://localhost:8082`
+Proxy URL: `http://localhost:8083`
 
 This starts:
 
