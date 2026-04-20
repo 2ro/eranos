@@ -13,11 +13,8 @@ export const BADGE_DEFINITION_KIND = 30009;
 /** NIP-58 badge award. */
 export const BADGE_AWARD_KIND = 8;
 
-/** NIP-56 report / moderation. */
-export const REPORT_KIND = 1984;
-
-/** NIP-09 deletion request. */
-export const DELETION_KIND = 5;
+// TODO: kind 1984 (NIP-56 reports) and kind 5 (NIP-09 deletions) will be
+// added when the moderation overlay is implemented.
 
 // ── Rank tier metadata ────────────────────────────────────────────────────────
 
@@ -142,13 +139,13 @@ export interface CommunityMembership {
  * 1. Seed rank 0 from the community definition (founder + moderators).
  * 2. Iteratively validate badge awards — awarder must be a validated
  *    member with rank strictly less than the awarded badge's rank.
- * 3. Apply moderation overlays (kind 1984 bans).
+ *
+ * TODO: Step 3 (moderation overlay via kind 1984 bans + kind 5 deletions)
+ * is not yet implemented.
  */
 export function resolveMembership(
   community: ParsedCommunity,
   awardEvents: NostrEvent[],
-  reportEvents: NostrEvent[],
-  deletionEvents: NostrEvent[],
 ): CommunityMembership {
   // Build badge-to-rank lookup
   const badgeToRank = new Map<string, number>();
@@ -172,26 +169,13 @@ export function resolveMembership(
     }
   }
 
-  // Build set of deleted event IDs (kind 5 targeting kind 8)
-  const deletedIds = new Set<string>();
-  for (const del of deletionEvents) {
-    const kTags = del.tags.filter(([n]) => n === 'k').map(([, v]) => v);
-    if (!kTags.includes('8')) continue;
-    for (const tag of del.tags) {
-      if (tag[0] === 'e') deletedIds.add(tag[1]);
-    }
-  }
-
-  // Filter out deleted awards
-  const activeAwards = awardEvents.filter((e) => !deletedIds.has(e.id));
-
   // Step 2: Iterative validation
   let changed = true;
   const processed = new Set<string>();
 
   while (changed) {
     changed = false;
-    for (const award of activeAwards) {
+    for (const award of awardEvents) {
       if (processed.has(award.id)) continue;
 
       const awarderPubkey = award.pubkey;
@@ -231,47 +215,6 @@ export function resolveMembership(
       }
 
       processed.add(award.id);
-    }
-  }
-
-  // Step 3: Apply moderation (bans)
-  // Build set of deleted report IDs
-  const deletedReportIds = new Set<string>();
-  for (const del of deletionEvents) {
-    const kTags = del.tags.filter(([n]) => n === 'k').map(([, v]) => v);
-    if (!kTags.includes('1984')) continue;
-    for (const tag of del.tags) {
-      if (tag[0] === 'e') deletedReportIds.add(tag[1]);
-    }
-  }
-
-  const communityATag = community.aTag;
-
-  for (const report of reportEvents) {
-    if (deletedReportIds.has(report.id)) continue;
-
-    // Must be scoped to this community
-    const scopedToThis = report.tags.some(
-      ([n, v]) => n === 'A' && v === communityATag,
-    );
-    if (!scopedToThis) continue;
-
-    const reporter = validated.get(report.pubkey);
-    if (!reporter) continue; // Non-member reports are ignored
-
-    // Ban: p tag only (no e tag)
-    const hasPTag = report.tags.some(([n]) => n === 'p');
-    const hasETag = report.tags.some(([n]) => n === 'e');
-
-    if (hasPTag && !hasETag) {
-      const targetPubkey = report.tags.find(([n]) => n === 'p')?.[1];
-      if (!targetPubkey) continue;
-      const target = validated.get(targetPubkey);
-      if (!target) continue;
-      // Reporter must outrank target
-      if (reporter.rank < target.rank) {
-        validated.delete(targetPubkey);
-      }
     }
   }
 
