@@ -3,9 +3,11 @@ import { DMMessagingInterface } from '@samthomson/nostr-messaging/ui';
 import { Link } from 'react-router-dom';
 import { useLayoutOptions } from '@/contexts/LayoutContext';
 import { useAppContext } from '@/hooks/useAppContext';
+import { useCurrentUser } from '@/hooks/useCurrentUser';
 
 const Messages = () => {
   const { config } = useAppContext();
+  const { user } = useCurrentUser();
   const messagingEnabled = config.messaging?.enabled ?? true;
 
   useSeoMeta({
@@ -22,7 +24,13 @@ const Messages = () => {
 
   return (
     <div className="h-dvh flex flex-col">
-      {messagingEnabled ? (
+      {!user ? (
+        <div className="flex-1 flex items-center justify-center p-6">
+          <div className="max-w-md text-center space-y-3 text-muted-foreground">
+            <p>Please log in to view your messages.</p>
+          </div>
+        </div>
+      ) : messagingEnabled ? (
         <DMMessagingInterface />
       ) : (
         <div className="flex-1 flex items-center justify-center p-6">
