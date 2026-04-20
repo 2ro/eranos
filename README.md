@@ -41,7 +41,7 @@ Development server: `http://localhost:8080`
 
 ### Docker Getting Started
 
-Use Docker Compose when you want the nginx reverse-proxy stack (same pattern as Ditto):
+Use Docker Compose when you want the nginx reverse-proxy stack (necessary if you want decryptable media in messages - kind 15s of NIP 17):
 
 ```sh
 git clone https://gitlab.com/soapbox-pub/agora-3.git
