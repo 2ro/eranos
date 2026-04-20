@@ -630,82 +630,88 @@ export function SearchPage() {
                     ))}
                   </div>
                 </div>
-                <Separator />
 
-                {/* Media + Protocol */}
-                <div className="grid grid-cols-2 gap-2">
-                  <div className="space-y-1.5">
-                    <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide flex items-center gap-1">Media</span>
-                    <Select value={mediaType} onValueChange={(v) => setMediaType(v)}>
-                      <SelectTrigger className="w-full bg-secondary/50 h-8 text-base md:text-xs">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="all">All</SelectItem>
-                        <SelectItem value="images">Images</SelectItem>
-                        <SelectItem value="videos">Videos</SelectItem>
-                        <SelectItem value="vines">Shorts</SelectItem>
-                        <SelectItem value="none">No media</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div className="space-y-1.5">
-                    <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide flex items-center gap-1">Protocol <HelpTip faqId="vs-mastodon-bluesky" iconSize="size-3" /></span>
-                    <Select value={platform} onValueChange={(v) => setPlatform(v)}>
-                      <SelectTrigger className="w-full bg-secondary/50 h-8 text-base md:text-xs">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="nostr">Nostr</SelectItem>
-                        <SelectItem value="activitypub">Mastodon</SelectItem>
-                        <SelectItem value="atproto">Bluesky</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
+                {/* Posts-only filters (hidden on communities tab) */}
+                {activeTab === 'posts' && (
+                  <>
+                    <Separator />
 
-                {/* Language + Kind */}
-                <div className="grid grid-cols-2 gap-2">
-                  <div className="space-y-1.5">
-                    <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide flex items-center gap-1">Language</span>
-                    <Select value={language} onValueChange={(v) => setLanguage(v)}>
-                      <SelectTrigger className="w-full bg-secondary/50 h-8 text-base md:text-xs">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="global">Global</SelectItem>
-                        <SelectItem value="en">English</SelectItem>
-                        <SelectItem value="es">Spanish</SelectItem>
-                        <SelectItem value="fr">French</SelectItem>
-                        <SelectItem value="de">German</SelectItem>
-                        <SelectItem value="ja">Japanese</SelectItem>
-                        <SelectItem value="zh">Chinese</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div className="space-y-1.5">
-                    <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide flex items-center gap-1">Kind</span>
-                    <KindPicker value={kindFilter} options={kindOptions} onChange={(v) => setKindFilter(v)} />
-                  </div>
-                </div>
+                    {/* Media + Protocol */}
+                    <div className="grid grid-cols-2 gap-2">
+                      <div className="space-y-1.5">
+                        <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide flex items-center gap-1">Media</span>
+                        <Select value={mediaType} onValueChange={(v) => setMediaType(v)}>
+                          <SelectTrigger className="w-full bg-secondary/50 h-8 text-base md:text-xs">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="all">All</SelectItem>
+                            <SelectItem value="images">Images</SelectItem>
+                            <SelectItem value="videos">Videos</SelectItem>
+                            <SelectItem value="vines">Shorts</SelectItem>
+                            <SelectItem value="none">No media</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div className="space-y-1.5">
+                        <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide flex items-center gap-1">Protocol <HelpTip faqId="vs-mastodon-bluesky" iconSize="size-3" /></span>
+                        <Select value={platform} onValueChange={(v) => setPlatform(v)}>
+                          <SelectTrigger className="w-full bg-secondary/50 h-8 text-base md:text-xs">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="nostr">Nostr</SelectItem>
+                            <SelectItem value="activitypub">Mastodon</SelectItem>
+                            <SelectItem value="atproto">Bluesky</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </div>
 
-                {kindFilter === 'custom' && (
-                  <Input
-                    type="text"
-                    inputMode="numeric"
-                    placeholder="e.g. 1, 30023"
-                    value={customKindText}
-                    onChange={(e) => setCustomKindText(e.target.value)}
-                    className="bg-secondary/50 border-border focus-visible:ring-1 rounded-lg text-base md:text-xs h-8"
-                  />
+                    {/* Language + Kind */}
+                    <div className="grid grid-cols-2 gap-2">
+                      <div className="space-y-1.5">
+                        <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide flex items-center gap-1">Language</span>
+                        <Select value={language} onValueChange={(v) => setLanguage(v)}>
+                          <SelectTrigger className="w-full bg-secondary/50 h-8 text-base md:text-xs">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="global">Global</SelectItem>
+                            <SelectItem value="en">English</SelectItem>
+                            <SelectItem value="es">Spanish</SelectItem>
+                            <SelectItem value="fr">French</SelectItem>
+                            <SelectItem value="de">German</SelectItem>
+                            <SelectItem value="ja">Japanese</SelectItem>
+                            <SelectItem value="zh">Chinese</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div className="space-y-1.5">
+                        <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide flex items-center gap-1">Kind</span>
+                        <KindPicker value={kindFilter} options={kindOptions} onChange={(v) => setKindFilter(v)} />
+                      </div>
+                    </div>
+
+                    {kindFilter === 'custom' && (
+                      <Input
+                        type="text"
+                        inputMode="numeric"
+                        placeholder="e.g. 1, 30023"
+                        value={customKindText}
+                        onChange={(e) => setCustomKindText(e.target.value)}
+                        className="bg-secondary/50 border-border focus-visible:ring-1 rounded-lg text-base md:text-xs h-8"
+                      />
+                    )}
+
+                    {/* Include replies toggle */}
+                    <Separator />
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-medium text-muted-foreground">Include replies</span>
+                      <Switch checked={includeReplies} onCheckedChange={setIncludeReplies} className="scale-90" />
+                    </div>
+                  </>
                 )}
-
-                {/* Include replies toggle */}
-                <Separator />
-                <div className="flex items-center justify-between">
-                  <span className="text-xs font-medium text-muted-foreground">Include replies</span>
-                  <Switch checked={includeReplies} onCheckedChange={setIncludeReplies} className="scale-90" />
-                </div>
               </PopoverContent>
             </Popover>
           )}
