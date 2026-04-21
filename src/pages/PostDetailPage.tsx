@@ -25,6 +25,7 @@ import { Link, useNavigate } from "react-router-dom";
 const ArticleContent = lazy(() => import("@/components/ArticleContent").then(m => ({ default: m.ArticleContent })));
 import { BadgeDetailContent } from "@/components/BadgeDetailContent";
 import { CalendarEventDetailPage } from "@/components/CalendarEventDetailPage";
+import { CommunityDetailPage } from "@/components/CommunityDetailPage";
 
 import {
   ColorMomentContent,
@@ -125,6 +126,7 @@ function shellTitleForKind(kind?: number): string {
   if (MUSIC_KINDS.has(kind)) return "Track Details";
   if (PODCAST_KINDS.has(kind)) return "Episode Details";
   if (CALENDAR_EVENT_KINDS.has(kind)) return "Event Details";
+  if (kind === 34550) return "Community";
   if (FOLLOW_PACK_KINDS.has(kind)) return "Follow Pack";
   if (kind === LIVE_STREAM_KIND) return "Live Stream";
   if (kind === 30617) return "Repository";
@@ -375,6 +377,11 @@ export function AddrPostDetailPage({ addr, relays }: AddrPostDetailPageProps) {
         <PodcastDetailContent event={resolvedEvent} />
       </MutedContentGuard>
     );
+  }
+
+  // Communities (NIP-72) get a dedicated detail page with members, events, and comments
+  if (resolvedEvent.kind === 34550) {
+    return <CommunityDetailPage event={resolvedEvent} />;
   }
 
   // Calendar events (NIP-52) get a dedicated detail page with RSVP

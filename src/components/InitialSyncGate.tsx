@@ -399,6 +399,8 @@ function SetupQuestionnaire({
       feedIncludePodcastTrailers: false,
       showDevelopment: false,
       feedIncludeDevelopment: false,
+      showCommunities: true,
+      feedIncludeCommunities: true,
       showBadges: false,
       showBadgeDefinitions: true,
       showProfileBadges: true,
