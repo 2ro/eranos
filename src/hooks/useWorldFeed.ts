@@ -22,50 +22,19 @@ const CHALLENGE_T_ALIASES = ['agora-action', 'pathos-challenge', 'agora-challeng
 
 const DEFAULT_PAGE_SIZE = 20;
 
-/** Maximum posts per country per page to maintain diversity. */
-const DIVERSITY_CAP = 4;
-
 /**
- * Apply diversity cap and kind-based filtering to raw events.
- * For the global feed, limits each country to DIVERSITY_CAP posts per batch
- * to prevent one active country from dominating.
+ * Filter raw events to only include valid world feed events.
+ * Keeps challenges, polls, and events with geographic tags.
  */
-async function applyWorldFilters(events: NostrEvent[]): Promise<NostrEvent[]> {
-  const { parseCountryIdentifier } = await import('@/lib/countryIdentifiers');
-  const postsByCountry = new Map<string, NostrEvent[]>();
-  const challenges: NostrEvent[] = [];
-
-  const filtered = events.filter(event => {
-    if (event.kind === CHALLENGE_KIND) return true;
-    if (event.kind === 1068) return true;
-    const kTags = event.tags.filter(([name]) => name === 'k').map(([, v]) => v);
-    const KTags = event.tags.filter(([name]) => name === 'K').map(([, v]) => v);
-    return kTags.includes('iso3166') || kTags.includes('geo') || KTags.includes('36639');
-  });
-
-  filtered.forEach(event => {
-    if (event.kind === CHALLENGE_KIND) {
-      challenges.push(event);
-      return;
-    }
-    const iTag = event.tags.find(([name]) => name === 'i')?.[1];
-    if (iTag) {
-      const country = parseCountryIdentifier(iTag);
-      if (country) {
-        const existing = postsByCountry.get(country) || [];
-        existing.push(event);
-        postsByCountry.set(country, existing);
-      }
-    }
-  });
-
-  const diversePosts: NostrEvent[] = [];
-  postsByCountry.forEach((posts) => {
-    const sorted = posts.sort((a, b) => b.created_at - a.created_at);
-    diversePosts.push(...sorted.slice(0, DIVERSITY_CAP));
-  });
-
-  return [...challenges, ...diversePosts]
+function filterWorldEvents(events: NostrEvent[]): NostrEvent[] {
+  return events
+    .filter(event => {
+      if (event.kind === CHALLENGE_KIND) return true;
+      if (event.kind === 1068) return true;
+      const kTags = event.tags.filter(([name]) => name === 'k').map(([, v]) => v);
+      const KTags = event.tags.filter(([name]) => name === 'K').map(([, v]) => v);
+      return kTags.includes('iso3166') || kTags.includes('geo') || KTags.includes('36639');
+    })
     .sort((a, b) => b.created_at - a.created_at);
 }
 
@@ -73,8 +42,8 @@ async function applyWorldFilters(events: NostrEvent[]): Promise<NostrEvent[]> {
  * World feed hook: combines infinite-scroll pagination with live streaming
  * and a "X new posts" buffer.
  *
- * - Initial load + pagination: queries all country-tagged events globally
- *   with a diversity cap (max N posts per country per page).
+ * - Initial load + pagination: queries all country-tagged events globally,
+ *   sorted by recency.
  * - Live streaming: opens a persistent subscription for new events,
  *   buffering them when the user is scrolled down.
  * - Flush: merges buffered events into the visible list with highlight
@@ -107,7 +76,7 @@ export function useWorldFeed(enabled: boolean) {
       ];
 
       const events = await nostr.query(filters, { signal });
-      const filtered = await applyWorldFilters(events);
+      const filtered = filterWorldEvents(events);
       const page = filtered.slice(0, DEFAULT_PAGE_SIZE);
 
       // Register all paginated event IDs so the stream doesn't duplicate them
