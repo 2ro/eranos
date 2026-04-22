@@ -17,6 +17,7 @@ import { getExtraKindDef } from "./lib/extraKinds";
 // Critical-path pages: eagerly loaded (landing + fallback)
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
+import MessagesPage from "./pages/Messages";
 
 // Lazy-loaded companion layer (~450K code-split)
 const BlobbiCompanionLayer = lazy(() => import("@/blobbi/companion").then(m => ({ default: m.BlobbiCompanionLayer })));
@@ -48,7 +49,6 @@ const LetterComposePage = lazy(() => import("./pages/LetterComposePage").then(m 
 const LetterPreferencesPage = lazy(() => import("./pages/LetterPreferencesPage").then(m => ({ default: m.LetterPreferencesPage })));
 const LettersPage = lazy(() => import("./pages/LettersPage").then(m => ({ default: m.LettersPage })));
 const MagicSettingsPage = lazy(() => import("./pages/MagicSettingsPage").then(m => ({ default: m.MagicSettingsPage })));
-const MessagesPage = lazy(() => import("./pages/Messages"));
 const NetworkSettingsPage = lazy(() => import("./pages/NetworkSettingsPage").then(m => ({ default: m.NetworkSettingsPage })));
 const NIP19Page = lazy(() => import("./pages/NIP19Page").then(m => ({ default: m.NIP19Page })));
 const NotificationSettings = lazy(() => import("./pages/NotificationSettings").then(m => ({ default: m.NotificationSettings })));
