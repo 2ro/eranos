@@ -33,6 +33,7 @@ const ActionsPage = lazy(() => import("./pages/ActionsPage"));
 const AdvancedSettingsPage = lazy(() => import("./pages/AdvancedSettingsPage").then(m => ({ default: m.AdvancedSettingsPage })));
 const ArticleEditorPage = lazy(() => import("./pages/ArticleEditorPage").then(m => ({ default: m.ArticleEditorPage })));
 const BadgesPage = lazy(() => import("./pages/BadgesPage").then(m => ({ default: m.BadgesPage })));
+const CommunitiesPage = lazy(() => import("./pages/CommunitiesPage").then(m => ({ default: m.CommunitiesPage })));
 const BookmarksPage = lazy(() => import("./pages/BookmarksPage").then(m => ({ default: m.BookmarksPage })));
 const ChangelogPage = lazy(() => import("./pages/ChangelogPage").then(m => ({ default: m.ChangelogPage })));
 const ContentPage = lazy(() => import("./pages/ContentPage").then(m => ({ default: m.ContentPage })));
@@ -166,6 +167,7 @@ export function AppRouter() {
             <Route path="/wallet" element={<WalletPage />} />
             <Route path="/world" element={<WorldPage />} />
             <Route path="/badges" element={<BadgesPage />} />
+            <Route path="/communities" element={<CommunitiesPage />} />
             <Route path="/letters" element={<LettersPage />} />
             <Route path="/letters/compose" element={<LetterComposePage />} />
             <Route path="/settings/letters" element={<LetterPreferencesPage />} />

@@ -83,6 +83,8 @@ export function TestApp({ children }: TestAppProps) {
       feedIncludePodcastTrailers: false,
       showDevelopment: false,
       feedIncludeDevelopment: false,
+      showCommunities: false,
+      feedIncludeCommunities: false,
       showBadges: false,
       showBadgeDefinitions: true,
       showProfileBadges: true,

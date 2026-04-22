@@ -2,15 +2,12 @@ import { useMemo, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { Users, Share2, Globe } from 'lucide-react';
 import { nip19 } from 'nostr-tools';
-import type { NostrEvent, NostrMetadata } from '@nostrify/nostrify';
+import type { NostrEvent } from '@nostrify/nostrify';
 
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { getAvatarShape } from '@/lib/avatarShape';
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Separator } from '@/components/ui/separator';
 import { useAuthor } from '@/hooks/useAuthor';
-import { useAuthors } from '@/hooks/useAuthors';
 import { useProfileUrl } from '@/hooks/useProfileUrl';
 import { useToast } from '@/hooks/useToast';
 import { genUserName } from '@/lib/genUserName';
@@ -43,45 +40,14 @@ function parseCommunityEvent(event: NostrEvent) {
   return { name, description, image, moderators, relays };
 }
 
-// --- Sub-components ---
-
-function ModeratorRow({ pubkey }: { pubkey: string }) {
-  const { data } = useAuthor(pubkey);
-  const metadata: NostrMetadata | undefined = data?.metadata;
-  const avatarShape = getAvatarShape(metadata);
-  const name = metadata?.display_name || metadata?.name || genUserName(pubkey);
-  const profileUrl = useProfileUrl(pubkey, metadata);
-
-  return (
-    <Link to={profileUrl} className="flex items-center gap-3 group py-1.5">
-      <Avatar shape={avatarShape} className="size-9 ring-2 ring-background">
-        <AvatarImage src={metadata?.picture} />
-        <AvatarFallback className="bg-muted text-muted-foreground text-xs">
-          {name.charAt(0).toUpperCase()}
-        </AvatarFallback>
-      </Avatar>
-      <div className="min-w-0 flex-1">
-        <p className="text-sm font-medium truncate group-hover:underline">{name}</p>
-        {metadata?.nip05 && (
-          <p className="text-xs text-muted-foreground truncate">{metadata.nip05}</p>
-        )}
-      </div>
-      <Badge variant="secondary" className="text-xs shrink-0">Moderator</Badge>
-    </Link>
-  );
-}
-
 // --- Main Component ---
 
 export function CommunityContent({ event }: { event: NostrEvent }) {
   const { toast } = useToast();
-  const { name, description, image, moderators, relays } = useMemo(
+  const { name, description, image } = useMemo(
     () => parseCommunityEvent(event),
     [event],
   );
-
-  // Batch-fetch moderator profiles
-  useAuthors(moderators);
 
   // Owner
   const ownerAuthor = useAuthor(event.pubkey);
@@ -144,18 +110,8 @@ export function CommunityContent({ event }: { event: NostrEvent }) {
         </div>
       )}
 
-      {/* Quick stats + share */}
-      <div className="flex items-center gap-3">
-        <Badge variant="outline" className="gap-1.5">
-          <Users className="size-3.5" />
-          {moderators.length} moderator{moderators.length !== 1 ? 's' : ''}
-        </Badge>
-        {relays.length > 0 && (
-          <Badge variant="outline" className="gap-1.5">
-            <Globe className="size-3.5" />
-            {relays.length} relay{relays.length !== 1 ? 's' : ''}
-          </Badge>
-        )}
+      {/* Share button */}
+      <div className="flex items-center">
         <Button variant="outline" size="icon" className="ml-auto size-8 shrink-0" onClick={handleShare}>
           <Share2 className="size-3.5" />
         </Button>
@@ -198,22 +154,6 @@ export function CommunityContent({ event }: { event: NostrEvent }) {
         </Link>
       </div>
 
-      <Separator />
-
-      {/* Moderators */}
-      {moderators.length > 0 && (
-        <section>
-          <h2 className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-3 flex items-center gap-2">
-            <Users className="size-3.5" />
-            Moderators
-          </h2>
-          <div className="space-y-1">
-            {moderators.map((pk) => (
-              <ModeratorRow key={pk} pubkey={pk} />
-            ))}
-          </div>
-        </section>
-      )}
     </div>
   );
 }

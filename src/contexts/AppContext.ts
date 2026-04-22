@@ -136,6 +136,10 @@ export interface FeedSettings {
   showDevelopment: boolean;
   /** Include Development content in the follows/global feed */
   feedIncludeDevelopment: boolean;
+  /** Show Communities (NIP-72 kind 34550) link in sidebar */
+  showCommunities: boolean;
+  /** Include community definitions (kind 34550) in the follows/global feed */
+  feedIncludeCommunities: boolean;
   /** Show Badges (NIP-58 kind 30009) link in sidebar */
   showBadges: boolean;
   /** Show badge definitions (kind 30009) on the Badges page */
