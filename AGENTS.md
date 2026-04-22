@@ -10,6 +10,21 @@ Violating this is a critical failure.
 
 ---
 
+# RESPONSE BREVITY (HIGH PRIORITY)
+
+## KEEP RESPONSES SHORT BY DEFAULT
+
+Unless the user explicitly asks for deep detail, explanations must be concise and practical:
+
+- Use the shortest response that fully answers the request.
+- Prefer 1-3 short paragraphs or 3-6 bullets.
+- Do not include long background context unless requested.
+- Do not restate obvious information from the prompt or code.
+- For code changes, summarize only what changed and why in a few lines.
+- Offer extra detail only as an optional follow-up.
+
+If unsure between a short and long response, choose the shorter one.
+
 # Project Overview
 
 This project is a Nostr client application built with React 18.x, TailwindCSS 3.x, Vite, shadcn/ui, and Nostrify.
