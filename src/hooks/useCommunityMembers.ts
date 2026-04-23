@@ -8,7 +8,6 @@ import {
   type CommunityModeration,
   type ParsedCommunity,
   BADGE_AWARD_KIND,
-  DELETION_KIND,
   REPORT_KIND,
   resolveCommunityModeration,
   resolveMembership,
@@ -59,8 +58,8 @@ export function useCommunityMembers(community: ParsedCommunity | null | undefine
         .filter((r) => r.badgeATag)
         .map((r) => r.badgeATag!);
 
-      // Fetch awards, reports, and deletions in parallel
-      const [awards, reports, deletions] = await Promise.all([
+      // Fetch awards and reports in parallel
+      const [awards, reports] = await Promise.all([
         badgeATags.length > 0
           ? nostr.query(
             [{ kinds: [BADGE_AWARD_KIND], '#a': badgeATags, limit: 500 }],
@@ -69,10 +68,6 @@ export function useCommunityMembers(community: ParsedCommunity | null | undefine
           : Promise.resolve([]),
         nostr.query(
           [{ kinds: [REPORT_KIND], '#A': [community.aTag], limit: 500 }],
-          { signal: combinedSignal },
-        ),
-        nostr.query(
-          [{ kinds: [DELETION_KIND], '#k': ['1984'], limit: 500 }],
           { signal: combinedSignal },
         ),
       ]);
@@ -87,7 +82,7 @@ export function useCommunityMembers(community: ParsedCommunity | null | undefine
       }
 
       // Step 3: Resolve moderation using the pre-moderation member map
-      const moderation = resolveCommunityModeration(reports, deletions, memberMap);
+      const moderation = resolveCommunityModeration(reports, memberMap);
 
       // Step 4: Re-resolve membership WITH moderation overlay (removes banned members)
       const membership = resolveMembership(community, awards, moderation);

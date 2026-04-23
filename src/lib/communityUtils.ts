@@ -16,9 +16,6 @@ export const BADGE_AWARD_KIND = 8;
 /** NIP-56 report. */
 export const REPORT_KIND = 1984;
 
-/** NIP-09 deletion request. */
-export const DELETION_KIND = 5;
-
 /** NIP-32 label namespace used for authoritative moderation actions. */
 export const MODERATION_LABEL_NAMESPACE = 'moderation';
 
@@ -265,34 +262,18 @@ export function parseCommunityReport(event: NostrEvent): CommunityReport | null 
  * and classifies each remaining report.
  *
  * @param reports - Kind 1984 events scoped to the community.
- * @param deletions - Kind 5 events that may reinstate 1984 events.
  * @param members - Validated membership map (pubkey -> CommunityMember).
  */
 export function resolveCommunityModeration(
   reports: NostrEvent[],
-  deletions: NostrEvent[],
   members: Map<string, CommunityMember>,
 ): CommunityModeration {
-  // Build set of reinstated (deleted) 1984 event IDs
-  const reinstated = new Set<string>();
-  for (const del of deletions) {
-    if (del.kind !== DELETION_KIND) continue;
-    // Only count deletions that target kind 1984
-    const hasKTag = del.tags.some(([n, v]) => n === 'k' && v === '1984');
-    if (!hasKTag) continue;
-    for (const [n, eid] of del.tags) {
-      if (n === 'e' && eid) reinstated.add(eid);
-    }
-  }
-
   const bannedEventIds = new Set<string>();
   const bannedPubkeys = new Set<string>();
   const reportsByEventId = new Map<string, CommunityReport[]>();
   const allReports: CommunityReport[] = [];
 
   for (const event of reports) {
-    // Skip reinstated events
-    if (reinstated.has(event.id)) continue;
 
     const parsed = parseCommunityReport(event);
     if (!parsed) continue;
