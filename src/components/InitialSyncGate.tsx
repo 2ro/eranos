@@ -28,7 +28,7 @@ import { AgoraLogo } from "@/components/AgoraLogo";
 import { ImageCropDialog } from "@/components/ImageCropDialog";
 import { IntroImage } from "@/components/IntroImage";
 import { ProfileCard } from "@/components/ProfileCard";
-import { ThemeGrid } from "@/components/ThemeSelector";
+
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -41,12 +41,12 @@ import { type SyncPhase, useInitialSync } from "@/hooks/useInitialSync";
 import { useLoginActions } from "@/hooks/useLoginActions";
 import { useNostrPublish } from "@/hooks/useNostrPublish";
 import { OnboardingContext } from "@/hooks/useOnboarding";
-import { useTheme } from "@/hooks/useTheme";
+
 import { toast } from "@/hooks/useToast";
 import { useUploadFile } from "@/hooks/useUploadFile";
 import { genUserName } from "@/lib/genUserName";
 import { getAvatarShape, isValidAvatarShape } from "@/lib/avatarShape";
-import { resolveTheme, resolveThemeConfig } from "@/themes";
+
 import { cn } from "@/lib/utils";
 
 // ---------------------------------------------------------------------------
@@ -234,18 +234,17 @@ const SUGGESTED_PACKS: { kind: number; pubkey: string; identifier: string }[] =
 
 // Steps for signup (includes keygen + profile) vs. settings-only (existing login)
 type SignupStep = "keygen" | "download" | "profile";
-type SettingsStep = "theme" | "follows" | "outro";
+type SettingsStep = "follows" | "outro";
 type Step = SignupStep | SettingsStep;
 
 const SIGNUP_STEPS: Step[] = [
-  "theme",
   "keygen",
   "download",
   "profile",
   "follows",
   "outro",
 ];
-const SETTINGS_STEPS: Step[] = ["theme", "follows", "outro"];
+const SETTINGS_STEPS: Step[] = ["follows", "outro"];
 
 function SetupQuestionnaire({
   onComplete,
@@ -275,6 +274,16 @@ function SetupQuestionnaire({
   const progress = (stepIndex / (steps.length - 1)) * 100;
 
   const goTo = useCallback((target: Step) => setStep(target), []);
+
+  // For settings-only flow (no theme step), trigger save+follow-check immediately
+  // so the follows step knows whether to show or skip to outro.
+  const didAutoSave = useRef(false);
+  useEffect(() => {
+    if (!isSignup && !didAutoSave.current) {
+      didAutoSave.current = true;
+      handleSaveAndContinue();
+    }
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const next = useCallback(() => {
     const i = steps.indexOf(step);
@@ -480,15 +489,6 @@ function SetupQuestionnaire({
           )}
 
           {/* Settings steps */}
-          {step === "theme" && (
-            <ThemeStep
-              onNext={isSignup ? next : handleSaveAndContinue}
-              onBack={back}
-              isFirst={isSignup && steps.indexOf("theme") === 0}
-              isSaving={!isSignup && isSaving}
-            />
-          )}
-
           {step === "follows" && hasFollows === false && (
             <FollowsStep
               onNext={(didFollow) => {
@@ -817,101 +817,6 @@ function ProfileStep({
 // ---------------------------------------------------------------------------
 // Settings steps
 // ---------------------------------------------------------------------------
-
-function ThemeStep({
-  onNext,
-  onBack,
-  isFirst = false,
-  isSaving = false,
-}: {
-  onNext: () => void;
-  onBack: () => void;
-  isFirst?: boolean;
-  isSaving?: boolean;
-}) {
-  const { theme, customTheme, themes } = useTheme();
-  const resolved = resolveTheme(theme);
-  const activeConfig = resolved === 'custom' ? customTheme : resolveThemeConfig(resolved, themes);
-  const bgUrl = activeConfig?.background?.url;
-
-  return (
-    <>
-      {/* Background image — full screen behind everything */}
-      {bgUrl && (
-        <div
-          className="fixed inset-0 z-0 bg-cover bg-center opacity-50 transition-all duration-700"
-          style={{ backgroundImage: `url(${bgUrl})` }}
-        />
-      )}
-
-      {/* Center content — semi-transparent on desktop when bg is active */}
-      <div
-        className={cn(
-          "relative z-10 flex flex-col gap-6 animate-in fade-in slide-in-from-right-4 duration-400",
-          "sm:rounded-2xl sm:transition-[background-color,backdrop-filter] sm:duration-700",
-          bgUrl
-            ? "sm:bg-background/60 sm:backdrop-blur-md sm:-mx-4 sm:px-4 sm:py-4"
-            : "",
-        )}
-      >
-        <div className="space-y-2">
-          <h2 className="text-xl font-semibold tracking-tight">
-            Choose your look
-          </h2>
-          <p className="text-sm text-muted-foreground">
-            Pick a theme that feels right.
-          </p>
-        </div>
-
-        <ThemeGrid columns="scroll" limit={9} />
-
-        {isFirst ? (
-          <Button
-            onClick={onNext}
-            className="w-full rounded-full h-11 gap-1.5"
-            disabled={isSaving}
-          >
-            {isSaving ? (
-              <>
-                <Loader2 className="w-4 h-4 animate-spin" /> Saving...
-              </>
-            ) : (
-              <>
-                Continue <ChevronRight className="w-4 h-4" />
-              </>
-            )}
-          </Button>
-        ) : (
-          <div className="flex gap-3">
-            <Button
-              variant="ghost"
-              onClick={onBack}
-              className="flex-1 rounded-full h-11"
-              disabled={isSaving}
-            >
-              Back
-            </Button>
-            <Button
-              onClick={onNext}
-              className="flex-1 rounded-full h-11 gap-1.5"
-              disabled={isSaving}
-            >
-              {isSaving ? (
-                <>
-                  <Loader2 className="w-4 h-4 animate-spin" /> Saving...
-                </>
-              ) : (
-                <>
-                  Continue <ChevronRight className="w-4 h-4" />
-                </>
-              )}
-            </Button>
-          </div>
-        )}
-      </div>
-    </>
-  );
-}
 
 // ---------------------------------------------------------------------------
 // Follow Packs Step
