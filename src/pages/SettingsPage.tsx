@@ -33,6 +33,13 @@ const settingsSections: SettingsSection[] = [
     requiresAuth: true,
   },
   {
+    id: 'appearance',
+    label: 'Appearance',
+    description: 'Switch between system, light, and dark mode',
+    illustration: '/theme-intro.png',
+    path: '/settings/appearance',
+  },
+  {
     id: 'feed',
     label: 'Home Feed',
     description: 'Choose what types of posts appear in your home feed',
