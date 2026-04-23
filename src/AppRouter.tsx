@@ -31,6 +31,7 @@ const HomePage = lazy(() => import("./pages/HomePage").then(m => ({ default: m.H
 // All other pages: code-split via React.lazy
 const ActionsPage = lazy(() => import("./pages/ActionsPage"));
 const AdvancedSettingsPage = lazy(() => import("./pages/AdvancedSettingsPage").then(m => ({ default: m.AdvancedSettingsPage })));
+const AppearanceSettingsPage = lazy(() => import("./pages/AppearanceSettingsPage").then(m => ({ default: m.AppearanceSettingsPage })));
 const ArticleEditorPage = lazy(() => import("./pages/ArticleEditorPage").then(m => ({ default: m.ArticleEditorPage })));
 const BadgesPage = lazy(() => import("./pages/BadgesPage").then(m => ({ default: m.BadgesPage })));
 const CommunitiesPage = lazy(() => import("./pages/CommunitiesPage").then(m => ({ default: m.CommunitiesPage })));
@@ -131,6 +132,7 @@ export function AppRouter() {
              <Route path="/g/:geohash" element={<GeotagPage />} />
             <Route path="/feed/:domain" element={<DomainFeedPage />} />
             <Route path="/settings" element={<SettingsPage />} />
+            <Route path="/settings/appearance" element={<AppearanceSettingsPage />} />
             <Route path="/settings/profile" element={<ProfileSettings />} />
             <Route path="/settings/feed" element={<ContentSettingsPage />} />
             <Route path="/settings/content" element={<ContentPage />} />
