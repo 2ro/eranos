@@ -154,8 +154,9 @@ export function Feed({ kinds, tagFilters, header, hideCompose, emptyMessage, fee
   const handleRefresh = usePageRefresh(queryKey);
   const handleWorldRefresh = useCallback(async () => {
     worldFeed.flushStreamBuffer();
+    await handleRefresh();
     window.scrollTo({ top: 0, behavior: 'smooth' });
-  }, [worldFeed.flushStreamBuffer]);
+  }, [worldFeed.flushStreamBuffer, handleRefresh]);
 
   const {
     data: rawData,
