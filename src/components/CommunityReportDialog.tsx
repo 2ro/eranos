@@ -13,21 +13,12 @@ import { useNostrPublish } from '@/hooks/useNostrPublish';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { toast } from '@/hooks/useToast';
 import type { NostrEvent } from '@nostrify/nostrify';
-import { REPORT_KIND } from '@/lib/communityUtils';
-
-// ── Report type options (NIP-56) ──────────────────────────────────────────────
-
-const REPORT_TYPES = [
-  { value: 'spam', label: 'Spam', description: 'Unsolicited or repetitive content' },
-  { value: 'nudity', label: 'Nudity or sexual content', description: 'Depictions of nudity or pornography' },
-  { value: 'profanity', label: 'Hateful speech', description: 'Profanity, hateful or abusive speech' },
-  { value: 'illegal', label: 'Illegal content', description: 'Content that may be illegal in some jurisdictions' },
-  { value: 'impersonation', label: 'Impersonation', description: 'Pretending to be someone else' },
-  { value: 'malware', label: 'Malware', description: 'Virus, trojan horse, spyware, or ransomware' },
-  { value: 'other', label: 'Other', description: 'Something else not listed above' },
-] as const;
-
-type ReportType = typeof REPORT_TYPES[number]['value'];
+import {
+  type Nip56ReportType,
+  NIP56_REPORT_TYPES,
+  NIP56_REPORT_TYPE_META,
+  REPORT_KIND,
+} from '@/lib/communityUtils';
 
 // ── Props ─────────────────────────────────────────────────────────────────────
 
@@ -48,7 +39,7 @@ export function CommunityReportDialog({
 }: CommunityReportDialogProps) {
   const { user } = useCurrentUser();
   const { mutateAsync: publishEvent, isPending } = useNostrPublish();
-  const [reportType, setReportType] = useState<ReportType | ''>('');
+  const [reportType, setReportType] = useState<Nip56ReportType | ''>('');
   const [details, setDetails] = useState('');
 
   const canSubmit = reportType !== '' && !isPending;
@@ -87,21 +78,24 @@ export function CommunityReportDialog({
         <div className="flex-1 overflow-y-auto min-h-0 -mx-6 px-6">
           <RadioGroup
             value={reportType}
-            onValueChange={(v) => setReportType(v as ReportType)}
+            onValueChange={(v) => setReportType(v as Nip56ReportType)}
             className="mt-2 space-y-1"
           >
-            {REPORT_TYPES.map((type) => (
-              <label
-                key={type.value}
-                className="flex items-start gap-3 rounded-lg px-3 py-2.5 cursor-pointer transition-colors hover:bg-secondary/60"
-              >
-                <RadioGroupItem value={type.value} className="mt-0.5 shrink-0" />
-                <div className="min-w-0">
-                  <span className="text-sm font-medium">{type.label}</span>
-                  <p className="text-xs text-muted-foreground mt-0.5">{type.description}</p>
-                </div>
-              </label>
-            ))}
+            {NIP56_REPORT_TYPES.map((type) => {
+              const meta = NIP56_REPORT_TYPE_META[type];
+              return (
+                <label
+                  key={type}
+                  className="flex items-start gap-3 rounded-lg px-3 py-2.5 cursor-pointer transition-colors hover:bg-secondary/60"
+                >
+                  <RadioGroupItem value={type} className="mt-0.5 shrink-0" />
+                  <div className="min-w-0">
+                    <span className="text-sm font-medium">{meta.label}</span>
+                    <p className="text-xs text-muted-foreground mt-0.5">{meta.description}</p>
+                  </div>
+                </label>
+              );
+            })}
           </RadioGroup>
 
           <div className="mt-3 space-y-2 pb-1">

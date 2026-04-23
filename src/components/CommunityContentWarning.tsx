@@ -2,10 +2,10 @@ import { useState } from 'react';
 import { AlertTriangle, Eye } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
-import type { CommunityReport } from '@/lib/communityUtils';
+import type { CommunityReport, Nip56ReportType } from '@/lib/communityUtils';
 
-/** Human-readable labels for NIP-56 report types. */
-const REPORT_TYPE_LABELS: Record<string, string> = {
+/** Lowercase prose labels for content warning summaries. */
+const REPORT_TYPE_LABELS: Record<Nip56ReportType, string> = {
   nudity: 'nudity',
   spam: 'spam',
   profanity: 'hateful speech',

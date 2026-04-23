@@ -34,7 +34,7 @@ const EMPTY_MEMBER_MAP = new Map<string, CommunityMember>();
 /**
  * Fetch and resolve the full membership tree and moderation state for a community.
  *
- * Queries badge awards (kind 8), reports (kind 1984), and deletions (kind 5),
+ * Queries badge awards (kind 8) and reports (kind 1984),
  * then runs the chain validation algorithm with moderation overlay.
  */
 export function useCommunityMembers(community: ParsedCommunity | null | undefined) {
@@ -72,20 +72,27 @@ export function useCommunityMembers(community: ParsedCommunity | null | undefine
         ),
       ]);
 
-      // Step 1-2: Resolve membership WITHOUT moderation (needed for authority checks)
-      const preModerationMembership = resolveMembership(community, awards);
+      // Step 1-2: Resolve full membership (needed for authority checks)
+      const fullMembership = resolveMembership(community, awards);
 
       // Build member lookup map for authority checks
       const memberMap = new Map<string, CommunityMember>();
-      for (const m of preModerationMembership.members) {
+      for (const m of fullMembership.members) {
         memberMap.set(m.pubkey, m);
       }
 
-      // Step 3: Resolve moderation using the pre-moderation member map
+      // Step 3: Resolve moderation using the member map
       const moderation = resolveCommunityModeration(reports, memberMap);
 
-      // Step 4: Re-resolve membership WITH moderation overlay (removes banned members)
-      const membership = resolveMembership(community, awards, moderation);
+      // Step 4: Apply moderation overlay — filter banned members from the
+      // already-computed membership rather than re-running chain validation.
+      const filteredMembers = fullMembership.members.filter(
+        (m) => !moderation.bannedPubkeys.has(m.pubkey),
+      );
+      const membership: CommunityMembership = {
+        members: filteredMembers,
+        totalCount: filteredMembers.length,
+      };
 
       return { membership, moderation, memberMap };
     },

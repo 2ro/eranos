@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { nip19 } from 'nostr-tools';
 import { useNavigate } from 'react-router-dom';
 
@@ -218,7 +218,8 @@ export function NoteMoreMenu({ event, open, onOpenChange, communityContext: comm
   // Auto-detect community context from React Context if not explicitly provided
   const { user } = useCurrentUser();
   const communityModCtx = useCommunityModerationContext();
-  const communityContext = communityContextProp ?? (() => {
+  const communityContext = useMemo(() => {
+    if (communityContextProp) return communityContextProp;
     if (!communityModCtx || !user) return undefined;
     const viewerMember = communityModCtx.memberMap.get(user.pubkey);
     if (!viewerMember) return undefined; // Non-member: no community report
@@ -230,7 +231,7 @@ export function NoteMoreMenu({ event, open, onOpenChange, communityContext: comm
       communityATag: communityModCtx.communityATag,
       canBan,
     };
-  })();
+  }, [communityContextProp, communityModCtx, user, event.pubkey]);
 
   const { mutate: deleteEvent, isPending: isDeleting } = useDeleteEvent();
 
@@ -298,7 +299,7 @@ export function NoteMoreMenu({ event, open, onOpenChange, communityContext: comm
         <ReportDialog event={event} open={reportOpen} onOpenChange={setReportOpen} />
       )}
 
-      {communityContext && (
+      {communityContext?.canBan && (
         <>
           <BanConfirmDialog
             mode="content"

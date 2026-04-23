@@ -168,6 +168,7 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
 
   // ── Members ─────────────────────────────────────────────────────────────────
   const { data: membership, moderation, memberMap, isLoading: membersLoading } = useCommunityMembers(community);
+  const viewerMember = user ? memberMap.get(user.pubkey) : undefined;
 
   // Batch-fetch profiles for all members
   const allMemberPubkeys = useMemo(
@@ -386,7 +387,6 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
                             roleLabel = m.pubkey === event.pubkey ? 'Founder' : 'Moderator';
                           }
                           // Determine if the current user can ban this member
-                          const viewerMember = user ? memberMap.get(user.pubkey) : undefined;
                           const canBanMember = viewerMember
                             && m.pubkey !== user?.pubkey
                             && viewerMember.rank < m.rank;

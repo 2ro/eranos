@@ -37,6 +37,17 @@ export const NIP56_REPORT_TYPES = [
 
 export type Nip56ReportType = typeof NIP56_REPORT_TYPES[number];
 
+/** Human-readable metadata for each NIP-56 report type. */
+export const NIP56_REPORT_TYPE_META: Record<Nip56ReportType, { label: string; description: string }> = {
+  spam: { label: 'Spam', description: 'Unsolicited or repetitive content' },
+  nudity: { label: 'Nudity or sexual content', description: 'Depictions of nudity or pornography' },
+  profanity: { label: 'Hateful speech', description: 'Profanity, hateful or abusive speech' },
+  illegal: { label: 'Illegal content', description: 'Content that may be illegal in some jurisdictions' },
+  impersonation: { label: 'Impersonation', description: 'Pretending to be someone else' },
+  malware: { label: 'Malware', description: 'Virus, trojan horse, spyware, or ransomware' },
+  other: { label: 'Other', description: 'Something else not listed above' },
+};
+
 // ── Rank tier metadata ────────────────────────────────────────────────────────
 
 export interface RankTier {
@@ -315,12 +326,10 @@ export function resolveCommunityModeration(
  * 1. Seed rank 0 from the community definition (founder + moderators).
  * 2. Iteratively validate badge awards — awarder must be a validated
  *    member with rank strictly less than the awarded badge's rank.
- * 3. Apply moderation overlay — remove banned members from the result.
  */
 export function resolveMembership(
   community: ParsedCommunity,
   awardEvents: NostrEvent[],
-  moderation?: CommunityModeration,
 ): CommunityMembership {
   // Build badge-to-rank lookup
   const badgeToRank = new Map<string, number>();
@@ -390,13 +399,6 @@ export function resolveMembership(
       }
 
       processed.add(award.id);
-    }
-  }
-
-  // Step 3: Apply moderation overlay — remove banned members
-  if (moderation) {
-    for (const bannedPk of moderation.bannedPubkeys) {
-      validated.delete(bannedPk);
     }
   }
 
