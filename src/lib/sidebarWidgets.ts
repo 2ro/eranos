@@ -92,14 +92,14 @@ export const WIDGET_DEFINITIONS: WidgetDefinition[] = [
   },
   {
     id: 'ai-chat',
-    label: 'AI Chat',
-    description: 'Chat with Shakespeare AI',
+    label: 'Agent',
+    description: 'Chat with your AI agent',
     icon: Bot,
     defaultHeight: 300,
     minHeight: 200,
     maxHeight: 700,
     category: 'personal',
-    href: '/ai-chat',
+    href: '/agent',
     fillHeight: true,
   },
 

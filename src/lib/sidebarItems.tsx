@@ -8,6 +8,7 @@ import {
   BookMarked,
   BookOpen,
   Bookmark,
+  Bot,
   CalendarDays,
   Camera,
   Clapperboard,
@@ -169,6 +170,7 @@ export const SIDEBAR_ITEMS: SidebarItemDef[] = [
   { id: "settings", label: "Settings", path: "/settings", icon: Settings },
   { id: "changelog", label: "Changelog", path: "/changelog", icon: ScrollText },
   { id: "help", label: "Help", path: "/help", icon: LifeBuoy },
+  { id: "agent", label: "Agent", path: "/agent", icon: Bot },
   // Content types
   { id: "actions", label: "Actions", path: "/actions", icon: Zap },
   { id: "events", label: "Events", path: "/events", icon: CalendarDays },

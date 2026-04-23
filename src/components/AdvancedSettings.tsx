@@ -1,15 +1,21 @@
-import { useState } from 'react';
-import { ChevronDown, ChevronUp, Bug, RotateCcw, AlertTriangle } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { ChevronDown, ChevronUp, Bot, Bug, RotateCcw, AlertTriangle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
+import { Textarea } from '@/components/ui/textarea';
 import { RequestToVanishDialog } from '@/components/RequestToVanishDialog';
 import { useAppContext } from '@/hooks/useAppContext';
 import { useToast } from '@/hooks/useToast';
 import { useEncryptedSettings } from '@/hooks/useEncryptedSettings';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
+import { useShakespeare, sortModelsByCost } from '@/hooks/useShakespeare';
+import { DEFAULT_SYSTEM_PROMPT_TEMPLATE } from '@/lib/aiChatSystemPrompt';
+
+import type { Model } from '@/hooks/useShakespeare';
 
 /** The build-time default DSN from the environment variable. */
 const DEFAULT_SENTRY_DSN = import.meta.env.VITE_SENTRY_DSN || '';
@@ -20,6 +26,7 @@ export function AdvancedSettings() {
   const { updateSettings } = useEncryptedSettings();
   const { user } = useCurrentUser();
   const [systemOpen, setSystemOpen] = useState(true);
+  const [aiOpen, setAiOpen] = useState(false);
   const [sentryOpen, setSentryOpen] = useState(false);
   const [dangerOpen, setDangerOpen] = useState(false);
   const [vanishDialogOpen, setVanishDialogOpen] = useState(false);
@@ -28,6 +35,25 @@ export function AdvancedSettings() {
   const [linkPreviewUrl, setLinkPreviewUrl] = useState(config.linkPreviewUrl);
   const [corsProxy, setCorsProxy] = useState(config.corsProxy);
   const [sentryDsn, setSentryDsn] = useState(config.sentryDsn);
+  const { getAvailableModels } = useShakespeare();
+  const [aiModels, setAiModels] = useState<Model[]>([]);
+  const [aiModelsLoading, setAiModelsLoading] = useState(false);
+  const [systemPromptDraft, setSystemPromptDraft] = useState(config.aiSystemPrompt || DEFAULT_SYSTEM_PROMPT_TEMPLATE);
+
+  // Fetch models lazily when the AI section is opened
+  useEffect(() => {
+    if (!aiOpen || !user || aiModels.length > 0) return;
+    let cancelled = false;
+    setAiModelsLoading(true);
+    getAvailableModels()
+      .then((response) => {
+        if (cancelled) return;
+        setAiModels(sortModelsByCost(response.data));
+      })
+      .catch(() => {})
+      .finally(() => { if (!cancelled) setAiModelsLoading(false); });
+    return () => { cancelled = true; };
+  }, [aiOpen, user, aiModels.length, getAvailableModels]);
 
   const handleStatsPubkeyChange = (value: string) => {
     setStatsPubkey(value);
@@ -174,6 +200,114 @@ export function AdvancedSettings() {
                   <span className="font-medium">Default: </span>
                   <span className="font-mono break-all">https://proxy.shakespeare.diy/?url={'{href}'}</span>
                 </div>
+              </div>
+            </div>
+          </CollapsibleContent>
+        </Collapsible>
+      </div>
+
+      {/* Agent Section */}
+      <div>
+        <Collapsible open={aiOpen} onOpenChange={setAiOpen}>
+          <CollapsibleTrigger asChild>
+            <Button
+              variant="ghost"
+              className="relative w-full justify-between px-3 py-3.5 h-auto hover:bg-muted/20 hover:text-foreground rounded-none"
+            >
+              <span className="flex items-center gap-2 text-base font-semibold">
+                <Bot className="h-4 w-4" />
+                Agent
+              </span>
+              {aiOpen ? (
+                <ChevronUp className="h-4 w-4 text-muted-foreground" />
+              ) : (
+                <ChevronDown className="h-4 w-4 text-muted-foreground" />
+              )}
+              <div className="absolute bottom-0 left-0 right-0 h-1 bg-primary rounded-full" />
+            </Button>
+          </CollapsibleTrigger>
+          <CollapsibleContent>
+            <div className="px-3 pt-3 pb-4 space-y-5">
+
+              {/* AI Model */}
+              <div>
+                <Label htmlFor="ai-model" className="text-sm font-medium">
+                  Model
+                </Label>
+                <p className="text-xs text-muted-foreground mt-1 mb-2">
+                  Choose which AI model the Agent uses for chat responses.
+                </p>
+                <Select
+                  value={config.aiModel || (aiModels.length > 0 ? aiModels[0].id : '')}
+                  onValueChange={(value) => {
+                    updateConfig(() => ({ aiModel: value }));
+                    toast({ title: 'AI model updated' });
+                  }}
+                  disabled={aiModelsLoading || aiModels.length === 0}
+                >
+                  <SelectTrigger id="ai-model">
+                    <SelectValue placeholder={aiModelsLoading ? 'Loading models...' : 'Select model'} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {aiModels.map((model) => {
+                      const totalCost = parseFloat(model.pricing.prompt) + parseFloat(model.pricing.completion);
+                      const isFree = totalCost === 0;
+                      return (
+                        <SelectItem key={model.id} value={model.id}>
+                          <span className="flex items-center gap-1.5">
+                            {model.name}
+                            {isFree && (
+                              <span className="text-[10px] font-medium text-green-600 dark:text-green-400 bg-green-500/10 px-1 rounded">
+                                FREE
+                              </span>
+                            )}
+                          </span>
+                        </SelectItem>
+                      );
+                    })}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* AI System Prompt */}
+              <div>
+                <Label htmlFor="ai-system-prompt" className="text-sm font-medium">
+                  System Prompt
+                </Label>
+                <p className="text-xs text-muted-foreground mt-1 mb-2">
+                  The base system prompt sent to the AI. Supports <code className="bg-muted px-1 rounded">{'{{SAVED_FEEDS}}'}</code> and <code className="bg-muted px-1 rounded">{'{{USER_IDENTITY}}'}</code> placeholders.
+                </p>
+                <Textarea
+                  id="ai-system-prompt"
+                  value={systemPromptDraft}
+                  onChange={(e) => setSystemPromptDraft(e.target.value)}
+                  onBlur={() => {
+                    const trimmed = systemPromptDraft.trim();
+                    const defaultPrompt = DEFAULT_SYSTEM_PROMPT_TEMPLATE;
+                    // If the user reverted back to the default text, store empty (meaning "use default")
+                    const valueToStore = trimmed === defaultPrompt ? '' : trimmed;
+                    if (valueToStore !== config.aiSystemPrompt) {
+                      updateConfig(() => ({ aiSystemPrompt: valueToStore }));
+                      toast({ title: valueToStore ? 'System prompt updated' : 'System prompt reset to default' });
+                    }
+                  }}
+                  className="min-h-[120px] max-h-[400px] resize-y font-mono text-base leading-relaxed"
+                />
+                {config.aiSystemPrompt && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-7 text-xs text-muted-foreground mt-2"
+                    onClick={() => {
+                      setSystemPromptDraft(DEFAULT_SYSTEM_PROMPT_TEMPLATE);
+                      updateConfig(() => ({ aiSystemPrompt: '' }));
+                      toast({ title: 'System prompt reset to default' });
+                    }}
+                  >
+                    <RotateCcw className="h-3 w-3 mr-1" />
+                    Reset to default
+                  </Button>
+                )}
               </div>
             </div>
           </CollapsibleContent>

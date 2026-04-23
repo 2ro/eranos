@@ -17,6 +17,7 @@ const DEFAULT_SIDEBAR_ORDER: string[] = [
   'world',
   'wallet',
   'messages',
+  'agent',
   'profile',
   'notifications',
   'settings',

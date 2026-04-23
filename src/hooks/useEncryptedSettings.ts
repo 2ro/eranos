@@ -121,6 +121,10 @@ export interface EncryptedSettings {
   };
   /** Letter preferences (stationery, font, frame, closing, signature, inbox filters) */
   letterPreferences?: LetterPreferences;
+  /** Override the AI model used by the Agent */
+  aiModel?: string;
+  /** Override the AI system prompt for the Agent */
+  aiSystemPrompt?: string;
 }
 
 /**

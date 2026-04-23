@@ -297,6 +297,10 @@ export interface AppConfig {
     /** Show developer/debug DM UI affordances. */
     devMode?: boolean;
   };
+  /** Override the AI model used by the Agent. When not set, the cheapest available model is used. */
+  aiModel?: string;
+  /** Override the AI system prompt. When not set, the default Agent prompt is used. Supports {{SAVED_FEEDS}} and {{USER_IDENTITY}} placeholders. */
+  aiSystemPrompt?: string;
 }
 
 /** Configuration for a single widget in the right sidebar. */

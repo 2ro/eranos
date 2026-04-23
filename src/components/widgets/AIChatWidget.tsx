@@ -94,8 +94,7 @@ export function AIChatWidget() {
   if (!user || !isAuthenticated) {
     return (
       <div className="flex flex-col items-center gap-3 py-6 px-3 text-center">
-        <pre className="text-xl font-mono text-primary leading-none">{'<[o_o]>'}</pre>
-        <p className="text-xs text-muted-foreground">Log in to chat with Dork</p>
+        <p className="text-xs text-muted-foreground">Log in to chat with the Agent</p>
       </div>
     );
   }
@@ -105,7 +104,6 @@ export function AIChatWidget() {
   if (hasCredits === false) {
     return (
       <div className="flex flex-col items-center gap-3 py-6 px-3 text-center">
-        <pre className="text-xl font-mono text-primary leading-none">{'<[o_o]>'}</pre>
         <p className="text-xs text-muted-foreground leading-relaxed">
           Grab some credits on{' '}
           <a
@@ -116,13 +114,13 @@ export function AIChatWidget() {
           >
             Shakespeare
           </a>
-          {' '}to chat with Dork.
+          {' '}to use the Agent.
         </p>
         <Link
-          to="/ai-chat"
+          to="/agent"
           className="text-xs font-medium text-primary hover:underline"
         >
-          Open AI Chat
+          Open Agent
         </Link>
       </div>
     );
@@ -135,7 +133,6 @@ export function AIChatWidget() {
         <div className="space-y-3 p-2">
           {messages.length === 0 && !streamingContent && (
             <div className="flex flex-col items-center gap-3 py-6 text-center">
-              <pre className="text-xl font-mono text-primary leading-none">{'<[o_o]>'}</pre>
               <p className="text-xs text-muted-foreground">Ask me anything...</p>
             </div>
           )}
@@ -187,7 +184,7 @@ export function AIChatWidget() {
 
 function MessageBubble({ message }: { message: ChatMessage }) {
   const isUser = message.role === 'user';
-  const content = typeof message.content === 'string' ? message.content : message.content.map((c) => c.text ?? '').join('');
+  const content = typeof message.content === 'string' ? message.content : (message.content ?? []).map((c) => c.text ?? '').join('');
 
   return (
     <div className={cn('flex', isUser ? 'justify-end' : 'justify-start')}>
