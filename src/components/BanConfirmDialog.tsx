@@ -60,7 +60,7 @@ export function BanConfirmDialog({
   const { mutateAsync: publishEvent, isPending } = useNostrPublish();
   const [reason, setReason] = useState('');
 
-  const title = mode === 'content' ? 'Remove content' : `Ban ${displayName ? `@${displayName}` : 'member'}`;
+  const title = mode === 'content' ? 'Remove post' : `Ban ${displayName ? `@${displayName}` : 'member'}`;
   const description = mode === 'content'
     ? 'This will remove the post from the community.'
     : `This will ban ${displayName ? `@${displayName}` : 'this member'} from the community. Their recruits remain unaffected.`;
@@ -84,11 +84,11 @@ export function BanConfirmDialog({
         tags,
       });
 
-      toast({ title: mode === 'content' ? 'Content removed' : 'Member banned' });
+      toast({ title: mode === 'content' ? 'Post removed' : 'Member banned' });
       setReason('');
       onOpenChange(false);
     } catch {
-      toast({ title: mode === 'content' ? 'Failed to remove content' : 'Failed to ban member', variant: 'destructive' });
+      toast({ title: mode === 'content' ? 'Failed to remove post' : 'Failed to ban member', variant: 'destructive' });
     }
   };
 

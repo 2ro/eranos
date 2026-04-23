@@ -269,8 +269,7 @@ export function parseCommunityReport(event: NostrEvent): CommunityReport | null 
 /**
  * Process community-scoped kind 1984 events into moderation data.
  *
- * Applies kind 5 reinstatements, validates membership and authority,
- * and classifies each remaining report.
+ * Validates membership and authority, and classifies each report.
  *
  * @param reports - Kind 1984 events scoped to the community.
  * @param members - Validated membership map (pubkey -> CommunityMember).
@@ -285,7 +284,6 @@ export function resolveCommunityModeration(
   const allReports: CommunityReport[] = [];
 
   for (const event of reports) {
-
     const parsed = parseCommunityReport(event);
     if (!parsed) continue;
 

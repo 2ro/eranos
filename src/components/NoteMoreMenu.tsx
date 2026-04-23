@@ -567,11 +567,6 @@ function NoteMoreMenuContent({ event, open, onOpenChange, communityContext, onRe
             label={isInSidebar ? 'Remove from sidebar' : 'Add to sidebar'}
             onClick={handleToggleSidebar}
           />
-        </div>
-
-        <Separator />
-
-        <div className="py-1">
           {isOwnPost && (
             <MenuItem
               icon={<Pin className={cn("size-5", pinned && "fill-current")} />}
@@ -586,6 +581,44 @@ function NoteMoreMenuContent({ event, open, onOpenChange, communityContext, onRe
               onClick={handleToggleCountryPin}
             />
           )}
+          {!isOwnPost && (
+            <MenuItem
+              icon={<BellOff className="size-5" />}
+              label="Mute Conversation"
+              onClick={handleMuteConversation}
+            />
+          )}
+          {!isOwnPost && (
+            <MenuItem
+              icon={<VolumeX className="size-5" />}
+              label={userMuted ? `Unmute @${displayName}` : `Mute @${displayName}`}
+              onClick={handleMuteUser}
+            />
+          )}
+          {!isOwnPost && (
+            <MenuItem
+              icon={<Flag className="size-5" />}
+              label={`Report @${displayName}`}
+              onClick={onReport}
+              destructive
+            />
+          )}
+          {!isOwnPost && communityContext?.canBan && (
+            <>
+              <MenuItem
+                icon={<ShieldBan className="size-5" />}
+                label="Remove post"
+                onClick={onBanContent}
+                destructive
+              />
+              <MenuItem
+                icon={<Ban className="size-5" />}
+                label={`Ban @${displayName}`}
+                onClick={onBanMember}
+                destructive
+              />
+            </>
+          )}
           {isOwnPost && (
             <MenuItem
               icon={<Trash2 className="size-5" />}
@@ -595,49 +628,6 @@ function NoteMoreMenuContent({ event, open, onOpenChange, communityContext, onRe
             />
           )}
         </div>
-
-        {!isOwnPost && (
-          <>
-            <Separator />
-
-            <div className="py-1">
-              {!isOwnPost && (
-                <MenuItem
-                  icon={<BellOff className="size-5" />}
-                  label="Mute Conversation"
-                  onClick={handleMuteConversation}
-                />
-              )}
-              <MenuItem
-                icon={<VolumeX className="size-5" />}
-                label={userMuted ? `Unmute @${displayName}` : `Mute @${displayName}`}
-                onClick={handleMuteUser}
-              />
-              <MenuItem
-                icon={<Flag className="size-5" />}
-                label={`Report @${displayName}`}
-                onClick={onReport}
-                destructive
-              />
-              {communityContext?.canBan && (
-                <>
-                  <MenuItem
-                    icon={<ShieldBan className="size-5" />}
-                    label="Remove content"
-                    onClick={onBanContent}
-                    destructive
-                  />
-                  <MenuItem
-                    icon={<Ban className="size-5" />}
-                    label={`Ban @${displayName}`}
-                    onClick={onBanMember}
-                    destructive
-                  />
-                </>
-              )}
-            </div>
-          </>
-        )}
 
         <Separator />
 
