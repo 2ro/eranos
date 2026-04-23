@@ -13,8 +13,32 @@ export const BADGE_DEFINITION_KIND = 30009;
 /** NIP-58 badge award. */
 export const BADGE_AWARD_KIND = 8;
 
-// TODO: kind 1984 (NIP-56 reports) and kind 5 (NIP-09 deletions) will be
-// added when the moderation overlay is implemented.
+/** NIP-56 report. */
+export const REPORT_KIND = 1984;
+
+/** NIP-09 deletion request. */
+export const DELETION_KIND = 5;
+
+/** NIP-32 label namespace used for authoritative moderation actions. */
+export const MODERATION_LABEL_NAMESPACE = 'moderation';
+
+/** NIP-32 label value that marks a kind 1984 event as an authoritative ban. */
+export const MODERATION_BAN_LABEL = 'ban';
+
+// ── NIP-56 report types ───────────────────────────────────────────────────────
+
+/** Standard NIP-56 report type strings. */
+export const NIP56_REPORT_TYPES = [
+  'nudity',
+  'malware',
+  'profanity',
+  'illegal',
+  'spam',
+  'impersonation',
+  'other',
+] as const;
+
+export type Nip56ReportType = typeof NIP56_REPORT_TYPES[number];
 
 // ── Rank tier metadata ────────────────────────────────────────────────────────
 
@@ -132,6 +156,177 @@ export interface CommunityMembership {
   totalCount: number;
 }
 
+// ── Community moderation ──────────────────────────────────────────────────────
+
+/**
+ * Classification of a community-scoped kind 1984 event.
+ *
+ * - `content-ban`: Authoritative removal of a specific post (has `e` tag + ban label).
+ * - `member-ban`: Authoritative ban of a member (no `e` tag + ban label).
+ * - `report`: Soft content warning from a member (NIP-56 report type, no ban label).
+ */
+export type CommunityReportAction = 'content-ban' | 'member-ban' | 'report';
+
+export interface CommunityReport {
+  /** The original kind 1984 event. */
+  event: NostrEvent;
+  /** Classified action type. */
+  action: CommunityReportAction;
+  /** Targeted event ID (for content-ban and report). Undefined for member-ban. */
+  targetEventId?: string;
+  /** Targeted pubkey. */
+  targetPubkey: string;
+  /** NIP-56 report type from the `e` or `p` tag (e.g. "nudity", "spam", "other"). */
+  reportType: Nip56ReportType;
+  /** Reporter's pubkey. */
+  reporterPubkey: string;
+}
+
+/** Moderation data resolved for a community. */
+export interface CommunityModeration {
+  /** Set of event IDs that are content-banned (should be omitted entirely). */
+  bannedEventIds: Set<string>;
+  /** Set of pubkeys that are member-banned. */
+  bannedPubkeys: Set<string>;
+  /** Reports grouped by target event ID (for content warnings). */
+  reportsByEventId: Map<string, CommunityReport[]>;
+  /** All parsed reports (for moderator review). */
+  allReports: CommunityReport[];
+}
+
+/**
+ * Check whether a kind 1984 event carries the authoritative `ban` label.
+ */
+function hasBanLabel(event: NostrEvent): boolean {
+  const hasNamespace = event.tags.some(
+    ([n, v]) => n === 'L' && v === MODERATION_LABEL_NAMESPACE,
+  );
+  const hasLabel = event.tags.some(
+    ([n, v, ns]) =>
+      n === 'l' && v === MODERATION_BAN_LABEL && ns === MODERATION_LABEL_NAMESPACE,
+  );
+  return hasNamespace && hasLabel;
+}
+
+/**
+ * Parse a community-scoped kind 1984 event into a structured report.
+ * Returns `null` if the event is not a valid community report.
+ */
+export function parseCommunityReport(event: NostrEvent): CommunityReport | null {
+  if (event.kind !== REPORT_KIND) return null;
+
+  // Must have a community A tag
+  const communityATag = event.tags.find(([n]) => n === 'A')?.[1];
+  if (!communityATag) return null;
+
+  // Extract target pubkey (required on all reports)
+  const pTag = event.tags.find(([n]) => n === 'p');
+  const targetPubkey = pTag?.[1];
+  if (!targetPubkey) return null;
+
+  // Extract target event ID (optional — determines content vs member action)
+  const eTag = event.tags.find(([n]) => n === 'e');
+  const targetEventId = eTag?.[1];
+
+  // Determine report type from the e or p tag's 3rd element
+  const rawType = eTag?.[2] || pTag?.[2] || 'other';
+  const reportType: Nip56ReportType = (NIP56_REPORT_TYPES as readonly string[]).includes(rawType)
+    ? (rawType as Nip56ReportType)
+    : 'other';
+
+  const isBan = hasBanLabel(event);
+
+  let action: CommunityReportAction;
+  if (isBan && targetEventId) {
+    action = 'content-ban';
+  } else if (isBan && !targetEventId) {
+    action = 'member-ban';
+  } else if (!isBan && targetEventId) {
+    action = 'report';
+  } else {
+    // No ban label and no e tag — invalid per classification table
+    return null;
+  }
+
+  return {
+    event,
+    action,
+    targetEventId,
+    targetPubkey,
+    reportType,
+    reporterPubkey: event.pubkey,
+  };
+}
+
+/**
+ * Process community-scoped kind 1984 events into moderation data.
+ *
+ * Applies kind 5 reinstatements, validates membership and authority,
+ * and classifies each remaining report.
+ *
+ * @param reports - Kind 1984 events scoped to the community.
+ * @param deletions - Kind 5 events that may reinstate 1984 events.
+ * @param members - Validated membership map (pubkey -> CommunityMember).
+ */
+export function resolveCommunityModeration(
+  reports: NostrEvent[],
+  deletions: NostrEvent[],
+  members: Map<string, CommunityMember>,
+): CommunityModeration {
+  // Build set of reinstated (deleted) 1984 event IDs
+  const reinstated = new Set<string>();
+  for (const del of deletions) {
+    if (del.kind !== DELETION_KIND) continue;
+    // Only count deletions that target kind 1984
+    const hasKTag = del.tags.some(([n, v]) => n === 'k' && v === '1984');
+    if (!hasKTag) continue;
+    for (const [n, eid] of del.tags) {
+      if (n === 'e' && eid) reinstated.add(eid);
+    }
+  }
+
+  const bannedEventIds = new Set<string>();
+  const bannedPubkeys = new Set<string>();
+  const reportsByEventId = new Map<string, CommunityReport[]>();
+  const allReports: CommunityReport[] = [];
+
+  for (const event of reports) {
+    // Skip reinstated events
+    if (reinstated.has(event.id)) continue;
+
+    const parsed = parseCommunityReport(event);
+    if (!parsed) continue;
+
+    // Reporter must be a valid community member
+    const reporter = members.get(parsed.reporterPubkey);
+    if (!reporter) continue;
+
+    if (parsed.action === 'content-ban' || parsed.action === 'member-ban') {
+      // Authority check: reporter rank must be strictly less than target rank
+      const target = members.get(parsed.targetPubkey);
+      const targetRank = target?.rank ?? Infinity; // Non-members treated as lowest
+      if (reporter.rank >= targetRank) continue; // Insufficient authority
+
+      if (parsed.action === 'content-ban' && parsed.targetEventId) {
+        bannedEventIds.add(parsed.targetEventId);
+      } else if (parsed.action === 'member-ban') {
+        bannedPubkeys.add(parsed.targetPubkey);
+      }
+    } else {
+      // Regular report — any member can report, no authority check
+      if (parsed.targetEventId) {
+        const existing = reportsByEventId.get(parsed.targetEventId) ?? [];
+        existing.push(parsed);
+        reportsByEventId.set(parsed.targetEventId, existing);
+      }
+    }
+
+    allReports.push(parsed);
+  }
+
+  return { bannedEventIds, bannedPubkeys, reportsByEventId, allReports };
+}
+
 /**
  * Resolve community membership via the chain validation algorithm
  * described in the community NIP.
@@ -139,13 +334,12 @@ export interface CommunityMembership {
  * 1. Seed rank 0 from the community definition (founder + moderators).
  * 2. Iteratively validate badge awards — awarder must be a validated
  *    member with rank strictly less than the awarded badge's rank.
- *
- * TODO: Step 3 (moderation overlay via kind 1984 bans + kind 5 deletions)
- * is not yet implemented.
+ * 3. Apply moderation overlay — remove banned members from the result.
  */
 export function resolveMembership(
   community: ParsedCommunity,
   awardEvents: NostrEvent[],
+  moderation?: CommunityModeration,
 ): CommunityMembership {
   // Build badge-to-rank lookup
   const badgeToRank = new Map<string, number>();
@@ -215,6 +409,13 @@ export function resolveMembership(
       }
 
       processed.add(award.id);
+    }
+  }
+
+  // Step 3: Apply moderation overlay — remove banned members
+  if (moderation) {
+    for (const bannedPk of moderation.bannedPubkeys) {
+      validated.delete(bannedPk);
     }
   }
 

@@ -742,7 +742,7 @@ Membership is **derived state**. Clients compute effective membership by resolvi
 1. **Seed rank 0**: The event publisher (founder) and all `p` tags (moderators) in the community definition are rank 0 members.
 2. **Query awards**: `{ kinds: [8], #a: [<all badge coordinates>] }`
 3. **Iteratively validate**: For each award, check if the awarder is a validated member with rank strictly less than the awarded rank. If valid, add the recipient. Repeat until no new members are discovered.
-4. **Apply moderation**: Query `{ kinds: [1984], #A: [<community-a-tag>] }`. Remove banned members (but not their downstream subtrees -- the chain remains intact). Hide reported posts.
+4. **Apply moderation**: Query `{ kinds: [1984, 5], #A: [<community-a-tag>] }`. Discard any kind `1984` event whose matching kind `5` deletion exists (reinstatement). Then classify remaining kind `1984` events into **bans** and **reports** (see [Moderation](#moderation)). Remove banned members and omit banned content. Attach report data to posts for content-warning display. Kind `1984` events from non-members are ignored entirely.
 
 Clients MUST NOT trust kind `8` events at face value. An attacker can publish awards for themselves, but these fail chain validation without a path to a founder or moderator.
 
@@ -797,59 +797,112 @@ Fetch all community-scoped posts and moderation data in a single request:
 }
 ```
 
-Clients then filter client-side: discard kind `1111` posts from non-members, and apply authoritative kind `1984` reports per the moderation rules below.
+Additionally, fetch kind `5` deletion events that may reinstate previously banned content or members:
+
+```jsonc
+{
+  "kinds": [5],
+  "#k": ["1984"]
+}
+```
+
+Clients then filter client-side: discard kind `1111` posts from non-members, apply kind `5` reinstatements, and process remaining kind `1984` events per the moderation rules below.
 
 ### Moderation
 
-Moderation uses kind `1984` ([NIP-56](https://github.com/nostr-protocol/nips/blob/master/56.md)) scoped to the community via the uppercase `A` tag. Reports from higher-ranked members are treated as **authoritative moderation actions**.
+Moderation uses kind `1984` ([NIP-56](https://github.com/nostr-protocol/nips/blob/master/56.md)) scoped to the community via the uppercase `A` tag. There are two tiers of moderation events:
 
-#### Authority Rules
+1. **Bans** -- authoritative actions from higher-ranked members that remove content or ban users. Identified by the presence of [NIP-32](https://github.com/nostr-protocol/nips/blob/master/32.md) label tags `["L", "moderation"]` and `["l", "ban", "moderation"]`.
+2. **Reports** -- soft flags from any valid community member using standard [NIP-56](https://github.com/nostr-protocol/nips/blob/master/56.md) report types (`nudity`, `spam`, `profanity`, `illegal`, `malware`, `impersonation`, `other`). No `L`/`l` tags. Clients display a content warning that users must click through to reveal.
 
-A report is **authoritative** if:
+Kind `1984` events from **non-members** are ignored entirely within community context.
 
-1. The reporter is a validated community member.
-2. The reporter's rank is strictly less than the target's rank (or the target is a non-member).
+#### Bans (Authoritative Moderation)
 
-Reports from non-members or insufficiently-ranked members are ignored.
+A ban is **authoritative** if and only if:
 
-#### Content Removal
+1. The event contains `["l", "ban", "moderation"]` and `["L", "moderation"]` tags.
+2. The publisher is a validated community member.
+3. The publisher's rank is **strictly less than** the target's rank (or the target is a non-member).
 
-Hide a post by publishing kind `1984` with both `e` and `p` tags:
+Bans that fail any of these conditions MUST be ignored.
 
-```jsonc
-{
-  "kind": 1984,
-  "pubkey": "<moderator-pubkey>",
-  "content": "Spam",
-  "tags": [
-    ["e", "<offending-event-id>"],
-    ["p", "<offending-author-pubkey>"],
-    ["A", "34550:<founder-pubkey>:<community-d-tag>"]
-  ]
-}
-```
+##### Content Ban
 
-#### Member Ban
-
-Ban a member by publishing kind `1984` with `p` tag only (no `e` tag). This is **non-cascading** -- only the targeted member is banned. Their kind `8` awards remain on relays, so downstream members whose chain passes through the banned member are still valid. For cascading removal, use badge revocation (kind `5`) instead.
+Ban a specific post by publishing kind `1984` with `e`, `p`, and `A` tags plus the `ban` label. The `e` and `p` tags use `"other"` as the NIP-56 report type since the action is administrative rather than categorical.
 
 ```jsonc
 {
   "kind": 1984,
   "pubkey": "<moderator-pubkey>",
-  "content": "Violated guidelines",
+  "content": "Reason for removal",
   "tags": [
-    ["p", "<banned-member-pubkey>"],
+    ["e", "<offending-event-id>", "other"],
+    ["p", "<offending-author-pubkey>", "other"],
+    ["A", "34550:<founder-pubkey>:<community-d-tag>"],
+    ["L", "moderation"],
+    ["l", "ban", "moderation"]
+  ]
+}
+```
+
+Clients MUST omit the banned event from the community feed entirely. The event is not displayed, blurred, or indicated in any way -- it is treated as if it does not exist.
+
+##### Member Ban
+
+Ban a member by publishing kind `1984` with `p` and `A` tags only (no `e` tag) plus the `ban` label. This is **non-cascading** -- only the targeted member is banned. Their kind `8` awards remain on relays, so downstream members whose chain passes through the banned member are still valid. For cascading removal, use badge revocation (kind `5`) instead.
+
+```jsonc
+{
+  "kind": 1984,
+  "pubkey": "<moderator-pubkey>",
+  "content": "Reason for ban",
+  "tags": [
+    ["p", "<banned-member-pubkey>", "other"],
+    ["A", "34550:<founder-pubkey>:<community-d-tag>"],
+    ["L", "moderation"],
+    ["l", "ban", "moderation"]
+  ]
+}
+```
+
+Clients distinguish content bans (`e` + `p` + `A` + `ban` label) from member bans (`p` + `A` + `ban` label, no `e` tag).
+
+#### Reports (Content Warnings)
+
+Any **valid community member** (regardless of rank) may report content by publishing kind `1984` with a standard NIP-56 report type on the `e` and `p` tags. Reports do NOT use `L`/`l` label tags.
+
+```jsonc
+{
+  "kind": 1984,
+  "pubkey": "<member-pubkey>",
+  "content": "Additional context",
+  "tags": [
+    ["e", "<event-id>", "nudity"],
+    ["p", "<author-pubkey>", "nudity"],
     ["A", "34550:<founder-pubkey>:<community-d-tag>"]
   ]
 }
 ```
 
-Clients distinguish content removal (`e` + `p` + `A`) from bans (`p` + `A`, no `e`).
+Clients SHOULD display reported content behind a content warning overlay that requires user interaction to reveal. The report type (e.g. `nudity`, `spam`) MAY be shown in the warning. Multiple reports on the same event reinforce the warning but do not automatically escalate to a ban.
+
+Reports from non-members are ignored.
+
+#### Classification Summary
+
+| `l` tag present? | `e` tag present? | Authority check | Result |
+|---|---|---|---|
+| `["l", "ban", "moderation"]` | Yes | Rank < target | Content ban (omit event) |
+| `["l", "ban", "moderation"]` | No | Rank < target | Member ban |
+| No | Yes | Member (any rank) | Content warning |
+| No | No | -- | Invalid (ignored) |
+| Any | Any | Non-member | Ignored |
+| `["l", "ban", "moderation"]` | Any | Rank >= target | Ignored |
 
 #### Reinstatement
 
-Delete the kind `1984` event via kind `5` ([NIP-09](https://github.com/nostr-protocol/nips/blob/master/09.md)). Per NIP-09, only the original author can delete it.
+Delete a kind `1984` ban or report via kind `5` ([NIP-09](https://github.com/nostr-protocol/nips/blob/master/09.md)). Per NIP-09, only the original author of the kind `1984` event can delete it.
 
 ```jsonc
 {
@@ -903,6 +956,7 @@ Both kind `34550` and kind `30009` are addressable events. To add or remove rank
 - [NIP-09](https://github.com/nostr-protocol/nips/blob/master/09.md) -- Event Deletion Request
 - [NIP-22](https://github.com/nostr-protocol/nips/blob/master/22.md) -- Comment
 - [NIP-31](https://github.com/nostr-protocol/nips/blob/master/31.md) -- Unknown Event Kinds (`alt` tag)
+- [NIP-32](https://github.com/nostr-protocol/nips/blob/master/32.md) -- Labeling (moderation `ban` label)
 - [NIP-56](https://github.com/nostr-protocol/nips/blob/master/56.md) -- Reporting
 - [NIP-58](https://github.com/nostr-protocol/nips/blob/master/58.md) -- Badges
 - [NIP-72](https://github.com/nostr-protocol/nips/blob/master/72.md) -- Moderated Communities

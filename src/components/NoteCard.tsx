@@ -41,6 +41,7 @@ import {
   ColorMomentEyeButton,
 } from "@/components/ColorMomentContent";
 import { CommentContext } from "@/components/CommentContext";
+import { CommunityContentWarning } from "@/components/CommunityContentWarning";
 import { ContentWarningGuard } from "@/components/ContentWarningGuard";
 import { EmojifiedText, ReactionEmoji } from "@/components/CustomEmoji";
 const CustomNipCard = lazy(() => import("@/components/CustomNipCard").then(m => ({ default: m.CustomNipCard })));
@@ -84,6 +85,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { VideoPlayer } from "@/components/VideoPlayer";
 import { VoiceMessagePlayer } from "@/components/VoiceMessagePlayer";
 import { ZapDialog } from "@/components/ZapDialog";
+import { useCommunityModerationContext } from "@/contexts/CommunityModerationContext";
 import { useAppContext } from "@/hooks/useAppContext";
 import { useAuthor } from "@/hooks/useAuthor";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
@@ -344,6 +346,10 @@ export const NoteCard = memo(function NoteCard({
   const [moreMenuOpen, setMoreMenuOpen] = useState(false);
   const [replyOpen, setReplyOpen] = useState(false);
 
+  // Community moderation context — shows content warnings for reported posts
+  const communityModCtx = useCommunityModerationContext();
+  const communityReports = communityModCtx?.moderation.reportsByEventId.get(event.id);
+
   // Check if the current user can zap this event's author
   const canZapAuthor = user && canZap(metadata);
 
@@ -552,7 +558,7 @@ export const NoteCard = memo(function NoteCard({
   }
 
   // Shared content block used in both normal and threaded layouts
-  const contentBlock = (
+  const rawContentBlock = (
     <>
       {/* Reply context (kind 1) or comment context (kind 1111) — shown above content */}
       {isComment && <CommentContext event={event} />}
@@ -674,6 +680,11 @@ export const NoteCard = memo(function NoteCard({
       </ContentWarningGuard>
     </>
   );
+
+  // Wrap with community content warning when the event has soft reports
+  const contentBlock = communityReports && communityReports.length > 0
+    ? <CommunityContentWarning reports={communityReports}>{rawContentBlock}</CommunityContentWarning>
+    : rawContentBlock;
 
   // Shared author info block — min-h-[42px] keeps the container the same height
   // whether the skeleton or the resolved profile is rendered, preventing layout shifts.
