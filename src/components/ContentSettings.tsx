@@ -255,7 +255,7 @@ function FeedTabsSection() {
   });
 
   const [showAgoraFeed, setShowAgoraFeed] = useState(() => {
-    const stored = localStorage.getItem('ditto:showDittoFeed');
+    const stored = localStorage.getItem('agora:showWorldFeed');
     return stored !== null ? stored === 'true' : true; // Default to true
   });
 
@@ -271,12 +271,12 @@ function FeedTabsSection() {
 
   const handleToggleAgoraFeed = async (checked: boolean) => {
     setShowAgoraFeed(checked);
-    localStorage.setItem('ditto:showDittoFeed', String(checked));
+    localStorage.setItem('agora:showWorldFeed', String(checked));
     toast({
-      title: checked ? 'Agora feed enabled' : 'Agora feed disabled',
+      title: checked ? 'World feed enabled' : 'World feed disabled',
       description: checked
-        ? 'The Agora feed tab will appear in your navigation'
-        : 'The Agora feed tab will be hidden',
+        ? 'The World feed tab will appear in your navigation'
+        : 'The World feed tab will be hidden',
     });
   };
 
@@ -447,8 +447,8 @@ function FeedTabsSection() {
       <div className="border-b border-border">
         <div className="flex items-center justify-between py-3.5 px-3">
           <div className="min-w-0">
-            <Label className="text-sm font-medium">Agora Feed</Label>
-            <p className="text-xs text-muted-foreground mt-0.5">Show trending and curated content from Agora relays</p>
+            <Label className="text-sm font-medium">World Feed</Label>
+            <p className="text-xs text-muted-foreground mt-0.5">Show posts from all countries around the world</p>
           </div>
           <Switch
             checked={showAgoraFeed}
