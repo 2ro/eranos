@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 import {
   Dialog,
   DialogContent,
@@ -57,6 +58,7 @@ export function BanConfirmDialog({
   open,
   onOpenChange,
 }: BanConfirmDialogProps) {
+  const queryClient = useQueryClient();
   const { mutateAsync: publishEvent, isPending } = useNostrPublish();
   const [reason, setReason] = useState('');
 
@@ -83,6 +85,13 @@ export function BanConfirmDialog({
         content: reason.trim(),
         tags,
       });
+
+      // Invalidate community queries so the moderation overlay updates
+      // immediately (removes banned content/members without a page refresh).
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ['community-members', communityATag] }),
+        queryClient.invalidateQueries({ queryKey: ['community-activity-feed'], exact: false }),
+      ]);
 
       toast({ title: mode === 'content' ? 'Post removed' : 'Member banned' });
       setReason('');

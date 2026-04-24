@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 import {
   Dialog,
   DialogContent,
@@ -38,6 +39,7 @@ export function CommunityReportDialog({
   onOpenChange,
 }: CommunityReportDialogProps) {
   const { user } = useCurrentUser();
+  const queryClient = useQueryClient();
   const { mutateAsync: publishEvent, isPending } = useNostrPublish();
   const [reportType, setReportType] = useState<Nip56ReportType | ''>('');
   const [details, setDetails] = useState('');
@@ -57,6 +59,13 @@ export function CommunityReportDialog({
           ['A', communityATag],
         ],
       });
+
+      // Invalidate community queries so the content warning overlay appears
+      // immediately and the activity feed filters out reported content.
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ['community-members', communityATag] }),
+        queryClient.invalidateQueries({ queryKey: ['community-activity-feed'], exact: false }),
+      ]);
 
       toast({ title: 'Report submitted' });
       setReportType('');
