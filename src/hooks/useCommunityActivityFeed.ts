@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import { useNostr } from '@nostrify/react';
 import { useQuery } from '@tanstack/react-query';
 import type { NostrEvent } from '@nostrify/nostrify';
@@ -13,6 +14,18 @@ import {
   resolveMembership,
 } from '@/lib/communityUtils';
 
+/** Internal result type — events plus per-community moderation/membership data. */
+interface ActivityFeedResult {
+  events: NostrEvent[];
+  /** Moderation data keyed by community A tag. */
+  moderationByATag: Map<string, CommunityModeration>;
+  /** Member maps keyed by community A tag (pre-moderation, for authority checks). */
+  memberMapByATag: Map<string, Map<string, CommunityMember>>;
+}
+
+const EMPTY_MODERATION_MAP = new Map<string, CommunityModeration>();
+const EMPTY_MEMBER_MAP_MAP = new Map<string, Map<string, CommunityMember>>();
+
 /**
  * Fetches a chronological activity feed for communities the current user
  * belongs to (founded or joined).
@@ -27,6 +40,9 @@ import {
  * community A's posts, not from community B.
  *
  * Sorted by created_at descending.
+ *
+ * Also returns per-community `moderationByATag` and `memberMapByATag` so
+ * callers can provide `CommunityModerationContext` to `NoteMoreMenu`.
  */
 export function useCommunityActivityFeed() {
   const { nostr } = useNostr();
@@ -35,10 +51,12 @@ export function useCommunityActivityFeed() {
   const aTags = myCommunities?.map((c) => c.community.aTag).filter(Boolean) ?? [];
   const aTagsKey = aTags.join(',');
 
-  return useQuery<NostrEvent[]>({
+  const query = useQuery<ActivityFeedResult>({
     queryKey: ['community-activity-feed', aTagsKey],
     queryFn: async ({ signal }) => {
-      if (aTags.length === 0 || !myCommunities) return [];
+      if (aTags.length === 0 || !myCommunities) {
+        return { events: [], moderationByATag: new Map(), memberMapByATag: new Map() };
+      }
 
       const timeout = AbortSignal.timeout(8_000);
       const combinedSignal = AbortSignal.any([signal, timeout]);
@@ -90,37 +108,41 @@ export function useCommunityActivityFeed() {
           : Promise.resolve([]),
       ]);
 
-      // ── Resolve moderation per community ──
+      // ── Resolve membership and moderation per community ──
+      // Membership is resolved for all communities so callers can provide
+      // CommunityModerationContext (for NoteMoreMenu ban actions).
       // Bans are community-scoped: a member banned in community A should only
-      // be filtered from community A's posts, not from community B's.
+      // be filtered from community A's posts, not from community B.
       const moderationByATag = new Map<string, CommunityModeration>();
+      const memberMapByATag = new Map<string, Map<string, CommunityMember>>();
 
-      if (reports.length > 0) {
-        // Group reports by community A tag
-        const reportsByATag = new Map<string, NostrEvent[]>();
-        for (const report of reports) {
-          const aTag = report.tags.find(([n]) => n === 'A')?.[1];
-          if (!aTag) continue;
-          const list = reportsByATag.get(aTag);
-          if (list) {
-            list.push(report);
-          } else {
-            reportsByATag.set(aTag, [report]);
-          }
+      // Group reports by community A tag
+      const reportsByATag = new Map<string, NostrEvent[]>();
+      for (const report of reports) {
+        const aTag = report.tags.find(([n]) => n === 'A')?.[1];
+        if (!aTag) continue;
+        const list = reportsByATag.get(aTag);
+        if (list) {
+          list.push(report);
+        } else {
+          reportsByATag.set(aTag, [report]);
         }
+      }
 
-        for (const entry of myCommunities) {
-          const community = entry.community;
-          const communityReports = reportsByATag.get(community.aTag);
-          if (!communityReports || communityReports.length === 0) continue;
+      for (const entry of myCommunities) {
+        const community = entry.community;
 
-          // Resolve membership for this community to validate report authority
-          const membership = resolveMembership(community, awards);
-          const memberMap = new Map<string, CommunityMember>();
-          for (const m of membership.members) {
-            memberMap.set(m.pubkey, m);
-          }
+        // Resolve membership for this community
+        const membership = resolveMembership(community, awards);
+        const memberMap = new Map<string, CommunityMember>();
+        for (const m of membership.members) {
+          memberMap.set(m.pubkey, m);
+        }
+        memberMapByATag.set(community.aTag, memberMap);
 
+        // Resolve moderation if there are reports for this community
+        const communityReports = reportsByATag.get(community.aTag);
+        if (communityReports && communityReports.length > 0) {
           moderationByATag.set(
             community.aTag,
             resolveCommunityModeration(communityReports, memberMap),
@@ -153,9 +175,20 @@ export function useCommunityActivityFeed() {
       }
 
       // Sort by created_at descending
-      return merged.sort((a, b) => b.created_at - a.created_at);
+      merged.sort((a, b) => b.created_at - a.created_at);
+
+      return { events: merged, moderationByATag, memberMapByATag };
     },
     enabled: !communitiesLoading && aTags.length > 0,
     staleTime: 2 * 60_000,
   });
+
+  return useMemo(() => ({
+    data: query.data?.events,
+    moderationByATag: query.data?.moderationByATag ?? EMPTY_MODERATION_MAP,
+    memberMapByATag: query.data?.memberMapByATag ?? EMPTY_MEMBER_MAP_MAP,
+    isLoading: query.isLoading,
+    isError: query.isError,
+    error: query.error,
+  }), [query.data, query.isLoading, query.isError, query.error]);
 }

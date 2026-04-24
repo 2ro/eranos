@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { useSeoMeta } from '@unhead/react';
 import { Users } from 'lucide-react';
@@ -11,6 +12,7 @@ import { PullToRefresh } from '@/components/PullToRefresh';
 import { SubHeaderBar } from '@/components/SubHeaderBar';
 import { TabButton } from '@/components/TabButton';
 import { Skeleton } from '@/components/ui/skeleton';
+import { CommunityModerationContext, type CommunityModerationContextValue } from '@/contexts/CommunityModerationContext';
 import { useLayoutOptions } from '@/contexts/LayoutContext';
 import { useAppContext } from '@/hooks/useAppContext';
 import { useCommunityActivityFeed } from '@/hooks/useCommunityActivityFeed';
@@ -191,7 +193,23 @@ function MyCommunitiesContent() {
 
 function ActivitiesTab({ onRefresh }: { onRefresh: () => Promise<void> }) {
   const { user } = useCurrentUser();
-  const { data: activityEvents, isLoading } = useCommunityActivityFeed();
+  const { data: activityEvents, isLoading, moderationByATag, memberMapByATag } = useCommunityActivityFeed();
+
+  // Build per-community context values for NoteMoreMenu moderation actions.
+  // Keyed by community A tag — each NoteCard is wrapped in its own provider.
+  const contextByATag = useMemo(() => {
+    const map = new Map<string, CommunityModerationContextValue>();
+    for (const [aTag, memberMap] of memberMapByATag) {
+      const moderation = moderationByATag.get(aTag) ?? {
+        bannedEventIds: new Set<string>(),
+        bannedPubkeys: new Set<string>(),
+        reportsByEventId: new Map(),
+        allReports: [],
+      };
+      map.set(aTag, { communityATag: aTag, moderation, memberMap });
+    }
+    return map;
+  }, [moderationByATag, memberMapByATag]);
 
   if (!user) {
     return (
@@ -220,9 +238,15 @@ function ActivitiesTab({ onRefresh }: { onRefresh: () => Promise<void> }) {
         </div>
       ) : activityEvents && activityEvents.length > 0 ? (
         <div>
-          {activityEvents.map((event) => (
-            <NoteCard key={event.id} event={event} />
-          ))}
+          {activityEvents.map((event) => {
+            const aTag = event.tags.find(([n]) => n === 'A')?.[1];
+            const ctx = aTag ? contextByATag.get(aTag) ?? null : null;
+            return (
+              <CommunityModerationContext.Provider key={event.id} value={ctx}>
+                <NoteCard event={event} />
+              </CommunityModerationContext.Provider>
+            );
+          })}
         </div>
       ) : (
         <FeedEmptyState message="No activity from your communities yet." />
