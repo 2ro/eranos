@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import { useInView } from 'react-intersection-observer';
 import { useNostr } from '@nostrify/react';
 import { useQuery } from '@tanstack/react-query';
@@ -22,20 +22,20 @@ import { useMuteList } from '@/hooks/useMuteList';
 import { useTabFeed } from '@/hooks/useProfileFeed';
 import { useSavedFeeds } from '@/hooks/useSavedFeeds';
 import { useResolveTabFilter } from '@/hooks/useResolveTabFilter';
-import { useCuratorFollowList } from '@/hooks/useCuratorFollowList';
-import { useCuratedDittoFeed } from '@/hooks/useCuratedDittoFeed';
+import { useWorldFeed } from '@/hooks/useWorldFeed';
 import { getEnabledFeedKinds } from '@/lib/extraKinds';
-import { diversifyFeedPages } from '@/lib/feedDiversity';
 import { isRepostKind, shouldHideFeedEvent } from '@/lib/feedUtils';
 import { isEventMuted } from '@/lib/muteHelpers';
 import { SubHeaderBar } from '@/components/SubHeaderBar';
 import { ARC_OVERHANG_PX } from '@/components/ArcBackground';
 import { TabButton } from '@/components/TabButton';
+import { useNavHidden } from '@/contexts/LayoutContext';
+import { cn } from '@/lib/utils';
 import type { FeedItem } from '@/lib/feedUtils';
 import type { NostrEvent } from '@nostrify/nostrify';
 import type { SavedFeed } from '@/contexts/AppContext';
 
-type CoreFeedTab = 'follows' | 'global' | 'communities' | 'ditto';
+type CoreFeedTab = 'follows' | 'global' | 'communities' | 'world';
 type FeedTab = CoreFeedTab | string; // string = saved feed id
 
 interface FeedProps {
@@ -59,7 +59,7 @@ export function Feed({ kinds, tagFilters, header, hideCompose, emptyMessage, fee
   const { savedFeeds } = useSavedFeeds();
   const { hashtags } = useInterests();
   const { hashtags: geotags } = useInterests('g');
-  const { data: curatorFollowList, isError: isCuratorError } = useCuratorFollowList();
+  const navHidden = useNavHidden();
 
   // Tab settings from localStorage
   const showGlobalFeed = (() => {
@@ -67,8 +67,8 @@ export function Feed({ kinds, tagFilters, header, hideCompose, emptyMessage, fee
     return stored !== null ? stored === 'true' : false;
   })();
 
-  const showDittoFeed = (() => {
-    const stored = localStorage.getItem('ditto:showDittoFeed');
+  const showWorldFeed = (() => {
+    const stored = localStorage.getItem('agora:showWorldFeed');
     return stored !== null ? stored === 'true' : true;
   })();
 
@@ -95,10 +95,14 @@ export function Feed({ kinds, tagFilters, header, hideCompose, emptyMessage, fee
   const { startSignup } = useOnboarding();
 
   // Kind-specific pages only support Follows + Global. Clamp any other
-  // persisted tab (e.g. 'ditto', 'communities') back to the appropriate default.
-  // Logged-out users must land on 'global' since 'follows' requires a user.
+  // persisted tab (e.g. 'world', 'communities') back to the appropriate default.
+  // Logged-out users on the home feed land on 'world' to see global content.
   const activeTab: FeedTab = (() => {
-    if (!kinds) return rawActiveTab; // Home feed: no clamping
+    if (!kinds) {
+      // Migrate legacy 'ditto' tab to 'world'
+      if (rawActiveTab === 'ditto') return 'world';
+      return rawActiveTab;
+    }
     if (rawActiveTab === 'global') return 'global';
     if (rawActiveTab === 'follows' && user) return 'follows';
     return user ? 'follows' : 'global';
@@ -116,57 +120,64 @@ export function Feed({ kinds, tagFilters, header, hideCompose, emptyMessage, fee
   // Is the active tab a geotag interest?
   const activeGeotag = activeTab.startsWith('geotag:') ? activeTab.slice(7) : null;
 
-  // When logged out (and not on a kind-specific page), show the "hot" sorted
-  // feed instead of the noisy global feed so new visitors see quality content.
-  const useTopFeedForLoggedOut = !user && !kinds;
+  // When logged out (and not on a kind-specific page), show the World feed.
+  const useWorldForLoggedOut = !user && !kinds;
 
-  // When the Ditto tab is active (logged in), show the same hot-sorted curated feed.
-  // Disabled on kind-specific pages — the Ditto tab is not shown there.
-  const useDittoTab = user && activeTab === 'ditto' && !kinds;
+  // When the World tab is active (logged in), show the world feed.
+  // Disabled on kind-specific pages — the World tab is not shown there.
+  const useWorldTab = activeTab === 'world' && !kinds;
+
+  // Is the world feed active?
+  const isWorldActive = useWorldForLoggedOut || !!useWorldTab;
 
   // Standard feed query (used when logged in, or on kind-specific pages, or core tabs)
-  const isCoreFeedTab = activeTab === 'follows' || activeTab === 'global' || activeTab === 'communities' || activeTab === 'ditto';
+  const isCoreFeedTab = activeTab === 'follows' || activeTab === 'global' || activeTab === 'communities' || activeTab === 'world';
   type UseFeedTab = 'follows' | 'global' | 'communities';
   const feedTabForQuery: UseFeedTab =
     activeTab === 'follows' || activeTab === 'global' || activeTab === 'communities'
       ? (activeTab as UseFeedTab)
       : 'global';
   const feedQuery = useFeed(
-    isCoreFeedTab ? feedTabForQuery : 'global',
+    isCoreFeedTab && !isWorldActive ? feedTabForQuery : 'global',
     (kinds || tagFilters) ? { kinds, tagFilters } : undefined,
   );
 
-  // Curated Ditto feed: latest content from the curator's follow list.
-  const topQuery = useCuratedDittoFeed(
-    curatorFollowList,
-    useTopFeedForLoggedOut || !!useDittoTab,
-  );
+  // World feed: all country-tagged events with diversity cap + live streaming.
+  const worldFeed = useWorldFeed(isWorldActive);
 
-  // Unify the two query shapes behind a single interface
-  const useDittoQuery = useTopFeedForLoggedOut || useDittoTab;
-  const activeQuery = useDittoQuery ? topQuery : feedQuery;
+  // For non-world tabs, use the standard feed query
   const queryKey = useMemo(
-    () => useDittoQuery ? ['ditto-curated-feed'] : ['feed', activeTab],
-    [useDittoQuery, activeTab],
+    () => isWorldActive ? ['world-feed'] : ['feed', activeTab],
+    [isWorldActive, activeTab],
   );
 
   const handleRefresh = usePageRefresh(queryKey);
+  const handleWorldRefresh = useCallback(async () => {
+    worldFeed.flushStreamBuffer();
+    await handleRefresh();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, [worldFeed.flushStreamBuffer, handleRefresh]);
 
   const {
     data: rawData,
     isPending,
     isLoading,
-    fetchNextPage,
-    hasNextPage,
-    isFetchingNextPage,
-  } = activeQuery;
+    fetchNextPage: fetchNextPageStandard,
+    hasNextPage: hasNextPageStandard,
+    isFetchingNextPage: isFetchingNextPageStandard,
+  } = feedQuery;
+
+  // Unify pagination interface
+  const fetchNextPage = isWorldActive ? worldFeed.fetchNextPage : fetchNextPageStandard;
+  const hasNextPage = isWorldActive ? worldFeed.hasNextPage : hasNextPageStandard;
+  const isFetchingNextPage = isWorldActive ? worldFeed.isFetchingNextPage : isFetchingNextPageStandard;
 
   // Auto-fetch page 2 as soon as page 1 arrives for smoother scrolling
   useEffect(() => {
-    if (hasNextPage && !isFetchingNextPage && rawData?.pages?.length === 1) {
+    if (!isWorldActive && hasNextPage && !isFetchingNextPage && rawData?.pages?.length === 1) {
       fetchNextPage();
     }
-  }, [hasNextPage, isFetchingNextPage, rawData?.pages?.length, fetchNextPage]);
+  }, [isWorldActive, hasNextPage, isFetchingNextPage, rawData?.pages?.length, fetchNextPage]);
 
   // Intersection observer for infinite scroll
   const { ref: scrollRef, inView } = useInView({
@@ -182,30 +193,13 @@ export function Feed({ kinds, tagFilters, header, hideCompose, emptyMessage, fee
 
   // Flatten, deduplicate, and filter muted content.
   const feedItems = useMemo(() => {
+    if (isWorldActive) {
+      // World feed: events are already filtered/deduped by useWorldFeed
+      return worldFeed.events.map((event): FeedItem => ({ event, sortTimestamp: event.created_at }));
+    }
+
     if (!rawData?.pages) return [];
     const seen = new Set<string>();
-
-    if (useDittoQuery) {
-      // Deduplicate and filter each page independently, then diversify
-      // page-by-page so earlier pages never change when new pages arrive.
-      const dedupedPages = (rawData.pages as unknown as import('@nostrify/nostrify').NostrEvent[][])
-        .map((page) =>
-          page
-            .filter((event) => {
-              if (seen.has(event.id)) return false;
-              seen.add(event.id);
-              if (shouldHideFeedEvent(event)) return false;
-              if (muteItems.length > 0 && isEventMuted(event, muteItems)) return false;
-              return true;
-            })
-            .map((event): FeedItem => ({ event, sortTimestamp: event.created_at })),
-        );
-
-      // Reorder for content-type diversity: cap any single type at 20%
-      // per page and enforce a minimum gap of 4 positions between same-type
-      // items, with gap state carrying across page boundaries.
-      return diversifyFeedPages(dedupedPages);
-    }
 
     return (rawData.pages as unknown as { items: FeedItem[] }[])
       .flatMap((page) => page.items)
@@ -217,11 +211,12 @@ export function Feed({ kinds, tagFilters, header, hideCompose, emptyMessage, fee
         if (muteItems.length > 0 && isEventMuted(item.event, muteItems)) return false;
         return true;
       });
-  }, [rawData?.pages, muteItems, useDittoQuery]);
+  }, [isWorldActive, worldFeed.events, rawData?.pages, muteItems]);
 
-  // Show skeletons while loading, but not if the curator list query errored
-  // (that would leave logged-out users staring at infinite skeletons).
-  const showSkeleton = (isPending || (isLoading && !rawData)) && !(useDittoQuery && isCuratorError);
+  // Show skeletons while loading.
+  const showSkeleton = isWorldActive
+    ? worldFeed.isLoading
+    : (isPending || (isLoading && !rawData));
 
   // Kind-specific pages (e.g. Development, WebXDC) only show Follows + Global tabs.
   // Extra tabs (Ditto, Community, saved feeds, hashtags) are only for the home feed.
@@ -246,8 +241,8 @@ export function Feed({ kinds, tagFilters, header, hideCompose, emptyMessage, fee
       {user && (
         <SubHeaderBar>
           <TabButton label="Follows" active={activeTab === 'follows'} onClick={() => handleSetActiveTab('follows')} />
-          {!isKindSpecificPage && showDittoFeed && (
-            <TabButton label="Ditto" active={activeTab === 'ditto'} onClick={() => handleSetActiveTab('ditto')} />
+          {!isKindSpecificPage && showWorldFeed && (
+            <TabButton label="World" active={activeTab === 'world'} onClick={() => handleSetActiveTab('world')} />
           )}
           {!isKindSpecificPage && showCommunityFeed && (
             <TabButton label={communityLabel} active={activeTab === 'communities'} onClick={() => handleSetActiveTab('communities')} />
@@ -296,7 +291,28 @@ export function Feed({ kinds, tagFilters, header, hideCompose, emptyMessage, fee
       ) : activeSavedFeed ? (
         <SavedFeedContent feed={activeSavedFeed} />
       ) : (
-        <PullToRefresh onRefresh={handleRefresh}>
+        <PullToRefresh onRefresh={isWorldActive ? handleWorldRefresh : handleRefresh}>
+          {/* "X new posts" pill for World tab */}
+          {isWorldActive && worldFeed.newPostCount > 0 && (
+            <div
+              className={cn(
+                'sticky new-posts-pill z-10 flex justify-center pointer-events-none',
+                'max-sidebar:transition-opacity max-sidebar:duration-300 max-sidebar:ease-in-out',
+                navHidden && 'max-sidebar:opacity-0 max-sidebar:pointer-events-none',
+              )}
+              style={{ marginBottom: '-3rem' }}
+            >
+              <button
+                onClick={() => {
+                  worldFeed.flushStreamBuffer();
+                  window.scrollTo({ top: 0, behavior: 'smooth' });
+                }}
+                className="pointer-events-auto px-4 py-1.5 rounded-full bg-primary text-primary-foreground text-sm font-medium shadow-lg hover:bg-primary/90 transition-colors animate-in fade-in slide-in-from-top-2 duration-300"
+              >
+                {worldFeed.newPostCount} new post{worldFeed.newPostCount !== 1 ? 's' : ''}
+              </button>
+            </div>
+          )}
           {showSkeleton ? (
             <div className="divide-y divide-border">
               {Array.from({ length: 5 }).map((_, i) => (
@@ -310,6 +326,7 @@ export function Feed({ kinds, tagFilters, header, hideCompose, emptyMessage, fee
                   key={item.repostedBy ? `repost-${item.repostedBy}-${item.event.id}` : item.event.id}
                   event={item.event}
                   repostedBy={item.repostedBy}
+                  highlight={isWorldActive && worldFeed.flushedIds.has(item.event.id)}
                 />
               ))}
               {hasNextPage && (
@@ -328,7 +345,9 @@ export function Feed({ kinds, tagFilters, header, hideCompose, emptyMessage, fee
                 emptyMessage ?? (
                   activeTab === 'follows'
                     ? 'Your feed is empty. Follow some people to see their posts here.'
-                    : 'No posts found. Check your relay connections or come back soon.'
+                    : activeTab === 'world'
+                      ? 'No world posts yet. Check back soon for global activity.'
+                      : 'No posts found. Check your relay connections or come back soon.'
                 )
               }
               showDiscover={!emptyMessage && activeTab === 'follows'}
