@@ -25,6 +25,7 @@ import { SparkWalletProvider } from "@/contexts/SparkWalletContext";
 import { BuildConfigSchema, type BuildConfig } from "@/lib/schemas";
 import { secureStorage } from "@/lib/secureStorage";
 import { EmotionDevProvider } from "@/blobbi/dev/EmotionDevContext";
+import { PROTOCOL_MODE } from "@samthomson/nostr-messaging/core";
 import AppRouter from "./AppRouter";
 
 const head = createHead({
@@ -157,6 +158,7 @@ const hardcodedConfig: AppConfig = {
   messaging: {
     enabled: true,
     relayMode: 'hybrid',
+    protocolMode: PROTOCOL_MODE.NIP17_ONLY,
     renderInlineMedia: true,
     soundEnabled: false,
     devMode: false,

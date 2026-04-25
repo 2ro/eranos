@@ -1,4 +1,5 @@
 import { createContext } from "react";
+import type { ProtocolMode } from "@samthomson/nostr-messaging/core";
 import type { ThemeConfig, ThemesConfig } from "@/themes";
 
 /**
@@ -259,6 +260,8 @@ export interface AppConfig {
     discoveryRelays?: string[];
     /** Relay strategy for DM transport. */
     relayMode?: "discovery" | "hybrid" | "strict_outbox";
+    /** Preferred send protocol(s) for DMs. */
+    protocolMode?: ProtocolMode;
     /** Show inline media previews in conversations. */
     renderInlineMedia?: boolean;
     /** Play a sound when new messages arrive. */

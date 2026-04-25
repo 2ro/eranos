@@ -396,6 +396,38 @@ export function NostrSync() {
         changed = true;
       }
 
+      if (encryptedSettings.messaging) {
+        type MessagingSettings = NonNullable<typeof current.messaging>;
+        const currentMessaging: MessagingSettings = current.messaging ?? {};
+        const remoteMessaging = encryptedSettings.messaging;
+        const scalarKeys: Array<Exclude<keyof MessagingSettings, "discoveryRelays">> = [
+          "enabled",
+          "relayMode",
+          "protocolMode",
+          "renderInlineMedia",
+          "soundEnabled",
+          "soundId",
+          "devMode",
+        ];
+
+        const scalarChanged = scalarKeys.some((key) => {
+          const incoming = remoteMessaging[key];
+          return incoming !== undefined && incoming !== currentMessaging[key];
+        });
+
+        const discoveryRelaysChanged =
+          remoteMessaging.discoveryRelays !== undefined &&
+          JSON.stringify(remoteMessaging.discoveryRelays) !==
+            JSON.stringify(currentMessaging.discoveryRelays);
+
+        const messagingChanged = scalarChanged || discoveryRelaysChanged;
+
+        if (messagingChanged) {
+          updates.messaging = { ...currentMessaging, ...remoteMessaging };
+          changed = true;
+        }
+      }
+
       // Return the same reference if nothing changed to prevent re-render
       return changed ? updates : current;
     });

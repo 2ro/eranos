@@ -239,6 +239,12 @@ export function useInitialSync() {
               if (parsed.linkPreviewUrl) {
                 updates.linkPreviewUrl = parsed.linkPreviewUrl;
               }
+              if (parsed.messaging) {
+                updates.messaging = {
+                  ...(current.messaging ?? {}),
+                  ...parsed.messaging,
+                };
+              }
 
               return updates;
             });

@@ -1,7 +1,14 @@
 import { z } from 'zod';
+import { PROTOCOL_MODE } from '@samthomson/nostr-messaging/core';
 
 import type { Theme, ContentWarningPolicy } from '@/contexts/AppContext';
 import type { CoreThemeColors, ThemeConfig, ThemesConfig } from '@/themes';
+
+const PROTOCOL_MODE_VALUES = [
+  PROTOCOL_MODE.NIP04_ONLY,
+  PROTOCOL_MODE.NIP17_ONLY,
+  PROTOCOL_MODE.NIP04_OR_NIP17,
+] as const;
 
 // ─── Theme Schemas ───────────────────────────────────────────────────
 
@@ -260,6 +267,7 @@ export const AppConfigSchema = z.object({
     enabled: z.boolean().optional(),
     discoveryRelays: z.array(z.string().url()).optional(),
     relayMode: z.enum(['discovery', 'hybrid', 'strict_outbox']).optional(),
+    protocolMode: z.enum(PROTOCOL_MODE_VALUES).optional(),
     renderInlineMedia: z.boolean().optional(),
     soundEnabled: z.boolean().optional(),
     soundId: z.string().optional(),
@@ -347,6 +355,7 @@ export const EncryptedSettingsSchema = z.looseObject({
     enabled: z.boolean().optional(),
     discoveryRelays: z.array(z.string().url()).optional(),
     relayMode: z.enum(['discovery', 'hybrid', 'strict_outbox']).optional(),
+    protocolMode: z.enum(PROTOCOL_MODE_VALUES).optional(),
     renderInlineMedia: z.boolean().optional(),
     soundEnabled: z.boolean().optional(),
     soundId: z.string().optional(),
