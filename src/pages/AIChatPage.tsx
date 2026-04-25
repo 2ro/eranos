@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, useRef, useState, useEffect, useCallback } from 'react';
 import { useSeoMeta } from '@unhead/react';
 import Markdown from 'react-markdown';
 import rehypeSanitize from 'rehype-sanitize';
@@ -19,6 +19,14 @@ import { DorkThinking } from '@/components/DorkThinking';
 import { useLayoutOptions } from '@/contexts/LayoutContext';
 
 import type { DisplayMessage, ToolCall } from '@/lib/aiChatTools';
+
+// ─── Slash Commands ───
+
+const SLASH_COMMANDS = [
+  { command: '/clear', description: 'Clear conversation history' },
+  { command: '/new', description: 'Start a new conversation' },
+  { command: '/tools', description: 'List available tools' },
+];
 
 // ─── Page Component ───
 
@@ -170,14 +178,13 @@ function AgentChatView({ hasCredits }: { hasCredits: boolean | null }) {
       {(hasCredits || hasCredits === null) && (
         <div className="shrink-0 px-4 pt-2 pb-4 sidebar:pb-3">
           <div className="max-w-2xl mx-auto flex items-end gap-2">
-            <Textarea
+            <SlashCommandInput
               value={input}
-              onChange={(e) => setInput(e.target.value)}
+              onChange={setInput}
               onKeyDown={handleKeyDown}
+              onSend={handleSend}
               placeholder={!selectedModel ? 'Loading...' : 'Send a message...'}
               disabled={!selectedModel || (isStreaming && !streamingText)}
-              className="min-h-[44px] max-h-40 resize-none bg-secondary/50 border-border focus-visible:ring-1"
-              rows={1}
             />
             {isStreaming ? (
               <Button
@@ -288,6 +295,34 @@ function EmptyState({ hasCredits, onSuggestion }: { hasCredits: boolean | null; 
 function MessageBubble({ message }: { message: DisplayMessage }) {
   const isUser = message.role === 'user';
 
+  // System notices — info vs error styling
+  if (message.noticeVariant) {
+    const isError = message.noticeVariant === 'error';
+    return (
+      <div className="flex items-start">
+        <div className="max-w-[85%] min-w-0">
+          <div className={cn(
+            'rounded-2xl px-4 py-2.5 text-sm rounded-tl-md border',
+            isError
+              ? 'bg-red-500/15 border-red-500/25 text-red-700 dark:text-red-400'
+              : 'bg-primary/15 border-primary/25 text-primary',
+          )}>
+            <div className={cn(
+              'prose prose-sm max-w-none prose-p:my-1 prose-headings:my-2 prose-ul:my-1 prose-ol:my-1 prose-li:my-0.5 prose-code:text-xs',
+              isError
+                ? 'text-red-700 dark:text-red-400 prose-strong:text-red-800 dark:prose-strong:text-red-300 prose-code:text-red-600 dark:prose-code:text-red-400 marker:text-red-700 dark:marker:text-red-400'
+                : 'text-primary prose-strong:text-primary prose-code:text-primary/80 marker:text-primary',
+            )}>
+              <Markdown rehypePlugins={[rehypeSanitize]}>
+                {message.content}
+              </Markdown>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className={cn('flex items-start', isUser && 'justify-end')}>
       <div className={cn('flex flex-col gap-1 max-w-[85%] min-w-0', isUser && 'items-end')}>
@@ -326,6 +361,121 @@ function MessageBubble({ message }: { message: DisplayMessage }) {
           {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
         </span>
       </div>
+    </div>
+  );
+}
+
+/** Text input with a slash-command autocomplete dropdown. */
+function SlashCommandInput({ value, onChange, onKeyDown, onSend, placeholder, disabled }: {
+  value: string;
+  onChange: (v: string) => void;
+  onKeyDown: (e: React.KeyboardEvent) => void;
+  onSend: (override?: string) => void;
+  placeholder?: string;
+  disabled?: boolean;
+}) {
+  const wrapperRef = useRef<HTMLDivElement>(null);
+  const [selectedIndex, setSelectedIndex] = useState(0);
+  const [menuDismissed, setMenuDismissed] = useState(false);
+
+  // Filter commands based on input
+  const matches = useMemo(() => {
+    if (!value.startsWith('/') || menuDismissed) return [];
+    const typed = value.toLowerCase();
+    return SLASH_COMMANDS.filter((c) => c.command.startsWith(typed));
+  }, [value, menuDismissed]);
+
+  const showMenu = matches.length > 0 && !disabled;
+
+  // Reset selection when matches change
+  useEffect(() => {
+    setSelectedIndex(0);
+  }, [matches.length]);
+
+  // Un-dismiss when input stops being a slash command or is cleared
+  useEffect(() => {
+    if (!value.startsWith('/')) setMenuDismissed(false);
+  }, [value]);
+
+  // Close menu on outside click
+  useEffect(() => {
+    if (!showMenu) return;
+    const handler = (e: MouseEvent) => {
+      if (wrapperRef.current && !wrapperRef.current.contains(e.target as Node)) {
+        setMenuDismissed(true);
+      }
+    };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, [showMenu]);
+
+  const selectCommand = useCallback((cmd: string) => {
+    onChange(cmd);
+    setMenuDismissed(true);
+    // Auto-send slash commands immediately
+    onSend(cmd);
+  }, [onChange, onSend]);
+
+  const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
+    if (showMenu) {
+      if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        setSelectedIndex((i) => (i - 1 + matches.length) % matches.length);
+        return;
+      }
+      if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        setSelectedIndex((i) => (i + 1) % matches.length);
+        return;
+      }
+      if (e.key === 'Tab' || (e.key === 'Enter' && !e.shiftKey)) {
+        e.preventDefault();
+        selectCommand(matches[selectedIndex].command);
+        return;
+      }
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        setMenuDismissed(true);
+        return;
+      }
+    }
+    // Fall through to parent handler (Enter → send, etc.)
+    onKeyDown(e);
+  }, [showMenu, matches, selectedIndex, selectCommand, onKeyDown]);
+
+  return (
+    <div ref={wrapperRef} className="relative flex-1 min-w-0">
+      {/* Autocomplete menu */}
+      {showMenu && (
+        <div className="absolute bottom-full left-0 right-0 mb-1.5 rounded-xl border border-border bg-popover shadow-lg overflow-hidden animate-in fade-in-0 slide-in-from-bottom-2 duration-150 z-10">
+          {matches.map((cmd, i) => (
+            <button
+              key={cmd.command}
+              className={cn(
+                'w-full flex items-center gap-3 px-3.5 py-2.5 text-left text-sm transition-colors',
+                i === selectedIndex ? 'bg-secondary' : 'hover:bg-secondary/50',
+              )}
+              onMouseEnter={() => setSelectedIndex(i)}
+              onMouseDown={(e) => {
+                e.preventDefault(); // Keep textarea focus
+                selectCommand(cmd.command);
+              }}
+            >
+              <span className="font-mono text-xs font-semibold text-foreground">{cmd.command}</span>
+              <span className="text-muted-foreground text-xs">{cmd.description}</span>
+            </button>
+          ))}
+        </div>
+      )}
+      <Textarea
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        onKeyDown={handleKeyDown}
+        placeholder={placeholder}
+        disabled={disabled}
+        className="min-h-[44px] max-h-40 resize-none bg-secondary/50 border-border focus-visible:ring-1"
+        rows={1}
+      />
     </div>
   );
 }
@@ -376,7 +526,7 @@ function CapacityRing({ capacity, promptTokens, contextWindow, storageBytes, max
             </svg>
           </div>
         </TooltipTrigger>
-        <TooltipContent>
+        <TooltipContent side="bottom">
           <p className="text-xs">
             Tokens: {promptTokens.toLocaleString()} / {contextWindow.toLocaleString()} ({tokenPct}%)
             <br />

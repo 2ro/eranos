@@ -4,7 +4,7 @@ import { z } from 'zod';
 import { useShakespeare, sortModelsByCost, type ChatMessage, type Model } from '@/hooks/useShakespeare';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useAppContext } from '@/hooks/useAppContext';
-import { useAIChatTools, TOOLS } from '@/hooks/useAIChatTools';
+import { useAIChatTools, TOOLS, TOOL_SUMMARIES } from '@/hooks/useAIChatTools';
 import { type DisplayMessage, type ToolCall } from '@/lib/aiChatTools';
 import { buildSystemPrompt, type UserIdentity } from '@/lib/aiChatSystemPrompt';
 
@@ -35,6 +35,7 @@ const StoredMessageSchema = z.object({
   toolCallId: z.string().optional(),
   // nostrEvent is not validated in detail — just needs to be an object if present
   nostrEvent: z.record(z.string(), z.unknown()).optional(),
+  noticeVariant: z.enum(['info', 'error']).optional(),
 });
 
 const StoredMessagesSchema = z.array(StoredMessageSchema);
@@ -236,12 +237,25 @@ export function useAIChatSession() {
         setInput('');
         return;
       }
+      if (cmd === '/tools') {
+        const listing = TOOL_SUMMARIES.map((t) => `- \`${t.name}\` — ${t.summary}`).join('\n');
+        setMessages((prev) => [...prev, {
+          id: crypto.randomUUID(),
+          role: 'assistant' as const,
+          content: `**Available tools:**\n\n${listing}`,
+          timestamp: new Date(),
+          noticeVariant: 'info',
+        }]);
+        setInput('');
+        return;
+      }
       // Unknown command — show feedback in chat
       setMessages((prev) => [...prev, {
         id: crypto.randomUUID(),
         role: 'assistant' as const,
-        content: `Unknown command \`${trimmed.split(' ')[0]}\`. Available commands: \`/new\`, \`/clear\`.`,
+        content: `Unknown command \`${trimmed.split(' ')[0]}\`. Available commands: \`/new\`, \`/clear\`, \`/tools\`.`,
         timestamp: new Date(),
+        noticeVariant: 'info',
       }]);
       setInput('');
       return;
@@ -256,6 +270,7 @@ export function useAIChatSession() {
         role: 'assistant' as const,
         content: 'This conversation has reached its limit. Use /clear to start a fresh conversation.',
         timestamp: new Date(),
+        noticeVariant: 'error',
       }]);
       setInput('');
       return;
@@ -413,6 +428,7 @@ export function useAIChatSession() {
         role: 'assistant' as const,
         content: `Something went wrong: ${errorText}`,
         timestamp: new Date(),
+        noticeVariant: 'error',
       }]);
     } finally {
       abortRef.current = null;
