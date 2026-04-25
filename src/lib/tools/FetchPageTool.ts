@@ -2,6 +2,7 @@ import { z } from 'zod';
 
 import { proxyUrl } from '@/lib/proxyUrl';
 
+import { sanitizeToolFetchUrl } from './sanitizeToolFetchUrl';
 import type { Tool, ToolResult, ToolContext } from './Tool';
 
 const inputSchema = z.object({
@@ -18,9 +19,9 @@ The page is fetched through a CORS proxy so it works in the browser. Images are 
   inputSchema,
 
   async execute(args: Params, ctx: ToolContext): Promise<ToolResult> {
-    const url = args.url.trim();
+    const url = sanitizeToolFetchUrl(args.url.trim());
     if (!url) {
-      return { result: JSON.stringify({ error: 'A URL is required.' }) };
+      return { result: JSON.stringify({ error: 'A valid public HTTPS URL is required.' }) };
     }
 
     let html: string;
@@ -47,7 +48,11 @@ The page is fetched through a CORS proxy so it works in the browser. Images are 
       if (!src) continue;
       try {
         const absolute = new URL(src, baseUrl).href;
-        if (/\.(png|jpe?g|gif|webp|svg|bmp|ico|avif)(\?.*)?$/i.test(absolute)) {
+        if (!/\.(png|jpe?g|gif|webp|svg|bmp|ico|avif)(\?.*)?$/i.test(absolute)) continue;
+        // Filter extracted URLs through the same fetch-safe check so that
+        // malicious pages cannot inject private-network URLs into the result
+        // list (which typically flows into downstream tool calls).
+        if (sanitizeToolFetchUrl(absolute)) {
           imageUrls.push(absolute);
         }
       } catch {

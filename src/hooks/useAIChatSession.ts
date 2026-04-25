@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect, useCallback, useMemo } from 'react';
 import { nip19 } from 'nostr-tools';
 import { z } from 'zod';
-import { useShakespeare, sortModelsByCost, type ChatMessage } from '@/hooks/useShakespeare';
+import { useShakespeare, sortModelsByCost, type ChatMessage, type Model } from '@/hooks/useShakespeare';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useAppContext } from '@/hooks/useAppContext';
 import { useAIChatTools, TOOLS } from '@/hooks/useAIChatTools';
@@ -12,7 +12,11 @@ import type { NostrEvent } from '@nostrify/nostrify';
 
 // ─── Persistence ───
 
-const CHAT_STORAGE_KEY = 'agora:ai-chat-messages';
+const CHAT_STORAGE_KEY_PREFIX = 'agora:ai-chat-messages';
+
+function chatStorageKey(appId: string, pubkey: string): string {
+  return `${CHAT_STORAGE_KEY_PREFIX}:${appId}:${pubkey}`;
+}
 
 /** Zod schema for a single persisted chat message. */
 const StoredToolCallSchema = z.object({
@@ -35,14 +39,14 @@ const StoredMessageSchema = z.object({
 
 const StoredMessagesSchema = z.array(StoredMessageSchema);
 
-function loadMessages(): DisplayMessage[] {
+function loadMessages(storageKey: string): DisplayMessage[] {
   try {
-    const raw = localStorage.getItem(CHAT_STORAGE_KEY);
+    const raw = localStorage.getItem(storageKey);
     if (!raw) return [];
     const parsed = StoredMessagesSchema.safeParse(JSON.parse(raw));
     if (!parsed.success) {
       console.warn('Discarding corrupted AI chat history:', parsed.error.message);
-      localStorage.removeItem(CHAT_STORAGE_KEY);
+      localStorage.removeItem(storageKey);
       return [];
     }
     return parsed.data.map((m) => ({
@@ -56,14 +60,31 @@ function loadMessages(): DisplayMessage[] {
   }
 }
 
-function saveMessages(messages: DisplayMessage[]): void {
+/** Persist messages and return the serialized byte size. */
+function saveMessages(storageKey: string, messages: DisplayMessage[]): number {
   try {
     const stored = messages.map((m) => ({ ...m, timestamp: m.timestamp.toISOString() }));
-    localStorage.setItem(CHAT_STORAGE_KEY, JSON.stringify(stored));
+    const json = JSON.stringify(stored);
+    localStorage.setItem(storageKey, json);
+    return new Blob([json]).size;
   } catch {
     // Storage full or unavailable — silently ignore
+    return 0;
   }
 }
+
+/** Measure byte size of the current persisted messages without re-serializing. */
+function measureStorageBytes(storageKey: string): number {
+  try {
+    const raw = localStorage.getItem(storageKey);
+    return raw ? new Blob([raw]).size : 0;
+  } catch {
+    return 0;
+  }
+}
+
+/** Conservative localStorage budget for chat messages (4 MB). */
+const MAX_STORAGE_BYTES = 4 * 1024 * 1024;
 
 // ─── Hook ───
 
@@ -72,46 +93,87 @@ export function useAIChatSession() {
   const { config } = useAppContext();
   const { sendStreamingMessage, getAvailableModels, getCreditsBalance, isLoading: apiLoading, error: apiError, clearError } = useShakespeare();
   const { executeToolCall, savedFeeds } = useAIChatTools();
+  const storageKey = user ? chatStorageKey(config.appId, user.pubkey) : null;
 
-  const [messages, setMessages] = useState<DisplayMessage[]>(loadMessages);
+  const [messages, setMessages] = useState<DisplayMessage[]>([]);
   const [input, setInput] = useState('');
   const [isStreaming, setIsStreaming] = useState(false);
   const [streamingText, setStreamingText] = useState('');
 
   // Resolve the effective model: config value, or fetch the cheapest as default
   const [defaultModel, setDefaultModel] = useState('');
+  const [models, setModels] = useState<Model[]>([]);
   const selectedModel = config.aiModel || defaultModel;
+
+  // Capacity tracking
+  const [lastPromptTokens, setLastPromptTokens] = useState(0);
+  const [storageBytes, setStorageBytes] = useState(0);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const abortRef = useRef<AbortController | null>(null);
+  const [loadedStorageKey, setLoadedStorageKey] = useState<string | null>(null);
 
-  // Persist messages to localStorage
+  // Load messages from the current user's scoped storage key.
   useEffect(() => {
-    saveMessages(messages);
-  }, [messages]);
+    if (!storageKey) {
+      setLoadedStorageKey(null);
+      setMessages([]);
+      setStorageBytes(0);
+      return;
+    }
+
+    setMessages(loadMessages(storageKey));
+    setStorageBytes(measureStorageBytes(storageKey));
+    setLoadedStorageKey(storageKey);
+  }, [storageKey]);
+
+  // Persist messages to localStorage and update storage bytes
+  useEffect(() => {
+    if (!storageKey || loadedStorageKey !== storageKey) return;
+    const bytes = saveMessages(storageKey, messages);
+    setStorageBytes(bytes);
+  }, [storageKey, loadedStorageKey, messages]);
 
   // Scroll to bottom on new messages or streaming text updates
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages, streamingText]);
 
-  // Fetch cheapest model as fallback when no model is configured
+  // Fetch available models (for default model + context_window lookup)
   useEffect(() => {
-    if (!user || config.aiModel) return;
+    if (!user) return;
 
     let cancelled = false;
     getAvailableModels()
       .then((response) => {
         if (cancelled) return;
-        const sorted = sortModelsByCost(response.data);
-        if (sorted.length > 0) {
-          setDefaultModel(sorted[0].id);
+        setModels(response.data);
+        if (!config.aiModel) {
+          const sorted = sortModelsByCost(response.data);
+          if (sorted.length > 0) {
+            setDefaultModel(sorted[0].id);
+          }
         }
       })
       .catch(() => {});
 
     return () => { cancelled = true; };
   }, [user, config.aiModel, getAvailableModels]);
+
+  // Compute capacity ratio (0 to 1) — max of token usage and storage usage
+  const contextWindow = useMemo(() => {
+    if (!selectedModel || models.length === 0) return 0;
+    const model = models.find((m) => m.id === selectedModel || m.fullId === selectedModel);
+    return model?.context_window ?? 0;
+  }, [selectedModel, models]);
+
+  const capacity = useMemo(() => {
+    const tokenRatio = contextWindow > 0 && lastPromptTokens > 0
+      ? lastPromptTokens / contextWindow
+      : 0;
+    const storageRatio = storageBytes / MAX_STORAGE_BYTES;
+    return Math.min(Math.max(tokenRatio, storageRatio), 1);
+  }, [lastPromptTokens, contextWindow, storageBytes]);
 
   // Build the system prompt — dynamic based on saved feeds, user identity, + optional custom override
   const savedFeedLabels = useMemo(() => savedFeeds.map((f) => f.label), [savedFeeds]);
@@ -187,6 +249,18 @@ export function useAIChatSession() {
 
     if (!selectedModel) return;
 
+    // Block sends when conversation capacity is exhausted
+    if (capacity >= 1) {
+      setMessages((prev) => [...prev, {
+        id: crypto.randomUUID(),
+        role: 'assistant' as const,
+        content: 'This conversation has reached its limit. Use /clear to start a fresh conversation.',
+        timestamp: new Date(),
+      }]);
+      setInput('');
+      return;
+    }
+
     clearError();
     setInput('');
 
@@ -205,6 +279,8 @@ export function useAIChatSession() {
     setIsStreaming(true);
     setStreamingText('');
 
+    let streamAccumulator = '';
+
     try {
       const MAX_TOOL_ROUNDS = 10;
       let apiMessages = buildApiMessages(newMessages);
@@ -214,7 +290,7 @@ export function useAIChatSession() {
         if (controller.signal.aborted) break;
 
         // Stream the response — text chunks update streamingText in real-time
-        let streamAccumulator = '';
+        streamAccumulator = '';
         const response = await sendStreamingMessage(
           apiMessages,
           selectedModel,
@@ -226,8 +302,11 @@ export function useAIChatSession() {
           controller.signal,
         );
 
-        // Stream finished — clear the streaming text
+        // Stream finished — clear the streaming text and update token usage
         setStreamingText('');
+        if (response.usage.prompt_tokens > 0) {
+          setLastPromptTokens(response.usage.prompt_tokens);
+        }
 
         const choice = response.choices[0];
         const assistantMsg = choice.message;
@@ -312,16 +391,36 @@ export function useAIChatSession() {
         apiMessages = buildApiMessages(currentMessages);
       }
     } catch (err) {
-      // Silently handle user-initiated abort and other errors
-      // (API-level errors are surfaced via apiError from useShakespeare)
-      if (err instanceof DOMException && err.name === 'AbortError') return;
+      // User-initiated stop — preserve whatever was streamed so far
+      if (controller.signal.aborted) {
+        if (streamAccumulator.trim()) {
+          setMessages((prev) => [...prev, {
+            id: crypto.randomUUID(),
+            role: 'assistant' as const,
+            content: streamAccumulator,
+            timestamp: new Date(),
+          }]);
+        }
+        return;
+      }
+
+      // Surface unexpected errors (e.g. buildApiMessages failure, loop bookkeeping)
+      // so the user gets feedback instead of streaming silently stopping.
+      // API-level errors are already surfaced via apiError from useShakespeare.
+      const errorText = err instanceof Error ? err.message : 'An unexpected error occurred.';
+      setMessages((prev) => [...prev, {
+        id: crypto.randomUUID(),
+        role: 'assistant' as const,
+        content: `Something went wrong: ${errorText}`,
+        timestamp: new Date(),
+      }]);
     } finally {
       abortRef.current = null;
       setIsStreaming(false);
       setStreamingText('');
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps -- handleClear is stable (only depends on clearError which is already listed)
-  }, [input, selectedModel, isStreaming, messages, buildApiMessages, sendStreamingMessage, executeToolCall, clearError]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- handleClear is stable (only depends on storageKey+clearError which are already covered)
+  }, [input, selectedModel, isStreaming, messages, capacity, buildApiMessages, sendStreamingMessage, executeToolCall, clearError]);
 
   // Stop an in-flight generation
   const handleStop = useCallback(() => {
@@ -339,9 +438,11 @@ export function useAIChatSession() {
   // Clear conversation
   const handleClear = useCallback(() => {
     setMessages([]);
-    localStorage.removeItem(CHAT_STORAGE_KEY);
+    if (storageKey) localStorage.removeItem(storageKey);
+    setLastPromptTokens(0);
+    setStorageBytes(0);
     clearError();
-  }, [clearError]);
+  }, [storageKey, clearError]);
 
   return {
     // State
@@ -354,6 +455,13 @@ export function useAIChatSession() {
     apiLoading,
     apiError,
     messagesEndRef,
+
+    // Capacity
+    capacity,
+    lastPromptTokens,
+    contextWindow,
+    storageBytes,
+    maxStorageBytes: MAX_STORAGE_BYTES,
 
     // Actions
     handleSend,

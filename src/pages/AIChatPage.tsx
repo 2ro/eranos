@@ -13,6 +13,7 @@ import { LoginArea } from '@/components/auth/LoginArea';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { cn } from '@/lib/utils';
 import { DorkThinking } from '@/components/DorkThinking';
 import { useLayoutOptions } from '@/contexts/LayoutContext';
@@ -64,6 +65,11 @@ function AgentChatView({ hasCredits }: { hasCredits: boolean | null }) {
     apiLoading,
     apiError,
     messagesEndRef,
+    capacity,
+    lastPromptTokens,
+    contextWindow,
+    storageBytes,
+    maxStorageBytes,
     handleSend,
     handleStop,
     handleKeyDown,
@@ -80,6 +86,13 @@ function AgentChatView({ hasCredits }: { hasCredits: boolean | null }) {
         </div>
       }>
         <div className="flex items-center gap-2 ml-auto">
+          <CapacityRing
+            capacity={capacity}
+            promptTokens={lastPromptTokens}
+            contextWindow={contextWindow}
+            storageBytes={storageBytes}
+            maxStorageBytes={maxStorageBytes}
+          />
           <Button
             variant="ghost"
             size="icon"
@@ -314,6 +327,64 @@ function MessageBubble({ message }: { message: DisplayMessage }) {
         </span>
       </div>
     </div>
+  );
+}
+
+/** Conversation capacity ring — appears at ≥75% usage. */
+function CapacityRing({ capacity, promptTokens, contextWindow, storageBytes, maxStorageBytes }: {
+  capacity: number;
+  promptTokens: number;
+  contextWindow: number;
+  storageBytes: number;
+  maxStorageBytes: number;
+}) {
+  if (capacity < 0.75) return null;
+
+  const pct = Math.min(capacity * 100, 100);
+  const size = 20;
+  const strokeWidth = 2;
+  const radius = (size - strokeWidth) / 2;
+  const circumference = 2 * Math.PI * radius;
+  const offset = circumference - (pct / 100) * circumference;
+
+  // Color: amber at 75-89%, red at 90%+
+  const ringColor = pct >= 90 ? 'text-destructive' : 'text-amber-500';
+
+  const tokenPct = contextWindow > 0 ? ((promptTokens / contextWindow) * 100).toFixed(0) : '\u2014';
+  const storageMB = (storageBytes / (1024 * 1024)).toFixed(1);
+  const maxMB = (maxStorageBytes / (1024 * 1024)).toFixed(0);
+
+  return (
+    <TooltipProvider>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <div className="cursor-help shrink-0">
+            <svg width={size} height={size} className="transform -rotate-90" viewBox={`0 0 ${size} ${size}`}>
+              <circle
+                cx={size / 2} cy={size / 2} r={radius}
+                fill="none" stroke="currentColor" strokeWidth={strokeWidth}
+                className="text-muted/30"
+              />
+              <circle
+                cx={size / 2} cy={size / 2} r={radius}
+                fill="none" stroke="currentColor" strokeWidth={strokeWidth}
+                strokeLinecap="round"
+                strokeDasharray={circumference}
+                strokeDashoffset={offset}
+                className={`${ringColor} transition-all duration-300 ease-in-out`}
+              />
+            </svg>
+          </div>
+        </TooltipTrigger>
+        <TooltipContent>
+          <p className="text-xs">
+            Tokens: {promptTokens.toLocaleString()} / {contextWindow.toLocaleString()} ({tokenPct}%)
+            <br />
+            Storage: {storageMB} / {maxMB} MB
+          </p>
+        </TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
   );
 }
 
