@@ -3,7 +3,6 @@ import { Link, useNavigate } from 'react-router-dom';
 import { nip19 } from 'nostr-tools';
 import {
   ArrowLeft,
-  CalendarDays,
   Crown,
   MessageCircle,
   Shield,
@@ -12,8 +11,6 @@ import {
   Users,
 } from 'lucide-react';
 import type { NostrEvent, NostrMetadata } from '@nostrify/nostrify';
-import { useNostr } from '@nostrify/react';
-import { useQuery } from '@tanstack/react-query';
 
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { getAvatarShape } from '@/lib/avatarShape';
@@ -22,7 +19,6 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { BanConfirmDialog } from '@/components/BanConfirmDialog';
 import { ComposeBox } from '@/components/ComposeBox';
-import { NoteCard } from '@/components/NoteCard';
 import { ThreadedReplyList, type ReplyNode } from '@/components/ThreadedReplyList';
 import { useAuthor } from '@/hooks/useAuthor';
 import { useAuthors } from '@/hooks/useAuthors';
@@ -36,9 +32,6 @@ import { applyCommunityModerationToEvents, canBanTarget, getViewerAuthority, par
 import { genUserName } from '@/lib/genUserName';
 import { sanitizeUrl } from '@/lib/sanitizeUrl';
 import { cn } from '@/lib/utils';
-
-// ── Calendar event kinds (NIP-52) ─────────────────────────────────────────────
-const CALENDAR_EVENT_KINDS = [31922, 31923];
 
 // ── Sub-components ────────────────────────────────────────────────────────────
 
@@ -101,26 +94,6 @@ function MembersSkeleton() {
   );
 }
 
-function EventsSkeleton() {
-  return (
-    <div className="divide-y divide-border">
-      {Array.from({ length: 3 }).map((_, i) => (
-        <div key={i} className="px-4 py-4 space-y-3">
-          <div className="flex items-center gap-3">
-            <Skeleton className="size-10 rounded-full" />
-            <div className="space-y-1.5 flex-1">
-              <Skeleton className="h-4 w-32" />
-              <Skeleton className="h-3 w-20" />
-            </div>
-          </div>
-          <Skeleton className="h-[180px] w-full rounded-lg" />
-          <Skeleton className="h-4 w-3/4" />
-        </div>
-      ))}
-    </div>
-  );
-}
-
 function ReplyCardSkeleton() {
   return (
     <div className="px-4 py-3 border-b border-border">
@@ -140,7 +113,6 @@ function ReplyCardSkeleton() {
 
 export function CommunityDetailPage({ event }: { event: NostrEvent }) {
   const navigate = useNavigate();
-  const { nostr } = useNostr();
   const { toast } = useToast();
   const { user } = useCurrentUser();
 
@@ -212,31 +184,6 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
     }
     return result;
   }, [membership, community]);
-
-  // ── Events (calendar events tagging this community) ─────────────────────────
-  const { data: communityEvents, isLoading: eventsLoading } = useQuery({
-    queryKey: ['community-events', communityATag],
-    queryFn: async ({ signal }) => {
-      if (!communityATag) return [];
-      const events = await nostr.query(
-        [{ kinds: CALENDAR_EVENT_KINDS, '#a': [communityATag], limit: 100 }],
-        { signal: AbortSignal.any([signal, AbortSignal.timeout(8_000)]) },
-      );
-      // Sort by start date descending
-      return events.sort((a, b) => {
-        const aStart = parseInt(a.tags.find(([n]) => n === 'start')?.[1] ?? '0', 10);
-        const bStart = parseInt(b.tags.find(([n]) => n === 'start')?.[1] ?? '0', 10);
-        return bStart - aStart;
-      });
-    },
-    enabled: !!communityATag,
-    staleTime: 2 * 60_000,
-  });
-
-  const moderatedCommunityEvents = useMemo(
-    () => applyCommunityModerationToEvents(communityEvents ?? [], moderation),
-    [communityEvents, moderation],
-  );
 
   // ── Comments (NIP-22 on the community event) ───────────────────────────────
   const { data: commentsData, isLoading: commentsLoading } = useComments(event, 500);
@@ -352,13 +299,6 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
                 Members
               </TabsTrigger>
               <TabsTrigger
-                value="events"
-                className="flex-1 rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none pb-3 pt-2"
-              >
-                <CalendarDays className="size-4 mr-1.5" />
-                Events
-              </TabsTrigger>
-              <TabsTrigger
                 value="comments"
                 className="flex-1 rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none pb-3 pt-2"
               >
@@ -409,23 +349,6 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
                         })}
                       </div>
                     </section>
-                  ))}
-                </div>
-              )}
-            </TabsContent>
-
-            {/* ── Events tab ── */}
-            <TabsContent value="events" className="mt-0">
-              {eventsLoading ? (
-                <EventsSkeleton />
-              ) : moderatedCommunityEvents.length === 0 ? (
-                <div className="py-12 text-center">
-                  <p className="text-muted-foreground text-sm">No events yet</p>
-                </div>
-              ) : (
-                <div>
-                  {moderatedCommunityEvents.map((ev) => (
-                    <NoteCard key={ev.id} event={ev} compact />
                   ))}
                 </div>
               )}
