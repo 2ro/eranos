@@ -556,7 +556,7 @@ export const NoteCard = memo(function NoteCard({
   // Wrapped in `CommunityContentWarning`, which subscribes to the community
   // moderation context internally and is a no-op outside community surfaces.
   const contentBlock = (
-    <CommunityContentWarning eventId={event.id}>
+    <CommunityContentWarning event={event}>
       {/* Reply context (kind 1) or comment context (kind 1111) — shown above content */}
       {isComment && <CommentContext event={event} />}
       {isReply && (

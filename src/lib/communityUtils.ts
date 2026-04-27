@@ -275,6 +275,25 @@ export function hasApplicableContentBan(
 }
 
 /**
+ * Returns the list of reports that apply to this event, or an empty array.
+ *
+ * Like content bans, a report's `p` tag is untrusted until it matches the
+ * target event's actual author. Without this pubkey match, any member
+ * could publish a kind 1984 pairing a victim event's ID with the
+ * reporter's own pubkey, forcing a content warning on an arbitrary event.
+ * This mirrors the id+pubkey match requirement in the NIP (see NIP.md
+ * §Classification Summary and §Reports — Content Warnings).
+ */
+export function getApplicableReports(
+  event: NostrEvent,
+  moderation: CommunityModeration,
+): CommunityReport[] {
+  const candidates = moderation.reportsByEventId.get(event.id);
+  if (!candidates) return [];
+  return candidates.filter((report) => report.targetPubkey === event.pubkey);
+}
+
+/**
  * Returns true when a single event survives community moderation
  * (not banned by author or content ban). Use for single-event checks;
  * use `applyCommunityModerationToEvents` for batch filtering.

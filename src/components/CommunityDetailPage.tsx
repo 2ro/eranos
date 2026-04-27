@@ -19,12 +19,14 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { BanConfirmDialog } from '@/components/BanConfirmDialog';
 import { ComposeBox } from '@/components/ComposeBox';
+import { MembersOnlyToggle } from '@/components/MembersOnlyToggle';
 import { ThreadedReplyList, type ReplyNode } from '@/components/ThreadedReplyList';
 import { useAuthor } from '@/hooks/useAuthor';
 import { useAuthors } from '@/hooks/useAuthors';
 import { useComments } from '@/hooks/useComments';
 import { useCommunityMembers } from '@/hooks/useCommunityMembers';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
+import { useMembersOnlyFilter } from '@/hooks/useMembersOnlyFilter';
 import { useProfileUrl } from '@/hooks/useProfileUrl';
 import { useToast } from '@/hooks/useToast';
 import { CommunityModerationContext } from '@/contexts/CommunityModerationContext';
@@ -187,14 +189,21 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
 
   // ── Comments (NIP-22 on the community event) ───────────────────────────────
   const { data: commentsData, isLoading: commentsLoading } = useComments(event, 500);
+  const { membersOnly } = useMembersOnlyFilter();
 
   const replyTree = useMemo((): ReplyNode[] => {
     if (!commentsData) return [];
     const topLevel = commentsData.topLevelComments ?? [];
 
-    // Filter: omit banned events and posts by banned members
-    const applyModeration = (events: NostrEvent[]): NostrEvent[] =>
-      applyCommunityModerationToEvents(events, moderation);
+    // Filter: omit banned events and posts by banned members, then optionally
+    // restrict to chain-validated members when the "members only" toggle is
+    // active. The member filter is a presentation-layer choice — the NIP
+    // recommends it as the canonical-feed default, but users may opt out.
+    const applyModeration = (events: NostrEvent[]): NostrEvent[] => {
+      const moderated = applyCommunityModerationToEvents(events, moderation);
+      if (!membersOnly) return moderated;
+      return moderated.filter((ev) => rankMap.has(ev.pubkey));
+    };
 
     const buildNode = (ev: NostrEvent): ReplyNode => {
       const allChildren = applyModeration(commentsData.getDirectReplies(ev.id) ?? []);
@@ -215,7 +224,7 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
     return applyModeration([...topLevel])
       .sort((a, b) => a.created_at - b.created_at)
       .map((r) => buildNode(r));
-  }, [commentsData, moderation]);
+  }, [commentsData, moderation, membersOnly, rankMap]);
 
   // ── Share handler ───────────────────────────────────────────────────────────
   const handleShare = useCallback(async () => {
@@ -290,22 +299,31 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
         {/* ── Tabs ── */}
         <CommunityModerationContext.Provider value={communityATag ? { communityATag, moderation, rankMap } : null}>
           <Tabs defaultValue="members" className="-mx-5">
-            <TabsList className="w-full rounded-none border-b border-border bg-transparent p-0 h-auto">
-              <TabsTrigger
-                value="members"
-                className="flex-1 rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none pb-3 pt-2"
-              >
-                <Users className="size-4 mr-1.5" />
-                Members
-              </TabsTrigger>
-              <TabsTrigger
-                value="comments"
-                className="flex-1 rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none pb-3 pt-2"
-              >
-                <MessageCircle className="size-4 mr-1.5" />
-                Comments
-              </TabsTrigger>
-            </TabsList>
+            {/* The TabsList stays flex so tabs share width, and the toggle
+                sits to the right of the tabs. The toggle filters all
+                content feeds within this community (currently only
+                Comments, but scoped that way so future feeds inherit). */}
+            <div className="flex items-stretch border-b border-border">
+              <TabsList className="flex-1 rounded-none bg-transparent p-0 h-auto">
+                <TabsTrigger
+                  value="members"
+                  className="flex-1 rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none pb-3 pt-2"
+                >
+                  <Users className="size-4 mr-1.5" />
+                  Members
+                </TabsTrigger>
+                <TabsTrigger
+                  value="comments"
+                  className="flex-1 rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none pb-3 pt-2"
+                >
+                  <MessageCircle className="size-4 mr-1.5" />
+                  Comments
+                </TabsTrigger>
+              </TabsList>
+              <div className="flex items-center pr-2 shrink-0">
+                <MembersOnlyToggle />
+              </div>
+            </div>
 
             {/* ── Members tab ── */}
             <TabsContent value="members" className="mt-0">
@@ -366,6 +384,10 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
                 </div>
               ) : replyTree.length > 0 ? (
                 <ThreadedReplyList roots={replyTree} />
+              ) : membersOnly && commentsData && (commentsData.topLevelComments?.length ?? 0) > 0 ? (
+                <div className="py-12 text-center text-muted-foreground text-sm px-5">
+                  No comments from community members yet. Toggle the shield icon to see all comments.
+                </div>
               ) : (
                 <div className="py-12 text-center text-muted-foreground text-sm">
                   No comments yet. Be the first to comment!

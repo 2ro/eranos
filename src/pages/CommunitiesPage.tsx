@@ -6,6 +6,7 @@ import { Users } from 'lucide-react';
 import { CommunityCard } from '@/components/CommunityCard';
 import { FeedEmptyState } from '@/components/FeedEmptyState';
 import { LoginArea } from '@/components/auth/LoginArea';
+import { MembersOnlyToggle } from '@/components/MembersOnlyToggle';
 import { NoteCard } from '@/components/NoteCard';
 import { PageHeader } from '@/components/PageHeader';
 import { PullToRefresh } from '@/components/PullToRefresh';
@@ -13,12 +14,13 @@ import { SubHeaderBar } from '@/components/SubHeaderBar';
 import { TabButton } from '@/components/TabButton';
 import { Skeleton } from '@/components/ui/skeleton';
 import { CommunityModerationContext, type CommunityModerationContextValue } from '@/contexts/CommunityModerationContext';
-import { EMPTY_MODERATION } from '@/lib/communityUtils';
+import { COMMUNITY_DEFINITION_KIND, EMPTY_MODERATION } from '@/lib/communityUtils';
 import { useLayoutOptions } from '@/contexts/LayoutContext';
 import { useAppContext } from '@/hooks/useAppContext';
 import { useCommunityActivityFeed } from '@/hooks/useCommunityActivityFeed';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useFeedTab } from '@/hooks/useFeedTab';
+import { useMembersOnlyFilter } from '@/hooks/useMembersOnlyFilter';
 import { useMyCommunities } from '@/hooks/useMyCommunities';
 
 // ─── Types ─────────────────────────────────────────────────────────────────────
@@ -91,7 +93,9 @@ export function CommunitiesPage() {
 
   return (
     <main className="pb-16 sidebar:pb-0">
-      <PageHeader title="Communities" icon={<Users className="size-5" />} />
+      <PageHeader title="Communities" icon={<Users className="size-5" />}>
+        {user && activeTab === 'activities' && <MembersOnlyToggle />}
+      </PageHeader>
 
       {/* Activities / My Communities tabs */}
       {user && (
@@ -195,6 +199,7 @@ function MyCommunitiesContent() {
 function ActivitiesTab({ onRefresh }: { onRefresh: () => Promise<void> }) {
   const { user } = useCurrentUser();
   const { data: activityEvents, isLoading, moderationByATag, rankMapByATag } = useCommunityActivityFeed();
+  const { membersOnly } = useMembersOnlyFilter();
 
   // Build per-community context values for NoteMoreMenu moderation actions.
   // Keyed by community A tag — each NoteCard is wrapped in its own provider.
@@ -206,6 +211,24 @@ function ActivitiesTab({ onRefresh }: { onRefresh: () => Promise<void> }) {
     }
     return map;
   }, [moderationByATag, rankMapByATag]);
+
+  // Apply the members-only presentation filter. Community definitions
+  // (kind 34550) are never filtered — they represent the community itself,
+  // not user-generated content. Only community-scoped content (kind 1111
+  // and future kinds) is filtered to authored-by-member when the toggle
+  // is active, matching the NIP's canonical-author guidance.
+  const displayedEvents = useMemo(() => {
+    if (!activityEvents) return activityEvents;
+    if (!membersOnly) return activityEvents;
+    return activityEvents.filter((event) => {
+      if (event.kind === COMMUNITY_DEFINITION_KIND) return true;
+      const aTag = event.tags.find(([n]) => n === 'A')?.[1];
+      if (!aTag) return true; // No community scope — pass through
+      const rankMap = rankMapByATag.get(aTag);
+      if (!rankMap) return true; // Moderation data not resolved — avoid hiding
+      return rankMap.has(event.pubkey);
+    });
+  }, [activityEvents, membersOnly, rankMapByATag]);
 
   if (!user) {
     return (
@@ -232,9 +255,9 @@ function ActivitiesTab({ onRefresh }: { onRefresh: () => Promise<void> }) {
             <NoteCardSkeleton key={i} />
           ))}
         </div>
-      ) : activityEvents && activityEvents.length > 0 ? (
+      ) : displayedEvents && displayedEvents.length > 0 ? (
         <div>
-          {activityEvents.map((event) => {
+          {displayedEvents.map((event) => {
             const aTag = event.tags.find(([n]) => n === 'A')?.[1];
             const ctx = aTag ? contextByATag.get(aTag) ?? null : null;
             return (
@@ -244,6 +267,8 @@ function ActivitiesTab({ onRefresh }: { onRefresh: () => Promise<void> }) {
             );
           })}
         </div>
+      ) : membersOnly && activityEvents && activityEvents.length > 0 ? (
+        <FeedEmptyState message="No activity from members of your communities yet. Toggle the shield icon to see all community activity." />
       ) : (
         <FeedEmptyState message="No activity from your communities yet." />
       )}
