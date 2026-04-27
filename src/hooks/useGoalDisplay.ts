@@ -21,43 +21,31 @@ function useNow(intervalMs: number): number {
 }
 
 export interface GoalDisplayData {
-  // Status
   expired: boolean;
   funded: boolean;
-
-  // Progress
   currentSats: number;
   percentage: number;
-  contributors: string[];
-  zapCount: number;
   progressLoading: boolean;
-
-  // Recipient
   metadata: NostrMetadata | undefined;
   displayName: string;
   avatarShape: string | undefined;
   profileUrl: string;
   lightningAddress: string | undefined;
-
-  // Deadline
   deadlineLabel: string | null;
-
-  // Community link
   communityName: string | undefined;
   communityUrl: string | undefined;
-
-  // Image (already sanitized at parse time)
+  /** Already sanitized at parse time. */
   image: string | undefined;
 }
 
 /**
  * Consolidates all display-related hooks and derived state for a goal event.
- * Used by both the standalone GoalCard and the compact NoteCard/detail renderers.
+ * Used by GoalCard inside NoteCard feeds and PostDetailPage.
  */
 export function useGoalDisplay(event: NostrEvent, goal: ParsedGoal): GoalDisplayData {
   const now = useNow(60_000);
   const expired = isGoalExpired(goal);
-  const { currentSats, percentage, contributors, zapCount, isLoading: progressLoading } =
+  const { currentSats, percentage, isLoading: progressLoading } =
     useGoalProgress(event.id, goal.amountMsat, goal.closedAt);
   const funded = percentage >= 100;
 
@@ -108,8 +96,6 @@ export function useGoalDisplay(event: NostrEvent, goal: ParsedGoal): GoalDisplay
     funded,
     currentSats,
     percentage,
-    contributors,
-    zapCount,
     progressLoading,
     metadata,
     displayName,

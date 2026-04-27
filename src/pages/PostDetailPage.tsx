@@ -2142,7 +2142,7 @@ function PostDetailContent({ event }: { event: NostrEvent }) {
             ) : isLetter ? (
               <EncryptedLetterContent event={event} />
             ) : isZapGoal ? (
-              <GoalCard event={event} variant="compact" />
+              <GoalCard event={event} />
             ) : isVine ||
               isPoll ||
               isGeocache ||

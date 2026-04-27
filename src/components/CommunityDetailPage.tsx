@@ -21,8 +21,8 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { BanConfirmDialog } from '@/components/BanConfirmDialog';
 import { ComposeBox } from '@/components/ComposeBox';
 import { CreateGoalDialog } from '@/components/CreateGoalDialog';
-import { GoalCard, GoalCardSkeleton } from '@/components/GoalCard';
 import { MembersOnlyToggle } from '@/components/MembersOnlyToggle';
+import { NoteCard } from '@/components/NoteCard';
 import { ReplyComposeModal } from '@/components/ReplyComposeModal';
 import { ThreadedReplyList, type ReplyNode } from '@/components/ThreadedReplyList';
 import { useAuthor } from '@/hooks/useAuthor';
@@ -37,7 +37,6 @@ import { useToast } from '@/hooks/useToast';
 import { CommunityModerationContext } from '@/contexts/CommunityModerationContext';
 import { useLayoutOptions } from '@/contexts/LayoutContext';
 import { applyCommunityModerationToEvents, canBanTarget, getViewerAuthority, parseCommunityEvent, type CommunityMember } from '@/lib/communityUtils';
-import { isGoalExpired } from '@/lib/goalUtils';
 import { genUserName } from '@/lib/genUserName';
 import { sanitizeUrl } from '@/lib/sanitizeUrl';
 import { cn } from '@/lib/utils';
@@ -205,15 +204,24 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
 
   // ── Fundraising goals (NIP-75) ──────────────────────────────────────────────
   const { data: goals, isLoading: goalsLoading } = useCommunityGoals(communityATag || undefined);
+
+  /** Check if a goal event's `closed_at` deadline has passed. */
+  const isExpired = (e: NostrEvent): boolean => {
+    const v = e.tags.find(([n]) => n === 'closed_at')?.[1];
+    if (!v) return false;
+    const ts = parseInt(v, 10);
+    return !isNaN(ts) && Math.floor(Date.now() / 1000) > ts;
+  };
+
   const activeGoals = useMemo(() => {
-    const all = (goals ?? []).filter((g) => !isGoalExpired(g.goal));
+    const all = (goals ?? []).filter((e) => !isExpired(e));
     if (!membersOnly) return all;
-    return all.filter((g) => rankMap.has(g.event.pubkey));
+    return all.filter((e) => rankMap.has(e.pubkey));
   }, [goals, membersOnly, rankMap]);
   const pastGoals = useMemo(() => {
-    const all = (goals ?? []).filter((g) => isGoalExpired(g.goal));
+    const all = (goals ?? []).filter((e) => isExpired(e));
     if (!membersOnly) return all;
-    return all.filter((g) => rankMap.has(g.event.pubkey));
+    return all.filter((e) => rankMap.has(e.pubkey));
   }, [goals, membersOnly, rankMap]);
 
   const replyTree = useMemo((): ReplyNode[] => {
@@ -446,9 +454,9 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
             {/* ── Fundraising tab ── */}
             <TabsContent value="fundraising" className="mt-0">
               {goalsLoading ? (
-                <div className="px-5 py-4 space-y-4">
+                <div className="divide-y divide-border">
                   {Array.from({ length: 2 }).map((_, i) => (
-                    <GoalCardSkeleton key={i} />
+                    <ReplyCardSkeleton key={i} />
                   ))}
                 </div>
               ) : activeGoals.length === 0 && pastGoals.length === 0 ? (
@@ -458,29 +466,23 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
                     : <>No fundraising goals yet.{user ? ' Create one to get started!' : ''}</>}
                 </div>
               ) : (
-                <div className="px-5 py-4 space-y-4">
+                <div className="divide-y divide-border">
                   {/* Active goals first */}
-                  {activeGoals.length > 0 && (
-                    <div className="space-y-4">
-                      {activeGoals.map((g) => (
-                        <GoalCard key={g.event.id} event={g.event} goal={g.goal} />
-                      ))}
-                    </div>
-                  )}
+                  {activeGoals.map((e) => (
+                    <NoteCard key={e.id} event={e} />
+                  ))}
 
                   {/* Past/expired goals */}
-                  {pastGoals.length > 0 && (
-                    <div className="space-y-3">
-                      {activeGoals.length > 0 && (
-                        <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wide pt-2">
-                          Past Goals
-                        </h4>
-                      )}
-                      {pastGoals.map((g) => (
-                        <GoalCard key={g.event.id} event={g.event} goal={g.goal} />
-                      ))}
+                  {pastGoals.length > 0 && activeGoals.length > 0 && (
+                    <div className="px-5 pt-4 pb-1">
+                      <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
+                        Past Goals
+                      </h4>
                     </div>
                   )}
+                  {pastGoals.map((e) => (
+                    <NoteCard key={e.id} event={e} />
+                  ))}
                 </div>
               )}
             </TabsContent>

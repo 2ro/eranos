@@ -607,6 +607,7 @@ export const NoteCard = memo(function NoteCard({
           <CommunityContent event={event} />
         ) : isZapGoal ? (
           <GoalCard event={event} />
+
         ) : isVoiceMessage ? (
           <VoiceMessagePlayer event={event} />
         ) : isCalendarEvent ? (
