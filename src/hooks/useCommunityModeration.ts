@@ -4,79 +4,67 @@ import { useQuery } from '@tanstack/react-query';
 import type { NostrEvent } from '@nostrify/nostrify';
 
 import { useCommunityMembers } from '@/hooks/useCommunityMembers';
-import { useCurrentUser } from '@/hooks/useCurrentUser';
-import { type CommunityMenuContext, COMMUNITY_DEFINITION_KIND, canBanTarget, getViewerAuthority, parseCommunityEvent } from '@/lib/communityUtils';
+import type { CommunityModerationContextValue } from '@/contexts/CommunityModerationContext';
+import { COMMUNITY_DEFINITION_KIND, parseCommunityEvent } from '@/lib/communityUtils';
 
 /**
- * Given a Nostr event, resolve its community moderation context (if any).
+ * Resolve the community moderation context for a single event.
  *
  * Extracts the community `A` tag from the event, fetches the community
- * definition, resolves membership & moderation, and returns the
- * `communityContext` prop shape that `NoteMoreMenu` expects.
+ * definition, resolves membership & moderation, and returns a value shaped
+ * for `CommunityModerationContext.Provider`. Callers install it as a
+ * Provider so that nested components (`NoteCard`, `NoteMoreMenu`) pick up
+ * the same moderation data via `useCommunityModerationContext()`.
  *
- * Returns `undefined` when:
+ * Returns `null` when:
  * - The event has no community `A` tag
  * - The `A` tag doesn't point to a kind 34550 community
- * - The viewer is not a member of the community
- * - Data is still loading
+ * - The community definition hasn't loaded yet
  */
-export function useCommunityModeration(event: NostrEvent): CommunityMenuContext | undefined {
+export function useCommunityModerationForEvent(event: NostrEvent): CommunityModerationContextValue | null {
   const { nostr } = useNostr();
-  const { user } = useCurrentUser();
 
-  // Extract the community A tag from the event (e.g. "34550:<pubkey>:<d-tag>")
-  const communityATag = useMemo(() => {
+  // Extract the community A tag and its addressable parts in one pass.
+  const parsed = useMemo(() => {
     const aValue = event.tags.find(([n]) => n === 'A')?.[1];
-    if (!aValue) return undefined;
-    // Validate it points to a kind 34550 community
-    if (!aValue.startsWith(`${COMMUNITY_DEFINITION_KIND}:`)) return undefined;
-    return aValue;
+    if (!aValue) return null;
+    if (!aValue.startsWith(`${COMMUNITY_DEFINITION_KIND}:`)) return null;
+    const parts = aValue.split(':');
+    if (parts.length < 3) return null;
+    return { aTag: aValue, pubkey: parts[1], dTag: parts.slice(2).join(':') };
   }, [event.tags]);
 
-  // Parse the A tag to get author + d-tag for fetching the definition
-  const addrParts = useMemo(() => {
-    if (!communityATag) return undefined;
-    const parts = communityATag.split(':');
-    if (parts.length < 3) return undefined;
-    return { pubkey: parts[1], dTag: parts.slice(2).join(':') };
-  }, [communityATag]);
-
-  // Fetch the community definition event
+  // Fetch the community definition event.
   const { data: communityEvent } = useQuery({
-    queryKey: ['community-definition', communityATag],
+    queryKey: ['community-definition', parsed?.aTag ?? ''],
     queryFn: async ({ signal }) => {
-      if (!addrParts) return null;
+      if (!parsed) return null;
       const events = await nostr.query(
         [{
           kinds: [COMMUNITY_DEFINITION_KIND],
-          authors: [addrParts.pubkey],
-          '#d': [addrParts.dTag],
+          authors: [parsed.pubkey],
+          '#d': [parsed.dTag],
           limit: 1,
         }],
         { signal: AbortSignal.any([signal, AbortSignal.timeout(8_000)]) },
       );
       return events[0] ?? null;
     },
-    enabled: !!addrParts,
+    enabled: !!parsed,
     staleTime: 5 * 60_000,
   });
 
-  // Parse the community definition
   const community = useMemo(
     () => (communityEvent ? parseCommunityEvent(communityEvent) : null),
     [communityEvent],
   );
 
-  // Resolve membership & moderation (reuses the same query key as CommunityDetailPage)
+  // Reuses the same TanStack cache key as CommunityDetailPage, so opening a
+  // post detail page after the feed has already loaded is free.
   const { moderation, rankMap } = useCommunityMembers(community);
 
-  // Compute the communityContext prop for NoteMoreMenu
   return useMemo(() => {
-    if (!communityATag || !user) return undefined;
-
-    const viewerMember = getViewerAuthority(user.pubkey, rankMap, moderation);
-    if (!viewerMember) return undefined;
-
-    return { communityATag, canBan: canBanTarget(viewerMember, rankMap.get(event.pubkey)) };
-  }, [communityATag, user, moderation, rankMap, event.pubkey]);
+    if (!parsed) return null;
+    return { communityATag: parsed.aTag, moderation, rankMap };
+  }, [parsed, moderation, rankMap]);
 }

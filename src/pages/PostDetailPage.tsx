@@ -58,7 +58,8 @@ import { publishedAtAction } from "@/lib/publishedAtAction";
 import { NoteContent } from "@/components/NoteContent";
 import { NsiteCard } from "@/components/NsiteCard";
 import { NoteMoreMenu } from "@/components/NoteMoreMenu";
-import { useCommunityModeration } from "@/hooks/useCommunityModeration";
+import { CommunityModerationContext } from "@/contexts/CommunityModerationContext";
+import { useCommunityModerationForEvent } from "@/hooks/useCommunityModeration";
 import { PostActionBar } from "@/components/PostActionBar";
 import { PatchCard } from "@/components/PatchCard";
 import { PodcastDetailContent } from "@/components/PodcastDetailContent";
@@ -963,8 +964,11 @@ function PostDetailContent({ event }: { event: NostrEvent }) {
 
   const pollVoteLabel = usePollVoteLabel(event);
 
-  // Community moderation for NoteMoreMenu — resolves from event's A tag
-  const communityContextForMenu = useCommunityModeration(event);
+  // Community moderation context — resolves from event's A tag. When
+  // present, we install it as a Provider below so `NoteMoreMenu` and
+  // `NoteCard` pick up community-aware menu items and content warnings
+  // via `useCommunityModerationContext()`.
+  const communityModContext = useCommunityModerationForEvent(event);
 
   // NIP-19 encoded event identifier for share URLs
   const encodedEventId = useMemo(() => {
@@ -1429,6 +1433,7 @@ function PostDetailContent({ event }: { event: NostrEvent }) {
   );
 
   return (
+    <CommunityModerationContext.Provider value={communityModContext}>
     <div>
       {/* Content preview for kind 1111 comments: external content, profile, or community */}
       {externalIdentifier && (
@@ -1566,7 +1571,6 @@ function PostDetailContent({ event }: { event: NostrEvent }) {
             event={event}
             open={moreMenuOpen}
             onOpenChange={setMoreMenuOpen}
-            communityContext={communityContextForMenu}
           />
           <ReplyComposeModal
             event={event}
@@ -1685,7 +1689,6 @@ function PostDetailContent({ event }: { event: NostrEvent }) {
             event={event}
             open={moreMenuOpen}
             onOpenChange={setMoreMenuOpen}
-            communityContext={communityContextForMenu}
           />
           <ReplyComposeModal
             event={event}
@@ -1789,7 +1792,7 @@ function PostDetailContent({ event }: { event: NostrEvent }) {
               </button>
             </div>
 
-            <NoteMoreMenu event={event} open={moreMenuOpen} onOpenChange={setMoreMenuOpen} communityContext={communityContextForMenu} />
+            <NoteMoreMenu event={event} open={moreMenuOpen} onOpenChange={setMoreMenuOpen} />
             <ReplyComposeModal event={event} open={replyOpen} onOpenChange={setReplyOpen} />
             <InteractionsModal eventId={event.id} open={interactionsOpen} onOpenChange={setInteractionsOpen} initialTab={interactionsTab} />
           </article>
@@ -1860,7 +1863,7 @@ function PostDetailContent({ event }: { event: NostrEvent }) {
               </button>
             </div>
 
-            <NoteMoreMenu event={event} open={moreMenuOpen} onOpenChange={setMoreMenuOpen} communityContext={communityContextForMenu} />
+            <NoteMoreMenu event={event} open={moreMenuOpen} onOpenChange={setMoreMenuOpen} />
             <ReplyComposeModal event={event} open={replyOpen} onOpenChange={setReplyOpen} />
             <InteractionsModal
               eventId={event.id}
@@ -1937,7 +1940,6 @@ function PostDetailContent({ event }: { event: NostrEvent }) {
             event={event}
             open={moreMenuOpen}
             onOpenChange={setMoreMenuOpen}
-            communityContext={communityContextForMenu}
           />
           <ReplyComposeModal
             event={event}
@@ -1988,7 +1990,7 @@ function PostDetailContent({ event }: { event: NostrEvent }) {
             onMore={() => setMoreMenuOpen(true)}
             className="mt-2 px-4"
           />
-          <NoteMoreMenu event={event} open={moreMenuOpen} onOpenChange={setMoreMenuOpen} communityContext={communityContextForMenu} />
+          <NoteMoreMenu event={event} open={moreMenuOpen} onOpenChange={setMoreMenuOpen} />
           <ReplyComposeModal event={event} open={replyOpen} onOpenChange={setReplyOpen} />
         </div>
       )}
@@ -2289,7 +2291,6 @@ function PostDetailContent({ event }: { event: NostrEvent }) {
             event={event}
             open={moreMenuOpen}
             onOpenChange={setMoreMenuOpen}
-            communityContext={communityContextForMenu}
           />
           <ReplyComposeModal
             event={event}
@@ -2315,13 +2316,14 @@ function PostDetailContent({ event }: { event: NostrEvent }) {
           </div>
         ) : replyTree.length > 0 ? (
           <ThreadedReplyList roots={replyTree} />
-        ) : !parentEventId ? (
+         ) : !parentEventId ? (
           <div className="py-12 text-center text-muted-foreground text-sm">
             No replies yet. Be the first to reply!
           </div>
         ) : null}
       </div>
     </div>
+    </CommunityModerationContext.Provider>
   );
 }
 

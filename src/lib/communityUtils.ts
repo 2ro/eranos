@@ -160,8 +160,6 @@ export interface CommunityMember {
 export interface CommunityMembership {
   /** Active members with banned members removed. Use this to list community members. */
   members: CommunityMember[];
-  /** Convenience: count of active members (including founder + moderators). */
-  totalCount: number;
 }
 
 /**
@@ -254,6 +252,12 @@ export const EMPTY_MODERATION: CommunityModeration = {
   allReports: [],
 };
 
+/** Empty membership sentinel — no members. */
+export const EMPTY_MEMBERSHIP: CommunityMembership = { members: [] };
+
+/** Empty rank map sentinel — shared frozen instance for default-return paths. */
+export const EMPTY_RANK_MAP: ReadonlyMap<string, CommunityMember> = new Map();
+
 /**
  * Returns true when a resolved content-ban candidate applies to this event.
  *
@@ -315,13 +319,14 @@ function hasBanLabel(event: NostrEvent): boolean {
 /**
  * Parse a community-scoped kind 1984 event into a structured report.
  * Returns `null` if the event is not a valid community report.
+ *
+ * Callers are expected to have already scoped the input to a community
+ * (e.g. via `#A` relay filter), so this parser does not re-verify the
+ * event's `A` tag — it only validates the structural tags that determine
+ * classification.
  */
 export function parseCommunityReport(event: NostrEvent): CommunityReport | null {
   if (event.kind !== REPORT_KIND) return null;
-
-  // Must have a community A tag
-  const communityATag = event.tags.find(([n]) => n === 'A')?.[1];
-  if (!communityATag) return null;
 
   // Extract target pubkey (required on all reports)
   const pTag = event.tags.find(([n]) => n === 'p');
@@ -349,6 +354,7 @@ export function parseCommunityReport(event: NostrEvent): CommunityReport | null 
     action = 'report';
   } else {
     // No ban label and no e tag — invalid per classification table
+    // (a "report" without a target event has nowhere to attach in the UI)
     return null;
   }
 
@@ -393,7 +399,24 @@ export function resolveCommunityModeration(
   const reportsByEventId = new Map<string, CommunityReport[]>();
   const allReports: CommunityReport[] = [];
 
-  // ── Pass 1: Collect and resolve ban candidates ──────────────────────
+  // Parse every event once. Drop anything that fails classification or is
+  // not authored by a validated member (membership overlay rules).
+  const parsed: CommunityReport[] = [];
+  for (const event of reports) {
+    const p = parseCommunityReport(event);
+    if (!p) continue;
+    if (!members.has(p.reporterPubkey)) continue;
+    parsed.push(p);
+  }
+
+  // ── Pass 1: Resolve bans in rank order ─────────────────────────────
+  //
+  // Bans are processed sorted by reporter rank ascending. Because bans
+  // require `reporter.rank < target.rank`, this guarantees that by the
+  // time we evaluate a rank-N reporter's bans, we've already finalised
+  // whether any lower-ranked members they're relying on are themselves
+  // banned by a higher-ranked moderator. A banned reporter's bans are
+  // then skipped.
 
   interface BanCandidate {
     parsed: CommunityReport;
@@ -402,67 +425,51 @@ export function resolveCommunityModeration(
 
   const banCandidates: BanCandidate[] = [];
 
-  for (const event of reports) {
-    const parsed = parseCommunityReport(event);
-    if (!parsed) continue;
-    if (parsed.action !== 'content-ban' && parsed.action !== 'member-ban') continue;
+  for (const p of parsed) {
+    if (p.action !== 'content-ban' && p.action !== 'member-ban') continue;
 
-    const reporter = members.get(parsed.reporterPubkey);
-    if (!reporter) continue;
+    // Reporter is guaranteed to be a member (filtered above).
+    const reporter = members.get(p.reporterPubkey)!;
 
-    // Authority check: reporter rank must be strictly less than target rank
-    const target = members.get(parsed.targetPubkey);
-    const targetRank = target?.rank ?? Infinity; // Non-members treated as lowest
-    if (reporter.rank >= targetRank) continue; // Insufficient authority
+    // Authority check: reporter rank must be strictly less than target rank.
+    // Non-members are treated as lowest rank (Infinity).
+    const targetRank = members.get(p.targetPubkey)?.rank ?? Infinity;
+    if (reporter.rank >= targetRank) continue;
 
-    banCandidates.push({ parsed, reporterRank: reporter.rank });
+    banCandidates.push({ parsed: p, reporterRank: reporter.rank });
   }
 
-  // Sort by reporter rank ascending so higher-authority bans are applied
-  // first. This ensures that when we reach a candidate whose reporter has
-  // been banned by a higher-ranked member, bannedPubkeys already contains
-  // that reporter.
   banCandidates.sort((a, b) => a.reporterRank - b.reporterRank);
 
-  for (const { parsed } of banCandidates) {
-    // Skip bans issued by members who are themselves banned
-    if (bannedPubkeys.has(parsed.reporterPubkey)) continue;
+  for (const { parsed: p } of banCandidates) {
+    if (bannedPubkeys.has(p.reporterPubkey)) continue;
 
-    if (parsed.action === 'content-ban' && parsed.targetEventId) {
-      const existing = contentBansByEventId.get(parsed.targetEventId) ?? [];
+    if (p.action === 'content-ban' && p.targetEventId) {
+      const existing = contentBansByEventId.get(p.targetEventId) ?? [];
       existing.push({
-        eventId: parsed.targetEventId,
-        targetPubkey: parsed.targetPubkey,
-        report: parsed,
+        eventId: p.targetEventId,
+        targetPubkey: p.targetPubkey,
+        report: p,
       });
-      contentBansByEventId.set(parsed.targetEventId, existing);
-    } else if (parsed.action === 'member-ban') {
-      bannedPubkeys.add(parsed.targetPubkey);
+      contentBansByEventId.set(p.targetEventId, existing);
+    } else if (p.action === 'member-ban') {
+      bannedPubkeys.add(p.targetPubkey);
     }
 
-    allReports.push(parsed);
+    allReports.push(p);
   }
 
-  // ── Pass 2: Resolve reports, excluding banned reporters ─────────────
+  // ── Pass 2: Attach soft reports, excluding banned reporters ────────
 
-  for (const event of reports) {
-    const parsed = parseCommunityReport(event);
-    if (!parsed) continue;
-    if (parsed.action !== 'report') continue;
+  for (const p of parsed) {
+    if (p.action !== 'report') continue;
+    if (bannedPubkeys.has(p.reporterPubkey)) continue;
+    if (!p.targetEventId) continue; // defensive — 'report' action always has one
 
-    // Skip reports from banned members
-    if (bannedPubkeys.has(parsed.reporterPubkey)) continue;
-
-    const reporter = members.get(parsed.reporterPubkey);
-    if (!reporter) continue;
-
-    if (parsed.targetEventId) {
-      const existing = reportsByEventId.get(parsed.targetEventId) ?? [];
-      existing.push(parsed);
-      reportsByEventId.set(parsed.targetEventId, existing);
-    }
-
-    allReports.push(parsed);
+    const existing = reportsByEventId.get(p.targetEventId) ?? [];
+    existing.push(p);
+    reportsByEventId.set(p.targetEventId, existing);
+    allReports.push(p);
   }
 
   return { contentBansByEventId, bannedPubkeys, reportsByEventId, allReports };
@@ -554,10 +561,7 @@ export function resolveMembership(
   const members = Array.from(validated.values());
   members.sort((a, b) => a.rank - b.rank);
 
-  return {
-    members,
-    totalCount: members.length,
-  };
+  return { members };
 }
 
 /**

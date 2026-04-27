@@ -88,9 +88,19 @@ export function BanConfirmDialog({
 
       // Invalidate community queries so the moderation overlay updates
       // immediately (removes banned content/members without a page refresh).
+      // The activity feed's key is `['community-activity-feed', <aTagsKey>]`
+      // where aTagsKey is a comma-joined list of the viewer's subscribed A
+      // tags. We match any feed whose aTagsKey contains this communityATag.
       await Promise.all([
         queryClient.invalidateQueries({ queryKey: ['community-members', communityATag] }),
-        queryClient.invalidateQueries({ queryKey: ['community-activity-feed'], exact: false }),
+        queryClient.invalidateQueries({
+          predicate: (q) => {
+            const [root, aTagsKey] = q.queryKey;
+            return root === 'community-activity-feed'
+              && typeof aTagsKey === 'string'
+              && aTagsKey.split(',').includes(communityATag);
+          },
+        }),
       ]);
 
       toast({ title: mode === 'content' ? 'Post removed from community' : 'Member banned from community' });

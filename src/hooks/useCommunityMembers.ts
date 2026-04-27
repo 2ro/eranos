@@ -8,7 +8,9 @@ import {
   type CommunityModeration,
   type ParsedCommunity,
   BADGE_AWARD_KIND,
+  EMPTY_MEMBERSHIP,
   EMPTY_MODERATION,
+  EMPTY_RANK_MAP,
   REPORT_KIND,
   resolveCommunityModeration,
   resolveMembership,
@@ -22,10 +24,6 @@ interface CommunityMembersResult {
   /** Chain-validated rank lookup (pubkey → rank) BEFORE moderation overlay. Includes banned members. Used for authority checks only — do NOT use to list active members. */
   rankMap: Map<string, CommunityMember>;
 }
-
-
-
-const EMPTY_RANK_MAP = new Map<string, CommunityMember>();
 
 /**
  * Fetch and resolve the full membership tree and moderation state for a community.
@@ -41,9 +39,9 @@ export function useCommunityMembers(community: ParsedCommunity | null | undefine
     queryFn: async ({ signal }) => {
       if (!community) {
         return {
-          membership: { members: [], totalCount: 0 },
+          membership: EMPTY_MEMBERSHIP,
           moderation: EMPTY_MODERATION,
-           rankMap: new Map(),
+          rankMap: new Map(),
         };
       }
 
@@ -82,12 +80,10 @@ export function useCommunityMembers(community: ParsedCommunity | null | undefine
 
       // Step 4: Apply moderation overlay — filter banned members from the
       // already-computed membership rather than re-running chain validation.
-      const filteredMembers = fullMembership.members.filter(
-        (m) => !moderation.bannedPubkeys.has(m.pubkey),
-      );
       const membership: CommunityMembership = {
-        members: filteredMembers,
-        totalCount: filteredMembers.length,
+        members: fullMembership.members.filter(
+          (m) => !moderation.bannedPubkeys.has(m.pubkey),
+        ),
       };
 
       return { membership, moderation, rankMap };
@@ -100,7 +96,7 @@ export function useCommunityMembers(community: ParsedCommunity | null | undefine
   return useMemo(() => ({
     data: query.data?.membership,
     moderation: query.data?.moderation ?? EMPTY_MODERATION,
-    rankMap: query.data?.rankMap ?? EMPTY_RANK_MAP,
+    rankMap: (query.data?.rankMap ?? EMPTY_RANK_MAP) as Map<string, CommunityMember>,
     isLoading: query.isLoading,
     isError: query.isError,
     error: query.error,

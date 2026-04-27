@@ -1,11 +1,12 @@
 import { useMemo } from 'react';
 import { useNostr } from '@nostrify/react';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import type { NostrEvent } from '@nostrify/nostrify';
 
 import { useMyCommunities } from './useMyCommunities';
 import {
   type CommunityMember,
+  type CommunityMembership,
   type CommunityModeration,
   BADGE_AWARD_KIND,
   COMMUNITY_DEFINITION_KIND,
@@ -24,8 +25,8 @@ interface ActivityFeedResult {
   rankMapByATag: Map<string, Map<string, CommunityMember>>;
 }
 
-const EMPTY_MODERATION_MAP = new Map<string, CommunityModeration>();
-const EMPTY_RANK_MAP_MAP = new Map<string, Map<string, CommunityMember>>();
+const EMPTY_MODERATION_BY_A_TAG: ReadonlyMap<string, CommunityModeration> = new Map();
+const EMPTY_RANK_MAP_BY_A_TAG: ReadonlyMap<string, Map<string, CommunityMember>> = new Map();
 
 /**
  * Fetches a chronological activity feed for communities the current user
@@ -47,6 +48,7 @@ const EMPTY_RANK_MAP_MAP = new Map<string, Map<string, CommunityMember>>();
  */
 export function useCommunityActivityFeed() {
   const { nostr } = useNostr();
+  const queryClient = useQueryClient();
   const { data: myCommunities, isLoading: communitiesLoading } = useMyCommunities();
 
   const aTags = myCommunities?.map((c) => c.community.aTag).filter(Boolean) ?? [];
@@ -133,21 +135,33 @@ export function useCommunityActivityFeed() {
       for (const entry of myCommunities) {
         const community = entry.community;
 
-        // Resolve membership for this community
-        const membership = resolveMembership(community, awards);
+        // Resolve membership for this community.
+        const fullMembership = resolveMembership(community, awards);
         const rankMap = new Map<string, CommunityMember>();
-        for (const m of membership.members) {
+        for (const m of fullMembership.members) {
           rankMap.set(m.pubkey, m);
         }
         rankMapByATag.set(community.aTag, rankMap);
 
-        // Resolve moderation if there are reports for this community
-        const communityReports = reportsByATag.get(community.aTag);
-        if (communityReports && communityReports.length > 0) {
-          moderationByATag.set(
-            community.aTag,
-            resolveCommunityModeration(communityReports, rankMap),
-          );
+        // Resolve moderation (uses rankMap for authority checks).
+        const communityReports = reportsByATag.get(community.aTag) ?? [];
+        const moderation = resolveCommunityModeration(communityReports, rankMap);
+        if (communityReports.length > 0) {
+          moderationByATag.set(community.aTag, moderation);
+        }
+
+        // Seed the per-community cache so opening a community detail page
+        // hits warm cache instead of re-querying kind 8 awards and kind
+        // 1984 reports. Only set when there's no existing entry — we don't
+        // want to overwrite a fresher fetch performed by CommunityDetailPage.
+        const cacheKey = ['community-members', community.aTag];
+        if (!queryClient.getQueryData(cacheKey)) {
+          const membership: CommunityMembership = {
+            members: fullMembership.members.filter(
+              (m) => !moderation.bannedPubkeys.has(m.pubkey),
+            ),
+          };
+          queryClient.setQueryData(cacheKey, { membership, moderation, rankMap });
         }
       }
 
@@ -182,8 +196,8 @@ export function useCommunityActivityFeed() {
 
   return useMemo(() => ({
     data: query.data?.events,
-    moderationByATag: query.data?.moderationByATag ?? EMPTY_MODERATION_MAP,
-    rankMapByATag: query.data?.rankMapByATag ?? EMPTY_RANK_MAP_MAP,
+    moderationByATag: (query.data?.moderationByATag ?? EMPTY_MODERATION_BY_A_TAG) as Map<string, CommunityModeration>,
+    rankMapByATag: (query.data?.rankMapByATag ?? EMPTY_RANK_MAP_BY_A_TAG) as Map<string, Map<string, CommunityMember>>,
     isLoading: query.isLoading,
     isError: query.isError,
     error: query.error,

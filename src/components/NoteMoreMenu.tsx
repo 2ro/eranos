@@ -58,6 +58,9 @@ import { usePinnedPosts } from '@/hooks/usePinnedPosts';
 import { useCountryFeed } from '@/contexts/CountryFeedContext';
 import { useCommunityModerationContext } from '@/contexts/CommunityModerationContext';
 import { type CommunityMenuContext, canBanTarget, getViewerAuthority } from '@/lib/communityUtils';
+// NOTE: `CommunityMenuContext` is derived automatically from
+// `useCommunityModerationContext()`. Parents install a
+// `CommunityModerationContext.Provider` to enable community-aware menu items.
 import { isAdmin } from '@/lib/admins';
 import { genUserName } from '@/lib/genUserName';
 import { timeAgo } from '@/lib/timeAgo';
@@ -70,8 +73,6 @@ interface NoteMoreMenuProps {
   event: NostrEvent;
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  /** Community context for community-scoped events. When provided, the community report dialog is shown instead of the global one. */
-  communityContext?: CommunityMenuContext;
 }
 
 interface MenuItemProps {
@@ -202,7 +203,7 @@ function EventJsonDialog({ event, nip19Id, open, onOpenChange }: EventJsonDialog
   );
 }
 
-export function NoteMoreMenu({ event, open, onOpenChange, communityContext: communityContextProp }: NoteMoreMenuProps) {
+export function NoteMoreMenu({ event, open, onOpenChange }: NoteMoreMenuProps) {
   // These states live here (not in NoteMoreMenuContent) so they persist after the menu closes
   const [reportOpen, setReportOpen] = useState(false);
   const [banContentOpen, setBanContentOpen] = useState(false);
@@ -211,11 +212,12 @@ export function NoteMoreMenu({ event, open, onOpenChange, communityContext: comm
   const [eventJsonOpen, setEventJsonOpen] = useState(false);
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
 
-  // Auto-detect community context from React Context if not explicitly provided
+  // Resolve community context from the React Context. Parents install a
+  // `CommunityModerationContext.Provider` (activity feed, community detail
+  // page, post detail page) to enable community-aware menu items.
   const { user } = useCurrentUser();
   const communityModCtx = useCommunityModerationContext();
-  const communityContext = useMemo(() => {
-    if (communityContextProp) return communityContextProp;
+  const communityContext = useMemo<CommunityMenuContext | undefined>(() => {
     if (!communityModCtx || !user) return undefined;
     const viewerMember = getViewerAuthority(user.pubkey, communityModCtx.rankMap, communityModCtx.moderation);
     if (!viewerMember) return undefined;
@@ -223,7 +225,7 @@ export function NoteMoreMenu({ event, open, onOpenChange, communityContext: comm
       communityATag: communityModCtx.communityATag,
       canBan: canBanTarget(viewerMember, communityModCtx.rankMap.get(event.pubkey)),
     };
-  }, [communityContextProp, communityModCtx, user, event.pubkey]);
+  }, [communityModCtx, user, event.pubkey]);
 
   const { mutate: deleteEvent, isPending: isDeleting } = useDeleteEvent();
 
@@ -352,6 +354,8 @@ export function NoteMoreMenu({ event, open, onOpenChange, communityContext: comm
 }
 
 interface NoteMoreMenuContentProps extends NoteMoreMenuProps {
+  /** Resolved community context (authored upstream from `CommunityModerationContext`). */
+  communityContext?: CommunityMenuContext;
   onReport: () => void;
   onBanContent: () => void;
   onBanMember: () => void;

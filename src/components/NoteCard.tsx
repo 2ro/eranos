@@ -85,7 +85,6 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { VideoPlayer } from "@/components/VideoPlayer";
 import { VoiceMessagePlayer } from "@/components/VoiceMessagePlayer";
 import { ZapDialog } from "@/components/ZapDialog";
-import { useCommunityModerationContext } from "@/contexts/CommunityModerationContext";
 import { useAppContext } from "@/hooks/useAppContext";
 import { useAuthor } from "@/hooks/useAuthor";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
@@ -346,10 +345,6 @@ export const NoteCard = memo(function NoteCard({
   const [moreMenuOpen, setMoreMenuOpen] = useState(false);
   const [replyOpen, setReplyOpen] = useState(false);
 
-  // Community moderation context — shows content warnings for reported posts
-  const communityModCtx = useCommunityModerationContext();
-  const communityReports = communityModCtx?.moderation.reportsByEventId.get(event.id);
-
   // Check if the current user can zap this event's author
   const canZapAuthor = user && canZap(metadata);
 
@@ -557,9 +552,11 @@ export const NoteCard = memo(function NoteCard({
     return null;
   }
 
-  // Shared content block used in both normal and threaded layouts
-  const rawContentBlock = (
-    <>
+  // Shared content block used in both normal and threaded layouts.
+  // Wrapped in `CommunityContentWarning`, which subscribes to the community
+  // moderation context internally and is a no-op outside community surfaces.
+  const contentBlock = (
+    <CommunityContentWarning eventId={event.id}>
       {/* Reply context (kind 1) or comment context (kind 1111) — shown above content */}
       {isComment && <CommentContext event={event} />}
       {isReply && (
@@ -678,13 +675,8 @@ export const NoteCard = memo(function NoteCard({
           />
         )}
       </ContentWarningGuard>
-    </>
+    </CommunityContentWarning>
   );
-
-  // Wrap with community content warning when the event has soft reports
-  const contentBlock = communityReports && communityReports.length > 0
-    ? <CommunityContentWarning reports={communityReports}>{rawContentBlock}</CommunityContentWarning>
-    : rawContentBlock;
 
   // Shared author info block — min-h-[42px] keeps the container the same height
   // whether the skeleton or the resolved profile is rendered, preventing layout shifts.

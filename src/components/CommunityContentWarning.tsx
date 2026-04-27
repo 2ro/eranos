@@ -1,8 +1,9 @@
 import { useState } from 'react';
 import { AlertTriangle, Eye } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { useCommunityModerationContext } from '@/contexts/CommunityModerationContext';
 import { cn } from '@/lib/utils';
-import type { CommunityReport, Nip56ReportType } from '@/lib/communityUtils';
+import type { Nip56ReportType } from '@/lib/communityUtils';
 
 /** Lowercase prose labels for content warning summaries. */
 const REPORT_TYPE_LABELS: Record<Nip56ReportType, string> = {
@@ -16,25 +17,31 @@ const REPORT_TYPE_LABELS: Record<Nip56ReportType, string> = {
 };
 
 interface CommunityContentWarningProps {
-  /** Reports filed against this content. */
-  reports: CommunityReport[];
-  /** The content to guard behind the warning. */
+  /** The event being rendered. Used to look up reports in the community context. */
+  eventId: string;
+  /** The content to guard behind the warning when the event has reports. */
   children: React.ReactNode;
   /** Optional class name for the wrapper. */
   className?: string;
 }
 
 /**
- * Guards content behind a community report warning overlay.
- * Users must click through to reveal reported content.
+ * Guards content behind a community report warning overlay when the event has
+ * been reported by community members. Subscribes to `CommunityModerationContext`
+ * internally so that parents outside community surfaces don't need to know or
+ * care about the community system — rendering this wrapper is a no-op when
+ * there's no community context in the tree.
  *
- * Children are **not mounted** until the user explicitly reveals,
- * so media and nested queries are deferred for reported content.
+ * Children are **not mounted** until the user explicitly reveals, so media and
+ * nested queries are deferred for reported content.
  */
-export function CommunityContentWarning({ reports, children, className }: CommunityContentWarningProps) {
+export function CommunityContentWarning({ eventId, children, className }: CommunityContentWarningProps) {
+  const modCtx = useCommunityModerationContext();
+  const reports = modCtx?.moderation.reportsByEventId.get(eventId);
   const [revealed, setRevealed] = useState(false);
 
-  if (revealed || reports.length === 0) {
+  // No community context or no reports → render children transparently.
+  if (!reports || reports.length === 0 || revealed) {
     return <>{children}</>;
   }
 
