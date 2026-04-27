@@ -290,40 +290,37 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
           <p className="text-sm leading-relaxed text-muted-foreground whitespace-pre-wrap">{descriptionText}</p>
         )}
 
-        {/* Founder */}
+        {/* Founder + community-wide filter toggle. The toggle sits
+            right-justified on the same row as the "Founded by" label so
+            it clearly scopes the whole community (every content feed
+            below the tabs), not any one tab. */}
         <div>
-          <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-1">Founded by</p>
+          <div className="flex items-start justify-between gap-2 mb-1">
+            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Founded by</p>
+            <MembersOnlyToggle className="-my-2 -mr-2" />
+          </div>
           <PersonRow pubkey={event.pubkey} />
         </div>
 
         {/* ── Tabs ── */}
         <CommunityModerationContext.Provider value={communityATag ? { communityATag, moderation, rankMap } : null}>
           <Tabs defaultValue="members" className="-mx-5">
-            {/* The TabsList stays flex so tabs share width, and the toggle
-                sits to the right of the tabs. The toggle filters all
-                content feeds within this community (currently only
-                Comments, but scoped that way so future feeds inherit). */}
-            <div className="flex items-stretch border-b border-border">
-              <TabsList className="flex-1 rounded-none bg-transparent p-0 h-auto">
-                <TabsTrigger
-                  value="members"
-                  className="flex-1 rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none pb-3 pt-2"
-                >
-                  <Users className="size-4 mr-1.5" />
-                  Members
-                </TabsTrigger>
-                <TabsTrigger
-                  value="comments"
-                  className="flex-1 rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none pb-3 pt-2"
-                >
-                  <MessageCircle className="size-4 mr-1.5" />
-                  Comments
-                </TabsTrigger>
-              </TabsList>
-              <div className="flex items-center pr-2 shrink-0">
-                <MembersOnlyToggle />
-              </div>
-            </div>
+            <TabsList className="w-full rounded-none border-b border-border bg-transparent p-0 h-auto">
+              <TabsTrigger
+                value="members"
+                className="flex-1 rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none pb-3 pt-2"
+              >
+                <Users className="size-4 mr-1.5" />
+                Members
+              </TabsTrigger>
+              <TabsTrigger
+                value="comments"
+                className="flex-1 rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none pb-3 pt-2"
+              >
+                <MessageCircle className="size-4 mr-1.5" />
+                Comments
+              </TabsTrigger>
+            </TabsList>
 
             {/* ── Members tab ── */}
             <TabsContent value="members" className="mt-0">
