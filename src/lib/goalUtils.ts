@@ -1,5 +1,6 @@
 import type { NostrEvent } from '@nostrify/nostrify';
 
+import { parseATagCoordinate } from '@/lib/nostrEvents';
 import { sanitizeUrl } from '@/lib/sanitizeUrl';
 
 // ── Kind constant ─────────────────────────────────────────────────────────────
@@ -83,11 +84,6 @@ export function isGoalExpired(goal: ParsedGoal): boolean {
   return Math.floor(Date.now() / 1000) > goal.closedAt;
 }
 
-/** Check whether a goal has been fully funded (current >= target). */
-export function isGoalFunded(currentMsat: number, goal: ParsedGoal): boolean {
-  return currentMsat >= goal.amountMsat;
-}
-
 /** Format satoshis with locale-aware separators. */
 export function formatSats(sats: number): string {
   return sats.toLocaleString();
@@ -95,15 +91,11 @@ export function formatSats(sats: number): string {
 
 /**
  * Parse a community `a` tag coordinate (`34550:<pubkey>:<d-tag>`) into its
- * constituent parts. Returns `undefined` if the format is invalid.
+ * constituent parts. Returns `undefined` if the format is invalid or the kind
+ * is not 34550.
  */
 export function parseCommunityATag(aTag: string): { kind: number; pubkey: string; identifier: string } | undefined {
-  const parts = aTag.split(':');
-  if (parts.length < 3) return undefined;
-  const kind = parseInt(parts[0], 10);
-  if (kind !== 34550) return undefined;
-  const pubkey = parts[1];
-  if (!pubkey) return undefined;
-  const identifier = parts.slice(2).join(':');
-  return { kind, pubkey, identifier };
+  const addr = parseATagCoordinate(aTag);
+  if (!addr || addr.kind !== 34550) return undefined;
+  return addr;
 }

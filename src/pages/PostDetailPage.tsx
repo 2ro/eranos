@@ -39,7 +39,7 @@ import {
 const CustomNipCard = lazy(() => import("@/components/CustomNipCard").then(m => ({ default: m.CustomNipCard })));
 import { FileMetadataContent } from "@/components/FileMetadataContent";
 import { FollowPackContent } from "@/components/FollowPackContent";
-import { GoalContent } from "@/components/GoalContent";
+import { GoalCard } from "@/components/GoalCard";
 import { FollowPackDetailContent } from "@/components/FollowPackDetailContent";
 import { FoundLogContent } from "@/components/FoundLogContent";
 import { GeocacheContent } from "@/components/GeocacheContent";
@@ -420,7 +420,6 @@ export function AddrPostDetailPage({ addr, relays }: AddrPostDetailPageProps) {
     </PostDetailShell>
   );
 }
-
 
 /** NoteCard + NIP-22 comments section for kind 10008/30008 profile badges detail page. */
 function ProfileBadgesDetailView({ event }: { event: NostrEvent }) {
@@ -2143,7 +2142,7 @@ function PostDetailContent({ event }: { event: NostrEvent }) {
             ) : isLetter ? (
               <EncryptedLetterContent event={event} />
             ) : isZapGoal ? (
-              <GoalContent event={event} />
+              <GoalCard event={event} variant="compact" />
             ) : isVine ||
               isPoll ||
               isGeocache ||

@@ -49,7 +49,7 @@ import { FollowPackContent } from "@/components/FollowPackContent";
 import { FoundLogContent } from "@/components/FoundLogContent";
 import { GeocacheContent } from "@/components/GeocacheContent";
 import { GitRepoCard } from "@/components/GitRepoCard";
-import { GoalContent } from "@/components/GoalContent";
+import { GoalCard } from "@/components/GoalCard";
 import { NsiteCard } from "@/components/NsiteCard";
 import { ImageGallery } from "@/components/ImageGallery";
 import { CardsIcon } from "@/components/icons/CardsIcon";
@@ -606,7 +606,7 @@ export const NoteCard = memo(function NoteCard({
         ) : isCommunity ? (
           <CommunityContent event={event} />
         ) : isZapGoal ? (
-          <GoalContent event={event} />
+          <GoalCard event={event} />
         ) : isVoiceMessage ? (
           <VoiceMessagePlayer event={event} />
         ) : isCalendarEvent ? (

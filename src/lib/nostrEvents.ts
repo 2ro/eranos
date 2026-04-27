@@ -78,3 +78,21 @@ function getParentEventTag(event: NostrEvent): string[] | undefined {
   // Deprecated positional scheme: last non-mention e-tag is the reply target
   return eTags[eTags.length - 1];
 }
+
+/**
+ * Parse a Nostr `a`-tag coordinate string (`kind:pubkey:identifier`) into its
+ * constituent parts. Returns `undefined` if the format is invalid.
+ *
+ * Handles d-tags that contain colons by joining everything after the second
+ * colon back together.
+ */
+export function parseATagCoordinate(aTag: string): { kind: number; pubkey: string; identifier: string } | undefined {
+  const parts = aTag.split(':');
+  if (parts.length < 3) return undefined;
+  const kind = parseInt(parts[0], 10);
+  if (isNaN(kind) || kind < 0) return undefined;
+  const pubkey = parts[1];
+  if (!pubkey) return undefined;
+  const identifier = parts.slice(2).join(':');
+  return { kind, pubkey, identifier };
+}

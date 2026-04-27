@@ -103,7 +103,6 @@ export function CreateGoalDialog({ communityATag, children, open: controlledOpen
         kind: ZAP_GOAL_KIND,
         content: title.trim(),
         tags,
-        created_at: Math.floor(Date.now() / 1000),
       });
 
       // Refresh the fundraising tab and the community activity feed
