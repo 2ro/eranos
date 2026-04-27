@@ -213,16 +213,20 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
     return !isNaN(ts) && Math.floor(Date.now() / 1000) > ts;
   };
 
+  const moderatedGoals = useMemo(
+    () => applyCommunityModerationToEvents(goals ?? [], moderation),
+    [goals, moderation],
+  );
   const activeGoals = useMemo(() => {
-    const all = (goals ?? []).filter((e) => !isExpired(e));
+    const all = moderatedGoals.filter((e) => !isExpired(e));
     if (!membersOnly) return all;
     return all.filter((e) => rankMap.has(e.pubkey));
-  }, [goals, membersOnly, rankMap]);
+  }, [moderatedGoals, membersOnly, rankMap]);
   const pastGoals = useMemo(() => {
-    const all = (goals ?? []).filter((e) => isExpired(e));
+    const all = moderatedGoals.filter((e) => isExpired(e));
     if (!membersOnly) return all;
     return all.filter((e) => rankMap.has(e.pubkey));
-  }, [goals, membersOnly, rankMap]);
+  }, [moderatedGoals, membersOnly, rankMap]);
 
   const replyTree = useMemo((): ReplyNode[] => {
     if (!commentsData) return [];
