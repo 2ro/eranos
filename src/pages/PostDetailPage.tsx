@@ -39,6 +39,7 @@ import {
 const CustomNipCard = lazy(() => import("@/components/CustomNipCard").then(m => ({ default: m.CustomNipCard })));
 import { FileMetadataContent } from "@/components/FileMetadataContent";
 import { FollowPackContent } from "@/components/FollowPackContent";
+import { GoalContent } from "@/components/GoalContent";
 import { FollowPackDetailContent } from "@/components/FollowPackDetailContent";
 import { FoundLogContent } from "@/components/FoundLogContent";
 import { GeocacheContent } from "@/components/GeocacheContent";
@@ -1027,6 +1028,7 @@ function PostDetailContent({ event }: { event: NostrEvent }) {
   const isLetter = event.kind === 8211;
   const isVanish = event.kind === VANISH_KIND;
   const isZap = event.kind === 9735;
+  const isZapGoal = event.kind === 9041;
   const isProfile = event.kind === 0;
   const isDevKind = isGitRepo || isPatch || isPullRequest || isCustomNip || isNsite;
   const isTextNote =
@@ -1056,6 +1058,7 @@ function PostDetailContent({ event }: { event: NostrEvent }) {
     !isLetter &&
     !isVanish &&
     !isZap &&
+    !isZapGoal &&
     !isProfile;
 
   const { data: stats } = useEventStats(event.id, event);
@@ -2139,6 +2142,8 @@ function PostDetailContent({ event }: { event: NostrEvent }) {
               <EncryptedMessageContent event={event} />
             ) : isLetter ? (
               <EncryptedLetterContent event={event} />
+            ) : isZapGoal ? (
+              <GoalContent event={event} />
             ) : isVine ||
               isPoll ||
               isGeocache ||

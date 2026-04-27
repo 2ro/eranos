@@ -23,6 +23,7 @@ import { ComposeBox } from '@/components/ComposeBox';
 import { CreateGoalDialog } from '@/components/CreateGoalDialog';
 import { GoalCard, GoalCardSkeleton } from '@/components/GoalCard';
 import { MembersOnlyToggle } from '@/components/MembersOnlyToggle';
+import { ReplyComposeModal } from '@/components/ReplyComposeModal';
 import { ThreadedReplyList, type ReplyNode } from '@/components/ThreadedReplyList';
 import { useAuthor } from '@/hooks/useAuthor';
 import { useAuthors } from '@/hooks/useAuthors';
@@ -34,6 +35,7 @@ import { useMembersOnlyFilter } from '@/hooks/useMembersOnlyFilter';
 import { useProfileUrl } from '@/hooks/useProfileUrl';
 import { useToast } from '@/hooks/useToast';
 import { CommunityModerationContext } from '@/contexts/CommunityModerationContext';
+import { useLayoutOptions } from '@/contexts/LayoutContext';
 import { applyCommunityModerationToEvents, canBanTarget, getViewerAuthority, parseCommunityEvent, type CommunityMember } from '@/lib/communityUtils';
 import { isGoalExpired } from '@/lib/goalUtils';
 import { genUserName } from '@/lib/genUserName';
@@ -126,6 +128,11 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
   // ── Member ban dialog state ────────────────────────────────────────────────
   const [banDialogOpen, setBanDialogOpen] = useState(false);
   const [banTargetPubkey, setBanTargetPubkey] = useState<string | null>(null);
+
+  // ── Tab + FAB state ────────────────────────────────────────────────────────
+  const [activeTab, setActiveTab] = useState('members');
+  const [composeOpen, setComposeOpen] = useState(false);
+  const [goalDialogOpen, setGoalDialogOpen] = useState(false);
 
   // Parse community definition
   const community = useMemo(() => parseCommunityEvent(event), [event]);
@@ -261,6 +268,25 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
     }
   }, [event, toast]);
 
+  // ── FAB — visible on comments & fundraising tabs ──────────────────────────
+  const handleFabClick = useCallback(() => {
+    if (activeTab === 'comments') {
+      setComposeOpen(true);
+    } else if (activeTab === 'fundraising') {
+      setGoalDialogOpen(true);
+    }
+  }, [activeTab]);
+
+  const fabIcon = activeTab === 'fundraising'
+    ? <Target strokeWidth={3} size={18} />
+    : undefined; // default Plus icon for comments
+
+  useLayoutOptions({
+    showFAB: activeTab === 'comments' || activeTab === 'fundraising',
+    onFabClick: handleFabClick,
+    fabIcon,
+  });
+
   // ── Render ──────────────────────────────────────────────────────────────────
   return (
     <div className="max-w-2xl mx-auto pb-16">
@@ -322,7 +348,7 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
 
         {/* ── Tabs ── */}
         <CommunityModerationContext.Provider value={communityATag ? { communityATag, moderation, rankMap } : null}>
-          <Tabs defaultValue="members" className="-mx-5">
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="-mx-5">
             <TabsList className="w-full rounded-none border-b border-border bg-transparent p-0 h-auto">
               <TabsTrigger
                 value="members"
@@ -419,13 +445,6 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
 
             {/* ── Fundraising tab ── */}
             <TabsContent value="fundraising" className="mt-0">
-              {/* Create goal button */}
-              {user && communityATag && (
-                <div className="px-5 py-3 border-b border-border">
-                  <CreateGoalDialog communityATag={communityATag} />
-                </div>
-              )}
-
               {goalsLoading ? (
                 <div className="px-5 py-4 space-y-4">
                   {Array.from({ length: 2 }).map((_, i) => (
@@ -480,6 +499,22 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
             setBanDialogOpen(open);
             if (!open) setBanTargetPubkey(null);
           }}
+        />
+      )}
+
+      {/* FAB-triggered compose modal for the comments tab */}
+      <ReplyComposeModal
+        event={event}
+        open={composeOpen}
+        onOpenChange={setComposeOpen}
+      />
+
+      {/* FAB-triggered goal creation dialog for the fundraising tab */}
+      {communityATag && (
+        <CreateGoalDialog
+          communityATag={communityATag}
+          open={goalDialogOpen}
+          onOpenChange={setGoalDialogOpen}
         />
       )}
     </div>

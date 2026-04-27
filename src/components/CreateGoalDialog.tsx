@@ -22,10 +22,16 @@ interface CreateGoalDialogProps {
   /** The community `a` tag coordinate (e.g. `34550:<pubkey>:<d-tag>`). */
   communityATag: string;
   children?: React.ReactNode;
+  /** Controlled open state. When provided, the component is controlled externally. */
+  open?: boolean;
+  /** Callback when the open state changes (for controlled mode). */
+  onOpenChange?: (open: boolean) => void;
 }
 
-export function CreateGoalDialog({ communityATag, children }: CreateGoalDialogProps) {
-  const [open, setOpen] = useState(false);
+export function CreateGoalDialog({ communityATag, children, open: controlledOpen, onOpenChange }: CreateGoalDialogProps) {
+  const [internalOpen, setInternalOpen] = useState(false);
+  const open = controlledOpen ?? internalOpen;
+  const setOpen = onOpenChange ?? setInternalOpen;
   const { user } = useCurrentUser();
   const { toast } = useToast();
   const { config } = useAppContext();
@@ -125,14 +131,16 @@ export function CreateGoalDialog({ communityATag, children }: CreateGoalDialogPr
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        {children ?? (
-          <Button variant="outline" size="sm" className="gap-1.5">
-            <Target className="size-4" />
-            New Goal
-          </Button>
-        )}
-      </DialogTrigger>
+      {controlledOpen === undefined && (
+        <DialogTrigger asChild>
+          {children ?? (
+            <Button variant="outline" size="sm" className="gap-1.5">
+              <Target className="size-4" />
+              New Goal
+            </Button>
+          )}
+        </DialogTrigger>
+      )}
       <DialogContent className="sm:max-w-md">
         <DialogTitle className="flex items-center gap-2">
           <Target className="size-5" />
