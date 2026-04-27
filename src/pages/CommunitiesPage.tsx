@@ -201,7 +201,7 @@ function ActivitiesTab({ onRefresh }: { onRefresh: () => Promise<void> }) {
     const map = new Map<string, CommunityModerationContextValue>();
     for (const [aTag, memberMap] of memberMapByATag) {
       const moderation = moderationByATag.get(aTag) ?? {
-        bannedEventIds: new Set<string>(),
+        contentBansByEventId: new Map(),
         bannedPubkeys: new Set<string>(),
         reportsByEventId: new Map(),
         allReports: [],

@@ -608,6 +608,14 @@ Clients SHOULD only surface events from the last hour (`since = now - 3600`). Ol
 
 Hierarchical communities on Nostr, composed from existing event kinds. Communities have ranked membership where authority flows downward through a chain of badge awards.
 
+This specification is intended to be a foundation for community-scoped features. A community is a kind `34550` root that other events can tag with uppercase `A`. Posts, events, polls, listings, and future content kinds can all participate in the same community model when they tag the community root and pass the membership and moderation rules below.
+
+The initial implementation focuses on three foundation capabilities:
+
+1. Viewing communities a user owns or belongs to.
+2. Posting community-scoped discussion content.
+3. Moderating community-scoped content and members within communities the viewer has authority over.
+
 **No new event kinds are introduced.** The system composes:
 
 - **Kind 34550** ([NIP-72](https://github.com/nostr-protocol/nips/blob/master/72.md)) -- Community Definition
@@ -615,7 +623,7 @@ Hierarchical communities on Nostr, composed from existing event kinds. Communiti
 - **Kind 8** ([NIP-58](https://github.com/nostr-protocol/nips/blob/master/58.md)) -- Badge Award
 - **Kind 1111** ([NIP-22](https://github.com/nostr-protocol/nips/blob/master/22.md)) -- Community Posts
 - **Kind 1984** ([NIP-56](https://github.com/nostr-protocol/nips/blob/master/56.md)) -- Moderation
-- **Kind 5** ([NIP-09](https://github.com/nostr-protocol/nips/blob/master/09.md)) -- Deletion / Revocation
+- **Kind 5** ([NIP-09](https://github.com/nostr-protocol/nips/blob/master/09.md)) -- Badge Award Revocation / Moderation Rescinding
 
 ### Overview
 
@@ -624,9 +632,9 @@ A hierarchical community consists of:
 1. **Badge definitions** (kind `30009`), one per rank tier, published by the founder.
 2. A **community definition** (kind `34550`) referencing those badges with rank indices.
 3. **Badge awards** (kind `8`) forming a chain of trust -- each award grants a rank, validated by the awarder's rank.
-4. **Posts** (kind `1111`) scoped to the community via NIP-22.
-5. **Reports** (kind `1984`) scoped to the community for content removal or member bans.
-6. **Deletion requests** (kind `5`) for revoking awards or rescinding moderation.
+4. **Community-scoped content** (initially kind `1111`) tagged to the community root.
+5. **Reports and bans** (kind `1984`) scoped to the community for content warnings, content removal, and member bans.
+6. **Deletion requests** (kind `5`) for revoking badge awards or rescinding moderation events.
 
 ### Membership Derivation
 
@@ -742,13 +750,20 @@ Membership is **derived state**. Clients compute effective membership by resolvi
 1. **Seed rank 0**: The event publisher (founder) and all `p` tags (moderators) in the community definition are rank 0 members.
 2. **Query awards**: `{ kinds: [8], #a: [<all badge coordinates>] }`
 3. **Iteratively validate**: For each award, check if the awarder is a validated member with rank strictly less than the awarded rank. If valid, add the recipient. Repeat until no new members are discovered.
-4. **Apply moderation**: Query `{ kinds: [1984, 5], #A: [<community-a-tag>] }`. Discard any kind `1984` event whose matching kind `5` deletion exists (reinstatement). Then classify remaining kind `1984` events into **bans** and **reports** (see [Moderation](#moderation)). Remove banned members and omit banned content. Attach report data to posts for content-warning display. Kind `1984` events from non-members are ignored entirely.
+4. **Resolve moderation**: Query `{ kinds: [1984], #A: [<community-a-tag>] }`. Classify kind `1984` events into **bans** and **reports** (see [Moderation](#moderation)). Kind `1984` events from non-members and banned members are ignored. Ban attempts from insufficiently ranked members are ignored, such as a rank 2 member trying to ban a rank 0 founder or moderator.
+5. **Apply moderation**: Remove banned members from effective membership. Omit content from banned authors, omit verified content bans, and attach report data to reported content for content-warning display.
 
 Clients MUST NOT trust kind `8` events at face value. An attacker can publish awards for themselves, but these fail chain validation without a path to a founder or moderator.
 
-### Community Posts
+### Community-Scoped Content
 
-Community discussion uses kind `1111` ([NIP-22](https://github.com/nostr-protocol/nips/blob/master/22.md)) scoped to the community definition as the root event.
+Community-scoped content is any event that tags the community definition with uppercase `A`. The foundation implementation starts with kind `1111` ([NIP-22](https://github.com/nostr-protocol/nips/blob/master/22.md)) posts, but the same moderation overlay applies to future community content kinds such as calendar events, polls, listings, or other domain-specific events.
+
+Clients SHOULD treat valid community members as the canonical authors for community views. Content from non-members MAY be shown in future review surfaces, but canonical community feeds SHOULD discard non-member content by default.
+
+#### Community Post
+
+Community discussion uses kind `1111` scoped to the community definition as the root event.
 
 #### Top-Level Post
 
@@ -788,7 +803,7 @@ Replies keep the community as root scope and point to the parent comment:
 
 #### Querying
 
-Fetch all community-scoped posts and moderation data in a single request:
+Fetch community-scoped content and moderation data together when relay limits permit. The `kinds` list can expand as the application adds supported community content kinds.
 
 ```jsonc
 {
@@ -797,25 +812,18 @@ Fetch all community-scoped posts and moderation data in a single request:
 }
 ```
 
-Additionally, fetch kind `5` deletion events that may reinstate previously banned content or members:
-
-```jsonc
-{
-  "kinds": [5],
-  "#k": ["1984"]
-}
-```
-
-Clients then filter client-side: discard kind `1111` posts from non-members, apply kind `5` reinstatements, and process remaining kind `1984` events per the moderation rules below.
+Clients then filter client-side: discard unsupported kinds, discard non-member content from canonical community views, and process kind `1984` events per the moderation rules below. The moderation overlay is content-kind agnostic: a valid content ban or warning applies to the targeted event regardless of whether that event is a post, calendar event, poll, listing, or future supported kind.
 
 ### Moderation
 
-Moderation uses kind `1984` ([NIP-56](https://github.com/nostr-protocol/nips/blob/master/56.md)) scoped to the community via the uppercase `A` tag. There are two tiers of moderation events:
+Moderation uses kind `1984` ([NIP-56](https://github.com/nostr-protocol/nips/blob/master/56.md)) scoped to the community via the uppercase `A` tag. Moderation is derived state: clients first resolve trusted moderation actions from kind `1984`, then apply those actions to concrete community-scoped events.
+
+There are two tiers of moderation events:
 
 1. **Bans** -- authoritative actions from higher-ranked members that remove content or ban users. Identified by the presence of [NIP-32](https://github.com/nostr-protocol/nips/blob/master/32.md) label tags `["L", "moderation"]` and `["l", "ban", "moderation"]`.
 2. **Reports** -- soft flags from any valid community member using standard [NIP-56](https://github.com/nostr-protocol/nips/blob/master/56.md) report types (`nudity`, `spam`, `profanity`, `illegal`, `malware`, `impersonation`, `other`). No `L`/`l` tags. Clients display a content warning that users must click through to reveal.
 
-Kind `1984` events from **non-members** are ignored entirely within community context.
+Kind `1984` events from **non-members** are ignored entirely within community context. Kind `1984` events from members who are themselves banned are also ignored after ban resolution; banned members cannot retain moderation or reporting authority.
 
 #### Bans (Authoritative Moderation)
 
@@ -823,7 +831,8 @@ A ban is **authoritative** if and only if:
 
 1. The event contains `["l", "ban", "moderation"]` and `["L", "moderation"]` tags.
 2. The publisher is a validated community member.
-3. The publisher's rank is **strictly less than** the target's rank (or the target is a non-member).
+3. The publisher is not themselves banned after ban resolution.
+4. The publisher's rank is **strictly less than** the target's rank (or the target is a non-member).
 
 Bans that fail any of these conditions MUST be ignored.
 
@@ -846,7 +855,9 @@ Ban a specific post by publishing kind `1984` with `e`, `p`, and `A` tags plus t
 }
 ```
 
-Clients MUST omit the banned event from the community feed entirely. The event is not displayed, blurred, or indicated in any way -- it is treated as if it does not exist.
+Clients MUST omit the banned event from canonical community feeds entirely. The event is not displayed, blurred, or indicated in any way -- it is treated as if it does not exist.
+
+The `e` and `p` tags are untrusted until matched against the actual target event. A content ban MUST only apply when the targeted event's `id` matches the ban's `e` tag and the targeted event's `pubkey` matches the ban's `p` tag. This prevents a malicious or mistaken report from hiding an event by pairing its event ID with a lower-ranked or non-member pubkey.
 
 ##### Member Ban
 
@@ -870,7 +881,7 @@ Clients distinguish content bans (`e` + `p` + `A` + `ban` label) from member ban
 
 #### Reports (Content Warnings)
 
-Any **valid community member** (regardless of rank) may report content by publishing kind `1984` with a standard NIP-56 report type on the `e` and `p` tags. Reports do NOT use `L`/`l` label tags.
+Any **valid, non-banned community member** (regardless of rank) may report content by publishing kind `1984` with a standard NIP-56 report type on the `e` and `p` tags. Reports do NOT use `L`/`l` label tags.
 
 ```jsonc
 {
@@ -887,22 +898,25 @@ Any **valid community member** (regardless of rank) may report content by publis
 
 Clients SHOULD display reported content behind a content warning overlay that requires user interaction to reveal. The report type (e.g. `nudity`, `spam`) MAY be shown in the warning. Multiple reports on the same event reinforce the warning but do not automatically escalate to a ban.
 
-Reports from non-members are ignored.
+Reports from non-members and banned members are ignored.
+
+As with content bans, report warnings MUST only attach to content when the target event's `id` matches the report's `e` tag and the target event's `pubkey` matches the report's `p` tag.
 
 #### Classification Summary
 
 | `l` tag present? | `e` tag present? | Authority check | Result |
 |---|---|---|---|
-| `["l", "ban", "moderation"]` | Yes | Rank < target | Content ban (omit event) |
-| `["l", "ban", "moderation"]` | No | Rank < target | Member ban |
-| No | Yes | Member (any rank) | Content warning |
+| `["l", "ban", "moderation"]` | Yes | Non-banned member; rank < target; `e`/`p` match target event | Content ban (omit event) |
+| `["l", "ban", "moderation"]` | No | Non-banned member; rank < target | Member ban |
+| No | Yes | Non-banned member; `e`/`p` match target event | Content warning |
 | No | No | -- | Invalid (ignored) |
 | Any | Any | Non-member | Ignored |
+| Any | Any | Banned member | Ignored |
 | `["l", "ban", "moderation"]` | Any | Rank >= target | Ignored |
 
-#### Reinstatement
+#### Rescinding Moderation
 
-Delete a kind `1984` ban or report via kind `5` ([NIP-09](https://github.com/nostr-protocol/nips/blob/master/09.md)). Per NIP-09, only the original author of the kind `1984` event can delete it.
+A kind `1984` ban or report can be rescinded by deleting the kind `1984` event via kind `5` ([NIP-09](https://github.com/nostr-protocol/nips/blob/master/09.md)). Per NIP-09, only the original author of the kind `1984` event can delete it.
 
 ```jsonc
 {
@@ -910,6 +924,8 @@ Delete a kind `1984` ban or report via kind `5` ([NIP-09](https://github.com/nos
   "tags": [["e", "<kind-1984-event-id>"], ["k", "1984"]]
 }
 ```
+
+Clients that implement moderation rescinding SHOULD discard any kind `1984` event whose matching kind `5` deletion exists before resolving bans and reports. This branch does not implement moderation rescinding yet; it is retained here as part of the protocol foundation for future moderation extensions.
 
 ### Revocation
 
@@ -1053,4 +1069,3 @@ The `content` of kind 11125 is a JSON object. Ditto extends it with a `missions`
 ```
 
 Each `Mission` is either a **TallyMission** (`{ id, target, count }`) or an **EventMission** (`{ id, target, events: string[] }`) where `events` contains Nostr event IDs that satisfy the mission. Evolution missions are populated when incubation or evolution begins and cleared when the stage transition completes or is cancelled.
-

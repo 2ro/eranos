@@ -32,7 +32,7 @@ import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useProfileUrl } from '@/hooks/useProfileUrl';
 import { useToast } from '@/hooks/useToast';
 import { CommunityModerationContext } from '@/contexts/CommunityModerationContext';
-import { parseCommunityEvent, type CommunityMember } from '@/lib/communityUtils';
+import { applyCommunityModerationToEvents, parseCommunityEvent, type CommunityMember } from '@/lib/communityUtils';
 import { genUserName } from '@/lib/genUserName';
 import { sanitizeUrl } from '@/lib/sanitizeUrl';
 import { cn } from '@/lib/utils';
@@ -168,7 +168,8 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
 
   // ── Members ─────────────────────────────────────────────────────────────────
   const { data: membership, moderation, memberMap, isLoading: membersLoading } = useCommunityMembers(community);
-  const viewerMember = user ? memberMap.get(user.pubkey) : undefined;
+  const viewerIsBanned = user ? moderation.bannedPubkeys.has(user.pubkey) : false;
+  const viewerMember = user && !viewerIsBanned ? memberMap.get(user.pubkey) : undefined;
 
   // Batch-fetch profiles for all members
   const allMemberPubkeys = useMemo(
@@ -233,6 +234,11 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
     staleTime: 2 * 60_000,
   });
 
+  const moderatedCommunityEvents = useMemo(
+    () => applyCommunityModerationToEvents(communityEvents ?? [], moderation),
+    [communityEvents, moderation],
+  );
+
   // ── Comments (NIP-22 on the community event) ───────────────────────────────
   const { data: commentsData, isLoading: commentsLoading } = useComments(event, 500);
 
@@ -241,11 +247,11 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
     const topLevel = commentsData.topLevelComments ?? [];
 
     // Filter: omit banned events and posts by banned members
-    const isBanned = (ev: NostrEvent): boolean =>
-      moderation.bannedEventIds.has(ev.id) || moderation.bannedPubkeys.has(ev.pubkey);
+    const applyModeration = (events: NostrEvent[]): NostrEvent[] =>
+      applyCommunityModerationToEvents(events, moderation);
 
     const buildNode = (ev: NostrEvent): ReplyNode => {
-      const allChildren = (commentsData.getDirectReplies(ev.id) ?? []).filter((c) => !isBanned(c));
+      const allChildren = applyModeration(commentsData.getDirectReplies(ev.id) ?? []);
       if (allChildren.length <= 1) {
         return {
           event: ev,
@@ -260,8 +266,7 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
       };
     };
 
-    return [...topLevel]
-      .filter((ev) => !isBanned(ev))
+    return applyModeration([...topLevel])
       .sort((a, b) => a.created_at - b.created_at)
       .map((r) => buildNode(r));
   }, [commentsData, moderation]);
@@ -414,16 +419,16 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
             <TabsContent value="events" className="mt-0">
               {eventsLoading ? (
                 <EventsSkeleton />
-              ) : !communityEvents || communityEvents.length === 0 ? (
-                <div className="py-12 text-center">
-                  <p className="text-muted-foreground text-sm">No events yet</p>
-                </div>
-              ) : (
-                <div>
-                  {communityEvents.map((ev) => (
-                    <NoteCard key={ev.id} event={ev} compact />
-                  ))}
-                </div>
+            ) : moderatedCommunityEvents.length === 0 ? (
+              <div className="py-12 text-center">
+                <p className="text-muted-foreground text-sm">No events yet</p>
+              </div>
+            ) : (
+              <div>
+                {moderatedCommunityEvents.map((ev) => (
+                  <NoteCard key={ev.id} event={ev} compact />
+                ))}
+              </div>
               )}
             </TabsContent>
 

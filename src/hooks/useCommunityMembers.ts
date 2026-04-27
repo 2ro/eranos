@@ -23,7 +23,7 @@ interface CommunityMembersResult {
 }
 
 const EMPTY_MODERATION: CommunityModeration = {
-  bannedEventIds: new Set(),
+  contentBansByEventId: new Map(),
   bannedPubkeys: new Set(),
   reportsByEventId: new Map(),
   allReports: [],

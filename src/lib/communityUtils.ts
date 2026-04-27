@@ -190,16 +190,74 @@ export interface CommunityReport {
   reporterPubkey: string;
 }
 
+export interface CommunityContentBan {
+  /** Target event ID claimed by the ban event's `e` tag. */
+  eventId: string;
+  /** Target pubkey claimed by the ban event's `p` tag. */
+  targetPubkey: string;
+  /** The parsed moderation event that requested this ban. */
+  report: CommunityReport;
+}
+
 /** Moderation data resolved for a community. */
 export interface CommunityModeration {
-  /** Set of event IDs that are content-banned (should be omitted entirely). */
-  bannedEventIds: Set<string>;
+  /** Content-ban candidates grouped by target event ID. Apply only when target pubkey matches the actual event author. */
+  contentBansByEventId: Map<string, CommunityContentBan[]>;
   /** Set of pubkeys that are member-banned. */
   bannedPubkeys: Set<string>;
   /** Reports grouped by target event ID (for content warnings). */
   reportsByEventId: Map<string, CommunityReport[]>;
   /** All parsed reports (for moderator review). */
   allReports: CommunityReport[];
+}
+
+export interface ApplyCommunityModerationOptions {
+  /**
+   * When true, omit events whose authors are not validated community members.
+   * This is intended for canonical community feeds. Leave false for contexts
+   * that intentionally include non-member content, such as review surfaces.
+   */
+  requireMembership?: boolean;
+  /** Validated member lookup, required when `requireMembership` is true. */
+  members?: Map<string, CommunityMember>;
+}
+
+/**
+ * Returns true when a resolved content-ban candidate applies to this event.
+ *
+ * The ban event's `p` tag is untrusted until it matches the target event's
+ * actual author. Without this check, a malicious report could pair a real
+ * event ID with a lower-ranked or non-member pubkey to bypass authority checks.
+ */
+export function hasApplicableContentBan(
+  event: NostrEvent,
+  moderation: CommunityModeration,
+): boolean {
+  const candidates = moderation.contentBansByEventId.get(event.id);
+  if (!candidates) return false;
+  return candidates.some((ban) => ban.targetPubkey === event.pubkey);
+}
+
+/**
+ * Applies resolved community moderation to concrete events.
+ *
+ * This function is intentionally pure and content-kind agnostic. Any event kind
+ * can pass through it as long as the caller has already scoped the events to a
+ * community and resolved that community's moderation state.
+ */
+export function applyCommunityModerationToEvents<T extends NostrEvent>(
+  events: T[],
+  moderation: CommunityModeration,
+  options: ApplyCommunityModerationOptions = {},
+): T[] {
+  const { requireMembership = false, members } = options;
+
+  return events.filter((event) => {
+    if (requireMembership && !members?.has(event.pubkey)) return false;
+    if (moderation.bannedPubkeys.has(event.pubkey)) return false;
+    if (hasApplicableContentBan(event, moderation)) return false;
+    return true;
+  });
 }
 
 /**
@@ -292,7 +350,7 @@ export function resolveCommunityModeration(
   reports: NostrEvent[],
   members: Map<string, CommunityMember>,
 ): CommunityModeration {
-  const bannedEventIds = new Set<string>();
+  const contentBansByEventId = new Map<string, CommunityContentBan[]>();
   const bannedPubkeys = new Set<string>();
   const reportsByEventId = new Map<string, CommunityReport[]>();
   const allReports: CommunityReport[] = [];
@@ -333,7 +391,13 @@ export function resolveCommunityModeration(
     if (bannedPubkeys.has(parsed.reporterPubkey)) continue;
 
     if (parsed.action === 'content-ban' && parsed.targetEventId) {
-      bannedEventIds.add(parsed.targetEventId);
+      const existing = contentBansByEventId.get(parsed.targetEventId) ?? [];
+      existing.push({
+        eventId: parsed.targetEventId,
+        targetPubkey: parsed.targetPubkey,
+        report: parsed,
+      });
+      contentBansByEventId.set(parsed.targetEventId, existing);
     } else if (parsed.action === 'member-ban') {
       bannedPubkeys.add(parsed.targetPubkey);
     }
@@ -363,7 +427,7 @@ export function resolveCommunityModeration(
     allReports.push(parsed);
   }
 
-  return { bannedEventIds, bannedPubkeys, reportsByEventId, allReports };
+  return { contentBansByEventId, bannedPubkeys, reportsByEventId, allReports };
 }
 
 /**

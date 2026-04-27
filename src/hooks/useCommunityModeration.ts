@@ -76,11 +76,12 @@ export function useCommunityModeration(event: NostrEvent): CommunityContextForMe
   );
 
   // Resolve membership & moderation (reuses the same query key as CommunityDetailPage)
-  const { memberMap } = useCommunityMembers(community);
+  const { moderation, memberMap } = useCommunityMembers(community);
 
   // Compute the communityContext prop for NoteMoreMenu
   return useMemo(() => {
     if (!communityATag || !user) return undefined;
+    if (moderation.bannedPubkeys.has(user.pubkey)) return undefined;
 
     const viewerMember = memberMap.get(user.pubkey);
     if (!viewerMember) return undefined; // Non-member: no moderation powers
@@ -91,5 +92,5 @@ export function useCommunityModeration(event: NostrEvent): CommunityContextForMe
       : true; // Can ban non-members
 
     return { communityATag, canBan };
-  }, [communityATag, user, memberMap, event.pubkey]);
+  }, [communityATag, user, moderation, memberMap, event.pubkey]);
 }

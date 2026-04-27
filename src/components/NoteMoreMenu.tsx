@@ -221,6 +221,7 @@ export function NoteMoreMenu({ event, open, onOpenChange, communityContext: comm
   const communityContext = useMemo(() => {
     if (communityContextProp) return communityContextProp;
     if (!communityModCtx || !user) return undefined;
+    if (communityModCtx.moderation.bannedPubkeys.has(user.pubkey)) return undefined;
     const viewerMember = communityModCtx.memberMap.get(user.pubkey);
     if (!viewerMember) return undefined; // Non-member: no community report
     const targetMember = communityModCtx.memberMap.get(event.pubkey);

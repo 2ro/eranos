@@ -10,6 +10,7 @@ import {
   BADGE_AWARD_KIND,
   COMMUNITY_DEFINITION_KIND,
   REPORT_KIND,
+  applyCommunityModerationToEvents,
   resolveCommunityModeration,
   resolveMembership,
 } from '@/lib/communityUtils';
@@ -150,17 +151,16 @@ export function useCommunityActivityFeed() {
         }
       }
 
-      // ── Check if an event is banned in its community ──
-      const isBanned = (event: NostrEvent): boolean => {
+      // ── Check whether an event survives moderation in its community ──
+      const isAllowedByModeration = (event: NostrEvent): boolean => {
         // Extract the community A tag from the event
         const eventATag = event.tags.find(([n]) => n === 'A')?.[1];
-        if (!eventATag) return false; // No community scope — not banneable
+        if (!eventATag) return true; // No community scope — not bannable here
 
         const moderation = moderationByATag.get(eventATag);
-        if (!moderation) return false; // No moderation data for this community
+        if (!moderation) return true; // No moderation data for this community
 
-        return moderation.bannedEventIds.has(event.id)
-          || moderation.bannedPubkeys.has(event.pubkey);
+        return applyCommunityModerationToEvents([event], moderation).length > 0;
       };
 
       // ── Merge, deduplicate, and filter ──
@@ -170,7 +170,7 @@ export function useCommunityActivityFeed() {
       for (const event of [...definitionEvents, ...comments]) {
         if (seen.has(event.id)) continue;
         seen.add(event.id);
-        if (isBanned(event)) continue;
+        if (!isAllowedByModeration(event)) continue;
         merged.push(event);
       }
 
