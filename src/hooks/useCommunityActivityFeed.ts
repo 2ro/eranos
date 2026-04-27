@@ -10,7 +10,7 @@ import {
   BADGE_AWARD_KIND,
   COMMUNITY_DEFINITION_KIND,
   REPORT_KIND,
-  applyCommunityModerationToEvents,
+  isEventAllowedByModeration,
   resolveCommunityModeration,
   resolveMembership,
 } from '@/lib/communityUtils';
@@ -20,12 +20,12 @@ interface ActivityFeedResult {
   events: NostrEvent[];
   /** Moderation data keyed by community A tag. */
   moderationByATag: Map<string, CommunityModeration>;
-  /** Member maps keyed by community A tag (pre-moderation, for authority checks). */
-  memberMapByATag: Map<string, Map<string, CommunityMember>>;
+  /** Chain-validated rank maps keyed by community A tag (pre-moderation, for authority checks). */
+  rankMapByATag: Map<string, Map<string, CommunityMember>>;
 }
 
 const EMPTY_MODERATION_MAP = new Map<string, CommunityModeration>();
-const EMPTY_MEMBER_MAP_MAP = new Map<string, Map<string, CommunityMember>>();
+const EMPTY_RANK_MAP_MAP = new Map<string, Map<string, CommunityMember>>();
 
 /**
  * Fetches a chronological activity feed for communities the current user
@@ -42,7 +42,7 @@ const EMPTY_MEMBER_MAP_MAP = new Map<string, Map<string, CommunityMember>>();
  *
  * Sorted by created_at descending.
  *
- * Also returns per-community `moderationByATag` and `memberMapByATag` so
+ * Also returns per-community `moderationByATag` and `rankMapByATag` so
  * callers can provide `CommunityModerationContext` to `NoteMoreMenu`.
  */
 export function useCommunityActivityFeed() {
@@ -56,7 +56,7 @@ export function useCommunityActivityFeed() {
     queryKey: ['community-activity-feed', aTagsKey],
     queryFn: async ({ signal }) => {
       if (aTags.length === 0 || !myCommunities) {
-        return { events: [], moderationByATag: new Map(), memberMapByATag: new Map() };
+        return { events: [], moderationByATag: new Map(), rankMapByATag: new Map() };
       }
 
       const timeout = AbortSignal.timeout(8_000);
@@ -115,7 +115,7 @@ export function useCommunityActivityFeed() {
       // Bans are community-scoped: a member banned in community A should only
       // be filtered from community A's posts, not from community B.
       const moderationByATag = new Map<string, CommunityModeration>();
-      const memberMapByATag = new Map<string, Map<string, CommunityMember>>();
+      const rankMapByATag = new Map<string, Map<string, CommunityMember>>();
 
       // Group reports by community A tag
       const reportsByATag = new Map<string, NostrEvent[]>();
@@ -135,32 +135,29 @@ export function useCommunityActivityFeed() {
 
         // Resolve membership for this community
         const membership = resolveMembership(community, awards);
-        const memberMap = new Map<string, CommunityMember>();
+        const rankMap = new Map<string, CommunityMember>();
         for (const m of membership.members) {
-          memberMap.set(m.pubkey, m);
+          rankMap.set(m.pubkey, m);
         }
-        memberMapByATag.set(community.aTag, memberMap);
+        rankMapByATag.set(community.aTag, rankMap);
 
         // Resolve moderation if there are reports for this community
         const communityReports = reportsByATag.get(community.aTag);
         if (communityReports && communityReports.length > 0) {
           moderationByATag.set(
             community.aTag,
-            resolveCommunityModeration(communityReports, memberMap),
+            resolveCommunityModeration(communityReports, rankMap),
           );
         }
       }
 
       // ── Check whether an event survives moderation in its community ──
-      const isAllowedByModeration = (event: NostrEvent): boolean => {
-        // Extract the community A tag from the event
+      const isAllowed = (event: NostrEvent): boolean => {
         const eventATag = event.tags.find(([n]) => n === 'A')?.[1];
         if (!eventATag) return true; // No community scope — not bannable here
-
         const moderation = moderationByATag.get(eventATag);
         if (!moderation) return true; // No moderation data for this community
-
-        return applyCommunityModerationToEvents([event], moderation).length > 0;
+        return isEventAllowedByModeration(event, moderation);
       };
 
       // ── Merge, deduplicate, and filter ──
@@ -170,14 +167,14 @@ export function useCommunityActivityFeed() {
       for (const event of [...definitionEvents, ...comments]) {
         if (seen.has(event.id)) continue;
         seen.add(event.id);
-        if (!isAllowedByModeration(event)) continue;
+        if (!isAllowed(event)) continue;
         merged.push(event);
       }
 
       // Sort by created_at descending
       merged.sort((a, b) => b.created_at - a.created_at);
 
-      return { events: merged, moderationByATag, memberMapByATag };
+      return { events: merged, moderationByATag, rankMapByATag };
     },
     enabled: !communitiesLoading && aTags.length > 0,
     staleTime: 2 * 60_000,
@@ -186,7 +183,7 @@ export function useCommunityActivityFeed() {
   return useMemo(() => ({
     data: query.data?.events,
     moderationByATag: query.data?.moderationByATag ?? EMPTY_MODERATION_MAP,
-    memberMapByATag: query.data?.memberMapByATag ?? EMPTY_MEMBER_MAP_MAP,
+    rankMapByATag: query.data?.rankMapByATag ?? EMPTY_RANK_MAP_MAP,
     isLoading: query.isLoading,
     isError: query.isError,
     error: query.error,

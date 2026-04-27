@@ -8,28 +8,24 @@ import {
   type CommunityModeration,
   type ParsedCommunity,
   BADGE_AWARD_KIND,
+  EMPTY_MODERATION,
   REPORT_KIND,
   resolveCommunityModeration,
   resolveMembership,
 } from '@/lib/communityUtils';
 
 interface CommunityMembersResult {
-  /** Resolved membership (with banned members removed). */
+  /** Resolved membership with banned members removed. Use `members` to list active community members. */
   membership: CommunityMembership;
   /** Resolved moderation data (bans, reports, content warnings). */
   moderation: CommunityModeration;
-  /** Validated member lookup (pubkey -> member) BEFORE moderation — used for authority checks. */
-  memberMap: Map<string, CommunityMember>;
+  /** Chain-validated rank lookup (pubkey → rank) BEFORE moderation overlay. Includes banned members. Used for authority checks only — do NOT use to list active members. */
+  rankMap: Map<string, CommunityMember>;
 }
 
-const EMPTY_MODERATION: CommunityModeration = {
-  contentBansByEventId: new Map(),
-  bannedPubkeys: new Set(),
-  reportsByEventId: new Map(),
-  allReports: [],
-};
 
-const EMPTY_MEMBER_MAP = new Map<string, CommunityMember>();
+
+const EMPTY_RANK_MAP = new Map<string, CommunityMember>();
 
 /**
  * Fetch and resolve the full membership tree and moderation state for a community.
@@ -47,7 +43,7 @@ export function useCommunityMembers(community: ParsedCommunity | null | undefine
         return {
           membership: { members: [], totalCount: 0 },
           moderation: EMPTY_MODERATION,
-          memberMap: new Map(),
+           rankMap: new Map(),
         };
       }
 
@@ -75,14 +71,14 @@ export function useCommunityMembers(community: ParsedCommunity | null | undefine
       // Step 1-2: Resolve full membership (needed for authority checks)
       const fullMembership = resolveMembership(community, awards);
 
-      // Build member lookup map for authority checks
-      const memberMap = new Map<string, CommunityMember>();
+      // Build rank lookup for authority checks (includes all chain-validated members, even those later banned)
+      const rankMap = new Map<string, CommunityMember>();
       for (const m of fullMembership.members) {
-        memberMap.set(m.pubkey, m);
+        rankMap.set(m.pubkey, m);
       }
 
-      // Step 3: Resolve moderation using the member map
-      const moderation = resolveCommunityModeration(reports, memberMap);
+      // Step 3: Resolve moderation using the rank map
+      const moderation = resolveCommunityModeration(reports, rankMap);
 
       // Step 4: Apply moderation overlay — filter banned members from the
       // already-computed membership rather than re-running chain validation.
@@ -94,7 +90,7 @@ export function useCommunityMembers(community: ParsedCommunity | null | undefine
         totalCount: filteredMembers.length,
       };
 
-      return { membership, moderation, memberMap };
+      return { membership, moderation, rankMap };
     },
     enabled: !!community,
     staleTime: 2 * 60_000,
@@ -104,7 +100,7 @@ export function useCommunityMembers(community: ParsedCommunity | null | undefine
   return useMemo(() => ({
     data: query.data?.membership,
     moderation: query.data?.moderation ?? EMPTY_MODERATION,
-    memberMap: query.data?.memberMap ?? EMPTY_MEMBER_MAP,
+    rankMap: query.data?.rankMap ?? EMPTY_RANK_MAP,
     isLoading: query.isLoading,
     isError: query.isError,
     error: query.error,

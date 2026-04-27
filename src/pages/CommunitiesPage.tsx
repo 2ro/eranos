@@ -13,6 +13,7 @@ import { SubHeaderBar } from '@/components/SubHeaderBar';
 import { TabButton } from '@/components/TabButton';
 import { Skeleton } from '@/components/ui/skeleton';
 import { CommunityModerationContext, type CommunityModerationContextValue } from '@/contexts/CommunityModerationContext';
+import { EMPTY_MODERATION } from '@/lib/communityUtils';
 import { useLayoutOptions } from '@/contexts/LayoutContext';
 import { useAppContext } from '@/hooks/useAppContext';
 import { useCommunityActivityFeed } from '@/hooks/useCommunityActivityFeed';
@@ -193,23 +194,18 @@ function MyCommunitiesContent() {
 
 function ActivitiesTab({ onRefresh }: { onRefresh: () => Promise<void> }) {
   const { user } = useCurrentUser();
-  const { data: activityEvents, isLoading, moderationByATag, memberMapByATag } = useCommunityActivityFeed();
+  const { data: activityEvents, isLoading, moderationByATag, rankMapByATag } = useCommunityActivityFeed();
 
   // Build per-community context values for NoteMoreMenu moderation actions.
   // Keyed by community A tag — each NoteCard is wrapped in its own provider.
   const contextByATag = useMemo(() => {
     const map = new Map<string, CommunityModerationContextValue>();
-    for (const [aTag, memberMap] of memberMapByATag) {
-      const moderation = moderationByATag.get(aTag) ?? {
-        contentBansByEventId: new Map(),
-        bannedPubkeys: new Set<string>(),
-        reportsByEventId: new Map(),
-        allReports: [],
-      };
-      map.set(aTag, { communityATag: aTag, moderation, memberMap });
+    for (const [aTag, rankMap] of rankMapByATag) {
+      const moderation = moderationByATag.get(aTag) ?? EMPTY_MODERATION;
+      map.set(aTag, { communityATag: aTag, moderation, rankMap });
     }
     return map;
-  }, [moderationByATag, memberMapByATag]);
+  }, [moderationByATag, rankMapByATag]);
 
   if (!user) {
     return (

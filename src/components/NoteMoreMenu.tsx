@@ -57,6 +57,7 @@ import { useOrganizers } from '@/hooks/useOrganizers';
 import { usePinnedPosts } from '@/hooks/usePinnedPosts';
 import { useCountryFeed } from '@/contexts/CountryFeedContext';
 import { useCommunityModerationContext } from '@/contexts/CommunityModerationContext';
+import { type CommunityMenuContext, canBanTarget, getViewerAuthority } from '@/lib/communityUtils';
 import { isAdmin } from '@/lib/admins';
 import { genUserName } from '@/lib/genUserName';
 import { timeAgo } from '@/lib/timeAgo';
@@ -70,12 +71,7 @@ interface NoteMoreMenuProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   /** Community context for community-scoped events. When provided, the community report dialog is shown instead of the global one. */
-  communityContext?: {
-    /** The community `A` tag coordinate (e.g. `34550:<pubkey>:<d-tag>`). */
-    communityATag: string;
-    /** Whether the current user has authority to ban this event's author. */
-    canBan: boolean;
-  };
+  communityContext?: CommunityMenuContext;
 }
 
 interface MenuItemProps {
@@ -221,16 +217,11 @@ export function NoteMoreMenu({ event, open, onOpenChange, communityContext: comm
   const communityContext = useMemo(() => {
     if (communityContextProp) return communityContextProp;
     if (!communityModCtx || !user) return undefined;
-    if (communityModCtx.moderation.bannedPubkeys.has(user.pubkey)) return undefined;
-    const viewerMember = communityModCtx.memberMap.get(user.pubkey);
-    if (!viewerMember) return undefined; // Non-member: no community report
-    const targetMember = communityModCtx.memberMap.get(event.pubkey);
-    const canBan = targetMember
-      ? viewerMember.rank < targetMember.rank
-      : true; // Can ban non-members
+    const viewerMember = getViewerAuthority(user.pubkey, communityModCtx.rankMap, communityModCtx.moderation);
+    if (!viewerMember) return undefined;
     return {
       communityATag: communityModCtx.communityATag,
-      canBan,
+      canBan: canBanTarget(viewerMember, communityModCtx.rankMap.get(event.pubkey)),
     };
   }, [communityContextProp, communityModCtx, user, event.pubkey]);
 

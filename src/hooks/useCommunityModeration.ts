@@ -5,15 +5,7 @@ import type { NostrEvent } from '@nostrify/nostrify';
 
 import { useCommunityMembers } from '@/hooks/useCommunityMembers';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
-import { COMMUNITY_DEFINITION_KIND, parseCommunityEvent } from '@/lib/communityUtils';
-
-/**
- * The shape expected by NoteMoreMenu's `communityContext` prop.
- */
-interface CommunityContextForMenu {
-  communityATag: string;
-  canBan: boolean;
-}
+import { type CommunityMenuContext, COMMUNITY_DEFINITION_KIND, canBanTarget, getViewerAuthority, parseCommunityEvent } from '@/lib/communityUtils';
 
 /**
  * Given a Nostr event, resolve its community moderation context (if any).
@@ -28,7 +20,7 @@ interface CommunityContextForMenu {
  * - The viewer is not a member of the community
  * - Data is still loading
  */
-export function useCommunityModeration(event: NostrEvent): CommunityContextForMenu | undefined {
+export function useCommunityModeration(event: NostrEvent): CommunityMenuContext | undefined {
   const { nostr } = useNostr();
   const { user } = useCurrentUser();
 
@@ -76,21 +68,15 @@ export function useCommunityModeration(event: NostrEvent): CommunityContextForMe
   );
 
   // Resolve membership & moderation (reuses the same query key as CommunityDetailPage)
-  const { moderation, memberMap } = useCommunityMembers(community);
+  const { moderation, rankMap } = useCommunityMembers(community);
 
   // Compute the communityContext prop for NoteMoreMenu
   return useMemo(() => {
     if (!communityATag || !user) return undefined;
-    if (moderation.bannedPubkeys.has(user.pubkey)) return undefined;
 
-    const viewerMember = memberMap.get(user.pubkey);
-    if (!viewerMember) return undefined; // Non-member: no moderation powers
+    const viewerMember = getViewerAuthority(user.pubkey, rankMap, moderation);
+    if (!viewerMember) return undefined;
 
-    const targetMember = memberMap.get(event.pubkey);
-    const canBan = targetMember
-      ? viewerMember.rank < targetMember.rank
-      : true; // Can ban non-members
-
-    return { communityATag, canBan };
-  }, [communityATag, user, moderation, memberMap, event.pubkey]);
+    return { communityATag, canBan: canBanTarget(viewerMember, rankMap.get(event.pubkey)) };
+  }, [communityATag, user, moderation, rankMap, event.pubkey]);
 }

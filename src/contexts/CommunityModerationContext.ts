@@ -12,8 +12,8 @@ export interface CommunityModerationContextValue {
   communityATag: string;
   /** Resolved moderation data (bans, reports, content warnings). */
   moderation: CommunityModeration;
-  /** Pre-moderation member lookup (pubkey -> CommunityMember) for authority checks. */
-  memberMap: Map<string, CommunityMember>;
+  /** Chain-validated rank lookup (pubkey → rank). Includes banned members — for authority checks only. */
+  rankMap: Map<string, CommunityMember>;
 }
 
 export const CommunityModerationContext = createContext<CommunityModerationContextValue | null>(null);

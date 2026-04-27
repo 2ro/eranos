@@ -158,10 +158,45 @@ export interface CommunityMember {
 }
 
 export interface CommunityMembership {
-  /** All validated members grouped by rank. */
+  /** Active members with banned members removed. Use this to list community members. */
   members: CommunityMember[];
-  /** Convenience: count of all members (including founder + moderators). */
+  /** Convenience: count of active members (including founder + moderators). */
   totalCount: number;
+}
+
+/**
+ * The shape expected by NoteMoreMenu's `communityContext` prop.
+ * Computed from rank + moderation data for a specific viewer/target pair.
+ */
+export interface CommunityMenuContext {
+  /** The community `A` tag coordinate (e.g. `34550:<pubkey>:<d-tag>`). */
+  communityATag: string;
+  /** Whether the current viewer has rank authority to ban this event's author. */
+  canBan: boolean;
+}
+
+// ── Authority helpers ─────────────────────────────────────────────────────────
+
+/**
+ * Whether `viewer` has rank authority to ban `target`.
+ * Non-members (target is undefined) can always be banned by any member.
+ */
+export function canBanTarget(viewer: CommunityMember, target: CommunityMember | undefined): boolean {
+  return target ? viewer.rank < target.rank : true;
+}
+
+/**
+ * Look up the viewer's rank entry, returning undefined if they are not a
+ * member or are banned. Use this to gate moderation UI — if the result is
+ * undefined, the viewer has no moderation authority.
+ */
+export function getViewerAuthority(
+  viewerPubkey: string,
+  rankMap: Map<string, CommunityMember>,
+  moderation: CommunityModeration,
+): CommunityMember | undefined {
+  if (moderation.bannedPubkeys.has(viewerPubkey)) return undefined;
+  return rankMap.get(viewerPubkey);
 }
 
 // ── Community moderation ──────────────────────────────────────────────────────
@@ -211,16 +246,13 @@ export interface CommunityModeration {
   allReports: CommunityReport[];
 }
 
-export interface ApplyCommunityModerationOptions {
-  /**
-   * When true, omit events whose authors are not validated community members.
-   * This is intended for canonical community feeds. Leave false for contexts
-   * that intentionally include non-member content, such as review surfaces.
-   */
-  requireMembership?: boolean;
-  /** Validated member lookup, required when `requireMembership` is true. */
-  members?: Map<string, CommunityMember>;
-}
+/** Empty moderation sentinel — no bans, no reports. */
+export const EMPTY_MODERATION: CommunityModeration = {
+  contentBansByEventId: new Map(),
+  bannedPubkeys: new Set(),
+  reportsByEventId: new Map(),
+  allReports: [],
+};
 
 /**
  * Returns true when a resolved content-ban candidate applies to this event.
@@ -239,6 +271,20 @@ export function hasApplicableContentBan(
 }
 
 /**
+ * Returns true when a single event survives community moderation
+ * (not banned by author or content ban). Use for single-event checks;
+ * use `applyCommunityModerationToEvents` for batch filtering.
+ */
+export function isEventAllowedByModeration(
+  event: NostrEvent,
+  moderation: CommunityModeration,
+): boolean {
+  if (moderation.bannedPubkeys.has(event.pubkey)) return false;
+  if (hasApplicableContentBan(event, moderation)) return false;
+  return true;
+}
+
+/**
  * Applies resolved community moderation to concrete events.
  *
  * This function is intentionally pure and content-kind agnostic. Any event kind
@@ -248,16 +294,8 @@ export function hasApplicableContentBan(
 export function applyCommunityModerationToEvents<T extends NostrEvent>(
   events: T[],
   moderation: CommunityModeration,
-  options: ApplyCommunityModerationOptions = {},
 ): T[] {
-  const { requireMembership = false, members } = options;
-
-  return events.filter((event) => {
-    if (requireMembership && !members?.has(event.pubkey)) return false;
-    if (moderation.bannedPubkeys.has(event.pubkey)) return false;
-    if (hasApplicableContentBan(event, moderation)) return false;
-    return true;
-  });
+  return events.filter((event) => isEventAllowedByModeration(event, moderation));
 }
 
 /**

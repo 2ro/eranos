@@ -32,7 +32,7 @@ import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useProfileUrl } from '@/hooks/useProfileUrl';
 import { useToast } from '@/hooks/useToast';
 import { CommunityModerationContext } from '@/contexts/CommunityModerationContext';
-import { applyCommunityModerationToEvents, parseCommunityEvent, type CommunityMember } from '@/lib/communityUtils';
+import { applyCommunityModerationToEvents, canBanTarget, getViewerAuthority, parseCommunityEvent, type CommunityMember } from '@/lib/communityUtils';
 import { genUserName } from '@/lib/genUserName';
 import { sanitizeUrl } from '@/lib/sanitizeUrl';
 import { cn } from '@/lib/utils';
@@ -167,9 +167,8 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
   }, [description, descriptionUrl]);
 
   // ── Members ─────────────────────────────────────────────────────────────────
-  const { data: membership, moderation, memberMap, isLoading: membersLoading } = useCommunityMembers(community);
-  const viewerIsBanned = user ? moderation.bannedPubkeys.has(user.pubkey) : false;
-  const viewerMember = user && !viewerIsBanned ? memberMap.get(user.pubkey) : undefined;
+  const { data: membership, moderation, rankMap, isLoading: membersLoading } = useCommunityMembers(community);
+  const viewerMember = user ? getViewerAuthority(user.pubkey, rankMap, moderation) : undefined;
 
   // Batch-fetch profiles for all members
   const allMemberPubkeys = useMemo(
@@ -342,7 +341,7 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
         </div>
 
         {/* ── Tabs ── */}
-        <CommunityModerationContext.Provider value={communityATag ? { communityATag, moderation, memberMap } : null}>
+        <CommunityModerationContext.Provider value={communityATag ? { communityATag, moderation, rankMap } : null}>
           <Tabs defaultValue="members" className="-mx-5">
             <TabsList className="w-full rounded-none border-b border-border bg-transparent p-0 h-auto">
               <TabsTrigger
@@ -394,7 +393,7 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
                           // Determine if the current user can ban this member
                           const canBanMember = viewerMember
                             && m.pubkey !== user?.pubkey
-                            && viewerMember.rank < m.rank;
+                            && canBanTarget(viewerMember, m);
                           return (
                             <PersonRow
                               key={m.pubkey}
