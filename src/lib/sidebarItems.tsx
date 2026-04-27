@@ -114,6 +114,13 @@ export const SIDEBAR_ITEMS: SidebarItemDef[] = [
     icon: Bell,
     requiresAuth: true,
   },
+  {
+    id: "messages",
+    label: "Messages",
+    path: "/messages",
+    icon: MessageSquareMore,
+    requiresAuth: true,
+  },
   { id: "search", label: "Search", path: "/search", icon: Search },
   {
     id: "verified",

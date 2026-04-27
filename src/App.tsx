@@ -8,7 +8,7 @@ import { InferSeoMetaPlugin } from "@unhead/addons";
 import { createHead, UnheadProvider } from "@unhead/react/client";
 import { useEffect } from "react";
 import { AppProvider } from "@/components/AppProvider";
-import { DMProvider, type DMConfig } from "@/components/DMProvider";
+import { DMProviderWrapper } from "@/components/DMProviderWrapper";
 import { InitialSyncGate } from "@/components/InitialSyncGate";
 import { NativeNotifications } from "@/components/NativeNotifications";
 import NostrProvider from "@/components/NostrProvider";
@@ -22,16 +22,11 @@ import { useNsecPasteGuard } from "@/hooks/useNsecPasteGuard";
 import type { AppConfig } from "@/contexts/AppContext";
 import { NWCProvider } from "@/contexts/NWCContext";
 import { SparkWalletProvider } from "@/contexts/SparkWalletContext";
-import { PROTOCOL_MODE } from "@/lib/dmConstants";
 import { BuildConfigSchema, type BuildConfig } from "@/lib/schemas";
 import { secureStorage } from "@/lib/secureStorage";
 import { EmotionDevProvider } from "@/blobbi/dev/EmotionDevContext";
+import { PROTOCOL_MODE } from "@samthomson/nostr-messaging/core";
 import AppRouter from "./AppRouter";
-
-const dmConfig: DMConfig = {
-  enabled: false,
-  protocolMode: PROTOCOL_MODE.NIP04_OR_NIP17,
-};
 
 const head = createHead({
   plugins: [InferSeoMetaPlugin()],
@@ -132,6 +127,7 @@ const hardcodedConfig: AppConfig = {
     "badges",
     "feed",
     "notifications",
+    "messages",
     "communities",
     "profile",
     "settings",
@@ -159,6 +155,14 @@ const hardcodedConfig: AppConfig = {
     { id: 'trends' },
     { id: 'hot-posts' },
   ],
+  messaging: {
+    enabled: true,
+    relayMode: 'hybrid',
+    protocolMode: PROTOCOL_MODE.NIP17_ONLY,
+    renderInlineMedia: true,
+    soundEnabled: false,
+    devMode: false,
+  },
 };
 
 /**
@@ -216,7 +220,7 @@ export function App() {
 
                     <NWCProvider>
                     <SparkWalletProvider>
-                    <DMProvider config={dmConfig}>
+                    <DMProviderWrapper>
                       <EmotionDevProvider>
                         <TooltipProvider>
                           <InitialSyncGate>
@@ -224,7 +228,7 @@ export function App() {
                           </InitialSyncGate>
                         </TooltipProvider>
                       </EmotionDevProvider>
-                    </DMProvider>
+                    </DMProviderWrapper>
                     </SparkWalletProvider>
                   </NWCProvider>
                 </NostrProvider>

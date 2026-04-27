@@ -2,6 +2,7 @@ import { useRef } from 'react';
 import { useNostr } from '@nostrify/react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import type { NostrFilter } from '@nostrify/nostrify';
+import type { ProtocolMode } from '@samthomson/nostr-messaging/core';
 
 import { useAppContext } from '@/hooks/useAppContext';
 import { useCurrentUser } from './useCurrentUser';
@@ -104,6 +105,17 @@ export interface EncryptedSettings {
   sentryDsn?: string;
   /** Saved feed tabs created from the search page. */
   savedFeeds?: SavedFeed[];
+  /** Direct messaging settings. */
+  messaging?: {
+    enabled?: boolean;
+    discoveryRelays?: string[];
+    relayMode?: 'discovery' | 'hybrid' | 'strict_outbox';
+    protocolMode?: ProtocolMode;
+    renderInlineMedia?: boolean;
+    soundEnabled?: boolean;
+    soundId?: string;
+    devMode?: boolean;
+  };
   /** Letter preferences (stationery, font, frame, closing, signature, inbox filters) */
   letterPreferences?: LetterPreferences;
 }

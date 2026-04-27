@@ -39,6 +39,36 @@ npm run dev
 
 Development server: `http://localhost:8080`
 
+### Docker Getting Started
+
+Use Docker Compose when you want the nginx reverse-proxy stack (necessary if you want decryptable media in messages - kind 15s of NIP 17):
+
+```sh
+git clone https://gitlab.com/soapbox-pub/agora-3.git
+cd agora-3
+cp .env.example .env
+docker compose up --build
+```
+
+Proxy URL: `http://localhost:8083`
+
+This starts:
+
+- `vite` service on the internal Docker network (`vite:8080`)
+- `web` service (`nginx`) on host port `8082`, proxying to Vite with websocket support
+
+Stop stack:
+
+```sh
+docker compose down
+```
+
+Production-style container build:
+
+```sh
+docker compose -f docker-compose.prod.yml up --build
+```
+
 ### Build
 
 ```sh

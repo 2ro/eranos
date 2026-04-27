@@ -1,7 +1,14 @@
 import { z } from 'zod';
+import { PROTOCOL_MODE } from '@samthomson/nostr-messaging/core';
 
 import type { Theme, ContentWarningPolicy } from '@/contexts/AppContext';
 import type { CoreThemeColors, ThemeConfig, ThemesConfig } from '@/themes';
+
+const PROTOCOL_MODE_VALUES = [
+  PROTOCOL_MODE.NIP04_ONLY,
+  PROTOCOL_MODE.NIP17_ONLY,
+  PROTOCOL_MODE.NIP04_OR_NIP17,
+] as const;
 
 // ─── Theme Schemas ───────────────────────────────────────────────────
 
@@ -256,6 +263,16 @@ export const AppConfigSchema = z.object({
     id: z.string(),
     height: z.number().optional(),
   })).optional(),
+  messaging: z.object({
+    enabled: z.boolean().optional(),
+    discoveryRelays: z.array(z.string().url()).optional(),
+    relayMode: z.enum(['discovery', 'hybrid', 'strict_outbox']).optional(),
+    protocolMode: z.enum(PROTOCOL_MODE_VALUES).optional(),
+    renderInlineMedia: z.boolean().optional(),
+    soundEnabled: z.boolean().optional(),
+    soundId: z.string().optional(),
+    devMode: z.boolean().optional(),
+  }).optional(),
 });
 
 // ─── BuildConfigSchema (build-time app config) ───────────────────────
@@ -334,6 +351,16 @@ export const EncryptedSettingsSchema = z.looseObject({
     id: z.string(),
     height: z.number().optional(),
   })).optional(),
+  messaging: z.object({
+    enabled: z.boolean().optional(),
+    discoveryRelays: z.array(z.string().url()).optional(),
+    relayMode: z.enum(['discovery', 'hybrid', 'strict_outbox']).optional(),
+    protocolMode: z.enum(PROTOCOL_MODE_VALUES).optional(),
+    renderInlineMedia: z.boolean().optional(),
+    soundEnabled: z.boolean().optional(),
+    soundId: z.string().optional(),
+    devMode: z.boolean().optional(),
+  }).optional(),
   homePage: z.string().optional(),
   showGlobalFeed: z.boolean().optional(),
   showCommunityFeed: z.boolean().optional(),
