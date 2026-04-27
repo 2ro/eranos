@@ -16,6 +16,7 @@ import {
   Share2,
   SmilePlus,
   PartyPopper,
+  Target,
   Users,
   Zap,
 } from "lucide-react";
@@ -48,6 +49,7 @@ import { FollowPackContent } from "@/components/FollowPackContent";
 import { FoundLogContent } from "@/components/FoundLogContent";
 import { GeocacheContent } from "@/components/GeocacheContent";
 import { GitRepoCard } from "@/components/GitRepoCard";
+import { GoalContent } from "@/components/GoalContent";
 import { NsiteCard } from "@/components/NsiteCard";
 import { ImageGallery } from "@/components/ImageGallery";
 import { CardsIcon } from "@/components/icons/CardsIcon";
@@ -400,6 +402,7 @@ export const NoteCard = memo(function NoteCard({
   const isProfileBadges = event.kind === 10008 || event.kind === 30008;
   const isBadge = isBadgeDefinition || isProfileBadges;
   const isCommunity = event.kind === 34550;
+  const isZapGoal = event.kind === 9041;
   const isReaction = event.kind === 7;
   const isPollVote = event.kind === 1018;
   const isRepost = event.kind === 6 || event.kind === 16;
@@ -444,6 +447,7 @@ export const NoteCard = memo(function NoteCard({
     !isEmojiPack &&
     !isBadge &&
     !isCommunity &&
+    !isZapGoal &&
     !isReaction &&
     !isPollVote &&
     !isRepost &&
@@ -601,6 +605,8 @@ export const NoteCard = memo(function NoteCard({
           <ProfileBadgesContent event={event} />
         ) : isCommunity ? (
           <CommunityContent event={event} />
+        ) : isZapGoal ? (
+          <GoalContent event={event} />
         ) : isVoiceMessage ? (
           <VoiceMessagePlayer event={event} />
         ) : isCalendarEvent ? (
@@ -1689,6 +1695,11 @@ const KIND_HEADER_MAP: Record<number, KindHeaderConfig> = {
     action: (event) => publishedAtAction(event, { created: "created a", updated: "updated a", fallback: "shared a" }),
     noun: "community",
     nounRoute: "/communities",
+  },
+  9041: {
+    icon: Target,
+    action: "created a",
+    noun: "fundraising goal",
   },
   30009: {
     icon: Award,

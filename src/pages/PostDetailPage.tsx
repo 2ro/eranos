@@ -127,6 +127,7 @@ function shellTitleForKind(kind?: number): string {
   if (PODCAST_KINDS.has(kind)) return "Episode Details";
   if (CALENDAR_EVENT_KINDS.has(kind)) return "Event Details";
   if (kind === 34550) return "Community";
+  if (kind === 9041) return "Fundraising Goal";
   if (FOLLOW_PACK_KINDS.has(kind)) return "Follow Pack";
   if (kind === LIVE_STREAM_KIND) return "Live Stream";
   if (kind === 30617) return "Repository";
@@ -418,6 +419,7 @@ export function AddrPostDetailPage({ addr, relays }: AddrPostDetailPageProps) {
     </PostDetailShell>
   );
 }
+
 
 /** NoteCard + NIP-22 comments section for kind 10008/30008 profile badges detail page. */
 function ProfileBadgesDetailView({ event }: { event: NostrEvent }) {

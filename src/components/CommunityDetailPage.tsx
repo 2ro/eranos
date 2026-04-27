@@ -8,6 +8,7 @@ import {
   Shield,
   ShieldBan,
   Share2,
+  Target,
   Users,
 } from 'lucide-react';
 import type { NostrEvent, NostrMetadata } from '@nostrify/nostrify';
@@ -19,18 +20,22 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { BanConfirmDialog } from '@/components/BanConfirmDialog';
 import { ComposeBox } from '@/components/ComposeBox';
+import { CreateGoalDialog } from '@/components/CreateGoalDialog';
+import { GoalCard, GoalCardSkeleton } from '@/components/GoalCard';
 import { MembersOnlyToggle } from '@/components/MembersOnlyToggle';
 import { ThreadedReplyList, type ReplyNode } from '@/components/ThreadedReplyList';
 import { useAuthor } from '@/hooks/useAuthor';
 import { useAuthors } from '@/hooks/useAuthors';
 import { useComments } from '@/hooks/useComments';
 import { useCommunityMembers } from '@/hooks/useCommunityMembers';
+import { useCommunityGoals } from '@/hooks/useCommunityGoals';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useMembersOnlyFilter } from '@/hooks/useMembersOnlyFilter';
 import { useProfileUrl } from '@/hooks/useProfileUrl';
 import { useToast } from '@/hooks/useToast';
 import { CommunityModerationContext } from '@/contexts/CommunityModerationContext';
 import { applyCommunityModerationToEvents, canBanTarget, getViewerAuthority, parseCommunityEvent, type CommunityMember } from '@/lib/communityUtils';
+import { isGoalExpired } from '@/lib/goalUtils';
 import { genUserName } from '@/lib/genUserName';
 import { sanitizeUrl } from '@/lib/sanitizeUrl';
 import { cn } from '@/lib/utils';
@@ -191,6 +196,19 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
   const { data: commentsData, isLoading: commentsLoading } = useComments(event, 500);
   const { membersOnly } = useMembersOnlyFilter();
 
+  // ── Fundraising goals (NIP-75) ──────────────────────────────────────────────
+  const { data: goals, isLoading: goalsLoading } = useCommunityGoals(communityATag || undefined);
+  const activeGoals = useMemo(() => {
+    const all = (goals ?? []).filter((g) => !isGoalExpired(g.goal));
+    if (!membersOnly) return all;
+    return all.filter((g) => rankMap.has(g.event.pubkey));
+  }, [goals, membersOnly, rankMap]);
+  const pastGoals = useMemo(() => {
+    const all = (goals ?? []).filter((g) => isGoalExpired(g.goal));
+    if (!membersOnly) return all;
+    return all.filter((g) => rankMap.has(g.event.pubkey));
+  }, [goals, membersOnly, rankMap]);
+
   const replyTree = useMemo((): ReplyNode[] => {
     if (!commentsData) return [];
     const topLevel = commentsData.topLevelComments ?? [];
@@ -320,6 +338,13 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
                 <MessageCircle className="size-4 mr-1.5" />
                 Comments
               </TabsTrigger>
+              <TabsTrigger
+                value="fundraising"
+                className="flex-1 rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none pb-3 pt-2"
+              >
+                <Target className="size-4 mr-1.5" />
+                Fundraising
+              </TabsTrigger>
             </TabsList>
 
             {/* ── Members tab ── */}
@@ -388,6 +413,55 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
               ) : (
                 <div className="py-12 text-center text-muted-foreground text-sm">
                   No comments yet. Be the first to comment!
+                </div>
+              )}
+            </TabsContent>
+
+            {/* ── Fundraising tab ── */}
+            <TabsContent value="fundraising" className="mt-0">
+              {/* Create goal button */}
+              {user && communityATag && (
+                <div className="px-5 py-3 border-b border-border">
+                  <CreateGoalDialog communityATag={communityATag} />
+                </div>
+              )}
+
+              {goalsLoading ? (
+                <div className="px-5 py-4 space-y-4">
+                  {Array.from({ length: 2 }).map((_, i) => (
+                    <GoalCardSkeleton key={i} />
+                  ))}
+                </div>
+              ) : activeGoals.length === 0 && pastGoals.length === 0 ? (
+                <div className="py-12 text-center text-muted-foreground text-sm px-5">
+                  {membersOnly && (goals ?? []).length > 0
+                    ? 'No fundraising goals from community members yet. Toggle the shield icon to see all goals.'
+                    : <>No fundraising goals yet.{user ? ' Create one to get started!' : ''}</>}
+                </div>
+              ) : (
+                <div className="px-5 py-4 space-y-4">
+                  {/* Active goals first */}
+                  {activeGoals.length > 0 && (
+                    <div className="space-y-4">
+                      {activeGoals.map((g) => (
+                        <GoalCard key={g.event.id} event={g.event} goal={g.goal} />
+                      ))}
+                    </div>
+                  )}
+
+                  {/* Past/expired goals */}
+                  {pastGoals.length > 0 && (
+                    <div className="space-y-3">
+                      {activeGoals.length > 0 && (
+                        <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wide pt-2">
+                          Past Goals
+                        </h4>
+                      )}
+                      {pastGoals.map((g) => (
+                        <GoalCard key={g.event.id} event={g.event} goal={g.goal} />
+                      ))}
+                    </div>
+                  )}
                 </div>
               )}
             </TabsContent>

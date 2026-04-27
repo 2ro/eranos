@@ -14,6 +14,7 @@ import {
   resolveCommunityModeration,
   resolveMembership,
 } from '@/lib/communityUtils';
+import { ZAP_GOAL_KIND } from '@/lib/goalUtils';
 
 /** Internal result type — events plus per-community moderation/membership data. */
 interface ActivityFeedResult {
@@ -70,8 +71,8 @@ export function useCommunityActivityFeed() {
         }
       }
 
-      // Fetch community definitions, comments, reports, and badge awards in parallel
-      const [definitionEvents, comments, reports, awards] = await Promise.all([
+      // Fetch community definitions, comments, reports, badge awards, and goals in parallel
+      const [definitionEvents, comments, reports, awards, goals] = await Promise.all([
         // The community definitions themselves
         nostr.query(
           [{
@@ -107,6 +108,15 @@ export function useCommunityActivityFeed() {
             { signal: combinedSignal },
           )
           : Promise.resolve([]),
+        // NIP-75 zap goals linked to these communities (lowercase a tag)
+        nostr.query(
+          [{
+            kinds: [ZAP_GOAL_KIND],
+            '#a': aTags,
+            limit: 50,
+          }],
+          { signal: combinedSignal },
+        ),
       ]);
 
       // ── Resolve membership and moderation per community ──
@@ -158,7 +168,7 @@ export function useCommunityActivityFeed() {
       const seen = new Set<string>();
       const merged: NostrEvent[] = [];
 
-      for (const event of [...definitionEvents, ...comments]) {
+      for (const event of [...definitionEvents, ...comments, ...goals]) {
         if (seen.has(event.id)) continue;
         seen.add(event.id);
         if (!isAllowed(event)) continue;

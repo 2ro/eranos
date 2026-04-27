@@ -91,6 +91,7 @@ const NOTIFICATION_KIND_NOUNS: Record<number, string> = {
   34139: 'playlist',
   34236: 'divine',
   34550: 'community',
+  9041: 'fundraising goal',
   35128: 'nsite',
   36787: 'track',
   37381: 'Magic deck',

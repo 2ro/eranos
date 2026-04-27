@@ -3,10 +3,10 @@ import { type ReactNode, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { nip19 } from 'nostr-tools';
 import {
-  Award, BarChart3, BookOpen, Camera, Clapperboard, FileText, Film,
+  Award, BarChart3, BookOpen, Camera, Clapperboard, Egg, FileText, Film,
   GitBranch, GitPullRequest, Mail, MapPin, MessageSquare, Mic, Music,
   Package, Palette, PartyPopper, Podcast, Radio, Rocket, SmilePlus,
-  Users, Vote, Zap,
+  Target, Users, Vote, Zap,
 } from 'lucide-react';
 import type { NostrEvent } from '@nostrify/nostrify';
 
@@ -134,6 +134,7 @@ const KIND_LABELS: Record<number, string> = {
   34139: 'a playlist',
   34236: 'a divine',
   34550: 'a community',
+  9041: 'a fundraising goal',
   35128: 'an nsite',
   36639: 'an action',
   36787: 'a track',
@@ -184,6 +185,8 @@ const KIND_ICONS: Partial<Record<number, React.ComponentType<{ className?: strin
   7516: ChestIcon,
   39089: PartyPopper,
   3367: Palette,
+  9041: Target,
+  31124: Egg,
   9735: Zap,
 };
 

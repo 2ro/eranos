@@ -1082,6 +1082,7 @@ function hasVideo(tags: string[][]): boolean {
 
 /** Fallback labels for well-known kinds not in EXTRA_KINDS. */
 const WELL_KNOWN_KIND_LABELS: Record<number, string> = {
+  9041: 'Fundraising Goal',
   31990: 'App',
   32267: 'Zapstore App',
   30063: 'Zapstore Release',
