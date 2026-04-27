@@ -317,13 +317,15 @@ function hasBanLabel(event: NostrEvent): boolean {
 }
 
 /**
- * Parse a community-scoped kind 1984 event into a structured report.
- * Returns `null` if the event is not a valid community report.
+ * Parse a kind 1984 event into a structured report based on its
+ * structural tags (target, ban label, report type).
  *
- * Callers are expected to have already scoped the input to a community
- * (e.g. via `#A` relay filter), so this parser does not re-verify the
- * event's `A` tag — it only validates the structural tags that determine
- * classification.
+ * This parser is **community-agnostic** — it does not validate the `A`
+ * tag or any community scoping. Callers that need a community-scoped
+ * view (the common case) should use `resolveCommunityModeration`, which
+ * enforces the `A` tag match against a specific community.
+ *
+ * Returns `null` if the event's structure is not a valid NIP-56 report.
  */
 export function parseCommunityReport(event: NostrEvent): CommunityReport | null {
   if (event.kind !== REPORT_KIND) return null;
@@ -371,6 +373,12 @@ export function parseCommunityReport(event: NostrEvent): CommunityReport | null 
 /**
  * Process community-scoped kind 1984 events into moderation data.
  *
+ * Events are filtered to those carrying an `A` tag matching
+ * `communityATag` before classification. This enforces the trust boundary
+ * at the public API surface so callers cannot accidentally cross-pollinate
+ * moderation state between communities (e.g. when a single relay query
+ * returns reports scoped to multiple communities via `#A`).
+ *
  * Uses a two-pass approach to prevent banned members from retaining
  * moderation authority:
  *
@@ -387,10 +395,13 @@ export function parseCommunityReport(event: NostrEvent): CommunityReport | null 
  * banned set from pass 1. This prevents banned members from polluting the
  * report queue.
  *
- * @param reports - Kind 1984 events scoped to the community.
+ * @param communityATag - The community's `A` tag value (`34550:<pubkey>:<d>`).
+ * @param reports - Candidate kind 1984 events. Events without a matching
+ *                  `A` tag are ignored.
  * @param members - Validated membership map (pubkey -> CommunityMember).
  */
 export function resolveCommunityModeration(
+  communityATag: string,
   reports: NostrEvent[],
   members: Map<string, CommunityMember>,
 ): CommunityModeration {
@@ -399,10 +410,17 @@ export function resolveCommunityModeration(
   const reportsByEventId = new Map<string, CommunityReport[]>();
   const allReports: CommunityReport[] = [];
 
-  // Parse every event once. Drop anything that fails classification or is
-  // not authored by a validated member (membership overlay rules).
+  // Parse every event once. Drop anything that:
+  //  - lacks an `A` tag matching this community (trust-boundary check;
+  //    protects against mixed-community event sets)
+  //  - fails structural classification
+  //  - is not authored by a validated member (membership overlay rules)
   const parsed: CommunityReport[] = [];
   for (const event of reports) {
+    const hasMatchingATag = event.tags.some(
+      ([n, v]) => n === 'A' && v === communityATag,
+    );
+    if (!hasMatchingATag) continue;
     const p = parseCommunityReport(event);
     if (!p) continue;
     if (!members.has(p.reporterPubkey)) continue;

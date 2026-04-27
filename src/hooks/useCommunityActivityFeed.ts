@@ -1,12 +1,11 @@
 import { useMemo } from 'react';
 import { useNostr } from '@nostrify/react';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import type { NostrEvent } from '@nostrify/nostrify';
 
 import { useMyCommunities } from './useMyCommunities';
 import {
   type CommunityMember,
-  type CommunityMembership,
   type CommunityModeration,
   BADGE_AWARD_KIND,
   COMMUNITY_DEFINITION_KIND,
@@ -48,7 +47,6 @@ const EMPTY_RANK_MAP_BY_A_TAG: ReadonlyMap<string, Map<string, CommunityMember>>
  */
 export function useCommunityActivityFeed() {
   const { nostr } = useNostr();
-  const queryClient = useQueryClient();
   const { data: myCommunities, isLoading: communitiesLoading } = useMyCommunities();
 
   const aTags = myCommunities?.map((c) => c.community.aTag).filter(Boolean) ?? [];
@@ -114,23 +112,18 @@ export function useCommunityActivityFeed() {
       // ── Resolve membership and moderation per community ──
       // Membership is resolved for all communities so callers can provide
       // CommunityModerationContext (for NoteMoreMenu ban actions).
-      // Bans are community-scoped: a member banned in community A should only
-      // be filtered from community A's posts, not from community B.
+      // Bans are community-scoped: a member banned in community A should
+      // only be filtered from community A's posts, not from community B.
+      //
+      // We do **not** seed the `['community-members', aTag]` cache from
+      // this hook. The activity feed uses shared relay limits across all
+      // subscribed communities (awards and reports both capped at 500
+      // total), so per-community results can be incomplete. Overwriting
+      // the members cache with incomplete data would silently corrupt
+      // membership, authority, and moderation state on detail pages.
+      // `useCommunityMembers` is the authoritative per-community fetch.
       const moderationByATag = new Map<string, CommunityModeration>();
       const rankMapByATag = new Map<string, Map<string, CommunityMember>>();
-
-      // Group reports by community A tag
-      const reportsByATag = new Map<string, NostrEvent[]>();
-      for (const report of reports) {
-        const aTag = report.tags.find(([n]) => n === 'A')?.[1];
-        if (!aTag) continue;
-        const list = reportsByATag.get(aTag);
-        if (list) {
-          list.push(report);
-        } else {
-          reportsByATag.set(aTag, [report]);
-        }
-      }
 
       for (const entry of myCommunities) {
         const community = entry.community;
@@ -143,25 +136,12 @@ export function useCommunityActivityFeed() {
         }
         rankMapByATag.set(community.aTag, rankMap);
 
-        // Resolve moderation (uses rankMap for authority checks).
-        const communityReports = reportsByATag.get(community.aTag) ?? [];
-        const moderation = resolveCommunityModeration(communityReports, rankMap);
-        if (communityReports.length > 0) {
+        // Resolve moderation. The resolver filters `reports` by matching
+        // `A` tag internally, so we can pass the full cross-community
+        // array without pre-grouping.
+        const moderation = resolveCommunityModeration(community.aTag, reports, rankMap);
+        if (moderation.allReports.length > 0) {
           moderationByATag.set(community.aTag, moderation);
-        }
-
-        // Seed the per-community cache so opening a community detail page
-        // hits warm cache instead of re-querying kind 8 awards and kind
-        // 1984 reports. Only set when there's no existing entry — we don't
-        // want to overwrite a fresher fetch performed by CommunityDetailPage.
-        const cacheKey = ['community-members', community.aTag];
-        if (!queryClient.getQueryData(cacheKey)) {
-          const membership: CommunityMembership = {
-            members: fullMembership.members.filter(
-              (m) => !moderation.bannedPubkeys.has(m.pubkey),
-            ),
-          };
-          queryClient.setQueryData(cacheKey, { membership, moderation, rankMap });
         }
       }
 

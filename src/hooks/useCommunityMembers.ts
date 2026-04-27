@@ -75,8 +75,10 @@ export function useCommunityMembers(community: ParsedCommunity | null | undefine
         rankMap.set(m.pubkey, m);
       }
 
-      // Step 3: Resolve moderation using the rank map
-      const moderation = resolveCommunityModeration(reports, rankMap);
+      // Step 3: Resolve moderation using the rank map. The resolver
+      // filters by `A` tag internally; we pass all reports as-is since
+      // the relay query already scoped them to this community.
+      const moderation = resolveCommunityModeration(community.aTag, reports, rankMap);
 
       // Step 4: Apply moderation overlay — filter banned members from the
       // already-computed membership rather than re-running chain validation.
