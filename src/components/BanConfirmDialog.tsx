@@ -62,9 +62,9 @@ export function BanConfirmDialog({
   const { mutateAsync: publishEvent, isPending } = useNostrPublish();
   const [reason, setReason] = useState('');
 
-  const title = mode === 'content' ? 'Remove post' : `Ban ${displayName ? `@${displayName}` : 'member'}`;
+  const title = mode === 'content' ? 'Remove from community' : `Ban ${displayName ? `@${displayName}` : 'member'} from community`;
   const description = mode === 'content'
-    ? 'This will remove the post from the community.'
+    ? 'This will hide the post from canonical community views.'
     : `This will ban ${displayName ? `@${displayName}` : 'this member'} from the community. Their recruits remain unaffected.`;
 
   const handleSubmit = async () => {
@@ -93,11 +93,11 @@ export function BanConfirmDialog({
         queryClient.invalidateQueries({ queryKey: ['community-activity-feed'], exact: false }),
       ]);
 
-      toast({ title: mode === 'content' ? 'Post removed' : 'Member banned' });
+      toast({ title: mode === 'content' ? 'Post removed from community' : 'Member banned from community' });
       setReason('');
       onOpenChange(false);
     } catch {
-      toast({ title: mode === 'content' ? 'Failed to remove post' : 'Failed to ban member', variant: 'destructive' });
+      toast({ title: mode === 'content' ? 'Failed to remove post from community' : 'Failed to ban member from community', variant: 'destructive' });
     }
   };
 

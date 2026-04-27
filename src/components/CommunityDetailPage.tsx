@@ -74,8 +74,8 @@ function PersonRow({ pubkey, label, size = 'md', onBan }: { pubkey: string; labe
         <button
           onClick={(e) => { e.stopPropagation(); onBan(); }}
           className="p-1.5 rounded-full text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors shrink-0"
-          aria-label="Ban member"
-          title="Ban member"
+          aria-label="Ban from community"
+          title="Ban from community"
         >
           <ShieldBan className="size-4" />
         </button>
@@ -419,16 +419,16 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
             <TabsContent value="events" className="mt-0">
               {eventsLoading ? (
                 <EventsSkeleton />
-            ) : moderatedCommunityEvents.length === 0 ? (
-              <div className="py-12 text-center">
-                <p className="text-muted-foreground text-sm">No events yet</p>
-              </div>
-            ) : (
-              <div>
-                {moderatedCommunityEvents.map((ev) => (
-                  <NoteCard key={ev.id} event={ev} compact />
-                ))}
-              </div>
+              ) : moderatedCommunityEvents.length === 0 ? (
+                <div className="py-12 text-center">
+                  <p className="text-muted-foreground text-sm">No events yet</p>
+                </div>
+              ) : (
+                <div>
+                  {moderatedCommunityEvents.map((ev) => (
+                    <NoteCard key={ev.id} event={ev} compact />
+                  ))}
+                </div>
               )}
             </TabsContent>
 

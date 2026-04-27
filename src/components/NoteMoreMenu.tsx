@@ -599,7 +599,7 @@ function NoteMoreMenuContent({ event, open, onOpenChange, communityContext, onRe
           {!isOwnPost && (
             <MenuItem
               icon={<Flag className="size-5" />}
-              label={`Report @${displayName}`}
+              label={communityContext ? 'Report post to community' : `Report @${displayName}`}
               onClick={onReport}
               destructive
             />
@@ -608,13 +608,13 @@ function NoteMoreMenuContent({ event, open, onOpenChange, communityContext, onRe
             <>
               <MenuItem
                 icon={<ShieldBan className="size-5" />}
-                label="Remove post"
+                label="Remove from community"
                 onClick={onBanContent}
                 destructive
               />
               <MenuItem
                 icon={<Ban className="size-5" />}
-                label={`Ban @${displayName}`}
+                label={`Ban @${displayName} from community`}
                 onClick={onBanMember}
                 destructive
               />
