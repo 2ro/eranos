@@ -157,7 +157,9 @@ export function useCommunityActivityFeed() {
 
       // ── Check whether an event survives moderation in its community ──
       const isAllowed = (event: NostrEvent): boolean => {
-        const eventATag = event.tags.find(([n]) => n === 'A')?.[1];
+        // NIP-22 comments use uppercase A; goals use lowercase a with a 34550: prefix
+        const eventATag = event.tags.find(([n]) => n === 'A')?.[1]
+          ?? event.tags.find(([n, v]) => n === 'a' && v?.startsWith('34550:'))?.[1];
         if (!eventATag) return true; // No community scope — not bannable here
         const moderation = moderationByATag.get(eventATag);
         if (!moderation) return true; // No moderation data for this community

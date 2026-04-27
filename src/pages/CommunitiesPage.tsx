@@ -2,6 +2,7 @@ import { useMemo } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { useSeoMeta } from '@unhead/react';
 import { Users } from 'lucide-react';
+import type { NostrEvent } from '@nostrify/nostrify';
 
 import { CommunityCard } from '@/components/CommunityCard';
 import { FeedEmptyState } from '@/components/FeedEmptyState';
@@ -196,6 +197,12 @@ function MyCommunitiesContent() {
 // Activities Tab
 // ═══════════════════════════════════════════════════════════════════════════════
 
+/** Extract the community a-tag from an event (uppercase A for NIP-22, lowercase a with 34550: prefix for goals). */
+function getCommunityATag(event: NostrEvent): string | undefined {
+  return event.tags.find(([n]) => n === 'A')?.[1]
+    ?? event.tags.find(([n, v]) => n === 'a' && v?.startsWith('34550:'))?.[1];
+}
+
 function ActivitiesTab({ onRefresh }: { onRefresh: () => Promise<void> }) {
   const { user } = useCurrentUser();
   const { data: activityEvents, isLoading, moderationByATag, rankMapByATag } = useCommunityActivityFeed();
@@ -222,7 +229,7 @@ function ActivitiesTab({ onRefresh }: { onRefresh: () => Promise<void> }) {
     if (!membersOnly) return activityEvents;
     return activityEvents.filter((event) => {
       if (event.kind === COMMUNITY_DEFINITION_KIND) return true;
-      const aTag = event.tags.find(([n]) => n === 'A')?.[1];
+      const aTag = getCommunityATag(event);
       if (!aTag) return true; // No community scope — pass through
       const rankMap = rankMapByATag.get(aTag);
       if (!rankMap) return true; // Moderation data not resolved — avoid hiding
@@ -258,7 +265,7 @@ function ActivitiesTab({ onRefresh }: { onRefresh: () => Promise<void> }) {
       ) : displayedEvents && displayedEvents.length > 0 ? (
         <div>
           {displayedEvents.map((event) => {
-            const aTag = event.tags.find(([n]) => n === 'A')?.[1];
+            const aTag = getCommunityATag(event);
             const ctx = aTag ? contextByATag.get(aTag) ?? null : null;
             return (
               <CommunityModerationContext.Provider key={event.id} value={ctx}>
