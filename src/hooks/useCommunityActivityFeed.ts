@@ -190,8 +190,8 @@ export function useCommunityActivityFeed() {
     data: query.data?.events,
     moderationByATag: (query.data?.moderationByATag ?? EMPTY_MODERATION_BY_A_TAG) as Map<string, CommunityModeration>,
     rankMapByATag: (query.data?.rankMapByATag ?? EMPTY_RANK_MAP_BY_A_TAG) as Map<string, Map<string, CommunityMember>>,
-    isLoading: query.isLoading,
+    isLoading: communitiesLoading || query.isLoading,
     isError: query.isError,
     error: query.error,
-  }), [query.data, query.isLoading, query.isError, query.error]);
+  }), [query.data, communitiesLoading, query.isLoading, query.isError, query.error]);
 }
