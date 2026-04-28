@@ -99,6 +99,7 @@ export function DMProviderWrapper({ children }: DMProviderWrapperProps) {
   const uiConfig = useMemo(() => ({
     showShorts: false,
     showSearch: true,
+    showHeader: false,
     isMobile,
   }), [isMobile]);
 
