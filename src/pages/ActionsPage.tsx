@@ -209,8 +209,9 @@ function ChallengeCard({ challenge, isExpired }: { challenge: Challenge; isExpir
     <RouterLink to={`/${naddr}`} className="block h-full">
       <Card
         className={cn(
-          'relative overflow-hidden border-2 border-primary/30 hover:border-primary/60 hover:shadow-2xl hover:shadow-primary/20 hover:-translate-y-1 transition-all duration-300 group cursor-pointer h-full flex flex-col',
-          isExpired && 'opacity-70 grayscale',
+          'relative overflow-hidden border-2 border-primary/30 transition-all duration-300 group cursor-pointer h-full flex flex-col',
+          !isExpired && 'hover:border-primary/60 hover:shadow-2xl hover:shadow-primary/20 hover:-translate-y-1',
+          isExpired && 'border-border/80 bg-muted/10',
         )}
       >
         {challenge.image && !imageLoadFailed && (
@@ -256,7 +257,11 @@ function ChallengeCard({ challenge, isExpired }: { challenge: Challenge; isExpir
             </div>
             <div className="flex-1 min-w-0">
               <div className="flex items-center justify-between gap-2">
-                <CardTitle className="text-xl font-black line-clamp-2 group-hover:text-primary transition-colors leading-tight">
+                <CardTitle className={cn(
+                  'text-xl font-black line-clamp-2 transition-colors leading-tight',
+                  !isExpired && 'group-hover:text-primary',
+                  isExpired && 'text-muted-foreground',
+                )}>
                   {challenge.title}
                 </CardTitle>
                 <ChallengeShareMenu challenge={challenge} />
@@ -282,31 +287,39 @@ function ChallengeCard({ challenge, isExpired }: { challenge: Challenge; isExpir
         </CardHeader>
 
         <CardContent className="flex-1 flex flex-col pb-4">
-          <p className="text-sm text-foreground/80 line-clamp-4 mb-4 flex-1 leading-relaxed">
+          <p className={cn(
+            'text-sm line-clamp-4 mb-4 flex-1 leading-relaxed',
+            isExpired ? 'text-muted-foreground/90' : 'text-foreground/80',
+          )}>
             {challenge.description}
           </p>
-          <div className="flex items-center justify-between p-3 bg-gradient-to-r from-primary/10 to-primary/5 rounded-lg border-2 border-primary/40 shadow-sm">
-            <div className="flex items-center gap-2">
+          <div className={cn(
+            'p-3 rounded-lg border-2 shadow-sm space-y-2',
+            isExpired
+              ? 'bg-muted/40 border-border/70'
+              : 'bg-gradient-to-r from-primary/10 to-primary/5 border-primary/40',
+          )}>
+            <div className="flex items-center gap-2 min-w-0">
               <Bitcoin className="h-5 w-5 text-primary" />
               <span className="font-bold text-lg">{formatSats(challenge.bounty)}</span>
               <span className="text-xs text-muted-foreground">sats</span>
             </div>
-            <div className="flex items-center gap-2 text-xs text-muted-foreground">
-              <Avatar className="h-6 w-6 border-2 border-background">
+            <div className="flex items-center gap-2 text-xs text-muted-foreground min-w-0">
+              <Avatar className="h-6 w-6 border-2 border-background shrink-0">
                 <AvatarImage src={metadata?.picture} />
                 <AvatarFallback className="text-[10px] bg-muted">
                   {displayName.slice(0, 2).toUpperCase()}
                 </AvatarFallback>
               </Avatar>
-              <span className="font-medium truncate max-w-[120px]">{displayName}</span>
+              <span className="font-medium truncate">{displayName}</span>
             </div>
           </div>
         </CardContent>
 
         <CardFooter className="mt-auto pt-0">
-          <Button className="w-full gap-2">
+          <Button className="w-full gap-2" variant={isExpired ? 'outline' : 'default'}>
             <Zap className="h-4 w-4 flex-shrink-0" />
-            <span className="truncate">View action</span>
+            <span className="truncate">{isExpired ? 'View archived action' : 'View action'}</span>
             <ChevronRight className="h-4 w-4 flex-shrink-0" />
           </Button>
         </CardFooter>
