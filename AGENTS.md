@@ -1190,6 +1190,7 @@ The router includes automatic scroll-to-top functionality and a 404 NotFound pag
 - Default connection to one Nostr relay for best performance
 - Comprehensive provider setup with NostrLoginProvider, QueryClientProvider, and custom AppProvider
 - **Never use the `any` type**: Always use proper TypeScript types for type safety
+- **Fail-fast error visibility**: Never silently hide errors in the UI. If data fails validation, a resource fails to load, or a user action errors, surface an explicit visible error state/message so users can see what failed and why.
 
 ## Loading States
 
