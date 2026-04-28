@@ -1,11 +1,9 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { nip19 } from 'nostr-tools';
 import { useNavigate } from 'react-router-dom';
 
 import {
   Bookmark,
-  ClipboardCopy,
-  AtSign,
   BellOff,
   VolumeX,
   Flag,
@@ -18,6 +16,8 @@ import {
   Copy,
   Check,
   Radio,
+  ShieldBan,
+  Ban,
 } from 'lucide-react';
 import {
   Dialog,
@@ -39,10 +39,11 @@ import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { getAvatarShape } from '@/lib/avatarShape';
 import { Separator } from '@/components/ui/separator';
 import { Button } from '@/components/ui/button';
+import { BanConfirmDialog } from '@/components/BanConfirmDialog';
 import { NoteContent } from '@/components/NoteContent';
 import { EmojifiedText } from '@/components/CustomEmoji';
-import { ReplyComposeModal } from '@/components/ReplyComposeModal';
 import { ReportDialog } from '@/components/ReportDialog';
+import { CommunityReportDialog } from '@/components/CommunityReportDialog';
 import { AddToListDialog } from '@/components/AddToListDialog';
 import { useNostr } from '@nostrify/react';
 import { useBookmarks } from '@/hooks/useBookmarks';
@@ -55,6 +56,11 @@ import { useFeedSettings } from '@/hooks/useFeedSettings';
 import { useOrganizers } from '@/hooks/useOrganizers';
 import { usePinnedPosts } from '@/hooks/usePinnedPosts';
 import { useCountryFeed } from '@/contexts/CountryFeedContext';
+import { useCommunityModerationContext } from '@/contexts/CommunityModerationContext';
+import { type CommunityMenuContext, canBanTarget, getViewerAuthority } from '@/lib/communityUtils';
+// NOTE: `CommunityMenuContext` is derived automatically from
+// `useCommunityModerationContext()`. Parents install a
+// `CommunityModerationContext.Provider` to enable community-aware menu items.
 import { isAdmin } from '@/lib/admins';
 import { genUserName } from '@/lib/genUserName';
 import { timeAgo } from '@/lib/timeAgo';
@@ -200,15 +206,30 @@ function EventJsonDialog({ event, nip19Id, open, onOpenChange }: EventJsonDialog
 export function NoteMoreMenu({ event, open, onOpenChange }: NoteMoreMenuProps) {
   // These states live here (not in NoteMoreMenuContent) so they persist after the menu closes
   const [reportOpen, setReportOpen] = useState(false);
-  const [mentionComposeOpen, setMentionComposeOpen] = useState(false);
+  const [banContentOpen, setBanContentOpen] = useState(false);
+  const [banMemberOpen, setBanMemberOpen] = useState(false);
   const [addToListOpen, setAddToListOpen] = useState(false);
   const [eventJsonOpen, setEventJsonOpen] = useState(false);
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
 
+  // Resolve community context from the React Context. Parents install a
+  // `CommunityModerationContext.Provider` (activity feed, community detail
+  // page, post detail page) to enable community-aware menu items.
+  const { user } = useCurrentUser();
+  const communityModCtx = useCommunityModerationContext();
+  const communityContext = useMemo<CommunityMenuContext | undefined>(() => {
+    if (!communityModCtx || !user) return undefined;
+    const viewerMember = getViewerAuthority(user.pubkey, communityModCtx.rankMap, communityModCtx.moderation);
+    if (!viewerMember) return undefined;
+    return {
+      communityATag: communityModCtx.communityATag,
+      canBan: canBanTarget(viewerMember, communityModCtx.rankMap.get(event.pubkey)),
+    };
+  }, [communityModCtx, user, event.pubkey]);
+
   const { mutate: deleteEvent, isPending: isDeleting } = useDeleteEvent();
 
   const nip19Id = encodeEventNip19(event);
-  const mentionContent = `nostr:${nip19.npubEncode(event.pubkey)} `;
 
   const handleDelete = () => {
     const dTag = event.tags.find(([name]) => name === 'd')?.[1];
@@ -233,13 +254,18 @@ export function NoteMoreMenu({ event, open, onOpenChange }: NoteMoreMenuProps) {
           event={event}
           open={open}
           onOpenChange={onOpenChange}
+          communityContext={communityContext}
           onReport={() => {
             onOpenChange(false);
             setTimeout(() => setReportOpen(true), 150);
           }}
-          onMention={() => {
+          onBanContent={() => {
             onOpenChange(false);
-            setTimeout(() => setMentionComposeOpen(true), 150);
+            setTimeout(() => setBanContentOpen(true), 150);
+          }}
+          onBanMember={() => {
+            onOpenChange(false);
+            setTimeout(() => setBanMemberOpen(true), 150);
           }}
           onAddToList={() => {
             onOpenChange(false);
@@ -256,14 +282,36 @@ export function NoteMoreMenu({ event, open, onOpenChange }: NoteMoreMenuProps) {
         />
       )}
 
-      <ReportDialog event={event} open={reportOpen} onOpenChange={setReportOpen} />
+      {communityContext ? (
+        <CommunityReportDialog
+          event={event}
+          communityATag={communityContext.communityATag}
+          open={reportOpen}
+          onOpenChange={setReportOpen}
+        />
+      ) : (
+        <ReportDialog event={event} open={reportOpen} onOpenChange={setReportOpen} />
+      )}
 
-      <ReplyComposeModal
-        open={mentionComposeOpen}
-        onOpenChange={setMentionComposeOpen}
-        initialContent={mentionContent}
-        title="New post"
-      />
+      {communityContext?.canBan && (
+        <>
+          <BanConfirmDialog
+            mode="content"
+            eventId={event.id}
+            targetPubkey={event.pubkey}
+            communityATag={communityContext.communityATag}
+            open={banContentOpen}
+            onOpenChange={setBanContentOpen}
+          />
+          <BanConfirmDialog
+            mode="member"
+            targetPubkey={event.pubkey}
+            communityATag={communityContext.communityATag}
+            open={banMemberOpen}
+            onOpenChange={setBanMemberOpen}
+          />
+        </>
+      )}
 
       <AddToListDialog
         pubkey={event.pubkey}
@@ -306,14 +354,17 @@ export function NoteMoreMenu({ event, open, onOpenChange }: NoteMoreMenuProps) {
 }
 
 interface NoteMoreMenuContentProps extends NoteMoreMenuProps {
+  /** Resolved community context (authored upstream from `CommunityModerationContext`). */
+  communityContext?: CommunityMenuContext;
   onReport: () => void;
-  onMention: () => void;
+  onBanContent: () => void;
+  onBanMember: () => void;
   onAddToList: () => void;
   onViewEventJson: () => void;
   onDelete: () => void;
 }
 
-function NoteMoreMenuContent({ event, open, onOpenChange, onReport, onMention, onAddToList, onViewEventJson, onDelete }: NoteMoreMenuContentProps) {
+function NoteMoreMenuContent({ event, open, onOpenChange, communityContext, onReport, onBanContent, onBanMember, onAddToList, onViewEventJson, onDelete }: NoteMoreMenuContentProps) {
   const navigate = useNavigate();
   const { user } = useCurrentUser();
   const { isBookmarked, toggleBookmark } = useBookmarks();
@@ -355,13 +406,6 @@ function NoteMoreMenuContent({ event, open, onOpenChange, onReport, onMention, o
 
   const handleViewPostDetails = () => {
     navigate(`/${nip19Id}`);
-    close();
-  };
-
-  const handleCopyLink = () => {
-    const url = `${window.location.origin}/${nip19Id}`;
-    navigator.clipboard.writeText(url);
-    toast({ title: 'Link copied to clipboard' });
     close();
   };
 
@@ -498,11 +542,6 @@ function NoteMoreMenuContent({ event, open, onOpenChange, onReport, onMention, o
             onClick={handleViewPostDetails}
           />
           <MenuItem
-            icon={<ClipboardCopy className="size-5" />}
-            label="Copy Link to Post"
-            onClick={handleCopyLink}
-          />
-          <MenuItem
             icon={<FileJson className="size-5" />}
             label="View Event JSON"
             onClick={onViewEventJson}
@@ -524,18 +563,6 @@ function NoteMoreMenuContent({ event, open, onOpenChange, onReport, onMention, o
             label={isInSidebar ? 'Remove from sidebar' : 'Add to sidebar'}
             onClick={handleToggleSidebar}
           />
-        </div>
-
-        <Separator />
-
-        <div className="py-1">
-          {!isOwnPost && (
-            <MenuItem
-              icon={<BellOff className="size-5" />}
-              label="Mute Conversation"
-              onClick={handleMuteConversation}
-            />
-          )}
           {isOwnPost && (
             <MenuItem
               icon={<Pin className={cn("size-5", pinned && "fill-current")} />}
@@ -550,6 +577,44 @@ function NoteMoreMenuContent({ event, open, onOpenChange, onReport, onMention, o
               onClick={handleToggleCountryPin}
             />
           )}
+          {!isOwnPost && (
+            <MenuItem
+              icon={<BellOff className="size-5" />}
+              label="Mute Conversation"
+              onClick={handleMuteConversation}
+            />
+          )}
+          {!isOwnPost && (
+            <MenuItem
+              icon={<VolumeX className="size-5" />}
+              label={userMuted ? `Unmute @${displayName}` : `Mute @${displayName}`}
+              onClick={handleMuteUser}
+            />
+          )}
+          {!isOwnPost && (
+            <MenuItem
+              icon={<Flag className="size-5" />}
+              label={communityContext ? 'Report post to community' : `Report @${displayName}`}
+              onClick={onReport}
+              destructive
+            />
+          )}
+          {!isOwnPost && communityContext?.canBan && (
+            <>
+              <MenuItem
+                icon={<ShieldBan className="size-5" />}
+                label="Remove from community"
+                onClick={onBanContent}
+                destructive
+              />
+              <MenuItem
+                icon={<Ban className="size-5" />}
+                label={`Ban @${displayName} from community`}
+                onClick={onBanMember}
+                destructive
+              />
+            </>
+          )}
           {isOwnPost && (
             <MenuItem
               icon={<Trash2 className="size-5" />}
@@ -558,34 +623,7 @@ function NoteMoreMenuContent({ event, open, onOpenChange, onReport, onMention, o
               destructive
             />
           )}
-          {!isOwnPost && (
-            <MenuItem
-              icon={<AtSign className="size-5" />}
-              label={`Mention @${displayName}`}
-              onClick={onMention}
-            />
-          )}
         </div>
-
-        {!isOwnPost && (
-          <>
-            <Separator />
-
-            <div className="py-1">
-              <MenuItem
-                icon={<VolumeX className="size-5" />}
-                label={userMuted ? `Unmute @${displayName}` : `Mute @${displayName}`}
-                onClick={handleMuteUser}
-              />
-              <MenuItem
-                icon={<Flag className="size-5" />}
-                label={`Report @${displayName}`}
-                onClick={onReport}
-                destructive
-              />
-            </div>
-          </>
-        )}
 
         <Separator />
 

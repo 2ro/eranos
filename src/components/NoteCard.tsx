@@ -41,6 +41,7 @@ import {
   ColorMomentEyeButton,
 } from "@/components/ColorMomentContent";
 import { CommentContext } from "@/components/CommentContext";
+import { CommunityContentWarning } from "@/components/CommunityContentWarning";
 import { ContentWarningGuard } from "@/components/ContentWarningGuard";
 import { EmojifiedText, ReactionEmoji } from "@/components/CustomEmoji";
 const CustomNipCard = lazy(() => import("@/components/CustomNipCard").then(m => ({ default: m.CustomNipCard })));
@@ -551,9 +552,11 @@ export const NoteCard = memo(function NoteCard({
     return null;
   }
 
-  // Shared content block used in both normal and threaded layouts
+  // Shared content block used in both normal and threaded layouts.
+  // Wrapped in `CommunityContentWarning`, which subscribes to the community
+  // moderation context internally and is a no-op outside community surfaces.
   const contentBlock = (
-    <>
+    <CommunityContentWarning event={event}>
       {/* Reply context (kind 1) or comment context (kind 1111) — shown above content */}
       {isComment && <CommentContext event={event} />}
       {isReply && (
@@ -672,7 +675,7 @@ export const NoteCard = memo(function NoteCard({
           />
         )}
       </ContentWarningGuard>
-    </>
+    </CommunityContentWarning>
   );
 
   // Shared author info block — min-h-[42px] keeps the container the same height
