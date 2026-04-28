@@ -3,6 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import type { NostrEvent, NostrFilter } from '@nostrify/nostrify';
 import { useOrganizers } from './useOrganizers';
 import { ADMIN_PUBKEYS } from '@/lib/admins';
+import { sanitizeUrl } from '@/lib/sanitizeUrl';
 
 /**
  * Activist Action (kind 36639) — see `NIP.md`.
@@ -28,6 +29,10 @@ export interface Challenge {
   deadline?: number;
   /** Cover image URL. */
   image?: string;
+  /** Raw image tag value from the event (for diagnostics/UI messaging). */
+  imageRaw?: string;
+  /** Human-readable image validation error, when the tag is present but unusable. */
+  imageError?: string;
   pubkey: string;
   createdAt: number;
 }
@@ -61,6 +66,10 @@ export function parseChallenge(event: NostrEvent): Challenge | null {
   const startTag = event.tags.find(([name]) => name === 'start')?.[1];
   const deadlineTag = event.tags.find(([name]) => name === 'deadline')?.[1];
   const imageTag = event.tags.find(([name]) => name === 'image')?.[1];
+  const sanitizedImage = sanitizeUrl(imageTag);
+  const imageError = imageTag && !sanitizedImage
+    ? 'Invalid image URL in event (only https URLs are allowed).'
+    : undefined;
 
   if (!dTag || !title || !typeTag || !bountyTag || !countryCode) {
     return null;
@@ -100,7 +109,10 @@ export function parseChallenge(event: NostrEvent): Challenge | null {
     countryCode,
     startTime: startTimestamp,
     deadline: deadlineTimestamp,
-    image: imageTag,
+    // Event tags are untrusted input — keep only valid https URLs.
+    image: sanitizedImage,
+    imageRaw: imageTag,
+    imageError,
     pubkey: event.pubkey,
     createdAt: event.created_at,
   };

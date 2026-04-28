@@ -2,7 +2,7 @@ import { useState, useMemo, useEffect, useCallback } from 'react';
 import { useInView } from 'react-intersection-observer';
 import { useSeoMeta } from '@unhead/react';
 import { useQueryClient } from '@tanstack/react-query';
-import { Zap, AtSign, MessageSquare, MessageCircle, Loader2, Award, Check, Mail } from 'lucide-react';
+import { Zap, AtSign, MessageSquare, MessageCircle, Loader2, Award, Check, Mail, Bell } from 'lucide-react';
 import { RepostIcon } from '@/components/icons/RepostIcon';
 import { Link, useNavigate } from 'react-router-dom';
 import { PullToRefresh } from '@/components/PullToRefresh';
@@ -41,6 +41,7 @@ import { Button } from '@/components/ui/button';
 import { BadgeThumbnail } from '@/components/BadgeThumbnail';
 import { BadgeContent } from '@/components/BadgeContent';
 import type { BadgeData } from '@/lib/parseBadgeDefinition';
+import { PageHeader } from '@/components/PageHeader';
 import { useLayoutOptions } from '@/contexts/LayoutContext';
 import { ARC_OVERHANG_PX } from '@/components/ArcBackground';
 
@@ -215,6 +216,7 @@ export function NotificationsPage() {
 
   return (
     <main className="flex-1 min-w-0">
+      <PageHeader title="Notifications" icon={<Bell className="size-5 text-primary" />} />
       {/* Tab bar */}
       <SubHeaderBar>
         {tabs.map(({ key, label }) => (

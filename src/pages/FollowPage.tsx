@@ -282,14 +282,14 @@ function FollowView({ pubkey }: { pubkey: string }) {
                 className="w-full rounded-full py-3 text-base font-semibold"
                 size="lg"
               >
-                Follow {displayName} on Ditto
+                Follow {displayName} on Agora
               </Button>
             ) : isOwnProfile ? (
               <div className="text-center space-y-3">
                 <div className="flex items-center justify-center gap-2 text-primary">
                   <UserPlus className="size-5" />
                   <p className="font-semibold">
-                    This is your follow link
+                    This is your profile follow link
                   </p>
                 </div>
                 <div className="flex flex-col gap-2">
@@ -535,7 +535,7 @@ function FollowPackView({ addr, relays }: { addr: AddrCoords; relays?: string[] 
                   size="lg"
                 >
                   <UserPlus className="size-5" />
-                  Follow {pubkeys.length} people on Ditto
+                  Follow {pubkeys.length} people on Agora
                 </Button>
               ) : isFollowingAll ? (
                 <Button disabled className="w-full rounded-full py-3 text-base font-semibold gap-2" size="lg">

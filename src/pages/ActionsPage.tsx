@@ -50,7 +50,7 @@ import {
 import {
   Camera, Palette, Info, Zap, Clock, Bitcoin, Plus, ChevronRight, Loader2,
   Link as LinkIcon, Check, MoreHorizontal, Trash2, Upload, ListFilter,
-  Calendar, DollarSign, Globe,
+  Calendar, DollarSign, Globe, AlertTriangle,
 } from 'lucide-react';
 
 const CHALLENGE_ICONS = {
@@ -197,6 +197,7 @@ function ChallengeCard({ challenge, isExpired }: { challenge: Challenge; isExpir
   const metadata: NostrMetadata | undefined = author.data?.metadata;
   const displayName = getDisplayName(metadata, challenge.pubkey);
   const Icon = CHALLENGE_ICONS[challenge.type];
+  const [imageLoadFailed, setImageLoadFailed] = useState(false);
 
   const naddr = nip19.naddrEncode({
     kind: 36639,
@@ -208,15 +209,39 @@ function ChallengeCard({ challenge, isExpired }: { challenge: Challenge; isExpir
     <RouterLink to={`/${naddr}`} className="block h-full">
       <Card
         className={cn(
-          'relative overflow-hidden border-2 border-primary/30 hover:border-primary/60 hover:shadow-2xl hover:shadow-primary/20 hover:-translate-y-1 transition-all duration-300 group cursor-pointer h-full flex flex-col',
-          isExpired && 'opacity-70 grayscale',
+          'relative overflow-hidden border-2 border-primary/30 transition-all duration-300 group cursor-pointer h-full flex flex-col',
+          !isExpired && 'hover:border-primary/60 hover:shadow-2xl hover:shadow-primary/20 hover:-translate-y-1',
+          isExpired && 'border-border/80 bg-muted/10',
         )}
       >
-        {challenge.image && (
+        {challenge.image && !imageLoadFailed && (
           <div className="relative w-full h-48 overflow-hidden">
-            <img src={challenge.image} alt={challenge.title} className="w-full h-full object-cover" />
+            <img
+              src={challenge.image}
+              alt={challenge.title}
+              className="w-full h-full object-cover"
+              onError={() => setImageLoadFailed(true)}
+            />
             <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
             <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-primary/80 via-primary to-primary/80" />
+          </div>
+        )}
+        {!challenge.image && challenge.imageError && (
+          <div className="mx-4 mt-4 rounded-lg border border-destructive/40 bg-destructive/10 p-3 text-xs text-destructive">
+            <div className="flex items-center gap-2 font-semibold">
+              <AlertTriangle className="h-3.5 w-3.5" />
+              Cover image rejected
+            </div>
+            <p className="mt-1">{challenge.imageError}</p>
+          </div>
+        )}
+        {challenge.image && imageLoadFailed && (
+          <div className="mx-4 mt-4 rounded-lg border border-destructive/40 bg-destructive/10 p-3 text-xs text-destructive">
+            <div className="flex items-center gap-2 font-semibold">
+              <AlertTriangle className="h-3.5 w-3.5" />
+              Cover image failed to load
+            </div>
+            <p className="mt-1 break-all">{challenge.image}</p>
           </div>
         )}
 
@@ -232,7 +257,11 @@ function ChallengeCard({ challenge, isExpired }: { challenge: Challenge; isExpir
             </div>
             <div className="flex-1 min-w-0">
               <div className="flex items-center justify-between gap-2">
-                <CardTitle className="text-xl font-black line-clamp-2 group-hover:text-primary transition-colors leading-tight">
+                <CardTitle className={cn(
+                  'text-xl font-black line-clamp-2 transition-colors leading-tight',
+                  !isExpired && 'group-hover:text-primary',
+                  isExpired && 'text-muted-foreground',
+                )}>
                   {challenge.title}
                 </CardTitle>
                 <ChallengeShareMenu challenge={challenge} />
@@ -258,31 +287,39 @@ function ChallengeCard({ challenge, isExpired }: { challenge: Challenge; isExpir
         </CardHeader>
 
         <CardContent className="flex-1 flex flex-col pb-4">
-          <p className="text-sm text-foreground/80 line-clamp-4 mb-4 flex-1 leading-relaxed">
+          <p className={cn(
+            'text-sm line-clamp-4 mb-4 flex-1 leading-relaxed',
+            isExpired ? 'text-muted-foreground/90' : 'text-foreground/80',
+          )}>
             {challenge.description}
           </p>
-          <div className="flex items-center justify-between p-3 bg-gradient-to-r from-primary/10 to-primary/5 rounded-lg border-2 border-primary/40 shadow-sm">
-            <div className="flex items-center gap-2">
+          <div className={cn(
+            'p-3 rounded-lg border-2 shadow-sm space-y-2',
+            isExpired
+              ? 'bg-muted/40 border-border/70'
+              : 'bg-gradient-to-r from-primary/10 to-primary/5 border-primary/40',
+          )}>
+            <div className="flex items-center gap-2 min-w-0">
               <Bitcoin className="h-5 w-5 text-primary" />
               <span className="font-bold text-lg">{formatSats(challenge.bounty)}</span>
               <span className="text-xs text-muted-foreground">sats</span>
             </div>
-            <div className="flex items-center gap-2 text-xs text-muted-foreground">
-              <Avatar className="h-6 w-6 border-2 border-background">
+            <div className="flex items-center gap-2 text-xs text-muted-foreground min-w-0">
+              <Avatar className="h-6 w-6 border-2 border-background shrink-0">
                 <AvatarImage src={metadata?.picture} />
                 <AvatarFallback className="text-[10px] bg-muted">
                   {displayName.slice(0, 2).toUpperCase()}
                 </AvatarFallback>
               </Avatar>
-              <span className="font-medium truncate max-w-[120px]">{displayName}</span>
+              <span className="font-medium truncate">{displayName}</span>
             </div>
           </div>
         </CardContent>
 
         <CardFooter className="mt-auto pt-0">
-          <Button className="w-full gap-2">
+          <Button className="w-full gap-2" variant={isExpired ? 'outline' : 'default'}>
             <Zap className="h-4 w-4 flex-shrink-0" />
-            <span className="truncate">View action</span>
+            <span className="truncate">{isExpired ? 'View archived action' : 'View action'}</span>
             <ChevronRight className="h-4 w-4 flex-shrink-0" />
           </Button>
         </CardFooter>
@@ -824,6 +861,7 @@ export default function ActionsPage() {
 
   const sortChallenges = (cs: Challenge[]) => {
     const sorted = [...cs];
+    const isPastOnlyList = sorted.length > 0 && sorted.every((c) => !!c.deadline && c.deadline <= now);
     switch (sortBy) {
       case 'recent':
         return sorted.sort((a, b) => b.createdAt - a.createdAt);
@@ -833,7 +871,8 @@ export default function ActionsPage() {
         return sorted.sort((a, b) => {
           if (!a.deadline) return 1;
           if (!b.deadline) return -1;
-          return a.deadline - b.deadline;
+          // Upcoming/current: soonest deadline first. Past: most recently ended first.
+          return isPastOnlyList ? b.deadline - a.deadline : a.deadline - b.deadline;
         });
     }
   };
@@ -850,6 +889,17 @@ export default function ActionsPage() {
   const visibleCurrent = showAllCurrent ? currentChallenges : currentChallenges.slice(0, DEFAULT_VISIBLE);
   const visibleUpcoming = showAllUpcoming ? upcomingChallenges : upcomingChallenges.slice(0, DEFAULT_VISIBLE);
   const visiblePast = showAllPast ? pastChallenges : pastChallenges.slice(0, DEFAULT_VISIBLE);
+  const hasCurrent = currentChallenges.length > 0;
+  const hasUpcoming = upcomingChallenges.length > 0;
+  const isOnlyPastView = !hasCurrent && !hasUpcoming && pastChallenges.length > 0;
+  const primarySectionTitle = hasCurrent
+    ? 'Active actions'
+    : hasUpcoming
+      ? 'Upcoming actions'
+      : pastChallenges.length > 0
+        ? 'Past actions'
+        : 'Actions';
+  const deadlineSortLabel = isOnlyPastView ? 'Recently ended' : 'Deadline soon';
 
   const headerControls = (
     <div className="flex items-center gap-1">
@@ -870,7 +920,7 @@ export default function ActionsPage() {
             {sortBy === 'bounty' && <Check className="ml-auto h-4 w-4" />}
           </DropdownMenuItem>
           <DropdownMenuItem onClick={() => setSortBy('deadline')} className={sortBy === 'deadline' ? 'bg-primary/10' : ''}>
-            <Calendar className="mr-2 h-4 w-4" /><span>Deadline soon</span>
+            <Calendar className="mr-2 h-4 w-4" /><span>{deadlineSortLabel}</span>
             {sortBy === 'deadline' && <Check className="ml-auto h-4 w-4" />}
           </DropdownMenuItem>
         </DropdownMenuContent>
@@ -934,12 +984,12 @@ export default function ActionsPage() {
             <div className="flex items-center justify-between">
               <h2 className="text-lg font-semibold flex items-center gap-2">
                 <Zap className="h-5 w-5 text-primary" />
-                {currentChallenges.length > 0 ? 'Active actions' : 'Actions'}
+                {primarySectionTitle}
               </h2>
               {headerControls}
             </div>
 
-            {currentChallenges.length > 0 ? (
+            {hasCurrent ? (
               <ChallengeSection
                 items={visibleCurrent}
                 total={currentChallenges.length}
@@ -948,7 +998,7 @@ export default function ActionsPage() {
                 onToggle={() => setShowAllCurrent(!showAllCurrent)}
                 isExpired={false}
               />
-            ) : upcomingChallenges.length > 0 ? (
+            ) : hasUpcoming ? (
               <ChallengeSection
                 items={visibleUpcoming}
                 total={upcomingChallenges.length}
@@ -957,9 +1007,18 @@ export default function ActionsPage() {
                 onToggle={() => setShowAllUpcoming(!showAllUpcoming)}
                 isExpired={false}
               />
+            ) : pastChallenges.length > 0 ? (
+              <ChallengeSection
+                items={visiblePast}
+                total={pastChallenges.length}
+                visible={DEFAULT_VISIBLE}
+                showAll={showAllPast}
+                onToggle={() => setShowAllPast(!showAllPast)}
+                isExpired
+              />
             ) : null}
 
-            {currentChallenges.length > 0 && upcomingChallenges.length > 0 && (
+            {hasCurrent && hasUpcoming && (
               <SectionDivider title="Upcoming actions" icon={<Calendar className="h-5 w-5 text-primary" />}>
                 <ChallengeSection
                   items={visibleUpcoming}
@@ -972,7 +1031,7 @@ export default function ActionsPage() {
               </SectionDivider>
             )}
 
-            {pastChallenges.length > 0 && (
+            {pastChallenges.length > 0 && (hasCurrent || hasUpcoming) && (
               <SectionDivider title="Past actions" icon={<Clock className="h-5 w-5" />} muted>
                 <ChallengeSection
                   items={visiblePast}

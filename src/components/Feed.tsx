@@ -225,6 +225,8 @@ export function Feed({ kinds, tagFilters, header, hideCompose, emptyMessage, fee
 
   return (
     <main className="flex-1 min-w-0 min-h-dvh">
+      {header}
+
       {/* CTA (logged out, main feed only) */}
       {!user && !kinds && (
         <LandingHero
@@ -234,8 +236,6 @@ export function Feed({ kinds, tagFilters, header, hideCompose, emptyMessage, fee
       )}
 
       {!hideCompose && <ComposeBox compact />}
-
-      {header}
 
       {/* Tabs (logged in) */}
       {user && (
