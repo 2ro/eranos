@@ -1,4 +1,4 @@
-import { useMemo, useCallback, useState } from 'react';
+import { useMemo, useCallback, useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { nip19 } from 'nostr-tools';
 import {
@@ -117,6 +117,15 @@ function ReplyCardSkeleton() {
   );
 }
 
+function useNow(intervalMs: number): number {
+  const [now, setNow] = useState(() => Math.floor(Date.now() / 1000));
+  useEffect(() => {
+    const id = setInterval(() => setNow(Math.floor(Date.now() / 1000)), intervalMs);
+    return () => clearInterval(id);
+  }, [intervalMs]);
+  return now;
+}
+
 // ── Main component ────────────────────────────────────────────────────────────
 
 export function CommunityDetailPage({ event }: { event: NostrEvent }) {
@@ -204,14 +213,15 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
 
   // ── Fundraising goals (NIP-75) ──────────────────────────────────────────────
   const { data: goals, isLoading: goalsLoading } = useCommunityGoals(communityATag || undefined);
+  const now = useNow(60_000);
 
   /** Check if a goal event's `closed_at` deadline has passed. */
-  const isExpired = (e: NostrEvent): boolean => {
+  const isExpired = useCallback((e: NostrEvent): boolean => {
     const v = e.tags.find(([n]) => n === 'closed_at')?.[1];
     if (!v) return false;
     const ts = parseInt(v, 10);
-    return !isNaN(ts) && Math.floor(Date.now() / 1000) > ts;
-  };
+    return !isNaN(ts) && now > ts;
+  }, [now]);
 
   const moderatedGoals = useMemo(
     () => applyCommunityModerationToEvents(goals ?? [], moderation),
@@ -221,12 +231,12 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
     const all = moderatedGoals.filter((e) => !isExpired(e));
     if (!membersOnly) return all;
     return all.filter((e) => rankMap.has(e.pubkey));
-  }, [moderatedGoals, membersOnly, rankMap]);
+  }, [moderatedGoals, membersOnly, rankMap, isExpired]);
   const pastGoals = useMemo(() => {
     const all = moderatedGoals.filter((e) => isExpired(e));
     if (!membersOnly) return all;
     return all.filter((e) => rankMap.has(e.pubkey));
-  }, [moderatedGoals, membersOnly, rankMap]);
+  }, [moderatedGoals, membersOnly, rankMap, isExpired]);
 
   const replyTree = useMemo((): ReplyNode[] => {
     if (!commentsData) return [];

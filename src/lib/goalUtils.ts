@@ -8,6 +8,17 @@ import { sanitizeUrl } from '@/lib/sanitizeUrl';
 /** NIP-75 Zap Goal (regular event). */
 export const ZAP_GOAL_KIND = 9041;
 
+function normalizeRelayUrl(value: string | undefined): string | undefined {
+  if (!value) return undefined;
+  try {
+    const url = new URL(value);
+    if (url.protocol !== 'wss:' && url.protocol !== 'ws:') return undefined;
+    return url.toString();
+  } catch {
+    return undefined;
+  }
+}
+
 // ── Parsed goal ───────────────────────────────────────────────────────────────
 
 export interface ParsedGoal {
@@ -29,6 +40,12 @@ export interface ParsedGoal {
   communityATag?: string;
   /** The pubkey receiving zaps (event author). */
   beneficiary: string;
+  /** Whether this goal declares NIP-57 zap splits. */
+  hasZapSplits: boolean;
+}
+
+export function hasGoalZapSplits(event: NostrEvent): boolean {
+  return event.kind === ZAP_GOAL_KIND && event.tags.some(([n]) => n === 'zap');
 }
 
 /**
@@ -49,7 +66,9 @@ export function parseGoalEvent(event: NostrEvent): ParsedGoal | null {
 
   // Required: relays tag
   const relaysTag = event.tags.find(([n]) => n === 'relays');
-  const relays = relaysTag ? relaysTag.slice(1).filter(Boolean) : [];
+  const relays = relaysTag
+    ? [...new Set(relaysTag.slice(1).map(normalizeRelayUrl).filter((v): v is string => !!v))]
+    : [];
   if (relays.length === 0) return null;
 
   // Optional tags
@@ -75,6 +94,7 @@ export function parseGoalEvent(event: NostrEvent): ParsedGoal | null {
     summary,
     communityATag,
     beneficiary: event.pubkey,
+    hasZapSplits: hasGoalZapSplits(event),
   };
 }
 

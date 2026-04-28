@@ -106,6 +106,7 @@ import { formatNumber } from "@/lib/formatNumber";
 import { publishedAtAction } from "@/lib/publishedAtAction";
 import { getEffectiveStreamStatus } from "@/lib/streamStatus";
 import { cn } from "@/lib/utils";
+import { hasGoalZapSplits } from "@/lib/goalUtils";
 
 
 /** Profile card for use in feeds (kind 0). */
@@ -344,7 +345,8 @@ export const NoteCard = memo(function NoteCard({
   const [replyOpen, setReplyOpen] = useState(false);
 
   // Check if the current user can zap this event's author
-  const canZapAuthor = user && canZap(metadata);
+  // TODO: Enable zapping split-recipient NIP-75 goals once zap split payments are supported.
+  const canZapAuthor = user && canZap(metadata) && !hasGoalZapSplits(event);
 
   const { onClick: openPost, onAuxClick: auxOpenPost } = useOpenPost(
     `/${encodedId}`,

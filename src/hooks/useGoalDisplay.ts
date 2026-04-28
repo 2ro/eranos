@@ -46,7 +46,7 @@ export function useGoalDisplay(event: NostrEvent, goal: ParsedGoal): GoalDisplay
   const now = useNow(60_000);
   const expired = isGoalExpired(goal);
   const { currentSats, percentage, isLoading: progressLoading } =
-    useGoalProgress(event.id, goal.amountMsat, goal.closedAt);
+    useGoalProgress(event, goal);
   const funded = percentage >= 100;
 
   // Recipient info

@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Clock, Target, Users, Zap } from 'lucide-react';
+import { Clock, Info, Target, Users, Zap } from 'lucide-react';
 import type { NostrEvent } from '@nostrify/nostrify';
 
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
@@ -98,33 +98,42 @@ function GoalCardInner({ event, goal }: { event: NostrEvent; goal: ParsedGoal })
         </div>
       </div>
 
-      {/* Recipient */}
-      <div className="flex items-center gap-2.5 rounded-lg bg-muted/50 px-3 py-2">
-        <Link to={d.profileUrl} className="shrink-0" onClick={(e) => e.stopPropagation()}>
-          <Avatar shape={d.avatarShape} className="size-8 ring-2 ring-background">
-            <AvatarImage src={d.metadata?.picture} />
-            <AvatarFallback className="bg-muted text-muted-foreground text-xs">
-              {d.displayName.charAt(0).toUpperCase()}
-            </AvatarFallback>
-          </Avatar>
-        </Link>
-        <div className="min-w-0 flex-1">
-          <p className="text-xs text-muted-foreground">Receiving zaps</p>
-          <Link
-            to={d.profileUrl}
-            className="text-sm font-medium truncate block hover:underline"
-            onClick={(e) => e.stopPropagation()}
-          >
-            {d.displayName}
-          </Link>
-          {d.lightningAddress && (
-            <p className="text-xs text-muted-foreground truncate" title={d.lightningAddress}>
-              <Zap className="size-3 inline-block mr-0.5 -mt-0.5" />
-              {d.lightningAddress}
-            </p>
-          )}
+      {goal.hasZapSplits ? (
+        // TODO: Render and support NIP-57 zap splits for NIP-75 goals.
+        <div className="flex items-start gap-2.5 rounded-lg bg-muted/50 px-3 py-2 text-muted-foreground">
+          <Info className="size-4 mt-0.5 shrink-0" />
+          <p className="text-xs leading-relaxed">
+            This goal uses split recipients. Split zap support is not available in this app yet.
+          </p>
         </div>
-      </div>
+      ) : (
+        <div className="flex items-center gap-2.5 rounded-lg bg-muted/50 px-3 py-2">
+          <Link to={d.profileUrl} className="shrink-0" onClick={(e) => e.stopPropagation()}>
+            <Avatar shape={d.avatarShape} className="size-8 ring-2 ring-background">
+              <AvatarImage src={d.metadata?.picture} />
+              <AvatarFallback className="bg-muted text-muted-foreground text-xs">
+                {d.displayName.charAt(0).toUpperCase()}
+              </AvatarFallback>
+            </Avatar>
+          </Link>
+          <div className="min-w-0 flex-1">
+            <p className="text-xs text-muted-foreground">Receiving zaps</p>
+            <Link
+              to={d.profileUrl}
+              className="text-sm font-medium truncate block hover:underline"
+              onClick={(e) => e.stopPropagation()}
+            >
+              {d.displayName}
+            </Link>
+            {d.lightningAddress && (
+              <p className="text-xs text-muted-foreground truncate" title={d.lightningAddress}>
+                <Zap className="size-3 inline-block mr-0.5 -mt-0.5" />
+                {d.lightningAddress}
+              </p>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
