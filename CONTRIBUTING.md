@@ -4,8 +4,8 @@ We welcome contributions, but we have high standards. Agora is a carefully desig
 
 **Required reading before you start:**
 
-- [Agora Philosophy](https://agora.spot/philosophy) -- the product vision. Your change must align with it.
-- [Contributing Guide](https://agora.spot/contributing) -- the upstream contribution process.
+- [Understanding Agora](#understanding-agora) -- the product vision. Your change must align with it.
+- This `CONTRIBUTING.md` guide -- the contribution process for this repository.
 - `AGENTS.md` in this repo -- the codebase conventions. Your AI tool should load this file.
 
 ## Understanding Agora
@@ -36,7 +36,7 @@ If a change does all three, it belongs. If it only does one, think harder. If it
 - A place where profiles feel like worlds, not business cards
 - The most fun you've had on the internet in years
 
-Read the [full philosophy](https://agora.spot/philosophy) for the complete vision.
+Read the full "Understanding Agora" section above for the complete vision.
 
 ## What we accept
 
@@ -46,11 +46,11 @@ One bug, one merge request. Fix exactly one thing. Don't bundle unrelated change
 
 ### New features and significant changes
 
-Every feature MR must link to an existing open issue and clearly align with the [Agora Philosophy](https://agora.spot/philosophy). The philosophy alignment section in the MR template is where you make the case for why your change belongs in Agora. If you can't articulate that clearly, the change probably doesn't belong.
+Every feature MR must link to an existing open issue and clearly align with the "Understanding Agora" section in this file. The philosophy alignment section in the MR template is where you make the case for why your change belongs in Agora. If you can't articulate that clearly, the change probably doesn't belong.
 
 If you have an idea for a feature that doesn't have an issue yet:
 
-1. Build it as a standalone Nostr app first (see [Contributing Guide](https://agora.spot/contributing)).
+1. Build it as a standalone Nostr app first (then document traction/feedback in the linked issue).
 2. Prove it works and get user feedback.
 3. Open an issue to discuss integration.
 
@@ -80,7 +80,7 @@ Read `AGENTS.md` in the repo root. This is the single source of truth for how co
 
 ### 4. Read the philosophy
 
-Read the [Agora Philosophy](https://agora.spot/philosophy). Agora is a carnival, not a platform. Your change should feel like it belongs in Agora -- not like it was transplanted from a generic social media template. Apply the product decision filter above.
+Read "Understanding Agora" in this file. Agora is a carnival, not a platform. Your change should feel like it belongs in Agora -- not like it was transplanted from a generic social media template. Apply the product decision filter above.
 
 ### 5. Plan before you code
 
@@ -163,7 +163,7 @@ Fill out every field in the MR template. Incomplete MRs will not be reviewed.
 ## What gets your MR closed without review
 
 - No linked issue
-- Feature MRs with no clear alignment with the [Agora Philosophy](https://agora.spot/philosophy)
+- Feature MRs with no clear alignment with "Understanding Agora" in this file
 - Features that fail the product decision filter (not magnetic, not threatening to the status quo, not peaceful)
 - Incomplete MR template (missing checklist, screenshots, or preview URL)
 - Changes that go beyond what was asked for (scope creep)
