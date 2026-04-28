@@ -58,6 +58,8 @@ import { publishedAtAction } from "@/lib/publishedAtAction";
 import { NoteContent } from "@/components/NoteContent";
 import { NsiteCard } from "@/components/NsiteCard";
 import { NoteMoreMenu } from "@/components/NoteMoreMenu";
+import { CommunityModerationContext } from "@/contexts/CommunityModerationContext";
+import { useCommunityModerationForEvent } from "@/hooks/useCommunityModeration";
 import { PostActionBar } from "@/components/PostActionBar";
 import { PatchCard } from "@/components/PatchCard";
 import { PodcastDetailContent } from "@/components/PodcastDetailContent";
@@ -962,6 +964,12 @@ function PostDetailContent({ event }: { event: NostrEvent }) {
 
   const pollVoteLabel = usePollVoteLabel(event);
 
+  // Community moderation context — resolves from event's A tag. When
+  // present, we install it as a Provider below so `NoteMoreMenu` and
+  // `NoteCard` pick up community-aware menu items and content warnings
+  // via `useCommunityModerationContext()`.
+  const communityModContext = useCommunityModerationForEvent(event);
+
   // NIP-19 encoded event identifier for share URLs
   const encodedEventId = useMemo(() => {
     if (event.kind >= 30000 && event.kind < 40000) {
@@ -1425,6 +1433,7 @@ function PostDetailContent({ event }: { event: NostrEvent }) {
   );
 
   return (
+    <CommunityModerationContext.Provider value={communityModContext}>
     <div>
       {/* Content preview for kind 1111 comments: external content, profile, or community */}
       {externalIdentifier && (
@@ -2307,13 +2316,14 @@ function PostDetailContent({ event }: { event: NostrEvent }) {
           </div>
         ) : replyTree.length > 0 ? (
           <ThreadedReplyList roots={replyTree} />
-        ) : !parentEventId ? (
+         ) : !parentEventId ? (
           <div className="py-12 text-center text-muted-foreground text-sm">
             No replies yet. Be the first to reply!
           </div>
         ) : null}
       </div>
     </div>
+    </CommunityModerationContext.Provider>
   );
 }
 

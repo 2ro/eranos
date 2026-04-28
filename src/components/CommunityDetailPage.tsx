@@ -1,44 +1,43 @@
-import { useMemo, useCallback } from 'react';
+import { useMemo, useCallback, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { nip19 } from 'nostr-tools';
 import {
   ArrowLeft,
-  CalendarDays,
   Crown,
   MessageCircle,
   Shield,
+  ShieldBan,
   Share2,
   Users,
 } from 'lucide-react';
 import type { NostrEvent, NostrMetadata } from '@nostrify/nostrify';
-import { useNostr } from '@nostrify/react';
-import { useQuery } from '@tanstack/react-query';
 
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { getAvatarShape } from '@/lib/avatarShape';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
+import { BanConfirmDialog } from '@/components/BanConfirmDialog';
 import { ComposeBox } from '@/components/ComposeBox';
-import { NoteCard } from '@/components/NoteCard';
+import { MembersOnlyToggle } from '@/components/MembersOnlyToggle';
 import { ThreadedReplyList, type ReplyNode } from '@/components/ThreadedReplyList';
 import { useAuthor } from '@/hooks/useAuthor';
 import { useAuthors } from '@/hooks/useAuthors';
 import { useComments } from '@/hooks/useComments';
 import { useCommunityMembers } from '@/hooks/useCommunityMembers';
+import { useCurrentUser } from '@/hooks/useCurrentUser';
+import { useMembersOnlyFilter } from '@/hooks/useMembersOnlyFilter';
 import { useProfileUrl } from '@/hooks/useProfileUrl';
 import { useToast } from '@/hooks/useToast';
-import { parseCommunityEvent, type CommunityMember } from '@/lib/communityUtils';
+import { CommunityModerationContext } from '@/contexts/CommunityModerationContext';
+import { applyCommunityModerationToEvents, canBanTarget, getViewerAuthority, parseCommunityEvent, type CommunityMember } from '@/lib/communityUtils';
 import { genUserName } from '@/lib/genUserName';
 import { sanitizeUrl } from '@/lib/sanitizeUrl';
 import { cn } from '@/lib/utils';
 
-// ── Calendar event kinds (NIP-52) ─────────────────────────────────────────────
-const CALENDAR_EVENT_KINDS = [31922, 31923];
-
 // ── Sub-components ────────────────────────────────────────────────────────────
 
-function PersonRow({ pubkey, label, size = 'md' }: { pubkey: string; label?: string; size?: 'sm' | 'md' }) {
+function PersonRow({ pubkey, label, size = 'md', onBan }: { pubkey: string; label?: string; size?: 'sm' | 'md'; onBan?: () => void }) {
   const { data } = useAuthor(pubkey);
   const metadata: NostrMetadata | undefined = data?.metadata;
   const avatarShape = getAvatarShape(metadata);
@@ -48,23 +47,35 @@ function PersonRow({ pubkey, label, size = 'md' }: { pubkey: string; label?: str
   const fallbackCls = size === 'sm' ? 'text-xs' : '';
 
   return (
-    <Link to={profileUrl} className="flex items-center gap-3 group py-1">
-      <Avatar shape={avatarShape} className={cn(avatarCls, 'ring-2 ring-background')}>
-        <AvatarImage src={metadata?.picture} />
-        <AvatarFallback className={cn('bg-muted text-muted-foreground', fallbackCls)}>
-          {name.charAt(0).toUpperCase()}
-        </AvatarFallback>
-      </Avatar>
-      <div className="min-w-0 flex-1">
-        <p className={cn('font-medium truncate group-hover:underline', size === 'sm' ? 'text-sm' : 'text-[15px]')}>{name}</p>
-        {metadata?.nip05 && (
-          <p className="text-xs text-muted-foreground truncate">{metadata.nip05}</p>
+    <div className="flex items-center gap-3 py-1">
+      <Link to={profileUrl} className="flex items-center gap-3 group flex-1 min-w-0">
+        <Avatar shape={avatarShape} className={cn(avatarCls, 'ring-2 ring-background')}>
+          <AvatarImage src={metadata?.picture} />
+          <AvatarFallback className={cn('bg-muted text-muted-foreground', fallbackCls)}>
+            {name.charAt(0).toUpperCase()}
+          </AvatarFallback>
+        </Avatar>
+        <div className="min-w-0 flex-1">
+          <p className={cn('font-medium truncate group-hover:underline', size === 'sm' ? 'text-sm' : 'text-[15px]')}>{name}</p>
+          {metadata?.nip05 && (
+            <p className="text-xs text-muted-foreground truncate">{metadata.nip05}</p>
+          )}
+        </div>
+        {label && (
+          <Badge variant="secondary" className="ml-auto capitalize text-xs shrink-0">{label}</Badge>
         )}
-      </div>
-      {label && (
-        <Badge variant="secondary" className="ml-auto capitalize text-xs shrink-0">{label}</Badge>
+      </Link>
+      {onBan && (
+        <button
+          onClick={(e) => { e.stopPropagation(); onBan(); }}
+          className="p-1.5 rounded-full text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors shrink-0"
+          aria-label="Ban from community"
+          title="Ban from community"
+        >
+          <ShieldBan className="size-4" />
+        </button>
       )}
-    </Link>
+    </div>
   );
 }
 
@@ -79,26 +90,6 @@ function MembersSkeleton() {
             <Skeleton className="h-3 w-20" />
           </div>
           <Skeleton className="h-5 w-16 rounded-full" />
-        </div>
-      ))}
-    </div>
-  );
-}
-
-function EventsSkeleton() {
-  return (
-    <div className="divide-y divide-border">
-      {Array.from({ length: 3 }).map((_, i) => (
-        <div key={i} className="px-4 py-4 space-y-3">
-          <div className="flex items-center gap-3">
-            <Skeleton className="size-10 rounded-full" />
-            <div className="space-y-1.5 flex-1">
-              <Skeleton className="h-4 w-32" />
-              <Skeleton className="h-3 w-20" />
-            </div>
-          </div>
-          <Skeleton className="h-[180px] w-full rounded-lg" />
-          <Skeleton className="h-4 w-3/4" />
         </div>
       ))}
     </div>
@@ -124,8 +115,12 @@ function ReplyCardSkeleton() {
 
 export function CommunityDetailPage({ event }: { event: NostrEvent }) {
   const navigate = useNavigate();
-  const { nostr } = useNostr();
   const { toast } = useToast();
+  const { user } = useCurrentUser();
+
+  // ── Member ban dialog state ────────────────────────────────────────────────
+  const [banDialogOpen, setBanDialogOpen] = useState(false);
+  const [banTargetPubkey, setBanTargetPubkey] = useState<string | null>(null);
 
   // Parse community definition
   const community = useMemo(() => parseCommunityEvent(event), [event]);
@@ -146,7 +141,8 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
   }, [description, descriptionUrl]);
 
   // ── Members ─────────────────────────────────────────────────────────────────
-  const { data: membership, isLoading: membersLoading } = useCommunityMembers(community);
+  const { data: membership, moderation, rankMap, isLoading: membersLoading } = useCommunityMembers(community);
+  const viewerMember = user ? getViewerAuthority(user.pubkey, rankMap, moderation) : undefined;
 
   // Batch-fetch profiles for all members
   const allMemberPubkeys = useMemo(
@@ -191,35 +187,26 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
     return result;
   }, [membership, community]);
 
-  // ── Events (calendar events tagging this community) ─────────────────────────
-  const { data: communityEvents, isLoading: eventsLoading } = useQuery({
-    queryKey: ['community-events', communityATag],
-    queryFn: async ({ signal }) => {
-      if (!communityATag) return [];
-      const events = await nostr.query(
-        [{ kinds: CALENDAR_EVENT_KINDS, '#a': [communityATag], limit: 100 }],
-        { signal: AbortSignal.any([signal, AbortSignal.timeout(8_000)]) },
-      );
-      // Sort by start date descending
-      return events.sort((a, b) => {
-        const aStart = parseInt(a.tags.find(([n]) => n === 'start')?.[1] ?? '0', 10);
-        const bStart = parseInt(b.tags.find(([n]) => n === 'start')?.[1] ?? '0', 10);
-        return bStart - aStart;
-      });
-    },
-    enabled: !!communityATag,
-    staleTime: 2 * 60_000,
-  });
-
   // ── Comments (NIP-22 on the community event) ───────────────────────────────
   const { data: commentsData, isLoading: commentsLoading } = useComments(event, 500);
+  const { membersOnly } = useMembersOnlyFilter();
 
   const replyTree = useMemo((): ReplyNode[] => {
     if (!commentsData) return [];
     const topLevel = commentsData.topLevelComments ?? [];
 
+    // Filter: omit banned events and posts by banned members, then optionally
+    // restrict to chain-validated members when the "members only" toggle is
+    // active. The member filter is a presentation-layer choice — the NIP
+    // recommends it as the canonical-feed default, but users may opt out.
+    const applyModeration = (events: NostrEvent[]): NostrEvent[] => {
+      const moderated = applyCommunityModerationToEvents(events, moderation);
+      if (!membersOnly) return moderated;
+      return moderated.filter((ev) => rankMap.has(ev.pubkey));
+    };
+
     const buildNode = (ev: NostrEvent): ReplyNode => {
-      const allChildren = commentsData.getDirectReplies(ev.id) ?? [];
+      const allChildren = applyModeration(commentsData.getDirectReplies(ev.id) ?? []);
       if (allChildren.length <= 1) {
         return {
           event: ev,
@@ -234,8 +221,10 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
       };
     };
 
-    return [...topLevel].sort((a, b) => a.created_at - b.created_at).map((r) => buildNode(r));
-  }, [commentsData]);
+    return applyModeration([...topLevel])
+      .sort((a, b) => a.created_at - b.created_at)
+      .map((r) => buildNode(r));
+  }, [commentsData, moderation, membersOnly, rankMap]);
 
   // ── Share handler ───────────────────────────────────────────────────────────
   const handleShare = useCallback(async () => {
@@ -301,114 +290,124 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
           <p className="text-sm leading-relaxed text-muted-foreground whitespace-pre-wrap">{descriptionText}</p>
         )}
 
-        {/* Founder */}
+        {/* Founder + community-wide filter toggle. The toggle sits
+            right-justified on the same row as the "Founded by" label so
+            it clearly scopes the whole community (every content feed
+            below the tabs), not any one tab. */}
         <div>
-          <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-1">Founded by</p>
+          <div className="flex items-start justify-between gap-2 mb-1">
+            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Founded by</p>
+            <MembersOnlyToggle className="-my-2 -mr-2" />
+          </div>
           <PersonRow pubkey={event.pubkey} />
         </div>
 
         {/* ── Tabs ── */}
-        <Tabs defaultValue="members" className="-mx-5">
-          <TabsList className="w-full rounded-none border-b border-border bg-transparent p-0 h-auto">
-            <TabsTrigger
-              value="members"
-              className="flex-1 rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none pb-3 pt-2"
-            >
-              <Users className="size-4 mr-1.5" />
-              Members
-            </TabsTrigger>
-            <TabsTrigger
-              value="events"
-              className="flex-1 rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none pb-3 pt-2"
-            >
-              <CalendarDays className="size-4 mr-1.5" />
-              Events
-            </TabsTrigger>
-            <TabsTrigger
-              value="comments"
-              className="flex-1 rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none pb-3 pt-2"
-            >
-              <MessageCircle className="size-4 mr-1.5" />
-              Comments
-            </TabsTrigger>
-          </TabsList>
+        <CommunityModerationContext.Provider value={communityATag ? { communityATag, moderation, rankMap } : null}>
+          <Tabs defaultValue="members" className="-mx-5">
+            <TabsList className="w-full rounded-none border-b border-border bg-transparent p-0 h-auto">
+              <TabsTrigger
+                value="members"
+                className="flex-1 rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none pb-3 pt-2"
+              >
+                <Users className="size-4 mr-1.5" />
+                Members
+              </TabsTrigger>
+              <TabsTrigger
+                value="comments"
+                className="flex-1 rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none pb-3 pt-2"
+              >
+                <MessageCircle className="size-4 mr-1.5" />
+                Comments
+              </TabsTrigger>
+            </TabsList>
 
-          {/* ── Members tab ── */}
-          <TabsContent value="members" className="mt-0">
-            {membersLoading ? (
-              <MembersSkeleton />
-            ) : membersByRank.length === 0 ? (
-              <div className="py-12 text-center text-muted-foreground text-sm px-5">
-                No members found.
-              </div>
-            ) : (
-              <div className="divide-y divide-border">
-                {membersByRank.map(({ rank, label, members }) => (
-                  <section key={rank} className="px-5 py-4">
-                    <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-3 flex items-center gap-2">
-                      {rank === 0 ? <Crown className="size-3.5 text-amber-500" /> : <Shield className="size-3.5" />}
-                      {label}
-                      <span className="text-muted-foreground/60 font-normal">({members.length})</span>
-                    </h3>
-                    <div className="space-y-0.5">
-                      {members.map((m) => {
-                        let roleLabel: string | undefined;
-                        if (rank === 0) {
-                          roleLabel = m.pubkey === event.pubkey ? 'Founder' : 'Moderator';
-                        }
-                        return (
-                          <PersonRow
-                            key={m.pubkey}
-                            pubkey={m.pubkey}
-                            label={roleLabel}
-                            size="sm"
-                          />
-                        );
-                      })}
-                    </div>
-                  </section>
-                ))}
-              </div>
-            )}
-          </TabsContent>
+            {/* ── Members tab ── */}
+            <TabsContent value="members" className="mt-0">
+              {membersLoading ? (
+                <MembersSkeleton />
+              ) : membersByRank.length === 0 ? (
+                <div className="py-12 text-center text-muted-foreground text-sm px-5">
+                  No members found.
+                </div>
+              ) : (
+                <div className="divide-y divide-border">
+                  {membersByRank.map(({ rank, label, members }) => (
+                    <section key={rank} className="px-5 py-4">
+                      <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-3 flex items-center gap-2">
+                        {rank === 0 ? <Crown className="size-3.5 text-amber-500" /> : <Shield className="size-3.5" />}
+                        {label}
+                        <span className="text-muted-foreground/60 font-normal">({members.length})</span>
+                      </h3>
+                      <div className="space-y-0.5">
+                        {members.map((m) => {
+                          let roleLabel: string | undefined;
+                          if (rank === 0) {
+                            roleLabel = m.pubkey === event.pubkey ? 'Founder' : 'Moderator';
+                          }
+                          // Determine if the current user can ban this member
+                          const canBanMember = viewerMember
+                            && m.pubkey !== user?.pubkey
+                            && canBanTarget(viewerMember, m);
+                          return (
+                            <PersonRow
+                              key={m.pubkey}
+                              pubkey={m.pubkey}
+                              label={roleLabel}
+                              size="sm"
+                              onBan={canBanMember ? () => {
+                                setBanTargetPubkey(m.pubkey);
+                                setBanDialogOpen(true);
+                              } : undefined}
+                            />
+                          );
+                        })}
+                      </div>
+                    </section>
+                  ))}
+                </div>
+              )}
+            </TabsContent>
 
-          {/* ── Events tab ── */}
-          <TabsContent value="events" className="mt-0">
-            {eventsLoading ? (
-              <EventsSkeleton />
-            ) : !communityEvents || communityEvents.length === 0 ? (
-              <div className="py-12 text-center">
-                <p className="text-muted-foreground text-sm">No events yet</p>
-              </div>
-            ) : (
-              <div>
-                {communityEvents.map((ev) => (
-                  <NoteCard key={ev.id} event={ev} compact />
-                ))}
-              </div>
-            )}
-          </TabsContent>
+            {/* ── Comments tab ── */}
+            <TabsContent value="comments" className="mt-0">
+              <ComposeBox compact replyTo={event} />
 
-          {/* ── Comments tab ── */}
-          <TabsContent value="comments" className="mt-0">
-            <ComposeBox compact replyTo={event} />
-
-            {commentsLoading ? (
-              <div className="divide-y divide-border">
-                {Array.from({ length: 3 }).map((_, i) => (
-                  <ReplyCardSkeleton key={i} />
-                ))}
-              </div>
-            ) : replyTree.length > 0 ? (
-              <ThreadedReplyList roots={replyTree} />
-            ) : (
-              <div className="py-12 text-center text-muted-foreground text-sm">
-                No comments yet. Be the first to comment!
-              </div>
-            )}
-          </TabsContent>
-        </Tabs>
+              {commentsLoading ? (
+                <div className="divide-y divide-border">
+                  {Array.from({ length: 3 }).map((_, i) => (
+                    <ReplyCardSkeleton key={i} />
+                  ))}
+                </div>
+              ) : replyTree.length > 0 ? (
+                <ThreadedReplyList roots={replyTree} />
+              ) : membersOnly && commentsData && (commentsData.topLevelComments?.length ?? 0) > 0 ? (
+                <div className="py-12 text-center text-muted-foreground text-sm px-5">
+                  No comments from community members yet. Toggle the shield icon to see all comments.
+                </div>
+              ) : (
+                <div className="py-12 text-center text-muted-foreground text-sm">
+                  No comments yet. Be the first to comment!
+                </div>
+              )}
+            </TabsContent>
+          </Tabs>
+        </CommunityModerationContext.Provider>
       </div>
+
+      {/* Member ban confirmation dialog */}
+      {banTargetPubkey && communityATag && (
+        <BanConfirmDialog
+          mode="member"
+          targetPubkey={banTargetPubkey}
+          communityATag={communityATag}
+          open={banDialogOpen}
+          onOpenChange={(open) => {
+            setBanDialogOpen(open);
+            if (!open) setBanTargetPubkey(null);
+          }}
+        />
+      )}
     </div>
   );
 }
