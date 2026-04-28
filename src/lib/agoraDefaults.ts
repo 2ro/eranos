@@ -36,5 +36,5 @@ export const VERIFIED_FOLLOW_PACK = {
   relays: decoded.data.relays,
 } as const;
 
-/** Sidebar path for the verified follow pack — routes to the rich FollowPackView. */
-export const VERIFIED_FOLLOW_PACK_PATH = `/follow/${VERIFIED_FOLLOW_PACK_NADDR}`;
+/** Sidebar path for the in-app Verified page. */
+export const VERIFIED_PAGE_PATH = '/verified';

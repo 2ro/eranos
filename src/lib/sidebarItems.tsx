@@ -35,7 +35,7 @@ import {
   WalletMinimal,
   Zap,
 } from "lucide-react";
-import { VERIFIED_FOLLOW_PACK_PATH } from "@/lib/agoraDefaults";
+import { VERIFIED_PAGE_PATH } from "@/lib/agoraDefaults";
 import { CardsIcon } from "@/components/icons/CardsIcon";
 import { ChestIcon } from "@/components/icons/ChestIcon";
 
@@ -125,7 +125,7 @@ export const SIDEBAR_ITEMS: SidebarItemDef[] = [
   {
     id: "verified",
     label: "Verified",
-    path: VERIFIED_FOLLOW_PACK_PATH,
+    path: VERIFIED_PAGE_PATH,
     icon: BadgeCheck,
   },
   {
