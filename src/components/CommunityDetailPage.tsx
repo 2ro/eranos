@@ -234,8 +234,13 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
   }, [moderatedGoals, membersOnly, rankMap, isExpired]);
   const pastGoals = useMemo(() => {
     const all = moderatedGoals.filter((e) => isExpired(e));
-    if (!membersOnly) return all;
-    return all.filter((e) => rankMap.has(e.pubkey));
+    const filtered = membersOnly ? all.filter((e) => rankMap.has(e.pubkey)) : all;
+    // Sort by deadline descending so the most recently ended goal appears first.
+    return filtered.sort((a, b) => {
+      const aClose = parseInt(a.tags.find(([n]) => n === 'closed_at')?.[1] ?? '0', 10);
+      const bClose = parseInt(b.tags.find(([n]) => n === 'closed_at')?.[1] ?? '0', 10);
+      return bClose - aClose;
+    });
   }, [moderatedGoals, membersOnly, rankMap, isExpired]);
 
   const replyTree = useMemo((): ReplyNode[] => {
