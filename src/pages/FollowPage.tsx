@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useInView } from 'react-intersection-observer';
 import { nip19 } from 'nostr-tools';
@@ -29,67 +29,11 @@ import { AgoraLogo } from '@/components/AgoraLogo';
 import { Nip05Badge } from '@/components/Nip05Badge';
 import { SubHeaderBar } from '@/components/SubHeaderBar';
 import { TabButton } from '@/components/TabButton';
-import { useActiveProfileTheme } from '@/hooks/useActiveProfileTheme';
 import { useOnboarding } from '@/hooks/useOnboarding';
-import { buildThemeCssFromCore } from '@/themes';
-import { loadAndApplyFont, loadAndApplyTitleFont } from '@/lib/fontLoader';
 import LoginDialog from '@/components/auth/LoginDialog';
 import type { FeedItem } from '@/lib/feedUtils';
 import type { AddressPointer } from 'nostr-tools/nip19';
 import NotFound from './NotFound';
-
-// ---------------------------------------------------------------------------
-// Theme application
-// ---------------------------------------------------------------------------
-
-function useApplyProfileTheme(pubkey: string | undefined) {
-  const themeQuery = useActiveProfileTheme(pubkey);
-  const theme = themeQuery.data;
-
-  useLayoutEffect(() => {
-    if (!theme?.colors) return;
-
-    const css = buildThemeCssFromCore(theme.colors);
-    let el = document.getElementById('theme-vars') as HTMLStyleElement | null;
-    const previousCss = el?.textContent ?? null;
-    if (!el) {
-      el = document.createElement('style');
-      el.id = 'theme-vars';
-      document.head.appendChild(el);
-    }
-    el.textContent = css;
-
-    if (theme.font) loadAndApplyFont(theme.font);
-    if (theme.titleFont) loadAndApplyTitleFont(theme.titleFont);
-
-    const bgStyleId = 'theme-background';
-    const prevBgEl = document.getElementById(bgStyleId) as HTMLStyleElement | null;
-    if (theme.background?.url) {
-      let bgEl = prevBgEl;
-      if (!bgEl) {
-        bgEl = document.createElement('style');
-        bgEl.id = bgStyleId;
-        document.head.appendChild(bgEl);
-      }
-      const mode = theme.background.mode ?? 'cover';
-      bgEl.textContent = mode === 'tile'
-        ? `body { background-image: url("${theme.background.url}"); background-repeat: repeat; background-size: auto; }`
-        : `body { background-image: url("${theme.background.url}"); background-size: cover; background-repeat: no-repeat; background-position: center; background-attachment: fixed; }`;
-    } else {
-      prevBgEl?.remove();
-    }
-
-    return () => {
-      const styleEl = document.getElementById('theme-vars') as HTMLStyleElement | null;
-      if (styleEl && previousCss !== null) {
-        styleEl.textContent = previousCss;
-      } else if (styleEl) {
-        styleEl.remove();
-      }
-      document.getElementById(bgStyleId)?.remove();
-    };
-  }, [theme]);
-}
 
 // ---------------------------------------------------------------------------
 // Profile feed (reuses useProfileFeed + NoteCard)
@@ -190,8 +134,6 @@ function FollowView({ pubkey }: { pubkey: string }) {
   const isLoggedOut = !user;
 
   const [loginOpen, setLoginOpen] = useState(false);
-
-  useApplyProfileTheme(pubkey);
 
   const hasAutoFollowed = useRef(false);
   const [followDone, setFollowDone] = useState(false);

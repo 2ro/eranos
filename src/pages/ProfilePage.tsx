@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useInView } from 'react-intersection-observer';
@@ -6,16 +6,14 @@ import { useNostr } from '@nostrify/react';
 import { useInfiniteQuery, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useSeoMeta } from '@unhead/react';
 import { nip19 } from 'nostr-tools';
-import { Zap, Flame, MoreHorizontal, ClipboardCopy, ExternalLink, VolumeX, Flag, Bitcoin, Pin, X, QrCode, Check, Copy, Loader2, Download, Palette, Pencil, Trash2, Eye, EyeOff, RefreshCw, RotateCcw, MessageSquare, Globe, Mail, Plus, GripVertical, ListPlus, Award, PanelLeft } from 'lucide-react';
+import { Zap, Flame, MoreHorizontal, ClipboardCopy, ExternalLink, VolumeX, Flag, Bitcoin, Pin, X, QrCode, Check, Copy, Loader2, Download, Pencil, Trash2, RotateCcw, MessageSquare, Globe, Mail, Plus, GripVertical, ListPlus, Award, PanelLeft } from 'lucide-react';
 
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { getAvatarShape, isEmoji, emojiAvatarBorderStyle } from '@/lib/avatarShape';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
-import { Switch } from '@/components/ui/switch';
-import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
 import { useLayoutOptions } from '@/contexts/LayoutContext';
@@ -59,14 +57,9 @@ import { MiniAudioPlayer } from '@/components/MiniAudioPlayer';
 import { isAudioUrl, isImageUrl, isVideoUrl } from '@/lib/mediaTypeDetection';
 import { VideoPlayer } from '@/components/VideoPlayer';
 
-import { useActiveProfileTheme } from '@/hooks/useActiveProfileTheme';
-import { usePublishTheme } from '@/hooks/usePublishTheme';
-import { useTheme } from '@/hooks/useTheme';
 import { useUserStatus } from '@/hooks/useUserStatus';
-import { useLocalStorage } from '@/hooks/useLocalStorage';
 import { useNip85UserStats } from '@/hooks/useNip85Stats';
 import { useFeedSettings } from '@/hooks/useFeedSettings';
-import { useEncryptedSettings } from '@/hooks/useEncryptedSettings';
 import { useProfileTabs } from '@/hooks/useProfileTabs';
 import { usePublishProfileTabs } from '@/hooks/usePublishProfileTabs';
 
@@ -88,14 +81,6 @@ import {
   horizontalListSortingStrategy, arrayMove,
 } from '@dnd-kit/sortable';
 import { CSS as DndCSS } from '@dnd-kit/utilities';
-import { buildThemeCssFromCore, coreToTokens, buildThemeCss, resolveTheme, resolveThemeConfig, toThemeVar, type CoreThemeColors, type ThemeConfig, type ThemeFont, type ThemeBackground } from '@/themes';
-import { loadAndApplyFont, loadAndApplyTitleFont } from '@/lib/fontLoader';
-import { resolveCssFamily } from '@/lib/fonts';
-import { hslStringToHex, hexToHslString } from '@/lib/colorUtils';
-import { ColorPicker } from '@/components/ui/color-picker';
-import { FontSection } from '@/components/FontPicker';
-import { BackgroundPicker } from '@/components/BackgroundPicker';
-import { PortalContainerProvider } from '@/hooks/usePortalContainer';
 import { formatNumber } from '@/lib/formatNumber';
 import { SubHeaderBar } from '@/components/SubHeaderBar';
 import { useActiveTabIndicator } from '@/components/SubHeaderBarContext';
@@ -1377,6 +1362,7 @@ type EditableTab = { label: string; isCore: boolean; tab?: ProfileTab };
   const followersCount = userStats?.followers ?? 0;
 
   const isOwnProfile = user?.pubkey === pubkey;
+  const { feedSettings } = useFeedSettings();
 
   // Does the profile owner follow the current user?
   // Wall posts are only visible to people the profile owner follows,
@@ -1387,211 +1373,6 @@ type EditableTab = { label: string; isCore: boolean; tab?: ProfileTab };
     return wallFollowList.includes(user.pubkey);
   }, [user?.pubkey, wallFollowList, isOwnProfile]);
   const { togglePin } = usePinnedNotes(isOwnProfile ? pubkey : undefined);
-
-  // Profile theme: always query (so we can show the indicator), but only apply when enabled
-  const { feedSettings } = useFeedSettings();
-  const showCustomProfileThemes = feedSettings.showCustomProfileThemes !== false;
-  const profileThemeQuery = useActiveProfileTheme(pubkey);
-  const profileTheme = profileThemeQuery.data;
-  const profileHasTheme = !!profileTheme?.colors;
-  const profileThemeColors = (showCustomProfileThemes || isOwnProfile) ? profileTheme?.colors : undefined;
-
-  // First-time custom theme info modal
-  const [hasSeenThemeInfo, setHasSeenThemeInfo] = useLocalStorage('ditto:seen-profile-theme-info', false);
-  const [themeInfoOpen, setThemeInfoOpen] = useState(false);
-  const { updateFeedSettings } = useFeedSettings();
-  const { updateSettings: encryptedUpdateSettings } = useEncryptedSettings();
-
-  // Own-profile share theme prompt
-  const { setActiveTheme, clearActiveTheme, isPending: isPublishingTheme } = usePublishTheme();
-  const [shareThemeOpen, setShareThemeOpen] = useState(false);
-  const [removeThemeOpen, setRemoveThemeOpen] = useState(false);
-  const [editProfileThemeOpen, setEditProfileThemeOpen] = useState(false);
-  const [editThemePortalContainer, setEditThemePortalContainer] = useState<HTMLElement | undefined>(undefined);
-  const editThemeContentRef = useCallback((node: HTMLElement | null) => {
-    setEditThemePortalContainer(node ?? undefined);
-  }, []);
-  const [localProfileColors, setLocalProfileColors] = useState<CoreThemeColors>({
-    background: '228 20% 10%',
-    text: '210 40% 98%',
-    primary: '258 70% 60%',
-  });
-  const [localProfileFont, setLocalProfileFont] = useState<ThemeFont | undefined>();
-  const [localProfileTitleFont, setLocalProfileTitleFont] = useState<ThemeFont | undefined>();
-  const [localProfileBg, setLocalProfileBg] = useState<ThemeBackground | undefined>();
-
-  // Initialize local state from profile theme when dialog opens
-  useEffect(() => {
-    if (editProfileThemeOpen && profileTheme) {
-      setLocalProfileColors(profileTheme.colors);
-      setLocalProfileFont(profileTheme.font);
-      setLocalProfileTitleFont(profileTheme.titleFont);
-      setLocalProfileBg(profileTheme.background);
-    }
-  }, [editProfileThemeOpen, profileTheme]);
-  const [dismissedThemeSnapshot, setDismissedThemeSnapshot] = useLocalStorage<string | null>('ditto:dismissed-share-theme-snapshot', null);
-
-  // Temporarily apply the visited user's theme globally while on their profile
-  const { theme: ownTheme, customTheme: ownCustomTheme, themes: configuredThemes, applyCustomTheme } = useTheme();
-
-  // Keep a ref to the latest own theme values so the cleanup function reads
-  // the *current* values (e.g. after "Copy Theme" was used) instead of stale closure values.
-  const ownThemeRef = useRef({ ownTheme, ownCustomTheme, configuredThemes });
-  ownThemeRef.current = { ownTheme, ownCustomTheme, configuredThemes };
-  const profileThemeFont = (showCustomProfileThemes || isOwnProfile) ? profileTheme?.font : undefined;
-  const profileThemeTitleFont = (showCustomProfileThemes || isOwnProfile) ? profileTheme?.titleFont : undefined;
-  const profileThemeBackground = (showCustomProfileThemes || isOwnProfile) ? profileTheme?.background : undefined;
-
-  // Whether we need to override the custom theme on this profile.
-  // When the profile has no published theme and the user has a custom app theme,
-  // fall back to the system-resolved builtin theme (light/dark based on OS preference)
-  // so the profile doesn't appear with the user's custom colors.
-  // Only apply this fallback once the query has settled (not while loading),
-  // to avoid a jarring flash — especially on your own profile where the
-  // current custom theme is already correct.
-  const profileThemeSettled = profileThemeQuery.isFetched;
-  const needsSystemFallback = profileThemeSettled && !profileThemeColors && ownTheme === 'custom';
-
-  // Detect whether the app custom theme differs from the published profile theme.
-  // Colors are compared via hex to avoid HSL precision issues from the hex round-trip.
-  // Fonts are compared by family name only, since the URL is resolved to a CDN URL at
-  // publish time and won't match the local config which omits it for bundled fonts.
-  const colorsToHex = (c: CoreThemeColors) =>
-    `${hslStringToHex(c.primary)}${hslStringToHex(c.text)}${hslStringToHex(c.background)}`;
-  const fontFamily = (f?: { family: string }) => f?.family ?? '';
-  const ownCustomThemeSnapshot = ownCustomTheme
-    ? colorsToHex(ownCustomTheme.colors) + fontFamily(ownCustomTheme.font) + fontFamily(ownCustomTheme.titleFont) + JSON.stringify(ownCustomTheme.background ?? '')
-    : null;
-  const profileThemeDiffers = profileHasTheme && ownCustomThemeSnapshot && profileTheme && ownCustomTheme
-    ? (colorsToHex(profileTheme.colors) !== colorsToHex(ownCustomTheme.colors)
-      || fontFamily(profileTheme.font) !== fontFamily(ownCustomTheme.font)
-      || fontFamily(profileTheme.titleFont) !== fontFamily(ownCustomTheme.titleFont)
-      || JSON.stringify(profileTheme.background ?? '') !== JSON.stringify(ownCustomTheme.background ?? ''))
-    : false;
-
-  // Show share-theme prompt on own profile when:
-  // 1. User has a custom theme but no published profile theme, OR
-  // 2. User's custom theme differs from their published profile theme
-  // Suppressed if the user dismissed the prompt for this exact custom theme snapshot.
-  const isDismissed = dismissedThemeSnapshot !== null && dismissedThemeSnapshot === ownCustomThemeSnapshot;
-  const showShareThemePrompt = isOwnProfile && ownTheme === 'custom' && ownCustomTheme && (!profileHasTheme || profileThemeDiffers) && !isDismissed;
-
-  // Show remove-theme button on own profile when the profile theme is in sync
-  // (custom theme matches published theme, or user is on a non-custom theme with a published theme)
-  const showRemoveThemeButton = isOwnProfile && profileHasTheme && !showShareThemePrompt;
-
-  // Determine the effective colors/font/background to apply on this profile:
-  // - If the profile has a theme, use it.
-  // - Otherwise, if the visitor has a custom theme, fall back to system builtin.
-  const effectiveProfileColors = profileThemeColors
-    ?? (needsSystemFallback ? resolveThemeConfig(resolveTheme('system') as 'light' | 'dark', configuredThemes).colors : undefined);
-  // When a profile has theme colors but no `f` tag, explicitly default to Inter
-  // so the visitor's custom font doesn't leak through.
-  const effectiveProfileFont = useMemo(
-    () => profileThemeColors ? (profileThemeFont ?? { family: 'Inter' }) : undefined,
-    [profileThemeColors, profileThemeFont],
-  );
-  // Title font falls back to the body font when not explicitly set,
-  // so the display name inherits the theme's body font rather than the default.
-  const effectiveProfileTitleFont = useMemo(
-    () => profileThemeColors ? (profileThemeTitleFont ?? effectiveProfileFont) : undefined,
-    [profileThemeColors, profileThemeTitleFont, effectiveProfileFont],
-  );
-  const effectiveProfileBackground = profileThemeColors ? profileThemeBackground : undefined;
-
-  useLayoutEffect(() => {
-    if (!effectiveProfileColors) return;
-
-    // Inject the profile theme's CSS vars onto :root
-    const css = buildThemeCssFromCore(effectiveProfileColors);
-    let el = document.getElementById('theme-vars') as HTMLStyleElement | null;
-    if (!el) {
-      el = document.createElement('style');
-      el.id = 'theme-vars';
-      document.head.appendChild(el);
-    }
-    const _previousCss = el.textContent;
-    el.textContent = css;
-
-    // Apply profile font (if any)
-    loadAndApplyFont(effectiveProfileFont);
-
-    // Apply profile title font (if any)
-    loadAndApplyTitleFont(effectiveProfileTitleFont);
-
-    // Apply profile background image (if any)
-    const bgStyleId = 'theme-background';
-    const previousBgEl = document.getElementById(bgStyleId) as HTMLStyleElement | null;
-
-    if (effectiveProfileBackground?.url) {
-      let bgEl = previousBgEl;
-      if (!bgEl) {
-        bgEl = document.createElement('style');
-        bgEl.id = bgStyleId;
-        document.head.appendChild(bgEl);
-      }
-      const bgMode = effectiveProfileBackground.mode ?? 'cover';
-      if (bgMode === 'tile') {
-        bgEl.textContent = `body { background-image: url("${effectiveProfileBackground.url}"); background-repeat: repeat; background-size: auto; }`;
-      } else {
-        bgEl.textContent = `body { background-image: url("${effectiveProfileBackground.url}"); background-size: cover; background-repeat: no-repeat; background-position: center; background-attachment: fixed; }`;
-      }
-    } else {
-      // No profile background — remove any existing background style
-      previousBgEl?.remove();
-    }
-
-    // Restore the user's own theme on cleanup.
-    // Read from ownThemeRef so we get the *latest* values (e.g. after "Copy Theme").
-    return () => {
-      const { ownTheme: curTheme, ownCustomTheme: curCustom, configuredThemes: curConfigured } = ownThemeRef.current;
-
-      const styleEl = document.getElementById('theme-vars') as HTMLStyleElement | null;
-      if (styleEl) {
-        // Always rebuild from the current theme setting so we never restore stale CSS
-        const resolved = resolveTheme(curTheme);
-        const colors = resolved === 'custom'
-          ? (curCustom?.colors ?? resolveThemeConfig('dark', curConfigured).colors)
-          : resolveThemeConfig(resolved, curConfigured).colors;
-        styleEl.textContent = buildThemeCss(coreToTokens(colors));
-      }
-      // Resolve the user's own active ThemeConfig (custom or configured light/dark)
-      const ownResolved = resolveTheme(curTheme);
-      const ownActiveConfig = ownResolved === 'custom'
-        ? curCustom
-        : resolveThemeConfig(ownResolved, curConfigured);
-
-      // Restore own font or clear override
-      loadAndApplyFont(ownActiveConfig?.font);
-
-      // Restore own title font or clear override
-      loadAndApplyTitleFont(ownActiveConfig?.titleFont);
-
-      // Restore own background or remove override
-      const bgEl = document.getElementById(bgStyleId) as HTMLStyleElement | null;
-      const ownBgUrl = ownActiveConfig?.background?.url;
-
-      if (ownBgUrl) {
-        // Always rebuild background CSS from the current own theme (via ref)
-        // so we never restore stale CSS captured before e.g. "Copy Theme".
-        const targetEl = bgEl ?? (() => {
-          const newBgEl = document.createElement('style');
-          newBgEl.id = bgStyleId;
-          document.head.appendChild(newBgEl);
-          return newBgEl;
-        })();
-        const ownBgMode = ownActiveConfig?.background?.mode ?? 'cover';
-        if (ownBgMode === 'tile') {
-          targetEl.textContent = `body { background-image: url("${ownBgUrl}"); background-repeat: repeat; background-size: auto; }`;
-        } else {
-          targetEl.textContent = `body { background-image: url("${ownBgUrl}"); background-size: cover; background-repeat: no-repeat; background-position: center; background-attachment: fixed; }`;
-        }
-      } else {
-        // Own theme has no background — remove the style element
-        bgEl?.remove();
-      }
-    };
-  }, [effectiveProfileColors, effectiveProfileFont, effectiveProfileTitleFont, effectiveProfileBackground]);
 
   const pinnedIds = useMemo(() => supplementary?.pinnedIds ?? [], [supplementary?.pinnedIds]);
 
@@ -1889,176 +1670,6 @@ type EditableTab = { label: string; isCore: boolean; tab?: ProfileTab };
               <div className="absolute inset-0 bg-gradient-to-br from-accent/10 via-transparent to-primary/5" />
             )}
 
-            {/* Custom theme indicator — shown when profile has a theme (active or disabled) */}
-            {profileHasTheme && !isOwnProfile && (
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <button
-                    className={cn(
-                      'absolute top-3 right-3 z-10 size-9 rounded-full backdrop-blur-sm border flex items-center justify-center transition-colors',
-                      showCustomProfileThemes
-                        ? 'bg-background/60 border-border/50 hover:bg-background/80'
-                        : 'bg-background/40 border-border/30 hover:bg-background/60',
-                    )}
-                  >
-                    {/* 3-burst pulse ring */}
-                    <span className={cn(
-                      'absolute inset-0 rounded-full animate-ping-3',
-                      showCustomProfileThemes ? 'bg-accent/30' : 'bg-primary/30',
-                    )} />
-                    <Palette className={cn(
-                      'size-4 relative',
-                      showCustomProfileThemes ? 'text-accent' : 'text-muted-foreground',
-                    )} />
-                    {/* Red notification dot — first time only */}
-                    {!hasSeenThemeInfo && (
-                      <span className="absolute -top-0.5 -right-0.5 size-3 rounded-full bg-red-500 border-2 border-background" />
-                    )}
-                  </button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" side="bottom" className="w-48">
-                  <DropdownMenuItem
-                    onClick={async () => {
-                      if (!hasSeenThemeInfo) {
-                        setThemeInfoOpen(true);
-                        setHasSeenThemeInfo(true);
-                      } else {
-                        const newVal = !showCustomProfileThemes;
-                        updateFeedSettings({ showCustomProfileThemes: newVal });
-                        if (user) {
-                          const updated = { ...feedSettings, showCustomProfileThemes: newVal };
-                          await encryptedUpdateSettings.mutateAsync({ feedSettings: updated });
-                        }
-                      }
-                    }}
-                    className="cursor-pointer"
-                  >
-                    {showCustomProfileThemes ? (
-                      <EyeOff className="size-4 mr-2" />
-                    ) : (
-                      <Eye className="size-4 mr-2" />
-                    )}
-                    {showCustomProfileThemes ? 'Hide Theme' : 'Show Theme'}
-                  </DropdownMenuItem>
-                  <DropdownMenuItem
-                    onClick={() => {
-                      if (!profileTheme) return;
-                      const themeConfig: ThemeConfig = {
-                        colors: profileTheme.colors,
-                        font: profileTheme.font,
-                        background: profileTheme.background,
-                      };
-                      applyCustomTheme(themeConfig);
-                      toast({ title: 'Theme applied', description: 'This profile\'s theme is now your app theme.' });
-                    }}
-                    className="cursor-pointer"
-                  >
-                    <Copy className="size-4 mr-2" />
-                    Copy Theme
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            )}
-
-            {/* Share theme prompt — own profile, custom theme not yet published */}
-            {showShareThemePrompt && ownCustomTheme && !profileThemeDiffers && (
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <button
-                    className="absolute top-3 right-3 z-10 size-9 rounded-full border flex items-center justify-center transition-all hover:scale-110"
-                    style={{
-                      backgroundColor: hslStringToHex(ownCustomTheme.colors.primary),
-                      borderColor: hslStringToHex(ownCustomTheme.colors.primary),
-                    }}
-                    onClick={() => setShareThemeOpen(true)}
-                  >
-                    {/* Continuous pulse ring themed to custom primary */}
-                    <span
-                      className="absolute inset-0 rounded-full animate-pulse-slow"
-                      style={{ backgroundColor: hslStringToHex(ownCustomTheme.colors.primary) }}
-                    />
-                    <Palette className="size-4 relative" style={{ color: hslStringToHex(ownCustomTheme.colors.background) }} />
-                  </button>
-                </TooltipTrigger>
-                <TooltipContent side="left">
-                  Apply your theme to your profile
-                </TooltipContent>
-              </Tooltip>
-            )}
-
-            {/* Update theme dropdown — own profile, custom theme differs from published */}
-            {showShareThemePrompt && ownCustomTheme && profileThemeDiffers && (
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <button
-                    className="absolute top-3 right-3 z-10 size-9 rounded-full border flex items-center justify-center transition-all hover:scale-110"
-                    style={{
-                      backgroundColor: hslStringToHex(ownCustomTheme.colors.primary),
-                      borderColor: hslStringToHex(ownCustomTheme.colors.primary),
-                    }}
-                  >
-                    {/* Continuous pulse ring themed to custom primary */}
-                    <span
-                      className="absolute inset-0 rounded-full animate-pulse-slow"
-                      style={{ backgroundColor: hslStringToHex(ownCustomTheme.colors.primary) }}
-                    />
-                    <Palette className="size-4 relative" style={{ color: hslStringToHex(ownCustomTheme.colors.background) }} />
-                  </button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" side="bottom" className="w-52">
-                  <DropdownMenuItem
-                    onClick={() => setShareThemeOpen(true)}
-                    className="cursor-pointer"
-                  >
-                    <RefreshCw className="size-4 mr-2" />
-                    Update Profile Theme
-                  </DropdownMenuItem>
-                  <DropdownMenuItem
-                    onClick={() => setEditProfileThemeOpen(true)}
-                    className="cursor-pointer"
-                  >
-                    <Pencil className="size-4 mr-2" />
-                    Edit Profile Theme
-                  </DropdownMenuItem>
-                  <DropdownMenuItem
-                    onClick={() => setRemoveThemeOpen(true)}
-                    className="cursor-pointer text-destructive focus:text-destructive"
-                  >
-                    <Trash2 className="size-4 mr-2" />
-                    Delete Profile Theme
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            )}
-
-            {/* Remove theme dropdown — own profile, profile theme is in sync or on non-custom theme */}
-            {showRemoveThemeButton && (
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <button
-                    className="absolute top-3 right-3 z-10 size-9 rounded-full backdrop-blur-sm border bg-background/60 border-border/50 hover:bg-background/80 flex items-center justify-center transition-colors"
-                  >
-                    <Palette className="size-4 text-accent" />
-                  </button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" side="bottom" className="w-52">
-                  <DropdownMenuItem
-                    onClick={() => setEditProfileThemeOpen(true)}
-                    className="cursor-pointer"
-                  >
-                    <Pencil className="size-4 mr-2" />
-                    Edit Profile Theme
-                  </DropdownMenuItem>
-                  <DropdownMenuItem
-                    onClick={() => setRemoveThemeOpen(true)}
-                    className="cursor-pointer text-destructive focus:text-destructive"
-                  >
-                    <Trash2 className="size-4 mr-2" />
-                    Delete Profile Theme
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            )}
           </div>
 
           {/* Profile info */}
@@ -2163,10 +1774,7 @@ type EditableTab = { label: string; isCore: boolean; tab?: ProfileTab };
                 </div>
               </div>
 
-              <h2
-                className="text-xl font-bold truncate"
-                style={effectiveProfileTitleFont ? { fontFamily: 'var(--title-font-family)' } : undefined}
-              >
+              <h2 className="text-xl font-bold truncate">
                 {metadataEvent ? (
                   <EmojifiedText tags={metadataEvent.tags}>{displayName}</EmojifiedText>
                 ) : displayName}
@@ -2667,217 +2275,6 @@ type EditableTab = { label: string; isCore: boolean; tab?: ProfileTab };
           />
         )}
 
-        {/* First-time custom theme info modal */}
-        <Dialog open={themeInfoOpen} onOpenChange={setThemeInfoOpen}>
-          <DialogContent className="sm:max-w-md rounded-2xl">
-            <DialogHeader>
-              <DialogTitle className="text-lg">Custom Profile Theme</DialogTitle>
-              <DialogDescription className="text-sm text-muted-foreground leading-relaxed">
-                You're viewing <span className="font-semibold text-foreground">{displayName}</span>'s profile with their own custom theme applied. The colors you see are part of their personal style.
-              </DialogDescription>
-            </DialogHeader>
-            <div className="space-y-4 pt-2">
-              <div className="flex items-center justify-between rounded-lg border p-3">
-                <div className="space-y-0.5 flex-1">
-                  <span className="text-sm font-medium">Show custom profile themes</span>
-                  <p className="text-xs text-muted-foreground">See other users' themes when visiting their profiles</p>
-                </div>
-                <Switch
-                  checked={showCustomProfileThemes}
-                  onCheckedChange={async (val) => {
-                    updateFeedSettings({ showCustomProfileThemes: val });
-                    if (user) {
-                      const updatedFeedSettings = { ...feedSettings, showCustomProfileThemes: val };
-                      await encryptedUpdateSettings.mutateAsync({ feedSettings: updatedFeedSettings });
-                    }
-                  }}
-                />
-              </div>
-              <p className="text-xs text-muted-foreground">
-                You can change this anytime in{' '}
-                <Link to="/settings/content" className="text-primary hover:underline" onClick={() => setThemeInfoOpen(false)}>
-                  Content Settings
-                </Link>.
-              </p>
-            </div>
-          </DialogContent>
-        </Dialog>
-
-        {/* Share theme to profile prompt — own profile, styled with the user's custom theme */}
-        <Dialog open={shareThemeOpen} onOpenChange={setShareThemeOpen}>
-          <DialogContent
-            className="sm:max-w-md rounded-2xl bg-background text-foreground border-border"
-            style={ownCustomTheme ? Object.fromEntries(
-              Object.entries(coreToTokens(ownCustomTheme.colors)).map(([k, v]) => [toThemeVar(k), v]),
-            ) : undefined}
-          >
-            <DialogHeader>
-              <DialogTitle className="text-lg">{profileThemeDiffers ? 'Update Your Profile Theme' : 'Share Your Theme'}</DialogTitle>
-              <DialogDescription className="text-sm text-muted-foreground leading-relaxed">
-                {profileThemeDiffers
-                  ? 'Your app theme has changed since you last published it. Would you like to update your profile theme to match?'
-                  : 'You have a custom theme, but it\'s not visible on your profile yet. Would you like to apply it so others can see it when they visit?'}
-              </DialogDescription>
-            </DialogHeader>
-
-            {/* Theme preview swatches */}
-            {ownCustomTheme && (
-              <div className="flex items-center justify-center gap-3 py-2">
-                {(['primary', 'text', 'background'] as const).map((key) => (
-                  <div key={key} className="flex flex-col items-center gap-1.5">
-                    <div
-                      className="size-10 rounded-full border border-border/50 shadow-sm"
-                      style={{ backgroundColor: `hsl(${ownCustomTheme.colors[key]})` }}
-                    />
-                    <span className="text-[10px] text-muted-foreground capitalize">{key}</span>
-                  </div>
-                ))}
-              </div>
-            )}
-
-            <div className="flex flex-col gap-2 pt-2">
-              <Button
-                onClick={async () => {
-                  if (!ownCustomTheme) return;
-                  try {
-                    await setActiveTheme({ themeConfig: ownCustomTheme });
-                    setShareThemeOpen(false);
-                  } catch {
-                    // Error is handled by the publish hook
-                  }
-                }}
-                disabled={isPublishingTheme}
-              >
-                {isPublishingTheme ? (
-                  <Loader2 className="size-4 animate-spin mr-2" />
-                ) : null}
-                {profileThemeDiffers ? 'Yes, update my theme' : 'Yes, apply my theme'}
-              </Button>
-              <Button
-                variant="ghost"
-                onClick={() => {
-                  setDismissedThemeSnapshot(ownCustomThemeSnapshot);
-                  setShareThemeOpen(false);
-                }}
-              >
-                No thanks
-              </Button>
-            </div>
-           </DialogContent>
-        </Dialog>
-
-        {/* Remove profile theme confirmation dialog */}
-        <Dialog open={removeThemeOpen} onOpenChange={setRemoveThemeOpen}>
-          <DialogContent className="sm:max-w-md rounded-2xl">
-            <DialogHeader>
-              <DialogTitle className="text-lg">Remove Profile Theme</DialogTitle>
-              <DialogDescription className="text-sm text-muted-foreground leading-relaxed">
-                This will remove your custom theme from your profile. Visitors will no longer see it when they visit.
-              </DialogDescription>
-            </DialogHeader>
-            <div className="flex flex-col gap-2 pt-2">
-              <Button
-                variant="destructive"
-                onClick={async () => {
-                  try {
-                    await clearActiveTheme();
-                    setRemoveThemeOpen(false);
-                  } catch {
-                    // Error is handled by the publish hook
-                  }
-                }}
-                disabled={isPublishingTheme}
-              >
-                {isPublishingTheme ? (
-                  <Loader2 className="size-4 animate-spin mr-2" />
-                ) : null}
-                Yes, remove it
-              </Button>
-              <Button
-                variant="ghost"
-                onClick={() => setRemoveThemeOpen(false)}
-              >
-                Keep it
-              </Button>
-            </div>
-          </DialogContent>
-        </Dialog>
-
-        {/* Edit profile theme dialog — independent from app theme */}
-        <Dialog open={editProfileThemeOpen} onOpenChange={setEditProfileThemeOpen}>
-          <DialogContent ref={editThemeContentRef} className="w-[calc(100%-2rem)] max-w-md max-h-[85vh] overflow-visible rounded-lg p-0">
-            <PortalContainerProvider value={editThemePortalContainer}>
-            <div className="overflow-y-auto max-h-[85vh] p-6 space-y-4">
-            <DialogHeader>
-              <DialogTitle style={localProfileTitleFont?.family ? { fontFamily: `"${resolveCssFamily(localProfileTitleFont.family)}", inherit` } : undefined}>Edit Profile Theme</DialogTitle>
-              <DialogDescription>
-                Customize the theme visitors see on your profile
-              </DialogDescription>
-            </DialogHeader>
-
-            <div className="space-y-4 py-2">
-              {/* Colors */}
-              <div className="flex items-start justify-center gap-6">
-                {(['primary', 'text', 'background'] as const).map((key) => (
-                  <ColorPicker
-                    key={key}
-                    label={key.charAt(0).toUpperCase() + key.slice(1)}
-                    value={hslStringToHex(localProfileColors[key])}
-                    onChange={(hex) => {
-                      setLocalProfileColors((prev) => ({
-                        ...prev,
-                        [key]: hexToHslString(hex),
-                      }));
-                    }}
-                  />
-                ))}
-              </div>
-
-              {/* Fonts (body + title) */}
-              <FontSection
-                bodyFont={localProfileFont}
-                onBodyFontChange={setLocalProfileFont}
-                titleFont={localProfileTitleFont}
-                onTitleFontChange={setLocalProfileTitleFont}
-              />
-
-              {/* Background */}
-              <BackgroundPicker
-                value={localProfileBg}
-                onChange={setLocalProfileBg}
-              />
-            </div>
-
-            <DialogFooter>
-              <Button
-                className="w-full"
-                onClick={async () => {
-                  try {
-                    await setActiveTheme({
-                      themeConfig: {
-                        colors: localProfileColors,
-                        font: localProfileFont,
-                        titleFont: localProfileTitleFont,
-                        background: localProfileBg,
-                      },
-                    });
-                    setEditProfileThemeOpen(false);
-                  } catch {
-                    // Error is handled by the publish hook
-                  }
-                }}
-                disabled={isPublishingTheme}
-              >
-                {isPublishingTheme ? (
-                  <Loader2 className="size-4 animate-spin mr-2" />
-                ) : null}
-                Save Profile Theme
-              </Button>
-            </DialogFooter>
-            </div>
-            </PortalContainerProvider>
-          </DialogContent>
-        </Dialog>
       </PullToRefresh>
       </main>
   );

@@ -7,8 +7,6 @@ import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { useEncryptedSettings, setLocalSettingsSync } from "@/hooks/useEncryptedSettings";
 import { isSyncDone } from "@/hooks/useInitialSync";
 import { parseBlossomServerList } from "@/lib/appBlossom";
-import { ACTIVE_THEME_KIND, parseActiveProfileTheme } from "@/lib/themeEvent";
-import type { ThemeConfig } from "@/themes";
 
 
 /**
@@ -19,7 +17,6 @@ import type { ThemeConfig } from "@/themes";
  * - NIP-65 relay list (kind 10002)
  * - BUD-03 Blossom server list (kind 10063)
  * - Encrypted app settings (kind 30078) - theme, feed settings, relay toggle
- * - Active profile theme (kind 16767) - when autoShareTheme is enabled
  */
 export function NostrSync() {
   const { nostr } = useNostr();
@@ -38,7 +35,6 @@ export function NostrSync() {
   // settings after a page reload.
   const lastSyncedTimestamp = useRef<number>(0);
   const [seededTimestamp, setSeededTimestamp] = useState(false);
-  const profileThemeSynced = useRef(false);
 
   // Reset sync state when the user changes (account switch).
   // We keep seededTimestamp=true so the seeding step (which prevents
@@ -54,7 +50,6 @@ export function NostrSync() {
     const pubkey = user?.pubkey;
     if (prevPubkey.current !== undefined && pubkey !== prevPubkey.current) {
       lastSyncedTimestamp.current = 0;
-      profileThemeSynced.current = false;
       accountSwitched.current = true;
 
       // Clear user-specific query caches on account switch.
@@ -477,60 +472,5 @@ export function NostrSync() {
     recentlyWritten,
     seededTimestamp,
   ]);
-
-  // Sync active profile theme (kind 16767) on pageload when autoShareTheme is enabled.
-  // This pulls in the user's published theme and applies it as the customTheme
-  // without changing the actual theme mode (light/dark/system/custom).
-  // NOTE: ref is declared near the top of the component so the user-change
-  // reset effect can clear it. See the prevPubkey effect above.
-
-  useEffect(() => {
-    if (!user || !config.autoShareTheme) return;
-    if (profileThemeSynced.current) return;
-    profileThemeSynced.current = true;
-
-    const controller = new AbortController();
-
-    const syncProfileTheme = async () => {
-      try {
-        const events = await nostr.query(
-          [{ kinds: [ACTIVE_THEME_KIND], authors: [user.pubkey], limit: 1 }],
-          { signal: controller.signal },
-        );
-
-        if (events.length === 0) return;
-
-        const parsed = parseActiveProfileTheme(events[0]);
-        if (!parsed) return;
-
-        // Convert ActiveProfileTheme to ThemeConfig
-        const remoteTheme: ThemeConfig = {
-          colors: parsed.colors,
-          ...(parsed.font && { font: parsed.font }),
-          ...(parsed.titleFont && { titleFont: parsed.titleFont }),
-          ...(parsed.background && { background: parsed.background }),
-        };
-
-        // Update customTheme if it differs from what we have locally.
-        // Do NOT change the `theme` value — leave it as light/dark/system/custom.
-        updateConfig((current) => {
-          if (
-            JSON.stringify(current.customTheme) === JSON.stringify(remoteTheme)
-          ) {
-            return current;
-          }
-          return { ...current, customTheme: remoteTheme };
-        });
-      } catch (error) {
-        if (error instanceof Error && error.name === "AbortError") return;
-        console.error("Failed to sync active profile theme:", error);
-      }
-    };
-
-    syncProfileTheme();
-
-    return () => controller.abort();
-  }, [user, config.autoShareTheme, nostr, updateConfig]);
-
   return null;
 }

@@ -315,14 +315,6 @@ export const EXTRA_KINDS: ExtraKindDef[] = [
         description: 'Shareable named themes',
         addressable: true,
       },
-      {
-        kind: 16767,
-        showKey: 'showProfileThemeUpdates',
-        feedKey: 'feedIncludeProfileThemeUpdates',
-        label: 'Profile Themes',
-        description: 'Profile theme updates',
-        addressable: false,
-      },
     ],
   },
   {

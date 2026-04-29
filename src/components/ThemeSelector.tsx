@@ -15,7 +15,6 @@ import { BackgroundPicker } from '@/components/BackgroundPicker';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
 import { Collapsible, CollapsibleTrigger, CollapsibleContent } from '@/components/ui/collapsible';
@@ -455,7 +454,7 @@ interface ThemeSelectorProps {
 }
 
 export function ThemeSelector({ builderOpen, onBuilderOpenChange, builderMode }: ThemeSelectorProps = {}) {
-  const { theme, customTheme, themes, autoShareTheme, setTheme, applyCustomTheme, setAutoShareTheme } = useTheme();
+  const { theme, customTheme, themes, setTheme, applyCustomTheme } = useTheme();
   const { user } = useCurrentUser();
   const { publishTheme, deleteTheme, isPending: isPublishing } = usePublishTheme();
   const { toast } = useToast();
@@ -891,24 +890,6 @@ export function ThemeSelector({ builderOpen, onBuilderOpenChange, builderMode }:
             {/* Background */}
             <BackgroundPicker />
 
-            {/* Auto-share toggle */}
-            {user && (
-              <div className="rounded-xl border border-border bg-card p-4">
-                <div className="flex items-center justify-between gap-4">
-                  <Label htmlFor="auto-share-theme-dialog" className="flex flex-col gap-1 cursor-pointer">
-                    <span className="text-sm font-medium">Sync with Profile</span>
-                    <span className="text-xs text-muted-foreground font-normal">
-                      Turn off to display different theme on profile than everywhere else
-                    </span>
-                  </Label>
-                  <Switch
-                    id="auto-share-theme-dialog"
-                    checked={autoShareTheme}
-                    onCheckedChange={setAutoShareTheme}
-                  />
-                </div>
-              </div>
-            )}
           </div>
 
           {/* Action buttons */}

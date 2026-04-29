@@ -1244,35 +1244,6 @@ function MuteTypeSection({
   );
 }
 
-export function ThemePreferencesSection() {
-  const { feedSettings, updateFeedSettings } = useFeedSettings();
-  const { updateSettings } = useEncryptedSettings();
-  const { user } = useCurrentUser();
-
-  const showOnProfiles = feedSettings.showCustomProfileThemes !== false;
-
-  const handleProfileThemeToggle = async (value: boolean) => {
-    updateFeedSettings({ showCustomProfileThemes: value });
-    if (user) {
-      const updatedFeedSettings = { ...feedSettings, showCustomProfileThemes: value };
-      await updateSettings.mutateAsync({ feedSettings: updatedFeedSettings });
-    }
-  };
-
-  return (
-    <div className="flex items-center justify-between">
-      <div className="space-y-0.5">
-        <Label className="text-sm font-medium">Show custom profile themes</Label>
-        <p className="text-xs text-muted-foreground">Display other users' custom themes when visiting their profiles</p>
-      </div>
-      <Switch
-        checked={showOnProfiles}
-        onCheckedChange={handleProfileThemeToggle}
-      />
-    </div>
-  );
-}
-
 function HomePageSetting() {
   const { config, updateConfig } = useAppContext();
   const { user } = useCurrentUser();
