@@ -13,14 +13,12 @@ import type { NostrEvent } from '@nostrify/nostrify';
 import {
   STATIONERY_PRESETS,
   COLOR_MOMENT_KIND,
-  THEME_KIND,
   type Stationery,
   colorMomentToStationery,
-  themeToStationery,
   presetToStationery,
   resolveStationery,
 } from '@/lib/letterTypes';
-import { useColorMomentsPage, useThemesPage } from '@/hooks/useStationery';
+import { useColorMomentsPage } from '@/hooks/useStationery';
 import { useFollowList } from '@/hooks/useFollowActions';
 import { StationeryPreview } from './StationeryBackground';
 
@@ -128,106 +126,6 @@ function ColorMomentsGrid({
 }
 
 // ---------------------------------------------------------------------------
-// Paginated themes grid with infinite scroll
-// ---------------------------------------------------------------------------
-
-function ThemesGrid({
-  selectedStationery,
-  onSelect,
-  authors,
-}: {
-  selectedStationery?: Stationery;
-  onSelect: (s: Stationery) => void;
-  authors?: string[];
-}) {
-  const [pages, setPages] = useState<NostrEvent[][]>([]);
-  const [until, setUntil] = useState<number | undefined>(undefined);
-  const [hasMore, setHasMore] = useState(true);
-  const lastUntilRef = useRef<number | 'init' | undefined>('init');
-
-  const { data: page, isLoading } = useThemesPage(PAGE_SIZE, until, authors);
-
-  useEffect(() => {
-    if (!page || isLoading) return;
-    if (lastUntilRef.current === until) return;
-    lastUntilRef.current = until;
-    if (page.length > 0) {
-      setPages((prev) => [...prev, page]);
-      if (page.length < PAGE_SIZE) setHasMore(false);
-    } else {
-      setHasMore(false);
-    }
-  }, [page, isLoading, until]);
-
-  const allItems = pages.flat();
-  const initialized = pages.length > 0 || (!isLoading && lastUntilRef.current !== 'init');
-
-  const loadMore = useCallback(() => {
-    if (!hasMore || isLoading || allItems.length === 0) return;
-    setUntil(allItems[allItems.length - 1].created_at - 1);
-  }, [hasMore, isLoading, allItems]);
-
-  const observerRef = useRef<IntersectionObserver | null>(null);
-  const sentinelCallback = useCallback(
-    (node: HTMLDivElement | null) => {
-      observerRef.current?.disconnect();
-      if (!node) return;
-      observerRef.current = new IntersectionObserver(
-        (entries) => { if (entries[0].isIntersecting) loadMore(); },
-        { threshold: 0.1 }
-      );
-      observerRef.current.observe(node);
-    },
-    [loadMore]
-  );
-
-  if (!initialized && isLoading) {
-    return (
-      <div className="grid grid-cols-5 gap-2">
-        {Array.from({ length: 10 }).map((_, i) => <Skeleton key={i} className="aspect-square rounded-2xl" />)}
-      </div>
-    );
-  }
-
-  if (initialized && allItems.length === 0) {
-    return <p className="py-6 text-center text-sm text-muted-foreground">none found — try presets</p>;
-  }
-
-  return (
-    <div className="overflow-y-auto rounded-xl" style={{ height: 160 }}>
-      <div className="grid grid-cols-5 gap-2">
-        {allItems.map((event) => {
-          const stationery = themeToStationery(event);
-          const isSelected = selectedStationery?.event?.id === event.id;
-          const title = event.tags.find(([n]) => n === 'title')?.[1];
-          return (
-            <button
-              key={event.id}
-              onClick={() => onSelect(stationery)}
-              title={title}
-              className="relative aspect-square rounded-2xl overflow-hidden transition-all hover:scale-105 active:scale-95"
-            >
-              <StationeryPreview
-                stationery={stationery}
-                selected={isSelected}
-                className="w-full h-full"
-              />
-            </button>
-          );
-        })}
-        {hasMore && (
-          <div ref={sentinelCallback} className="col-span-5 h-2">
-            {isLoading && Array.from({ length: 5 }).map((_, i) => (
-              <Skeleton key={i} className="aspect-square rounded-2xl" />
-            ))}
-          </div>
-        )}
-      </div>
-    </div>
-  );
-}
-
-// ---------------------------------------------------------------------------
 // Main StationeryPicker
 // ---------------------------------------------------------------------------
 
@@ -236,7 +134,7 @@ interface StationeryPickerProps {
   onSelect: (stationery: Stationery) => void;
 }
 
-type Tab = 'presets' | 'colors' | 'themes';
+type Tab = 'presets' | 'colors';
 
 export function StationeryPicker({ selected, onSelect }: StationeryPickerProps) {
   const [tab, setTab] = useState<Tab>('presets');
@@ -258,7 +156,6 @@ export function StationeryPicker({ selected, onSelect }: StationeryPickerProps) 
   const emojiMode = selected?.emojiMode ?? 'tile';
   const hasEmoji = !!resolved?.emoji;
   const isColorMoment = selected?.event?.kind === COLOR_MOMENT_KIND;
-  const isTheme = selected?.event?.kind === THEME_KIND;
 
   // Remember the last color moment event so we can restore it when toggling off flat mode
   const lastColorMomentRef = useRef<NostrEvent | undefined>(undefined);
@@ -287,12 +184,10 @@ export function StationeryPicker({ selected, onSelect }: StationeryPickerProps) 
   const tabs: { id: Tab; label: string }[] = [
     { id: 'presets', label: 'presets' },
     { id: 'colors',  label: 'moments' },
-    { id: 'themes',  label: 'themes' },
   ];
 
   const isMomentsTab = tab === 'colors';
-  const isThemesTab = tab === 'themes';
-  const showInfoButton = isMomentsTab || isThemesTab;
+  const showInfoButton = isMomentsTab;
 
   return (
     <div className="space-y-3">
@@ -364,12 +259,11 @@ export function StationeryPicker({ selected, onSelect }: StationeryPickerProps) 
         )}
 
         {tab === 'colors' && <ColorMomentsGrid key={scope} selectedStationery={selected} onSelect={onSelect} authors={scopedAuthors} />}
-        {tab === 'themes' && <ThemesGrid key={scope} selectedStationery={selected} onSelect={onSelect} authors={scopedAuthors} />}
       </div>
 
-      {((hasEmoji && !isTheme) || isColorMoment || isFlatMode) && (
+      {(hasEmoji || isColorMoment || isFlatMode) && (
         <div className="flex items-center gap-4 px-1 pt-1">
-          {hasEmoji && !isTheme && (
+          {hasEmoji && (
             <label className="flex items-center gap-1.5">
               <Switch checked={emojiMode === 'emblem'} onCheckedChange={toggleEmojiMode} />
               <span className="text-sm text-muted-foreground font-medium">emblem</span>
@@ -402,27 +296,6 @@ export function StationeryPicker({ selected, onSelect }: StationeryPickerProps) 
                     className="text-foreground font-medium underline underline-offset-2 hover:no-underline"
                   >
                     Discover and create color moments
-                  </Link>
-                </p>
-              </div>
-            </>
-          )}
-          {isThemesTab && (
-            <>
-              <DialogHeader>
-                <DialogTitle>Agora themes</DialogTitle>
-              </DialogHeader>
-              <div className="space-y-3 text-sm text-muted-foreground">
-                <p>
-                  Agora themes are UI themes shared by the community. Letters borrow their colors and fonts to style your letter.
-                </p>
-                <p>
-                  <Link
-                    to="/themes"
-                    onClick={() => setInfoOpen(false)}
-                    className="text-foreground font-medium underline underline-offset-2 hover:no-underline"
-                  >
-                    Browse and create themes
                   </Link>
                 </p>
               </div>

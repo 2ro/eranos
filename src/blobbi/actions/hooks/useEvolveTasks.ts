@@ -22,7 +22,6 @@ import { trackEvolutionMissionEvent, readMissionsFromStorage, ensureSessionStore
 import {
   EVOLVE_MISSIONS,
   EVOLVE_REQUIRED_INTERACTIONS,
-  EVOLVE_REQUIRED_THEMES,
   EVOLVE_REQUIRED_COLOR_MOMENTS,
   EVOLVE_STAT_THRESHOLD,
   findEvolutionMission,
@@ -30,7 +29,6 @@ import {
 } from '../lib/evolution-missions';
 
 import {
-  KIND_THEME_DEFINITION,
   KIND_COLOR_MOMENT,
   KIND_PROFILE_METADATA,
   type HatchTask,
@@ -45,7 +43,6 @@ export const KIND_PROFILE_TABS = 16769;
 // Re-export for backward compat
 export {
   EVOLVE_REQUIRED_INTERACTIONS,
-  EVOLVE_REQUIRED_THEMES,
   EVOLVE_REQUIRED_COLOR_MOMENTS,
   EVOLVE_STAT_THRESHOLD,
 };
@@ -115,7 +112,6 @@ export function useEvolveTasks(
       if (!pubkey) return null;
 
       const filters: NostrFilter[] = [
-        { kinds: [KIND_THEME_DEFINITION], authors: [pubkey], limit: EVOLVE_REQUIRED_THEMES },
         { kinds: [KIND_COLOR_MOMENT], authors: [pubkey], limit: EVOLVE_REQUIRED_COLOR_MOMENTS },
         { kinds: [KIND_PROFILE_TABS], authors: [pubkey], limit: 1 },
         { kinds: [KIND_PROFILE_METADATA], authors: [pubkey], limit: 1 },
@@ -124,7 +120,6 @@ export function useEvolveTasks(
       const events = await nostr.query(filters);
 
       return {
-        themeEvents: events.filter(e => e.kind === KIND_THEME_DEFINITION),
         colorMomentEvents: events.filter(e => e.kind === KIND_COLOR_MOMENT),
         profileTabsEvents: events.filter(e => e.kind === KIND_PROFILE_TABS),
         hasProfileMetadata: events.some(e => e.kind === KIND_PROFILE_METADATA),
@@ -140,7 +135,6 @@ export function useEvolveTasks(
   const queryCounts: Record<string, number> = useMemo(() => {
     if (!data) return {} as Record<string, number>;
     return {
-      create_themes: data.themeEvents.length,
       color_moments: data.colorMomentEvents.length,
       edit_profile: (data.profileTabsEvents.length >= 1 || data.hasProfileMetadata) ? 1 : 0,
     };
@@ -158,12 +152,6 @@ export function useEvolveTasks(
     if (!current || current.evolution.length === 0) return;
     const evo = current.evolution;
 
-    for (const event of data.themeEvents) {
-      const m = findEvolutionMission(evo, 'create_themes');
-      if (m && isEventMission(m) && !m.events.includes(event.id)) {
-        trackEvolutionMissionEvent('create_themes', event.id, pubkey);
-      }
-    }
     for (const event of data.colorMomentEvents) {
       const m = findEvolutionMission(evo, 'color_moments');
       if (m && isEventMission(m) && !m.events.includes(event.id)) {

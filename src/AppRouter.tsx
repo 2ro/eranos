@@ -63,7 +63,6 @@ const ProfileSettings = lazy(() => import("./pages/ProfileSettings").then(m => (
 const RelayPage = lazy(() => import("./pages/RelayPage").then(m => ({ default: m.RelayPage })));
 const SearchPage = lazy(() => import("./pages/SearchPage").then(m => ({ default: m.SearchPage })));
 const SettingsPage = lazy(() => import("./pages/SettingsPage").then(m => ({ default: m.SettingsPage })));
-const ThemesPage = lazy(() => import("./pages/ThemesPage").then(m => ({ default: m.ThemesPage })));
 const UserListsPage = lazy(() => import("./pages/UserListsPage").then(m => ({ default: m.UserListsPage })));
 const WalletSettingsPage = lazy(() => import("./pages/WalletSettingsPage").then(m => ({ default: m.WalletSettingsPage })));
 const WalletPage = lazy(() => import("./pages/WalletPage").then(m => ({ default: m.WalletPage })));
@@ -167,7 +166,6 @@ export function AppRouter() {
                 />
               }
             />
-            <Route path="/themes" element={<ThemesPage />} />
             <Route path="/bookmarks" element={<BookmarksPage />} />
             <Route path="/wallet" element={<WalletPage />} />
             <Route path="/verified" element={<VerifiedPage />} />

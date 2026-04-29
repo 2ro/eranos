@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useSeoMeta } from '@unhead/react';
 import { RotateCcw } from 'lucide-react';
-import { MuteSettingsInternals, SensitiveContentSection, ThemePreferencesSection } from '@/components/ContentSettings';
+import { MuteSettingsInternals, SensitiveContentSection } from '@/components/ContentSettings';
 import { MuteListRecoveryDialog } from '@/components/MuteListRecoveryDialog';
 import { PageHeader } from '@/components/PageHeader';
 import { IntroImage } from '@/components/IntroImage';
@@ -86,17 +86,6 @@ export function ContentPage() {
           </div>
           <div className="pb-4">
             <SensitiveContentSection />
-          </div>
-        </div>
-
-        {/* Theme Preferences Section */}
-        <div>
-          <div className="relative px-3 py-3.5">
-            <h2 className="text-base font-semibold">Theme Preferences</h2>
-            <div className="absolute bottom-0 left-0 right-0 h-1 bg-primary rounded-full" />
-          </div>
-          <div className="px-3 py-4">
-            <ThemePreferencesSection />
           </div>
         </div>
 

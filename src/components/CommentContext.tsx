@@ -5,7 +5,7 @@ import { nip19 } from 'nostr-tools';
 import {
   Award, BarChart3, BookOpen, Camera, Clapperboard, Egg, FileText, Film,
   GitBranch, GitPullRequest, Mail, MapPin, MessageSquare, Mic, Music,
-  Package, Palette, PartyPopper, Podcast, Radio, Rocket, SmilePlus, Sparkles,
+  Package, Palette, PartyPopper, Podcast, Radio, Rocket, SmilePlus,
   Users, Vote, Zap,
 } from 'lucide-react';
 import type { NostrEvent } from '@nostrify/nostrify';
@@ -114,7 +114,6 @@ const KIND_LABELS: Record<number, string> = {
   3367: 'a color moment',
   7516: 'a found log',
   15128: 'an nsite',
-  16767: 'a theme',
   10008: 'profile badges',
   30008: 'profile badges',
   30009: 'a badge',
@@ -137,7 +136,6 @@ const KIND_LABELS: Record<number, string> = {
   34550: 'a community',
   35128: 'an nsite',
   36639: 'an action',
-  36767: 'a theme',
   36787: 'a track',
   37381: 'a Magic deck',
   37516: 'a treasure',
@@ -180,8 +178,6 @@ const KIND_ICONS: Partial<Record<number, React.ComponentType<{ className?: strin
   31990: Package,
   32267: Package,
   34236: Clapperboard,
-  36767: Sparkles,
-  16767: Sparkles,
   36787: Music,
   34139: Music,
   37381: CardsIcon,
@@ -220,8 +216,6 @@ function getRootKindLabel(rootKind: string | undefined): string {
 const KIND_SUFFIXES: Partial<Record<number, string>> = {
   30009: 'badge',
   30030: 'emoji pack',
-  36767: 'theme',
-  16767: 'theme',
   39089: 'follow pack',
   37381: 'deck',
   37516: 'treasure',

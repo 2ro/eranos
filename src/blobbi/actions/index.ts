@@ -50,7 +50,6 @@ export type { TaskProcessType, TaskProcessConfig, ActiveTaskProcessResult } from
 export { 
   useHatchTasks, 
   filterPersistentTasks,
-  KIND_THEME_DEFINITION,
   KIND_COLOR_MOMENT,
   HATCH_REQUIRED_INTERACTIONS,
   REQUIRED_INTERACTIONS, // Legacy export
@@ -62,7 +61,6 @@ export type { HatchTask, HatchTasksResult, TaskType } from './hooks/useHatchTask
 export {
   useEvolveTasks,
   KIND_PROFILE_TABS,
-  EVOLVE_REQUIRED_THEMES,
   EVOLVE_REQUIRED_COLOR_MOMENTS,
   EVOLVE_REQUIRED_INTERACTIONS,
   EVOLVE_STAT_THRESHOLD,

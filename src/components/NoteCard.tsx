@@ -17,7 +17,6 @@ import {
   Share2,
   SmilePlus,
   PartyPopper,
-  Sparkles,
   Users,
   Zap,
 } from "lucide-react";
@@ -71,7 +70,6 @@ import { ReactionButton } from "@/components/ReactionButton";
 import { ReplyComposeModal } from "@/components/ReplyComposeModal";
 import { ReplyContext } from "@/components/ReplyContext";
 import { RepostMenu } from "@/components/RepostMenu";
-import { ThemeContent } from "@/components/ThemeContent";
 import { EncryptedMessageContent } from "@/components/EncryptedMessageContent";
 import { EncryptedLetterContent } from "@/components/EncryptedLetterContent";
 import { VanishCardCompact } from "@/components/VanishEventContent";
@@ -397,9 +395,6 @@ export const NoteCard = memo(function NoteCard({
   const isMagicDeck = event.kind === 37381;
   const isStream = event.kind === 30311;
   const isFileMetadata = event.kind === 1063;
-  const isThemeDefinition = event.kind === 36767;
-  const isActiveTheme = event.kind === 16767;
-  const isTheme = isThemeDefinition || isActiveTheme;
   const isVoiceMessage = event.kind === 1222 || event.kind === 1244;
   const isCalendarEvent = event.kind === 31922 || event.kind === 31923;
   const isEmojiPack = event.kind === 30030;
@@ -447,7 +442,6 @@ export const NoteCard = memo(function NoteCard({
     !isMagicDeck &&
     !isStream &&
     !isFileMetadata &&
-    !isTheme &&
     !isVoiceMessage &&
     !isCalendarEvent &&
     !isEmojiPack &&
@@ -611,8 +605,6 @@ export const NoteCard = memo(function NoteCard({
           <ProfileBadgesContent event={event} />
         ) : isCommunity ? (
           <CommunityContent event={event} />
-        ) : isTheme ? (
-          <ThemeContent event={event} />
         ) : isVoiceMessage ? (
           <VoiceMessagePlayer event={event} />
         ) : isCalendarEvent ? (
@@ -1693,18 +1685,6 @@ const KIND_HEADER_MAP: Record<number, KindHeaderConfig> = {
     action: (event) => publishedAtAction(event, { created: "created a", updated: "updated a", fallback: "shared a" }),
     noun: "deck",
     nounRoute: "/decks",
-  },
-  36767: {
-    icon: Sparkles,
-    action: (event) => publishedAtAction(event, { created: "created a", updated: "updated a", fallback: "shared a" }),
-    noun: "theme",
-    nounRoute: "/themes",
-  },
-  16767: {
-    icon: Sparkles,
-    action: (event) => publishedAtAction(event, { created: "created a", updated: "updated their", fallback: "updated their" }),
-    noun: "theme",
-    nounRoute: "/themes",
   },
   30030: {
     icon: SmilePlus,

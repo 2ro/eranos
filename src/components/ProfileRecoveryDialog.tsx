@@ -15,10 +15,8 @@ import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useNostrPublish } from '@/hooks/useNostrPublish';
 import { useToast } from '@/hooks/useToast';
 import { genUserName } from '@/lib/genUserName';
-import { ACTIVE_THEME_KIND, parseActiveProfileTheme } from '@/lib/themeEvent';
-import { coreToTokens } from '@/themes';
 import { cn } from '@/lib/utils';
-import { Check, Loader2, RotateCcw, User, Users, Palette } from 'lucide-react';
+import { Check, Loader2, RotateCcw, User, Users } from 'lucide-react';
 
 /**
  * Query all events matching a filter using `req()` instead of `query()`.
@@ -73,10 +71,6 @@ function formatDate(timestamp: number): string {
 }
 
 /** Extracts HSL color string for inline styles. */
-function hsl(value: string): string {
-  return `hsl(${value})`;
-}
-
 // ─── Profile Snapshot Card ────────────────────────────────────────────
 
 function ProfileSnapshotCard({
@@ -155,101 +149,6 @@ function ProfileSnapshotCard({
           </Button>
         </div>
       )}
-    </div>
-  );
-}
-
-// ─── Theme Snapshot Card ──────────────────────────────────────────────
-
-function ThemeSnapshotCard({
-  event,
-  isCurrent,
-  onRestore,
-  isRestoring,
-}: {
-  event: NostrEvent;
-  isCurrent: boolean;
-  onRestore: () => void;
-  isRestoring: boolean;
-}) {
-  const parsed = useMemo(() => parseActiveProfileTheme(event), [event]);
-  const title = event.tags.find(([n]) => n === 'title')?.[1] ?? 'Profile Theme';
-  const tokens = useMemo(() => (parsed ? coreToTokens(parsed.colors) : null), [parsed]);
-
-  if (!parsed || !tokens) {
-    return null;
-  }
-
-  return (
-    <div
-      className={cn(
-        'group relative rounded-xl border overflow-hidden transition-all',
-        isCurrent
-          ? 'border-primary/40 bg-primary/5'
-          : 'border-border hover:border-primary/20',
-      )}
-    >
-      {isCurrent && (
-        <div className="absolute top-3 right-3 z-10 flex items-center gap-1 text-xs font-medium text-primary bg-background/80 backdrop-blur-sm rounded-full px-2 py-0.5">
-          <Check className="size-3.5" />
-          Current
-        </div>
-      )}
-
-      {/* Theme mini-mockup */}
-      <div
-        className="aspect-[3/1] relative"
-        style={{ backgroundColor: hsl(tokens.background) }}
-      >
-        {parsed.background?.url && (
-          <img
-            src={parsed.background.url}
-            alt=""
-            className="absolute inset-0 w-full h-full object-cover opacity-40"
-          />
-        )}
-        <div className="p-4 space-y-2 relative">
-          <div
-            className="h-2.5 w-3/4 rounded-full"
-            style={{ backgroundColor: hsl(tokens.foreground), opacity: 0.5 }}
-          />
-          <div
-            className="h-2.5 w-1/2 rounded-full"
-            style={{ backgroundColor: hsl(tokens.mutedForeground), opacity: 0.35 }}
-          />
-          <div
-            className="h-5 w-20 rounded"
-            style={{ backgroundColor: hsl(tokens.primary) }}
-          />
-        </div>
-      </div>
-
-      {/* Info + restore */}
-      <div className="px-4 py-3 flex items-center justify-between gap-2">
-        <div className="min-w-0 flex-1">
-          <div className="text-sm font-medium truncate">{title}</div>
-          <div className="text-[11px] text-muted-foreground/70">
-            {formatDate(event.created_at)}
-          </div>
-        </div>
-
-        {!isCurrent && (
-          <Button
-            variant="outline"
-            size="sm"
-            className="h-8 text-xs rounded-lg gap-1.5 shrink-0"
-            onClick={onRestore}
-            disabled={isRestoring}
-          >
-            {isRestoring ? (
-              <Loader2 className="size-3.5 animate-spin" />
-            ) : (
-              <RotateCcw className="size-3.5" />
-            )}
-            Restore
-          </Button>
-        )}
-      </div>
     </div>
   );
 }
@@ -440,92 +339,6 @@ function ProfileHistoryTab({ onClose }: { onClose: () => void }) {
   );
 }
 
-// ─── Theme History Tab ────────────────────────────────────────────────
-
-function ThemeHistoryTab({ onClose }: { onClose: () => void }) {
-  const { nostr } = useNostr();
-  const { user } = useCurrentUser();
-  const { mutateAsync: publishEvent } = useNostrPublish();
-  const { toast } = useToast();
-  const queryClient = useQueryClient();
-  const [restoringId, setRestoringId] = useState<string | null>(null);
-
-  const pubkey = user?.pubkey;
-
-  const themeHistory = useQuery<NostrEvent[]>({
-    queryKey: ['profile-recovery', 'kind16767', pubkey],
-    queryFn: async () => {
-      if (!pubkey) return [];
-      const events = await queryAllEvents(
-        nostr,
-        [{ kinds: [ACTIVE_THEME_KIND], authors: [pubkey] }],
-        AbortSignal.timeout(10000),
-      );
-      return events
-        .sort((a, b) => b.created_at - a.created_at)
-        .filter((e) => parseActiveProfileTheme(e) !== null);
-    },
-    enabled: !!pubkey,
-    staleTime: 30_000,
-  });
-
-  const themeEvents = themeHistory.data ?? [];
-  const currentThemeId = themeEvents[0]?.id;
-
-  const handleRestore = async (event: NostrEvent) => {
-    setRestoringId(event.id);
-    try {
-      await publishEvent({
-        kind: event.kind,
-        content: event.content,
-        tags: event.tags,
-        created_at: Math.floor(Date.now() / 1000),
-      });
-
-      toast({
-        title: 'Theme restored',
-        description: `Successfully restored from ${formatDate(event.created_at)}.`,
-      });
-
-      queryClient.invalidateQueries({ queryKey: ['profile-recovery', 'kind16767', pubkey] });
-      queryClient.invalidateQueries({ queryKey: ['activeProfileTheme', pubkey] });
-
-      onClose();
-    } catch (error) {
-      console.error('Failed to restore event:', error);
-      toast({
-        title: 'Restore failed',
-        description: 'Could not republish the event. Please try again.',
-        variant: 'destructive',
-      });
-    } finally {
-      setRestoringId(null);
-    }
-  };
-
-  if (themeHistory.isLoading) {
-    return <SnapshotSkeleton />;
-  }
-
-  if (themeEvents.length === 0) {
-    return <EmptyState label="No theme history found. Your relay may not store historical events." />;
-  }
-
-  return (
-    <>
-      {themeEvents.map((event) => (
-        <ThemeSnapshotCard
-          key={event.id}
-          event={event}
-          isCurrent={event.id === currentThemeId}
-          onRestore={() => handleRestore(event)}
-          isRestoring={restoringId === event.id}
-        />
-      ))}
-    </>
-  );
-}
-
 // ─── Follows History Tab ──────────────────────────────────────────────
 
 function FollowsHistoryTab({ onClose }: { onClose: () => void }) {
@@ -633,10 +446,6 @@ export function ProfileRecoveryDialog({ open, onOpenChange }: ProfileRecoveryDia
                 <Users className="size-3.5" />
                 Follows
               </TabsTrigger>
-              <TabsTrigger value="theme" className="flex-1 gap-1.5">
-                <Palette className="size-3.5" />
-                Theme
-              </TabsTrigger>
             </TabsList>
           </div>
 
@@ -651,9 +460,6 @@ export function ProfileRecoveryDialog({ open, onOpenChange }: ProfileRecoveryDia
               <FollowsHistoryTab onClose={close} />
             </TabsContent>
 
-            <TabsContent value="theme" className="m-0 p-4 space-y-3">
-              <ThemeHistoryTab onClose={close} />
-            </TabsContent>
           </ScrollArea>
         </Tabs>
       </DialogContent>
