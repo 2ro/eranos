@@ -2,11 +2,8 @@ import { useMemo } from 'react';
 import { useNostr } from '@nostrify/react';
 import { useQuery } from '@tanstack/react-query';
 import type { NostrEvent } from '@nostrify/nostrify';
-import { nip57 } from 'nostr-tools';
 
 import { extractZapAmount, extractZapSender } from '@/hooks/useEventInteractions';
-import { useLnurlSigner } from '@/hooks/useLnurlSigner';
-import { parseBolt11AmountMsats } from '@/lib/bolt11';
 import type { ParsedGoal } from '@/lib/goalUtils';
 
 export interface GoalProgress {
@@ -26,53 +23,22 @@ export interface GoalProgress {
   zapCount: number;
 }
 
-function tagValue(tags: string[][], name: string): string | undefined {
-  return tags.find(([n]) => n === name)?.[1];
-}
-
-function isValidGoalZapReceipt(
-  receipt: NostrEvent,
-  goalEventId: string,
-  beneficiary: string,
-  receiptSigner: string | undefined,
-): boolean {
-  if (!receiptSigner || receipt.pubkey !== receiptSigner) return false;
-
-  const description = tagValue(receipt.tags, 'description');
-  if (!description || nip57.validateZapRequest(description) !== null) return false;
-
-  let zapRequest: NostrEvent;
-  try {
-    zapRequest = JSON.parse(description) as NostrEvent;
-  } catch {
-    return false;
-  }
-
-  const pTags = zapRequest.tags.filter(([n]) => n === 'p');
-  const eTags = zapRequest.tags.filter(([n]) => n === 'e');
-  if (pTags.length !== 1 || pTags[0][1] !== beneficiary) return false;
-  if (eTags.length !== 1 || eTags[0][1] !== goalEventId) return false;
-  if (tagValue(receipt.tags, 'p') !== beneficiary) return false;
-
-  const requestMsats = parseInt(tagValue(zapRequest.tags, 'amount') ?? '', 10);
-  if (isNaN(requestMsats) || requestMsats <= 0) return false;
-
-  const invoiceMsats = parseBolt11AmountMsats(tagValue(receipt.tags, 'bolt11'));
-  return invoiceMsats > 0 && invoiceMsats === requestMsats;
-}
-
 /**
- * Queries kind 9735 zap receipts targeting a goal event and tallies validated progress.
+ * Queries kind 9735 zap receipts targeting a goal event and tallies progress.
  * Respects the goal's `relays` and `closed_at` deadline.
+ *
+ * Zap receipts are tallied at face value (same as the rest of the app).
+ * Full NIP-57 validation was removed because the LNURL signer resolution
+ * added a network request per beneficiary for a trust level that is still
+ * spoofable and that no other zap display in the app enforces.
  */
 export function useGoalProgress(goalEvent: NostrEvent | undefined, goal: ParsedGoal) {
   const { nostr } = useNostr();
-  const { data: receiptSigner } = useLnurlSigner(goal.beneficiary);
   const goalEventId = goalEvent?.id;
   const relaysKey = goal.relays.join(',');
 
   const query = useQuery({
-    queryKey: ['goal-progress', goalEventId, goal.beneficiary, receiptSigner, relaysKey],
+    queryKey: ['goal-progress', goalEventId, relaysKey],
     queryFn: async (c) => {
       if (!goalEventId) {
         return { receipts: [] as { msats: number; sender: string; createdAt: number }[] };
@@ -86,13 +52,11 @@ export function useGoalProgress(goalEvent: NostrEvent | undefined, goal: ParsedG
       );
 
       return {
-        receipts: receipts
-          .filter((r) => isValidGoalZapReceipt(r, goalEventId, goal.beneficiary, receiptSigner ?? undefined))
-          .map((r) => ({
-            msats: extractZapAmount(r),
-            sender: extractZapSender(r),
-            createdAt: r.created_at,
-          })),
+        receipts: receipts.map((r) => ({
+          msats: extractZapAmount(r),
+          sender: extractZapSender(r),
+          createdAt: r.created_at,
+        })),
       };
     },
     enabled: !!goalEventId,
