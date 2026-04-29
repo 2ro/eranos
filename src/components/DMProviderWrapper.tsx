@@ -11,6 +11,7 @@ import { useUploadFile } from "@/hooks/useUploadFile";
 import { useProfileSupplementary } from "@/hooks/useProfileData";
 import { useIsMobile } from "@/hooks/useIsMobile";
 import { getDisplayName } from "@/lib/getDisplayName";
+import { getEffectiveRelays } from "@/lib/appRelays";
 import { useAuthors } from "@/hooks/useAuthors";
 
 interface DMProviderWrapperProps {
@@ -57,10 +58,10 @@ export function DMProviderWrapper({ children }: DMProviderWrapperProps) {
       return messaging.discoveryRelays;
     }
 
-    return config.relayMetadata.relays
+    return getEffectiveRelays(config.relayMetadata, config.useAppRelays).relays
       .filter((relay) => relay.read)
       .map((relay) => relay.url);
-  }, [messaging.discoveryRelays, config.relayMetadata.relays]);
+  }, [messaging.discoveryRelays, config.relayMetadata, config.useAppRelays]);
 
   const relayMode = messaging.relayMode ?? "hybrid";
   const protocolMode = messaging.protocolMode;
