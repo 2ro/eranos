@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo } from 'react';
 import { nip19 } from 'nostr-tools';
 import type { NostrEvent, NostrMetadata } from '@nostrify/nostrify';
 
@@ -8,17 +8,8 @@ import { genUserName } from '@/lib/genUserName';
 import { useAddrEvent } from '@/hooks/useEvent';
 import { useAuthor } from '@/hooks/useAuthor';
 import { useGoalProgress } from '@/hooks/useGoalProgress';
+import { useNow } from '@/hooks/useNow';
 import { useProfileUrl } from '@/hooks/useProfileUrl';
-
-/** Re-renders every `intervalMs` so time-dependent values stay fresh. */
-function useNow(intervalMs: number): number {
-  const [now, setNow] = useState(() => Math.floor(Date.now() / 1000));
-  useEffect(() => {
-    const id = setInterval(() => setNow(Math.floor(Date.now() / 1000)), intervalMs);
-    return () => clearInterval(id);
-  }, [intervalMs]);
-  return now;
-}
 
 export interface GoalDisplayData {
   expired: boolean;

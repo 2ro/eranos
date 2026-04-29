@@ -15,6 +15,7 @@ import { useAppContext } from '@/hooks/useAppContext';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useNostrPublish } from '@/hooks/useNostrPublish';
 import { useToast } from '@/hooks/useToast';
+import { sanitizeUrl } from '@/lib/sanitizeUrl';
 import { useQueryClient } from '@tanstack/react-query';
 import { ZAP_GOAL_KIND } from '@/lib/goalUtils';
 
@@ -89,7 +90,10 @@ export function CreateGoalDialog({ communityATag, children, open: controlledOpen
       tags.push(['summary', summary.trim()]);
     }
     if (imageUrl.trim()) {
-      tags.push(['image', imageUrl.trim()]);
+      const sanitizedImage = sanitizeUrl(imageUrl.trim());
+      if (sanitizedImage) {
+        tags.push(['image', sanitizedImage]);
+      }
     }
     if (deadlineDate) {
       const deadline = Math.floor(new Date(deadlineDate).getTime() / 1000);

@@ -1,4 +1,4 @@
-import { useMemo, useCallback, useEffect, useState } from 'react';
+import { useMemo, useCallback, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { nip19 } from 'nostr-tools';
 import {
@@ -32,6 +32,7 @@ import { useCommunityMembers } from '@/hooks/useCommunityMembers';
 import { useCommunityGoals } from '@/hooks/useCommunityGoals';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useMembersOnlyFilter } from '@/hooks/useMembersOnlyFilter';
+import { useNow } from '@/hooks/useNow';
 import { useProfileUrl } from '@/hooks/useProfileUrl';
 import { useToast } from '@/hooks/useToast';
 import { CommunityModerationContext } from '@/contexts/CommunityModerationContext';
@@ -115,15 +116,6 @@ function ReplyCardSkeleton() {
       </div>
     </div>
   );
-}
-
-function useNow(intervalMs: number): number {
-  const [now, setNow] = useState(() => Math.floor(Date.now() / 1000));
-  useEffect(() => {
-    const id = setInterval(() => setNow(Math.floor(Date.now() / 1000)), intervalMs);
-    return () => clearInterval(id);
-  }, [intervalMs]);
-  return now;
 }
 
 // ── Main component ────────────────────────────────────────────────────────────
@@ -314,6 +306,11 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
     fabIcon,
   });
 
+  const moderationCtx = useMemo(
+    () => communityATag ? { communityATag, moderation, rankMap } : null,
+    [communityATag, moderation, rankMap],
+  );
+
   // ── Render ──────────────────────────────────────────────────────────────────
   return (
     <div className="max-w-2xl mx-auto pb-16">
@@ -374,7 +371,7 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
         </div>
 
         {/* ── Tabs ── */}
-        <CommunityModerationContext.Provider value={communityATag ? { communityATag, moderation, rankMap } : null}>
+        <CommunityModerationContext.Provider value={moderationCtx}>
           <Tabs value={activeTab} onValueChange={setActiveTab} className="-mx-5">
             <TabsList className="w-full rounded-none border-b border-border bg-transparent p-0 h-auto">
               <TabsTrigger
