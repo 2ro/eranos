@@ -45,7 +45,7 @@ function parseBolt11AmountMsats(bolt11: string | undefined): number {
   }
 }
 
-async function resolveZapReceiptSigner(profileEvent: NostrEvent | undefined): Promise<string | undefined> {
+async function resolveZapReceiptSigner(profileEvent: NostrEvent | undefined, signal?: AbortSignal): Promise<string | undefined> {
   if (!profileEvent) return undefined;
 
   let lnurl = '';
@@ -66,7 +66,7 @@ async function resolveZapReceiptSigner(profileEvent: NostrEvent | undefined): Pr
   if (!lnurl) return undefined;
 
   try {
-    const res = await fetch(lnurl, { signal: AbortSignal.timeout(5000) });
+    const res = await fetch(lnurl, { signal: signal ? AbortSignal.any([signal, AbortSignal.timeout(5000)]) : AbortSignal.timeout(5000) });
     if (!res.ok) return undefined;
     const body = await res.json() as { allowsNostr?: boolean; nostrPubkey?: string };
     return body.allowsNostr && /^[a-f0-9]{64}$/.test(body.nostrPubkey ?? '')
@@ -126,7 +126,7 @@ export function useGoalProgress(goalEvent: NostrEvent | undefined, goal: ParsedG
         return { receipts: [] as { msats: number; sender: string; createdAt: number }[] };
       }
       const signal = AbortSignal.any([c.signal, AbortSignal.timeout(8000)]);
-      const receiptSigner = await resolveZapReceiptSigner(author.data?.event);
+      const receiptSigner = await resolveZapReceiptSigner(author.data?.event, c.signal);
       const relay = goal.relays.length > 0 ? nostr.group(goal.relays) : nostr;
 
       const receipts = await relay.query(
