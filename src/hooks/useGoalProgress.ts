@@ -117,9 +117,10 @@ export function useGoalProgress(goalEvent: NostrEvent | undefined, goal: ParsedG
   const author = useAuthor(goal.beneficiary);
   const goalEventId = goalEvent?.id;
   const relaysKey = goal.relays.join(',');
+  const lnAddr = author.data?.metadata?.lud16 ?? author.data?.metadata?.lud06;
 
   const query = useQuery({
-    queryKey: ['goal-progress', goalEventId, goal.beneficiary, author.data?.event?.id, relaysKey],
+    queryKey: ['goal-progress', goalEventId, goal.beneficiary, lnAddr, relaysKey],
     queryFn: async (c) => {
       if (!goalEventId) {
         return { receipts: [] as { msats: number; sender: string; createdAt: number }[] };
