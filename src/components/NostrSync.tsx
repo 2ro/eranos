@@ -312,14 +312,6 @@ export function NostrSync() {
       }
 
       if (
-        encryptedSettings.autoShareTheme !== undefined &&
-        encryptedSettings.autoShareTheme !== current.autoShareTheme
-      ) {
-        updates.autoShareTheme = encryptedSettings.autoShareTheme;
-        changed = true;
-      }
-
-      if (
         encryptedSettings.useAppRelays !== undefined &&
         encryptedSettings.useAppRelays !== current.useAppRelays
       ) {

@@ -4,7 +4,6 @@ import { sanitizeCssString } from '@/lib/fontLoader';
 
 export const LETTER_KIND = 8211;
 export const COLOR_MOMENT_KIND = 3367;
-export const THEME_KIND = 36767;
 
 /** Default stationery background color (parchment). */
 export const DEFAULT_STATIONERY_COLOR = '#F5E6D3';
@@ -63,7 +62,7 @@ export interface Stationery {
   frame?: FrameStyle;
   /** When true, color-shift the frame emojis to match the stationery palette. */
   frameTint?: boolean;
-  /** Source Nostr event (kind 36767 theme or kind 3367 color moment). */
+  /** Source Nostr event (kind 3367 color moment). */
   event?: NostrEvent;
 
   // --- Legacy flat fallbacks (from old letters, not set by new code) ---
@@ -123,28 +122,6 @@ export function resolveStationery(s: Stationery): ResolvedStationery {
     if (!base.emoji) {
       const raw = event.content?.trim();
       if (raw && [...raw].length <= 2 && /\p{Emoji}/u.test(raw)) base.emoji = raw;
-    }
-    return base;
-  }
-
-  if (event?.kind === THEME_KIND) {
-    const colorTags = event.tags.filter(([n]) => n === 'c');
-    for (const [, hex, marker] of colorTags) {
-      if (marker === 'text') base.textColor = hex;
-      if (marker === 'primary') base.primaryColor = hex;
-    }
-
-    const bgTag = event.tags.find(([n]) => n === 'bg');
-    if (bgTag) {
-      for (const slot of bgTag.slice(1)) {
-        // Sanitize event-sourced URL before CSS `url(...)` interpolation (H-2).
-        if (slot.startsWith('url ')) base.imageUrl = sanitizeUrl(slot.slice(4));
-        else if (slot === 'mode tile') base.imageMode = 'tile';
-        else if (slot === 'mode cover') base.imageMode = 'cover';
-      }
-    }
-    if (!base.imageUrl) {
-      base.imageUrl = sanitizeUrl(event.tags.find(([n]) => n === 'image')?.[1]);
     }
     return base;
   }
@@ -290,8 +267,3 @@ export function colorMomentToStationery(event: NostrEvent): Stationery {
   return { color, event };
 }
 
-/** Build a Stationery from a kind 36767 theme event. */
-export function themeToStationery(event: NostrEvent): Stationery {
-  const bg = event.tags.filter(([n]) => n === 'c').find(([, , marker]) => marker === 'background');
-  return { color: bg?.[1] ?? DEFAULT_STATIONERY_COLOR, event };
-}

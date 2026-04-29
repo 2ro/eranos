@@ -12,7 +12,6 @@ const CURATED_KINDS = [
   34236, // Divines (addressable short videos)
   36787, // Music Tracks
   34139, // Music Playlists
-  36767, // Themes
   37381, // Magic Decks
   3367,  // Color Moments
   37516, // Treasures

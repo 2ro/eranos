@@ -87,20 +87,6 @@ export interface FeedSettings {
   showWebxdc: boolean;
   /** Include Webxdc apps in the follows/global feed */
   feedIncludeWebxdc: boolean;
-  /** Show Themes link in sidebar */
-  showProfileThemes: boolean;
-  /** Include Profile Theme updates in the follows/global feed (legacy key, maps to feedIncludeThemeDefinitions + feedIncludeProfileThemeUpdates) */
-  feedIncludeProfileThemes: boolean;
-  /** Show theme definitions (kind 36767) on Themes page */
-  showThemeDefinitions: boolean;
-  /** Include theme definitions in the follows/global feed */
-  feedIncludeThemeDefinitions: boolean;
-  /** Show profile theme updates (kind 16767) on Themes page */
-  showProfileThemeUpdates: boolean;
-  /** Include profile theme updates in the follows/global feed */
-  feedIncludeProfileThemeUpdates: boolean;
-  /** Show custom profile themes when visiting other users' profiles */
-  showCustomProfileThemes: boolean;
   /** Include voice messages (kind 1222 + 1244) in the follows/global feed */
   feedIncludeVoiceMessages: boolean;
   /** Show NIP-30 custom emojis in the emoji picker */
@@ -201,8 +187,6 @@ export interface AppConfig {
   theme: Theme;
   /** Custom theme config (colors, fonts, background). Only used when theme === "custom". */
   customTheme?: ThemeConfig;
-  /** Automatically publish custom theme changes to profile (kind 16767). Default: true. */
-  autoShareTheme: boolean;
   /** Configured light and dark themes. Overrides the builtin themes when set. */
   themes?: ThemesConfig;
   /** NIP-65 relay list metadata */

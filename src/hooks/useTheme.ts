@@ -88,26 +88,11 @@ export function useTheme() {
     syncToEncrypted({ theme: 'custom', customTheme: normalizedConfig });
   }, [updateConfig, syncToEncrypted]);
 
-  /** Update the autoShareTheme setting. */
-  const setAutoShareTheme = useCallback((enabled: boolean) => {
-    updateConfig((currentConfig) => ({
-      ...currentConfig,
-      autoShareTheme: enabled,
-    }));
-    if (user) {
-      updateSettings.mutateAsync({ autoShareTheme: enabled }).catch((error) => {
-        console.error('Failed to sync autoShareTheme to encrypted storage:', error);
-      });
-    }
-  }, [user, updateConfig, updateSettings]);
-
   return {
     theme: config.theme,
     customTheme: config.customTheme,
     themes: config.themes,
-    autoShareTheme: config.autoShareTheme,
     setTheme,
     applyCustomTheme,
-    setAutoShareTheme,
   };
 }

@@ -11,7 +11,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
-  Palette,
   Droplets,
   MessageSquare,
   Heart,
@@ -57,8 +56,6 @@ function TaskIcon({ taskId }: { taskId: string }) {
   const iconClass = 'size-5';
 
   switch (taskId) {
-    case 'create_themes':
-      return <Palette className={iconClass} />;
     case 'color_moments':
       return <Droplets className={iconClass} />;
     case 'create_posts':

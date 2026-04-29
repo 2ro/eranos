@@ -31,8 +31,6 @@ import {
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
-/** Kind for theme definition events */
-export const KIND_THEME_DEFINITION = 36767;
 /** Kind for color moment events (espy.you) */
 export const KIND_COLOR_MOMENT = 3367;
 /** Kind for profile metadata */
@@ -164,7 +162,6 @@ export function useHatchTasks(
       if (!pubkey) return null;
 
       const filters: NostrFilter[] = [
-        { kinds: [KIND_THEME_DEFINITION], authors: [pubkey], limit: 1 },
         { kinds: [KIND_COLOR_MOMENT], authors: [pubkey], limit: 1 },
         { kinds: [KIND_SHORT_TEXT_NOTE], authors: [pubkey], '#t': ['blobbi'], limit: 1 },
       ];
@@ -172,7 +169,6 @@ export function useHatchTasks(
       const events = await nostr.query(filters);
 
       return {
-        themeEvents: events.filter(e => e.kind === KIND_THEME_DEFINITION),
         colorMomentEvents: events.filter(e => e.kind === KIND_COLOR_MOMENT),
         postEvents: events.filter(e => e.kind === KIND_SHORT_TEXT_NOTE),
       };
@@ -188,7 +184,6 @@ export function useHatchTasks(
     if (!data) return {} as Record<string, number>;
     const validPosts = data.postEvents.filter(e => isValidHatchPost(e));
     return {
-      create_theme: data.themeEvents.length,
       color_moment: data.colorMomentEvents.length,
       create_post: validPosts.length,
     };
@@ -206,12 +201,6 @@ export function useHatchTasks(
     if (!current || current.evolution.length === 0) return;
     const evo = current.evolution;
 
-    for (const event of data.themeEvents) {
-      const m = findEvolutionMission(evo, 'create_theme');
-      if (m && isEventMission(m) && !m.events.includes(event.id)) {
-        trackEvolutionMissionEvent('create_theme', event.id, pubkey);
-      }
-    }
     for (const event of data.colorMomentEvents) {
       const m = findEvolutionMission(evo, 'color_moment');
       if (m && isEventMission(m) && !m.events.includes(event.id)) {

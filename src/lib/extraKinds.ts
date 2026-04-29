@@ -297,27 +297,6 @@ export const EXTRA_KINDS: ExtraKindDef[] = [
     sites: [{ url: 'https://webxdc.org', name: 'webxdc.org' }],
   },
   {
-    kind: 36767,
-    id: 'themes',
-    showKey: 'showProfileThemes',
-    label: 'Themes',
-    description: 'Custom UI themes & updates',
-    route: 'themes',
-    addressable: true,
-    section: 'social',
-    blurb: 'Shareable custom UI themes. Create your own theme or browse themes shared by others.',
-    subKinds: [
-      {
-        kind: 36767,
-        showKey: 'showThemeDefinitions',
-        feedKey: 'feedIncludeThemeDefinitions',
-        label: 'Theme Definitions',
-        description: 'Shareable named themes',
-        addressable: true,
-      },
-    ],
-  },
-  {
     kind: 1068,
     id: 'polls',
     showKey: 'showPolls',

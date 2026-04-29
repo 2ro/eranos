@@ -477,7 +477,7 @@ const links = getAllTags(event.tags, 'r')
 
 **Mitigation strategy — sanitize at the parse layer:**
 
-1. **URLs in CSS `url()` values**: Pass through `sanitizeUrl()` at parse time. The `URL` constructor normalises the string, percent-encoding characters like `"`, `)`, and `\` that could escape the CSS context. Invalid or non-`https:` URLs are rejected entirely. This is already done for theme event background and font URLs in `src/lib/themeEvent.ts`.
+1. **URLs in CSS `url()` values**: Pass through `sanitizeUrl()` at parse time. The `URL` constructor normalises the string, percent-encoding characters like `"`, `)`, and `\` that could escape the CSS context. Invalid or non-`https:` URLs are rejected entirely.
 
 2. **Strings in CSS declarations** (e.g. font family names): Use `sanitizeCssString()` from `src/lib/fontLoader.ts`, which uses an allowlist approach — only Unicode letters, numbers, spaces, hyphens, underscores, apostrophes, and periods are permitted. Everything else is stripped.
 

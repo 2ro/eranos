@@ -8,7 +8,7 @@ import { Loader2, Lock } from 'lucide-react';
 import { InkPenIcon } from '@/components/icons/InkPenIcon';
 import type { NostrEvent } from '@nostrify/nostrify';
 import { useDecryptLetter } from '@/hooks/useLetters';
-import { FONT_OPTIONS, LINE_HEIGHT_RATIO, COLOR_MOMENT_KIND, THEME_KIND, resolveStationery, colorMomentToStationery, themeToStationery, type Letter } from '@/lib/letterTypes';
+import { FONT_OPTIONS, LINE_HEIGHT_RATIO, COLOR_MOMENT_KIND, resolveStationery, colorMomentToStationery, type Letter } from '@/lib/letterTypes';
 import { hexLuminance, backgroundTextColor } from '@/lib/colorUtils';
 import { ColorPaletteDisplay, type PaletteLayout } from './ColorPaletteDisplay';
 import { ensureLetterFonts } from '@/lib/letterUtils';
@@ -19,7 +19,6 @@ import { LetterStickers } from './LetterStickers';
 import { useTheme } from '@/hooks/useTheme';
 import { toast } from '@/hooks/useToast';
 import { paletteToTheme, getColors } from '@/lib/colorMomentUtils';
-import { parseThemeDefinition } from '@/lib/themeEvent';
 import type { ThemeConfig } from '@/themes';
 import {
   Dialog,
@@ -31,7 +30,7 @@ import { nip19 } from 'nostr-tools';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 
 // ---------------------------------------------------------------------------
-// Attached gift — color moment or theme that can be applied on the spot
+// Attached gift — color moment that can be applied on the spot
 // ---------------------------------------------------------------------------
 
 /** Renders an attached gift — present box overlapping a themed bubble. */
@@ -49,31 +48,13 @@ function LetterAttachment({ event }: { event: NostrEvent }) {
       const resolved = resolveStationery(stationery);
       return { type: 'color-moment' as const, label: 'Color Moment', colors, core, resolved };
     }
-    if (event.kind === THEME_KIND) {
-      const parsed = parseThemeDefinition(event);
-      if (!parsed) return null;
-      const stationery = themeToStationery(event);
-      const resolved = resolveStationery(stationery);
-      return {
-        type: 'theme' as const,
-        label: parsed.title ?? 'Theme',
-        colors: [] as string[],
-        core: parsed.colors,
-        resolved,
-        themeConfig: { colors: parsed.colors, font: parsed.font, titleFont: parsed.titleFont, background: parsed.background, title: parsed.title } as ThemeConfig,
-      };
-    }
     return null;
   }, [event]);
 
   const handleApply = useCallback(() => {
     if (!attachment) return;
     prevRef.current = { mode: theme, config: customTheme };
-    if (attachment.type === 'color-moment') {
-      applyCustomTheme(attachment.core);
-    } else {
-      applyCustomTheme(attachment.themeConfig!);
-    }
+    applyCustomTheme(attachment.core);
     setApplied(true);
     toast({
       title: 'Theme applied',
@@ -102,9 +83,7 @@ function LetterAttachment({ event }: { event: NostrEvent }) {
   const primary = `hsl(${attachment.core.primary})`;
   // Use a visible border when the bg is very light to avoid white-on-white
   const needsBorder = hexLuminance(bg) > 0.85;
-  const ribbonColor = attachment.type === 'color-moment'
-    ? (attachment.colors[Math.floor(attachment.colors.length / 2)] ?? primary)
-    : primary;
+  const ribbonColor = attachment.colors[Math.floor(attachment.colors.length / 2)] ?? primary;
   // Derive readable text color from the scrimmed background
   const textColor = backgroundTextColor(bg);
 
@@ -149,22 +128,13 @@ function LetterAttachment({ event }: { event: NostrEvent }) {
           border: needsBorder ? '1px solid hsl(var(--border))' : `1px solid ${ribbonColor}22`,
         }}
       >
-        {/* Background: actual color moment pattern or theme image */}
+        {/* Background: actual color moment pattern */}
         {attachment.type === 'color-moment' && attachment.colors.length > 0 && (
           <ColorPaletteDisplay
             colors={attachment.colors}
             layout={(resolved.layout as PaletteLayout) || 'horizontal'}
             className="absolute inset-0"
           />
-        )}
-        {attachment.type === 'theme' && resolved.imageUrl && (
-          <div className="absolute inset-0">
-            <img
-              src={resolved.imageUrl}
-              alt=""
-              className="w-full h-full object-cover"
-            />
-          </div>
         )}
         {/* Scrim for text readability */}
         <div className="absolute inset-0" style={{ background: `${bg}bb` }} />

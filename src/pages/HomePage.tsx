@@ -16,7 +16,6 @@ const PAGE_LOADERS: Record<string, React.LazyExoticComponent<React.ComponentType
   'badges': lazy(() => import('./BadgesPage').then(m => ({ default: m.BadgesPage }))),
   'events': lazy(() => import('./EventsFeedPage').then(m => ({ default: m.EventsFeedPage }))),
   'photos': lazy(() => import('./PhotosFeedPage').then(m => ({ default: m.PhotosFeedPage }))),
-  'themes': lazy(() => import('./ThemesPage').then(m => ({ default: m.ThemesPage }))),
   'world': lazy(() => import('./WorldPage').then(m => ({ default: m.WorldPage }))),
   'lists': lazy(() => import('./UserListsPage').then(m => ({ default: m.UserListsPage }))),
   'letters': lazy(() => import('./LettersPage').then(m => ({ default: m.LettersPage }))),

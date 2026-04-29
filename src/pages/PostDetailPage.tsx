@@ -68,7 +68,6 @@ const PullRequestCard = lazy(() => import("@/components/PullRequestCard").then(m
 import { ReactionButton } from "@/components/ReactionButton";
 import { ReplyComposeModal } from "@/components/ReplyComposeModal";
 import { RepostMenu } from "@/components/RepostMenu";
-import { ThemeContent } from "@/components/ThemeContent";
 import { ThreadedReplyList, FlatThreadedReplyList, type ReplyNode } from "@/components/ThreadedReplyList";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { getAvatarShape } from "@/lib/avatarShape";
@@ -1009,7 +1008,6 @@ function PostDetailContent({ event }: { event: NostrEvent }) {
   const isArticle = event.kind === 30023;
   const isMagicDeck = event.kind === 37381;
   const isFileMetadata = event.kind === 1063;
-  const isTheme = event.kind === 36767 || event.kind === 16767;
   const isVoiceMessage = event.kind === 1222 || event.kind === 1244;
   const isReaction = event.kind === 7;
   const isRepost = event.kind === 6 || event.kind === 16;
@@ -1044,7 +1042,6 @@ function PostDetailContent({ event }: { event: NostrEvent }) {
     !isArticle &&
     !isMagicDeck &&
     !isFileMetadata &&
-    !isTheme &&
     !isVoiceMessage &&
     !isReaction &&
     !isRepost &&
@@ -2094,8 +2091,6 @@ function PostDetailContent({ event }: { event: NostrEvent }) {
               <MagicDeckContent event={event} />
             ) : isFileMetadata ? (
               <FileMetadataContent event={event} />
-            ) : isTheme ? (
-              <ThemeContent event={event} expanded />
             ) : isVoiceMessage ? (
               <VoiceMessagePlayer event={event} />
             ) : isCommunity ? (

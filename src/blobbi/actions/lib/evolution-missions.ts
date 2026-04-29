@@ -49,16 +49,6 @@ export interface EvolutionMissionDefinition {
 
 export const HATCH_MISSIONS: readonly EvolutionMissionDefinition[] = [
   {
-    id: 'create_theme',
-    title: 'Create Theme',
-    description: 'Create a custom theme for your profile',
-    target: 1,
-    tracking: 'event',
-    action: 'navigate',
-    actionTarget: '/themes',
-    actionLabel: 'Create Theme',
-  },
-  {
     id: 'color_moment',
     title: 'Color Moment',
     description: 'Share a color moment on espy',
@@ -90,16 +80,6 @@ export const HATCH_MISSIONS: readonly EvolutionMissionDefinition[] = [
 // ─── Evolve Mission Pool ─────────────────────────────────────────────────────
 
 export const EVOLVE_MISSIONS: readonly EvolutionMissionDefinition[] = [
-  {
-    id: 'create_themes',
-    title: 'Create Themes',
-    description: 'Create 3 custom themes',
-    target: 3,
-    tracking: 'event',
-    action: 'navigate',
-    actionTarget: '/themes',
-    actionLabel: 'Create Theme',
-  },
   {
     id: 'color_moments',
     title: 'Color Moments',
@@ -156,9 +136,6 @@ export const HATCH_REQUIRED_INTERACTIONS = 7;
 
 /** Required interactions to complete the evolve interactions task */
 export const EVOLVE_REQUIRED_INTERACTIONS = 21;
-
-/** Required themes for evolve task */
-export const EVOLVE_REQUIRED_THEMES = 3;
 
 /** Required color moments for evolve task */
 export const EVOLVE_REQUIRED_COLOR_MOMENTS = 3;
