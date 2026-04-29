@@ -2,11 +2,11 @@ import { useMemo } from 'react';
 import { useNostr } from '@nostrify/react';
 import { useQuery } from '@tanstack/react-query';
 import type { NostrEvent } from '@nostrify/nostrify';
-import { bech32 } from '@scure/base';
 import { nip57 } from 'nostr-tools';
 
 import { extractZapAmount, extractZapSender } from '@/hooks/useEventInteractions';
-import { useAuthor } from '@/hooks/useAuthor';
+import { useLnurlSigner } from '@/hooks/useLnurlSigner';
+import { parseBolt11AmountMsats } from '@/lib/bolt11';
 import type { ParsedGoal } from '@/lib/goalUtils';
 
 export interface GoalProgress {
@@ -28,53 +28,6 @@ export interface GoalProgress {
 
 function tagValue(tags: string[][], name: string): string | undefined {
   return tags.find(([n]) => n === name)?.[1];
-}
-
-function parseBolt11AmountMsats(bolt11: string | undefined): number {
-  if (!bolt11) return 0;
-  const match = bolt11.toLowerCase().match(/^ln\w+?(\d+)([munp]?)1/);
-  if (!match) return 0;
-  const value = parseInt(match[1], 10);
-  if (isNaN(value)) return 0;
-  switch (match[2]) {
-    case 'm': return value * 100_000_000;
-    case 'u': return value * 100_000;
-    case 'n': return value * 100;
-    case 'p': return value / 10;
-    default: return value * 100_000_000_000;
-  }
-}
-
-async function resolveZapReceiptSigner(profileEvent: NostrEvent | undefined, signal?: AbortSignal): Promise<string | undefined> {
-  if (!profileEvent) return undefined;
-
-  let lnurl = '';
-  try {
-    const metadata = JSON.parse(profileEvent.content) as { lud06?: string; lud16?: string };
-    if (metadata.lud06) {
-      const { words } = bech32.decode(metadata.lud06, 1000);
-      lnurl = new TextDecoder().decode(new Uint8Array(bech32.fromWords(words)));
-    } else if (metadata.lud16) {
-      const [name, domain] = metadata.lud16.split('@');
-      if (!name || !domain) return undefined;
-      lnurl = new URL(`/.well-known/lnurlp/${name}`, `https://${domain}`).toString();
-    }
-  } catch {
-    return undefined;
-  }
-
-  if (!lnurl) return undefined;
-
-  try {
-    const res = await fetch(lnurl, { signal: signal ? AbortSignal.any([signal, AbortSignal.timeout(5000)]) : AbortSignal.timeout(5000) });
-    if (!res.ok) return undefined;
-    const body = await res.json() as { allowsNostr?: boolean; nostrPubkey?: string };
-    return body.allowsNostr && /^[a-f0-9]{64}$/.test(body.nostrPubkey ?? '')
-      ? body.nostrPubkey
-      : undefined;
-  } catch {
-    return undefined;
-  }
 }
 
 function isValidGoalZapReceipt(
@@ -114,19 +67,17 @@ function isValidGoalZapReceipt(
  */
 export function useGoalProgress(goalEvent: NostrEvent | undefined, goal: ParsedGoal) {
   const { nostr } = useNostr();
-  const author = useAuthor(goal.beneficiary);
+  const { data: receiptSigner } = useLnurlSigner(goal.beneficiary);
   const goalEventId = goalEvent?.id;
   const relaysKey = goal.relays.join(',');
-  const lnAddr = author.data?.metadata?.lud16 ?? author.data?.metadata?.lud06;
 
   const query = useQuery({
-    queryKey: ['goal-progress', goalEventId, goal.beneficiary, lnAddr, relaysKey],
+    queryKey: ['goal-progress', goalEventId, goal.beneficiary, receiptSigner, relaysKey],
     queryFn: async (c) => {
       if (!goalEventId) {
         return { receipts: [] as { msats: number; sender: string; createdAt: number }[] };
       }
       const signal = AbortSignal.any([c.signal, AbortSignal.timeout(8000)]);
-      const receiptSigner = await resolveZapReceiptSigner(author.data?.event, c.signal);
       const relay = goal.relays.length > 0 ? nostr.group(goal.relays) : nostr;
 
       const receipts = await relay.query(
@@ -136,7 +87,7 @@ export function useGoalProgress(goalEvent: NostrEvent | undefined, goal: ParsedG
 
       return {
         receipts: receipts
-          .filter((r) => isValidGoalZapReceipt(r, goalEventId, goal.beneficiary, receiptSigner))
+          .filter((r) => isValidGoalZapReceipt(r, goalEventId, goal.beneficiary, receiptSigner ?? undefined))
           .map((r) => ({
             msats: extractZapAmount(r),
             sender: extractZapSender(r),
