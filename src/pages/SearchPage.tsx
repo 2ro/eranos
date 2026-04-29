@@ -61,7 +61,7 @@ type TabType = 'communities' | 'posts' | 'accounts';
 const VALID_TABS: TabType[] = ['communities', 'posts', 'accounts'];
 
 function parseTab(value: string | null): TabType {
-  return VALID_TABS.includes(value as TabType) ? (value as TabType) : 'posts';
+  return VALID_TABS.includes(value as TabType) ? (value as TabType) : 'communities';
 }
 
 const VALID_AUTHOR_SCOPES = ['anyone', 'follows', 'people'] as const;
