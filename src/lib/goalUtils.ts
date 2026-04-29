@@ -64,12 +64,12 @@ export function parseGoalEvent(event: NostrEvent): ParsedGoal | null {
   const amountMsat = parseInt(amountStr, 10);
   if (isNaN(amountMsat) || amountMsat <= 0) return null;
 
-  // Required: relays tag
+  // Relays tag — preferred but not required. When empty, the goal progress
+  // hook falls back to the user's configured relays.
   const relaysTag = event.tags.find(([n]) => n === 'relays');
   const relays = relaysTag
     ? [...new Set(relaysTag.slice(1).map(normalizeRelayUrl).filter((v): v is string => !!v))]
     : [];
-  if (relays.length === 0) return null;
 
   // Optional tags
   const closedAtStr = event.tags.find(([n]) => n === 'closed_at')?.[1];
