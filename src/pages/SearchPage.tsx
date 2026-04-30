@@ -198,7 +198,7 @@ export function SearchPage() {
   const setActiveTab = useCallback((tab: TabType) => {
     setSearchParams((prev) => {
       const next = new URLSearchParams(prev);
-      if (tab === 'posts') {
+      if (tab === 'communities') {
         next.delete('tab');
       } else {
         next.set('tab', tab);
@@ -1204,5 +1204,4 @@ function SaveDestinationRow({
     </button>
   );
 }
-
 

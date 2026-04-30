@@ -14,6 +14,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { getAvatarShape } from '@/lib/avatarShape';
@@ -23,12 +24,17 @@ import { useNostrPublish } from '@/hooks/useNostrPublish';
 import { useUploadFile } from '@/hooks/useUploadFile';
 import { useToast } from '@/hooks/useToast';
 import { useSearchProfiles, type SearchProfile } from '@/hooks/useSearchProfiles';
+import { PortalContainerProvider } from '@/hooks/usePortalContainer';
 import { genUserName } from '@/lib/genUserName';
 import { fetchFreshEvent } from '@/lib/fetchFreshEvent';
 import {
   COMMUNITY_DEFINITION_KIND,
   BADGE_DEFINITION_KIND,
   BADGE_AWARD_KIND,
+  EMPTY_MODERATION,
+  type CommunityMember,
+  type CommunityMembership,
+  type CommunityModeration,
   type ParsedCommunity,
 } from '@/lib/communityUtils';
 import { cn } from '@/lib/utils';
@@ -40,6 +46,12 @@ type MemberRole = 'moderator' | 'member';
 interface PendingMember {
   profile: SearchProfile;
   role: MemberRole;
+}
+
+interface CommunityMembersCacheValue {
+  membership: CommunityMembership;
+  moderation: CommunityModeration;
+  rankMap: Map<string, CommunityMember>;
 }
 
 interface AddMemberDialogProps {
@@ -72,7 +84,12 @@ export function AddMemberDialog({
   const [badgeImageUrl, setBadgeImageUrl] = useState('');
   const [badgeImagePreview, setBadgeImagePreview] = useState('');
   const [isPublishing, setIsPublishing] = useState(false);
+  const [portalContainer, setPortalContainer] = useState<HTMLElement | undefined>(undefined);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const dialogContentRef = useCallback((node: HTMLElement | null) => {
+    setPortalContainer(node ?? undefined);
+  }, []);
 
   // Mutations
   const { mutateAsync: publishEvent } = useNostrPublish();
@@ -128,6 +145,55 @@ export function AddMemberDialog({
         : m,
     ));
   }, [isFounder]);
+
+  const applyOptimisticMembership = useCallback((members: PendingMember[], awardEvents: Map<string, NostrEvent>) => {
+    queryClient.setQueryData<CommunityMembersCacheValue>(['community-members', community.aTag], (prev) => {
+      const moderation = prev?.moderation ?? EMPTY_MODERATION;
+      const rankMap = new Map(prev?.rankMap ?? []);
+      const membershipByPubkey = new Map(
+        (prev?.membership.members ?? []).map((member) => [member.pubkey, member] as const),
+      );
+
+      const seedRankZero = (pubkey: string) => {
+        if (moderation.bannedPubkeys.has(pubkey)) return;
+        const member: CommunityMember = { pubkey, rank: 0 };
+        if (!membershipByPubkey.has(pubkey)) membershipByPubkey.set(pubkey, member);
+        if (!rankMap.has(pubkey)) rankMap.set(pubkey, member);
+      };
+
+      seedRankZero(community.founderPubkey);
+      community.moderatorPubkeys.forEach(seedRankZero);
+
+      for (const pending of members) {
+        if (moderation.bannedPubkeys.has(pending.profile.pubkey)) continue;
+
+        const nextMember: CommunityMember = pending.role === 'moderator'
+          ? { pubkey: pending.profile.pubkey, rank: 0 }
+          : {
+              pubkey: pending.profile.pubkey,
+              rank: 1,
+              awardEvent: awardEvents.get(pending.profile.pubkey),
+              awardedBy: user?.pubkey,
+            };
+
+        const current = membershipByPubkey.get(nextMember.pubkey);
+        if (!current || nextMember.rank < current.rank) {
+          membershipByPubkey.set(nextMember.pubkey, nextMember);
+        }
+
+        const currentRank = rankMap.get(nextMember.pubkey);
+        if (!currentRank || nextMember.rank < currentRank.rank) {
+          rankMap.set(nextMember.pubkey, nextMember);
+        }
+      }
+
+      const membership: CommunityMembership = {
+        members: Array.from(membershipByPubkey.values()).sort((a, b) => a.rank - b.rank),
+      };
+
+      return { membership, moderation, rankMap };
+    });
+  }, [community.aTag, community.founderPubkey, community.moderatorPubkeys, queryClient, user?.pubkey]);
 
   // ── Badge image upload ────────────────────────────────────────────────────
 
@@ -229,9 +295,10 @@ export function AddMemberDialog({
       }
 
       // Step 3: Publish badge awards for each member
+      const memberAwardEvents = new Map<string, NostrEvent>();
       if (newMembers.length > 0 && badgeATag) {
         for (const member of newMembers) {
-          await publishEvent({
+          const awardEvent = await publishEvent({
             kind: BADGE_AWARD_KIND,
             content: '',
             tags: [
@@ -240,11 +307,11 @@ export function AddMemberDialog({
               ['alt', `Badge award: Member in ${community.name}`],
             ],
           } as Omit<NostrEvent, 'id' | 'pubkey' | 'sig'>);
+          memberAwardEvents.set(member.profile.pubkey, awardEvent);
         }
       }
 
-      // Invalidate queries
-      queryClient.invalidateQueries({ queryKey: ['community-members'], exact: false });
+      applyOptimisticMembership(pendingMembers, memberAwardEvents);
       queryClient.invalidateQueries({ queryKey: ['my-communities'], exact: false });
       if (!hasBadge && newMembers.length > 0) {
         queryClient.invalidateQueries({ queryKey: ['badge-feed'] });
@@ -264,14 +331,15 @@ export function AddMemberDialog({
     }
   }, [
     user, pendingMembers, existingBadgeATag, hasBadge, community, communityEvent,
-    badgeImageUrl, nostr, publishEvent, queryClient, toast, handleOpenChange,
+    badgeImageUrl, nostr, publishEvent, queryClient, toast, handleOpenChange, applyOptimisticMembership,
   ]);
 
   if (!user) return null;
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
-      <DialogContent className="sm:max-w-md gap-0 p-0 overflow-hidden">
+      <DialogContent ref={dialogContentRef} className="sm:max-w-md gap-0 p-0 overflow-visible">
+        <PortalContainerProvider value={portalContainer}>
         <DialogHeader className="px-5 pt-5 pb-3">
           <DialogTitle className="flex items-center gap-2">
             <UserPlus className="size-5 text-primary" />
@@ -284,19 +352,19 @@ export function AddMemberDialog({
           </DialogDescription>
         </DialogHeader>
 
-        {/* Search input lives outside ScrollArea so its dropdown isn't clipped */}
-        <div className="px-5 pb-3">
-          <PersonSearch
-            onAdd={addPerson}
-            excludePubkeys={[
-              community.founderPubkey,
-              ...pendingMembers.map((m) => m.profile.pubkey),
-            ]}
-          />
-        </div>
-
-        <ScrollArea className="max-h-[50vh]">
+        <ScrollArea className="max-h-[60vh]">
           <div className="px-5 pb-5 space-y-4">
+            {/* People search */}
+            <div className="space-y-1.5">
+              <Label>Search people</Label>
+              <PersonSearch
+                onAdd={addPerson}
+                excludePubkeys={[
+                  community.founderPubkey,
+                  ...pendingMembers.map((m) => m.profile.pubkey),
+                ]}
+              />
+            </div>
 
             {/* Pending members list */}
             {pendingMembers.length > 0 && (
@@ -375,6 +443,7 @@ export function AddMemberDialog({
             </Button>
           </div>
         </ScrollArea>
+        </PortalContainerProvider>
       </DialogContent>
     </Dialog>
   );
@@ -392,7 +461,6 @@ function PersonSearch({
 }) {
   const [query, setQuery] = useState('');
   const [dropdownOpen, setDropdownOpen] = useState(false);
-  const containerRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
   const { data: profiles, isFetching } = useSearchProfiles(query);
@@ -411,16 +479,6 @@ function PersonSearch({
     }
   }, [filteredProfiles, query]);
 
-  useEffect(() => {
-    function handleClickOutside(e: MouseEvent) {
-      if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
-        setDropdownOpen(false);
-      }
-    }
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
-
   const handleSelect = useCallback((profile: SearchProfile) => {
     onAdd(profile);
     setQuery('');
@@ -429,47 +487,49 @@ function PersonSearch({
   }, [onAdd]);
 
   return (
-    <div ref={containerRef} className="relative">
-      <div className="relative flex items-center">
-        <Search className="absolute left-3 size-4 text-muted-foreground pointer-events-none" />
-        {isFetching && query.trim() && (
-          <Loader2 className="absolute right-3 size-4 text-muted-foreground animate-spin" />
-        )}
-        <Input
-          ref={inputRef}
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          onFocus={() => {
-            if (query.trim().length > 0 && filteredProfiles.length > 0) {
-              setDropdownOpen(true);
-            }
-          }}
-          placeholder="Search people to add..."
-          className="pl-10 pr-10 rounded-full bg-secondary border-0 focus-visible:ring-0 focus-visible:ring-offset-0 h-9 text-sm"
-          autoComplete="off"
-        />
-      </div>
+    <Popover open={dropdownOpen} onOpenChange={setDropdownOpen}>
+      <PopoverTrigger asChild>
+        <div className="relative flex items-center">
+          <Search className="absolute left-3 size-4 text-muted-foreground pointer-events-none" />
+          {isFetching && query.trim() && (
+            <Loader2 className="absolute right-3 size-4 text-muted-foreground animate-spin" />
+          )}
+          <Input
+            ref={inputRef}
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            onFocus={() => {
+              if (query.trim().length > 0 && filteredProfiles.length > 0) {
+                setDropdownOpen(true);
+              }
+            }}
+            placeholder="Search people to add..."
+            className="pl-10 pr-10 rounded-full bg-secondary border-0 focus-visible:ring-0 focus-visible:ring-offset-0 h-9 text-sm"
+            autoComplete="off"
+          />
+        </div>
+      </PopoverTrigger>
 
-      {/* Results — opens downward */}
-      {dropdownOpen && filteredProfiles.length > 0 && (
-        <div className="absolute top-full left-0 right-0 mt-1.5 z-50 rounded-xl border border-border bg-popover shadow-lg overflow-hidden animate-in fade-in-0 zoom-in-95 slide-in-from-top-2 duration-150">
+      <PopoverContent
+        align="start"
+        side="bottom"
+        sideOffset={6}
+        onOpenAutoFocus={(e) => e.preventDefault()}
+        className="z-[270] w-[var(--radix-popover-trigger-width)] rounded-xl border-border p-0 shadow-lg overflow-hidden"
+      >
+        {filteredProfiles.length > 0 ? (
           <div className="max-h-[200px] overflow-y-auto py-1">
             {filteredProfiles.map((profile) => (
               <SearchResultItem key={profile.pubkey} profile={profile} onClick={handleSelect} />
             ))}
           </div>
-        </div>
-      )}
-
-      {/* No results */}
-      {dropdownOpen && query.trim().length >= 2 && !isFetching && filteredProfiles.length === 0 && (
-        <div className="absolute top-full left-0 right-0 mt-1.5 z-50 rounded-xl border border-border bg-popover shadow-lg overflow-hidden animate-in fade-in-0 zoom-in-95 slide-in-from-top-2 duration-150">
+        ) : query.trim().length >= 2 && !isFetching ? (
           <div className="py-4 text-center text-sm text-muted-foreground">
             No people found
           </div>
-        </div>
-      )}
-    </div>
+        ) : null}
+      </PopoverContent>
+    </Popover>
   );
 }
 

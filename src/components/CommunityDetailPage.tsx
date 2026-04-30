@@ -17,7 +17,6 @@ import type { NostrEvent, NostrMetadata } from '@nostrify/nostrify';
 import { AddMemberDialog } from '@/components/AddMemberDialog';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { BanConfirmDialog } from '@/components/BanConfirmDialog';
@@ -161,6 +160,16 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
   // Founder can add moderators + members; moderators (rank 0) can add members
   const isFounder = !!user && user.pubkey === event.pubkey;
   const canAddMembers = !!viewerMember && viewerMember.rank === 0;
+
+  const handleAddMembersClick = useCallback(() => {
+    setAddMemberOpen(true);
+  }, []);
+
+  useLayoutOptions({
+    showFAB: canAddMembers && activeTab === 'members',
+    onFabClick: handleAddMembersClick,
+    fabIcon: <UserPlus className="size-5" />,
+  });
 
   // Batch-fetch profiles for all members
   const allMemberPubkeys = useMemo(
@@ -453,20 +462,6 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
                       </div>
                     </section>
                   ))}
-                </div>
-              )}
-
-              {/* Add member button — visible to founder and moderators */}
-              {canAddMembers && (
-                <div className="px-5 py-4">
-                  <Button
-                    variant="outline"
-                    className="w-full gap-2 rounded-full"
-                    onClick={() => setAddMemberOpen(true)}
-                  >
-                    <UserPlus className="size-4" />
-                    Add Members
-                  </Button>
                 </div>
               )}
             </TabsContent>
