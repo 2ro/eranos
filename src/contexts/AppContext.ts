@@ -139,8 +139,6 @@ export interface FeedSettings {
   feedIncludeProfileBadges: boolean;
   /** Include Request to Vanish events (kind 62) in the follows/global feed */
   feedIncludeVanish: boolean;
-  /** Include Blobbi pet updates (kind 31124) in the follows/global feed */
-  feedIncludeBlobbi: boolean;
   /** Include replies in the follows feed (default: true) */
   followsFeedShowReplies: boolean;
 }
@@ -259,7 +257,7 @@ export interface AppConfig {
 
 /** Configuration for a single widget in the right sidebar. */
 export interface WidgetConfig {
-  /** Widget type identifier (e.g. "trends", "blobbi", "wikipedia", "bluesky"). */
+  /** Widget type identifier (e.g. "trends", "wikipedia", "bluesky"). */
   id: string;
   /** User-configured height in pixels. Overrides the widget's default height. */
   height?: number;

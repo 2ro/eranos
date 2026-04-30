@@ -1,5 +1,4 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
-import { useQueryClient } from '@tanstack/react-query';
 
 /**
  * Connection state for the Nostr session.
@@ -70,10 +69,8 @@ function calculateReconnectDelay(
  * 4. Duplicate subscriptions and queries are prevented
  * 
  * Since nostrify manages relay pools internally, this hook focuses on:
- * - Preventing duplicate query invalidations
  * - Managing reconnection state
  * - Providing connection status to components
- * - Coordinating with React Query for data freshness
  * 
  * @param options Configuration options
  * @returns Session state and control functions
@@ -81,8 +78,6 @@ function calculateReconnectDelay(
 export function usePersistentNostrSession(
   options: PersistentNostrSessionOptions = {}
 ) {
-  const queryClient = useQueryClient();
-  
   // Extract individual option values to ensure stable dependencies
   const maxReconnectDelay = options.maxReconnectDelay ?? DEFAULT_OPTIONS.maxReconnectDelay;
   const baseReconnectDelay = options.baseReconnectDelay ?? DEFAULT_OPTIONS.baseReconnectDelay;
@@ -115,7 +110,6 @@ export function usePersistentNostrSession(
   
   /**
    * Handle connection restored.
-   * Invalidates stale queries to fetch fresh data.
    */
   const handleConnectionRestored = useCallback(() => {
     if (!mounted.current) return;
@@ -130,17 +124,7 @@ export function usePersistentNostrSession(
     
     clearReconnectTimeout();
     
-    // Invalidate Blobbi-related queries to fetch fresh data
-    // This is batched by React Query to avoid multiple refetches
-    queryClient.invalidateQueries({
-      queryKey: ['blobbonaut-profile'],
-      refetchType: 'active', // Only refetch if the query is actively being used
-    });
-    queryClient.invalidateQueries({
-      queryKey: ['blobbi-companion'],
-      refetchType: 'active',
-    });
-  }, [queryClient, clearReconnectTimeout]);
+  }, [clearReconnectTimeout]);
   
   /**
    * Handle connection lost.
@@ -191,8 +175,7 @@ export function usePersistentNostrSession(
       isReconnecting: true,
     }));
     
-    // Since nostrify manages connections internally, we just need to
-    // invalidate queries to trigger fresh fetches
+    // Nostrify manages connections internally; update our local state.
     handleConnectionRestored();
   }, [clearReconnectTimeout, handleConnectionRestored]);
   
@@ -244,35 +227,6 @@ export function usePersistentNostrSession(
       window.removeEventListener('offline', handleOffline);
     };
   }, [handleConnectionRestored, handleConnectionLost]);
-  
-  // Handle visibility change (tab focus)
-  useEffect(() => {
-    const handleVisibilityChange = () => {
-      if (document.visibilityState === 'visible') {
-        // Tab became visible - check if we need to refresh data
-        // Use a small delay to avoid immediate refetch
-        setTimeout(() => {
-          if (mounted.current && state.isConnected) {
-            // Only invalidate if queries are stale (controlled by staleTime)
-            queryClient.invalidateQueries({
-              queryKey: ['blobbonaut-profile'],
-              refetchType: 'active',
-            });
-            queryClient.invalidateQueries({
-              queryKey: ['blobbi-companion'],
-              refetchType: 'active',
-            });
-          }
-        }, 1000);
-      }
-    };
-    
-    document.addEventListener('visibilitychange', handleVisibilityChange);
-    
-    return () => {
-      document.removeEventListener('visibilitychange', handleVisibilityChange);
-    };
-  }, [queryClient, state.isConnected]);
   
   return {
     /** Current session state */

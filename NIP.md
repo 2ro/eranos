@@ -33,12 +33,7 @@ These event kinds were created by community contributors and are supported by Di
 | 4223  | Weather Reading        | Sensor readings from a weather station                           | [Draft NIP](https://github.com/nostr-protocol/nips/pull/2163)                            |
 | 7516  | Found Log              | Log entry recording a user finding a geocache                    | [NIP-GC](https://gitlab.com/chad.curtis/treasures/-/blob/main/NIP-GC.md)                 |
 | 8211  | Encrypted Letter       | Encrypted personal letter with visual stationery                 | [NIP](https://gitlab.com/chad.curtis/lief/-/blob/main/NIP.md)                            |
-| 11125 | Blobbonaut Profile     | Owner profile with coins, achievements, and inventory            | [NIP-BB](https://github.com/Danidfra/nostr-pet/blob/production/NIP.md)                   |
-| 14919 | Blobbi Interaction     | Individual pet interaction (feed, play, clean, etc.)             | [NIP-BB](https://github.com/Danidfra/nostr-pet/blob/production/NIP.md)                   |
-| 14920 | Blobbi Breeding        | Breeding event between two adult Blobbis                         | [NIP-BB](https://github.com/Danidfra/nostr-pet/blob/production/NIP.md)                   |
-| 14921 | Blobbi Record          | Immutable lifecycle record (birth, evolution, adoption)          | [NIP-BB](https://github.com/Danidfra/nostr-pet/blob/production/NIP.md)                   |
 | 16158 | Weather Station        | Weather station metadata (location, sensors, connectivity)       | [Draft NIP](https://github.com/nostr-protocol/nips/pull/2163)                            |
-| 31124 | Blobbi Pet State       | Current state of a virtual Blobbi pet (addressable)              | [NIP-BB](https://github.com/Danidfra/nostr-pet/blob/production/NIP.md)                   |
 | 37516 | Geocache               | Geocache listing for real-world treasure hunting                 | [NIP-GC](https://gitlab.com/chad.curtis/treasures/-/blob/main/NIP-GC.md)                 |
 
 ---
@@ -878,30 +873,3 @@ NIP-44 encrypted personal letters with visual stationery, hand-drawn stickers, d
 **Firmware:** https://github.com/samthomson/weather-station
 
 Kind 16158 (replaceable) describes a weather station's configuration: name, geohash location, elevation, power source, connectivity, and sensor inventory. Kind 4223 (regular) carries individual sensor readings as 3-parameter tags `[sensor_type, value, model]`, enabling historical queries and cross-station comparison. Each station has its own keypair.
-
-### Blobbi Virtual Pet (Kinds 31124, 14919, 14920, 14921, 11125)
-
-**Author:** Danifra
-**Spec:** https://github.com/Danidfra/nostr-pet/blob/production/NIP.md
-**App:** https://nostr-pet.vercel.app
-**See also:** [Blobbi tag schema](docs/blobbi/blobbi-tag-schema.md) (Ditto-specific integration details)
-
-NIP-BB defines a virtual pet lifecycle on Nostr. Kind 31124 (addressable) holds the current pet state across three stages (egg, baby, adult) with stats, appearance, and personality traits. Kind 14919 logs individual interactions, kind 14920 records breeding events, kind 14921 stores immutable lifecycle records, and kind 11125 (replaceable) holds the owner's profile with coins, achievements, and inventory.
-
-#### Kind 11125 `content` JSON — `missions` field
-
-The `content` of kind 11125 is a JSON object. Ditto extends it with a `missions` field that tracks daily and evolution mission progress:
-
-```jsonc
-{
-  "missions": {
-    "date": "2026-04-16",       // ISO date string for the current daily mission set
-    "daily": [ /* Mission[] */ ],
-    "evolution": [ /* Mission[] — active hatch/evolve tasks, cleared on stage transition */ ],
-    "rerolls": 2                // remaining daily mission rerolls
-  }
-  // ...other profile fields (coins, achievements, inventory, etc.)
-}
-```
-
-Each `Mission` is either a **TallyMission** (`{ id, target, count }`) or an **EventMission** (`{ id, target, events: string[] }`) where `events` contains Nostr event IDs that satisfy the mission. Evolution missions are populated when incubation or evolution begins and cleared when the stage transition completes or is cancelled.

@@ -4,7 +4,6 @@
 
 ### Added
 - Back up your secret key right from Profile settings -- reveal, copy, and save it to iCloud Keychain, Android Credential Manager, or a local file
-- Blobbi mission progress now persists across page refreshes, so your hatching and evolution journey picks up right where you left off
 
 ### Changed
 - AI chat has been overhauled with a cleaner layout, the Dork mascot across empty states, and a clear path to grab Shakespeare credits when you run out
@@ -12,15 +11,11 @@
 
 ### Fixed
 - Avatar shape selection during signup now actually saves to your profile
-- Blobbi interaction missions now tally correctly the moment you start incubating or evolving
-- Blobbi task progress displays the right numbers immediately on page load instead of showing 0 until everything catches up
 
 ## [2.7.1] - 2026-04-16
 
 ### Added
 - Tap the Home tab while already on Home to scroll to the top and refresh your feed
-- Blobbi hatch and evolve missions now count your existing posts, themes, and color moments retroactively -- no need to start from scratch
-- New Blobbis begin incubating and evolving immediately after adoption, so every care action counts toward your next milestone
 
 ### Changed
 - Signup's save-key step is clearer: the button now reads "Save Key", shows a spinner while saving, and warns you before the key is revealed on screen
@@ -36,19 +31,14 @@
 ## [2.7.0] - 2026-04-14
 
 ### Added
-- Customizable widget sidebar -- drag, drop, and rearrange widgets on your feed including Trending, Hot Posts, Bluesky, AI Chat, Blobbi, Music, Photos, Wikipedia, and more
-- Blobbi rooms -- swipe between living spaces, clean up after your pet, and earn XP from daily care routines
 - Native push notifications on iOS with author names, content previews, and smart grouping by category
-- Haptic feedback throughout the app -- taps, buzzes, and pulses when you react, zap, repost, pull to refresh, play games, and interact with your Blobbi
 - Hot Posts widget showing the most popular posts from your feed at a glance
 
 ### Changed
 - Sidebar widgets are now clickable links that take you to their full pages
-- Blobbi widget shows live stats with circular ring indicators and quick action buttons
 
 ### Fixed
 - Zaps embedded in posts now render as proper inline cards instead of blank space
-- Quote posts display media and Blobbi companions correctly
 - Deep linking on Google Play works again
 - Game controller buttons no longer trigger text selection on long-press on iOS
 
@@ -89,7 +79,6 @@
 
 ### Added
 - Lightning invoices embedded in posts now render as tappable payment cards
-- Blobbi companions in the feed reflect their current condition and projected health
 
 ### Changed
 - Profile headers are cleaner -- lightning addresses and verification badges moved out of the way, and website URLs no longer show a trailing slash
@@ -119,7 +108,6 @@
 - File downloads now save directly to Documents on iOS and Android instead of silently failing
 - Mobile search no longer scrolls the page behind it and properly hides the bottom navigation bar
 - iOS swipe-back navigation works correctly throughout the app
-- Blobbi companions appear reliably on profiles instead of sometimes going missing
 - IndexedDB no longer crashes on devices with Lockdown Mode enabled
 
 ## [2.6.1] - 2026-04-06
@@ -133,7 +121,6 @@
 ### Changed
 - Webxdc games and apps run in a more secure sandbox with stricter content policies and private subdomains
 - Nsite previews now use the same secure sandbox as webxdc apps
-- Blobbi items work as instant abilities instead of consumable inventory -- no more fiddly quantity pickers
 
 ### Fixed
 - Desktop tab bar no longer overflows when you have lots of tabs -- scroll arrows appear automatically
@@ -147,7 +134,6 @@
 
 ### Added
 - Follow links and QR codes -- share a link or scannable code that lets anyone follow you with one tap, complete with your themed profile preview and recent posts
-- Immersive Blobbi hatching ceremony -- crack your egg through cinematic stages with shaking animations, a burst of light, sparkles, typewriter dialog, and a naming moment
 
 ### Changed
 - Footer links redesigned as compact icon chips for a cleaner look
@@ -157,8 +143,6 @@
 - Custom themes now apply correctly when logging in on a new device
 - Settings and preferences sync reliably across devices
 - Mobile sidebar links no longer clip into the safe area
-- Blobbi page background overlay now appears properly on custom themes
-- Blobbi companion state no longer resets unexpectedly from stale cache data
 - Letter compose picker no longer gets hidden behind the top navigation arc
 
 ## [2.5.2] - 2026-04-04
@@ -180,7 +164,6 @@
 ### Added
 - Run nsites and web apps directly inside Ditto -- hit the "Run" button on any nsite or app card to preview it in an overlay without leaving your feed
 - File uploads in the poll composer -- attach images and media to your polls
-- Blobbi posts now appear in the homepage feed
 
 ### Changed
 - Profile media sidebar fills remaining slots with photos from text posts when there aren't enough dedicated media posts
@@ -202,7 +185,6 @@
 ## [2.4.0] - 2026-04-02
 
 ### Added
-- First-hatch tour: a guided experience for hatching your very first Blobbi egg, with progressive crack animations, an inline card flow, and a reveal moment
 - Customizable bottom bar: rearrange or hide any item in the navigation bar to make Ditto feel like yours
 - Mission surface card in the feed that surfaces your active quests at a glance
 
@@ -210,7 +192,6 @@
 - Missions redesigned as a quest board with collapsible cards and a lighter aesthetic
 - "Edit Profile" mission now completes when you update any profile field, not just wall-specific edits
 - Media tab on profiles now shows only photos, videos, and other media -- not plain text posts
-- Blobbi onboarding state now syncs to your profile so it follows you across devices
 
 ### Fixed
 - Notification dot no longer reappears after you've already marked notifications as read
@@ -258,10 +239,8 @@
 
 ### Added
 - Emoji pack creator and editor with drag-and-drop image upload, auto-generated identifiers, and description field
-- Blobbi companions now appear in feeds and post detail pages
 
 ### Changed
-- Blobbi shop redesigned with a tile layout and instant buy -- no more categories or accessory tabs
 - Emoji packs without any valid emojis are now hidden from feeds
 - Custom emoji shortcode collisions across packs are automatically resolved with pack-prefixed names
 
@@ -274,7 +253,6 @@
 ### Changed
 - My Badges tab overhauled with drag-and-drop reordering, a scrollable list, and a showcase-style carousel for pending badges
 - Encrypted letter envelopes now show the mailing side first (sender and recipient), then flip to reveal the wax seal
-- Blobbi companions are more expressive -- richer status reactions, sleeping visuals, and body effects like dirt and hunger cues
 
 ### Fixed
 - Notification dot not clearing after marking notifications as read
@@ -331,7 +309,6 @@
 
 ### Changed
 - Compose textarea expands smoothly as you type instead of snapping to a new height
-- Blobbi stickers auto-shrink near card edges and clip cleanly at rounded boundaries
 
 ### Fixed
 - Feed gaps when replies are disabled no longer cause missing posts
@@ -390,9 +367,6 @@
 ## [2.2.0] - 2026-03-28
 
 ### Added
-- Blobbi virtual pets -- adopt an egg, hatch it, evolve it into one of 16 adult forms, and care for it with feeding, cleaning, medicine, music, and singing
-- Blobbi companion that follows you around the app, tracks your cursor, blinks, expresses emotions, and reacts to what you're doing
-- Blobbi shop and inventory system with items that affect your pet's stats
 - Daily missions with reroll, care streaks, and stage-based rewards
 - Immersive full-screen divines experience on both mobile and desktop with floating controls
 - Relay information panel on the network settings page

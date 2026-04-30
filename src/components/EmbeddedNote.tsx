@@ -1,4 +1,4 @@
-import { lazy, type ReactNode, Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { type ReactNode, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { nip19 } from 'nostr-tools';
 import type { NostrEvent } from '@nostrify/nostrify';
@@ -26,8 +26,6 @@ import { cn } from '@/lib/utils';
 import { useAppContext } from '@/hooks/useAppContext';
 import { IMAGE_URL_REGEX, IMETA_MEDIA_URL_TEST_REGEX, extractVideoUrls, extractAudioUrls } from '@/lib/mediaUrls';
 import { getKindLabel, getKindIcon } from '@/lib/extraKinds';
-
-const BlobbiStateCard = lazy(() => import('@/components/BlobbiStateCard').then(m => ({ default: m.BlobbiStateCard })));
 
 /** NIP-62 Request to Vanish. */
 const VANISH_KIND = 62;
@@ -206,12 +204,10 @@ function EmbeddedNoteCard({
   const [contentOverflows, setContentOverflows] = useState(false);
   const [contentExpanded, setContentExpanded] = useState(false);
 
-  const isBlobbiState = event.kind === 31124;
   const isPhoto = event.kind === 20;
 
   // Attachment counts for indicator chips
   const attachments = useMemo(() => {
-    if (isBlobbiState) return { imgs: 0, vids: 0, auds: 0, apps: 0, links: 0, photos: 0 };
     if (isPhoto) {
       const photoCount = event.tags.filter(([n]) => n === 'imeta').length;
       return { imgs: 0, vids: 0, auds: 0, apps: 0, links: 0, photos: photoCount };
@@ -223,7 +219,7 @@ function EmbeddedNoteCard({
     const allUrls = event.content.match(/https?:\/\/[^\s]+/g) || [];
     const links = allUrls.filter((u) => !IMETA_MEDIA_URL_TEST_REGEX.test(u)).length;
     return { imgs, vids, auds, apps, links, photos: 0 };
-  }, [event.content, event.tags, isPhoto, isBlobbiState]);
+  }, [event.content, event.tags, isPhoto]);
 
   // Kind label for non-text-note kinds
   const kindMeta = useMemo(() => {
@@ -271,10 +267,6 @@ function EmbeddedNoteCard({
         <p className="text-xs text-muted-foreground italic">
           Content warning{cwTag?.[1] ? <>{' '}&ldquo;{cwTag[1]}&rdquo;</> : ''}
         </p>
-      ) : isBlobbiState ? (
-        <Suspense fallback={<Skeleton className="h-24 w-full rounded-lg" />}>
-          <BlobbiStateCard event={event} />
-        </Suspense>
       ) : tagMeta ? (
         <>
           {tagMeta.title && (

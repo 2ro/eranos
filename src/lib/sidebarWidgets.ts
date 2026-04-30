@@ -2,7 +2,6 @@ import type { ComponentType } from 'react';
 import {
   TrendingUp,
   Flame,
-  Egg,
   SmilePlus,
   Bot,
   Camera,
@@ -80,17 +79,6 @@ export const WIDGET_DEFINITIONS: WidgetDefinition[] = [
   },
 
   // Personal
-  {
-    id: 'blobbi',
-    label: 'Blobbi',
-    description: 'Your virtual pet companion',
-    icon: Egg,
-    defaultHeight: 350,
-    minHeight: 200,
-    maxHeight: 500,
-    category: 'personal',
-    href: '/blobbi',
-  },
   {
     id: 'status',
     label: 'Status',
