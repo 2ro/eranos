@@ -9,12 +9,15 @@ import {
   ShieldBan,
   Share2,
   Target,
+  UserPlus,
   Users,
 } from 'lucide-react';
 import type { NostrEvent, NostrMetadata } from '@nostrify/nostrify';
 
+import { AddMemberDialog } from '@/components/AddMemberDialog';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { BanConfirmDialog } from '@/components/BanConfirmDialog';
@@ -131,6 +134,7 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
   const [activeTab, setActiveTab] = useState('members');
   const [composeOpen, setComposeOpen] = useState(false);
   const [goalDialogOpen, setGoalDialogOpen] = useState(false);
+  const [addMemberOpen, setAddMemberOpen] = useState(false);
 
   // Parse community definition
   const community = useMemo(() => parseCommunityEvent(event), [event]);
@@ -153,6 +157,10 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
   // ── Members ─────────────────────────────────────────────────────────────────
   const { data: membership, moderation, rankMap, isLoading: membersLoading } = useCommunityMembers(community);
   const viewerMember = user ? getViewerAuthority(user.pubkey, rankMap, moderation) : undefined;
+
+  // Founder can add moderators + members; moderators (rank 0) can add members
+  const isFounder = !!user && user.pubkey === event.pubkey;
+  const canAddMembers = !!viewerMember && viewerMember.rank === 0;
 
   // Batch-fetch profiles for all members
   const allMemberPubkeys = useMemo(
@@ -285,21 +293,28 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
     }
   }, [event, toast]);
 
-  // ── FAB — visible on comments & fundraising tabs ──────────────────────────
+  // ── FAB — visible on comments, fundraising, and members tabs ──────────────
   const handleFabClick = useCallback(() => {
     if (activeTab === 'comments') {
       setComposeOpen(true);
     } else if (activeTab === 'fundraising') {
       setGoalDialogOpen(true);
+    } else if (activeTab === 'members') {
+      setAddMemberOpen(true);
     }
   }, [activeTab]);
 
   const fabIcon = activeTab === 'fundraising'
     ? <Target strokeWidth={3} size={18} />
-    : undefined; // default Plus icon for comments
+    : activeTab === 'members'
+      ? <UserPlus className="size-5" />
+      : undefined; // default Plus icon for comments
 
   useLayoutOptions({
-    showFAB: activeTab === 'comments' || activeTab === 'fundraising',
+    showFAB:
+      activeTab === 'comments'
+      || activeTab === 'fundraising'
+      || (activeTab === 'members' && canAddMembers),
     onFabClick: handleFabClick,
     fabIcon,
   });
@@ -440,6 +455,20 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
                   ))}
                 </div>
               )}
+
+              {/* Add member button — visible to founder and moderators */}
+              {canAddMembers && (
+                <div className="px-5 py-4">
+                  <Button
+                    variant="outline"
+                    className="w-full gap-2 rounded-full"
+                    onClick={() => setAddMemberOpen(true)}
+                  >
+                    <UserPlus className="size-4" />
+                    Add Members
+                  </Button>
+                </div>
+              )}
             </TabsContent>
 
             {/* ── Comments tab ── */}
@@ -531,6 +560,17 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
           communityATag={communityATag}
           open={goalDialogOpen}
           onOpenChange={setGoalDialogOpen}
+        />
+      )}
+
+      {/* Add member dialog */}
+      {canAddMembers && community && (
+        <AddMemberDialog
+          open={addMemberOpen}
+          onOpenChange={setAddMemberOpen}
+          communityEvent={event}
+          community={community}
+          isFounder={isFounder}
         />
       )}
     </div>
