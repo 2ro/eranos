@@ -4,7 +4,6 @@ import { AudioNavigationGuard } from "@/components/AudioNavigationGuard";
 import { DeepLinkHandler } from "@/components/DeepLinkHandler";
 import { MinimizedAudioBar } from "@/components/MinimizedAudioBar";
 import { AudioPlayerProvider } from "@/contexts/AudioPlayerContext";
-import { BlobbiActionsProvider } from "@/blobbi/companion/interaction/BlobbiActionsProvider";
 import { sidebarItemIcon } from "@/lib/sidebarItems";
 import { Toaster } from "./components/ui/toaster";
 import { MainLayout } from "./components/MainLayout";
@@ -18,9 +17,6 @@ import { getExtraKindDef } from "./lib/extraKinds";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import MessagesPage from "./pages/Messages";
-
-// Lazy-loaded companion layer (~450K code-split)
-const BlobbiCompanionLayer = lazy(() => import("@/blobbi/companion").then(m => ({ default: m.BlobbiCompanionLayer })));
 
 // Lazy-loaded compose modal (pulls in emoji-mart ~620K)
 const ReplyComposeModal = lazy(() => import("@/components/ReplyComposeModal").then(m => ({ default: m.ReplyComposeModal })));
@@ -112,11 +108,6 @@ export function AppRouter() {
         <AudioNavigationGuard />
         <DeepLinkHandler />
         <ScrollToTop />
-        <BlobbiActionsProvider>
-          <Suspense fallback={null}>
-            <BlobbiCompanionLayer />
-          </Suspense>
-        </BlobbiActionsProvider>
         <Routes>
           {/* Auto-follow deep link: fullscreen immersive (no sidebars/nav) */}
           <Route path="/follow/:npub" element={<FollowPage />} />

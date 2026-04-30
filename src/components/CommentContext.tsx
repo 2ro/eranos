@@ -3,7 +3,7 @@ import { type ReactNode, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { nip19 } from 'nostr-tools';
 import {
-  Award, BarChart3, BookOpen, Camera, Clapperboard, Egg, FileText, Film,
+  Award, BarChart3, BookOpen, Camera, Clapperboard, FileText, Film,
   GitBranch, GitPullRequest, Mail, MapPin, MessageSquare, Mic, Music,
   Package, Palette, PartyPopper, Podcast, Radio, Rocket, SmilePlus,
   Users, Vote, Zap,
@@ -141,7 +141,6 @@ const KIND_LABELS: Record<number, string> = {
   37516: 'a treasure',
   39089: 'a follow pack',
   9735: 'a zap',
-  31124: 'a Blobbi',
 };
 
 /** Kind-specific icons — matches sidebar and NoteCard icons. */
@@ -186,7 +185,6 @@ const KIND_ICONS: Partial<Record<number, React.ComponentType<{ className?: strin
   39089: PartyPopper,
   3367: Palette,
   9735: Zap,
-  31124: Egg,
 };
 
 /**

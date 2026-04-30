@@ -9,7 +9,6 @@ import {
   Clapperboard,
   Code,
   Earth,
-  Egg,
   Film,
   HelpCircle,
   LifeBuoy,
@@ -201,7 +200,6 @@ export const CONTENT_KIND_ICONS: Record<string, IconComponent> = {
   world: Earth,
   archive: HelpCircle,
   bluesky: HelpCircle,
-  blobbi: Egg,
   vanish: MessageSquareMore,
 };
 

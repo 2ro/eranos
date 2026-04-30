@@ -30,7 +30,6 @@ import type { WidgetDefinition } from '@/lib/sidebarWidgets';
 
 const TrendingWidget = lazy(() => import('@/components/widgets/TrendingWidget').then((m) => ({ default: m.TrendingWidget })));
 const HotPostsWidget = lazy(() => import('@/components/widgets/HotPostsWidget').then((m) => ({ default: m.HotPostsWidget })));
-const BlobbiWidget = lazy(() => import('@/components/widgets/BlobbiWidget').then((m) => ({ default: m.BlobbiWidget })));
 const StatusWidget = lazy(() => import('@/components/widgets/StatusWidget').then((m) => ({ default: m.StatusWidget })));
 const AIChatWidget = lazy(() => import('@/components/widgets/AIChatWidget').then((m) => ({ default: m.AIChatWidget })));
 const BlueskyWidget = lazy(() => import('@/components/widgets/BlueskyWidget').then((m) => ({ default: m.BlueskyWidget })));
@@ -48,8 +47,6 @@ function WidgetContent({ id }: { id: string }) {
       return <TrendingWidget />;
     case 'hot-posts':
       return <HotPostsWidget />;
-    case 'blobbi':
-      return <BlobbiWidget />;
     case 'status':
       return <StatusWidget />;
     case 'ai-chat':

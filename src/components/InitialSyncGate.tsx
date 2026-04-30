@@ -409,7 +409,6 @@ function SetupQuestionnaire({
       feedIncludeBadgeDefinitions: false,
       feedIncludeProfileBadges: false,
       feedIncludeVanish: true,
-      feedIncludeBlobbi: true,
       followsFeedShowReplies: true,
     };
 

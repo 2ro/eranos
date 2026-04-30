@@ -24,7 +24,6 @@ import { NWCProvider } from "@/contexts/NWCContext";
 import { SparkWalletProvider } from "@/contexts/SparkWalletContext";
 import { BuildConfigSchema, type BuildConfig } from "@/lib/schemas";
 import { secureStorage } from "@/lib/secureStorage";
-import { EmotionDevProvider } from "@/blobbi/dev/EmotionDevContext";
 import { PROTOCOL_MODE } from "@samthomson/nostr-messaging/core";
 import AppRouter from "./AppRouter";
 
@@ -107,7 +106,6 @@ const hardcodedConfig: AppConfig = {
     feedIncludeBadgeDefinitions: true,
     feedIncludeProfileBadges: true,
     feedIncludeVanish: true,
-    feedIncludeBlobbi: true,
     followsFeedShowReplies: true,
   },
   sidebarOrder: [
@@ -213,13 +211,11 @@ export function App() {
                     <NWCProvider>
                     <SparkWalletProvider>
                     <DMProviderWrapper>
-                      <EmotionDevProvider>
-                        <TooltipProvider>
-                          <InitialSyncGate>
-                            <AppRouter />
-                          </InitialSyncGate>
-                        </TooltipProvider>
-                      </EmotionDevProvider>
+                      <TooltipProvider>
+                        <InitialSyncGate>
+                          <AppRouter />
+                        </InitialSyncGate>
+                      </TooltipProvider>
                     </DMProviderWrapper>
                     </SparkWalletProvider>
                   </NWCProvider>

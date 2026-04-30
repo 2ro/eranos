@@ -1,4 +1,4 @@
-import { lazy, Suspense, useMemo } from 'react';
+import { useMemo } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useNostr } from '@nostrify/react';
 import { useQuery } from '@tanstack/react-query';
@@ -6,7 +6,6 @@ import { nip19 } from 'nostr-tools';
 import { Award, Image, MessageSquareOff } from 'lucide-react';
 import type { NostrEvent } from '@nostrify/nostrify';
 
-const BlobbiStateCard = lazy(() => import('@/components/BlobbiStateCard').then(m => ({ default: m.BlobbiStateCard })));
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { getAvatarShape } from '@/lib/avatarShape';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -88,11 +87,6 @@ export function EmbeddedNaddr({ addr, className, disableHoverCards }: EmbeddedNa
   // Profile badges (kind 10008/30008) get a compact badge row preview
   if (isProfileBadgesKind(event.kind)) {
     return <EmbeddedProfileBadgesCard event={event} className={className} />;
-  }
-
-  // Blobbi state events render the pet visual inline
-  if (event.kind === 31124) {
-    return <EmbeddedBlobbiCard event={event} className={className} disableHoverCards={disableHoverCards} />;
   }
 
   return <EmbeddedNaddrCard event={event} className={className} disableHoverCards={disableHoverCards} />;
@@ -391,28 +385,6 @@ function EmbeddedNaddrCard({ event, className, disableHoverCards }: { event: Nos
           </span>
         )}
       </div>
-    </EmbeddedCardShell>
-  );
-}
-
-/** Embedded card for kind 31124 Blobbi state events — renders the pet visual inline. */
-function EmbeddedBlobbiCard({ event, className, disableHoverCards }: { event: NostrEvent; className?: string; disableHoverCards?: boolean }) {
-  const naddrId = useMemo(() => {
-    const dTag = event.tags.find(([n]) => n === 'd')?.[1] ?? '';
-    return nip19.naddrEncode({ kind: event.kind, pubkey: event.pubkey, identifier: dTag });
-  }, [event]);
-
-  return (
-    <EmbeddedCardShell
-      pubkey={event.pubkey}
-      createdAt={event.created_at}
-      navigateTo={naddrId}
-      className={className}
-      disableHoverCards={disableHoverCards}
-    >
-      <Suspense fallback={<Skeleton className="h-24 w-full rounded-lg" />}>
-        <BlobbiStateCard event={event} />
-      </Suspense>
     </EmbeddedCardShell>
   );
 }
