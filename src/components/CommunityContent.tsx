@@ -1,14 +1,12 @@
-import { useMemo, useCallback } from 'react';
+import { useMemo } from 'react';
 import { Link } from 'react-router-dom';
-import { Users, Share2, Globe } from 'lucide-react';
-import { nip19 } from 'nostr-tools';
+import { Users, Globe } from 'lucide-react';
 import type { NostrEvent } from '@nostrify/nostrify';
 
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
-import { Button } from '@/components/ui/button';
+import { getAvatarShape } from '@/lib/avatarShape';
 import { useAuthor } from '@/hooks/useAuthor';
 import { useProfileUrl } from '@/hooks/useProfileUrl';
-import { useToast } from '@/hooks/useToast';
 import { genUserName } from '@/lib/genUserName';
 import { cn } from '@/lib/utils';
 import { sanitizeUrl } from '@/lib/sanitizeUrl';
@@ -42,7 +40,6 @@ function parseCommunityEvent(event: NostrEvent) {
 // --- Main Component ---
 
 export function CommunityContent({ event }: { event: NostrEvent }) {
-  const { toast } = useToast();
   const { name, description, image } = useMemo(
     () => parseCommunityEvent(event),
     [event],
@@ -51,6 +48,7 @@ export function CommunityContent({ event }: { event: NostrEvent }) {
   // Owner
   const ownerAuthor = useAuthor(event.pubkey);
   const ownerMetadata = ownerAuthor.data?.metadata;
+  const ownerAvatarShape = getAvatarShape(ownerMetadata);
   const ownerName = ownerMetadata?.display_name || ownerMetadata?.name || genUserName(event.pubkey);
   const ownerProfileUrl = useProfileUrl(event.pubkey, ownerMetadata);
 
@@ -65,22 +63,6 @@ export function CommunityContent({ event }: { event: NostrEvent }) {
     if (!descriptionUrl) return description;
     return description.replace(new RegExp(`\\s*${descriptionUrl.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\s*$`), '').trim();
   }, [description, descriptionUrl]);
-
-  const handleShare = useCallback(async () => {
-    const d = getTag(event.tags, 'd') ?? '';
-    const naddr = nip19.naddrEncode({
-      kind: event.kind,
-      pubkey: event.pubkey,
-      identifier: d,
-    });
-    const url = `${window.location.origin}/${naddr}`;
-    try {
-      await navigator.clipboard.writeText(url);
-      toast({ title: 'Link copied to clipboard' });
-    } catch {
-      toast({ title: 'Failed to copy link', variant: 'destructive' });
-    }
-  }, [event, toast]);
 
   return (
     <div className="mt-3 space-y-5">
@@ -108,13 +90,6 @@ export function CommunityContent({ event }: { event: NostrEvent }) {
         </div>
       )}
 
-      {/* Share button */}
-      <div className="flex items-center">
-        <Button variant="outline" size="icon" className="ml-auto size-8 shrink-0" onClick={handleShare}>
-          <Share2 className="size-3.5" />
-        </Button>
-      </div>
-
       {/* Description */}
       {descriptionText && (
         <p className="text-sm leading-relaxed text-muted-foreground whitespace-pre-wrap">{descriptionText}</p>
@@ -137,7 +112,7 @@ export function CommunityContent({ event }: { event: NostrEvent }) {
       <div>
         <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-2">Created by</p>
         <Link to={ownerProfileUrl} className="flex items-center gap-3 group">
-          <Avatar className={cn('size-10 ring-2 ring-background')}>
+          <Avatar shape={ownerAvatarShape} className={cn('size-10 ring-2 ring-background')}>
             <AvatarImage src={ownerMetadata?.picture} />
             <AvatarFallback className="bg-muted text-muted-foreground">
               {ownerName.charAt(0).toUpperCase()}
