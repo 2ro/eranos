@@ -1,7 +1,8 @@
-import { useState, useCallback, useRef } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Users, Upload, Loader2 } from 'lucide-react';
 import { useNostr } from '@nostrify/react';
+import { useQueryClient } from '@tanstack/react-query';
 import { nip19 } from 'nostr-tools';
 import type { NostrEvent } from '@nostrify/nostrify';
 
@@ -21,7 +22,8 @@ import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useNostrPublish } from '@/hooks/useNostrPublish';
 import { useUploadFile } from '@/hooks/useUploadFile';
 import { useToast } from '@/hooks/useToast';
-import { COMMUNITY_DEFINITION_KIND } from '@/lib/communityUtils';
+import { fetchFreshEvent } from '@/lib/fetchFreshEvent';
+import { COMMUNITY_DEFINITION_KIND, type ParsedCommunity } from '@/lib/communityUtils';
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
@@ -40,15 +42,21 @@ function slugify(text: string): string {
 interface CreateCommunityDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  /** Existing community event when editing. Omit to create a new community. */
+  communityEvent?: NostrEvent;
+  /** Parsed existing community data when editing. */
+  community?: ParsedCommunity;
 }
 
 // ── Component ─────────────────────────────────────────────────────────────────
 
-export function CreateCommunityDialog({ open, onOpenChange }: CreateCommunityDialogProps) {
+export function CreateCommunityDialog({ open, onOpenChange, communityEvent, community }: CreateCommunityDialogProps) {
   const { user } = useCurrentUser();
   const { nostr } = useNostr();
   const { toast } = useToast();
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
+  const isEditing = !!communityEvent && !!community;
 
   // Form state
   const [name, setName] = useState('');
@@ -63,15 +71,33 @@ export function CreateCommunityDialog({ open, onOpenChange }: CreateCommunityDia
   const { mutateAsync: uploadFile, isPending: isUploading } = useUploadFile();
 
   // Derived
-  const effectiveSlug = slugify(name);
+  const effectiveSlug = isEditing && community ? community.dTag : slugify(name);
+
+  const populateFromCommunity = useCallback(() => {
+    setName(community?.name ?? '');
+    setDescription(community?.description ?? '');
+    setImageUrl(community?.image ?? '');
+    setImagePreview(community?.image ?? '');
+    setIsPublishing(false);
+  }, [community]);
 
   const resetForm = useCallback(() => {
-    setName('');
-    setDescription('');
-    setImageUrl('');
-    setImagePreview('');
-    setIsPublishing(false);
-  }, []);
+    if (isEditing) {
+      populateFromCommunity();
+    } else {
+      setName('');
+      setDescription('');
+      setImageUrl('');
+      setImagePreview('');
+      setIsPublishing(false);
+    }
+  }, [isEditing, populateFromCommunity]);
+
+  useEffect(() => {
+    if (open && isEditing) {
+      populateFromCommunity();
+    }
+  }, [open, isEditing, populateFromCommunity]);
 
   const handleOpenChange = useCallback((nextOpen: boolean) => {
     if (!nextOpen) resetForm();
@@ -104,6 +130,27 @@ export function CreateCommunityDialog({ open, onOpenChange }: CreateCommunityDia
     if (file) handleFileSelect(file);
   }, [handleFileSelect]);
 
+  const buildUpdatedCommunityTags = useCallback((baseTags: string[][]): string[][] => {
+    const tags = baseTags.filter(([name]) => !['d', 'name', 'description', 'image', 'alt'].includes(name));
+    const nextTags: string[][] = [
+      ['d', effectiveSlug],
+      ['name', name.trim()],
+    ];
+
+    if (description.trim()) {
+      nextTags.push(['description', description.trim()]);
+    }
+
+    if (imageUrl) {
+      nextTags.push(['image', imageUrl]);
+    }
+
+    nextTags.push(...tags);
+    nextTags.push(['alt', `Community: ${name.trim()}`]);
+
+    return nextTags;
+  }, [description, effectiveSlug, imageUrl, name]);
+
   // ── Publish ───────────────────────────────────────────────────────────────
 
   const handleCreate = useCallback(async () => {
@@ -111,6 +158,32 @@ export function CreateCommunityDialog({ open, onOpenChange }: CreateCommunityDia
 
     setIsPublishing(true);
     try {
+      if (isEditing && communityEvent && community) {
+        const prev = await fetchFreshEvent(nostr, {
+          kinds: [COMMUNITY_DEFINITION_KIND],
+          authors: [communityEvent.pubkey],
+          '#d': [community.dTag],
+        });
+
+        const updatedEvent = await publishEvent({
+          kind: COMMUNITY_DEFINITION_KIND,
+          content: prev?.content ?? communityEvent.content,
+          tags: buildUpdatedCommunityTags(prev?.tags ?? communityEvent.tags),
+          prev: prev ?? undefined,
+        } as Omit<NostrEvent, 'id' | 'pubkey' | 'sig'> & { prev?: NostrEvent });
+
+        queryClient.setQueryData(
+          ['addr-event', COMMUNITY_DEFINITION_KIND, communityEvent.pubkey, community.dTag],
+          updatedEvent,
+        );
+        queryClient.invalidateQueries({ queryKey: ['community-activity-feed'], exact: false });
+        queryClient.invalidateQueries({ queryKey: ['my-communities'], exact: false });
+
+        toast({ title: 'Community updated!' });
+        handleOpenChange(false);
+        return;
+      }
+
       // Check for d-tag collision (same author, same kind, same d-tag)
       const existing = await nostr.query([{
         kinds: [COMMUNITY_DEFINITION_KIND],
@@ -129,26 +202,11 @@ export function CreateCommunityDialog({ open, onOpenChange }: CreateCommunityDia
         return;
       }
 
-      // Build community definition tags
-      const communityTags: string[][] = [
-        ['d', effectiveSlug],
-        ['name', name.trim()],
-      ];
-
-      if (description.trim()) {
-        communityTags.push(['description', description.trim()]);
-      }
-
-      if (imageUrl) {
-        communityTags.push(['image', imageUrl]);
-      }
-
       // Founder as moderator (p tag)
-      communityTags.push(['p', user.pubkey, '', 'moderator']);
-      communityTags.push(['alt', `Community: ${name.trim()}`]);
+      const communityTags = buildUpdatedCommunityTags([['p', user.pubkey, '', 'moderator']]);
 
       // Publish community definition (kind 34550)
-      const communityEvent = await publishEvent({
+      const createdEvent = await publishEvent({
         kind: COMMUNITY_DEFINITION_KIND,
         content: '',
         tags: communityTags,
@@ -157,7 +215,7 @@ export function CreateCommunityDialog({ open, onOpenChange }: CreateCommunityDia
       // Navigate to the new community
       const naddr = nip19.naddrEncode({
         kind: COMMUNITY_DEFINITION_KIND,
-        pubkey: communityEvent.pubkey,
+        pubkey: createdEvent.pubkey,
         identifier: effectiveSlug,
       });
 
@@ -166,14 +224,17 @@ export function CreateCommunityDialog({ open, onOpenChange }: CreateCommunityDia
       navigate(`/${naddr}`);
     } catch (err) {
       toast({
-        title: 'Failed to create community',
+        title: isEditing ? 'Failed to update community' : 'Failed to create community',
         description: err instanceof Error ? err.message : 'Please try again.',
         variant: 'destructive',
       });
     } finally {
       setIsPublishing(false);
     }
-  }, [user, name, effectiveSlug, description, imageUrl, nostr, publishEvent, toast, handleOpenChange, navigate]);
+  }, [
+    user, name, effectiveSlug, isEditing, communityEvent, community, nostr,
+    publishEvent, buildUpdatedCommunityTags, queryClient, toast, handleOpenChange, navigate,
+  ]);
 
   if (!user) return null;
 
@@ -183,10 +244,12 @@ export function CreateCommunityDialog({ open, onOpenChange }: CreateCommunityDia
         <DialogHeader className="px-5 pt-5 pb-3">
           <DialogTitle className="flex items-center gap-2">
             <Users className="size-5 text-primary" />
-            Create a Community
+            {isEditing ? 'Edit Community' : 'Create a Community'}
           </DialogTitle>
           <DialogDescription>
-            Start a new community on Nostr. You'll be the founder.
+            {isEditing
+              ? 'Update the name, image, and description. Moderators are preserved.'
+              : "Start a new community on Nostr. You'll be the founder."}
           </DialogDescription>
         </DialogHeader>
 
@@ -204,7 +267,7 @@ export function CreateCommunityDialog({ open, onOpenChange }: CreateCommunityDia
               />
               {name.trim() && (
                 <p className="text-xs text-muted-foreground font-mono">
-                  ID: {effectiveSlug || '...'}
+                  ID: {effectiveSlug || '...'}{isEditing ? ' (unchanged)' : ''}
                 </p>
               )}
             </div>
@@ -265,16 +328,16 @@ export function CreateCommunityDialog({ open, onOpenChange }: CreateCommunityDia
               />
             </div>
 
-            {/* Create button */}
+            {/* Submit button */}
             <Button
               onClick={handleCreate}
               disabled={!name.trim() || !effectiveSlug || isPublishing || isUploading}
               className="w-full gap-2"
             >
               {isPublishing ? (
-                <><Loader2 className="size-4 animate-spin" /> Creating...</>
+                <><Loader2 className="size-4 animate-spin" /> {isEditing ? 'Saving...' : 'Creating...'}</>
               ) : (
-                <><Users className="size-4" /> Create Community</>
+                <><Users className="size-4" /> {isEditing ? 'Save Changes' : 'Create Community'}</>
               )}
             </Button>
           </div>

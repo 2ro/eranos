@@ -5,6 +5,7 @@ import {
   ArrowLeft,
   Crown,
   MessageCircle,
+  Pencil,
   Shield,
   ShieldBan,
   Share2,
@@ -15,6 +16,7 @@ import {
 import type { NostrEvent, NostrMetadata } from '@nostrify/nostrify';
 
 import { AddMemberDialog } from '@/components/AddMemberDialog';
+import { CreateCommunityDialog } from '@/components/CreateCommunityDialog';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -134,6 +136,7 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
   const [composeOpen, setComposeOpen] = useState(false);
   const [goalDialogOpen, setGoalDialogOpen] = useState(false);
   const [addMemberOpen, setAddMemberOpen] = useState(false);
+  const [editCommunityOpen, setEditCommunityOpen] = useState(false);
 
   // Parse community definition
   const community = useMemo(() => parseCommunityEvent(event), [event]);
@@ -346,6 +349,15 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
           <ArrowLeft className="size-5" />
         </button>
         <h1 className="text-xl font-bold flex-1 truncate">Community</h1>
+        {isFounder && community && (
+          <button
+            className="p-2 rounded-full hover:bg-secondary/60 transition-colors"
+            onClick={() => setEditCommunityOpen(true)}
+            aria-label="Edit community"
+          >
+            <Pencil className="size-5" />
+          </button>
+        )}
         <button
           className="p-2 rounded-full hover:bg-secondary/60 transition-colors"
           onClick={handleShare}
@@ -566,6 +578,16 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
           communityEvent={event}
           community={community}
           isFounder={isFounder}
+        />
+      )}
+
+      {/* Edit community dialog — founder only */}
+      {isFounder && community && (
+        <CreateCommunityDialog
+          open={editCommunityOpen}
+          onOpenChange={setEditCommunityOpen}
+          communityEvent={event}
+          community={community}
         />
       )}
     </div>
