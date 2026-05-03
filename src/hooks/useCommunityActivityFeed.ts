@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import { useNostr } from '@nostrify/react';
-import { useInfiniteQuery } from '@tanstack/react-query';
+import { useInfiniteQuery, useQueryClient } from '@tanstack/react-query';
 import type { NostrEvent } from '@nostrify/nostrify';
 
 import { useMyCommunities } from './useMyCommunities';
@@ -54,6 +54,7 @@ const ACTIVITY_PAGE_SIZE = 100;
  */
 export function useCommunityActivityFeed() {
   const { nostr } = useNostr();
+  const queryClient = useQueryClient();
   const { data: myCommunities, isLoading: communitiesLoading } = useMyCommunities();
 
   const aTags = myCommunities?.map((c) => c.community.aTag).filter(Boolean) ?? [];
@@ -198,6 +199,14 @@ export function useCommunityActivityFeed() {
       const paginatedActivity = [...comments, ...goals];
       const oldestActivityTimestamp = getPaginationCursor(paginatedActivity);
 
+      // Seed the ['event', id] cache so embedded previews (quotes, reply
+      // context, etc.) resolve instantly instead of refetching.
+      for (const event of merged) {
+        if (!queryClient.getQueryData(['event', event.id])) {
+          queryClient.setQueryData(['event', event.id], event);
+        }
+      }
+
       return {
         events: merged,
         moderationByATag,
@@ -213,6 +222,9 @@ export function useCommunityActivityFeed() {
     initialPageParam: undefined as number | undefined,
     enabled: !communitiesLoading && aTags.length > 0,
     staleTime: 2 * 60_000,
+    gcTime: 30 * 60_000,
+    placeholderData: (prev) => prev,
+    refetchOnWindowFocus: false,
   });
 
   return useMemo(() => {

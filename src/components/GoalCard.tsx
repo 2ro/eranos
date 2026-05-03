@@ -7,6 +7,7 @@ import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { useGoalDisplay } from '@/hooks/useGoalDisplay';
 import { formatSats, parseGoalEvent, type ParsedGoal } from '@/lib/goalUtils';
 import { cn } from '@/lib/utils';
@@ -90,6 +91,18 @@ function GoalCardInner({ event, goal }: { event: NostrEvent; goal: ParsedGoal })
           <span className="font-medium text-foreground">
             {d.progressLoading ? (
               <Skeleton className="h-3.5 w-16 inline-block" />
+            ) : d.progressIsPartial ? (
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <span className="cursor-help underline decoration-dotted underline-offset-2">
+                    ~{formatSats(d.currentSats)} sats
+                  </span>
+                </TooltipTrigger>
+                <TooltipContent side="top" className="max-w-[240px] text-xs">
+                  Showing at least this amount. More zap receipts exist than we
+                  could tally in a single fetch, so the real total is higher.
+                </TooltipContent>
+              </Tooltip>
             ) : (
               <>{formatSats(d.currentSats)} sats</>
             )}

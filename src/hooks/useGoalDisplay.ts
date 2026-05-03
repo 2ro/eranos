@@ -17,6 +17,8 @@ export interface GoalDisplayData {
   currentSats: number;
   percentage: number;
   progressLoading: boolean;
+  /** True when the zap tally hit the safety cap — the displayed total is a lower bound. */
+  progressIsPartial: boolean;
   metadata: NostrMetadata | undefined;
   displayName: string;
   avatarShape: string | undefined;
@@ -36,7 +38,7 @@ export interface GoalDisplayData {
 export function useGoalDisplay(event: NostrEvent, goal: ParsedGoal): GoalDisplayData {
   const now = useNow(60_000);
   const expired = isGoalExpired(goal);
-  const { currentSats, percentage, isLoading: progressLoading } =
+  const { currentSats, percentage, isLoading: progressLoading, isPartial: progressIsPartial } =
     useGoalProgress(event, goal);
   const funded = percentage >= 100;
 
@@ -88,6 +90,7 @@ export function useGoalDisplay(event: NostrEvent, goal: ParsedGoal): GoalDisplay
     currentSats,
     percentage,
     progressLoading,
+    progressIsPartial,
     metadata,
     displayName,
     avatarShape,
