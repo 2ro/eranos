@@ -1,8 +1,9 @@
-import { useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { useSeoMeta } from '@unhead/react';
-import { Users } from 'lucide-react';
+import { Loader2, Users } from 'lucide-react';
 import type { NostrEvent } from '@nostrify/nostrify';
+import { useInView } from 'react-intersection-observer';
 
 import { CommunityCard } from '@/components/CommunityCard';
 import { FeedEmptyState } from '@/components/FeedEmptyState';
@@ -205,8 +206,23 @@ function getCommunityATag(event: NostrEvent): string | undefined {
 
 function ActivitiesTab({ onRefresh }: { onRefresh: () => Promise<void> }) {
   const { user } = useCurrentUser();
-  const { data: activityEvents, isLoading, moderationByATag, rankMapByATag } = useCommunityActivityFeed();
+  const {
+    data: activityEvents,
+    isLoading,
+    moderationByATag,
+    rankMapByATag,
+    hasNextPage,
+    isFetchingNextPage,
+    fetchNextPage,
+  } = useCommunityActivityFeed();
   const { membersOnly } = useMembersOnlyFilter();
+  const { ref: scrollRef, inView } = useInView({ threshold: 0, rootMargin: '400px' });
+
+  useEffect(() => {
+    if (inView && hasNextPage && !isFetchingNextPage) {
+      fetchNextPage();
+    }
+  }, [inView, hasNextPage, isFetchingNextPage, fetchNextPage]);
 
   // Build per-community context values for NoteMoreMenu moderation actions.
   // Keyed by community A tag — each NoteCard is wrapped in its own provider.
@@ -256,29 +272,36 @@ function ActivitiesTab({ onRefresh }: { onRefresh: () => Promise<void> }) {
 
   return (
     <PullToRefresh onRefresh={onRefresh}>
-      {isLoading ? (
-        <div className="divide-y divide-border">
-          {Array.from({ length: 5 }).map((_, i) => (
-            <NoteCardSkeleton key={i} />
-          ))}
-        </div>
-      ) : displayedEvents && displayedEvents.length > 0 ? (
-        <div>
-          {displayedEvents.map((event) => {
-            const aTag = getCommunityATag(event);
-            const ctx = aTag ? contextByATag.get(aTag) ?? null : null;
-            return (
-              <CommunityModerationContext.Provider key={event.id} value={ctx}>
-                <NoteCard event={event} />
-              </CommunityModerationContext.Provider>
-            );
-          })}
-        </div>
-      ) : membersOnly && activityEvents && activityEvents.length > 0 ? (
-        <FeedEmptyState message="No activity from members of your communities yet. Toggle the shield icon to see all community activity." />
-      ) : (
-        <FeedEmptyState message="No activity from your communities yet." />
-      )}
+      <>
+        {isLoading ? (
+          <div className="divide-y divide-border">
+            {Array.from({ length: 5 }).map((_, i) => (
+              <NoteCardSkeleton key={i} />
+            ))}
+          </div>
+        ) : displayedEvents && displayedEvents.length > 0 ? (
+          <div>
+            {displayedEvents.map((event) => {
+              const aTag = getCommunityATag(event);
+              const ctx = aTag ? contextByATag.get(aTag) ?? null : null;
+              return (
+                <CommunityModerationContext.Provider key={event.id} value={ctx}>
+                  <NoteCard event={event} />
+                </CommunityModerationContext.Provider>
+              );
+            })}
+          </div>
+        ) : membersOnly && activityEvents && activityEvents.length > 0 ? (
+          <FeedEmptyState message="No activity from members of your communities yet. Toggle the shield icon to see all community activity." />
+        ) : (
+          <FeedEmptyState message="No activity from your communities yet." />
+        )}
+        {!isLoading && hasNextPage && (
+          <div ref={scrollRef} className="py-4 flex justify-center">
+            {isFetchingNextPage && <Loader2 className="size-5 animate-spin text-muted-foreground" />}
+          </div>
+        )}
+      </>
     </PullToRefresh>
   );
 }

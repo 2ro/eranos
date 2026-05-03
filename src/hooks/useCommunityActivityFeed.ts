@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import { useNostr } from '@nostrify/react';
-import { useQuery } from '@tanstack/react-query';
+import { useInfiniteQuery } from '@tanstack/react-query';
 import type { NostrEvent } from '@nostrify/nostrify';
 
 import { useMyCommunities } from './useMyCommunities';
@@ -15,6 +15,7 @@ import {
   resolveMembership,
 } from '@/lib/communityUtils';
 import { ZAP_GOAL_KIND } from '@/lib/goalUtils';
+import { getPaginationCursor } from '@/lib/feedUtils';
 
 /** Internal result type — events plus per-community moderation/membership data. */
 interface ActivityFeedResult {
@@ -23,10 +24,15 @@ interface ActivityFeedResult {
   moderationByATag: Map<string, CommunityModeration>;
   /** Chain-validated rank maps keyed by community A tag (pre-moderation, for authority checks). */
   rankMapByATag: Map<string, Map<string, CommunityMember>>;
+  /** Cursor for the next comments/goals page. */
+  oldestActivityTimestamp: number;
+  /** Whether at least one paginated activity filter returned a full page. */
+  hasMoreActivity: boolean;
 }
 
 const EMPTY_MODERATION_BY_A_TAG: ReadonlyMap<string, CommunityModeration> = new Map();
 const EMPTY_RANK_MAP_BY_A_TAG: ReadonlyMap<string, Map<string, CommunityMember>> = new Map();
+const ACTIVITY_PAGE_SIZE = 100;
 
 /**
  * Fetches a chronological activity feed for communities the current user
@@ -53,15 +59,22 @@ export function useCommunityActivityFeed() {
   const aTags = myCommunities?.map((c) => c.community.aTag).filter(Boolean) ?? [];
   const aTagsKey = aTags.join(',');
 
-  const query = useQuery<ActivityFeedResult>({
+  const query = useInfiniteQuery<ActivityFeedResult, Error>({
     queryKey: ['community-activity-feed', aTagsKey],
-    queryFn: async ({ signal }) => {
+    queryFn: async ({ pageParam, signal }) => {
       if (aTags.length === 0 || !myCommunities) {
-        return { events: [], moderationByATag: new Map(), rankMapByATag: new Map() };
+        return {
+          events: [],
+          moderationByATag: new Map(),
+          rankMapByATag: new Map(),
+          oldestActivityTimestamp: Math.floor(Date.now() / 1000),
+          hasMoreActivity: false,
+        };
       }
 
       const timeout = AbortSignal.timeout(8_000);
       const combinedSignal = AbortSignal.any([signal, timeout]);
+      const until = pageParam as number | undefined;
 
       // Collect all badge a-tag coordinates across all communities for membership resolution
       const allBadgeATags: string[] = [];
@@ -88,7 +101,8 @@ export function useCommunityActivityFeed() {
           [{
             kinds: [1111],
             '#A': aTags,
-            limit: 100,
+            limit: ACTIVITY_PAGE_SIZE,
+            ...(until ? { until } : {}),
           }],
           { signal: combinedSignal },
         ),
@@ -113,7 +127,8 @@ export function useCommunityActivityFeed() {
           [{
             kinds: [ZAP_GOAL_KIND],
             '#a': aTags,
-            limit: 50,
+            limit: ACTIVITY_PAGE_SIZE,
+            ...(until ? { until } : {}),
           }],
           { signal: combinedSignal },
         ),
@@ -180,18 +195,49 @@ export function useCommunityActivityFeed() {
       // Sort by created_at descending
       merged.sort((a, b) => b.created_at - a.created_at);
 
-      return { events: merged, moderationByATag, rankMapByATag };
+      const paginatedActivity = [...comments, ...goals];
+      const oldestActivityTimestamp = getPaginationCursor(paginatedActivity);
+
+      return {
+        events: merged,
+        moderationByATag,
+        rankMapByATag,
+        oldestActivityTimestamp,
+        hasMoreActivity: comments.length === ACTIVITY_PAGE_SIZE || goals.length === ACTIVITY_PAGE_SIZE,
+      };
     },
+    getNextPageParam: (lastPage) => {
+      if (!lastPage.hasMoreActivity) return undefined;
+      return lastPage.oldestActivityTimestamp - 1;
+    },
+    initialPageParam: undefined as number | undefined,
     enabled: !communitiesLoading && aTags.length > 0,
     staleTime: 2 * 60_000,
   });
 
-  return useMemo(() => ({
-    data: query.data?.events,
-    moderationByATag: (query.data?.moderationByATag ?? EMPTY_MODERATION_BY_A_TAG) as Map<string, CommunityModeration>,
-    rankMapByATag: (query.data?.rankMapByATag ?? EMPTY_RANK_MAP_BY_A_TAG) as Map<string, Map<string, CommunityMember>>,
-    isLoading: communitiesLoading || query.isLoading,
-    isError: query.isError,
-    error: query.error,
-  }), [query.data, communitiesLoading, query.isLoading, query.isError, query.error]);
+  return useMemo(() => {
+    const pages = query.data?.pages ?? [];
+    const seen = new Set<string>();
+    const events = pages
+      .flatMap((page) => page.events)
+      .filter((event) => {
+        if (seen.has(event.id)) return false;
+        seen.add(event.id);
+        return true;
+      })
+      .sort((a, b) => b.created_at - a.created_at);
+    const latestPage = pages[pages.length - 1];
+
+    return {
+      data: query.data ? events : undefined,
+      moderationByATag: (latestPage?.moderationByATag ?? EMPTY_MODERATION_BY_A_TAG) as Map<string, CommunityModeration>,
+      rankMapByATag: (latestPage?.rankMapByATag ?? EMPTY_RANK_MAP_BY_A_TAG) as Map<string, Map<string, CommunityMember>>,
+      isLoading: communitiesLoading || query.isLoading,
+      isError: query.isError,
+      error: query.error,
+      hasNextPage: query.hasNextPage,
+      isFetchingNextPage: query.isFetchingNextPage,
+      fetchNextPage: query.fetchNextPage,
+    };
+  }, [query.data, communitiesLoading, query.isLoading, query.isError, query.error, query.hasNextPage, query.isFetchingNextPage, query.fetchNextPage]);
 }

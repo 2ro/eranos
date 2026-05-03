@@ -4,7 +4,11 @@ import { useQuery } from '@tanstack/react-query';
 import type { NostrEvent } from '@nostrify/nostrify';
 
 import { extractZapAmount, extractZapSender } from '@/hooks/useEventInteractions';
+import { getPaginationCursor } from '@/lib/feedUtils';
 import type { ParsedGoal } from '@/lib/goalUtils';
+
+const ZAP_RECEIPT_PAGE_SIZE = 500;
+const MAX_ZAP_RECEIPT_PAGES = 20;
 
 export interface GoalProgress {
   /** Total zapped in millisatoshis. */
@@ -21,6 +25,14 @@ export interface GoalProgress {
   contributors: string[];
   /** Number of individual zap receipts. */
   zapCount: number;
+  /** True when the tally reached the safety cap before exhausting relay results. */
+  isPartial: boolean;
+}
+
+interface ZapReceiptItem {
+  msats: number;
+  sender: string;
+  createdAt: number;
 }
 
 /**
@@ -38,26 +50,47 @@ export function useGoalProgress(goalEvent: NostrEvent | undefined, goal: ParsedG
   const relaysKey = goal.relays.join(',');
 
   const query = useQuery({
-    queryKey: ['goal-progress', goalEventId, relaysKey],
+    queryKey: ['goal-progress', goalEventId, relaysKey, goal.closedAt ?? null],
     queryFn: async (c) => {
       if (!goalEventId) {
-        return { receipts: [] as { msats: number; sender: string; createdAt: number }[] };
+        return { receipts: [] as ZapReceiptItem[], isPartial: false };
       }
       const signal = AbortSignal.any([c.signal, AbortSignal.timeout(8000)]);
       const relay = goal.relays.length > 0 ? nostr.group(goal.relays) : nostr;
+      const receipts: ZapReceiptItem[] = [];
+      const seen = new Set<string>();
+      let until = goal.closedAt;
+      let isPartial = false;
 
-      const receipts = await relay.query(
-        [{ kinds: [9735], '#e': [goalEventId], limit: 500 }],
-        { signal },
-      );
+      for (let page = 0; page < MAX_ZAP_RECEIPT_PAGES; page++) {
+        const events = await relay.query(
+          [{ kinds: [9735], '#e': [goalEventId], limit: ZAP_RECEIPT_PAGE_SIZE, ...(until ? { until } : {}) }],
+          { signal },
+        );
 
-      return {
-        receipts: receipts.map((r) => ({
-          msats: extractZapAmount(r),
-          sender: extractZapSender(r),
-          createdAt: r.created_at,
-        })),
-      };
+        const validEvents = events.filter((event) => !goal.closedAt || event.created_at <= goal.closedAt);
+
+        for (const event of validEvents) {
+          if (seen.has(event.id)) continue;
+          seen.add(event.id);
+          receipts.push({
+            msats: extractZapAmount(event),
+            sender: extractZapSender(event),
+            createdAt: event.created_at,
+          });
+        }
+
+        if (events.length < ZAP_RECEIPT_PAGE_SIZE || validEvents.length === 0) {
+          break;
+        }
+
+        until = getPaginationCursor(validEvents) - 1;
+        if (page === MAX_ZAP_RECEIPT_PAGES - 1) {
+          isPartial = true;
+        }
+      }
+
+      return { receipts, isPartial };
     },
     enabled: !!goalEventId,
     staleTime: 30_000,
@@ -92,6 +125,7 @@ export function useGoalProgress(goalEvent: NostrEvent | undefined, goal: ParsedG
       percentage: targetMsat > 0 ? Math.min(100, Math.round((totalMsat / targetMsat) * 100)) : 0,
       contributors: Array.from(contributorSet),
       zapCount: count,
+      isPartial: query.data?.isPartial ?? false,
     };
   }, [query.data, goal.amountMsat, goal.closedAt]);
 
