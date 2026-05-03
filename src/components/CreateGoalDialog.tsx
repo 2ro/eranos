@@ -15,6 +15,7 @@ import { useAppContext } from '@/hooks/useAppContext';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useNostrPublish } from '@/hooks/useNostrPublish';
 import { useToast } from '@/hooks/useToast';
+import { getEffectiveRelays } from '@/lib/appRelays';
 import { sanitizeUrl } from '@/lib/sanitizeUrl';
 import { useQueryClient } from '@tanstack/react-query';
 import { ZAP_GOAL_KIND } from '@/lib/goalUtils';
@@ -70,8 +71,8 @@ export function CreateGoalDialog({ communityATag, children, open: controlledOpen
 
     const msats = sats * 1000;
 
-    // Build relay list from the user's configured relays
-    const relayUrls = config.relayMetadata.relays
+    // NIP-75 relay hints are where zap receipts should be published and tallied.
+    const relayUrls = getEffectiveRelays(config.relayMetadata, true).relays
       .filter((r) => r.write)
       .map((r) => r.url);
     if (relayUrls.length === 0) {
