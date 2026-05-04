@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { nip19 } from 'nostr-tools';
 import {
   ArrowLeft,
+  Bookmark,
   Crown,
   MessageCircle,
   Pencil,
@@ -31,6 +32,7 @@ import { ThreadedReplyList, type ReplyNode } from '@/components/ThreadedReplyLis
 import { useAuthor } from '@/hooks/useAuthor';
 import { useAuthors } from '@/hooks/useAuthors';
 import { useComments } from '@/hooks/useComments';
+import { useCommunityBookmarks } from '@/hooks/useCommunityBookmarks';
 import { useCommunityMembers } from '@/hooks/useCommunityMembers';
 import { useCommunityGoals } from '@/hooks/useCommunityGoals';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
@@ -163,6 +165,18 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
   // Founder can add moderators + members; moderators (rank 0) can add members
   const isFounder = !!user && user.pubkey === event.pubkey;
   const canAddMembers = !!viewerMember && viewerMember.rank === 0;
+
+  // NIP-51 kind 10004 community bookmark toggle. Toasts are fired from inside
+  // the mutation so they survive even if this page unmounts mid-publish.
+  const {
+    isBookmarked: isCommunityBookmarked,
+    toggleBookmark: toggleCommunityBookmark,
+  } = useCommunityBookmarks();
+  const bookmarked = !!communityATag && isCommunityBookmarked(communityATag);
+  const handleToggleBookmark = useCallback(() => {
+    if (!user || !communityATag) return;
+    toggleCommunityBookmark.mutate({ aTag: communityATag });
+  }, [user, communityATag, toggleCommunityBookmark]);
 
   const handleAddMembersClick = useCallback(() => {
     setAddMemberOpen(true);
@@ -356,6 +370,16 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
             aria-label="Edit community"
           >
             <Pencil className="size-5" />
+          </button>
+        )}
+        {user && communityATag && (
+          <button
+            className="p-2 rounded-full hover:bg-secondary/60 transition-colors"
+            onClick={handleToggleBookmark}
+            aria-label={bookmarked ? 'Remove community bookmark' : 'Bookmark community'}
+            aria-pressed={bookmarked}
+          >
+            <Bookmark className={cn('size-5', bookmarked && 'fill-current')} />
           </button>
         )}
         <button
