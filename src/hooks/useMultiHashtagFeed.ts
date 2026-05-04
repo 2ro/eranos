@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { useFeedRelays } from '@/hooks/useFeedRelays';
+import { useNostr } from '@nostrify/react';
+import { DITTO_RELAY } from '@/lib/appRelays';
 import type { NostrEvent, NostrFilter } from '@nostrify/nostrify';
 import type { TrackedRegion } from '@/hooks/useEventDashboardConfig';
 
@@ -18,6 +19,7 @@ export interface UseMultiHashtagFeedOptions {
 const DUPLICATE_WINDOW_SECONDS = 600;
 const QUERY_LIMIT = 2000;
 const MAX_PAGES = 5;
+const MAX_EVENTS = 10_000;
 const OVERLAP_SECONDS = 60;
 const PAGE_TIMEOUT_MS = 5000;
 const POLL_TIMEOUT_MS = 8000;
@@ -94,7 +96,12 @@ export function useMultiHashtagFeed(
   since?: number | null,
   options?: UseMultiHashtagFeedOptions,
 ) {
-  const feedRelays = useFeedRelays();
+  // Query DITTO_RELAY directly (NRelay1) instead of via NPool to avoid the
+  // pool's 300ms eoseTimeout race condition on large #t filters (400+ values).
+  // Kind 1111 dashboard events are published by Agora users to Ditto, so this
+  // relay is the canonical source. Multi-relay can be added later if needed.
+  const { nostr } = useNostr();
+  const relay = useMemo(() => nostr.relay(DITTO_RELAY), [nostr]);
   const enabled = options?.enabled !== false;
 
   const allHashtags = useMemo(() => {
@@ -136,10 +143,24 @@ export function useMultiHashtagFeed(
       const eventMap = eventMapRef.current;
 
       if (!backfillDoneRef.current) {
+        // Resume from oldest known event so retries don't re-fetch from the top.
         let until: number | undefined = undefined;
+        if (eventMap.size > 0) {
+          let minTs = Infinity;
+          for (const evt of eventMap.values()) {
+            if (evt.created_at < minTs) minTs = evt.created_at;
+          }
+          until = minTs; // inclusive — eventMap deduplicates overlap
+        }
+
+        let completedCleanly = true;
+        // Only set when we hit a definitive end: empty batch, reached `since`,
+        // or relay confirms nothing older exists (sub-limit overlap page).
+        let reachedEnd = false;
 
         for (let page = 0; page < MAX_PAGES; page++) {
-          if (querySignal.aborted) break;
+          if (querySignal.aborted) { completedCleanly = false; break; }
+          if (eventMap.size >= MAX_EVENTS) { reachedEnd = true; break; }
 
           const pageSignal = AbortSignal.any([
             querySignal,
@@ -154,13 +175,23 @@ export function useMultiHashtagFeed(
             ...(until !== undefined ? { until } : {}),
           };
 
-          const batch = await feedRelays.query([filter], { signal: pageSignal });
+          let batch: NostrEvent[];
+          try {
+            batch = await relay.query([filter], { signal: pageSignal });
+          } catch {
+            // NRelay1 throws on signal abort or timeout — do NOT mark backfill
+            // as done. The next refetch (10s) will retry from the current cursor.
+            completedCleanly = false;
+            break;
+          }
 
-          if (batch.length === 0) break;
+          if (batch.length === 0) { reachedEnd = true; break; }
 
+          let newEventsInPage = 0;
           for (const event of batch) {
             if (!eventMap.has(event.id)) {
               eventMap.set(event.id, event);
+              newEventsInPage++;
             }
             if (event.created_at > highWaterMarkRef.current) {
               highWaterMarkRef.current = event.created_at;
@@ -168,14 +199,32 @@ export function useMultiHashtagFeed(
           }
 
           const oldestInBatch = Math.min(...batch.map((e) => e.created_at));
-          if (since && oldestInBatch <= since) break;
+          if (since && oldestInBatch <= since) { reachedEnd = true; break; }
 
-          const nextUntil = oldestInBatch - 1;
-          if (until !== undefined && nextUntil >= until) break;
-          until = nextUntil;
+          // Inclusive cursor: use oldestInBatch (not oldestInBatch - 1) to avoid
+          // skipping events that share the boundary timestamp. The eventMap
+          // deduplicates any overlap by event ID.
+          if (until !== undefined && oldestInBatch >= until && newEventsInPage === 0) {
+            // No timestamp progress and no new events. Check whether the relay
+            // confirmed there's nothing older (returned fewer than limit) or the
+            // boundary is saturated (returned exactly limit, all already-known).
+            if (batch.length < QUERY_LIMIT) {
+              // Sub-limit batch with no new events → relay has nothing older.
+              reachedEnd = true;
+              break;
+            }
+            // Batch at limit but all known → boundary timestamp is saturated.
+            // Skip past it to probe for older events on the next iteration.
+            until = oldestInBatch - 1;
+          } else {
+            until = oldestInBatch;
+          }
         }
 
-        if (!querySignal.aborted) {
+        // Mark backfill done only when we both avoided errors AND confirmed we
+        // reached the end of available data. If the loop exhausted MAX_PAGES
+        // without hitting an end condition, the next refetch will continue.
+        if (completedCleanly && reachedEnd && !querySignal.aborted) {
           markBackfillDone();
         }
       } else {
@@ -189,12 +238,18 @@ export function useMultiHashtagFeed(
           AbortSignal.timeout(POLL_TIMEOUT_MS),
         ]);
 
-        const batch = await feedRelays.query([{
-          kinds: [1111],
-          '#t': allHashtags,
-          limit: QUERY_LIMIT,
-          since: pollSince,
-        }], { signal: pollSignal });
+        let batch: NostrEvent[];
+        try {
+          batch = await relay.query([{
+            kinds: [1111],
+            '#t': allHashtags,
+            limit: QUERY_LIMIT,
+            since: pollSince,
+          }], { signal: pollSignal });
+        } catch {
+          // NRelay1 throws on signal abort — return current data.
+          return deduplicatePosts(Array.from(eventMap.values()));
+        }
 
         for (const event of batch) {
           if (!eventMap.has(event.id)) {

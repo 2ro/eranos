@@ -24,6 +24,34 @@ export function materializeHashtags(_scope: TerritorialScope, code: string): str
   return [code];
 }
 
+/** Strip legacy "ve-" prefix from a code. */
+const stripVe = (s: string) => s.replace(/^ve-/, '');
+
+/**
+ * Migrate a legacy TrackedRegion.
+ * Handles old `queryOptions` field and `ve-` prefix in stored codes.
+ */
+function migrateRegion(r: TrackedRegion): TrackedRegion {
+  let region = r;
+
+  // Strip legacy queryOptions if present
+  if ('queryOptions' in region) {
+    const { queryOptions: _, ...rest } = region as TrackedRegion & { queryOptions?: unknown };
+    region = rest;
+  }
+
+  // Strip legacy "ve-" prefix from stored codes
+  if (region.code?.startsWith('ve-') || region.hashtags.some((h) => h.startsWith('ve-'))) {
+    region = {
+      ...region,
+      ...(region.code ? { code: stripVe(region.code) } : {}),
+      hashtags: region.hashtags.map(stripVe),
+    };
+  }
+
+  return region;
+}
+
 /**
  * Create default config: 24 states + 379 municipalities.
  * Each entry tracks its own code. No time filter by default.
@@ -73,7 +101,11 @@ export function useEventDashboardConfig() {
 
   const config: DashboardConfig = useMemo(() => {
     if (savedConfig) {
-      return { ...savedConfig, since: savedConfig.since ?? null };
+      return {
+        ...savedConfig,
+        since: savedConfig.since ?? null,
+        regions: savedConfig.regions.map(migrateRegion),
+      };
     }
     return defaultConfigRef.current!;
   }, [savedConfig]);

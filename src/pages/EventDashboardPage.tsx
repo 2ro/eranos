@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Activity, Lock, Shield, Radio } from 'lucide-react';
+import { Activity, Lock, Shield, Radio, Settings } from 'lucide-react';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useLayoutOptions } from '@/contexts/LayoutContext';
 import { isAdmin } from '@/lib/admins';
@@ -8,6 +8,7 @@ import { PageHeader } from '@/components/PageHeader';
 import { Card, CardContent } from '@/components/ui/card';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 
 import { useEventDashboard } from '@/hooks/useEventDashboard';
 import { KpiGrid } from '@/components/event-dashboard/KpiGrid';
@@ -17,6 +18,7 @@ import { DistributionDonut } from '@/components/event-dashboard/DistributionDonu
 import { ParticipantsList } from '@/components/event-dashboard/ParticipantsList';
 import { RecentActivityList } from '@/components/event-dashboard/RecentActivityList';
 import { DashboardSkeleton } from '@/components/event-dashboard/DashboardSkeleton';
+import { ConfigDrawer } from '@/components/event-dashboard/ConfigDrawer';
 import type { TerritorialLevel } from '@/components/event-dashboard/types';
 
 /**
@@ -27,6 +29,7 @@ export function EventDashboardPage() {
   const { user } = useCurrentUser();
   const userIsAdmin = !!user && isAdmin(user.pubkey);
   const [territorialLevel, setTerritorialLevel] = useState<TerritorialLevel>('municipalities');
+  const [configOpen, setConfigOpen] = useState(false);
 
   // Use wider layout — removes 600px cap but keeps sidebar shell
   useLayoutOptions({ noMaxWidth: true, rightSidebar: null });
@@ -121,7 +124,12 @@ export function EventDashboardPage() {
   return (
     <main>
       <PageHeader title="Event Dashboard" icon={<Activity className="size-5" />}>
-        {statusBadge}
+        <div className="flex items-center gap-2">
+          {statusBadge}
+          <Button size="icon" variant="ghost" className="size-8" onClick={() => setConfigOpen(true)}>
+            <Settings className="size-4" />
+          </Button>
+        </div>
       </PageHeader>
 
       <div className="px-4 pb-24 max-w-4xl mx-auto space-y-6">
@@ -170,6 +178,8 @@ export function EventDashboardPage() {
           </>
         )}
       </div>
+
+      <ConfigDrawer open={configOpen} onOpenChange={setConfigOpen} />
     </main>
   );
 }

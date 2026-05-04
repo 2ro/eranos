@@ -2,7 +2,8 @@ import { useMemo } from 'react';
 import type { NostrEvent } from '@nostrify/nostrify';
 import { useEventDashboardConfig } from '@/hooks/useEventDashboardConfig';
 import { useMultiHashtagFeed, type RegionFeed } from '@/hooks/useMultiHashtagFeed';
-import { getStateCodeForHashtag, getStateByCode, getMunicipalityLabel } from '@/lib/venezuelaTerritorial';
+import { getStateCodeForHashtag, getStateByCode, getMunicipalityLabel, extractMunicipalityFromContent } from '@/lib/venezuelaTerritorial';
+import { getActiveTrackedCodes, getCoveredStates } from '@/lib/territorialCoverage';
 import type {
   TerritorialLevel,
   DashboardStatus,
@@ -116,12 +117,26 @@ export function useEventDashboard({ enabled, territorialLevel }: UseEventDashboa
 
   // Aggregate regionFeeds into displayFeeds based on territorial level
   const displayFeeds = useMemo<AggregatedFeed[]>(() => {
+    // Custom/free-form entries (no type) pass through as their own row in all views
+    const customFeeds: AggregatedFeed[] = [];
+
     if (territorialLevel === 'states') {
       const stateMap = new Map<string, { label: string; postMap: Map<string, NostrEvent> }>();
 
       for (const feed of regionFeeds) {
         const region = config.regions.find((r) => r.id === feed.regionId);
-        if (!region?.type) continue;
+        if (!region?.type) {
+          if (region && feed.count > 0) {
+            customFeeds.push({
+              regionId: feed.regionId,
+              label: region.label,
+              code: region.code || region.hashtags[0] || '',
+              posts: feed.posts,
+              count: feed.count,
+            });
+          }
+          continue;
+        }
         const code = region.code || region.hashtags[0] || '';
         const stateCode = getStateCodeForHashtag(code);
         if (!stateCode) continue;
@@ -136,10 +151,12 @@ export function useEventDashboard({ enabled, territorialLevel }: UseEventDashboa
         }
       }
 
-      return Array.from(stateMap.entries()).map(([code, { label, postMap }]) => {
+      const stateFeeds = Array.from(stateMap.entries()).map(([code, { label, postMap }]) => {
         const posts = Array.from(postMap.values()).sort((a, b) => b.created_at - a.created_at);
         return { regionId: code, label, code, posts, count: posts.length };
       });
+
+      return [...stateFeeds, ...customFeeds];
     }
 
     // Municipalities view: use municipality-type regions directly
@@ -147,7 +164,18 @@ export function useEventDashboard({ enabled, territorialLevel }: UseEventDashboa
 
     for (const feed of regionFeeds) {
       const region = config.regions.find((r) => r.id === feed.regionId);
-      if (!region?.type) continue;
+      if (!region?.type) {
+        if (region && feed.count > 0) {
+          customFeeds.push({
+            regionId: feed.regionId,
+            label: region.label,
+            code: region.code || region.hashtags[0] || '',
+            posts: feed.posts,
+            count: feed.count,
+          });
+        }
+        continue;
+      }
       const code = region.code || region.hashtags[0] || '';
 
       if (region.type === 'municipality') {
@@ -159,26 +187,39 @@ export function useEventDashboard({ enabled, territorialLevel }: UseEventDashboa
           bucket.postMap.set(post.id, post);
         }
       } else if (region.type === 'state') {
-        // State feeds: distribute posts to municipality buckets via t-tags
+        const stateCode = region.code || region.hashtags[0] || '';
+        // State feeds: distribute posts to municipality buckets via t-tags,
+        // with content-scan fallback for legacy posts that lack municipality tags.
         for (const post of feed.posts) {
+          let resolved: string | undefined;
           for (const [name, value] of post.tags) {
             if (name !== 't') continue;
-            if (getMunicipalityLabel(value)) {
-              if (!muniMap.has(value)) {
-                muniMap.set(value, { label: getMunicipalityLabel(value)!, postMap: new Map() });
-              }
-              muniMap.get(value)!.postMap.set(post.id, post);
-              break;
+            if (getMunicipalityLabel(value)) { resolved = value; break; }
+          }
+          // Content fallback: only if post has no municipality tag.
+          // Same-state guard: only accept if candidate belongs to this state.
+          if (!resolved) {
+            const candidate = extractMunicipalityFromContent(post.content);
+            if (candidate && candidate.slice(0, 2) === stateCode) {
+              resolved = candidate;
             }
+          }
+          if (resolved) {
+            if (!muniMap.has(resolved)) {
+              muniMap.set(resolved, { label: getMunicipalityLabel(resolved)!, postMap: new Map() });
+            }
+            muniMap.get(resolved)!.postMap.set(post.id, post);
           }
         }
       }
     }
 
-    return Array.from(muniMap.entries()).map(([code, { label, postMap }]) => {
+    const muniFeeds = Array.from(muniMap.entries()).map(([code, { label, postMap }]) => {
       const posts = Array.from(postMap.values()).sort((a, b) => b.created_at - a.created_at);
       return { regionId: code, label, code, posts, count: posts.length };
     }).filter((f) => f.count > 0);
+
+    return [...muniFeeds, ...customFeeds];
   }, [regionFeeds, config.regions, territorialLevel]);
 
   // Derive KPIs
@@ -194,17 +235,19 @@ export function useEventDashboard({ enabled, territorialLevel }: UseEventDashboa
     const fiveMinutesAgo = Math.floor(Date.now() / 1000) - 300;
     const thirtySecondsAgo = Math.floor(Date.now() / 1000) - 30;
 
+    const activeCodes = getActiveTrackedCodes(config);
+
     return {
       totalPosts: viewPosts.length,
       activeRegions: displayFeeds.filter((f) => f.posts[0]?.created_at > thirtySecondsAgo).length,
       trackedCount: territorialLevel === 'states'
-        ? config.regions.filter((r) => r.type === 'state').length
+        ? getCoveredStates(activeCodes).length
         : config.regions.filter((r) => r.type === 'municipality').length,
-      allCodesTracked: new Set(config.regions.flatMap((r) => r.hashtags)).size,
+      allCodesTracked: activeCodes.size,
       last5min: viewPosts.filter((p) => p.created_at > fiveMinutesAgo).length,
       uniquePosters: new Set(viewPosts.map((p) => p.pubkey)).size,
     };
-  }, [displayFeeds, config.regions, territorialLevel]);
+  }, [displayFeeds, config, territorialLevel]);
 
   // Time series
   const timeSeries = useMemo(() => buildTimeSeries(regionFeeds), [regionFeeds]);
@@ -250,6 +293,14 @@ export function useEventDashboard({ enabled, territorialLevel }: UseEventDashboa
         // Try state resolution
         const stateCode = getStateCodeForHashtag(value);
         if (stateCode && labelMap.has(stateCode)) { regionLabel = labelMap.get(stateCode)!; break; }
+      }
+
+      // Content fallback: resolve municipality from content for legacy posts
+      if (regionLabel === 'Unknown') {
+        const contentMuni = extractMunicipalityFromContent(post.content);
+        if (contentMuni && labelMap.has(contentMuni)) {
+          regionLabel = labelMap.get(contentMuni)!;
+        }
       }
 
       return {

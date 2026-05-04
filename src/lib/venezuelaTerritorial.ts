@@ -310,3 +310,49 @@ export function isStateCode(value: string): boolean {
 export function getAllMunicipalitiesForState(stateCode: string): Municipality[] {
   return VE_MUNICIPALITIES.filter((m) => m.stateCode === stateCode);
 }
+
+// ---------------------------------------------------------------------------
+// Content fallback: extract municipality code from event content
+// ---------------------------------------------------------------------------
+
+/** Matches territorial codes in free text: NN-NNN… or NN-NNN…-NNN…[a-z]? */
+const CONTENT_MUNI_RE = /\b(\d{2}-\d{3,6}(?:-\d{3,6}[a-z]?)?)/g;
+
+/**
+ * Try to reduce a raw territorial code to a known municipality code.
+ * Handles 3-segment parroquia codes ("01-10104-10104a" → "01-10104")
+ * and alpha-suffixed 2-segment codes ("01-10104a" → "01-10104").
+ */
+function extractMunicipalityCodeFromRaw(raw: string): string | undefined {
+  if (municipalityByCode.has(raw)) return raw;
+  const parts = raw.split('-');
+  if (parts.length >= 3) {
+    const candidate = `${parts[0]}-${parts[1]}`;
+    if (municipalityByCode.has(candidate)) return candidate;
+  }
+  if (parts.length === 2) {
+    const candidate = `${parts[0]}-${parts[1].replace(/[a-z]+$/, '')}`;
+    if (municipalityByCode.has(candidate)) return candidate;
+  }
+  return undefined;
+}
+
+/**
+ * Legacy-post fallback: scan free-text content for a valid municipality code.
+ *
+ * Older Agora versions truncated hashtags at the first hyphen, so a post
+ * intended for municipality "07-713" was published with only `t: ["07"]`.
+ * This helper extracts the first known municipality code from the event
+ * content so such posts can be attributed correctly.
+ *
+ * Returns the first valid match, or `undefined`.
+ */
+export function extractMunicipalityFromContent(content: string): string | undefined {
+  CONTENT_MUNI_RE.lastIndex = 0;
+  let match: RegExpExecArray | null;
+  while ((match = CONTENT_MUNI_RE.exec(content)) !== null) {
+    const result = extractMunicipalityCodeFromRaw(match[1]);
+    if (result) return result;
+  }
+  return undefined;
+}
