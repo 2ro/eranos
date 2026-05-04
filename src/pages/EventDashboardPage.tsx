@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Activity, Lock, Shield } from 'lucide-react';
+import { Activity, Lock, Shield, Radio } from 'lucide-react';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useLayoutOptions } from '@/contexts/LayoutContext';
 import { isAdmin } from '@/lib/admins';
@@ -9,25 +9,19 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 
+import { useEventDashboard } from '@/hooks/useEventDashboard';
 import { KpiGrid } from '@/components/event-dashboard/KpiGrid';
 import { ActivityChart } from '@/components/event-dashboard/ActivityChart';
 import { TopRegionsChart } from '@/components/event-dashboard/TopRegionsChart';
 import { DistributionDonut } from '@/components/event-dashboard/DistributionDonut';
 import { ParticipantsList } from '@/components/event-dashboard/ParticipantsList';
 import { RecentActivityList } from '@/components/event-dashboard/RecentActivityList';
+import { DashboardSkeleton } from '@/components/event-dashboard/DashboardSkeleton';
 import type { TerritorialLevel } from '@/components/event-dashboard/types';
-import {
-  MOCK_KPIS,
-  MOCK_TIME_SERIES,
-  MOCK_LEADERBOARD,
-  MOCK_DISTRIBUTION,
-  MOCK_PARTICIPANTS,
-  MOCK_ACTIVITY,
-} from '@/components/event-dashboard/mockData';
 
 /**
  * Event Dashboard page — admin-only live monitoring dashboard.
- * Phase 1: Visual layout with mock data. No relay fetching or real logic.
+ * Phase 2: Connected to real relay data via useEventDashboard.
  */
 export function EventDashboardPage() {
   const { user } = useCurrentUser();
@@ -36,6 +30,11 @@ export function EventDashboardPage() {
 
   // Use wider layout — removes 600px cap but keeps sidebar shell
   useLayoutOptions({ noMaxWidth: true, rightSidebar: null });
+
+  const {
+    kpis, timeSeries, leaderboard, distribution, participants, activity,
+    status, isLoading, error,
+  } = useEventDashboard({ enabled: userIsAdmin, territorialLevel });
 
   // Not logged in
   if (!user) {
@@ -80,51 +79,96 @@ export function EventDashboardPage() {
     );
   }
 
+  // Error state
+  if (error && kpis.totalPosts === 0) {
+    return (
+      <main>
+        <PageHeader title="Event Dashboard" icon={<Activity className="size-5" />}>
+          <Badge variant="destructive" className="gap-1.5 text-xs font-medium">
+            <span className="size-2 rounded-full bg-red-100" />
+            Disconnected
+          </Badge>
+        </PageHeader>
+        <div className="px-4 py-6 max-w-2xl mx-auto">
+          <Card className="border-destructive/30">
+            <CardContent className="py-12 px-8 text-center">
+              <div className="max-w-sm mx-auto space-y-4">
+                <Radio className="h-10 w-10 text-destructive mx-auto" />
+                <p className="text-lg font-semibold">Unable to connect</p>
+                <p className="text-sm text-muted-foreground">
+                  Could not reach the relay. Check your connection or try again shortly.
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </main>
+    );
+  }
+
+  // Status badge
+  const statusBadge = (
+    <Badge variant="outline" className="gap-1.5 text-xs font-medium">
+      <span className="relative flex size-2">
+        <span className={`animate-ping absolute inline-flex h-full w-full rounded-full opacity-75 ${status === 'syncing' ? 'bg-yellow-400' : status === 'live' ? 'bg-green-400' : 'bg-gray-400'}`} />
+        <span className={`relative inline-flex rounded-full size-2 ${status === 'syncing' ? 'bg-yellow-500' : status === 'live' ? 'bg-green-500' : 'bg-gray-500'}`} />
+      </span>
+      {status === 'syncing' ? 'Syncing' : status === 'live' ? 'Live' : 'Connecting'}
+    </Badge>
+  );
+
   // Admin — show dashboard
   return (
     <main>
-      <PageHeader
-        title="Event Dashboard"
-        icon={<Activity className="size-5" />}
-      >
-        <Badge variant="outline" className="gap-1.5 text-xs font-medium">
-          <span className="relative flex size-2">
-            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75" />
-            <span className="relative inline-flex rounded-full size-2 bg-green-500" />
-          </span>
-          Live
-        </Badge>
+      <PageHeader title="Event Dashboard" icon={<Activity className="size-5" />}>
+        {statusBadge}
       </PageHeader>
 
       <div className="px-4 pb-24 max-w-4xl mx-auto space-y-6">
-        {/* Territorial level toggle */}
-        <Tabs
-          value={territorialLevel}
-          onValueChange={(v) => setTerritorialLevel(v as TerritorialLevel)}
-        >
-          <TabsList>
-            <TabsTrigger value="states">States</TabsTrigger>
-            <TabsTrigger value="municipalities">Municipalities</TabsTrigger>
-          </TabsList>
-        </Tabs>
+        {isLoading ? (
+          <DashboardSkeleton />
+        ) : (
+          <>
+            {/* Territorial level toggle */}
+            <Tabs
+              value={territorialLevel}
+              onValueChange={(v) => setTerritorialLevel(v as TerritorialLevel)}
+            >
+              <TabsList>
+                <TabsTrigger value="states">States</TabsTrigger>
+                <TabsTrigger value="municipalities">Municipalities</TabsTrigger>
+              </TabsList>
+            </Tabs>
 
-        {/* KPI metrics */}
-        <KpiGrid kpis={MOCK_KPIS} territorialLevel={territorialLevel} />
+            {/* KPI metrics */}
+            <KpiGrid kpis={kpis} territorialLevel={territorialLevel} />
 
-        {/* Publishing activity chart */}
-        <ActivityChart data={MOCK_TIME_SERIES} />
+            {/* Publishing activity chart */}
+            {timeSeries.some((b) => b.posts > 0) && (
+              <ActivityChart data={timeSeries} />
+            )}
 
-        {/* Top 5 bar chart */}
-        <TopRegionsChart data={MOCK_LEADERBOARD} territorialLevel={territorialLevel} />
+            {/* Top 5 bar chart */}
+            {leaderboard.length > 0 && (
+              <TopRegionsChart data={leaderboard} territorialLevel={territorialLevel} />
+            )}
 
-        {/* Participants list */}
-        <ParticipantsList data={MOCK_PARTICIPANTS} territorialLevel={territorialLevel} />
+            {/* Participants list */}
+            {participants.length > 0 && (
+              <ParticipantsList data={participants} territorialLevel={territorialLevel} />
+            )}
 
-        {/* Post distribution donut */}
-        <DistributionDonut data={MOCK_DISTRIBUTION} />
+            {/* Post distribution donut */}
+            {distribution.length > 0 && distribution.reduce((s, d) => s + d.value, 0) > 0 && (
+              <DistributionDonut data={distribution} />
+            )}
 
-        {/* Recent activity */}
-        <RecentActivityList data={MOCK_ACTIVITY} />
+            {/* Recent activity */}
+            {activity.length > 0 && (
+              <RecentActivityList data={activity} />
+            )}
+          </>
+        )}
       </div>
     </main>
   );

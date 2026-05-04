@@ -53,8 +53,6 @@ export interface ParticipantRow {
 export interface ActivityItem {
   id: string;
   pubkey: string;
-  displayName: string;
-  avatarUrl?: string;
   content: string;
   created_at: number;
   regionLabel: string;

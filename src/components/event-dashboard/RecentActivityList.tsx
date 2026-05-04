@@ -1,8 +1,10 @@
 import { useState } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { useAuthor } from '@/hooks/useAuthor';
+import { genUserName } from '@/lib/genUserName';
 import type { ActivityItem } from './types';
 
 interface RecentActivityListProps {
@@ -20,7 +22,12 @@ function formatTimeAgo(timestamp: number): string {
 }
 
 function ActivityRow({ item }: { item: ActivityItem }) {
-  const initials = item.displayName
+  const author = useAuthor(item.pubkey);
+  const metadata = author.data?.metadata;
+  const displayName = metadata?.display_name || metadata?.name || genUserName(item.pubkey);
+  const avatarUrl = metadata?.picture;
+
+  const initials = displayName
     .split(' ')
     .map((w) => w[0])
     .slice(0, 2)
@@ -30,11 +37,12 @@ function ActivityRow({ item }: { item: ActivityItem }) {
   return (
     <div className="flex items-center gap-3 py-2.5 border-b last:border-b-0">
       <Avatar className="size-8 shrink-0">
+        {avatarUrl && <AvatarImage src={avatarUrl} alt={displayName} />}
         <AvatarFallback className="text-[10px] font-semibold">{initials}</AvatarFallback>
       </Avatar>
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2">
-          <span className="text-sm font-medium truncate">{item.displayName}</span>
+          <span className="text-sm font-medium truncate">{displayName}</span>
           <Badge variant="secondary" className="text-[10px] px-1.5 py-0 shrink-0">
             {item.regionLabel}
           </Badge>
