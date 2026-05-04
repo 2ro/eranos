@@ -46,6 +46,7 @@ import { CommunityReportDialog } from '@/components/CommunityReportDialog';
 import { AddToListDialog } from '@/components/AddToListDialog';
 import { useNostr } from '@nostrify/react';
 import { useBookmarks } from '@/hooks/useBookmarks';
+import { useCommunityBookmarks } from '@/hooks/useCommunityBookmarks';
 import { usePinnedNotes } from '@/hooks/usePinnedNotes';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useAuthor } from '@/hooks/useAuthor';
@@ -56,7 +57,7 @@ import { useOrganizers } from '@/hooks/useOrganizers';
 import { usePinnedPosts } from '@/hooks/usePinnedPosts';
 import { useCountryFeed } from '@/contexts/CountryFeedContext';
 import { useCommunityModerationContext } from '@/contexts/CommunityModerationContext';
-import { type CommunityMenuContext, canBanTarget, getViewerAuthority } from '@/lib/communityUtils';
+import { type CommunityMenuContext, canBanTarget, getViewerAuthority, COMMUNITY_DEFINITION_KIND } from '@/lib/communityUtils';
 // NOTE: `CommunityMenuContext` is derived automatically from
 // `useCommunityModerationContext()`. Parents install a
 // `CommunityModerationContext.Provider` to enable community-aware menu items.
@@ -367,7 +368,26 @@ function NoteMoreMenuContent({ event, open, onOpenChange, communityContext, onRe
   const navigate = useNavigate();
   const { user } = useCurrentUser();
   const { isBookmarked, toggleBookmark } = useBookmarks();
-  const bookmarked = isBookmarked(event.id);
+  const {
+    isBookmarked: isCommunityBookmarked,
+    toggleBookmark: toggleCommunityBookmark,
+  } = useCommunityBookmarks();
+
+  // Community events (kind 34550) are bookmarked via NIP-51 kind 10004
+  // using their addressable `a` tag coordinate, so the reference stays
+  // valid across community updates. Non-community events use the standard
+  // kind 10003 bookmark list keyed by event id.
+  const isCommunityEvent = event.kind === COMMUNITY_DEFINITION_KIND;
+  const communityATag = useMemo(() => {
+    if (!isCommunityEvent) return undefined;
+    const dTag = event.tags.find(([n]) => n === 'd')?.[1];
+    if (!dTag) return undefined;
+    return `${COMMUNITY_DEFINITION_KIND}:${event.pubkey}:${dTag}`;
+  }, [isCommunityEvent, event.pubkey, event.tags]);
+
+  const bookmarked = isCommunityEvent
+    ? !!communityATag && isCommunityBookmarked(communityATag)
+    : isBookmarked(event.id);
   const { isPinned, togglePin } = usePinnedNotes(user?.pubkey);
   const pinned = isPinned(event.id);
   const isOwnPost = user?.pubkey === event.pubkey;
@@ -409,7 +429,15 @@ function NoteMoreMenuContent({ event, open, onOpenChange, communityContext, onRe
 
   const handleBookmark = () => {
     impactLight();
-    toggleBookmark.mutate(event.id);
+    if (isCommunityEvent) {
+      if (!communityATag) return;
+      // Success/error toasts are fired from the mutation itself in
+      // useCommunityBookmarks so they survive this dialog unmounting
+      // before the publish resolves.
+      toggleCommunityBookmark.mutate({ aTag: communityATag });
+    } else {
+      toggleBookmark.mutate(event.id);
+    }
     close();
   };
 
@@ -546,7 +574,11 @@ function NoteMoreMenuContent({ event, open, onOpenChange, communityContext, onRe
           />
           <MenuItem
             icon={<Bookmark className={cn("size-5", bookmarked && "fill-current")} />}
-            label={bookmarked ? 'Remove Bookmark' : 'Bookmark'}
+            label={
+              isCommunityEvent
+                ? (bookmarked ? 'Remove community bookmark' : 'Bookmark community')
+                : (bookmarked ? 'Remove Bookmark' : 'Bookmark')
+            }
             onClick={handleBookmark}
           />
           {user && (

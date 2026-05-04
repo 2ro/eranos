@@ -791,6 +791,22 @@ Both kind `34550` and kind `30009` are addressable events. To add or remove rank
 2. Extract badge `a` tags from results.
 3. `{ "kinds": [34550], "#a": ["30009:...", "..."] }`
 
+**Communities a user has bookmarked:**
+
+Agora uses [NIP-51](https://github.com/nostr-protocol/nips/blob/master/51.md) kind `10004` ("Communities") to let users save communities they want quick access to without requiring membership. Bookmarked communities are surfaced in the "My Communities" view alongside founded and member-of communities.
+
+1. `{ "kinds": [10004], "authors": ["<user-pubkey>"], "limit": 1 }`
+2. Extract `a` tags whose value begins with `34550:` from the result.
+3. For each coordinate `34550:<author-pubkey>:<d-tag>`, query the community definition with both `authors` and `#d` filters to prevent spoofing:
+
+   ```jsonc
+   { "kinds": [34550], "authors": ["<author-pubkey>"], "#d": ["<d-tag>"], "limit": 1 }
+   ```
+
+Clients toggling a bookmark MUST perform a read-modify-write cycle on the replaceable kind `10004` event: fetch the freshest version from relays, add or remove the matching `["a", "34550:<pubkey>:<d-tag>"]` tag, and republish the full tag list. Appending new entries to the end preserves chronological bookmark order per NIP-51.
+
+When the same community appears in multiple discovery sources, clients SHOULD display a single card but MAY indicate all applicable relationships (e.g. a member who has also bookmarked a community).
+
 ### Security Considerations
 
 - **Author filtering**: Clients MUST filter community definitions by `authors` to prevent impersonation.
@@ -804,6 +820,7 @@ Both kind `34550` and kind `30009` are addressable events. To add or remove rank
 - [NIP-22](https://github.com/nostr-protocol/nips/blob/master/22.md) -- Comment
 - [NIP-31](https://github.com/nostr-protocol/nips/blob/master/31.md) -- Unknown Event Kinds (`alt` tag)
 - [NIP-32](https://github.com/nostr-protocol/nips/blob/master/32.md) -- Labeling (moderation `ban` label)
+- [NIP-51](https://github.com/nostr-protocol/nips/blob/master/51.md) -- Lists (kind `10004` Communities list for bookmarks)
 - [NIP-56](https://github.com/nostr-protocol/nips/blob/master/56.md) -- Reporting
 - [NIP-58](https://github.com/nostr-protocol/nips/blob/master/58.md) -- Badges
 - [NIP-72](https://github.com/nostr-protocol/nips/blob/master/72.md) -- Moderated Communities

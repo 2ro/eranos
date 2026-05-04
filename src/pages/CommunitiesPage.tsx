@@ -215,6 +215,8 @@ function MyCommunitiesContent() {
           key={entry.community.aTag}
           event={entry.event}
           isFounded={entry.isFounded}
+          isMember={entry.isMember}
+          isBookmarked={entry.isBookmarked}
         />
       ))}
     </div>

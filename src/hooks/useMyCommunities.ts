@@ -3,6 +3,7 @@ import { useNostr } from '@nostrify/react';
 import { useQuery } from '@tanstack/react-query';
 
 import { useCurrentUser } from './useCurrentUser';
+import { COMMUNITIES_LIST_KIND } from './useCommunityBookmarks';
 import {
   COMMUNITY_DEFINITION_KIND,
   BADGE_AWARD_KIND,
@@ -17,15 +18,26 @@ export interface MyCommunityEntry {
   event: NostrEvent;
   /** Whether the current user is the founder. */
   isFounded: boolean;
+  /** Whether the current user is a validated (chain-derived) member. */
+  isMember: boolean;
+  /** Whether the current user has bookmarked the community via kind 10004. */
+  isBookmarked: boolean;
 }
 
 /**
- * Fetch communities the logged-in user has founded or been recruited into.
+ * Fetch communities the logged-in user has founded, been recruited into,
+ * or bookmarked via their NIP-51 Communities list (kind 10004).
  *
- * Discovery follows the NIP:
- * 1. Founded: `{ kinds: [34550], authors: [<user-pubkey>] }`
- * 2. Member-of: query kind 8 awards targeting the user, extract badge `a` tags,
+ * Discovery:
+ *
+ * 1. Founded -- `{ kinds: [34550], authors: [user.pubkey] }`
+ * 2. Member-of -- kind 8 awards targeting the user, extract badge `a` tags,
  *    then find the community definitions referencing those badges.
+ * 3. Bookmarked -- read kind 10004 authored by user, extract `a` tags
+ *    pointing at kind 34550 events, and fetch those community definitions.
+ *
+ * Priority when the same community appears in multiple sources:
+ * founded > member > bookmarked.
  */
 export function useMyCommunities() {
   const { nostr } = useNostr();
@@ -39,17 +51,27 @@ export function useMyCommunities() {
       const timeout = AbortSignal.timeout(10_000);
       const combinedSignal = AbortSignal.any([signal, timeout]);
 
-      // Step 1: Communities founded by the user
+      // ── Step 1: Communities founded by the user ───────────────────────────
       const foundedEvents = await nostr.query(
         [{ kinds: [COMMUNITY_DEFINITION_KIND], authors: [user.pubkey], limit: 50 }],
         { signal: combinedSignal },
       );
 
-      // Step 2: Badge awards targeting the user
-      const awards = await nostr.query(
-        [{ kinds: [BADGE_AWARD_KIND], '#p': [user.pubkey], limit: 200 }],
-        { signal: combinedSignal },
-      );
+      // ── Step 2: Badge awards targeting the user + Bookmarks list ──────────
+      //
+      // Batched into a single relay round-trip. The kind 10004 list is a
+      // replaceable event, so pulling it here keeps the read path tight and
+      // reuses the same connection.
+      const [awards, bookmarkListEvents] = await Promise.all([
+        nostr.query(
+          [{ kinds: [BADGE_AWARD_KIND], '#p': [user.pubkey], limit: 200 }],
+          { signal: combinedSignal },
+        ),
+        nostr.query(
+          [{ kinds: [COMMUNITIES_LIST_KIND], authors: [user.pubkey], limit: 1 }],
+          { signal: combinedSignal },
+        ),
+      ]);
 
       // Extract badge a-tag coordinates from awards
       const badgeATags = new Set<string>();
@@ -70,26 +92,120 @@ export function useMyCommunities() {
         );
       }
 
-      // Merge and deduplicate (founded takes priority)
+      // ── Step 4: Resolve bookmarked community coordinates ──────────────────
+      //
+      // NIP-51 kind 10004 stores community definitions as `a` tags like
+      // `34550:<pubkey>:<d-tag>`. For each bookmarked coordinate we query
+      // with both `authors` and `#d` so relays return a single authentic
+      // event per bookmark (per AGENTS.md security guidance on addressable
+      // events).
+      //
+      // Multiple coordinates with the same author are grouped to minimise
+      // the number of relay queries while keeping the author filter intact.
+
+      const bookmarkListEvent = bookmarkListEvents[0];
+      const bookmarkedCoords: string[] = (bookmarkListEvent?.tags ?? [])
+        .filter(([n, v]) =>
+          n === 'a'
+          && typeof v === 'string'
+          && v.startsWith(`${COMMUNITY_DEFINITION_KIND}:`),
+        )
+        .map(([, v]) => v);
+
+      // Group bookmarked coords by author pubkey: author -> Set<d-tag>
+      const coordsByAuthor = new Map<string, Set<string>>();
+      for (const coord of bookmarkedCoords) {
+        // Format: "34550:<pubkey>:<d-tag>" -- d-tag may itself contain ":"
+        const firstColon = coord.indexOf(':');
+        const secondColon = coord.indexOf(':', firstColon + 1);
+        if (firstColon === -1 || secondColon === -1) continue;
+        const authorPubkey = coord.slice(firstColon + 1, secondColon);
+        const dTag = coord.slice(secondColon + 1);
+        if (!authorPubkey || !dTag) continue;
+        const existing = coordsByAuthor.get(authorPubkey);
+        if (existing) {
+          existing.add(dTag);
+        } else {
+          coordsByAuthor.set(authorPubkey, new Set([dTag]));
+        }
+      }
+
+      let bookmarkedCommunityEvents: NostrEvent[] = [];
+      if (coordsByAuthor.size > 0) {
+        const bookmarkQueries = await Promise.all(
+          Array.from(coordsByAuthor.entries()).map(([authorPubkey, dTags]) =>
+            nostr.query(
+              [{
+                kinds: [COMMUNITY_DEFINITION_KIND],
+                authors: [authorPubkey],
+                '#d': [...dTags],
+                limit: dTags.size,
+              }],
+              { signal: combinedSignal },
+            ),
+          ),
+        );
+        bookmarkedCommunityEvents = bookmarkQueries.flat();
+      }
+
+      const bookmarkedATagSet = new Set(bookmarkedCoords);
+
+      // ── Merge & deduplicate ──────────────────────────────────────────────
+      // Priority: founded > member > bookmarked. `isBookmarked` is resolved
+      // from the bookmark list irrespective of which bucket produced the
+      // entry, so founders/members who have also bookmarked see both flags.
       const seen = new Map<string, MyCommunityEntry>();
 
       for (const event of foundedEvents) {
         const community = parseCommunityEvent(event);
         if (!community) continue;
-        seen.set(community.aTag, { community, event, isFounded: true });
+        seen.set(community.aTag, {
+          community,
+          event,
+          isFounded: true,
+          isMember: false,
+          isBookmarked: bookmarkedATagSet.has(community.aTag),
+        });
       }
 
       for (const event of memberCommunityEvents) {
         const community = parseCommunityEvent(event);
         if (!community) continue;
-        if (!seen.has(community.aTag)) {
-          seen.set(community.aTag, { community, event, isFounded: false });
-        }
+        if (seen.has(community.aTag)) continue;
+        seen.set(community.aTag, {
+          community,
+          event,
+          isFounded: false,
+          isMember: true,
+          isBookmarked: bookmarkedATagSet.has(community.aTag),
+        });
       }
 
-      // Sort: founded first, then by created_at descending
+      for (const event of bookmarkedCommunityEvents) {
+        const community = parseCommunityEvent(event);
+        if (!community) continue;
+        if (!bookmarkedATagSet.has(community.aTag)) continue;
+        if (seen.has(community.aTag)) continue;
+        seen.set(community.aTag, {
+          community,
+          event,
+          isFounded: false,
+          isMember: false,
+          isBookmarked: true,
+        });
+      }
+
+      // Sort: founded first, then member, then bookmarked-only;
+      // tie-break by created_at descending.
+      const sortRank = (entry: MyCommunityEntry): number => {
+        if (entry.isFounded) return 0;
+        if (entry.isMember) return 1;
+        return 2;
+      };
+
       return Array.from(seen.values()).sort((a, b) => {
-        if (a.isFounded !== b.isFounded) return a.isFounded ? -1 : 1;
+        const rankDiff = sortRank(a) - sortRank(b);
+        if (rankDiff !== 0) return rankDiff;
         return b.event.created_at - a.event.created_at;
       });
     },
