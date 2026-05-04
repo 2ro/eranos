@@ -18,6 +18,8 @@ import { ExternalFavicon } from '@/components/ExternalFavicon';
 import { useQueryClient } from '@tanstack/react-query';
 import { useNip05Resolve } from '@/hooks/useNip05Resolve';
 import { useAuthor } from '@/hooks/useAuthor';
+import { useCurrentUser } from '@/hooks/useCurrentUser';
+import { isAdmin } from '@/lib/admins';
 import { useEvent, useAddrEvent, type AddrCoords } from '@/hooks/useEvent';
 import { useArchiveSearch, type ArchiveSearchResult } from '@/hooks/useArchiveSearch';
 import { searchSidebarItems, type SidebarItemDef } from '@/lib/sidebarItems';
@@ -52,6 +54,7 @@ export function ProfileSearchDropdown({
   const containerRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const listRef = useRef<HTMLDivElement>(null);
+  const { user: currentUser } = useCurrentUser();
 
   const { data: rawProfiles, isFetching, followedPubkeys } = useSearchProfiles(query);
 
@@ -65,8 +68,8 @@ export function ProfileSearchDropdown({
   const countryMatchRaw = useMemo(() => searchCountry(query), [query]);
   const countryMatch = hideCountry ? null : countryMatchRaw;
 
-  // Nav item suggestions (local, synchronous)
-  const navItems = useMemo(() => searchSidebarItems(query), [query]);
+  // Nav item suggestions (local, synchronous) — hide admin-only items from non-admins
+  const navItems = useMemo(() => searchSidebarItems(query).filter(item => !item.requiresAdmin || isAdmin(currentUser?.pubkey)), [query, currentUser]);
 
   // URL detection — show "Comment on" option when query is a full URL
   const queryIsUrl = useMemo(() => isFullUrl(query), [query]);

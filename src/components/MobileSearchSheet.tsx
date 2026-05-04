@@ -16,6 +16,8 @@ import { ExternalFavicon } from '@/components/ExternalFavicon';
 import { useQueryClient } from '@tanstack/react-query';
 import { useNip05Resolve } from '@/hooks/useNip05Resolve';
 import { useAuthor } from '@/hooks/useAuthor';
+import { useCurrentUser } from '@/hooks/useCurrentUser';
+import { isAdmin } from '@/lib/admins';
 import { useEvent, useAddrEvent, type AddrCoords } from '@/hooks/useEvent';
 import { useArchiveSearch, type ArchiveSearchResult } from '@/hooks/useArchiveSearch';
 import { searchSidebarItems, type SidebarItemDef } from '@/lib/sidebarItems';
@@ -32,6 +34,7 @@ export function MobileSearchSheet({ open, onClose }: MobileSearchSheetProps) {
   const [query, setQuery] = useState('');
   const [selectedIndex, setSelectedIndex] = useState(-1);
   const inputRef = useRef<HTMLInputElement>(null);
+  const { user: currentUser } = useCurrentUser();
 
   const { data: rawProfiles, isFetching, followedPubkeys } = useSearchProfiles(query);
 
@@ -44,8 +47,8 @@ export function MobileSearchSheet({ open, onClose }: MobileSearchSheetProps) {
   // Country suggestion (local, synchronous)
   const countryMatch = useMemo(() => searchCountry(query), [query]);
 
-  // Nav item suggestions (local, synchronous)
-  const navItems = useMemo(() => searchSidebarItems(query), [query]);
+  // Nav item suggestions (local, synchronous) — hide admin-only items from non-admins
+  const navItems = useMemo(() => searchSidebarItems(query).filter(item => !item.requiresAdmin || isAdmin(currentUser?.pubkey)), [query, currentUser]);
 
   // URL detection — show "Comment on" option when query is a full URL
   const queryIsUrl = useMemo(() => isFullUrl(query), [query]);

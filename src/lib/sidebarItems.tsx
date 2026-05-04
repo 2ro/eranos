@@ -1,4 +1,5 @@
 import {
+  Activity,
   Award,
   BadgeCheck,
   BookOpen,
@@ -85,6 +86,8 @@ export interface SidebarItemDef {
   icon: IconComponent;
   /** If true, only shown when a user is logged in. */
   requiresAuth?: boolean;
+  /** If true, only shown to platform admins (implies requiresAuth). */
+  requiresAdmin?: boolean;
 }
 
 // ── Registry ──────────────────────────────────────────────────────────────────
@@ -160,6 +163,7 @@ export const SIDEBAR_ITEMS: SidebarItemDef[] = [
   { id: "badges", label: "Badges", path: "/badges", icon: Award },
   { id: "communities", label: "Communities", path: "/communities", icon: Users },
   { id: "world", label: "World", path: "/world", icon: Earth },
+  { id: "event-dashboard", label: "Dashboard", path: "/event-dashboard", icon: Activity, requiresAuth: true, requiresAdmin: true },
 ];
 
 /** Set of all known sidebar item IDs for quick lookup. */

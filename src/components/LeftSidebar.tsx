@@ -27,7 +27,8 @@ import { useHasUnreadNotifications } from '@/hooks/useHasUnreadNotifications';
 import { genUserName } from '@/lib/genUserName';
 import { VerifiedNip05Text } from '@/components/Nip05Badge';
 import { useProfileUrl } from '@/hooks/useProfileUrl';
-import { isItemActive } from '@/lib/sidebarItems';
+import { isItemActive, getSidebarItem } from '@/lib/sidebarItems';
+import { isAdmin } from '@/lib/admins';
 
 import { useUserStatus } from '@/hooks/useUserStatus';
 import { usePublishStatus } from '@/hooks/usePublishStatus';
@@ -48,8 +49,18 @@ export function LeftSidebar() {
   } = useFeedSettings();
   const { config } = useAppContext();
 
-  const visibleItems = orderedItems;
-  const visibleHiddenItems = hiddenItems;
+  const visibleItems = orderedItems.filter((id) => {
+    const def = getSidebarItem(id);
+    if (!def) return true; // custom/external items pass through
+    if (def.requiresAdmin && !isAdmin(user?.pubkey)) return false;
+    return true;
+  });
+  const visibleHiddenItems = hiddenItems.filter((item) => {
+    const def = getSidebarItem(item.id);
+    if (!def) return true;
+    if (def.requiresAdmin && !isAdmin(user?.pubkey)) return false;
+    return true;
+  });
 
   const hasUnread = useHasUnreadNotifications();
   const userProfileUrl = useProfileUrl(user?.pubkey ?? '', metadata);

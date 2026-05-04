@@ -21,7 +21,8 @@ import { useLoggedInAccounts, type Account } from '@/hooks/useLoggedInAccounts';
 import { useFeedSettings } from '@/hooks/useFeedSettings';
 import { useHasUnreadNotifications } from '@/hooks/useHasUnreadNotifications';
 import { useProfileUrl } from '@/hooks/useProfileUrl';
-import { isItemActive } from '@/lib/sidebarItems';
+import { isItemActive, getSidebarItem } from '@/lib/sidebarItems';
+import { isAdmin } from '@/lib/admins';
 import { useAppContext } from '@/hooks/useAppContext';
 import { useTheme } from '@/hooks/useTheme';
 import { useUserStatus } from '@/hooks/useUserStatus';
@@ -90,13 +91,25 @@ export function MobileDrawer({ open, onOpenChange }: MobileDrawerProps) {
   const visibleItems = useMemo(() => {
     // Remove dividers that have no real items above them (at the top or right after another divider).
     return orderedItems.filter((id, i) => {
-      if (id !== 'divider') return true;
-      const prevNonDivider = orderedItems.slice(0, i).some((prev) => prev !== 'divider');
-      return prevNonDivider;
+      if (id === 'divider') {
+        const prevNonDivider = orderedItems.slice(0, i).some((prev) => prev !== 'divider');
+        return prevNonDivider;
+      }
+      const def = getSidebarItem(id);
+      if (!def) return true; // custom/external items pass through
+      if (def.requiresAdmin && !isAdmin(user?.pubkey)) return false;
+      return true;
     });
-  }, [orderedItems]);
+  }, [orderedItems, user]);
 
-  const visibleHiddenItems = hiddenItems;
+  const visibleHiddenItems = useMemo(() => {
+    return hiddenItems.filter((item) => {
+      const def = getSidebarItem(item.id);
+      if (!def) return true;
+      if (def.requiresAdmin && !isAdmin(user?.pubkey)) return false;
+      return true;
+    });
+  }, [hiddenItems, user]);
 
   const handleClose = () => { onOpenChange(false); setMoreMenuOpen(false); };
   const handleLogout = async () => { await logout(); handleClose(); navigate('/'); };
