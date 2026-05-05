@@ -19,6 +19,7 @@ import type { NostrEvent, NostrMetadata } from '@nostrify/nostrify';
 
 import { AddMemberDialog } from '@/components/AddMemberDialog';
 import { CreateCommunityDialog } from '@/components/CreateCommunityDialog';
+import { CreateCommunityEventDialog } from '@/components/CreateCommunityEventDialog';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -141,6 +142,22 @@ function getCalendarEventStart(event: NostrEvent): number {
   return isNaN(timestamp) ? 0 : timestamp;
 }
 
+function getCalendarEventEnd(event: NostrEvent): number {
+  const start = getTag(event.tags, 'start');
+  if (!start) return 0;
+
+  if (event.kind === 31922) {
+    const end = getTag(event.tags, 'end');
+    const endDate = new Date(`${end || start}T00:00:00Z`);
+    if (isNaN(endDate.getTime())) return 0;
+    return Math.floor(endDate.getTime() / 1000) + (end ? 0 : 86400);
+  }
+
+  const end = getTag(event.tags, 'end') || start;
+  const endTs = parseInt(end, 10);
+  return isNaN(endTs) ? 0 : endTs;
+}
+
 // ── Main component ────────────────────────────────────────────────────────────
 
 export function CommunityDetailPage({ event }: { event: NostrEvent }) {
@@ -156,6 +173,7 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
   const [activeTab, setActiveTab] = useState('members');
   const [composeOpen, setComposeOpen] = useState(false);
   const [goalDialogOpen, setGoalDialogOpen] = useState(false);
+  const [eventDialogOpen, setEventDialogOpen] = useState(false);
   const [addMemberOpen, setAddMemberOpen] = useState(false);
   const [editCommunityOpen, setEditCommunityOpen] = useState(false);
 
@@ -292,6 +310,14 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
       return bStart - aStart;
     });
   }, [communityEvents, moderation, membersOnly, rankMap, now]);
+  const activeEventItems = useMemo(
+    () => eventItems.filter((e) => getCalendarEventEnd(e) >= now),
+    [eventItems, now],
+  );
+  const pastEventItems = useMemo(
+    () => eventItems.filter((e) => getCalendarEventEnd(e) < now),
+    [eventItems, now],
+  );
 
   const replyTree = useMemo((): ReplyNode[] => {
     if (!commentsData) return [];
@@ -351,6 +377,8 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
       setComposeOpen(true);
     } else if (activeTab === 'fundraising') {
       setGoalDialogOpen(true);
+    } else if (activeTab === 'events') {
+      setEventDialogOpen(true);
     } else if (activeTab === 'members') {
       setAddMemberOpen(true);
     }
@@ -360,7 +388,9 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
     ? <Target strokeWidth={3} size={18} />
     : activeTab === 'members'
       ? <UserPlus className="size-5" />
-      : undefined; // default Plus icon for comments
+      : activeTab === 'events'
+        ? <CalendarDays className="size-5" />
+        : undefined; // default Plus icon for comments
 
   useLayoutOptions({
     showFAB:
@@ -368,8 +398,7 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
       || activeTab === 'fundraising'
       || activeTab === 'events'
       || (activeTab === 'members' && canAddMembers),
-    fabKind: activeTab === 'events' ? 31923 : 1,
-    onFabClick: activeTab === 'events' ? undefined : handleFabClick,
+    onFabClick: handleFabClick,
     fabIcon,
   });
 
@@ -606,7 +635,7 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
                     <ReplyCardSkeleton key={i} />
                   ))}
                 </div>
-              ) : eventItems.length === 0 ? (
+              ) : activeEventItems.length === 0 && pastEventItems.length === 0 ? (
                 <div className="py-12 text-center text-muted-foreground text-sm px-5">
                   {membersOnly && (communityEvents ?? []).length > 0
                     ? 'No events from community members yet. Toggle the shield icon to see all events.'
@@ -614,7 +643,18 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
                 </div>
               ) : (
                 <div className="divide-y divide-border">
-                  {eventItems.map((e) => (
+                  {activeEventItems.map((e) => (
+                    <NoteCard key={e.id} event={e} />
+                  ))}
+
+                  {pastEventItems.length > 0 && activeEventItems.length > 0 && (
+                    <div className="px-5 pt-4 pb-1">
+                      <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
+                        Past Events
+                      </h4>
+                    </div>
+                  )}
+                  {pastEventItems.map((e) => (
                     <NoteCard key={e.id} event={e} />
                   ))}
                 </div>
@@ -651,6 +691,15 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
           communityATag={communityATag}
           open={goalDialogOpen}
           onOpenChange={setGoalDialogOpen}
+        />
+      )}
+
+      {/* FAB-triggered event creation dialog for the events tab */}
+      {communityATag && (
+        <CreateCommunityEventDialog
+          communityATag={communityATag}
+          open={eventDialogOpen}
+          onOpenChange={setEventDialogOpen}
         />
       )}
 
