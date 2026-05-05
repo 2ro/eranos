@@ -1,6 +1,7 @@
-import { useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import type { NostrEvent } from '@nostrify/nostrify';
 import { useEventDashboardConfig } from '@/hooks/useEventDashboardConfig';
+import type { TrackedRegion } from '@/hooks/useEventDashboardConfig';
 import { useMultiHashtagFeed, type RegionFeed } from '@/hooks/useMultiHashtagFeed';
 import { getStateCodeForHashtag, getStateByCode, getMunicipalityLabel, extractMunicipalityFromContent } from '@/lib/venezuelaTerritorial';
 import { getActiveTrackedCodes, getCoveredStates } from '@/lib/territorialCoverage';
@@ -115,6 +116,21 @@ export function useEventDashboard({ enabled, territorialLevel }: UseEventDashboa
   const { regionFeeds, globalPosts, isLoading, isBackfilling, error } =
     useMultiHashtagFeed(config.regions, config.since, { enabled });
 
+  // Clock tick (10s) so time-relative KPIs recompute even when data is unchanged.
+  const [now, setNow] = useState(() => Math.floor(Date.now() / 1000));
+  useEffect(() => {
+    if (!enabled) return;
+    const id = setInterval(() => setNow(Math.floor(Date.now() / 1000)), 10_000);
+    return () => clearInterval(id);
+  }, [enabled]);
+
+  // Pre-build region lookup for O(1) access inside displayFeeds aggregation.
+  const regionById = useMemo(() => {
+    const map = new Map<string, TrackedRegion>();
+    for (const r of config.regions) map.set(r.id, r);
+    return map;
+  }, [config.regions]);
+
   // Aggregate regionFeeds into displayFeeds based on territorial level
   const displayFeeds = useMemo<AggregatedFeed[]>(() => {
     // Custom/free-form entries (no type) pass through as their own row in all views
@@ -124,7 +140,7 @@ export function useEventDashboard({ enabled, territorialLevel }: UseEventDashboa
       const stateMap = new Map<string, { label: string; postMap: Map<string, NostrEvent> }>();
 
       for (const feed of regionFeeds) {
-        const region = config.regions.find((r) => r.id === feed.regionId);
+        const region = regionById.get(feed.regionId);
         if (!region?.type) {
           if (region && feed.count > 0) {
             customFeeds.push({
@@ -163,7 +179,7 @@ export function useEventDashboard({ enabled, territorialLevel }: UseEventDashboa
     const muniMap = new Map<string, { label: string; postMap: Map<string, NostrEvent> }>();
 
     for (const feed of regionFeeds) {
-      const region = config.regions.find((r) => r.id === feed.regionId);
+      const region = regionById.get(feed.regionId);
       if (!region?.type) {
         if (region && feed.count > 0) {
           customFeeds.push({
@@ -205,8 +221,10 @@ export function useEventDashboard({ enabled, territorialLevel }: UseEventDashboa
             }
           }
           if (resolved) {
+            const resolvedLabel = getMunicipalityLabel(resolved);
+            if (!resolvedLabel) continue;
             if (!muniMap.has(resolved)) {
-              muniMap.set(resolved, { label: getMunicipalityLabel(resolved)!, postMap: new Map() });
+              muniMap.set(resolved, { label: resolvedLabel, postMap: new Map() });
             }
             muniMap.get(resolved)!.postMap.set(post.id, post);
           }
@@ -220,7 +238,7 @@ export function useEventDashboard({ enabled, territorialLevel }: UseEventDashboa
     }).filter((f) => f.count > 0);
 
     return [...muniFeeds, ...customFeeds];
-  }, [regionFeeds, config.regions, territorialLevel]);
+  }, [regionFeeds, regionById, territorialLevel]);
 
   // Derive KPIs
   const kpis = useMemo<DashboardKpis>(() => {
@@ -232,8 +250,8 @@ export function useEventDashboard({ enabled, territorialLevel }: UseEventDashboa
     }
     const viewPosts = Array.from(viewPostMap.values());
 
-    const fiveMinutesAgo = Math.floor(Date.now() / 1000) - 300;
-    const thirtySecondsAgo = Math.floor(Date.now() / 1000) - 30;
+    const fiveMinutesAgo = now - 300;
+    const thirtySecondsAgo = now - 30;
 
     const activeCodes = getActiveTrackedCodes(config);
 
@@ -247,7 +265,7 @@ export function useEventDashboard({ enabled, territorialLevel }: UseEventDashboa
       last5min: viewPosts.filter((p) => p.created_at > fiveMinutesAgo).length,
       uniquePosters: new Set(viewPosts.map((p) => p.pubkey)).size,
     };
-  }, [displayFeeds, config, territorialLevel]);
+  }, [displayFeeds, config, territorialLevel, now]);
 
   // Time series
   const timeSeries = useMemo(() => buildTimeSeries(regionFeeds), [regionFeeds]);
@@ -265,7 +283,7 @@ export function useEventDashboard({ enabled, territorialLevel }: UseEventDashboa
 
   // Participants (full sorted list)
   const participants = useMemo<ParticipantRow[]>(() => {
-    const thirtySecondsAgo = Math.floor(Date.now() / 1000) - 30;
+    const thirtySecondsAgo = now - 30;
     return [...displayFeeds]
       .sort((a, b) => b.count - a.count)
       .map((feed, i) => ({
@@ -276,7 +294,7 @@ export function useEventDashboard({ enabled, territorialLevel }: UseEventDashboa
         count: feed.count,
         isActive: feed.posts.length > 0 && feed.posts[0].created_at > thirtySecondsAgo,
       }));
-  }, [displayFeeds]);
+  }, [displayFeeds, now]);
 
   // Activity items (from globalPosts with label resolution)
   const activity = useMemo<ActivityItem[]>(() => {
@@ -313,9 +331,12 @@ export function useEventDashboard({ enabled, territorialLevel }: UseEventDashboa
     });
   }, [globalPosts, displayFeeds]);
 
-  // Status
-  const status: DashboardStatus = isLoading && globalPosts.length === 0
+  // Status — surface relay errors even after initial data is loaded.
+  const hasData = globalPosts.length > 0;
+  const status: DashboardStatus = isLoading && !hasData
     ? 'connecting'
+    : error && hasData
+    ? 'disconnected'
     : isBackfilling
     ? 'syncing'
     : 'live';
@@ -328,7 +349,7 @@ export function useEventDashboard({ enabled, territorialLevel }: UseEventDashboa
     participants,
     activity,
     status,
-    isLoading: isLoading && globalPosts.length === 0,
+    isLoading: isLoading && !hasData,
     error: error as Error | null,
   };
 }

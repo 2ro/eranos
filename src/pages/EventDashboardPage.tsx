@@ -111,12 +111,12 @@ export function EventDashboardPage() {
 
   // Status badge
   const statusBadge = (
-    <Badge variant="outline" className="gap-1.5 text-xs font-medium">
+    <Badge variant={status === 'disconnected' ? 'destructive' : 'outline'} className="gap-1.5 text-xs font-medium">
       <span className="relative flex size-2">
-        <span className={`animate-ping absolute inline-flex h-full w-full rounded-full opacity-75 ${status === 'syncing' ? 'bg-yellow-400' : status === 'live' ? 'bg-green-400' : 'bg-gray-400'}`} />
-        <span className={`relative inline-flex rounded-full size-2 ${status === 'syncing' ? 'bg-yellow-500' : status === 'live' ? 'bg-green-500' : 'bg-gray-500'}`} />
+        <span className={`animate-ping absolute inline-flex h-full w-full rounded-full opacity-75 ${status === 'syncing' ? 'bg-yellow-400' : status === 'live' ? 'bg-green-400' : status === 'disconnected' ? 'bg-red-400' : 'bg-gray-400'}`} />
+        <span className={`relative inline-flex rounded-full size-2 ${status === 'syncing' ? 'bg-yellow-500' : status === 'live' ? 'bg-green-500' : status === 'disconnected' ? 'bg-red-500' : 'bg-gray-500'}`} />
       </span>
-      {status === 'syncing' ? 'Syncing' : status === 'live' ? 'Live' : 'Connecting'}
+      {status === 'syncing' ? 'Syncing' : status === 'live' ? 'Live' : status === 'disconnected' ? 'Disconnected' : 'Connecting'}
     </Badge>
   );
 
