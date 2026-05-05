@@ -21,7 +21,7 @@ import { useToast } from '@/hooks/useToast';
 import { sanitizeUrl } from '@/lib/sanitizeUrl';
 
 interface CreateCommunityEventDialogProps {
-  communityATag: string;
+  communityATag?: string;
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }
@@ -71,6 +71,7 @@ export function CreateCommunityEventDialog({ communityATag, open, onOpenChange }
     () => Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC',
     [],
   );
+  const isCommunityEvent = !!communityATag;
 
   const resetForm = useCallback(() => {
     setStep(1);
@@ -125,17 +126,18 @@ export function CreateCommunityEventDialog({ communityATag, open, onOpenChange }
 
     const trimmedTitle = title.trim();
     const dTag = `${slugify(trimmedTitle) || 'event'}-${Date.now()}`;
-    const communityAuthor = parseCommunityAuthor(communityATag);
     const tags: string[][] = [
       ['d', dTag],
       ['title', trimmedTitle],
-      ['A', communityATag],
-      ['K', '34550'],
-      ['alt', `Community event: ${trimmedTitle}`],
+      ['alt', `${isCommunityEvent ? 'Community event' : 'Calendar event'}: ${trimmedTitle}`],
     ];
 
-    if (communityAuthor) {
-      tags.push(['P', communityAuthor]);
+    if (communityATag) {
+      const communityAuthor = parseCommunityAuthor(communityATag);
+      tags.push(['A', communityATag], ['K', '34550']);
+      if (communityAuthor) {
+        tags.push(['P', communityAuthor]);
+      }
     }
 
     if (description.trim()) {
@@ -196,15 +198,18 @@ export function CreateCommunityEventDialog({ communityATag, open, onOpenChange }
       });
 
       await Promise.all([
-        queryClient.invalidateQueries({ queryKey: ['community-events', communityATag] }),
-        queryClient.invalidateQueries({
+        queryClient.invalidateQueries({ queryKey: ['feed'] }),
+        ...(communityATag ? [
+          queryClient.invalidateQueries({ queryKey: ['community-events', communityATag] }),
+          queryClient.invalidateQueries({
           predicate: (q) => {
             const [root, aTagsKey] = q.queryKey;
             return root === 'community-activity-feed'
               && typeof aTagsKey === 'string'
               && aTagsKey.split(',').includes(communityATag);
           },
-        }),
+          }),
+        ] : []),
       ]);
 
       toast({ title: 'Event created!' });
@@ -234,6 +239,7 @@ export function CreateCommunityEventDialog({ communityATag, open, onOpenChange }
     toast,
     user,
     validateInfoStep,
+    isCommunityEvent,
   ]);
 
   if (!user) return null;
