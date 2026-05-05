@@ -162,6 +162,10 @@ const hardcodedConfig: AppConfig = {
     soundEnabled: false,
     devMode: false,
   },
+  aiBaseURL: 'https://ai.shakespeare.diy/v1',
+  aiApiKey: '',
+  aiModel: 'grok-4.1-fast',
+  aiSystemPrompt: '',
 };
 
 /**
