@@ -4,6 +4,7 @@ import { nip19 } from 'nostr-tools';
 import {
   ArrowLeft,
   Bookmark,
+  CalendarDays,
   Crown,
   MessageCircle,
   Pencil,
@@ -33,6 +34,7 @@ import { useAuthor } from '@/hooks/useAuthor';
 import { useAuthors } from '@/hooks/useAuthors';
 import { useComments } from '@/hooks/useComments';
 import { useCommunityBookmarks } from '@/hooks/useCommunityBookmarks';
+import { useCommunityEvents } from '@/hooks/useCommunityEvents';
 import { useCommunityMembers } from '@/hooks/useCommunityMembers';
 import { useCommunityGoals } from '@/hooks/useCommunityGoals';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
@@ -122,6 +124,23 @@ function ReplyCardSkeleton() {
   );
 }
 
+function getTag(tags: string[][], name: string): string | undefined {
+  return tags.find(([n]) => n === name)?.[1];
+}
+
+function getCalendarEventStart(event: NostrEvent): number {
+  const start = getTag(event.tags, 'start');
+  if (!start) return 0;
+
+  if (event.kind === 31922) {
+    const date = new Date(`${start}T00:00:00Z`);
+    return isNaN(date.getTime()) ? 0 : Math.floor(date.getTime() / 1000);
+  }
+
+  const timestamp = parseInt(start, 10);
+  return isNaN(timestamp) ? 0 : timestamp;
+}
+
 // ── Main component ────────────────────────────────────────────────────────────
 
 export function CommunityDetailPage({ event }: { event: NostrEvent }) {
@@ -178,16 +197,6 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
     toggleCommunityBookmark.mutate({ aTag: communityATag });
   }, [user, communityATag, toggleCommunityBookmark]);
 
-  const handleAddMembersClick = useCallback(() => {
-    setAddMemberOpen(true);
-  }, []);
-
-  useLayoutOptions({
-    showFAB: canAddMembers && activeTab === 'members',
-    onFabClick: handleAddMembersClick,
-    fabIcon: <UserPlus className="size-5" />,
-  });
-
   // Batch-fetch profiles for all members
   const allMemberPubkeys = useMemo(
     () => membership?.members.map((m) => m.pubkey) ?? [],
@@ -237,6 +246,7 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
 
   // ── Fundraising goals (NIP-75) ──────────────────────────────────────────────
   const { data: goals, isLoading: goalsLoading } = useCommunityGoals(communityATag || undefined);
+  const { data: communityEvents, isLoading: eventsLoading } = useCommunityEvents(communityATag || undefined);
   const now = useNow(60_000);
 
   /** Check if a goal event's `closed_at` deadline has passed. */
@@ -266,6 +276,22 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
       return bClose - aClose;
     });
   }, [moderatedGoals, membersOnly, rankMap, isExpired]);
+
+  const eventItems = useMemo(() => {
+    const moderated = applyCommunityModerationToEvents(communityEvents ?? [], moderation);
+    const visible = membersOnly ? moderated.filter((e) => rankMap.has(e.pubkey)) : moderated;
+
+    return [...visible].sort((a, b) => {
+      const aStart = getCalendarEventStart(a);
+      const bStart = getCalendarEventStart(b);
+      const aFuture = aStart >= now;
+      const bFuture = bStart >= now;
+      if (aFuture && !bFuture) return -1;
+      if (!aFuture && bFuture) return 1;
+      if (aFuture && bFuture) return aStart - bStart;
+      return bStart - aStart;
+    });
+  }, [communityEvents, moderation, membersOnly, rankMap, now]);
 
   const replyTree = useMemo((): ReplyNode[] => {
     if (!commentsData) return [];
@@ -340,8 +366,10 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
     showFAB:
       activeTab === 'comments'
       || activeTab === 'fundraising'
+      || activeTab === 'events'
       || (activeTab === 'members' && canAddMembers),
-    onFabClick: handleFabClick,
+    fabKind: activeTab === 'events' ? 31923 : 1,
+    onFabClick: activeTab === 'events' ? undefined : handleFabClick,
     fabIcon,
   });
 
@@ -455,6 +483,13 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
                 <Target className="size-4 mr-1.5" />
                 Fundraising
               </TabsTrigger>
+              <TabsTrigger
+                value="events"
+                className="flex-1 rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none pb-3 pt-2"
+              >
+                <CalendarDays className="size-4 mr-1.5" />
+                Events
+              </TabsTrigger>
             </TabsList>
 
             {/* ── Members tab ── */}
@@ -557,6 +592,29 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
                     </div>
                   )}
                   {pastGoals.map((e) => (
+                    <NoteCard key={e.id} event={e} />
+                  ))}
+                </div>
+              )}
+            </TabsContent>
+
+            {/* ── Events tab ── */}
+            <TabsContent value="events" className="mt-0">
+              {eventsLoading ? (
+                <div className="divide-y divide-border">
+                  {Array.from({ length: 3 }).map((_, i) => (
+                    <ReplyCardSkeleton key={i} />
+                  ))}
+                </div>
+              ) : eventItems.length === 0 ? (
+                <div className="py-12 text-center text-muted-foreground text-sm px-5">
+                  {membersOnly && (communityEvents ?? []).length > 0
+                    ? 'No events from community members yet. Toggle the shield icon to see all events.'
+                    : <>No events yet.{user ? ' Create one to get started!' : ''}</>}
+                </div>
+              ) : (
+                <div className="divide-y divide-border">
+                  {eventItems.map((e) => (
                     <NoteCard key={e.id} event={e} />
                   ))}
                 </div>
