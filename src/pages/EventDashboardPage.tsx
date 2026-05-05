@@ -22,7 +22,7 @@ import { ConfigDrawer } from '@/components/event-dashboard/ConfigDrawer';
 import type { TerritorialLevel } from '@/components/event-dashboard/types';
 
 /**
- * Event Dashboard page — admin-only live monitoring dashboard.
+ * Dashboard page — admin-only live monitoring dashboard.
  * Phase 2: Connected to real relay data via useEventDashboard.
  */
 export function EventDashboardPage() {
@@ -43,7 +43,7 @@ export function EventDashboardPage() {
   if (!user) {
     return (
       <main>
-        <PageHeader title="Event Dashboard" icon={<Activity className="size-5" />} />
+        <PageHeader title="Dashboard" icon={<Activity className="size-5" />} />
         <div className="px-4 py-6 max-w-2xl mx-auto">
           <div className="text-center space-y-6 py-12">
             <div className="w-16 h-16 mx-auto rounded-full bg-primary/20 flex items-center justify-center">
@@ -64,7 +64,7 @@ export function EventDashboardPage() {
   if (!userIsAdmin) {
     return (
       <main>
-        <PageHeader title="Event Dashboard" icon={<Activity className="size-5" />} />
+        <PageHeader title="Dashboard" icon={<Activity className="size-5" />} />
         <div className="px-4 py-6 max-w-2xl mx-auto">
           <Card className="bg-gradient-to-br from-destructive/5 to-destructive/10 border-destructive/20">
             <CardContent className="pt-6">
@@ -86,7 +86,7 @@ export function EventDashboardPage() {
   if (error && kpis.totalPosts === 0) {
     return (
       <main>
-        <PageHeader title="Event Dashboard" icon={<Activity className="size-5" />}>
+        <PageHeader title="Dashboard" icon={<Activity className="size-5" />}>
           <Badge variant="destructive" className="gap-1.5 text-xs font-medium">
             <span className="size-2 rounded-full bg-red-100" />
             Disconnected
@@ -123,7 +123,7 @@ export function EventDashboardPage() {
   // Admin — show dashboard
   return (
     <main>
-      <PageHeader title="Event Dashboard" icon={<Activity className="size-5" />}>
+      <PageHeader title="Dashboard" icon={<Activity className="size-5" />}>
         <div className="flex items-center gap-2">
           {statusBadge}
           <Button size="icon" variant="ghost" className="size-8" onClick={() => setConfigOpen(true)}>

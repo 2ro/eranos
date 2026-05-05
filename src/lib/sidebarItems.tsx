@@ -163,7 +163,7 @@ export const SIDEBAR_ITEMS: SidebarItemDef[] = [
   { id: "badges", label: "Badges", path: "/badges", icon: Award },
   { id: "communities", label: "Communities", path: "/communities", icon: Users },
   { id: "world", label: "World", path: "/world", icon: Earth },
-  { id: "event-dashboard", label: "Dashboard", path: "/event-dashboard", icon: Activity, requiresAuth: true, requiresAdmin: true },
+  { id: "dashboard", label: "Dashboard", path: "/dashboard", icon: Activity, requiresAuth: true, requiresAdmin: true },
 ];
 
 /** Set of all known sidebar item IDs for quick lookup. */

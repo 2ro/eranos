@@ -179,7 +179,8 @@ export function AppRouter() {
             <Route path="/i/*" element={<ExternalContentPage />} />
             <Route path="/actions" element={<ActionsPage />} />
             <Route path="/organizers" element={<OrganizersPage />} />
-            <Route path="/event-dashboard" element={<EventDashboardPage />} />
+            <Route path="/dashboard" element={<EventDashboardPage />} />
+            <Route path="/event-dashboard" element={<Navigate to="/dashboard" replace />} />
 
             {/* Callback target for remote signers (e.g. Amber, Primal) after NIP-46 approval */}
             <Route path="/remoteloginsuccess" element={<RemoteLoginSuccessPage />} />
