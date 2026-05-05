@@ -3,7 +3,7 @@ import { useNostr } from '@nostrify/react';
 import { useQuery } from '@tanstack/react-query';
 
 import { useCurrentUser } from './useCurrentUser';
-import { COMMUNITIES_LIST_KIND } from './useCommunityBookmarks';
+import { COMMUNITIES_LIST_KIND, parseCommunityBookmarkATag } from './useCommunityBookmarks';
 import {
   COMMUNITY_DEFINITION_KIND,
   BADGE_AWARD_KIND,
@@ -108,44 +108,34 @@ export function useMyCommunities() {
         .filter(([n, v]) =>
           n === 'a'
           && typeof v === 'string'
-          && v.startsWith(`${COMMUNITY_DEFINITION_KIND}:`),
+          && !!parseCommunityBookmarkATag(v),
         )
         .map(([, v]) => v);
 
       // Group bookmarked coords by author pubkey: author -> Set<d-tag>
       const coordsByAuthor = new Map<string, Set<string>>();
       for (const coord of bookmarkedCoords) {
-        // Format: "34550:<pubkey>:<d-tag>" -- d-tag may itself contain ":"
-        const firstColon = coord.indexOf(':');
-        const secondColon = coord.indexOf(':', firstColon + 1);
-        if (firstColon === -1 || secondColon === -1) continue;
-        const authorPubkey = coord.slice(firstColon + 1, secondColon);
-        const dTag = coord.slice(secondColon + 1);
-        if (!authorPubkey || !dTag) continue;
-        const existing = coordsByAuthor.get(authorPubkey);
+        const parsed = parseCommunityBookmarkATag(coord);
+        if (!parsed) continue;
+        const existing = coordsByAuthor.get(parsed.pubkey);
         if (existing) {
-          existing.add(dTag);
+          existing.add(parsed.dTag);
         } else {
-          coordsByAuthor.set(authorPubkey, new Set([dTag]));
+          coordsByAuthor.set(parsed.pubkey, new Set([parsed.dTag]));
         }
       }
 
       let bookmarkedCommunityEvents: NostrEvent[] = [];
       if (coordsByAuthor.size > 0) {
-        const bookmarkQueries = await Promise.all(
-          Array.from(coordsByAuthor.entries()).map(([authorPubkey, dTags]) =>
-            nostr.query(
-              [{
-                kinds: [COMMUNITY_DEFINITION_KIND],
-                authors: [authorPubkey],
-                '#d': [...dTags],
-                limit: dTags.size,
-              }],
-              { signal: combinedSignal },
-            ),
-          ),
+        bookmarkedCommunityEvents = await nostr.query(
+          Array.from(coordsByAuthor.entries()).map(([authorPubkey, dTags]) => ({
+            kinds: [COMMUNITY_DEFINITION_KIND],
+            authors: [authorPubkey],
+            '#d': [...dTags],
+            limit: dTags.size,
+          })),
+          { signal: combinedSignal },
         );
-        bookmarkedCommunityEvents = bookmarkQueries.flat();
       }
 
       const bookmarkedATagSet = new Set(bookmarkedCoords);

@@ -174,7 +174,7 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
   } = useCommunityBookmarks();
   const bookmarked = !!communityATag && isCommunityBookmarked(communityATag);
   const handleToggleBookmark = useCallback(() => {
-    if (!user || !communityATag) return;
+    if (!user || !communityATag || toggleCommunityBookmark.isPending) return;
     toggleCommunityBookmark.mutate({ aTag: communityATag });
   }, [user, communityATag, toggleCommunityBookmark]);
 
@@ -374,10 +374,12 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
         )}
         {user && communityATag && (
           <button
-            className="p-2 rounded-full hover:bg-secondary/60 transition-colors"
+            className="p-2 rounded-full hover:bg-secondary/60 transition-colors disabled:opacity-50 disabled:pointer-events-none"
             onClick={handleToggleBookmark}
+            disabled={toggleCommunityBookmark.isPending}
             aria-label={bookmarked ? 'Remove community bookmark' : 'Bookmark community'}
             aria-pressed={bookmarked}
+            aria-busy={toggleCommunityBookmark.isPending}
           >
             <Bookmark className={cn('size-5', bookmarked && 'fill-current')} />
           </button>

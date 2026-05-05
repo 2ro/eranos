@@ -5,10 +5,21 @@ import { useCurrentUser } from './useCurrentUser';
 import { useNostrPublish } from './useNostrPublish';
 import { fetchFreshEvent } from '@/lib/fetchFreshEvent';
 import { COMMUNITY_DEFINITION_KIND } from '@/lib/communityUtils';
+import { parseATagCoordinate } from '@/lib/nostrEvents';
 import { toast } from '@/hooks/useToast';
 
 /** NIP-51 Communities list — kind 10004. */
 export const COMMUNITIES_LIST_KIND = 10004;
+
+const HEX_PUBKEY_RE = /^[0-9a-f]{64}$/i;
+
+/** Parse and validate a NIP-51 community list coordinate. */
+export function parseCommunityBookmarkATag(aTag: string): { pubkey: string; dTag: string } | undefined {
+  const coord = parseATagCoordinate(aTag);
+  if (!coord || coord.kind !== COMMUNITY_DEFINITION_KIND) return undefined;
+  if (!HEX_PUBKEY_RE.test(coord.pubkey) || !coord.identifier) return undefined;
+  return { pubkey: coord.pubkey, dTag: coord.identifier };
+}
 
 /**
  * Hook to manage the user's NIP-51 Communities list (kind 10004).
@@ -42,7 +53,7 @@ export function useCommunityBookmarks() {
   // Extract bookmarked community a-tags (only `34550:` coordinates)
   const bookmarkedATags: string[] = (listQuery.data?.tags ?? [])
     .filter(([name, value]) =>
-      name === 'a' && typeof value === 'string' && value.startsWith(`${COMMUNITY_DEFINITION_KIND}:`),
+      name === 'a' && typeof value === 'string' && !!parseCommunityBookmarkATag(value),
     )
     .map(([, value]) => value);
 
