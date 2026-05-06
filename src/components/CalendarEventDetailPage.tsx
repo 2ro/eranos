@@ -1,4 +1,4 @@
-import { useState, useMemo, useCallback } from 'react';
+import { useMemo, useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { nip19 } from 'nostr-tools';
 import {
@@ -9,7 +9,7 @@ import {
   Users,
   Check,
   X as XIcon,
-  HelpCircle,
+  Star,
   Share2,
   ExternalLink,
   Zap,
@@ -21,7 +21,6 @@ import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
-import { Textarea } from '@/components/ui/textarea';
 import { NoteContent } from '@/components/NoteContent';
 import { RSVPAvatars } from '@/components/RSVPAvatars';
 import { ZapDialog } from '@/components/ZapDialog';
@@ -183,28 +182,19 @@ export function CalendarEventDetailPage({ event }: { event: NostrEvent }) {
   const myRsvp = useMyRSVP(eventCoord);
   const publishRSVP = usePublishRSVP();
 
-  const [selectedStatus, setSelectedStatus] = useState<'accepted' | 'declined' | 'tentative' | null>(null);
-  const [rsvpNote, setRsvpNote] = useState('');
-
-  const activeStatus = selectedStatus ?? myRsvp.status;
-  const hasChanged = selectedStatus !== null && selectedStatus !== myRsvp.status;
-
-  const handleRSVP = useCallback(async () => {
-    if (!activeStatus) return;
+  const handleRSVP = useCallback(async (status: 'accepted' | 'declined' | 'tentative') => {
+    if (status === myRsvp.status) return;
     try {
       await publishRSVP.mutateAsync({
         eventCoord,
         eventAuthorPubkey: event.pubkey,
-        status: activeStatus,
-        note: rsvpNote || undefined,
+        status,
       });
-      setSelectedStatus(null);
-      setRsvpNote('');
       toast({ title: 'RSVP updated' });
     } catch {
       toast({ title: 'Failed to update RSVP', variant: 'destructive' });
     }
-  }, [activeStatus, eventCoord, event.pubkey, rsvpNote, publishRSVP, toast]);
+  }, [eventCoord, event.pubkey, myRsvp.status, publishRSVP, toast]);
 
   const handleShare = useCallback(async () => {
     const d = getTag(event.tags, 'd') ?? '';
@@ -222,8 +212,7 @@ export function CalendarEventDetailPage({ event }: { event: NostrEvent }) {
     }
   }, [event, toast]);
 
-  const isAuthor = user?.pubkey === event.pubkey;
-  const showRSVP = !!user && !isAuthor;
+  const showRSVP = !!user;
 
   return (
     <div className="max-w-2xl mx-auto pb-16">
@@ -353,95 +342,69 @@ export function CalendarEventDetailPage({ event }: { event: NostrEvent }) {
           </>
         )}
 
-        {/* RSVP section */}
-        {showRSVP && (
-          <div className="rounded-[1.25rem] bg-background/85 p-4 space-y-3">
-            <h2 className="text-sm font-semibold px-1">Your RSVP</h2>
-
-            {myRsvp.status && !selectedStatus && (
-              <div className="px-1">
-                <Badge
-                  variant="outline"
-                  className={cn(
-                    myRsvp.status === 'accepted' && 'border-green-500 text-green-600',
-                    myRsvp.status === 'tentative' && 'border-amber-500 text-amber-600',
-                    myRsvp.status === 'declined' && 'border-destructive text-destructive',
-                  )}
-                >
-                  {myRsvp.status === 'accepted' ? 'Going' : myRsvp.status === 'tentative' ? 'Maybe' : "Can't Go"}
-                </Badge>
-              </div>
-            )}
-
-            <div className="flex gap-2">
-              <Button
-                size="sm"
-                variant={activeStatus === 'accepted' ? 'default' : 'outline'}
-                className={cn('flex-1 rounded-full', activeStatus === 'accepted' && 'bg-green-600 hover:bg-green-700 text-white')}
-                onClick={() => setSelectedStatus('accepted')}
-              >
-                <Check className="size-3.5 mr-1.5" /> Going
-              </Button>
-              <Button
-                size="sm"
-                variant={activeStatus === 'tentative' ? 'default' : 'outline'}
-                className={cn('flex-1 rounded-full', activeStatus === 'tentative' && 'bg-amber-500 hover:bg-amber-600 text-white')}
-                onClick={() => setSelectedStatus('tentative')}
-              >
-                <HelpCircle className="size-3.5 mr-1.5" /> Maybe
-              </Button>
-              <Button
-                size="sm"
-                variant={activeStatus === 'declined' ? 'default' : 'outline'}
-                className={cn('flex-1 rounded-full', activeStatus === 'declined' && 'bg-destructive hover:bg-destructive/90 text-destructive-foreground')}
-                onClick={() => setSelectedStatus('declined')}
-              >
-                <XIcon className="size-3.5 mr-1.5" /> Can't Go
-              </Button>
-            </div>
-
-            {activeStatus && (
-              <Textarea
-                placeholder="Add a note (optional)"
-                value={rsvpNote}
-                onChange={(e) => setRsvpNote(e.target.value)}
-                className="mt-1 resize-none rounded-xl"
-                rows={2}
-              />
-            )}
-
-            {(hasChanged || (activeStatus && !myRsvp.status)) && (
-              <Button
-                size="sm"
-                onClick={handleRSVP}
-                disabled={publishRSVP.isPending}
-                className="w-full mt-1 rounded-full"
-              >
-                {publishRSVP.isPending ? 'Updating...' : myRsvp.status ? 'Update RSVP' : 'Submit RSVP'}
-              </Button>
-            )}
-          </div>
-        )}
-
         {/* Attendees */}
         {rsvps.total > 0 && (
-          <section className="space-y-3">
-            <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide flex items-center gap-2">
-              <Users className="size-4" /> Attendees
-            </h2>
-            <div className="space-y-2.5">
-              {([
-                ['Going', rsvps.accepted, 'border-green-500/50 bg-green-500/5 text-green-600'],
-                ['Maybe', rsvps.tentative, 'border-amber-500/50 bg-amber-500/5 text-amber-600'],
-                ["Can't Go", rsvps.declined, 'border-muted-foreground/30 bg-muted/30 text-muted-foreground'],
-              ] as const).map(([label, pks, cls]) => pks.length > 0 && (
-                <div key={label} className="flex items-center gap-3">
-                  <Badge variant="outline" className={cn(cls, 'shrink-0 text-xs')}>{label} ({pks.length})</Badge>
-                  <RSVPAvatars pubkeys={pks} maxVisible={8} size="sm" />
-                </div>
-              ))}
-            </div>
-          </section>
+          <>
+            <Separator />
+            <section className="space-y-3">
+              <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide flex items-center gap-2">
+                <Users className="size-4" /> Attendees
+              </h2>
+              <div className="space-y-2.5">
+                {([
+                  ['Going', rsvps.accepted, 'border-green-500/50 bg-green-500/5 text-green-600'],
+                  ['Interested', rsvps.tentative, 'border-amber-500/50 bg-amber-500/5 text-amber-600'],
+                  ["Can't Go", rsvps.declined, 'border-muted-foreground/30 bg-muted/30 text-muted-foreground'],
+                ] as const).map(([label, pks, cls]) => pks.length > 0 && (
+                  <div key={label} className="flex items-center gap-3">
+                    <Badge variant="outline" className={cn(cls, 'shrink-0 text-xs')}>{label} ({pks.length})</Badge>
+                    <RSVPAvatars pubkeys={pks} maxVisible={8} size="sm" />
+                  </div>
+                ))}
+              </div>
+            </section>
+          </>
+        )}
+
+        {/* RSVP section */}
+        {showRSVP && (
+          <>
+            <Separator />
+            <section className="space-y-3">
+              <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide flex items-center gap-2">
+                <Check className="size-4" /> RSVP
+              </h2>
+              <div className="flex gap-2">
+                <Button
+                  size="sm"
+                  variant={myRsvp.status === 'accepted' ? 'default' : 'outline'}
+                  disabled={publishRSVP.isPending}
+                  className={cn('flex-1 rounded-full', myRsvp.status === 'accepted' && 'bg-green-600 hover:bg-green-700 text-white')}
+                  onClick={() => handleRSVP('accepted')}
+                >
+                  <Check className="size-3.5 mr-1.5" /> Going
+                </Button>
+                <Button
+                  size="sm"
+                  variant={myRsvp.status === 'tentative' ? 'default' : 'outline'}
+                  disabled={publishRSVP.isPending}
+                  className={cn('flex-1 rounded-full', myRsvp.status === 'tentative' && 'bg-amber-500 hover:bg-amber-600 text-white')}
+                  onClick={() => handleRSVP('tentative')}
+                >
+                  <Star className="size-3.5 mr-1.5" /> Interested
+                </Button>
+                <Button
+                  size="sm"
+                  variant={myRsvp.status === 'declined' ? 'default' : 'outline'}
+                  disabled={publishRSVP.isPending}
+                  className={cn('flex-1 rounded-full', myRsvp.status === 'declined' && 'bg-destructive hover:bg-destructive/90 text-destructive-foreground')}
+                  onClick={() => handleRSVP('declined')}
+                >
+                  <XIcon className="size-3.5 mr-1.5" /> Can't Go
+                </Button>
+              </div>
+            </section>
+          </>
         )}
       </div>
     </div>

@@ -17,6 +17,7 @@ import { Switch } from '@/components/ui/switch';
 import { Textarea } from '@/components/ui/textarea';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useNostrPublish } from '@/hooks/useNostrPublish';
+import { usePublishRSVP } from '@/hooks/usePublishRSVP';
 import { useToast } from '@/hooks/useToast';
 import { sanitizeUrl } from '@/lib/sanitizeUrl';
 
@@ -55,6 +56,7 @@ export function CreateCommunityEventDialog({ communityATag, open, onOpenChange }
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const { mutateAsync: publishEvent, isPending } = useNostrPublish();
+  const { mutateAsync: publishRSVP } = usePublishRSVP();
 
   const [step, setStep] = useState<1 | 2>(1);
   const [title, setTitle] = useState('');
@@ -197,6 +199,17 @@ export function CreateCommunityEventDialog({ communityATag, open, onOpenChange }
         tags,
       });
 
+      // Auto-RSVP the author as "accepted" so they appear in the attendees list.
+      // Best-effort: don't block on failure -- the event itself is already published.
+      const eventCoord = `${kind}:${user.pubkey}:${dTag}`;
+      publishRSVP({
+        eventCoord,
+        eventAuthorPubkey: user.pubkey,
+        status: 'accepted',
+      }).catch(() => {
+        // Silently ignore -- user can manually RSVP from the detail page if needed.
+      });
+
       await Promise.all([
         queryClient.invalidateQueries({ queryKey: ['feed'] }),
         ...(communityATag ? [
@@ -231,6 +244,7 @@ export function CreateCommunityEventDialog({ communityATag, open, onOpenChange }
     imageUrl,
     location,
     publishEvent,
+    publishRSVP,
     queryClient,
     startDate,
     startTime,
