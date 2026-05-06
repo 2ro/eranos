@@ -1,6 +1,5 @@
-import { useMemo, useCallback } from 'react';
+import { useMemo, useCallback, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { nip19 } from 'nostr-tools';
 import {
   ArrowLeft,
   CalendarDays,
@@ -10,9 +9,7 @@ import {
   Check,
   X as XIcon,
   Star,
-  Share2,
   ExternalLink,
-  Zap,
   Link as LinkIcon,
 } from 'lucide-react';
 import type { NostrEvent, NostrMetadata } from '@nostrify/nostrify';
@@ -22,8 +19,13 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { NoteContent } from '@/components/NoteContent';
+import { NoteMoreMenu } from '@/components/NoteMoreMenu';
+import { PostActionBar } from '@/components/PostActionBar';
+import { ReplyComposeModal } from '@/components/ReplyComposeModal';
 import { RSVPAvatars } from '@/components/RSVPAvatars';
-import { ZapDialog } from '@/components/ZapDialog';
+import { Skeleton } from '@/components/ui/skeleton';
+import { ThreadedReplyList, type ReplyNode } from '@/components/ThreadedReplyList';
+import { useComments } from '@/hooks/useComments';
 import { useAuthor } from '@/hooks/useAuthor';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useEventRSVPs } from '@/hooks/useEventRSVPs';
@@ -181,6 +183,29 @@ export function CalendarEventDetailPage({ event }: { event: NostrEvent }) {
   const rsvps = useEventRSVPs(eventCoord);
   const myRsvp = useMyRSVP(eventCoord);
   const publishRSVP = usePublishRSVP();
+  const { data: commentsData, isLoading: commentsLoading } = useComments(event, 500);
+  const [replyOpen, setReplyOpen] = useState(false);
+  const [moreMenuOpen, setMoreMenuOpen] = useState(false);
+
+  const replyTree = useMemo((): ReplyNode[] => {
+    const buildNode = (comment: NostrEvent): ReplyNode => {
+      const children = commentsData?.getDirectReplies(comment.id) ?? [];
+      if (children.length <= 1) {
+        return { event: comment, children: children.map((child) => buildNode(child)) };
+      }
+
+      const [first, ...rest] = children;
+      return {
+        event: comment,
+        children: [buildNode(first)],
+        hiddenChildren: rest.map((child) => buildNode(child)),
+      };
+    };
+
+    return [...(commentsData?.topLevelComments ?? [])]
+      .sort((a, b) => a.created_at - b.created_at)
+      .map((comment) => buildNode(comment));
+  }, [commentsData]);
 
   const handleRSVP = useCallback(async (status: 'accepted' | 'declined' | 'tentative') => {
     if (status === myRsvp.status) return;
@@ -195,22 +220,6 @@ export function CalendarEventDetailPage({ event }: { event: NostrEvent }) {
       toast({ title: 'Failed to update RSVP', variant: 'destructive' });
     }
   }, [eventCoord, event.pubkey, myRsvp.status, publishRSVP, toast]);
-
-  const handleShare = useCallback(async () => {
-    const d = getTag(event.tags, 'd') ?? '';
-    const naddr = nip19.naddrEncode({
-      kind: event.kind,
-      pubkey: event.pubkey,
-      identifier: d,
-    });
-    const url = `${window.location.origin}/${naddr}`;
-    try {
-      await navigator.clipboard.writeText(url);
-      toast({ title: 'Link copied to clipboard' });
-    } catch {
-      toast({ title: 'Failed to copy link', variant: 'destructive' });
-    }
-  }, [event, toast]);
 
   const showRSVP = !!user;
 
@@ -243,24 +252,10 @@ export function CalendarEventDetailPage({ event }: { event: NostrEvent }) {
       <div className="px-5 mt-5 space-y-5">
         {/* Title */}
         <h2 className="text-2xl font-bold leading-tight tracking-tight">{title}</h2>
-        {/* Organizer row + actions */}
+        {/* Organizer row */}
         <div className="flex items-center gap-3">
           <div className="flex-1 min-w-0">
             <PersonRow pubkey={event.pubkey} />
-          </div>
-          <div className="flex items-center gap-1 shrink-0">
-            <ZapDialog target={event}>
-              <button className="p-2 rounded-full hover:bg-secondary/60 transition-colors" aria-label="Zap">
-                <Zap className="size-5" />
-              </button>
-            </ZapDialog>
-            <button
-              className="p-2 rounded-full hover:bg-secondary/60 transition-colors"
-              onClick={handleShare}
-              aria-label="Share"
-            >
-              <Share2 className="size-5" />
-            </button>
           </div>
         </div>
 
@@ -406,6 +401,42 @@ export function CalendarEventDetailPage({ event }: { event: NostrEvent }) {
             </section>
           </>
         )}
+
+        <PostActionBar
+          event={event}
+          replyLabel="Comments"
+          onReply={() => setReplyOpen(true)}
+          onMore={() => setMoreMenuOpen(true)}
+          className="-mx-5 px-5"
+        />
+
+        <NoteMoreMenu event={event} open={moreMenuOpen} onOpenChange={setMoreMenuOpen} />
+        <ReplyComposeModal event={event} open={replyOpen} onOpenChange={setReplyOpen} />
+
+        <section>
+          {commentsLoading ? (
+            <div className="space-y-3">
+              {Array.from({ length: 3 }).map((_, i) => (
+                <div key={i} className="flex gap-3">
+                  <Skeleton className="size-10 rounded-full shrink-0" />
+                  <div className="flex-1 space-y-2">
+                    <Skeleton className="h-4 w-32" />
+                    <Skeleton className="h-4 w-full" />
+                    <Skeleton className="h-4 w-2/3" />
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : replyTree.length > 0 ? (
+            <div className="-mx-5">
+              <ThreadedReplyList roots={replyTree} />
+            </div>
+          ) : (
+            <div className="py-8 text-center text-muted-foreground text-sm">
+              No comments yet. Be the first to comment!
+            </div>
+          )}
+        </section>
       </div>
     </div>
   );
