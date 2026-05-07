@@ -279,12 +279,18 @@ export function AddMemberDialog({
           updatedTags.push(['a', badgeATag, '', 'member']);
         }
 
-        await publishEvent({
+        const updatedEvent = await publishEvent({
           kind: COMMUNITY_DEFINITION_KIND,
           content: prev?.content ?? '',
           tags: updatedTags,
           prev: prev ?? undefined,
         } as Omit<NostrEvent, 'id' | 'pubkey' | 'sig'> & { prev?: NostrEvent });
+
+        queryClient.setQueryData(
+          ['addr-event', COMMUNITY_DEFINITION_KIND, communityEvent.pubkey, community.dTag],
+          updatedEvent,
+        );
+        queryClient.setQueryData(['event', updatedEvent.id], updatedEvent);
       }
 
       // Step 3: Publish badge awards for each member
@@ -305,6 +311,9 @@ export function AddMemberDialog({
       }
 
       applyOptimisticMembership(pendingMembers, memberAwardEvents);
+      queryClient.invalidateQueries({ queryKey: ['addr-event', COMMUNITY_DEFINITION_KIND, communityEvent.pubkey, community.dTag] });
+      queryClient.invalidateQueries({ queryKey: ['community-members', community.aTag] });
+      queryClient.invalidateQueries({ queryKey: ['community-activity-feed'], exact: false });
       queryClient.invalidateQueries({ queryKey: ['my-communities'], exact: false });
       if (!hasBadge && newMembers.length > 0) {
         queryClient.invalidateQueries({ queryKey: ['badge-feed'] });
