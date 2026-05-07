@@ -162,11 +162,7 @@ function AgentChatView({ hasCredits }: { hasCredits: boolean | null }) {
                   heading="Rate limited."
                   body="You're sending messages too fast. Grab some credits on"
                 />
-              ) : (
-                <div className="rounded-lg bg-destructive/10 border border-destructive/20 text-destructive text-sm px-4 py-3">
-                  {apiError}
-                </div>
-              )
+              ) : null
             )}
 
             <div ref={messagesEndRef} />
