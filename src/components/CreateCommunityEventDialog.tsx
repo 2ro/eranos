@@ -1,6 +1,8 @@
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { CalendarDays, ChevronLeft } from 'lucide-react';
+import { useNostr } from '@nostrify/react';
 import { useQueryClient } from '@tanstack/react-query';
+import type { NostrEvent } from '@nostrify/nostrify';
 
 import {
   Dialog,
@@ -20,13 +22,32 @@ import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useNostrPublish } from '@/hooks/useNostrPublish';
 import { usePublishRSVP } from '@/hooks/usePublishRSVP';
 import { useToast } from '@/hooks/useToast';
+import { fetchFreshEvent } from '@/lib/fetchFreshEvent';
 import { sanitizeUrl } from '@/lib/sanitizeUrl';
 
 interface CreateCommunityEventDialogProps {
   communityATag?: string;
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  event?: NostrEvent;
 }
+
+const MANAGED_EDIT_TAGS = new Set([
+  'd',
+  'title',
+  'alt',
+  'summary',
+  'location',
+  'image',
+  'start',
+  'end',
+  'D',
+  'start_tzid',
+  'end_tzid',
+  'A',
+  'K',
+  'P',
+]);
 
 function slugify(text: string): string {
   return text
@@ -43,6 +64,22 @@ function addDays(date: string, days: number): string {
   return parsed.toISOString().slice(0, 10);
 }
 
+function subtractDays(date: string, days: number): string {
+  return addDays(date, -days);
+}
+
+function formatLocalDateTimeFields(timestamp: string): { date: string; time: string } {
+  const parsed = parseInt(timestamp, 10);
+  if (!Number.isFinite(parsed) || parsed <= 0) return { date: '', time: '' };
+
+  const date = new Date(parsed * 1000);
+  const pad = (n: number) => n.toString().padStart(2, '0');
+  return {
+    date: `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`,
+    time: `${pad(date.getHours())}:${pad(date.getMinutes())}`,
+  };
+}
+
 function toLocalTimestamp(date: string, time: string): number {
   return Math.floor(new Date(`${date}T${time}:00`).getTime() / 1000);
 }
@@ -52,8 +89,9 @@ function parseCommunityAuthor(communityATag: string): string | undefined {
   return pubkey || undefined;
 }
 
-export function CreateCommunityEventDialog({ communityATag, open, onOpenChange }: CreateCommunityEventDialogProps) {
+export function CreateCommunityEventDialog({ communityATag, open, onOpenChange, event }: CreateCommunityEventDialogProps) {
   const { user } = useCurrentUser();
+  const { nostr } = useNostr();
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const { mutateAsync: publishEvent, isPending } = useNostrPublish();
@@ -75,7 +113,9 @@ export function CreateCommunityEventDialog({ communityATag, open, onOpenChange }
     () => Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC',
     [],
   );
-  const isCommunityEvent = !!communityATag;
+  const isEditing = !!event;
+  const effectiveCommunityATag = communityATag ?? event?.tags.find(([name]) => name === 'A')?.[1];
+  const isCommunityEvent = !!effectiveCommunityATag;
 
   const resetForm = useCallback(() => {
     setStep(1);
@@ -96,6 +136,41 @@ export function CreateCommunityEventDialog({ communityATag, open, onOpenChange }
     onOpenChange(nextOpen);
   }, [onOpenChange, resetForm]);
 
+  useEffect(() => {
+    if (!open || !event) return;
+
+    const titleTag = event.tags.find(([name]) => name === 'title')?.[1] ?? '';
+    const summaryTag = event.tags.find(([name]) => name === 'summary')?.[1] ?? '';
+    const imageTag = event.tags.find(([name]) => name === 'image')?.[1] ?? '';
+    const locationTag = event.tags.find(([name]) => name === 'location')?.[1] ?? '';
+    const startTag = event.tags.find(([name]) => name === 'start')?.[1] ?? '';
+    const endTag = event.tags.find(([name]) => name === 'end')?.[1] ?? '';
+    const isAllDay = event.kind === 31922;
+
+    setStep(1);
+    setTitle(titleTag);
+    setDescription(summaryTag || event.content);
+    setImageUrl(imageTag);
+    setLocation(locationTag);
+    setAllDay(isAllDay);
+    setIsImageUploading(false);
+
+    if (isAllDay) {
+      setStartDate(startTag);
+      setStartTime('');
+      setEndDate(endTag ? subtractDays(endTag, 1) : '');
+      setEndTime('');
+      return;
+    }
+
+    const startFields = formatLocalDateTimeFields(startTag);
+    const endFields = formatLocalDateTimeFields(endTag);
+    setStartDate(startFields.date);
+    setStartTime(startFields.time);
+    setEndDate(endFields.date);
+    setEndTime(endFields.time);
+  }, [event, open]);
+
   const validateInfoStep = useCallback((): boolean => {
     if (!title.trim()) {
       toast({ title: 'Enter an event title', variant: 'destructive' });
@@ -104,14 +179,15 @@ export function CreateCommunityEventDialog({ communityATag, open, onOpenChange }
     return true;
   }, [title, toast]);
 
-  const handleNext = useCallback(() => {
+  const handleNext = useCallback((e?: React.MouseEvent<HTMLButtonElement>) => {
+    e?.preventDefault();
+    e?.stopPropagation();
     if (isImageUploading) return;
     if (!validateInfoStep()) return;
     setStep(2);
   }, [isImageUploading, validateInfoStep]);
 
-  const handleSubmit = useCallback(async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = useCallback(async () => {
     if (!user) return;
     if (isImageUploading) {
       toast({ title: 'Image is still uploading', description: 'Please wait for the upload to finish.' });
@@ -135,105 +211,123 @@ export function CreateCommunityEventDialog({ communityATag, open, onOpenChange }
     }
 
     const trimmedTitle = title.trim();
-    const dTag = `${slugify(trimmedTitle) || 'event'}-${Date.now()}`;
-    const tags: string[][] = [
-      ['d', dTag],
-      ['title', trimmedTitle],
-      ['alt', `${isCommunityEvent ? 'Community event' : 'Calendar event'}: ${trimmedTitle}`],
-    ];
-
-    if (communityATag) {
-      const communityAuthor = parseCommunityAuthor(communityATag);
-      tags.push(['A', communityATag], ['K', '34550']);
-      if (communityAuthor) {
-        tags.push(['P', communityAuthor]);
-      }
-    }
-
-    if (description.trim()) {
-      tags.push(['summary', description.trim()]);
-    }
-
-    if (location.trim()) {
-      tags.push(['location', location.trim()]);
-    }
-
-    if (imageUrl.trim()) {
-      const sanitizedImage = sanitizeUrl(imageUrl.trim());
-      if (!sanitizedImage) {
-        toast({ title: 'Image URL must be a valid https URL', variant: 'destructive' });
-        return;
-      }
-      tags.push(['image', sanitizedImage]);
-    }
-
-    let kind = 31922;
-    if (allDay) {
-      tags.push(['start', startDate]);
-      if (endDate) {
-        if (endDate < startDate) {
-          toast({ title: 'End date must be on or after the start date', variant: 'destructive' });
-          return;
-        }
-        tags.push(['end', addDays(endDate, 1)]);
-      }
-    } else {
-      kind = 31923;
-      const startTs = toLocalTimestamp(startDate, startTime);
-      if (!Number.isFinite(startTs) || startTs <= 0) {
-        toast({ title: 'Start date or time is invalid', variant: 'destructive' });
-        return;
-      }
-      tags.push(['start', String(startTs)]);
-      tags.push(['D', String(Math.floor(startTs / 86400))]);
-      tags.push(['start_tzid', timezone]);
-
-      if (endTime) {
-        const effectiveEndDate = endDate || startDate;
-        const endTs = toLocalTimestamp(effectiveEndDate, endTime);
-        if (!Number.isFinite(endTs) || endTs <= startTs) {
-          toast({ title: 'End time must be after the start time', variant: 'destructive' });
-          return;
-        }
-        tags.push(['end', String(endTs)]);
-        tags.push(['end_tzid', timezone]);
-      }
-    }
+    const dTag = event?.tags.find(([name]) => name === 'd')?.[1] || `${slugify(trimmedTitle) || 'event'}-${Date.now()}`;
+    let kind = isEditing && event ? event.kind : 31922;
 
     try {
-      await publishEvent({
+      const prev = isEditing && event
+        ? await fetchFreshEvent(nostr, {
+            kinds: [event.kind],
+            authors: [event.pubkey],
+            '#d': [dTag],
+          })
+        : undefined;
+      const preservedTags = isEditing
+        ? (prev?.tags ?? event?.tags ?? []).filter(([name]) => !MANAGED_EDIT_TAGS.has(name))
+        : [];
+      const tags: string[][] = [
+        ['d', dTag],
+        ['title', trimmedTitle],
+        ['alt', `${isCommunityEvent ? 'Community event' : 'Calendar event'}: ${trimmedTitle}`],
+        ...preservedTags,
+      ];
+
+      if (effectiveCommunityATag) {
+        const communityAuthor = parseCommunityAuthor(effectiveCommunityATag);
+        tags.push(['A', effectiveCommunityATag], ['K', '34550']);
+        if (communityAuthor) {
+          tags.push(['P', communityAuthor]);
+        }
+      }
+
+      if (description.trim()) {
+        tags.push(['summary', description.trim()]);
+      }
+
+      if (location.trim()) {
+        tags.push(['location', location.trim()]);
+      }
+
+      if (imageUrl.trim()) {
+        const sanitizedImage = sanitizeUrl(imageUrl.trim());
+        if (!sanitizedImage) {
+          toast({ title: 'Image URL must be a valid https URL', variant: 'destructive' });
+          return;
+        }
+        tags.push(['image', sanitizedImage]);
+      }
+
+      if (allDay) {
+        tags.push(['start', startDate]);
+        if (endDate) {
+          if (endDate < startDate) {
+            toast({ title: 'End date must be on or after the start date', variant: 'destructive' });
+            return;
+          }
+          tags.push(['end', addDays(endDate, 1)]);
+        }
+      } else {
+        if (!isEditing) kind = 31923;
+        const startTs = toLocalTimestamp(startDate, startTime);
+        if (!Number.isFinite(startTs) || startTs <= 0) {
+          toast({ title: 'Start date or time is invalid', variant: 'destructive' });
+          return;
+        }
+        tags.push(['start', String(startTs)]);
+        tags.push(['D', String(Math.floor(startTs / 86400))]);
+        tags.push(['start_tzid', timezone]);
+
+        if (endTime) {
+          const effectiveEndDate = endDate || startDate;
+          const endTs = toLocalTimestamp(effectiveEndDate, endTime);
+          if (!Number.isFinite(endTs) || endTs <= startTs) {
+            toast({ title: 'End time must be after the start time', variant: 'destructive' });
+            return;
+          }
+          tags.push(['end', String(endTs)]);
+          tags.push(['end_tzid', timezone]);
+        }
+      }
+
+      const publishedEvent = await publishEvent({
         kind,
         content: description.trim(),
         tags,
+        prev: prev ?? undefined,
       });
 
-      // Auto-RSVP the author as "accepted" so they appear in the attendees list.
-      // Best-effort: don't block on failure -- the event itself is already published.
-      const eventCoord = `${kind}:${user.pubkey}:${dTag}`;
-      publishRSVP({
-        eventCoord,
-        eventAuthorPubkey: user.pubkey,
-        status: 'accepted',
-      }).catch(() => {
-        // Silently ignore -- user can manually RSVP from the detail page if needed.
-      });
+      if (!isEditing) {
+        // Auto-RSVP the author as "accepted" so they appear in the attendees list.
+        // Best-effort: don't block on failure -- the event itself is already published.
+        const eventCoord = `${kind}:${user.pubkey}:${dTag}`;
+        publishRSVP({
+          eventCoord,
+          eventAuthorPubkey: user.pubkey,
+          status: 'accepted',
+        }).catch(() => {
+          // Silently ignore -- user can manually RSVP from the detail page if needed.
+        });
+      }
+
+      queryClient.setQueryData(['addr-event', kind, publishedEvent.pubkey, dTag], publishedEvent);
 
       await Promise.all([
         queryClient.invalidateQueries({ queryKey: ['feed'] }),
-        ...(communityATag ? [
-          queryClient.invalidateQueries({ queryKey: ['community-events', communityATag] }),
+        queryClient.invalidateQueries({ queryKey: ['addr-event', kind, publishedEvent.pubkey, dTag] }),
+        ...(effectiveCommunityATag ? [
+          queryClient.invalidateQueries({ queryKey: ['community-events', effectiveCommunityATag] }),
           queryClient.invalidateQueries({
           predicate: (q) => {
             const [root, aTagsKey] = q.queryKey;
             return root === 'community-activity-feed'
               && typeof aTagsKey === 'string'
-              && aTagsKey.split(',').includes(communityATag);
+              && aTagsKey.split(',').includes(effectiveCommunityATag);
           },
           }),
         ] : []),
       ]);
 
-      toast({ title: 'Event created!' });
+      toast({ title: isEditing ? 'Event updated!' : 'Event created!' });
       handleOpenChange(false);
     } catch (err) {
       toast({
@@ -244,14 +338,16 @@ export function CreateCommunityEventDialog({ communityATag, open, onOpenChange }
     }
   }, [
     allDay,
-    communityATag,
     description,
     endDate,
     endTime,
+    effectiveCommunityATag,
     handleOpenChange,
     imageUrl,
     isImageUploading,
+    isEditing,
     location,
+    nostr,
     publishEvent,
     publishRSVP,
     queryClient,
@@ -263,6 +359,7 @@ export function CreateCommunityEventDialog({ communityATag, open, onOpenChange }
     user,
     validateInfoStep,
     isCommunityEvent,
+    event,
   ]);
 
   if (!user) return null;
@@ -273,14 +370,14 @@ export function CreateCommunityEventDialog({ communityATag, open, onOpenChange }
         <DialogHeader className="px-5 pt-5 pb-3">
           <DialogTitle className="flex items-center gap-2">
             <CalendarDays className="size-5 text-primary" />
-            Create Event
+            {isEditing ? 'Edit Event' : 'Create Event'}
           </DialogTitle>
           <DialogDescription>
             Step {step} of 2 · {step === 1 ? 'What is happening?' : 'When and where?'}
           </DialogDescription>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={(e) => e.preventDefault()}>
           <ScrollArea className="max-h-[62vh]">
             <div className="px-5 pb-5 space-y-4">
               {step === 1 ? (
@@ -321,12 +418,15 @@ export function CreateCommunityEventDialog({ communityATag, open, onOpenChange }
                   <div className="flex items-center justify-between gap-4 rounded-xl border border-border px-3 py-3">
                     <div className="space-y-0.5">
                       <Label htmlFor="community-event-all-day">All-day event</Label>
-                      <p className="text-xs text-muted-foreground">Turn off to add start and end times.</p>
+                      <p className="text-xs text-muted-foreground">
+                        {isEditing ? "Event type can't be changed while editing." : 'Turn off to add start and end times.'}
+                      </p>
                     </div>
                     <Switch
                       id="community-event-all-day"
                       checked={allDay}
                       onCheckedChange={setAllDay}
+                      disabled={isEditing}
                     />
                   </div>
 
@@ -410,8 +510,8 @@ export function CreateCommunityEventDialog({ communityATag, open, onOpenChange }
                   <ChevronLeft className="size-4" />
                   Back
                 </Button>
-                <Button type="submit" className="flex-1" disabled={isPending || isImageUploading}>
-                  {isPending ? 'Creating...' : isImageUploading ? 'Uploading...' : 'Create Event'}
+                <Button type="button" className="flex-1" onClick={handleSubmit} disabled={isPending || isImageUploading}>
+                  {isPending ? (isEditing ? 'Saving...' : 'Creating...') : isImageUploading ? 'Uploading...' : isEditing ? 'Save Event' : 'Create Event'}
                 </Button>
               </>
             )}

@@ -9,6 +9,7 @@ import {
   Check,
   X as XIcon,
   Star,
+  Pencil,
   ExternalLink,
   Link as LinkIcon,
 } from 'lucide-react';
@@ -22,6 +23,7 @@ import { NoteContent } from '@/components/NoteContent';
 import { NoteMoreMenu } from '@/components/NoteMoreMenu';
 import { PostActionBar } from '@/components/PostActionBar';
 import { ReplyComposeModal } from '@/components/ReplyComposeModal';
+import { CreateCommunityEventDialog } from '@/components/CreateCommunityEventDialog';
 import { RSVPAvatars } from '@/components/RSVPAvatars';
 import { Skeleton } from '@/components/ui/skeleton';
 import { ThreadedReplyList, type ReplyNode } from '@/components/ThreadedReplyList';
@@ -186,6 +188,8 @@ export function CalendarEventDetailPage({ event }: { event: NostrEvent }) {
   const { data: commentsData, isLoading: commentsLoading } = useComments(event, 500);
   const [replyOpen, setReplyOpen] = useState(false);
   const [moreMenuOpen, setMoreMenuOpen] = useState(false);
+  const [editOpen, setEditOpen] = useState(false);
+  const canEdit = user?.pubkey === event.pubkey;
 
   const replyTree = useMemo((): ReplyNode[] => {
     const buildNode = (comment: NostrEvent): ReplyNode => {
@@ -235,6 +239,15 @@ export function CalendarEventDetailPage({ event }: { event: NostrEvent }) {
           <ArrowLeft className="size-5" />
         </button>
         <h1 className="text-xl font-bold flex-1">Event Details</h1>
+        {canEdit && (
+          <button
+            className="p-2 rounded-full hover:bg-secondary/60 transition-colors"
+            onClick={() => setEditOpen(true)}
+            aria-label="Edit event"
+          >
+            <Pencil className="size-5" />
+          </button>
+        )}
       </div>
 
       {/* ── Cover image ── */}
@@ -412,6 +425,13 @@ export function CalendarEventDetailPage({ event }: { event: NostrEvent }) {
 
         <NoteMoreMenu event={event} open={moreMenuOpen} onOpenChange={setMoreMenuOpen} />
         <ReplyComposeModal event={event} open={replyOpen} onOpenChange={setReplyOpen} />
+        {canEdit && (
+          <CreateCommunityEventDialog
+            open={editOpen}
+            onOpenChange={setEditOpen}
+            event={event}
+          />
+        )}
 
         <section>
           {commentsLoading ? (
