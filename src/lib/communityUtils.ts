@@ -428,11 +428,9 @@ export function resolveCommunityModeration(
   // non-members while founder/moderators can ban anyone.
   //
   // Candidates are sorted by reporter rank ascending so leadership bans
-  // are resolved before member bans. Because authority is strict
-  // (`reporter.rank < target.rank`), a banned reporter can never appear
-  // earlier in the sorted list than whoever banned them — so no extra
-  // `bannedPubkeys.has(reporter)` check is needed here. Pass 2 handles
-  // the remaining case (soft reports from members who end up banned).
+  // are resolved before member bans. A reporter banned by an earlier
+  // authoritative action must not retain moderation authority for later
+  // actions in the same pass.
 
   interface BanCandidate {
     parsed: CommunityReport;
@@ -457,6 +455,8 @@ export function resolveCommunityModeration(
   banCandidates.sort((a, b) => a.reporterRank - b.reporterRank);
 
   for (const { parsed: p } of banCandidates) {
+    if (bannedPubkeys.has(p.reporterPubkey)) continue;
+
     if (p.action === 'content-ban' && p.targetEventId) {
       const existing = contentBansByEventId.get(p.targetEventId) ?? [];
       existing.push({
