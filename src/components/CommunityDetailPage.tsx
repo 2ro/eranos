@@ -1,4 +1,5 @@
-import { useMemo, useCallback, useState } from 'react';
+import { useMemo, useCallback, useEffect, useState } from 'react';
+import { useInView } from 'react-intersection-observer';
 import { Link, useNavigate } from 'react-router-dom';
 import { nip19 } from 'nostr-tools';
 import {
@@ -6,8 +7,10 @@ import {
   Bookmark,
   CalendarDays,
   Crown,
+  Loader2,
   MessageCircle,
   Pencil,
+  Rss,
   Shield,
   ShieldBan,
   Share2,
@@ -26,9 +29,11 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { BanConfirmDialog } from '@/components/BanConfirmDialog';
 import { ComposeBox } from '@/components/ComposeBox';
+import { FeedEmptyState } from '@/components/FeedEmptyState';
 import { CreateGoalDialog } from '@/components/CreateGoalDialog';
 import { MembersOnlyToggle } from '@/components/MembersOnlyToggle';
 import { NoteCard } from '@/components/NoteCard';
+import { PullToRefresh } from '@/components/PullToRefresh';
 import { ReplyComposeModal } from '@/components/ReplyComposeModal';
 import { ThreadedReplyList, type ReplyNode } from '@/components/ThreadedReplyList';
 import { useAuthor } from '@/hooks/useAuthor';
@@ -39,13 +44,18 @@ import { useCommunityEvents } from '@/hooks/useCommunityEvents';
 import { useCommunityMembers } from '@/hooks/useCommunityMembers';
 import { useCommunityGoals } from '@/hooks/useCommunityGoals';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
+import { useFeed } from '@/hooks/useFeed';
 import { useMembersOnlyFilter } from '@/hooks/useMembersOnlyFilter';
+import { useMuteList } from '@/hooks/useMuteList';
 import { useNow } from '@/hooks/useNow';
+import { usePageRefresh } from '@/hooks/usePageRefresh';
 import { useProfileUrl } from '@/hooks/useProfileUrl';
 import { useToast } from '@/hooks/useToast';
 import { CommunityModerationContext } from '@/contexts/CommunityModerationContext';
 import { useLayoutOptions } from '@/contexts/LayoutContext';
 import { applyCommunityModerationToEvents, canBanTarget, getViewerAuthority, parseCommunityEvent, type CommunityMember } from '@/lib/communityUtils';
+import { isEventMuted } from '@/lib/muteHelpers';
+import { shouldHideFeedEvent, type FeedItem } from '@/lib/feedUtils';
 import { genUserName } from '@/lib/genUserName';
 import { sanitizeUrl } from '@/lib/sanitizeUrl';
 import { cn } from '@/lib/utils';
@@ -122,6 +132,94 @@ function ReplyCardSkeleton() {
         </div>
       </div>
     </div>
+  );
+}
+
+function CommunityMemberFeed({ authorPubkeys, isMembershipLoading }: { authorPubkeys: string[]; isMembershipLoading: boolean }) {
+  const { muteItems } = useMuteList();
+  const { ref: scrollRef, inView } = useInView({ threshold: 0, rootMargin: '400px' });
+  const queryKey = useMemo(() => ['feed', 'follows'], []);
+  const handleRefresh = usePageRefresh(queryKey);
+  const uniqueAuthors = useMemo(() => Array.from(new Set(authorPubkeys)), [authorPubkeys]);
+
+  const {
+    data: rawData,
+    isPending,
+    isLoading,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+  } = useFeed('follows', { authors: uniqueAuthors });
+
+  useEffect(() => {
+    if (inView && hasNextPage && !isFetchingNextPage) {
+      fetchNextPage();
+    }
+  }, [inView, hasNextPage, isFetchingNextPage, fetchNextPage]);
+
+  const feedItems = useMemo(() => {
+    if (!rawData?.pages) return [];
+    const seen = new Set<string>();
+
+    return (rawData.pages as { items: FeedItem[] }[])
+      .flatMap((page) => page.items)
+      .filter((item) => {
+        const key = item.repostedBy ? `repost-${item.repostedBy}-${item.event.id}` : item.event.id;
+        if (!key || seen.has(key)) return false;
+        seen.add(key);
+        if (shouldHideFeedEvent(item.event)) return false;
+        if (muteItems.length > 0 && isEventMuted(item.event, muteItems)) return false;
+        return true;
+      });
+  }, [rawData?.pages, muteItems]);
+
+  if (!isMembershipLoading && uniqueAuthors.length === 0) {
+    return (
+      <div className="py-12 text-center text-muted-foreground text-sm px-5">
+        No active members found.
+      </div>
+    );
+  }
+
+  if (isMembershipLoading || isPending || (isLoading && !rawData)) {
+    return (
+      <div className="divide-y divide-border">
+        {Array.from({ length: 5 }).map((_, i) => (
+          <ReplyCardSkeleton key={i} />
+        ))}
+      </div>
+    );
+  }
+
+  if (feedItems.length === 0) {
+    return (
+      <PullToRefresh onRefresh={handleRefresh}>
+        <FeedEmptyState message="No posts from active community members yet." />
+      </PullToRefresh>
+    );
+  }
+
+  return (
+    <PullToRefresh onRefresh={handleRefresh}>
+      <div>
+        {feedItems.map((item) => (
+          <NoteCard
+            key={item.repostedBy ? `repost-${item.repostedBy}-${item.event.id}` : item.event.id}
+            event={item.event}
+            repostedBy={item.repostedBy}
+          />
+        ))}
+        {hasNextPage && (
+          <div ref={scrollRef} className="py-4">
+            {isFetchingNextPage && (
+              <div className="flex justify-center">
+                <Loader2 className="size-5 animate-spin text-muted-foreground" />
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+    </PullToRefresh>
   );
 }
 
@@ -468,31 +566,38 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
         {/* ── Tabs ── */}
         <CommunityModerationContext.Provider value={moderationCtx}>
           <Tabs value={activeTab} onValueChange={setActiveTab} className="-mx-5">
-            <TabsList className="w-full rounded-none border-b border-border bg-transparent p-0 h-auto">
+            <TabsList className="w-full justify-start overflow-x-auto scrollbar-none rounded-none border-b border-border bg-transparent p-0 h-auto">
               <TabsTrigger
                 value="members"
-                className="flex-1 rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none pb-3 pt-2"
+                className="flex-none min-w-fit rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none px-4 pb-3 pt-2"
               >
                 <Users className="size-4 mr-1.5" />
                 Members
               </TabsTrigger>
               <TabsTrigger
+                value="feed"
+                className="flex-none min-w-fit rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none px-4 pb-3 pt-2"
+              >
+                <Rss className="size-4 mr-1.5" />
+                Feed
+              </TabsTrigger>
+              <TabsTrigger
                 value="comments"
-                className="flex-1 rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none pb-3 pt-2"
+                className="flex-none min-w-fit rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none px-4 pb-3 pt-2"
               >
                 <MessageCircle className="size-4 mr-1.5" />
                 Comments
               </TabsTrigger>
               <TabsTrigger
                 value="fundraising"
-                className="flex-1 rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none pb-3 pt-2"
+                className="flex-none min-w-fit rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none px-4 pb-3 pt-2"
               >
                 <Target className="size-4 mr-1.5" />
                 Fundraising
               </TabsTrigger>
               <TabsTrigger
                 value="events"
-                className="flex-1 rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none pb-3 pt-2"
+                className="flex-none min-w-fit rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none px-4 pb-3 pt-2"
               >
                 <CalendarDays className="size-4 mr-1.5" />
                 Events
@@ -544,6 +649,14 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
                   ))}
                 </div>
               )}
+            </TabsContent>
+
+            {/* ── Feed tab ── */}
+            <TabsContent value="feed" className="mt-0">
+              <CommunityMemberFeed
+                authorPubkeys={allMemberPubkeys}
+                isMembershipLoading={membersLoading}
+              />
             </TabsContent>
 
             {/* ── Comments tab ── */}
