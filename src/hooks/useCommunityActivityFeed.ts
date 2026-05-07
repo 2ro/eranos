@@ -25,15 +25,30 @@ interface ActivityFeedResult {
   moderationByATag: Map<string, CommunityModeration>;
   /** Flat authority maps keyed by community A tag (pre-moderation, for authority checks). */
   rankMapByATag: Map<string, Map<string, CommunityMember>>;
-  /** Cursor for the next comments/goals page. */
-  oldestActivityTimestamp: number;
-  /** Whether at least one paginated activity filter returned a full page. */
-  hasMoreActivity: boolean;
+  /** Cursor for the next comments page, when comments still have more events. */
+  commentsNextUntil?: number;
+  /** Cursor for the next goals page, when goals still have more events. */
+  goalsNextUntil?: number;
+  /** Whether comments still have more events. */
+  hasMoreComments: boolean;
+  /** Whether goals still have more events. */
+  hasMoreGoals: boolean;
+}
+
+interface ActivityFeedPageParam {
+  includeComments: boolean;
+  includeGoals: boolean;
+  commentsUntil?: number;
+  goalsUntil?: number;
 }
 
 const EMPTY_MODERATION_BY_A_TAG: ReadonlyMap<string, CommunityModeration> = new Map();
 const EMPTY_RANK_MAP_BY_A_TAG: ReadonlyMap<string, Map<string, CommunityMember>> = new Map();
 const ACTIVITY_PAGE_SIZE = 100;
+const INITIAL_PAGE_PARAM: ActivityFeedPageParam = {
+  includeComments: true,
+  includeGoals: true,
+};
 
 /**
  * Fetches a chronological activity feed for communities the current user
@@ -69,14 +84,14 @@ export function useCommunityActivityFeed() {
           events: [],
           moderationByATag: new Map(),
           rankMapByATag: new Map(),
-          oldestActivityTimestamp: Math.floor(Date.now() / 1000),
-          hasMoreActivity: false,
+          hasMoreComments: false,
+          hasMoreGoals: false,
         };
       }
 
       const timeout = AbortSignal.timeout(8_000);
       const combinedSignal = AbortSignal.any([signal, timeout]);
-      const until = pageParam as number | undefined;
+      const page = (pageParam as ActivityFeedPageParam | undefined) ?? INITIAL_PAGE_PARAM;
 
       const awardFilters = myCommunities
         .filter((entry) => !!entry.community.memberBadgeATag)
@@ -103,15 +118,17 @@ export function useCommunityActivityFeed() {
           { signal: combinedSignal },
         ),
         // Kind 1111 comments scoped to these communities via uppercase A tag
-        nostr.query(
-          [{
-            kinds: [1111],
-            '#A': aTags,
-            limit: ACTIVITY_PAGE_SIZE,
-            ...(until ? { until } : {}),
-          }],
-          { signal: combinedSignal },
-        ),
+        page.includeComments
+          ? nostr.query(
+            [{
+              kinds: [1111],
+              '#A': aTags,
+              limit: ACTIVITY_PAGE_SIZE,
+              ...(page.commentsUntil ? { until: page.commentsUntil } : {}),
+            }],
+            { signal: combinedSignal },
+          )
+          : Promise.resolve([] as NostrEvent[]),
         // Flat membership awards, one exhaustive query per community.
         awardFilters.length > 0
           ? Promise.all(
@@ -119,15 +136,17 @@ export function useCommunityActivityFeed() {
           ).then((pages) => pages.flat())
           : Promise.resolve([] as NostrEvent[]),
         // NIP-75 zap goals linked to these communities (lowercase a tag)
-        nostr.query(
-          [{
-            kinds: [ZAP_GOAL_KIND],
-            '#a': aTags,
-            limit: ACTIVITY_PAGE_SIZE,
-            ...(until ? { until } : {}),
-          }],
-          { signal: combinedSignal },
-        ),
+        page.includeGoals
+          ? nostr.query(
+            [{
+              kinds: [ZAP_GOAL_KIND],
+              '#a': aTags,
+              limit: ACTIVITY_PAGE_SIZE,
+              ...(page.goalsUntil ? { until: page.goalsUntil } : {}),
+            }],
+            { signal: combinedSignal },
+          )
+          : Promise.resolve([] as NostrEvent[]),
       ]);
 
       // ── Resolve membership and moderation per community ──
@@ -209,8 +228,8 @@ export function useCommunityActivityFeed() {
       // Sort by created_at descending
       merged.sort((a, b) => b.created_at - a.created_at);
 
-      const paginatedActivity = [...comments, ...goals];
-      const oldestActivityTimestamp = getPaginationCursor(paginatedActivity);
+      const hasMoreComments = page.includeComments && comments.length === ACTIVITY_PAGE_SIZE;
+      const hasMoreGoals = page.includeGoals && goals.length === ACTIVITY_PAGE_SIZE;
 
       // Seed the ['event', id] cache so embedded previews (quotes, reply
       // context, etc.) resolve instantly instead of refetching.
@@ -224,15 +243,22 @@ export function useCommunityActivityFeed() {
         events: merged,
         moderationByATag,
         rankMapByATag,
-        oldestActivityTimestamp,
-        hasMoreActivity: comments.length === ACTIVITY_PAGE_SIZE || goals.length === ACTIVITY_PAGE_SIZE,
+        commentsNextUntil: hasMoreComments ? getPaginationCursor(comments) - 1 : undefined,
+        goalsNextUntil: hasMoreGoals ? getPaginationCursor(goals) - 1 : undefined,
+        hasMoreComments,
+        hasMoreGoals,
       };
     },
     getNextPageParam: (lastPage) => {
-      if (!lastPage.hasMoreActivity) return undefined;
-      return lastPage.oldestActivityTimestamp - 1;
+      if (!lastPage.hasMoreComments && !lastPage.hasMoreGoals) return undefined;
+      return {
+        includeComments: lastPage.hasMoreComments,
+        includeGoals: lastPage.hasMoreGoals,
+        commentsUntil: lastPage.commentsNextUntil,
+        goalsUntil: lastPage.goalsNextUntil,
+      } satisfies ActivityFeedPageParam;
     },
-    initialPageParam: undefined as number | undefined,
+    initialPageParam: INITIAL_PAGE_PARAM,
     enabled: !communitiesLoading && aTags.length > 0,
     staleTime: 2 * 60_000,
     gcTime: 30 * 60_000,
