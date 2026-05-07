@@ -15,6 +15,7 @@ import {
   resolveCommunityModeration,
   resolveMembership,
 } from '@/lib/communityUtils';
+import { queryAll } from '@/lib/queryAll';
 
 interface CommunityMembersResult {
   /** Resolved membership with banned members removed. Use `members` to list active community members. */
@@ -49,9 +50,14 @@ export function useCommunityMembers(community: ParsedCommunity | null | undefine
 
       const awardAuthors = [community.founderPubkey, ...community.moderatorPubkeys];
 
+      // Exhaustive paging: awards and reports are unbounded sets that grow
+      // with the community. `queryAll` pages with `until` until the relay
+      // drains, capped at 5_000 events / 10 pages so worst-case cost is
+      // bounded. See src/lib/queryAll.ts.
       const awards = community.memberBadgeATag
-        ? await nostr.query(
-          [{ kinds: [BADGE_AWARD_KIND], authors: awardAuthors, '#a': [community.memberBadgeATag], limit: 500 }],
+        ? await queryAll(
+          nostr,
+          { kinds: [BADGE_AWARD_KIND], authors: awardAuthors, '#a': [community.memberBadgeATag], limit: 500 },
           { signal: combinedSignal },
         )
         : [];
@@ -66,8 +72,9 @@ export function useCommunityMembers(community: ParsedCommunity | null | undefine
       }
 
       const reportAuthors = fullMembership.members.map((member) => member.pubkey);
-      const reports = await nostr.query(
-        [{ kinds: [REPORT_KIND], authors: reportAuthors, '#A': [community.aTag], limit: 500 }],
+      const reports = await queryAll(
+        nostr,
+        { kinds: [REPORT_KIND], authors: reportAuthors, '#A': [community.aTag], limit: 500 },
         { signal: combinedSignal },
       );
 

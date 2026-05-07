@@ -16,6 +16,7 @@ import {
 } from '@/lib/communityUtils';
 import { ZAP_GOAL_KIND } from '@/lib/goalUtils';
 import { getPaginationCursor } from '@/lib/feedUtils';
+import { queryAll } from '@/lib/queryAll';
 
 /** Internal result type — events plus per-community moderation/membership data. */
 interface ActivityFeedResult {
@@ -87,6 +88,9 @@ export function useCommunityActivityFeed() {
         }));
 
       // Fetch community definitions, comments, membership awards, and goals in parallel.
+      // Awards are exhausted per-community with `queryAll` so every community's
+      // membership is complete, regardless of how many communities the user
+      // belongs to. See src/lib/queryAll.ts.
       const [definitionEvents, comments, awards, goals] = await Promise.all([
         // The community definitions themselves
         nostr.query(
@@ -108,13 +112,12 @@ export function useCommunityActivityFeed() {
           }],
           { signal: combinedSignal },
         ),
-        // Flat membership awards, scoped by each community's authorized awarders.
+        // Flat membership awards, one exhaustive query per community.
         awardFilters.length > 0
-          ? nostr.query(
-            awardFilters,
-            { signal: combinedSignal },
-          )
-          : Promise.resolve([]),
+          ? Promise.all(
+            awardFilters.map((f) => queryAll(nostr, f, { signal: combinedSignal })),
+          ).then((pages) => pages.flat())
+          : Promise.resolve([] as NostrEvent[]),
         // NIP-75 zap goals linked to these communities (lowercase a tag)
         nostr.query(
           [{
@@ -134,12 +137,9 @@ export function useCommunityActivityFeed() {
       // only be filtered from community A's posts, not from community B.
       //
       // We do **not** seed the `['community-members', aTag]` cache from
-      // this hook. The activity feed uses shared relay limits across all
-      // subscribed communities (awards and reports both capped at 500
-      // total), so per-community results can be incomplete. Overwriting
-      // the members cache with incomplete data would silently corrupt
-      // membership, authority, and moderation state on detail pages.
-      // `useCommunityMembers` is the authoritative per-community fetch.
+      // this hook. Even with exhaustive `queryAll` paging, the per-community
+      // fetch in `useCommunityMembers` may apply different filters or
+      // trigger a fresh read; keeping it authoritative avoids stale writes.
       const rankMapByATag = new Map<string, Map<string, CommunityMember>>();
       const reportAuthorSet = new Set<string>();
 
@@ -157,8 +157,9 @@ export function useCommunityActivityFeed() {
       }
 
       const reports = reportAuthorSet.size > 0
-        ? await nostr.query(
-          [{ kinds: [REPORT_KIND], authors: [...reportAuthorSet], '#A': aTags, limit: 500 }],
+        ? await queryAll(
+          nostr,
+          { kinds: [REPORT_KIND], authors: [...reportAuthorSet], '#A': aTags, limit: 500 },
           { signal: combinedSignal },
         )
         : [];
