@@ -185,6 +185,23 @@ export function CreateCommunityDialog({ open, onOpenChange, communityEvent, comm
       }
 
       const badgeDTag = `${effectiveSlug}-member`;
+      const existingBadge = await nostr.query([{
+        kinds: [BADGE_DEFINITION_KIND],
+        authors: [user.pubkey],
+        '#d': [badgeDTag],
+        limit: 1,
+      }]);
+
+      if (existingBadge.length > 0) {
+        toast({
+          title: 'Member badge ID already in use',
+          description: 'Choose a different community name so the member badge can be created safely.',
+          variant: 'destructive',
+        });
+        setIsPublishing(false);
+        return;
+      }
+
       const badgeEvent = await publishEvent({
         kind: BADGE_DEFINITION_KIND,
         content: '',

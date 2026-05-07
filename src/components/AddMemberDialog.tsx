@@ -228,6 +228,23 @@ export function AddMemberDialog({
       // Step 1: Create badge definition if needed
       if (newMembers.length > 0 && !hasBadge) {
         const badgeDTag = `${community.dTag}-member`;
+        const existingBadge = await nostr.query([{
+          kinds: [BADGE_DEFINITION_KIND],
+          authors: [user.pubkey],
+          '#d': [badgeDTag],
+          limit: 1,
+        }]);
+
+        if (existingBadge.length > 0) {
+          toast({
+            title: 'Member badge ID already in use',
+            description: 'This community needs a member badge, but that badge identifier already exists on your account.',
+            variant: 'destructive',
+          });
+          setIsPublishing(false);
+          return;
+        }
+
         const badgeTags: string[][] = [
           ['d', badgeDTag],
           ['name', 'Member'],
