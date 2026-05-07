@@ -47,24 +47,14 @@ export function useCommunityMembers(community: ParsedCommunity | null | undefine
 
       const combinedSignal = AbortSignal.any([signal, AbortSignal.timeout(10_000)]);
 
-      // Collect all badge a-tag coordinates from the community definition
-      const badgeATags = community.ranks
-        .filter((r) => r.badgeATag)
-        .map((r) => r.badgeATag!);
+      const awardAuthors = [community.founderPubkey, ...community.moderatorPubkeys];
 
-      // Fetch awards and reports in parallel
-      const [awards, reports] = await Promise.all([
-        badgeATags.length > 0
-          ? nostr.query(
-            [{ kinds: [BADGE_AWARD_KIND], '#a': badgeATags, limit: 500 }],
-            { signal: combinedSignal },
-          )
-          : Promise.resolve([]),
-        nostr.query(
-          [{ kinds: [REPORT_KIND], '#A': [community.aTag], limit: 500 }],
+      const awards = community.memberBadgeATag
+        ? await nostr.query(
+          [{ kinds: [BADGE_AWARD_KIND], authors: awardAuthors, '#a': [community.memberBadgeATag], limit: 500 }],
           { signal: combinedSignal },
-        ),
-      ]);
+        )
+        : [];
 
       // Step 1-2: Resolve full membership (needed for authority checks)
       const fullMembership = resolveMembership(community, awards);
@@ -75,7 +65,13 @@ export function useCommunityMembers(community: ParsedCommunity | null | undefine
         rankMap.set(m.pubkey, m);
       }
 
-      // Step 3: Resolve moderation using the rank map. The resolver
+      const reportAuthors = fullMembership.members.map((member) => member.pubkey);
+      const reports = await nostr.query(
+        [{ kinds: [REPORT_KIND], authors: reportAuthors, '#A': [community.aTag], limit: 500 }],
+        { signal: combinedSignal },
+      );
+
+      // Step 3: Resolve moderation using the flat membership map. The resolver
       // filters by `A` tag internally; we pass all reports as-is since
       // the relay query already scoped them to this community.
       const moderation = resolveCommunityModeration(community.aTag, reports, rankMap);

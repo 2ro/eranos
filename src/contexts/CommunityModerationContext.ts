@@ -12,7 +12,7 @@ export interface CommunityModerationContextValue {
   communityATag: string;
   /** Resolved moderation data (bans, reports, content warnings). */
   moderation: CommunityModeration;
-  /** Chain-validated rank lookup (pubkey → rank). Includes banned members — for authority checks only. */
+  /** Flat membership lookup (pubkey -> authority rank). Includes banned members for authority checks only. */
   rankMap: Map<string, CommunityMember>;
 }
 

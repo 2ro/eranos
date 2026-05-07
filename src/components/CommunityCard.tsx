@@ -17,7 +17,7 @@ interface CommunityCardProps {
   event: NostrEvent;
   /** Whether the current user founded this community. */
   isFounded?: boolean;
-  /** Whether the current user is a validated member (rank > 0 via badge chain). */
+  /** Whether the current user is a validated member. */
   isMember?: boolean;
   /** Whether the current user has bookmarked this community (NIP-51 kind 10004). */
   isBookmarked?: boolean;
@@ -49,8 +49,6 @@ export function CommunityCard({
     pubkey: event.pubkey,
     identifier: community.dTag,
   });
-
-  const rankCount = community.ranks.length - 1; // Exclude rank 0
 
   return (
     <Link
@@ -133,10 +131,10 @@ export function CommunityCard({
                 {community.moderatorPubkeys.length}
               </span>
             )}
-            {rankCount > 0 && (
+            {community.memberBadgeATag && (
               <span className="flex items-center gap-1 text-[11px] text-muted-foreground">
                 <Users className="size-3" />
-                {rankCount} rank{rankCount !== 1 ? 's' : ''}
+                Member badge
               </span>
             )}
           </div>

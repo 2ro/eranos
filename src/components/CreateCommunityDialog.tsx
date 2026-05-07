@@ -23,7 +23,7 @@ import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useNostrPublish } from '@/hooks/useNostrPublish';
 import { useToast } from '@/hooks/useToast';
 import { fetchFreshEvent } from '@/lib/fetchFreshEvent';
-import { COMMUNITY_DEFINITION_KIND, type ParsedCommunity } from '@/lib/communityUtils';
+import { BADGE_DEFINITION_KIND, COMMUNITY_DEFINITION_KIND, type ParsedCommunity } from '@/lib/communityUtils';
 import { sanitizeUrl } from '@/lib/sanitizeUrl';
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
@@ -184,8 +184,23 @@ export function CreateCommunityDialog({ open, onOpenChange, communityEvent, comm
         return;
       }
 
-      // Founder as moderator (p tag)
-      const communityTags = buildUpdatedCommunityTags([['p', user.pubkey, '', 'moderator']]);
+      const badgeDTag = `${effectiveSlug}-member`;
+      const badgeEvent = await publishEvent({
+        kind: BADGE_DEFINITION_KIND,
+        content: '',
+        tags: [
+          ['d', badgeDTag],
+          ['name', 'Member'],
+          ['description', `Member of ${name.trim()}`],
+          ['alt', `Badge definition: Member of ${name.trim()}`],
+        ],
+      } as Omit<NostrEvent, 'id' | 'pubkey' | 'sig'>);
+
+      // Founder as moderator (p tag) plus one flat member badge reference.
+      const communityTags = buildUpdatedCommunityTags([
+        ['a', `${BADGE_DEFINITION_KIND}:${badgeEvent.pubkey}:${badgeDTag}`, '', 'member'],
+        ['p', user.pubkey, '', 'moderator'],
+      ]);
 
       // Publish community definition (kind 34550)
       const createdEvent = await publishEvent({

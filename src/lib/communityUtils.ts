@@ -48,16 +48,7 @@ export const NIP56_REPORT_TYPE_META: Record<Nip56ReportType, { label: string; de
   other: { label: 'Other', description: 'Something else not listed above' },
 };
 
-// ── Rank tier metadata ────────────────────────────────────────────────────────
-
-export interface RankTier {
-  /** Numeric rank index (0 = founder/moderator, 1+ = badge-based). */
-  rank: number;
-  /** Badge `a` tag coordinate (e.g. `30009:<pubkey>:<d-tag>`). Undefined for rank 0. */
-  badgeATag?: string;
-  /** Optional relay hint from the community definition's `a` tag. */
-  relayHint?: string;
-}
+const HEX_PUBKEY_RE = /^[0-9a-f]{64}$/i;
 
 // ── Parsed community ──────────────────────────────────────────────────────────
 
@@ -74,8 +65,10 @@ export interface ParsedCommunity {
   founderPubkey: string;
   /** Moderator pubkeys (from `p` tags with role "moderator"). */
   moderatorPubkeys: string[];
-  /** Ordered rank tiers (rank 0 first, then badge-based ranks). */
-  ranks: RankTier[];
+  /** Member badge `a` tag coordinate (e.g. `30009:<pubkey>:<d-tag>`). */
+  memberBadgeATag?: string;
+  /** Optional relay hint from the community definition's member badge `a` tag. */
+  memberBadgeRelayHint?: string;
   /** Recommended relay URLs. */
   relays: string[];
   /** The `a` tag coordinate for the community: `34550:<pubkey>:<d-tag>`. */
@@ -98,32 +91,16 @@ export function parseCommunityEvent(event: NostrEvent): ParsedCommunity | null {
   const image = sanitizeUrl(rawImage);
 
   // Moderators: p tags with "moderator" role (4th element)
-  const moderatorPubkeys = event.tags
+  const moderatorPubkeys = Array.from(new Set(event.tags
     .filter(([n, , , role]) => n === 'p' && role === 'moderator')
     .map(([, pubkey]) => pubkey)
-    .filter(Boolean);
+    .filter((pubkey): pubkey is string => !!pubkey && pubkey !== event.pubkey && HEX_PUBKEY_RE.test(pubkey))));
 
-  // Badge rank tiers: a tags pointing to kind 30009 with rank index in 4th element
-  const badgeRanks: RankTier[] = [];
-  for (const tag of event.tags) {
-    if (tag[0] !== 'a') continue;
-    const coord = tag[1];
-    if (!coord || !coord.startsWith('30009:')) continue;
-    const rankStr = tag[3];
-    const rank = parseInt(rankStr, 10);
-    if (isNaN(rank) || rank < 1) continue;
-    badgeRanks.push({
-      rank,
-      badgeATag: coord,
-      relayHint: tag[2] || undefined,
-    });
-  }
-
-  // Sort badge ranks ascending
-  badgeRanks.sort((a, b) => a.rank - b.rank);
-
-  // Build full rank list: rank 0 (founder/moderators) + badge ranks
-  const ranks: RankTier[] = [{ rank: 0 }, ...badgeRanks];
+  const memberBadgeTag = event.tags.find(
+    ([n, coord, , role]) => n === 'a' && coord?.startsWith('30009:') && role === 'member',
+  );
+  const memberBadgeATag = memberBadgeTag?.[1];
+  const memberBadgeRelayHint = memberBadgeTag?.[2] || undefined;
 
   // Relay URLs
   const relays = event.tags
@@ -138,7 +115,8 @@ export function parseCommunityEvent(event: NostrEvent): ParsedCommunity | null {
     image,
     founderPubkey: event.pubkey,
     moderatorPubkeys,
-    ranks,
+    memberBadgeATag,
+    memberBadgeRelayHint,
     relays,
     aTag: `${COMMUNITY_DEFINITION_KIND}:${event.pubkey}:${dTag}`,
   };
@@ -151,7 +129,7 @@ export interface CommunityMember {
   pubkey: string;
   /** Their effective rank in this community. */
   rank: number;
-  /** The badge award event that established membership (undefined for rank 0). */
+  /** The badge award event that established membership (undefined for leadership). */
   awardEvent?: NostrEvent;
   /** Pubkey of whoever awarded them (undefined for rank 0). */
   awardedBy?: string;
@@ -352,7 +330,7 @@ export function parseCommunityReport(event: NostrEvent): CommunityReport | null 
   // Extract target pubkey (required on all reports)
   const pTag = event.tags.find(([n]) => n === 'p');
   const targetPubkey = pTag?.[1];
-  if (!targetPubkey) return null;
+  if (!targetPubkey || !HEX_PUBKEY_RE.test(targetPubkey)) return null;
 
   // Extract target event ID (optional — determines content vs member action)
   const eTag = event.tags.find(([n]) => n === 'e');
@@ -401,13 +379,10 @@ export function parseCommunityReport(event: NostrEvent): CommunityReport | null 
  * Uses a two-pass approach to prevent banned members from retaining
  * moderation authority:
  *
- * **Pass 1 — Resolve bans (rank-ordered):**
- * Collects all valid ban candidates (membership + authority checks), then
- * processes them sorted by reporter rank ascending. Because bans require
- * `reporter.rank < target.rank`, the ban graph is a DAG — processing in
- * rank order guarantees that by the time we evaluate a rank-N reporter's
- * bans, we've already finalised whether all lower-ranked members are
- * banned. If a reporter is themselves banned, their bans are skipped.
+ * **Pass 1 — Resolve bans (authority-ordered):**
+ * Founder/moderators (rank 0) can ban members and non-members. Members
+ * (rank 1) can ban only non-members. Processing leadership before members
+ * ensures banned members cannot keep moderation authority.
  *
  * **Pass 2 — Resolve reports (filtered):**
  * Processes non-ban reports, skipping any reporter who ended up in the
@@ -446,14 +421,11 @@ export function resolveCommunityModeration(
     parsed.push(p);
   }
 
-  // ── Pass 1: Resolve bans in rank order ─────────────────────────────
+  // ── Pass 1: Resolve bans in authority order ────────────────────────
   //
-  // Bans are processed sorted by reporter rank ascending. Because bans
-  // require `reporter.rank < target.rank`, this guarantees that by the
-  // time we evaluate a rank-N reporter's bans, we've already finalised
-  // whether any lower-ranked members they're relying on are themselves
-  // banned by a higher-ranked moderator. A banned reporter's bans are
-  // then skipped.
+  // Rank 0 means founder/moderator and rank 1 means member. The existing
+  // numeric check maps to the flat authority model: leadership can ban
+  // members/non-members, while members can only ban non-members (Infinity).
 
   interface BanCandidate {
     parsed: CommunityReport;
@@ -513,29 +485,18 @@ export function resolveCommunityModeration(
 }
 
 /**
- * Resolve community membership via the chain validation algorithm
- * described in the community NIP.
+ * Resolve flat community membership from founder/moderators plus membership
+ * awards already queried with `authors: [founder, ...moderators]`.
  *
- * 1. Seed rank 0 from the community definition (founder + moderators).
- * 2. Iteratively validate badge awards — awarder must be a validated
- *    member with rank strictly less than the awarded badge's rank.
+ * This resolver intentionally does not re-check award authors. The relay query
+ * authors filter is the trust boundary for authorized awarders.
  */
 export function resolveMembership(
   community: ParsedCommunity,
   awardEvents: NostrEvent[],
 ): CommunityMembership {
-  // Build badge-to-rank lookup
-  const badgeToRank = new Map<string, number>();
-  for (const tier of community.ranks) {
-    if (tier.badgeATag) {
-      badgeToRank.set(tier.badgeATag, tier.rank);
-    }
-  }
-
-  // Track validated members: pubkey -> CommunityMember
   const validated = new Map<string, CommunityMember>();
 
-  // Step 1: Seed rank 0
   validated.set(community.founderPubkey, {
     pubkey: community.founderPubkey,
     rank: 0,
@@ -546,52 +507,26 @@ export function resolveMembership(
     }
   }
 
-  // Step 2: Iterative validation
-  let changed = true;
-  const processed = new Set<string>();
-
-  while (changed) {
-    changed = false;
+  if (community.memberBadgeATag) {
     for (const award of awardEvents) {
-      if (processed.has(award.id)) continue;
-
-      const awarderPubkey = award.pubkey;
-      const awarder = validated.get(awarderPubkey);
-      if (!awarder) continue; // Awarder not validated yet
-
-      // Find which badge is being awarded
-      const badgeATag = award.tags.find(
-        ([n, v]) => n === 'a' && v?.startsWith('30009:'),
-      )?.[1];
+      if (award.kind !== BADGE_AWARD_KIND) continue;
+      const badgeATag = award.tags.find(([n, v]) => n === 'a' && v === community.memberBadgeATag)?.[1];
       if (!badgeATag) continue;
 
-      const awardedRank = badgeToRank.get(badgeATag);
-      if (awardedRank === undefined) continue; // Badge not in this community
-
-      // Awarder must have strictly lower rank number
-      if (awarder.rank >= awardedRank) continue;
-
-      // Find recipient(s)
       const recipients = award.tags
         .filter(([n]) => n === 'p')
         .map(([, pk]) => pk)
-        .filter(Boolean);
+        .filter((pk): pk is string => !!pk && HEX_PUBKEY_RE.test(pk));
 
       for (const recipientPk of recipients) {
-        const existing = validated.get(recipientPk);
-        // Only accept if it gives a better (lower) rank or first membership
-        if (!existing || awardedRank < existing.rank) {
-          validated.set(recipientPk, {
-            pubkey: recipientPk,
-            rank: awardedRank,
-            awardEvent: award,
-            awardedBy: awarderPubkey,
-          });
-          changed = true;
-        }
+        if (validated.has(recipientPk)) continue;
+        validated.set(recipientPk, {
+          pubkey: recipientPk,
+          rank: 1,
+          awardEvent: award,
+          awardedBy: award.pubkey,
+        });
       }
-
-      processed.add(award.id);
     }
   }
 

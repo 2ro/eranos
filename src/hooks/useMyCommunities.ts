@@ -75,10 +75,14 @@ export function useMyCommunities() {
 
       // Extract badge a-tag coordinates from awards
       const badgeATags = new Set<string>();
+      const awardsByBadgeATag = new Map<string, NostrEvent[]>();
       for (const award of awards) {
         for (const tag of award.tags) {
           if (tag[0] === 'a' && tag[1]?.startsWith('30009:')) {
             badgeATags.add(tag[1]);
+            const list = awardsByBadgeATag.get(tag[1]) ?? [];
+            list.push(award);
+            awardsByBadgeATag.set(tag[1], list);
           }
         }
       }
@@ -161,6 +165,11 @@ export function useMyCommunities() {
       for (const event of memberCommunityEvents) {
         const community = parseCommunityEvent(event);
         if (!community) continue;
+        if (!community.memberBadgeATag || !badgeATags.has(community.memberBadgeATag)) continue;
+        const authorizedAwarders = new Set([community.founderPubkey, ...community.moderatorPubkeys]);
+        const hasValidAward = (awardsByBadgeATag.get(community.memberBadgeATag) ?? [])
+          .some((award) => authorizedAwarders.has(award.pubkey));
+        if (!hasValidAward) continue;
         if (seen.has(community.aTag)) continue;
         seen.set(community.aTag, {
           community,

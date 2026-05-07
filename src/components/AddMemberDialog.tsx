@@ -64,6 +64,8 @@ interface AddMemberDialogProps {
   community: ParsedCommunity;
   /** Whether the current user is the founder (can add moderators). */
   isFounder: boolean;
+  /** Existing active members and moderators, excluded from duplicate adds. */
+  existingMemberPubkeys: string[];
 }
 
 // ── Component ─────────────────────────────────────────────────────────────────
@@ -74,6 +76,7 @@ export function AddMemberDialog({
   communityEvent,
   community,
   isFounder,
+  existingMemberPubkeys,
 }: AddMemberDialogProps) {
   const { user } = useCurrentUser();
   const { nostr } = useNostr();
@@ -94,8 +97,8 @@ export function AddMemberDialog({
   // Mutations
   const { mutateAsync: publishEvent } = useNostrPublish();
 
-  // Does this community already have a badge definition?
-  const existingBadgeATag = community.ranks.find((r) => r.rank === 1)?.badgeATag;
+  // Does this community already have a member badge definition?
+  const existingBadgeATag = community.memberBadgeATag;
   const hasBadge = !!existingBadgeATag;
 
   // Are there any pending members with the "member" role?
@@ -123,6 +126,10 @@ export function AddMemberDialog({
       toast({ title: 'Already the founder' });
       return;
     }
+    if (existingMemberPubkeys.includes(profile.pubkey)) {
+      toast({ title: 'Already in the community' });
+      return;
+    }
     if (pendingMembers.some((m) => m.profile.pubkey === profile.pubkey)) {
       toast({ title: 'Already added' });
       return;
@@ -130,7 +137,7 @@ export function AddMemberDialog({
     // Default role: member if they're not already a moderator, moderator if founder is adding
     const defaultRole: MemberRole = isFounder ? 'moderator' : 'member';
     setPendingMembers((prev) => [...prev, { profile, role: defaultRole }]);
-  }, [user, community.founderPubkey, pendingMembers, isFounder, toast]);
+  }, [user, community.founderPubkey, existingMemberPubkeys, pendingMembers, isFounder, toast]);
 
   const removePerson = useCallback((pubkey: string) => {
     setPendingMembers((prev) => prev.filter((m) => m.profile.pubkey !== pubkey));
@@ -206,6 +213,10 @@ export function AddMemberDialog({
       toast({ title: 'Image URL must be a valid https URL', variant: 'destructive' });
       return;
     }
+    if (needsBadgeCreation && !isFounder) {
+      toast({ title: 'Member badge is missing', description: 'Only the founder can initialize community membership.', variant: 'destructive' });
+      return;
+    }
 
     setIsPublishing(true);
     try {
@@ -265,7 +276,7 @@ export function AddMemberDialog({
 
         // Add badge a tag if badge was just created
         if (badgeATag && !hasBadge) {
-          updatedTags.push(['a', badgeATag, '', '1']);
+          updatedTags.push(['a', badgeATag, '', 'member']);
         }
 
         await publishEvent({
@@ -312,7 +323,7 @@ export function AddMemberDialog({
       setIsPublishing(false);
     }
   }, [
-    user, pendingMembers, existingBadgeATag, hasBadge, community, communityEvent,
+    user, pendingMembers, existingBadgeATag, hasBadge, needsBadgeCreation, isFounder, community, communityEvent,
     badgeImageUrl, nostr, publishEvent, queryClient, toast, handleOpenChange, applyOptimisticMembership, isBadgeImageUploading,
   ]);
 
@@ -343,6 +354,7 @@ export function AddMemberDialog({
                 onAdd={addPerson}
                 excludePubkeys={[
                   community.founderPubkey,
+                  ...existingMemberPubkeys,
                   ...pendingMembers.map((m) => m.profile.pubkey),
                 ]}
               />

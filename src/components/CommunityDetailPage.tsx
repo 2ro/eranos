@@ -222,41 +222,19 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
   );
   useAuthors(allMemberPubkeys);
 
-  // Group members by rank
-  const membersByRank = useMemo(() => {
-    if (!membership || !community) return [];
-    const groups = new Map<number, CommunityMember[]>();
-    for (const m of membership.members) {
-      const list = groups.get(m.rank) ?? [];
-      list.push(m);
-      groups.set(m.rank, list);
+  const memberSections = useMemo(() => {
+    if (!membership) return [];
+    const leadership: CommunityMember[] = [];
+    const members: CommunityMember[] = [];
+    for (const member of membership.members) {
+      if (member.rank === 0) leadership.push(member);
+      else members.push(member);
     }
-    // Build ordered groups with labels
-    const result: { rank: number; label: string; members: CommunityMember[] }[] = [];
-    const sortedRanks = Array.from(groups.keys()).sort((a, b) => a - b);
-    for (const rank of sortedRanks) {
-      const members = groups.get(rank)!;
-      let label: string;
-      if (rank === 0) {
-        label = 'Leadership';
-      } else {
-        // Find the badge a-tag for this rank from community definition
-        const tier = community.ranks.find((r) => r.rank === rank);
-        // Use the badge d-tag suffix as a label hint, or fall back to "Rank N"
-        if (tier?.badgeATag) {
-          const parts = tier.badgeATag.split(':');
-          const dTag = parts.slice(2).join(':');
-          // Try to extract a human-readable name from the d-tag (after the UUID prefix)
-          const namePart = dTag.split('-').pop();
-          label = namePart ? namePart.charAt(0).toUpperCase() + namePart.slice(1) : `Rank ${rank}`;
-        } else {
-          label = `Rank ${rank}`;
-        }
-      }
-      result.push({ rank, label, members });
-    }
-    return result;
-  }, [membership, community]);
+    return [
+      { key: 'leadership', label: 'Leadership', members: leadership },
+      { key: 'members', label: 'Members', members },
+    ].filter((section) => section.members.length > 0);
+  }, [membership]);
 
   // ── Comments (NIP-22 on the community event) ───────────────────────────────
   const { data: commentsData, isLoading: commentsLoading } = useComments(event, 500);
@@ -525,23 +503,23 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
             <TabsContent value="members" className="mt-0">
               {membersLoading ? (
                 <MembersSkeleton />
-              ) : membersByRank.length === 0 ? (
+              ) : memberSections.length === 0 ? (
                 <div className="py-12 text-center text-muted-foreground text-sm px-5">
                   No members found.
                 </div>
               ) : (
                 <div className="divide-y divide-border">
-                  {membersByRank.map(({ rank, label, members }) => (
-                    <section key={rank} className="px-5 py-4">
+                  {memberSections.map(({ key, label, members }) => (
+                    <section key={key} className="px-5 py-4">
                       <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-3 flex items-center gap-2">
-                        {rank === 0 ? <Crown className="size-3.5 text-amber-500" /> : <Shield className="size-3.5" />}
+                        {key === 'leadership' ? <Crown className="size-3.5 text-amber-500" /> : <Shield className="size-3.5" />}
                         {label}
                         <span className="text-muted-foreground/60 font-normal">({members.length})</span>
                       </h3>
                       <div className="space-y-0.5">
                         {members.map((m) => {
                           let roleLabel: string | undefined;
-                          if (rank === 0) {
+                          if (m.rank === 0) {
                             roleLabel = m.pubkey === event.pubkey ? 'Founder' : 'Moderator';
                           }
                           // Determine if the current user can ban this member
@@ -711,6 +689,7 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
           communityEvent={event}
           community={community}
           isFounder={isFounder}
+          existingMemberPubkeys={allMemberPubkeys}
         />
       )}
 

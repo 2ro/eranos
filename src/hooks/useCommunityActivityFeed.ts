@@ -77,16 +77,17 @@ export function useCommunityActivityFeed() {
       const combinedSignal = AbortSignal.any([signal, timeout]);
       const until = pageParam as number | undefined;
 
-      // Collect all badge a-tag coordinates across all communities for membership resolution
-      const allBadgeATags: string[] = [];
-      for (const entry of myCommunities) {
-        for (const rank of entry.community.ranks) {
-          if (rank.badgeATag) allBadgeATags.push(rank.badgeATag);
-        }
-      }
+      const awardFilters = myCommunities
+        .filter((entry) => !!entry.community.memberBadgeATag)
+        .map((entry) => ({
+          kinds: [BADGE_AWARD_KIND],
+          authors: [entry.community.founderPubkey, ...entry.community.moderatorPubkeys],
+          '#a': [entry.community.memberBadgeATag!],
+          limit: 500,
+        }));
 
-      // Fetch community definitions, comments, reports, badge awards, and goals in parallel
-      const [definitionEvents, comments, reports, awards, goals] = await Promise.all([
+      // Fetch community definitions, comments, membership awards, and goals in parallel.
+      const [definitionEvents, comments, awards, goals] = await Promise.all([
         // The community definitions themselves
         nostr.query(
           [{
@@ -107,19 +108,10 @@ export function useCommunityActivityFeed() {
           }],
           { signal: combinedSignal },
         ),
-        // Kind 1984 reports scoped to these communities
-        nostr.query(
-          [{
-            kinds: [REPORT_KIND],
-            '#A': aTags,
-            limit: 500,
-          }],
-          { signal: combinedSignal },
-        ),
-        // Badge awards for membership resolution
-        allBadgeATags.length > 0
+        // Flat membership awards, scoped by each community's authorized awarders.
+        awardFilters.length > 0
           ? nostr.query(
-            [{ kinds: [BADGE_AWARD_KIND], '#a': allBadgeATags, limit: 500 }],
+            awardFilters,
             { signal: combinedSignal },
           )
           : Promise.resolve([]),
@@ -148,19 +140,34 @@ export function useCommunityActivityFeed() {
       // the members cache with incomplete data would silently corrupt
       // membership, authority, and moderation state on detail pages.
       // `useCommunityMembers` is the authoritative per-community fetch.
-      const moderationByATag = new Map<string, CommunityModeration>();
       const rankMapByATag = new Map<string, Map<string, CommunityMember>>();
+      const reportAuthorSet = new Set<string>();
 
       for (const entry of myCommunities) {
         const community = entry.community;
 
-        // Resolve membership for this community.
+        // Resolve flat membership for this community.
         const fullMembership = resolveMembership(community, awards);
         const rankMap = new Map<string, CommunityMember>();
         for (const m of fullMembership.members) {
           rankMap.set(m.pubkey, m);
+          reportAuthorSet.add(m.pubkey);
         }
         rankMapByATag.set(community.aTag, rankMap);
+      }
+
+      const reports = reportAuthorSet.size > 0
+        ? await nostr.query(
+          [{ kinds: [REPORT_KIND], authors: [...reportAuthorSet], '#A': aTags, limit: 500 }],
+          { signal: combinedSignal },
+        )
+        : [];
+
+      const moderationByATag = new Map<string, CommunityModeration>();
+
+      for (const entry of myCommunities) {
+        const community = entry.community;
+        const rankMap = rankMapByATag.get(community.aTag) ?? new Map<string, CommunityMember>();
 
         // Resolve moderation. The resolver filters `reports` by matching
         // `A` tag internally, so we can pass the full cross-community
@@ -183,12 +190,17 @@ export function useCommunityActivityFeed() {
       };
 
       // ── Merge, deduplicate, and filter ──
+      const knownCommunityATags = new Set(aTags);
       const seen = new Set<string>();
       const merged: NostrEvent[] = [];
 
       for (const event of [...definitionEvents, ...comments, ...goals]) {
         if (seen.has(event.id)) continue;
         seen.add(event.id);
+        if (event.kind === COMMUNITY_DEFINITION_KIND) {
+          const dTag = event.tags.find(([n]) => n === 'd')?.[1];
+          if (!dTag || !knownCommunityATags.has(`${COMMUNITY_DEFINITION_KIND}:${event.pubkey}:${dTag}`)) continue;
+        }
         if (!isAllowed(event)) continue;
         merged.push(event);
       }
