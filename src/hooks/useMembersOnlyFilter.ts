@@ -10,10 +10,10 @@ const STORAGE_KEY = 'community:members-only';
  * Controls whether community views filter content down to posts authored by
  * validated members, or show everything scoped to the community.
  *
- * Defaults to `true` (members-only), which aligns with the NIP's "canonical
- * community feeds SHOULD discard non-member content by default" guidance
- * (see NIP.md §Community-Scoped Content). Users can opt out per their
- * preference via a shield-icon toggle in the UI.
+ * Defaults to `false` (show everything). The flat-communities spec treats
+ * members-only as a MAY feature (see NIP.md §Community-Scoped Content) —
+ * the protocol makes no recommendation, so the default is the broader view
+ * and users opt in via the shield-icon toggle.
  *
  * Implementation: a module-level singleton store (Set of subscribers +
  * cached boolean). Every component mounting `useMembersOnlyFilter` shares
@@ -23,21 +23,21 @@ const STORAGE_KEY = 'community:members-only';
  * via the browser's `storage` event.
  */
 
-/** Read the persisted boolean, defaulting to `true` when absent or malformed. */
+/** Read the persisted boolean, defaulting to `false` when absent or malformed. */
 function readFromStorage(): boolean {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
-    if (raw === null) return true;
+    if (raw === null) return false;
     return JSON.parse(raw) === true;
   } catch {
-    return true;
+    return false;
   }
 }
 
 // ── Module-level singleton store ────────────────────────────────────────────
 // Module initialisation accesses `localStorage` which is unavailable in some
 // SSR-ish environments. Guard so the module can still be imported.
-let cached: boolean = typeof localStorage !== 'undefined' ? readFromStorage() : true;
+let cached: boolean = typeof localStorage !== 'undefined' ? readFromStorage() : false;
 const subscribers = new Set<() => void>();
 
 function notify() {

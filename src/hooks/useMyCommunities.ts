@@ -7,6 +7,7 @@ import { COMMUNITIES_LIST_KIND, parseCommunityBookmarkATag } from './useCommunit
 import {
   COMMUNITY_DEFINITION_KIND,
   BADGE_AWARD_KIND,
+  isAuthorizedAward,
   parseCommunityEvent,
   type ParsedCommunity,
 } from '@/lib/communityUtils';
@@ -166,9 +167,8 @@ export function useMyCommunities() {
         const community = parseCommunityEvent(event);
         if (!community) continue;
         if (!community.memberBadgeATag || !badgeATags.has(community.memberBadgeATag)) continue;
-        const authorizedAwarders = new Set([community.founderPubkey, ...community.moderatorPubkeys]);
         const hasValidAward = (awardsByBadgeATag.get(community.memberBadgeATag) ?? [])
-          .some((award) => authorizedAwarders.has(award.pubkey));
+          .some((award) => isAuthorizedAward(award, community));
         if (!hasValidAward) continue;
         if (seen.has(community.aTag)) continue;
         seen.set(community.aTag, {

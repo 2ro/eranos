@@ -423,9 +423,16 @@ export function resolveCommunityModeration(
 
   // ── Pass 1: Resolve bans in authority order ────────────────────────
   //
-  // Rank 0 means founder/moderator and rank 1 means member. The existing
-  // numeric check maps to the flat authority model: leadership can ban
-  // members/non-members, while members can only ban non-members (Infinity).
+  // Rank 0 means founder/moderator and rank 1 means member. Non-members
+  // are treated as lowest rank (Infinity), so members can only ban
+  // non-members while founder/moderators can ban anyone.
+  //
+  // Candidates are sorted by reporter rank ascending so leadership bans
+  // are resolved before member bans. Because authority is strict
+  // (`reporter.rank < target.rank`), a banned reporter can never appear
+  // earlier in the sorted list than whoever banned them — so no extra
+  // `bannedPubkeys.has(reporter)` check is needed here. Pass 2 handles
+  // the remaining case (soft reports from members who end up banned).
 
   interface BanCandidate {
     parsed: CommunityReport;
@@ -437,22 +444,19 @@ export function resolveCommunityModeration(
   for (const p of parsed) {
     if (p.action !== 'content-ban' && p.action !== 'member-ban') continue;
 
-    // Reporter is guaranteed to be a member (filtered above).
-    const reporter = members.get(p.reporterPubkey)!;
-
-    // Authority check: reporter rank must be strictly less than target rank.
-    // Non-members are treated as lowest rank (Infinity).
+    // Reporter membership is guaranteed by the parse-time filter above.
+    const reporterRank = members.get(p.reporterPubkey)!.rank;
     const targetRank = members.get(p.targetPubkey)?.rank ?? Infinity;
-    if (reporter.rank >= targetRank) continue;
 
-    banCandidates.push({ parsed: p, reporterRank: reporter.rank });
+    // Authority check: strict rank inequality.
+    if (reporterRank >= targetRank) continue;
+
+    banCandidates.push({ parsed: p, reporterRank });
   }
 
   banCandidates.sort((a, b) => a.reporterRank - b.reporterRank);
 
   for (const { parsed: p } of banCandidates) {
-    if (bannedPubkeys.has(p.reporterPubkey)) continue;
-
     if (p.action === 'content-ban' && p.targetEventId) {
       const existing = contentBansByEventId.get(p.targetEventId) ?? [];
       existing.push({
@@ -485,11 +489,34 @@ export function resolveCommunityModeration(
 }
 
 /**
- * Resolve flat community membership from founder/moderators plus membership
- * awards already queried with `authors: [founder, ...moderators]`.
+ * Whether a kind 8 badge award is a valid membership award for a community.
  *
- * This resolver intentionally does not re-check award authors. The relay query
- * authors filter is the trust boundary for authorized awarders.
+ * Three conditions must hold (per NIP.md §Badge Awards):
+ * 1. The event is a kind 8 badge award.
+ * 2. The award author is the founder or a current moderator of the community.
+ * 3. The award contains an `a` tag referencing the community's member badge.
+ *
+ * This is the single source of truth for award authorization. Both the
+ * membership resolver and any discovery path that reaches awards through
+ * an unfiltered query (e.g. `#p`-based "communities I belong to" lookups)
+ * MUST apply this check before trusting the award.
+ */
+export function isAuthorizedAward(award: NostrEvent, community: ParsedCommunity): boolean {
+  if (award.kind !== BADGE_AWARD_KIND) return false;
+  if (!community.memberBadgeATag) return false;
+  if (award.pubkey !== community.founderPubkey && !community.moderatorPubkeys.includes(award.pubkey)) return false;
+  return award.tags.some(([n, v]) => n === 'a' && v === community.memberBadgeATag);
+}
+
+/**
+ * Resolve flat community membership from founder/moderators plus membership
+ * awards.
+ *
+ * Each award is validated via `isAuthorizedAward`. Callers SHOULD still query
+ * with `authors: [founder, ...moderators]` so the relay indexes the trust
+ * boundary, but this resolver enforces the same check client-side so that
+ * discovery paths which reach awards by other filters (e.g. `#p` on the
+ * viewer) stay consistent.
  */
 export function resolveMembership(
   community: ParsedCommunity,
@@ -507,26 +534,22 @@ export function resolveMembership(
     }
   }
 
-  if (community.memberBadgeATag) {
-    for (const award of awardEvents) {
-      if (award.kind !== BADGE_AWARD_KIND) continue;
-      const badgeATag = award.tags.find(([n, v]) => n === 'a' && v === community.memberBadgeATag)?.[1];
-      if (!badgeATag) continue;
+  for (const award of awardEvents) {
+    if (!isAuthorizedAward(award, community)) continue;
 
-      const recipients = award.tags
-        .filter(([n]) => n === 'p')
-        .map(([, pk]) => pk)
-        .filter((pk): pk is string => !!pk && HEX_PUBKEY_RE.test(pk));
+    const recipients = award.tags
+      .filter(([n]) => n === 'p')
+      .map(([, pk]) => pk)
+      .filter((pk): pk is string => !!pk && HEX_PUBKEY_RE.test(pk));
 
-      for (const recipientPk of recipients) {
-        if (validated.has(recipientPk)) continue;
-        validated.set(recipientPk, {
-          pubkey: recipientPk,
-          rank: 1,
-          awardEvent: award,
-          awardedBy: award.pubkey,
-        });
-      }
+    for (const recipientPk of recipients) {
+      if (validated.has(recipientPk)) continue;
+      validated.set(recipientPk, {
+        pubkey: recipientPk,
+        rank: 1,
+        awardEvent: award,
+        awardedBy: award.pubkey,
+      });
     }
   }
 

@@ -303,8 +303,8 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
 
     // Filter: omit banned events and posts by banned members, then optionally
     // restrict to validated members when the "members only" toggle is
-    // active. The member filter is a presentation-layer choice — the NIP
-    // recommends it as the canonical-feed default, but users may opt out.
+    // active. The member filter is a presentation-layer opt-in — the NIP
+    // lists it as a MAY feature, so users default to seeing everything.
     const applyModeration = (events: NostrEvent[]): NostrEvent[] => {
       const moderated = applyCommunityModerationToEvents(events, moderation);
       if (!membersOnly) return moderated;

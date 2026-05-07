@@ -468,7 +468,7 @@ Parent, child, sister, and rank relationships are intentionally out of scope for
 
 ### Membership Derivation
 
-Community membership is derived from three sources:
+Membership is sourced from the community definition and from validated kind `8` membership awards. This produces three populations:
 
 - **Founder** -- the `pubkey` field on the kind `34550` event. One per community, immutable. Controls the community definition since only they can republish the addressable event.
 - **Moderators** -- the `p` tags on the kind `34550` event with role `"moderator"` (matching [NIP-72](https://github.com/nostr-protocol/nips/blob/master/72.md)). Mutable by republishing the community definition.
@@ -585,7 +585,7 @@ The `authors` filter is the primary membership-award trust boundary. Awards from
 
 Community-scoped content is any event that tags the community definition with uppercase `A`. The foundation implementation starts with kind `1111` ([NIP-22](https://github.com/nostr-protocol/nips/blob/master/22.md)) posts, but the same moderation overlay applies to future community content kinds such as calendar events, polls, listings, or other domain-specific events.
 
-Clients SHOULD treat valid community members as the canonical authors for community views. Content from non-members MAY be shown in future review surfaces, but canonical community feeds SHOULD discard non-member content by default.
+Clients MAY offer a members-only view that filters community posts down to the resolved member set as an `authors` filter. Whether this is on by default, opt-in, or omitted entirely is a client UX choice -- the protocol makes no recommendation.
 
 #### Community Post
 
