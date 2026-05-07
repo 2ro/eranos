@@ -1,6 +1,6 @@
-import { useState, useCallback, useEffect, useRef } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Users, Upload, Loader2 } from 'lucide-react';
+import { Users, Loader2 } from 'lucide-react';
 import { useNostr } from '@nostrify/react';
 import { useQueryClient } from '@tanstack/react-query';
 import { nip19 } from 'nostr-tools';
@@ -18,12 +18,13 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { ImageUploadField } from '@/components/ImageUploadField';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useNostrPublish } from '@/hooks/useNostrPublish';
-import { useUploadFile } from '@/hooks/useUploadFile';
 import { useToast } from '@/hooks/useToast';
 import { fetchFreshEvent } from '@/lib/fetchFreshEvent';
 import { COMMUNITY_DEFINITION_KIND, type ParsedCommunity } from '@/lib/communityUtils';
+import { sanitizeUrl } from '@/lib/sanitizeUrl';
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
@@ -62,13 +63,11 @@ export function CreateCommunityDialog({ open, onOpenChange, communityEvent, comm
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [imageUrl, setImageUrl] = useState('');
-  const [imagePreview, setImagePreview] = useState('');
   const [isPublishing, setIsPublishing] = useState(false);
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [isImageUploading, setIsImageUploading] = useState(false);
 
   // Mutations
   const { mutateAsync: publishEvent } = useNostrPublish();
-  const { mutateAsync: uploadFile, isPending: isUploading } = useUploadFile();
 
   // Derived
   const effectiveSlug = isEditing && community ? community.dTag : slugify(name);
@@ -77,8 +76,8 @@ export function CreateCommunityDialog({ open, onOpenChange, communityEvent, comm
     setName(community?.name ?? '');
     setDescription(community?.description ?? '');
     setImageUrl(community?.image ?? '');
-    setImagePreview(community?.image ?? '');
     setIsPublishing(false);
+    setIsImageUploading(false);
   }, [community]);
 
   const resetForm = useCallback(() => {
@@ -88,8 +87,8 @@ export function CreateCommunityDialog({ open, onOpenChange, communityEvent, comm
       setName('');
       setDescription('');
       setImageUrl('');
-      setImagePreview('');
       setIsPublishing(false);
+      setIsImageUploading(false);
     }
   }, [isEditing, populateFromCommunity]);
 
@@ -104,32 +103,6 @@ export function CreateCommunityDialog({ open, onOpenChange, communityEvent, comm
     onOpenChange(nextOpen);
   }, [onOpenChange, resetForm]);
 
-  // ── Image upload ──────────────────────────────────────────────────────────
-
-  const handleFileSelect = useCallback(async (file: File) => {
-    if (!file.type.startsWith('image/')) {
-      toast({ title: 'Invalid file', description: 'Please select an image file.', variant: 'destructive' });
-      return;
-    }
-    const reader = new FileReader();
-    reader.onload = (e) => setImagePreview(e.target?.result as string);
-    reader.readAsDataURL(file);
-    try {
-      const [[, url]] = await uploadFile(file);
-      setImageUrl(url);
-      toast({ title: 'Image uploaded' });
-    } catch {
-      setImagePreview('');
-      toast({ title: 'Upload failed', description: 'Please try again.', variant: 'destructive' });
-    }
-  }, [uploadFile, toast]);
-
-  const handleDrop = useCallback((e: React.DragEvent) => {
-    e.preventDefault();
-    const file = e.dataTransfer.files[0];
-    if (file) handleFileSelect(file);
-  }, [handleFileSelect]);
-
   const buildUpdatedCommunityTags = useCallback((baseTags: string[][]): string[][] => {
     const tags = baseTags.filter(([name]) => !['d', 'name', 'description', 'image', 'alt'].includes(name));
     const nextTags: string[][] = [
@@ -141,8 +114,9 @@ export function CreateCommunityDialog({ open, onOpenChange, communityEvent, comm
       nextTags.push(['description', description.trim()]);
     }
 
-    if (imageUrl) {
-      nextTags.push(['image', imageUrl]);
+    const sanitizedImage = sanitizeUrl(imageUrl.trim());
+    if (sanitizedImage) {
+      nextTags.push(['image', sanitizedImage]);
     }
 
     nextTags.push(...tags);
@@ -155,6 +129,14 @@ export function CreateCommunityDialog({ open, onOpenChange, communityEvent, comm
 
   const handleCreate = useCallback(async () => {
     if (!user || !name.trim() || !effectiveSlug) return;
+    if (isImageUploading) {
+      toast({ title: 'Image is still uploading', description: 'Please wait for the upload to finish.' });
+      return;
+    }
+    if (imageUrl.trim() && !sanitizeUrl(imageUrl.trim())) {
+      toast({ title: 'Image URL must be a valid https URL', variant: 'destructive' });
+      return;
+    }
 
     setIsPublishing(true);
     try {
@@ -232,7 +214,7 @@ export function CreateCommunityDialog({ open, onOpenChange, communityEvent, comm
       setIsPublishing(false);
     }
   }, [
-    user, name, effectiveSlug, isEditing, communityEvent, community, nostr,
+    user, name, effectiveSlug, isEditing, communityEvent, community, nostr, isImageUploading, imageUrl,
     publishEvent, buildUpdatedCommunityTags, queryClient, toast, handleOpenChange, navigate,
   ]);
 
@@ -240,7 +222,7 @@ export function CreateCommunityDialog({ open, onOpenChange, communityEvent, comm
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
-      <DialogContent className="sm:max-w-md gap-0 p-0 overflow-hidden">
+      <DialogContent className="sm:max-w-lg gap-0 p-0 overflow-hidden">
         <DialogHeader className="px-5 pt-5 pb-3">
           <DialogTitle className="flex items-center gap-2">
             <Users className="size-5 text-primary" />
@@ -253,7 +235,7 @@ export function CreateCommunityDialog({ open, onOpenChange, communityEvent, comm
           </DialogDescription>
         </DialogHeader>
 
-        <ScrollArea className="max-h-[60vh]">
+        <ScrollArea className="max-h-[calc(100vh-9rem)] sm:max-h-none">
           <div className="px-5 pb-5 space-y-4">
             {/* Community name */}
             <div className="space-y-1.5">
@@ -272,46 +254,15 @@ export function CreateCommunityDialog({ open, onOpenChange, communityEvent, comm
               )}
             </div>
 
-            {/* Image upload */}
-            <div className="space-y-1.5">
-              <Label>
-                Community Image
-                <span className="text-muted-foreground font-normal ml-1">(recommended)</span>
-              </Label>
-              <div
-                role="button"
-                tabIndex={0}
-                onClick={() => fileInputRef.current?.click()}
-                onDrop={handleDrop}
-                onDragOver={(e) => e.preventDefault()}
-                onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') fileInputRef.current?.click(); }}
-                className="relative flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-border rounded-xl bg-secondary/5 hover:bg-secondary/10 transition-colors cursor-pointer overflow-hidden"
-              >
-                {imagePreview ? (
-                  <img src={imagePreview} alt="Community image preview" className="w-full h-full object-cover" />
-                ) : isUploading ? (
-                  <div className="flex flex-col items-center gap-2 text-muted-foreground">
-                    <Loader2 className="size-6 animate-spin" />
-                    <span className="text-xs">Uploading...</span>
-                  </div>
-                ) : (
-                  <div className="flex flex-col items-center gap-2 text-muted-foreground">
-                    <Upload className="size-6 opacity-40" />
-                    <span className="text-xs">Drop an image or click to upload</span>
-                  </div>
-                )}
-                <input
-                  ref={fileInputRef}
-                  type="file"
-                  accept="image/*"
-                  className="hidden"
-                  onChange={(e) => {
-                    const file = e.target.files?.[0];
-                    if (file) handleFileSelect(file);
-                  }}
-                />
-              </div>
-            </div>
+            <ImageUploadField
+              id="community-image"
+              label={<>Community Image <span className="text-muted-foreground font-normal">(recommended)</span></>}
+              value={imageUrl}
+              onChange={setImageUrl}
+              onUploadingChange={setIsImageUploading}
+              previewAlt="Community image preview"
+              dropAreaClassName="min-h-32"
+            />
 
             {/* Description */}
             <div className="space-y-1.5">
@@ -331,7 +282,7 @@ export function CreateCommunityDialog({ open, onOpenChange, communityEvent, comm
             {/* Submit button */}
             <Button
               onClick={handleCreate}
-              disabled={!name.trim() || !effectiveSlug || isPublishing || isUploading}
+              disabled={!name.trim() || !effectiveSlug || isPublishing || isImageUploading}
               className="w-full gap-2"
             >
               {isPublishing ? (

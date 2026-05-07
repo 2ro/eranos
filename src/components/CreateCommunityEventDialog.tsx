@@ -1,5 +1,5 @@
-import { useCallback, useMemo, useRef, useState } from 'react';
-import { CalendarDays, ChevronLeft, Loader2, Upload, X } from 'lucide-react';
+import { useCallback, useMemo, useState } from 'react';
+import { CalendarDays, ChevronLeft } from 'lucide-react';
 import { useQueryClient } from '@tanstack/react-query';
 
 import {
@@ -15,13 +15,11 @@ import { Label } from '@/components/ui/label';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Switch } from '@/components/ui/switch';
 import { Textarea } from '@/components/ui/textarea';
+import { ImageUploadField } from '@/components/ImageUploadField';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
-import { useAppContext } from '@/hooks/useAppContext';
 import { useNostrPublish } from '@/hooks/useNostrPublish';
 import { usePublishRSVP } from '@/hooks/usePublishRSVP';
 import { useToast } from '@/hooks/useToast';
-import { useUploadFile } from '@/hooks/useUploadFile';
-import { resizeImage } from '@/lib/resizeImage';
 import { sanitizeUrl } from '@/lib/sanitizeUrl';
 
 interface CreateCommunityEventDialogProps {
@@ -56,13 +54,10 @@ function parseCommunityAuthor(communityATag: string): string | undefined {
 
 export function CreateCommunityEventDialog({ communityATag, open, onOpenChange }: CreateCommunityEventDialogProps) {
   const { user } = useCurrentUser();
-  const { config } = useAppContext();
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const { mutateAsync: publishEvent, isPending } = useNostrPublish();
   const { mutateAsync: publishRSVP } = usePublishRSVP();
-  const { mutateAsync: uploadFile, isPending: isUploading } = useUploadFile();
-  const imageInputRef = useRef<HTMLInputElement>(null);
 
   const [step, setStep] = useState<1 | 2>(1);
   const [title, setTitle] = useState('');
@@ -74,6 +69,7 @@ export function CreateCommunityEventDialog({ communityATag, open, onOpenChange }
   const [endDate, setEndDate] = useState('');
   const [endTime, setEndTime] = useState('');
   const [location, setLocation] = useState('');
+  const [isImageUploading, setIsImageUploading] = useState(false);
 
   const timezone = useMemo(
     () => Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC',
@@ -92,6 +88,7 @@ export function CreateCommunityEventDialog({ communityATag, open, onOpenChange }
     setEndDate('');
     setEndTime('');
     setLocation('');
+    setIsImageUploading(false);
   }, []);
 
   const handleOpenChange = useCallback((nextOpen: boolean) => {
@@ -108,57 +105,15 @@ export function CreateCommunityEventDialog({ communityATag, open, onOpenChange }
   }, [title, toast]);
 
   const handleNext = useCallback(() => {
-    if (isUploading) return;
+    if (isImageUploading) return;
     if (!validateInfoStep()) return;
     setStep(2);
-  }, [isUploading, validateInfoStep]);
-
-  const handleImageFile = useCallback(async (file: File) => {
-    if (!file.type.startsWith('image/')) {
-      toast({ title: 'Invalid file', description: 'Please choose an image file.', variant: 'destructive' });
-      return;
-    }
-
-    try {
-      const uploadableFile = config.imageQuality === 'compressed'
-        ? (await resizeImage(file)).file
-        : file;
-      const [[, url]] = await uploadFile(uploadableFile);
-      setImageUrl(url);
-      toast({ title: 'Image uploaded' });
-    } catch (err) {
-      toast({
-        title: 'Upload failed',
-        description: err instanceof Error ? err.message : 'Please try again.',
-        variant: 'destructive',
-      });
-    }
-  }, [config.imageQuality, toast, uploadFile]);
-
-  const handleImagePaste = useCallback((e: React.ClipboardEvent) => {
-    const items = e.clipboardData?.items;
-    if (!items) return;
-
-    for (const item of Array.from(items)) {
-      if (!item.type.startsWith('image/')) continue;
-      const file = item.getAsFile();
-      if (!file) return;
-      e.preventDefault();
-      void handleImageFile(file);
-      return;
-    }
-  }, [handleImageFile]);
-
-  const handleImageDrop = useCallback((e: React.DragEvent) => {
-    e.preventDefault();
-    const file = e.dataTransfer.files[0];
-    if (file) void handleImageFile(file);
-  }, [handleImageFile]);
+  }, [isImageUploading, validateInfoStep]);
 
   const handleSubmit = useCallback(async (e: React.FormEvent) => {
     e.preventDefault();
     if (!user) return;
-    if (isUploading) {
+    if (isImageUploading) {
       toast({ title: 'Image is still uploading', description: 'Please wait for the upload to finish.' });
       return;
     }
@@ -295,7 +250,7 @@ export function CreateCommunityEventDialog({ communityATag, open, onOpenChange }
     endTime,
     handleOpenChange,
     imageUrl,
-    isUploading,
+    isImageUploading,
     location,
     publishEvent,
     publishRSVP,
@@ -326,7 +281,7 @@ export function CreateCommunityEventDialog({ communityATag, open, onOpenChange }
         </DialogHeader>
 
         <form onSubmit={handleSubmit}>
-          <ScrollArea className="max-h-[62vh]" onPaste={handleImagePaste}>
+          <ScrollArea className="max-h-[62vh]">
             <div className="px-5 pb-5 space-y-4">
               {step === 1 ? (
                 <>
@@ -352,68 +307,14 @@ export function CreateCommunityEventDialog({ communityATag, open, onOpenChange }
                     />
                   </div>
 
-                  <div className="space-y-1.5">
-                    <Label htmlFor="community-event-image">Image (recommended)</Label>
-                    <div>
-                    <div
-                      role="button"
-                      tabIndex={0}
-                      onClick={() => imageInputRef.current?.click()}
-                      onDrop={handleImageDrop}
-                      onDragOver={(e) => e.preventDefault()}
-                      onKeyDown={(e) => {
-                        if (e.key === 'Enter' || e.key === ' ') imageInputRef.current?.click();
-                      }}
-                      className="relative flex min-h-28 w-full cursor-pointer flex-col items-center justify-center overflow-hidden rounded-t-xl border border-b-0 border-dashed border-border bg-secondary/20 text-center transition-colors hover:bg-secondary/35 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-                    >
-                      {isUploading ? (
-                        <div className="flex flex-col items-center gap-2 text-muted-foreground">
-                          <Loader2 className="size-5 animate-spin" />
-                          <span className="text-xs">Uploading image...</span>
-                        </div>
-                      ) : sanitizeUrl(imageUrl) ? (
-                        <>
-                          <img src={sanitizeUrl(imageUrl)} alt="Event image preview" className="absolute inset-0 h-full w-full object-cover" />
-                          <button
-                            type="button"
-                            aria-label="Remove image"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              setImageUrl('');
-                              if (imageInputRef.current) imageInputRef.current.value = '';
-                            }}
-                            className="absolute right-2 top-2 rounded-full bg-background/90 p-1 text-muted-foreground shadow-sm transition-colors hover:text-destructive"
-                          >
-                            <X className="size-4" />
-                          </button>
-                        </>
-                      ) : (
-                        <div className="flex flex-col items-center gap-2 px-4 text-muted-foreground">
-                          <Upload className="size-5 opacity-50" />
-                          <span className="text-xs">Paste, drop, or click to upload an image</span>
-                        </div>
-                      )}
-                      <input
-                        ref={imageInputRef}
-                        type="file"
-                        accept="image/*"
-                        className="hidden"
-                        onChange={(e) => {
-                          const file = e.target.files?.[0];
-                          if (file) void handleImageFile(file);
-                        }}
-                      />
-                    </div>
-                    <Input
-                      id="community-event-image"
-                      type="url"
-                      placeholder="Paste an image URL, or upload above"
-                      value={imageUrl}
-                      onChange={(e) => setImageUrl(e.target.value)}
-                      className="rounded-t-none rounded-b-xl"
-                    />
-                    </div>
-                  </div>
+                  <ImageUploadField
+                    id="community-event-image"
+                    label="Image (recommended)"
+                    value={imageUrl}
+                    onChange={setImageUrl}
+                    onUploadingChange={setIsImageUploading}
+                    previewAlt="Event image preview"
+                  />
                 </>
               ) : (
                 <>
@@ -499,8 +400,8 @@ export function CreateCommunityEventDialog({ communityATag, open, onOpenChange }
                 <Button type="button" variant="outline" className="flex-1" onClick={() => handleOpenChange(false)}>
                   Cancel
                 </Button>
-                <Button type="button" className="flex-1" onClick={handleNext} disabled={isUploading}>
-                  {isUploading ? 'Uploading...' : 'Next'}
+                <Button type="button" className="flex-1" onClick={handleNext} disabled={isImageUploading}>
+                  {isImageUploading ? 'Uploading...' : 'Next'}
                 </Button>
               </>
             ) : (
@@ -509,8 +410,8 @@ export function CreateCommunityEventDialog({ communityATag, open, onOpenChange }
                   <ChevronLeft className="size-4" />
                   Back
                 </Button>
-                <Button type="submit" className="flex-1" disabled={isPending || isUploading}>
-                  {isPending ? 'Creating...' : isUploading ? 'Uploading...' : 'Create Event'}
+                <Button type="submit" className="flex-1" disabled={isPending || isImageUploading}>
+                  {isPending ? 'Creating...' : isImageUploading ? 'Uploading...' : 'Create Event'}
                 </Button>
               </>
             )}

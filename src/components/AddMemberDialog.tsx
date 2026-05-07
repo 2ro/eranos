@@ -1,5 +1,5 @@
 import { useState, useCallback, useRef, useEffect, useMemo } from 'react';
-import { UserPlus, Upload, Loader2, X, Search, Crown, Users } from 'lucide-react';
+import { UserPlus, Loader2, X, Search, Crown, Users } from 'lucide-react';
 import { useNostr } from '@nostrify/react';
 import { useQueryClient } from '@tanstack/react-query';
 import type { NostrEvent } from '@nostrify/nostrify';
@@ -17,16 +17,17 @@ import { Label } from '@/components/ui/label';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
+import { ImageUploadField } from '@/components/ImageUploadField';
 import { getAvatarShape } from '@/lib/avatarShape';
 import { EmojifiedText } from '@/components/CustomEmoji';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useNostrPublish } from '@/hooks/useNostrPublish';
-import { useUploadFile } from '@/hooks/useUploadFile';
 import { useToast } from '@/hooks/useToast';
 import { useSearchProfiles, type SearchProfile } from '@/hooks/useSearchProfiles';
 import { PortalContainerProvider } from '@/hooks/usePortalContainer';
 import { genUserName } from '@/lib/genUserName';
 import { fetchFreshEvent } from '@/lib/fetchFreshEvent';
+import { sanitizeUrl } from '@/lib/sanitizeUrl';
 import {
   COMMUNITY_DEFINITION_KIND,
   BADGE_DEFINITION_KIND,
@@ -82,10 +83,9 @@ export function AddMemberDialog({
   // Form state
   const [pendingMembers, setPendingMembers] = useState<PendingMember[]>([]);
   const [badgeImageUrl, setBadgeImageUrl] = useState('');
-  const [badgeImagePreview, setBadgeImagePreview] = useState('');
+  const [isBadgeImageUploading, setIsBadgeImageUploading] = useState(false);
   const [isPublishing, setIsPublishing] = useState(false);
   const [portalContainer, setPortalContainer] = useState<HTMLElement | undefined>(undefined);
-  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const dialogContentRef = useCallback((node: HTMLElement | null) => {
     setPortalContainer(node ?? undefined);
@@ -93,7 +93,6 @@ export function AddMemberDialog({
 
   // Mutations
   const { mutateAsync: publishEvent } = useNostrPublish();
-  const { mutateAsync: uploadFile, isPending: isUploading } = useUploadFile();
 
   // Does this community already have a badge definition?
   const existingBadgeATag = community.ranks.find((r) => r.rank === 1)?.badgeATag;
@@ -107,7 +106,7 @@ export function AddMemberDialog({
   const resetForm = useCallback(() => {
     setPendingMembers([]);
     setBadgeImageUrl('');
-    setBadgeImagePreview('');
+    setIsBadgeImageUploading(false);
     setIsPublishing(false);
   }, []);
 
@@ -195,36 +194,18 @@ export function AddMemberDialog({
     });
   }, [community.aTag, community.founderPubkey, community.moderatorPubkeys, queryClient, user?.pubkey]);
 
-  // ── Badge image upload ────────────────────────────────────────────────────
-
-  const handleBadgeFileSelect = useCallback(async (file: File) => {
-    if (!file.type.startsWith('image/')) {
-      toast({ title: 'Invalid file', description: 'Please select an image file.', variant: 'destructive' });
-      return;
-    }
-    const reader = new FileReader();
-    reader.onload = (e) => setBadgeImagePreview(e.target?.result as string);
-    reader.readAsDataURL(file);
-    try {
-      const [[, url]] = await uploadFile(file);
-      setBadgeImageUrl(url);
-      toast({ title: 'Badge image uploaded' });
-    } catch {
-      setBadgeImagePreview('');
-      toast({ title: 'Upload failed', description: 'Please try again.', variant: 'destructive' });
-    }
-  }, [uploadFile, toast]);
-
-  const handleBadgeDrop = useCallback((e: React.DragEvent) => {
-    e.preventDefault();
-    const file = e.dataTransfer.files[0];
-    if (file) handleBadgeFileSelect(file);
-  }, [handleBadgeFileSelect]);
-
   // ── Publish ───────────────────────────────────────────────────────────────
 
   const handleSubmit = useCallback(async () => {
     if (!user || pendingMembers.length === 0) return;
+    if (isBadgeImageUploading) {
+      toast({ title: 'Image is still uploading', description: 'Please wait for the upload to finish.' });
+      return;
+    }
+    if (badgeImageUrl.trim() && !sanitizeUrl(badgeImageUrl.trim())) {
+      toast({ title: 'Image URL must be a valid https URL', variant: 'destructive' });
+      return;
+    }
 
     setIsPublishing(true);
     try {
@@ -241,8 +222,9 @@ export function AddMemberDialog({
           ['name', 'Member'],
           ['description', `Member of ${community.name}`],
         ];
-        if (badgeImageUrl) {
-          badgeTags.push(['image', badgeImageUrl, '1024x1024']);
+        const sanitizedBadgeImage = sanitizeUrl(badgeImageUrl.trim());
+        if (sanitizedBadgeImage) {
+          badgeTags.push(['image', sanitizedBadgeImage, '1024x1024']);
         }
         badgeTags.push(['alt', `Badge definition: Member of ${community.name}`]);
 
@@ -331,7 +313,7 @@ export function AddMemberDialog({
     }
   }, [
     user, pendingMembers, existingBadgeATag, hasBadge, community, communityEvent,
-    badgeImageUrl, nostr, publishEvent, queryClient, toast, handleOpenChange, applyOptimisticMembership,
+    badgeImageUrl, nostr, publishEvent, queryClient, toast, handleOpenChange, applyOptimisticMembership, isBadgeImageUploading,
   ]);
 
   if (!user) return null;
@@ -388,51 +370,23 @@ export function AddMemberDialog({
 
             {/* Badge image — only shown when badge needs to be created */}
             {needsBadgeCreation && (
-              <div className="space-y-1.5">
-                <Label>
-                  Member Badge Image
-                  <span className="text-muted-foreground font-normal ml-1">(optional)</span>
-                </Label>
-                <div
-                  role="button"
-                  tabIndex={0}
-                  onClick={() => fileInputRef.current?.click()}
-                  onDrop={handleBadgeDrop}
-                  onDragOver={(e) => e.preventDefault()}
-                  onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') fileInputRef.current?.click(); }}
-                  className="relative flex flex-col items-center justify-center w-full h-24 border-2 border-dashed border-border rounded-xl bg-secondary/5 hover:bg-secondary/10 transition-colors cursor-pointer overflow-hidden"
-                >
-                  {badgeImagePreview ? (
-                    <img src={badgeImagePreview} alt="Badge preview" className="h-full object-contain" />
-                  ) : isUploading ? (
-                    <div className="flex flex-col items-center gap-1.5 text-muted-foreground">
-                      <Loader2 className="size-5 animate-spin" />
-                      <span className="text-xs">Uploading...</span>
-                    </div>
-                  ) : (
-                    <div className="flex flex-col items-center gap-1.5 text-muted-foreground">
-                      <Upload className="size-5 opacity-40" />
-                      <span className="text-xs">Drop an image or click to upload</span>
-                    </div>
-                  )}
-                  <input
-                    ref={fileInputRef}
-                    type="file"
-                    accept="image/*"
-                    className="hidden"
-                    onChange={(e) => {
-                      const file = e.target.files?.[0];
-                      if (file) handleBadgeFileSelect(file);
-                    }}
-                  />
-                </div>
-              </div>
+              <ImageUploadField
+                id="member-badge-image"
+                label={<>Member Badge Image <span className="text-muted-foreground font-normal">(optional)</span></>}
+                value={badgeImageUrl}
+                onChange={setBadgeImageUrl}
+                onUploadingChange={setIsBadgeImageUploading}
+                uploadToastTitle="Badge image uploaded"
+                previewAlt="Badge preview"
+                objectFit="contain"
+                dropAreaClassName="min-h-24"
+              />
             )}
 
             {/* Submit button */}
             <Button
               onClick={handleSubmit}
-              disabled={pendingMembers.length === 0 || isPublishing || isUploading}
+              disabled={pendingMembers.length === 0 || isPublishing || isBadgeImageUploading}
               className="w-full gap-2"
             >
               {isPublishing ? (
