@@ -22,7 +22,7 @@ interface ActivityFeedResult {
   events: NostrEvent[];
   /** Moderation data keyed by community A tag. */
   moderationByATag: Map<string, CommunityModeration>;
-  /** Chain-validated rank maps keyed by community A tag (pre-moderation, for authority checks). */
+  /** Flat authority maps keyed by community A tag (pre-moderation, for authority checks). */
   rankMapByATag: Map<string, Map<string, CommunityMember>>;
   /** Cursor for the next comments/goals page. */
   oldestActivityTimestamp: number;

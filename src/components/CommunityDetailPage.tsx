@@ -302,7 +302,7 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
     const topLevel = commentsData.topLevelComments ?? [];
 
     // Filter: omit banned events and posts by banned members, then optionally
-    // restrict to chain-validated members when the "members only" toggle is
+    // restrict to validated members when the "members only" toggle is
     // active. The member filter is a presentation-layer choice — the NIP
     // recommends it as the canonical-feed default, but users may opt out.
     const applyModeration = (events: NostrEvent[]): NostrEvent[] => {

@@ -18,7 +18,7 @@ export interface MyCommunityEntry {
   event: NostrEvent;
   /** Whether the current user is the founder. */
   isFounded: boolean;
-  /** Whether the current user is a validated (chain-derived) member. */
+  /** Whether the current user is a validated member. */
   isMember: boolean;
   /** Whether the current user has bookmarked the community via kind 10004. */
   isBookmarked: boolean;

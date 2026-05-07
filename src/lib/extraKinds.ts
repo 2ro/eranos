@@ -329,11 +329,11 @@ export const EXTRA_KINDS: ExtraKindDef[] = [
     feedKey: 'feedIncludeCommunities',
     extraFeedKinds: [9041],
     label: 'Communities',
-    description: 'Hierarchical communities with ranked membership (NIP-72)',
+    description: 'Flat communities with badge-based membership (NIP-72)',
     route: 'communities',
     addressable: true,
     section: 'social',
-    blurb: 'Hierarchical communities on Nostr with ranked membership, badge-based authority chains, and moderation. Founded and managed by community creators.',
+    blurb: 'Flat communities on Nostr with one member badge, explicit moderators, and community moderation.',
   },
   {
     kind: 62,

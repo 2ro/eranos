@@ -11,7 +11,7 @@ interface MembersOnlyToggleProps {
 /**
  * Shield-icon toggle that controls the "members only" filter for community
  * surfaces. When active (default), community feeds only show content authored
- * by chain-validated members — matching the NIP's canonical-author
+ * by validated members — matching the NIP's canonical-author
  * recommendation. When inactive, the feed shows every event scoped to the
  * community regardless of author.
  *

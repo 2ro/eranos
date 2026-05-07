@@ -8,7 +8,7 @@ const STORAGE_KEY = 'community:members-only';
 
 /**
  * Controls whether community views filter content down to posts authored by
- * chain-validated members, or show everything scoped to the community.
+ * validated members, or show everything scoped to the community.
  *
  * Defaults to `true` (members-only), which aligns with the NIP's "canonical
  * community feeds SHOULD discard non-member content by default" guidance

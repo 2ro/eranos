@@ -97,7 +97,7 @@ export function CommunitiesPage() {
 
   useSeoMeta({
     title: `Communities | ${config.appName}`,
-    description: 'Discover and join hierarchical communities on Nostr',
+    description: 'Discover and join flat communities on Nostr',
   });
 
   return (

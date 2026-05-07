@@ -21,15 +21,15 @@ interface CommunityMembersResult {
   membership: CommunityMembership;
   /** Resolved moderation data (bans, reports, content warnings). */
   moderation: CommunityModeration;
-  /** Chain-validated rank lookup (pubkey → rank) BEFORE moderation overlay. Includes banned members. Used for authority checks only — do NOT use to list active members. */
+  /** Flat authority lookup before moderation overlay. Includes banned members. Used for authority checks only — do NOT use to list active members. */
   rankMap: Map<string, CommunityMember>;
 }
 
 /**
- * Fetch and resolve the full membership tree and moderation state for a community.
+ * Fetch and resolve flat membership and moderation state for a community.
  *
- * Queries badge awards (kind 8) and reports (kind 1984),
- * then runs the chain validation algorithm with moderation overlay.
+ * Queries founder/moderator-authored membership awards (kind 8), then
+ * queries member-authored reports and bans (kind 1984).
  */
 export function useCommunityMembers(community: ParsedCommunity | null | undefined) {
   const { nostr } = useNostr();
@@ -59,7 +59,7 @@ export function useCommunityMembers(community: ParsedCommunity | null | undefine
       // Step 1-2: Resolve full membership (needed for authority checks)
       const fullMembership = resolveMembership(community, awards);
 
-      // Build rank lookup for authority checks (includes all chain-validated members, even those later banned)
+      // Build authority lookup for checks (includes members even if later banned).
       const rankMap = new Map<string, CommunityMember>();
       for (const m of fullMembership.members) {
         rankMap.set(m.pubkey, m);
@@ -77,7 +77,7 @@ export function useCommunityMembers(community: ParsedCommunity | null | undefine
       const moderation = resolveCommunityModeration(community.aTag, reports, rankMap);
 
       // Step 4: Apply moderation overlay — filter banned members from the
-      // already-computed membership rather than re-running chain validation.
+      // already-computed membership.
       const membership: CommunityMembership = {
         members: fullMembership.members.filter(
           (m) => !moderation.bannedPubkeys.has(m.pubkey),
