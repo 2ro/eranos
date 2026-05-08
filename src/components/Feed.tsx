@@ -144,6 +144,7 @@ export function Feed({ kinds, tagFilters, header, hideCompose, emptyMessage, fee
 
   // World feed: all country-tagged events with diversity cap + live streaming.
   const worldFeed = useWorldFeed(isWorldActive);
+  const { flushStreamBuffer } = worldFeed;
 
   // For non-world tabs, use the standard feed query
   const queryKey = useMemo(
@@ -153,10 +154,10 @@ export function Feed({ kinds, tagFilters, header, hideCompose, emptyMessage, fee
 
   const handleRefresh = usePageRefresh(queryKey);
   const handleWorldRefresh = useCallback(async () => {
-    worldFeed.flushStreamBuffer();
+    flushStreamBuffer();
     await handleRefresh();
     window.scrollTo({ top: 0, behavior: 'smooth' });
-  }, [worldFeed.flushStreamBuffer, handleRefresh]);
+  }, [flushStreamBuffer, handleRefresh]);
 
   const {
     data: rawData,
