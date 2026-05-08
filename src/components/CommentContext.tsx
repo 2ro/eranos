@@ -3,7 +3,7 @@ import { type ReactNode, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { nip19 } from 'nostr-tools';
 import {
-  Award, BarChart3, BookOpen, Camera, Clapperboard, Egg, FileText, Film,
+  Award, BarChart3, BookOpen, Camera, Clapperboard, FileText, Film,
   GitBranch, GitPullRequest, Mail, MapPin, MessageSquare, Mic, Music,
   Package, Palette, PartyPopper, Podcast, Radio, Rocket, SmilePlus,
   Target, Users, Vote, Zap,
@@ -186,7 +186,6 @@ const KIND_ICONS: Partial<Record<number, React.ComponentType<{ className?: strin
   39089: PartyPopper,
   3367: Palette,
   9041: Target,
-  31124: Egg,
   9735: Zap,
 };
 
