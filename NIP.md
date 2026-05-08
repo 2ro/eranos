@@ -22,6 +22,23 @@
 | Protocol                 | Composed Kinds                          | Description                                                     |
 |--------------------------|-----------------------------------------|-----------------------------------------------------------------|
 | Flat Communities | 34550, 30009, 8, 1111, 1984 | One-level badge membership with explicit moderators (NIP-72 ext) |
+| Community Chat | 34550, 1311 | Realtime member chat scoped to a NIP-72 community |
+
+### Community Chat
+
+Agora uses NIP-53 live chat messages (`kind:1311`) for realtime chat inside a NIP-72 community. Messages are scoped directly to the community definition's address using an `a` tag:
+
+```json
+{
+  "kind": 1311,
+  "content": "Hello community!",
+  "tags": [
+    ["a", "34550:<community-author-pubkey>:<community-d-tag>", "", "root"]
+  ]
+}
+```
+
+Clients SHOULD query community chat with `{ "kinds": [1311], "#a": ["34550:<pubkey>:<d-tag>"] }`. Agora treats sending as members-only at the UI layer and applies the same community moderation overlay used for community posts.
 
 ### Community Kinds
 

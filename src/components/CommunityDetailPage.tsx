@@ -28,6 +28,7 @@ import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { BanConfirmDialog } from '@/components/BanConfirmDialog';
+import { CommunityChatPanel } from '@/components/CommunityChatPanel';
 import { ComposeBox } from '@/components/ComposeBox';
 import { FeedEmptyState } from '@/components/FeedEmptyState';
 import { CreateGoalDialog } from '@/components/CreateGoalDialog';
@@ -575,6 +576,13 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
                 Members
               </TabsTrigger>
               <TabsTrigger
+                value="chat"
+                className="flex-none min-w-fit rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none px-4 pb-3 pt-2"
+              >
+                <MessageCircle className="size-4 mr-1.5" />
+                Chat
+              </TabsTrigger>
+              <TabsTrigger
                 value="feed"
                 className="flex-none min-w-fit rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none px-4 pb-3 pt-2"
               >
@@ -647,6 +655,22 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
                       </div>
                     </section>
                   ))}
+                </div>
+              )}
+            </TabsContent>
+
+            {/* ── Chat tab ── */}
+            <TabsContent value="chat" className="mt-0">
+              {communityATag ? (
+                <CommunityChatPanel
+                  communityATag={communityATag}
+                  moderation={moderation}
+                  rankMap={rankMap}
+                  isMembershipLoading={membersLoading}
+                />
+              ) : (
+                <div className="py-12 text-center text-muted-foreground text-sm px-5">
+                  Community chat is unavailable for this community.
                 </div>
               )}
             </TabsContent>
