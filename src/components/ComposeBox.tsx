@@ -105,6 +105,8 @@ async function getImageMeta(file: File): Promise<{ dim?: string; blurhash?: stri
 
 interface ComposeBoxProps {
   onSuccess?: () => void;
+  /** Callback with the freshly published event, useful for optimistic parent caches. */
+  onPublished?: (event: NostrEvent) => void;
   placeholder?: string;
   compact?: boolean;
   /** Event being replied to – adds NIP-10 reply tags when set. A URL triggers NIP-22 comment mode. */
@@ -123,6 +125,17 @@ interface ComposeBoxProps {
   initialContent?: string;
   /** Open directly in poll mode. */
   initialMode?: 'post' | 'poll';
+  /** Publish directly as a custom event kind with fixed tags instead of note/comment mode. */
+  customPublish?: {
+    kind: number;
+    tags: string[][];
+    successTitle?: string;
+    successDescription?: string;
+  };
+  /** Hide the poll option from the overflow tray. */
+  hidePoll?: boolean;
+  /** Label for the primary submit button. */
+  submitLabel?: string;
 }
 
 /** Circular progress ring for character count. */
@@ -165,6 +178,7 @@ function CharRing({ count, max }: { count: number; max: number }) {
 
 export function ComposeBox({ 
   onSuccess, 
+  onPublished,
   placeholder = "What's on your mind?", 
   compact = false, 
   replyTo, 
@@ -175,6 +189,9 @@ export function ComposeBox({
   onHasPreviewableContentChange,
   initialContent = '',
   initialMode = 'post',
+  customPublish,
+  hidePoll = false,
+  submitLabel = 'Post!',
 }: ComposeBoxProps) {
   const { user, metadata, isLoading: isProfileLoading } = useCurrentUser();
   const userProfileUrl = useProfileUrl(user?.pubkey ?? '', metadata);
@@ -267,6 +284,21 @@ export function ComposeBox({
   const expand = useCallback(() => {
     if (!expanded) setExpanded(true);
   }, [expanded]);
+
+  const buildContentWarningTags = useCallback((): string[][] => {
+    if (!cwEnabled) return [];
+
+    const tags: string[][] = [
+      ['content-warning', cwText || ''],
+      ['L', 'content-warning'],
+    ];
+
+    if (cwText) {
+      tags.push(['l', cwText, 'content-warning']);
+    }
+
+    return tags;
+  }, [cwEnabled, cwText]);
 
 
 
@@ -645,6 +677,16 @@ export function ComposeBox({
       ];
       const imetaTag = ['imeta', ...imetaFields];
 
+      const cwTags = buildContentWarningTags();
+
+      if (customPublish) {
+        const event = await createEvent({
+          kind: customPublish.kind,
+          content: audioUrl,
+          tags: [...customPublish.tags, imetaTag, ...cwTags],
+        });
+        onPublished?.(event);
+      } else {
       // Determine kind: 1244 for NIP-22 replies, 1222 for root messages
       const isNip22Reply = replyTo && (replyTo instanceof URL || replyTo.kind !== 1);
       const isKind1Reply = replyTo && !(replyTo instanceof URL) && replyTo.kind === 1;
@@ -653,7 +695,7 @@ export function ComposeBox({
         // NIP-22 voice reply (kind 1244) — use postComment infrastructure
         // but we need to publish kind 1244 directly since postComment uses kind 1111
         // Build NIP-22 tags manually
-        const voiceTags: string[][] = [imetaTag];
+        const voiceTags: string[][] = [imetaTag, ...cwTags];
 
         if (replyTo instanceof URL) {
           voiceTags.push(['I', replyTo.toString()]);
@@ -678,7 +720,7 @@ export function ComposeBox({
         });
       } else if (isKind1Reply && !(replyTo instanceof URL)) {
         // NIP-10 voice reply to a kind 1 note — still publish as kind 1222 with reply tags
-        const voiceTags: string[][] = [imetaTag];
+        const voiceTags: string[][] = [imetaTag, ...cwTags];
         const rootTag = replyTo.tags.find(([name, , , marker]) => name === 'e' && marker === 'root');
         if (rootTag) {
           voiceTags.push(['e', rootTag[1], rootTag[2] || DITTO_RELAY, 'root', ...(rootTag[4] ? [rootTag[4]] : [])]);
@@ -698,8 +740,9 @@ export function ComposeBox({
         await createEvent({
           kind: 1222,
           content: audioUrl,
-          tags: [imetaTag],
+          tags: [imetaTag, ...cwTags],
         });
+      }
       }
 
       // Reset state
@@ -722,7 +765,7 @@ export function ComposeBox({
     } finally {
       setIsPublishingVoice(false);
     }
-  }, [user, voiceRecorder, uploadFile, createEvent, replyTo, queryClient, toast, onSuccess]);
+  }, [user, voiceRecorder, uploadFile, buildContentWarningTags, customPublish, createEvent, onPublished, replyTo, queryClient, toast, onSuccess]);
 
   const handleSubmit = async () => {
     if (!content.trim() || !user || charCount > MAX_CHARS) return;
@@ -800,13 +843,7 @@ export function ComposeBox({
       }
 
       // NIP-36: content warning
-      if (cwEnabled) {
-        tags.push(['content-warning', cwText || '']);
-        tags.push(['L', 'content-warning']);
-        if (cwText) {
-          tags.push(['l', cwText, 'content-warning']);
-        }
-      }
+      tags.push(...buildContentWarningTags());
 
       // NIP-30: Add emoji tags for custom emojis referenced in content
       if (customEmojis.length > 0) {
@@ -872,7 +909,15 @@ export function ComposeBox({
 
 
 
-      if (isNip22Reply) {
+      if (customPublish) {
+        const event = await createEvent({
+          kind: customPublish.kind,
+          content: finalContent,
+          tags: [...customPublish.tags, ...tags],
+          created_at: Math.floor(Date.now() / 1000),
+        });
+        onPublished?.(event);
+      } else if (isNip22Reply) {
         // NIP-22: use usePostComment for non-kind-1 targets and URL roots
         // Determine root and reply params for the comment hook
         let root: NostrEvent | URL | `#${string}`;
@@ -973,7 +1018,10 @@ export function ComposeBox({
         queryClient.invalidateQueries({ queryKey: ['event-interactions', quotedEvent.id] });
       }
       notificationSuccess();
-      toast({ title: 'Posted!', description: replyTo ? 'Your reply has been published.' : quotedEvent ? 'Your quote has been published.' : 'Your note has been published.' });
+      toast({
+        title: customPublish?.successTitle ?? 'Posted!',
+        description: customPublish?.successDescription ?? (replyTo ? 'Your reply has been published.' : quotedEvent ? 'Your quote has been published.' : 'Your note has been published.'),
+      });
       onSuccess?.();
     } catch {
       toast({ title: 'Error', description: 'Failed to publish note.', variant: 'destructive' });
@@ -1530,7 +1578,7 @@ export function ComposeBox({
                       {/* Polls are top-level events (kind 1068), so they only make sense as a
                           standalone post or rooted on an external-content URL (e.g. iso3166: country
                           page). Hide for actual event replies (NostrEvent replyTo). */}
-                      {(!replyTo || replyTo instanceof URL) && (
+                      {!hidePoll && (!replyTo || replyTo instanceof URL) && !customPublish && (
                         <button
                           type="button"
                           onClick={() => { setMode((m) => m === 'poll' ? 'post' : 'poll'); setTrayOpen(false); expand(); }}
@@ -1585,7 +1633,7 @@ export function ComposeBox({
                     className="rounded-full px-5 font-bold"
                     size="sm"
                   >
-                    {isPending || isCommentPending ? 'Posting...' : 'Post!'}
+                    {isPending || isCommentPending ? 'Posting...' : submitLabel}
                   </Button>
                 )}
               </div>

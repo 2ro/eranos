@@ -1,20 +1,18 @@
-import { useCallback, useState, type KeyboardEvent } from 'react';
+import { useCallback, useMemo } from 'react';
 import { Link } from 'react-router-dom';
-import { MessageSquare, Send } from 'lucide-react';
+import { MessageSquare } from 'lucide-react';
 import { useQueryClient } from '@tanstack/react-query';
 import type { NostrEvent, NostrMetadata } from '@nostrify/nostrify';
 
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Textarea } from '@/components/ui/textarea';
+import { ComposeBox } from '@/components/ComposeBox';
+import { ContentWarningGuard } from '@/components/ContentWarningGuard';
 import { NoteContent } from '@/components/NoteContent';
 import { useAuthor } from '@/hooks/useAuthor';
 import { useCommunityChatMessages, COMMUNITY_CHAT_KIND } from '@/hooks/useCommunityChatMessages';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
-import { useNostrPublish } from '@/hooks/useNostrPublish';
 import { useProfileUrl } from '@/hooks/useProfileUrl';
-import { useToast } from '@/hooks/useToast';
 import { getAvatarShape } from '@/lib/avatarShape';
 import { getDisplayName } from '@/lib/getDisplayName';
 import type { CommunityMember, CommunityModeration } from '@/lib/communityUtils';
@@ -43,10 +41,7 @@ export function CommunityChatPanel({
 }: CommunityChatPanelProps) {
   const queryClient = useQueryClient();
   const { user } = useCurrentUser();
-  const { toast } = useToast();
-  const { mutateAsync: publishEvent, isPending } = useNostrPublish();
   const { data: messages, isLoading, isError, error, queryKey } = useCommunityChatMessages(communityATag, moderation);
-  const [message, setMessage] = useState('');
 
   const isBanned = !!user && moderation.bannedPubkeys.has(user.pubkey);
   const isMember = !!user && rankMap.has(user.pubkey) && !isBanned;
@@ -61,66 +56,36 @@ export function CommunityChatPanel({
           : undefined;
   const canSend = !disabledReason;
 
-  const handleSend = useCallback(async () => {
-    const content = message.trim();
-    if (!content || !canSend || isPending) return;
+  const chatPublish = useMemo(() => ({
+    kind: COMMUNITY_CHAT_KIND,
+    tags: [['a', communityATag, '', 'root']],
+    successTitle: 'Message sent',
+    successDescription: 'Your chat message has been published.',
+  }), [communityATag]);
 
-    try {
-      setMessage('');
-      const event = await publishEvent({
-        kind: COMMUNITY_CHAT_KIND,
-        content,
-        tags: [['a', communityATag, '', 'root']],
-      });
-
-      queryClient.setQueryData<NostrEvent[]>(queryKey, (old = []) => {
-        if (old.some((existing) => existing.id === event.id)) return old;
-        return [...old, event].sort((a, b) => b.created_at - a.created_at);
-      });
-    } catch {
-      setMessage(content);
-      toast({
-        title: 'Failed to send message',
-        description: 'Please try again in a moment.',
-        variant: 'destructive',
-      });
-    }
-  }, [message, canSend, isPending, publishEvent, communityATag, queryClient, queryKey, toast]);
-
-  const handleKeyDown = (event: KeyboardEvent<HTMLTextAreaElement>) => {
-    if (event.key === 'Enter' && !event.shiftKey) {
-      event.preventDefault();
-      void handleSend();
-    }
-  };
+  const handlePublished = useCallback((event: NostrEvent) => {
+    queryClient.setQueryData<NostrEvent[]>(queryKey, (old = []) => {
+      if (old.some((existing) => existing.id === event.id)) return old;
+      return [...old, event].sort((a, b) => b.created_at - a.created_at);
+    });
+  }, [queryClient, queryKey]);
 
   return (
-    <div className="px-4 py-4 space-y-4">
+    <div>
       <div>
         {disabledReason && (
-          <p className="mb-2 text-center text-xs text-muted-foreground">{disabledReason}</p>
+          <p className="px-4 pt-3 text-center text-xs text-muted-foreground">{disabledReason}</p>
         )}
-        <div className="flex items-end gap-2">
-          <Textarea
-            value={message}
-            onChange={(event) => setMessage(event.target.value)}
-            onKeyDown={handleKeyDown}
-            placeholder="Message the community..."
-            disabled={!canSend || isPending}
-            maxLength={1000}
-            className="max-h-32 min-h-11 resize-none rounded-xl text-base md:text-sm"
+        {canSend && (
+          <ComposeBox
+            compact
+            placeholder="What's up?"
+            customPublish={chatPublish}
+            hidePoll
+            submitLabel="Send"
+            onPublished={handlePublished}
           />
-          <Button
-            type="button"
-            size="icon"
-            className="size-11 shrink-0 rounded-xl"
-            onClick={() => void handleSend()}
-            disabled={!message.trim() || !canSend || isPending}
-            aria-label="Send chat message"
-          >
-            <Send className="size-4" />
-          </Button>
-        </div>
+        )}
       </div>
 
       <div>
@@ -139,7 +104,7 @@ export function CommunityChatPanel({
             <p className="mt-1 text-xs text-muted-foreground">Start the first live conversation here.</p>
           </div>
         ) : (
-          <div className="divide-y divide-border">
+          <div>
             {messages.map((event, index) => {
               const previous = messages[index - 1];
               const showAvatar = !previous
@@ -178,7 +143,7 @@ function CommunityChatMessage({ event, showAvatar }: { event: NostrEvent; showAv
   const profileUrl = useProfileUrl(event.pubkey, metadata);
 
   return (
-    <div className={cn('group flex gap-3 px-2 py-3 transition-colors hover:bg-secondary/40', !showAvatar && 'py-2')}>
+    <div className={cn('group flex gap-3 px-4 py-3 transition-colors hover:bg-secondary/40', !showAvatar && 'py-2')}>
       <div className="w-8 shrink-0">
         {showAvatar ? (
           <Link to={profileUrl} onClick={(event) => event.stopPropagation()}>
@@ -208,15 +173,11 @@ function CommunityChatMessage({ event, showAvatar }: { event: NostrEvent; showAv
             <span className="text-[10px] text-muted-foreground/60">{shortTimeAgo(event.created_at)}</span>
           </div>
         )}
-        <div className="break-words text-sm leading-relaxed">
-          <NoteContent
-            event={event}
-            className="inline"
-            disableEmbeds
-            disableMediaEmbeds
-            disableNoteEmbeds
-          />
-        </div>
+        <ContentWarningGuard event={event}>
+          <div className="break-words text-sm leading-relaxed">
+            <NoteContent event={event} disableNoteEmbeds />
+          </div>
+        </ContentWarningGuard>
       </div>
     </div>
   );
