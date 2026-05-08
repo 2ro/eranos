@@ -1,6 +1,7 @@
 import { useNostr } from '@nostrify/react';
 import { useQuery } from '@tanstack/react-query';
 import type { NostrEvent } from '@nostrify/nostrify';
+import { parseBolt11AmountMsats } from '@/lib/bolt11';
 import { isCustomEmoji, getCustomEmojiUrl } from '@/lib/customEmoji';
 
 export interface RepostEntry {
@@ -65,26 +66,11 @@ export function extractZapAmount(event: NostrEvent): number {
 
   const bolt11Tag = event.tags.find(([name]) => name === 'bolt11');
   if (bolt11Tag?.[1]) {
-    const msats = parseBolt11Amount(bolt11Tag[1]);
+    const msats = parseBolt11AmountMsats(bolt11Tag[1]);
     if (msats > 0) return msats;
   }
 
   return 0;
-}
-
-function parseBolt11Amount(bolt11: string): number {
-  const match = bolt11.toLowerCase().match(/^ln\w+?(\d+)([munp]?)1/);
-  if (!match) return 0;
-  const value = parseInt(match[1], 10);
-  if (isNaN(value)) return 0;
-  const multiplier = match[2];
-  switch (multiplier) {
-    case 'm': return value * 100_000_000;
-    case 'u': return value * 100_000;
-    case 'n': return value * 100;
-    case 'p': return value / 10;
-    default:  return value * 100_000_000_000;
-  }
 }
 
 /** Extracts the sender pubkey from a kind 9735 zap receipt. */

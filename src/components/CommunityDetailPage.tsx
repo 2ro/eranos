@@ -8,6 +8,7 @@ import {
   Shield,
   ShieldBan,
   Share2,
+  Target,
   Users,
 } from 'lucide-react';
 import type { NostrEvent, NostrMetadata } from '@nostrify/nostrify';
@@ -19,17 +20,23 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { BanConfirmDialog } from '@/components/BanConfirmDialog';
 import { ComposeBox } from '@/components/ComposeBox';
+import { CreateGoalDialog } from '@/components/CreateGoalDialog';
 import { MembersOnlyToggle } from '@/components/MembersOnlyToggle';
+import { NoteCard } from '@/components/NoteCard';
+import { ReplyComposeModal } from '@/components/ReplyComposeModal';
 import { ThreadedReplyList, type ReplyNode } from '@/components/ThreadedReplyList';
 import { useAuthor } from '@/hooks/useAuthor';
 import { useAuthors } from '@/hooks/useAuthors';
 import { useComments } from '@/hooks/useComments';
 import { useCommunityMembers } from '@/hooks/useCommunityMembers';
+import { useCommunityGoals } from '@/hooks/useCommunityGoals';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useMembersOnlyFilter } from '@/hooks/useMembersOnlyFilter';
+import { useNow } from '@/hooks/useNow';
 import { useProfileUrl } from '@/hooks/useProfileUrl';
 import { useToast } from '@/hooks/useToast';
 import { CommunityModerationContext } from '@/contexts/CommunityModerationContext';
+import { useLayoutOptions } from '@/contexts/LayoutContext';
 import { applyCommunityModerationToEvents, canBanTarget, getViewerAuthority, parseCommunityEvent, type CommunityMember } from '@/lib/communityUtils';
 import { genUserName } from '@/lib/genUserName';
 import { sanitizeUrl } from '@/lib/sanitizeUrl';
@@ -122,6 +129,11 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
   const [banDialogOpen, setBanDialogOpen] = useState(false);
   const [banTargetPubkey, setBanTargetPubkey] = useState<string | null>(null);
 
+  // ── Tab + FAB state ────────────────────────────────────────────────────────
+  const [activeTab, setActiveTab] = useState('members');
+  const [composeOpen, setComposeOpen] = useState(false);
+  const [goalDialogOpen, setGoalDialogOpen] = useState(false);
+
   // Parse community definition
   const community = useMemo(() => parseCommunityEvent(event), [event]);
   const name = community?.name ?? 'Unnamed Community';
@@ -191,6 +203,38 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
   const { data: commentsData, isLoading: commentsLoading } = useComments(event, 500);
   const { membersOnly } = useMembersOnlyFilter();
 
+  // ── Fundraising goals (NIP-75) ──────────────────────────────────────────────
+  const { data: goals, isLoading: goalsLoading } = useCommunityGoals(communityATag || undefined);
+  const now = useNow(60_000);
+
+  /** Check if a goal event's `closed_at` deadline has passed. */
+  const isExpired = useCallback((e: NostrEvent): boolean => {
+    const v = e.tags.find(([n]) => n === 'closed_at')?.[1];
+    if (!v) return false;
+    const ts = parseInt(v, 10);
+    return !isNaN(ts) && now > ts;
+  }, [now]);
+
+  const moderatedGoals = useMemo(
+    () => applyCommunityModerationToEvents(goals ?? [], moderation),
+    [goals, moderation],
+  );
+  const activeGoals = useMemo(() => {
+    const all = moderatedGoals.filter((e) => !isExpired(e));
+    if (!membersOnly) return all;
+    return all.filter((e) => rankMap.has(e.pubkey));
+  }, [moderatedGoals, membersOnly, rankMap, isExpired]);
+  const pastGoals = useMemo(() => {
+    const all = moderatedGoals.filter((e) => isExpired(e));
+    const filtered = membersOnly ? all.filter((e) => rankMap.has(e.pubkey)) : all;
+    // Sort by deadline descending so the most recently ended goal appears first.
+    return filtered.sort((a, b) => {
+      const aClose = parseInt(a.tags.find(([n]) => n === 'closed_at')?.[1] ?? '0', 10);
+      const bClose = parseInt(b.tags.find(([n]) => n === 'closed_at')?.[1] ?? '0', 10);
+      return bClose - aClose;
+    });
+  }, [moderatedGoals, membersOnly, rankMap, isExpired]);
+
   const replyTree = useMemo((): ReplyNode[] => {
     if (!commentsData) return [];
     const topLevel = commentsData.topLevelComments ?? [];
@@ -242,6 +286,30 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
       toast({ title: 'Failed to copy link', variant: 'destructive' });
     }
   }, [event, toast]);
+
+  // ── FAB — visible on comments & fundraising tabs ──────────────────────────
+  const handleFabClick = useCallback(() => {
+    if (activeTab === 'comments') {
+      setComposeOpen(true);
+    } else if (activeTab === 'fundraising') {
+      setGoalDialogOpen(true);
+    }
+  }, [activeTab]);
+
+  const fabIcon = activeTab === 'fundraising'
+    ? <Target strokeWidth={3} size={18} />
+    : undefined; // default Plus icon for comments
+
+  useLayoutOptions({
+    showFAB: activeTab === 'comments' || activeTab === 'fundraising',
+    onFabClick: handleFabClick,
+    fabIcon,
+  });
+
+  const moderationCtx = useMemo(
+    () => communityATag ? { communityATag, moderation, rankMap } : null,
+    [communityATag, moderation, rankMap],
+  );
 
   // ── Render ──────────────────────────────────────────────────────────────────
   return (
@@ -303,8 +371,8 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
         </div>
 
         {/* ── Tabs ── */}
-        <CommunityModerationContext.Provider value={communityATag ? { communityATag, moderation, rankMap } : null}>
-          <Tabs defaultValue="members" className="-mx-5">
+        <CommunityModerationContext.Provider value={moderationCtx}>
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="-mx-5">
             <TabsList className="w-full rounded-none border-b border-border bg-transparent p-0 h-auto">
               <TabsTrigger
                 value="members"
@@ -319,6 +387,13 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
               >
                 <MessageCircle className="size-4 mr-1.5" />
                 Comments
+              </TabsTrigger>
+              <TabsTrigger
+                value="fundraising"
+                className="flex-1 rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none pb-3 pt-2"
+              >
+                <Target className="size-4 mr-1.5" />
+                Fundraising
               </TabsTrigger>
             </TabsList>
 
@@ -391,6 +466,42 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
                 </div>
               )}
             </TabsContent>
+
+            {/* ── Fundraising tab ── */}
+            <TabsContent value="fundraising" className="mt-0">
+              {goalsLoading ? (
+                <div className="divide-y divide-border">
+                  {Array.from({ length: 2 }).map((_, i) => (
+                    <ReplyCardSkeleton key={i} />
+                  ))}
+                </div>
+              ) : activeGoals.length === 0 && pastGoals.length === 0 ? (
+                <div className="py-12 text-center text-muted-foreground text-sm px-5">
+                  {membersOnly && (goals ?? []).length > 0
+                    ? 'No fundraising goals from community members yet. Toggle the shield icon to see all goals.'
+                    : <>No fundraising goals yet.{user ? ' Create one to get started!' : ''}</>}
+                </div>
+              ) : (
+                <div className="divide-y divide-border">
+                  {/* Active goals first */}
+                  {activeGoals.map((e) => (
+                    <NoteCard key={e.id} event={e} />
+                  ))}
+
+                  {/* Past/expired goals */}
+                  {pastGoals.length > 0 && activeGoals.length > 0 && (
+                    <div className="px-5 pt-4 pb-1">
+                      <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
+                        Past Goals
+                      </h4>
+                    </div>
+                  )}
+                  {pastGoals.map((e) => (
+                    <NoteCard key={e.id} event={e} />
+                  ))}
+                </div>
+              )}
+            </TabsContent>
           </Tabs>
         </CommunityModerationContext.Provider>
       </div>
@@ -406,6 +517,22 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
             setBanDialogOpen(open);
             if (!open) setBanTargetPubkey(null);
           }}
+        />
+      )}
+
+      {/* FAB-triggered compose modal for the comments tab */}
+      <ReplyComposeModal
+        event={event}
+        open={composeOpen}
+        onOpenChange={setComposeOpen}
+      />
+
+      {/* FAB-triggered goal creation dialog for the fundraising tab */}
+      {communityATag && (
+        <CreateGoalDialog
+          communityATag={communityATag}
+          open={goalDialogOpen}
+          onOpenChange={setGoalDialogOpen}
         />
       )}
     </div>

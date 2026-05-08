@@ -810,6 +810,78 @@ Both kind `34550` and kind `30009` are addressable events. To add or remove rank
 
 ---
 
+## Community Fundraising Goals (NIP-75)
+
+### Summary
+
+Communities can host fundraising campaigns using [NIP-75 Zap Goals](https://github.com/nostr-protocol/nips/blob/master/75.md) (kind `9041`). A zap goal linked to a community allows members and supporters to contribute sats toward a shared target.
+
+### Linking Goals to Communities
+
+A zap goal is linked to a community by including an `a` tag pointing to the community's kind `34550` definition:
+
+```json
+{
+  "kind": 9041,
+  "content": "Community meetup travel fund",
+  "tags": [
+    ["amount", "500000000"],
+    ["relays", "wss://relay.ditto.pub", "wss://relay.primal.net"],
+    ["a", "34550:<community-author-pubkey>:<community-d-identifier>"],
+    ["alt", "Zap goal: Community meetup travel fund"],
+    ["summary", "Help fund travel for our annual meetup"],
+    ["image", "https://example.com/meetup.jpg"],
+    ["closed_at", "1735689600"]
+  ]
+}
+```
+
+### Required Tags (per NIP-75)
+
+- `amount` -- Target amount in millisatoshis
+- `relays` -- Relay URLs where zaps should be sent and tallied from
+
+### Optional Tags (per NIP-75)
+
+- `closed_at` -- Unix timestamp deadline; zap receipts after this time are excluded from the tally
+- `image` -- Image URL for the goal
+- `summary` -- Brief description
+
+### Additional Tags (Agora-specific)
+
+- `a` -- Community link (`34550:<pubkey>:<d-tag>`) scoping the goal to a community
+- `alt` -- NIP-31 human-readable description
+
+### Querying
+
+Community goals are queried by filtering on the `a` tag:
+
+```
+{ "kinds": [9041], "#a": ["34550:<pubkey>:<d-tag>"], "limit": 50 }
+```
+
+### Progress Tallying
+
+Goal progress is calculated from kind `9735` zap receipts targeting the goal event:
+
+```
+{ "kinds": [9735], "#e": ["<goal-event-id>"], "limit": 500 }
+```
+
+Receipts with `created_at` after the `closed_at` deadline (if set) are excluded from the tally.
+
+### Access Control
+
+Anyone may create a zap goal linked to a community. The existing community members-only feed filter controls whether non-member goals are displayed. Anyone may zap a goal.
+
+### Dependencies
+
+- [NIP-57](https://github.com/nostr-protocol/nips/blob/master/57.md) -- Lightning Zaps
+- [NIP-72](https://github.com/nostr-protocol/nips/blob/master/72.md) -- Moderated Communities
+- [NIP-75](https://github.com/nostr-protocol/nips/blob/master/75.md) -- Zap Goals
+
+---
+
 ## Kind 0 Extension: Avatar Shape
 
 ### Summary

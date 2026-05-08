@@ -10,6 +10,8 @@ import type { Event } from 'nostr-tools';
 import type { WebLNProvider } from '@webbtc/webln-types';
 import { useQueryClient } from '@tanstack/react-query';
 import { notificationSuccess } from '@/lib/haptics';
+import { parseGoalEvent } from '@/lib/goalUtils';
+import type { NostrEvent } from '@nostrify/nostrify';
 
 /**
  * Hook for sending zaps to an event author.
@@ -110,11 +112,17 @@ export function useZaps(
 
       const zapAmount = amount * 1000; // convert to millisats
 
+      const goalRelays = target.kind === 9041
+        ? parseGoalEvent(target as unknown as NostrEvent)?.relays
+        : undefined;
+
       const zapRequest = nip57.makeZapRequest({
         profile: target.pubkey,
         event: event,
         amount: zapAmount,
-        relays: config.relayMetadata.relays.map(r => r.url),
+        relays: goalRelays && goalRelays.length > 0
+          ? goalRelays
+          : config.relayMetadata.relays.map(r => r.url),
         comment
       });
 

@@ -327,6 +327,7 @@ export const EXTRA_KINDS: ExtraKindDef[] = [
     id: 'communities',
     showKey: 'showCommunities',
     feedKey: 'feedIncludeCommunities',
+    extraFeedKinds: [9041],
     label: 'Communities',
     description: 'Hierarchical communities with ranked membership (NIP-72)',
     route: 'communities',
