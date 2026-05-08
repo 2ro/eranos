@@ -1,6 +1,6 @@
-import { useCallback, useEffect, useRef, useState, type KeyboardEvent } from 'react';
+import { useCallback, useState, type KeyboardEvent } from 'react';
 import { Link } from 'react-router-dom';
-import { MessageCircle, Send } from 'lucide-react';
+import { MessageSquare, Send } from 'lucide-react';
 import { useQueryClient } from '@tanstack/react-query';
 import type { NostrEvent, NostrMetadata } from '@nostrify/nostrify';
 
@@ -47,8 +47,6 @@ export function CommunityChatPanel({
   const { mutateAsync: publishEvent, isPending } = useNostrPublish();
   const { data: messages, isLoading, isError, error, queryKey } = useCommunityChatMessages(communityATag, moderation);
   const [message, setMessage] = useState('');
-  const scrollRef = useRef<HTMLDivElement>(null);
-  const shouldAutoScrollRef = useRef(true);
 
   const isBanned = !!user && moderation.bannedPubkeys.has(user.pubkey);
   const isMember = !!user && rankMap.has(user.pubkey) && !isBanned;
@@ -62,17 +60,6 @@ export function CommunityChatPanel({
           ? 'Only community members can chat.'
           : undefined;
   const canSend = !disabledReason;
-
-  useEffect(() => {
-    if (!shouldAutoScrollRef.current || !scrollRef.current) return;
-    scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
-  }, [messages.length]);
-
-  const handleScroll = useCallback(() => {
-    const el = scrollRef.current;
-    if (!el) return;
-    shouldAutoScrollRef.current = el.scrollHeight - el.scrollTop - el.clientHeight < 80;
-  }, []);
 
   const handleSend = useCallback(async () => {
     const content = message.trim();
@@ -88,7 +75,7 @@ export function CommunityChatPanel({
 
       queryClient.setQueryData<NostrEvent[]>(queryKey, (old = []) => {
         if (old.some((existing) => existing.id === event.id)) return old;
-        return [...old, event].sort((a, b) => a.created_at - b.created_at);
+        return [...old, event].sort((a, b) => b.created_at - a.created_at);
       });
     } catch {
       setMessage(content);
@@ -108,77 +95,60 @@ export function CommunityChatPanel({
   };
 
   return (
-    <div className="px-4 py-4">
-      <div className="overflow-hidden rounded-2xl border border-border bg-card shadow-sm">
-        <div className="flex items-center gap-2 border-b border-border px-4 py-3">
-          <MessageCircle className="size-4 text-primary" />
-          <div className="min-w-0 flex-1">
-            <h3 className="text-sm font-semibold leading-none">Community Chat</h3>
-            <p className="mt-1 text-xs text-muted-foreground">Fast, realtime messages for members.</p>
-          </div>
-          <span className="text-xs tabular-nums text-muted-foreground">
-            {messages.length} message{messages.length === 1 ? '' : 's'}
-          </span>
+    <div className="px-4 py-4 space-y-4">
+      <div>
+        {disabledReason && (
+          <p className="mb-2 text-center text-xs text-muted-foreground">{disabledReason}</p>
+        )}
+        <div className="flex items-end gap-2">
+          <Textarea
+            value={message}
+            onChange={(event) => setMessage(event.target.value)}
+            onKeyDown={handleKeyDown}
+            placeholder="Message the community..."
+            disabled={!canSend || isPending}
+            maxLength={1000}
+            className="max-h-32 min-h-11 resize-none rounded-xl text-base md:text-sm"
+          />
+          <Button
+            type="button"
+            size="icon"
+            className="size-11 shrink-0 rounded-xl"
+            onClick={() => void handleSend()}
+            disabled={!message.trim() || !canSend || isPending}
+            aria-label="Send chat message"
+          >
+            <Send className="size-4" />
+          </Button>
         </div>
+      </div>
 
-        <div
-          ref={scrollRef}
-          className="h-[min(68vh,560px)] overflow-y-auto px-3 py-3"
-          onScroll={handleScroll}
-        >
-          {isLoading ? (
-            <CommunityChatSkeleton />
-          ) : isError ? (
-            <div className="flex h-full items-center justify-center px-4 text-center text-sm text-destructive">
-              {error instanceof Error ? error.message : 'Failed to load community chat.'}
-            </div>
-          ) : messages.length === 0 ? (
-            <div className="flex h-full flex-col items-center justify-center px-4 text-center">
-              <div className="mb-3 rounded-full bg-primary/10 p-3">
-                <MessageCircle className="size-6 text-primary" />
-              </div>
-              <p className="text-sm font-medium">No messages yet</p>
-              <p className="mt-1 text-xs text-muted-foreground">Start the first live conversation here.</p>
-            </div>
-          ) : (
-            <div className="space-y-1">
-              {messages.map((event, index) => {
-                const previous = messages[index - 1];
-                const showAvatar = !previous
-                  || previous.pubkey !== event.pubkey
-                  || event.created_at - previous.created_at > 300;
-                return <CommunityChatMessage key={event.id} event={event} showAvatar={showAvatar} />;
-              })}
-            </div>
-          )}
-        </div>
-
-        <div className="border-t border-border p-3">
-          {disabledReason && (
-            <p className="mb-2 text-center text-xs text-muted-foreground">{disabledReason}</p>
-          )}
-          <div className="flex items-end gap-2">
-            <Textarea
-              value={message}
-              onChange={(event) => setMessage(event.target.value)}
-              onKeyDown={handleKeyDown}
-              placeholder="Message the community..."
-              disabled={!canSend || isPending}
-              maxLength={1000}
-              className="max-h-32 min-h-11 resize-none rounded-xl text-base md:text-sm"
-            />
-            <Button
-              type="button"
-              size="icon"
-              className="size-11 shrink-0 rounded-xl"
-              onClick={() => void handleSend()}
-              disabled={!message.trim() || !canSend || isPending}
-              aria-label="Send chat message"
-            >
-              <Send className="size-4" />
-            </Button>
+      <div>
+        {isLoading ? (
+          <CommunityChatSkeleton />
+        ) : isError ? (
+          <div className="py-12 px-4 text-center text-sm text-destructive">
+            {error instanceof Error ? error.message : 'Failed to load community chat.'}
           </div>
-        </div>
+        ) : messages.length === 0 ? (
+          <div className="flex flex-col items-center justify-center px-4 py-12 text-center">
+            <div className="mb-3 rounded-full bg-primary/10 p-3">
+              <MessageSquare className="size-6 text-primary" />
+            </div>
+            <p className="text-sm font-medium">No messages yet</p>
+            <p className="mt-1 text-xs text-muted-foreground">Start the first live conversation here.</p>
+          </div>
+        ) : (
+          <div className="divide-y divide-border">
+            {messages.map((event, index) => {
+              const previous = messages[index - 1];
+              const showAvatar = !previous
+                || previous.pubkey !== event.pubkey
+                || previous.created_at - event.created_at > 300;
+              return <CommunityChatMessage key={event.id} event={event} showAvatar={showAvatar} />;
+            })}
+          </div>
+        )}
       </div>
     </div>
   );
@@ -186,7 +156,7 @@ export function CommunityChatPanel({
 
 function CommunityChatSkeleton() {
   return (
-    <div className="space-y-4 p-2">
+    <div className="space-y-4 px-2 py-3">
       {Array.from({ length: 6 }).map((_, index) => (
         <div key={index} className="flex items-start gap-3">
           <Skeleton className="size-8 rounded-full" />
@@ -208,7 +178,7 @@ function CommunityChatMessage({ event, showAvatar }: { event: NostrEvent; showAv
   const profileUrl = useProfileUrl(event.pubkey, metadata);
 
   return (
-    <div className={cn('group flex gap-3 rounded-xl px-2 py-1.5 transition-colors hover:bg-secondary/40', !showAvatar && 'py-0.5')}>
+    <div className={cn('group flex gap-3 px-2 py-3 transition-colors hover:bg-secondary/40', !showAvatar && 'py-2')}>
       <div className="w-8 shrink-0">
         {showAvatar ? (
           <Link to={profileUrl} onClick={(event) => event.stopPropagation()}>

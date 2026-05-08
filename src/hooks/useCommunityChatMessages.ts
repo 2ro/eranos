@@ -32,7 +32,7 @@ export function useCommunityChatMessages(
 
       return events
         .filter((event) => isCommunityChatMessage(event, communityATag))
-        .sort((a, b) => a.created_at - b.created_at);
+        .sort((a, b) => b.created_at - a.created_at);
     },
     enabled: !!communityATag,
     staleTime: 10_000,
@@ -57,7 +57,7 @@ export function useCommunityChatMessages(
 
           queryClient.setQueryData<NostrEvent[]>(queryKey, (old = []) => {
             if (old.some((existing) => existing.id === event.id)) return old;
-            return [...old, event].sort((a, b) => a.created_at - b.created_at);
+            return [...old, event].sort((a, b) => b.created_at - a.created_at);
           });
         }
       } catch (error) {

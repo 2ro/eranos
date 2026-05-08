@@ -9,6 +9,7 @@ import {
   Crown,
   Loader2,
   MessageCircle,
+  MessageSquare,
   Pencil,
   Rss,
   Shield,
@@ -485,83 +486,85 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
   );
 
   // ── Render ──────────────────────────────────────────────────────────────────
+  const heroIconClassName = 'size-5 text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.85)]';
+
   return (
     <div className="max-w-2xl mx-auto pb-16">
-      {/* ── Top bar ── */}
-      <div className="flex items-center gap-4 px-4 pt-4 pb-3">
-        <button
-          onClick={() => window.history.length > 1 ? navigate(-1) : navigate('/')}
-          className="p-1.5 -ml-1.5 rounded-full hover:bg-secondary/60 transition-colors"
-          aria-label="Go back"
-        >
-          <ArrowLeft className="size-5" />
-        </button>
-        <h1 className="text-xl font-bold flex-1 truncate">Community</h1>
-        {isFounder && community && (
-          <button
-            className="p-2 rounded-full hover:bg-secondary/60 transition-colors"
-            onClick={() => setEditCommunityOpen(true)}
-            aria-label="Edit community"
-          >
-            <Pencil className="size-5" />
-          </button>
+      {/* ── Hero image ── */}
+      <div className="relative h-32 w-full overflow-hidden sm:h-40">
+        {image ? (
+          <img src={image} alt={name} className="w-full h-full object-cover" />
+        ) : (
+          <div className="absolute inset-0 bg-gradient-to-br from-primary/50 via-primary/25 to-primary/5" />
         )}
-        {user && communityATag && (
-          <button
-            className="p-2 rounded-full hover:bg-secondary/60 transition-colors disabled:opacity-50 disabled:pointer-events-none"
-            onClick={handleToggleBookmark}
-            disabled={toggleCommunityBookmark.isPending}
-            aria-label={bookmarked ? 'Remove community bookmark' : 'Bookmark community'}
-            aria-pressed={bookmarked}
-            aria-busy={toggleCommunityBookmark.isPending}
-          >
-            <Bookmark className={cn('size-5', bookmarked && 'fill-current')} />
-          </button>
+        <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/10 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+        {!image && (
+          <Users className="size-12 text-primary/20 sm:size-16" />
         )}
-        <button
-          className="p-2 rounded-full hover:bg-secondary/60 transition-colors"
-          onClick={handleShare}
-          aria-label="Share"
-        >
-          <Share2 className="size-5" />
-        </button>
+
+        {/* ── Top bar ── */}
+        <div className="absolute inset-x-0 top-0 z-10 flex items-center gap-2 px-4 pt-4">
+          <button
+            onClick={() => window.history.length > 1 ? navigate(-1) : navigate('/')}
+            className="p-2 -ml-2 rounded-full hover:bg-black/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80 transition-colors"
+            aria-label="Go back"
+          >
+            <ArrowLeft className={heroIconClassName} />
+          </button>
+          <div className="flex-1" />
+          {isFounder && community && (
+            <button
+              className="p-2 rounded-full hover:bg-black/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80 transition-colors"
+              onClick={() => setEditCommunityOpen(true)}
+              aria-label="Edit community"
+            >
+              <Pencil className={heroIconClassName} />
+            </button>
+          )}
+          {user && communityATag && (
+            <button
+              className="p-2 rounded-full hover:bg-black/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80 disabled:opacity-50 disabled:pointer-events-none transition-colors"
+              onClick={handleToggleBookmark}
+              disabled={toggleCommunityBookmark.isPending}
+              aria-label={bookmarked ? 'Remove community bookmark' : 'Bookmark community'}
+              aria-pressed={bookmarked}
+              aria-busy={toggleCommunityBookmark.isPending}
+            >
+              <Bookmark className={cn(heroIconClassName, bookmarked && 'fill-white')} />
+            </button>
+          )}
+          <button
+            className="p-2 rounded-full hover:bg-black/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80 transition-colors"
+            onClick={handleShare}
+            aria-label="Share"
+          >
+            <Share2 className={heroIconClassName} />
+          </button>
+        </div>
+
+        <div className="absolute bottom-0 left-0 right-0 px-5 pb-3">
+          <h2 className="text-xl font-bold text-white leading-tight drop-shadow-lg sm:text-2xl">{name}</h2>
+        </div>
       </div>
 
-      {/* ── Hero image ── */}
-      {image ? (
-        <div className="relative aspect-[21/9] w-full overflow-hidden">
-          <img src={image} alt={name} className="w-full h-full object-cover" />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
-          <div className="absolute bottom-0 left-0 right-0 px-5 pb-4">
-            <h2 className="text-2xl font-bold text-white leading-tight drop-shadow-lg">{name}</h2>
-          </div>
-        </div>
-      ) : (
-        <div className="relative aspect-[21/9] w-full bg-gradient-to-br from-primary/15 via-primary/5 to-transparent flex items-center justify-center">
-          <Users className="size-16 text-primary/20" />
-          <div className="absolute bottom-0 left-0 right-0 px-5 pb-4">
-            <h2 className="text-2xl font-bold leading-tight">{name}</h2>
-          </div>
-        </div>
-      )}
-
       {/* ── Community info ── */}
-      <div className="px-5 mt-4 space-y-4">
+      <div className="px-5 mt-3 space-y-3">
         {/* Description */}
         {descriptionText && (
-          <p className="text-sm leading-relaxed text-muted-foreground whitespace-pre-wrap">{descriptionText}</p>
+          <p className="line-clamp-3 text-sm leading-relaxed text-muted-foreground whitespace-pre-wrap">{descriptionText}</p>
         )}
 
-        {/* Founder + community-wide filter toggle. The toggle sits
-            right-justified on the same row as the "Founded by" label so
-            it clearly scopes the whole community (every content feed
-            below the tabs), not any one tab. */}
-        <div>
-          <div className="flex items-start justify-between gap-2 mb-1">
-            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Founded by</p>
+        {/* Founder + community-wide filter toggle. Keep this compact so the
+            content tabs stay visible on small screens. */}
+        <div className="flex items-center justify-between gap-3">
+          <div className="min-w-0 flex-1">
+            <p className="mb-1 text-[11px] font-medium text-muted-foreground uppercase tracking-wider">Founded by</p>
+            <PersonRow pubkey={event.pubkey} size="sm" />
+          </div>
+          <div className="flex shrink-0 items-center gap-2">
             <MembersOnlyToggle className="-my-2 -mr-2" />
           </div>
-          <PersonRow pubkey={event.pubkey} />
         </div>
 
         {/* ── Tabs ── */}
@@ -579,7 +582,7 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
                 value="chat"
                 className="flex-none min-w-fit rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none px-4 pb-3 pt-2"
               >
-                <MessageCircle className="size-4 mr-1.5" />
+                <MessageSquare className="size-4 mr-1.5" />
                 Chat
               </TabsTrigger>
               <TabsTrigger
