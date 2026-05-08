@@ -338,7 +338,7 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
   const { data: commentsData, isLoading: commentsLoading } = useComments(event, 500);
   const { membersOnly } = useMembersOnlyFilter();
 
-  // ── Fundraising goals (NIP-75) ──────────────────────────────────────────────
+  // ── Goals (NIP-75) ──────────────────────────────────────────────────────────
   const { data: goals, isLoading: goalsLoading } = useCommunityGoals(communityATag || undefined);
   const { data: communityEvents, isLoading: eventsLoading } = useCommunityEvents(communityATag || undefined);
   const now = useNow(60_000);
@@ -447,11 +447,11 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
     }
   }, [event, toast]);
 
-  // ── FAB — visible on comments, fundraising, and members tabs ──────────────
+  // ── FAB — visible on comments, goals, and members tabs ─────────────────────
   const handleFabClick = useCallback(() => {
     if (activeTab === 'comments') {
       setComposeOpen(true);
-    } else if (activeTab === 'fundraising') {
+    } else if (activeTab === 'goals') {
       setGoalDialogOpen(true);
     } else if (activeTab === 'events') {
       setEventDialogOpen(true);
@@ -460,7 +460,7 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
     }
   }, [activeTab]);
 
-  const fabIcon = activeTab === 'fundraising'
+  const fabIcon = activeTab === 'goals'
     ? <Target strokeWidth={3} size={18} />
     : activeTab === 'members'
       ? <UserPlus className="size-5" />
@@ -471,7 +471,7 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
   useLayoutOptions({
     showFAB:
       activeTab === 'comments'
-      || activeTab === 'fundraising'
+      || activeTab === 'goals'
       || activeTab === 'events'
       || (activeTab === 'members' && canAddMembers),
     onFabClick: handleFabClick,
@@ -586,14 +586,14 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
                 className="flex-none min-w-fit rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none px-4 pb-3 pt-2"
               >
                 <MessageCircle className="size-4 mr-1.5" />
-                Comments
+                Posts
               </TabsTrigger>
               <TabsTrigger
-                value="fundraising"
+                value="goals"
                 className="flex-none min-w-fit rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none px-4 pb-3 pt-2"
               >
                 <Target className="size-4 mr-1.5" />
-                Fundraising
+                Goals
               </TabsTrigger>
               <TabsTrigger
                 value="events"
@@ -682,8 +682,8 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
               )}
             </TabsContent>
 
-            {/* ── Fundraising tab ── */}
-            <TabsContent value="fundraising" className="mt-0">
+            {/* ── Goals tab ── */}
+            <TabsContent value="goals" className="mt-0">
               {goalsLoading ? (
                 <div className="divide-y divide-border">
                   {Array.from({ length: 2 }).map((_, i) => (
@@ -693,8 +693,8 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
               ) : activeGoals.length === 0 && pastGoals.length === 0 ? (
                 <div className="py-12 text-center text-muted-foreground text-sm px-5">
                   {membersOnly && (goals ?? []).length > 0
-                    ? 'No fundraising goals from community members yet. Toggle the shield icon to see all goals.'
-                    : <>No fundraising goals yet.{user ? ' Create one to get started!' : ''}</>}
+                    ? 'No goals from community members yet. Toggle the shield icon to see all goals.'
+                    : <>No goals yet.{user ? ' Create one to get started!' : ''}</>}
                 </div>
               ) : (
                 <div className="divide-y divide-border">
@@ -776,7 +776,7 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
         onOpenChange={setComposeOpen}
       />
 
-      {/* FAB-triggered goal creation dialog for the fundraising tab */}
+      {/* FAB-triggered goal creation dialog for the goals tab */}
       {communityATag && (
         <CreateGoalDialog
           communityATag={communityATag}

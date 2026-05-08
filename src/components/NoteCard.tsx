@@ -16,7 +16,6 @@ import {
   Share2,
   SmilePlus,
   PartyPopper,
-  Target,
   Users,
   Zap,
 } from "lucide-react";
@@ -1694,11 +1693,6 @@ const KIND_HEADER_MAP: Record<number, KindHeaderConfig> = {
     action: (event) => publishedAtAction(event, { created: "created a", updated: "updated a", fallback: "shared a" }),
     noun: "community",
     nounRoute: "/communities",
-  },
-  9041: {
-    icon: Target,
-    action: "created a",
-    noun: "fundraising goal",
   },
   30009: {
     icon: Award,

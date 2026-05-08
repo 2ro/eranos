@@ -119,7 +119,7 @@ export function CreateGoalDialog({ communityATag, children, open: controlledOpen
         tags,
       });
 
-      // Refresh the fundraising tab and the community activity feed
+      // Refresh the goals tab and the community activity feed
       await Promise.all([
         queryClient.invalidateQueries({ queryKey: ['community-goals', communityATag] }),
         queryClient.invalidateQueries({
@@ -132,7 +132,7 @@ export function CreateGoalDialog({ communityATag, children, open: controlledOpen
         }),
       ]);
 
-      toast({ title: 'Fundraising goal created!' });
+      toast({ title: 'Goal created!' });
       resetForm();
       setOpen(false);
     } catch {
@@ -157,7 +157,7 @@ export function CreateGoalDialog({ communityATag, children, open: controlledOpen
       <DialogContent className="sm:max-w-md">
         <DialogTitle className="flex items-center gap-2">
           <Target className="size-5" />
-          Create Fundraising Goal
+          Create Goal
         </DialogTitle>
 
         <form onSubmit={handleSubmit} className="space-y-4 mt-2">
@@ -201,7 +201,7 @@ export function CreateGoalDialog({ communityATag, children, open: controlledOpen
             <Label htmlFor="goal-summary">Description (optional)</Label>
             <Textarea
               id="goal-summary"
-              placeholder="Tell people what this fundraiser is for..."
+              placeholder="Tell people what this goal is for..."
               value={summary}
               onChange={(e) => setSummary(e.target.value)}
               rows={3}
@@ -214,7 +214,7 @@ export function CreateGoalDialog({ communityATag, children, open: controlledOpen
             value={imageUrl}
             onChange={setImageUrl}
             onUploadingChange={setIsImageUploading}
-            previewAlt="Fundraising goal image preview"
+            previewAlt="Goal image preview"
           />
 
           <Button type="submit" className="w-full" disabled={isPending || isImageUploading}>
