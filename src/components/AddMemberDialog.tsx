@@ -495,7 +495,7 @@ function PersonSearch({
                 setDropdownOpen(true);
               }
             }}
-            placeholder="Search people to add..."
+            placeholder="Search people or paste npub..."
             className="pl-10 pr-10 rounded-full bg-secondary border-0 focus-visible:ring-0 focus-visible:ring-offset-0 h-9 text-sm"
             autoComplete="off"
           />

@@ -428,7 +428,7 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
     };
 
     return applyModeration([...topLevel])
-      .sort((a, b) => a.created_at - b.created_at)
+      .sort((a, b) => b.created_at - a.created_at)
       .map((r) => buildNode(r));
   }, [commentsData, moderation, membersOnly, rankMap]);
 

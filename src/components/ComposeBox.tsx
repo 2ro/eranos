@@ -131,6 +131,7 @@ interface ComposeBoxProps {
     tags: string[][];
     successTitle?: string;
     successDescription?: string;
+    suppressSuccessToast?: boolean;
   };
   /** Hide the poll option from the overflow tray. */
   hidePoll?: boolean;
@@ -1018,10 +1019,12 @@ export function ComposeBox({
         queryClient.invalidateQueries({ queryKey: ['event-interactions', quotedEvent.id] });
       }
       notificationSuccess();
-      toast({
-        title: customPublish?.successTitle ?? 'Posted!',
-        description: customPublish?.successDescription ?? (replyTo ? 'Your reply has been published.' : quotedEvent ? 'Your quote has been published.' : 'Your note has been published.'),
-      });
+      if (!customPublish?.suppressSuccessToast) {
+        toast({
+          title: customPublish?.successTitle ?? 'Posted!',
+          description: customPublish?.successDescription ?? (replyTo ? 'Your reply has been published.' : quotedEvent ? 'Your quote has been published.' : 'Your note has been published.'),
+        });
+      }
       onSuccess?.();
     } catch {
       toast({ title: 'Error', description: 'Failed to publish note.', variant: 'destructive' });

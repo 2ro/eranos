@@ -59,8 +59,7 @@ export function CommunityChatPanel({
   const chatPublish = useMemo(() => ({
     kind: COMMUNITY_CHAT_KIND,
     tags: [['a', communityATag, '', 'root']],
-    successTitle: 'Message sent',
-    successDescription: 'Your chat message has been published.',
+    suppressSuccessToast: true,
   }), [communityATag]);
 
   const handlePublished = useCallback((event: NostrEvent) => {
@@ -136,49 +135,83 @@ function CommunityChatSkeleton() {
 }
 
 function CommunityChatMessage({ event, showAvatar }: { event: NostrEvent; showAvatar: boolean }) {
+  const { user } = useCurrentUser();
   const author = useAuthor(event.pubkey);
   const metadata: NostrMetadata | undefined = author.data?.metadata;
   const displayName = getDisplayName(metadata, event.pubkey);
   const avatarShape = getAvatarShape(metadata);
   const profileUrl = useProfileUrl(event.pubkey, metadata);
+  const isOwnMessage = user?.pubkey === event.pubkey;
 
   return (
-    <div className={cn('group flex gap-3 px-4 py-3 transition-colors hover:bg-secondary/40', !showAvatar && 'py-2')}>
-      <div className="w-8 shrink-0">
-        {showAvatar ? (
-          <Link to={profileUrl} onClick={(event) => event.stopPropagation()}>
-            <Avatar shape={avatarShape} className="size-8">
-              <AvatarImage src={metadata?.picture} alt={displayName} />
-              <AvatarFallback className="bg-primary/15 text-[10px] text-primary">
-                {displayName.slice(0, 2).toUpperCase()}
-              </AvatarFallback>
-            </Avatar>
-          </Link>
-        ) : (
-          <span className="hidden pt-0.5 text-[10px] text-muted-foreground/60 group-hover:block">
-            {shortTimeAgo(event.created_at)}
-          </span>
-        )}
-      </div>
-      <div className="min-w-0 flex-1">
+    <div
+      className={cn(
+        'group flex gap-3 px-4 py-3 transition-colors hover:bg-secondary/40',
+        !showAvatar && 'py-2',
+        isOwnMessage && 'justify-end',
+      )}
+    >
+      {!isOwnMessage && <ChatMessageAvatar showAvatar={showAvatar} profileUrl={profileUrl} avatarShape={avatarShape} metadata={metadata} displayName={displayName} createdAt={event.created_at} />}
+      <div className={cn('min-w-0 flex-1', isOwnMessage && 'flex flex-col items-end')}>
         {showAvatar && (
-          <div className="mb-0.5 flex items-baseline gap-2">
+          <div className={cn('mb-0.5 flex items-baseline gap-2', isOwnMessage && 'justify-end')}>
             <Link
               to={profileUrl}
-              className="truncate text-xs font-semibold text-primary hover:underline"
+              className={cn('truncate text-xs font-semibold text-primary hover:underline', isOwnMessage && 'order-2')}
               onClick={(event) => event.stopPropagation()}
             >
               {displayName}
             </Link>
-            <span className="text-[10px] text-muted-foreground/60">{shortTimeAgo(event.created_at)}</span>
+            <span className={cn('text-[10px] text-muted-foreground/60', isOwnMessage && 'order-1')}>{shortTimeAgo(event.created_at)}</span>
           </div>
         )}
         <ContentWarningGuard event={event}>
-          <div className="break-words text-sm leading-relaxed">
+          <div
+            className={cn(
+              'max-w-[64%] break-words text-sm leading-relaxed sm:max-w-xs',
+              isOwnMessage && 'text-right',
+            )}
+          >
             <NoteContent event={event} disableNoteEmbeds />
           </div>
         </ContentWarningGuard>
       </div>
+      {isOwnMessage && <ChatMessageAvatar showAvatar={showAvatar} profileUrl={profileUrl} avatarShape={avatarShape} metadata={metadata} displayName={displayName} createdAt={event.created_at} />}
+    </div>
+  );
+}
+
+function ChatMessageAvatar({
+  showAvatar,
+  profileUrl,
+  avatarShape,
+  metadata,
+  displayName,
+  createdAt,
+}: {
+  showAvatar: boolean;
+  profileUrl: string;
+  avatarShape: ReturnType<typeof getAvatarShape>;
+  metadata: NostrMetadata | undefined;
+  displayName: string;
+  createdAt: number;
+}) {
+  return (
+    <div className="w-8 shrink-0">
+      {showAvatar ? (
+        <Link to={profileUrl} onClick={(event) => event.stopPropagation()}>
+          <Avatar shape={avatarShape} className="size-8">
+            <AvatarImage src={metadata?.picture} alt={displayName} />
+            <AvatarFallback className="bg-primary/15 text-[10px] text-primary">
+              {displayName.slice(0, 2).toUpperCase()}
+            </AvatarFallback>
+          </Avatar>
+        </Link>
+      ) : (
+        <span className="hidden pt-0.5 text-[10px] text-muted-foreground/60 group-hover:block">
+          {shortTimeAgo(createdAt)}
+        </span>
+      )}
     </div>
   );
 }
