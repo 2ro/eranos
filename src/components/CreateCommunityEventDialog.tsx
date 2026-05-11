@@ -112,7 +112,7 @@ export function CreateCommunityEventDialog({ communityATag, open, onOpenChange, 
   const isEditing = !!event;
   const effectiveCommunityATag = communityATag ?? event?.tags.find(([name]) => name === 'A')?.[1];
   const isCommunityEvent = !!effectiveCommunityATag;
-  const minEndDate = startDate ? addDays(startDate, allDay ? 1 : 0) : undefined;
+  const minEndDate = startDate || undefined;
 
   const resetForm = useCallback(() => {
     setStep(1);
@@ -155,7 +155,7 @@ export function CreateCommunityEventDialog({ communityATag, open, onOpenChange, 
     if (isAllDay) {
       setStartDate(startTag);
       setStartTime('');
-      setEndDate(endTag);
+      setEndDate(endTag ? addDays(endTag, -1) : '');
       setEndTime('');
       return;
     }
@@ -186,8 +186,8 @@ export function CreateCommunityEventDialog({ communityATag, open, onOpenChange, 
 
   const handleAllDayChange = useCallback((checked: boolean) => {
     setAllDay(checked);
-    if (checked && startDate && endDate && endDate <= startDate) {
-      setEndDate(addDays(startDate, 1));
+    if (checked && startDate && endDate && endDate < startDate) {
+      setEndDate(startDate);
     }
   }, [endDate, startDate]);
 
@@ -195,11 +195,11 @@ export function CreateCommunityEventDialog({ communityATag, open, onOpenChange, 
     setStartDate(nextStartDate);
     if (!nextStartDate || !endDate) return;
 
-    const nextMinEndDate = addDays(nextStartDate, allDay ? 1 : 0);
+    const nextMinEndDate = nextStartDate;
     if (endDate < nextMinEndDate) {
       setEndDate(nextMinEndDate);
     }
-  }, [allDay, endDate]);
+  }, [endDate]);
 
   const seedEndDate = useCallback(() => {
     if (!endDate && minEndDate) {
@@ -275,11 +275,13 @@ export function CreateCommunityEventDialog({ communityATag, open, onOpenChange, 
       if (allDay) {
         tags.push(['start', startDate]);
         if (endDate) {
-          if (endDate <= startDate) {
-            toast({ title: 'End date must be after the start date', variant: 'destructive' });
+          if (endDate < startDate) {
+            toast({ title: 'End date must be on or after the start date', variant: 'destructive' });
             return;
           }
-          tags.push(['end', endDate]);
+          if (endDate > startDate) {
+            tags.push(['end', addDays(endDate, 1)]);
+          }
         }
       } else {
         if (endDate && endDate < startDate) {

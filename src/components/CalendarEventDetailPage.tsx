@@ -74,14 +74,28 @@ function formatDetailDate(event: NostrEvent): string {
   if (!startRaw) return 'Date not specified';
 
   if (event.kind === 31922) {
-    const fmt = (d: string) => {
+    const parseDate = (d: string) => {
       const [y, m, day] = d.split('-').map(Number);
-      return new Date(y, m - 1, day).toLocaleDateString('en-US', {
+      return new Date(y, m - 1, day);
+    };
+    const fmt = (d: Date) => {
+      return d.toLocaleDateString('en-US', {
         weekday: 'long', month: 'long', day: 'numeric', year: 'numeric',
       });
     };
-    if (endRaw && endRaw !== startRaw) return `${fmt(startRaw)} - ${fmt(endRaw)}`;
-    return fmt(startRaw);
+
+    const startDate = parseDate(startRaw);
+    if (isNaN(startDate.getTime())) return startRaw;
+
+    if (endRaw) {
+      const endDate = parseDate(endRaw);
+      if (!isNaN(endDate.getTime()) && endDate > startDate) {
+        endDate.setDate(endDate.getDate() - 1);
+        if (endDate > startDate) return `${fmt(startDate)} - ${fmt(endDate)}`;
+      }
+    }
+
+    return fmt(startDate);
   }
 
   // kind 31923 — unix timestamps
