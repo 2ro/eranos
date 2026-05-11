@@ -8,7 +8,6 @@ import { useQuery, useInfiniteQuery } from '@tanstack/react-query';
 import { useInView } from 'react-intersection-observer';
 
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
-import { getAvatarShape } from '@/lib/avatarShape';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { ComposeBox } from '@/components/ComposeBox';
@@ -55,7 +54,6 @@ export function BadgeDetailContent({ event }: { event: NostrEvent }) {
 
   const author = useAuthor(event.pubkey);
   const metadata = author.data?.metadata;
-  const avatarShape = getAvatarShape(metadata);
   const displayName = metadata?.name || genUserName(event.pubkey);
   const npub = useMemo(() => nip19.npubEncode(event.pubkey), [event.pubkey]);
 
@@ -141,7 +139,7 @@ export function BadgeDetailContent({ event }: { event: NostrEvent }) {
         {/* Issuer row */}
         <div className="flex items-center gap-3">
           <Link to={`/${npub}`}>
-            <Avatar shape={avatarShape} className="size-11">
+            <Avatar className="size-11">
               <AvatarImage src={metadata?.picture} alt={displayName} />
               <AvatarFallback className="bg-primary/20 text-primary text-sm">
                 {displayName[0]?.toUpperCase()}
@@ -452,7 +450,6 @@ function CommentsTab({ event, orderedReplies, commentsLoading }: {
 function AwardeeCard({ pubkey, metadata }: { pubkey: string; metadata?: NostrMetadata }) {
   const displayName = metadata?.name || metadata?.display_name || genUserName(pubkey);
   const about = metadata?.about;
-  const avatarShape = getAvatarShape(metadata);
   const profileUrl = useProfileUrl(pubkey, metadata);
 
   return (
@@ -460,7 +457,7 @@ function AwardeeCard({ pubkey, metadata }: { pubkey: string; metadata?: NostrMet
       to={profileUrl}
       className="flex items-center gap-3 px-4 py-3 hover:bg-secondary/30 transition-colors"
     >
-      <Avatar shape={avatarShape} className="size-11 shrink-0">
+      <Avatar className="size-11 shrink-0">
         <AvatarImage src={metadata?.picture} alt={displayName} />
         <AvatarFallback className="bg-primary/20 text-primary text-sm">
           {displayName[0]?.toUpperCase()}

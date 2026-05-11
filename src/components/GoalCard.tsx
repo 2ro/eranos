@@ -122,7 +122,7 @@ function GoalCardInner({ event, goal }: { event: NostrEvent; goal: ParsedGoal })
       ) : (
         <div className="flex items-center gap-2.5 rounded-lg bg-muted/50 px-3 py-2">
           <Link to={d.profileUrl} className="shrink-0" onClick={(e) => e.stopPropagation()}>
-            <Avatar shape={d.avatarShape} className="size-8 ring-2 ring-background">
+            <Avatar className="size-8 ring-2 ring-background">
               <AvatarImage src={d.metadata?.picture} />
               <AvatarFallback className="bg-muted text-muted-foreground text-xs">
                 {d.displayName.charAt(0).toUpperCase()}

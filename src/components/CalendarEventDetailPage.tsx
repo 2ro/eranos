@@ -18,7 +18,6 @@ import {
 import type { NostrEvent, NostrMetadata } from '@nostrify/nostrify';
 
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
-import { getAvatarShape } from '@/lib/avatarShape';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
@@ -122,7 +121,6 @@ function roleSort(a: string, b: string): number {
 function PersonRow({ pubkey, label, size = 'md' }: { pubkey: string; label?: string; size?: 'sm' | 'md' }) {
   const { data } = useAuthor(pubkey);
   const metadata: NostrMetadata | undefined = data?.metadata;
-  const avatarShape = getAvatarShape(metadata);
   const name = metadata?.display_name || metadata?.name || genUserName(pubkey);
   const profileUrl = useProfileUrl(pubkey, metadata);
   const avatarCls = size === 'sm' ? 'size-8' : 'size-11';
@@ -130,7 +128,7 @@ function PersonRow({ pubkey, label, size = 'md' }: { pubkey: string; label?: str
 
   return (
     <Link to={profileUrl} className="flex items-center gap-3 group">
-      <Avatar shape={avatarShape} className={cn(avatarCls, 'ring-2 ring-background')}>
+      <Avatar className={cn(avatarCls, 'ring-2 ring-background')}>
         <AvatarImage src={metadata?.picture} />
         <AvatarFallback className={cn('bg-muted text-muted-foreground', fallbackCls)}>
           {name.charAt(0).toUpperCase()}

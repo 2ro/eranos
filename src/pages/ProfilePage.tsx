@@ -9,7 +9,6 @@ import { nip19 } from 'nostr-tools';
 import { Zap, Flame, MoreHorizontal, ClipboardCopy, ExternalLink, VolumeX, Flag, Bitcoin, Pin, X, QrCode, Check, Copy, Loader2, Download, Pencil, Trash2, RotateCcw, MessageSquare, Globe, Mail, Plus, GripVertical, ListPlus, Award, PanelLeft } from 'lucide-react';
 
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
-import { getAvatarShape, isEmoji, emojiAvatarBorderStyle } from '@/lib/avatarShape';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
@@ -392,7 +391,6 @@ function MenuRow({ icon, label, onClick, destructive }: { icon: React.ReactNode;
 function FollowingUserRow({ pubkey, onNavigate }: { pubkey: string; onNavigate?: () => void }) {
   const author = useAuthor(pubkey);
   const metadata = author.data?.metadata;
-  const avatarShape = getAvatarShape(metadata);
   const displayName = metadata?.name || genUserName(pubkey);
   const npubEncoded = useMemo(() => nip19.npubEncode(pubkey), [pubkey]);
 
@@ -412,7 +410,7 @@ function FollowingUserRow({ pubkey, onNavigate }: { pubkey: string; onNavigate?:
         </>
       ) : (
         <>
-          <Avatar shape={avatarShape} className="size-10 shrink-0">
+          <Avatar className="size-10 shrink-0">
             <AvatarImage src={metadata?.picture} alt={displayName} />
             <AvatarFallback className="bg-primary/20 text-primary text-sm">
               {displayName[0]?.toUpperCase()}
@@ -1271,8 +1269,6 @@ type EditableTab = { label: string; isCore: boolean; tab?: ProfileTab };
   // Kind 0 — resolved from the author cache (seeded by the feed query above).
   const author = useAuthor(pubkey);
   const metadata = author.data?.metadata;
-  const avatarShape = getAvatarShape(metadata);
-  const isEmojiShape = !!avatarShape && isEmoji(avatarShape);
   const profileStatus = useUserStatus(pubkey);
 
   // Refetch the author's profile whenever we navigate to this profile page.
@@ -1695,14 +1691,12 @@ type EditableTab = { label: string; isCore: boolean; tab?: ProfileTab };
                     onClick={() => metadata?.picture && setLightboxImage(metadata.picture)}
                     disabled={!metadata?.picture}
                   >
-                    <div style={isEmojiShape ? emojiAvatarBorderStyle : undefined}>
-                      <Avatar shape={avatarShape} className={cn(isEmojiShape ? 'size-[88px] md:size-[120px]' : 'size-24 md:size-32 border-4 border-background', metadata?.picture && 'cursor-pointer')}>
-                        <AvatarImage src={metadata?.picture} alt={displayName} />
-                        <AvatarFallback className="bg-primary/20 text-primary text-2xl md:text-3xl">
-                          {displayName[0].toUpperCase()}
-                        </AvatarFallback>
-                      </Avatar>
-                    </div>
+                    <Avatar className={cn('size-24 md:size-32 border-4 border-background', metadata?.picture && 'cursor-pointer')}>
+                      <AvatarImage src={metadata?.picture} alt={displayName} />
+                      <AvatarFallback className="bg-primary/20 text-primary text-2xl md:text-3xl">
+                        {displayName[0].toUpperCase()}
+                      </AvatarFallback>
+                    </Avatar>
                   </button>
 
                   {/* NIP-38 thought bubble — floats beside the avatar over the banner */}

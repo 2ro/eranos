@@ -14,7 +14,6 @@ import { generateSecretKey, getPublicKey, nip19 } from 'nostr-tools';
 import { saveNsec } from '@/lib/credentialManager';
 import { ProfileCard } from '@/components/ProfileCard';
 import { ImageCropDialog } from '@/components/ImageCropDialog';
-import { isValidAvatarShape } from '@/lib/avatarShape';
 import type { NostrMetadata } from '@nostrify/nostrify';
 
 interface SignupDialogProps {
@@ -31,7 +30,6 @@ const SignupDialog: React.FC<SignupDialogProps> = ({ isOpen, onClose }) => {
     about: '',
     picture: '',
     banner: '',
-    shape: '',
   });
   const [cropState, setCropState] = useState<{ imageSrc: string; aspect: number; field: 'picture' | 'banner' } | null>(null);
   const pickInputRef = useRef<HTMLInputElement>(null);
@@ -110,12 +108,7 @@ const SignupDialog: React.FC<SignupDialogProps> = ({ isOpen, onClose }) => {
   const finishSignup = async (skipProfile = false) => {
     try {
       if (!skipProfile && (profileData.name || profileData.about || profileData.picture)) {
-        // Build the outgoing metadata, stripping empty strings and validating shape.
-        const { shape, ...rest } = profileData;
-        const data: Record<string, unknown> = { ...rest };
-        if (shape && isValidAvatarShape(shape)) {
-          data.shape = shape;
-        }
+        const data: Record<string, unknown> = { ...profileData };
         for (const key in data) {
           if (data[key] === '') delete data[key];
         }
@@ -148,7 +141,7 @@ const SignupDialog: React.FC<SignupDialogProps> = ({ isOpen, onClose }) => {
       setStep('generate');
       setNsec('');
       setShowKey(false);
-      setProfileData({ name: '', about: '', picture: '', banner: '', shape: '' });
+      setProfileData({ name: '', about: '', picture: '', banner: '' });
     }
   }, [isOpen]);
 
@@ -246,7 +239,6 @@ const SignupDialog: React.FC<SignupDialogProps> = ({ isOpen, onClose }) => {
                   metadata={profileData}
                   onChange={(patch) => setProfileData(prev => ({ ...prev, ...patch }))}
                   onPickImage={handlePickImage}
-                  onAvatarShape={(shape) => setProfileData(prev => ({ ...prev, shape }))}
                 />
               </div>
 

@@ -1,8 +1,7 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useState } from 'react';
 import type { NostrMetadata } from '@nostrify/nostrify';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { type AvatarShape, isValidAvatarShape, isEmoji, getAvatarMaskUrlAsync, shapedAvatarBorderStyle } from '@/lib/avatarShape';
-import { CheckCircle2, Pencil, Plus, Trash2, ChevronDown, ImagePlus, SmilePlus, X as XIcon } from 'lucide-react';
+import { CheckCircle2, Pencil, Plus, Trash2, ChevronDown, ImagePlus, X as XIcon } from 'lucide-react';
 import { genUserName } from '@/lib/genUserName';
 import { BioContent } from '@/components/BioContent';
 import { cn } from '@/lib/utils';
@@ -12,8 +11,6 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
-import { EmojiPicker, type EmojiSelection } from '@/components/EmojiPicker';
 import { useProfileBadges } from '@/hooks/useProfileBadges';
 import { useBadgeDefinitions } from '@/hooks/useBadgeDefinitions';
 import { BadgeShowcaseGrid } from '@/components/BadgeShowcaseGrid';
@@ -94,8 +91,6 @@ export interface ProfileCardProps {
   metadata: Partial<NostrMetadata>;
   onChange?: (patch: Partial<NostrMetadata>) => void;
   onPickImage?: (field: 'picture' | 'banner') => void;
-  /** Called when user picks an avatar shape (emoji string, or empty to clear). */
-  onAvatarShape?: (shape: string) => void;
   /** Called when user removes their avatar picture. */
   onRemoveAvatar?: () => void;
   /** Show NIP-05 row (default true) */
@@ -110,7 +105,6 @@ export function ProfileCard({
   metadata,
   onChange,
   onPickImage,
-  onAvatarShape,
   onRemoveAvatar,
   showNip05 = true,
   extraFields,
@@ -119,7 +113,6 @@ export function ProfileCard({
   const editable = !!onChange;
   const [nip05Focused, setNip05Focused] = useState(false);
   const [fieldsOpen, setFieldsOpen] = useState(false);
-  const [emojiPickerOpen, setEmojiPickerOpen] = useState(false);
 
   const { user } = useCurrentUser();
   const isOwnProfile = !!pubkey && !!user && pubkey === user.pubkey;
@@ -132,49 +125,6 @@ export function ProfileCard({
 
   // Sanitize banner URL from untrusted metadata before CSS url() interpolation
   const bannerUrl = sanitizeUrl(metadata.banner);
-
-  // Read shape from metadata (it's a custom property passed through the loose schema)
-  const rawShape = metadata.shape;
-  const shape: AvatarShape | undefined = isValidAvatarShape(rawShape) ? rawShape : undefined;
-  const isEmojiShape = !!shape && isEmoji(shape);
-  const hasCustomShape = isEmojiShape;
-
-  // State for async-loaded mask URL for the hover overlay
-  const [overlayMaskUrl, setOverlayMaskUrl] = useState<string>('');
-
-  // Load mask URL asynchronously when shape changes
-  useEffect(() => {
-    if (!hasCustomShape || !shape) {
-      setOverlayMaskUrl('');
-      return;
-    }
-
-    let cancelled = false;
-    getAvatarMaskUrlAsync(shape).then((url) => {
-      if (!cancelled) {
-        setOverlayMaskUrl(url);
-      }
-    });
-
-    return () => {
-      cancelled = true;
-    };
-  }, [hasCustomShape, shape]);
-
-  // Memoized mask style for the hover overlay on shaped avatars
-  const overlayMaskStyle = useMemo<React.CSSProperties | undefined>(() => {
-    if (!overlayMaskUrl) return undefined;
-    return {
-      WebkitMaskImage: `url(${overlayMaskUrl})`,
-      maskImage: `url(${overlayMaskUrl})`,
-      WebkitMaskSize: 'contain',
-      maskSize: 'contain' as string,
-      WebkitMaskRepeat: 'no-repeat',
-      maskRepeat: 'no-repeat' as string,
-      WebkitMaskPosition: 'center',
-      maskPosition: 'center' as string,
-    };
-  }, [overlayMaskUrl]);
 
   const nip05 = metadata.nip05;
   const nip05Domain = nip05 ? getNip05Domain(nip05) : undefined;
@@ -225,84 +175,41 @@ export function ProfileCard({
         {/* Avatar */}
         <div className="flex justify-between items-start -mt-12 mb-3">
           {editable ? (
-            <>
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <button type="button" className="relative shrink-0 cursor-pointer group outline-none">
-                    <div style={hasCustomShape ? shapedAvatarBorderStyle : undefined}>
-                      <Avatar shape={shape} className={cn("shadow-sm", hasCustomShape ? "size-[88px]" : "size-24 border-4 border-background")}>
-                        <AvatarImage src={metadata.picture} alt={displayName} className="object-cover" />
-                        <AvatarFallback className="bg-primary/20 text-primary text-2xl font-bold">
-                          {metadata.picture ? initial : <Plus className="size-8 text-muted-foreground" strokeWidth={4} />}
-                        </AvatarFallback>
-                      </Avatar>
-                    </div>
-                    <div
-                      className={cn(
-                        'absolute inset-0 bg-black/0 group-hover:bg-black/45 transition-colors flex items-center justify-center',
-                        !hasCustomShape && 'rounded-full',
-                      )}
-                      style={overlayMaskStyle}
-                    >
-                      <Pencil className="size-6 text-white opacity-0 group-hover:opacity-100 transition-opacity drop-shadow" />
-                    </div>
-                    {metadata.picture && (
-                      <div className="absolute bottom-0 right-0 size-7 rounded-full bg-background border border-border shadow-sm flex items-center justify-center transition-opacity">
-                        <Pencil className="size-3.5 text-muted-foreground" />
-                      </div>
-                    )}
-                  </button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="start" sideOffset={6}>
-                  <DropdownMenuItem onClick={() => onPickImage?.('picture')}>
-                    <ImagePlus className="size-4 mr-2" />
-                    Change avatar
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => setEmojiPickerOpen(true)}>
-                    <SmilePlus className="size-4 mr-2" />
-                    Set avatar shape
-                  </DropdownMenuItem>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <button type="button" className="relative shrink-0 cursor-pointer group outline-none">
+                  <Avatar className="shadow-sm size-24 border-4 border-background">
+                    <AvatarImage src={metadata.picture} alt={displayName} className="object-cover" />
+                    <AvatarFallback className="bg-primary/20 text-primary text-2xl font-bold">
+                      {metadata.picture ? initial : <Plus className="size-8 text-muted-foreground" strokeWidth={4} />}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div className="absolute inset-0 bg-black/0 group-hover:bg-black/45 transition-colors flex items-center justify-center rounded-full">
+                    <Pencil className="size-6 text-white opacity-0 group-hover:opacity-100 transition-opacity drop-shadow" />
+                  </div>
                   {metadata.picture && (
-                    <DropdownMenuItem onClick={() => onRemoveAvatar?.()} className="text-destructive focus:text-destructive">
-                      <XIcon className="size-4 mr-2" />
-                      Remove avatar
-                    </DropdownMenuItem>
-                  )}
-                </DropdownMenuContent>
-              </DropdownMenu>
-
-              <Dialog open={emojiPickerOpen} onOpenChange={setEmojiPickerOpen}>
-                <DialogContent className="w-fit max-w-[calc(100vw-2rem)] p-0 gap-0 overflow-hidden">
-                  <DialogHeader className="px-4 pt-4 pb-2">
-                    <DialogTitle className="text-base">Set avatar shape</DialogTitle>
-                    <DialogDescription>Pick an emoji to mask your avatar</DialogDescription>
-                  </DialogHeader>
-                  <EmojiPicker onSelect={(selection: EmojiSelection) => {
-                    if (selection.type === 'native') {
-                      onAvatarShape?.(selection.emoji);
-                      setEmojiPickerOpen(false);
-                    }
-                  }} />
-                  {hasCustomShape && (
-                    <div className="px-4 pb-4 pt-2 border-t">
-                      <Button
-                        type="button"
-                        variant="outline"
-                        size="sm"
-                        className="w-full text-destructive hover:text-destructive"
-                        onClick={() => { onAvatarShape?.(''); setEmojiPickerOpen(false); }}
-                      >
-                        <XIcon className="size-3.5 mr-1.5" />
-                        Remove avatar shape
-                      </Button>
+                    <div className="absolute bottom-0 right-0 size-7 rounded-full bg-background border border-border shadow-sm flex items-center justify-center transition-opacity">
+                      <Pencil className="size-3.5 text-muted-foreground" />
                     </div>
                   )}
-                </DialogContent>
-              </Dialog>
-            </>
+                </button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="start" sideOffset={6}>
+                <DropdownMenuItem onClick={() => onPickImage?.('picture')}>
+                  <ImagePlus className="size-4 mr-2" />
+                  Change avatar
+                </DropdownMenuItem>
+                {metadata.picture && (
+                  <DropdownMenuItem onClick={() => onRemoveAvatar?.()} className="text-destructive focus:text-destructive">
+                    <XIcon className="size-4 mr-2" />
+                    Remove avatar
+                  </DropdownMenuItem>
+                )}
+              </DropdownMenuContent>
+            </DropdownMenu>
           ) : (
-            <div className="relative shrink-0" style={hasCustomShape ? shapedAvatarBorderStyle : undefined}>
-              <Avatar shape={shape} className={cn("shadow-sm", hasCustomShape ? "size-[88px]" : "size-24 border-4 border-background")}>
+            <div className="relative shrink-0">
+              <Avatar className="shadow-sm size-24 border-4 border-background">
                 <AvatarImage src={metadata.picture} alt={displayName} className="object-cover" />
                 <AvatarFallback className="bg-primary/20 text-primary text-2xl font-bold">
                   {initial}

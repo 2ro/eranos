@@ -44,7 +44,6 @@ import { useOpenPost } from "@/hooks/useOpenPost";
 import { useProfileUrl } from "@/hooks/useProfileUrl";
 import { usePageRefresh } from "@/hooks/usePageRefresh";
 import { useInfiniteHotFeed } from "@/hooks/useTrending";
-import { getAvatarShape } from "@/lib/avatarShape";
 import { getExtraKindDef } from "@/lib/extraKinds";
 import type { FeedItem } from "@/lib/feedUtils";
 import { getDisplayName } from "@/lib/getDisplayName";
@@ -229,7 +228,6 @@ function VideoGridCard({ event }: { event: NostrEvent }) {
 
   const author = useAuthor(event.pubkey);
   const metadata = author.data?.metadata;
-  const avatarShape = getAvatarShape(metadata);
   const displayName = getDisplayName(metadata, event.pubkey);
   const profileUrl = useProfileUrl(event.pubkey, metadata);
 
@@ -288,7 +286,7 @@ function VideoGridCard({ event }: { event: NostrEvent }) {
           {author.isLoading ? (
             <Skeleton className="size-8 rounded-full" />
           ) : (
-            <Avatar shape={avatarShape} className="size-8">
+            <Avatar className="size-8">
               <AvatarImage src={metadata?.picture} alt={displayName} />
               <AvatarFallback className="bg-primary/20 text-primary text-[10px]">
                 {displayName[0]?.toUpperCase()}

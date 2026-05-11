@@ -18,7 +18,6 @@ import { useAuthor } from '@/hooks/useAuthor';
 import { useProfileUrl } from '@/hooks/useProfileUrl';
 import { isProfileBadgesKind } from '@/lib/badgeUtils';
 import { extractZapAmount, extractZapSender, extractZapMessage } from '@/hooks/useEventInteractions';
-import { getAvatarShape } from '@/lib/avatarShape';
 import { genUserName } from '@/lib/genUserName';
 import { formatNumber } from '@/lib/formatNumber';
 import { timeAgo } from '@/lib/timeAgo';
@@ -101,7 +100,6 @@ function EmbeddedZapCard({ event, className, disableHoverCards }: { event: Nostr
   const sender = useAuthor(senderPubkey || undefined);
   const senderMeta = sender.data?.metadata;
   const senderName = senderMeta?.name || (senderPubkey ? genUserName(senderPubkey) : 'Someone');
-  const senderShape = getAvatarShape(senderMeta);
   const senderProfileUrl = useProfileUrl(senderPubkey, senderMeta);
 
   return (
@@ -135,7 +133,7 @@ function EmbeddedZapCard({ event, className, disableHoverCards }: { event: Nostr
         {senderPubkey && (
           <MaybeHoverCard pubkey={senderPubkey} disabled={disableHoverCards}>
             <Link to={senderProfileUrl} className="shrink-0" onClick={(e) => e.stopPropagation()}>
-              <Avatar shape={senderShape} className="size-5">
+              <Avatar className="size-5">
                 <AvatarImage src={senderMeta?.picture} alt={senderName} />
                 <AvatarFallback className="bg-primary/20 text-primary text-[10px]">
                   {senderName[0]?.toUpperCase()}

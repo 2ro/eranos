@@ -4,7 +4,6 @@ import QRCode from 'qrcode';
 import { Copy, Check } from 'lucide-react';
 
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
-import { getAvatarShape } from '@/lib/avatarShape';
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useAuthor } from '@/hooks/useAuthor';
@@ -62,7 +61,7 @@ export function FollowQRDialog({ open, onOpenChange }: FollowQRDialogProps) {
 
         {/* Avatar + name */}
         <div className="flex flex-col items-center gap-2">
-          <Avatar shape={getAvatarShape(metadata)} className="size-16 ring-2 ring-secondary">
+          <Avatar className="size-16 ring-2 ring-secondary">
             <AvatarImage src={metadata?.picture} alt={displayName} />
             <AvatarFallback className="text-xl font-semibold">
               {displayName.charAt(0).toUpperCase()}

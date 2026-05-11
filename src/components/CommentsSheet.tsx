@@ -15,7 +15,6 @@ import { useProfileUrl } from '@/hooks/useProfileUrl';
 import { getDisplayName } from '@/lib/getDisplayName';
 import { timeAgo } from '@/lib/timeAgo';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
-import { getAvatarShape } from '@/lib/avatarShape';
 import { Skeleton } from '@/components/ui/skeleton';
 import { ProfileHoverCard } from '@/components/ProfileHoverCard';
 import { ComposeBox } from '@/components/ComposeBox';
@@ -64,7 +63,6 @@ function useEventComments(event: NostrEvent | undefined) {
 function CommentRow({ event }: { event: NostrEvent }) {
   const author = useAuthor(event.pubkey);
   const metadata = author.data?.metadata;
-  const avatarShape = getAvatarShape(metadata);
   const displayName = getDisplayName(metadata, event.pubkey);
   const profileUrl = useProfileUrl(event.pubkey, metadata);
 
@@ -75,7 +73,7 @@ function CommentRow({ event }: { event: NostrEvent }) {
           {author.isLoading ? (
             <Skeleton className="size-7 rounded-full" />
           ) : (
-            <Avatar shape={avatarShape} className="size-7">
+            <Avatar className="size-7">
               <AvatarImage src={metadata?.picture} alt={displayName} />
               <AvatarFallback className="text-[10px] bg-primary/20 text-primary">
                 {displayName[0]?.toUpperCase()}

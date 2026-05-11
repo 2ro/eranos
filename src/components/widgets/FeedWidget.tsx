@@ -17,7 +17,6 @@ import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useFollowList } from '@/hooks/useFollowActions';
 import { useCuratorFollowList } from '@/hooks/useCuratorFollowList';
 import { genUserName } from '@/lib/genUserName';
-import { getAvatarShape } from '@/lib/avatarShape';
 import { timeAgo } from '@/lib/timeAgo';
 
 interface FeedWidgetProps {
@@ -95,7 +94,6 @@ export function FeedWidget({ kinds, feedPath, feedLabel, limit = 5, emptyMessage
 function CompactEventCard({ event }: { event: NostrEvent }) {
   const author = useAuthor(event.pubkey);
   const metadata = author.data?.metadata;
-  const avatarShape = getAvatarShape(metadata);
   const displayName = metadata?.name || genUserName(event.pubkey);
   const encodedId = useMemo(() => nip19.neventEncode({ id: event.id, author: event.pubkey }), [event]);
 
@@ -116,7 +114,7 @@ function CompactEventCard({ event }: { event: NostrEvent }) {
       className="block hover:bg-secondary/40 px-2 py-2 rounded-lg transition-colors"
     >
       <div className="flex items-center gap-1.5 mb-0.5">
-        <Avatar shape={avatarShape} className="size-4">
+        <Avatar className="size-4">
           <AvatarImage src={metadata?.picture} alt={displayName} />
           <AvatarFallback className="bg-primary/20 text-primary text-[8px]">
             {displayName[0]?.toUpperCase()}

@@ -13,7 +13,6 @@ import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useFollowList } from '@/hooks/useFollowActions';
 import { useCuratorFollowList } from '@/hooks/useCuratorFollowList';
 import { genUserName } from '@/lib/genUserName';
-import { getAvatarShape } from '@/lib/avatarShape';
 import { timeAgo } from '@/lib/timeAgo';
 import { sanitizeUrl } from '@/lib/sanitizeUrl';
 
@@ -76,7 +75,6 @@ export function PhotoWidget() {
 function PhotoCard({ event }: { event: NostrEvent }) {
   const author = useAuthor(event.pubkey);
   const metadata = author.data?.metadata;
-  const avatarShape = getAvatarShape(metadata);
   const displayName = metadata?.name || genUserName(event.pubkey);
   const encodedId = useMemo(() => nip19.neventEncode({ id: event.id, author: event.pubkey }), [event]);
 
@@ -100,7 +98,7 @@ function PhotoCard({ event }: { event: NostrEvent }) {
       {/* Author + caption */}
       <div className="mt-2 px-0.5 space-y-1">
         <div className="flex items-center gap-1.5">
-          <Avatar shape={avatarShape} className="size-4">
+          <Avatar className="size-4">
             <AvatarImage src={metadata?.picture} alt={displayName} />
             <AvatarFallback className="bg-primary/20 text-primary text-[8px]">
               {displayName[0]?.toUpperCase()}

@@ -2,7 +2,6 @@ import { useMemo } from 'react';
 import { nip19 } from 'nostr-tools';
 import type { NostrEvent, NostrMetadata } from '@nostrify/nostrify';
 
-import { getAvatarShape } from '@/lib/avatarShape';
 import { isGoalExpired, parseCommunityATag, type ParsedGoal } from '@/lib/goalUtils';
 import { genUserName } from '@/lib/genUserName';
 import { useAddrEvent } from '@/hooks/useEvent';
@@ -21,7 +20,6 @@ export interface GoalDisplayData {
   progressIsPartial: boolean;
   metadata: NostrMetadata | undefined;
   displayName: string;
-  avatarShape: string | undefined;
   profileUrl: string;
   lightningAddress: string | undefined;
   deadlineLabel: string | null;
@@ -46,7 +44,6 @@ export function useGoalDisplay(event: NostrEvent, goal: ParsedGoal): GoalDisplay
   const author = useAuthor(goal.beneficiary);
   const metadata: NostrMetadata | undefined = author.data?.metadata;
   const displayName = metadata?.display_name || metadata?.name || genUserName(goal.beneficiary);
-  const avatarShape = getAvatarShape(metadata);
   const profileUrl = useProfileUrl(goal.beneficiary, metadata);
   const lightningAddress = metadata?.lud16 || metadata?.lud06 || undefined;
 
@@ -93,7 +90,6 @@ export function useGoalDisplay(event: NostrEvent, goal: ParsedGoal): GoalDisplay
     progressIsPartial,
     metadata,
     displayName,
-    avatarShape,
     profileUrl,
     lightningAddress,
     deadlineLabel,

@@ -14,7 +14,6 @@ import {
 import type { NostrEvent, NostrMetadata } from '@nostrify/nostrify';
 
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
-import { getAvatarShape } from '@/lib/avatarShape';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
@@ -47,7 +46,6 @@ import { cn } from '@/lib/utils';
 function PersonRow({ pubkey, label, size = 'md', onBan }: { pubkey: string; label?: string; size?: 'sm' | 'md'; onBan?: () => void }) {
   const { data } = useAuthor(pubkey);
   const metadata: NostrMetadata | undefined = data?.metadata;
-  const avatarShape = getAvatarShape(metadata);
   const name = metadata?.display_name || metadata?.name || genUserName(pubkey);
   const profileUrl = useProfileUrl(pubkey, metadata);
   const avatarCls = size === 'sm' ? 'size-8' : 'size-10';
@@ -56,7 +54,7 @@ function PersonRow({ pubkey, label, size = 'md', onBan }: { pubkey: string; labe
   return (
     <div className="flex items-center gap-3 py-1">
       <Link to={profileUrl} className="flex items-center gap-3 group flex-1 min-w-0">
-        <Avatar shape={avatarShape} className={cn(avatarCls, 'ring-2 ring-background')}>
+        <Avatar className={cn(avatarCls, 'ring-2 ring-background')}>
           <AvatarImage src={metadata?.picture} />
           <AvatarFallback className={cn('bg-muted text-muted-foreground', fallbackCls)}>
             {name.charAt(0).toUpperCase()}
