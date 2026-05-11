@@ -168,8 +168,8 @@ function CommunityChatMessage({ event, showAvatar }: { event: NostrEvent; showAv
         <ContentWarningGuard event={event}>
           <div
             className={cn(
-              'max-w-[64%] break-words text-sm leading-relaxed sm:max-w-xs',
-              isOwnMessage && 'text-right',
+              'inline-block w-fit max-w-[64%] break-words rounded-2xl px-3 py-2 text-sm leading-relaxed sm:max-w-xs',
+              isOwnMessage ? 'rounded-tr-md bg-primary text-primary-foreground text-right' : 'rounded-tl-md bg-secondary/60',
             )}
           >
             <NoteContent event={event} disableNoteEmbeds />
