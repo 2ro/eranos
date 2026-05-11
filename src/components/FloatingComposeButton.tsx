@@ -27,14 +27,12 @@ interface FloatingComposeButtonProps {
 }
 
 export function FloatingComposeButton({ kind = 1, href, onFabClick, icon }: FloatingComposeButtonProps) {
-  const { user, isLoading } = useCurrentUser();
+  const { user } = useCurrentUser();
   const navigate = useNavigate();
   const [composeOpen, setComposeOpen] = useState(false);
   const [comingSoonOpen, setComingSoonOpen] = useState(false);
 
-  // Hide until user metadata is resolved so the shape mask is immediately
-  // correct — avoids a brief flash of the default circle fallback.
-  if (!user || isLoading) {
+  if (!user) {
     return null;
   }
 

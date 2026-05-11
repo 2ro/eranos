@@ -7,7 +7,6 @@ import { Award, Image, MessageSquareOff } from 'lucide-react';
 import type { NostrEvent } from '@nostrify/nostrify';
 
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
-import { getAvatarShape } from '@/lib/avatarShape';
 import { Skeleton } from '@/components/ui/skeleton';
 import { EmojifiedText } from '@/components/CustomEmoji';
 import { EmbeddedCardShell } from '@/components/EmbeddedCardShell';
@@ -194,7 +193,6 @@ export function EmbeddedProfileBadgesCard({ event, className }: { event: NostrEv
   const navigate = useNavigate();
   const author = useAuthor(event.pubkey);
   const metadata = author.data?.metadata;
-  const avatarShape = getAvatarShape(metadata);
   const displayName = metadata?.name || genUserName(event.pubkey);
   const profileUrl = useProfileUrl(event.pubkey, metadata);
 
@@ -272,7 +270,7 @@ export function EmbeddedProfileBadgesCard({ event, className }: { event: NostrEv
                 className="shrink-0"
                 onClick={(e) => e.stopPropagation()}
               >
-                <Avatar shape={avatarShape} className="size-5">
+                <Avatar className="size-5">
                   <AvatarImage src={metadata?.picture} alt={displayName} />
                   <AvatarFallback className="bg-primary/20 text-primary text-[10px]">
                     {displayName[0]?.toUpperCase()}

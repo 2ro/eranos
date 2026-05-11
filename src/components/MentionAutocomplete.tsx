@@ -2,7 +2,6 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { nip19 } from 'nostr-tools';
 import { UserRoundCheck } from 'lucide-react';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
-import { getAvatarShape } from '@/lib/avatarShape';
 import { EmojifiedText } from '@/components/CustomEmoji';
 import { useSearchProfiles, type SearchProfile } from '@/hooks/useSearchProfiles';
 import { genUserName } from '@/lib/genUserName';
@@ -314,7 +313,7 @@ function MentionItem({
       onMouseDown={(e) => e.preventDefault()}
     >
       <div className="relative shrink-0">
-        <Avatar shape={getAvatarShape(metadata)} className="size-8">
+        <Avatar className="size-8">
           <AvatarImage src={metadata.picture} alt={displayName} />
           <AvatarFallback className="bg-primary/20 text-primary text-xs">
             {displayName[0]?.toUpperCase() || '?'}

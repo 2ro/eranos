@@ -14,7 +14,6 @@ import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { EmojifiedText } from '@/components/CustomEmoji';
 import { VerifiedNip05Text } from '@/components/Nip05Badge';
-import { getAvatarShape } from '@/lib/avatarShape';
 import { genUserName } from '@/lib/genUserName';
 import { timeAgo } from '@/lib/timeAgo';
 import { cn } from '@/lib/utils';
@@ -109,10 +108,9 @@ function VoterAvatarsButton({
         {votes.slice(0, 6).map((vote) => {
           const authorData = authorsMap?.get(vote.pubkey);
           const metadata = authorData?.metadata;
-          const avatarShape = getAvatarShape(metadata);
           const name = metadata?.name || genUserName(vote.pubkey);
           return (
-            <Avatar key={vote.pubkey} shape={avatarShape} className="size-5 ring-1 ring-background">
+            <Avatar key={vote.pubkey} className="size-5 ring-1 ring-background">
               <AvatarImage src={metadata?.picture} alt={name} />
               <AvatarFallback className="bg-primary/20 text-primary text-[8px]">
                 {name[0]?.toUpperCase()}
@@ -484,7 +482,6 @@ function VoterRow({ vote, optionLabelMap, pollType, authorsMap }: VoterRowProps)
   const individualAuthor = useAuthor(authorsMap?.has(vote.pubkey) ? undefined : vote.pubkey);
   const authorData = authorsMap?.get(vote.pubkey) ?? individualAuthor.data;
   const metadata = authorData?.metadata;
-  const avatarShape = getAvatarShape(metadata);
   const displayName = metadata?.name || genUserName(vote.pubkey);
 
   const nevent = useMemo(
@@ -521,7 +518,7 @@ function VoterRow({ vote, optionLabelMap, pollType, authorsMap }: VoterRowProps)
       }}
       className="flex items-center gap-3 px-4 py-3 hover:bg-secondary/30 transition-colors"
     >
-      <Avatar shape={avatarShape} className="size-10 shrink-0">
+      <Avatar className="size-10 shrink-0">
         <AvatarImage src={metadata?.picture} alt={displayName} />
         <AvatarFallback className="bg-primary/20 text-primary text-sm">
           {displayName[0].toUpperCase()}

@@ -3,7 +3,6 @@ import { LinkFooter } from '@/components/LinkFooter';
 import { useOpenPost } from '@/hooks/useOpenPost';
 import { X } from 'lucide-react';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
-import { getAvatarShape } from '@/lib/avatarShape';
 import { Skeleton } from '@/components/ui/skeleton';
 import { EmojifiedText } from '@/components/CustomEmoji';
 import { useTrendingTags, useLatestAccounts, useSortedPosts, useTagSparklines } from '@/hooks/useTrending';
@@ -187,7 +186,6 @@ export function RightSidebar() {
 function HotPostCard({ event }: { event: NostrEvent }) {
   const author = useAuthor(event.pubkey);
   const metadata = author.data?.metadata;
-  const avatarShape = getAvatarShape(metadata);
   const displayName = metadata?.name || genUserName(event.pubkey);
   const encodedId = useMemo(() => nip19.neventEncode({ id: event.id, author: event.pubkey }), [event]);
   const { onClick: openPost, onAuxClick } = useOpenPost(`/${encodedId}`);
@@ -207,7 +205,7 @@ function HotPostCard({ event }: { event: NostrEvent }) {
       className="block w-full text-left hover:bg-secondary/40 -mx-2 px-2 py-2 rounded-lg transition-colors"
     >
       <div className="flex items-center gap-1.5 mb-0.5">
-        <Avatar shape={avatarShape} className="size-4">
+        <Avatar className="size-4">
           <AvatarImage src={metadata?.picture} alt={displayName} />
           <AvatarFallback className="bg-primary/20 text-primary text-[8px]">
             {displayName[0]?.toUpperCase()}
@@ -234,13 +232,12 @@ function LatestAccountCard({ event, onDismiss }: { event: NostrEvent; onDismiss:
   }
 
   const displayName = metadata.name || genUserName(event.pubkey);
-  const latestAvatarShape = getAvatarShape(metadata);
   const npub = useMemo(() => nip19.npubEncode(event.pubkey), [event.pubkey]);
 
   return (
     <div className="flex items-center gap-3 group hover:bg-secondary/40 -mx-2 px-2 py-2 rounded-lg transition-colors">
       <Link to={`/${npub}`} className="shrink-0">
-        <Avatar shape={latestAvatarShape} className="size-10">
+        <Avatar className="size-10">
           <AvatarImage src={metadata.picture} alt={displayName} />
           <AvatarFallback className="bg-primary/20 text-primary text-sm">
             {displayName[0].toUpperCase()}

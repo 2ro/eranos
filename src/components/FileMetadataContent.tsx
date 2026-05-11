@@ -9,7 +9,6 @@ import { AudioVisualizer } from '@/components/AudioVisualizer';
 import { useAuthor } from '@/hooks/useAuthor';
 import { getDisplayName } from '@/lib/getDisplayName';
 import { genUserName } from '@/lib/genUserName';
-import { getAvatarShape } from '@/lib/avatarShape';
 import { sanitizeUrl } from '@/lib/sanitizeUrl';
 
 /** Extract the first value of a tag by name. */
@@ -56,7 +55,6 @@ function AudioFileContent({
         mime={mime}
         avatarUrl={metadata?.picture}
         avatarFallback={displayName[0]?.toUpperCase() ?? '?'}
-        avatarShape={getAvatarShape(metadata)}
       />
       {description && <DescriptionCard text={description} />}
     </div>

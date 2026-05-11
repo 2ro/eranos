@@ -9,7 +9,6 @@ import { Badge } from '@/components/ui/badge';
 import { useAuthor } from '@/hooks/useAuthor';
 import { useProfileUrl } from '@/hooks/useProfileUrl';
 import { genUserName } from '@/lib/genUserName';
-import { getAvatarShape } from '@/lib/avatarShape';
 import { parseCommunityEvent, COMMUNITY_DEFINITION_KIND } from '@/lib/communityUtils';
 import { cn } from '@/lib/utils';
 
@@ -30,7 +29,6 @@ export function CommunityCard({ event, isFounded, className }: CommunityCardProp
 
   const founderAuthor = useAuthor(event.pubkey);
   const founderMeta = founderAuthor.data?.metadata;
-  const founderAvatarShape = getAvatarShape(founderMeta);
   const founderName = founderMeta?.display_name || founderMeta?.name || genUserName(event.pubkey);
   const founderProfileUrl = useProfileUrl(event.pubkey, founderMeta);
 
@@ -97,7 +95,7 @@ export function CommunityCard({ event, isFounded, className }: CommunityCardProp
             onClick={(e) => e.stopPropagation()}
             className="flex items-center gap-1.5 min-w-0"
           >
-            <Avatar shape={founderAvatarShape} className="size-5">
+            <Avatar className="size-5">
               <AvatarImage src={founderMeta?.picture} />
               <AvatarFallback className="text-[8px] bg-muted">
                 {founderName.charAt(0).toUpperCase()}

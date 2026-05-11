@@ -77,7 +77,6 @@ import { ZapstoreAppContent } from "@/components/ZapstoreAppContent";
 import { ZapstoreReleaseContent, ZapstoreAssetContent } from "@/components/ZapstoreReleaseContent";
 import { AppHandlerContent } from "@/components/AppHandlerContent";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { getAvatarShape } from "@/lib/avatarShape";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { VideoPlayer } from "@/components/VideoPlayer";
@@ -184,7 +183,6 @@ export function ActivityCard({
 export interface ActorRowProps {
   pubkey: string;
   profileUrl: string;
-  avatarShape: Parameters<typeof Avatar>[0]['shape'];
   picture?: string;
   displayName: string;
   authorEvent?: NostrEvent;
@@ -196,7 +194,7 @@ export interface ActorRowProps {
   timestampLabel: string;
 }
 
-export function ActorRow({ pubkey, profileUrl, avatarShape, picture, displayName, authorEvent, isLoading, label, extra, timestampLabel }: ActorRowProps) {
+export function ActorRow({ pubkey, profileUrl, picture, displayName, authorEvent, isLoading, label, extra, timestampLabel }: ActorRowProps) {
   if (isLoading) {
     return (
       <div className="flex items-center gap-2">
@@ -209,7 +207,7 @@ export function ActorRow({ pubkey, profileUrl, avatarShape, picture, displayName
     <div className="flex items-center gap-2">
       <ProfileHoverCard pubkey={pubkey} asChild>
         <Link to={profileUrl} className="shrink-0" onClick={(e) => e.stopPropagation()}>
-          <Avatar shape={avatarShape} className="size-6">
+          <Avatar className="size-6">
             <AvatarImage src={picture} alt={displayName} />
             <AvatarFallback className="bg-primary/20 text-primary text-[8px]">{displayName[0]?.toUpperCase()}</AvatarFallback>
           </Avatar>
@@ -324,14 +322,12 @@ export const NoteCard = memo(function NoteCard({
   const zapSenderPubkey = useMemo(() => event.kind === 9735 ? extractZapSender(event) : '', [event]);
   const zapSender = useAuthor(zapSenderPubkey || undefined);
   const zapSenderMeta = zapSender.data?.metadata;
-  const zapSenderShape = getAvatarShape(zapSenderMeta);
   const zapSenderName = getDisplayName(zapSenderMeta, zapSenderPubkey);
   const zapSenderUrl = useProfileUrl(zapSenderPubkey, zapSenderMeta);
 
   const pollVoteLabel = usePollVoteLabel(event);
 
   const metadata = author.data?.metadata;
-  const avatarShape = getAvatarShape(metadata);
   const displayName = getDisplayName(metadata, event.pubkey);
   const nip05 = metadata?.nip05;
   const { data: nip05Verified, isPending: nip05Pending } = useNip05Verify(
@@ -731,7 +727,7 @@ export const NoteCard = memo(function NoteCard({
         className="shrink-0"
         onClick={(e) => e.stopPropagation()}
       >
-        <Avatar shape={avatarShape} className={threaded || threadedLast ? "size-10" : "size-11"}>
+        <Avatar className={threaded || threadedLast ? "size-10" : "size-11"}>
           <AvatarImage src={metadata?.picture} alt={displayName} />
           <AvatarFallback className="bg-primary/20 text-primary text-sm">
             {displayName[0]?.toUpperCase()}
@@ -900,7 +896,7 @@ export const NoteCard = memo(function NoteCard({
           </div>
         }
         actorRow={
-          <ActorRow pubkey={event.pubkey} profileUrl={profileUrl} avatarShape={avatarShape} picture={metadata?.picture}
+          <ActorRow pubkey={event.pubkey} profileUrl={profileUrl} picture={metadata?.picture}
             displayName={displayName} authorEvent={author.data?.event} isLoading={author.isLoading} label="reacted" timestampLabel={timeAgo(event.created_at)} />
         }
         threaded={threaded} threadedLast={threadedLast} threadedLineClassName={threadedLineClassName}
@@ -920,7 +916,7 @@ export const NoteCard = memo(function NoteCard({
           </div>
         }
         actorRow={
-          <ActorRow pubkey={event.pubkey} profileUrl={profileUrl} avatarShape={avatarShape} picture={metadata?.picture}
+          <ActorRow pubkey={event.pubkey} profileUrl={profileUrl} picture={metadata?.picture}
             displayName={displayName} authorEvent={author.data?.event} isLoading={author.isLoading} label="reposted" timestampLabel={timeAgo(event.created_at)} />
         }
         threaded={threaded} threadedLast={threadedLast} threadedLineClassName={threadedLineClassName}
@@ -942,7 +938,7 @@ export const NoteCard = memo(function NoteCard({
           </div>
         }
         actorRow={
-          <ActorRow pubkey={zapSenderPubkey} profileUrl={zapSenderUrl} avatarShape={zapSenderShape} picture={zapSenderMeta?.picture}
+          <ActorRow pubkey={zapSenderPubkey} profileUrl={zapSenderUrl} picture={zapSenderMeta?.picture}
             displayName={zapSenderName} authorEvent={zapSender.data?.event} isLoading={zapSender.isLoading} label="zapped" timestampLabel={timeAgo(event.created_at)}
             extra={zapAmountSats > 0 ? (
               <span className="text-sm font-semibold text-amber-500 shrink-0">
@@ -967,7 +963,7 @@ export const NoteCard = memo(function NoteCard({
         icon={
           <ProfileHoverCard pubkey={event.pubkey} asChild>
             <Link to={profileUrl} className="shrink-0" onClick={(e) => e.stopPropagation()}>
-              <Avatar shape={avatarShape} className={iconSize}>
+              <Avatar className={iconSize}>
                 <AvatarImage src={metadata?.picture} alt={displayName} />
                 <AvatarFallback className="bg-primary/20 text-primary text-sm">{displayName[0]?.toUpperCase()}</AvatarFallback>
               </Avatar>

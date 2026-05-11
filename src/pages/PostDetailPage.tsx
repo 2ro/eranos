@@ -70,7 +70,6 @@ import { ReplyComposeModal } from "@/components/ReplyComposeModal";
 import { RepostMenu } from "@/components/RepostMenu";
 import { ThreadedReplyList, FlatThreadedReplyList, type ReplyNode } from "@/components/ThreadedReplyList";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { getAvatarShape } from "@/lib/avatarShape";
 import { Button } from "@/components/ui/button";
 import {
   Collapsible,
@@ -527,7 +526,6 @@ function CopyableHex({ value }: { value: string }) {
 function AuthorHintRow({ pubkey }: { pubkey: string }) {
   const author = useAuthor(pubkey);
   const metadata = author.data?.metadata;
-  const avatarShape = getAvatarShape(metadata);
   const displayName = getDisplayName(metadata, pubkey);
   const profileUrl = useProfileUrl(pubkey, metadata);
 
@@ -544,7 +542,7 @@ function AuthorHintRow({ pubkey }: { pubkey: string }) {
           </>
         ) : (
           <>
-            <Avatar shape={avatarShape} className="size-6 shrink-0">
+            <Avatar className="size-6 shrink-0">
               <AvatarImage src={metadata?.picture} alt={displayName} />
               <AvatarFallback className="bg-primary/20 text-primary text-[10px]">
                 {displayName[0]?.toUpperCase()}
@@ -943,7 +941,6 @@ function PostDetailContent({ event }: { event: NostrEvent }) {
   const queryClient = useQueryClient();
   const author = useAuthor(event.pubkey);
   const metadata = author.data?.metadata;
-  const avatarShape = getAvatarShape(metadata);
   const displayName = getDisplayName(metadata, event.pubkey);
 
   // Refetch the author's profile whenever we navigate to a post by this author.
@@ -957,7 +954,6 @@ function PostDetailContent({ event }: { event: NostrEvent }) {
   const zapSenderPubkeyRaw = useMemo(() => event.kind === 9735 ? extractZapSender(event) : '', [event]);
   const zapSenderAuthor = useAuthor(zapSenderPubkeyRaw || undefined);
   const zapSenderMeta = zapSenderAuthor.data?.metadata;
-  const zapSenderShape = getAvatarShape(zapSenderMeta);
   const zapSenderDisplayName = getDisplayName(zapSenderMeta, zapSenderPubkeyRaw);
   const zapSenderProfileUrl = useProfileUrl(zapSenderPubkeyRaw, zapSenderMeta);
 
@@ -1479,7 +1475,7 @@ function PostDetailContent({ event }: { event: NostrEvent }) {
                 <>
                   <ProfileHoverCard pubkey={event.pubkey} asChild>
                     <Link to={profileUrl} className="shrink-0">
-                      <Avatar shape={avatarShape} className="size-6">
+                      <Avatar className="size-6">
                         <AvatarImage
                           src={metadata?.picture}
                           alt={displayName}
@@ -1597,7 +1593,7 @@ function PostDetailContent({ event }: { event: NostrEvent }) {
                 <>
                   <ProfileHoverCard pubkey={event.pubkey} asChild>
                     <Link to={profileUrl} className="shrink-0">
-                      <Avatar shape={avatarShape} className="size-6">
+                      <Avatar className="size-6">
                         <AvatarImage
                           src={metadata?.picture}
                           alt={displayName}
@@ -1719,7 +1715,7 @@ function PostDetailContent({ event }: { event: NostrEvent }) {
                     {zapSenderPubkeyRaw && (
                       <ProfileHoverCard pubkey={zapSenderPubkeyRaw} asChild>
                         <Link to={zapSenderProfileUrl} className="shrink-0">
-                          <Avatar shape={zapSenderShape} className="size-6">
+                          <Avatar className="size-6">
                             <AvatarImage src={zapSenderMeta?.picture} alt={zapSenderDisplayName} />
                             <AvatarFallback className="bg-primary/20 text-primary text-[10px]">
                               {zapSenderDisplayName[0]?.toUpperCase()}
@@ -1960,7 +1956,7 @@ function PostDetailContent({ event }: { event: NostrEvent }) {
             icon={
               <ProfileHoverCard pubkey={event.pubkey} asChild>
                 <Link to={profileUrl} className="shrink-0">
-                  <Avatar shape={avatarShape} className="size-10">
+                  <Avatar className="size-10">
                     <AvatarImage src={metadata?.picture} alt={displayName} />
                     <AvatarFallback className="bg-primary/20 text-primary text-sm">{displayName[0]?.toUpperCase()}</AvatarFallback>
                   </Avatar>
@@ -2026,7 +2022,7 @@ function PostDetailContent({ event }: { event: NostrEvent }) {
               <>
                 <ProfileHoverCard pubkey={event.pubkey} asChild>
                   <Link to={profileUrl}>
-                    <Avatar shape={avatarShape} className="size-11">
+                    <Avatar className="size-11">
                       <AvatarImage src={metadata?.picture} alt={displayName} />
                       <AvatarFallback className="bg-primary/20 text-primary text-sm">
                         {displayName[0].toUpperCase()}

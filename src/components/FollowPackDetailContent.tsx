@@ -5,7 +5,6 @@ import { nip19 } from 'nostr-tools';
 import type { NostrEvent, NostrMetadata } from '@nostrify/nostrify';
 
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
-import { getAvatarShape } from '@/lib/avatarShape';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Badge } from '@/components/ui/badge';
@@ -147,7 +146,6 @@ export function FollowPackDetailContent({ event }: { event: NostrEvent }) {
 
   const author = useAuthor(event.pubkey);
   const metadata = author.data?.metadata;
-  const avatarShape = getAvatarShape(metadata);
   const displayName = metadata?.name || genUserName(event.pubkey);
   const npub = useMemo(() => nip19.npubEncode(event.pubkey), [event.pubkey]);
 
@@ -247,7 +245,7 @@ export function FollowPackDetailContent({ event }: { event: NostrEvent }) {
         {/* Author row */}
         <div className="flex items-center gap-3">
           <Link to={`/${npub}`}>
-            <Avatar shape={avatarShape} className="size-11">
+            <Avatar className="size-11">
               <AvatarImage src={metadata?.picture} alt={displayName} />
               <AvatarFallback className="bg-primary/20 text-primary text-sm">
                 {displayName[0]?.toUpperCase()}
@@ -361,7 +359,6 @@ export function MemberCard({
   const npub = useMemo(() => nip19.npubEncode(pubkey), [pubkey]);
   const displayName = metadata?.name || metadata?.display_name || genUserName(pubkey);
   const about = metadata?.about;
-  const avatarShape = getAvatarShape(metadata);
   const { follow, unfollow, isPending } = useFollowActions();
 
   const handleFollowToggle = useCallback(
@@ -382,7 +379,7 @@ export function MemberCard({
       onClick={() => navigate(`/${npub}`)}
     >
       <Link to={`/${npub}`} className="shrink-0" onClick={(e) => e.stopPropagation()}>
-        <Avatar shape={avatarShape} className="size-11">
+        <Avatar className="size-11">
           <AvatarImage src={metadata?.picture} alt={displayName} />
           <AvatarFallback className="bg-primary/20 text-primary text-sm">
             {displayName[0]?.toUpperCase()}

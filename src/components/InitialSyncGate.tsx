@@ -45,7 +45,6 @@ import { OnboardingContext } from "@/hooks/useOnboarding";
 import { toast } from "@/hooks/useToast";
 import { useUploadFile } from "@/hooks/useUploadFile";
 import { genUserName } from "@/lib/genUserName";
-import { getAvatarShape, isValidAvatarShape } from "@/lib/avatarShape";
 
 import { cn } from "@/lib/utils";
 
@@ -707,12 +706,7 @@ function ProfileStep({
     const hasData = Object.values(profileData).some((v) => v);
     if (hasData) {
       try {
-        // Build the outgoing metadata, stripping empty strings and validating shape.
-        const { shape, ...rest } = profileData;
-        const data: Record<string, unknown> = { ...rest };
-        if (shape && isValidAvatarShape(shape)) {
-          data.shape = shape;
-        }
+        const data: Record<string, unknown> = { ...profileData };
         for (const key in data) {
           if (data[key] === "") delete data[key];
         }
@@ -774,9 +768,6 @@ function ProfileStep({
             setProfileData((prev) => ({ ...prev, ...patch }))
           }
           onPickImage={handlePickImage}
-          onAvatarShape={(shape) =>
-            setProfileData((prev) => ({ ...prev, shape }))
-          }
           showNip05={false}
         />
       </div>
@@ -1086,9 +1077,9 @@ function AuthorAttribution({ pubkey }: { pubkey: string }) {
 }
 
 /** Tiny avatar used in pack member stacks. */
-function MiniAvatar({ src, name, metadata }: { src?: string; name: string; metadata?: NostrMetadata }) {
+function MiniAvatar({ src, name }: { src?: string; name: string; metadata?: NostrMetadata }) {
   return (
-    <Avatar className="size-7 ring-2 ring-background" shape={getAvatarShape(metadata)}>
+    <Avatar className="size-7 ring-2 ring-background">
       <AvatarImage src={src} alt={name} />
       <AvatarFallback className="bg-primary/15 text-primary text-[10px]">
         {name[0]?.toUpperCase()}

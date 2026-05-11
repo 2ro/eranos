@@ -8,7 +8,6 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { ProfileHoverCard } from '@/components/ProfileHoverCard';
 import { useAuthor } from '@/hooks/useAuthor';
 import { useProfileUrl } from '@/hooks/useProfileUrl';
-import { getAvatarShape } from '@/lib/avatarShape';
 import { getDisplayName } from '@/lib/getDisplayName';
 import { genUserName } from '@/lib/genUserName';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -26,7 +25,6 @@ interface EncryptedMessageContentProps {
 function Participant({ pubkey }: { pubkey: string }) {
   const author = useAuthor(pubkey);
   const metadata = author.data?.metadata;
-  const avatarShape = getAvatarShape(metadata);
   const displayName = getDisplayName(metadata, pubkey);
   const profileUrl = useProfileUrl(pubkey, metadata);
 
@@ -43,7 +41,7 @@ function Participant({ pubkey }: { pubkey: string }) {
     <div className="flex flex-col items-center gap-1.5 min-w-0">
       <ProfileHoverCard pubkey={pubkey} asChild>
         <Link to={profileUrl} onClick={(e) => e.stopPropagation()}>
-          <Avatar shape={avatarShape} className="size-10 ring-2 ring-background shadow-md">
+          <Avatar className="size-10 ring-2 ring-background shadow-md">
             <AvatarImage src={metadata?.picture} alt={displayName} />
             <AvatarFallback className="bg-primary/20 text-primary text-xs font-semibold">
               {displayName[0]?.toUpperCase()}
@@ -129,7 +127,6 @@ export function EncryptedMessageCompact({ event, className }: EncryptedMessageCo
   const navigate = useNavigate();
   const author = useAuthor(event.pubkey);
   const metadata = author.data?.metadata;
-  const avatarShape = getAvatarShape(metadata);
   const displayName = metadata?.name || genUserName(event.pubkey);
   const recipientPubkey = event.tags.find(([n]) => n === 'p')?.[1];
   const recipientAuthor = useAuthor(recipientPubkey ?? '');
@@ -181,7 +178,7 @@ export function EncryptedMessageCompact({ event, className }: EncryptedMessageCo
                   className="shrink-0"
                   onClick={(e) => e.stopPropagation()}
                 >
-                  <Avatar shape={avatarShape} className="size-5">
+                  <Avatar className="size-5">
                     <AvatarImage src={metadata?.picture} alt={displayName} />
                     <AvatarFallback className="bg-primary/20 text-primary text-[10px]">
                       {displayName[0]?.toUpperCase()}

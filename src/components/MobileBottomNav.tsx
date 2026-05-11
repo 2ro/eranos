@@ -3,7 +3,6 @@ import { Link, useLocation } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
 import { Bell, Home, Search, User } from 'lucide-react';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
-import { getAvatarShape } from '@/lib/avatarShape';
 import { cn } from '@/lib/utils';
 import { selectionChanged } from '@/lib/haptics';
 import { useHasUnreadNotifications } from '@/hooks/useHasUnreadNotifications';
@@ -130,7 +129,7 @@ export function MobileBottomNav() {
                 isOnProfile ? 'text-primary' : 'text-muted-foreground',
               )}
             >
-              <Avatar shape={getAvatarShape(metadata)} className="size-5">
+              <Avatar className="size-5">
                 <AvatarImage src={metadata?.picture} alt={displayName} />
                 <AvatarFallback className="bg-primary/20 text-primary text-[8px]">
                   {displayName?.[0]?.toUpperCase() || <User className="size-3" />}
