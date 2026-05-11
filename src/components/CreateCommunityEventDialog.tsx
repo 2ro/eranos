@@ -331,7 +331,7 @@ export function CreateCommunityEventDialog({ communityATag, open, onOpenChange, 
       handleOpenChange(false);
     } catch (err) {
       toast({
-        title: 'Failed to create event',
+        title: isEditing ? 'Failed to update event' : 'Failed to create event',
         description: err instanceof Error ? err.message : 'Please try again.',
         variant: 'destructive',
       });
