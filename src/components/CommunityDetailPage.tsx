@@ -30,6 +30,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { BanConfirmDialog } from '@/components/BanConfirmDialog';
 import { CommunityChatPanel } from '@/components/CommunityChatPanel';
+import { CommunityBadgePanel } from '@/components/CommunityBadgePanel';
 import { ComposeBox } from '@/components/ComposeBox';
 import { FeedEmptyState } from '@/components/FeedEmptyState';
 import { CreateGoalDialog } from '@/components/CreateGoalDialog';
@@ -566,6 +567,14 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
             <MembersOnlyToggle className="-my-2 -mr-2" />
           </div>
         </div>
+
+        {community && (
+          <CommunityBadgePanel
+            communityEvent={event}
+            community={community}
+            isFounder={isFounder}
+          />
+        )}
 
         {/* ── Tabs ── */}
         <CommunityModerationContext.Provider value={moderationCtx}>
