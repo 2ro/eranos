@@ -64,10 +64,6 @@ function addDays(date: string, days: number): string {
   return parsed.toISOString().slice(0, 10);
 }
 
-function subtractDays(date: string, days: number): string {
-  return addDays(date, -days);
-}
-
 function formatLocalDateTimeFields(timestamp: string): { date: string; time: string } {
   const parsed = parseInt(timestamp, 10);
   if (!Number.isFinite(parsed) || parsed <= 0) return { date: '', time: '' };
@@ -116,6 +112,7 @@ export function CreateCommunityEventDialog({ communityATag, open, onOpenChange, 
   const isEditing = !!event;
   const effectiveCommunityATag = communityATag ?? event?.tags.find(([name]) => name === 'A')?.[1];
   const isCommunityEvent = !!effectiveCommunityATag;
+  const minEndDate = startDate ? addDays(startDate, allDay ? 1 : 0) : undefined;
 
   const resetForm = useCallback(() => {
     setStep(1);
@@ -158,7 +155,7 @@ export function CreateCommunityEventDialog({ communityATag, open, onOpenChange, 
     if (isAllDay) {
       setStartDate(startTag);
       setStartTime('');
-      setEndDate(endTag ? subtractDays(endTag, 1) : '');
+      setEndDate(endTag);
       setEndTime('');
       return;
     }
@@ -186,6 +183,29 @@ export function CreateCommunityEventDialog({ communityATag, open, onOpenChange, 
     if (!validateInfoStep()) return;
     setStep(2);
   }, [isImageUploading, validateInfoStep]);
+
+  const handleAllDayChange = useCallback((checked: boolean) => {
+    setAllDay(checked);
+    if (checked && startDate && endDate && endDate <= startDate) {
+      setEndDate(addDays(startDate, 1));
+    }
+  }, [endDate, startDate]);
+
+  const handleStartDateChange = useCallback((nextStartDate: string) => {
+    setStartDate(nextStartDate);
+    if (!nextStartDate || !endDate) return;
+
+    const nextMinEndDate = addDays(nextStartDate, allDay ? 1 : 0);
+    if (endDate < nextMinEndDate) {
+      setEndDate(nextMinEndDate);
+    }
+  }, [allDay, endDate]);
+
+  const seedEndDate = useCallback(() => {
+    if (!endDate && minEndDate) {
+      setEndDate(minEndDate);
+    }
+  }, [endDate, minEndDate]);
 
   const handleSubmit = useCallback(async () => {
     if (!user) return;
@@ -260,13 +280,18 @@ export function CreateCommunityEventDialog({ communityATag, open, onOpenChange, 
       if (allDay) {
         tags.push(['start', startDate]);
         if (endDate) {
-          if (endDate < startDate) {
-            toast({ title: 'End date must be on or after the start date', variant: 'destructive' });
+          if (endDate <= startDate) {
+            toast({ title: 'End date must be after the start date', variant: 'destructive' });
             return;
           }
-          tags.push(['end', addDays(endDate, 1)]);
+          tags.push(['end', endDate]);
         }
       } else {
+        if (endDate && endDate < startDate) {
+          toast({ title: 'End date must be on or after the start date', variant: 'destructive' });
+          return;
+        }
+
         if (!isEditing) kind = 31923;
         const startTs = toLocalTimestamp(startDate, startTime);
         if (!Number.isFinite(startTs) || startTs <= 0) {
@@ -425,7 +450,7 @@ export function CreateCommunityEventDialog({ communityATag, open, onOpenChange, 
                     <Switch
                       id="community-event-all-day"
                       checked={allDay}
-                      onCheckedChange={setAllDay}
+                      onCheckedChange={handleAllDayChange}
                       disabled={isEditing}
                     />
                   </div>
@@ -438,7 +463,7 @@ export function CreateCommunityEventDialog({ communityATag, open, onOpenChange, 
                         type="date"
                         className="[color-scheme:light] dark:[color-scheme:dark]"
                         value={startDate}
-                        onChange={(e) => setStartDate(e.target.value)}
+                        onChange={(e) => handleStartDateChange(e.target.value)}
                         required
                       />
                     </div>
@@ -449,6 +474,8 @@ export function CreateCommunityEventDialog({ communityATag, open, onOpenChange, 
                         type="date"
                         className="[color-scheme:light] dark:[color-scheme:dark]"
                         value={endDate}
+                        min={minEndDate}
+                        onFocus={seedEndDate}
                         onChange={(e) => setEndDate(e.target.value)}
                       />
                     </div>
