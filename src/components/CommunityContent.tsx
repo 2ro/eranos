@@ -4,7 +4,6 @@ import { Users, Globe } from 'lucide-react';
 import type { NostrEvent } from '@nostrify/nostrify';
 
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
-import { getAvatarShape } from '@/lib/avatarShape';
 import { useAuthor } from '@/hooks/useAuthor';
 import { useProfileUrl } from '@/hooks/useProfileUrl';
 import { genUserName } from '@/lib/genUserName';
@@ -48,7 +47,6 @@ export function CommunityContent({ event }: { event: NostrEvent }) {
   // Owner
   const ownerAuthor = useAuthor(event.pubkey);
   const ownerMetadata = ownerAuthor.data?.metadata;
-  const ownerAvatarShape = getAvatarShape(ownerMetadata);
   const ownerName = ownerMetadata?.display_name || ownerMetadata?.name || genUserName(event.pubkey);
   const ownerProfileUrl = useProfileUrl(event.pubkey, ownerMetadata);
 
@@ -112,7 +110,7 @@ export function CommunityContent({ event }: { event: NostrEvent }) {
       <div>
         <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-2">Created by</p>
         <Link to={ownerProfileUrl} className="flex items-center gap-3 group">
-          <Avatar shape={ownerAvatarShape} className={cn('size-10 ring-2 ring-background')}>
+          <Avatar className={cn('size-10 ring-2 ring-background')}>
             <AvatarImage src={ownerMetadata?.picture} />
             <AvatarFallback className="bg-muted text-muted-foreground">
               {ownerName.charAt(0).toUpperCase()}

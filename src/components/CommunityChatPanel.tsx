@@ -13,7 +13,6 @@ import { useAuthor } from '@/hooks/useAuthor';
 import { useCommunityChatMessages, COMMUNITY_CHAT_KIND } from '@/hooks/useCommunityChatMessages';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useProfileUrl } from '@/hooks/useProfileUrl';
-import { getAvatarShape } from '@/lib/avatarShape';
 import { getDisplayName } from '@/lib/getDisplayName';
 import type { CommunityMember, CommunityModeration } from '@/lib/communityUtils';
 import { cn } from '@/lib/utils';
@@ -139,7 +138,6 @@ function CommunityChatMessage({ event, showAvatar }: { event: NostrEvent; showAv
   const author = useAuthor(event.pubkey);
   const metadata: NostrMetadata | undefined = author.data?.metadata;
   const displayName = getDisplayName(metadata, event.pubkey);
-  const avatarShape = getAvatarShape(metadata);
   const profileUrl = useProfileUrl(event.pubkey, metadata);
   const isOwnMessage = user?.pubkey === event.pubkey;
 
@@ -151,7 +149,7 @@ function CommunityChatMessage({ event, showAvatar }: { event: NostrEvent; showAv
         isOwnMessage && 'justify-end',
       )}
     >
-      {!isOwnMessage && <ChatMessageAvatar showAvatar={showAvatar} profileUrl={profileUrl} avatarShape={avatarShape} metadata={metadata} displayName={displayName} createdAt={event.created_at} />}
+      {!isOwnMessage && <ChatMessageAvatar showAvatar={showAvatar} profileUrl={profileUrl} metadata={metadata} displayName={displayName} createdAt={event.created_at} />}
       <div className={cn('min-w-0 flex-1', isOwnMessage && 'flex flex-col items-end')}>
         {showAvatar && (
           <div className={cn('mb-0.5 flex items-baseline gap-2', isOwnMessage && 'justify-end')}>
@@ -176,7 +174,7 @@ function CommunityChatMessage({ event, showAvatar }: { event: NostrEvent; showAv
           </div>
         </ContentWarningGuard>
       </div>
-      {isOwnMessage && <ChatMessageAvatar showAvatar={showAvatar} profileUrl={profileUrl} avatarShape={avatarShape} metadata={metadata} displayName={displayName} createdAt={event.created_at} />}
+      {isOwnMessage && <ChatMessageAvatar showAvatar={showAvatar} profileUrl={profileUrl} metadata={metadata} displayName={displayName} createdAt={event.created_at} />}
     </div>
   );
 }
@@ -184,14 +182,12 @@ function CommunityChatMessage({ event, showAvatar }: { event: NostrEvent; showAv
 function ChatMessageAvatar({
   showAvatar,
   profileUrl,
-  avatarShape,
   metadata,
   displayName,
   createdAt,
 }: {
   showAvatar: boolean;
   profileUrl: string;
-  avatarShape: ReturnType<typeof getAvatarShape>;
   metadata: NostrMetadata | undefined;
   displayName: string;
   createdAt: number;
@@ -200,7 +196,7 @@ function ChatMessageAvatar({
     <div className="w-8 shrink-0">
       {showAvatar ? (
         <Link to={profileUrl} onClick={(event) => event.stopPropagation()}>
-          <Avatar shape={avatarShape} className="size-8">
+          <Avatar className="size-8">
             <AvatarImage src={metadata?.picture} alt={displayName} />
             <AvatarFallback className="bg-primary/15 text-[10px] text-primary">
               {displayName.slice(0, 2).toUpperCase()}

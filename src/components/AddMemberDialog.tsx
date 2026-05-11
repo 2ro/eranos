@@ -18,7 +18,6 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { ImageUploadField } from '@/components/ImageUploadField';
-import { getAvatarShape } from '@/lib/avatarShape';
 import { EmojifiedText } from '@/components/CustomEmoji';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useNostrPublish } from '@/hooks/useNostrPublish';
@@ -541,7 +540,7 @@ function PendingMemberChip({
 
   return (
     <div className="flex items-center gap-2 p-2 rounded-lg bg-secondary/30 border border-border/50">
-      <Avatar shape={getAvatarShape(metadata)} className="size-7 shrink-0">
+      <Avatar className="size-7 shrink-0">
         <AvatarImage src={metadata.picture} alt={displayName} />
         <AvatarFallback className="bg-primary/20 text-primary text-[10px]">
           {displayName[0]?.toUpperCase() || '?'}
@@ -592,7 +591,7 @@ function SearchResultItem({ profile, onClick }: { profile: SearchProfile; onClic
       onClick={() => onClick(profile)}
       onMouseDown={(e) => e.preventDefault()}
     >
-      <Avatar shape={getAvatarShape(metadata)} className="size-8 shrink-0">
+      <Avatar className="size-8 shrink-0">
         <AvatarImage src={metadata.picture} alt={displayName} />
         <AvatarFallback className="bg-primary/20 text-primary text-xs">
           {displayName[0]?.toUpperCase() || '?'}
