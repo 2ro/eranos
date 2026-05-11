@@ -225,11 +225,6 @@ export function CreateCommunityEventDialog({ communityATag, open, onOpenChange, 
       return;
     }
 
-    if (!allDay && endDate && !endTime) {
-      toast({ title: 'Add an end time or clear the end date', variant: 'destructive' });
-      return;
-    }
-
     const trimmedTitle = title.trim();
     const dTag = event?.tags.find(([name]) => name === 'd')?.[1] || `${slugify(trimmedTitle) || 'event'}-${Date.now()}`;
     let kind = isEditing && event ? event.kind : 31922;
@@ -302,9 +297,10 @@ export function CreateCommunityEventDialog({ communityATag, open, onOpenChange, 
         tags.push(['D', String(Math.floor(startTs / 86400))]);
         tags.push(['start_tzid', timezone]);
 
-        if (endTime) {
+        if (endDate || endTime) {
           const effectiveEndDate = endDate || startDate;
-          const endTs = toLocalTimestamp(effectiveEndDate, endTime);
+          const effectiveEndTime = endTime || startTime;
+          const endTs = toLocalTimestamp(effectiveEndDate, effectiveEndTime);
           if (!Number.isFinite(endTs) || endTs <= startTs) {
             toast({ title: 'End time must be after the start time', variant: 'destructive' });
             return;
