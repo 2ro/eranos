@@ -17,11 +17,14 @@ import { Label } from '@/components/ui/label';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
+import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
+import { BadgeThumbnail } from '@/components/BadgeThumbnail';
 import { ImageUploadField } from '@/components/ImageUploadField';
 import { EmojifiedText } from '@/components/CustomEmoji';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useNostrPublish } from '@/hooks/useNostrPublish';
 import { useToast } from '@/hooks/useToast';
+import { useBadgeDefinitions } from '@/hooks/useBadgeDefinitions';
 import { useSearchProfiles, type SearchProfile } from '@/hooks/useSearchProfiles';
 import { PortalContainerProvider } from '@/hooks/usePortalContainer';
 import { genUserName } from '@/lib/genUserName';
@@ -37,7 +40,6 @@ import {
   type CommunityModeration,
   type ParsedCommunity,
 } from '@/lib/communityUtils';
-import { cn } from '@/lib/utils';
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -46,6 +48,11 @@ type MemberRole = 'moderator' | 'member';
 interface PendingMember {
   profile: SearchProfile;
   role: MemberRole;
+}
+
+interface BadgeRef {
+  pubkey: string;
+  identifier: string;
 }
 
 interface CommunityMembersCacheValue {
@@ -65,6 +72,14 @@ interface AddMemberDialogProps {
   isFounder: boolean;
   /** Existing active members and moderators, excluded from duplicate adds. */
   existingMemberPubkeys: string[];
+}
+
+function parseBadgeATag(aTag: string | undefined): BadgeRef | undefined {
+  if (!aTag) return undefined;
+  const [kind, pubkey, ...identifierParts] = aTag.split(':');
+  const identifier = identifierParts.join(':');
+  if (kind !== String(BADGE_DEFINITION_KIND) || !pubkey || !identifier) return undefined;
+  return { pubkey, identifier };
 }
 
 // ── Component ─────────────────────────────────────────────────────────────────
@@ -99,6 +114,10 @@ export function AddMemberDialog({
   // Does this community already have a member badge definition?
   const existingBadgeATag = community.memberBadgeATag;
   const hasBadge = !!existingBadgeATag;
+  const existingBadgeRef = useMemo(() => parseBadgeATag(existingBadgeATag), [existingBadgeATag]);
+  const existingBadgeRefs = useMemo(() => existingBadgeRef ? [existingBadgeRef] : [], [existingBadgeRef]);
+  const { badgeMap, isLoading: isBadgeLoading, isError: isBadgeError } = useBadgeDefinitions(existingBadgeRefs);
+  const existingBadge = existingBadgeATag ? badgeMap.get(existingBadgeATag) : undefined;
 
   // Are there any pending members with the "member" role?
   const hasPendingMembers = pendingMembers.some((m) => m.role === 'member');
@@ -133,20 +152,18 @@ export function AddMemberDialog({
       toast({ title: 'Already added' });
       return;
     }
-    // Default role: member if they're not already a moderator, moderator if founder is adding
-    const defaultRole: MemberRole = isFounder ? 'moderator' : 'member';
-    setPendingMembers((prev) => [...prev, { profile, role: defaultRole }]);
-  }, [user, community.founderPubkey, existingMemberPubkeys, pendingMembers, isFounder, toast]);
+    setPendingMembers((prev) => [...prev, { profile, role: 'member' }]);
+  }, [user, community.founderPubkey, existingMemberPubkeys, pendingMembers, toast]);
 
   const removePerson = useCallback((pubkey: string) => {
     setPendingMembers((prev) => prev.filter((m) => m.profile.pubkey !== pubkey));
   }, []);
 
-  const toggleRole = useCallback((pubkey: string) => {
-    if (!isFounder) return; // Only founder can toggle to moderator
+  const setRole = useCallback((pubkey: string, role: MemberRole) => {
+    if (!isFounder) return; // Only founder can appoint moderators
     setPendingMembers((prev) => prev.map((m) =>
       m.profile.pubkey === pubkey
-        ? { ...m, role: m.role === 'moderator' ? 'member' : 'moderator' }
+        ? { ...m, role }
         : m,
     ));
   }, [isFounder]);
@@ -363,18 +380,14 @@ export function AddMemberDialog({
             <UserPlus className="size-5 text-primary" />
             Add Members
           </DialogTitle>
-          <DialogDescription>
-            {isFounder
-              ? 'Add moderators or members to your community.'
-              : 'Invite members to the community.'}
-          </DialogDescription>
+          <DialogDescription>Add to community</DialogDescription>
         </DialogHeader>
 
         <ScrollArea className="max-h-[60vh]">
           <div className="px-5 pb-5 space-y-4">
             {/* People search */}
             <div className="space-y-1.5">
-              <Label>Search people</Label>
+              <Label>Search</Label>
               <PersonSearch
                 onAdd={addPerson}
                 excludePubkeys={[
@@ -398,26 +411,56 @@ export function AddMemberDialog({
                       key={pm.profile.pubkey}
                       pending={pm}
                       onRemove={removePerson}
-                      onToggleRole={isFounder ? toggleRole : undefined}
+                      onRoleChange={isFounder ? setRole : undefined}
                     />
                   ))}
                 </div>
               </div>
             )}
 
-            {/* Badge image — only shown when badge needs to be created */}
-            {needsBadgeCreation && (
-              <ImageUploadField
-                id="member-badge-image"
-                label={<>Member Badge Image <span className="text-muted-foreground font-normal">(optional)</span></>}
-                value={badgeImageUrl}
-                onChange={setBadgeImageUrl}
-                onUploadingChange={setIsBadgeImageUploading}
-                uploadToastTitle="Badge image uploaded"
-                previewAlt="Badge preview"
-                objectFit="contain"
-                dropAreaClassName="min-h-24"
-              />
+            {hasPendingMembers && (
+              <div className="space-y-2">
+                <Label>Member badge</Label>
+                {hasBadge ? (
+                  <div className="rounded-xl border border-border/60 bg-secondary/30 p-3">
+                    {isBadgeError ? (
+                      <p className="text-sm text-destructive">Failed to load the current member badge.</p>
+                    ) : isBadgeLoading ? (
+                      <div className="flex items-center gap-3">
+                        <div className="size-12 animate-pulse rounded-lg bg-muted" />
+                        <div className="space-y-2">
+                          <div className="h-4 w-28 animate-pulse rounded bg-muted" />
+                          <div className="h-3 w-44 animate-pulse rounded bg-muted" />
+                        </div>
+                      </div>
+                    ) : existingBadge ? (
+                      <div className="flex items-center gap-3">
+                        <BadgeThumbnail badge={existingBadge} size={48} className="shrink-0" />
+                        <div className="min-w-0">
+                          <p className="text-sm font-medium truncate">{existingBadge.name}</p>
+                          <p className="text-xs text-muted-foreground line-clamp-2">
+                            {existingBadge.description || 'Selected members will receive this badge.'}
+                          </p>
+                        </div>
+                      </div>
+                    ) : (
+                      <p className="text-sm text-destructive">The configured member badge could not be found.</p>
+                    )}
+                  </div>
+                ) : (
+                  <ImageUploadField
+                    id="member-badge-image"
+                    label={<>Create Member Badge Image <span className="text-muted-foreground font-normal">(optional)</span></>}
+                    value={badgeImageUrl}
+                    onChange={setBadgeImageUrl}
+                    onUploadingChange={setIsBadgeImageUploading}
+                    uploadToastTitle="Badge image uploaded"
+                    previewAlt="Badge preview"
+                    objectFit="contain"
+                    dropAreaClassName="min-h-24"
+                  />
+                )}
+              </div>
             )}
 
             {/* Submit button */}
@@ -494,7 +537,7 @@ function PersonSearch({
                 setDropdownOpen(true);
               }
             }}
-            placeholder="Search people or paste npub..."
+            placeholder="Search people..."
             className="pl-10 pr-10 rounded-full bg-secondary border-0 focus-visible:ring-0 focus-visible:ring-offset-0 h-9 text-sm"
             autoComplete="off"
           />
@@ -528,11 +571,11 @@ function PersonSearch({
 function PendingMemberChip({
   pending,
   onRemove,
-  onToggleRole,
+  onRoleChange,
 }: {
   pending: PendingMember;
   onRemove: (pubkey: string) => void;
-  onToggleRole?: (pubkey: string) => void;
+  onRoleChange?: (pubkey: string, role: MemberRole) => void;
 }) {
   const { profile, role } = pending;
   const { metadata, pubkey } = profile;
@@ -550,23 +593,31 @@ function PendingMemberChip({
         <EmojifiedText tags={profile.event.tags}>{displayName}</EmojifiedText>
       </span>
 
-      {/* Role badge — clickable if founder can toggle */}
-      <button
-        type="button"
-        onClick={onToggleRole ? () => onToggleRole(pubkey) : undefined}
-        disabled={!onToggleRole}
-        className={cn(
-          'flex items-center gap-1 text-xs font-medium px-2 py-0.5 rounded-full shrink-0 transition-colors',
-          role === 'moderator'
-            ? 'bg-amber-500/10 text-amber-600 dark:text-amber-400'
-            : 'bg-primary/10 text-primary',
-          onToggleRole && 'cursor-pointer hover:opacity-80',
-        )}
-        title={onToggleRole ? 'Click to toggle role' : undefined}
-      >
-        {role === 'moderator' ? <Crown className="size-3" /> : <Users className="size-3" />}
-        {role === 'moderator' ? 'Moderator' : 'Member'}
-      </button>
+      {onRoleChange ? (
+        <ToggleGroup
+          type="single"
+          value={role}
+          onValueChange={(value) => {
+            if (value === 'member' || value === 'moderator') onRoleChange(pubkey, value);
+          }}
+          className="shrink-0 rounded-full bg-muted p-0.5"
+          aria-label={`Role for ${displayName}`}
+        >
+          <ToggleGroupItem value="member" size="sm" className="h-7 rounded-full px-2 text-xs data-[state=on]:bg-primary data-[state=on]:text-primary-foreground" aria-label="Member">
+            <Users className="size-3 sm:mr-1" />
+            <span className="hidden sm:inline">Member</span>
+          </ToggleGroupItem>
+          <ToggleGroupItem value="moderator" size="sm" className="h-7 rounded-full px-2 text-xs data-[state=on]:bg-amber-500 data-[state=on]:text-white" aria-label="Moderator">
+            <Crown className="size-3 sm:mr-1" />
+            <span className="hidden sm:inline">Moderator</span>
+          </ToggleGroupItem>
+        </ToggleGroup>
+      ) : (
+        <span className="flex shrink-0 items-center gap-1 rounded-full bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary">
+          <Users className="size-3" />
+          Member
+        </span>
+      )}
 
       <button
         type="button"
