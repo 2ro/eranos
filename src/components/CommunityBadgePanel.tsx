@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { Award, Loader2, Pencil } from 'lucide-react';
+import { Award, Loader2 } from 'lucide-react';
 import { useNostr } from '@nostrify/react';
 import { useQueryClient } from '@tanstack/react-query';
 import type { NostrEvent } from '@nostrify/nostrify';
@@ -81,44 +81,51 @@ export function CommunityBadgePanel({ communityEvent, community, isFounder }: Co
 
   if (!community.memberBadgeATag && !isFounder) return null;
 
+  const badgeButtonLabel = badge ? `Edit ${badge.name} badge` : 'Set member badge';
+
+  const badgeVisual = isLoading ? (
+    <div className="size-10 animate-pulse rounded-lg bg-muted" />
+  ) : badge ? (
+    <BadgeThumbnail badge={badge} size={40} className="shrink-0" />
+  ) : (
+    <div className="flex size-10 shrink-0 items-center justify-center rounded-lg border border-border bg-background text-muted-foreground">
+      <Award className="size-4" />
+    </div>
+  );
+
   return (
-    <div className="rounded-2xl border border-border/70 bg-secondary/25 p-3">
-      <div className="flex items-center gap-3">
-        {isLoading ? (
-          <div className="size-12 animate-pulse rounded-lg bg-muted" />
-        ) : badge ? (
-          <BadgeThumbnail badge={badge} size={48} className="shrink-0" />
-        ) : (
-          <div className="flex size-12 shrink-0 items-center justify-center rounded-lg border border-border bg-background text-muted-foreground">
-            <Award className="size-5" />
-          </div>
-        )}
+    <div className="min-w-0 flex-1">
+      <p className="mb-1 text-[11px] font-medium text-muted-foreground uppercase tracking-wider">Member badge</p>
+      <div className="flex items-center gap-3 py-1">
+        {isFounder ? (
+          <button
+            type="button"
+            onClick={() => setEditOpen(true)}
+            className="shrink-0 rounded-lg transition-opacity hover:opacity-80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+            aria-label={badgeButtonLabel}
+            title={badgeButtonLabel}
+          >
+            {badgeVisual}
+          </button>
+        ) : badgeVisual}
 
         <div className="min-w-0 flex-1">
-          <p className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">Member badge</p>
           {isError ? (
-            <p className="text-sm text-destructive">Failed to load the community badge.</p>
+            <p className="text-sm text-destructive">Failed to load badge</p>
           ) : isLoading ? (
-            <div className="mt-1 space-y-1.5">
-              <div className="h-4 w-28 animate-pulse rounded bg-muted" />
-              <div className="h-3 w-40 animate-pulse rounded bg-muted" />
+            <div className="space-y-1.5">
+              <div className="h-4 w-24 animate-pulse rounded bg-muted" />
+              <div className="h-3 w-16 animate-pulse rounded bg-muted" />
             </div>
           ) : badge ? (
             <>
-              <p className="truncate text-sm font-semibold">{badge.name}</p>
-              <p className="line-clamp-1 text-xs text-muted-foreground">{badge.description || 'Awarded to community members.'}</p>
+              <p className="truncate text-sm font-medium">{badge.name}</p>
+              <p className="truncate text-xs text-muted-foreground">Community member badge</p>
             </>
           ) : (
-            <p className="text-sm text-muted-foreground">No member badge configured.</p>
+            <p className="text-sm text-muted-foreground">Set badge</p>
           )}
         </div>
-
-        {isFounder && (
-          <Button variant="outline" size="sm" className="shrink-0 gap-1.5" onClick={() => setEditOpen(true)}>
-            <Pencil className="size-3.5" />
-            {badge ? 'Edit' : 'Set'}
-          </Button>
-        )}
       </div>
 
       {isFounder && (

@@ -556,25 +556,9 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
           <p className="line-clamp-3 text-sm leading-relaxed text-muted-foreground whitespace-pre-wrap">{descriptionText}</p>
         )}
 
-        {/* Founder + community-wide filter toggle. Keep this compact so the
-            content tabs stay visible on small screens. */}
-        <div className="flex items-center justify-between gap-3">
-          <div className="min-w-0 flex-1">
-            <p className="mb-1 text-[11px] font-medium text-muted-foreground uppercase tracking-wider">Founded by</p>
-            <PersonRow pubkey={event.pubkey} size="sm" />
-          </div>
-          <div className="flex shrink-0 items-center gap-2">
-            <MembersOnlyToggle className="-my-2 -mr-2" />
-          </div>
+        <div className="flex justify-end">
+          <MembersOnlyToggle className="-my-2 -mr-2" />
         </div>
-
-        {community && (
-          <CommunityBadgePanel
-            communityEvent={event}
-            community={community}
-            isFounder={isFounder}
-          />
-        )}
 
         {/* ── Tabs ── */}
         <CommunityModerationContext.Provider value={moderationCtx}>
@@ -626,6 +610,16 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
 
             {/* ── Members tab ── */}
             <TabsContent value="members" className="mt-0">
+              {community && (
+                <section className="border-b border-border px-5 py-4">
+                  <CommunityBadgePanel
+                    communityEvent={event}
+                    community={community}
+                    isFounder={isFounder}
+                  />
+                </section>
+              )}
+
               {membersLoading ? (
                 <MembersSkeleton />
               ) : memberSections.length === 0 ? (
