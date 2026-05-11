@@ -32,6 +32,19 @@ function getTag(tags: string[][], name: string): string | undefined {
   return tags.find(([n]) => n === name)?.[1];
 }
 
+function getEventStartTimestamp(event: NostrEvent): number {
+  const start = getTag(event.tags, "start");
+  if (!start) return 0;
+
+  if (event.kind === 31922) {
+    const timestamp = Date.parse(`${start}T00:00:00Z`);
+    return Number.isNaN(timestamp) ? 0 : Math.floor(timestamp / 1000);
+  }
+
+  const timestamp = parseInt(start, 10);
+  return Number.isNaN(timestamp) ? 0 : timestamp;
+}
+
 // ─── EventsFeedPage ───────────────────────────────────────────────────────────
 
 export function EventsFeedPage() {
@@ -93,8 +106,8 @@ export function EventsFeedPage() {
       });
 
     return items.sort((a, b) => {
-      const aStart = parseInt(getTag(a.event.tags, "start") ?? "0", 10);
-      const bStart = parseInt(getTag(b.event.tags, "start") ?? "0", 10);
+      const aStart = getEventStartTimestamp(a.event);
+      const bStart = getEventStartTimestamp(b.event);
       const aFuture = aStart >= now;
       const bFuture = bStart >= now;
       if (aFuture && !bFuture) return -1;
