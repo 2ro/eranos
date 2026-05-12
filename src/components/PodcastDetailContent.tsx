@@ -22,8 +22,6 @@ import { canZap } from '@/lib/canZap';
 import { formatNumber } from '@/lib/formatNumber';
 import { cn } from '@/lib/utils';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
-import { getAvatarShape } from '@/lib/avatarShape';
-
 import { ReactionButton } from '@/components/ReactionButton';
 import { RepostMenu } from '@/components/RepostMenu';
 import { NoteMoreMenu } from '@/components/NoteMoreMenu';
@@ -55,7 +53,6 @@ function EpisodeDetail({ event }: { event: NostrEvent }) {
 
   const author = useAuthor(event.pubkey);
   const metadata = author.data?.metadata;
-  const avatarShape = getAvatarShape(metadata);
   const displayName = getDisplayName(metadata, event.pubkey);
   const profileUrl = useProfileUrl(event.pubkey, metadata);
   const { user } = useCurrentUser();
@@ -124,7 +121,7 @@ function EpisodeDetail({ event }: { event: NostrEvent }) {
           <h2 className="text-xl sm:text-2xl font-bold leading-tight">{parsed?.title ?? 'Untitled'}</h2>
 
           <Link to={profileUrl} className="flex items-center gap-2 group" onClick={(e) => e.stopPropagation()}>
-            <Avatar shape={avatarShape} className="size-6">
+            <Avatar className="size-6">
               <AvatarImage src={metadata?.picture} alt={displayName} />
               <AvatarFallback className="bg-primary/20 text-primary text-[10px]">{displayName[0]?.toUpperCase()}</AvatarFallback>
             </Avatar>
@@ -285,7 +282,6 @@ function TrailerDetail({ event }: { event: NostrEvent }) {
 
   const author = useAuthor(event.pubkey);
   const metadata = author.data?.metadata;
-  const avatarShape = getAvatarShape(metadata);
   const displayName = getDisplayName(metadata, event.pubkey);
   const profileUrl = useProfileUrl(event.pubkey, metadata);
 
@@ -327,7 +323,7 @@ function TrailerDetail({ event }: { event: NostrEvent }) {
           <h2 className="text-xl sm:text-2xl font-bold leading-tight">{parsed?.title ?? 'Untitled'}</h2>
 
           <Link to={profileUrl} className="flex items-center gap-2 group">
-            <Avatar shape={avatarShape} className="size-6">
+            <Avatar className="size-6">
               <AvatarImage src={metadata?.picture} alt={displayName} />
               <AvatarFallback className="bg-primary/20 text-primary text-[10px]">{displayName[0]?.toUpperCase()}</AvatarFallback>
             </Avatar>

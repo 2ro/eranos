@@ -18,7 +18,6 @@ import { Link, useSearchParams } from 'react-router-dom';
 import { NoteCard } from '@/components/NoteCard';
 import { PullToRefresh } from '@/components/PullToRefresh';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
-import { getAvatarShape } from '@/lib/avatarShape';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
@@ -62,7 +61,7 @@ type TabType = 'communities' | 'posts' | 'accounts';
 const VALID_TABS: TabType[] = ['communities', 'posts', 'accounts'];
 
 function parseTab(value: string | null): TabType {
-  return VALID_TABS.includes(value as TabType) ? (value as TabType) : 'posts';
+  return VALID_TABS.includes(value as TabType) ? (value as TabType) : 'communities';
 }
 
 const VALID_AUTHOR_SCOPES = ['anyone', 'follows', 'people'] as const;
@@ -199,7 +198,7 @@ export function SearchPage() {
   const setActiveTab = useCallback((tab: TabType) => {
     setSearchParams((prev) => {
       const next = new URLSearchParams(prev);
-      if (tab === 'posts') {
+      if (tab === 'communities') {
         next.delete('tab');
       } else {
         next.set('tab', tab);
@@ -867,7 +866,6 @@ function AccountItem({ profile, isFollowed }: { profile: { pubkey: string; metad
   const npub = useMemo(() => nip19.npubEncode(profile.pubkey), [profile.pubkey]);
   const metadata = profile.metadata as { name?: string; nip05?: string; picture?: string; about?: string; bot?: boolean };
   const displayName = metadata?.name || genUserName(profile.pubkey);
-  const profileAvatarShape = getAvatarShape(metadata);
   const tags = profile.event?.tags ?? [];
 
   return (
@@ -876,7 +874,7 @@ function AccountItem({ profile, isFollowed }: { profile: { pubkey: string; metad
       className="flex items-center gap-3 px-4 py-3 hover:bg-secondary/30 transition-colors"
     >
       <div className="relative shrink-0">
-        <Avatar shape={profileAvatarShape} className="size-11">
+        <Avatar className="size-11">
           <AvatarImage src={metadata?.picture} alt={displayName} />
           <AvatarFallback className="bg-primary/20 text-primary text-sm">
             {displayName[0]?.toUpperCase() || '?'}
@@ -951,7 +949,6 @@ function FollowsList() {
 function FollowItem({ pubkey }: { pubkey: string }) {
   const author = useAuthor(pubkey);
   const metadata = author.data?.metadata;
-  const avatarShape = getAvatarShape(metadata);
   const npub = useMemo(() => nip19.npubEncode(pubkey), [pubkey]);
   const displayName = metadata?.name || genUserName(pubkey);
   const tags = author.data?.event?.tags ?? [];
@@ -966,7 +963,7 @@ function FollowItem({ pubkey }: { pubkey: string }) {
       className="flex items-center gap-3 px-4 py-3 hover:bg-secondary/30 transition-colors"
     >
       <div className="relative shrink-0">
-        <Avatar shape={avatarShape} className="size-11">
+        <Avatar className="size-11">
           <AvatarImage src={metadata?.picture} alt={displayName} />
           <AvatarFallback className="bg-primary/20 text-primary text-sm">
             {displayName[0]?.toUpperCase() || '?'}
@@ -1207,5 +1204,4 @@ function SaveDestinationRow({
     </button>
   );
 }
-
 

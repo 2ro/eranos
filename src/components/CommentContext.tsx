@@ -6,7 +6,7 @@ import {
   Award, BarChart3, BookOpen, Camera, Clapperboard, FileText, Film,
   GitBranch, GitPullRequest, Mail, MapPin, MessageSquare, Mic, Music,
   Package, Palette, PartyPopper, Podcast, Radio, Rocket, SmilePlus,
-  Users, Vote, Zap,
+  Target, Users, Vote, Zap,
 } from 'lucide-react';
 import type { NostrEvent } from '@nostrify/nostrify';
 
@@ -134,6 +134,7 @@ const KIND_LABELS: Record<number, string> = {
   34139: 'a playlist',
   34236: 'a divine',
   34550: 'a community',
+  9041: 'a goal',
   35128: 'an nsite',
   36639: 'an action',
   36787: 'a track',
@@ -184,6 +185,7 @@ const KIND_ICONS: Partial<Record<number, React.ComponentType<{ className?: strin
   7516: ChestIcon,
   39089: PartyPopper,
   3367: Palette,
+  9041: Target,
   9735: Zap,
 };
 

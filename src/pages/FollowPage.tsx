@@ -9,8 +9,6 @@ import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { NoteCard } from '@/components/NoteCard';
-import { getAvatarShape, isEmoji, emojiAvatarBorderStyle } from '@/lib/avatarShape';
-import { cn } from '@/lib/utils';
 import { useAuthor } from '@/hooks/useAuthor';
 import { useAuthors } from '@/hooks/useAuthors';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
@@ -180,33 +178,19 @@ function FollowView({ pubkey }: { pubkey: string }) {
         <div className="bg-background/85">
         <div className="flex flex-col items-center px-4 -mt-12 md:-mt-16 relative z-10 max-w-2xl mx-auto w-full" style={{ paddingBottom: ARC_OVERHANG_PX + 16 }}>
           {/* Avatar — matches ProfilePage border treatment */}
-          {(() => {
-            const avatarShape = getAvatarShape(metadata);
-            const isEmojiShape = !!avatarShape && isEmoji(avatarShape);
-            return (
-              <div className="relative">
-                <div style={isEmojiShape ? emojiAvatarBorderStyle : undefined}>
-                  <Avatar
-                    shape={avatarShape}
-                    className={cn(
-                      isEmojiShape ? 'size-[88px] md:size-[120px]' : 'size-24 md:size-32 border-4 border-background',
-                      'shadow-lg',
-                    )}
-                  >
-                    <AvatarImage src={metadata?.picture} alt={displayName} />
-                    <AvatarFallback className="bg-primary/20 text-primary text-2xl md:text-3xl">
-                      {displayName.charAt(0).toUpperCase()}
-                    </AvatarFallback>
-                  </Avatar>
-                </div>
-                {(followDone || isAlreadyFollowing) && (
-                  <div className="absolute -bottom-1 -right-1 bg-background rounded-full p-0.5 shadow">
-                    <CheckCircle2 className="size-6 text-primary fill-primary/20" />
-                  </div>
-                )}
+          <div className="relative">
+            <Avatar className="size-24 md:size-32 border-4 border-background shadow-lg">
+              <AvatarImage src={metadata?.picture} alt={displayName} />
+              <AvatarFallback className="bg-primary/20 text-primary text-2xl md:text-3xl">
+                {displayName.charAt(0).toUpperCase()}
+              </AvatarFallback>
+            </Avatar>
+            {(followDone || isAlreadyFollowing) && (
+              <div className="absolute -bottom-1 -right-1 bg-background rounded-full p-0.5 shadow">
+                <CheckCircle2 className="size-6 text-primary fill-primary/20" />
               </div>
-            );
-          })()}
+            )}
+          </div>
 
           {/* Name + NIP-05 */}
           <div className="mt-3 text-center">
@@ -430,9 +414,8 @@ function FollowPackView({ addr, relays }: { addr: AddrCoords; relays?: string[] 
               {pubkeys.slice(0, 5).map((pk) => {
                 const member = membersMap?.get(pk);
                 const name = member?.metadata?.name || genUserName(pk);
-                const shape = getAvatarShape(member?.metadata);
                 return (
-                  <Avatar key={pk} shape={shape} className="size-12 border-2 border-background shadow-md">
+                  <Avatar key={pk} className="size-12 border-2 border-background shadow-md">
                     <AvatarImage src={member?.metadata?.picture} alt={name} />
                     <AvatarFallback className="bg-primary/20 text-primary text-xs">
                       {name[0]?.toUpperCase()}
@@ -452,7 +435,7 @@ function FollowPackView({ addr, relays }: { addr: AddrCoords; relays?: string[] 
 
             {/* Author attribution */}
             <Link to={`/${nip19.npubEncode(addr.pubkey)}`} className="flex items-center gap-1.5 mt-1.5 hover:underline">
-              <Avatar shape={getAvatarShape(authorMeta)} className="size-5">
+              <Avatar className="size-5">
                 <AvatarImage src={authorMeta?.picture} alt={authorName} />
                 <AvatarFallback className="bg-primary/20 text-primary text-[10px]">
                   {authorName[0]?.toUpperCase()}

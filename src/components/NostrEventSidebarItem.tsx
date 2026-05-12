@@ -11,7 +11,6 @@ import { nostrUriToNip19 } from '@/lib/sidebarItems';
 import { useAuthor } from '@/hooks/useAuthor';
 import { getKindIcon } from '@/lib/extraKinds';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
-import { getAvatarShape } from '@/lib/avatarShape';
 import { genUserName } from '@/lib/genUserName';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useNostrEventSidebar } from '@/hooks/useNostrEventSidebar';
@@ -42,10 +41,8 @@ export interface NostrEventSidebarItemProps {
 function ProfileSidebarIcon({ pubkey, className }: { pubkey: string; className?: string }) {
   const { data } = useAuthor(pubkey);
   const metadata: NostrMetadata | undefined = data?.metadata;
-  const shape = getAvatarShape(metadata);
-
   return (
-    <Avatar shape={shape} className={cn('size-6 shrink-0', className)}>
+    <Avatar className={cn('size-6 shrink-0', className)}>
       <AvatarImage src={metadata?.picture} alt={metadata?.name} />
       <AvatarFallback className="bg-primary/20 text-primary text-[10px]">
         {(metadata?.name?.[0] || '?').toUpperCase()}

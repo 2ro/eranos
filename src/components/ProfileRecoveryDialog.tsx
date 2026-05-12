@@ -7,7 +7,6 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
-import { getAvatarShape } from '@/lib/avatarShape';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Separator } from '@/components/ui/separator';
@@ -86,8 +85,6 @@ function ProfileSnapshotCard({
 }) {
   const metadata = useMemo(() => parseMetadata(event.content), [event.content]);
   const displayName = metadata?.display_name || metadata?.name || genUserName(event.pubkey);
-  const avatarShape = getAvatarShape(metadata);
-
   return (
     <div
       className={cn(
@@ -106,7 +103,7 @@ function ProfileSnapshotCard({
 
       <div className="flex items-start gap-3">
         {/* Avatar */}
-        <Avatar shape={avatarShape} className="size-11 shrink-0 ring-2 ring-background">
+        <Avatar className="size-11 shrink-0 ring-2 ring-background">
           {metadata?.picture ? (
             <AvatarImage src={metadata.picture} alt={displayName} />
           ) : null}

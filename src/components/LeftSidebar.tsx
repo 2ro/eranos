@@ -6,7 +6,6 @@ import {
 } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
-import { getAvatarShape } from '@/lib/avatarShape';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { AgoraLogo } from '@/components/AgoraLogo';
 import { EmojifiedText } from '@/components/CustomEmoji';
@@ -40,7 +39,6 @@ export function LeftSidebar() {
   const location = useLocation();
   const navigate = useNavigate();
   const { user, metadata, event: currentUserEvent, isLoading: isProfileLoading } = useCurrentUser();
-  const currentUserAvatarShape = getAvatarShape(metadata);
   const { currentUser, otherUsers, setLogin } = useLoggedInAccounts();
   const { logout } = useLoginActions();
 
@@ -165,7 +163,7 @@ export function LeftSidebar() {
                 {isProfileLoading ? (
                   <Skeleton className="size-10 shrink-0 rounded-full" />
                 ) : (
-                  <Avatar shape={currentUserAvatarShape} className="size-10 shrink-0">
+                  <Avatar className="size-10 shrink-0">
                     <AvatarImage src={metadata?.picture} alt={metadata?.name} />
                     <AvatarFallback className="bg-primary/20 text-primary text-sm">
                       {(metadata?.display_name || metadata?.name || genUserName(user.pubkey))[0]?.toUpperCase() ?? '?'}
@@ -194,7 +192,7 @@ export function LeftSidebar() {
               {/* Current user */}
               <Link to={userProfileUrl} onClick={() => setAccountPopoverOpen(false)} className="block p-4 border-b border-border hover:bg-secondary/60 transition-colors">
                 <div className="flex items-center gap-3">
-                  <Avatar shape={currentUserAvatarShape} className="size-11 shrink-0">
+                  <Avatar className="size-11 shrink-0">
                     <AvatarImage src={currentUser.metadata.picture} alt={getDisplayName(currentUser)} />
                     <AvatarFallback className="bg-primary/20 text-primary text-sm">{getDisplayName(currentUser).charAt(0).toUpperCase()}</AvatarFallback>
                   </Avatar>
@@ -295,7 +293,7 @@ export function LeftSidebar() {
                 <div className="border-b border-border">
                   {otherUsers.map((account) => (
                     <button key={account.id} onClick={() => { setLogin(account.id); setAccountPopoverOpen(false); }} className="flex items-center gap-3 w-full px-4 py-3 hover:bg-secondary/60 transition-colors">
-                      <Avatar shape={getAvatarShape(account.metadata)} className="size-9 shrink-0">
+                      <Avatar className="size-9 shrink-0">
                         <AvatarImage src={account.metadata.picture} alt={getDisplayName(account)} />
                         <AvatarFallback className="bg-primary/20 text-primary text-xs">{getDisplayName(account).charAt(0).toUpperCase()}</AvatarFallback>
                       </Avatar>

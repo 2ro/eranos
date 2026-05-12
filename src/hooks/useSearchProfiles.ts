@@ -3,6 +3,7 @@ import { useNostr } from '@nostrify/react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { NSchema as n } from '@nostrify/nostrify';
 import type { NostrEvent, NostrMetadata } from '@nostrify/nostrify';
+import { nip19 } from 'nostr-tools';
 import { useFollowList } from '@/hooks/useFollowActions';
 import { useDebounce } from '@/hooks/useDebounce';
 
@@ -10,6 +11,37 @@ export interface SearchProfile {
   pubkey: string;
   metadata: NostrMetadata;
   event: NostrEvent;
+}
+
+function getPubkeyFromNip19(value: string): string | undefined {
+  const trimmed = value.trim().replace(/^nostr:/, '');
+  if (!trimmed) return undefined;
+
+  try {
+    const decoded = nip19.decode(trimmed);
+    if (decoded.type === 'npub') return decoded.data;
+    if (decoded.type === 'nprofile') return decoded.data.pubkey;
+  } catch {
+    return undefined;
+  }
+
+  return undefined;
+}
+
+function makeFallbackProfile(pubkey: string): SearchProfile {
+  return {
+    pubkey,
+    metadata: {},
+    event: {
+      id: '',
+      pubkey,
+      created_at: 0,
+      kind: 0,
+      tags: [],
+      content: '{}',
+      sig: '',
+    },
+  };
 }
 
 /**
@@ -66,6 +98,31 @@ export function useSearchProfiles(query: string) {
 
   // Debounce the query so we don't hammer the relay on every keystroke
   const debouncedQuery = useDebounce(query, 300);
+  const directPubkey = useMemo(() => getPubkeyFromNip19(debouncedQuery), [debouncedQuery]);
+
+  const directProfile = useQuery<SearchProfile | undefined>({
+    queryKey: ['search-profiles', 'direct', directPubkey],
+    queryFn: async ({ signal }) => {
+      if (!directPubkey) return undefined;
+
+      const events = await nostr.query(
+        [{ kinds: [0], authors: [directPubkey], limit: 1 }],
+        { signal: AbortSignal.any([signal, AbortSignal.timeout(5000)]) },
+      );
+
+      const event = events.sort((a, b) => b.created_at - a.created_at)[0];
+      if (!event) return makeFallbackProfile(directPubkey);
+
+      try {
+        const metadata = n.json().pipe(n.metadata()).parse(event.content);
+        return { pubkey: event.pubkey, metadata, event };
+      } catch {
+        return makeFallbackProfile(directPubkey);
+      }
+    },
+    enabled: !!directPubkey,
+    staleTime: 30 * 1000,
+  });
 
   const relayResults = useQuery<SearchProfile[]>({
     queryKey: ['search-profiles', debouncedQuery],
@@ -100,7 +157,7 @@ export function useSearchProfiles(query: string) {
 
       return Array.from(seen.values());
     },
-    enabled: debouncedQuery.trim().length >= 1,
+    enabled: debouncedQuery.trim().length >= 1 && !directPubkey,
     staleTime: 30 * 1000,
     placeholderData: (prev) => prev,
   });
@@ -109,6 +166,10 @@ export function useSearchProfiles(query: string) {
   // cached author profiles when the relay search returns nothing.
   const data = useMemo(() => {
     const relayData = relayResults.data;
+
+    if (directProfile.data) {
+      return [directProfile.data];
+    }
 
     if (relayData && relayData.length > 0) {
       return [...relayData].sort((a, b) => {
@@ -124,11 +185,12 @@ export function useSearchProfiles(query: string) {
     }
 
     return relayData;
-  }, [relayResults.data, followedPubkeys, debouncedQuery, queryClient]);
+  }, [relayResults.data, directProfile.data, followedPubkeys, debouncedQuery, queryClient]);
 
   return {
     ...relayResults,
     data,
+    isFetching: relayResults.isFetching || directProfile.isFetching,
     followedPubkeys,
   };
 }

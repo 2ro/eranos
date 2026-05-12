@@ -1,9 +1,13 @@
-import { useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
 import { useSeoMeta } from '@unhead/react';
-import { Users } from 'lucide-react';
+import { Loader2, Search, Users } from 'lucide-react';
+import type { NostrEvent } from '@nostrify/nostrify';
+import { useInView } from 'react-intersection-observer';
 
 import { CommunityCard } from '@/components/CommunityCard';
+import { CreateCommunityDialog } from '@/components/CreateCommunityDialog';
 import { FeedEmptyState } from '@/components/FeedEmptyState';
 import { LoginArea } from '@/components/auth/LoginArea';
 import { MembersOnlyToggle } from '@/components/MembersOnlyToggle';
@@ -12,6 +16,7 @@ import { PageHeader } from '@/components/PageHeader';
 import { PullToRefresh } from '@/components/PullToRefresh';
 import { SubHeaderBar } from '@/components/SubHeaderBar';
 import { TabButton } from '@/components/TabButton';
+import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { CommunityModerationContext, type CommunityModerationContextValue } from '@/contexts/CommunityModerationContext';
 import { COMMUNITY_DEFINITION_KIND, EMPTY_MODERATION } from '@/lib/communityUtils';
@@ -76,19 +81,23 @@ export function CommunitiesPage() {
   const { config } = useAppContext();
   const { user } = useCurrentUser();
   const queryClient = useQueryClient();
-
-  useLayoutOptions({
-    hasSubHeader: !!user,
-  });
+  const [createDialogOpen, setCreateDialogOpen] = useState(false);
 
   const [activeTab, setActiveTab] = useFeedTab<CommunitiesTab>('communities', [
     'activities',
     'mine',
   ]);
 
+  useLayoutOptions({
+    hasSubHeader: !!user,
+    showFAB: !!user && activeTab === 'mine',
+    onFabClick: () => setCreateDialogOpen(true),
+    fabIcon: <Users className="size-5" />,
+  });
+
   useSeoMeta({
     title: `Communities | ${config.appName}`,
-    description: 'Discover and join hierarchical communities on Nostr',
+    description: 'Discover and join flat communities on Nostr',
   });
 
   return (
@@ -129,6 +138,8 @@ export function CommunitiesPage() {
           }
         />
       )}
+
+      <CreateCommunityDialog open={createDialogOpen} onOpenChange={setCreateDialogOpen} />
     </main>
   );
 }
@@ -175,7 +186,25 @@ function MyCommunitiesContent() {
 
   if (!myCommunities || myCommunities.length === 0) {
     return (
-      <FeedEmptyState message="You haven't founded or joined any communities yet." />
+      <div className="py-20 px-8 flex flex-col items-center gap-6 text-center">
+        <div className="p-4 rounded-full bg-primary/10">
+          <Users className="size-8 text-primary" />
+        </div>
+        <div className="space-y-2 max-w-xs">
+          <h2 className="text-xl font-bold">No communities yet</h2>
+          <p className="text-muted-foreground text-sm">
+            Discover communities to join via the Search page, or create your own using the button below.
+          </p>
+        </div>
+        <div className="flex flex-col gap-2 w-full max-w-xs">
+          <Button asChild className="rounded-full">
+            <Link to="/search?tab=communities">
+              <Search className="size-4 mr-2" />
+              Search communities
+            </Link>
+          </Button>
+        </div>
+      </div>
     );
   }
 
@@ -186,6 +215,8 @@ function MyCommunitiesContent() {
           key={entry.community.aTag}
           event={entry.event}
           isFounded={entry.isFounded}
+          isMember={entry.isMember}
+          isBookmarked={entry.isBookmarked}
         />
       ))}
     </div>
@@ -196,10 +227,31 @@ function MyCommunitiesContent() {
 // Activities Tab
 // ═══════════════════════════════════════════════════════════════════════════════
 
+/** Extract the community a-tag from an event (uppercase A for NIP-22, lowercase a with 34550: prefix for goals). */
+function getCommunityATag(event: NostrEvent): string | undefined {
+  return event.tags.find(([n]) => n === 'A')?.[1]
+    ?? event.tags.find(([n, v]) => n === 'a' && v?.startsWith('34550:'))?.[1];
+}
+
 function ActivitiesTab({ onRefresh }: { onRefresh: () => Promise<void> }) {
   const { user } = useCurrentUser();
-  const { data: activityEvents, isLoading, moderationByATag, rankMapByATag } = useCommunityActivityFeed();
+  const {
+    data: activityEvents,
+    isLoading,
+    moderationByATag,
+    rankMapByATag,
+    hasNextPage,
+    isFetchingNextPage,
+    fetchNextPage,
+  } = useCommunityActivityFeed();
   const { membersOnly } = useMembersOnlyFilter();
+  const { ref: scrollRef, inView } = useInView({ threshold: 0, rootMargin: '400px' });
+
+  useEffect(() => {
+    if (inView && hasNextPage && !isFetchingNextPage) {
+      fetchNextPage();
+    }
+  }, [inView, hasNextPage, isFetchingNextPage, fetchNextPage]);
 
   // Build per-community context values for NoteMoreMenu moderation actions.
   // Keyed by community A tag — each NoteCard is wrapped in its own provider.
@@ -222,7 +274,7 @@ function ActivitiesTab({ onRefresh }: { onRefresh: () => Promise<void> }) {
     if (!membersOnly) return activityEvents;
     return activityEvents.filter((event) => {
       if (event.kind === COMMUNITY_DEFINITION_KIND) return true;
-      const aTag = event.tags.find(([n]) => n === 'A')?.[1];
+      const aTag = getCommunityATag(event);
       if (!aTag) return true; // No community scope — pass through
       const rankMap = rankMapByATag.get(aTag);
       if (!rankMap) return true; // Moderation data not resolved — avoid hiding
@@ -249,29 +301,54 @@ function ActivitiesTab({ onRefresh }: { onRefresh: () => Promise<void> }) {
 
   return (
     <PullToRefresh onRefresh={onRefresh}>
-      {isLoading ? (
-        <div className="divide-y divide-border">
-          {Array.from({ length: 5 }).map((_, i) => (
-            <NoteCardSkeleton key={i} />
-          ))}
-        </div>
-      ) : displayedEvents && displayedEvents.length > 0 ? (
-        <div>
-          {displayedEvents.map((event) => {
-            const aTag = event.tags.find(([n]) => n === 'A')?.[1];
-            const ctx = aTag ? contextByATag.get(aTag) ?? null : null;
-            return (
-              <CommunityModerationContext.Provider key={event.id} value={ctx}>
-                <NoteCard event={event} />
-              </CommunityModerationContext.Provider>
-            );
-          })}
-        </div>
-      ) : membersOnly && activityEvents && activityEvents.length > 0 ? (
-        <FeedEmptyState message="No activity from members of your communities yet. Toggle the shield icon to see all community activity." />
-      ) : (
-        <FeedEmptyState message="No activity from your communities yet." />
-      )}
+      <>
+        {isLoading ? (
+          <div className="divide-y divide-border">
+            {Array.from({ length: 5 }).map((_, i) => (
+              <NoteCardSkeleton key={i} />
+            ))}
+          </div>
+        ) : displayedEvents && displayedEvents.length > 0 ? (
+          <div>
+            {displayedEvents.map((event) => {
+              const aTag = getCommunityATag(event);
+              const ctx = aTag ? contextByATag.get(aTag) ?? null : null;
+              return (
+                <CommunityModerationContext.Provider key={event.id} value={ctx}>
+                  <NoteCard event={event} />
+                </CommunityModerationContext.Provider>
+              );
+            })}
+          </div>
+        ) : membersOnly && activityEvents && activityEvents.length > 0 ? (
+          <FeedEmptyState message="No activity from members of your communities yet. Toggle the shield icon to see all community activity." />
+        ) : (
+          <div className="py-20 px-8 flex flex-col items-center gap-6 text-center">
+            <div className="p-4 rounded-full bg-primary/10">
+              <Users className="size-8 text-primary" />
+            </div>
+            <div className="space-y-2 max-w-xs">
+              <h2 className="text-xl font-bold">No activity yet</h2>
+              <p className="text-muted-foreground text-sm">
+                Discover communities to join via the Search page, or create your own from the My Communities tab.
+              </p>
+            </div>
+            <div className="flex flex-col gap-2 w-full max-w-xs">
+              <Button asChild className="rounded-full">
+                <Link to="/search?tab=communities">
+                  <Search className="size-4 mr-2" />
+                  Search communities
+                </Link>
+              </Button>
+            </div>
+          </div>
+        )}
+        {!isLoading && hasNextPage && (
+          <div ref={scrollRef} className="py-4 flex justify-center">
+            {isFetchingNextPage && <Loader2 className="size-5 animate-spin text-muted-foreground" />}
+          </div>
+        )}
+      </>
     </PullToRefresh>
   );
 }

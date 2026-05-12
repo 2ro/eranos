@@ -1,7 +1,8 @@
 import type { NostrEvent } from "@nostrify/nostrify";
 import { useSeoMeta } from "@unhead/react";
 import { CalendarDays, Loader2 } from "lucide-react";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
+import { CreateCommunityEventDialog } from "@/components/CreateCommunityEventDialog";
 import { FeedEmptyState } from "@/components/FeedEmptyState";
 import { KindInfoButton } from "@/components/KindInfoButton";
 import { NoteCard } from "@/components/NoteCard";
@@ -31,12 +32,26 @@ function getTag(tags: string[][], name: string): string | undefined {
   return tags.find(([n]) => n === name)?.[1];
 }
 
+function getEventStartTimestamp(event: NostrEvent): number {
+  const start = getTag(event.tags, "start");
+  if (!start) return 0;
+
+  if (event.kind === 31922) {
+    const timestamp = Date.parse(`${start}T00:00:00Z`);
+    return Number.isNaN(timestamp) ? 0 : Math.floor(timestamp / 1000);
+  }
+
+  const timestamp = parseInt(start, 10);
+  return Number.isNaN(timestamp) ? 0 : timestamp;
+}
+
 // ─── EventsFeedPage ───────────────────────────────────────────────────────────
 
 export function EventsFeedPage() {
   const { config } = useAppContext();
   const { user } = useCurrentUser();
   const { muteItems } = useMuteList();
+  const [createOpen, setCreateOpen] = useState(false);
 
   const [activeTab, setActiveTab] = useFeedTab<FeedTab>("events", [
     "follows",
@@ -44,7 +59,12 @@ export function EventsFeedPage() {
   ]);
 
   useSeoMeta({ title: `Events | ${config.appName}` });
-  useLayoutOptions({ showFAB: true, fabKind: 31923, hasSubHeader: !!user });
+  useLayoutOptions({
+    showFAB: true,
+    onFabClick: () => setCreateOpen(true),
+    fabIcon: <CalendarDays className="size-5" />,
+    hasSubHeader: !!user,
+  });
 
   // Calendar events feed
   const feedQuery = useFeed(activeTab, { kinds: [31922, 31923] });
@@ -86,8 +106,8 @@ export function EventsFeedPage() {
       });
 
     return items.sort((a, b) => {
-      const aStart = parseInt(getTag(a.event.tags, "start") ?? "0", 10);
-      const bStart = parseInt(getTag(b.event.tags, "start") ?? "0", 10);
+      const aStart = getEventStartTimestamp(a.event);
+      const bStart = getEventStartTimestamp(b.event);
       const aFuture = aStart >= now;
       const bFuture = bStart >= now;
       if (aFuture && !bFuture) return -1;
@@ -160,6 +180,8 @@ export function EventsFeedPage() {
           />
         )}
       </PullToRefresh>
+
+      <CreateCommunityEventDialog open={createOpen} onOpenChange={setCreateOpen} />
     </main>
   );
 }

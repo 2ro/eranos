@@ -39,6 +39,7 @@ import {
 const CustomNipCard = lazy(() => import("@/components/CustomNipCard").then(m => ({ default: m.CustomNipCard })));
 import { FileMetadataContent } from "@/components/FileMetadataContent";
 import { FollowPackContent } from "@/components/FollowPackContent";
+import { GoalCard } from "@/components/GoalCard";
 import { FollowPackDetailContent } from "@/components/FollowPackDetailContent";
 import { FoundLogContent } from "@/components/FoundLogContent";
 import { GeocacheContent } from "@/components/GeocacheContent";
@@ -69,7 +70,6 @@ import { ReplyComposeModal } from "@/components/ReplyComposeModal";
 import { RepostMenu } from "@/components/RepostMenu";
 import { ThreadedReplyList, FlatThreadedReplyList, type ReplyNode } from "@/components/ThreadedReplyList";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { getAvatarShape } from "@/lib/avatarShape";
 import { Button } from "@/components/ui/button";
 import {
   Collapsible,
@@ -127,6 +127,7 @@ function shellTitleForKind(kind?: number): string {
   if (PODCAST_KINDS.has(kind)) return "Episode Details";
   if (CALENDAR_EVENT_KINDS.has(kind)) return "Event Details";
   if (kind === 34550) return "Community";
+  if (kind === 9041) return "Goal";
   if (FOLLOW_PACK_KINDS.has(kind)) return "Follow Pack";
   if (kind === LIVE_STREAM_KIND) return "Live Stream";
   if (kind === 30617) return "Repository";
@@ -525,7 +526,6 @@ function CopyableHex({ value }: { value: string }) {
 function AuthorHintRow({ pubkey }: { pubkey: string }) {
   const author = useAuthor(pubkey);
   const metadata = author.data?.metadata;
-  const avatarShape = getAvatarShape(metadata);
   const displayName = getDisplayName(metadata, pubkey);
   const profileUrl = useProfileUrl(pubkey, metadata);
 
@@ -542,7 +542,7 @@ function AuthorHintRow({ pubkey }: { pubkey: string }) {
           </>
         ) : (
           <>
-            <Avatar shape={avatarShape} className="size-6 shrink-0">
+            <Avatar className="size-6 shrink-0">
               <AvatarImage src={metadata?.picture} alt={displayName} />
               <AvatarFallback className="bg-primary/20 text-primary text-[10px]">
                 {displayName[0]?.toUpperCase()}
@@ -941,7 +941,6 @@ function PostDetailContent({ event }: { event: NostrEvent }) {
   const queryClient = useQueryClient();
   const author = useAuthor(event.pubkey);
   const metadata = author.data?.metadata;
-  const avatarShape = getAvatarShape(metadata);
   const displayName = getDisplayName(metadata, event.pubkey);
 
   // Refetch the author's profile whenever we navigate to a post by this author.
@@ -955,7 +954,6 @@ function PostDetailContent({ event }: { event: NostrEvent }) {
   const zapSenderPubkeyRaw = useMemo(() => event.kind === 9735 ? extractZapSender(event) : '', [event]);
   const zapSenderAuthor = useAuthor(zapSenderPubkeyRaw || undefined);
   const zapSenderMeta = zapSenderAuthor.data?.metadata;
-  const zapSenderShape = getAvatarShape(zapSenderMeta);
   const zapSenderDisplayName = getDisplayName(zapSenderMeta, zapSenderPubkeyRaw);
   const zapSenderProfileUrl = useProfileUrl(zapSenderPubkeyRaw, zapSenderMeta);
 
@@ -1025,6 +1023,7 @@ function PostDetailContent({ event }: { event: NostrEvent }) {
   const isLetter = event.kind === 8211;
   const isVanish = event.kind === VANISH_KIND;
   const isZap = event.kind === 9735;
+  const isZapGoal = event.kind === 9041;
   const isProfile = event.kind === 0;
   const isDevKind = isGitRepo || isPatch || isPullRequest || isCustomNip || isNsite;
   const isTextNote =
@@ -1054,6 +1053,7 @@ function PostDetailContent({ event }: { event: NostrEvent }) {
     !isLetter &&
     !isVanish &&
     !isZap &&
+    !isZapGoal &&
     !isProfile;
 
   const { data: stats } = useEventStats(event.id, event);
@@ -1475,7 +1475,7 @@ function PostDetailContent({ event }: { event: NostrEvent }) {
                 <>
                   <ProfileHoverCard pubkey={event.pubkey} asChild>
                     <Link to={profileUrl} className="shrink-0">
-                      <Avatar shape={avatarShape} className="size-6">
+                      <Avatar className="size-6">
                         <AvatarImage
                           src={metadata?.picture}
                           alt={displayName}
@@ -1593,7 +1593,7 @@ function PostDetailContent({ event }: { event: NostrEvent }) {
                 <>
                   <ProfileHoverCard pubkey={event.pubkey} asChild>
                     <Link to={profileUrl} className="shrink-0">
-                      <Avatar shape={avatarShape} className="size-6">
+                      <Avatar className="size-6">
                         <AvatarImage
                           src={metadata?.picture}
                           alt={displayName}
@@ -1715,7 +1715,7 @@ function PostDetailContent({ event }: { event: NostrEvent }) {
                     {zapSenderPubkeyRaw && (
                       <ProfileHoverCard pubkey={zapSenderPubkeyRaw} asChild>
                         <Link to={zapSenderProfileUrl} className="shrink-0">
-                          <Avatar shape={zapSenderShape} className="size-6">
+                          <Avatar className="size-6">
                             <AvatarImage src={zapSenderMeta?.picture} alt={zapSenderDisplayName} />
                             <AvatarFallback className="bg-primary/20 text-primary text-[10px]">
                               {zapSenderDisplayName[0]?.toUpperCase()}
@@ -1956,7 +1956,7 @@ function PostDetailContent({ event }: { event: NostrEvent }) {
             icon={
               <ProfileHoverCard pubkey={event.pubkey} asChild>
                 <Link to={profileUrl} className="shrink-0">
-                  <Avatar shape={avatarShape} className="size-10">
+                  <Avatar className="size-10">
                     <AvatarImage src={metadata?.picture} alt={displayName} />
                     <AvatarFallback className="bg-primary/20 text-primary text-sm">{displayName[0]?.toUpperCase()}</AvatarFallback>
                   </Avatar>
@@ -2022,7 +2022,7 @@ function PostDetailContent({ event }: { event: NostrEvent }) {
               <>
                 <ProfileHoverCard pubkey={event.pubkey} asChild>
                   <Link to={profileUrl}>
-                    <Avatar shape={avatarShape} className="size-11">
+                    <Avatar className="size-11">
                       <AvatarImage src={metadata?.picture} alt={displayName} />
                       <AvatarFallback className="bg-primary/20 text-primary text-sm">
                         {displayName[0].toUpperCase()}
@@ -2137,6 +2137,8 @@ function PostDetailContent({ event }: { event: NostrEvent }) {
               <EncryptedMessageContent event={event} />
             ) : isLetter ? (
               <EncryptedLetterContent event={event} />
+            ) : isZapGoal ? (
+              <GoalCard event={event} />
             ) : isVine ||
               isPoll ||
               isGeocache ||

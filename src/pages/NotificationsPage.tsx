@@ -23,7 +23,6 @@ import { isEventMuted } from '@/lib/muteHelpers';
 import { genUserName } from '@/lib/genUserName';
 import { nip19 } from 'nostr-tools';
 import { isReplyEvent } from '@/lib/nostrEvents';
-import { getAvatarShape, emojiAvatarBorderStyle } from '@/lib/avatarShape';
 import { useProfileUrl } from '@/hooks/useProfileUrl';
 import { formatNumber } from '@/lib/formatNumber';
 import { cn } from '@/lib/utils';
@@ -91,6 +90,7 @@ const NOTIFICATION_KIND_NOUNS: Record<number, string> = {
   34139: 'playlist',
   34236: 'divine',
   34550: 'community',
+  9041: 'goal',
   35128: 'nsite',
   36787: 'track',
   37381: 'Magic deck',
@@ -367,18 +367,11 @@ function ActorAvatar({ pubkey }: { pubkey: string }) {
   const metadata = author.data?.metadata;
   const name = metadata?.name ?? genUserName(pubkey);
   const profileUrl = useProfileUrl(pubkey, metadata);
-  const shape = getAvatarShape(metadata);
-  const isEmojiShape = !!shape;
 
   return (
     <ProfileHoverCard pubkey={pubkey} asChild>
-      <Link
-        to={profileUrl}
-        title={name}
-        className="shrink-0"
-        style={isEmojiShape ? emojiAvatarBorderStyle : undefined}
-      >
-        <Avatar className={cn("size-7", !isEmojiShape && "ring-2 ring-background")} shape={shape}>
+      <Link to={profileUrl} title={name} className="shrink-0">
+        <Avatar className="size-7 ring-2 ring-background">
           {metadata?.picture && <AvatarImage src={metadata.picture} alt={name} />}
           <AvatarFallback className="text-[10px]">{name.slice(0, 2).toUpperCase()}</AvatarFallback>
         </Avatar>

@@ -40,7 +40,6 @@ import { useStreamKind } from "@/hooks/useStreamKind";
 import { type EventStats, useEventStats } from "@/hooks/useTrending";
 import { useUserReaction } from "@/hooks/useUserReaction";
 import { DITTO_RELAY } from "@/lib/appRelays";
-import { getAvatarShape } from "@/lib/avatarShape";
 import { canZap } from "@/lib/canZap";
 import { EXTRA_KINDS } from "@/lib/extraKinds";
 import { getRepostKind } from "@/lib/feedUtils";
@@ -334,7 +333,6 @@ export function VineCard({
 	const { user } = useCurrentUser();
 	const author = useAuthor(event.pubkey);
 	const metadata = author.data?.metadata;
-	const avatarShape = getAvatarShape(metadata);
 	const displayName = getDisplayName(metadata, event.pubkey);
 	const profileUrl = useProfileUrl(event.pubkey, metadata);
 	const { data: stats } = useEventStats(event.id, event);
@@ -555,10 +553,7 @@ export function VineCard({
 							{author.isLoading ? (
 								<Skeleton className="size-11 rounded-full" />
 							) : (
-								<Avatar
-									shape={avatarShape}
-									className="size-11 border-2 border-white shadow-lg"
-								>
+								<Avatar className="size-11 border-2 border-white shadow-lg">
 									<AvatarImage src={metadata?.picture} alt={displayName} />
 									<AvatarFallback className="bg-primary/80 text-white text-sm font-bold">
 										{displayName[0]?.toUpperCase()}

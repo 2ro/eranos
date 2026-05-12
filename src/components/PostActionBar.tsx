@@ -13,6 +13,7 @@ import { useEventStats } from '@/hooks/useTrending';
 import { useToast } from '@/hooks/useToast';
 import { canZap } from '@/lib/canZap';
 import { formatNumber } from '@/lib/formatNumber';
+import { hasGoalZapSplits } from '@/lib/goalUtils';
 import { shareOrCopy } from '@/lib/share';
 
 interface PostActionBarProps {
@@ -36,7 +37,8 @@ export function PostActionBar({
   const { user } = useCurrentUser();
   const author = useAuthor(event.pubkey);
   const metadata = author.data?.metadata;
-  const canZapAuthor = user && canZap(metadata);
+  // TODO: Enable zapping split-recipient NIP-75 goals once zap split payments are supported.
+  const canZapAuthor = user && canZap(metadata) && !hasGoalZapSplits(event);
 
   const { data: stats } = useEventStats(event.id, event);
   const repostTotal = (stats?.reposts ?? 0) + (stats?.quotes ?? 0);

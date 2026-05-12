@@ -1,16 +1,15 @@
 import { useMemo } from 'react';
 import { Link } from 'react-router-dom';
-import { Crown, Shield, Users } from 'lucide-react';
+import { Bookmark, Crown, Shield, Users } from 'lucide-react';
 import { nip19 } from 'nostr-tools';
 import type { NostrEvent } from '@nostrify/nostrify';
 
-import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { useAuthor } from '@/hooks/useAuthor';
 import { useProfileUrl } from '@/hooks/useProfileUrl';
-import { genUserName } from '@/lib/genUserName';
-import { getAvatarShape } from '@/lib/avatarShape';
 import { parseCommunityEvent, COMMUNITY_DEFINITION_KIND } from '@/lib/communityUtils';
+import { genUserName } from '@/lib/genUserName';
 import { cn } from '@/lib/utils';
 
 interface CommunityCardProps {
@@ -18,19 +17,27 @@ interface CommunityCardProps {
   event: NostrEvent;
   /** Whether the current user founded this community. */
   isFounded?: boolean;
+  /** Whether the current user is a validated member. */
+  isMember?: boolean;
+  /** Whether the current user follows this community via NIP-51 kind 10004. */
+  isBookmarked?: boolean;
   className?: string;
 }
 
 /**
  * Compact card for displaying a community in a list.
- * Shows image, name, description snippet, founder info, and moderator count.
+ * Shows image, name, description snippet, founder info, and community status.
  */
-export function CommunityCard({ event, isFounded, className }: CommunityCardProps) {
+export function CommunityCard({
+  event,
+  isFounded,
+  isMember,
+  isBookmarked,
+  className,
+}: CommunityCardProps) {
   const community = useMemo(() => parseCommunityEvent(event), [event]);
-
   const founderAuthor = useAuthor(event.pubkey);
   const founderMeta = founderAuthor.data?.metadata;
-  const founderAvatarShape = getAvatarShape(founderMeta);
   const founderName = founderMeta?.display_name || founderMeta?.name || genUserName(event.pubkey);
   const founderProfileUrl = useProfileUrl(event.pubkey, founderMeta);
 
@@ -41,8 +48,6 @@ export function CommunityCard({ event, isFounded, className }: CommunityCardProp
     pubkey: event.pubkey,
     identifier: community.dTag,
   });
-
-  const rankCount = community.ranks.length - 1; // Exclude rank 0
 
   return (
     <Link
@@ -75,12 +80,22 @@ export function CommunityCard({ event, isFounded, className }: CommunityCardProp
           <h3 className="text-sm font-semibold truncate flex-1 group-hover:text-primary transition-colors">
             {community.name}
           </h3>
-          {isFounded && (
+          {isFounded ? (
             <Badge variant="secondary" className="text-[10px] gap-1 shrink-0 bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20">
               <Crown className="size-2.5" />
               Founder
             </Badge>
-          )}
+          ) : isMember ? (
+            <Badge variant="secondary" className="text-[10px] gap-1 shrink-0 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20">
+              <Shield className="size-2.5" />
+              Member
+            </Badge>
+          ) : isBookmarked ? (
+            <Badge variant="secondary" className="text-[10px] gap-1 shrink-0 bg-primary/10 text-primary border-primary/20">
+              <Bookmark className="size-2.5 fill-current" />
+              Following
+            </Badge>
+          ) : null}
         </div>
 
         {/* Description */}
@@ -97,7 +112,7 @@ export function CommunityCard({ event, isFounded, className }: CommunityCardProp
             onClick={(e) => e.stopPropagation()}
             className="flex items-center gap-1.5 min-w-0"
           >
-            <Avatar shape={founderAvatarShape} className="size-5">
+            <Avatar className="size-5">
               <AvatarImage src={founderMeta?.picture} />
               <AvatarFallback className="text-[8px] bg-muted">
                 {founderName.charAt(0).toUpperCase()}
@@ -115,10 +130,10 @@ export function CommunityCard({ event, isFounded, className }: CommunityCardProp
                 {community.moderatorPubkeys.length}
               </span>
             )}
-            {rankCount > 0 && (
+            {community.memberBadgeATag && (
               <span className="flex items-center gap-1 text-[11px] text-muted-foreground">
                 <Users className="size-3" />
-                {rankCount} rank{rankCount !== 1 ? 's' : ''}
+                Member badge
               </span>
             )}
           </div>

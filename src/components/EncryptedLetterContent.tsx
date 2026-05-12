@@ -27,7 +27,6 @@ import { ProfileHoverCard } from '@/components/ProfileHoverCard';
 import { useAuthor } from '@/hooks/useAuthor';
 import { useProfileUrl } from '@/hooks/useProfileUrl';
 import { useCardTilt } from '@/hooks/useCardTilt';
-import { getAvatarShape } from '@/lib/avatarShape';
 import { getDisplayName } from '@/lib/getDisplayName';
 import { genUserName } from '@/lib/genUserName';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -107,13 +106,12 @@ function SealAvatar({ pubkey }: { pubkey: string }) {
   const author = useAuthor(pubkey);
   const metadata = author.data?.metadata;
   const displayName = getDisplayName(metadata, pubkey);
-  const avatarShape = getAvatarShape(metadata);
   const profileUrl = useProfileUrl(pubkey, metadata);
 
   return (
     <ProfileHoverCard pubkey={pubkey} asChild>
       <Link to={profileUrl} onClick={(e) => e.stopPropagation()}>
-        <Avatar shape={avatarShape} className="size-12 ring-2 ring-amber-900/30 shadow-lg">
+        <Avatar className="size-12 ring-2 ring-amber-900/30 shadow-lg">
           <AvatarImage src={metadata?.picture} alt={displayName} />
           <AvatarFallback className="bg-amber-900/20 text-amber-900 text-sm font-bold">
             {displayName[0]?.toUpperCase()}
@@ -456,7 +454,6 @@ export function EncryptedLetterCompact({ event, className }: EncryptedLetterComp
   const navigate = useNavigate();
   const author = useAuthor(event.pubkey);
   const metadata = author.data?.metadata;
-  const avatarShape = getAvatarShape(metadata);
   const displayName = metadata?.name || genUserName(event.pubkey);
   const recipientPubkey = event.tags.find(([n]) => n === 'p')?.[1];
   const recipientAuthor = useAuthor(recipientPubkey ?? '');
@@ -507,7 +504,7 @@ export function EncryptedLetterCompact({ event, className }: EncryptedLetterComp
                   className="shrink-0"
                   onClick={(e) => e.stopPropagation()}
                 >
-                  <Avatar shape={avatarShape} className="size-5">
+                  <Avatar className="size-5">
                     <AvatarImage src={metadata?.picture} alt={displayName} />
                     <AvatarFallback className="bg-primary/20 text-primary text-[10px]">
                       {displayName[0]?.toUpperCase()}

@@ -10,23 +10,25 @@ import { COMMUNITY_DEFINITION_KIND, parseCommunityEvent } from '@/lib/communityU
 /**
  * Resolve the community moderation context for a single event.
  *
- * Extracts the community `A` tag from the event, fetches the community
+ * Extracts the community tag from the event, fetches the community
  * definition, resolves membership & moderation, and returns a value shaped
  * for `CommunityModerationContext.Provider`. Callers install it as a
  * Provider so that nested components (`NoteCard`, `NoteMoreMenu`) pick up
  * the same moderation data via `useCommunityModerationContext()`.
  *
  * Returns `null` when:
- * - The event has no community `A` tag
- * - The `A` tag doesn't point to a kind 34550 community
+ * - The event has no community tag
+ * - The tag doesn't point to a kind 34550 community
  * - The community definition hasn't loaded yet
  */
 export function useCommunityModerationForEvent(event: NostrEvent): CommunityModerationContextValue | null {
   const { nostr } = useNostr();
 
-  // Extract the community A tag and its addressable parts in one pass.
+  // Extract the community tag and its addressable parts in one pass.
+  // NIP-22 comments use uppercase A; NIP-75 goals link with lowercase a.
   const parsed = useMemo(() => {
-    const aValue = event.tags.find(([n]) => n === 'A')?.[1];
+    const aValue = event.tags.find(([n]) => n === 'A')?.[1]
+      ?? event.tags.find(([n, v]) => n === 'a' && v?.startsWith(`${COMMUNITY_DEFINITION_KIND}:`))?.[1];
     if (!aValue) return null;
     if (!aValue.startsWith(`${COMMUNITY_DEFINITION_KIND}:`)) return null;
     const parts = aValue.split(':');

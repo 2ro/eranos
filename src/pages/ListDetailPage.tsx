@@ -15,7 +15,6 @@ import {
 } from 'lucide-react';
 import { RepostIcon } from '@/components/icons/RepostIcon';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
-import { getAvatarShape } from '@/lib/avatarShape';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import {
@@ -72,7 +71,6 @@ function MemberCard({ pubkey, isOwner, listId, onRemoved }: {
 }) {
   const author = useAuthor(pubkey);
   const metadata = author.data?.metadata;
-  const avatarShape = getAvatarShape(metadata);
   const displayName = metadata?.display_name || metadata?.name || genUserName(pubkey);
   const profileUrl = useProfileUrl(pubkey, metadata);
   const { data: followData } = useFollowList();
@@ -113,7 +111,7 @@ function MemberCard({ pubkey, isOwner, listId, onRemoved }: {
           </>
         ) : (
           <>
-            <Avatar shape={avatarShape} className="size-10 shrink-0">
+            <Avatar className="size-10 shrink-0">
               <AvatarImage src={metadata?.picture} alt={displayName} />
               <AvatarFallback className="bg-primary/20 text-primary text-sm">
                 {displayName[0]?.toUpperCase()}
@@ -369,7 +367,6 @@ export function ListDetailPage() {
   const listAuthor = useAuthor(decoded?.pubkey ?? '');
   const listAuthorMetadata = listAuthor.data?.metadata;
   const listAuthorName = listAuthorMetadata?.name || listAuthorMetadata?.display_name || (decoded ? genUserName(decoded.pubkey) : '');
-  const listAuthorAvatarShape = getAvatarShape(listAuthorMetadata);
   const listAuthorProfileUrl = useProfileUrl(decoded?.pubkey ?? '', listAuthorMetadata);
 
   // Fetch preview avatars for the member stack
@@ -484,7 +481,7 @@ export function ListDetailPage() {
               <h1 className="text-lg font-bold truncate">{list.title}</h1>
               {decoded && (
                 <Link to={listAuthorProfileUrl} className="flex items-center gap-1.5 mt-0.5 group">
-                  <Avatar shape={listAuthorAvatarShape} className="size-4">
+                  <Avatar className="size-4">
                     <AvatarImage src={listAuthorMetadata?.picture} alt={listAuthorName} />
                     <AvatarFallback className="bg-primary/20 text-primary text-[8px]">
                       {listAuthorName[0]?.toUpperCase()}
@@ -585,9 +582,8 @@ export function ListDetailPage() {
               {previewPubkeys.map((pk) => {
                 const member = previewMembersMap?.get(pk);
                 const name = member?.metadata?.name || genUserName(pk);
-                const shape = getAvatarShape(member?.metadata);
                 return (
-                  <Avatar key={pk} shape={shape} className="size-7 ring-2 ring-background">
+                  <Avatar key={pk} className="size-7 ring-2 ring-background">
                     <AvatarImage src={member?.metadata?.picture} alt={name} />
                     <AvatarFallback className="bg-primary/20 text-primary text-[10px]">
                       {name[0]?.toUpperCase()}

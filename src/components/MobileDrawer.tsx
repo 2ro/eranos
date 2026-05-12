@@ -2,7 +2,6 @@ import { useState, useId, useMemo } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { ChevronDown, ChevronUp, LogOut, UserPlus, Loader2, QrCode } from 'lucide-react';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
-import { getAvatarShape } from '@/lib/avatarShape';
 import { Sheet, SheetContent, SheetTitle } from '@/components/ui/sheet';
 import { SidebarNavList } from '@/components/SidebarNavItem';
 import { SidebarMoreMenu } from '@/components/SidebarMoreMenu';
@@ -50,7 +49,6 @@ export function MobileDrawer({ open, onOpenChange }: MobileDrawerProps) {
   const location = useLocation();
   const navigate = useNavigate();
   const { user, metadata, event: currentUserEvent } = useCurrentUser();
-  const currentUserAvatarShape = getAvatarShape(metadata);
   const userProfileUrl = useProfileUrl(user?.pubkey ?? '', metadata);
   const { logout } = useLoginActions();
   const { otherUsers, setLogin } = useLoggedInAccounts();
@@ -155,7 +153,7 @@ export function MobileDrawer({ open, onOpenChange }: MobileDrawerProps) {
                 className="flex items-center gap-3 px-3 hover:bg-secondary/60 transition-colors w-full text-left"
                 style={{ minHeight: `calc(3rem + var(--safe-area-inset-top, env(safe-area-inset-top, 0px)))`, paddingTop: `var(--safe-area-inset-top, env(safe-area-inset-top, 0px))` }}
               >
-                <Avatar shape={currentUserAvatarShape} className="size-7 shrink-0">
+                <Avatar className="size-7 shrink-0">
                   <AvatarImage src={metadata?.picture} alt={displayName} />
                   <AvatarFallback className="bg-primary/20 text-primary text-xs">
                     {displayName[0].toUpperCase()}
@@ -266,7 +264,7 @@ export function MobileDrawer({ open, onOpenChange }: MobileDrawerProps) {
                       onClick={() => { setLogin(account.id); handleClose(); }}
                       className="flex items-center gap-3 w-full px-3 py-2 hover:bg-secondary/60 transition-colors"
                     >
-                      <Avatar shape={getAvatarShape(account.metadata)} className="size-7 shrink-0">
+                      <Avatar className="size-7 shrink-0">
                         <AvatarImage src={account.metadata.picture} alt={getDisplayName(account)} />
                         <AvatarFallback className="bg-primary/20 text-primary text-xs">
                           {getDisplayName(account).charAt(0).toUpperCase()}

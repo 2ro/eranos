@@ -16,7 +16,6 @@ import { useFollowList } from '@/hooks/useFollowActions';
 import { useCuratorFollowList } from '@/hooks/useCuratorFollowList';
 import { parseMusicTrack, toAudioTrack } from '@/lib/musicHelpers';
 import { genUserName } from '@/lib/genUserName';
-import { getAvatarShape } from '@/lib/avatarShape';
 import { timeAgo } from '@/lib/timeAgo';
 import { formatTime } from '@/lib/formatTime';
 import { cn } from '@/lib/utils';
@@ -67,7 +66,6 @@ function MusicCard({ event }: { event: NostrEvent }) {
   const player = useAudioPlayer();
   const author = useAuthor(event.pubkey);
   const metadata = author.data?.metadata;
-  const avatarShape = getAvatarShape(metadata);
   const displayName = metadata?.name || genUserName(event.pubkey);
 
   const parsed = useMemo(() => parseMusicTrack(event), [event]);
@@ -150,7 +148,7 @@ function MusicCard({ event }: { event: NostrEvent }) {
 
         {/* Author row */}
         <div className="flex items-center gap-1.5 pt-0.5">
-          <Avatar shape={avatarShape} className="size-4">
+          <Avatar className="size-4">
             <AvatarImage src={metadata?.picture} alt={displayName} />
             <AvatarFallback className="bg-primary/20 text-primary text-[8px]">
               {displayName[0]?.toUpperCase()}
