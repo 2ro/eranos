@@ -21,24 +21,24 @@ export interface MyCommunityEntry {
   isFounded: boolean;
   /** Whether the current user is a validated member. */
   isMember: boolean;
-  /** Whether the current user has bookmarked the community via kind 10004. */
+  /** Whether the current user follows the community via kind 10004. */
   isBookmarked: boolean;
 }
 
 /**
  * Fetch communities the logged-in user has founded, been recruited into,
- * or bookmarked via their NIP-51 Communities list (kind 10004).
+ * or follows via their NIP-51 Communities list (kind 10004).
  *
  * Discovery:
  *
  * 1. Founded -- `{ kinds: [34550], authors: [user.pubkey] }`
  * 2. Member-of -- kind 8 awards targeting the user, extract badge `a` tags,
  *    then find the community definitions referencing those badges.
- * 3. Bookmarked -- read kind 10004 authored by user, extract `a` tags
+ * 3. Followed -- read kind 10004 authored by user, extract `a` tags
  *    pointing at kind 34550 events, and fetch those community definitions.
  *
  * Priority when the same community appears in multiple sources:
- * founded > member > bookmarked.
+ * founded > member > followed.
  */
 export function useMyCommunities() {
   const { nostr } = useNostr();
@@ -97,9 +97,9 @@ export function useMyCommunities() {
         );
       }
 
-      // ── Step 4: Resolve bookmarked community coordinates ──────────────────
+      // ── Step 4: Resolve followed community coordinates ────────────────────
       //
-      // NIP-51 kind 10004 stores community definitions as `a` tags like
+      // NIP-51 kind 10004 stores followed community definitions as `a` tags like
       // `34550:<pubkey>:<d-tag>`. For each bookmarked coordinate we query
       // with both `authors` and `#d` so relays return a single authentic
       // event per bookmark (per AGENTS.md security guidance on addressable
@@ -146,8 +146,8 @@ export function useMyCommunities() {
       const bookmarkedATagSet = new Set(bookmarkedCoords);
 
       // ── Merge & deduplicate ──────────────────────────────────────────────
-      // Priority: founded > member > bookmarked. `isBookmarked` is resolved
-      // from the bookmark list irrespective of which bucket produced the
+      // Priority: founded > member > followed. `isBookmarked` is resolved
+      // from the kind 10004 list irrespective of which bucket produced the
       // entry, so founders/members who have also bookmarked see both flags.
       const seen = new Map<string, MyCommunityEntry>();
 
@@ -194,7 +194,7 @@ export function useMyCommunities() {
         });
       }
 
-      // Sort: founded first, then member, then bookmarked-only;
+      // Sort: founded first, then member, then followed-only;
       // tie-break by created_at descending.
       const sortRank = (entry: MyCommunityEntry): number => {
         if (entry.isFounded) return 0;

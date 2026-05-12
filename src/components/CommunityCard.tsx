@@ -19,7 +19,7 @@ interface CommunityCardProps {
   isFounded?: boolean;
   /** Whether the current user is a validated member. */
   isMember?: boolean;
-  /** Whether the current user has bookmarked this community (NIP-51 kind 10004). */
+  /** Whether the current user follows this community via NIP-51 kind 10004. */
   isBookmarked?: boolean;
   className?: string;
 }
@@ -93,7 +93,7 @@ export function CommunityCard({
           ) : isBookmarked ? (
             <Badge variant="secondary" className="text-[10px] gap-1 shrink-0 bg-primary/10 text-primary border-primary/20">
               <Bookmark className="size-2.5 fill-current" />
-              Bookmarked
+              Following
             </Badge>
           ) : null}
         </div>

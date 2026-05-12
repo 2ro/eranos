@@ -16,6 +16,47 @@ interface FollowButtonProps {
   size?: 'default' | 'sm' | 'lg' | 'icon';
 }
 
+interface FollowToggleButtonProps {
+  /** Whether the target is currently followed. */
+  isFollowing: boolean;
+  /** Whether a follow/unfollow mutation is pending. */
+  isPending?: boolean;
+  /** Called when the button is clicked. */
+  onClick: (event: React.MouseEvent) => void;
+  /** Optional class name overrides. */
+  className?: string;
+  /** Button size variant. Defaults to "sm". */
+  size?: 'default' | 'sm' | 'lg' | 'icon';
+  /** Disable the button. */
+  disabled?: boolean;
+}
+
+export function FollowToggleButton({
+  isFollowing,
+  isPending = false,
+  onClick,
+  className,
+  size = 'sm',
+  disabled = false,
+}: FollowToggleButtonProps) {
+  return (
+    <Button
+      type="button"
+      size={size}
+      variant={isFollowing ? 'outline' : 'default'}
+      className={cn(
+        'rounded-full font-bold',
+        isFollowing && 'bg-transparent border border-border text-foreground hover:bg-destructive/10 hover:text-destructive hover:border-destructive/50',
+        className,
+      )}
+      onClick={onClick}
+      disabled={disabled || isPending}
+    >
+      {isPending ? '...' : isFollowing ? 'Unfollow' : 'Follow'}
+    </Button>
+  );
+}
+
 /**
  * Reusable follow / unfollow button.
  *
@@ -57,19 +98,12 @@ export function FollowButton({ pubkey, className, size = 'sm' }: FollowButtonPro
   if (!user || user.pubkey === pubkey) return null;
 
   return (
-    <Button
-      type="button"
+    <FollowToggleButton
       size={size}
-      variant={isFollowing ? 'outline' : 'default'}
-      className={cn(
-        'rounded-full font-bold',
-        isFollowing && 'bg-background border border-border text-foreground hover:bg-destructive hover:text-destructive-foreground hover:border-destructive',
-        className,
-      )}
+      isFollowing={isFollowing}
+      isPending={isPending}
+      className={className}
       onClick={handleToggleFollow}
-      disabled={isPending}
-    >
-      {isPending ? '...' : isFollowing ? 'Unfollow' : 'Follow'}
-    </Button>
+    />
   );
 }

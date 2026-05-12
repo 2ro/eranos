@@ -25,7 +25,7 @@ export function parseCommunityBookmarkATag(aTag: string): { pubkey: string; dTag
  * Hook to manage the user's NIP-51 Communities list (kind 10004).
  *
  * This list stores `a` tag coordinates for kind 34550 community definitions
- * that the user has bookmarked / "saved". Unlike `useBookmarks` (kind 10003)
+ * that the user follows. Unlike `useBookmarks` (kind 10003)
  * which targets event IDs, this list targets addressable coordinates so the
  * reference remains stable across community updates.
  */
@@ -113,12 +113,12 @@ export function useCommunityBookmarks() {
       queryClient.invalidateQueries({ queryKey: ['community-bookmarks', user?.pubkey] });
       queryClient.invalidateQueries({ queryKey: ['my-communities'] });
       toast({
-        title: removed ? 'Community removed from bookmarks' : 'Community bookmarked',
+        title: removed ? 'Community unfollowed' : 'Community followed',
       });
     },
     onError: () => {
       toast({
-        title: 'Failed to update bookmark',
+        title: 'Failed to update community follow',
         variant: 'destructive',
       });
     },
@@ -127,13 +127,13 @@ export function useCommunityBookmarks() {
   return {
     /** The kind 10004 list event itself. */
     listEvent: listQuery.data,
-    /** Array of bookmarked community `a` tag coordinates. */
+    /** Array of followed community `a` tag coordinates from kind 10004. */
     bookmarkedATags,
     /** Whether the list query is still loading. */
     isLoading: listQuery.isLoading,
     /** Check whether a given `a` tag coordinate is bookmarked. */
     isBookmarked,
-    /** Toggle a community bookmark on/off. */
+    /** Toggle a kind 10004 community follow on/off. */
     toggleBookmark,
   };
 }

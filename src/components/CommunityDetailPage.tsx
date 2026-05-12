@@ -4,7 +4,6 @@ import { Link, useNavigate } from 'react-router-dom';
 import { nip19 } from 'nostr-tools';
 import {
   ArrowLeft,
-  Bookmark,
   CalendarDays,
   Crown,
   Loader2,
@@ -33,6 +32,7 @@ import { CommunityChatPanel } from '@/components/CommunityChatPanel';
 import { CommunityBadgePanel } from '@/components/CommunityBadgePanel';
 import { ComposeBox } from '@/components/ComposeBox';
 import { FeedEmptyState } from '@/components/FeedEmptyState';
+import { FollowToggleButton } from '@/components/FollowButton';
 import { CreateGoalDialog } from '@/components/CreateGoalDialog';
 import { MembersOnlyToggle } from '@/components/MembersOnlyToggle';
 import { NoteCard } from '@/components/NoteCard';
@@ -304,17 +304,23 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
   const isFounder = !!user && user.pubkey === event.pubkey;
   const canAddMembers = !!viewerMember && viewerMember.rank === 0;
 
-  // NIP-51 kind 10004 community bookmark toggle. Toasts are fired from inside
-  // the mutation so they survive even if this page unmounts mid-publish.
+  // NIP-51 kind 10004 is the standard Communities list. In the UI this is
+  // presented as following a community.
   const {
-    isBookmarked: isCommunityBookmarked,
-    toggleBookmark: toggleCommunityBookmark,
+    isBookmarked: isCommunitySaved,
+    toggleBookmark: toggleCommunityFollow,
   } = useCommunityBookmarks();
-  const bookmarked = !!communityATag && isCommunityBookmarked(communityATag);
-  const handleToggleBookmark = useCallback(() => {
-    if (!user || !communityATag || toggleCommunityBookmark.isPending) return;
-    toggleCommunityBookmark.mutate({ aTag: communityATag });
-  }, [user, communityATag, toggleCommunityBookmark]);
+  const savedCommunityFollow = !!communityATag && isCommunitySaved(communityATag);
+  const membershipFollow = isFounder || !!viewerMember;
+  const communityFollowed = membershipFollow || savedCommunityFollow;
+  const handleToggleFollow = useCallback(() => {
+    if (!user || !communityATag || toggleCommunityFollow.isPending) return;
+    if (membershipFollow) {
+      toast({ title: isFounder ? 'You founded this community' : 'You are already a member of this community' });
+      return;
+    }
+    toggleCommunityFollow.mutate({ aTag: communityATag });
+  }, [user, communityATag, toggleCommunityFollow, membershipFollow, isFounder, toast]);
 
   // Batch-fetch profiles for all members
   const allMemberPubkeys = useMemo(
@@ -528,39 +534,36 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
           <p className="line-clamp-3 text-sm leading-relaxed text-muted-foreground whitespace-pre-wrap">{descriptionText}</p>
         )}
 
-        <div className="flex justify-end gap-1">
-          <MembersOnlyToggle />
-          {isFounder && community && (
+        <div className="flex items-center justify-between gap-3">
+          {user && communityATag && (
+            <FollowToggleButton
+              size="sm"
+              isFollowing={communityFollowed}
+              isPending={toggleCommunityFollow.isPending}
+              onClick={handleToggleFollow}
+            />
+          )}
+          <div className="ml-auto flex items-center gap-1">
+            <MembersOnlyToggle />
+            {isFounder && community && (
+              <button
+                type="button"
+                className={actionButtonClassName}
+                onClick={() => setEditCommunityOpen(true)}
+                aria-label="Edit community"
+              >
+                <Pencil className="size-5" />
+              </button>
+            )}
             <button
               type="button"
               className={actionButtonClassName}
-              onClick={() => setEditCommunityOpen(true)}
-              aria-label="Edit community"
+              onClick={handleShare}
+              aria-label="Share"
             >
-              <Pencil className="size-5" />
+              <Share2 className="size-5" />
             </button>
-          )}
-          {user && communityATag && (
-            <button
-              type="button"
-              className={cn(actionButtonClassName, bookmarked && 'text-primary hover:text-primary hover:bg-primary/10')}
-              onClick={handleToggleBookmark}
-              disabled={toggleCommunityBookmark.isPending}
-              aria-label={bookmarked ? 'Remove community bookmark' : 'Bookmark community'}
-              aria-pressed={bookmarked}
-              aria-busy={toggleCommunityBookmark.isPending}
-            >
-              <Bookmark className={cn('size-5', bookmarked && 'fill-current')} />
-            </button>
-          )}
-          <button
-            type="button"
-            className={actionButtonClassName}
-            onClick={handleShare}
-            aria-label="Share"
-          >
-            <Share2 className="size-5" />
-          </button>
+          </div>
         </div>
 
         {/* ── Tabs ── */}
