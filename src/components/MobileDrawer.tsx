@@ -87,15 +87,20 @@ export function MobileDrawer({ open, onOpenChange }: MobileDrawerProps) {
   const hasBgImage = Object.keys(bgStyle).length > 0;
 
   const visibleItems = useMemo(() => {
-    // Remove dividers that have no real items above them (at the top or right after another divider).
-    return orderedItems.filter((id, i) => {
-      if (id === 'divider') {
-        const prevNonDivider = orderedItems.slice(0, i).some((prev) => prev !== 'divider');
-        return prevNonDivider;
-      }
+    // Phase 1: filter out non-visible items (admin-only for non-admins).
+    const filtered = orderedItems.filter((id) => {
+      if (id === 'divider') return true; // pass through, cleaned in phase 2
       const def = getSidebarItem(id);
-      if (!def) return true; // custom/external items pass through
+      if (!def) return true;
       if (def.requiresAdmin && !isAdmin(user?.pubkey)) return false;
+      return true;
+    });
+    // Phase 2: remove leading, trailing, and consecutive dividers.
+    return filtered.filter((id, i, arr) => {
+      if (id !== 'divider') return true;
+      if (i === 0) return false;
+      if (i === arr.length - 1) return false;
+      if (arr[i - 1] === 'divider') return false;
       return true;
     });
   }, [orderedItems, user]);

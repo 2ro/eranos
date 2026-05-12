@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useMemo } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import {
   UserPlus, LogOut,
@@ -47,12 +47,24 @@ export function LeftSidebar() {
   } = useFeedSettings();
   const { config } = useAppContext();
 
-  const visibleItems = orderedItems.filter((id) => {
-    const def = getSidebarItem(id);
-    if (!def) return true; // custom/external items pass through
-    if (def.requiresAdmin && !isAdmin(user?.pubkey)) return false;
-    return true;
-  });
+  const visibleItems = useMemo(() => {
+    // Phase 1: filter out admin-only items for non-admins.
+    const filtered = orderedItems.filter((id) => {
+      if (id === 'divider') return true; // pass through, cleaned in phase 2
+      const def = getSidebarItem(id);
+      if (!def) return true;
+      if (def.requiresAdmin && !isAdmin(user?.pubkey)) return false;
+      return true;
+    });
+    // Phase 2: remove leading, trailing, and consecutive dividers.
+    return filtered.filter((id, i, arr) => {
+      if (id !== 'divider') return true;
+      if (i === 0) return false;
+      if (i === arr.length - 1) return false;
+      if (arr[i - 1] === 'divider') return false;
+      return true;
+    });
+  }, [orderedItems, user]);
   const visibleHiddenItems = hiddenItems.filter((item) => {
     const def = getSidebarItem(item.id);
     if (!def) return true;

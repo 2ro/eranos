@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
@@ -58,6 +58,12 @@ function ActivityRow({ item }: { item: ActivityItem }) {
 
 export function RecentActivityList({ data }: RecentActivityListProps) {
   const [page, setPage] = useState(0);
+
+  // Clamp page when data shrinks.
+  useEffect(() => {
+    setPage((p) => Math.min(p, Math.max(0, Math.ceil(data.length / ITEMS_PER_PAGE) - 1)));
+  }, [data.length]);
+
   const totalPages = Math.max(1, Math.ceil(data.length / ITEMS_PER_PAGE));
   const paged = data.slice(page * ITEMS_PER_PAGE, (page + 1) * ITEMS_PER_PAGE);
 

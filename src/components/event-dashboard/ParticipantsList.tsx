@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import type { ParticipantRow, TerritorialLevel } from './types';
@@ -12,6 +12,13 @@ const ITEMS_PER_PAGE = 10;
 
 export function ParticipantsList({ data, territorialLevel }: ParticipantsListProps) {
   const [page, setPage] = useState(0);
+
+  // Reset on category switch; clamp when data shrinks.
+  useEffect(() => { setPage(0); }, [territorialLevel]);
+  useEffect(() => {
+    setPage((p) => Math.min(p, Math.max(0, Math.ceil(data.length / ITEMS_PER_PAGE) - 1)));
+  }, [data.length]);
+
   const totalPages = Math.max(1, Math.ceil(data.length / ITEMS_PER_PAGE));
   const paged = data.slice(page * ITEMS_PER_PAGE, (page + 1) * ITEMS_PER_PAGE);
 

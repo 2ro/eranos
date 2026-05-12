@@ -331,12 +331,12 @@ export function useEventDashboard({ enabled, territorialLevel }: UseEventDashboa
     });
   }, [globalPosts, displayFeeds]);
 
-  // Status — surface relay errors even after initial data is loaded.
+  // Status — useMultiHashtagFeed swallows relay errors so `error` is always
+  // null in practice. We keep the DashboardStatus type unchanged (consumers
+  // may still reference 'disconnected') but never produce it here.
   const hasData = globalPosts.length > 0;
   const status: DashboardStatus = isLoading && !hasData
     ? 'connecting'
-    : error && hasData
-    ? 'disconnected'
     : isBackfilling
     ? 'syncing'
     : 'live';
