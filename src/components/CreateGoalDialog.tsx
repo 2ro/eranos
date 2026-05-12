@@ -11,6 +11,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import { ImageUploadField } from '@/components/ImageUploadField';
 import { useAppContext } from '@/hooks/useAppContext';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useNostrPublish } from '@/hooks/useNostrPublish';
@@ -45,6 +46,7 @@ export function CreateGoalDialog({ communityATag, children, open: controlledOpen
   const [summary, setSummary] = useState('');
   const [imageUrl, setImageUrl] = useState('');
   const [deadlineDate, setDeadlineDate] = useState('');
+  const [isImageUploading, setIsImageUploading] = useState(false);
 
   const resetForm = () => {
     setTitle('');
@@ -52,11 +54,16 @@ export function CreateGoalDialog({ communityATag, children, open: controlledOpen
     setSummary('');
     setImageUrl('');
     setDeadlineDate('');
+    setIsImageUploading(false);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!user) return;
+    if (isImageUploading) {
+      toast({ title: 'Image is still uploading', description: 'Please wait for the upload to finish.' });
+      return;
+    }
 
     const sats = parseInt(amountSats, 10);
     if (isNaN(sats) || sats <= 0) {
@@ -92,9 +99,11 @@ export function CreateGoalDialog({ communityATag, children, open: controlledOpen
     }
     if (imageUrl.trim()) {
       const sanitizedImage = sanitizeUrl(imageUrl.trim());
-      if (sanitizedImage) {
-        tags.push(['image', sanitizedImage]);
+      if (!sanitizedImage) {
+        toast({ title: 'Image URL must be a valid https URL', variant: 'destructive' });
+        return;
       }
+      tags.push(['image', sanitizedImage]);
     }
     if (deadlineDate) {
       const deadline = Math.floor(new Date(deadlineDate).getTime() / 1000);
@@ -110,7 +119,7 @@ export function CreateGoalDialog({ communityATag, children, open: controlledOpen
         tags,
       });
 
-      // Refresh the fundraising tab and the community activity feed
+      // Refresh the goals tab and the community activity feed
       await Promise.all([
         queryClient.invalidateQueries({ queryKey: ['community-goals', communityATag] }),
         queryClient.invalidateQueries({
@@ -123,7 +132,7 @@ export function CreateGoalDialog({ communityATag, children, open: controlledOpen
         }),
       ]);
 
-      toast({ title: 'Fundraising goal created!' });
+      toast({ title: 'Goal created!' });
       resetForm();
       setOpen(false);
     } catch {
@@ -148,7 +157,7 @@ export function CreateGoalDialog({ communityATag, children, open: controlledOpen
       <DialogContent className="sm:max-w-md">
         <DialogTitle className="flex items-center gap-2">
           <Target className="size-5" />
-          Create Fundraising Goal
+          Create Goal
         </DialogTitle>
 
         <form onSubmit={handleSubmit} className="space-y-4 mt-2">
@@ -163,53 +172,53 @@ export function CreateGoalDialog({ communityATag, children, open: controlledOpen
             />
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="goal-amount">Target Amount (sats)</Label>
-            <Input
-              id="goal-amount"
-              type="number"
-              min="1"
-              placeholder="e.g. 100000"
-              value={amountSats}
-              onChange={(e) => setAmountSats(e.target.value)}
-              required
-            />
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+            <div className="space-y-2">
+              <Label htmlFor="goal-amount">Amount (sats)</Label>
+              <Input
+                id="goal-amount"
+                type="number"
+                min="1"
+                placeholder="e.g. 100000"
+                value={amountSats}
+                onChange={(e) => setAmountSats(e.target.value)}
+                required
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="goal-deadline">Deadline (optional)</Label>
+              <Input
+                id="goal-deadline"
+                type="datetime-local"
+                value={deadlineDate}
+                onChange={(e) => setDeadlineDate(e.target.value)}
+              />
+            </div>
           </div>
 
           <div className="space-y-2">
             <Label htmlFor="goal-summary">Description (optional)</Label>
             <Textarea
               id="goal-summary"
-              placeholder="Tell people what this fundraiser is for..."
+              placeholder="Tell people what this goal is for..."
               value={summary}
               onChange={(e) => setSummary(e.target.value)}
               rows={3}
             />
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="goal-image">Image URL (optional)</Label>
-            <Input
-              id="goal-image"
-              type="url"
-              placeholder="https://..."
-              value={imageUrl}
-              onChange={(e) => setImageUrl(e.target.value)}
-            />
-          </div>
+          <ImageUploadField
+            id="goal-image"
+            label="Image (recommended)"
+            value={imageUrl}
+            onChange={setImageUrl}
+            onUploadingChange={setIsImageUploading}
+            previewAlt="Goal image preview"
+          />
 
-          <div className="space-y-2">
-            <Label htmlFor="goal-deadline">Deadline (optional)</Label>
-            <Input
-              id="goal-deadline"
-              type="datetime-local"
-              value={deadlineDate}
-              onChange={(e) => setDeadlineDate(e.target.value)}
-            />
-          </div>
-
-          <Button type="submit" className="w-full" disabled={isPending}>
-            {isPending ? 'Creating...' : 'Create Goal'}
+          <Button type="submit" className="w-full" disabled={isPending || isImageUploading}>
+            {isPending ? 'Creating...' : isImageUploading ? 'Uploading...' : 'Create Goal'}
           </Button>
         </form>
       </DialogContent>

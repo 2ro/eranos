@@ -1,34 +1,28 @@
 import { useMemo } from 'react';
 import type { NostrEvent } from '@nostrify/nostrify';
-import { CalendarDays, MapPin, Clock, Users } from 'lucide-react';
+import { CalendarDays, Clock, MapPin, Users } from 'lucide-react';
 
-import { cn } from '@/lib/utils';
 import { NoteContent } from '@/components/NoteContent';
-import { Badge } from '@/components/ui/badge';
 import { RSVPAvatars } from '@/components/RSVPAvatars';
+import { Badge } from '@/components/ui/badge';
+import { sanitizeUrl } from '@/lib/sanitizeUrl';
+import { cn } from '@/lib/utils';
 
 interface CalendarEventContentProps {
   event: NostrEvent;
-  /** When true, limits the description to 2 lines for compact feed display. */
+  /** When true, renders a compact feed card. */
   compact?: boolean;
   className?: string;
 }
 
-/** Extract the first value for a given tag name. */
 function getTag(tags: string[][], name: string): string | undefined {
   return tags.find(([n]) => n === name)?.[1];
 }
 
-/** Collect all values for a repeated tag name. */
 function getAllTags(tags: string[][], name: string): string[][] {
   return tags.filter(([n]) => n === name);
 }
 
-/**
- * Parse a location tag value. Some clients encode location as JSON
- * (e.g. `{"description":"Riga, Latvia","coordinates":{"lat":56.9,"lon":24.1}}`).
- * Extract a human-readable string when possible, otherwise return the raw value.
- */
 function parseLocation(raw: string): string {
   const trimmed = raw.trim();
   if (!trimmed.startsWith('{')) return raw;
@@ -43,14 +37,12 @@ function parseLocation(raw: string): string {
   return raw;
 }
 
-/** Date-only formatter: "Jan 15, 2026" */
 const dateFormatter = new Intl.DateTimeFormat('en-US', {
   month: 'short',
   day: 'numeric',
   year: 'numeric',
 });
 
-/** Date+time formatter: "Jan 15, 2026 at 3:00 PM" */
 const dateTimeFormatter = new Intl.DateTimeFormat('en-US', {
   month: 'short',
   day: 'numeric',
@@ -59,52 +51,35 @@ const dateTimeFormatter = new Intl.DateTimeFormat('en-US', {
   minute: '2-digit',
 });
 
-/** Time-only formatter: "3:00 PM" */
 const timeFormatter = new Intl.DateTimeFormat('en-US', {
   hour: 'numeric',
   minute: '2-digit',
 });
 
-/** Check if two dates fall on the same calendar day. */
 function isSameDay(a: Date, b: Date): boolean {
   return (
-    a.getFullYear() === b.getFullYear() &&
-    a.getMonth() === b.getMonth() &&
-    a.getDate() === b.getDate()
+    a.getFullYear() === b.getFullYear()
+    && a.getMonth() === b.getMonth()
+    && a.getDate() === b.getDate()
   );
 }
 
-/**
- * Format the date/time display for a NIP-52 calendar event.
- *
- * Kind 31922 (date-based): "Jan 15, 2026" or "Jan 15 - Jan 17, 2026"
- * Kind 31923 (time-based): "Jan 15, 2026 at 3:00 PM" or time ranges
- */
 function formatEventDate(event: NostrEvent): string {
   const start = getTag(event.tags, 'start');
   if (!start) return '';
 
   if (event.kind === 31922) {
-    // Date-based: start/end are YYYY-MM-DD strings
-    // Parse as UTC to avoid timezone shifting the date
-    const startDate = new Date(start + 'T00:00:00Z');
+    const startDate = new Date(`${start}T00:00:00Z`);
     if (isNaN(startDate.getTime())) return start;
 
     const end = getTag(event.tags, 'end');
     if (end) {
-      const endDate = new Date(end + 'T00:00:00Z');
+      const endDate = new Date(`${end}T00:00:00Z`);
       if (!isNaN(endDate.getTime()) && endDate > startDate) {
-        // Multi-day range: "Jan 15 - Jan 17, 2026"
-        // NIP-52: end date is exclusive, so display the last inclusive day
         const lastDay = new Date(endDate.getTime() - 86400000);
         if (lastDay > startDate) {
-          const startParts = dateFormatter.formatToParts(startDate);
-          const startStr = startParts
-            .filter((p) => p.type !== 'year' && p.type !== 'literal' || p.value === ' ')
-            .map((p) => (p.type === 'literal' && p.value.includes(',') ? '' : p.value))
-            .join('')
-            .trim();
-          return `${startStr} – ${dateFormatter.format(lastDay)}`;
+          const startStr = dateFormatter.format(startDate).replace(/, \d{4}$/, '');
+          return `${startStr} - ${dateFormatter.format(lastDay)}`;
         }
       }
     }
@@ -113,7 +88,6 @@ function formatEventDate(event: NostrEvent): string {
   }
 
   if (event.kind === 31923) {
-    // Time-based: start/end are Unix timestamps
     const startTs = parseInt(start, 10);
     if (isNaN(startTs)) return start;
     const startDate = new Date(startTs * 1000);
@@ -123,13 +97,10 @@ function formatEventDate(event: NostrEvent): string {
       const endTs = parseInt(end, 10);
       if (!isNaN(endTs) && endTs > startTs) {
         const endDate = new Date(endTs * 1000);
-
         if (isSameDay(startDate, endDate)) {
-          // Same day: "Jan 15, 2026 at 3:00 PM – 5:00 PM"
-          return `${dateTimeFormatter.format(startDate)} – ${timeFormatter.format(endDate)}`;
+          return `${dateTimeFormatter.format(startDate)} - ${timeFormatter.format(endDate)}`;
         }
-        // Different days: "Jan 15, 2026 at 3:00 PM – Jan 16, 2026 at 5:00 PM"
-        return `${dateTimeFormatter.format(startDate)} – ${dateTimeFormatter.format(endDate)}`;
+        return `${dateTimeFormatter.format(startDate)} - ${dateTimeFormatter.format(endDate)}`;
       }
     }
 
@@ -139,173 +110,162 @@ function formatEventDate(event: NostrEvent): string {
   return start;
 }
 
+function getEventEndTimestamp(event: NostrEvent): number {
+  const start = getTag(event.tags, 'start');
+  if (!start) return 0;
+
+  if (event.kind === 31922) {
+    const end = getTag(event.tags, 'end');
+    const endDate = new Date(`${end || start}T00:00:00Z`);
+    if (isNaN(endDate.getTime())) return 0;
+    return Math.floor(endDate.getTime() / 1000) + (end ? 0 : 86400);
+  }
+
+  const end = getTag(event.tags, 'end') || start;
+  const endTs = parseInt(end, 10);
+  return isNaN(endTs) ? 0 : endTs;
+}
+
 /** Renders NIP-52 calendar event content (kind 31922 and 31923). */
 export function CalendarEventContent({ event, compact, className }: CalendarEventContentProps) {
   const title = useMemo(() => getTag(event.tags, 'title'), [event.tags]);
-  const image = useMemo(() => getTag(event.tags, 'image'), [event.tags]);
+  const image = useMemo(() => sanitizeUrl(getTag(event.tags, 'image')), [event.tags]);
   const locationRaw = useMemo(() => getTag(event.tags, 'location'), [event.tags]);
   const location = useMemo(() => locationRaw ? parseLocation(locationRaw) : undefined, [locationRaw]);
   const dateDisplay = useMemo(() => formatEventDate(event), [event]);
   const hashtags = useMemo(() => getAllTags(event.tags, 't').map(([, v]) => v).filter(Boolean), [event.tags]);
   const participants = useMemo(() => getAllTags(event.tags, 'p'), [event.tags]);
-  const hasContent = event.content.trim().length > 0;
   const summary = useMemo(() => getTag(event.tags, 'summary'), [event.tags]);
+  const ended = useMemo(() => getEventEndTimestamp(event) < Math.floor(Date.now() / 1000), [event]);
+  const hasContent = event.content.trim().length > 0;
 
   const participantPubkeys = useMemo(
     () => participants.map(([, pubkey]) => pubkey).filter(Boolean),
     [participants],
   );
 
+  if (compact) {
+    return (
+      <div className={cn('mt-3 space-y-3', className)}>
+        {image && (
+          <div className="relative -mx-4 aspect-[21/9] overflow-hidden">
+            <img src={image} alt={title ?? 'Calendar event'} className="w-full h-full object-cover" loading="lazy" />
+            {participantPubkeys.length > 0 && (
+              <div className="absolute bottom-2 left-3">
+                <RSVPAvatars pubkeys={participantPubkeys} maxVisible={4} size="md" />
+              </div>
+            )}
+          </div>
+        )}
+
+        <div className="flex items-start justify-between gap-2">
+          <div className="flex items-center gap-2 min-w-0">
+            <CalendarDays className="size-4 text-primary shrink-0" />
+            <h3 className="font-semibold text-[15px] leading-tight line-clamp-2">{title ?? 'Untitled event'}</h3>
+          </div>
+          {ended ? (
+            <Badge variant="secondary" className="shrink-0">Ended</Badge>
+          ) : dateDisplay ? (
+            <span className="flex items-center gap-1 text-xs text-muted-foreground shrink-0 max-w-[45%]">
+              <Clock className="size-3" />
+              <span className="truncate">{dateDisplay}</span>
+            </span>
+          ) : null}
+        </div>
+
+        {dateDisplay && ended && (
+          <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+            <Clock className="size-3" />
+            <span>{dateDisplay}</span>
+          </div>
+        )}
+
+        {(summary || hasContent) && (
+          <div className="text-sm text-muted-foreground leading-relaxed line-clamp-2">
+            {summary && !hasContent ? (
+              <p>{summary}</p>
+            ) : (
+              <NoteContent event={event} className="text-sm" hideEmbedImages />
+            )}
+          </div>
+        )}
+
+        {(location || participantPubkeys.length > 0) && (
+          <div className="flex items-center gap-2.5 rounded-lg bg-muted/50 px-3 py-2">
+            {location ? (
+              <>
+                <MapPin className="h-4 w-4 shrink-0 text-red-500" />
+                <span className="text-sm truncate flex-1">{location}</span>
+              </>
+            ) : (
+              <>
+                <Users className="h-4 w-4 shrink-0 text-primary" />
+                <span className="text-sm text-muted-foreground flex-1">Participants</span>
+              </>
+            )}
+            {participantPubkeys.length > 0 && (
+              <RSVPAvatars pubkeys={participantPubkeys} maxVisible={4} size="sm" />
+            )}
+          </div>
+        )}
+
+        {hashtags.length > 0 && (
+          <div className="flex flex-wrap gap-1.5">
+            {hashtags.slice(0, 4).map((tag) => (
+              <Badge key={tag} variant="secondary" className="text-[11px] px-2 py-0.5">
+                {tag}
+              </Badge>
+            ))}
+          </div>
+        )}
+      </div>
+    );
+  }
+
   return (
     <div className={cn('mt-2 rounded-xl border border-border overflow-hidden', className)}>
-      {compact ? (
-        /* ── Compact feed card matching reference design ── */
-        <>
-          {/* Cover image with capped height, or gradient placeholder */}
-          {image ? (
-            <div className="relative h-[180px] overflow-hidden">
-              <img
-                src={image}
-                alt={title ?? 'Calendar event'}
-                className="h-full w-full object-cover"
-                loading="lazy"
-              />
-              {/* Participant avatars overlaid on the image */}
-              {participantPubkeys.length > 0 && (
-                <div className="absolute bottom-2 left-3">
-                  <RSVPAvatars pubkeys={participantPubkeys} maxVisible={4} size="md" />
-                </div>
-              )}
-            </div>
-          ) : (
-            <div className="relative flex items-center justify-center bg-gradient-to-br from-primary/10 via-primary/5 to-transparent h-[100px]">
-              <CalendarDays className="h-10 w-10 text-primary/30" />
-              {participantPubkeys.length > 0 && (
-                <div className="absolute bottom-2 left-3">
-                  <RSVPAvatars pubkeys={participantPubkeys} maxVisible={4} size="md" />
-                </div>
-              )}
-            </div>
-          )}
-
-          {/* Event details below image */}
-          <div className="p-3 space-y-2">
-            {/* Title */}
-            {title && (
-              <h3 className="text-base font-bold leading-snug line-clamp-2">{title}</h3>
-            )}
-
-            {/* Date/time */}
-            {dateDisplay && (
-              <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                <Clock className="h-3.5 w-3.5 shrink-0" />
-                <span>{dateDisplay}</span>
-              </div>
-            )}
-
-            {/* Description snippet — hard-capped to ~2 lines */}
-            {(summary || hasContent) && (
-              <div className="text-sm text-muted-foreground max-h-[2.8em] overflow-hidden relative">
-                {summary && !hasContent ? (
-                  <p className="line-clamp-2">{summary}</p>
-                ) : (
-                  <NoteContent event={event} className="text-sm" hideEmbedImages />
-                )}
-              </div>
-            )}
-
-            {/* Location pill */}
-            {location && (
-              <div className="flex items-center gap-2.5 rounded-lg bg-secondary/50 px-3 py-2">
-                <MapPin className="h-4 w-4 shrink-0 text-red-500" />
-                <span className="text-sm truncate">{location}</span>
-              </div>
-            )}
-
-            {/* Hashtags */}
-            {hashtags.length > 0 && (
-              <div className="flex flex-wrap gap-1.5">
-                {hashtags.slice(0, 4).map((tag) => (
-                  <Badge key={tag} variant="secondary" className="text-[11px] px-2 py-0.5">
-                    {tag}
-                  </Badge>
-                ))}
-              </div>
-            )}
-          </div>
-        </>
+      {image ? (
+        <div className="aspect-video rounded-lg overflow-hidden">
+          <img src={image} alt={title ?? 'Calendar event'} className="h-full w-full object-cover" loading="lazy" />
+        </div>
       ) : (
-        /* ── Full detail layout (detail page, expanded view) ── */
-        <>
-          {/* Cover image or gradient header */}
-          {image ? (
-            <div className="aspect-video rounded-lg overflow-hidden">
-              <img
-                src={image}
-                alt={title ?? 'Calendar event'}
-                className="h-full w-full object-cover"
-                loading="lazy"
-              />
-            </div>
-          ) : (
-            <div className="flex items-center justify-center bg-gradient-to-br from-primary/10 via-primary/5 to-transparent py-8">
-              <CalendarDays className="h-10 w-10 text-primary/30" />
-            </div>
-          )}
-
-          {/* Event details */}
-          <div className="space-y-2 p-3">
-            {title && (
-              <h3 className="text-[15px] font-semibold leading-snug">{title}</h3>
-            )}
-
-            {dateDisplay && (
-              <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-                <Clock className="h-3.5 w-3.5 shrink-0" />
-                <span>{dateDisplay}</span>
-              </div>
-            )}
-
-            {location && (
-              <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-                <MapPin className="h-3.5 w-3.5 shrink-0" />
-                <span>{location}</span>
-              </div>
-            )}
-
-            {participants.length > 0 && (
-              <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-                <Users className="h-3.5 w-3.5 shrink-0" />
-                <span>
-                  {participants.length} {participants.length === 1 ? 'participant' : 'participants'}
-                </span>
-              </div>
-            )}
-
-            {summary && !hasContent && (
-              <p className="text-sm text-muted-foreground">
-                {summary}
-              </p>
-            )}
-
-            {hasContent && (
-              <div>
-                <NoteContent event={event} className="text-sm" hideEmbedImages={!!image} />
-              </div>
-            )}
-
-            {hashtags.length > 0 && (
-              <div className="flex flex-wrap gap-1.5 pt-1">
-                {hashtags.map((tag) => (
-                  <Badge key={tag} variant="secondary" className="text-[11px] px-2 py-0">
-                    {tag}
-                  </Badge>
-                ))}
-              </div>
-            )}
-          </div>
-        </>
+        <div className="flex items-center justify-center bg-gradient-to-br from-primary/10 via-primary/5 to-transparent py-8">
+          <CalendarDays className="h-10 w-10 text-primary/30" />
+        </div>
       )}
+
+      <div className="space-y-2 p-3">
+        {title && <h3 className="text-[15px] font-semibold leading-snug">{title}</h3>}
+        {dateDisplay && (
+          <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+            <Clock className="h-3.5 w-3.5 shrink-0" />
+            <span>{dateDisplay}</span>
+          </div>
+        )}
+        {location && (
+          <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+            <MapPin className="h-3.5 w-3.5 shrink-0" />
+            <span>{location}</span>
+          </div>
+        )}
+        {participants.length > 0 && (
+          <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+            <Users className="h-3.5 w-3.5 shrink-0" />
+            <span>{participants.length} {participants.length === 1 ? 'participant' : 'participants'}</span>
+          </div>
+        )}
+        {summary && !hasContent && <p className="text-sm text-muted-foreground">{summary}</p>}
+        {hasContent && <NoteContent event={event} className="text-sm" hideEmbedImages={!!image} />}
+        {hashtags.length > 0 && (
+          <div className="flex flex-wrap gap-1.5 pt-1">
+            {hashtags.map((tag) => (
+              <Badge key={tag} variant="secondary" className="text-[11px] px-2 py-0">
+                {tag}
+              </Badge>
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   );
 }

@@ -13,6 +13,7 @@ import { useCallback, useMemo } from "react";
  */
 const DEFAULT_SIDEBAR_ORDER: string[] = [
   'wallet',
+  'search',
   'verified',
   'actions',
   'polls',

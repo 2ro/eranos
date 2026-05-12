@@ -34,6 +34,8 @@ interface FeedPage {
 interface UseFeedOptions {
   /** Override the kinds list instead of using feed settings. Used by kind-specific pages. */
   kinds?: number[];
+  /** Override the follows author list. Used by scoped member feeds. */
+  authors?: string[];
   /** Additional tag filters to apply (e.g. `{ '#m': ['application/x-webxdc'] }`). */
   tagFilters?: Record<string, string[]>;
 }
@@ -51,15 +53,19 @@ export function useFeed(tab: 'follows' | 'global' | 'communities', options?: Use
   const allKinds = options?.kinds ?? getEnabledFeedKinds(feedSettings);
 
   const tagFilters = options?.tagFilters;
+  const authorsOverride = options?.authors;
 
   // Stable key so queries re-run when settings change.
   const kindsKey = [...allKinds].sort().join(',');
+  const authorsKey = authorsOverride ? [...authorsOverride].sort().join(',') : '';
   const tagFiltersKey = tagFilters ? JSON.stringify(tagFilters) : '';
 
   // For the follows tab, wait until the follow list is loaded before running any query.
   // Without this guard, the query falls through to the global branch while followList is still loading.
   // Allow query to run if not on follows tab, OR if follow list has loaded (even if empty).
-  const followsReady = tab !== 'follows' || (!!user && followList !== undefined);
+  const followsReady = authorsOverride
+    ? authorsOverride.length > 0
+    : tab !== 'follows' || (!!user && followList !== undefined);
 
   // Load community pubkeys from localStorage
   const communityPubkeys = (() => {
@@ -84,7 +90,7 @@ export function useFeed(tab: 'follows' | 'global' | 'communities', options?: Use
     // on page load because feedSettings is read from localStorage
     // synchronously — the encrypted settings sync at ~5s only calls
     // updateConfig if values actually differ (NostrSync changed guard).
-    queryKey: ['feed', tab, user?.pubkey ?? '', kindsKey, tagFiltersKey, communityPubkeys.length, feedSettings.followsFeedShowReplies],
+    queryKey: ['feed', tab, user?.pubkey ?? '', kindsKey, authorsKey, tagFiltersKey, communityPubkeys.length, feedSettings.followsFeedShowReplies],
     queryFn: async ({ pageParam }) => {
       const signal = AbortSignal.timeout(8000);
       const now = Math.floor(Date.now() / 1000);
@@ -238,10 +244,12 @@ export function useFeed(tab: 'follows' | 'global' | 'communities', options?: Use
         cacheEvents(dedupedItems);
 
         return { items: dedupedItems, oldestQueryTimestamp, rawCount: validFilteredEvents.length };
-      } else if (tab === 'follows' && user && followList !== undefined) {
+      } else if ((authorsOverride && authorsOverride.length > 0) || (tab === 'follows' && user && followList !== undefined)) {
         // Follows feed — posts, reposts, and extra kinds from people you follow
         // If followList is empty, just query own posts
-        const authors = followList.length > 0 ? [...followList, user.pubkey] : [user.pubkey];
+        const authors = authorsOverride ?? (user && followList
+          ? (followList.length > 0 ? [...followList, user.pubkey] : [user.pubkey])
+          : []);
         const fetchLimit = !feedSettings.followsFeedShowReplies ? PAGE_SIZE * OVER_FETCH_MULTIPLIER : PAGE_SIZE;
         const filter: Record<string, unknown> = { kinds: allKinds, authors, limit: fetchLimit, ...tagFilters };
         if (pageParam) {

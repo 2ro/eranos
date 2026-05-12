@@ -10,10 +10,12 @@ interface MembersOnlyToggleProps {
 
 /**
  * Shield-icon toggle that controls the "members only" filter for community
- * surfaces. When active (default), community feeds only show content authored
- * by chain-validated members — matching the NIP's canonical-author
- * recommendation. When inactive, the feed shows every event scoped to the
- * community regardless of author.
+ * surfaces. When active, community feeds only show content authored by
+ * validated members. When inactive (default), the feed shows every event
+ * scoped to the community regardless of author.
+ *
+ * Per the flat-communities spec, members-only is a MAY feature — the
+ * protocol makes no recommendation, so the toggle is an opt-in UX choice.
  *
  * The preference is persisted in localStorage via `useMembersOnlyFilter` and
  * is global across community surfaces (Activities feed, per-community

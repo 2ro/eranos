@@ -21,6 +21,7 @@ import { NoteCard } from '@/components/NoteCard';
 import { ComposeBox } from '@/components/ComposeBox';
 import { ReplyComposeModal } from '@/components/ReplyComposeModal';
 import { ProfileReactionButton } from '@/components/ProfileReactionButton';
+import { FollowToggleButton } from '@/components/FollowButton';
 import { ZapDialog } from '@/components/ZapDialog';
 import { ExternalFavicon } from '@/components/ExternalFavicon';
 import { Nip05Badge, VerifiedNip05Text } from '@/components/Nip05Badge';
@@ -1753,17 +1754,12 @@ type EditableTab = { label: string; isCore: boolean; tab?: ProfileTab };
                       </Button>
                     </Link>
                   ) : (
-                    <Button
-                      className={cn(
-                        'rounded-full font-bold',
-                        isFollowing && 'bg-transparent border border-border text-foreground hover:bg-destructive/10 hover:text-destructive hover:border-destructive/50',
-                      )}
-                      variant={isFollowing ? 'outline' : 'default'}
+                    <FollowToggleButton
+                      isFollowing={isFollowing}
+                      isPending={followPending}
                       onClick={handleToggleFollow}
-                      disabled={followPending || !user}
-                    >
-                      {followPending ? '...' : isFollowing ? 'Unfollow' : 'Follow'}
-                    </Button>
+                      disabled={!user}
+                    />
                   )}
                 </div>
               </div>

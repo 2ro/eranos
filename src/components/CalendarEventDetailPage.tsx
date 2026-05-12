@@ -1,6 +1,5 @@
-import { useState, useMemo, useCallback } from 'react';
+import { useMemo, useCallback, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { nip19 } from 'nostr-tools';
 import {
   ArrowLeft,
   CalendarDays,
@@ -9,10 +8,9 @@ import {
   Users,
   Check,
   X as XIcon,
-  HelpCircle,
-  Share2,
+  Star,
+  Pencil,
   ExternalLink,
-  Zap,
   Link as LinkIcon,
 } from 'lucide-react';
 import type { NostrEvent, NostrMetadata } from '@nostrify/nostrify';
@@ -21,10 +19,15 @@ import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
-import { Textarea } from '@/components/ui/textarea';
 import { NoteContent } from '@/components/NoteContent';
+import { NoteMoreMenu } from '@/components/NoteMoreMenu';
+import { PostActionBar } from '@/components/PostActionBar';
+import { ReplyComposeModal } from '@/components/ReplyComposeModal';
+import { CreateCommunityEventDialog } from '@/components/CreateCommunityEventDialog';
 import { RSVPAvatars } from '@/components/RSVPAvatars';
-import { ZapDialog } from '@/components/ZapDialog';
+import { Skeleton } from '@/components/ui/skeleton';
+import { ThreadedReplyList, type ReplyNode } from '@/components/ThreadedReplyList';
+import { useComments } from '@/hooks/useComments';
 import { useAuthor } from '@/hooks/useAuthor';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useEventRSVPs } from '@/hooks/useEventRSVPs';
@@ -71,14 +74,28 @@ function formatDetailDate(event: NostrEvent): string {
   if (!startRaw) return 'Date not specified';
 
   if (event.kind === 31922) {
-    const fmt = (d: string) => {
+    const parseDate = (d: string) => {
       const [y, m, day] = d.split('-').map(Number);
-      return new Date(y, m - 1, day).toLocaleDateString('en-US', {
+      return new Date(y, m - 1, day);
+    };
+    const fmt = (d: Date) => {
+      return d.toLocaleDateString('en-US', {
         weekday: 'long', month: 'long', day: 'numeric', year: 'numeric',
       });
     };
-    if (endRaw && endRaw !== startRaw) return `${fmt(startRaw)} - ${fmt(endRaw)}`;
-    return fmt(startRaw);
+
+    const startDate = parseDate(startRaw);
+    if (isNaN(startDate.getTime())) return startRaw;
+
+    if (endRaw) {
+      const endDate = parseDate(endRaw);
+      if (!isNaN(endDate.getTime()) && endDate > startDate) {
+        endDate.setDate(endDate.getDate() - 1);
+        if (endDate > startDate) return `${fmt(startDate)} - ${fmt(endDate)}`;
+      }
+    }
+
+    return fmt(startDate);
   }
 
   // kind 31923 — unix timestamps
@@ -182,48 +199,47 @@ export function CalendarEventDetailPage({ event }: { event: NostrEvent }) {
   const rsvps = useEventRSVPs(eventCoord);
   const myRsvp = useMyRSVP(eventCoord);
   const publishRSVP = usePublishRSVP();
+  const { data: commentsData, isLoading: commentsLoading } = useComments(event, 500);
+  const [replyOpen, setReplyOpen] = useState(false);
+  const [moreMenuOpen, setMoreMenuOpen] = useState(false);
+  const [editOpen, setEditOpen] = useState(false);
+  const canEdit = user?.pubkey === event.pubkey;
 
-  const [selectedStatus, setSelectedStatus] = useState<'accepted' | 'declined' | 'tentative' | null>(null);
-  const [rsvpNote, setRsvpNote] = useState('');
+  const replyTree = useMemo((): ReplyNode[] => {
+    const buildNode = (comment: NostrEvent): ReplyNode => {
+      const children = commentsData?.getDirectReplies(comment.id) ?? [];
+      if (children.length <= 1) {
+        return { event: comment, children: children.map((child) => buildNode(child)) };
+      }
 
-  const activeStatus = selectedStatus ?? myRsvp.status;
-  const hasChanged = selectedStatus !== null && selectedStatus !== myRsvp.status;
+      const [first, ...rest] = children;
+      return {
+        event: comment,
+        children: [buildNode(first)],
+        hiddenChildren: rest.map((child) => buildNode(child)),
+      };
+    };
 
-  const handleRSVP = useCallback(async () => {
-    if (!activeStatus) return;
+    return [...(commentsData?.topLevelComments ?? [])]
+      .sort((a, b) => a.created_at - b.created_at)
+      .map((comment) => buildNode(comment));
+  }, [commentsData]);
+
+  const handleRSVP = useCallback(async (status: 'accepted' | 'declined' | 'tentative') => {
+    if (status === myRsvp.status) return;
     try {
       await publishRSVP.mutateAsync({
         eventCoord,
         eventAuthorPubkey: event.pubkey,
-        status: activeStatus,
-        note: rsvpNote || undefined,
+        status,
       });
-      setSelectedStatus(null);
-      setRsvpNote('');
       toast({ title: 'RSVP updated' });
     } catch {
       toast({ title: 'Failed to update RSVP', variant: 'destructive' });
     }
-  }, [activeStatus, eventCoord, event.pubkey, rsvpNote, publishRSVP, toast]);
+  }, [eventCoord, event.pubkey, myRsvp.status, publishRSVP, toast]);
 
-  const handleShare = useCallback(async () => {
-    const d = getTag(event.tags, 'd') ?? '';
-    const naddr = nip19.naddrEncode({
-      kind: event.kind,
-      pubkey: event.pubkey,
-      identifier: d,
-    });
-    const url = `${window.location.origin}/${naddr}`;
-    try {
-      await navigator.clipboard.writeText(url);
-      toast({ title: 'Link copied to clipboard' });
-    } catch {
-      toast({ title: 'Failed to copy link', variant: 'destructive' });
-    }
-  }, [event, toast]);
-
-  const isAuthor = user?.pubkey === event.pubkey;
-  const showRSVP = !!user && !isAuthor;
+  const showRSVP = !!user;
 
   return (
     <div className="max-w-2xl mx-auto pb-16">
@@ -237,6 +253,15 @@ export function CalendarEventDetailPage({ event }: { event: NostrEvent }) {
           <ArrowLeft className="size-5" />
         </button>
         <h1 className="text-xl font-bold flex-1">Event Details</h1>
+        {canEdit && (
+          <button
+            className="p-2 rounded-full hover:bg-secondary/60 transition-colors"
+            onClick={() => setEditOpen(true)}
+            aria-label="Edit event"
+          >
+            <Pencil className="size-5" />
+          </button>
+        )}
       </div>
 
       {/* ── Cover image ── */}
@@ -254,24 +279,10 @@ export function CalendarEventDetailPage({ event }: { event: NostrEvent }) {
       <div className="px-5 mt-5 space-y-5">
         {/* Title */}
         <h2 className="text-2xl font-bold leading-tight tracking-tight">{title}</h2>
-        {/* Organizer row + actions */}
+        {/* Organizer row */}
         <div className="flex items-center gap-3">
           <div className="flex-1 min-w-0">
             <PersonRow pubkey={event.pubkey} />
-          </div>
-          <div className="flex items-center gap-1 shrink-0">
-            <ZapDialog target={event}>
-              <button className="p-2 rounded-full hover:bg-secondary/60 transition-colors" aria-label="Zap">
-                <Zap className="size-5" />
-              </button>
-            </ZapDialog>
-            <button
-              className="p-2 rounded-full hover:bg-secondary/60 transition-colors"
-              onClick={handleShare}
-              aria-label="Share"
-            >
-              <Share2 className="size-5" />
-            </button>
           </div>
         </div>
 
@@ -353,96 +364,113 @@ export function CalendarEventDetailPage({ event }: { event: NostrEvent }) {
           </>
         )}
 
-        {/* RSVP section */}
-        {showRSVP && (
-          <div className="rounded-[1.25rem] bg-background/85 p-4 space-y-3">
-            <h2 className="text-sm font-semibold px-1">Your RSVP</h2>
-
-            {myRsvp.status && !selectedStatus && (
-              <div className="px-1">
-                <Badge
-                  variant="outline"
-                  className={cn(
-                    myRsvp.status === 'accepted' && 'border-green-500 text-green-600',
-                    myRsvp.status === 'tentative' && 'border-amber-500 text-amber-600',
-                    myRsvp.status === 'declined' && 'border-destructive text-destructive',
-                  )}
-                >
-                  {myRsvp.status === 'accepted' ? 'Going' : myRsvp.status === 'tentative' ? 'Maybe' : "Can't Go"}
-                </Badge>
-              </div>
-            )}
-
-            <div className="flex gap-2">
-              <Button
-                size="sm"
-                variant={activeStatus === 'accepted' ? 'default' : 'outline'}
-                className={cn('flex-1 rounded-full', activeStatus === 'accepted' && 'bg-green-600 hover:bg-green-700 text-white')}
-                onClick={() => setSelectedStatus('accepted')}
-              >
-                <Check className="size-3.5 mr-1.5" /> Going
-              </Button>
-              <Button
-                size="sm"
-                variant={activeStatus === 'tentative' ? 'default' : 'outline'}
-                className={cn('flex-1 rounded-full', activeStatus === 'tentative' && 'bg-amber-500 hover:bg-amber-600 text-white')}
-                onClick={() => setSelectedStatus('tentative')}
-              >
-                <HelpCircle className="size-3.5 mr-1.5" /> Maybe
-              </Button>
-              <Button
-                size="sm"
-                variant={activeStatus === 'declined' ? 'default' : 'outline'}
-                className={cn('flex-1 rounded-full', activeStatus === 'declined' && 'bg-destructive hover:bg-destructive/90 text-destructive-foreground')}
-                onClick={() => setSelectedStatus('declined')}
-              >
-                <XIcon className="size-3.5 mr-1.5" /> Can't Go
-              </Button>
-            </div>
-
-            {activeStatus && (
-              <Textarea
-                placeholder="Add a note (optional)"
-                value={rsvpNote}
-                onChange={(e) => setRsvpNote(e.target.value)}
-                className="mt-1 resize-none rounded-xl"
-                rows={2}
-              />
-            )}
-
-            {(hasChanged || (activeStatus && !myRsvp.status)) && (
-              <Button
-                size="sm"
-                onClick={handleRSVP}
-                disabled={publishRSVP.isPending}
-                className="w-full mt-1 rounded-full"
-              >
-                {publishRSVP.isPending ? 'Updating...' : myRsvp.status ? 'Update RSVP' : 'Submit RSVP'}
-              </Button>
-            )}
-          </div>
-        )}
-
         {/* Attendees */}
         {rsvps.total > 0 && (
-          <section className="space-y-3">
-            <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide flex items-center gap-2">
-              <Users className="size-4" /> Attendees
-            </h2>
-            <div className="space-y-2.5">
-              {([
-                ['Going', rsvps.accepted, 'border-green-500/50 bg-green-500/5 text-green-600'],
-                ['Maybe', rsvps.tentative, 'border-amber-500/50 bg-amber-500/5 text-amber-600'],
-                ["Can't Go", rsvps.declined, 'border-muted-foreground/30 bg-muted/30 text-muted-foreground'],
-              ] as const).map(([label, pks, cls]) => pks.length > 0 && (
-                <div key={label} className="flex items-center gap-3">
-                  <Badge variant="outline" className={cn(cls, 'shrink-0 text-xs')}>{label} ({pks.length})</Badge>
-                  <RSVPAvatars pubkeys={pks} maxVisible={8} size="sm" />
+          <>
+            <Separator />
+            <section className="space-y-3">
+              <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide flex items-center gap-2">
+                <Users className="size-4" /> Attendees
+              </h2>
+              <div className="space-y-2.5">
+                {([
+                  ['Going', rsvps.accepted, 'border-green-500/50 bg-green-500/5 text-green-600'],
+                  ['Interested', rsvps.tentative, 'border-amber-500/50 bg-amber-500/5 text-amber-600'],
+                  ["Can't Go", rsvps.declined, 'border-muted-foreground/30 bg-muted/30 text-muted-foreground'],
+                ] as const).map(([label, pks, cls]) => pks.length > 0 && (
+                  <div key={label} className="flex items-center gap-3">
+                    <Badge variant="outline" className={cn(cls, 'shrink-0 text-xs')}>{label} ({pks.length})</Badge>
+                    <RSVPAvatars pubkeys={pks} maxVisible={8} size="sm" />
+                  </div>
+                ))}
+              </div>
+            </section>
+          </>
+        )}
+
+        {/* RSVP section */}
+        {showRSVP && (
+          <>
+            <Separator />
+            <section className="space-y-3">
+              <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide flex items-center gap-2">
+                <Check className="size-4" /> RSVP
+              </h2>
+              <div className="flex gap-2">
+                <Button
+                  size="sm"
+                  variant={myRsvp.status === 'accepted' ? 'default' : 'outline'}
+                  disabled={publishRSVP.isPending}
+                  className={cn('flex-1 rounded-full', myRsvp.status === 'accepted' && 'bg-green-600 hover:bg-green-700 text-white')}
+                  onClick={() => handleRSVP('accepted')}
+                >
+                  <Check className="size-3.5 mr-1.5" /> Going
+                </Button>
+                <Button
+                  size="sm"
+                  variant={myRsvp.status === 'tentative' ? 'default' : 'outline'}
+                  disabled={publishRSVP.isPending}
+                  className={cn('flex-1 rounded-full', myRsvp.status === 'tentative' && 'bg-amber-500 hover:bg-amber-600 text-white')}
+                  onClick={() => handleRSVP('tentative')}
+                >
+                  <Star className="size-3.5 mr-1.5" /> Interested
+                </Button>
+                <Button
+                  size="sm"
+                  variant={myRsvp.status === 'declined' ? 'default' : 'outline'}
+                  disabled={publishRSVP.isPending}
+                  className={cn('flex-1 rounded-full', myRsvp.status === 'declined' && 'bg-destructive hover:bg-destructive/90 text-destructive-foreground')}
+                  onClick={() => handleRSVP('declined')}
+                >
+                  <XIcon className="size-3.5 mr-1.5" /> Can't Go
+                </Button>
+              </div>
+            </section>
+          </>
+        )}
+
+        <PostActionBar
+          event={event}
+          replyLabel="Comments"
+          onReply={() => setReplyOpen(true)}
+          onMore={() => setMoreMenuOpen(true)}
+          className="-mx-5 px-5"
+        />
+
+        <NoteMoreMenu event={event} open={moreMenuOpen} onOpenChange={setMoreMenuOpen} />
+        <ReplyComposeModal event={event} open={replyOpen} onOpenChange={setReplyOpen} />
+        {canEdit && (
+          <CreateCommunityEventDialog
+            open={editOpen}
+            onOpenChange={setEditOpen}
+            event={event}
+          />
+        )}
+
+        <section>
+          {commentsLoading ? (
+            <div className="space-y-3">
+              {Array.from({ length: 3 }).map((_, i) => (
+                <div key={i} className="flex gap-3">
+                  <Skeleton className="size-10 rounded-full shrink-0" />
+                  <div className="flex-1 space-y-2">
+                    <Skeleton className="h-4 w-32" />
+                    <Skeleton className="h-4 w-full" />
+                    <Skeleton className="h-4 w-2/3" />
+                  </div>
                 </div>
               ))}
             </div>
-          </section>
-        )}
+          ) : replyTree.length > 0 ? (
+            <div className="-mx-5">
+              <ThreadedReplyList roots={replyTree} />
+            </div>
+          ) : (
+            <div className="py-8 text-center text-muted-foreground text-sm">
+              No comments yet. Be the first to comment!
+            </div>
+          )}
+        </section>
       </div>
     </div>
   );

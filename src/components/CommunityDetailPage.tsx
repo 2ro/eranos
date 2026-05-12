@@ -1,42 +1,64 @@
-import { useMemo, useCallback, useState } from 'react';
+import { useMemo, useCallback, useEffect, useState } from 'react';
+import { useInView } from 'react-intersection-observer';
 import { Link, useNavigate } from 'react-router-dom';
 import { nip19 } from 'nostr-tools';
 import {
   ArrowLeft,
+  CalendarDays,
   Crown,
+  Loader2,
   MessageCircle,
+  MessageSquare,
+  Pencil,
+  Rss,
   Shield,
   ShieldBan,
   Share2,
   Target,
+  UserPlus,
   Users,
 } from 'lucide-react';
 import type { NostrEvent, NostrMetadata } from '@nostrify/nostrify';
 
+import { AddMemberDialog } from '@/components/AddMemberDialog';
+import { CreateCommunityDialog } from '@/components/CreateCommunityDialog';
+import { CreateCommunityEventDialog } from '@/components/CreateCommunityEventDialog';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { BanConfirmDialog } from '@/components/BanConfirmDialog';
+import { CommunityChatPanel } from '@/components/CommunityChatPanel';
+import { CommunityBadgePanel } from '@/components/CommunityBadgePanel';
 import { ComposeBox } from '@/components/ComposeBox';
+import { FeedEmptyState } from '@/components/FeedEmptyState';
+import { FollowToggleButton } from '@/components/FollowButton';
 import { CreateGoalDialog } from '@/components/CreateGoalDialog';
 import { MembersOnlyToggle } from '@/components/MembersOnlyToggle';
 import { NoteCard } from '@/components/NoteCard';
+import { PullToRefresh } from '@/components/PullToRefresh';
 import { ReplyComposeModal } from '@/components/ReplyComposeModal';
 import { ThreadedReplyList, type ReplyNode } from '@/components/ThreadedReplyList';
 import { useAuthor } from '@/hooks/useAuthor';
 import { useAuthors } from '@/hooks/useAuthors';
 import { useComments } from '@/hooks/useComments';
+import { useCommunityBookmarks } from '@/hooks/useCommunityBookmarks';
+import { useCommunityEvents } from '@/hooks/useCommunityEvents';
 import { useCommunityMembers } from '@/hooks/useCommunityMembers';
 import { useCommunityGoals } from '@/hooks/useCommunityGoals';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
+import { useFeed } from '@/hooks/useFeed';
 import { useMembersOnlyFilter } from '@/hooks/useMembersOnlyFilter';
+import { useMuteList } from '@/hooks/useMuteList';
 import { useNow } from '@/hooks/useNow';
+import { usePageRefresh } from '@/hooks/usePageRefresh';
 import { useProfileUrl } from '@/hooks/useProfileUrl';
 import { useToast } from '@/hooks/useToast';
 import { CommunityModerationContext } from '@/contexts/CommunityModerationContext';
 import { useLayoutOptions } from '@/contexts/LayoutContext';
 import { applyCommunityModerationToEvents, canBanTarget, getViewerAuthority, parseCommunityEvent, type CommunityMember } from '@/lib/communityUtils';
+import { isEventMuted } from '@/lib/muteHelpers';
+import { shouldHideFeedEvent, type FeedItem } from '@/lib/feedUtils';
 import { genUserName } from '@/lib/genUserName';
 import { sanitizeUrl } from '@/lib/sanitizeUrl';
 import { cn } from '@/lib/utils';
@@ -116,6 +138,127 @@ function ReplyCardSkeleton() {
   );
 }
 
+function CommunityMemberFeed({ authorPubkeys, isMembershipLoading }: { authorPubkeys: string[]; isMembershipLoading: boolean }) {
+  const { muteItems } = useMuteList();
+  const { ref: scrollRef, inView } = useInView({ threshold: 0, rootMargin: '400px' });
+  const queryKey = useMemo(() => ['feed', 'follows'], []);
+  const handleRefresh = usePageRefresh(queryKey);
+  const uniqueAuthors = useMemo(() => Array.from(new Set(authorPubkeys)), [authorPubkeys]);
+
+  const {
+    data: rawData,
+    isPending,
+    isLoading,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+  } = useFeed('follows', { authors: uniqueAuthors });
+
+  useEffect(() => {
+    if (inView && hasNextPage && !isFetchingNextPage) {
+      fetchNextPage();
+    }
+  }, [inView, hasNextPage, isFetchingNextPage, fetchNextPage]);
+
+  const feedItems = useMemo(() => {
+    if (!rawData?.pages) return [];
+    const seen = new Set<string>();
+
+    return (rawData.pages as { items: FeedItem[] }[])
+      .flatMap((page) => page.items)
+      .filter((item) => {
+        const key = item.repostedBy ? `repost-${item.repostedBy}-${item.event.id}` : item.event.id;
+        if (!key || seen.has(key)) return false;
+        seen.add(key);
+        if (shouldHideFeedEvent(item.event)) return false;
+        if (muteItems.length > 0 && isEventMuted(item.event, muteItems)) return false;
+        return true;
+      });
+  }, [rawData?.pages, muteItems]);
+
+  if (!isMembershipLoading && uniqueAuthors.length === 0) {
+    return (
+      <div className="py-12 text-center text-muted-foreground text-sm px-5">
+        No active members found.
+      </div>
+    );
+  }
+
+  if (isMembershipLoading || isPending || (isLoading && !rawData)) {
+    return (
+      <div className="divide-y divide-border">
+        {Array.from({ length: 5 }).map((_, i) => (
+          <ReplyCardSkeleton key={i} />
+        ))}
+      </div>
+    );
+  }
+
+  if (feedItems.length === 0) {
+    return (
+      <PullToRefresh onRefresh={handleRefresh}>
+        <FeedEmptyState message="No posts from active community members yet." />
+      </PullToRefresh>
+    );
+  }
+
+  return (
+    <PullToRefresh onRefresh={handleRefresh}>
+      <div>
+        {feedItems.map((item) => (
+          <NoteCard
+            key={item.repostedBy ? `repost-${item.repostedBy}-${item.event.id}` : item.event.id}
+            event={item.event}
+            repostedBy={item.repostedBy}
+          />
+        ))}
+        {hasNextPage && (
+          <div ref={scrollRef} className="py-4">
+            {isFetchingNextPage && (
+              <div className="flex justify-center">
+                <Loader2 className="size-5 animate-spin text-muted-foreground" />
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+    </PullToRefresh>
+  );
+}
+
+function getTag(tags: string[][], name: string): string | undefined {
+  return tags.find(([n]) => n === name)?.[1];
+}
+
+function getCalendarEventStart(event: NostrEvent): number {
+  const start = getTag(event.tags, 'start');
+  if (!start) return 0;
+
+  if (event.kind === 31922) {
+    const date = new Date(`${start}T00:00:00Z`);
+    return isNaN(date.getTime()) ? 0 : Math.floor(date.getTime() / 1000);
+  }
+
+  const timestamp = parseInt(start, 10);
+  return isNaN(timestamp) ? 0 : timestamp;
+}
+
+function getCalendarEventEnd(event: NostrEvent): number {
+  const start = getTag(event.tags, 'start');
+  if (!start) return 0;
+
+  if (event.kind === 31922) {
+    const end = getTag(event.tags, 'end');
+    const endDate = new Date(`${end || start}T00:00:00Z`);
+    if (isNaN(endDate.getTime())) return 0;
+    return Math.floor(endDate.getTime() / 1000) + (end ? 0 : 86400);
+  }
+
+  const end = getTag(event.tags, 'end') || start;
+  const endTs = parseInt(end, 10);
+  return isNaN(endTs) ? 0 : endTs;
+}
+
 // ── Main component ────────────────────────────────────────────────────────────
 
 export function CommunityDetailPage({ event }: { event: NostrEvent }) {
@@ -131,6 +274,9 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
   const [activeTab, setActiveTab] = useState('members');
   const [composeOpen, setComposeOpen] = useState(false);
   const [goalDialogOpen, setGoalDialogOpen] = useState(false);
+  const [eventDialogOpen, setEventDialogOpen] = useState(false);
+  const [addMemberOpen, setAddMemberOpen] = useState(false);
+  const [editCommunityOpen, setEditCommunityOpen] = useState(false);
 
   // Parse community definition
   const community = useMemo(() => parseCommunityEvent(event), [event]);
@@ -154,6 +300,28 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
   const { data: membership, moderation, rankMap, isLoading: membersLoading } = useCommunityMembers(community);
   const viewerMember = user ? getViewerAuthority(user.pubkey, rankMap, moderation) : undefined;
 
+  // Founder can add moderators + members; moderators (rank 0) can add members
+  const isFounder = !!user && user.pubkey === event.pubkey;
+  const canAddMembers = !!viewerMember && viewerMember.rank === 0;
+
+  // NIP-51 kind 10004 is the standard Communities list. In the UI this is
+  // presented as following a community.
+  const {
+    isBookmarked: isCommunitySaved,
+    toggleBookmark: toggleCommunityFollow,
+  } = useCommunityBookmarks();
+  const savedCommunityFollow = !!communityATag && isCommunitySaved(communityATag);
+  const membershipFollow = isFounder || !!viewerMember;
+  const communityFollowed = membershipFollow || savedCommunityFollow;
+  const handleToggleFollow = useCallback(() => {
+    if (!user || !communityATag || toggleCommunityFollow.isPending) return;
+    if (membershipFollow) {
+      toast({ title: isFounder ? 'You founded this community' : 'You are already a member of this community' });
+      return;
+    }
+    toggleCommunityFollow.mutate({ aTag: communityATag });
+  }, [user, communityATag, toggleCommunityFollow, membershipFollow, isFounder, toast]);
+
   // Batch-fetch profiles for all members
   const allMemberPubkeys = useMemo(
     () => membership?.members.map((m) => m.pubkey) ?? [],
@@ -161,48 +329,27 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
   );
   useAuthors(allMemberPubkeys);
 
-  // Group members by rank
-  const membersByRank = useMemo(() => {
-    if (!membership || !community) return [];
-    const groups = new Map<number, CommunityMember[]>();
-    for (const m of membership.members) {
-      const list = groups.get(m.rank) ?? [];
-      list.push(m);
-      groups.set(m.rank, list);
+  const memberSections = useMemo(() => {
+    if (!membership) return [];
+    const leadership: CommunityMember[] = [];
+    const members: CommunityMember[] = [];
+    for (const member of membership.members) {
+      if (member.rank === 0) leadership.push(member);
+      else members.push(member);
     }
-    // Build ordered groups with labels
-    const result: { rank: number; label: string; members: CommunityMember[] }[] = [];
-    const sortedRanks = Array.from(groups.keys()).sort((a, b) => a - b);
-    for (const rank of sortedRanks) {
-      const members = groups.get(rank)!;
-      let label: string;
-      if (rank === 0) {
-        label = 'Leadership';
-      } else {
-        // Find the badge a-tag for this rank from community definition
-        const tier = community.ranks.find((r) => r.rank === rank);
-        // Use the badge d-tag suffix as a label hint, or fall back to "Rank N"
-        if (tier?.badgeATag) {
-          const parts = tier.badgeATag.split(':');
-          const dTag = parts.slice(2).join(':');
-          // Try to extract a human-readable name from the d-tag (after the UUID prefix)
-          const namePart = dTag.split('-').pop();
-          label = namePart ? namePart.charAt(0).toUpperCase() + namePart.slice(1) : `Rank ${rank}`;
-        } else {
-          label = `Rank ${rank}`;
-        }
-      }
-      result.push({ rank, label, members });
-    }
-    return result;
-  }, [membership, community]);
+    return [
+      { key: 'leadership', label: 'Leadership', members: leadership },
+      { key: 'members', label: 'Members', members },
+    ].filter((section) => section.members.length > 0);
+  }, [membership]);
 
   // ── Comments (NIP-22 on the community event) ───────────────────────────────
   const { data: commentsData, isLoading: commentsLoading } = useComments(event, 500);
   const { membersOnly } = useMembersOnlyFilter();
 
-  // ── Fundraising goals (NIP-75) ──────────────────────────────────────────────
+  // ── Goals (NIP-75) ──────────────────────────────────────────────────────────
   const { data: goals, isLoading: goalsLoading } = useCommunityGoals(communityATag || undefined);
+  const { data: communityEvents, isLoading: eventsLoading } = useCommunityEvents(communityATag || undefined);
   const now = useNow(60_000);
 
   /** Check if a goal event's `closed_at` deadline has passed. */
@@ -233,14 +380,38 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
     });
   }, [moderatedGoals, membersOnly, rankMap, isExpired]);
 
+  const eventItems = useMemo(() => {
+    const moderated = applyCommunityModerationToEvents(communityEvents ?? [], moderation);
+    const visible = membersOnly ? moderated.filter((e) => rankMap.has(e.pubkey)) : moderated;
+
+    return [...visible].sort((a, b) => {
+      const aStart = getCalendarEventStart(a);
+      const bStart = getCalendarEventStart(b);
+      const aFuture = aStart >= now;
+      const bFuture = bStart >= now;
+      if (aFuture && !bFuture) return -1;
+      if (!aFuture && bFuture) return 1;
+      if (aFuture && bFuture) return aStart - bStart;
+      return bStart - aStart;
+    });
+  }, [communityEvents, moderation, membersOnly, rankMap, now]);
+  const activeEventItems = useMemo(
+    () => eventItems.filter((e) => getCalendarEventEnd(e) >= now),
+    [eventItems, now],
+  );
+  const pastEventItems = useMemo(
+    () => eventItems.filter((e) => getCalendarEventEnd(e) < now),
+    [eventItems, now],
+  );
+
   const replyTree = useMemo((): ReplyNode[] => {
     if (!commentsData) return [];
     const topLevel = commentsData.topLevelComments ?? [];
 
     // Filter: omit banned events and posts by banned members, then optionally
-    // restrict to chain-validated members when the "members only" toggle is
-    // active. The member filter is a presentation-layer choice — the NIP
-    // recommends it as the canonical-feed default, but users may opt out.
+    // restrict to validated members when the "members only" toggle is
+    // active. The member filter is a presentation-layer opt-in — the NIP
+    // lists it as a MAY feature, so users default to seeing everything.
     const applyModeration = (events: NostrEvent[]): NostrEvent[] => {
       const moderated = applyCommunityModerationToEvents(events, moderation);
       if (!membersOnly) return moderated;
@@ -264,7 +435,7 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
     };
 
     return applyModeration([...topLevel])
-      .sort((a, b) => a.created_at - b.created_at)
+      .sort((a, b) => b.created_at - a.created_at)
       .map((r) => buildNode(r));
   }, [commentsData, moderation, membersOnly, rankMap]);
 
@@ -285,21 +456,33 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
     }
   }, [event, toast]);
 
-  // ── FAB — visible on comments & fundraising tabs ──────────────────────────
+  // ── FAB — visible on comments, goals, and members tabs ─────────────────────
   const handleFabClick = useCallback(() => {
     if (activeTab === 'comments') {
       setComposeOpen(true);
-    } else if (activeTab === 'fundraising') {
+    } else if (activeTab === 'goals') {
       setGoalDialogOpen(true);
+    } else if (activeTab === 'events') {
+      setEventDialogOpen(true);
+    } else if (activeTab === 'members') {
+      setAddMemberOpen(true);
     }
   }, [activeTab]);
 
-  const fabIcon = activeTab === 'fundraising'
+  const fabIcon = activeTab === 'goals'
     ? <Target strokeWidth={3} size={18} />
-    : undefined; // default Plus icon for comments
+    : activeTab === 'members'
+      ? <UserPlus className="size-5" />
+      : activeTab === 'events'
+        ? <CalendarDays className="size-5" />
+        : undefined; // default Plus icon for comments
 
   useLayoutOptions({
-    showFAB: activeTab === 'comments' || activeTab === 'fundraising',
+    showFAB:
+      activeTab === 'comments'
+      || activeTab === 'goals'
+      || activeTab === 'events'
+      || (activeTab === 'members' && canAddMembers),
     onFabClick: handleFabClick,
     fabIcon,
   });
@@ -310,112 +493,158 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
   );
 
   // ── Render ──────────────────────────────────────────────────────────────────
+  const heroIconClassName = 'size-5 text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.85)]';
+  const actionButtonClassName = 'p-2 rounded-full text-muted-foreground hover:bg-secondary hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50 disabled:pointer-events-none transition-colors';
+
   return (
     <div className="max-w-2xl mx-auto pb-16">
-      {/* ── Top bar ── */}
-      <div className="flex items-center gap-4 px-4 pt-4 pb-3">
-        <button
-          onClick={() => window.history.length > 1 ? navigate(-1) : navigate('/')}
-          className="p-1.5 -ml-1.5 rounded-full hover:bg-secondary/60 transition-colors"
-          aria-label="Go back"
-        >
-          <ArrowLeft className="size-5" />
-        </button>
-        <h1 className="text-xl font-bold flex-1 truncate">Community</h1>
-        <button
-          className="p-2 rounded-full hover:bg-secondary/60 transition-colors"
-          onClick={handleShare}
-          aria-label="Share"
-        >
-          <Share2 className="size-5" />
-        </button>
-      </div>
-
       {/* ── Hero image ── */}
-      {image ? (
-        <div className="relative aspect-[21/9] w-full overflow-hidden">
+      <div className="relative h-32 w-full overflow-hidden sm:h-40">
+        {image ? (
           <img src={image} alt={name} className="w-full h-full object-cover" />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
-          <div className="absolute bottom-0 left-0 right-0 px-5 pb-4">
-            <h2 className="text-2xl font-bold text-white leading-tight drop-shadow-lg">{name}</h2>
-          </div>
-        </div>
-      ) : (
-        <div className="relative aspect-[21/9] w-full bg-gradient-to-br from-primary/15 via-primary/5 to-transparent flex items-center justify-center">
-          <Users className="size-16 text-primary/20" />
-          <div className="absolute bottom-0 left-0 right-0 px-5 pb-4">
-            <h2 className="text-2xl font-bold leading-tight">{name}</h2>
-          </div>
-        </div>
-      )}
-
-      {/* ── Community info ── */}
-      <div className="px-5 mt-4 space-y-4">
-        {/* Description */}
-        {descriptionText && (
-          <p className="text-sm leading-relaxed text-muted-foreground whitespace-pre-wrap">{descriptionText}</p>
+        ) : (
+          <div className="absolute inset-0 bg-gradient-to-br from-primary/50 via-primary/25 to-primary/5" />
+        )}
+        <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/10 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+        {!image && (
+          <Users className="size-12 text-primary/20 sm:size-16" />
         )}
 
-        {/* Founder + community-wide filter toggle. The toggle sits
-            right-justified on the same row as the "Founded by" label so
-            it clearly scopes the whole community (every content feed
-            below the tabs), not any one tab. */}
-        <div>
-          <div className="flex items-start justify-between gap-2 mb-1">
-            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Founded by</p>
-            <MembersOnlyToggle className="-my-2 -mr-2" />
+        {/* ── Top bar ── */}
+        <div className="absolute left-0 top-0 z-10 px-4 pt-4">
+          <button
+            onClick={() => window.history.length > 1 ? navigate(-1) : navigate('/')}
+            className="p-2 -ml-2 rounded-full hover:bg-black/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80 transition-colors"
+            aria-label="Go back"
+          >
+            <ArrowLeft className={heroIconClassName} />
+          </button>
+        </div>
+
+        <div className="absolute bottom-0 left-0 right-0 px-5 pb-3">
+          <h2 className="text-xl font-bold text-white leading-tight drop-shadow-lg sm:text-2xl">{name}</h2>
+        </div>
+      </div>
+
+      {/* ── Community info ── */}
+      <div className="px-5 mt-3 space-y-3">
+        {/* Description */}
+        {descriptionText && (
+          <p className="line-clamp-3 text-sm leading-relaxed text-muted-foreground whitespace-pre-wrap">{descriptionText}</p>
+        )}
+
+        <div className="flex items-center justify-between gap-3">
+          {user && communityATag && (
+            <FollowToggleButton
+              size="sm"
+              isFollowing={communityFollowed}
+              isPending={toggleCommunityFollow.isPending}
+              onClick={handleToggleFollow}
+            />
+          )}
+          <div className="ml-auto flex items-center gap-1">
+            <MembersOnlyToggle />
+            {isFounder && community && (
+              <button
+                type="button"
+                className={actionButtonClassName}
+                onClick={() => setEditCommunityOpen(true)}
+                aria-label="Edit community"
+              >
+                <Pencil className="size-5" />
+              </button>
+            )}
+            <button
+              type="button"
+              className={actionButtonClassName}
+              onClick={handleShare}
+              aria-label="Share"
+            >
+              <Share2 className="size-5" />
+            </button>
           </div>
-          <PersonRow pubkey={event.pubkey} />
         </div>
 
         {/* ── Tabs ── */}
         <CommunityModerationContext.Provider value={moderationCtx}>
           <Tabs value={activeTab} onValueChange={setActiveTab} className="-mx-5">
-            <TabsList className="w-full rounded-none border-b border-border bg-transparent p-0 h-auto">
+            <TabsList className="w-full justify-start overflow-x-auto scrollbar-none rounded-none border-b border-border bg-transparent p-0 h-auto">
               <TabsTrigger
                 value="members"
-                className="flex-1 rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none pb-3 pt-2"
+                className="flex-none min-w-fit rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none px-4 pb-3 pt-2"
               >
                 <Users className="size-4 mr-1.5" />
                 Members
               </TabsTrigger>
               <TabsTrigger
-                value="comments"
-                className="flex-1 rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none pb-3 pt-2"
+                value="chat"
+                className="flex-none min-w-fit rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none px-4 pb-3 pt-2"
               >
-                <MessageCircle className="size-4 mr-1.5" />
-                Comments
+                <MessageSquare className="size-4 mr-1.5" />
+                Chat
               </TabsTrigger>
               <TabsTrigger
-                value="fundraising"
-                className="flex-1 rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none pb-3 pt-2"
+                value="feed"
+                className="flex-none min-w-fit rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none px-4 pb-3 pt-2"
+              >
+                <Rss className="size-4 mr-1.5" />
+                Feed
+              </TabsTrigger>
+              <TabsTrigger
+                value="comments"
+                className="flex-none min-w-fit rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none px-4 pb-3 pt-2"
+              >
+                <MessageCircle className="size-4 mr-1.5" />
+                Posts
+              </TabsTrigger>
+              <TabsTrigger
+                value="goals"
+                className="flex-none min-w-fit rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none px-4 pb-3 pt-2"
               >
                 <Target className="size-4 mr-1.5" />
-                Fundraising
+                Goals
+              </TabsTrigger>
+              <TabsTrigger
+                value="events"
+                className="flex-none min-w-fit rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none px-4 pb-3 pt-2"
+              >
+                <CalendarDays className="size-4 mr-1.5" />
+                Events
               </TabsTrigger>
             </TabsList>
 
             {/* ── Members tab ── */}
             <TabsContent value="members" className="mt-0">
+              {community && (
+                <section className="border-b border-border px-5 py-4">
+                  <CommunityBadgePanel
+                    communityEvent={event}
+                    community={community}
+                    isFounder={isFounder}
+                  />
+                </section>
+              )}
+
               {membersLoading ? (
                 <MembersSkeleton />
-              ) : membersByRank.length === 0 ? (
+              ) : memberSections.length === 0 ? (
                 <div className="py-12 text-center text-muted-foreground text-sm px-5">
                   No members found.
                 </div>
               ) : (
                 <div className="divide-y divide-border">
-                  {membersByRank.map(({ rank, label, members }) => (
-                    <section key={rank} className="px-5 py-4">
+                  {memberSections.map(({ key, label, members }) => (
+                    <section key={key} className="px-5 py-4">
                       <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-3 flex items-center gap-2">
-                        {rank === 0 ? <Crown className="size-3.5 text-amber-500" /> : <Shield className="size-3.5" />}
+                        {key === 'leadership' ? <Crown className="size-3.5 text-amber-500" /> : <Shield className="size-3.5" />}
                         {label}
                         <span className="text-muted-foreground/60 font-normal">({members.length})</span>
                       </h3>
                       <div className="space-y-0.5">
                         {members.map((m) => {
                           let roleLabel: string | undefined;
-                          if (rank === 0) {
+                          if (m.rank === 0) {
                             roleLabel = m.pubkey === event.pubkey ? 'Founder' : 'Moderator';
                           }
                           // Determine if the current user can ban this member
@@ -442,6 +671,30 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
               )}
             </TabsContent>
 
+            {/* ── Chat tab ── */}
+            <TabsContent value="chat" className="mt-0">
+              {communityATag ? (
+                <CommunityChatPanel
+                  communityATag={communityATag}
+                  moderation={moderation}
+                  rankMap={rankMap}
+                  isMembershipLoading={membersLoading}
+                />
+              ) : (
+                <div className="py-12 text-center text-muted-foreground text-sm px-5">
+                  Community chat is unavailable for this community.
+                </div>
+              )}
+            </TabsContent>
+
+            {/* ── Feed tab ── */}
+            <TabsContent value="feed" className="mt-0">
+              <CommunityMemberFeed
+                authorPubkeys={allMemberPubkeys}
+                isMembershipLoading={membersLoading}
+              />
+            </TabsContent>
+
             {/* ── Comments tab ── */}
             <TabsContent value="comments" className="mt-0">
               <ComposeBox compact replyTo={event} />
@@ -465,8 +718,8 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
               )}
             </TabsContent>
 
-            {/* ── Fundraising tab ── */}
-            <TabsContent value="fundraising" className="mt-0">
+            {/* ── Goals tab ── */}
+            <TabsContent value="goals" className="mt-0">
               {goalsLoading ? (
                 <div className="divide-y divide-border">
                   {Array.from({ length: 2 }).map((_, i) => (
@@ -476,8 +729,8 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
               ) : activeGoals.length === 0 && pastGoals.length === 0 ? (
                 <div className="py-12 text-center text-muted-foreground text-sm px-5">
                   {membersOnly && (goals ?? []).length > 0
-                    ? 'No fundraising goals from community members yet. Toggle the shield icon to see all goals.'
-                    : <>No fundraising goals yet.{user ? ' Create one to get started!' : ''}</>}
+                    ? 'No goals from community members yet. Toggle the shield icon to see all goals.'
+                    : <>No goals yet.{user ? ' Create one to get started!' : ''}</>}
                 </div>
               ) : (
                 <div className="divide-y divide-border">
@@ -495,6 +748,40 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
                     </div>
                   )}
                   {pastGoals.map((e) => (
+                    <NoteCard key={e.id} event={e} />
+                  ))}
+                </div>
+              )}
+            </TabsContent>
+
+            {/* ── Events tab ── */}
+            <TabsContent value="events" className="mt-0">
+              {eventsLoading ? (
+                <div className="divide-y divide-border">
+                  {Array.from({ length: 3 }).map((_, i) => (
+                    <ReplyCardSkeleton key={i} />
+                  ))}
+                </div>
+              ) : activeEventItems.length === 0 && pastEventItems.length === 0 ? (
+                <div className="py-12 text-center text-muted-foreground text-sm px-5">
+                  {membersOnly && (communityEvents ?? []).length > 0
+                    ? 'No events from community members yet. Toggle the shield icon to see all events.'
+                    : <>No events yet.{user ? ' Create one to get started!' : ''}</>}
+                </div>
+              ) : (
+                <div className="divide-y divide-border">
+                  {activeEventItems.map((e) => (
+                    <NoteCard key={e.id} event={e} />
+                  ))}
+
+                  {pastEventItems.length > 0 && activeEventItems.length > 0 && (
+                    <div className="px-5 pt-4 pb-1">
+                      <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
+                        Past Events
+                      </h4>
+                    </div>
+                  )}
+                  {pastEventItems.map((e) => (
                     <NoteCard key={e.id} event={e} />
                   ))}
                 </div>
@@ -525,12 +812,43 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
         onOpenChange={setComposeOpen}
       />
 
-      {/* FAB-triggered goal creation dialog for the fundraising tab */}
+      {/* FAB-triggered goal creation dialog for the goals tab */}
       {communityATag && (
         <CreateGoalDialog
           communityATag={communityATag}
           open={goalDialogOpen}
           onOpenChange={setGoalDialogOpen}
+        />
+      )}
+
+      {/* FAB-triggered event creation dialog for the events tab */}
+      {communityATag && (
+        <CreateCommunityEventDialog
+          communityATag={communityATag}
+          open={eventDialogOpen}
+          onOpenChange={setEventDialogOpen}
+        />
+      )}
+
+      {/* Add member dialog */}
+      {canAddMembers && community && (
+        <AddMemberDialog
+          open={addMemberOpen}
+          onOpenChange={setAddMemberOpen}
+          communityEvent={event}
+          community={community}
+          isFounder={isFounder}
+          existingMemberPubkeys={allMemberPubkeys}
+        />
+      )}
+
+      {/* Edit community dialog — founder only */}
+      {isFounder && community && (
+        <CreateCommunityDialog
+          open={editCommunityOpen}
+          onOpenChange={setEditCommunityOpen}
+          communityEvent={event}
+          community={community}
         />
       )}
     </div>

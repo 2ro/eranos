@@ -178,6 +178,9 @@ export function useZaps(
 
             // Invalidate zap queries to refresh counts
             queryClient.invalidateQueries({ queryKey: ['zaps'] });
+            if (target.kind === 9041) {
+              queryClient.invalidateQueries({ queryKey: ['goal-progress', target.id] });
+            }
 
             // Close dialog last to ensure clean state
             onZapSuccess?.();
@@ -223,6 +226,9 @@ export function useZaps(
 
             // Invalidate zap queries to refresh counts
             queryClient.invalidateQueries({ queryKey: ['zaps'] });
+            if (target.kind === 9041) {
+              queryClient.invalidateQueries({ queryKey: ['goal-progress', target.id] });
+            }
 
             // Close dialog last to ensure clean state
             onZapSuccess?.();

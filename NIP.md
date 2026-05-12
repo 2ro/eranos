@@ -21,7 +21,24 @@
 
 | Protocol                 | Composed Kinds                          | Description                                                     |
 |--------------------------|-----------------------------------------|-----------------------------------------------------------------|
-| Hierarchical Communities | 34550, 30009, 8, 1111, 1984, 5         | Ranked community membership via badge award chains (NIP-72 ext) |
+| Flat Communities | 34550, 30009, 8, 1111, 1984 | One-level badge membership with explicit moderators (NIP-72 ext) |
+| Community Chat | 34550, 1311 | Realtime member chat scoped to a NIP-72 community |
+
+### Community Chat
+
+Agora uses NIP-53 live chat messages (`kind:1311`) for realtime chat inside a NIP-72 community. Messages are scoped directly to the community definition's address using an `a` tag:
+
+```json
+{
+  "kind": 1311,
+  "content": "Hello community!",
+  "tags": [
+    ["a", "34550:<community-author-pubkey>:<community-d-tag>", "", "root"]
+  ]
+}
+```
+
+Clients SHOULD query community chat with `{ "kinds": [1311], "#a": ["34550:<pubkey>:<d-tag>"] }`. Agora treats sending as members-only at the UI layer and applies the same community moderation overlay used for community posts.
 
 ### Community Kinds
 
@@ -435,9 +452,9 @@ Clients SHOULD only surface events from the last hour (`since = now - 3600`). Ol
 
 ---
 
-## Hierarchical Communities
+## Flat Communities
 
-Hierarchical communities on Nostr, composed from existing event kinds. Communities have ranked membership where authority flows downward through a chain of badge awards.
+Flat communities on Nostr, composed from existing event kinds. Communities have one membership badge, explicit moderators, and no recursive badge-chain authority.
 
 This specification is intended to be a foundation for community-scoped features. A community is a kind `34550` root that other events can tag with uppercase `A`. Posts, events, polls, listings, and future content kinds can all participate in the same community model when they tag the community root and pass the membership and moderation rules below.
 
@@ -454,34 +471,31 @@ The initial implementation focuses on three foundation capabilities:
 - **Kind 8** ([NIP-58](https://github.com/nostr-protocol/nips/blob/master/58.md)) -- Badge Award
 - **Kind 1111** ([NIP-22](https://github.com/nostr-protocol/nips/blob/master/22.md)) -- Community Posts
 - **Kind 1984** ([NIP-56](https://github.com/nostr-protocol/nips/blob/master/56.md)) -- Moderation
-- **Kind 5** ([NIP-09](https://github.com/nostr-protocol/nips/blob/master/09.md)) -- Badge Award Revocation / Moderation Rescinding
-
 ### Overview
 
-A hierarchical community consists of:
+A flat community consists of:
 
-1. **Badge definitions** (kind `30009`), one per rank tier, published by the founder.
-2. A **community definition** (kind `34550`) referencing those badges with rank indices.
-3. **Badge awards** (kind `8`) forming a chain of trust -- each award grants a rank, validated by the awarder's rank.
+1. **One badge definition** (kind `30009`) that represents community membership.
+2. A **community definition** (kind `34550`) referencing that member badge with the role marker `"member"`.
+3. **Badge awards** (kind `8`) authored by the founder or current moderators, granting membership directly.
 4. **Community-scoped content** (initially kind `1111`) tagged to the community root.
-5. **Reports and bans** (kind `1984`) scoped to the community for content warnings, content removal, and member bans.
-6. **Deletion requests** (kind `5`) for revoking badge awards or rescinding moderation events.
+5. **Reports and bans** (kind `1984`) scoped to the community for content warnings, content removal, and member/non-member bans.
+
+Parent, child, sister, and rank relationships are intentionally out of scope for the core permission model. Apps may build discovery or directory surfaces separately.
 
 ### Membership Derivation
 
-Community membership is derived from three distinct sources, each resolved differently:
+Membership is sourced from the community definition and from validated kind `8` membership awards. This produces three populations:
 
 - **Founder** -- the `pubkey` field on the kind `34550` event. One per community, immutable. Controls the community definition since only they can republish the addressable event.
-- **Moderators** -- the `p` tags on the kind `34550` event (matching [NIP-72](https://github.com/nostr-protocol/nips/blob/master/72.md)). Mutable (the founder can add/remove by republishing). Share rank 0 with the founder.
-- **Members** -- derived from kind `8` badge awards forming the authority chain. A member's rank is determined by the badge they were awarded (rank 1 and below).
+- **Moderators** -- the `p` tags on the kind `34550` event with role `"moderator"` (matching [NIP-72](https://github.com/nostr-protocol/nips/blob/master/72.md)). Mutable by republishing the community definition.
+- **Members** -- pubkeys named in `p` tags on kind `8` badge awards that reference the community's member badge and are authored by the founder or a current moderator.
 
-The founder and moderators have no badge. Their rank 0 status comes from the community definition itself. Rank 0 cannot be awarded via kind `8` -- there is no rank 0 badge definition. Clients determine founder/moderator display from the community event directly.
-
-Authority is **rank-based, not badge-specific**. A member at rank N can award any badge at rank M where M > N.
+The founder and moderators have no membership badge requirement. Their leadership status comes from the community definition itself. Members cannot grant membership to other members.
 
 ### Community Definition
 
-A kind `34550` event defines the community, extending [NIP-72](https://github.com/nostr-protocol/nips/blob/master/72.md) with badge `a` tags that encode rank indices.
+A kind `34550` event defines the community, extending [NIP-72](https://github.com/nostr-protocol/nips/blob/master/72.md) with one badge `a` tag that identifies the member badge.
 
 #### Tags
 
@@ -491,18 +505,18 @@ A kind `34550` event defines the community, extending [NIP-72](https://github.co
 | `name` | Yes | Human-readable name. |
 | `description` | No | Community description. |
 | `image` | No | Image URL. |
-| `a` | Yes (1+) | Badge definition reference with rank index (see format below). |
-| `p` | Yes (1+) | Moderator pubkeys. Implicitly rank 0. The 4th element SHOULD be `"moderator"`. |
+| `a` | Yes (1) | Member badge definition reference with role marker `"member"`. |
+| `p` | No | Moderator pubkeys. The 4th element SHOULD be `"moderator"`. |
 | `relay` | No | Recommended relay URL for community content (per [NIP-72](https://github.com/nostr-protocol/nips/blob/master/72.md)). |
 | `alt` | No | [NIP-31](https://github.com/nostr-protocol/nips/blob/master/31.md) description. |
 
 #### Badge `a` Tag Format
 
 ```
-["a", "30009:<pubkey>:<badge-d-tag>", "<relay-hint>", "<rank-index>"]
+["a", "30009:<pubkey>:<badge-d-tag>", "<relay-hint>", "member"]
 ```
 
-Rank `0` is reserved for the founder and moderators (derived from the community definition, not from badges). Badge `a` tags define awardable ranks starting from `1`. Higher numbers = lower authority. Indices MUST be contiguous starting from 1.
+The fourth element is a strict protocol marker, not a display label. Communities can still use the badge definition's `name`, `description`, and `image` tags for expressive member labels.
 
 #### Example
 
@@ -516,10 +530,7 @@ Rank `0` is reserved for the founder and moderators (derived from the community 
     ["name", "The Arbiter's Guard"],
     ["description", "Elite Halo 2 clan"],
     ["image", "https://example.com/clan-banner.jpg"],
-    ["a", "30009:<founder-pubkey>:a1b2c3d4-...-staff", "", "1"],
-    ["a", "30009:<founder-pubkey>:a1b2c3d4-...-member", "", "2"],
-    ["a", "30009:<founder-pubkey>:a1b2c3d4-...-peon", "", "3"],
-    ["p", "<founder-pubkey>", "", "moderator"],
+    ["a", "30009:<founder-pubkey>:a1b2c3d4-...-member", "", "member"],
     ["p", "<co-moderator-pubkey>", "", "moderator"],
     ["relay", "wss://relay.example.com"],
     ["alt", "Community: The Arbiter's Guard"]
@@ -529,9 +540,9 @@ Rank `0` is reserved for the founder and moderators (derived from the community 
 
 ### Badge Definitions
 
-Each rank tier is a standard [NIP-58](https://github.com/nostr-protocol/nips/blob/master/58.md) kind `30009` badge definition published by the founder. Badge definitions MUST be published **before** the community definition that references them.
+The member badge is a standard [NIP-58](https://github.com/nostr-protocol/nips/blob/master/58.md) kind `30009` badge definition published by the founder. The badge definition SHOULD be published **before** the community definition that references it.
 
-The `d` tag SHOULD use the format `<community-d-tag>-<rank-name>` for global uniqueness.
+The `d` tag SHOULD use the format `<community-d-tag>-member` for global uniqueness.
 
 ```jsonc
 {
@@ -539,58 +550,59 @@ The `d` tag SHOULD use the format `<community-d-tag>-<rank-name>` for global uni
   "pubkey": "<founder-pubkey>",
   "content": "",
   "tags": [
-    ["d", "a1b2c3d4-...-staff"],
-    ["name", "Staff"],
-    ["description", "Trusted officers who manage clan operations."],
-    ["image", "https://example.com/staff-badge.png"],
-    ["alt", "Badge definition: Staff"]
+    ["d", "a1b2c3d4-...-member"],
+    ["name", "Member"],
+    ["description", "Member of The Arbiter's Guard"],
+    ["image", "https://example.com/member-badge.png"],
+    ["alt", "Badge definition: Member of The Arbiter's Guard"]
   ]
 }
 ```
 
 ### Badge Awards
 
-Membership is established through kind `8` badge awards ([NIP-58](https://github.com/nostr-protocol/nips/blob/master/58.md)). Each award forms a chain link.
+Membership is established through kind `8` badge awards ([NIP-58](https://github.com/nostr-protocol/nips/blob/master/58.md)). Each valid award grants membership directly.
 
 A badge award is **valid** if and only if:
 
-1. The `a` tag references a badge definition listed in the community definition.
-2. The awarder is a validated member at a rank **strictly less than** the badge's rank index.
-3. The awarder's chain can be walked upward to a founder or moderator.
+1. The `a` tag references the member badge listed in the community definition.
+2. The award author is the founder or a moderator listed in the community definition currently being evaluated.
+3. The award contains at least one `p` tag naming an awarded pubkey.
 
 ```jsonc
-// Moderator (rank 0) awarding Staff (rank 1)
+// Moderator awarding community membership
 {
   "kind": 8,
-  "pubkey": "<founder-pubkey>",
+  "pubkey": "<moderator-pubkey>",
   "content": "",
   "tags": [
-    ["a", "30009:<founder-pubkey>:a1b2c3d4-...-staff"],
+    ["a", "30009:<founder-pubkey>:a1b2c3d4-...-member"],
     ["p", "<recipient-pubkey>"],
     ["alt", "Badge award: Staff in The Arbiter's Guard"]
   ]
 }
 ```
 
-### Chain Validation
+### Membership Validation
 
-Membership is **derived state**. Clients compute effective membership by resolving the authority graph from badge awards, then applying moderation overlays.
+Membership is resolved with indexed relay filters. There is no recursive authority graph.
 
 #### Algorithm
 
-1. **Seed rank 0**: The event publisher (founder) and all `p` tags (moderators) in the community definition are rank 0 members.
-2. **Query awards**: `{ kinds: [8], #a: [<all badge coordinates>] }`
-3. **Iteratively validate**: For each award, check if the awarder is a validated member with rank strictly less than the awarded rank. If valid, add the recipient. Repeat until no new members are discovered.
-4. **Resolve moderation**: Query `{ kinds: [1984], #A: [<community-a-tag>] }`. Classify kind `1984` events into **bans** and **reports** (see [Moderation](#moderation)). Kind `1984` events from non-members and banned members are ignored. Ban attempts from insufficiently ranked members are ignored, such as a rank 2 member trying to ban a rank 0 founder or moderator.
-5. **Apply moderation**: Remove banned members from effective membership. Omit content from banned authors, omit verified content bans, and attach report data to reported content for content-warning display.
+1. Fetch the community definition using kind `34550`, the founder pubkey, and the community `d` tag.
+2. Extract the founder pubkey, moderator pubkeys, and member badge coordinate.
+3. Query awards: `{ kinds: [8], authors: [<founder>, ...<moderators>], #a: [<member-badge-coordinate>] }`.
+4. Flatten `p` tags from matching awards.
+5. The member set is the union of the founder, current moderators, and awarded pubkeys.
+6. Resolve moderation and apply moderation overlays.
 
-Clients MUST NOT trust kind `8` events at face value. An attacker can publish awards for themselves, but these fail chain validation without a path to a founder or moderator.
+The `authors` filter is the primary membership-award trust boundary. Awards from non-founder, non-moderator pubkeys are not valid community membership awards.
 
 ### Community-Scoped Content
 
 Community-scoped content is any event that tags the community definition with uppercase `A`. The foundation implementation starts with kind `1111` ([NIP-22](https://github.com/nostr-protocol/nips/blob/master/22.md)) posts, but the same moderation overlay applies to future community content kinds such as calendar events, polls, listings, or other domain-specific events.
 
-Clients SHOULD treat valid community members as the canonical authors for community views. Content from non-members MAY be shown in future review surfaces, but canonical community feeds SHOULD discard non-member content by default.
+Clients MAY offer a members-only view that filters community posts down to the resolved member set as an `authors` filter. Whether this is on by default, opt-in, or omitted entirely is a client UX choice -- the protocol makes no recommendation.
 
 #### Community Post
 
@@ -634,24 +646,25 @@ Replies keep the community as root scope and point to the parent comment:
 
 #### Querying
 
-Fetch community-scoped content and moderation data together when relay limits permit. The `kinds` list can expand as the application adds supported community content kinds.
+Clients MAY use the resolved member set as an `authors` filter for members-only views.
 
 ```jsonc
 {
-  "kinds": [1111, 1984],
-  "#A": ["34550:<founder-pubkey>:<community-d-tag>"]
+  "kinds": [1111],
+  "#A": ["34550:<founder-pubkey>:<community-d-tag>"],
+  "authors": ["<founder>", "<moderator>", "<member>"]
 }
 ```
 
-Clients then filter client-side: discard unsupported kinds, discard non-member content from canonical community views, and process kind `1984` events per the moderation rules below. The moderation overlay is content-kind agnostic: a valid content ban or warning applies to the targeted event regardless of whether that event is a post, calendar event, poll, listing, or future supported kind.
+The moderation overlay is content-kind agnostic: a valid content ban or warning applies to the targeted event regardless of whether that event is a post, calendar event, poll, listing, or future supported kind.
 
 ### Moderation
 
 Moderation uses kind `1984` ([NIP-56](https://github.com/nostr-protocol/nips/blob/master/56.md)) scoped to the community via the uppercase `A` tag. Moderation is derived state: clients first resolve trusted moderation actions from kind `1984`, then apply those actions to concrete community-scoped events.
 
-There are two tiers of moderation events:
+There are two moderation event classes:
 
-1. **Bans** -- authoritative actions from higher-ranked members that remove content or ban users. Identified by the presence of [NIP-32](https://github.com/nostr-protocol/nips/blob/master/32.md) label tags `["L", "moderation"]` and `["l", "ban", "moderation"]`.
+1. **Bans** -- authoritative actions that remove content or ban users. Identified by the presence of [NIP-32](https://github.com/nostr-protocol/nips/blob/master/32.md) label tags `["L", "moderation"]` and `["l", "ban", "moderation"]`.
 2. **Reports** -- soft flags from any valid community member using standard [NIP-56](https://github.com/nostr-protocol/nips/blob/master/56.md) report types (`nudity`, `spam`, `profanity`, `illegal`, `malware`, `impersonation`, `other`). No `L`/`l` tags. Clients display a content warning that users must click through to reveal.
 
 Kind `1984` events from **non-members** are ignored entirely within community context. Kind `1984` events from members who are themselves banned are also ignored after ban resolution; banned members cannot retain moderation or reporting authority.
@@ -663,7 +676,9 @@ A ban is **authoritative** if and only if:
 1. The event contains `["l", "ban", "moderation"]` and `["L", "moderation"]` tags.
 2. The publisher is a validated community member.
 3. The publisher is not themselves banned after ban resolution.
-4. The publisher's rank is **strictly less than** the target's rank (or the target is a non-member).
+4. The publisher's authority covers the target:
+   - founder/moderators may ban member and non-member authors/content;
+   - members may ban only non-member authors/content.
 
 Bans that fail any of these conditions MUST be ignored.
 
@@ -688,11 +703,11 @@ Ban a specific post by publishing kind `1984` with `e`, `p`, and `A` tags plus t
 
 Clients MUST omit the banned event from canonical community feeds entirely. The event is not displayed, blurred, or indicated in any way -- it is treated as if it does not exist.
 
-The `e` and `p` tags are untrusted until matched against the actual target event. A content ban MUST only apply when the targeted event's `id` matches the ban's `e` tag and the targeted event's `pubkey` matches the ban's `p` tag. This prevents a malicious or mistaken report from hiding an event by pairing its event ID with a lower-ranked or non-member pubkey.
+The `e` and `p` tags are untrusted until matched against the actual target event. A content ban MUST only apply when the targeted event's `id` matches the ban's `e` tag and the targeted event's `pubkey` matches the ban's `p` tag. This prevents a malicious or mistaken report from hiding an event by pairing its event ID with a different target pubkey.
 
 ##### Member Ban
 
-Ban a member by publishing kind `1984` with `p` and `A` tags only (no `e` tag) plus the `ban` label. This is **non-cascading** -- only the targeted member is banned. Their kind `8` awards remain on relays, so downstream members whose chain passes through the banned member are still valid. For cascading removal, use badge revocation (kind `5`) instead.
+Ban an author by publishing kind `1984` with `p` and `A` tags only (no `e` tag) plus the `ban` label. Founder/moderator-authored bans may target members or non-members. Member-authored bans may target non-members only.
 
 ```jsonc
 {
@@ -700,7 +715,7 @@ Ban a member by publishing kind `1984` with `p` and `A` tags only (no `e` tag) p
   "pubkey": "<moderator-pubkey>",
   "content": "Reason for ban",
   "tags": [
-    ["p", "<banned-member-pubkey>", "other"],
+    ["p", "<banned-pubkey>", "other"],
     ["A", "34550:<founder-pubkey>:<community-d-tag>"],
     ["L", "moderation"],
     ["l", "ban", "moderation"]
@@ -712,7 +727,7 @@ Clients distinguish content bans (`e` + `p` + `A` + `ban` label) from member ban
 
 #### Reports (Content Warnings)
 
-Any **valid, non-banned community member** (regardless of rank) may report content by publishing kind `1984` with a standard NIP-56 report type on the `e` and `p` tags. Reports do NOT use `L`/`l` label tags.
+Any **valid, non-banned community member** may report content by publishing kind `1984` with a standard NIP-56 report type on the `e` and `p` tags. Reports do NOT use `L`/`l` label tags.
 
 ```jsonc
 {
@@ -737,45 +752,16 @@ As with content bans, report warnings MUST only attach to content when the targe
 
 | `l` tag present? | `e` tag present? | Authority check | Result |
 |---|---|---|---|
-| `["l", "ban", "moderation"]` | Yes | Non-banned member; rank < target; `e`/`p` match target event | Content ban (omit event) |
-| `["l", "ban", "moderation"]` | No | Non-banned member; rank < target | Member ban |
+| `["l", "ban", "moderation"]` | Yes | Founder/moderator, or member targeting non-member content; `e`/`p` match target event | Content ban (omit event) |
+| `["l", "ban", "moderation"]` | No | Founder/moderator, or member targeting non-member author | Author ban |
 | No | Yes | Non-banned member; `e`/`p` match target event | Content warning |
 | No | No | -- | Invalid (ignored) |
 | Any | Any | Non-member | Ignored |
 | Any | Any | Banned member | Ignored |
-| `["l", "ban", "moderation"]` | Any | Rank >= target | Ignored |
-
-#### Rescinding Moderation
-
-A kind `1984` ban or report can be rescinded by deleting the kind `1984` event via kind `5` ([NIP-09](https://github.com/nostr-protocol/nips/blob/master/09.md)). Per NIP-09, only the original author of the kind `1984` event can delete it.
-
-```jsonc
-{
-  "kind": 5,
-  "tags": [["e", "<kind-1984-event-id>"], ["k", "1984"]]
-}
-```
-
-Clients that implement moderation rescinding SHOULD discard any kind `1984` event whose matching kind `5` deletion exists before resolving bans and reports. This branch does not implement moderation rescinding yet; it is retained here as part of the protocol foundation for future moderation extensions.
-
-### Revocation
-
-A badge awarder can revoke their own award via kind `5`:
-
-```jsonc
-{
-  "kind": 5,
-  "tags": [["e", "<kind-8-event-id>"], ["k", "8"]]
-}
-```
-
-This is **cascading** -- the chain link is destroyed, so the revoked member and all downstream members whose chain depended on it lose validated status. Per NIP-09, only the original publisher of the kind `8` event can delete it.
-
-**Ban vs revocation**: Use kind `1984` to ban a single member without affecting their downstream recruits. Use kind `5` revocation to remove a member and cascade to their entire subtree.
 
 ### Community Updates
 
-Both kind `34550` and kind `30009` are addressable events. To add or remove ranks, republish the community definition with updated `a` tags. To update moderators, republish with updated `p` tags. Removing a moderator cascades to members they recruited (unless those members have another valid chain path). Only the founder (event publisher) can republish the community definition.
+Both kind `34550` and kind `30009` are addressable events. To change the member badge or update moderators, republish the community definition. Only the founder (event publisher) can republish the community definition. If a moderator is removed, their authored membership awards no longer count because they are excluded from the authorized awarder query.
 
 ### Discovery
 
@@ -790,20 +776,37 @@ Both kind `34550` and kind `30009` are addressable events. To add or remove rank
 1. `{ "kinds": [8], "#p": ["<user-pubkey>"] }`
 2. Extract badge `a` tags from results.
 3. `{ "kinds": [34550], "#a": ["30009:...", "..."] }`
+4. Keep only communities whose `member` badge reference matches the award badge coordinate.
+
+**Communities a user has bookmarked:**
+
+Agora uses [NIP-51](https://github.com/nostr-protocol/nips/blob/master/51.md) kind `10004` ("Communities") to let users save communities they want quick access to without requiring membership. Bookmarked communities are surfaced in the "My Communities" view alongside founded and member-of communities.
+
+1. `{ "kinds": [10004], "authors": ["<user-pubkey>"], "limit": 1 }`
+2. Extract `a` tags whose value begins with `34550:` from the result.
+3. For each coordinate `34550:<author-pubkey>:<d-tag>`, query the community definition with both `authors` and `#d` filters to prevent spoofing:
+
+   ```jsonc
+   { "kinds": [34550], "authors": ["<author-pubkey>"], "#d": ["<d-tag>"], "limit": 1 }
+   ```
+
+Clients toggling a bookmark MUST perform a read-modify-write cycle on the replaceable kind `10004` event: fetch the freshest version from relays, add or remove the matching `["a", "34550:<pubkey>:<d-tag>"]` tag, and republish the full tag list. Appending new entries to the end preserves chronological bookmark order per NIP-51.
+
+When the same community appears in multiple discovery sources, clients SHOULD display a single card but MAY indicate all applicable relationships (e.g. a member who has also bookmarked a community).
 
 ### Security Considerations
 
 - **Author filtering**: Clients MUST filter community definitions by `authors` to prevent impersonation.
-- **Chain validation is required**: Never trust kind `8` events without walking the authority chain.
-- **Badge d-tag uniqueness**: Use `<community-d-tag>-<rank-name>` to prevent cross-community collisions.
-- **Badge acceptance is cosmetic**: NIP-58 kind `10008`/`30008` events have no effect on chain validation.
+- **Award author filtering is required**: Query member badge awards with `authors: [founder, ...moderators]`.
+- **Badge d-tag uniqueness**: Use `<community-d-tag>-member` to prevent cross-community collisions.
+- **Badge acceptance is cosmetic**: NIP-58 kind `10008`/`30008` events have no effect on community membership.
 
 ### Dependencies
 
-- [NIP-09](https://github.com/nostr-protocol/nips/blob/master/09.md) -- Event Deletion Request
 - [NIP-22](https://github.com/nostr-protocol/nips/blob/master/22.md) -- Comment
 - [NIP-31](https://github.com/nostr-protocol/nips/blob/master/31.md) -- Unknown Event Kinds (`alt` tag)
 - [NIP-32](https://github.com/nostr-protocol/nips/blob/master/32.md) -- Labeling (moderation `ban` label)
+- [NIP-51](https://github.com/nostr-protocol/nips/blob/master/51.md) -- Lists (kind `10004` Communities list for bookmarks)
 - [NIP-56](https://github.com/nostr-protocol/nips/blob/master/56.md) -- Reporting
 - [NIP-58](https://github.com/nostr-protocol/nips/blob/master/58.md) -- Badges
 - [NIP-72](https://github.com/nostr-protocol/nips/blob/master/72.md) -- Moderated Communities

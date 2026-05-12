@@ -61,7 +61,7 @@ type TabType = 'communities' | 'posts' | 'accounts';
 const VALID_TABS: TabType[] = ['communities', 'posts', 'accounts'];
 
 function parseTab(value: string | null): TabType {
-  return VALID_TABS.includes(value as TabType) ? (value as TabType) : 'posts';
+  return VALID_TABS.includes(value as TabType) ? (value as TabType) : 'communities';
 }
 
 const VALID_AUTHOR_SCOPES = ['anyone', 'follows', 'people'] as const;
@@ -198,7 +198,7 @@ export function SearchPage() {
   const setActiveTab = useCallback((tab: TabType) => {
     setSearchParams((prev) => {
       const next = new URLSearchParams(prev);
-      if (tab === 'posts') {
+      if (tab === 'communities') {
         next.delete('tab');
       } else {
         next.set('tab', tab);
@@ -1204,5 +1204,4 @@ function SaveDestinationRow({
     </button>
   );
 }
-
 
