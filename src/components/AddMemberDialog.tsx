@@ -398,8 +398,7 @@ export function AddMemberDialog({
       }
 
       applyOptimisticMembership(pendingMembers, memberAwardEvents);
-      queryClient.invalidateQueries({ queryKey: ['addr-event', COMMUNITY_DEFINITION_KIND, communityEvent.pubkey, community.dTag] });
-      queryClient.invalidateQueries({ queryKey: ['community-members', community.aTag] });
+      queryClient.invalidateQueries({ queryKey: ['community-members', community.aTag], refetchType: 'inactive' });
       queryClient.invalidateQueries({ queryKey: ['community-activity-feed'], exact: false });
       queryClient.invalidateQueries({ queryKey: ['my-communities'], exact: false });
       if (!hasBadge && newMembers.length > 0) {

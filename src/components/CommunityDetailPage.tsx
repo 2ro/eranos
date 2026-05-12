@@ -488,6 +488,7 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
 
   // ── Render ──────────────────────────────────────────────────────────────────
   const heroIconClassName = 'size-5 text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.85)]';
+  const actionButtonClassName = 'p-2 rounded-full text-muted-foreground hover:bg-secondary hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50 disabled:pointer-events-none transition-colors';
 
   return (
     <div className="max-w-2xl mx-auto pb-16">
@@ -505,42 +506,13 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
         )}
 
         {/* ── Top bar ── */}
-        <div className="absolute inset-x-0 top-0 z-10 flex items-center gap-2 px-4 pt-4">
+        <div className="absolute left-0 top-0 z-10 px-4 pt-4">
           <button
             onClick={() => window.history.length > 1 ? navigate(-1) : navigate('/')}
             className="p-2 -ml-2 rounded-full hover:bg-black/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80 transition-colors"
             aria-label="Go back"
           >
             <ArrowLeft className={heroIconClassName} />
-          </button>
-          <div className="flex-1" />
-          {isFounder && community && (
-            <button
-              className="p-2 rounded-full hover:bg-black/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80 transition-colors"
-              onClick={() => setEditCommunityOpen(true)}
-              aria-label="Edit community"
-            >
-              <Pencil className={heroIconClassName} />
-            </button>
-          )}
-          {user && communityATag && (
-            <button
-              className="p-2 rounded-full hover:bg-black/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80 disabled:opacity-50 disabled:pointer-events-none transition-colors"
-              onClick={handleToggleBookmark}
-              disabled={toggleCommunityBookmark.isPending}
-              aria-label={bookmarked ? 'Remove community bookmark' : 'Bookmark community'}
-              aria-pressed={bookmarked}
-              aria-busy={toggleCommunityBookmark.isPending}
-            >
-              <Bookmark className={cn(heroIconClassName, bookmarked && 'fill-white')} />
-            </button>
-          )}
-          <button
-            className="p-2 rounded-full hover:bg-black/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80 transition-colors"
-            onClick={handleShare}
-            aria-label="Share"
-          >
-            <Share2 className={heroIconClassName} />
           </button>
         </div>
 
@@ -556,8 +528,39 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
           <p className="line-clamp-3 text-sm leading-relaxed text-muted-foreground whitespace-pre-wrap">{descriptionText}</p>
         )}
 
-        <div className="flex justify-end">
-          <MembersOnlyToggle className="-my-2 -mr-2" />
+        <div className="flex justify-end gap-1">
+          <MembersOnlyToggle />
+          {isFounder && community && (
+            <button
+              type="button"
+              className={actionButtonClassName}
+              onClick={() => setEditCommunityOpen(true)}
+              aria-label="Edit community"
+            >
+              <Pencil className="size-5" />
+            </button>
+          )}
+          {user && communityATag && (
+            <button
+              type="button"
+              className={cn(actionButtonClassName, bookmarked && 'text-primary hover:text-primary hover:bg-primary/10')}
+              onClick={handleToggleBookmark}
+              disabled={toggleCommunityBookmark.isPending}
+              aria-label={bookmarked ? 'Remove community bookmark' : 'Bookmark community'}
+              aria-pressed={bookmarked}
+              aria-busy={toggleCommunityBookmark.isPending}
+            >
+              <Bookmark className={cn('size-5', bookmarked && 'fill-current')} />
+            </button>
+          )}
+          <button
+            type="button"
+            className={actionButtonClassName}
+            onClick={handleShare}
+            aria-label="Share"
+          >
+            <Share2 className="size-5" />
+          </button>
         </div>
 
         {/* ── Tabs ── */}

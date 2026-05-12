@@ -1,13 +1,7 @@
 import { useMemo } from 'react';
-import { Link } from 'react-router-dom';
 import { Users, Globe } from 'lucide-react';
 import type { NostrEvent } from '@nostrify/nostrify';
 
-import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
-import { useAuthor } from '@/hooks/useAuthor';
-import { useProfileUrl } from '@/hooks/useProfileUrl';
-import { genUserName } from '@/lib/genUserName';
-import { cn } from '@/lib/utils';
 import { sanitizeUrl } from '@/lib/sanitizeUrl';
 
 // --- Helpers ---
@@ -43,12 +37,6 @@ export function CommunityContent({ event }: { event: NostrEvent }) {
     () => parseCommunityEvent(event),
     [event],
   );
-
-  // Owner
-  const ownerAuthor = useAuthor(event.pubkey);
-  const ownerMetadata = ownerAuthor.data?.metadata;
-  const ownerName = ownerMetadata?.display_name || ownerMetadata?.name || genUserName(event.pubkey);
-  const ownerProfileUrl = useProfileUrl(event.pubkey, ownerMetadata);
 
   // Extract website URL from description if present
   const descriptionUrl = useMemo(() => {
@@ -105,25 +93,6 @@ export function CommunityContent({ event }: { event: NostrEvent }) {
           {descriptionUrl.replace(/^https?:\/\//, '').replace(/\/$/, '')}
         </a>
       )}
-
-      {/* Owner */}
-      <div>
-        <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-2">Created by</p>
-        <Link to={ownerProfileUrl} className="flex items-center gap-3 group">
-          <Avatar className={cn('size-10 ring-2 ring-background')}>
-            <AvatarImage src={ownerMetadata?.picture} />
-            <AvatarFallback className="bg-muted text-muted-foreground">
-              {ownerName.charAt(0).toUpperCase()}
-            </AvatarFallback>
-          </Avatar>
-          <div className="min-w-0 flex-1">
-            <p className="font-medium truncate group-hover:underline">{ownerName}</p>
-            {ownerMetadata?.nip05 && (
-              <p className="text-xs text-muted-foreground truncate">{ownerMetadata.nip05}</p>
-            )}
-          </div>
-        </Link>
-      </div>
 
     </div>
   );

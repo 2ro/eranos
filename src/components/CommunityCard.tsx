@@ -4,12 +4,12 @@ import { Bookmark, Crown, Shield, Users } from 'lucide-react';
 import { nip19 } from 'nostr-tools';
 import type { NostrEvent } from '@nostrify/nostrify';
 
-import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { useAuthor } from '@/hooks/useAuthor';
 import { useProfileUrl } from '@/hooks/useProfileUrl';
-import { genUserName } from '@/lib/genUserName';
 import { parseCommunityEvent, COMMUNITY_DEFINITION_KIND } from '@/lib/communityUtils';
+import { genUserName } from '@/lib/genUserName';
 import { cn } from '@/lib/utils';
 
 interface CommunityCardProps {
@@ -26,7 +26,7 @@ interface CommunityCardProps {
 
 /**
  * Compact card for displaying a community in a list.
- * Shows image, name, description snippet, founder info, and moderator count.
+ * Shows image, name, description snippet, founder info, and community status.
  */
 export function CommunityCard({
   event,
@@ -36,7 +36,6 @@ export function CommunityCard({
   className,
 }: CommunityCardProps) {
   const community = useMemo(() => parseCommunityEvent(event), [event]);
-
   const founderAuthor = useAuthor(event.pubkey);
   const founderMeta = founderAuthor.data?.metadata;
   const founderName = founderMeta?.display_name || founderMeta?.name || genUserName(event.pubkey);

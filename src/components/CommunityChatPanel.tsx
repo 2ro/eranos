@@ -163,7 +163,7 @@ function CommunityChatMessage({ event, showAvatar }: { event: NostrEvent; showAv
             <span className={cn('text-[10px] text-muted-foreground/60', isOwnMessage && 'order-1')}>{shortTimeAgo(event.created_at)}</span>
           </div>
         )}
-        <ContentWarningGuard event={event}>
+        <ContentWarningGuard event={event} className="w-full max-w-[64%] sm:max-w-xs">
           <div
             className={cn(
               'inline-block w-fit max-w-[64%] break-words rounded-2xl px-3 py-2 text-sm leading-relaxed sm:max-w-xs',

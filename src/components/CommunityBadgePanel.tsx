@@ -79,8 +79,6 @@ export function CommunityBadgePanel({ communityEvent, community, isFounder }: Co
   const { badgeMap, isLoading, isError } = useBadgeDefinitions(badgeRefs);
   const badge = community.memberBadgeATag ? badgeMap.get(community.memberBadgeATag) : undefined;
 
-  if (!community.memberBadgeATag && !isFounder) return null;
-
   const badgeButtonLabel = badge ? `Edit ${badge.name} badge` : 'Set member badge';
 
   const badgeVisual = isLoading ? (
@@ -88,7 +86,7 @@ export function CommunityBadgePanel({ communityEvent, community, isFounder }: Co
   ) : badge ? (
     <BadgeThumbnail badge={badge} size={40} className="shrink-0" />
   ) : (
-    <div className="flex size-10 shrink-0 items-center justify-center rounded-lg border border-border bg-background text-muted-foreground">
+    <div className="flex size-10 shrink-0 items-center justify-center rounded-full bg-muted text-muted-foreground">
       <Award className="size-4" />
     </div>
   );
@@ -123,7 +121,12 @@ export function CommunityBadgePanel({ communityEvent, community, isFounder }: Co
               <p className="truncate text-xs text-muted-foreground">Community member badge</p>
             </>
           ) : (
-            <p className="text-sm text-muted-foreground">Set badge</p>
+            <>
+              <p className="truncate text-sm font-medium">Member badge</p>
+              <p className="truncate text-xs text-muted-foreground">
+                {isFounder ? 'Click the badge image to set one' : 'No badge set yet'}
+              </p>
+            </>
           )}
         </div>
       </div>
