@@ -11,7 +11,7 @@ interface KpiTileProps {
   label: string;
   value: number | string;
   accent?: boolean;
-  /** Small secondary text below the value. Easy to remove later. */
+  /** Optional secondary text displayed below the KPI value. */
   hint?: string;
 }
 
@@ -39,7 +39,7 @@ function KpiTile({ icon: Icon, label, value, accent, hint }: KpiTileProps) {
 export function KpiGrid({ kpis, territorialLevel }: KpiGridProps) {
   const scopeLabel = territorialLevel === 'states' ? 'Covered States' : 'Tracked Municipalities';
   const legacyHint = territorialLevel === 'municipalities' && kpis.legacyDetected > 0
-    ? `+${kpis.legacyDetected} content-matched municipalities`
+    ? `${kpis.legacyDetected} matched by content scan`
     : undefined;
 
   return (

@@ -293,7 +293,9 @@ export function useEventDashboard({ enabled, territorialLevel }: UseEventDashboa
     const activeCodes = getActiveTrackedCodes(config);
 
     return {
-      totalPosts: globalCount ?? viewPosts.length,
+      totalPosts: territorialLevel === 'states'
+        ? Math.max(globalCount ?? 0, viewPosts.length)
+        : viewPosts.length,
       activeRegions: displayFeeds.filter((f) => f.posts[0]?.created_at > thirtySecondsAgo).length,
       trackedCount: territorialLevel === 'states'
         ? getCoveredStates(activeCodes).length
@@ -323,7 +325,9 @@ export function useEventDashboard({ enabled, territorialLevel }: UseEventDashboa
     return buildDistribution(stableFeeds);
   }, [displayFeeds, getStableCount]);
 
-  // Participants (full sorted list)
+  // Participants (full sorted list).
+  // Intentionally uses raw event-based counts (no COUNT floor) because each
+  // row derives live/activity state from the loaded events themselves.
   const participants = useMemo<ParticipantRow[]>(() => {
     const thirtySecondsAgo = now - 30;
     return [...displayFeeds]
