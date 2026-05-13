@@ -12,6 +12,8 @@ export interface DashboardKpis {
   allCodesTracked: number;
   last5min: number;
   uniquePosters: number;
+  /** Posts attributed to municipalities only via content-scan fallback (no municipality t-tag). */
+  legacyDetected: number;
 }
 
 /** A single bucket in the publishing activity time-series chart. */

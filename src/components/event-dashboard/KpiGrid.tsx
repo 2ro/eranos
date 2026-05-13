@@ -11,9 +11,11 @@ interface KpiTileProps {
   label: string;
   value: number | string;
   accent?: boolean;
+  /** Small secondary text below the value. Easy to remove later. */
+  hint?: string;
 }
 
-function KpiTile({ icon: Icon, label, value, accent }: KpiTileProps) {
+function KpiTile({ icon: Icon, label, value, accent, hint }: KpiTileProps) {
   return (
     <div className={`rounded-lg p-3 flex flex-col gap-1 ${accent ? 'bg-primary/10 border border-primary/20' : 'bg-muted/40'}`}>
       <div className="flex items-center gap-1.5">
@@ -25,16 +27,24 @@ function KpiTile({ icon: Icon, label, value, accent }: KpiTileProps) {
       <span className={`text-2xl font-bold tabular-nums leading-none ${accent ? 'text-primary' : 'text-foreground'}`}>
         {value}
       </span>
+      {hint && (
+        <span className="text-[10px] text-muted-foreground/70 font-normal leading-tight">
+          {hint}
+        </span>
+      )}
     </div>
   );
 }
 
 export function KpiGrid({ kpis, territorialLevel }: KpiGridProps) {
   const scopeLabel = territorialLevel === 'states' ? 'Covered States' : 'Tracked Municipalities';
+  const legacyHint = territorialLevel === 'municipalities' && kpis.legacyDetected > 0
+    ? `+${kpis.legacyDetected} content-matched municipalities`
+    : undefined;
 
   return (
     <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-      <KpiTile icon={Globe} label="Total Posts" value={kpis.totalPosts} accent />
+      <KpiTile icon={Globe} label="Total Posts" value={kpis.totalPosts} accent hint={legacyHint} />
       <KpiTile icon={Radio} label="Active Regions" value={kpis.activeRegions} />
       <KpiTile icon={MapPin} label={scopeLabel} value={kpis.trackedCount} />
       <KpiTile icon={Layers} label="All Codes Tracked" value={kpis.allCodesTracked} />

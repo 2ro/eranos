@@ -1,8 +1,9 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import type { NostrEvent } from '@nostrify/nostrify';
 import { useEventDashboardConfig } from '@/hooks/useEventDashboardConfig';
 import type { TrackedRegion } from '@/hooks/useEventDashboardConfig';
 import { useMultiHashtagFeed, type RegionFeed } from '@/hooks/useMultiHashtagFeed';
+import { useDashboardCounts } from '@/hooks/useDashboardCounts';
 import { getStateCodeForHashtag, getStateByCode, getMunicipalityLabel, extractMunicipalityFromContent } from '@/lib/venezuelaTerritorial';
 import { getActiveTrackedCodes, getCoveredStates } from '@/lib/territorialCoverage';
 import type {
@@ -115,6 +116,8 @@ export function useEventDashboard({ enabled, territorialLevel }: UseEventDashboa
 
   const { regionFeeds, globalPosts, isLoading, isBackfilling, error } =
     useMultiHashtagFeed(config.regions, config.since, { enabled });
+
+  const { globalCount, stateCounts } = useDashboardCounts(config.regions, config.since, { enabled });
 
   // Clock tick (10s) so time-relative KPIs recompute even when data is unchanged.
   const [now, setNow] = useState(() => Math.floor(Date.now() / 1000));
@@ -240,6 +243,40 @@ export function useEventDashboard({ enabled, territorialLevel }: UseEventDashboa
     return [...muniFeeds, ...customFeeds];
   }, [regionFeeds, regionById, territorialLevel]);
 
+  // Helper: apply relay COUNT as a stable floor for state-level counts.
+  // Used only in leaderboard/distribution, NOT in participants.
+  const getStableCount = useCallback((feed: AggregatedFeed): number =>
+    territorialLevel === 'states'
+      ? Math.max(feed.count, stateCounts?.get(feed.code) ?? 0)
+      : feed.count,
+  [territorialLevel, stateCounts]);
+
+  // Count posts attributed to municipalities via content-scan fallback only.
+  // These posts have the state-level t-tag but lack a municipality t-tag.
+  // Deduplicated by event ID since the same post can appear in multiple feeds.
+  const legacyDetected = useMemo(() => {
+    const legacyIds = new Set<string>();
+    for (const feed of regionFeeds) {
+      const region = regionById.get(feed.regionId);
+      if (region?.type !== 'state') continue;
+      const stateCode = region.code || region.hashtags[0] || '';
+      for (const post of feed.posts) {
+        if (legacyIds.has(post.id)) continue;
+        // Check if post already has a municipality t-tag
+        const hasMuniTag = post.tags.some(
+          ([name, value]) => name === 't' && getMunicipalityLabel(value) !== undefined,
+        );
+        if (hasMuniTag) continue;
+        // Check if content-scan would resolve a municipality
+        const candidate = extractMunicipalityFromContent(post.content);
+        if (candidate && candidate.slice(0, 2) === stateCode) {
+          legacyIds.add(post.id);
+        }
+      }
+    }
+    return legacyIds.size;
+  }, [regionFeeds, regionById]);
+
   // Derive KPIs
   const kpis = useMemo<DashboardKpis>(() => {
     const viewPostMap = new Map<string, NostrEvent>();
@@ -256,7 +293,7 @@ export function useEventDashboard({ enabled, territorialLevel }: UseEventDashboa
     const activeCodes = getActiveTrackedCodes(config);
 
     return {
-      totalPosts: viewPosts.length,
+      totalPosts: globalCount ?? viewPosts.length,
       activeRegions: displayFeeds.filter((f) => f.posts[0]?.created_at > thirtySecondsAgo).length,
       trackedCount: territorialLevel === 'states'
         ? getCoveredStates(activeCodes).length
@@ -264,22 +301,27 @@ export function useEventDashboard({ enabled, territorialLevel }: UseEventDashboa
       allCodesTracked: activeCodes.size,
       last5min: viewPosts.filter((p) => p.created_at > fiveMinutesAgo).length,
       uniquePosters: new Set(viewPosts.map((p) => p.pubkey)).size,
+      legacyDetected,
     };
-  }, [displayFeeds, config, territorialLevel, now]);
+  }, [displayFeeds, config, territorialLevel, now, globalCount, legacyDetected]);
 
   // Time series
   const timeSeries = useMemo(() => buildTimeSeries(regionFeeds), [regionFeeds]);
 
-  // Leaderboard (top 5)
+  // Leaderboard (top 5) — uses stable COUNT floor for state-level
   const leaderboard = useMemo<LeaderboardEntry[]>(() => {
     return [...displayFeeds]
-      .sort((a, b) => b.count - a.count)
+      .map((feed) => ({ ...feed, stableCount: getStableCount(feed) }))
+      .sort((a, b) => b.stableCount - a.stableCount)
       .slice(0, 5)
-      .map((feed, i) => ({ rank: i + 1, regionId: feed.regionId, label: feed.label, count: feed.count }));
-  }, [displayFeeds]);
+      .map((feed, i) => ({ rank: i + 1, regionId: feed.regionId, label: feed.label, count: feed.stableCount }));
+  }, [displayFeeds, getStableCount]);
 
-  // Distribution donut
-  const distribution = useMemo(() => buildDistribution(displayFeeds), [displayFeeds]);
+  // Distribution donut — uses stable COUNT floor for state-level
+  const distribution = useMemo(() => {
+    const stableFeeds = displayFeeds.map((feed) => ({ ...feed, count: getStableCount(feed) }));
+    return buildDistribution(stableFeeds);
+  }, [displayFeeds, getStableCount]);
 
   // Participants (full sorted list)
   const participants = useMemo<ParticipantRow[]>(() => {
