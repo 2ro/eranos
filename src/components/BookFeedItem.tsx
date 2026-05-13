@@ -18,12 +18,12 @@ import { ZapDialog } from '@/components/ZapDialog';
 import { useAuthor } from '@/hooks/useAuthor';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useEventStats } from '@/hooks/useTrending';
+import { useUserZap } from '@/hooks/useUserZap';
 import { useProfileUrl } from '@/hooks/useProfileUrl';
 import { useOpenPost } from '@/hooks/useOpenPost';
 import { useBookSummary } from '@/hooks/useBookSummary';
 import { getDisplayName } from '@/lib/getDisplayName';
 import { timeAgo } from '@/lib/timeAgo';
-import { canZap } from '@/lib/canZap';
 import { formatNumber } from '@/lib/formatNumber';
 import { cn } from '@/lib/utils';
 import { BOOKSTR_KINDS, extractISBNFromEvent, parseBookReview, ratingToStars } from '@/lib/bookstr';
@@ -58,7 +58,8 @@ export function BookFeedItem({ event, className }: BookFeedItemProps) {
   const [moreMenuOpen, setMoreMenuOpen] = useState(false);
   const [replyOpen, setReplyOpen] = useState(false);
 
-  const canZapAuthor = user && canZap(metadata);
+  const canZapAuthor = !!user && user.pubkey !== event.pubkey;
+  const isZapped = useUserZap(canZapAuthor ? event.id : undefined) === true;
 
   const isbn = useMemo(() => extractISBNFromEvent(event), [event]);
   const isReview = event.kind === BOOKSTR_KINDS.BOOK_REVIEW;
@@ -251,10 +252,15 @@ export function BookFeedItem({ event, className }: BookFeedItemProps) {
             {canZapAuthor && (
               <ZapDialog target={event}>
                 <button
-                  className="flex items-center gap-1.5 p-2 rounded-full text-muted-foreground hover:text-amber-500 hover:bg-amber-500/10 transition-colors"
-                  title="Zap"
+                  className={cn(
+                    'flex items-center gap-1.5 p-2 rounded-full transition-colors',
+                    isZapped
+                      ? 'text-amber-500 hover:text-amber-500/80 hover:bg-amber-500/10'
+                      : 'text-muted-foreground hover:text-amber-500 hover:bg-amber-500/10',
+                  )}
+                  title={isZapped ? 'Zapped' : 'Zap'}
                 >
-                  <Zap className="size-5" />
+                  <Zap className="size-5" fill={isZapped ? 'currentColor' : 'none'} />
                   {stats?.zapAmount ? <span className="text-sm tabular-nums">{formatNumber(stats.zapAmount)}</span> : null}
                 </button>
               </ZapDialog>

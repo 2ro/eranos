@@ -45,10 +45,18 @@ export interface FeedSettings {
   feedIncludeReposts: boolean;
   /** Include generic reposts (kind 16) in the feed */
   feedIncludeGenericReposts: boolean;
+  /** Include reactions (kind 7) in the feed, rendered as "X reacted to" overlays on the target event. Default: false. */
+  feedIncludeReactions: boolean;
+  /** Include zaps (Lightning kind 9735 + on-chain kind 8333) in the feed, rendered as "X zapped" overlays on the target event. Default: false. */
+  feedIncludeZaps: boolean;
   /** Include long-form articles (kind 30023) in the feed */
   feedIncludeArticles: boolean;
   /** Show Articles (kind 30023) link in sidebar */
   showArticles: boolean;
+  /** Show Highlights (kind 9802) link in sidebar */
+  showHighlights: boolean;
+  /** Include NIP-84 Highlights (kind 9802) in the follows/global feed */
+  feedIncludeHighlights: boolean;
   /** Show Events (kind 31922/31923) link in sidebar */
   showEvents: boolean;
   /** Include calendar events in the follows/global feed */
@@ -65,8 +73,8 @@ export interface FeedSettings {
   showTreasureFoundLogs: boolean;
   /** Show Colors (kind 3367) link in sidebar */
   showColors: boolean;
-  /** Show Follow Packs (kind 39089) link in sidebar */
-  showPacks: boolean;
+  /** Show People Lists (kind 39089 follow packs, kind 30000 people sets) link in sidebar */
+  showPeopleLists: boolean;
   /** Include Vines in the follows/global feed */
   feedIncludeVines: boolean;
   /** Include Polls in the follows/global feed */
@@ -77,8 +85,8 @@ export interface FeedSettings {
   feedIncludeTreasureFoundLogs: boolean;
   /** Include Colors in the follows/global feed */
   feedIncludeColors: boolean;
-  /** Include Follow Packs in the follows/global feed */
-  feedIncludePacks: boolean;
+  /** Include People Lists (kind 3 follow lists, kind 30000 people sets, kind 39089 follow packs) in the follows/global feed */
+  feedIncludePeopleLists: boolean;
   /** Show Magic Decks (kind 37381) link in sidebar */
   showDecks: boolean;
   /** Include Magic Decks in the follows/global feed */
@@ -133,12 +141,24 @@ export interface FeedSettings {
   showBadgeDefinitions: boolean;
   /** Show profile badges (kind 10008/30008) on the Badges page */
   showProfileBadges: boolean;
+  /** Show badge awards (kind 8) on the Badges page */
+  showBadgeAwards: boolean;
   /** Include badge definitions (kind 30009) in the follows/global feed */
   feedIncludeBadgeDefinitions: boolean;
   /** Include profile badges (kind 10008/30008) in the follows/global feed */
   feedIncludeProfileBadges: boolean;
+  /** Include badge awards (kind 8) in the follows/global feed */
+  feedIncludeBadgeAwards: boolean;
   /** Include Request to Vanish events (kind 62) in the follows/global feed */
   feedIncludeVanish: boolean;
+  /** Show Birdstar (kind 2473 bird detections + kind 30621 custom constellations) link in sidebar */
+  showBirdstar: boolean;
+  /** Include bird detections (kind 2473) in the follows/global feed */
+  feedIncludeBirdDetections: boolean;
+  /** Include Birdex life lists (kind 12473) in the follows/global feed */
+  feedIncludeBirdex: boolean;
+  /** Include custom constellations (kind 30621) in the follows/global feed */
+  feedIncludeConstellations: boolean;
   /** Include replies in the follows feed (default: true) */
   followsFeedShowReplies: boolean;
 }
@@ -173,6 +193,14 @@ export interface AppConfig {
   appName: string;
   /** Application identifier used as a prefix for application-specific metadata (NIP-78 d-tags, etc). Default: "agora". */
   appId: string;
+  /**
+   * Canonical origin used when generating shareable URLs (QR codes, copy-link,
+   * remote-login callbacks, etc). Falls back to `window.location.origin` when
+   * unset. Configure this in `ditto.json` for native builds, where
+   * `window.location.origin` is `capacitor://localhost` or `https://localhost`.
+   * Must NOT include a trailing slash.
+   */
+  shareOrigin?: string;
   /** Sidebar item ID to display on the homepage ("/"). Default: "feed". */
   homePage: string;
   /** Display name used in the NIP-89 "client" tag. Falls back to `appName` when not set. */
@@ -191,6 +219,13 @@ export interface AppConfig {
   relayMetadata: RelayMetadata;
   /** Whether to use app default relays in addition to user relays */
   useAppRelays: boolean;
+  /**
+   * Whether to include the user's personal NIP-65 relay list in the effective relay set.
+   * Defaults to `false` — users must opt-in via Settings → Network to actually connect
+   * to their own relays. Until enabled, only the app-default relays are used (assuming
+   * `useAppRelays` is true).
+   */
+  useUserRelays: boolean;
   /** Feed and sidebar content settings */
   feedSettings: FeedSettings;
   /** Ordered list of sidebar item IDs (built-in + extra-kind). */
@@ -226,12 +261,21 @@ export interface AppConfig {
   plausibleEndpoint: string;
   /** Saved home feed tabs. Cached locally so they appear instantly on load. */
   savedFeeds: SavedFeed[];
+  /** Autoplay videos in feeds and previews (muted). Default: false. */
+  autoplayVideos: boolean;
   /** Image upload quality: "compressed" resizes/optimizes, "original" uploads as-is. Default: "compressed". */
   imageQuality: 'compressed' | 'original';
   /** Hex pubkey of the curator whose follow list defines the curated feed. */
   curatorPubkey?: string;
   /** Wildcard domain used for iframe sandboxing (e.g. "iframe.diy"). Default: "iframe.diy". */
   sandboxDomain: string;
+  /**
+   * Base URL for the Esplora-compatible Bitcoin REST API. Used by the wallet,
+   * on-chain zap flows, and NIP-73 Bitcoin tx/address pages. The standard
+   * Esplora REST root (no version segment). The mempool.space `/v1/prices`
+   * extension is appended by the price call. Default: "https://mempool.space/api".
+   */
+  esploraBaseUrl: string;
   /** Ordered list of right sidebar widget configs. Each entry is a widget type ID with optional display settings. */
   sidebarWidgets: WidgetConfig[];
   /** Direct messaging integration settings. */

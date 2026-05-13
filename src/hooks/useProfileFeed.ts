@@ -2,7 +2,7 @@ import { useNostr } from '@nostrify/react';
 import { useInfiniteQuery, useQueryClient } from '@tanstack/react-query';
 import { useFeedSettings } from './useFeedSettings';
 import { getEnabledFeedKinds } from '@/lib/extraKinds';
-import { getPaginationCursor, parseRepostContent, isRepostKind, type FeedItem } from '@/lib/feedUtils';
+import { getPaginationCursor, parseRepostContent, isRepostKind, shouldHideFeedEvent, type FeedItem } from '@/lib/feedUtils';
 import { isReplyEvent } from '@/lib/nostrEvents';
 import type { NostrEvent, NostrFilter } from '@nostrify/nostrify';
 
@@ -133,17 +133,23 @@ export function useProfileFeed(pubkey: string | undefined, activeTab: ProfileTab
       const validEvents = events.filter((ev) => ev.created_at <= now);
       const oldestQueryTimestamp = getPaginationCursor(validEvents);
 
+      // Drop events the feed layer wants hidden (deprecated kind 30000 follow sets,
+      // unlisted decks, hidden treasures, empty emoji packs). NoteCard would return
+      // null anyway, but filtering here avoids wasted mounts and keeps the profile
+      // feed consistent with the home feed (Feed.tsx uses the same helper).
+      const visibleEvents = validEvents.filter((ev) => !shouldHideFeedEvent(ev));
+
       // Process events into FeedItems, unwrapping kind 6/16 reposts
       const items: FeedItem[] = [];
       const repostMissingIds: string[] = [];
       const repostMap = new Map<string, NostrEvent>();
 
-      for (const ev of validEvents) {
+      for (const ev of visibleEvents) {
         if (isRepostKind(ev.kind)) {
           // Handle reposts (kind 6 for notes, kind 16 for generic)
           const embedded = parseRepostContent(ev);
           if (embedded && embedded.created_at <= now) {
-            items.push({ event: embedded, repostedBy: ev.pubkey, sortTimestamp: ev.created_at });
+            items.push({ event: embedded, repostedBy: ev.pubkey, repostEvent: ev, sortTimestamp: ev.created_at });
           } else {
             const repostedId = ev.tags.find(([name]) => name === 'e')?.[1];
             if (repostedId) {
@@ -167,7 +173,7 @@ export function useProfileFeed(pubkey: string | undefined, activeTab: ProfileTab
           for (const original of originals) {
             const repost = repostMap.get(original.id);
             if (repost && original.created_at <= now) {
-              items.push({ event: original, repostedBy: repost.pubkey, sortTimestamp: repost.created_at });
+              items.push({ event: original, repostedBy: repost.pubkey, repostEvent: repost, sortTimestamp: repost.created_at });
             }
           }
         } catch {
@@ -354,7 +360,7 @@ export function useTabFeed(
         if (isRepostKind(ev.kind)) {
           const embedded = parseRepostContent(ev);
           if (embedded && embedded.created_at <= now) {
-            items.push({ event: embedded, repostedBy: ev.pubkey, sortTimestamp: ev.created_at });
+            items.push({ event: embedded, repostedBy: ev.pubkey, repostEvent: ev, sortTimestamp: ev.created_at });
           } else {
             const repostedId = ev.tags.find(([name]) => name === 'e')?.[1];
             if (repostedId) {
@@ -376,7 +382,7 @@ export function useTabFeed(
           for (const original of originals) {
             const repost = repostMap.get(original.id);
             if (repost && original.created_at <= now) {
-              items.push({ event: original, repostedBy: repost.pubkey, sortTimestamp: repost.created_at });
+              items.push({ event: original, repostedBy: repost.pubkey, repostEvent: repost, sortTimestamp: repost.created_at });
             }
           }
         } catch {

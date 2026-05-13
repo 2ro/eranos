@@ -87,6 +87,8 @@ Prepend a new section to `CHANGELOG.md` directly below the `# Changelog` heading
 ```markdown
 ## [X.Y.Z] - YYYY-MM-DD
 
+A short single-paragraph summary of this release written in plain prose -- max 500 characters. This appears on the App Store, Google Play, and the in-app "what's new" toast.
+
 ### Added
 - Description of new features
 
@@ -100,7 +102,100 @@ Prepend a new section to `CHANGELOG.md` directly below the `# Changelog` heading
 - Description of removed features
 ```
 
-**Rules:**
+#### The Summary Paragraph
+
+Every release section MUST start with a single plaintext paragraph (not a bullet, not a heading) that summarises the release for app-store-style audiences:
+
+- **Single paragraph, plain prose.** No bullets, no headings, no Markdown formatting beyond plain text.
+- **Max ~500 characters.** Apple App Store and Google Play both cap "What's new" text at 500. The CI `release-notes` job warns when the summary is longer.
+- **Audience: end users discovering the update.** Describe the most noticeable user-visible changes; omit internal cleanups even if they're in the bullets below.
+- **Tone matches the bullets.** Present-tense, no Nostr jargon, no NIP/kind numbers (see Rules below).
+- **Maintenance releases** -- write a one-sentence summary like `A behind-the-scenes maintenance release with no user-facing changes.` Don't leave it blank; the CI fallback `Ditto vX.Y.Z` is a last resort for legacy entries, not new ones.
+
+The same paragraph is used in three places automatically:
+- **App Store** -- "What's New in This Version" via fastlane `deliver`
+- **Google Play** -- "What's new in this version" via fastlane `supply` `metadata/android/<lang>/changelogs/<versionCode>.txt`
+- **In-app toast** -- the `What's new in vX.Y.Z` toast that fires when users load a new version (see `src/components/VersionCheck.tsx`)
+- The full section (summary + lists) goes into the GitLab Release description.
+
+Extraction is handled by `scripts/extract-release-notes.mjs`; you don't have to write store-specific copy.
+
+#### Changelog Quality Checklist
+
+Before drafting any entries, run through this checklist. It is NOT optional -- skipping steps here is the most common way a release goes out with misleading notes.
+
+##### 5.1. Diff the code, not just the commit log
+
+Commit messages describe intent at the moment of commit; they over- and under-represent the cumulative effect at release time. Before drafting entries, **run a real diff** for each area of substantial change:
+
+```bash
+# Full diff between tags
+git diff v<prev>..HEAD
+
+# Or narrowed to an area you're unsure about
+git diff v<prev>..HEAD -- src/components/ComposeBox.tsx
+```
+
+Only the diff reveals intra-release churn (commits that cancel each other out, bugs introduced and then fixed, refactors that land and get reverted). Reading commit messages alone is insufficient.
+
+##### 5.2. Trace every candidate "Fixed" entry to its origin commit
+
+For each bug fix you're considering listing, find the commit that introduced the bug.
+
+**Fast path -- check for `Regression-of:` trailers** (see AGENTS.md "Attributing Regressions"). If the fix commit declares its origin in a trailer, you don't need to hunt:
+
+```bash
+# List all commits in the release window with their Regression-of trailers (if any)
+git log v<prev>..HEAD --no-merges \
+  --format='%h %s%n  Regression-of: %(trailers:key=Regression-of,valueonly,separator=%x20)'
+```
+
+For each `Regression-of: <sha>` entry, check whether `<sha>` is also in the release window:
+
+```bash
+# Returns 0 if <sha> is BEFORE v<prev> (pre-existing bug -> legit "Fixed" entry)
+# Returns non-zero if <sha> is AFTER v<prev> (intra-release -> omit from "Fixed")
+git merge-base --is-ancestor <sha> v<prev>
+```
+
+**Fallback -- manual tracing** (when no trailer is present):
+
+```bash
+# Show the history of a file across all commits
+git log --oneline v<prev>..HEAD -- path/to/file.tsx
+
+# Or blame the specific lines the fix touched
+git blame -L <start>,<end> -- path/to/file.tsx
+```
+
+**If the introducing commit is also in this release window (i.e. after the previous tag), the bug is intra-release.** The user on the previous version never experienced it. Do NOT list it as a "Fixed" entry. Fold it into the relevant "Added" or "Changed" entry, or omit it entirely.
+
+##### 5.3. The "Would a user on the previous version notice this?" test
+
+The changelog describes the delta between the previous release and this one **from the user's perspective** -- not the development history. Before writing each entry, ask:
+
+> "Did a user on the previous published version experience this exact thing?"
+
+- If they experienced a broken state that is now fixed: **"Fixed" entry**
+- If they experienced the old behavior and now see new behavior: **"Changed" or "Added" entry**
+- If they never saw either state (introduced AND resolved within this release window): **omit entirely**
+
+This applies to more than just bugs:
+- A feature added and then reverted in the same release: omit both
+- A refactor that was done and then undone: omit both
+- A performance regression introduced and then fixed: omit both
+- A typo introduced in a new string and then corrected: mention the new string (if user-facing) as a single "Added"/"Changed" entry, with no "Fixed" entry
+
+##### 5.4. Worked example -- intra-release bug
+
+> **Scenario:** Commit A overhauls the compose box and, as a side effect, breaks the background of the expanded emoji picker. Commit B, later in the same release window, restores the background.
+>
+> **Correct changelog:** One "Added" entry describing the compose box overhaul. The emoji picker background is part of the finished state the user receives.
+>
+> **Incorrect changelog:** An "Added" entry for the overhaul AND a "Fixed" entry for the emoji picker background. The user on the previous version never saw the broken background; listing it invents a problem they didn't have and makes the release notes read like a developer changelog.
+
+#### Rules
+
 - Only include categories that have entries (omit empty categories)
 - Write **user-facing descriptions**, not raw commit messages
 - Keep descriptions concise -- one line per change
@@ -109,9 +204,9 @@ Prepend a new section to `CHANGELOG.md` directly below the `# Changelog` heading
 - Focus on what the user sees/experiences, not internal implementation details
 - Use the current date in YYYY-MM-DD format
 - **Never use Nostr protocol jargon.** NIP numbers (e.g., "NIP-89", "NIP-17"), kind numbers (e.g., "kind 30078"), and other protocol-level references must not appear in the changelog. Describe the feature in plain language from the user's perspective. For example, write "App cards for Nostr apps" instead of "App cards for Nostr apps (NIP-89)". The changelog audience is end users, not protocol developers.
-- **Collapse related work into one entry.** If a feature was added and then fixed/tweaked across multiple commits in the same release, present the finished result as a single "Added" entry. Never list something as "Added" and then also list fixes for that same thing -- the user sees the end product, not the development history.
+- **Only ship what the user sees.** If a bug was introduced AND fixed within this release, the user never saw it -- omit the fix entirely (or fold the net result into the relevant Added/Changed entry). The same applies to features that were added and reverted, refactors that cancel out, and any other intra-release churn. See the Changelog Quality Checklist above (especially 5.2 and 5.3) for the procedure to verify this.
+- **Collapse related work into one entry.** If a feature was added and then tweaked across multiple commits in the same release, present the finished result as a single "Added" entry. Never list something as "Added" and then also list fixes for that same thing -- the user sees the end product, not the development history.
 - **Omit purely internal changes.** CI fixes, build pipeline tweaks, developer tooling, and infrastructure changes should be omitted from the changelog entirely unless they have a direct, visible impact on the user experience. The changelog is for users, not developers.
-- **Compare the actual code between versions** to understand what really changed, rather than just reading commit messages. Commit messages may over- or under-represent the significance of changes.
 
 ### Step 6: Update Version in All Files
 
@@ -190,8 +285,12 @@ git push origin main vX.Y.Z
 
 This triggers the GitLab CI pipeline which will:
 1. Build a signed Android APK and AAB
-2. Create a GitLab Release with download links
-3. Publish the APK to Zapstore
+2. Build a signed iOS IPA on the self-hosted Mac runner
+3. Extract release notes (full body + summary paragraph) from `CHANGELOG.md`
+4. Create a GitLab Release with APK / AAB / IPA download links
+5. Publish the APK to Zapstore
+6. Publish the AAB to Google Play (production track) with the summary as the "What's new" text
+7. Submit the iOS IPA to App Store Connect for review with the summary as the "What's New" text
 
 ### Step 12: Confirm
 
@@ -212,11 +311,15 @@ After pushing, inform the user:
 
 ## CI Pipeline
 
-The CI pipeline (`.gitlab-ci.yml`) is triggered by tags matching the pattern `/^v\d+\.\d+\.\d+$/` (e.g., `v2.1.0`). It runs three jobs:
+The CI pipeline (`.gitlab-ci.yml`) is triggered by tags matching the pattern `/^v\d+\.\d+\.\d+$/` (e.g., `v2.1.0`). It runs seven jobs:
 
 1. **build-apk**: Builds signed Android APK and AAB, stamps `versionName` and `versionCode` into the build
-2. **release**: Creates a GitLab Release with the changelog content and download links
-3. **publish-zapstore**: Publishes the APK to Zapstore
+2. **build-ipa**: Builds the signed App Store IPA on the self-hosted Mac runner (`tags: [macos]`); stamps `MARKETING_VERSION` and `CFBundleVersion` into the Xcode project. The IPA is uploaded to GitLab's Generic Packages registry and exposed as a CI artifact for downstream jobs
+3. **release-notes**: Extracts the version's changelog section and summary paragraph from `CHANGELOG.md` into two artifacts (`release-notes.md` and `release-notes-summary.txt`) consumed by `release`, `publish-app-store`, and `publish-google-play`
+4. **release**: Creates a GitLab Release with the full changelog section and APK / AAB / IPA download links
+5. **publish-zapstore**: Publishes the APK to Zapstore
+6. **publish-google-play**: Uploads the AAB to Google Play production track and writes the release summary to `metadata/android/en-US/changelogs/<versionCode>.txt`
+7. **publish-app-store**: Submits the prebuilt IPA to App Store Connect for review with the release summary as the "What's New" text. Runs on the self-hosted Mac runner (`tags: [macos]`) because `fastlane deliver` shells out to Apple's iTMSTransporter to upload the IPA, and that tool only ships inside Xcode — the previous Linux runner crashed at the upload step with `No such file or directory @ dir_chdir0` because `Helper.itms_path` resolved to a missing Xcode path. The build appears in App Store Connect within ~30 minutes; Apple's human review then takes 24-48 hours typically. Once approved, you must release manually in App Store Connect (`automatic_release: false`) — this is the final human gate. For runner operations, match cert rotation, and debugging, load the **`mac-runner`** skill.
 
 ## Troubleshooting
 

@@ -144,8 +144,12 @@ export const FeedSettingsSchema = z.looseObject({
   feedIncludeComments: z.boolean().optional(),
   feedIncludeReposts: z.boolean().optional(),
   feedIncludeGenericReposts: z.boolean().optional(),
+  feedIncludeReactions: z.boolean().optional(),
+  feedIncludeZaps: z.boolean().optional(),
   feedIncludeArticles: z.boolean().optional(),
   showArticles: z.boolean().optional(),
+  showHighlights: z.boolean().optional(),
+  feedIncludeHighlights: z.boolean().optional(),
   showEvents: z.boolean().optional(),
   feedIncludeEvents: z.boolean().optional(),
   showVines: z.boolean().optional(),
@@ -154,14 +158,14 @@ export const FeedSettingsSchema = z.looseObject({
   showTreasureGeocaches: z.boolean().optional(),
   showTreasureFoundLogs: z.boolean().optional(),
   showColors: z.boolean().optional(),
-  showPacks: z.boolean().optional(),
+  showPeopleLists: z.boolean().optional(),
   showStreams: z.boolean().optional(),
   feedIncludeVines: z.boolean().optional(),
   feedIncludePolls: z.boolean().optional(),
   feedIncludeTreasureGeocaches: z.boolean().optional(),
   feedIncludeTreasureFoundLogs: z.boolean().optional(),
   feedIncludeColors: z.boolean().optional(),
-  feedIncludePacks: z.boolean().optional(),
+  feedIncludePeopleLists: z.boolean().optional(),
   feedIncludeStreams: z.boolean().optional(),
   showDecks: z.boolean().optional(),
   feedIncludeDecks: z.boolean().optional(),
@@ -182,6 +186,12 @@ export const FeedSettingsSchema = z.looseObject({
   feedIncludeDevelopment: z.boolean().optional(),
   showCommunities: z.boolean().optional(),
   feedIncludeCommunities: z.boolean().optional(),
+  showBadgeAwards: z.boolean().optional(),
+  feedIncludeBadgeAwards: z.boolean().optional(),
+  showBirdstar: z.boolean().optional(),
+  feedIncludeBirdDetections: z.boolean().optional(),
+  feedIncludeBirdex: z.boolean().optional(),
+  feedIncludeConstellations: z.boolean().optional(),
 });
 
 /** Schema for a NIP-01 filter object (lenient — allows variable placeholder strings). */
@@ -213,6 +223,7 @@ export const SavedFeedSchema = z.object({
 export const AppConfigSchema = z.object({
   appName: z.string().optional(),
   appId: z.string().optional(),
+  shareOrigin: z.string().url().optional(),
   homePage: z.string().optional(),
   clientName: z.string().optional(),
   /** NIP-19 naddr1 string for the kind 31990 handler event. */
@@ -223,6 +234,7 @@ export const AppConfigSchema = z.object({
   themes: ThemesConfigSchema.optional(),
   relayMetadata: RelayMetadataSchema,
   useAppRelays: z.boolean(),
+  useUserRelays: z.boolean(),
   feedSettings: FeedSettingsSchema,
   sidebarOrder: z.array(z.string()),
   nip85StatsPubkey: z.string().refine(
@@ -247,9 +259,11 @@ export const AppConfigSchema = z.object({
       return result.success ? [result.data] : [];
     })
   ).optional().default([]),
+  autoplayVideos: z.boolean(),
   imageQuality: z.enum(['compressed', 'original']),
   curatorPubkey: z.string().regex(/^[0-9a-f]{64}$/i).optional(),
   sandboxDomain: z.string().optional(),
+  esploraBaseUrl: z.string().url(),
   sidebarWidgets: z.array(z.object({
     id: z.string(),
     height: z.number().optional(),
@@ -319,6 +333,7 @@ export const EncryptedSettingsSchema = z.looseObject({
   theme: ThemeSchema.optional(),
   customTheme: ThemeConfigCompatSchema.optional(),
   useAppRelays: z.boolean().optional(),
+  useUserRelays: z.boolean().optional(),
   feedSettings: FeedSettingsSchema.optional(),
   contentFilters: z.array(ContentFilterSchema).optional(),
   contentWarningPolicy: ContentWarningPolicySchema.optional(),
@@ -360,6 +375,7 @@ export const EncryptedSettingsSchema = z.looseObject({
     userCount: z.number(),
     nip05: z.record(z.string(), z.unknown()),
   }).optional(),
+  autoplayVideos: z.boolean().optional(),
   corsProxy: z.string().optional(),
   faviconUrl: z.string().optional(),
   linkPreviewUrl: z.string().optional(),

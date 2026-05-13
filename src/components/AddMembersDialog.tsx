@@ -65,7 +65,7 @@ export function AddMembersDialog({ open, onOpenChange, listId, listPubkeys }: Ad
     try {
       await addToList.mutateAsync({ listId, pubkey: profile.pubkey });
       setAddedPubkeys((prev) => new Set(prev).add(profile.pubkey));
-      const name = profile.metadata.display_name || profile.metadata.name || genUserName(profile.pubkey);
+              const name = profile.metadata.name || profile.metadata.display_name || genUserName(profile.pubkey);
       toast({ title: `Added ${name} to list` });
     } catch {
       toast({ title: 'Failed to add member', variant: 'destructive' });
@@ -141,7 +141,7 @@ export function AddMembersDialog({ open, onOpenChange, listId, listPubkeys }: Ad
             </div>
           ) : (
             filteredResults.map((profile, idx) => {
-              const name = profile.metadata.display_name || profile.metadata.name || genUserName(profile.pubkey);
+      const name = profile.metadata.name || profile.metadata.display_name || genUserName(profile.pubkey);
               const isAdding = addingPubkeys.has(profile.pubkey);
               const isAdded = addedPubkeys.has(profile.pubkey);
               const isSelected = idx === selectedIdx;

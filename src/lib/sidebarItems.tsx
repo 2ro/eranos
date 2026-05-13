@@ -1,8 +1,11 @@
 import {
   Award,
   BadgeCheck,
-  BookOpen,
   Bell,
+  Bird,
+  Blocks,
+  BookMarked,
+  BookOpen,
   Bookmark,
   CalendarDays,
   Camera,
@@ -11,6 +14,7 @@ import {
   Earth,
   Film,
   HelpCircle,
+  Highlighter,
   LifeBuoy,
   List,
   MessageSquare,
@@ -28,6 +32,7 @@ import {
   Settings,
   Smile,
   SmilePlus,
+  Stars,
   User,
   Users,
   Vote,
@@ -53,6 +58,16 @@ export function isSidebarDivider(id: string): boolean {
 /** Returns true if the given sidebar order ID is a `nostr:` URI. */
 export function isNostrUri(id: string): boolean {
   return id.startsWith("nostr:");
+}
+
+/** Returns true if the given sidebar order ID is an `nsite://` URI. */
+export function isNsiteUri(id: string): boolean {
+  return id.startsWith("nsite://");
+}
+
+/** Extracts the nsite subdomain from an `nsite://` URI. */
+export function nsiteUriToSubdomain(uri: string): string {
+  return uri.slice("nsite://".length);
 }
 
 /** Extracts the NIP-19 bech32 identifier from a `nostr:` URI. Returns the raw string if not a nostr: URI. */
@@ -155,8 +170,21 @@ export const SIDEBAR_ITEMS: SidebarItemDef[] = [
   { id: "actions", label: "Actions", path: "/actions", icon: Zap },
   { id: "events", label: "Events", path: "/events", icon: CalendarDays },
   { id: "photos", label: "Photos", path: "/photos", icon: Camera },
+  { id: "videos", label: "Videos", path: "/videos", icon: Film },
   { id: "articles", label: "Articles", path: "/articles", icon: Newspaper },
+  { id: "highlights", label: "Highlights", path: "/highlights", icon: Highlighter },
+  { id: "books", label: "Books", path: "/books", icon: BookMarked },
+  { id: "vines", label: "Divines", path: "/vines", icon: Clapperboard },
+  { id: "music", label: "Music", path: "/music", icon: Music },
+  { id: "podcasts", label: "Podcasts", path: "/podcasts", icon: Podcast },
+  { id: "webxdc", label: "Webxdc", path: "/webxdc", icon: Blocks },
   { id: "polls", label: "Polls", path: "/polls", icon: Vote },
+  { id: "packs", label: "Follow Packs", path: "/packs", icon: PartyPopper },
+  { id: "colors", label: "Color Moments", path: "/colors", icon: Palette },
+  { id: "decks", label: "Magic Decks", path: "/decks", icon: CardsIcon },
+  { id: "treasures", label: "Treasures", path: "/treasures", icon: ChestIcon },
+  { id: "emojis", label: "Emojis", path: "/emojis", icon: SmilePlus },
+  { id: "development", label: "Development", path: "/development", icon: Code },
   { id: "badges", label: "Badges", path: "/badges", icon: Award },
   { id: "communities", label: "Communities", path: "/communities", icon: Users },
   { id: "world", label: "World", path: "/world", icon: Earth },
@@ -177,9 +205,13 @@ export const CONTENT_KIND_ICONS: Record<string, IconComponent> = {
   comments: MessageSquareMore,
   reposts: Repeat2,
   "generic-reposts": Repeat2,
+  reactions: SmilePlus,
+  zaps: Zap,
   voice: Mic,
   "custom-emojis": Smile,
   statuses: SmilePlus,
+  "bird-detections": Bird,
+  constellations: Stars,
   ...Object.fromEntries(
     SIDEBAR_ITEMS.filter((s) => s.icon).map((s) => [s.id, s.icon]),
   ),
@@ -279,6 +311,15 @@ export function isItemActive(
   if (isNostrUri(id)) {
     const nip19Id = nostrUriToNip19(id);
     return pathname === `/${nip19Id}`;
+  }
+
+  // Nsite URI items: active when the nsite preview is open for this subdomain.
+  // The pathname will be the naddr of the nsite event, which we can't cheaply
+  // derive here without async resolution. For now, nsite items are never
+  // highlighted as "active" via pathname — the visual indication comes from
+  // the nsite preview panel being open.
+  if (isNsiteUri(id)) {
+    return false;
   }
 
   // External content items: active when pathname matches /i/<encoded-value>

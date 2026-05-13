@@ -22,7 +22,7 @@ export function useZaps(
   target: Event,
   webln: WebLNProvider | null,
   _nwcConnection: NWCConnection | null,
-  onZapSuccess?: () => void
+  onZapSuccess?: (result: { amountSats: number }) => void
 ) {
   const { toast } = useToast();
   const { user } = useCurrentUser();
@@ -171,10 +171,9 @@ export function useZaps(
             setInvoice(null);
             notificationSuccess();
 
-            toast({
-              title: 'Zap successful!',
-              description: `You sent ${amount} sats via NWC to the author.`,
-            });
+            // Optimistically mark this event as zapped-by-me so the bolt
+            // icon fills instantly — relay echo of the 9735 receipt may lag.
+            queryClient.setQueryData(['user-zap', target.id], true);
 
             // Invalidate zap queries to refresh counts
             queryClient.invalidateQueries({ queryKey: ['zaps'] });
@@ -182,8 +181,16 @@ export function useZaps(
               queryClient.invalidateQueries({ queryKey: ['goal-progress', target.id] });
             }
 
-            // Close dialog last to ensure clean state
-            onZapSuccess?.();
+            if (onZapSuccess) {
+              // Consumer (e.g. ZapDialog) owns the success UI — skip the
+              // toast so we don't double up with their celebration screen.
+              onZapSuccess({ amountSats: amount });
+            } else {
+              toast({
+                title: 'Zap successful!',
+                description: `You sent ${amount} sats via NWC to the author.`,
+              });
+            }
             return;
           } catch (nwcError) {
             console.error('NWC payment failed, falling back:', nwcError);
@@ -219,10 +226,9 @@ export function useZaps(
             setInvoice(null);
             notificationSuccess();
 
-            toast({
-              title: 'Zap successful!',
-              description: `You sent ${amount} sats to the author.`,
-            });
+            // Optimistically mark this event as zapped-by-me so the bolt
+            // icon fills instantly — relay echo of the 9735 receipt may lag.
+            queryClient.setQueryData(['user-zap', target.id], true);
 
             // Invalidate zap queries to refresh counts
             queryClient.invalidateQueries({ queryKey: ['zaps'] });
@@ -230,8 +236,14 @@ export function useZaps(
               queryClient.invalidateQueries({ queryKey: ['goal-progress', target.id] });
             }
 
-            // Close dialog last to ensure clean state
-            onZapSuccess?.();
+            if (onZapSuccess) {
+              onZapSuccess({ amountSats: amount });
+            } else {
+              toast({
+                title: 'Zap successful!',
+                description: `You sent ${amount} sats to the author.`,
+              });
+            }
           } catch (weblnError) {
             console.error('WebLN payment failed, falling back:', weblnError);
 

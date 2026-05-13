@@ -314,16 +314,17 @@
 
 /* ── Wii Mail envelope grid ─────────────────────────────────────────────────── */
 
-/* Staggered entrance: envelopes pop in one by one */
+/* Staggered entrance: envelopes pop in one by one.
+   Keep the animation short and avoid large rotations so the tap target
+   doesn't shift while the user is already trying to interact. */
 @keyframes envelope-entrance {
-  0%   { opacity: 0; transform: scale(0.6) translateY(20px) rotate(-4deg); }
-  60%  { opacity: 1; transform: scale(1.05) translateY(-2px) rotate(1deg); }
-  80%  { transform: scale(0.97) translateY(1px) rotate(-0.5deg); }
-  100% { opacity: 1; transform: scale(1) translateY(0) rotate(0deg); }
+  0%   { opacity: 0; transform: scale(0.85) translateY(12px); }
+  70%  { opacity: 1; transform: scale(1.02) translateY(-1px); }
+  100% { opacity: 1; transform: scale(1) translateY(0); }
 }
 
 .envelope-card {
-  animation: envelope-entrance 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  animation: envelope-entrance 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) both;
   animation-delay: var(--entrance-delay, 0ms);
   transform-origin: center bottom;
   cursor: pointer;
@@ -344,13 +345,17 @@
   transition: transform 0.15s ease;
 }
 
-.envelope-card:hover .envelope-body,
-.envelope-card:focus-visible .envelope-body {
-  animation: envelope-wobble 0.5s ease-in-out;
+/* Wobble only on true pointer hover — skip on touch where :hover sticks
+   and the rotation shifts the tap target, making repeated taps miss. */
+@media (hover: hover) and (pointer: fine) {
+  .envelope-card:hover .envelope-body,
+  .envelope-card:focus-visible .envelope-body {
+    animation: envelope-wobble 0.5s ease-in-out;
+  }
 }
 
 .envelope-card:active .envelope-body {
-  transform: scale(0.92);
+  transform: scale(0.95);
   animation: none;
 }
 
@@ -623,5 +628,44 @@
 @keyframes room-arrow-nudge-right {
   0%, 100% { transform: translateX(0); }
   50% { transform: translateX(3px); }
+}
+
+/* ── Overstimulation block overlay ─────────────────────────────────────────── */
+
+@keyframes overstim-vignette-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes overstim-vignette-out {
+  from { opacity: 1; }
+  to   { opacity: 0; }
+}
+
+@keyframes overstim-shockwave {
+  0%   { transform: scale(0.1); opacity: 1; }
+  60%  { opacity: 0.6; }
+  100% { transform: scale(2.2); opacity: 0; }
+}
+
+@keyframes vomit-fall {
+  0%   { transform: translate(-50%, -100%) translate(0, 0) scale(1); opacity: 1; }
+  100% { transform: translate(-50%, -100%) translate(var(--vomit-dx), var(--vomit-dy)) scale(1); opacity: 1; }
+}
+
+/* Override global scrollbar-hiding for elements that need a visible thin scrollbar */
+.scrollbar-thin {
+  scrollbar-width: thin;
+}
+.scrollbar-thin::-webkit-scrollbar {
+  display: block;
+  height: 4px;
+}
+.scrollbar-thin::-webkit-scrollbar-thumb {
+  background: hsl(var(--muted-foreground) / 0.3);
+  border-radius: 9999px;
+}
+.scrollbar-thin::-webkit-scrollbar-track {
+  background: transparent;
 }
 

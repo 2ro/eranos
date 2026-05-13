@@ -1,11 +1,16 @@
 import { useNostr } from '@nostrify/react';
-import { NLogin, type NostrConnectParams, useNostrLogin } from '@nostrify/react/login';
+import {
+  NLogin,
+  type NostrConnectParams,
+  type NostrConnectStatus,
+  useNostrLogin,
+} from '@nostrify/react/login';
 import { useAppContext } from '@/hooks/useAppContext';
-import { DITTO_RELAY } from '@/lib/appRelays';
+import { APP_RELAYS } from '@/lib/appRelays';
 
 // NOTE: This file should not be edited except for adding new login methods.
 
-export type { NostrConnectParams };
+export type { NostrConnectParams, NostrConnectStatus };
 export { generateNostrConnectParams, generateNostrConnectURI } from '@nostrify/react/login';
 
 export function useLoginActions() {
@@ -30,9 +35,16 @@ export function useLoginActions() {
       addLogin(login);
     },
     // Login via nostrconnect:// (client-initiated NIP-46)
-    // The client displays a QR code and waits for the remote signer to connect
-    async nostrconnect(params: NostrConnectParams, signal?: AbortSignal): Promise<void> {
-      const login = await NLogin.fromNostrConnect(params, nostr, { signal });
+    // The client displays a QR code and waits for the remote signer to connect.
+    //
+    // `onStatus` is forwarded from @nostrify/react so the UI can render
+    // live progress through the handshake phases — see NostrConnectStatus.
+    async nostrconnect(
+      params: NostrConnectParams,
+      signal?: AbortSignal,
+      onStatus?: (status: NostrConnectStatus) => void,
+    ): Promise<void> {
+      const login = await NLogin.fromNostrConnect(params, nostr, { signal, onStatus });
       addLogin(login);
     },
     // Get the relay URLs for NIP-46 nostrconnect communication
@@ -40,8 +52,10 @@ export function useLoginActions() {
       const relays = config.relayMetadata.relays
         .filter((r) => r.write)
         .map((r) => r.url);
-      // Fall back to a sensible default if no write relays are configured
-      return relays.length > 0 ? relays : [DITTO_RELAY];
+      // Fall back to the app default relays if the user has none configured
+      return relays.length > 0
+        ? relays
+        : APP_RELAYS.relays.filter((r) => r.write).map((r) => r.url);
     },
     // Log out the current user
     async logout(): Promise<void> {

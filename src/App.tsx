@@ -1,12 +1,10 @@
 // NOTE: This file should normally not be modified unless you are adding a new provider.
 // To add new routes, edit the AppRouter.tsx file.
 
-import { Capacitor, SystemBars, SystemBarsStyle } from "@capacitor/core";
 import { NostrLoginProvider } from "@nostrify/react/login";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { InferSeoMetaPlugin } from "@unhead/addons";
 import { createHead, UnheadProvider } from "@unhead/react/client";
-import { useEffect } from "react";
 import { AppProvider } from "@/components/AppProvider";
 import { DMProviderWrapper } from "@/components/DMProviderWrapper";
 import { InitialSyncGate } from "@/components/InitialSyncGate";
@@ -45,11 +43,13 @@ const queryClient = new QueryClient({
 const hardcodedConfig: AppConfig = {
   appName: "Agora",
   appId: "agora",
+  shareOrigin: import.meta.env.VITE_SHARE_ORIGIN || undefined,
   homePage: "feed",
   client: "naddr1qvzqqqru7cpzq7q6z5ns2hm5c8msyv83qwzxpxe52j8c4d4q5m92wsp9sflelkh9qqzkg6t5w3hswjl4yp",
   magicMouse: false,
   theme: "system",
   useAppRelays: true,
+  useUserRelays: false,
   relayMetadata: {
     relays: [],
     updatedAt: 0,
@@ -59,8 +59,12 @@ const hardcodedConfig: AppConfig = {
     feedIncludeComments: true,
     feedIncludeReposts: true,
     feedIncludeGenericReposts: true,
+    feedIncludeReactions: false,
+    feedIncludeZaps: false,
     feedIncludeArticles: true,
     showArticles: true,
+    showHighlights: true,
+    feedIncludeHighlights: false,
     showEvents: true,
     feedIncludeEvents: true,
     showVines: true,
@@ -69,13 +73,13 @@ const hardcodedConfig: AppConfig = {
     showTreasureGeocaches: true,
     showTreasureFoundLogs: true,
     showColors: true,
-    showPacks: true,
+    showPeopleLists: true,
     feedIncludeVines: true,
     feedIncludePolls: true,
     feedIncludeTreasureGeocaches: true,
     feedIncludeTreasureFoundLogs: true,
     feedIncludeColors: true,
-    feedIncludePacks: true,
+    feedIncludePeopleLists: true,
     showDecks: true,
     feedIncludeDecks: true,
     showWebxdc: true,
@@ -103,9 +107,15 @@ const hardcodedConfig: AppConfig = {
     showBadges: true,
     showBadgeDefinitions: true,
     showProfileBadges: true,
+    showBadgeAwards: true,
     feedIncludeBadgeDefinitions: true,
     feedIncludeProfileBadges: true,
+    feedIncludeBadgeAwards: true,
     feedIncludeVanish: true,
+    showBirdstar: true,
+    feedIncludeBirdDetections: true,
+    feedIncludeBirdex: true,
+    feedIncludeConstellations: true,
     followsFeedShowReplies: true,
   },
   sidebarOrder: [
@@ -138,9 +148,11 @@ const hardcodedConfig: AppConfig = {
   plausibleDomain: import.meta.env.VITE_PLAUSIBLE_DOMAIN || "",
   plausibleEndpoint: import.meta.env.VITE_PLAUSIBLE_ENDPOINT || "",
   savedFeeds: [],
+  autoplayVideos: false,
   imageQuality: 'compressed',
   curatorPubkey: '932614571afcbad4d17a191ee281e39eebbb41b93fac8fd87829622aeb112f4d',
   sandboxDomain: 'iframe.diy',
+  esploraBaseUrl: 'https://mempool.space/api',
   sidebarWidgets: [
     { id: 'trends' },
     { id: 'hot-posts' },
@@ -185,17 +197,6 @@ const defaultConfig: AppConfig = {
 export function App() {
   useNsecPasteGuard();
 
-  useEffect(() => {
-    // Initialize system bars for mobile apps.
-    // On Android 16+ (API 36), edge-to-edge is enforced by the OS so
-    // setOverlaysWebView / setBackgroundColor no longer work. The new
-    // SystemBars API (bundled with @capacitor/core 8+) is the replacement.
-    if (Capacitor.isNativePlatform()) {
-      SystemBars.setStyle({ style: SystemBarsStyle.Dark }).catch(() => {
-        // SystemBars may not be available on all platforms
-      });
-    }
-  }, []);
 
   return (
     <UnheadProvider head={head}>

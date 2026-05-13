@@ -2,9 +2,12 @@
  * Structured FAQ content for the Help section.
  *
  * This module is the single source of truth for all Help/FAQ data.
- * Any page can import `FAQ_CATEGORIES` or use `getFAQItems()` to render
- * a full FAQ or a filtered subset (e.g. only "payments" questions on a
- * wallet settings page).
+ * Any page can call `getFAQCategories(appName)` or `getFAQItems(appName)` to
+ * render a full FAQ or a filtered subset (e.g. only "payments" questions on
+ * a wallet settings page).
+ *
+ * Author-visible strings containing the app name are stored with the
+ * `{appName}` placeholder and substituted at read-time by the helpers.
  */
 
 // ── Types ─────────────────────────────────────────────────────────────────────
@@ -31,7 +34,12 @@ export interface FAQCategory {
 
 // ── Data ──────────────────────────────────────────────────────────────────────
 
-export const FAQ_CATEGORIES: FAQCategory[] = [
+/**
+ * Raw FAQ template content. Strings may contain the literal `{appName}`
+ * placeholder, which is substituted at read-time by `getFAQCategories()`
+ * and friends.
+ */
+const FAQ_TEMPLATE: FAQCategory[] = [
   // ── Getting Started ─────────────────────────────────────────────────────
   {
     id: 'getting-started',
@@ -39,10 +47,10 @@ export const FAQ_CATEGORIES: FAQCategory[] = [
     items: [
       {
         id: 'what-is-ditto',
-        question: 'What is Agora?',
+        question: 'What is {appName}?',
         answer: [
-          'Agora is a social media platform built on Nostr \u2014 a new kind of open, decentralized network. Think of Agora as the app you\'re using right now to connect with people, post, and discover content.',
-          'Because Agora is built on Nostr, your account isn\'t locked to this site. You own your identity and can take it to any other Nostr app.',
+          '{appName} is a social media platform built on Nostr \u2014 a new kind of open, decentralized network. Think of {appName} as the app you\'re using right now to connect with people, post, and discover content.',
+          'Because {appName} is built on Nostr, your account isn\'t locked to this site. You own your identity and can take it to any other Nostr app.',
         ],
       },
       {
@@ -55,9 +63,9 @@ export const FAQ_CATEGORIES: FAQCategory[] = [
       },
       {
         id: 'login-other-apps',
-        question: 'Can I log into other Nostr apps with my Agora account?',
+        question: 'Can I log into other Nostr apps with my {appName} account?',
         answer: [
-          'Yes! Your Agora account **is** a Nostr account. You can use the same keys to log into any Nostr app \u2014 Primal, Damus, Amethyst, Coracle, and many more. Your posts, followers, and profile carry over everywhere.',
+          'Yes! Your {appName} account **is** a Nostr account. You can use the same keys to log into any Nostr app \u2014 Primal, Damus, Amethyst, Coracle, and many more. Your posts, followers, and profile carry over everywhere.',
           'Explore the full range of Nostr apps at [nostrapps.com](https://nostrapps.com/).',
         ],
       },
@@ -87,9 +95,9 @@ export const FAQ_CATEGORIES: FAQCategory[] = [
       },
       {
         id: 'cost-to-use',
-        question: 'Does Agora cost anything?',
+        question: 'Does {appName} cost anything?',
         answer: [
-          '**Nope!** Agora is completely free to use. Zaps (tips) are optional and just for fun. There are no premium tiers, no paywalls, no hidden fees.',
+          '**Nope!** {appName} is completely free to use. Zaps (tips) are optional and just for fun. There are no premium tiers, no paywalls, no hidden fees.',
         ],
       },
       {
@@ -113,7 +121,7 @@ export const FAQ_CATEGORIES: FAQCategory[] = [
         question: 'Can I download this on the App Store or Google Play?',
         answer: [
           'This site works as a web app right from your browser \u2014 no download needed! You can also "Add to Home Screen" on your phone to get an app-like experience.',
-          'On Android, you can download Agora from [Zap Store](https://zapstore.dev/apps/pub.agora.app), a community-driven app store for the Nostr ecosystem. iOS support is planned for the future \u2014 stay tuned!',
+          'On Android, you can download {appName} from [Zap Store](https://zapstore.dev/apps/pub.agora.app), a community-driven app store for the Nostr ecosystem. iOS support is planned for the future \u2014 stay tuned!',
         ],
       },
       {
@@ -128,7 +136,7 @@ export const FAQ_CATEGORIES: FAQCategory[] = [
         id: 'nostr-app-store',
         question: 'Is there a Nostr-specific app store?',
         answer: [
-          'Yes! [Zap Store](https://zapstore.dev/) is a community-driven app store built specifically for the Nostr ecosystem. You can discover and download Nostr apps, and the apps are verified by the community rather than a corporation. Agora is listed there \u2014 [get it on Zap Store](https://zapstore.dev/apps/pub.agora.app).',
+          'Yes! [Zap Store](https://zapstore.dev/) is a community-driven app store built specifically for the Nostr ecosystem. You can discover and download Nostr apps, and the apps are verified by the community rather than a corporation. {appName} is listed there \u2014 [get it on Zap Store](https://zapstore.dev/apps/pub.agora.app).',
           'You can also browse a directory of Nostr apps at [nostrapps.com](https://nostrapps.com/).',
         ],
       },
@@ -146,6 +154,24 @@ export const FAQ_CATEGORIES: FAQCategory[] = [
         answer: [
           'Zaps are tips! They let you send tiny amounts of Bitcoin to someone as a way of saying "great post" or "thanks."',
           'Think of it like a super-powered Like button that actually sends real money. They use the Lightning Network, which makes them instant and nearly free. To learn more, check out [Understanding Zaps](https://nostr.how/en/zaps).',
+        ],
+      },
+      {
+        id: 'send-bitcoin-onchain',
+        question: 'How does sending Bitcoin work?',
+        answer: [
+          'This sends real Bitcoin on-chain, using your Nostr key as your wallet \u2014 no separate account, no top-up.',
+          'Your send pays a small network fee to miners so the transaction gets confirmed. Faster confirmation costs a bit more; {appName} picks a sensible default.',
+          'Once broadcast, it\'s public and irreversible. The creator\'s post gets tagged so they know the Bitcoin came from you.',
+        ],
+      },
+      {
+        id: 'send-bitcoin-lightning',
+        question: 'How does sending Bitcoin over Lightning work?',
+        answer: [
+          'Lightning is a faster, cheaper layer built on top of Bitcoin. Payments settle in seconds and fees are usually fractions of a cent.',
+          'You\'ll pay from your connected Lightning wallet. The creator receives the Bitcoin right away, and the payment is attached to their post as a zap so everyone can see the support.',
+          'To learn more, check out [Understanding Zaps](https://nostr.how/en/zaps).',
         ],
       },
       {
@@ -298,14 +324,14 @@ export const FAQ_CATEGORIES: FAQCategory[] = [
         question: 'What does "open source" mean, and why does it matter?',
         answer: [
           'Open source means the code that powers this app is publicly available for anyone to read, verify, and improve. There are no hidden algorithms, no secret data collection, and no backdoors.',
-          'Anyone can check exactly what the software does. It\'s the digital equivalent of a restaurant with a glass kitchen \u2014 nothing to hide. You can browse the [Agora source code](https://gitlab.com/soapbox-pub/agora-3) yourself.',
+          'Anyone can check exactly what the software does. It\'s the digital equivalent of a restaurant with a glass kitchen \u2014 nothing to hide. You can browse the [{appName} source code](https://gitlab.com/soapbox-pub/agora-3) yourself.',
         ],
       },
       {
         id: 'self-host',
-        question: 'Can I self-host Agora?',
+        question: 'Can I self-host {appName}?',
         answer: [
-          'Yes! Because Agora is open source, anyone can run their own instance. You get full control over your server, your data, and your community.',
+          'Yes! Because {appName} is open source, anyone can run their own instance. You get full control over your server, your data, and your community.',
           'If you\'re interested, check out the project README for self-hosting and deployment steps.',
         ],
       },
@@ -323,19 +349,51 @@ export const FAQ_CATEGORIES: FAQCategory[] = [
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
+/** Replace all occurrences of `{appName}` in a string with the resolved value. */
+function substitute(str: string, appName: string): string {
+  return str.replaceAll('{appName}', appName);
+}
+
+/** Substitute placeholders in a single FAQ item. */
+function substituteItem(item: FAQItem, appName: string): FAQItem {
+  return {
+    ...item,
+    question: substitute(item.question, appName),
+    answer: item.answer.map((p) => substitute(p, appName)),
+  };
+}
+
+/** Substitute placeholders in a single category (questions + answers). */
+function substituteCategory(cat: FAQCategory, appName: string): FAQCategory {
+  return {
+    ...cat,
+    label: substitute(cat.label, appName),
+    description: cat.description ? substitute(cat.description, appName) : undefined,
+    items: cat.items.map((i) => substituteItem(i, appName)),
+  };
+}
+
+/**
+ * Return the full list of FAQ categories with `{appName}` placeholders
+ * resolved to the given `appName`.
+ */
+export function getFAQCategories(appName: string): FAQCategory[] {
+  return FAQ_TEMPLATE.map((c) => substituteCategory(c, appName));
+}
+
 /** Flat list of every FAQ item, optionally filtered by category ID. */
-export function getFAQItems(categoryId?: string): FAQItem[] {
+export function getFAQItems(appName: string, categoryId?: string): FAQItem[] {
   const cats = categoryId
-    ? FAQ_CATEGORIES.filter((c) => c.id === categoryId)
-    : FAQ_CATEGORIES;
-  return cats.flatMap((c) => c.items);
+    ? FAQ_TEMPLATE.filter((c) => c.id === categoryId)
+    : FAQ_TEMPLATE;
+  return cats.flatMap((c) => c.items).map((i) => substituteItem(i, appName));
 }
 
 /** Look up a single FAQ item by its ID across all categories. */
-export function getFAQItem(itemId: string): FAQItem | undefined {
-  for (const cat of FAQ_CATEGORIES) {
+export function getFAQItem(appName: string, itemId: string): FAQItem | undefined {
+  for (const cat of FAQ_TEMPLATE) {
     const found = cat.items.find((i) => i.id === itemId);
-    if (found) return found;
+    if (found) return substituteItem(found, appName);
   }
   return undefined;
 }

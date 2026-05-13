@@ -5,20 +5,24 @@ import { nip19 } from 'nostr-tools';
 
 import { useCurrentUser } from './useCurrentUser';
 import { useNostrPublish } from './useNostrPublish';
+import { useAppContext } from './useAppContext';
 import { fetchFreshEvent } from '@/lib/fetchFreshEvent';
+import { getStorageKey } from '@/lib/storageKey';
 
 export interface MuteListItem {
   type: 'pubkey' | 'hashtag' | 'word' | 'thread';
   value: string;
 }
 
-/** localStorage key for cached mute list items. */
-const MUTE_CACHE_KEY = 'ditto:muteListCache';
+/** Build the localStorage key for cached mute list items. */
+export function getMuteCacheKey(appId: string): string {
+  return getStorageKey(appId, 'muteListCache');
+}
 
 /** Read cached mute items from localStorage for a given user. */
-function getCachedMuteItems(pubkey: string): MuteListItem[] | undefined {
+function getCachedMuteItems(cacheKey: string, pubkey: string): MuteListItem[] | undefined {
   try {
-    const raw = localStorage.getItem(MUTE_CACHE_KEY);
+    const raw = localStorage.getItem(cacheKey);
     if (!raw) return undefined;
     const cached = JSON.parse(raw);
     if (cached.pubkey !== pubkey || !Array.isArray(cached.items)) return undefined;
@@ -29,9 +33,9 @@ function getCachedMuteItems(pubkey: string): MuteListItem[] | undefined {
 }
 
 /** Persist decrypted mute items to localStorage. */
-export function setCachedMuteItems(pubkey: string, items: MuteListItem[]): void {
+export function setCachedMuteItems(appId: string, pubkey: string, items: MuteListItem[]): void {
   try {
-    localStorage.setItem(MUTE_CACHE_KEY, JSON.stringify({ pubkey, items }));
+    localStorage.setItem(getMuteCacheKey(appId), JSON.stringify({ pubkey, items }));
   } catch {
     // Storage full or unavailable — non-critical
   }
@@ -144,11 +148,13 @@ async function getAllMuteItems(
 export function useMuteList() {
   const { nostr } = useNostr();
   const { user } = useCurrentUser();
+  const { config } = useAppContext();
   const queryClient = useQueryClient();
   const { mutateAsync: publishEvent } = useNostrPublish();
+  const cacheKey = getMuteCacheKey(config.appId);
 
   // Placeholder from localStorage so mutes apply immediately on page load
-  const cachedItems = user ? getCachedMuteItems(user.pubkey) : undefined;
+  const cachedItems = user ? getCachedMuteItems(cacheKey, user.pubkey) : undefined;
 
   // Query the current mute list
   const query = useQuery({
@@ -181,7 +187,7 @@ export function useMuteList() {
       const items = await getAllMuteItems(event, user.signer, user.pubkey);
 
       // Persist to localStorage for next page load
-      setCachedMuteItems(user.pubkey, items);
+      setCachedMuteItems(config.appId, user.pubkey, items);
 
       return items;
     },
@@ -216,7 +222,7 @@ export function useMuteList() {
         : [...currentItems, { ...item, value: normalizedValue }];
 
       // Update localStorage immediately so it survives page refresh
-      setCachedMuteItems(user.pubkey, newItems);
+      setCachedMuteItems(config.appId, user.pubkey, newItems);
 
       await updateMuteList(newItems, prev);
     },
@@ -240,9 +246,54 @@ export function useMuteList() {
       );
 
       // Update localStorage immediately so it survives page refresh
-      setCachedMuteItems(user.pubkey, newItems);
+      setCachedMuteItems(config.appId, user.pubkey, newItems);
 
       await updateMuteList(newItems, prev);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['muteList', user?.pubkey] });
+    },
+  });
+
+  // Bulk-add many pubkeys to the mute list in a single publish.
+  // Returns the count of pubkeys newly muted (excluding ones already muted).
+  const muteManyPubkeys = useMutation<number, Error, string[]>({
+    mutationFn: async (pubkeys: string[]): Promise<number> => {
+      if (!user) throw new Error('User not logged in');
+
+      // Normalize + dedupe input
+      const normalized = new Set<string>();
+      for (const pk of pubkeys) {
+        if (!pk) continue;
+        normalized.add(normalizePubkey(pk));
+      }
+
+      // ① Fetch the freshest kind 10000 from relays
+      const prev = await fetchFreshEvent(nostr, { kinds: [10000], authors: [user.pubkey] });
+      const currentItems = await getAllMuteItems(prev, user.signer, user.pubkey);
+
+      // ② Determine which pubkeys are not already muted
+      const alreadyMuted = new Set(
+        currentItems.filter((i) => i.type === 'pubkey').map((i) => i.value),
+      );
+      const toAdd: MuteListItem[] = [];
+      for (const pk of normalized) {
+        if (!alreadyMuted.has(pk)) {
+          toAdd.push({ type: 'pubkey', value: pk });
+        }
+      }
+
+      // Nothing to add — skip the publish to avoid a no-op kind 10000 broadcast
+      if (toAdd.length === 0) return 0;
+
+      const newItems = [...currentItems, ...toAdd];
+
+      // Update localStorage immediately so mutes apply on refresh
+      setCachedMuteItems(config.appId, user.pubkey, newItems);
+
+      await updateMuteList(newItems, prev);
+
+      return toAdd.length;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['muteList', user?.pubkey] });
@@ -317,6 +368,7 @@ export function useMuteList() {
     error: query.error || muteItems.error,
     addMute,
     removeMute,
+    muteManyPubkeys,
     isMuted,
     mutedPubkeys,
     mutedHashtags,

@@ -6,6 +6,7 @@ import { useAuthor } from '@/hooks/useAuthor';
 import { useDecryptLetter } from '@/hooks/useLetters';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useNostrPublish } from '@/hooks/useNostrPublish';
+import { useShareOrigin } from '@/hooks/useShareOrigin';
 import { useQueryClient } from '@tanstack/react-query';
 import { toast } from '@/hooks/useToast';
 import { genUserName } from '@/lib/genUserName';
@@ -51,13 +52,14 @@ export function LetterCard({ letter, mode }: LetterCardProps) {
   const { user } = useCurrentUser();
   const { mutate: publishEvent } = useNostrPublish();
   const queryClient = useQueryClient();
+  const shareOrigin = useShareOrigin();
 
-  const displayName = author.data?.metadata?.name || genUserName(otherPubkey);
+  const displayName = author.data?.metadata?.name || author.data?.metadata?.display_name || genUserName(otherPubkey);
   const avatar = author.data?.metadata?.picture;
   const npub = nip19.npubEncode(otherPubkey);
 
   const noteId = nip19.noteEncode(letter.event.id);
-  const letterUrl = `${window.location.origin}/${noteId}`;
+  const letterUrl = `${shareOrigin}/${noteId}`;
   const isOwnLetter = user?.pubkey === letter.sender;
 
   const handleCopyLink = (e: React.MouseEvent) => {
@@ -278,6 +280,7 @@ export function LetterCard({ letter, mode }: LetterCardProps) {
                     ) : content ? (
                       <>
                         <p
+                          dir="auto"
                           className="whitespace-pre-wrap font-semibold tracking-wide overflow-hidden flex-1 min-h-0"
                           style={{
                             fontSize: '4.8cqw',
@@ -300,10 +303,10 @@ export function LetterCard({ letter, mode }: LetterCardProps) {
                         {(content.closing || content.signature) && (
                           <div className="flex flex-col items-end" style={{ paddingTop: '6cqw', gap: '3cqw', paddingRight: '4cqw', fontFamily: letterFontFamily }}>
                             {content.closing && (
-                              <p style={{ fontSize: '4.8cqw', color: textColor }}>{content.closing}</p>
+                              <p dir="auto" style={{ fontSize: '4.8cqw', color: textColor }}>{content.closing}</p>
                             )}
                             {content.signature && (
-                              <p className="font-semibold" style={{ fontSize: '5cqw', color: textColor }}>{content.signature}</p>
+                              <p dir="auto" className="font-semibold" style={{ fontSize: '5cqw', color: textColor }}>{content.signature}</p>
                             )}
                           </div>
                         )}

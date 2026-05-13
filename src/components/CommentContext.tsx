@@ -3,10 +3,10 @@ import { type ReactNode, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { nip19 } from 'nostr-tools';
 import {
-  Award, BarChart3, BookOpen, Camera, Clapperboard, FileText, Film,
-  GitBranch, GitPullRequest, Mail, MapPin, MessageSquare, Mic, Music,
+  Award, BarChart3, Bird, BookOpen, Camera, Clapperboard, FileText, Film,
+  GitBranch, GitPullRequest, Highlighter, Mail, MapPin, MessageSquare, Mic, Music,
   Package, Palette, PartyPopper, Podcast, Radio, Rocket, SmilePlus,
-  Target, Users, Vote, Zap,
+  Stars, Target, Users, UserCheck, Vote, Zap,
 } from 'lucide-react';
 import type { NostrEvent } from '@nostrify/nostrify';
 
@@ -26,9 +26,12 @@ import { usePollVoteLabel } from '@/hooks/usePollVoteLabel';
 import { useAuthor } from '@/hooks/useAuthor';
 import { useBookInfo } from '@/hooks/useBookInfo';
 import { useLinkPreview } from '@/hooks/useLinkPreview';
+import { useScryfallCard } from '@/hooks/useScryfallCard';
 import { getDisplayName } from '@/lib/getDisplayName';
 import { genUserName } from '@/lib/genUserName';
 import { getCountryInfo } from '@/lib/countries';
+import { extractGathererCard, type GathererCard } from '@/lib/linkEmbed';
+import { cardPrimaryImage } from '@/lib/scryfall';
 
 
 /** Default classes shared by all comment context rows. */
@@ -95,9 +98,11 @@ function parseCommentRoot(event: NostrEvent): CommentRoot | undefined {
 const KIND_LABELS: Record<number, string> = {
   0: 'a profile',
   1: 'a post',
+  3: 'a follow list',
   4: 'an encrypted message',
   6: 'a repost',
   7: 'a reaction',
+  8: 'a badge award',
   16: 'a repost',
   20: 'a photo',
   21: 'a video',
@@ -111,6 +116,8 @@ const KIND_LABELS: Record<number, string> = {
   8211: 'a letter',
   1617: 'a patch',
   1618: 'a pull request',
+  2473: 'a bird detection',
+  12473: 'a Birdex',
   3367: 'a color moment',
   7516: 'a found log',
   15128: 'an nsite',
@@ -140,8 +147,11 @@ const KIND_LABELS: Record<number, string> = {
   36787: 'a track',
   37381: 'a Magic deck',
   37516: 'a treasure',
+  30000: 'a follow set',
+  30621: 'a constellation',
   39089: 'a follow pack',
   9735: 'a zap',
+  9802: 'a highlight',
 };
 
 /** Kind-specific icons — matches sidebar and NoteCard icons. */
@@ -150,6 +160,7 @@ const KIND_ICONS: Partial<Record<number, React.ComponentType<{ className?: strin
   1: MessageSquare,
   4: Mail,
   6: RepostIcon,
+  8: Award,
   16: RepostIcon,
   20: Camera,
   21: Film,
@@ -183,19 +194,27 @@ const KIND_ICONS: Partial<Record<number, React.ComponentType<{ className?: strin
   37381: CardsIcon,
   37516: ChestIcon,
   7516: ChestIcon,
+  3: UserCheck,
+  30000: Users,
   39089: PartyPopper,
   3367: Palette,
   9041: Target,
   9735: Zap,
+  9802: Highlighter,
+  2473: Bird,
+  12473: Bird,
+  30621: Stars,
 };
 
 /**
  * Get a singular comment-context label for a kind number.
  * Only uses KIND_LABELS (which has proper singular forms with articles).
  * Never falls through to EXTRA_KINDS labels since those are plural/categorical.
+ * Unknown kinds render as "an unsupported event" — never as "a post", which
+ * would misrepresent arbitrary event kinds as text notes.
  */
 function getKindLabel(kind: number): string {
-  return KIND_LABELS[kind] ?? 'a post';
+  return KIND_LABELS[kind] ?? 'an unsupported event';
 }
 
 /** Parse a rootKind string into a label, handling both numeric and external content kinds. */
@@ -216,9 +235,11 @@ function getRootKindLabel(rootKind: string | undefined): string {
 const KIND_SUFFIXES: Partial<Record<number, string>> = {
   30009: 'badge',
   30030: 'emoji pack',
+  30000: 'follow set',
   39089: 'follow pack',
   37381: 'deck',
   37516: 'treasure',
+  30621: 'constellation',
   34550: 'community',
   30054: 'episode',
   30055: 'trailer',
@@ -258,6 +279,7 @@ function getEventDisplayName(event: NostrEvent): { text: string; icon?: React.Co
   const title = event.tags.find(([name]) => name === 'title')?.[1];
   const name = event.tags.find(([name]) => name === 'name')?.[1];
   const dTag = event.tags.find(([name]) => name === 'd')?.[1];
+  const alt = event.tags.find(([name]) => name === 'alt')?.[1]?.trim();
   const displayTitle = title || name || dTag;
 
   // Kinds with a custom postfix (e.g. "Ditto on Zapstore")
@@ -272,10 +294,17 @@ function getEventDisplayName(event: NostrEvent): { text: string; icon?: React.Co
     return { text: `${displayTitle} ${suffix}`, icon };
   }
 
-  // Generic: just use the title if available
-  if (displayTitle) return { text: displayTitle, icon };
+  // Known kinds: use the conventional title/name/d tag if available.
+  if (KIND_LABELS[event.kind] && displayTitle) {
+    return { text: displayTitle, icon };
+  }
 
-  // Fall back to kind label
+  // Unknown kinds: only trust the NIP-31 `alt` tag. title/name/d have
+  // kind-specific semantics we can't interpret; `d` in particular is often
+  // an opaque compound identifier.
+  if (alt) return { text: alt, icon };
+
+  // Fall back to kind label ("an unsupported event" for unknown kinds).
   return { text: getKindLabel(event.kind), icon };
 }
 
@@ -388,7 +417,7 @@ export function CommentContext({ event, className }: CommentContextProps) {
 function ReplyToCommentContext({ pubkey, eventId, className }: { pubkey: string; eventId?: string; className?: string }) {
   const author = useAuthor(pubkey);
   const metadata = author.data?.metadata;
-  const displayName = metadata?.name ?? genUserName(pubkey);
+  const displayName = metadata?.name ?? metadata?.display_name ?? genUserName(pubkey);
   const npubEncoded = useMemo(() => nip19.npubEncode(pubkey), [pubkey]);
   const parentLink = useMemo(() => {
     if (!eventId) return undefined;
@@ -422,14 +451,53 @@ function AddrCommentContext({ root, className }: { root: CommentRoot; className?
     return <ProfileBadgesCommentContext root={root} className={className} />;
   }
 
+  // Kind 3 follow lists have no title of their own — synthesize one from the author's name
+  if (root.addr?.kind === 3) {
+    return <FollowListCommentContext pubkey={root.addr.pubkey} className={className} />;
+  }
+
   return <GenericAddrCommentContext root={root} className={className} />;
+}
+
+/** Comment context for kind 3 (follow list) roots — shows "Commenting on @Name's follow list". */
+function FollowListCommentContext({ pubkey, className }: { pubkey: string; className?: string }) {
+  const author = useAuthor(pubkey);
+  const metadata = author.data?.metadata;
+  const displayName = metadata?.name ?? metadata?.display_name ?? genUserName(pubkey);
+  const npubEncoded = useMemo(() => nip19.npubEncode(pubkey), [pubkey]);
+  const listLink = useMemo(
+    () => `/${nip19.naddrEncode({ kind: 3, pubkey, identifier: '' })}`,
+    [pubkey],
+  );
+
+  return (
+    <CommentContextRow prefix="Commenting on" className={className} loading={author.isLoading}>
+      <ProfileHoverCard pubkey={pubkey} asChild>
+        <Link
+          to={`/${npubEncoded}`}
+          className="text-primary hover:underline truncate"
+          onClick={(e) => e.stopPropagation()}
+        >
+          @{displayName}'s
+        </Link>
+      </ProfileHoverCard>
+      <Link
+        to={listLink}
+        className="inline-flex items-center gap-1 text-primary hover:underline shrink-0"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <UserCheck className="size-3.5 shrink-0" />
+        follow list
+      </Link>
+    </CommentContextRow>
+  );
 }
 
 /** Comment context for kind 0 (profile) roots — shows "Commenting on @Name". */
 function ProfileCommentContext({ pubkey, className }: { pubkey: string; className?: string }) {
   const author = useAuthor(pubkey);
   const metadata = author.data?.metadata;
-  const displayName = metadata?.name ?? genUserName(pubkey);
+  const displayName = metadata?.name ?? metadata?.display_name ?? genUserName(pubkey);
   const npubEncoded = useMemo(() => nip19.npubEncode(pubkey), [pubkey]);
 
   return (
@@ -452,7 +520,7 @@ function ProfileBadgesCommentContext({ root, className }: { root: CommentRoot; c
   const pubkey = root.addr?.pubkey ?? '';
   const author = useAuthor(pubkey);
   const metadata = author.data?.metadata;
-  const displayName = metadata?.name ?? genUserName(pubkey);
+  const displayName = metadata?.name ?? metadata?.display_name ?? genUserName(pubkey);
   const npubEncoded = useMemo(() => nip19.npubEncode(pubkey), [pubkey]);
 
   // Build naddr link for the profile badges event
@@ -658,8 +726,14 @@ function ExternalCommentContext({ root, className }: { root: CommentRoot; classN
     return <IsbnCommentContext identifier={identifier} className={className} />;
   }
 
-  // URL identifiers get special treatment — show page title with favicon
+  // URL identifiers get special treatment — show page title with favicon.
+  // Gatherer URLs are routed to a Scryfall-backed renderer that shows the
+  // actual card name instead of the raw URL.
   if (identifier.startsWith('http://') || identifier.startsWith('https://')) {
+    const gathererCard = extractGathererCard(identifier);
+    if (gathererCard) {
+      return <GathererCardCommentContext card={gathererCard} url={identifier} className={className} />;
+    }
     return <UrlCommentContext url={identifier} className={className} />;
   }
 
@@ -834,6 +908,85 @@ function IsbnCommentContext({ identifier, className }: { identifier: string; cla
               {authors && (
                 <p className="text-xs text-muted-foreground truncate">
                   by {authors}
+                </p>
+              )}
+            </div>
+          </div>
+        </HoverCardContent>
+      </HoverCard>
+    </CommentContextRow>
+  );
+}
+
+/**
+ * Comment context for gatherer.wizards.com URLs — resolves the URL to a
+ * Magic: The Gathering card via Scryfall and shows the card's real name
+ * (e.g. "Xenagos, God of Revels") instead of the raw URL.
+ */
+function GathererCardCommentContext({
+  card,
+  url,
+  className,
+}: {
+  card: GathererCard;
+  url: string;
+  className?: string;
+}) {
+  const lookup = useMemo(() => (
+    card.kind === 'multiverse'
+      ? { kind: 'multiverse' as const, multiverseId: card.multiverseId }
+      : { kind: 'set' as const, set: card.set, number: card.number, lang: card.lang }
+  ), [card]);
+  const { data: scryCard, isLoading } = useScryfallCard(lookup);
+  const link = `/i/${encodeURIComponent(url)}`;
+
+  const displayText = scryCard?.name ?? 'Magic card';
+  const coverUrl = scryCard ? cardPrimaryImage(scryCard, 'small') : undefined;
+
+  return (
+    <CommentContextRow prefix="Commenting on" className={className} loading={isLoading}>
+      <HoverCard openDelay={300} closeDelay={150}>
+        <HoverCardTrigger asChild>
+          <Link
+            to={link}
+            className="inline-flex items-center gap-1 text-primary hover:underline truncate cursor-pointer"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <CardsIcon className="size-3.5 shrink-0" />
+            {displayText}
+          </Link>
+        </HoverCardTrigger>
+        <HoverCardContent
+          side="bottom"
+          align="start"
+          sideOffset={4}
+          className="w-72 p-0 rounded-2xl shadow-lg"
+          onClick={(e) => e.stopPropagation()}
+        >
+          <div className="flex items-center gap-3 px-4 py-3">
+            {coverUrl ? (
+              <img
+                src={coverUrl}
+                alt={scryCard?.name ?? 'Magic card'}
+                className="w-9 h-12 rounded object-cover shrink-0"
+                loading="lazy"
+              />
+            ) : (
+              <div className="w-9 h-12 rounded bg-secondary flex items-center justify-center shrink-0">
+                <CardsIcon className="size-4 text-muted-foreground/40" />
+              </div>
+            )}
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                <CardsIcon className="size-3 shrink-0" />
+                <span>Magic Card</span>
+              </div>
+              <p className="text-sm font-medium truncate mt-0.5">
+                {scryCard?.name ?? 'Unknown card'}
+              </p>
+              {scryCard?.set_name && (
+                <p className="text-xs text-muted-foreground truncate">
+                  {scryCard.set_name}
                 </p>
               )}
             </div>

@@ -7,6 +7,7 @@ import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useAuthor } from '@/hooks/useAuthor';
+import { useShareOrigin } from '@/hooks/useShareOrigin';
 import { genUserName } from '@/lib/genUserName';
 import { getThemedQRColors } from '@/lib/qrColors';
 
@@ -18,14 +19,15 @@ interface FollowQRDialogProps {
 export function FollowQRDialog({ open, onOpenChange }: FollowQRDialogProps) {
   const { user } = useCurrentUser();
   const author = useAuthor(user?.pubkey ?? '');
+  const shareOrigin = useShareOrigin();
   const [qrDataUrl, setQrDataUrl] = useState<string>('');
   const [copied, setCopied] = useState(false);
 
   const metadata = author.data?.metadata;
-  const displayName = user ? metadata?.name || genUserName(user.pubkey) : '';
+  const displayName = user ? metadata?.name || metadata?.display_name || genUserName(user.pubkey) : '';
 
   const npub = user ? nip19.npubEncode(user.pubkey) : '';
-  const followUrl = npub ? `${window.location.origin}/follow/${npub}` : '';
+  const followUrl = npub ? `${shareOrigin}/follow/${npub}` : '';
 
   useEffect(() => {
     if (!followUrl || !open) return;

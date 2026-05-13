@@ -1,6 +1,7 @@
 import type { FeedSettings } from '@/contexts/AppContext';
+import type { NostrEvent } from '@nostrify/nostrify';
 import type { ComponentType } from 'react';
-import { Globe, GitPullRequestArrow, MessageSquareMore, CircleAlert, Zap } from 'lucide-react';
+import { Bird, CircleAlert, GitPullRequestArrow, Globe, MessageSquareMore, Stars, UserCheck, Users, Zap } from 'lucide-react';
 import { RepostIcon } from '@/components/icons/RepostIcon';
 import { CONTENT_KIND_ICONS } from '@/lib/sidebarItems';
 
@@ -119,6 +120,29 @@ export const EXTRA_KINDS: ExtraKindDef[] = [
     feedOnly: true,
   },
   {
+    kind: 7,
+    id: 'reactions',
+    feedKey: 'feedIncludeReactions',
+    label: 'Reactions',
+    description: 'People reacting to posts (likes and emoji reactions). Disabled by default.',
+    addressable: false,
+    section: 'feed',
+    feedOnly: true,
+  },
+  {
+    kind: 9735,
+    id: 'zaps',
+    feedKey: 'feedIncludeZaps',
+    // Combine Lightning (9735) and on-chain Bitcoin (8333) zaps into a single
+    // toggle so users don't have to think about which rail was used.
+    extraFeedKinds: [8333],
+    label: 'Zaps',
+    description: 'People zapping posts (Lightning and on-chain Bitcoin). Disabled by default.',
+    addressable: false,
+    section: 'feed',
+    feedOnly: true,
+  },
+  {
     kind: 30023,
     id: 'articles',
     showKey: 'showArticles',
@@ -208,7 +232,7 @@ export const EXTRA_KINDS: ExtraKindDef[] = [
     addressable: true,
     section: 'media',
     blurb: 'Discover and listen to music tracks and playlists shared on Nostr. Upload music and create playlists from a dedicated music app.',
-    sites: [{ url: 'https://nodecast.xyz' }],
+    sites: [{ url: 'https://nodecast.xyz' }, { url: 'https://zaptrax.app', name: 'ZapTrax' }, { url: 'https://sunami.app', name: 'Sunami' }],
     subKinds: [
       {
         kind: 36787,
@@ -312,14 +336,17 @@ export const EXTRA_KINDS: ExtraKindDef[] = [
   {
     kind: 39089,
     id: 'packs',
-    showKey: 'showPacks',
-    feedKey: 'feedIncludePacks',
-    label: 'Follow Packs',
-    description: 'Curated follow recommendations',
+    showKey: 'showPeopleLists',
+    feedKey: 'feedIncludePeopleLists',
+    // Also include related people-list kinds under the same feed toggle:
+    // kind 3 (NIP-02 follow list) and kind 30000 (NIP-51 follow set).
+    extraFeedKinds: [3, 30000],
+    label: 'People Lists',
+    description: 'Follow packs, follow lists, and people sets',
     route: 'packs',
     addressable: true,
     section: 'social',
-    blurb: 'Curated lists of people to follow. Browse or create your own.',
+    blurb: 'Curated lists of people to follow — follow packs, follow lists, and people sets. Browse or create your own.',
     sites: [{ url: 'https://following.space', name: 'following.space' }, { url: 'https://following.party', name: 'following.party' }],
   },
   {
@@ -412,6 +439,13 @@ export const EXTRA_KINDS: ExtraKindDef[] = [
         description: 'Accepted profile badges (kind 10008)',
         extraFeedKinds: [30008], // legacy kind for backwards compatibility
       },
+      {
+        kind: 8,
+        showKey: 'showBadgeAwards',
+        feedKey: 'feedIncludeBadgeAwards',
+        label: 'Badge Awards',
+        description: 'Badge award events (kind 8)',
+      },
     ],
   },
   {
@@ -443,6 +477,56 @@ export const EXTRA_KINDS: ExtraKindDef[] = [
         addressable: false,
       },
     ],
+  },
+  // NIP-84 Highlights — kind 9802 (regular)
+  {
+    kind: 9802,
+    id: 'highlights',
+    showKey: 'showHighlights',
+    feedKey: 'feedIncludeHighlights',
+    label: 'Highlights',
+    description: 'Noteworthy excerpts from articles, posts, and the web (NIP-84)',
+    route: 'highlights',
+    addressable: false,
+    section: 'social',
+    blurb: "Highlights are excerpts people find valuable — a paragraph from an article, a passage from a blog post, or a quote from anywhere on the web. Browse what people are reading and what's resonating.",
+  },
+  // Birdstar (feed-only — external app, no Ditto page)
+  {
+    kind: 2473,
+    id: 'bird-detections',
+    feedKey: 'feedIncludeBirdDetections',
+    label: 'Bird Detections',
+    description: 'Species heard in the wild (Birdsong Spotter)',
+    addressable: false,
+    section: 'whimsy',
+    feedOnly: true,
+    blurb: 'Bird-by-ear detections — someone heard a species sing or call, and logged the sighting. Identified by Wikidata entity.',
+    sites: [{ url: 'https://birdstar.app', name: 'Birdstar' }],
+  },
+  {
+    kind: 12473,
+    id: 'birdex',
+    feedKey: 'feedIncludeBirdex',
+    label: 'Birdex',
+    description: 'Cumulative life list of every species a user has ever identified',
+    addressable: false,
+    section: 'whimsy',
+    feedOnly: true,
+    blurb: 'Birdex — an author\'s cumulative life list of every species they have ever identified, in chronological order of first detection.',
+    sites: [{ url: 'https://birdstar.app', name: 'Birdstar' }],
+  },
+  {
+    kind: 30621,
+    id: 'constellations',
+    feedKey: 'feedIncludeConstellations',
+    label: 'Constellations',
+    description: 'User-drawn custom star figures (Starpoint)',
+    addressable: true,
+    section: 'whimsy',
+    feedOnly: true,
+    blurb: 'Custom constellations drawn star-by-star on an interactive sky map. Trace your own figures and share them on Nostr.',
+    sites: [{ url: 'https://birdstar.app', name: 'Birdstar' }],
   },
   // Development
   {
@@ -509,9 +593,11 @@ export function getPageKinds(def: ExtraKindDef, feedSettings: FeedSettings): num
  * a label more specific than their parent category.
  */
 const KIND_SPECIFIC_LABELS: Record<number, string> = {
+  3: 'follow list',
   6: 'repost',
   7: 'reaction',
   16: 'repost',
+  30000: 'follow set',
   1617: 'patch',
   1618: 'patch comment',
   15128: 'nsite',
@@ -529,14 +615,19 @@ const KIND_SPECIFIC_LABELS: Record<number, string> = {
  * Specific icons for kinds that need a different icon than their parent category.
  */
 const KIND_SPECIFIC_ICONS: Partial<Record<number, ComponentType<{ className?: string }>>> = {
+  3: UserCheck,
   6: RepostIcon,
   16: RepostIcon,
+  30000: Users,
   1617: GitPullRequestArrow,
   1618: MessageSquareMore,
   15128: Globe,
   35128: Globe,
   30817: CircleAlert,
   36639: Zap,
+  2473: Bird,
+  12473: Bird,
+  30621: Stars,
 };
 
 /**
@@ -622,4 +713,20 @@ export function getAllExtraKindNumbers(): number[] {
   }
 
   return kinds;
+}
+
+/**
+ * Extract the NIP-31 `alt` tag — the author's own human-readable fallback
+ * text for clients that don't know how to render the event's kind.
+ *
+ * Only `alt` is consulted. Other tags (`title`, `name`, `summary`,
+ * `description`, `d`) are intentionally excluded: they have kind-specific
+ * semantics and are not guaranteed to be safe user-facing text. When `alt`
+ * is missing, callers should render a neutral "unsupported kind" tombstone.
+ *
+ * Returns `undefined` if the event has no `alt` tag (or it's blank).
+ */
+export function getEventFallbackText(event: NostrEvent): string | undefined {
+  const alt = event.tags.find(([n]) => n === 'alt')?.[1];
+  return alt && alt.trim().length > 0 ? alt.trim() : undefined;
 }

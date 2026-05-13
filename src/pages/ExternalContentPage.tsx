@@ -1,11 +1,10 @@
 import { useCallback, useMemo, useState } from 'react';
 import { useSeoMeta } from '@unhead/react';
-import { ArrowLeft, Globe, MessageSquare, MoreHorizontal, Repeat2, Star, AlertTriangle, PanelLeft, Trash2 } from 'lucide-react';
+import { ArrowLeft, Globe, MessageCircle, MessageSquare, MoreHorizontal, Repeat2, Star, AlertTriangle, PanelLeft, Trash2 } from 'lucide-react';
 import { Link, useLocation, useParams } from 'react-router-dom';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger,
@@ -16,6 +15,9 @@ import { ReplyComposeModal } from '@/components/ReplyComposeModal';
 import { ExternalReactionButton } from '@/components/ExternalReactionButton';
 import { BookReviewFormDialog } from '@/components/BookReviewForm';
 import { ProfileHoverCard } from '@/components/ProfileHoverCard';
+import { SubHeaderBar } from '@/components/SubHeaderBar';
+import { TabButton } from '@/components/TabButton';
+import { ARC_OVERHANG_PX } from '@/components/ArcBackground';
 import {
   UrlContentHeader,
   BookContentHeader,
@@ -24,6 +26,7 @@ import {
 import { PrecipitationEffect } from '@/components/PrecipitationEffect';
 import { parseExternalUri, headerLabel, seoTitle, type ExternalContent } from '@/lib/externalContent';
 import { ratingToStars } from '@/lib/bookstr';
+import { formatNumber } from '@/lib/formatNumber';
 import { useAppContext } from '@/hooks/useAppContext';
 import { useWeather, getPrecipitation } from '@/hooks/useWeather';
 import { useComments } from '@/hooks/useComments';
@@ -43,19 +46,31 @@ import { useLinkPreview } from '@/hooks/useLinkPreview';
 import { useLayoutOptions } from '@/contexts/LayoutContext';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useFeedSettings } from '@/hooks/useFeedSettings';
+import { useWikipediaSummary } from '@/hooks/useWikipediaSummary';
+import { useWikidataEntity } from '@/hooks/useWikidataEntity';
+import { useScryfallCard } from '@/hooks/useScryfallCard';
 import { useToast } from '@/hooks/useToast';
 import { getDisplayName } from '@/lib/getDisplayName';
 import { timeAgo } from '@/lib/timeAgo';
+import { extractWikipediaTitle, extractWikidataId, extractGathererCard } from '@/lib/linkEmbed';
 import { cn } from '@/lib/utils';
 import type { NostrEvent } from '@nostrify/nostrify';
 import type { BookReview } from '@/lib/bookstr';
 import NotFound from './NotFound';
 
 // ---------------------------------------------------------------------------
-// Action bar component for external content (react + share)
+// Action bar component for external content (comment + react + share)
 // ---------------------------------------------------------------------------
 
-function ExternalActionBar({ content }: { content: ExternalContent }) {
+interface ExternalActionBarProps {
+  content: ExternalContent;
+  /** Opens the comment composer. */
+  onComment: () => void;
+  /** Number of top-level comments on this content, for the comment button badge. */
+  commentCount: number;
+}
+
+function ExternalActionBar({ content, onComment, commentCount }: ExternalActionBarProps) {
   const { user } = useCurrentUser();
   const { toast } = useToast();
   const identifier = content.value;
@@ -78,6 +93,16 @@ function ExternalActionBar({ content }: { content: ExternalContent }) {
 
   return (
     <div className="flex items-center gap-1 px-4 py-2 border-b border-border">
+      {/* Comment button — opens the compose modal, same as the FAB */}
+      <button
+        className="flex items-center gap-1.5 p-2 rounded-full transition-colors text-muted-foreground hover:text-sky-500 hover:bg-sky-500/10"
+        title="Comment"
+        onClick={onComment}
+      >
+        <MessageCircle className="size-5" />
+        {commentCount > 0 && <span className="text-sm tabular-nums">{formatNumber(commentCount)}</span>}
+      </button>
+
       {/* Reaction button */}
       <ExternalReactionButton content={content} />
 
@@ -158,7 +183,7 @@ export function ExternalContentPage() {
     if (!rawUri) return '';
     // If the wildcard param looks already encoded (no "://" present), decode it.
     if (!rawUri.includes('://')) {
-      return decodeURIComponent(rawUri);
+      try { return decodeURIComponent(rawUri); } catch { return rawUri; }
     }
     // Otherwise it's a bare URL — reattach any query string the browser separated out.
     return rawUri + location.search;
@@ -173,18 +198,50 @@ export function ExternalContentPage() {
   const linkPreviewUrl = content?.type === 'url' ? content.value : null;
   const { data: linkPreview } = useLinkPreview(linkPreviewUrl);
 
-  const resolvedTitle = linkPreview?.title;
+  // For Wikipedia URLs, use the Wikipedia API for accurate titles.
+  // For Wikidata URLs, resolve the entity's English Wikipedia sitelink and fall through
+  // to the Wikipedia branch so the page title and back-link behave identically.
+  const directWikiTitle = useMemo(() => linkPreviewUrl ? extractWikipediaTitle(linkPreviewUrl) : null, [linkPreviewUrl]);
+  const wikidataId = useMemo(() => linkPreviewUrl ? extractWikidataId(linkPreviewUrl) : null, [linkPreviewUrl]);
+  const { data: wikidataEntity } = useWikidataEntity(directWikiTitle ? null : wikidataId);
+  const wikiTitle = directWikiTitle ?? wikidataEntity?.wikipediaTitle ?? null;
+  const { data: wikiSummary } = useWikipediaSummary(wikiTitle);
+
+  // For Gatherer URLs, look up the card on Scryfall for its real name. The
+  // same query is made (and cached) by GathererCardHeader, so this adds no
+  // extra network traffic.
+  const gathererCard = useMemo(() => linkPreviewUrl ? extractGathererCard(linkPreviewUrl) : null, [linkPreviewUrl]);
+  const scryfallLookup = useMemo(() => {
+    if (!gathererCard) return null;
+    return gathererCard.kind === 'multiverse'
+      ? { kind: 'multiverse' as const, multiverseId: gathererCard.multiverseId }
+      : { kind: 'set' as const, set: gathererCard.set, number: gathererCard.number, lang: gathererCard.lang };
+  }, [gathererCard]);
+  const { data: scryfallCard } = useScryfallCard(scryfallLookup);
+
+  const resolvedTitle = wikiSummary?.title ?? scryfallCard?.name ?? linkPreview?.title;
 
   const pageTitle = resolvedTitle ?? (content ? headerLabel(content) : 'External Content');
 
   useSeoMeta({ title: content ? (resolvedTitle ? `${resolvedTitle} | ${config.appName}` : seoTitle(content, config.appName)) : `External Content | ${config.appName}` });
 
   // Build the NIP-73 identifier for comments.
-  // For URLs, the raw URL is used. For others, the full prefixed identifier.
-  const commentRoot = useMemo(() => {
-    if (!content) return undefined;
-    return new URL(content.value);
+  // For URLs, a URL object is used. For others (isbn:, iso3166:, etc.) the raw identifier
+  // is passed to useComments for querying. The `#${string}` type is a marker for "non-URL
+  // external identifier" — the runtime value is the plain identifier (e.g. `iso3166:VE`),
+  // matching the format used in NIP-73 `I`/`i` tag values and consistent with PostDetailPage
+  // and ComposeBox. ComposeBox/ReplyComposeModal do not accept this type.
+  const commentRootUrl = useMemo((): URL | undefined => {
+    if (!content || content.type !== 'url') return undefined;
+    try { return new URL(content.value); } catch { return undefined; }
   }, [content]);
+
+  const commentRootId = useMemo((): `#${string}` | undefined => {
+    if (!content || content.type === 'url') return undefined;
+    return content.value as `#${string}`;
+  }, [content]);
+
+  const commentRoot: URL | `#${string}` | undefined = commentRootUrl ?? commentRootId;
 
   const { muteItems } = useMuteList();
 
@@ -286,7 +343,7 @@ export function ExternalContentPage() {
     onFabClick: openCompose,
   });
 
-  if (!content || !uri || !commentRoot) {
+  if (!content || !uri) {
     return <NotFound />;
   }
 
@@ -325,10 +382,14 @@ export function ExternalContentPage() {
       </div>
 
       {/* React / share action bar */}
-      <ExternalActionBar content={content} />
+      <ExternalActionBar
+        content={content}
+        onComment={openCompose}
+        commentCount={orderedReplies.length}
+      />
 
-      {/* Comment compose dialog (opened via FAB) */}
-      <ReplyComposeModal event={commentRoot} open={composeOpen} onOpenChange={setComposeOpen} />
+      {/* Comment compose dialog (opened via FAB or the Comment button) */}
+      {commentRoot && <ReplyComposeModal event={commentRoot} open={composeOpen} onOpenChange={setComposeOpen} />}
 
       {/* ISBN pages get a tabbed interface with Comments + Reviews */}
       {content.type === 'isbn' ? (
@@ -412,6 +473,31 @@ export function ExternalContentPage() {
 // Shared helpers
 // ---------------------------------------------------------------------------
 
+/** Props shared by the comments section (both standalone and inside a tab). */
+interface ExternalCommentsSectionProps {
+  commentRoot: URL | `#${string}` | undefined;
+  orderedReplies: Array<{ reply: NostrEvent; firstSubReply?: NostrEvent }>;
+  commentsLoading: boolean;
+}
+
+/** Inline compose box + threaded replies list (or loading/empty state). */
+function ExternalCommentsSection({ commentRoot, orderedReplies, commentsLoading }: ExternalCommentsSectionProps) {
+  return (
+    <>
+      {commentRoot && <ComposeBox compact replyTo={commentRoot} />}
+      <div>
+        {commentsLoading ? (
+          <CommentsSkeleton />
+        ) : orderedReplies.length > 0 ? (
+          <FlatThreadedReplyList replies={orderedReplies} />
+        ) : (
+          <CommentsEmptyState />
+        )}
+      </div>
+    </>
+  );
+}
+
 function CommentsSkeleton() {
   return (
     <div className="divide-y divide-border">
@@ -452,81 +538,76 @@ function CommentsEmptyState() {
 
 interface BookContentTabsProps {
   isbn: string;
-  commentRoot: URL;
+  commentRoot: URL | `#${string}` | undefined;
   orderedReplies: Array<{ reply: NostrEvent; firstSubReply?: NostrEvent }>;
   commentsLoading: boolean;
 }
 
+type BookTab = 'comments' | 'reviews';
+
 function BookContentTabs({ isbn, commentRoot, orderedReplies, commentsLoading }: BookContentTabsProps) {
   const { user } = useCurrentUser();
   const { data: reviews = [], isLoading: reviewsLoading } = useBookReviews(isbn);
+  const [activeTab, setActiveTab] = useState<BookTab>('comments');
+
+  const commentCount = orderedReplies.length;
+  const reviewCount = reviews.length;
 
   return (
-    <Tabs defaultValue="comments" className="w-full">
-      <TabsList className="w-full rounded-none border-b border-border bg-transparent h-auto p-0">
-        <TabsTrigger
-          value="comments"
-          className="flex-1 rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none py-3 text-sm font-medium"
-        >
-          <MessageSquare className="size-4 mr-2" />
-          Comments{orderedReplies.length > 0 ? ` (${orderedReplies.length})` : ''}
-        </TabsTrigger>
-        <TabsTrigger
-          value="reviews"
-          className="flex-1 rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none py-3 text-sm font-medium"
-        >
-          <Star className="size-4 mr-2" />
-          Reviews{reviews.length > 0 ? ` (${reviews.length})` : ''}
-        </TabsTrigger>
-      </TabsList>
+    <>
+      <SubHeaderBar>
+        <TabButton
+          label={`Comments${commentCount > 0 ? ` (${commentCount})` : ''}`}
+          active={activeTab === 'comments'}
+          onClick={() => setActiveTab('comments')}
+        />
+        <TabButton
+          label={`Reviews${reviewCount > 0 ? ` (${reviewCount})` : ''}`}
+          active={activeTab === 'reviews'}
+          onClick={() => setActiveTab('reviews')}
+        />
+      </SubHeaderBar>
+      <div style={{ height: ARC_OVERHANG_PX }} />
 
-      <TabsContent value="comments" className="mt-0">
-        {/* Inline compose box */}
-        <ComposeBox compact replyTo={commentRoot} />
-
-        {/* Threaded comments list */}
-        <div>
-          {commentsLoading ? (
-            <CommentsSkeleton />
-          ) : orderedReplies.length > 0 ? (
-            <FlatThreadedReplyList replies={orderedReplies} />
-          ) : (
-            <CommentsEmptyState />
+      {activeTab === 'comments' ? (
+        <ExternalCommentsSection
+          commentRoot={commentRoot}
+          orderedReplies={orderedReplies}
+          commentsLoading={commentsLoading}
+        />
+      ) : (
+        <>
+          {/* Write review CTA */}
+          {user && (
+            <div className="px-4 py-3 border-b border-border">
+              <BookReviewFormDialog isbn={isbn}>
+                <Button variant="outline" className="w-full">
+                  <Star className="size-4 mr-2" />
+                  Write a Review
+                </Button>
+              </BookReviewFormDialog>
+            </div>
           )}
-        </div>
-      </TabsContent>
 
-      <TabsContent value="reviews" className="mt-0">
-        {/* Write review CTA */}
-        {user && (
-          <div className="px-4 py-3 border-b border-border">
-            <BookReviewFormDialog isbn={isbn}>
-              <Button variant="outline" className="w-full">
-                <Star className="size-4 mr-2" />
-                Write a Review
-              </Button>
-            </BookReviewFormDialog>
-          </div>
-        )}
-
-        {/* Reviews list */}
-        {reviewsLoading ? (
-          <CommentsSkeleton />
-        ) : reviews.length > 0 ? (
-          <div className="divide-y divide-border">
-            {reviews.map(({ event, review }) => (
-              <BookReviewCard key={event.id} event={event} review={review} />
-            ))}
-          </div>
-        ) : (
-          <div className="py-12 text-center text-muted-foreground text-sm">
-            <Star className="size-12 mx-auto mb-4 opacity-30" />
-            <p className="text-lg font-medium mb-2">No reviews yet</p>
-            <p>Be the first to review this book!</p>
-          </div>
-        )}
-      </TabsContent>
-    </Tabs>
+          {/* Reviews list */}
+          {reviewsLoading ? (
+            <CommentsSkeleton />
+          ) : reviews.length > 0 ? (
+            <div className="divide-y divide-border">
+              {reviews.map(({ event, review }) => (
+                <BookReviewCard key={event.id} event={event} review={review} />
+              ))}
+            </div>
+          ) : (
+            <div className="py-12 text-center text-muted-foreground text-sm">
+              <Star className="size-12 mx-auto mb-4 opacity-30" />
+              <p className="text-lg font-medium mb-2">No reviews yet</p>
+              <p>Be the first to review this book!</p>
+            </div>
+          )}
+        </>
+      )}
+    </>
   );
 }
 

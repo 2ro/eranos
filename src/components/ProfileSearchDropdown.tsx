@@ -372,9 +372,19 @@ export function ProfileSearchDropdown({
               onClick={handleTextSearch}
               onMouseDown={(e) => e.preventDefault()}
             >
-              <div className="size-10 shrink-0 rounded-full bg-primary/10 flex items-center justify-center">
-                <Search className="size-4 text-primary" />
-              </div>
+              {(() => {
+                const highlighted = totalItems === 0 || selectedIndex === -1;
+                return (
+                  <div
+                    className={cn(
+                      'size-10 shrink-0 rounded-full flex items-center justify-center',
+                      highlighted ? 'bg-accent-foreground/10' : 'bg-primary/10',
+                    )}
+                  >
+                    <Search className={cn('size-4', highlighted ? 'text-accent-foreground' : 'text-primary')} />
+                  </div>
+                );
+              })()}
               <span className="text-sm font-medium truncate">
                 Search for "{query.trim()}"
               </span>
@@ -484,8 +494,13 @@ function NavItem({
       onClick={() => onClick(item)}
       onMouseDown={(e) => e.preventDefault()}
     >
-      <div className="size-10 shrink-0 rounded-full bg-primary/10 flex items-center justify-center">
-        <Icon className="size-4 text-primary" />
+      <div
+        className={cn(
+          'size-10 shrink-0 rounded-full flex items-center justify-center',
+          isSelected ? 'bg-accent-foreground/10' : 'bg-primary/10',
+        )}
+      >
+        <Icon className={cn('size-4', isSelected ? 'text-accent-foreground' : 'text-primary')} />
       </div>
       <span className="font-semibold text-sm truncate">{item.label}</span>
     </button>
@@ -880,7 +895,7 @@ function ProfileItem({
   onClick: (profile: SearchProfile, profileUrl: string) => void;
 }) {
   const { metadata, pubkey } = profile;
-  const displayName = metadata.display_name || metadata.name || genUserName(pubkey);
+  const displayName = metadata.name || metadata.display_name || genUserName(pubkey);
   const nip05 = metadata.nip05;
   const { data: nip05Verified } = useNip05Verify(nip05, pubkey);
   const profileUrl = useProfileUrl(pubkey, metadata);

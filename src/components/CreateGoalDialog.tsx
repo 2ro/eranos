@@ -79,7 +79,7 @@ export function CreateGoalDialog({ communityATag, children, open: controlledOpen
     const msats = sats * 1000;
 
     // NIP-75 relay hints are where zap receipts should be published and tallied.
-    const relayUrls = getEffectiveRelays(config.relayMetadata, true).relays
+    const relayUrls = getEffectiveRelays(config.relayMetadata, config.useAppRelays, config.useUserRelays).relays
       .filter((r) => r.write)
       .map((r) => r.url);
     if (relayUrls.length === 0) {

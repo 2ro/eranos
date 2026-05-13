@@ -48,6 +48,22 @@ export function isRepostKind(kind: number): boolean {
   return REPOST_KINDS.has(kind);
 }
 
+/** The set of kind numbers that represent reactions. */
+export const REACTION_KINDS = new Set([7]);
+
+/** Check if a kind number is a reaction kind (7). */
+export function isReactionKind(kind: number): boolean {
+  return REACTION_KINDS.has(kind);
+}
+
+/** The set of kind numbers that represent zap events (Lightning + on-chain). */
+export const ZAP_KINDS = new Set([9735, 8333]);
+
+/** Check if a kind number is a zap kind (9735 Lightning or 8333 on-chain). */
+export function isZapKind(kind: number): boolean {
+  return ZAP_KINDS.has(kind);
+}
+
 /**
  * Returns the correct repost kind for a given event.
  * Kind 6 is only for reposting kind 1 text notes; kind 16 is for everything else.
@@ -56,14 +72,50 @@ export function getRepostKind(originalEventKind: number): number {
   return originalEventKind === 1 ? 6 : 16;
 }
 
-/** A feed item — either a direct post or a repost wrapping the original event. */
+/** Overlay describing a reaction (kind 7) made to a target event. */
+export interface ReactionOverlay {
+  /** The reaction event itself (used for linking to the underlying nevent). */
+  event: NostrEvent;
+  /** Pubkey of the person who reacted. */
+  pubkey: string;
+}
+
+/** Overlay describing a zap (kind 9735 Lightning or kind 8333 on-chain). */
+export interface ZapOverlay {
+  /** The zap event itself (used for linking to the underlying nevent). */
+  event: NostrEvent;
+  /** Pubkey of the sender (resolved through P-tag / description / event.pubkey). */
+  pubkey: string;
+  /** Zap amount in sats. May be 0 if unparseable. */
+  sats: number;
+}
+
+/** A feed item — either a direct post, a repost, a reaction, or a zap wrapping the original event. */
 export interface FeedItem {
-  /** The event to display (original note). */
+  /** The event to display (original note / target event). */
   event: NostrEvent;
   /** If this item is a repost, the pubkey of the person who reposted it. */
   repostedBy?: string;
-  /** Sort timestamp — uses the repost timestamp when present for correct ordering. */
+  /** If this item is a repost and we have the wrapper event, the kind 6 / 16 repost event itself (used for linking "reposted" to its nevent). */
+  repostEvent?: NostrEvent;
+  /** If this item is a reaction overlay, the reaction event + actor pubkey. */
+  reactedBy?: ReactionOverlay;
+  /** If this item is a zap overlay, the zap event + sender pubkey + amount. */
+  zappedBy?: ZapOverlay;
+  /** Sort timestamp — uses the wrapper event's timestamp when present for correct ordering. */
   sortTimestamp: number;
+}
+
+/**
+ * Compute a stable React key / dedup key for a feed item. The same target
+ * event can appear with multiple wrappers (a repost AND a reaction AND a
+ * zap), so the key incorporates the wrapper event id when present.
+ */
+export function feedItemKey(item: FeedItem): string {
+  if (item.reactedBy) return `reaction-${item.reactedBy.event.id}-${item.event.id}`;
+  if (item.zappedBy) return `zap-${item.zappedBy.event.id}-${item.event.id}`;
+  if (item.repostedBy) return `repost-${item.repostedBy}-${item.event.id}`;
+  return item.event.id;
 }
 
 /** d-tags reserved by NIP-51 for other purposes — hide these kind 30000 events from feeds. */
@@ -95,6 +147,31 @@ export function shouldHideFeedEvent(event: NostrEvent): boolean {
   if (event.kind === 37516 && event.tags.some(([n, v]) => n === 't' && v === 'hidden')) return true;
   // Emoji packs (kind 30030) without at least one valid emoji tag
   if (event.kind === 30030 && !event.tags.some(([n, sc, url]) => n === 'emoji' && sc && url)) return true;
+  // Bird detections (kind 2473) without a Wikidata entity reference — the NIP
+  // requires an `i` tag pointing at https://www.wikidata.org/entity/Q<digits>.
+  if (event.kind === 2473) {
+    const wikidataRe = /^https:\/\/www\.wikidata\.org\/entity\/Q\d+$/;
+    if (!event.tags.some(([n, v]) => n === 'i' && typeof v === 'string' && wikidataRe.test(v))) return true;
+  }
+  // Birdex life lists (kind 12473) with no valid species entries — a
+  // Birdex is an index over the author's kind 2473 detections, so one
+  // with zero parseable `i` tags has nothing to show.
+  if (event.kind === 12473) {
+    const wikidataRe = /^https:\/\/www\.wikidata\.org\/entity\/Q\d+$/;
+    if (!event.tags.some(([n, v]) => n === 'i' && typeof v === 'string' && wikidataRe.test(v))) return true;
+  }
+  // Custom constellations (kind 30621) without any valid edge tags
+  if (event.kind === 30621) {
+    const hasEdge = event.tags.some(([n, from, to]) => n === 'edge' && /^\d+$/.test(from ?? '') && /^\d+$/.test(to ?? ''));
+    if (!hasEdge) return true;
+  }
+  // NIP-84 highlights (kind 9802) with no excerpt AND no source reference.
+  // Either is required to have anything meaningful to render.
+  if (event.kind === 9802) {
+    const hasContent = event.content.trim().length > 0;
+    const hasSource = event.tags.some(([n]) => n === 'a' || n === 'e' || n === 'r');
+    if (!hasContent && !hasSource) return true;
+  }
   return false;
 }
 

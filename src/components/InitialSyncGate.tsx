@@ -408,6 +408,18 @@ function SetupQuestionnaire({
       feedIncludeBadgeDefinitions: false,
       feedIncludeProfileBadges: false,
       feedIncludeVanish: true,
+      showBadgeAwards: true,
+      feedIncludeBadgeAwards: true,
+      showBirdstar: true,
+      feedIncludeBirdDetections: true,
+      feedIncludeBirdex: true,
+      feedIncludeConstellations: true,
+      showHighlights: true,
+      feedIncludeHighlights: false,
+      showPeopleLists: true,
+      feedIncludePeopleLists: true,
+      feedIncludeReactions: false,
+      feedIncludeZaps: false,
       followsFeedShowReplies: true,
     };
 

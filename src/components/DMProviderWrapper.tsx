@@ -58,10 +58,10 @@ export function DMProviderWrapper({ children }: DMProviderWrapperProps) {
       return messaging.discoveryRelays;
     }
 
-    return getEffectiveRelays(config.relayMetadata, config.useAppRelays).relays
+    return getEffectiveRelays(config.relayMetadata, config.useAppRelays, config.useUserRelays).relays
       .filter((relay) => relay.read)
       .map((relay) => relay.url);
-  }, [messaging.discoveryRelays, config.relayMetadata, config.useAppRelays]);
+  }, [messaging.discoveryRelays, config.relayMetadata, config.useAppRelays, config.useUserRelays]);
 
   const relayMode = messaging.relayMode ?? "hybrid";
   const protocolMode = messaging.protocolMode;

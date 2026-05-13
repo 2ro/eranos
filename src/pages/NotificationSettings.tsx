@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { Capacitor } from '@capacitor/core';
 import { useSeoMeta } from '@unhead/react';
-import { Bell, BellOff, AlertTriangle, Heart, Repeat2, Zap, AtSign, MessageSquare, Users, Award, Mail, Radio, MonitorSmartphone } from 'lucide-react';
+import { Bell, BellOff, AlertTriangle, Heart, Highlighter, Repeat2, Zap, AtSign, MessageSquare, Users, Award, Mail, Radio, MonitorSmartphone } from 'lucide-react';
 import { Navigate } from 'react-router-dom';
 import { PageHeader } from '@/components/PageHeader';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
@@ -13,7 +13,7 @@ import { useEncryptedSettings } from '@/hooks/useEncryptedSettings';
 import { usePushNotifications } from '@/hooks/usePushNotifications';
 import { toast } from '@/hooks/useToast';
 
-type NotificationPrefKey = 'reactions' | 'reposts' | 'zaps' | 'mentions' | 'comments' | 'badges' | 'letters';
+type NotificationPrefKey = 'reactions' | 'reposts' | 'zaps' | 'mentions' | 'comments' | 'badges' | 'letters' | 'highlights';
 
 interface NotificationTypeRow {
   key: NotificationPrefKey;
@@ -41,8 +41,8 @@ const NOTIFICATION_TYPES: NotificationTypeRow[] = [
   {
     key: 'zaps',
     label: 'Zaps',
-    kinds: [9735],
-    description: 'When someone sends you a zap',
+    kinds: [9735, 8333],
+    description: 'When someone sends you a lightning or on-chain zap',
     icon: <Zap className="size-5" />,
   },
   {
@@ -72,6 +72,13 @@ const NOTIFICATION_TYPES: NotificationTypeRow[] = [
     kinds: [8211],
     description: 'When someone sends you a letter',
     icon: <Mail className="size-5" />,
+  },
+  {
+    key: 'highlights',
+    label: 'Highlights',
+    kinds: [9802],
+    description: 'When someone highlights your content',
+    icon: <Highlighter className="size-5" />,
   },
 ];
 

@@ -51,6 +51,8 @@ export interface EncryptedSettings {
   customTheme?: ThemeConfig;
   /** Whether to use app default relays in addition to user relays */
   useAppRelays?: boolean;
+  /** Whether to include the user's personal NIP-65 relay list in the effective relay set. */
+  useUserRelays?: boolean;
   /** Feed and sidebar content settings */
   feedSettings?: FeedSettings;
   /** Advanced content filters */
@@ -72,6 +74,7 @@ export interface EncryptedSettings {
     comments?: boolean;
     badges?: boolean;
     letters?: boolean;
+    highlights?: boolean;
     onlyFollowing?: boolean;
   };
   /** Last sync timestamp */
@@ -99,6 +102,8 @@ export interface EncryptedSettings {
   faviconUrl?: string;
   /** Custom link preview URI template (only synced when non-empty) */
   linkPreviewUrl?: string;
+  /** Autoplay videos in feeds and previews (muted) */
+  autoplayVideos?: boolean;
   /** Sentry DSN for error reporting (empty string = disabled) */
   sentryDsn?: string;
   /** Saved feed tabs created from the search page. */

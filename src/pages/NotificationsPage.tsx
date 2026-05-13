@@ -2,7 +2,7 @@ import { useState, useMemo, useEffect, useCallback } from 'react';
 import { useInView } from 'react-intersection-observer';
 import { useSeoMeta } from '@unhead/react';
 import { useQueryClient } from '@tanstack/react-query';
-import { Zap, AtSign, MessageSquare, MessageCircle, Loader2, Award, Check, Mail, Bell } from 'lucide-react';
+import { Zap, AtSign, MessageSquare, MessageCircle, Highlighter, Loader2, Award, Mail, Bell } from 'lucide-react';
 import { RepostIcon } from '@/components/icons/RepostIcon';
 import { Link, useNavigate } from 'react-router-dom';
 import { PullToRefresh } from '@/components/PullToRefresh';
@@ -25,13 +25,14 @@ import { nip19 } from 'nostr-tools';
 import { isReplyEvent } from '@/lib/nostrEvents';
 import { useProfileUrl } from '@/hooks/useProfileUrl';
 import { formatNumber } from '@/lib/formatNumber';
+import { getZapAmountSats, getZapSenderPubkey } from '@/lib/zapHelpers';
+import { encodeEventAddress } from '@/lib/encodeEvent';
 import { cn } from '@/lib/utils';
 import { ProfileHoverCard } from '@/components/ProfileHoverCard';
 import { ReactionEmoji, EmojifiedText } from '@/components/CustomEmoji';
-import { useAcceptBadge } from '@/hooks/useAcceptBadge';
-import { useProfileBadges } from '@/hooks/useProfileBadges';
 import { useBadgeDefinitions } from '@/hooks/useBadgeDefinitions';
-import { BADGE_DEFINITION_KIND } from '@/lib/badgeUtils';
+import { AcceptBadgeButton } from '@/components/AcceptBadgeButton';
+import { BADGE_DEFINITION_KIND, parseBadgeATag, unslugify } from '@/lib/badgeUtils';
 import { LETTER_KIND, type Letter } from '@/lib/letterTypes';
 import { EnvelopeCard } from '@/components/letter/EnvelopeCard';
 import { LetterDetailSheet } from '@/components/letter/LetterDetailSheet';
@@ -57,6 +58,7 @@ const NOTIFICATION_KIND_NOUNS: Record<number, string> = {
   4: 'encrypted message',
   6: 'repost',
   7: 'reaction',
+  8: 'badge award',
   16: 'repost',
   20: 'photo',
   21: 'video',
@@ -68,6 +70,9 @@ const NOTIFICATION_KIND_NOUNS: Record<number, string> = {
   1222: 'voice message',
   1617: 'patch',
   1618: 'pull request',
+  9802: 'highlight',
+  2473: 'bird detection',
+  12473: 'Birdex',
   3367: 'color moment',
   7516: 'found log',
   15128: 'nsite',
@@ -95,6 +100,7 @@ const NOTIFICATION_KIND_NOUNS: Record<number, string> = {
   36787: 'track',
   37381: 'Magic deck',
   37516: 'treasure',
+  30621: 'constellation',
   39089: 'follow pack',
 };
 
@@ -284,6 +290,7 @@ function GroupedNotificationView({ group }: { group: GroupedNotificationItem }) 
         ? <RepostNotification item={group.actors[0]} isNew={group.isNew} />
         : <RepostNotificationGroup group={group} />;
     case 9735:
+    case 8333:
       return solo
         ? <ZapNotification item={group.actors[0]} isNew={group.isNew} />
         : <ZapNotificationGroup group={group} />;
@@ -297,6 +304,10 @@ function GroupedNotificationView({ group }: { group: GroupedNotificationItem }) 
         : <BadgeAwardNotificationGroup group={group} />;
     case LETTER_KIND:
       return <LetterNotification item={group.actors[0]} isNew={group.isNew} />;
+    case 9802:
+      return solo
+        ? <HighlightNotification item={group.actors[0]} isNew={group.isNew} />
+        : <HighlightNotificationGroup group={group} />;
     default:
       return null;
   }
@@ -365,7 +376,7 @@ function ActorAvatars({ actors }: { actors: NotificationItem[] }) {
 function ActorAvatar({ pubkey }: { pubkey: string }) {
   const author = useAuthor(pubkey);
   const metadata = author.data?.metadata;
-  const name = metadata?.name ?? genUserName(pubkey);
+  const name = metadata?.name ?? metadata?.display_name ?? genUserName(pubkey);
   const profileUrl = useProfileUrl(pubkey, metadata);
 
   return (
@@ -391,7 +402,7 @@ function GroupHeader({
 }: {
   actors: NotificationItem[];
   icon: React.ReactNode;
-  action: string;
+  action: React.ReactNode;
 }) {
   // Build a human-readable subject line from the first 2 actor names
   const firstActor = actors[0];
@@ -437,7 +448,7 @@ function GroupHeader({
 /** Helper hook to get a display name for a pubkey. */
 function useActorName(pubkey: string): string {
   const author = useAuthor(pubkey || 'dummy');
-  return author.data?.metadata?.name ?? genUserName(pubkey || 'dummy');
+  return author.data?.metadata?.name ?? author.data?.metadata?.display_name ?? genUserName(pubkey || 'dummy');
 }
 
 function ActorLink({ pubkey, name }: { pubkey: string; name: string }) {
@@ -473,7 +484,7 @@ function LikeNotification({ item, isNew }: { item: NotificationItem; isNew: bool
               <ReactionEmoji content={item.event.content.trim()} tags={item.event.tags} className="inline-block h-4 w-4 object-contain" />
             </span>
           }
-          action={`reacted to your ${noun}`}
+          action={<ActionLink event={item.event}>{`reacted to your ${noun}`}</ActionLink>}
         />
       </div>
       {!isProfileReaction && <ReferencedNoteCard item={item} />}
@@ -492,7 +503,7 @@ function RepostNotification({ item, isNew }: { item: NotificationItem; isNew: bo
         <NotificationHeader
           actorPubkey={item.event.pubkey}
           icon={<RepostIcon className="size-4 text-accent" />}
-          action={`reposted your ${noun}`}
+          action={<ActionLink event={item.event}>{`reposted your ${noun}`}</ActionLink>}
         />
       </div>
       <ReferencedNoteCard item={item} />
@@ -503,41 +514,27 @@ function RepostNotification({ item, isNew }: { item: NotificationItem; isNew: bo
 // ──────────────────────────────────────
 // Zap Notification (single actor)
 // ──────────────────────────────────────
+
+/**
+ * Renders a notification action verb that links to the underlying event
+ * (the reaction, repost, or zap) on the /:nip19 detail page. Falls back
+ * to a plain span when `event` is undefined.
+ */
+function ActionLink({ event, children }: { event: NostrEvent | undefined; children: React.ReactNode }) {
+  const href = useMemo(() => (event ? `/${encodeEventAddress(event)}` : undefined), [event]);
+  if (!href) return <>{children}</>;
+  return (
+    <Link to={href} className="hover:underline">
+      {children}
+    </Link>
+  );
+}
+
 function ZapNotification({ item, isNew }: { item: NotificationItem; isNew: boolean }) {
   const { event } = item;
 
-  const zapAmount = useMemo(() => {
-    const amountTag = event.tags.find(([name]) => name === 'amount');
-    if (amountTag?.[1]) {
-      const msats = parseInt(amountTag[1], 10);
-      if (!isNaN(msats) && msats > 0) return Math.floor(msats / 1000);
-    }
-    const descTag = event.tags.find(([name]) => name === 'description');
-    if (descTag?.[1]) {
-      try {
-        const zapRequest = JSON.parse(descTag[1]);
-        const reqAmountTag = zapRequest.tags?.find(([name]: [string]) => name === 'amount');
-        if (reqAmountTag?.[1]) {
-          const msats = parseInt(reqAmountTag[1], 10);
-          if (!isNaN(msats) && msats > 0) return Math.floor(msats / 1000);
-        }
-      } catch { /* ignore */ }
-    }
-    return 0;
-  }, [event]);
-
-  const senderPubkey = useMemo(() => {
-    const pTag = event.tags.find(([name]) => name === 'P');
-    if (pTag?.[1]) return pTag[1];
-    const descTag = event.tags.find(([name]) => name === 'description');
-    if (descTag?.[1]) {
-      try {
-        const zapRequest = JSON.parse(descTag[1]);
-        if (zapRequest.pubkey) return zapRequest.pubkey;
-      } catch { /* ignore */ }
-    }
-    return event.pubkey;
-  }, [event]);
+  const zapAmount = useMemo(() => getZapAmountSats(event), [event]);
+  const senderPubkey = useMemo(() => getZapSenderPubkey(event), [event]);
 
   const amountLabel = zapAmount > 0 ? ` ${formatNumber(zapAmount)} sats` : '';
 
@@ -547,7 +544,7 @@ function ZapNotification({ item, isNew }: { item: NotificationItem; isNew: boole
         <NotificationHeader
           actorPubkey={senderPubkey}
           icon={<Zap className="size-4 text-amber-500 fill-amber-500" />}
-          action={`zapped you${amountLabel}`}
+          action={<ActionLink event={event}>{`zapped you${amountLabel}`}</ActionLink>}
         />
       </div>
       <ReferencedNoteCard item={item} />
@@ -573,7 +570,7 @@ function LikeNotificationGroup({ group }: { group: GroupedNotificationItem }) {
             <ReactionEmoji content={firstEvent.content.trim()} tags={firstEvent.tags} className="inline-block h-4 w-4 object-contain" />
           </span>
         }
-        action={`reacted to your ${noun}`}
+        action={<ActionLink event={firstEvent}>{`reacted to your ${noun}`}</ActionLink>}
       />
       {!isProfileReaction && <ReferencedNoteCard item={group.actors[0]} />}
     </NotificationWrapper>
@@ -590,7 +587,7 @@ function RepostNotificationGroup({ group }: { group: GroupedNotificationItem }) 
       <GroupHeader
         actors={group.actors}
         icon={<RepostIcon className="size-4 text-accent" />}
-        action={`reposted your ${noun}`}
+        action={<ActionLink event={group.actors[0].event}>{`reposted your ${noun}`}</ActionLink>}
       />
       <ReferencedNoteCard item={group.actors[0]} />
     </NotificationWrapper>
@@ -601,48 +598,24 @@ function RepostNotificationGroup({ group }: { group: GroupedNotificationItem }) 
 // Zap Notification (grouped)
 // ──────────────────────────────────────
 function ZapNotificationGroup({ group }: { group: GroupedNotificationItem }) {
-  // Sum zap amounts across all actors in the group
+  // Sum zap amounts across all actors in the group. Mixes lightning (9735)
+  // and on-chain (8333) zaps — both contribute their sat value to the total.
   const totalSats = useMemo(() => {
     let total = 0;
     for (const item of group.actors) {
-      const event = item.event;
-      const amountTag = event.tags.find(([name]) => name === 'amount');
-      if (amountTag?.[1]) {
-        const msats = parseInt(amountTag[1], 10);
-        if (!isNaN(msats) && msats > 0) { total += Math.floor(msats / 1000); continue; }
-      }
-      const descTag = event.tags.find(([name]) => name === 'description');
-      if (descTag?.[1]) {
-        try {
-          const zapRequest = JSON.parse(descTag[1]);
-          const reqAmountTag = zapRequest.tags?.find(([name]: [string]) => name === 'amount');
-          if (reqAmountTag?.[1]) {
-            const msats = parseInt(reqAmountTag[1], 10);
-            if (!isNaN(msats) && msats > 0) { total += Math.floor(msats / 1000); continue; }
-          }
-        } catch { /* ignore */ }
-      }
+      total += getZapAmountSats(item.event);
     }
     return total;
   }, [group.actors]);
 
-  // Extract sender pubkeys from zap receipts to use as the actor pubkeys
+  // Extract sender pubkeys from zap events to use as the actor pubkeys
+  // (for 9735 the receipt is signed by the LNURL provider; for 8333 the
+  // sender already authors the event).
   const zapActors = useMemo<NotificationItem[]>(() => {
     return group.actors.map((item) => {
-      const event = item.event;
-      let senderPubkey = event.pubkey;
-      const pTag = event.tags.find(([name]) => name === 'P');
-      if (pTag?.[1]) { senderPubkey = pTag[1]; }
-      else {
-        const descTag = event.tags.find(([name]) => name === 'description');
-        if (descTag?.[1]) {
-          try {
-            const zapRequest = JSON.parse(descTag[1]);
-            if (zapRequest.pubkey) senderPubkey = zapRequest.pubkey;
-          } catch { /* ignore */ }
-        }
-      }
-      return { ...item, event: { ...event, pubkey: senderPubkey } };
+      const senderPubkey = getZapSenderPubkey(item.event);
+      if (senderPubkey === item.event.pubkey) return item;
+      return { ...item, event: { ...item.event, pubkey: senderPubkey } };
     });
   }, [group.actors]);
 
@@ -653,7 +626,7 @@ function ZapNotificationGroup({ group }: { group: GroupedNotificationItem }) {
       <GroupHeader
         actors={zapActors}
         icon={<Zap className="size-4 text-amber-500 fill-amber-500" />}
-        action={`zapped you${amountLabel}`}
+        action={<ActionLink event={group.actors[0].event}>{`zapped you${amountLabel}`}</ActionLink>}
       />
       <ReferencedNoteCard item={group.actors[0]} />
     </NotificationWrapper>
@@ -776,26 +749,81 @@ function LetterNotification({ item, isNew }: { item: NotificationItem; isNew: bo
 }
 
 // ──────────────────────────────────────
-// Badge Award helpers
+// Highlight Notification (kind 9802)
 // ──────────────────────────────────────
 
-/** Extract pubkey and identifier from a kind 8 award event's `a` tag. */
-function parseBadgeATag(event: NostrEvent): { pubkey: string; identifier: string } | undefined {
-  const aVal = event.tags.find(([n, v]) => n === 'a' && v?.startsWith(`${BADGE_DEFINITION_KIND}:`))?.[1];
-  if (!aVal) return undefined;
-  const parts = aVal.split(':');
-  if (parts.length < 3 || !parts[1] || !parts[2]) return undefined;
-  // Validate pubkey is a 64-char hex string to avoid crashes in nip19.naddrEncode
-  if (!/^[0-9a-f]{64}$/.test(parts[1])) return undefined;
-  return { pubkey: parts[1], identifier: parts.slice(2).join(':') };
+/** Compact rendering of a single highlight excerpt (shared between single/grouped views). */
+function HighlightExcerpt({ event }: { event: NostrEvent }) {
+  const navigate = useNavigate();
+  const nevent = useMemo(
+    () => nip19.neventEncode({ id: event.id, author: event.pubkey }),
+    [event.id, event.pubkey],
+  );
+  const excerpt = event.content.trim();
+  if (!excerpt) return null;
+  return (
+    <blockquote
+      role="link"
+      tabIndex={0}
+      onClick={(e) => {
+        e.stopPropagation();
+        navigate(`/${nevent}`);
+      }}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          e.stopPropagation();
+          navigate(`/${nevent}`);
+        }
+      }}
+      className="mx-4 mb-3 mt-1 rounded-r-lg border-l-[3px] border-primary/70 bg-primary/5 pl-3 pr-3 py-2 cursor-pointer hover:bg-primary/10 transition-colors"
+    >
+      <p className="font-serif text-[14px] leading-relaxed whitespace-pre-wrap break-words line-clamp-4 text-foreground">
+        {excerpt}
+      </p>
+    </blockquote>
+  );
 }
 
-/** Turn a d-tag slug like "first-post" into "First Post". */
-function unslugify(slug: string): string {
-  return slug
-    .replace(/[-_]/g, ' ')
-    .replace(/\b\w/g, (c) => c.toUpperCase());
+function HighlightNotification({ item, isNew }: { item: NotificationItem; isNew: boolean }) {
+  const noun = getNotificationKindNoun(item.referencedEvent?.kind);
+  return (
+    <NotificationWrapper isNew={isNew}>
+      <div className="px-4 pt-3">
+        <NotificationHeader
+          actorPubkey={item.event.pubkey}
+          icon={<Highlighter className="size-4 text-primary" />}
+          action={`highlighted your ${noun}`}
+        />
+      </div>
+      <HighlightExcerpt event={item.event} />
+      <ReferencedNoteCard item={item} />
+    </NotificationWrapper>
+  );
 }
+
+function HighlightNotificationGroup({ group }: { group: GroupedNotificationItem }) {
+  // Grouping is keyed by (highlight event id), so in practice every group
+  // here contains one actor — keep the group fallback just in case the
+  // grouping policy changes.
+  const noun = getNotificationKindNoun(group.referencedEvent?.kind);
+  const first = group.actors[0];
+  return (
+    <NotificationWrapper isNew={group.isNew}>
+      <GroupHeader
+        actors={group.actors}
+        icon={<Highlighter className="size-4 text-primary" />}
+        action={`highlighted your ${noun}`}
+      />
+      {first && <HighlightExcerpt event={first.event} />}
+      {first && <ReferencedNoteCard item={first} />}
+    </NotificationWrapper>
+  );
+}
+
+// ──────────────────────────────────────
+// Badge Award helpers
+// ──────────────────────────────────────
 
 /** Hook: resolve the display name, badge data, and definition event for a single badge award event. */
 function useBadgeAward(awardEvent: NostrEvent): { name: string | undefined; badge: BadgeData | undefined; definitionEvent: NostrEvent | undefined } {
@@ -811,73 +839,6 @@ function useBadgeAward(awardEvent: NostrEvent): { name: string | undefined; badg
     badge: definition ?? undefined,
     definitionEvent: definition?.event,
   };
-}
-
-// ──────────────────────────────────────
-// Accept Badge Button (shared by single and grouped badge notifications)
-// ──────────────────────────────────────
-function AcceptBadgeButton({ awardEvent, prominent }: { awardEvent: NostrEvent; prominent?: boolean }) {
-  const { user } = useCurrentUser();
-  const { refs } = useProfileBadges(user?.pubkey);
-  const { mutate: acceptBadge, isPending, isSuccess } = useAcceptBadge();
-
-  const aTag = awardEvent.tags.find(([n, v]) => n === 'a' && v?.startsWith('30009:'))?.[1];
-
-  // Check if already accepted
-  const alreadyAccepted = refs.some((r) => r.aTag === aTag) || isSuccess;
-
-  if (!aTag || !user) return null;
-
-  if (alreadyAccepted) {
-    return (
-      <span className={cn(
-        "inline-flex items-center gap-1 text-muted-foreground",
-        prominent ? "text-sm" : "text-xs",
-      )}>
-        <Check className={prominent ? "size-4" : "size-3"} />
-        Accepted
-      </span>
-    );
-  }
-
-  if (prominent) {
-    return (
-      <Button
-        className="rounded-full px-6 h-10 text-sm font-semibold gap-2 shadow-md hover:scale-105 active:scale-95 transition-all"
-        onClick={() => acceptBadge({ aTag, awardEventId: awardEvent.id })}
-        disabled={isPending}
-        style={{ filter: 'drop-shadow(0 2px 8px hsl(var(--primary) / 0.25))' }}
-      >
-        {isPending ? (
-          <Loader2 className="size-4 animate-spin" />
-        ) : (
-          <>
-            <Award className="size-4" />
-            Accept Badge
-          </>
-        )}
-      </Button>
-    );
-  }
-
-  return (
-    <Button
-      size="sm"
-      variant="outline"
-      className="h-7 px-2.5 text-xs font-medium gap-1 transition-colors hover:bg-primary hover:text-primary-foreground"
-      onClick={() => acceptBadge({ aTag, awardEventId: awardEvent.id })}
-      disabled={isPending}
-    >
-      {isPending ? (
-        <Loader2 className="size-3 animate-spin" />
-      ) : (
-        <>
-          <Award className="size-3" />
-          Accept
-        </>
-      )}
-    </Button>
-  );
 }
 
 // ──────────────────────────────────────
@@ -985,11 +946,11 @@ function NotificationHeader({
 }: {
   actorPubkey: string;
   icon: React.ReactNode;
-  action: string;
+  action: React.ReactNode;
 }) {
   const author = useAuthor(actorPubkey);
   const metadata = author.data?.metadata;
-  const displayName = metadata?.name || genUserName(actorPubkey);
+  const displayName = metadata?.name || metadata?.display_name || genUserName(actorPubkey);
   const profileUrl = useProfileUrl(actorPubkey, metadata);
 
   if (author.isLoading) {

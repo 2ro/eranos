@@ -7,6 +7,7 @@ import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { useEncryptedSettings, setLocalSettingsSync } from "@/hooks/useEncryptedSettings";
 import { isSyncDone } from "@/hooks/useInitialSync";
 import { parseBlossomServerList } from "@/lib/appBlossom";
+import { getStorageKey } from "@/lib/storageKey";
 
 
 /**
@@ -208,7 +209,7 @@ export function NostrSync() {
         // Only reset theme/sidebar for real account switches, not fresh signups.
         // During signup, isSyncDone returns false and the onboarding
         // questionnaire owns theme state until it saves settings.
-        if (isSyncDone(user.pubkey)) {
+        if (isSyncDone(config.appId, user.pubkey)) {
           updateConfig((current) => {
             let changed = false;
             const updates = { ...current };
@@ -319,6 +320,14 @@ export function NostrSync() {
         changed = true;
       }
 
+      if (
+        encryptedSettings.useUserRelays !== undefined &&
+        encryptedSettings.useUserRelays !== current.useUserRelays
+      ) {
+        updates.useUserRelays = encryptedSettings.useUserRelays;
+        changed = true;
+      }
+
       if (encryptedSettings.feedSettings) {
         const currentFeed = current.feedSettings;
         const remoteFeed = encryptedSettings.feedSettings;
@@ -421,17 +430,19 @@ export function NostrSync() {
 
     // Sync feed tab settings (stored directly in localStorage, not AppConfig)
     if (encryptedSettings.showGlobalFeed !== undefined) {
-      const current = localStorage.getItem("ditto:showGlobalFeed");
+      const key = getStorageKey(config.appId, "showGlobalFeed");
+      const current = localStorage.getItem(key);
       const incoming = String(encryptedSettings.showGlobalFeed);
       if (current !== incoming) {
-        localStorage.setItem("ditto:showGlobalFeed", incoming);
+        localStorage.setItem(key, incoming);
       }
     }
     if (encryptedSettings.showCommunityFeed !== undefined) {
-      const current = localStorage.getItem("ditto:showCommunityFeed");
+      const key = getStorageKey(config.appId, "showCommunityFeed");
+      const current = localStorage.getItem(key);
       const incoming = String(encryptedSettings.showCommunityFeed);
       if (current !== incoming) {
-        localStorage.setItem("ditto:showCommunityFeed", incoming);
+        localStorage.setItem(key, incoming);
       }
     }
     if (encryptedSettings.communityData) {
@@ -440,12 +451,13 @@ export function NostrSync() {
         label: encryptedSettings.communityData.label,
         userCount: encryptedSettings.communityData.userCount,
       };
-      const currentRaw = localStorage.getItem("ditto:community");
+      const communityKey = getStorageKey(config.appId, "community");
+      const currentRaw = localStorage.getItem(communityKey);
       const incoming = JSON.stringify(community);
       if (currentRaw !== incoming) {
-        localStorage.setItem("ditto:community", incoming);
+        localStorage.setItem(communityKey, incoming);
         localStorage.setItem(
-          "ditto:communityData",
+          getStorageKey(config.appId, "communityData"),
           JSON.stringify({ names: encryptedSettings.communityData.nip05 }),
         );
       }
@@ -463,6 +475,7 @@ export function NostrSync() {
     updateConfig,
     recentlyWritten,
     seededTimestamp,
+    config.appId,
   ]);
   return null;
 }

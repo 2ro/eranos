@@ -9,9 +9,8 @@ import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Input } from '@/components/ui/input';
-import { ScrollArea } from '@/components/ui/scroll-area';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
-import { Dialog, DialogContent } from '@/components/ui/dialog';
+
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { useCustomEmojis } from '@/hooks/useCustomEmojis';
 import { useFeedSettings } from '@/hooks/useFeedSettings';
@@ -19,8 +18,8 @@ import { GifPicker } from '@/components/GifPicker';
 import { EmbeddedNote } from '@/components/EmbeddedNote';
 import { EmbeddedNaddr } from '@/components/EmbeddedNaddr';
 import { MentionAutocomplete } from '@/components/MentionAutocomplete';
-import { CustomEmojiImg } from '@/components/CustomEmoji';
 import { EmojiShortcodeAutocomplete } from '@/components/EmojiShortcodeAutocomplete';
+import { StickerPicker } from '@/components/StickerPicker';
 
 import { NoteContent } from '@/components/NoteContent';
 
@@ -45,6 +44,8 @@ import { formatTime } from '@/lib/formatTime';
 import { genUserName } from '@/lib/genUserName';
 import { DITTO_RELAY } from '@/lib/appRelays';
 import { resizeImage } from '@/lib/resizeImage';
+import { extractHashtags } from '@/lib/hashtag';
+import { useIsMobile } from '@/hooks/useIsMobile';
 
 const MAX_CHARS = 5000;
 
@@ -103,20 +104,30 @@ async function getImageMeta(file: File): Promise<{ dim?: string; blurhash?: stri
   }
 }
 
+/** Root target for a compose action that isn't a Nostr event — a URL or a NIP-73 hashtag-style identifier (e.g. `bitcoin:tx:...`, `isbn:...`, `iso3166:...`). */
+export type ExternalReplyRoot = URL | `#${string}`;
+
+/** True if `replyTo` is an external (non-Nostr-event) root. */
+function isExternalRoot(replyTo: NostrEvent | ExternalReplyRoot | undefined): replyTo is ExternalReplyRoot {
+  return replyTo instanceof URL || typeof replyTo === 'string';
+}
+
 interface ComposeBoxProps {
   onSuccess?: () => void;
   /** Callback with the freshly published event, useful for optimistic parent caches. */
   onPublished?: (event: NostrEvent) => void;
   placeholder?: string;
   compact?: boolean;
-  /** Event being replied to – adds NIP-10 reply tags when set. A URL triggers NIP-22 comment mode. */
-  replyTo?: NostrEvent | URL;
+  /** Event being replied to – adds NIP-10 reply tags when set. A URL or NIP-73 identifier triggers NIP-22 comment mode. */
+  replyTo?: NostrEvent | ExternalReplyRoot;
   /** Event being quoted – shows embedded preview and adds quote tags. */
   quotedEvent?: NostrEvent;
   /** If true, the compose area is always expanded (e.g. inside a modal). */
   forceExpanded?: boolean;
   /** If true, hides the avatar (useful inside modals with their own layout). */
   hideAvatar?: boolean;
+  /** If true, suppresses the bottom border. Use when the composer sits directly above a visually distinct section (e.g. tabs with an arc background) that already provides separation. */
+  hideBorder?: boolean;
   /** Controlled preview mode (for modal usage). */
   previewMode?: boolean;
   /** Callback to notify parent of previewable content changes. */
@@ -186,6 +197,7 @@ export function ComposeBox({
   quotedEvent, 
   forceExpanded = false, 
   hideAvatar = false,
+  hideBorder = false,
   previewMode: controlledPreviewMode,
   onHasPreviewableContentChange,
   initialContent = '',
@@ -207,8 +219,26 @@ export function ComposeBox({
   const { toast } = useToast();
   const { config } = useAppContext();
   const imageQuality = config.imageQuality;
+  const isMobile = useIsMobile();
 
-  const [content, setContent] = useState(initialContent);
+  // Build a stable localStorage key based on compose context.
+  // Different contexts (new post, reply, quote) each get their own draft slot.
+  const draftKey = useMemo(() => {
+    if (replyTo instanceof URL) return `compose-draft:url:${replyTo.href}`;
+    if (typeof replyTo === 'string') return `compose-draft:ext:${replyTo}`;
+    if (replyTo) return `compose-draft:reply:${replyTo.id}`;
+    if (quotedEvent) return `compose-draft:quote:${quotedEvent.id}`;
+    return 'compose-draft:new';
+  }, [replyTo, quotedEvent]);
+
+  const [content, setContent] = useState(() => {
+    if (initialContent) return initialContent;
+    try {
+      return localStorage.getItem(draftKey) ?? '';
+    } catch {
+      return '';
+    }
+  });
   const [expanded, setExpanded] = useState(false);
   const [cwEnabled, setCwEnabled] = useState(false);
   const [cwText, setCwText] = useState('');
@@ -226,7 +256,6 @@ export function ComposeBox({
   const [pollType, setPollType] = useState<'singlechoice' | 'multiplechoice'>('singlechoice');
   const [pollDuration, setPollDuration] = useState<7 | 3 | 1 | 0>(7);
   const [removedEmbeds, setRemovedEmbeds] = useState<Set<string>>(new Set());
-  const [_uploadedFileTags, setUploadedFileTags] = useState<string[][]>([]);
   /** Maps uploaded file URLs to their NIP-94 tags (grouped per upload). */
   const [uploadedFileGroups, setUploadedFileGroups] = useState<Map<string, string[][]>>(new Map());
   /** Maps .xdc URLs to their generated webxdc UUIDs. */
@@ -254,30 +283,66 @@ export function ComposeBox({
     setPollType('singlechoice');
     setPollDuration(7);
     setRemovedEmbeds(new Set());
-    setUploadedFileTags([]);
     setUploadedFileGroups(new Map());
     setWebxdcUuids(new Map());
     setWebxdcMetas(new Map());
-  }, [initialMode]);
+    // Clear the auto-saved draft
+    try { localStorage.removeItem(draftKey); } catch { /* ignore */ }
+  }, [initialMode, draftKey]);
 
   // Use controlled preview mode if provided, otherwise use internal state
   const previewMode = controlledPreviewMode !== undefined ? controlledPreviewMode : internalPreviewMode;
 
-  // Auto-expand when quotedEvent is provided
+  // Auto-expand when quotedEvent is provided or draft is restored
   useEffect(() => {
-    if (quotedEvent) {
+    if (quotedEvent || content) {
       setExpanded(true);
     }
-  }, [quotedEvent]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [quotedEvent]); // Only run on mount / quotedEvent change, not on every content change
 
-  // Auto-resize textarea height as content grows/shrinks
+  // Auto-resize textarea height as content grows/shrinks.
+  // Also re-run when previewMode toggles off so the remounted textarea
+  // is sized to fit its content immediately.
   useEffect(() => {
     const el = textareaRef.current;
     if (!el) return;
     // Reset to auto so shrinking is detected correctly
     el.style.height = 'auto';
     el.style.height = `${el.scrollHeight}px`;
-  }, [content]);
+  }, [content, previewMode]);
+
+  // Auto-save draft content to localStorage (debounced to avoid thrashing)
+  useEffect(() => {
+    if (initialContent) return; // Don't auto-save when content was pre-filled
+    const timer = setTimeout(() => {
+      try {
+        if (content.trim()) {
+          localStorage.setItem(draftKey, content);
+        } else {
+          localStorage.removeItem(draftKey);
+        }
+      } catch {
+        // localStorage might be full or unavailable
+      }
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [content, draftKey, initialContent]);
+
+  // On mobile, blur the textarea when the picker opens to dismiss the keyboard.
+  const pickerWasOpen = useRef(false);
+  useEffect(() => {
+    if (!isMobile) return;
+    if (pickerOpen) {
+      textareaRef.current?.blur();
+      pickerWasOpen.current = true;
+    } else if (pickerWasOpen.current) {
+      // Refocus after picker closes so the user can keep typing
+      pickerWasOpen.current = false;
+      const timer = setTimeout(() => textareaRef.current?.focus(), 150);
+      return () => clearTimeout(timer);
+    }
+  }, [pickerOpen, isMobile]);
 
   const charCount = content.length;
   const remaining = MAX_CHARS - charCount;
@@ -302,6 +367,17 @@ export function ComposeBox({
   }, [cwEnabled, cwText]);
 
 
+  // When the compose box transitions from collapsed → expanded (feed context),
+  // ensure the textarea keeps focus.  The height change re-render can
+  // occasionally drop focus on desktop browsers.  On iOS the native tap
+  // already handles focus, so this is mainly a desktop safety net.
+  const wasExpanded = useRef(false);
+  useEffect(() => {
+    if (expanded && !wasExpanded.current) {
+      textareaRef.current?.focus();
+    }
+    wasExpanded.current = expanded;
+  }, [expanded]);
 
   // Detect embeds in content (nevent, note, naddr, URLs) with their positions
   const detectedEmbeds = useMemo(() => {
@@ -459,8 +535,8 @@ export function ComposeBox({
   const mockEvent = useMemo(() => {
     if (!user || !content) return null;
     
-    const hashtags = content.match(/#[\p{L}\p{N}_]+/gu)?.map((t) => t.slice(1)) || [];
-    const tags: string[][] = hashtags.map((t) => ['t', t.toLowerCase()]);
+    const hashtags = extractHashtags(content);
+    const tags: string[][] = hashtags.map((t) => ['t', t]);
 
     // NIP-30: Add emoji tags for custom emojis referenced in content
     if (customEmojis.length > 0) {
@@ -578,7 +654,6 @@ export function ComposeBox({
       }
 
       // Store the full NIP-94 tags for later use in imeta
-      setUploadedFileTags((prev) => [...prev, ...tags]);
       setUploadedFileGroups((prev) => new Map(prev).set(url, tags));
       setContent((prev) => (prev ? prev + '\n' + url : url));
 
@@ -689,8 +764,8 @@ export function ComposeBox({
         onPublished?.(event);
       } else {
       // Determine kind: 1244 for NIP-22 replies, 1222 for root messages
-      const isNip22Reply = replyTo && (replyTo instanceof URL || replyTo.kind !== 1);
-      const isKind1Reply = replyTo && !(replyTo instanceof URL) && replyTo.kind === 1;
+      const isNip22Reply = replyTo && (isExternalRoot(replyTo) || replyTo.kind !== 1);
+      const isKind1Reply = replyTo && !isExternalRoot(replyTo) && replyTo.kind === 1;
 
       if (isNip22Reply) {
         // NIP-22 voice reply (kind 1244) — use postComment infrastructure
@@ -699,11 +774,18 @@ export function ComposeBox({
         const voiceTags: string[][] = [imetaTag, ...cwTags];
 
         if (replyTo instanceof URL) {
+          const kLabel = replyTo.protocol === 'http:' || replyTo.protocol === 'https:' ? 'web' : replyTo.protocol.replace(/:$/, '');
           voiceTags.push(['I', replyTo.toString()]);
-          voiceTags.push(['K', replyTo.protocol === 'http:' || replyTo.protocol === 'https:' ? 'web' : replyTo.protocol.replace(/:$/, '')]);
+          voiceTags.push(['K', kLabel]);
           // lowercase reply tags pointing to same root
           voiceTags.push(['i', replyTo.toString()]);
-          voiceTags.push(['k', replyTo.protocol === 'http:' || replyTo.protocol === 'https:' ? 'web' : replyTo.protocol.replace(/:$/, '')]);
+          voiceTags.push(['k', kLabel]);
+        } else if (typeof replyTo === 'string') {
+          // NIP-73 hashtag-style identifier (e.g. `bitcoin:tx:...`, `isbn:...`, `iso3166:...`)
+          voiceTags.push(['I', replyTo]);
+          voiceTags.push(['K', '#']);
+          voiceTags.push(['i', replyTo]);
+          voiceTags.push(['k', '#']);
         } else {
           voiceTags.push(['E', replyTo.id]);
           voiceTags.push(['K', replyTo.kind.toString()]);
@@ -719,7 +801,7 @@ export function ComposeBox({
           content: audioUrl,
           tags: voiceTags,
         });
-      } else if (isKind1Reply && !(replyTo instanceof URL)) {
+      } else if (isKind1Reply && !isExternalRoot(replyTo)) {
         // NIP-10 voice reply to a kind 1 note — still publish as kind 1222 with reply tags
         const voiceTags: string[][] = [imetaTag, ...cwTags];
         const rootTag = replyTo.tags.find(([name, , , marker]) => name === 'e' && marker === 'root');
@@ -749,7 +831,7 @@ export function ComposeBox({
       // Reset state
       queryClient.invalidateQueries({ queryKey: ['feed'] });
       if (replyTo) {
-        if (replyTo instanceof URL) {
+        if (isExternalRoot(replyTo)) {
           queryClient.invalidateQueries({ queryKey: ['nostr', 'comments'] });
         } else {
           queryClient.invalidateQueries({ queryKey: ['replies', replyTo.id] });
@@ -772,8 +854,8 @@ export function ComposeBox({
     if (!content.trim() || !user || charCount > MAX_CHARS) return;
 
     try {
-      const hashtags = content.match(/#[\p{L}\p{N}_]+/gu)?.map((t) => t.slice(1)) || [];
-      const tags: string[][] = hashtags.map((t) => ['t', t.toLowerCase()]);
+      const hashtags = extractHashtags(content);
+      const tags: string[][] = hashtags.map((t) => ['t', t]);
 
       // NIP-27 mention p tags — extract nostr:npub1... from content
       const mentionMatches = content.matchAll(/nostr:(npub1[023456789acdefghjklmnpqrstuvwxyz]+)/g);
@@ -794,10 +876,10 @@ export function ComposeBox({
         tags.push(['p', pk]);
       }
 
-      // Reply tags: NIP-10 for kind 1 targets, NIP-22 for non-kind-1 targets and URLs
-      const isNip22Reply = replyTo && (replyTo instanceof URL || replyTo.kind !== 1);
+      // Reply tags: NIP-10 for kind 1 targets, NIP-22 for non-kind-1 targets and external roots (URL or NIP-73 id)
+      const isNip22Reply = replyTo && (isExternalRoot(replyTo) || replyTo.kind !== 1);
 
-      if (replyTo && !isNip22Reply && !(replyTo instanceof URL)) {
+      if (replyTo && !isNip22Reply && !isExternalRoot(replyTo)) {
         // NIP-10 reply tags (kind 1 targets only)
         const rootTag = replyTo.tags.find(([name, , , marker]) => name === 'e' && marker === 'root');
         if (rootTag) {
@@ -927,6 +1009,9 @@ export function ComposeBox({
         if (replyTo instanceof URL) {
           // External content root — the URL is the root directly
           root = replyTo;
+        } else if (typeof replyTo === 'string') {
+          // NIP-73 hashtag-style identifier root (e.g. `bitcoin:tx:...`, `isbn:...`)
+          root = replyTo;
         } else if (replyTo.kind === 1111) {
           // Replying to a comment: replyTo is the parent, root is derived from its uppercase tags
           reply = replyTo;
@@ -995,14 +1080,14 @@ export function ComposeBox({
 
       resetComposeState();
       // Optimistically bump the reply count on the parent event
-      if (replyTo && !(replyTo instanceof URL)) {
+      if (replyTo && !isExternalRoot(replyTo)) {
         queryClient.setQueryData<EventStats>(['event-stats', replyTo.id], (prev) =>
           prev ? { ...prev, replies: prev.replies + 1 } : prev,
         );
       }
       queryClient.invalidateQueries({ queryKey: ['feed'] });
       if (replyTo) {
-        if (replyTo instanceof URL) {
+        if (isExternalRoot(replyTo)) {
           queryClient.invalidateQueries({ queryKey: ['nostr', 'comments'] });
         } else {
           queryClient.invalidateQueries({ queryKey: ['replies', replyTo.id] });
@@ -1094,7 +1179,12 @@ export function ComposeBox({
   if (!user && compact) return null;
 
   return (
-    <div className={cn("px-4 py-3 bg-background/85 rounded-2xl")}>
+    <div className={cn(
+      "px-4 pt-3 bg-background/85 flex flex-col",
+      forceExpanded ? "flex-1 min-h-0 rounded-2xl" : "",
+      pickerOpen ? "pb-0" : "pb-3",
+      !forceExpanded && !hideBorder && "border-b border-border",
+    )}>
       {/* Preview toggle at top when not controlled and has previewable content */}
       {hasPreviewableContent && controlledPreviewMode === undefined && (
         <div className="flex items-center justify-end mb-3">
@@ -1125,7 +1215,7 @@ export function ComposeBox({
         </div>
       )}
 
-      <div className="flex gap-3">
+      <div className={cn("flex gap-3", forceExpanded && "flex-1 min-h-0")}>
         {!hideAvatar && user && (
           isProfileLoading ? (
             <Skeleton className="size-12 shrink-0 mt-0.5 rounded-full" />
@@ -1134,19 +1224,22 @@ export function ComposeBox({
               <Avatar className="size-12 shrink-0 mt-0.5">
                 <AvatarImage src={metadata?.picture} alt={metadata?.name} />
                 <AvatarFallback className="bg-primary/20 text-primary text-sm">
-                  {(metadata?.display_name || metadata?.name || genUserName(user?.pubkey))[0]?.toUpperCase() ?? '?'}
+                  {(metadata?.name || metadata?.display_name || genUserName(user?.pubkey))[0]?.toUpperCase() ?? '?'}
                 </AvatarFallback>
               </Avatar>
             </Link>
           )
         )}
 
-        <div className="flex-1 min-w-0">
+        <div className={cn("flex-1 min-w-0", forceExpanded && "flex flex-col min-h-0")}>
+          {/* Scrollable content area (textarea, poll, CW, quoted event) */}
+          <div className={cn(forceExpanded && "flex-1 min-h-0 overflow-y-auto")}>
           {!previewMode ? (
           /* ── Edit mode — Textarea ────────────────────────────── */
           <div className="relative">
             <textarea
               ref={textareaRef}
+              dir="auto"
               value={content}
               onChange={(e) => setContent(e.target.value)}
               onPointerDown={expand}
@@ -1159,6 +1252,10 @@ export function ComposeBox({
               )}
               rows={1}
               disabled={!user}
+              // In modal context, auto-focus the textarea so the keyboard
+              // opens immediately — especially important on iOS where
+              // programmatic focus() outside a user gesture is ignored.
+              autoFocus={forceExpanded}
               onKeyDown={(e) => {
                 if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) {
                   handleSubmit();
@@ -1179,8 +1276,8 @@ export function ComposeBox({
         ) : (
           /* Preview mode - Show how post will look */
           mockEvent && (
-            <div className="pt-2.5 pb-2 min-h-[100px]">
-              <div className="text-lg opacity-85">
+            <div className="pt-2.5 pb-2 min-h-[100px] overflow-hidden">
+              <div className="text-lg opacity-85 [&_img]:max-w-full [&_img]:h-auto">
                 <NoteContent event={mockEvent} className="text-foreground" />
               </div>
             </div>
@@ -1305,7 +1402,7 @@ export function ComposeBox({
 
         {/* Quoted event preview */}
         {showQuotedEvent && quotedEvent && quotedEventKey && (
-          <div className="mt-4 mb-3">
+          <div className="mt-4 mb-3 overflow-hidden">
             {quotedEvent.kind >= 30000 && quotedEvent.kind < 40000 ? (
               <EmbeddedNaddr addr={{
                 kind: quotedEvent.kind,
@@ -1315,10 +1412,14 @@ export function ComposeBox({
             ) : (
               <EmbeddedNote eventId={quotedEvent.id} authorHint={quotedEvent.pubkey} />
             )}
-          </div>
+           </div>
         )}
+        </div>{/* end scrollable content area */}
 
-        {/* Toolbar + post button */}
+        </div>{/* end flex-1 content column */}
+      </div>{/* end avatar + content row */}
+
+        {/* Toolbar + post button — full width, not indented by avatar */}
         {isExpanded && (
           voiceRecorder.isRecording || isPublishingVoice ? (
             /* ── Voice recording UI ─────────────────────────────── */
@@ -1377,9 +1478,9 @@ export function ComposeBox({
             </div>
           ) : (
             /* ── Normal toolbar ──────────────────────────────────── */
-            <div className="flex items-center justify-between mt-3">
+            <div className={cn("flex items-center justify-between mt-3", forceExpanded && "shrink-0")}>
               {/* Left: action icons */}
-              <div className="flex items-center gap-1 -ml-2">
+              <div className="flex items-center gap-1">
                 {/* File upload */}
                 <Tooltip>
                   <TooltipTrigger asChild>
@@ -1427,12 +1528,12 @@ export function ComposeBox({
                   </Tooltip>
                 )}
 
-                 {/* Emoji / GIF picker */}
+                 {/* Emoji / GIF picker toggle — inline panel renders below the toolbar */}
                  <Tooltip>
                    <TooltipTrigger asChild>
                      <button
                        type="button"
-                       onClick={() => setPickerOpen(true)}
+                       onClick={() => setPickerOpen((v) => !v)}
                        className={cn(
                          'p-2 rounded-full transition-colors',
                          pickerOpen
@@ -1445,115 +1546,6 @@ export function ComposeBox({
                    </TooltipTrigger>
                    {!pickerOpen && <TooltipContent>Emoji / GIF</TooltipContent>}
                  </Tooltip>
-                 <Dialog open={pickerOpen} onOpenChange={setPickerOpen}>
-                   <DialogContent
-                     className="w-auto max-w-fit p-0 gap-0 border-border rounded-xl overflow-hidden [&>button]:hidden"
-                     onOpenAutoFocus={(e) => e.preventDefault()}
-                   >
-                     {/* Tab bar */}
-                     <div className="flex">
-                       <button
-                         type="button"
-                         onClick={() => setPickerTab('emoji')}
-                         className={cn(
-                           'flex-1 flex items-center justify-center gap-1.5 py-2 text-xs font-medium transition-colors border-b-2',
-                           pickerTab === 'emoji'
-                             ? 'text-primary border-primary'
-                             : 'text-muted-foreground hover:text-foreground border-border',
-                         )}
-                       >
-                         <Smile className="size-3.5" />
-                         Emoji
-                       </button>
-                       <button
-                         type="button"
-                         onClick={() => setPickerTab('gif')}
-                         className={cn(
-                           'flex-1 flex items-center justify-center gap-1.5 py-2 text-xs font-medium transition-colors border-b-2',
-                           pickerTab === 'gif'
-                             ? 'text-primary border-primary'
-                             : 'text-muted-foreground hover:text-foreground border-border',
-                         )}
-                       >
-                         <svg width="14" height="14" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                           <rect x="1" y="1" width="16" height="16" rx="3" stroke="currentColor" strokeWidth="1.5" fill="none"/>
-                           <text x="9" y="9" textAnchor="middle" dominantBaseline="central" fontSize="7" fontWeight="700" fontFamily="system-ui,sans-serif" fill="currentColor" letterSpacing="0.5">GIF</text>
-                         </svg>
-                         GIF
-                       </button>
-                       {customEmojis.length > 0 && (
-                         <button
-                           type="button"
-                           onClick={() => setPickerTab('stickers')}
-                           className={cn(
-                             'flex-1 flex items-center justify-center gap-1.5 py-2 text-xs font-medium transition-colors border-b-2',
-                             pickerTab === 'stickers'
-                               ? 'text-primary border-primary'
-                               : 'text-muted-foreground hover:text-foreground border-border',
-                           )}
-                         >
-                           <Sticker className="size-3.5" />
-                           Stickers
-                         </button>
-                       )}
-                     </div>
-                     {/* Picker content */}
-                      {pickerTab === 'emoji' ? (
-                        <Suspense fallback={<div className="w-[316px] h-[435px] flex items-center justify-center"><Loader2 className="size-6 animate-spin text-muted-foreground" /></div>}>
-                          <LazyEmojiPicker
-                            customEmojis={customEmojis}
-                            onSelect={(selection) => {
-                              if (selection.type === 'native') {
-                                insertEmoji(selection.emoji);
-                              } else {
-                                insertEmoji(`:${selection.shortcode}:`);
-                              }
-                            }}
-                          />
-                        </Suspense>
-                     ) : pickerTab === 'stickers' ? (
-                       <div className="w-[316px] h-[435px]">
-                         {customEmojis.length === 0 ? (
-                           <div className="flex flex-col items-center justify-center h-full text-muted-foreground gap-2">
-                             <Sticker className="size-8 opacity-40" />
-                             <p className="text-sm">No sticker packs yet</p>
-                             <p className="text-xs">Add emoji packs to your profile to use stickers</p>
-                           </div>
-                         ) : (
-                           <ScrollArea className="h-full">
-                             <div className="grid grid-cols-4 gap-1.5 p-2">
-                               {customEmojis.map((emoji) => (
-                                 <button
-                                   key={emoji.shortcode}
-                                   type="button"
-                                   title={emoji.shortcode}
-                                   onClick={() => {
-                                     setContent((prev) => (prev ? prev + '\n' + emoji.url : emoji.url));
-                                     setPickerOpen(false);
-                                     expand();
-                                   }}
-                                   className="aspect-square rounded-lg overflow-hidden hover:bg-muted transition-colors p-1 group"
-                                 >
-                                    <CustomEmojiImg
-                                      name={emoji.shortcode}
-                                      url={emoji.url}
-                                      className="w-full h-full object-contain group-hover:scale-110 transition-transform duration-150"
-                                    />
-                                 </button>
-                               ))}
-                             </div>
-                           </ScrollArea>
-                         )}
-                       </div>
-                     ) : (
-                       <GifPicker onSelect={(gif) => {
-                         setContent((prev) => (prev ? prev + '\n' + gif.url : gif.url));
-                         setPickerOpen(false);
-                         expand();
-                       }} />
-                     )}
-                   </DialogContent>
-                 </Dialog>
 
                 {/* Overflow: Poll + CW */}
                 <Popover open={trayOpen} onOpenChange={setTrayOpen}>
@@ -1576,7 +1568,7 @@ export function ComposeBox({
                     </TooltipTrigger>
                     {!trayOpen && <TooltipContent>More</TooltipContent>}
                   </Tooltip>
-                  <PopoverContent side="bottom" align="start" sideOffset={6} className="w-44 p-1.5 rounded-xl border-border shadow-lg">
+                  <PopoverContent side="top" align="start" sideOffset={6} className="w-44 p-1.5 rounded-xl border-border shadow-lg">
                     <div className="flex flex-col gap-0.5">
                       {/* Polls are top-level events (kind 1068), so they only make sense as a
                           standalone post or rooted on an external-content URL (e.g. iso3166: country
@@ -1643,8 +1635,93 @@ export function ComposeBox({
             </div>
           )
         )}
-        </div>
-      </div>
+
+      {/* Inline emoji / GIF / sticker picker panel — rendered outside the
+          padded content area so it bleeds edge-to-edge. */}
+      {pickerOpen && (
+        <div className={cn("-mx-4 shrink-0 overflow-hidden animate-in fade-in-0 duration-150", forceExpanded && "rounded-b-2xl")}>
+          {/* Tab bar — pill highlight style for inline mode */}
+          <div className="flex gap-1 px-3 pt-2">
+              <button
+                type="button"
+                onClick={() => setPickerTab('emoji')}
+                className={cn(
+                  'flex items-center justify-center gap-1.5 px-4 py-1.5 rounded-full text-sm font-medium transition-colors',
+                  pickerTab === 'emoji'
+                    ? 'bg-primary/15 text-primary'
+                    : 'text-muted-foreground hover:text-foreground hover:bg-muted',
+                )}
+              >
+                <Smile className="size-3.5" />
+                Emoji
+              </button>
+              <button
+                type="button"
+                onClick={() => setPickerTab('gif')}
+                className={cn(
+                  'flex items-center justify-center gap-1.5 px-4 py-1.5 rounded-full text-sm font-medium transition-colors',
+                  pickerTab === 'gif'
+                    ? 'bg-primary/15 text-primary'
+                    : 'text-muted-foreground hover:text-foreground hover:bg-muted',
+                )}
+              >
+                <svg width="14" height="14" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                  <rect x="1" y="1" width="16" height="16" rx="3" stroke="currentColor" strokeWidth="1.5" fill="none"/>
+                  <text x="9" y="9" textAnchor="middle" dominantBaseline="central" fontSize="7" fontWeight="700" fontFamily="system-ui,sans-serif" fill="currentColor" letterSpacing="0.5">GIF</text>
+                </svg>
+                GIF
+              </button>
+              {customEmojis.length > 0 && (
+                <button
+                  type="button"
+                  onClick={() => setPickerTab('stickers')}
+                  className={cn(
+                    'flex items-center justify-center gap-1.5 px-4 py-1.5 rounded-full text-sm font-medium transition-colors',
+                    pickerTab === 'stickers'
+                      ? 'bg-primary/15 text-primary'
+                      : 'text-muted-foreground hover:text-foreground hover:bg-muted',
+                  )}
+                >
+                  <Sticker className="size-3.5" />
+                  Stickers
+                </button>
+              )}
+            </div>
+            {/* Picker content */}
+            {pickerTab === 'emoji' ? (
+              <Suspense fallback={<div className="w-full h-[280px] flex items-center justify-center"><Loader2 className="size-6 animate-spin text-muted-foreground" /></div>}>
+                <LazyEmojiPicker
+                  customEmojis={customEmojis}
+                  onSelect={(selection) => {
+                    if (selection.type === 'native') {
+                      insertEmoji(selection.emoji);
+                    } else {
+                      insertEmoji(`:${selection.shortcode}:`);
+                    }
+                  }}
+                />
+              </Suspense>
+            ) : pickerTab === 'stickers' ? (
+              <StickerPicker
+                customEmojis={customEmojis}
+                height={280}
+                autoFocus={!isMobile}
+                onSelect={(emoji) => {
+                  setContent((prev) => (prev ? prev + '\n' + emoji.url : emoji.url));
+                  setPickerOpen(false);
+                  expand();
+                }}
+              />
+            ) : (
+              <GifPicker onSelect={(gif) => {
+                setContent((prev) => (prev ? prev + '\n' + gif.url : gif.url));
+                setPickerOpen(false);
+                expand();
+              }} />
+            )}
+          </div>
+        )}
+
     </div>
   );
 }
