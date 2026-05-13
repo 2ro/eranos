@@ -153,6 +153,8 @@ export function useFollowActions(): UseFollowActionsReturn {
 
         // ⑥ Invalidate cached follow-list queries so UI updates
         queryClient.invalidateQueries({ queryKey: ['follow-list'] });
+        queryClient.invalidateQueries({ queryKey: ['feed'] });
+        queryClient.invalidateQueries({ queryKey: ['following-feed'] });
       } finally {
         setIsPending(false);
       }

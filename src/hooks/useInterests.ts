@@ -10,7 +10,17 @@ import { useCurrentUser } from './useCurrentUser';
 import { useNostrPublish } from './useNostrPublish';
 import { fetchFreshEvent } from '@/lib/fetchFreshEvent';
 
-export function useInterests(tagName: 't' | 'g' = 't') {
+type InterestTagName = 't' | 'g' | 'i';
+
+function normalizeInterest(tagName: InterestTagName, value: string): string {
+  const stripped = value.replace(/^#/, '').trim();
+  if (tagName === 'i' && stripped.toLowerCase().startsWith('iso3166:')) {
+    return `iso3166:${stripped.slice('iso3166:'.length).toUpperCase()}`;
+  }
+  return stripped.toLowerCase();
+}
+
+export function useInterests(tagName: InterestTagName = 't') {
   const { nostr } = useNostr();
   const { user } = useCurrentUser();
   const queryClient = useQueryClient();
@@ -36,12 +46,12 @@ export function useInterests(tagName: 't' | 'g' = 't') {
   /** All interests for this tag type, normalized to lowercase. */
   const hashtags: string[] = (interestsQuery.data?.tags ?? [])
     .filter(([name]) => name === tagName)
-    .map(([, value]) => value.toLowerCase())
+    .map(([, value]) => normalizeInterest(tagName, value))
     .filter((v, i, arr) => arr.indexOf(v) === i); // deduplicate
 
   /** Check if the user follows a specific interest. */
   function hasInterest(tag: string): boolean {
-    return hashtags.includes(tag.toLowerCase());
+    return hashtags.includes(normalizeInterest(tagName, tag));
   }
 
   const invalidate = () => {
@@ -52,7 +62,7 @@ export function useInterests(tagName: 't' | 'g' = 't') {
   const addInterest = useMutation({
     mutationFn: async (tag: string) => {
       if (!user) throw new Error('Must be logged in');
-      const normalized = tag.toLowerCase().replace(/^#/, '');
+      const normalized = normalizeInterest(tagName, tag);
       if (!normalized) throw new Error('Empty tag');
 
       // Fetch the freshest kind 10015 from relays before mutating
@@ -64,7 +74,7 @@ export function useInterests(tagName: 't' | 'g' = 't') {
       const currentTags = prev?.tags ?? [];
 
       // Don't add duplicates
-      if (currentTags.some(([n, v]) => n === tagName && v.toLowerCase() === normalized)) return;
+      if (currentTags.some(([n, v]) => n === tagName && normalizeInterest(tagName, v) === normalized)) return;
 
       const newTags = [...currentTags, [tagName, normalized]];
       await publishEvent({
@@ -81,7 +91,7 @@ export function useInterests(tagName: 't' | 'g' = 't') {
   const removeInterest = useMutation({
     mutationFn: async (tag: string) => {
       if (!user) throw new Error('Must be logged in');
-      const normalized = tag.toLowerCase().replace(/^#/, '');
+      const normalized = normalizeInterest(tagName, tag);
 
       // Fetch the freshest kind 10015 from relays before mutating
       const prev = await fetchFreshEvent(nostr, {
@@ -92,7 +102,7 @@ export function useInterests(tagName: 't' | 'g' = 't') {
       if (!prev) return;
 
       const newTags = prev.tags.filter(
-        ([name, value]) => !(name === tagName && value.toLowerCase() === normalized),
+        ([name, value]) => !(name === tagName && normalizeInterest(tagName, value) === normalized),
       );
       await publishEvent({
         kind: 10015,

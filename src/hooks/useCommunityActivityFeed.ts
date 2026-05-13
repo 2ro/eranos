@@ -68,7 +68,7 @@ const INITIAL_PAGE_PARAM: ActivityFeedPageParam = {
  * Also returns per-community `moderationByATag` and `rankMapByATag` so
  * callers can provide `CommunityModerationContext` to `NoteMoreMenu`.
  */
-export function useCommunityActivityFeed() {
+export function useCommunityActivityFeed(enabled = true) {
   const { nostr } = useNostr();
   const queryClient = useQueryClient();
   const { data: myCommunities, isLoading: communitiesLoading } = useMyCommunities();
@@ -259,7 +259,7 @@ export function useCommunityActivityFeed() {
       } satisfies ActivityFeedPageParam;
     },
     initialPageParam: INITIAL_PAGE_PARAM,
-    enabled: !communitiesLoading && aTags.length > 0,
+    enabled: enabled && !communitiesLoading && aTags.length > 0,
     staleTime: 2 * 60_000,
     gcTime: 30 * 60_000,
     placeholderData: (prev) => prev,
@@ -283,12 +283,12 @@ export function useCommunityActivityFeed() {
       data: query.data ? events : undefined,
       moderationByATag: (latestPage?.moderationByATag ?? EMPTY_MODERATION_BY_A_TAG) as Map<string, CommunityModeration>,
       rankMapByATag: (latestPage?.rankMapByATag ?? EMPTY_RANK_MAP_BY_A_TAG) as Map<string, Map<string, CommunityMember>>,
-      isLoading: communitiesLoading || query.isLoading,
+      isLoading: enabled && (communitiesLoading || query.isLoading),
       isError: query.isError,
       error: query.error,
       hasNextPage: query.hasNextPage,
       isFetchingNextPage: query.isFetchingNextPage,
       fetchNextPage: query.fetchNextPage,
     };
-  }, [query.data, communitiesLoading, query.isLoading, query.isError, query.error, query.hasNextPage, query.isFetchingNextPage, query.fetchNextPage]);
+  }, [query.data, enabled, communitiesLoading, query.isLoading, query.isError, query.error, query.hasNextPage, query.isFetchingNextPage, query.fetchNextPage]);
 }

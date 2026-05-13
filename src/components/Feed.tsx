@@ -9,11 +9,12 @@ import { NoteCard } from '@/components/NoteCard';
 import { PullToRefresh } from '@/components/PullToRefresh';
 import { FeedEmptyState } from '@/components/FeedEmptyState';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Loader2, MapPin } from 'lucide-react';
+import { Globe2, Loader2, MapPin } from 'lucide-react';
 import LoginDialog from '@/components/auth/LoginDialog';
 import { useOnboarding } from '@/hooks/useOnboarding';
 import { useFeed } from '@/hooks/useFeed';
 import { useFeedSettings } from '@/hooks/useFeedSettings';
+import { useFollowingFeed } from '@/hooks/useFollowingFeed';
 import { DITTO_RELAYS } from '@/lib/appRelays';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useFeedTab } from '@/hooks/useFeedTab';
@@ -29,13 +30,14 @@ import { isEventMuted } from '@/lib/muteHelpers';
 import { SubHeaderBar } from '@/components/SubHeaderBar';
 import { ARC_OVERHANG_PX } from '@/components/ArcBackground';
 import { TabButton } from '@/components/TabButton';
+import { Button } from '@/components/ui/button';
 import { useNavHidden } from '@/contexts/LayoutContext';
 import { cn } from '@/lib/utils';
 import type { FeedItem } from '@/lib/feedUtils';
 import type { NostrEvent } from '@nostrify/nostrify';
 import type { SavedFeed } from '@/contexts/AppContext';
 
-type CoreFeedTab = 'follows' | 'global' | 'communities' | 'world';
+type CoreFeedTab = 'follows' | 'network' | 'global' | 'communities' | 'world';
 type FeedTab = CoreFeedTab | string; // string = saved feed id
 
 interface FeedProps {
@@ -120,6 +122,10 @@ export function Feed({ kinds, tagFilters, header, hideCompose, emptyMessage, fee
   // Is the active tab a geotag interest?
   const activeGeotag = activeTab.startsWith('geotag:') ? activeTab.slice(7) : null;
 
+  // Kind-specific pages (e.g. Development, WebXDC) only show Follows + Global tabs.
+  // Extra tabs (World, Community, saved feeds, hashtags) are only for the home feed.
+  const isKindSpecificPage = !!kinds;
+
   // When logged out (and not on a kind-specific page), show the World feed.
   const useWorldForLoggedOut = !user && !kinds;
 
@@ -131,16 +137,24 @@ export function Feed({ kinds, tagFilters, header, hideCompose, emptyMessage, fee
   const isWorldActive = useWorldForLoggedOut || !!useWorldTab;
 
   // Standard feed query (used when logged in, or on kind-specific pages, or core tabs)
-  const isCoreFeedTab = activeTab === 'follows' || activeTab === 'global' || activeTab === 'communities' || activeTab === 'world';
-  type UseFeedTab = 'follows' | 'global' | 'communities';
+  const isHomeFollowingActive = activeTab === 'follows' && !isKindSpecificPage && !tagFilters;
+  const isCoreFeedTab = activeTab === 'follows' || activeTab === 'network' || activeTab === 'global' || activeTab === 'communities' || activeTab === 'world';
+  type UseFeedTab = 'follows' | 'network' | 'global' | 'communities';
   const feedTabForQuery: UseFeedTab =
-    activeTab === 'follows' || activeTab === 'global' || activeTab === 'communities'
-      ? (activeTab as UseFeedTab)
+    activeTab === 'follows'
+      ? (isHomeFollowingActive ? 'network' : 'network')
+      : activeTab === 'network' || activeTab === 'global' || activeTab === 'communities'
+        ? (activeTab as UseFeedTab)
       : 'global';
+  const standardFeedOptions = (kinds || tagFilters)
+    ? { kinds, tagFilters, enabled: !isHomeFollowingActive }
+    : { enabled: !isHomeFollowingActive };
   const feedQuery = useFeed(
     isCoreFeedTab && !isWorldActive ? feedTabForQuery : 'global',
-    (kinds || tagFilters) ? { kinds, tagFilters } : undefined,
+    standardFeedOptions,
   );
+
+  const followingFeed = useFollowingFeed(isHomeFollowingActive);
 
   // World feed: all country-tagged events with diversity cap + live streaming.
   const worldFeed = useWorldFeed(isWorldActive);
@@ -148,8 +162,12 @@ export function Feed({ kinds, tagFilters, header, hideCompose, emptyMessage, fee
 
   // For non-world tabs, use the standard feed query
   const queryKey = useMemo(
-    () => isWorldActive ? ['world-feed'] : ['feed', activeTab],
-    [isWorldActive, activeTab],
+    () => isWorldActive
+      ? ['world-feed']
+      : isHomeFollowingActive
+        ? [['feed', 'network'], ['community-activity-feed'], ['following-country-feed']]
+        : ['feed', activeTab],
+    [isWorldActive, isHomeFollowingActive, activeTab],
   );
 
   const handleRefresh = usePageRefresh(queryKey);
@@ -166,7 +184,7 @@ export function Feed({ kinds, tagFilters, header, hideCompose, emptyMessage, fee
     fetchNextPage: fetchNextPageStandard,
     hasNextPage: hasNextPageStandard,
     isFetchingNextPage: isFetchingNextPageStandard,
-  } = feedQuery;
+  } = isHomeFollowingActive ? followingFeed : feedQuery;
 
   // Unify pagination interface
   const fetchNextPage = isWorldActive ? worldFeed.fetchNextPage : fetchNextPageStandard;
@@ -175,10 +193,10 @@ export function Feed({ kinds, tagFilters, header, hideCompose, emptyMessage, fee
 
   // Auto-fetch page 2 as soon as page 1 arrives for smoother scrolling
   useEffect(() => {
-    if (!isWorldActive && hasNextPage && !isFetchingNextPage && rawData?.pages?.length === 1) {
+    if (!isHomeFollowingActive && !isWorldActive && hasNextPage && !isFetchingNextPage && rawData?.pages?.length === 1) {
       fetchNextPage();
     }
-  }, [isWorldActive, hasNextPage, isFetchingNextPage, rawData?.pages?.length, fetchNextPage]);
+  }, [isHomeFollowingActive, isWorldActive, hasNextPage, isFetchingNextPage, rawData?.pages?.length, fetchNextPage]);
 
   // Intersection observer for infinite scroll
   const { ref: scrollRef, inView } = useInView({
@@ -219,9 +237,6 @@ export function Feed({ kinds, tagFilters, header, hideCompose, emptyMessage, fee
     ? worldFeed.isLoading
     : (isPending || (isLoading && !rawData));
 
-  // Kind-specific pages (e.g. Development, WebXDC) only show Follows + Global tabs.
-  // Extra tabs (Ditto, Community, saved feeds, hashtags) are only for the home feed.
-  const isKindSpecificPage = !!kinds;
   const showSavedFeedTabs = user && !isKindSpecificPage && !tagFilters;
 
   return (
@@ -241,7 +256,10 @@ export function Feed({ kinds, tagFilters, header, hideCompose, emptyMessage, fee
       {/* Tabs (logged in) */}
       {user && (
         <SubHeaderBar>
-          <TabButton label="Follows" active={activeTab === 'follows'} onClick={() => handleSetActiveTab('follows')} />
+          <TabButton label={isKindSpecificPage || tagFilters ? 'Follows' : 'Following'} active={activeTab === 'follows'} onClick={() => handleSetActiveTab('follows')} />
+          {!isKindSpecificPage && !tagFilters && (
+            <TabButton label="Network" active={activeTab === 'network'} onClick={() => handleSetActiveTab('network')} />
+          )}
           {!isKindSpecificPage && showWorldFeed && (
             <TabButton label="World" active={activeTab === 'world'} onClick={() => handleSetActiveTab('world')} />
           )}
@@ -340,20 +358,22 @@ export function Feed({ kinds, tagFilters, header, hideCompose, emptyMessage, fee
                 </div>
               )}
             </div>
+          ) : isHomeFollowingActive && !emptyMessage ? (
+            <FollowingEmptyState onExploreWorld={() => handleSetActiveTab('world')} />
           ) : (
             <FeedEmptyState
               message={
                 emptyMessage ?? (
-                  activeTab === 'follows'
+                  activeTab === 'follows' || activeTab === 'network'
                     ? 'Your feed is empty. Follow some people to see their posts here.'
                     : activeTab === 'world'
                       ? 'No world posts yet. Check back soon for global activity.'
                       : 'No posts found. Check your relay connections or come back soon.'
                 )
               }
-              showDiscover={!emptyMessage && activeTab === 'follows'}
+              showDiscover={!emptyMessage && (activeTab === 'follows' || activeTab === 'network')}
               onSwitchToGlobal={
-                activeTab === 'follows' && showGlobalFeed
+                (activeTab === 'follows' || activeTab === 'network') && showGlobalFeed
                   ? () => handleSetActiveTab('global')
                   : undefined
               }
@@ -620,6 +640,28 @@ function NoteCardSkeleton() {
         <Skeleton className="h-4 w-8" />
         <Skeleton className="h-4 w-8" />
         <Skeleton className="h-4 w-8" />
+      </div>
+    </div>
+  );
+}
+
+function FollowingEmptyState({ onExploreWorld }: { onExploreWorld: () => void }) {
+  return (
+    <div className="py-20 px-8 flex flex-col items-center gap-6 text-center">
+      <div className="p-4 rounded-full bg-primary/10">
+        <Globe2 className="size-8 text-primary" />
+      </div>
+      <div className="space-y-2 max-w-xs">
+        <h2 className="text-xl font-bold">No countries yet</h2>
+        <p className="text-muted-foreground text-sm">
+          Explore the World tab and follow countries to build your Following feed.
+        </p>
+      </div>
+      <div className="flex flex-col gap-2 w-full max-w-xs">
+        <Button className="rounded-full" onClick={onExploreWorld}>
+          <Globe2 className="size-4 mr-2" />
+          Explore World
+        </Button>
       </div>
     </div>
   );

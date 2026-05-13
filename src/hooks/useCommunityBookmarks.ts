@@ -112,6 +112,8 @@ export function useCommunityBookmarks() {
     onSuccess: ({ removed }) => {
       queryClient.invalidateQueries({ queryKey: ['community-bookmarks', user?.pubkey] });
       queryClient.invalidateQueries({ queryKey: ['my-communities'] });
+      queryClient.invalidateQueries({ queryKey: ['community-activity-feed'] });
+      queryClient.invalidateQueries({ queryKey: ['following-feed'] });
       toast({
         title: removed ? 'Community unfollowed' : 'Community followed',
       });

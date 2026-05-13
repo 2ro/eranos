@@ -6,6 +6,7 @@ import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Skeleton } from '@/components/ui/skeleton';
 import { ExternalFavicon } from '@/components/ExternalFavicon';
 import { ExternalReactionButton } from '@/components/ExternalReactionButton';
+import { FollowToggleButton } from '@/components/FollowButton';
 import { LinkEmbed } from '@/components/LinkEmbed';
 import { ReplyComposeModal } from '@/components/ReplyComposeModal';
 import { WikipediaIcon } from '@/components/icons/WikipediaIcon';
@@ -18,6 +19,8 @@ import { useBlueskyPost } from '@/hooks/useBlueskyPost';
 import { useBookInfo } from '@/hooks/useBookInfo';
 import { useAddrEvent } from '@/hooks/useEvent';
 import { useAuthor } from '@/hooks/useAuthor';
+import { useCountryFollows } from '@/hooks/useCountryFollows';
+import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useProfileUrl } from '@/hooks/useProfileUrl';
 import { useWeather } from '@/hooks/useWeather';
 import { useToast } from '@/hooks/useToast';
@@ -665,6 +668,23 @@ export function CountryContentHeader({ code }: { code: string }) {
   const info = getCountryInfo(code);
   const wikiTitle = getWikipediaTitle(code);
   const { data: wiki, isLoading: wikiLoading } = useWikipediaSummary(wikiTitle);
+  const { user } = useCurrentUser();
+  const { isFollowingCountry, toggleCountryFollow, isPending } = useCountryFollows();
+  const { toast } = useToast();
+  const isFollowing = info ? isFollowingCountry(code) : false;
+
+  const handleToggleFollow = useCallback(async (event: React.MouseEvent) => {
+    event.preventDefault();
+    event.stopPropagation();
+    if (!user || !info || isPending) return;
+
+    try {
+      await toggleCountryFollow(code);
+      toast({ title: isFollowing ? 'Country unfollowed' : 'Country followed' });
+    } catch {
+      toast({ title: 'Failed to update country follow', variant: 'destructive' });
+    }
+  }, [user, info, isPending, toggleCountryFollow, code, toast, isFollowing]);
 
   if (!info) {
     return (
@@ -679,7 +699,7 @@ export function CountryContentHeader({ code }: { code: string }) {
     <div className="rounded-2xl border border-border overflow-hidden">
       {/* Flag + name */}
       <div className="p-6 sm:p-8">
-        <div className="flex items-center gap-4">
+        <div className="flex items-start gap-4">
           {info.subdivision && wiki?.thumbnail ? (
             <img
               src={wiki.thumbnail.source}
@@ -691,20 +711,33 @@ export function CountryContentHeader({ code }: { code: string }) {
               {info.flag}
             </span>
           )}
-          <div className="space-y-1">
-            <h2 className="text-2xl sm:text-3xl font-bold leading-snug">
-              {info.subdivisionName ?? info.name}
-            </h2>
-            {info.subdivision && (
-              <p className="text-sm text-muted-foreground">
-                {info.name}{info.subdivisionName ? '' : ` · ${info.subdivision}`}
-              </p>
-            )}
-            {wiki?.description && (
-              <p className="text-sm text-muted-foreground capitalize">
-                {wiki.description}
-              </p>
-            )}
+          <div className="min-w-0 flex-1 space-y-1">
+            <div className="flex items-start justify-between gap-3">
+              <div className="min-w-0 space-y-1">
+                <h2 className="text-2xl sm:text-3xl font-bold leading-snug">
+                  {info.subdivisionName ?? info.name}
+                </h2>
+                {info.subdivision && (
+                  <p className="text-sm text-muted-foreground">
+                    {info.name}{info.subdivisionName ? '' : ` · ${info.subdivision}`}
+                  </p>
+                )}
+                {wiki?.description && (
+                  <p className="text-sm text-muted-foreground capitalize">
+                    {wiki.description}
+                  </p>
+                )}
+              </div>
+              {user && (
+                <FollowToggleButton
+                  size="sm"
+                  isFollowing={isFollowing}
+                  isPending={isPending}
+                  onClick={handleToggleFollow}
+                  className="shrink-0"
+                />
+              )}
+            </div>
           </div>
         </div>
 

@@ -38,10 +38,12 @@ interface UseFeedOptions {
   authors?: string[];
   /** Additional tag filters to apply (e.g. `{ '#m': ['application/x-webxdc'] }`). */
   tagFilters?: Record<string, string[]>;
+  /** Whether the query should run. */
+  enabled?: boolean;
 }
 
-/** Hook to fetch the global, followed, or communities feed with infinite scroll pagination. */
-export function useFeed(tab: 'follows' | 'global' | 'communities', options?: UseFeedOptions) {
+/** Hook to fetch the global, followed/network, or communities feed with infinite scroll pagination. */
+export function useFeed(tab: 'follows' | 'network' | 'global' | 'communities', options?: UseFeedOptions) {
   const { nostr } = useNostr();
   const queryClient = useQueryClient();
   const { user } = useCurrentUser();
@@ -60,12 +62,13 @@ export function useFeed(tab: 'follows' | 'global' | 'communities', options?: Use
   const authorsKey = authorsOverride ? [...authorsOverride].sort().join(',') : '';
   const tagFiltersKey = tagFilters ? JSON.stringify(tagFilters) : '';
 
-  // For the follows tab, wait until the follow list is loaded before running any query.
+  // For follow-list based tabs, wait until the follow list is loaded before running any query.
   // Without this guard, the query falls through to the global branch while followList is still loading.
   // Allow query to run if not on follows tab, OR if follow list has loaded (even if empty).
+  const isFollowListTab = tab === 'follows' || tab === 'network';
   const followsReady = authorsOverride
     ? authorsOverride.length > 0
-    : tab !== 'follows' || (!!user && followList !== undefined);
+    : !isFollowListTab || (!!user && followList !== undefined);
 
   // Load community pubkeys from localStorage
   const communityPubkeys = (() => {
@@ -244,8 +247,8 @@ export function useFeed(tab: 'follows' | 'global' | 'communities', options?: Use
         cacheEvents(dedupedItems);
 
         return { items: dedupedItems, oldestQueryTimestamp, rawCount: validFilteredEvents.length };
-      } else if ((authorsOverride && authorsOverride.length > 0) || (tab === 'follows' && user && followList !== undefined)) {
-        // Follows feed — posts, reposts, and extra kinds from people you follow
+      } else if ((authorsOverride && authorsOverride.length > 0) || (isFollowListTab && user && followList !== undefined)) {
+        // Follows/network feed — posts, reposts, and extra kinds from people you follow
         // If followList is empty, just query own posts
         const authors = authorsOverride ?? (user && followList
           ? (followList.length > 0 ? [...followList, user.pubkey] : [user.pubkey])
@@ -368,7 +371,7 @@ export function useFeed(tab: 'follows' | 'global' | 'communities', options?: Use
       return lastPage.oldestQueryTimestamp - 1;
     },
     initialPageParam: undefined as number | undefined,
-    enabled: followsReady,
+    enabled: followsReady && (options?.enabled ?? true),
     staleTime: 60 * 1000,
     // No refetchInterval — automatic background refetches cause the entire
     // feed to re-sort and jump.  Users can pull-to-refresh for fresh content.
