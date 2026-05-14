@@ -7,8 +7,12 @@ import { fetchContactPubkeys } from './helpers';
 import type { NostrEvent, NostrFilter } from '@nostrify/nostrify';
 import type { Tool, ToolResult, ToolContext } from './Tool';
 
+const WORLD_KINDS = [1111, 1068];
+const CHALLENGE_KIND = 36639;
+const CHALLENGE_T_ALIASES = ['agora-action', 'pathos-challenge', 'agora-challenge'];
+
 const inputSchema = z.object({
-  feed_name: z.string().optional().describe('Name of an existing feed: "follows", "global", or a saved feed label.'),
+  feed_name: z.string().optional().describe('Name of an existing feed: "follows", "global", "world", or a saved feed label.'),
   kinds: z.array(z.number()).optional().describe('Event kind numbers to filter (e.g. [1] for text notes, [20] for photos, [30023] for articles).'),
   authors: z.array(z.string()).optional().describe('Author filter. Use "$me" for the logged-in user, "$contacts" for their follow list, or hex pubkeys.'),
   search: z.string().optional().describe('Full-text search query (NIP-50).'),
@@ -28,6 +32,7 @@ You can reference an existing feed by name or build a query on the fly:
 **Named feeds:**
 - "follows" — posts from people the user follows
 - "global" — recent posts from everyone
+- "world" — same source as the app's World tab: geographic country/geo posts, polls, and Agora actions/challenges
 - Any saved feed label the user has created (check the system prompt for available feeds)
 
 **Ad-hoc queries:**
@@ -40,7 +45,7 @@ You can reference an existing feed by name or build a query on the fly:
 **Time window:**
 - hours: how far back to look (default: 12). Set to 0 to disable the time window (for "latest post by X" queries)
 
-When the user asks about a country (e.g. "what's going on in Venezuela?"), use the country parameter. When they ask about their friends or follows, use feed_name "follows". When they ask about a topic, use search or hashtag.
+When the user asks what's happening in the world, use feed_name "world". When the user asks about a country (e.g. "what's going on in Venezuela?"), use the country parameter. When they ask about their friends or follows, use feed_name "follows". When they ask about a topic, use search or hashtag.
 
 After receiving results, summarize the key topics, conversations, and notable posts for the user.`,
 
@@ -60,15 +65,16 @@ After receiving results, summarize the key topics, conversations, and notable po
       return { result: JSON.stringify(resolved) };
     }
 
-    const { filter, needsDittoRelay, feedLabel } = resolved;
+    const { filters, needsDittoRelay, feedLabel } = resolved;
 
     const store = needsDittoRelay ? ctx.nostr.group(DITTO_RELAYS) : ctx.nostr;
     const events = await store.query(
-      [filter],
+      filters,
       { signal: AbortSignal.timeout(10000) },
     );
 
-    const sorted = events.sort((a: NostrEvent, b: NostrEvent) => b.created_at - a.created_at);
+    const filtered = feedLabel === 'world' ? filterWorldEvents(events) : events;
+    const sorted = filtered.sort((a: NostrEvent, b: NostrEvent) => b.created_at - a.created_at);
 
     if (sorted.length === 0) {
       return {
@@ -124,7 +130,7 @@ interface ResolveContext {
 }
 
 type ResolvedFilter =
-  | { filter: NostrFilter; needsDittoRelay: boolean; feedLabel: string }
+  | { filters: NostrFilter[]; needsDittoRelay: boolean; feedLabel: string }
   | { error: string; available_feeds?: string };
 
 /** Build a base filter with optional `since`. */
@@ -146,7 +152,7 @@ function resolveFilter(
       return { error: `Invalid country code "${country}". Use a 2-letter ISO 3166-1 alpha-2 code (e.g. "US", "VE", "JP").` };
     }
     return {
-      filter: { ...baseFilter(sinceTimestamp, limit), kinds: [1111], '#I': [`iso3166:${country}`] } as NostrFilter,
+      filters: [{ ...baseFilter(sinceTimestamp, limit), kinds: [1111], '#I': [`iso3166:${country}`] } as NostrFilter],
       needsDittoRelay: false,
       feedLabel: `country: ${country}`,
     };
@@ -157,12 +163,24 @@ function resolveFilter(
     if (!ctx.user) return { error: 'Must be logged in to read the follows feed.' };
     const authors = [ctx.user.pubkey, ...contactPubkeys];
     if (authors.length <= 1) return { error: 'The user is not following anyone yet.' };
-    return { filter: { ...baseFilter(sinceTimestamp, limit), kinds: [1], authors }, needsDittoRelay: false, feedLabel: 'follows' };
+    return { filters: [{ ...baseFilter(sinceTimestamp, limit), kinds: [1], authors }], needsDittoRelay: false, feedLabel: 'follows' };
   }
 
   // Named feed: global
   if (feedName === 'global') {
-    return { filter: { ...baseFilter(sinceTimestamp, limit), kinds: [1] }, needsDittoRelay: false, feedLabel: 'global' };
+    return { filters: [{ ...baseFilter(sinceTimestamp, limit), kinds: [1] }], needsDittoRelay: false, feedLabel: 'global' };
+  }
+
+  // Named feed: world — same initial query source as useWorldFeed.
+  if (feedName === 'world') {
+    return {
+      filters: [
+        { ...baseFilter(sinceTimestamp, limit), kinds: WORLD_KINDS, '#k': ['iso3166', 'geo'] } as NostrFilter,
+        { ...baseFilter(sinceTimestamp, Math.max(1, Math.floor(limit / 4))), kinds: [CHALLENGE_KIND], '#t': CHALLENGE_T_ALIASES } as NostrFilter,
+      ],
+      needsDittoRelay: false,
+      feedLabel: 'world',
+    };
   }
 
   // Named feed: user saved feed
@@ -197,7 +215,7 @@ function resolveFilter(
         }
       }
 
-      return { filter, needsDittoRelay, feedLabel: match.label };
+      return { filters: [filter], needsDittoRelay, feedLabel: match.label };
     } catch (err) {
       return { error: `Failed to resolve saved feed "${match.label}": ${err instanceof Error ? err.message : 'Unknown error'}` };
     }
@@ -224,7 +242,18 @@ function resolveFilter(
   }
 
   const feedLabel = args.search ? `search: ${args.search}` : args.hashtag ? `#${args.hashtag}` : 'ad-hoc';
-  return { filter, needsDittoRelay, feedLabel };
+  return { filters: [filter], needsDittoRelay, feedLabel };
+}
+
+/** Match the World tab's raw event eligibility before summarizing. */
+function filterWorldEvents(events: NostrEvent[]): NostrEvent[] {
+  return events.filter((event) => {
+    if (event.kind === CHALLENGE_KIND) return true;
+    if (event.kind === 1068) return true;
+    const kTags = event.tags.filter(([name]) => name === 'k').map(([, v]) => v);
+    const KTags = event.tags.filter(([name]) => name === 'K').map(([, v]) => v);
+    return kTags.includes('iso3166') || kTags.includes('geo') || KTags.includes(String(CHALLENGE_KIND));
+  });
 }
 
 /** Format events into a markdown summary with author display names. */

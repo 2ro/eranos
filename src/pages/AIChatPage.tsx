@@ -2,7 +2,7 @@ import { useMemo, useRef, useState, useEffect, useCallback } from 'react';
 import { useSeoMeta } from '@unhead/react';
 import Markdown from 'react-markdown';
 import rehypeSanitize from 'rehype-sanitize';
-import { Bot, Send, Square, Trash2 } from 'lucide-react';
+import { Bot, Loader2, Send, Square, Trash2 } from 'lucide-react';
 
 import { PageHeader } from '@/components/PageHeader';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
@@ -14,7 +14,6 @@ import { Textarea } from '@/components/ui/textarea';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { cn } from '@/lib/utils';
-import { DorkThinking } from '@/components/DorkThinking';
 import { useLayoutOptions } from '@/contexts/LayoutContext';
 
 import type { DisplayMessage, ToolCall } from '@/lib/aiChatTools';
@@ -129,7 +128,7 @@ function AgentChatView() {
               <div className="flex items-start">
                 <div className="flex flex-col gap-1 max-w-[85%] min-w-0">
                   <div className="rounded-2xl px-4 py-2.5 text-sm bg-secondary/60 border border-border rounded-tl-md">
-                    <div className="prose prose-sm max-w-none text-foreground prose-headings:text-foreground prose-strong:text-foreground prose-p:my-1 prose-headings:my-2 prose-ul:my-1 prose-ol:my-1 prose-li:my-0.5 prose-pre:my-2 prose-code:text-xs prose-a:text-primary">
+                    <div className="prose prose-sm max-w-none overflow-wrap-anywhere text-foreground prose-headings:text-foreground prose-strong:text-foreground prose-p:my-1 prose-headings:my-2 prose-ul:my-1 prose-ol:my-1 prose-li:my-0.5 prose-pre:my-2 prose-code:text-xs prose-a:text-primary">
                       <Markdown rehypePlugins={[rehypeSanitize]}>
                         {streamingText}
                       </Markdown>
@@ -140,13 +139,7 @@ function AgentChatView() {
             )}
 
             {/* Loading indicator */}
-            {(isStreaming || apiLoading) && !streamingText && messages[messages.length - 1]?.role === 'user' && (
-              <div className="flex items-start">
-                <div className="rounded-2xl px-4 py-3 bg-secondary/60 border border-border rounded-tl-md">
-                  <DorkThinking />
-                </div>
-              </div>
-            )}
+            {(isStreaming || apiLoading) && !streamingText && <ThinkingIndicator />}
 
             {/* Error display */}
             {apiError && (
@@ -207,6 +200,17 @@ function AgentChatView() {
 
 // ─── Sub-Components ───
 
+function ThinkingIndicator() {
+  return (
+    <div className="flex items-start">
+      <div className="inline-flex items-center gap-2 rounded-2xl rounded-tl-md border border-border bg-secondary/60 px-4 py-3 text-sm text-muted-foreground">
+        <Loader2 className="size-4 animate-spin text-primary" />
+        <span>Thinking...</span>
+      </div>
+    </div>
+  );
+}
+
 function ErrorBanner({ heading, body }: { heading: string; body: string }) {
   return (
     <div className="rounded-2xl bg-secondary/60 border border-border px-4 py-4 text-sm space-y-2">
@@ -224,7 +228,7 @@ const AGENT_GREETINGS = [
 
 const SUGGESTIONS = [
   "What are my friends talking about?",
-  "What's going on in Venezuela?",
+  "What's happening in the world?",
 ];
 
 function EmptyState({ onSuggestion }: { onSuggestion: (text: string) => void }) {
@@ -269,7 +273,7 @@ function MessageBubble({ message }: { message: DisplayMessage }) {
               : 'bg-primary/15 border-primary/25 text-primary',
           )}>
             <div className={cn(
-              'prose prose-sm max-w-none prose-p:my-1 prose-headings:my-2 prose-ul:my-1 prose-ol:my-1 prose-li:my-0.5 prose-code:text-xs',
+              'prose prose-sm max-w-none overflow-wrap-anywhere prose-p:my-1 prose-headings:my-2 prose-ul:my-1 prose-ol:my-1 prose-li:my-0.5 prose-code:text-xs',
               isError
                 ? 'text-red-700 dark:text-red-400 prose-strong:text-red-800 dark:prose-strong:text-red-300 prose-code:text-red-600 dark:prose-code:text-red-400 marker:text-red-700 dark:marker:text-red-400'
                 : 'text-primary prose-strong:text-primary prose-code:text-primary/80 marker:text-primary',
@@ -298,9 +302,9 @@ function MessageBubble({ message }: { message: DisplayMessage }) {
             )}
           >
             {isUser ? (
-              <p className="whitespace-pre-wrap break-words">{message.content}</p>
+              <p className="whitespace-pre-wrap overflow-wrap-anywhere">{message.content}</p>
             ) : (
-              <div className="prose prose-sm max-w-none text-foreground prose-headings:text-foreground prose-strong:text-foreground prose-p:my-1 prose-headings:my-2 prose-ul:my-1 prose-ol:my-1 prose-li:my-0.5 prose-pre:my-2 prose-code:text-xs prose-a:text-primary">
+              <div className="prose prose-sm max-w-none overflow-wrap-anywhere text-foreground prose-headings:text-foreground prose-strong:text-foreground prose-p:my-1 prose-headings:my-2 prose-ul:my-1 prose-ol:my-1 prose-li:my-0.5 prose-pre:my-2 prose-code:text-xs prose-a:text-primary">
                 <Markdown rehypePlugins={[rehypeSanitize]}>
                   {message.content}
                 </Markdown>

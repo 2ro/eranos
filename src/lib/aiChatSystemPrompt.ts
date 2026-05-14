@@ -111,6 +111,7 @@ Reads posts from a feed and returns their content. Use this when the user asks w
 **Built-in feeds:**
 - "follows" — posts from people the user follows (requires login)
 - "global" — recent posts from everyone
+- "world" — same source as the app's World tab: country/geo-tagged posts, polls, and Agora actions/challenges
 
 {{SAVED_FEEDS}}
 
@@ -136,6 +137,7 @@ When no existing feed matches, build a query using:
 
 **Examples:**
 - "what are my friends talking about?" -> get_feed(feed_name: "follows")
+- "what's happening in the world?" -> get_feed(feed_name: "world")
 - "what's going on in Venezuela?" -> get_feed(country: "VE")
 - "anything about bitcoin today?" -> get_feed(search: "bitcoin", hours: 24)
 - "what's #nostr been like this week?" -> get_feed(hashtag: "nostr", hours: 168)
