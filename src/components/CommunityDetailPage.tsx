@@ -406,6 +406,37 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
     [eventItems, now],
   );
 
+  // ── Initiatives (Goals + Events merged into one chronological list) ───────
+  // Active items go first, sorted: future events ascending by start date,
+  // then active goals by creation date (newest first). Past items follow.
+  const activeInitiatives = useMemo(() => {
+    const items = [...activeGoals, ...activeEventItems];
+    return items.sort((a, b) => {
+      const aIsEvent = a.kind === 31922 || a.kind === 31923;
+      const bIsEvent = b.kind === 31922 || b.kind === 31923;
+      if (aIsEvent && bIsEvent) {
+        return getCalendarEventStart(a) - getCalendarEventStart(b);
+      }
+      if (aIsEvent) return -1;
+      if (bIsEvent) return 1;
+      return b.created_at - a.created_at;
+    });
+  }, [activeGoals, activeEventItems]);
+
+  const pastInitiatives = useMemo(() => {
+    const items = [...pastGoals, ...pastEventItems];
+    return items.sort((a, b) => {
+      // Newest-first by the relevant "end" timestamp.
+      const aEnd = a.kind === 31922 || a.kind === 31923
+        ? getCalendarEventEnd(a)
+        : parseInt(a.tags.find(([n]) => n === 'closed_at')?.[1] ?? String(a.created_at), 10);
+      const bEnd = b.kind === 31922 || b.kind === 31923
+        ? getCalendarEventEnd(b)
+        : parseInt(b.tags.find(([n]) => n === 'closed_at')?.[1] ?? String(b.created_at), 10);
+      return bEnd - aEnd;
+    });
+  }, [pastGoals, pastEventItems]);
+
   const replyTree = useMemo((): ReplyNode[] => {
     if (!commentsData) return [];
     const topLevel = commentsData.topLevelComments ?? [];
@@ -458,30 +489,46 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
     }
   }, [event, toast]);
 
-  // ── FAB — visible on comments, goals, events tabs ──────────────────────────
-  const handleFabClick = useCallback(() => {
-    if (activeTab === 'comments') {
-      setComposeOpen(true);
-    } else if (activeTab === 'goals') {
-      setGoalDialogOpen(true);
-    } else if (activeTab === 'events') {
-      setEventDialogOpen(true);
-    }
-  }, [activeTab]);
+  // ── FAB — opens a floating action menu anchored to the FAB itself ─────────
+  // Visible on tabs whose surfaces accept user-authored content.
+  const fabAvailable = activeTab === 'comments' || activeTab === 'initiatives';
 
-  const fabIcon = activeTab === 'goals'
-    ? <Target strokeWidth={3} size={18} />
-    : activeTab === 'events'
-      ? <CalendarDays className="size-5" />
-      : undefined; // default Plus icon for comments
+  const fabMenu = useMemo(() => {
+    if (!fabAvailable) return undefined;
+    return [
+      {
+        id: 'new-post',
+        label: 'New post',
+        icon: <MessageCircle className="size-4" />,
+        onSelect: () => {
+          setActiveTab('comments');
+          setComposeOpen(true);
+        },
+      },
+      {
+        id: 'new-goal',
+        label: 'New goal',
+        icon: <Target className="size-4" />,
+        onSelect: () => {
+          setActiveTab('initiatives');
+          setGoalDialogOpen(true);
+        },
+      },
+      {
+        id: 'new-event',
+        label: 'New event',
+        icon: <CalendarDays className="size-4" />,
+        onSelect: () => {
+          setActiveTab('initiatives');
+          setEventDialogOpen(true);
+        },
+      },
+    ];
+  }, [fabAvailable]);
 
   useLayoutOptions({
-    showFAB:
-      activeTab === 'comments'
-      || activeTab === 'goals'
-      || activeTab === 'events',
-    onFabClick: handleFabClick,
-    fabIcon,
+    showFAB: fabAvailable,
+    fabMenu,
   });
 
   const moderationCtx = useMemo(
@@ -618,18 +665,11 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
                 Posts
               </TabsTrigger>
               <TabsTrigger
-                value="goals"
+                value="initiatives"
                 className="flex-none min-w-fit rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none px-4 pb-3 pt-2"
               >
                 <Target className="size-4 mr-1.5" />
-                Goals
-              </TabsTrigger>
-              <TabsTrigger
-                value="events"
-                className="flex-none min-w-fit rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none px-4 pb-3 pt-2"
-              >
-                <CalendarDays className="size-4 mr-1.5" />
-                Events
+                Initiatives
               </TabsTrigger>
             </TabsList>
 
@@ -680,70 +720,34 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
               )}
             </TabsContent>
 
-            {/* ── Goals tab ── */}
-            <TabsContent value="goals" className="mt-0">
-              {goalsLoading ? (
-                <div className="divide-y divide-border">
-                  {Array.from({ length: 2 }).map((_, i) => (
-                    <ReplyCardSkeleton key={i} />
-                  ))}
-                </div>
-              ) : activeGoals.length === 0 && pastGoals.length === 0 ? (
-                <div className="py-12 text-center text-muted-foreground text-sm px-5">
-                  {membersOnly && (goals ?? []).length > 0
-                    ? 'No goals from community members yet. Toggle the shield icon to see all goals.'
-                    : <>No goals yet.{user ? ' Create one to get started!' : ''}</>}
-                </div>
-              ) : (
-                <div className="divide-y divide-border">
-                  {/* Active goals first */}
-                  {activeGoals.map((e) => (
-                    <NoteCard key={e.id} event={e} />
-                  ))}
-
-                  {/* Past/expired goals */}
-                  {pastGoals.length > 0 && activeGoals.length > 0 && (
-                    <div className="px-5 pt-4 pb-1">
-                      <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
-                        Past Goals
-                      </h4>
-                    </div>
-                  )}
-                  {pastGoals.map((e) => (
-                    <NoteCard key={e.id} event={e} />
-                  ))}
-                </div>
-              )}
-            </TabsContent>
-
-            {/* ── Events tab ── */}
-            <TabsContent value="events" className="mt-0">
-              {eventsLoading ? (
+            {/* ── Initiatives tab (Goals + Events, unified list) ── */}
+            <TabsContent value="initiatives" className="mt-0">
+              {goalsLoading || eventsLoading ? (
                 <div className="divide-y divide-border">
                   {Array.from({ length: 3 }).map((_, i) => (
                     <ReplyCardSkeleton key={i} />
                   ))}
                 </div>
-              ) : activeEventItems.length === 0 && pastEventItems.length === 0 ? (
+              ) : activeInitiatives.length === 0 && pastInitiatives.length === 0 ? (
                 <div className="py-12 text-center text-muted-foreground text-sm px-5">
-                  {membersOnly && (communityEvents ?? []).length > 0
-                    ? 'No events from community members yet. Toggle the shield icon to see all events.'
-                    : <>No events yet.{user ? ' Create one to get started!' : ''}</>}
+                  {membersOnly && ((goals ?? []).length > 0 || (communityEvents ?? []).length > 0)
+                    ? 'No initiatives from community members yet. Toggle the shield icon to see all initiatives.'
+                    : <>No initiatives yet.{user ? ' Create a goal or an event to get started!' : ''}</>}
                 </div>
               ) : (
                 <div className="divide-y divide-border">
-                  {activeEventItems.map((e) => (
+                  {activeInitiatives.map((e) => (
                     <NoteCard key={e.id} event={e} />
                   ))}
 
-                  {pastEventItems.length > 0 && activeEventItems.length > 0 && (
+                  {pastInitiatives.length > 0 && activeInitiatives.length > 0 && (
                     <div className="px-5 pt-4 pb-1">
                       <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
-                        Past Events
+                        Past
                       </h4>
                     </div>
                   )}
-                  {pastEventItems.map((e) => (
+                  {pastInitiatives.map((e) => (
                     <NoteCard key={e.id} event={e} />
                   ))}
                 </div>
