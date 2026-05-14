@@ -5,7 +5,6 @@ import rehypeSanitize from 'rehype-sanitize';
 import { Bot, Send, Square, Trash2 } from 'lucide-react';
 
 import { PageHeader } from '@/components/PageHeader';
-import { useShakespeareCredits } from '@/hooks/useShakespeare';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useAppContext } from '@/hooks/useAppContext';
 import { useAIChatSession } from '@/hooks/useAIChatSession';
@@ -33,7 +32,6 @@ const SLASH_COMMANDS = [
 export function AIChatPage() {
   const { config } = useAppContext();
   const { user } = useCurrentUser();
-  const hasCredits = useShakespeareCredits();
 
   useSeoMeta({
     title: `Agent | ${config.appName}`,
@@ -57,12 +55,12 @@ export function AIChatPage() {
     );
   }
 
-  return <AgentChatView hasCredits={hasCredits} />;
+  return <AgentChatView />;
 }
 
 // ─── Chat View ───
 
-function AgentChatView({ hasCredits }: { hasCredits: boolean | null }) {
+function AgentChatView() {
   const {
     messages,
     input,
@@ -117,7 +115,7 @@ function AgentChatView({ hasCredits }: { hasCredits: boolean | null }) {
       {/* Messages Area */}
       {messages.length === 0 && !streamingText ? (
         <div className="flex-1 flex items-center justify-center px-4">
-          <EmptyState hasCredits={hasCredits} onSuggestion={handleSend} />
+          <EmptyState onSuggestion={handleSend} />
         </div>
       ) : (
         <ScrollArea className="flex-1">
@@ -154,13 +152,13 @@ function AgentChatView({ hasCredits }: { hasCredits: boolean | null }) {
             {apiError && (
               apiError.includes('run out of credits') ? (
                 <ErrorBanner
-                  heading="You've run out of credits."
-                  body="Add more on"
+                  heading="Agent is temporarily unavailable."
+                  body="Please try again in a moment."
                 />
               ) : apiError.includes('Rate limited') ? (
                 <ErrorBanner
                   heading="Rate limited."
-                  body="You're sending messages too fast. Grab some credits on"
+                  body="You're sending messages too fast. Please wait a moment and try again."
                 />
               ) : null
             )}
@@ -170,41 +168,39 @@ function AgentChatView({ hasCredits }: { hasCredits: boolean | null }) {
         </ScrollArea>
       )}
 
-      {/* Input Area — hidden when user has no credits */}
-      {(hasCredits || hasCredits === null) && (
-        <div className="shrink-0 px-4 pt-2 pb-4 sidebar:pb-3">
-          <div className="max-w-2xl mx-auto flex items-end gap-2">
-            <SlashCommandInput
-              value={input}
-              onChange={setInput}
-              onKeyDown={handleKeyDown}
-              onSend={handleSend}
-              placeholder={!selectedModel ? 'Loading...' : 'Send a message...'}
-              disabled={!selectedModel || (isStreaming && !streamingText)}
-            />
-            {isStreaming ? (
-              <Button
-                onClick={handleStop}
-                size="icon"
-                variant="outline"
-                className="size-11 shrink-0 rounded-xl"
-                title="Stop generating"
-              >
-                <Square className="size-4" />
-              </Button>
-            ) : (
-              <Button
-                onClick={() => handleSend()}
-                disabled={!input.trim() || !selectedModel}
-                size="icon"
-                className="size-11 shrink-0 rounded-xl"
-              >
-                <Send className="size-4" />
-              </Button>
-            )}
-          </div>
+      {/* Input Area */}
+      <div className="shrink-0 px-4 pt-2 pb-4 sidebar:pb-3">
+        <div className="max-w-2xl mx-auto flex items-end gap-2">
+          <SlashCommandInput
+            value={input}
+            onChange={setInput}
+            onKeyDown={handleKeyDown}
+            onSend={handleSend}
+            placeholder={!selectedModel ? 'Loading...' : 'Send a message...'}
+            disabled={!selectedModel || (isStreaming && !streamingText)}
+          />
+          {isStreaming ? (
+            <Button
+              onClick={handleStop}
+              size="icon"
+              variant="outline"
+              className="size-11 shrink-0 rounded-xl"
+              title="Stop generating"
+            >
+              <Square className="size-4" />
+            </Button>
+          ) : (
+            <Button
+              onClick={() => handleSend()}
+              disabled={!input.trim() || !selectedModel}
+              size="icon"
+              className="size-11 shrink-0 rounded-xl"
+            >
+              <Send className="size-4" />
+            </Button>
+          )}
         </div>
-      )}
+      </div>
     </main>
   );
 }
@@ -212,23 +208,10 @@ function AgentChatView({ hasCredits }: { hasCredits: boolean | null }) {
 // ─── Sub-Components ───
 
 function ErrorBanner({ heading, body }: { heading: string; body: string }) {
-  const shakespeareLink = (
-    <a
-      href="https://shakespeare.diy"
-      target="_blank"
-      rel="noopener noreferrer"
-      className="inline-flex items-center gap-1 text-primary hover:underline"
-    >
-      Shakespeare
-    </a>
-  );
-
   return (
     <div className="rounded-2xl bg-secondary/60 border border-border px-4 py-4 text-sm space-y-2">
       <p className="font-medium text-foreground">{heading}</p>
-      <p className="text-muted-foreground">
-        {body} {shakespeareLink} to keep chatting.
-      </p>
+      <p className="text-muted-foreground">{body}</p>
     </div>
   );
 }
@@ -244,7 +227,7 @@ const SUGGESTIONS = [
   "What's going on in Venezuela?",
 ];
 
-function EmptyState({ hasCredits, onSuggestion }: { hasCredits: boolean | null; onSuggestion: (text: string) => void }) {
+function EmptyState({ onSuggestion }: { onSuggestion: (text: string) => void }) {
   const greeting = useMemo(() => AGENT_GREETINGS[Math.floor(Math.random() * AGENT_GREETINGS.length)], []);
 
   return (
@@ -255,35 +238,17 @@ function EmptyState({ hasCredits, onSuggestion }: { hasCredits: boolean | null; 
         <p className="text-sm text-muted-foreground">{greeting}</p>
       </div>
 
-      {hasCredits !== false && (
-        <div className="flex flex-wrap justify-center gap-2 max-w-md">
-          {SUGGESTIONS.map((s) => (
-            <button
-              key={s}
-              onClick={() => onSuggestion(s)}
-              className="px-4 py-2 rounded-full text-sm border border-border bg-secondary/40 hover:bg-secondary/80 text-foreground transition-colors"
-            >
-              {s}
-            </button>
-          ))}
-        </div>
-      )}
-
-      {hasCredits === false && (
-        <div className="flex flex-col items-center gap-4 max-w-xs">
-          <p className="text-sm text-muted-foreground leading-relaxed">
-            You need credits to use the Agent. Get some on Shakespeare to get started.
-          </p>
-          <a
-            href="https://shakespeare.diy"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 transition-colors"
+      <div className="flex flex-wrap justify-center gap-2 max-w-md">
+        {SUGGESTIONS.map((s) => (
+          <button
+            key={s}
+            onClick={() => onSuggestion(s)}
+            className="px-4 py-2 rounded-full text-sm border border-border bg-secondary/40 hover:bg-secondary/80 text-foreground transition-colors"
           >
-            Get Credits
-          </a>
-        </div>
-      )}
+            {s}
+          </button>
+        ))}
+      </div>
     </div>
   );
 }

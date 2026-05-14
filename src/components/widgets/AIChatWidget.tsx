@@ -1,11 +1,10 @@
 import { useState, useRef, useCallback, useEffect } from 'react';
 import { Send } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
-import { Link } from 'react-router-dom';
 
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { DorkThinking } from '@/components/DorkThinking';
-import { useShakespeare, useShakespeareCredits, type ChatMessage } from '@/hooks/useShakespeare';
+import { useShakespeare, type ChatMessage } from '@/hooks/useShakespeare';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { cn } from '@/lib/utils';
 
@@ -20,7 +19,6 @@ const conversationCache = new Map<string, ChatMessage[]>();
 export function AIChatWidget() {
   const { user } = useCurrentUser();
   const { sendStreamingMessage, getAvailableModels, isLoading, isAuthenticated } = useShakespeare();
-  const hasCredits = useShakespeareCredits();
 
   // Fetch available models and select the cheapest as default
   const { data: defaultModelId } = useQuery({
@@ -95,33 +93,6 @@ export function AIChatWidget() {
     return (
       <div className="flex flex-col items-center gap-3 py-6 px-3 text-center">
         <p className="text-xs text-muted-foreground">Log in to chat with the Agent</p>
-      </div>
-    );
-  }
-
-  // Show credits CTA when the user has no credits (hasCredits === false).
-  // While loading (hasCredits === undefined) we fall through to the chat UI.
-  if (hasCredits === false) {
-    return (
-      <div className="flex flex-col items-center gap-3 py-6 px-3 text-center">
-        <p className="text-xs text-muted-foreground leading-relaxed">
-          Grab some credits on{' '}
-          <a
-            href="https://shakespeare.diy"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-primary hover:underline"
-          >
-            Shakespeare
-          </a>
-          {' '}to use the Agent.
-        </p>
-        <Link
-          to="/agent"
-          className="text-xs font-medium text-primary hover:underline"
-        >
-          Open Agent
-        </Link>
       </div>
     );
   }
