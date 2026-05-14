@@ -6,25 +6,37 @@ import { useCommunityActivityFeed } from '@/hooks/useCommunityActivityFeed';
 import { useCountryFollows } from '@/hooks/useCountryFollows';
 import { useFeed } from '@/hooks/useFeed';
 import { useFeedRelays } from '@/hooks/useFeedRelays';
+import { useFeedSettings } from '@/hooks/useFeedSettings';
+import { useInterests } from '@/hooks/useInterests';
 import { getCountryFilterValues, parseCountryIdentifier } from '@/lib/countryIdentifiers';
-import type { FeedItem } from '@/lib/feedUtils';
+import { getEnabledFeedKinds } from '@/lib/extraKinds';
+import { isRepostKind, type FeedItem } from '@/lib/feedUtils';
+import { buildTagFilterValues } from '@/lib/tagFilterValues';
 
 const COUNTRY_PAGE_SIZE = 40;
+const HASHTAG_PAGE_SIZE = 40;
 const CHALLENGE_T_ALIASES = ['agora-action', 'pathos-challenge', 'agora-challenge'];
 
 /**
  * Sliding window used as a fallback recency floor for the Following feed
  * when the network feed has no events yet. Without this, an inactive
- * follow list lets very old community/country events take over the top
- * of the feed before the network feed has a chance to populate.
+ * follow list lets very old community/country/hashtag events take over
+ * the top of the feed before the network feed has a chance to populate.
  *
  * 14 days is intentionally short to keep the Following feed feeling
  * "current" — items older than this should only be reachable via
- * pagination on dedicated tabs (Network, Communities, country pages).
+ * pagination on dedicated tabs (Network, Communities, country/hashtag
+ * pages).
  */
 const RECENCY_WINDOW_SECONDS = 14 * 24 * 60 * 60;
 
 interface CountryFeedPage {
+  events: NostrEvent[];
+  oldestTimestamp: number | null;
+  totalFetched: number;
+}
+
+interface HashtagFeedPage {
   events: NostrEvent[];
   oldestTimestamp: number | null;
   totalFetched: number;
@@ -91,10 +103,66 @@ function useFollowedCountriesFeed(countryCodes: string[], enabled: boolean) {
   });
 }
 
+function useFollowedHashtagsFeed(hashtags: string[], kinds: number[], enabled: boolean) {
+  const feedRelays = useFeedRelays();
+  const hashtagsKey = hashtags.join(',');
+  const kindsKey = [...kinds].sort().join(',');
+
+  return useInfiniteQuery<HashtagFeedPage, Error>({
+    queryKey: ['following-hashtag-feed', hashtagsKey, kindsKey],
+    queryFn: async ({ pageParam, signal: querySignal }) => {
+      if (hashtags.length === 0 || kinds.length === 0) {
+        return { events: [], oldestTimestamp: null, totalFetched: 0 };
+      }
+
+      const signal = AbortSignal.any([querySignal, AbortSignal.timeout(5000)]);
+      const until = pageParam as number | undefined;
+
+      // Hashtags on Nostr are case-sensitive at the relay level but the UI
+      // treats them as case-insensitive. Pass through the same expansion
+      // used by the dedicated hashtag page so we don't miss posts that
+      // tag, e.g., `#Bitcoin` instead of `#bitcoin`.
+      const filterValues = Array.from(new Set(
+        hashtags.flatMap((tag) => buildTagFilterValues(tag, '#t')),
+      ));
+
+      const filter: NostrFilter = {
+        kinds,
+        '#t': filterValues,
+        limit: HASHTAG_PAGE_SIZE,
+        ...(until && { until }),
+      };
+
+      const events = await feedRelays.query([filter], { signal });
+      const sorted = [...events].sort((a, b) => b.created_at - a.created_at);
+      const pageEvents = sorted.slice(0, HASHTAG_PAGE_SIZE);
+      const oldestTimestamp = pageEvents.length > 0
+        ? pageEvents[pageEvents.length - 1].created_at
+        : null;
+
+      return {
+        events: pageEvents,
+        oldestTimestamp,
+        totalFetched: sorted.length,
+      };
+    },
+    initialPageParam: undefined as number | undefined,
+    getNextPageParam: (lastPage) => {
+      if (lastPage.totalFetched < HASHTAG_PAGE_SIZE || !lastPage.oldestTimestamp) return undefined;
+      return lastPage.oldestTimestamp - 1;
+    },
+    enabled: enabled && hashtags.length > 0 && kinds.length > 0,
+    staleTime: 30_000,
+    refetchOnWindowFocus: false,
+    placeholderData: (previousData) => previousData,
+  });
+}
+
 /**
  * Combined "Following" feed: people you follow + your communities' activity +
- * the countries you follow. Items are sorted strictly by recency
- * (`sortTimestamp` desc) with no per-source prioritisation.
+ * the countries you follow + the hashtags you follow. Items are sorted
+ * strictly by recency (`sortTimestamp` desc) with no per-source
+ * prioritisation.
  *
  * Older content from sources with sparse activity is filtered out so the
  * top of the feed doesn't drift back in time while a higher-volume source
@@ -105,11 +173,20 @@ function useFollowedCountriesFeed(countryCodes: string[], enabled: boolean) {
  *     applies a recency floor).
  */
 export function useFollowingFeed(enabled = true) {
+  const { feedSettings } = useFeedSettings();
+  const hashtagKinds = useMemo(
+    () => getEnabledFeedKinds(feedSettings).filter((k) => !isRepostKind(k)),
+    [feedSettings],
+  );
+
   const networkFeed = useFeed('network', { enabled });
   const communityFeed = useCommunityActivityFeed(enabled);
   const { followedCountries, isLoading: countryFollowsLoading } = useCountryFollows();
   const countryFeed = useFollowedCountriesFeed(followedCountries, enabled);
   const hasFollowedCountries = followedCountries.length > 0;
+  const { hashtags: followedHashtags, isLoading: hashtagFollowsLoading } = useInterests('t');
+  const hashtagFeed = useFollowedHashtagsFeed(followedHashtags, hashtagKinds, enabled);
+  const hasFollowedHashtags = followedHashtags.length > 0;
 
   const data = useMemo(() => {
     const networkItems = (networkFeed.data?.pages as unknown as { items: FeedItem[] }[] | undefined)
@@ -124,9 +201,14 @@ export function useFollowingFeed(enabled = true) {
       .flatMap((page) => page.events)
       .map((event): FeedItem => ({ event, sortTimestamp: event.created_at }));
 
+    const hashtagItems = (hashtagFeed.data?.pages ?? [])
+      .flatMap((page) => page.events)
+      .map((event): FeedItem => ({ event, sortTimestamp: event.created_at }));
+
     // Recency floor: prevent an older event from a sparse source (e.g. a
-    // community or country with little recent activity) from out-ranking a
-    // newer item that simply hasn't loaded into the network feed yet.
+    // community/country/hashtag with little recent activity) from
+    // out-ranking a newer item that simply hasn't loaded into the network
+    // feed yet.
     const nowSeconds = Math.floor(Date.now() / 1000);
     const networkOldest = networkItems.length > 0
       ? Math.min(...networkItems.map((item) => item.sortTimestamp))
@@ -137,9 +219,9 @@ export function useFollowingFeed(enabled = true) {
       : windowFloor;
 
     // Network items pass through untouched — they define their own
-    // recency floor. Community and country items are filtered to drop
-    // anything older than the floor.
-    const trimmedExternal = [...communityItems, ...countryItems]
+    // recency floor. Community, country, and hashtag items are filtered
+    // to drop anything older than the floor.
+    const trimmedExternal = [...communityItems, ...countryItems, ...hashtagItems]
       .filter((item) => item.sortTimestamp >= recencyFloor);
 
     const merged = [...networkItems, ...trimmedExternal];
@@ -160,7 +242,7 @@ export function useFollowingFeed(enabled = true) {
     );
 
     return { pages: [{ items: sorted }] };
-  }, [networkFeed.data?.pages, communityFeed.data, countryFeed.data?.pages]);
+  }, [networkFeed.data?.pages, communityFeed.data, countryFeed.data?.pages, hashtagFeed.data?.pages]);
 
   const networkHasNextPage = networkFeed.hasNextPage;
   const networkFetchNextPage = networkFeed.fetchNextPage;
@@ -168,12 +250,15 @@ export function useFollowingFeed(enabled = true) {
   const communityFetchNextPage = communityFeed.fetchNextPage;
   const countryHasNextPage = countryFeed.hasNextPage;
   const countryFetchNextPage = countryFeed.fetchNextPage;
+  const hashtagHasNextPage = hashtagFeed.hasNextPage;
+  const hashtagFetchNextPage = hashtagFeed.fetchNextPage;
 
   const fetchNextPage = useCallback(async () => {
     await Promise.all([
       networkHasNextPage ? networkFetchNextPage() : Promise.resolve(),
       communityHasNextPage ? communityFetchNextPage() : Promise.resolve(),
       countryHasNextPage ? countryFetchNextPage() : Promise.resolve(),
+      hashtagHasNextPage ? hashtagFetchNextPage() : Promise.resolve(),
     ]);
   }, [
     networkHasNextPage,
@@ -182,6 +267,8 @@ export function useFollowingFeed(enabled = true) {
     communityFetchNextPage,
     countryHasNextPage,
     countryFetchNextPage,
+    hashtagHasNextPage,
+    hashtagFetchNextPage,
   ]);
 
   return {
@@ -191,19 +278,25 @@ export function useFollowingFeed(enabled = true) {
       || communityFeed.isLoading
       || countryFollowsLoading
       || (hasFollowedCountries && countryFeed.isPending)
+      || hashtagFollowsLoading
+      || (hasFollowedHashtags && hashtagFeed.isPending)
     ),
     isLoading: enabled && (
       networkFeed.isLoading
       || communityFeed.isLoading
       || countryFollowsLoading
       || (hasFollowedCountries && countryFeed.isLoading)
+      || hashtagFollowsLoading
+      || (hasFollowedHashtags && hashtagFeed.isLoading)
     ),
     fetchNextPage,
     hasNextPage: !!networkFeed.hasNextPage
       || !!communityFeed.hasNextPage
-      || !!countryFeed.hasNextPage,
+      || !!countryFeed.hasNextPage
+      || !!hashtagFeed.hasNextPage,
     isFetchingNextPage: networkFeed.isFetchingNextPage
       || communityFeed.isFetchingNextPage
-      || countryFeed.isFetchingNextPage,
+      || countryFeed.isFetchingNextPage
+      || hashtagFeed.isFetchingNextPage,
   };
 }

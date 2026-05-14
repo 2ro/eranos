@@ -56,6 +56,10 @@ export function useInterests(tagName: InterestTagName = 't') {
 
   const invalidate = () => {
     queryClient.invalidateQueries({ queryKey: ['interests', user?.pubkey] });
+    // The Following feed pulls from `t`/`g`/`i` interests, so any mutation
+    // here can change what shows up there.
+    queryClient.invalidateQueries({ queryKey: ['following-hashtag-feed'] });
+    queryClient.invalidateQueries({ queryKey: ['following-country-feed'] });
   };
 
   /** Add an interest. */
