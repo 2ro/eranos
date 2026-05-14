@@ -1,14 +1,13 @@
 import { useCallback, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
-import { Bell, Home, Search, User } from 'lucide-react';
-import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
+import { Bell, Earth, Search, Users } from 'lucide-react';
+import { AgoraBoltIcon } from '@/components/icons/AgoraBoltIcon';
 import { cn } from '@/lib/utils';
 import { selectionChanged } from '@/lib/haptics';
 import { useHasUnreadNotifications } from '@/hooks/useHasUnreadNotifications';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useScrollDirection } from '@/hooks/useScrollDirection';
-import { useProfileUrl } from '@/hooks/useProfileUrl';
 import { useAppContext } from '@/hooks/useAppContext';
 import { useLayoutSnapshot } from '@/contexts/LayoutContext';
 import { getSidebarItem } from '@/lib/sidebarItems';
@@ -20,20 +19,51 @@ const hiddenStyle: React.CSSProperties = {
   transform: `translateY(calc(100% + ${ARC_UP_OVERHANG_PX}px))`,
 };
 
+interface NavItemProps {
+  icon: React.ComponentType<{ className?: string }>;
+  label: string;
+  active: boolean;
+  badge?: boolean;
+  onClick?: (e: React.MouseEvent) => void;
+  to?: string;
+  /** 'sm' shrinks the slot (smaller flex basis + smaller icon/label) for outer items. */
+  size?: 'sm' | 'md';
+}
+
+/** A side item in the bottom nav row. */
+function NavItem({ icon: Icon, label, active, badge, onClick, to, size = 'md' }: NavItemProps) {
+  const isSm = size === 'sm';
+  const className = cn(
+    'flex flex-col items-center justify-center gap-0.5 py-2 transition-colors min-w-0',
+    isSm ? 'flex-[0.7]' : 'flex-1',
+    active ? 'text-primary' : 'text-muted-foreground',
+  );
+  const inner = (
+    <>
+      <span className="relative">
+        <Icon className={isSm ? 'size-4' : 'size-5'} />
+        {badge && (
+          <span className="absolute -top-1 right-0 size-2 bg-primary rounded-full" />
+        )}
+      </span>
+      <span className={cn('font-medium truncate', isSm ? 'text-[9px]' : 'text-[10px]')}>{label}</span>
+    </>
+  );
+  if (to) return <Link to={to} onClick={onClick} className={className}>{inner}</Link>;
+  return <button onClick={onClick} className={className}>{inner}</button>;
+}
+
 export function MobileBottomNav() {
   const location = useLocation();
   const queryClient = useQueryClient();
-  const { user, metadata } = useCurrentUser();
+  const { user } = useCurrentUser();
   const hasUnread = useHasUnreadNotifications();
   const { scrollContainer, noArcs } = useLayoutSnapshot();
   const { hidden } = useScrollDirection(scrollContainer);
-  const profileUrl = useProfileUrl(user?.pubkey ?? '', metadata);
 
   const { config } = useAppContext();
   const homeItem = getSidebarItem(config.homePage);
-  const HomeIcon = homeItem?.icon ?? Home;
-  const homeLabel = homeItem?.label ?? 'Home';
-  const homePath = homeItem?.path;
+  const homePath = homeItem?.path ?? '/';
 
   const [searchOpen, setSearchOpen] = useState(false);
 
@@ -43,11 +73,24 @@ export function MobileBottomNav() {
     setSearchOpen((v) => !v);
   }, []);
 
+  const handleFeedClick = useCallback((e: React.MouseEvent) => {
+    selectionChanged();
+    setSearchOpen(false);
+    if (location.pathname === '/' || location.pathname === homePath) {
+      e.preventDefault();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      void queryClient.invalidateQueries({ queryKey: ['feed'] });
+      void queryClient.invalidateQueries({ queryKey: ['ditto-curated-feed'] });
+    }
+  }, [location.pathname, homePath, queryClient]);
+
   // Hide the nav when search sheet is open so it doesn't compete for space
   const isHidden = hidden || searchOpen;
 
-  const displayName = metadata?.name || metadata?.display_name;
-  const isOnProfile = user && location.pathname === profileUrl;
+  const isOnFeed = location.pathname === '/' || location.pathname === homePath;
+  const isOnCommunities = location.pathname === '/communities' || location.pathname.startsWith('/communities/');
+  const isOnWorld = location.pathname === '/world' || location.pathname.startsWith('/world/');
+  const isOnNotifications = location.pathname === '/notifications';
 
   return (
     <>
@@ -63,91 +106,79 @@ export function MobileBottomNav() {
         {/* Arc + items wrapper */}
         <div className="relative">
           <ArcBackground variant={noArcs ? 'rect' : 'up'} />
-          <div className="h-11 flex items-center relative">
+          <div className="h-12 flex items-end pb-0 relative translate-y-2">
 
-          {/* Home */}
-          <Link
-            to="/"
-            onClick={() => {
-              selectionChanged();
-              setSearchOpen(false);
-              // When already on the home page, scroll to top and refresh the feed
-              if (location.pathname === '/' || location.pathname === homePath) {
-                window.scrollTo({ top: 0, behavior: 'smooth' });
-                void queryClient.invalidateQueries({ queryKey: ['feed'] });
-                void queryClient.invalidateQueries({ queryKey: ['ditto-curated-feed'] });
-              }
-            }}
-            className={cn(
-              'flex flex-col items-center justify-center gap-0.5 flex-1 py-2 transition-colors',
-              (location.pathname === '/' || location.pathname === homePath) ? 'text-primary' : 'text-muted-foreground',
-            )}
-          >
-            <HomeIcon className="size-5" />
-            <span className="text-[10px] font-medium">{homeLabel}</span>
-          </Link>
+            {/* Search */}
+            <NavItem
+              icon={Search}
+              label="Search"
+              active={searchOpen}
+              onClick={handleSearchClick}
+              size="sm"
+            />
 
-          {/* Search */}
-          <button
-            onClick={handleSearchClick}
-            className={cn(
-              'flex flex-col items-center justify-center gap-0.5 flex-1 py-2 transition-colors',
-              searchOpen ? 'text-primary' : 'text-muted-foreground',
-            )}
-          >
-            <Search className="size-5" />
-            <span className="text-[10px] font-medium">Search</span>
-          </button>
-
-          {/* Notifications */}
-          {user && (
-            <Link
-              to="/notifications"
+            {/* Communities */}
+            <NavItem
+              icon={Users}
+              label="Communities"
+              active={isOnCommunities}
+              to="/communities"
               onClick={() => { selectionChanged(); setSearchOpen(false); }}
-              className={cn(
-                'flex flex-col items-center justify-center gap-0.5 flex-1 py-2 transition-colors',
-                location.pathname === '/notifications' ? 'text-primary' : 'text-muted-foreground',
-              )}
-            >
-              <span className="relative">
-                <Bell className="size-5" />
-                {hasUnread && (
-                  <span className="absolute -top-1 right-0 size-2 bg-primary rounded-full" />
-                )}
-              </span>
-              <span className="text-[10px] font-medium">Notifications</span>
-            </Link>
-          )}
+            />
 
-          {/* Profile */}
-          {user ? (
-            <Link
-              to={profileUrl}
+            {/* Center spacer — reserved for the apex Feed button */}
+            <div className="flex-[0.4]" aria-hidden="true" />
+
+            {/* Notifications */}
+            {user ? (
+              <NavItem
+                icon={Bell}
+                label="Notifications"
+                active={isOnNotifications}
+                badge={hasUnread}
+                to="/notifications"
+                onClick={() => { selectionChanged(); setSearchOpen(false); }}
+              />
+            ) : (
+              <div className="flex-1" aria-hidden="true" />
+            )}
+
+            {/* World */}
+            <NavItem
+              icon={Earth}
+              label="World"
+              active={isOnWorld}
+              to="/world"
               onClick={() => { selectionChanged(); setSearchOpen(false); }}
-              className={cn(
-                'flex flex-col items-center justify-center gap-0.5 flex-1 py-2 transition-colors',
-                isOnProfile ? 'text-primary' : 'text-muted-foreground',
-              )}
-            >
-              <Avatar className="size-5">
-                <AvatarImage src={metadata?.picture} alt={displayName} />
-                <AvatarFallback className="bg-primary/20 text-primary text-[8px]">
-                  {displayName?.[0]?.toUpperCase() || <User className="size-3" />}
-                </AvatarFallback>
-              </Avatar>
-              <span className="text-[10px] font-medium">Profile</span>
-            </Link>
-          ) : (
-            <Link
-              to="/profile"
-              className="flex flex-col items-center justify-center gap-0.5 flex-1 py-2 transition-colors text-muted-foreground"
-            >
-              <User className="size-5" />
-              <span className="text-[10px] font-medium">Profile</span>
-            </Link>
-          )}
+              size="sm"
+            />
 
           </div>
+
+          {/* Apex Feed button — Agora bolt mark cradled in the V notch, with label below. */}
+          <Link
+            to={homePath}
+            onClick={handleFeedClick}
+            aria-label={homeItem?.label ?? 'Feed'}
+            className={cn(
+              'absolute left-1/2 -translate-x-1/2 z-10 -top-6',
+              'flex flex-col items-center gap-3',
+              'transition-transform hover:scale-105 active:scale-95',
+            )}
+          >
+            <AgoraBoltIcon
+              className={cn(
+                'size-16 drop-shadow-md',
+                isOnFeed && 'drop-shadow-[0_0_8px_hsl(var(--primary)/0.6)]',
+              )}
+            />
+            <span className={cn(
+              'text-[10px] font-semibold leading-none',
+              isOnFeed ? 'text-primary' : 'text-foreground',
+            )}>
+              {homeItem?.label ?? 'Feed'}
+            </span>
+          </Link>
         </div>
         {/* Safe area fill — matches the arc's semi-transparent background */}
         <div className="safe-area-bottom bg-background/85" />

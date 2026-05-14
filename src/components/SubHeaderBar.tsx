@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { ArcBackground, ARC_OVERHANG_PX } from '@/components/ArcBackground';
+import { ArcBackground } from '@/components/ArcBackground';
 import { useNavHidden } from '@/contexts/LayoutContext';
 import { SubHeaderBarContext } from '@/components/SubHeaderBarContext';
 
@@ -30,7 +30,7 @@ interface SubHeaderBarProps {
  * Used by all tab bars (Feed, Search, Notifications, etc.) and the MobileTopBar
  * fallback arc.
  */
-export function SubHeaderBar({ children, className, innerClassName, noArc, pinned }: SubHeaderBarProps) {
+export function SubHeaderBar({ children, className, innerClassName, noArc: _noArc, pinned }: SubHeaderBarProps) {
   const [hover, setHover] = useState<HoverSlice | null>(null);
   const [active, setActive] = useState<HoverSlice | null>(null);
   const navHidden = useNavHidden();
@@ -125,38 +125,35 @@ export function SubHeaderBar({ children, className, innerClassName, noArc, pinne
             style={{ height: 'var(--safe-area-inset-top, env(safe-area-inset-top, 0px))' }}
           />
         )}
-        {/* Inner wrapper so ArcBackground covers only the tab area, not the safe-area padding above.
-            sidebar:pt-2 adds desktop top padding inside the arc rather than outside it. */}
-        <div className="relative sidebar:pt-2">
-          <ArcBackground variant={noArc ? 'rect' : 'down'} />
-          {/* Per-tab arc hover highlight: full-width arc, clipped to the hovered tab's x-slice */}
-          {hover && !noArc && (
+        {/* Inner wrapper holds the ArcBackground and tab content. */}
+        <div className="relative">
+          <ArcBackground variant="rect" />
+          {/* Per-tab hover highlight: a flat-bottomed slab clipped to the hovered tab's x-slice */}
+          {hover && (
             <svg
               aria-hidden
-              className="absolute top-0 left-0 w-full pointer-events-none"
+              className="absolute top-0 left-0 w-full h-full pointer-events-none"
               style={{
-                height: `calc(100% + ${ARC_OVERHANG_PX}px)`,
                 clipPath: `inset(0 calc(100% - ${hover.left + hover.width}px) 0 ${hover.left}px)`,
               }}
               viewBox="0 0 100 64"
               preserveAspectRatio="none"
             >
-              <path d="M0,0 L100,0 L100,44 Q50,64 0,44 Z" className="fill-secondary/40" />
+              <path d="M0,0 L100,0 L100,64 L0,64 Z" className="fill-secondary/40" />
             </svg>
           )}
-          {/* Active tab indicator: the arc's bottom edge as a stroke, clipped to the active tab's x-slice */}
-          {active && !noArc && (
+          {/* Active tab indicator: a flat underline along the bottom edge, clipped to the active tab's x-slice */}
+          {active && (
             <svg
               aria-hidden
-              className="absolute top-0 left-0 w-full pointer-events-none"
+              className="absolute top-0 left-0 w-full h-full pointer-events-none"
               style={{
-                height: `calc(100% + ${ARC_OVERHANG_PX}px)`,
                 clipPath: `inset(0 calc(100% - ${active.left + active.width}px) 0 ${active.left}px)`,
               }}
               viewBox="0 0 100 64"
               preserveAspectRatio="none"
             >
-              <path d="M100,44 Q50,64 0,44" fill="none" className="stroke-primary" strokeWidth="3" />
+              <path d="M0,62 L100,62" fill="none" className="stroke-primary" strokeWidth="3" vectorEffect="non-scaling-stroke" />
             </svg>
           )}
           {/* Tab content sits above the SVG background */}
@@ -174,7 +171,7 @@ export function SubHeaderBar({ children, className, innerClassName, noArc, pinne
             )}
             <div
               ref={scrollRef}
-              className={cn('relative flex overflow-x-auto scrollbar-none', innerClassName)}
+              className={cn('relative flex overflow-x-auto scrollbar-none py-1', innerClassName)}
             >
               {children}
             </div>

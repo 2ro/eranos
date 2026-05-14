@@ -11,7 +11,7 @@ interface MobileTopBarProps {
   hasSubHeader?: boolean;
 }
 
-export function MobileTopBar({ onAvatarClick, hasSubHeader }: MobileTopBarProps) {
+export function MobileTopBar({ onAvatarClick, hasSubHeader: _hasSubHeader }: MobileTopBarProps) {
   const location = useLocation();
   const navHidden = useNavHidden();
 
@@ -34,7 +34,7 @@ export function MobileTopBar({ onAvatarClick, hasSubHeader }: MobileTopBarProps)
       />
       {/* Relative wrapper so ArcBackground only covers the content area, not the safe-area padding above it. */}
       <div className="relative">
-        <ArcBackground variant={hasSubHeader ? 'rect' : 'down'} />
+        <ArcBackground variant="rect" />
         <div className="relative flex items-center px-3 h-10">
           {/* Left: hamburger menu icon */}
           <div className="flex items-center justify-center w-7 shrink-0">
