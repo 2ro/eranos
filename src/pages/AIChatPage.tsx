@@ -241,7 +241,7 @@ const AGENT_GREETINGS = [
 
 const SUGGESTIONS = [
   "What are my friends talking about?",
-  "What's happening on Nostr right now?",
+  "What's going on in Venezuela?",
 ];
 
 function EmptyState({ hasCredits, onSuggestion }: { hasCredits: boolean | null; onSuggestion: (text: string) => void }) {
