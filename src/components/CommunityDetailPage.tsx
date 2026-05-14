@@ -1,4 +1,4 @@
-import { useMemo, useCallback, useState, useLayoutEffect, useRef } from 'react';
+import { useMemo, useCallback, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { nip19 } from 'nostr-tools';
 import {
@@ -6,6 +6,7 @@ import {
   Activity as ActivityIcon,
   CalendarDays,
   Crown,
+  Info,
   MessageCircle,
   MoreVertical,
   Pencil,
@@ -208,29 +209,9 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
     return description.replace(new RegExp(`\\s*${descriptionUrl.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\s*$`), '').trim();
   }, [description, descriptionUrl]);
 
-  // Detect whether the banner description is visually clipped by the
-  // line-clamp. If it is — or if there's a stripped website URL not shown
-  // inline — clicking the description opens a modal with the full text.
-  const descriptionRef = useRef<HTMLParagraphElement>(null);
-  const [descriptionClipped, setDescriptionClipped] = useState(false);
-  useLayoutEffect(() => {
-    const el = descriptionRef.current;
-    if (!el) {
-      setDescriptionClipped(false);
-      return;
-    }
-    const measure = () => {
-      setDescriptionClipped(el.scrollHeight > el.clientHeight + 1);
-    };
-    measure();
-    // Re-measure on viewport changes — the line-clamp boundary shifts with
-    // container width.
-    const ro = new ResizeObserver(measure);
-    ro.observe(el);
-    return () => ro.disconnect();
-  }, [descriptionText]);
-
-  const descriptionExpandable = descriptionClipped || !!descriptionUrl;
+  // Whether to render the description info button next to the title — true
+  // whenever there's any description text or a stripped trailing URL.
+  const descriptionExpandable = !!descriptionText || !!descriptionUrl;
 
   /**
    * Synthesize a kind-1 pseudo-event so we can hand the description off to
@@ -517,18 +498,38 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
 
   return (
     <div className="max-w-2xl mx-auto pb-16">
-      {/* ── Hero banner — image fills the area, title/description/members overlaid ── */}
-      <div className="relative w-full overflow-hidden aspect-[16/9] sm:aspect-[2/1]">
-        {image ? (
-          <img src={image} alt={name} className="absolute inset-0 w-full h-full object-cover" />
-        ) : (
-          <div className="absolute inset-0 bg-gradient-to-br from-primary/50 via-primary/25 to-primary/5 flex items-center justify-center">
-            <Users className="size-16 text-primary/20 sm:size-20" />
-          </div>
-        )}
-        {/* Gradient overlay — modeled on the adventure detail pattern so
-            overlaid text stays legible against any background image. */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-black/40" />
+      <CommunityModerationContext.Provider value={moderationCtx}>
+        <Tabs value={activeTab} onValueChange={setActiveTab}>
+      {/* ── Hero banner + tabs share a single image/gradient backdrop so the
+          banner image continues underneath the tab strip and fades into the
+          page background — eliminating the seam between the two. ── */}
+      <div className="relative isolate overflow-hidden">
+        {/* Shared backdrop — image (or fallback gradient) + darkening overlay
+            that spans the full height of (banner + tabs) and fades to the
+            page background at its bottom edge. */}
+        <div aria-hidden className="absolute inset-0 -z-10">
+          {image ? (
+            <img src={image} alt="" className="absolute inset-0 w-full h-full object-cover" />
+          ) : (
+            <div className="absolute inset-0 bg-gradient-to-br from-primary/50 via-primary/25 to-primary/5" />
+          )}
+          {/* Darkening overlay that fades to the page background at the
+              bottom of the tab strip — makes tab text legible and erases the
+              hard seam between banner and tabs. Stops push the heavy darkness
+              down so it sits behind the tabs, not over the banner. */}
+          <div className="absolute inset-0 bg-[linear-gradient(to_bottom,transparent_0%,transparent_15%,rgba(0,0,0,0.9)_75%,rgba(0,0,0,0.9)_97%,hsl(var(--background))_100%)]" />
+        </div>
+
+        {/* Banner — fixed aspect ratio, title/description/buttons overlaid */}
+        <div className="relative w-full aspect-[2/1] sm:aspect-[21/9]">
+          {!image && (
+            <div className="absolute inset-0 flex items-center justify-center">
+              <Users className="size-16 text-primary/20 sm:size-20" />
+            </div>
+          )}
+          {/* Extra top/bottom darkening on the hero specifically (above the
+              shared overlay) so overlaid title/description stay legible. */}
+          <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-transparent via-transparent to-black/40" />
 
         {/* Top bar — back button (left) + follow toggle (right) */}
         <div className="absolute left-0 right-0 top-0 z-10 flex items-center justify-between px-4 pt-4">
@@ -562,34 +563,11 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
           )}
         </div>
 
-        {/* Title + description + bottom row (member stack + actions) */}
-        <div className="absolute bottom-0 left-0 right-0 px-5 pb-6 pt-8 [text-shadow:0_1px_4px_rgba(0,0,0,0.7),0_2px_8px_rgba(0,0,0,0.4)]">
-          <h2 className="text-xl font-bold text-white leading-tight sm:text-2xl">{name}</h2>
-          {descriptionText && (
-            descriptionExpandable ? (
-              <button
-                type="button"
-                onClick={() => setDescriptionDialogOpen(true)}
-                className="block w-full text-left mt-3 rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80"
-                aria-label="Show full description"
-              >
-                <p
-                  ref={descriptionRef}
-                  className="line-clamp-2 text-sm leading-snug text-white/90 whitespace-pre-wrap hover:text-white transition-colors"
-                >
-                  {descriptionText}
-                </p>
-              </button>
-            ) : (
-              <p
-                ref={descriptionRef}
-                className="line-clamp-2 text-sm leading-snug text-white/90 mt-3 whitespace-pre-wrap"
-              >
-                {descriptionText}
-              </p>
-            )
-          )}
-          <div className="mt-4 flex items-center justify-between gap-2 [text-shadow:none]">
+        {/* Member stack sits ABOVE the title; the title row carries the Info
+            button (left of name) and action buttons (right). Description has
+            moved behind an Info button to reduce banner clutter. */}
+        <div className="absolute bottom-0 left-0 right-0 px-5 pb-3 pt-8 [text-shadow:0_1px_4px_rgba(0,0,0,0.7),0_2px_8px_rgba(0,0,0,0.4)]">
+          <div className="flex [text-shadow:none]">
             {/* Avatar stack — clickable to open full members dialog */}
             <button
               type="button"
@@ -609,9 +587,24 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
                 </span>
               )}
             </button>
+          </div>
+          <div className="mt-1.5 flex items-end justify-between gap-2">
+            <div className="flex items-center gap-1.5 min-w-0">
+              <h2 className="text-xl font-bold text-white leading-tight sm:text-2xl truncate">{name}</h2>
+              {descriptionExpandable && (
+                <button
+                  type="button"
+                  onClick={() => setDescriptionDialogOpen(true)}
+                  className="-my-1 -mr-1 p-1 rounded-full text-white/75 hover:text-white hover:bg-white/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80 transition-colors"
+                  aria-label="About this community"
+                >
+                  <Info className="size-4 [text-shadow:none] drop-shadow-[0_1px_2px_rgba(0,0,0,0.85)]" />
+                </button>
+              )}
+            </div>
 
             {/* Banner action row — MembersOnly + Share + overflow menu (Unfollow / Edit) */}
-            <div className="flex items-center gap-0.5 shrink-0">
+            <div className="flex items-center gap-0.5 shrink-0 [text-shadow:none]">
               <MembersOnlyToggle
                 className="text-white/90 hover:text-white hover:bg-white/15 data-[state=on]:text-white"
               />
@@ -648,31 +641,31 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
       </div>
 
       {/* ── Tabs ── */}
-      <CommunityModerationContext.Provider value={moderationCtx}>
-        <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="w-full justify-stretch rounded-none border-b border-border bg-transparent p-0 h-auto">
+          <TabsList className="w-full justify-stretch rounded-none border-b border-white/15 bg-transparent p-0 h-auto">
             <TabsTrigger
               value="chat"
-              className="flex-1 min-w-0 rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none px-4 pb-3 pt-2"
+              className="flex-1 min-w-0 rounded-none border-b-2 border-transparent text-white/75 hover:text-white data-[state=active]:text-white data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none px-4 pb-3 pt-2 [text-shadow:0_1px_3px_rgba(0,0,0,0.6)]"
             >
               <MessageCircle className="size-4 mr-1.5" />
               Chat
             </TabsTrigger>
             <TabsTrigger
               value="activity"
-              className="flex-1 min-w-0 rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none px-4 pb-3 pt-2"
+              className="flex-1 min-w-0 rounded-none border-b-2 border-transparent text-white/75 hover:text-white data-[state=active]:text-white data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none px-4 pb-3 pt-2 [text-shadow:0_1px_3px_rgba(0,0,0,0.6)]"
             >
               <ActivityIcon className="size-4 mr-1.5" />
               Activity
             </TabsTrigger>
             <TabsTrigger
               value="pulse"
-              className="flex-1 min-w-0 rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none px-4 pb-3 pt-2"
+              className="flex-1 min-w-0 rounded-none border-b-2 border-transparent text-white/75 hover:text-white data-[state=active]:text-white data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none px-4 pb-3 pt-2 [text-shadow:0_1px_3px_rgba(0,0,0,0.6)]"
             >
               <Radio className="size-4 mr-1.5" />
               Pulse
             </TabsTrigger>
           </TabsList>
+      </div>
+      {/* ── /shared banner+tabs backdrop wrapper ── */}
 
           {/* Sublabel for the currently-active tab. Only rendered when the
               tab has a descriptor to show — keeps the rest of the tab strip
