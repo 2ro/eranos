@@ -1,20 +1,21 @@
-import { useMemo, useCallback, useEffect, useState } from 'react';
-import { useInView } from 'react-intersection-observer';
+import { useMemo, useCallback, useState, useLayoutEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { nip19 } from 'nostr-tools';
 import {
   ArrowLeft,
+  Activity as ActivityIcon,
   CalendarDays,
   Crown,
-  Loader2,
   MessageCircle,
-  MessageSquare,
+  MoreVertical,
   Pencil,
-  Rss,
+  Radio,
   Shield,
   ShieldBan,
   Share2,
   Target,
+  UserCheck,
+  UserMinus,
   UserPlus,
   Users,
 } from 'lucide-react';
@@ -27,18 +28,19 @@ import { PeopleAvatarStack } from '@/components/PeopleAvatarStack';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { BanConfirmDialog } from '@/components/BanConfirmDialog';
 import { CommunityChatPanel } from '@/components/CommunityChatPanel';
+import { CommunityPulsePanel } from '@/components/CommunityPulsePanel';
+import { NoteContent } from '@/components/NoteContent';
 import { CommunityBadgePanel } from '@/components/CommunityBadgePanel';
 import { ComposeBox } from '@/components/ComposeBox';
-import { FeedEmptyState } from '@/components/FeedEmptyState';
 import { FollowToggleButton } from '@/components/FollowButton';
 import { CreateGoalDialog } from '@/components/CreateGoalDialog';
 import { MembersOnlyToggle } from '@/components/MembersOnlyToggle';
 import { NoteCard } from '@/components/NoteCard';
-import { PullToRefresh } from '@/components/PullToRefresh';
 import { ReplyComposeModal } from '@/components/ReplyComposeModal';
 import { ThreadedReplyList, type ReplyNode } from '@/components/ThreadedReplyList';
 import { useAuthor } from '@/hooks/useAuthor';
@@ -49,18 +51,13 @@ import { useCommunityEvents } from '@/hooks/useCommunityEvents';
 import { useCommunityMembers } from '@/hooks/useCommunityMembers';
 import { useCommunityGoals } from '@/hooks/useCommunityGoals';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
-import { useFeed } from '@/hooks/useFeed';
 import { useMembersOnlyFilter } from '@/hooks/useMembersOnlyFilter';
-import { useMuteList } from '@/hooks/useMuteList';
 import { useNow } from '@/hooks/useNow';
-import { usePageRefresh } from '@/hooks/usePageRefresh';
 import { useProfileUrl } from '@/hooks/useProfileUrl';
 import { useToast } from '@/hooks/useToast';
 import { CommunityModerationContext } from '@/contexts/CommunityModerationContext';
 import { useLayoutOptions } from '@/contexts/LayoutContext';
 import { applyCommunityModerationToEvents, canBanTarget, getViewerAuthority, parseCommunityEvent, type CommunityMember } from '@/lib/communityUtils';
-import { isEventMuted } from '@/lib/muteHelpers';
-import { shouldHideFeedEvent, type FeedItem } from '@/lib/feedUtils';
 import { genUserName } from '@/lib/genUserName';
 import { sanitizeUrl } from '@/lib/sanitizeUrl';
 import { cn } from '@/lib/utils';
@@ -140,94 +137,6 @@ function ReplyCardSkeleton() {
   );
 }
 
-function CommunityMemberFeed({ authorPubkeys, isMembershipLoading }: { authorPubkeys: string[]; isMembershipLoading: boolean }) {
-  const { muteItems } = useMuteList();
-  const { ref: scrollRef, inView } = useInView({ threshold: 0, rootMargin: '400px' });
-  const queryKey = useMemo(() => ['feed', 'follows'], []);
-  const handleRefresh = usePageRefresh(queryKey);
-  const uniqueAuthors = useMemo(() => Array.from(new Set(authorPubkeys)), [authorPubkeys]);
-
-  const {
-    data: rawData,
-    isPending,
-    isLoading,
-    fetchNextPage,
-    hasNextPage,
-    isFetchingNextPage,
-  } = useFeed('follows', { authors: uniqueAuthors });
-
-  useEffect(() => {
-    if (inView && hasNextPage && !isFetchingNextPage) {
-      fetchNextPage();
-    }
-  }, [inView, hasNextPage, isFetchingNextPage, fetchNextPage]);
-
-  const feedItems = useMemo(() => {
-    if (!rawData?.pages) return [];
-    const seen = new Set<string>();
-
-    return (rawData.pages as { items: FeedItem[] }[])
-      .flatMap((page) => page.items)
-      .filter((item) => {
-        const key = item.repostedBy ? `repost-${item.repostedBy}-${item.event.id}` : item.event.id;
-        if (!key || seen.has(key)) return false;
-        seen.add(key);
-        if (shouldHideFeedEvent(item.event)) return false;
-        if (muteItems.length > 0 && isEventMuted(item.event, muteItems)) return false;
-        return true;
-      });
-  }, [rawData?.pages, muteItems]);
-
-  if (!isMembershipLoading && uniqueAuthors.length === 0) {
-    return (
-      <div className="py-12 text-center text-muted-foreground text-sm px-5">
-        No active members found.
-      </div>
-    );
-  }
-
-  if (isMembershipLoading || isPending || (isLoading && !rawData)) {
-    return (
-      <div className="divide-y divide-border">
-        {Array.from({ length: 5 }).map((_, i) => (
-          <ReplyCardSkeleton key={i} />
-        ))}
-      </div>
-    );
-  }
-
-  if (feedItems.length === 0) {
-    return (
-      <PullToRefresh onRefresh={handleRefresh}>
-        <FeedEmptyState message="No posts from active community members yet." />
-      </PullToRefresh>
-    );
-  }
-
-  return (
-    <PullToRefresh onRefresh={handleRefresh}>
-      <div>
-        {feedItems.map((item) => (
-          <NoteCard
-            key={item.repostedBy ? `repost-${item.repostedBy}-${item.event.id}` : item.event.id}
-            event={item.event}
-            repostedBy={item.repostedBy}
-          />
-        ))}
-        {hasNextPage && (
-          <div ref={scrollRef} className="py-4">
-            {isFetchingNextPage && (
-              <div className="flex justify-center">
-                <Loader2 className="size-5 animate-spin text-muted-foreground" />
-              </div>
-            )}
-          </div>
-        )}
-      </div>
-    </PullToRefresh>
-  );
-}
-
 function getTag(tags: string[][], name: string): string | undefined {
   return tags.find(([n]) => n === name)?.[1];
 }
@@ -279,6 +188,7 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
   const [eventDialogOpen, setEventDialogOpen] = useState(false);
   const [editCommunityOpen, setEditCommunityOpen] = useState(false);
   const [membersDialogOpen, setMembersDialogOpen] = useState(false);
+  const [descriptionDialogOpen, setDescriptionDialogOpen] = useState(false);
 
   // Parse community definition
   const community = useMemo(() => parseCommunityEvent(event), [event]);
@@ -297,6 +207,47 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
     if (!descriptionUrl) return description;
     return description.replace(new RegExp(`\\s*${descriptionUrl.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\s*$`), '').trim();
   }, [description, descriptionUrl]);
+
+  // Detect whether the banner description is visually clipped by the
+  // line-clamp. If it is — or if there's a stripped website URL not shown
+  // inline — clicking the description opens a modal with the full text.
+  const descriptionRef = useRef<HTMLParagraphElement>(null);
+  const [descriptionClipped, setDescriptionClipped] = useState(false);
+  useLayoutEffect(() => {
+    const el = descriptionRef.current;
+    if (!el) {
+      setDescriptionClipped(false);
+      return;
+    }
+    const measure = () => {
+      setDescriptionClipped(el.scrollHeight > el.clientHeight + 1);
+    };
+    measure();
+    // Re-measure on viewport changes — the line-clamp boundary shifts with
+    // container width.
+    const ro = new ResizeObserver(measure);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, [descriptionText]);
+
+  const descriptionExpandable = descriptionClipped || !!descriptionUrl;
+
+  /**
+   * Synthesize a kind-1 pseudo-event so we can hand the description off to
+   * `NoteContent` for the same link / hashtag / nostr-URI / embed rendering
+   * used in NoteCard. Reuses the community event's `pubkey` and `id` to
+   * satisfy hooks inside `NoteContent` (author lookup, memo keys, etc.); the
+   * synthesized event is never published.
+   */
+  const descriptionPseudoEvent = useMemo<NostrEvent>(() => ({
+    id: `community-description-${event.id}`,
+    pubkey: event.pubkey,
+    kind: 1,
+    created_at: event.created_at,
+    tags: [],
+    content: description,
+    sig: '',
+  }), [description, event.id, event.pubkey, event.created_at]);
 
   // ── Members ─────────────────────────────────────────────────────────────────
   const { data: membership, moderation, rankMap, isLoading: membersLoading } = useCommunityMembers(community);
@@ -472,6 +423,30 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
       .map((r) => buildNode(r));
   }, [commentsData, moderation, membersOnly, rankMap]);
 
+  // ── Activity feed — merge active initiatives with top-level discussion
+  // posts into one chronological stream (newest first). Each entry is tagged
+  // so the renderer can dispatch to NoteCard (initiative) or
+  // ThreadedReplyList (discussion subtree).
+  type ActivityItem =
+    | { kind: 'initiative'; event: NostrEvent; ts: number }
+    | { kind: 'discussion'; node: ReplyNode; ts: number };
+
+  const activityItems = useMemo((): ActivityItem[] => {
+    const items: ActivityItem[] = [
+      ...activeInitiatives.map((ev) => ({
+        kind: 'initiative' as const,
+        event: ev,
+        ts: ev.created_at,
+      })),
+      ...replyTree.map((node) => ({
+        kind: 'discussion' as const,
+        node,
+        ts: node.event.created_at,
+      })),
+    ];
+    return items.sort((a, b) => b.ts - a.ts);
+  }, [activeInitiatives, replyTree]);
+
   // ── Share handler ───────────────────────────────────────────────────────────
   const handleShare = useCallback(async () => {
     const d = event.tags.find(([n]) => n === 'd')?.[1] ?? '';
@@ -491,7 +466,7 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
 
   // ── FAB — opens a floating action menu anchored to the FAB itself ─────────
   // Visible on tabs whose surfaces accept user-authored content.
-  const fabAvailable = activeTab === 'comments' || activeTab === 'initiatives';
+  const fabAvailable = activeTab === 'activity';
 
   const fabMenu = useMemo(() => {
     if (!fabAvailable) return undefined;
@@ -501,7 +476,7 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
         label: 'New post',
         icon: <MessageCircle className="size-4" />,
         onSelect: () => {
-          setActiveTab('comments');
+          setActiveTab('activity');
           setComposeOpen(true);
         },
       },
@@ -510,7 +485,7 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
         label: 'New goal',
         icon: <Target className="size-4" />,
         onSelect: () => {
-          setActiveTab('initiatives');
+          setActiveTab('activity');
           setGoalDialogOpen(true);
         },
       },
@@ -519,7 +494,7 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
         label: 'New event',
         icon: <CalendarDays className="size-4" />,
         onSelect: () => {
-          setActiveTab('initiatives');
+          setActiveTab('activity');
           setEventDialogOpen(true);
         },
       },
@@ -543,7 +518,7 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
   return (
     <div className="max-w-2xl mx-auto pb-16">
       {/* ── Hero banner — image fills the area, title/description/members overlaid ── */}
-      <div className="relative w-full overflow-hidden aspect-[2/1] sm:aspect-[5/2]">
+      <div className="relative w-full overflow-hidden aspect-[16/9] sm:aspect-[2/1]">
         {image ? (
           <img src={image} alt={name} className="absolute inset-0 w-full h-full object-cover" />
         ) : (
@@ -570,6 +545,14 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
               isFollowing={communityFollowed}
               isPending={toggleCommunityFollow.isPending}
               onClick={handleToggleFollow}
+              icon={<UserPlus className="size-4" />}
+              followingIcon={
+                <>
+                  <UserCheck className="size-4 group-hover:hidden group-focus-visible:hidden" />
+                  <UserMinus className="size-4 hidden group-hover:inline group-focus-visible:inline" />
+                </>
+              }
+              hoverToUnfollow
               className={cn(
                 'shadow-md',
                 !communityFollowed && 'bg-white text-black hover:bg-white/90',
@@ -580,14 +563,33 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
         </div>
 
         {/* Title + description + bottom row (member stack + actions) */}
-        <div className="absolute bottom-0 left-0 right-0 px-5 pb-3 [text-shadow:0_1px_4px_rgba(0,0,0,0.7),0_2px_8px_rgba(0,0,0,0.4)]">
+        <div className="absolute bottom-0 left-0 right-0 px-5 pb-6 pt-8 [text-shadow:0_1px_4px_rgba(0,0,0,0.7),0_2px_8px_rgba(0,0,0,0.4)]">
           <h2 className="text-xl font-bold text-white leading-tight sm:text-2xl">{name}</h2>
           {descriptionText && (
-            <p className="line-clamp-2 text-sm leading-snug text-white/90 mt-1.5 whitespace-pre-wrap">
-              {descriptionText}
-            </p>
+            descriptionExpandable ? (
+              <button
+                type="button"
+                onClick={() => setDescriptionDialogOpen(true)}
+                className="block w-full text-left mt-3 rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80"
+                aria-label="Show full description"
+              >
+                <p
+                  ref={descriptionRef}
+                  className="line-clamp-2 text-sm leading-snug text-white/90 whitespace-pre-wrap hover:text-white transition-colors"
+                >
+                  {descriptionText}
+                </p>
+              </button>
+            ) : (
+              <p
+                ref={descriptionRef}
+                className="line-clamp-2 text-sm leading-snug text-white/90 mt-3 whitespace-pre-wrap"
+              >
+                {descriptionText}
+              </p>
+            )
           )}
-          <div className="mt-2 flex items-center justify-between gap-2 [text-shadow:none]">
+          <div className="mt-4 flex items-center justify-between gap-2 [text-shadow:none]">
             {/* Avatar stack — clickable to open full members dialog */}
             <button
               type="button"
@@ -608,21 +610,11 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
               )}
             </button>
 
-            {/* Banner action row — MembersOnly, Edit (founder), Share */}
+            {/* Banner action row — MembersOnly + Share + overflow menu (Unfollow / Edit) */}
             <div className="flex items-center gap-0.5 shrink-0">
               <MembersOnlyToggle
                 className="text-white/90 hover:text-white hover:bg-white/15 data-[state=on]:text-white"
               />
-              {isFounder && community && (
-                <button
-                  type="button"
-                  className={bannerActionClassName}
-                  onClick={() => setEditCommunityOpen(true)}
-                  aria-label="Edit community"
-                >
-                  <Pencil className="size-5" />
-                </button>
-              )}
               <button
                 type="button"
                 className={bannerActionClassName}
@@ -631,49 +623,67 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
               >
                 <Share2 className="size-5" />
               </button>
+              {isFounder && community && (
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <button
+                      type="button"
+                      className={bannerActionClassName}
+                      aria-label="More actions"
+                    >
+                      <MoreVertical className="size-5" />
+                    </button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" side="top" sideOffset={6} className="min-w-[180px]">
+                    <DropdownMenuItem onSelect={() => setEditCommunityOpen(true)}>
+                      <Pencil className="size-4 mr-2" />
+                      Edit community
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              )}
             </div>
           </div>
         </div>
       </div>
 
-      {/* ── Community info ── */}
-      <div className="px-5 mt-3 space-y-3">
+      {/* ── Tabs ── */}
+      <CommunityModerationContext.Provider value={moderationCtx}>
+        <Tabs value={activeTab} onValueChange={setActiveTab}>
+          <TabsList className="w-full justify-stretch rounded-none border-b border-border bg-transparent p-0 h-auto">
+            <TabsTrigger
+              value="chat"
+              className="flex-1 min-w-0 rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none px-4 pb-3 pt-2"
+            >
+              <MessageCircle className="size-4 mr-1.5" />
+              Chat
+            </TabsTrigger>
+            <TabsTrigger
+              value="activity"
+              className="flex-1 min-w-0 rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none px-4 pb-3 pt-2"
+            >
+              <ActivityIcon className="size-4 mr-1.5" />
+              Activity
+            </TabsTrigger>
+            <TabsTrigger
+              value="pulse"
+              className="flex-1 min-w-0 rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none px-4 pb-3 pt-2"
+            >
+              <Radio className="size-4 mr-1.5" />
+              Pulse
+            </TabsTrigger>
+          </TabsList>
 
-        {/* ── Tabs ── */}
-        <CommunityModerationContext.Provider value={moderationCtx}>
-          <Tabs value={activeTab} onValueChange={setActiveTab} className="-mx-5">
-            <TabsList className="w-full justify-start overflow-x-auto scrollbar-none rounded-none border-b border-border bg-transparent p-0 h-auto">
-              <TabsTrigger
-                value="chat"
-                className="flex-none min-w-fit rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none px-4 pb-3 pt-2"
-              >
-                <MessageSquare className="size-4 mr-1.5" />
-                Chat
-              </TabsTrigger>
-              <TabsTrigger
-                value="feed"
-                className="flex-none min-w-fit rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none px-4 pb-3 pt-2"
-              >
-                <Rss className="size-4 mr-1.5" />
-                Feed
-              </TabsTrigger>
-              <TabsTrigger
-                value="comments"
-                className="flex-none min-w-fit rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none px-4 pb-3 pt-2"
-              >
-                <MessageCircle className="size-4 mr-1.5" />
-                Posts
-              </TabsTrigger>
-              <TabsTrigger
-                value="initiatives"
-                className="flex-none min-w-fit rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none px-4 pb-3 pt-2"
-              >
-                <Target className="size-4 mr-1.5" />
-                Initiatives
-              </TabsTrigger>
-            </TabsList>
+          {/* Sublabel for the currently-active tab. Only rendered when the
+              tab has a descriptor to show — keeps the rest of the tab strip
+              clean. */}
+          {activeTab === 'pulse' && (
+            <div className="px-5 py-2 text-xs text-muted-foreground text-center">
+              What members are posting elsewhere across Nostr.
+            </div>
+          )}
 
-            {/* ── Chat tab ── */}
+            {/* ── Chat tab — community kind-9 messages ── */}
             <TabsContent value="chat" className="mt-0">
               {communityATag ? (
                 <CommunityChatPanel
@@ -689,58 +699,39 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
               )}
             </TabsContent>
 
-            {/* ── Feed tab ── */}
-            <TabsContent value="feed" className="mt-0">
-              <CommunityMemberFeed
-                authorPubkeys={allMemberPubkeys}
-                isMembershipLoading={membersLoading}
-              />
-            </TabsContent>
-
-            {/* ── Comments tab ── */}
-            <TabsContent value="comments" className="mt-0">
+            {/* ── Activity tab — chronological stream of initiatives
+                 (goals + events) interleaved with threaded NIP-22 discussion,
+                 followed by past initiatives. ── */}
+            <TabsContent value="activity" className="mt-0">
               <ComposeBox compact replyTo={event} />
 
-              {commentsLoading ? (
+              {(commentsLoading || goalsLoading || eventsLoading) ? (
                 <div className="divide-y divide-border">
                   {Array.from({ length: 3 }).map((_, i) => (
                     <ReplyCardSkeleton key={i} />
                   ))}
                 </div>
-              ) : replyTree.length > 0 ? (
-                <ThreadedReplyList roots={replyTree} />
-              ) : membersOnly && commentsData && (commentsData.topLevelComments?.length ?? 0) > 0 ? (
+              ) : activityItems.length === 0 && pastInitiatives.length === 0 ? (
                 <div className="py-12 text-center text-muted-foreground text-sm px-5">
-                  No comments from community members yet. Toggle the shield icon to see all comments.
-                </div>
-              ) : (
-                <div className="py-12 text-center text-muted-foreground text-sm">
-                  No comments yet. Be the first to comment!
-                </div>
-              )}
-            </TabsContent>
-
-            {/* ── Initiatives tab (Goals + Events, unified list) ── */}
-            <TabsContent value="initiatives" className="mt-0">
-              {goalsLoading || eventsLoading ? (
-                <div className="divide-y divide-border">
-                  {Array.from({ length: 3 }).map((_, i) => (
-                    <ReplyCardSkeleton key={i} />
-                  ))}
-                </div>
-              ) : activeInitiatives.length === 0 && pastInitiatives.length === 0 ? (
-                <div className="py-12 text-center text-muted-foreground text-sm px-5">
-                  {membersOnly && ((goals ?? []).length > 0 || (communityEvents ?? []).length > 0)
-                    ? 'No initiatives from community members yet. Toggle the shield icon to see all initiatives.'
-                    : <>No initiatives yet.{user ? ' Create a goal or an event to get started!' : ''}</>}
+                  {membersOnly && (
+                    (commentsData && (commentsData.topLevelComments?.length ?? 0) > 0) ||
+                    (goals ?? []).length > 0 ||
+                    (communityEvents ?? []).length > 0
+                  )
+                    ? 'No activity from community members yet. Toggle the shield icon to see everything.'
+                    : <>No activity yet.{user ? ' Start a discussion, set a goal, or schedule an event!' : ''}</>}
                 </div>
               ) : (
                 <div className="divide-y divide-border">
-                  {activeInitiatives.map((e) => (
-                    <NoteCard key={e.id} event={e} />
-                  ))}
+                  {activityItems.map((item) =>
+                    item.kind === 'initiative' ? (
+                      <NoteCard key={item.event.id} event={item.event} />
+                    ) : (
+                      <ThreadedReplyList key={item.node.event.id} roots={[item.node]} />
+                    )
+                  )}
 
-                  {pastInitiatives.length > 0 && activeInitiatives.length > 0 && (
+                  {pastInitiatives.length > 0 && (
                     <div className="px-5 pt-4 pb-1">
                       <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
                         Past
@@ -753,9 +744,46 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
                 </div>
               )}
             </TabsContent>
+
+            {/* ── Pulse tab — what community members are posting elsewhere
+                 across Nostr. Excludes events tagged with this community's
+                 `a` reference. ── */}
+            <TabsContent value="pulse" className="mt-0">
+              {communityATag ? (
+                <CommunityPulsePanel
+                  communityATag={communityATag}
+                  memberPubkeys={allMemberPubkeys}
+                  isMembershipLoading={membersLoading}
+                />
+              ) : (
+                <div className="py-12 text-center text-muted-foreground text-sm px-5">
+                  Pulse is unavailable for this community.
+                </div>
+              )}
+            </TabsContent>
           </Tabs>
         </CommunityModerationContext.Provider>
-      </div>
+
+      {/* Description dialog — opened by clicking the truncated description in
+          the banner. Renders the full raw description plus a clickable
+          website link when the description ends with a URL. */}
+      <Dialog open={descriptionDialogOpen} onOpenChange={setDescriptionDialogOpen}>
+        <DialogContent className="max-w-lg max-h-[85vh] flex flex-col overflow-hidden p-0 gap-0">
+          <DialogHeader className="px-5 pt-5 pb-3 border-b border-border shrink-0">
+            <DialogTitle>About {name}</DialogTitle>
+          </DialogHeader>
+          <div className="px-5 py-4 overflow-y-auto">
+            {description ? (
+              <NoteContent
+                event={descriptionPseudoEvent}
+                className="text-sm leading-relaxed break-words"
+              />
+            ) : (
+              <p className="text-sm text-muted-foreground">No description provided.</p>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
 
       {/* Members dialog — opened from the avatar stack in the banner. Replaces
           the former Members tab; contains badge panel, leadership +
