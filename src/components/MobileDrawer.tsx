@@ -20,7 +20,8 @@ import { useLoggedInAccounts, type Account } from '@/hooks/useLoggedInAccounts';
 import { useFeedSettings } from '@/hooks/useFeedSettings';
 import { useHasUnreadNotifications } from '@/hooks/useHasUnreadNotifications';
 import { useProfileUrl } from '@/hooks/useProfileUrl';
-import { isItemActive } from '@/lib/sidebarItems';
+import { isItemActive, getSidebarItem } from '@/lib/sidebarItems';
+import { isAdmin } from '@/lib/admins';
 import { useAppContext } from '@/hooks/useAppContext';
 import { useTheme } from '@/hooks/useTheme';
 import { useUserStatus } from '@/hooks/useUserStatus';
@@ -86,15 +87,32 @@ export function MobileDrawer({ open, onOpenChange }: MobileDrawerProps) {
   const hasBgImage = Object.keys(bgStyle).length > 0;
 
   const visibleItems = useMemo(() => {
-    // Remove dividers that have no real items above them (at the top or right after another divider).
-    return orderedItems.filter((id, i) => {
-      if (id !== 'divider') return true;
-      const prevNonDivider = orderedItems.slice(0, i).some((prev) => prev !== 'divider');
-      return prevNonDivider;
+    // Phase 1: filter out non-visible items (admin-only for non-admins).
+    const filtered = orderedItems.filter((id) => {
+      if (id === 'divider') return true; // pass through, cleaned in phase 2
+      const def = getSidebarItem(id);
+      if (!def) return true;
+      if (def.requiresAdmin && !isAdmin(user?.pubkey)) return false;
+      return true;
     });
-  }, [orderedItems]);
+    // Phase 2: remove leading, trailing, and consecutive dividers.
+    return filtered.filter((id, i, arr) => {
+      if (id !== 'divider') return true;
+      if (i === 0) return false;
+      if (i === arr.length - 1) return false;
+      if (arr[i - 1] === 'divider') return false;
+      return true;
+    });
+  }, [orderedItems, user]);
 
-  const visibleHiddenItems = hiddenItems;
+  const visibleHiddenItems = useMemo(() => {
+    return hiddenItems.filter((item) => {
+      const def = getSidebarItem(item.id);
+      if (!def) return true;
+      if (def.requiresAdmin && !isAdmin(user?.pubkey)) return false;
+      return true;
+    });
+  }, [hiddenItems, user]);
 
   const handleClose = () => { onOpenChange(false); setMoreMenuOpen(false); };
   const handleLogout = async () => { await logout(); handleClose(); navigate('/'); };

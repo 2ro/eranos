@@ -61,6 +61,7 @@ const NIP19Page = lazy(() => import("./pages/NIP19Page").then(m => ({ default: m
 const NotificationSettings = lazy(() => import("./pages/NotificationSettings").then(m => ({ default: m.NotificationSettings })));
 const NotificationsPage = lazy(() => import("./pages/NotificationsPage").then(m => ({ default: m.NotificationsPage })));
 const OrganizersPage = lazy(() => import("./pages/OrganizersPage").then(m => ({ default: m.OrganizersPage })));
+const EventDashboardPage = lazy(() => import("./pages/EventDashboardPage").then(m => ({ default: m.EventDashboardPage })));
 const PhotosFeedPage = lazy(() => import("./pages/PhotosFeedPage").then(m => ({ default: m.PhotosFeedPage })));
 const PodcastsFeedPage = lazy(() => import("./pages/PodcastsFeedPage").then(m => ({ default: m.PodcastsFeedPage })));
 const PrivacyPolicyPage = lazy(() => import("./pages/PrivacyPolicyPage").then(m => ({ default: m.PrivacyPolicyPage })));
@@ -292,6 +293,8 @@ export function AppRouter() {
             <Route path="/i/*" element={<ExternalContentPage />} />
             <Route path="/actions" element={<ActionsPage />} />
             <Route path="/organizers" element={<OrganizersPage />} />
+            <Route path="/dashboard" element={<EventDashboardPage />} />
+            <Route path="/event-dashboard" element={<Navigate to="/dashboard" replace />} />
 
             {/* Callback target for remote signers (e.g. Amber, Primal) after NIP-46 approval */}
             <Route path="/remoteloginsuccess" element={<RemoteLoginSuccessPage />} />
