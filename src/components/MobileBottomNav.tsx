@@ -130,18 +130,14 @@ export function MobileBottomNav() {
             <div className="flex-[0.4]" aria-hidden="true" />
 
             {/* Notifications */}
-            {user ? (
-              <NavItem
-                icon={Bell}
-                label="Notifications"
-                active={isOnNotifications}
-                badge={hasUnread}
-                to="/notifications"
-                onClick={() => { selectionChanged(); setSearchOpen(false); }}
-              />
-            ) : (
-              <div className="flex-1" aria-hidden="true" />
-            )}
+            <NavItem
+              icon={Bell}
+              label="Notifications"
+              active={isOnNotifications}
+              badge={!!user && hasUnread}
+              to="/notifications"
+              onClick={() => { selectionChanged(); setSearchOpen(false); }}
+            />
 
             {/* World */}
             <NavItem
@@ -162,7 +158,7 @@ export function MobileBottomNav() {
             aria-label={homeItem?.label ?? 'Feed'}
             className={cn(
               'absolute left-1/2 -translate-x-1/2 z-10 -top-6',
-              'flex flex-col items-center gap-3',
+              'flex items-center',
               'transition-transform hover:scale-105 active:scale-95',
             )}
           >
@@ -172,12 +168,6 @@ export function MobileBottomNav() {
                 isOnFeed && 'drop-shadow-[0_0_8px_hsl(var(--primary)/0.6)]',
               )}
             />
-            <span className={cn(
-              'text-[10px] font-semibold leading-none',
-              isOnFeed ? 'text-primary' : 'text-foreground',
-            )}>
-              {homeItem?.label ?? 'Feed'}
-            </span>
           </Link>
         </div>
         {/* Safe area fill — matches the arc's semi-transparent background */}
