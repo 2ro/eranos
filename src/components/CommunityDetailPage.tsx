@@ -20,11 +20,13 @@ import {
 } from 'lucide-react';
 import type { NostrEvent, NostrMetadata } from '@nostrify/nostrify';
 
-import { AddMemberDialog } from '@/components/AddMemberDialog';
+import { AddMemberPanel } from '@/components/AddMemberDialog';
 import { CreateCommunityDialog } from '@/components/CreateCommunityDialog';
 import { CreateCommunityEventDialog } from '@/components/CreateCommunityEventDialog';
+import { PeopleAvatarStack } from '@/components/PeopleAvatarStack';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { BanConfirmDialog } from '@/components/BanConfirmDialog';
@@ -271,12 +273,12 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
   const [banTargetPubkey, setBanTargetPubkey] = useState<string | null>(null);
 
   // ── Tab + FAB state ────────────────────────────────────────────────────────
-  const [activeTab, setActiveTab] = useState('members');
+  const [activeTab, setActiveTab] = useState('chat');
   const [composeOpen, setComposeOpen] = useState(false);
   const [goalDialogOpen, setGoalDialogOpen] = useState(false);
   const [eventDialogOpen, setEventDialogOpen] = useState(false);
-  const [addMemberOpen, setAddMemberOpen] = useState(false);
   const [editCommunityOpen, setEditCommunityOpen] = useState(false);
+  const [membersDialogOpen, setMembersDialogOpen] = useState(false);
 
   // Parse community definition
   const community = useMemo(() => parseCommunityEvent(event), [event]);
@@ -456,7 +458,7 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
     }
   }, [event, toast]);
 
-  // ── FAB — visible on comments, goals, and members tabs ─────────────────────
+  // ── FAB — visible on comments, goals, events tabs ──────────────────────────
   const handleFabClick = useCallback(() => {
     if (activeTab === 'comments') {
       setComposeOpen(true);
@@ -464,25 +466,20 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
       setGoalDialogOpen(true);
     } else if (activeTab === 'events') {
       setEventDialogOpen(true);
-    } else if (activeTab === 'members') {
-      setAddMemberOpen(true);
     }
   }, [activeTab]);
 
   const fabIcon = activeTab === 'goals'
     ? <Target strokeWidth={3} size={18} />
-    : activeTab === 'members'
-      ? <UserPlus className="size-5" />
-      : activeTab === 'events'
-        ? <CalendarDays className="size-5" />
-        : undefined; // default Plus icon for comments
+    : activeTab === 'events'
+      ? <CalendarDays className="size-5" />
+      : undefined; // default Plus icon for comments
 
   useLayoutOptions({
     showFAB:
       activeTab === 'comments'
       || activeTab === 'goals'
-      || activeTab === 'events'
-      || (activeTab === 'members' && canAddMembers),
+      || activeTab === 'events',
     onFabClick: handleFabClick,
     fabIcon,
   });
@@ -494,89 +491,111 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
 
   // ── Render ──────────────────────────────────────────────────────────────────
   const heroIconClassName = 'size-5 text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.85)]';
-  const actionButtonClassName = 'p-2 rounded-full text-muted-foreground hover:bg-secondary hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50 disabled:pointer-events-none transition-colors';
+  const bannerActionClassName = 'p-2 rounded-full text-white/90 hover:text-white hover:bg-white/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80 disabled:opacity-50 disabled:pointer-events-none transition-colors';
 
   return (
     <div className="max-w-2xl mx-auto pb-16">
-      {/* ── Hero image ── */}
-      <div className="relative h-32 w-full overflow-hidden sm:h-40">
+      {/* ── Hero banner — image fills the area, title/description/members overlaid ── */}
+      <div className="relative w-full overflow-hidden aspect-[2/1] sm:aspect-[5/2]">
         {image ? (
-          <img src={image} alt={name} className="w-full h-full object-cover" />
+          <img src={image} alt={name} className="absolute inset-0 w-full h-full object-cover" />
         ) : (
-          <div className="absolute inset-0 bg-gradient-to-br from-primary/50 via-primary/25 to-primary/5" />
+          <div className="absolute inset-0 bg-gradient-to-br from-primary/50 via-primary/25 to-primary/5 flex items-center justify-center">
+            <Users className="size-16 text-primary/20 sm:size-20" />
+          </div>
         )}
-        <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/10 to-transparent" />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
-        {!image && (
-          <Users className="size-12 text-primary/20 sm:size-16" />
-        )}
+        {/* Gradient overlay — modeled on the adventure detail pattern so
+            overlaid text stays legible against any background image. */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-black/40" />
 
-        {/* ── Top bar ── */}
-        <div className="absolute left-0 top-0 z-10 px-4 pt-4">
+        {/* Top bar — back button (left) + follow toggle (right) */}
+        <div className="absolute left-0 right-0 top-0 z-10 flex items-center justify-between px-4 pt-4">
           <button
             onClick={() => window.history.length > 1 ? navigate(-1) : navigate('/')}
-            className="p-2 -ml-2 rounded-full hover:bg-black/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80 transition-colors"
+            className="p-2 -ml-2 rounded-full hover:bg-black/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80 transition-colors"
             aria-label="Go back"
           >
             <ArrowLeft className={heroIconClassName} />
           </button>
-        </div>
-
-        <div className="absolute bottom-0 left-0 right-0 px-5 pb-3">
-          <h2 className="text-xl font-bold text-white leading-tight drop-shadow-lg sm:text-2xl">{name}</h2>
-        </div>
-      </div>
-
-      {/* ── Community info ── */}
-      <div className="px-5 mt-3 space-y-3">
-        {/* Description */}
-        {descriptionText && (
-          <p className="line-clamp-3 text-sm leading-relaxed text-muted-foreground whitespace-pre-wrap">{descriptionText}</p>
-        )}
-
-        <div className="flex items-center justify-between gap-3">
           {user && communityATag && (
             <FollowToggleButton
               size="sm"
               isFollowing={communityFollowed}
               isPending={toggleCommunityFollow.isPending}
               onClick={handleToggleFollow}
+              className={cn(
+                'shadow-md',
+                !communityFollowed && 'bg-white text-black hover:bg-white/90',
+                communityFollowed && 'bg-black/30 backdrop-blur-sm border-white/40 text-white hover:bg-destructive/30 hover:text-white hover:border-destructive/60',
+              )}
             />
           )}
-          <div className="ml-auto flex items-center gap-1">
-            <MembersOnlyToggle />
-            {isFounder && community && (
-              <button
-                type="button"
-                className={actionButtonClassName}
-                onClick={() => setEditCommunityOpen(true)}
-                aria-label="Edit community"
-              >
-                <Pencil className="size-5" />
-              </button>
-            )}
+        </div>
+
+        {/* Title + description + bottom row (member stack + actions) */}
+        <div className="absolute bottom-0 left-0 right-0 px-5 pb-3 [text-shadow:0_1px_4px_rgba(0,0,0,0.7),0_2px_8px_rgba(0,0,0,0.4)]">
+          <h2 className="text-xl font-bold text-white leading-tight sm:text-2xl">{name}</h2>
+          {descriptionText && (
+            <p className="line-clamp-2 text-sm leading-snug text-white/90 mt-1.5 whitespace-pre-wrap">
+              {descriptionText}
+            </p>
+          )}
+          <div className="mt-2 flex items-center justify-between gap-2 [text-shadow:none]">
+            {/* Avatar stack — clickable to open full members dialog */}
             <button
               type="button"
-              className={actionButtonClassName}
-              onClick={handleShare}
-              aria-label="Share"
+              onClick={() => setMembersDialogOpen(true)}
+              className="flex items-center gap-2 -ml-1 px-1 py-1 rounded-md hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80 transition-colors min-w-0"
+              aria-label="Show all members"
             >
-              <Share2 className="size-5" />
+              <PeopleAvatarStack
+                pubkeys={allMemberPubkeys}
+                maxVisible={6}
+                size="sm"
+                className="[&_.ring-2]:ring-black/40 pointer-events-none"
+              />
+              {allMemberPubkeys.length > 0 && (
+                <span className="text-xs font-medium text-white/90 [text-shadow:0_1px_3px_rgba(0,0,0,0.7)] truncate">
+                  {allMemberPubkeys.length} member{allMemberPubkeys.length !== 1 ? 's' : ''}
+                </span>
+              )}
             </button>
+
+            {/* Banner action row — MembersOnly, Edit (founder), Share */}
+            <div className="flex items-center gap-0.5 shrink-0">
+              <MembersOnlyToggle
+                className="text-white/90 hover:text-white hover:bg-white/15 data-[state=on]:text-white"
+              />
+              {isFounder && community && (
+                <button
+                  type="button"
+                  className={bannerActionClassName}
+                  onClick={() => setEditCommunityOpen(true)}
+                  aria-label="Edit community"
+                >
+                  <Pencil className="size-5" />
+                </button>
+              )}
+              <button
+                type="button"
+                className={bannerActionClassName}
+                onClick={handleShare}
+                aria-label="Share"
+              >
+                <Share2 className="size-5" />
+              </button>
+            </div>
           </div>
         </div>
+      </div>
+
+      {/* ── Community info ── */}
+      <div className="px-5 mt-3 space-y-3">
 
         {/* ── Tabs ── */}
         <CommunityModerationContext.Provider value={moderationCtx}>
           <Tabs value={activeTab} onValueChange={setActiveTab} className="-mx-5">
             <TabsList className="w-full justify-start overflow-x-auto scrollbar-none rounded-none border-b border-border bg-transparent p-0 h-auto">
-              <TabsTrigger
-                value="members"
-                className="flex-none min-w-fit rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none px-4 pb-3 pt-2"
-              >
-                <Users className="size-4 mr-1.5" />
-                Members
-              </TabsTrigger>
               <TabsTrigger
                 value="chat"
                 className="flex-none min-w-fit rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none px-4 pb-3 pt-2"
@@ -613,63 +632,6 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
                 Events
               </TabsTrigger>
             </TabsList>
-
-            {/* ── Members tab ── */}
-            <TabsContent value="members" className="mt-0">
-              {community && (
-                <section className="border-b border-border px-5 py-4">
-                  <CommunityBadgePanel
-                    communityEvent={event}
-                    community={community}
-                    isFounder={isFounder}
-                  />
-                </section>
-              )}
-
-              {membersLoading ? (
-                <MembersSkeleton />
-              ) : memberSections.length === 0 ? (
-                <div className="py-12 text-center text-muted-foreground text-sm px-5">
-                  No members found.
-                </div>
-              ) : (
-                <div className="divide-y divide-border">
-                  {memberSections.map(({ key, label, members }) => (
-                    <section key={key} className="px-5 py-4">
-                      <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-3 flex items-center gap-2">
-                        {key === 'leadership' ? <Crown className="size-3.5 text-amber-500" /> : <Shield className="size-3.5" />}
-                        {label}
-                        <span className="text-muted-foreground/60 font-normal">({members.length})</span>
-                      </h3>
-                      <div className="space-y-0.5">
-                        {members.map((m) => {
-                          let roleLabel: string | undefined;
-                          if (m.rank === 0) {
-                            roleLabel = m.pubkey === event.pubkey ? 'Founder' : 'Moderator';
-                          }
-                          // Determine if the current user can ban this member
-                          const canBanMember = viewerMember
-                            && m.pubkey !== user?.pubkey
-                            && canBanTarget(viewerMember, m);
-                          return (
-                            <PersonRow
-                              key={m.pubkey}
-                              pubkey={m.pubkey}
-                              label={roleLabel}
-                              size="sm"
-                              onBan={canBanMember ? () => {
-                                setBanTargetPubkey(m.pubkey);
-                                setBanDialogOpen(true);
-                              } : undefined}
-                            />
-                          );
-                        })}
-                      </div>
-                    </section>
-                  ))}
-                </div>
-              )}
-            </TabsContent>
 
             {/* ── Chat tab ── */}
             <TabsContent value="chat" className="mt-0">
@@ -791,6 +753,94 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
         </CommunityModerationContext.Provider>
       </div>
 
+      {/* Members dialog — opened from the avatar stack in the banner. Replaces
+          the former Members tab; contains badge panel, leadership +
+          rank-and-file sections, and (for founders/mods) the inline
+          search-and-add panel at the bottom. */}
+      <Dialog open={membersDialogOpen} onOpenChange={setMembersDialogOpen}>
+        <DialogContent className="max-w-lg max-h-[85vh] flex flex-col overflow-hidden p-0 gap-0">
+          <DialogHeader className="px-5 pt-5 pb-3 border-b border-border shrink-0">
+            <DialogTitle className="flex items-center gap-2">
+              <Users className="size-5" />
+              Members
+              {allMemberPubkeys.length > 0 && (
+                <span className="text-muted-foreground font-normal text-sm">({allMemberPubkeys.length})</span>
+              )}
+            </DialogTitle>
+          </DialogHeader>
+
+          <div className="flex-1 overflow-y-auto">
+            {community && (
+              <section className="border-b border-border px-5 py-4">
+                <CommunityBadgePanel
+                  communityEvent={event}
+                  community={community}
+                  isFounder={isFounder}
+                />
+              </section>
+            )}
+
+            {membersLoading ? (
+              <MembersSkeleton />
+            ) : memberSections.length === 0 ? (
+              <div className="py-12 text-center text-muted-foreground text-sm px-5">
+                No members found.
+              </div>
+            ) : (
+              <div className="divide-y divide-border">
+                {memberSections.map(({ key, label, members }) => (
+                  <section key={key} className="px-5 py-4">
+                    <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-3 flex items-center gap-2">
+                      {key === 'leadership' ? <Crown className="size-3.5 text-amber-500" /> : <Shield className="size-3.5" />}
+                      {label}
+                      <span className="text-muted-foreground/60 font-normal">({members.length})</span>
+                    </h3>
+                    <div className="space-y-0.5">
+                      {members.map((m) => {
+                        let roleLabel: string | undefined;
+                        if (m.rank === 0) {
+                          roleLabel = m.pubkey === event.pubkey ? 'Founder' : 'Moderator';
+                        }
+                        const canBanMember = viewerMember
+                          && m.pubkey !== user?.pubkey
+                          && canBanTarget(viewerMember, m);
+                        return (
+                          <PersonRow
+                            key={m.pubkey}
+                            pubkey={m.pubkey}
+                            label={roleLabel}
+                            size="sm"
+                            onBan={canBanMember ? () => {
+                              setBanTargetPubkey(m.pubkey);
+                              setBanDialogOpen(true);
+                            } : undefined}
+                          />
+                        );
+                      })}
+                    </div>
+                  </section>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {canAddMembers && community && (
+            <div className="border-t border-border px-5 py-4 shrink-0 max-h-[50vh] overflow-y-auto">
+              <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-3 flex items-center gap-2">
+                <UserPlus className="size-3.5" />
+                Add members
+              </h3>
+              <AddMemberPanel
+                communityEvent={event}
+                community={community}
+                isFounder={isFounder}
+                existingMemberPubkeys={allMemberPubkeys}
+              />
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+
       {/* Member ban confirmation dialog */}
       {banTargetPubkey && communityATag && (
         <BanConfirmDialog
@@ -827,18 +877,6 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
           communityATag={communityATag}
           open={eventDialogOpen}
           onOpenChange={setEventDialogOpen}
-        />
-      )}
-
-      {/* Add member dialog */}
-      {canAddMembers && community && (
-        <AddMemberDialog
-          open={addMemberOpen}
-          onOpenChange={setAddMemberOpen}
-          communityEvent={event}
-          community={community}
-          isFounder={isFounder}
-          existingMemberPubkeys={allMemberPubkeys}
         />
       )}
 
