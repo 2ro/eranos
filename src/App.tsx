@@ -123,9 +123,11 @@ const hardcodedConfig: AppConfig = {
     "communities",
     "world",
     "wallet",
+    "agent",
     "messages",
     "profile",
     "notifications",
+    "search",
     "settings",
   ],
   nip85StatsPubkey:

@@ -16,10 +16,11 @@ const DEFAULT_SIDEBAR_ORDER: string[] = [
   'communities',
   'world',
   'wallet',
-  'messages',
   'agent',
+  'messages',
   'profile',
   'notifications',
+  'search',
   'settings',
 ];
 
