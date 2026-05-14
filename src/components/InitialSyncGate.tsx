@@ -7,7 +7,6 @@ import {
   Download,
   Eye,
   EyeOff,
-  Heart,
   Loader2,
   UserPlus,
   Users,
@@ -41,6 +40,7 @@ import { type SyncPhase, useInitialSync } from "@/hooks/useInitialSync";
 import { useLoginActions } from "@/hooks/useLoginActions";
 import { useNostrPublish } from "@/hooks/useNostrPublish";
 import { OnboardingContext } from "@/hooks/useOnboarding";
+import { AgoraBoltIcon } from "@/components/icons/AgoraBoltIcon";
 
 import { toast } from "@/hooks/useToast";
 import { useUploadFile } from "@/hooks/useUploadFile";
@@ -512,7 +512,7 @@ function SetupQuestionnaire({
 function KeygenStep({ onGenerate }: { onGenerate: () => void }) {
   return (
     <div className="flex flex-col items-center text-center gap-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
-      <AgoraLogo size={80} />
+      <AgoraBoltIcon className="size-20 drop-shadow-md" />
 
       <div className="space-y-3">
         <h1 className="text-2xl font-bold tracking-tight">
@@ -1108,12 +1108,7 @@ function PackCardSkeleton() {
 function OutroStep({ onComplete }: { onComplete: () => void }) {
   return (
     <div className="flex flex-col items-center text-center gap-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
-      <div className="relative">
-        <AgoraLogo size={72} />
-        <div className="absolute -bottom-1 -right-1 bg-primary/10 rounded-full p-1.5">
-          <Heart className="w-5 h-5 text-primary fill-primary" />
-        </div>
-      </div>
+      <AgoraBoltIcon className="size-[72px] drop-shadow-md" />
 
       <div className="space-y-3 max-w-xs">
         <h2 className="text-2xl font-bold tracking-tight">You're all set</h2>
