@@ -74,9 +74,7 @@ function MainLayoutInner() {
       {/* Main layout - three column on desktop */}
       <div className={cn("flex justify-center mx-auto max-w-[1200px]", wrapperClassName)}>
         {/* Desktop left sidebar - hidden below sidebar breakpoint */}
-        <div className="hidden sidebar:block">
-          <LeftSidebar />
-        </div>
+        <LeftSidebar />
 
         {/* Main content + right sidebar: inside Suspense so the left sidebar persists while lazy pages load */}
         <Suspense fallback={<PageSkeleton />}>

@@ -44,7 +44,7 @@ import { EmojifiedText, ReactionEmoji } from "@/components/CustomEmoji";
 const CustomNipCard = lazy(() => import("@/components/CustomNipCard").then(m => ({ default: m.CustomNipCard })));
 import { EmojiPackContent } from "@/components/EmojiPackContent";
 import { FileMetadataContent } from "@/components/FileMetadataContent";
-import { FollowPackContent } from "@/components/FollowPackContent";
+import { PeopleListContent } from "@/components/PeopleListContent";
 import { FoundLogContent } from "@/components/FoundLogContent";
 import { GeocacheContent } from "@/components/GeocacheContent";
 import { GitRepoCard } from "@/components/GitRepoCard";
@@ -387,7 +387,7 @@ export const NoteCard = memo(function NoteCard({
   const isGeocache = event.kind === 37516;
   const isFoundLog = event.kind === 7516;
   const isColor = event.kind === 3367;
-  const isFollowPack = event.kind === 39089 || event.kind === 30000;
+  const isFollowPack = event.kind === 3 || event.kind === 39089 || event.kind === 30000;
   const isArticle = event.kind === 30023;
   const isMagicDeck = event.kind === 37381;
   const isStream = event.kind === 30311;
@@ -583,7 +583,7 @@ export const NoteCard = memo(function NoteCard({
         ) : isColor ? (
           <ColorMomentContent event={event} />
         ) : isFollowPack ? (
-          <FollowPackContent event={event} />
+          <PeopleListContent event={event} />
         ) : isArticle ? (
           <Suspense fallback={<Skeleton className="h-24 w-full rounded-lg" />}>
             <ArticleContent event={event} preview className="mt-2" />
