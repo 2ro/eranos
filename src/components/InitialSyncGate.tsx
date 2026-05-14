@@ -44,6 +44,7 @@ import { OnboardingContext } from "@/hooks/useOnboarding";
 
 import { toast } from "@/hooks/useToast";
 import { useUploadFile } from "@/hooks/useUploadFile";
+import { VERIFIED_FOLLOW_PACK } from "@/lib/agoraDefaults";
 import { genUserName } from "@/lib/genUserName";
 
 import { cn } from "@/lib/utils";
@@ -223,12 +224,7 @@ function SyncScreen({ phase }: { phase: SyncPhase }) {
 /** Suggested follow packs shown to new users with empty follow lists. */
 const SUGGESTED_PACKS: { kind: number; pubkey: string; identifier: string }[] =
   [
-    {
-      kind: 39089,
-      pubkey:
-        "932614571afcbad4d17a191ee281e39eebbb41b93fac8fd87829622aeb112f4d",
-      identifier: "k4p5w0n22suf",
-    },
+    VERIFIED_FOLLOW_PACK,
   ];
 
 // Steps for signup (includes keygen + profile) vs. settings-only (existing login)
@@ -1066,30 +1062,12 @@ function PackCard({
         </Button>
       </div>
 
-      {/* Author attribution */}
-      <AuthorAttribution pubkey={event.pubkey} />
-    </div>
-  );
-}
-
-/** Small author attribution bar at the bottom of a pack card. */
-function AuthorAttribution({ pubkey }: { pubkey: string }) {
-  const { data: authorData } = useAuthors([pubkey]);
-  const metadata: NostrMetadata | undefined = authorData?.get(pubkey)?.metadata;
-  const name = metadata?.name || genUserName(pubkey);
-
-  return (
-    <div className="px-4 py-2 bg-muted/30 border-t border-border flex items-center gap-2">
-      <MiniAvatar src={metadata?.picture} name={name} metadata={metadata} />
-      <span className="text-xs text-muted-foreground truncate">
-        by <span className="font-medium text-foreground">{name}</span>
-      </span>
     </div>
   );
 }
 
 /** Tiny avatar used in pack member stacks. */
-function MiniAvatar({ src, name }: { src?: string; name: string; metadata?: NostrMetadata }) {
+function MiniAvatar({ src, name }: { src?: string; name: string }) {
   return (
     <Avatar className="size-7 ring-2 ring-background">
       <AvatarImage src={src} alt={name} />

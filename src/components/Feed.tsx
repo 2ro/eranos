@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useInView } from 'react-intersection-observer';
 import { usePageRefresh } from '@/hooks/usePageRefresh';
 import { ComposeBox } from '@/components/ComposeBox';
@@ -50,6 +51,7 @@ interface FeedProps {
 
 export function Feed({ kinds, tagFilters, header, hideCompose, emptyMessage, feedId = 'home' }: FeedProps = {}) {
   const { user } = useCurrentUser();
+  const navigate = useNavigate();
   const { muteItems } = useMuteList();
   const { savedFeeds } = useSavedFeeds();
   const navHidden = useNavHidden();
@@ -332,7 +334,7 @@ export function Feed({ kinds, tagFilters, header, hideCompose, emptyMessage, fee
               )}
             </div>
           ) : isHomeFollowingActive && !emptyMessage ? (
-            <FollowingEmptyState onExploreWorld={() => handleSetActiveTab('world')} />
+            <FollowingEmptyState onExploreWorld={() => navigate('/world')} />
           ) : (
             <FeedEmptyState
               message={
@@ -512,7 +514,7 @@ function FollowingEmptyState({ onExploreWorld }: { onExploreWorld: () => void })
       <div className="space-y-2 max-w-xs">
         <h2 className="text-xl font-bold">No countries yet</h2>
         <p className="text-muted-foreground text-sm">
-          Explore the World tab and follow countries to build your Following feed.
+          Explore the World page and follow countries to build your Following feed.
         </p>
       </div>
       <div className="flex flex-col gap-2 w-full max-w-xs">
