@@ -114,6 +114,10 @@ async function applyFeedFilters(
   events: NostrEvent[],
   countryCode: string | undefined
 ): Promise<NostrEvent[]> {
+  const parseCountryIdentifier = countryCode
+    ? (await import('@/lib/countryIdentifiers')).parseCountryIdentifier
+    : undefined;
+
   // Filter by kind and tags
   let filteredEvents = events.filter(event => {
     if (event.kind === 36639) {
@@ -124,6 +128,10 @@ async function applyFeedFilters(
       return true;
     }
     if (event.kind === 1068) return true;
+    if (countryCode) {
+      const iTag = event.tags.find(([name]) => name === 'i')?.[1];
+      return !!iTag && parseCountryIdentifier?.(iTag)?.toUpperCase() === countryCode.toUpperCase();
+    }
     const kTags = event.tags.filter(([name]) => name === 'k').map(([, v]) => v);
     const KTags = event.tags.filter(([name]) => name === 'K').map(([, v]) => v);
     return kTags.includes('iso3166') || kTags.includes('geo') || KTags.includes('36639');

@@ -1,6 +1,12 @@
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQueryClient, type InfiniteData } from '@tanstack/react-query';
 import { useNostrPublish } from '@/hooks/useNostrPublish';
 import { NKinds, type NostrEvent } from '@nostrify/nostrify';
+
+interface PaginatedFeedPage {
+  events: NostrEvent[];
+  oldestTimestamp: number | null;
+  totalFetched: number;
+}
 
 interface PostCommentParams {
   root: NostrEvent | URL | `#${string}`; // The root event to comment on
@@ -44,15 +50,58 @@ export function usePostComment() {
 
       return event;
     },
-    onSuccess: (_, { root }) => {
+    onSuccess: (event, { root }) => {
       const rootKey = root instanceof URL ? root.toString() : typeof root === 'string' ? root : root.id;
+      const countryCode = getCountryCode(root);
 
       // Invalidate and refetch comments
       queryClient.invalidateQueries({
         queryKey: ['nostr', 'comments', rootKey]
       });
+
+      if (countryCode) {
+        queryClient.setQueriesData<InfiniteData<PaginatedFeedPage>>(
+          { queryKey: ['agora-feed-paginated', countryCode] },
+          (data) => {
+            if (!data || data.pages.length === 0) return data;
+            if (data.pages.some((page) => page.events.some((item) => item.id === event.id))) return data;
+
+            const [firstPage, ...restPages] = data.pages;
+            return {
+              ...data,
+              pages: [
+                {
+                  ...firstPage,
+                  events: [event, ...firstPage.events],
+                  totalFetched: firstPage.totalFetched + 1,
+                },
+                ...restPages,
+              ],
+            };
+          },
+        );
+
+        queryClient.invalidateQueries({ queryKey: ['agora-feed-paginated', countryCode] });
+        queryClient.invalidateQueries({ queryKey: ['agora-feed-new-posts', countryCode] });
+        setTimeout(() => {
+          queryClient.invalidateQueries({ queryKey: ['agora-feed-paginated', countryCode] });
+          queryClient.invalidateQueries({ queryKey: ['agora-feed-new-posts', countryCode] });
+        }, 3000);
+      }
     },
   });
+}
+
+function getCountryCode(root: NostrEvent | URL | `#${string}`): string | undefined {
+  if (root instanceof URL && root.protocol === 'iso3166:') {
+    return root.pathname.toUpperCase();
+  }
+
+  if (typeof root === 'string' && root.toLowerCase().startsWith('iso3166:')) {
+    return root.slice('iso3166:'.length).toUpperCase();
+  }
+
+  return undefined;
 }
 
 /** Build NIP-22 comment tags for a given scope and target, enriched with hints when available. */
