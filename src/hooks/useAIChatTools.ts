@@ -54,6 +54,7 @@ export function useAIChatTools() {
     user: user ? { pubkey: user.pubkey } : undefined,
     config: {
       corsProxy: config.corsProxy,
+      feedSettings: config.feedSettings,
     },
     savedFeeds,
   }), [nostr, user, config, savedFeeds]);

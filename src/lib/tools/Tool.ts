@@ -40,6 +40,7 @@ export interface ToolContext {
   /** App configuration values. */
   config: {
     corsProxy: string;
+    feedSettings: import('@/contexts/AppContext').FeedSettings;
   };
   /** Saved feed definitions. */
   savedFeeds: Array<{

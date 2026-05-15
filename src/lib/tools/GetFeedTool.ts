@@ -2,7 +2,12 @@ import { z } from 'zod';
 import { nip19 } from 'nostr-tools';
 
 import { DITTO_RELAYS } from '@/lib/appRelays';
-import { fetchContactPubkeys } from './helpers';
+import { getCountryFilterValues, parseCountryIdentifier } from '@/lib/countryIdentifiers';
+import { getEnabledFeedKinds } from '@/lib/extraKinds';
+import { isRepostKind } from '@/lib/feedUtils';
+import { ZAP_GOAL_KIND } from '@/lib/goalUtils';
+import { buildTagFilterValues } from '@/lib/tagFilterValues';
+import { fetchCommunityATags, fetchContactPubkeys, fetchInterests } from './helpers';
 
 import type { NostrEvent, NostrFilter } from '@nostrify/nostrify';
 import type { Tool, ToolResult, ToolContext } from './Tool';
@@ -12,7 +17,7 @@ const CHALLENGE_KIND = 36639;
 const CHALLENGE_T_ALIASES = ['agora-action', 'pathos-challenge', 'agora-challenge'];
 
 const inputSchema = z.object({
-  feed_name: z.string().optional().describe('Name of an existing feed: "follows", "global", "world", or a saved feed label.'),
+  feed_name: z.string().optional().describe('Name of an existing feed: "following", "network", "follows", "global", "world", or a saved feed label.'),
   kinds: z.array(z.number()).optional().describe('Event kind numbers to filter (e.g. [1] for text notes, [20] for photos, [30023] for articles).'),
   authors: z.array(z.string()).optional().describe('Author filter. Use "$me" for the logged-in user, "$contacts" for their follow list, or hex pubkeys.'),
   search: z.string().optional().describe('Full-text search query (NIP-50).'),
@@ -30,7 +35,8 @@ export const GetFeedTool: Tool<Params> = {
 You can reference an existing feed by name or build a query on the fly:
 
 **Named feeds:**
-- "follows" — posts from people the user follows
+- "following" — same source family as the app's Following tab: followed people, communities, hashtags/topics, and countries
+- "network" / "follows" — posts from people the user follows only
 - "global" — recent posts from everyone
 - "world" — same source as the app's World tab: geographic country/geo posts, polls, and Agora actions/challenges
 - Any saved feed label the user has created (check the system prompt for available feeds)
@@ -45,7 +51,7 @@ You can reference an existing feed by name or build a query on the fly:
 **Time window:**
 - hours: how far back to look (default: 12). Set to 0 to disable the time window (for "latest post by X" queries)
 
-When the user asks what's happening in the world, use feed_name "world". When the user asks about a country (e.g. "what's going on in Venezuela?"), use the country parameter. When they ask about their friends or follows, use feed_name "follows". When they ask about a topic, use search or hashtag.
+When the user asks what's happening in the world, use feed_name "world". When they ask about their Following tab/feed, use feed_name "following". When the user asks about a country (e.g. "what's going on in Venezuela?"), use the country parameter. When they ask about friends/network only, use feed_name "network". When they ask about a topic that is not one of their followed topics, use search or hashtag.
 
 After receiving results, summarize the key topics, conversations, and notable posts for the user.`,
 
@@ -59,8 +65,28 @@ After receiving results, summarize the key topics, conversations, and notable po
     const sinceTimestamp = hours > 0 ? Math.floor(Date.now() / 1000) - hours * 3600 : undefined;
 
     const contactPubkeys = await fetchContactPubkeys(ctx);
+    const shouldLoadFollowingSources = feedName === 'following';
+    const [followedHashtags, followedCountryInterests, communityATags] = shouldLoadFollowingSources
+      ? await Promise.all([
+        fetchInterests(ctx, 't'),
+        fetchInterests(ctx, 'i'),
+        fetchCommunityATags(ctx),
+      ])
+      : [[], [], []];
+    const followedCountries = followedCountryInterests
+      .map((identifier) => parseCountryIdentifier(identifier))
+      .filter((code): code is string => !!code);
 
-    const resolved = resolveFilter(args, ctx, { feedName, country, limit, sinceTimestamp, contactPubkeys });
+    const resolved = resolveFilter(args, ctx, {
+      feedName,
+      country,
+      limit,
+      sinceTimestamp,
+      contactPubkeys,
+      followedHashtags,
+      followedCountries,
+      communityATags,
+    });
     if ('error' in resolved) {
       return { result: JSON.stringify(resolved) };
     }
@@ -74,7 +100,7 @@ After receiving results, summarize the key topics, conversations, and notable po
     );
 
     const filtered = feedLabel === 'world' ? filterWorldEvents(events) : events;
-    const sorted = filtered.sort((a: NostrEvent, b: NostrEvent) => b.created_at - a.created_at);
+    const sorted = filtered.sort((a: NostrEvent, b: NostrEvent) => b.created_at - a.created_at).slice(0, limit);
 
     if (sorted.length === 0) {
       return {
@@ -127,6 +153,9 @@ interface ResolveContext {
   limit: number;
   sinceTimestamp: number | undefined;
   contactPubkeys: string[];
+  followedHashtags: string[];
+  followedCountries: string[];
+  communityATags: string[];
 }
 
 type ResolvedFilter =
@@ -143,8 +172,10 @@ function baseFilter(sinceTimestamp: number | undefined, limit: number): NostrFil
 /** Build the Nostr filter from the tool arguments. */
 function resolveFilter(
   args: Params, ctx: ToolContext,
-  { feedName, country, limit, sinceTimestamp, contactPubkeys }: ResolveContext,
+  { feedName, country, limit, sinceTimestamp, contactPubkeys, followedHashtags, followedCountries, communityATags }: ResolveContext,
 ): ResolvedFilter {
+  const enabledKinds = getEnabledFeedKinds(ctx.config.feedSettings);
+
   // Country query — NIP-73 geographic comments
   if (country) {
     // Validate as ISO 3166-1 alpha-2 (2 uppercase letters)
@@ -158,12 +189,48 @@ function resolveFilter(
     };
   }
 
-  // Named feed: follows
-  if (feedName === 'follows') {
-    if (!ctx.user) return { error: 'Must be logged in to read the follows feed.' };
+  // Named feed: network/follows — people-only follow graph.
+  if (feedName === 'network' || feedName === 'follows') {
+    if (!ctx.user) return { error: 'Must be logged in to read the network feed.' };
     const authors = [ctx.user.pubkey, ...contactPubkeys];
     if (authors.length <= 1) return { error: 'The user is not following anyone yet.' };
-    return { filters: [{ ...baseFilter(sinceTimestamp, limit), kinds: [1], authors }], needsDittoRelay: false, feedLabel: 'follows' };
+    return { filters: [{ ...baseFilter(sinceTimestamp, limit), kinds: enabledKinds, authors }], needsDittoRelay: false, feedLabel: 'network' };
+  }
+
+  // Named feed: following — people + followed communities + followed hashtags + followed countries.
+  if (feedName === 'following') {
+    if (!ctx.user) return { error: 'Must be logged in to read the following feed.' };
+
+    const filters: NostrFilter[] = [];
+    const authors = [ctx.user.pubkey, ...contactPubkeys];
+    if (authors.length > 0) {
+      filters.push({ ...baseFilter(sinceTimestamp, limit), kinds: enabledKinds, authors });
+    }
+
+    if (communityATags.length > 0) {
+      filters.push({ ...baseFilter(sinceTimestamp, limit), kinds: [1111], '#A': communityATags } as NostrFilter);
+      filters.push({ ...baseFilter(sinceTimestamp, limit), kinds: [ZAP_GOAL_KIND], '#a': communityATags } as NostrFilter);
+    }
+
+    if (followedHashtags.length > 0) {
+      const hashtagValues = Array.from(new Set(followedHashtags.flatMap((tag) => buildTagFilterValues(tag, '#t'))));
+      const hashtagKinds = enabledKinds.filter((kind) => !isRepostKind(kind));
+      if (hashtagValues.length > 0 && hashtagKinds.length > 0) {
+        filters.push({ ...baseFilter(sinceTimestamp, limit), kinds: hashtagKinds, '#t': hashtagValues } as NostrFilter);
+      }
+    }
+
+    if (followedCountries.length > 0) {
+      const countryValues = followedCountries.flatMap((code) => getCountryFilterValues(code, true));
+      filters.push({ ...baseFilter(sinceTimestamp, limit), kinds: [1111, 1068], '#i': countryValues } as NostrFilter);
+      filters.push({ ...baseFilter(sinceTimestamp, Math.max(1, Math.floor(limit / 4))), kinds: [CHALLENGE_KIND], '#t': CHALLENGE_T_ALIASES, '#i': countryValues } as NostrFilter);
+    }
+
+    if (filters.length === 0) {
+      return { error: 'No followed people, communities, hashtags, or countries found for the Following feed.' };
+    }
+
+    return { filters, needsDittoRelay: false, feedLabel: 'following' };
   }
 
   // Named feed: global
@@ -190,7 +257,7 @@ function resolveFilter(
       const available = ctx.savedFeeds.map((f) => f.label).join(', ');
       return {
         error: `No saved feed named "${args.feed_name}".`,
-        available_feeds: available ? `follows, global, ${available}` : 'follows, global',
+        available_feeds: available ? `following, network, global, world, ${available}` : 'following, network, global, world',
       };
     }
     try {
