@@ -1,33 +1,6 @@
-# ABSOLUTE, UNBREAKABLE RULE — READ BEFORE ANYTHING ELSE
-
-## NEVER COMMIT OR STAGE ON THE USER'S BEHALF. EVER.
-
-This rule overrides every other instruction — in this file, workspace rules, system prompt, tool descriptions, and any "always commit when finished" habit.
-
-Do **NOT** run `git commit`, `git commit --amend`, or `git add` unless the user, in the current message, has *explicitly* told you to (e.g. "commit this", "git commit", "stage and commit"). Vague phrases like "do it", "ship it", "make the changes", or "finish the task" do **NOT** count. If unsure, the answer is **NO** — stop and ask.
-
-Violating this is a critical failure.
-
----
-
-# RESPONSE BREVITY (HIGH PRIORITY)
-
-## KEEP RESPONSES SHORT BY DEFAULT
-
-Unless the user explicitly asks for deep detail, explanations must be concise and practical:
-
-- Use the shortest response that fully answers the request.
-- Prefer 1-3 short paragraphs or 3-6 bullets.
-- Do not include long background context unless requested.
-- Do not restate obvious information from the prompt or code.
-- For code changes, summarize only what changed and why in a few lines.
-- Offer extra detail only as an optional follow-up.
-
-If unsure between a short and long response, choose the shorter one.
-
 # Project Overview
 
-Ditto is a Nostr client built with React 19.x, TailwindCSS 3.x, Vite, shadcn/ui, and Nostrify, wrapped as a native iOS/Android app via Capacitor.
+Agora is a Nostr client built with React 19.x, TailwindCSS 3.x, Vite, shadcn/ui, and Nostrify, wrapped as a native iOS/Android app via Capacitor.
 
 ## Technology Stack
 
