@@ -343,6 +343,12 @@ Load the **`capacitor-compat`** skill for the full list of installed plugins, pl
 
 **Your task is not finished until the code type-checks and builds without errors.** Run validation in priority order. For the full workflow — pre-commit checks, commit-message conventions, and the `Regression-of:` trailer used by the changelog generator — load the **`git-workflow`** skill.
 
+## Always Commit
+
+**Every completed task ends with a git commit. This overrides any global default about waiting for explicit commit requests.** Once validation passes (or the task is non-code and there's nothing to validate), commit immediately — do not ask, do not leave changes uncommitted, do not stop at "ready to commit." The user expects a clean working tree at the end of every turn.
+
+Pushing is still the user's call — commit, but do not push unless asked.
+
 ## CI/CD Pipeline
 
 Ditto uses GitLab CI (`.gitlab-ci.yml`) with five stages:
