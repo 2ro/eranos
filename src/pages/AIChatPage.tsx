@@ -128,7 +128,7 @@ function AgentChatView() {
               <div className="flex items-start">
                 <div className="flex flex-col gap-1 max-w-[85%] min-w-0">
                   <div className="rounded-2xl px-4 py-2.5 text-sm bg-secondary/60 border border-border rounded-tl-md">
-                    <div className="prose prose-sm max-w-none overflow-wrap-anywhere text-foreground prose-headings:text-foreground prose-strong:text-foreground prose-p:my-1 prose-headings:my-2 prose-ul:my-1 prose-ol:my-1 prose-li:my-0.5 prose-pre:my-2 prose-code:text-xs prose-a:text-primary">
+                    <div className="prose prose-sm max-w-none overflow-wrap-anywhere text-foreground prose-headings:text-foreground prose-strong:text-foreground prose-p:my-1 prose-headings:my-2 prose-ul:my-1 prose-ol:my-1 prose-li:my-0.5 prose-pre:my-2 prose-code:text-xs prose-code:text-primary prose-code:font-medium prose-a:text-primary">
                       <Markdown rehypePlugins={[rehypeSanitize]}>
                         {streamingText}
                       </Markdown>
@@ -304,7 +304,7 @@ function MessageBubble({ message }: { message: DisplayMessage }) {
             {isUser ? (
               <p className="whitespace-pre-wrap overflow-wrap-anywhere">{message.content}</p>
             ) : (
-              <div className="prose prose-sm max-w-none overflow-wrap-anywhere text-foreground prose-headings:text-foreground prose-strong:text-foreground prose-p:my-1 prose-headings:my-2 prose-ul:my-1 prose-ol:my-1 prose-li:my-0.5 prose-pre:my-2 prose-code:text-xs prose-a:text-primary">
+              <div className="prose prose-sm max-w-none overflow-wrap-anywhere text-foreground prose-headings:text-foreground prose-strong:text-foreground prose-p:my-1 prose-headings:my-2 prose-ul:my-1 prose-ol:my-1 prose-li:my-0.5 prose-pre:my-2 prose-code:text-xs prose-code:text-primary prose-code:font-medium prose-a:text-primary">
                 <Markdown rehypePlugins={[rehypeSanitize]}>
                   {message.content}
                 </Markdown>
