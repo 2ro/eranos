@@ -28,6 +28,7 @@ import { genUserName } from '@/lib/genUserName';
 import { getCountryInfo, getWikipediaTitle } from '@/lib/countries';
 import { useWikipediaSummary } from '@/hooks/useWikipediaSummary';
 import { useCountryFacts, type CountryFacts } from '@/hooks/useCountryFacts';
+import { useCommonsAudio } from '@/hooks/useCommonsAudio';
 import { formatNumber } from '@/lib/formatNumber';
 import { EXTRA_KINDS } from '@/lib/extraKinds';
 import { CONTENT_KIND_ICONS } from '@/lib/sidebarItems';
@@ -702,46 +703,93 @@ function VitalsRow({ facts }: { facts: CountryFacts }) {
 }
 
 /**
- * Tiny circular play button for a country's national anthem. Designed to sit
- * overlaid on the hero photo next to the country name — no surrounding label
- * (the country name is the label), no list-style chrome, just an iconic
+ * Tiny circular play button for a country's national anthem. Sits overlaid
+ * on the hero photo next to the country name — no surrounding label (the
+ * country name is the label), no list-style chrome, just an iconic
  * affordance.
  *
- * The `<audio>` element only mounts after the first click via `armed`, so we
- * don't pull a multi-megabyte OGG file from Commons for every visitor.
+ * Why this is more involved than it looks:
+ *
+ * 1. **Codec compatibility.** Commons anthems are almost always OGG Vorbis,
+ *    which Safari and iOS WKWebView can't decode. We resolve the filename
+ *    to a list of Commons derivatives (incl. MP3 transcodes) via
+ *    `useCommonsAudio` and render one `<source>` per derivative, MP3 first
+ *    so Safari picks it. Without this step the anthem plays in Chrome /
+ *    Firefox only and silently fails on Apple devices.
+ *
+ * 2. **Autoplay gesture.** Browsers only allow `play()` to start if it's
+ *    called *synchronously* inside a user gesture. We always mount the
+ *    `<audio>` element (with `preload="none"` so no bytes are fetched
+ *    upfront) and call `play()` directly from the click handler — not from
+ *    an effect after a state update, which loses the gesture token.
+ *
+ * 3. **Silent failures.** `audio.play()` returns a promise that rejects on
+ *    autoplay block / decode error / network failure. We catch the
+ *    rejection and surface it via toast so the user gets feedback instead
+ *    of a stuck "playing" button with no audio.
  */
-function AnthemButton({ url, title }: { url: string; title: string | null }) {
+function AnthemButton({ filename, title }: { filename: string; title: string | null }) {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const [playing, setPlaying] = useState(false);
-  const [armed, setArmed] = useState(false);
+  const { data: derivatives, isLoading } = useCommonsAudio(filename);
+  const { toast } = useToast();
+
+  // Sort MP3 first — Safari / WKWebView can't play Ogg Vorbis but happily
+  // decodes audio/mpeg. Chrome and Firefox accept either. The browser
+  // picks the first `<source>` whose `type` it claims to support, so the
+  // ordering here is the difference between "works on iOS" and "doesn't".
+  const sortedDerivatives = useMemo(() => {
+    if (!derivatives) return [];
+    return [...derivatives].sort((a, b) => {
+      const isMp3 = (t: string) => /^audio\/mpeg\b/i.test(t);
+      return Number(isMp3(b.type)) - Number(isMp3(a.type));
+    });
+  }, [derivatives]);
+
+  const hasPlayable = sortedDerivatives.length > 0;
 
   const toggle = useCallback((event: React.MouseEvent) => {
     event.preventDefault();
     event.stopPropagation();
     const el = audioRef.current;
-    if (!el) {
-      setArmed(true);
-      setPlaying(true);
-      return;
-    }
+    if (!el || !hasPlayable) return;
     if (el.paused) {
-      void el.play();
+      // play() is async and may reject (autoplay blocked, decode error,
+      // network error). Catch the rejection so the failure isn't silent.
+      el.play().catch((err: unknown) => {
+        const message = err instanceof Error ? err.message : 'Playback failed';
+        toast({
+          title: 'Could not play anthem',
+          description: message,
+          variant: 'destructive',
+        });
+        setPlaying(false);
+      });
     } else {
       el.pause();
     }
-  }, []);
+  }, [hasPlayable, toast]);
 
-  useEffect(() => {
-    if (!armed || !audioRef.current) return;
-    const el = audioRef.current;
-    if (playing && el.paused) void el.play();
-  }, [armed, playing]);
+  const tooltip = !hasPlayable && !isLoading
+    ? 'Anthem unavailable'
+    : playing
+      ? `Pause anthem${title ? `: ${title}` : ''}`
+      : `Play anthem${title ? `: ${title}` : ''}`;
 
-  // Tooltip shows the anthem title if we have one; fall back to the generic
-  // label so the button is always self-explanatory on hover.
-  const tooltip = playing
-    ? `Pause anthem${title ? `: ${title}` : ''}`
-    : `Play anthem${title ? `: ${title}` : ''}`;
+  // While loading derivatives, render a disabled placeholder of the same
+  // size so the hero layout doesn't shift when the URLs resolve.
+  if (isLoading) {
+    return (
+      <div
+        aria-hidden
+        className="inline-flex size-8 rounded-full shrink-0 bg-black/20 border border-white/20 backdrop-blur-sm [text-shadow:none]"
+      />
+    );
+  }
+
+  // No playable derivatives — don't render the button at all rather than
+  // leaving a dead affordance on the page.
+  if (!hasPlayable) return null;
 
   return (
     <>
@@ -760,17 +808,28 @@ function AnthemButton({ url, title }: { url: string; title: string | null }) {
       >
         {playing ? <Pause className="size-3.5" /> : <Play className="size-3.5 translate-x-[1px]" />}
       </button>
-      {armed && (
-        <audio
-          ref={audioRef}
-          src={url}
-          preload="auto"
-          onPlay={() => setPlaying(true)}
-          onPause={() => setPlaying(false)}
-          onEnded={() => setPlaying(false)}
-          className="sr-only"
-        />
-      )}
+      {/* Always-mounted audio element with no preload — bytes only start
+          flowing after the user clicks Play. Multiple <source> tags let
+          the browser pick a format it can actually decode. */}
+      <audio
+        ref={audioRef}
+        preload="none"
+        onPlay={() => setPlaying(true)}
+        onPause={() => setPlaying(false)}
+        onEnded={() => setPlaying(false)}
+        onError={() => {
+          setPlaying(false);
+          toast({
+            title: 'Could not load anthem',
+            variant: 'destructive',
+          });
+        }}
+        className="sr-only"
+      >
+        {sortedDerivatives.map((d) => (
+          <source key={d.src} src={d.src} type={d.type} />
+        ))}
+      </audio>
     </>
   );
 }
@@ -912,8 +971,8 @@ export function CountryContentHeader({ code }: { code: string }) {
                 <h2 className="text-2xl sm:text-4xl font-bold leading-tight text-white truncate">
                   {info.subdivisionName ?? info.name}
                 </h2>
-                {facts?.anthemUrl && (
-                  <AnthemButton url={facts.anthemUrl} title={facts.anthemTitle} />
+                {facts?.anthemFilename && (
+                  <AnthemButton filename={facts.anthemFilename} title={facts.anthemTitle} />
                 )}
               </div>
               {info.subdivision ? (

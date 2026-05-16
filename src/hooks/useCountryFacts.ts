@@ -36,8 +36,15 @@ export interface CountryFacts {
   currencies: string[];
   /** Coat of arms image URL (Commons Special:FilePath). */
   coatOfArmsUrl: string | null;
-  /** National anthem audio file URL (Commons Special:FilePath). */
-  anthemUrl: string | null;
+  /**
+   * Commons filename of the national anthem audio file (e.g.
+   * `Gloria al Bravo Pueblo instrumental.ogg`). To play it you need to
+   * resolve actual playable derivative URLs through the MediaWiki API —
+   * see `useCommonsAudio`. The raw filename is exposed (rather than a
+   * direct URL) because OGG Vorbis isn't playable in Safari/WKWebView,
+   * so we always want to negotiate an MP3 transcode.
+   */
+  anthemFilename: string | null;
   /** National anthem title. */
   anthemTitle: string | null;
   /** Time zone(s) (UTC offsets as strings, e.g. "UTC+1"). */
@@ -111,20 +118,37 @@ interface SparqlResponse {
 }
 
 /**
- * Convert a Wikidata "Commons media" claim value into a direct image / audio
- * URL via Commons' Special:FilePath redirect endpoint. SPARQL returns image
- * values either as a `http://commons.wikimedia.org/wiki/Special:FilePath/...`
- * URL or as a raw filename — Special:FilePath handles both safely.
+ * Convert a Wikidata "Commons media" claim value into a direct image URL
+ * via Commons' Special:FilePath redirect endpoint. SPARQL returns image
+ * values as `http://commons.wikimedia.org/wiki/Special:FilePath/<encoded>`
+ * URLs — `<encoded>` is already percent-encoded, so we decode first and
+ * then re-encode to avoid double-encoding spaces (`%20` → `%2520`).
+ *
+ * Always returns `https://` even though SPARQL emits `http://`, so the
+ * URL is loadable from secure contexts without mixed-content blocks.
  */
-function commonsUrl(raw: string | undefined): string | null {
-  if (!raw) return null;
-  // Strip the SPARQL-prepended URI if present, leaving just the filename.
-  const filename = raw.replace(/^https?:\/\/commons\.wikimedia\.org\/wiki\/Special:FilePath\//i, '');
+function commonsImageUrl(raw: string | undefined): string | null {
+  const filename = commonsFilename(raw);
   if (!filename) return null;
-  // Re-encode through the canonical endpoint so the browser gets a 302 to
-  // the real CDN URL (and gets the standard Commons content negotiation —
-  // e.g. SVG → PNG for browsers that don't render SVG, OGG with proper MIME).
   return `https://commons.wikimedia.org/wiki/Special:FilePath/${encodeURIComponent(filename)}`;
+}
+
+/**
+ * Extract the raw Commons filename from a `Special:FilePath/...` URL,
+ * decoding the percent-encoding once so the result is a plain filename
+ * (e.g. `Gloria al Bravo Pueblo instrumental.ogg`).
+ */
+function commonsFilename(raw: string | undefined): string | null {
+  if (!raw) return null;
+  const encoded = raw.replace(/^https?:\/\/commons\.wikimedia\.org\/wiki\/Special:FilePath\//i, '');
+  if (!encoded) return null;
+  try {
+    return decodeURIComponent(encoded);
+  } catch {
+    // If the input was already plain (or malformed), fall back to using
+    // it as-is rather than throwing the whole fetch away.
+    return encoded;
+  }
 }
 
 function splitConcat(value: string | undefined): string[] {
@@ -204,8 +228,8 @@ async function fetchCountryFacts(
       inception: parseInception(get('inception')),
       languages: splitConcat(get('languages')),
       currencies: splitConcat(get('currencies')),
-      coatOfArmsUrl: commonsUrl(get('coatOfArms')),
-      anthemUrl: commonsUrl(get('anthem')),
+      coatOfArmsUrl: commonsImageUrl(get('coatOfArms')),
+      anthemFilename: commonsFilename(get('anthem')),
       anthemTitle: get('anthemTitle') ?? null,
       timeZones: splitConcat(get('timeZones')),
       wikidataUrl: `https://www.wikidata.org/wiki/${id}`,
