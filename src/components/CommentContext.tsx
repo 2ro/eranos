@@ -987,7 +987,7 @@ export function CountryFlagBackdrop({ event }: { event: NostrEvent }) {
             alt=""
             decoding="async"
             onError={() => setImageFailed(true)}
-            className="w-full h-full object-cover opacity-[0.12] select-none"
+            className="w-full h-full object-cover opacity-20 select-none"
             style={{
               maskImage: 'linear-gradient(to bottom, black 0%, black 35%, transparent 100%)',
               WebkitMaskImage: 'linear-gradient(to bottom, black 0%, black 35%, transparent 100%)',
@@ -999,7 +999,7 @@ export function CountryFlagBackdrop({ event }: { event: NostrEvent }) {
           // mask shape as the image so the visual swap is seamless when the
           // image arrives.
           <div
-            className="absolute inset-0 opacity-[0.12]"
+            className="absolute inset-0 opacity-20"
             style={{
               backgroundImage: paletteGradient,
               maskImage: 'linear-gradient(to bottom, black 0%, black 35%, transparent 100%)',
