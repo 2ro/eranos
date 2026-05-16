@@ -1,7 +1,7 @@
 import type { FeedSettings } from '@/contexts/AppContext';
 import type { NostrEvent } from '@nostrify/nostrify';
 import type { ComponentType } from 'react';
-import { Bird, CircleAlert, GitPullRequestArrow, Globe, Megaphone, MessageSquareMore, Stars, UserCheck, Users, Zap } from 'lucide-react';
+import { Bird, CircleAlert, GitPullRequestArrow, Globe, Megaphone, MessageSquareMore, Stars, UserCheck, Users } from 'lucide-react';
 import { RepostIcon } from '@/components/icons/RepostIcon';
 import { CONTENT_KIND_ICONS } from '@/lib/sidebarItems';
 
