@@ -819,8 +819,8 @@ function CountryPillBadge({ identifier, className }: { identifier: string; class
           aria-label={`Posted from ${info?.name ?? code}`}
           className={cn(
             // Surface — a glassy passport-stamp gradient.
-            'group/pill inline-flex items-center gap-2 max-w-[10rem] sm:max-w-[14rem]',
-            'rounded-full py-1 pl-1 pr-3',
+            'group/pill inline-flex items-center gap-1.5 max-w-[10rem] sm:max-w-[14rem]',
+            'rounded-full py-1 px-3',
             'bg-gradient-to-br from-primary via-primary/95 to-accent text-primary-foreground',
             'ring-1 ring-inset ring-white/20',
             'shadow-md shadow-primary/30',
@@ -832,18 +832,15 @@ function CountryPillBadge({ identifier, className }: { identifier: string; class
             className,
           )}
         >
-          {/* Flag — sits in a small bright disc so it reads as a stamp seal */}
+          {/* Flag — drop shadow gives it depth against the gradient */}
           <span
             className={cn(
-              'shrink-0 inline-flex items-center justify-center',
-              'size-6 rounded-full bg-white/90 dark:bg-white/95',
-              'shadow-inner shadow-black/10',
-              'text-base leading-none',
+              'shrink-0 text-lg leading-none',
               'motion-safe:group-hover/pill:rotate-[6deg] transition-transform',
             )}
             role="img"
             aria-label={info ? `Flag of ${info.name}` : code}
-            style={{ filter: 'drop-shadow(0 1px 1px rgba(0,0,0,0.15))' }}
+            style={{ filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.35))' }}
           >
             {flag}
           </span>
