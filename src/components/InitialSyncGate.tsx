@@ -964,11 +964,11 @@ function CountriesStep({
                 )}
               >
                 {isSelected && (
-                  <span className="absolute right-3 top-1 rounded-full bg-primary p-0.5 text-primary-foreground shadow-sm">
+                  <span className="absolute right-3 top-1 z-10 rounded-full bg-primary p-0.5 text-primary-foreground shadow-sm">
                     <Check className="size-3" />
                   </span>
                 )}
-                <span className="text-5xl leading-none drop-shadow-sm transition-transform group-hover:scale-110" aria-hidden="true">
+                <span className="relative z-0 text-5xl leading-none drop-shadow-sm transition-transform group-hover:scale-110" aria-hidden="true">
                   {country.flag}
                 </span>
                 <span className="line-clamp-2 min-w-0 text-xs font-medium leading-tight">
