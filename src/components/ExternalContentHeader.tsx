@@ -607,19 +607,59 @@ function WikipediaExtract({ extract, articleUrl }: { extract: string; articleUrl
 // "hero + Wikipedia extract" instead of leaving empty rows behind.
 
 /**
- * Single-line current weather strip — just the essentials: icon, temperature,
- * description, weather-station city, and optional country capital. Wind /
- * humidity / feels-like were trimmed because the goal is destination flavour,
- * not a forecast widget.
+ * Combined weather + vitals row that lives directly below the hero photo.
  *
- * The capital is rendered here (rather than in the vitals row below) because
- * "where you are in the country right now" reads more naturally beside the
- * current weather than alongside population / language / currency facts.
+ * **Left:** current weather (icon + temperature + description) and the
+ * country capital — answers "where am I right now and what's it like there"
+ * in one glance.
+ *
+ * **Right:** vitals (population, primary language, currency) — answers
+ * "what's the country itself like" in three short tokens.
+ *
+ * Collapsing the two into one row (instead of stacking them as
+ * separate bars) keeps the header from feeling chunky on tall mobile
+ * viewports. The flex layout wraps cleanly when there isn't enough
+ * horizontal room: vitals fall onto a second line under the weather
+ * group rather than getting crushed beside it.
+ *
+ * Each side renders nothing when its data is missing; the surrounding
+ * `<div>` itself unmounts when both sides are empty so the divider
+ * above the Wikipedia extract doesn't draw against a phantom row.
  */
-function WeatherLine({ code, capital }: { code: string; capital?: string | null }) {
+function WeatherVitalsRow({ code, facts }: { code: string; facts: CountryFacts | undefined }) {
   const { data: weather, isLoading } = useWeather(code);
+  const capital = facts?.capital ?? null;
 
-  if (isLoading) {
+  const vitals: { key: string; icon: React.ReactNode; label: string; value: string }[] = [];
+  if (facts) {
+    if (facts.population !== null) {
+      vitals.push({
+        key: 'population',
+        icon: <Users className="size-3 shrink-0" />,
+        label: 'Population',
+        value: formatNumber(facts.population),
+      });
+    }
+    if (facts.languages.length > 0) {
+      vitals.push({
+        key: 'languages',
+        icon: <Languages className="size-3 shrink-0" />,
+        label: facts.languages.length > 1 ? 'Languages' : 'Language',
+        // Cap at two on this line; the rest stays in the tooltip.
+        value: facts.languages.slice(0, 2).join(', '),
+      });
+    }
+    if (facts.currencies.length > 0) {
+      vitals.push({
+        key: 'currency',
+        icon: <Coins className="size-3 shrink-0" />,
+        label: facts.currencies.length > 1 ? 'Currencies' : 'Currency',
+        value: facts.currencies[0],
+      });
+    }
+  }
+
+  if (isLoading && vitals.length === 0) {
     return (
       <div className="px-4 py-2 flex items-center gap-3">
         <Skeleton className="size-6 rounded-md" />
@@ -628,91 +668,59 @@ function WeatherLine({ code, capital }: { code: string; capital?: string | null 
     );
   }
 
-  // If we have neither weather nor capital, render nothing — no half-empty
-  // row when both data sources are missing.
-  if (!weather && !capital) return null;
+  const hasWeatherSide = !!weather || !!capital;
+  const hasVitalsSide = vitals.length > 0;
+  if (!hasWeatherSide && !hasVitalsSide) return null;
 
   return (
-    <div className="px-4 py-2 flex flex-wrap items-baseline gap-x-3 gap-y-1 text-sm">
-      {weather && (
-        <>
-          <span className="flex items-baseline gap-2 text-foreground">
-            <span className="text-xl leading-none" role="img" aria-label={weather.description}>
-              {weather.icon}
+    <div className="px-4 py-2 flex flex-wrap items-center justify-between gap-x-4 gap-y-1.5 text-sm">
+      {/* Left group — weather + capital. */}
+      {hasWeatherSide && (
+        <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1 min-w-0">
+          {weather && (
+            <>
+              <span className="flex items-baseline gap-2 text-foreground">
+                <span className="text-xl leading-none" role="img" aria-label={weather.description}>
+                  {weather.icon}
+                </span>
+                <span className="font-bold tabular-nums">{weather.temperature}°</span>
+              </span>
+              <span className="text-muted-foreground">{weather.description}</span>
+            </>
+          )}
+          {capital && (
+            // The country's capital is the stable national place anchor for
+            // the header. The weather-station city is intentionally omitted
+            // — it's often a smaller, less-recognised town nearby and
+            // duplicates a less-meaningful place name on the same line.
+            <span className="flex items-center gap-1 text-muted-foreground/80 text-xs">
+              <Landmark className="size-3 shrink-0" />
+              <span>{capital}</span>
             </span>
-            <span className="font-bold tabular-nums">{weather.temperature}°</span>
-          </span>
-          <span className="text-muted-foreground">{weather.description}</span>
-        </>
+          )}
+        </div>
       )}
-      {capital && (
-        // The country's capital is the stable national place anchor for the
-        // header. The weather-station city is intentionally omitted — it
-        // often reads as a smaller, less recognisable nearby town and
-        // duplicates a less-meaningful place name on the same line.
-        <span className="flex items-center gap-1 text-muted-foreground/80 text-xs">
-          <Landmark className="size-3 shrink-0" />
-          <span>{capital}</span>
-        </span>
+
+      {/* Right group — vitals (population, language, currency). On narrow
+          viewports this wraps onto its own line under the weather group
+          rather than getting crushed beside it. */}
+      {hasVitalsSide && (
+        <ul className="flex flex-wrap items-center gap-x-4 gap-y-1.5 text-sm text-muted-foreground min-w-0">
+          {vitals.map((item) => (
+            <li
+              key={item.key}
+              className="flex items-center gap-1.5 min-w-0"
+              title={`${item.label}: ${item.value}`}
+            >
+              {item.icon}
+              <span className="font-medium text-foreground truncate max-w-[14ch] sm:max-w-[18ch]">
+                {item.value}
+              </span>
+            </li>
+          ))}
+        </ul>
       )}
     </div>
-  );
-}
-
-/**
- * Compact vitals row — Population · Languages · Currency.
- *
- * Capital lives on the weather line above (it reads more naturally next to
- * the current weather-station city than next to population / language /
- * currency). Government type, inception date, area, and demonym are
- * encyclopedic rather than evocative, so they're omitted entirely (one
- * click away on Wikipedia).
- *
- * Renders nothing if all three fields are missing — small / poorly-documented
- * countries don't get a half-empty row.
- */
-function VitalsRow({ facts }: { facts: CountryFacts }) {
-  const items: { key: string; icon: React.ReactNode; label: string; value: string }[] = [];
-
-  if (facts.population !== null) {
-    items.push({
-      key: 'population',
-      icon: <Users className="size-3 shrink-0" />,
-      label: 'Population',
-      value: formatNumber(facts.population),
-    });
-  }
-  if (facts.languages.length > 0) {
-    items.push({
-      key: 'languages',
-      icon: <Languages className="size-3 shrink-0" />,
-      label: facts.languages.length > 1 ? 'Languages' : 'Language',
-      // Cap at two on this line; the rest is a tooltip-only detail.
-      value: facts.languages.slice(0, 2).join(', '),
-    });
-  }
-  if (facts.currencies.length > 0) {
-    items.push({
-      key: 'currency',
-      icon: <Coins className="size-3 shrink-0" />,
-      label: facts.currencies.length > 1 ? 'Currencies' : 'Currency',
-      value: facts.currencies[0],
-    });
-  }
-
-  if (items.length === 0) return null;
-
-  return (
-    <ul className="px-4 py-2 flex flex-wrap items-center gap-x-4 gap-y-1.5 text-sm text-muted-foreground">
-      {items.map((item) => (
-        <li key={item.key} className="flex items-center gap-1.5 min-w-0" title={`${item.label}: ${item.value}`}>
-          {item.icon}
-          <span className="font-medium text-foreground truncate max-w-[14ch] sm:max-w-[18ch]">
-            {item.value}
-          </span>
-        </li>
-      ))}
-    </ul>
   );
 }
 
@@ -1034,8 +1042,7 @@ export function CountryContentHeader({ code }: { code: string }) {
           when its data is missing, so the header degrades to just the
           hero + extract for sparsely-documented places. */}
       <div className="divide-y divide-border/40">
-        <WeatherLine code={code} capital={facts?.capital} />
-        {facts && <VitalsRow facts={facts} />}
+        <WeatherVitalsRow code={code} facts={facts ?? undefined} />
         {facts?.motto && (
           // Motto lives on its own line below the hero (rather than
           // crammed into the hero overlay) so it has room to read as a
