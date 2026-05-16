@@ -510,15 +510,15 @@ function FollowingEmptyState({ onExploreWorld }: { onExploreWorld: () => void })
         <Globe2 className="size-8 text-primary" />
       </div>
       <div className="space-y-2 max-w-xs">
-        <h2 className="text-xl font-bold">No countries yet</h2>
+        <h2 className="text-xl font-bold">No activity yet</h2>
         <p className="text-muted-foreground text-sm">
-          Explore the World page and follow countries to build your Following feed.
+          Your Following feed is quiet right now. Visit World to discover more global activity.
         </p>
       </div>
       <div className="flex flex-col gap-2 w-full max-w-xs">
         <Button className="rounded-full" onClick={onExploreWorld}>
           <Globe2 className="size-4 mr-2" />
-          Explore World
+          Visit World
         </Button>
       </div>
     </div>
