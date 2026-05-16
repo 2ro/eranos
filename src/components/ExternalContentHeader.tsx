@@ -608,10 +608,15 @@ function WikipediaExtract({ extract, articleUrl }: { extract: string; articleUrl
 
 /**
  * Single-line current weather strip — just the essentials: icon, temperature,
- * description, and city. Wind / humidity / feels-like were trimmed because
- * the goal is destination flavour, not a forecast widget.
+ * description, weather-station city, and optional country capital. Wind /
+ * humidity / feels-like were trimmed because the goal is destination flavour,
+ * not a forecast widget.
+ *
+ * The capital is rendered here (rather than in the vitals row below) because
+ * "where you are in the country right now" reads more naturally beside the
+ * current weather than alongside population / language / currency facts.
  */
-function WeatherLine({ code }: { code: string }) {
+function WeatherLine({ code, capital }: { code: string; capital?: string | null }) {
   const { data: weather, isLoading } = useWeather(code);
 
   if (isLoading) {
@@ -623,20 +628,35 @@ function WeatherLine({ code }: { code: string }) {
     );
   }
 
-  if (!weather) return null;
+  // If we have neither weather nor capital, render nothing — no half-empty
+  // row when both data sources are missing.
+  if (!weather && !capital) return null;
 
   return (
     <div className="px-4 py-2 flex flex-wrap items-baseline gap-x-3 gap-y-1 text-sm">
-      <span className="flex items-baseline gap-2 text-foreground">
-        <span className="text-xl leading-none" role="img" aria-label={weather.description}>
-          {weather.icon}
-        </span>
-        <span className="font-bold tabular-nums">{weather.temperature}°</span>
-      </span>
-      <span className="text-muted-foreground">{weather.description}</span>
-      {weather.city && (
+      {weather && (
+        <>
+          <span className="flex items-baseline gap-2 text-foreground">
+            <span className="text-xl leading-none" role="img" aria-label={weather.description}>
+              {weather.icon}
+            </span>
+            <span className="font-bold tabular-nums">{weather.temperature}°</span>
+          </span>
+          <span className="text-muted-foreground">{weather.description}</span>
+        </>
+      )}
+      {weather?.city && (
         <span className="text-muted-foreground/80 text-xs">
           · {weather.city}
+        </span>
+      )}
+      {capital && (
+        // Capital reads as a stable national signal rather than the current
+        // weather-station city — flag it with a small Landmark icon so the
+        // two place names are visually distinguishable on the same line.
+        <span className="flex items-center gap-1 text-muted-foreground/80 text-xs">
+          <Landmark className="size-3 shrink-0" />
+          <span>{capital}</span>
         </span>
       )}
     </div>
@@ -644,22 +664,20 @@ function WeatherLine({ code }: { code: string }) {
 }
 
 /**
- * Compact vitals row — Capital · Population · Languages · Currency.
+ * Compact vitals row — Population · Languages · Currency.
  *
- * These four facts were chosen because they read like a postcard: where you
- * are, who you're among, what they speak, what they spend. Government type,
- * inception date, area, and demonym are encyclopedic rather than evocative,
- * so they're omitted entirely (one click away on Wikipedia).
+ * Capital lives on the weather line above (it reads more naturally next to
+ * the current weather-station city than next to population / language /
+ * currency). Government type, inception date, area, and demonym are
+ * encyclopedic rather than evocative, so they're omitted entirely (one
+ * click away on Wikipedia).
  *
- * Renders nothing if all four are missing — small / poorly-documented
+ * Renders nothing if all three fields are missing — small / poorly-documented
  * countries don't get a half-empty row.
  */
 function VitalsRow({ facts }: { facts: CountryFacts }) {
   const items: { key: string; icon: React.ReactNode; label: string; value: string }[] = [];
 
-  if (facts.capital) {
-    items.push({ key: 'capital', icon: <Landmark className="size-3 shrink-0" />, label: 'Capital', value: facts.capital });
-  }
   if (facts.population !== null) {
     items.push({
       key: 'population',
@@ -989,32 +1007,38 @@ export function CountryContentHeader({ code }: { code: string }) {
               ) : wiki?.description ? (
                 <p className="text-sm text-white/85 mt-0.5 truncate capitalize">{wiki.description}</p>
               ) : null}
-              {facts?.motto && (
-                <p className="text-xs text-white/80 mt-1 italic truncate" title={facts.motto}>
-                  &ldquo;{facts.motto}&rdquo;
-                </p>
-              )}
             </div>
           </div>
         </div>
       </div>
 
-      {/* Below-hero content — three optional one-liners. Each renders
-          nothing when its data is missing, so the header degrades to just
-          the hero + extract for sparsely-documented places. */}
+      {/* Below-hero content — optional one-liners. Each renders nothing
+          when its data is missing, so the header degrades to just the
+          hero + extract for sparsely-documented places. */}
       <div className="divide-y divide-border/40">
-        <WeatherLine code={code} />
+        <WeatherLine code={code} capital={facts?.capital} />
         {facts && <VitalsRow facts={facts} />}
+        {facts?.motto && (
+          // Motto lives on its own line below the hero (rather than
+          // crammed into the hero overlay) so it has room to read as a
+          // proper national epigraph — italic, quoted, full column width.
+          <p
+            className="px-4 py-2 text-sm italic text-muted-foreground"
+            title={facts.motto}
+          >
+            &ldquo;{facts.motto}&rdquo;
+          </p>
+        )}
 
         {/* Wikipedia extract — prose, no surrounding card. */}
         {wikiLoading ? (
-          <div className="px-4 pt-3 pb-1 space-y-2">
+          <div className="px-4 pb-1 space-y-2">
             <Skeleton className="h-4 w-full" />
             <Skeleton className="h-4 w-full" />
             <Skeleton className="h-4 w-3/4" />
           </div>
         ) : wiki?.extract ? (
-          <div className="px-4 pt-3 pb-1">
+          <div className="px-4 pb-1">
             <WikipediaExtract extract={wiki.extract} articleUrl={wiki.articleUrl} />
           </div>
         ) : null}

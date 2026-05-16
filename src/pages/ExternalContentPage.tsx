@@ -1,6 +1,6 @@
 import { useCallback, useMemo, useState } from 'react';
 import { useSeoMeta } from '@unhead/react';
-import { ArrowLeft, Globe, MessageCircle, MessageSquare, MoreHorizontal, Repeat2, Star, AlertTriangle, PanelLeft, Trash2 } from 'lucide-react';
+import { ArrowLeft, BarChart3, Globe, MessageCircle, MessageSquare, MoreHorizontal, Repeat2, Star, AlertTriangle, PanelLeft, Trash2 } from 'lucide-react';
 import { Link, useLocation, useParams } from 'react-router-dom';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Badge } from '@/components/ui/badge';
@@ -34,7 +34,7 @@ import { usePaginatedFeed } from '@/hooks/usePaginatedFeed';
 import { useInfiniteScroll } from '@/hooks/useInfiniteScroll';
 import { usePinnedPosts } from '@/hooks/usePinnedPosts';
 import { CountryFeedProvider } from '@/components/CountryFeedProvider';
-import { CountryStatsDrawer } from '@/components/world/CountryStatsDrawer';
+import { CountryStatsDialog } from '@/components/world/CountryStatsDialog';
 import { Pin } from 'lucide-react';
 import { NoteCard } from '@/components/NoteCard';
 import { useBookReviews } from '@/hooks/useBookReviews';
@@ -77,6 +77,14 @@ function ExternalActionBar({ content, onComment, commentCount }: ExternalActionB
   const { addToSidebar, removeFromSidebar, orderedItems } = useFeedSettings();
 
   const isInSidebar = orderedItems.includes(identifier);
+
+  // Country pages get a "View stats" item in the 3-dots menu (the kind-30385
+  // snapshot is country-scoped, so it's not meaningful for URL / ISBN / unknown
+  // content types). The dialog is controlled from local state and mounted at
+  // the bottom of the bar so the dropdown can dismiss without unmounting it
+  // mid-animation.
+  const countryCode = content.type === 'iso3166' ? content.code : null;
+  const [statsOpen, setStatsOpen] = useState(false);
 
   const handleAddToSidebar = useCallback(() => {
     addToSidebar(identifier);
@@ -141,6 +149,12 @@ function ExternalActionBar({ content, onComment, commentCount }: ExternalActionB
           </button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-52">
+          {countryCode && (
+            <DropdownMenuItem onClick={() => setStatsOpen(true)} className="gap-3">
+              <BarChart3 className="size-4" />
+              View stats
+            </DropdownMenuItem>
+          )}
           {isInSidebar ? (
             <DropdownMenuItem onClick={handleRemoveFromSidebar} className="gap-3">
               <Trash2 className="size-4" />
@@ -161,6 +175,14 @@ function ExternalActionBar({ content, onComment, commentCount }: ExternalActionB
           onOpenChange={setShareOpen}
           initialContent={identifier}
           title="Share to feed"
+        />
+      )}
+
+      {countryCode && (
+        <CountryStatsDialog
+          countryCode={countryCode}
+          open={statsOpen}
+          onOpenChange={setStatsOpen}
         />
       )}
     </div>
@@ -364,17 +386,6 @@ export function ExternalContentPage() {
           <ArrowLeft className="size-5" />
         </Link>
         <h1 className="text-xl font-bold truncate">{pageTitle}</h1>
-        {/* Right-aligned actions. The flex-1 spacer pushes the stats
-            button to the trailing edge of the header — same pattern as
-            the 3-dot menu in `ExternalActionBar`. Only country pages get
-            a stats button today (the kind-30385 snapshot is country-
-            scoped); other content types fall back to no trailing slot. */}
-        {isCountry && countryCode && (
-          <>
-            <div className="flex-1" />
-            <CountryStatsDrawer countryCode={countryCode} />
-          </>
-        )}
       </div>
 
       <div className="px-4 space-y-6 pb-4">
