@@ -34,7 +34,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 
 import {
-  Camera, Palette, Info, Zap, Clock, Bitcoin, Plus, ChevronRight, Loader2,
+  Camera, Palette, Info, Clock, Bitcoin, Plus, ChevronRight, Loader2,
   Link as LinkIcon, Check, MoreHorizontal, Trash2, ListFilter,
   Calendar, DollarSign, Globe, Megaphone,
 } from 'lucide-react';
@@ -43,7 +43,7 @@ const ACTION_ICONS = {
   photo: Camera,
   art: Palette,
   info: Info,
-  action: Zap,
+  action: Megaphone,
 } as const;
 
 function formatSats(sats: number): string {

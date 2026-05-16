@@ -2,7 +2,7 @@ import { useMemo } from 'react';
 import { useSeoMeta } from '@unhead/react';
 import { format } from 'date-fns';
 import { Link as RouterLink } from 'react-router-dom';
-import { Camera, Palette, Info, Zap, Clock, Bitcoin, Loader2, MessageSquare, Trophy, ArrowLeft } from 'lucide-react';
+import { Camera, Palette, Info, Megaphone, Clock, Bitcoin, Loader2, MessageSquare, Trophy, ArrowLeft } from 'lucide-react';
 import type { NostrMetadata } from '@nostrify/nostrify';
 
 import { useAction, type Action } from '@/hooks/useActions';
@@ -24,7 +24,7 @@ const ACTION_ICONS = {
   photo: Camera,
   art: Palette,
   info: Info,
-  action: Zap,
+  action: Megaphone,
 } as const;
 
 interface ActionDetailPageProps {
@@ -82,7 +82,7 @@ function DetailHeader() {
         <ArrowLeft className="size-5" />
       </RouterLink>
       <div className="flex items-center gap-2 flex-1 min-w-0">
-        <Zap className="size-5 text-primary" />
+        <Megaphone className="size-5 text-primary" />
         <h1 className="text-lg font-semibold truncate">Action</h1>
       </div>
     </div>

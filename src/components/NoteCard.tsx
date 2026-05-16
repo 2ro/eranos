@@ -7,6 +7,7 @@ import {
   GitBranch,
   GitPullRequest,
   Mail,
+  Megaphone,
   MessageCircle,
   Rocket,
   MoreHorizontal,
@@ -30,6 +31,7 @@ import {
   PodcastEpisodeContent,
   PodcastTrailerContent,
 } from "@/components/AudioKindContent";
+import { ActionContent } from "@/components/ActionContent";
 import { BadgeContent } from "@/components/BadgeContent";
 import { CommunityContent } from "@/components/CommunityContent";
 import { CalendarEventContent } from "@/components/CalendarEventContent";
@@ -400,6 +402,7 @@ export const NoteCard = memo(function NoteCard({
   const isBadge = isBadgeDefinition || isProfileBadges;
   const isCommunity = event.kind === 34550;
   const isZapGoal = event.kind === 9041;
+  const isAction = event.kind === 36639;
   const isReaction = event.kind === 7;
   const isPollVote = event.kind === 1018;
   const isRepost = event.kind === 6 || event.kind === 16;
@@ -445,6 +448,7 @@ export const NoteCard = memo(function NoteCard({
     !isBadge &&
     !isCommunity &&
     !isZapGoal &&
+    !isAction &&
     !isReaction &&
     !isPollVote &&
     !isRepost &&
@@ -608,6 +612,9 @@ export const NoteCard = memo(function NoteCard({
           <CommunityContent event={event} />
         ) : isZapGoal ? (
           <GoalCard event={event} />
+
+        ) : isAction ? (
+          <ActionContent event={event} />
 
         ) : isVoiceMessage ? (
           <VoiceMessagePlayer event={event} />
@@ -1836,7 +1843,7 @@ const KIND_HEADER_MAP: Record<number, KindHeaderConfig> = {
     action: "zapped",
   },
   36639: {
-    icon: Zap,
+    icon: Megaphone,
     action: (event) => publishedAtAction(event, { created: "posted an", updated: "updated an", fallback: "posted an" }),
     noun: "action",
     nounRoute: "/actions",

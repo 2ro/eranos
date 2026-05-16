@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 import { nip19 } from 'nostr-tools';
 import {
   Award, BarChart3, Bird, BookOpen, Camera, Clapperboard, FileText, Film,
-  GitBranch, GitPullRequest, Highlighter, Mail, MapPin, MessageSquare, Mic, Music,
+  GitBranch, GitPullRequest, Highlighter, Mail, MapPin, Megaphone, MessageSquare, Mic, Music,
   Package, Palette, PartyPopper, Podcast, Radio, Rocket, SmilePlus,
   Stars, Target, Users, UserCheck, Vote, Zap,
 } from 'lucide-react';
@@ -178,7 +178,7 @@ const KIND_ICONS: Partial<Record<number, React.ComponentType<{ className?: strin
   1618: GitPullRequest,
   15128: Rocket,
   35128: Rocket,
-  36639: Zap,
+  36639: Megaphone,
   10008: Award,
   30008: Award,
   30009: Award,

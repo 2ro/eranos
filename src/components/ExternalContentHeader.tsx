@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowLeft, BookOpen, Coins, ExternalLink, FileText, Globe, Landmark, Languages, MapPin, MessageCircle, Package, Pause, Play, Repeat2, Share2, User, UserCheck, UserMinus, UserPlus, Users, Zap } from 'lucide-react';
+import { ArrowLeft, BookOpen, Coins, ExternalLink, FileText, Globe, Landmark, Languages, MapPin, Megaphone, MessageCircle, Package, Pause, Play, Repeat2, Share2, User, UserCheck, UserMinus, UserPlus, Users, Zap } from 'lucide-react';
 import { nip19 } from 'nostr-tools';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -1458,7 +1458,7 @@ export function AddressableEventPreview({ addr }: { addr: { kind: number; pubkey
     // Fallback icons for well-known kinds not in EXTRA_KINDS
     if (addr.kind === 31990 || addr.kind === 32267 || addr.kind === 30063 || addr.kind === 3063) return Package;
     if (addr.kind === 15128 || addr.kind === 35128) return Globe;
-    if (addr.kind === 36639) return Zap;
+    if (addr.kind === 36639) return Megaphone;
     return FileText;
   }, [kindDef, addr.kind]);
 
