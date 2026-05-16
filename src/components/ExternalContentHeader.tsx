@@ -645,15 +645,11 @@ function WeatherLine({ code, capital }: { code: string; capital?: string | null 
           <span className="text-muted-foreground">{weather.description}</span>
         </>
       )}
-      {weather?.city && (
-        <span className="text-muted-foreground/80 text-xs">
-          · {weather.city}
-        </span>
-      )}
       {capital && (
-        // Capital reads as a stable national signal rather than the current
-        // weather-station city — flag it with a small Landmark icon so the
-        // two place names are visually distinguishable on the same line.
+        // The country's capital is the stable national place anchor for the
+        // header. The weather-station city is intentionally omitted — it
+        // often reads as a smaller, less recognisable nearby town and
+        // duplicates a less-meaningful place name on the same line.
         <span className="flex items-center gap-1 text-muted-foreground/80 text-xs">
           <Landmark className="size-3 shrink-0" />
           <span>{capital}</span>
