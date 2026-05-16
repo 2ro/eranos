@@ -847,14 +847,8 @@ function CountryPillBadge({ identifier, className }: { identifier: string; class
           >
             {flag}
           </span>
-          {/* Two-line stack: tiny tracker + country name */}
-          <span className="flex flex-col items-start leading-none min-w-0">
-            <span className="text-[9px] font-semibold uppercase tracking-[0.12em] opacity-80">
-              Posted from
-            </span>
-            <span className="text-[12px] font-bold truncate mt-0.5 max-w-[8rem] sm:max-w-[12rem]">
-              {label}
-            </span>
+          <span className="text-[12px] font-bold truncate max-w-[8rem] sm:max-w-[12rem]">
+            {label}
           </span>
         </Link>
       </HoverCardTrigger>
