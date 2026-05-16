@@ -930,10 +930,10 @@ function CountriesStep({
     <div className="flex flex-col gap-6 animate-in fade-in slide-in-from-right-4 duration-400">
       <div className="space-y-2">
         <h2 className="text-xl font-semibold tracking-tight">
-          Choose your countries
+          Follow world events
         </h2>
         <p className="text-sm text-muted-foreground">
-          Follow countries you care about to bring local conversations and actions into your feed.
+          Choose countries to add to your feed.
         </p>
       </div>
 
@@ -948,7 +948,7 @@ function CountriesStep({
       </div>
 
       {orderedCountries.length > 0 ? (
-        <div className="grid max-h-96 grid-cols-3 gap-2 overflow-y-auto rounded-2xl bg-muted/30 p-2 sm:grid-cols-4">
+        <div className="grid max-h-96 grid-cols-3 gap-x-3 gap-y-5 overflow-y-auto pr-1 sm:grid-cols-4">
           {orderedCountries.map((country) => {
             const isSelected = selectedCodes.has(country.code);
             return (
@@ -957,27 +957,22 @@ function CountriesStep({
                 type="button"
                 onClick={() => toggleCountry(country.code)}
                 className={cn(
-                  "group relative flex min-h-24 flex-col items-center justify-center gap-2 rounded-2xl p-3 text-center transition-all hover:bg-background/80 hover:shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+                  "group relative flex min-h-20 flex-col items-center justify-start gap-2 rounded-xl px-1 py-2 text-center transition-transform hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
                   isSelected
-                    ? "bg-primary/10 shadow-sm ring-1 ring-primary/30"
-                    : "bg-background/55",
+                    ? "text-primary"
+                    : "text-foreground",
                 )}
               >
                 {isSelected && (
-                  <span className="absolute right-2 top-2 rounded-full bg-primary p-0.5 text-primary-foreground shadow-sm">
+                  <span className="absolute right-3 top-1 rounded-full bg-primary p-0.5 text-primary-foreground shadow-sm">
                     <Check className="size-3" />
                   </span>
                 )}
-                <span className="text-4xl leading-none drop-shadow-sm transition-transform group-hover:scale-110" aria-hidden="true">
+                <span className="text-5xl leading-none drop-shadow-sm transition-transform group-hover:scale-110" aria-hidden="true">
                   {country.flag}
                 </span>
-                <span className="min-w-0 space-y-0.5">
-                  <span className="line-clamp-2 text-xs font-semibold leading-tight text-foreground">
-                    {country.name}
-                  </span>
-                  <span className="block text-[10px] font-medium uppercase tracking-wide text-muted-foreground">
-                    {country.code}
-                  </span>
+                <span className="line-clamp-2 min-w-0 text-xs font-medium leading-tight">
+                  {country.name}
                 </span>
               </button>
             );
