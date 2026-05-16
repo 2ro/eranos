@@ -29,10 +29,11 @@ import { useLinkPreview } from '@/hooks/useLinkPreview';
 import { useScryfallCard } from '@/hooks/useScryfallCard';
 import { getDisplayName } from '@/lib/getDisplayName';
 import { genUserName } from '@/lib/genUserName';
-import { getCountryInfo } from '@/lib/countries';
+import { getCountryInfo, getWikipediaTitle } from '@/lib/countries';
 import { useCountryFeed } from '@/contexts/CountryFeedContext';
 import { cn } from '@/lib/utils';
 import { useFlagPalette } from '@/lib/flagPalette';
+import { useWikipediaSummary } from '@/hooks/useWikipediaSummary';
 import { extractGathererCard, type GathererCard } from '@/lib/linkEmbed';
 import { cardPrimaryImage } from '@/lib/scryfall';
 
@@ -959,41 +960,67 @@ export function CountryCommentPill({ event, className }: { event: NostrEvent; cl
 }
 
 /**
- * Decorative flag backdrop for country-rooted kind-1111 posts. Renders a
- * large blurred flag emoji in the upper-right of the card that fades down
- * into transparency before reaching the content, echoing the hero pattern
- * used on the country detail page. Pairs with `CountryCommentPill`.
+ * Decorative flag backdrop for country-rooted kind-1111 posts. Renders the
+ * country's Wikipedia lead image (the flag, for country articles) faded
+ * behind the post, echoing the country detail page's hero
+ * (`CountryContentHeader` in `ExternalContentHeader.tsx`) but scaled down
+ * to a card. Pairs with `CountryCommentPill`.
  *
  * Designed to be rendered as the first child of a `relative isolate
  * overflow-hidden` parent so the absolute layer is contained and never
  * leaks behind sibling cards. Pointer events disabled so the post body
  * stays fully interactive.
  *
+ * The Wikipedia summary fetch is cached for 24 h across all cards
+ * referencing the same country code, so a feed of N Venezuelan posts only
+ * pays the network cost once.
+ *
  * Visibility rules: see `useCountryRootContext` (identical to the pill).
  */
 export function CountryFlagBackdrop({ event }: { event: NostrEvent }) {
   const ctx = useCountryRootContext(event);
+  const info = ctx ? getCountryInfo(ctx.code) : null;
+  const wikiTitle = ctx ? getWikipediaTitle(ctx.code) : null;
+  const { data: wiki } = useWikipediaSummary(wikiTitle);
+
   if (!ctx) return null;
-  const info = getCountryInfo(ctx.code);
-  const flag = info?.flag ?? '🌍';
+
+  // For country articles Wikipedia returns the flag as the page's lead image
+  // — the same source used by `CountryContentHeader`. Prefer `thumbnail` over
+  // `originalImage` because the card-sized backdrop doesn't need the full
+  // resolution and a smaller asset reduces feed-scroll memory pressure.
+  const flagImage = wiki?.thumbnail?.source ?? wiki?.originalImage?.source ?? null;
+  const flagEmoji = info?.flag ?? '🌍';
 
   return (
     <div aria-hidden className="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
-      {/* Giant flag emoji anchored upper-right. text-[12rem] gives a glyph
-          roughly the width of the card on mobile so two stripes are visible;
-          we deliberately overshoot the right edge so the eye sees colors,
-          not a complete flag. */}
-      <span
-        className="absolute -top-6 -right-10 sm:-top-8 sm:-right-12 text-[11rem] sm:text-[14rem] leading-none opacity-70 blur-sm select-none"
-        style={{ filter: 'blur(6px) saturate(1.15)' }}
-        role="presentation"
-      >
-        {flag}
-      </span>
-      {/* Fade overlay: lets a horizontal band of color show through at the
-          very top, then quickly resolves to the card's surface so the post
-          body sits on a clean background. Uses --background so the seam
-          disappears in both light and dark themes. */}
+      {flagImage ? (
+        // Real flag SVG/PNG anchored upper-right, overshooting the edge so the
+        // eye reads colors rather than a complete framed flag. Slight blur
+        // softens stripe boundaries and helps it sit behind text. `select-none`
+        // avoids weird drag-handle behavior on touch devices.
+        <img
+          src={flagImage}
+          alt=""
+          loading="lazy"
+          className="absolute -top-6 -right-10 sm:-top-8 sm:-right-12 w-72 sm:w-96 max-w-none select-none opacity-60"
+          style={{ filter: 'blur(2px) saturate(1.1)' }}
+        />
+      ) : (
+        // Until Wikipedia resolves (or if it fails) fall back to the flag
+        // emoji at huge size — same composition, no network dependency.
+        <span
+          className="absolute -top-6 -right-10 sm:-top-8 sm:-right-12 text-[11rem] sm:text-[14rem] leading-none opacity-70 select-none"
+          style={{ filter: 'blur(6px) saturate(1.15)' }}
+          role="presentation"
+        >
+          {flagEmoji}
+        </span>
+      )}
+      {/* Fade overlay — same shape as the country detail hero's `skyOverlay`,
+          retuned for a much shorter card surface. Bleeds the flag colors at
+          the top, then quickly resolves to `hsl(var(--background))` so the
+          post body sits on a clean, theme-consistent background. */}
       <div
         className="absolute inset-0"
         style={{
