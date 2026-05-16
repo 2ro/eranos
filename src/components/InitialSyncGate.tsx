@@ -1042,6 +1042,7 @@ function FollowsStep({
   const { nostr } = useNostr();
   const { user } = useCurrentUser();
   const { mutateAsync: publishEvent } = useNostrPublish();
+  const queryClient = useQueryClient();
 
   const [packs, setPacks] = useState<NostrEvent[]>([]);
   const [loading, setLoading] = useState(true);
@@ -1108,13 +1109,21 @@ function FollowsStep({
           .filter((pk) => !existingPubkeys.has(pk))
           .map((pk) => ["p", pk]);
 
+        const tags = [...nonPTags, ...existingPTags, ...newPTags];
+
         // 4. Publish with prev for published_at preservation
-        await publishEvent({
+        const event = await publishEvent({
           kind: 3,
           content: prev?.content ?? "",
-          tags: [...nonPTags, ...existingPTags, ...newPTags],
+          tags,
           prev: prev ?? undefined,
         });
+
+        const pubkeys = tags.filter(([n]) => n === "p").map(([, pk]) => pk);
+        queryClient.setQueryData(["follow-list", user.pubkey], { event, pubkeys });
+        queryClient.invalidateQueries({ queryKey: ["follow-list", user.pubkey] });
+        queryClient.invalidateQueries({ queryKey: ["feed"] });
+        queryClient.invalidateQueries({ queryKey: ["following-feed"] });
 
         setFollowedPacks((prev) => new Set([...prev, packId]));
       } catch (error) {
@@ -1123,7 +1132,7 @@ function FollowsStep({
         setFollowingPack(null);
       }
     },
-    [user, nostr, publishEvent],
+    [user, nostr, publishEvent, queryClient],
   );
 
   return (

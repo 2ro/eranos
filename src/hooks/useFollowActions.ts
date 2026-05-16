@@ -200,15 +200,22 @@ export function useFollowActions(): UseFollowActionsReturn {
         if (newPTags.length === 0) return 0;
 
         // ④ Publish (non-p tags first, then existing p tags, then new p tags)
-        await publishEvent({
+        const tags = [...nonPTags, ...existingPTags, ...newPTags];
+        const event = await publishEvent({
           kind: 3,
           content: prev?.content ?? '',
-          tags: [...nonPTags, ...existingPTags, ...newPTags],
+          tags,
           prev: prev ?? undefined,
         });
 
-        // ⑤ Invalidate cached follow-list queries so UI updates
+        const nextPubkeys = tags.filter(([name]) => name === 'p').map(([, pk]) => pk);
+        queryClient.setQueryData(['follow-list', user.pubkey], { event, pubkeys: nextPubkeys });
+
+        // ⑤ Invalidate dependent queries so feeds mounted with the previous
+        // follow list do not remain empty/stale.
         queryClient.invalidateQueries({ queryKey: ['follow-list'] });
+        queryClient.invalidateQueries({ queryKey: ['feed'] });
+        queryClient.invalidateQueries({ queryKey: ['following-feed'] });
 
         return newPTags.length;
       } finally {
