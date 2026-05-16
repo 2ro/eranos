@@ -113,10 +113,14 @@ function ActionHeader({ action }: { action: Action }) {
         <div className="flex-1 min-w-0">
           <h1 className="text-2xl sm:text-3xl font-black leading-tight">{action.title}</h1>
           <div className="flex items-center gap-2 mt-2 flex-wrap">
-            <span className="text-xl" title={getGeoDisplayName(action.countryCode)}>
-              {countryCodeToFlag(action.countryCode)}
-            </span>
-            <span className="text-sm text-muted-foreground">{getGeoDisplayName(action.countryCode)}</span>
+            {action.countryCode && (
+              <>
+                <span className="text-xl" title={getGeoDisplayName(action.countryCode)}>
+                  {countryCodeToFlag(action.countryCode)}
+                </span>
+                <span className="text-sm text-muted-foreground">{getGeoDisplayName(action.countryCode)}</span>
+              </>
+            )}
             {isExpired ? (
               <span className="px-2 py-1 rounded-md bg-muted text-muted-foreground text-xs font-semibold flex items-center gap-1">
                 <Clock className="h-3 w-3" /> Expired

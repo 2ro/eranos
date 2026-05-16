@@ -11,10 +11,8 @@ import { useAuthor } from '@/hooks/useAuthor';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useNostrPublish } from '@/hooks/useNostrPublish';
 import { useUploadFile } from '@/hooks/useUploadFile';
-import { useOrganizers } from '@/hooks/useOrganizers';
 import { useIsMobile } from '@/hooks/useIsMobile';
 import { useToast } from '@/hooks/useToast';
-import { isAdmin } from '@/lib/admins';
 import { createCountryIdentifier } from '@/lib/countryIdentifiers';
 import { getAllCountries, getGeoDisplayName, countryCodeToFlag } from '@/lib/countries';
 import { getDisplayName } from '@/lib/genUserName';
@@ -268,12 +266,14 @@ function ActionCard({ action, isExpired }: { action: Action; isExpired?: boolean
           <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
 
           {/* Country flag — top-left, sitting on the image */}
-          <span
-            className="absolute top-3 left-3 text-2xl drop-shadow-md"
-            title={getGeoDisplayName(action.countryCode)}
-          >
-            {countryCodeToFlag(action.countryCode)}
-          </span>
+          {action.countryCode && (
+            <span
+              className="absolute top-3 left-3 text-2xl drop-shadow-md"
+              title={getGeoDisplayName(action.countryCode)}
+            >
+              {countryCodeToFlag(action.countryCode)}
+            </span>
+          )}
 
           {/* Deadline / expired pill — top-right */}
           {isExpired ? (
@@ -333,7 +333,7 @@ function ActionCard({ action, isExpired }: { action: Action; isExpired?: boolean
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Create Action dialog (admin / organizer only)
+// Create Action dialog
 // ─────────────────────────────────────────────────────────────────────────────
 
 interface CreateFormState {
@@ -353,30 +353,22 @@ interface CreateFormState {
 
 function CreateActionForm({
   formData, setFormData, isSubmitting, handleSubmit, onCancel,
-  userIsAdmin, pageCountryCode,
+  pageCountryCode,
 }: {
   formData: CreateFormState;
   setFormData: (data: CreateFormState) => void;
   isSubmitting: boolean;
   handleSubmit: () => void;
   onCancel: () => void;
-  userIsAdmin: boolean;
   pageCountryCode?: string;
 }) {
   const { mutateAsync: uploadFile, isPending: isUploading } = useUploadFile();
   const allCountries = useMemo(() => getAllCountries(), []);
 
   const countryOptions = useMemo(() => {
-    if (!userIsAdmin) {
-      if (!formData.selectedCountry) return [];
-      return [{
-        value: formData.selectedCountry,
-        label: getGeoDisplayName(formData.selectedCountry),
-        flag: countryCodeToFlag(formData.selectedCountry),
-      }];
-    }
-
-    const options: Array<{ value: string; label: string; flag: string }> = [];
+    const options: Array<{ value: string; label: string; flag: string }> = [
+      { value: 'none', label: 'No country', flag: '🌍' },
+    ];
     if (pageCountryCode) {
       options.push({
         value: pageCountryCode,
@@ -394,7 +386,7 @@ function CreateActionForm({
       }
     });
     return options;
-  }, [userIsAdmin, formData.selectedCountry, pageCountryCode, allCountries]);
+  }, [pageCountryCode, allCountries]);
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -422,9 +414,9 @@ function CreateActionForm({
   return (
     <>
       <div className="space-y-4 py-2 px-4 max-w-full overflow-hidden">
-        {userIsAdmin && countryOptions.length > 1 && (
+        {countryOptions.length > 0 && (
           <div className="space-y-2">
-            <Label htmlFor="country">Country</Label>
+            <Label htmlFor="country">Country (optional)</Label>
             <Popover open={countryPickerOpen} onOpenChange={setCountryPickerOpen}>
               <PopoverTrigger asChild>
                 <Button
@@ -439,7 +431,7 @@ function CreateActionForm({
                       <span>{getGeoDisplayName(formData.selectedCountry)}</span>
                     </span>
                   ) : (
-                    <span>Select country</span>
+                    <span>No country</span>
                   )}
                   <ChevronRight className="ml-2 h-4 w-4 shrink-0 opacity-50 rotate-90" />
                 </Button>
@@ -455,7 +447,7 @@ function CreateActionForm({
                           key={option.value}
                           value={`${option.label} ${option.value}`}
                           onSelect={() => {
-                            setFormData({ ...formData, selectedCountry: option.value });
+                            setFormData({ ...formData, selectedCountry: option.value === 'none' ? '' : option.value });
                             setCountryPickerOpen(false);
                           }}
                           className="gap-2"
@@ -465,7 +457,7 @@ function CreateActionForm({
                           <Check
                             className={cn(
                               'h-4 w-4',
-                              formData.selectedCountry === option.value ? 'opacity-100' : 'opacity-0',
+                              (formData.selectedCountry || 'none') === option.value ? 'opacity-100' : 'opacity-0',
                             )}
                           />
                         </CommandItem>
@@ -670,7 +662,7 @@ function CreateActionForm({
       <div className="flex flex-col gap-2 p-4 pt-2">
         <Button
           onClick={handleSubmit}
-          disabled={!formData.title || !formData.description || !formData.bounty || !formData.selectedCountry || isSubmitting}
+          disabled={!formData.title || !formData.description || !formData.bounty || isSubmitting}
           className="gap-2 w-full"
         >
           {isSubmitting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />}
@@ -694,7 +686,6 @@ function CreateActionDialog({
   const { mutateAsync: createEvent } = useNostrPublish();
   const queryClient = useQueryClient();
   const isMobile = useIsMobile();
-  const { isOrganizer } = useOrganizers();
   const { toast } = useToast();
   const browserTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
@@ -712,32 +703,25 @@ function CreateActionDialog({
     timezone: browserTimezone,
   });
 
-  const userIsAdmin = user ? isAdmin(user.pubkey) : false;
-  const userIsLocalOrganizer =
-    user && countryCode ? isOrganizer(user.pubkey, countryCode) : false;
-  // Admins can author for any country; non-admin organizers can only author for
-  // a country they're appointed to. Outside a country context, only admins
-  // can create.
-  const canCreateAction = userIsAdmin || userIsLocalOrganizer;
-
   const handleSubmit = async () => {
-    if (!user || !formData.selectedCountry) return;
+    if (!user) return;
     setIsSubmitting(true);
     try {
       const now = Date.now();
       const slug = formData.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
       const dTag = `${slug || 'action'}-${now}`;
-      const countryUpper = formData.selectedCountry.toUpperCase();
 
       const tags: string[][] = [
         ['d', dTag],
         ['title', formData.title],
         ['challenge-type', formData.type],
         ['bounty', formData.bounty],
-        ['i', createCountryIdentifier(countryUpper)],
         ['t', 'agora-action'],
         ['alt', `Agora activist action: ${formData.title}`],
       ];
+      if (formData.selectedCountry) {
+        tags.push(['i', createCountryIdentifier(formData.selectedCountry.toUpperCase())]);
+      }
       if (formData.coverImage) tags.push(['image', formData.coverImage]);
 
       if (formData.startDate) {
@@ -783,7 +767,7 @@ function CreateActionDialog({
     }
   };
 
-  if (!user || !canCreateAction) return null;
+  if (!user) return null;
 
   if (isMobile) {
     return (
@@ -797,7 +781,7 @@ function CreateActionDialog({
             <DrawerDescription>
               {countryCode
                 ? `New action for ${getGeoDisplayName(countryCode)}.`
-                : 'New action — pick a country below.'}
+                : 'New action. You can optionally choose a country below.'}
             </DrawerDescription>
           </DrawerHeader>
           <div className="overflow-y-auto flex-1 pb-safe">
@@ -807,7 +791,6 @@ function CreateActionDialog({
               isSubmitting={isSubmitting}
               handleSubmit={handleSubmit}
               onCancel={() => onOpenChange(false)}
-              userIsAdmin={userIsAdmin}
               pageCountryCode={countryCode}
             />
           </div>
@@ -827,7 +810,7 @@ function CreateActionDialog({
           <DialogDescription>
             {countryCode
               ? `New action for ${getGeoDisplayName(countryCode)}.`
-              : 'New action — pick a country below.'}
+              : 'New action. You can optionally choose a country below.'}
           </DialogDescription>
         </DialogHeader>
         <div className="overflow-y-auto overflow-x-hidden flex-1 min-h-0">
@@ -837,7 +820,6 @@ function CreateActionDialog({
             isSubmitting={isSubmitting}
             handleSubmit={handleSubmit}
             onCancel={() => onOpenChange(false)}
-            userIsAdmin={userIsAdmin}
             pageCountryCode={countryCode}
           />
         </div>
@@ -854,7 +836,6 @@ type SortOption = 'recent' | 'bounty' | 'deadline';
 
 export default function ActionsPage() {
   const { user } = useCurrentUser();
-  const { isOrganizer, isLoading: organizersLoading } = useOrganizers();
 
   const [selectedCountry, setSelectedCountry] = useState<string | undefined>(undefined);
   const [sortBy, setSortBy] = useState<SortOption>('recent');
@@ -866,15 +847,10 @@ export default function ActionsPage() {
     limit: 300,
   });
 
-  const userIsAdmin = user ? isAdmin(user.pubkey) : false;
-  const userIsLocalOrganizer =
-    user && selectedCountry ? isOrganizer(user.pubkey, selectedCountry) : false;
-  const canCreateAction = userIsAdmin || userIsLocalOrganizer;
-
   // Drive the global FAB from the canonical layout API so we get the same
   // circular Plus button every other page has.
   useLayoutOptions({
-    showFAB: !!user && canCreateAction,
+    showFAB: !!user,
     onFabClick: () => setCreateOpen(true),
   });
 
@@ -903,7 +879,7 @@ export default function ActionsPage() {
     description: 'Complete activist actions and earn Bitcoin bounties. Take photos, create art, gather information, and take action for change.',
   });
 
-  const isLoading = organizersLoading || actionsLoading;
+  const isLoading = actionsLoading;
 
   // Section split (parser already returns: current → upcoming → past).
   // We re-derive here so that local sorting can be applied per section.
@@ -1114,10 +1090,10 @@ export default function ActionsPage() {
               <div className="space-y-2 max-w-xs">
                 <h3 className="text-xl font-bold">No actions yet</h3>
                 <p className="text-muted-foreground text-sm">
-                  Be the first to create an action for {selectedCountryName}.
+                  {selectedCountry ? `Be the first to create an action for ${selectedCountryName}.` : 'Be the first to create an action.'}
                 </p>
               </div>
-              {canCreateAction && (
+              {user && (
                 <Button onClick={() => setCreateOpen(true)} className="rounded-full">
                   <Plus className="size-4 mr-2" />
                   Create action

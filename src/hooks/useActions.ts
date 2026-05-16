@@ -1,8 +1,6 @@
 import { useNostr } from '@nostrify/react';
 import { useQuery } from '@tanstack/react-query';
 import type { NostrEvent, NostrFilter } from '@nostrify/nostrify';
-import { useOrganizers } from './useOrganizers';
-import { ADMIN_PUBKEYS } from '@/lib/admins';
 import { sanitizeUrl } from '@/lib/sanitizeUrl';
 
 /**
@@ -22,7 +20,7 @@ export interface Action {
   description: string;
   type: 'photo' | 'art' | 'info' | 'action';
   bounty: number;
-  countryCode: string;
+  countryCode?: string;
   /** Unix timestamp — when action becomes active. Defaults to created_at. */
   startTime?: number;
   /** Unix timestamp — when action expires. Defaults to start + 48h. */
@@ -71,7 +69,7 @@ export function parseAction(event: NostrEvent): Action | null {
     ? 'Invalid image URL in event (only https URLs are allowed).'
     : undefined;
 
-  if (!dTag || !title || !typeTag || !bountyTag || !countryCode) {
+  if (!dTag || !title || !typeTag || !bountyTag) {
     return null;
   }
 
@@ -131,20 +129,14 @@ interface UseActionsOptions {
  *   then upcoming (soonest start first),
  *   then past (most recently expired first).
  *
- * Only events authored by platform admins or per-country organizers are
- * surfaced — anyone else publishing kind 36639 is ignored client-side.
+ * Actions are user-generated. Country filtering only applies when a country
+ * code is provided.
  */
 export function useActions({ countryCode, limit = 50 }: UseActionsOptions = {}) {
   const { nostr } = useNostr();
-  const { organizers, isLoading: organizersLoading } = useOrganizers();
-
-  const allowedCreators = new Set([
-    ...organizers.map((org) => org.pubkey),
-    ...ADMIN_PUBKEYS,
-  ]);
 
   return useQuery({
-    queryKey: ['agora-actions', countryCode, limit, organizers.length],
+    queryKey: ['agora-actions', countryCode, limit],
     queryFn: async (c) => {
       const signal = AbortSignal.any([c.signal, AbortSignal.timeout(5000)]);
 
@@ -169,7 +161,6 @@ export function useActions({ countryCode, limit = 50 }: UseActionsOptions = {}) 
       const parsed = allEvents
         .map(parseAction)
         .filter((c): c is Action => c !== null)
-        .filter((c) => allowedCreators.has(c.pubkey))
         .filter((c) => !countryCode || c.countryCode === countryCode.toUpperCase());
 
       // Deduplicate by addressable coordinate (pubkey:d-tag), keeping the
@@ -216,14 +207,11 @@ export function useActions({ countryCode, limit = 50 }: UseActionsOptions = {}) 
     },
     staleTime: 60_000,
     refetchInterval: 120_000,
-    enabled: !organizersLoading,
   });
 }
 
 /**
- * Fetches a single action by its addressable coordinate. Author filtering is
- * required so the d-tag identifier alone cannot be used by an attacker to
- * surface a spoofed action.
+ * Fetches a single action by its addressable coordinate.
  */
 export function useAction(pubkey: string | undefined, identifier: string | undefined) {
   const { nostr } = useNostr();
