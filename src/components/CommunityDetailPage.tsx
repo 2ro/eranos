@@ -4,6 +4,7 @@ import { nip19 } from 'nostr-tools';
 import {
   ArrowLeft,
   Activity as ActivityIcon,
+  Award,
   CalendarDays,
   Crown,
   Info,
@@ -23,7 +24,7 @@ import {
 } from 'lucide-react';
 import type { NostrEvent, NostrMetadata } from '@nostrify/nostrify';
 
-import { AddMemberPanel } from '@/components/AddMemberDialog';
+import { AddMemberDialog } from '@/components/AddMemberDialog';
 import { CreateCommunityDialog } from '@/components/CreateCommunityDialog';
 import { CreateCommunityEventDialog } from '@/components/CreateCommunityEventDialog';
 import { CreateActionDialog } from '@/components/CreateActionDialog';
@@ -38,7 +39,7 @@ import { BanConfirmDialog } from '@/components/BanConfirmDialog';
 import { CommunityChatPanel } from '@/components/CommunityChatPanel';
 import { CommunityPulsePanel } from '@/components/CommunityPulsePanel';
 import { NoteContent } from '@/components/NoteContent';
-import { CommunityBadgePanel } from '@/components/CommunityBadgePanel';
+import { CommunityBadgeEditorDialog } from '@/components/CommunityBadgePanel';
 import { ComposeBox } from '@/components/ComposeBox';
 import { FollowToggleButton } from '@/components/FollowButton';
 import { CreateGoalDialog } from '@/components/CreateGoalDialog';
@@ -195,6 +196,8 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
   const [eventDialogOpen, setEventDialogOpen] = useState(false);
   const [editCommunityOpen, setEditCommunityOpen] = useState(false);
   const [membersDialogOpen, setMembersDialogOpen] = useState(false);
+  const [addMembersDialogOpen, setAddMembersDialogOpen] = useState(false);
+  const [badgeDialogOpen, setBadgeDialogOpen] = useState(false);
   const [descriptionDialogOpen, setDescriptionDialogOpen] = useState(false);
 
   // Parse community definition
@@ -242,7 +245,7 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
 
   // Founder can add moderators + members; moderators (rank 0) can add members
   const isFounder = !!user && user.pubkey === event.pubkey;
-  const canAddMembers = !!viewerMember && viewerMember.rank === 0;
+  const canAddMembers = isFounder || (!!viewerMember && viewerMember.rank === 0);
 
   // NIP-51 kind 10004 is the standard Communities list. In the UI this is
   // presented as following a community.
@@ -639,7 +642,7 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
               )}
             </div>
 
-            {/* Banner action row — MembersOnly + Share + overflow menu (Unfollow / Edit) */}
+            {/* Banner action row — MembersOnly + Share + overflow menu */}
             <div className="flex items-center gap-0.5 shrink-0 [text-shadow:none]">
               <MembersOnlyToggle
                 className="text-white/90 hover:text-white hover:bg-white/15 data-[state=on]:text-white"
@@ -652,25 +655,41 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
               >
                 <Share2 className="size-5" />
               </button>
-              {isFounder && community && (
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <button
-                      type="button"
-                      className={bannerActionClassName}
-                      aria-label="More actions"
-                    >
-                      <MoreVertical className="size-5" />
-                    </button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end" side="top" sideOffset={6} className="min-w-[180px]">
-                    <DropdownMenuItem onSelect={() => setEditCommunityOpen(true)}>
-                      <Pencil className="size-4 mr-2" />
-                      Edit community
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <button
+                    type="button"
+                    className={bannerActionClassName}
+                    aria-label="More actions"
+                  >
+                    <MoreVertical className="size-5" />
+                  </button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" side="top" sideOffset={6} className="min-w-[180px]">
+                  <DropdownMenuItem onSelect={() => setMembersDialogOpen(true)}>
+                    <Users className="size-4 mr-2" />
+                    View members
+                  </DropdownMenuItem>
+                  {canAddMembers && community && (
+                    <DropdownMenuItem onSelect={() => setAddMembersDialogOpen(true)}>
+                      <UserPlus className="size-4 mr-2" />
+                      Add members
                     </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              )}
+                  )}
+                  {isFounder && community && (
+                    <>
+                      <DropdownMenuItem onSelect={() => setBadgeDialogOpen(true)}>
+                        <Award className="size-4 mr-2" />
+                        Edit badge
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onSelect={() => setEditCommunityOpen(true)}>
+                        <Pencil className="size-4 mr-2" />
+                        Edit community
+                      </DropdownMenuItem>
+                    </>
+                  )}
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
           </div>
         </div>
@@ -806,10 +825,7 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
         </DialogContent>
       </Dialog>
 
-      {/* Members dialog — opened from the avatar stack in the banner. Replaces
-          the former Members tab; contains badge panel, leadership +
-          rank-and-file sections, and (for founders/mods) the inline
-          search-and-add panel at the bottom. */}
+      {/* Members dialog — opened from the avatar stack or overflow menu. */}
       <Dialog open={membersDialogOpen} onOpenChange={setMembersDialogOpen}>
         <DialogContent className="max-w-lg max-h-[85vh] flex flex-col overflow-hidden p-0 gap-0">
           <DialogHeader className="px-5 pt-5 pb-3 border-b border-border shrink-0">
@@ -823,16 +839,6 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
           </DialogHeader>
 
           <div className="flex-1 overflow-y-auto">
-            {community && (
-              <section className="border-b border-border px-5 py-4">
-                <CommunityBadgePanel
-                  communityEvent={event}
-                  community={community}
-                  isFounder={isFounder}
-                />
-              </section>
-            )}
-
             {membersLoading ? (
               <MembersSkeleton />
             ) : memberSections.length === 0 ? (
@@ -877,22 +883,30 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
             )}
           </div>
 
-          {canAddMembers && community && (
-            <div className="border-t border-border px-5 py-4 shrink-0 max-h-[50vh] overflow-y-auto">
-              <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-3 flex items-center gap-2">
-                <UserPlus className="size-3.5" />
-                Add members
-              </h3>
-              <AddMemberPanel
-                communityEvent={event}
-                community={community}
-                isFounder={isFounder}
-                existingMemberPubkeys={allMemberPubkeys}
-              />
-            </div>
-          )}
         </DialogContent>
       </Dialog>
+
+      {/* Add members dialog — founder/moderator only. */}
+      {canAddMembers && community && (
+        <AddMemberDialog
+          open={addMembersDialogOpen}
+          onOpenChange={setAddMembersDialogOpen}
+          communityEvent={event}
+          community={community}
+          isFounder={isFounder}
+          existingMemberPubkeys={allMemberPubkeys}
+        />
+      )}
+
+      {/* Member badge editor — founder only. */}
+      {isFounder && community && (
+        <CommunityBadgeEditorDialog
+          open={badgeDialogOpen}
+          onOpenChange={setBadgeDialogOpen}
+          communityEvent={event}
+          community={community}
+        />
+      )}
 
       {/* Member ban confirmation dialog */}
       {banTargetPubkey && communityATag && (

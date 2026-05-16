@@ -144,6 +144,33 @@ export function CommunityBadgePanel({ communityEvent, community, isFounder }: Co
   );
 }
 
+export function CommunityBadgeEditorDialog({
+  open,
+  onOpenChange,
+  communityEvent,
+  community,
+}: {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  communityEvent: NostrEvent;
+  community: ParsedCommunity;
+}) {
+  const badgeRef = useMemo(() => parseBadgeATag(community.memberBadgeATag), [community.memberBadgeATag]);
+  const badgeRefs = useMemo(() => badgeRef ? [badgeRef] : [], [badgeRef]);
+  const { badgeMap } = useBadgeDefinitions(badgeRefs);
+  const badge = community.memberBadgeATag ? badgeMap.get(community.memberBadgeATag) : undefined;
+
+  return (
+    <CommunityBadgeDialog
+      open={open}
+      onOpenChange={onOpenChange}
+      communityEvent={communityEvent}
+      community={community}
+      badge={badge}
+    />
+  );
+}
+
 function CommunityBadgeDialog({
   open,
   onOpenChange,
