@@ -7,6 +7,7 @@ import {
   Download,
   Eye,
   EyeOff,
+  Search,
   Loader2,
   UserPlus,
   Users,
@@ -45,6 +46,8 @@ import { AgoraBoltIcon } from "@/components/icons/AgoraBoltIcon";
 import { toast } from "@/hooks/useToast";
 import { useUploadFile } from "@/hooks/useUploadFile";
 import { VERIFIED_FOLLOW_PACK } from "@/lib/agoraDefaults";
+import { COUNTRIES } from "@/lib/countries";
+import { createCountryIdentifier, parseCountryIdentifier } from "@/lib/countryIdentifiers";
 import { genUserName } from "@/lib/genUserName";
 
 import { cn } from "@/lib/utils";
@@ -227,19 +230,26 @@ const SUGGESTED_PACKS: { kind: number; pubkey: string; identifier: string }[] =
     VERIFIED_FOLLOW_PACK,
   ];
 
+const COUNTRY_LIST = Object.entries(COUNTRIES)
+  .map(([code, { name, flag }]) => ({ code, name, flag }))
+  .sort((a, b) => a.name.localeCompare(b.name));
+
+const SUGGESTED_COUNTRY_CODES = ["US", "BR", "VE", "NG", "IN", "JP", "DE", "ZA"];
+
 // Steps for signup (includes keygen + profile) vs. settings-only (existing login)
 type SignupStep = "keygen" | "download" | "profile";
-type SettingsStep = "follows" | "outro";
+type SettingsStep = "countries" | "follows" | "outro";
 type Step = SignupStep | SettingsStep;
 
 const SIGNUP_STEPS: Step[] = [
   "keygen",
   "download",
   "profile",
+  "countries",
   "follows",
   "outro",
 ];
-const SETTINGS_STEPS: Step[] = ["follows", "outro"];
+const SETTINGS_STEPS: Step[] = ["countries", "follows", "outro"];
 
 function SetupQuestionnaire({
   onComplete,
@@ -348,7 +358,7 @@ function SetupQuestionnaire({
     }
   }, [nsec, login, next, config.appName]);
 
-  // Save settings and transition to the follows step (or outro if they have follows)
+  // Save settings and transition to the country step before people discovery.
   const handleSaveAndContinue = useCallback(async () => {
     setIsSaving(true);
 
@@ -456,11 +466,7 @@ function SetupQuestionnaire({
     setHasFollows(userHasFollows);
     setIsSaving(false);
 
-    if (userHasFollows) {
-      goTo("outro");
-    } else {
-      goTo("follows");
-    }
+    goTo("countries");
   }, [updateConfig, updateSettings, user, nostr, goTo]);
 
   return (
@@ -488,6 +494,17 @@ function SetupQuestionnaire({
           )}
 
           {/* Settings steps */}
+          {step === "countries" && (
+            <CountriesStep
+              onNext={(didFollowCountries) => {
+                if (didFollowCountries) onPreload();
+                goTo(hasFollows ? "outro" : "follows");
+              }}
+              onBack={back}
+              canBack={stepIndex > 0}
+            />
+          )}
+
           {step === "follows" && hasFollows === false && (
             <FollowsStep
               onNext={(didFollow) => {
@@ -808,6 +825,201 @@ function ProfileStep({
 // ---------------------------------------------------------------------------
 // Settings steps
 // ---------------------------------------------------------------------------
+
+function CountriesStep({
+  onNext,
+  onBack,
+  canBack,
+}: {
+  onNext: (didFollowCountries: boolean) => void;
+  onBack: () => void;
+  canBack: boolean;
+}) {
+  const { nostr } = useNostr();
+  const { user } = useCurrentUser();
+  const { mutateAsync: publishEvent } = useNostrPublish();
+  const queryClient = useQueryClient();
+  const [search, setSearch] = useState("");
+  const [selectedCodes, setSelectedCodes] = useState<Set<string>>(new Set());
+  const [isSaving, setIsSaving] = useState(false);
+
+  const suggestedCountries = useMemo(
+    () => SUGGESTED_COUNTRY_CODES
+      .map((code) => COUNTRY_LIST.find((country) => country.code === code))
+      .filter((country): country is (typeof COUNTRY_LIST)[number] => !!country),
+    [],
+  );
+
+  const filteredCountries = useMemo(() => {
+    const query = search.trim().toLowerCase();
+    if (!query) return COUNTRY_LIST;
+    return COUNTRY_LIST.filter(
+      (country) => country.name.toLowerCase().includes(query) || country.code.toLowerCase().includes(query),
+    );
+  }, [search]);
+
+  const visibleCountries = search.trim() ? filteredCountries.slice(0, 24) : suggestedCountries;
+
+  const toggleCountry = (code: string) => {
+    setSelectedCodes((current) => {
+      const next = new Set(current);
+      if (next.has(code)) {
+        next.delete(code);
+      } else {
+        next.add(code);
+      }
+      return next;
+    });
+  };
+
+  const handleContinue = async () => {
+    if (!user || selectedCodes.size === 0) {
+      onNext(false);
+      return;
+    }
+
+    setIsSaving(true);
+    try {
+      const identifiers = Array.from(selectedCodes).map((code) => createCountryIdentifier(code));
+      const prev = await fetchFreshEvent(nostr, {
+        kinds: [10015],
+        authors: [user.pubkey],
+      });
+
+      const existingTags = prev?.tags ?? [];
+      const missingIdentifiers = identifiers.filter((identifier) => !existingTags.some(
+        ([name, value]) => name === "i" && parseCountryIdentifier(value) === parseCountryIdentifier(identifier),
+      ));
+
+      const newTags = missingIdentifiers.length === 0
+        ? existingTags
+        : [
+          ...existingTags,
+          ...missingIdentifiers.map((identifier) => ["i", identifier]),
+        ];
+
+      if (newTags !== existingTags) {
+        await publishEvent({
+          kind: 10015,
+          content: prev?.content ?? "",
+          tags: newTags,
+          prev: prev ?? undefined,
+        });
+        queryClient.invalidateQueries({ queryKey: ["interests", user.pubkey] });
+        queryClient.invalidateQueries({ queryKey: ["following-country-feed"] });
+        queryClient.invalidateQueries({ queryKey: ["following-feed"] });
+      }
+
+      onNext(true);
+    } catch (error) {
+      console.error("Failed to follow countries:", error);
+      toast({
+        title: "Could not follow countries",
+        description: "Please try again or skip this step for now.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  return (
+    <div className="flex flex-col gap-6 animate-in fade-in slide-in-from-right-4 duration-400">
+      <div className="space-y-2">
+        <h2 className="text-xl font-semibold tracking-tight">
+          Choose your countries
+        </h2>
+        <p className="text-sm text-muted-foreground">
+          Follow countries you care about to bring local conversations and actions into your feed.
+        </p>
+      </div>
+
+      <div className="relative">
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground pointer-events-none" />
+        <Input
+          placeholder="Search countries..."
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          className="pl-9"
+        />
+      </div>
+
+      {visibleCountries.length > 0 ? (
+        <div className="grid grid-cols-2 gap-2 max-h-80 overflow-y-auto pr-1">
+          {visibleCountries.map((country) => {
+            const isSelected = selectedCodes.has(country.code);
+            return (
+              <button
+                key={country.code}
+                type="button"
+                onClick={() => toggleCountry(country.code)}
+                className={cn(
+                  "flex items-center gap-3 rounded-xl border p-3 text-left transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+                  isSelected
+                    ? "border-primary bg-primary/10 text-primary"
+                    : "border-border hover:bg-secondary/70",
+                )}
+              >
+                <span className="text-2xl leading-none" aria-hidden="true">
+                  {country.flag}
+                </span>
+                <span className="min-w-0 flex-1">
+                  <span className="block truncate text-sm font-medium text-foreground">
+                    {country.name}
+                  </span>
+                  <span className="text-xs text-muted-foreground">
+                    {country.code}
+                  </span>
+                </span>
+                {isSelected && <Check className="size-4 shrink-0" />}
+              </button>
+            );
+          })}
+        </div>
+      ) : (
+        <div className="rounded-xl border border-dashed p-8 text-center text-sm text-muted-foreground">
+          No countries match "{search}".
+        </div>
+      )}
+
+      {search.trim() && filteredCountries.length > visibleCountries.length && (
+        <p className="text-center text-xs text-muted-foreground">
+          Keep typing to narrow {filteredCountries.length} matches.
+        </p>
+      )}
+
+      <div className="flex gap-3">
+        <Button
+          variant="ghost"
+          onClick={onBack}
+          className="flex-1 rounded-full h-11"
+          disabled={!canBack || isSaving}
+        >
+          Back
+        </Button>
+        <Button
+          onClick={handleContinue}
+          className="flex-1 rounded-full h-11 gap-1.5"
+          disabled={isSaving}
+        >
+          {isSaving ? (
+            <>
+              <Loader2 className="w-4 h-4 animate-spin" /> Saving...
+            </>
+          ) : selectedCodes.size > 0 ? (
+            <>
+              Continue <ChevronRight className="w-4 h-4" />
+            </>
+          ) : (
+            <>
+              Skip for now <ChevronRight className="w-4 h-4" />
+            </>
+          )}
+        </Button>
+      </div>
+    </div>
+  );
+}
 
 // ---------------------------------------------------------------------------
 // Follow Packs Step
