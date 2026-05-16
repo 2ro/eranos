@@ -17,7 +17,6 @@ import { BookReviewFormDialog } from '@/components/BookReviewForm';
 import { ProfileHoverCard } from '@/components/ProfileHoverCard';
 import { SubHeaderBar } from '@/components/SubHeaderBar';
 import { TabButton } from '@/components/TabButton';
-import { ARC_OVERHANG_PX } from '@/components/ArcBackground';
 import {
   UrlContentHeader,
   BookContentHeader,
@@ -598,7 +597,6 @@ function BookContentTabs({ isbn, commentRoot, orderedReplies, commentsLoading }:
           onClick={() => setActiveTab('reviews')}
         />
       </SubHeaderBar>
-      <div style={{ height: ARC_OVERHANG_PX }} />
 
       {activeTab === 'comments' ? (
         <ExternalCommentsSection

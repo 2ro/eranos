@@ -13,7 +13,6 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { ComposeBox } from '@/components/ComposeBox';
 import { NoteCard } from '@/components/NoteCard';
 import { FlatThreadedReplyList } from '@/components/ThreadedReplyList';
-import { ARC_OVERHANG_PX } from '@/components/ArcBackground';
 import { SubHeaderBar } from '@/components/SubHeaderBar';
 import { TabButton } from '@/components/TabButton';
 import { useAuthor } from '@/hooks/useAuthor';
@@ -232,7 +231,6 @@ export function BadgeDetailContent({ event }: { event: NostrEvent }) {
       </SubHeaderBar>
 
       {/* Tab content */}
-      <div style={{ height: ARC_OVERHANG_PX }} />
       {activeTab === 'awarded' ? (
         <AwardedToTab
           awardedPubkeys={awardedPubkeys}

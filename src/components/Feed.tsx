@@ -23,7 +23,6 @@ import { useWorldFeed } from '@/hooks/useWorldFeed';
 import { shouldHideFeedEvent } from '@/lib/feedUtils';
 import { isEventMuted } from '@/lib/muteHelpers';
 import { SubHeaderBar } from '@/components/SubHeaderBar';
-import { ARC_OVERHANG_PX } from '@/components/ArcBackground';
 import { TabButton } from '@/components/TabButton';
 import { Button } from '@/components/ui/button';
 import { useNavHidden } from '@/contexts/LayoutContext';
@@ -281,7 +280,6 @@ export function Feed({ kinds, tagFilters, header, hideCompose, emptyMessage, fee
       )}
 
       {/* Feed content — saved feed tab gets its own stream */}
-      {user && <div style={{ height: ARC_OVERHANG_PX }} />}
       {activeSavedFeed ? (
         <SavedFeedContent feed={activeSavedFeed} />
       ) : (

@@ -85,7 +85,6 @@ import { formatNumber } from '@/lib/formatNumber';
 import { SubHeaderBar } from '@/components/SubHeaderBar';
 import { useActiveTabIndicator } from '@/components/SubHeaderBarContext';
 import { TabButton } from '@/components/TabButton';
-import { ARC_OVERHANG_PX } from '@/components/ArcBackground';
 import type { AddrCoords } from '@/hooks/useEvent';
 import { sanitizeUrl } from '@/lib/sanitizeUrl';
 import { impactMedium } from '@/lib/haptics';
@@ -2002,8 +2001,6 @@ type EditableTab = { label: string; isCore: boolean; tab?: ProfileTab };
             </div>
           )}
         </SubHeaderBar>
-
-        <div style={{ height: ARC_OVERHANG_PX }} />
 
         {/* Add/edit single tab modal */}
         {pubkey && (

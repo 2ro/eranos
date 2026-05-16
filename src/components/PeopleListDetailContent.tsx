@@ -37,7 +37,6 @@ import { VerifiedNip05Text } from '@/components/Nip05Badge';
 import { AddMembersDialog } from '@/components/AddMembersDialog';
 import { ComposeBox } from '@/components/ComposeBox';
 import { FlatThreadedReplyList } from '@/components/ThreadedReplyList';
-import { ARC_OVERHANG_PX } from '@/components/ArcBackground';
 import { PostActionBar } from '@/components/PostActionBar';
 import { NoteMoreMenu } from '@/components/NoteMoreMenu';
 import { FollowAllSplitButton } from '@/components/FollowAllSplitButton';
@@ -512,9 +511,6 @@ export function PeopleListDetailContent({ event }: { event: NostrEvent }) {
           onClick={() => setActiveTab('comments')}
         />
       </SubHeaderBar>
-
-      {/* Spacer below the pinned tabs (matches ProfilePage / BadgeDetailContent). */}
-      <div style={{ height: ARC_OVERHANG_PX }} />
 
       {/* Owner "Add members" row — above members tab content */}
       {ownerCanRemove && activeTab === 'members' && (

@@ -122,9 +122,6 @@ export function CommunitiesPage() {
         </SubHeaderBar>
       )}
 
-      {/* Arc overhang spacer */}
-      {user && <div style={{ height: 20 }} />}
-
       {/* Tab content */}
       {activeTab === 'mine' ? (
         <MyCommunitiesTab />

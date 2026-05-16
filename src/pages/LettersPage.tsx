@@ -17,7 +17,6 @@ import { LoginArea } from '@/components/auth/LoginArea';
 import { PageHeader } from '@/components/PageHeader';
 import { SubHeaderBar } from '@/components/SubHeaderBar';
 import { TabButton } from '@/components/TabButton';
-import { ARC_OVERHANG_PX } from '@/components/ArcBackground';
 import { EnvelopeCard } from '@/components/letter/EnvelopeCard';
 import { LetterDetailSheet } from '@/components/letter/LetterDetailSheet';
 import type { Letter } from '@/lib/letterTypes';
@@ -111,7 +110,6 @@ export function LettersPage() {
         <TabButton label="Inbox" active={tab === 'inbox'} onClick={() => setTab('inbox')} />
         <TabButton label="Sent" active={tab === 'sent'} onClick={() => setTab('sent')} />
       </SubHeaderBar>
-      <div style={{ height: ARC_OVERHANG_PX }} />
 
       {/* Envelope grid */}
       <div className="px-4 py-3">
