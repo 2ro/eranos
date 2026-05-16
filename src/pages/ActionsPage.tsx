@@ -18,10 +18,13 @@ import { isAdmin } from '@/lib/admins';
 import { createCountryIdentifier } from '@/lib/countryIdentifiers';
 import { getAllCountries, getGeoDisplayName, countryCodeToFlag } from '@/lib/countries';
 import { getDisplayName } from '@/lib/genUserName';
+import { DEFAULT_CHALLENGE_COVERS, DEFAULT_COVER_IMAGE } from '@/lib/defaultChallengeCovers';
+import { useLayoutOptions } from '@/contexts/LayoutContext';
 import { cn } from '@/lib/utils';
 
 import { PageHeader } from '@/components/PageHeader';
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { TimezoneSwitcher } from '@/components/TimezoneSwitcher';
+import { Card, CardContent } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -50,7 +53,7 @@ import {
 import {
   Camera, Palette, Info, Zap, Clock, Bitcoin, Plus, ChevronRight, Loader2,
   Link as LinkIcon, Check, MoreHorizontal, Trash2, Upload, ListFilter,
-  Calendar, DollarSign, Globe, AlertTriangle,
+  Calendar, DollarSign, Globe, Megaphone,
 } from 'lucide-react';
 
 const CHALLENGE_ICONS = {
@@ -64,31 +67,60 @@ function formatSats(sats: number): string {
   return sats.toLocaleString();
 }
 
+/**
+ * Convert a calendar date+time (interpreted in the given IANA timezone) to a
+ * Unix timestamp in seconds.
+ *
+ * The trick: we ask `Intl.DateTimeFormat` to format a candidate UTC instant in
+ * the target zone, see how far off the wall-clock fields are, and shift by
+ * that delta. One iteration suffices because the zone offset is locally
+ * constant (DST transitions don't move by more than an hour, well below the
+ * day-granularity inputs we receive).
+ */
+function unixSecondsInTimezone(
+  year: number, month: number, day: number,
+  hours: number, minutes: number,
+  timezone: string,
+): number {
+  const utcGuess = Date.UTC(year, month - 1, day, hours, minutes, 0);
+  const formatter = new Intl.DateTimeFormat('en-US', {
+    timeZone: timezone,
+    year: 'numeric', month: '2-digit', day: '2-digit',
+    hour: '2-digit', minute: '2-digit', second: '2-digit',
+    hour12: false,
+  });
+  const parts = Object.fromEntries(
+    formatter.formatToParts(new Date(utcGuess)).map((p) => [p.type, p.value]),
+  );
+  const asWallClock = Date.UTC(
+    Number(parts.year),
+    Number(parts.month) - 1,
+    Number(parts.day),
+    Number(parts.hour) === 24 ? 0 : Number(parts.hour),
+    Number(parts.minute),
+    Number(parts.second),
+  );
+  const offsetMs = utcGuess - asWallClock;
+  return Math.floor((utcGuess + offsetMs) / 1000);
+}
+
 // ─────────────────────────────────────────────────────────────────────────────
 // Skeletons / Cards
 // ─────────────────────────────────────────────────────────────────────────────
 
 function ChallengeSkeleton() {
   return (
-    <Card>
-      <CardHeader>
-        <div className="flex items-start gap-3">
-          <Skeleton className="h-12 w-12 rounded-lg" />
-          <div className="flex-1 space-y-2">
-            <Skeleton className="h-5 w-3/4" />
-            <Skeleton className="h-4 w-1/2" />
-          </div>
-        </div>
-      </CardHeader>
-      <CardContent>
-        <div className="space-y-2">
-          <Skeleton className="h-4 w-full" />
-          <Skeleton className="h-4 w-4/5" />
+    <Card className="overflow-hidden">
+      <Skeleton className="h-40 w-full rounded-none" />
+      <CardContent className="space-y-3 pt-4">
+        <Skeleton className="h-6 w-3/4" />
+        <Skeleton className="h-4 w-full" />
+        <Skeleton className="h-4 w-4/5" />
+        <div className="flex items-center justify-between pt-2">
+          <Skeleton className="h-4 w-20" />
+          <Skeleton className="h-4 w-24" />
         </div>
       </CardContent>
-      <CardFooter>
-        <Skeleton className="h-10 w-full" />
-      </CardFooter>
     </Card>
   );
 }
@@ -205,124 +237,96 @@ function ChallengeCard({ challenge, isExpired }: { challenge: Challenge; isExpir
     identifier: challenge.id,
   });
 
+  // Always show a cover — fall back to the default if the author didn't set
+  // one, or the URL failed to validate / load.
+  const coverImage = (challenge.image && !imageLoadFailed)
+    ? challenge.image
+    : DEFAULT_COVER_IMAGE;
+
   return (
-    <RouterLink to={`/${naddr}`} className="block h-full">
+    <RouterLink to={`/${naddr}`} className="block group">
       <Card
         className={cn(
-          'relative overflow-hidden border-2 border-primary/30 transition-all duration-300 group cursor-pointer h-full flex flex-col',
-          !isExpired && 'hover:border-primary/60 hover:shadow-2xl hover:shadow-primary/20 hover:-translate-y-1',
-          isExpired && 'border-border/80 bg-muted/10',
+          'overflow-hidden transition-colors',
+          'hover:bg-muted/30',
+          isExpired && 'opacity-70',
         )}
       >
-        {challenge.image && !imageLoadFailed && (
-          <div className="relative w-full h-48 overflow-hidden">
-            <img
-              src={challenge.image}
-              alt={challenge.title}
-              className="w-full h-full object-cover"
-              onError={() => setImageLoadFailed(true)}
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
-            <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-primary/80 via-primary to-primary/80" />
-          </div>
-        )}
-        {!challenge.image && challenge.imageError && (
-          <div className="mx-4 mt-4 rounded-lg border border-destructive/40 bg-destructive/10 p-3 text-xs text-destructive">
-            <div className="flex items-center gap-2 font-semibold">
-              <AlertTriangle className="h-3.5 w-3.5" />
-              Cover image rejected
-            </div>
-            <p className="mt-1">{challenge.imageError}</p>
-          </div>
-        )}
-        {challenge.image && imageLoadFailed && (
-          <div className="mx-4 mt-4 rounded-lg border border-destructive/40 bg-destructive/10 p-3 text-xs text-destructive">
-            <div className="flex items-center gap-2 font-semibold">
-              <AlertTriangle className="h-3.5 w-3.5" />
-              Cover image failed to load
-            </div>
-            <p className="mt-1 break-all">{challenge.image}</p>
-          </div>
-        )}
+        {/* Cover image — full bleed, modest height */}
+        <div className="relative w-full h-40 overflow-hidden bg-muted">
+          <img
+            src={coverImage}
+            alt={challenge.title}
+            className={cn(
+              'w-full h-full object-cover transition-transform duration-300',
+              !isExpired && 'group-hover:scale-[1.02]',
+              isExpired && 'grayscale',
+            )}
+            onError={() => setImageLoadFailed(true)}
+            loading="lazy"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
 
-        <CardHeader className="pb-3 pt-5">
-          <div className="flex items-start gap-4">
-            <div
-              className={cn(
-                'p-3 rounded-xl bg-gradient-to-br from-primary/20 to-primary/20 border-2 border-primary/40 shadow-md',
-                isExpired && 'grayscale',
-              )}
-            >
-              <Icon className="h-7 w-7 text-primary" />
+          {/* Country flag — top-left, sitting on the image */}
+          <span
+            className="absolute top-3 left-3 text-2xl drop-shadow-md"
+            title={getGeoDisplayName(challenge.countryCode)}
+          >
+            {countryCodeToFlag(challenge.countryCode)}
+          </span>
+
+          {/* Deadline / expired pill — top-right */}
+          {isExpired ? (
+            <div className="absolute top-3 right-3 px-2 py-0.5 rounded-full bg-background/90 text-xs font-medium text-muted-foreground flex items-center gap-1">
+              <Clock className="h-3 w-3" />
+              Expired
             </div>
+          ) : challenge.deadline ? (
+            <div className="absolute top-3 right-3 px-2 py-0.5 rounded-full bg-background/90 text-xs font-medium flex items-center gap-1">
+              <Clock className="h-3 w-3" />
+              {format(challenge.deadline * 1000, 'MMM d')}
+            </div>
+          ) : null}
+        </div>
+
+        <CardContent className="pt-4 pb-4 space-y-3">
+          <div className="flex items-start gap-2">
+            <Icon className="h-5 w-5 text-primary shrink-0 mt-0.5" />
             <div className="flex-1 min-w-0">
-              <div className="flex items-center justify-between gap-2">
-                <CardTitle className={cn(
-                  'text-xl font-black line-clamp-2 transition-colors leading-tight',
-                  !isExpired && 'group-hover:text-primary',
-                  isExpired && 'text-muted-foreground',
-                )}>
-                  {challenge.title}
-                </CardTitle>
-                <ChallengeShareMenu challenge={challenge} />
-              </div>
-              <div className="flex items-center gap-2 mt-2 flex-wrap">
-                <span className="text-xl" title={getGeoDisplayName(challenge.countryCode)}>
-                  {countryCodeToFlag(challenge.countryCode)}
-                </span>
-                {isExpired ? (
-                  <div className="px-2 py-1 rounded-md bg-muted text-muted-foreground text-xs font-semibold flex items-center gap-1">
-                    <Clock className="h-3 w-3" />
-                    Expired
-                  </div>
-                ) : challenge.deadline ? (
-                  <div className="px-2 py-1 rounded-md bg-accent/10 border border-accent/30 text-accent text-xs font-semibold flex items-center gap-1">
-                    <Clock className="h-3 w-3" />
-                    {format(challenge.deadline * 1000, 'MMM d, yyyy')}
-                  </div>
-                ) : null}
-              </div>
+              <h3 className={cn(
+                'text-lg font-bold leading-tight line-clamp-2',
+                !isExpired && 'group-hover:text-primary transition-colors',
+              )}>
+                {challenge.title}
+              </h3>
+            </div>
+            <div onClick={(e) => e.preventDefault()}>
+              <ChallengeShareMenu challenge={challenge} />
             </div>
           </div>
-        </CardHeader>
 
-        <CardContent className="flex-1 flex flex-col pb-4">
           <p className={cn(
-            'text-sm line-clamp-4 mb-4 flex-1 leading-relaxed',
-            isExpired ? 'text-muted-foreground/90' : 'text-foreground/80',
+            'text-sm line-clamp-3 leading-relaxed',
+            isExpired ? 'text-muted-foreground' : 'text-muted-foreground',
           )}>
             {challenge.description}
           </p>
-          <div className={cn(
-            'p-3 rounded-lg border-2 shadow-sm space-y-2',
-            isExpired
-              ? 'bg-muted/40 border-border/70'
-              : 'bg-gradient-to-r from-primary/10 to-primary/5 border-primary/40',
-          )}>
-            <div className="flex items-center gap-2 min-w-0">
-              <Bitcoin className="h-5 w-5 text-primary" />
-              <span className="font-bold text-lg">{formatSats(challenge.bounty)}</span>
-              <span className="text-xs text-muted-foreground">sats</span>
-            </div>
-            <div className="flex items-center gap-2 text-xs text-muted-foreground min-w-0">
-              <Avatar className="h-6 w-6 border-2 border-background shrink-0">
-                <AvatarImage src={metadata?.picture} />
-                <AvatarFallback className="text-[10px] bg-muted">
-                  {displayName.slice(0, 2).toUpperCase()}
-                </AvatarFallback>
-              </Avatar>
-              <span className="font-medium truncate">{displayName}</span>
-            </div>
+
+          {/* Meta row: bounty · author. No nested box. */}
+          <div className="flex items-center gap-2 text-sm pt-1 min-w-0">
+            <Bitcoin className="h-4 w-4 text-primary shrink-0" />
+            <span className="font-semibold">{formatSats(challenge.bounty)}</span>
+            <span className="text-muted-foreground text-xs">sats</span>
+            <span className="text-muted-foreground/50">·</span>
+            <Avatar className="h-5 w-5 shrink-0">
+              <AvatarImage src={metadata?.picture} />
+              <AvatarFallback className="text-[9px] bg-muted">
+                {displayName.slice(0, 2).toUpperCase()}
+              </AvatarFallback>
+            </Avatar>
+            <span className="text-muted-foreground text-xs truncate">{displayName}</span>
           </div>
         </CardContent>
-
-        <CardFooter className="mt-auto pt-0">
-          <Button className="w-full gap-2" variant={isExpired ? 'outline' : 'default'}>
-            <Zap className="h-4 w-4 flex-shrink-0" />
-            <span className="truncate">{isExpired ? 'View archived action' : 'View action'}</span>
-            <ChevronRight className="h-4 w-4 flex-shrink-0" />
-          </Button>
-        </CardFooter>
       </Card>
     </RouterLink>
   );
@@ -343,6 +347,8 @@ interface CreateFormState {
   time: string;
   coverImage: string;
   selectedCountry: string;
+  /** IANA timezone used to interpret start/deadline date+time fields. */
+  timezone: string;
 }
 
 function CreateChallengeForm({
@@ -396,12 +402,22 @@ function CreateChallengeForm({
     try {
       const [[, url]] = await uploadFile(file);
       setFormData({ ...formData, coverImage: url });
+      setSelectedDefaultId(null);
     } catch (error) {
       console.error('Failed to upload cover image:', error);
     }
   };
 
+  const handleDefaultCoverSelect = (coverId: string, coverUrl: string) => {
+    setFormData({ ...formData, coverImage: coverUrl });
+    setSelectedDefaultId(coverId);
+  };
+
   const [countryPickerOpen, setCountryPickerOpen] = useState(false);
+  const [selectedDefaultId, setSelectedDefaultId] = useState<string | null>(() => {
+    const match = DEFAULT_CHALLENGE_COVERS.find((c) => c.url === formData.coverImage);
+    return match?.id ?? null;
+  });
 
   return (
     <>
@@ -463,16 +479,44 @@ function CreateChallengeForm({
         )}
 
         <div className="space-y-2">
-          <Label>Cover image (optional)</Label>
-          {formData.coverImage && (
-            <div className="relative w-full h-32 rounded-lg overflow-hidden border border-border">
-              <img
-                src={formData.coverImage}
-                alt="Cover preview"
-                className="w-full h-full object-cover"
-              />
+          <Label>Cover image</Label>
+
+          {/* Live preview */}
+          <div className="relative w-full h-32 rounded-lg overflow-hidden border border-border">
+            <img
+              src={formData.coverImage || DEFAULT_COVER_IMAGE}
+              alt="Cover preview"
+              className="w-full h-full object-cover"
+            />
+          </div>
+
+          {/* Default cover gallery — horizontal scroll */}
+          <div className="relative w-full overflow-hidden">
+            <div className="flex gap-2 overflow-x-auto pb-2 -mx-1 px-1">
+              {DEFAULT_CHALLENGE_COVERS.map((cover) => {
+                const isActive = selectedDefaultId === cover.id || formData.coverImage === cover.url;
+                return (
+                  <button
+                    key={cover.id}
+                    type="button"
+                    onClick={() => handleDefaultCoverSelect(cover.id, cover.url)}
+                    className={cn(
+                      'relative h-20 w-28 flex-shrink-0 rounded-md overflow-hidden border-2 transition-all',
+                      isActive
+                        ? 'border-primary ring-2 ring-primary/50'
+                        : 'border-border hover:border-primary/50',
+                    )}
+                    title={cover.name}
+                    aria-label={`Select ${cover.name} cover`}
+                  >
+                    <img src={cover.url} alt={cover.name} className="w-full h-full object-cover" />
+                  </button>
+                );
+              })}
             </div>
-          )}
+          </div>
+
+          {/* Custom upload */}
           <div className="flex items-center gap-2">
             <Label
               htmlFor="cover-upload"
@@ -483,9 +527,7 @@ function CreateChallengeForm({
               ) : (
                 <Upload className="h-4 w-4" />
               )}
-              <span className="text-sm">
-                {formData.coverImage ? 'Replace cover' : 'Upload cover'}
-              </span>
+              <span className="text-sm">Upload custom</span>
             </Label>
             <input
               id="cover-upload"
@@ -606,6 +648,24 @@ function CreateChallengeForm({
             {formData.deadline && !formData.time && ' • Ends at 23:59 local time'}
           </p>
         </div>
+
+        {/* Timezone — auto-revealed once any date field is set, since the start /
+            deadline times are interpreted in this zone. */}
+        {(formData.startDate || formData.deadline) && (
+          <div className="space-y-2 bg-muted/30 p-3 rounded-lg border border-border/50 animate-in slide-in-from-top-2 duration-200">
+            <Label className="text-sm font-medium flex items-center gap-2">
+              <Clock className="h-4 w-4" />
+              Timezone
+            </Label>
+            <TimezoneSwitcher
+              value={formData.timezone}
+              onChange={(timezone) => setFormData({ ...formData, timezone })}
+            />
+            <p className="text-xs text-muted-foreground">
+              Start and deadline times will be interpreted in this timezone.
+            </p>
+          </div>
+        )}
       </div>
       <div className="flex flex-col gap-2 p-4 pt-2">
         <Button
@@ -613,7 +673,7 @@ function CreateChallengeForm({
           disabled={!formData.title || !formData.description || !formData.bounty || !formData.selectedCountry || isSubmitting}
           className="gap-2 w-full"
         >
-          {isSubmitting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Bitcoin className="h-4 w-4" />}
+          {isSubmitting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />}
           Create action
         </Button>
         <Button variant="outline" onClick={onCancel} className="w-full">Cancel</Button>
@@ -623,9 +683,12 @@ function CreateChallengeForm({
 }
 
 function CreateChallengeDialog({
-  countryCode, variant = 'inline',
-}: { countryCode?: string; variant?: 'inline' | 'fab' }) {
-  const [open, setOpen] = useState(false);
+  countryCode, open, onOpenChange,
+}: {
+  countryCode?: string;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+}) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { user } = useCurrentUser();
   const { mutateAsync: createEvent } = useNostrPublish();
@@ -633,6 +696,7 @@ function CreateChallengeDialog({
   const isMobile = useIsMobile();
   const { isOrganizer } = useOrganizers();
   const { toast } = useToast();
+  const browserTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
   const [formData, setFormData] = useState<CreateFormState>({
     title: '',
@@ -643,8 +707,9 @@ function CreateChallengeDialog({
     startTime: '',
     deadline: '',
     time: '',
-    coverImage: '',
+    coverImage: DEFAULT_COVER_IMAGE,
     selectedCountry: countryCode || '',
+    timezone: browserTimezone,
   });
 
   const userIsAdmin = user ? isAdmin(user.pubkey) : false;
@@ -680,16 +745,16 @@ function CreateChallengeDialog({
         const [hours, minutes] = formData.startTime
           ? formData.startTime.split(':').map(Number)
           : [0, 0];
-        const startDate = new Date(year, month - 1, day, hours, minutes, 0);
-        tags.push(['start', String(Math.floor(startDate.getTime() / 1000))]);
+        const startSeconds = unixSecondsInTimezone(year, month, day, hours, minutes, formData.timezone);
+        tags.push(['start', String(startSeconds)]);
       }
       if (formData.deadline) {
         const [year, month, day] = formData.deadline.split('-').map(Number);
         const [hours, minutes] = formData.time
           ? formData.time.split(':').map(Number)
           : [23, 59];
-        const deadlineDate = new Date(year, month - 1, day, hours, minutes, 0);
-        tags.push(['deadline', String(Math.floor(deadlineDate.getTime() / 1000))]);
+        const deadlineSeconds = unixSecondsInTimezone(year, month, day, hours, minutes, formData.timezone);
+        tags.push(['deadline', String(deadlineSeconds)]);
       }
 
       await createEvent({
@@ -701,12 +766,14 @@ function CreateChallengeDialog({
       await queryClient.invalidateQueries({ queryKey: ['agora-challenges'] });
       await queryClient.refetchQueries({ queryKey: ['agora-challenges'] });
 
-      setOpen(false);
       setFormData({
         title: '', description: '', type: 'photo', bounty: '',
         startDate: '', startTime: '', deadline: '', time: '',
-        coverImage: '', selectedCountry: countryCode || '',
+        coverImage: DEFAULT_COVER_IMAGE,
+        selectedCountry: countryCode || '',
+        timezone: browserTimezone,
       });
+      onOpenChange(false);
       toast({ title: 'Action created' });
     } catch (error) {
       console.error('Failed to create action:', error);
@@ -718,28 +785,13 @@ function CreateChallengeDialog({
 
   if (!user || !canCreateChallenge) return null;
 
-  const trigger = variant === 'fab'
-    ? (
-      <Button className="shadow-lg" aria-label="Create action">
-        <Plus className="h-4 w-4 mr-2" />
-        Create action
-      </Button>
-    )
-    : (
-      <Button className="gap-2">
-        <Plus className="h-4 w-4 flex-shrink-0" />
-        <span className="truncate">Create action</span>
-      </Button>
-    );
-
   if (isMobile) {
     return (
-      <Drawer open={open} onOpenChange={setOpen}>
-        <DrawerTrigger asChild>{trigger}</DrawerTrigger>
+      <Drawer open={open} onOpenChange={onOpenChange}>
         <DrawerContent className="h-[85dvh] max-h-[85dvh]">
           <DrawerHeader className="text-left">
             <DrawerTitle className="flex items-center gap-2">
-              <Zap className="h-5 w-5 text-primary" />
+              <Megaphone className="h-5 w-5 text-primary" />
               Create action
             </DrawerTitle>
             <DrawerDescription>
@@ -754,7 +806,7 @@ function CreateChallengeDialog({
               setFormData={setFormData}
               isSubmitting={isSubmitting}
               handleSubmit={handleSubmit}
-              onCancel={() => setOpen(false)}
+              onCancel={() => onOpenChange(false)}
               userIsAdmin={userIsAdmin}
               pageCountryCode={countryCode}
             />
@@ -765,12 +817,11 @@ function CreateChallengeDialog({
   }
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>{trigger}</DialogTrigger>
+    <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-md sm:max-w-lg md:max-w-2xl max-h-[85vh] w-[calc(100vw-2rem)] sm:w-full overflow-hidden flex flex-col p-0">
         <DialogHeader className="px-6 pt-6 pb-4 flex-shrink-0">
           <DialogTitle className="flex items-center gap-2">
-            <Zap className="h-5 w-5 text-primary" />
+            <Megaphone className="h-5 w-5 text-primary" />
             Create action
           </DialogTitle>
           <DialogDescription>
@@ -785,7 +836,7 @@ function CreateChallengeDialog({
             setFormData={setFormData}
             isSubmitting={isSubmitting}
             handleSubmit={handleSubmit}
-            onCancel={() => setOpen(false)}
+            onCancel={() => onOpenChange(false)}
             userIsAdmin={userIsAdmin}
             pageCountryCode={countryCode}
           />
@@ -808,6 +859,7 @@ export default function ActionsPage() {
   const [selectedCountry, setSelectedCountry] = useState<string | undefined>(undefined);
   const [sortBy, setSortBy] = useState<SortOption>('recent');
   const [headerCountryPickerOpen, setHeaderCountryPickerOpen] = useState(false);
+  const [createOpen, setCreateOpen] = useState(false);
 
   const { data: challenges, isLoading: challengesLoading } = useChallenges({
     countryCode: selectedCountry,
@@ -818,6 +870,13 @@ export default function ActionsPage() {
   const userIsLocalOrganizer =
     user && selectedCountry ? isOrganizer(user.pubkey, selectedCountry) : false;
   const canCreateChallenge = userIsAdmin || userIsLocalOrganizer;
+
+  // Drive the global FAB from the canonical layout API so we get the same
+  // circular Plus button every other page has.
+  useLayoutOptions({
+    showFAB: !!user && canCreateChallenge,
+    onFabClick: () => setCreateOpen(true),
+  });
 
   const allCountries = useMemo(() => getAllCountries(), []);
 
@@ -971,21 +1030,18 @@ export default function ActionsPage() {
   );
 
   return (
-    <main>
-      <PageHeader title="Actions" icon={<Zap className="size-5 text-primary" />} />
+    <main className="pb-16 sidebar:pb-0">
+      <PageHeader title="Actions" icon={<Megaphone className="size-5" />} />
 
-      <div className="px-4 pb-24 max-w-5xl mx-auto">
+      <div className="px-4 max-w-2xl mx-auto">
         {isLoading ? (
-          <div className="grid md:grid-cols-2 gap-4">
+          <div className="space-y-4">
             {[...Array(4)].map((_, i) => <ChallengeSkeleton key={i} />)}
           </div>
         ) : (challenges && challenges.length > 0) ? (
           <div className="space-y-8">
             <div className="flex items-center justify-between">
-              <h2 className="text-lg font-semibold flex items-center gap-2">
-                <Zap className="h-5 w-5 text-primary" />
-                {primarySectionTitle}
-              </h2>
+              <h2 className="text-xl font-bold">{primarySectionTitle}</h2>
               {headerControls}
             </div>
 
@@ -1019,7 +1075,7 @@ export default function ActionsPage() {
             ) : null}
 
             {hasCurrent && hasUpcoming && (
-              <SectionDivider title="Upcoming actions" icon={<Calendar className="h-5 w-5 text-primary" />}>
+              <SectionDivider title="Upcoming">
                 <ChallengeSection
                   items={visibleUpcoming}
                   total={upcomingChallenges.length}
@@ -1032,7 +1088,7 @@ export default function ActionsPage() {
             )}
 
             {pastChallenges.length > 0 && (hasCurrent || hasUpcoming) && (
-              <SectionDivider title="Past actions" icon={<Clock className="h-5 w-5" />} muted>
+              <SectionDivider title="Past">
                 <ChallengeSection
                   items={visiblePast}
                   total={pastChallenges.length}
@@ -1047,43 +1103,36 @@ export default function ActionsPage() {
         ) : (
           <>
             <div className="flex items-center justify-between mb-6">
-              <h2 className="text-lg font-semibold flex items-center gap-2">
-                <Zap className="h-5 w-5 text-primary" />
-                Active actions
-              </h2>
+              <h2 className="text-xl font-bold">Active actions</h2>
               {headerControls}
             </div>
 
-            <Card className="border-dashed border-2 border-primary/20 bg-gradient-to-br from-primary/5 to-transparent">
-              <CardContent className="py-12 px-6 text-center">
-                <div className="relative mx-auto mb-6">
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <div className="w-32 h-32 bg-primary/10 rounded-full blur-2xl" />
-                  </div>
-                  <div className="relative w-20 h-20 mx-auto rounded-2xl bg-gradient-to-br from-primary/20 to-primary/20 flex items-center justify-center ring-4 ring-primary/10">
-                    <Zap className="h-10 w-10 text-primary" />
-                  </div>
-                </div>
-                <div className="space-y-2">
-                  <h3 className="text-xl font-bold">No actions yet</h3>
-                  <p className="text-muted-foreground">
-                    Be the first to create an action for {selectedCountryName}.
-                  </p>
-                </div>
-                <div className="hidden md:flex flex-col items-center gap-3 mt-6">
-                  <CreateChallengeDialog countryCode={selectedCountry} />
-                </div>
-              </CardContent>
-            </Card>
+            <div className="py-20 px-8 flex flex-col items-center gap-6 text-center">
+              <div className="p-4 rounded-full bg-primary/10">
+                <Megaphone className="size-8 text-primary" />
+              </div>
+              <div className="space-y-2 max-w-xs">
+                <h3 className="text-xl font-bold">No actions yet</h3>
+                <p className="text-muted-foreground text-sm">
+                  Be the first to create an action for {selectedCountryName}.
+                </p>
+              </div>
+              {canCreateChallenge && (
+                <Button onClick={() => setCreateOpen(true)} className="rounded-full">
+                  <Plus className="size-4 mr-2" />
+                  Create action
+                </Button>
+              )}
+            </div>
           </>
         )}
       </div>
 
-      {user && canCreateChallenge && (
-        <div className="fixed bottom-safe-20 sm:bottom-24 right-4 z-30">
-          <CreateChallengeDialog countryCode={selectedCountry} variant="fab" />
-        </div>
-      )}
+      <CreateChallengeDialog
+        countryCode={selectedCountry}
+        open={createOpen}
+        onOpenChange={setCreateOpen}
+      />
     </main>
   );
 }
@@ -1095,7 +1144,7 @@ function ChallengeSection({
 }) {
   return (
     <div className="space-y-4">
-      <div className="grid md:grid-cols-2 gap-4">
+      <div className="space-y-4">
         {items.map((challenge) => (
           <ChallengeCard
             key={`${challenge.pubkey}:${challenge.id}`}
@@ -1120,14 +1169,12 @@ function ChallengeSection({
 }
 
 function SectionDivider({
-  title, icon, muted, children,
-}: { title: string; icon: React.ReactNode; muted?: boolean; children: React.ReactNode }) {
+  title, children,
+}: { title: string; children: React.ReactNode }) {
   return (
     <div className="space-y-4">
       <div className="flex items-center gap-3">
-        <div className="flex-1 border-t border-border/50" />
-        <h2 className={cn('text-lg font-semibold flex items-center gap-2', muted && 'text-muted-foreground')}>
-          {icon}
+        <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
           {title}
         </h2>
         <div className="flex-1 border-t border-border/50" />
