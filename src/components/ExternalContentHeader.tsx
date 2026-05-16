@@ -703,17 +703,20 @@ function WeatherVitalsRow({ code, facts }: { code: string; facts: CountryFacts |
 
       {/* Right group — vitals (population, language, currency). On narrow
           viewports this wraps onto its own line under the weather group
-          rather than getting crushed beside it. */}
+          rather than getting crushed beside it. Styled to match the
+          capital chip on the left (text-xs muted-foreground/80 with a
+          size-3 icon) so the row reads as a single uniform metadata
+          strip rather than two competing weights. */}
       {hasVitalsSide && (
-        <ul className="flex flex-wrap items-center gap-x-4 gap-y-1.5 text-sm text-muted-foreground min-w-0">
+        <ul className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground/80 min-w-0">
           {vitals.map((item) => (
             <li
               key={item.key}
-              className="flex items-center gap-1.5 min-w-0"
+              className="flex items-center gap-1 min-w-0"
               title={`${item.label}: ${item.value}`}
             >
               {item.icon}
-              <span className="font-medium text-foreground truncate max-w-[14ch] sm:max-w-[18ch]">
+              <span className="truncate max-w-[14ch] sm:max-w-[18ch]">
                 {item.value}
               </span>
             </li>
@@ -1043,17 +1046,6 @@ export function CountryContentHeader({ code }: { code: string }) {
           hero + extract for sparsely-documented places. */}
       <div className="divide-y divide-border/40">
         <WeatherVitalsRow code={code} facts={facts ?? undefined} />
-        {facts?.motto && (
-          // Motto lives on its own line below the hero (rather than
-          // crammed into the hero overlay) so it has room to read as a
-          // proper national epigraph — italic, quoted, full column width.
-          <p
-            className="px-4 py-2 text-sm italic text-muted-foreground"
-            title={facts.motto}
-          >
-            &ldquo;{facts.motto}&rdquo;
-          </p>
-        )}
 
         {/* Wikipedia extract — prose, no surrounding card. */}
         {wikiLoading ? (

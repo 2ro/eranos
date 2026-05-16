@@ -12,8 +12,6 @@ export interface CountryFacts {
   id: string;
   /** Official native name(s) — `<lang>: <name>` pairs. */
   officialNames: { lang: string; name: string }[];
-  /** Country motto. */
-  motto: string | null;
   /** Demonym (e.g. "French" for France). */
   demonym: string | null;
   /** Capital city name. */
@@ -70,7 +68,6 @@ function buildQuery(code: string): string {
   return `
 SELECT
   ?country ?countryLabel
-  ?motto ?mottoLabel
   ?demonymLabel
   ?capitalLabel
   ?governmentLabel
@@ -90,7 +87,6 @@ WHERE {
   ?country wdt:P297 "${safeCode}" .
   OPTIONAL { ?country wdt:P1813 ?demonym . FILTER(LANG(?demonym) = "en") }
   OPTIONAL { ?country wdt:P1448 ?officialName . }
-  OPTIONAL { ?country wdt:P1546 ?motto . }
   OPTIONAL { ?country wdt:P36 ?capital . }
   OPTIONAL { ?country wdt:P122 ?government . }
   OPTIONAL { ?country wdt:P35 ?headOfState . }
@@ -115,7 +111,7 @@ WHERE {
   OPTIONAL { ?country wdt:P85 ?anthemRef . ?anthemRef wdt:P51 ?anthem . ?anthemRef rdfs:label ?anthemLabel . FILTER(LANG(?anthemLabel) = "en") }
   SERVICE wikibase:label { bd:serviceParam wikibase:language "en". }
 }
-GROUP BY ?country ?countryLabel ?motto ?mottoLabel ?demonymLabel ?capitalLabel ?governmentLabel ?headOfStateLabel ?headOfGovernmentLabel ?population ?area ?inception
+GROUP BY ?country ?countryLabel ?demonymLabel ?capitalLabel ?governmentLabel ?headOfStateLabel ?headOfGovernmentLabel ?population ?area ?inception
 LIMIT 1`;
 }
 
@@ -227,7 +223,6 @@ async function fetchCountryFacts(
     return {
       id,
       officialNames,
-      motto: get('mottoLabel') ?? get('motto') ?? null,
       demonym: get('demonymLabel') ?? null,
       capital: get('capitalLabel') ?? null,
       government: get('governmentLabel') ?? null,
