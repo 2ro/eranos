@@ -37,7 +37,7 @@ import {
   ColorMomentContent,
   ColorMomentEyeButton,
 } from "@/components/ColorMomentContent";
-import { CommentContext } from "@/components/CommentContext";
+import { CommentContext, CountryCommentPill } from "@/components/CommentContext";
 import { CommunityContentWarning } from "@/components/CommunityContentWarning";
 import { ContentWarningGuard } from "@/components/ContentWarningGuard";
 import { EmojifiedText, ReactionEmoji } from "@/components/CustomEmoji";
@@ -1031,7 +1031,10 @@ export const NoteCard = memo(function NoteCard({
             )}
           </div>
           <div className={cn("flex-1 min-w-0", threaded && "pb-3")}>
-            {authorInfo}
+            <div className="flex items-center justify-between gap-2">
+              {authorInfo}
+              <CountryCommentPill event={event} className="shrink-0" />
+            </div>
             {contentBlock}
             {actionButtons}
             <NoteMoreMenu
@@ -1098,11 +1101,12 @@ export const NoteCard = memo(function NoteCard({
         })()
       )}
 
-      {/* Header: avatar + name/handle stacked */}
+      {/* Header: avatar + name/handle stacked, with optional country pill on the right */}
       <div className="flex items-center gap-3">
         {avatarElement}
         {authorInfo}
         {isColor && <ColorMomentEyeButton event={event} />}
+        <CountryCommentPill event={event} className="shrink-0" />
       </div>
 
       {contentBlock}

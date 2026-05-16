@@ -801,81 +801,145 @@ function UrlCommentContext({ url, className }: { url: string; className?: string
   );
 }
 
-/** Comment context for ISO 3166 country/subdivision identifiers — renders a bold flag pill linking to the country feed. */
-function CountryCommentContext({ identifier, className }: { identifier: string; className?: string }) {
+/** Internal: the actual flag pill markup. Used by `CountryCommentPill`. */
+function CountryPillBadge({ identifier, className }: { identifier: string; className?: string }) {
   const code = identifier.slice('iso3166:'.length);
   const info = getCountryInfo(code);
   const link = `/i/${encodeURIComponent(identifier)}`;
-
-  // Suppress the country pill when the post is already being rendered inside
-  // that same country's feed page — there it's a top-level neighborhood
-  // post, not a reply with context to surface. The pill still appears
-  // everywhere else (World feed, profiles, notifications, search) so users
-  // see which neighborhood a post belongs to.
-  const countryFeed = useCountryFeed();
-  if (countryFeed && countryFeed.countryCode === code.toUpperCase()) {
-    return null;
-  }
 
   const label = info?.subdivisionName ?? info?.name ?? code;
   const flag = info?.flag ?? '🌍';
 
   return (
-    <div className={cn('mt-1 mb-2 min-w-0 overflow-hidden', className)}>
-      <HoverCard openDelay={300} closeDelay={150}>
-        <HoverCardTrigger asChild>
-          <Link
-            to={link}
-            onClick={(e) => e.stopPropagation()}
-            className={cn(
-              'group inline-flex items-center gap-1.5 max-w-full',
-              'rounded-full border border-primary/20 bg-primary/10 text-primary',
-              'pl-1.5 pr-2.5 py-1 text-xs font-semibold',
-              'transition-all hover:bg-primary/15 hover:border-primary/30',
-              'motion-safe:hover:scale-[1.02] motion-safe:active:scale-[0.98]',
-              'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 focus-visible:ring-offset-1 focus-visible:ring-offset-background',
-            )}
-          >
-            <span
-              className="text-base leading-none shrink-0"
-              role="img"
-              aria-label={info ? `Flag of ${info.name}` : code}
-            >
-              {flag}
-            </span>
-            <span className="truncate">{label}</span>
-          </Link>
-        </HoverCardTrigger>
-        <HoverCardContent
-          side="bottom"
-          align="start"
-          sideOffset={4}
-          className="w-64 p-0 rounded-2xl shadow-lg"
+    <HoverCard openDelay={300} closeDelay={150}>
+      <HoverCardTrigger asChild>
+        <Link
+          to={link}
           onClick={(e) => e.stopPropagation()}
+          aria-label={`Posted from ${info?.name ?? code}`}
+          className={cn(
+            // Surface — a glassy passport-stamp gradient.
+            'group/pill inline-flex items-center gap-2 max-w-[10rem] sm:max-w-[14rem]',
+            'rounded-full py-1 pl-1 pr-3',
+            'bg-gradient-to-br from-primary via-primary/95 to-accent text-primary-foreground',
+            'ring-1 ring-inset ring-white/20',
+            'shadow-md shadow-primary/30',
+            // Motion / focus
+            'transition-all duration-200',
+            'motion-safe:hover:shadow-lg motion-safe:hover:shadow-primary/40',
+            'motion-safe:hover:scale-[1.03] motion-safe:active:scale-[0.97]',
+            'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60 focus-visible:ring-offset-2 focus-visible:ring-offset-background',
+            className,
+          )}
         >
-          <div className="flex items-center gap-3 px-4 py-3">
-            <span className="text-2xl leading-none shrink-0" role="img" aria-label={info ? `Flag of ${info.name}` : code}>
-              {flag}
+          {/* Flag — sits in a small bright disc so it reads as a stamp seal */}
+          <span
+            className={cn(
+              'shrink-0 inline-flex items-center justify-center',
+              'size-6 rounded-full bg-white/90 dark:bg-white/95',
+              'shadow-inner shadow-black/10',
+              'text-base leading-none',
+              'motion-safe:group-hover/pill:rotate-[6deg] transition-transform',
+            )}
+            role="img"
+            aria-label={info ? `Flag of ${info.name}` : code}
+            style={{ filter: 'drop-shadow(0 1px 1px rgba(0,0,0,0.15))' }}
+          >
+            {flag}
+          </span>
+          {/* Two-line stack: tiny tracker + country name */}
+          <span className="flex flex-col items-start leading-none min-w-0">
+            <span className="text-[9px] font-semibold uppercase tracking-[0.12em] opacity-80">
+              Posted from
             </span>
-            <div className="flex-1 min-w-0">
-              <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-                <MapPin className="size-3 shrink-0" />
-                <span>{info?.subdivisionName ? 'Region' : 'Country'}</span>
-              </div>
-              <p className="text-sm font-medium truncate mt-0.5">
-                {info?.subdivisionName ?? info?.name ?? code}
-              </p>
-              {info?.subdivisionName && info.name && (
-                <p className="text-xs text-muted-foreground truncate">
-                  {info.name}
-                </p>
-              )}
+            <span className="text-[12px] font-bold truncate mt-0.5 max-w-[8rem] sm:max-w-[12rem]">
+              {label}
+            </span>
+          </span>
+        </Link>
+      </HoverCardTrigger>
+      <HoverCardContent
+        side="bottom"
+        align="end"
+        sideOffset={6}
+        className="w-64 p-0 rounded-2xl shadow-lg overflow-hidden"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* Accent bar at the top of the preview to match the pill surface */}
+        <div className="h-1 w-full bg-gradient-to-r from-primary via-primary/90 to-accent" />
+        <div className="flex items-center gap-3 px-4 py-3">
+          <span className="text-2xl leading-none shrink-0" role="img" aria-label={info ? `Flag of ${info.name}` : code}>
+            {flag}
+          </span>
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+              <MapPin className="size-3 shrink-0" />
+              <span>{info?.subdivisionName ? 'Region' : 'Country'}</span>
             </div>
+            <p className="text-sm font-medium truncate mt-0.5">
+              {info?.subdivisionName ?? info?.name ?? code}
+            </p>
+            {info?.subdivisionName && info.name && (
+              <p className="text-xs text-muted-foreground truncate">
+                {info.name}
+              </p>
+            )}
           </div>
-        </HoverCardContent>
-      </HoverCard>
-    </div>
+        </div>
+      </HoverCardContent>
+    </HoverCard>
   );
+}
+
+/**
+ * Standalone country flag pill for kind-1111 events whose root is an ISO 3166
+ * identifier. Intended to be rendered in the upper-right of `NoteCard`'s
+ * header row so the post reads as a neighborhood entry instead of a comment.
+ *
+ * Returns `null` when:
+ *   - the event isn't kind 1111
+ *   - the event's parent is another comment (k="1111") — we want context for
+ *     the immediate parent (`Replying to @user`) to take over there
+ *   - the root I tag isn't an `iso3166:` identifier
+ *   - we're already inside that country's feed page
+ *
+ * Because the pill takes over the country-root presentation, the body-level
+ * `CommentContext` is silent for country roots — see `CountryCommentContext`.
+ */
+export function CountryCommentPill({ event, className }: { event: NostrEvent; className?: string }) {
+  const countryFeed = useCountryFeed();
+
+  // Skip non-comments
+  if (event.kind !== 1111) return null;
+
+  // If the direct parent is another kind-1111 comment, the body shows
+  // "Replying to @user" — the country pill would be visual noise.
+  const parentKind = event.tags.find(([name]) => name === 'k')?.[1];
+  if (parentKind === '1111') return null;
+
+  // Root I tag (uppercase = root identifier per NIP-22)
+  const iTag = event.tags.find(([name]) => name === 'I')?.[1];
+  if (!iTag || !iTag.startsWith('iso3166:')) return null;
+
+  const code = iTag.slice('iso3166:'.length);
+
+  // Suppress when already inside the matching country feed page — there the
+  // pill would just point back to the page the user is already on.
+  if (countryFeed && countryFeed.countryCode === code.toUpperCase()) {
+    return null;
+  }
+
+  return <CountryPillBadge identifier={iTag} className={className} />;
+}
+
+/**
+ * Body-level comment context for ISO 3166 roots — intentionally renders
+ * nothing. The country pill is hoisted into the card header via
+ * `CountryCommentPill`, so we suppress the in-body version to avoid
+ * duplication.
+ */
+function CountryCommentContext(_props: { identifier: string; className?: string }) {
+  return null;
 }
 
 /** Comment context for ISBN identifiers — fetches and displays the book title with hover preview. */
