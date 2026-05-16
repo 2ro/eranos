@@ -16,7 +16,7 @@ const DEFAULT_PAGE_SIZE = 20;
 
 // Canonical write tag is `agora-action`. We also accept `pathos-challenge`
 // and `agora-challenge` as read aliases so legacy events stay visible. Keep
-// in sync with `useChallenges.ts`.
+// in sync with `useActions.ts`.
 const CHALLENGE_T_ALIASES = ['agora-action', 'pathos-challenge', 'agora-challenge'];
 
 /**
@@ -53,7 +53,7 @@ export function usePaginatedFeed({
       // Query for:
       // 1. kind 1111 events - Geographic root posts and challenge comments
       // 2. kind 1068 events - NIP-88 Polls (country-scoped)
-      // 3. kind 36639 events - Challenge creation events
+      // 3. kind 36639 events - Action creation events
       const filters: NostrFilter[] = [];
       
       if (countryCode) {

@@ -6,7 +6,7 @@ import { format } from 'date-fns';
 import { nip19 } from 'nostr-tools';
 import type { NostrMetadata } from '@nostrify/nostrify';
 
-import { useChallenges, type Challenge } from '@/hooks/useChallenges';
+import { useActions, type Action } from '@/hooks/useActions';
 import { useAuthor } from '@/hooks/useAuthor';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useNostrPublish } from '@/hooks/useNostrPublish';
@@ -18,7 +18,7 @@ import { isAdmin } from '@/lib/admins';
 import { createCountryIdentifier } from '@/lib/countryIdentifiers';
 import { getAllCountries, getGeoDisplayName, countryCodeToFlag } from '@/lib/countries';
 import { getDisplayName } from '@/lib/genUserName';
-import { DEFAULT_CHALLENGE_COVERS, DEFAULT_COVER_IMAGE } from '@/lib/defaultChallengeCovers';
+import { DEFAULT_ACTION_COVERS, DEFAULT_COVER_IMAGE } from '@/lib/defaultActionCovers';
 import { useLayoutOptions } from '@/contexts/LayoutContext';
 import { cn } from '@/lib/utils';
 
@@ -56,7 +56,7 @@ import {
   Calendar, DollarSign, Globe, Megaphone,
 } from 'lucide-react';
 
-const CHALLENGE_ICONS = {
+const ACTION_ICONS = {
   photo: Camera,
   art: Palette,
   info: Info,
@@ -108,7 +108,7 @@ function unixSecondsInTimezone(
 // Skeletons / Cards
 // ─────────────────────────────────────────────────────────────────────────────
 
-function ChallengeSkeleton() {
+function ActionSkeleton() {
   return (
     <Card className="overflow-hidden">
       <Skeleton className="h-40 w-full rounded-none" />
@@ -125,7 +125,7 @@ function ChallengeSkeleton() {
   );
 }
 
-function ChallengeShareMenu({ challenge }: { challenge: Challenge }) {
+function ActionShareMenu({ action }: { action: Action }) {
   const { user } = useCurrentUser();
   const { mutateAsync: createEvent } = useNostrPublish();
   const { toast } = useToast();
@@ -133,19 +133,19 @@ function ChallengeShareMenu({ challenge }: { challenge: Challenge }) {
   const [copied, setCopied] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
 
-  const isOwner = user?.pubkey === challenge.pubkey;
+  const isOwner = user?.pubkey === action.pubkey;
 
   const naddr = nip19.naddrEncode({
     kind: 36639,
-    pubkey: challenge.pubkey,
-    identifier: challenge.id,
+    pubkey: action.pubkey,
+    identifier: action.id,
   });
 
-  const challengeUrl = `${window.location.origin}/${naddr}`;
+  const actionUrl = `${window.location.origin}/${naddr}`;
 
   const handleCopyLink = async () => {
     try {
-      await navigator.clipboard.writeText(challengeUrl);
+      await navigator.clipboard.writeText(actionUrl);
       setCopied(true);
       toast({ title: 'Link copied' });
       setTimeout(() => setCopied(false), 2000);
@@ -171,12 +171,12 @@ function ChallengeShareMenu({ challenge }: { challenge: Challenge }) {
         kind: 5,
         content: 'Deleted action',
         tags: [
-          ['e', challenge.event.id],
-          ['a', `36639:${challenge.pubkey}:${challenge.id}`],
+          ['e', action.event.id],
+          ['a', `36639:${action.pubkey}:${action.id}`],
         ],
       });
-      await queryClient.invalidateQueries({ queryKey: ['agora-challenges'] });
-      await queryClient.invalidateQueries({ queryKey: ['agora-challenge'] });
+      await queryClient.invalidateQueries({ queryKey: ['agora-actions'] });
+      await queryClient.invalidateQueries({ queryKey: ['agora-action'] });
       toast({ title: 'Action deleted' });
     } catch (error) {
       console.error('Failed to delete action:', error);
@@ -224,23 +224,23 @@ function ChallengeShareMenu({ challenge }: { challenge: Challenge }) {
   );
 }
 
-function ChallengeCard({ challenge, isExpired }: { challenge: Challenge; isExpired?: boolean }) {
-  const author = useAuthor(challenge.pubkey);
+function ActionCard({ action, isExpired }: { action: Action; isExpired?: boolean }) {
+  const author = useAuthor(action.pubkey);
   const metadata: NostrMetadata | undefined = author.data?.metadata;
-  const displayName = getDisplayName(metadata, challenge.pubkey);
-  const Icon = CHALLENGE_ICONS[challenge.type];
+  const displayName = getDisplayName(metadata, action.pubkey);
+  const Icon = ACTION_ICONS[action.type];
   const [imageLoadFailed, setImageLoadFailed] = useState(false);
 
   const naddr = nip19.naddrEncode({
     kind: 36639,
-    pubkey: challenge.pubkey,
-    identifier: challenge.id,
+    pubkey: action.pubkey,
+    identifier: action.id,
   });
 
   // Always show a cover — fall back to the default if the author didn't set
   // one, or the URL failed to validate / load.
-  const coverImage = (challenge.image && !imageLoadFailed)
-    ? challenge.image
+  const coverImage = (action.image && !imageLoadFailed)
+    ? action.image
     : DEFAULT_COVER_IMAGE;
 
   return (
@@ -256,7 +256,7 @@ function ChallengeCard({ challenge, isExpired }: { challenge: Challenge; isExpir
         <div className="relative w-full h-40 overflow-hidden bg-muted">
           <img
             src={coverImage}
-            alt={challenge.title}
+            alt={action.title}
             className={cn(
               'w-full h-full object-cover transition-transform duration-300',
               !isExpired && 'group-hover:scale-[1.02]',
@@ -270,9 +270,9 @@ function ChallengeCard({ challenge, isExpired }: { challenge: Challenge; isExpir
           {/* Country flag — top-left, sitting on the image */}
           <span
             className="absolute top-3 left-3 text-2xl drop-shadow-md"
-            title={getGeoDisplayName(challenge.countryCode)}
+            title={getGeoDisplayName(action.countryCode)}
           >
-            {countryCodeToFlag(challenge.countryCode)}
+            {countryCodeToFlag(action.countryCode)}
           </span>
 
           {/* Deadline / expired pill — top-right */}
@@ -281,10 +281,10 @@ function ChallengeCard({ challenge, isExpired }: { challenge: Challenge; isExpir
               <Clock className="h-3 w-3" />
               Expired
             </div>
-          ) : challenge.deadline ? (
+          ) : action.deadline ? (
             <div className="absolute top-3 right-3 px-2 py-0.5 rounded-full bg-background/90 text-xs font-medium flex items-center gap-1">
               <Clock className="h-3 w-3" />
-              {format(challenge.deadline * 1000, 'MMM d')}
+              {format(action.deadline * 1000, 'MMM d')}
             </div>
           ) : null}
         </div>
@@ -297,11 +297,11 @@ function ChallengeCard({ challenge, isExpired }: { challenge: Challenge; isExpir
                 'text-lg font-bold leading-tight line-clamp-2',
                 !isExpired && 'group-hover:text-primary transition-colors',
               )}>
-                {challenge.title}
+                {action.title}
               </h3>
             </div>
             <div onClick={(e) => e.preventDefault()}>
-              <ChallengeShareMenu challenge={challenge} />
+              <ActionShareMenu action={action} />
             </div>
           </div>
 
@@ -309,13 +309,13 @@ function ChallengeCard({ challenge, isExpired }: { challenge: Challenge; isExpir
             'text-sm line-clamp-3 leading-relaxed',
             isExpired ? 'text-muted-foreground' : 'text-muted-foreground',
           )}>
-            {challenge.description}
+            {action.description}
           </p>
 
           {/* Meta row: bounty · author. No nested box. */}
           <div className="flex items-center gap-2 text-sm pt-1 min-w-0">
             <Bitcoin className="h-4 w-4 text-primary shrink-0" />
-            <span className="font-semibold">{formatSats(challenge.bounty)}</span>
+            <span className="font-semibold">{formatSats(action.bounty)}</span>
             <span className="text-muted-foreground text-xs">sats</span>
             <span className="text-muted-foreground/50">·</span>
             <Avatar className="h-5 w-5 shrink-0">
@@ -339,7 +339,7 @@ function ChallengeCard({ challenge, isExpired }: { challenge: Challenge; isExpir
 interface CreateFormState {
   title: string;
   description: string;
-  type: Challenge['type'];
+  type: Action['type'];
   bounty: string;
   startDate: string;
   startTime: string;
@@ -351,7 +351,7 @@ interface CreateFormState {
   timezone: string;
 }
 
-function CreateChallengeForm({
+function CreateActionForm({
   formData, setFormData, isSubmitting, handleSubmit, onCancel,
   userIsAdmin, pageCountryCode,
 }: {
@@ -415,7 +415,7 @@ function CreateChallengeForm({
 
   const [countryPickerOpen, setCountryPickerOpen] = useState(false);
   const [selectedDefaultId, setSelectedDefaultId] = useState<string | null>(() => {
-    const match = DEFAULT_CHALLENGE_COVERS.find((c) => c.url === formData.coverImage);
+    const match = DEFAULT_ACTION_COVERS.find((c) => c.url === formData.coverImage);
     return match?.id ?? null;
   });
 
@@ -493,7 +493,7 @@ function CreateChallengeForm({
           {/* Default cover gallery — horizontal scroll */}
           <div className="relative w-full overflow-hidden">
             <div className="flex gap-2 overflow-x-auto pb-2 -mx-1 px-1">
-              {DEFAULT_CHALLENGE_COVERS.map((cover) => {
+              {DEFAULT_ACTION_COVERS.map((cover) => {
                 const isActive = selectedDefaultId === cover.id || formData.coverImage === cover.url;
                 return (
                   <button
@@ -567,7 +567,7 @@ function CreateChallengeForm({
             <Select
               value={formData.type}
               onValueChange={(value) =>
-                setFormData({ ...formData, type: value as Challenge['type'] })
+                setFormData({ ...formData, type: value as Action['type'] })
               }
             >
               <SelectTrigger>
@@ -682,7 +682,7 @@ function CreateChallengeForm({
   );
 }
 
-function CreateChallengeDialog({
+function CreateActionDialog({
   countryCode, open, onOpenChange,
 }: {
   countryCode?: string;
@@ -718,7 +718,7 @@ function CreateChallengeDialog({
   // Admins can author for any country; non-admin organizers can only author for
   // a country they're appointed to. Outside a country context, only admins
   // can create.
-  const canCreateChallenge = userIsAdmin || userIsLocalOrganizer;
+  const canCreateAction = userIsAdmin || userIsLocalOrganizer;
 
   const handleSubmit = async () => {
     if (!user || !formData.selectedCountry) return;
@@ -763,8 +763,8 @@ function CreateChallengeDialog({
         tags,
       });
 
-      await queryClient.invalidateQueries({ queryKey: ['agora-challenges'] });
-      await queryClient.refetchQueries({ queryKey: ['agora-challenges'] });
+      await queryClient.invalidateQueries({ queryKey: ['agora-actions'] });
+      await queryClient.refetchQueries({ queryKey: ['agora-actions'] });
 
       setFormData({
         title: '', description: '', type: 'photo', bounty: '',
@@ -783,7 +783,7 @@ function CreateChallengeDialog({
     }
   };
 
-  if (!user || !canCreateChallenge) return null;
+  if (!user || !canCreateAction) return null;
 
   if (isMobile) {
     return (
@@ -801,7 +801,7 @@ function CreateChallengeDialog({
             </DrawerDescription>
           </DrawerHeader>
           <div className="overflow-y-auto flex-1 pb-safe">
-            <CreateChallengeForm
+            <CreateActionForm
               formData={formData}
               setFormData={setFormData}
               isSubmitting={isSubmitting}
@@ -831,7 +831,7 @@ function CreateChallengeDialog({
           </DialogDescription>
         </DialogHeader>
         <div className="overflow-y-auto overflow-x-hidden flex-1 min-h-0">
-          <CreateChallengeForm
+          <CreateActionForm
             formData={formData}
             setFormData={setFormData}
             isSubmitting={isSubmitting}
@@ -861,7 +861,7 @@ export default function ActionsPage() {
   const [headerCountryPickerOpen, setHeaderCountryPickerOpen] = useState(false);
   const [createOpen, setCreateOpen] = useState(false);
 
-  const { data: challenges, isLoading: challengesLoading } = useChallenges({
+  const { data: actions, isLoading: actionsLoading } = useActions({
     countryCode: selectedCountry,
     limit: 300,
   });
@@ -869,12 +869,12 @@ export default function ActionsPage() {
   const userIsAdmin = user ? isAdmin(user.pubkey) : false;
   const userIsLocalOrganizer =
     user && selectedCountry ? isOrganizer(user.pubkey, selectedCountry) : false;
-  const canCreateChallenge = userIsAdmin || userIsLocalOrganizer;
+  const canCreateAction = userIsAdmin || userIsLocalOrganizer;
 
   // Drive the global FAB from the canonical layout API so we get the same
   // circular Plus button every other page has.
   useLayoutOptions({
-    showFAB: !!user && canCreateChallenge,
+    showFAB: !!user && canCreateAction,
     onFabClick: () => setCreateOpen(true),
   });
 
@@ -903,22 +903,22 @@ export default function ActionsPage() {
     description: 'Complete activist actions and earn Bitcoin bounties. Take photos, create art, gather information, and take action for change.',
   });
 
-  const isLoading = organizersLoading || challengesLoading;
+  const isLoading = organizersLoading || actionsLoading;
 
   // Section split (parser already returns: current → upcoming → past).
   // We re-derive here so that local sorting can be applied per section.
   const now = Date.now() / 1000;
-  const currentUnsorted = challenges?.filter((c) => {
+  const currentUnsorted = actions?.filter((c) => {
     const startTime = c.startTime ?? c.createdAt;
     return startTime <= now && (!c.deadline || c.deadline > now);
   }) ?? [];
-  const upcomingUnsorted = challenges?.filter((c) => {
+  const upcomingUnsorted = actions?.filter((c) => {
     const startTime = c.startTime ?? c.createdAt;
     return startTime > now;
   }) ?? [];
-  const pastUnsorted = challenges?.filter((c) => c.deadline && c.deadline <= now) ?? [];
+  const pastUnsorted = actions?.filter((c) => c.deadline && c.deadline <= now) ?? [];
 
-  const sortChallenges = (cs: Challenge[]) => {
+  const sortActions = (cs: Action[]) => {
     const sorted = [...cs];
     const isPastOnlyList = sorted.length > 0 && sorted.every((c) => !!c.deadline && c.deadline <= now);
     switch (sortBy) {
@@ -936,26 +936,26 @@ export default function ActionsPage() {
     }
   };
 
-  const currentChallenges = sortChallenges(currentUnsorted);
-  const upcomingChallenges = sortChallenges(upcomingUnsorted);
-  const pastChallenges = sortChallenges(pastUnsorted);
+  const currentActions = sortActions(currentUnsorted);
+  const upcomingActions = sortActions(upcomingUnsorted);
+  const pastActions = sortActions(pastUnsorted);
 
   const DEFAULT_VISIBLE = 4;
   const [showAllCurrent, setShowAllCurrent] = useState(false);
   const [showAllUpcoming, setShowAllUpcoming] = useState(false);
   const [showAllPast, setShowAllPast] = useState(false);
 
-  const visibleCurrent = showAllCurrent ? currentChallenges : currentChallenges.slice(0, DEFAULT_VISIBLE);
-  const visibleUpcoming = showAllUpcoming ? upcomingChallenges : upcomingChallenges.slice(0, DEFAULT_VISIBLE);
-  const visiblePast = showAllPast ? pastChallenges : pastChallenges.slice(0, DEFAULT_VISIBLE);
-  const hasCurrent = currentChallenges.length > 0;
-  const hasUpcoming = upcomingChallenges.length > 0;
-  const isOnlyPastView = !hasCurrent && !hasUpcoming && pastChallenges.length > 0;
+  const visibleCurrent = showAllCurrent ? currentActions : currentActions.slice(0, DEFAULT_VISIBLE);
+  const visibleUpcoming = showAllUpcoming ? upcomingActions : upcomingActions.slice(0, DEFAULT_VISIBLE);
+  const visiblePast = showAllPast ? pastActions : pastActions.slice(0, DEFAULT_VISIBLE);
+  const hasCurrent = currentActions.length > 0;
+  const hasUpcoming = upcomingActions.length > 0;
+  const isOnlyPastView = !hasCurrent && !hasUpcoming && pastActions.length > 0;
   const primarySectionTitle = hasCurrent
     ? 'Active actions'
     : hasUpcoming
       ? 'Upcoming actions'
-      : pastChallenges.length > 0
+    : pastActions.length > 0
         ? 'Past actions'
         : 'Actions';
   const deadlineSortLabel = isOnlyPastView ? 'Recently ended' : 'Deadline soon';
@@ -1036,9 +1036,9 @@ export default function ActionsPage() {
       <div className="px-4 max-w-2xl mx-auto">
         {isLoading ? (
           <div className="space-y-4">
-            {[...Array(4)].map((_, i) => <ChallengeSkeleton key={i} />)}
+            {[...Array(4)].map((_, i) => <ActionSkeleton key={i} />)}
           </div>
-        ) : (challenges && challenges.length > 0) ? (
+        ) : (actions && actions.length > 0) ? (
           <div className="space-y-8">
             <div className="flex items-center justify-between">
               <h2 className="text-xl font-bold">{primarySectionTitle}</h2>
@@ -1046,27 +1046,27 @@ export default function ActionsPage() {
             </div>
 
             {hasCurrent ? (
-              <ChallengeSection
+              <ActionSection
                 items={visibleCurrent}
-                total={currentChallenges.length}
+                total={currentActions.length}
                 visible={DEFAULT_VISIBLE}
                 showAll={showAllCurrent}
                 onToggle={() => setShowAllCurrent(!showAllCurrent)}
                 isExpired={false}
               />
             ) : hasUpcoming ? (
-              <ChallengeSection
+              <ActionSection
                 items={visibleUpcoming}
-                total={upcomingChallenges.length}
+                total={upcomingActions.length}
                 visible={DEFAULT_VISIBLE}
                 showAll={showAllUpcoming}
                 onToggle={() => setShowAllUpcoming(!showAllUpcoming)}
                 isExpired={false}
               />
-            ) : pastChallenges.length > 0 ? (
-              <ChallengeSection
+            ) : pastActions.length > 0 ? (
+              <ActionSection
                 items={visiblePast}
-                total={pastChallenges.length}
+                total={pastActions.length}
                 visible={DEFAULT_VISIBLE}
                 showAll={showAllPast}
                 onToggle={() => setShowAllPast(!showAllPast)}
@@ -1076,9 +1076,9 @@ export default function ActionsPage() {
 
             {hasCurrent && hasUpcoming && (
               <SectionDivider title="Upcoming">
-                <ChallengeSection
+                <ActionSection
                   items={visibleUpcoming}
-                  total={upcomingChallenges.length}
+                  total={upcomingActions.length}
                   visible={DEFAULT_VISIBLE}
                   showAll={showAllUpcoming}
                   onToggle={() => setShowAllUpcoming(!showAllUpcoming)}
@@ -1087,11 +1087,11 @@ export default function ActionsPage() {
               </SectionDivider>
             )}
 
-            {pastChallenges.length > 0 && (hasCurrent || hasUpcoming) && (
+            {pastActions.length > 0 && (hasCurrent || hasUpcoming) && (
               <SectionDivider title="Past">
-                <ChallengeSection
+                <ActionSection
                   items={visiblePast}
-                  total={pastChallenges.length}
+                  total={pastActions.length}
                   visible={DEFAULT_VISIBLE}
                   showAll={showAllPast}
                   onToggle={() => setShowAllPast(!showAllPast)}
@@ -1117,7 +1117,7 @@ export default function ActionsPage() {
                   Be the first to create an action for {selectedCountryName}.
                 </p>
               </div>
-              {canCreateChallenge && (
+              {canCreateAction && (
                 <Button onClick={() => setCreateOpen(true)} className="rounded-full">
                   <Plus className="size-4 mr-2" />
                   Create action
@@ -1128,7 +1128,7 @@ export default function ActionsPage() {
         )}
       </div>
 
-      <CreateChallengeDialog
+      <CreateActionDialog
         countryCode={selectedCountry}
         open={createOpen}
         onOpenChange={setCreateOpen}
@@ -1137,18 +1137,18 @@ export default function ActionsPage() {
   );
 }
 
-function ChallengeSection({
+function ActionSection({
   items, total, visible, showAll, onToggle, isExpired,
 }: {
-  items: Challenge[]; total: number; visible: number; showAll: boolean; onToggle: () => void; isExpired: boolean;
+  items: Action[]; total: number; visible: number; showAll: boolean; onToggle: () => void; isExpired: boolean;
 }) {
   return (
     <div className="space-y-4">
       <div className="space-y-4">
-        {items.map((challenge) => (
-          <ChallengeCard
-            key={`${challenge.pubkey}:${challenge.id}`}
-            challenge={challenge}
+        {items.map((action) => (
+          <ActionCard
+            key={`${action.pubkey}:${action.id}`}
+            action={action}
             isExpired={isExpired}
           />
         ))}

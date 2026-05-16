@@ -15,7 +15,7 @@ import { sanitizeUrl } from '@/lib/sanitizeUrl';
  *    is accepted as a read alias.
  */
 
-export interface Challenge {
+export interface Action {
   event: NostrEvent;
   id: string;
   title: string;
@@ -37,7 +37,7 @@ export interface Challenge {
   createdAt: number;
 }
 
-export function parseChallenge(event: NostrEvent): Challenge | null {
+export function parseAction(event: NostrEvent): Action | null {
   const dTag = event.tags.find(([name]) => name === 'd')?.[1];
   const title = event.tags.find(([name]) => name === 'title')?.[1];
   const typeTag = event.tags.find(([name]) => name === 'challenge-type')?.[1];
@@ -75,7 +75,7 @@ export function parseChallenge(event: NostrEvent): Challenge | null {
     return null;
   }
 
-  const type = typeTag as Challenge['type'];
+  const type = typeTag as Action['type'];
   if (!['photo', 'art', 'info', 'action'].includes(type)) {
     return null;
   }
@@ -118,7 +118,7 @@ export function parseChallenge(event: NostrEvent): Challenge | null {
   };
 }
 
-interface UseChallengesOptions {
+interface UseActionsOptions {
   /** Optional ISO 3166-1 alpha-2 country code. When omitted, queries globally. */
   countryCode?: string;
   /** Maximum number of events to request from relays. */
@@ -134,7 +134,7 @@ interface UseChallengesOptions {
  * Only events authored by platform admins or per-country organizers are
  * surfaced — anyone else publishing kind 36639 is ignored client-side.
  */
-export function useChallenges({ countryCode, limit = 50 }: UseChallengesOptions = {}) {
+export function useActions({ countryCode, limit = 50 }: UseActionsOptions = {}) {
   const { nostr } = useNostr();
   const { organizers, isLoading: organizersLoading } = useOrganizers();
 
@@ -144,7 +144,7 @@ export function useChallenges({ countryCode, limit = 50 }: UseChallengesOptions 
   ]);
 
   return useQuery({
-    queryKey: ['agora-challenges', countryCode, limit, organizers.length],
+    queryKey: ['agora-actions', countryCode, limit, organizers.length],
     queryFn: async (c) => {
       const signal = AbortSignal.any([c.signal, AbortSignal.timeout(5000)]);
 
@@ -167,30 +167,30 @@ export function useChallenges({ countryCode, limit = 50 }: UseChallengesOptions 
       const allEvents = await nostr.query(queries, { signal });
 
       const parsed = allEvents
-        .map(parseChallenge)
-        .filter((c): c is Challenge => c !== null)
+        .map(parseAction)
+        .filter((c): c is Action => c !== null)
         .filter((c) => allowedCreators.has(c.pubkey))
         .filter((c) => !countryCode || c.countryCode === countryCode.toUpperCase());
 
       // Deduplicate by addressable coordinate (pubkey:d-tag), keeping the
       // newest event per coordinate (replaceable-event semantics).
-      const byAddrKey = new Map<string, Challenge>();
-      for (const challenge of parsed) {
-        const addrKey = `${challenge.pubkey}:${challenge.id}`;
+      const byAddrKey = new Map<string, Action>();
+      for (const action of parsed) {
+        const addrKey = `${action.pubkey}:${action.id}`;
         const existing = byAddrKey.get(addrKey);
-        if (!existing || challenge.createdAt > existing.createdAt) {
-          byAddrKey.set(addrKey, challenge);
+        if (!existing || action.createdAt > existing.createdAt) {
+          byAddrKey.set(addrKey, action);
         }
       }
 
-      const challenges = Array.from(byAddrKey.values());
+      const actions = Array.from(byAddrKey.values());
 
       const now = Date.now() / 1000;
-      const upcoming: Challenge[] = [];
-      const current: Challenge[] = [];
-      const past: Challenge[] = [];
+      const upcoming: Action[] = [];
+      const current: Action[] = [];
+      const past: Action[] = [];
 
-      challenges.forEach((c) => {
+      actions.forEach((c) => {
         const startTime = c.startTime ?? c.createdAt;
         if (startTime > now) {
           upcoming.push(c);
@@ -225,11 +225,11 @@ export function useChallenges({ countryCode, limit = 50 }: UseChallengesOptions 
  * required so the d-tag identifier alone cannot be used by an attacker to
  * surface a spoofed action.
  */
-export function useChallenge(pubkey: string | undefined, identifier: string | undefined) {
+export function useAction(pubkey: string | undefined, identifier: string | undefined) {
   const { nostr } = useNostr();
 
   return useQuery({
-    queryKey: ['agora-challenge', pubkey, identifier],
+    queryKey: ['agora-action', pubkey, identifier],
     queryFn: async (c) => {
       if (!pubkey || !identifier) return null;
       const signal = AbortSignal.any([c.signal, AbortSignal.timeout(3000)]);
@@ -245,7 +245,7 @@ export function useChallenge(pubkey: string | undefined, identifier: string | un
       );
 
       if (events.length === 0) return null;
-      return parseChallenge(events[0]);
+      return parseAction(events[0]);
     },
     enabled: !!pubkey && !!identifier,
     staleTime: 300_000,

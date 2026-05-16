@@ -1,12 +1,12 @@
 /**
- * Default cover images for actions/challenges.
+ * Default cover images for actions.
  * Bold, eye-catching visuals related to civil unrest, protests, and human rights.
  *
  * Used by the action creation form as a gallery the author can pick from when
  * they don't want to upload a custom cover, and as a fallback for action cards
  * whose author never set an image.
  */
-export const DEFAULT_CHALLENGE_COVERS = [
+export const DEFAULT_ACTION_COVERS = [
   { id: 'cover1', url: '/challenge-covers/cover1.png', name: 'Protest March' },
   { id: 'cover2', url: '/challenge-covers/cover2.png', name: 'Raised Fists' },
   { id: 'cover3', url: '/challenge-covers/cover3.png', name: 'Unity' },
@@ -25,6 +25,6 @@ export const DEFAULT_COVER_IMAGE = '/challenge-covers/cover9.png';
 
 /** Pick a random default cover image (used for variety in fallbacks). */
 export function getRandomDefaultCover() {
-  const index = Math.floor(Math.random() * DEFAULT_CHALLENGE_COVERS.length);
-  return DEFAULT_CHALLENGE_COVERS[index];
+  const index = Math.floor(Math.random() * DEFAULT_ACTION_COVERS.length);
+  return DEFAULT_ACTION_COVERS[index];
 }

@@ -7,7 +7,7 @@ import { extractZapAmount } from '@/hooks/useEventInteractions';
  * supplied event IDs, then returns a `Map<eventId, totalSats>` summing the
  * msat amounts per receipt.
  *
- * Used by `ChallengeDetailPage` to rank submissions by total zap amount.
+ * Used by `ActionDetailPage` to rank submissions by total zap amount.
  */
 export function useSubmissionZapTotals(eventIds: string[]) {
   const { nostr } = useNostr();
