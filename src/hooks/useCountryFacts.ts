@@ -79,7 +79,7 @@ SELECT
   ?population
   ?area
   ?inception
-  (GROUP_CONCAT(DISTINCT ?languageLabel; SEPARATOR="|") AS ?languages)
+  (GROUP_CONCAT(DISTINCT ?languageEntry; SEPARATOR="|") AS ?languages)
   (GROUP_CONCAT(DISTINCT ?currencyLabel; SEPARATOR="|") AS ?currencies)
   (GROUP_CONCAT(DISTINCT ?timeZoneLabel; SEPARATOR="|") AS ?timeZones)
   (GROUP_CONCAT(DISTINCT CONCAT(LANG(?officialName), ":", STR(?officialName)); SEPARATOR="|") AS ?officialNames)
@@ -98,7 +98,17 @@ WHERE {
   OPTIONAL { ?country wdt:P1082 ?population . }
   OPTIONAL { ?country wdt:P2046 ?area . }
   OPTIONAL { ?country wdt:P571 ?inception . }
-  OPTIONAL { ?country wdt:P37 ?language . ?language rdfs:label ?languageLabel . FILTER(LANG(?languageLabel) = "en") }
+  OPTIONAL {
+    ?country wdt:P37 ?language .
+    ?language rdfs:label ?languageLabel . FILTER(LANG(?languageLabel) = "en")
+    # Wikidata lists sign languages as official languages of many
+    # countries (e.g. Venezuelan Sign Language for VE) alongside the
+    # spoken language(s). For a destination-flavour header the user
+    # is asking "what do they speak?" — signed languages are
+    # accessibility metadata, not a postcard answer. Filter them out.
+    FILTER NOT EXISTS { ?language wdt:P31/wdt:P279* wd:Q34228 }
+    BIND(?languageLabel AS ?languageEntry)
+  }
   OPTIONAL { ?country wdt:P38 ?currency . ?currency rdfs:label ?currencyLabel . FILTER(LANG(?currencyLabel) = "en") }
   OPTIONAL { ?country wdt:P421 ?timeZone . ?timeZone rdfs:label ?timeZoneLabel . FILTER(LANG(?timeZoneLabel) = "en") }
   OPTIONAL { ?country wdt:P94 ?coatOfArms . }

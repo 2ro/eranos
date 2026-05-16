@@ -394,17 +394,22 @@ export function ExternalContentPage() {
         </div>
       )}
 
-      <div className="px-4 space-y-6 pb-4">
-        {/* Content-specific header */}
-        {content.type === 'url' && <UrlContentHeader url={content.value} />}
-        {content.type === 'isbn' && <BookContentHeader isbn={content.value} />}
-        {content.type === 'unknown' && (
-          <div className="rounded-2xl border border-border p-5 text-center">
-            <Globe className="size-8 mx-auto mb-2 text-muted-foreground/40" />
-            <p className="text-sm text-muted-foreground break-all">{content.value}</p>
-          </div>
-        )}
-      </div>
+      {/* Content-specific header wrapper. Skipped on country pages because
+          the country hero is edge-to-edge — an empty `px-4 pb-4` wrapper
+          above it would leave a dead band of padding between the top of
+          the column and the start of the hero photo. */}
+      {!isCountry && (
+        <div className="px-4 space-y-6 pb-4">
+          {content.type === 'url' && <UrlContentHeader url={content.value} />}
+          {content.type === 'isbn' && <BookContentHeader isbn={content.value} />}
+          {content.type === 'unknown' && (
+            <div className="rounded-2xl border border-border p-5 text-center">
+              <Globe className="size-8 mx-auto mb-2 text-muted-foreground/40" />
+              <p className="text-sm text-muted-foreground break-all">{content.value}</p>
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Country header lives OUTSIDE the px-4 wrapper above so the hero
           backdrop, gradients, and bottom-anchored title can bleed flush to
