@@ -30,6 +30,7 @@ import { useScryfallCard } from '@/hooks/useScryfallCard';
 import { getDisplayName } from '@/lib/getDisplayName';
 import { genUserName } from '@/lib/genUserName';
 import { getCountryInfo } from '@/lib/countries';
+import { useCountryFeed } from '@/contexts/CountryFeedContext';
 import { extractGathererCard, type GathererCard } from '@/lib/linkEmbed';
 import { cardPrimaryImage } from '@/lib/scryfall';
 
@@ -804,6 +805,16 @@ function CountryCommentContext({ identifier, className }: { identifier: string; 
   const code = identifier.slice('iso3166:'.length);
   const info = getCountryInfo(code);
   const link = `/i/${encodeURIComponent(identifier)}`;
+
+  // Suppress the "Commenting on 🇻🇪 Venezuela" header when the post is already
+  // being rendered inside that same country's feed page — there it's a
+  // top-level neighborhood post, not a reply with context to surface.
+  // We still render the header outside the country feed (profiles, notifications,
+  // search, etc.) so users can see what it's replying to.
+  const countryFeed = useCountryFeed();
+  if (countryFeed && countryFeed.countryCode === code.toUpperCase()) {
+    return null;
+  }
 
   const displayText = info
     ? info.subdivisionName
