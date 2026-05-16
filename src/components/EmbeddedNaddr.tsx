@@ -7,6 +7,7 @@ import { Award, Image, MessageSquareOff } from 'lucide-react';
 import type { NostrEvent } from '@nostrify/nostrify';
 
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
+import { ActionContent } from '@/components/ActionContent';
 import { Skeleton } from '@/components/ui/skeleton';
 import { EmojifiedText } from '@/components/CustomEmoji';
 import { EmbeddedCardShell } from '@/components/EmbeddedCardShell';
@@ -86,6 +87,10 @@ export function EmbeddedNaddr({ addr, className, disableHoverCards }: EmbeddedNa
   // Profile badges (kind 10008/30008) get a compact badge row preview
   if (isProfileBadgesKind(event.kind)) {
     return <EmbeddedProfileBadgesCard event={event} className={className} />;
+  }
+
+  if (event.kind === 36639) {
+    return <ActionContent event={event} />;
   }
 
   return <EmbeddedNaddrCard event={event} className={className} disableHoverCards={disableHoverCards} />;

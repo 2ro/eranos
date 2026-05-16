@@ -2,6 +2,7 @@ import { useMemo } from 'react';
 import { useSeoMeta } from '@unhead/react';
 import { format } from 'date-fns';
 import { Link as RouterLink } from 'react-router-dom';
+import { nip19 } from 'nostr-tools';
 import { Camera, Palette, Info, Megaphone, Clock, Bitcoin, Loader2, MessageSquare, Trophy, ArrowLeft } from 'lucide-react';
 import type { NostrMetadata } from '@nostrify/nostrify';
 
@@ -9,8 +10,10 @@ import { useAction, type Action } from '@/hooks/useActions';
 import { useAuthor } from '@/hooks/useAuthor';
 import { useComments } from '@/hooks/useComments';
 import { useSubmissionZapTotals } from '@/hooks/useSubmissionZapTotals';
+import { useAddrEvent, type AddrCoords } from '@/hooks/useEvent';
 import { getDisplayName } from '@/lib/genUserName';
 import { getGeoDisplayName, countryCodeToFlag } from '@/lib/countries';
+import { parseCommunityEvent } from '@/lib/communityUtils';
 import { cn } from '@/lib/utils';
 
 import { Card, CardContent } from '@/components/ui/card';
@@ -26,6 +29,16 @@ const ACTION_ICONS = {
   info: Info,
   action: Megaphone,
 } as const;
+
+function getCommunityAddr(action: Action): AddrCoords | undefined {
+  const aTag = action.event.tags.find(([name, value]) => name === 'A' && value?.startsWith('34550:'))?.[1];
+  if (!aTag) return undefined;
+  const [kind, pubkey, ...identifierParts] = aTag.split(':');
+  const parsedKind = Number(kind);
+  const identifier = identifierParts.join(':');
+  if (parsedKind !== 34550 || !pubkey || !identifier) return undefined;
+  return { kind: parsedKind, pubkey, identifier };
+}
 
 interface ActionDetailPageProps {
   pubkey: string;
@@ -91,6 +104,9 @@ function DetailHeader() {
 
 function ActionHeader({ action }: { action: Action }) {
   const author = useAuthor(action.pubkey);
+  const communityAddr = useMemo(() => getCommunityAddr(action), [action]);
+  const communityEvent = useAddrEvent(communityAddr).data;
+  const community = communityEvent ? parseCommunityEvent(communityEvent) : null;
   const metadata: NostrMetadata | undefined = author.data?.metadata;
   const displayName = getDisplayName(metadata, action.pubkey);
   const Icon = ACTION_ICONS[action.type];
@@ -120,6 +136,15 @@ function ActionHeader({ action }: { action: Action }) {
                 </span>
                 <span className="text-sm text-muted-foreground">{getGeoDisplayName(action.countryCode)}</span>
               </>
+            )}
+            {community && communityAddr && (
+              <RouterLink
+                to={`/${nip19.naddrEncode(communityAddr)}`}
+                className="inline-flex items-center gap-1 rounded-md bg-primary/10 px-2 py-1 text-xs font-semibold text-primary hover:bg-primary/15"
+              >
+                <Megaphone className="h-3 w-3" />
+                {community.name}
+              </RouterLink>
             )}
             {isExpired ? (
               <span className="px-2 py-1 rounded-md bg-muted text-muted-foreground text-xs font-semibold flex items-center gap-1">
