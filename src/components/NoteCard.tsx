@@ -468,8 +468,8 @@ export const NoteCard = memo(function NoteCard({
 
   const isComment = event.kind === 1111;
   // True when CountryFlagBackdrop is rendering — used to flip the header
-  // strip to high-contrast white text so the author/timestamp stay legible
-  // against the dark wash overlaid on the flag.
+  // strip to high-contrast white text in dark mode so the author/timestamp
+  // stay legible against the dark wash overlaid on the flag.
   const flagMode = useIsCountryRooted(event);
   const isReply = isTextNote && !isComment && isReplyEvent(event);
 
@@ -1041,7 +1041,7 @@ export const NoteCard = memo(function NoteCard({
             <div
               className={cn(
                 flagMode &&
-                  "text-white [&_a]:text-white [&_.text-muted-foreground]:text-white/85 [text-shadow:0_1px_3px_rgba(0,0,0,0.85),0_2px_8px_rgba(0,0,0,0.55)]",
+                  "dark:text-white dark:[&_a]:text-white dark:[&_.text-muted-foreground]:text-white/85 dark:[text-shadow:0_1px_3px_rgba(0,0,0,0.85),0_2px_8px_rgba(0,0,0,0.55)]",
               )}
             >
               {threadedKindHeader}
@@ -1063,7 +1063,7 @@ export const NoteCard = memo(function NoteCard({
                   className={cn(
                     "min-w-0 flex-1",
                     flagMode &&
-                      "text-white [&_a]:text-white [&_.text-muted-foreground]:text-white/85 [text-shadow:0_1px_3px_rgba(0,0,0,0.85),0_2px_8px_rgba(0,0,0,0.55)]",
+                      "dark:text-white dark:[&_a]:text-white dark:[&_.text-muted-foreground]:text-white/85 dark:[text-shadow:0_1px_3px_rgba(0,0,0,0.85),0_2px_8px_rgba(0,0,0,0.55)]",
                   )}
                 >
                   {authorInfo}
@@ -1104,15 +1104,15 @@ export const NoteCard = memo(function NoteCard({
       {/* Foreground wrapper — `relative` lifts the entire post above the
           absolute backdrop layer rendered by CountryFlagBackdrop. */}
       <div className="relative">
-        {/* Header strip — sits over the flag backdrop's dark wash when
-            present. Flips to white text with a drop shadow in flag mode so
-            the name/handle/timestamp stay legible against any flag.
+        {/* Header strip — sits over the flag backdrop when present. In dark
+            mode it flips to white text with a drop shadow so the
+            name/handle/timestamp stay legible against the dimmed flag.
             CountryCommentPill is rendered outside this wrapper so it keeps
             its own gradient/text-shadow styling untouched. */}
         <div
           className={cn(
             flagMode &&
-              "text-white [&_a]:text-white [&_.text-muted-foreground]:text-white/85 [text-shadow:0_1px_3px_rgba(0,0,0,0.85),0_2px_8px_rgba(0,0,0,0.55)]",
+              "dark:text-white dark:[&_a]:text-white dark:[&_.text-muted-foreground]:text-white/85 dark:[text-shadow:0_1px_3px_rgba(0,0,0,0.85),0_2px_8px_rgba(0,0,0,0.55)]",
           )}
         >
           {/* Action header — repost takes priority, otherwise derived from event kind */}
