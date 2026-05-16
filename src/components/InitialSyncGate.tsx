@@ -854,6 +854,15 @@ function CountriesStep({
     [selectedCodes],
   );
 
+  const orderedCountries = useMemo(() => {
+    const selected = selectedCountries;
+    const selectedSet = new Set(selected.map((country) => country.code));
+    return [
+      ...selected,
+      ...filteredCountries.filter((country) => !selectedSet.has(country.code)),
+    ];
+  }, [filteredCountries, selectedCountries]);
+
   const toggleCountry = (code: string) => {
     setSelectedCodes((current) => {
       const next = new Set(current);
@@ -938,33 +947,9 @@ function CountriesStep({
         />
       </div>
 
-      {selectedCountries.length > 0 && (
-        <div className="rounded-xl border bg-card p-3 space-y-2">
-          <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-            Selected
-          </p>
-          <div className="flex max-h-28 flex-wrap gap-2 overflow-y-auto pr-1">
-            {selectedCountries.map((country) => (
-              <button
-                key={country.code}
-                type="button"
-                onClick={() => toggleCountry(country.code)}
-                className="inline-flex items-center gap-2 rounded-full bg-primary/10 px-3 py-1.5 text-sm font-medium text-primary transition-colors hover:bg-primary/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-                aria-label={`Remove ${country.name}`}
-              >
-                <span className="text-base leading-none" aria-hidden="true">
-                  {country.flag}
-                </span>
-                <span>{country.name}</span>
-              </button>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {filteredCountries.length > 0 ? (
-        <div className="grid max-h-80 grid-cols-2 gap-2 overflow-y-auto pr-1">
-          {filteredCountries.map((country) => {
+      {orderedCountries.length > 0 ? (
+        <div className="grid max-h-96 grid-cols-3 gap-2 overflow-y-auto rounded-2xl bg-muted/30 p-2 sm:grid-cols-4">
+          {orderedCountries.map((country) => {
             const isSelected = selectedCodes.has(country.code);
             return (
               <button
@@ -972,24 +957,28 @@ function CountriesStep({
                 type="button"
                 onClick={() => toggleCountry(country.code)}
                 className={cn(
-                  "flex items-center gap-3 rounded-xl border p-3 text-left transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+                  "group relative flex min-h-24 flex-col items-center justify-center gap-2 rounded-2xl p-3 text-center transition-all hover:bg-background/80 hover:shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
                   isSelected
-                    ? "border-primary bg-primary/10 text-primary"
-                    : "border-border hover:bg-secondary/70",
+                    ? "bg-primary/10 shadow-sm ring-1 ring-primary/30"
+                    : "bg-background/55",
                 )}
               >
-                <span className="text-2xl leading-none" aria-hidden="true">
+                {isSelected && (
+                  <span className="absolute right-2 top-2 rounded-full bg-primary p-0.5 text-primary-foreground shadow-sm">
+                    <Check className="size-3" />
+                  </span>
+                )}
+                <span className="text-4xl leading-none drop-shadow-sm transition-transform group-hover:scale-110" aria-hidden="true">
                   {country.flag}
                 </span>
-                <span className="min-w-0 flex-1">
-                  <span className="block truncate text-sm font-medium text-foreground">
+                <span className="min-w-0 space-y-0.5">
+                  <span className="line-clamp-2 text-xs font-semibold leading-tight text-foreground">
                     {country.name}
                   </span>
-                  <span className="text-xs text-muted-foreground">
+                  <span className="block text-[10px] font-medium uppercase tracking-wide text-muted-foreground">
                     {country.code}
                   </span>
                 </span>
-                {isSelected && <Check className="size-4 shrink-0" />}
               </button>
             );
           })}
