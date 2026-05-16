@@ -551,11 +551,10 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
           ) : (
             <div className="absolute inset-0 bg-gradient-to-br from-primary/50 via-primary/25 to-primary/5" />
           )}
-          {/* Darkening overlay that fades to the page background at the
-              bottom of the tab strip — makes tab text legible and erases the
-              hard seam between banner and tabs. Stops push the heavy darkness
-              down so it sits behind the tabs, not over the banner. */}
-          <div className="absolute inset-0 bg-[linear-gradient(to_bottom,transparent_0%,transparent_15%,rgba(0,0,0,0.9)_75%,rgba(0,0,0,0.9)_97%,hsl(var(--background))_100%)]" />
+          {/* Theme-aware fade to the page background. This keeps the hero edge
+              seamless in both light and dark modes without forcing a black
+              band behind the tabs. */}
+          <div className="absolute inset-0 bg-[linear-gradient(to_bottom,transparent_0%,transparent_25%,hsl(var(--background)/0.55)_75%,hsl(var(--background)/0.9)_97%,hsl(var(--background))_100%)]" />
         </div>
 
         {/* Banner — fixed aspect ratio, title/description/buttons overlaid */}
