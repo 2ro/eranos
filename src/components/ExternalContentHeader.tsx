@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { BookOpen, Coins, ExternalLink, FileText, Globe, Landmark, Languages, MapPin, MessageCircle, Package, Pause, Play, Repeat2, Share2, User, Users, Zap } from 'lucide-react';
+import { ArrowLeft, BookOpen, Coins, ExternalLink, FileText, Globe, Landmark, Languages, MapPin, MessageCircle, Package, Pause, Play, Repeat2, Share2, User, Users, Zap } from 'lucide-react';
 import { nip19 } from 'nostr-tools';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -905,8 +905,11 @@ export function CountryContentHeader({ code }: { code: string }) {
 
   return (
     // Edge-to-edge container — caller is expected to mount this outside any
-    // horizontal padding wrapper so the hero can fill the column.
-    <section className="relative isolate overflow-hidden -mt-5 mb-2">
+    // horizontal padding wrapper so the hero can fill the column. The country
+    // hero replaces the page header (it carries its own back arrow + follow
+    // button overlaid on the photo), so no negative top margin is needed to
+    // tuck under a sibling header band.
+    <section className="relative isolate overflow-hidden mb-2">
       {/* Hero — Wikipedia photo (or gradient fallback) with day/night sky
           overlay that fades into the page background. Aspect ratio scales
           from a compact 2:1 on phones to a cinematic 21:9 on tablets+. */}
@@ -929,6 +932,25 @@ export function CountryContentHeader({ code }: { code: string }) {
           {/* Sky-tint + bottom fade. */}
           <div className={cn('absolute inset-0', skyOverlay)} />
         </div>
+
+        {/* Top-left back button overlaid on the photo. Mirrors the
+            sibling top-right follow button's white-on-glass style. Hidden
+            on wide layouts where the persistent left sidebar already
+            provides navigation (matches the original page-header back
+            arrow's `sidebar:hidden` rule). */}
+        <Link
+          to="/"
+          aria-label="Back"
+          className={cn(
+            'sidebar:hidden absolute top-3 left-3 z-10 inline-flex items-center justify-center size-9 rounded-full',
+            'bg-black/30 text-white backdrop-blur-sm border border-white/30',
+            'hover:bg-black/50 hover:border-white/50',
+            'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80',
+            'transition-colors shadow-md',
+          )}
+        >
+          <ArrowLeft className="size-5" />
+        </Link>
 
         {/* Top-right follow button overlaid on the photo. */}
         {user && (

@@ -374,19 +374,25 @@ export function ExternalContentPage() {
         <PrecipitationEffect type={precipitation.type} intensity={precipitation.intensity} />
       )}
 
-      {/* Non-sticky transparent header */}
-      <div className="flex items-center gap-4 px-4 pt-4 pb-5">
-        <Link
-          to={content.type === 'isbn' ? '/books' : '/'}
-          className={cn(
-            'p-2 rounded-full hover:bg-secondary transition-colors',
-            content.type !== 'isbn' && 'sidebar:hidden',
-          )}
-        >
-          <ArrowLeft className="size-5" />
-        </Link>
-        <h1 className="text-xl font-bold truncate">{pageTitle}</h1>
-      </div>
+      {/* Non-sticky transparent header — skipped on country pages because
+          the country hero carries its own back arrow overlaid on the
+          photo, which lets the cinematic banner reach all the way to the
+          top of the column instead of sitting under a redundant title
+          bar. */}
+      {!isCountry && (
+        <div className="flex items-center gap-4 px-4 pt-4 pb-5">
+          <Link
+            to={content.type === 'isbn' ? '/books' : '/'}
+            className={cn(
+              'p-2 rounded-full hover:bg-secondary transition-colors',
+              content.type !== 'isbn' && 'sidebar:hidden',
+            )}
+          >
+            <ArrowLeft className="size-5" />
+          </Link>
+          <h1 className="text-xl font-bold truncate">{pageTitle}</h1>
+        </div>
+      )}
 
       <div className="px-4 space-y-6 pb-4">
         {/* Content-specific header */}
