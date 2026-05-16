@@ -1,4 +1,5 @@
 import {
+  Activity,
   Award,
   BadgeCheck,
   Bell,
@@ -195,11 +196,21 @@ export const SIDEBAR_ITEMS: SidebarItemDef[] = [
   { id: "world", label: "World", path: "/world", icon: Earth },
 ];
 
+/**
+ * Sidebar items that are addable from their own page but omitted from the
+ * default/sidebar customization option list.
+ */
+const OPTIONAL_SIDEBAR_ITEMS: SidebarItemDef[] = [
+  { id: "dashboard", label: "Dashboard", path: "/dashboard", icon: Activity },
+];
+
+const ALL_SIDEBAR_ITEMS = [...SIDEBAR_ITEMS, ...OPTIONAL_SIDEBAR_ITEMS];
+
 /** Set of all known sidebar item IDs for quick lookup. */
-export const SIDEBAR_ITEM_IDS = new Set(SIDEBAR_ITEMS.map((s) => s.id));
+export const SIDEBAR_ITEM_IDS = new Set(ALL_SIDEBAR_ITEMS.map((s) => s.id));
 
 /** Map from ID to definition for O(1) lookup. */
-const SIDEBAR_ITEM_MAP = new Map(SIDEBAR_ITEMS.map((s) => [s.id, s]));
+const SIDEBAR_ITEM_MAP = new Map(ALL_SIDEBAR_ITEMS.map((s) => [s.id, s]));
 
 /**
  * Icons for content types used outside the sidebar (e.g. ContentSettings).
