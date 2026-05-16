@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { BookOpen, Coins, Crown, Droplets, ExternalLink, FileText, Flag, Globe, Landmark, Languages, MapPin, MessageCircle, Package, Play, Repeat2, Share2, Sparkles, Sunrise, Sunset, User, Users, Wind, Zap } from 'lucide-react';
+import { BookOpen, Coins, ExternalLink, FileText, Globe, Landmark, Languages, MapPin, MessageCircle, Package, Pause, Play, Repeat2, Share2, User, Users, Zap } from 'lucide-react';
 import { nip19 } from 'nostr-tools';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -596,179 +596,130 @@ function WikipediaExtract({ extract, articleUrl }: { extract: string; articleUrl
   );
 }
 
-function WeatherStrip({ code }: { code: string }) {
+// ── Weather, vitals, and anthem ─────────────────────────────────────────────
+//
+// The country header surfaces three optional signals below the hero photo:
+// a one-line weather strip, a one-line vitals row (capital / population /
+// languages / currency from Wikidata), and a tiny anthem-play button that
+// lives *inside* the hero. Each piece renders nothing when its data is
+// missing, so countries with sparse Wikidata coverage degrade gracefully to
+// "hero + Wikipedia extract" instead of leaving empty rows behind.
+
+/**
+ * Single-line current weather strip — just the essentials: icon, temperature,
+ * description, and city. Wind / humidity / feels-like were trimmed because
+ * the goal is destination flavour, not a forecast widget.
+ */
+function WeatherLine({ code }: { code: string }) {
   const { data: weather, isLoading } = useWeather(code);
 
   if (isLoading) {
     return (
-      <div className="flex items-center gap-3 px-4 py-3">
-        <Skeleton className="size-8 rounded-md" />
-        <Skeleton className="h-4 w-20" />
-        <Skeleton className="h-4 w-32" />
+      <div className="px-4 py-2 flex items-center gap-3">
+        <Skeleton className="size-6 rounded-md" />
+        <Skeleton className="h-4 w-40" />
       </div>
     );
   }
 
   if (!weather) return null;
 
-  // Borderless inline weather strip — sits below the hero on its own line,
-  // intentionally without a card box so the immersive header continues to
-  // feel like one continuous space rather than a stack of widgets.
   return (
-    <div className="px-4 py-3">
-      <div className="flex flex-wrap items-center gap-x-5 gap-y-2 text-sm text-muted-foreground">
-        <div className="flex items-center gap-2">
-          <span className="text-2xl leading-none" role="img" aria-label={weather.description}>
-            {weather.icon}
-          </span>
-          <span className="font-bold text-foreground tabular-nums text-lg leading-none">
-            {weather.temperature}°
-          </span>
-          <span className="text-xs">{weather.description}</span>
-        </div>
-        <span className="flex items-center gap-1.5 text-xs">
-          <span className="opacity-60">Feels</span>
-          <span className="font-medium text-foreground tabular-nums">
-            {weather.apparentTemperature}°
-          </span>
+    <div className="px-4 py-2 flex flex-wrap items-baseline gap-x-3 gap-y-1 text-sm">
+      <span className="flex items-baseline gap-2 text-foreground">
+        <span className="text-xl leading-none" role="img" aria-label={weather.description}>
+          {weather.icon}
         </span>
-        <span className="flex items-center gap-1.5 text-xs">
-          <Droplets className="size-3 shrink-0" />
-          <span className="font-medium text-foreground tabular-nums">{weather.humidity}%</span>
+        <span className="font-bold tabular-nums">{weather.temperature}°</span>
+      </span>
+      <span className="text-muted-foreground">{weather.description}</span>
+      {weather.city && (
+        <span className="text-muted-foreground/80 text-xs">
+          · {weather.city}
         </span>
-        <span className="flex items-center gap-1.5 text-xs">
-          <Wind className="size-3 shrink-0" />
-          <span className="font-medium text-foreground tabular-nums">
-            {weather.windSpeed} km/h
-          </span>
-        </span>
-        {weather.city && (
-          <span className="flex items-center gap-1.5 text-xs">
-            <MapPin className="size-3 shrink-0" />
-            <span className="truncate">{weather.city}</span>
-          </span>
-        )}
-        <span className="flex items-center gap-1.5 text-xs" title={weather.isDay ? 'Daytime' : 'Nighttime'}>
-          {weather.isDay ? <Sunrise className="size-3 shrink-0" /> : <Sunset className="size-3 shrink-0" />}
-          <span className="font-medium text-foreground">{weather.isDay ? 'Day' : 'Night'}</span>
-        </span>
-      </div>
+      )}
     </div>
   );
 }
 
-// ── Country fast-facts strip (Wikidata) ─────────────────────────────────────
-
 /**
- * Borderless grid of "fast facts" pulled from Wikidata — capital, population,
- * languages, currency, etc. Designed to feel like a tour-book sidebar
- * stripped of its chrome: pure data + iconography, no cards.
+ * Compact vitals row — Capital · Population · Languages · Currency.
+ *
+ * These four facts were chosen because they read like a postcard: where you
+ * are, who you're among, what they speak, what they spend. Government type,
+ * inception date, area, and demonym are encyclopedic rather than evocative,
+ * so they're omitted entirely (one click away on Wikipedia).
+ *
+ * Renders nothing if all four are missing — small / poorly-documented
+ * countries don't get a half-empty row.
  */
-function CountryFactsStrip({ facts }: { facts: CountryFacts }) {
-  const items: { icon: React.ReactNode; label: string; value: string; key: string }[] = [];
+function VitalsRow({ facts }: { facts: CountryFacts }) {
+  const items: { key: string; icon: React.ReactNode; label: string; value: string }[] = [];
 
   if (facts.capital) {
-    items.push({ key: 'capital', icon: <Landmark className="size-3.5" />, label: 'Capital', value: facts.capital });
+    items.push({ key: 'capital', icon: <Landmark className="size-3 shrink-0" />, label: 'Capital', value: facts.capital });
   }
   if (facts.population !== null) {
     items.push({
       key: 'population',
-      icon: <Users className="size-3.5" />,
+      icon: <Users className="size-3 shrink-0" />,
       label: 'Population',
       value: formatNumber(facts.population),
-    });
-  }
-  if (facts.area !== null) {
-    items.push({
-      key: 'area',
-      icon: <Globe className="size-3.5" />,
-      label: 'Area',
-      // The Intl formatter handles thousands separators per locale; km² stays
-      // as a plain suffix because there's no first-class unit for it.
-      value: `${facts.area.toLocaleString()} km²`,
     });
   }
   if (facts.languages.length > 0) {
     items.push({
       key: 'languages',
-      icon: <Languages className="size-3.5" />,
+      icon: <Languages className="size-3 shrink-0" />,
       label: facts.languages.length > 1 ? 'Languages' : 'Language',
-      value: facts.languages.slice(0, 3).join(', '),
+      // Cap at two on this line; the rest is a tooltip-only detail.
+      value: facts.languages.slice(0, 2).join(', '),
     });
   }
   if (facts.currencies.length > 0) {
     items.push({
       key: 'currency',
-      icon: <Coins className="size-3.5" />,
+      icon: <Coins className="size-3 shrink-0" />,
       label: facts.currencies.length > 1 ? 'Currencies' : 'Currency',
-      value: facts.currencies.slice(0, 2).join(', '),
-    });
-  }
-  if (facts.government) {
-    items.push({
-      key: 'government',
-      icon: <Crown className="size-3.5" />,
-      label: 'Government',
-      value: facts.government,
-    });
-  }
-  if (facts.inception) {
-    items.push({
-      key: 'inception',
-      icon: <Sparkles className="size-3.5" />,
-      label: 'Established',
-      value: facts.inception,
-    });
-  }
-  if (facts.demonym) {
-    items.push({
-      key: 'demonym',
-      icon: <User className="size-3.5" />,
-      label: 'Demonym',
-      value: facts.demonym,
+      value: facts.currencies[0],
     });
   }
 
   if (items.length === 0) return null;
 
   return (
-    <dl className="px-4 py-4 grid grid-cols-2 sm:grid-cols-3 gap-x-4 gap-y-3">
+    <ul className="px-4 py-2 flex flex-wrap items-center gap-x-4 gap-y-1.5 text-sm text-muted-foreground">
       {items.map((item) => (
-        <div key={item.key} className="min-w-0">
-          <dt className="flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
-            {item.icon}
-            <span>{item.label}</span>
-          </dt>
-          <dd className="mt-0.5 text-sm font-medium text-foreground truncate" title={item.value}>
+        <li key={item.key} className="flex items-center gap-1.5 min-w-0" title={`${item.label}: ${item.value}`}>
+          {item.icon}
+          <span className="font-medium text-foreground truncate max-w-[14ch] sm:max-w-[18ch]">
             {item.value}
-          </dd>
-        </div>
+          </span>
+        </li>
       ))}
-    </dl>
+    </ul>
   );
 }
 
-// ── National anthem player ──────────────────────────────────────────────────
-
 /**
- * Minimal national-anthem audio player. Lazy — the `<audio>` element only
- * starts loading after the user clicks Play, so we don't pull a multi-megabyte
- * OGG file from Commons just because someone navigated to a country page.
+ * Tiny circular play button for a country's national anthem. Designed to sit
+ * overlaid on the hero photo next to the country name — no surrounding label
+ * (the country name is the label), no list-style chrome, just an iconic
+ * affordance.
  *
- * Uses native HTMLAudioElement events for state instead of polling: `play`
- * and `pause` toggle the local state; `ended` resets back to "paused" so the
- * button doesn't strand the user in a "playing" state at the end of the file.
+ * The `<audio>` element only mounts after the first click via `armed`, so we
+ * don't pull a multi-megabyte OGG file from Commons for every visitor.
  */
-function AnthemPlayer({ url, title }: { url: string; title: string | null }) {
+function AnthemButton({ url, title }: { url: string; title: string | null }) {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const [playing, setPlaying] = useState(false);
   const [armed, setArmed] = useState(false);
 
-  const toggle = useCallback(() => {
+  const toggle = useCallback((event: React.MouseEvent) => {
+    event.preventDefault();
+    event.stopPropagation();
     const el = audioRef.current;
     if (!el) {
-      // First click — mount the audio element. The effect below will start
-      // playback as soon as the ref is wired up.
       setArmed(true);
       setPlaying(true);
       return;
@@ -786,23 +737,29 @@ function AnthemPlayer({ url, title }: { url: string; title: string | null }) {
     if (playing && el.paused) void el.play();
   }, [armed, playing]);
 
+  // Tooltip shows the anthem title if we have one; fall back to the generic
+  // label so the button is always self-explanatory on hover.
+  const tooltip = playing
+    ? `Pause anthem${title ? `: ${title}` : ''}`
+    : `Play anthem${title ? `: ${title}` : ''}`;
+
   return (
-    <div className="px-4 py-3 flex items-center gap-3">
+    <>
       <button
         type="button"
         onClick={toggle}
-        aria-label={playing ? 'Pause national anthem' : 'Play national anthem'}
-        className="inline-flex items-center justify-center size-9 rounded-full bg-primary/15 text-primary hover:bg-primary/25 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring transition-colors"
+        aria-label={tooltip}
+        title={tooltip}
+        className={cn(
+          'inline-flex items-center justify-center size-8 rounded-full shrink-0',
+          'bg-black/30 text-white backdrop-blur-sm border border-white/30',
+          'hover:bg-black/50 hover:border-white/50',
+          'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80',
+          'transition-colors [text-shadow:none]',
+        )}
       >
-        <Play className={cn('size-4', playing && 'hidden')} />
-        <span className={cn('size-3 bg-current rounded-sm', !playing && 'hidden')} aria-hidden />
+        {playing ? <Pause className="size-3.5" /> : <Play className="size-3.5 translate-x-[1px]" />}
       </button>
-      <div className="min-w-0">
-        <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
-          National anthem
-        </p>
-        <p className="text-sm font-medium truncate">{title ?? 'Play anthem'}</p>
-      </div>
       {armed && (
         <audio
           ref={audioRef}
@@ -814,7 +771,7 @@ function AnthemPlayer({ url, title }: { url: string; title: string | null }) {
           className="sr-only"
         />
       )}
-    </div>
+    </>
   );
 }
 
@@ -830,6 +787,11 @@ export function CountryContentHeader({ code }: { code: string }) {
   const { isFollowingCountry, toggleCountryFollow, isPending } = useCountryFollows();
   const { toast } = useToast();
   const isFollowing = info ? isFollowingCountry(code) : false;
+
+  // Coat of arms image errors silently — Wikidata sometimes points at SVG
+  // files that fail to render in WKWebView, or at filenames that have moved.
+  // Hide the image rather than show a broken-image icon next to the flag.
+  const [coatError, setCoatError] = useState(false);
 
   const handleToggleFollow = useCallback(async (event: React.MouseEvent) => {
     event.preventDefault();
@@ -856,17 +818,21 @@ export function CountryContentHeader({ code }: { code: string }) {
   const heroImage = wiki?.originalImage?.source ?? wiki?.thumbnail?.source ?? null;
   const isDay = weather?.isDay ?? true;
   // Sky-tint gradient layered above the hero photo. Warm amber/rose during
-  // local daytime, deep indigo/violet at night. The gradient stops are
-  // identical between day and night — only the colour palette flips — so
-  // the cinematic shape is preserved while the mood follows the destination.
+  // local daytime, deep indigo/violet at night. Same gradient shape, only
+  // the colour palette flips — preserves the cinematic curve while the mood
+  // follows the destination.
   const skyOverlay = isDay
     ? 'bg-[linear-gradient(to_bottom,rgba(254,202,87,0.18)_0%,rgba(255,107,107,0.12)_30%,rgba(0,0,0,0.65)_70%,hsl(var(--background))_100%)]'
     : 'bg-[linear-gradient(to_bottom,rgba(30,27,75,0.55)_0%,rgba(15,23,42,0.55)_30%,rgba(0,0,0,0.85)_70%,hsl(var(--background))_100%)]';
 
+  // Whether to show the coat of arms inside the hero. Subdivisions get a
+  // thumbnail in the flag slot already (from Wikipedia), so we skip the coat
+  // of arms there to avoid two images competing for the same spot.
+  const showCoatOfArms = !info.subdivision && !!facts?.coatOfArmsUrl && !coatError;
+
   return (
     // Edge-to-edge container — caller is expected to mount this outside any
-    // horizontal padding wrapper so the hero can fill the column. We add a
-    // small bottom margin to space the facts strip from the action bar.
+    // horizontal padding wrapper so the hero can fill the column.
     <section className="relative isolate overflow-hidden -mt-5 mb-2">
       {/* Hero — Wikipedia photo (or gradient fallback) with day/night sky
           overlay that fades into the page background. Aspect ratio scales
@@ -891,9 +857,7 @@ export function CountryContentHeader({ code }: { code: string }) {
           <div className={cn('absolute inset-0', skyOverlay)} />
         </div>
 
-        {/* Top-right follow button overlaid on the photo. The page-level
-            back arrow + Stats button sit above this hero in the page header,
-            so we only need the destination-specific affordance here. */}
+        {/* Top-right follow button overlaid on the photo. */}
         {user && (
           <div className="absolute top-3 right-3 z-10">
             <FollowToggleButton
@@ -914,31 +878,53 @@ export function CountryContentHeader({ code }: { code: string }) {
             white text legible against any underlying photo. */}
         <div className="absolute bottom-0 left-0 right-0 px-5 pb-4 pt-10 [text-shadow:0_1px_4px_rgba(0,0,0,0.7),0_2px_8px_rgba(0,0,0,0.4)]">
           <div className="flex items-end gap-3">
-            {info.subdivision && wiki?.thumbnail ? (
-              <img
-                src={wiki.thumbnail.source}
-                alt={info.subdivisionName ?? info.subdivision}
-                className="size-14 sm:size-16 rounded-md object-cover shadow-lg border border-white/20 [text-shadow:none]"
-              />
-            ) : (
-              <span
-                className="text-5xl sm:text-6xl leading-none drop-shadow-[0_2px_8px_rgba(0,0,0,0.6)] [text-shadow:none]"
-                role="img"
-                aria-label={`Flag of ${info.name}`}
-              >
-                {info.flag}
-              </span>
-            )}
+            {/* Flag + (optional) coat of arms. Subdivisions show a small
+                Wikipedia thumbnail in the same slot when available. */}
+            <div className="flex items-end gap-2 [text-shadow:none] shrink-0">
+              {info.subdivision && wiki?.thumbnail ? (
+                <img
+                  src={wiki.thumbnail.source}
+                  alt={info.subdivisionName ?? info.subdivision}
+                  className="size-14 sm:size-16 rounded-md object-cover shadow-lg border border-white/20"
+                />
+              ) : (
+                <span
+                  className="text-5xl sm:text-6xl leading-none drop-shadow-[0_2px_8px_rgba(0,0,0,0.6)]"
+                  role="img"
+                  aria-label={`Flag of ${info.name}`}
+                >
+                  {info.flag}
+                </span>
+              )}
+              {showCoatOfArms && (
+                <img
+                  src={facts!.coatOfArmsUrl!}
+                  alt={`Coat of arms of ${info.name}`}
+                  className="h-10 sm:h-14 w-auto object-contain drop-shadow-[0_2px_8px_rgba(0,0,0,0.6)] -mb-1"
+                  loading="lazy"
+                  onError={() => setCoatError(true)}
+                />
+              )}
+            </div>
+
             <div className="min-w-0 flex-1 pb-1">
-              <h2 className="text-2xl sm:text-4xl font-bold leading-tight text-white truncate">
-                {info.subdivisionName ?? info.name}
-              </h2>
+              <div className="flex items-center gap-2 min-w-0">
+                <h2 className="text-2xl sm:text-4xl font-bold leading-tight text-white truncate">
+                  {info.subdivisionName ?? info.name}
+                </h2>
+                {facts?.anthemUrl && (
+                  <AnthemButton url={facts.anthemUrl} title={facts.anthemTitle} />
+                )}
+              </div>
               {info.subdivision ? (
                 <p className="text-sm text-white/85 mt-0.5 truncate">
                   {info.name}{info.subdivisionName ? '' : ` · ${info.subdivision}`}
                 </p>
               ) : facts?.officialNames?.[0] && facts.officialNames[0].name !== info.name ? (
-                <p className="text-sm text-white/85 mt-0.5 truncate italic" lang={facts.officialNames[0].lang || undefined}>
+                <p
+                  className="text-sm text-white/85 mt-0.5 truncate italic"
+                  lang={facts.officialNames[0].lang || undefined}
+                >
                   {facts.officialNames[0].name}
                 </p>
               ) : wiki?.description ? (
@@ -954,54 +940,25 @@ export function CountryContentHeader({ code }: { code: string }) {
         </div>
       </div>
 
-      {/* Below-hero content — no card chrome, just stacked sections. */}
-      <div>
-        {/* Weather strip (always shown when data is available; the
-            precipitation overlay rendered by ExternalContentPage will already
-            be animating across the whole viewport). */}
-        <WeatherStrip code={code} />
-
-        {/* Fast-facts grid from Wikidata. */}
-        {facts && <CountryFactsStrip facts={facts} />}
-
-        {/* National anthem player + coat of arms — both optional, both
-            country-flair signals that this is a destination, not just a tag. */}
-        {(facts?.anthemUrl || facts?.coatOfArmsUrl) && (
-          <div className="px-4 py-2 flex flex-wrap items-center gap-x-6 gap-y-3 border-t border-border/40">
-            {facts.coatOfArmsUrl && (
-              <div className="flex items-center gap-3">
-                <img
-                  src={facts.coatOfArmsUrl}
-                  alt={`Coat of arms of ${info.name}`}
-                  className="h-16 w-auto object-contain"
-                  loading="lazy"
-                />
-                <div className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
-                  <Flag className="size-3" />
-                  <span>Coat of arms</span>
-                </div>
-              </div>
-            )}
-            {facts.anthemUrl && (
-              <div className="flex-1 min-w-[200px] -mx-4">
-                <AnthemPlayer url={facts.anthemUrl} title={facts.anthemTitle} />
-              </div>
-            )}
-          </div>
-        )}
+      {/* Below-hero content — three optional one-liners. Each renders
+          nothing when its data is missing, so the header degrades to just
+          the hero + extract for sparsely-documented places. */}
+      <div className="divide-y divide-border/40">
+        <WeatherLine code={code} />
+        {facts && <VitalsRow facts={facts} />}
 
         {/* Wikipedia extract — prose, no surrounding card. */}
-        <div className="px-4 pt-4 pb-1">
-          {wikiLoading ? (
-            <div className="space-y-2">
-              <Skeleton className="h-4 w-full" />
-              <Skeleton className="h-4 w-full" />
-              <Skeleton className="h-4 w-3/4" />
-            </div>
-          ) : wiki?.extract ? (
+        {wikiLoading ? (
+          <div className="px-4 pt-3 pb-1 space-y-2">
+            <Skeleton className="h-4 w-full" />
+            <Skeleton className="h-4 w-full" />
+            <Skeleton className="h-4 w-3/4" />
+          </div>
+        ) : wiki?.extract ? (
+          <div className="px-4 pt-3 pb-1">
             <WikipediaExtract extract={wiki.extract} articleUrl={wiki.articleUrl} />
-          ) : null}
-        </div>
+          </div>
+        ) : null}
       </div>
     </section>
   );
