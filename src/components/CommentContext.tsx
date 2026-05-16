@@ -32,6 +32,7 @@ import { genUserName } from '@/lib/genUserName';
 import { getCountryInfo } from '@/lib/countries';
 import { useCountryFeed } from '@/contexts/CountryFeedContext';
 import { cn } from '@/lib/utils';
+import { useFlagPalette } from '@/lib/flagPalette';
 import { extractGathererCard, type GathererCard } from '@/lib/linkEmbed';
 import { cardPrimaryImage } from '@/lib/scryfall';
 
@@ -810,6 +811,20 @@ function CountryPillBadge({ identifier, className }: { identifier: string; class
   const label = info?.subdivisionName ?? info?.name ?? code;
   const flag = info?.flag ?? '🌍';
 
+  // Sample dominant colors from the flag emoji at render time. While the
+  // palette is being extracted (or if extraction fails), the pill keeps its
+  // primary->accent fallback so it never flashes a bare surface.
+  const palette = useFlagPalette(flag);
+  const hasPalette = palette && palette.length > 0;
+  const gradientStyle = hasPalette
+    ? {
+        backgroundImage:
+          palette.length === 1
+            ? `linear-gradient(135deg, ${palette[0]}, ${palette[0]})`
+            : `linear-gradient(135deg, ${palette.join(', ')})`,
+      }
+    : undefined;
+
   return (
     <HoverCard openDelay={300} closeDelay={150}>
       <HoverCardTrigger asChild>
@@ -817,16 +832,19 @@ function CountryPillBadge({ identifier, className }: { identifier: string; class
           to={link}
           onClick={(e) => e.stopPropagation()}
           aria-label={`Posted from ${info?.name ?? code}`}
+          style={gradientStyle}
           className={cn(
-            // Surface — a glassy passport-stamp gradient.
+            // Surface — gradient pulled from the flag's own colors when the
+            // canvas sample is ready; primary->accent until then.
             'group/pill inline-flex items-center gap-1.5 max-w-[10rem] sm:max-w-[14rem]',
             'rounded-full py-1 px-3',
-            'bg-gradient-to-br from-primary via-primary/95 to-accent text-primary-foreground',
+            !hasPalette && 'bg-gradient-to-br from-primary via-primary/95 to-accent',
+            'text-white',
             'ring-1 ring-inset ring-white/20',
-            'shadow-md shadow-primary/30',
+            'shadow-md shadow-black/30',
             // Motion / focus
             'transition-all duration-200',
-            'motion-safe:hover:shadow-lg motion-safe:hover:shadow-primary/40',
+            'motion-safe:hover:shadow-lg motion-safe:hover:shadow-black/40',
             'motion-safe:hover:scale-[1.03] motion-safe:active:scale-[0.97]',
             'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60 focus-visible:ring-offset-2 focus-visible:ring-offset-background',
             className,
@@ -844,7 +862,10 @@ function CountryPillBadge({ identifier, className }: { identifier: string; class
           >
             {flag}
           </span>
-          <span className="text-[12px] font-bold truncate max-w-[8rem] sm:max-w-[12rem]">
+          <span
+            className="text-[12px] font-bold truncate max-w-[8rem] sm:max-w-[12rem]"
+            style={{ textShadow: '0 1px 2px rgba(0,0,0,0.45)' }}
+          >
             {label}
           </span>
         </Link>
@@ -857,7 +878,14 @@ function CountryPillBadge({ identifier, className }: { identifier: string; class
         onClick={(e) => e.stopPropagation()}
       >
         {/* Accent bar at the top of the preview to match the pill surface */}
-        <div className="h-1 w-full bg-gradient-to-r from-primary via-primary/90 to-accent" />
+        <div
+          className={cn('h-1 w-full', !hasPalette && 'bg-gradient-to-r from-primary via-primary/90 to-accent')}
+          style={
+            hasPalette
+              ? { backgroundImage: `linear-gradient(to right, ${palette.join(', ')})` }
+              : undefined
+          }
+        />
         <div className="flex items-center gap-3 px-4 py-3">
           <span className="text-2xl leading-none shrink-0" role="img" aria-label={info ? `Flag of ${info.name}` : code}>
             {flag}
