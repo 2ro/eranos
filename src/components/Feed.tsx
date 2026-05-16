@@ -8,7 +8,7 @@ import { NoteCard } from '@/components/NoteCard';
 import { PullToRefresh } from '@/components/PullToRefresh';
 import { FeedEmptyState } from '@/components/FeedEmptyState';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Globe2, Loader2 } from 'lucide-react';
+import { Globe2, Loader2, Users } from 'lucide-react';
 import LoginDialog from '@/components/auth/LoginDialog';
 import { useOnboarding } from '@/hooks/useOnboarding';
 import { useFeed } from '@/hooks/useFeed';
@@ -333,6 +333,8 @@ export function Feed({ kinds, tagFilters, header, hideCompose, emptyMessage, fee
             </div>
           ) : isHomeFollowingActive && !emptyMessage ? (
             <FollowingEmptyState onExploreWorld={() => navigate('/world')} />
+          ) : activeTab === 'network' && !emptyMessage ? (
+            <NetworkEmptyState onDiscoverPeople={() => navigate('/packs')} />
           ) : (
             <FeedEmptyState
               message={
@@ -519,6 +521,28 @@ function FollowingEmptyState({ onExploreWorld }: { onExploreWorld: () => void })
         <Button className="rounded-full" onClick={onExploreWorld}>
           <Globe2 className="size-4 mr-2" />
           Visit World
+        </Button>
+      </div>
+    </div>
+  );
+}
+
+function NetworkEmptyState({ onDiscoverPeople }: { onDiscoverPeople: () => void }) {
+  return (
+    <div className="py-20 px-8 flex flex-col items-center gap-6 text-center">
+      <div className="p-4 rounded-full bg-primary/10">
+        <Users className="size-8 text-primary" />
+      </div>
+      <div className="space-y-2 max-w-xs">
+        <h2 className="text-xl font-bold">No network activity yet</h2>
+        <p className="text-muted-foreground text-sm">
+          Follow more people to fill your Network feed.
+        </p>
+      </div>
+      <div className="flex flex-col gap-2 w-full max-w-xs">
+        <Button className="rounded-full" onClick={onDiscoverPeople}>
+          <Users className="size-4 mr-2" />
+          Discover people
         </Button>
       </div>
     </div>
