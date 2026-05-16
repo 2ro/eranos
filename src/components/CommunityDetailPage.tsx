@@ -33,7 +33,7 @@ import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
+import { Tabs, TabsContent } from '@/components/ui/tabs';
 import { BanConfirmDialog } from '@/components/BanConfirmDialog';
 import { CommunityChatPanel } from '@/components/CommunityChatPanel';
 import { CommunityPulsePanel } from '@/components/CommunityPulsePanel';
@@ -43,6 +43,8 @@ import { ComposeBox } from '@/components/ComposeBox';
 import { FollowToggleButton } from '@/components/FollowButton';
 import { CreateGoalDialog } from '@/components/CreateGoalDialog';
 import { MembersOnlyToggle } from '@/components/MembersOnlyToggle';
+import { SubHeaderBar } from '@/components/SubHeaderBar';
+import { TabButton } from '@/components/TabButton';
 import { NoteCard } from '@/components/NoteCard';
 import { ReplyComposeModal } from '@/components/ReplyComposeModal';
 import { ThreadedReplyList, type ReplyNode } from '@/components/ThreadedReplyList';
@@ -538,13 +540,10 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
     <div className="max-w-2xl mx-auto pb-16">
       <CommunityModerationContext.Provider value={moderationCtx}>
         <Tabs value={activeTab} onValueChange={setActiveTab}>
-      {/* ── Hero banner + tabs share a single image/gradient backdrop so the
-          banner image continues underneath the tab strip and fades into the
-          page background — eliminating the seam between the two. ── */}
+      {/* ── Hero banner image/gradient fades into the page background. ── */}
       <div className="relative isolate overflow-hidden">
-        {/* Shared backdrop — image (or fallback gradient) + darkening overlay
-            that spans the full height of (banner + tabs) and fades to the
-            page background at its bottom edge. */}
+        {/* Shared backdrop — image (or fallback gradient) + theme-aware overlay
+            that fades to the page background at its bottom edge. */}
         <div aria-hidden className="absolute inset-0 -z-10">
           {image ? (
             <img src={image} alt="" className="absolute inset-0 w-full h-full object-cover" />
@@ -677,32 +676,23 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
         </div>
       </div>
 
-      {/* ── Tabs ── */}
-          <TabsList className="w-full justify-stretch rounded-none border-b border-white/15 bg-transparent p-0 h-auto">
-            <TabsTrigger
-              value="activity"
-              className="flex-1 min-w-0 rounded-none border-b-2 border-transparent text-white/75 hover:text-white data-[state=active]:text-white data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none px-4 pb-3 pt-2 [text-shadow:0_1px_3px_rgba(0,0,0,0.6)]"
-            >
+      </div>
+
+          {/* ── Tabs ── */}
+          <SubHeaderBar>
+            <TabButton active={activeTab === 'activity'} label="Activity" onClick={() => setActiveTab('activity')}>
               <ActivityIcon className="size-4 mr-1.5" />
               Activity
-            </TabsTrigger>
-            <TabsTrigger
-              value="pulse"
-              className="flex-1 min-w-0 rounded-none border-b-2 border-transparent text-white/75 hover:text-white data-[state=active]:text-white data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none px-4 pb-3 pt-2 [text-shadow:0_1px_3px_rgba(0,0,0,0.6)]"
-            >
+            </TabButton>
+            <TabButton active={activeTab === 'pulse'} label="Pulse" onClick={() => setActiveTab('pulse')}>
               <Radio className="size-4 mr-1.5" />
               Pulse
-            </TabsTrigger>
-            <TabsTrigger
-              value="chat"
-              className="flex-1 min-w-0 rounded-none border-b-2 border-transparent text-white/75 hover:text-white data-[state=active]:text-white data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none px-4 pb-3 pt-2 [text-shadow:0_1px_3px_rgba(0,0,0,0.6)]"
-            >
+            </TabButton>
+            <TabButton active={activeTab === 'chat'} label="Chat" onClick={() => setActiveTab('chat')}>
               <MessageCircle className="size-4 mr-1.5" />
               Chat
-            </TabsTrigger>
-          </TabsList>
-      </div>
-      {/* ── /shared banner+tabs backdrop wrapper ── */}
+            </TabButton>
+          </SubHeaderBar>
 
           {/* Sublabel for the currently-active tab. Only rendered when the
               tab has a descriptor to show — keeps the rest of the tab strip
