@@ -1,5 +1,5 @@
 import type React from 'react';
-import { type ReactNode, useMemo } from 'react';
+import { type ReactNode, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { nip19 } from 'nostr-tools';
 import {
@@ -859,7 +859,7 @@ function CountryPillBadge({ identifier, className }: { identifier: string; class
             )}
             role="img"
             aria-label={info ? `Flag of ${info.name}` : code}
-            style={{ filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.35))' }}
+            style={{ filter: 'drop-shadow(0 1px 1px rgba(0,0,0,0.18))' }}
           >
             {flag}
           </span>
@@ -944,6 +944,17 @@ function useCountryRootContext(event: NostrEvent): { iTag: string; code: string 
 }
 
 /**
+ * Whether the given event is rendering with country chrome (pill + flag
+ * backdrop) in the current context. Useful for sibling components that want
+ * to coordinate styling — e.g. NoteCard switching its text to white when a
+ * flag is showing through behind the author row.
+ */
+// eslint-disable-next-line react-refresh/only-export-components
+export function useIsCountryRooted(event: NostrEvent): boolean {
+  return useCountryRootContext(event) !== null;
+}
+
+/**
  * Standalone country flag pill for kind-1111 events whose root is an ISO 3166
  * identifier. Intended to be rendered in the upper-right of `NoteCard`'s
  * header row so the post reads as a neighborhood entry instead of a comment.
@@ -966,9 +977,10 @@ export function CountryCommentPill({ event, className }: { event: NostrEvent; cl
  * (`CountryContentHeader` in `ExternalContentHeader.tsx`) but scaled down
  * to a card. Pairs with `CountryCommentPill`.
  *
- * Designed to be rendered as the first child of a `relative isolate
- * overflow-hidden` parent so the absolute layer is contained and never
- * leaks behind sibling cards. Pointer events disabled so the post body
+ * Designed to be rendered as the first child of a `relative overflow-hidden`
+ * parent. The wrapper is absolutely positioned at `z-0`; its foreground
+ * siblings must declare `relative` (any positioned value works) so they
+ * paint above the backdrop. Pointer events are disabled so the post body
  * stays fully interactive.
  *
  * The Wikipedia summary fetch is cached for 24 h across all cards
@@ -982,52 +994,79 @@ export function CountryFlagBackdrop({ event }: { event: NostrEvent }) {
   const info = ctx ? getCountryInfo(ctx.code) : null;
   const wikiTitle = ctx ? getWikipediaTitle(ctx.code) : null;
   const { data: wiki } = useWikipediaSummary(wikiTitle);
+  // Sample dominant colors from the flag emoji at render time. Used as the
+  // fallback gradient while Wikipedia is still resolving and after image
+  // load failures, so the backdrop never reverts to a giant blurred emoji.
+  const palette = useFlagPalette(info?.flag);
+  // Track image load failures so we cleanly fall back to the flag-color
+  // gradient. Wikipedia hosts these PNGs from upload.wikimedia.org which is
+  // generally CORS-friendly, but hotlink-protection or transient 4xx
+  // responses can still happen.
+  const [imageFailed, setImageFailed] = useState(false);
 
   if (!ctx) return null;
 
   // For country articles Wikipedia returns the flag as the page's lead image
-  // — the same source used by `CountryContentHeader`. Prefer `thumbnail` over
-  // `originalImage` because the card-sized backdrop doesn't need the full
-  // resolution and a smaller asset reduces feed-scroll memory pressure.
-  const flagImage = wiki?.thumbnail?.source ?? wiki?.originalImage?.source ?? null;
-  const flagEmoji = info?.flag ?? '🌍';
+  // — the same source used by `CountryContentHeader`. Prefer the original
+  // (full-resolution) over the 330px thumbnail; the thumbnail gets upscaled
+  // and looks fuzzy when stretched across a full-width feed card.
+  const flagImage = !imageFailed
+    ? (wiki?.originalImage?.source ?? wiki?.thumbnail?.source ?? null)
+    : null;
+
+  // Pre-built gradient using the palette (sampled from the flag emoji at
+  // mount). Used as the fallback when Wikipedia hasn't returned an image or
+  // its image failed to load. Single-color palettes get duplicated so
+  // linear-gradient still has two stops.
+  const paletteGradient =
+    palette && palette.length > 0
+      ? `linear-gradient(135deg, ${palette.length === 1 ? `${palette[0]}, ${palette[0]}` : palette.join(', ')})`
+      : null;
 
   return (
-    <div aria-hidden className="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
-      {flagImage ? (
-        // Real flag SVG/PNG anchored upper-right, overshooting the edge so the
-        // eye reads colors rather than a complete framed flag. Slight blur
-        // softens stripe boundaries and helps it sit behind text. `select-none`
-        // avoids weird drag-handle behavior on touch devices.
-        <img
-          src={flagImage}
-          alt=""
-          loading="lazy"
-          className="absolute -top-6 -right-10 sm:-top-8 sm:-right-12 w-72 sm:w-96 max-w-none select-none opacity-60"
-          style={{ filter: 'blur(2px) saturate(1.1)' }}
+    <div aria-hidden className="pointer-events-none absolute inset-0 z-0 overflow-hidden">
+      <div className="absolute top-0 left-0 right-0 h-64 sm:h-72">
+        {flagImage ? (
+          // Full-width flag banner across the top of the card. A mask-image
+          // gradient fades the image to nothing at its bottom edge, so the
+          // flag dissolves into the card with no hard seam.
+          <img
+            src={flagImage}
+            alt=""
+            decoding="async"
+            onError={() => setImageFailed(true)}
+            className="w-full h-full object-cover opacity-60 select-none"
+            style={{
+              maskImage: 'linear-gradient(to bottom, black 0%, black 35%, transparent 100%)',
+              WebkitMaskImage: 'linear-gradient(to bottom, black 0%, black 35%, transparent 100%)',
+            }}
+          />
+        ) : paletteGradient ? (
+          // Wikipedia not yet resolved (or its image failed) — paint the
+          // flag-color gradient as a placeholder/fallback. Same opacity and
+          // mask shape as the image so the visual swap is seamless when the
+          // image arrives.
+          <div
+            className="absolute inset-0 opacity-60"
+            style={{
+              backgroundImage: paletteGradient,
+              maskImage: 'linear-gradient(to bottom, black 0%, black 35%, transparent 100%)',
+              WebkitMaskImage: 'linear-gradient(to bottom, black 0%, black 35%, transparent 100%)',
+            }}
+          />
+        ) : null}
+        {/* Black wash for foreground readability. Mirrors the mask shape
+            so the wash itself fades along with the flag — no hard edge. */}
+        <div
+          className="absolute inset-0"
+          style={{
+            backgroundImage:
+              'linear-gradient(to bottom, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.75) 50%, rgba(0,0,0,0) 100%)',
+            maskImage: 'linear-gradient(to bottom, black 0%, black 35%, transparent 100%)',
+            WebkitMaskImage: 'linear-gradient(to bottom, black 0%, black 35%, transparent 100%)',
+          }}
         />
-      ) : (
-        // Until Wikipedia resolves (or if it fails) fall back to the flag
-        // emoji at huge size — same composition, no network dependency.
-        <span
-          className="absolute -top-6 -right-10 sm:-top-8 sm:-right-12 text-[11rem] sm:text-[14rem] leading-none opacity-70 select-none"
-          style={{ filter: 'blur(6px) saturate(1.15)' }}
-          role="presentation"
-        >
-          {flagEmoji}
-        </span>
-      )}
-      {/* Fade overlay — same shape as the country detail hero's `skyOverlay`,
-          retuned for a much shorter card surface. Bleeds the flag colors at
-          the top, then quickly resolves to `hsl(var(--background))` so the
-          post body sits on a clean, theme-consistent background. */}
-      <div
-        className="absolute inset-0"
-        style={{
-          backgroundImage:
-            'linear-gradient(to bottom, hsl(var(--background) / 0) 0%, hsl(var(--background) / 0.35) 30%, hsl(var(--background) / 0.9) 65%, hsl(var(--background)) 90%)',
-        }}
-      />
+      </div>
     </div>
   );
 }

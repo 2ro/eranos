@@ -37,7 +37,7 @@ import {
   ColorMomentContent,
   ColorMomentEyeButton,
 } from "@/components/ColorMomentContent";
-import { CommentContext, CountryCommentPill, CountryFlagBackdrop } from "@/components/CommentContext";
+import { CommentContext, CountryCommentPill, CountryFlagBackdrop, useIsCountryRooted } from "@/components/CommentContext";
 import { CommunityContentWarning } from "@/components/CommunityContentWarning";
 import { ContentWarningGuard } from "@/components/ContentWarningGuard";
 import { EmojifiedText, ReactionEmoji } from "@/components/CustomEmoji";
@@ -463,6 +463,10 @@ export const NoteCard = memo(function NoteCard({
     !isProfile;
 
   const isComment = event.kind === 1111;
+  // True when CountryFlagBackdrop is rendering — used to flip the header
+  // strip to high-contrast white text so the author/timestamp stay legible
+  // against the dark wash overlaid on the flag.
+  const flagMode = useIsCountryRooted(event);
   const isReply = isTextNote && !isComment && isReplyEvent(event);
 
   // Find all people being replied to (for "Replying to @user1 and @user2")
@@ -1015,7 +1019,7 @@ export const NoteCard = memo(function NoteCard({
     return (
       <article
         className={cn(
-          "relative isolate px-4 pt-3 hover:bg-secondary/30 transition-colors cursor-pointer overflow-hidden",
+          "relative px-4 pt-3 hover:bg-secondary/30 transition-colors cursor-pointer overflow-hidden",
           threaded ? "pb-0" : "pb-3 border-b border-border",
           className,
         )}
@@ -1023,20 +1027,147 @@ export const NoteCard = memo(function NoteCard({
         onAuxClick={handleAuxClick}
       >
         <CountryFlagBackdrop event={event} />
-        {threadedKindHeader}
-        <div className="flex gap-3">
-          <div className="flex flex-col items-center">
-            {avatarElement}
-            {threaded && (
-              <div className={cn("w-0.5 flex-1 mt-2 rounded-full", threadedLineClassName || "bg-foreground/20")} />
-            )}
-          </div>
-          <div className={cn("flex-1 min-w-0", threaded && "pb-3")}>
-            <div className="flex items-center justify-between gap-2">
-              {authorInfo}
-              <CountryCommentPill event={event} className="shrink-0" />
+        {/* Foreground wrapper — `relative` lifts the entire post above the
+            absolute backdrop layer rendered by CountryFlagBackdrop. */}
+        <div className="relative">
+          {threadedKindHeader && (
+            <div
+              className={cn(
+                flagMode &&
+                  "text-white [&_a]:text-white [&_.text-muted-foreground]:text-white/85 [text-shadow:0_1px_3px_rgba(0,0,0,0.85),0_2px_8px_rgba(0,0,0,0.55)]",
+              )}
+            >
+              {threadedKindHeader}
             </div>
-            {contentBlock}
+          )}
+          <div className="flex gap-3">
+            <div className="flex flex-col items-center">
+              {avatarElement}
+              {threaded && (
+                <div className={cn("w-0.5 flex-1 mt-2 rounded-full", threadedLineClassName || "bg-foreground/20")} />
+              )}
+            </div>
+            <div className={cn("flex-1 min-w-0", threaded && "pb-3")}>
+              <div className="flex items-center justify-between gap-2">
+                {/* authorInfo wears flag-mode white text + shadow when a flag
+                    backdrop is showing; the pill stays in its own gradient
+                    styling so we scope the flip to authorInfo only. */}
+                <div
+                  className={cn(
+                    "min-w-0 flex-1",
+                    flagMode &&
+                      "text-white [&_a]:text-white [&_.text-muted-foreground]:text-white/85 [text-shadow:0_1px_3px_rgba(0,0,0,0.85),0_2px_8px_rgba(0,0,0,0.55)]",
+                  )}
+                >
+                  {authorInfo}
+                </div>
+                <CountryCommentPill event={event} className="shrink-0 [text-shadow:none]" />
+              </div>
+              {contentBlock}
+              {actionButtons}
+              <NoteMoreMenu
+                event={event}
+                open={moreMenuOpen}
+                onOpenChange={setMoreMenuOpen}
+              />
+              <ReplyComposeModal
+                event={event}
+                open={replyOpen}
+                onOpenChange={setReplyOpen}
+              />
+            </div>
+          </div>
+        </div>
+      </article>
+    );
+  }
+
+  // ── Normal layout ──
+  return (
+    <article
+      className={cn(
+        "relative px-4 py-3 border-b border-border hover:bg-secondary/30 transition-colors cursor-pointer overflow-hidden",
+        highlight && "animate-highlight-fade",
+        className,
+      )}
+      onClick={handleCardClick}
+      onAuxClick={handleAuxClick}
+    >
+      <CountryFlagBackdrop event={event} />
+      {/* Foreground wrapper — `relative` lifts the entire post above the
+          absolute backdrop layer rendered by CountryFlagBackdrop. */}
+      <div className="relative">
+        {/* Header strip — sits over the flag backdrop's dark wash when
+            present. Flips to white text with a drop shadow in flag mode so
+            the name/handle/timestamp stay legible against any flag.
+            CountryCommentPill is rendered outside this wrapper so it keeps
+            its own gradient/text-shadow styling untouched. */}
+        <div
+          className={cn(
+            flagMode &&
+              "text-white [&_a]:text-white [&_.text-muted-foreground]:text-white/85 [text-shadow:0_1px_3px_rgba(0,0,0,0.85),0_2px_8px_rgba(0,0,0,0.55)]",
+          )}
+        >
+          {/* Action header — repost takes priority, otherwise derived from event kind */}
+          {repostedBy ? (
+            <EventActionHeader
+              pubkey={repostedBy}
+              icon={RepostIcon}
+              iconClassName="text-accent"
+              action="reposted"
+            />
+          ) : (
+            !hideKindHeader && KIND_HEADER_MAP[event.kind] &&
+            (() => {
+              const cfg = KIND_HEADER_MAP[event.kind];
+              const isLive =
+                event.kind === 30311 && getEffectiveStreamStatus(event) === "live";
+              return (
+                <EventActionHeader
+                  pubkey={event.pubkey}
+                  icon={cfg.icon}
+                  iconClassName={
+                    event.kind === 30311
+                      ? isLive
+                        ? "text-primary"
+                        : "text-muted-foreground"
+                      : cfg.iconClassName
+                  }
+                  action={
+                    typeof cfg.action === "function"
+                      ? cfg.action(event)
+                      : cfg.action
+                  }
+                  noun={cfg.noun}
+                  nounRoute={cfg.nounRoute}
+                />
+              );
+            })()
+          )}
+
+          {/* Header: avatar + name/handle stacked. The country pill is
+              appended outside this flag-mode wrapper as a flex sibling, so
+              it keeps its own surface treatment. */}
+          <div className="flex items-center gap-3">
+            {avatarElement}
+            {authorInfo}
+            {isColor && <ColorMomentEyeButton event={event} />}
+            {/* Country pill — rendered outside the flag-mode color flip via
+                `[&]:` to escape the parent's color rules. It's wrapped in
+                its own flex slot so the row layout matches the non-flag
+                case (pill anchored right). */}
+            <CountryCommentPill
+              event={event}
+              className="shrink-0 [text-shadow:none]"
+            />
+          </div>
+        </div>
+
+        {contentBlock}
+
+        {/* Action buttons — hidden in compact/embed mode */}
+        {!compact && (
+          <>
             {actionButtons}
             <NoteMoreMenu
               event={event}
@@ -1048,87 +1179,9 @@ export const NoteCard = memo(function NoteCard({
               open={replyOpen}
               onOpenChange={setReplyOpen}
             />
-          </div>
-        </div>
-      </article>
-    );
-  }
-
-  // ── Normal layout ──
-  return (
-    <article
-      className={cn(
-        "relative isolate px-4 py-3 border-b border-border hover:bg-secondary/30 transition-colors cursor-pointer overflow-hidden",
-        highlight && "animate-highlight-fade",
-        className,
-      )}
-      onClick={handleCardClick}
-      onAuxClick={handleAuxClick}
-    >
-      <CountryFlagBackdrop event={event} />
-      {/* Action header — repost takes priority, otherwise derived from event kind */}
-      {repostedBy ? (
-        <EventActionHeader
-          pubkey={repostedBy}
-          icon={RepostIcon}
-          iconClassName="text-accent"
-          action="reposted"
-        />
-      ) : (
-        !hideKindHeader && KIND_HEADER_MAP[event.kind] &&
-        (() => {
-          const cfg = KIND_HEADER_MAP[event.kind];
-          const isLive =
-            event.kind === 30311 && getEffectiveStreamStatus(event) === "live";
-          return (
-            <EventActionHeader
-              pubkey={event.pubkey}
-              icon={cfg.icon}
-              iconClassName={
-                event.kind === 30311
-                  ? isLive
-                    ? "text-primary"
-                    : "text-muted-foreground"
-                  : cfg.iconClassName
-              }
-              action={
-                typeof cfg.action === "function"
-                  ? cfg.action(event)
-                  : cfg.action
-              }
-              noun={cfg.noun}
-              nounRoute={cfg.nounRoute}
-            />
-          );
-        })()
-      )}
-
-      {/* Header: avatar + name/handle stacked, with optional country pill on the right */}
-      <div className="flex items-center gap-3">
-        {avatarElement}
-        {authorInfo}
-        {isColor && <ColorMomentEyeButton event={event} />}
-        <CountryCommentPill event={event} className="shrink-0" />
+          </>
+        )}
       </div>
-
-      {contentBlock}
-
-      {/* Action buttons — hidden in compact/embed mode */}
-      {!compact && (
-        <>
-          {actionButtons}
-          <NoteMoreMenu
-            event={event}
-            open={moreMenuOpen}
-            onOpenChange={setMoreMenuOpen}
-          />
-          <ReplyComposeModal
-            event={event}
-            open={replyOpen}
-            onOpenChange={setReplyOpen}
-          />
-        </>
-      )}
     </article>
   );
 });
