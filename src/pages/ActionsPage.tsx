@@ -35,10 +35,10 @@ import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from '@/components/ui/select';
 import {
-  Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger,
+  Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle,
 } from '@/components/ui/dialog';
 import {
-  Drawer, DrawerContent, DrawerDescription, DrawerHeader, DrawerTitle, DrawerTrigger,
+  Drawer, DrawerContent, DrawerDescription, DrawerHeader, DrawerTitle,
 } from '@/components/ui/drawer';
 import {
   Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList,
