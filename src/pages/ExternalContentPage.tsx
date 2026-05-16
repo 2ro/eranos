@@ -34,7 +34,7 @@ import { usePaginatedFeed } from '@/hooks/usePaginatedFeed';
 import { useInfiniteScroll } from '@/hooks/useInfiniteScroll';
 import { usePinnedPosts } from '@/hooks/usePinnedPosts';
 import { CountryFeedProvider } from '@/components/CountryFeedProvider';
-import { CommunityStatsPanel } from '@/components/CommunityStatsPanel';
+import { CountryStatsDrawer } from '@/components/world/CountryStatsDrawer';
 import { Pin } from 'lucide-react';
 import { NoteCard } from '@/components/NoteCard';
 import { useBookReviews } from '@/hooks/useBookReviews';
@@ -364,6 +364,17 @@ export function ExternalContentPage() {
           <ArrowLeft className="size-5" />
         </Link>
         <h1 className="text-xl font-bold truncate">{pageTitle}</h1>
+        {/* Right-aligned actions. The flex-1 spacer pushes the stats
+            button to the trailing edge of the header — same pattern as
+            the 3-dot menu in `ExternalActionBar`. Only country pages get
+            a stats button today (the kind-30385 snapshot is country-
+            scoped); other content types fall back to no trailing slot. */}
+        {isCountry && countryCode && (
+          <>
+            <div className="flex-1" />
+            <CountryStatsDrawer countryCode={countryCode} />
+          </>
+        )}
       </div>
 
       <div className="px-4 space-y-6 pb-4">
@@ -401,12 +412,6 @@ export function ExternalContentPage() {
         <CountryFeedProvider countryCode={countryCode}>
           {/* Inline compose box */}
           <ComposeBox compact replyTo={commentRoot} />
-
-          {/* Community stats snapshot (kind 30385) for this country.
-              Renders nothing when no trusted snapshot exists. */}
-          <div className="px-4 pt-2">
-            <CommunityStatsPanel countryCode={countryCode} />
-          </div>
 
           {/* Pinned posts (curated by country organizers/admins). Skipped on
               ISBN/url/unknown content types — only meaningful for country feeds. */}
