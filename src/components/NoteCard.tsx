@@ -37,7 +37,7 @@ import {
   ColorMomentContent,
   ColorMomentEyeButton,
 } from "@/components/ColorMomentContent";
-import { CommentContext, CountryCommentPill } from "@/components/CommentContext";
+import { CommentContext, CountryCommentPill, CountryFlagBackdrop } from "@/components/CommentContext";
 import { CommunityContentWarning } from "@/components/CommunityContentWarning";
 import { ContentWarningGuard } from "@/components/ContentWarningGuard";
 import { EmojifiedText, ReactionEmoji } from "@/components/CustomEmoji";
@@ -1015,13 +1015,14 @@ export const NoteCard = memo(function NoteCard({
     return (
       <article
         className={cn(
-          "px-4 pt-3 hover:bg-secondary/30 transition-colors cursor-pointer overflow-hidden",
+          "relative isolate px-4 pt-3 hover:bg-secondary/30 transition-colors cursor-pointer overflow-hidden",
           threaded ? "pb-0" : "pb-3 border-b border-border",
           className,
         )}
         onClick={handleCardClick}
         onAuxClick={handleAuxClick}
       >
+        <CountryFlagBackdrop event={event} />
         {threadedKindHeader}
         <div className="flex gap-3">
           <div className="flex flex-col items-center">
@@ -1057,13 +1058,14 @@ export const NoteCard = memo(function NoteCard({
   return (
     <article
       className={cn(
-        "px-4 py-3 border-b border-border hover:bg-secondary/30 transition-colors cursor-pointer overflow-hidden",
+        "relative isolate px-4 py-3 border-b border-border hover:bg-secondary/30 transition-colors cursor-pointer overflow-hidden",
         highlight && "animate-highlight-fade",
         className,
       )}
       onClick={handleCardClick}
       onAuxClick={handleAuxClick}
     >
+      <CountryFlagBackdrop event={event} />
       {/* Action header — repost takes priority, otherwise derived from event kind */}
       {repostedBy ? (
         <EventActionHeader

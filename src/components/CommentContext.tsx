@@ -911,28 +911,19 @@ function CountryPillBadge({ identifier, className }: { identifier: string; class
 }
 
 /**
- * Standalone country flag pill for kind-1111 events whose root is an ISO 3166
- * identifier. Intended to be rendered in the upper-right of `NoteCard`'s
- * header row so the post reads as a neighborhood entry instead of a comment.
- *
- * Returns `null` when:
- *   - the event isn't kind 1111
- *   - the event's parent is another comment (k="1111") — we want context for
- *     the immediate parent (`Replying to @user`) to take over there
- *   - the root I tag isn't an `iso3166:` identifier
- *   - we're already inside that country's feed page
- *
- * Because the pill takes over the country-root presentation, the body-level
- * `CommentContext` is silent for country roots — see `CountryCommentContext`.
+ * Resolve whether a kind-1111 event should display country-rooted UI in the
+ * current context. Shared by `CountryCommentPill` (renders a pill in the
+ * card header) and `CountryFlagBackdrop` (renders a faded flag behind the
+ * card). Returns `null` to suppress both; otherwise returns the resolved
+ * country identifier so callers don't re-parse tags.
  */
-export function CountryCommentPill({ event, className }: { event: NostrEvent; className?: string }) {
+function useCountryRootContext(event: NostrEvent): { iTag: string; code: string } | null {
   const countryFeed = useCountryFeed();
 
-  // Skip non-comments
   if (event.kind !== 1111) return null;
 
   // If the direct parent is another kind-1111 comment, the body shows
-  // "Replying to @user" — the country pill would be visual noise.
+  // "Replying to @user" — country chrome would be visual noise.
   const parentKind = event.tags.find(([name]) => name === 'k')?.[1];
   if (parentKind === '1111') return null;
 
@@ -943,12 +934,75 @@ export function CountryCommentPill({ event, className }: { event: NostrEvent; cl
   const code = iTag.slice('iso3166:'.length);
 
   // Suppress when already inside the matching country feed page — there the
-  // pill would just point back to the page the user is already on.
+  // chrome would just point back to the page the user is already on.
   if (countryFeed && countryFeed.countryCode === code.toUpperCase()) {
     return null;
   }
 
-  return <CountryPillBadge identifier={iTag} className={className} />;
+  return { iTag, code };
+}
+
+/**
+ * Standalone country flag pill for kind-1111 events whose root is an ISO 3166
+ * identifier. Intended to be rendered in the upper-right of `NoteCard`'s
+ * header row so the post reads as a neighborhood entry instead of a comment.
+ *
+ * Visibility rules: see `useCountryRootContext`.
+ *
+ * Because the pill takes over the country-root presentation, the body-level
+ * `CommentContext` is silent for country roots — see `CountryCommentContext`.
+ */
+export function CountryCommentPill({ event, className }: { event: NostrEvent; className?: string }) {
+  const ctx = useCountryRootContext(event);
+  if (!ctx) return null;
+  return <CountryPillBadge identifier={ctx.iTag} className={className} />;
+}
+
+/**
+ * Decorative flag backdrop for country-rooted kind-1111 posts. Renders a
+ * large blurred flag emoji in the upper-right of the card that fades down
+ * into transparency before reaching the content, echoing the hero pattern
+ * used on the country detail page. Pairs with `CountryCommentPill`.
+ *
+ * Designed to be rendered as the first child of a `relative isolate
+ * overflow-hidden` parent so the absolute layer is contained and never
+ * leaks behind sibling cards. Pointer events disabled so the post body
+ * stays fully interactive.
+ *
+ * Visibility rules: see `useCountryRootContext` (identical to the pill).
+ */
+export function CountryFlagBackdrop({ event }: { event: NostrEvent }) {
+  const ctx = useCountryRootContext(event);
+  if (!ctx) return null;
+  const info = getCountryInfo(ctx.code);
+  const flag = info?.flag ?? '🌍';
+
+  return (
+    <div aria-hidden className="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
+      {/* Giant flag emoji anchored upper-right. text-[12rem] gives a glyph
+          roughly the width of the card on mobile so two stripes are visible;
+          we deliberately overshoot the right edge so the eye sees colors,
+          not a complete flag. */}
+      <span
+        className="absolute -top-6 -right-10 sm:-top-8 sm:-right-12 text-[11rem] sm:text-[14rem] leading-none opacity-70 blur-sm select-none"
+        style={{ filter: 'blur(6px) saturate(1.15)' }}
+        role="presentation"
+      >
+        {flag}
+      </span>
+      {/* Fade overlay: lets a horizontal band of color show through at the
+          very top, then quickly resolves to the card's surface so the post
+          body sits on a clean background. Uses --background so the seam
+          disappears in both light and dark themes. */}
+      <div
+        className="absolute inset-0"
+        style={{
+          backgroundImage:
+            'linear-gradient(to bottom, hsl(var(--background) / 0) 0%, hsl(var(--background) / 0.35) 30%, hsl(var(--background) / 0.9) 65%, hsl(var(--background)) 90%)',
+        }}
+      />
+    </div>
+  );
 }
 
 /**
