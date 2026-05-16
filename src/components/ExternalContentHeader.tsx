@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowLeft, BookOpen, Coins, ExternalLink, FileText, Globe, Landmark, Languages, MapPin, MessageCircle, Package, Pause, Play, Repeat2, Share2, User, Users, Zap } from 'lucide-react';
+import { ArrowLeft, BookOpen, Coins, ExternalLink, FileText, Globe, Landmark, Languages, MapPin, MessageCircle, Package, Pause, Play, Repeat2, Share2, User, UserCheck, UserMinus, UserPlus, Users, Zap } from 'lucide-react';
 import { nip19 } from 'nostr-tools';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -971,6 +971,14 @@ export function CountryContentHeader({ code }: { code: string }) {
               isFollowing={isFollowing}
               isPending={isPending}
               onClick={handleToggleFollow}
+              icon={<UserPlus className="size-4" />}
+              followingIcon={
+                <>
+                  <UserCheck className="size-4 group-hover:hidden group-focus-visible:hidden" />
+                  <UserMinus className="size-4 hidden group-hover:inline group-focus-visible:inline" />
+                </>
+              }
+              hoverToUnfollow
               className={cn(
                 'shadow-md',
                 !isFollowing && 'bg-white text-black hover:bg-white/90',
