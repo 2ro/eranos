@@ -1,14 +1,13 @@
 import { useState } from 'react';
-import { Activity, Lock, Shield, Radio, Settings } from 'lucide-react';
-import { useCurrentUser } from '@/hooks/useCurrentUser';
+import { Activity, PanelLeft, Radio, Settings, Trash2 } from 'lucide-react';
 import { useLayoutOptions } from '@/contexts/LayoutContext';
-import { isAdmin } from '@/lib/admins';
-import { LoginArea } from '@/components/auth/LoginArea';
 import { PageHeader } from '@/components/PageHeader';
 import { Card, CardContent } from '@/components/ui/card';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { useFeedSettings } from '@/hooks/useFeedSettings';
+import { useToast } from '@/hooks/useToast';
 
 import { useEventDashboard } from '@/hooks/useEventDashboard';
 import { KpiGrid } from '@/components/event-dashboard/KpiGrid';
@@ -22,14 +21,25 @@ import { ConfigDrawer } from '@/components/event-dashboard/ConfigDrawer';
 import type { TerritorialLevel } from '@/components/event-dashboard/types';
 
 /**
- * Dashboard page — admin-only live monitoring dashboard.
- * Phase 2: Connected to real relay data via useEventDashboard.
+ * Dashboard page — public live monitoring dashboard.
  */
 export function EventDashboardPage() {
-  const { user } = useCurrentUser();
-  const userIsAdmin = !!user && isAdmin(user.pubkey);
   const [territorialLevel, setTerritorialLevel] = useState<TerritorialLevel>('municipalities');
   const [configOpen, setConfigOpen] = useState(false);
+  const { addToSidebar, removeFromSidebar, orderedItems } = useFeedSettings();
+  const { toast } = useToast();
+  const isInSidebar = orderedItems.includes('dashboard');
+
+  const handleToggleSidebar = () => {
+    if (isInSidebar) {
+      removeFromSidebar('dashboard');
+      toast({ title: 'Removed from sidebar' });
+      return;
+    }
+
+    addToSidebar('dashboard');
+    toast({ title: 'Added to sidebar' });
+  };
 
   // Use wider layout — removes 600px cap but keeps sidebar shell
   useLayoutOptions({ noMaxWidth: true, rightSidebar: null });
@@ -37,50 +47,7 @@ export function EventDashboardPage() {
   const {
     kpis, timeSeries, leaderboard, distribution, participants, activity,
     status, isLoading, error,
-  } = useEventDashboard({ enabled: userIsAdmin, territorialLevel });
-
-  // Not logged in
-  if (!user) {
-    return (
-      <main>
-        <PageHeader title="Dashboard" icon={<Activity className="size-5" />} />
-        <div className="px-4 py-6 max-w-2xl mx-auto">
-          <div className="text-center space-y-6 py-12">
-            <div className="w-16 h-16 mx-auto rounded-full bg-primary/20 flex items-center justify-center">
-              <Shield className="h-8 w-8 text-primary" />
-            </div>
-            <div className="space-y-2">
-              <h3 className="font-semibold text-lg">Sign in required</h3>
-              <p className="text-muted-foreground">Log in with an authorized account to access the dashboard.</p>
-            </div>
-            <LoginArea className="justify-center" />
-          </div>
-        </div>
-      </main>
-    );
-  }
-
-  // Logged in but not admin
-  if (!userIsAdmin) {
-    return (
-      <main>
-        <PageHeader title="Dashboard" icon={<Activity className="size-5" />} />
-        <div className="px-4 py-6 max-w-2xl mx-auto">
-          <Card className="bg-gradient-to-br from-destructive/5 to-destructive/10 border-destructive/20">
-            <CardContent className="pt-6">
-              <div className="text-center space-y-4">
-                <div className="w-16 h-16 mx-auto rounded-full bg-gradient-to-br from-destructive/20 to-destructive/30 flex items-center justify-center">
-                  <Lock className="h-8 w-8 text-destructive" />
-                </div>
-                <h3 className="font-semibold text-lg">Admin access required</h3>
-                <p className="text-muted-foreground">This dashboard is restricted to platform administrators.</p>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-      </main>
-    );
-  }
+  } = useEventDashboard({ enabled: true, territorialLevel });
 
   // Error state
   if (error && kpis.totalPosts === 0) {
@@ -120,12 +87,21 @@ export function EventDashboardPage() {
     </Badge>
   );
 
-  // Admin — show dashboard
   return (
     <main>
       <PageHeader title="Dashboard" icon={<Activity className="size-5" />}>
         <div className="flex items-center gap-2">
           {statusBadge}
+          <Button
+            size="sm"
+            variant="outline"
+            className="h-8 gap-1.5"
+            onClick={handleToggleSidebar}
+            title={isInSidebar ? 'Remove from sidebar' : 'Add to sidebar'}
+          >
+            {isInSidebar ? <Trash2 className="size-4" /> : <PanelLeft className="size-4" />}
+            <span className="hidden sm:inline">{isInSidebar ? 'Remove' : 'Add to sidebar'}</span>
+          </Button>
           <Button size="icon" variant="ghost" className="size-8" onClick={() => setConfigOpen(true)}>
             <Settings className="size-4" />
           </Button>

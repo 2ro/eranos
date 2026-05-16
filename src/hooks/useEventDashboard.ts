@@ -24,7 +24,7 @@ const REGION_COLORS = [
 ];
 
 interface UseEventDashboardOptions {
-  /** Must be true for relay queries to fire. Pass isAdmin(user.pubkey). */
+  /** Must be true for relay queries to fire. */
   enabled: boolean;
   /** Current territorial view level. */
   territorialLevel: TerritorialLevel;

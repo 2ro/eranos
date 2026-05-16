@@ -1,6 +1,6 @@
 import { useCallback, useMemo, useState } from 'react';
 import { useSeoMeta } from '@unhead/react';
-import { ArrowLeft, BarChart3, Globe, MessageCircle, MessageSquare, MoreHorizontal, Repeat2, Star, AlertTriangle, PanelLeft, Trash2 } from 'lucide-react';
+import { Activity, ArrowLeft, BarChart3, Globe, MessageCircle, MessageSquare, MoreHorizontal, Repeat2, Star, AlertTriangle, PanelLeft, Trash2 } from 'lucide-react';
 import { Link, useLocation, useParams } from 'react-router-dom';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Badge } from '@/components/ui/badge';
@@ -83,6 +83,7 @@ function ExternalActionBar({ content, onComment, commentCount }: ExternalActionB
   // the bottom of the bar so the dropdown can dismiss without unmounting it
   // mid-animation.
   const countryCode = content.type === 'iso3166' ? content.code : null;
+  const showDashboardLink = countryCode?.toUpperCase() === 'VE';
   const [statsOpen, setStatsOpen] = useState(false);
 
   const handleAddToSidebar = useCallback(() => {
@@ -148,6 +149,14 @@ function ExternalActionBar({ content, onComment, commentCount }: ExternalActionB
           </button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-52">
+          {showDashboardLink && (
+            <DropdownMenuItem asChild>
+              <Link to="/dashboard" className="gap-3">
+                <Activity className="size-4" />
+                View Dashboard
+              </Link>
+            </DropdownMenuItem>
+          )}
           {countryCode && (
             <DropdownMenuItem onClick={() => setStatsOpen(true)} className="gap-3">
               <BarChart3 className="size-4" />
