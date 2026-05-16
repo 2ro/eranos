@@ -7,6 +7,7 @@ import {
   CalendarDays,
   Crown,
   Info,
+  Megaphone,
   MessageCircle,
   MoreVertical,
   Pencil,
@@ -25,6 +26,7 @@ import type { NostrEvent, NostrMetadata } from '@nostrify/nostrify';
 import { AddMemberPanel } from '@/components/AddMemberDialog';
 import { CreateCommunityDialog } from '@/components/CreateCommunityDialog';
 import { CreateCommunityEventDialog } from '@/components/CreateCommunityEventDialog';
+import { CreateActionDialog } from '@/components/CreateActionDialog';
 import { PeopleAvatarStack } from '@/components/PeopleAvatarStack';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
@@ -49,6 +51,7 @@ import { useAuthors } from '@/hooks/useAuthors';
 import { useComments } from '@/hooks/useComments';
 import { useCommunityBookmarks } from '@/hooks/useCommunityBookmarks';
 import { useCommunityEvents } from '@/hooks/useCommunityEvents';
+import { useCommunityActions } from '@/hooks/useCommunityActions';
 import { useCommunityMembers } from '@/hooks/useCommunityMembers';
 import { useCommunityGoals } from '@/hooks/useCommunityGoals';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
@@ -186,6 +189,7 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
   const [activeTab, setActiveTab] = useState('activity');
   const [composeOpen, setComposeOpen] = useState(false);
   const [goalDialogOpen, setGoalDialogOpen] = useState(false);
+  const [actionDialogOpen, setActionDialogOpen] = useState(false);
   const [eventDialogOpen, setEventDialogOpen] = useState(false);
   const [editCommunityOpen, setEditCommunityOpen] = useState(false);
   const [membersDialogOpen, setMembersDialogOpen] = useState(false);
@@ -284,6 +288,7 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
   // ── Goals (NIP-75) ──────────────────────────────────────────────────────────
   const { data: goals, isLoading: goalsLoading } = useCommunityGoals(communityATag || undefined);
   const { data: communityEvents, isLoading: eventsLoading } = useCommunityEvents(communityATag || undefined);
+  const { data: communityActions, isLoading: actionsLoading } = useCommunityActions(communityATag || undefined);
   const now = useNow(60_000);
 
   /** Check if a goal event's `closed_at` deadline has passed. */
@@ -338,11 +343,31 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
     [eventItems, now],
   );
 
+  const actionEvents = useMemo(() => {
+    const moderated = applyCommunityModerationToEvents((communityActions ?? []).map((a) => a.event), moderation);
+    return membersOnly ? moderated.filter((e) => rankMap.has(e.pubkey)) : moderated;
+  }, [communityActions, moderation, membersOnly, rankMap]);
+  const activeActionEvents = useMemo(
+    () => actionEvents.filter((e) => {
+      const action = communityActions?.find((a) => a.event.id === e.id);
+      if (!action) return false;
+      return !action.deadline || action.deadline > now;
+    }),
+    [actionEvents, communityActions, now],
+  );
+  const pastActionEvents = useMemo(
+    () => actionEvents.filter((e) => {
+      const action = communityActions?.find((a) => a.event.id === e.id);
+      return !!action?.deadline && action.deadline <= now;
+    }),
+    [actionEvents, communityActions, now],
+  );
+
   // ── Initiatives (Goals + Events merged into one chronological list) ───────
   // Active items go first, sorted: future events ascending by start date,
   // then active goals by creation date (newest first). Past items follow.
   const activeInitiatives = useMemo(() => {
-    const items = [...activeGoals, ...activeEventItems];
+    const items = [...activeGoals, ...activeEventItems, ...activeActionEvents];
     return items.sort((a, b) => {
       const aIsEvent = a.kind === 31922 || a.kind === 31923;
       const bIsEvent = b.kind === 31922 || b.kind === 31923;
@@ -353,21 +378,25 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
       if (bIsEvent) return 1;
       return b.created_at - a.created_at;
     });
-  }, [activeGoals, activeEventItems]);
+  }, [activeGoals, activeEventItems, activeActionEvents]);
 
   const pastInitiatives = useMemo(() => {
-    const items = [...pastGoals, ...pastEventItems];
+    const items = [...pastGoals, ...pastEventItems, ...pastActionEvents];
     return items.sort((a, b) => {
       // Newest-first by the relevant "end" timestamp.
-      const aEnd = a.kind === 31922 || a.kind === 31923
+      const aEnd = a.kind === 36639
+        ? parseInt(a.tags.find(([n]) => n === 'deadline')?.[1] ?? String(a.created_at), 10)
+        : a.kind === 31922 || a.kind === 31923
         ? getCalendarEventEnd(a)
         : parseInt(a.tags.find(([n]) => n === 'closed_at')?.[1] ?? String(a.created_at), 10);
-      const bEnd = b.kind === 31922 || b.kind === 31923
+      const bEnd = b.kind === 36639
+        ? parseInt(b.tags.find(([n]) => n === 'deadline')?.[1] ?? String(b.created_at), 10)
+        : b.kind === 31922 || b.kind === 31923
         ? getCalendarEventEnd(b)
         : parseInt(b.tags.find(([n]) => n === 'closed_at')?.[1] ?? String(b.created_at), 10);
       return bEnd - aEnd;
     });
-  }, [pastGoals, pastEventItems]);
+  }, [pastGoals, pastEventItems, pastActionEvents]);
 
   const replyTree = useMemo((): ReplyNode[] => {
     if (!commentsData) return [];
@@ -468,6 +497,15 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
         onSelect: () => {
           setActiveTab('activity');
           setGoalDialogOpen(true);
+        },
+      },
+      {
+        id: 'new-action',
+        label: 'New action',
+        icon: <Megaphone className="size-4" />,
+        onSelect: () => {
+          setActiveTab('activity');
+          setActionDialogOpen(true);
         },
       },
       {
@@ -693,12 +731,12 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
             </TabsContent>
 
             {/* ── Activity tab — chronological stream of initiatives
-                 (goals + events) interleaved with threaded NIP-22 discussion,
+                  (actions + goals + events) interleaved with threaded NIP-22 discussion,
                  followed by past initiatives. ── */}
             <TabsContent value="activity" className="mt-0">
               <ComposeBox compact replyTo={event} />
 
-              {(commentsLoading || goalsLoading || eventsLoading) ? (
+              {(commentsLoading || goalsLoading || eventsLoading || actionsLoading) ? (
                 <div className="divide-y divide-border">
                   {Array.from({ length: 3 }).map((_, i) => (
                     <ReplyCardSkeleton key={i} />
@@ -709,10 +747,11 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
                   {membersOnly && (
                     (commentsData && (commentsData.topLevelComments?.length ?? 0) > 0) ||
                     (goals ?? []).length > 0 ||
+                    (communityActions ?? []).length > 0 ||
                     (communityEvents ?? []).length > 0
                   )
                     ? 'No activity from community members yet. Toggle the shield icon to see everything.'
-                    : <>No activity yet.{user ? ' Start a discussion, set a goal, or schedule an event!' : ''}</>}
+                    : <>No activity yet.{user ? ' Start a discussion, create an action, set a goal, or schedule an event!' : ''}</>}
                 </div>
               ) : (
                 <div className="divide-y divide-border">
@@ -897,6 +936,14 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
       )}
 
       {/* FAB-triggered event creation dialog for the events tab */}
+      {communityATag && (
+        <CreateActionDialog
+          communityATag={communityATag}
+          open={actionDialogOpen}
+          onOpenChange={setActionDialogOpen}
+        />
+      )}
+
       {communityATag && (
         <CreateCommunityEventDialog
           communityATag={communityATag}

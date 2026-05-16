@@ -25,6 +25,7 @@ import { cn } from '@/lib/utils';
 
 interface CreateActionDialogProps {
   countryCode?: string;
+  communityATag?: string;
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }
@@ -63,6 +64,11 @@ function unixSecondsInTimezone(year: number, month: number, day: number, hours: 
     Number(parts.second),
   );
   return Math.floor((utcGuess + (utcGuess - asWallClock)) / 1000);
+}
+
+function parseCommunityAuthor(communityATag: string): string | undefined {
+  const [, pubkey] = communityATag.split(':');
+  return pubkey || undefined;
 }
 
 function CreateActionForm({
@@ -276,7 +282,7 @@ function CreateActionForm({
   );
 }
 
-export function CreateActionDialog({ countryCode, open, onOpenChange }: CreateActionDialogProps) {
+export function CreateActionDialog({ countryCode, communityATag, open, onOpenChange }: CreateActionDialogProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { user } = useCurrentUser();
   const { mutateAsync: createEvent } = useNostrPublish();
@@ -315,6 +321,11 @@ export function CreateActionDialog({ countryCode, open, onOpenChange }: CreateAc
         ['alt', `Agora activist action: ${formData.title}`],
       ];
       if (formData.selectedCountry) tags.push(['i', createCountryIdentifier(formData.selectedCountry.toUpperCase())]);
+      if (communityATag) {
+        const communityAuthor = parseCommunityAuthor(communityATag);
+        tags.push(['A', communityATag], ['K', '34550']);
+        if (communityAuthor) tags.push(['P', communityAuthor]);
+      }
       if (formData.coverImage) tags.push(['image', formData.coverImage]);
 
       if (formData.startDate) {
@@ -332,6 +343,19 @@ export function CreateActionDialog({ countryCode, open, onOpenChange }: CreateAc
 
       await queryClient.invalidateQueries({ queryKey: ['agora-actions'] });
       await queryClient.refetchQueries({ queryKey: ['agora-actions'] });
+      if (communityATag) {
+        await Promise.all([
+          queryClient.invalidateQueries({ queryKey: ['community-actions', communityATag] }),
+          queryClient.invalidateQueries({
+            predicate: (q) => {
+              const [root, aTagsKey] = q.queryKey;
+              return root === 'community-activity-feed'
+                && typeof aTagsKey === 'string'
+                && aTagsKey.split(',').includes(communityATag);
+            },
+          }),
+        ]);
+      }
 
       setFormData({
         title: '', description: '', type: 'photo', bounty: '',
@@ -352,7 +376,9 @@ export function CreateActionDialog({ countryCode, open, onOpenChange }: CreateAc
 
   if (!user) return null;
 
-  const description = countryCode
+  const description = communityATag
+    ? 'New community action. You can optionally choose a country below.'
+    : countryCode
     ? `New action for ${getGeoDisplayName(countryCode)}.`
     : 'New action. You can optionally choose a country below.';
 
