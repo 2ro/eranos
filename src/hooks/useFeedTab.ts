@@ -26,6 +26,10 @@ export function useFeedTab<T extends string = string>(
     try {
       const stored = sessionStorage.getItem(key);
       if (stored) {
+        if (feedId === 'home' && stored === 'network') {
+          sessionStorage.setItem(key, defaultTab);
+          return defaultTab;
+        }
         if (!validTabs || validTabs.includes(stored as T)) {
           return stored as T;
         }

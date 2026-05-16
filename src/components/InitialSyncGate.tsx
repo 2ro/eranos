@@ -849,20 +849,6 @@ function CountriesStep({
     );
   }, [search]);
 
-  const selectedCountries = useMemo(
-    () => COUNTRY_LIST.filter((country) => selectedCodes.has(country.code)),
-    [selectedCodes],
-  );
-
-  const orderedCountries = useMemo(() => {
-    const selected = selectedCountries;
-    const selectedSet = new Set(selected.map((country) => country.code));
-    return [
-      ...selected,
-      ...filteredCountries.filter((country) => !selectedSet.has(country.code)),
-    ];
-  }, [filteredCountries, selectedCountries]);
-
   const toggleCountry = (code: string) => {
     setSelectedCodes((current) => {
       const next = new Set(current);
@@ -947,9 +933,9 @@ function CountriesStep({
         />
       </div>
 
-      {orderedCountries.length > 0 ? (
+      {filteredCountries.length > 0 ? (
         <div className="grid max-h-96 grid-cols-3 gap-x-3 gap-y-5 overflow-y-auto pr-1 sm:grid-cols-4">
-          {orderedCountries.map((country) => {
+          {filteredCountries.map((country) => {
             const isSelected = selectedCodes.has(country.code);
             return (
               <button
