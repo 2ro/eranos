@@ -44,6 +44,7 @@ import {
 import { VERIFIED_PAGE_PATH } from "@/lib/agoraDefaults";
 import { CardsIcon } from "@/components/icons/CardsIcon";
 import { ChestIcon } from "@/components/icons/ChestIcon";
+import { LogoIcon } from "@/components/icons/LogoIcon";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -124,7 +125,7 @@ export const SIDEBAR_ITEMS: SidebarItemDef[] = [
     icon: WalletMinimal,
     requiresAuth: true,
   },
-  { id: "feed", label: "Feed", path: "/feed", icon: Megaphone },
+  { id: "feed", label: "Feed", path: "/feed", icon: LogoIcon },
   {
     id: "notifications",
     label: "Notifications",
