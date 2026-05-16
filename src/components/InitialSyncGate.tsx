@@ -234,8 +234,6 @@ const COUNTRY_LIST = Object.entries(COUNTRIES)
   .map(([code, { name, flag }]) => ({ code, name, flag }))
   .sort((a, b) => a.name.localeCompare(b.name));
 
-const SUGGESTED_COUNTRY_CODES = ["US", "BR", "VE", "NG", "IN", "JP", "DE", "ZA"];
-
 // Steps for signup (includes keygen + profile) vs. settings-only (existing login)
 type SignupStep = "keygen" | "download" | "profile";
 type SettingsStep = "countries" | "follows" | "outro";
@@ -843,13 +841,6 @@ function CountriesStep({
   const [selectedCodes, setSelectedCodes] = useState<Set<string>>(new Set());
   const [isSaving, setIsSaving] = useState(false);
 
-  const suggestedCountries = useMemo(
-    () => SUGGESTED_COUNTRY_CODES
-      .map((code) => COUNTRY_LIST.find((country) => country.code === code))
-      .filter((country): country is (typeof COUNTRY_LIST)[number] => !!country),
-    [],
-  );
-
   const filteredCountries = useMemo(() => {
     const query = search.trim().toLowerCase();
     if (!query) return COUNTRY_LIST;
@@ -858,7 +849,10 @@ function CountriesStep({
     );
   }, [search]);
 
-  const visibleCountries = search.trim() ? filteredCountries.slice(0, 24) : suggestedCountries;
+  const selectedCountries = useMemo(
+    () => COUNTRY_LIST.filter((country) => selectedCodes.has(country.code)),
+    [selectedCodes],
+  );
 
   const toggleCountry = (code: string) => {
     setSelectedCodes((current) => {
@@ -944,9 +938,33 @@ function CountriesStep({
         />
       </div>
 
-      {visibleCountries.length > 0 ? (
-        <div className="grid grid-cols-2 gap-2 max-h-80 overflow-y-auto pr-1">
-          {visibleCountries.map((country) => {
+      {selectedCountries.length > 0 && (
+        <div className="rounded-xl border bg-card p-3 space-y-2">
+          <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+            Selected
+          </p>
+          <div className="flex max-h-28 flex-wrap gap-2 overflow-y-auto pr-1">
+            {selectedCountries.map((country) => (
+              <button
+                key={country.code}
+                type="button"
+                onClick={() => toggleCountry(country.code)}
+                className="inline-flex items-center gap-2 rounded-full bg-primary/10 px-3 py-1.5 text-sm font-medium text-primary transition-colors hover:bg-primary/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                aria-label={`Remove ${country.name}`}
+              >
+                <span className="text-base leading-none" aria-hidden="true">
+                  {country.flag}
+                </span>
+                <span>{country.name}</span>
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {filteredCountries.length > 0 ? (
+        <div className="grid max-h-80 grid-cols-2 gap-2 overflow-y-auto pr-1">
+          {filteredCountries.map((country) => {
             const isSelected = selectedCodes.has(country.code);
             return (
               <button
@@ -980,12 +998,6 @@ function CountriesStep({
         <div className="rounded-xl border border-dashed p-8 text-center text-sm text-muted-foreground">
           No countries match "{search}".
         </div>
-      )}
-
-      {search.trim() && filteredCountries.length > visibleCountries.length && (
-        <p className="text-center text-xs text-muted-foreground">
-          Keep typing to narrow {filteredCountries.length} matches.
-        </p>
       )}
 
       <div className="flex gap-3">
