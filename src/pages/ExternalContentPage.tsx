@@ -381,7 +381,6 @@ export function ExternalContentPage() {
         {/* Content-specific header */}
         {content.type === 'url' && <UrlContentHeader url={content.value} />}
         {content.type === 'isbn' && <BookContentHeader isbn={content.value} />}
-        {content.type === 'iso3166' && <CountryContentHeader code={content.code} />}
         {content.type === 'unknown' && (
           <div className="rounded-2xl border border-border p-5 text-center">
             <Globe className="size-8 mx-auto mb-2 text-muted-foreground/40" />
@@ -389,6 +388,13 @@ export function ExternalContentPage() {
           </div>
         )}
       </div>
+
+      {/* Country header lives OUTSIDE the px-4 wrapper above so the hero
+          backdrop, gradients, and bottom-anchored title can bleed flush to
+          the column edges — the "you've arrived" feeling depends on the
+          image touching the left/right rails rather than floating in a
+          padded box. */}
+      {content.type === 'iso3166' && <CountryContentHeader code={content.code} />}
 
       {/* React / share action bar */}
       <ExternalActionBar

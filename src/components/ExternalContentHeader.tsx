@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { BookOpen, Droplets, ExternalLink, FileText, Globe, MapPin, MessageCircle, Package, Play, Repeat2, Share2, User, Users, Wind, Zap } from 'lucide-react';
+import { BookOpen, Coins, Crown, Droplets, ExternalLink, FileText, Flag, Globe, Landmark, Languages, MapPin, MessageCircle, Package, Play, Repeat2, Share2, Sparkles, Sunrise, Sunset, User, Users, Wind, Zap } from 'lucide-react';
 import { nip19 } from 'nostr-tools';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -27,6 +27,8 @@ import { useToast } from '@/hooks/useToast';
 import { genUserName } from '@/lib/genUserName';
 import { getCountryInfo, getWikipediaTitle } from '@/lib/countries';
 import { useWikipediaSummary } from '@/hooks/useWikipediaSummary';
+import { useCountryFacts, type CountryFacts } from '@/hooks/useCountryFacts';
+import { formatNumber } from '@/lib/formatNumber';
 import { EXTRA_KINDS } from '@/lib/extraKinds';
 import { CONTENT_KIND_ICONS } from '@/lib/sidebarItems';
 import { cn } from '@/lib/utils';
@@ -594,72 +596,224 @@ function WikipediaExtract({ extract, articleUrl }: { extract: string; articleUrl
   );
 }
 
-function WeatherWidget({ code }: { code: string }) {
+function WeatherStrip({ code }: { code: string }) {
   const { data: weather, isLoading } = useWeather(code);
 
   if (isLoading) {
     return (
-      <div className="mt-5 rounded-xl bg-secondary/50 p-4">
-        <div className="flex items-center gap-4">
-          <Skeleton className="size-12 rounded-lg" />
-          <div className="flex-1 space-y-2">
-            <Skeleton className="h-5 w-24" />
-            <Skeleton className="h-3 w-32" />
-          </div>
-          <div className="space-y-2">
-            <Skeleton className="h-3 w-16" />
-            <Skeleton className="h-3 w-16" />
-          </div>
-        </div>
+      <div className="flex items-center gap-3 px-4 py-3">
+        <Skeleton className="size-8 rounded-md" />
+        <Skeleton className="h-4 w-20" />
+        <Skeleton className="h-4 w-32" />
       </div>
     );
   }
 
   if (!weather) return null;
 
+  // Borderless inline weather strip — sits below the hero on its own line,
+  // intentionally without a card box so the immersive header continues to
+  // feel like one continuous space rather than a stack of widgets.
   return (
-    <div className="mt-5 rounded-xl bg-gradient-to-br from-secondary/60 to-secondary/30 border border-border/50 p-4 transition-all hover:border-border">
-      <div className="flex items-center gap-4">
-        {/* Weather icon + temperature */}
-        <div className="flex items-center gap-3">
-          <span className="text-4xl leading-none" role="img" aria-label={weather.description}>
+    <div className="px-4 py-3">
+      <div className="flex flex-wrap items-center gap-x-5 gap-y-2 text-sm text-muted-foreground">
+        <div className="flex items-center gap-2">
+          <span className="text-2xl leading-none" role="img" aria-label={weather.description}>
             {weather.icon}
           </span>
-          <div>
-            <p className="text-2xl font-bold tabular-nums leading-tight">
-              {weather.temperature}°C
-            </p>
-            <p className="text-xs text-muted-foreground">
-              {weather.description}
-            </p>
-          </div>
+          <span className="font-bold text-foreground tabular-nums text-lg leading-none">
+            {weather.temperature}°
+          </span>
+          <span className="text-xs">{weather.description}</span>
         </div>
-
-        {/* Divider */}
-        <div className="h-10 w-px bg-border/60 mx-1" />
-
-        {/* Details */}
-        <div className="flex-1 grid grid-cols-2 gap-x-4 gap-y-1 text-xs text-muted-foreground">
-          <span className="flex items-center gap-1.5">
-            <span className="text-foreground/60">Feels like</span>
-            <span className="font-medium text-foreground tabular-nums">{weather.apparentTemperature}°</span>
+        <span className="flex items-center gap-1.5 text-xs">
+          <span className="opacity-60">Feels</span>
+          <span className="font-medium text-foreground tabular-nums">
+            {weather.apparentTemperature}°
           </span>
-          <span className="flex items-center gap-1.5">
-            <Droplets className="size-3 shrink-0" />
-            <span className="font-medium text-foreground tabular-nums">{weather.humidity}%</span>
+        </span>
+        <span className="flex items-center gap-1.5 text-xs">
+          <Droplets className="size-3 shrink-0" />
+          <span className="font-medium text-foreground tabular-nums">{weather.humidity}%</span>
+        </span>
+        <span className="flex items-center gap-1.5 text-xs">
+          <Wind className="size-3 shrink-0" />
+          <span className="font-medium text-foreground tabular-nums">
+            {weather.windSpeed} km/h
           </span>
-          <span className="flex items-center gap-1.5">
-            <Wind className="size-3 shrink-0" />
-            <span className="font-medium text-foreground tabular-nums">{weather.windSpeed} km/h</span>
+        </span>
+        {weather.city && (
+          <span className="flex items-center gap-1.5 text-xs">
+            <MapPin className="size-3 shrink-0" />
+            <span className="truncate">{weather.city}</span>
           </span>
-          {weather.city && (
-            <span className="flex items-center gap-1.5">
-              <MapPin className="size-3 shrink-0" />
-              <span className="truncate">{weather.city}</span>
-            </span>
-          )}
-        </div>
+        )}
+        <span className="flex items-center gap-1.5 text-xs" title={weather.isDay ? 'Daytime' : 'Nighttime'}>
+          {weather.isDay ? <Sunrise className="size-3 shrink-0" /> : <Sunset className="size-3 shrink-0" />}
+          <span className="font-medium text-foreground">{weather.isDay ? 'Day' : 'Night'}</span>
+        </span>
       </div>
+    </div>
+  );
+}
+
+// ── Country fast-facts strip (Wikidata) ─────────────────────────────────────
+
+/**
+ * Borderless grid of "fast facts" pulled from Wikidata — capital, population,
+ * languages, currency, etc. Designed to feel like a tour-book sidebar
+ * stripped of its chrome: pure data + iconography, no cards.
+ */
+function CountryFactsStrip({ facts }: { facts: CountryFacts }) {
+  const items: { icon: React.ReactNode; label: string; value: string; key: string }[] = [];
+
+  if (facts.capital) {
+    items.push({ key: 'capital', icon: <Landmark className="size-3.5" />, label: 'Capital', value: facts.capital });
+  }
+  if (facts.population !== null) {
+    items.push({
+      key: 'population',
+      icon: <Users className="size-3.5" />,
+      label: 'Population',
+      value: formatNumber(facts.population),
+    });
+  }
+  if (facts.area !== null) {
+    items.push({
+      key: 'area',
+      icon: <Globe className="size-3.5" />,
+      label: 'Area',
+      // The Intl formatter handles thousands separators per locale; km² stays
+      // as a plain suffix because there's no first-class unit for it.
+      value: `${facts.area.toLocaleString()} km²`,
+    });
+  }
+  if (facts.languages.length > 0) {
+    items.push({
+      key: 'languages',
+      icon: <Languages className="size-3.5" />,
+      label: facts.languages.length > 1 ? 'Languages' : 'Language',
+      value: facts.languages.slice(0, 3).join(', '),
+    });
+  }
+  if (facts.currencies.length > 0) {
+    items.push({
+      key: 'currency',
+      icon: <Coins className="size-3.5" />,
+      label: facts.currencies.length > 1 ? 'Currencies' : 'Currency',
+      value: facts.currencies.slice(0, 2).join(', '),
+    });
+  }
+  if (facts.government) {
+    items.push({
+      key: 'government',
+      icon: <Crown className="size-3.5" />,
+      label: 'Government',
+      value: facts.government,
+    });
+  }
+  if (facts.inception) {
+    items.push({
+      key: 'inception',
+      icon: <Sparkles className="size-3.5" />,
+      label: 'Established',
+      value: facts.inception,
+    });
+  }
+  if (facts.demonym) {
+    items.push({
+      key: 'demonym',
+      icon: <User className="size-3.5" />,
+      label: 'Demonym',
+      value: facts.demonym,
+    });
+  }
+
+  if (items.length === 0) return null;
+
+  return (
+    <dl className="px-4 py-4 grid grid-cols-2 sm:grid-cols-3 gap-x-4 gap-y-3">
+      {items.map((item) => (
+        <div key={item.key} className="min-w-0">
+          <dt className="flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+            {item.icon}
+            <span>{item.label}</span>
+          </dt>
+          <dd className="mt-0.5 text-sm font-medium text-foreground truncate" title={item.value}>
+            {item.value}
+          </dd>
+        </div>
+      ))}
+    </dl>
+  );
+}
+
+// ── National anthem player ──────────────────────────────────────────────────
+
+/**
+ * Minimal national-anthem audio player. Lazy — the `<audio>` element only
+ * starts loading after the user clicks Play, so we don't pull a multi-megabyte
+ * OGG file from Commons just because someone navigated to a country page.
+ *
+ * Uses native HTMLAudioElement events for state instead of polling: `play`
+ * and `pause` toggle the local state; `ended` resets back to "paused" so the
+ * button doesn't strand the user in a "playing" state at the end of the file.
+ */
+function AnthemPlayer({ url, title }: { url: string; title: string | null }) {
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const [playing, setPlaying] = useState(false);
+  const [armed, setArmed] = useState(false);
+
+  const toggle = useCallback(() => {
+    const el = audioRef.current;
+    if (!el) {
+      // First click — mount the audio element. The effect below will start
+      // playback as soon as the ref is wired up.
+      setArmed(true);
+      setPlaying(true);
+      return;
+    }
+    if (el.paused) {
+      void el.play();
+    } else {
+      el.pause();
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!armed || !audioRef.current) return;
+    const el = audioRef.current;
+    if (playing && el.paused) void el.play();
+  }, [armed, playing]);
+
+  return (
+    <div className="px-4 py-3 flex items-center gap-3">
+      <button
+        type="button"
+        onClick={toggle}
+        aria-label={playing ? 'Pause national anthem' : 'Play national anthem'}
+        className="inline-flex items-center justify-center size-9 rounded-full bg-primary/15 text-primary hover:bg-primary/25 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring transition-colors"
+      >
+        <Play className={cn('size-4', playing && 'hidden')} />
+        <span className={cn('size-3 bg-current rounded-sm', !playing && 'hidden')} aria-hidden />
+      </button>
+      <div className="min-w-0">
+        <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+          National anthem
+        </p>
+        <p className="text-sm font-medium truncate">{title ?? 'Play anthem'}</p>
+      </div>
+      {armed && (
+        <audio
+          ref={audioRef}
+          src={url}
+          preload="auto"
+          onPlay={() => setPlaying(true)}
+          onPause={() => setPlaying(false)}
+          onEnded={() => setPlaying(false)}
+          className="sr-only"
+        />
+      )}
     </div>
   );
 }
@@ -668,6 +822,10 @@ export function CountryContentHeader({ code }: { code: string }) {
   const info = getCountryInfo(code);
   const wikiTitle = getWikipediaTitle(code);
   const { data: wiki, isLoading: wikiLoading } = useWikipediaSummary(wikiTitle);
+  // Country facts are only fetched for sovereign countries (alpha-2 codes);
+  // the hook's internal guard returns `null` for subdivisions like `US-CA`.
+  const { data: facts } = useCountryFacts(info?.subdivision ? null : code);
+  const { data: weather } = useWeather(code);
   const { user } = useCurrentUser();
   const { isFollowingCountry, toggleCountryFollow, isPending } = useCountryFollows();
   const { toast } = useToast();
@@ -688,74 +846,164 @@ export function CountryContentHeader({ code }: { code: string }) {
 
   if (!info) {
     return (
-      <div className="rounded-2xl border border-border p-5 text-center">
+      <div className="rounded-2xl border border-border p-5 text-center mx-4">
         <MapPin className="size-8 mx-auto mb-2 text-muted-foreground/40" />
         <p className="text-muted-foreground">Unknown country code: {code}</p>
       </div>
     );
   }
 
+  const heroImage = wiki?.originalImage?.source ?? wiki?.thumbnail?.source ?? null;
+  const isDay = weather?.isDay ?? true;
+  // Sky-tint gradient layered above the hero photo. Warm amber/rose during
+  // local daytime, deep indigo/violet at night. The gradient stops are
+  // identical between day and night — only the colour palette flips — so
+  // the cinematic shape is preserved while the mood follows the destination.
+  const skyOverlay = isDay
+    ? 'bg-[linear-gradient(to_bottom,rgba(254,202,87,0.18)_0%,rgba(255,107,107,0.12)_30%,rgba(0,0,0,0.65)_70%,hsl(var(--background))_100%)]'
+    : 'bg-[linear-gradient(to_bottom,rgba(30,27,75,0.55)_0%,rgba(15,23,42,0.55)_30%,rgba(0,0,0,0.85)_70%,hsl(var(--background))_100%)]';
+
   return (
-    <div className="rounded-2xl border border-border overflow-hidden">
-      {/* Flag + name */}
-      <div className="p-6 sm:p-8">
-        <div className="flex items-start gap-4">
-          {info.subdivision && wiki?.thumbnail ? (
+    // Edge-to-edge container — caller is expected to mount this outside any
+    // horizontal padding wrapper so the hero can fill the column. We add a
+    // small bottom margin to space the facts strip from the action bar.
+    <section className="relative isolate overflow-hidden -mt-5 mb-2">
+      {/* Hero — Wikipedia photo (or gradient fallback) with day/night sky
+          overlay that fades into the page background. Aspect ratio scales
+          from a compact 2:1 on phones to a cinematic 21:9 on tablets+. */}
+      <div className="relative w-full aspect-[2/1] sm:aspect-[21/9]">
+        <div aria-hidden className="absolute inset-0 -z-10">
+          {heroImage ? (
             <img
-              src={wiki.thumbnail.source}
-              alt={info.subdivisionName ?? info.subdivision}
-              className="size-16 sm:size-20 rounded-md object-cover shadow-sm border border-border"
+              src={heroImage}
+              alt=""
+              className="absolute inset-0 w-full h-full object-cover"
+              loading="eager"
             />
           ) : (
-            <span className="text-6xl sm:text-7xl leading-none" role="img" aria-label={`Flag of ${info.name}`}>
-              {info.flag}
-            </span>
+            // Fallback when Wikipedia has no hero image — a warm flag-toned
+            // gradient that still feels destination-y rather than empty.
+            <div className={cn('absolute inset-0', isDay
+              ? 'bg-gradient-to-br from-amber-400/30 via-rose-400/20 to-primary/10'
+              : 'bg-gradient-to-br from-indigo-900/60 via-slate-900/60 to-primary/20')} />
           )}
-          <div className="min-w-0 flex-1 space-y-1">
-            <div className="flex items-start justify-between gap-3">
-              <div className="min-w-0 space-y-1">
-                <h2 className="text-2xl sm:text-3xl font-bold leading-snug">
-                  {info.subdivisionName ?? info.name}
-                </h2>
-                {info.subdivision && (
-                  <p className="text-sm text-muted-foreground">
-                    {info.name}{info.subdivisionName ? '' : ` · ${info.subdivision}`}
-                  </p>
-                )}
-                {wiki?.description && (
-                  <p className="text-sm text-muted-foreground capitalize">
-                    {wiki.description}
-                  </p>
-                )}
-              </div>
-              {user && (
-                <FollowToggleButton
-                  size="sm"
-                  isFollowing={isFollowing}
-                  isPending={isPending}
-                  onClick={handleToggleFollow}
-                  className="shrink-0"
-                />
+          {/* Sky-tint + bottom fade. */}
+          <div className={cn('absolute inset-0', skyOverlay)} />
+        </div>
+
+        {/* Top-right follow button overlaid on the photo. The page-level
+            back arrow + Stats button sit above this hero in the page header,
+            so we only need the destination-specific affordance here. */}
+        {user && (
+          <div className="absolute top-3 right-3 z-10">
+            <FollowToggleButton
+              size="sm"
+              isFollowing={isFollowing}
+              isPending={isPending}
+              onClick={handleToggleFollow}
+              className={cn(
+                'shadow-md',
+                !isFollowing && 'bg-white text-black hover:bg-white/90',
+                isFollowing && 'bg-black/30 backdrop-blur-sm border-white/40 text-white hover:bg-destructive/30 hover:text-white hover:border-destructive/60',
+              )}
+            />
+          </div>
+        )}
+
+        {/* Bottom-anchored hero title block. The text-shadow utility keeps
+            white text legible against any underlying photo. */}
+        <div className="absolute bottom-0 left-0 right-0 px-5 pb-4 pt-10 [text-shadow:0_1px_4px_rgba(0,0,0,0.7),0_2px_8px_rgba(0,0,0,0.4)]">
+          <div className="flex items-end gap-3">
+            {info.subdivision && wiki?.thumbnail ? (
+              <img
+                src={wiki.thumbnail.source}
+                alt={info.subdivisionName ?? info.subdivision}
+                className="size-14 sm:size-16 rounded-md object-cover shadow-lg border border-white/20 [text-shadow:none]"
+              />
+            ) : (
+              <span
+                className="text-5xl sm:text-6xl leading-none drop-shadow-[0_2px_8px_rgba(0,0,0,0.6)] [text-shadow:none]"
+                role="img"
+                aria-label={`Flag of ${info.name}`}
+              >
+                {info.flag}
+              </span>
+            )}
+            <div className="min-w-0 flex-1 pb-1">
+              <h2 className="text-2xl sm:text-4xl font-bold leading-tight text-white truncate">
+                {info.subdivisionName ?? info.name}
+              </h2>
+              {info.subdivision ? (
+                <p className="text-sm text-white/85 mt-0.5 truncate">
+                  {info.name}{info.subdivisionName ? '' : ` · ${info.subdivision}`}
+                </p>
+              ) : facts?.officialNames?.[0] && facts.officialNames[0].name !== info.name ? (
+                <p className="text-sm text-white/85 mt-0.5 truncate italic" lang={facts.officialNames[0].lang || undefined}>
+                  {facts.officialNames[0].name}
+                </p>
+              ) : wiki?.description ? (
+                <p className="text-sm text-white/85 mt-0.5 truncate capitalize">{wiki.description}</p>
+              ) : null}
+              {facts?.motto && (
+                <p className="text-xs text-white/80 mt-1 italic truncate" title={facts.motto}>
+                  &ldquo;{facts.motto}&rdquo;
+                </p>
               )}
             </div>
           </div>
         </div>
-
-        {/* Current weather */}
-        <WeatherWidget code={code} />
-
-        {/* Wikipedia extract */}
-        {wikiLoading ? (
-          <div className="mt-5 space-y-2">
-            <Skeleton className="h-4 w-full" />
-            <Skeleton className="h-4 w-full" />
-            <Skeleton className="h-4 w-3/4" />
-          </div>
-        ) : wiki?.extract ? (
-          <WikipediaExtract extract={wiki.extract} articleUrl={wiki.articleUrl} />
-        ) : null}
       </div>
-    </div>
+
+      {/* Below-hero content — no card chrome, just stacked sections. */}
+      <div>
+        {/* Weather strip (always shown when data is available; the
+            precipitation overlay rendered by ExternalContentPage will already
+            be animating across the whole viewport). */}
+        <WeatherStrip code={code} />
+
+        {/* Fast-facts grid from Wikidata. */}
+        {facts && <CountryFactsStrip facts={facts} />}
+
+        {/* National anthem player + coat of arms — both optional, both
+            country-flair signals that this is a destination, not just a tag. */}
+        {(facts?.anthemUrl || facts?.coatOfArmsUrl) && (
+          <div className="px-4 py-2 flex flex-wrap items-center gap-x-6 gap-y-3 border-t border-border/40">
+            {facts.coatOfArmsUrl && (
+              <div className="flex items-center gap-3">
+                <img
+                  src={facts.coatOfArmsUrl}
+                  alt={`Coat of arms of ${info.name}`}
+                  className="h-16 w-auto object-contain"
+                  loading="lazy"
+                />
+                <div className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
+                  <Flag className="size-3" />
+                  <span>Coat of arms</span>
+                </div>
+              </div>
+            )}
+            {facts.anthemUrl && (
+              <div className="flex-1 min-w-[200px] -mx-4">
+                <AnthemPlayer url={facts.anthemUrl} title={facts.anthemTitle} />
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Wikipedia extract — prose, no surrounding card. */}
+        <div className="px-4 pt-4 pb-1">
+          {wikiLoading ? (
+            <div className="space-y-2">
+              <Skeleton className="h-4 w-full" />
+              <Skeleton className="h-4 w-full" />
+              <Skeleton className="h-4 w-3/4" />
+            </div>
+          ) : wiki?.extract ? (
+            <WikipediaExtract extract={wiki.extract} articleUrl={wiki.articleUrl} />
+          ) : null}
+        </div>
+      </div>
+    </section>
   );
 }
 
