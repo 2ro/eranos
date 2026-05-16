@@ -183,7 +183,7 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
   const [banTargetPubkey, setBanTargetPubkey] = useState<string | null>(null);
 
   // ── Tab + FAB state ────────────────────────────────────────────────────────
-  const [activeTab, setActiveTab] = useState('chat');
+  const [activeTab, setActiveTab] = useState('activity');
   const [composeOpen, setComposeOpen] = useState(false);
   const [goalDialogOpen, setGoalDialogOpen] = useState(false);
   const [eventDialogOpen, setEventDialogOpen] = useState(false);
@@ -643,13 +643,6 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
       {/* ── Tabs ── */}
           <TabsList className="w-full justify-stretch rounded-none border-b border-white/15 bg-transparent p-0 h-auto">
             <TabsTrigger
-              value="chat"
-              className="flex-1 min-w-0 rounded-none border-b-2 border-transparent text-white/75 hover:text-white data-[state=active]:text-white data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none px-4 pb-3 pt-2 [text-shadow:0_1px_3px_rgba(0,0,0,0.6)]"
-            >
-              <MessageCircle className="size-4 mr-1.5" />
-              Chat
-            </TabsTrigger>
-            <TabsTrigger
               value="activity"
               className="flex-1 min-w-0 rounded-none border-b-2 border-transparent text-white/75 hover:text-white data-[state=active]:text-white data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none px-4 pb-3 pt-2 [text-shadow:0_1px_3px_rgba(0,0,0,0.6)]"
             >
@@ -662,6 +655,13 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
             >
               <Radio className="size-4 mr-1.5" />
               Pulse
+            </TabsTrigger>
+            <TabsTrigger
+              value="chat"
+              className="flex-1 min-w-0 rounded-none border-b-2 border-transparent text-white/75 hover:text-white data-[state=active]:text-white data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none px-4 pb-3 pt-2 [text-shadow:0_1px_3px_rgba(0,0,0,0.6)]"
+            >
+              <MessageCircle className="size-4 mr-1.5" />
+              Chat
             </TabsTrigger>
           </TabsList>
       </div>
