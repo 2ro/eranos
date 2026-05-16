@@ -31,6 +31,7 @@ import { getDisplayName } from '@/lib/getDisplayName';
 import { genUserName } from '@/lib/genUserName';
 import { getCountryInfo } from '@/lib/countries';
 import { useCountryFeed } from '@/contexts/CountryFeedContext';
+import { cn } from '@/lib/utils';
 import { extractGathererCard, type GathererCard } from '@/lib/linkEmbed';
 import { cardPrimaryImage } from '@/lib/scryfall';
 
@@ -800,38 +801,49 @@ function UrlCommentContext({ url, className }: { url: string; className?: string
   );
 }
 
-/** Comment context for ISO 3166 country/subdivision identifiers — shows flag and name with hover preview. */
+/** Comment context for ISO 3166 country/subdivision identifiers — renders a bold flag pill linking to the country feed. */
 function CountryCommentContext({ identifier, className }: { identifier: string; className?: string }) {
   const code = identifier.slice('iso3166:'.length);
   const info = getCountryInfo(code);
   const link = `/i/${encodeURIComponent(identifier)}`;
 
-  // Suppress the "Commenting on 🇻🇪 Venezuela" header when the post is already
-  // being rendered inside that same country's feed page — there it's a
-  // top-level neighborhood post, not a reply with context to surface.
-  // We still render the header outside the country feed (profiles, notifications,
-  // search, etc.) so users can see what it's replying to.
+  // Suppress the country pill when the post is already being rendered inside
+  // that same country's feed page — there it's a top-level neighborhood
+  // post, not a reply with context to surface. The pill still appears
+  // everywhere else (World feed, profiles, notifications, search) so users
+  // see which neighborhood a post belongs to.
   const countryFeed = useCountryFeed();
   if (countryFeed && countryFeed.countryCode === code.toUpperCase()) {
     return null;
   }
 
-  const displayText = info
-    ? info.subdivisionName
-      ? `${info.flag} ${info.subdivisionName}`
-      : `${info.flag} ${info.name}`
-    : identifier;
+  const label = info?.subdivisionName ?? info?.name ?? code;
+  const flag = info?.flag ?? '🌍';
 
   return (
-    <CommentContextRow prefix="Commenting on" className={className}>
+    <div className={cn('mt-1 mb-2 min-w-0 overflow-hidden', className)}>
       <HoverCard openDelay={300} closeDelay={150}>
         <HoverCardTrigger asChild>
           <Link
             to={link}
-            className="text-primary hover:underline truncate cursor-pointer"
             onClick={(e) => e.stopPropagation()}
+            className={cn(
+              'group inline-flex items-center gap-1.5 max-w-full',
+              'rounded-full border border-primary/20 bg-primary/10 text-primary',
+              'pl-1.5 pr-2.5 py-1 text-xs font-semibold',
+              'transition-all hover:bg-primary/15 hover:border-primary/30',
+              'motion-safe:hover:scale-[1.02] motion-safe:active:scale-[0.98]',
+              'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 focus-visible:ring-offset-1 focus-visible:ring-offset-background',
+            )}
           >
-            {displayText}
+            <span
+              className="text-base leading-none shrink-0"
+              role="img"
+              aria-label={info ? `Flag of ${info.name}` : code}
+            >
+              {flag}
+            </span>
+            <span className="truncate">{label}</span>
           </Link>
         </HoverCardTrigger>
         <HoverCardContent
@@ -843,7 +855,7 @@ function CountryCommentContext({ identifier, className }: { identifier: string; 
         >
           <div className="flex items-center gap-3 px-4 py-3">
             <span className="text-2xl leading-none shrink-0" role="img" aria-label={info ? `Flag of ${info.name}` : code}>
-              {info?.flag ?? '🌍'}
+              {flag}
             </span>
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
@@ -862,7 +874,7 @@ function CountryCommentContext({ identifier, className }: { identifier: string; 
           </div>
         </HoverCardContent>
       </HoverCard>
-    </CommentContextRow>
+    </div>
   );
 }
 
