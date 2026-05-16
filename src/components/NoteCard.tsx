@@ -39,7 +39,7 @@ import {
   ColorMomentContent,
   ColorMomentEyeButton,
 } from "@/components/ColorMomentContent";
-import { CommentContext, CountryCommentPill, CountryFlagBackdrop, useIsCountryRooted } from "@/components/CommentContext";
+import { CommentContext, CountryCommentPill, CountryFlagBackdrop } from "@/components/CommentContext";
 import { CommunityContentWarning } from "@/components/CommunityContentWarning";
 import { ContentWarningGuard } from "@/components/ContentWarningGuard";
 import { EmojifiedText, ReactionEmoji } from "@/components/CustomEmoji";
@@ -467,10 +467,6 @@ export const NoteCard = memo(function NoteCard({
     !isProfile;
 
   const isComment = event.kind === 1111;
-  // True when CountryFlagBackdrop is rendering — used to flip the header
-  // strip to high-contrast white text in dark mode so the author/timestamp
-  // stay legible against the dark wash overlaid on the flag.
-  const flagMode = useIsCountryRooted(event);
   const isReply = isTextNote && !isComment && isReplyEvent(event);
 
   // Find all people being replied to (for "Replying to @user1 and @user2")
@@ -1038,12 +1034,7 @@ export const NoteCard = memo(function NoteCard({
             absolute backdrop layer rendered by CountryFlagBackdrop. */}
         <div className="relative">
           {threadedKindHeader && (
-            <div
-              className={cn(
-                flagMode &&
-                  "dark:text-white dark:[&_a]:text-white dark:[&_.text-muted-foreground]:text-white/85 dark:[text-shadow:0_1px_3px_rgba(0,0,0,0.85),0_2px_8px_rgba(0,0,0,0.55)]",
-              )}
-            >
+            <div>
               {threadedKindHeader}
             </div>
           )}
@@ -1056,16 +1047,7 @@ export const NoteCard = memo(function NoteCard({
             </div>
             <div className={cn("flex-1 min-w-0", threaded && "pb-3")}>
               <div className="flex items-center justify-between gap-2">
-                {/* authorInfo wears flag-mode white text + shadow when a flag
-                    backdrop is showing; the pill stays in its own gradient
-                    styling so we scope the flip to authorInfo only. */}
-                <div
-                  className={cn(
-                    "min-w-0 flex-1",
-                    flagMode &&
-                      "dark:text-white dark:[&_a]:text-white dark:[&_.text-muted-foreground]:text-white/85 dark:[text-shadow:0_1px_3px_rgba(0,0,0,0.85),0_2px_8px_rgba(0,0,0,0.55)]",
-                  )}
-                >
+                <div className="min-w-0 flex-1">
                   {authorInfo}
                 </div>
                 <CountryCommentPill event={event} className="shrink-0 [text-shadow:none]" />
@@ -1104,17 +1086,7 @@ export const NoteCard = memo(function NoteCard({
       {/* Foreground wrapper — `relative` lifts the entire post above the
           absolute backdrop layer rendered by CountryFlagBackdrop. */}
       <div className="relative">
-        {/* Header strip — sits over the flag backdrop when present. In dark
-            mode it flips to white text with a drop shadow so the
-            name/handle/timestamp stay legible against the dimmed flag.
-            CountryCommentPill is rendered outside this wrapper so it keeps
-            its own gradient/text-shadow styling untouched. */}
-        <div
-          className={cn(
-            flagMode &&
-              "dark:text-white dark:[&_a]:text-white dark:[&_.text-muted-foreground]:text-white/85 dark:[text-shadow:0_1px_3px_rgba(0,0,0,0.85),0_2px_8px_rgba(0,0,0,0.55)]",
-          )}
-        >
+        <div>
           {/* Action header — repost takes priority, otherwise derived from event kind */}
           {repostedBy ? (
             <EventActionHeader

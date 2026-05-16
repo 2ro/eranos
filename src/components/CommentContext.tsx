@@ -987,7 +987,7 @@ export function CountryFlagBackdrop({ event }: { event: NostrEvent }) {
             alt=""
             decoding="async"
             onError={() => setImageFailed(true)}
-            className="w-full h-full object-cover opacity-30 saturate-75 brightness-125 dark:opacity-60 dark:saturate-100 dark:brightness-100 select-none"
+            className="w-full h-full object-cover opacity-[0.12] select-none"
             style={{
               maskImage: 'linear-gradient(to bottom, black 0%, black 35%, transparent 100%)',
               WebkitMaskImage: 'linear-gradient(to bottom, black 0%, black 35%, transparent 100%)',
@@ -995,11 +995,11 @@ export function CountryFlagBackdrop({ event }: { event: NostrEvent }) {
           />
         ) : paletteGradient ? (
           // Wikipedia not yet resolved (or its image failed) — paint the
-          // flag-color gradient as a placeholder/fallback. Same theme-aware opacity and
+          // flag-color gradient as a placeholder/fallback. Same opacity and
           // mask shape as the image so the visual swap is seamless when the
           // image arrives.
           <div
-            className="absolute inset-0 opacity-30 saturate-75 brightness-125 dark:opacity-60 dark:saturate-100 dark:brightness-100"
+            className="absolute inset-0 opacity-[0.12]"
             style={{
               backgroundImage: paletteGradient,
               maskImage: 'linear-gradient(to bottom, black 0%, black 35%, transparent 100%)',
@@ -1007,27 +1007,6 @@ export function CountryFlagBackdrop({ event }: { event: NostrEvent }) {
             }}
           />
         ) : null}
-        {/* Light mode washes/brightens the flag for dark text; dark mode keeps
-            the original dimmed treatment for white text. Both washes mirror
-            the mask shape so they fade with no hard edge. */}
-        <div
-          className="absolute inset-0 dark:hidden"
-          style={{
-            backgroundImage:
-              'linear-gradient(to bottom, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0.84) 50%, rgba(255,255,255,0) 100%)',
-            maskImage: 'linear-gradient(to bottom, black 0%, black 35%, transparent 100%)',
-            WebkitMaskImage: 'linear-gradient(to bottom, black 0%, black 35%, transparent 100%)',
-          }}
-        />
-        <div
-          className="absolute inset-0 hidden dark:block"
-          style={{
-            backgroundImage:
-              'linear-gradient(to bottom, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.75) 50%, rgba(0,0,0,0) 100%)',
-            maskImage: 'linear-gradient(to bottom, black 0%, black 35%, transparent 100%)',
-            WebkitMaskImage: 'linear-gradient(to bottom, black 0%, black 35%, transparent 100%)',
-          }}
-        />
       </div>
     </div>
   );
