@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useSeoMeta } from '@unhead/react';
 import { useQueryClient } from '@tanstack/react-query';
+import type { NostrEvent } from '@nostrify/nostrify';
 import {
   CalendarClock,
   Tag,
@@ -21,12 +22,22 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { CampaignProgress } from '@/components/CampaignCard';
 import { DonateDialog } from '@/components/DonateDialog';
+import { PostActionBar } from '@/components/PostActionBar';
+import { ReplyComposeModal } from '@/components/ReplyComposeModal';
+import { NoteMoreMenu } from '@/components/NoteMoreMenu';
+import {
+  InteractionsModal,
+  type InteractionTab,
+} from '@/components/InteractionsModal';
+import { ThreadedReplyList, type ReplyNode } from '@/components/ThreadedReplyList';
 import { useAuthor } from '@/hooks/useAuthor';
 import { useBitcoinWallet } from '@/hooks/useBitcoinWallet';
 import { useCampaign } from '@/hooks/useCampaign';
 import { useCampaignDonations } from '@/hooks/useCampaignDonations';
+import { useComments } from '@/hooks/useComments';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useProfileUrl } from '@/hooks/useProfileUrl';
+import { useEventStats } from '@/hooks/useTrending';
 import { useToast } from '@/hooks/useToast';
 import { useLayoutOptions } from '@/contexts/LayoutContext';
 import {
@@ -35,6 +46,7 @@ import {
   type ParsedCampaign,
 } from '@/lib/campaign';
 import { satsToUSD } from '@/lib/bitcoin';
+import { formatNumber } from '@/lib/formatNumber';
 import { genUserName } from '@/lib/genUserName';
 import { sanitizeUrl } from '@/lib/sanitizeUrl';
 import NotFound from './NotFound';
@@ -98,7 +110,61 @@ function CampaignDetailContent({ campaign }: { campaign: ParsedCampaign }) {
   const queryClient = useQueryClient();
 
   const [donateOpen, setDonateOpen] = useState(false);
+  const [replyOpen, setReplyOpen] = useState(false);
+  const [moreMenuOpen, setMoreMenuOpen] = useState(false);
+  const [interactionsOpen, setInteractionsOpen] = useState(false);
+  const [interactionsTab, setInteractionsTab] = useState<InteractionTab>('reposts');
 
+  const openInteractions = (tab: InteractionTab) => {
+    setInteractionsTab(tab);
+    setInteractionsOpen(true);
+  };
+
+  // Engagement stats (replies / reposts / reactions / zaps) for the campaign
+  // event itself — drives the counters above the action bar.
+  const { data: engagementStats } = useEventStats(campaign.event.id, campaign.event);
+
+  // Fetch NIP-22 comments for this addressable campaign. useComments resolves
+  // the `#A` filter automatically when given an addressable NostrEvent.
+  const { data: commentsData, isLoading: commentsLoading } = useComments(
+    campaign.event,
+    500,
+  );
+
+  // Build a recursive reply tree from the flat comment list. Top-level
+  // comments are sorted newest first; nested replies (the second branch
+  // onward at each level) are collapsed behind a "show more replies" toggle
+  // by ThreadedReplyList — matching PostDetailPage behaviour.
+  const replyTree = useMemo((): ReplyNode[] => {
+    if (!commentsData) return [];
+
+    const buildNode = (ev: NostrEvent): ReplyNode => {
+      const allChildren = commentsData.getDirectReplies(ev.id) ?? [];
+      if (allChildren.length <= 1) {
+        return {
+          event: ev,
+          children: allChildren.map((c) => buildNode(c)),
+        };
+      }
+      const [first, ...rest] = allChildren;
+      return {
+        event: ev,
+        children: [buildNode(first)],
+        hiddenChildren: rest.map((c) => buildNode(c)),
+      };
+    };
+
+    return [...(commentsData.topLevelComments ?? [])]
+      .sort((a, b) => b.created_at - a.created_at)
+      .map((r) => buildNode(r));
+  }, [commentsData]);
+
+  const hasStats =
+    !!engagementStats?.replies ||
+    !!engagementStats?.reposts ||
+    !!engagementStats?.quotes ||
+    !!engagementStats?.reactions ||
+    !!engagementStats?.zapCount;
   const cover = sanitizeUrl(campaign.image);
   const creatorMetadata = author.data?.metadata;
   const creatorName =
@@ -274,10 +340,10 @@ function CampaignDetailContent({ campaign }: { campaign: ParsedCampaign }) {
                   </>
                 )}
 
-                <div className="grid grid-cols-3 gap-2">
+                <div className="grid grid-cols-4 gap-2">
                   <Button
                     size="lg"
-                    className="w-full col-span-2 h-12 text-base"
+                    className="w-full col-span-3"
                     onClick={() => setDonateOpen(true)}
                     disabled={deadline?.isPast}
                   >
@@ -359,19 +425,101 @@ function CampaignDetailContent({ campaign }: { campaign: ParsedCampaign }) {
                     </p>
                   )}
                 </div>
+
+                <div className="space-y-2 border-t border-border/60 pt-4">
+                  <div className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                    Story
+                  </div>
+                  <article className="prose prose-neutral dark:prose-invert max-w-none">
+                    {campaign.story.trim().length > 0 ? (
+                      <ArticleContent event={storyEvent} />
+                    ) : (
+                      <p className="text-muted-foreground italic">
+                        The organizer hasn't written a story for this campaign yet.
+                      </p>
+                    )}
+                  </article>
+                </div>
+
+                {/* Engagement: stats row, action bar, threaded replies */}
+                <div className="space-y-2 border-t border-border/60 pt-4">
+                  {hasStats && (
+                    <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs sm:text-sm text-muted-foreground">
+                      {engagementStats?.reposts ? (
+                        <button
+                          onClick={() => openInteractions('reposts')}
+                          className="hover:underline transition-colors"
+                        >
+                          <span className="font-bold text-foreground">
+                            {formatNumber(engagementStats.reposts)}
+                          </span>{' '}
+                          Repost{engagementStats.reposts !== 1 ? 's' : ''}
+                        </button>
+                      ) : null}
+                      {engagementStats?.quotes ? (
+                        <button
+                          onClick={() => openInteractions('quotes')}
+                          className="hover:underline transition-colors"
+                        >
+                          <span className="font-bold text-foreground">
+                            {formatNumber(engagementStats.quotes)}
+                          </span>{' '}
+                          Quote{engagementStats.quotes !== 1 ? 's' : ''}
+                        </button>
+                      ) : null}
+                      {engagementStats?.reactions ? (
+                        <button
+                          onClick={() => openInteractions('reactions')}
+                          className="hover:underline transition-colors"
+                        >
+                          <span className="font-bold text-foreground">
+                            {formatNumber(engagementStats.reactions)}
+                          </span>{' '}
+                          Like{engagementStats.reactions !== 1 ? 's' : ''}
+                        </button>
+                      ) : null}
+                      {engagementStats?.zapCount ? (
+                        <button
+                          onClick={() => openInteractions('zaps')}
+                          className="hover:underline transition-colors"
+                        >
+                          <span className="font-bold text-foreground">
+                            {formatNumber(engagementStats.zapCount)}
+                          </span>{' '}
+                          Zap{engagementStats.zapCount !== 1 ? 's' : ''}
+                        </button>
+                      ) : null}
+                    </div>
+                  )}
+
+                  <PostActionBar
+                    event={campaign.event}
+                    replyLabel="Comment"
+                    onReply={() => setReplyOpen(true)}
+                    onMore={() => setMoreMenuOpen(true)}
+                  />
+
+                  {/* Threaded comments */}
+                  <div className="pt-2">
+                    {commentsLoading ? (
+                      <div className="space-y-3">
+                        {Array.from({ length: 3 }).map((_, i) => (
+                          <CampaignReplySkeleton key={i} />
+                        ))}
+                      </div>
+                    ) : replyTree.length > 0 ? (
+                      <div className="-mx-2 sm:-mx-4">
+                        <ThreadedReplyList roots={replyTree} />
+                      </div>
+                    ) : (
+                      <div className="py-8 text-center text-sm text-muted-foreground">
+                        No comments yet. Be the first to comment!
+                      </div>
+                    )}
+                  </div>
+                </div>
               </CardContent>
             </Card>
-
-            {/* Story */}
-            <article className="prose prose-neutral dark:prose-invert max-w-none pt-1">
-              {campaign.story.trim().length > 0 ? (
-                <ArticleContent event={storyEvent} />
-              ) : (
-                <p className="text-muted-foreground italic">
-                  The organizer hasn't written a story for this campaign yet.
-                </p>
-              )}
-            </article>
         </div>
       </div>
 
@@ -387,6 +535,23 @@ function CampaignDetailContent({ campaign }: { campaign: ParsedCampaign }) {
           }
         }}
         btcPrice={btcPrice}
+      />
+
+      <ReplyComposeModal
+        event={campaign.event}
+        open={replyOpen}
+        onOpenChange={setReplyOpen}
+      />
+      <NoteMoreMenu
+        event={campaign.event}
+        open={moreMenuOpen}
+        onOpenChange={setMoreMenuOpen}
+      />
+      <InteractionsModal
+        eventId={campaign.event.id}
+        open={interactionsOpen}
+        onOpenChange={setInteractionsOpen}
+        initialTab={interactionsTab}
       />
     </main>
   );
@@ -479,5 +644,20 @@ function CampaignDetailSkeleton() {
         </div>
       </div>
     </main>
+  );
+}
+
+function CampaignReplySkeleton() {
+  return (
+    <div className="py-3 border-b border-border last:border-b-0">
+      <div className="flex gap-3">
+        <Skeleton className="size-10 rounded-full shrink-0" />
+        <div className="flex-1 space-y-2">
+          <Skeleton className="h-4 w-32" />
+          <Skeleton className="h-4 w-full" />
+          <Skeleton className="h-4 w-2/3" />
+        </div>
+      </div>
+    </div>
   );
 }
