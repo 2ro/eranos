@@ -156,7 +156,7 @@ const hardcodedConfig: AppConfig = {
   ],
   aiBaseURL: 'https://ai.shakespeare.diy/v1',
   aiApiKey: '',
-  aiModel: 'grok-4.1-fast',
+  aiModel: 'google/gemma-4-26b',
   aiSystemPrompt: '',
 };
 
