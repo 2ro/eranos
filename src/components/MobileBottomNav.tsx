@@ -98,7 +98,7 @@ export function MobileBottomNav() {
 
       <nav
         className={cn(
-          'fixed bottom-0 left-0 right-0 z-40 sidebar:hidden will-change-transform',
+          'fixed bottom-0 left-0 right-0 z-40 will-change-transform',
           'transition-transform duration-300 ease-in-out',
         )}
         style={isHidden ? hiddenStyle : undefined}

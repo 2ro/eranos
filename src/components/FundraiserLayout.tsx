@@ -1,6 +1,7 @@
 import { Suspense, useCallback, useMemo, useRef, useState } from 'react';
 import { Outlet } from 'react-router-dom';
 
+import { MobileBottomNav } from '@/components/MobileBottomNav';
 import { TopNav } from '@/components/TopNav';
 import { Skeleton } from '@/components/ui/skeleton';
 import {
@@ -59,7 +60,7 @@ function FundraiserLayoutInner() {
     <CenterColumnContext.Provider value={centerColumnEl}>
       <DrawerContext.Provider value={openDrawer}>
         <NavHiddenContext.Provider value={false}>
-          <div className="min-h-dvh flex flex-col bg-background">
+          <div className="min-h-dvh flex flex-col bg-background pb-[calc(var(--bottom-nav-height)+env(safe-area-inset-bottom,0px))]">
             <TopNav />
 
             <Suspense fallback={<PageSkeleton />}>
@@ -85,6 +86,8 @@ function FundraiserLayoutInner() {
 
             <SiteFooter />
           </div>
+
+          <MobileBottomNav />
         </NavHiddenContext.Provider>
       </DrawerContext.Provider>
     </CenterColumnContext.Provider>
