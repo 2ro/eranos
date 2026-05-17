@@ -84,8 +84,9 @@ export function CommunityZapDialog({
   triggerIcon,
   onZapLaunched,
 }: CommunityZapDialogProps) {
+  const defaultAmount = mode === 'bitcoin' ? '1000' : '100';
   const [open, setOpen] = useState(false);
-  const [amount, setAmount] = useState('100');
+  const [amount, setAmount] = useState(defaultAmount);
   const [comment, setComment] = useState(`Zapped the whole ${community.name} community!`);
   const [removedPubkeys, setRemovedPubkeys] = useState<Set<string>>(new Set());
   const [isLaunching, setIsLaunching] = useState(false);
@@ -119,8 +120,9 @@ export function CommunityZapDialog({
   useEffect(() => {
     if (!open) return;
     setRemovedPubkeys(new Set());
+    setAmount(defaultAmount);
     setComment(`Zapped the whole ${community.name} community!`);
-  }, [open, community.name]);
+  }, [open, community.name, defaultAmount]);
 
   const recipients = useMemo<RecipientView[]>(() => {
     return members.map((member) => {
