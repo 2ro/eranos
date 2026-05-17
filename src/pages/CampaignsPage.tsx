@@ -112,28 +112,28 @@ export function CampaignsPage() {
     <main className="min-h-screen pb-16">
       {/* Hero */}
       <section className="relative overflow-hidden border-b border-border bg-gradient-to-br from-primary/15 via-background to-secondary/40">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 py-12 lg:py-16">
-          <div className="max-w-2xl space-y-5">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-14 lg:py-20">
+          <div className="max-w-3xl space-y-5">
             <div className="inline-flex items-center gap-2 rounded-full bg-background/70 backdrop-blur px-3 py-1 border border-border text-xs font-medium">
               <Sparkles className="size-3.5 text-primary" />
               On-chain fundraising on Nostr
             </div>
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight leading-tight">
-              Fund the people and projects that matter to you.
+            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight leading-[1.1]">
+              Where successful fundraisers start.
             </h1>
-            <p className="text-base sm:text-lg text-muted-foreground">
+            <p className="text-base sm:text-lg text-muted-foreground max-w-2xl">
               Every donation is a single Bitcoin transaction, split directly to each campaign's
               beneficiaries. No middlemen, no chargebacks, no held funds.
             </p>
             <div className="flex flex-wrap gap-3 pt-2">
-              <Button size="lg" asChild>
+              <Button size="lg" asChild className="rounded-full">
                 <Link to="/campaigns/new">
                   <PlusCircle className="size-4 mr-2" />
                   Start a campaign
                 </Link>
               </Button>
               {!user && (
-                <Button variant="outline" size="lg" asChild>
+                <Button variant="outline" size="lg" asChild className="rounded-full">
                   <a href="#campaigns">Explore campaigns</a>
                 </Button>
               )}
@@ -142,7 +142,7 @@ export function CampaignsPage() {
         </div>
       </section>
 
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 py-10 lg:py-14 space-y-12" id="campaigns">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-10 lg:py-14 space-y-12" id="campaigns">
         {/* Featured */}
         <section className="space-y-5">
           <div className="flex items-end justify-between gap-4">
@@ -179,7 +179,7 @@ export function CampaignsPage() {
           ) : userCampaigns.length === 0 ? (
             <EmptyState />
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
               {userCampaigns.map((campaign) => (
                 <CampaignCard key={campaign.aTag} campaign={campaign} />
               ))}

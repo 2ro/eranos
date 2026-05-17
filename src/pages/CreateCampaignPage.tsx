@@ -277,19 +277,6 @@ export function CreateCampaignPage() {
 
   return (
     <main className="min-h-screen pb-16">
-      <div className="sticky top-0 z-20 bg-background/85 backdrop-blur border-b border-border">
-        <div className="max-w-3xl mx-auto px-4 py-3 flex items-center gap-4">
-          <button
-            onClick={() => navigate(-1)}
-            className="p-2 -ml-2 rounded-full hover:bg-secondary motion-safe:transition-colors"
-            aria-label="Go back"
-          >
-            <ArrowLeft className="size-5" />
-          </button>
-          <h1 className="text-base font-semibold flex-1 min-w-0">Start a campaign</h1>
-        </div>
-      </div>
-
       <form
         className="max-w-3xl mx-auto px-4 sm:px-6 py-8 lg:py-10 space-y-8"
         onSubmit={(e) => {
@@ -298,6 +285,17 @@ export function CreateCampaignPage() {
           submitMutation.mutate();
         }}
       >
+        <div className="flex items-center gap-2 -ml-2">
+          <button
+            type="button"
+            onClick={() => navigate(-1)}
+            className="p-2 rounded-full hover:bg-secondary motion-safe:transition-colors text-muted-foreground hover:text-foreground"
+            aria-label="Go back"
+          >
+            <ArrowLeft className="size-5" />
+          </button>
+          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">Start a campaign</h1>
+        </div>
         {/* Organizer banner */}
         <div className="flex items-center gap-3 text-sm text-muted-foreground">
           <Avatar className="size-8">

@@ -6,7 +6,7 @@ import { MinimizedAudioBar } from "@/components/MinimizedAudioBar";
 import { AudioPlayerProvider } from "@/contexts/AudioPlayerContext";
 import { sidebarItemIcon } from "@/lib/sidebarItems";
 import { Toaster } from "./components/ui/toaster";
-import { MainLayout } from "./components/MainLayout";
+import { FundraiserLayout } from "./components/FundraiserLayout";
 import { ScrollToTop } from "./components/ScrollToTop";
 import { VersionCheck } from "./components/VersionCheck";
 import { useCurrentUser } from "./hooks/useCurrentUser";
@@ -24,11 +24,9 @@ const ReplyComposeModal = lazy(() => import("@/components/ReplyComposeModal").th
 // Lazy-loaded emoji pack dialog
 const EmojiPackDialog = lazy(() => import("@/components/EmojiPackDialog").then(m => ({ default: m.EmojiPackDialog })));
 
-// HomePage eagerly imported all page components; now lazy-loaded
-const HomePage = lazy(() => import("./pages/HomePage").then(m => ({ default: m.HomePage })));
-
-// Campaigns: lazy-loaded list + create pages. (Detail page is dispatched from
-// NIP19Page when an naddr resolves to kind 30223.)
+// Campaigns: home + create. (Campaign detail is dispatched from NIP19Page
+// when an naddr resolves to kind 30223.) The campaigns list IS the homepage;
+// the configurable HomePage delegation from the Twitter-era app is gone.
 const CampaignsPage = lazy(() => import("./pages/CampaignsPage").then(m => ({ default: m.CampaignsPage })));
 const CreateCampaignPage = lazy(() => import("./pages/CreateCampaignPage").then(m => ({ default: m.CreateCampaignPage })));
 
@@ -159,11 +157,11 @@ export function AppRouter() {
           {/* Auto-follow deep link: fullscreen immersive (no sidebars/nav) */}
           <Route path="/follow/:npub" element={<FollowPage />} />
 
-          {/* All routes share the persistent MainLayout (sidebar + nav) */}
-          <Route element={<MainLayout />}>
-            <Route path="/" element={<HomePage />} />
+          {/* All routes share the persistent FundraiserLayout (top nav + footer) */}
+          <Route element={<FundraiserLayout />}>
+            <Route path="/" element={<CampaignsPage />} />
             <Route path="/feed" element={<Index />} />
-            <Route path="/campaigns" element={<CampaignsPage />} />
+            <Route path="/campaigns" element={<Navigate to="/" replace />} />
             <Route path="/campaigns/new" element={<CreateCampaignPage />} />
             <Route path="/notifications" element={<NotificationsPage />} />
             <Route path="/messages" element={<MessagesPage />} />

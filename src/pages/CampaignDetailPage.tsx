@@ -119,25 +119,22 @@ function CampaignDetailContent({ campaign }: { campaign: ParsedCampaign }) {
 
   return (
     <main className="min-h-screen pb-16">
-      {/* Sticky-ish top bar with back button */}
-      <div className="sticky top-0 z-20 bg-background/85 backdrop-blur border-b border-border">
-        <div className="max-w-5xl mx-auto px-4 py-3 flex items-center gap-4">
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 py-6 lg:py-10">
+        {/* Inline back arrow — the global TopNav handles primary navigation. */}
+        <div className="flex items-center gap-2 mb-4 -ml-2">
           <button
             onClick={() => navigate(-1)}
-            className="p-2 -ml-2 rounded-full hover:bg-secondary motion-safe:transition-colors"
+            className="p-2 rounded-full hover:bg-secondary motion-safe:transition-colors text-muted-foreground hover:text-foreground"
             aria-label="Go back"
           >
             <ChevronLeft className="size-5" />
           </button>
-          <h1 className="text-base font-semibold truncate flex-1 min-w-0">{campaign.title}</h1>
-          <Button variant="ghost" size="sm" onClick={handleShare} className="shrink-0">
+          <Button variant="ghost" size="sm" onClick={handleShare} className="ml-auto">
             <Share2 className="size-4 sm:mr-1.5" />
             <span className="hidden sm:inline">Share</span>
           </Button>
         </div>
-      </div>
 
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 py-6 lg:py-10">
         {/* Hero */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-10">
           <div className="lg:col-span-2 space-y-6">
@@ -239,7 +236,7 @@ function CampaignDetailContent({ campaign }: { campaign: ParsedCampaign }) {
           </div>
 
           {/* Donation rail */}
-          <aside className="lg:col-span-1 lg:sticky lg:top-20 self-start space-y-4">
+          <aside className="lg:col-span-1 lg:sticky lg:top-[5rem] self-start space-y-4">
             <Card>
               <CardContent className="p-5 space-y-4">
                 {statsLoading ? (
@@ -357,13 +354,8 @@ function RecipientRow({ pubkey, weight }: { pubkey: string; weight: number }) {
 function CampaignDetailSkeleton() {
   return (
     <main className="min-h-screen pb-16">
-      <div className="sticky top-0 z-20 bg-background/85 backdrop-blur border-b border-border">
-        <div className="max-w-5xl mx-auto px-4 py-3 flex items-center gap-4">
-          <Skeleton className="size-9 rounded-full" />
-          <Skeleton className="h-5 w-48 flex-1" />
-        </div>
-      </div>
       <div className="max-w-5xl mx-auto px-4 sm:px-6 py-6 lg:py-10">
+        <Skeleton className="h-9 w-9 rounded-full mb-4" />
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-10">
           <div className="lg:col-span-2 space-y-6">
             <Skeleton className="aspect-[16/9] w-full rounded-xl" />
