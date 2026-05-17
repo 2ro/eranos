@@ -87,21 +87,26 @@ requestAnimationFrame(() => {
   document.getElementById('preloader')?.remove();
 });
 
-// ─── Service worker takeover (web only) ──────────────────────────────────────
+// ─── Service worker registration (web only) ─────────────────────────────────
 //
-// A previous version of Agora deployed at this origin shipped a precaching
-// service worker that's still serving stale HTML/JS to returning users. The
-// SW we ship now (public/sw.js) has no fetch handler and nukes every cache
-// on activate, so as soon as the browser installs it, returning users start
-// getting fresh builds again.
+// Register /sw.js unconditionally on web. The SW itself (public/sw.js) has
+// no fetch handler and wipes caches on activate — see that file for the
+// stale-SW eviction story.
 //
-// usePushNotifications() also registers /sw.js, but only when the user
-// visits the notification settings page — that's not good enough to evict
-// the old SW for everyone. We register here on every web page load so the
-// new SW takes over for all visitors, regardless of whether they use push.
+// This registration does NOT fix the stale-SW problem on its own: returning
+// users with the old precache SW never run any of our new JS, because the
+// old SW serves the old bundle from cache. The browser evicts the old SW
+// out-of-band by re-fetching /sw.js on its own update schedule, and the
+// new SW's activate handler does the actual cache wipe + tab reload.
 //
-// Native (Capacitor) skips this — the bundled web assets are served from
-// the local filesystem and there's no stale SW on the origin to evict.
+// What this registration buys us is forward-looking insurance: it ensures
+// every web visitor has a SW in place, so the next time we need to ship an
+// emergency cache bust via /sw.js, there's something for the browser to
+// update. Without it, only push-enabled users (who hit
+// usePushNotifications) would ever have a SW registered.
+//
+// Native (Capacitor) skips this — assets are served from the local
+// filesystem, no SW involved.
 if (!Capacitor.isNativePlatform() && 'serviceWorker' in navigator) {
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('/sw.js', { scope: '/' }).catch((err) => {
