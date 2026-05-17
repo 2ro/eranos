@@ -111,6 +111,25 @@ If neither `e` nor `a` is present, the zap targets the recipient's **profile** (
 3. Sender signs and publishes a kind 8333 event referencing that `txid` with the appropriate `e`/`a`/`p` tags.
 4. The event is published **after** broadcast; the txid is already final at that point.
 
+### Batch / Community Zaps
+
+A single Bitcoin transaction MAY pay multiple recipients by including one output per recipient. Clients SHOULD still publish **one kind 8333 event per recipient**, all referencing the same `i` tag (`bitcoin:tx:<txid>`) but each with its own `p` tag and `amount` tag.
+
+For community-level zaps, clients MAY include the community addressable coordinate in an `a` tag and the community kind in a `K` tag:
+
+```json
+[
+  ["i", "bitcoin:tx:<txid>"],
+  ["p", "<recipient-pubkey>"],
+  ["amount", "1000"],
+  ["a", "34550:<community-author>:<community-d-tag>"],
+  ["K", "34550"],
+  ["alt", "Bitcoin zap: 1000 sats"]
+]
+```
+
+The `amount` tag is the amount paid to that event's `p` recipient only. It MUST NOT be the total value of the batch transaction.
+
 ### Client Behavior
 
 **Querying onchain zaps for an event:**
