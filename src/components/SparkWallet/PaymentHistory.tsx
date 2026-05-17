@@ -219,10 +219,20 @@ export function PaymentHistory({ limit, className }: PaymentHistoryProps) {
 
   const [selectedPayment, setSelectedPayment] = useState<BreezPaymentInfo | null>(null);
   const [detailDialogOpen, setDetailDialogOpen] = useState(false);
+  const [isManualRefresh, setIsManualRefresh] = useState(false);
 
   const handlePaymentClick = (payment: BreezPaymentInfo) => {
     setSelectedPayment(payment);
     setDetailDialogOpen(true);
+  };
+
+  const handleRefresh = async () => {
+    setIsManualRefresh(true);
+    try {
+      await refreshPayments();
+    } finally {
+      setIsManualRefresh(false);
+    }
   };
 
   // If limit is specified, only show that many; otherwise show all loaded payments
@@ -253,11 +263,11 @@ export function PaymentHistory({ limit, className }: PaymentHistoryProps) {
             )}
           </div>
           <button
-            onClick={() => refreshPayments()}
-            disabled={isLoadingPayments}
+            onClick={handleRefresh}
+            disabled={isManualRefresh}
             className="inline-flex min-w-24 items-center justify-end gap-1.5 text-sm text-muted-foreground transition-colors hover:text-foreground disabled:opacity-70"
           >
-            {isLoadingPayments ? (
+            {isManualRefresh ? (
               <Loader2 className="h-4 w-4 animate-spin" />
             ) : (
               <RefreshCw className="h-4 w-4" />
