@@ -286,17 +286,6 @@ function CampaignDetailContent({ campaign }: { campaign: ParsedCampaign }) {
               </span>
             </div>
 
-            {/* Story */}
-            <article className="prose prose-neutral dark:prose-invert max-w-none pt-1">
-              {campaign.story.trim().length > 0 ? (
-                <ArticleContent event={storyEvent} />
-              ) : (
-                <p className="text-muted-foreground italic">
-                  The organizer hasn't written a story for this campaign yet.
-                </p>
-              )}
-            </article>
-
             {/* Recipients */}
             <Card>
               <CardContent className="p-5 space-y-4">
@@ -315,6 +304,17 @@ function CampaignDetailContent({ campaign }: { campaign: ParsedCampaign }) {
                 </div>
               </CardContent>
             </Card>
+
+            {/* Story */}
+            <article className="prose prose-neutral dark:prose-invert max-w-none pt-1">
+              {campaign.story.trim().length > 0 ? (
+                <ArticleContent event={storyEvent} />
+              ) : (
+                <p className="text-muted-foreground italic">
+                  The organizer hasn't written a story for this campaign yet.
+                </p>
+              )}
+            </article>
         </div>
       </div>
 
