@@ -203,14 +203,6 @@ function CampaignDetailContent({ campaign }: { campaign: ParsedCampaign }) {
                 >
                   <ChevronLeft className="size-6 drop-shadow-[0_1px_2px_rgba(0,0,0,0.85)]" />
                 </button>
-                <button
-                  type="button"
-                  onClick={handleShare}
-                  className="inline-flex items-center justify-center rounded-full p-2.5 text-white/90 hover:bg-white/15 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80 motion-safe:transition-colors"
-                  aria-label="Share campaign"
-                >
-                  <Share2 className="size-5 drop-shadow-[0_1px_2px_rgba(0,0,0,0.85)]" />
-                </button>
               </div>
 
               <div className="absolute inset-x-0 bottom-0 z-10 space-y-2 p-5 sm:p-6 [text-shadow:0_1px_4px_rgba(0,0,0,0.75),0_2px_10px_rgba(0,0,0,0.45)]">
@@ -264,7 +256,7 @@ function CampaignDetailContent({ campaign }: { campaign: ParsedCampaign }) {
                   <Skeleton className="h-12 w-full" />
                 ) : (
                   <>
-                    <div>
+                    <div className="flex flex-wrap items-baseline gap-x-2 gap-y-1">
                       <div className="text-3xl font-bold tracking-tight">
                         {formatSatsFull(raisedSats, btcPrice)}
                       </div>
@@ -279,23 +271,13 @@ function CampaignDetailContent({ campaign }: { campaign: ParsedCampaign }) {
                       goalSats={campaign.goalSats}
                       btcPrice={btcPrice}
                     />
-                    <div className="flex justify-between text-xs text-muted-foreground">
-                      <span>
-                        {stats?.donorCount ?? 0}{' '}
-                        {stats?.donorCount === 1 ? 'donor' : 'donors'}
-                      </span>
-                      <span>
-                        {stats?.txCount ?? 0}{' '}
-                        {stats?.txCount === 1 ? 'donation' : 'donations'}
-                      </span>
-                    </div>
                   </>
                 )}
 
-                <div className="grid gap-2 sm:grid-cols-2">
+                <div className="grid grid-cols-3 gap-2">
                   <Button
                     size="lg"
-                    className="w-full"
+                    className="w-full col-span-2"
                     onClick={() => setDonateOpen(true)}
                     disabled={deadline?.isPast}
                   >
@@ -305,7 +287,7 @@ function CampaignDetailContent({ campaign }: { campaign: ParsedCampaign }) {
 
                   <Button variant="outline" size="lg" className="w-full" onClick={handleShare}>
                     <Share2 className="size-4 mr-2" />
-                    Share campaign
+                    Share
                   </Button>
                 </div>
 
@@ -317,11 +299,6 @@ function CampaignDetailContent({ campaign }: { campaign: ParsedCampaign }) {
                     </Link>
                   </Button>
                 )}
-
-                <div className="text-xs text-muted-foreground text-center px-2">
-                  Donations are sent on-chain to each beneficiary's Nostr-derived Bitcoin address in a
-                  single Bitcoin transaction.
-                </div>
 
                 <div className="space-y-2 border-t border-border/60 pt-4">
                   <div className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
@@ -341,7 +318,6 @@ function CampaignDetailContent({ campaign }: { campaign: ParsedCampaign }) {
                         {campaign.pubkey.slice(0, 12)}…{campaign.pubkey.slice(-8)}
                       </div>
                     </div>
-                    <Badge variant="outline" className="shrink-0">Organizer</Badge>
                   </Link>
                 </div>
 
