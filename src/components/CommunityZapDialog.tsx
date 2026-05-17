@@ -27,7 +27,7 @@ import { cn } from '@/lib/utils';
 import { notificationSuccess } from '@/lib/haptics';
 
 type RecipientRole = 'founder' | 'moderator' | 'member';
-type RecipientStatus = 'ready' | 'loading' | 'missing-ln' | 'removed';
+type RecipientStatus = 'ready' | 'loading' | 'missing-ln' | 'removed' | 'self';
 
 interface RecipientView {
   pubkey: string;
@@ -99,7 +99,9 @@ export function CommunityZapDialog({
       const metadata: NostrMetadata | undefined = author?.metadata;
       const lightningAddress = metadata?.lud16 || metadata?.lud06;
       const removed = removedPubkeys.has(member.pubkey);
-      const status: RecipientStatus = removed
+      const status: RecipientStatus = user?.pubkey === member.pubkey
+        ? 'self'
+        : removed
         ? 'removed'
         : authors.isLoading && !author?.event
         ? 'loading'
@@ -117,13 +119,13 @@ export function CommunityZapDialog({
         status,
       };
     });
-  }, [authors.data, authors.isLoading, community, members, removedPubkeys]);
+  }, [authors.data, authors.isLoading, community, members, removedPubkeys, user?.pubkey]);
 
   const amountSats = parseInt(amount, 10);
   const selectedRecipients = recipients.filter(
     (recipient) => recipient.status === 'ready' && recipient.authorEvent,
   );
-  const skippedCount = recipients.filter((recipient) => recipient.status === 'missing-ln').length;
+  const skippedCount = recipients.filter((recipient) => recipient.status === 'missing-ln' || recipient.status === 'self').length;
   const removedCount = recipients.filter((recipient) => recipient.status === 'removed').length;
   const totalSats = Number.isFinite(amountSats) && amountSats > 0
     ? amountSats * selectedRecipients.length
@@ -363,7 +365,7 @@ function RecipientRow({
 }) {
   const isReady = recipient.status === 'ready';
   const isRemoved = recipient.status === 'removed';
-  const isUnavailable = recipient.status === 'missing-ln' || recipient.status === 'loading';
+  const isUnavailable = recipient.status === 'missing-ln' || recipient.status === 'loading' || recipient.status === 'self';
 
   return (
     <div className={cn('flex items-center gap-3 px-5 py-3', (isRemoved || isUnavailable) && 'opacity-55')}>
@@ -381,6 +383,8 @@ function RecipientRow({
         <p className="text-xs text-muted-foreground truncate">
           {recipient.status === 'loading'
             ? 'Loading profile...'
+            : recipient.status === 'self'
+            ? 'You · skipped'
             : recipient.lightningAddress
             ? shortAddress(recipient.lightningAddress)
             : 'No Lightning address · skipped'}
