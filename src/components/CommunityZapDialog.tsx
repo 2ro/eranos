@@ -279,19 +279,15 @@ export function CommunityZapDialog({
 
               <div className="grid grid-cols-2 gap-3 text-sm">
                 <div className="rounded-xl bg-background/70 p-3">
-                  <p className="text-muted-foreground">Selected</p>
-                  <p className="text-lg font-bold tabular-nums">{selectedRecipients.length}</p>
+                  <p className="flex items-center gap-1.5 text-muted-foreground">
+                    <Wallet className="size-3.5" />
+                    Balance
+                  </p>
+                  <p className="text-lg font-bold tabular-nums">{sparkWallet.balance.toLocaleString()} sats</p>
                 </div>
                 <div className="rounded-xl bg-background/70 p-3">
                   <p className="text-muted-foreground">Total</p>
                   <p className="text-lg font-bold tabular-nums">{totalSats.toLocaleString()} sats</p>
-                </div>
-                <div className="col-span-2 rounded-xl bg-background/70 p-3">
-                  <p className="flex items-center gap-1.5 text-muted-foreground">
-                    <Wallet className="size-3.5" />
-                    Wallet balance
-                  </p>
-                  <p className="text-lg font-bold tabular-nums">{sparkWallet.balance.toLocaleString()} sats</p>
                 </div>
               </div>
             </div>
@@ -454,7 +450,12 @@ function HoldToZapButton({
       aria-label={`Hold for 3 seconds to zap ${selectedCount} members with ${totalSats.toLocaleString()} sats total`}
     >
       <span
-        className="absolute inset-y-0 left-0 rounded-full bg-gradient-to-r from-amber-300 to-amber-500 transition-[width] duration-75 ease-linear"
+        className="absolute inset-0 origin-left rounded-full bg-gradient-to-r from-amber-300 via-amber-400 to-amber-500 transition-transform duration-75 ease-linear"
+        style={{ transform: `scaleX(${progress})` }}
+        aria-hidden="true"
+      />
+      <span
+        className="absolute bottom-0 left-0 h-1 rounded-full bg-amber-200 transition-[width] duration-75 ease-linear"
         style={{ width: `${progressPercent}%` }}
         aria-hidden="true"
       />
