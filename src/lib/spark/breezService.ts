@@ -149,6 +149,7 @@ class BreezWalletService {
   private sdk: BreezSdk | null = null;
   private wasmInitialized: boolean = false;
   private eventListeners: Map<string, BreezEventHandler> = new Map();
+  private syncPromise: Promise<void> | null = null;
   private state: BreezWalletState = {
     isInitialized: false,
     isConnected: false,
@@ -264,8 +265,7 @@ class BreezWalletService {
       logger.debug("[BreezWallet] Step 4/4: Starting background sync...");
 
       // Background sync - don't await, let it run async
-      this.sdk
-        .syncWallet({})
+      this.runSyncWallet()
         .then(() => {
           this.syncBalance().catch(() => {});
           logger.debug("[BreezWallet] Background sync completed");
@@ -709,7 +709,7 @@ class BreezWalletService {
     try {
       logger.debug("[BreezWallet] Syncing wallet...");
       await withTimeout(
-        this.sdk!.syncWallet({}),
+        this.runSyncWallet(),
         SYNC_TIMEOUT_MS,
         "[BreezWallet] syncWallet",
       );
@@ -719,6 +719,24 @@ class BreezWalletService {
       logger.error("[BreezWallet] Wallet sync failed:", error);
       throw error;
     }
+  }
+
+  private runSyncWallet(): Promise<void> {
+    if (!this.sdk) {
+      return Promise.reject(
+        new Error("Breez wallet not connected. Call connect() first."),
+      );
+    }
+
+    if (this.syncPromise) {
+      return this.syncPromise;
+    }
+
+    this.syncPromise = this.sdk.syncWallet({}).then(() => undefined).finally(() => {
+      this.syncPromise = null;
+    });
+
+    return this.syncPromise;
   }
 
   /**
