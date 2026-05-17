@@ -33,6 +33,7 @@ import {
   encodeCampaignNaddr,
   type ParsedCampaign,
 } from '@/lib/campaign';
+import { satsToUSD } from '@/lib/bitcoin';
 import { genUserName } from '@/lib/genUserName';
 import { sanitizeUrl } from '@/lib/sanitizeUrl';
 import NotFound from './NotFound';
@@ -46,7 +47,8 @@ interface CampaignDetailPageProps {
   relays?: string[];
 }
 
-function formatSatsFull(sats: number): string {
+function formatSatsFull(sats: number, btcPrice: number | undefined): string {
+  if (btcPrice) return satsToUSD(sats, btcPrice);
   if (sats >= 100_000_000) return `${(sats / 100_000_000).toLocaleString(undefined, { maximumFractionDigits: 4 })} BTC`;
   return `${sats.toLocaleString()} sats`;
 }
@@ -247,17 +249,18 @@ function CampaignDetailContent({ campaign }: { campaign: ParsedCampaign }) {
                   <>
                     <div>
                       <div className="text-3xl font-bold tracking-tight">
-                        {formatSatsFull(raisedSats)}
+                        {formatSatsFull(raisedSats, btcPrice)}
                       </div>
                       {campaign.goalSats && (
                         <div className="text-sm text-muted-foreground">
-                          raised of {formatSatsFull(campaign.goalSats)} goal
+                          raised of {formatSatsFull(campaign.goalSats, btcPrice)} goal
                         </div>
                       )}
                     </div>
                     <CampaignProgress
                       raisedSats={raisedSats}
                       goalSats={campaign.goalSats}
+                      btcPrice={btcPrice}
                     />
                     <div className="flex justify-between text-xs text-muted-foreground">
                       <span>

@@ -42,6 +42,7 @@ import {
   BITCOIN_DUST_LIMIT,
   formatSats,
   satsToUSD,
+  usdToSats,
 } from '@/lib/bitcoin';
 import {
   minDonationForSplit,
@@ -51,17 +52,20 @@ import {
 import { cn } from '@/lib/utils';
 
 /**
- * On-chain donation presets, in sats. Tuned for a fundraising context where
- * a single tx pays multiple recipients — anything under ~10K sats is likely
- * to hit dust + fee limits after the split.
+ * Donation presets in USD. The signed event and Bitcoin transaction still use
+ * sats; USD is only the user-facing input currency.
  */
-const PRESET_AMOUNTS: readonly { amount: number; icon: React.ComponentType<{ className?: string }>; label: string }[] = [
-  { amount: 10_000, icon: Sparkle, label: '10K' },
-  { amount: 25_000, icon: Sparkles, label: '25K' },
-  { amount: 100_000, icon: Star, label: '100K' },
-  { amount: 500_000, icon: Heart, label: '500K' },
-  { amount: 1_000_000, icon: HandHeart, label: '1M' },
+const PRESET_AMOUNTS: readonly { amountUsd: number; icon: React.ComponentType<{ className?: string }>; label: string }[] = [
+  { amountUsd: 10, icon: Sparkle, label: '$10' },
+  { amountUsd: 25, icon: Sparkles, label: '$25' },
+  { amountUsd: 100, icon: Star, label: '$100' },
+  { amountUsd: 500, icon: Heart, label: '$500' },
+  { amountUsd: 1_000, icon: HandHeart, label: '$1K' },
 ];
+
+function parseUsdInput(input: string): number {
+  return Number(input.replace(/[, $]/g, ''));
+}
 
 const FEE_SPEED_LABELS: Record<DonationFeeSpeed, string> = {
   fastest: 'Fastest (~10 min)',
@@ -87,8 +91,8 @@ export function DonateDialog({ campaign, open, onOpenChange, btcPrice }: DonateD
   const { toast } = useToast();
 
   const [step, setStep] = useState<Step>('form');
-  const [amountSats, setAmountSats] = useState<number>(PRESET_AMOUNTS[1].amount);
-  const [customAmount, setCustomAmount] = useState('');
+  const [amountUsd, setAmountUsd] = useState<number>(PRESET_AMOUNTS[1].amountUsd);
+  const [customUsd, setCustomUsd] = useState('');
   const [comment, setComment] = useState('');
   const [feeSpeed, setFeeSpeed] = useState<DonationFeeSpeed>('halfHour');
   const [result, setResult] = useState<DonateCampaignResult | null>(null);
@@ -105,14 +109,15 @@ export function DonateDialog({ campaign, open, onOpenChange, btcPrice }: DonateD
     return minDonationForSplit(campaign.recipients, user?.pubkey, BITCOIN_DUST_LIMIT);
   }, [campaign.recipients, user?.pubkey]);
 
-  const effectiveAmount = customAmount.trim()
-    ? Number(customAmount.replace(/[, ]/g, ''))
-    : amountSats;
+  const effectiveUsd = customUsd.trim()
+    ? parseUsdInput(customUsd)
+    : amountUsd;
+  const effectiveAmount = usdToSats(effectiveUsd, btcPrice);
 
   const splitPreview = useMemo(() => {
     if (!Number.isFinite(effectiveAmount) || effectiveAmount <= 0) return null;
     try {
-      return splitDonation(campaign.recipients, Math.floor(effectiveAmount), user?.pubkey);
+      return splitDonation(campaign.recipients, effectiveAmount, user?.pubkey);
     } catch {
       return null;
     }
@@ -125,7 +130,7 @@ export function DonateDialog({ campaign, open, onOpenChange, btcPrice }: DonateD
     mutationFn: async () =>
       donateToCampaign({
         campaign,
-        amountSats: Math.floor(effectiveAmount),
+        amountSats: effectiveAmount,
         comment,
         feeSpeed,
       }),
@@ -203,11 +208,11 @@ export function DonateDialog({ campaign, open, onOpenChange, btcPrice }: DonateD
     <Dialog open={open} onOpenChange={handleClose}>
       <DialogContent className="sm:max-w-md">
         {step === 'success' && result ? (
-          <SuccessView campaign={campaign} result={result} onClose={handleClose} />
+          <SuccessView campaign={campaign} result={result} btcPrice={btcPrice} onClose={handleClose} />
         ) : step === 'confirm' ? (
           <ConfirmView
             campaign={campaign}
-            amountSats={Math.floor(effectiveAmount)}
+            amountSats={effectiveAmount}
             feeSpeed={feeSpeed}
             comment={comment}
             btcPrice={btcPrice}
@@ -218,8 +223,9 @@ export function DonateDialog({ campaign, open, onOpenChange, btcPrice }: DonateD
         ) : (
           <FormView
             campaign={campaign}
-            presetAmount={amountSats}
-            customAmount={customAmount}
+            presetAmountUsd={amountUsd}
+            customUsd={customUsd}
+            effectiveUsd={effectiveUsd}
             effectiveAmount={effectiveAmount}
             minDonation={minDonation}
             belowMin={belowMin}
@@ -228,10 +234,10 @@ export function DonateDialog({ campaign, open, onOpenChange, btcPrice }: DonateD
             feeSpeed={feeSpeed}
             btcPrice={btcPrice}
             onPresetClick={(amt) => {
-              setAmountSats(amt);
-              setCustomAmount('');
+              setAmountUsd(amt);
+              setCustomUsd('');
             }}
-            onCustomChange={(v) => setCustomAmount(v)}
+            onCustomChange={(v) => setCustomUsd(v)}
             onCommentChange={setComment}
             onFeeSpeedChange={setFeeSpeed}
             onNext={() => setStep('confirm')}
@@ -247,8 +253,9 @@ export function DonateDialog({ campaign, open, onOpenChange, btcPrice }: DonateD
 
 function FormView({
   campaign,
-  presetAmount,
-  customAmount,
+  presetAmountUsd,
+  customUsd,
+  effectiveUsd,
   effectiveAmount,
   minDonation,
   belowMin,
@@ -264,8 +271,9 @@ function FormView({
   onCancel,
 }: {
   campaign: ParsedCampaign;
-  presetAmount: number;
-  customAmount: string;
+  presetAmountUsd: number;
+  customUsd: string;
+  effectiveUsd: number;
   effectiveAmount: number;
   minDonation: number;
   belowMin: boolean;
@@ -281,7 +289,8 @@ function FormView({
   onCancel: () => void;
 }) {
   const recipientCount = campaign.recipients.length;
-  const validAmount = Number.isFinite(effectiveAmount) && effectiveAmount > 0;
+  const hasPrice = !!btcPrice && Number.isFinite(btcPrice) && btcPrice > 0;
+  const validAmount = hasPrice && Number.isFinite(effectiveUsd) && effectiveUsd > 0 && effectiveAmount > 0;
   const canContinue = validAmount && !belowMin && !tooSmallSplit;
 
   return (
@@ -300,10 +309,10 @@ function FormView({
       <div className="space-y-4">
         {/* Preset grid */}
         <div className="space-y-2">
-          <Label>Amount</Label>
+          <Label>Amount (USD)</Label>
           <div className="grid grid-cols-5 gap-2">
-            {PRESET_AMOUNTS.map(({ amount, icon: Icon, label }) => {
-              const selected = !customAmount && amount === presetAmount;
+            {PRESET_AMOUNTS.map(({ amountUsd: amount, icon: Icon, label }) => {
+              const selected = !customUsd && amount === presetAmountUsd;
               return (
                 <button
                   key={amount}
@@ -327,26 +336,26 @@ function FormView({
 
         {/* Custom override */}
         <div className="space-y-2">
-          <Label htmlFor="donate-custom">Or enter a custom amount (sats)</Label>
+          <Label htmlFor="donate-custom">Or enter a custom amount (USD)</Label>
           <Input
             id="donate-custom"
             type="text"
-            inputMode="numeric"
-            placeholder={`Min ${minDonation.toLocaleString()} sats`}
-            value={customAmount}
+            inputMode="decimal"
+            placeholder={btcPrice ? `Min ${satsToUSD(minDonation, btcPrice)}` : 'Enter USD amount'}
+            value={customUsd}
             onChange={(e) => onCustomChange(e.target.value)}
           />
           <div className="flex justify-between text-xs text-muted-foreground">
             <span>
               {validAmount
-                ? `${formatSats(Math.floor(effectiveAmount))} sats${
-                    btcPrice ? ` · ${satsToUSD(Math.floor(effectiveAmount), btcPrice)}` : ''
-                  }`
-                : `Minimum: ${minDonation.toLocaleString()} sats`}
+                ? `${satsToUSD(effectiveAmount, btcPrice)} · ${formatSats(effectiveAmount)} sats`
+                : btcPrice
+                  ? `Minimum: ${satsToUSD(minDonation, btcPrice)} (${minDonation.toLocaleString()} sats)`
+                  : 'Waiting for BTC/USD price'}
             </span>
             <span>
               {recipientCount > 1 && validAmount
-                ? `≈ ${formatSats(Math.floor(effectiveAmount / recipientCount))} per recipient`
+                ? `≈ ${formatSats(Math.floor(effectiveAmount / recipientCount))} sats per recipient`
                 : ''}
             </span>
           </div>
@@ -389,6 +398,15 @@ function FormView({
               That's too small to split across {recipientCount} recipients (each output must be at
               least {BITCOIN_DUST_LIMIT.toLocaleString()} sats). Minimum donation:{' '}
               {minDonation.toLocaleString()} sats.
+            </AlertDescription>
+          </Alert>
+        )}
+
+        {!hasPrice && (
+          <Alert>
+            <AlertTriangle className="size-4" />
+            <AlertDescription className="text-xs">
+              Waiting for the BTC/USD price before converting your USD donation to sats.
             </AlertDescription>
           </Alert>
         )}
@@ -465,12 +483,8 @@ function ConfirmView({
           <div className="flex justify-between text-sm">
             <span className="text-muted-foreground">Donation amount</span>
             <span className="font-medium">
-              {formatSats(amountSats)} sats
-              {btcPrice && (
-                <span className="ml-2 text-xs text-muted-foreground">
-                  ({satsToUSD(amountSats, btcPrice)})
-                </span>
-              )}
+              {btcPrice ? satsToUSD(amountSats, btcPrice) : `${formatSats(amountSats)} sats`}
+              {btcPrice && <span className="ml-2 text-xs text-muted-foreground">({formatSats(amountSats)} sats)</span>}
             </span>
           </div>
           <div className="flex justify-between text-sm">
@@ -526,7 +540,7 @@ function ConfirmView({
             ) : (
               <>
                 <HandHeart className="size-4 mr-1.5" />
-                Donate {formatSats(amountSats)} sats
+                Donate {btcPrice ? satsToUSD(amountSats, btcPrice) : `${formatSats(amountSats)} sats`}
               </>
             )}
           </Button>
@@ -541,10 +555,12 @@ function ConfirmView({
 function SuccessView({
   campaign,
   result,
+  btcPrice,
   onClose,
 }: {
   campaign: ParsedCampaign;
   result: DonateCampaignResult;
+  btcPrice?: number;
   onClose: () => void;
 }) {
   return (
@@ -570,7 +586,9 @@ function SuccessView({
         <div className="space-y-1 text-sm">
           <div className="flex justify-between">
             <span className="text-muted-foreground">Amount sent</span>
-            <span className="font-medium">{formatSats(result.totalSats)} sats</span>
+            <span className="font-medium">
+              {btcPrice ? satsToUSD(result.totalSats, btcPrice) : `${formatSats(result.totalSats)} sats`}
+            </span>
           </div>
           <div className="flex justify-between">
             <span className="text-muted-foreground">Network fee</span>

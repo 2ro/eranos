@@ -29,11 +29,13 @@ import {
 } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { useAuthor } from '@/hooks/useAuthor';
+import { useBitcoinWallet } from '@/hooks/useBitcoinWallet';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useNostrPublish } from '@/hooks/useNostrPublish';
 import { useToast } from '@/hooks/useToast';
 import { useUploadFile } from '@/hooks/useUploadFile';
 import { useLayoutOptions } from '@/contexts/LayoutContext';
+import { formatSats, satsToUSD, usdToSats } from '@/lib/bitcoin';
 import {
   CAMPAIGN_CATEGORIES,
   CAMPAIGN_CATEGORY_LABELS,
@@ -77,6 +79,7 @@ export function CreateCampaignPage() {
 
   const { user } = useCurrentUser();
   const author = useAuthor(user?.pubkey ?? '');
+  const { btcPrice } = useBitcoinWallet();
   const navigate = useNavigate();
   const { nostr } = useNostr();
   const { mutateAsync: publishEvent } = useNostrPublish();
@@ -84,21 +87,23 @@ export function CreateCampaignPage() {
   const { toast } = useToast();
 
   const [title, setTitle] = useState('');
-  const [identifier, setIdentifier] = useState('');
-  const [identifierTouched, setIdentifierTouched] = useState(false);
   const [summary, setSummary] = useState('');
   const [story, setStory] = useState('');
   const [imageUrl, setImageUrl] = useState('');
   const [category, setCategory] = useState<CampaignCategory>('community');
-  const [goalSats, setGoalSats] = useState('');
+  const [goalUsd, setGoalUsd] = useState('');
   const [deadline, setDeadline] = useState('');
   const [location, setLocation] = useState('');
   const [recipients, setRecipients] = useState<RecipientDraft[]>([{ input: '', weight: '' }]);
   const [formError, setFormError] = useState('');
 
-  // Auto-derive the slug from the title until the user manually edits it.
+  // The slug is protocol plumbing: derive it from the title instead of asking
+  // fundraisers to understand Nostr d-tags.
   const derivedIdentifier = useMemo(() => slugifyCampaignIdentifier(title), [title]);
-  const effectiveIdentifier = identifierTouched ? identifier : derivedIdentifier;
+  const goalSatsPreview = useMemo(() => {
+    const n = Number(goalUsd.replace(/[, $]/g, ''));
+    return usdToSats(n, btcPrice);
+  }, [btcPrice, goalUsd]);
 
   useSeoMeta({
     title: 'Start a campaign | Agora',
@@ -136,10 +141,10 @@ export function CreateCampaignPage() {
     mutationFn: async () => {
       if (!user) throw new Error('You must be logged in to create a campaign.');
       const trimmedTitle = title.trim();
-      const slug = effectiveIdentifier.trim();
+      const slug = derivedIdentifier;
 
       if (!trimmedTitle) throw new Error('Title is required.');
-      if (!slug) throw new Error('Identifier is required.');
+      if (!slug) throw new Error('Title must include letters or numbers so a campaign URL can be created.');
       if (!/^[a-z0-9][a-z0-9-]{0,63}$/.test(slug)) {
         throw new Error('Identifier must be lowercase letters, numbers, and hyphens.');
       }
@@ -173,12 +178,15 @@ export function CreateCampaignPage() {
 
       // Goal / deadline.
       let goalNum: number | undefined;
-      if (goalSats.trim()) {
-        const n = Number(goalSats.replace(/[, ]/g, ''));
-        if (!Number.isFinite(n) || !Number.isInteger(n) || n <= 0) {
-          throw new Error('Goal must be a positive integer in sats.');
+      if (goalUsd.trim()) {
+        const n = Number(goalUsd.replace(/[, $]/g, ''));
+        if (!Number.isFinite(n) || n <= 0) {
+          throw new Error('Goal must be a positive USD amount.');
         }
-        goalNum = n;
+        goalNum = usdToSats(n, btcPrice);
+        if (goalNum <= 0) {
+          throw new Error('Bitcoin price is unavailable. Try again before setting a USD goal.');
+        }
       }
 
       let deadlineNum: number | undefined;
@@ -308,7 +316,7 @@ export function CreateCampaignPage() {
         </div>
 
         {/* Cover image */}
-        <FormSection title="Cover image" description="Choose a hero image for your campaign card.">
+        <FormSection title="Cover image" requirement="Optional" description="Choose a hero image for your campaign card.">
           <CoverPicker
             url={imageUrl}
             isUploading={isUploading}
@@ -325,7 +333,7 @@ export function CreateCampaignPage() {
         </FormSection>
 
         {/* Title & identifier */}
-        <FormSection title="Title" description="What are you raising money for?">
+        <FormSection title="Title" requirement="Required" description="What are you raising money for? The campaign URL is created from this title automatically.">
           <Input
             value={title}
             onChange={(e) => setTitle(e.target.value)}
@@ -333,30 +341,18 @@ export function CreateCampaignPage() {
             maxLength={200}
             required
           />
-          <div className="space-y-1.5">
-            <Label htmlFor="campaign-identifier" className="text-xs text-muted-foreground">
-              Identifier (URL slug)
-            </Label>
-            <Input
-              id="campaign-identifier"
-              value={effectiveIdentifier}
-              onChange={(e) => {
-                setIdentifier(e.target.value);
-                setIdentifierTouched(true);
-              }}
-              placeholder="save-the-last-bookstore"
-              pattern="^[a-z0-9][a-z0-9-]{0,63}$"
-              className="font-mono text-sm"
-            />
-            <p className="text-xs text-muted-foreground">
-              Lowercase letters, numbers, and hyphens. Used in the campaign's permanent address.
-            </p>
-          </div>
+          <p className="text-xs text-muted-foreground">
+            URL preview:{' '}
+            <span className="font-mono text-foreground">
+              /{derivedIdentifier || 'your-campaign-title'}
+            </span>
+          </p>
         </FormSection>
 
         {/* Summary */}
         <FormSection
           title="Summary"
+          requirement="Optional"
           description="A short one-paragraph pitch shown in cards and previews."
         >
           <Textarea
@@ -371,6 +367,7 @@ export function CreateCampaignPage() {
         {/* Story */}
         <FormSection
           title="Story"
+          requirement="Optional"
           description="Tell donors why this matters. Markdown is supported."
         >
           <Textarea
@@ -383,7 +380,7 @@ export function CreateCampaignPage() {
         </FormSection>
 
         {/* Category + goal + deadline + location */}
-        <FormSection title="Details" description="A few more facts about your campaign.">
+        <FormSection title="Details" requirement="Optional" description="A few more facts about your campaign.">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="space-y-1.5">
               <Label htmlFor="campaign-category">Category</Label>
@@ -404,15 +401,20 @@ export function CreateCampaignPage() {
               </Select>
             </div>
             <div className="space-y-1.5">
-              <Label htmlFor="campaign-goal">Goal (sats, optional)</Label>
+              <Label htmlFor="campaign-goal">Goal (USD)</Label>
               <Input
                 id="campaign-goal"
                 type="text"
-                inputMode="numeric"
-                placeholder="10000000"
-                value={goalSats}
-                onChange={(e) => setGoalSats(e.target.value)}
+                inputMode="decimal"
+                placeholder="100,000"
+                value={goalUsd}
+                onChange={(e) => setGoalUsd(e.target.value)}
               />
+              <p className="text-xs text-muted-foreground">
+                {goalSatsPreview > 0 && btcPrice
+                  ? `Publishes as ${formatSats(goalSatsPreview)} sats (${satsToUSD(goalSatsPreview, btcPrice)} at current BTC price).`
+                  : 'Stored on Nostr as sats using the current BTC/USD price.'}
+              </p>
             </div>
             <div className="space-y-1.5">
               <Label htmlFor="campaign-deadline">Deadline (optional)</Label>
@@ -438,6 +440,7 @@ export function CreateCampaignPage() {
         {/* Recipients */}
         <FormSection
           title="Beneficiaries"
+          requirement="Required"
           description="One or more Nostr accounts that receive split-payment donations. Equal split by default; set a weight to adjust the share."
         >
           <div className="space-y-3">
@@ -490,17 +493,31 @@ export function CreateCampaignPage() {
 
 function FormSection({
   title,
+  requirement,
   description,
   children,
 }: {
   title: string;
+  requirement: 'Required' | 'Optional';
   description?: string;
   children: React.ReactNode;
 }) {
   return (
     <section className="space-y-3">
       <div className="space-y-0.5">
-        <h2 className="text-lg font-semibold">{title}</h2>
+        <h2 className="flex items-center gap-2 text-lg font-semibold">
+          {title}
+          <span
+            className={cn(
+              'rounded-full px-2 py-0.5 text-[11px] font-medium',
+              requirement === 'Required'
+                ? 'bg-primary/10 text-primary'
+                : 'bg-muted text-muted-foreground',
+            )}
+          >
+            {requirement}
+          </span>
+        </h2>
         {description && <p className="text-sm text-muted-foreground">{description}</p>}
       </div>
       <div className="space-y-3">{children}</div>

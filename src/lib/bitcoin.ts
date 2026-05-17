@@ -135,6 +135,12 @@ export function satsToUSD(sats: number, btcPrice: number): string {
   });
 }
 
+export function usdToSats(usd: number, btcPrice: number | undefined): number {
+  if (!btcPrice || !Number.isFinite(btcPrice) || btcPrice <= 0) return 0;
+  if (!Number.isFinite(usd) || usd <= 0) return 0;
+  return Math.round((usd / btcPrice) * 100_000_000);
+}
+
 export interface Transaction {
   txid: string;
   amount: number;

@@ -1,5 +1,6 @@
 import { useMemo } from 'react';
 import { Link } from 'react-router-dom';
+import { useQuery } from '@tanstack/react-query';
 import { CalendarClock, HandHeart, MapPin, Target, Users } from 'lucide-react';
 
 import { Badge } from '@/components/ui/badge';
@@ -13,6 +14,7 @@ import {
   type ParsedCampaign,
   encodeCampaignNaddr,
 } from '@/lib/campaign';
+import { fetchBtcPrice, satsToUSD } from '@/lib/bitcoin';
 import { genUserName } from '@/lib/genUserName';
 import { sanitizeUrl } from '@/lib/sanitizeUrl';
 import { cn } from '@/lib/utils';
@@ -23,6 +25,11 @@ function formatSatsShort(sats: number): string {
   if (sats >= 1_000_000) return `${(sats / 1_000_000).toFixed(2)}M sats`;
   if (sats >= 10_000) return `${(sats / 1_000).toFixed(0)}K sats`;
   return `${sats.toLocaleString()} sats`;
+}
+
+function formatCampaignAmount(sats: number, btcPrice: number | undefined): string {
+  if (btcPrice) return satsToUSD(sats, btcPrice);
+  return formatSatsShort(sats);
 }
 
 function formatDeadline(unixSeconds: number): { label: string; isPast: boolean } {
@@ -40,10 +47,12 @@ function formatDeadline(unixSeconds: number): { label: string; isPast: boolean }
 export function CampaignProgress({
   raisedSats,
   goalSats,
+  btcPrice,
   className,
 }: {
   raisedSats: number;
   goalSats?: number;
+  btcPrice?: number;
   className?: string;
 }) {
   const pct = goalSats && goalSats > 0 ? Math.min(100, Math.round((raisedSats / goalSats) * 100)) : 0;
@@ -51,9 +60,9 @@ export function CampaignProgress({
     <div className={cn('space-y-1.5', className)}>
       <Progress value={pct} className="h-2" />
       <div className="flex items-baseline justify-between gap-2 text-sm">
-        <span className="font-semibold">{formatSatsShort(raisedSats)}</span>
+        <span className="font-semibold">{formatCampaignAmount(raisedSats, btcPrice)}</span>
         {goalSats ? (
-          <span className="text-muted-foreground">of {formatSatsShort(goalSats)} goal</span>
+          <span className="text-muted-foreground">of {formatCampaignAmount(goalSats, btcPrice)} goal</span>
         ) : (
           <span className="text-muted-foreground">raised</span>
         )}
@@ -76,6 +85,12 @@ interface CampaignCardProps {
 export function CampaignCard({ campaign, variant = 'compact', className }: CampaignCardProps) {
   const author = useAuthor(campaign.pubkey);
   const { data: stats } = useCampaignDonations(campaign.aTag);
+  const { data: btcPrice } = useQuery({
+    queryKey: ['btc-price'],
+    queryFn: fetchBtcPrice,
+    staleTime: 30_000,
+    refetchInterval: 60_000,
+  });
 
   const naddr = useMemo(() => encodeCampaignNaddr(campaign), [campaign]);
   const cover = sanitizeUrl(campaign.image);
@@ -156,7 +171,7 @@ export function CampaignCard({ campaign, variant = 'compact', className }: Campa
 
           <div className="flex-1" />
 
-          <CampaignProgress raisedSats={raisedSats} goalSats={campaign.goalSats} />
+          <CampaignProgress raisedSats={raisedSats} goalSats={campaign.goalSats} btcPrice={btcPrice} />
 
           {/* Meta row */}
           <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 text-xs text-muted-foreground pt-1">
