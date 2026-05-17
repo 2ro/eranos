@@ -95,7 +95,7 @@ export function CampaignsPage() {
 
   useSeoMeta({
     title: `Fundraisers | ${config.appName}`,
-    description: 'Discover and support fundraising campaigns on Agora.',
+    description: 'Connecting activists to unstoppable funding.',
   });
 
   // Exclude featured campaigns from the main list so they don't appear twice.
@@ -116,14 +116,15 @@ export function CampaignsPage() {
           <div className="max-w-3xl space-y-5">
             <div className="inline-flex items-center gap-2 rounded-full bg-background/70 backdrop-blur px-3 py-1 border border-border text-xs font-medium">
               <Sparkles className="size-3.5 text-primary" />
-              On-chain fundraising on Nostr
+              Unstoppable fundraising on Nostr
             </div>
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight leading-[1.1]">
-              Where successful fundraisers start.
+              Connecting activists to unstoppable funding.
             </h1>
             <p className="text-base sm:text-lg text-muted-foreground max-w-2xl">
-              Every donation is a single Bitcoin transaction, split directly to each campaign's
-              beneficiaries. No middlemen, no chargebacks, no held funds.
+              Raise Bitcoin directly from supporters around the world. Every donation settles
+              straight to your campaign's beneficiaries — no middlemen, no chargebacks, no
+              platform holding your funds.
             </p>
             <div className="flex flex-wrap gap-3 pt-2">
               <Button size="lg" asChild className="rounded-full">
