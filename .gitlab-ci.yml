@@ -49,12 +49,14 @@ deploy-web:
     - echo "$DEPLOY_SSH_KEY" | tr -d '\r' > ~/.ssh/id_ed25519 && chmod 600 ~/.ssh/id_ed25519
     - ssh-keyscan -H "${DEPLOY_TARGET##*@}" >> ~/.ssh/known_hosts 2>/dev/null
 
-    # Two-phase rsync: upload hashed assets first, then index.html, so the
-    # site never serves an index.html that points at assets that haven't
-    # finished uploading. The destination ":/" is the rrsync jail root on
-    # venus, which maps to /var/www/agora.spot/.
+    # Two-phase rsync: upload hashed assets first, then index.html and sw.js,
+    # so the site never serves an index.html that points at assets that
+    # haven't finished uploading. sw.js is in the second pass for the same
+    # reason — it's a stable filename that all browsers re-fetch to check
+    # for updates, so we want it to land last. The destination ":/" is the
+    # rrsync jail root on venus, which maps to /var/www/agora.spot/.
     - rsync -av --exclude=/sw.js --exclude=/index.html -e "ssh -i ~/.ssh/id_ed25519" dist/ "${DEPLOY_TARGET}:/"
-    - rsync -av -e "ssh -i ~/.ssh/id_ed25519" dist/index.html "${DEPLOY_TARGET}:/"
+    - rsync -av -e "ssh -i ~/.ssh/id_ed25519" dist/index.html dist/sw.js "${DEPLOY_TARGET}:/"
 
 # Disabled: nsite deploy not needed right now; re-enable by restoring the
 # rules below to run on default branch (and ensure NSITE_NBUNKSEC is set).

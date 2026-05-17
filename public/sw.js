@@ -56,8 +56,23 @@ self.addEventListener('notificationclick', (event) => {
 });
 
 // --- Activate immediately ---
+//
+// On activate, nuke every Cache Storage entry. A previous version of Agora
+// deployed a precaching service worker (Workbox-style) that's still serving
+// stale HTML/JS to returning users on the same origin. Wiping caches here
+// means the first request a returning user makes after this SW takes over
+// will hit the network and get the new build.
+//
+// This SW itself does not intercept fetches (no 'fetch' handler), so it
+// never repopulates a cache — only push notifications are handled below.
 
 self.addEventListener('install', () => self.skipWaiting());
 self.addEventListener('activate', (event) => {
-  event.waitUntil(self.clients.claim());
+  event.waitUntil(
+    (async () => {
+      const keys = await caches.keys();
+      await Promise.all(keys.map((key) => caches.delete(key)));
+      await self.clients.claim();
+    })(),
+  );
 });
