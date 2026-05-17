@@ -131,10 +131,9 @@ function CampaignDetailContent({ campaign }: { campaign: ParsedCampaign }) {
 
   return (
     <main className="min-h-screen pb-16">
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 py-6 lg:py-10">
+      <div className="max-w-3xl mx-auto px-4 sm:px-6 py-6 lg:py-10">
         {/* Hero */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-10">
-          <div className="lg:col-span-2 space-y-4">
+        <div className="space-y-4">
             {/* Cover */}
             <div className="relative aspect-[16/9] rounded-xl overflow-hidden bg-gradient-to-br from-primary/40 via-primary/20 to-secondary">
               {cover ? (
@@ -175,6 +174,74 @@ function CampaignDetailContent({ campaign }: { campaign: ParsedCampaign }) {
                 )}
               </div>
             </div>
+
+            {/* Donation */}
+            <Card>
+              <CardContent className="p-5 space-y-4">
+                {statsLoading ? (
+                  <Skeleton className="h-12 w-full" />
+                ) : (
+                  <>
+                    <div>
+                      <div className="text-3xl font-bold tracking-tight">
+                        {formatSatsFull(raisedSats, btcPrice)}
+                      </div>
+                      {campaign.goalSats && (
+                        <div className="text-sm text-muted-foreground">
+                          raised of {formatSatsFull(campaign.goalSats, btcPrice)} goal
+                        </div>
+                      )}
+                    </div>
+                    <CampaignProgress
+                      raisedSats={raisedSats}
+                      goalSats={campaign.goalSats}
+                      btcPrice={btcPrice}
+                    />
+                    <div className="flex justify-between text-xs text-muted-foreground">
+                      <span>
+                        {stats?.donorCount ?? 0}{' '}
+                        {stats?.donorCount === 1 ? 'donor' : 'donors'}
+                      </span>
+                      <span>
+                        {stats?.txCount ?? 0}{' '}
+                        {stats?.txCount === 1 ? 'donation' : 'donations'}
+                      </span>
+                    </div>
+                  </>
+                )}
+
+                <div className="grid gap-2 sm:grid-cols-2">
+                  <Button
+                    size="lg"
+                    className="w-full"
+                    onClick={() => setDonateOpen(true)}
+                    disabled={deadline?.isPast}
+                  >
+                    <HandHeart className="size-4 mr-2" />
+                    {deadline?.isPast ? 'Campaign ended' : 'Donate'}
+                  </Button>
+
+                  <Button variant="outline" size="lg" className="w-full" onClick={handleShare}>
+                    <Share2 className="size-4 mr-2" />
+                    Share campaign
+                  </Button>
+                </div>
+
+                {isCreator && (
+                  <Button variant="ghost" className="w-full" asChild>
+                    <Link to={`/campaigns/edit/${naddr}`}>
+                      <Pencil className="size-4 mr-2" />
+                      Edit campaign
+                    </Link>
+                  </Button>
+                )}
+
+                <div className="text-xs text-muted-foreground text-center px-2">
+                  Donations are sent on-chain to each beneficiary's Nostr-derived Bitcoin address in a
+                  single Bitcoin transaction.
+                </div>
+              </CardContent>
+            </Card>
 
             {/* Creator + meta */}
             <div className="flex flex-wrap items-center gap-x-5 gap-y-2 text-sm text-muted-foreground border-y border-border py-3">
@@ -248,75 +315,6 @@ function CampaignDetailContent({ campaign }: { campaign: ParsedCampaign }) {
                 </div>
               </CardContent>
             </Card>
-          </div>
-
-          {/* Donation rail */}
-          <aside className="lg:col-span-1 lg:sticky lg:top-[5rem] self-start space-y-4">
-            <Card>
-              <CardContent className="p-5 space-y-4">
-                {statsLoading ? (
-                  <Skeleton className="h-12 w-full" />
-                ) : (
-                  <>
-                    <div>
-                      <div className="text-3xl font-bold tracking-tight">
-                        {formatSatsFull(raisedSats, btcPrice)}
-                      </div>
-                      {campaign.goalSats && (
-                        <div className="text-sm text-muted-foreground">
-                          raised of {formatSatsFull(campaign.goalSats, btcPrice)} goal
-                        </div>
-                      )}
-                    </div>
-                    <CampaignProgress
-                      raisedSats={raisedSats}
-                      goalSats={campaign.goalSats}
-                      btcPrice={btcPrice}
-                    />
-                    <div className="flex justify-between text-xs text-muted-foreground">
-                      <span>
-                        {stats?.donorCount ?? 0}{' '}
-                        {stats?.donorCount === 1 ? 'donor' : 'donors'}
-                      </span>
-                      <span>
-                        {stats?.txCount ?? 0}{' '}
-                        {stats?.txCount === 1 ? 'donation' : 'donations'}
-                      </span>
-                    </div>
-                  </>
-                )}
-
-                <Button
-                  size="lg"
-                  className="w-full"
-                  onClick={() => setDonateOpen(true)}
-                  disabled={deadline?.isPast}
-                >
-                  <HandHeart className="size-4 mr-2" />
-                  {deadline?.isPast ? 'Campaign ended' : 'Donate'}
-                </Button>
-
-                <Button variant="outline" className="w-full" onClick={handleShare}>
-                  <Share2 className="size-4 mr-2" />
-                  Share campaign
-                </Button>
-
-                {isCreator && (
-                  <Button variant="ghost" className="w-full" asChild>
-                    <Link to={`/campaigns/edit/${naddr}`}>
-                      <Pencil className="size-4 mr-2" />
-                      Edit campaign
-                    </Link>
-                  </Button>
-                )}
-              </CardContent>
-            </Card>
-
-            <div className="text-xs text-muted-foreground text-center px-2">
-              Donations are sent on-chain to each beneficiary's Nostr-derived Bitcoin address in a
-              single Bitcoin transaction.
-            </div>
-          </aside>
         </div>
       </div>
 
