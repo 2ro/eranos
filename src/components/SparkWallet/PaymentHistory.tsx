@@ -4,7 +4,7 @@
  */
 
 import { useState } from 'react';
-import { ArrowDownLeft, ArrowUpRight, Clock, Loader2, Zap, User } from "lucide-react";
+import { ArrowDownLeft, ArrowUpRight, Clock, Loader2, RefreshCw, Zap, User } from "lucide-react";
 import { Link } from 'react-router-dom';
 import { nip19 } from 'nostr-tools';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -255,13 +255,14 @@ export function PaymentHistory({ limit, className }: PaymentHistoryProps) {
           <button
             onClick={() => refreshPayments()}
             disabled={isLoadingPayments}
-            className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+            className="inline-flex min-w-24 items-center justify-end gap-1.5 text-sm text-muted-foreground transition-colors hover:text-foreground disabled:opacity-70"
           >
             {isLoadingPayments ? (
               <Loader2 className="h-4 w-4 animate-spin" />
             ) : (
-              "Refresh"
+              <RefreshCw className="h-4 w-4" />
             )}
+            <span>Refresh</span>
           </button>
         </div>
       </CardHeader>
