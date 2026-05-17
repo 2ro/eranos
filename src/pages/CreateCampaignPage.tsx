@@ -3,17 +3,16 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useSeoMeta } from '@unhead/react';
 import { useMutation } from '@tanstack/react-query';
 import { useNostr } from '@nostrify/react';
-import { nip19 } from 'nostr-tools';
 import {
   AlertTriangle,
   ArrowLeft,
   HandHeart,
   ImagePlus,
   Loader2,
-  PlusCircle,
   X,
 } from 'lucide-react';
 
+import { PersonSearch } from '@/components/AddMemberDialog';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
@@ -34,6 +33,7 @@ import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useNostrPublish } from '@/hooks/useNostrPublish';
 import { useToast } from '@/hooks/useToast';
 import { useUploadFile } from '@/hooks/useUploadFile';
+import type { SearchProfile } from '@/hooks/useSearchProfiles';
 import { useLayoutOptions } from '@/contexts/LayoutContext';
 import { formatSats, satsToUSD, usdToSats } from '@/lib/bitcoin';
 import {
@@ -48,31 +48,6 @@ import {
 import { genUserName } from '@/lib/genUserName';
 import { sanitizeUrl } from '@/lib/sanitizeUrl';
 import { cn } from '@/lib/utils';
-
-/** A pending recipient row in the form (before validation). */
-interface RecipientDraft {
-  /** Hex pubkey or npub1… entered by the user. */
-  input: string;
-  /** Optional weight string (parsed at submit time). */
-  weight: string;
-}
-
-const HEX_64_RE = /^[0-9a-f]{64}$/;
-
-function decodePubkey(input: string): string | null {
-  const trimmed = input.trim();
-  if (HEX_64_RE.test(trimmed)) return trimmed;
-  if (trimmed.startsWith('npub1') || trimmed.startsWith('nprofile1')) {
-    try {
-      const decoded = nip19.decode(trimmed);
-      if (decoded.type === 'npub') return decoded.data;
-      if (decoded.type === 'nprofile') return decoded.data.pubkey;
-    } catch {
-      return null;
-    }
-  }
-  return null;
-}
 
 export function CreateCampaignPage() {
   useLayoutOptions({ noMaxWidth: true, rightSidebar: null });
@@ -94,7 +69,7 @@ export function CreateCampaignPage() {
   const [goalUsd, setGoalUsd] = useState('');
   const [deadline, setDeadline] = useState('');
   const [location, setLocation] = useState('');
-  const [recipients, setRecipients] = useState<RecipientDraft[]>([{ input: '', weight: '' }]);
+  const [recipients, setRecipients] = useState<SearchProfile[]>([]);
   const [formError, setFormError] = useState('');
 
   // The slug is protocol plumbing: derive it from the title instead of asking
@@ -125,16 +100,25 @@ export function CreateCampaignPage() {
     }
   };
 
-  const setRecipientField = (index: number, patch: Partial<RecipientDraft>) => {
-    setRecipients((prev) => prev.map((r, i) => (i === index ? { ...r, ...patch } : r)));
+  const addRecipient = (profile: SearchProfile) => {
+    setRecipients((prev) => prev.some((r) => r.pubkey === profile.pubkey) ? prev : [...prev, profile]);
   };
 
-  const addRecipient = () => {
-    setRecipients((prev) => [...prev, { input: '', weight: '' }]);
+  const addRecipients = (profiles: SearchProfile[]) => {
+    setRecipients((prev) => {
+      const seen = new Set(prev.map((r) => r.pubkey));
+      const next = [...prev];
+      for (const profile of profiles) {
+        if (seen.has(profile.pubkey)) continue;
+        seen.add(profile.pubkey);
+        next.push(profile);
+      }
+      return next;
+    });
   };
 
-  const removeRecipient = (index: number) => {
-    setRecipients((prev) => prev.filter((_, i) => i !== index));
+  const removeRecipient = (pubkey: string) => {
+    setRecipients((prev) => prev.filter((r) => r.pubkey !== pubkey));
   };
 
   const submitMutation = useMutation({
@@ -150,26 +134,13 @@ export function CreateCampaignPage() {
       }
 
       // Validate recipients.
-      const parsedRecipients: { pubkey: string; weight: number }[] = [];
+      const parsedRecipients: { pubkey: string }[] = [];
       const seen = new Set<string>();
       for (const r of recipients) {
-        if (!r.input.trim()) continue;
-        const pubkey = decodePubkey(r.input);
-        if (!pubkey) {
-          throw new Error(`Invalid recipient: "${r.input.trim()}". Use an npub or hex pubkey.`);
-        }
+        const pubkey = r.pubkey;
         if (seen.has(pubkey)) continue;
         seen.add(pubkey);
-
-        let weight = 1;
-        if (r.weight.trim()) {
-          const parsed = Number(r.weight);
-          if (!Number.isFinite(parsed) || parsed <= 0) {
-            throw new Error(`Recipient weight must be a positive number.`);
-          }
-          weight = parsed;
-        }
-        parsedRecipients.push({ pubkey, weight });
+        parsedRecipients.push({ pubkey });
       }
 
       if (parsedRecipients.length === 0) {
@@ -225,13 +196,7 @@ export function CreateCampaignPage() {
       if (deadlineNum !== undefined) tags.push(['deadline', String(deadlineNum)]);
       if (location.trim()) tags.push(['location', location.trim()]);
       for (const r of parsedRecipients) {
-        const pTag: string[] = ['p', r.pubkey];
-        if (r.weight !== 1) {
-          // Relay hint kept empty so the weight lands at the 4th element per spec.
-          pTag.push('');
-          pTag.push(String(r.weight));
-        }
-        tags.push(pTag);
+        tags.push(['p', r.pubkey]);
       }
 
       const published = await publishEvent({
@@ -441,21 +406,34 @@ export function CreateCampaignPage() {
         <FormSection
           title="Beneficiaries"
           requirement="Required"
-          description="One or more Nostr accounts that receive split-payment donations. Equal split by default; set a weight to adjust the share."
+          description="One or more Nostr accounts that receive split-payment donations. Donations are split evenly across everyone in the campaign."
         >
           <div className="space-y-3">
-            {recipients.map((r, i) => (
-              <RecipientField
-                key={i}
-                value={r}
-                onChange={(patch) => setRecipientField(i, patch)}
-                onRemove={recipients.length > 1 ? () => removeRecipient(i) : undefined}
-              />
-            ))}
-            <Button type="button" variant="outline" size="sm" onClick={addRecipient}>
-              <PlusCircle className="size-4 mr-2" />
-              Add another beneficiary
-            </Button>
+            <PersonSearch
+              onAdd={addRecipient}
+              onAddMany={addRecipients}
+              excludePubkeys={recipients.map((r) => r.pubkey)}
+            />
+            {recipients.length > 0 ? (
+              <div className="space-y-2">
+                <Label className="text-xs text-muted-foreground">
+                  Beneficiaries ({recipients.length})
+                </Label>
+                <div className="space-y-2">
+                  {recipients.map((recipient) => (
+                    <RecipientRow
+                      key={recipient.pubkey}
+                      profile={recipient}
+                      onRemove={() => removeRecipient(recipient.pubkey)}
+                    />
+                  ))}
+                </div>
+              </div>
+            ) : (
+              <p className="rounded-lg border border-dashed border-border px-3 py-4 text-center text-sm text-muted-foreground">
+                Search for people by name, NIP-05, npub, or nprofile to add beneficiaries.
+              </p>
+            )}
           </div>
         </FormSection>
 
@@ -589,42 +567,32 @@ function CoverPicker({
   );
 }
 
-function RecipientField({
-  value,
-  onChange,
-  onRemove,
-}: {
-  value: RecipientDraft;
-  onChange: (patch: Partial<RecipientDraft>) => void;
-  onRemove?: () => void;
-}) {
+function RecipientRow({ profile, onRemove }: { profile: SearchProfile; onRemove: () => void }) {
+  const displayName = profile.metadata.display_name || profile.metadata.name || genUserName(profile.pubkey);
+  const picture = sanitizeUrl(profile.metadata.picture);
+
   return (
-    <div className="flex flex-col sm:flex-row gap-2 items-start sm:items-center">
-      <Input
-        className="flex-1 font-mono text-sm"
-        placeholder="npub1… or 64-char hex pubkey"
-        value={value.input}
-        onChange={(e) => onChange({ input: e.target.value })}
-      />
-      <Input
-        type="text"
-        inputMode="decimal"
-        placeholder="weight"
-        value={value.weight}
-        onChange={(e) => onChange({ weight: e.target.value })}
-        className="w-full sm:w-24"
-      />
-      {onRemove && (
-        <Button
-          type="button"
-          variant="ghost"
-          size="icon"
-          onClick={onRemove}
-          aria-label="Remove recipient"
-        >
-          <X className="size-4" />
-        </Button>
-      )}
+    <div className="flex items-center gap-3 rounded-lg border border-border/60 bg-secondary/30 p-2">
+      <Avatar className="size-8 shrink-0">
+        {picture && <AvatarImage src={picture} alt="" />}
+        <AvatarFallback className="text-xs">{displayName.slice(0, 2).toUpperCase()}</AvatarFallback>
+      </Avatar>
+      <div className="min-w-0 flex-1">
+        <div className="truncate text-sm font-medium">{displayName}</div>
+        <div className="truncate font-mono text-xs text-muted-foreground">
+          {profile.pubkey.slice(0, 12)}…{profile.pubkey.slice(-8)}
+        </div>
+      </div>
+      <Button
+        type="button"
+        variant="ghost"
+        size="icon"
+        onClick={onRemove}
+        aria-label={`Remove ${displayName}`}
+        className="shrink-0"
+      >
+        <X className="size-4" />
+      </Button>
     </div>
   );
 }

@@ -550,28 +550,21 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
       <LightningEffect ref={lightningRef} />
       <CommunityModerationContext.Provider value={moderationCtx}>
         <Tabs value={activeTab} onValueChange={setActiveTab}>
-      {/* ── Hero banner + tabs share a single image/gradient backdrop so the
-          banner image continues underneath the tab strip and fades into the
-          page background — eliminating the seam between the two. ── */}
+      {/* ── Hero banner + tabs ── */}
       <div className="relative isolate overflow-hidden">
-        {/* Shared backdrop — image (or fallback gradient) + darkening overlay
-            that spans the full height of (banner + tabs) and fades to the
-            page background at its bottom edge. */}
+        {/* Tabs get their own dark backdrop so the cover image only appears in
+            the hero, not repeated underneath the tab strip. */}
         <div aria-hidden className="absolute inset-0 -z-10">
+          <div className="absolute inset-x-0 bottom-0 h-12 bg-[linear-gradient(to_bottom,rgba(0,0,0,0.9)_0%,rgba(0,0,0,0.9)_75%,hsl(var(--background))_100%)]" />
+        </div>
+
+        {/* Banner — fixed aspect ratio, title/description/buttons overlaid */}
+        <div className="relative w-full aspect-[2/1] sm:aspect-[21/9]">
           {image ? (
             <img src={image} alt="" className="absolute inset-0 w-full h-full object-cover" />
           ) : (
             <div className="absolute inset-0 bg-gradient-to-br from-primary/50 via-primary/25 to-primary/5" />
           )}
-          {/* Darkening overlay that fades to the page background at the
-              bottom of the tab strip — makes tab text legible and erases the
-              hard seam between banner and tabs. Stops push the heavy darkness
-              down so it sits behind the tabs, not over the banner. */}
-          <div className="absolute inset-0 bg-[linear-gradient(to_bottom,transparent_0%,transparent_15%,rgba(0,0,0,0.9)_75%,rgba(0,0,0,0.9)_97%,hsl(var(--background))_100%)]" />
-        </div>
-
-        {/* Banner — fixed aspect ratio, title/description/buttons overlaid */}
-        <div className="relative w-full aspect-[2/1] sm:aspect-[21/9]">
           {!image && (
             <div className="absolute inset-0 flex items-center justify-center">
               <Users className="size-16 text-primary/20 sm:size-20" />

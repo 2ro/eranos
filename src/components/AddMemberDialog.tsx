@@ -579,7 +579,7 @@ export function AddMemberPanel({
 // ── Sub-Components ────────────────────────────────────────────────────────────
 
 /** Inline type-ahead person search. */
-function PersonSearch({
+export function PersonSearch({
   onAdd,
   onAddMany,
   excludePubkeys,
