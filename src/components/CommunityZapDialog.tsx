@@ -218,16 +218,17 @@ export function CommunityZapDialog({
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button
+        <button
           type="button"
-          variant="ghost"
-          size="icon"
-          className={cn(triggerClassName ?? 'shadow-md bg-white text-black hover:bg-white/90')}
+          className={cn(
+            'inline-flex items-center justify-center',
+            triggerClassName ?? 'p-2 rounded-full shadow-md bg-white text-black hover:bg-white/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring transition-colors',
+          )}
           aria-label="Zap community"
           title="Zap community"
         >
           <Zap className="size-5" />
-        </Button>
+        </button>
       </DialogTrigger>
       <DialogContent className="max-w-lg max-h-[88vh] flex flex-col overflow-hidden p-0 gap-0 [&>button]:top-3 [&>button]:right-3">
         <DialogHeader className="px-5 pt-5 pb-3 border-b border-border shrink-0">
