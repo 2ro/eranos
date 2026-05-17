@@ -99,6 +99,10 @@ function CampaignDetailContent({ campaign }: { campaign: ParsedCampaign }) {
 
   const isCreator = user?.pubkey === campaign.pubkey;
   const naddr = useMemo(() => encodeCampaignNaddr(campaign), [campaign]);
+  const storyEvent = useMemo(
+    () => ({ ...campaign.event, tags: campaign.event.tags.filter(([name]) => name !== 'image') }),
+    [campaign.event],
+  );
 
   useSeoMeta({
     title: `${campaign.title} | Agora Fundraisers`,
@@ -211,7 +215,7 @@ function CampaignDetailContent({ campaign }: { campaign: ParsedCampaign }) {
             {/* Story */}
             <article className="prose prose-neutral dark:prose-invert max-w-none">
               {campaign.story.trim().length > 0 ? (
-                <ArticleContent event={campaign.event} />
+                <ArticleContent event={storyEvent} />
               ) : (
                 <p className="text-muted-foreground italic">
                   The organizer hasn't written a story for this campaign yet.
