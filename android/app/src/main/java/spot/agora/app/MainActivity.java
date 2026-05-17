@@ -63,7 +63,7 @@ public class MainActivity extends BridgeActivity {
     private void handleNotificationIntent(Intent intent) {
         if (intent == null) return;
         Uri data = intent.getData();
-        if (data != null && "ditto.pub".equals(data.getHost())) {
+        if (data != null && "agora.spot".equals(data.getHost())) {
             String path = data.getPath();
             if (path != null && !path.isEmpty()) {
                 // Wait for WebView to be ready, then navigate

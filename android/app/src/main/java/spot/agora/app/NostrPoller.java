@@ -337,7 +337,7 @@ public class NostrPoller {
         if (manager == null) return;
 
         Intent intent = new Intent(context, MainActivity.class);
-        intent.setData(Uri.parse("https://ditto.pub/notifications"));
+        intent.setData(Uri.parse("https://agora.spot/notifications"));
         intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_CLEAR_TOP);
         PendingIntent pendingIntent = PendingIntent.getActivity(
                 context, id, intent,
