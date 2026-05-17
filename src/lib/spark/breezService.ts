@@ -5,6 +5,8 @@
  */
 
 import { logger } from "@/lib/logger";
+import { sha256 } from "@noble/hashes/sha256";
+import { bytesToHex } from "@noble/hashes/utils";
 import initBreezSDK, {
   BreezSdk,
   connect,
@@ -46,9 +48,20 @@ import { wordlist } from "@scure/bip39/wordlists/english";
 
 const SYNC_TIMEOUT_MS = 20000;
 const INFO_TIMEOUT_MS = 15000;
+const encoder = new TextEncoder();
 
 const isTimeoutError = (error: unknown): boolean =>
   error instanceof Error && error.message.includes("timed out");
+
+const getStorageDir = (mnemonic: string, network: Network): string => {
+  const normalizedMnemonic = mnemonic.trim().replace(/\s+/g, " ");
+  const fingerprint = bytesToHex(sha256(encoder.encode(normalizedMnemonic))).slice(
+    0,
+    24,
+  );
+
+  return `spark-wallet-${network}-${fingerprint}`;
+};
 
 const withTimeout = async <T>(
   promise: Promise<T>,
@@ -206,8 +219,10 @@ class BreezWalletService {
         mnemonic: mnemonic,
       };
 
-      // Storage directory for web (uses IndexedDB)
-      const storageDir = "spark-wallet";
+      // Storage directory for web (uses IndexedDB). It must be scoped per
+      // mnemonic; otherwise a newly-created wallet can reuse stale SDK state
+      // and generate invoices for a previous wallet.
+      const storageDir = getStorageDir(mnemonic, network);
 
       // Connect to SDK
       const connectRequest: ConnectRequest = {
@@ -316,7 +331,7 @@ class BreezWalletService {
    */
   async getBalance(): Promise<number> {
     await this.ensureConnected();
-    await this.syncBalance();
+    await this.syncBalance(false);
     return this.state.balance;
   }
 
