@@ -63,6 +63,7 @@ export type SparkWalletDiagnostics = {
   completedReceiveTotal: number;
   completedSendTotal: number;
   pendingReceiveTotal: number;
+  syncError: string | null;
   latestPayment:
     | Pick<
         BreezPaymentInfo,
@@ -985,6 +986,7 @@ export function SparkWalletProvider({ children }: { children: ReactNode }) {
       completedReceiveTotal: 0,
       completedSendTotal: 0,
       pendingReceiveTotal: 0,
+      syncError: null,
       latestPayment: null,
     };
 
@@ -992,7 +994,14 @@ export function SparkWalletProvider({ children }: { children: ReactNode }) {
       return emptyDiagnostics;
     }
 
-    await breezService.syncWallet();
+    let syncError: string | null = null;
+    try {
+      await breezService.syncWallet();
+    } catch (error) {
+      syncError = error instanceof Error ? error.message : "Unknown sync error";
+      logger.warn("[SparkWallet] Diagnostics sync failed:", error);
+    }
+
     const [info, paymentList] = await Promise.all([
       breezService.getInfo(),
       breezService.getPaymentHistory({
@@ -1043,6 +1052,7 @@ export function SparkWalletProvider({ children }: { children: ReactNode }) {
       completedReceiveTotal,
       completedSendTotal,
       pendingReceiveTotal,
+      syncError,
       latestPayment,
     };
   }, [balance, payments.length]);

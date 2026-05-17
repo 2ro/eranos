@@ -46,7 +46,7 @@ import initBreezSDK, {
 import { generateMnemonic, validateMnemonic } from "@scure/bip39";
 import { wordlist } from "@scure/bip39/wordlists/english";
 
-const SYNC_TIMEOUT_MS = 20000;
+const SYNC_TIMEOUT_MS = 60000;
 const INFO_TIMEOUT_MS = 15000;
 const encoder = new TextEncoder();
 
