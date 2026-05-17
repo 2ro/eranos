@@ -1269,6 +1269,9 @@ type EditableTab = { label: string; isCore: boolean; tab?: ProfileTab };
   // Kind 0 — resolved from the author cache (seeded by the feed query above).
   const author = useAuthor(pubkey);
   const metadata = author.data?.metadata;
+  const bannerUrl = sanitizeUrl(metadata?.banner);
+  const [failedBannerUrl, setFailedBannerUrl] = useState<string | undefined>();
+  const showBanner = Boolean(bannerUrl && failedBannerUrl !== bannerUrl);
   const profileStatus = useUserStatus(pubkey);
 
   // Refetch the author's profile whenever we navigate to this profile page.
@@ -1655,12 +1658,15 @@ type EditableTab = { label: string; isCore: boolean; tab?: ProfileTab };
           <div className="h-36 md:h-48 bg-secondary relative">
             {author.isLoading ? (
               <Skeleton className="w-full h-full rounded-none" />
-            ) : metadata?.banner ? (
+            ) : showBanner ? (
               <img
-                src={metadata.banner}
+                src={bannerUrl}
                 alt=""
                 className="w-full h-full object-cover cursor-pointer"
-                onClick={() => setLightboxImage(metadata.banner!)}
+                referrerPolicy="no-referrer"
+                decoding="async"
+                onClick={() => { if (bannerUrl) setLightboxImage(bannerUrl); }}
+                onError={() => setFailedBannerUrl(bannerUrl)}
               />
             ) : (
               <div className="absolute inset-0 bg-gradient-to-br from-accent/10 via-transparent to-primary/5" />
@@ -2542,4 +2548,3 @@ function NoTabsEmptyState() {
     </div>
   );
 }
-
