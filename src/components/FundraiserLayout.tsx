@@ -9,6 +9,7 @@ import {
   LayoutStore,
   LayoutStoreContext,
   NavHiddenContext,
+  useLayoutSnapshot,
 } from '@/contexts/LayoutContext';
 import { cn } from '@/lib/utils';
 
@@ -23,8 +24,10 @@ import { cn } from '@/lib/utils';
  * - We still provide `LayoutStoreContext`, so pages that call
  *   `useLayoutOptions(...)` keep working. Most options (FAB, sidebars,
  *   mobile arc) are intentionally ignored here because the new shell has
- *   no FAB and no sidebars. The store still drives the
- *   `wrapperClassName` escape hatch for pages that need to widen.
+ *   no FAB and no sidebars. The store drives two width-related escape
+ *   hatches: `wrapperClassName` (extra classes on the center column) and
+ *   `noMaxWidth` (drops the default `max-w-3xl` cap). The `fullBleed`
+ *   preset expands to both, so edge-to-edge pages keep working.
  * - `CenterColumnContext` exposes the content `<div>` so legacy components
  *   (e.g. nsite preview overlay) can still portal into it.
  * - `DrawerContext` and `NavHiddenContext` are kept as no-op providers so
@@ -45,6 +48,7 @@ function PageSkeleton() {
 function FundraiserLayoutInner() {
   const centerColumnRef = useRef<HTMLDivElement>(null);
   const [centerColumnEl, setCenterColumnEl] = useState<HTMLElement | null>(null);
+  const { noMaxWidth, wrapperClassName } = useLayoutSnapshot();
 
   // Mobile drawer is owned by TopNav now, so consumers of `useOpenDrawer`
   // become no-ops. Keeping the context shape avoids touching every page that
@@ -64,7 +68,16 @@ function FundraiserLayoutInner() {
                   centerColumnRef.current = el;
                   setCenterColumnEl(el);
                 }}
-                className={cn('flex-1 min-w-0 w-full')}
+                className={cn(
+                  'flex-1 min-w-0 w-full mx-auto',
+                  // App-wide cap on the center column so pages like /help
+                  // don't stretch across widescreen monitors. Pages that
+                  // need a wider canvas opt out via `noMaxWidth: true` (or
+                  // the `fullBleed` preset), which expands to `!max-w-none`
+                  // through `wrapperClassName`.
+                  !noMaxWidth && 'max-w-3xl',
+                  wrapperClassName,
+                )}
               >
                 <Outlet />
               </div>
