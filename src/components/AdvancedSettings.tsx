@@ -521,7 +521,7 @@ export function AdvancedSettings() {
                     <h3 className="text-sm font-medium">Delete Account</h3>
                     <p className="text-xs text-muted-foreground mt-1 leading-relaxed">
                       Permanently delete your data from the network, including your profile,
-                      posts, reactions, and direct messages. This action is irreversible.
+                      posts, and reactions. This action is irreversible.
                     </p>
                   </div>
                   <Button

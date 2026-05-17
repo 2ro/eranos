@@ -6,7 +6,6 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { InferSeoMetaPlugin } from "@unhead/addons";
 import { createHead, UnheadProvider } from "@unhead/react/client";
 import { AppProvider } from "@/components/AppProvider";
-import { DMProviderWrapper } from "@/components/DMProviderWrapper";
 import { InitialSyncGate } from "@/components/InitialSyncGate";
 import { NativeNotifications } from "@/components/NativeNotifications";
 import NostrProvider from "@/components/NostrProvider";
@@ -22,7 +21,6 @@ import { NWCProvider } from "@/contexts/NWCContext";
 import { SparkWalletProvider } from "@/contexts/SparkWalletContext";
 import { BuildConfigSchema, type BuildConfig } from "@/lib/schemas";
 import { secureStorage } from "@/lib/secureStorage";
-import { PROTOCOL_MODE } from "@samthomson/nostr-messaging/core";
 import AppRouter from "./AppRouter";
 
 const head = createHead({
@@ -124,7 +122,6 @@ const hardcodedConfig: AppConfig = {
     "world",
     "wallet",
     "agent",
-    "messages",
     "profile",
     "notifications",
     "search",
@@ -156,14 +153,6 @@ const hardcodedConfig: AppConfig = {
     { id: 'hot-posts' },
     { id: 'ai-chat' },
   ],
-  messaging: {
-    enabled: true,
-    relayMode: 'hybrid',
-    protocolMode: PROTOCOL_MODE.NIP17_ONLY,
-    renderInlineMedia: true,
-    soundEnabled: false,
-    devMode: false,
-  },
   aiBaseURL: 'https://ai.shakespeare.diy/v1',
   aiApiKey: '',
   aiModel: 'grok-4.1-fast',
@@ -214,13 +203,11 @@ export function App() {
 
                     <NWCProvider>
                     <SparkWalletProvider>
-                    <DMProviderWrapper>
                       <TooltipProvider>
                         <InitialSyncGate>
                           <AppRouter />
                         </InitialSyncGate>
                       </TooltipProvider>
-                    </DMProviderWrapper>
                     </SparkWalletProvider>
                   </NWCProvider>
                 </NostrProvider>

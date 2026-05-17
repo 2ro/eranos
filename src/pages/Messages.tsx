@@ -1,50 +1,41 @@
 import { useSeoMeta } from '@unhead/react';
-import { DMMessagingInterface } from '@samthomson/nostr-messaging/ui';
-import { Link } from 'react-router-dom';
-import { useLayoutOptions } from '@/contexts/LayoutContext';
-import { useAppContext } from '@/hooks/useAppContext';
-import { useCurrentUser } from '@/hooks/useCurrentUser';
+import { ArrowUpRight, Lock } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
+import { openUrl } from '@/lib/downloadFile';
+
+const WHITENOISE_URL = 'https://www.whitenoise.chat/';
 
 const Messages = () => {
-  const { config } = useAppContext();
-  const { user } = useCurrentUser();
-  const messagingEnabled = config.messaging?.enabled ?? true;
-
   useSeoMeta({
     title: 'Messages',
-    description: 'Private encrypted messaging on Nostr',
-  });
-
-  useLayoutOptions({
-    rightSidebar: null,
-    noMaxWidth: true,
-    noOverscroll: true,
-    wrapperClassName: 'max-w-full',
+    description: 'Private messaging on Nostr',
   });
 
   return (
-    <div className="h-dvh flex flex-col">
-      {!user ? (
-        <div className="flex-1 flex items-center justify-center p-6">
-          <div className="max-w-md text-center space-y-3 text-muted-foreground">
-            <p>Please log in to view your messages.</p>
+    <div className="flex-1 flex items-center justify-center p-6">
+      <Card className="max-w-md w-full border-dashed">
+        <CardContent className="py-10 px-8 text-center space-y-5">
+          <div className="mx-auto w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
+            <Lock className="w-6 h-6 text-primary" />
           </div>
-        </div>
-      ) : messagingEnabled ? (
-        <DMMessagingInterface />
-      ) : (
-        <div className="flex-1 flex items-center justify-center p-6">
-          <div className="max-w-md text-center space-y-3">
-            <h2 className="text-xl font-semibold">Chats are turned off</h2>
-            <p className="text-sm text-muted-foreground">
-              Enable messaging in settings to start using chats.
+          <div className="space-y-2">
+            <h2 className="text-xl font-semibold">Private messaging lives elsewhere</h2>
+            <p className="text-sm text-muted-foreground leading-relaxed">
+              Agora doesn&apos;t handle direct messages. For end-to-end encrypted Nostr chat with strong metadata protection, we recommend White Noise.
             </p>
-            <Link to="/settings/advanced" className="inline-block text-sm text-primary hover:underline">
-              Open Settings
-            </Link>
           </div>
-        </div>
-      )}
+          <Button
+            type="button"
+            size="lg"
+            className="w-full"
+            onClick={() => openUrl(WHITENOISE_URL)}
+          >
+            Install White Noise
+            <ArrowUpRight className="ml-2 w-4 h-4" />
+          </Button>
+        </CardContent>
+      </Card>
     </div>
   );
 };

@@ -20,7 +20,6 @@ interface RequestToVanishDialogProps {
 const DELETION_ITEMS = [
   { id: 'profile', label: 'Your profile and metadata' },
   { id: 'posts', label: 'All posts, replies, and reactions' },
-  { id: 'messages', label: 'Direct messages' },
   { id: 'settings', label: 'Follow lists and settings' },
   { id: 'other', label: 'All other events submitted to the network' },
 ] as const;

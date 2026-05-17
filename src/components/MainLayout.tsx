@@ -109,7 +109,7 @@ function MainLayoutInner() {
               (unset) falls back to the default. We distinguish these because
               `??` would otherwise treat `null` the same as unset and render
               the default — which silently breaks pages that intend to be
-              full-bleed (e.g. /world, /messages). */}
+              full-bleed (e.g. /world). */}
           {rightSidebar === undefined
             ? <Suspense fallback={<div className="w-[300px] shrink-0 hidden xl:block" />}><WidgetSidebar /></Suspense>
             : rightSidebar}

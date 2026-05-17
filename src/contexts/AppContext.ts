@@ -1,5 +1,4 @@
 import { createContext } from "react";
-import type { ProtocolMode } from "@samthomson/nostr-messaging/core";
 import type { ThemeConfig, ThemesConfig } from "@/themes";
 
 /**
@@ -278,25 +277,6 @@ export interface AppConfig {
   esploraBaseUrl: string;
   /** Ordered list of right sidebar widget configs. Each entry is a widget type ID with optional display settings. */
   sidebarWidgets: WidgetConfig[];
-  /** Direct messaging integration settings. */
-  messaging?: {
-    /** Enable the DM experience. */
-    enabled?: boolean;
-    /** Relay URLs used for DM discovery and querying. */
-    discoveryRelays?: string[];
-    /** Relay strategy for DM transport. */
-    relayMode?: "discovery" | "hybrid" | "strict_outbox";
-    /** Preferred send protocol(s) for DMs. */
-    protocolMode?: ProtocolMode;
-    /** Show inline media previews in conversations. */
-    renderInlineMedia?: boolean;
-    /** Play a sound when new messages arrive. */
-    soundEnabled?: boolean;
-    /** Selected sound ID for message notifications. */
-    soundId?: string;
-    /** Show developer/debug DM UI affordances. */
-    devMode?: boolean;
-  };
   /** Base URL for the AI chat-completions provider (OpenAI-compatible /v1 endpoint). */
   aiBaseURL: string;
   /** API key for the AI provider. Empty string = use NIP-98 auth (only valid for Shakespeare). */

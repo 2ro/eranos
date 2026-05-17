@@ -55,7 +55,6 @@ const LetterComposePage = lazy(() => import("./pages/LetterComposePage").then(m 
 const LetterPreferencesPage = lazy(() => import("./pages/LetterPreferencesPage").then(m => ({ default: m.LetterPreferencesPage })));
 const LettersPage = lazy(() => import("./pages/LettersPage").then(m => ({ default: m.LettersPage })));
 const MagicSettingsPage = lazy(() => import("./pages/MagicSettingsPage").then(m => ({ default: m.MagicSettingsPage })));
-const MessagingSettingsPage = lazy(() => import("./pages/MessagingSettingsPage").then(m => ({ default: m.MessagingSettingsPage })));
 const MusicPage = lazy(() => import("./pages/MusicPage").then(m => ({ default: m.MusicPage })));
 const NetworkSettingsPage = lazy(() => import("./pages/NetworkSettingsPage").then(m => ({ default: m.NetworkSettingsPage })));
 const NIP19Page = lazy(() => import("./pages/NIP19Page").then(m => ({ default: m.NIP19Page })));
@@ -177,7 +176,6 @@ export function AppRouter() {
               path="/settings/notifications"
               element={<NotificationSettings />}
             />
-            <Route path="/settings/messaging" element={<MessagingSettingsPage />} />
             <Route
               path="/settings/advanced"
               element={<AdvancedSettingsPage />}

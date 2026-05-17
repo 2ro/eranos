@@ -174,45 +174,6 @@ The two zap kinds are complementary. Clients SHOULD sum verified amounts from bo
 
 ---
 
-## Standard NIPs: Direct Messaging
-
-This application implements encrypted direct messaging using two standard Nostr protocols:
-
-### NIP-04 (Legacy Encrypted DMs)
-
-| Field | Value |
-|-------|-------|
-| Kind  | 4     |
-| Spec  | [NIP-04](https://github.com/nostr-protocol/nips/blob/master/04.md) |
-
-Legacy encrypted direct messages. Content is encrypted with AES-256-CBC using a shared secret derived from the sender's private key and recipient's public key. The recipient is identified by a `p` tag.
-
-Used for backward compatibility with older Nostr clients that do not support NIP-17.
-
-### NIP-17 (Private Direct Messages)
-
-| Field | Value |
-|-------|-------|
-| Kinds | 1059 (Gift Wrap), 1060 (Seal) |
-| Spec  | [NIP-17](https://github.com/nostr-protocol/nips/blob/master/17.md) |
-
-Modern private direct messages using the Gift Wrap protocol. Messages are triple-layered:
-
-1. **Rumor** (kind 14) — unsigned plaintext message
-2. **Seal** (kind 13) — rumor encrypted to the recipient, signed by the sender
-3. **Gift Wrap** (kind 1059) — seal encrypted to the recipient, signed by a random ephemeral key
-
-This provides metadata protection: relays and observers cannot determine the sender, recipient, or content. The application uses NIP-17 as the default send protocol, with optional NIP-04 compatibility for older clients.
-
-### Protocol Configuration
-
-Users can configure their preferred send protocol via Settings > Messages:
-
-- **NIP-17 only** (default) — maximum privacy, only modern clients can read
-- **NIP-04 + NIP-17** — sends via both protocols for compatibility with legacy clients
-
----
-
 ## Kind 16769: Profile Tabs
 
 ### Summary

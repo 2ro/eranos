@@ -976,7 +976,7 @@ function BackupKeySection() {
     <div className="space-y-4">
       {heading}
       <p className="text-xs text-muted-foreground leading-relaxed">
-        This secret key controls your account on {config.appName}. Anyone with it can post, read your DMs, and impersonate you. Store it in a password manager or somewhere else only you can access.
+        This secret key controls your account on {config.appName}. Anyone with it can post and impersonate you. Store it in a password manager or somewhere else only you can access.
       </p>
 
       <div className="relative">

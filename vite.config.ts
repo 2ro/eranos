@@ -150,11 +150,6 @@ export default defineConfig(({ mode }) => {
     globals: true,
     environment: 'jsdom',
     setupFiles: './src/test/setup.ts',
-    server: {
-      deps: {
-        inline: ['@samthomson/nostr-messaging'],
-      },
-    },
     onConsoleLog(log) {
       return !log.includes("React Router Future Flag Warning");
     },
