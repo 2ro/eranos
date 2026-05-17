@@ -43,6 +43,7 @@ interface CommunityZapDialogProps {
   community: ParsedCommunity;
   members: CommunityMember[];
   membersLoading: boolean;
+  triggerClassName?: string;
   onZapLaunched?: (details: { count: number; totalSats: number }) => void;
 }
 
@@ -71,6 +72,7 @@ export function CommunityZapDialog({
   community,
   members,
   membersLoading,
+  triggerClassName,
   onZapLaunched,
 }: CommunityZapDialogProps) {
   const [open, setOpen] = useState(false);
@@ -216,9 +218,15 @@ export function CommunityZapDialog({
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button type="button" size="sm" className="shadow-md bg-white text-black hover:bg-white/90">
-          <Zap className="size-4 mr-1.5" />
-          Zap Community
+        <Button
+          type="button"
+          variant="ghost"
+          size="icon"
+          className={cn(triggerClassName ?? 'shadow-md bg-white text-black hover:bg-white/90')}
+          aria-label="Zap community"
+          title="Zap community"
+        >
+          <Zap className="size-5" />
         </Button>
       </DialogTrigger>
       <DialogContent className="max-w-lg max-h-[88vh] flex flex-col overflow-hidden p-0 gap-0 [&>button]:top-3 [&>button]:right-3">
@@ -277,11 +285,14 @@ export function CommunityZapDialog({
                   <p className="text-muted-foreground">Total</p>
                   <p className="text-lg font-bold tabular-nums">{totalSats.toLocaleString()} sats</p>
                 </div>
+                <div className="col-span-2 rounded-xl bg-background/70 p-3">
+                  <p className="flex items-center gap-1.5 text-muted-foreground">
+                    <Wallet className="size-3.5" />
+                    Wallet balance
+                  </p>
+                  <p className="text-lg font-bold tabular-nums">{sparkWallet.balance.toLocaleString()} sats</p>
+                </div>
               </div>
-
-              <p className="text-xs text-muted-foreground leading-relaxed">
-                Each selected member receives {Number.isFinite(amountSats) && amountSats > 0 ? amountSats.toLocaleString() : '0'} sats. Your Spark wallet pays any Lightning fees.
-              </p>
             </div>
 
             <div className="space-y-2">
@@ -408,11 +419,13 @@ function HoldToZapButton({
   }, [disabled, isLaunching]);
 
   const remainingSeconds = Math.max(0, Math.ceil((HOLD_DURATION_MS * (1 - progress)) / 1000));
+  const progressPercent = progress * 100;
 
   return (
     <Button
       type="button"
-      className="relative h-12 w-full overflow-hidden rounded-full"
+      variant="secondary"
+      className="relative h-12 w-full overflow-hidden rounded-full border border-amber-500/35 bg-muted text-foreground hover:bg-muted"
       disabled={disabled}
       onPointerDown={(event) => {
         event.currentTarget.setPointerCapture(event.pointerId);
@@ -440,11 +453,12 @@ function HoldToZapButton({
       aria-label={`Hold for 3 seconds to zap ${selectedCount} members with ${totalSats.toLocaleString()} sats total`}
     >
       <span
-        className="absolute inset-y-0 left-0 bg-amber-300/35 transition-[width] duration-75"
-        style={{ width: `${progress * 100}%` }}
+        className="absolute inset-y-0 left-0 rounded-full bg-gradient-to-r from-amber-300 to-amber-500 transition-[width] duration-75 ease-linear"
+        style={{ width: `${progressPercent}%` }}
         aria-hidden="true"
       />
-      <span className="relative z-10 flex items-center justify-center">
+      <span className="absolute inset-0 rounded-full shadow-[inset_0_0_0_1px_rgba(255,255,255,0.12)]" aria-hidden="true" />
+      <span className="relative z-10 flex items-center justify-center mix-blend-normal">
         {isLaunching ? (
           <>
             <Loader2 className="size-4 mr-2 animate-spin" />

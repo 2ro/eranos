@@ -652,19 +652,20 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
               )}
             </div>
 
-            {/* Banner action row — MembersOnly + Share + overflow menu */}
+            {/* Banner action row — MembersOnly + Zap + Share + overflow menu */}
             <div className="flex items-center gap-0.5 shrink-0 [text-shadow:none]">
+              <MembersOnlyToggle
+                className="text-white/90 hover:text-white hover:bg-white/15 data-[state=on]:text-white"
+              />
               {community && membership && (
                 <CommunityZapDialog
                   community={community}
                   members={membership.members}
                   membersLoading={membersLoading}
+                  triggerClassName={bannerActionClassName}
                   onZapLaunched={handleCommunityZapLaunched}
                 />
               )}
-              <MembersOnlyToggle
-                className="text-white/90 hover:text-white hover:bg-white/15 data-[state=on]:text-white"
-              />
               <button
                 type="button"
                 className={bannerActionClassName}
