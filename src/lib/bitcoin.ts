@@ -11,10 +11,17 @@ const VBYTES_PER_OUTPUT = 43;
 const VBYTES_OVERHEAD = 10.5;
 
 let _ECPair: ECPairAPI | null = null;
+let eccInitialized = false;
+
+function initBitcoinEcc(): void {
+  if (eccInitialized) return;
+  bitcoin.initEccLib(ecc);
+  eccInitialized = true;
+}
 
 function getECPair(): ECPairAPI {
+  initBitcoinEcc();
   if (!_ECPair) {
-    bitcoin.initEccLib(ecc);
     _ECPair = ECPairFactory(ecc);
   }
   return _ECPair;
@@ -28,6 +35,7 @@ export function nostrPubkeyToBitcoinAddress(pubkeyHex: string): string {
   if (!isValidPubkeyHex(pubkeyHex)) return '';
 
   try {
+    initBitcoinEcc();
     const pubkeyBuffer = Buffer.from(pubkeyHex, 'hex');
     const { address } = bitcoin.payments.p2tr({
       internalPubkey: pubkeyBuffer,
@@ -502,7 +510,7 @@ export function buildUnsignedMultiOutputPsbt(
 }
 
 export function signPsbtLocal(psbtHex: string, privateKeyHex: string): string {
-  bitcoin.initEccLib(ecc);
+  initBitcoinEcc();
   const psbt = bitcoin.Psbt.fromHex(psbtHex, { network: bitcoin.networks.bitcoin });
 
   const keyPair = getECPair().fromPrivateKey(Buffer.from(privateKeyHex, 'hex'));
@@ -531,7 +539,7 @@ export function signPsbtLocal(psbtHex: string, privateKeyHex: string): string {
 }
 
 export function finalizePsbt(psbtHex: string): string {
-  bitcoin.initEccLib(ecc);
+  initBitcoinEcc();
   const psbt = bitcoin.Psbt.fromHex(psbtHex, { network: bitcoin.networks.bitcoin });
   psbt.finalizeAllInputs();
   return psbt.extractTransaction().toHex();

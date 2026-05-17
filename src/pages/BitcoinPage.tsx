@@ -99,18 +99,24 @@ export function BitcoinPage() {
 
           <SendBitcoinDialog isOpen={sendOpen} onClose={() => setSendOpen(false)} btcPrice={btcPrice} />
 
-          <div className="rounded-2xl bg-white p-4 shadow-sm">
-            <QRCodeCanvas value={bitcoinAddress} size={200} level="M" />
-          </div>
+          {bitcoinAddress ? (
+            <div className="rounded-2xl bg-white p-4 shadow-sm">
+              <QRCodeCanvas value={bitcoinAddress} size={200} level="M" />
+            </div>
+          ) : (
+            <Skeleton className="size-[232px] rounded-2xl" />
+          )}
 
-          <button
-            type="button"
-            onClick={copyAddress}
-            className="flex items-center gap-2 rounded-full border px-4 py-2 font-mono text-sm text-muted-foreground transition-colors hover:bg-muted/50"
-          >
-            {truncatedAddress}
-            {copiedAddress ? <Check className="size-3.5 text-green-500" /> : <Copy className="size-3.5" />}
-          </button>
+          {bitcoinAddress && (
+            <button
+              type="button"
+              onClick={copyAddress}
+              className="flex items-center gap-2 rounded-full border px-4 py-2 font-mono text-sm text-muted-foreground transition-colors hover:bg-muted/50"
+            >
+              {truncatedAddress}
+              {copiedAddress ? <Check className="size-3.5 text-green-500" /> : <Copy className="size-3.5" />}
+            </button>
+          )}
 
           {transactions && transactions.length > 0 && (
             <>
