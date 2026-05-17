@@ -14,14 +14,17 @@ import { ChatDialog } from '@/components/chat/ChatDialog';
 const WorldMap = lazy(() => import('@/components/world/WorldMap'));
 
 /**
- * Match the `sidebar` Tailwind breakpoint (900px). At this width and above
- * the layout has room for a docked right column (`WorldDiscoveryPanel`);
- * below it we fall back to the bottom drawer (`WorldDiscoveryDrawer`).
+ * Breakpoint at which the world page has room for a docked right column
+ * (`WorldDiscoveryPanel`) alongside the left sidebar and a usable map.
+ * Below this width we fall back to the floating discovery launcher +
+ * modal so the map isn't crushed.
  *
- * Hardcoded to avoid pulling Tailwind config into the client bundle, same
- * approach as `useIsMobile`.
+ * Matches the `xl` Tailwind breakpoint (1280px) — the same threshold the
+ * default `WidgetSidebar` uses. The earlier `sidebar` breakpoint (900px)
+ * left only ~540px of map between the 300px left rail and the 360px
+ * discovery panel, which was too cramped to be useful.
  */
-const SIDEBAR_MEDIA_QUERY = '(min-width: 900px)';
+const SIDEBAR_MEDIA_QUERY = '(min-width: 1280px)';
 
 function useHasSidebar(): boolean {
   const [hasSidebar, setHasSidebar] = useState(() =>
@@ -39,7 +42,6 @@ function useHasSidebar(): boolean {
 
 export function WorldPage() {
   const { config } = useAppContext();
-  const [pageEl, setPageEl] = useState<HTMLDivElement | null>(null);
   const hasSidebar = useHasSidebar();
 
   useSeoMeta({
@@ -84,10 +86,11 @@ export function WorldPage() {
   return (
     // h-dvh inside the column fills the full viewport on both mobile (where
     // the column's negative margin pulls content under the translucent top
-    // bar) and desktop (where there's no top/bottom chrome). The drawer is
-    // portaled inside this wrapper so it inherits the column's horizontal
-    // bounds — no overlap with the docked desktop discovery panel.
-    <div ref={setPageEl} className="relative w-full h-dvh overflow-hidden bg-muted/20">
+    // bar) and desktop (where there's no top/bottom chrome). The floating
+    // discovery button is absolutely positioned inside this wrapper so it
+    // stays scoped to the column and doesn't overlap the docked desktop
+    // discovery panel.
+    <div className="relative w-full h-dvh overflow-hidden bg-muted/20">
       <Suspense
         fallback={
           <div className="absolute inset-0">
@@ -105,12 +108,11 @@ export function WorldPage() {
         </div>
       </Suspense>
 
-      {/* Bottom discovery drawer — only mounted below the sidebar breakpoint.
-          Above it, the docked `WorldDiscoveryPanel` (rendered as the layout's
-          right sidebar) takes over and the drawer is unnecessary. We mount
-          conditionally rather than CSS-hiding so vaul's drag handlers and
-          listeners aren't running on desktop where the drawer is invisible. */}
-      {!hasSidebar && <WorldDiscoveryDrawer container={pageEl} activities={activities} />}
+      {/* Below the sidebar breakpoint, surface the discovery experience as
+          a floating button + modal. Above it, the docked
+          `WorldDiscoveryPanel` (rendered as the layout's right sidebar)
+          takes over and this component is unmounted. */}
+      {!hasSidebar && <WorldDiscoveryDrawer activities={activities} />}
 
       {/* Per-geohash realtime chat. Only mounted while open so the relay
           subscription tears down cleanly when the dialog closes. */}

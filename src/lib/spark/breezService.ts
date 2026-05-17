@@ -5,6 +5,8 @@
  */
 
 import { logger } from "@/lib/logger";
+import { sha256 } from "@noble/hashes/sha256";
+import { bytesToHex } from "@noble/hashes/utils";
 import initBreezSDK, {
   BreezSdk,
   connect,
@@ -44,11 +46,22 @@ import initBreezSDK, {
 import { generateMnemonic, validateMnemonic } from "@scure/bip39";
 import { wordlist } from "@scure/bip39/wordlists/english";
 
-const SYNC_TIMEOUT_MS = 20000;
+const SYNC_TIMEOUT_MS = 60000;
 const INFO_TIMEOUT_MS = 15000;
+const encoder = new TextEncoder();
 
 const isTimeoutError = (error: unknown): boolean =>
   error instanceof Error && error.message.includes("timed out");
+
+const getStorageDir = (mnemonic: string, network: Network): string => {
+  const normalizedMnemonic = mnemonic.trim().replace(/\s+/g, " ");
+  const fingerprint = bytesToHex(sha256(encoder.encode(normalizedMnemonic))).slice(
+    0,
+    24,
+  );
+
+  return `spark-wallet-${network}-${fingerprint}`;
+};
 
 const withTimeout = async <T>(
   promise: Promise<T>,
@@ -81,6 +94,11 @@ export type BreezWalletState = {
   balance: number; // Balance in sats
   tokenBalances: Map<string, unknown>; // Token balances if any
   lastSynced?: Date;
+};
+
+export type BreezWalletInfo = {
+  identityPubkey: string;
+  balanceSats: number;
 };
 
 /**
@@ -131,6 +149,7 @@ class BreezWalletService {
   private sdk: BreezSdk | null = null;
   private wasmInitialized: boolean = false;
   private eventListeners: Map<string, BreezEventHandler> = new Map();
+  private syncPromise: Promise<void> | null = null;
   private state: BreezWalletState = {
     isInitialized: false,
     isConnected: false,
@@ -206,8 +225,10 @@ class BreezWalletService {
         mnemonic: mnemonic,
       };
 
-      // Storage directory for web (uses IndexedDB)
-      const storageDir = "spark-wallet";
+      // Storage directory for web (uses IndexedDB). It must be scoped per
+      // mnemonic; otherwise a newly-created wallet can reuse stale SDK state
+      // and generate invoices for a previous wallet.
+      const storageDir = getStorageDir(mnemonic, network);
 
       // Connect to SDK
       const connectRequest: ConnectRequest = {
@@ -244,8 +265,7 @@ class BreezWalletService {
       logger.debug("[BreezWallet] Step 4/4: Starting background sync...");
 
       // Background sync - don't await, let it run async
-      this.sdk
-        .syncWallet({})
+      this.runSyncWallet()
         .then(() => {
           this.syncBalance().catch(() => {});
           logger.debug("[BreezWallet] Background sync completed");
@@ -316,8 +336,29 @@ class BreezWalletService {
    */
   async getBalance(): Promise<number> {
     await this.ensureConnected();
-    await this.syncBalance();
+    await this.syncBalance(false);
     return this.state.balance;
+  }
+
+  /**
+   * Get current SDK wallet info without forcing a blocking initial sync.
+   */
+  async getInfo(): Promise<BreezWalletInfo> {
+    await this.ensureConnected();
+
+    const info: GetInfoResponse = await withTimeout(
+      this.sdk!.getInfo({ ensureSynced: false }),
+      INFO_TIMEOUT_MS,
+      "[BreezWallet] getInfo",
+    );
+    this.state.balance = info.balanceSats;
+    this.state.tokenBalances = info.tokenBalances;
+    this.state.lastSynced = new Date();
+
+    return {
+      identityPubkey: info.identityPubkey,
+      balanceSats: info.balanceSats,
+    };
   }
 
   /**
@@ -668,7 +709,7 @@ class BreezWalletService {
     try {
       logger.debug("[BreezWallet] Syncing wallet...");
       await withTimeout(
-        this.sdk!.syncWallet({}),
+        this.runSyncWallet(),
         SYNC_TIMEOUT_MS,
         "[BreezWallet] syncWallet",
       );
@@ -678,6 +719,24 @@ class BreezWalletService {
       logger.error("[BreezWallet] Wallet sync failed:", error);
       throw error;
     }
+  }
+
+  private runSyncWallet(): Promise<void> {
+    if (!this.sdk) {
+      return Promise.reject(
+        new Error("Breez wallet not connected. Call connect() first."),
+      );
+    }
+
+    if (this.syncPromise) {
+      return this.syncPromise;
+    }
+
+    this.syncPromise = this.sdk.syncWallet({}).then(() => undefined).finally(() => {
+      this.syncPromise = null;
+    });
+
+    return this.syncPromise;
   }
 
   /**

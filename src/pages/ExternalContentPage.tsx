@@ -1,6 +1,6 @@
 import { useCallback, useMemo, useState } from 'react';
 import { useSeoMeta } from '@unhead/react';
-import { ArrowLeft, Globe, MessageCircle, MessageSquare, MoreHorizontal, Repeat2, Star, AlertTriangle, PanelLeft, Trash2 } from 'lucide-react';
+import { Activity, ArrowLeft, BarChart3, Globe, MessageCircle, MessageSquare, MoreHorizontal, Repeat2, Star, AlertTriangle, PanelLeft, Trash2 } from 'lucide-react';
 import { Link, useLocation, useParams } from 'react-router-dom';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Badge } from '@/components/ui/badge';
@@ -17,7 +17,6 @@ import { BookReviewFormDialog } from '@/components/BookReviewForm';
 import { ProfileHoverCard } from '@/components/ProfileHoverCard';
 import { SubHeaderBar } from '@/components/SubHeaderBar';
 import { TabButton } from '@/components/TabButton';
-import { ARC_OVERHANG_PX } from '@/components/ArcBackground';
 import {
   UrlContentHeader,
   BookContentHeader,
@@ -34,7 +33,7 @@ import { usePaginatedFeed } from '@/hooks/usePaginatedFeed';
 import { useInfiniteScroll } from '@/hooks/useInfiniteScroll';
 import { usePinnedPosts } from '@/hooks/usePinnedPosts';
 import { CountryFeedProvider } from '@/components/CountryFeedProvider';
-import { CommunityStatsPanel } from '@/components/CommunityStatsPanel';
+import { CountryStatsDialog } from '@/components/world/CountryStatsDialog';
 import { Pin } from 'lucide-react';
 import { NoteCard } from '@/components/NoteCard';
 import { useBookReviews } from '@/hooks/useBookReviews';
@@ -77,6 +76,15 @@ function ExternalActionBar({ content, onComment, commentCount }: ExternalActionB
   const { addToSidebar, removeFromSidebar, orderedItems } = useFeedSettings();
 
   const isInSidebar = orderedItems.includes(identifier);
+
+  // Country pages get a "View stats" item in the 3-dots menu (the kind-30385
+  // snapshot is country-scoped, so it's not meaningful for URL / ISBN / unknown
+  // content types). The dialog is controlled from local state and mounted at
+  // the bottom of the bar so the dropdown can dismiss without unmounting it
+  // mid-animation.
+  const countryCode = content.type === 'iso3166' ? content.code : null;
+  const showDashboardLink = countryCode?.toUpperCase() === 'VE';
+  const [statsOpen, setStatsOpen] = useState(false);
 
   const handleAddToSidebar = useCallback(() => {
     addToSidebar(identifier);
@@ -141,6 +149,20 @@ function ExternalActionBar({ content, onComment, commentCount }: ExternalActionB
           </button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-52">
+          {showDashboardLink && (
+            <DropdownMenuItem asChild>
+              <Link to="/dashboard" className="gap-3">
+                <Activity className="size-4" />
+                View Dashboard
+              </Link>
+            </DropdownMenuItem>
+          )}
+          {countryCode && (
+            <DropdownMenuItem onClick={() => setStatsOpen(true)} className="gap-3">
+              <BarChart3 className="size-4" />
+              View stats
+            </DropdownMenuItem>
+          )}
           {isInSidebar ? (
             <DropdownMenuItem onClick={handleRemoveFromSidebar} className="gap-3">
               <Trash2 className="size-4" />
@@ -161,6 +183,14 @@ function ExternalActionBar({ content, onComment, commentCount }: ExternalActionB
           onOpenChange={setShareOpen}
           initialContent={identifier}
           title="Share to feed"
+        />
+      )}
+
+      {countryCode && (
+        <CountryStatsDialog
+          countryCode={countryCode}
+          open={statsOpen}
+          onOpenChange={setStatsOpen}
         />
       )}
     </div>
@@ -225,20 +255,18 @@ export function ExternalContentPage() {
 
   useSeoMeta({ title: content ? (resolvedTitle ? `${resolvedTitle} | ${config.appName}` : seoTitle(content, config.appName)) : `External Content | ${config.appName}` });
 
-  // Build the NIP-73 identifier for comments.
-  // For URLs, a URL object is used. For others (isbn:, iso3166:, etc.) the raw identifier
-  // is passed to useComments for querying. The `#${string}` type is a marker for "non-URL
-  // external identifier" — the runtime value is the plain identifier (e.g. `iso3166:VE`),
-  // matching the format used in NIP-73 `I`/`i` tag values and consistent with PostDetailPage
-  // and ComposeBox. ComposeBox/ReplyComposeModal do not accept this type.
+  // Build the NIP-73 identifier for comments. NIP-73 identifiers with schemes
+  // (isbn:, iso3166:, bitcoin:, etc.) are URL objects so NIP-22 writes the
+  // protocol into the k/K tag instead of treating them as hashtags.
   const commentRootUrl = useMemo((): URL | undefined => {
     if (!content || content.type !== 'url') return undefined;
     try { return new URL(content.value); } catch { return undefined; }
   }, [content]);
 
-  const commentRootId = useMemo((): `#${string}` | undefined => {
+  const commentRootId = useMemo((): URL | `#${string}` | undefined => {
     if (!content || content.type === 'url') return undefined;
-    return content.value as `#${string}`;
+    if (content.value.startsWith('#')) return content.value as `#${string}`;
+    try { return new URL(content.value); } catch { return content.value as `#${string}`; }
   }, [content]);
 
   const commentRoot: URL | `#${string}` | undefined = commentRootUrl ?? commentRootId;
@@ -354,32 +382,49 @@ export function ExternalContentPage() {
         <PrecipitationEffect type={precipitation.type} intensity={precipitation.intensity} />
       )}
 
-      {/* Non-sticky transparent header */}
-      <div className="flex items-center gap-4 px-4 pt-4 pb-5">
-        <Link
-          to={content.type === 'isbn' ? '/books' : '/'}
-          className={cn(
-            'p-2 rounded-full hover:bg-secondary transition-colors',
-            content.type !== 'isbn' && 'sidebar:hidden',
-          )}
-        >
-          <ArrowLeft className="size-5" />
-        </Link>
-        <h1 className="text-xl font-bold truncate">{pageTitle}</h1>
-      </div>
+      {/* Non-sticky transparent header — skipped on country pages because
+          the country hero carries its own back arrow overlaid on the
+          photo, which lets the cinematic banner reach all the way to the
+          top of the column instead of sitting under a redundant title
+          bar. */}
+      {!isCountry && (
+        <div className="flex items-center gap-4 px-4 pt-4 pb-5">
+          <Link
+            to={content.type === 'isbn' ? '/books' : '/'}
+            className={cn(
+              'p-2 rounded-full hover:bg-secondary transition-colors',
+              content.type !== 'isbn' && 'sidebar:hidden',
+            )}
+          >
+            <ArrowLeft className="size-5" />
+          </Link>
+          <h1 className="text-xl font-bold truncate">{pageTitle}</h1>
+        </div>
+      )}
 
-      <div className="px-4 space-y-6 pb-4">
-        {/* Content-specific header */}
-        {content.type === 'url' && <UrlContentHeader url={content.value} />}
-        {content.type === 'isbn' && <BookContentHeader isbn={content.value} />}
-        {content.type === 'iso3166' && <CountryContentHeader code={content.code} />}
-        {content.type === 'unknown' && (
-          <div className="rounded-2xl border border-border p-5 text-center">
-            <Globe className="size-8 mx-auto mb-2 text-muted-foreground/40" />
-            <p className="text-sm text-muted-foreground break-all">{content.value}</p>
-          </div>
-        )}
-      </div>
+      {/* Content-specific header wrapper. Skipped on country pages because
+          the country hero is edge-to-edge — an empty `px-4 pb-4` wrapper
+          above it would leave a dead band of padding between the top of
+          the column and the start of the hero photo. */}
+      {!isCountry && (
+        <div className="px-4 space-y-6 pb-4">
+          {content.type === 'url' && <UrlContentHeader url={content.value} />}
+          {content.type === 'isbn' && <BookContentHeader isbn={content.value} />}
+          {content.type === 'unknown' && (
+            <div className="rounded-2xl border border-border p-5 text-center">
+              <Globe className="size-8 mx-auto mb-2 text-muted-foreground/40" />
+              <p className="text-sm text-muted-foreground break-all">{content.value}</p>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Country header lives OUTSIDE the px-4 wrapper above so the hero
+          backdrop, gradients, and bottom-anchored title can bleed flush to
+          the column edges — the "you've arrived" feeling depends on the
+          image touching the left/right rails rather than floating in a
+          padded box. */}
+      {content.type === 'iso3166' && <CountryContentHeader code={content.code} />}
 
       {/* React / share action bar */}
       <ExternalActionBar
@@ -403,12 +448,6 @@ export function ExternalContentPage() {
         <CountryFeedProvider countryCode={countryCode}>
           {/* Inline compose box */}
           <ComposeBox compact replyTo={commentRoot} />
-
-          {/* Community stats snapshot (kind 30385) for this country.
-              Renders nothing when no trusted snapshot exists. */}
-          <div className="px-4 pt-2">
-            <CommunityStatsPanel countryCode={countryCode} />
-          </div>
 
           {/* Pinned posts (curated by country organizers/admins). Skipped on
               ISBN/url/unknown content types — only meaningful for country feeds. */}
@@ -567,7 +606,6 @@ function BookContentTabs({ isbn, commentRoot, orderedReplies, commentsLoading }:
           onClick={() => setActiveTab('reviews')}
         />
       </SubHeaderBar>
-      <div style={{ height: ARC_OVERHANG_PX }} />
 
       {activeTab === 'comments' ? (
         <ExternalCommentsSection

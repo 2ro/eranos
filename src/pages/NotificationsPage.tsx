@@ -43,7 +43,6 @@ import { BadgeContent } from '@/components/BadgeContent';
 import type { BadgeData } from '@/lib/parseBadgeDefinition';
 import { PageHeader } from '@/components/PageHeader';
 import { useLayoutOptions } from '@/contexts/LayoutContext';
-import { ARC_OVERHANG_PX } from '@/components/ArcBackground';
 
 type NotificationTab = 'all' | 'mentions';
 
@@ -233,7 +232,6 @@ export function NotificationsPage() {
           />
         ))}
       </SubHeaderBar>
-      <div style={{ height: ARC_OVERHANG_PX }} />
 
       {/* Content */}
       <PullToRefresh onRefresh={handleRefresh}>

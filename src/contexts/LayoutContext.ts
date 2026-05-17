@@ -1,5 +1,17 @@
 import { createContext, useContext, useEffect, useLayoutEffect, useRef, useSyncExternalStore } from 'react';
 
+/** A single entry inside the FAB action menu. */
+export interface FabMenuItem {
+  /** Stable identifier, used as React key. */
+  id: string;
+  /** Visible label shown next to the icon. */
+  label: string;
+  /** Optional leading icon. */
+  icon?: React.ReactNode;
+  /** Invoked when the item is selected; the menu closes automatically. */
+  onSelect: () => void;
+}
+
 /** Options that pages can set to configure the persistent MainLayout. */
 export interface LayoutOptions {
   /** Optional custom right sidebar to replace the default one */
@@ -14,6 +26,13 @@ export interface LayoutOptions {
   onFabClick?: () => void;
   /** If set, overrides the default FAB icon (Plus). */
   fabIcon?: React.ReactNode;
+  /**
+   * If set, the FAB renders as a Popover trigger; tapping it reveals this
+   * stack of menu items anchored to the FAB. Selecting an item closes the
+   * menu and fires its `onSelect`. Mutually exclusive with `onFabClick` —
+   * if both are set, the menu wins.
+   */
+  fabMenu?: FabMenuItem[];
   /** Additional classes for the wrapper div */
   wrapperClassName?: string;
   /**
@@ -80,7 +99,7 @@ export interface LayoutOptions {
 
 /** All own-property keys of LayoutOptions used for shallow comparison. */
 const LAYOUT_KEYS: (keyof LayoutOptions)[] = [
-  'showFAB', 'fabKind', 'fabHref', 'onFabClick', 'fabIcon',
+  'showFAB', 'fabKind', 'fabHref', 'onFabClick', 'fabIcon', 'fabMenu',
   'wrapperClassName', 'rightSidebar', 'scrollContainer',
   'noOverscroll', 'noMaxWidth', 'hasSubHeader', 'noArcs',
   'hideTopBar', 'hideBottomNav',

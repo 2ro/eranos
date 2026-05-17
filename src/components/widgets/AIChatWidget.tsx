@@ -1,11 +1,10 @@
 import { useState, useRef, useCallback, useEffect } from 'react';
 import { Send } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
-import { Link } from 'react-router-dom';
 
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { DorkThinking } from '@/components/DorkThinking';
-import { useShakespeare, useShakespeareCredits, type ChatMessage } from '@/hooks/useShakespeare';
+import { useShakespeare, type ChatMessage } from '@/hooks/useShakespeare';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { cn } from '@/lib/utils';
 
@@ -20,7 +19,6 @@ const conversationCache = new Map<string, ChatMessage[]>();
 export function AIChatWidget() {
   const { user } = useCurrentUser();
   const { sendStreamingMessage, getAvailableModels, isLoading, isAuthenticated } = useShakespeare();
-  const hasCredits = useShakespeareCredits();
 
   // Fetch available models and select the cheapest as default
   const { data: defaultModelId } = useQuery({
@@ -94,36 +92,7 @@ export function AIChatWidget() {
   if (!user || !isAuthenticated) {
     return (
       <div className="flex flex-col items-center gap-3 py-6 px-3 text-center">
-        <pre className="text-xl font-mono text-primary leading-none">{'<[o_o]>'}</pre>
-        <p className="text-xs text-muted-foreground">Log in to chat with Dork</p>
-      </div>
-    );
-  }
-
-  // Show credits CTA when the user has no credits (hasCredits === false).
-  // While loading (hasCredits === undefined) we fall through to the chat UI.
-  if (hasCredits === false) {
-    return (
-      <div className="flex flex-col items-center gap-3 py-6 px-3 text-center">
-        <pre className="text-xl font-mono text-primary leading-none">{'<[o_o]>'}</pre>
-        <p className="text-xs text-muted-foreground leading-relaxed">
-          Grab some credits on{' '}
-          <a
-            href="https://shakespeare.diy"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-primary hover:underline"
-          >
-            Shakespeare
-          </a>
-          {' '}to chat with Dork.
-        </p>
-        <Link
-          to="/ai-chat"
-          className="text-xs font-medium text-primary hover:underline"
-        >
-          Open AI Chat
-        </Link>
+        <p className="text-xs text-muted-foreground">Log in to chat with the Agent</p>
       </div>
     );
   }
@@ -135,7 +104,6 @@ export function AIChatWidget() {
         <div className="space-y-3 p-2">
           {messages.length === 0 && !streamingContent && (
             <div className="flex flex-col items-center gap-3 py-6 text-center">
-              <pre className="text-xl font-mono text-primary leading-none">{'<[o_o]>'}</pre>
               <p className="text-xs text-muted-foreground">Ask me anything...</p>
             </div>
           )}
@@ -187,7 +155,7 @@ export function AIChatWidget() {
 
 function MessageBubble({ message }: { message: ChatMessage }) {
   const isUser = message.role === 'user';
-  const content = typeof message.content === 'string' ? message.content : message.content.map((c) => c.text ?? '').join('');
+  const content = typeof message.content === 'string' ? message.content : (message.content ?? []).map((c) => c.text ?? '').join('');
 
   return (
     <div className={cn('flex', isUser ? 'justify-end' : 'justify-start')}>

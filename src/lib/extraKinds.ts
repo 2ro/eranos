@@ -1,7 +1,7 @@
 import type { FeedSettings } from '@/contexts/AppContext';
 import type { NostrEvent } from '@nostrify/nostrify';
 import type { ComponentType } from 'react';
-import { Bird, CircleAlert, GitPullRequestArrow, Globe, MessageSquareMore, Stars, UserCheck, Users, Zap } from 'lucide-react';
+import { Bird, CircleAlert, GitPullRequestArrow, Globe, Megaphone, MessageSquareMore, Stars, UserCheck, Users } from 'lucide-react';
 import { RepostIcon } from '@/components/icons/RepostIcon';
 import { CONTENT_KIND_ICONS } from '@/lib/sidebarItems';
 
@@ -624,7 +624,7 @@ const KIND_SPECIFIC_ICONS: Partial<Record<number, ComponentType<{ className?: st
   15128: Globe,
   35128: Globe,
   30817: CircleAlert,
-  36639: Zap,
+  36639: Megaphone,
   2473: Bird,
   12473: Bird,
   30621: Stars,

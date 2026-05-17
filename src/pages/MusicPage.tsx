@@ -5,7 +5,6 @@ import { KindInfoButton } from '@/components/KindInfoButton';
 import { PageHeader } from '@/components/PageHeader';
 import { SubHeaderBar } from '@/components/SubHeaderBar';
 import { TabButton } from '@/components/TabButton';
-import { ARC_OVERHANG_PX } from '@/components/ArcBackground';
 import { useLayoutOptions } from '@/contexts/LayoutContext';
 import { useAppContext } from '@/hooks/useAppContext';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
@@ -61,7 +60,6 @@ export function MusicPage() {
         <TabButton label="Playlists" active={activeTab === 'playlists'} onClick={() => setActiveTab('playlists')} />
         <TabButton label="Artists" active={activeTab === 'artists'} onClick={() => setActiveTab('artists')} />
       </SubHeaderBar>
-      <div style={{ height: ARC_OVERHANG_PX }} />
 
       {/* Tab content */}
       {activeTab === 'discover' && (

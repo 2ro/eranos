@@ -94,29 +94,36 @@ function emojify(
   return result.length > 0 ? result : [text];
 }
 
-/** Bech32 charset used by NIP-19 identifiers. */
-const BECH32_CHARS = '023456789acdefghjklmnpqrstuvwxyz';
-
-/** Regex to extract an naddr1 identifier from a URL path. */
-const NADDR_IN_URL_REGEX = new RegExp(`naddr1[${BECH32_CHARS}]{10,}`, 'i');
-
-/** Try to extract naddr coordinates from a URL containing an naddr1 identifier. */
-function extractNaddrFromUrl(url: string): AddrCoords | null {
-  const match = url.match(NADDR_IN_URL_REGEX);
-  if (!match) return null;
-  try {
-    const decoded = nip19.decode(match[0]);
-    if (decoded.type === 'naddr') {
-      return decoded.data as AddrCoords;
-    }
-  } catch {
-    // invalid naddr
-  }
-  return null;
-}
-
 /** Regex matching flag emoji: pairs of Regional Indicator Symbol letters (U+1F1E6–U+1F1FF). */
 const FLAG_EMOJI_REGEX = /([\u{1F1E6}-\u{1F1FF}]{2})/gu;
+
+function parseAddressCoordinate(value: string): AddrCoords | null {
+  const parts = value.split(':');
+  if (parts.length < 3) return null;
+
+  const kind = Number(parts[0]);
+  const pubkey = parts[1];
+  const identifier = parts.slice(2).join(':');
+
+  if (!Number.isInteger(kind) || !/^[0-9a-f]{64}$/i.test(pubkey)) return null;
+  return { kind, pubkey, identifier };
+}
+
+function tokenMatchesQTag(token: ContentToken, qTagValue: string): boolean {
+  if (token.type === 'nevent-embed') {
+    return token.eventId === qTagValue;
+  }
+
+  if (token.type === 'naddr-embed') {
+    const addr = parseAddressCoordinate(qTagValue);
+    return !!addr
+      && token.addr.kind === addr.kind
+      && token.addr.pubkey === addr.pubkey
+      && token.addr.identifier === addr.identifier;
+  }
+
+  return false;
+}
 
 /**
  * Convert a flag emoji (pair of Regional Indicator Symbols) to an ISO 3166-1 alpha-2 code.
@@ -357,11 +364,7 @@ export function NoteContent({
         const lineSuffix = nextNewline === -1 ? afterUrl : afterUrl.substring(0, nextNewline);
         const isEndOfLine = lineSuffix.trim() === '';
 
-        // Check if the URL contains an naddr1 identifier → embed as Nostr event + preserve link
-        const naddrFromUrl = extractNaddrFromUrl(url);
-        if (naddrFromUrl) {
-          result.push({ type: 'naddr-embed', addr: naddrFromUrl, url });
-        } else if (isEndOfLine) {
+        if (isEndOfLine) {
           // Standalone URL at end of line → rich embed (YouTube, Tweet, or link preview)
           result.push({ type: 'link-embed', url });
         } else {
@@ -437,6 +440,24 @@ export function NoteContent({
             }
           }
         }
+      }
+    }
+
+    // Quote posts should render from their q tags even when the content only
+    // contains a normal web URL for the target (for example, Boost links).
+    for (const [qTagValue, qInfo] of qTagMap) {
+      if (result.some((token) => tokenMatchesQTag(token, qTagValue))) continue;
+
+      const addr = parseAddressCoordinate(qTagValue);
+      if (addr) {
+        result.push({ type: 'naddr-embed', addr });
+      } else if (/^[0-9a-f]{64}$/i.test(qTagValue)) {
+        result.push({
+          type: 'nevent-embed',
+          eventId: qTagValue,
+          relays: qInfo.relay ? [qInfo.relay] : undefined,
+          author: qInfo.author,
+        });
       }
     }
 

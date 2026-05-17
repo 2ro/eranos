@@ -297,6 +297,14 @@ export interface AppConfig {
     /** Show developer/debug DM UI affordances. */
     devMode?: boolean;
   };
+  /** Base URL for the AI chat-completions provider (OpenAI-compatible /v1 endpoint). */
+  aiBaseURL: string;
+  /** API key for the AI provider. Empty string = use NIP-98 auth (only valid for Shakespeare). */
+  aiApiKey: string;
+  /** AI model identifier sent to the provider (e.g. "grok-4.1-fast", "claude-opus-4.6"). */
+  aiModel: string;
+  /** Custom system prompt for the Agent. Empty string = use the default template. */
+  aiSystemPrompt: string;
 }
 
 /** Configuration for a single widget in the right sidebar. */

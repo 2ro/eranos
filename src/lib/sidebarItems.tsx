@@ -3,11 +3,13 @@ import {
   Award,
   BadgeCheck,
   Bell,
+  Bitcoin,
   Bird,
   Blocks,
   BookMarked,
   BookOpen,
   Bookmark,
+  Bot,
   CalendarDays,
   Camera,
   Clapperboard,
@@ -43,6 +45,7 @@ import {
 import { VERIFIED_PAGE_PATH } from "@/lib/agoraDefaults";
 import { CardsIcon } from "@/components/icons/CardsIcon";
 import { ChestIcon } from "@/components/icons/ChestIcon";
+import { LogoIcon } from "@/components/icons/LogoIcon";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -123,7 +126,14 @@ export const SIDEBAR_ITEMS: SidebarItemDef[] = [
     icon: WalletMinimal,
     requiresAuth: true,
   },
-  { id: "feed", label: "Feed", path: "/feed", icon: Megaphone },
+  {
+    id: "bitcoin",
+    label: "Bitcoin",
+    path: "/bitcoin",
+    icon: Bitcoin,
+    requiresAuth: true,
+  },
+  { id: "feed", label: "Feed", path: "/feed", icon: LogoIcon },
   {
     id: "notifications",
     label: "Notifications",
@@ -169,8 +179,9 @@ export const SIDEBAR_ITEMS: SidebarItemDef[] = [
   { id: "settings", label: "Settings", path: "/settings", icon: Settings },
   { id: "changelog", label: "Changelog", path: "/changelog", icon: ScrollText },
   { id: "help", label: "Help", path: "/help", icon: LifeBuoy },
+  { id: "agent", label: "Agent", path: "/agent", icon: Bot },
   // Content types
-  { id: "actions", label: "Actions", path: "/actions", icon: Zap },
+  { id: "actions", label: "Actions", path: "/actions", icon: Megaphone },
   { id: "events", label: "Events", path: "/events", icon: CalendarDays },
   { id: "photos", label: "Photos", path: "/photos", icon: Camera },
   { id: "videos", label: "Videos", path: "/videos", icon: Film },
@@ -191,14 +202,23 @@ export const SIDEBAR_ITEMS: SidebarItemDef[] = [
   { id: "badges", label: "Badges", path: "/badges", icon: Award },
   { id: "communities", label: "Communities", path: "/communities", icon: Users },
   { id: "world", label: "World", path: "/world", icon: Earth },
-  { id: "dashboard", label: "Dashboard", path: "/dashboard", icon: Activity, requiresAuth: true, requiresAdmin: true },
 ];
 
+/**
+ * Sidebar items that are addable from their own page but omitted from the
+ * default/sidebar customization option list.
+ */
+const OPTIONAL_SIDEBAR_ITEMS: SidebarItemDef[] = [
+  { id: "dashboard", label: "Dashboard", path: "/dashboard", icon: Activity },
+];
+
+const ALL_SIDEBAR_ITEMS = [...SIDEBAR_ITEMS, ...OPTIONAL_SIDEBAR_ITEMS];
+
 /** Set of all known sidebar item IDs for quick lookup. */
-export const SIDEBAR_ITEM_IDS = new Set(SIDEBAR_ITEMS.map((s) => s.id));
+export const SIDEBAR_ITEM_IDS = new Set(ALL_SIDEBAR_ITEMS.map((s) => s.id));
 
 /** Map from ID to definition for O(1) lookup. */
-const SIDEBAR_ITEM_MAP = new Map(SIDEBAR_ITEMS.map((s) => [s.id, s]));
+const SIDEBAR_ITEM_MAP = new Map(ALL_SIDEBAR_ITEMS.map((s) => [s.id, s]));
 
 /**
  * Icons for content types used outside the sidebar (e.g. ContentSettings).

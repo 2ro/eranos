@@ -105,13 +105,13 @@ export const builtinThemes: Record<'light' | 'dark', CoreThemeColors> = {
   light: {
     background: '0 0% 100%',
     text: '222 47% 11%',
-    primary: '15 90% 48%',
+    primary: '24 100% 50%',
   },
 
   dark: {
     background: '0 0% 10%',
     text: '0 0% 95%',
-    primary: '15 90% 52%',
+    primary: '24 100% 50%',
   },
 };
 

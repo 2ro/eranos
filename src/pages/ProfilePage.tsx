@@ -85,7 +85,6 @@ import { formatNumber } from '@/lib/formatNumber';
 import { SubHeaderBar } from '@/components/SubHeaderBar';
 import { useActiveTabIndicator } from '@/components/SubHeaderBarContext';
 import { TabButton } from '@/components/TabButton';
-import { ARC_OVERHANG_PX } from '@/components/ArcBackground';
 import type { AddrCoords } from '@/hooks/useEvent';
 import { sanitizeUrl } from '@/lib/sanitizeUrl';
 import { impactMedium } from '@/lib/haptics';
@@ -915,6 +914,75 @@ function ProfileImageLightbox({ imageUrl, onClose }: { imageUrl: string; onClose
   );
 }
 
+function ProfileBannerImage({ src, onClick }: { src: string; onClick: () => void }) {
+  const [useBlobFallback, setUseBlobFallback] = useState(false);
+  const [blobUrl, setBlobUrl] = useState<string>();
+  const [failed, setFailed] = useState(false);
+
+  useEffect(() => {
+    setUseBlobFallback(false);
+    setBlobUrl(undefined);
+    setFailed(false);
+  }, [src]);
+
+  useEffect(() => {
+    if (!blobUrl) return;
+    return () => URL.revokeObjectURL(blobUrl);
+  }, [blobUrl]);
+
+  useEffect(() => {
+    if (!useBlobFallback) return;
+
+    const controller = new AbortController();
+
+    void fetch(src, { signal: controller.signal })
+      .then((response) => {
+        if (!response.ok) throw new Error(`Failed to load banner: ${response.status}`);
+        return response.blob();
+      })
+      .then((blob) => {
+        setBlobUrl(URL.createObjectURL(blob));
+      })
+      .catch((error: unknown) => {
+        if (error instanceof DOMException && error.name === 'AbortError') return;
+        setFailed(true);
+      });
+
+    return () => controller.abort();
+  }, [src, useBlobFallback]);
+
+  const imageSrc = blobUrl ?? (useBlobFallback ? undefined : src);
+
+  if (failed) {
+    return <div className="absolute inset-0 bg-gradient-to-br from-accent/10 via-transparent to-primary/5" />;
+  }
+
+  return (
+    <>
+      {useBlobFallback && !blobUrl && (
+        <div className="absolute inset-0 bg-gradient-to-br from-accent/10 via-transparent to-primary/5" />
+      )}
+      {imageSrc && (
+        <img
+          src={imageSrc}
+          alt=""
+          className="w-full h-full object-cover cursor-pointer"
+          referrerPolicy="no-referrer"
+          decoding="async"
+          onClick={onClick}
+          onError={() => {
+            if (blobUrl) {
+              setFailed(true);
+            } else {
+              setUseBlobFallback(true);
+            }
+          }}
+        />
+      )}
+    </>
+  );
+}
+
 // ----- Main Component -----
 
 const CORE_TAB_LABELS = ['Posts', 'Posts & replies', 'Media', 'Badges', 'Likes', 'Wall'];
@@ -1270,6 +1338,7 @@ type EditableTab = { label: string; isCore: boolean; tab?: ProfileTab };
   // Kind 0 — resolved from the author cache (seeded by the feed query above).
   const author = useAuthor(pubkey);
   const metadata = author.data?.metadata;
+  const bannerUrl = sanitizeUrl(metadata?.banner);
   const profileStatus = useUserStatus(pubkey);
 
   // Refetch the author's profile whenever we navigate to this profile page.
@@ -1656,12 +1725,10 @@ type EditableTab = { label: string; isCore: boolean; tab?: ProfileTab };
           <div className="h-36 md:h-48 bg-secondary relative">
             {author.isLoading ? (
               <Skeleton className="w-full h-full rounded-none" />
-            ) : metadata?.banner ? (
-              <img
-                src={metadata.banner}
-                alt=""
-                className="w-full h-full object-cover cursor-pointer"
-                onClick={() => setLightboxImage(metadata.banner!)}
+            ) : bannerUrl ? (
+              <ProfileBannerImage
+                src={bannerUrl}
+                onClick={() => setLightboxImage(bannerUrl)}
               />
             ) : (
               <div className="absolute inset-0 bg-gradient-to-br from-accent/10 via-transparent to-primary/5" />
@@ -2002,8 +2069,6 @@ type EditableTab = { label: string; isCore: boolean; tab?: ProfileTab };
             </div>
           )}
         </SubHeaderBar>
-
-        <div style={{ height: ARC_OVERHANG_PX }} />
 
         {/* Add/edit single tab modal */}
         {pubkey && (
@@ -2545,4 +2610,3 @@ function NoTabsEmptyState() {
     </div>
   );
 }
-

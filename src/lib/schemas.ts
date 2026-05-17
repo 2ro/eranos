@@ -278,6 +278,10 @@ export const AppConfigSchema = z.object({
     soundId: z.string().optional(),
     devMode: z.boolean().optional(),
   }).optional(),
+  aiBaseURL: z.string().optional(),
+  aiApiKey: z.string().optional(),
+  aiModel: z.string().optional(),
+  aiSystemPrompt: z.string().optional(),
 });
 
 // ─── BuildConfigSchema (build-time app config) ───────────────────────
@@ -388,4 +392,8 @@ export const EncryptedSettingsSchema = z.looseObject({
       return result.success ? [result.data] : [];
     })
   ).optional(),
+  aiBaseURL: z.string().optional(),
+  aiApiKey: z.string().optional(),
+  aiModel: z.string().optional(),
+  aiSystemPrompt: z.string().optional(),
 });

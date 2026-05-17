@@ -18,13 +18,15 @@ interface WorldDiscoveryPanelProps {
 
 /**
  * Desktop right-column variant of the world discovery surface. Always
- * visible alongside the full-bleed map at the `sidebar` breakpoint and up.
- * Mirrors the content of `WorldDiscoveryDrawer` (mobile) so users get the
- * same affordances regardless of device — trending countries, community
- * stats snapshot, and the full A–Z country browser.
+ * visible alongside the full-bleed map at the `xl` breakpoint (1280px)
+ * and up. Mirrors the content of `WorldDiscoveryDrawer` (mobile / tablet)
+ * so users get the same affordances regardless of device — trending
+ * countries, community stats snapshot, and the full A–Z country browser.
  *
- * Hidden below the sidebar breakpoint via `hidden sidebar:flex`; the
- * mobile bottom drawer takes over there.
+ * Hidden below `xl` via `hidden xl:flex`; the floating discovery launcher
+ * + modal takes over there. The cutoff sits at `xl` (not the lower
+ * `sidebar` breakpoint) because the map needs at least ~700-800px of
+ * horizontal room to be readable next to the 360px panel.
  */
 export function WorldDiscoveryPanel({ activities, className }: WorldDiscoveryPanelProps) {
   // Same trending derivation as the drawer's peek strip — fold subdivision
@@ -54,11 +56,12 @@ export function WorldDiscoveryPanel({ activities, className }: WorldDiscoveryPan
   return (
     <aside
       className={cn(
-        // `hidden sidebar:flex` keeps the panel out of the layout flow on
-        // mobile so the bottom drawer is the only discovery surface there.
+        // `hidden xl:flex` keeps the panel out of the layout flow below
+        // 1280px so the map gets the full column width and the floating
+        // discovery launcher is the only discovery surface there.
         // `sticky top-0 h-screen` pins it next to the map column without
         // affecting page scroll behavior.
-        'hidden sidebar:flex flex-col w-[360px] shrink-0 h-screen sticky top-0 border-l border-border bg-background overflow-hidden',
+        'hidden xl:flex flex-col w-[360px] shrink-0 h-screen sticky top-0 border-l border-border bg-background overflow-hidden',
         className,
       )}
       aria-label="World discovery panel"

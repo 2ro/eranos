@@ -1,7 +1,6 @@
 import { useState, useEffect, useMemo, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useInView } from 'react-intersection-observer';
-import { useNostr } from '@nostrify/react';
-import { useQuery } from '@tanstack/react-query';
 import { usePageRefresh } from '@/hooks/usePageRefresh';
 import { ComposeBox } from '@/components/ComposeBox';
 import { LandingHero } from '@/components/LandingHero';
@@ -9,33 +8,29 @@ import { NoteCard } from '@/components/NoteCard';
 import { PullToRefresh } from '@/components/PullToRefresh';
 import { FeedEmptyState } from '@/components/FeedEmptyState';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Loader2, MapPin } from 'lucide-react';
+import { Globe2, Loader2, Users } from 'lucide-react';
 import LoginDialog from '@/components/auth/LoginDialog';
 import { useOnboarding } from '@/hooks/useOnboarding';
 import { useFeed } from '@/hooks/useFeed';
-import { useFeedSettings } from '@/hooks/useFeedSettings';
-import { DITTO_RELAYS } from '@/lib/appRelays';
+import { useFollowingFeed } from '@/hooks/useFollowingFeed';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useFeedTab } from '@/hooks/useFeedTab';
-import { useInterests } from '@/hooks/useInterests';
 import { useMuteList } from '@/hooks/useMuteList';
 import { useTabFeed } from '@/hooks/useProfileFeed';
 import { useSavedFeeds } from '@/hooks/useSavedFeeds';
 import { useResolveTabFilter } from '@/hooks/useResolveTabFilter';
 import { useWorldFeed } from '@/hooks/useWorldFeed';
-import { getEnabledFeedKinds } from '@/lib/extraKinds';
-import { isRepostKind, shouldHideFeedEvent } from '@/lib/feedUtils';
+import { shouldHideFeedEvent } from '@/lib/feedUtils';
 import { isEventMuted } from '@/lib/muteHelpers';
 import { SubHeaderBar } from '@/components/SubHeaderBar';
-import { ARC_OVERHANG_PX } from '@/components/ArcBackground';
 import { TabButton } from '@/components/TabButton';
+import { Button } from '@/components/ui/button';
 import { useNavHidden } from '@/contexts/LayoutContext';
 import { cn } from '@/lib/utils';
 import type { FeedItem } from '@/lib/feedUtils';
-import type { NostrEvent } from '@nostrify/nostrify';
 import type { SavedFeed } from '@/contexts/AppContext';
 
-type CoreFeedTab = 'follows' | 'global' | 'communities' | 'world';
+type CoreFeedTab = 'follows' | 'network' | 'global' | 'communities' | 'world';
 type FeedTab = CoreFeedTab | string; // string = saved feed id
 
 interface FeedProps {
@@ -55,10 +50,9 @@ interface FeedProps {
 
 export function Feed({ kinds, tagFilters, header, hideCompose, emptyMessage, feedId = 'home' }: FeedProps = {}) {
   const { user } = useCurrentUser();
+  const navigate = useNavigate();
   const { muteItems } = useMuteList();
   const { savedFeeds } = useSavedFeeds();
-  const { hashtags } = useInterests();
-  const { hashtags: geotags } = useInterests('g');
   const navHidden = useNavHidden();
 
   // Tab settings from localStorage
@@ -101,6 +95,9 @@ export function Feed({ kinds, tagFilters, header, hideCompose, emptyMessage, fee
     if (!kinds) {
       // Migrate legacy 'ditto' tab to 'world'
       if (rawActiveTab === 'ditto') return 'world';
+      // Legacy hashtag:/geotag: tabs are now part of the combined Following
+      // feed; surface them there instead of rendering a missing sub-feed.
+      if (rawActiveTab.startsWith('hashtag:') || rawActiveTab.startsWith('geotag:')) return 'follows';
       return rawActiveTab;
     }
     if (rawActiveTab === 'global') return 'global';
@@ -114,11 +111,19 @@ export function Feed({ kinds, tagFilters, header, hideCompose, emptyMessage, fee
     [savedFeeds, activeTab],
   );
 
-  // Is the active tab a hashtag interest?
-  const activeHashtag = activeTab.startsWith('hashtag:') ? activeTab.slice(8) : null;
+  // Migrate legacy hashtag:/geotag: tabs (which used to render their own
+  // sub-feeds) back to the home Following feed. Followed hashtags/geotags
+  // now contribute to the combined Following feed instead of getting
+  // dedicated tabs.
+  useEffect(() => {
+    if (rawActiveTab.startsWith('hashtag:') || rawActiveTab.startsWith('geotag:')) {
+      handleSetActiveTab('follows');
+    }
+  }, [rawActiveTab, handleSetActiveTab]);
 
-  // Is the active tab a geotag interest?
-  const activeGeotag = activeTab.startsWith('geotag:') ? activeTab.slice(7) : null;
+  // Kind-specific pages (e.g. Development, WebXDC) only show Follows + Global tabs.
+  // Extra tabs (World, Community, saved feeds) are only for the home feed.
+  const isKindSpecificPage = !!kinds;
 
   // When logged out (and not on a kind-specific page), show the World feed.
   const useWorldForLoggedOut = !user && !kinds;
@@ -131,16 +136,24 @@ export function Feed({ kinds, tagFilters, header, hideCompose, emptyMessage, fee
   const isWorldActive = useWorldForLoggedOut || !!useWorldTab;
 
   // Standard feed query (used when logged in, or on kind-specific pages, or core tabs)
-  const isCoreFeedTab = activeTab === 'follows' || activeTab === 'global' || activeTab === 'communities' || activeTab === 'world';
-  type UseFeedTab = 'follows' | 'global' | 'communities';
+  const isHomeFollowingActive = activeTab === 'follows' && !isKindSpecificPage && !tagFilters;
+  const isCoreFeedTab = activeTab === 'follows' || activeTab === 'network' || activeTab === 'global' || activeTab === 'communities' || activeTab === 'world';
+  type UseFeedTab = 'follows' | 'network' | 'global' | 'communities';
   const feedTabForQuery: UseFeedTab =
-    activeTab === 'follows' || activeTab === 'global' || activeTab === 'communities'
-      ? (activeTab as UseFeedTab)
+    activeTab === 'follows'
+      ? (isHomeFollowingActive ? 'network' : 'network')
+      : activeTab === 'network' || activeTab === 'global' || activeTab === 'communities'
+        ? (activeTab as UseFeedTab)
       : 'global';
+  const standardFeedOptions = (kinds || tagFilters)
+    ? { kinds, tagFilters, enabled: !isHomeFollowingActive }
+    : { enabled: !isHomeFollowingActive };
   const feedQuery = useFeed(
     isCoreFeedTab && !isWorldActive ? feedTabForQuery : 'global',
-    (kinds || tagFilters) ? { kinds, tagFilters } : undefined,
+    standardFeedOptions,
   );
+
+  const followingFeed = useFollowingFeed(isHomeFollowingActive);
 
   // World feed: all country-tagged events with diversity cap + live streaming.
   const worldFeed = useWorldFeed(isWorldActive);
@@ -148,8 +161,12 @@ export function Feed({ kinds, tagFilters, header, hideCompose, emptyMessage, fee
 
   // For non-world tabs, use the standard feed query
   const queryKey = useMemo(
-    () => isWorldActive ? ['world-feed'] : ['feed', activeTab],
-    [isWorldActive, activeTab],
+    () => isWorldActive
+      ? ['world-feed']
+      : isHomeFollowingActive
+        ? [['feed', 'network'], ['community-activity-feed'], ['following-country-feed']]
+        : ['feed', activeTab],
+    [isWorldActive, isHomeFollowingActive, activeTab],
   );
 
   const handleRefresh = usePageRefresh(queryKey);
@@ -166,7 +183,7 @@ export function Feed({ kinds, tagFilters, header, hideCompose, emptyMessage, fee
     fetchNextPage: fetchNextPageStandard,
     hasNextPage: hasNextPageStandard,
     isFetchingNextPage: isFetchingNextPageStandard,
-  } = feedQuery;
+  } = isHomeFollowingActive ? followingFeed : feedQuery;
 
   // Unify pagination interface
   const fetchNextPage = isWorldActive ? worldFeed.fetchNextPage : fetchNextPageStandard;
@@ -175,10 +192,10 @@ export function Feed({ kinds, tagFilters, header, hideCompose, emptyMessage, fee
 
   // Auto-fetch page 2 as soon as page 1 arrives for smoother scrolling
   useEffect(() => {
-    if (!isWorldActive && hasNextPage && !isFetchingNextPage && rawData?.pages?.length === 1) {
+    if (!isHomeFollowingActive && !isWorldActive && hasNextPage && !isFetchingNextPage && rawData?.pages?.length === 1) {
       fetchNextPage();
     }
-  }, [isWorldActive, hasNextPage, isFetchingNextPage, rawData?.pages?.length, fetchNextPage]);
+  }, [isHomeFollowingActive, isWorldActive, hasNextPage, isFetchingNextPage, rawData?.pages?.length, fetchNextPage]);
 
   // Intersection observer for infinite scroll
   const { ref: scrollRef, inView } = useInView({
@@ -219,9 +236,6 @@ export function Feed({ kinds, tagFilters, header, hideCompose, emptyMessage, fee
     ? worldFeed.isLoading
     : (isPending || (isLoading && !rawData));
 
-  // Kind-specific pages (e.g. Development, WebXDC) only show Follows + Global tabs.
-  // Extra tabs (Ditto, Community, saved feeds, hashtags) are only for the home feed.
-  const isKindSpecificPage = !!kinds;
   const showSavedFeedTabs = user && !isKindSpecificPage && !tagFilters;
 
   return (
@@ -236,12 +250,15 @@ export function Feed({ kinds, tagFilters, header, hideCompose, emptyMessage, fee
         />
       )}
 
-      {!hideCompose && <ComposeBox compact />}
+      {!hideCompose && <ComposeBox compact hideBorder />}
 
       {/* Tabs (logged in) */}
       {user && (
         <SubHeaderBar>
-          <TabButton label="Follows" active={activeTab === 'follows'} onClick={() => handleSetActiveTab('follows')} />
+          <TabButton label={isKindSpecificPage || tagFilters ? 'Follows' : 'Following'} active={activeTab === 'follows'} onClick={() => handleSetActiveTab('follows')} />
+          {!isKindSpecificPage && !tagFilters && (
+            <TabButton label="Network" active={activeTab === 'network'} onClick={() => handleSetActiveTab('network')} />
+          )}
           {!isKindSpecificPage && showWorldFeed && (
             <TabButton label="World" active={activeTab === 'world'} onClick={() => handleSetActiveTab('world')} />
           )}
@@ -259,37 +276,11 @@ export function Feed({ kinds, tagFilters, header, hideCompose, emptyMessage, fee
               onClick={() => handleSetActiveTab(feed.id)}
             />
           ))}
-          {showSavedFeedTabs && hashtags.map((tag) => (
-            <TabButton
-              key={`hashtag:${tag}`}
-              label={`#${tag}`}
-              active={activeTab === `hashtag:${tag}`}
-              onClick={() => handleSetActiveTab(`hashtag:${tag}`)}
-            />
-          ))}
-          {showSavedFeedTabs && geotags.map((tag) => (
-            <TabButton
-              key={`geotag:${tag}`}
-              label={tag}
-              active={activeTab === `geotag:${tag}`}
-              onClick={() => handleSetActiveTab(`geotag:${tag}`)}
-            >
-              <span className="flex items-center justify-center gap-1">
-                <MapPin className="size-3.5" />
-                {tag}
-              </span>
-            </TabButton>
-          ))}
         </SubHeaderBar>
       )}
 
       {/* Feed content — saved feed tab gets its own stream */}
-      {user && <div style={{ height: ARC_OVERHANG_PX }} />}
-      {activeHashtag ? (
-        <HashtagFeedContent tag={activeHashtag} />
-      ) : activeGeotag ? (
-        <GeotagFeedContent tag={activeGeotag} />
-      ) : activeSavedFeed ? (
+      {activeSavedFeed ? (
         <SavedFeedContent feed={activeSavedFeed} />
       ) : (
         <PullToRefresh onRefresh={isWorldActive ? handleWorldRefresh : handleRefresh}>
@@ -340,20 +331,24 @@ export function Feed({ kinds, tagFilters, header, hideCompose, emptyMessage, fee
                 </div>
               )}
             </div>
+          ) : isHomeFollowingActive && !emptyMessage ? (
+            <FollowingEmptyState onExploreWorld={() => navigate('/world')} />
+          ) : activeTab === 'network' && !emptyMessage ? (
+            <NetworkEmptyState onDiscoverPeople={() => navigate('/packs')} />
           ) : (
             <FeedEmptyState
               message={
                 emptyMessage ?? (
-                  activeTab === 'follows'
+                  activeTab === 'follows' || activeTab === 'network'
                     ? 'Your feed is empty. Follow some people to see their posts here.'
                     : activeTab === 'world'
                       ? 'No world posts yet. Check back soon for global activity.'
                       : 'No posts found. Check your relay connections or come back soon.'
                 )
               }
-              showDiscover={!emptyMessage && activeTab === 'follows'}
+              showDiscover={!emptyMessage && (activeTab === 'follows' || activeTab === 'network')}
               onSwitchToGlobal={
-                activeTab === 'follows' && showGlobalFeed
+                (activeTab === 'follows' || activeTab === 'network') && showGlobalFeed
                   ? () => handleSetActiveTab('global')
                   : undefined
               }
@@ -486,121 +481,6 @@ function SavedFeedContent({ feed }: { feed: SavedFeed }) {
   );
 }
 
-/** Renders a feed of posts tagged with a specific hashtag. */
-function HashtagFeedContent({ tag }: { tag: string }) {
-  const { nostr } = useNostr();
-  const { muteItems } = useMuteList();
-  const { feedSettings } = useFeedSettings();
-  const kinds = getEnabledFeedKinds(feedSettings).filter((k) => !isRepostKind(k));
-  const kindsKey = [...kinds].sort().join(',');
-
-  const queryKey = useMemo(() => ['hashtag-feed', tag, kindsKey], [tag, kindsKey]);
-  const handleRefresh = usePageRefresh(queryKey);
-
-  const { data: events, isLoading } = useQuery<NostrEvent[]>({
-    queryKey,
-    queryFn: async ({ signal }) => {
-      const ditto = nostr.group(DITTO_RELAYS);
-      return ditto.query(
-        [{ kinds, '#t': [tag.toLowerCase()], limit: 40 }],
-        { signal: AbortSignal.any([signal, AbortSignal.timeout(10000)]) },
-      );
-    },
-  });
-
-  const filteredEvents = useMemo((): NostrEvent[] => {
-    if (!events) return [];
-    if (muteItems.length === 0) return events;
-    return events.filter((e) => !isEventMuted(e, muteItems));
-  }, [events, muteItems]);
-
-  if (isLoading && filteredEvents.length === 0) {
-    return (
-      <div className="divide-y divide-border">
-        {Array.from({ length: 5 }).map((_, i) => (
-          <NoteCardSkeleton key={i} />
-        ))}
-      </div>
-    );
-  }
-
-  if (filteredEvents.length === 0) {
-    return (
-      <PullToRefresh onRefresh={handleRefresh}>
-        <FeedEmptyState message={`No posts found with #${tag}.`} />
-      </PullToRefresh>
-    );
-  }
-
-  return (
-    <PullToRefresh onRefresh={handleRefresh}>
-      <div>
-        {filteredEvents.map((event) => (
-          <NoteCard key={event.id} event={event} />
-        ))}
-      </div>
-    </PullToRefresh>
-  );
-}
-
-/** Renders a feed of posts tagged with a specific geohash. */
-function GeotagFeedContent({ tag }: { tag: string }) {
-  const { nostr } = useNostr();
-  const { muteItems } = useMuteList();
-  const { feedSettings } = useFeedSettings();
-  const kinds = getEnabledFeedKinds(feedSettings).filter((k) => !isRepostKind(k));
-  const kindsKey = [...kinds].sort().join(',');
-
-  const queryKey = useMemo(() => ['geotag-feed', tag, kindsKey], [tag, kindsKey]);
-  const handleRefresh = usePageRefresh(queryKey);
-
-  const { data: events, isLoading } = useQuery<NostrEvent[]>({
-    queryKey,
-    queryFn: async ({ signal }) => {
-      const ditto = nostr.group(DITTO_RELAYS);
-      const filter = { kinds, limit: 40 } as Record<string, unknown>;
-      filter['#g'] = [tag];
-      return ditto.query([filter as Parameters<typeof ditto.query>[0][number]], {
-        signal: AbortSignal.any([signal, AbortSignal.timeout(10000)]),
-      });
-    },
-  });
-
-  const filteredEvents = useMemo((): NostrEvent[] => {
-    if (!events) return [];
-    if (muteItems.length === 0) return events;
-    return events.filter((e) => !isEventMuted(e, muteItems));
-  }, [events, muteItems]);
-
-  if (isLoading && filteredEvents.length === 0) {
-    return (
-      <div className="divide-y divide-border">
-        {Array.from({ length: 5 }).map((_, i) => (
-          <NoteCardSkeleton key={i} />
-        ))}
-      </div>
-    );
-  }
-
-  if (filteredEvents.length === 0) {
-    return (
-      <PullToRefresh onRefresh={handleRefresh}>
-        <FeedEmptyState message={`No posts found near ${tag}.`} />
-      </PullToRefresh>
-    );
-  }
-
-  return (
-    <PullToRefresh onRefresh={handleRefresh}>
-      <div>
-        {filteredEvents.map((event) => (
-          <NoteCard key={event.id} event={event} />
-        ))}
-      </div>
-    </PullToRefresh>
-  );
-}
-
 function NoteCardSkeleton() {
   return (
     <div className="px-4 py-3 border-b border-border">
@@ -620,6 +500,50 @@ function NoteCardSkeleton() {
         <Skeleton className="h-4 w-8" />
         <Skeleton className="h-4 w-8" />
         <Skeleton className="h-4 w-8" />
+      </div>
+    </div>
+  );
+}
+
+function FollowingEmptyState({ onExploreWorld }: { onExploreWorld: () => void }) {
+  return (
+    <div className="py-20 px-8 flex flex-col items-center gap-6 text-center">
+      <div className="p-4 rounded-full bg-primary/10">
+        <Globe2 className="size-8 text-primary" />
+      </div>
+      <div className="space-y-2 max-w-xs">
+        <h2 className="text-xl font-bold">No activity yet</h2>
+        <p className="text-muted-foreground text-sm">
+          Your Following feed is quiet right now. Visit World to discover more global activity.
+        </p>
+      </div>
+      <div className="flex flex-col gap-2 w-full max-w-xs">
+        <Button className="rounded-full" onClick={onExploreWorld}>
+          <Globe2 className="size-4 mr-2" />
+          Visit World
+        </Button>
+      </div>
+    </div>
+  );
+}
+
+function NetworkEmptyState({ onDiscoverPeople }: { onDiscoverPeople: () => void }) {
+  return (
+    <div className="py-20 px-8 flex flex-col items-center gap-6 text-center">
+      <div className="p-4 rounded-full bg-primary/10">
+        <Users className="size-8 text-primary" />
+      </div>
+      <div className="space-y-2 max-w-xs">
+        <h2 className="text-xl font-bold">No network activity yet</h2>
+        <p className="text-muted-foreground text-sm">
+          Follow more people to fill your Network feed.
+        </p>
+      </div>
+      <div className="flex flex-col gap-2 w-full max-w-xs">
+        <Button className="rounded-full" onClick={onDiscoverPeople}>
+          <Users className="size-4 mr-2" />
+          Discover people
+        </Button>
       </div>
     </div>
   );

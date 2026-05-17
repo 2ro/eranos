@@ -55,6 +55,10 @@
   .safe-area-inset-bottom {
     bottom: var(--safe-area-inset-bottom, env(safe-area-inset-bottom, 0px));
   }
+
+  .overflow-wrap-anywhere {
+    overflow-wrap: anywhere;
+  }
   
   /* FAB bottom offset: clears bottom nav + safe area inset on mobile */
   .bottom-fab {
@@ -149,11 +153,10 @@
     }
   }
 
-  /* Anchor the world discovery drawer above the mobile bottom nav so the
-     bottom-nav stays usable while the drawer sits in its peek state. On
-     desktop there's no bottom nav, so the drawer anchors to the viewport
-     bottom. Vaul drives translation via [data-vaul-drawer] CSS, so we only
-     adjust the anchor — not the transform. */
+  /* Anchor world-page floating overlays (the discovery launcher button and
+     the docked desktop drawer slot) above the mobile bottom nav so the
+     bottom-nav stays usable. On desktop there's no bottom nav, so they
+     anchor to the viewport bottom. */
   .world-drawer-anchor {
     bottom: 0;
   }
@@ -164,7 +167,58 @@
   }
 }
 
+/* Leaflet control theming — override the default white/gray controls to
+   match the app's themed palette. The default `leaflet/dist/leaflet.css`
+   ships with hardcoded `background: white` / dark border colors that
+   clash with our themed surfaces (especially in dark mode and on the
+   `/world` map where controls sit on top of the dark Positron tiles).
 
+   We re-style only the controls; tile rendering and marker popovers are
+   untouched. Hover state uses the primary color so the controls match
+   the same orange accent as buttons elsewhere. */
+.leaflet-bar {
+  border: 1px solid hsl(var(--border)) !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.18) !important;
+  border-radius: calc(var(--radius) - 0.25rem) !important;
+  overflow: hidden;
+}
+
+.leaflet-bar a,
+.leaflet-bar a:hover,
+.leaflet-bar a:focus {
+  background-color: hsl(var(--background) / 0.95) !important;
+  color: hsl(var(--foreground)) !important;
+  border-bottom: 1px solid hsl(var(--border)) !important;
+  backdrop-filter: blur(4px);
+  transition: background-color 120ms, color 120ms;
+}
+
+.leaflet-bar a:last-child {
+  border-bottom: none !important;
+}
+
+.leaflet-bar a:hover,
+.leaflet-bar a:focus {
+  background-color: hsl(var(--primary)) !important;
+  color: hsl(var(--primary-foreground)) !important;
+}
+
+.leaflet-bar a.leaflet-disabled {
+  background-color: hsl(var(--muted)) !important;
+  color: hsl(var(--muted-foreground) / 0.5) !important;
+  cursor: not-allowed;
+}
+
+/* Attribution control (hidden on /world via `attributionControl={false}`,
+   but kept consistent for any other map usage). */
+.leaflet-control-attribution {
+  background-color: hsl(var(--background) / 0.85) !important;
+  color: hsl(var(--muted-foreground)) !important;
+  backdrop-filter: blur(4px);
+}
+.leaflet-control-attribution a {
+  color: hsl(var(--primary)) !important;
+}
 
 @keyframes spin {
   from { transform: rotate(0deg); }
@@ -668,4 +722,3 @@
 .scrollbar-thin::-webkit-scrollbar-track {
   background: transparent;
 }
-

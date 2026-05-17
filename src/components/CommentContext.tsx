@@ -1,10 +1,10 @@
 import type React from 'react';
-import { type ReactNode, useMemo } from 'react';
+import { type ReactNode, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { nip19 } from 'nostr-tools';
 import {
   Award, BarChart3, Bird, BookOpen, Camera, Clapperboard, FileText, Film,
-  GitBranch, GitPullRequest, Highlighter, Mail, MapPin, MessageSquare, Mic, Music,
+  GitBranch, GitPullRequest, Highlighter, Mail, MapPin, Megaphone, MessageSquare, Mic, Music,
   Package, Palette, PartyPopper, Podcast, Radio, Rocket, SmilePlus,
   Stars, Target, Users, UserCheck, Vote, Zap,
 } from 'lucide-react';
@@ -29,7 +29,11 @@ import { useLinkPreview } from '@/hooks/useLinkPreview';
 import { useScryfallCard } from '@/hooks/useScryfallCard';
 import { getDisplayName } from '@/lib/getDisplayName';
 import { genUserName } from '@/lib/genUserName';
-import { getCountryInfo } from '@/lib/countries';
+import { getCountryInfo, getWikipediaTitle } from '@/lib/countries';
+import { useCountryFeed } from '@/contexts/CountryFeedContext';
+import { cn } from '@/lib/utils';
+import { useFlagPalette } from '@/lib/flagPalette';
+import { useWikipediaSummary } from '@/hooks/useWikipediaSummary';
 import { extractGathererCard, type GathererCard } from '@/lib/linkEmbed';
 import { cardPrimaryImage } from '@/lib/scryfall';
 
@@ -174,7 +178,7 @@ const KIND_ICONS: Partial<Record<number, React.ComponentType<{ className?: strin
   1618: GitPullRequest,
   15128: Rocket,
   35128: Rocket,
-  36639: Zap,
+  36639: Megaphone,
   10008: Award,
   30008: Award,
   30009: Award,
@@ -799,60 +803,223 @@ function UrlCommentContext({ url, className }: { url: string; className?: string
   );
 }
 
-/** Comment context for ISO 3166 country/subdivision identifiers — shows flag and name with hover preview. */
-function CountryCommentContext({ identifier, className }: { identifier: string; className?: string }) {
+/** Internal: clickable country flag emoji that opens the country feed. */
+function CountryPillBadge({ identifier, className }: { identifier: string; className?: string }) {
   const code = identifier.slice('iso3166:'.length);
   const info = getCountryInfo(code);
   const link = `/i/${encodeURIComponent(identifier)}`;
 
-  const displayText = info
-    ? info.subdivisionName
-      ? `${info.flag} ${info.subdivisionName}`
-      : `${info.flag} ${info.name}`
-    : identifier;
+  const flag = info?.flag ?? '🌍';
 
   return (
-    <CommentContextRow prefix="Commenting on" className={className}>
-      <HoverCard openDelay={300} closeDelay={150}>
-        <HoverCardTrigger asChild>
-          <Link
-            to={link}
-            className="text-primary hover:underline truncate cursor-pointer"
-            onClick={(e) => e.stopPropagation()}
-          >
-            {displayText}
-          </Link>
-        </HoverCardTrigger>
-        <HoverCardContent
-          side="bottom"
-          align="start"
-          sideOffset={4}
-          className="w-64 p-0 rounded-2xl shadow-lg"
+    <HoverCard openDelay={300} closeDelay={150}>
+      <HoverCardTrigger asChild>
+        <Link
+          to={link}
           onClick={(e) => e.stopPropagation()}
+          aria-label={`Posted from ${info?.name ?? code}`}
+          className={cn(
+            'group/flag inline-flex items-center justify-center shrink-0',
+            'text-xl leading-none',
+            'transition-transform duration-200',
+            'motion-safe:hover:scale-110 motion-safe:active:scale-95',
+            'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:ring-offset-2 focus-visible:ring-offset-background rounded-full',
+            className,
+          )}
         >
-          <div className="flex items-center gap-3 px-4 py-3">
-            <span className="text-2xl leading-none shrink-0" role="img" aria-label={info ? `Flag of ${info.name}` : code}>
-              {info?.flag ?? '🌍'}
-            </span>
-            <div className="flex-1 min-w-0">
-              <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-                <MapPin className="size-3 shrink-0" />
-                <span>{info?.subdivisionName ? 'Region' : 'Country'}</span>
-              </div>
-              <p className="text-sm font-medium truncate mt-0.5">
-                {info?.subdivisionName ?? info?.name ?? code}
-              </p>
-              {info?.subdivisionName && info.name && (
-                <p className="text-xs text-muted-foreground truncate">
-                  {info.name}
-                </p>
-              )}
+          <span role="img" aria-label={info ? `Flag of ${info.name}` : code}>
+            {flag}
+          </span>
+        </Link>
+      </HoverCardTrigger>
+      <HoverCardContent
+        side="bottom"
+        align="end"
+        sideOffset={6}
+        className="w-64 p-0 rounded-2xl shadow-lg overflow-hidden"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="flex items-center gap-3 px-4 py-3">
+          <span className="text-2xl leading-none shrink-0" role="img" aria-label={info ? `Flag of ${info.name}` : code}>
+            {flag}
+          </span>
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+              <MapPin className="size-3 shrink-0" />
+              <span>{info?.subdivisionName ? 'Region' : 'Country'}</span>
             </div>
+            <p className="text-sm font-medium truncate mt-0.5">
+              {info?.subdivisionName ?? info?.name ?? code}
+            </p>
+            {info?.subdivisionName && info.name && (
+              <p className="text-xs text-muted-foreground truncate">
+                {info.name}
+              </p>
+            )}
           </div>
-        </HoverCardContent>
-      </HoverCard>
-    </CommentContextRow>
+        </div>
+      </HoverCardContent>
+    </HoverCard>
   );
+}
+
+/**
+ * Resolve whether a kind-1111 event should display country-rooted UI in the
+ * current context. Shared by `CountryCommentPill` (renders a pill in the
+ * card header) and `CountryFlagBackdrop` (renders a faded flag behind the
+ * card). Returns `null` to suppress both; otherwise returns the resolved
+ * country identifier so callers don't re-parse tags.
+ */
+function useCountryRootContext(event: NostrEvent): { iTag: string; code: string } | null {
+  const countryFeed = useCountryFeed();
+
+  if (event.kind !== 1111) return null;
+
+  // If the direct parent is another kind-1111 comment, the body shows
+  // "Replying to @user" — country chrome would be visual noise.
+  const parentKind = event.tags.find(([name]) => name === 'k')?.[1];
+  if (parentKind === '1111') return null;
+
+  // Root I tag (uppercase = root identifier per NIP-22)
+  const iTag = event.tags.find(([name]) => name === 'I')?.[1];
+  if (!iTag || !iTag.startsWith('iso3166:')) return null;
+
+  const code = iTag.slice('iso3166:'.length);
+
+  // Suppress when already inside the matching country feed page — there the
+  // chrome would just point back to the page the user is already on.
+  if (countryFeed && countryFeed.countryCode === code.toUpperCase()) {
+    return null;
+  }
+
+  return { iTag, code };
+}
+
+/**
+ * Whether the given event is rendering with country chrome (pill + flag
+ * backdrop) in the current context. Useful for sibling components that want
+ * to coordinate styling — e.g. NoteCard switching its text to white when a
+ * flag is showing through behind the author row.
+ */
+// eslint-disable-next-line react-refresh/only-export-components
+export function useIsCountryRooted(event: NostrEvent): boolean {
+  return useCountryRootContext(event) !== null;
+}
+
+/**
+ * Standalone country flag pill for kind-1111 events whose root is an ISO 3166
+ * identifier. Intended to be rendered in the upper-right of `NoteCard`'s
+ * header row so the post reads as a neighborhood entry instead of a comment.
+ *
+ * Visibility rules: see `useCountryRootContext`.
+ *
+ * Because the pill takes over the country-root presentation, the body-level
+ * `CommentContext` is silent for country roots — see `CountryCommentContext`.
+ */
+export function CountryCommentPill({ event, className }: { event: NostrEvent; className?: string }) {
+  const ctx = useCountryRootContext(event);
+  if (!ctx) return null;
+  return <CountryPillBadge identifier={ctx.iTag} className={className} />;
+}
+
+/**
+ * Decorative flag backdrop for country-rooted kind-1111 posts. Renders the
+ * country's Wikipedia lead image (the flag, for country articles) faded
+ * behind the post, echoing the country detail page's hero
+ * (`CountryContentHeader` in `ExternalContentHeader.tsx`) but scaled down
+ * to a card. Pairs with `CountryCommentPill`.
+ *
+ * Designed to be rendered as the first child of a `relative overflow-hidden`
+ * parent. The wrapper is absolutely positioned at `z-0`; its foreground
+ * siblings must declare `relative` (any positioned value works) so they
+ * paint above the backdrop. Pointer events are disabled so the post body
+ * stays fully interactive.
+ *
+ * The Wikipedia summary fetch is cached for 24 h across all cards
+ * referencing the same country code, so a feed of N Venezuelan posts only
+ * pays the network cost once.
+ *
+ * Visibility rules: see `useCountryRootContext` (identical to the pill).
+ */
+export function CountryFlagBackdrop({ event }: { event: NostrEvent }) {
+  const ctx = useCountryRootContext(event);
+  const info = ctx ? getCountryInfo(ctx.code) : null;
+  const wikiTitle = ctx ? getWikipediaTitle(ctx.code) : null;
+  const { data: wiki } = useWikipediaSummary(wikiTitle);
+  // Sample dominant colors from the flag emoji at render time. Used as the
+  // fallback gradient while Wikipedia is still resolving and after image
+  // load failures, so the backdrop never reverts to a giant blurred emoji.
+  const palette = useFlagPalette(info?.flag);
+  // Track image load failures so we cleanly fall back to the flag-color
+  // gradient. Wikipedia hosts these PNGs from upload.wikimedia.org which is
+  // generally CORS-friendly, but hotlink-protection or transient 4xx
+  // responses can still happen.
+  const [imageFailed, setImageFailed] = useState(false);
+
+  if (!ctx) return null;
+
+  // For country articles Wikipedia returns the flag as the page's lead image
+  // — the same source used by `CountryContentHeader`. Prefer the original
+  // (full-resolution) over the 330px thumbnail; the thumbnail gets upscaled
+  // and looks fuzzy when stretched across a full-width feed card.
+  const flagImage = !imageFailed
+    ? (wiki?.originalImage?.source ?? wiki?.thumbnail?.source ?? null)
+    : null;
+
+  // Pre-built gradient using the palette (sampled from the flag emoji at
+  // mount). Used as the fallback when Wikipedia hasn't returned an image or
+  // its image failed to load. Single-color palettes get duplicated so
+  // linear-gradient still has two stops.
+  const paletteGradient =
+    palette && palette.length > 0
+      ? `linear-gradient(135deg, ${palette.length === 1 ? `${palette[0]}, ${palette[0]}` : palette.join(', ')})`
+      : null;
+
+  return (
+    <div aria-hidden className="pointer-events-none absolute inset-0 z-0 overflow-hidden">
+      <div className="absolute top-0 left-0 right-0 h-64 sm:h-72">
+        {flagImage ? (
+          // Full-width flag banner across the top of the card. A mask-image
+          // gradient fades the image to nothing at its bottom edge, so the
+          // flag dissolves into the card with no hard seam.
+          <img
+            src={flagImage}
+            alt=""
+            decoding="async"
+            onError={() => setImageFailed(true)}
+            className="w-full h-full object-cover opacity-20 select-none"
+            style={{
+              maskImage: 'linear-gradient(to bottom, black 0%, black 35%, transparent 100%)',
+              WebkitMaskImage: 'linear-gradient(to bottom, black 0%, black 35%, transparent 100%)',
+            }}
+          />
+        ) : paletteGradient ? (
+          // Wikipedia not yet resolved (or its image failed) — paint the
+          // flag-color gradient as a placeholder/fallback. Same opacity and
+          // mask shape as the image so the visual swap is seamless when the
+          // image arrives.
+          <div
+            className="absolute inset-0 opacity-20"
+            style={{
+              backgroundImage: paletteGradient,
+              maskImage: 'linear-gradient(to bottom, black 0%, black 35%, transparent 100%)',
+              WebkitMaskImage: 'linear-gradient(to bottom, black 0%, black 35%, transparent 100%)',
+            }}
+          />
+        ) : null}
+      </div>
+    </div>
+  );
+}
+
+/**
+ * Body-level comment context for ISO 3166 roots — intentionally renders
+ * nothing. The country pill is hoisted into the card header via
+ * `CountryCommentPill`, so we suppress the in-body version to avoid
+ * duplication.
+ */
+function CountryCommentContext(_props: { identifier: string; className?: string }) {
+  return null;
 }
 
 /** Comment context for ISBN identifiers — fetches and displays the book title with hover preview. */

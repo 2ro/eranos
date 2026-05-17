@@ -1,8 +1,7 @@
 import { Link } from 'react-router-dom';
 
-import { AgoraLogo } from '@/components/AgoraLogo';
+import { AgoraBoltIcon } from '@/components/icons/AgoraBoltIcon';
 import { Button } from '@/components/ui/button';
-import { useAppContext } from '@/hooks/useAppContext';
 
 interface LandingHeroProps {
   onLoginClick: () => void;
@@ -10,22 +9,20 @@ interface LandingHeroProps {
 }
 
 export function LandingHero({ onLoginClick, onSignupClick }: LandingHeroProps) {
-  const { config } = useAppContext();
-
   return (
     <div className="landing-hero">
       {/* ── Hero Header ── */}
       <div className="px-4 pt-8 pb-6 text-center space-y-4">
         <div className="flex justify-center landing-hero-fade" style={{ animationDelay: '0ms' }}>
-          <AgoraLogo size={56} />
+          <AgoraBoltIcon className="size-16 drop-shadow-md" />
         </div>
 
-        <div className="space-y-2 landing-hero-fade" style={{ animationDelay: '80ms' }}>
-          <h1 className="text-2xl sidebar:text-3xl font-bold tracking-tight">
-            {config.appName}
+        <div className="space-y-1 landing-hero-fade" style={{ animationDelay: '80ms' }}>
+          <h1 className="text-2xl sidebar:text-3xl font-black tracking-tight leading-none">
+            ÁGORA
           </h1>
-          <p className="text-muted-foreground text-sm sidebar:text-base max-w-xs mx-auto leading-relaxed">
-            Your content. Your vibe. Your&nbsp;rules.
+          <p className="text-[11px] sidebar:text-xs uppercase tracking-wider text-muted-foreground font-semibold">
+            Power to the people
           </p>
         </div>
 

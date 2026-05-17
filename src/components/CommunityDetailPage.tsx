@@ -1,20 +1,25 @@
-import { useMemo, useCallback, useEffect, useState } from 'react';
-import { useInView } from 'react-intersection-observer';
+import { useMemo, useCallback, useRef, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { nip19 } from 'nostr-tools';
 import {
   ArrowLeft,
+  Activity as ActivityIcon,
+  Award,
   CalendarDays,
   Crown,
-  Loader2,
+  Info,
+  Link2,
+  Megaphone,
   MessageCircle,
-  MessageSquare,
+  MoreVertical,
   Pencil,
-  Rss,
+  Radio,
   Shield,
   ShieldBan,
   Share2,
   Target,
+  UserCheck,
+  UserMinus,
   UserPlus,
   Users,
 } from 'lucide-react';
@@ -23,20 +28,25 @@ import type { NostrEvent, NostrMetadata } from '@nostrify/nostrify';
 import { AddMemberDialog } from '@/components/AddMemberDialog';
 import { CreateCommunityDialog } from '@/components/CreateCommunityDialog';
 import { CreateCommunityEventDialog } from '@/components/CreateCommunityEventDialog';
+import { CreateActionDialog } from '@/components/CreateActionDialog';
+import { PeopleAvatarStack } from '@/components/PeopleAvatarStack';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { BanConfirmDialog } from '@/components/BanConfirmDialog';
 import { CommunityChatPanel } from '@/components/CommunityChatPanel';
-import { CommunityBadgePanel } from '@/components/CommunityBadgePanel';
+import { CommunityPulsePanel } from '@/components/CommunityPulsePanel';
+import { CommunityZapDialog } from '@/components/CommunityZapDialog';
+import { NoteContent } from '@/components/NoteContent';
+import { CommunityBadgeEditorDialog } from '@/components/CommunityBadgePanel';
 import { ComposeBox } from '@/components/ComposeBox';
-import { FeedEmptyState } from '@/components/FeedEmptyState';
 import { FollowToggleButton } from '@/components/FollowButton';
 import { CreateGoalDialog } from '@/components/CreateGoalDialog';
 import { MembersOnlyToggle } from '@/components/MembersOnlyToggle';
 import { NoteCard } from '@/components/NoteCard';
-import { PullToRefresh } from '@/components/PullToRefresh';
 import { ReplyComposeModal } from '@/components/ReplyComposeModal';
 import { ThreadedReplyList, type ReplyNode } from '@/components/ThreadedReplyList';
 import { useAuthor } from '@/hooks/useAuthor';
@@ -44,21 +54,18 @@ import { useAuthors } from '@/hooks/useAuthors';
 import { useComments } from '@/hooks/useComments';
 import { useCommunityBookmarks } from '@/hooks/useCommunityBookmarks';
 import { useCommunityEvents } from '@/hooks/useCommunityEvents';
+import { useCommunityActions } from '@/hooks/useCommunityActions';
 import { useCommunityMembers } from '@/hooks/useCommunityMembers';
 import { useCommunityGoals } from '@/hooks/useCommunityGoals';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
-import { useFeed } from '@/hooks/useFeed';
 import { useMembersOnlyFilter } from '@/hooks/useMembersOnlyFilter';
-import { useMuteList } from '@/hooks/useMuteList';
 import { useNow } from '@/hooks/useNow';
-import { usePageRefresh } from '@/hooks/usePageRefresh';
 import { useProfileUrl } from '@/hooks/useProfileUrl';
 import { useToast } from '@/hooks/useToast';
 import { CommunityModerationContext } from '@/contexts/CommunityModerationContext';
 import { useLayoutOptions } from '@/contexts/LayoutContext';
+import { LightningEffect, type LightningEffectHandle } from '@/components/LightningEffect';
 import { applyCommunityModerationToEvents, canBanTarget, getViewerAuthority, parseCommunityEvent, type CommunityMember } from '@/lib/communityUtils';
-import { isEventMuted } from '@/lib/muteHelpers';
-import { shouldHideFeedEvent, type FeedItem } from '@/lib/feedUtils';
 import { genUserName } from '@/lib/genUserName';
 import { sanitizeUrl } from '@/lib/sanitizeUrl';
 import { cn } from '@/lib/utils';
@@ -138,94 +145,6 @@ function ReplyCardSkeleton() {
   );
 }
 
-function CommunityMemberFeed({ authorPubkeys, isMembershipLoading }: { authorPubkeys: string[]; isMembershipLoading: boolean }) {
-  const { muteItems } = useMuteList();
-  const { ref: scrollRef, inView } = useInView({ threshold: 0, rootMargin: '400px' });
-  const queryKey = useMemo(() => ['feed', 'follows'], []);
-  const handleRefresh = usePageRefresh(queryKey);
-  const uniqueAuthors = useMemo(() => Array.from(new Set(authorPubkeys)), [authorPubkeys]);
-
-  const {
-    data: rawData,
-    isPending,
-    isLoading,
-    fetchNextPage,
-    hasNextPage,
-    isFetchingNextPage,
-  } = useFeed('follows', { authors: uniqueAuthors });
-
-  useEffect(() => {
-    if (inView && hasNextPage && !isFetchingNextPage) {
-      fetchNextPage();
-    }
-  }, [inView, hasNextPage, isFetchingNextPage, fetchNextPage]);
-
-  const feedItems = useMemo(() => {
-    if (!rawData?.pages) return [];
-    const seen = new Set<string>();
-
-    return (rawData.pages as { items: FeedItem[] }[])
-      .flatMap((page) => page.items)
-      .filter((item) => {
-        const key = item.repostedBy ? `repost-${item.repostedBy}-${item.event.id}` : item.event.id;
-        if (!key || seen.has(key)) return false;
-        seen.add(key);
-        if (shouldHideFeedEvent(item.event)) return false;
-        if (muteItems.length > 0 && isEventMuted(item.event, muteItems)) return false;
-        return true;
-      });
-  }, [rawData?.pages, muteItems]);
-
-  if (!isMembershipLoading && uniqueAuthors.length === 0) {
-    return (
-      <div className="py-12 text-center text-muted-foreground text-sm px-5">
-        No active members found.
-      </div>
-    );
-  }
-
-  if (isMembershipLoading || isPending || (isLoading && !rawData)) {
-    return (
-      <div className="divide-y divide-border">
-        {Array.from({ length: 5 }).map((_, i) => (
-          <ReplyCardSkeleton key={i} />
-        ))}
-      </div>
-    );
-  }
-
-  if (feedItems.length === 0) {
-    return (
-      <PullToRefresh onRefresh={handleRefresh}>
-        <FeedEmptyState message="No posts from active community members yet." />
-      </PullToRefresh>
-    );
-  }
-
-  return (
-    <PullToRefresh onRefresh={handleRefresh}>
-      <div>
-        {feedItems.map((item) => (
-          <NoteCard
-            key={item.repostedBy ? `repost-${item.repostedBy}-${item.event.id}` : item.event.id}
-            event={item.event}
-            repostedBy={item.repostedBy}
-          />
-        ))}
-        {hasNextPage && (
-          <div ref={scrollRef} className="py-4">
-            {isFetchingNextPage && (
-              <div className="flex justify-center">
-                <Loader2 className="size-5 animate-spin text-muted-foreground" />
-              </div>
-            )}
-          </div>
-        )}
-      </div>
-    </PullToRefresh>
-  );
-}
-
 function getTag(tags: string[][], name: string): string | undefined {
   return tags.find(([n]) => n === name)?.[1];
 }
@@ -265,18 +184,23 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
   const navigate = useNavigate();
   const { toast } = useToast();
   const { user } = useCurrentUser();
+  const lightningRef = useRef<LightningEffectHandle>(null);
 
   // ── Member ban dialog state ────────────────────────────────────────────────
   const [banDialogOpen, setBanDialogOpen] = useState(false);
   const [banTargetPubkey, setBanTargetPubkey] = useState<string | null>(null);
 
   // ── Tab + FAB state ────────────────────────────────────────────────────────
-  const [activeTab, setActiveTab] = useState('members');
+  const [activeTab, setActiveTab] = useState('activity');
   const [composeOpen, setComposeOpen] = useState(false);
   const [goalDialogOpen, setGoalDialogOpen] = useState(false);
+  const [actionDialogOpen, setActionDialogOpen] = useState(false);
   const [eventDialogOpen, setEventDialogOpen] = useState(false);
-  const [addMemberOpen, setAddMemberOpen] = useState(false);
   const [editCommunityOpen, setEditCommunityOpen] = useState(false);
+  const [membersDialogOpen, setMembersDialogOpen] = useState(false);
+  const [addMembersDialogOpen, setAddMembersDialogOpen] = useState(false);
+  const [badgeDialogOpen, setBadgeDialogOpen] = useState(false);
+  const [descriptionDialogOpen, setDescriptionDialogOpen] = useState(false);
 
   // Parse community definition
   const community = useMemo(() => parseCommunityEvent(event), [event]);
@@ -296,13 +220,34 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
     return description.replace(new RegExp(`\\s*${descriptionUrl.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\s*$`), '').trim();
   }, [description, descriptionUrl]);
 
+  // Whether to render the description info button next to the title — true
+  // whenever there's any description text or a stripped trailing URL.
+  const descriptionExpandable = !!descriptionText || !!descriptionUrl;
+
+  /**
+   * Synthesize a kind-1 pseudo-event so we can hand the description off to
+   * `NoteContent` for the same link / hashtag / nostr-URI / embed rendering
+   * used in NoteCard. Reuses the community event's `pubkey` and `id` to
+   * satisfy hooks inside `NoteContent` (author lookup, memo keys, etc.); the
+   * synthesized event is never published.
+   */
+  const descriptionPseudoEvent = useMemo<NostrEvent>(() => ({
+    id: `community-description-${event.id}`,
+    pubkey: event.pubkey,
+    kind: 1,
+    created_at: event.created_at,
+    tags: [],
+    content: description,
+    sig: '',
+  }), [description, event.id, event.pubkey, event.created_at]);
+
   // ── Members ─────────────────────────────────────────────────────────────────
   const { data: membership, moderation, rankMap, isLoading: membersLoading } = useCommunityMembers(community);
   const viewerMember = user ? getViewerAuthority(user.pubkey, rankMap, moderation) : undefined;
 
   // Founder can add moderators + members; moderators (rank 0) can add members
   const isFounder = !!user && user.pubkey === event.pubkey;
-  const canAddMembers = !!viewerMember && viewerMember.rank === 0;
+  const canAddMembers = isFounder || (!!viewerMember && viewerMember.rank === 0);
 
   // NIP-51 kind 10004 is the standard Communities list. In the UI this is
   // presented as following a community.
@@ -350,6 +295,7 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
   // ── Goals (NIP-75) ──────────────────────────────────────────────────────────
   const { data: goals, isLoading: goalsLoading } = useCommunityGoals(communityATag || undefined);
   const { data: communityEvents, isLoading: eventsLoading } = useCommunityEvents(communityATag || undefined);
+  const { data: communityActions, isLoading: actionsLoading } = useCommunityActions(communityATag || undefined);
   const now = useNow(60_000);
 
   /** Check if a goal event's `closed_at` deadline has passed. */
@@ -404,6 +350,61 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
     [eventItems, now],
   );
 
+  const actionEvents = useMemo(() => {
+    const moderated = applyCommunityModerationToEvents((communityActions ?? []).map((a) => a.event), moderation);
+    return membersOnly ? moderated.filter((e) => rankMap.has(e.pubkey)) : moderated;
+  }, [communityActions, moderation, membersOnly, rankMap]);
+  const activeActionEvents = useMemo(
+    () => actionEvents.filter((e) => {
+      const action = communityActions?.find((a) => a.event.id === e.id);
+      if (!action) return false;
+      return !action.deadline || action.deadline > now;
+    }),
+    [actionEvents, communityActions, now],
+  );
+  const pastActionEvents = useMemo(
+    () => actionEvents.filter((e) => {
+      const action = communityActions?.find((a) => a.event.id === e.id);
+      return !!action?.deadline && action.deadline <= now;
+    }),
+    [actionEvents, communityActions, now],
+  );
+
+  // ── Initiatives (Goals + Events merged into one chronological list) ───────
+  // Active items go first, sorted: future events ascending by start date,
+  // then active goals by creation date (newest first). Past items follow.
+  const activeInitiatives = useMemo(() => {
+    const items = [...activeGoals, ...activeEventItems, ...activeActionEvents];
+    return items.sort((a, b) => {
+      const aIsEvent = a.kind === 31922 || a.kind === 31923;
+      const bIsEvent = b.kind === 31922 || b.kind === 31923;
+      if (aIsEvent && bIsEvent) {
+        return getCalendarEventStart(a) - getCalendarEventStart(b);
+      }
+      if (aIsEvent) return -1;
+      if (bIsEvent) return 1;
+      return b.created_at - a.created_at;
+    });
+  }, [activeGoals, activeEventItems, activeActionEvents]);
+
+  const pastInitiatives = useMemo(() => {
+    const items = [...pastGoals, ...pastEventItems, ...pastActionEvents];
+    return items.sort((a, b) => {
+      // Newest-first by the relevant "end" timestamp.
+      const aEnd = a.kind === 36639
+        ? parseInt(a.tags.find(([n]) => n === 'deadline')?.[1] ?? String(a.created_at), 10)
+        : a.kind === 31922 || a.kind === 31923
+        ? getCalendarEventEnd(a)
+        : parseInt(a.tags.find(([n]) => n === 'closed_at')?.[1] ?? String(a.created_at), 10);
+      const bEnd = b.kind === 36639
+        ? parseInt(b.tags.find(([n]) => n === 'deadline')?.[1] ?? String(b.created_at), 10)
+        : b.kind === 31922 || b.kind === 31923
+        ? getCalendarEventEnd(b)
+        : parseInt(b.tags.find(([n]) => n === 'closed_at')?.[1] ?? String(b.created_at), 10);
+      return bEnd - aEnd;
+    });
+  }, [pastGoals, pastEventItems, pastActionEvents]);
+
   const replyTree = useMemo((): ReplyNode[] => {
     if (!commentsData) return [];
     const topLevel = commentsData.topLevelComments ?? [];
@@ -439,6 +440,30 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
       .map((r) => buildNode(r));
   }, [commentsData, moderation, membersOnly, rankMap]);
 
+  // ── Activity feed — merge active initiatives with top-level discussion
+  // posts into one chronological stream (newest first). Each entry is tagged
+  // so the renderer can dispatch to NoteCard (initiative) or
+  // ThreadedReplyList (discussion subtree).
+  type ActivityItem =
+    | { kind: 'initiative'; event: NostrEvent; ts: number }
+    | { kind: 'discussion'; node: ReplyNode; ts: number };
+
+  const activityItems = useMemo((): ActivityItem[] => {
+    const items: ActivityItem[] = [
+      ...activeInitiatives.map((ev) => ({
+        kind: 'initiative' as const,
+        event: ev,
+        ts: ev.created_at,
+      })),
+      ...replyTree.map((node) => ({
+        kind: 'discussion' as const,
+        node,
+        ts: node.event.created_at,
+      })),
+    ];
+    return items.sort((a, b) => b.ts - a.ts);
+  }, [activeInitiatives, replyTree]);
+
   // ── Share handler ───────────────────────────────────────────────────────────
   const handleShare = useCallback(async () => {
     const d = event.tags.find(([n]) => n === 'd')?.[1] ?? '';
@@ -456,35 +481,55 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
     }
   }, [event, toast]);
 
-  // ── FAB — visible on comments, goals, and members tabs ─────────────────────
-  const handleFabClick = useCallback(() => {
-    if (activeTab === 'comments') {
-      setComposeOpen(true);
-    } else if (activeTab === 'goals') {
-      setGoalDialogOpen(true);
-    } else if (activeTab === 'events') {
-      setEventDialogOpen(true);
-    } else if (activeTab === 'members') {
-      setAddMemberOpen(true);
-    }
-  }, [activeTab]);
+  // ── FAB — opens a floating action menu anchored to the FAB itself ─────────
+  // Visible on tabs whose surfaces accept user-authored content.
+  const fabAvailable = activeTab === 'activity';
 
-  const fabIcon = activeTab === 'goals'
-    ? <Target strokeWidth={3} size={18} />
-    : activeTab === 'members'
-      ? <UserPlus className="size-5" />
-      : activeTab === 'events'
-        ? <CalendarDays className="size-5" />
-        : undefined; // default Plus icon for comments
+  const fabMenu = useMemo(() => {
+    if (!fabAvailable) return undefined;
+    return [
+      {
+        id: 'new-post',
+        label: 'New post',
+        icon: <MessageCircle className="size-4" />,
+        onSelect: () => {
+          setActiveTab('activity');
+          setComposeOpen(true);
+        },
+      },
+      {
+        id: 'new-goal',
+        label: 'New goal',
+        icon: <Target className="size-4" />,
+        onSelect: () => {
+          setActiveTab('activity');
+          setGoalDialogOpen(true);
+        },
+      },
+      {
+        id: 'new-action',
+        label: 'New action',
+        icon: <Megaphone className="size-4" />,
+        onSelect: () => {
+          setActiveTab('activity');
+          setActionDialogOpen(true);
+        },
+      },
+      {
+        id: 'new-event',
+        label: 'New event',
+        icon: <CalendarDays className="size-4" />,
+        onSelect: () => {
+          setActiveTab('activity');
+          setEventDialogOpen(true);
+        },
+      },
+    ];
+  }, [fabAvailable]);
 
   useLayoutOptions({
-    showFAB:
-      activeTab === 'comments'
-      || activeTab === 'goals'
-      || activeTab === 'events'
-      || (activeTab === 'members' && canAddMembers),
-    onFabClick: handleFabClick,
-    fabIcon,
+    showFAB: fabAvailable,
+    fabMenu,
   });
 
   const moderationCtx = useMemo(
@@ -492,186 +537,232 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
     [communityATag, moderation, rankMap],
   );
 
+  const handleCommunityZapLaunched = useCallback(() => {
+    lightningRef.current?.triggerLightning({ strikes: 4 });
+  }, []);
+
   // ── Render ──────────────────────────────────────────────────────────────────
   const heroIconClassName = 'size-5 text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.85)]';
-  const actionButtonClassName = 'p-2 rounded-full text-muted-foreground hover:bg-secondary hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50 disabled:pointer-events-none transition-colors';
+  const bannerActionClassName = 'p-2 rounded-full text-white/90 hover:text-white hover:bg-white/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80 disabled:opacity-50 disabled:pointer-events-none transition-colors';
 
   return (
     <div className="max-w-2xl mx-auto pb-16">
-      {/* ── Hero image ── */}
-      <div className="relative h-32 w-full overflow-hidden sm:h-40">
-        {image ? (
-          <img src={image} alt={name} className="w-full h-full object-cover" />
-        ) : (
-          <div className="absolute inset-0 bg-gradient-to-br from-primary/50 via-primary/25 to-primary/5" />
-        )}
-        <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/10 to-transparent" />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
-        {!image && (
-          <Users className="size-12 text-primary/20 sm:size-16" />
-        )}
+      <LightningEffect ref={lightningRef} />
+      <CommunityModerationContext.Provider value={moderationCtx}>
+        <Tabs value={activeTab} onValueChange={setActiveTab}>
+      {/* ── Hero banner + tabs share a single image/gradient backdrop so the
+          banner image continues underneath the tab strip and fades into the
+          page background — eliminating the seam between the two. ── */}
+      <div className="relative isolate overflow-hidden">
+        {/* Shared backdrop — image (or fallback gradient) + darkening overlay
+            that spans the full height of (banner + tabs) and fades to the
+            page background at its bottom edge. */}
+        <div aria-hidden className="absolute inset-0 -z-10">
+          {image ? (
+            <img src={image} alt="" className="absolute inset-0 w-full h-full object-cover" />
+          ) : (
+            <div className="absolute inset-0 bg-gradient-to-br from-primary/50 via-primary/25 to-primary/5" />
+          )}
+          {/* Darkening overlay that fades to the page background at the
+              bottom of the tab strip — makes tab text legible and erases the
+              hard seam between banner and tabs. Stops push the heavy darkness
+              down so it sits behind the tabs, not over the banner. */}
+          <div className="absolute inset-0 bg-[linear-gradient(to_bottom,transparent_0%,transparent_15%,rgba(0,0,0,0.9)_75%,rgba(0,0,0,0.9)_97%,hsl(var(--background))_100%)]" />
+        </div>
 
-        {/* ── Top bar ── */}
-        <div className="absolute left-0 top-0 z-10 px-4 pt-4">
+        {/* Banner — fixed aspect ratio, title/description/buttons overlaid */}
+        <div className="relative w-full aspect-[2/1] sm:aspect-[21/9]">
+          {!image && (
+            <div className="absolute inset-0 flex items-center justify-center">
+              <Users className="size-16 text-primary/20 sm:size-20" />
+            </div>
+          )}
+          {/* Extra top/bottom darkening on the hero specifically (above the
+              shared overlay) so overlaid title/description stay legible. */}
+          <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-transparent via-transparent to-black/40" />
+
+        {/* Top bar — back button (left) + follow toggle (right) */}
+        <div className="absolute left-0 right-0 top-0 z-10 flex items-center justify-between px-4 pt-4">
           <button
             onClick={() => window.history.length > 1 ? navigate(-1) : navigate('/')}
-            className="p-2 -ml-2 rounded-full hover:bg-black/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80 transition-colors"
+            className="p-2 -ml-2 rounded-full hover:bg-black/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80 transition-colors"
             aria-label="Go back"
           >
             <ArrowLeft className={heroIconClassName} />
           </button>
-        </div>
-
-        <div className="absolute bottom-0 left-0 right-0 px-5 pb-3">
-          <h2 className="text-xl font-bold text-white leading-tight drop-shadow-lg sm:text-2xl">{name}</h2>
-        </div>
-      </div>
-
-      {/* ── Community info ── */}
-      <div className="px-5 mt-3 space-y-3">
-        {/* Description */}
-        {descriptionText && (
-          <p className="line-clamp-3 text-sm leading-relaxed text-muted-foreground whitespace-pre-wrap">{descriptionText}</p>
-        )}
-
-        <div className="flex items-center justify-between gap-3">
           {user && communityATag && (
             <FollowToggleButton
               size="sm"
               isFollowing={communityFollowed}
               isPending={toggleCommunityFollow.isPending}
               onClick={handleToggleFollow}
+              icon={<UserPlus className="size-4" />}
+              followingIcon={
+                <>
+                  <UserCheck className="size-4 group-hover:hidden group-focus-visible:hidden" />
+                  <UserMinus className="size-4 hidden group-hover:inline group-focus-visible:inline" />
+                </>
+              }
+              hoverToUnfollow
+              className={cn(
+                'shadow-md',
+                !communityFollowed && 'bg-white text-black hover:bg-white/90',
+                communityFollowed && 'bg-black/30 backdrop-blur-sm border-white/40 text-white hover:bg-destructive/30 hover:text-white hover:border-destructive/60',
+              )}
             />
           )}
-          <div className="ml-auto flex items-center gap-1">
-            <MembersOnlyToggle />
-            {isFounder && community && (
-              <button
-                type="button"
-                className={actionButtonClassName}
-                onClick={() => setEditCommunityOpen(true)}
-                aria-label="Edit community"
-              >
-                <Pencil className="size-5" />
-              </button>
-            )}
-            <button
-              type="button"
-              className={actionButtonClassName}
-              onClick={handleShare}
-              aria-label="Share"
-            >
-              <Share2 className="size-5" />
-            </button>
-          </div>
         </div>
 
-        {/* ── Tabs ── */}
-        <CommunityModerationContext.Provider value={moderationCtx}>
-          <Tabs value={activeTab} onValueChange={setActiveTab} className="-mx-5">
-            <TabsList className="w-full justify-start overflow-x-auto scrollbar-none rounded-none border-b border-border bg-transparent p-0 h-auto">
-              <TabsTrigger
-                value="members"
-                className="flex-none min-w-fit rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none px-4 pb-3 pt-2"
-              >
-                <Users className="size-4 mr-1.5" />
-                Members
-              </TabsTrigger>
-              <TabsTrigger
-                value="chat"
-                className="flex-none min-w-fit rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none px-4 pb-3 pt-2"
-              >
-                <MessageSquare className="size-4 mr-1.5" />
-                Chat
-              </TabsTrigger>
-              <TabsTrigger
-                value="feed"
-                className="flex-none min-w-fit rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none px-4 pb-3 pt-2"
-              >
-                <Rss className="size-4 mr-1.5" />
-                Feed
-              </TabsTrigger>
-              <TabsTrigger
-                value="comments"
-                className="flex-none min-w-fit rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none px-4 pb-3 pt-2"
-              >
-                <MessageCircle className="size-4 mr-1.5" />
-                Posts
-              </TabsTrigger>
-              <TabsTrigger
-                value="goals"
-                className="flex-none min-w-fit rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none px-4 pb-3 pt-2"
-              >
-                <Target className="size-4 mr-1.5" />
-                Goals
-              </TabsTrigger>
-              <TabsTrigger
-                value="events"
-                className="flex-none min-w-fit rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none px-4 pb-3 pt-2"
-              >
-                <CalendarDays className="size-4 mr-1.5" />
-                Events
-              </TabsTrigger>
-            </TabsList>
-
-            {/* ── Members tab ── */}
-            <TabsContent value="members" className="mt-0">
-              {community && (
-                <section className="border-b border-border px-5 py-4">
-                  <CommunityBadgePanel
-                    communityEvent={event}
-                    community={community}
-                    isFounder={isFounder}
-                  />
-                </section>
+        {/* Member stack sits ABOVE the title; the title row carries the Info
+            button (left of name) and action buttons (right). Description has
+            moved behind an Info button to reduce banner clutter. */}
+        <div className="absolute bottom-0 left-0 right-0 px-5 pb-3 pt-8 [text-shadow:0_1px_4px_rgba(0,0,0,0.7),0_2px_8px_rgba(0,0,0,0.4)]">
+          <div className="flex [text-shadow:none]">
+            {/* Avatar stack — clickable to open full members dialog */}
+            <button
+              type="button"
+              onClick={() => setMembersDialogOpen(true)}
+              className="flex items-center gap-2 -ml-1 px-1 py-1 rounded-md hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80 transition-colors min-w-0"
+              aria-label="Show all members"
+            >
+              <PeopleAvatarStack
+                pubkeys={allMemberPubkeys}
+                maxVisible={6}
+                size="sm"
+                className="[&_.ring-2]:ring-black/40 pointer-events-none"
+              />
+              {allMemberPubkeys.length > 0 && (
+                <span className="text-xs font-medium text-white/90 [text-shadow:0_1px_3px_rgba(0,0,0,0.7)] truncate">
+                  {allMemberPubkeys.length} member{allMemberPubkeys.length !== 1 ? 's' : ''}
+                </span>
               )}
-
-              {membersLoading ? (
-                <MembersSkeleton />
-              ) : memberSections.length === 0 ? (
-                <div className="py-12 text-center text-muted-foreground text-sm px-5">
-                  No members found.
-                </div>
-              ) : (
-                <div className="divide-y divide-border">
-                  {memberSections.map(({ key, label, members }) => (
-                    <section key={key} className="px-5 py-4">
-                      <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-3 flex items-center gap-2">
-                        {key === 'leadership' ? <Crown className="size-3.5 text-amber-500" /> : <Shield className="size-3.5" />}
-                        {label}
-                        <span className="text-muted-foreground/60 font-normal">({members.length})</span>
-                      </h3>
-                      <div className="space-y-0.5">
-                        {members.map((m) => {
-                          let roleLabel: string | undefined;
-                          if (m.rank === 0) {
-                            roleLabel = m.pubkey === event.pubkey ? 'Founder' : 'Moderator';
-                          }
-                          // Determine if the current user can ban this member
-                          const canBanMember = viewerMember
-                            && m.pubkey !== user?.pubkey
-                            && canBanTarget(viewerMember, m);
-                          return (
-                            <PersonRow
-                              key={m.pubkey}
-                              pubkey={m.pubkey}
-                              label={roleLabel}
-                              size="sm"
-                              onBan={canBanMember ? () => {
-                                setBanTargetPubkey(m.pubkey);
-                                setBanDialogOpen(true);
-                              } : undefined}
-                            />
-                          );
-                        })}
-                      </div>
-                    </section>
-                  ))}
-                </div>
+            </button>
+          </div>
+          <div className="mt-1.5 flex items-end justify-between gap-2">
+            <div className="flex items-center gap-1.5 min-w-0">
+              <h2 className="text-xl font-bold text-white leading-tight sm:text-2xl truncate">{name}</h2>
+              {descriptionExpandable && (
+                <button
+                  type="button"
+                  onClick={() => setDescriptionDialogOpen(true)}
+                  className="-my-1 -mr-1 p-1 rounded-full text-white/75 hover:text-white hover:bg-white/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80 transition-colors"
+                  aria-label="About this community"
+                >
+                  <Info className="size-4 [text-shadow:none] drop-shadow-[0_1px_2px_rgba(0,0,0,0.85)]" />
+                </button>
               )}
-            </TabsContent>
+            </div>
 
-            {/* ── Chat tab ── */}
+            {/* Banner action row — MembersOnly + Zap + Share + overflow menu */}
+            <div className="flex items-center gap-0.5 shrink-0 [text-shadow:none]">
+              <MembersOnlyToggle
+                className="text-white/90 hover:text-white hover:bg-white/15 data-[state=on]:text-white"
+              />
+              {community && membership && (
+                <CommunityZapDialog
+                  community={community}
+                  members={membership.members}
+                  membersLoading={membersLoading}
+                  triggerClassName={bannerActionClassName}
+                  onZapLaunched={handleCommunityZapLaunched}
+                />
+              )}
+              {community && membership && (
+                <CommunityZapDialog
+                  community={community}
+                  members={membership.members}
+                  membersLoading={membersLoading}
+                  mode="bitcoin"
+                  triggerClassName={bannerActionClassName}
+                  triggerIcon={<Link2 className="size-5" />}
+                  onZapLaunched={handleCommunityZapLaunched}
+                />
+              )}
+              <button
+                type="button"
+                className={bannerActionClassName}
+                onClick={handleShare}
+                aria-label="Share"
+              >
+                <Share2 className="size-5" />
+              </button>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <button
+                    type="button"
+                    className={bannerActionClassName}
+                    aria-label="More actions"
+                  >
+                    <MoreVertical className="size-5" />
+                  </button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" side="top" sideOffset={6} className="min-w-[180px]">
+                  <DropdownMenuItem onSelect={() => setMembersDialogOpen(true)}>
+                    <Users className="size-4 mr-2" />
+                    View members
+                  </DropdownMenuItem>
+                  {canAddMembers && community && (
+                    <DropdownMenuItem onSelect={() => setAddMembersDialogOpen(true)}>
+                      <UserPlus className="size-4 mr-2" />
+                      Add members
+                    </DropdownMenuItem>
+                  )}
+                  {isFounder && community && (
+                    <>
+                      <DropdownMenuItem onSelect={() => setBadgeDialogOpen(true)}>
+                        <Award className="size-4 mr-2" />
+                        Edit badge
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onSelect={() => setEditCommunityOpen(true)}>
+                        <Pencil className="size-4 mr-2" />
+                        Edit community
+                      </DropdownMenuItem>
+                    </>
+                  )}
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* ── Tabs ── */}
+          <TabsList className="w-full justify-stretch rounded-none border-b border-white/15 bg-transparent p-0 h-auto">
+            <TabsTrigger
+              value="activity"
+              className="flex-1 min-w-0 rounded-none border-b-2 border-transparent text-white/75 hover:text-white data-[state=active]:text-white data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none px-4 pb-3 pt-2 [text-shadow:0_1px_3px_rgba(0,0,0,0.6)]"
+            >
+              <ActivityIcon className="size-4 mr-1.5" />
+              Activity
+            </TabsTrigger>
+            <TabsTrigger
+              value="pulse"
+              className="flex-1 min-w-0 rounded-none border-b-2 border-transparent text-white/75 hover:text-white data-[state=active]:text-white data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none px-4 pb-3 pt-2 [text-shadow:0_1px_3px_rgba(0,0,0,0.6)]"
+            >
+              <Radio className="size-4 mr-1.5" />
+              Pulse
+            </TabsTrigger>
+            <TabsTrigger
+              value="chat"
+              className="flex-1 min-w-0 rounded-none border-b-2 border-transparent text-white/75 hover:text-white data-[state=active]:text-white data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none px-4 pb-3 pt-2 [text-shadow:0_1px_3px_rgba(0,0,0,0.6)]"
+            >
+              <MessageCircle className="size-4 mr-1.5" />
+              Chat
+            </TabsTrigger>
+          </TabsList>
+      </div>
+      {/* ── /shared banner+tabs backdrop wrapper ── */}
+
+          {/* Sublabel for the currently-active tab. Only rendered when the
+              tab has a descriptor to show — keeps the rest of the tab strip
+              clean. */}
+          {activeTab === 'pulse' && (
+            <div className="px-5 py-2 text-xs text-muted-foreground text-center">
+              What members are posting elsewhere across Nostr.
+            </div>
+          )}
+
+            {/* ── Chat tab — community kind-9 messages ── */}
             <TabsContent value="chat" className="mt-0">
               {communityATag ? (
                 <CommunityChatPanel
@@ -687,109 +778,174 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
               )}
             </TabsContent>
 
-            {/* ── Feed tab ── */}
-            <TabsContent value="feed" className="mt-0">
-              <CommunityMemberFeed
-                authorPubkeys={allMemberPubkeys}
-                isMembershipLoading={membersLoading}
-              />
-            </TabsContent>
-
-            {/* ── Comments tab ── */}
-            <TabsContent value="comments" className="mt-0">
+            {/* ── Activity tab — chronological stream of initiatives
+                  (actions + goals + events) interleaved with threaded NIP-22 discussion,
+                 followed by past initiatives. ── */}
+            <TabsContent value="activity" className="mt-0">
               <ComposeBox compact replyTo={event} />
 
-              {commentsLoading ? (
+              {(commentsLoading || goalsLoading || eventsLoading || actionsLoading) ? (
                 <div className="divide-y divide-border">
                   {Array.from({ length: 3 }).map((_, i) => (
                     <ReplyCardSkeleton key={i} />
                   ))}
                 </div>
-              ) : replyTree.length > 0 ? (
-                <ThreadedReplyList roots={replyTree} />
-              ) : membersOnly && commentsData && (commentsData.topLevelComments?.length ?? 0) > 0 ? (
+              ) : activityItems.length === 0 && pastInitiatives.length === 0 ? (
                 <div className="py-12 text-center text-muted-foreground text-sm px-5">
-                  No comments from community members yet. Toggle the shield icon to see all comments.
-                </div>
-              ) : (
-                <div className="py-12 text-center text-muted-foreground text-sm">
-                  No comments yet. Be the first to comment!
-                </div>
-              )}
-            </TabsContent>
-
-            {/* ── Goals tab ── */}
-            <TabsContent value="goals" className="mt-0">
-              {goalsLoading ? (
-                <div className="divide-y divide-border">
-                  {Array.from({ length: 2 }).map((_, i) => (
-                    <ReplyCardSkeleton key={i} />
-                  ))}
-                </div>
-              ) : activeGoals.length === 0 && pastGoals.length === 0 ? (
-                <div className="py-12 text-center text-muted-foreground text-sm px-5">
-                  {membersOnly && (goals ?? []).length > 0
-                    ? 'No goals from community members yet. Toggle the shield icon to see all goals.'
-                    : <>No goals yet.{user ? ' Create one to get started!' : ''}</>}
+                  {membersOnly && (
+                    (commentsData && (commentsData.topLevelComments?.length ?? 0) > 0) ||
+                    (goals ?? []).length > 0 ||
+                    (communityActions ?? []).length > 0 ||
+                    (communityEvents ?? []).length > 0
+                  )
+                    ? 'No activity from community members yet. Toggle the shield icon to see everything.'
+                    : <>No activity yet.{user ? ' Start a discussion, create an action, set a goal, or schedule an event!' : ''}</>}
                 </div>
               ) : (
                 <div className="divide-y divide-border">
-                  {/* Active goals first */}
-                  {activeGoals.map((e) => (
-                    <NoteCard key={e.id} event={e} />
-                  ))}
+                  {activityItems.map((item) =>
+                    item.kind === 'initiative' ? (
+                      <NoteCard key={item.event.id} event={item.event} />
+                    ) : (
+                      <ThreadedReplyList key={item.node.event.id} roots={[item.node]} />
+                    )
+                  )}
 
-                  {/* Past/expired goals */}
-                  {pastGoals.length > 0 && activeGoals.length > 0 && (
+                  {pastInitiatives.length > 0 && (
                     <div className="px-5 pt-4 pb-1">
                       <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
-                        Past Goals
+                        Past
                       </h4>
                     </div>
                   )}
-                  {pastGoals.map((e) => (
+                  {pastInitiatives.map((e) => (
                     <NoteCard key={e.id} event={e} />
                   ))}
                 </div>
               )}
             </TabsContent>
 
-            {/* ── Events tab ── */}
-            <TabsContent value="events" className="mt-0">
-              {eventsLoading ? (
-                <div className="divide-y divide-border">
-                  {Array.from({ length: 3 }).map((_, i) => (
-                    <ReplyCardSkeleton key={i} />
-                  ))}
-                </div>
-              ) : activeEventItems.length === 0 && pastEventItems.length === 0 ? (
-                <div className="py-12 text-center text-muted-foreground text-sm px-5">
-                  {membersOnly && (communityEvents ?? []).length > 0
-                    ? 'No events from community members yet. Toggle the shield icon to see all events.'
-                    : <>No events yet.{user ? ' Create one to get started!' : ''}</>}
-                </div>
+            {/* ── Pulse tab — what community members are posting elsewhere
+                 across Nostr. Excludes events tagged with this community's
+                 `a` reference. ── */}
+            <TabsContent value="pulse" className="mt-0">
+              {communityATag ? (
+                <CommunityPulsePanel
+                  communityATag={communityATag}
+                  memberPubkeys={allMemberPubkeys}
+                  isMembershipLoading={membersLoading}
+                />
               ) : (
-                <div className="divide-y divide-border">
-                  {activeEventItems.map((e) => (
-                    <NoteCard key={e.id} event={e} />
-                  ))}
-
-                  {pastEventItems.length > 0 && activeEventItems.length > 0 && (
-                    <div className="px-5 pt-4 pb-1">
-                      <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
-                        Past Events
-                      </h4>
-                    </div>
-                  )}
-                  {pastEventItems.map((e) => (
-                    <NoteCard key={e.id} event={e} />
-                  ))}
+                <div className="py-12 text-center text-muted-foreground text-sm px-5">
+                  Pulse is unavailable for this community.
                 </div>
               )}
             </TabsContent>
           </Tabs>
         </CommunityModerationContext.Provider>
-      </div>
+
+      {/* Description dialog — opened by clicking the truncated description in
+          the banner. Renders the full raw description plus a clickable
+          website link when the description ends with a URL. */}
+      <Dialog open={descriptionDialogOpen} onOpenChange={setDescriptionDialogOpen}>
+        <DialogContent className="max-w-lg max-h-[85vh] flex flex-col overflow-hidden p-0 gap-0">
+          <DialogHeader className="px-5 pt-5 pb-3 border-b border-border shrink-0">
+            <DialogTitle>About {name}</DialogTitle>
+          </DialogHeader>
+          <div className="px-5 py-4 overflow-y-auto">
+            {description ? (
+              <NoteContent
+                event={descriptionPseudoEvent}
+                className="text-sm leading-relaxed break-words"
+              />
+            ) : (
+              <p className="text-sm text-muted-foreground">No description provided.</p>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Members dialog — opened from the avatar stack or overflow menu. */}
+      <Dialog open={membersDialogOpen} onOpenChange={setMembersDialogOpen}>
+        <DialogContent className="max-w-lg max-h-[85vh] flex flex-col overflow-hidden p-0 gap-0">
+          <DialogHeader className="px-5 pt-5 pb-3 border-b border-border shrink-0">
+            <DialogTitle className="flex items-center gap-2">
+              <Users className="size-5" />
+              Members
+              {allMemberPubkeys.length > 0 && (
+                <span className="text-muted-foreground font-normal text-sm">({allMemberPubkeys.length})</span>
+              )}
+            </DialogTitle>
+          </DialogHeader>
+
+          <div className="flex-1 overflow-y-auto">
+            {membersLoading ? (
+              <MembersSkeleton />
+            ) : memberSections.length === 0 ? (
+              <div className="py-12 text-center text-muted-foreground text-sm px-5">
+                No members found.
+              </div>
+            ) : (
+              <div className="divide-y divide-border">
+                {memberSections.map(({ key, label, members }) => (
+                  <section key={key} className="px-5 py-4">
+                    <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-3 flex items-center gap-2">
+                      {key === 'leadership' ? <Crown className="size-3.5 text-amber-500" /> : <Shield className="size-3.5" />}
+                      {label}
+                      <span className="text-muted-foreground/60 font-normal">({members.length})</span>
+                    </h3>
+                    <div className="space-y-0.5">
+                      {members.map((m) => {
+                        let roleLabel: string | undefined;
+                        if (m.rank === 0) {
+                          roleLabel = m.pubkey === event.pubkey ? 'Founder' : 'Moderator';
+                        }
+                        const canBanMember = viewerMember
+                          && m.pubkey !== user?.pubkey
+                          && canBanTarget(viewerMember, m);
+                        return (
+                          <PersonRow
+                            key={m.pubkey}
+                            pubkey={m.pubkey}
+                            label={roleLabel}
+                            size="sm"
+                            onBan={canBanMember ? () => {
+                              setBanTargetPubkey(m.pubkey);
+                              setBanDialogOpen(true);
+                            } : undefined}
+                          />
+                        );
+                      })}
+                    </div>
+                  </section>
+                ))}
+              </div>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Add members dialog — founder/moderator only. */}
+      {canAddMembers && community && (
+        <AddMemberDialog
+          open={addMembersDialogOpen}
+          onOpenChange={setAddMembersDialogOpen}
+          communityEvent={event}
+          community={community}
+          isFounder={isFounder}
+          existingMemberPubkeys={allMemberPubkeys}
+        />
+      )}
+
+      {/* Member badge editor — founder only. */}
+      {isFounder && community && (
+        <CommunityBadgeEditorDialog
+          open={badgeDialogOpen}
+          onOpenChange={setBadgeDialogOpen}
+          communityEvent={event}
+          community={community}
+        />
+      )}
 
       {/* Member ban confirmation dialog */}
       {banTargetPubkey && communityATag && (
@@ -823,22 +979,18 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
 
       {/* FAB-triggered event creation dialog for the events tab */}
       {communityATag && (
+        <CreateActionDialog
+          communityATag={communityATag}
+          open={actionDialogOpen}
+          onOpenChange={setActionDialogOpen}
+        />
+      )}
+
+      {communityATag && (
         <CreateCommunityEventDialog
           communityATag={communityATag}
           open={eventDialogOpen}
           onOpenChange={setEventDialogOpen}
-        />
-      )}
-
-      {/* Add member dialog */}
-      {canAddMembers && community && (
-        <AddMemberDialog
-          open={addMemberOpen}
-          onOpenChange={setAddMemberOpen}
-          communityEvent={event}
-          community={community}
-          isFounder={isFounder}
-          existingMemberPubkeys={allMemberPubkeys}
         />
       )}
 

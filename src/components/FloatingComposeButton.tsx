@@ -7,8 +7,10 @@ import {
   DialogContent,
   DialogTitle,
 } from '@/components/ui/dialog';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { FabButton } from '@/components/FabButton';
+import type { FabMenuItem } from '@/contexts/LayoutContext';
 
 // Lazy-load the compose modal (pulls in emoji-mart ~620K)
 const ReplyComposeModal = lazy(() => import('@/components/ReplyComposeModal').then(m => ({ default: m.ReplyComposeModal })));
@@ -24,16 +26,72 @@ interface FloatingComposeButtonProps {
   onFabClick?: () => void;
   /** If set, overrides the default Plus icon. */
   icon?: React.ReactNode;
+  /** If set, the FAB opens an anchored popover with these items. */
+  menu?: FabMenuItem[];
 }
 
-export function FloatingComposeButton({ kind = 1, href, onFabClick, icon }: FloatingComposeButtonProps) {
+export function FloatingComposeButton({ kind = 1, href, onFabClick, icon, menu }: FloatingComposeButtonProps) {
   const { user } = useCurrentUser();
   const navigate = useNavigate();
   const [composeOpen, setComposeOpen] = useState(false);
   const [comingSoonOpen, setComingSoonOpen] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
 
   if (!user) {
     return null;
+  }
+
+  const renderedIcon = icon ?? <Plus strokeWidth={4} size={16} />;
+
+  // ── Menu mode — anchor a Popover to the FAB itself ────────────────────────
+  if (menu && menu.length > 0) {
+    return (
+      <Popover open={menuOpen} onOpenChange={setMenuOpen}>
+        <PopoverTrigger asChild>
+          <button
+            type="button"
+            aria-label="Add"
+            aria-expanded={menuOpen}
+            aria-haspopup="menu"
+            className="relative size-16 transition-transform hover:scale-105 active:scale-95 disabled:opacity-40 disabled:pointer-events-none"
+            style={{ filter: 'drop-shadow(0 2px 8px hsl(var(--primary) / 0.25))' }}
+          >
+            <div className="absolute inset-0 bg-primary rounded-full" />
+            <span className="absolute inset-0 flex items-center justify-center text-primary-foreground">
+              {renderedIcon}
+            </span>
+          </button>
+        </PopoverTrigger>
+        <PopoverContent
+          side="top"
+          align="end"
+          sideOffset={12}
+          className="w-auto min-w-[180px] p-1.5 rounded-2xl"
+        >
+          <div role="menu" aria-label="Add" className="flex flex-col gap-0.5">
+            {menu.map((item) => (
+              <button
+                key={item.id}
+                type="button"
+                role="menuitem"
+                onClick={() => {
+                  setMenuOpen(false);
+                  item.onSelect();
+                }}
+                className="group flex items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium text-foreground hover:bg-primary hover:text-primary-foreground focus-visible:bg-primary focus-visible:text-primary-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring transition-colors text-left"
+              >
+                {item.icon && (
+                  <span className="text-primary shrink-0 group-hover:text-primary-foreground group-focus-visible:text-primary-foreground transition-colors">
+                    {item.icon}
+                  </span>
+                )}
+                <span>{item.label}</span>
+              </button>
+            ))}
+          </div>
+        </PopoverContent>
+      </Popover>
+    );
   }
 
   const handleClick = () => {
@@ -52,7 +110,7 @@ export function FloatingComposeButton({ kind = 1, href, onFabClick, icon }: Floa
     <>
       <FabButton
         onClick={handleClick}
-        icon={icon ?? <Plus strokeWidth={4} size={16} />}
+        icon={renderedIcon}
       />
 
       {/* Kind 1: Compose modal (lazy-loaded) */}

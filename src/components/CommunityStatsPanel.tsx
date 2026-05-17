@@ -55,11 +55,22 @@ export function CommunityStatsPanel({ countryCode, className, compact = false }:
 
   const [tf, setTf] = useState<StatsTimeframe>('7d');
 
-  if (isLoading && !stats) return <PanelSkeleton className={className} />;
+  if (isLoading && !stats) return <PanelSkeleton className={className} compact={compact} />;
   if (!stats) return null;
 
   return (
-    <section className={cn('rounded-2xl border border-border bg-background/40 p-4 space-y-4', className)}>
+    <section
+      className={cn(
+        // Standalone usage gets a card-style border. Compact usage is
+        // embedded inside another bordered surface (the world discovery
+        // modal / docked panel) where an extra border produces a
+        // box-in-a-box look — drop it and rely on spacing alone.
+        compact
+          ? 'space-y-4'
+          : 'rounded-2xl border border-border bg-background/40 p-4 space-y-4',
+        className,
+      )}
+    >
       <PanelHeader stats={stats} timeframe={tf} onTimeframeChange={setTf} />
       <AggregateCounts stats={stats} timeframe={tf} compact={compact} />
       <Leaderboards stats={stats} timeframe={tf} compact={compact} />
@@ -371,9 +382,16 @@ function RankBadge({ rank }: { rank: number }) {
 
 // ── Skeleton ─────────────────────────────────────────────────────────────────
 
-function PanelSkeleton({ className }: { className?: string }) {
+function PanelSkeleton({ className, compact }: { className?: string; compact?: boolean }) {
   return (
-    <section className={cn('rounded-2xl border border-border bg-background/40 p-4 space-y-4', className)}>
+    <section
+      className={cn(
+        compact
+          ? 'space-y-4'
+          : 'rounded-2xl border border-border bg-background/40 p-4 space-y-4',
+        className,
+      )}
+    >
       <Skeleton className="h-5 w-40" />
       <div className="grid grid-cols-2 sm:grid-cols-5 gap-2">
         {Array.from({ length: 5 }).map((_, i) => (

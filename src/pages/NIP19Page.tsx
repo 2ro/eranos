@@ -6,7 +6,7 @@ import NotFound from './NotFound';
 import { ProfilePage } from './ProfilePage';
 import { PostDetailPage, AddrPostDetailPage, PostDetailShell, PostDetailSkeleton } from './PostDetailPage';
 import { ListDetailPage } from './ListDetailPage';
-import { ChallengeDetailPage } from './ChallengeDetailPage';
+import { ActionDetailPage } from './ActionDetailPage';
 import type { AddressPointer } from 'nostr-tools/nip19';
 
 const HEX_64_RE = /^[0-9a-f]{64}$/;
@@ -118,7 +118,7 @@ export function NIP19Page() {
         return <ListDetailPage />;
       }
       if (addr.kind === 36639) {
-        return <ChallengeDetailPage pubkey={addr.pubkey} identifier={addr.identifier} />;
+        return <ActionDetailPage pubkey={addr.pubkey} identifier={addr.identifier} />;
       }
       return <AddrPostDetailPage addr={{ kind: addr.kind, pubkey: addr.pubkey, identifier: addr.identifier }} relays={addr.relays} />;
     }

@@ -119,17 +119,15 @@ const hardcodedConfig: AppConfig = {
     followsFeedShowReplies: true,
   },
   sidebarOrder: [
-    "wallet",
-    "verified",
-    "actions",
-    "polls",
-    "world",
-    "badges",
     "feed",
-    "notifications",
-    "messages",
     "communities",
+    "world",
+    "wallet",
+    "agent",
+    "messages",
     "profile",
+    "notifications",
+    "search",
     "settings",
   ],
   nip85StatsPubkey:
@@ -156,6 +154,7 @@ const hardcodedConfig: AppConfig = {
   sidebarWidgets: [
     { id: 'trends' },
     { id: 'hot-posts' },
+    { id: 'ai-chat' },
   ],
   messaging: {
     enabled: true,
@@ -165,6 +164,10 @@ const hardcodedConfig: AppConfig = {
     soundEnabled: false,
     devMode: false,
   },
+  aiBaseURL: 'https://ai.shakespeare.diy/v1',
+  aiApiKey: '',
+  aiModel: 'grok-4.1-fast',
+  aiSystemPrompt: '',
 };
 
 /**

@@ -250,8 +250,10 @@ export function UnclaimedDeposits({ className }: UnclaimedDepositsProps) {
     }
   };
 
-  // Don't render if wallet not initialized or no unclaimed deposits
-  if (!isInitialized || (unclaimedDeposits.length === 0 && !isLoadingDeposits)) {
+  // Avoid inserting/removing a loading card below the balance during routine
+  // background syncs. Only render this section when there is something useful
+  // for the user to act on.
+  if (!isInitialized || unclaimedDeposits.length === 0) {
     return null;
   }
 
@@ -282,21 +284,14 @@ export function UnclaimedDeposits({ className }: UnclaimedDepositsProps) {
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-3">
-          {isLoadingDeposits ? (
-            <div className="py-6 text-center">
-              <Loader2 className="h-6 w-6 animate-spin mx-auto text-muted-foreground" />
-              <p className="text-sm text-muted-foreground mt-2">Loading deposits...</p>
-            </div>
-          ) : (
-            unclaimedDeposits.map((deposit) => (
-              <DepositItem 
-                key={`${deposit.txid}:${deposit.vout}`} 
-                deposit={deposit}
-                onClaim={() => handleOpenClaimDialog(deposit)}
-                onRefund={() => handleOpenRefundDialog(deposit)}
-              />
-            ))
-          )}
+          {unclaimedDeposits.map((deposit) => (
+            <DepositItem 
+              key={`${deposit.txid}:${deposit.vout}`} 
+              deposit={deposit}
+              onClaim={() => handleOpenClaimDialog(deposit)}
+              onRefund={() => handleOpenRefundDialog(deposit)}
+            />
+          ))}
         </CardContent>
       </Card>
 

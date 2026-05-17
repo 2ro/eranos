@@ -12,17 +12,15 @@ import { useCallback, useMemo } from "react";
  * dropdown and can be added back via the edit-sidebar UI.
  */
 const DEFAULT_SIDEBAR_ORDER: string[] = [
-  'wallet',
-  'search',
-  'verified',
-  'actions',
-  'polls',
-  'world',
-  'badges',
   'feed',
-  'notifications',
   'communities',
+  'world',
+  'wallet',
+  'agent',
+  'messages',
   'profile',
+  'notifications',
+  'search',
   'settings',
 ];
 

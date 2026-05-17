@@ -1,25 +1,12 @@
-import { useState, useEffect } from 'react';
 import { cn } from '@/lib/utils';
 
-const DORK_ANIMATION = [
-  '<[o_o]>',
-  '>[-_-]<',
-  '<[0_0]>',
-  '>[-_-]<',
-];
-
-/** Animated Dork face shown while the AI is thinking. */
+/** Animated thinking indicator shown while the AI agent is processing. */
 export function DorkThinking({ className }: { className?: string }) {
-  const [frame, setFrame] = useState(0);
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setFrame((f) => (f + 1) % DORK_ANIMATION.length);
-    }, 100);
-    return () => clearInterval(interval);
-  }, []);
-
   return (
-    <pre className={cn('font-mono text-muted-foreground leading-none', className)}>{DORK_ANIMATION[frame]}</pre>
+    <div className={cn('flex items-center gap-1.5', className)}>
+      <span className="size-1.5 rounded-full bg-muted-foreground/60 animate-bounce [animation-delay:0ms]" />
+      <span className="size-1.5 rounded-full bg-muted-foreground/60 animate-bounce [animation-delay:150ms]" />
+      <span className="size-1.5 rounded-full bg-muted-foreground/60 animate-bounce [animation-delay:300ms]" />
+    </div>
   );
 }

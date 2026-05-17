@@ -48,7 +48,6 @@ import { genUserName } from '@/lib/genUserName';
 import { VerifiedNip05Text } from '@/components/Nip05Badge';
 import { SubHeaderBar } from '@/components/SubHeaderBar';
 import { TabButton } from '@/components/TabButton';
-import { ARC_OVERHANG_PX } from '@/components/ArcBackground';
 import { cn, parseKindFilter } from '@/lib/utils';
 import type { TabFilter } from '@/contexts/AppContext';
 import { useLayoutOptions, useNavHidden } from '@/contexts/LayoutContext';
@@ -425,7 +424,6 @@ export function SearchPage() {
         <TabButton label="Posts" active={activeTab === 'posts'} onClick={() => setActiveTab('posts')} />
         <TabButton label="Accounts" active={activeTab === 'accounts'} onClick={() => setActiveTab('accounts')} />
       </SubHeaderBar>
-      <div style={{ height: ARC_OVERHANG_PX }} />
 
       {/* Search input bar — always rendered right after tabs, like ComposeBox on Feed */}
       <div className="px-4 py-3">

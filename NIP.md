@@ -111,6 +111,25 @@ If neither `e` nor `a` is present, the zap targets the recipient's **profile** (
 3. Sender signs and publishes a kind 8333 event referencing that `txid` with the appropriate `e`/`a`/`p` tags.
 4. The event is published **after** broadcast; the txid is already final at that point.
 
+### Batch / Community Zaps
+
+A single Bitcoin transaction MAY pay multiple recipients by including one output per recipient. Clients SHOULD still publish **one kind 8333 event per recipient**, all referencing the same `i` tag (`bitcoin:tx:<txid>`) but each with its own `p` tag and `amount` tag.
+
+For community-level zaps, clients MAY include the community addressable coordinate in an `a` tag and the community kind in a `K` tag:
+
+```json
+[
+  ["i", "bitcoin:tx:<txid>"],
+  ["p", "<recipient-pubkey>"],
+  ["amount", "1000"],
+  ["a", "34550:<community-author>:<community-d-tag>"],
+  ["K", "34550"],
+  ["alt", "Bitcoin zap: 1000 sats"]
+]
+```
+
+The `amount` tag is the amount paid to that event's `p` recipient only. It MUST NOT be the total value of the batch transaction.
+
 ### Client Behavior
 
 **Querying onchain zaps for an event:**
@@ -294,18 +313,15 @@ After resolution (assuming `$follows` = `["pk1", "pk2"]`):
 
 ### Summary
 
-Addressable event kind for publishing **activist actions** (called "challenges" internally for backwards compatibility). An action is a country-scoped task — take a photo, make art, gather information, or take direct action — with an optional sats bounty paid out via NIP-57 zaps to the best **submissions**.
+Addressable event kind for publishing **activist actions**. An action is a task — take a photo, make art, gather information, or take direct action — with an optional country scope, optional community scope, and an optional sats bounty paid out via NIP-57 zaps to the best **submissions**.
 
 Submissions are **NIP-22 comments** (kind 1111) authored under the action's coordinate, ranked by zap totals. There is no separate submission kind; an earlier draft (kind 36640) was deprecated in favor of NIP-22 reuse.
 
 ### Trust model
 
-Anyone can publish a kind 36639 event, but clients SHOULD only display actions whose author is either:
+Actions are user-generated. Anyone can publish a kind 36639 event, and Agora displays valid actions without platform-admin or country-organizer author filtering.
 
-1. A platform-level admin (see `src/lib/admins.ts`), or
-2. An organizer for the action's country (see kind 30078 `agora-organizers`).
-
-This authorization model is identical to the per-country pin model — see Kind 30078 in this document for the storage shape.
+Community-scoped actions inherit the community's moderation context. Clients rendering a specific community SHOULD query by the community `A` tag and apply that community's moderation and membership filters.
 
 ### Event Structure
 
@@ -319,6 +335,9 @@ This authorization model is identical to the per-country pin model — see Kind 
     ["challenge-type", "photo"],
     ["bounty", "10000"],
     ["i", "iso3166:US"],
+    ["A", "34550:<community-pubkey>:<community-d-tag>"],
+    ["K", "34550"],
+    ["P", "<community-pubkey>"],
     ["t", "agora-action"],
     ["image", "https://example.com/cover.jpg"],
     ["start", "1729000000"],
@@ -336,7 +355,10 @@ This authorization model is identical to the per-country pin model — see Kind 
 | `title`          | Yes      | Short title shown on cards.                                                                              |
 | `challenge-type` | Yes      | One of `photo`, `art`, `info`, `action`. Drives the display icon and submission expectations.            |
 | `bounty`         | Yes      | Bounty in **sats**, as an unsigned integer string. Paid out via zaps to the chosen submission(s).        |
-| `i`              | Yes      | NIP-73 country identifier: `iso3166:XX` (preferred). Legacy `geo:XX` (length 6, country code only) is accepted as a read alias. Optionally combined with a `location` tag fallback. |
+| `i`              | No       | NIP-73 country identifier: `iso3166:XX` (preferred). Legacy `geo:XX` (length 6, country code only) is accepted as a read alias. Optionally combined with a `location` tag fallback. |
+| `A`              | No       | Community root coordinate for community-scoped actions, e.g. `34550:<pubkey>:<d-tag>`.                 |
+| `K`              | No       | Root kind hint for community-scoped actions. Use `34550` when `A` points to a NIP-72 community.         |
+| `P`              | No       | Root author hint for community-scoped actions. Use the community definition author pubkey.              |
 | `t`              | Yes      | Discovery tag. Canonical write value is `agora-action`. Read aliases: `pathos-challenge`, `agora-challenge`. |
 | `image`          | No       | Cover image URL.                                                                                         |
 | `start`          | No       | Unix timestamp when the action becomes active. Defaults to `created_at`.                                 |
@@ -374,7 +396,17 @@ Per country:
 }
 ```
 
-After fetching, clients MUST filter the results down to events whose author is either an admin or an organizer for the event's country.
+Per community:
+
+```json
+{
+  "kinds": [36639],
+  "#A": ["34550:<community-pubkey>:<community-d-tag>"],
+  "limit": 50
+}
+```
+
+Country and community scopes are independent. A future action MAY include both `i` and `A`/`K`/`P` tags when both scopes are useful.
 
 ---
 
@@ -1119,4 +1151,3 @@ Albums are represented as kind 34139 playlist events with a `["t", "album"]` tag
 - Albums display release date and label information when available
 - Track ordering follows the order of `a` tags in the event
 - The same detail view, playback, and commenting features apply to both albums and playlists
-

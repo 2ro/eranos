@@ -29,17 +29,23 @@ interface ActivityFeedResult {
   commentsNextUntil?: number;
   /** Cursor for the next goals page, when goals still have more events. */
   goalsNextUntil?: number;
+  /** Cursor for the next actions page, when actions still have more events. */
+  actionsNextUntil?: number;
   /** Whether comments still have more events. */
   hasMoreComments: boolean;
   /** Whether goals still have more events. */
   hasMoreGoals: boolean;
+  /** Whether actions still have more events. */
+  hasMoreActions: boolean;
 }
 
 interface ActivityFeedPageParam {
   includeComments: boolean;
   includeGoals: boolean;
+  includeActions: boolean;
   commentsUntil?: number;
   goalsUntil?: number;
+  actionsUntil?: number;
 }
 
 const EMPTY_MODERATION_BY_A_TAG: ReadonlyMap<string, CommunityModeration> = new Map();
@@ -48,6 +54,7 @@ const ACTIVITY_PAGE_SIZE = 100;
 const INITIAL_PAGE_PARAM: ActivityFeedPageParam = {
   includeComments: true,
   includeGoals: true,
+  includeActions: true,
 };
 
 /**
@@ -57,6 +64,7 @@ const INITIAL_PAGE_PARAM: ActivityFeedPageParam = {
  * The feed merges:
  * 1. Kind 34550 community definition events for the user's communities
  * 2. Kind 1111 NIP-22 comments scoped to those communities (via #A tag)
+ * 3. Kind 36639 actions scoped to those communities (via #A tag)
  *
  * Community moderation (kind 1984 bans) is applied per-community: events
  * from banned members and individually banned posts are filtered out.
@@ -68,7 +76,7 @@ const INITIAL_PAGE_PARAM: ActivityFeedPageParam = {
  * Also returns per-community `moderationByATag` and `rankMapByATag` so
  * callers can provide `CommunityModerationContext` to `NoteMoreMenu`.
  */
-export function useCommunityActivityFeed() {
+export function useCommunityActivityFeed(enabled = true) {
   const { nostr } = useNostr();
   const queryClient = useQueryClient();
   const { data: myCommunities, isLoading: communitiesLoading } = useMyCommunities();
@@ -86,6 +94,7 @@ export function useCommunityActivityFeed() {
           rankMapByATag: new Map(),
           hasMoreComments: false,
           hasMoreGoals: false,
+          hasMoreActions: false,
         };
       }
 
@@ -102,11 +111,11 @@ export function useCommunityActivityFeed() {
           limit: 500,
         }));
 
-      // Fetch community definitions, comments, membership awards, and goals in parallel.
+      // Fetch community definitions, comments, membership awards, goals, and actions in parallel.
       // Awards are exhausted per-community with `queryAll` so every community's
       // membership is complete, regardless of how many communities the user
       // belongs to. See src/lib/queryAll.ts.
-      const [definitionEvents, comments, awards, goals] = await Promise.all([
+      const [definitionEvents, comments, awards, goals, actions] = await Promise.all([
         // The community definitions themselves
         nostr.query(
           [{
@@ -143,6 +152,18 @@ export function useCommunityActivityFeed() {
               '#a': aTags,
               limit: ACTIVITY_PAGE_SIZE,
               ...(page.goalsUntil ? { until: page.goalsUntil } : {}),
+            }],
+            { signal: combinedSignal },
+          )
+          : Promise.resolve([] as NostrEvent[]),
+        // Activist actions linked to these communities (uppercase A tag)
+        page.includeActions
+          ? nostr.query(
+            [{
+              kinds: [36639],
+              '#A': aTags,
+              limit: ACTIVITY_PAGE_SIZE,
+              ...(page.actionsUntil ? { until: page.actionsUntil } : {}),
             }],
             { signal: combinedSignal },
           )
@@ -200,7 +221,7 @@ export function useCommunityActivityFeed() {
 
       // ── Check whether an event survives moderation in its community ──
       const isAllowed = (event: NostrEvent): boolean => {
-        // NIP-22 comments use uppercase A; goals use lowercase a with a 34550: prefix
+        // NIP-22 comments and actions use uppercase A; goals use lowercase a with a 34550: prefix
         const eventATag = event.tags.find(([n]) => n === 'A')?.[1]
           ?? event.tags.find(([n, v]) => n === 'a' && v?.startsWith('34550:'))?.[1];
         if (!eventATag) return true; // No community scope — not bannable here
@@ -214,7 +235,7 @@ export function useCommunityActivityFeed() {
       const seen = new Set<string>();
       const merged: NostrEvent[] = [];
 
-      for (const event of [...definitionEvents, ...comments, ...goals]) {
+      for (const event of [...definitionEvents, ...comments, ...goals, ...actions]) {
         if (seen.has(event.id)) continue;
         seen.add(event.id);
         if (event.kind === COMMUNITY_DEFINITION_KIND) {
@@ -230,6 +251,7 @@ export function useCommunityActivityFeed() {
 
       const hasMoreComments = page.includeComments && comments.length === ACTIVITY_PAGE_SIZE;
       const hasMoreGoals = page.includeGoals && goals.length === ACTIVITY_PAGE_SIZE;
+      const hasMoreActions = page.includeActions && actions.length === ACTIVITY_PAGE_SIZE;
 
       // Seed the ['event', id] cache so embedded previews (quotes, reply
       // context, etc.) resolve instantly instead of refetching.
@@ -245,21 +267,25 @@ export function useCommunityActivityFeed() {
         rankMapByATag,
         commentsNextUntil: hasMoreComments ? getPaginationCursor(comments) - 1 : undefined,
         goalsNextUntil: hasMoreGoals ? getPaginationCursor(goals) - 1 : undefined,
+        actionsNextUntil: hasMoreActions ? getPaginationCursor(actions) - 1 : undefined,
         hasMoreComments,
         hasMoreGoals,
+        hasMoreActions,
       };
     },
     getNextPageParam: (lastPage) => {
-      if (!lastPage.hasMoreComments && !lastPage.hasMoreGoals) return undefined;
+      if (!lastPage.hasMoreComments && !lastPage.hasMoreGoals && !lastPage.hasMoreActions) return undefined;
       return {
         includeComments: lastPage.hasMoreComments,
         includeGoals: lastPage.hasMoreGoals,
+        includeActions: lastPage.hasMoreActions,
         commentsUntil: lastPage.commentsNextUntil,
         goalsUntil: lastPage.goalsNextUntil,
+        actionsUntil: lastPage.actionsNextUntil,
       } satisfies ActivityFeedPageParam;
     },
     initialPageParam: INITIAL_PAGE_PARAM,
-    enabled: !communitiesLoading && aTags.length > 0,
+    enabled: enabled && !communitiesLoading && aTags.length > 0,
     staleTime: 2 * 60_000,
     gcTime: 30 * 60_000,
     placeholderData: (prev) => prev,
@@ -283,12 +309,12 @@ export function useCommunityActivityFeed() {
       data: query.data ? events : undefined,
       moderationByATag: (latestPage?.moderationByATag ?? EMPTY_MODERATION_BY_A_TAG) as Map<string, CommunityModeration>,
       rankMapByATag: (latestPage?.rankMapByATag ?? EMPTY_RANK_MAP_BY_A_TAG) as Map<string, Map<string, CommunityMember>>,
-      isLoading: communitiesLoading || query.isLoading,
+      isLoading: enabled && (communitiesLoading || query.isLoading),
       isError: query.isError,
       error: query.error,
       hasNextPage: query.hasNextPage,
       isFetchingNextPage: query.isFetchingNextPage,
       fetchNextPage: query.fetchNextPage,
     };
-  }, [query.data, communitiesLoading, query.isLoading, query.isError, query.error, query.hasNextPage, query.isFetchingNextPage, query.fetchNextPage]);
+  }, [query.data, enabled, communitiesLoading, query.isLoading, query.isError, query.error, query.hasNextPage, query.isFetchingNextPage, query.fetchNextPage]);
 }

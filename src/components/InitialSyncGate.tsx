@@ -7,7 +7,7 @@ import {
   Download,
   Eye,
   EyeOff,
-  Heart,
+  Search,
   Loader2,
   UserPlus,
   Users,
@@ -41,9 +41,13 @@ import { type SyncPhase, useInitialSync } from "@/hooks/useInitialSync";
 import { useLoginActions } from "@/hooks/useLoginActions";
 import { useNostrPublish } from "@/hooks/useNostrPublish";
 import { OnboardingContext } from "@/hooks/useOnboarding";
+import { AgoraBoltIcon } from "@/components/icons/AgoraBoltIcon";
 
 import { toast } from "@/hooks/useToast";
 import { useUploadFile } from "@/hooks/useUploadFile";
+import { VERIFIED_FOLLOW_PACK } from "@/lib/agoraDefaults";
+import { COUNTRIES } from "@/lib/countries";
+import { createCountryIdentifier, parseCountryIdentifier } from "@/lib/countryIdentifiers";
 import { genUserName } from "@/lib/genUserName";
 
 import { cn } from "@/lib/utils";
@@ -223,27 +227,27 @@ function SyncScreen({ phase }: { phase: SyncPhase }) {
 /** Suggested follow packs shown to new users with empty follow lists. */
 const SUGGESTED_PACKS: { kind: number; pubkey: string; identifier: string }[] =
   [
-    {
-      kind: 39089,
-      pubkey:
-        "932614571afcbad4d17a191ee281e39eebbb41b93fac8fd87829622aeb112f4d",
-      identifier: "k4p5w0n22suf",
-    },
+    VERIFIED_FOLLOW_PACK,
   ];
+
+const COUNTRY_LIST = Object.entries(COUNTRIES)
+  .map(([code, { name, flag }]) => ({ code, name, flag }))
+  .sort((a, b) => a.name.localeCompare(b.name));
 
 // Steps for signup (includes keygen + profile) vs. settings-only (existing login)
 type SignupStep = "keygen" | "download" | "profile";
-type SettingsStep = "follows" | "outro";
+type SettingsStep = "countries" | "follows" | "outro";
 type Step = SignupStep | SettingsStep;
 
 const SIGNUP_STEPS: Step[] = [
   "keygen",
   "download",
   "profile",
+  "countries",
   "follows",
   "outro",
 ];
-const SETTINGS_STEPS: Step[] = ["follows", "outro"];
+const SETTINGS_STEPS: Step[] = ["countries", "follows", "outro"];
 
 function SetupQuestionnaire({
   onComplete,
@@ -352,7 +356,7 @@ function SetupQuestionnaire({
     }
   }, [nsec, login, next, config.appName]);
 
-  // Save settings and transition to the follows step (or outro if they have follows)
+  // Save settings and transition to the country step before people discovery.
   const handleSaveAndContinue = useCallback(async () => {
     setIsSaving(true);
 
@@ -460,11 +464,7 @@ function SetupQuestionnaire({
     setHasFollows(userHasFollows);
     setIsSaving(false);
 
-    if (userHasFollows) {
-      goTo("outro");
-    } else {
-      goTo("follows");
-    }
+    goTo("countries");
   }, [updateConfig, updateSettings, user, nostr, goTo]);
 
   return (
@@ -492,6 +492,17 @@ function SetupQuestionnaire({
           )}
 
           {/* Settings steps */}
+          {step === "countries" && (
+            <CountriesStep
+              onNext={(didFollowCountries) => {
+                if (didFollowCountries) onPreload();
+                goTo(hasFollows ? "outro" : "follows");
+              }}
+              onBack={back}
+              canBack={stepIndex > 0}
+            />
+          )}
+
           {step === "follows" && hasFollows === false && (
             <FollowsStep
               onNext={(didFollow) => {
@@ -516,7 +527,7 @@ function SetupQuestionnaire({
 function KeygenStep({ onGenerate }: { onGenerate: () => void }) {
   return (
     <div className="flex flex-col items-center text-center gap-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
-      <AgoraLogo size={80} />
+      <AgoraBoltIcon className="size-20 drop-shadow-md" />
 
       <div className="space-y-3">
         <h1 className="text-2xl font-bold tracking-tight">
@@ -813,6 +824,185 @@ function ProfileStep({
 // Settings steps
 // ---------------------------------------------------------------------------
 
+function CountriesStep({
+  onNext,
+  onBack,
+  canBack,
+}: {
+  onNext: (didFollowCountries: boolean) => void;
+  onBack: () => void;
+  canBack: boolean;
+}) {
+  const { nostr } = useNostr();
+  const { user } = useCurrentUser();
+  const { mutateAsync: publishEvent } = useNostrPublish();
+  const queryClient = useQueryClient();
+  const [search, setSearch] = useState("");
+  const [selectedCodes, setSelectedCodes] = useState<Set<string>>(new Set());
+  const [isSaving, setIsSaving] = useState(false);
+
+  const filteredCountries = useMemo(() => {
+    const query = search.trim().toLowerCase();
+    if (!query) return COUNTRY_LIST;
+    return COUNTRY_LIST.filter(
+      (country) => country.name.toLowerCase().includes(query) || country.code.toLowerCase().includes(query),
+    );
+  }, [search]);
+
+  const toggleCountry = (code: string) => {
+    setSelectedCodes((current) => {
+      const next = new Set(current);
+      if (next.has(code)) {
+        next.delete(code);
+      } else {
+        next.add(code);
+      }
+      return next;
+    });
+  };
+
+  const handleContinue = async () => {
+    if (!user || selectedCodes.size === 0) {
+      onNext(false);
+      return;
+    }
+
+    setIsSaving(true);
+    try {
+      const identifiers = Array.from(selectedCodes).map((code) => createCountryIdentifier(code));
+      const prev = await fetchFreshEvent(nostr, {
+        kinds: [10015],
+        authors: [user.pubkey],
+      });
+
+      const existingTags = prev?.tags ?? [];
+      const missingIdentifiers = identifiers.filter((identifier) => !existingTags.some(
+        ([name, value]) => name === "i" && parseCountryIdentifier(value) === parseCountryIdentifier(identifier),
+      ));
+
+      const newTags = missingIdentifiers.length === 0
+        ? existingTags
+        : [
+          ...existingTags,
+          ...missingIdentifiers.map((identifier) => ["i", identifier]),
+        ];
+
+      if (newTags !== existingTags) {
+        await publishEvent({
+          kind: 10015,
+          content: prev?.content ?? "",
+          tags: newTags,
+          prev: prev ?? undefined,
+        });
+        queryClient.invalidateQueries({ queryKey: ["interests", user.pubkey] });
+        queryClient.invalidateQueries({ queryKey: ["following-country-feed"] });
+        queryClient.invalidateQueries({ queryKey: ["following-feed"] });
+      }
+
+      onNext(true);
+    } catch (error) {
+      console.error("Failed to follow countries:", error);
+      toast({
+        title: "Could not follow countries",
+        description: "Please try again or skip this step for now.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  return (
+    <div className="flex flex-col gap-6 animate-in fade-in slide-in-from-right-4 duration-400">
+      <div className="space-y-2">
+        <h2 className="text-xl font-semibold tracking-tight">
+          Follow world events
+        </h2>
+        <p className="text-sm text-muted-foreground">
+          Choose countries to add to your feed.
+        </p>
+      </div>
+
+      <div className="relative">
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground pointer-events-none" />
+        <Input
+          placeholder="Search countries..."
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          className="pl-9"
+        />
+      </div>
+
+      {filteredCountries.length > 0 ? (
+        <div className="grid max-h-96 grid-cols-3 gap-x-3 gap-y-5 overflow-y-auto pr-1 sm:grid-cols-4">
+          {filteredCountries.map((country) => {
+            const isSelected = selectedCodes.has(country.code);
+            return (
+              <button
+                key={country.code}
+                type="button"
+                onClick={() => toggleCountry(country.code)}
+                className={cn(
+                  "group relative flex min-h-20 flex-col items-center justify-start gap-2 rounded-xl px-1 py-2 text-center transition-transform hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+                  isSelected
+                    ? "text-primary"
+                    : "text-foreground",
+                )}
+              >
+                {isSelected && (
+                  <span className="absolute right-3 top-1 z-10 rounded-full bg-primary p-0.5 text-primary-foreground shadow-sm">
+                    <Check className="size-3" />
+                  </span>
+                )}
+                <span className="relative z-0 text-5xl leading-none drop-shadow-sm transition-transform group-hover:scale-110" aria-hidden="true">
+                  {country.flag}
+                </span>
+                <span className="line-clamp-2 min-w-0 text-xs font-medium leading-tight">
+                  {country.name}
+                </span>
+              </button>
+            );
+          })}
+        </div>
+      ) : (
+        <div className="rounded-xl border border-dashed p-8 text-center text-sm text-muted-foreground">
+          No countries match "{search}".
+        </div>
+      )}
+
+      <div className="flex gap-3">
+        <Button
+          variant="ghost"
+          onClick={onBack}
+          className="flex-1 rounded-full h-11"
+          disabled={!canBack || isSaving}
+        >
+          Back
+        </Button>
+        <Button
+          onClick={handleContinue}
+          className="flex-1 rounded-full h-11 gap-1.5"
+          disabled={isSaving}
+        >
+          {isSaving ? (
+            <>
+              <Loader2 className="w-4 h-4 animate-spin" /> Saving...
+            </>
+          ) : selectedCodes.size > 0 ? (
+            <>
+              Continue <ChevronRight className="w-4 h-4" />
+            </>
+          ) : (
+            <>
+              Skip for now <ChevronRight className="w-4 h-4" />
+            </>
+          )}
+        </Button>
+      </div>
+    </div>
+  );
+}
+
 // ---------------------------------------------------------------------------
 // Follow Packs Step
 // ---------------------------------------------------------------------------
@@ -838,6 +1028,7 @@ function FollowsStep({
   const { nostr } = useNostr();
   const { user } = useCurrentUser();
   const { mutateAsync: publishEvent } = useNostrPublish();
+  const queryClient = useQueryClient();
 
   const [packs, setPacks] = useState<NostrEvent[]>([]);
   const [loading, setLoading] = useState(true);
@@ -904,13 +1095,21 @@ function FollowsStep({
           .filter((pk) => !existingPubkeys.has(pk))
           .map((pk) => ["p", pk]);
 
+        const tags = [...nonPTags, ...existingPTags, ...newPTags];
+
         // 4. Publish with prev for published_at preservation
-        await publishEvent({
+        const event = await publishEvent({
           kind: 3,
           content: prev?.content ?? "",
-          tags: [...nonPTags, ...existingPTags, ...newPTags],
+          tags,
           prev: prev ?? undefined,
         });
+
+        const pubkeys = tags.filter(([n]) => n === "p").map(([, pk]) => pk);
+        queryClient.setQueryData(["follow-list", user.pubkey], { event, pubkeys });
+        queryClient.invalidateQueries({ queryKey: ["follow-list", user.pubkey] });
+        queryClient.invalidateQueries({ queryKey: ["feed"] });
+        queryClient.invalidateQueries({ queryKey: ["following-feed"] });
 
         setFollowedPacks((prev) => new Set([...prev, packId]));
       } catch (error) {
@@ -919,7 +1118,7 @@ function FollowsStep({
         setFollowingPack(null);
       }
     },
-    [user, nostr, publishEvent],
+    [user, nostr, publishEvent, queryClient],
   );
 
   return (
@@ -1066,30 +1265,12 @@ function PackCard({
         </Button>
       </div>
 
-      {/* Author attribution */}
-      <AuthorAttribution pubkey={event.pubkey} />
-    </div>
-  );
-}
-
-/** Small author attribution bar at the bottom of a pack card. */
-function AuthorAttribution({ pubkey }: { pubkey: string }) {
-  const { data: authorData } = useAuthors([pubkey]);
-  const metadata: NostrMetadata | undefined = authorData?.get(pubkey)?.metadata;
-  const name = metadata?.name || genUserName(pubkey);
-
-  return (
-    <div className="px-4 py-2 bg-muted/30 border-t border-border flex items-center gap-2">
-      <MiniAvatar src={metadata?.picture} name={name} metadata={metadata} />
-      <span className="text-xs text-muted-foreground truncate">
-        by <span className="font-medium text-foreground">{name}</span>
-      </span>
     </div>
   );
 }
 
 /** Tiny avatar used in pack member stacks. */
-function MiniAvatar({ src, name }: { src?: string; name: string; metadata?: NostrMetadata }) {
+function MiniAvatar({ src, name }: { src?: string; name: string }) {
   return (
     <Avatar className="size-7 ring-2 ring-background">
       <AvatarImage src={src} alt={name} />
@@ -1130,12 +1311,7 @@ function PackCardSkeleton() {
 function OutroStep({ onComplete }: { onComplete: () => void }) {
   return (
     <div className="flex flex-col items-center text-center gap-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
-      <div className="relative">
-        <AgoraLogo size={72} />
-        <div className="absolute -bottom-1 -right-1 bg-primary/10 rounded-full p-1.5">
-          <Heart className="w-5 h-5 text-primary fill-primary" />
-        </div>
-      </div>
+      <AgoraBoltIcon className="size-[72px] drop-shadow-md" />
 
       <div className="space-y-3 max-w-xs">
         <h2 className="text-2xl font-bold tracking-tight">You're all set</h2>

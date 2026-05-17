@@ -1,6 +1,7 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useCurrentUser } from './useCurrentUser';
+import { useAppContext } from './useAppContext';
 import type { NUser } from '@nostrify/react/login';
 
 /** Error subclass carrying rate-limit metadata. */
@@ -16,15 +17,25 @@ export class RateLimitError extends Error {
 }
 
 // Types for Shakespeare API (compatible with OpenAI ChatCompletionMessageParam)
+export interface ToolCallFunction {
+  id: string;
+  type: 'function';
+  function: { name: string; arguments: string };
+}
+
 export interface ChatMessage {
-  role: 'user' | 'assistant' | 'system';
-  content: string | Array<{
+  role: 'user' | 'assistant' | 'system' | 'tool';
+  content: string | null | Array<{
     type: 'text' | 'image_url';
     text?: string;
     image_url?: {
       url: string;
     };
   }>;
+  /** Present on assistant messages that invoke tools. */
+  tool_calls?: ToolCallFunction[];
+  /** Present on tool result messages — must match a tool_calls[].id from the preceding assistant message. */
+  tool_call_id?: string;
 }
 
 /** Tool function definition for chat completions. */
@@ -99,6 +110,15 @@ export interface ModelsResponse {
   data: Model[];
 }
 
+/** Sort models by total cost (prompt + completion), cheapest first. */
+export function sortModelsByCost(models: Model[]): Model[] {
+  return [...models].sort((a, b) => {
+    const costA = parseFloat(a.pricing.prompt) + parseFloat(a.pricing.completion);
+    const costB = parseFloat(b.pricing.prompt) + parseFloat(b.pricing.completion);
+    return costA - costB;
+  });
+}
+
 export interface CreditsResponse {
   object: string;
   amount: number;
@@ -106,7 +126,17 @@ export interface CreditsResponse {
 
 // ─── Provider Configuration ───
 
-const SHAKESPEARE_API_URL = 'https://ai.shakespeare.diy/v1';
+const DEFAULT_SHAKESPEARE_API_URL = 'https://ai.shakespeare.diy/v1';
+
+/** True when `url` points at the Shakespeare-hosted AI proxy (NIP-98 auth). */
+function isShakespeareEndpoint(url: string): boolean {
+  try {
+    const host = new URL(url).host;
+    return host === 'ai.shakespeare.diy' || host.endsWith('.shakespeare.diy');
+  } catch {
+    return false;
+  }
+}
 
 // ─── Helpers ───
 
@@ -243,11 +273,36 @@ function formatError(err: unknown): string {
 
 export function useShakespeare() {
   const { user } = useCurrentUser();
+  const { config } = useAppContext();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   /** Unix-ms timestamp until which the client is rate-limited, or null. */
   const [retryAfter, setRetryAfter] = useState<number | null>(null);
   const retryTimerRef = useRef<ReturnType<typeof setTimeout>>(undefined);
+
+  const apiUrl = useMemo(() => {
+    const raw = (config.aiBaseURL || DEFAULT_SHAKESPEARE_API_URL).trim();
+    return raw.replace(/\/+$/, '');
+  }, [config.aiBaseURL]);
+
+  const buildAuthHeader = useCallback(async (
+    method: string,
+    url: string,
+    body?: unknown,
+  ): Promise<string> => {
+    const apiKey = config.aiApiKey.trim();
+    if (apiKey) {
+      return `Bearer ${apiKey}`;
+    }
+    if (!isShakespeareEndpoint(url)) {
+      throw new Error(
+        'An API key is required for this endpoint. ' +
+        'Set one in Agent settings, or change the base URL to an endpoint that supports NIP-98 auth.',
+      );
+    }
+    const token = await createNIP98Token(method, url, body, user ?? undefined);
+    return `Nostr ${token}`;
+  }, [config.aiApiKey, user]);
 
   // Auto-clear retryAfter once the cooldown expires.
   useEffect(() => {
@@ -294,16 +349,12 @@ export function useShakespeare() {
         ...options,
       };
 
-      const token = await createNIP98Token(
-        'POST',
-        `${SHAKESPEARE_API_URL}/chat/completions`,
-        requestBody,
-        user,
-      );
-      const response = await fetch(`${SHAKESPEARE_API_URL}/chat/completions`, {
+      const chatUrl = `${apiUrl}/chat/completions`;
+      const authHeader = await buildAuthHeader('POST', chatUrl, requestBody);
+      const response = await fetch(chatUrl, {
         method: 'POST',
         headers: {
-          'Authorization': `Nostr ${token}`,
+          'Authorization': authHeader,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(requestBody),
@@ -323,16 +374,21 @@ export function useShakespeare() {
     } finally {
       setIsLoading(false);
     }
-  }, [user]);
+  }, [user, apiUrl, buildAuthHeader]);
 
   // ─── Chat completions (streaming) ───
+  //
+  // Streams text via `onChunk` and returns the fully-assembled response
+  // (including any tool_calls) so callers can use the same tool-loop
+  // logic as the non-streaming path.
 
   const sendStreamingMessage = useCallback(async (
     messages: ChatMessage[],
     modelId: string,
     onChunk: (chunk: string) => void,
-    options?: Partial<ChatCompletionRequest>
-  ): Promise<void> => {
+    options?: Partial<ChatCompletionRequest>,
+    signal?: AbortSignal,
+  ): Promise<ChatCompletionResponse> => {
     if (!user) {
       throw new Error('User must be logged in to use AI features');
     }
@@ -350,19 +406,16 @@ export function useShakespeare() {
         ...options,
       };
 
-      const token = await createNIP98Token(
-        'POST',
-        `${SHAKESPEARE_API_URL}/chat/completions`,
-        requestBody,
-        user,
-      );
-      const response = await fetch(`${SHAKESPEARE_API_URL}/chat/completions`, {
+      const chatUrl = `${apiUrl}/chat/completions`;
+      const authHeader = await buildAuthHeader('POST', chatUrl, requestBody);
+      const response = await fetch(chatUrl, {
         method: 'POST',
         headers: {
-          'Authorization': `Nostr ${token}`,
+          'Authorization': authHeader,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(requestBody),
+        signal,
       });
 
       await handleAPIError(response);
@@ -374,34 +427,121 @@ export function useShakespeare() {
       const reader = response.body.getReader();
       const decoder = new TextDecoder();
 
+      // Accumulate the full response from stream deltas
+      let content = '';
+      let finishReason = 'stop';
+      let responseId = '';
+      let responseModel = model;
+      let usage = { prompt_tokens: 0, completion_tokens: 0, total_tokens: 0 };
+      const toolCalls: Map<number, ToolCallFunction> = new Map();
+
+      /** Process a single parsed SSE data object, accumulating deltas. */
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const processDelta = (parsed: any) => {
+        const delta = parsed.choices?.[0]?.delta;
+        if (!delta) return;
+
+        if (parsed.id) responseId = parsed.id;
+        if (parsed.model) responseModel = parsed.model;
+        if (parsed.choices?.[0]?.finish_reason) {
+          finishReason = parsed.choices[0].finish_reason;
+        }
+
+        if (delta.content) {
+          content += delta.content;
+          onChunk(delta.content);
+        }
+
+        if (delta.tool_calls) {
+          for (const tc of delta.tool_calls) {
+            const idx = tc.index ?? 0;
+            const existing = toolCalls.get(idx);
+            if (!existing) {
+              toolCalls.set(idx, {
+                id: tc.id ?? '',
+                type: 'function',
+                function: {
+                  name: tc.function?.name ?? '',
+                  arguments: tc.function?.arguments ?? '',
+                },
+              });
+            } else {
+              if (tc.id) existing.id = tc.id;
+              if (tc.function?.name) existing.function.name += tc.function.name;
+              if (tc.function?.arguments) existing.function.arguments += tc.function.arguments;
+            }
+          }
+        }
+      };
+
+      /** Try to parse and process a single SSE data payload string. */
+      const processSSEData = (data: string) => {
+        if (data === '[DONE]') return;
+        try {
+          const parsed = JSON.parse(data);
+          // Capture usage from the final chunk (which has choices: [] and real token counts)
+          if (parsed.usage?.prompt_tokens) {
+            usage = {
+              prompt_tokens: parsed.usage.prompt_tokens,
+              completion_tokens: parsed.usage.completion_tokens ?? 0,
+              total_tokens: parsed.usage.total_tokens ?? 0,
+            };
+          }
+          processDelta(parsed);
+        } catch {
+          // Malformed JSON — nothing to do
+        }
+      };
+
+      // Buffer for incomplete SSE lines that span across reader.read() boundaries.
+      let lineBuffer = '';
+
       try {
         while (true) {
           const { done, value } = await reader.read();
           if (done) break;
 
-          const chunk = decoder.decode(value);
-          const lines = chunk.split('\n');
+          const chunk = decoder.decode(value, { stream: true });
+          const combined = lineBuffer + chunk;
+          const segments = combined.split('\n');
+          // The last segment may be incomplete — save it for the next iteration
+          lineBuffer = segments.pop() ?? '';
 
-          for (const line of lines) {
-            if (line.startsWith('data: ')) {
-              const data = line.slice(6);
-              if (data === '[DONE]') return;
-
-              try {
-                const parsed = JSON.parse(data);
-                const content = parsed.choices?.[0]?.delta?.content;
-                if (content) {
-                  onChunk(content);
-                }
-              } catch {
-                // Ignore parsing errors for incomplete chunks
-              }
-            }
+          for (const line of segments) {
+            if (!line.startsWith('data: ')) continue;
+            processSSEData(line.slice(6));
           }
+        }
+
+        // Process any remaining buffered line after the stream ends
+        if (lineBuffer.startsWith('data: ')) {
+          processSSEData(lineBuffer.slice(6));
         }
       } finally {
         reader.releaseLock();
       }
+
+      // Assemble the full response in the same shape as the non-streaming endpoint
+      const assembledToolCalls = toolCalls.size > 0
+        ? Array.from(toolCalls.values())
+        : undefined;
+
+      return {
+        id: responseId,
+        object: 'chat.completion',
+        created: Math.floor(Date.now() / 1000),
+        model: responseModel,
+        choices: [{
+          index: 0,
+          message: {
+            role: 'assistant',
+            content: content || undefined,
+            ...(assembledToolCalls ? { tool_calls: assembledToolCalls } : {}),
+          },
+          finish_reason: finishReason,
+        }],
+        usage,
+      };
     } catch (err) {
       if (err instanceof RateLimitError) {
         setRetryAfter(err.retryAfter);
@@ -414,7 +554,7 @@ export function useShakespeare() {
     } finally {
       setIsLoading(false);
     }
-  }, [user]);
+  }, [user, apiUrl, buildAuthHeader]);
 
   // ─── Credit balance (Shakespeare AI only) ───
 
@@ -424,16 +564,11 @@ export function useShakespeare() {
     }
 
     try {
-      const token = await createNIP98Token(
-        'GET',
-        `${SHAKESPEARE_API_URL}/credits`,
-        undefined,
-        user,
-      );
-
-      const response = await fetch(`${SHAKESPEARE_API_URL}/credits`, {
+      const creditsUrl = `${apiUrl}/credits`;
+      const authHeader = await buildAuthHeader('GET', creditsUrl);
+      const response = await fetch(creditsUrl, {
         method: 'GET',
-        headers: { 'Authorization': `Nostr ${token}` },
+        headers: { 'Authorization': authHeader },
       });
 
       await handleAPIError(response);
@@ -441,7 +576,7 @@ export function useShakespeare() {
     } catch (err) {
       throw new Error(formatError(err));
     }
-  }, [user]);
+  }, [user, apiUrl, buildAuthHeader]);
 
   // ─── Available models (merged from both providers) ───
 
@@ -454,15 +589,11 @@ export function useShakespeare() {
     setError(null);
 
     try {
-      const token = await createNIP98Token(
-        'GET',
-        `${SHAKESPEARE_API_URL}/models`,
-        undefined,
-        user,
-      );
-      const response = await fetch(`${SHAKESPEARE_API_URL}/models`, {
+      const modelsUrl = `${apiUrl}/models`;
+      const authHeader = await buildAuthHeader('GET', modelsUrl);
+      const response = await fetch(modelsUrl, {
         method: 'GET',
-        headers: { 'Authorization': `Nostr ${token}` },
+        headers: { 'Authorization': authHeader },
       });
       await handleAPIError(response);
       const result = (await response.json()) as ModelsResponse;
@@ -481,7 +612,7 @@ export function useShakespeare() {
     } finally {
       setIsLoading(false);
     }
-  }, [user]);
+  }, [user, apiUrl, buildAuthHeader]);
 
   return {
     // State

@@ -51,7 +51,7 @@ function PageSkeleton() {
 
 /** Inner component that reads layout options from the context store. */
 function MainLayoutInner() {
-  const { rightSidebar, showFAB = false, fabKind = 1, fabHref, onFabClick, fabIcon, wrapperClassName, noOverscroll, noMaxWidth, scrollContainer, hasSubHeader, hideTopBar, hideBottomNav } = useLayoutSnapshot();
+  const { rightSidebar, showFAB = false, fabKind = 1, fabHref, onFabClick, fabIcon, fabMenu, wrapperClassName, noOverscroll, noMaxWidth, scrollContainer, hasSubHeader, hideTopBar, hideBottomNav } = useLayoutSnapshot();
   const [drawerOpen, setDrawerOpen] = useState(false);
   const openDrawer = useCallback(() => setDrawerOpen(true), []);
   const centerColumnRef = useRef<HTMLDivElement>(null);
@@ -98,7 +98,7 @@ function MainLayoutInner() {
               <div className="hidden sidebar:block sticky bottom-6 z-30 pointer-events-none">
                 <div className="flex justify-end pr-4">
                   <div className="pointer-events-auto">
-                    <FloatingComposeButton kind={fabKind} href={fabHref} onFabClick={onFabClick} icon={fabIcon} />
+                    <FloatingComposeButton kind={fabKind} href={fabHref} onFabClick={onFabClick} icon={fabIcon} menu={fabMenu} />
                   </div>
                 </div>
               </div>
@@ -128,7 +128,7 @@ function MainLayoutInner() {
           style={navHidden ? { transform: `translateY(calc(var(--bottom-nav-height) + var(--safe-area-inset-bottom, env(safe-area-inset-bottom, 0px))))` } : undefined}
         >
           <div className="pointer-events-auto">
-            <FloatingComposeButton kind={fabKind} href={fabHref} onFabClick={onFabClick} icon={fabIcon} />
+            <FloatingComposeButton kind={fabKind} href={fabHref} onFabClick={onFabClick} icon={fabIcon} menu={fabMenu} />
           </div>
         </div>
       )}

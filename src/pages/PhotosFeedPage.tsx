@@ -17,7 +17,6 @@ import {
   MediaCollage,
   MediaCollageSkeleton,
 } from "@/components/MediaCollage";
-import { ARC_OVERHANG_PX } from "@/components/ArcBackground";
 import { PageHeader } from "@/components/PageHeader";
 import { PullToRefresh } from "@/components/PullToRefresh";
 import { SubHeaderBar } from "@/components/SubHeaderBar";
@@ -138,7 +137,6 @@ export function PhotosFeedPage() {
             onClick={() => setActiveTab("global")}
           />
         </SubHeaderBar>
-        <div style={{ height: ARC_OVERHANG_PX }} />
 
         {/* Grid */}
         <PullToRefresh onRefresh={handleRefresh}>

@@ -4,7 +4,6 @@ import { Globe, Info, Mail, Shield, Zap, Server, Hash } from 'lucide-react';
 import { useParams } from 'react-router-dom';
 import { useNostr } from '@nostrify/react';
 import { useQuery } from '@tanstack/react-query';
-import { ARC_OVERHANG_PX } from '@/components/ArcBackground';
 import { NoteCard } from '@/components/NoteCard';
 import { PageHeader } from '@/components/PageHeader';
 import { SubHeaderBar } from '@/components/SubHeaderBar';
@@ -109,8 +108,6 @@ export function RelayPage() {
 
       <RelayInfoPanel info={info} infoLoading={infoLoading} infoError={infoError} open={infoOpen} />
       <SubHeaderBar>{null}</SubHeaderBar>
-
-      <div style={{ height: ARC_OVERHANG_PX }} />
 
       {/* Feed section */}
       <div>

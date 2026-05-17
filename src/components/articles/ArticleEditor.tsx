@@ -36,7 +36,6 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { SubHeaderBar } from '@/components/SubHeaderBar';
-import { ARC_OVERHANG_PX } from '@/components/ArcBackground';
 import { TabButton } from '@/components/TabButton';
 import { FabButton } from '@/components/FabButton';
 import { toast } from '@/hooks/useToast';
@@ -559,8 +558,6 @@ export function ArticleEditor({ initialData, editMode = false }: ArticleEditorPr
           />
         </SubHeaderBar>
       </div>
-      {/* Spacer for the arc overhang */}
-      <div style={{ height: ARC_OVERHANG_PX }} />
 
       <input
         ref={fileInputRef}

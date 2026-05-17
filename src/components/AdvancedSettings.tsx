@@ -1,15 +1,21 @@
-import { useState } from 'react';
-import { ChevronDown, ChevronUp, Bug, RotateCcw, AlertTriangle } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { ChevronDown, ChevronUp, RotateCcw, AlertTriangle, Eye, EyeOff } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
+import { Textarea } from '@/components/ui/textarea';
 import { RequestToVanishDialog } from '@/components/RequestToVanishDialog';
 import { useAppContext } from '@/hooks/useAppContext';
 import { useToast } from '@/hooks/useToast';
 import { useEncryptedSettings } from '@/hooks/useEncryptedSettings';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
+import { DEFAULT_SYSTEM_PROMPT_TEMPLATE } from '@/lib/aiChatSystemPrompt';
+
+/** Hardcoded default values for Agent provider fields. Used for reset buttons. */
+const DEFAULT_AI_BASE_URL = 'https://ai.shakespeare.diy/v1';
+const DEFAULT_AI_MODEL = 'grok-4.1-fast';
 
 /** The build-time default DSN from the environment variable. */
 const DEFAULT_SENTRY_DSN = import.meta.env.VITE_SENTRY_DSN || '';
@@ -20,6 +26,7 @@ export function AdvancedSettings() {
   const { updateSettings } = useEncryptedSettings();
   const { user } = useCurrentUser();
   const [systemOpen, setSystemOpen] = useState(true);
+  const [aiOpen, setAiOpen] = useState(false);
   const [sentryOpen, setSentryOpen] = useState(false);
   const [dangerOpen, setDangerOpen] = useState(false);
   const [vanishDialogOpen, setVanishDialogOpen] = useState(false);
@@ -28,6 +35,73 @@ export function AdvancedSettings() {
   const [linkPreviewUrl, setLinkPreviewUrl] = useState(config.linkPreviewUrl);
   const [corsProxy, setCorsProxy] = useState(config.corsProxy);
   const [sentryDsn, setSentryDsn] = useState(config.sentryDsn);
+  const [baseUrlDraft, setBaseUrlDraft] = useState(config.aiBaseURL);
+  const [apiKeyDraft, setApiKeyDraft] = useState(config.aiApiKey);
+  const [modelDraft, setModelDraft] = useState(config.aiModel);
+  const [showApiKey, setShowApiKey] = useState(false);
+  const [systemPromptDraft, setSystemPromptDraft] = useState(config.aiSystemPrompt || DEFAULT_SYSTEM_PROMPT_TEMPLATE);
+
+  useEffect(() => { setBaseUrlDraft(config.aiBaseURL); }, [config.aiBaseURL]);
+  useEffect(() => { setApiKeyDraft(config.aiApiKey); }, [config.aiApiKey]);
+  useEffect(() => { setModelDraft(config.aiModel); }, [config.aiModel]);
+
+  const commitBaseUrl = () => {
+    const trimmed = baseUrlDraft.trim().replace(/\/+$/, '');
+    if (!trimmed) {
+      setBaseUrlDraft(DEFAULT_AI_BASE_URL);
+      if (config.aiBaseURL !== DEFAULT_AI_BASE_URL) {
+        updateConfig((current) => ({ ...current, aiBaseURL: DEFAULT_AI_BASE_URL }));
+        toast({ title: 'Base URL reset to default' });
+      }
+      return;
+    }
+    if (trimmed !== config.aiBaseURL) {
+      updateConfig((current) => ({ ...current, aiBaseURL: trimmed }));
+      toast({ title: 'AI base URL updated' });
+    }
+  };
+
+  const commitApiKey = () => {
+    const trimmed = apiKeyDraft.trim();
+    if (trimmed !== config.aiApiKey) {
+      updateConfig((current) => ({ ...current, aiApiKey: trimmed }));
+      toast({ title: trimmed ? 'API key updated' : 'API key cleared (using NIP-98 auth)' });
+    }
+  };
+
+  const commitModel = () => {
+    const trimmed = modelDraft.trim();
+    if (!trimmed) {
+      setModelDraft(DEFAULT_AI_MODEL);
+      if (config.aiModel !== DEFAULT_AI_MODEL) {
+        updateConfig((current) => ({ ...current, aiModel: DEFAULT_AI_MODEL }));
+        toast({ title: 'AI model reset to default' });
+      }
+      return;
+    }
+    if (trimmed !== config.aiModel) {
+      updateConfig((current) => ({ ...current, aiModel: trimmed }));
+      toast({ title: 'AI model updated' });
+    }
+  };
+
+  const resetProviderDefaults = () => {
+    setBaseUrlDraft(DEFAULT_AI_BASE_URL);
+    setApiKeyDraft('');
+    setModelDraft(DEFAULT_AI_MODEL);
+    updateConfig((current) => ({
+      ...current,
+      aiBaseURL: DEFAULT_AI_BASE_URL,
+      aiApiKey: '',
+      aiModel: DEFAULT_AI_MODEL,
+    }));
+    toast({ title: 'Provider settings reset to defaults' });
+  };
+
+  const providerIsDefault =
+    config.aiBaseURL === DEFAULT_AI_BASE_URL &&
+    config.aiApiKey === '' &&
+    config.aiModel === DEFAULT_AI_MODEL;
 
   const handleStatsPubkeyChange = (value: string) => {
     setStatsPubkey(value);
@@ -42,6 +116,156 @@ export function AdvancedSettings() {
 
   return (
     <div>
+      {/* Agent Section */}
+      <div>
+        <Collapsible open={aiOpen} onOpenChange={setAiOpen}>
+          <CollapsibleTrigger asChild>
+            <Button
+              variant="ghost"
+              className="relative w-full justify-between px-3 py-3.5 h-auto hover:bg-muted/20 hover:text-foreground rounded-none"
+            >
+              <span className="text-base font-semibold">Agent</span>
+              {aiOpen ? (
+                <ChevronUp className="h-4 w-4 text-muted-foreground" />
+              ) : (
+                <ChevronDown className="h-4 w-4 text-muted-foreground" />
+              )}
+              <div className="absolute bottom-0 left-0 right-0 h-1 bg-primary rounded-full" />
+            </Button>
+          </CollapsibleTrigger>
+          <CollapsibleContent>
+            <div className="px-3 pt-3 pb-4 space-y-5 border-b border-border">
+
+              {/* AI Base URL */}
+              <div>
+                <Label htmlFor="ai-base-url" className="text-sm font-medium">
+                  Base URL
+                </Label>
+                <p className="text-xs text-muted-foreground mt-1 mb-2">
+                  OpenAI-compatible <code className="bg-muted px-1 rounded">/v1</code> endpoint. An API key is required for endpoints that don't support NIP-98 auth.
+                </p>
+                <Input
+                  id="ai-base-url"
+                  type="url"
+                  value={baseUrlDraft}
+                  onChange={(e) => setBaseUrlDraft(e.target.value)}
+                  onBlur={commitBaseUrl}
+                  placeholder={DEFAULT_AI_BASE_URL}
+                  className="font-mono text-base md:text-sm"
+                  autoComplete="off"
+                  spellCheck={false}
+                />
+              </div>
+
+              {/* API Key */}
+              <div>
+                <Label htmlFor="ai-api-key" className="text-sm font-medium">
+                  API key
+                </Label>
+                <p className="text-xs text-muted-foreground mt-1 mb-2">
+                  Optional. Required for endpoints that use standard API-key auth (e.g. OpenAI, Anthropic, OpenRouter).
+                </p>
+                <div className="flex gap-2">
+                  <Input
+                    id="ai-api-key"
+                    type={showApiKey ? 'text' : 'password'}
+                    value={apiKeyDraft}
+                    onChange={(e) => setApiKeyDraft(e.target.value)}
+                    onBlur={commitApiKey}
+                    placeholder="Leave empty to use NIP-98 auth"
+                    className="font-mono text-base md:text-sm"
+                    autoComplete="off"
+                    spellCheck={false}
+                  />
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="icon"
+                    onClick={() => setShowApiKey((value) => !value)}
+                    aria-label={showApiKey ? 'Hide API key' : 'Show API key'}
+                  >
+                    {showApiKey ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                  </Button>
+                </div>
+              </div>
+
+              {/* AI Model */}
+              <div>
+                <Label htmlFor="ai-model" className="text-sm font-medium">
+                  Model
+                </Label>
+                <p className="text-xs text-muted-foreground mt-1 mb-2">
+                  Model ID sent to the provider (e.g. <code className="bg-muted px-1 rounded">grok-4.1-fast</code>, <code className="bg-muted px-1 rounded">claude-opus-4.6</code>, <code className="bg-muted px-1 rounded">gpt-4o</code>).
+                </p>
+                <Input
+                  id="ai-model"
+                  type="text"
+                  value={modelDraft}
+                  onChange={(e) => setModelDraft(e.target.value)}
+                  onBlur={commitModel}
+                  placeholder={DEFAULT_AI_MODEL}
+                  className="font-mono text-base md:text-sm"
+                  autoComplete="off"
+                  spellCheck={false}
+                />
+                {!providerIsDefault && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-7 text-xs text-muted-foreground mt-2"
+                    onClick={resetProviderDefaults}
+                  >
+                    <RotateCcw className="h-3 w-3 mr-1" />
+                    Reset provider to default
+                  </Button>
+                )}
+              </div>
+
+              {/* AI System Prompt */}
+              <div>
+                <Label htmlFor="ai-system-prompt" className="text-sm font-medium">
+                  System Prompt
+                </Label>
+                <p className="text-xs text-muted-foreground mt-1 mb-2">
+                  The base system prompt sent to the AI. Supports <code className="bg-muted px-1 rounded">{'{{SAVED_FEEDS}}'}</code> and <code className="bg-muted px-1 rounded">{'{{USER_IDENTITY}}'}</code> placeholders.
+                </p>
+                <Textarea
+                  id="ai-system-prompt"
+                  value={systemPromptDraft}
+                  onChange={(e) => setSystemPromptDraft(e.target.value)}
+                  onBlur={() => {
+                    const trimmed = systemPromptDraft.trim();
+                    const defaultPrompt = DEFAULT_SYSTEM_PROMPT_TEMPLATE;
+                    // If the user reverted back to the default text, store empty (meaning "use default")
+                    const valueToStore = trimmed === defaultPrompt ? '' : trimmed;
+                    if (valueToStore !== config.aiSystemPrompt) {
+                      updateConfig(() => ({ aiSystemPrompt: valueToStore }));
+                      toast({ title: valueToStore ? 'System prompt updated' : 'System prompt reset to default' });
+                    }
+                  }}
+                  className="min-h-[120px] max-h-[400px] resize-y font-mono text-base leading-relaxed"
+                />
+                {config.aiSystemPrompt && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-7 text-xs text-muted-foreground mt-2"
+                    onClick={() => {
+                      setSystemPromptDraft(DEFAULT_SYSTEM_PROMPT_TEMPLATE);
+                      updateConfig(() => ({ aiSystemPrompt: '' }));
+                      toast({ title: 'System prompt reset to default' });
+                    }}
+                  >
+                    <RotateCcw className="h-3 w-3 mr-1" />
+                    Reset to default
+                  </Button>
+                )}
+              </div>
+            </div>
+          </CollapsibleContent>
+        </Collapsible>
+      </div>
+
       {/* System Section (includes Stats Source) */}
       <div>
         <Collapsible open={systemOpen} onOpenChange={setSystemOpen}>
@@ -188,10 +412,7 @@ export function AdvancedSettings() {
               variant="ghost"
               className="relative w-full justify-between px-3 py-3.5 h-auto hover:bg-muted/20 hover:text-foreground rounded-none"
             >
-              <span className="flex items-center gap-2 text-base font-semibold">
-                <Bug className="h-4 w-4" />
-                Error Reporting
-              </span>
+              <span className="text-base font-semibold">Error Reporting</span>
               {sentryOpen ? (
                 <ChevronUp className="h-4 w-4 text-muted-foreground" />
               ) : (

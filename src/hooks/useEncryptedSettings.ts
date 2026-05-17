@@ -121,6 +121,14 @@ export interface EncryptedSettings {
   };
   /** Letter preferences (stationery, font, frame, closing, signature, inbox filters) */
   letterPreferences?: LetterPreferences;
+  /** Base URL for the AI chat-completions provider */
+  aiBaseURL?: string;
+  /** API key for the AI provider */
+  aiApiKey?: string;
+  /** Override the AI model used by the Agent */
+  aiModel?: string;
+  /** Override the AI system prompt for the Agent */
+  aiSystemPrompt?: string;
 }
 
 /**

@@ -1,6 +1,6 @@
 import { lazy, Suspense, useState, useRef, useCallback, useMemo, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Paperclip, Smile, AlertTriangle, X, Loader2, Mic, Square, Sticker, BarChart3, Plus, ChevronLeft } from 'lucide-react';
+import { Paperclip, Smile, AlertTriangle, X, Loader2, Mic, Square, Sticker, BarChart3, Plus, ChevronLeft, HelpCircle } from 'lucide-react';
 import { nip19 } from 'nostr-tools';
 import { encode as blurhashEncode } from 'blurhash';
 import type { NostrEvent } from '@nostrify/nostrify';
@@ -12,6 +12,7 @@ import { Input } from '@/components/ui/input';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Select, SelectContent, SelectItem, SelectTrigger } from '@/components/ui/select';
 import { useCustomEmojis } from '@/hooks/useCustomEmojis';
 import { useFeedSettings } from '@/hooks/useFeedSettings';
 import { GifPicker } from '@/components/GifPicker';
@@ -27,6 +28,9 @@ import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useNostrPublish } from '@/hooks/useNostrPublish';
 import { usePostComment } from '@/hooks/usePostComment';
 import { useUploadFile } from '@/hooks/useUploadFile';
+import { useCountryFollows } from '@/hooks/useCountryFollows';
+import { getCountryInfo } from '@/lib/countries';
+import { createCountryIdentifier } from '@/lib/countryIdentifiers';
 import { useQueryClient } from '@tanstack/react-query';
 import { useToast } from '@/hooks/useToast';
 import { useAppContext } from '@/hooks/useAppContext';
@@ -249,6 +253,28 @@ export function ComposeBox({
 
   // Poll mode state
   const [mode, setMode] = useState<'post' | 'poll'>(initialMode);
+
+  // Country-destination toggle. Only meaningful for top-level new posts
+  // from the home feed (no replyTo, not a custom-kind publish). When a
+  // country code is selected, the post is published as a NIP-22 kind
+  // 1111 comment rooted on that country instead of a plain kind 1 note.
+  // Dropdown lists only the countries the user follows, with "Global"
+  // always at the top.
+  const { followedCountries } = useCountryFollows();
+  const canChooseDestination =
+    !replyTo && !customPublish && mode === 'post' && !!user && followedCountries.length > 0;
+  /** `'world'` for a regular kind-1 note, or an ISO 3166 country code for a kind-1111 community post. */
+  const [destination, setDestination] = useState<'world' | string>('world');
+  const selectedCountryCode = destination !== 'world' ? destination : null;
+  const selectedCountryInfo = selectedCountryCode ? getCountryInfo(selectedCountryCode) : null;
+  // If the user unfollows the currently-selected country mid-session,
+  // snap back to world so we don't try to publish a kind 1111 with
+  // a root the user no longer cares about.
+  useEffect(() => {
+    if (selectedCountryCode && !followedCountries.includes(selectedCountryCode)) {
+      setDestination('world');
+    }
+  }, [selectedCountryCode, followedCountries]);
   const [pollOptions, setPollOptions] = useState([
     { id: pollOptionId(), label: '' },
     { id: pollOptionId(), label: '' },
@@ -286,6 +312,7 @@ export function ComposeBox({
     setUploadedFileGroups(new Map());
     setWebxdcUuids(new Map());
     setWebxdcMetas(new Map());
+    setDestination('world');
     // Clear the auto-saved draft
     try { localStorage.removeItem(draftKey); } catch { /* ignore */ }
   }, [initialMode, draftKey]);
@@ -1069,6 +1096,12 @@ export function ComposeBox({
         }
 
         await postComment({ root, reply, content: finalContent, tags });
+      } else if (canChooseDestination && selectedCountryCode) {
+        // No replyTo, but the user picked a followed country as the
+        // destination — publish as a NIP-22 kind 1111 rooted on the
+        // country identifier (mirrors the country page's compose flow).
+        const countryRoot = new URL(createCountryIdentifier(selectedCountryCode));
+        await postComment({ root: countryRoot, reply: undefined, content: finalContent, tags });
       } else {
         await createEvent({
           kind: 1,
@@ -1245,7 +1278,13 @@ export function ComposeBox({
               onPointerDown={expand}
               onFocus={expand}
               onPaste={handlePaste}
-              placeholder={mode === 'poll' ? 'Ask a question…' : placeholder}
+              placeholder={
+                mode === 'poll'
+                  ? 'Ask a question…'
+                  : selectedCountryInfo
+                    ? `What's happening in ${selectedCountryInfo.name}?`
+                    : placeholder
+              }
               className={cn(
                 'w-full bg-transparent text-foreground placeholder:text-muted-foreground resize-none outline-none text-lg pt-2.5 pb-2 opacity-85 break-words overflow-hidden transition-[min-height] duration-200 ease-in-out',
                 isExpanded ? 'min-h-[100px]' : 'min-h-[44px]',
@@ -1418,6 +1457,114 @@ export function ComposeBox({
 
         </div>{/* end flex-1 content column */}
       </div>{/* end avatar + content row */}
+
+        {/* Destination row — its own line above the toolbar so the
+            "Post to" label gives it semantic context. The dropdown lists
+            "Global" first, then every country the user follows. The
+            help icon opens a popover that explains the difference
+            between a global post and a country community post. Shown
+            only for new top-level posts from a logged-in user with
+            at least one followed country. */}
+        {canChooseDestination && isExpanded && (
+          <div className="mt-2 flex items-center justify-end gap-2">
+            <span className="text-xs font-medium text-muted-foreground">
+              Post to
+            </span>
+            <Popover>
+              <PopoverTrigger asChild>
+                <button
+                  type="button"
+                  aria-label="What's the difference between global and community posts?"
+                  className={cn(
+                    'inline-flex items-center justify-center size-5 rounded-full shrink-0',
+                    'text-muted-foreground/70 hover:text-foreground hover:bg-muted/60',
+                    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50',
+                    'transition-colors',
+                  )}
+                >
+                  <HelpCircle className="size-3.5" />
+                </button>
+              </PopoverTrigger>
+              <PopoverContent
+                side="top"
+                align="end"
+                className="w-72 p-0 rounded-2xl overflow-hidden"
+              >
+                {(() => {
+                  // Use the currently-selected country (falling back to
+                  // the first followed one) only as the *flag emoji* in
+                  // the example. The text stays generic so the popover
+                  // reads as an explanation of the feature, not a
+                  // description of the user's current pick.
+                  const exampleCode = selectedCountryCode ?? followedCountries[0];
+                  const exampleFlag = exampleCode ? getCountryInfo(exampleCode)?.flag : null;
+                  return (
+                    <div className="p-4 space-y-3">
+                      <div className="flex gap-3">
+                        <span className="text-2xl leading-none shrink-0" aria-hidden="true">🌍</span>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-semibold">Global</p>
+                          <p className="text-xs text-muted-foreground mt-0.5">
+                            A regular post visible to everyone on Nostr. Anyone, anywhere can see it.
+                          </p>
+                        </div>
+                      </div>
+                      <div className="flex gap-3">
+                        <span className="text-2xl leading-none shrink-0" aria-hidden="true">
+                          {exampleFlag ?? '🌐'}
+                        </span>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-semibold">Your country community</p>
+                          <p className="text-xs text-muted-foreground mt-0.5">
+                            Shown in that country's local feed alongside posts from neighbors. Best for community-relevant updates.
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })()}
+              </PopoverContent>
+            </Popover>
+            <Select value={destination} onValueChange={setDestination}>
+              <SelectTrigger
+                aria-label="Post destination"
+                className={cn(
+                  'h-8 w-auto gap-1.5 px-2.5 py-1 text-base leading-none',
+                  'border-0 bg-muted/50 hover:bg-muted shadow-none',
+                  'focus:ring-2 focus:ring-primary/50 focus:ring-offset-0',
+                  'rounded-lg',
+                )}
+              >
+                {/* Show just the flag in the trigger to keep the row
+                    compact on mobile. The list items below carry the
+                    country name so users can still tell them apart. */}
+                <span aria-hidden="true">
+                  {selectedCountryInfo?.flag ?? '🌍'}
+                </span>
+              </SelectTrigger>
+              <SelectContent align="end" className="min-w-[180px]">
+                <SelectItem value="world">
+                  <span className="inline-flex items-center gap-2">
+                    <span aria-hidden="true">🌍</span>
+                    <span>Global</span>
+                  </span>
+                </SelectItem>
+                {followedCountries.map((code) => {
+                  const info = getCountryInfo(code);
+                  if (!info) return null;
+                  return (
+                    <SelectItem key={code} value={code}>
+                      <span className="inline-flex items-center gap-2">
+                        <span aria-hidden="true">{info.flag}</span>
+                        <span>{info.name}</span>
+                      </span>
+                    </SelectItem>
+                  );
+                })}
+              </SelectContent>
+            </Select>
+          </div>
+        )}
 
         {/* Toolbar + post button — full width, not indented by avatar */}
         {isExpanded && (

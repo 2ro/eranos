@@ -2,6 +2,7 @@ import type { NostrEvent, NostrSigner } from '@nostrify/types';
 import { createElement } from 'react';
 import { toast } from '@/hooks/useToast';
 import { NudgeToastContent } from '@/components/SignerToastContent';
+import { type BtcSigner, hasBtcSigning } from '@/lib/bitcoin-signers';
 import { getKindLabel } from '@/lib/kindLabels';
 
 // ---------------------------------------------------------------------------
@@ -35,6 +36,7 @@ const NUDGE_OVERRIDES: Record<number, string> = {
   1: 'post',
   3: 'contact list update',
   11: 'post',
+  8333: 'Bitcoin zap',
   4932: 'webxdc sync',
   10000: 'mute list update',
   10001: 'pinned notes update',
@@ -303,6 +305,13 @@ export function signerWithNudge(
 
   if (signer.nip44) {
     wrapped.nip44 = wrapCrypto(signer.nip44);
+  }
+
+  if (hasBtcSigning(signer)) {
+    const btcWrapped = wrapped as BtcSigner;
+    const btcSigner = signer;
+    btcWrapped.signPsbt = (psbtHex: string) =>
+      run(() => btcSigner.signPsbt(psbtHex), undefined, 'sign');
   }
 
   return wrapped;

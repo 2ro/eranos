@@ -55,6 +55,23 @@ import {
   checkRelayBackupInfo,
 } from "@/lib/spark/backup";
 
+export type SparkWalletDiagnostics = {
+  identityPubkey: string | null;
+  sdkBalance: number | null;
+  cachedBalance: number;
+  paymentCount: number;
+  completedReceiveTotal: number;
+  completedSendTotal: number;
+  pendingReceiveTotal: number;
+  syncError: string | null;
+  latestPayment:
+    | Pick<
+        BreezPaymentInfo,
+        "id" | "amount" | "paymentType" | "status" | "timestamp"
+      >
+    | null;
+};
+
 /** Context value type */
 export interface SparkWalletContextValue {
   // State
@@ -120,6 +137,7 @@ export interface SparkWalletContextValue {
   // Utility
   refreshBalance: () => Promise<void>;
   refreshPayments: () => Promise<void>;
+  getDiagnostics: () => Promise<SparkWalletDiagnostics>;
   setEnabled: (enabled: boolean) => void;
   parseInput: (
     input: string,
@@ -959,6 +977,86 @@ export function SparkWalletProvider({ children }: { children: ReactNode }) {
     }
   }, [user?.pubkey]);
 
+  const getDiagnostics = useCallback(async (): Promise<SparkWalletDiagnostics> => {
+    const emptyDiagnostics: SparkWalletDiagnostics = {
+      identityPubkey: null,
+      sdkBalance: null,
+      cachedBalance: balance,
+      paymentCount: payments.length,
+      completedReceiveTotal: 0,
+      completedSendTotal: 0,
+      pendingReceiveTotal: 0,
+      syncError: null,
+      latestPayment: null,
+    };
+
+    if (!breezService.isConnected()) {
+      return emptyDiagnostics;
+    }
+
+    let syncError: string | null = null;
+    try {
+      await breezService.syncWallet();
+    } catch (error) {
+      syncError = error instanceof Error ? error.message : "Unknown sync error";
+      logger.warn("[SparkWallet] Diagnostics sync failed:", error);
+    }
+
+    const [info, paymentList] = await Promise.all([
+      breezService.getInfo(),
+      breezService.getPaymentHistory({
+        limit: PAYMENTS_PAGE_SIZE,
+        sortAscending: false,
+      }),
+    ]);
+    const sorted = [...paymentList].sort(
+      (a, b) => Number(b.timestamp) - Number(a.timestamp),
+    );
+
+    const completedReceiveTotal = sorted
+      .filter(
+        (payment) =>
+          payment.paymentType === "receive" && payment.status === "completed",
+      )
+      .reduce((total, payment) => total + payment.amount, 0);
+    const completedSendTotal = sorted
+      .filter(
+        (payment) =>
+          payment.paymentType === "send" && payment.status === "completed",
+      )
+      .reduce((total, payment) => total + payment.amount + payment.fees, 0);
+    const pendingReceiveTotal = sorted
+      .filter(
+        (payment) =>
+          payment.paymentType === "receive" && payment.status === "pending",
+      )
+      .reduce((total, payment) => total + payment.amount, 0);
+    const latestPayment = sorted[0]
+      ? {
+          id: sorted[0].id,
+          amount: sorted[0].amount,
+          paymentType: sorted[0].paymentType,
+          status: sorted[0].status,
+          timestamp: sorted[0].timestamp,
+        }
+      : null;
+
+    setBalance(info.balanceSats);
+    setPayments(sorted);
+
+    return {
+      identityPubkey: info.identityPubkey,
+      sdkBalance: info.balanceSats,
+      cachedBalance: balance,
+      paymentCount: sorted.length,
+      completedReceiveTotal,
+      completedSendTotal,
+      pendingReceiveTotal,
+      syncError,
+      latestPayment,
+    };
+  }, [balance, payments.length]);
+
   const refreshPayments = useCallback(async () => {
     if (!breezService.isConnected()) return;
 
@@ -1432,6 +1530,7 @@ export function SparkWalletProvider({ children }: { children: ReactNode }) {
       // Utility
       refreshBalance,
       refreshPayments,
+      getDiagnostics,
       setEnabled,
       parseInput,
       getMnemonic,
@@ -1498,6 +1597,7 @@ export function SparkWalletProvider({ children }: { children: ReactNode }) {
       deleteLightningAddress,
       refreshBalance,
       refreshPayments,
+      getDiagnostics,
       setEnabled,
       parseInput,
       getMnemonic,

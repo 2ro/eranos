@@ -119,6 +119,10 @@ export function TestApp({ children }: TestAppProps) {
     sandboxDomain: 'iframe.diy',
     esploraBaseUrl: 'https://mempool.space/api',
     sidebarWidgets: [],
+    aiBaseURL: 'https://ai.shakespeare.diy/v1',
+    aiApiKey: '',
+    aiModel: 'grok-4.1-fast',
+    aiSystemPrompt: '',
   };
 
   return (

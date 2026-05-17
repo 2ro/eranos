@@ -7,6 +7,7 @@ import {
   GitBranch,
   GitPullRequest,
   Mail,
+  Megaphone,
   MessageCircle,
   Rocket,
   MoreHorizontal,
@@ -30,6 +31,7 @@ import {
   PodcastEpisodeContent,
   PodcastTrailerContent,
 } from "@/components/AudioKindContent";
+import { ActionContent } from "@/components/ActionContent";
 import { BadgeContent } from "@/components/BadgeContent";
 import { CommunityContent } from "@/components/CommunityContent";
 import { CalendarEventContent } from "@/components/CalendarEventContent";
@@ -37,7 +39,7 @@ import {
   ColorMomentContent,
   ColorMomentEyeButton,
 } from "@/components/ColorMomentContent";
-import { CommentContext } from "@/components/CommentContext";
+import { CommentContext, CountryCommentPill, CountryFlagBackdrop } from "@/components/CommentContext";
 import { CommunityContentWarning } from "@/components/CommunityContentWarning";
 import { ContentWarningGuard } from "@/components/ContentWarningGuard";
 import { EmojifiedText, ReactionEmoji } from "@/components/CustomEmoji";
@@ -400,6 +402,7 @@ export const NoteCard = memo(function NoteCard({
   const isBadge = isBadgeDefinition || isProfileBadges;
   const isCommunity = event.kind === 34550;
   const isZapGoal = event.kind === 9041;
+  const isAction = event.kind === 36639;
   const isReaction = event.kind === 7;
   const isPollVote = event.kind === 1018;
   const isRepost = event.kind === 6 || event.kind === 16;
@@ -445,6 +448,7 @@ export const NoteCard = memo(function NoteCard({
     !isBadge &&
     !isCommunity &&
     !isZapGoal &&
+    !isAction &&
     !isReaction &&
     !isPollVote &&
     !isRepost &&
@@ -604,6 +608,9 @@ export const NoteCard = memo(function NoteCard({
           <CommunityContent event={event} />
         ) : isZapGoal ? (
           <GoalCard event={event} />
+
+        ) : isAction ? (
+          <ActionContent event={event} />
 
         ) : isVoiceMessage ? (
           <VoiceMessagePlayer event={event} />
@@ -1015,24 +1022,131 @@ export const NoteCard = memo(function NoteCard({
     return (
       <article
         className={cn(
-          "px-4 pt-3 hover:bg-secondary/30 transition-colors cursor-pointer overflow-hidden",
+          "relative px-4 pt-3 hover:bg-secondary/30 transition-colors cursor-pointer overflow-hidden",
           threaded ? "pb-0" : "pb-3 border-b border-border",
           className,
         )}
         onClick={handleCardClick}
         onAuxClick={handleAuxClick}
       >
-        {threadedKindHeader}
-        <div className="flex gap-3">
-          <div className="flex flex-col items-center">
-            {avatarElement}
-            {threaded && (
-              <div className={cn("w-0.5 flex-1 mt-2 rounded-full", threadedLineClassName || "bg-foreground/20")} />
-            )}
+        <CountryFlagBackdrop event={event} />
+        {/* Foreground wrapper — `relative` lifts the entire post above the
+            absolute backdrop layer rendered by CountryFlagBackdrop. */}
+        <div className="relative">
+          {threadedKindHeader && (
+            <div>
+              {threadedKindHeader}
+            </div>
+          )}
+          <div className="flex gap-3">
+            <div className="flex flex-col items-center">
+              {avatarElement}
+              {threaded && (
+                <div className={cn("w-0.5 flex-1 mt-2 rounded-full", threadedLineClassName || "bg-foreground/20")} />
+              )}
+            </div>
+            <div className={cn("flex-1 min-w-0", threaded && "pb-3")}>
+              <div className="flex items-center justify-between gap-2">
+                <div className="min-w-0 flex-1">
+                  {authorInfo}
+                </div>
+                <CountryCommentPill event={event} className="shrink-0 [text-shadow:none]" />
+              </div>
+              {contentBlock}
+              {actionButtons}
+              <NoteMoreMenu
+                event={event}
+                open={moreMenuOpen}
+                onOpenChange={setMoreMenuOpen}
+              />
+              <ReplyComposeModal
+                event={event}
+                open={replyOpen}
+                onOpenChange={setReplyOpen}
+              />
+            </div>
           </div>
-          <div className={cn("flex-1 min-w-0", threaded && "pb-3")}>
+        </div>
+      </article>
+    );
+  }
+
+  // ── Normal layout ──
+  return (
+    <article
+      className={cn(
+        "relative px-4 py-3 border-b border-border hover:bg-secondary/30 transition-colors cursor-pointer overflow-hidden",
+        highlight && "animate-highlight-fade",
+        className,
+      )}
+      onClick={handleCardClick}
+      onAuxClick={handleAuxClick}
+    >
+      <CountryFlagBackdrop event={event} />
+      {/* Foreground wrapper — `relative` lifts the entire post above the
+          absolute backdrop layer rendered by CountryFlagBackdrop. */}
+      <div className="relative">
+        <div>
+          {/* Action header — repost takes priority, otherwise derived from event kind */}
+          {repostedBy ? (
+            <EventActionHeader
+              pubkey={repostedBy}
+              icon={RepostIcon}
+              iconClassName="text-accent"
+              action="reposted"
+            />
+          ) : (
+            !hideKindHeader && KIND_HEADER_MAP[event.kind] &&
+            (() => {
+              const cfg = KIND_HEADER_MAP[event.kind];
+              const isLive =
+                event.kind === 30311 && getEffectiveStreamStatus(event) === "live";
+              return (
+                <EventActionHeader
+                  pubkey={event.pubkey}
+                  icon={cfg.icon}
+                  iconClassName={
+                    event.kind === 30311
+                      ? isLive
+                        ? "text-primary"
+                        : "text-muted-foreground"
+                      : cfg.iconClassName
+                  }
+                  action={
+                    typeof cfg.action === "function"
+                      ? cfg.action(event)
+                      : cfg.action
+                  }
+                  noun={cfg.noun}
+                  nounRoute={cfg.nounRoute}
+                />
+              );
+            })()
+          )}
+
+          {/* Header: avatar + name/handle stacked. The country pill is
+              appended outside this flag-mode wrapper as a flex sibling, so
+              it keeps its own surface treatment. */}
+          <div className="flex items-center gap-3">
+            {avatarElement}
             {authorInfo}
-            {contentBlock}
+            {isColor && <ColorMomentEyeButton event={event} />}
+            {/* Country pill — rendered outside the flag-mode color flip via
+                `[&]:` to escape the parent's color rules. It's wrapped in
+                its own flex slot so the row layout matches the non-flag
+                case (pill anchored right). */}
+            <CountryCommentPill
+              event={event}
+              className="shrink-0 [text-shadow:none]"
+            />
+          </div>
+        </div>
+
+        {contentBlock}
+
+        {/* Action buttons — hidden in compact/embed mode */}
+        {!compact && (
+          <>
             {actionButtons}
             <NoteMoreMenu
               event={event}
@@ -1044,85 +1158,9 @@ export const NoteCard = memo(function NoteCard({
               open={replyOpen}
               onOpenChange={setReplyOpen}
             />
-          </div>
-        </div>
-      </article>
-    );
-  }
-
-  // ── Normal layout ──
-  return (
-    <article
-      className={cn(
-        "px-4 py-3 border-b border-border hover:bg-secondary/30 transition-colors cursor-pointer overflow-hidden",
-        highlight && "animate-highlight-fade",
-        className,
-      )}
-      onClick={handleCardClick}
-      onAuxClick={handleAuxClick}
-    >
-      {/* Action header — repost takes priority, otherwise derived from event kind */}
-      {repostedBy ? (
-        <EventActionHeader
-          pubkey={repostedBy}
-          icon={RepostIcon}
-          iconClassName="text-accent"
-          action="reposted"
-        />
-      ) : (
-        !hideKindHeader && KIND_HEADER_MAP[event.kind] &&
-        (() => {
-          const cfg = KIND_HEADER_MAP[event.kind];
-          const isLive =
-            event.kind === 30311 && getEffectiveStreamStatus(event) === "live";
-          return (
-            <EventActionHeader
-              pubkey={event.pubkey}
-              icon={cfg.icon}
-              iconClassName={
-                event.kind === 30311
-                  ? isLive
-                    ? "text-primary"
-                    : "text-muted-foreground"
-                  : cfg.iconClassName
-              }
-              action={
-                typeof cfg.action === "function"
-                  ? cfg.action(event)
-                  : cfg.action
-              }
-              noun={cfg.noun}
-              nounRoute={cfg.nounRoute}
-            />
-          );
-        })()
-      )}
-
-      {/* Header: avatar + name/handle stacked */}
-      <div className="flex items-center gap-3">
-        {avatarElement}
-        {authorInfo}
-        {isColor && <ColorMomentEyeButton event={event} />}
+          </>
+        )}
       </div>
-
-      {contentBlock}
-
-      {/* Action buttons — hidden in compact/embed mode */}
-      {!compact && (
-        <>
-          {actionButtons}
-          <NoteMoreMenu
-            event={event}
-            open={moreMenuOpen}
-            onOpenChange={setMoreMenuOpen}
-          />
-          <ReplyComposeModal
-            event={event}
-            open={replyOpen}
-            onOpenChange={setReplyOpen}
-          />
-        </>
-      )}
     </article>
   );
 });
@@ -1777,7 +1815,7 @@ const KIND_HEADER_MAP: Record<number, KindHeaderConfig> = {
     action: "zapped",
   },
   36639: {
-    icon: Zap,
+    icon: Megaphone,
     action: (event) => publishedAtAction(event, { created: "posted an", updated: "updated an", fallback: "posted an" }),
     noun: "action",
     nounRoute: "/actions",

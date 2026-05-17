@@ -1,4 +1,4 @@
-import { Quote, Undo2 } from 'lucide-react';
+import { Quote, Rocket, Undo2 } from 'lucide-react';
 import { RepostIcon } from '@/components/icons/RepostIcon';
 import { useState } from 'react';
 import type { NostrEvent } from '@nostrify/nostrify';
@@ -14,6 +14,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { useToast } from '@/hooks/useToast';
 import { getRepostKind } from '@/lib/feedUtils';
 import { DITTO_RELAY } from '@/lib/appRelays';
+import { encodeEventAddress } from '@/lib/encodeEvent';
 import type { EventStats } from '@/hooks/useTrending';
 
 interface RepostMenuProps {
@@ -24,6 +25,7 @@ interface RepostMenuProps {
 export function RepostMenu({ event, children }: RepostMenuProps) {
   const [open, setOpen] = useState(false);
   const [quoteOpen, setQuoteOpen] = useState(false);
+  const [quoteInitialContent, setQuoteInitialContent] = useState<string | undefined>(undefined);
   const { user } = useCurrentUser();
   const { mutate: publishEvent } = useNostrPublish();
   const { mutate: deleteEvent } = useDeleteEvent();
@@ -140,6 +142,13 @@ export function RepostMenu({ event, children }: RepostMenuProps) {
   };
 
   const handleQuote = () => {
+    setQuoteInitialContent(undefined);
+    setOpen(false);
+    setQuoteOpen(true);
+  };
+
+  const handleBoost = () => {
+    setQuoteInitialContent(`\n\nhttps://agora.spot/${encodeEventAddress(event)}`);
     setOpen(false);
     setQuoteOpen(true);
   };
@@ -177,7 +186,17 @@ export function RepostMenu({ event, children }: RepostMenuProps) {
         className="flex items-center gap-3 w-full px-4 py-3 text-[15px] text-foreground hover:bg-secondary/60 transition-colors"
       >
         <Quote className="size-5" />
-        <span>Quote post</span>
+        <span>Quote</span>
+      </button>
+      <button
+        onClick={(e) => {
+          e.stopPropagation();
+          handleBoost();
+        }}
+        className="flex items-center gap-3 w-full px-4 py-3 text-[15px] text-foreground hover:bg-secondary/60 transition-colors"
+      >
+        <Rocket className="size-5" />
+        <span>Boost</span>
       </button>
     </div>
   );
@@ -203,6 +222,7 @@ export function RepostMenu({ event, children }: RepostMenuProps) {
         quotedEvent={event}
         open={quoteOpen}
         onOpenChange={setQuoteOpen}
+        initialContent={quoteInitialContent}
       />
     </>
   );

@@ -16,7 +16,7 @@ const DEFAULT_PAGE_SIZE = 20;
 
 // Canonical write tag is `agora-action`. We also accept `pathos-challenge`
 // and `agora-challenge` as read aliases so legacy events stay visible. Keep
-// in sync with `useChallenges.ts`.
+// in sync with `useActions.ts`.
 const CHALLENGE_T_ALIASES = ['agora-action', 'pathos-challenge', 'agora-challenge'];
 
 /**
@@ -53,7 +53,7 @@ export function usePaginatedFeed({
       // Query for:
       // 1. kind 1111 events - Geographic root posts and challenge comments
       // 2. kind 1068 events - NIP-88 Polls (country-scoped)
-      // 3. kind 36639 events - Challenge creation events
+      // 3. kind 36639 events - Action creation events
       const filters: NostrFilter[] = [];
       
       if (countryCode) {
@@ -114,6 +114,10 @@ async function applyFeedFilters(
   events: NostrEvent[],
   countryCode: string | undefined
 ): Promise<NostrEvent[]> {
+  const parseCountryIdentifier = countryCode
+    ? (await import('@/lib/countryIdentifiers')).parseCountryIdentifier
+    : undefined;
+
   // Filter by kind and tags
   let filteredEvents = events.filter(event => {
     if (event.kind === 36639) {
@@ -124,6 +128,10 @@ async function applyFeedFilters(
       return true;
     }
     if (event.kind === 1068) return true;
+    if (countryCode) {
+      const iTag = event.tags.find(([name]) => name === 'i')?.[1];
+      return !!iTag && parseCountryIdentifier?.(iTag)?.toUpperCase() === countryCode.toUpperCase();
+    }
     const kTags = event.tags.filter(([name]) => name === 'k').map(([, v]) => v);
     const KTags = event.tags.filter(([name]) => name === 'K').map(([, v]) => v);
     return kTags.includes('iso3166') || kTags.includes('geo') || KTags.includes('36639');

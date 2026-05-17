@@ -76,6 +76,19 @@ interface AddMemberDialogProps {
   existingMemberPubkeys: string[];
 }
 
+interface AddMemberPanelProps {
+  /** The raw community definition event. */
+  communityEvent: NostrEvent;
+  /** Parsed community data. */
+  community: ParsedCommunity;
+  /** Whether the current user is the founder (can add moderators). */
+  isFounder: boolean;
+  /** Existing active members and moderators, excluded from duplicate adds. */
+  existingMemberPubkeys: string[];
+  /** Called after a successful publish so the host (dialog/page) can close or refresh. */
+  onComplete?: () => void;
+}
+
 function parseBadgeATag(aTag: string | undefined): BadgeRef | undefined {
   if (!aTag) return undefined;
   const [kind, pubkey, ...identifierParts] = aTag.split(':');
@@ -120,6 +133,57 @@ export function AddMemberDialog({
   existingMemberPubkeys,
 }: AddMemberDialogProps) {
   const { user } = useCurrentUser();
+  const [portalContainer, setPortalContainer] = useState<HTMLElement | undefined>(undefined);
+
+  const dialogContentRef = useCallback((node: HTMLElement | null) => {
+    setPortalContainer(node ?? undefined);
+  }, []);
+
+  if (!user) return null;
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent ref={dialogContentRef} className="sm:max-w-md gap-0 p-0 overflow-visible">
+        <PortalContainerProvider value={portalContainer}>
+          <DialogHeader className="px-5 pt-5 pb-3">
+            <DialogTitle className="flex items-center gap-2">
+              <UserPlus className="size-5 text-primary" />
+              Add Members
+            </DialogTitle>
+            <DialogDescription>Add to community</DialogDescription>
+          </DialogHeader>
+
+          <ScrollArea className="max-h-[60vh]">
+            <div className="px-5 pb-5">
+              <AddMemberPanel
+                communityEvent={communityEvent}
+                community={community}
+                isFounder={isFounder}
+                existingMemberPubkeys={existingMemberPubkeys}
+                onComplete={() => onOpenChange(false)}
+              />
+            </div>
+          </ScrollArea>
+        </PortalContainerProvider>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+/**
+ * Inline form that searches for people and adds them as community members or
+ * moderators. Pulled out of `AddMemberDialog` so the same flow can be
+ * embedded inside other surfaces — e.g. the members dialog on
+ * `CommunityDetailPage` — without nesting a second `Dialog`.
+ */
+export function AddMemberPanel({
+  communityEvent,
+  community,
+  isFounder,
+  existingMemberPubkeys,
+  onComplete,
+}: AddMemberPanelProps) {
+  const { user } = useCurrentUser();
   const { nostr } = useNostr();
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -129,11 +193,6 @@ export function AddMemberDialog({
   const [badgeImageUrl, setBadgeImageUrl] = useState('');
   const [isBadgeImageUploading, setIsBadgeImageUploading] = useState(false);
   const [isPublishing, setIsPublishing] = useState(false);
-  const [portalContainer, setPortalContainer] = useState<HTMLElement | undefined>(undefined);
-
-  const dialogContentRef = useCallback((node: HTMLElement | null) => {
-    setPortalContainer(node ?? undefined);
-  }, []);
 
   // Mutations
   const { mutateAsync: publishEvent } = useNostrPublish();
@@ -157,11 +216,6 @@ export function AddMemberDialog({
     setIsBadgeImageUploading(false);
     setIsPublishing(false);
   }, []);
-
-  const handleOpenChange = useCallback((nextOpen: boolean) => {
-    if (!nextOpen) resetForm();
-    onOpenChange(nextOpen);
-  }, [onOpenChange, resetForm]);
 
   // ── People management ─────────────────────────────────────────────────────
 
@@ -407,7 +461,8 @@ export function AddMemberDialog({
 
       const addedCount = pendingMembers.length;
       toast({ title: `Added ${addedCount} ${addedCount === 1 ? 'person' : 'people'} to the community` });
-      handleOpenChange(false);
+      resetForm();
+      onComplete?.();
     } catch (err) {
       toast({
         title: 'Failed to add members',
@@ -419,121 +474,105 @@ export function AddMemberDialog({
     }
   }, [
     user, pendingMembers, existingBadgeATag, hasBadge, needsBadgeCreation, isFounder, community, communityEvent,
-    badgeImageUrl, nostr, publishEvent, queryClient, toast, handleOpenChange, applyOptimisticMembership, isBadgeImageUploading,
+    badgeImageUrl, nostr, publishEvent, queryClient, toast, resetForm, onComplete, applyOptimisticMembership, isBadgeImageUploading,
   ]);
 
   if (!user) return null;
 
   return (
-    <Dialog open={open} onOpenChange={handleOpenChange}>
-      <DialogContent ref={dialogContentRef} className="sm:max-w-md gap-0 p-0 overflow-visible">
-        <PortalContainerProvider value={portalContainer}>
-        <DialogHeader className="px-5 pt-5 pb-3">
-          <DialogTitle className="flex items-center gap-2">
-            <UserPlus className="size-5 text-primary" />
-            Add Members
-          </DialogTitle>
-          <DialogDescription>Add to community</DialogDescription>
-        </DialogHeader>
+    <div className="space-y-4">
+      {/* People search */}
+      <div className="space-y-1.5">
+        <Label>Search</Label>
+        <PersonSearch
+          onAdd={addPerson}
+          onAddMany={addPeople}
+          excludePubkeys={[
+            community.founderPubkey,
+            ...existingMemberPubkeys,
+            ...pendingMembers.map((m) => m.profile.pubkey),
+          ]}
+        />
+      </div>
 
-        <ScrollArea className="max-h-[60vh]">
-          <div className="px-5 pb-5 space-y-4">
-            {/* People search */}
-            <div className="space-y-1.5">
-              <Label>Search</Label>
-              <PersonSearch
-                onAdd={addPerson}
-                onAddMany={addPeople}
-                excludePubkeys={[
-                  community.founderPubkey,
-                  ...existingMemberPubkeys,
-                  ...pendingMembers.map((m) => m.profile.pubkey),
-                ]}
+      {/* Pending members list */}
+      {pendingMembers.length > 0 && (
+        <div className="space-y-1.5">
+          <Label>
+            People to add
+            <span className="text-muted-foreground font-normal ml-1">({pendingMembers.length})</span>
+          </Label>
+          <div className="space-y-1">
+            {pendingMembers.map((pm) => (
+              <PendingMemberChip
+                key={pm.profile.pubkey}
+                pending={pm}
+                onRemove={removePerson}
+                onRoleChange={isFounder ? setRole : undefined}
               />
-            </div>
-
-            {/* Pending members list */}
-            {pendingMembers.length > 0 && (
-              <div className="space-y-1.5">
-                <Label>
-                  People to add
-                  <span className="text-muted-foreground font-normal ml-1">({pendingMembers.length})</span>
-                </Label>
-                <div className="space-y-1">
-                  {pendingMembers.map((pm) => (
-                    <PendingMemberChip
-                      key={pm.profile.pubkey}
-                      pending={pm}
-                      onRemove={removePerson}
-                      onRoleChange={isFounder ? setRole : undefined}
-                    />
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {hasPendingMembers && (
-              <div className="space-y-2">
-                <Label>Member badge</Label>
-                {hasBadge ? (
-                  <div className="rounded-xl border border-border/60 bg-secondary/30 p-3">
-                    {isBadgeError ? (
-                      <p className="text-sm text-destructive">Failed to load the current member badge.</p>
-                    ) : isBadgeLoading ? (
-                      <div className="flex items-center gap-3">
-                        <div className="size-12 animate-pulse rounded-lg bg-muted" />
-                        <div className="space-y-2">
-                          <div className="h-4 w-28 animate-pulse rounded bg-muted" />
-                          <div className="h-3 w-44 animate-pulse rounded bg-muted" />
-                        </div>
-                      </div>
-                    ) : existingBadge ? (
-                      <div className="flex items-center gap-3">
-                        <BadgeThumbnail badge={existingBadge} size={48} className="shrink-0" />
-                        <div className="min-w-0">
-                          <p className="text-sm font-medium truncate">{existingBadge.name}</p>
-                          <p className="text-xs text-muted-foreground line-clamp-2">
-                            {existingBadge.description || 'Selected members will receive this badge.'}
-                          </p>
-                        </div>
-                      </div>
-                    ) : (
-                      <p className="text-sm text-destructive">The configured member badge could not be found.</p>
-                    )}
-                  </div>
-                ) : (
-                  <ImageUploadField
-                    id="member-badge-image"
-                    label={<>Create Member Badge Image <span className="text-muted-foreground font-normal">(optional)</span></>}
-                    value={badgeImageUrl}
-                    onChange={setBadgeImageUrl}
-                    onUploadingChange={setIsBadgeImageUploading}
-                    uploadToastTitle="Badge image uploaded"
-                    previewAlt="Badge preview"
-                    objectFit="contain"
-                    dropAreaClassName="min-h-24"
-                  />
-                )}
-              </div>
-            )}
-
-            {/* Submit button */}
-            <Button
-              onClick={handleSubmit}
-              disabled={pendingMembers.length === 0 || isPublishing || isBadgeImageUploading}
-              className="w-full gap-2"
-            >
-              {isPublishing ? (
-                <><Loader2 className="size-4 animate-spin" /> Adding...</>
-              ) : (
-                <><UserPlus className="size-4" /> Add {pendingMembers.length || ''} {pendingMembers.length === 1 ? 'Person' : pendingMembers.length > 1 ? 'People' : 'Members'}</>
-              )}
-            </Button>
+            ))}
           </div>
-        </ScrollArea>
-        </PortalContainerProvider>
-      </DialogContent>
-    </Dialog>
+        </div>
+      )}
+
+      {hasPendingMembers && (
+        <div className="space-y-2">
+          <Label>Member badge</Label>
+          {hasBadge ? (
+            <div className="rounded-xl border border-border/60 bg-secondary/30 p-3">
+              {isBadgeError ? (
+                <p className="text-sm text-destructive">Failed to load the current member badge.</p>
+              ) : isBadgeLoading ? (
+                <div className="flex items-center gap-3">
+                  <div className="size-12 animate-pulse rounded-lg bg-muted" />
+                  <div className="space-y-2">
+                    <div className="h-4 w-28 animate-pulse rounded bg-muted" />
+                    <div className="h-3 w-44 animate-pulse rounded bg-muted" />
+                  </div>
+                </div>
+              ) : existingBadge ? (
+                <div className="flex items-center gap-3">
+                  <BadgeThumbnail badge={existingBadge} size={48} className="shrink-0" />
+                  <div className="min-w-0">
+                    <p className="text-sm font-medium truncate">{existingBadge.name}</p>
+                    <p className="text-xs text-muted-foreground line-clamp-2">
+                      {existingBadge.description || 'Selected members will receive this badge.'}
+                    </p>
+                  </div>
+                </div>
+              ) : (
+                <p className="text-sm text-destructive">The configured member badge could not be found.</p>
+              )}
+            </div>
+          ) : (
+            <ImageUploadField
+              id="member-badge-image"
+              label={<>Create Member Badge Image <span className="text-muted-foreground font-normal">(optional)</span></>}
+              value={badgeImageUrl}
+              onChange={setBadgeImageUrl}
+              onUploadingChange={setIsBadgeImageUploading}
+              uploadToastTitle="Badge image uploaded"
+              previewAlt="Badge preview"
+              objectFit="contain"
+              dropAreaClassName="min-h-24"
+            />
+          )}
+        </div>
+      )}
+
+      {/* Submit button */}
+      <Button
+        onClick={handleSubmit}
+        disabled={pendingMembers.length === 0 || isPublishing || isBadgeImageUploading}
+        className="w-full gap-2"
+      >
+        {isPublishing ? (
+          <><Loader2 className="size-4 animate-spin" /> Adding...</>
+        ) : (
+          <><UserPlus className="size-4" /> Add {pendingMembers.length || ''} {pendingMembers.length === 1 ? 'Person' : pendingMembers.length > 1 ? 'People' : 'Members'}</>
+        )}
+      </Button>
+    </div>
   );
 }
 

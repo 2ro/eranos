@@ -1,9 +1,12 @@
 import { useCallback } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { AgoraLogo } from '@/components/AgoraLogo';
 import { BarsStaggeredIcon } from '@/components/icons/BarsStaggeredIcon';
-import { ArcBackground } from '@/components/ArcBackground';
+import { AgoraBoltIcon } from '@/components/icons/AgoraBoltIcon';
 import { useNavHidden } from '@/contexts/LayoutContext';
+
+const SAFE_AREA_TOP_HEIGHT = 'var(--safe-area-inset-top, env(safe-area-inset-top, 0px))';
+const HIDDEN_TOP_BAR_TRANSFORM = 'translateY(calc(-100% - 20px - var(--safe-area-inset-top, env(safe-area-inset-top, 0px))))';
+const TRANSLUCENT_HEADER_STYLE: React.CSSProperties = { backgroundColor: 'hsl(var(--background) / 0.85)' };
 
 interface MobileTopBarProps {
   onAvatarClick: () => void;
@@ -11,7 +14,7 @@ interface MobileTopBarProps {
   hasSubHeader?: boolean;
 }
 
-export function MobileTopBar({ onAvatarClick, hasSubHeader }: MobileTopBarProps) {
+export function MobileTopBar({ onAvatarClick, hasSubHeader: _hasSubHeader }: MobileTopBarProps) {
   const location = useLocation();
   const navHidden = useNavHidden();
 
@@ -23,43 +26,47 @@ export function MobileTopBar({ onAvatarClick, hasSubHeader }: MobileTopBarProps)
   }, [location.pathname]);
 
   return (
-    <header
-      className="sticky top-0 z-20 sidebar:hidden safe-area-top transition-transform duration-300 ease-in-out"
-      style={navHidden ? { transform: 'translateY(calc(-100% - 20px - var(--safe-area-inset-top, env(safe-area-inset-top, 0px))))' } : undefined}
-    >
-      {/* Safe-area fill — only covers the padding zone above the content with a single layer of bg. */}
-      <div
-        className="absolute top-0 left-0 right-0 bg-background/85"
-        style={{ height: 'var(--safe-area-inset-top, env(safe-area-inset-top, 0px))' }}
-      />
-      {/* Relative wrapper so ArcBackground only covers the content area, not the safe-area padding above it. */}
-      <div className="relative">
-        <ArcBackground variant={hasSubHeader ? 'rect' : 'down'} />
-        <div className="relative flex items-center px-3 h-10">
-          {/* Left: hamburger menu icon */}
-          <div className="flex items-center justify-center w-7 shrink-0">
-            <button onClick={onAvatarClick} className="rounded-full focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-1 focus:ring-offset-background text-muted-foreground hover:text-foreground transition-colors">
-              <BarsStaggeredIcon className="size-5" />
-            </button>
-          </div>
+    <>
+      {/* Keep the top unsafe region covered even when the top bar slides away. */}
+      {navHidden && (
+        <div
+          aria-hidden="true"
+          className="pointer-events-none fixed left-0 right-0 top-0 z-20 sidebar:hidden"
+          style={{ ...TRANSLUCENT_HEADER_STYLE, height: SAFE_AREA_TOP_HEIGHT }}
+        />
+      )}
 
-          {/* Center: Agora lockup */}
-          <div className="flex-1 flex items-center justify-center">
-            <Link to="/" onClick={handleLogoClick} className="flex items-center gap-2">
-              <AgoraLogo size={28} />
-              <div className="flex flex-col leading-none">
-                <span className="text-sm font-black tracking-tight text-foreground">ÁGORA</span>
-                <span className="text-[7px] uppercase tracking-wider text-muted-foreground font-semibold">
-                  Power to the people
-                </span>
-              </div>
-            </Link>
-          </div>
+      <header
+        className="sticky top-0 z-20 sidebar:hidden transition-transform duration-300 ease-in-out"
+        style={navHidden ? { ...TRANSLUCENT_HEADER_STYLE, transform: HIDDEN_TOP_BAR_TRANSFORM } : TRANSLUCENT_HEADER_STYLE}
+      >
+        <div className="relative safe-area-top">
+          <div className="flex items-center px-3 h-10">
+            {/* Left: hamburger menu icon */}
+            <div className="flex items-center justify-center w-7 shrink-0">
+              <button onClick={onAvatarClick} className="rounded-full focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-1 focus:ring-offset-background text-muted-foreground hover:text-foreground transition-colors">
+                <BarsStaggeredIcon className="size-5" />
+              </button>
+            </div>
 
-          {/* Right: spacer for symmetry */}
-          <div className="w-7 shrink-0" />
+            {/* Center: Agora lockup */}
+            <div className="flex-1 flex items-center justify-center">
+              <Link to="/" onClick={handleLogoClick} className="flex items-center gap-2">
+                <AgoraBoltIcon className="size-7 drop-shadow-sm" />
+                <div className="flex flex-col leading-none">
+                  <span className="text-sm font-black tracking-tight text-foreground">ÁGORA</span>
+                  <span className="text-[7px] uppercase tracking-wider text-muted-foreground font-semibold">
+                    Power to the people
+                  </span>
+                </div>
+              </Link>
+            </div>
+
+            {/* Right: spacer for symmetry */}
+            <div className="w-7 shrink-0" />
+          </div>
         </div>
-      </div>
-    </header>
+      </header>
+    </>
   );
 }

@@ -2,15 +2,18 @@ import { useMemo } from 'react';
 import { useSeoMeta } from '@unhead/react';
 import { format } from 'date-fns';
 import { Link as RouterLink } from 'react-router-dom';
-import { Camera, Palette, Info, Zap, Clock, Bitcoin, Loader2, MessageSquare, Trophy, ArrowLeft } from 'lucide-react';
+import { nip19 } from 'nostr-tools';
+import { Camera, Palette, Info, Megaphone, Clock, Bitcoin, Loader2, MessageSquare, Trophy, ArrowLeft } from 'lucide-react';
 import type { NostrMetadata } from '@nostrify/nostrify';
 
-import { useChallenge, type Challenge } from '@/hooks/useChallenges';
+import { useAction, type Action } from '@/hooks/useActions';
 import { useAuthor } from '@/hooks/useAuthor';
 import { useComments } from '@/hooks/useComments';
 import { useSubmissionZapTotals } from '@/hooks/useSubmissionZapTotals';
+import { useAddrEvent, type AddrCoords } from '@/hooks/useEvent';
 import { getDisplayName } from '@/lib/genUserName';
 import { getGeoDisplayName, countryCodeToFlag } from '@/lib/countries';
+import { parseCommunityEvent } from '@/lib/communityUtils';
 import { cn } from '@/lib/utils';
 
 import { Card, CardContent } from '@/components/ui/card';
@@ -20,24 +23,34 @@ import { ComposeBox } from '@/components/ComposeBox';
 import { NoteCard } from '@/components/NoteCard';
 import NotFound from '@/pages/NotFound';
 
-const CHALLENGE_ICONS = {
+const ACTION_ICONS = {
   photo: Camera,
   art: Palette,
   info: Info,
-  action: Zap,
+  action: Megaphone,
 } as const;
 
-interface ChallengeDetailPageProps {
+function getCommunityAddr(action: Action): AddrCoords | undefined {
+  const aTag = action.event.tags.find(([name, value]) => name === 'A' && value?.startsWith('34550:'))?.[1];
+  if (!aTag) return undefined;
+  const [kind, pubkey, ...identifierParts] = aTag.split(':');
+  const parsedKind = Number(kind);
+  const identifier = identifierParts.join(':');
+  if (parsedKind !== 34550 || !pubkey || !identifier) return undefined;
+  return { kind: parsedKind, pubkey, identifier };
+}
+
+interface ActionDetailPageProps {
   pubkey: string;
   identifier: string;
 }
 
-export function ChallengeDetailPage({ pubkey, identifier }: ChallengeDetailPageProps) {
-  const { data: challenge, isLoading, isError } = useChallenge(pubkey, identifier);
+export function ActionDetailPage({ pubkey, identifier }: ActionDetailPageProps) {
+  const { data: action, isLoading, isError } = useAction(pubkey, identifier);
 
   useSeoMeta({
-    title: challenge ? `${challenge.title} | Agora Action` : 'Action | Agora',
-    description: challenge?.description?.slice(0, 200),
+    title: action ? `${action.title} | Agora Action` : 'Action | Agora',
+    description: action?.description?.slice(0, 200),
   });
 
   if (isLoading) {
@@ -54,7 +67,7 @@ export function ChallengeDetailPage({ pubkey, identifier }: ChallengeDetailPageP
     );
   }
 
-  if (isError || !challenge) {
+  if (isError || !action) {
     return <NotFound />;
   }
 
@@ -62,10 +75,10 @@ export function ChallengeDetailPage({ pubkey, identifier }: ChallengeDetailPageP
     <main>
       <DetailHeader />
       <article className="px-4 max-w-3xl mx-auto space-y-6 pb-24">
-        <ChallengeHeader challenge={challenge} />
-        <ChallengeBounty challenge={challenge} />
-        <ChallengeDescription challenge={challenge} />
-        <SubmissionsSection challenge={challenge} />
+        <ActionHeader action={action} />
+        <ActionBounty action={action} />
+        <ActionDescription action={action} />
+        <SubmissionsSection action={action} />
       </article>
     </main>
   );
@@ -82,26 +95,29 @@ function DetailHeader() {
         <ArrowLeft className="size-5" />
       </RouterLink>
       <div className="flex items-center gap-2 flex-1 min-w-0">
-        <Zap className="size-5 text-primary" />
+        <Megaphone className="size-5 text-primary" />
         <h1 className="text-lg font-semibold truncate">Action</h1>
       </div>
     </div>
   );
 }
 
-function ChallengeHeader({ challenge }: { challenge: Challenge }) {
-  const author = useAuthor(challenge.pubkey);
+function ActionHeader({ action }: { action: Action }) {
+  const author = useAuthor(action.pubkey);
+  const communityAddr = useMemo(() => getCommunityAddr(action), [action]);
+  const communityEvent = useAddrEvent(communityAddr).data;
+  const community = communityEvent ? parseCommunityEvent(communityEvent) : null;
   const metadata: NostrMetadata | undefined = author.data?.metadata;
-  const displayName = getDisplayName(metadata, challenge.pubkey);
-  const Icon = CHALLENGE_ICONS[challenge.type];
+  const displayName = getDisplayName(metadata, action.pubkey);
+  const Icon = ACTION_ICONS[action.type];
   const now = Date.now() / 1000;
-  const isExpired = !!challenge.deadline && challenge.deadline <= now;
+  const isExpired = !!action.deadline && action.deadline <= now;
 
   return (
     <div className="space-y-4">
-      {challenge.image && (
+      {action.image && (
         <div className="relative w-full h-56 sm:h-64 overflow-hidden rounded-2xl border border-border">
-          <img src={challenge.image} alt={challenge.title} className="w-full h-full object-cover" />
+          <img src={action.image} alt={action.title} className="w-full h-full object-cover" />
           <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
           <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-primary/80 via-primary to-primary/80" />
         </div>
@@ -111,19 +127,32 @@ function ChallengeHeader({ challenge }: { challenge: Challenge }) {
           <Icon className="h-7 w-7 text-primary" />
         </div>
         <div className="flex-1 min-w-0">
-          <h1 className="text-2xl sm:text-3xl font-black leading-tight">{challenge.title}</h1>
+          <h1 className="text-2xl sm:text-3xl font-black leading-tight">{action.title}</h1>
           <div className="flex items-center gap-2 mt-2 flex-wrap">
-            <span className="text-xl" title={getGeoDisplayName(challenge.countryCode)}>
-              {countryCodeToFlag(challenge.countryCode)}
-            </span>
-            <span className="text-sm text-muted-foreground">{getGeoDisplayName(challenge.countryCode)}</span>
+            {action.countryCode && (
+              <>
+                <span className="text-xl" title={getGeoDisplayName(action.countryCode)}>
+                  {countryCodeToFlag(action.countryCode)}
+                </span>
+                <span className="text-sm text-muted-foreground">{getGeoDisplayName(action.countryCode)}</span>
+              </>
+            )}
+            {community && communityAddr && (
+              <RouterLink
+                to={`/${nip19.naddrEncode(communityAddr)}`}
+                className="inline-flex items-center gap-1 rounded-md bg-primary/10 px-2 py-1 text-xs font-semibold text-primary hover:bg-primary/15"
+              >
+                <Megaphone className="h-3 w-3" />
+                {community.name}
+              </RouterLink>
+            )}
             {isExpired ? (
               <span className="px-2 py-1 rounded-md bg-muted text-muted-foreground text-xs font-semibold flex items-center gap-1">
                 <Clock className="h-3 w-3" /> Expired
               </span>
-            ) : challenge.deadline ? (
+            ) : action.deadline ? (
               <span className="px-2 py-1 rounded-md bg-accent/10 border border-accent/30 text-accent text-xs font-semibold flex items-center gap-1">
-                <Clock className="h-3 w-3" /> {format(challenge.deadline * 1000, 'MMM d, yyyy HH:mm')}
+                <Clock className="h-3 w-3" /> {format(action.deadline * 1000, 'MMM d, yyyy HH:mm')}
               </span>
             ) : null}
           </div>
@@ -142,7 +171,7 @@ function ChallengeHeader({ challenge }: { challenge: Challenge }) {
   );
 }
 
-function ChallengeBounty({ challenge }: { challenge: Challenge }) {
+function ActionBounty({ action }: { action: Action }) {
   return (
     <Card className="border-2 border-primary/40 bg-gradient-to-r from-primary/10 to-primary/5">
       <CardContent className="py-4 flex items-center gap-3">
@@ -152,7 +181,7 @@ function ChallengeBounty({ challenge }: { challenge: Challenge }) {
             Bounty
           </div>
           <div className="font-black text-2xl">
-            {challenge.bounty.toLocaleString()}
+            {action.bounty.toLocaleString()}
             <span className="text-sm font-medium text-muted-foreground ml-1">sats</span>
           </div>
         </div>
@@ -164,17 +193,17 @@ function ChallengeBounty({ challenge }: { challenge: Challenge }) {
   );
 }
 
-function ChallengeDescription({ challenge }: { challenge: Challenge }) {
-  if (!challenge.description.trim()) return null;
+function ActionDescription({ action }: { action: Action }) {
+  if (!action.description.trim()) return null;
   return (
     <div className="prose prose-sm max-w-none whitespace-pre-wrap break-words text-foreground/90 leading-relaxed">
-      {challenge.description}
+      {action.description}
     </div>
   );
 }
 
-function SubmissionsSection({ challenge }: { challenge: Challenge }) {
-  const { data: commentsData, isLoading: commentsLoading } = useComments(challenge.event);
+function SubmissionsSection({ action }: { action: Action }) {
+  const { data: commentsData, isLoading: commentsLoading } = useComments(action.event);
 
   const topLevel = useMemo(
     () => commentsData?.topLevelComments ?? [],
@@ -207,7 +236,7 @@ function SubmissionsSection({ challenge }: { challenge: Challenge }) {
         </h2>
       </header>
 
-      <ComposeBox compact replyTo={challenge.event} placeholder="Submit your contribution…" />
+      <ComposeBox compact replyTo={action.event} placeholder="Submit your contribution…" />
 
       {commentsLoading ? (
         <SubmissionsSkeleton />
@@ -284,7 +313,7 @@ function SubmissionsEmptyState() {
 
 /** Loader-state subcomponent used when the addressable coordinate is still
  *  being decoded (e.g. by NIP19Page). */
-export function ChallengeDetailLoading() {
+export function ActionDetailLoading() {
   return (
     <main>
       <DetailHeader />

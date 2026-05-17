@@ -29,6 +29,16 @@ interface FollowToggleButtonProps {
   size?: 'default' | 'sm' | 'lg' | 'icon';
   /** Disable the button. */
   disabled?: boolean;
+  /** Optional leading icon shown before the label. */
+  icon?: React.ReactNode;
+  /** Optional leading icon shown when the target is followed (overrides `icon`). */
+  followingIcon?: React.ReactNode;
+  /**
+   * If true, the followed state shows "Following" by default and swaps to
+   * "Unfollow" on hover/focus (Twitter-style). When false (default), the
+   * followed state shows "Unfollow" directly.
+   */
+  hoverToUnfollow?: boolean;
 }
 
 export function FollowToggleButton({
@@ -38,21 +48,42 @@ export function FollowToggleButton({
   className,
   size = 'sm',
   disabled = false,
+  icon,
+  followingIcon,
+  hoverToUnfollow = false,
 }: FollowToggleButtonProps) {
+  const leadingIcon = isFollowing ? (followingIcon ?? icon) : icon;
+  const followedLabel = (
+    isPending
+      ? '...'
+      : isFollowing
+        ? hoverToUnfollow
+          // Two spans crossfade on hover/focus via group state — keeps button width stable.
+          ? (
+              <>
+                <span className="group-hover:hidden group-focus-visible:hidden">Following</span>
+                <span className="hidden group-hover:inline group-focus-visible:inline">Unfollow</span>
+              </>
+            )
+          : 'Unfollow'
+        : 'Follow'
+  );
+
   return (
     <Button
       type="button"
       size={size}
       variant={isFollowing ? 'outline' : 'default'}
       className={cn(
-        'rounded-full font-bold',
+        'group rounded-full font-bold gap-1.5',
         isFollowing && 'bg-transparent border border-border text-foreground hover:bg-destructive/10 hover:text-destructive hover:border-destructive/50',
         className,
       )}
       onClick={onClick}
       disabled={disabled || isPending}
     >
-      {isPending ? '...' : isFollowing ? 'Unfollow' : 'Follow'}
+      {!isPending && leadingIcon}
+      {followedLabel}
     </Button>
   );
 }
