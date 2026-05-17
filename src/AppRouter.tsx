@@ -35,6 +35,7 @@ const AppearanceSettingsPage = lazy(() => import("./pages/AppearanceSettingsPage
 const ArchivePage = lazy(() => import("./pages/ArchivePage").then(m => ({ default: m.ArchivePage })));
 const ArticleEditorPage = lazy(() => import("./pages/ArticleEditorPage").then(m => ({ default: m.ArticleEditorPage })));
 const BadgesPage = lazy(() => import("./pages/BadgesPage").then(m => ({ default: m.BadgesPage })));
+const BitcoinPage = lazy(() => import("./pages/BitcoinPage").then(m => ({ default: m.BitcoinPage })));
 const BlueskyPage = lazy(() => import("./pages/BlueskyPage").then(m => ({ default: m.BlueskyPage })));
 const BookmarksPage = lazy(() => import("./pages/BookmarksPage").then(m => ({ default: m.BookmarksPage })));
 const BooksPage = lazy(() => import("./pages/BooksPage").then(m => ({ default: m.BooksPage })));
@@ -268,6 +269,7 @@ export function AppRouter() {
               }
             />
             <Route path="/wallet" element={<WalletPage />} />
+            <Route path="/bitcoin" element={<BitcoinPage />} />
             <Route path="/bookmarks" element={<BookmarksPage />} />
             <Route path="/ai-chat" element={<AIChatPage />} />
             <Route path="/verified" element={<VerifiedPage />} />
