@@ -1,4 +1,4 @@
-import { useMemo, useCallback, useState } from 'react';
+import { useMemo, useCallback, useRef, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { nip19 } from 'nostr-tools';
 import {
@@ -38,6 +38,7 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { BanConfirmDialog } from '@/components/BanConfirmDialog';
 import { CommunityChatPanel } from '@/components/CommunityChatPanel';
 import { CommunityPulsePanel } from '@/components/CommunityPulsePanel';
+import { CommunityZapDialog } from '@/components/CommunityZapDialog';
 import { NoteContent } from '@/components/NoteContent';
 import { CommunityBadgeEditorDialog } from '@/components/CommunityBadgePanel';
 import { ComposeBox } from '@/components/ComposeBox';
@@ -62,6 +63,7 @@ import { useProfileUrl } from '@/hooks/useProfileUrl';
 import { useToast } from '@/hooks/useToast';
 import { CommunityModerationContext } from '@/contexts/CommunityModerationContext';
 import { useLayoutOptions } from '@/contexts/LayoutContext';
+import { LightningEffect, type LightningEffectHandle } from '@/components/LightningEffect';
 import { applyCommunityModerationToEvents, canBanTarget, getViewerAuthority, parseCommunityEvent, type CommunityMember } from '@/lib/communityUtils';
 import { genUserName } from '@/lib/genUserName';
 import { sanitizeUrl } from '@/lib/sanitizeUrl';
@@ -181,6 +183,7 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
   const navigate = useNavigate();
   const { toast } = useToast();
   const { user } = useCurrentUser();
+  const lightningRef = useRef<LightningEffectHandle>(null);
 
   // ── Member ban dialog state ────────────────────────────────────────────────
   const [banDialogOpen, setBanDialogOpen] = useState(false);
@@ -533,12 +536,17 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
     [communityATag, moderation, rankMap],
   );
 
+  const handleCommunityZapLaunched = useCallback(() => {
+    lightningRef.current?.triggerLightning({ strikes: 4 });
+  }, []);
+
   // ── Render ──────────────────────────────────────────────────────────────────
   const heroIconClassName = 'size-5 text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.85)]';
   const bannerActionClassName = 'p-2 rounded-full text-white/90 hover:text-white hover:bg-white/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80 disabled:opacity-50 disabled:pointer-events-none transition-colors';
 
   return (
     <div className="max-w-2xl mx-auto pb-16">
+      <LightningEffect ref={lightningRef} />
       <CommunityModerationContext.Provider value={moderationCtx}>
         <Tabs value={activeTab} onValueChange={setActiveTab}>
       {/* ── Hero banner + tabs share a single image/gradient backdrop so the
@@ -646,6 +654,14 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
 
             {/* Banner action row — MembersOnly + Share + overflow menu */}
             <div className="flex items-center gap-0.5 shrink-0 [text-shadow:none]">
+              {community && membership && (
+                <CommunityZapDialog
+                  community={community}
+                  members={membership.members}
+                  membersLoading={membersLoading}
+                  onZapLaunched={handleCommunityZapLaunched}
+                />
+              )}
               <MembersOnlyToggle
                 className="text-white/90 hover:text-white hover:bg-white/15 data-[state=on]:text-white"
               />
