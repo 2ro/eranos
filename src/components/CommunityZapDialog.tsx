@@ -243,7 +243,12 @@ export function CommunityZapDialog({
           <div className="px-5 py-4 space-y-4">
             <div className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="community-zap-amount">Amount per member</Label>
+                <div className="flex items-center justify-between gap-3">
+                  <Label htmlFor="community-zap-amount">Amount per member</Label>
+                  <div className="rounded-full bg-muted px-3 py-1 text-xs font-medium text-muted-foreground">
+                    Balance <span className="tabular-nums text-foreground">{sparkWallet.balance.toLocaleString()} sats</span>
+                  </div>
+                </div>
                 <div className="relative">
                   <Input
                     id="community-zap-amount"
@@ -257,17 +262,6 @@ export function CommunityZapDialog({
                   <span className="pointer-events-none absolute right-5 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">
                     sats
                   </span>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-3 text-sm">
-                <div className="rounded-xl bg-background/70 p-3">
-                  <p className="text-muted-foreground">Balance</p>
-                  <p className="text-lg font-bold tabular-nums">{sparkWallet.balance.toLocaleString()} sats</p>
-                </div>
-                <div className="rounded-xl bg-background/70 p-3">
-                  <p className="text-muted-foreground">Total</p>
-                  <p className="text-lg font-bold tabular-nums">{totalSats.toLocaleString()} sats</p>
                 </div>
               </div>
             </div>
@@ -395,8 +389,6 @@ function HoldToZapButton({
     if (disabled || isLaunching) cancelHold();
   }, [disabled, isLaunching]);
 
-  const remainingSeconds = Math.max(0, Math.ceil((HOLD_DURATION_MS * (1 - progress)) / 1000));
-
   return (
     <Button
       type="button"
@@ -429,7 +421,7 @@ function HoldToZapButton({
       aria-label={`Hold for 3 seconds to zap ${selectedCount} members with ${totalSats.toLocaleString()} sats total`}
     >
       <span
-        className="absolute inset-0 origin-left rounded-full bg-primary/15 transition-transform duration-75 ease-linear"
+        className="absolute inset-0 origin-left rounded-full bg-background/25 transition-transform duration-75 ease-linear"
         style={{ transform: `scaleX(${progress})` }}
         aria-hidden="true"
       />
@@ -440,16 +432,8 @@ function HoldToZapButton({
             <Loader2 className="size-4 mr-2 animate-spin" />
             Launching...
           </>
-        ) : holding ? (
-          <>
-            <Zap className="size-4 mr-2" />
-            Keep holding... {remainingSeconds}s
-          </>
         ) : (
-          <>
-            <Zap className="size-4 mr-2" />
-            Hold to zap {selectedCount} · {totalSats.toLocaleString()} sats
-          </>
+          `Zap ${totalSats.toLocaleString()} sats`
         )}
       </span>
     </Button>
