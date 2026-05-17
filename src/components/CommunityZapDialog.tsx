@@ -279,10 +279,7 @@ export function CommunityZapDialog({
 
               <div className="grid grid-cols-2 gap-3 text-sm">
                 <div className="rounded-xl bg-background/70 p-3">
-                  <p className="flex items-center gap-1.5 text-muted-foreground">
-                    <Wallet className="size-3.5" />
-                    Balance
-                  </p>
+                  <p className="text-muted-foreground">Balance</p>
                   <p className="text-lg font-bold tabular-nums">{sparkWallet.balance.toLocaleString()} sats</p>
                 </div>
                 <div className="rounded-xl bg-background/70 p-3">
@@ -416,13 +413,12 @@ function HoldToZapButton({
   }, [disabled, isLaunching]);
 
   const remainingSeconds = Math.max(0, Math.ceil((HOLD_DURATION_MS * (1 - progress)) / 1000));
-  const progressPercent = progress * 100;
 
   return (
     <Button
       type="button"
       variant="secondary"
-      className="relative h-12 w-full overflow-hidden rounded-full border border-amber-500/35 bg-muted text-foreground hover:bg-muted"
+      className="relative h-12 w-full overflow-hidden rounded-full border border-primary/30 bg-primary/15 text-foreground hover:bg-primary/15"
       disabled={disabled}
       onPointerDown={(event) => {
         event.currentTarget.setPointerCapture(event.pointerId);
@@ -450,13 +446,8 @@ function HoldToZapButton({
       aria-label={`Hold for 3 seconds to zap ${selectedCount} members with ${totalSats.toLocaleString()} sats total`}
     >
       <span
-        className="absolute inset-0 origin-left rounded-full bg-gradient-to-r from-amber-300 via-amber-400 to-amber-500 transition-transform duration-75 ease-linear"
+        className="absolute inset-0 origin-left rounded-full bg-primary transition-transform duration-75 ease-linear"
         style={{ transform: `scaleX(${progress})` }}
-        aria-hidden="true"
-      />
-      <span
-        className="absolute bottom-0 left-0 h-1 rounded-full bg-amber-200 transition-[width] duration-75 ease-linear"
-        style={{ width: `${progressPercent}%` }}
         aria-hidden="true"
       />
       <span className="absolute inset-0 rounded-full shadow-[inset_0_0_0_1px_rgba(255,255,255,0.12)]" aria-hidden="true" />
