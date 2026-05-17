@@ -26,6 +26,36 @@ test:
   script:
     - npm run test
 
+# Deploy the built web app to agora.spot on venus.vps via rsync over SSH.
+# Uses the per-site jailed deploy key documented in GITLAB_DEPLOY.md.
+# DEPLOY_SSH_KEY and DEPLOY_TARGET are protected CI/CD variables; they're
+# only exposed to jobs on the protected default branch.
+deploy-web:
+  stage: deploy
+  timeout: 10 minutes
+  rules:
+    - if: $CI_COMMIT_TAG
+      when: never
+    - if: $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH && $DEPLOY_SSH_KEY && $DEPLOY_TARGET
+  script:
+    # Build the web app
+    - npm ci
+    - npm run build
+    - cp dist/index.html dist/404.html
+
+    # Install rsync + ssh client and load the deploy key
+    - apt-get update -qq && apt-get install -y --no-install-recommends rsync openssh-client >/dev/null
+    - mkdir -p ~/.ssh && chmod 700 ~/.ssh
+    - echo "$DEPLOY_SSH_KEY" | tr -d '\r' > ~/.ssh/id_ed25519 && chmod 600 ~/.ssh/id_ed25519
+    - ssh-keyscan -H "${DEPLOY_TARGET##*@}" >> ~/.ssh/known_hosts 2>/dev/null
+
+    # Two-phase rsync: upload hashed assets first, then index.html, so the
+    # site never serves an index.html that points at assets that haven't
+    # finished uploading. The destination ":/" is the rrsync jail root on
+    # venus, which maps to /var/www/agora.spot/.
+    - rsync -av --exclude=/sw.js --exclude=/index.html -e "ssh -i ~/.ssh/id_ed25519" dist/ "${DEPLOY_TARGET}:/"
+    - rsync -av -e "ssh -i ~/.ssh/id_ed25519" dist/index.html "${DEPLOY_TARGET}:/"
+
 # Disabled: nsite deploy not needed right now; re-enable by restoring the
 # rules below to run on default branch (and ensure NSITE_NBUNKSEC is set).
 deploy-nsite:
