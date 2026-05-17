@@ -8,6 +8,7 @@ import {
   CalendarDays,
   Crown,
   Info,
+  Link2,
   Megaphone,
   MessageCircle,
   MoreVertical,
@@ -663,6 +664,17 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
                   members={membership.members}
                   membersLoading={membersLoading}
                   triggerClassName={bannerActionClassName}
+                  onZapLaunched={handleCommunityZapLaunched}
+                />
+              )}
+              {community && membership && (
+                <CommunityZapDialog
+                  community={community}
+                  members={membership.members}
+                  membersLoading={membersLoading}
+                  mode="bitcoin"
+                  triggerClassName={bannerActionClassName}
+                  triggerIcon={<Link2 className="size-5" />}
                   onZapLaunched={handleCommunityZapLaunched}
                 />
               )}

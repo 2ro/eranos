@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Check, Loader2, Plus, Wallet, X, Zap } from 'lucide-react';
 import type { NostrEvent, NostrMetadata } from '@nostrify/nostrify';
@@ -52,6 +52,7 @@ interface CommunityZapDialogProps {
   membersLoading: boolean;
   mode?: CommunityZapMode;
   triggerClassName?: string;
+  triggerIcon?: ReactNode;
   onZapLaunched?: (details: { count: number; totalSats: number }) => void;
 }
 
@@ -80,6 +81,7 @@ export function CommunityZapDialog({
   membersLoading,
   mode = 'lightning',
   triggerClassName,
+  triggerIcon,
   onZapLaunched,
 }: CommunityZapDialogProps) {
   const [open, setOpen] = useState(false);
@@ -293,7 +295,7 @@ export function CommunityZapDialog({
           aria-label={mode === 'lightning' ? 'Zap community' : 'Bitcoin zap community'}
           title={mode === 'lightning' ? 'Zap community' : 'Bitcoin zap community'}
         >
-          <Zap className="size-5" />
+          {triggerIcon ?? <Zap className="size-5" />}
         </button>
       </DialogTrigger>
       <DialogContent className="max-w-lg max-h-[88vh] flex flex-col overflow-hidden p-0 gap-0 [&>button]:top-3 [&>button]:right-3">
