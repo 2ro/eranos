@@ -1,5 +1,6 @@
 import { useSeoMeta } from '@unhead/react';
-import { ArrowUpRight, Lock } from 'lucide-react';
+import { ArrowUpRight } from 'lucide-react';
+import { WhiteNoiseIcon } from '@/components/icons/WhiteNoiseIcon';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { openUrl } from '@/lib/downloadFile';
@@ -15,10 +16,8 @@ const Messages = () => {
   return (
     <div className="flex-1 flex items-center justify-center p-6">
       <Card className="max-w-md w-full border-dashed">
-        <CardContent className="py-10 px-8 text-center space-y-5">
-          <div className="mx-auto w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
-            <Lock className="w-6 h-6 text-primary" />
-          </div>
+        <CardContent className="py-10 px-8 text-center space-y-6">
+          <WhiteNoiseIcon className="mx-auto h-14 w-auto text-foreground" />
           <div className="space-y-2">
             <h2 className="text-xl font-semibold">Private messaging lives elsewhere</h2>
             <p className="text-sm text-muted-foreground leading-relaxed">

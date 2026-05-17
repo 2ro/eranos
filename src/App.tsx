@@ -122,6 +122,7 @@ const hardcodedConfig: AppConfig = {
     "world",
     "wallet",
     "agent",
+    "messages",
     "profile",
     "notifications",
     "search",
