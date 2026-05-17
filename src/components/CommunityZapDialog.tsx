@@ -47,8 +47,6 @@ interface CommunityZapDialogProps {
   onZapLaunched?: (details: { count: number; totalSats: number }) => void;
 }
 
-const PRESET_AMOUNTS = [21, 100, 500, 1000];
-
 function roleLabel(role: RecipientRole): string {
   switch (role) {
     case 'founder': return 'Founder';
@@ -243,7 +241,7 @@ export function CommunityZapDialog({
 
         <div className="flex-1 overflow-y-auto">
           <div className="px-5 py-4 space-y-4">
-            <div className="rounded-2xl border border-amber-500/20 bg-amber-500/10 p-4 space-y-3">
+            <div className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="community-zap-amount">Amount per member</Label>
                 <div className="relative">
@@ -260,21 +258,6 @@ export function CommunityZapDialog({
                     sats
                   </span>
                 </div>
-              </div>
-
-              <div className="grid grid-cols-4 gap-2">
-                {PRESET_AMOUNTS.map((preset) => (
-                  <Button
-                    key={preset}
-                    type="button"
-                    variant={amount === String(preset) ? 'default' : 'secondary'}
-                    size="sm"
-                    className="rounded-full"
-                    onClick={() => setAmount(String(preset))}
-                  >
-                    {preset >= 1000 ? `${preset / 1000}k` : preset}
-                  </Button>
-                ))}
               </div>
 
               <div className="grid grid-cols-2 gap-3 text-sm">
@@ -418,7 +401,7 @@ function HoldToZapButton({
     <Button
       type="button"
       variant="secondary"
-      className="relative h-12 w-full overflow-hidden rounded-full border border-primary/30 bg-primary/15 text-foreground hover:bg-primary/15"
+      className="relative h-12 w-full overflow-hidden rounded-full border border-primary bg-primary text-primary-foreground hover:bg-primary"
       disabled={disabled}
       onPointerDown={(event) => {
         event.currentTarget.setPointerCapture(event.pointerId);
@@ -446,7 +429,7 @@ function HoldToZapButton({
       aria-label={`Hold for 3 seconds to zap ${selectedCount} members with ${totalSats.toLocaleString()} sats total`}
     >
       <span
-        className="absolute inset-0 origin-left rounded-full bg-primary transition-transform duration-75 ease-linear"
+        className="absolute inset-0 origin-left rounded-full bg-primary/15 transition-transform duration-75 ease-linear"
         style={{ transform: `scaleX(${progress})` }}
         aria-hidden="true"
       />
