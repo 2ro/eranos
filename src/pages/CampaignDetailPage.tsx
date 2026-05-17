@@ -167,6 +167,31 @@ function CampaignDetailContent({ campaign }: { campaign: ParsedCampaign }) {
                 <h1 className="text-3xl sm:text-4xl font-bold leading-tight tracking-tight text-white">
                   {campaign.title}
                 </h1>
+                <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 text-xs sm:text-sm font-medium text-white/85">
+                  {campaign.category && (
+                    <span className="inline-flex items-center gap-1.5">
+                      <Tag className="size-3.5 sm:size-4" />
+                      {CAMPAIGN_CATEGORY_LABELS[campaign.category]}
+                    </span>
+                  )}
+                  {campaign.location && (
+                    <span className="inline-flex items-center gap-1.5">
+                      <MapPin className="size-3.5 sm:size-4" />
+                      {campaign.location}
+                    </span>
+                  )}
+                  {deadline && (
+                    <span className="inline-flex items-center gap-1.5">
+                      <CalendarClock className="size-3.5 sm:size-4" />
+                      {deadline.label}
+                    </span>
+                  )}
+                  <span className="inline-flex items-center gap-1.5">
+                    <Users className="size-3.5 sm:size-4" />
+                    {campaign.recipients.length}{' '}
+                    {campaign.recipients.length === 1 ? 'recipient' : 'recipients'}
+                  </span>
+                </div>
                 {campaign.summary && (
                   <p className="max-w-2xl text-base sm:text-lg text-white/90 line-clamp-3">
                     {campaign.summary}
@@ -243,64 +268,48 @@ function CampaignDetailContent({ campaign }: { campaign: ParsedCampaign }) {
               </CardContent>
             </Card>
 
-            {/* Creator + meta */}
-            <div className="flex flex-wrap items-center gap-x-5 gap-y-2 text-sm text-muted-foreground border-y border-border py-3">
-              <Link
-                to={creatorUrl}
-                className="inline-flex items-center gap-2 hover:text-foreground motion-safe:transition-colors"
-              >
-                <Avatar className="size-7">
-                  {creatorAvatar && <AvatarImage src={creatorAvatar} alt="" />}
-                  <AvatarFallback>{creatorName.slice(0, 2).toUpperCase()}</AvatarFallback>
-                </Avatar>
-                <span>
-                  organized by <span className="font-medium text-foreground">{creatorName}</span>
-                </span>
-              </Link>
-              {campaign.category && (
-                <span className="inline-flex items-center gap-1.5">
-                  <Tag className="size-4" />
-                  {CAMPAIGN_CATEGORY_LABELS[campaign.category]}
-                </span>
-              )}
-              {campaign.location && (
-                <span className="inline-flex items-center gap-1.5">
-                  <MapPin className="size-4" />
-                  {campaign.location}
-                </span>
-              )}
-              {deadline && (
-                <span
-                  className={`inline-flex items-center gap-1.5${
-                    deadline.isPast ? ' text-destructive' : ''
-                  }`}
-                >
-                  <CalendarClock className="size-4" />
-                  {deadline.label}
-                </span>
-              )}
-              <span className="inline-flex items-center gap-1.5">
-                <Users className="size-4" />
-                {campaign.recipients.length}{' '}
-                {campaign.recipients.length === 1 ? 'recipient' : 'recipients'}
-              </span>
-            </div>
-
             {/* Recipients */}
             <Card>
               <CardContent className="p-5 space-y-4">
                 <div>
-                  <h2 className="text-lg font-bold">Beneficiaries</h2>
+                  <h2 className="text-lg font-bold">Organizer and beneficiaries</h2>
                   <p className="text-sm text-muted-foreground">
-                    Your donation is split across {campaign.recipients.length}{' '}
-                    {campaign.recipients.length === 1 ? 'person' : 'people'} in a single Bitcoin
-                    transaction.
+                    The organizer created this campaign. Donations are split evenly across the
+                    beneficiaries below.
                   </p>
                 </div>
-                <div className="divide-y divide-border/60">
+
+                <div className="space-y-2">
+                  <div className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                    Organized by
+                  </div>
+                  <Link
+                    to={`/${campaign.pubkey}`}
+                    className="flex items-center gap-3 rounded-md py-2 hover:bg-muted/40 -mx-2 px-2 motion-safe:transition-colors"
+                  >
+                    <Avatar className="size-9 shrink-0">
+                      {creatorAvatar && <AvatarImage src={creatorAvatar} alt="" />}
+                      <AvatarFallback>{creatorName.slice(0, 2).toUpperCase()}</AvatarFallback>
+                    </Avatar>
+                    <div className="min-w-0 flex-1">
+                      <div className="font-medium text-sm truncate">{creatorName}</div>
+                      <div className="text-xs text-muted-foreground font-mono truncate">
+                        {campaign.pubkey.slice(0, 12)}…{campaign.pubkey.slice(-8)}
+                      </div>
+                    </div>
+                    <Badge variant="outline" className="shrink-0">Organizer</Badge>
+                  </Link>
+                </div>
+
+                <div className="space-y-2 border-t border-border/60 pt-4">
+                  <div className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                    Beneficiaries
+                  </div>
+                  <div className="divide-y divide-border/60">
                   {campaign.recipients.map((r) => (
                     <RecipientRow key={r.pubkey} pubkey={r.pubkey} weight={r.weight} />
                   ))}
+                  </div>
                 </div>
               </CardContent>
             </Card>
