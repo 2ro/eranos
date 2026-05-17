@@ -243,8 +243,8 @@ function CampaignDetailContent({ campaign }: { campaign: ParsedCampaign }) {
             </div>
 
             {/* Support */}
-            <Card className="border-0">
-              <CardContent className="p-5 space-y-4">
+            <Card className="border-0 bg-transparent shadow-none">
+              <CardContent className="p-0 space-y-4">
                 <div>
                   <h2 className="text-lg font-bold">Support Campaign</h2>
                   <p className="text-sm text-muted-foreground">
