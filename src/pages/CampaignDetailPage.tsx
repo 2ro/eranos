@@ -131,40 +131,95 @@ function CampaignDetailContent({ campaign }: { campaign: ParsedCampaign }) {
     500,
   );
 
-  // Build a recursive reply tree from the flat comment list. Top-level
-  // comments are sorted newest first; nested replies (the second branch
-  // onward at each level) are collapsed behind a "show more replies" toggle
-  // by ThreadedReplyList — matching PostDetailPage behaviour.
-  const replyTree = useMemo((): ReplyNode[] => {
-    if (!commentsData) return [];
+  // Build a recursive reply tree from the flat comment list, then interleave
+  // kind 8333 on-chain donation receipts as top-level nodes sorted by
+  // created_at. ThreadedReplyList renders each via NoteCard, which has a
+  // dedicated zap-receipt layout that already handles kind 8333.
+  //
+  // A single donation produces one kind 8333 receipt per beneficiary (same
+  // txid, same donor), so we dedupe by `(txid, donorPubkey)` and rewrite the
+  // canonical receipt's `amount` tag to the summed total so the card shows
+  // the full donation rather than one beneficiary's share.
+  const donationReceipts = useMemo((): NostrEvent[] => {
+    if (!stats?.receipts || stats.receipts.length === 0) return [];
 
-    const buildNode = (ev: NostrEvent): ReplyNode => {
-      const allChildren = commentsData.getDirectReplies(ev.id) ?? [];
+    type Aggregate = {
+      canonical: NostrEvent;
+      totalSats: number;
+      perRecipient: Map<string, number>;
+    };
+    const byDonation = new Map<string, Aggregate>();
+
+    for (const receipt of stats.receipts) {
+      const txid = receipt.tags.find(([n]) => n === 'i')?.[1]?.replace(/^bitcoin:tx:/, '');
+      const recipientPubkey = receipt.tags.find(([n]) => n === 'p')?.[1];
+      const amountTag = receipt.tags.find(([n]) => n === 'amount')?.[1];
+      const amount = amountTag ? Number(amountTag) : NaN;
+      if (!txid || !recipientPubkey || !Number.isFinite(amount) || amount <= 0) continue;
+
+      const key = `${txid}:${receipt.pubkey}`;
+      const prev = byDonation.get(key);
+      // Same (txid, donor, recipient) → take the largest claim. Different
+      // recipients on the same donation → sum.
+      const perRecipient = prev?.perRecipient ?? new Map<string, number>();
+      const claim = Math.max(perRecipient.get(recipientPubkey) ?? 0, amount);
+      perRecipient.set(recipientPubkey, claim);
+      const totalSats = Array.from(perRecipient.values()).reduce((s, n) => s + n, 0);
+      // Use the newest receipt as the canonical event (so created_at reflects
+      // the latest activity for the donation).
+      const canonical = prev && prev.canonical.created_at >= receipt.created_at
+        ? prev.canonical
+        : receipt;
+      byDonation.set(key, { canonical, totalSats, perRecipient });
+    }
+
+    // Materialise display events with the summed amount tag.
+    return Array.from(byDonation.values()).map(({ canonical, totalSats }) => ({
+      ...canonical,
+      tags: [
+        ...canonical.tags.filter(([n]) => n !== 'amount'),
+        ['amount', String(totalSats)],
+      ],
+    }));
+  }, [stats?.receipts]);
+
+  const replyTree = useMemo((): ReplyNode[] => {
+    const topLevelComments = commentsData?.topLevelComments ?? [];
+
+    const buildCommentNode = (ev: NostrEvent): ReplyNode => {
+      const allChildren = commentsData?.getDirectReplies(ev.id) ?? [];
       if (allChildren.length <= 1) {
         return {
           event: ev,
-          children: allChildren.map((c) => buildNode(c)),
+          children: allChildren.map((c) => buildCommentNode(c)),
         };
       }
       const [first, ...rest] = allChildren;
       return {
         event: ev,
-        children: [buildNode(first)],
-        hiddenChildren: rest.map((c) => buildNode(c)),
+        children: [buildCommentNode(first)],
+        hiddenChildren: rest.map((c) => buildCommentNode(c)),
       };
     };
 
-    return [...(commentsData.topLevelComments ?? [])]
-      .sort((a, b) => b.created_at - a.created_at)
-      .map((r) => buildNode(r));
-  }, [commentsData]);
+    const commentNodes = topLevelComments.map((c) => buildCommentNode(c));
+    // Donations have no replies of their own in this view.
+    const donationNodes: ReplyNode[] = donationReceipts.map((ev) => ({ event: ev, children: [] }));
 
+    return [...commentNodes, ...donationNodes].sort(
+      (a, b) => b.event.created_at - a.event.created_at,
+    );
+  }, [commentsData, donationReceipts]);
+
+  // Engagement counters above the action bar. Zaps are intentionally excluded
+  // for campaigns — Lightning zaps are not how campaigns are funded (on-chain
+  // donations via kind 8333 are), so showing a zap count here would suggest
+  // the wrong CTA.
   const hasStats =
     !!engagementStats?.replies ||
     !!engagementStats?.reposts ||
     !!engagementStats?.quotes ||
-    !!engagementStats?.reactions ||
-    !!engagementStats?.zapCount;
+    !!engagementStats?.reactions;
   const cover = sanitizeUrl(campaign.image);
   const creatorMetadata = author.data?.metadata;
   const creatorName =
@@ -478,30 +533,20 @@ function CampaignDetailContent({ campaign }: { campaign: ParsedCampaign }) {
                           Like{engagementStats.reactions !== 1 ? 's' : ''}
                         </button>
                       ) : null}
-                      {engagementStats?.zapCount ? (
-                        <button
-                          onClick={() => openInteractions('zaps')}
-                          className="hover:underline transition-colors"
-                        >
-                          <span className="font-bold text-foreground">
-                            {formatNumber(engagementStats.zapCount)}
-                          </span>{' '}
-                          Zap{engagementStats.zapCount !== 1 ? 's' : ''}
-                        </button>
-                      ) : null}
                     </div>
                   )}
 
                   <PostActionBar
                     event={campaign.event}
                     replyLabel="Comment"
+                    hideZap
                     onReply={() => setReplyOpen(true)}
                     onMore={() => setMoreMenuOpen(true)}
                   />
 
-                  {/* Threaded comments */}
+                  {/* Threaded comments + on-chain donation receipts */}
                   <div className="pt-2">
-                    {commentsLoading ? (
+                    {commentsLoading && statsLoading && replyTree.length === 0 ? (
                       <div className="space-y-3">
                         {Array.from({ length: 3 }).map((_, i) => (
                           <CampaignReplySkeleton key={i} />

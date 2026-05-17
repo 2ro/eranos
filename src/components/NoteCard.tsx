@@ -92,7 +92,8 @@ import { useProfileUrl } from "@/hooks/useProfileUrl";
 import { toast } from "@/hooks/useToast";
 import { useEventStats } from "@/hooks/useTrending";
 import { canZap } from "@/lib/canZap";
-import { extractZapAmount, extractZapSender, extractZapMessage } from "@/hooks/useEventInteractions";
+import { extractZapSender, extractZapMessage } from "@/hooks/useEventInteractions";
+import { getZapAmountSats } from "@/lib/zapHelpers";
 import { getContentWarning } from "@/lib/contentWarning";
 import { genUserName } from "@/lib/genUserName";
 import { getDisplayName } from "@/lib/getDisplayName";
@@ -320,7 +321,14 @@ export const NoteCard = memo(function NoteCard({
   const { config } = useAppContext();
   const { user } = useCurrentUser();
   const author = useAuthor(event.pubkey);
-  const zapSenderPubkey = useMemo(() => event.kind === 9735 ? extractZapSender(event) : '', [event]);
+  // Kind 9735 (Lightning zap) sender lives in the receipt's `P` tag / embedded
+  // zap-request `pubkey`; kind 8333 (on-chain Bitcoin zap) is signed by the
+  // donor directly so the event's own pubkey IS the sender.
+  const zapSenderPubkey = useMemo(() => {
+    if (event.kind === 9735) return extractZapSender(event);
+    if (event.kind === 8333) return event.pubkey;
+    return '';
+  }, [event]);
   const zapSender = useAuthor(zapSenderPubkey || undefined);
   const zapSenderMeta = zapSender.data?.metadata;
   const zapSenderName = getDisplayName(zapSenderMeta, zapSenderPubkey);
@@ -428,7 +436,7 @@ export const NoteCard = memo(function NoteCard({
   const isEncryptedDM = event.kind === 4;
   const isLetter = event.kind === 8211;
   const isVanish = event.kind === 62;
-  const isZap = event.kind === 9735;
+  const isZap = event.kind === 9735 || event.kind === 8333;
   const isProfile = event.kind === 0;
   const isDevKind = isGitRepo || isPatch || isPullRequest || isCustomNip || isNsite;
   const isTextNote =
@@ -931,10 +939,13 @@ export const NoteCard = memo(function NoteCard({
     );
   }
 
-  // ── Zap receipt layout (kind 9735) ──
+  // ── Zap receipt layout (kind 9735 Lightning, kind 8333 on-chain Bitcoin) ──
   if (isZap) {
-    const zapAmountSats = Math.floor(extractZapAmount(event) / 1000);
-    const zapMessage = extractZapMessage(event);
+    const zapAmountSats = getZapAmountSats(event);
+    // Kind 9735 stores the zapper's note in the embedded zap-request's
+    // `content`; kind 8333 stores the donor's comment in the event's own
+    // `content` field directly (no embedded request).
+    const zapMessage = event.kind === 8333 ? event.content : extractZapMessage(event);
     const iconSize = threaded || threadedLast ? "size-10" : "size-11";
     return (
       <ActivityCard

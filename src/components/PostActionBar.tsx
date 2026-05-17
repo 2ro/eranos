@@ -22,6 +22,10 @@ interface PostActionBarProps {
   replyLabel?: string;
   onReply: () => void;
   onMore: () => void;
+  /** Hide the zap button entirely. Useful for events with their own donation
+   * flow (e.g. fundraising campaigns) where a generic Lightning zap is the
+   * wrong primary CTA. Defaults to false. */
+  hideZap?: boolean;
   /** Extra classes on the outer wrapper div. */
   className?: string;
 }
@@ -31,6 +35,7 @@ export function PostActionBar({
   replyLabel = 'Reply',
   onReply,
   onMore,
+  hideZap = false,
   className,
 }: PostActionBarProps) {
   const { toast } = useToast();
@@ -38,7 +43,7 @@ export function PostActionBar({
   const author = useAuthor(event.pubkey);
   const metadata = author.data?.metadata;
   // TODO: Enable zapping split-recipient NIP-75 goals once zap split payments are supported.
-  const canZapAuthor = user && canZap(metadata) && !hasGoalZapSplits(event);
+  const canZapAuthor = !hideZap && user && canZap(metadata) && !hasGoalZapSplits(event);
 
   const { data: stats } = useEventStats(event.id, event);
   const repostTotal = (stats?.reposts ?? 0) + (stats?.quotes ?? 0);
