@@ -15,6 +15,7 @@ import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useToast } from '@/hooks/useToast';
 import {
   broadcastTransaction,
+  BITCOIN_DUST_LIMIT,
   btcToSats,
   buildUnsignedPsbt,
   estimateFee,
@@ -162,6 +163,10 @@ export function SendBitcoinDialog({ isOpen, onClose, btcPrice }: SendBitcoinDial
     }
     if (parsedAmountSats <= 0) {
       setError('Enter a valid amount.');
+      return;
+    }
+    if (parsedAmountSats < BITCOIN_DUST_LIMIT) {
+      setError(`Bitcoin sends must be at least ${BITCOIN_DUST_LIMIT.toLocaleString()} sats.`);
       return;
     }
     if (parsedAmountSats + previewFee > totalBalance) {

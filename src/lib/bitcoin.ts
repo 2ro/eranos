@@ -5,7 +5,7 @@ import * as ecc from '@bitcoinerlab/secp256k1';
 import { ECPairFactory, type ECPairAPI } from 'ecpair';
 
 const MEMPOOL_API = 'https://mempool.space/api';
-const DUST_LIMIT = 546;
+export const BITCOIN_DUST_LIMIT = 546;
 const VBYTES_PER_INPUT = 57.5;
 const VBYTES_PER_OUTPUT = 43;
 const VBYTES_OVERHEAD = 10.5;
@@ -377,6 +377,13 @@ export function buildUnsignedPsbt(
   utxos: UTXO[],
   feeRate: number,
 ): UnsignedPsbt {
+  if (!validateBitcoinAddress(toAddress)) {
+    throw new Error(`Invalid Bitcoin address: ${toAddress}`);
+  }
+  if (!Number.isInteger(amountSats) || amountSats < BITCOIN_DUST_LIMIT) {
+    throw new Error(`Bitcoin outputs must be at least ${BITCOIN_DUST_LIMIT} sats.`);
+  }
+
   const internalPubkey = Buffer.from(senderPubkeyHex, 'hex');
   const { address: changeAddress } = bitcoin.payments.p2tr({
     internalPubkey,
@@ -404,7 +411,7 @@ export function buildUnsignedPsbt(
   }
 
   const change2Out = totalInput - amountSats - estimateFee(utxos.length, 2, feeRate);
-  const hasChange = change2Out >= DUST_LIMIT;
+  const hasChange = change2Out >= BITCOIN_DUST_LIMIT;
   const numOutputs = hasChange ? 2 : 1;
   const fee = estimateFee(utxos.length, numOutputs, feeRate);
   const change = totalInput - amountSats - fee;
@@ -438,8 +445,8 @@ export function buildUnsignedMultiOutputPsbt(
     if (!validateBitcoinAddress(output.address)) {
       throw new Error(`Invalid Bitcoin address: ${output.address}`);
     }
-    if (!Number.isInteger(output.amountSats) || output.amountSats < DUST_LIMIT) {
-      throw new Error(`Bitcoin outputs must be at least ${DUST_LIMIT} sats.`);
+    if (!Number.isInteger(output.amountSats) || output.amountSats < BITCOIN_DUST_LIMIT) {
+      throw new Error(`Bitcoin outputs must be at least ${BITCOIN_DUST_LIMIT} sats.`);
     }
   }
 
@@ -472,7 +479,7 @@ export function buildUnsignedMultiOutputPsbt(
   const totalOutput = outputs.reduce((sum, output) => sum + output.amountSats, 0);
   const feeWithChange = estimateFee(utxos.length, outputs.length + 1, feeRate);
   const changeWithChange = totalInput - totalOutput - feeWithChange;
-  const hasChange = changeWithChange >= DUST_LIMIT;
+  const hasChange = changeWithChange >= BITCOIN_DUST_LIMIT;
   const numOutputs = outputs.length + (hasChange ? 1 : 0);
   const fee = estimateFee(utxos.length, numOutputs, feeRate);
   const change = totalInput - totalOutput - fee;

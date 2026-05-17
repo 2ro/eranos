@@ -25,7 +25,7 @@ import { useCommunityOnchainZaps } from '@/hooks/useCommunityOnchainZaps';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useSparkWallet } from '@/hooks/useSparkWallet';
 import { useToast } from '@/hooks/useToast';
-import { estimateFee, fetchUTXOs, getFeeRates, nostrPubkeyToBitcoinAddress } from '@/lib/bitcoin';
+import { BITCOIN_DUST_LIMIT, estimateFee, fetchUTXOs, getFeeRates, nostrPubkeyToBitcoinAddress } from '@/lib/bitcoin';
 import type { CommunityMember, ParsedCommunity } from '@/lib/communityUtils';
 import { getDisplayName } from '@/lib/getDisplayName';
 import { cn } from '@/lib/utils';
@@ -176,6 +176,7 @@ export function CommunityZapDialog({
     && selectedRecipients.length > 0
     && Number.isFinite(amountSats)
     && amountSats > 0
+    && (mode === 'lightning' || amountSats >= BITCOIN_DUST_LIMIT)
     && (mode === 'lightning' ? sparkWallet.balance >= totalSats : bitcoinBalance >= bitcoinTotalSats)
     && !isLaunching;
 
@@ -205,6 +206,14 @@ export function CommunityZapDialog({
     }
     if (!Number.isFinite(amountSats) || amountSats <= 0) {
       toast({ title: 'Invalid amount', description: 'Enter a positive amount in sats.', variant: 'destructive' });
+      return;
+    }
+    if (mode === 'bitcoin' && amountSats < BITCOIN_DUST_LIMIT) {
+      toast({
+        title: 'Amount too small',
+        description: `On-chain Bitcoin outputs must be at least ${BITCOIN_DUST_LIMIT.toLocaleString()} sats.`,
+        variant: 'destructive',
+      });
       return;
     }
     if (selectedRecipients.length === 0) {
@@ -361,6 +370,11 @@ export function CommunityZapDialog({
             )}
             {mode === 'bitcoin' && walletReady && (
               <div className="rounded-2xl border border-border bg-muted/40 p-3 text-sm">
+                {Number.isFinite(amountSats) && amountSats > 0 && amountSats < BITCOIN_DUST_LIMIT && (
+                  <p className="mb-2 text-xs text-destructive">
+                    On-chain outputs must be at least {BITCOIN_DUST_LIMIT.toLocaleString()} sats per member.
+                  </p>
+                )}
                 <div className="flex justify-between gap-3">
                   <span className="text-muted-foreground">Estimated miner fee</span>
                   <span className="font-medium tabular-nums">{estimatedBitcoinFee.toLocaleString()} sats</span>
