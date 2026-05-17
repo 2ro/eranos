@@ -29,7 +29,6 @@ import { useProfileUrl } from '@/hooks/useProfileUrl';
 import { useToast } from '@/hooks/useToast';
 import { useLayoutOptions } from '@/contexts/LayoutContext';
 import {
-  CAMPAIGN_CATEGORY_LABELS,
   encodeCampaignNaddr,
   type ParsedCampaign,
 } from '@/lib/campaign';
@@ -100,7 +99,10 @@ function CampaignDetailContent({ campaign }: { campaign: ParsedCampaign }) {
   const isCreator = user?.pubkey === campaign.pubkey;
   const naddr = useMemo(() => encodeCampaignNaddr(campaign), [campaign]);
   const storyEvent = useMemo(
-    () => ({ ...campaign.event, tags: campaign.event.tags.filter(([name]) => name !== 'image') }),
+    () => ({
+      ...campaign.event,
+      tags: campaign.event.tags.filter(([name]) => !['image', 'summary', 'title', 't'].includes(name)),
+    }),
     [campaign.event],
   );
 
@@ -128,26 +130,11 @@ function CampaignDetailContent({ campaign }: { campaign: ParsedCampaign }) {
   return (
     <main className="min-h-screen pb-16">
       <div className="max-w-5xl mx-auto px-4 sm:px-6 py-6 lg:py-10">
-        {/* Inline back arrow — the global TopNav handles primary navigation. */}
-        <div className="flex items-center gap-2 mb-4 -ml-2">
-          <button
-            onClick={() => navigate(-1)}
-            className="p-2 rounded-full hover:bg-secondary motion-safe:transition-colors text-muted-foreground hover:text-foreground"
-            aria-label="Go back"
-          >
-            <ChevronLeft className="size-5" />
-          </button>
-          <Button variant="ghost" size="sm" onClick={handleShare} className="ml-auto">
-            <Share2 className="size-4 sm:mr-1.5" />
-            <span className="hidden sm:inline">Share</span>
-          </Button>
-        </div>
-
         {/* Hero */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-10">
-          <div className="lg:col-span-2 space-y-6">
+          <div className="lg:col-span-2 space-y-4">
             {/* Cover */}
-            <div className="relative aspect-[16/9] rounded-xl overflow-hidden bg-gradient-to-br from-primary/15 via-primary/5 to-secondary">
+            <div className="relative aspect-[16/9] rounded-xl overflow-hidden bg-gradient-to-br from-primary/40 via-primary/20 to-secondary">
               {cover ? (
                 <img src={cover} alt="" className="absolute inset-0 size-full object-cover" />
               ) : (
@@ -155,28 +142,41 @@ function CampaignDetailContent({ campaign }: { campaign: ParsedCampaign }) {
                   <HandHeart className="size-16 text-primary/40" />
                 </div>
               )}
-              {campaign.category && (
-                <Badge
-                  variant="secondary"
-                  className="absolute top-4 left-4 backdrop-blur bg-background/80 border-border/40"
-                >
-                  {CAMPAIGN_CATEGORY_LABELS[campaign.category]}
-                </Badge>
-              )}
-            </div>
+              <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/25 to-black/45" />
 
-            {/* Title + summary */}
-            <div className="space-y-3">
-              <h1 className="text-3xl sm:text-4xl font-bold leading-tight tracking-tight">
-                {campaign.title}
-              </h1>
-              {campaign.summary && (
-                <p className="text-lg text-muted-foreground">{campaign.summary}</p>
-              )}
+              <div className="absolute left-0 right-0 top-0 z-10 flex items-center justify-between px-4 pt-4">
+                <button
+                  onClick={() => navigate(-1)}
+                  className="p-2 -ml-2 rounded-full text-white/90 hover:bg-white/15 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80 motion-safe:transition-colors"
+                  aria-label="Go back"
+                >
+                  <ChevronLeft className="size-5 drop-shadow-[0_1px_2px_rgba(0,0,0,0.85)]" />
+                </button>
+                <button
+                  type="button"
+                  onClick={handleShare}
+                  className="inline-flex items-center gap-1.5 rounded-full px-3 py-2 text-sm font-medium text-white/90 hover:bg-white/15 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80 motion-safe:transition-colors"
+                  aria-label="Share campaign"
+                >
+                  <Share2 className="size-4 drop-shadow-[0_1px_2px_rgba(0,0,0,0.85)]" />
+                  <span className="hidden sm:inline drop-shadow-[0_1px_2px_rgba(0,0,0,0.85)]">Share</span>
+                </button>
+              </div>
+
+              <div className="absolute inset-x-0 bottom-0 z-10 space-y-2 p-5 sm:p-6 [text-shadow:0_1px_4px_rgba(0,0,0,0.75),0_2px_10px_rgba(0,0,0,0.45)]">
+                <h1 className="text-3xl sm:text-4xl font-bold leading-tight tracking-tight text-white">
+                  {campaign.title}
+                </h1>
+                {campaign.summary && (
+                  <p className="max-w-2xl text-base sm:text-lg text-white/90 line-clamp-3">
+                    {campaign.summary}
+                  </p>
+                )}
+              </div>
             </div>
 
             {/* Creator + meta */}
-            <div className="flex flex-wrap items-center gap-x-5 gap-y-2 text-sm text-muted-foreground border-y border-border py-4">
+            <div className="flex flex-wrap items-center gap-x-5 gap-y-2 text-sm text-muted-foreground border-y border-border py-3">
               <Link
                 to={creatorUrl}
                 className="inline-flex items-center gap-2 hover:text-foreground motion-safe:transition-colors"
@@ -189,6 +189,11 @@ function CampaignDetailContent({ campaign }: { campaign: ParsedCampaign }) {
                   organized by <span className="font-medium text-foreground">{creatorName}</span>
                 </span>
               </Link>
+              {campaign.category && (
+                <Badge variant="outline" className="rounded-full font-normal text-muted-foreground">
+                  #{campaign.category}
+                </Badge>
+              )}
               {campaign.location && (
                 <span className="inline-flex items-center gap-1.5">
                   <MapPin className="size-4" />
@@ -213,7 +218,7 @@ function CampaignDetailContent({ campaign }: { campaign: ParsedCampaign }) {
             </div>
 
             {/* Story */}
-            <article className="prose prose-neutral dark:prose-invert max-w-none">
+            <article className="prose prose-neutral dark:prose-invert max-w-none pt-1">
               {campaign.story.trim().length > 0 ? (
                 <ArticleContent event={storyEvent} />
               ) : (
