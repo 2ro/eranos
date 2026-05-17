@@ -8,6 +8,7 @@ import Index from './Index';
 // All other pages are lazy-loaded so they don't bloat the index chunk.
 // HomePage renders exactly ONE page at a time, so only that page's chunk is loaded.
 const PAGE_LOADERS: Record<string, React.LazyExoticComponent<React.ComponentType>> = {
+  'campaigns': lazy(() => import('./CampaignsPage').then(m => ({ default: m.CampaignsPage }))),
   'notifications': lazy(() => import('./NotificationsPage').then(m => ({ default: m.NotificationsPage }))),
   'search': lazy(() => import('./SearchPage').then(m => ({ default: m.SearchPage }))),
   'bookmarks': lazy(() => import('./BookmarksPage').then(m => ({ default: m.BookmarksPage }))),

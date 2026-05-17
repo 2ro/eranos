@@ -7,6 +7,8 @@ import { ProfilePage } from './ProfilePage';
 import { PostDetailPage, AddrPostDetailPage, PostDetailShell, PostDetailSkeleton } from './PostDetailPage';
 import { ListDetailPage } from './ListDetailPage';
 import { ActionDetailPage } from './ActionDetailPage';
+import { CampaignDetailPage } from './CampaignDetailPage';
+import { CAMPAIGN_KIND } from '@/lib/campaign';
 import type { AddressPointer } from 'nostr-tools/nip19';
 
 const HEX_64_RE = /^[0-9a-f]{64}$/;
@@ -119,6 +121,15 @@ export function NIP19Page() {
       }
       if (addr.kind === 36639) {
         return <ActionDetailPage pubkey={addr.pubkey} identifier={addr.identifier} />;
+      }
+      if (addr.kind === CAMPAIGN_KIND) {
+        return (
+          <CampaignDetailPage
+            pubkey={addr.pubkey}
+            identifier={addr.identifier}
+            relays={addr.relays}
+          />
+        );
       }
       return <AddrPostDetailPage addr={{ kind: addr.kind, pubkey: addr.pubkey, identifier: addr.identifier }} relays={addr.relays} />;
     }

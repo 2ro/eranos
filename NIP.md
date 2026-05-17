@@ -14,6 +14,7 @@
 |-------|----------------------------|----------------------------------------------------------------|
 | 20000 | Ephemeral Geo Chat (public) | Geo-anchored ephemeral chat message (kind 20000, public)      |
 | 20001 | Ephemeral Geo Heartbeat    | Geo-anchored ephemeral presence heartbeat (kind 20001)         |
+| 30223 | Campaign                   | Fundraising campaign with a list of on-chain Bitcoin recipients |
 | 30385 | Community Stats Snapshot   | Pre-computed per-country / global community leaderboards       |
 | 36639 | Activist Action            | Country-scoped activist challenge with a sats bounty           |
 
@@ -171,6 +172,129 @@ Clients MUST verify a kind 8333 event on-chain before counting it toward a zap t
 | Fees | Sub-satoshi typical | Significant at low amounts |
 
 The two zap kinds are complementary. Clients SHOULD sum verified amounts from both kinds when displaying total zap stats for a post or profile.
+
+---
+
+## Kind 30223: Campaign
+
+### Summary
+
+Addressable event representing a **fundraising campaign**. A campaign carries the marketing-style metadata you would expect on GoFundMe, Kickstarter, or GiveSendGo (title, summary, cover image, story, category, goal, optional deadline and location), and — most importantly — a list of recipient pubkeys (`p` tags) that share the proceeds of any donation.
+
+Donations are sent as a **single Bitcoin on-chain transaction** with one output per recipient. The donor's wallet derives each recipient's Taproot address from their pubkey via BIP-340/BIP-341 (the same scheme used by kind 8333 onchain zaps), so the campaign event itself does not need to carry Bitcoin addresses. After broadcasting the funding tx, the donor's client publishes one kind 8333 event per recipient, all referencing the same `txid` and tagging the campaign via `a` / `K`, so the donation shows up in the campaign's totals and in each recipient's profile zap history.
+
+The kind is addressable so the creator can edit the story, image, goal, deadline, and recipient list over the life of the campaign without minting new identifiers. The `d` tag is the campaign's slug.
+
+### Event Structure
+
+```json
+{
+  "kind": 30223,
+  "pubkey": "<creator-pubkey>",
+  "content": "<markdown story>",
+  "tags": [
+    ["d", "save-the-bookstore"],
+    ["title", "Save the Last Bookstore"],
+    ["summary", "Help our 40-year-old neighborhood bookstore make rent through winter."],
+    ["image", "https://example.com/cover.jpg"],
+    ["t", "community"],
+    ["goal", "10000000"],
+    ["deadline", "1735689600"],
+    ["location", "Portland, OR"],
+    ["p", "<recipient-1-hex-pubkey>", "wss://relay.example", "2"],
+    ["p", "<recipient-2-hex-pubkey>", "wss://relay.example", "1"],
+    ["p", "<recipient-3-hex-pubkey>"],
+    ["alt", "Fundraising campaign: Save the Last Bookstore"]
+  ]
+}
+```
+
+### Content
+
+The `content` field is the **campaign story**, formatted as Markdown. Clients SHOULD render it with the same Markdown renderer they use for NIP-23 long-form content. Empty content is permitted (e.g. for a campaign that lives entirely in its summary).
+
+### Tags
+
+| Tag        | Required | Description                                                                                                                                                       |
+|------------|----------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `d`        | Yes      | Campaign slug, unique per author. Forms the addressable coordinate `30223:<pubkey>:<d>`.                                                                          |
+| `title`    | Yes      | Display title of the campaign (plain text, max ~200 chars).                                                                                                       |
+| `summary`  | Recommended | Short one-paragraph tagline shown in feed cards and previews.                                                                                                  |
+| `image`    | Recommended | HTTPS URL of the cover image (jpg/png/webp). Clients MUST sanitize and verify the URL before rendering.                                                       |
+| `t`        | Recommended | Category. SHOULD be one of: `medical`, `memorial`, `emergency`, `education`, `animals`, `community`, `sports`, `creative`, `business`, `faith`, `other`. Multiple `t` tags MAY be used. |
+| `goal`     | Recommended | Fundraising goal in **satoshis** (decimal integer). Omit if the campaign has no fixed goal.                                                                       |
+| `deadline` | Optional | Unix timestamp (seconds) at which the campaign closes. After the deadline, clients SHOULD show the campaign as ended but MAY still accept donations.              |
+| `location` | Optional | Human-readable location string (e.g. "Portland, OR" or "Online"). For machine-readable geo, a `g` (geohash) tag MAY be added in parallel.                          |
+| `p`        | Yes (≥1) | Recipient pubkey. The 2nd element is the hex pubkey; the 3rd (optional) is a relay hint; the 4th (optional) is a positive decimal **weight** for split allocation. |
+| `alt`      | Recommended | NIP-31 human-readable fallback.                                                                                                                                   |
+
+### Recipient Split Rules
+
+When a donor sends an amount `T` in satoshis to a campaign:
+
+1. Read all `p` tags from the campaign event.
+2. Parse the weight of each `p` tag from the 4th element. If absent, malformed, or non-positive, the weight defaults to **1**.
+3. Compute each recipient's share as `floor(T * weight_i / sum_of_weights)` satoshis.
+4. Any remainder from rounding (at most N−1 sats) MAY be appended to the largest share or kept by the donor as change — clients SHOULD prefer appending the remainder to the largest share so the full amount reaches the campaign.
+5. If any computed share is below the Bitcoin dust limit (546 sats for P2TR), the donor's client MUST refuse the donation and surface a minimum-amount error.
+
+Equal splits are the default: omit the weight on every `p` tag, and all recipients receive `floor(T / N)` sats each.
+
+### Donation Flow
+
+1. Donor opens the campaign and chooses an amount in sats (preset or custom).
+2. Donor's client computes per-recipient amounts using the split rules above.
+3. Donor's client builds a **single PSBT** with one output per recipient (paying each recipient's derived Taproot address) plus a change output back to the donor.
+4. Donor signs the PSBT with their Nostr key (Taproot key-path spend) and broadcasts the resulting transaction.
+5. Donor's client publishes **one kind 8333 event per recipient**, all referencing the same `txid` in their `i` tag. Each kind 8333 event MUST include:
+
+   ```json
+   [
+     ["i", "bitcoin:tx:<txid>"],
+     ["p", "<recipient-pubkey>"],
+     ["amount", "<sats-paid-to-that-recipient>"],
+     ["a", "30223:<campaign-author-pubkey>:<campaign-d-tag>"],
+     ["K", "30223"],
+     ["alt", "Donation to <campaign-title>: <amount> sats"]
+   ]
+   ```
+
+This mirrors the community batch-zap pattern documented in the kind 8333 section above, with the campaign's addressable coordinate replacing the community coordinate.
+
+### Querying
+
+**List campaigns (newest first):**
+
+```json
+{ "kinds": [30223], "limit": 50 }
+```
+
+**Filter by category:**
+
+```json
+{ "kinds": [30223], "#t": ["medical"], "limit": 50 }
+```
+
+**Fetch a specific campaign:**
+
+```json
+{ "kinds": [30223], "authors": ["<creator-pubkey>"], "#d": ["<slug>"], "limit": 1 }
+```
+
+**Aggregate donations for a campaign:**
+
+```json
+{ "kinds": [8333], "#a": ["30223:<creator-pubkey>:<slug>"], "limit": 500 }
+```
+
+Clients MUST verify each kind 8333 event on-chain before counting it toward the campaign total, per the verification rules in the kind 8333 section.
+
+### Client Behavior
+
+- **Recipient validity:** clients SHOULD reject `p` tag entries whose pubkey is not 64 hex characters and SHOULD ignore weights that are not positive finite decimals.
+- **Dust protection:** when a donor enters an amount that would assign any recipient less than the dust limit, the client MUST block the donation and either suggest the minimum viable total or prompt the donor to remove recipients.
+- **Editability:** the creator MAY republish the same `(kind, pubkey, d)` triple to update the campaign. Clients SHOULD keep `published_at` from the first publish on subsequent edits (NIP-23 convention).
+- **Closing:** the creator MAY publish a NIP-09 kind 5 deletion request referencing the campaign's `a` coordinate to retire it. Clients SHOULD continue to render past donations against the campaign even after closure.
 
 ---
 

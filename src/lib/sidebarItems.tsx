@@ -16,6 +16,7 @@ import {
   Code,
   Earth,
   Film,
+  HandHeart,
   HelpCircle,
   Highlighter,
   LifeBuoy,
@@ -134,6 +135,7 @@ export const SIDEBAR_ITEMS: SidebarItemDef[] = [
     requiresAuth: true,
   },
   { id: "feed", label: "Feed", path: "/feed", icon: LogoIcon },
+  { id: "campaigns", label: "Fundraisers", path: "/campaigns", icon: HandHeart },
   {
     id: "notifications",
     label: "Notifications",

@@ -27,6 +27,11 @@ const EmojiPackDialog = lazy(() => import("@/components/EmojiPackDialog").then(m
 // HomePage eagerly imported all page components; now lazy-loaded
 const HomePage = lazy(() => import("./pages/HomePage").then(m => ({ default: m.HomePage })));
 
+// Campaigns: lazy-loaded list + create pages. (Detail page is dispatched from
+// NIP19Page when an naddr resolves to kind 30223.)
+const CampaignsPage = lazy(() => import("./pages/CampaignsPage").then(m => ({ default: m.CampaignsPage })));
+const CreateCampaignPage = lazy(() => import("./pages/CreateCampaignPage").then(m => ({ default: m.CreateCampaignPage })));
+
 // All other pages: code-split via React.lazy
 const ActionsPage = lazy(() => import("./pages/ActionsPage"));
 const AdvancedSettingsPage = lazy(() => import("./pages/AdvancedSettingsPage").then(m => ({ default: m.AdvancedSettingsPage })));
@@ -158,6 +163,8 @@ export function AppRouter() {
           <Route element={<MainLayout />}>
             <Route path="/" element={<HomePage />} />
             <Route path="/feed" element={<Index />} />
+            <Route path="/campaigns" element={<CampaignsPage />} />
+            <Route path="/campaigns/new" element={<CreateCampaignPage />} />
             <Route path="/notifications" element={<NotificationsPage />} />
             <Route path="/messages" element={<MessagesPage />} />
             <Route path="/search" element={<SearchPage />} />
