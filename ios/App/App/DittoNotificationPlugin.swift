@@ -33,7 +33,7 @@ public class DittoNotificationPlugin: CAPPlugin, CAPBridgedPlugin {
 
     // MARK: - Constants
 
-    static let bgTaskIdentifier = "pub.ditto.app.notification-refresh"
+    static let bgTaskIdentifier = "spot.agora.app.notification-refresh"
     private static let prefsKey = "ditto_notification_config"
 
     // MARK: - Plugin Methods

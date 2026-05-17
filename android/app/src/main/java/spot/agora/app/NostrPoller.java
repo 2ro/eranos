@@ -1,4 +1,4 @@
-package pub.ditto.app;
+package spot.agora.app;
 
 import android.app.NotificationChannel;
 import android.app.NotificationManager;

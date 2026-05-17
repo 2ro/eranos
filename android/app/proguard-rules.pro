@@ -7,7 +7,7 @@
 
 # Keep Capacitor classes (WebView JS bridge)
 -keep class com.getcapacitor.** { *; }
--keep class pub.ditto.app.** { *; }
+-keep class spot.agora.app.** { *; }
 
 # Keep WebView JS interfaces
 -keepclassmembers class * {

@@ -1,7 +1,7 @@
 import type { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
-  appId: 'pub.agora.app',
+  appId: 'spot.agora.app',
   appName: 'Agora',
   webDir: 'dist',
   server: {

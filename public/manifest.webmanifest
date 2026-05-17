@@ -91,13 +91,8 @@
   "related_applications": [
     {
       "platform": "play",
-      "url": "https://play.google.com/store/apps/details?id=pub.ditto.app",
-      "id": "pub.ditto.app"
-    },
-    {
-      "platform": "itunes",
-      "url": "https://apps.apple.com/us/app/ditto-fun-social-media/id6761851821",
-      "id": "6761851821"
+      "url": "https://play.google.com/store/apps/details?id=spot.agora.app",
+      "id": "spot.agora.app"
     }
   ],
   "prefer_related_applications": false

@@ -61,7 +61,7 @@
 	</array>
 	<key>BGTaskSchedulerPermittedIdentifiers</key>
 	<array>
-		<string>pub.agora.app.notification-refresh</string>
+		<string>spot.agora.app.notification-refresh</string>
 	</array>
 </dict>
 </plist>
