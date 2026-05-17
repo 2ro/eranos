@@ -93,6 +93,7 @@ export function WalletSettingsContent() {
     deleteLightningAddress,
     isInitialized,
     getSparkAddress,
+    getDiagnostics,
   } = useSparkWallet();
 
   const [showMnemonicDialog, setShowMnemonicDialog] = useState(false);
@@ -111,6 +112,7 @@ export function WalletSettingsContent() {
   const [showCopyConfirm, setShowCopyConfirm] = useState(false);
   const [action, setAction] = useState<"sync" | "export" | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [isCopyingDiagnostics, setIsCopyingDiagnostics] = useState(false);
   const [deleteConfirmText, setDeleteConfirmText] = useState("");
 
   // Clipboard security refs
@@ -313,6 +315,37 @@ export function WalletSettingsContent() {
       return;
     }
     setShowCopyConfirm(true);
+  };
+
+  const handleCopyDiagnostics = async () => {
+    setIsCopyingDiagnostics(true);
+    try {
+      const diagnostics = await getDiagnostics();
+      await navigator.clipboard.writeText(
+        JSON.stringify(
+          {
+            capturedAt: new Date().toISOString(),
+            ...diagnostics,
+          },
+          null,
+          2,
+        ),
+      );
+      toast({
+        title: "Wallet diagnostics copied",
+        description: "Paste these details into the bug report or support chat.",
+      });
+    } catch (error) {
+      logger.error("Failed to copy wallet diagnostics:", error);
+      toast({
+        title: "Diagnostics failed",
+        description:
+          error instanceof Error ? error.message : "Could not copy diagnostics",
+        variant: "destructive",
+      });
+    } finally {
+      setIsCopyingDiagnostics(false);
+    }
   };
 
   const handleMnemonicSubmit = async () => {
@@ -810,6 +843,34 @@ export function WalletSettingsContent() {
         </CardHeader>
         <CardContent>
           <LockTimeoutSettings />
+        </CardContent>
+      </Card>
+
+      {/* Diagnostics Section */}
+      <Card className="bg-card/50 backdrop-blur-sm border-border/50">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <RefreshCw className="h-5 w-5" />
+            Wallet Diagnostics
+          </CardTitle>
+          <CardDescription>
+            Copy non-secret wallet state to debug balance or payment history issues.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <Button
+            onClick={handleCopyDiagnostics}
+            variant="outline"
+            className="w-full text-xs sm:text-sm"
+            disabled={isCopyingDiagnostics || !isInitialized}
+          >
+            {isCopyingDiagnostics ? (
+              <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+            ) : (
+              <Copy className="h-4 w-4 mr-2" />
+            )}
+            <span className="truncate">Copy Wallet Diagnostics</span>
+          </Button>
         </CardContent>
       </Card>
 

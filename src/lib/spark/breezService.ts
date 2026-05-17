@@ -96,6 +96,11 @@ export type BreezWalletState = {
   lastSynced?: Date;
 };
 
+export type BreezWalletInfo = {
+  identityPubkey: string;
+  balanceSats: number;
+};
+
 /**
  * Payment info type
  */
@@ -333,6 +338,27 @@ class BreezWalletService {
     await this.ensureConnected();
     await this.syncBalance(false);
     return this.state.balance;
+  }
+
+  /**
+   * Get current SDK wallet info without forcing a blocking initial sync.
+   */
+  async getInfo(): Promise<BreezWalletInfo> {
+    await this.ensureConnected();
+
+    const info: GetInfoResponse = await withTimeout(
+      this.sdk!.getInfo({ ensureSynced: false }),
+      INFO_TIMEOUT_MS,
+      "[BreezWallet] getInfo",
+    );
+    this.state.balance = info.balanceSats;
+    this.state.tokenBalances = info.tokenBalances;
+    this.state.lastSynced = new Date();
+
+    return {
+      identityPubkey: info.identityPubkey,
+      balanceSats: info.balanceSats,
+    };
   }
 
   /**
