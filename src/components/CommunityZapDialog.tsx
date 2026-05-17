@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { Check, Loader2, Plus, Wallet, X, Zap } from 'lucide-react';
 import type { NostrEvent, NostrMetadata } from '@nostrify/nostrify';
 
@@ -16,18 +17,23 @@ import {
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import { useBitcoinSigner } from '@/hooks/useBitcoinSigner';
+import { useBitcoinWallet } from '@/hooks/useBitcoinWallet';
 import { useAuthors } from '@/hooks/useAuthors';
 import { useCommunityBatchZaps } from '@/hooks/useCommunityBatchZaps';
+import { useCommunityOnchainZaps } from '@/hooks/useCommunityOnchainZaps';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useSparkWallet } from '@/hooks/useSparkWallet';
 import { useToast } from '@/hooks/useToast';
+import { estimateFee, fetchUTXOs, getFeeRates, nostrPubkeyToBitcoinAddress } from '@/lib/bitcoin';
 import type { CommunityMember, ParsedCommunity } from '@/lib/communityUtils';
 import { getDisplayName } from '@/lib/getDisplayName';
 import { cn } from '@/lib/utils';
 import { notificationSuccess } from '@/lib/haptics';
 
 type RecipientRole = 'founder' | 'moderator' | 'member';
-type RecipientStatus = 'ready' | 'loading' | 'missing-ln' | 'removed' | 'self';
+type RecipientStatus = 'ready' | 'loading' | 'missing-ln' | 'missing-btc' | 'removed' | 'self';
+type CommunityZapMode = 'lightning' | 'bitcoin';
 
 interface RecipientView {
   pubkey: string;
@@ -35,6 +41,7 @@ interface RecipientView {
   name: string;
   picture?: string;
   lightningAddress?: string;
+  bitcoinAddress?: string;
   authorEvent?: NostrEvent;
   status: RecipientStatus;
 }
@@ -43,6 +50,7 @@ interface CommunityZapDialogProps {
   community: ParsedCommunity;
   members: CommunityMember[];
   membersLoading: boolean;
+  mode?: CommunityZapMode;
   triggerClassName?: string;
   onZapLaunched?: (details: { count: number; totalSats: number }) => void;
 }
@@ -70,6 +78,7 @@ export function CommunityZapDialog({
   community,
   members,
   membersLoading,
+  mode = 'lightning',
   triggerClassName,
   onZapLaunched,
 }: CommunityZapDialogProps) {
@@ -81,11 +90,29 @@ export function CommunityZapDialog({
 
   const { user } = useCurrentUser();
   const sparkWallet = useSparkWallet();
+  const bitcoinWallet = useBitcoinWallet();
+  const { canSignPsbt } = useBitcoinSigner();
   const { toast } = useToast();
   const { zapCommunity } = useCommunityBatchZaps();
+  const { zapCommunityOnchain } = useCommunityOnchainZaps();
 
   const pubkeys = useMemo(() => members.map((member) => member.pubkey), [members]);
   const authors = useAuthors(pubkeys);
+  const senderBitcoinAddress = user ? nostrPubkeyToBitcoinAddress(user.pubkey) : '';
+
+  const { data: bitcoinUtxos, isLoading: isLoadingBitcoinUtxos } = useQuery({
+    queryKey: ['bitcoin-utxos', senderBitcoinAddress],
+    queryFn: () => fetchUTXOs(senderBitcoinAddress),
+    enabled: open && mode === 'bitcoin' && !!senderBitcoinAddress,
+    staleTime: 30_000,
+  });
+
+  const { data: feeRates, isLoading: isLoadingFeeRates } = useQuery({
+    queryKey: ['bitcoin-fee-rates'],
+    queryFn: getFeeRates,
+    enabled: open && mode === 'bitcoin',
+    staleTime: 30_000,
+  });
 
   useEffect(() => {
     if (!open) return;
@@ -98,16 +125,15 @@ export function CommunityZapDialog({
       const author = authors.data?.get(member.pubkey);
       const metadata: NostrMetadata | undefined = author?.metadata;
       const lightningAddress = metadata?.lud16 || metadata?.lud06;
+      const bitcoinAddress = nostrPubkeyToBitcoinAddress(member.pubkey);
       const removed = removedPubkeys.has(member.pubkey);
-      const status: RecipientStatus = user?.pubkey === member.pubkey
-        ? 'self'
-        : removed
-        ? 'removed'
-        : authors.isLoading && !author?.event
-        ? 'loading'
-        : lightningAddress && author?.event
-        ? 'ready'
-        : 'missing-ln';
+      const status: RecipientStatus = (() => {
+        if (user?.pubkey === member.pubkey) return 'self';
+        if (removed) return 'removed';
+        if (mode === 'bitcoin') return bitcoinAddress ? 'ready' : 'missing-btc';
+        if (authors.isLoading && !author?.event) return 'loading';
+        return lightningAddress && author?.event ? 'ready' : 'missing-ln';
+      })();
 
       return {
         pubkey: member.pubkey,
@@ -115,28 +141,40 @@ export function CommunityZapDialog({
         name: getDisplayName(metadata, member.pubkey),
         picture: metadata?.picture,
         lightningAddress,
+        bitcoinAddress,
         authorEvent: author?.event,
         status,
       };
     });
-  }, [authors.data, authors.isLoading, community, members, removedPubkeys, user?.pubkey]);
+  }, [authors.data, authors.isLoading, community, members, mode, removedPubkeys, user?.pubkey]);
 
   const amountSats = parseInt(amount, 10);
-  const selectedRecipients = recipients.filter(
-    (recipient) => recipient.status === 'ready' && recipient.authorEvent,
-  );
-  const skippedCount = recipients.filter((recipient) => recipient.status === 'missing-ln' || recipient.status === 'self').length;
+  const selectedRecipients = recipients.filter((recipient) => (
+    mode === 'lightning'
+      ? recipient.status === 'ready' && recipient.authorEvent
+      : recipient.status === 'ready' && recipient.bitcoinAddress
+  ));
+  const skippedCount = recipients.filter((recipient) => (
+    recipient.status === 'missing-ln' || recipient.status === 'missing-btc' || recipient.status === 'self'
+  )).length;
   const removedCount = recipients.filter((recipient) => recipient.status === 'removed').length;
   const totalSats = Number.isFinite(amountSats) && amountSats > 0
     ? amountSats * selectedRecipients.length
     : 0;
-  const walletReady = sparkWallet.isEnabled && sparkWallet.isInitialized;
+  const estimatedBitcoinFee = mode === 'bitcoin' && bitcoinUtxos?.length && feeRates && selectedRecipients.length > 0
+    ? estimateFee(bitcoinUtxos.length, selectedRecipients.length + 1, feeRates.halfHourFee)
+    : 0;
+  const bitcoinTotalSats = totalSats + estimatedBitcoinFee;
+  const bitcoinBalance = bitcoinWallet.addressData?.totalBalance ?? 0;
+  const walletReady = mode === 'lightning'
+    ? sparkWallet.isEnabled && sparkWallet.isInitialized
+    : !!user && canSignPsbt && !!bitcoinWallet.addressData && !!bitcoinUtxos?.length && !!feeRates;
   const canSubmit = !!user
     && walletReady
     && selectedRecipients.length > 0
     && Number.isFinite(amountSats)
     && amountSats > 0
-    && sparkWallet.balance >= totalSats
+    && (mode === 'lightning' ? sparkWallet.balance >= totalSats : bitcoinBalance >= bitcoinTotalSats)
     && !isLaunching;
 
   const toggleRemoved = (pubkey: string, remove: boolean) => {
@@ -154,7 +192,13 @@ export function CommunityZapDialog({
       return;
     }
     if (!walletReady) {
-      toast({ title: 'Wallet required', description: 'Set up your Agora Wallet to zap a community.', variant: 'destructive' });
+      toast({
+        title: 'Wallet required',
+        description: mode === 'lightning'
+          ? 'Set up your Agora Wallet to zap a community.'
+          : 'Log in with a Bitcoin-capable signer and fund your Bitcoin wallet.',
+        variant: 'destructive',
+      });
       return;
     }
     if (!Number.isFinite(amountSats) || amountSats <= 0) {
@@ -165,7 +209,7 @@ export function CommunityZapDialog({
       toast({ title: 'No recipients', description: 'No selected members can receive zaps.', variant: 'destructive' });
       return;
     }
-    if (sparkWallet.balance < totalSats) {
+    if (mode === 'lightning' && sparkWallet.balance < totalSats) {
       toast({
         title: 'Insufficient balance',
         description: `You need at least ${totalSats.toLocaleString()} sats before Lightning fees.`,
@@ -173,27 +217,39 @@ export function CommunityZapDialog({
       });
       return;
     }
+    if (mode === 'bitcoin' && bitcoinBalance < bitcoinTotalSats) {
+      toast({
+        title: 'Insufficient balance',
+        description: `You need about ${bitcoinTotalSats.toLocaleString()} sats including miner fees.`,
+        variant: 'destructive',
+      });
+      return;
+    }
 
-    const batchRecipients = selectedRecipients
+    const lightningRecipients = selectedRecipients
       .filter((recipient): recipient is RecipientView & { authorEvent: NostrEvent } => !!recipient.authorEvent)
       .map((recipient) => ({ pubkey: recipient.pubkey, authorEvent: recipient.authorEvent }));
+    const bitcoinRecipients = selectedRecipients.map((recipient) => ({ pubkey: recipient.pubkey }));
+    const launchedCount = mode === 'lightning' ? lightningRecipients.length : bitcoinRecipients.length;
+    const launchedTotal = mode === 'lightning' ? totalSats : bitcoinTotalSats;
 
     setIsLaunching(true);
     setOpen(false);
-    onZapLaunched?.({ count: batchRecipients.length, totalSats });
+    onZapLaunched?.({ count: launchedCount, totalSats: launchedTotal });
     toast({
-      title: `Zapping ${batchRecipients.length} members...`,
-      description: `${totalSats.toLocaleString()} sats are on the way.`,
+      title: mode === 'lightning' ? `Zapping ${launchedCount} members...` : `Broadcasting Bitcoin zap...`,
+      description: mode === 'lightning'
+        ? `${totalSats.toLocaleString()} sats are on the way.`
+        : `${totalSats.toLocaleString()} sats plus miner fees are being sent.`,
     });
 
-    void zapCommunity({
-      community,
-      recipients: batchRecipients,
-      amountSats,
-      comment,
-    }).then((summary) => {
+    const zapPromise = mode === 'lightning'
+      ? zapCommunity({ community, recipients: lightningRecipients, amountSats, comment })
+      : zapCommunityOnchain({ community, recipients: bitcoinRecipients, amountSats, comment });
+
+    void zapPromise.then((summary) => {
       setIsLaunching(false);
-      if (summary.failed.length > 0) {
+      if ('failed' in summary && summary.failed.length > 0) {
         toast({
           title: `Zapped ${summary.succeeded} of ${summary.attempted} members`,
           description: `${summary.failed.length} zap${summary.failed.length === 1 ? '' : 's'} failed.`,
@@ -201,10 +257,22 @@ export function CommunityZapDialog({
         });
         return;
       }
+      if ('publishFailed' in summary && summary.publishFailed.length > 0) {
+        toast({
+          title: `Bitcoin sent, ${summary.published} of ${summary.attempted} receipts published`,
+          description: `Broadcast tx ${summary.txid.slice(0, 12)}... but ${summary.publishFailed.length} Nostr event${summary.publishFailed.length === 1 ? '' : 's'} failed.`,
+          variant: 'destructive',
+        });
+        return;
+      }
       notificationSuccess();
       toast({
-        title: `Zapped ${summary.succeeded} members`,
-        description: `${summary.totalSats.toLocaleString()} sats sent to ${community.name}.`,
+        title: mode === 'lightning'
+          ? `Zapped ${summary.succeeded} members`
+          : `Bitcoin zapped ${summary.published} members`,
+        description: mode === 'lightning'
+          ? `${summary.totalSats.toLocaleString()} sats sent to ${community.name}.`
+          : `${summary.totalSats.toLocaleString()} sats sent in tx ${summary.txid.slice(0, 12)}...`,
       });
     }).catch((error) => {
       setIsLaunching(false);
@@ -222,8 +290,8 @@ export function CommunityZapDialog({
             'inline-flex items-center justify-center',
             triggerClassName ?? 'p-2 rounded-full shadow-md bg-white text-black hover:bg-white/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring transition-colors',
           )}
-          aria-label="Zap community"
-          title="Zap community"
+          aria-label={mode === 'lightning' ? 'Zap community' : 'Bitcoin zap community'}
+          title={mode === 'lightning' ? 'Zap community' : 'Bitcoin zap community'}
         >
           <Zap className="size-5" />
         </button>
@@ -232,10 +300,12 @@ export function CommunityZapDialog({
         <DialogHeader className="px-5 pt-5 pb-3 border-b border-border shrink-0">
           <DialogTitle className="flex items-center gap-2">
             <Zap className="size-5 text-amber-500" />
-            Zap Community
+            {mode === 'lightning' ? 'Zap Community' : 'Bitcoin Zap Community'}
           </DialogTitle>
           <DialogDescription>
-            Send a real Nostr zap to each selected active member.
+            {mode === 'lightning'
+              ? 'Send a real Nostr zap to each selected active member.'
+              : 'Send one on-chain Bitcoin transaction to all selected members.'}
           </DialogDescription>
         </DialogHeader>
 
@@ -246,7 +316,9 @@ export function CommunityZapDialog({
                 <div className="flex items-center justify-between gap-3">
                   <Label htmlFor="community-zap-amount">Amount per member</Label>
                   <div className="rounded-full bg-muted px-3 py-1 text-xs font-medium text-muted-foreground">
-                    Balance <span className="tabular-nums text-foreground">{sparkWallet.balance.toLocaleString()} sats</span>
+                    Balance <span className="tabular-nums text-foreground">
+                      {(mode === 'lightning' ? sparkWallet.balance : bitcoinBalance).toLocaleString()} sats
+                    </span>
                   </div>
                 </div>
                 <div className="relative">
@@ -280,7 +352,21 @@ export function CommunityZapDialog({
             {!walletReady && (
               <div className="flex items-start gap-3 rounded-2xl border border-destructive/30 bg-destructive/10 p-3 text-sm text-destructive">
                 <Wallet className="size-4 mt-0.5 shrink-0" />
-                Set up and unlock your Agora Wallet before zapping the community.
+                {mode === 'lightning'
+                  ? 'Set up and unlock your Agora Wallet before zapping the community.'
+                  : 'Log in with a Bitcoin-capable signer and fund your Bitcoin wallet before zapping the community.'}
+              </div>
+            )}
+            {mode === 'bitcoin' && walletReady && (
+              <div className="rounded-2xl border border-border bg-muted/40 p-3 text-sm">
+                <div className="flex justify-between gap-3">
+                  <span className="text-muted-foreground">Estimated miner fee</span>
+                  <span className="font-medium tabular-nums">{estimatedBitcoinFee.toLocaleString()} sats</span>
+                </div>
+                <div className="mt-1 flex justify-between gap-3">
+                  <span className="text-muted-foreground">Total debit</span>
+                  <span className="font-medium tabular-nums">{bitcoinTotalSats.toLocaleString()} sats</span>
+                </div>
               </div>
             )}
           </div>
@@ -298,6 +384,9 @@ export function CommunityZapDialog({
               {membersLoading || authors.isLoading ? (
                 <Loader2 className="size-4 animate-spin text-muted-foreground" />
               ) : null}
+              {mode === 'bitcoin' && (isLoadingBitcoinUtxos || isLoadingFeeRates) ? (
+                <Loader2 className="size-4 animate-spin text-muted-foreground" />
+              ) : null}
             </div>
 
             <div className="divide-y divide-border">
@@ -306,6 +395,7 @@ export function CommunityZapDialog({
                   key={recipient.pubkey}
                   recipient={recipient}
                   amountSats={amountSats}
+                  mode={mode}
                   onRemove={() => toggleRemoved(recipient.pubkey, true)}
                   onRestore={() => toggleRemoved(recipient.pubkey, false)}
                 />
@@ -319,7 +409,8 @@ export function CommunityZapDialog({
             disabled={!canSubmit}
             isLaunching={isLaunching}
             selectedCount={selectedRecipients.length}
-            totalSats={totalSats}
+            totalSats={mode === 'lightning' ? totalSats : bitcoinTotalSats}
+            mode={mode}
             onComplete={handleSubmit}
           />
         </div>
@@ -335,12 +426,14 @@ function HoldToZapButton({
   isLaunching,
   selectedCount,
   totalSats,
+  mode,
   onComplete,
 }: {
   disabled: boolean;
   isLaunching: boolean;
   selectedCount: number;
   totalSats: number;
+  mode: CommunityZapMode;
   onComplete: () => void;
 }) {
   const [progress, setProgress] = useState(0);
@@ -389,6 +482,9 @@ function HoldToZapButton({
     if (disabled || isLaunching) cancelHold();
   }, [disabled, isLaunching]);
 
+  const actionLabel = mode === 'lightning' ? 'zap' : 'send';
+  const holdingLabel = mode === 'lightning' ? 'Keep holding to zap...' : 'Keep holding to send...';
+
   return (
     <Button
       type="button"
@@ -432,8 +528,10 @@ function HoldToZapButton({
             <Loader2 className="size-4 mr-2 animate-spin" />
             Launching...
           </>
+        ) : holding ? (
+          holdingLabel
         ) : (
-          `Zap ${totalSats.toLocaleString()} sats`
+          `Hold to ${actionLabel} ${selectedCount} · ${totalSats.toLocaleString()} sats`
         )}
       </span>
     </Button>
@@ -443,17 +541,22 @@ function HoldToZapButton({
 function RecipientRow({
   recipient,
   amountSats,
+  mode,
   onRemove,
   onRestore,
 }: {
   recipient: RecipientView;
   amountSats: number;
+  mode: CommunityZapMode;
   onRemove: () => void;
   onRestore: () => void;
 }) {
   const isReady = recipient.status === 'ready';
   const isRemoved = recipient.status === 'removed';
-  const isUnavailable = recipient.status === 'missing-ln' || recipient.status === 'loading' || recipient.status === 'self';
+  const isUnavailable = recipient.status === 'missing-ln'
+    || recipient.status === 'missing-btc'
+    || recipient.status === 'loading'
+    || recipient.status === 'self';
 
   return (
     <div className={cn('flex items-center gap-3 px-5 py-3', (isRemoved || isUnavailable) && 'opacity-55')}>
@@ -473,6 +576,10 @@ function RecipientRow({
             ? 'Loading profile...'
             : recipient.status === 'self'
             ? 'You · skipped'
+            : mode === 'bitcoin' && recipient.bitcoinAddress
+            ? shortAddress(recipient.bitcoinAddress)
+            : mode === 'bitcoin'
+            ? 'No Bitcoin address · skipped'
             : recipient.lightningAddress
             ? shortAddress(recipient.lightningAddress)
             : 'No Lightning address · skipped'}
