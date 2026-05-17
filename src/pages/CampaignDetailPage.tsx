@@ -147,19 +147,18 @@ function CampaignDetailContent({ campaign }: { campaign: ParsedCampaign }) {
               <div className="absolute left-0 right-0 top-0 z-10 flex items-center justify-between px-4 pt-4">
                 <button
                   onClick={() => navigate(-1)}
-                  className="p-2 -ml-2 rounded-full text-white/90 hover:bg-white/15 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80 motion-safe:transition-colors"
+                  className="p-2.5 -ml-2 rounded-full text-white/90 hover:bg-white/15 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80 motion-safe:transition-colors"
                   aria-label="Go back"
                 >
-                  <ChevronLeft className="size-5 drop-shadow-[0_1px_2px_rgba(0,0,0,0.85)]" />
+                  <ChevronLeft className="size-6 drop-shadow-[0_1px_2px_rgba(0,0,0,0.85)]" />
                 </button>
                 <button
                   type="button"
                   onClick={handleShare}
-                  className="inline-flex items-center gap-1.5 rounded-full px-3 py-2 text-sm font-medium text-white/90 hover:bg-white/15 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80 motion-safe:transition-colors"
+                  className="inline-flex items-center justify-center rounded-full p-2.5 text-white/90 hover:bg-white/15 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80 motion-safe:transition-colors"
                   aria-label="Share campaign"
                 >
-                  <Share2 className="size-4 drop-shadow-[0_1px_2px_rgba(0,0,0,0.85)]" />
-                  <span className="hidden sm:inline drop-shadow-[0_1px_2px_rgba(0,0,0,0.85)]">Share</span>
+                  <Share2 className="size-5 drop-shadow-[0_1px_2px_rgba(0,0,0,0.85)]" />
                 </button>
               </div>
 
