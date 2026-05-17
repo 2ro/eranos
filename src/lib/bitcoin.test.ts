@@ -7,10 +7,13 @@ import '@/lib/polyfills';
 import {
   isLargeAmount,
   LARGE_AMOUNT_USD_THRESHOLD,
+  buildUnsignedMultiOutputPsbt,
+  estimateFee,
   nostrPubkeyToBitcoinAddress,
   npubToBitcoinAddress,
   validateBitcoinAddress,
 } from '@/lib/bitcoin';
+import type { UTXO } from '@/lib/bitcoin';
 
 beforeAll(() => {
   bitcoin.initEccLib(ecc);
@@ -140,5 +143,73 @@ describe('isLargeAmount', () => {
 
   it('exports a sensible default threshold', () => {
     expect(LARGE_AMOUNT_USD_THRESHOLD).toBe(100);
+  });
+});
+
+describe('buildUnsignedMultiOutputPsbt', () => {
+  const senderPubkey = 'd6889cb081036e0faefa3a35157ad71086b123b2b144b649798b494c300a961d';
+  const recipient1 = 'bc1pjxzw9tm6qatyapu3c409dg8k23p4hjlk4ehwwlsum3emjqsaetrqppyu2z';
+  const recipient2 = 'bc1p2jdrzv2w45xws7qlguk0acmz9clje8fasvhx3kv3cgpmhm8qtzhsq6fyhy';
+  const utxos: UTXO[] = [
+    {
+      txid: '00'.repeat(32),
+      vout: 0,
+      value: 50_000,
+      status: { confirmed: true },
+    },
+  ];
+
+  it('builds one recipient output per payment plus change when economical', () => {
+    const { psbtHex, fee } = buildUnsignedMultiOutputPsbt(
+      senderPubkey,
+      [
+        { address: recipient1, amountSats: 1_000 },
+        { address: recipient2, amountSats: 2_000 },
+      ],
+      utxos,
+      2,
+    );
+
+    const psbt = bitcoin.Psbt.fromHex(psbtHex, { network: bitcoin.networks.bitcoin });
+    expect(psbt.txOutputs).toHaveLength(3);
+    expect(fee).toBe(estimateFee(1, 3, 2));
+  });
+
+  it('omits uneconomical dust change', () => {
+    const fee = estimateFee(1, 2, 2);
+    const { psbtHex } = buildUnsignedMultiOutputPsbt(
+      senderPubkey,
+      [
+        { address: recipient1, amountSats: 10_000 },
+        { address: recipient2, amountSats: 50_000 - 10_000 - fee - 100 },
+      ],
+      utxos,
+      2,
+    );
+
+    const psbt = bitcoin.Psbt.fromHex(psbtHex, { network: bitcoin.networks.bitcoin });
+    expect(psbt.txOutputs).toHaveLength(2);
+  });
+
+  it('rejects empty output sets', () => {
+    expect(() => buildUnsignedMultiOutputPsbt(senderPubkey, [], utxos, 2)).toThrow(/recipient/i);
+  });
+
+  it('rejects outputs below dust', () => {
+    expect(() => buildUnsignedMultiOutputPsbt(
+      senderPubkey,
+      [{ address: recipient1, amountSats: 1 }],
+      utxos,
+      2,
+    )).toThrow(/546/);
+  });
+
+  it('rejects insufficient funds', () => {
+    expect(() => buildUnsignedMultiOutputPsbt(
+      senderPubkey,
+      [{ address: recipient1, amountSats: 100_000 }],
+      utxos,
+      2,
+    )).toThrow(/insufficient/i);
   });
 });

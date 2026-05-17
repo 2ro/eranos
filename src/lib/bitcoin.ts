@@ -365,6 +365,11 @@ export interface UnsignedPsbt {
   fee: number;
 }
 
+export interface BitcoinPaymentOutput {
+  address: string;
+  amountSats: number;
+}
+
 export function buildUnsignedPsbt(
   senderPubkeyHex: string,
   toAddress: string,
@@ -411,6 +416,76 @@ export function buildUnsignedPsbt(
   }
 
   psbt.addOutput({ address: toAddress, value: BigInt(amountSats) });
+
+  if (hasChange) {
+    psbt.addOutput({ address: changeAddress, value: BigInt(change) });
+  }
+
+  return { psbtHex: psbt.toHex(), fee };
+}
+
+export function buildUnsignedMultiOutputPsbt(
+  senderPubkeyHex: string,
+  outputs: BitcoinPaymentOutput[],
+  utxos: UTXO[],
+  feeRate: number,
+): UnsignedPsbt {
+  if (outputs.length === 0) {
+    throw new Error('At least one recipient output is required.');
+  }
+
+  for (const output of outputs) {
+    if (!validateBitcoinAddress(output.address)) {
+      throw new Error(`Invalid Bitcoin address: ${output.address}`);
+    }
+    if (!Number.isInteger(output.amountSats) || output.amountSats < DUST_LIMIT) {
+      throw new Error(`Bitcoin outputs must be at least ${DUST_LIMIT} sats.`);
+    }
+  }
+
+  const internalPubkey = Buffer.from(senderPubkeyHex, 'hex');
+  const { address: changeAddress } = bitcoin.payments.p2tr({
+    internalPubkey,
+    network: bitcoin.networks.bitcoin,
+  });
+  if (!changeAddress) throw new Error('Failed to derive change address');
+
+  const psbt = new bitcoin.Psbt({ network: bitcoin.networks.bitcoin });
+  let totalInput = 0;
+
+  for (const utxo of utxos) {
+    psbt.addInput({
+      hash: utxo.txid,
+      index: utxo.vout,
+      witnessUtxo: {
+        script: bitcoin.payments.p2tr({
+          internalPubkey,
+          network: bitcoin.networks.bitcoin,
+        }).output!,
+        value: BigInt(utxo.value),
+      },
+      tapInternalKey: internalPubkey,
+    });
+    totalInput += utxo.value;
+  }
+
+  const totalOutput = outputs.reduce((sum, output) => sum + output.amountSats, 0);
+  const feeWithChange = estimateFee(utxos.length, outputs.length + 1, feeRate);
+  const changeWithChange = totalInput - totalOutput - feeWithChange;
+  const hasChange = changeWithChange >= DUST_LIMIT;
+  const numOutputs = outputs.length + (hasChange ? 1 : 0);
+  const fee = estimateFee(utxos.length, numOutputs, feeRate);
+  const change = totalInput - totalOutput - fee;
+
+  if (change < 0) {
+    throw new Error(
+      `Insufficient funds. Need ${(totalOutput + fee).toLocaleString()} sats, have ${totalInput.toLocaleString()} sats.`,
+    );
+  }
+
+  for (const output of outputs) {
+    psbt.addOutput({ address: output.address, value: BigInt(output.amountSats) });
+  }
 
   if (hasChange) {
     psbt.addOutput({ address: changeAddress, value: BigInt(change) });
