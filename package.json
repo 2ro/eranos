@@ -15,7 +15,7 @@
     "node": ">=22"
   },
   "dependencies": {
-    "@breeztech/breez-sdk-spark": "^0.13.2-dev1",
+    "@breeztech/breez-sdk-spark": "^0.10.0",
     "@capacitor/app": "^8.0.0",
     "@capacitor/barcode-scanner": "^3.0.2",
     "@capacitor/core": "^8.1.0",
