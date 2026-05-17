@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { Check, Loader2, Plus, Wallet, X, Zap } from 'lucide-react';
 import type { NostrEvent, NostrMetadata } from '@nostrify/nostrify';
 
@@ -333,22 +333,136 @@ export function CommunityZapDialog({
         </div>
 
         <div className="border-t border-border p-4 shrink-0">
-          <Button type="button" className="w-full rounded-full h-11" disabled={!canSubmit} onClick={handleSubmit}>
-            {isLaunching ? (
-              <>
-                <Loader2 className="size-4 mr-2 animate-spin" />
-                Launching...
-              </>
-            ) : (
-              <>
-                <Zap className="size-4 mr-2" />
-                Zap {selectedRecipients.length} member{selectedRecipients.length === 1 ? '' : 's'}
-              </>
-            )}
-          </Button>
+          <HoldToZapButton
+            disabled={!canSubmit}
+            isLaunching={isLaunching}
+            selectedCount={selectedRecipients.length}
+            totalSats={totalSats}
+            onComplete={handleSubmit}
+          />
         </div>
       </DialogContent>
     </Dialog>
+  );
+}
+
+const HOLD_DURATION_MS = 3000;
+
+function HoldToZapButton({
+  disabled,
+  isLaunching,
+  selectedCount,
+  totalSats,
+  onComplete,
+}: {
+  disabled: boolean;
+  isLaunching: boolean;
+  selectedCount: number;
+  totalSats: number;
+  onComplete: () => void;
+}) {
+  const [progress, setProgress] = useState(0);
+  const [holding, setHolding] = useState(false);
+  const rafRef = useRef(0);
+  const startedAtRef = useRef(0);
+  const completedRef = useRef(false);
+
+  const cancelHold = () => {
+    if (rafRef.current) cancelAnimationFrame(rafRef.current);
+    rafRef.current = 0;
+    startedAtRef.current = 0;
+    completedRef.current = false;
+    setHolding(false);
+    setProgress(0);
+  };
+
+  const tick = () => {
+    const elapsed = performance.now() - startedAtRef.current;
+    const nextProgress = Math.min(1, elapsed / HOLD_DURATION_MS);
+    setProgress(nextProgress);
+    if (nextProgress >= 1) {
+      completedRef.current = true;
+      setHolding(false);
+      setProgress(0);
+      onComplete();
+      return;
+    }
+    rafRef.current = requestAnimationFrame(tick);
+  };
+
+  const startHold = () => {
+    if (disabled || isLaunching || holding) return;
+    completedRef.current = false;
+    startedAtRef.current = performance.now();
+    setHolding(true);
+    setProgress(0);
+    rafRef.current = requestAnimationFrame(tick);
+  };
+
+  useEffect(() => () => {
+    if (rafRef.current) cancelAnimationFrame(rafRef.current);
+  }, []);
+
+  useEffect(() => {
+    if (disabled || isLaunching) cancelHold();
+  }, [disabled, isLaunching]);
+
+  const remainingSeconds = Math.max(0, Math.ceil((HOLD_DURATION_MS * (1 - progress)) / 1000));
+
+  return (
+    <Button
+      type="button"
+      className="relative h-12 w-full overflow-hidden rounded-full"
+      disabled={disabled}
+      onPointerDown={(event) => {
+        event.currentTarget.setPointerCapture(event.pointerId);
+        startHold();
+      }}
+      onPointerUp={(event) => {
+        if (event.currentTarget.hasPointerCapture(event.pointerId)) {
+          event.currentTarget.releasePointerCapture(event.pointerId);
+        }
+        if (!completedRef.current) cancelHold();
+      }}
+      onPointerCancel={cancelHold}
+      onKeyDown={(event) => {
+        if ((event.key === 'Enter' || event.key === ' ') && !event.repeat) {
+          event.preventDefault();
+          startHold();
+        }
+      }}
+      onKeyUp={(event) => {
+        if (event.key === 'Enter' || event.key === ' ') {
+          event.preventDefault();
+          if (!completedRef.current) cancelHold();
+        }
+      }}
+      aria-label={`Hold for 3 seconds to zap ${selectedCount} members with ${totalSats.toLocaleString()} sats total`}
+    >
+      <span
+        className="absolute inset-y-0 left-0 bg-amber-300/35 transition-[width] duration-75"
+        style={{ width: `${progress * 100}%` }}
+        aria-hidden="true"
+      />
+      <span className="relative z-10 flex items-center justify-center">
+        {isLaunching ? (
+          <>
+            <Loader2 className="size-4 mr-2 animate-spin" />
+            Launching...
+          </>
+        ) : holding ? (
+          <>
+            <Zap className="size-4 mr-2" />
+            Keep holding... {remainingSeconds}s
+          </>
+        ) : (
+          <>
+            <Zap className="size-4 mr-2" />
+            Hold to zap {selectedCount} · {totalSats.toLocaleString()} sats
+          </>
+        )}
+      </span>
+    </Button>
   );
 }
 
