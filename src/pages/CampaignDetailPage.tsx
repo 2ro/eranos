@@ -36,7 +36,6 @@ import { useCampaign } from '@/hooks/useCampaign';
 import { useCampaignDonations } from '@/hooks/useCampaignDonations';
 import { useComments } from '@/hooks/useComments';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
-import { useProfileUrl } from '@/hooks/useProfileUrl';
 import { useEventStats } from '@/hooks/useTrending';
 import { useToast } from '@/hooks/useToast';
 import { useLayoutOptions } from '@/contexts/LayoutContext';
@@ -76,17 +75,6 @@ function formatDeadline(unixSeconds: number): { label: string; isPast: boolean }
   if (days <= 1) return { label: 'Ends today', isPast: false };
   if (days < 60) return { label: `${days} days left`, isPast: false };
   return { label: `Ends ${new Date(unixSeconds * 1000).toLocaleDateString()}`, isPast: false };
-}
-
-function getTag(tags: string[][], name: string): string | undefined {
-  return tags.find(([n]) => n === name)?.[1];
-}
-
-interface DonationListItem {
-  txid: string;
-  donorPubkey: string;
-  amountSats: number;
-  createdAt: number;
 }
 
 export function CampaignDetailPage({ pubkey, identifier, relays }: CampaignDetailPageProps) {
@@ -224,8 +212,6 @@ function CampaignDetailContent({ campaign }: { campaign: ParsedCampaign }) {
   const creatorMetadata = author.data?.metadata;
   const creatorName =
     creatorMetadata?.display_name || creatorMetadata?.name || genUserName(campaign.pubkey);
-  const creatorAvatar = sanitizeUrl(creatorMetadata?.picture);
-  const creatorUrl = useProfileUrl(campaign.pubkey, creatorMetadata);
 
   const deadline = campaign.deadline ? formatDeadline(campaign.deadline) : null;
   const raisedSats = stats?.totalSats ?? 0;
@@ -239,45 +225,6 @@ function CampaignDetailContent({ campaign }: { campaign: ParsedCampaign }) {
     }),
     [campaign.event],
   );
-  const recentDonations = useMemo<DonationListItem[]>(() => {
-    const byTxDonorRecipient = new Map<string, DonationListItem & { recipientPubkey: string }>();
-
-    for (const receipt of stats?.receipts ?? []) {
-      const txid = getTag(receipt.tags, 'i')?.replace(/^bitcoin:tx:/, '');
-      const recipientPubkey = getTag(receipt.tags, 'p');
-      const amountTag = getTag(receipt.tags, 'amount');
-      const amount = amountTag ? Number(amountTag) : NaN;
-      if (!txid || !recipientPubkey || !Number.isFinite(amount) || amount <= 0) continue;
-
-      const key = `${txid}:${receipt.pubkey}:${recipientPubkey}`;
-      const prev = byTxDonorRecipient.get(key);
-      if (!prev || amount > prev.amountSats) {
-        byTxDonorRecipient.set(key, {
-          txid,
-          donorPubkey: receipt.pubkey,
-          recipientPubkey,
-          amountSats: amount,
-          createdAt: receipt.created_at,
-        });
-      }
-    }
-
-    const byTxDonor = new Map<string, DonationListItem>();
-    for (const item of byTxDonorRecipient.values()) {
-      const key = `${item.txid}:${item.donorPubkey}`;
-      const prev = byTxDonor.get(key);
-      byTxDonor.set(key, {
-        txid: item.txid,
-        donorPubkey: item.donorPubkey,
-        amountSats: (prev?.amountSats ?? 0) + item.amountSats,
-        createdAt: Math.max(prev?.createdAt ?? 0, item.createdAt),
-      });
-    }
-
-    return Array.from(byTxDonor.values())
-      .sort((a, b) => b.createdAt - a.createdAt)
-      .slice(0, 6);
-  }, [stats?.receipts]);
 
   useSeoMeta({
     title: `${campaign.title} | Agora Fundraisers`,
@@ -327,9 +274,18 @@ function CampaignDetailContent({ campaign }: { campaign: ParsedCampaign }) {
               </div>
 
               <div className="absolute inset-x-0 bottom-0 z-10 space-y-2 p-5 sm:p-6 [text-shadow:0_1px_4px_rgba(0,0,0,0.75),0_2px_10px_rgba(0,0,0,0.45)]">
-                <h1 className="text-3xl sm:text-4xl font-bold leading-tight tracking-tight text-white">
-                  {campaign.title}
-                </h1>
+                <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
+                  <h1 className="text-3xl sm:text-4xl font-bold leading-tight tracking-tight text-white">
+                    {campaign.title}
+                  </h1>
+                  <Link
+                    to={`/${campaign.pubkey}`}
+                    onClick={(e) => e.stopPropagation()}
+                    className="text-xs sm:text-sm text-white/85 hover:text-white motion-safe:transition-colors"
+                  >
+                    by <span className="font-medium">{creatorName}</span>
+                  </Link>
+                </div>
                 <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 text-xs sm:text-sm font-medium text-white/85">
                   {campaign.category && (
                     <span className="inline-flex items-center gap-1.5">
@@ -423,27 +379,6 @@ function CampaignDetailContent({ campaign }: { campaign: ParsedCampaign }) {
 
                 <div className="space-y-2 border-t border-border/60 pt-4">
                   <div className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-                    Organizer
-                  </div>
-                  <Link
-                    to={`/${campaign.pubkey}`}
-                    className="flex items-center gap-3 rounded-md py-2 hover:bg-muted/40 -mx-2 px-2 motion-safe:transition-colors"
-                  >
-                    <Avatar className="size-9 shrink-0">
-                      {creatorAvatar && <AvatarImage src={creatorAvatar} alt="" />}
-                      <AvatarFallback>{creatorName.slice(0, 2).toUpperCase()}</AvatarFallback>
-                    </Avatar>
-                    <div className="min-w-0 flex-1">
-                      <div className="font-medium text-sm truncate">{creatorName}</div>
-                      <div className="text-xs text-muted-foreground font-mono truncate">
-                        {campaign.pubkey.slice(0, 12)}…{campaign.pubkey.slice(-8)}
-                      </div>
-                    </div>
-                  </Link>
-                </div>
-
-                <div className="space-y-2 border-t border-border/60 pt-4">
-                  <div className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
                     Beneficiaries
                   </div>
                   <div className="divide-y divide-border/60">
@@ -451,34 +386,6 @@ function CampaignDetailContent({ campaign }: { campaign: ParsedCampaign }) {
                     <RecipientRow key={r.pubkey} pubkey={r.pubkey} weight={r.weight} />
                   ))}
                   </div>
-                </div>
-
-                <div className="space-y-2 border-t border-border/60 pt-4">
-                  <div className="flex items-center justify-between gap-3">
-                    <div className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-                      Donors
-                    </div>
-                  </div>
-                  {statsLoading ? (
-                    <div className="space-y-2">
-                      <Skeleton className="h-10 w-full" />
-                      <Skeleton className="h-10 w-full" />
-                    </div>
-                  ) : recentDonations.length > 0 ? (
-                    <div className="divide-y divide-border/60">
-                      {recentDonations.map((donation) => (
-                        <DonationRow
-                          key={`${donation.txid}:${donation.donorPubkey}`}
-                          donation={donation}
-                          btcPrice={btcPrice}
-                        />
-                      ))}
-                    </div>
-                  ) : (
-                    <p className="rounded-lg border border-dashed border-border px-3 py-4 text-center text-sm text-muted-foreground">
-                      No public donation receipts yet.
-                    </p>
-                  )}
                 </div>
 
                 <div className="space-y-2 border-t border-border/60 pt-4">
@@ -496,8 +403,9 @@ function CampaignDetailContent({ campaign }: { campaign: ParsedCampaign }) {
                   </article>
                 </div>
 
-                {/* Engagement: stats row, action bar, threaded replies */}
-                <div className="space-y-2 border-t border-border/60 pt-4">
+                {/* Engagement: stats row, action bar, threaded replies.
+                    No top border here — PostActionBar carries its own. */}
+                <div className="space-y-2 pt-4">
                   {hasStats && (
                     <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs sm:text-sm text-muted-foreground">
                       {engagementStats?.reposts ? (
@@ -607,6 +515,7 @@ function RecipientRow({ pubkey, weight }: { pubkey: string; weight: number }) {
   const metadata = author.data?.metadata;
   const name = metadata?.display_name || metadata?.name || genUserName(pubkey);
   const picture = sanitizeUrl(metadata?.picture);
+  const nip05 = metadata?.nip05;
 
   return (
     <Link
@@ -619,9 +528,9 @@ function RecipientRow({ pubkey, weight }: { pubkey: string; weight: number }) {
       </Avatar>
       <div className="min-w-0 flex-1">
         <div className="font-medium text-sm truncate">{name}</div>
-        <div className="text-xs text-muted-foreground font-mono truncate">
-          {pubkey.slice(0, 12)}…{pubkey.slice(-8)}
-        </div>
+        {nip05 && (
+          <div className="text-xs text-muted-foreground truncate">{nip05}</div>
+        )}
       </div>
       {weight !== 1 && (
         <Badge variant="outline" className="shrink-0">
@@ -629,66 +538,6 @@ function RecipientRow({ pubkey, weight }: { pubkey: string; weight: number }) {
         </Badge>
       )}
     </Link>
-  );
-}
-
-function DonationRow({ donation, btcPrice }: { donation: DonationListItem; btcPrice?: number }) {
-  const author = useAuthor(donation.donorPubkey);
-  const metadata = author.data?.metadata;
-  const name = metadata?.display_name || metadata?.name || genUserName(donation.donorPubkey);
-  const picture = sanitizeUrl(metadata?.picture);
-
-  return (
-    <div className="flex items-center gap-3 py-2.5">
-      <Link to={`/${donation.donorPubkey}`} className="shrink-0">
-        <Avatar className="size-9">
-          {picture && <AvatarImage src={picture} alt="" />}
-          <AvatarFallback>{name.slice(0, 2).toUpperCase()}</AvatarFallback>
-        </Avatar>
-      </Link>
-      <div className="min-w-0 flex-1">
-        <Link to={`/${donation.donorPubkey}`} className="font-medium text-sm truncate hover:underline block">
-          {name}
-        </Link>
-        <Link
-          to={`/i/bitcoin:tx:${donation.txid}`}
-          className="text-xs text-muted-foreground font-mono truncate hover:text-foreground block"
-        >
-          {donation.txid.slice(0, 12)}…{donation.txid.slice(-8)}
-        </Link>
-      </div>
-      <div className="text-right text-sm font-semibold shrink-0">
-        {formatSatsFull(donation.amountSats, btcPrice)}
-      </div>
-    </div>
-  );
-}
-
-function CampaignDetailSkeleton() {
-  return (
-    <main className="min-h-screen pb-16">
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 py-6 lg:py-10">
-        <Skeleton className="h-9 w-9 rounded-full mb-4" />
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-10">
-          <div className="lg:col-span-2 space-y-6">
-            <Skeleton className="aspect-[16/9] w-full rounded-xl" />
-            <Skeleton className="h-10 w-3/4" />
-            <Skeleton className="h-5 w-full" />
-            <Skeleton className="h-5 w-5/6" />
-            <Skeleton className="h-32 w-full" />
-          </div>
-          <aside className="lg:col-span-1 space-y-4">
-            <Card>
-              <CardContent className="p-5 space-y-4">
-                <Skeleton className="h-10 w-32" />
-                <Skeleton className="h-2 w-full" />
-                <Skeleton className="h-10 w-full" />
-              </CardContent>
-            </Card>
-          </aside>
-        </div>
-      </div>
-    </main>
   );
 }
 
@@ -704,5 +553,35 @@ function CampaignReplySkeleton() {
         </div>
       </div>
     </div>
+  );
+}
+
+function CampaignDetailSkeleton() {
+  return (
+    <main className="min-h-screen pb-16">
+      <div className="max-w-3xl mx-auto px-4 sm:px-6 py-6 lg:py-10">
+        <div className="space-y-4">
+          <Skeleton className="aspect-[16/9] w-full rounded-xl" />
+          <div className="space-y-3">
+            <Skeleton className="h-10 w-2/3" />
+            <div className="flex flex-wrap gap-3">
+              <Skeleton className="h-4 w-24" />
+              <Skeleton className="h-4 w-24" />
+              <Skeleton className="h-4 w-32" />
+            </div>
+            <Skeleton className="h-5 w-full" />
+            <Skeleton className="h-5 w-4/5" />
+          </div>
+          <div className="space-y-3 pt-2">
+            <Skeleton className="h-10 w-40" />
+            <Skeleton className="h-2 w-full" />
+            <div className="grid grid-cols-4 gap-2">
+              <Skeleton className="h-11 w-full col-span-3" />
+              <Skeleton className="h-11 w-full" />
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
   );
 }
