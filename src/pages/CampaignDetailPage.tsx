@@ -243,12 +243,12 @@ function CampaignDetailContent({ campaign }: { campaign: ParsedCampaign }) {
             </div>
 
             {/* Support */}
-            <Card>
+            <Card className="border-0">
               <CardContent className="p-5 space-y-4">
                 <div>
-                  <h2 className="text-lg font-bold">Support this campaign</h2>
+                  <h2 className="text-lg font-bold">Support Campaign</h2>
                   <p className="text-sm text-muted-foreground">
-                    Donations are sent on-chain and split evenly across the beneficiaries below.
+                    Donations are sent with Bitcoin and split across the beneficiaries.
                   </p>
                 </div>
 
@@ -277,11 +277,11 @@ function CampaignDetailContent({ campaign }: { campaign: ParsedCampaign }) {
                 <div className="grid grid-cols-3 gap-2">
                   <Button
                     size="lg"
-                    className="w-full col-span-2"
+                    className="w-full col-span-2 h-12 text-base"
                     onClick={() => setDonateOpen(true)}
                     disabled={deadline?.isPast}
                   >
-                    <HandHeart className="size-4 mr-2" />
+                    <HandHeart className="size-5 mr-2" />
                     {deadline?.isPast ? 'Campaign ended' : 'Donate'}
                   </Button>
 
@@ -302,7 +302,7 @@ function CampaignDetailContent({ campaign }: { campaign: ParsedCampaign }) {
 
                 <div className="space-y-2 border-t border-border/60 pt-4">
                   <div className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-                    Organized by
+                    Organizer
                   </div>
                   <Link
                     to={`/${campaign.pubkey}`}
@@ -335,13 +335,8 @@ function CampaignDetailContent({ campaign }: { campaign: ParsedCampaign }) {
                 <div className="space-y-2 border-t border-border/60 pt-4">
                   <div className="flex items-center justify-between gap-3">
                     <div className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-                      Recent donations
+                      Donors
                     </div>
-                    {recentDonations.length > 0 && (
-                      <span className="text-xs text-muted-foreground">
-                        {recentDonations.length} shown
-                      </span>
-                    )}
                   </div>
                   {statsLoading ? (
                     <div className="space-y-2">
