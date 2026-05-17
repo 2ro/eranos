@@ -66,6 +66,17 @@ function formatDeadline(unixSeconds: number): { label: string; isPast: boolean }
   return { label: `Ends ${new Date(unixSeconds * 1000).toLocaleDateString()}`, isPast: false };
 }
 
+function getTag(tags: string[][], name: string): string | undefined {
+  return tags.find(([n]) => n === name)?.[1];
+}
+
+interface DonationListItem {
+  txid: string;
+  donorPubkey: string;
+  amountSats: number;
+  createdAt: number;
+}
+
 export function CampaignDetailPage({ pubkey, identifier, relays }: CampaignDetailPageProps) {
   useLayoutOptions({ noMaxWidth: true, rightSidebar: null });
 
@@ -107,6 +118,45 @@ function CampaignDetailContent({ campaign }: { campaign: ParsedCampaign }) {
     }),
     [campaign.event],
   );
+  const recentDonations = useMemo<DonationListItem[]>(() => {
+    const byTxDonorRecipient = new Map<string, DonationListItem & { recipientPubkey: string }>();
+
+    for (const receipt of stats?.receipts ?? []) {
+      const txid = getTag(receipt.tags, 'i')?.replace(/^bitcoin:tx:/, '');
+      const recipientPubkey = getTag(receipt.tags, 'p');
+      const amountTag = getTag(receipt.tags, 'amount');
+      const amount = amountTag ? Number(amountTag) : NaN;
+      if (!txid || !recipientPubkey || !Number.isFinite(amount) || amount <= 0) continue;
+
+      const key = `${txid}:${receipt.pubkey}:${recipientPubkey}`;
+      const prev = byTxDonorRecipient.get(key);
+      if (!prev || amount > prev.amountSats) {
+        byTxDonorRecipient.set(key, {
+          txid,
+          donorPubkey: receipt.pubkey,
+          recipientPubkey,
+          amountSats: amount,
+          createdAt: receipt.created_at,
+        });
+      }
+    }
+
+    const byTxDonor = new Map<string, DonationListItem>();
+    for (const item of byTxDonorRecipient.values()) {
+      const key = `${item.txid}:${item.donorPubkey}`;
+      const prev = byTxDonor.get(key);
+      byTxDonor.set(key, {
+        txid: item.txid,
+        donorPubkey: item.donorPubkey,
+        amountSats: (prev?.amountSats ?? 0) + item.amountSats,
+        createdAt: Math.max(prev?.createdAt ?? 0, item.createdAt),
+      });
+    }
+
+    return Array.from(byTxDonor.values())
+      .sort((a, b) => b.createdAt - a.createdAt)
+      .slice(0, 6);
+  }, [stats?.receipts]);
 
   useSeoMeta({
     title: `${campaign.title} | Agora Fundraisers`,
@@ -200,9 +250,16 @@ function CampaignDetailContent({ campaign }: { campaign: ParsedCampaign }) {
               </div>
             </div>
 
-            {/* Donation */}
+            {/* Support */}
             <Card>
               <CardContent className="p-5 space-y-4">
+                <div>
+                  <h2 className="text-lg font-bold">Support this campaign</h2>
+                  <p className="text-sm text-muted-foreground">
+                    Donations are sent on-chain and split evenly across the beneficiaries below.
+                  </p>
+                </div>
+
                 {statsLoading ? (
                   <Skeleton className="h-12 w-full" />
                 ) : (
@@ -265,21 +322,8 @@ function CampaignDetailContent({ campaign }: { campaign: ParsedCampaign }) {
                   Donations are sent on-chain to each beneficiary's Nostr-derived Bitcoin address in a
                   single Bitcoin transaction.
                 </div>
-              </CardContent>
-            </Card>
 
-            {/* Recipients */}
-            <Card>
-              <CardContent className="p-5 space-y-4">
-                <div>
-                  <h2 className="text-lg font-bold">Organizer and beneficiaries</h2>
-                  <p className="text-sm text-muted-foreground">
-                    The organizer created this campaign. Donations are split evenly across the
-                    beneficiaries below.
-                  </p>
-                </div>
-
-                <div className="space-y-2">
+                <div className="space-y-2 border-t border-border/60 pt-4">
                   <div className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
                     Organized by
                   </div>
@@ -310,6 +354,39 @@ function CampaignDetailContent({ campaign }: { campaign: ParsedCampaign }) {
                     <RecipientRow key={r.pubkey} pubkey={r.pubkey} weight={r.weight} />
                   ))}
                   </div>
+                </div>
+
+                <div className="space-y-2 border-t border-border/60 pt-4">
+                  <div className="flex items-center justify-between gap-3">
+                    <div className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                      Recent donations
+                    </div>
+                    {recentDonations.length > 0 && (
+                      <span className="text-xs text-muted-foreground">
+                        {recentDonations.length} shown
+                      </span>
+                    )}
+                  </div>
+                  {statsLoading ? (
+                    <div className="space-y-2">
+                      <Skeleton className="h-10 w-full" />
+                      <Skeleton className="h-10 w-full" />
+                    </div>
+                  ) : recentDonations.length > 0 ? (
+                    <div className="divide-y divide-border/60">
+                      {recentDonations.map((donation) => (
+                        <DonationRow
+                          key={`${donation.txid}:${donation.donorPubkey}`}
+                          donation={donation}
+                          btcPrice={btcPrice}
+                        />
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="rounded-lg border border-dashed border-border px-3 py-4 text-center text-sm text-muted-foreground">
+                      No public donation receipts yet.
+                    </p>
+                  )}
                 </div>
               </CardContent>
             </Card>
@@ -371,6 +448,38 @@ function RecipientRow({ pubkey, weight }: { pubkey: string; weight: number }) {
         </Badge>
       )}
     </Link>
+  );
+}
+
+function DonationRow({ donation, btcPrice }: { donation: DonationListItem; btcPrice?: number }) {
+  const author = useAuthor(donation.donorPubkey);
+  const metadata = author.data?.metadata;
+  const name = metadata?.display_name || metadata?.name || genUserName(donation.donorPubkey);
+  const picture = sanitizeUrl(metadata?.picture);
+
+  return (
+    <div className="flex items-center gap-3 py-2.5">
+      <Link to={`/${donation.donorPubkey}`} className="shrink-0">
+        <Avatar className="size-9">
+          {picture && <AvatarImage src={picture} alt="" />}
+          <AvatarFallback>{name.slice(0, 2).toUpperCase()}</AvatarFallback>
+        </Avatar>
+      </Link>
+      <div className="min-w-0 flex-1">
+        <Link to={`/${donation.donorPubkey}`} className="font-medium text-sm truncate hover:underline block">
+          {name}
+        </Link>
+        <Link
+          to={`/i/bitcoin:tx:${donation.txid}`}
+          className="text-xs text-muted-foreground font-mono truncate hover:text-foreground block"
+        >
+          {donation.txid.slice(0, 12)}…{donation.txid.slice(-8)}
+        </Link>
+      </div>
+      <div className="text-right text-sm font-semibold shrink-0">
+        {formatSatsFull(donation.amountSats, btcPrice)}
+      </div>
+    </div>
   );
 }
 
