@@ -4,6 +4,7 @@ import { useSeoMeta } from '@unhead/react';
 import { useQueryClient } from '@tanstack/react-query';
 import {
   CalendarClock,
+  Tag,
   ChevronLeft,
   HandHeart,
   MapPin,
@@ -29,6 +30,7 @@ import { useProfileUrl } from '@/hooks/useProfileUrl';
 import { useToast } from '@/hooks/useToast';
 import { useLayoutOptions } from '@/contexts/LayoutContext';
 import {
+  CAMPAIGN_CATEGORY_LABELS,
   encodeCampaignNaddr,
   type ParsedCampaign,
 } from '@/lib/campaign';
@@ -189,9 +191,10 @@ function CampaignDetailContent({ campaign }: { campaign: ParsedCampaign }) {
                 </span>
               </Link>
               {campaign.category && (
-                <Badge variant="outline" className="rounded-full font-normal text-muted-foreground">
-                  #{campaign.category}
-                </Badge>
+                <span className="inline-flex items-center gap-1.5">
+                  <Tag className="size-4" />
+                  {CAMPAIGN_CATEGORY_LABELS[campaign.category]}
+                </span>
               )}
               {campaign.location && (
                 <span className="inline-flex items-center gap-1.5">
