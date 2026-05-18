@@ -185,6 +185,12 @@ function formatDateInput(unixSeconds: number | undefined): string {
   return new Date(unixSeconds * 1000).toISOString().slice(0, 10);
 }
 
+function getTodayDateInput(): string {
+  const date = new Date();
+  date.setMinutes(date.getMinutes() - date.getTimezoneOffset());
+  return date.toISOString().slice(0, 10);
+}
+
 export function CreateCampaignPage() {
   useLayoutOptions({ noMaxWidth: true, rightSidebar: null });
 
@@ -281,6 +287,7 @@ export function CreateCampaignPage() {
     const n = Number(goalUsd.replace(/[, $]/g, ''));
     return usdToSats(n, btcPrice);
   }, [btcPrice, goalUsd]);
+  const minDeadline = useMemo(() => getTodayDateInput(), []);
 
   useSeoMeta({
     title: isEditMode ? 'Edit campaign | Agora' : 'Start a campaign | Agora',
@@ -404,6 +411,9 @@ export function CreateCampaignPage() {
 
       let deadlineNum: number | undefined;
       if (deadline.trim()) {
+        if (deadline < minDeadline) {
+          throw new Error('Deadline cannot be in the past.');
+        }
         const ts = Math.floor(new Date(deadline).getTime() / 1000);
         if (!Number.isFinite(ts) || ts <= 0) {
           throw new Error('Deadline is not a valid date.');
@@ -749,7 +759,7 @@ export function CreateCampaignPage() {
 
           <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
             {/* Goal */}
-            <FormSection title="Goal" requirement="Optional" description="Set a target amount for donors to rally around.">
+            <FormSection title="Goal" requirement="Optional" description="Set a target">
               <div className="relative">
                 <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">
                   $
@@ -767,20 +777,22 @@ export function CreateCampaignPage() {
                   USD
                 </span>
               </div>
-              <p className="text-xs text-muted-foreground">
-                {goalSatsPreview > 0 && btcPrice
-                  ? `${formatSats(goalSatsPreview)} sats (${satsToUSDWhole(goalSatsPreview, btcPrice)}).`
-                  : 'Stored as sats.'}
-              </p>
+              {goalSatsPreview > 0 && btcPrice && (
+                <p className="text-xs text-muted-foreground">
+                  {formatSats(goalSatsPreview)} sats ({satsToUSDWhole(goalSatsPreview, btcPrice)}).
+                </p>
+              )}
             </FormSection>
 
             {/* Deadline */}
-            <FormSection title="Deadline" requirement="Optional" description="Show donors when the campaign is time-sensitive.">
+            <FormSection title="Deadline" requirement="Optional" description="Show urgency">
               <Input
                 id="campaign-deadline"
                 type="date"
+                min={minDeadline}
                 value={deadline}
                 onChange={(e) => setDeadline(e.target.value)}
+                className="[color-scheme:light] dark:[color-scheme:dark] dark:[&::-webkit-calendar-picker-indicator]:invert dark:[&::-webkit-calendar-picker-indicator]:opacity-80"
               />
             </FormSection>
           </div>
