@@ -391,10 +391,12 @@ export function getGeoDisplayName(code: string, _lang?: string): string {
 }
 
 /**
- * Return the flag emoji for an ISO 3166-1 country code or 3166-2 subdivision
- * code. Subdivisions resolve to their parent country's flag (no per-region
- * flag exists in Unicode for arbitrary subdivisions). Unknown codes return
- * an empty string.
+ * Convert a 2-letter ISO 3166-1 alpha-2 country code (or a subdivision
+ * code) to its regional indicator emoji sequence representing the country
+ * flag. Returns the parent country flag for subdivisions — for actual
+ * subnational flags use {@link subdivisionFlag}.
+ *
+ * Unknown codes return an empty string.
  */
 export function countryCodeToFlag(code: string): string {
   const upper = code.toUpperCase();
@@ -405,6 +407,37 @@ export function countryCodeToFlag(code: string): string {
     .split('')
     .map((c) => String.fromCodePoint(0x1F1E6 + c.charCodeAt(0) - 65))
     .join('');
+}
+
+/**
+ * Returns the Unicode emoji flag for ISO 3166-2 subdivisions that have an
+ * RGI ("Recommended for General Interchange") tag sequence — the only
+ * subnational flags broadly supported across Apple, Google, Microsoft,
+ * and major mobile fonts.
+ *
+ * As of Unicode 15.1 that set is exactly three: the constituent countries
+ * of the United Kingdom (England, Scotland, Wales). All other ISO 3166-2
+ * codes return `null`, and callers should fall back to the parent country
+ * flag plus a typographic subdivision-code badge.
+ *
+ * Construction: a black flag (`U+1F3F4`) followed by ASCII tag characters
+ * for each lowercase letter of the `cc-sss` identifier, terminated by a
+ * cancel tag (`U+E007F`).
+ */
+const RGI_SUBDIVISION_FLAGS = new Set(['GB-ENG', 'GB-SCT', 'GB-WLS']);
+
+export function subdivisionFlag(code: string): string | null {
+  const upper = code.toUpperCase();
+  if (!RGI_SUBDIVISION_FLAGS.has(upper)) return null;
+
+  // Tag sequence: <U+1F3F4><tagged 'gb'><tagged 'sss'><U+E007F>
+  const [country, region] = upper.toLowerCase().split('-');
+  const codePoints: number[] = [0x1f3f4];
+  // Each ASCII letter / digit is tagged via U+E0000 + codepoint.
+  for (const ch of country) codePoints.push(0xe0000 + ch.charCodeAt(0));
+  for (const ch of region) codePoints.push(0xe0000 + ch.charCodeAt(0));
+  codePoints.push(0xe007f); // Cancel tag.
+  return String.fromCodePoint(...codePoints);
 }
 
 // ── Map coordinates ──────────────────────────────────────────────────────────

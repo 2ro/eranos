@@ -245,22 +245,33 @@ export function DiscoverHero({ className }: DiscoverHeroProps) {
         </div>
       </div>
 
+      {/* Readability scrim. Sits above the globe + atmosphere but below
+          the foreground content so the headline / paragraph stay legible
+          regardless of which hue the palette is currently cycling
+          through. Top-down so the eye-line lands on the darkest pixels;
+          we taper to transparent before the ticker pill so the CTAs and
+          stat row underneath keep their warm wash. */}
+      <div
+        className="absolute inset-x-0 top-0 h-72 sm:h-80 pointer-events-none bg-gradient-to-b from-black/55 via-black/25 to-transparent"
+        aria-hidden="true"
+      />
+
       {/* Foreground content — headline above the sphere, ticker + CTAs
           below it. Uses the same `max-w-5xl` container as the rest of
           the Discover page so the hero never sprawls wider than the
           shelves beneath it. */}
       <div className="relative max-w-5xl mx-auto px-4 sm:px-6 py-12 sm:py-16 lg:py-20 min-h-[560px] sm:min-h-[640px] lg:min-h-[680px] flex flex-col items-center text-center">
         <div className="relative space-y-3 max-w-3xl">
-          <p className="text-xs sm:text-sm font-semibold uppercase tracking-[0.18em] text-foreground/70">
+          <p className="text-xs sm:text-sm font-semibold uppercase tracking-[0.18em] text-white/80 drop-shadow">
             Discover
           </p>
-          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight leading-[1.05] drop-shadow-sm">
+          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight leading-[1.05] text-white drop-shadow-[0_2px_12px_rgb(0_0_0/0.55)]">
             The world,
             <br className="sm:hidden" /> gathering.
           </h1>
-          <p className="text-base sm:text-lg text-foreground/75 max-w-2xl mx-auto">
+          <p className="text-base sm:text-lg text-white/85 max-w-2xl mx-auto drop-shadow-[0_1px_6px_rgb(0_0_0/0.5)]">
             Campaigns, communities, and conversations from every corner of the
-            globe — backed by Bitcoin, broadcast on Nostr, owned by no one.
+            globe. Backed by Bitcoin, broadcast on Nostr, owned by no one.
           </p>
         </div>
 
