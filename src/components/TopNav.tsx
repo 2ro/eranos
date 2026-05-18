@@ -19,7 +19,7 @@ interface NavItem {
 }
 
 const NAV_ITEMS: NavItem[] = [
-  { label: 'Discover', to: '/', exact: true },
+  { label: 'Discover', to: '/feed' },
   { label: 'Start a campaign', to: '/campaigns/new' },
   { label: 'About', to: '/help' },
 ];
