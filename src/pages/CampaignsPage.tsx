@@ -230,7 +230,7 @@ export function CampaignsPage() {
             off-screen so most of it sits beyond the viewport — the visible
             arc reads as a horizon rather than a centered illustration. */}
         <div className="absolute inset-0 flex items-center justify-end pointer-events-none">
-          <div className="pointer-events-auto translate-x-[40%] sm:translate-x-[32%] lg:translate-x-[22%] opacity-90">
+          <div className="pointer-events-auto translate-x-[30%] sm:translate-x-[22%] lg:translate-x-[12%] opacity-90">
             <HeroGlobe
               markers={globeMarkers}
               selectedKey={highlightedMarkerKey}
