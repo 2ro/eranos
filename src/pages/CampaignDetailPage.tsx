@@ -265,7 +265,7 @@ function CampaignDetailContent({ campaign }: { campaign: ParsedCampaign }) {
               )}
               <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/25 to-black/45" />
 
-              <div className="absolute left-0 right-0 top-0 z-10 flex items-center justify-between px-4 pt-4">
+              <div className="absolute left-0 right-0 top-0 z-10 flex items-center justify-between gap-3 px-4 pt-4">
                 <button
                   onClick={() => navigate(-1)}
                   className="p-2.5 -ml-2 rounded-full text-white/90 hover:bg-white/15 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80 motion-safe:transition-colors"
@@ -273,6 +273,18 @@ function CampaignDetailContent({ campaign }: { campaign: ParsedCampaign }) {
                 >
                   <ChevronLeft className="size-6 drop-shadow-[0_1px_2px_rgba(0,0,0,0.85)]" />
                 </button>
+                {isCreator && (
+                  <Button
+                    asChild
+                    size="sm"
+                    className="rounded-full bg-white/90 text-black shadow-sm hover:bg-white focus-visible:ring-white/80"
+                  >
+                    <Link to={`/campaigns/new?edit=${encodeURIComponent(naddr)}`}>
+                      <Pencil className="size-4 mr-2" />
+                      Edit
+                    </Link>
+                  </Button>
+                )}
               </div>
 
               <div className="absolute inset-x-0 bottom-0 z-10 space-y-2 p-5 sm:p-6 [text-shadow:0_1px_4px_rgba(0,0,0,0.75),0_2px_10px_rgba(0,0,0,0.45)]">
@@ -369,15 +381,6 @@ function CampaignDetailContent({ campaign }: { campaign: ParsedCampaign }) {
                     Share
                   </Button>
                 </div>
-
-                {isCreator && (
-                  <Button variant="ghost" className="w-full" asChild>
-                    <Link to={`/campaigns/edit/${naddr}`}>
-                      <Pencil className="size-4 mr-2" />
-                      Edit campaign
-                    </Link>
-                  </Button>
-                )}
 
                 <div className="space-y-2 border-t border-border/60 pt-4">
                   <div className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">

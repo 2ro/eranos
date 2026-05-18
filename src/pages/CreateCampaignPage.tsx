@@ -1,8 +1,10 @@
-import { useMemo, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useEffect, useMemo, useState } from 'react';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { useSeoMeta } from '@unhead/react';
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useNostr } from '@nostrify/react';
+import type { NostrEvent } from '@nostrify/nostrify';
+import { nip19 } from 'nostr-tools';
 import {
   AlertTriangle,
   ArrowLeft,
@@ -30,6 +32,7 @@ import {
 } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { useBitcoinWallet } from '@/hooks/useBitcoinWallet';
+import { useCampaign } from '@/hooks/useCampaign';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useNostrPublish } from '@/hooks/useNostrPublish';
 import { useToast } from '@/hooks/useToast';
@@ -46,9 +49,60 @@ import {
   type CampaignCategory,
   slugifyCampaignIdentifier,
 } from '@/lib/campaign';
+import { fetchFreshEvent } from '@/lib/fetchFreshEvent';
 import { genUserName } from '@/lib/genUserName';
 import { sanitizeUrl } from '@/lib/sanitizeUrl';
 import { cn } from '@/lib/utils';
+
+interface EditTarget {
+  pubkey: string;
+  identifier: string;
+  relays?: string[];
+}
+
+function getEditTarget(value: string | null): EditTarget | null {
+  if (!value) return null;
+
+  try {
+    const decoded = nip19.decode(value);
+    if (decoded.type !== 'naddr' || decoded.data.kind !== CAMPAIGN_KIND) return null;
+    return {
+      pubkey: decoded.data.pubkey,
+      identifier: decoded.data.identifier,
+      ...(decoded.data.relays ? { relays: decoded.data.relays } : {}),
+    };
+  } catch {
+    return null;
+  }
+}
+
+function makeRecipientProfile(pubkey: string): SearchProfile {
+  return {
+    pubkey,
+    metadata: {},
+    event: {
+      id: '',
+      pubkey,
+      created_at: 0,
+      kind: 0,
+      tags: [],
+      content: '{}',
+      sig: '',
+    },
+  };
+}
+
+function formatGoalUsd(goalSats: number | undefined, btcPrice: number | undefined): string {
+  if (!goalSats || !btcPrice) return '';
+  const usd = (goalSats / 100_000_000) * btcPrice;
+  if (!Number.isFinite(usd) || usd <= 0) return '';
+  return usd.toFixed(usd >= 100 ? 0 : 2);
+}
+
+function formatDateInput(unixSeconds: number | undefined): string {
+  if (!unixSeconds) return '';
+  return new Date(unixSeconds * 1000).toISOString().slice(0, 10);
+}
 
 export function CreateCampaignPage() {
   useLayoutOptions({ noMaxWidth: true, rightSidebar: null });
@@ -56,6 +110,8 @@ export function CreateCampaignPage() {
   const { user } = useCurrentUser();
   const { btcPrice } = useBitcoinWallet();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const queryClient = useQueryClient();
   const { nostr } = useNostr();
   const { mutateAsync: publishEvent } = useNostrPublish();
   const { mutateAsync: uploadFile, isPending: isUploading } = useUploadFile();
@@ -71,19 +127,56 @@ export function CreateCampaignPage() {
   const [location, setLocation] = useState('');
   const [recipients, setRecipients] = useState<SearchProfile[]>([]);
   const [formError, setFormError] = useState('');
+  const [prepopulatedEventId, setPrepopulatedEventId] = useState<string | null>(null);
+  const [prepopulatedGoalEventId, setPrepopulatedGoalEventId] = useState<string | null>(null);
+
+  const editNaddr = searchParams.get('edit');
+  const editTarget = useMemo(() => getEditTarget(editNaddr), [editNaddr]);
+  const isEditMode = !!editNaddr;
+  const editCampaignQuery = useCampaign({
+    pubkey: editTarget?.pubkey ?? '',
+    identifier: editTarget?.identifier ?? '',
+    ...(editTarget?.relays ? { relays: editTarget.relays } : {}),
+  });
+  const editCampaign = isEditMode ? editCampaignQuery.data : null;
 
   // The slug is protocol plumbing: derive it from the title instead of asking
   // fundraisers to understand Nostr d-tags.
   const derivedIdentifier = useMemo(() => slugifyCampaignIdentifier(title), [title]);
+  const activeIdentifier = editCampaign?.identifier ?? derivedIdentifier;
   const goalSatsPreview = useMemo(() => {
     const n = Number(goalUsd.replace(/[, $]/g, ''));
     return usdToSats(n, btcPrice);
   }, [btcPrice, goalUsd]);
 
   useSeoMeta({
-    title: 'Start a campaign | Agora',
-    description: 'Launch a fundraising campaign on Agora.',
+    title: isEditMode ? 'Edit campaign | Agora' : 'Start a campaign | Agora',
+    description: isEditMode ? 'Update your fundraising campaign on Agora.' : 'Launch a fundraising campaign on Agora.',
   });
+
+  useEffect(() => {
+    if (!editCampaign || prepopulatedEventId === editCampaign.event.id) return;
+
+    setTitle(editCampaign.title);
+    setSummary(editCampaign.summary);
+    setStory(editCampaign.story);
+    setImageUrl(editCampaign.image ?? '');
+    setCategory(editCampaign.category ?? 'human-rights');
+    setDeadline(formatDateInput(editCampaign.deadline));
+    setLocation(editCampaign.location ?? '');
+    setRecipients(editCampaign.recipients.map((recipient) => makeRecipientProfile(recipient.pubkey)));
+    setPrepopulatedEventId(editCampaign.event.id);
+  }, [editCampaign, prepopulatedEventId]);
+
+  useEffect(() => {
+    if (!editCampaign || prepopulatedGoalEventId === editCampaign.event.id || goalUsd.trim()) return;
+
+    const formattedGoal = formatGoalUsd(editCampaign.goalSats, btcPrice);
+    if (!formattedGoal) return;
+
+    setGoalUsd(formattedGoal);
+    setPrepopulatedGoalEventId(editCampaign.event.id);
+  }, [btcPrice, editCampaign, goalUsd, prepopulatedGoalEventId]);
 
   const handleImagePick = async (file: File) => {
     try {
@@ -124,8 +217,12 @@ export function CreateCampaignPage() {
   const submitMutation = useMutation({
     mutationFn: async () => {
       if (!user) throw new Error('You must be logged in to create a campaign.');
+      if (isEditMode && !editCampaign) throw new Error('Campaign could not be loaded for editing.');
+      if (editCampaign && editCampaign.pubkey !== user.pubkey) {
+        throw new Error('Only the campaign author can edit this campaign.');
+      }
       const trimmedTitle = title.trim();
-      const slug = derivedIdentifier;
+      const slug = activeIdentifier;
 
       if (!trimmedTitle) throw new Error('Title is required.');
       if (!slug) throw new Error('Title must include letters or numbers so a campaign URL can be created.');
@@ -169,16 +266,28 @@ export function CreateCampaignPage() {
         deadlineNum = ts;
       }
 
-      // d-tag collision guard. Block silent overwrite of an existing campaign
-      // by the same author — even with the same author, we want explicit edit
-      // flows, not "create with the same slug".
-      const existing = await nostr.query([
-        { kinds: [CAMPAIGN_KIND], authors: [user.pubkey], '#d': [slug], limit: 1 },
-      ]);
-      if (existing.length > 0) {
-        throw new Error(
-          `You already have a campaign with the identifier "${slug}". Choose another.`,
-        );
+      let prev: NostrEvent | null = null;
+      if (isEditMode) {
+        prev = await fetchFreshEvent(nostr, {
+          kinds: [CAMPAIGN_KIND],
+          authors: [user.pubkey],
+          '#d': [slug],
+        });
+        if (!prev || !parseCampaign(prev)) {
+          throw new Error('Could not find the latest version of this campaign to update.');
+        }
+      } else {
+        // d-tag collision guard. Block silent overwrite of an existing campaign
+        // by the same author — even with the same author, we want explicit edit
+        // flows, not "create with the same slug".
+        const existing = await nostr.query([
+          { kinds: [CAMPAIGN_KIND], authors: [user.pubkey], '#d': [slug], limit: 1 },
+        ]);
+        if (existing.length > 0) {
+          throw new Error(
+            `You already have a campaign with the identifier "${slug}". Choose another.`,
+          );
+        }
       }
 
       // Validate image URL (must be https).
@@ -203,6 +312,7 @@ export function CreateCampaignPage() {
         kind: CAMPAIGN_KIND,
         content: story,
         tags,
+        prev: prev ?? undefined,
       });
 
       const parsed = parseCampaign(published);
@@ -212,13 +322,21 @@ export function CreateCampaignPage() {
       return parsed;
     },
     onSuccess: (campaign) => {
-      toast({ title: 'Campaign launched', description: 'Your fundraiser is live.' });
+      void queryClient.invalidateQueries({ queryKey: ['campaign', campaign.pubkey, campaign.identifier] });
+      toast({
+        title: isEditMode ? 'Campaign updated' : 'Campaign launched',
+        description: isEditMode ? 'Your fundraiser changes are live.' : 'Your fundraiser is live.',
+      });
       navigate(`/${encodeCampaignNaddr(campaign)}`);
     },
     onError: (error: unknown) => {
       const msg = error instanceof Error ? error.message : String(error);
       setFormError(msg);
-      toast({ title: 'Could not publish campaign', description: msg, variant: 'destructive' });
+      toast({
+        title: isEditMode ? 'Could not update campaign' : 'Could not publish campaign',
+        description: msg,
+        variant: 'destructive',
+      });
     },
   });
 
@@ -235,6 +353,63 @@ export function CreateCampaignPage() {
               </p>
               <Button asChild>
                 <Link to="/">Go home</Link>
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
+      </main>
+    );
+  }
+
+  if (isEditMode && !editTarget) {
+    return (
+      <main className="min-h-screen pb-16">
+        <div className="max-w-2xl mx-auto px-4 sm:px-6 py-12">
+          <Card>
+            <CardContent className="py-12 px-8 text-center space-y-4">
+              <AlertTriangle className="size-10 text-muted-foreground/60 mx-auto" />
+              <h2 className="text-xl font-semibold">Invalid edit link</h2>
+              <p className="text-muted-foreground">
+                This campaign edit link is missing a valid campaign address.
+              </p>
+              <Button type="button" onClick={() => navigate('/campaigns/new')}>
+                Start a new campaign
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
+      </main>
+    );
+  }
+
+  if (isEditMode && editCampaignQuery.isLoading) {
+    return (
+      <main className="min-h-screen pb-16">
+        <div className="max-w-3xl mx-auto px-4 sm:px-6 py-8 lg:py-10">
+          <Card>
+            <CardContent className="py-12 px-8 text-center space-y-3">
+              <Loader2 className="size-8 animate-spin text-muted-foreground mx-auto" />
+              <p className="text-sm text-muted-foreground">Loading campaign…</p>
+            </CardContent>
+          </Card>
+        </div>
+      </main>
+    );
+  }
+
+  if (isEditMode && (!editCampaign || editCampaign.pubkey !== user.pubkey)) {
+    return (
+      <main className="min-h-screen pb-16">
+        <div className="max-w-2xl mx-auto px-4 sm:px-6 py-12">
+          <Card>
+            <CardContent className="py-12 px-8 text-center space-y-4">
+              <AlertTriangle className="size-10 text-muted-foreground/60 mx-auto" />
+              <h2 className="text-xl font-semibold">Campaign cannot be edited</h2>
+              <p className="text-muted-foreground">
+                Only the author of this campaign can update it.
+              </p>
+              <Button type="button" onClick={() => navigate(-1)}>
+                Go back
               </Button>
             </CardContent>
           </Card>
@@ -263,11 +438,14 @@ export function CreateCampaignPage() {
             >
               <ArrowLeft className="size-5" />
             </button>
-            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">Start a campaign</h1>
+            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">
+              {isEditMode ? 'Edit campaign' : 'Start a campaign'}
+            </h1>
           </div>
           <p className="max-w-2xl text-sm sm:text-base text-muted-foreground">
-            Add the essentials first. You can expand Details when you are ready to add a pitch,
-            category, goal, timeline, or location.
+            {isEditMode
+              ? 'Update the essentials or expand Details to refine the pitch, goal, timeline, or location.'
+              : 'Add the essentials first. You can expand Details when you are ready to add a pitch, category, goal, timeline, or location.'}
           </p>
         </div>
 
@@ -283,8 +461,9 @@ export function CreateCampaignPage() {
           <p className="text-xs text-muted-foreground">
             URL preview:{' '}
             <span className="font-mono text-foreground">
-              /{derivedIdentifier || 'your-campaign-title'}
+              /{activeIdentifier || 'your-campaign-title'}
             </span>
+            {isEditMode && ' (kept from the original campaign)'}
           </p>
         </FormSection>
 
@@ -436,19 +615,19 @@ export function CreateCampaignPage() {
         )}
 
         <div className="flex gap-3 justify-end pt-2 border-t border-border">
-          <Button type="button" variant="outline" onClick={() => navigate('/')}>
+          <Button type="button" variant="outline" onClick={() => isEditMode ? navigate(-1) : navigate('/')}>
             Cancel
           </Button>
           <Button type="submit" disabled={submitMutation.isPending}>
             {submitMutation.isPending ? (
               <>
                 <Loader2 className="size-4 mr-2 animate-spin" />
-                Publishing…
+                {isEditMode ? 'Updating…' : 'Publishing…'}
               </>
             ) : (
               <>
                 <HandHeart className="size-4 mr-2" />
-                Launch campaign
+                {isEditMode ? 'Update campaign' : 'Launch campaign'}
               </>
             )}
           </Button>
