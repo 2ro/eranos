@@ -1,7 +1,8 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useSeoMeta } from '@unhead/react';
-import { HandHeart, LogIn, Sparkles } from 'lucide-react';
+import { nip19 } from 'nostr-tools';
+import { Check, Copy, HandHeart, LogIn, Send, Sparkles } from 'lucide-react';
 
 import { AgoraLogo } from '@/components/AgoraLogo';
 import LoginDialog from '@/components/auth/LoginDialog';
@@ -11,6 +12,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { useAppContext } from '@/hooks/useAppContext';
 import { useCampaigns } from '@/hooks/useCampaigns';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
+import { useToast } from '@/hooks/useToast';
 
 /**
  * Landing page for someone who already has a Nostr account and was told a
@@ -145,22 +147,31 @@ function ClaimedCampaigns({ pubkey }: { pubkey: string }) {
           ))}
         </div>
       ) : (
-        <Card className="border-dashed">
-          <CardContent className="py-12 px-8 text-center space-y-3">
-            <HandHeart className="size-10 text-muted-foreground/60 mx-auto" />
-            <h2 className="text-lg font-semibold">No campaigns found yet</h2>
-            <p className="text-muted-foreground max-w-md mx-auto text-sm">
-              We didn't find a campaign that lists this account as a beneficiary. If you were
-              expecting one, double-check with the organizer that they used the same Nostr public
-              key (npub) you just signed in with.
-            </p>
-            <div className="pt-2">
-              <Button variant="outline" asChild>
-                <Link to="/settings/profile">Edit my profile</Link>
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
+        // Empty state. The primary action a freshly-signed-up invitee needs
+        // here is sending their new npub back to whoever invited them — once
+        // the inviter adds them as a recipient, the campaign will show up on
+        // a future visit. The "no campaigns matched" detail copy stays, but
+        // demoted below the send-npub card.
+        <div className="space-y-5">
+          <SendNpubCard pubkey={pubkey} />
+
+          <Card className="border-dashed">
+            <CardContent className="py-8 px-6 text-center space-y-3">
+              <HandHeart className="size-8 text-muted-foreground/60 mx-auto" />
+              <h2 className="text-base font-semibold">Expecting a campaign already?</h2>
+              <p className="text-muted-foreground max-w-md mx-auto text-sm">
+                We didn't find a campaign that lists this account as a beneficiary. If you were
+                told one was set up for you, double-check with the organizer that they used the
+                same Nostr public key (npub) you just signed in with.
+              </p>
+              <div className="pt-1">
+                <Button variant="outline" size="sm" asChild>
+                  <Link to="/settings/profile">Edit my profile</Link>
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
       )}
 
       <div className="text-sm text-muted-foreground border-t pt-6">
@@ -175,3 +186,112 @@ function ClaimedCampaigns({ pubkey }: { pubkey: string }) {
 }
 
 export default ClaimPage;
+
+/**
+ * Surfaced in the empty-state path of {@link ClaimedCampaigns}.
+ *
+ * When a freshly-signed-up invitee lands here and no campaign yet lists them
+ * as a beneficiary, the most likely explanation is that the inviter is still
+ * waiting on the invitee's npub to add them. This card hands them a one-tap
+ * reply they can paste into whatever channel the original invite came from
+ * (Telegram, iMessage, email, etc.), plus a "bare npub" affordance for
+ * pasting into an existing thread without the templated framing.
+ *
+ * Pure UX — no event publishing, no analytics ping back to the inviter. The
+ * invitee still has to send the message manually; we just remove the friction
+ * of typing or hunting for their npub in settings.
+ */
+function SendNpubCard({ pubkey }: { pubkey: string }) {
+  const { toast } = useToast();
+  const npub = useMemo(() => nip19.npubEncode(pubkey), [pubkey]);
+  const [copiedNpub, setCopiedNpub] = useState(false);
+  const [copiedMessage, setCopiedMessage] = useState(false);
+
+  const replyMessage = `I finished setting up my Agora account! My npub is: ${npub} — you can add me as a beneficiary now.`;
+
+  const writeClipboard = async (
+    value: string,
+    setMarker: (b: boolean) => void,
+    successTitle: string,
+  ) => {
+    try {
+      await navigator.clipboard.writeText(value);
+      setMarker(true);
+      setTimeout(() => setMarker(false), 1500);
+      toast({ title: successTitle });
+    } catch {
+      toast({
+        title: 'Copy failed',
+        description: 'Your browser blocked clipboard access. Select and copy the text manually.',
+        variant: 'destructive',
+      });
+    }
+  };
+
+  return (
+    <Card className="border-2 border-primary/50 bg-primary/5">
+      <CardContent className="py-6 px-6 space-y-4">
+        <div className="flex items-start gap-3">
+          <div className="rounded-full bg-primary/15 p-2 shrink-0">
+            <Send className="size-5 text-primary" />
+          </div>
+          <div className="min-w-0 flex-1 space-y-1">
+            <h2 className="text-lg font-semibold">
+              Finished setting up? Send your npub to whoever invited you.
+            </h2>
+            <p className="text-sm text-muted-foreground">
+              They need your npub to add you as a beneficiary on the campaign. Once they do, it
+              will show up here.
+            </p>
+          </div>
+        </div>
+
+        <div className="space-y-1.5">
+          <span className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
+            Your npub
+          </span>
+          <button
+            type="button"
+            onClick={() => writeClipboard(npub, setCopiedNpub, 'Npub copied')}
+            className="w-full flex items-center justify-between gap-2 rounded-lg border bg-background px-3 py-2.5 font-mono text-xs text-left hover:bg-muted/60 motion-safe:transition-colors"
+            aria-label="Copy npub"
+          >
+            <span className="break-all">{npub}</span>
+            {copiedNpub ? (
+              <Check className="size-4 text-green-500 shrink-0" />
+            ) : (
+              <Copy className="size-4 text-muted-foreground shrink-0" />
+            )}
+          </button>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+          <Button
+            type="button"
+            onClick={() => writeClipboard(replyMessage, setCopiedMessage, 'Reply message copied')}
+          >
+            {copiedMessage ? (
+              <Check className="size-4 mr-1.5 text-green-200" />
+            ) : (
+              <Copy className="size-4 mr-1.5" />
+            )}
+            Copy reply message
+          </Button>
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => writeClipboard(npub, setCopiedNpub, 'Npub copied')}
+          >
+            <Copy className="size-4 mr-1.5" />
+            Copy npub only
+          </Button>
+        </div>
+
+        <p className="text-xs text-muted-foreground">
+          Paste it into the same conversation where they invited you — Telegram, iMessage, email,
+          or wherever.
+        </p>
+      </CardContent>
+    </Card>
+  );
+}
