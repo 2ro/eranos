@@ -246,6 +246,10 @@ interface NoteCardProps {
   highlight?: boolean;
   /** If true, suppress the kind-derived action header (e.g. "created a badge"). Used when the parent already provides context. */
   hideKindHeader?: boolean;
+  /** Override the NIP-22 context row prefix. Used by synthetic zap cards. */
+  commentContextPrefix?: string;
+  /** Event used for actions/navigation when the displayed card is synthetic. */
+  actionEvent?: NostrEvent;
 }
 
 /** Gets a tag value by name. */
@@ -333,9 +337,7 @@ function findZapTargetTag(event: NostrEvent, requestTags: string[][], name: stri
   return event.tags.find(([tagName]) => tagName === name) ?? requestTags.find(([tagName]) => tagName === name);
 }
 
-function buildZapTargetCommentEvent(event: NostrEvent, requestTags: string[][]): NostrEvent | undefined {
-  if (event.kind !== 9735 && event.kind !== 8333) return undefined;
-
+function buildZapCommentEvent(event: NostrEvent, requestTags: string[][], senderPubkey: string, content: string): NostrEvent {
   const tags: string[][] = [];
   const aTag = findZapTargetTag(event, requestTags, "a");
   const eTag = findZapTargetTag(event, requestTags, "e");
@@ -354,22 +356,12 @@ function buildZapTargetCommentEvent(event: NostrEvent, requestTags: string[][]):
     tags.push(["A", `0:${recipientTag[1]}:`], ["K", "0"]);
   }
 
-  if (tags.length === 0) return undefined;
-
   return {
     ...event,
-    kind: 1111,
-    content: "",
-    tags,
-  };
-}
-
-function buildZapMessageEvent(event: NostrEvent, content: string, requestTags: string[][]): NostrEvent {
-  return {
-    ...event,
+    pubkey: senderPubkey,
     kind: 1111,
     content,
-    tags: requestTags.length > 0 ? requestTags : event.tags,
+    tags,
   };
 }
 
@@ -383,10 +375,14 @@ export const NoteCard = memo(function NoteCard({
   threadedLast,
   highlight,
   hideKindHeader,
+  commentContextPrefix,
+  actionEvent,
 }: NoteCardProps) {
+  const actionTarget = actionEvent ?? event;
   const { config } = useAppContext();
   const { user } = useCurrentUser();
   const author = useAuthor(event.pubkey);
+  const actionAuthor = useAuthor(actionEvent?.pubkey);
   // Kind 9735 (Lightning zap) sender lives in the receipt's `P` tag / embedded
   // zap-request `pubkey`; kind 8333 (on-chain Bitcoin zap) is signed by the
   // donor directly so the event's own pubkey IS the sender.
@@ -395,26 +391,12 @@ export const NoteCard = memo(function NoteCard({
     if (event.kind === 8333) return event.pubkey;
     return '';
   }, [event]);
-  const zapSender = useAuthor(zapSenderPubkey || undefined);
-  const zapSenderMeta = zapSender.data?.metadata;
-  const zapSenderName = getDisplayName(zapSenderMeta, zapSenderPubkey);
-  const zapSenderUrl = useProfileUrl(zapSenderPubkey, zapSenderMeta);
-  const zapSenderNip05 = zapSenderMeta?.nip05;
-  // NIP-05 verification for the zap sender (donor). Mirrors how `useNip05Verify`
-  // is used for the receipt author below — passing undefined when the receipt
-  // doesn't yield a sender (non-zap events) so the hook stays disabled.
-  const { data: zapSenderNip05Verified, isPending: zapSenderNip05Pending } =
-    useNip05Verify(zapSenderNip05, zapSenderPubkey || undefined);
-
   const zapRequestTags = useMemo(() => getZapRequestTags(event), [event]);
-  const zapTargetCommentEvent = useMemo(
-    () => buildZapTargetCommentEvent(event, zapRequestTags),
-    [event, zapRequestTags],
-  );
 
   const pollVoteLabel = usePollVoteLabel(event);
 
   const metadata = author.data?.metadata;
+  const actionMetadata = actionEvent ? actionAuthor.data?.metadata : metadata;
   const displayName = getDisplayName(metadata, event.pubkey);
   const nip05 = metadata?.nip05;
   const { data: nip05Verified, isPending: nip05Pending } = useNip05Verify(
@@ -422,8 +404,8 @@ export const NoteCard = memo(function NoteCard({
     event.pubkey,
   );
   const profileUrl = useProfileUrl(event.pubkey, metadata);
-  const encodedId = useMemo(() => encodeEventId(event), [event]);
-  const { data: stats } = useEventStats(event.id, event);
+  const encodedId = useMemo(() => encodeEventId(actionTarget), [actionTarget]);
+  const { data: stats } = useEventStats(actionTarget.id, actionTarget);
   // Cached BTC→USD spot price. Always queried (cheap, shared cache key) so the
   // zap-card layout below can render amounts as USD when available.
   const { data: btcPrice } = useBtcPrice();
@@ -432,7 +414,7 @@ export const NoteCard = memo(function NoteCard({
 
   // Check if the current user can zap this event's author
   // TODO: Enable zapping split-recipient NIP-75 goals once zap split payments are supported.
-  const canZapAuthor = user && canZap(metadata) && !hasGoalZapSplits(event);
+  const canZapAuthor = user && canZap(actionMetadata) && !hasGoalZapSplits(actionTarget);
 
   const { onClick: openPost, onAuxClick: auxOpenPost } = useOpenPost(
     `/${encodedId}`,
@@ -642,7 +624,7 @@ export const NoteCard = memo(function NoteCard({
   const contentBlock = (
     <CommunityContentWarning event={event}>
       {/* Reply context (kind 1) or comment context (kind 1111) — shown above content */}
-      {isComment && <CommentContext event={event} />}
+      {isComment && <CommentContext event={event} prefix={commentContextPrefix} />}
       {isReply && (
         <ReplyContext
           pubkeys={replyToPubkeys}
@@ -849,7 +831,7 @@ export const NoteCard = memo(function NoteCard({
             ) : null}
           </button>
 
-          <RepostMenu event={event}>
+          <RepostMenu event={actionTarget}>
             {(isReposted: boolean) => (
               <button
                 className={`flex items-center gap-1.5 p-2 rounded-full transition-colors ${isReposted ? "text-accent hover:text-accent/80 hover:bg-accent/10" : "text-muted-foreground hover:text-accent hover:bg-accent/10"}`}
@@ -866,14 +848,14 @@ export const NoteCard = memo(function NoteCard({
           </RepostMenu>
 
           <ReactionButton
-        eventId={event.id}
-        eventPubkey={event.pubkey}
-        eventKind={event.kind}
+        eventId={actionTarget.id}
+        eventPubkey={actionTarget.pubkey}
+        eventKind={actionTarget.kind}
         reactionCount={stats?.reactions}
       />
 
       {canZapAuthor && (
-        <ZapDialog target={event}>
+        <ZapDialog target={actionTarget}>
           <button
             className="flex items-center gap-1.5 p-2 rounded-full text-muted-foreground hover:text-amber-500 hover:bg-amber-500/10 transition-colors"
             title="Zap"
@@ -941,8 +923,8 @@ export const NoteCard = memo(function NoteCard({
               {!compact && (
                 <>
                   {actionButtons}
-                  <NoteMoreMenu event={event} open={moreMenuOpen} onOpenChange={setMoreMenuOpen} />
-                  <ReplyComposeModal event={event} open={replyOpen} onOpenChange={setReplyOpen} />
+                  <NoteMoreMenu event={actionTarget} open={moreMenuOpen} onOpenChange={setMoreMenuOpen} />
+                  <ReplyComposeModal event={actionTarget} open={replyOpen} onOpenChange={setReplyOpen} />
                 </>
               )}
             </div>
@@ -965,12 +947,12 @@ export const NoteCard = memo(function NoteCard({
           <>
             {actionButtons}
             <NoteMoreMenu
-              event={event}
+              event={actionTarget}
               open={moreMenuOpen}
               onOpenChange={setMoreMenuOpen}
             />
             <ReplyComposeModal
-              event={event}
+              event={actionTarget}
               open={replyOpen}
               onOpenChange={setReplyOpen}
             />
@@ -1021,159 +1003,35 @@ export const NoteCard = memo(function NoteCard({
   }
 
   // ── Zap receipt layout (kind 9735 Lightning, kind 8333 on-chain Bitcoin) ──
-  //
-  // Mirrors NIP-22 cards: author header first, target context in the
-  // "Commenting on" slot, optional text body, then the shared action bar.
+  // Render as a synthetic NIP-22 card so spacing, header, body, and actions
+  // stay identical to comments while keeping actions tied to the zap receipt.
   if (isZap) {
     const zapAmountSats = getZapAmountSats(event);
-    // Kind 9735 stores the zapper's note in the embedded zap-request's
-    // `content`; kind 8333 stores the donor's comment in the event's own
-    // `content` field directly (no embedded request).
     const zapMessage = (event.kind === 8333 ? event.content : extractZapMessage(event)).trim();
-
-    const zapLabel = "donated";
-
-    // Amount: USD when btcPrice is available, sats fallback otherwise. The
-    // raw sats string is preserved as a `title` tooltip so it's never lost.
     const usdLabel = btcPrice ? satsToUSD(zapAmountSats, btcPrice) : undefined;
     const satsLabel = `${formatNumber(zapAmountSats)} ${zapAmountSats === 1 ? 'sat' : 'sats'}`;
     const amountText = usdLabel ?? satsLabel;
-
-    const zapMessageEvent = zapMessage
-      ? buildZapMessageEvent(event, zapMessage, zapRequestTags)
-      : undefined;
-
-    const donorAvatar = zapSender.isLoading ? (
-      <Skeleton
-        className={cn(
-          threaded || threadedLast ? "size-10" : "size-11",
-          "rounded-full shrink-0",
-        )}
-      />
-    ) : (
-      <ProfileHoverCard pubkey={zapSenderPubkey} asChild>
-        <Link
-          to={zapSenderUrl}
-          className="shrink-0"
-          onClick={(e) => e.stopPropagation()}
-        >
-          <Avatar className={threaded || threadedLast ? "size-10" : "size-11"}>
-            <AvatarImage src={zapSenderMeta?.picture} alt={zapSenderName} />
-            <AvatarFallback className="bg-primary/20 text-primary text-sm">
-              {zapSenderName[0]?.toUpperCase()}
-            </AvatarFallback>
-          </Avatar>
-        </Link>
-      </ProfileHoverCard>
-    );
-
-    const donorInfo = zapSender.isLoading ? (
-      <div className="min-w-0 min-h-[42px] flex flex-col justify-center space-y-1.5">
-        <Skeleton className="h-4 w-28" />
-        <Skeleton className="h-3 w-36" />
-      </div>
-    ) : (
-      <div className="min-w-0 flex-1 min-h-[42px] flex flex-col justify-center">
-        {/* Top line: donor name · action verb · amount. Mirrors a regular
-            note's name row but inlines the verb + amount so the card reads
-            as one sentence at a glance. */}
-        <div className="flex items-center gap-1.5 flex-wrap">
-          <ProfileHoverCard pubkey={zapSenderPubkey} asChild>
-            <Link
-              to={zapSenderUrl}
-              className="font-bold text-[15px] hover:underline truncate"
-              onClick={(e) => e.stopPropagation()}
-            >
-              {zapSender.data?.event ? (
-                <EmojifiedText tags={zapSender.data.event.tags}>
-                  {zapSenderName}
-                </EmojifiedText>
-              ) : (
-                zapSenderName
-              )}
-            </Link>
-          </ProfileHoverCard>
-          <span className="text-sm text-muted-foreground shrink-0">
-            {zapLabel}
-          </span>
-          {zapAmountSats > 0 && (
-            <span
-              className="text-sm font-semibold text-amber-500 shrink-0"
-              title={usdLabel ? satsLabel : undefined}
-            >
-              {amountText}
-            </span>
-          )}
-        </div>
-        {/* Bottom line: nip05 · timeAgo — same as the regular note layout. */}
-        <div className="flex items-center gap-1 text-sm text-muted-foreground min-w-0 pr-2">
-          {zapSenderNip05 && zapSenderNip05Pending && (
-            <Skeleton className="h-3 w-24" />
-          )}
-          {zapSenderNip05 && zapSenderNip05Pending && (
-            <span className="shrink-0">·</span>
-          )}
-          {zapSenderNip05 && zapSenderNip05Verified && (
-            <Nip05Badge nip05={zapSenderNip05} pubkey={zapSenderPubkey} />
-          )}
-          {zapSenderNip05 && zapSenderNip05Verified && (
-            <span className="shrink-0">·</span>
-          )}
-          <span className="shrink-0 hover:underline whitespace-nowrap">
-            {timeAgo(event.created_at)}
-          </span>
-        </div>
-      </div>
+    const donationPrefix = zapAmountSats > 0 ? `Donated ${amountText} to` : "Donated to";
+    const zapCommentEvent = buildZapCommentEvent(
+      event,
+      zapRequestTags,
+      zapSenderPubkey || event.pubkey,
+      zapMessage,
     );
 
     return (
-      <article
-        className={cn(
-          "relative px-4 py-3 hover:bg-secondary/30 transition-colors cursor-pointer overflow-hidden",
-          threaded ? "pb-0" : "border-b border-border",
-          className,
-        )}
-        onClick={handleCardClick}
-        onAuxClick={handleAuxClick}
-      >
-        <div className="relative">
-          <div className="flex gap-3">
-            <div className="flex flex-col items-center">
-              {donorAvatar}
-              {threaded && (
-                <div
-                  className={cn(
-                    "w-0.5 flex-1 mt-2 rounded-full",
-                    threadedLineClassName || "bg-foreground/20",
-                  )}
-                />
-              )}
-            </div>
-            <div className={cn("flex-1 min-w-0", threaded && "pb-3")}>
-              {donorInfo}
-              {zapTargetCommentEvent && (
-                <CommentContext event={zapTargetCommentEvent} prefix="Donated to" />
-              )}
-              {zapMessageEvent && <TruncatedNoteContent event={zapMessageEvent} />}
-              {!compact && (
-                <>
-                  {actionButtons}
-                  <NoteMoreMenu
-                    event={event}
-                    open={moreMenuOpen}
-                    onOpenChange={setMoreMenuOpen}
-                  />
-                  <ReplyComposeModal
-                    event={event}
-                    open={replyOpen}
-                    onOpenChange={setReplyOpen}
-                  />
-                </>
-              )}
-            </div>
-          </div>
-        </div>
-      </article>
+      <NoteCard
+        event={zapCommentEvent}
+        actionEvent={event}
+        className={className}
+        compact={compact}
+        threaded={threaded}
+        threadedLineClassName={threadedLineClassName}
+        threadedLast={threadedLast}
+        highlight={highlight}
+        hideKindHeader
+        commentContextPrefix={donationPrefix}
+      />
     );
   }
 
@@ -1271,12 +1129,12 @@ export const NoteCard = memo(function NoteCard({
               {contentBlock}
               {actionButtons}
               <NoteMoreMenu
-                event={event}
+                event={actionTarget}
                 open={moreMenuOpen}
                 onOpenChange={setMoreMenuOpen}
               />
               <ReplyComposeModal
-                event={event}
+                event={actionTarget}
                 open={replyOpen}
                 onOpenChange={setReplyOpen}
               />
@@ -1365,12 +1223,12 @@ export const NoteCard = memo(function NoteCard({
           <>
             {actionButtons}
             <NoteMoreMenu
-              event={event}
+              event={actionTarget}
               open={moreMenuOpen}
               onOpenChange={setMoreMenuOpen}
             />
             <ReplyComposeModal
-              event={event}
+              event={actionTarget}
               open={replyOpen}
               onOpenChange={setReplyOpen}
             />
