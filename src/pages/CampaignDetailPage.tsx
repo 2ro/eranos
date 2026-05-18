@@ -8,6 +8,7 @@ import {
   Tag,
   Archive,
   ArchiveRestore,
+  Bitcoin,
   ChevronLeft,
   HandHeart,
   MapPin,
@@ -19,6 +20,7 @@ import {
 import { ArticleContent } from '@/components/ArticleContent';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
+import { BeneficiaryDonateDialog } from '@/components/BeneficiaryDonateDialog';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -657,28 +659,46 @@ function RecipientRow({ pubkey, weight }: { pubkey: string; weight: number }) {
   const name = metadata?.display_name || metadata?.name || genUserName(pubkey);
   const picture = sanitizeUrl(metadata?.picture);
   const nip05 = metadata?.nip05;
+  const [donateOpen, setDonateOpen] = useState(false);
 
   return (
-    <Link
-      to={`/${pubkey}`}
-      className="flex items-center gap-3 py-2.5 hover:bg-muted/40 -mx-2 px-2 rounded-md motion-safe:transition-colors"
-    >
-      <Avatar className="size-9 shrink-0">
-        {picture && <AvatarImage src={picture} alt="" />}
-        <AvatarFallback>{name.slice(0, 2).toUpperCase()}</AvatarFallback>
-      </Avatar>
-      <div className="min-w-0 flex-1">
-        <div className="font-medium text-sm truncate">{name}</div>
-        {nip05 && (
-          <div className="text-xs text-muted-foreground truncate">{nip05}</div>
+    <div className="flex items-center gap-2 py-2.5 -mx-2 px-2 rounded-md motion-safe:transition-colors hover:bg-muted/40">
+      <Link
+        to={`/${pubkey}`}
+        className="flex items-center gap-3 min-w-0 flex-1 rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+      >
+        <Avatar className="size-9 shrink-0">
+          {picture && <AvatarImage src={picture} alt="" />}
+          <AvatarFallback>{name.slice(0, 2).toUpperCase()}</AvatarFallback>
+        </Avatar>
+        <div className="min-w-0 flex-1">
+          <div className="font-medium text-sm truncate">{name}</div>
+          {nip05 && (
+            <div className="text-xs text-muted-foreground truncate">{nip05}</div>
+          )}
+        </div>
+        {weight !== 1 && (
+          <Badge variant="outline" className="shrink-0">
+            weight {weight}
+          </Badge>
         )}
-      </div>
-      {weight !== 1 && (
-        <Badge variant="outline" className="shrink-0">
-          weight {weight}
-        </Badge>
-      )}
-    </Link>
+      </Link>
+      <Button
+        size="sm"
+        variant="outline"
+        className="shrink-0"
+        onClick={() => setDonateOpen(true)}
+        aria-label={`Donate to ${name}`}
+      >
+        <Bitcoin className="size-4 mr-1.5" />
+        Donate
+      </Button>
+      <BeneficiaryDonateDialog
+        pubkey={pubkey}
+        open={donateOpen}
+        onOpenChange={setDonateOpen}
+      />
+    </div>
   );
 }
 
