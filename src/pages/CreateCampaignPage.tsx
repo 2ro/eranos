@@ -69,12 +69,8 @@ interface EditTarget {
   relays?: string[];
 }
 
-/** Origin used in the shareable invite / notify links. Falls back to the
- * canonical production domain when window is unavailable (SSR safety). */
+/** Canonical origin used in shareable invite / notify links. */
 function getShareOrigin(): string {
-  if (typeof window !== 'undefined' && window.location?.origin) {
-    return window.location.origin;
-  }
   return 'https://agora.spot';
 }
 
