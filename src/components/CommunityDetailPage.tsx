@@ -2,10 +2,10 @@ import { useMemo, useCallback, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { nip19 } from 'nostr-tools';
 import {
-  ArrowLeft,
   Activity as ActivityIcon,
   Award,
   CalendarDays,
+  ChevronLeft,
   Crown,
   Info,
   Megaphone,
@@ -204,6 +204,7 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
   const name = community?.name ?? 'Unnamed Community';
   const description = community?.description ?? '';
   const image = community?.image;
+  const cover = sanitizeUrl(image);
   const communityATag = community?.aTag ?? '';
 
   // Extract website URL from description
@@ -525,6 +526,8 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
   }, [fabAvailable]);
 
   useLayoutOptions({
+    noMaxWidth: true,
+    rightSidebar: null,
     showFAB: fabAvailable,
     fabMenu,
   });
@@ -539,197 +542,187 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
   }, []);
 
   // ── Render ──────────────────────────────────────────────────────────────────
-  const heroIconClassName = 'size-5 text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.85)]';
-  const bannerActionClassName = 'p-2 rounded-full text-white/90 hover:text-white hover:bg-white/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80 disabled:opacity-50 disabled:pointer-events-none transition-colors';
+  const heroIconClassName = 'size-6 text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.85)]';
+  const bannerActionClassName = 'p-2.5 rounded-full text-white/90 hover:text-white hover:bg-white/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80 disabled:opacity-50 disabled:pointer-events-none transition-colors';
 
   return (
-    <div className="max-w-2xl mx-auto pb-16">
-      <CommunityModerationContext.Provider value={moderationCtx}>
-        <Tabs value={activeTab} onValueChange={setActiveTab}>
-      {/* ── Hero banner + tabs ── */}
-      <div className="relative isolate overflow-hidden">
-        {/* Tabs get their own dark backdrop so the cover image only appears in
-            the hero, not repeated underneath the tab strip. */}
-        <div aria-hidden className="absolute inset-0 -z-10">
-          <div className="absolute inset-x-0 bottom-0 h-12 bg-[linear-gradient(to_bottom,rgba(0,0,0,0.9)_0%,rgba(0,0,0,0.9)_75%,hsl(var(--background))_100%)]" />
-        </div>
+    <main className="min-h-screen pb-16">
+      <div className="max-w-3xl mx-auto px-4 sm:px-6 py-6 lg:py-10">
+        <CommunityModerationContext.Provider value={moderationCtx}>
+          <Tabs value={activeTab} onValueChange={setActiveTab}>
+            <div className="space-y-4">
+              <div className="relative aspect-[16/9] rounded-xl overflow-hidden bg-gradient-to-br from-primary/40 via-primary/20 to-secondary">
+                {cover ? (
+                  <img src={cover} alt="" className="absolute inset-0 size-full object-cover" />
+                ) : (
+                  <div className="absolute inset-0 bg-gradient-to-br from-primary/50 via-primary/25 to-secondary" />
+                )}
+                {!cover && (
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <Users className="size-16 text-primary/40 sm:size-20" />
+                  </div>
+                )}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/25 to-black/45" />
 
-        {/* Banner — fixed aspect ratio, title/description/buttons overlaid */}
-        <div className="relative w-full aspect-[2/1] sm:aspect-[21/9]">
-          {image ? (
-            <img src={image} alt="" className="absolute inset-0 w-full h-full object-cover" />
-          ) : (
-            <div className="absolute inset-0 bg-gradient-to-br from-primary/50 via-primary/25 to-primary/5" />
-          )}
-          {!image && (
-            <div className="absolute inset-0 flex items-center justify-center">
-              <Users className="size-16 text-primary/20 sm:size-20" />
-            </div>
-          )}
-          {/* Extra top/bottom darkening on the hero specifically (above the
-              shared overlay) so overlaid title/description stay legible. */}
-          <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-transparent via-transparent to-black/40" />
-
-        {/* Top bar — back button (left) + follow toggle (right) */}
-        <div className="absolute left-0 right-0 top-0 z-10 flex items-center justify-between px-4 pt-4">
-          <button
-            onClick={() => window.history.length > 1 ? navigate(-1) : navigate('/')}
-            className="p-2 -ml-2 rounded-full hover:bg-black/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80 transition-colors"
-            aria-label="Go back"
-          >
-            <ArrowLeft className={heroIconClassName} />
-          </button>
-          {user && communityATag && (
-            <FollowToggleButton
-              size="sm"
-              isFollowing={communityFollowed}
-              isPending={toggleCommunityFollow.isPending}
-              onClick={handleToggleFollow}
-              icon={<UserPlus className="size-4" />}
-              followingIcon={
-                <>
-                  <UserCheck className="size-4 group-hover:hidden group-focus-visible:hidden" />
-                  <UserMinus className="size-4 hidden group-hover:inline group-focus-visible:inline" />
-                </>
-              }
-              hoverToUnfollow
-              className={cn(
-                'shadow-md',
-                !communityFollowed && 'bg-white text-black hover:bg-white/90',
-                communityFollowed && 'bg-black/30 backdrop-blur-sm border-white/40 text-white hover:bg-destructive/30 hover:text-white hover:border-destructive/60',
-              )}
-            />
-          )}
-        </div>
-
-        {/* Member stack sits ABOVE the title; the title row carries the Info
-            button (left of name) and action buttons (right). Description has
-            moved behind an Info button to reduce banner clutter. */}
-        <div className="absolute bottom-0 left-0 right-0 px-5 pb-3 pt-8 [text-shadow:0_1px_4px_rgba(0,0,0,0.7),0_2px_8px_rgba(0,0,0,0.4)]">
-          <div className="flex [text-shadow:none]">
-            {/* Avatar stack — clickable to open full members dialog */}
-            <button
-              type="button"
-              onClick={() => setMembersDialogOpen(true)}
-              className="flex items-center gap-2 -ml-1 px-1 py-1 rounded-md hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80 transition-colors min-w-0"
-              aria-label="Show all members"
-            >
-              <PeopleAvatarStack
-                pubkeys={allMemberPubkeys}
-                maxVisible={6}
-                size="sm"
-                className="[&_.ring-2]:ring-black/40 pointer-events-none"
-              />
-              {allMemberPubkeys.length > 0 && (
-                <span className="text-xs font-medium text-white/90 [text-shadow:0_1px_3px_rgba(0,0,0,0.7)] truncate">
-                  {allMemberPubkeys.length} member{allMemberPubkeys.length !== 1 ? 's' : ''}
-                </span>
-              )}
-            </button>
-          </div>
-          <div className="mt-1.5 flex items-end justify-between gap-2">
-            <div className="flex items-center gap-1.5 min-w-0">
-              <h2 className="text-xl font-bold text-white leading-tight sm:text-2xl truncate">{name}</h2>
-              {descriptionExpandable && (
-                <button
-                  type="button"
-                  onClick={() => setDescriptionDialogOpen(true)}
-                  className="-my-1 -mr-1 p-1 rounded-full text-white/75 hover:text-white hover:bg-white/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80 transition-colors"
-                  aria-label="About this community"
-                >
-                  <Info className="size-4 [text-shadow:none] drop-shadow-[0_1px_2px_rgba(0,0,0,0.85)]" />
-                </button>
-              )}
-            </div>
-
-            {/* Banner action row — MembersOnly + Zap + Share + overflow menu */}
-            <div className="flex items-center gap-0.5 shrink-0 [text-shadow:none]">
-              <MembersOnlyToggle
-                className="text-white/90 hover:text-white hover:bg-white/15 data-[state=on]:text-white"
-              />
-              {community && membership && (
-                <CommunityZapDialog
-                  community={community}
-                  members={membership.members}
-                  membersLoading={membersLoading}
-                  triggerClassName={bannerActionClassName}
-                  onZapLaunched={handleCommunityZapLaunched}
-                />
-              )}
-              <button
-                type="button"
-                className={bannerActionClassName}
-                onClick={handleShare}
-                aria-label="Share"
-              >
-                <Share2 className="size-5" />
-              </button>
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
+                <div className="absolute left-0 right-0 top-0 z-10 flex items-center justify-between gap-3 px-4 pt-4">
                   <button
-                    type="button"
-                    className={bannerActionClassName}
-                    aria-label="More actions"
+                    onClick={() => window.history.length > 1 ? navigate(-1) : navigate('/')}
+                    className="p-2.5 -ml-2 rounded-full text-white/90 hover:bg-white/15 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80 motion-safe:transition-colors"
+                    aria-label="Go back"
                   >
-                    <MoreVertical className="size-5" />
+                    <ChevronLeft className={heroIconClassName} />
                   </button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" side="top" sideOffset={6} className="min-w-[180px]">
-                  <DropdownMenuItem onSelect={() => setMembersDialogOpen(true)}>
-                    <Users className="size-4 mr-2" />
-                    View members
-                  </DropdownMenuItem>
-                  {canAddMembers && community && (
-                    <DropdownMenuItem onSelect={() => setAddMembersDialogOpen(true)}>
-                      <UserPlus className="size-4 mr-2" />
-                      Add members
-                    </DropdownMenuItem>
+                  {user && communityATag && (
+                    <FollowToggleButton
+                      size="sm"
+                      isFollowing={communityFollowed}
+                      isPending={toggleCommunityFollow.isPending}
+                      onClick={handleToggleFollow}
+                      icon={<UserPlus className="size-4" />}
+                      followingIcon={
+                        <>
+                          <UserCheck className="size-4 group-hover:hidden group-focus-visible:hidden" />
+                          <UserMinus className="size-4 hidden group-hover:inline group-focus-visible:inline" />
+                        </>
+                      }
+                      hoverToUnfollow
+                      className={cn(
+                        'shadow-none',
+                        !communityFollowed && 'bg-white/95 text-black hover:bg-white',
+                        communityFollowed && 'bg-transparent backdrop-blur-sm border-white/40 text-white hover:bg-destructive/30 hover:text-white hover:border-destructive/60',
+                      )}
+                    />
                   )}
-                  {isFounder && community && (
-                    <>
-                      <DropdownMenuItem onSelect={() => setBadgeDialogOpen(true)}>
-                        <Award className="size-4 mr-2" />
-                        Edit badge
-                      </DropdownMenuItem>
-                      <DropdownMenuItem onSelect={() => setEditCommunityOpen(true)}>
-                        <Pencil className="size-4 mr-2" />
-                        Edit community
-                      </DropdownMenuItem>
-                    </>
-                  )}
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </div>
-          </div>
-        </div>
-      </div>
+                </div>
 
-      {/* ── Tabs ── */}
-          <TabsList className="w-full justify-stretch rounded-none border-b border-white/15 bg-transparent p-0 h-auto">
-            <TabsTrigger
-              value="activity"
-              className="flex-1 min-w-0 rounded-none border-b-2 border-transparent text-white/75 hover:text-white data-[state=active]:text-white data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none px-4 pb-3 pt-2 [text-shadow:0_1px_3px_rgba(0,0,0,0.6)]"
-            >
-              <ActivityIcon className="size-4 mr-1.5" />
-              Activity
-            </TabsTrigger>
-            <TabsTrigger
-              value="pulse"
-              className="flex-1 min-w-0 rounded-none border-b-2 border-transparent text-white/75 hover:text-white data-[state=active]:text-white data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none px-4 pb-3 pt-2 [text-shadow:0_1px_3px_rgba(0,0,0,0.6)]"
-            >
-              <Radio className="size-4 mr-1.5" />
-              Pulse
-            </TabsTrigger>
-            <TabsTrigger
-              value="chat"
-              className="flex-1 min-w-0 rounded-none border-b-2 border-transparent text-white/75 hover:text-white data-[state=active]:text-white data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none px-4 pb-3 pt-2 [text-shadow:0_1px_3px_rgba(0,0,0,0.6)]"
-            >
-              <MessageCircle className="size-4 mr-1.5" />
-              Chat
-            </TabsTrigger>
-          </TabsList>
-      </div>
-      {/* ── /shared banner+tabs backdrop wrapper ── */}
+                <div className="absolute inset-x-0 bottom-0 z-10 space-y-2 p-5 sm:p-6 [text-shadow:0_1px_4px_rgba(0,0,0,0.75),0_2px_10px_rgba(0,0,0,0.45)]">
+                  <div className="flex [text-shadow:none]">
+                    <button
+                      type="button"
+                      onClick={() => setMembersDialogOpen(true)}
+                      className="flex items-center gap-2 -ml-1 px-1 py-1 rounded-md hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80 transition-colors min-w-0"
+                      aria-label="Show all members"
+                    >
+                      <PeopleAvatarStack
+                        pubkeys={allMemberPubkeys}
+                        maxVisible={6}
+                        size="sm"
+                        className="[&_.ring-2]:ring-black/40 pointer-events-none"
+                      />
+                      {allMemberPubkeys.length > 0 && (
+                        <span className="text-xs font-medium text-white/90 [text-shadow:0_1px_3px_rgba(0,0,0,0.7)] truncate">
+                          {allMemberPubkeys.length} member{allMemberPubkeys.length !== 1 ? 's' : ''}
+                        </span>
+                      )}
+                    </button>
+                  </div>
+                  <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+                    <div className="min-w-0 space-y-2">
+                      <div className="flex items-center gap-1.5 min-w-0">
+                        <h1 className="text-3xl sm:text-4xl font-bold leading-tight tracking-tight text-white truncate">{name}</h1>
+                        {descriptionExpandable && (
+                          <button
+                            type="button"
+                            onClick={() => setDescriptionDialogOpen(true)}
+                            className="-my-1 -mr-1 p-1 rounded-full text-white/75 hover:text-white hover:bg-white/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80 transition-colors"
+                            aria-label="About this community"
+                          >
+                            <Info className="size-4 [text-shadow:none] drop-shadow-[0_1px_2px_rgba(0,0,0,0.85)]" />
+                          </button>
+                        )}
+                      </div>
+                      {descriptionText && (
+                        <p className="max-w-2xl text-base sm:text-lg text-white/90 line-clamp-2">
+                          {descriptionText}
+                        </p>
+                      )}
+                    </div>
+
+                    <div className="flex items-center gap-0.5 shrink-0 [text-shadow:none]">
+                      <MembersOnlyToggle
+                        className="text-white/90 hover:text-white hover:bg-white/15 data-[state=on]:text-white"
+                      />
+                      {community && membership && (
+                        <CommunityZapDialog
+                          community={community}
+                          members={membership.members}
+                          membersLoading={membersLoading}
+                          triggerClassName={bannerActionClassName}
+                          onZapLaunched={handleCommunityZapLaunched}
+                        />
+                      )}
+                      <button
+                        type="button"
+                        className={bannerActionClassName}
+                        onClick={handleShare}
+                        aria-label="Share"
+                      >
+                        <Share2 className="size-5" />
+                      </button>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <button
+                            type="button"
+                            className={bannerActionClassName}
+                            aria-label="More actions"
+                          >
+                            <MoreVertical className="size-5" />
+                          </button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end" side="top" sideOffset={6} className="min-w-[180px]">
+                          <DropdownMenuItem onSelect={() => setMembersDialogOpen(true)}>
+                            <Users className="size-4 mr-2" />
+                            View members
+                          </DropdownMenuItem>
+                          {canAddMembers && community && (
+                            <DropdownMenuItem onSelect={() => setAddMembersDialogOpen(true)}>
+                              <UserPlus className="size-4 mr-2" />
+                              Add members
+                            </DropdownMenuItem>
+                          )}
+                          {isFounder && community && (
+                            <>
+                              <DropdownMenuItem onSelect={() => setBadgeDialogOpen(true)}>
+                                <Award className="size-4 mr-2" />
+                                Edit badge
+                              </DropdownMenuItem>
+                              <DropdownMenuItem onSelect={() => setEditCommunityOpen(true)}>
+                                <Pencil className="size-4 mr-2" />
+                                Edit community
+                              </DropdownMenuItem>
+                            </>
+                          )}
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <TabsList className="grid h-auto w-full grid-cols-3 rounded-xl border bg-card/70 p-1 shadow-sm backdrop-blur">
+                <TabsTrigger
+                  value="activity"
+                  className="min-w-0 rounded-lg border border-transparent px-3 py-2 text-muted-foreground shadow-none hover:text-foreground data-[state=active]:border-border data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm"
+                >
+                  <ActivityIcon className="size-4 mr-1.5" />
+                  Activity
+                </TabsTrigger>
+                <TabsTrigger
+                  value="pulse"
+                  className="min-w-0 rounded-lg border border-transparent px-3 py-2 text-muted-foreground shadow-none hover:text-foreground data-[state=active]:border-border data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm"
+                >
+                  <Radio className="size-4 mr-1.5" />
+                  Pulse
+                </TabsTrigger>
+                <TabsTrigger
+                  value="chat"
+                  className="min-w-0 rounded-lg border border-transparent px-3 py-2 text-muted-foreground shadow-none hover:text-foreground data-[state=active]:border-border data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm"
+                >
+                  <MessageCircle className="size-4 mr-1.5" />
+                  Chat
+                </TabsTrigger>
+              </TabsList>
+            </div>
 
           {/* Sublabel for the currently-active tab. Only rendered when the
               tab has a descriptor to show — keeps the rest of the tab strip
@@ -981,6 +974,7 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
           community={community}
         />
       )}
-    </div>
+      </div>
+    </main>
   );
 }

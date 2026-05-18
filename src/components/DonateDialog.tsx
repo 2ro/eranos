@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import {
   AlertTriangle,
   ArrowUpRight,
@@ -41,16 +41,21 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Textarea } from '@/components/ui/textarea';
 import LoginDialog from '@/components/auth/LoginDialog';
 import { useAuthor } from '@/hooks/useAuthor';
+import { useAppContext } from '@/hooks/useAppContext';
 import { useBitcoinSigner } from '@/hooks/useBitcoinSigner';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useDonateCampaign, type DonateCampaignResult, type DonationFeeSpeed } from '@/hooks/useDonateCampaign';
 import { useToast } from '@/hooks/useToast';
 import {
   BITCOIN_DUST_LIMIT,
+  estimateFee,
+  fetchUTXOs,
   formatSats,
+  getFeeRates,
   nostrPubkeyToBitcoinAddress,
   satsToUSD,
   usdToSats,
+  type FeeRates,
 } from '@/lib/bitcoin';
 import {
   minDonationForSplit,
@@ -82,6 +87,34 @@ const FEE_SPEED_LABELS: Record<DonationFeeSpeed, string> = {
   hour: 'One hour',
   economy: 'Economy (~1 day)',
 };
+
+function feeRateForSpeed(rates: FeeRates, speed: DonationFeeSpeed): number {
+  return {
+    fastest: rates.fastestFee,
+    halfHour: rates.halfHourFee,
+    hour: rates.hourFee,
+    economy: rates.economyFee,
+  }[speed];
+}
+
+function estimateDonationFee({
+  inputCount,
+  outputCount,
+  totalBalance,
+  amountSats,
+  feeRate,
+}: {
+  inputCount: number;
+  outputCount: number;
+  totalBalance: number;
+  amountSats: number;
+  feeRate: number;
+}): number {
+  const feeWithChange = estimateFee(inputCount, outputCount + 1, feeRate);
+  const changeWithChange = totalBalance - amountSats - feeWithChange;
+  const hasChange = changeWithChange >= BITCOIN_DUST_LIMIT;
+  return estimateFee(inputCount, outputCount + (hasChange ? 1 : 0), feeRate);
+}
 
 interface DonateDialogProps {
   campaign: ParsedCampaign;
@@ -318,9 +351,50 @@ function FormView({
   onCancel: () => void;
 }) {
   const recipientCount = campaign.recipients.length;
+  const { user } = useCurrentUser();
+  const { config } = useAppContext();
+  const { esploraBaseUrl } = config;
+  const senderAddress = user ? nostrPubkeyToBitcoinAddress(user.pubkey) : '';
   const hasPrice = !!btcPrice && Number.isFinite(btcPrice) && btcPrice > 0;
   const validAmount = hasPrice && Number.isFinite(effectiveUsd) && effectiveUsd > 0 && effectiveAmount > 0;
   const canContinue = validAmount && !belowMin && !tooSmallSplit;
+
+  const { data: utxos } = useQuery({
+    queryKey: ['bitcoin-utxos', esploraBaseUrl, senderAddress],
+    queryFn: () => fetchUTXOs(senderAddress, esploraBaseUrl),
+    enabled: !!senderAddress && validAmount,
+    staleTime: 30_000,
+  });
+
+  const { data: feeRates } = useQuery({
+    queryKey: ['bitcoin-fee-rates', esploraBaseUrl],
+    queryFn: () => getFeeRates(esploraBaseUrl),
+    enabled: validAmount,
+    staleTime: 30_000,
+  });
+
+  const totalBalance = useMemo(() => utxos?.reduce((sum, utxo) => sum + utxo.value, 0) ?? 0, [utxos]);
+  const feeEstimates = useMemo(() => {
+    if (!utxos?.length || !feeRates || !validAmount) return {};
+
+    let outputCount = recipientCount;
+    try {
+      outputCount = splitDonation(campaign.recipients, effectiveAmount, user?.pubkey).length;
+    } catch {
+      return {};
+    }
+
+    return (Object.keys(FEE_SPEED_LABELS) as DonationFeeSpeed[]).reduce<Partial<Record<DonationFeeSpeed, number>>>((acc, speed) => {
+      acc[speed] = estimateDonationFee({
+        inputCount: utxos.length,
+        outputCount,
+        totalBalance,
+        amountSats: effectiveAmount,
+        feeRate: feeRateForSpeed(feeRates, speed),
+      });
+      return acc;
+    }, {});
+  }, [utxos, feeRates, validAmount, recipientCount, campaign.recipients, effectiveAmount, user?.pubkey, totalBalance]);
 
   return (
     <>
@@ -405,7 +479,7 @@ function FormView({
 
         {/* Fee speed */}
         <div className="space-y-2">
-          <Label>Transaction Speed</Label>
+          <Label>Arrival</Label>
           <Select value={feeSpeed} onValueChange={(v) => onFeeSpeedChange(v as DonationFeeSpeed)}>
             <SelectTrigger>
               <SelectValue />
@@ -414,6 +488,9 @@ function FormView({
               {(Object.keys(FEE_SPEED_LABELS) as DonationFeeSpeed[]).map((speed) => (
                 <SelectItem key={speed} value={speed}>
                   {FEE_SPEED_LABELS[speed]}
+                  {btcPrice && feeEstimates[speed] !== undefined
+                    ? ` · ${satsToUSD(feeEstimates[speed], btcPrice)} fee`
+                    : ''}
                 </SelectItem>
               ))}
             </SelectContent>
@@ -484,6 +561,9 @@ function ConfirmView({
   onConfirm: () => void;
 }) {
   const { user } = useCurrentUser();
+  const { config } = useAppContext();
+  const { esploraBaseUrl } = config;
+  const senderAddress = user ? nostrPubkeyToBitcoinAddress(user.pubkey) : '';
   const splits = useMemo(() => {
     try {
       return splitDonation(campaign.recipients, amountSats, user?.pubkey);
@@ -491,6 +571,46 @@ function ConfirmView({
       return [];
     }
   }, [campaign.recipients, amountSats, user?.pubkey]);
+
+  const { data: utxos, isLoading: utxosLoading, isError: utxosError } = useQuery({
+    queryKey: ['bitcoin-utxos', esploraBaseUrl, senderAddress],
+    queryFn: () => fetchUTXOs(senderAddress, esploraBaseUrl),
+    enabled: !!senderAddress && amountSats > 0,
+    staleTime: 30_000,
+  });
+
+  const { data: feeRates, isLoading: feeRatesLoading, isError: feeRatesError } = useQuery({
+    queryKey: ['bitcoin-fee-rates', esploraBaseUrl],
+    queryFn: () => getFeeRates(esploraBaseUrl),
+    enabled: amountSats > 0,
+    staleTime: 30_000,
+  });
+
+  const totalBalance = useMemo(() => utxos?.reduce((sum, utxo) => sum + utxo.value, 0) ?? 0, [utxos]);
+  const estimatedFee = useMemo(() => {
+    if (!utxos?.length || !feeRates || splits.length === 0) return undefined;
+
+    return estimateDonationFee({
+      inputCount: utxos.length,
+      outputCount: splits.length,
+      totalBalance,
+      amountSats,
+      feeRate: feeRateForSpeed(feeRates, feeSpeed),
+    });
+  }, [utxos, feeRates, splits.length, feeSpeed, totalBalance, amountSats]);
+  const feeLoading = utxosLoading || feeRatesLoading;
+  const feeError = utxosError || feeRatesError;
+  const noSpendableFunds = !!utxos && utxos.length === 0;
+  const insufficientFunds = estimatedFee !== undefined && totalBalance < amountSats + estimatedFee;
+  const canConfirm = !isPending && estimatedFee !== undefined && !feeError && !noSpendableFunds && !insufficientFunds;
+  const formatReviewAmount = (sats: number) => (
+    btcPrice ? (
+      <>
+        {satsToUSD(sats, btcPrice)}
+        <span className="ml-2 text-xs text-muted-foreground">({formatSats(sats)} sats)</span>
+      </>
+    ) : `${formatSats(sats)} sats`
+  );
 
   return (
     <>
@@ -512,19 +632,61 @@ function ConfirmView({
           <div className="flex justify-between text-sm">
             <span className="text-muted-foreground">Donation amount</span>
             <span className="font-medium">
-              {btcPrice ? satsToUSD(amountSats, btcPrice) : `${formatSats(amountSats)} sats`}
-              {btcPrice && <span className="ml-2 text-xs text-muted-foreground">({formatSats(amountSats)} sats)</span>}
+              {formatReviewAmount(amountSats)}
             </span>
           </div>
           <div className="flex justify-between text-sm">
-            <span className="text-muted-foreground">Recipients</span>
-            <span className="font-medium">{splits.length}</span>
+            <span className="text-muted-foreground">Network fee</span>
+            <span className="font-medium">
+              {estimatedFee !== undefined
+                ? formatReviewAmount(estimatedFee)
+                : feeLoading
+                  ? 'Calculating…'
+                  : noSpendableFunds
+                    ? 'No spendable funds'
+                    : 'Unavailable'}
+            </span>
           </div>
+          {estimatedFee !== undefined && (
+            <div className="flex justify-between text-sm">
+              <span className="text-muted-foreground">Total</span>
+              <span className="font-medium">
+                {formatReviewAmount(amountSats + estimatedFee)}
+              </span>
+            </div>
+          )}
           <div className="flex justify-between text-sm">
-            <span className="text-muted-foreground">Speed</span>
+            <span className="text-muted-foreground">Arrival</span>
             <span className="font-medium">{FEE_SPEED_LABELS[feeSpeed]}</span>
           </div>
         </div>
+
+        {feeError && (
+          <Alert variant="destructive">
+            <AlertTriangle className="size-4" />
+            <AlertDescription className="text-xs">
+              Could not estimate the network fee. Check your connection and try again.
+            </AlertDescription>
+          </Alert>
+        )}
+
+        {noSpendableFunds && (
+          <Alert variant="destructive">
+            <AlertTriangle className="size-4" />
+            <AlertDescription className="text-xs">
+              Your Bitcoin wallet has no spendable funds.
+            </AlertDescription>
+          </Alert>
+        )}
+
+        {insufficientFunds && estimatedFee !== undefined && (
+          <Alert variant="destructive">
+            <AlertTriangle className="size-4" />
+            <AlertDescription className="text-xs">
+              Insufficient funds. This donation needs {(amountSats + estimatedFee).toLocaleString()} sats including the network fee.
+            </AlertDescription>
+          </Alert>
+        )}
 
         <div className="rounded-lg border border-border max-h-40 overflow-auto">
           <table className="w-full text-xs">
@@ -551,8 +713,7 @@ function ConfirmView({
         )}
 
         <p className="text-center text-xs text-muted-foreground">
-          A network fee is added on top of your donation. The exact fee depends on current mempool
-          conditions.
+          The fee is locked into the transaction when you sign. Confirmation time can still vary with mempool conditions.
         </p>
 
         <div className="flex gap-2">
@@ -560,7 +721,7 @@ function ConfirmView({
             <ChevronLeft className="size-4 mr-1" />
             Back
           </Button>
-          <Button onClick={onConfirm} disabled={isPending} className="flex-1">
+          <Button onClick={onConfirm} disabled={!canConfirm} className="flex-1">
             {isPending ? (
               <>
                 <Loader2 className="size-4 mr-1.5 animate-spin" />
