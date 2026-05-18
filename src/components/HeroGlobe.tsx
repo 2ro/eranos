@@ -12,11 +12,23 @@ interface GeoPoint {
   lng: number;
 }
 
+/**
+ * Visual variant for a globe marker. Each kind gets its own glyph + halo
+ * so the three "threads" of Discover — campaigns, communities, and
+ * country activity — read distinctly without needing legend chrome.
+ */
+export type GlobeMarkerKind = 'campaign' | 'community' | 'country-pulse';
+
 interface CampaignMarker extends GeoPoint {
   /** Stable key for the marker (e.g. the campaign aTag). */
   key: string;
   /** Tooltip / accessible label shown on hover. */
   label?: string;
+  /**
+   * Visual style of this marker. Defaults to `'campaign'` so existing
+   * callers (the campaigns hero) keep their heart markers unchanged.
+   */
+  kind?: GlobeMarkerKind;
 }
 
 interface HeroGlobeProps {
@@ -362,10 +374,16 @@ export function HeroGlobe({
 
         {/* Campaign markers — a small heart glyph with a warm glow halo.
             Each marker is a button: clicking selects the campaign, which
-            the parent uses to populate the spotlight card. */}
+            the parent uses to populate the spotlight card.
+
+            On the Discover page the same `<g>` slots are reused for
+            community and country-pulse markers, distinguished by `m.kind`
+            and rendered with a softer glyph + halo so campaigns stay the
+            visual lead. */}
         <g ref={markersRef}>
           {markers.map((m) => {
             const isSelected = m.key === selectedKey;
+            const kind: GlobeMarkerKind = m.kind ?? 'campaign';
             return (
               <g
                 key={m.key}
@@ -391,25 +409,51 @@ export function HeroGlobe({
                   outline: 'none',
                 }}
               >
-                {/* Glow halo (stronger for the active marker). */}
-                <circle
-                  r={isSelected ? 16 : 12}
-                  fill={`url(#hero-marker-glow${isSelected ? '-active' : ''})`}
-                />
-                {/* Heart glyph. Path is centered at the origin (~14×12 units)
-                    so the parent <g>'s translate+scale lands it on the globe. */}
-                <path
-                  d="M0,3.5 C-3.5,1 -7,-1.5 -7,-4.5 C-7,-7 -5,-8.5 -3,-8.5 C-1.5,-8.5 -0.5,-7.5 0,-6.5 C0.5,-7.5 1.5,-8.5 3,-8.5 C5,-8.5 7,-7 7,-4.5 C7,-1.5 3.5,1 0,3.5 Z"
-                  fill="hsl(var(--primary))"
-                  stroke="hsl(40 100% 98%)"
-                  strokeWidth="0.6"
-                  strokeLinejoin="round"
-                />
-                {/* Tiny inner highlight to make the heart pop on the warm
-                    landmass without needing a heavy outline. */}
-                <ellipse cx={-2.5} cy={-5.5} rx={1.5} ry={1} fill="hsl(40 100% 98% / 0.55)" />
+                {kind === 'campaign' ? (
+                  <>
+                    {/* Glow halo (stronger for the active marker). */}
+                    <circle
+                      r={isSelected ? 16 : 12}
+                      fill={`url(#hero-marker-glow${isSelected ? '-active' : ''})`}
+                    />
+                    {/* Heart glyph. Path is centered at the origin (~14×12 units)
+                        so the parent <g>'s translate+scale lands it on the globe. */}
+                    <path
+                      d="M0,3.5 C-3.5,1 -7,-1.5 -7,-4.5 C-7,-7 -5,-8.5 -3,-8.5 C-1.5,-8.5 -0.5,-7.5 0,-6.5 C0.5,-7.5 1.5,-8.5 3,-8.5 C5,-8.5 7,-7 7,-4.5 C7,-1.5 3.5,1 0,3.5 Z"
+                      fill="hsl(var(--primary))"
+                      stroke="hsl(40 100% 98%)"
+                      strokeWidth="0.6"
+                      strokeLinejoin="round"
+                    />
+                    {/* Tiny inner highlight to make the heart pop on the warm
+                        landmass without needing a heavy outline. */}
+                    <ellipse cx={-2.5} cy={-5.5} rx={1.5} ry={1} fill="hsl(40 100% 98% / 0.55)" />
+                  </>
+                ) : kind === 'community' ? (
+                  <>
+                    {/* Community: a softly-glowing ring. Reads as a circle of
+                        people, gathered. Smaller than the heart so campaigns
+                        stay the dominant signal. */}
+                    <circle r={10} fill="url(#hero-marker-glow)" />
+                    <circle
+                      r={4.2}
+                      fill="hsl(40 100% 96% / 0.92)"
+                      stroke="hsl(28 65% 45% / 0.55)"
+                      strokeWidth="0.7"
+                    />
+                    <circle r={1.4} fill="hsl(28 70% 50%)" />
+                  </>
+                ) : (
+                  <>
+                    {/* Country pulse: tiny warm sun-dot, no halo button feel.
+                        These are decorative — they trace where the world is
+                        currently posting without inviting interaction. */}
+                    <circle r={6} fill="url(#hero-marker-glow)" opacity={0.65} />
+                    <circle r={1.8} fill="hsl(38 100% 70%)" />
+                  </>
+                )}
                 {/* Transparent hit target — much easier to click/tap than the
-                    tiny visible heart, especially on touch. */}
+                    tiny visible glyph, especially on touch. */}
                 <circle
                   r={14}
                   fill="transparent"
