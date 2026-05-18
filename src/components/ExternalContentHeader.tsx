@@ -26,6 +26,8 @@ import { useWeather } from '@/hooks/useWeather';
 import { useToast } from '@/hooks/useToast';
 import { genUserName } from '@/lib/genUserName';
 import { getCountryInfo, getWikipediaTitle } from '@/lib/countries';
+import { CountryFlag } from '@/components/CountryFlag';
+import { customFlagAsset, hasCustomFlag } from '@/lib/customFlags';
 import { useWikipediaSummary } from '@/hooks/useWikipediaSummary';
 import { useCountryFacts, type CountryFacts } from '@/hooks/useCountryFacts';
 import { useCommonsAudio } from '@/hooks/useCommonsAudio';
@@ -899,7 +901,12 @@ export function CountryContentHeader({ code }: { code: string }) {
     );
   }
 
-  const heroImage = wiki?.originalImage?.source ?? wiki?.thumbnail?.source ?? null;
+  // For codes with a bundled flag asset (Tibet's Snow Lion), drive the
+  // hero banner from that SVG instead of Wikipedia's lead image. The
+  // Wikipedia article for `Tibet (autonomous region)` typically returns a
+  // map or administrative photo, which contradicts the editorial choice
+  // to surface Tibet as a country in its own right.
+  const heroImage = customFlagAsset(code) ?? wiki?.originalImage?.source ?? wiki?.thumbnail?.source ?? null;
   const isDay = weather?.isDay ?? true;
   // Sky-tint gradient layered above the hero photo. Warm amber/rose during
   // local daytime, deep indigo/violet at night. Same gradient shape, only
@@ -992,23 +999,25 @@ export function CountryContentHeader({ code }: { code: string }) {
             white text legible against any underlying photo. */}
         <div className="absolute bottom-0 left-0 right-0 px-5 pb-4 pt-10 [text-shadow:0_1px_4px_rgba(0,0,0,0.7),0_2px_8px_rgba(0,0,0,0.4)]">
           <div className="flex items-end gap-3">
-            {/* Flag + (optional) coat of arms. Subdivisions show a small
-                Wikipedia thumbnail in the same slot when available. */}
+            {/* Flag + (optional) coat of arms. Subdivisions normally
+                show a small Wikipedia thumbnail in the same slot when
+                available; entries with a bundled custom flag asset
+                (Tibet's Snow Lion) bypass that branch so our editorial
+                flag wins. */}
             <div className="flex items-end gap-2 [text-shadow:none] shrink-0">
-              {info.subdivision && wiki?.thumbnail ? (
+              {info.subdivision && wiki?.thumbnail && !hasCustomFlag(code) ? (
                 <img
                   src={wiki.thumbnail.source}
                   alt={info.subdivisionName ?? info.subdivision}
                   className="size-14 sm:size-16 rounded-md object-cover shadow-lg border border-white/20"
                 />
               ) : (
-                <span
-                  className="text-5xl sm:text-6xl leading-none drop-shadow-[0_2px_8px_rgba(0,0,0,0.6)]"
-                  role="img"
-                  aria-label={`Flag of ${info.name}`}
-                >
-                  {info.flag}
-                </span>
+                <CountryFlag
+                  code={code}
+                  emoji={info.flag}
+                  label={`Flag of ${info.subdivisionName ?? info.name}`}
+                  className="text-5xl sm:text-6xl drop-shadow-[0_2px_8px_rgba(0,0,0,0.6)]"
+                />
               )}
               {showCoatOfArms && (
                 <img
@@ -1030,7 +1039,7 @@ export function CountryContentHeader({ code }: { code: string }) {
                   <AnthemButton filename={facts.anthemFilename} title={facts.anthemTitle} />
                 )}
               </div>
-              {info.subdivision ? (
+              {info.subdivision && !hasCustomFlag(code) ? (
                 <p className="text-sm text-white/85 mt-0.5 truncate">
                   {info.name}{info.subdivisionName ? '' : ` · ${info.subdivision}`}
                 </p>
@@ -1236,14 +1245,24 @@ function BookPreview({ isbn, link }: { isbn: string; link: string }) {
 function CountryPreview({ code, link }: { code: string; link: string }) {
   const info = getCountryInfo(code);
 
+  // For ISO 3166-2 codes we treat editorially as countries (Tibet today),
+  // prefer the subdivision's own name and let `CountryFlag` swap in the
+  // bundled Snow Lion SVG instead of the parent-country emoji.
+  const displayName = hasCustomFlag(code)
+    ? info?.subdivisionName ?? info?.name ?? code
+    : info?.name ?? code;
+
   return (
     <Link
       to={link}
       className="flex items-center gap-3 px-4 py-3 border-b border-border hover:bg-secondary/30 transition-colors"
     >
-      <span className="text-2xl leading-none shrink-0" role="img" aria-label={info ? `Flag of ${info.name}` : code}>
-        {info?.flag ?? '🌍'}
-      </span>
+      <CountryFlag
+        code={code}
+        emoji={info?.flag ?? '🌍'}
+        label={`Flag of ${displayName}`}
+        className="text-2xl shrink-0"
+      />
 
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
@@ -1251,7 +1270,7 @@ function CountryPreview({ code, link }: { code: string; link: string }) {
           <span>Country</span>
         </div>
         <p className="text-sm font-medium truncate mt-0.5">
-          {info?.name ?? code}
+          {displayName}
         </p>
       </div>
 

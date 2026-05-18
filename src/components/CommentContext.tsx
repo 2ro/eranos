@@ -30,6 +30,8 @@ import { useScryfallCard } from '@/hooks/useScryfallCard';
 import { getDisplayName } from '@/lib/getDisplayName';
 import { genUserName } from '@/lib/genUserName';
 import { getCountryInfo, getWikipediaTitle } from '@/lib/countries';
+import { CountryFlag } from '@/components/CountryFlag';
+import { customFlagAsset, hasCustomFlag } from '@/lib/customFlags';
 import { useCountryFeed } from '@/contexts/CountryFeedContext';
 import { cn } from '@/lib/utils';
 import { useFlagPalette } from '@/lib/flagPalette';
@@ -811,6 +813,16 @@ function CountryPillBadge({ identifier, className }: { identifier: string; class
   const link = `/i/${encodeURIComponent(identifier)}`;
 
   const flag = info?.flag ?? '🌍';
+  // Treat ISO codes with a curated custom flag (Tibet) as country-level
+  // throughout the pill chrome — display its own name, drop the parent
+  // country sub-line, and label it as a country rather than a region.
+  const treatAsCountry = hasCustomFlag(code);
+  const displayLabel = treatAsCountry
+    ? info?.subdivisionName ?? info?.name ?? code
+    : info?.subdivisionName ?? info?.name ?? code;
+  const subLabel = !treatAsCountry && info?.subdivisionName && info.name ? info.name : null;
+  const tierLabel = info?.subdivisionName && !treatAsCountry ? 'Region' : 'Country';
+  const ariaLabel = info ? `Flag of ${displayLabel}` : code;
 
   return (
     <HoverCard openDelay={300} closeDelay={150}>
@@ -828,9 +840,9 @@ function CountryPillBadge({ identifier, className }: { identifier: string; class
             className,
           )}
         >
-          <span role="img" aria-label={info ? `Flag of ${info.name}` : code}>
-            {flag}
-          </span>
+          {/* CountryFlag swaps in a bundled SVG (Tibet's Snow Lion etc.)
+              when the ISO code has no Unicode flag — emoji otherwise. */}
+          <CountryFlag code={code} emoji={flag} label={ariaLabel} />
         </Link>
       </HoverCardTrigger>
       <HoverCardContent
@@ -841,20 +853,23 @@ function CountryPillBadge({ identifier, className }: { identifier: string; class
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center gap-3 px-4 py-3">
-          <span className="text-2xl leading-none shrink-0" role="img" aria-label={info ? `Flag of ${info.name}` : code}>
-            {flag}
-          </span>
+          <CountryFlag
+            code={code}
+            emoji={flag}
+            label={ariaLabel}
+            className="text-2xl shrink-0"
+          />
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
               <MapPin className="size-3 shrink-0" />
-              <span>{info?.subdivisionName ? 'Region' : 'Country'}</span>
+              <span>{tierLabel}</span>
             </div>
             <p className="text-sm font-medium truncate mt-0.5">
-              {info?.subdivisionName ?? info?.name ?? code}
+              {displayLabel}
             </p>
-            {info?.subdivisionName && info.name && (
+            {subLabel && (
               <p className="text-xs text-muted-foreground truncate">
-                {info.name}
+                {subLabel}
               </p>
             )}
           </div>
@@ -959,12 +974,18 @@ export function CountryFlagBackdrop({ event }: { event: NostrEvent }) {
 
   if (!ctx) return null;
 
+  // Bundled-asset override: for codes with a curated flag SVG (currently
+  // CN-XZ / Tibet) we skip Wikipedia entirely — its lead image is often
+  // a parent-country map or an administrative-region inset, neither of
+  // which reads as a flag behind a note. The Snow Lion SVG is what the
+  // post is editorially "about", so it earns the backdrop slot.
+  const bundledAsset = customFlagAsset(ctx.code);
   // For country articles Wikipedia returns the flag as the page's lead image
   // — the same source used by `CountryContentHeader`. Prefer the original
   // (full-resolution) over the 330px thumbnail; the thumbnail gets upscaled
   // and looks fuzzy when stretched across a full-width feed card.
   const flagImage = !imageFailed
-    ? (wiki?.originalImage?.source ?? wiki?.thumbnail?.source ?? null)
+    ? (bundledAsset ?? wiki?.originalImage?.source ?? wiki?.thumbnail?.source ?? null)
     : null;
 
   // Pre-built gradient using the palette (sampled from the flag emoji at

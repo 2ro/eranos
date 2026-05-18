@@ -13,6 +13,7 @@ import { useSubmissionZapTotals } from '@/hooks/useSubmissionZapTotals';
 import { useAddrEvent, type AddrCoords } from '@/hooks/useEvent';
 import { getDisplayName } from '@/lib/genUserName';
 import { getGeoDisplayName, countryCodeToFlag } from '@/lib/countries';
+import { CountryFlag } from '@/components/CountryFlag';
 import { parseCommunityEvent } from '@/lib/communityUtils';
 import { cn } from '@/lib/utils';
 
@@ -131,9 +132,12 @@ function ActionHeader({ action }: { action: Action }) {
           <div className="flex items-center gap-2 mt-2 flex-wrap">
             {action.countryCode && (
               <>
-                <span className="text-xl" title={getGeoDisplayName(action.countryCode)}>
-                  {countryCodeToFlag(action.countryCode)}
-                </span>
+                <CountryFlag
+                  code={action.countryCode}
+                  emoji={countryCodeToFlag(action.countryCode)}
+                  label={getGeoDisplayName(action.countryCode)}
+                  className="text-xl"
+                />
                 <span className="text-sm text-muted-foreground">{getGeoDisplayName(action.countryCode)}</span>
               </>
             )}

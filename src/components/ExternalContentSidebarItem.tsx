@@ -7,6 +7,7 @@ import { useMemo } from 'react';
 import { cn } from '@/lib/utils';
 import { parseExternalUri, headerLabel } from '@/lib/externalContent';
 import { getCountryInfo } from '@/lib/countries';
+import { CountryFlag } from '@/components/CountryFlag';
 import { ExternalFavicon } from '@/components/ExternalFavicon';
 import { useBookInfo } from '@/hooks/useBookInfo';
 
@@ -31,7 +32,14 @@ function ExternalSidebarIcon({ id }: { id: string }) {
   if (content.type === 'iso3166') {
     const info = getCountryInfo(content.code);
     if (info?.flag) {
-      return <span className="text-lg leading-none shrink-0">{info.flag}</span>;
+      return (
+        <CountryFlag
+          code={content.code}
+          emoji={info.flag}
+          label={info.subdivisionName ?? info.name}
+          className="text-lg shrink-0"
+        />
+      );
     }
   }
 

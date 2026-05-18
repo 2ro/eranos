@@ -6,6 +6,7 @@ import { Bitcoin, Camera, Clock, Info, Megaphone, Palette } from 'lucide-react';
 
 import { parseAction, type Action } from '@/hooks/useActions';
 import { countryCodeToFlag, getGeoDisplayName } from '@/lib/countries';
+import { CountryFlag } from '@/components/CountryFlag';
 import { DEFAULT_COVER_IMAGE } from '@/lib/defaultActionCovers';
 import { cn } from '@/lib/utils';
 
@@ -54,9 +55,12 @@ export function ActionContent({ event, compact = true }: { event: NostrEvent; co
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent" />
         {action.countryCode && (
-          <span className="absolute left-3 top-3 text-2xl drop-shadow-md" title={getGeoDisplayName(action.countryCode)}>
-            {countryCodeToFlag(action.countryCode)}
-          </span>
+          <CountryFlag
+            code={action.countryCode}
+            emoji={countryCodeToFlag(action.countryCode)}
+            label={getGeoDisplayName(action.countryCode)}
+            className="absolute left-3 top-3 text-2xl drop-shadow-md"
+          />
         )}
         <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between gap-2 text-white">
           <span className="inline-flex items-center gap-1.5 rounded-full bg-black/45 px-2.5 py-1 text-xs font-semibold backdrop-blur-sm">

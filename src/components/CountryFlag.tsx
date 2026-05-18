@@ -1,4 +1,5 @@
 import { cn } from '@/lib/utils';
+import { customFlagAsset } from '@/lib/customFlags';
 
 interface CountryFlagProps {
   /**
@@ -15,20 +16,6 @@ interface CountryFlagProps {
 }
 
 /**
- * Map of ISO codes that render as a bundled `<img>` asset instead of an
- * emoji. Unicode does not define flag emoji for everything that has a
- * recognised flag — Tibet (the Snow Lion flag) being the headline case —
- * so we ship the canonical SVG and swap it in when we can.
- *
- * Note we treat `CN-XZ` as country-level Tibet here, mirroring the
- * editorial choice the older Agora codebase made: the ISO 3166-2 code is
- * used as the identifier, but the display reads as a country.
- */
-const CUSTOM_FLAG_ASSETS: Record<string, string> = {
-  'CN-XZ': '/flag-tibet.svg',
-};
-
-/**
  * Render a flag for a country or subdivision. For codes with a bundled
  * SVG (currently Tibet) we emit an `<img>` that visually matches the
  * surrounding emoji line-height; for everything else we drop the emoji
@@ -39,14 +26,15 @@ const CUSTOM_FLAG_ASSETS: Record<string, string> = {
  * the emoji and the SVG will scale to match (`h-[1em] w-auto`).
  */
 export function CountryFlag({ code, emoji, label, className }: CountryFlagProps) {
-  const upper = code.toUpperCase();
-  const customAsset = CUSTOM_FLAG_ASSETS[upper];
+  const customAsset = customFlagAsset(code);
 
   if (customAsset) {
     return (
       // The wrapper span carries the font-size class so the inner image
       // can size itself in `em` units and stay in lockstep with the
-      // emoji glyphs on neighbouring chips.
+      // emoji glyphs on neighbouring chips. A thin border + tiny radius
+      // keeps the SVG reading as a *flag* and not a colored rectangle
+      // when it's shrunk down inside a small chip.
       <span
         className={cn('inline-flex items-center leading-none', className)}
         role="img"
@@ -56,7 +44,7 @@ export function CountryFlag({ code, emoji, label, className }: CountryFlagProps)
           src={customAsset}
           alt=""
           aria-hidden="true"
-          className="inline-block h-[1em] w-auto rounded-sm align-middle shadow-sm"
+          className="inline-block h-[1em] w-auto rounded-[2px] align-middle ring-1 ring-black/10 dark:ring-white/15 shadow-sm"
           loading="lazy"
         />
       </span>

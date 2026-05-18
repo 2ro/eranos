@@ -12,6 +12,7 @@ import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useNostrPublish } from '@/hooks/useNostrPublish';
 import { useToast } from '@/hooks/useToast';
 import { getAllCountries, getGeoDisplayName, countryCodeToFlag } from '@/lib/countries';
+import { CountryFlag } from '@/components/CountryFlag';
 import { getDisplayName } from '@/lib/genUserName';
 import { DEFAULT_COVER_IMAGE } from '@/lib/defaultActionCovers';
 import { useLayoutOptions } from '@/contexts/LayoutContext';
@@ -215,12 +216,12 @@ function ActionCard({ action, isExpired }: { action: Action; isExpired?: boolean
 
           {/* Country flag — top-left, sitting on the image */}
           {action.countryCode && (
-            <span
+            <CountryFlag
+              code={action.countryCode}
+              emoji={countryCodeToFlag(action.countryCode)}
+              label={getGeoDisplayName(action.countryCode)}
               className="absolute top-3 left-3 text-2xl drop-shadow-md"
-              title={getGeoDisplayName(action.countryCode)}
-            >
-              {countryCodeToFlag(action.countryCode)}
-            </span>
+            />
           )}
 
           {/* Deadline / expired pill — top-right */}
