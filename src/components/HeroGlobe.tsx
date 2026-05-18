@@ -13,11 +13,20 @@ interface GeoPoint {
 interface CampaignMarker extends GeoPoint {
   /** Stable key for the marker (e.g. the campaign aTag). */
   key: string;
+  /** Tooltip / accessible label shown on hover. */
+  label?: string;
 }
 
 interface HeroGlobeProps {
   /** Markers to plot on top of the globe — one per geo-located campaign. */
   markers?: CampaignMarker[];
+  /**
+   * Marker the user has selected. The selected marker gets a stronger glow
+   * and a slightly larger heart so it reads as the "live" one.
+   */
+  selectedKey?: string | null;
+  /** Fires when the user clicks a marker. */
+  onMarkerClick?: (key: string) => void;
   /** Optional className applied to the outer container. */
   className?: string;
 }
@@ -31,7 +40,7 @@ const LANDMASSES: readonly GeoPoint[][] = LAND_RINGS.map((flat) => {
   return out;
 });
 
-const RADIUS = 240;
+const RADIUS = 255;
 const CENTER = 300;
 /** Seconds per full revolution. Slow on purpose so the motion is ambient. */
 const ROTATION_PERIOD_SECONDS = 90;
@@ -70,7 +79,12 @@ function project(lat: number, lng: number, rotationDeg: number) {
  * refs so the component never re-renders during animation. Respects
  * `prefers-reduced-motion` by holding at a static angle.
  */
-export function HeroGlobe({ markers = [], className }: HeroGlobeProps) {
+export function HeroGlobe({
+  markers = [],
+  selectedKey = null,
+  onMarkerClick,
+  className,
+}: HeroGlobeProps) {
   const landRef = useRef<SVGGElement | null>(null);
   const markersRef = useRef<SVGGElement | null>(null);
 
@@ -94,6 +108,24 @@ export function HeroGlobe({ markers = [], className }: HeroGlobeProps) {
         : (elapsedSeconds / ROTATION_PERIOD_SECONDS) * 360;
 
       // --- Landmass polygons ---
+      //
+      // For each ring we walk vertex-by-vertex projecting through the
+      // orthographic camera. Vertices on the *front* of the sphere
+      // (z > 0) are kept as-is. Vertices on the *back* (z < 0) would
+      // otherwise project on top of front-side land — orthographic
+      // projection collapses depth — so we drop them.
+      //
+      // Where a ring crosses the visible limb (front ↔ back) we emit an
+      // interpolated point on the limb itself, so polygons that wrap
+      // around the side of the globe close cleanly along the sphere's
+      // outline instead of cutting across the disc interior.
+      //
+      // We also fade rings out over a narrow band near the limb so they
+      // don't pop on/off when crossing z = 0. Anything with maxZ below
+      // FADE_OUT is considered fully hidden; rings between FADE_OUT and
+      // FADE_IN ease in/out.
+      const FADE_OUT = 0.0;
+      const FADE_IN = 0.08;
       const landEl = landRef.current;
       if (landEl) {
         const polygons = landEl.children;
@@ -101,24 +133,60 @@ export function HeroGlobe({ markers = [], className }: HeroGlobeProps) {
           const ring = LANDMASSES[i];
           const polygon = polygons[i] as SVGPolygonElement | undefined;
           if (!polygon) continue;
-          // Project every vertex; if the whole ring is on the back hemisphere
-          // we just hide it. Rings that straddle the limb are clipped by the
-          // sphere mask defined in <defs>, so we can emit them unmodified.
+
+          // First pass: project every vertex, remembering z so we can
+          // detect front/back transitions cheaply.
+          const n = ring.length;
+          const xs = new Array<number>(n);
+          const ys = new Array<number>(n);
+          const zs = new Array<number>(n);
           let maxZ = -1;
-          const parts: string[] = [];
-          for (let j = 0; j < ring.length; j++) {
+          for (let j = 0; j < n; j++) {
             const p = project(ring[j].lat, ring[j].lng, rotation);
+            xs[j] = p.x;
+            ys[j] = p.y;
+            zs[j] = p.z;
             if (p.z > maxZ) maxZ = p.z;
-            parts.push(`${p.x.toFixed(1)},${p.y.toFixed(1)}`);
           }
-          if (maxZ <= 0) {
+          if (maxZ <= FADE_OUT) {
+            polygon.setAttribute('opacity', '0');
+            continue;
+          }
+
+          // Second pass: emit only the visible portion. For each edge we
+          // include the endpoint when it's in front, and any limb-crossing
+          // we step over gets an interpolated point on the sphere edge.
+          const parts: string[] = [];
+          for (let j = 0; j < n; j++) {
+            const k = (j + 1) % n;
+            const zj = zs[j];
+            const zk = zs[k];
+            if (zj > 0) parts.push(`${xs[j].toFixed(1)},${ys[j].toFixed(1)}`);
+            if ((zj > 0) !== (zk > 0)) {
+              // Find the parameter t in [0,1] along this edge where z=0.
+              const t = zj / (zj - zk);
+              const ex = xs[j] + (xs[k] - xs[j]) * t;
+              const ey = ys[j] + (ys[k] - ys[j]) * t;
+              // Project the limb point onto the actual sphere edge so it
+              // never lands inside the disc.
+              const dx = ex - CENTER;
+              const dy = ey - CENTER;
+              const d = Math.hypot(dx, dy) || 1;
+              const lx = CENTER + (dx / d) * RADIUS;
+              const ly = CENTER + (dy / d) * RADIUS;
+              parts.push(`${lx.toFixed(1)},${ly.toFixed(1)}`);
+            }
+          }
+          if (parts.length < 3) {
             polygon.setAttribute('opacity', '0');
             continue;
           }
           polygon.setAttribute('points', parts.join(' '));
-          // Slightly fade rings sitting close to the limb so the sphere
-          // edges feel less hard.
-          polygon.setAttribute('opacity', Math.min(1, 0.5 + maxZ * 0.6).toFixed(2));
+          // Smooth fade as rings come around the limb. `fade` clamps to
+          // [0,1] over the narrow FADE_OUT→FADE_IN band, then we keep
+          // adding the small depth-based dimming used before.
+          const fade = Math.min(1, Math.max(0, (maxZ - FADE_OUT) / (FADE_IN - FADE_OUT)));
+          polygon.setAttribute('opacity', (fade * Math.min(1, 0.55 + maxZ * 0.55)).toFixed(2));
         }
       }
 
@@ -133,9 +201,16 @@ export function HeroGlobe({ markers = [], className }: HeroGlobeProps) {
           const p = project(m.lat, m.lng, rotation);
           if (p.z <= 0) {
             group.setAttribute('opacity', '0');
+            // Pull off-canvas so backside markers don't intercept clicks.
+            group.setAttribute('transform', 'translate(-1000 -1000)');
             continue;
           }
-          group.setAttribute('transform', `translate(${p.x.toFixed(2)} ${p.y.toFixed(2)})`);
+          // Selected marker scales up subtly to read as "you are here".
+          const scale = m.key === selectedKey ? 1.35 : 1;
+          group.setAttribute(
+            'transform',
+            `translate(${p.x.toFixed(2)} ${p.y.toFixed(2)}) scale(${scale})`,
+          );
           group.setAttribute('opacity', (0.55 + p.z * 0.45).toFixed(2));
         }
       }
@@ -147,24 +222,26 @@ export function HeroGlobe({ markers = [], className }: HeroGlobeProps) {
 
     rafId = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(rafId);
-  }, [markers, ringSizes]);
+  }, [markers, ringSizes, selectedKey]);
 
   return (
-    <div className={className} aria-hidden="true">
+    <div className={className}>
       <svg
         viewBox="0 0 600 600"
         className="size-full"
-        role="presentation"
+        role="img"
+        aria-label="Globe showing locations of active fundraising campaigns"
         focusable="false"
       >
         <defs>
           {/* Sphere base: warm cream lit from the upper-left, fading to a
               slightly cooler shadow on the lower-right. Deliberately
-              non-blue to avoid the satellite/HUD look. */}
+              non-blue to avoid the satellite/HUD look. Kept partially
+              translucent so the hero photo bleeds through softly. */}
           <radialGradient id="hero-globe-base" cx="35%" cy="32%" r="75%">
-            <stop offset="0%" stopColor="hsl(40 90% 96%)" />
-            <stop offset="55%" stopColor="hsl(34 60% 86%)" />
-            <stop offset="100%" stopColor="hsl(28 35% 70%)" />
+            <stop offset="0%" stopColor="hsl(40 90% 96% / 0.75)" />
+            <stop offset="55%" stopColor="hsl(34 60% 86% / 0.7)" />
+            <stop offset="100%" stopColor="hsl(28 35% 70% / 0.65)" />
           </radialGradient>
           {/* Subtle warm rim light along the limb. */}
           <radialGradient id="hero-globe-rim" cx="50%" cy="50%" r="50%">
@@ -176,10 +253,17 @@ export function HeroGlobe({ markers = [], className }: HeroGlobeProps) {
             <stop offset="0%" stopColor="hsl(50 100% 98% / 0.7)" />
             <stop offset="100%" stopColor="hsl(50 100% 98% / 0)" />
           </radialGradient>
-          {/* Marker glow halo. */}
+          {/* Marker glow halo. Soft, warm, no pulsing. */}
           <radialGradient id="hero-marker-glow" cx="50%" cy="50%" r="50%">
-            <stop offset="0%" stopColor="hsl(var(--primary))" stopOpacity="0.7" />
-            <stop offset="70%" stopColor="hsl(var(--primary))" stopOpacity="0.15" />
+            <stop offset="0%" stopColor="hsl(var(--primary))" stopOpacity="0.55" />
+            <stop offset="70%" stopColor="hsl(var(--primary))" stopOpacity="0.12" />
+            <stop offset="100%" stopColor="hsl(var(--primary))" stopOpacity="0" />
+          </radialGradient>
+          {/* Stronger halo used for the selected marker so it visibly leads
+              the eye to whatever the spotlight card is currently showing. */}
+          <radialGradient id="hero-marker-glow-active" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stopColor="hsl(var(--primary))" stopOpacity="0.9" />
+            <stop offset="55%" stopColor="hsl(var(--primary))" stopOpacity="0.3" />
             <stop offset="100%" stopColor="hsl(var(--primary))" stopOpacity="0" />
           </radialGradient>
           {/* Clip everything to the sphere so polygons straddling the
@@ -197,8 +281,8 @@ export function HeroGlobe({ markers = [], className }: HeroGlobeProps) {
           <g
             ref={landRef}
             fill="hsl(30 55% 52%)"
-            stroke="hsl(28 50% 40% / 0.35)"
-            strokeWidth="0.6"
+            stroke="hsl(28 50% 40% / 0.25)"
+            strokeWidth="0.3"
             strokeLinejoin="round"
           >
             {LANDMASSES.map((_, i) => (
@@ -224,16 +308,64 @@ export function HeroGlobe({ markers = [], className }: HeroGlobeProps) {
           pointerEvents="none"
         />
 
-        {/* Campaign markers — a soft halo and a small solid dot. No pulsing,
-            no targeting reticle, no "ping" animation. */}
+        {/* Campaign markers — a small heart glyph with a warm glow halo.
+            Each marker is a button: clicking selects the campaign, which
+            the parent uses to populate the spotlight card. */}
         <g ref={markersRef}>
-          {markers.map((m) => (
-            <g key={m.key} opacity={0} transform="translate(-10 -10)">
-              <circle r={11} fill="url(#hero-marker-glow)" />
-              <circle r={3} fill="hsl(var(--primary))" />
-              <circle r={1.2} fill="hsl(40 100% 96%)" />
-            </g>
-          ))}
+          {markers.map((m) => {
+            const isSelected = m.key === selectedKey;
+            return (
+              <g
+                key={m.key}
+                opacity={0}
+                transform="translate(-1000 -1000)"
+                role={onMarkerClick ? 'button' : undefined}
+                tabIndex={onMarkerClick ? 0 : undefined}
+                aria-label={m.label ?? 'View campaign'}
+                aria-pressed={onMarkerClick ? isSelected : undefined}
+                onClick={onMarkerClick ? () => onMarkerClick(m.key) : undefined}
+                onKeyDown={
+                  onMarkerClick
+                    ? (e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                          e.preventDefault();
+                          onMarkerClick(m.key);
+                        }
+                      }
+                    : undefined
+                }
+                style={{
+                  cursor: onMarkerClick ? 'pointer' : undefined,
+                  outline: 'none',
+                }}
+              >
+                {/* Glow halo (stronger for the active marker). */}
+                <circle
+                  r={isSelected ? 16 : 12}
+                  fill={`url(#hero-marker-glow${isSelected ? '-active' : ''})`}
+                />
+                {/* Heart glyph. Path is centered at the origin (~14×12 units)
+                    so the parent <g>'s translate+scale lands it on the globe. */}
+                <path
+                  d="M0,3.5 C-3.5,1 -7,-1.5 -7,-4.5 C-7,-7 -5,-8.5 -3,-8.5 C-1.5,-8.5 -0.5,-7.5 0,-6.5 C0.5,-7.5 1.5,-8.5 3,-8.5 C5,-8.5 7,-7 7,-4.5 C7,-1.5 3.5,1 0,3.5 Z"
+                  fill="hsl(var(--primary))"
+                  stroke="hsl(40 100% 98%)"
+                  strokeWidth="0.6"
+                  strokeLinejoin="round"
+                />
+                {/* Tiny inner highlight to make the heart pop on the warm
+                    landmass without needing a heavy outline. */}
+                <ellipse cx={-2.5} cy={-5.5} rx={1.5} ry={1} fill="hsl(40 100% 98% / 0.55)" />
+                {/* Transparent hit target — much easier to click/tap than the
+                    tiny visible heart, especially on touch. */}
+                <circle
+                  r={14}
+                  fill="transparent"
+                  style={{ cursor: onMarkerClick ? 'pointer' : 'default' }}
+                />
+              </g>
+            );
+          })}
         </g>
       </svg>
     </div>

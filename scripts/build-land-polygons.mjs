@@ -17,45 +17,6 @@ const REPO_ROOT = path.resolve(__dirname, '..');
 const INPUT = process.argv[2] ?? '/tmp/opencode/countries-110m.json';
 const OUTPUT = path.join(REPO_ROOT, 'src/lib/landPolygons.ts');
 
-/** Douglas-Peucker on a polyline of [lng, lat] pairs. */
-function simplify(points, tolerance) {
-  if (points.length < 3) return points.slice();
-  const sqTol = tolerance * tolerance;
-
-  function sqSegDist(p, a, b) {
-    let x = a[0], y = a[1];
-    let dx = b[0] - x, dy = b[1] - y;
-    if (dx !== 0 || dy !== 0) {
-      const t = ((p[0] - x) * dx + (p[1] - y) * dy) / (dx * dx + dy * dy);
-      if (t > 1) { x = b[0]; y = b[1]; }
-      else if (t > 0) { x += dx * t; y += dy * t; }
-    }
-    dx = p[0] - x;
-    dy = p[1] - y;
-    return dx * dx + dy * dy;
-  }
-
-  function dp(first, last, simplified) {
-    let maxSqDist = sqTol;
-    let index = -1;
-    for (let i = first + 1; i < last; i++) {
-      const sqDist = sqSegDist(points[i], points[first], points[last]);
-      if (sqDist > maxSqDist) { index = i; maxSqDist = sqDist; }
-    }
-    if (index !== -1) {
-      if (index - first > 1) dp(first, index, simplified);
-      simplified.push(points[index]);
-      if (last - index > 1) dp(index, last, simplified);
-    }
-  }
-
-  const last = points.length - 1;
-  const simplified = [points[0]];
-  dp(0, last, simplified);
-  simplified.push(points[last]);
-  return simplified;
-}
-
 const topo = JSON.parse(fs.readFileSync(INPUT, 'utf8'));
 const layer = topo.objects.countries;
 const transform = topo.transform;
@@ -114,19 +75,17 @@ for (const feature of layer.geometries) {
   }
 }
 
-// Aggressive simplification: tolerance is in degrees. ~1.2° drops most coastal
-// noise while keeping continent shapes recognizable at hero scale.
-const TOLERANCE_DEG = 1.2;
-// Drop tiny islands whose simplified ring would be near-useless.
-const MIN_VERTS_AFTER = 4;
+// Use the full Natural Earth 110m resolution. We skip Douglas-Peucker
+// entirely so coastlines look organic at hero scale rather than blocky.
+// We still quantize to 0.1° (well below the rendered pixel size on a
+// ~600 px globe) which is a free ~30 % byte saving with no visible loss.
+const MIN_VERTS = 3;
 
 const simplifiedRings = [];
 for (const ring of rings) {
-  const s = simplify(ring, TOLERANCE_DEG);
-  if (s.length < MIN_VERTS_AFTER) continue;
-  // Quantize to 0.1° to shave bytes — well below the resolution we render at.
+  if (ring.length < MIN_VERTS) continue;
   const flat = [];
-  for (const [lng, lat] of s) {
+  for (const [lng, lat] of ring) {
     flat.push(Math.round(lng * 10) / 10, Math.round(lat * 10) / 10);
   }
   simplifiedRings.push(flat);

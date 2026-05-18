@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useSeoMeta } from '@unhead/react';
 import { useQueries } from '@tanstack/react-query';
@@ -10,6 +10,8 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { CampaignCard, CampaignCardSkeleton } from '@/components/CampaignCard';
 import { HeroGlobe } from '@/components/HeroGlobe';
+import { HeroCampaignSpotlight } from '@/components/HeroCampaignSpotlight';
+import { CampaignHeroBackground } from '@/components/CampaignHeroBackground';
 import { useCampaigns } from '@/hooks/useCampaigns';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useLayoutOptions } from '@/contexts/LayoutContext';
@@ -117,70 +119,172 @@ export function CampaignsPage() {
     [allCampaigns, featuredCoords],
   );
 
-  // Geo-locate campaigns for the hero globe. We match the free-form
-  // `location` field against ISO 3166-1 names/codes and fall back to the
-  // country capital coordinates. Campaigns without a resolvable location
-  // simply don't get a marker.
-  const globeMarkers = useMemo(() => {
-    const out: { key: string; lat: number; lng: number }[] = [];
-    const seen = new Set<string>();
-    for (const c of allCampaigns ?? []) {
-      if (!c.location) continue;
+  // Build the spotlight pool: every campaign that has both a parseable
+  // location AND would make sense to feature. Featured campaigns come first
+  // (in their hand-picked order), then everything else, newest first.
+  //
+  // Each entry resolves a country code from the free-form `location` field
+  // and pulls the country's capital coordinates from `getCoordinates`. The
+  // globe uses these to place a heart marker; the spotlight card uses the
+  // full `campaign` object.
+  const spotlightables = useMemo(() => {
+    type Entry = {
+      key: string;
+      campaign: ParsedCampaign;
+      lat: number;
+      lng: number;
+    };
+    const out: Entry[] = [];
+    const seenAtag = new Set<string>();
+    const seenCountry = new Set<string>();
+
+    const add = (c: ParsedCampaign) => {
+      if (seenAtag.has(c.aTag)) return;
+      if (!c.location) return;
       const match = searchCountry(c.location);
-      if (!match) continue;
+      if (!match) return;
       const coords = getCoordinates(match.country.code);
-      if (!coords) continue;
+      if (!coords) return;
       // Deduplicate by country so a single popular country doesn't pile
-      // dozens of overlapping markers on top of each other.
-      if (seen.has(match.country.code)) continue;
-      seen.add(match.country.code);
-      out.push({ key: c.aTag, lat: coords.latitude, lng: coords.longitude });
+      // dozens of overlapping markers on top of each other. We keep the
+      // first one we see, which — given the iteration order below — means
+      // featured wins, then newest.
+      if (seenCountry.has(match.country.code)) return;
+      seenAtag.add(c.aTag);
+      seenCountry.add(match.country.code);
+      out.push({ key: c.aTag, campaign: c, lat: coords.latitude, lng: coords.longitude });
+    };
+
+    for (const c of visibleFeatured) {
+      if (c) add(c);
     }
+    for (const c of allCampaigns ?? []) add(c);
     return out;
-  }, [allCampaigns]);
+  }, [visibleFeatured, allCampaigns]);
+
+  const globeMarkers = useMemo(
+    () =>
+      spotlightables.map((s) => ({
+        key: s.key,
+        lat: s.lat,
+        lng: s.lng,
+        label: s.campaign.title,
+      })),
+    [spotlightables],
+  );
+
+  // Selection lives here so the globe and the spotlight card stay in sync.
+  // `null` means "auto-cycle through the spotlightables"; clicking a marker
+  // pins the selection until the user clicks a different one.
+  const [selectedKey, setSelectedKey] = useState<string | null>(null);
+  // A separate cursor advances when no marker is selected, so cycling
+  // continues to drive the spotlight even while the user is reading.
+  const [cycleIndex, setCycleIndex] = useState(0);
+
+  useEffect(() => {
+    if (selectedKey !== null) return;
+    if (spotlightables.length <= 1) return;
+    const id = window.setInterval(() => {
+      setCycleIndex((i) => (i + 1) % spotlightables.length);
+    }, 6_000);
+    return () => window.clearInterval(id);
+  }, [selectedKey, spotlightables.length]);
+
+  // Resolve the spotlight to actually display.
+  const spotlightCampaign = useMemo(() => {
+    if (selectedKey) {
+      return spotlightables.find((s) => s.key === selectedKey)?.campaign ?? null;
+    }
+    if (spotlightables.length === 0) return null;
+    return spotlightables[cycleIndex % spotlightables.length].campaign;
+  }, [selectedKey, cycleIndex, spotlightables]);
+
+  // The key the globe should highlight matches whatever the card shows.
+  const highlightedMarkerKey = useMemo(() => {
+    if (selectedKey) return selectedKey;
+    if (spotlightables.length === 0) return null;
+    return spotlightables[cycleIndex % spotlightables.length].key;
+  }, [selectedKey, cycleIndex, spotlightables]);
 
   return (
     <main className="min-h-screen pb-16">
-      {/* Hero */}
-      <section className="relative overflow-hidden border-b border-border bg-gradient-to-br from-primary/15 via-background to-secondary/40">
-        {/* Slow-spinning globe sits behind the text. Positioned to the right
-            on wider viewports so it doesn't fight the headline for attention,
-            and pulled mostly off-screen on mobile so it still reads as an
-            ambient accent without crowding the copy. */}
-        <div
-          className="pointer-events-none absolute inset-y-0 right-[-30%] sm:right-[-20%] lg:right-[-8%] flex items-center justify-end opacity-60 sm:opacity-70"
-          aria-hidden="true"
-        >
-          <HeroGlobe
-            markers={globeMarkers}
-            className="aspect-square w-[520px] sm:w-[600px] lg:w-[680px] max-w-none"
-          />
+      {/* Hero.
+
+          Layered, back-to-front:
+            1. CampaignHeroBackground — full-bleed crossfading banner image
+               from the currently-spotlit campaign, with a warm tint + film
+               grain so headlines stay legible.
+            2. HeroGlobe — large slow-spinning globe anchored to the right,
+               heart markers click-select campaigns.
+            3. Headline column — title + paragraph + CTAs, top-left.
+            4. HeroCampaignSpotlight — title + summary + "View campaign"
+               button for the active campaign, bottom-right.
+
+          Inspired by the Treasures HeroGallery pattern: the photo IS the
+          background, everything else floats over it. */}
+      <section className="relative overflow-hidden border-b border-border bg-secondary/40">
+        <CampaignHeroBackground imageUrl={spotlightCampaign?.image} />
+
+        {/* Globe sits in front of the photo BG but behind the text /
+            spotlight card. Anchored to the right edge and pushed further
+            off-screen so most of it sits beyond the viewport — the visible
+            arc reads as a horizon rather than a centered illustration. */}
+        <div className="absolute inset-0 flex items-center justify-end pointer-events-none">
+          <div className="pointer-events-auto translate-x-[40%] sm:translate-x-[32%] lg:translate-x-[22%] opacity-90">
+            <HeroGlobe
+              markers={globeMarkers}
+              selectedKey={highlightedMarkerKey}
+              onMarkerClick={(key) =>
+                // Toggle off when the user re-clicks the active marker,
+                // restoring the auto-cycle.
+                setSelectedKey((prev) => (prev === key ? null : key))
+              }
+              className="aspect-square w-[560px] sm:w-[680px] lg:w-[820px] max-w-none drop-shadow-2xl"
+            />
+          </div>
         </div>
 
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 py-14 lg:py-20">
-          <div className="max-w-3xl space-y-5">
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight leading-[1.1]">
+        {/* Foreground content — headline + CTAs at the top, spotlight info
+            at the bottom. Both share the same container so they line up
+            against the same left edge as the rest of the page. */}
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 py-14 lg:py-20 min-h-[560px] sm:min-h-[600px] lg:min-h-[640px] flex flex-col">
+          <div className="space-y-5 max-w-2xl">
+            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight leading-[1.1] drop-shadow-sm">
               Connecting activists to unstoppable funding.
             </h1>
-            <p className="text-base sm:text-lg text-muted-foreground max-w-2xl">
+            <p className="text-base sm:text-lg text-foreground/80 max-w-2xl">
               Raise Bitcoin directly from supporters around the world. Every donation settles
               straight to your campaign's beneficiaries, with no middlemen, no chargebacks, and no
               platform holding your funds.
             </p>
             <div className="flex flex-wrap gap-3 pt-2">
-              <Button size="lg" asChild className="rounded-full">
+              <Button size="lg" asChild className="rounded-full shadow-lg">
                 <Link to="/campaigns/new">
                   <PlusCircle className="size-4 mr-2" />
                   Start a campaign
                 </Link>
               </Button>
               {!user && (
-                <Button variant="outline" size="lg" asChild className="rounded-full">
+                <Button
+                  variant="outline"
+                  size="lg"
+                  asChild
+                  className="rounded-full bg-background/70 backdrop-blur"
+                >
                   <a href="#campaigns">Explore campaigns</a>
                 </Button>
               )}
             </div>
           </div>
+
+          {(spotlightCampaign || (featuredLoading && spotlightables.length === 0)) && (
+            <div className="mt-auto pt-10 max-w-sm">
+              <HeroCampaignSpotlight
+                campaign={spotlightCampaign}
+                isLoading={featuredLoading && spotlightables.length === 0}
+              />
+            </div>
+          )}
         </div>
       </section>
 

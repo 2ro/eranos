@@ -14,23 +14,11 @@ import {
   type ParsedCampaign,
   encodeCampaignNaddr,
 } from '@/lib/campaign';
-import { fetchBtcPrice, satsToUSDWhole } from '@/lib/bitcoin';
+import { fetchBtcPrice } from '@/lib/bitcoin';
+import { formatCampaignAmount } from '@/lib/formatCampaignAmount';
 import { genUserName } from '@/lib/genUserName';
 import { sanitizeUrl } from '@/lib/sanitizeUrl';
 import { cn } from '@/lib/utils';
-
-/** Formats a sats count into `1,234,567 sats` or `0.012 BTC` once large. */
-function formatSatsShort(sats: number): string {
-  if (sats >= 100_000_000) return `${(sats / 100_000_000).toFixed(2)} BTC`;
-  if (sats >= 1_000_000) return `${(sats / 1_000_000).toFixed(2)}M sats`;
-  if (sats >= 10_000) return `${(sats / 1_000).toFixed(0)}K sats`;
-  return `${sats.toLocaleString()} sats`;
-}
-
-function formatCampaignAmount(sats: number, btcPrice: number | undefined): string {
-  if (btcPrice) return satsToUSDWhole(sats, btcPrice);
-  return formatSatsShort(sats);
-}
 
 function formatDeadline(unixSeconds: number): { label: string; isPast: boolean } {
   const now = Math.floor(Date.now() / 1000);

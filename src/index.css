@@ -722,3 +722,22 @@
 .scrollbar-thin::-webkit-scrollbar-track {
   background: transparent;
 }
+
+/* Slow Ken-Burns-style pan for full-bleed hero images. The image is
+   oversized (scale 1.12) so the translation never reveals the edge. */
+@keyframes heroPanRight {
+  0%   { transform: scale(1.12) translateX(-1.5%); }
+  50%  { transform: scale(1.12) translateX(1.5%); }
+  100% { transform: scale(1.12) translateX(-1.5%); }
+}
+@keyframes heroPanLeft {
+  0%   { transform: scale(1.12) translateX(1.5%); }
+  50%  { transform: scale(1.12) translateX(-1.5%); }
+  100% { transform: scale(1.12) translateX(1.5%); }
+}
+.hero-pan-right { animation: heroPanRight 28s ease-in-out infinite; }
+.hero-pan-left  { animation: heroPanLeft 28s ease-in-out infinite; }
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-pan-right, .hero-pan-left { animation: none; }
+}
