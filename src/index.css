@@ -738,6 +738,18 @@
 .hero-pan-right { animation: heroPanRight 28s ease-in-out infinite; }
 .hero-pan-left  { animation: heroPanLeft 28s ease-in-out infinite; }
 
+/* Slow breathing glow used on the hero globe's outer halo so the beacon
+   feels alive rather than statically pasted. The radius itself doesn't
+   change — only opacity — so the layout stays rock-stable. Range is
+   intentionally narrow + low so the halo is felt, not seen. */
+@keyframes heroGlobeHaloBreath {
+  0%   { opacity: 0.32; }
+  50%  { opacity: 0.55; }
+  100% { opacity: 0.32; }
+}
+.hero-globe-halo-breath { animation: heroGlobeHaloBreath 6.5s ease-in-out infinite; }
+
 @media (prefers-reduced-motion: reduce) {
   .hero-pan-right, .hero-pan-left { animation: none; }
+  .hero-globe-halo-breath { animation: none; opacity: 0.42; }
 }

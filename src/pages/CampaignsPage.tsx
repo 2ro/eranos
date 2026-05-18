@@ -12,6 +12,8 @@ import { CampaignCard, CampaignCardSkeleton } from '@/components/CampaignCard';
 import { HeroGlobe } from '@/components/HeroGlobe';
 import { HeroCampaignSpotlight } from '@/components/HeroCampaignSpotlight';
 import { CampaignHeroBackground } from '@/components/CampaignHeroBackground';
+import { HeroAtmosphere } from '@/components/HeroAtmosphere';
+import { hopeHueFor } from '@/lib/hopePalette';
 import { useCampaigns } from '@/hooks/useCampaigns';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useLayoutOptions } from '@/contexts/LayoutContext';
@@ -206,6 +208,14 @@ export function CampaignsPage() {
     return spotlightables[cycleIndex % spotlightables.length].key;
   }, [selectedKey, cycleIndex, spotlightables]);
 
+  // Active "hopeful" hue keyed to the spotlit campaign. Both the
+  // surrounding atmosphere and the globe consume this so the entire
+  // hero shifts color together as campaigns cycle.
+  const activeHue = useMemo(
+    () => hopeHueFor(spotlightCampaign?.aTag),
+    [spotlightCampaign?.aTag],
+  );
+
   return (
     <main className="min-h-screen pb-16">
       {/* Hero.
@@ -225,30 +235,54 @@ export function CampaignsPage() {
       <section className="relative overflow-hidden border-b border-border bg-secondary/40">
         <CampaignHeroBackground imageUrl={spotlightCampaign?.image} />
 
-        {/* Globe sits in front of the photo BG but behind the text /
-            spotlight card. Anchored to the right edge and pushed further
-            off-screen so most of it sits beyond the viewport — the visible
-            arc reads as a horizon rather than a centered illustration. */}
-        <div className="absolute inset-0 flex items-center justify-end pointer-events-none">
-          <div className="pointer-events-auto translate-x-[30%] sm:translate-x-[22%] lg:translate-x-[12%] opacity-90">
-            <HeroGlobe
-              markers={globeMarkers}
-              selectedKey={highlightedMarkerKey}
-              onMarkerClick={(key) =>
-                // Toggle off when the user re-clicks the active marker,
-                // restoring the auto-cycle.
-                setSelectedKey((prev) => (prev === key ? null : key))
-              }
-              className="aspect-square w-[560px] sm:w-[680px] lg:w-[820px] max-w-none drop-shadow-2xl"
-            />
+        {/* Per-campaign hopeful color atmosphere. Sits on top of the
+            photo and below the globe so its mix-blend-mode: screen layers
+            can warm the darks back up — the photo ends up tinted toward
+            the active hue without losing headline contrast. */}
+        <HeroAtmosphere seed={spotlightCampaign?.aTag} />
+
+        {/* Globe — center sits a little to the left of the TopNav account
+            switcher anchor so a larger slice of the sphere reads inside
+            the hero rather than off the right edge. */}
+        <div className="absolute inset-0 pointer-events-none">
+          <div className="relative max-w-7xl mx-auto h-full px-4 sm:px-6">
+            <div className="absolute inset-y-0 right-4 sm:right-6 flex items-center">
+              <div className="pointer-events-auto translate-x-[40%] sm:translate-x-[38%] lg:translate-x-[38%] opacity-90">
+                <HeroGlobe
+                  markers={globeMarkers}
+                  selectedKey={highlightedMarkerKey}
+                  onMarkerClick={(key) =>
+                    // Toggle off when the user re-clicks the active
+                    // marker, restoring the auto-cycle.
+                    setSelectedKey((prev) => (prev === key ? null : key))
+                  }
+                  hue={activeHue}
+                  // Fluid sizing scaled to dynamic viewport width (dvw),
+                  // clamped so it never shrinks below phone-comfortable
+                  // nor balloons on ultra-wide monitors.
+                  className="aspect-square max-w-none drop-shadow-2xl"
+                  style={{ width: 'clamp(360px, 46dvw, 820px)' }}
+                />
+              </div>
+            </div>
           </div>
         </div>
 
+        {/* Readability scrim. Layered *above* the globe so the headline
+            area stays legible even when a slice of the sphere sits behind
+            it. Only shown on tablet and below — at lg+ the globe sits
+            outside the headline column, so the scrim would just mute the
+            photo for no benefit. */}
+        <div
+          className="absolute inset-0 pointer-events-none bg-gradient-to-r from-black/55 via-black/30 to-transparent lg:hidden"
+          aria-hidden="true"
+        />
+
         {/* Foreground content — headline + CTAs at the top, spotlight info
-            at the bottom. Both share the same container so they line up
-            against the same left edge as the rest of the page. */}
+            at the bottom. Shares the `max-w-7xl mx-auto` container with the
+            globe so everything aligns to the same left/right axis. */}
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 py-14 lg:py-20 min-h-[560px] sm:min-h-[600px] lg:min-h-[640px] flex flex-col">
-          <div className="space-y-5 max-w-2xl">
+          <div className="relative space-y-5 max-w-2xl">
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight leading-[1.1] drop-shadow-sm">
               Connecting activists to unstoppable funding.
             </h1>
@@ -278,7 +312,7 @@ export function CampaignsPage() {
           </div>
 
           {(spotlightCampaign || (featuredLoading && spotlightables.length === 0)) && (
-            <div className="mt-auto pt-10 max-w-sm">
+            <div className="relative mt-auto pt-10 max-w-sm">
               <HeroCampaignSpotlight
                 campaign={spotlightCampaign}
                 isLoading={featuredLoading && spotlightables.length === 0}

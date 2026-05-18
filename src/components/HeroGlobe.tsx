@@ -1,6 +1,8 @@
+import type { CSSProperties } from 'react';
 import { useEffect, useMemo, useRef } from 'react';
 
 import { LAND_RINGS } from '@/lib/landPolygons';
+import { HOPE_PALETTE, type HopeHue } from '@/lib/hopePalette';
 
 /** Geographic point used by the globe projection. */
 interface GeoPoint {
@@ -27,8 +29,15 @@ interface HeroGlobeProps {
   selectedKey?: string | null;
   /** Fires when the user clicks a marker. */
   onMarkerClick?: (key: string) => void;
+  /**
+   * Active hopeful hue. Drives the outer halo color and the back-lit
+   * limb tint so the globe agrees with the surrounding {@link HeroAtmosphere}.
+   */
+  hue?: HopeHue;
   /** Optional className applied to the outer container. */
   className?: string;
+  /** Optional inline style applied to the outer container (e.g. fluid width via `clamp()`). */
+  style?: CSSProperties;
 }
 
 /** Pre-parsed land rings as arrays of {lat, lng} points. */
@@ -40,7 +49,7 @@ const LANDMASSES: readonly GeoPoint[][] = LAND_RINGS.map((flat) => {
   return out;
 });
 
-const RADIUS = 255;
+const RADIUS = 285;
 const CENTER = 300;
 /** Seconds per full revolution. Slow on purpose so the motion is ambient. */
 const ROTATION_PERIOD_SECONDS = 140;
@@ -83,7 +92,9 @@ export function HeroGlobe({
   markers = [],
   selectedKey = null,
   onMarkerClick,
+  hue = HOPE_PALETTE[0],
   className,
+  style,
 }: HeroGlobeProps) {
   const landRef = useRef<SVGGElement | null>(null);
   const markersRef = useRef<SVGGElement | null>(null);
@@ -225,32 +236,58 @@ export function HeroGlobe({
   }, [markers, ringSizes, selectedKey]);
 
   return (
-    <div className={className}>
-      <svg
-        viewBox="0 0 600 600"
-        className="size-full"
-        role="img"
-        aria-label="Globe showing locations of active fundraising campaigns"
-        focusable="false"
-      >
+    <div className={className} style={style}>
+      {/* Wrapper so the outer halo can sit behind the SVG. The halo is a
+          plain div (not part of the SVG) so its blur extends past the
+          sphere without needing a giant viewBox, and so we can drive it
+          with a CSS keyframe animation independent of the rotation. */}
+      <div className="relative size-full">
+        {/* Outer atmospheric halo. Scaled larger than the wrapper so light
+            spills out into the photo, blurred for softness, and tinted
+            with the active campaign's hopeful hue. Breathes slowly via
+            the .hero-globe-halo-breath class defined in index.css. */}
+        <div
+          className="hero-globe-halo-breath absolute inset-[-15%] pointer-events-none"
+          aria-hidden="true"
+          style={{
+            backgroundImage: `radial-gradient(closest-side, ${hue.glow} 0%, ${hue.rim} 30%, transparent 70%)`,
+            filter: 'blur(40px)',
+            // background-image isn't actually transitionable across
+            // gradient stops in CSS, but keeping the declaration here
+            // documents that the hue swap is driven by React re-renders
+            // synced to the HeroAtmosphere crossfade.
+          }}
+        />
+
+        <svg
+          viewBox="0 0 600 600"
+          className="relative size-full"
+          role="img"
+          aria-label="Globe showing locations of active fundraising campaigns"
+          focusable="false"
+        >
         <defs>
-          {/* Sphere base: warm cream lit from the upper-left, fading to a
-              slightly cooler shadow on the lower-right. Deliberately
-              non-blue to avoid the satellite/HUD look. Kept partially
-              translucent so the hero photo bleeds through softly. */}
-          <radialGradient id="hero-globe-base" cx="35%" cy="32%" r="75%">
-            <stop offset="0%" stopColor="hsl(40 90% 96% / 0.75)" />
-            <stop offset="55%" stopColor="hsl(34 60% 86% / 0.7)" />
-            <stop offset="100%" stopColor="hsl(28 35% 70% / 0.65)" />
+          {/* Sphere base: warm dawn gold lit from the upper-left, fading
+              into a deeper honey shadow on the lower-right. The whole
+              sphere is meant to read as "lit from within" — like the
+              moment before sunrise — not as a slab of dirt. */}
+          <radialGradient id="hero-globe-base" cx="32%" cy="28%" r="78%">
+            <stop offset="0%" stopColor="hsl(46 100% 96% / 0.92)" />
+            <stop offset="40%" stopColor="hsl(38 90% 82% / 0.82)" />
+            <stop offset="100%" stopColor="hsl(28 65% 60% / 0.72)" />
           </radialGradient>
-          {/* Subtle warm rim light along the limb. */}
+          {/* Back-lit limb light. Reads as light pooling on the inside of
+              the sphere edge — Earthrise rather than satellite. Tinted
+              with the active hopeful hue, kept narrow + low-opacity so it
+              feels like atmosphere, not a neon ring. */}
           <radialGradient id="hero-globe-rim" cx="50%" cy="50%" r="50%">
-            <stop offset="93%" stopColor="hsl(30 80% 70% / 0)" />
-            <stop offset="100%" stopColor="hsl(30 70% 55% / 0.55)" />
+            <stop offset="86%" stopColor={hue.rim} stopOpacity="0" />
+            <stop offset="97%" stopColor={hue.rim} stopOpacity="0.55" />
+            <stop offset="100%" stopColor={hue.glow} stopOpacity="0" />
           </radialGradient>
           {/* Soft highlight in the upper-left to sell the sphere shape. */}
-          <radialGradient id="hero-globe-highlight" cx="30%" cy="25%" r="35%">
-            <stop offset="0%" stopColor="hsl(50 100% 98% / 0.7)" />
+          <radialGradient id="hero-globe-highlight" cx="28%" cy="22%" r="38%">
+            <stop offset="0%" stopColor="hsl(50 100% 98% / 0.85)" />
             <stop offset="100%" stopColor="hsl(50 100% 98% / 0)" />
           </radialGradient>
           {/* Marker glow halo. Soft, warm, no pulsing. */}
@@ -368,6 +405,7 @@ export function HeroGlobe({
           })}
         </g>
       </svg>
+      </div>
     </div>
   );
 }
