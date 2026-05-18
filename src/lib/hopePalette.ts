@@ -111,3 +111,59 @@ export function hopeHueFor(seed: string | undefined | null): HopeHue {
   if (!seed) return HOPE_PALETTE[0];
   return HOPE_PALETTE[hashSeed(seed) % HOPE_PALETTE.length];
 }
+
+/**
+ * Cool-hued sibling palette used on the Organize / Communities hero.
+ * Where {@link HOPE_PALETTE} reads as dawn / golden hour, this one reads
+ * as water, leaves, and twilight — communal, calm, "we're in this
+ * together" rather than "new day, new campaign".
+ *
+ * Same shape as {@link HopeHue} so callers can pass entries from either
+ * palette interchangeably into {@link HeroAtmosphere} or
+ * {@link HeroHands}.
+ */
+export const COOL_PALETTE: readonly HopeHue[] = [
+  // Teal — equal parts blue and green, the canonical "hands holding hands"
+  // color. Anchors the rotation.
+  {
+    name: 'teal',
+    scrim: 'hsl(180 70% 45% / 0.32)',
+    glow: 'hsl(178 85% 52% / 0.5)',
+    rim: 'hsl(176 90% 65% / 0.55)',
+  },
+  // Ocean — deeper, more blue. Reads as depth / trust.
+  {
+    name: 'ocean',
+    scrim: 'hsl(206 75% 48% / 0.32)',
+    glow: 'hsl(204 90% 58% / 0.5)',
+    rim: 'hsl(202 95% 70% / 0.55)',
+  },
+  // Forest — leans green. Growth / continuity / land.
+  {
+    name: 'forest',
+    scrim: 'hsl(158 65% 42% / 0.32)',
+    glow: 'hsl(156 80% 50% / 0.5)',
+    rim: 'hsl(154 85% 62% / 0.55)',
+  },
+  // Lagoon — bright blue-green, joyful and warm-for-cool.
+  {
+    name: 'lagoon',
+    scrim: 'hsl(186 75% 48% / 0.32)',
+    glow: 'hsl(184 90% 56% / 0.5)',
+    rim: 'hsl(182 95% 68% / 0.55)',
+  },
+  // Mint — softer green-leaning hue. Gentle, hopeful.
+  {
+    name: 'mint',
+    scrim: 'hsl(164 60% 50% / 0.3)',
+    glow: 'hsl(162 75% 58% / 0.48)',
+    rim: 'hsl(160 85% 70% / 0.55)',
+  },
+  // Cobalt — pure cool blue, the cold end of the rotation.
+  {
+    name: 'cobalt',
+    scrim: 'hsl(218 75% 52% / 0.32)',
+    glow: 'hsl(216 90% 62% / 0.5)',
+    rim: 'hsl(214 95% 72% / 0.55)',
+  },
+];

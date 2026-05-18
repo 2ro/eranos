@@ -9,7 +9,7 @@ import { useInView } from 'react-intersection-observer';
 import { CreateCommunityDialog } from '@/components/CreateCommunityDialog';
 import { FeedEmptyState } from '@/components/FeedEmptyState';
 import { HeroAtmosphere } from '@/components/HeroAtmosphere';
-import { HeroGlobe, type GlobeMarkerKind } from '@/components/HeroGlobe';
+import { HeroBanner } from '@/components/HeroBanner';
 import { LoginArea } from '@/components/auth/LoginArea';
 import { MembersOnlyToggle } from '@/components/MembersOnlyToggle';
 import { NoteCard } from '@/components/NoteCard';
@@ -22,7 +22,7 @@ import { HorizontalScroll } from '@/components/discovery/HorizontalScroll';
 import { CommunityMiniCard, CommunityMiniCardSkeleton } from '@/components/discovery/CommunityMiniCard';
 import { SectionHeader } from '@/components/discovery/SectionHeader';
 import { COMMUNITY_DEFINITION_KIND, EMPTY_MODERATION } from '@/lib/communityUtils';
-import { HOPE_PALETTE } from '@/lib/hopePalette';
+import { COOL_PALETTE } from '@/lib/hopePalette';
 import { cn } from '@/lib/utils';
 import { useLayoutOptions } from '@/contexts/LayoutContext';
 import { useAppContext } from '@/hooks/useAppContext';
@@ -153,14 +153,6 @@ interface CommunitiesHeroProps {
   onCreateCommunity: () => void;
 }
 
-interface GlobeMarker {
-  key: string;
-  lat: number;
-  lng: number;
-  label: string;
-  kind: GlobeMarkerKind;
-}
-
 interface TickerStat {
   id: string;
   value: string;
@@ -172,36 +164,16 @@ function CommunitiesHero({ onCreateCommunity }: CommunitiesHeroProps) {
   const { data: communities } = useDiscoverCommunities({ limit: 24 });
   const { data: activityByCountry } = useGlobalActivity();
   const { data: donations, isLoading: donationsLoading } = useGlobalDonations();
-  const [hueIndex, setHueIndex] = useState(1);
+  const [hueIndex, setHueIndex] = useState(0);
 
   useEffect(() => {
     const id = window.setInterval(() => {
-      setHueIndex((i) => (i + 1) % HOPE_PALETTE.length);
+      setHueIndex((i) => (i + 1) % COOL_PALETTE.length);
     }, 9_000);
     return () => window.clearInterval(id);
   }, []);
 
-  const activeHue = HOPE_PALETTE[hueIndex];
-  const markers = useMemo<GlobeMarker[]>(() => {
-    const scatter: Array<{ lat: number; lng: number }> = [
-      { lat: 40.7, lng: -74.0 },
-      { lat: -23.5, lng: -46.6 },
-      { lat: 51.5, lng: -0.1 },
-      { lat: -1.3, lng: 36.8 },
-      { lat: 35.7, lng: 139.7 },
-      { lat: 28.6, lng: 77.2 },
-      { lat: -33.9, lng: 151.2 },
-      { lat: 19.4, lng: -99.1 },
-    ];
-
-    return (communities ?? []).slice(0, scatter.length).map((community, index) => ({
-      key: community.aTag,
-      lat: scatter[index].lat,
-      lng: scatter[index].lng,
-      label: community.name,
-      kind: 'community',
-    }));
-  }, [communities]);
+  const activeHue = COOL_PALETTE[hueIndex];
 
   const stats = useMemo<TickerStat[]>(() => {
     const items: TickerStat[] = [];
@@ -248,27 +220,33 @@ function CommunitiesHero({ onCreateCommunity }: CommunitiesHeroProps) {
 
   return (
     <section className="relative overflow-hidden border-b border-border bg-secondary/30">
-      <HeroAtmosphere seed={`communities-${activeHue.name}`} />
+      {/* Rotating photo banner — World Liberty Congress events. Crossfades
+          every 7s and pans slowly between cuts. Sits at the bottom of the
+          stack so atmosphere, scrims, and content layer above it. */}
+      <HeroBanner />
 
-      <div className="absolute inset-0 pointer-events-none flex items-center justify-center">
-        <div className="pointer-events-auto opacity-90">
-          <HeroGlobe
-            markers={markers}
-            hue={activeHue}
-            className="aspect-square max-w-none drop-shadow-2xl"
-            style={{ width: 'clamp(440px, 62dvw, 720px)' }}
-          />
-        </div>
-      </div>
+      {/* Cool atmosphere — blue/green hues rotate independently of the
+          banner cycle. The explicit `hue` prop overrides the warm
+          seed-derived default HeroAtmosphere uses on campaign pages. The
+          screen-blend gradients tint the photo without flattening it. */}
+      <HeroAtmosphere hue={activeHue} />
 
+      {/* Top scrim so the headline stays legible regardless of which
+          photo is currently on top. */}
       <div
-        className="absolute inset-x-0 top-0 h-72 sm:h-80 pointer-events-none bg-gradient-to-b from-black/55 via-black/25 to-transparent"
+        className="absolute inset-x-0 top-0 h-64 sm:h-80 pointer-events-none bg-gradient-to-b from-black/70 via-black/40 to-transparent"
         aria-hidden="true"
       />
 
-      <div className="relative max-w-5xl mx-auto px-4 sm:px-6 py-12 sm:py-16 lg:py-20 min-h-[560px] sm:min-h-[640px] lg:min-h-[680px] flex flex-col items-center text-center">
+      {/* Bottom scrim so the stat pill + CTA stay legible across photos. */}
+      <div
+        className="absolute inset-x-0 bottom-0 h-56 sm:h-72 pointer-events-none bg-gradient-to-t from-black/70 via-black/35 to-transparent"
+        aria-hidden="true"
+      />
+
+      <div className="relative max-w-5xl mx-auto px-4 sm:px-6 py-10 sm:py-12 lg:py-14 min-h-[380px] sm:min-h-[420px] lg:min-h-[460px] flex flex-col items-center text-center">
         <div className="relative space-y-3 max-w-3xl">
-          <p className="text-xs sm:text-sm font-semibold uppercase tracking-[0.18em] text-white/80 drop-shadow">
+          <p className="text-xs sm:text-sm font-semibold uppercase tracking-[0.18em] text-white/85 drop-shadow">
             Organize
           </p>
           <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight leading-[1.05] text-white drop-shadow-[0_2px_12px_rgb(0_0_0/0.55)]">
@@ -280,10 +258,10 @@ function CommunitiesHero({ onCreateCommunity }: CommunitiesHeroProps) {
           </p>
         </div>
 
-        <div className="flex-1 min-h-[180px] sm:min-h-[220px]" aria-hidden="true" />
+        <div className="flex-1 min-h-[100px] sm:min-h-[120px]" aria-hidden="true" />
 
         <div
-          className="relative w-full max-w-md mx-auto rounded-full bg-background/55 backdrop-blur-xl backdrop-saturate-150 border border-white/20 dark:border-white/10 px-5 py-3 shadow-lg shadow-amber-500/10"
+          className="relative w-full max-w-md mx-auto rounded-full bg-background/55 backdrop-blur-xl backdrop-saturate-150 border border-white/20 dark:border-white/10 px-5 py-3 shadow-lg shadow-teal-500/10"
           aria-live="polite"
         >
           {currentStat ? (
@@ -316,18 +294,18 @@ function CommunitiesHero({ onCreateCommunity }: CommunitiesHeroProps) {
           )}
         </div>
 
-        <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
+        <div className="mt-5 flex flex-wrap items-center justify-center gap-3">
           <Button
             type="button"
             size="lg"
             onClick={onCreateCommunity}
             className={cn(
               'relative rounded-full text-white font-semibold text-base h-12 px-7 [&_svg]:size-[18px]',
-              'bg-gradient-to-br from-white/14 via-amber-100/10 to-rose-100/10 hover:from-white/20 hover:via-amber-100/14 hover:to-rose-100/14',
+              'bg-gradient-to-br from-white/14 via-cyan-100/10 to-emerald-100/10 hover:from-white/20 hover:via-cyan-100/14 hover:to-emerald-100/14',
               'backdrop-blur-xl backdrop-saturate-150',
               'border border-white/25 hover:border-white/35',
-              'shadow-[inset_0_0_0_1px_rgb(255_255_255/0.08),0_10px_28px_-12px_hsl(24_85%_45%/0.4)]',
-              'hover:shadow-[inset_0_0_0_1px_rgb(255_255_255/0.12),0_12px_32px_-10px_hsl(24_85%_45%/0.5)]',
+              'shadow-[inset_0_0_0_1px_rgb(255_255_255/0.08),0_10px_28px_-12px_hsl(186_75%_45%/0.45)]',
+              'hover:shadow-[inset_0_0_0_1px_rgb(255_255_255/0.12),0_12px_32px_-10px_hsl(186_75%_45%/0.55)]',
               'motion-safe:transition-colors motion-safe:duration-200',
             )}
           >

@@ -9,8 +9,19 @@ interface HeroAtmosphereProps {
    * `aTag`. The same seed always picks the same hue from
    * {@link HOPE_PALETTE}. Pass `null`/`undefined` when no campaign is
    * spotlit and the atmosphere will default to the first palette entry.
+   *
+   * Ignored when `hue` is provided. Optional only when `hue` is given;
+   * the campaign hero still depends on seed-based selection.
    */
-  seed: string | undefined | null;
+  seed?: string | undefined | null;
+  /**
+   * Explicit hue override. When set, the atmosphere skips seed-based
+   * palette selection and crossfades whenever this hue changes. Use this
+   * when the page already rotates hues itself (e.g. the Organize hero
+   * cycles a cool palette every few seconds) or when the seed-derived
+   * warm palette is the wrong vibe.
+   */
+  hue?: HopeHue;
   /** Extra classes for the outer wrapper. */
   className?: string;
 }
@@ -40,13 +51,13 @@ const FADE_MS = 1500;
  * the old one, matching the timing of the photo crossfade so the whole
  * hero blooms together.
  */
-export function HeroAtmosphere({ seed, className }: HeroAtmosphereProps) {
+export function HeroAtmosphere({ seed, hue: hueOverride, className }: HeroAtmosphereProps) {
   const idRef = useRef(0);
   const [layers, setLayers] = useState<AtmosphereLayer[]>([]);
   const lastHueRef = useRef<string | null>(null);
 
   useEffect(() => {
-    const hue = hopeHueFor(seed ?? null);
+    const hue = hueOverride ?? hopeHueFor(seed ?? null);
     if (hue.name === lastHueRef.current) return;
     lastHueRef.current = hue.name;
 
@@ -59,7 +70,7 @@ export function HeroAtmosphere({ seed, className }: HeroAtmosphereProps) {
       setLayers((prev) => prev.filter((l) => l.id === id));
     }, FADE_MS + 50);
     return () => window.clearTimeout(timeout);
-  }, [seed]);
+  }, [seed, hueOverride]);
 
   return (
     <div className={cn('absolute inset-0 pointer-events-none', className)} aria-hidden="true">
