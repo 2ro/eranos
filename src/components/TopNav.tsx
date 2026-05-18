@@ -39,7 +39,7 @@ const NAV_ITEMS: NavItem[] = [
   { label: 'Discover', to: '/discover', icon: HandHeart },
   { label: 'World', to: '/world', icon: Earth },
   { label: 'Organize', to: '/communities', icon: Users },
-  { label: 'Action', to: '/actions', icon: Megaphone },
+  { label: 'Actions', to: '/actions', icon: Megaphone },
 ];
 
 interface MobileLinkItem extends NavItem {
@@ -129,7 +129,7 @@ export function TopNav() {
               <X className="size-5" />
             </button>
           </div>
-          <nav className="flex-1 overflow-y-auto px-3 py-4 space-y-4">
+          <nav className="flex-1 overflow-y-auto px-3 py-4">
             <MobileLinkList items={NAV_ITEMS} onClose={() => setMobileOpen(false)} />
             <MobileLinkList
               items={getProfileMenuItems({
