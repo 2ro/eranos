@@ -1,9 +1,9 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { useSeoMeta } from '@unhead/react';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useNostr } from '@nostrify/react';
-import type { NostrEvent } from '@nostrify/nostrify';
+import type { NostrEvent, NostrMetadata } from '@nostrify/nostrify';
 import { nip19 } from 'nostr-tools';
 import {
   AlertTriangle,
@@ -31,6 +31,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
+import { parseAuthorEvent } from '@/hooks/useAuthor';
 import { useBitcoinWallet } from '@/hooks/useBitcoinWallet';
 import { useCampaign } from '@/hooks/useCampaign';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
@@ -92,6 +93,19 @@ function makeRecipientProfile(pubkey: string): SearchProfile {
   };
 }
 
+function makeRecipientProfileFromAuthor(
+  pubkey: string,
+  author: { event?: NostrEvent; metadata?: NostrMetadata } | undefined,
+): SearchProfile {
+  if (!author?.event) return makeRecipientProfile(pubkey);
+
+  return {
+    pubkey,
+    metadata: author.metadata ?? {},
+    event: author.event,
+  };
+}
+
 function formatGoalUsd(goalSats: number | undefined, btcPrice: number | undefined): string {
   if (!goalSats || !btcPrice) return '';
   const usd = (goalSats / 100_000_000) * btcPrice;
@@ -139,6 +153,57 @@ export function CreateCampaignPage() {
     ...(editTarget?.relays ? { relays: editTarget.relays } : {}),
   });
   const editCampaign = isEditMode ? editCampaignQuery.data : null;
+  const editRecipientPubkeys = useMemo(
+    () => editCampaign?.recipients.map((recipient) => recipient.pubkey) ?? [],
+    [editCampaign],
+  );
+  const editRecipientProfiles = useQuery({
+    queryKey: ['campaign-edit-recipients', editRecipientPubkeys],
+    queryFn: async ({ signal }): Promise<SearchProfile[]> => {
+      const cachedProfiles = new Map<string, SearchProfile>();
+      const missingPubkeys: string[] = [];
+
+      for (const pubkey of editRecipientPubkeys) {
+        const cachedAuthor = queryClient.getQueryData<{ event?: NostrEvent; metadata?: NostrMetadata }>([
+          'author',
+          pubkey,
+        ]);
+
+        if (cachedAuthor?.event) {
+          cachedProfiles.set(pubkey, makeRecipientProfileFromAuthor(pubkey, cachedAuthor));
+        } else {
+          missingPubkeys.push(pubkey);
+        }
+      }
+
+      if (missingPubkeys.length > 0) {
+        const events = await nostr.query(
+          [{ kinds: [0], authors: missingPubkeys, limit: missingPubkeys.length }],
+          { signal },
+        );
+
+        const latestByPubkey = new Map<string, NostrEvent>();
+        for (const event of events) {
+          const existing = latestByPubkey.get(event.pubkey);
+          if (!existing || event.created_at > existing.created_at) {
+            latestByPubkey.set(event.pubkey, event);
+          }
+        }
+
+        for (const pubkey of missingPubkeys) {
+          const event = latestByPubkey.get(pubkey);
+          if (!event) continue;
+          const parsed = parseAuthorEvent(event);
+          queryClient.setQueryData(['author', pubkey], parsed);
+          cachedProfiles.set(pubkey, makeRecipientProfileFromAuthor(pubkey, parsed));
+        }
+      }
+
+      return editRecipientPubkeys.map((pubkey) => cachedProfiles.get(pubkey) ?? makeRecipientProfile(pubkey));
+    },
+    enabled: isEditMode && editRecipientPubkeys.length > 0,
+    staleTime: 5 * 60 * 1000,
+  });
 
   // The slug is protocol plumbing: derive it from the title instead of asking
   // fundraisers to understand Nostr d-tags.
@@ -167,6 +232,16 @@ export function CreateCampaignPage() {
     setRecipients(editCampaign.recipients.map((recipient) => makeRecipientProfile(recipient.pubkey)));
     setPrepopulatedEventId(editCampaign.event.id);
   }, [editCampaign, prepopulatedEventId]);
+
+  useEffect(() => {
+    const profiles = editRecipientProfiles.data;
+    if (!profiles || profiles.length === 0) return;
+
+    setRecipients((prev) => prev.map((recipient) => {
+      const profile = profiles.find((item) => item.pubkey === recipient.pubkey);
+      return profile ?? recipient;
+    }));
+  }, [editRecipientProfiles.data]);
 
   useEffect(() => {
     if (!editCampaign || prepopulatedGoalEventId === editCampaign.event.id || goalUsd.trim()) return;
@@ -421,7 +496,7 @@ export function CreateCampaignPage() {
   return (
     <main className="min-h-screen pb-16">
       <form
-        className="max-w-3xl mx-auto px-4 sm:px-6 py-8 lg:py-10 space-y-8"
+        className="max-w-3xl mx-auto px-4 sm:px-6 py-8 lg:py-10 space-y-5"
         onSubmit={(e) => {
           e.preventDefault();
           setFormError('');
@@ -444,168 +519,170 @@ export function CreateCampaignPage() {
           </div>
           <p className="max-w-2xl text-sm sm:text-base text-muted-foreground">
             {isEditMode
-              ? 'Update the essentials or expand Details to refine the pitch, goal, timeline, or location.'
-              : 'Add the essentials first. You can expand Details when you are ready to add a pitch, category, goal, timeline, or location.'}
+              ? 'Update the essentials. Details are optional.'
+              : 'Add title and beneficiaries first. Details are optional.'}
           </p>
         </div>
 
-        {/* Title & identifier */}
-        <FormSection title="Title" requirement="Required" description="What are you raising money for? The campaign URL is created from this title automatically.">
-          <Input
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            placeholder="Save the Last Bookstore"
-            maxLength={200}
-            required
-          />
-          <p className="text-xs text-muted-foreground">
-            URL preview:{' '}
-            <span className="font-mono text-foreground">
-              /{activeIdentifier || 'your-campaign-title'}
-            </span>
-            {isEditMode && ' (kept from the original campaign)'}
-          </p>
-        </FormSection>
-
-        {/* Recipients */}
-        <FormSection
-          title="Beneficiaries"
-          requirement="Required"
-          description="One or more Nostr accounts that receive split-payment donations. Donations are split evenly across everyone in the campaign."
-        >
-          <div className="space-y-3">
-            <PersonSearch
-              onAdd={addRecipient}
-              onAddMany={addRecipients}
-              excludePubkeys={recipients.map((r) => r.pubkey)}
+        <div className="rounded-2xl bg-card/50 p-2">
+          {/* Title & identifier */}
+          <FormSection title="Title" requirement="Required" description="Campaign URL is created automatically.">
+            <Input
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              placeholder="Save the Last Bookstore"
+              maxLength={200}
+              required
             />
-            {recipients.length > 0 ? (
-              <div className="space-y-2">
-                <Label className="text-xs text-muted-foreground">
-                  Beneficiaries ({recipients.length})
-                </Label>
+            <p className="text-xs text-muted-foreground">
+              URL preview:{' '}
+              <span className="font-mono text-foreground">
+                /{activeIdentifier || 'your-campaign-title'}
+              </span>
+              {isEditMode && ' (kept from original)'}
+            </p>
+          </FormSection>
+
+          {/* Recipients */}
+          <FormSection
+            title="Beneficiaries"
+            requirement="Required"
+            description="Who receives donations. Splits are even."
+          >
+            <div className="space-y-3">
+              <PersonSearch
+                onAdd={addRecipient}
+                onAddMany={addRecipients}
+                excludePubkeys={recipients.map((r) => r.pubkey)}
+              />
+              {recipients.length > 0 ? (
                 <div className="space-y-2">
-                  {recipients.map((recipient) => (
-                    <RecipientRow
-                      key={recipient.pubkey}
-                      profile={recipient}
-                      onRemove={() => removeRecipient(recipient.pubkey)}
-                    />
-                  ))}
+                  <Label className="text-xs text-muted-foreground">
+                    Beneficiaries ({recipients.length})
+                  </Label>
+                  <div className="space-y-1.5">
+                    {recipients.map((recipient) => (
+                      <RecipientRow
+                        key={recipient.pubkey}
+                        profile={recipient}
+                        onRemove={() => removeRecipient(recipient.pubkey)}
+                      />
+                    ))}
+                  </div>
+                </div>
+              ) : (
+                <p className="rounded-lg bg-muted/40 px-3 py-4 text-center text-sm text-muted-foreground">
+                  Search by name, NIP-05, npub, or nprofile.
+                </p>
+              )}
+            </div>
+          </FormSection>
+
+          {/* Cover image */}
+          <FormSection title="Cover image" requirement="Optional" description="Shown on campaign cards.">
+            <CoverPicker
+              url={imageUrl}
+              isUploading={isUploading}
+              onPick={handleImagePick}
+              onClear={() => setImageUrl('')}
+            />
+            <Input
+              type="url"
+              inputMode="url"
+              placeholder="Or paste an https:// image URL"
+              value={imageUrl}
+              onChange={(e) => setImageUrl(e.target.value)}
+            />
+          </FormSection>
+
+          {/* Optional details */}
+          <CollapsibleFormSection
+            title="Details"
+            requirement="Optional"
+            description="Extra context for donors."
+          >
+            <div className="space-y-5">
+              <div className="space-y-1.5">
+                <Label htmlFor="campaign-summary">Summary</Label>
+                <Textarea
+                  id="campaign-summary"
+                  value={summary}
+                  onChange={(e) => setSummary(e.target.value)}
+                  placeholder="A short pitch for cards and previews."
+                  rows={2}
+                  maxLength={300}
+                />
+              </div>
+
+              <div className="space-y-1.5">
+                <Label htmlFor="campaign-story">Story</Label>
+                <Textarea
+                  id="campaign-story"
+                  value={story}
+                  onChange={(e) => setStory(e.target.value)}
+                  placeholder="Tell donors why this matters. Markdown is supported."
+                  rows={7}
+                  className="font-mono text-sm"
+                />
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="space-y-1.5">
+                  <Label htmlFor="campaign-category">Category</Label>
+                  <Select
+                    value={category}
+                    onValueChange={(v) => setCategory(v as CampaignCategory)}
+                  >
+                    <SelectTrigger id="campaign-category">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {CAMPAIGN_CATEGORIES.map((cat) => (
+                        <SelectItem key={cat} value={cat}>
+                          {CAMPAIGN_CATEGORY_LABELS[cat]}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-1.5">
+                  <Label htmlFor="campaign-goal">Goal (USD)</Label>
+                  <Input
+                    id="campaign-goal"
+                    type="text"
+                    inputMode="decimal"
+                    placeholder="100,000"
+                    value={goalUsd}
+                    onChange={(e) => setGoalUsd(e.target.value)}
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    {goalSatsPreview > 0 && btcPrice
+                      ? `${formatSats(goalSatsPreview)} sats (${satsToUSD(goalSatsPreview, btcPrice)}).`
+                      : 'Stored as sats.'}
+                  </p>
+                </div>
+                <div className="space-y-1.5">
+                  <Label htmlFor="campaign-deadline">Deadline (optional)</Label>
+                  <Input
+                    id="campaign-deadline"
+                    type="date"
+                    value={deadline}
+                    onChange={(e) => setDeadline(e.target.value)}
+                  />
+                </div>
+                <div className="space-y-1.5">
+                  <Label htmlFor="campaign-location">Location (optional)</Label>
+                  <Input
+                    id="campaign-location"
+                    value={location}
+                    onChange={(e) => setLocation(e.target.value)}
+                    placeholder="Portland, OR"
+                  />
                 </div>
               </div>
-            ) : (
-              <p className="rounded-lg border border-dashed border-border px-3 py-4 text-center text-sm text-muted-foreground">
-                Search for people by name, NIP-05, npub, or nprofile to add beneficiaries.
-              </p>
-            )}
-          </div>
-        </FormSection>
-
-        {/* Cover image */}
-        <FormSection title="Cover image" requirement="Optional" description="Choose a hero image for your campaign card.">
-          <CoverPicker
-            url={imageUrl}
-            isUploading={isUploading}
-            onPick={handleImagePick}
-            onClear={() => setImageUrl('')}
-          />
-          <Input
-            type="url"
-            inputMode="url"
-            placeholder="Or paste an https:// image URL"
-            value={imageUrl}
-            onChange={(e) => setImageUrl(e.target.value)}
-          />
-        </FormSection>
-
-        {/* Optional details */}
-        <CollapsibleFormSection
-          title="Details"
-          requirement="Optional"
-          description="Add more context for donors when you have it."
-        >
-          <div className="space-y-5">
-            <div className="space-y-1.5">
-              <Label htmlFor="campaign-summary">Summary</Label>
-              <Textarea
-                id="campaign-summary"
-                value={summary}
-                onChange={(e) => setSummary(e.target.value)}
-                placeholder="A short one-paragraph pitch shown in cards and previews."
-                rows={2}
-                maxLength={300}
-              />
             </div>
-
-            <div className="space-y-1.5">
-              <Label htmlFor="campaign-story">Story</Label>
-              <Textarea
-                id="campaign-story"
-                value={story}
-                onChange={(e) => setStory(e.target.value)}
-                placeholder="Tell donors why this matters. Markdown is supported."
-                rows={7}
-                className="font-mono text-sm"
-              />
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div className="space-y-1.5">
-                <Label htmlFor="campaign-category">Category</Label>
-                <Select
-                  value={category}
-                  onValueChange={(v) => setCategory(v as CampaignCategory)}
-                >
-                  <SelectTrigger id="campaign-category">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {CAMPAIGN_CATEGORIES.map((cat) => (
-                      <SelectItem key={cat} value={cat}>
-                        {CAMPAIGN_CATEGORY_LABELS[cat]}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="space-y-1.5">
-                <Label htmlFor="campaign-goal">Goal (USD)</Label>
-                <Input
-                  id="campaign-goal"
-                  type="text"
-                  inputMode="decimal"
-                  placeholder="100,000"
-                  value={goalUsd}
-                  onChange={(e) => setGoalUsd(e.target.value)}
-                />
-                <p className="text-xs text-muted-foreground">
-                  {goalSatsPreview > 0 && btcPrice
-                    ? `Publishes as ${formatSats(goalSatsPreview)} sats (${satsToUSD(goalSatsPreview, btcPrice)} at current BTC price).`
-                    : 'Stored on Nostr as sats using the current BTC/USD price.'}
-                </p>
-              </div>
-              <div className="space-y-1.5">
-                <Label htmlFor="campaign-deadline">Deadline (optional)</Label>
-                <Input
-                  id="campaign-deadline"
-                  type="date"
-                  value={deadline}
-                  onChange={(e) => setDeadline(e.target.value)}
-                />
-              </div>
-              <div className="space-y-1.5">
-                <Label htmlFor="campaign-location">Location (optional)</Label>
-                <Input
-                  id="campaign-location"
-                  value={location}
-                  onChange={(e) => setLocation(e.target.value)}
-                  placeholder="Portland, OR"
-                />
-              </div>
-            </div>
-          </div>
-        </CollapsibleFormSection>
+          </CollapsibleFormSection>
+        </div>
 
         {formError && (
           <Alert variant="destructive">
@@ -614,7 +691,7 @@ export function CreateCampaignPage() {
           </Alert>
         )}
 
-        <div className="flex gap-3 justify-end pt-2 border-t border-border">
+        <div className="flex gap-3 justify-end pt-1">
           <Button type="button" variant="outline" onClick={() => isEditMode ? navigate(-1) : navigate('/')}>
             Cancel
           </Button>
@@ -651,7 +728,7 @@ function FormSection({
   children: React.ReactNode;
 }) {
   return (
-    <section className="space-y-3 rounded-2xl border border-border/70 bg-card p-4 shadow-sm sm:p-5">
+    <section className="space-y-2.5 rounded-xl p-3 sm:p-4">
       <div className="space-y-0.5">
         <h2 className="flex items-center gap-2 text-lg font-semibold">
           {title}
@@ -668,7 +745,7 @@ function FormSection({
         </h2>
         {description && <p className="text-sm text-muted-foreground">{description}</p>}
       </div>
-      <div className="space-y-3">{children}</div>
+      <div className="space-y-2.5">{children}</div>
     </section>
   );
 }
@@ -685,10 +762,10 @@ function CollapsibleFormSection({
   children: React.ReactNode;
 }) {
   return (
-    <Collapsible className="rounded-2xl border border-border/70 bg-card shadow-sm" defaultOpen={false}>
+    <Collapsible className="rounded-xl" defaultOpen={false}>
       <CollapsibleTrigger
         type="button"
-        className="group flex w-full items-start justify-between gap-4 p-4 text-left sm:p-5"
+        className="group flex w-full items-start justify-between gap-4 p-3 text-left sm:p-4"
       >
         <div className="space-y-0.5">
           <h2 className="flex items-center gap-2 text-lg font-semibold">
@@ -708,7 +785,7 @@ function CollapsibleFormSection({
         </div>
         <ChevronDown className="mt-1 size-5 shrink-0 text-muted-foreground motion-safe:transition-transform group-data-[state=open]:rotate-180" />
       </CollapsibleTrigger>
-      <CollapsibleContent className="px-4 pb-4 sm:px-5 sm:pb-5">
+      <CollapsibleContent className="px-3 pb-3 sm:px-4 sm:pb-4">
         {children}
       </CollapsibleContent>
     </Collapsible>
@@ -784,16 +861,13 @@ function RecipientRow({ profile, onRemove }: { profile: SearchProfile; onRemove:
   const picture = sanitizeUrl(profile.metadata.picture);
 
   return (
-    <div className="flex items-center gap-3 rounded-lg border border-border/60 bg-secondary/30 p-2">
+    <div className="flex items-center gap-3 rounded-lg bg-secondary/30 p-2.5">
       <Avatar className="size-8 shrink-0">
         {picture && <AvatarImage src={picture} alt="" />}
         <AvatarFallback className="text-xs">{displayName.slice(0, 2).toUpperCase()}</AvatarFallback>
       </Avatar>
       <div className="min-w-0 flex-1">
         <div className="truncate text-sm font-medium">{displayName}</div>
-        <div className="truncate font-mono text-xs text-muted-foreground">
-          {profile.pubkey.slice(0, 12)}…{profile.pubkey.slice(-8)}
-        </div>
       </div>
       <Button
         type="button"

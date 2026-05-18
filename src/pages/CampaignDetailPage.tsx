@@ -276,8 +276,9 @@ function CampaignDetailContent({ campaign }: { campaign: ParsedCampaign }) {
                 {isCreator && (
                   <Button
                     asChild
+                    variant="ghost"
                     size="sm"
-                    className="rounded-full bg-white/90 text-black shadow-sm hover:bg-white focus-visible:ring-white/80"
+                    className="rounded-full bg-transparent text-white/90 shadow-none hover:bg-white/15 hover:text-white focus-visible:ring-white/80"
                   >
                     <Link to={`/campaigns/new?edit=${encodeURIComponent(naddr)}`}>
                       <Pencil className="size-4 mr-2" />
