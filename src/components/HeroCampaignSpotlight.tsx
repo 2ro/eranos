@@ -4,7 +4,7 @@ import { ArrowRight, MapPin } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { cn } from '@/lib/utils';
-import { encodeCampaignNaddr, type ParsedCampaign } from '@/lib/campaign';
+import { encodeCampaignNaddr, getCampaignCountryLabel, type ParsedCampaign } from '@/lib/campaign';
 import { sanitizeUrl } from '@/lib/sanitizeUrl';
 import { useAuthor } from '@/hooks/useAuthor';
 import { genUserName } from '@/lib/genUserName';
@@ -58,6 +58,7 @@ export function HeroCampaignSpotlight({
   const meta = author.data?.metadata;
   const authorName = meta?.display_name || meta?.name || genUserName(campaign.pubkey);
   const authorPicture = sanitizeUrl(meta?.picture);
+  const countryLabel = getCampaignCountryLabel(campaign);
 
   return (
     <div
@@ -122,10 +123,10 @@ export function HeroCampaignSpotlight({
           </Avatar>
           <span className="font-medium">{authorName}</span>
         </span>
-        {campaign.location && (
+        {countryLabel && (
           <span className="inline-flex items-center gap-1">
             <MapPin className="size-3" />
-            <span className="truncate max-w-[16ch]">{campaign.location}</span>
+            <span className="truncate max-w-[16ch]">{countryLabel}</span>
           </span>
         )}
         <Link

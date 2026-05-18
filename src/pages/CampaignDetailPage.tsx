@@ -55,6 +55,7 @@ import { useLayoutOptions } from '@/contexts/LayoutContext';
 import {
   CAMPAIGN_CATEGORY_LABELS,
   encodeCampaignNaddr,
+  getCampaignCountryLabel,
   type ParsedCampaign,
 } from '@/lib/campaign';
 import { satsToUSDWhole } from '@/lib/bitcoin';
@@ -232,6 +233,7 @@ function CampaignDetailContent({ campaign }: { campaign: ParsedCampaign }) {
     creatorMetadata?.display_name || creatorMetadata?.name || genUserName(campaign.pubkey);
 
   const deadline = campaign.deadline ? formatDeadline(campaign.deadline) : null;
+  const countryLabel = getCampaignCountryLabel(campaign);
   const raisedSats = stats?.totalSats ?? 0;
 
   const isCreator = user?.pubkey === campaign.pubkey;
@@ -385,10 +387,10 @@ function CampaignDetailContent({ campaign }: { campaign: ParsedCampaign }) {
                       {CAMPAIGN_CATEGORY_LABELS[campaign.category]}
                     </span>
                   )}
-                  {campaign.location && (
+                  {countryLabel && (
                     <span className="inline-flex items-center gap-1.5">
                       <MapPin className="size-3.5 sm:size-4" />
-                      {campaign.location}
+                      {countryLabel}
                     </span>
                   )}
                   {deadline && (

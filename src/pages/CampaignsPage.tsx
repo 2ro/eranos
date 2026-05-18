@@ -122,14 +122,11 @@ export function CampaignsPage() {
     [allCampaigns, featuredCoords],
   );
 
-  // Build the spotlight pool: every campaign that has both a parseable
-  // location AND would make sense to feature. Featured campaigns come first
-  // (in their hand-picked order), then everything else, newest first.
-  //
-  // Each entry resolves a country code from the free-form `location` field
-  // and pulls the country's capital coordinates from `getCoordinates`. The
-  // globe uses these to place a heart marker; the spotlight card uses the
-  // full `campaign` object.
+  // Build the spotlight pool: every campaign that has a country and would
+  // make sense to feature. New events use NIP-73 `i` country tags; legacy
+  // campaigns can still resolve from the old free-form `location` field.
+  // Featured campaigns come first (in their hand-picked order), then
+  // everything else, newest first.
   const spotlightables = useMemo(() => {
     type Entry = {
       key: string;
@@ -143,18 +140,17 @@ export function CampaignsPage() {
 
     const add = (c: ParsedCampaign) => {
       if (seenAtag.has(c.aTag)) return;
-      if (!c.location) return;
-      const match = searchCountry(c.location);
-      if (!match) return;
-      const coords = getCoordinates(match.country.code);
+      const countryCode = c.countryCode ?? (c.location ? searchCountry(c.location)?.country.code : undefined);
+      if (!countryCode) return;
+      const coords = getCoordinates(countryCode);
       if (!coords) return;
       // Deduplicate by country so a single popular country doesn't pile
       // dozens of overlapping markers on top of each other. We keep the
       // first one we see, which — given the iteration order below — means
       // featured wins, then newest.
-      if (seenCountry.has(match.country.code)) return;
+      if (seenCountry.has(countryCode)) return;
       seenAtag.add(c.aTag);
-      seenCountry.add(match.country.code);
+      seenCountry.add(countryCode);
       out.push({ key: c.aTag, campaign: c, lat: coords.latitude, lng: coords.longitude });
     };
 

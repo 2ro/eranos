@@ -179,7 +179,7 @@ The two zap kinds are complementary. Clients SHOULD sum verified amounts from bo
 
 ### Summary
 
-Addressable event representing a **fundraising campaign**. A campaign carries the marketing-style metadata you would expect on GoFundMe, Kickstarter, or GiveSendGo (title, summary, cover image, story, category, goal, optional deadline and location), and — most importantly — a list of recipient pubkeys (`p` tags) that share the proceeds of any donation.
+Addressable event representing a **fundraising campaign**. A campaign carries the marketing-style metadata you would expect on GoFundMe, Kickstarter, or GiveSendGo (title, summary, cover image, story, category, goal, optional deadline, and recommended country), and — most importantly — a list of recipient pubkeys (`p` tags) that share the proceeds of any donation.
 
 Donations are sent as a **single Bitcoin on-chain transaction** with one output per recipient. The donor's wallet derives each recipient's Taproot address from their pubkey via BIP-340/BIP-341 (the same scheme used by kind 8333 onchain zaps), so the campaign event itself does not need to carry Bitcoin addresses. After broadcasting the funding tx, the donor's client publishes one kind 8333 event per recipient, all referencing the same `txid` and tagging the campaign via `a` / `K`, so the donation shows up in the campaign's totals and in each recipient's profile zap history.
 
@@ -200,7 +200,8 @@ The kind is addressable so the creator can edit the story, image, goal, deadline
     ["t", "community"],
     ["goal", "10000000"],
     ["deadline", "1735689600"],
-    ["location", "Portland, OR"],
+    ["i", "iso3166:VE"],
+    ["k", "iso3166"],
     ["p", "<recipient-1-hex-pubkey>", "wss://relay.example", "2"],
     ["p", "<recipient-2-hex-pubkey>", "wss://relay.example", "1"],
     ["p", "<recipient-3-hex-pubkey>"],
@@ -224,7 +225,9 @@ The `content` field is the **campaign story**, formatted as Markdown. Clients SH
 | `t`        | Recommended | Category. SHOULD be one of: `medical`, `memorial`, `emergency`, `education`, `animals`, `community`, `sports`, `creative`, `business`, `faith`, `other`. Multiple `t` tags MAY be used. |
 | `goal`     | Recommended | Fundraising goal in **satoshis** (decimal integer). Omit if the campaign has no fixed goal.                                                                       |
 | `deadline` | Optional | Unix timestamp (seconds) at which the campaign closes. After the deadline, clients SHOULD show the campaign as ended but MAY still accept donations.              |
-| `location` | Optional | Human-readable location string (e.g. "Portland, OR" or "Online"). For machine-readable geo, a `g` (geohash) tag MAY be added in parallel.                          |
+| `i`        | Recommended | NIP-73 country identifier for sorting and discovery. SHOULD be `iso3166:<code>` with an uppercase ISO 3166-1 alpha-2 country code (e.g. `iso3166:VE`).              |
+| `k`        | Recommended if `i` is present | NIP-73 external content kind. For country identifiers this SHOULD be `iso3166`.                                                        |
+| `location` | Legacy | Human-readable location string used by older campaign events. New events SHOULD prefer `i` + `k` country tags. Clients MAY display this as a fallback only.          |
 | `status`   | Optional | Lifecycle status. The only defined value is `archived`, which marks the campaign closed without deleting it. Other values SHOULD be ignored. See *Closing & archiving* below. |
 | `p`        | Yes (≥1) | Recipient pubkey. The 2nd element is the hex pubkey; the 3rd (optional) is a relay hint; the 4th (optional) is a positive decimal **weight** for split allocation. |
 | `alt`      | Recommended | NIP-31 human-readable fallback.                                                                                                                                   |

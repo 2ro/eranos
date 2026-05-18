@@ -1,6 +1,9 @@
 import type { NostrEvent } from '@nostrify/nostrify';
 import { nip19 } from 'nostr-tools';
 
+import { COUNTRIES } from '@/lib/countries';
+import { parseCountryIdentifier } from '@/lib/countryIdentifiers';
+
 /** Addressable kind number for fundraising campaigns (see NIP.md). */
 export const CAMPAIGN_KIND = 30223;
 
@@ -88,6 +91,8 @@ export interface ParsedCampaign {
   deadline?: number;
   /** Human-readable location string. */
   location?: string;
+  /** ISO 3166-1 alpha-2 country code parsed from a NIP-73 `i` tag. */
+  countryCode?: string;
   /** Validated recipient list (always at least one). */
   recipients: CampaignRecipient[];
   /** Created-at from the event. */
@@ -112,6 +117,15 @@ function parsePositiveInt(s: string | undefined): number | undefined {
   const n = Number(s);
   if (!Number.isFinite(n) || !Number.isInteger(n) || n <= 0) return undefined;
   return n;
+}
+
+function getCountryCode(event: NostrEvent): string | undefined {
+  for (const [name, value] of event.tags) {
+    if (name !== 'i' || typeof value !== 'string') continue;
+    const code = parseCountryIdentifier(value);
+    if (code && /^[A-Z]{2}$/.test(code)) return code;
+  }
+  return undefined;
 }
 
 /**
@@ -188,10 +202,18 @@ export function parseCampaign(event: NostrEvent): ParsedCampaign | null {
     goalSats: parsePositiveInt(getTag(event, 'goal')),
     deadline: parsePositiveInt(getTag(event, 'deadline')),
     location: getTag(event, 'location')?.trim() || undefined,
+    countryCode: getCountryCode(event),
     recipients,
     createdAt: event.created_at,
     archived,
   };
+}
+
+/** Human display for a campaign's structured country, falling back to legacy location text. */
+export function getCampaignCountryLabel(campaign: ParsedCampaign): string | undefined {
+  const country = campaign.countryCode ? COUNTRIES[campaign.countryCode] : undefined;
+  if (country) return `${country.flag} ${country.name}`;
+  return campaign.location;
 }
 
 /** Output of {@link splitDonation}: per-recipient amounts in sats. */

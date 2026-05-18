@@ -13,6 +13,7 @@ import {
   CAMPAIGN_CATEGORY_LABELS,
   type ParsedCampaign,
   encodeCampaignNaddr,
+  getCampaignCountryLabel,
 } from '@/lib/campaign';
 import { formatCampaignAmount } from '@/lib/formatCampaignAmount';
 import { genUserName } from '@/lib/genUserName';
@@ -82,6 +83,7 @@ export function CampaignCard({ campaign, variant = 'compact', className }: Campa
     genUserName(campaign.pubkey);
   const deadline = campaign.deadline ? formatDeadline(campaign.deadline) : null;
   const raisedSats = stats?.totalSats ?? 0;
+  const countryLabel = getCampaignCountryLabel(campaign);
 
   const isFeatured = variant === 'featured';
 
@@ -177,10 +179,10 @@ export function CampaignCard({ campaign, variant = 'compact', className }: Campa
                 {stats.donorCount} {stats.donorCount === 1 ? 'donor' : 'donors'}
               </span>
             )}
-            {campaign.location && (
+            {countryLabel && (
               <span className="inline-flex items-center gap-1.5">
                 <MapPin className="size-3.5" />
-                {campaign.location}
+                {countryLabel}
               </span>
             )}
             {deadline && (

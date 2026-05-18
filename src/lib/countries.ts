@@ -204,7 +204,7 @@ export const COUNTRIES: Record<string, { name: string; flag: string }> = {
 };
 
 /** Pre-sorted array of country entries for searching. */
-const COUNTRY_LIST = Object.entries(COUNTRIES)
+export const COUNTRY_LIST = Object.entries(COUNTRIES)
   .map(([code, { name, flag }]) => ({ code, name, flag }))
   .sort((a, b) => a.name.localeCompare(b.name));
 
@@ -248,6 +248,30 @@ export function searchCountry(query: string): CountryMatch | null {
     }
   }
   return best ? { country: best, exact: false } : null;
+}
+
+/**
+ * Find multiple countries matching the query, ranked for typeahead results.
+ * Matches ISO code, exact name, name prefix, then name substring.
+ */
+export function searchCountries(query: string, limit = 8): CountryEntry[] {
+  const q = query.trim().toLowerCase();
+  if (q.length < 2) return [];
+
+  const ranked = COUNTRY_LIST
+    .map((country) => {
+      const code = country.code.toLowerCase();
+      const name = country.name.toLowerCase();
+      if (code === q) return { country, rank: 0 };
+      if (name === q) return { country, rank: 1 };
+      if (name.startsWith(q)) return { country, rank: 2 };
+      if (name.includes(q)) return { country, rank: 3 };
+      return null;
+    })
+    .filter((match): match is { country: CountryEntry; rank: number } => match !== null)
+    .sort((a, b) => a.rank - b.rank || a.country.name.localeCompare(b.country.name));
+
+  return ranked.slice(0, limit).map(({ country }) => country);
 }
 
 /**

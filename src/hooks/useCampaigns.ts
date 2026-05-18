@@ -3,10 +3,13 @@ import { useQuery } from '@tanstack/react-query';
 import type { NostrEvent, NostrFilter } from '@nostrify/nostrify';
 
 import { CAMPAIGN_KIND, type CampaignCategory, parseCampaign, type ParsedCampaign } from '@/lib/campaign';
+import { createCountryIdentifier } from '@/lib/countryIdentifiers';
 
 interface UseCampaignsOptions {
   /** Optional category filter (`t` tag). */
   category?: CampaignCategory;
+  /** Optional ISO 3166-1 alpha-2 country filter (`i` tag). */
+  countryCode?: string;
   /** Maximum number of events to fetch from relays. Default: 60. */
   limit?: number;
   /** Authors to fetch from, e.g. for a profile's campaigns. */
@@ -40,16 +43,17 @@ interface UseCampaignsOptions {
  */
 export function useCampaigns(options: UseCampaignsOptions = {}) {
   const { nostr } = useNostr();
-  const { category, limit = 60, authors, recipientPubkeys, includeArchived = false } = options;
+  const { category, countryCode, limit = 60, authors, recipientPubkeys, includeArchived = false } = options;
 
   return useQuery({
     queryKey: [
       'campaigns',
-      { category, limit, authors, recipientPubkeys, includeArchived },
+      { category, countryCode, limit, authors, recipientPubkeys, includeArchived },
     ],
     queryFn: async (c) => {
       const filter: NostrFilter = { kinds: [CAMPAIGN_KIND], limit };
       if (category) filter['#t'] = [category];
+      if (countryCode) filter['#i'] = [createCountryIdentifier(countryCode)];
       if (authors && authors.length > 0) filter.authors = authors;
       if (recipientPubkeys && recipientPubkeys.length > 0) {
         filter['#p'] = recipientPubkeys;
