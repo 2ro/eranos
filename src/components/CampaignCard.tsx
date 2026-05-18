@@ -1,6 +1,5 @@
 import { useMemo } from 'react';
 import { Link } from 'react-router-dom';
-import { useQuery } from '@tanstack/react-query';
 import { CalendarClock, HandHeart, MapPin, Target, Users, Archive } from 'lucide-react';
 
 import { Badge } from '@/components/ui/badge';
@@ -8,13 +7,13 @@ import { Card } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useAuthor } from '@/hooks/useAuthor';
+import { useBtcPrice } from '@/hooks/useBtcPrice';
 import { useCampaignDonations } from '@/hooks/useCampaignDonations';
 import {
   CAMPAIGN_CATEGORY_LABELS,
   type ParsedCampaign,
   encodeCampaignNaddr,
 } from '@/lib/campaign';
-import { fetchBtcPrice } from '@/lib/bitcoin';
 import { formatCampaignAmount } from '@/lib/formatCampaignAmount';
 import { genUserName } from '@/lib/genUserName';
 import { sanitizeUrl } from '@/lib/sanitizeUrl';
@@ -73,12 +72,7 @@ interface CampaignCardProps {
 export function CampaignCard({ campaign, variant = 'compact', className }: CampaignCardProps) {
   const author = useAuthor(campaign.pubkey);
   const { data: stats } = useCampaignDonations(campaign.aTag);
-  const { data: btcPrice } = useQuery({
-    queryKey: ['btc-price'],
-    queryFn: fetchBtcPrice,
-    staleTime: 30_000,
-    refetchInterval: 60_000,
-  });
+  const { data: btcPrice } = useBtcPrice();
 
   const naddr = useMemo(() => encodeCampaignNaddr(campaign), [campaign]);
   const cover = sanitizeUrl(campaign.image);

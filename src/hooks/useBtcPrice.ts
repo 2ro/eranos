@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 
 import { fetchBtcPrice } from '@/lib/bitcoin';
+import { useAppContext } from '@/hooks/useAppContext';
 
 /**
  * Tiny standalone hook for the spot BTC→USD price.
@@ -14,9 +15,11 @@ import { fetchBtcPrice } from '@/lib/bitcoin';
  * share a single in-flight request and TanStack Query dedupes naturally.
  */
 export function useBtcPrice() {
+  const { config } = useAppContext();
+  const { esploraBaseUrl } = config;
   return useQuery({
-    queryKey: ['btc-price'],
-    queryFn: fetchBtcPrice,
+    queryKey: ['btc-price', esploraBaseUrl],
+    queryFn: () => fetchBtcPrice(esploraBaseUrl),
     refetchInterval: 60_000,
     staleTime: 30_000,
   });

@@ -1,5 +1,6 @@
-import { useState, useEffect, useRef, forwardRef } from 'react';
-import { Zap, Copy, Check, ExternalLink, Sparkle, Sparkles, Star, Rocket, X, Smile } from 'lucide-react';
+import { useState, useEffect, useRef, useMemo, useCallback, forwardRef } from 'react';
+import { Zap, Copy, Check, ExternalLink, X, Bitcoin, Loader2 } from 'lucide-react';
+import { useQuery } from '@tanstack/react-query';
 import { openUrl } from '@/lib/downloadFile';
 import { impactMedium } from '@/lib/haptics';
 import { HelpTip } from '@/components/HelpTip';
@@ -11,26 +12,26 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { Card, CardContent } from '@/components/ui/card';
-import { Separator } from '@/components/ui/separator';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { EmojiPicker } from '@/components/EmojiPicker';
-import { EmojiShortcodeAutocomplete } from '@/components/EmojiShortcodeAutocomplete';
+import { QRCodeCanvas } from '@/components/ui/qrcode';
+import { OnchainZapContent } from '@/components/OnchainZapContent';
+import { ZapSuccessScreen } from '@/components/ZapSuccessScreen';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useAuthor } from '@/hooks/useAuthor';
+import { useBitcoinSigner } from '@/hooks/useBitcoinSigner';
 import { useToast } from '@/hooks/useToast';
 import { useZaps } from '@/hooks/useZaps';
 import { useWallet } from '@/hooks/useWallet';
 import { useAppContext } from '@/hooks/useAppContext';
-import { useCustomEmojis } from '@/hooks/useCustomEmojis';
-import { useFeedSettings } from '@/hooks/useFeedSettings';
-import { useInsertText } from '@/hooks/useInsertText';
+import { canZap } from '@/lib/canZap';
+import {
+  fetchBtcPrice,
+  isLargeAmount,
+  satsToUSD,
+} from '@/lib/bitcoin';
 import type { Event } from 'nostr-tools';
-import QRCode from 'qrcode';
-import type { WebLNProvider } from "@webbtc/webln-types";
+import type { WebLNProvider } from '@webbtc/webln-types';
 
 interface ZapDialogProps {
   target: Event;
@@ -38,240 +39,248 @@ interface ZapDialogProps {
   className?: string;
 }
 
-const presetAmounts = [
-  { amount: 21, icon: Sparkle },
-  { amount: 50, icon: Sparkles },
-  { amount: 100, icon: Zap },
-  { amount: 250, icon: Star },
-  { amount: 1000, icon: Rocket },
-];
+// USD presets for the Lightning tab. Lightning zaps are expected to be
+// much smaller than on-chain sends (which have a fixed per-tx fee floor),
+// so the presets stay in tip-jar territory.
+const LIGHTNING_USD_PRESETS = [0.1, 0.5, 1, 2, 5];
 
-interface ZapContentProps {
+/** Format a preset button label without trailing zeros ($0.10 → $0.10, $1 → $1). */
+function formatPresetLabel(usd: number): string {
+  return usd < 1 ? `$${usd.toFixed(2)}` : `$${usd}`;
+}
+
+interface LightningZapContentProps {
   invoice: string | null;
-  amount: number | string;
-  comment: string;
+  usdAmount: number | string;
+  amountSats: number;
+  btcPrice: number | undefined;
   isZapping: boolean;
-  qrCodeUrl: string;
   copied: boolean;
   webln: WebLNProvider | null;
+  insufficient: boolean;
+  isLarge: boolean;
+  confirmArmed: boolean;
+  error: string;
   handleZap: () => void;
   handleCopy: () => void;
   openInWallet: () => void;
-  setAmount: (amount: number | string) => void;
-  setComment: (comment: string) => void;
-  inputRef: React.RefObject<HTMLInputElement | null>;
-  commentTextareaRef: React.RefObject<HTMLTextAreaElement | null>;
-  insertEmoji: (emoji: string) => void;
-  insertAtCursor: (params: { start: number; end: number; replacement: string }) => void;
-  customEmojis: Array<{ shortcode: string; url: string }>;
-  zap: (amount: number, comment: string) => void;
+  setUsdAmount: (amount: number | string) => void;
+  setError: (msg: string) => void;
+  editingAmount: boolean;
+  setEditingAmount: (v: boolean) => void;
+  amountInputRef: React.RefObject<HTMLInputElement | null>;
+  commitAmountEdit: () => void;
+  payWithWebLN: () => void;
 }
 
-// Moved ZapContent outside of ZapDialog to prevent re-renders causing focus loss
-const ZapContent = forwardRef<HTMLDivElement, ZapContentProps>(({
+/**
+ * Lightning zap flow. Mirrors the onchain tab: one screen, one button, no
+ * comment field. Amount is denominated in USD and converted to sats at
+ * payment time using the same BTC price query the onchain tab uses.
+ *
+ * Defined outside `ZapDialog` as a `forwardRef` to keep the amount input
+ * from losing focus on parent re-renders.
+ */
+const LightningZapContent = forwardRef<HTMLDivElement, LightningZapContentProps>(({
   invoice,
-  amount,
-  comment,
+  usdAmount,
+  amountSats,
+  btcPrice,
   isZapping,
-  qrCodeUrl,
   copied,
   webln,
+  insufficient,
+  isLarge,
+  confirmArmed,
+  error,
   handleZap,
   handleCopy,
   openInWallet,
-  setAmount,
-  setComment,
-  inputRef,
-  commentTextareaRef,
-  insertEmoji,
-  insertAtCursor,
-  customEmojis,
-  zap,
-}, ref) => (
-  <div ref={ref}>
-    {invoice ? (
-      <div className="flex flex-col h-full min-h-0">
-        {/* Payment amount display */}
-        <div className="text-center pt-4">
-          <div className="text-2xl font-bold">{amount} sats</div>
-        </div>
+  setUsdAmount,
+  setError,
+  editingAmount,
+  setEditingAmount,
+  amountInputRef,
+  commitAmountEdit,
+  payWithWebLN,
+}, ref) => {
+  const currentUsd = typeof usdAmount === 'string' ? parseFloat(usdAmount) : usdAmount;
+  const hasValidAmount = Number.isFinite(currentUsd) && currentUsd > 0;
+  const usdString = btcPrice && amountSats > 0 ? satsToUSD(amountSats, btcPrice) : '';
+  // When btcPrice hasn't loaded yet, fall back to formatting the raw USD
+  // input so small values like 0.1 still render as "$0.10".
+  const fallbackUsd = hasValidAmount
+    ? (currentUsd < 1 ? `$${currentUsd.toFixed(2)}` : `$${currentUsd}`)
+    : '';
+  const usdDisplay = usdString || fallbackUsd;
 
-        <Separator className="my-4" />
-
-        <div className="flex flex-col justify-center min-h-0 flex-1 px-5">
-          {/* QR Code */}
-          <div className="flex justify-center">
-            <Card className="p-3 w-[min(240px,70vw,35vh)] mx-auto">
-              <CardContent className="p-0 flex justify-center">
-                {qrCodeUrl ? (
-                  <img
-                    src={qrCodeUrl}
-                    alt="Lightning Invoice QR Code"
-                    className="w-full h-auto aspect-square object-contain"
-                  />
-                ) : (
-                  <div className="w-full aspect-square bg-muted animate-pulse rounded" />
-                )}
-              </CardContent>
-            </Card>
-          </div>
-
-          {/* Invoice input */}
-          <div className="space-y-2 mt-4">
-            <Label htmlFor="invoice">Lightning Invoice</Label>
-            <div className="flex gap-2 min-w-0">
-              <Input
-                id="invoice"
-                value={invoice}
-                readOnly
-                className="font-mono text-base md:text-xs min-w-0 flex-1 overflow-hidden text-ellipsis"
-                onClick={(e) => e.currentTarget.select()}
-              />
-              <Button
-                variant="outline"
-                size="icon"
-                onClick={handleCopy}
-                className="shrink-0"
-              >
-                {copied ? (
-                  <Check className="h-4 w-4 text-green-600" />
-                ) : (
-                  <Copy className="h-4 w-4" />
-                )}
-              </Button>
-            </div>
-          </div>
-
-          {/* Payment buttons */}
-          <div className="space-y-3 mt-4">
-            {webln && (
-              <Button
-                onClick={() => {
-                  const finalAmount = typeof amount === 'string' ? parseInt(amount, 10) : amount;
-                  zap(finalAmount, comment);
-                }}
-                disabled={isZapping}
-                className="w-full"
-                size="lg"
-              >
-                <Zap className="h-4 w-4 mr-2" />
-                {isZapping ? "Processing..." : "Pay with WebLN"}
-              </Button>
-            )}
-
-            <Button
-              variant="outline"
-              onClick={openInWallet}
-              className="w-full"
-              size="lg"
-            >
-              <ExternalLink className="h-4 w-4 mr-2" />
-              Open in Lightning Wallet
-            </Button>
-
-            <div className="text-xs text-muted-foreground text-center pb-3">
-              Scan the QR code or copy the invoice to pay with any Lightning wallet.
-            </div>
+  if (invoice) {
+    return (
+      <div ref={ref} className="grid gap-3 px-4 py-4 w-full overflow-hidden">
+        {/* Amount header — USD only; sats are an implementation detail. */}
+        <div className="flex flex-col items-center pt-1">
+          <div className="text-3xl font-semibold tabular-nums">
+            {usdDisplay}
           </div>
         </div>
-      </div>
-    ) : (
-      <>
-        <div className="grid gap-3 px-4 py-4 w-full overflow-hidden">
-          <ToggleGroup
-            type="single"
-            value={String(amount)}
-            onValueChange={(value) => {
-              if (value) {
-                setAmount(parseInt(value, 10));
-              }
-            }}
-            className="grid grid-cols-5 gap-1 w-full"
-          >
-            {presetAmounts.map(({ amount: presetAmount, icon: Icon }) => (
-              <ToggleGroupItem
-                key={presetAmount}
-                value={String(presetAmount)}
-                className="flex flex-col h-auto min-w-0 text-xs px-1 py-2"
-              >
-                <Icon className="h-4 w-4 mb-1" />
-                <span className="truncate">{presetAmount}</span>
-              </ToggleGroupItem>
-            ))}
-          </ToggleGroup>
-          <div className="flex items-center gap-2">
-            <div className="h-px flex-1 bg-muted" />
-            <span className="text-xs text-muted-foreground">OR</span>
-            <div className="h-px flex-1 bg-muted" />
+
+        {/* QR code */}
+        <div className="flex justify-center">
+          <div className="bg-white p-3 rounded-xl" aria-label="Lightning invoice QR code">
+            <QRCodeCanvas value={invoice.toUpperCase()} size={220} level="M" className="block" />
           </div>
+        </div>
+
+        {/* Invoice copy row */}
+        <div className="flex gap-2 min-w-0">
           <Input
-            ref={inputRef}
-            id="custom-amount"
-            type="number"
-            placeholder="Custom amount"
-            value={amount}
-            onChange={(e) => setAmount(e.target.value)}
-            className="w-full"
+            id="invoice"
+            value={invoice}
+            readOnly
+            aria-label="Lightning invoice"
+            className="font-mono text-xs min-w-0 flex-1 overflow-hidden text-ellipsis"
+            onClick={(e) => e.currentTarget.select()}
           />
-          <div className="relative">
-            <Textarea
-              ref={commentTextareaRef}
-              id="custom-comment"
-              placeholder="Add a comment (optional)"
-              value={comment}
-              onChange={(e) => setComment(e.target.value)}
-              className="w-full resize-none"
-              rows={2}
-            />
-            <EmojiShortcodeAutocomplete
-              textareaRef={commentTextareaRef}
-              content={comment}
-              onInsertEmoji={insertAtCursor}
-            />
-          </div>
-          <div className="flex items-center">
-            <Popover>
-              <PopoverTrigger asChild>
-                <button
-                  type="button"
-                  className="p-1.5 rounded-full text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors"
-                >
-                  <Smile className="size-4" />
-                </button>
-              </PopoverTrigger>
-              <PopoverContent
-                align="start"
-                sideOffset={8}
-                className="w-auto p-0 border-border"
-              >
-                <EmojiPicker
-                  customEmojis={customEmojis}
-                  onSelect={(selection) => {
-                    const text = selection.type === 'native' ? selection.emoji : `:${selection.shortcode}:`;
-                    insertEmoji(text);
-                  }}
-                />
-              </PopoverContent>
-            </Popover>
-          </div>
-        </div>
-        <div className="px-4 pb-4">
-          <Button onClick={handleZap} className="w-full" disabled={isZapping} size="default">
-            {isZapping ? (
-              'Creating invoice...'
+          <Button
+            type="button"
+            variant="outline"
+            size="icon"
+            onClick={handleCopy}
+            className="shrink-0"
+            aria-label="Copy invoice"
+          >
+            {copied ? (
+              <Check className="h-4 w-4 text-green-600" />
             ) : (
-              <>
-                <Zap className="h-4 w-4 mr-2" />
-                Zap {amount} sats
-              </>
+              <Copy className="h-4 w-4" />
             )}
           </Button>
         </div>
-      </>
-    )}
-  </div>
-));
-ZapContent.displayName = 'ZapContent';
+
+        {/* Payment actions */}
+        <div className="grid gap-2">
+          {webln && (
+            <Button
+              type="button"
+              onClick={payWithWebLN}
+              disabled={isZapping}
+              className="w-full"
+            >
+              {isZapping ? (
+                <>
+                  <Loader2 className="size-4 mr-1.5 animate-spin" />
+                  Processing…
+                </>
+              ) : (
+                'Pay with WebLN'
+              )}
+            </Button>
+          )}
+          <Button
+            type="button"
+            variant={webln ? 'outline' : 'default'}
+            onClick={openInWallet}
+            className="w-full"
+          >
+            <ExternalLink className="h-4 w-4 mr-2" />
+            Open in Lightning Wallet
+          </Button>
+        </div>
+
+        <p className="text-[11px] text-muted-foreground text-center">
+          Scan the QR or copy the invoice to pay with any Lightning wallet.
+        </p>
+      </div>
+    );
+  }
+
+  return (
+    <div ref={ref} className="grid gap-3 px-4 py-4 w-full overflow-hidden">
+      {/* Amount — big number on top, editable by clicking. Matches OnchainZapContent. */}
+      <div className="flex flex-col items-center pt-2">
+        {editingAmount ? (
+          <div className="flex items-baseline justify-center">
+            <span className={`text-4xl font-semibold ${insufficient ? 'text-destructive' : 'text-muted-foreground'}`}>$</span>
+            <input
+              ref={amountInputRef}
+              type="number"
+              inputMode="decimal"
+              min={0}
+              step="0.01"
+              value={usdAmount}
+              onChange={(e) => { setUsdAmount(e.target.value); setError(''); }}
+              onBlur={commitAmountEdit}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  e.preventDefault();
+                  commitAmountEdit();
+                }
+              }}
+              aria-label="Amount in USD"
+              className={`bg-transparent border-0 outline-none text-4xl font-semibold text-center [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none ${insufficient ? 'text-destructive' : ''}`}
+              style={{ width: `${Math.max(2, String(usdAmount).length + 1)}ch` }}
+            />
+          </div>
+        ) : (
+          <button
+            type="button"
+            onClick={() => setEditingAmount(true)}
+            aria-label="Edit amount"
+            className="flex items-baseline justify-center rounded-md px-2 -mx-2 hover:bg-muted/50 focus:outline-none focus-visible:ring-2 focus-visible:ring-ring transition-colors"
+          >
+            <span className={`text-4xl font-semibold ${insufficient ? 'text-destructive' : 'text-muted-foreground'}`}>$</span>
+            <span className={`text-4xl font-semibold tabular-nums ${insufficient ? 'text-destructive' : ''}`}>
+              {hasValidAmount ? (currentUsd < 1 ? currentUsd.toFixed(2) : currentUsd) : 0}
+            </span>
+          </button>
+        )}
+      </div>
+
+      {/* Presets — compact. Lightning zaps lean small, so the defaults stay
+          in tip-jar territory. */}
+      <ToggleGroup
+        type="single"
+        value={LIGHTNING_USD_PRESETS.includes(Number(usdAmount)) ? String(usdAmount) : ''}
+        onValueChange={(v) => { if (v) { setUsdAmount(Number(v)); setError(''); setEditingAmount(false); } }}
+        className="grid grid-cols-5 gap-1 w-full"
+      >
+        {LIGHTNING_USD_PRESETS.map((v) => (
+          <ToggleGroupItem
+            key={v}
+            value={String(v)}
+            className="h-8 min-w-0 text-xs font-semibold px-1"
+          >
+            {formatPresetLabel(v)}
+          </ToggleGroupItem>
+        ))}
+      </ToggleGroup>
+
+      {error && (
+        <p className="text-xs text-destructive">{error}</p>
+      )}
+
+      <Button
+        type="button"
+        onClick={handleZap}
+        disabled={!btcPrice || amountSats <= 0 || isZapping}
+        variant={isLarge && !isZapping ? 'destructive' : 'default'}
+        className="w-full"
+      >
+        {isZapping ? (
+          <>
+            <Loader2 className="size-4 mr-1.5 animate-spin" />
+            Creating invoice…
+          </>
+        ) : isLarge && confirmArmed ? (
+          <>Tap again to send {usdDisplay}</>
+        ) : (
+          <>Send {usdDisplay}</>
+        )}
+      </Button>
+    </div>
+  );
+});
+LightningZapContent.displayName = 'LightningZapContent';
 
 export function ZapDialog({ target, children, className }: ZapDialogProps) {
   const [open, setOpen] = useState(false);
@@ -279,61 +288,91 @@ export function ZapDialog({ target, children, className }: ZapDialogProps) {
   const { data: author } = useAuthor(target.pubkey);
   const { toast } = useToast();
   const { webln, activeNWC } = useWallet();
-  const { zap, isZapping, invoice, setInvoice } = useZaps(target, webln, activeNWC, () => setOpen(false));
   const { config } = useAppContext();
-  const [amount, setAmount] = useState<number | string>(100);
-  const [comment, setComment] = useState<string>('');
+  const { esploraBaseUrl } = config;
+
+  // Success state: populated by either zap rail's onSuccess callback.
+  // When set, we replace the tab UI with <ZapSuccessScreen />.
+  const [success, setSuccess] = useState<
+    | { kind: 'onchain'; amountSats: number; txid: string }
+    | { kind: 'lightning'; amountSats: number }
+    | null
+  >(null);
+
+  const handleLightningSuccess = useCallback(
+    ({ amountSats }: { amountSats: number }) => {
+      setSuccess({ kind: 'lightning', amountSats });
+    },
+    [],
+  );
+
+  const { zap, isZapping, invoice, setInvoice } = useZaps(
+    target,
+    webln,
+    activeNWC,
+    handleLightningSuccess,
+  );
+
+  // USD-denominated state (matches OnchainZapContent). The sats amount is
+  // derived just before we hit the LNURL endpoint.
+  const [usdAmount, setUsdAmount] = useState<number | string>(0.5);
   const [copied, setCopied] = useState(false);
-  const [qrCodeUrl, setQrCodeUrl] = useState<string>('');
-  const inputRef = useRef<HTMLInputElement>(null);
-  const commentTextareaRef = useRef<HTMLTextAreaElement>(null);
-  const { feedSettings } = useFeedSettings();
-  const { emojis: allCustomEmojis } = useCustomEmojis();
-  const customEmojis = feedSettings.showCustomEmojis !== false ? allCustomEmojis : [];
-  const { insertAtCursor, insertEmoji } = useInsertText(commentTextareaRef, comment, setComment);
+  const [editingAmount, setEditingAmount] = useState(false);
+  const [error, setError] = useState('');
+  const [confirmArmed, setConfirmArmed] = useState(false);
+  const amountInputRef = useRef<HTMLInputElement>(null);
 
+  const { data: btcPrice } = useQuery({
+    queryKey: ['btc-price', esploraBaseUrl],
+    queryFn: () => fetchBtcPrice(esploraBaseUrl),
+    staleTime: 30_000,
+  });
+
+  // Convert the USD amount to sats for the actual Lightning payment.
+  const amountSats = useMemo(() => {
+    if (!btcPrice) return 0;
+    const usd = typeof usdAmount === 'string' ? parseFloat(usdAmount) : usdAmount;
+    if (!Number.isFinite(usd) || usd <= 0) return 0;
+    const btc = usd / btcPrice;
+    return Math.round(btc * 100_000_000);
+  }, [usdAmount, btcPrice]);
+
+  const isLarge = isLargeAmount(amountSats, btcPrice);
+  // Lightning has no local balance concept (the wallet / LNURL handles that),
+  // so `insufficient` stays false — kept for symmetry with the onchain props.
+  const insufficient = false;
+
+  // Default tab: Bitcoin. Users can switch to Lightning if available.
+  // If the user's signer can't sign PSBTs AND Lightning is available, we
+  // transparently default to Lightning instead of showing an unusable
+  // Bitcoin tab as the primary option.
+  const { capability: btcCapability } = useBitcoinSigner();
+  const hasLightning = canZap(author?.metadata);
+  const bitcoinUnsupported = btcCapability === 'unsupported';
+  const [activeTab, setActiveTab] = useState<'onchain' | 'lightning'>(
+    bitcoinUnsupported && hasLightning ? 'lightning' : 'onchain',
+  );
+
+  // Re-arm (clear confirmation) whenever the amount moves — editing after
+  // arming forces another deliberate click. Mirrors OnchainZapContent.
   useEffect(() => {
-    if (target) {
-      setComment(`Zapped with ${config.appName}!`);
+    setConfirmArmed(false);
+  }, [amountSats]);
+
+  // Focus + select-all when the amount is clicked into edit mode.
+  useEffect(() => {
+    if (editingAmount) {
+      amountInputRef.current?.focus();
+      amountInputRef.current?.select();
     }
-  }, [target, config.appName]);
+  }, [editingAmount]);
 
-  // Generate QR code
-  useEffect(() => {
-    let isCancelled = false;
-
-    const generateQR = async () => {
-      if (!invoice) {
-        setQrCodeUrl('');
-        return;
-      }
-
-      try {
-        const url = await QRCode.toDataURL(invoice.toUpperCase(), {
-          width: 512,
-          margin: 2,
-          color: {
-            dark: '#000000',
-            light: '#FFFFFF',
-          },
-        });
-
-        if (!isCancelled) {
-          setQrCodeUrl(url);
-        }
-      } catch (err) {
-        if (!isCancelled) {
-          console.error('Failed to generate QR code:', err);
-        }
-      }
-    };
-
-    generateQR();
-
-    return () => {
-      isCancelled = true;
-    };
-  }, [invoice]);
+  const commitAmountEdit = useCallback(() => {
+    setEditingAmount(false);
+    if (typeof usdAmount === 'string' && usdAmount.trim() === '') {
+      setUsdAmount(0);
+    }
+  }, [usdAmount]);
 
   const handleCopy = async () => {
     if (invoice) {
@@ -349,55 +388,93 @@ export function ZapDialog({ target, children, className }: ZapDialogProps) {
 
   const openInWallet = () => {
     if (invoice) {
-      const lightningUrl = `lightning:${invoice}`;
-      openUrl(lightningUrl);
+      openUrl(`lightning:${invoice}`);
     }
   };
 
   useEffect(() => {
     if (open) {
-      setAmount(100);
+      setUsdAmount(0.5);
       setInvoice(null);
       setCopied(false);
-      setQrCodeUrl('');
+      setEditingAmount(false);
+      setError('');
+      setConfirmArmed(false);
+      setSuccess(null);
+      setActiveTab(bitcoinUnsupported && hasLightning ? 'lightning' : 'onchain');
     } else {
-      setAmount(100);
+      setUsdAmount(0.5);
       setInvoice(null);
       setCopied(false);
-      setQrCodeUrl('');
+      setEditingAmount(false);
+      setError('');
+      setConfirmArmed(false);
+      setSuccess(null);
     }
+    // `bitcoinUnsupported`/`hasLightning` deliberately excluded — we only
+    // want to reset the active tab on open/close, not on every capability
+    // re-render. The mid-session flip is handled by the effect below.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open, setInvoice]);
 
+  // Previously, if Bitcoin capability flipped to `unsupported` mid-session we
+  // auto-switched to Lightning because the Bitcoin tab was a dead-end. The
+  // Bitcoin tab now shows a QR fallback for unsupported signers, so users
+  // should be free to click into it. We only bias the *initial* tab choice
+  // toward Lightning (above, in the useState initializer and the open-reset
+  // effect); manual navigation into Bitcoin is respected.
+
   const handleZap = () => {
+    setError('');
+    if (!btcPrice) { setError('Waiting for BTC price…'); return; }
+    if (amountSats <= 0) { setError('Enter an amount.'); return; }
+
+    // Two-tap safety for large amounts: first click arms, second click sends.
+    if (isLarge && !confirmArmed) {
+      setConfirmArmed(true);
+      return;
+    }
+
     impactMedium();
-    const finalAmount = typeof amount === 'string' ? parseInt(amount, 10) : amount;
-    zap(finalAmount, comment);
+    zap(amountSats, '');
   };
 
-  const contentProps = {
+  const payWithWebLN = () => {
+    if (amountSats > 0) {
+      zap(amountSats, '');
+    }
+  };
+
+  const lightningContentProps: LightningZapContentProps = {
     invoice,
-    amount,
-    comment,
+    usdAmount,
+    amountSats,
+    btcPrice,
     isZapping,
-    qrCodeUrl,
     copied,
     webln,
+    insufficient,
+    isLarge,
+    confirmArmed,
+    error,
     handleZap,
     handleCopy,
     openInWallet,
-    setAmount,
-    setComment,
-    inputRef,
-    commentTextareaRef,
-    insertEmoji,
-    insertAtCursor,
-    customEmojis,
-    zap,
+    setUsdAmount,
+    setError,
+    editingAmount,
+    setEditingAmount,
+    amountInputRef,
+    commitAmountEdit,
+    payWithWebLN,
   };
 
-  const canZap = !!user && user.pubkey !== target.pubkey && !!(author?.metadata?.lud06 || author?.metadata?.lud16);
+  // Zap button shows for any logged-in user except when targeting oneself.
+  // On-chain is always available; Lightning is offered as an in-dialog option
+  // when the author has a Lightning address.
+  const canOpenZap = !!user && user.pubkey !== target.pubkey;
 
-  if (!canZap) {
+  if (!canOpenZap) {
     return <>{children}</>;
   }
 
@@ -411,7 +488,20 @@ export function ZapDialog({ target, children, className }: ZapDialogProps) {
       <DialogContent className="max-w-[425px] rounded-2xl p-0 gap-0 border-border overflow-hidden max-h-[95vh] [&>button]:hidden" data-testid="zap-modal">
         <div className="flex items-center justify-between px-4 h-12">
           <DialogTitle className="text-base font-semibold flex items-center gap-1.5">
-            {invoice ? 'Lightning Payment' : 'Send a Zap'} <HelpTip faqId="what-are-zaps" />
+            {success
+              ? 'Success'
+              : invoice
+                ? 'Lightning Payment'
+                : 'Send Bitcoin'}{' '}
+            {!success && (
+              <HelpTip
+                faqId={
+                  invoice || activeTab === 'lightning'
+                    ? 'send-bitcoin-lightning'
+                    : 'send-bitcoin-onchain'
+                }
+              />
+            )}
           </DialogTitle>
           <button
             onClick={() => setOpen(false)}
@@ -420,11 +510,49 @@ export function ZapDialog({ target, children, className }: ZapDialogProps) {
             <X className="size-5" />
           </button>
         </div>
-        <p className="px-4 -mt-1 mb-1 text-sm text-muted-foreground">
-          {invoice ? 'Pay with Bitcoin Lightning Network' : 'Send a small Bitcoin payment to support the creator.'}
-        </p>
         <div className="overflow-y-auto">
-          <ZapContent {...contentProps} />
+          {success ? (
+            <ZapSuccessScreen
+              recipientPubkey={target.pubkey}
+              amountSats={success.amountSats}
+              btcPrice={btcPrice}
+              txid={success.kind === 'onchain' ? success.txid : undefined}
+              onClose={() => setOpen(false)}
+            />
+          ) : hasLightning ? (
+            <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as 'onchain' | 'lightning')} className="w-full">
+              <div className="px-4 pt-2">
+                <TabsList className="grid w-full grid-cols-2 h-9">
+                  <TabsTrigger value="onchain" className="gap-1.5 text-xs">
+                    <Bitcoin className="size-3.5" /> Bitcoin
+                  </TabsTrigger>
+                  <TabsTrigger value="lightning" className="gap-1.5 text-xs">
+                    <Zap className="size-3.5" /> Lightning
+                  </TabsTrigger>
+                </TabsList>
+              </div>
+              <TabsContent value="onchain" className="mt-0">
+                <OnchainZapContent
+                  target={target}
+                  onSuccess={({ txid, amountSats }) =>
+                    setSuccess({ kind: 'onchain', amountSats, txid })
+                  }
+                  onClose={() => setOpen(false)}
+                />
+              </TabsContent>
+              <TabsContent value="lightning" className="mt-0">
+                <LightningZapContent {...lightningContentProps} />
+              </TabsContent>
+            </Tabs>
+          ) : (
+            <OnchainZapContent
+              target={target}
+              onSuccess={({ txid, amountSats }) =>
+                setSuccess({ kind: 'onchain', amountSats, txid })
+              }
+              onClose={() => setOpen(false)}
+            />
+          )}
         </div>
       </DialogContent>
     </Dialog>

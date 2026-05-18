@@ -18,7 +18,6 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { useNsecPasteGuard } from "@/hooks/useNsecPasteGuard";
 import type { AppConfig } from "@/contexts/AppContext";
 import { NWCProvider } from "@/contexts/NWCContext";
-import { SparkWalletProvider } from "@/contexts/SparkWalletContext";
 import { BuildConfigSchema, type BuildConfig } from "@/lib/schemas";
 import { secureStorage } from "@/lib/secureStorage";
 import AppRouter from "./AppRouter";
@@ -203,13 +202,11 @@ export function App() {
                   <NativeNotifications />
 
                     <NWCProvider>
-                    <SparkWalletProvider>
                       <TooltipProvider>
                         <InitialSyncGate>
                           <AppRouter />
                         </InitialSyncGate>
                       </TooltipProvider>
-                    </SparkWalletProvider>
                   </NWCProvider>
                 </NostrProvider>
               </NostrLoginProvider>

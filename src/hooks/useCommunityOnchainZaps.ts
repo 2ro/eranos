@@ -1,5 +1,6 @@
 import { useQueryClient } from '@tanstack/react-query';
 
+import { useAppContext } from '@/hooks/useAppContext';
 import { useBitcoinSigner, isSignerCapabilityError, reportSignerUnsupported } from '@/hooks/useBitcoinSigner';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useNostrPublish } from '@/hooks/useNostrPublish';
@@ -60,6 +61,8 @@ export function useCommunityOnchainZaps() {
   const { canSignPsbt, signPsbt } = useBitcoinSigner();
   const { mutateAsync: publishEvent } = useNostrPublish();
   const queryClient = useQueryClient();
+  const { config } = useAppContext();
+  const { esploraBaseUrl } = config;
 
   async function zapCommunityOnchain({
     community,
@@ -91,8 +94,8 @@ export function useCommunityOnchainZaps() {
     });
 
     const [utxos, rates] = await Promise.all([
-      fetchUTXOs(senderAddress),
-      getFeeRates(),
+      fetchUTXOs(senderAddress, esploraBaseUrl),
+      getFeeRates(esploraBaseUrl),
     ]);
     if (utxos.length === 0) {
       throw new Error('Your Bitcoin wallet has no spendable funds.');
@@ -117,7 +120,7 @@ export function useCommunityOnchainZaps() {
     }
 
     const txHex = finalizePsbt(signedHex);
-    const txid = await broadcastTransaction(txHex);
+    const txid = await broadcastTransaction(txHex, esploraBaseUrl);
     const publishFailed: CommunityOnchainZapPublishFailure[] = [];
     let published = 0;
 

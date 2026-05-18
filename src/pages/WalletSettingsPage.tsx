@@ -3,7 +3,6 @@ import { Navigate } from 'react-router-dom';
 import { PageHeader } from '@/components/PageHeader';
 import { HelpTip } from '@/components/HelpTip';
 import { WalletSettings } from '@/components/WalletSettings';
-import { WalletSettingsContent } from '@/components/WalletSettingsContent';
 import { useAppContext } from '@/hooks/useAppContext';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 
@@ -13,7 +12,7 @@ export function WalletSettingsPage() {
 
   useSeoMeta({
     title: `Wallet | Settings | ${config.appName}`,
-    description: 'Manage your Spark wallet, recovery phrase, lightning address, and external wallet connections.',
+    description: 'Manage your wallet connections',
   });
 
   if (!user) {
@@ -30,21 +29,14 @@ export function WalletSettingsPage() {
           <div className="flex-1 min-w-0">
             <h1 className="text-xl font-bold flex items-center gap-1.5">Wallet <HelpTip faqId="connect-wallet" /></h1>
             <p className="text-sm text-muted-foreground mt-0.5">
-              Manage your built-in wallet, backups, and external connections
+              Manage wallet connections and payments
             </p>
           </div>
         }
       />
 
-      <div className="p-4 space-y-8">
-        {/* Spark wallet: backup, recovery phrase, lightning address, security, danger zone */}
-        <WalletSettingsContent />
-
-        {/* External wallet connections (NWC + WebLN) */}
-        <section>
-          <h2 className="text-lg font-semibold mb-3">External Connections</h2>
-          <WalletSettings />
-        </section>
+      <div className="p-4">
+        <WalletSettings />
       </div>
     </main>
   );

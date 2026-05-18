@@ -4,16 +4,12 @@ import { useAuthor } from '@/hooks/useAuthor';
 import { useAppContext } from '@/hooks/useAppContext';
 import { useToast } from '@/hooks/useToast';
 import { useNWC } from '@/hooks/useNWCContext';
-import { useSparkWallet } from '@/hooks/useSparkWallet';
 import type { NWCConnection } from '@/hooks/useNWC';
+import { nip57 } from 'nostr-tools';
 import type { Event } from 'nostr-tools';
 import type { WebLNProvider } from '@webbtc/webln-types';
 import { useQueryClient } from '@tanstack/react-query';
 import { notificationSuccess } from '@/lib/haptics';
-import { parseGoalEvent } from '@/lib/goalUtils';
-import { createZapInvoice } from '@/lib/createZapInvoice';
-import { breezService } from '@/lib/spark/breezService';
-import type { NostrEvent } from '@nostrify/nostrify';
 
 /**
  * Hook for sending zaps to an event author.
@@ -32,7 +28,6 @@ export function useZaps(
   const queryClient = useQueryClient();
   const author = useAuthor(target?.pubkey);
   const { sendPayment, getActiveConnection } = useNWC();
-  const sparkWallet = useSparkWallet();
   const [isZapping, setIsZapping] = useState(false);
   const [invoice, setInvoice] = useState<string | null>(null);
 
@@ -94,70 +89,71 @@ export function useZaps(
         return;
       }
 
-      const goalRelays = target.kind === 9041
-        ? parseGoalEvent(target as unknown as NostrEvent)?.relays
-        : undefined;
+      // Get zap endpoint using the old reliable method
+      const zapEndpoint = await nip57.getZapEndpoint(author.data.event);
+      if (!zapEndpoint) {
+        toast({
+          title: 'Zap endpoint not found',
+          description: 'Could not find a zap endpoint for the author.',
+          variant: 'destructive',
+        });
+        setIsZapping(false);
+        return;
+      }
 
+      // Create zap request - use appropriate event format based on kind
+      // For addressable events (30000-39999), pass the object to get 'a' tag
+      // For all other events, pass the ID string to get 'e' tag
+      const event = (target.kind >= 30000 && target.kind < 40000)
+        ? target
+        : target.id;
+
+      const zapAmount = amount * 1000; // convert to millisats
+
+      const zapRequest = nip57.makeZapRequest({
+        profile: target.pubkey,
+        event: event,
+        amount: zapAmount,
+        relays: config.relayMetadata.relays.map(r => r.url),
+        comment
+      });
+
+      // Sign the zap request (but don't publish to relays - only send to LNURL endpoint)
       if (!user.signer) {
         throw new Error('No signer available');
       }
+      const signedZapRequest = await user.signer.signEvent(zapRequest);
 
       try {
-        const newInvoice = await createZapInvoice({
-          recipientEvent: author.data.event,
-          recipientPubkey: target.pubkey,
-          target,
-          amountSats: amount,
-          comment,
-          relays: goalRelays && goalRelays.length > 0
-            ? goalRelays
-            : config.relayMetadata.relays.map(r => r.url),
-          signer: user.signer,
-        });
+        const zapUrl = new URL(zapEndpoint);
+        zapUrl.searchParams.set('amount', String(zapAmount));
+        zapUrl.searchParams.set('nostr', JSON.stringify(signedZapRequest));
+
+        const res = await fetch(zapUrl.toString());
+        const responseText = await res.text();
+        let responseData: { pr?: string; reason?: string } = {};
+
+        try {
+          responseData = responseText ? JSON.parse(responseText) : {};
+        } catch (parseError) {
+          // Some LNURL providers return plain text/html for server errors.
+          console.warn('Failed to parse zap callback response as JSON', parseError);
+        }
+
+        if (!res.ok) {
+          const fallbackReason = responseText.trim() || 'Unknown error';
+          throw new Error(`HTTP ${res.status}: ${responseData.reason || fallbackReason}`);
+        }
+
+        const newInvoice = responseData.pr;
+        if (!newInvoice || typeof newInvoice !== 'string') {
+          throw new Error('Lightning service did not return a valid invoice');
+        }
 
         // Get the current active NWC connection dynamically
         const currentNWCConnection = getActiveConnection();
 
-        // Try self-custodial Agora Wallet first if it is ready and funded.
-        if (sparkWallet.isEnabled && sparkWallet.isInitialized && sparkWallet.balance >= amount) {
-          try {
-            await breezService.sendPayment(newInvoice);
-            await Promise.allSettled([
-              sparkWallet.refreshBalance(),
-              sparkWallet.refreshPayments(),
-            ]);
-
-            setIsZapping(false);
-            setInvoice(null);
-            notificationSuccess();
-
-            queryClient.setQueryData(['user-zap', target.id], true);
-            queryClient.invalidateQueries({ queryKey: ['zaps'] });
-            if (target.kind === 9041) {
-              queryClient.invalidateQueries({ queryKey: ['goal-progress', target.id] });
-            }
-
-            if (onZapSuccess) {
-              onZapSuccess({ amountSats: amount });
-            } else {
-              toast({
-                title: 'Zap successful!',
-                description: `You sent ${amount} sats from your Agora Wallet.`,
-              });
-            }
-            return;
-          } catch (sparkError) {
-            console.error('Agora Wallet payment failed, falling back:', sparkError);
-            const errorMessage = sparkError instanceof Error ? sparkError.message : 'Unknown wallet error';
-            toast({
-              title: 'Wallet payment failed',
-              description: `${errorMessage}. Falling back to other payment methods...`,
-              variant: 'destructive',
-            });
-          }
-        }
-
-        // Try NWC next if available and properly connected
+        // Try NWC first if available and properly connected
         if (currentNWCConnection && currentNWCConnection.connectionString && currentNWCConnection.isConnected) {
           try {
             await sendPayment(currentNWCConnection, newInvoice);
@@ -173,9 +169,6 @@ export function useZaps(
 
             // Invalidate zap queries to refresh counts
             queryClient.invalidateQueries({ queryKey: ['zaps'] });
-            if (target.kind === 9041) {
-              queryClient.invalidateQueries({ queryKey: ['goal-progress', target.id] });
-            }
 
             if (onZapSuccess) {
               // Consumer (e.g. ZapDialog) owns the success UI — skip the
@@ -228,9 +221,6 @@ export function useZaps(
 
             // Invalidate zap queries to refresh counts
             queryClient.invalidateQueries({ queryKey: ['zaps'] });
-            if (target.kind === 9041) {
-              queryClient.invalidateQueries({ queryKey: ['goal-progress', target.id] });
-            }
 
             if (onZapSuccess) {
               onZapSuccess({ amountSats: amount });

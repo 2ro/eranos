@@ -7,8 +7,25 @@
  */
 
 import type { NostrEvent, NostrSigner } from "@nostrify/nostrify";
-import type { SparkBackupData } from "./types";
 import { logger } from "@/lib/logger";
+
+/**
+ * Encrypted backup payload published to relays as kind 30078 (NIP-78).
+ *
+ * The `content` of the backup event is JSON-serialised SparkBackupData,
+ * whose `encryptedMnemonic` field is the NIP-44 ciphertext of the user's
+ * 12-word recovery phrase. Self-encryption (pubkey encrypts for itself)
+ * means only the same Nostr key can recover the mnemonic.
+ */
+interface SparkBackupData {
+  version: 2;
+  type: "spark-wallet-backup";
+  encryption: "nip44";
+  pubkey: string;
+  encryptedMnemonic: string;
+  createdAt: number; // milliseconds
+  createdBy: string;
+}
 
 /** NIP-78 kind for application-specific data */
 const BACKUP_KIND = 30078;

@@ -1,4 +1,4 @@
-import { useMemo, useCallback, useRef, useState } from 'react';
+import { useMemo, useCallback, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { nip19 } from 'nostr-tools';
 import {
@@ -8,7 +8,6 @@ import {
   CalendarDays,
   Crown,
   Info,
-  Link2,
   Megaphone,
   MessageCircle,
   MoreVertical,
@@ -64,7 +63,6 @@ import { useProfileUrl } from '@/hooks/useProfileUrl';
 import { useToast } from '@/hooks/useToast';
 import { CommunityModerationContext } from '@/contexts/CommunityModerationContext';
 import { useLayoutOptions } from '@/contexts/LayoutContext';
-import { LightningEffect, type LightningEffectHandle } from '@/components/LightningEffect';
 import { applyCommunityModerationToEvents, canBanTarget, getViewerAuthority, parseCommunityEvent, type CommunityMember } from '@/lib/communityUtils';
 import { genUserName } from '@/lib/genUserName';
 import { sanitizeUrl } from '@/lib/sanitizeUrl';
@@ -184,7 +182,6 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
   const navigate = useNavigate();
   const { toast } = useToast();
   const { user } = useCurrentUser();
-  const lightningRef = useRef<LightningEffectHandle>(null);
 
   // ── Member ban dialog state ────────────────────────────────────────────────
   const [banDialogOpen, setBanDialogOpen] = useState(false);
@@ -538,7 +535,7 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
   );
 
   const handleCommunityZapLaunched = useCallback(() => {
-    lightningRef.current?.triggerLightning({ strikes: 4 });
+    // No-op for now; previously triggered a Lightning visual effect.
   }, []);
 
   // ── Render ──────────────────────────────────────────────────────────────────
@@ -547,7 +544,6 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
 
   return (
     <div className="max-w-2xl mx-auto pb-16">
-      <LightningEffect ref={lightningRef} />
       <CommunityModerationContext.Provider value={moderationCtx}>
         <Tabs value={activeTab} onValueChange={setActiveTab}>
       {/* ── Hero banner + tabs ── */}
@@ -657,17 +653,6 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
                   members={membership.members}
                   membersLoading={membersLoading}
                   triggerClassName={bannerActionClassName}
-                  onZapLaunched={handleCommunityZapLaunched}
-                />
-              )}
-              {community && membership && (
-                <CommunityZapDialog
-                  community={community}
-                  members={membership.members}
-                  membersLoading={membersLoading}
-                  mode="bitcoin"
-                  triggerClassName={bannerActionClassName}
-                  triggerIcon={<Link2 className="size-5" />}
                   onZapLaunched={handleCommunityZapLaunched}
                 />
               )}

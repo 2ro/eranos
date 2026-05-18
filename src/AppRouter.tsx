@@ -38,7 +38,6 @@ const AppearanceSettingsPage = lazy(() => import("./pages/AppearanceSettingsPage
 const ArchivePage = lazy(() => import("./pages/ArchivePage").then(m => ({ default: m.ArchivePage })));
 const ArticleEditorPage = lazy(() => import("./pages/ArticleEditorPage").then(m => ({ default: m.ArticleEditorPage })));
 const BadgesPage = lazy(() => import("./pages/BadgesPage").then(m => ({ default: m.BadgesPage })));
-const BitcoinPage = lazy(() => import("./pages/BitcoinPage").then(m => ({ default: m.BitcoinPage })));
 const BlueskyPage = lazy(() => import("./pages/BlueskyPage").then(m => ({ default: m.BlueskyPage })));
 const BookmarksPage = lazy(() => import("./pages/BookmarksPage").then(m => ({ default: m.BookmarksPage })));
 const BooksPage = lazy(() => import("./pages/BooksPage").then(m => ({ default: m.BooksPage })));
@@ -79,6 +78,7 @@ const VerifiedPage = lazy(() => import("./pages/VerifiedPage").then(m => ({ defa
 const VideosFeedPage = lazy(() => import("./pages/VideosFeedPage").then(m => ({ default: m.VideosFeedPage })));
 const VinesFeedPage = lazy(() => import("./pages/VinesFeedPage").then(m => ({ default: m.VinesFeedPage })));
 const WalletPage = lazy(() => import("./pages/WalletPage").then(m => ({ default: m.WalletPage })));
+const WalletRecoveryPage = lazy(() => import("./pages/WalletRecoveryPage").then(m => ({ default: m.WalletRecoveryPage })));
 const WalletSettingsPage = lazy(() => import("./pages/WalletSettingsPage").then(m => ({ default: m.WalletSettingsPage })));
 const WebxdcFeedPage = lazy(() => import("./pages/WebxdcFeedPage").then(m => ({ default: m.WebxdcFeedPage })));
 const WikipediaPage = lazy(() => import("./pages/WikipediaPage").then(m => ({ default: m.WikipediaPage })));
@@ -276,7 +276,8 @@ export function AppRouter() {
               }
             />
             <Route path="/wallet" element={<WalletPage />} />
-            <Route path="/bitcoin" element={<BitcoinPage />} />
+            <Route path="/wallet/recovery" element={<WalletRecoveryPage />} />
+            <Route path="/bitcoin" element={<Navigate to="/wallet" replace />} />
             <Route path="/bookmarks" element={<BookmarksPage />} />
             <Route path="/ai-chat" element={<AIChatPage />} />
             <Route path="/verified" element={<VerifiedPage />} />

@@ -1,5 +1,6 @@
 import { useQueryClient } from '@tanstack/react-query';
 
+import { useAppContext } from '@/hooks/useAppContext';
 import { isSignerCapabilityError, reportSignerUnsupported, useBitcoinSigner } from '@/hooks/useBitcoinSigner';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useNostrPublish } from '@/hooks/useNostrPublish';
@@ -78,6 +79,8 @@ export function useDonateCampaign() {
   const { canSignPsbt, signPsbt } = useBitcoinSigner();
   const { mutateAsync: publishEvent } = useNostrPublish();
   const queryClient = useQueryClient();
+  const { config } = useAppContext();
+  const { esploraBaseUrl } = config;
 
   async function donateToCampaign({
     campaign,
@@ -117,7 +120,7 @@ export function useDonateCampaign() {
       return { address, amountSats: s.amountSats };
     });
 
-    const [utxos, rates] = await Promise.all([fetchUTXOs(senderAddress), getFeeRates()]);
+    const [utxos, rates] = await Promise.all([fetchUTXOs(senderAddress, esploraBaseUrl), getFeeRates(esploraBaseUrl)]);
     if (utxos.length === 0) {
       throw new Error('Your Bitcoin wallet has no spendable funds.');
     }
@@ -141,7 +144,7 @@ export function useDonateCampaign() {
     }
 
     const txHex = finalizePsbt(signedHex);
-    const txid = await broadcastTransaction(txHex);
+    const txid = await broadcastTransaction(txHex, esploraBaseUrl);
 
     // Publish one kind 8333 receipt per recipient. The on-chain tx is already
     // final at this point; we record per-recipient publish failures rather

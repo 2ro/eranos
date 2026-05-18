@@ -16,6 +16,8 @@ export type Theme = "light" | "dark" | "system" | "custom";
  */
 export type ContentWarningPolicy = "blur" | "hide" | "show";
 
+/** Whether monetary amounts (zaps, balances, etc.) are displayed in USD or sats. */
+export type CurrencyDisplay = "usd" | "sats";
 /** How to handle events with a NIP-36 content-warning tag. */
 export type NsfwPolicy = "blur" | "hide" | "show";
 
@@ -275,6 +277,12 @@ export interface AppConfig {
    * extension is appended by the price call. Default: "https://mempool.space/api".
    */
   esploraBaseUrl: string;
+  /**
+   * Display preference for monetary amounts (zap totals, balances, send forms).
+   * - "usd" (default): convert sats to USD using the live BTC price.
+   * - "sats": always show raw satoshi counts.
+   */
+  currencyDisplay?: CurrencyDisplay;
   /** Ordered list of right sidebar widget configs. Each entry is a widget type ID with optional display settings. */
   sidebarWidgets: WidgetConfig[];
   /** Base URL for the AI chat-completions provider (OpenAI-compatible /v1 endpoint). */

@@ -257,6 +257,7 @@ export const AppConfigSchema = z.object({
   curatorPubkey: z.string().regex(/^[0-9a-f]{64}$/i).optional(),
   sandboxDomain: z.string().optional(),
   esploraBaseUrl: z.string().url(),
+  currencyDisplay: z.enum(['usd', 'sats']).optional(),
   sidebarWidgets: z.array(z.object({
     id: z.string(),
     height: z.number().optional(),

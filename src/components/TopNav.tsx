@@ -174,7 +174,6 @@ function SecondaryMobileLinks({ onClose }: { onClose: () => void }) {
 
   const items: { label: string; to: string }[] = [
     { label: 'Wallet', to: '/wallet' },
-    { label: 'Bitcoin', to: '/bitcoin' },
     { label: 'Notifications', to: '/notifications' },
     { label: 'Profile', to: `/${nip19.npubEncode(user.pubkey)}` },
     { label: 'Settings', to: '/settings' },
