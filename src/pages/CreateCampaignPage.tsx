@@ -692,7 +692,7 @@ export function CreateCampaignPage() {
                 <Share2 className="size-3.5 opacity-70" />
               </button>
 
-              {recipients.length > 0 ? (
+              {recipients.length > 0 && (
                 <div className="space-y-2">
                   <Label className="text-xs text-muted-foreground">
                     Beneficiaries ({recipients.length})
@@ -708,10 +708,6 @@ export function CreateCampaignPage() {
                     ))}
                   </div>
                 </div>
-              ) : (
-                <p className="rounded-lg bg-muted/40 px-3 py-4 text-center text-sm text-muted-foreground">
-                  Search by name, NIP-05, npub, or nprofile.
-                </p>
               )}
             </div>
           </FormSection>
