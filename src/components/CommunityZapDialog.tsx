@@ -1,6 +1,6 @@
-import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
+import { useEffect, useMemo, useState, type ReactNode } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { Check, Loader2, Plus, Wallet, X, Zap } from 'lucide-react';
+import { ArrowUpRight, Check, ChevronLeft, Loader2, Plus, Wallet, X, Zap } from 'lucide-react';
 import type { NostrEvent, NostrMetadata } from '@nostrify/nostrify';
 
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -49,8 +49,11 @@ interface CommunityZapDialogProps {
   membersLoading: boolean;
   triggerClassName?: string;
   triggerIcon?: ReactNode;
+  triggerLabel?: string;
   onZapLaunched?: (details: { count: number; totalSats: number }) => void;
 }
+
+type Step = 'form' | 'confirm';
 
 function roleLabel(role: RecipientRole): string {
   switch (role) {
@@ -77,10 +80,12 @@ export function CommunityZapDialog({
   membersLoading,
   triggerClassName,
   triggerIcon,
+  triggerLabel,
   onZapLaunched,
 }: CommunityZapDialogProps) {
   const defaultAmount = '1000';
   const [open, setOpen] = useState(false);
+  const [step, setStep] = useState<Step>('form');
   const [amount, setAmount] = useState(defaultAmount);
   const [comment, setComment] = useState(`Zapped the whole ${community.name} community!`);
   const [removedPubkeys, setRemovedPubkeys] = useState<Set<string>>(new Set());
@@ -114,6 +119,7 @@ export function CommunityZapDialog({
 
   useEffect(() => {
     if (!open) return;
+    setStep('form');
     setRemovedPubkeys(new Set());
     setAmount(defaultAmount);
     setComment(`Zapped the whole ${community.name} community!`);
@@ -155,7 +161,7 @@ export function CommunityZapDialog({
     ? amountSats * selectedRecipients.length
     : 0;
   const estimatedBitcoinFee = bitcoinUtxos?.length && feeRates && selectedRecipients.length > 0
-    ? estimateFee(bitcoinUtxos.length, selectedRecipients.length + 1, feeRates.halfHourFee)
+    ? estimateFee(bitcoinUtxos.length, selectedRecipients.length + 1, feeRates.fastestFee)
     : 0;
   const bitcoinTotalSats = totalSats + estimatedBitcoinFee;
   const bitcoinBalance = bitcoinWallet.addressData?.totalBalance ?? 0;
@@ -167,6 +173,7 @@ export function CommunityZapDialog({
     && amountSats >= BITCOIN_DUST_LIMIT
     && bitcoinBalance >= bitcoinTotalSats
     && !isLaunching;
+  const canReview = canSubmit;
 
   const toggleRemoved = (pubkey: string, remove: boolean) => {
     setRemovedPubkeys((prev) => {
@@ -225,7 +232,7 @@ export function CommunityZapDialog({
       description: `${totalSats.toLocaleString()} sats plus miner fees are being sent.`,
     });
 
-    void zapCommunityOnchain({ community, recipients: bitcoinRecipients, amountSats, comment })
+    void zapCommunityOnchain({ community, recipients: bitcoinRecipients, amountSats, comment, feeSpeed: 'fastest' })
       .then((summary) => {
         setIsLaunching(false);
         if (summary.publishFailed.length > 0) {
@@ -262,241 +269,208 @@ export function CommunityZapDialog({
           title="Bitcoin zap community"
         >
           {triggerIcon ?? <Zap className="size-5" />}
+          {triggerLabel && <span>{triggerLabel}</span>}
         </button>
       </DialogTrigger>
       <DialogContent className="max-w-lg max-h-[88vh] flex flex-col overflow-hidden p-0 gap-0 [&>button]:top-3 [&>button]:right-3">
         <DialogHeader className="px-5 pt-5 pb-3 border-b border-border shrink-0">
           <DialogTitle className="flex items-center gap-2">
             <Zap className="size-5 text-amber-500" />
-            Bitcoin Zap Community
+            {step === 'confirm' ? 'Confirm Community Zap' : 'Bitcoin Zap Community'}
           </DialogTitle>
           <DialogDescription>
-            Send one on-chain Bitcoin transaction to all selected members.
+            {step === 'confirm'
+              ? 'Review the split before broadcasting.'
+              : 'Send one on-chain Bitcoin transaction to all selected members.'}
           </DialogDescription>
         </DialogHeader>
 
-        <div className="flex-1 overflow-y-auto">
-          <div className="px-5 py-4 space-y-4">
-            <div className="space-y-4">
-              <div className="space-y-2">
-                <div className="flex items-center justify-between gap-3">
-                  <Label htmlFor="community-zap-amount">Amount per member</Label>
-                  <div className="rounded-full bg-muted px-3 py-1 text-xs font-medium text-muted-foreground">
-                    Balance <span className="tabular-nums text-foreground">
-                      {bitcoinBalance.toLocaleString()} sats
-                    </span>
+        {step === 'form' ? (
+          <>
+            <div className="flex-1 overflow-y-auto">
+              <div className="px-5 py-4 space-y-4">
+                <div className="space-y-4">
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between gap-3">
+                      <Label htmlFor="community-zap-amount">Amount per member</Label>
+                      <div className="rounded-full bg-muted px-3 py-1 text-xs font-medium text-muted-foreground">
+                        Balance <span className="tabular-nums text-foreground">
+                          {bitcoinBalance.toLocaleString()} sats
+                        </span>
+                      </div>
+                    </div>
+                    <div className="relative">
+                      <Input
+                        id="community-zap-amount"
+                        type="number"
+                        inputMode="numeric"
+                        value={amount}
+                        onChange={(e) => setAmount(e.target.value)}
+                        onWheel={(e) => (e.target as HTMLInputElement).blur()}
+                        className="h-12 rounded-full bg-background/90 pr-14 text-center text-lg font-semibold"
+                      />
+                      <span className="pointer-events-none absolute right-5 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">
+                        sats
+                      </span>
+                    </div>
                   </div>
                 </div>
-                <div className="relative">
-                  <Input
-                    id="community-zap-amount"
-                    type="number"
-                    inputMode="numeric"
-                    value={amount}
-                    onChange={(e) => setAmount(e.target.value)}
-                    onWheel={(e) => (e.target as HTMLInputElement).blur()}
-                    className="h-12 rounded-full bg-background/90 pr-14 text-center text-lg font-semibold"
+
+                <div className="space-y-2">
+                  <Label htmlFor="community-zap-comment">Comment</Label>
+                  <Textarea
+                    id="community-zap-comment"
+                    value={comment}
+                    onChange={(e) => setComment(e.target.value)}
+                    rows={2}
+                    className="resize-none rounded-2xl"
                   />
-                  <span className="pointer-events-none absolute right-5 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">
-                    sats
-                  </span>
+                </div>
+
+                {!walletReady && (
+                  <div className="flex items-start gap-3 rounded-2xl border border-destructive/30 bg-destructive/10 p-3 text-sm text-destructive">
+                    <Wallet className="size-4 mt-0.5 shrink-0" />
+                    Log in with a Bitcoin-capable signer and fund your Bitcoin wallet before zapping the community.
+                  </div>
+                )}
+                {walletReady && (
+                  <div className="rounded-2xl border border-border bg-muted/40 p-3 text-sm">
+                    {Number.isFinite(amountSats) && amountSats > 0 && amountSats < BITCOIN_DUST_LIMIT && (
+                      <p className="mb-2 text-xs text-destructive">
+                        On-chain outputs must be at least {BITCOIN_DUST_LIMIT.toLocaleString()} sats per member.
+                      </p>
+                    )}
+                    <div className="flex justify-between gap-3">
+                      <span className="text-muted-foreground">Estimated miner fee</span>
+                      <span className="font-medium tabular-nums">{estimatedBitcoinFee.toLocaleString()} sats</span>
+                    </div>
+                    <div className="mt-1 flex justify-between gap-3">
+                      <span className="text-muted-foreground">Total</span>
+                      <span className="font-medium tabular-nums">{bitcoinTotalSats.toLocaleString()} sats</span>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              <div className="border-t border-border">
+                <div className="flex items-center justify-between px-5 py-3">
+                  <div>
+                    <h3 className="text-sm font-semibold">Recipients</h3>
+                    <p className="text-xs text-muted-foreground">
+                      {selectedRecipients.length} selected
+                      {removedCount > 0 ? ` · ${removedCount} removed` : ''}
+                      {skippedCount > 0 ? ` · ${skippedCount} skipped` : ''}
+                    </p>
+                  </div>
+                  {membersLoading || authors.isLoading ? (
+                    <Loader2 className="size-4 animate-spin text-muted-foreground" />
+                  ) : null}
+                  {isLoadingBitcoinUtxos || isLoadingFeeRates ? (
+                    <Loader2 className="size-4 animate-spin text-muted-foreground" />
+                  ) : null}
+                </div>
+
+                <div className="divide-y divide-border">
+                  {recipients.map((recipient) => (
+                    <RecipientRow
+                      key={recipient.pubkey}
+                      recipient={recipient}
+                      amountSats={amountSats}
+                      onRemove={() => toggleRemoved(recipient.pubkey, true)}
+                      onRestore={() => toggleRemoved(recipient.pubkey, false)}
+                    />
+                  ))}
                 </div>
               </div>
             </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="community-zap-comment">Comment</Label>
-              <Textarea
-                id="community-zap-comment"
-                value={comment}
-                onChange={(e) => setComment(e.target.value)}
-                rows={2}
-                className="resize-none rounded-2xl"
-              />
-            </div>
-
-            {!walletReady && (
-              <div className="flex items-start gap-3 rounded-2xl border border-destructive/30 bg-destructive/10 p-3 text-sm text-destructive">
-                <Wallet className="size-4 mt-0.5 shrink-0" />
-                Log in with a Bitcoin-capable signer and fund your Bitcoin wallet before zapping the community.
+            <div className="border-t border-border p-4 shrink-0">
+              <div className="flex gap-2">
+                <Button variant="outline" onClick={() => setOpen(false)} className="flex-1" disabled={isLaunching}>
+                  Cancel
+                </Button>
+                <Button onClick={() => setStep('confirm')} disabled={!canReview} className="flex-1">
+                  <ArrowUpRight className="size-4 mr-1.5" />
+                  Review
+                </Button>
               </div>
-            )}
-            {walletReady && (
-              <div className="rounded-2xl border border-border bg-muted/40 p-3 text-sm">
-                {Number.isFinite(amountSats) && amountSats > 0 && amountSats < BITCOIN_DUST_LIMIT && (
-                  <p className="mb-2 text-xs text-destructive">
-                    On-chain outputs must be at least {BITCOIN_DUST_LIMIT.toLocaleString()} sats per member.
-                  </p>
-                )}
+            </div>
+          </>
+        ) : (
+          <>
+            <div className="flex-1 overflow-y-auto px-5 py-4 space-y-4">
+              <div className="rounded-lg bg-muted/50 p-4 space-y-1">
+                <Label className="text-xs text-muted-foreground">Community</Label>
+                <p className="font-medium truncate">{community.name}</p>
+              </div>
+
+              <div className="space-y-1 text-sm">
                 <div className="flex justify-between gap-3">
-                  <span className="text-muted-foreground">Estimated miner fee</span>
+                  <span className="text-muted-foreground">Amount per member</span>
+                  <span className="font-medium tabular-nums">{amountSats.toLocaleString()} sats</span>
+                </div>
+                <div className="flex justify-between gap-3">
+                  <span className="text-muted-foreground">Recipients</span>
+                  <span className="font-medium tabular-nums">{selectedRecipients.length}</span>
+                </div>
+                <div className="flex justify-between gap-3">
+                  <span className="text-muted-foreground">Network fee</span>
                   <span className="font-medium tabular-nums">{estimatedBitcoinFee.toLocaleString()} sats</span>
                 </div>
-                <div className="mt-1 flex justify-between gap-3">
-                  <span className="text-muted-foreground">Total debit</span>
+                <div className="flex justify-between gap-3">
+                  <span className="text-muted-foreground">Total</span>
                   <span className="font-medium tabular-nums">{bitcoinTotalSats.toLocaleString()} sats</span>
                 </div>
+                <div className="flex justify-between gap-3">
+                  <span className="text-muted-foreground">Arrival</span>
+                  <span className="font-medium">Fastest (~10 min)</span>
+                </div>
               </div>
-            )}
-          </div>
 
-          <div className="border-t border-border">
-            <div className="flex items-center justify-between px-5 py-3">
-              <div>
-                <h3 className="text-sm font-semibold">Recipients</h3>
-                <p className="text-xs text-muted-foreground">
-                  {selectedRecipients.length} selected
-                  {removedCount > 0 ? ` · ${removedCount} removed` : ''}
-                  {skippedCount > 0 ? ` · ${skippedCount} skipped` : ''}
-                </p>
+              <div className="rounded-lg border border-border max-h-56 overflow-auto">
+                <div className="divide-y divide-border">
+                  {selectedRecipients.map((recipient) => (
+                    <RecipientSummaryRow key={recipient.pubkey} recipient={recipient} amountSats={amountSats} />
+                  ))}
+                </div>
               </div>
-              {membersLoading || authors.isLoading ? (
-                <Loader2 className="size-4 animate-spin text-muted-foreground" />
-              ) : null}
-              {isLoadingBitcoinUtxos || isLoadingFeeRates ? (
-                <Loader2 className="size-4 animate-spin text-muted-foreground" />
-              ) : null}
+
+              {comment && (
+                <div className="rounded-lg bg-muted/40 p-3">
+                  <Label className="text-xs text-muted-foreground">Your comment</Label>
+                  <p className="text-sm whitespace-pre-wrap break-words mt-1">{comment}</p>
+                </div>
+              )}
+
+              <p className="text-center text-xs text-muted-foreground">
+                The fee is locked into the transaction when you sign. Confirmation time can still vary with mempool conditions.
+              </p>
             </div>
 
-            <div className="divide-y divide-border">
-              {recipients.map((recipient) => (
-                <RecipientRow
-                  key={recipient.pubkey}
-                  recipient={recipient}
-                  amountSats={amountSats}
-                  onRemove={() => toggleRemoved(recipient.pubkey, true)}
-                  onRestore={() => toggleRemoved(recipient.pubkey, false)}
-                />
-              ))}
+            <div className="border-t border-border p-4 shrink-0">
+              <div className="flex gap-2">
+                <Button variant="outline" onClick={() => setStep('form')} disabled={isLaunching} className="flex-1">
+                  <ChevronLeft className="size-4 mr-1" />
+                  Back
+                </Button>
+                <Button onClick={handleSubmit} disabled={!canSubmit} className="flex-1">
+                  {isLaunching ? (
+                    <>
+                      <Loader2 className="size-4 mr-1.5 animate-spin" />
+                      Sending...
+                    </>
+                  ) : (
+                    <>
+                      <Zap className="size-4 mr-1.5" />
+                      Zap {selectedRecipients.length}
+                    </>
+                  )}
+                </Button>
+              </div>
             </div>
-          </div>
-        </div>
-
-        <div className="border-t border-border p-4 shrink-0">
-          <HoldToZapButton
-            disabled={!canSubmit}
-            isLaunching={isLaunching}
-            selectedCount={selectedRecipients.length}
-            totalSats={bitcoinTotalSats}
-            onComplete={handleSubmit}
-          />
-        </div>
+          </>
+        )}
       </DialogContent>
     </Dialog>
-  );
-}
-
-const HOLD_DURATION_MS = 3000;
-
-function HoldToZapButton({
-  disabled,
-  isLaunching,
-  selectedCount,
-  totalSats,
-  onComplete,
-}: {
-  disabled: boolean;
-  isLaunching: boolean;
-  selectedCount: number;
-  totalSats: number;
-  onComplete: () => void;
-}) {
-  const [progress, setProgress] = useState(0);
-  const [holding, setHolding] = useState(false);
-  const rafRef = useRef(0);
-  const startedAtRef = useRef(0);
-  const completedRef = useRef(false);
-
-  const cancelHold = () => {
-    if (rafRef.current) cancelAnimationFrame(rafRef.current);
-    rafRef.current = 0;
-    startedAtRef.current = 0;
-    completedRef.current = false;
-    setHolding(false);
-    setProgress(0);
-  };
-
-  const tick = () => {
-    const elapsed = performance.now() - startedAtRef.current;
-    const nextProgress = Math.min(1, elapsed / HOLD_DURATION_MS);
-    setProgress(nextProgress);
-    if (nextProgress >= 1) {
-      completedRef.current = true;
-      setHolding(false);
-      setProgress(0);
-      onComplete();
-      return;
-    }
-    rafRef.current = requestAnimationFrame(tick);
-  };
-
-  const startHold = () => {
-    if (disabled || isLaunching || holding) return;
-    completedRef.current = false;
-    startedAtRef.current = performance.now();
-    setHolding(true);
-    setProgress(0);
-    rafRef.current = requestAnimationFrame(tick);
-  };
-
-  useEffect(() => () => {
-    if (rafRef.current) cancelAnimationFrame(rafRef.current);
-  }, []);
-
-  useEffect(() => {
-    if (disabled || isLaunching) cancelHold();
-  }, [disabled, isLaunching]);
-
-  return (
-    <Button
-      type="button"
-      variant="secondary"
-      className="relative h-12 w-full overflow-hidden rounded-full border border-primary bg-primary text-primary-foreground hover:bg-primary"
-      disabled={disabled}
-      onPointerDown={(event) => {
-        event.currentTarget.setPointerCapture(event.pointerId);
-        startHold();
-      }}
-      onPointerUp={(event) => {
-        if (event.currentTarget.hasPointerCapture(event.pointerId)) {
-          event.currentTarget.releasePointerCapture(event.pointerId);
-        }
-        if (!completedRef.current) cancelHold();
-      }}
-      onPointerCancel={cancelHold}
-      onKeyDown={(event) => {
-        if ((event.key === 'Enter' || event.key === ' ') && !event.repeat) {
-          event.preventDefault();
-          startHold();
-        }
-      }}
-      onKeyUp={(event) => {
-        if (event.key === 'Enter' || event.key === ' ') {
-          event.preventDefault();
-          if (!completedRef.current) cancelHold();
-        }
-      }}
-      aria-label={`Hold for 3 seconds to zap ${selectedCount} members with ${totalSats.toLocaleString()} sats total`}
-    >
-      <span
-        className="absolute inset-0 origin-left rounded-full bg-background/25 transition-transform duration-75 ease-linear"
-        style={{ transform: `scaleX(${progress})` }}
-        aria-hidden="true"
-      />
-      <span className="absolute inset-0 rounded-full shadow-[inset_0_0_0_1px_rgba(255,255,255,0.12)]" aria-hidden="true" />
-      <span className="relative z-10 flex items-center justify-center mix-blend-normal">
-        {isLaunching ? (
-          <>
-            <Loader2 className="size-4 mr-2 animate-spin" />
-            Launching...
-          </>
-        ) : holding ? (
-          'Keep holding to send...'
-        ) : (
-          `Hold to send ${selectedCount} · ${totalSats.toLocaleString()} sats`
-        )}
-      </span>
-    </Button>
   );
 }
 
@@ -563,6 +537,31 @@ function RecipientRow({
         ) : (
           <Check className="size-4 text-muted-foreground/50" aria-hidden="true" />
         )}
+      </div>
+    </div>
+  );
+}
+
+function RecipientSummaryRow({ recipient, amountSats }: { recipient: RecipientView; amountSats: number }) {
+  return (
+    <div className="flex items-center gap-3 px-3 py-2">
+      <Avatar className="size-8 shrink-0">
+        <AvatarImage src={recipient.picture} />
+        <AvatarFallback>{recipient.name[0]?.toUpperCase()}</AvatarFallback>
+      </Avatar>
+      <div className="min-w-0 flex-1">
+        <div className="flex items-center gap-2 min-w-0">
+          <p className="font-medium truncate text-sm">{recipient.name}</p>
+          <Badge variant="secondary" className="text-[10px] h-5 px-1.5 shrink-0">
+            {roleLabel(recipient.role)}
+          </Badge>
+        </div>
+        <p className="text-xs text-muted-foreground truncate">
+          {recipient.bitcoinAddress ? shortAddress(recipient.bitcoinAddress) : recipient.pubkey.slice(0, 8)}
+        </p>
+      </div>
+      <div className="shrink-0 text-right text-xs font-medium tabular-nums">
+        {amountSats.toLocaleString()} sats
       </div>
     </div>
   );

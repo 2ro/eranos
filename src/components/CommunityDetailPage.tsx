@@ -21,6 +21,7 @@ import {
   UserMinus,
   UserPlus,
   Users,
+  Zap,
 } from 'lucide-react';
 import type { NostrEvent, NostrMetadata } from '@nostrify/nostrify';
 
@@ -31,6 +32,7 @@ import { CreateActionDialog } from '@/components/CreateActionDialog';
 import { PeopleAvatarStack } from '@/components/PeopleAvatarStack';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -642,23 +644,6 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
                       <MembersOnlyToggle
                         className="text-white/90 hover:text-white hover:bg-white/15 data-[state=on]:text-white"
                       />
-                      {community && membership && (
-                        <CommunityZapDialog
-                          community={community}
-                          members={membership.members}
-                          membersLoading={membersLoading}
-                          triggerClassName={bannerActionClassName}
-                          onZapLaunched={handleCommunityZapLaunched}
-                        />
-                      )}
-                      <button
-                        type="button"
-                        className={bannerActionClassName}
-                        onClick={handleShare}
-                        aria-label="Share"
-                      >
-                        <Share2 className="size-5" />
-                      </button>
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                           <button
@@ -697,6 +682,30 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
                     </div>
                   </div>
                 </div>
+              </div>
+
+              <div className="grid grid-cols-4 gap-2">
+                {community && membership && (
+                  <CommunityZapDialog
+                    community={community}
+                    members={membership.members}
+                    membersLoading={membersLoading}
+                    triggerIcon={<Zap className="size-5" />}
+                    triggerLabel="Zap all"
+                    triggerClassName="col-span-3 h-11 w-full gap-2 rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground shadow hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring motion-safe:transition-colors"
+                    onZapLaunched={handleCommunityZapLaunched}
+                  />
+                )}
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="lg"
+                  className={community && membership ? 'w-full' : 'col-span-4 w-full'}
+                  onClick={handleShare}
+                >
+                  <Share2 className="size-4 mr-2" />
+                  Share
+                </Button>
               </div>
 
               <TabsList className="grid h-auto w-full grid-cols-3 rounded-xl border bg-card/70 p-1 shadow-sm backdrop-blur">
