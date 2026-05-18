@@ -6,16 +6,17 @@ export const CAMPAIGN_KIND = 30223;
 
 /** Canonical category slugs shown in the create-campaign form. */
 export const CAMPAIGN_CATEGORIES = [
-  'medical',
-  'memorial',
-  'emergency',
+  'human-rights',
+  'civil-liberties',
+  'democracy',
+  'political-prisoners',
+  'legal-defense',
+  'independent-media',
+  'humanitarian-aid',
+  'emergency-relief',
   'education',
-  'animals',
   'community',
-  'sports',
-  'creative',
-  'business',
-  'faith',
+  'medical-aid',
   'other',
 ] as const;
 
@@ -23,17 +24,29 @@ export type CampaignCategory = typeof CAMPAIGN_CATEGORIES[number];
 
 /** Human-readable labels for category slugs. */
 export const CAMPAIGN_CATEGORY_LABELS: Record<CampaignCategory, string> = {
-  medical: 'Medical',
-  memorial: 'Memorial',
-  emergency: 'Emergency',
-  education: 'Education',
-  animals: 'Animals',
-  community: 'Community',
-  sports: 'Sports',
-  creative: 'Creative',
-  business: 'Business',
-  faith: 'Faith',
+  'human-rights': 'Human Rights',
+  'civil-liberties': 'Civil Liberties',
+  democracy: 'Democracy & Free Elections',
+  'political-prisoners': 'Political Prisoners',
+  'legal-defense': 'Legal Defense',
+  'independent-media': 'Independent Media',
+  'humanitarian-aid': 'Humanitarian Aid',
+  'emergency-relief': 'Emergency Relief',
+  education: 'Education & Training',
+  community: 'Community Organizing',
+  'medical-aid': 'Medical Aid',
   other: 'Other',
+};
+
+const LEGACY_CAMPAIGN_CATEGORY_ALIASES: Record<string, CampaignCategory> = {
+  medical: 'medical-aid',
+  emergency: 'emergency-relief',
+  animals: 'humanitarian-aid',
+  sports: 'community',
+  creative: 'community',
+  business: 'community',
+  faith: 'community',
+  memorial: 'other',
 };
 
 /** A 64-character lowercase hex string (Nostr pubkey or event id). */
@@ -136,6 +149,11 @@ export function parseCampaign(event: NostrEvent): ParsedCampaign | null {
     if (name !== 't' || typeof value !== 'string') continue;
     if ((CAMPAIGN_CATEGORIES as readonly string[]).includes(value)) {
       category = value as CampaignCategory;
+      break;
+    }
+    const legacyCategory = LEGACY_CAMPAIGN_CATEGORY_ALIASES[value];
+    if (legacyCategory) {
+      category = legacyCategory;
       break;
     }
   }

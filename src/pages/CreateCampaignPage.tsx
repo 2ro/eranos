@@ -6,6 +6,7 @@ import { useNostr } from '@nostrify/react';
 import {
   AlertTriangle,
   ArrowLeft,
+  ChevronDown,
   HandHeart,
   ImagePlus,
   Loader2,
@@ -17,6 +18,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import {
@@ -27,7 +29,6 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
-import { useAuthor } from '@/hooks/useAuthor';
 import { useBitcoinWallet } from '@/hooks/useBitcoinWallet';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useNostrPublish } from '@/hooks/useNostrPublish';
@@ -53,7 +54,6 @@ export function CreateCampaignPage() {
   useLayoutOptions({ noMaxWidth: true, rightSidebar: null });
 
   const { user } = useCurrentUser();
-  const author = useAuthor(user?.pubkey ?? '');
   const { btcPrice } = useBitcoinWallet();
   const navigate = useNavigate();
   const { nostr } = useNostr();
@@ -65,7 +65,7 @@ export function CreateCampaignPage() {
   const [summary, setSummary] = useState('');
   const [story, setStory] = useState('');
   const [imageUrl, setImageUrl] = useState('');
-  const [category, setCategory] = useState<CampaignCategory>('community');
+  const [category, setCategory] = useState<CampaignCategory>('human-rights');
   const [goalUsd, setGoalUsd] = useState('');
   const [deadline, setDeadline] = useState('');
   const [location, setLocation] = useState('');
@@ -243,11 +243,6 @@ export function CreateCampaignPage() {
     );
   }
 
-  const creatorMetadata = author.data?.metadata;
-  const creatorName =
-    creatorMetadata?.display_name || creatorMetadata?.name || genUserName(user.pubkey);
-  const creatorPicture = sanitizeUrl(creatorMetadata?.picture);
-
   return (
     <main className="min-h-screen pb-16">
       <form
@@ -258,44 +253,23 @@ export function CreateCampaignPage() {
           submitMutation.mutate();
         }}
       >
-        <div className="flex items-center gap-2 -ml-2">
-          <button
-            type="button"
-            onClick={() => navigate(-1)}
-            className="p-2 rounded-full hover:bg-secondary motion-safe:transition-colors text-muted-foreground hover:text-foreground"
-            aria-label="Go back"
-          >
-            <ArrowLeft className="size-5" />
-          </button>
-          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">Start a campaign</h1>
+        <div className="space-y-3">
+          <div className="flex items-center gap-2 -ml-2">
+            <button
+              type="button"
+              onClick={() => navigate(-1)}
+              className="p-2 rounded-full hover:bg-secondary motion-safe:transition-colors text-muted-foreground hover:text-foreground"
+              aria-label="Go back"
+            >
+              <ArrowLeft className="size-5" />
+            </button>
+            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">Start a campaign</h1>
+          </div>
+          <p className="max-w-2xl text-sm sm:text-base text-muted-foreground">
+            Add the essentials first. You can expand Details when you are ready to add a pitch,
+            category, goal, timeline, or location.
+          </p>
         </div>
-        {/* Organizer banner */}
-        <div className="flex items-center gap-3 text-sm text-muted-foreground">
-          <Avatar className="size-8">
-            {creatorPicture && <AvatarImage src={creatorPicture} alt="" />}
-            <AvatarFallback>{creatorName.slice(0, 2).toUpperCase()}</AvatarFallback>
-          </Avatar>
-          <span>
-            Publishing as <span className="font-medium text-foreground">{creatorName}</span>
-          </span>
-        </div>
-
-        {/* Cover image */}
-        <FormSection title="Cover image" requirement="Optional" description="Choose a hero image for your campaign card.">
-          <CoverPicker
-            url={imageUrl}
-            isUploading={isUploading}
-            onPick={handleImagePick}
-            onClear={() => setImageUrl('')}
-          />
-          <Input
-            type="url"
-            inputMode="url"
-            placeholder="Or paste an https:// image URL"
-            value={imageUrl}
-            onChange={(e) => setImageUrl(e.target.value)}
-          />
-        </FormSection>
 
         {/* Title & identifier */}
         <FormSection title="Title" requirement="Required" description="What are you raising money for? The campaign URL is created from this title automatically.">
@@ -312,94 +286,6 @@ export function CreateCampaignPage() {
               /{derivedIdentifier || 'your-campaign-title'}
             </span>
           </p>
-        </FormSection>
-
-        {/* Summary */}
-        <FormSection
-          title="Summary"
-          requirement="Optional"
-          description="A short one-paragraph pitch shown in cards and previews."
-        >
-          <Textarea
-            value={summary}
-            onChange={(e) => setSummary(e.target.value)}
-            placeholder="Help our 40-year-old bookstore make rent through winter."
-            rows={2}
-            maxLength={300}
-          />
-        </FormSection>
-
-        {/* Story */}
-        <FormSection
-          title="Story"
-          requirement="Optional"
-          description="Tell donors why this matters. Markdown is supported."
-        >
-          <Textarea
-            value={story}
-            onChange={(e) => setStory(e.target.value)}
-            placeholder="Write your campaign story here. You can use Markdown for headings, lists, and emphasis."
-            rows={10}
-            className="font-mono text-sm"
-          />
-        </FormSection>
-
-        {/* Category + goal + deadline + location */}
-        <FormSection title="Details" requirement="Optional" description="A few more facts about your campaign.">
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div className="space-y-1.5">
-              <Label htmlFor="campaign-category">Category</Label>
-              <Select
-                value={category}
-                onValueChange={(v) => setCategory(v as CampaignCategory)}
-              >
-                <SelectTrigger id="campaign-category">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {CAMPAIGN_CATEGORIES.map((cat) => (
-                    <SelectItem key={cat} value={cat}>
-                      {CAMPAIGN_CATEGORY_LABELS[cat]}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="space-y-1.5">
-              <Label htmlFor="campaign-goal">Goal (USD)</Label>
-              <Input
-                id="campaign-goal"
-                type="text"
-                inputMode="decimal"
-                placeholder="100,000"
-                value={goalUsd}
-                onChange={(e) => setGoalUsd(e.target.value)}
-              />
-              <p className="text-xs text-muted-foreground">
-                {goalSatsPreview > 0 && btcPrice
-                  ? `Publishes as ${formatSats(goalSatsPreview)} sats (${satsToUSD(goalSatsPreview, btcPrice)} at current BTC price).`
-                  : 'Stored on Nostr as sats using the current BTC/USD price.'}
-              </p>
-            </div>
-            <div className="space-y-1.5">
-              <Label htmlFor="campaign-deadline">Deadline (optional)</Label>
-              <Input
-                id="campaign-deadline"
-                type="date"
-                value={deadline}
-                onChange={(e) => setDeadline(e.target.value)}
-              />
-            </div>
-            <div className="space-y-1.5">
-              <Label htmlFor="campaign-location">Location (optional)</Label>
-              <Input
-                id="campaign-location"
-                value={location}
-                onChange={(e) => setLocation(e.target.value)}
-                placeholder="Portland, OR"
-              />
-            </div>
-          </div>
         </FormSection>
 
         {/* Recipients */}
@@ -436,6 +322,111 @@ export function CreateCampaignPage() {
             )}
           </div>
         </FormSection>
+
+        {/* Cover image */}
+        <FormSection title="Cover image" requirement="Optional" description="Choose a hero image for your campaign card.">
+          <CoverPicker
+            url={imageUrl}
+            isUploading={isUploading}
+            onPick={handleImagePick}
+            onClear={() => setImageUrl('')}
+          />
+          <Input
+            type="url"
+            inputMode="url"
+            placeholder="Or paste an https:// image URL"
+            value={imageUrl}
+            onChange={(e) => setImageUrl(e.target.value)}
+          />
+        </FormSection>
+
+        {/* Optional details */}
+        <CollapsibleFormSection
+          title="Details"
+          requirement="Optional"
+          description="Add more context for donors when you have it."
+        >
+          <div className="space-y-5">
+            <div className="space-y-1.5">
+              <Label htmlFor="campaign-summary">Summary</Label>
+              <Textarea
+                id="campaign-summary"
+                value={summary}
+                onChange={(e) => setSummary(e.target.value)}
+                placeholder="A short one-paragraph pitch shown in cards and previews."
+                rows={2}
+                maxLength={300}
+              />
+            </div>
+
+            <div className="space-y-1.5">
+              <Label htmlFor="campaign-story">Story</Label>
+              <Textarea
+                id="campaign-story"
+                value={story}
+                onChange={(e) => setStory(e.target.value)}
+                placeholder="Tell donors why this matters. Markdown is supported."
+                rows={7}
+                className="font-mono text-sm"
+              />
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="space-y-1.5">
+                <Label htmlFor="campaign-category">Category</Label>
+                <Select
+                  value={category}
+                  onValueChange={(v) => setCategory(v as CampaignCategory)}
+                >
+                  <SelectTrigger id="campaign-category">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {CAMPAIGN_CATEGORIES.map((cat) => (
+                      <SelectItem key={cat} value={cat}>
+                        {CAMPAIGN_CATEGORY_LABELS[cat]}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="campaign-goal">Goal (USD)</Label>
+                <Input
+                  id="campaign-goal"
+                  type="text"
+                  inputMode="decimal"
+                  placeholder="100,000"
+                  value={goalUsd}
+                  onChange={(e) => setGoalUsd(e.target.value)}
+                />
+                <p className="text-xs text-muted-foreground">
+                  {goalSatsPreview > 0 && btcPrice
+                    ? `Publishes as ${formatSats(goalSatsPreview)} sats (${satsToUSD(goalSatsPreview, btcPrice)} at current BTC price).`
+                    : 'Stored on Nostr as sats using the current BTC/USD price.'}
+                </p>
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="campaign-deadline">Deadline (optional)</Label>
+                <Input
+                  id="campaign-deadline"
+                  type="date"
+                  value={deadline}
+                  onChange={(e) => setDeadline(e.target.value)}
+                />
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="campaign-location">Location (optional)</Label>
+                <Input
+                  id="campaign-location"
+                  value={location}
+                  onChange={(e) => setLocation(e.target.value)}
+                  placeholder="Portland, OR"
+                />
+              </div>
+            </div>
+          </div>
+        </CollapsibleFormSection>
 
         {formError && (
           <Alert variant="destructive">
@@ -481,7 +472,7 @@ function FormSection({
   children: React.ReactNode;
 }) {
   return (
-    <section className="space-y-3">
+    <section className="space-y-3 rounded-2xl border border-border/70 bg-card p-4 shadow-sm sm:p-5">
       <div className="space-y-0.5">
         <h2 className="flex items-center gap-2 text-lg font-semibold">
           {title}
@@ -503,6 +494,48 @@ function FormSection({
   );
 }
 
+function CollapsibleFormSection({
+  title,
+  requirement,
+  description,
+  children,
+}: {
+  title: string;
+  requirement: 'Required' | 'Optional';
+  description?: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <Collapsible className="rounded-2xl border border-border/70 bg-card shadow-sm" defaultOpen={false}>
+      <CollapsibleTrigger
+        type="button"
+        className="group flex w-full items-start justify-between gap-4 p-4 text-left sm:p-5"
+      >
+        <div className="space-y-0.5">
+          <h2 className="flex items-center gap-2 text-lg font-semibold">
+            {title}
+            <span
+              className={cn(
+                'rounded-full px-2 py-0.5 text-[11px] font-medium',
+                requirement === 'Required'
+                  ? 'bg-primary/10 text-primary'
+                  : 'bg-muted text-muted-foreground',
+              )}
+            >
+              {requirement}
+            </span>
+          </h2>
+          {description && <p className="text-sm text-muted-foreground">{description}</p>}
+        </div>
+        <ChevronDown className="mt-1 size-5 shrink-0 text-muted-foreground motion-safe:transition-transform group-data-[state=open]:rotate-180" />
+      </CollapsibleTrigger>
+      <CollapsibleContent className="px-4 pb-4 sm:px-5 sm:pb-5">
+        {children}
+      </CollapsibleContent>
+    </Collapsible>
+  );
+}
+
 function CoverPicker({
   url,
   isUploading,
@@ -518,7 +551,7 @@ function CoverPicker({
   return (
     <label
       className={cn(
-        'relative block aspect-[16/9] w-full rounded-xl border-2 border-dashed border-border cursor-pointer overflow-hidden bg-gradient-to-br from-muted/40 via-background to-muted/20 motion-safe:transition-colors hover:border-primary',
+        'relative block h-40 w-full cursor-pointer overflow-hidden rounded-xl border-2 border-dashed border-border bg-gradient-to-br from-muted/40 via-background to-muted/20 motion-safe:transition-colors hover:border-primary sm:h-48',
         isUploading && 'opacity-70 pointer-events-none',
       )}
     >
