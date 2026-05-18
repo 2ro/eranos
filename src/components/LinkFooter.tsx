@@ -40,6 +40,11 @@ export function LinkFooter({ onNavigate }: LinkFooterProps) {
           Privacy
         </Link>
 
+        <Link to="/safety" className={chipClass} onClick={onNavigate}>
+          <Shield className={iconClass} />
+          Safety
+        </Link>
+
         <a
           href="https://gitlab.com/soapbox-pub/agora-3"
           className={chipClass}

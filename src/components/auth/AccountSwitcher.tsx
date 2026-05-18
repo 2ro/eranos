@@ -3,7 +3,7 @@
 
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Bell, ChevronDown, CircleHelp, LogOut, Search, Settings, User, UserIcon, UserPlus, Wallet } from 'lucide-react';
+import { Activity, Bell, ChevronDown, CircleHelp, LogOut, Search, Settings, User, UserIcon, UserPlus, Wallet } from 'lucide-react';
 import { nip19 } from 'nostr-tools';
 import {
   DropdownMenu,
@@ -15,6 +15,7 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar.tsx';
 import { Skeleton } from '@/components/ui/skeleton.tsx';
 import { useLoggedInAccounts, type Account } from '@/hooks/useLoggedInAccounts';
+import { useFeedSettings } from '@/hooks/useFeedSettings';
 import { genUserName } from '@/lib/genUserName';
 
 interface AccountSwitcherProps {
@@ -23,6 +24,7 @@ interface AccountSwitcherProps {
 
 export function AccountSwitcher({ onAddAccountClick }: AccountSwitcherProps) {
   const { currentUser, otherUsers, isLoading, setLogin, removeLogin } = useLoggedInAccounts();
+  const { orderedItems } = useFeedSettings();
   const [isOpen, setIsOpen] = useState(false);
 
   if (!currentUser) return null;
@@ -79,6 +81,14 @@ export function AccountSwitcher({ onAddAccountClick }: AccountSwitcherProps) {
             {user.id === currentUser.id && <div className='w-2 h-2 rounded-full bg-primary'></div>}
           </DropdownMenuItem>
         ))}
+        {orderedItems.includes('dashboard') && (
+          <DropdownMenuItem asChild className='flex items-center gap-2 cursor-pointer p-2 rounded-md'>
+            <Link to="/dashboard">
+              <Activity className='w-4 h-4' />
+              <span>Dashboard</span>
+            </Link>
+          </DropdownMenuItem>
+        )}
         <DropdownMenuItem asChild className='flex items-center gap-2 cursor-pointer p-2 rounded-md'>
           <Link to="/wallet">
             <Wallet className='w-4 h-4' />

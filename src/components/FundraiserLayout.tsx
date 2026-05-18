@@ -100,6 +100,7 @@ function SiteFooter() {
           <a href="/help" className="hover:text-foreground motion-safe:transition-colors">Help</a>
           <a href="/privacy" className="hover:text-foreground motion-safe:transition-colors">Privacy</a>
           <a href="/safety" className="hover:text-foreground motion-safe:transition-colors">Safety</a>
+          <a href="/changelog" className="hover:text-foreground motion-safe:transition-colors">Changelog</a>
         </nav>
       </div>
     </footer>
