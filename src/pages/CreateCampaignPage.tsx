@@ -4,6 +4,7 @@ import { useSeoMeta } from '@unhead/react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useNostr } from '@nostrify/react';
 import type { NostrEvent, NostrMetadata } from '@nostrify/nostrify';
+import { Capacitor } from '@capacitor/core';
 import { nip19 } from 'nostr-tools';
 import {
   AlertTriangle,
@@ -15,6 +16,7 @@ import {
   Loader2,
   MapPin,
   MessageCircle,
+  Share2,
   UserPlus,
   X,
 } from 'lucide-react';
@@ -97,6 +99,29 @@ async function copyShareText(
     });
     return false;
   }
+}
+
+async function shareTextOrCopy(
+  text: string,
+  toast: ReturnType<typeof useToast>['toast'],
+  fallbackSuccessTitle: string,
+): Promise<void> {
+  try {
+    if (Capacitor.isNativePlatform()) {
+      const { Share } = await import('@capacitor/share');
+      await Share.share({ text });
+      return;
+    }
+
+    if (navigator.share) {
+      await navigator.share({ text });
+      return;
+    }
+  } catch (error) {
+    if (error instanceof Error && error.name === 'AbortError') return;
+  }
+
+  await copyShareText(text, toast, fallbackSuccessTitle);
 }
 
 function getEditTarget(value: string | null): EditTarget | null {
@@ -638,13 +663,13 @@ export function CreateCampaignPage() {
                 onClick={() => {
                   const url = `${getShareOrigin()}/receive`;
                   const message = `I want to create a fundraiser for you on Agora! Sign up to create your account and start receiving donations directly to your Bitcoin wallet: ${url}`;
-                  void copyShareText(message, toast, 'Invite copied');
+                  void shareTextOrCopy(message, toast, 'Invite copied');
                 }}
                 className="w-full flex items-center justify-center gap-2 rounded-lg border border-dashed border-border bg-background px-3 py-2.5 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted/40 motion-safe:transition-colors"
               >
                 <UserPlus className="size-4" />
                 Recipient not here yet? Invite them
-                <Copy className="size-3.5 opacity-70" />
+                <Share2 className="size-3.5 opacity-70" />
               </button>
 
               {recipients.length > 0 ? (
