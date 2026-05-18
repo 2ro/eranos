@@ -589,7 +589,7 @@ export function CreateCampaignPage() {
           submitMutation.mutate();
         }}
       >
-        <div className="space-y-3">
+        <div>
           <div className="flex items-center gap-2 -ml-2">
             <button
               type="button"
@@ -603,16 +603,11 @@ export function CreateCampaignPage() {
               {isEditMode ? 'Edit campaign' : 'Start a campaign'}
             </h1>
           </div>
-          <p className="max-w-2xl text-sm sm:text-base text-muted-foreground">
-            {isEditMode
-              ? 'Update the essentials. Details are optional.'
-              : 'Add title and beneficiaries first. Details are optional.'}
-          </p>
         </div>
 
         <div className="rounded-2xl bg-card/50 p-2">
           {/* Title & identifier */}
-          <FormSection title="Title" requirement="Required" description="Campaign URL is created automatically.">
+          <FormSection title="Title" requirement="Required">
             <Input
               value={title}
               onChange={(e) => setTitle(e.target.value)}
@@ -630,7 +625,7 @@ export function CreateCampaignPage() {
           </FormSection>
 
           {/* Country */}
-          <FormSection title="Country" requirement="Recommended" description="Help discover campaigns by country.">
+          <FormSection title="Country" requirement="Recommended">
             <CountrySelect
               query={countryQuery}
               selectedCode={countryCode}
@@ -653,7 +648,7 @@ export function CreateCampaignPage() {
           </FormSection>
 
           {/* Tags */}
-          <FormSection title="Tags" requirement="Recommended" description="Comma-separated topics for discovery. You do not need to include #.">
+          <FormSection title="Tags" requirement="Recommended">
             <Input
               id="campaign-tags"
               value={tagInput}
@@ -666,7 +661,6 @@ export function CreateCampaignPage() {
           <FormSection
             title="Beneficiaries"
             requirement="Required"
-            description="Who receives donations. Splits are even."
           >
             <div className="space-y-3">
               <PersonSearch
@@ -713,7 +707,7 @@ export function CreateCampaignPage() {
           </FormSection>
 
           {/* Cover image */}
-          <FormSection title="Cover image" requirement="Optional" description="Shown on campaign cards.">
+          <FormSection title="Cover image" requirement="Optional">
             <CoverPicker
               url={imageUrl}
               isUploading={isUploading}
@@ -730,7 +724,7 @@ export function CreateCampaignPage() {
           </FormSection>
 
           {/* Summary */}
-          <FormSection title="Summary" requirement="Optional" description="A short pitch for cards and previews.">
+          <FormSection title="Summary" requirement="Optional">
             <Textarea
               id="campaign-summary"
               value={summary}
@@ -742,7 +736,7 @@ export function CreateCampaignPage() {
           </FormSection>
 
           {/* Story */}
-          <FormSection title="Story" requirement="Optional" description="Tell donors why this matters. Markdown is supported.">
+          <FormSection title="Story" requirement="Optional">
             <Textarea
               id="campaign-story"
               value={story}
@@ -755,7 +749,7 @@ export function CreateCampaignPage() {
 
           <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
             {/* Goal */}
-            <FormSection title="Goal" requirement="Optional" description="Set a target">
+            <FormSection title="Goal" requirement="Optional">
               <div className="relative">
                 <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">
                   $
@@ -781,7 +775,7 @@ export function CreateCampaignPage() {
             </FormSection>
 
             {/* Deadline */}
-            <FormSection title="Deadline" requirement="Optional" description="Show urgency">
+            <FormSection title="Deadline" requirement="Optional">
               <Input
                 id="campaign-deadline"
                 type="date"
@@ -829,12 +823,10 @@ export function CreateCampaignPage() {
 function FormSection({
   title,
   requirement,
-  description,
   children,
 }: {
   title: string;
   requirement: 'Required' | 'Recommended' | 'Optional';
-  description?: string;
   children: React.ReactNode;
 }) {
   return (
@@ -846,7 +838,6 @@ function FormSection({
             {requirement}
           </span>
         </h2>
-        {description && <p className="text-sm text-muted-foreground">{description}</p>}
       </div>
       <div className="space-y-2.5">{children}</div>
     </section>
