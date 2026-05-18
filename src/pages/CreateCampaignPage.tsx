@@ -40,7 +40,7 @@ import { useToast } from '@/hooks/useToast';
 import { useUploadFile } from '@/hooks/useUploadFile';
 import type { SearchProfile } from '@/hooks/useSearchProfiles';
 import { useLayoutOptions } from '@/contexts/LayoutContext';
-import { formatSats, satsToUSD, usdToSats } from '@/lib/bitcoin';
+import { formatSats, satsToUSDWhole, usdToSats } from '@/lib/bitcoin';
 import {
   CAMPAIGN_CATEGORIES,
   CAMPAIGN_CATEGORY_LABELS,
@@ -657,7 +657,7 @@ export function CreateCampaignPage() {
                   />
                   <p className="text-xs text-muted-foreground">
                     {goalSatsPreview > 0 && btcPrice
-                      ? `${formatSats(goalSatsPreview)} sats (${satsToUSD(goalSatsPreview, btcPrice)}).`
+                      ? `${formatSats(goalSatsPreview)} sats (${satsToUSDWhole(goalSatsPreview, btcPrice)}).`
                       : 'Stored as sats.'}
                   </p>
                 </div>

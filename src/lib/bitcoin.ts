@@ -135,6 +135,20 @@ export function satsToUSD(sats: number, btcPrice: number): string {
   });
 }
 
+/**
+ * Like {@link satsToUSD} but rounded to the nearest whole dollar (no cents).
+ * Use for zap goal / campaign progress displays where cents are visual noise.
+ */
+export function satsToUSDWhole(sats: number, btcPrice: number): string {
+  const btc = sats / 100_000_000;
+  return (btc * btcPrice).toLocaleString('en-US', {
+    style: 'currency',
+    currency: 'USD',
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
+  });
+}
+
 export function usdToSats(usd: number, btcPrice: number | undefined): number {
   if (!btcPrice || !Number.isFinite(btcPrice) || btcPrice <= 0) return 0;
   if (!Number.isFinite(usd) || usd <= 0) return 0;

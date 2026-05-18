@@ -44,7 +44,7 @@ import {
   encodeCampaignNaddr,
   type ParsedCampaign,
 } from '@/lib/campaign';
-import { satsToUSD } from '@/lib/bitcoin';
+import { satsToUSDWhole } from '@/lib/bitcoin';
 import { formatNumber } from '@/lib/formatNumber';
 import { genUserName } from '@/lib/genUserName';
 import { sanitizeUrl } from '@/lib/sanitizeUrl';
@@ -61,7 +61,7 @@ interface CampaignDetailPageProps {
 }
 
 function formatSatsFull(sats: number, btcPrice: number | undefined): string {
-  if (btcPrice) return satsToUSD(sats, btcPrice);
+  if (btcPrice) return satsToUSDWhole(sats, btcPrice);
   if (sats >= 100_000_000) return `${(sats / 100_000_000).toLocaleString(undefined, { maximumFractionDigits: 4 })} BTC`;
   return `${sats.toLocaleString()} sats`;
 }

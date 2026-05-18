@@ -14,7 +14,7 @@ import {
   type ParsedCampaign,
   encodeCampaignNaddr,
 } from '@/lib/campaign';
-import { fetchBtcPrice, satsToUSD } from '@/lib/bitcoin';
+import { fetchBtcPrice, satsToUSDWhole } from '@/lib/bitcoin';
 import { genUserName } from '@/lib/genUserName';
 import { sanitizeUrl } from '@/lib/sanitizeUrl';
 import { cn } from '@/lib/utils';
@@ -28,7 +28,7 @@ function formatSatsShort(sats: number): string {
 }
 
 function formatCampaignAmount(sats: number, btcPrice: number | undefined): string {
-  if (btcPrice) return satsToUSD(sats, btcPrice);
+  if (btcPrice) return satsToUSDWhole(sats, btcPrice);
   return formatSatsShort(sats);
 }
 
