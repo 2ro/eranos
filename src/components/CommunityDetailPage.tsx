@@ -729,24 +729,24 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
                 </Button>
               </div>
 
-              <TabsList className="grid h-auto w-full grid-cols-3 rounded-xl border bg-card/70 p-1 shadow-sm backdrop-blur">
+              <TabsList className="grid h-auto w-full grid-cols-3 gap-2 rounded-none bg-transparent p-0 shadow-none">
                 <TabsTrigger
                   value="activity"
-                  className="min-w-0 rounded-lg border border-transparent px-3 py-2 text-muted-foreground shadow-none hover:text-foreground data-[state=active]:border-border data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm"
+                  className="min-w-0 rounded-lg border border-transparent px-3 py-2 text-muted-foreground shadow-none hover:bg-muted/40 hover:text-foreground data-[state=active]:border-border data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm"
                 >
                   <ActivityIcon className="size-4 mr-1.5" />
                   Activity
                 </TabsTrigger>
                 <TabsTrigger
                   value="pulse"
-                  className="min-w-0 rounded-lg border border-transparent px-3 py-2 text-muted-foreground shadow-none hover:text-foreground data-[state=active]:border-border data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm"
+                  className="min-w-0 rounded-lg border border-transparent px-3 py-2 text-muted-foreground shadow-none hover:bg-muted/40 hover:text-foreground data-[state=active]:border-border data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm"
                 >
                   <Radio className="size-4 mr-1.5" />
                   Pulse
                 </TabsTrigger>
                 <TabsTrigger
                   value="chat"
-                  className="min-w-0 rounded-lg border border-transparent px-3 py-2 text-muted-foreground shadow-none hover:text-foreground data-[state=active]:border-border data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm"
+                  className="min-w-0 rounded-lg border border-transparent px-3 py-2 text-muted-foreground shadow-none hover:bg-muted/40 hover:text-foreground data-[state=active]:border-border data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm"
                 >
                   <MessageCircle className="size-4 mr-1.5" />
                   Chat
