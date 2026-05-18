@@ -12,8 +12,6 @@
 
 | Kind  | Name                       | Description                                                    |
 |-------|----------------------------|----------------------------------------------------------------|
-| 20000 | Ephemeral Geo Chat (public) | Geo-anchored ephemeral chat message (kind 20000, public)      |
-| 20001 | Ephemeral Geo Heartbeat    | Geo-anchored ephemeral presence heartbeat (kind 20001)         |
 | 30223 | Campaign                   | Fundraising campaign with a list of on-chain Bitcoin recipients |
 | 30385 | Community Stats Snapshot   | Pre-computed per-country / global community leaderboards       |
 | 36639 | Activist Action            | Country-scoped activist challenge with a sats bounty           |
@@ -611,66 +609,6 @@ Global snapshot:
 ```
 
 After fetching, take the event with the highest `created_at` and parse it. Cache for ~1–2 minutes; the producer typically refreshes on a similar cadence.
-
----
-
-## Kinds 20000 / 20001: Ephemeral Geo Chat
-
-### Summary
-
-Ephemeral events used to power realtime location-anchored chat on the world map. Both kinds live in NIP-01's ephemeral range (`20000 ≤ kind < 30000`), so relays MUST NOT persist them — they are short-lived signals only.
-
-- **Kind 20000** — public chat message. The `content` field carries the message text.
-- **Kind 20001** — presence "heartbeat". Same tag schema, but `content` MAY be empty (the event simply broadcasts that someone is listening at the geohash).
-
-This kind range is shared with the wider Bitchat / geo-chat ecosystem; Agora interoperates with Pathos and other clients producing the same shape.
-
-### Tags
-
-| Tag | Required | Purpose                                                                 |
-|-----|----------|-------------------------------------------------------------------------|
-| `g` | Yes      | Geohash anchoring the message. Any precision is allowed; the dialog filters by exact-match `g` value, while the map clusters by full geohash. |
-| `n` | No       | Display nickname (≤ 16 chars after client-side truncation). Anonymous senders pick a random "ghost" handle; logged-in senders may use their account display name. |
-
-Events without a `g` tag MUST be ignored — they cannot be plotted.
-
-### Identity
-
-There are two valid signing paths:
-
-1. **Real identity** — a logged-in user signs with their existing Nostr key (typically via NIP-07 / NIP-46). Other clients can correlate the chat message with the author's public profile.
-2. **Ephemeral "ghost" identity** — the client generates a fresh in-memory keypair (never persisted) and signs locally. Only the chosen `n` nickname is persisted (in `localStorage`) so the user keeps a stable handle even though the pubkey rotates per session.
-
-Clients SHOULD let logged-in users toggle between modes per-session and SHOULD default to the ghost mode when no account is available.
-
-### Relay Routing
-
-Because ephemeral events are not stored, latency dominates the experience. Clients SHOULD:
-
-1. Always include a baseline of widely-reachable relays (`wss://nos.lol`, `wss://relay.damus.io`, `wss://relay.primal.net`).
-2. Augment with geo-located relays drawn from the [permissionlesstech/georelays](https://github.com/permissionlesstech/georelays) CSV catalogue (`relayUrl,latitude,longitude` per line).
-3. For a specific geohash conversation, prefer the relays nearest the decoded coordinates (Haversine distance, top-N).
-4. For the global map heatmap, take a rotating window (e.g. 8 relays, rotated every 5 minutes) so coverage spreads without saturating any single relay.
-
-### Time Window
-
-Clients SHOULD only surface events from the last hour (`since = now - 3600`). Older ephemeral events are uninteresting for "what's happening right now" and most relays will have dropped them anyway.
-
-### Example
-
-```json
-{
-  "kind": 20000,
-  "created_at": 1734567890,
-  "pubkey": "...",
-  "tags": [
-    ["g", "u4pruydqqvj"],
-    ["n", "stealthranger4242"]
-  ],
-  "content": "anyone in berlin tonight?",
-  "sig": "..."
-}
-```
 
 ---
 

@@ -16,8 +16,6 @@ import {
 import { cn } from '@/lib/utils';
 import { useIsMobile } from '@/hooks/useIsMobile';
 import { CountryActivityPopover } from './CountryActivityPopover';
-import { EphemeralMarkersLayer } from './EphemeralMarkersLayer';
-import type { EphemeralEventData } from '@/hooks/useEphemeralEvents';
 
 // CARTO Positron tiles — clean, label-rich basemap with a dark variant.
 const POSITRON_LIGHT_URL = 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png';
@@ -484,12 +482,6 @@ interface WorldMapProps {
   activities: Map<string, number>;
   /** Map of country code → top trending hashtag (no leading `#`). */
   topHashtags?: Map<string, string>;
-  /** Recent ephemeral chat events (kinds 20000/20001) to plot as a sky-blue
-   *  layer on top of the orange community-activity bubbles. */
-  ephemeralEvents?: EphemeralEventData[];
-  /** Called when a chat bubble row is clicked. The page is responsible for
-   *  mounting the actual chat dialog. */
-  onOpenChat?: (geohash: string) => void;
   /** Triggered when the underlying tile layer finishes initial load. */
   onMapReady?: () => void;
 }
@@ -501,14 +493,10 @@ interface WorldMapProps {
  * `/i/iso3166:XX` country feed. At low zoom levels nearby bubbles fold into
  * clusters with a roll-up popover.
  *
- * Optionally overlays a sky-blue ephemeral chat layer (kinds 20000/20001)
- * with a `onOpenChat` callback used to launch the per-geohash realtime chat.
  */
 export function WorldMap({
   activities,
   topHashtags,
-  ephemeralEvents,
-  onOpenChat,
   onMapReady,
 }: WorldMapProps) {
   const isMobile = useIsMobile();
@@ -573,13 +561,6 @@ export function WorldMap({
         />
         <MapSizeController />
         <MarkersOverlay activityMarkers={activityMarkers} isMobile={isMobile} />
-        {ephemeralEvents && ephemeralEvents.length > 0 && onOpenChat && (
-          <EphemeralMarkersLayer
-            events={ephemeralEvents}
-            onOpenChat={onOpenChat}
-            isMobile={isMobile}
-          />
-        )}
       </MapContainer>
     </div>
   );
