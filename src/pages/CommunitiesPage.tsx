@@ -217,11 +217,11 @@ function CommunitiesHero({ onCreateCommunity }: CommunitiesHeroProps) {
             Organize
           </p>
           <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight leading-[1.05] text-white drop-shadow-[0_2px_12px_rgb(0_0_0/0.55)]">
-            Build a place
-            <br className="sm:hidden" /> for your people.
+            Strength
+            <br className="sm:hidden" /> in numbers.
           </h1>
           <p className="text-base sm:text-lg text-white/85 max-w-2xl mx-auto drop-shadow-[0_1px_6px_rgb(0_0_0/0.5)]">
-            Create flat Nostr communities, gather members with badges, and keep up with what your spaces are doing.
+            Create communities, gather members, and keep up with what your spaces are doing.
           </p>
         </div>
 
@@ -232,7 +232,7 @@ function CommunitiesHero({ onCreateCommunity }: CommunitiesHeroProps) {
             <span className="p-2 rounded-full bg-primary/15 text-primary">
               <Sparkles className="size-5" aria-hidden />
             </span>
-            <span className="font-semibold tracking-tight">Communities are portable, member-led, and owned by no platform.</span>
+            <span className="font-semibold tracking-tight">Sovereign community organization</span>
           </div>
         </div>
 
@@ -253,14 +253,6 @@ function CommunitiesHero({ onCreateCommunity }: CommunitiesHeroProps) {
           >
             <PlusCircle className="mr-2" />
             Create a community
-          </Button>
-          <Button
-            variant="outline"
-            size="lg"
-            asChild
-            className="rounded-full bg-background/60 backdrop-blur h-12 px-6 text-base"
-          >
-            <a href="#community-activity">See activity</a>
           </Button>
         </div>
       </div>
