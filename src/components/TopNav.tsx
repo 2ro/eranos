@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link, NavLink } from 'react-router-dom';
 import { Menu, PlusCircle, X } from 'lucide-react';
+import { nip19 } from 'nostr-tools';
 
 import { LoginArea } from '@/components/auth/LoginArea';
 import { Button } from '@/components/ui/button';
@@ -175,7 +176,7 @@ function SecondaryMobileLinks({ onClose }: { onClose: () => void }) {
     { label: 'Wallet', to: '/wallet' },
     { label: 'Bitcoin', to: '/bitcoin' },
     { label: 'Notifications', to: '/notifications' },
-    { label: 'Profile', to: '/profile' },
+    { label: 'Profile', to: `/${nip19.npubEncode(user.pubkey)}` },
     { label: 'Settings', to: '/settings' },
   ];
   return (
