@@ -2,17 +2,11 @@
  * Hardcoded list of `naddr1...` identifiers for the two featured fundraisers
  * shown at the top of the Campaigns homepage.
  *
- * TODO: replace these placeholder slots with real campaign naddrs once the
- * fundraisers have been chosen by the stakeholders. Until then the UI renders
- * a graceful empty state in their place.
- *
  * Each entry MUST be a `naddr1...` identifier whose decoded kind is
  * `CAMPAIGN_KIND` (30223). Anything else is silently ignored at the page
  * level so a typo doesn't break the homepage.
  */
 export const FEATURED_CAMPAIGN_NADDRS: readonly string[] = [
-  // TODO(featured-campaign-1): paste an naddr1... here
-  '',
-  // TODO(featured-campaign-2): paste an naddr1... here
-  '',
+  'naddr1qvzqqqrkpupzpyexz3t34l966ngh5xg7u2q788hthdqmj0av3lv8s2tz9t43zt6dqqg8vmmvw4h8gcty94cx7ur4d3shy96anxu',
+  'naddr1qvzqqqrkpupzpyexz3t34l966ngh5xg7u2q788hthdqmj0av3lv8s2tz9t43zt6dqqfk67fdwd6x2ctvw358jttxwfjk2er0d5dde0sj',
 ];
