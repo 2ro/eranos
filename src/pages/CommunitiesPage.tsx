@@ -227,12 +227,20 @@ function CommunitiesHero({ onCreateCommunity }: CommunitiesHeroProps) {
 
         <div className="flex-1 min-h-[180px] sm:min-h-[220px]" aria-hidden="true" />
 
-        <div className="relative w-full max-w-md mx-auto rounded-full bg-background/55 backdrop-blur-xl backdrop-saturate-150 border border-white/20 dark:border-white/10 px-5 py-3 shadow-lg shadow-amber-500/10">
-          <div className="flex items-center justify-center gap-3 text-sm sm:text-base">
-            <span className="p-2 rounded-full bg-primary/15 text-primary">
+        <div
+          className="relative w-full max-w-md mx-auto rounded-full bg-background/55 backdrop-blur-xl backdrop-saturate-150 border border-white/20 dark:border-white/10 px-5 py-3 shadow-lg shadow-amber-500/10"
+          aria-live="polite"
+        >
+          <div className="flex items-center justify-center gap-3 motion-safe:animate-in motion-safe:fade-in motion-safe:duration-500">
+            <span className="text-primary shrink-0">
               <Sparkles className="size-5" aria-hidden />
             </span>
-            <span className="font-semibold tracking-tight">Sovereign community organization</span>
+            <span className="text-sm sm:text-base font-semibold tracking-tight">
+              Sovereign
+            </span>
+            <span className="text-xs sm:text-sm text-muted-foreground line-clamp-1">
+              community organization
+            </span>
           </div>
         </div>
 
