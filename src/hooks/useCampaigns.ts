@@ -11,6 +11,12 @@ interface UseCampaignsOptions {
   limit?: number;
   /** Authors to fetch from, e.g. for a profile's campaigns. */
   authors?: string[];
+  /**
+   * Include campaigns that have been archived by their creator
+   * (`["status", "archived"]`). Defaults to `false` so archived
+   * campaigns never appear in the main fundraisers listing.
+   */
+  includeArchived?: boolean;
 }
 
 /**
@@ -20,15 +26,19 @@ interface UseCampaignsOptions {
  * Campaigns that fail validation (missing title, no recipients, etc.) are
  * dropped so the UI never has to defensively check for missing fields.
  *
+ * Archived campaigns (`status=archived`) are excluded by default. Pass
+ * `includeArchived: true` to load them — used by the author's own profile
+ * view so they can see and reopen their own archives.
+ *
  * For each `(pubkey, d)` pair we keep only the latest event — relays may
  * return older revisions of an addressable event alongside the current one.
  */
 export function useCampaigns(options: UseCampaignsOptions = {}) {
   const { nostr } = useNostr();
-  const { category, limit = 60, authors } = options;
+  const { category, limit = 60, authors, includeArchived = false } = options;
 
   return useQuery({
-    queryKey: ['campaigns', { category, limit, authors }],
+    queryKey: ['campaigns', { category, limit, authors, includeArchived }],
     queryFn: async (c) => {
       const filter: NostrFilter = { kinds: [CAMPAIGN_KIND], limit };
       if (category) filter['#t'] = [category];
@@ -51,7 +61,9 @@ export function useCampaigns(options: UseCampaignsOptions = {}) {
       const parsed: ParsedCampaign[] = [];
       for (const event of latestByCoord.values()) {
         const campaign = parseCampaign(event);
-        if (campaign) parsed.push(campaign);
+        if (!campaign) continue;
+        if (!includeArchived && campaign.archived) continue;
+        parsed.push(campaign);
       }
       parsed.sort((a, b) => b.createdAt - a.createdAt);
       return parsed;

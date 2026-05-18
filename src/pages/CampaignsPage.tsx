@@ -99,9 +99,15 @@ export function CampaignsPage() {
   });
 
   // Exclude featured campaigns from the main list so they don't appear twice.
-  const featuredCoords = useMemo(
-    () => new Set(featured.filter(Boolean).map((c) => c!.aTag)),
+  // Archived campaigns are already filtered upstream by useCampaigns, but if a
+  // featured slot points at one that's since been archived we drop it here too.
+  const visibleFeatured = useMemo(
+    () => featured.map((c) => (c && !c.archived ? c : null)),
     [featured],
+  );
+  const featuredCoords = useMemo(
+    () => new Set(visibleFeatured.filter(Boolean).map((c) => c!.aTag)),
+    [visibleFeatured],
   );
   const userCampaigns = useMemo(
     () => (allCampaigns ?? []).filter((c) => !featuredCoords.has(c.aTag)),
@@ -155,7 +161,7 @@ export function CampaignsPage() {
             </div>
           </div>
 
-          <FeaturedRow campaigns={featured} isLoading={featuredLoading} />
+          <FeaturedRow campaigns={visibleFeatured} isLoading={featuredLoading} />
         </section>
 
         {/* User-submitted */}

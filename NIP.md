@@ -225,6 +225,7 @@ The `content` field is the **campaign story**, formatted as Markdown. Clients SH
 | `goal`     | Recommended | Fundraising goal in **satoshis** (decimal integer). Omit if the campaign has no fixed goal.                                                                       |
 | `deadline` | Optional | Unix timestamp (seconds) at which the campaign closes. After the deadline, clients SHOULD show the campaign as ended but MAY still accept donations.              |
 | `location` | Optional | Human-readable location string (e.g. "Portland, OR" or "Online"). For machine-readable geo, a `g` (geohash) tag MAY be added in parallel.                          |
+| `status`   | Optional | Lifecycle status. The only defined value is `archived`, which marks the campaign closed without deleting it. Other values SHOULD be ignored. See *Closing & archiving* below. |
 | `p`        | Yes (≥1) | Recipient pubkey. The 2nd element is the hex pubkey; the 3rd (optional) is a relay hint; the 4th (optional) is a positive decimal **weight** for split allocation. |
 | `alt`      | Recommended | NIP-31 human-readable fallback.                                                                                                                                   |
 
@@ -294,7 +295,7 @@ Clients MUST verify each kind 8333 event on-chain before counting it toward the 
 - **Recipient validity:** clients SHOULD reject `p` tag entries whose pubkey is not 64 hex characters and SHOULD ignore weights that are not positive finite decimals.
 - **Dust protection:** when a donor enters an amount that would assign any recipient less than the dust limit, the client MUST block the donation and either suggest the minimum viable total or prompt the donor to remove recipients.
 - **Editability:** the creator MAY republish the same `(kind, pubkey, d)` triple to update the campaign. Clients SHOULD keep `published_at` from the first publish on subsequent edits (NIP-23 convention).
-- **Closing:** the creator MAY publish a NIP-09 kind 5 deletion request referencing the campaign's `a` coordinate to retire it. Clients SHOULD continue to render past donations against the campaign even after closure.
+- **Closing & archiving:** the creator MAY soft-close a campaign by republishing it with a `["status", "archived"]` tag. Clients SHOULD hide archived campaigns from discovery feeds and disable the donate flow, but MUST keep them reachable by direct link so existing donors can still find them and donation history is preserved. The creator can reopen the campaign by republishing without the status tag (or with any other status value). For a hard delete, the creator MAY publish a NIP-09 kind 5 deletion request referencing the campaign's `a` coordinate; clients SHOULD continue to render past donations against the campaign even after deletion.
 
 ---
 

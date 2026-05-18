@@ -92,6 +92,13 @@ export interface ParsedCampaign {
   recipients: CampaignRecipient[];
   /** Created-at from the event. */
   createdAt: number;
+  /**
+   * True when the creator has marked the campaign closed via
+   * `["status", "archived"]`. Archived campaigns are hidden from main
+   * listings but still load by direct link so existing donors can find
+   * them and donation history is preserved.
+   */
+  archived: boolean;
 }
 
 /** Returns the first value of a tag, or undefined. */
@@ -163,6 +170,11 @@ export function parseCampaign(event: NostrEvent): ParsedCampaign | null {
   const rawImage = getTag(event, 'image');
   const image = rawImage && /^https:\/\//i.test(rawImage) ? rawImage : undefined;
 
+  // Status tag. We only recognize `archived` today; any other value is
+  // ignored so future statuses (e.g. `paused`, `funded`) don't accidentally
+  // get treated as archived.
+  const archived = getTag(event, 'status') === 'archived';
+
   return {
     event,
     pubkey: event.pubkey,
@@ -178,6 +190,7 @@ export function parseCampaign(event: NostrEvent): ParsedCampaign | null {
     location: getTag(event, 'location')?.trim() || undefined,
     recipients,
     createdAt: event.created_at,
+    archived,
   };
 }
 

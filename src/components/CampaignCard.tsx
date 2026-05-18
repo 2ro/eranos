@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
-import { CalendarClock, HandHeart, MapPin, Target, Users } from 'lucide-react';
+import { CalendarClock, HandHeart, MapPin, Target, Users, Archive } from 'lucide-react';
 
 import { Badge } from '@/components/ui/badge';
 import { Card } from '@/components/ui/card';
@@ -142,6 +142,15 @@ export function CampaignCard({ campaign, variant = 'compact', className }: Campa
               className="absolute top-3 left-3 backdrop-blur bg-background/80 border-border/40"
             >
               {CAMPAIGN_CATEGORY_LABELS[campaign.category]}
+            </Badge>
+          )}
+          {campaign.archived && (
+            <Badge
+              variant="secondary"
+              className="absolute top-3 right-3 backdrop-blur bg-background/85 border-border/40"
+            >
+              <Archive className="size-3.5 mr-1" />
+              Archived
             </Badge>
           )}
         </div>

@@ -6,6 +6,8 @@ import type { NostrEvent } from '@nostrify/nostrify';
 import {
   CalendarClock,
   Tag,
+  Archive,
+  ArchiveRestore,
   ChevronLeft,
   HandHeart,
   MapPin,
@@ -20,6 +22,16 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 import { CampaignProgress } from '@/components/CampaignCard';
 import { DonateDialog } from '@/components/DonateDialog';
 import { PostActionBar } from '@/components/PostActionBar';
@@ -30,6 +42,7 @@ import {
   type InteractionTab,
 } from '@/components/InteractionsModal';
 import { ThreadedReplyList, type ReplyNode } from '@/components/ThreadedReplyList';
+import { useArchiveCampaign } from '@/hooks/useArchiveCampaign';
 import { useAuthor } from '@/hooks/useAuthor';
 import { useBitcoinWallet } from '@/hooks/useBitcoinWallet';
 import { useCampaign } from '@/hooks/useCampaign';
@@ -104,6 +117,9 @@ function CampaignDetailContent({ campaign }: { campaign: ParsedCampaign }) {
   const [interactionsOpen, setInteractionsOpen] = useState(false);
   const [storyExpanded, setStoryExpanded] = useState(false);
   const [interactionsTab, setInteractionsTab] = useState<InteractionTab>('reposts');
+  const [archiveConfirmOpen, setArchiveConfirmOpen] = useState(false);
+
+  const archiveMutation = useArchiveCampaign();
 
   const openInteractions = (tab: InteractionTab) => {
     setInteractionsTab(tab);
@@ -249,6 +265,31 @@ function CampaignDetailContent({ campaign }: { campaign: ParsedCampaign }) {
     }
   };
 
+  const handleToggleArchive = () => {
+    archiveMutation.mutate(
+      { campaign, archived: !campaign.archived },
+      {
+        onSuccess: (updated) => {
+          toast({
+            title: updated.archived ? 'Campaign archived' : 'Campaign reopened',
+            description: updated.archived
+              ? 'Hidden from the main fundraisers feed. Donors with the link can still view it.'
+              : 'Visible in the main fundraisers feed again.',
+          });
+          setArchiveConfirmOpen(false);
+        },
+        onError: (error: unknown) => {
+          const msg = error instanceof Error ? error.message : String(error);
+          toast({
+            title: campaign.archived ? 'Could not reopen campaign' : 'Could not archive campaign',
+            description: msg,
+            variant: 'destructive',
+          });
+        },
+      },
+    );
+  };
+
   return (
     <main className="min-h-screen pb-16">
       <div className="max-w-3xl mx-auto px-4 sm:px-6 py-6 lg:py-10">
@@ -274,21 +315,57 @@ function CampaignDetailContent({ campaign }: { campaign: ParsedCampaign }) {
                   <ChevronLeft className="size-6 drop-shadow-[0_1px_2px_rgba(0,0,0,0.85)]" />
                 </button>
                 {isCreator && (
-                  <Button
-                    asChild
-                    variant="ghost"
-                    size="sm"
-                    className="rounded-full bg-transparent text-white/90 shadow-none hover:bg-white/15 hover:text-white focus-visible:ring-white/80"
-                  >
-                    <Link to={`/campaigns/new?edit=${encodeURIComponent(naddr)}`}>
-                      <Pencil className="size-4 mr-2" />
-                      Edit
-                    </Link>
-                  </Button>
+                  <div className="flex items-center gap-1.5">
+                    <Button
+                      asChild
+                      variant="ghost"
+                      size="sm"
+                      className="rounded-full bg-transparent text-white/90 shadow-none hover:bg-white/15 hover:text-white focus-visible:ring-white/80"
+                    >
+                      <Link to={`/campaigns/new?edit=${encodeURIComponent(naddr)}`}>
+                        <Pencil className="size-4 mr-2" />
+                        Edit
+                      </Link>
+                    </Button>
+                    {campaign.archived ? (
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        onClick={handleToggleArchive}
+                        disabled={archiveMutation.isPending}
+                        className="rounded-full bg-transparent text-white/90 shadow-none hover:bg-white/15 hover:text-white focus-visible:ring-white/80"
+                      >
+                        <ArchiveRestore className="size-4 mr-2" />
+                        Reopen
+                      </Button>
+                    ) : (
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => setArchiveConfirmOpen(true)}
+                        disabled={archiveMutation.isPending}
+                        className="rounded-full bg-transparent text-white/90 shadow-none hover:bg-white/15 hover:text-white focus-visible:ring-white/80"
+                      >
+                        <Archive className="size-4 mr-2" />
+                        Archive
+                      </Button>
+                    )}
+                  </div>
                 )}
               </div>
 
               <div className="absolute inset-x-0 bottom-0 z-10 space-y-2 p-5 sm:p-6 [text-shadow:0_1px_4px_rgba(0,0,0,0.75),0_2px_10px_rgba(0,0,0,0.45)]">
+                {campaign.archived && (
+                  <Badge
+                    variant="secondary"
+                    className="bg-background/85 text-foreground border-border/40 backdrop-blur [text-shadow:none]"
+                  >
+                    <Archive className="size-3.5 mr-1.5" />
+                    Archived
+                  </Badge>
+                )}
                 <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
                   <h1 className="text-3xl sm:text-4xl font-bold leading-tight tracking-tight text-white">
                     {campaign.title}
@@ -371,10 +448,14 @@ function CampaignDetailContent({ campaign }: { campaign: ParsedCampaign }) {
                     size="lg"
                     className="w-full col-span-3"
                     onClick={() => setDonateOpen(true)}
-                    disabled={deadline?.isPast}
+                    disabled={deadline?.isPast || campaign.archived}
                   >
                     <HandHeart className="size-5 mr-2" />
-                    {deadline?.isPast ? 'Campaign ended' : 'Donate'}
+                    {campaign.archived
+                      ? 'Campaign archived'
+                      : deadline?.isPast
+                        ? 'Campaign ended'
+                        : 'Donate'}
                   </Button>
 
                   <Button variant="outline" size="lg" className="w-full" onClick={handleShare}>
@@ -538,6 +619,31 @@ function CampaignDetailContent({ campaign }: { campaign: ParsedCampaign }) {
         onOpenChange={setInteractionsOpen}
         initialTab={interactionsTab}
       />
+
+      <AlertDialog open={archiveConfirmOpen} onOpenChange={setArchiveConfirmOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Archive this campaign?</AlertDialogTitle>
+            <AlertDialogDescription>
+              The campaign will be hidden from the main fundraisers feed and no
+              new donations can be made. Anyone with the link can still view it,
+              and past donations stay attached. You can reopen it at any time.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={archiveMutation.isPending}>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={(e) => {
+                e.preventDefault();
+                handleToggleArchive();
+              }}
+              disabled={archiveMutation.isPending}
+            >
+              {archiveMutation.isPending ? 'Archiving…' : 'Archive'}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </main>
   );
 }
