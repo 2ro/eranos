@@ -795,11 +795,8 @@ export function CreateCampaignPage() {
           </Alert>
         )}
 
-        <div className="flex gap-3 justify-end pt-1">
-          <Button type="button" variant="outline" onClick={() => isEditMode ? navigate(-1) : navigate('/')}>
-            Cancel
-          </Button>
-          <Button type="submit" disabled={submitMutation.isPending}>
+        <div className="pt-1">
+          <Button type="submit" disabled={submitMutation.isPending} className="w-full">
             {submitMutation.isPending ? (
               <>
                 <Loader2 className="size-4 mr-2 animate-spin" />
