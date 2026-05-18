@@ -72,7 +72,7 @@ export function TopNav() {
           {/* Primary CTA pill — hidden on small screens to keep the bar uncluttered;
               the same action lives at the top of the mobile menu and as a FAB-style
               button in the homepage hero. */}
-          <Button asChild size="sm" className="hidden sm:inline-flex rounded-full">
+          <Button asChild className="hidden h-11 rounded-full px-4 sm:inline-flex">
             <Link to="/campaigns/new">
               <PlusCircle className="size-4 mr-1.5" />
               Start Campaign
