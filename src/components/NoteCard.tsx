@@ -85,6 +85,7 @@ import { VoiceMessagePlayer } from "@/components/VoiceMessagePlayer";
 import { ZapDialog } from "@/components/ZapDialog";
 import { useAppContext } from "@/hooks/useAppContext";
 import { useAuthor } from "@/hooks/useAuthor";
+import { useAddrEvent } from "@/hooks/useEvent";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { useNip05Verify } from "@/hooks/useNip05Verify";
 import { useOpenPost } from "@/hooks/useOpenPost";
@@ -336,6 +337,29 @@ export const NoteCard = memo(function NoteCard({
   const zapSenderMeta = zapSender.data?.metadata;
   const zapSenderName = getDisplayName(zapSenderMeta, zapSenderPubkey);
   const zapSenderUrl = useProfileUrl(zapSenderPubkey, zapSenderMeta);
+  const zapSenderNip05 = zapSenderMeta?.nip05;
+  // NIP-05 verification for the zap sender (donor). Mirrors how `useNip05Verify`
+  // is used for the receipt author below — passing undefined when the receipt
+  // doesn't yield a sender (non-zap events) so the hook stays disabled.
+  const { data: zapSenderNip05Verified, isPending: zapSenderNip05Pending } =
+    useNip05Verify(zapSenderNip05, zapSenderPubkey || undefined);
+
+  // Resolve the zap target (only when the receipt carries an `a` tag). Used to
+  // render "donated $X to <Campaign Title>" with the title as a clickable
+  // link. Returns undefined for non-zap events and Lightning zaps to plain
+  // notes (e-tag only), in which case the target line is omitted.
+  const zapTargetAddr = useMemo(() => {
+    if (event.kind !== 9735 && event.kind !== 8333) return undefined;
+    const aTag = event.tags.find(([n]) => n === "a")?.[1];
+    if (!aTag) return undefined;
+    const parts = aTag.split(":");
+    const kind = parseInt(parts[0] ?? "", 10);
+    const pubkey = parts[1];
+    const identifier = parts.slice(2).join(":");
+    if (!Number.isFinite(kind) || !pubkey) return undefined;
+    return { kind, pubkey, identifier };
+  }, [event]);
+  const { data: zapTargetEvent } = useAddrEvent(zapTargetAddr);
 
   const pollVoteLabel = usePollVoteLabel(event);
 
@@ -946,60 +970,200 @@ export const NoteCard = memo(function NoteCard({
   }
 
   // ── Zap receipt layout (kind 9735 Lightning, kind 8333 on-chain Bitcoin) ──
+  //
+  // Designed to mirror the standard NoteCard layout pixel-for-pixel: large
+  // donor avatar on the left, donor name + nip05 + timeAgo stacked on the
+  // right, action bar in the exact same position with the same spacing.
+  // The amber zap icon shrinks to a small badge to the left of the avatar so
+  // the card visually reads as "a person did X" rather than "an activity".
   if (isZap) {
     const zapAmountSats = getZapAmountSats(event);
     // Kind 9735 stores the zapper's note in the embedded zap-request's
     // `content`; kind 8333 stores the donor's comment in the event's own
     // `content` field directly (no embedded request).
     const zapMessage = event.kind === 8333 ? event.content : extractZapMessage(event);
-    const iconSize = threaded || threadedLast ? "size-10" : "size-11";
 
     // Label: "donated" for campaign targets (kind 30223 via the `a` tag),
-    // otherwise "sent". We can determine the target's kind without a network
-    // round-trip when the receipt carries an `a` tag — Lightning zaps to
-    // plain notes carry only `e`, so they fall back to "sent".
+    // otherwise "sent". Determined without a network round-trip when the
+    // receipt carries an `a` tag — Lightning zaps to plain notes carry only
+    // `e`, so they fall back to "sent".
     const targetKind = getTargetKindFromAddr(event);
-    const zapLabel = targetKind === CAMPAIGN_KIND ? "donated" : "sent";
+    const isCampaignTarget = targetKind === CAMPAIGN_KIND;
+    const zapLabel = isCampaignTarget ? "donated" : "sent";
 
-    // Amount: USD when btcPrice is available, sats fallback otherwise. Both
-    // renderings include the secondary unit as a `title` tooltip so the raw
-    // sats value is never lost.
+    // Amount: USD when btcPrice is available, sats fallback otherwise. The
+    // raw sats string is preserved as a `title` tooltip so it's never lost.
     const usdLabel = btcPrice ? satsToUSD(zapAmountSats, btcPrice) : undefined;
     const satsLabel = `${formatNumber(zapAmountSats)} ${zapAmountSats === 1 ? 'sat' : 'sats'}`;
-    const amountElement = zapAmountSats > 0 ? (
-      <span
-        className="text-sm font-semibold text-amber-500 shrink-0"
-        title={usdLabel ? satsLabel : undefined}
-      >
-        {usdLabel ?? satsLabel}
-      </span>
-    ) : undefined;
+    const amountText = usdLabel ?? satsLabel;
+
+    // Target title + naddr for the "to <Campaign>" link. We only render the
+    // link when the target event has resolved AND it's a campaign (since
+    // "donated $X to <note title>" wouldn't make sense for a Lightning zap
+    // of a kind 1 note).
+    const targetTitle = isCampaignTarget && zapTargetEvent
+      ? zapTargetEvent.tags.find(([n]) => n === "title")?.[1]
+      : undefined;
+    const targetNaddr = isCampaignTarget && zapTargetAddr
+      ? nip19.naddrEncode({
+          kind: zapTargetAddr.kind,
+          pubkey: zapTargetAddr.pubkey,
+          identifier: zapTargetAddr.identifier,
+        })
+      : undefined;
+
+    const donorAvatar = zapSender.isLoading ? (
+      <Skeleton
+        className={cn(
+          threaded || threadedLast ? "size-10" : "size-11",
+          "rounded-full shrink-0",
+        )}
+      />
+    ) : (
+      <ProfileHoverCard pubkey={zapSenderPubkey} asChild>
+        <Link
+          to={zapSenderUrl}
+          className="shrink-0 relative"
+          onClick={(e) => e.stopPropagation()}
+        >
+          <Avatar className={threaded || threadedLast ? "size-10" : "size-11"}>
+            <AvatarImage src={zapSenderMeta?.picture} alt={zapSenderName} />
+            <AvatarFallback className="bg-primary/20 text-primary text-sm">
+              {zapSenderName[0]?.toUpperCase()}
+            </AvatarFallback>
+          </Avatar>
+          {/* Small zap badge anchored to the bottom-right of the donor avatar
+              — keeps the "this is a zap" signal without commandeering the
+              entire icon slot. */}
+          <span
+            aria-hidden
+            className="absolute -bottom-0.5 -right-0.5 flex items-center justify-center size-5 rounded-full bg-amber-500/15 ring-2 ring-background"
+          >
+            <Zap className="size-3 text-amber-500 fill-amber-500" />
+          </span>
+        </Link>
+      </ProfileHoverCard>
+    );
+
+    const donorInfo = zapSender.isLoading ? (
+      <div className="min-w-0 min-h-[42px] flex flex-col justify-center space-y-1.5">
+        <Skeleton className="h-4 w-28" />
+        <Skeleton className="h-3 w-36" />
+      </div>
+    ) : (
+      <div className="min-w-0 flex-1 min-h-[42px] flex flex-col justify-center">
+        {/* Top line: donor name · action verb · amount. Mirrors a regular
+            note's name row but inlines the verb + amount so the card reads
+            as one sentence at a glance. */}
+        <div className="flex items-center gap-1.5 flex-wrap">
+          <ProfileHoverCard pubkey={zapSenderPubkey} asChild>
+            <Link
+              to={zapSenderUrl}
+              className="font-bold text-[15px] hover:underline truncate"
+              onClick={(e) => e.stopPropagation()}
+            >
+              {zapSender.data?.event ? (
+                <EmojifiedText tags={zapSender.data.event.tags}>
+                  {zapSenderName}
+                </EmojifiedText>
+              ) : (
+                zapSenderName
+              )}
+            </Link>
+          </ProfileHoverCard>
+          <span className="text-sm text-muted-foreground shrink-0">
+            {zapLabel}
+          </span>
+          {zapAmountSats > 0 && (
+            <span
+              className="text-sm font-semibold text-amber-500 shrink-0"
+              title={usdLabel ? satsLabel : undefined}
+            >
+              {amountText}
+            </span>
+          )}
+          {targetTitle && targetNaddr && (
+            <>
+              <span className="text-sm text-muted-foreground shrink-0">to</span>
+              <Link
+                to={`/${targetNaddr}`}
+                onClick={(e) => e.stopPropagation()}
+                className="text-sm font-medium text-primary hover:underline truncate"
+              >
+                {targetTitle}
+              </Link>
+            </>
+          )}
+        </div>
+        {/* Bottom line: nip05 · timeAgo — same as the regular note layout. */}
+        <div className="flex items-center gap-1 text-sm text-muted-foreground min-w-0 pr-2">
+          {zapSenderNip05 && zapSenderNip05Pending && (
+            <Skeleton className="h-3 w-24" />
+          )}
+          {zapSenderNip05 && zapSenderNip05Pending && (
+            <span className="shrink-0">·</span>
+          )}
+          {zapSenderNip05 && zapSenderNip05Verified && (
+            <Nip05Badge nip05={zapSenderNip05} pubkey={zapSenderPubkey} />
+          )}
+          {zapSenderNip05 && zapSenderNip05Verified && (
+            <span className="shrink-0">·</span>
+          )}
+          <span className="shrink-0 hover:underline whitespace-nowrap">
+            {timeAgo(event.created_at)}
+          </span>
+        </div>
+      </div>
+    );
 
     return (
-      <ActivityCard
-        icon={
-          <div className={cn("flex items-center justify-center rounded-full bg-amber-500/10 shrink-0", iconSize)}>
-            <Zap className="size-5 text-amber-500 fill-amber-500" />
-          </div>
-        }
-        actorRow={
-          <ActorRow pubkey={zapSenderPubkey} profileUrl={zapSenderUrl} picture={zapSenderMeta?.picture}
-            displayName={zapSenderName} authorEvent={zapSender.data?.event} isLoading={zapSender.isLoading} label={zapLabel} timestampLabel={timeAgo(event.created_at)}
-            extra={amountElement}
-          />
-        }
-        threaded={threaded} threadedLast={threadedLast} threadedLineClassName={threadedLineClassName}
-        className={className} onClick={handleCardClick} onAuxClick={handleAuxClick}
+      <article
+        className={cn(
+          "relative px-4 py-3 hover:bg-secondary/30 transition-colors cursor-pointer overflow-hidden",
+          threaded ? "pb-0" : "border-b border-border",
+          className,
+        )}
+        onClick={handleCardClick}
+        onAuxClick={handleAuxClick}
       >
-        {zapMessage && <p className="text-xs text-muted-foreground italic mt-1">&ldquo;{zapMessage}&rdquo;</p>}
-        {/* Make zap cards interactive: reply, repost, react, share — same
-            affordances as a regular note. Each kind 9735 / 8333 event is a
-            valid Nostr event in its own right, so NIP-22 replies target it
-            directly via its event id. */}
-        {actionButtons}
-        <NoteMoreMenu event={event} open={moreMenuOpen} onOpenChange={setMoreMenuOpen} />
-        <ReplyComposeModal event={event} open={replyOpen} onOpenChange={setReplyOpen} />
-      </ActivityCard>
+        <div className="relative">
+          <div className="flex gap-3">
+            <div className="flex flex-col items-center">
+              {donorAvatar}
+              {threaded && (
+                <div
+                  className={cn(
+                    "w-0.5 flex-1 mt-2 rounded-full",
+                    threadedLineClassName || "bg-foreground/20",
+                  )}
+                />
+              )}
+            </div>
+            <div className={cn("flex-1 min-w-0", threaded && "pb-3")}>
+              {donorInfo}
+              {/* Optional donor comment — same italic muted treatment used by
+                  the ActivityCard layout, but anchored under the author row
+                  to match the regular note's content position. */}
+              {zapMessage && (
+                <p className="text-sm text-muted-foreground italic mt-1 break-words">
+                  &ldquo;{zapMessage}&rdquo;
+                </p>
+              )}
+              {actionButtons}
+              <NoteMoreMenu
+                event={event}
+                open={moreMenuOpen}
+                onOpenChange={setMoreMenuOpen}
+              />
+              <ReplyComposeModal
+                event={event}
+                open={replyOpen}
+                onOpenChange={setReplyOpen}
+              />
+            </div>
+          </div>
+        </div>
+      </article>
     );
   }
 
