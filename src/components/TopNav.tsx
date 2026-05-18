@@ -49,8 +49,9 @@ interface MobileLinkItem extends NavItem {
 /**
  * Persistent top navigation bar rendered by {@link FundraiserLayout}. Mirrors
  * the GoFundMe-style chrome: brand mark on the left, primary nav links in the
- * middle, "Sign in" / account avatar plus a "Start Campaign" pill on the
- * right. Collapses to a hamburger menu below the `md` breakpoint.
+ * middle, "Sign in" / account avatar on the right plus a "Start Campaign"
+ * pill once the user is logged in. Collapses to a hamburger menu below the
+ * `md` breakpoint.
  */
 export function TopNav() {
   const { config } = useAppContext();
@@ -94,13 +95,16 @@ export function TopNav() {
         <div className="flex items-center gap-2 sm:gap-3">
           {/* Primary CTA pill — hidden on small screens to keep the bar uncluttered;
               the same action lives at the top of the mobile menu and as a FAB-style
-              button in the homepage hero. */}
-          <Button asChild className="hidden h-11 rounded-full px-4 sm:inline-flex">
-            <Link to="/campaigns/new">
-              <PlusCircle className="size-4 mr-1.5" />
-              Start Campaign
-            </Link>
-          </Button>
+              button in the homepage hero. Also hidden when logged out, where the
+              hero CTA and the "Sign in" / "Sign up" buttons carry the load. */}
+          {user && (
+            <Button asChild className="hidden h-11 rounded-full px-4 sm:inline-flex">
+              <Link to="/campaigns/new">
+                <PlusCircle className="size-4 mr-1.5" />
+                Start Campaign
+              </Link>
+            </Button>
+          )}
 
           {/* LoginArea handles both logged-in (account avatar dropdown) and
               logged-out (Log in / Sign up) states. We render it inline-flex
