@@ -39,6 +39,7 @@ import {
 } from '@/components/ui/select';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Textarea } from '@/components/ui/textarea';
+import LoginDialog from '@/components/auth/LoginDialog';
 import { useAuthor } from '@/hooks/useAuthor';
 import { useBitcoinSigner } from '@/hooks/useBitcoinSigner';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
@@ -175,41 +176,22 @@ export function DonateDialog({ campaign, open, onOpenChange, btcPrice }: DonateD
 
   // ── Logged-out flow ──
   //
-  // Single-recipient campaigns can be paid by anyone with any Bitcoin wallet
-  // (no Nostr login needed — the donor just sends BTC directly to the
-  // recipient's Taproot address). Multi-recipient campaigns still require a
-  // login because the split needs a signed PSBT with one output per recipient.
+  // The ideal path is always to log in and donate through the campaign, so the
+  // donation publishes a kind 8333 receipt and counts toward the goal. As a
+  // secondary path, single-recipient campaigns can be paid externally from any
+  // Bitcoin wallet — the funds reach the recipient but no Nostr receipt is
+  // published, so the donation won't appear in Agora's totals. Multi-recipient
+  // campaigns only support the log-in path (the split needs the donor's
+  // signature on a single PSBT with N outputs).
   if (open && !user) {
-    if (campaign.recipients.length === 1) {
-      return (
-        <Dialog open={open} onOpenChange={handleClose}>
-          <DialogContent className="sm:max-w-md max-h-[90vh] overflow-y-auto">
-            <ExternalPayView
-              campaign={campaign}
-              btcPrice={btcPrice}
-              onClose={handleClose}
-            />
-          </DialogContent>
-        </Dialog>
-      );
-    }
-
     return (
       <Dialog open={open} onOpenChange={handleClose}>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              <LogIn className="size-5 text-primary" />
-              Log in to donate
-            </DialogTitle>
-            <DialogDescription>
-              This campaign splits donations across {campaign.recipients.length} recipients in a
-              single Bitcoin transaction. That requires your Nostr key to sign — log in with your
-              nsec or a signer that supports{' '}
-              <code className="font-mono text-xs">signPsbt</code> to continue.
-            </DialogDescription>
-          </DialogHeader>
-          <Button onClick={handleClose}>Close</Button>
+        <DialogContent className="sm:max-w-md max-h-[90vh] overflow-y-auto">
+          <LoggedOutChooserView
+            campaign={campaign}
+            btcPrice={btcPrice}
+            onClose={handleClose}
+          />
         </DialogContent>
       </Dialog>
     );
@@ -678,6 +660,149 @@ export function DonateButtonSkeleton() {
   return <Skeleton className="h-10 w-32" />;
 }
 
+// ─── Logged-out chooser view ────────────────────────────────────────────────
+
+/**
+ * Shown when a logged-out user clicks Donate. Frames the choice clearly:
+ *
+ * 1. **Recommended**: log in and donate through Agora so the donation
+ *    publishes a kind 8333 receipt and counts toward the campaign goal.
+ * 2. **Secondary** (single-recipient campaigns only): pay the recipient
+ *    directly with any Bitcoin wallet. Funds reach the recipient but the
+ *    donation won't appear in Agora's totals or donor list.
+ *
+ * Multi-recipient campaigns hide the secondary option because the split
+ * fundamentally requires a single PSBT signed by the donor.
+ */
+function LoggedOutChooserView({
+  campaign,
+  btcPrice,
+  onClose,
+}: {
+  campaign: ParsedCampaign;
+  btcPrice?: number;
+  onClose: () => void;
+}) {
+  const [view, setView] = useState<'choose' | 'external'>('choose');
+  const [loginOpen, setLoginOpen] = useState(false);
+
+  const singleRecipient = campaign.recipients.length === 1;
+  const firstRecipient = campaign.recipients[0];
+  const recipientAuthor = useAuthor(firstRecipient.pubkey);
+  const recipientName = singleRecipient
+    ? recipientAuthor.data?.metadata?.display_name ||
+      recipientAuthor.data?.metadata?.name ||
+      genUserName(firstRecipient.pubkey)
+    : '';
+
+  if (view === 'external') {
+    return (
+      <ExternalPayView
+        campaign={campaign}
+        btcPrice={btcPrice}
+        onBack={() => setView('choose')}
+        onClose={onClose}
+      />
+    );
+  }
+
+  return (
+    <>
+      <DialogHeader>
+        <DialogTitle className="flex items-center gap-2">
+          <HandHeart className="size-5 text-primary" />
+          Log in to donate to this campaign
+        </DialogTitle>
+        <DialogDescription>
+          Donations made through Agora publish a Nostr receipt that counts
+          toward <span className="font-medium">{campaign.title}</span>'s goal and
+          appears in the donor list.
+        </DialogDescription>
+      </DialogHeader>
+
+      <div className="space-y-3">
+        {/* Primary path — log in */}
+        <button
+          type="button"
+          onClick={() => setLoginOpen(true)}
+          className="w-full text-left rounded-xl border-2 border-primary bg-primary/5 p-4 hover:bg-primary/10 motion-safe:transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+        >
+          <div className="flex items-start gap-3">
+            <div className="rounded-full bg-primary/15 p-2 shrink-0">
+              <LogIn className="size-5 text-primary" />
+            </div>
+            <div className="min-w-0 flex-1">
+              <div className="flex items-center gap-2 flex-wrap">
+                <span className="font-semibold">Log in & donate</span>
+                <span className="text-[10px] font-semibold uppercase tracking-wide px-1.5 py-0.5 rounded-full bg-primary text-primary-foreground">
+                  Recommended
+                </span>
+              </div>
+              <p className="mt-1 text-sm text-muted-foreground">
+                Your donation counts toward the campaign goal and shows up in the donor list.
+                {!singleRecipient &&
+                  ` Required for this campaign because it splits across ${campaign.recipients.length} recipients.`}
+              </p>
+            </div>
+            <ArrowUpRight className="size-4 text-muted-foreground shrink-0 mt-1" />
+          </div>
+        </button>
+
+        {/* Secondary path — external pay, single recipient only */}
+        {singleRecipient && (
+          <button
+            type="button"
+            onClick={() => setView('external')}
+            className="w-full text-left rounded-xl border border-border bg-background p-4 hover:bg-muted/50 motion-safe:transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+          >
+            <div className="flex items-start gap-3">
+              <div className="rounded-full bg-muted p-2 shrink-0">
+                <Wallet className="size-5 text-muted-foreground" />
+              </div>
+              <div className="min-w-0 flex-1">
+                <div className="font-semibold">
+                  Donate to {recipientName} directly
+                </div>
+                <p className="mt-1 text-sm text-muted-foreground">
+                  Pay {recipientName} from any Bitcoin wallet. It{' '}
+                  <span className="font-medium text-foreground">won't count</span> toward the
+                  campaign goal, but {recipientName} will still receive it.
+                </p>
+              </div>
+              <ArrowUpRight className="size-4 text-muted-foreground shrink-0 mt-1" />
+            </div>
+          </button>
+        )}
+
+        {!singleRecipient && (
+          <Alert>
+            <AlertTriangle className="size-4" />
+            <AlertDescription className="text-xs">
+              This campaign splits each donation across {campaign.recipients.length} recipients in
+              one transaction, which requires your signature. Direct payments aren't available for
+              multi-recipient campaigns.
+            </AlertDescription>
+          </Alert>
+        )}
+
+        <Button variant="ghost" onClick={onClose} className="w-full">
+          Cancel
+        </Button>
+      </div>
+
+      <LoginDialog
+        isOpen={loginOpen}
+        onClose={() => setLoginOpen(false)}
+        onLogin={() => {
+          // The outer DonateDialog re-renders once `user` becomes truthy and
+          // automatically swaps to the FormView for the now-logged-in donor.
+          setLoginOpen(false);
+        }}
+      />
+    </>
+  );
+}
+
 // ─── External-pay view (logged-out, single recipient) ────────────────────────
 
 /**
@@ -692,10 +817,13 @@ export function DonateButtonSkeleton() {
 function ExternalPayView({
   campaign,
   btcPrice,
+  onBack,
   onClose,
 }: {
   campaign: ParsedCampaign;
   btcPrice?: number;
+  /** When provided, renders a back affordance returning to the chooser. */
+  onBack?: () => void;
   onClose: () => void;
 }) {
   const recipient = campaign.recipients[0];
@@ -779,6 +907,16 @@ function ExternalPayView({
   return (
     <>
       <DialogHeader>
+        {onBack && (
+          <button
+            type="button"
+            onClick={onBack}
+            className="self-start -ml-1 inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground motion-safe:transition-colors mb-1"
+          >
+            <ChevronLeft className="size-3.5" />
+            Back
+          </button>
+        )}
         <DialogTitle className="flex items-center gap-2">
           <Wallet className="size-5 text-primary" />
           Pay with any Bitcoin wallet
