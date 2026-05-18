@@ -10,7 +10,6 @@ import {
   AlertTriangle,
   ArrowLeft,
   ChevronDown,
-  Copy,
   HandHeart,
   ImagePlus,
   Loader2,
@@ -1081,11 +1080,11 @@ function RecipientRow({
     const url = `${getShareOrigin()}/claim`;
     const titleClause = campaignTitle.trim() ? ` called "${campaignTitle.trim()}"` : '';
     const message = `I just started a fundraiser for you on Agora${titleClause}! Sign in here for more info and to claim your donations: ${url}`;
-    void copyShareText(message, toast, `Message for ${displayName} copied`);
+    void shareTextOrCopy(message, toast, `Message for ${displayName} copied`);
   };
 
   return (
-    <div className="rounded-lg bg-secondary/30 p-2.5 space-y-2">
+    <div className="rounded-lg bg-secondary/30 p-2.5">
       <div className="flex items-center gap-3">
         <Avatar className="size-8 shrink-0">
           {picture && <AvatarImage src={picture} alt="" />}
@@ -1097,6 +1096,16 @@ function RecipientRow({
         <Button
           type="button"
           variant="ghost"
+          size="sm"
+          onClick={handleNotify}
+          className="h-8 shrink-0 gap-1.5 px-2 text-xs text-muted-foreground hover:text-foreground"
+        >
+          <MessageCircle className="size-3.5" />
+          Notify
+        </Button>
+        <Button
+          type="button"
+          variant="ghost"
           size="icon"
           onClick={onRemove}
           aria-label={`Remove ${displayName}`}
@@ -1105,15 +1114,6 @@ function RecipientRow({
           <X className="size-4" />
         </Button>
       </div>
-      <button
-        type="button"
-        onClick={handleNotify}
-        className="w-full flex items-center justify-center gap-2 rounded-md border border-border bg-background px-2.5 py-1.5 text-xs font-medium text-muted-foreground hover:text-foreground hover:bg-muted/40 motion-safe:transition-colors"
-      >
-        <MessageCircle className="size-3.5" />
-        Send {displayName} a message about this campaign
-        <Copy className="size-3 opacity-70" />
-      </button>
     </div>
   );
 }
