@@ -43,7 +43,7 @@ const LANDMASSES: readonly GeoPoint[][] = LAND_RINGS.map((flat) => {
 const RADIUS = 255;
 const CENTER = 300;
 /** Seconds per full revolution. Slow on purpose so the motion is ambient. */
-const ROTATION_PERIOD_SECONDS = 90;
+const ROTATION_PERIOD_SECONDS = 140;
 
 /**
  * Orthographic projection: turns a (lat, lng) pair into 2D screen
