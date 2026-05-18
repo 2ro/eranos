@@ -262,7 +262,7 @@ export function CampaignsPage() {
                   // clamped so it never shrinks below phone-comfortable
                   // nor balloons on ultra-wide monitors.
                   className="aspect-square max-w-none drop-shadow-2xl"
-                  style={{ width: 'clamp(360px, 46dvw, 820px)' }}
+                  style={{ width: 'clamp(620px, 58dvw, 820px)' }}
                 />
               </div>
             </div>
