@@ -14,6 +14,7 @@ import { HeroCampaignSpotlight } from '@/components/HeroCampaignSpotlight';
 import { CampaignHeroBackground } from '@/components/CampaignHeroBackground';
 import { HeroAtmosphere } from '@/components/HeroAtmosphere';
 import { hopeHueFor } from '@/lib/hopePalette';
+import { cn } from '@/lib/utils';
 import { useCampaigns } from '@/hooks/useCampaigns';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useLayoutOptions } from '@/contexts/LayoutContext';
@@ -292,9 +293,33 @@ export function CampaignsPage() {
               platform holding your funds.
             </p>
             <div className="flex flex-wrap gap-3 pt-2">
-              <Button size="lg" asChild className="rounded-full shadow-lg">
+              {/* Primary CTA — clean translucent glass pill with a hint
+                  of warmth bleeding through. The hopefulness comes from
+                  the photo + atmosphere underneath plus a soft warm
+                  shadow, not from added gloss. */}
+              <Button
+                size="lg"
+                asChild
+                className={cn(
+                  // A touch larger than the default lg button — enough
+                  // weight to read as primary, not enough to feel chunky.
+                  'relative rounded-full text-white font-semibold text-base h-12 px-7 [&_svg]:size-[18px]',
+                  // Subtle warm-tinted glass body, kept more transparent.
+                  // Hover lifts the tint a hair without changing the pill
+                  // character — no shadow bloom, no halo.
+                  'bg-gradient-to-br from-white/14 via-amber-100/10 to-rose-100/10 hover:from-white/20 hover:via-amber-100/14 hover:to-rose-100/14',
+                  'backdrop-blur-xl backdrop-saturate-150',
+                  'border border-white/25 hover:border-white/35',
+                  // Single hair-thin inner highlight + a warm-tinted
+                  // realistic drop shadow that ties the button to the
+                  // hopeful palette. Hover only nudges the shadow.
+                  'shadow-[inset_0_0_0_1px_rgb(255_255_255/0.08),0_10px_28px_-12px_hsl(24_85%_45%/0.4)]',
+                  'hover:shadow-[inset_0_0_0_1px_rgb(255_255_255/0.12),0_12px_32px_-10px_hsl(24_85%_45%/0.5)]',
+                  'motion-safe:transition-colors motion-safe:duration-200',
+                )}
+              >
                 <Link to="/campaigns/new">
-                  <PlusCircle className="size-4 mr-2" />
+                  <PlusCircle className="mr-2" />
                   Start a campaign
                 </Link>
               </Button>
@@ -303,7 +328,7 @@ export function CampaignsPage() {
                   variant="outline"
                   size="lg"
                   asChild
-                  className="rounded-full bg-background/70 backdrop-blur"
+                  className="rounded-full bg-background/60 backdrop-blur h-12 px-6 text-base"
                 >
                   <a href="#campaigns">Explore campaigns</a>
                 </Button>

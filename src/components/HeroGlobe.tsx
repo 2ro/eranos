@@ -103,6 +103,16 @@ export function HeroGlobe({
   // elements to update without re-reading the DOM each frame.
   const ringSizes = useMemo(() => LANDMASSES.map((r) => r.length), []);
 
+  // Live refs so the rAF loop can read the latest markers / selection
+  // without retriggering the effect — otherwise every spotlight tick
+  // would tear down the loop and snap rotation back to 0°.
+  const markersRefValue = useRef(markers);
+  const selectedKeyRef = useRef(selectedKey);
+  useEffect(() => {
+    markersRefValue.current = markers;
+    selectedKeyRef.current = selectedKey;
+  }, [markers, selectedKey]);
+
   useEffect(() => {
     const prefersReducedMotion =
       typeof window !== 'undefined' &&
@@ -203,10 +213,12 @@ export function HeroGlobe({
 
       // --- Campaign markers ---
       const markersEl = markersRef.current;
+      const liveMarkers = markersRefValue.current;
+      const liveSelectedKey = selectedKeyRef.current;
       if (markersEl) {
         const groups = markersEl.children;
-        for (let i = 0; i < markers.length; i++) {
-          const m = markers[i];
+        for (let i = 0; i < liveMarkers.length; i++) {
+          const m = liveMarkers[i];
           const group = groups[i] as SVGGElement | undefined;
           if (!group) continue;
           const p = project(m.lat, m.lng, rotation);
@@ -217,7 +229,7 @@ export function HeroGlobe({
             continue;
           }
           // Selected marker scales up subtly to read as "you are here".
-          const scale = m.key === selectedKey ? 1.35 : 1;
+          const scale = m.key === liveSelectedKey ? 1.35 : 1;
           group.setAttribute(
             'transform',
             `translate(${p.x.toFixed(2)} ${p.y.toFixed(2)}) scale(${scale})`,
@@ -233,7 +245,10 @@ export function HeroGlobe({
 
     rafId = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(rafId);
-  }, [markers, ringSizes, selectedKey]);
+    // `markers` and `selectedKey` are read inside `tick` via refs above,
+    // so we deliberately omit them from this dep list to keep the
+    // rotation loop alive across spotlight cycles.
+  }, [ringSizes]);
 
   return (
     <div className={className} style={style}>
