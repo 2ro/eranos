@@ -428,17 +428,21 @@ function CampaignDetailContent({ campaign }: { campaign: ParsedCampaign }) {
                       <div className="text-3xl font-bold tracking-tight">
                         {formatSatsFull(raisedSats, btcPrice)}
                       </div>
-                      {campaign.goalSats && (
+                      {campaign.goalSats ? (
                         <div className="text-sm text-muted-foreground">
                           raised of {formatSatsFull(campaign.goalSats, btcPrice)} goal
                         </div>
+                      ) : (
+                        <div className="text-sm text-muted-foreground">raised</div>
                       )}
                     </div>
-                    <CampaignProgress
-                      raisedSats={raisedSats}
-                      goalSats={campaign.goalSats}
-                      btcPrice={btcPrice}
-                    />
+                    {campaign.goalSats && (
+                      <CampaignProgress
+                        raisedSats={raisedSats}
+                        goalSats={campaign.goalSats}
+                        btcPrice={btcPrice}
+                      />
+                    )}
                   </>
                 )}
 

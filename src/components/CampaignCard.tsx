@@ -43,16 +43,18 @@ export function CampaignProgress({
   btcPrice?: number;
   className?: string;
 }) {
-  const pct = goalSats && goalSats > 0 ? Math.min(100, Math.round((raisedSats / goalSats) * 100)) : 0;
+  const hasGoal = !!goalSats && goalSats > 0;
+  const pct = hasGoal ? Math.min(100, Math.round((raisedSats / goalSats!) * 100)) : 0;
   return (
     <div className={cn('space-y-1.5', className)}>
-      <Progress value={pct} className="h-2" />
+      {hasGoal && <Progress value={pct} className="h-2" />}
       <div className="flex items-baseline justify-between gap-2 text-sm">
-        <span className="font-semibold">{formatCampaignAmount(raisedSats, btcPrice)}</span>
-        {goalSats ? (
-          <span className="text-muted-foreground">of {formatCampaignAmount(goalSats, btcPrice)} goal</span>
-        ) : (
-          <span className="text-muted-foreground">raised</span>
+        <span className="font-semibold">
+          {formatCampaignAmount(raisedSats, btcPrice)}
+          {!hasGoal && <span className="ml-1 font-normal text-muted-foreground">raised</span>}
+        </span>
+        {hasGoal && (
+          <span className="text-muted-foreground">of {formatCampaignAmount(goalSats!, btcPrice)} goal</span>
         )}
       </div>
     </div>

@@ -82,31 +82,33 @@ export function HeroCampaignSpotlight({
 
       {/* Progress / goal. Hand-rolled instead of using <CampaignProgress>
           so we can tune the bar for legibility on top of a photo: dark
-          translucent track, glowing primary fill. The percent label sits
-          inside the bar's empty area so the number reads even without a
-          goal. */}
+          translucent track, glowing primary fill. When the campaign has no
+          goal tag, the bar is omitted entirely and we only show the raised
+          total. */}
       {(() => {
         const raised = stats?.totalSats ?? 0;
         const goal = campaign.goalSats;
-        const pct = goal && goal > 0 ? Math.min(100, Math.round((raised / goal) * 100)) : 0;
+        const hasGoal = !!goal && goal > 0;
+        const pct = hasGoal ? Math.min(100, Math.round((raised / goal!) * 100)) : 0;
         return (
           <div className="space-y-1.5 pt-1 max-w-xs">
-            <div className="relative h-1.5 w-full overflow-hidden rounded-full bg-black/40 ring-1 ring-white/15">
-              <div
-                className="absolute inset-y-0 left-0 rounded-full bg-primary shadow-[0_0_8px_hsl(var(--primary)/0.7)] motion-safe:transition-[width] motion-safe:duration-500"
-                style={{ width: `${pct}%` }}
-              />
-            </div>
+            {hasGoal && (
+              <div className="relative h-1.5 w-full overflow-hidden rounded-full bg-black/40 ring-1 ring-white/15">
+                <div
+                  className="absolute inset-y-0 left-0 rounded-full bg-primary shadow-[0_0_8px_hsl(var(--primary)/0.7)] motion-safe:transition-[width] motion-safe:duration-500"
+                  style={{ width: `${pct}%` }}
+                />
+              </div>
+            )}
             <div className="flex items-baseline justify-between gap-2 text-[11px] [text-shadow:none]">
               <span className="font-semibold text-foreground">
                 {formatCampaignAmount(raised, btcPrice)}
+                {!hasGoal && <span className="ml-1 font-normal text-foreground/70">raised</span>}
               </span>
-              {goal ? (
+              {hasGoal && (
                 <span className="text-foreground/70">
-                  of {formatCampaignAmount(goal, btcPrice)} goal
+                  of {formatCampaignAmount(goal!, btcPrice)} goal
                 </span>
-              ) : (
-                <span className="text-foreground/70">raised</span>
               )}
             </div>
           </div>
