@@ -243,8 +243,8 @@ export function useEventDashboard({ enabled, territorialLevel }: UseEventDashboa
     return [...muniFeeds, ...customFeeds];
   }, [regionFeeds, regionById, territorialLevel]);
 
-  // Helper: apply relay COUNT as a stable floor for state-level counts.
-  // Used only in leaderboard/distribution, NOT in participants.
+  // Applies the relay COUNT floor to displayed state-level counts.
+  // No-op for municipalities.
   const getStableCount = useCallback((feed: AggregatedFeed): number =>
     territorialLevel === 'states'
       ? Math.max(feed.count, stateCounts?.get(feed.code) ?? 0)
