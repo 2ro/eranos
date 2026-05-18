@@ -12,6 +12,11 @@ interface UseCampaignsOptions {
   /** Authors to fetch from, e.g. for a profile's campaigns. */
   authors?: string[];
   /**
+   * Restrict to campaigns whose recipient `p` tags include any of these
+   * pubkeys. Used by the /claim page to find campaigns set up *for* a user.
+   */
+  recipientPubkeys?: string[];
+  /**
    * Include campaigns that have been archived by their creator
    * (`["status", "archived"]`). Defaults to `false` so archived
    * campaigns never appear in the main fundraisers listing.
@@ -35,14 +40,20 @@ interface UseCampaignsOptions {
  */
 export function useCampaigns(options: UseCampaignsOptions = {}) {
   const { nostr } = useNostr();
-  const { category, limit = 60, authors, includeArchived = false } = options;
+  const { category, limit = 60, authors, recipientPubkeys, includeArchived = false } = options;
 
   return useQuery({
-    queryKey: ['campaigns', { category, limit, authors, includeArchived }],
+    queryKey: [
+      'campaigns',
+      { category, limit, authors, recipientPubkeys, includeArchived },
+    ],
     queryFn: async (c) => {
       const filter: NostrFilter = { kinds: [CAMPAIGN_KIND], limit };
       if (category) filter['#t'] = [category];
       if (authors && authors.length > 0) filter.authors = authors;
+      if (recipientPubkeys && recipientPubkeys.length > 0) {
+        filter['#p'] = recipientPubkeys;
+      }
 
       const events = await nostr.query([filter], { signal: c.signal });
 

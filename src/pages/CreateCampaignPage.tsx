@@ -9,9 +9,12 @@ import {
   AlertTriangle,
   ArrowLeft,
   ChevronDown,
+  Copy,
   HandHeart,
   ImagePlus,
   Loader2,
+  MessageCircle,
+  UserPlus,
   X,
 } from 'lucide-react';
 
@@ -59,6 +62,38 @@ interface EditTarget {
   pubkey: string;
   identifier: string;
   relays?: string[];
+}
+
+/** Origin used in the shareable invite / notify links. Falls back to the
+ * canonical production domain when window is unavailable (SSR safety). */
+function getShareOrigin(): string {
+  if (typeof window !== 'undefined' && window.location?.origin) {
+    return window.location.origin;
+  }
+  return 'https://agora.spot';
+}
+
+/**
+ * Copy text to clipboard with a uniform toast reaction. Returns true on
+ * success so the caller can update transient UI state.
+ */
+async function copyShareText(
+  text: string,
+  toast: ReturnType<typeof useToast>['toast'],
+  successTitle: string,
+): Promise<boolean> {
+  try {
+    await navigator.clipboard.writeText(text);
+    toast({ title: successTitle, description: 'Paste it into a DM, email, or text message.' });
+    return true;
+  } catch {
+    toast({
+      title: 'Copy failed',
+      description: 'Your browser blocked clipboard access. Select and copy the text manually.',
+      variant: 'destructive',
+    });
+    return false;
+  }
 }
 
 function getEditTarget(value: string | null): EditTarget | null {
@@ -555,6 +590,24 @@ export function CreateCampaignPage() {
                 onAddMany={addRecipients}
                 excludePubkeys={recipients.map((r) => r.pubkey)}
               />
+
+              {/* "Recipient not here yet?" invite affordance. Always visible
+                  because even campaigns with existing recipients may have one
+                  beneficiary who's still off-Nostr. */}
+              <button
+                type="button"
+                onClick={() => {
+                  const url = `${getShareOrigin()}/receive`;
+                  const message = `I want to create a fundraiser for you on Agora! Sign up to create your account and start receiving donations directly to your Bitcoin wallet: ${url}`;
+                  void copyShareText(message, toast, 'Invite copied');
+                }}
+                className="w-full flex items-center justify-center gap-2 rounded-lg border border-dashed border-border bg-background px-3 py-2.5 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted/40 motion-safe:transition-colors"
+              >
+                <UserPlus className="size-4" />
+                Recipient not here yet? Invite them
+                <Copy className="size-3.5 opacity-70" />
+              </button>
+
               {recipients.length > 0 ? (
                 <div className="space-y-2">
                   <Label className="text-xs text-muted-foreground">
@@ -565,6 +618,7 @@ export function CreateCampaignPage() {
                       <RecipientRow
                         key={recipient.pubkey}
                         profile={recipient}
+                        campaignTitle={title}
                         onRemove={() => removeRecipient(recipient.pubkey)}
                       />
                     ))}
@@ -856,29 +910,56 @@ function CoverPicker({
   );
 }
 
-function RecipientRow({ profile, onRemove }: { profile: SearchProfile; onRemove: () => void }) {
+function RecipientRow({
+  profile,
+  campaignTitle,
+  onRemove,
+}: {
+  profile: SearchProfile;
+  campaignTitle: string;
+  onRemove: () => void;
+}) {
+  const { toast } = useToast();
   const displayName = profile.metadata.display_name || profile.metadata.name || genUserName(profile.pubkey);
   const picture = sanitizeUrl(profile.metadata.picture);
 
+  const handleNotify = () => {
+    const url = `${getShareOrigin()}/claim`;
+    const titleClause = campaignTitle.trim() ? ` called "${campaignTitle.trim()}"` : '';
+    const message = `I just started a fundraiser for you on Agora${titleClause}! Sign in here for more info and to claim your donations: ${url}`;
+    void copyShareText(message, toast, `Message for ${displayName} copied`);
+  };
+
   return (
-    <div className="flex items-center gap-3 rounded-lg bg-secondary/30 p-2.5">
-      <Avatar className="size-8 shrink-0">
-        {picture && <AvatarImage src={picture} alt="" />}
-        <AvatarFallback className="text-xs">{displayName.slice(0, 2).toUpperCase()}</AvatarFallback>
-      </Avatar>
-      <div className="min-w-0 flex-1">
-        <div className="truncate text-sm font-medium">{displayName}</div>
+    <div className="rounded-lg bg-secondary/30 p-2.5 space-y-2">
+      <div className="flex items-center gap-3">
+        <Avatar className="size-8 shrink-0">
+          {picture && <AvatarImage src={picture} alt="" />}
+          <AvatarFallback className="text-xs">{displayName.slice(0, 2).toUpperCase()}</AvatarFallback>
+        </Avatar>
+        <div className="min-w-0 flex-1">
+          <div className="truncate text-sm font-medium">{displayName}</div>
+        </div>
+        <Button
+          type="button"
+          variant="ghost"
+          size="icon"
+          onClick={onRemove}
+          aria-label={`Remove ${displayName}`}
+          className="shrink-0"
+        >
+          <X className="size-4" />
+        </Button>
       </div>
-      <Button
+      <button
         type="button"
-        variant="ghost"
-        size="icon"
-        onClick={onRemove}
-        aria-label={`Remove ${displayName}`}
-        className="shrink-0"
+        onClick={handleNotify}
+        className="w-full flex items-center justify-center gap-2 rounded-md border border-border bg-background px-2.5 py-1.5 text-xs font-medium text-muted-foreground hover:text-foreground hover:bg-muted/40 motion-safe:transition-colors"
       >
-        <X className="size-4" />
-      </Button>
+        <MessageCircle className="size-3.5" />
+        Send {displayName} a message about this campaign
+        <Copy className="size-3 opacity-70" />
+      </button>
     </div>
   );
 }

@@ -84,6 +84,8 @@ const WebxdcFeedPage = lazy(() => import("./pages/WebxdcFeedPage").then(m => ({ 
 const WikipediaPage = lazy(() => import("./pages/WikipediaPage").then(m => ({ default: m.WikipediaPage })));
 const WorldPage = lazy(() => import("./pages/WorldPage").then(m => ({ default: m.WorldPage })));
 const FollowPage = lazy(() => import("./pages/FollowPage").then(m => ({ default: m.FollowPage })));
+const ReceivePage = lazy(() => import("./pages/ReceivePage").then(m => ({ default: m.ReceivePage })));
+const ClaimPage = lazy(() => import("./pages/ClaimPage").then(m => ({ default: m.ClaimPage })));
 const RemoteLoginSuccessPage = lazy(() => import("./pages/RemoteLoginSuccessPage").then(m => ({ default: m.RemoteLoginSuccessPage })));
 
 const pollsDef = getExtraKindDef("polls")!;
@@ -156,6 +158,8 @@ export function AppRouter() {
         <Routes>
           {/* Auto-follow deep link: fullscreen immersive (no sidebars/nav) */}
           <Route path="/follow/:npub" element={<FollowPage />} />
+          <Route path="/receive" element={<ReceivePage />} />
+          <Route path="/claim" element={<ClaimPage />} />
 
           {/* All routes share the persistent FundraiserLayout (top nav + footer) */}
           <Route element={<FundraiserLayout />}>
