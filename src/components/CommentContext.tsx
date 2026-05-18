@@ -383,6 +383,7 @@ function EventHoverLink({ display, link, hoverContent }: EventHoverLinkProps) {
 interface CommentContextProps {
   event: NostrEvent;
   className?: string;
+  prefix?: string;
 }
 
 /**
@@ -390,7 +391,7 @@ interface CommentContextProps {
  * When the parent item (lowercase k tag) is another kind 1111 comment, shows "Replying to @user"
  * using the lowercase p tag (parent author). Otherwise shows "Commenting on [root]".
  */
-export function CommentContext({ event, className }: CommentContextProps) {
+export function CommentContext({ event, className, prefix = 'Commenting on' }: CommentContextProps) {
   // If the direct parent is another comment (k="1111"), show "Replying to @user"
   const parentKind = event.tags.find(([name]) => name === 'k')?.[1];
   const parentAuthorPubkey = event.tags.findLast(([name]) => name === 'p')?.[1];
@@ -405,11 +406,11 @@ export function CommentContext({ event, className }: CommentContextProps) {
 
   switch (root.type) {
     case 'addr':
-      return <AddrCommentContext root={root} className={className} />;
+      return <AddrCommentContext root={root} className={className} prefix={prefix} />;
     case 'event':
-      return <EventCommentContext root={root} className={className} />;
+      return <EventCommentContext root={root} className={className} prefix={prefix} />;
     case 'external':
-      return <ExternalCommentContext root={root} className={className} />;
+      return <ExternalCommentContext root={root} className={className} prefix={prefix} />;
     default:
       return null;
   }
@@ -444,27 +445,27 @@ function ReplyToCommentContext({ pubkey, eventId, className }: { pubkey: string;
 }
 
 /** Comment context for addressable event roots (A tag). */
-function AddrCommentContext({ root, className }: { root: CommentRoot; className?: string }) {
+function AddrCommentContext({ root, className, prefix }: { root: CommentRoot; className?: string; prefix: string }) {
   // Kind 0 (profile) roots get special treatment — show "@DisplayName" with a profile link
   if (root.addr?.kind === 0) {
-    return <ProfileCommentContext pubkey={root.addr.pubkey} className={className} />;
+    return <ProfileCommentContext pubkey={root.addr.pubkey} className={className} prefix={prefix} />;
   }
 
   // Kind 10008 or 30008 (profile badges) roots — show "@User's profile badges"
   if (root.addr?.kind === 10008 || root.addr?.kind === 30008) {
-    return <ProfileBadgesCommentContext root={root} className={className} />;
+    return <ProfileBadgesCommentContext root={root} className={className} prefix={prefix} />;
   }
 
   // Kind 3 follow lists have no title of their own — synthesize one from the author's name
   if (root.addr?.kind === 3) {
-    return <FollowListCommentContext pubkey={root.addr.pubkey} className={className} />;
+    return <FollowListCommentContext pubkey={root.addr.pubkey} className={className} prefix={prefix} />;
   }
 
-  return <GenericAddrCommentContext root={root} className={className} />;
+  return <GenericAddrCommentContext root={root} className={className} prefix={prefix} />;
 }
 
 /** Comment context for kind 3 (follow list) roots — shows "Commenting on @Name's follow list". */
-function FollowListCommentContext({ pubkey, className }: { pubkey: string; className?: string }) {
+function FollowListCommentContext({ pubkey, className, prefix }: { pubkey: string; className?: string; prefix: string }) {
   const author = useAuthor(pubkey);
   const metadata = author.data?.metadata;
   const displayName = metadata?.name ?? metadata?.display_name ?? genUserName(pubkey);
@@ -475,7 +476,7 @@ function FollowListCommentContext({ pubkey, className }: { pubkey: string; class
   );
 
   return (
-    <CommentContextRow prefix="Commenting on" className={className} loading={author.isLoading}>
+    <CommentContextRow prefix={prefix} className={className} loading={author.isLoading}>
       <ProfileHoverCard pubkey={pubkey} asChild>
         <Link
           to={`/${npubEncoded}`}
@@ -498,14 +499,14 @@ function FollowListCommentContext({ pubkey, className }: { pubkey: string; class
 }
 
 /** Comment context for kind 0 (profile) roots — shows "Commenting on @Name". */
-function ProfileCommentContext({ pubkey, className }: { pubkey: string; className?: string }) {
+function ProfileCommentContext({ pubkey, className, prefix }: { pubkey: string; className?: string; prefix: string }) {
   const author = useAuthor(pubkey);
   const metadata = author.data?.metadata;
   const displayName = metadata?.name ?? metadata?.display_name ?? genUserName(pubkey);
   const npubEncoded = useMemo(() => nip19.npubEncode(pubkey), [pubkey]);
 
   return (
-    <CommentContextRow prefix="Commenting on" className={className} loading={author.isLoading}>
+    <CommentContextRow prefix={prefix} className={className} loading={author.isLoading}>
       <ProfileHoverCard pubkey={pubkey} asChild>
         <Link
           to={`/${npubEncoded}`}
@@ -520,7 +521,7 @@ function ProfileCommentContext({ pubkey, className }: { pubkey: string; classNam
 }
 
 /** Comment context for kind 10008/30008 (profile badges) roots — shows "Commenting on profile badges by @User". */
-function ProfileBadgesCommentContext({ root, className }: { root: CommentRoot; className?: string }) {
+function ProfileBadgesCommentContext({ root, className, prefix }: { root: CommentRoot; className?: string; prefix: string }) {
   const pubkey = root.addr?.pubkey ?? '';
   const author = useAuthor(pubkey);
   const metadata = author.data?.metadata;
@@ -542,7 +543,7 @@ function ProfileBadgesCommentContext({ root, className }: { root: CommentRoot; c
   ) : undefined;
 
   return (
-    <CommentContextRow prefix="Commenting on" className={className} loading={author.isLoading}>
+    <CommentContextRow prefix={prefix} className={className} loading={author.isLoading}>
       {link && hoverContent ? (
         <EventHoverLink
           display={{ text: 'profile badges', icon: Award }}
@@ -570,11 +571,11 @@ function ProfileBadgesCommentContext({ root, className }: { root: CommentRoot; c
 }
 
 /** Comment context for non-profile addressable event roots (A tag). */
-function GenericAddrCommentContext({ root, className }: { root: CommentRoot; className?: string }) {
+function GenericAddrCommentContext({ root, className, prefix }: { root: CommentRoot; className?: string; prefix: string }) {
   const { data: event, isLoading } = useAddrEvent(root.addr, root.relayHint ? [root.relayHint] : undefined);
 
   const isCommunity = root.rootKind === '34550' || root.addr?.kind === 34550;
-  const prefix = isCommunity ? 'Posted in' : 'Commenting on';
+  const rowPrefix = isCommunity && prefix === 'Commenting on' ? 'Posted in' : prefix;
 
   const display = event ? getEventDisplayName(event) : { text: getRootKindLabel(root.rootKind) };
   const link = event ? getRootLink(event) : undefined;
@@ -588,7 +589,7 @@ function GenericAddrCommentContext({ root, className }: { root: CommentRoot; cla
   ) : undefined;
 
   return (
-    <CommentContextRow prefix={prefix} className={className} loading={isLoading}>
+    <CommentContextRow prefix={rowPrefix} className={className} loading={isLoading}>
       {link && hoverContent ? (
         <EventHoverLink display={display} link={link} hoverContent={hoverContent} />
       ) : link ? (
@@ -608,7 +609,7 @@ function GenericAddrCommentContext({ root, className }: { root: CommentRoot; cla
 }
 
 /** Comment context for regular event roots (E tag). */
-function EventCommentContext({ root, className }: { root: CommentRoot; className?: string }) {
+function EventCommentContext({ root, className, prefix }: { root: CommentRoot; className?: string; prefix: string }) {
   const { data: event, isLoading } = useEvent(
     root.eventId,
     root.relayHint ? [root.relayHint] : undefined,
@@ -617,12 +618,12 @@ function EventCommentContext({ root, className }: { root: CommentRoot; className
 
   // Kind 7 reactions get special treatment
   if (event?.kind === 7) {
-    return <ReactionCommentContext event={event} className={className} />;
+    return <ReactionCommentContext event={event} className={className} prefix={prefix} />;
   }
 
   // Kind 1018 poll votes get special treatment
   if (event?.kind === 1018) {
-    return <PollVoteCommentContext event={event} className={className} />;
+    return <PollVoteCommentContext event={event} className={className} prefix={prefix} />;
   }
 
   const display = event ? getEventDisplayName(event) : { text: getRootKindLabel(root.rootKind) };
@@ -639,7 +640,7 @@ function EventCommentContext({ root, className }: { root: CommentRoot; className
   ) : undefined;
 
   return (
-    <CommentContextRow prefix="Commenting on" className={className} loading={isLoading}>
+    <CommentContextRow prefix={prefix} className={className} loading={isLoading}>
       {link && hoverContent ? (
         <EventHoverLink display={display} link={link} hoverContent={hoverContent} />
       ) : (
@@ -650,7 +651,7 @@ function EventCommentContext({ root, className }: { root: CommentRoot; className
 }
 
 /** Comment context for kind 7 reaction roots — shows "Commenting on {emoji} by @{name}". */
-function ReactionCommentContext({ event, className }: { event: NostrEvent; className?: string }) {
+function ReactionCommentContext({ event, className, prefix }: { event: NostrEvent; className?: string; prefix: string }) {
   const author = useAuthor(event.pubkey);
   const metadata = author.data?.metadata;
   const displayName = getDisplayName(metadata, event.pubkey);
@@ -658,7 +659,7 @@ function ReactionCommentContext({ event, className }: { event: NostrEvent; class
   const profileLink = `/${nip19.npubEncode(event.pubkey)}`;
 
   return (
-    <CommentContextRow prefix="Commenting on" className={className}>
+    <CommentContextRow prefix={prefix} className={className}>
       <Link
         to={reactionLink}
         className="text-primary hover:underline shrink-0 cursor-pointer"
@@ -685,7 +686,7 @@ function ReactionCommentContext({ event, className }: { event: NostrEvent; class
 }
 
 /** Comment context for kind 1018 poll vote roots — shows "Commenting on @{name}'s vote for {option}". */
-function PollVoteCommentContext({ event, className }: { event: NostrEvent; className?: string }) {
+function PollVoteCommentContext({ event, className, prefix }: { event: NostrEvent; className?: string; prefix: string }) {
   const author = useAuthor(event.pubkey);
   const metadata = author.data?.metadata;
   const displayName = getDisplayName(metadata, event.pubkey);
@@ -695,7 +696,7 @@ function PollVoteCommentContext({ event, className }: { event: NostrEvent; class
   const voteLabel = usePollVoteLabel(event);
 
   return (
-    <CommentContextRow prefix="Commenting on" className={className}>
+    <CommentContextRow prefix={prefix} className={className}>
       {author.isLoading ? (
         <Skeleton className="h-3.5 w-16 inline-block" />
       ) : (
@@ -722,12 +723,12 @@ function PollVoteCommentContext({ event, className }: { event: NostrEvent; class
 }
 
 /** Comment context for external content roots (I tag). */
-function ExternalCommentContext({ root, className }: { root: CommentRoot; className?: string }) {
+function ExternalCommentContext({ root, className, prefix }: { root: CommentRoot; className?: string; prefix: string }) {
   const identifier = root.identifier ?? '';
 
   // ISBN identifiers get special treatment — show book title instead of raw ISBN
   if (identifier.startsWith('isbn:')) {
-    return <IsbnCommentContext identifier={identifier} className={className} />;
+    return <IsbnCommentContext identifier={identifier} className={className} prefix={prefix} />;
   }
 
   // URL identifiers get special treatment — show page title with favicon.
@@ -736,21 +737,21 @@ function ExternalCommentContext({ root, className }: { root: CommentRoot; classN
   if (identifier.startsWith('http://') || identifier.startsWith('https://')) {
     const gathererCard = extractGathererCard(identifier);
     if (gathererCard) {
-      return <GathererCardCommentContext card={gathererCard} url={identifier} className={className} />;
+      return <GathererCardCommentContext card={gathererCard} url={identifier} className={className} prefix={prefix} />;
     }
-    return <UrlCommentContext url={identifier} className={className} />;
+    return <UrlCommentContext url={identifier} className={className} prefix={prefix} />;
   }
 
   // ISO 3166 country/subdivision identifiers get special treatment
   if (identifier.startsWith('iso3166:')) {
-    return <CountryCommentContext identifier={identifier} className={className} />;
+    return <CountryCommentContext identifier={identifier} className={className} prefix={prefix} />;
   }
 
   // Generic fallback for other external identifiers
   const link = `/i/${encodeURIComponent(identifier)}`;
 
   return (
-    <CommentContextRow prefix="Commenting on" className={className}>
+    <CommentContextRow prefix={prefix} className={className}>
       <Link
         to={link}
         className="text-primary hover:underline truncate"
@@ -763,7 +764,7 @@ function ExternalCommentContext({ root, className }: { root: CommentRoot; classN
 }
 
 /** Comment context for URL identifiers — fetches and displays the page title with favicon. */
-function UrlCommentContext({ url, className }: { url: string; className?: string }) {
+function UrlCommentContext({ url, className, prefix }: { url: string; className?: string; prefix: string }) {
   const { data: preview, isLoading } = useLinkPreview(url);
   const link = `/i/${encodeURIComponent(url)}`;
 
@@ -777,7 +778,7 @@ function UrlCommentContext({ url, className }: { url: string; className?: string
   const title = preview?.title;
 
   return (
-    <CommentContextRow prefix="Commenting on" className={className} loading={isLoading}>
+    <CommentContextRow prefix={prefix} className={className} loading={isLoading}>
       <ExternalFavicon url={url} size={14} className="shrink-0" />
       <HoverCard openDelay={300} closeDelay={150}>
         <HoverCardTrigger asChild>
@@ -1018,12 +1019,12 @@ export function CountryFlagBackdrop({ event }: { event: NostrEvent }) {
  * `CountryCommentPill`, so we suppress the in-body version to avoid
  * duplication.
  */
-function CountryCommentContext(_props: { identifier: string; className?: string }) {
+function CountryCommentContext(_props: { identifier: string; className?: string; prefix: string }) {
   return null;
 }
 
 /** Comment context for ISBN identifiers — fetches and displays the book title with hover preview. */
-function IsbnCommentContext({ identifier, className }: { identifier: string; className?: string }) {
+function IsbnCommentContext({ identifier, className, prefix }: { identifier: string; className?: string; prefix: string }) {
   const isbn = identifier.slice('isbn:'.length);
   const { data: bookInfo, isLoading } = useBookInfo(isbn);
   const link = `/i/${encodeURIComponent(identifier)}`;
@@ -1032,7 +1033,7 @@ function IsbnCommentContext({ identifier, className }: { identifier: string; cla
   const authors = bookInfo?.authors?.map((a) => a.name).join(', ');
 
   return (
-    <CommentContextRow prefix="Commenting on" className={className} loading={isLoading}>
+    <CommentContextRow prefix={prefix} className={className} loading={isLoading}>
       <HoverCard openDelay={300} closeDelay={150}>
         <HoverCardTrigger asChild>
           <Link
@@ -1094,10 +1095,12 @@ function GathererCardCommentContext({
   card,
   url,
   className,
+  prefix,
 }: {
   card: GathererCard;
   url: string;
   className?: string;
+  prefix: string;
 }) {
   const lookup = useMemo(() => (
     card.kind === 'multiverse'
@@ -1111,7 +1114,7 @@ function GathererCardCommentContext({
   const coverUrl = scryCard ? cardPrimaryImage(scryCard, 'small') : undefined;
 
   return (
-    <CommentContextRow prefix="Commenting on" className={className} loading={isLoading}>
+    <CommentContextRow prefix={prefix} className={className} loading={isLoading}>
       <HoverCard openDelay={300} closeDelay={150}>
         <HoverCardTrigger asChild>
           <Link
