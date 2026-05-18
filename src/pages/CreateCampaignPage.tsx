@@ -9,7 +9,6 @@ import { nip19 } from 'nostr-tools';
 import {
   AlertTriangle,
   ArrowLeft,
-  ChevronDown,
   HandHeart,
   ImagePlus,
   Loader2,
@@ -25,16 +24,8 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { parseAuthorEvent } from '@/hooks/useAuthor';
 import { useBitcoinWallet } from '@/hooks/useBitcoinWallet';
@@ -47,12 +38,9 @@ import type { SearchProfile } from '@/hooks/useSearchProfiles';
 import { useLayoutOptions } from '@/contexts/LayoutContext';
 import { formatSats, satsToUSDWhole, usdToSats } from '@/lib/bitcoin';
 import {
-  CAMPAIGN_CATEGORIES,
-  CAMPAIGN_CATEGORY_LABELS,
   CAMPAIGN_KIND,
   encodeCampaignNaddr,
   parseCampaign,
-  type CampaignCategory,
   slugifyCampaignIdentifier,
 } from '@/lib/campaign';
 import { fetchFreshEvent } from '@/lib/fetchFreshEvent';
@@ -171,6 +159,22 @@ function formatGoalUsd(goalSats: number | undefined, btcPrice: number | undefine
   return usd.toFixed(usd >= 100 ? 0 : 2);
 }
 
+function normalizeCampaignTag(value: string): string {
+  return value.trim().replace(/^#+/, '').toLowerCase().replace(/\s+/g, '-');
+}
+
+function parseCampaignTagInput(value: string): string[] {
+  const seen = new Set<string>();
+  const tags: string[] = [];
+  for (const part of value.split(',')) {
+    const tag = normalizeCampaignTag(part);
+    if (!tag || seen.has(tag)) continue;
+    seen.add(tag);
+    tags.push(tag);
+  }
+  return tags;
+}
+
 function getExactCountryCode(query: string): string | undefined {
   const match = searchCountry(query);
   return match?.exact ? match.country.code : undefined;
@@ -198,7 +202,7 @@ export function CreateCampaignPage() {
   const [summary, setSummary] = useState('');
   const [story, setStory] = useState('');
   const [imageUrl, setImageUrl] = useState('');
-  const [category, setCategory] = useState<CampaignCategory>('human-rights');
+  const [tagInput, setTagInput] = useState('');
   const [goalUsd, setGoalUsd] = useState('');
   const [deadline, setDeadline] = useState('');
   const [countryQuery, setCountryQuery] = useState('');
@@ -290,7 +294,7 @@ export function CreateCampaignPage() {
     setSummary(editCampaign.summary);
     setStory(editCampaign.story);
     setImageUrl(editCampaign.image ?? '');
-    setCategory(editCampaign.category ?? 'human-rights');
+    setTagInput(editCampaign.tags.join(', '));
     setDeadline(formatDateInput(editCampaign.deadline));
     const editCountryCode = editCampaign.countryCode ?? getExactCountryCode(editCampaign.location ?? '') ?? '';
     setCountryCode(editCountryCode);
@@ -408,6 +412,7 @@ export function CreateCampaignPage() {
       }
 
       const resolvedCountryCode = countryCode || getExactCountryCode(countryQuery);
+      const campaignTags = parseCampaignTagInput(tagInput);
 
       let prev: NostrEvent | null = null;
       if (isEditMode) {
@@ -439,10 +444,10 @@ export function CreateCampaignPage() {
       const tags: string[][] = [
         ['d', slug],
         ['title', trimmedTitle],
-        ['t', category],
         ['alt', `Fundraising campaign: ${trimmedTitle}`],
       ];
       if (summary.trim()) tags.splice(2, 0, ['summary', summary.trim()]);
+      for (const tag of campaignTags) tags.push(['t', tag]);
       if (sanitizedImage) tags.push(['image', sanitizedImage]);
       if (goalNum !== undefined) tags.push(['goal', String(goalNum)]);
       if (deadlineNum !== undefined) tags.push(['deadline', String(deadlineNum)]);
@@ -615,7 +620,7 @@ export function CreateCampaignPage() {
           </FormSection>
 
           {/* Country */}
-          <FormSection title="Country" requirement="Recommended" description="Helps people discover and sort campaigns by country.">
+          <FormSection title="Country" requirement="Recommended" description="Help discover campaigns by country.">
             <CountrySelect
               query={countryQuery}
               selectedCode={countryCode}
@@ -635,6 +640,19 @@ export function CreateCampaignPage() {
                 setCountryQuery('');
               }}
             />
+          </FormSection>
+
+          {/* Tags */}
+          <FormSection title="Tags" requirement="Recommended" description="Comma-separated topics for discovery. You do not need to include #.">
+            <Input
+              id="campaign-tags"
+              value={tagInput}
+              onChange={(e) => setTagInput(e.target.value)}
+              placeholder="human rights, legal defense, independent media"
+            />
+            <p className="text-xs text-muted-foreground">
+              Published as Nostr <span className="font-mono text-foreground">t</span> tags.
+            </p>
           </FormSection>
 
           {/* Recipients */}
@@ -708,84 +726,58 @@ export function CreateCampaignPage() {
             />
           </FormSection>
 
-          {/* Optional details */}
-          <CollapsibleFormSection
-            title="Details"
-            requirement="Optional"
-            description="Extra context for donors."
-          >
-            <div className="space-y-5">
-              <div className="space-y-1.5">
-                <Label htmlFor="campaign-summary">Summary</Label>
-                <Textarea
-                  id="campaign-summary"
-                  value={summary}
-                  onChange={(e) => setSummary(e.target.value)}
-                  placeholder="A short pitch for cards and previews."
-                  rows={2}
-                  maxLength={300}
-                />
-              </div>
+          {/* Summary */}
+          <FormSection title="Summary" requirement="Optional" description="A short pitch for cards and previews.">
+            <Textarea
+              id="campaign-summary"
+              value={summary}
+              onChange={(e) => setSummary(e.target.value)}
+              placeholder="Help our neighborhood legal clinic defend peaceful protesters."
+              rows={2}
+              maxLength={300}
+            />
+          </FormSection>
 
-              <div className="space-y-1.5">
-                <Label htmlFor="campaign-story">Story</Label>
-                <Textarea
-                  id="campaign-story"
-                  value={story}
-                  onChange={(e) => setStory(e.target.value)}
-                  placeholder="Tell donors why this matters. Markdown is supported."
-                  rows={7}
-                  className="font-mono text-sm"
-                />
-              </div>
+          {/* Story */}
+          <FormSection title="Story" requirement="Optional" description="Tell donors why this matters. Markdown is supported.">
+            <Textarea
+              id="campaign-story"
+              value={story}
+              onChange={(e) => setStory(e.target.value)}
+              placeholder="Share the background, who benefits, and how funds will be used."
+              rows={7}
+              className="font-mono text-sm"
+            />
+          </FormSection>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="space-y-1.5">
-                  <Label htmlFor="campaign-category">Category</Label>
-                  <Select
-                    value={category}
-                    onValueChange={(v) => setCategory(v as CampaignCategory)}
-                  >
-                    <SelectTrigger id="campaign-category">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {CAMPAIGN_CATEGORIES.map((cat) => (
-                        <SelectItem key={cat} value={cat}>
-                          {CAMPAIGN_CATEGORY_LABELS[cat]}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className="space-y-1.5">
-                  <Label htmlFor="campaign-goal">Goal (USD)</Label>
-                  <Input
-                    id="campaign-goal"
-                    type="text"
-                    inputMode="decimal"
-                    placeholder="100,000"
-                    value={goalUsd}
-                    onChange={(e) => setGoalUsd(e.target.value)}
-                  />
-                  <p className="text-xs text-muted-foreground">
-                    {goalSatsPreview > 0 && btcPrice
-                      ? `${formatSats(goalSatsPreview)} sats (${satsToUSDWhole(goalSatsPreview, btcPrice)}).`
-                      : 'Stored as sats.'}
-                  </p>
-                </div>
-                <div className="space-y-1.5">
-                  <Label htmlFor="campaign-deadline">Deadline (optional)</Label>
-                  <Input
-                    id="campaign-deadline"
-                    type="date"
-                    value={deadline}
-                    onChange={(e) => setDeadline(e.target.value)}
-                  />
-                </div>
-              </div>
-            </div>
-          </CollapsibleFormSection>
+          <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+            {/* Goal */}
+            <FormSection title="Goal" requirement="Optional" description="Set a target amount for donors to rally around.">
+              <Input
+                id="campaign-goal"
+                type="text"
+                inputMode="decimal"
+                placeholder="100,000"
+                value={goalUsd}
+                onChange={(e) => setGoalUsd(e.target.value)}
+              />
+              <p className="text-xs text-muted-foreground">
+                {goalSatsPreview > 0 && btcPrice
+                  ? `${formatSats(goalSatsPreview)} sats (${satsToUSDWhole(goalSatsPreview, btcPrice)}).`
+                  : 'Stored as sats.'}
+              </p>
+            </FormSection>
+
+            {/* Deadline */}
+            <FormSection title="Deadline" requirement="Optional" description="Show donors when the campaign is time-sensitive.">
+              <Input
+                id="campaign-deadline"
+                type="date"
+                value={deadline}
+                onChange={(e) => setDeadline(e.target.value)}
+              />
+            </FormSection>
+          </div>
         </div>
 
         {formError && (
@@ -844,41 +836,6 @@ function FormSection({
       </div>
       <div className="space-y-2.5">{children}</div>
     </section>
-  );
-}
-
-function CollapsibleFormSection({
-  title,
-  requirement,
-  description,
-  children,
-}: {
-  title: string;
-  requirement: 'Required' | 'Recommended' | 'Optional';
-  description?: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <Collapsible className="rounded-xl" defaultOpen={false}>
-      <CollapsibleTrigger
-        type="button"
-        className="group flex w-full items-start justify-between gap-4 p-3 text-left sm:p-4"
-      >
-        <div className="space-y-0.5">
-          <h2 className="flex items-center gap-2 text-lg font-semibold">
-            {title}
-            <span className="text-xs font-medium text-muted-foreground">
-              {requirement}
-            </span>
-          </h2>
-          {description && <p className="text-sm text-muted-foreground">{description}</p>}
-        </div>
-        <ChevronDown className="mt-1 size-5 shrink-0 text-muted-foreground motion-safe:transition-transform group-data-[state=open]:rotate-180" />
-      </CollapsibleTrigger>
-      <CollapsibleContent className="px-3 pb-3 sm:px-4 sm:pb-4">
-        {children}
-      </CollapsibleContent>
-    </Collapsible>
   );
 }
 
@@ -986,13 +943,9 @@ function CountrySelect({
         )}
       </div>
 
-      {selectedCountry ? (
+      {selectedCountry && (
         <p className="text-xs text-muted-foreground">
           Publishes <span className="font-mono text-foreground">i: iso3166:{selectedCode}</span> for country sorting.
-        </p>
-      ) : (
-        <p className="text-xs text-muted-foreground">
-          Start typing a country name, then choose one from the list.
         </p>
       )}
     </div>

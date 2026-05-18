@@ -85,6 +85,8 @@ export interface ParsedCampaign {
   image?: string;
   /** Category slug from the first `t` tag matching a known category, or `undefined`. */
   category?: CampaignCategory;
+  /** Campaign tags parsed from all `t` tags, in event order. */
+  tags: string[];
   /** Goal in satoshis, or `undefined` if not set. */
   goalSats?: number;
   /** Deadline (Unix seconds), or `undefined` if not set. */
@@ -126,6 +128,19 @@ function getCountryCode(event: NostrEvent): string | undefined {
     if (code && /^[A-Z]{2}$/.test(code)) return code;
   }
   return undefined;
+}
+
+function getCampaignTags(event: NostrEvent): string[] {
+  const seen = new Set<string>();
+  const tags: string[] = [];
+  for (const [name, value] of event.tags) {
+    if (name !== 't' || typeof value !== 'string') continue;
+    const tag = value.trim();
+    if (!tag || seen.has(tag)) continue;
+    seen.add(tag);
+    tags.push(tag);
+  }
+  return tags;
 }
 
 /**
@@ -188,6 +203,7 @@ export function parseCampaign(event: NostrEvent): ParsedCampaign | null {
   // ignored so future statuses (e.g. `paused`, `funded`) don't accidentally
   // get treated as archived.
   const archived = getTag(event, 'status') === 'archived';
+  const tags = getCampaignTags(event);
 
   return {
     event,
@@ -199,6 +215,7 @@ export function parseCampaign(event: NostrEvent): ParsedCampaign | null {
     story: event.content,
     image,
     category,
+    tags,
     goalSats: parsePositiveInt(getTag(event, 'goal')),
     deadline: parsePositiveInt(getTag(event, 'deadline')),
     location: getTag(event, 'location')?.trim() || undefined,
@@ -214,6 +231,17 @@ export function getCampaignCountryLabel(campaign: ParsedCampaign): string | unde
   const country = campaign.countryCode ? COUNTRIES[campaign.countryCode] : undefined;
   if (country) return `${country.flag} ${country.name}`;
   return campaign.location;
+}
+
+export function getCampaignPrimaryTagLabel(campaign: ParsedCampaign): string | undefined {
+  const firstTag = campaign.tags[0] ?? campaign.category;
+  if (!firstTag) return undefined;
+  if ((CAMPAIGN_CATEGORIES as readonly string[]).includes(firstTag)) {
+    return CAMPAIGN_CATEGORY_LABELS[firstTag as CampaignCategory];
+  }
+  const legacyCategory = LEGACY_CAMPAIGN_CATEGORY_ALIASES[firstTag];
+  if (legacyCategory) return CAMPAIGN_CATEGORY_LABELS[legacyCategory];
+  return firstTag.replace(/-/g, ' ').replace(/\b\w/g, (char) => char.toUpperCase());
 }
 
 /** Output of {@link splitDonation}: per-recipient amounts in sats. */

@@ -197,7 +197,8 @@ The kind is addressable so the creator can edit the story, image, goal, deadline
     ["title", "Save the Last Bookstore"],
     ["summary", "Help our 40-year-old neighborhood bookstore make rent through winter."],
     ["image", "https://example.com/cover.jpg"],
-    ["t", "community"],
+    ["t", "human-rights"],
+    ["t", "legal-defense"],
     ["goal", "10000000"],
     ["deadline", "1735689600"],
     ["i", "iso3166:VE"],
@@ -222,7 +223,7 @@ The `content` field is the **campaign story**, formatted as Markdown. Clients SH
 | `title`    | Yes      | Display title of the campaign (plain text, max ~200 chars).                                                                                                       |
 | `summary`  | Recommended | Short one-paragraph tagline shown in feed cards and previews.                                                                                                  |
 | `image`    | Recommended | HTTPS URL of the cover image (jpg/png/webp). Clients MUST sanitize and verify the URL before rendering.                                                       |
-| `t`        | Recommended | Category. SHOULD be one of: `medical`, `memorial`, `emergency`, `education`, `animals`, `community`, `sports`, `creative`, `business`, `faith`, `other`. Multiple `t` tags MAY be used. |
+| `t`        | Recommended | Topic tag for discovery and filtering (e.g. `human-rights`, `legal-defense`, `independent-media`). Multiple `t` tags MAY be used. Clients SHOULD normalize user-entered tag labels by removing a leading `#`, lowercasing, and replacing whitespace with hyphens. |
 | `goal`     | Recommended | Fundraising goal in **satoshis** (decimal integer). Omit if the campaign has no fixed goal.                                                                       |
 | `deadline` | Optional | Unix timestamp (seconds) at which the campaign closes. After the deadline, clients SHOULD show the campaign as ended but MAY still accept donations.              |
 | `i`        | Recommended | NIP-73 country identifier for sorting and discovery. SHOULD be `iso3166:<code>` with an uppercase ISO 3166-1 alpha-2 country code (e.g. `iso3166:VE`).              |

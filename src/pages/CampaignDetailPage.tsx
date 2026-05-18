@@ -53,9 +53,9 @@ import { useEventStats } from '@/hooks/useTrending';
 import { useToast } from '@/hooks/useToast';
 import { useLayoutOptions } from '@/contexts/LayoutContext';
 import {
-  CAMPAIGN_CATEGORY_LABELS,
   encodeCampaignNaddr,
   getCampaignCountryLabel,
+  getCampaignPrimaryTagLabel,
   type ParsedCampaign,
 } from '@/lib/campaign';
 import { satsToUSDWhole } from '@/lib/bitcoin';
@@ -234,6 +234,7 @@ function CampaignDetailContent({ campaign }: { campaign: ParsedCampaign }) {
 
   const deadline = campaign.deadline ? formatDeadline(campaign.deadline) : null;
   const countryLabel = getCampaignCountryLabel(campaign);
+  const tagLabel = getCampaignPrimaryTagLabel(campaign);
   const raisedSats = stats?.totalSats ?? 0;
 
   const isCreator = user?.pubkey === campaign.pubkey;
@@ -381,10 +382,10 @@ function CampaignDetailContent({ campaign }: { campaign: ParsedCampaign }) {
                   </Link>
                 </div>
                 <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 text-xs sm:text-sm font-medium text-white/85">
-                  {campaign.category && (
+                  {tagLabel && (
                     <span className="inline-flex items-center gap-1.5">
                       <Tag className="size-3.5 sm:size-4" />
-                      {CAMPAIGN_CATEGORY_LABELS[campaign.category]}
+                      {tagLabel}
                     </span>
                   )}
                   {countryLabel && (

@@ -10,10 +10,10 @@ import { useAuthor } from '@/hooks/useAuthor';
 import { useBtcPrice } from '@/hooks/useBtcPrice';
 import { useCampaignDonations } from '@/hooks/useCampaignDonations';
 import {
-  CAMPAIGN_CATEGORY_LABELS,
   type ParsedCampaign,
   encodeCampaignNaddr,
   getCampaignCountryLabel,
+  getCampaignPrimaryTagLabel,
 } from '@/lib/campaign';
 import { formatCampaignAmount } from '@/lib/formatCampaignAmount';
 import { genUserName } from '@/lib/genUserName';
@@ -84,6 +84,7 @@ export function CampaignCard({ campaign, variant = 'compact', className }: Campa
   const deadline = campaign.deadline ? formatDeadline(campaign.deadline) : null;
   const raisedSats = stats?.totalSats ?? 0;
   const countryLabel = getCampaignCountryLabel(campaign);
+  const tagLabel = getCampaignPrimaryTagLabel(campaign);
 
   const isFeatured = variant === 'featured';
 
@@ -120,12 +121,12 @@ export function CampaignCard({ campaign, variant = 'compact', className }: Campa
               <HandHeart className="size-12 text-primary/40" />
             </div>
           )}
-          {campaign.category && (
+          {tagLabel && (
             <Badge
               variant="secondary"
               className="absolute top-3 left-3 backdrop-blur bg-background/80 border-border/40"
             >
-              {CAMPAIGN_CATEGORY_LABELS[campaign.category]}
+              {tagLabel}
             </Badge>
           )}
           {campaign.archived && (
