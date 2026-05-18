@@ -617,8 +617,8 @@ export function CreateCampaignPage() {
             />
             <p className="text-xs text-muted-foreground flex items-baseline gap-1 min-w-0">
               <span className="shrink-0">URL preview:</span>
-              <span className="font-mono text-foreground truncate">
-                /{activeIdentifier || 'your-campaign-title'}
+              <span className="font-mono text-foreground truncate min-w-0">
+                /{activeIdentifier || 'your-campaign-title'}{!isEditMode && derivedIdentifier.length >= 64 && '...'}
               </span>
               {isEditMode && <span className="shrink-0">(kept from original)</span>}
             </p>

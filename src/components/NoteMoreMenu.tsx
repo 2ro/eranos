@@ -523,7 +523,7 @@ function NoteMoreMenuContent({ event, open, onOpenChange, communityContext, onRe
                 {/^[A-Za-z0-9+/=_-]{20,}$/.test(event.content.trim()) ? (
                   <span className="italic">Encrypted content</span>
                 ) : (
-                  <p className="text-sm leading-relaxed whitespace-pre-wrap break-words">
+                  <p className="text-sm leading-relaxed whitespace-pre-wrap overflow-wrap-anywhere">
                     {event.content}
                   </p>
                 )}
