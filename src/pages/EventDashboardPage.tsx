@@ -1,13 +1,11 @@
 import { useState } from 'react';
-import { Activity, PanelLeft, PanelLeftClose, Radio, Settings } from 'lucide-react';
+import { Activity, Radio, Settings } from 'lucide-react';
 import { useLayoutOptions } from '@/contexts/LayoutContext';
 import { PageHeader } from '@/components/PageHeader';
 import { Card, CardContent } from '@/components/ui/card';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { useFeedSettings } from '@/hooks/useFeedSettings';
-import { useToast } from '@/hooks/useToast';
 
 import { useEventDashboard } from '@/hooks/useEventDashboard';
 import { KpiGrid } from '@/components/event-dashboard/KpiGrid';
@@ -26,20 +24,6 @@ import type { TerritorialLevel } from '@/components/event-dashboard/types';
 export function EventDashboardPage() {
   const [territorialLevel, setTerritorialLevel] = useState<TerritorialLevel>('municipalities');
   const [configOpen, setConfigOpen] = useState(false);
-  const { addToSidebar, removeFromSidebar, orderedItems } = useFeedSettings();
-  const { toast } = useToast();
-  const isInSidebar = orderedItems.includes('dashboard');
-
-  const handleToggleSidebar = () => {
-    if (isInSidebar) {
-      removeFromSidebar('dashboard');
-      toast({ title: 'Removed from sidebar' });
-      return;
-    }
-
-    addToSidebar('dashboard');
-    toast({ title: 'Added to sidebar' });
-  };
 
   // Use wider layout — removes 600px cap but keeps sidebar shell
   useLayoutOptions({ noMaxWidth: true, rightSidebar: null });
@@ -63,16 +47,6 @@ export function EventDashboardPage() {
   const headerActions = (
     <div className="flex items-center gap-1.5">
       {statusBadge}
-      <Button
-        size="icon"
-        variant="ghost"
-        className="size-8"
-        onClick={handleToggleSidebar}
-        aria-label={isInSidebar ? 'Remove from sidebar' : 'Add to sidebar'}
-        title={isInSidebar ? 'Remove from sidebar' : 'Add to sidebar'}
-      >
-        {isInSidebar ? <PanelLeftClose className="size-4" /> : <PanelLeft className="size-4" />}
-      </Button>
       <Button size="icon" variant="ghost" className="size-8" onClick={() => setConfigOpen(true)} aria-label="Dashboard settings">
         <Settings className="size-4" />
       </Button>
