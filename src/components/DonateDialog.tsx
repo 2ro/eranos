@@ -768,10 +768,20 @@ function SuccessView({
   btcPrice?: number;
   onClose: () => void;
 }) {
+  const txPath = `/i/bitcoin:tx:${result.txid}`;
+  const formatSuccessAmount = (sats: number) => (
+    btcPrice ? (
+      <>
+        {satsToUSD(sats, btcPrice)}
+        <span className="ml-2 text-xs text-muted-foreground">({formatSats(sats)} sats)</span>
+      </>
+    ) : `${formatSats(sats)} sats`
+  );
+
   return (
     <>
       <DialogHeader>
-        <DialogTitle className="flex items-center gap-2 text-green-600 dark:text-green-400">
+        <DialogTitle className="flex items-center gap-2 text-green-700 dark:text-green-300">
           <Check className="size-5" />
           Donation Sent
         </DialogTitle>
@@ -781,11 +791,15 @@ function SuccessView({
       </DialogHeader>
 
       <div className="space-y-4">
-        <div className="rounded-lg bg-green-50 dark:bg-green-950/30 p-4 space-y-1">
-          <Label className="text-xs text-green-700 dark:text-green-300">Transaction ID</Label>
-          <p className="break-all font-mono text-xs text-green-900 dark:text-green-100">
+        <div className="rounded-lg border border-green-200 bg-green-50 p-4 space-y-1.5 dark:border-green-800 dark:bg-green-950/40">
+          <Label className="text-xs text-green-800 dark:text-green-200">Transaction ID</Label>
+          <Link
+            to={txPath}
+            onClick={onClose}
+            className="block break-all font-mono text-xs leading-relaxed text-green-950 underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-700 dark:text-green-50 dark:focus-visible:ring-green-300"
+          >
             {result.txid}
-          </p>
+          </Link>
         </div>
 
         <div className="space-y-1 text-sm">
@@ -797,7 +811,7 @@ function SuccessView({
           </div>
           <div className="flex justify-between">
             <span className="text-muted-foreground">Network fee</span>
-            <span className="font-medium">{formatSats(result.fee)} sats</span>
+            <span className="font-medium">{formatSuccessAmount(result.fee)}</span>
           </div>
           <div className="flex justify-between">
             <span className="text-muted-foreground">Recipients paid</span>
@@ -818,11 +832,11 @@ function SuccessView({
 
         <div className="flex gap-2">
           <Button variant="outline" className="flex-1" asChild>
-            <Link to={`/i/bitcoin:tx:${result.txid}`} onClick={onClose}>
+            <Link to={txPath} onClick={onClose}>
               View Transaction
             </Link>
           </Button>
-          <Button className="flex-1" onClick={onClose}>
+          <Button className="flex-1 bg-green-700 text-white hover:bg-green-800 dark:bg-green-300 dark:text-green-950 dark:hover:bg-green-200" onClick={onClose}>
             Done
           </Button>
         </div>
