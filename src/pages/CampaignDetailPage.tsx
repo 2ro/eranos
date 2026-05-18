@@ -25,6 +25,7 @@ import { useBitcoinWallet } from '@/hooks/useBitcoinWallet';
 import { useCampaign } from '@/hooks/useCampaign';
 import { useCampaignDonations } from '@/hooks/useCampaignDonations';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
+import { useProfileUrl } from '@/hooks/useProfileUrl';
 import { useToast } from '@/hooks/useToast';
 import { useLayoutOptions } from '@/contexts/LayoutContext';
 import {
@@ -89,6 +90,7 @@ function CampaignDetailContent({ campaign }: { campaign: ParsedCampaign }) {
   const creatorName =
     creatorMetadata?.display_name || creatorMetadata?.name || genUserName(campaign.pubkey);
   const creatorAvatar = sanitizeUrl(creatorMetadata?.picture);
+  const creatorUrl = useProfileUrl(campaign.pubkey, creatorMetadata);
 
   const deadline = campaign.deadline ? formatDeadline(campaign.deadline) : null;
   const raisedSats = stats?.totalSats ?? 0;
@@ -170,7 +172,7 @@ function CampaignDetailContent({ campaign }: { campaign: ParsedCampaign }) {
             {/* Creator + meta */}
             <div className="flex flex-wrap items-center gap-x-5 gap-y-2 text-sm text-muted-foreground border-y border-border py-4">
               <Link
-                to={`/${campaign.pubkey}`}
+                to={creatorUrl}
                 className="inline-flex items-center gap-2 hover:text-foreground motion-safe:transition-colors"
               >
                 <Avatar className="size-7">
