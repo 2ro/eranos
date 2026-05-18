@@ -446,10 +446,10 @@ function CampaignDetailContent({ campaign }: { campaign: ParsedCampaign }) {
                   </>
                 )}
 
-                <div className="grid grid-cols-4 gap-2">
+                <div className="flex gap-2">
                   <Button
                     size="lg"
-                    className="w-full col-span-3"
+                    className="flex-1"
                     onClick={() => setDonateOpen(true)}
                     disabled={deadline?.isPast || campaign.archived}
                   >
@@ -461,7 +461,7 @@ function CampaignDetailContent({ campaign }: { campaign: ParsedCampaign }) {
                         : 'Donate'}
                   </Button>
 
-                  <Button variant="outline" size="lg" className="w-full" onClick={handleShare}>
+                  <Button variant="outline" size="lg" className="shrink-0" onClick={handleShare}>
                     <Share2 className="size-4 mr-2" />
                     Share
                   </Button>
@@ -716,9 +716,9 @@ function CampaignDetailSkeleton() {
           <div className="space-y-3 pt-2">
             <Skeleton className="h-10 w-40" />
             <Skeleton className="h-2 w-full" />
-            <div className="grid grid-cols-4 gap-2">
-              <Skeleton className="h-11 w-full col-span-3" />
-              <Skeleton className="h-11 w-full" />
+            <div className="flex gap-2">
+              <Skeleton className="h-11 flex-1" />
+              <Skeleton className="h-11 w-24 shrink-0" />
             </div>
           </div>
         </div>

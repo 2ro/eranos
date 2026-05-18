@@ -167,6 +167,15 @@
   }
 }
 
+/* Push Leaflet's top-positioned controls (zoom +/−) below the sticky app
+   header so they remain clickable on /world. The header is 4rem (64px)
+   tall; the extra 0.5rem gives a comfortable gap. The default
+   `leaflet.css` sets `.leaflet-top .leaflet-control { margin-top: 10px }`
+   which lands behind the header. */
+.leaflet-top .leaflet-control {
+  margin-top: 4.5rem !important;
+}
+
 /* Leaflet control theming — override the default white/gray controls to
    match the app's themed palette. The default `leaflet/dist/leaflet.css`
    ships with hardcoded `background: white` / dark border colors that
