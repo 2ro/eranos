@@ -246,9 +246,10 @@ export function DiscoverHero({ className }: DiscoverHeroProps) {
       </div>
 
       {/* Foreground content — headline above the sphere, ticker + CTAs
-          below it. Uses the same `max-w-7xl` container as the campaigns
-          page so everything aligns. */}
-      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 py-12 sm:py-16 lg:py-20 min-h-[560px] sm:min-h-[640px] lg:min-h-[680px] flex flex-col items-center text-center">
+          below it. Uses the same `max-w-5xl` container as the rest of
+          the Discover page so the hero never sprawls wider than the
+          shelves beneath it. */}
+      <div className="relative max-w-5xl mx-auto px-4 sm:px-6 py-12 sm:py-16 lg:py-20 min-h-[560px] sm:min-h-[640px] lg:min-h-[680px] flex flex-col items-center text-center">
         <div className="relative space-y-3 max-w-3xl">
           <p className="text-xs sm:text-sm font-semibold uppercase tracking-[0.18em] text-foreground/70">
             Discover

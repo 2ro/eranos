@@ -89,7 +89,7 @@ export function DiscoverPage() {
           than the first shelf. The horizontal scroll bleeds off the edge
           deliberately, telegraphing that there's more if you swipe. */}
       <section className="border-b border-border/60 bg-background/60 py-5">
-        <div className="max-w-7xl mx-auto">
+        <div className="max-w-5xl mx-auto">
           <div className="px-4 sm:px-6 mb-3">
             <h2 className="text-sm font-semibold uppercase tracking-wider text-foreground/80">
               Where the world is showing up
@@ -103,7 +103,7 @@ export function DiscoverPage() {
         </div>
       </section>
 
-      <div className="max-w-7xl mx-auto space-y-2 sm:space-y-4">
+      <div className="max-w-5xl mx-auto space-y-2 sm:space-y-4">
         {/* Campaigns shelf — "Help raise hope." */}
         <section className="pt-6">
           <SectionHeader
@@ -170,28 +170,37 @@ export function DiscoverPage() {
           )}
         </section>
 
-        {/* Mixed feed — "Voices from everywhere." */}
-        <section className="pt-4 pb-8">
-          <div className="px-4 sm:px-6 mb-3 flex items-end justify-between gap-4">
-            <div>
-              <h2 className="text-2xl sm:text-3xl font-bold tracking-tight">
-                Voices from everywhere
-              </h2>
-              <p className="text-sm text-muted-foreground mt-1 max-w-xl">
-                New campaigns, posts tagged to a country, comments inside
-                communities, and on-the-ground actions — one timeline, sorted
-                by what just happened.
-              </p>
-            </div>
-            <Button asChild variant="ghost" size="sm" className="hidden sm:inline-flex shrink-0">
-              <Link to="/world">
-                <Globe2 className="size-4 mr-1.5" />
-                Open the world
-              </Link>
-            </Button>
-          </div>
+        {/* Mixed feed — "Voices from everywhere."
 
-          <DiscoverFeed />
+            The shelves above intentionally bleed off the edge of the
+            `max-w-5xl` page column so the horizontal scroll cue reads
+            from any breakpoint. The feed below is a *reading* column,
+            so we tighten it to `max-w-2xl` and center it inside the
+            wider page — rows read at a comfortable line length without
+            the shelves losing their horizontal canvas. */}
+        <section className="pt-4 pb-8">
+          <div className="max-w-2xl mx-auto">
+            <div className="px-4 sm:px-6 mb-3 flex items-end justify-between gap-4">
+              <div>
+                <h2 className="text-2xl sm:text-3xl font-bold tracking-tight">
+                  Voices from everywhere
+                </h2>
+                <p className="text-sm text-muted-foreground mt-1 max-w-xl">
+                  New campaigns, posts tagged to a country, comments inside
+                  communities, and on-the-ground actions — one timeline, sorted
+                  by what just happened.
+                </p>
+              </div>
+              <Button asChild variant="ghost" size="sm" className="hidden sm:inline-flex shrink-0">
+                <Link to="/world">
+                  <Globe2 className="size-4 mr-1.5" />
+                  Open the world
+                </Link>
+              </Button>
+            </div>
+
+            <DiscoverFeed />
+          </div>
         </section>
       </div>
     </main>
