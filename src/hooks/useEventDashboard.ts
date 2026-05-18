@@ -326,21 +326,23 @@ export function useEventDashboard({ enabled, territorialLevel }: UseEventDashboa
   }, [displayFeeds, getStableCount]);
 
   // Participants (full sorted list).
-  // Intentionally uses raw event-based counts (no COUNT floor) because each
-  // row derives live/activity state from the loaded events themselves.
+  // Counts use the same stable COUNT floor as leaderboard/distribution so
+  // that per-state numbers are consistent across all dashboard sections.
+  // Live/activity state still derives from the loaded events themselves.
   const participants = useMemo<ParticipantRow[]>(() => {
     const thirtySecondsAgo = now - 30;
     return [...displayFeeds]
-      .sort((a, b) => b.count - a.count)
+      .map((feed) => ({ ...feed, stableCount: getStableCount(feed) }))
+      .sort((a, b) => b.stableCount - a.stableCount)
       .map((feed, i) => ({
         rank: i + 1,
         regionId: feed.regionId,
         label: feed.label,
         hashtag: feed.code,
-        count: feed.count,
+        count: feed.stableCount,
         isActive: feed.posts.length > 0 && feed.posts[0].created_at > thirtySecondsAgo,
       }));
-  }, [displayFeeds, now]);
+  }, [displayFeeds, getStableCount, now]);
 
   // Activity items (from globalPosts with label resolution)
   const activity = useMemo<ActivityItem[]>(() => {
