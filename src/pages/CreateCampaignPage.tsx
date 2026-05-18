@@ -650,9 +650,6 @@ export function CreateCampaignPage() {
               onChange={(e) => setTagInput(e.target.value)}
               placeholder="human rights, legal defense, independent media"
             />
-            <p className="text-xs text-muted-foreground">
-              Published as Nostr <span className="font-mono text-foreground">t</span> tags.
-            </p>
           </FormSection>
 
           {/* Recipients */}
@@ -753,14 +750,23 @@ export function CreateCampaignPage() {
           <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
             {/* Goal */}
             <FormSection title="Goal" requirement="Optional" description="Set a target amount for donors to rally around.">
-              <Input
-                id="campaign-goal"
-                type="text"
-                inputMode="decimal"
-                placeholder="100,000"
-                value={goalUsd}
-                onChange={(e) => setGoalUsd(e.target.value)}
-              />
+              <div className="relative">
+                <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">
+                  $
+                </span>
+                <Input
+                  id="campaign-goal"
+                  type="text"
+                  inputMode="decimal"
+                  placeholder="100,000"
+                  value={goalUsd}
+                  onChange={(e) => setGoalUsd(e.target.value)}
+                  className="pl-7 pr-14"
+                />
+                <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-xs font-medium text-muted-foreground">
+                  USD
+                </span>
+              </div>
               <p className="text-xs text-muted-foreground">
                 {goalSatsPreview > 0 && btcPrice
                   ? `${formatSats(goalSatsPreview)} sats (${satsToUSDWhole(goalSatsPreview, btcPrice)}).`
