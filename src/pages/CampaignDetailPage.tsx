@@ -8,7 +8,6 @@ import {
   Tag,
   Archive,
   ArchiveRestore,
-  Bitcoin,
   ChevronLeft,
   HandHeart,
   MapPin,
@@ -690,7 +689,6 @@ function RecipientRow({ pubkey, weight }: { pubkey: string; weight: number }) {
         onClick={() => setDonateOpen(true)}
         aria-label={`Donate to ${name}`}
       >
-        <Bitcoin className="size-4 mr-1.5" />
         Donate
       </Button>
       <BeneficiaryDonateDialog
