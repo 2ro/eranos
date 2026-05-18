@@ -3,7 +3,7 @@
 
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Bell, ChevronDown, CircleHelp, LogOut, Settings, User, UserIcon, UserPlus, Wallet } from 'lucide-react';
+import { Bell, ChevronDown, CircleHelp, LogOut, Search, Settings, User, UserIcon, UserPlus, Wallet } from 'lucide-react';
 import { nip19 } from 'nostr-tools';
 import {
   DropdownMenu,
@@ -95,6 +95,12 @@ export function AccountSwitcher({ onAddAccountClick }: AccountSwitcherProps) {
           <Link to={`/${nip19.npubEncode(currentUser.pubkey)}`}>
             <User className='w-4 h-4' />
             <span>Profile</span>
+          </Link>
+        </DropdownMenuItem>
+        <DropdownMenuItem asChild className='flex items-center gap-2 cursor-pointer p-2 rounded-md'>
+          <Link to="/search">
+            <Search className='w-4 h-4' />
+            <span>Search</span>
           </Link>
         </DropdownMenuItem>
         <DropdownMenuItem asChild className='flex items-center gap-2 cursor-pointer p-2 rounded-md'>

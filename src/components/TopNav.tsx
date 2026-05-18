@@ -20,9 +20,9 @@ interface NavItem {
 
 const NAV_ITEMS: NavItem[] = [
   { label: 'Discover', to: '/discover' },
-  { label: 'Explore', to: '/world' },
+  { label: 'World', to: '/world' },
   { label: 'Organize', to: '/communities' },
-  { label: 'Search', to: '/search' },
+  { label: 'Action', to: '/actions' },
 ];
 
 /**
