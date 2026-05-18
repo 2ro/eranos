@@ -5,15 +5,12 @@ import {
   Bell,
   CircleHelp,
   Earth,
-  FileText,
   HandHeart,
   Megaphone,
   Menu,
   PlusCircle,
   Search,
   Settings,
-  Shield,
-  ScrollText,
   User,
   Users,
   Wallet,
@@ -48,12 +45,6 @@ const NAV_ITEMS: NavItem[] = [
 interface MobileLinkItem extends NavItem {
   requiresAuth?: boolean;
 }
-
-const FOOTER_ITEMS: NavItem[] = [
-  { label: 'Privacy', to: '/privacy', icon: FileText },
-  { label: 'Safety', to: '/safety', icon: Shield },
-  { label: 'Changelog', to: '/changelog', icon: ScrollText },
-];
 
 /**
  * Persistent top navigation bar rendered by {@link FundraiserLayout}. Mirrors
@@ -147,7 +138,6 @@ export function TopNav() {
               })}
               onClose={() => setMobileOpen(false)}
             />
-            <MobileLinkList items={FOOTER_ITEMS} onClose={() => setMobileOpen(false)} />
           </nav>
           <div className="border-t border-border p-4 space-y-3">
             <Button asChild className="w-full rounded-full" onClick={() => setMobileOpen(false)}>
@@ -156,6 +146,7 @@ export function TopNav() {
                 Start Campaign
               </Link>
             </Button>
+            <MobileFooterLinks onClose={() => setMobileOpen(false)} />
           </div>
         </SheetContent>
       </Sheet>
@@ -179,6 +170,29 @@ function NavLinkButton({ item }: { item: NavItem }) {
     >
       {item.label}
     </NavLink>
+  );
+}
+
+function MobileFooterLinks({ onClose }: { onClose: () => void }) {
+  const items = [
+    { label: 'Privacy', to: '/privacy' },
+    { label: 'Safety', to: '/safety' },
+    { label: 'Changelog', to: '/changelog' },
+  ];
+
+  return (
+    <nav className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-xs text-muted-foreground">
+      {items.map((item) => (
+        <Link
+          key={item.to}
+          to={item.to}
+          onClick={onClose}
+          className="hover:text-foreground motion-safe:transition-colors"
+        >
+          {item.label}
+        </Link>
+      ))}
+    </nav>
   );
 }
 
