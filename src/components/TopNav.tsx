@@ -23,7 +23,6 @@ const NAV_ITEMS: NavItem[] = [
   { label: 'Explore', to: '/world' },
   { label: 'Organize', to: '/communities' },
   { label: 'Search', to: '/search' },
-  { label: 'Help', to: '/help' },
 ];
 
 /**

@@ -3,7 +3,7 @@
 
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Bell, ChevronDown, LogOut, Settings, User, UserIcon, UserPlus, Wallet } from 'lucide-react';
+import { Bell, ChevronDown, CircleHelp, LogOut, Settings, User, UserIcon, UserPlus, Wallet } from 'lucide-react';
 import { nip19 } from 'nostr-tools';
 import {
   DropdownMenu,
@@ -101,6 +101,12 @@ export function AccountSwitcher({ onAddAccountClick }: AccountSwitcherProps) {
           <Link to="/settings">
             <Settings className='w-4 h-4' />
             <span>Settings</span>
+          </Link>
+        </DropdownMenuItem>
+        <DropdownMenuItem asChild className='flex items-center gap-2 cursor-pointer p-2 rounded-md'>
+          <Link to="/help">
+            <CircleHelp className='w-4 h-4' />
+            <span>Help</span>
           </Link>
         </DropdownMenuItem>
         <DropdownMenuSeparator />
