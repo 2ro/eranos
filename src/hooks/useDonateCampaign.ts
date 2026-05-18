@@ -14,7 +14,7 @@ import {
   nostrPubkeyToBitcoinAddress,
 } from '@/lib/bitcoin';
 import type { FeeRates } from '@/lib/bitcoin';
-import { CAMPAIGN_KIND, minDonationForSplit, type ParsedCampaign, splitDonation } from '@/lib/campaign';
+import { minDonationForSplit, type ParsedCampaign, splitDonation } from '@/lib/campaign';
 
 /** Supported on-chain fee speeds (mirrors {@link SendBitcoinDialog}). */
 export type DonationFeeSpeed = 'fastest' | 'halfHour' | 'hour' | 'economy';
@@ -162,7 +162,7 @@ export function useDonateCampaign() {
             ['p', split.pubkey],
             ['amount', String(split.amountSats)],
             ['a', campaign.aTag],
-            ['K', String(CAMPAIGN_KIND)],
+            ['K', String(campaign.event.kind)],
             [
               'alt',
               `Donation to ${campaign.title}: ${split.amountSats.toLocaleString()} sats`,

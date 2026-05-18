@@ -7,6 +7,7 @@ import {
   CalendarDays,
   ChevronLeft,
   Crown,
+  HandHeart,
   Info,
   Megaphone,
   MessageCircle,
@@ -21,7 +22,6 @@ import {
   UserMinus,
   UserPlus,
   Users,
-  Zap,
 } from 'lucide-react';
 import type { NostrEvent, NostrMetadata } from '@nostrify/nostrify';
 
@@ -40,7 +40,7 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { BanConfirmDialog } from '@/components/BanConfirmDialog';
 import { CommunityChatPanel } from '@/components/CommunityChatPanel';
 import { CommunityPulsePanel } from '@/components/CommunityPulsePanel';
-import { CommunityZapDialog } from '@/components/CommunityZapDialog';
+import { DonateDialog } from '@/components/DonateDialog';
 import { NoteContent } from '@/components/NoteContent';
 import { CommunityBadgeEditorDialog } from '@/components/CommunityBadgePanel';
 import { ComposeBox } from '@/components/ComposeBox';
@@ -53,6 +53,7 @@ import { ThreadedReplyList, type ReplyNode } from '@/components/ThreadedReplyLis
 import { useAuthor } from '@/hooks/useAuthor';
 import { useAuthors } from '@/hooks/useAuthors';
 import { useComments } from '@/hooks/useComments';
+import { useBitcoinWallet } from '@/hooks/useBitcoinWallet';
 import { useCommunityBookmarks } from '@/hooks/useCommunityBookmarks';
 import { useCommunityEvents } from '@/hooks/useCommunityEvents';
 import { useCommunityActions } from '@/hooks/useCommunityActions';
@@ -66,6 +67,7 @@ import { useToast } from '@/hooks/useToast';
 import { CommunityModerationContext } from '@/contexts/CommunityModerationContext';
 import { useLayoutOptions } from '@/contexts/LayoutContext';
 import { applyCommunityModerationToEvents, canBanTarget, getViewerAuthority, parseCommunityEvent, type CommunityMember } from '@/lib/communityUtils';
+import type { ParsedCampaign } from '@/lib/campaign';
 import { genUserName } from '@/lib/genUserName';
 import { sanitizeUrl } from '@/lib/sanitizeUrl';
 import { cn } from '@/lib/utils';
@@ -184,6 +186,7 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
   const navigate = useNavigate();
   const { toast } = useToast();
   const { user } = useCurrentUser();
+  const { btcPrice } = useBitcoinWallet();
 
   // ── Member ban dialog state ────────────────────────────────────────────────
   const [banDialogOpen, setBanDialogOpen] = useState(false);
@@ -200,6 +203,7 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
   const [addMembersDialogOpen, setAddMembersDialogOpen] = useState(false);
   const [badgeDialogOpen, setBadgeDialogOpen] = useState(false);
   const [descriptionDialogOpen, setDescriptionDialogOpen] = useState(false);
+  const [donateOpen, setDonateOpen] = useState(false);
 
   // Parse community definition
   const community = useMemo(() => parseCommunityEvent(event), [event]);
@@ -244,6 +248,28 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
   // ── Members ─────────────────────────────────────────────────────────────────
   const { data: membership, moderation, rankMap, isLoading: membersLoading } = useCommunityMembers(community);
   const viewerMember = user ? getViewerAuthority(user.pubkey, rankMap, moderation) : undefined;
+
+  const communityDonationTarget = useMemo<ParsedCampaign | null>(() => {
+    if (!community || !membership || membership.members.length === 0) return null;
+    return {
+      event,
+      pubkey: event.pubkey,
+      identifier: community.dTag,
+      aTag: community.aTag,
+      title: community.name,
+      summary: community.description,
+      story: community.description,
+      image: community.image,
+      category: 'community',
+      tags: ['community'],
+      recipients: membership.members.map((member) => ({
+        pubkey: member.pubkey,
+        weight: 1,
+      })),
+      createdAt: event.created_at,
+      archived: false,
+    };
+  }, [community, membership, event]);
 
   // Founder can add moderators + members; moderators (rank 0) can add members
   const isFounder = !!user && user.pubkey === event.pubkey;
@@ -539,10 +565,6 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
     [communityATag, moderation, rankMap],
   );
 
-  const handleCommunityZapLaunched = useCallback(() => {
-    // No-op for now; previously triggered a Lightning visual effect.
-  }, []);
-
   // ── Render ──────────────────────────────────────────────────────────────────
   const heroIconClassName = 'size-6 text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.85)]';
   const bannerActionClassName = 'p-2.5 rounded-full text-white/90 hover:text-white hover:bg-white/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80 disabled:opacity-50 disabled:pointer-events-none transition-colors';
@@ -685,22 +707,21 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
               </div>
 
               <div className="grid grid-cols-4 gap-2">
-                {community && membership && (
-                  <CommunityZapDialog
-                    community={community}
-                    members={membership.members}
-                    membersLoading={membersLoading}
-                    triggerIcon={<Zap className="size-5" />}
-                    triggerLabel="Zap all"
-                    triggerClassName="col-span-3 h-11 w-full gap-2 rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground shadow hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring motion-safe:transition-colors"
-                    onZapLaunched={handleCommunityZapLaunched}
-                  />
+                {communityDonationTarget && (
+                  <Button
+                    size="lg"
+                    className="w-full col-span-3"
+                    onClick={() => setDonateOpen(true)}
+                  >
+                    <HandHeart className="size-5 mr-2" />
+                    Donate
+                  </Button>
                 )}
                 <Button
                   type="button"
                   variant="outline"
                   size="lg"
-                  className={community && membership ? 'w-full' : 'col-span-4 w-full'}
+                  className={communityDonationTarget ? 'w-full' : 'col-span-4 w-full'}
                   onClick={handleShare}
                 >
                   <Share2 className="size-4 mr-2" />
@@ -823,6 +844,15 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
             </TabsContent>
           </Tabs>
         </CommunityModerationContext.Provider>
+
+      {communityDonationTarget && (
+        <DonateDialog
+          campaign={communityDonationTarget}
+          open={donateOpen}
+          onOpenChange={setDonateOpen}
+          btcPrice={btcPrice}
+        />
+      )}
 
       {/* Description dialog — opened by clicking the truncated description in
           the banner. Renders the full raw description plus a clickable
