@@ -48,6 +48,7 @@ import { satsToUSD } from '@/lib/bitcoin';
 import { formatNumber } from '@/lib/formatNumber';
 import { genUserName } from '@/lib/genUserName';
 import { sanitizeUrl } from '@/lib/sanitizeUrl';
+import { cn } from '@/lib/utils';
 import NotFound from './NotFound';
 
 interface CampaignDetailPageProps {
@@ -101,6 +102,7 @@ function CampaignDetailContent({ campaign }: { campaign: ParsedCampaign }) {
   const [replyOpen, setReplyOpen] = useState(false);
   const [moreMenuOpen, setMoreMenuOpen] = useState(false);
   const [interactionsOpen, setInteractionsOpen] = useState(false);
+  const [storyExpanded, setStoryExpanded] = useState(false);
   const [interactionsTab, setInteractionsTab] = useState<InteractionTab>('reposts');
 
   const openInteractions = (tab: InteractionTab) => {
@@ -392,15 +394,41 @@ function CampaignDetailContent({ campaign }: { campaign: ParsedCampaign }) {
                   <div className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
                     Story
                   </div>
-                  <article className="prose prose-neutral dark:prose-invert max-w-none">
-                    {campaign.story.trim().length > 0 ? (
-                      <ArticleContent event={storyEvent} />
-                    ) : (
+                  {campaign.story.trim().length > 0 ? (
+                    <div className="space-y-2">
+                      <div
+                        className={cn(
+                          'relative overflow-hidden',
+                          !storyExpanded && 'max-h-[4.5rem]',
+                        )}
+                      >
+                        <article className="prose prose-neutral dark:prose-invert max-w-none">
+                          <ArticleContent event={storyEvent} />
+                        </article>
+                        {!storyExpanded && (
+                          // Fade overlay hints at clipped content. Pointer-events
+                          // disabled so the Read more button below is clickable.
+                          <div
+                            aria-hidden
+                            className="pointer-events-none absolute inset-x-0 bottom-0 h-12 bg-gradient-to-t from-background to-transparent"
+                          />
+                        )}
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => setStoryExpanded((v) => !v)}
+                        className="text-sm font-medium text-primary hover:underline motion-safe:transition-colors"
+                      >
+                        {storyExpanded ? 'Show less' : 'Read more'}
+                      </button>
+                    </div>
+                  ) : (
+                    <article className="prose prose-neutral dark:prose-invert max-w-none">
                       <p className="text-muted-foreground italic">
                         The organizer hasn't written a story for this campaign yet.
                       </p>
-                    )}
-                  </article>
+                    </article>
+                  )}
                 </div>
 
                 {/* Engagement: stats row, action bar, threaded replies.

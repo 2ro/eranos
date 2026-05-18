@@ -66,3 +66,21 @@ export function getZapSenderPubkey(event: NostrEvent): string {
 export function getTargetEventId(event: NostrEvent): string | undefined {
   return event.tags.find(([name]) => name === 'e')?.[1];
 }
+
+/**
+ * Returns the kind number of the target event being zapped, if it can be
+ * determined from the receipt's `a` tag (addressable coordinate). Lightning
+ * zaps (kind 9735) to non-addressable events only carry an `e` tag, so this
+ * returns undefined for those — callers that need the kind in that case must
+ * fetch the target event themselves.
+ *
+ * Used to distinguish on-chain donations to campaigns (kind 30223) from
+ * other zap targets so the UI can label them as "donated" rather than the
+ * generic "sent / zapped".
+ */
+export function getTargetKindFromAddr(event: NostrEvent): number | undefined {
+  const aTag = event.tags.find(([name]) => name === 'a')?.[1];
+  if (!aTag) return undefined;
+  const kind = parseInt(aTag.split(':')[0], 10);
+  return Number.isFinite(kind) ? kind : undefined;
+}

@@ -93,7 +93,10 @@ import { toast } from "@/hooks/useToast";
 import { useEventStats } from "@/hooks/useTrending";
 import { canZap } from "@/lib/canZap";
 import { extractZapSender, extractZapMessage } from "@/hooks/useEventInteractions";
-import { getZapAmountSats } from "@/lib/zapHelpers";
+import { getZapAmountSats, getTargetKindFromAddr } from "@/lib/zapHelpers";
+import { satsToUSD } from "@/lib/bitcoin";
+import { CAMPAIGN_KIND } from "@/lib/campaign";
+import { useBtcPrice } from "@/hooks/useBtcPrice";
 import { getContentWarning } from "@/lib/contentWarning";
 import { genUserName } from "@/lib/genUserName";
 import { getDisplayName } from "@/lib/getDisplayName";
@@ -346,6 +349,9 @@ export const NoteCard = memo(function NoteCard({
   const profileUrl = useProfileUrl(event.pubkey, metadata);
   const encodedId = useMemo(() => encodeEventId(event), [event]);
   const { data: stats } = useEventStats(event.id, event);
+  // Cached BTC→USD spot price. Always queried (cheap, shared cache key) so the
+  // zap-card layout below can render amounts as USD when available.
+  const { data: btcPrice } = useBtcPrice();
   const [moreMenuOpen, setMoreMenuOpen] = useState(false);
   const [replyOpen, setReplyOpen] = useState(false);
 
@@ -947,6 +953,28 @@ export const NoteCard = memo(function NoteCard({
     // `content` field directly (no embedded request).
     const zapMessage = event.kind === 8333 ? event.content : extractZapMessage(event);
     const iconSize = threaded || threadedLast ? "size-10" : "size-11";
+
+    // Label: "donated" for campaign targets (kind 30223 via the `a` tag),
+    // otherwise "sent". We can determine the target's kind without a network
+    // round-trip when the receipt carries an `a` tag — Lightning zaps to
+    // plain notes carry only `e`, so they fall back to "sent".
+    const targetKind = getTargetKindFromAddr(event);
+    const zapLabel = targetKind === CAMPAIGN_KIND ? "donated" : "sent";
+
+    // Amount: USD when btcPrice is available, sats fallback otherwise. Both
+    // renderings include the secondary unit as a `title` tooltip so the raw
+    // sats value is never lost.
+    const usdLabel = btcPrice ? satsToUSD(zapAmountSats, btcPrice) : undefined;
+    const satsLabel = `${formatNumber(zapAmountSats)} ${zapAmountSats === 1 ? 'sat' : 'sats'}`;
+    const amountElement = zapAmountSats > 0 ? (
+      <span
+        className="text-sm font-semibold text-amber-500 shrink-0"
+        title={usdLabel ? satsLabel : undefined}
+      >
+        {usdLabel ?? satsLabel}
+      </span>
+    ) : undefined;
+
     return (
       <ActivityCard
         icon={
@@ -956,18 +984,21 @@ export const NoteCard = memo(function NoteCard({
         }
         actorRow={
           <ActorRow pubkey={zapSenderPubkey} profileUrl={zapSenderUrl} picture={zapSenderMeta?.picture}
-            displayName={zapSenderName} authorEvent={zapSender.data?.event} isLoading={zapSender.isLoading} label="zapped" timestampLabel={timeAgo(event.created_at)}
-            extra={zapAmountSats > 0 ? (
-              <span className="text-sm font-semibold text-amber-500 shrink-0">
-                {formatNumber(zapAmountSats)} {zapAmountSats === 1 ? 'sat' : 'sats'}
-              </span>
-            ) : undefined}
+            displayName={zapSenderName} authorEvent={zapSender.data?.event} isLoading={zapSender.isLoading} label={zapLabel} timestampLabel={timeAgo(event.created_at)}
+            extra={amountElement}
           />
         }
         threaded={threaded} threadedLast={threadedLast} threadedLineClassName={threadedLineClassName}
         className={className} onClick={handleCardClick} onAuxClick={handleAuxClick}
       >
         {zapMessage && <p className="text-xs text-muted-foreground italic mt-1">&ldquo;{zapMessage}&rdquo;</p>}
+        {/* Make zap cards interactive: reply, repost, react, share — same
+            affordances as a regular note. Each kind 9735 / 8333 event is a
+            valid Nostr event in its own right, so NIP-22 replies target it
+            directly via its event id. */}
+        {actionButtons}
+        <NoteMoreMenu event={event} open={moreMenuOpen} onOpenChange={setMoreMenuOpen} />
+        <ReplyComposeModal event={event} open={replyOpen} onOpenChange={setReplyOpen} />
       </ActivityCard>
     );
   }
