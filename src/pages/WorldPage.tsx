@@ -3,11 +3,9 @@ import { useSeoMeta } from '@unhead/react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useAppContext } from '@/hooks/useAppContext';
 import { useGlobalActivity, useTopCountryHashtags } from '@/hooks/useGlobalActivity';
-import { useEphemeralEvents } from '@/hooks/useEphemeralEvents';
 import { useLayoutOptions } from '@/contexts/LayoutContext';
 import { WorldDiscoveryDrawer } from '@/components/world/WorldDiscoveryDrawer';
 import { WorldDiscoveryPanel } from '@/components/world/WorldDiscoveryPanel';
-import { ChatDialog } from '@/components/chat/ChatDialog';
 
 // Lazy-load the map: react-leaflet + leaflet pull in ~150 KB of JS that we
 // don't want to ship with the rest of the app shell.
@@ -51,20 +49,6 @@ export function WorldPage() {
 
   const { data: activities } = useGlobalActivity();
   const { data: topHashtags } = useTopCountryHashtags();
-  const { data: ephemeralEvents } = useEphemeralEvents();
-  const [activeChatGeohash, setActiveChatGeohash] = useState<string | null>(null);
-
-  // Memoise the per-geohash slice so `ChatDialog` (and its `useChatSession`
-  // effects) get a stable array reference across renders — without this,
-  // every WorldPage re-render would feed a fresh array into ChatDialog,
-  // re-firing every dependent effect and risking ref-callback storms.
-  const chatInitialEvents = useMemo(
-    () =>
-      activeChatGeohash
-        ? ephemeralEvents?.filter((e) => e.geohash === activeChatGeohash) ?? []
-        : [],
-    [activeChatGeohash, ephemeralEvents],
-  );
 
   // Memoise the activities/hashtags fallbacks too — `new Map()` literals
   // produce a fresh reference every render, which causes WorldMap's
@@ -102,8 +86,6 @@ export function WorldPage() {
           <WorldMap
             activities={safeActivities}
             topHashtags={safeTopHashtags}
-            ephemeralEvents={ephemeralEvents}
-            onOpenChat={setActiveChatGeohash}
           />
         </div>
       </Suspense>
@@ -113,17 +95,6 @@ export function WorldPage() {
           `WorldDiscoveryPanel` (rendered as the layout's right sidebar)
           takes over and this component is unmounted. */}
       {!hasSidebar && <WorldDiscoveryDrawer activities={activities} />}
-
-      {/* Per-geohash realtime chat. Only mounted while open so the relay
-          subscription tears down cleanly when the dialog closes. */}
-      {activeChatGeohash && (
-        <ChatDialog
-          isOpen={!!activeChatGeohash}
-          onClose={() => setActiveChatGeohash(null)}
-          geohash={activeChatGeohash}
-          initialEvents={chatInitialEvents}
-        />
-      )}
     </div>
   );
 }

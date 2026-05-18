@@ -1,6 +1,21 @@
-import { useState } from 'react';
+import { useState, type ComponentType } from 'react';
 import { Link, NavLink } from 'react-router-dom';
-import { Menu, PlusCircle, X } from 'lucide-react';
+import {
+  Activity,
+  Bell,
+  CircleHelp,
+  Earth,
+  HandHeart,
+  Megaphone,
+  Menu,
+  PlusCircle,
+  Search,
+  Settings,
+  User,
+  Users,
+  Wallet,
+  X,
+} from 'lucide-react';
 import { nip19 } from 'nostr-tools';
 
 import { LoginArea } from '@/components/auth/LoginArea';
@@ -9,30 +24,38 @@ import { LogoIcon } from '@/components/icons/LogoIcon';
 import { Sheet, SheetContent } from '@/components/ui/sheet';
 import { useAppContext } from '@/hooks/useAppContext';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
+import { useFeedSettings } from '@/hooks/useFeedSettings';
 import { cn } from '@/lib/utils';
 
 interface NavItem {
   label: string;
   to: string;
+  icon: ComponentType<{ className?: string }>;
   /** If true, this link is treated as active only on an exact match. */
   exact?: boolean;
 }
 
 const NAV_ITEMS: NavItem[] = [
-  { label: 'Discover', to: '/discover' },
-  { label: 'Start a campaign', to: '/campaigns/new' },
-  { label: 'About', to: '/help' },
+  { label: 'Discover', to: '/discover', icon: HandHeart },
+  { label: 'World', to: '/world', icon: Earth },
+  { label: 'Organize', to: '/communities', icon: Users },
+  { label: 'Actions', to: '/actions', icon: Megaphone },
 ];
+
+interface MobileLinkItem extends NavItem {
+  requiresAuth?: boolean;
+}
 
 /**
  * Persistent top navigation bar rendered by {@link FundraiserLayout}. Mirrors
  * the GoFundMe-style chrome: brand mark on the left, primary nav links in the
- * middle, "Sign in" / account avatar plus a "Start a campaign" pill on the
+ * middle, "Sign in" / account avatar plus a "Start Campaign" pill on the
  * right. Collapses to a hamburger menu below the `md` breakpoint.
  */
 export function TopNav() {
   const { config } = useAppContext();
   const { user } = useCurrentUser();
+  const { orderedItems } = useFeedSettings();
   const [mobileOpen, setMobileOpen] = useState(false);
 
   return (
@@ -72,10 +95,10 @@ export function TopNav() {
           {/* Primary CTA pill — hidden on small screens to keep the bar uncluttered;
               the same action lives at the top of the mobile menu and as a FAB-style
               button in the homepage hero. */}
-          <Button asChild size="sm" className="hidden sm:inline-flex rounded-full">
+          <Button asChild className="hidden h-11 rounded-full px-4 sm:inline-flex">
             <Link to="/campaigns/new">
               <PlusCircle className="size-4 mr-1.5" />
-              Start a campaign
+              Start Campaign
             </Link>
           </Button>
 
@@ -107,36 +130,23 @@ export function TopNav() {
             </button>
           </div>
           <nav className="flex-1 overflow-y-auto px-3 py-4">
-            <ul className="space-y-1">
-              {NAV_ITEMS.map((item) => (
-                <li key={item.to}>
-                  <NavLink
-                    to={item.to}
-                    end={item.exact}
-                    onClick={() => setMobileOpen(false)}
-                    className={({ isActive }) =>
-                      cn(
-                        'flex items-center px-3 py-2.5 rounded-lg text-sm font-medium motion-safe:transition-colors',
-                        isActive
-                          ? 'bg-primary/10 text-foreground'
-                          : 'text-muted-foreground hover:text-foreground hover:bg-secondary',
-                      )
-                    }
-                  >
-                    {item.label}
-                  </NavLink>
-                </li>
-              ))}
-            </ul>
+            <MobileLinkList items={NAV_ITEMS} onClose={() => setMobileOpen(false)} />
+            <MobileLinkList
+              items={getProfileMenuItems({
+                userPubkey: user?.pubkey,
+                showDashboard: orderedItems.includes('dashboard'),
+              })}
+              onClose={() => setMobileOpen(false)}
+            />
           </nav>
           <div className="border-t border-border p-4 space-y-3">
             <Button asChild className="w-full rounded-full" onClick={() => setMobileOpen(false)}>
               <Link to="/campaigns/new">
                 <PlusCircle className="size-4 mr-1.5" />
-                Start a campaign
+                Start Campaign
               </Link>
             </Button>
-            <SecondaryMobileLinks onClose={() => setMobileOpen(false)} />
+            <MobileFooterLinks onClose={() => setMobileOpen(false)} />
           </div>
         </SheetContent>
       </Sheet>
@@ -163,32 +173,72 @@ function NavLinkButton({ item }: { item: NavItem }) {
   );
 }
 
-/**
- * Secondary links inside the mobile drawer for the logged-in user — quick
- * shortcuts to the parts of the app that live outside the fundraising flow
- * but should still be reachable.
- */
-function SecondaryMobileLinks({ onClose }: { onClose: () => void }) {
-  const { user } = useCurrentUser();
-  if (!user) return null;
-
-  const items: { label: string; to: string }[] = [
-    { label: 'Wallet', to: '/wallet' },
-    { label: 'Notifications', to: '/notifications' },
-    { label: 'Profile', to: `/${nip19.npubEncode(user.pubkey)}` },
-    { label: 'Settings', to: '/settings' },
+function MobileFooterLinks({ onClose }: { onClose: () => void }) {
+  const items = [
+    { label: 'Privacy', to: '/privacy' },
+    { label: 'Safety', to: '/safety' },
+    { label: 'Changelog', to: '/changelog' },
   ];
+
+  return (
+    <nav className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-xs text-muted-foreground">
+      {items.map((item) => (
+        <Link
+          key={item.to}
+          to={item.to}
+          onClick={onClose}
+          className="hover:text-foreground motion-safe:transition-colors"
+        >
+          {item.label}
+        </Link>
+      ))}
+    </nav>
+  );
+}
+
+function getProfileMenuItems({
+  userPubkey,
+  showDashboard,
+}: {
+  userPubkey?: string;
+  showDashboard: boolean;
+}): MobileLinkItem[] {
+  if (!userPubkey) return [];
+
+  return [
+    ...(showDashboard ? [{ label: 'Dashboard', to: '/dashboard', icon: Activity }] : []),
+    { label: 'Wallet', to: '/wallet', icon: Wallet },
+    { label: 'Notifications', to: '/notifications', icon: Bell },
+    { label: 'Profile', to: `/${nip19.npubEncode(userPubkey)}`, icon: User },
+    { label: 'Search', to: '/search', icon: Search },
+    { label: 'Settings', to: '/settings', icon: Settings },
+    { label: 'Help', to: '/help', icon: CircleHelp },
+  ];
+}
+
+function MobileLinkList({ items, onClose }: { items: MobileLinkItem[]; onClose: () => void }) {
+  if (items.length === 0) return null;
+
   return (
     <ul className="space-y-1">
       {items.map((item) => (
         <li key={item.to}>
-          <Link
+          <NavLink
             to={item.to}
+            end={item.exact}
             onClick={onClose}
-            className="block px-3 py-2 rounded-lg text-sm text-muted-foreground hover:text-foreground hover:bg-secondary motion-safe:transition-colors"
+            className={({ isActive }) =>
+              cn(
+                'flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium motion-safe:transition-colors',
+                isActive
+                  ? 'bg-primary/10 text-foreground'
+                  : 'text-muted-foreground hover:text-foreground hover:bg-secondary',
+              )
+            }
           >
+            <item.icon className="size-4 shrink-0" />
             {item.label}
-          </Link>
+          </NavLink>
         </li>
       ))}
     </ul>

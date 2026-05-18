@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { useSeoMeta } from '@unhead/react';
 import { Link as RouterLink } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
@@ -14,12 +14,14 @@ import { useToast } from '@/hooks/useToast';
 import { getAllCountries, getGeoDisplayName, countryCodeToFlag } from '@/lib/countries';
 import { CountryFlag } from '@/components/CountryFlag';
 import { getDisplayName } from '@/lib/genUserName';
-import { DEFAULT_COVER_IMAGE } from '@/lib/defaultActionCovers';
+import { DEFAULT_ACTION_COVERS, DEFAULT_COVER_IMAGE } from '@/lib/defaultActionCovers';
+import { HOPE_PALETTE } from '@/lib/hopePalette';
 import { useLayoutOptions } from '@/contexts/LayoutContext';
 import { cn } from '@/lib/utils';
 import { CreateActionDialog } from '@/components/CreateActionDialog';
+import { HeroAtmosphere } from '@/components/HeroAtmosphere';
+import { HeroBanner } from '@/components/HeroBanner';
 
-import { PageHeader } from '@/components/PageHeader';
 import { Card, CardContent } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
@@ -301,8 +303,10 @@ export default function ActionsPage() {
   });
 
   // Drive the global FAB from the canonical layout API so we get the same
-  // circular Plus button every other page has.
+  // circular Plus button every other page has. `noMaxWidth: true` lets
+  // the hero banner span the full content column.
   useLayoutOptions({
+    noMaxWidth: true,
     showFAB: !!user,
     onFabClick: () => setCreateOpen(true),
   });
@@ -460,9 +464,13 @@ export default function ActionsPage() {
 
   return (
     <main className="pb-16 sidebar:pb-0">
-      <PageHeader title="Actions" icon={<Megaphone className="size-5" />} />
+      <ActionsHero
+        actionCount={actions?.length ?? 0}
+        canCreate={!!user}
+        onCreateAction={() => setCreateOpen(true)}
+      />
 
-      <div className="px-4 max-w-2xl mx-auto">
+      <div className="px-4 max-w-2xl mx-auto pt-6">
         {isLoading ? (
           <div className="space-y-4">
             {[...Array(4)].map((_, i) => <ActionSkeleton key={i} />)}
@@ -563,6 +571,140 @@ export default function ActionsPage() {
         onOpenChange={setCreateOpen}
       />
     </main>
+  );
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// Hero
+// ═══════════════════════════════════════════════════════════════════════════════
+
+/**
+ * Banner rotation for the Actions hero. We reuse the same gallery the
+ * action create form offers as a default cover, so the hero feels
+ * thematically continuous with the cards below — readers see the
+ * vocabulary of imagery they'll be picking from when they create their
+ * own action. Filtered to a single source extension where multiple
+ * exist isn't necessary; the browser handles `.png` / `.jpeg` mixed.
+ */
+const ACTIONS_HERO_IMAGES: readonly string[] = DEFAULT_ACTION_COVERS.map(
+  (c) => c.url,
+);
+
+interface ActionsHeroProps {
+  /** Number of actions currently loaded — fuels the live stat pill. */
+  actionCount: number;
+  /** When true, the primary CTA opens the create-action dialog. */
+  canCreate: boolean;
+  /** Fires when the user clicks the primary CTA. */
+  onCreateAction: () => void;
+}
+
+/**
+ * Photo-led hero for the Actions index. Same structural recipe as the
+ * Organize hero (rotating banner + atmospheric tint + scrims + overlay
+ * copy + glassy CTA), but tuned for action's "dawn / golden hour" vibe:
+ * uses {@link HOPE_PALETTE} instead of the cool palette so the warm
+ * hues land on top of the protest photography rather than competing
+ * with it.
+ */
+function ActionsHero({ actionCount, canCreate, onCreateAction }: ActionsHeroProps) {
+  // Cycle through warm hues on the same cadence as the banner so the
+  // whole hero feels like one coordinated moment instead of two
+  // unrelated rotations.
+  const [hueIndex, setHueIndex] = useState(0);
+  useEffect(() => {
+    const id = window.setInterval(() => {
+      setHueIndex((i) => (i + 1) % HOPE_PALETTE.length);
+    }, 9_000);
+    return () => window.clearInterval(id);
+  }, []);
+  const activeHue = HOPE_PALETTE[hueIndex];
+
+  return (
+    <section className="relative overflow-hidden border-b border-border bg-secondary/30">
+      {/* Rotating photo banner — uses the same gallery offered as default
+          action covers, so the hero previews the visual vocabulary of
+          the cards below. Crossfades every 7s and pans slowly between
+          cuts. */}
+      <HeroBanner images={ACTIONS_HERO_IMAGES} />
+
+      {/* Warm atmosphere — golden-hour scrim + radial glow + sunrise rim.
+          Drives the hue cycle so the photo never feels static even when
+          a single banner image is on screen. */}
+      <HeroAtmosphere hue={activeHue} />
+
+      {/* Top scrim so the headline stays legible across every photo in
+          the rotation. */}
+      <div
+        className="absolute inset-x-0 top-0 h-64 sm:h-80 pointer-events-none bg-gradient-to-b from-black/70 via-black/40 to-transparent"
+        aria-hidden="true"
+      />
+
+      {/* Bottom scrim so the stat pill + CTA stay legible. */}
+      <div
+        className="absolute inset-x-0 bottom-0 h-56 sm:h-72 pointer-events-none bg-gradient-to-t from-black/70 via-black/35 to-transparent"
+        aria-hidden="true"
+      />
+
+      <div className="relative max-w-5xl mx-auto px-4 sm:px-6 py-10 sm:py-12 lg:py-14 min-h-[380px] sm:min-h-[420px] lg:min-h-[460px] flex flex-col items-center text-center">
+        <div className="relative space-y-3 max-w-3xl">
+          <p className="text-xs sm:text-sm font-semibold uppercase tracking-[0.18em] text-white/85 drop-shadow">
+            Act
+          </p>
+          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight leading-[1.05] text-white drop-shadow-[0_2px_12px_rgb(0_0_0/0.55)]">
+            Small acts,
+            <br className="sm:hidden" /> real change.
+          </h1>
+          <p className="text-base sm:text-lg text-white/85 max-w-2xl mx-auto drop-shadow-[0_1px_6px_rgb(0_0_0/0.5)]">
+            Photograph protests, make art, gather information, organize on the ground.
+            Get paid in Bitcoin when your work moves the needle.
+          </p>
+        </div>
+
+        <div className="flex-1 min-h-[100px] sm:min-h-[120px]" aria-hidden="true" />
+
+        {/* Live stat pill. Mirrors the Communities hero's pattern but
+            only carries a single fact — the current action count —
+            so it stays calm and the headline does the heavy lifting. */}
+        <div
+          className="relative w-full max-w-md mx-auto rounded-full bg-background/55 backdrop-blur-xl backdrop-saturate-150 border border-white/20 dark:border-white/10 px-5 py-3 shadow-lg shadow-amber-500/10"
+          aria-live="polite"
+        >
+          <div className="flex items-center justify-center gap-3">
+            <Megaphone className="size-5 text-primary shrink-0" aria-hidden />
+            <span className="text-sm sm:text-base font-semibold tracking-tight">
+              {actionCount.toLocaleString()}
+            </span>
+            <span className="text-xs sm:text-sm text-muted-foreground line-clamp-1">
+              {actionCount === 1 ? 'action in motion right now' : 'actions in motion right now'}
+            </span>
+          </div>
+        </div>
+
+        <div className="mt-5 flex flex-wrap items-center justify-center gap-3">
+          <Button
+            type="button"
+            size="lg"
+            onClick={onCreateAction}
+            disabled={!canCreate}
+            className={cn(
+              'relative rounded-full text-white font-semibold text-base h-12 px-7 [&_svg]:size-[18px]',
+              'bg-gradient-to-br from-white/14 via-amber-100/10 to-rose-100/10 hover:from-white/20 hover:via-amber-100/14 hover:to-rose-100/14',
+              'backdrop-blur-xl backdrop-saturate-150',
+              'border border-white/25 hover:border-white/35',
+              'shadow-[inset_0_0_0_1px_rgb(255_255_255/0.08),0_10px_28px_-12px_hsl(24_85%_45%/0.4)]',
+              'hover:shadow-[inset_0_0_0_1px_rgb(255_255_255/0.12),0_12px_32px_-10px_hsl(24_85%_45%/0.5)]',
+              'motion-safe:transition-colors motion-safe:duration-200',
+              'disabled:opacity-60 disabled:cursor-not-allowed',
+            )}
+            aria-label={canCreate ? 'Create action' : 'Log in to create an action'}
+          >
+            <Plus className="mr-2" />
+            Create action
+          </Button>
+        </div>
+      </div>
+    </section>
   );
 }
 

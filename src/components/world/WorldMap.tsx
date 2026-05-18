@@ -16,8 +16,6 @@ import {
 import { cn } from '@/lib/utils';
 import { useIsMobile } from '@/hooks/useIsMobile';
 import { CountryActivityPopover } from './CountryActivityPopover';
-import { EphemeralMarkersLayer } from './EphemeralMarkersLayer';
-import type { EphemeralEventData } from '@/hooks/useEphemeralEvents';
 
 // CARTO Positron tiles — clean, label-rich basemap with a dark variant.
 const POSITRON_LIGHT_URL = 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png';
@@ -26,19 +24,16 @@ const ATTRIBUTION =
   '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>';
 
 /**
- * Pick a sensible initial zoom so the world fills the viewport vertically
- * — at zoom 2 the world tile is 1024px tall, which leaves visible ocean
- * bands above and below the map on phones, tablets, and smaller laptops.
- * Bumping to zoom 3 (2048px tall) on sub-`xl` viewports eliminates those
- * gaps while still showing most of the globe. Wider viewports keep zoom
- * 2 because the docked discovery panel appears there and we want as
- * much of the world visible next to it.
+ * Pick a sensible initial zoom so the world fills the viewport vertically.
+ * Sub-`xl` viewports use zoom 4 to give a closer view of populated regions;
+ * wider viewports use zoom 3 since the docked discovery panel appears there
+ * and we want more of the world visible next to it.
  *
  * Matches the 1280px breakpoint used by `WorldPage` for the panel cutoff.
  */
 function getInitialZoom(): number {
-  if (typeof window === 'undefined') return 2;
-  return window.innerWidth < 1280 ? 3 : 2;
+  if (typeof window === 'undefined') return 3;
+  return window.innerWidth < 1280 ? 4 : 3;
 }
 
 interface ActivityMarker {
@@ -484,12 +479,6 @@ interface WorldMapProps {
   activities: Map<string, number>;
   /** Map of country code → top trending hashtag (no leading `#`). */
   topHashtags?: Map<string, string>;
-  /** Recent ephemeral chat events (kinds 20000/20001) to plot as a sky-blue
-   *  layer on top of the orange community-activity bubbles. */
-  ephemeralEvents?: EphemeralEventData[];
-  /** Called when a chat bubble row is clicked. The page is responsible for
-   *  mounting the actual chat dialog. */
-  onOpenChat?: (geohash: string) => void;
   /** Triggered when the underlying tile layer finishes initial load. */
   onMapReady?: () => void;
 }
@@ -501,14 +490,10 @@ interface WorldMapProps {
  * `/i/iso3166:XX` country feed. At low zoom levels nearby bubbles fold into
  * clusters with a roll-up popover.
  *
- * Optionally overlays a sky-blue ephemeral chat layer (kinds 20000/20001)
- * with a `onOpenChat` callback used to launch the per-geohash realtime chat.
  */
 export function WorldMap({
   activities,
   topHashtags,
-  ephemeralEvents,
-  onOpenChat,
   onMapReady,
 }: WorldMapProps) {
   const isMobile = useIsMobile();
@@ -551,7 +536,7 @@ export function WorldMap({
   return (
     <div ref={containerRef} className="w-full h-full relative isolate">
       <MapContainer
-        center={[8, -66]}
+        center={[20, -30]}
         zoom={getInitialZoom()}
         minZoom={2}
         maxZoom={10}
@@ -573,13 +558,6 @@ export function WorldMap({
         />
         <MapSizeController />
         <MarkersOverlay activityMarkers={activityMarkers} isMobile={isMobile} />
-        {ephemeralEvents && ephemeralEvents.length > 0 && onOpenChat && (
-          <EphemeralMarkersLayer
-            events={ephemeralEvents}
-            onOpenChat={onOpenChat}
-            isMobile={isMobile}
-          />
-        )}
       </MapContainer>
     </div>
   );
