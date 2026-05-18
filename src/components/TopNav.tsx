@@ -20,14 +20,14 @@ interface NavItem {
 
 const NAV_ITEMS: NavItem[] = [
   { label: 'Discover', to: '/discover' },
-  { label: 'Start a campaign', to: '/campaigns/new' },
-  { label: 'About', to: '/help' },
+  { label: 'Explore', to: '/world' },
+  { label: 'Help', to: '/help' },
 ];
 
 /**
  * Persistent top navigation bar rendered by {@link FundraiserLayout}. Mirrors
  * the GoFundMe-style chrome: brand mark on the left, primary nav links in the
- * middle, "Sign in" / account avatar plus a "Start a campaign" pill on the
+ * middle, "Sign in" / account avatar plus a "Start Campaign" pill on the
  * right. Collapses to a hamburger menu below the `md` breakpoint.
  */
 export function TopNav() {
@@ -75,7 +75,7 @@ export function TopNav() {
           <Button asChild size="sm" className="hidden sm:inline-flex rounded-full">
             <Link to="/campaigns/new">
               <PlusCircle className="size-4 mr-1.5" />
-              Start a campaign
+              Start Campaign
             </Link>
           </Button>
 
@@ -133,7 +133,7 @@ export function TopNav() {
             <Button asChild className="w-full rounded-full" onClick={() => setMobileOpen(false)}>
               <Link to="/campaigns/new">
                 <PlusCircle className="size-4 mr-1.5" />
-                Start a campaign
+                Start Campaign
               </Link>
             </Button>
             <SecondaryMobileLinks onClose={() => setMobileOpen(false)} />

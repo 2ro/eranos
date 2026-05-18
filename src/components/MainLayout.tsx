@@ -3,7 +3,6 @@ import { Outlet } from 'react-router-dom';
 import { LeftSidebar } from '@/components/LeftSidebar';
 import { MobileTopBar } from '@/components/MobileTopBar';
 import { MobileDrawer } from '@/components/MobileDrawer';
-import { MobileBottomNav } from '@/components/MobileBottomNav';
 import { FloatingComposeButton } from '@/components/FloatingComposeButton';
 import { CursorFireEffect } from '@/components/CursorFireEffect';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -51,7 +50,7 @@ function PageSkeleton() {
 
 /** Inner component that reads layout options from the context store. */
 function MainLayoutInner() {
-  const { rightSidebar, showFAB = false, fabKind = 1, fabHref, onFabClick, fabIcon, fabMenu, wrapperClassName, noOverscroll, noMaxWidth, scrollContainer, hasSubHeader, hideTopBar, hideBottomNav } = useLayoutSnapshot();
+  const { rightSidebar, showFAB = false, fabKind = 1, fabHref, onFabClick, fabIcon, fabMenu, wrapperClassName, noOverscroll, noMaxWidth, scrollContainer, hasSubHeader, hideTopBar } = useLayoutSnapshot();
   const [drawerOpen, setDrawerOpen] = useState(false);
   const openDrawer = useCallback(() => setDrawerOpen(true), []);
   const centerColumnRef = useRef<HTMLDivElement>(null);
@@ -115,9 +114,6 @@ function MainLayoutInner() {
             : rightSidebar}
         </Suspense>
       </div>
-
-      {/* Mobile bottom nav - only on small screens, slides out on scroll */}
-      {!hideBottomNav && <MobileBottomNav />}
 
       {/* Mobile FAB — fixed to viewport, hidden on desktop where the
           in-column sticky FAB (above) takes over. Mirrors bottom nav
