@@ -5,6 +5,7 @@ import {
   ChartTooltipContent,
   type ChartConfig,
 } from '@/components/ui/chart';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import type { DistributionSlice } from './types';
 
 interface DistributionDonutProps {
@@ -19,46 +20,50 @@ export function DistributionDonut({ data }: DistributionDonutProps) {
   );
 
   return (
-    <div className="rounded-2xl border border-border p-4 space-y-3">
-      <h3 className="text-sm font-medium text-muted-foreground">Post Distribution</h3>
-      <div className="flex flex-col sm:flex-row items-center gap-6">
-        <div className="w-full max-w-[200px]">
-          <ChartContainer config={chartConfig} className="aspect-square w-full">
-            <PieChart>
-              <ChartTooltip content={<ChartTooltipContent hideLabel />} />
-              <Pie
-                data={data}
-                dataKey="value"
-                nameKey="name"
-                innerRadius="55%"
-                outerRadius="85%"
-                strokeWidth={2}
-                stroke="hsl(var(--background))"
-              >
-                {data.map((slice, i) => (
-                  <Cell key={i} fill={slice.fill} />
-                ))}
-              </Pie>
-            </PieChart>
-          </ChartContainer>
+    <Card>
+      <CardHeader>
+        <CardTitle className="text-sm font-medium text-muted-foreground">Post Distribution</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <div className="flex flex-col sm:flex-row items-center gap-6">
+          <div className="w-full max-w-[200px]">
+            <ChartContainer config={chartConfig} className="aspect-square w-full">
+              <PieChart>
+                <ChartTooltip content={<ChartTooltipContent hideLabel />} />
+                <Pie
+                  data={data}
+                  dataKey="value"
+                  nameKey="name"
+                  innerRadius="55%"
+                  outerRadius="85%"
+                  strokeWidth={2}
+                  stroke="hsl(var(--background))"
+                >
+                  {data.map((slice, i) => (
+                    <Cell key={i} fill={slice.fill} />
+                  ))}
+                </Pie>
+              </PieChart>
+            </ChartContainer>
+          </div>
+          <div className="flex-1 w-full space-y-2">
+            {data.map((slice) => {
+              const pct = total > 0 ? Math.round((slice.value / total) * 100) : 0;
+              return (
+                <div key={slice.name} className="flex items-center gap-2 text-sm">
+                  <span
+                    className="size-2.5 rounded-sm shrink-0"
+                    style={{ backgroundColor: slice.fill }}
+                  />
+                  <span className="flex-1 truncate font-medium">{slice.name}</span>
+                  <span className="text-muted-foreground tabular-nums">{pct}%</span>
+                  <span className="font-semibold tabular-nums w-10 text-right">{slice.value}</span>
+                </div>
+              );
+            })}
+          </div>
         </div>
-        <div className="flex-1 w-full space-y-2">
-          {data.map((slice) => {
-            const pct = total > 0 ? Math.round((slice.value / total) * 100) : 0;
-            return (
-              <div key={slice.name} className="flex items-center gap-2 text-sm">
-                <span
-                  className="size-2.5 rounded-sm shrink-0"
-                  style={{ backgroundColor: slice.fill }}
-                />
-                <span className="flex-1 truncate font-medium">{slice.name}</span>
-                <span className="text-muted-foreground tabular-nums">{pct}%</span>
-                <span className="font-semibold tabular-nums w-10 text-right">{slice.value}</span>
-              </div>
-            );
-          })}
-        </div>
-      </div>
-    </div>
+      </CardContent>
+    </Card>
   );
 }

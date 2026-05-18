@@ -26,7 +26,7 @@ export function ParticipantsList({ data, territorialLevel }: ParticipantsListPro
   const columnLabel = territorialLevel === 'states' ? 'State' : 'Municipality';
 
   return (
-    <div className="rounded-2xl border border-border overflow-hidden">
+    <div className="rounded-lg border bg-card text-card-foreground shadow-sm overflow-hidden">
       <div className="px-4 py-3 border-b bg-muted/30">
         <h3 className="text-sm font-medium text-muted-foreground">{title}</h3>
       </div>
