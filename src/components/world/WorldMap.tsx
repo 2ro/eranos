@@ -24,19 +24,16 @@ const ATTRIBUTION =
   '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>';
 
 /**
- * Pick a sensible initial zoom so the world fills the viewport vertically
- * — at zoom 2 the world tile is 1024px tall, which leaves visible ocean
- * bands above and below the map on phones, tablets, and smaller laptops.
- * Bumping to zoom 3 (2048px tall) on sub-`xl` viewports eliminates those
- * gaps while still showing most of the globe. Wider viewports keep zoom
- * 2 because the docked discovery panel appears there and we want as
- * much of the world visible next to it.
+ * Pick a sensible initial zoom so the world fills the viewport vertically.
+ * Sub-`xl` viewports use zoom 4 to give a closer view of populated regions;
+ * wider viewports use zoom 3 since the docked discovery panel appears there
+ * and we want more of the world visible next to it.
  *
  * Matches the 1280px breakpoint used by `WorldPage` for the panel cutoff.
  */
 function getInitialZoom(): number {
-  if (typeof window === 'undefined') return 2;
-  return window.innerWidth < 1280 ? 3 : 2;
+  if (typeof window === 'undefined') return 3;
+  return window.innerWidth < 1280 ? 4 : 3;
 }
 
 interface ActivityMarker {
@@ -539,7 +536,7 @@ export function WorldMap({
   return (
     <div ref={containerRef} className="w-full h-full relative isolate">
       <MapContainer
-        center={[8, -66]}
+        center={[20, -30]}
         zoom={getInitialZoom()}
         minZoom={2}
         maxZoom={10}
