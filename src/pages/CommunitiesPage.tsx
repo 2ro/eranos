@@ -196,22 +196,22 @@ function CommunitiesHero({ onCreateCommunity }: CommunitiesHeroProps) {
       <HeroAtmosphere seed={`communities-${activeHue.name}`} />
 
       <div className="absolute inset-0 pointer-events-none flex items-center justify-center">
-        <div className="pointer-events-auto opacity-90 translate-y-8 sm:translate-y-12">
+        <div className="pointer-events-auto opacity-90">
           <HeroGlobe
             markers={markers}
             hue={activeHue}
             className="aspect-square max-w-none drop-shadow-2xl"
-            style={{ width: 'clamp(460px, 66dvw, 760px)' }}
+            style={{ width: 'clamp(440px, 62dvw, 720px)' }}
           />
         </div>
       </div>
 
       <div
-        className="absolute inset-x-0 top-0 h-80 pointer-events-none bg-gradient-to-b from-black/60 via-black/25 to-transparent"
+        className="absolute inset-x-0 top-0 h-72 sm:h-80 pointer-events-none bg-gradient-to-b from-black/55 via-black/25 to-transparent"
         aria-hidden="true"
       />
 
-      <div className="relative max-w-5xl mx-auto px-4 sm:px-6 py-12 sm:py-16 lg:py-20 min-h-[540px] sm:min-h-[620px] flex flex-col items-center text-center">
+      <div className="relative max-w-5xl mx-auto px-4 sm:px-6 py-12 sm:py-16 lg:py-20 min-h-[560px] sm:min-h-[640px] lg:min-h-[680px] flex flex-col items-center text-center">
         <div className="relative space-y-3 max-w-3xl">
           <p className="text-xs sm:text-sm font-semibold uppercase tracking-[0.18em] text-white/80 drop-shadow">
             Organize
@@ -225,9 +225,9 @@ function CommunitiesHero({ onCreateCommunity }: CommunitiesHeroProps) {
           </p>
         </div>
 
-        <div className="flex-1 min-h-[180px] sm:min-h-[230px]" aria-hidden="true" />
+        <div className="flex-1 min-h-[180px] sm:min-h-[220px]" aria-hidden="true" />
 
-        <div className="relative w-full max-w-lg mx-auto rounded-3xl bg-background/55 backdrop-blur-xl backdrop-saturate-150 border border-white/20 dark:border-white/10 px-5 py-4 shadow-lg shadow-amber-500/10">
+        <div className="relative w-full max-w-md mx-auto rounded-full bg-background/55 backdrop-blur-xl backdrop-saturate-150 border border-white/20 dark:border-white/10 px-5 py-3 shadow-lg shadow-amber-500/10">
           <div className="flex items-center justify-center gap-3 text-sm sm:text-base">
             <span className="p-2 rounded-full bg-primary/15 text-primary">
               <Sparkles className="size-5" aria-hidden />
