@@ -192,37 +192,29 @@ export default ClaimPage;
  *
  * When a freshly-signed-up invitee lands here and no campaign yet lists them
  * as a beneficiary, the most likely explanation is that the inviter is still
- * waiting on the invitee's npub to add them. This card hands them a one-tap
- * reply they can paste into whatever channel the original invite came from
- * (Telegram, iMessage, email, etc.), plus a "bare npub" affordance for
- * pasting into an existing thread without the templated framing.
+ * waiting on the invitee's npub to add them. This card hands them a
+ * one-tap copy of their own npub so they can paste it back into whatever
+ * channel the original invite came from.
  *
  * Pure UX — no event publishing, no analytics ping back to the inviter. The
  * invitee still has to send the message manually; we just remove the friction
- * of typing or hunting for their npub in settings.
+ * of hunting for their npub in settings.
  */
 function SendNpubCard({ pubkey }: { pubkey: string }) {
   const { toast } = useToast();
   const npub = useMemo(() => nip19.npubEncode(pubkey), [pubkey]);
   const [copiedNpub, setCopiedNpub] = useState(false);
-  const [copiedMessage, setCopiedMessage] = useState(false);
 
-  const replyMessage = `I finished setting up my Agora account! My npub is: ${npub} — you can add me as a beneficiary now.`;
-
-  const writeClipboard = async (
-    value: string,
-    setMarker: (b: boolean) => void,
-    successTitle: string,
-  ) => {
+  const writeClipboard = async () => {
     try {
-      await navigator.clipboard.writeText(value);
-      setMarker(true);
-      setTimeout(() => setMarker(false), 1500);
-      toast({ title: successTitle });
+      await navigator.clipboard.writeText(npub);
+      setCopiedNpub(true);
+      setTimeout(() => setCopiedNpub(false), 1500);
+      toast({ title: 'Npub copied' });
     } catch {
       toast({
         title: 'Copy failed',
-        description: 'Your browser blocked clipboard access. Select and copy the text manually.',
+        description: 'Your browser blocked clipboard access. Select and copy the npub manually.',
         variant: 'destructive',
       });
     }
@@ -252,7 +244,7 @@ function SendNpubCard({ pubkey }: { pubkey: string }) {
           </span>
           <button
             type="button"
-            onClick={() => writeClipboard(npub, setCopiedNpub, 'Npub copied')}
+            onClick={writeClipboard}
             className="w-full flex items-center justify-between gap-2 rounded-lg border bg-background px-3 py-2.5 font-mono text-xs text-left hover:bg-muted/60 motion-safe:transition-colors"
             aria-label="Copy npub"
           >
@@ -265,27 +257,14 @@ function SendNpubCard({ pubkey }: { pubkey: string }) {
           </button>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-          <Button
-            type="button"
-            onClick={() => writeClipboard(replyMessage, setCopiedMessage, 'Reply message copied')}
-          >
-            {copiedMessage ? (
-              <Check className="size-4 mr-1.5 text-green-200" />
-            ) : (
-              <Copy className="size-4 mr-1.5" />
-            )}
-            Copy reply message
-          </Button>
-          <Button
-            type="button"
-            variant="outline"
-            onClick={() => writeClipboard(npub, setCopiedNpub, 'Npub copied')}
-          >
+        <Button type="button" onClick={writeClipboard} className="w-full">
+          {copiedNpub ? (
+            <Check className="size-4 mr-1.5 text-green-200" />
+          ) : (
             <Copy className="size-4 mr-1.5" />
-            Copy npub only
-          </Button>
-        </div>
+          )}
+          Copy my npub
+        </Button>
 
         <p className="text-xs text-muted-foreground">
           Paste it into the same conversation where they invited you — Telegram, iMessage, email,
