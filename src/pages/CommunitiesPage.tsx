@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
 import { useSeoMeta } from '@unhead/react';
-import { Loader2, PlusCircle, Search, Sparkles, Users } from 'lucide-react';
+import { Globe2, HandHeart, Loader2, PlusCircle, Search, Users } from 'lucide-react';
 import type { NostrEvent } from '@nostrify/nostrify';
 import { useInView } from 'react-intersection-observer';
 
@@ -29,9 +29,12 @@ import { useAppContext } from '@/hooks/useAppContext';
 import { useCommunityActivityFeed } from '@/hooks/useCommunityActivityFeed';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useDiscoverCommunities } from '@/hooks/useDiscoverCommunities';
+import { useGlobalActivity } from '@/hooks/useGlobalActivity';
+import { useGlobalDonations } from '@/hooks/useGlobalDonations';
 import { useMembersOnlyFilter } from '@/hooks/useMembersOnlyFilter';
 import { useMyCommunities } from '@/hooks/useMyCommunities';
 import { useToast } from '@/hooks/useToast';
+import { formatSatsShort } from '@/lib/formatCampaignAmount';
 
 // ─── Skeletons ─────────────────────────────────────────────────────────────────
 
@@ -158,8 +161,17 @@ interface GlobeMarker {
   kind: GlobeMarkerKind;
 }
 
+interface TickerStat {
+  id: string;
+  value: string;
+  label: string;
+  icon: React.ReactNode;
+}
+
 function CommunitiesHero({ onCreateCommunity }: CommunitiesHeroProps) {
   const { data: communities } = useDiscoverCommunities({ limit: 24 });
+  const { data: activityByCountry } = useGlobalActivity();
+  const { data: donations, isLoading: donationsLoading } = useGlobalDonations();
   const [hueIndex, setHueIndex] = useState(1);
 
   useEffect(() => {
@@ -190,6 +202,49 @@ function CommunitiesHero({ onCreateCommunity }: CommunitiesHeroProps) {
       kind: 'community',
     }));
   }, [communities]);
+
+  const stats = useMemo<TickerStat[]>(() => {
+    const items: TickerStat[] = [];
+
+    if (donations && donations.totalSats > 0) {
+      items.push({
+        id: 'sats',
+        value: formatSatsShort(donations.totalSats),
+        label: `raised on-chain across ${donations.campaignCount.toLocaleString()} ${
+          donations.campaignCount === 1 ? 'campaign' : 'campaigns'
+        }`,
+        icon: <HandHeart className="size-5" aria-hidden />,
+      });
+    }
+    if (communities && communities.length > 0) {
+      items.push({
+        id: 'communities',
+        value: communities.length.toLocaleString(),
+        label: `${communities.length === 1 ? 'community' : 'communities'} gathering on Nostr`,
+        icon: <Users className="size-5" aria-hidden />,
+      });
+    }
+    if (activityByCountry && activityByCountry.size > 0) {
+      items.push({
+        id: 'countries',
+        value: activityByCountry.size.toLocaleString(),
+        label: `${activityByCountry.size === 1 ? 'country' : 'countries'} posting today`,
+        icon: <Globe2 className="size-5" aria-hidden />,
+      });
+    }
+    return items;
+  }, [donations, communities, activityByCountry]);
+
+  const [tickerIndex, setTickerIndex] = useState(0);
+  useEffect(() => {
+    if (stats.length <= 1) return;
+    const id = window.setInterval(() => {
+      setTickerIndex((i) => (i + 1) % stats.length);
+    }, 4_000);
+    return () => window.clearInterval(id);
+  }, [stats.length]);
+
+  const currentStat = stats[tickerIndex % Math.max(stats.length, 1)];
 
   return (
     <section className="relative overflow-hidden border-b border-border bg-secondary/30">
@@ -231,17 +286,34 @@ function CommunitiesHero({ onCreateCommunity }: CommunitiesHeroProps) {
           className="relative w-full max-w-md mx-auto rounded-full bg-background/55 backdrop-blur-xl backdrop-saturate-150 border border-white/20 dark:border-white/10 px-5 py-3 shadow-lg shadow-amber-500/10"
           aria-live="polite"
         >
-          <div className="flex items-center justify-center gap-3 motion-safe:animate-in motion-safe:fade-in motion-safe:duration-500">
-            <span className="text-primary shrink-0">
-              <Sparkles className="size-5" aria-hidden />
-            </span>
-            <span className="text-sm sm:text-base font-semibold tracking-tight">
-              Sovereign
-            </span>
-            <span className="text-xs sm:text-sm text-muted-foreground line-clamp-1">
-              community organization
-            </span>
-          </div>
+          {currentStat ? (
+            <div
+              key={currentStat.id}
+              className="flex items-center justify-center gap-3 motion-safe:animate-in motion-safe:fade-in motion-safe:duration-500"
+            >
+              <span className="text-primary shrink-0">{currentStat.icon}</span>
+              <span className="text-sm sm:text-base font-semibold tracking-tight">
+                {currentStat.value}
+              </span>
+              <span className="text-xs sm:text-sm text-muted-foreground line-clamp-1">
+                {currentStat.label}
+              </span>
+            </div>
+          ) : (
+            <div className="flex items-center justify-center gap-3">
+              {donationsLoading ? (
+                <>
+                  <Skeleton className="size-5 rounded-full" />
+                  <Skeleton className="h-4 w-20" />
+                  <Skeleton className="h-3 w-32" />
+                </>
+              ) : (
+                <span className="text-xs text-muted-foreground">
+                  Connecting to relays…
+                </span>
+              )}
+            </div>
+          )}
         </div>
 
         <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
