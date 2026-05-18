@@ -816,16 +816,7 @@ function FormSection({
       <div className="space-y-0.5">
         <h2 className="flex items-center gap-2 text-lg font-semibold">
           {title}
-          <span
-            className={cn(
-              'rounded-full px-2 py-0.5 text-[11px] font-medium',
-              requirement === 'Required'
-                ? 'bg-primary/10 text-primary'
-                : requirement === 'Recommended'
-                  ? 'bg-amber-500/10 text-amber-700 dark:text-amber-300'
-                : 'bg-muted text-muted-foreground',
-            )}
-          >
+          <span className="text-xs font-medium text-muted-foreground">
             {requirement}
           </span>
         </h2>
@@ -856,16 +847,7 @@ function CollapsibleFormSection({
         <div className="space-y-0.5">
           <h2 className="flex items-center gap-2 text-lg font-semibold">
             {title}
-            <span
-              className={cn(
-                'rounded-full px-2 py-0.5 text-[11px] font-medium',
-                requirement === 'Required'
-                  ? 'bg-primary/10 text-primary'
-                  : requirement === 'Recommended'
-                    ? 'bg-amber-500/10 text-amber-700 dark:text-amber-300'
-                  : 'bg-muted text-muted-foreground',
-              )}
-            >
+            <span className="text-xs font-medium text-muted-foreground">
               {requirement}
             </span>
           </h2>
@@ -934,7 +916,7 @@ function CountrySelect({
               setOpen(false);
             }
           }}
-          className="pl-9 pr-9"
+          className="h-9 rounded-full border-0 bg-secondary pl-10 pr-10 text-sm focus-visible:ring-0 focus-visible:ring-offset-0"
           placeholder="Search countries, e.g. Venezuela"
           autoComplete="off"
           role="combobox"
@@ -956,7 +938,7 @@ function CountrySelect({
           <div
             id="campaign-country-results"
             role="listbox"
-            className="absolute z-20 mt-2 max-h-72 w-full overflow-y-auto rounded-xl border border-border bg-popover p-1 shadow-lg"
+            className="absolute z-20 mt-2 max-h-[200px] w-full overflow-y-auto rounded-xl border border-border bg-popover py-1 shadow-lg"
           >
             {results.map((country, index) => (
               <button
@@ -967,11 +949,11 @@ function CountrySelect({
                 onMouseDown={(e) => e.preventDefault()}
                 onClick={() => selectCountry(country)}
                 className={cn(
-                  'flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left motion-safe:transition-colors',
-                  index === selectedIndex ? 'bg-accent text-accent-foreground' : 'hover:bg-secondary/60',
+                  'flex w-full cursor-pointer items-center gap-3 px-3 py-2 text-left transition-colors hover:bg-secondary/60',
+                  index === selectedIndex && 'bg-secondary/60',
                 )}
               >
-                <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-secondary text-lg leading-none" role="img" aria-label={`Flag of ${country.name}`}>
+                <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-secondary text-lg leading-none" role="img" aria-label={`Flag of ${country.name}`}>
                   {country.flag}
                 </span>
                 <span className="min-w-0 flex-1">
