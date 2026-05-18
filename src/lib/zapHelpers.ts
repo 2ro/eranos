@@ -12,7 +12,11 @@ import { extractZapAmount } from '@/hooks/useEventInteractions';
  * and rely solely on bolt11, which is why callers that don't fall back
  * to bolt11 will display "X zapped you" with no amount.
  *
- * Kind 8333: the `amount` tag carries sats directly (see NIP.md).
+ * Kind 8333: the `amount` tag carries the total sats paid to all
+ * recipients listed under `p` tags in this event (see NIP.md). For
+ * single-recipient events that total IS the per-recipient amount; for
+ * multi-recipient events (campaign donations, batch zaps) it is the
+ * combined total.
  *
  * Returns 0 when no amount can be determined.
  */
@@ -30,6 +34,34 @@ export function getZapAmountSats(event: NostrEvent): number {
   // through amount tag → description.tags amount → bolt11 invoice.
   const msats = extractZapAmount(event);
   return Math.floor(msats / 1000);
+}
+
+/**
+ * Returns the slice of a zap that was attributed to a specific recipient.
+ *
+ * For kind 9735 (Lightning) and single-recipient kind 8333 events, this is
+ * the same as {@link getZapAmountSats}. For multi-recipient kind 8333
+ * events (campaign donations, batch zaps), the event's `amount` tag is the
+ * sum across N recipients without per-recipient granularity, so this
+ * estimates the viewer's slice as `amount / p_count`. Strict on-chain
+ * verification (matching each `p` against tx outputs) would yield exact
+ * per-recipient amounts; this helper is for display surfaces (notification
+ * "zapped you N sats") that don't perform that verification.
+ *
+ * Returns 0 if the viewer is not listed as a recipient, or if the amount
+ * cannot be determined.
+ */
+export function getZapAmountSatsForRecipient(event: NostrEvent, recipientPubkey: string): number {
+  const total = getZapAmountSats(event);
+  if (total <= 0) return 0;
+
+  if (event.kind !== 8333) return total;
+
+  const recipients = event.tags.filter(([n]) => n === 'p').map(([, v]) => v).filter((v): v is string => typeof v === 'string');
+  if (recipients.length === 0) return total;
+  if (!recipients.includes(recipientPubkey)) return 0;
+  if (recipients.length === 1) return total;
+  return Math.floor(total / recipients.length);
 }
 
 /**

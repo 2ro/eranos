@@ -18,9 +18,14 @@ export interface GlobalDonationStats {
  * ticker to show network-wide impact ("X sats raised across Y campaigns
  * in Z countries").
  *
- * Like {@link useCampaignDonations}, totals are **self-reported**: a
- * strict verifier would re-check each `i` tag against mempool.space
- * before counting. That's left to a future iteration.
+ * Like {@link useCampaignDonations}, each event's `amount` tag is the
+ * total sats paid to the recipients it lists (see `NIP.md`), so summing
+ * `amount` across all events yields the network total whether the events
+ * are legacy single-recipient receipts or new multi-recipient ones.
+ *
+ * Totals are **self-reported**: a strict verifier would re-check each
+ * `i` tag against mempool.space before counting. That's left to a future
+ * iteration.
  *
  * Costs one relay round-trip; cached for 5 minutes so the ticker
  * stabilises after the first load.
@@ -36,10 +41,8 @@ export function useGlobalDonations() {
         { signal: AbortSignal.any([signal, AbortSignal.timeout(10_000)]) },
       );
 
-      // Sum per-(txid,recipient) to avoid double-counting receipts where
-      // multiple recipients claim the same tx. Mirrors the dedupe logic
-      // in useCampaignDonations.
-      const txTotals = new Map<string, number>();
+      let totalSats = 0;
+      const txids = new Set<string>();
       const donors = new Set<string>();
       const campaigns = new Set<string>();
 
@@ -49,25 +52,16 @@ export function useGlobalDonations() {
         const amount = amountTag ? Number(amountTag) : NaN;
         if (!txid || !Number.isFinite(amount) || amount <= 0) continue;
 
-        const recipient = event.tags.find(([n]) => n === 'p')?.[1] ?? '';
-        const key = `${txid}:${recipient}`;
-        const prev = txTotals.get(key) ?? 0;
-        if (amount > prev) txTotals.set(key, amount);
-
+        totalSats += amount;
+        txids.add(txid);
         donors.add(event.pubkey);
         const aTag = event.tags.find(([n]) => n === 'a')?.[1];
         if (aTag) campaigns.add(aTag);
       }
 
-      const totalSats = Array.from(txTotals.values()).reduce((sum, n) => sum + n, 0);
-      const uniqueTxids = new Set<string>();
-      for (const key of txTotals.keys()) {
-        uniqueTxids.add(key.split(':')[0]);
-      }
-
       return {
         totalSats,
-        txCount: uniqueTxids.size,
+        txCount: txids.size,
         donorCount: donors.size,
         campaignCount: campaigns.size,
       };

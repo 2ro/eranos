@@ -179,10 +179,10 @@ export function DonateDialog({ campaign, open, onOpenChange, btcPrice }: DonateD
     onSuccess: (r) => {
       setResult(r);
       setStep('success');
-      if (r.publishFailed.length > 0) {
+      if (!r.receiptPublished) {
         toast({
-          title: 'Donation sent, but some receipts failed',
-          description: `On-chain tx ${r.txid.slice(0, 12)}… broadcast; ${r.publishFailed.length} of ${r.publishFailed.length + r.publishedReceipts} kind 8333 receipts didn't publish.`,
+          title: 'Donation sent, but the receipt failed',
+          description: `On-chain tx ${r.txid.slice(0, 12)}… broadcast; the kind 8333 receipt didn't publish${r.receiptPublishError ? ` (${r.receiptPublishError})` : ''}.`,
           variant: 'destructive',
         });
       } else {
@@ -819,12 +819,11 @@ function SuccessView({
           </div>
         </div>
 
-        {result.publishFailed.length > 0 && (
+        {!result.receiptPublished && (
           <Alert>
             <AlertTriangle className="size-4" />
             <AlertDescription className="text-xs">
-              The Bitcoin tx is final, but {result.publishFailed.length} kind 8333 receipt
-              {result.publishFailed.length === 1 ? '' : 's'} didn't publish. Your donation still
+              The Bitcoin tx is final, but the kind 8333 receipt didn't publish. Your donation still
               counts.
             </AlertDescription>
           </Alert>

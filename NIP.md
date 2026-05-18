@@ -71,6 +71,8 @@ Because every Nostr keypair deterministically maps to a Bitcoin Taproot (P2TR) a
 
 ### Event Structure
 
+Single-recipient zap (the common case — tipping a post or profile):
+
 ```json
 {
   "kind": 8333,
@@ -86,6 +88,26 @@ Because every Nostr keypair deterministically maps to a Bitcoin Taproot (P2TR) a
 }
 ```
 
+Multi-recipient zap (one transaction paying multiple recipients — campaign donations, community splits):
+
+```json
+{
+  "kind": 8333,
+  "pubkey": "<sender-pubkey>",
+  "content": "Great campaign!",
+  "tags": [
+    ["i", "bitcoin:tx:<txid>"],
+    ["p", "<recipient-1-pubkey>"],
+    ["p", "<recipient-2-pubkey>"],
+    ["p", "<recipient-3-pubkey>"],
+    ["amount", "<total-sats-paid-to-all-listed-recipients>"],
+    ["a", "30223:<campaign-author>:<campaign-d-tag>"],
+    ["K", "30223"],
+    ["alt", "Donation: 75000 sats across 3 recipients"]
+  ]
+}
+```
+
 ### Content
 
 The `content` field is a human-readable comment from the sender (may be empty). It is NOT a zap request JSON (unlike NIP-57 kind 9735).
@@ -95,39 +117,40 @@ The `content` field is a human-readable comment from the sender (may be empty). 
 | Tag      | Required | Description                                                                                  |
 |----------|----------|----------------------------------------------------------------------------------------------|
 | `i`      | Yes      | NIP-73 external content identifier. MUST be `bitcoin:tx:<txid>` where `<txid>` is a 64-char lowercase hex Bitcoin transaction ID. |
-| `p`      | Yes      | 32-byte hex pubkey of the zap **recipient** (the author being paid).                         |
-| `amount` | Yes      | Amount paid to the recipient in **satoshis** (decimal integer). This is the sum of outputs in the tx that paid the recipient's derived Taproot address — *not* the total tx value. |
+| `p`      | Yes (≥1) | 32-byte hex pubkey of a zap **recipient** (an author being paid). A single event MAY include multiple `p` tags when the transaction has one output per recipient — each `p` tag MUST correspond to at least one tx output paying that recipient's derived Taproot address. |
+| `amount` | Yes      | **Total** amount paid in **satoshis** (decimal integer). This is the sum of outputs in the tx that paid the derived Taproot addresses of **all** listed `p` recipients combined — *not* the total tx value (it excludes the sender's change output). For single-recipient events this is the amount paid to that one recipient. |
 | `e`      | If zapping an event | 32-byte hex ID of the event being zapped. Include a relay hint as the 3rd element where possible. |
 | `a`      | If zapping an addressable event | Addressable event coordinate `<kind>:<pubkey>:<d-tag>`. Used instead of (or alongside) `e` for kinds 30000–39999. |
 | `alt`    | Yes      | NIP-31 human-readable fallback.                                                              |
 
-If neither `e` nor `a` is present, the zap targets the recipient's **profile** (i.e. a tip to the pubkey, not to a specific event).
+If neither `e` nor `a` is present, the zap targets the recipients' **profiles** (i.e. a tip to the pubkey(s), not to a specific event).
 
 ### Publishing Flow
 
-1. Sender builds a Bitcoin transaction paying the recipient's derived Taproot address (`nostrPubkeyToBitcoinAddress(recipientPubkey)`).
+1. Sender builds a Bitcoin transaction with one output per intended recipient, each paying the recipient's derived Taproot address (`nostrPubkeyToBitcoinAddress(recipientPubkey)`).
 2. Sender broadcasts the transaction to the Bitcoin network and obtains the `txid`.
-3. Sender signs and publishes a kind 8333 event referencing that `txid` with the appropriate `e`/`a`/`p` tags.
+3. Sender signs and publishes a **single** kind 8333 event referencing that `txid` with one `p` tag per recipient and an `amount` tag carrying the total paid across all of them.
 4. The event is published **after** broadcast; the txid is already final at that point.
 
 ### Batch / Community Zaps
 
-A single Bitcoin transaction MAY pay multiple recipients by including one output per recipient. Clients SHOULD still publish **one kind 8333 event per recipient**, all referencing the same `i` tag (`bitcoin:tx:<txid>`) but each with its own `p` tag and `amount` tag.
+A single Bitcoin transaction MAY pay multiple recipients by including one output per recipient. Clients SHOULD publish **one kind 8333 event per transaction**, listing every recipient under its own `p` tag and putting the combined total in the single `amount` tag. Per-recipient amounts are not encoded in the event — clients that need them recompute them from the on-chain transaction during verification (each `p` tag's derived Taproot address is matched against tx outputs).
 
 For community-level zaps, clients MAY include the community addressable coordinate in an `a` tag and the community kind in a `K` tag:
 
 ```json
 [
   ["i", "bitcoin:tx:<txid>"],
-  ["p", "<recipient-pubkey>"],
-  ["amount", "1000"],
+  ["p", "<recipient-1-pubkey>"],
+  ["p", "<recipient-2-pubkey>"],
+  ["amount", "5000"],
   ["a", "34550:<community-author>:<community-d-tag>"],
   ["K", "34550"],
-  ["alt", "Bitcoin zap: 1000 sats"]
+  ["alt", "Bitcoin zap: 5000 sats across 2 recipients"]
 ]
 ```
 
-The `amount` tag is the amount paid to that event's `p` recipient only. It MUST NOT be the total value of the batch transaction.
+The `amount` tag MUST be the sum of outputs paying the listed recipients; it MUST NOT include the sender's change output.
 
 ### Client Behavior
 
@@ -137,7 +160,7 @@ The `amount` tag is the amount paid to that event's `p` recipient only. It MUST 
 { "kinds": [8333], "#e": ["<target-event-id>"], "limit": 100 }
 ```
 
-For addressable events, use `"#a": ["<kind>:<pubkey>:<d-tag>"]` instead. For profile-level zaps, use `"#p": ["<pubkey>"]`.
+For addressable events, use `"#a": ["<kind>:<pubkey>:<d-tag>"]` instead. For profile-level zaps targeting a specific user, use `"#p": ["<pubkey>"]` — this matches both single-recipient events tagging that user and multi-recipient events where the user is one of several recipients.
 
 **Verification (REQUIRED before trusting amounts):**
 
@@ -145,15 +168,17 @@ Clients MUST verify a kind 8333 event on-chain before counting it toward a zap t
 
 1. Extract the txid from the `i` tag.
 2. Fetch the transaction from a Bitcoin data source (e.g. a mempool.space-compatible Esplora API).
-3. Derive the recipient's expected Taproot address from the `p` tag pubkey.
-4. Sum the values of all outputs in the transaction that pay that address. This is the **verified amount**. Change outputs paying back to the **sender's** derived Taproot address MUST NOT be counted toward the verified amount — only outputs to the recipient.
-5. If the verified amount is 0, the event SHOULD be discarded.
+3. For each `p` tag, derive the recipient's expected Taproot address.
+4. Sum the values of all outputs in the transaction that pay any of the derived recipient addresses. This is the **verified amount**. Change outputs paying back to the **sender's** derived Taproot address MUST NOT be counted toward the verified amount — only outputs to listed recipients.
+5. If the verified amount is 0 (no listed recipient received anything in the tx), the event SHOULD be discarded.
 6. If the sender's `amount` tag exceeds the verified amount, clients MAY discard the event or MAY display the smaller verified amount (capping). Clients MUST NOT display or count the claimed amount when it exceeds the verified amount.
 7. Unconfirmed transactions MAY be displayed as pending; clients MAY require confirmation before counting them toward public totals. Because unconfirmed transactions can be evicted (RBF, double-spend), clients SHOULD either exclude them from aggregate zap totals or clearly label them as pending.
 
-**Sender/recipient identity:** Clients SHOULD reject events where the sender's pubkey (`event.pubkey`) equals the recipient pubkey from the `p` tag. Self-zaps are trivial to fabricate (the sender already controls the destination address) and contribute nothing meaningful to zap totals.
+When a client needs to attribute a multi-recipient event's amount to one specific recipient (e.g. rendering a profile zap-history entry), it MAY sum only the tx outputs paying that one recipient's derived Taproot address. Per-recipient amounts are not stored in the event — they are recomputed from the transaction at display time.
 
-**Deduplication:** Clients SHOULD deduplicate events that reference the same `txid` (an attacker could publish many events pointing at one real transaction). One kind 8333 event per (txid, target) pair is canonical — when multiple events reference the same `txid` for the same target, the earliest is preferred.
+**Sender/recipient identity:** Clients SHOULD reject events where the sender's pubkey (`event.pubkey`) appears in any `p` tag. Self-zaps are trivial to fabricate (the sender already controls the destination address) and contribute nothing meaningful to zap totals. Outputs in the underlying transaction that pay the sender's own derived Taproot address are change outputs and MUST NOT be counted toward the verified amount regardless of the tag set.
+
+**Deduplication:** Clients SHOULD deduplicate events that reference the same `txid` (an attacker could publish many events pointing at one real transaction). One kind 8333 event per `txid` is canonical — when multiple events reference the same `txid`, the earliest is preferred.
 
 **Network scope:** This specification applies to Bitcoin **mainnet** only. Testnet, signet, and other networks are out of scope; addresses and txids on those networks MUST NOT be used in kind 8333 events.
 
@@ -179,7 +204,7 @@ The two zap kinds are complementary. Clients SHOULD sum verified amounts from bo
 
 Addressable event representing a **fundraising campaign**. A campaign carries the marketing-style metadata you would expect on GoFundMe, Kickstarter, or GiveSendGo (title, summary, cover image, story, category, goal, optional deadline, and recommended country), and — most importantly — a list of recipient pubkeys (`p` tags) that share the proceeds of any donation.
 
-Donations are sent as a **single Bitcoin on-chain transaction** with one output per recipient. The donor's wallet derives each recipient's Taproot address from their pubkey via BIP-340/BIP-341 (the same scheme used by kind 8333 onchain zaps), so the campaign event itself does not need to carry Bitcoin addresses. After broadcasting the funding tx, the donor's client publishes one kind 8333 event per recipient, all referencing the same `txid` and tagging the campaign via `a` / `K`, so the donation shows up in the campaign's totals and in each recipient's profile zap history.
+Donations are sent as a **single Bitcoin on-chain transaction** with one output per recipient. The donor's wallet derives each recipient's Taproot address from their pubkey via BIP-340/BIP-341 (the same scheme used by kind 8333 onchain zaps), so the campaign event itself does not need to carry Bitcoin addresses. After broadcasting the funding tx, the donor's client publishes one kind 8333 event referencing the `txid`, listing every campaign recipient under its own `p` tag, and tagging the campaign via `a` / `K`. The donation then shows up in the campaign's totals and in each recipient's profile zap history (the `#p` filter matches every listed recipient).
 
 The kind is addressable so the creator can edit the story, image, goal, deadline, and recipient list over the life of the campaign without minting new identifiers. The `d` tag is the campaign's slug.
 
@@ -249,18 +274,22 @@ Equal splits are the default: omit the weight on every `p` tag, and all recipien
 2. Donor's client computes per-recipient amounts using the split rules above.
 3. Donor's client builds a **single PSBT** with one output per recipient (paying each recipient's derived Taproot address) plus a change output back to the donor.
 4. Donor signs the PSBT with their Nostr key (Taproot key-path spend) and broadcasts the resulting transaction.
-5. Donor's client publishes **one kind 8333 event per recipient**, all referencing the same `txid` in their `i` tag. Each kind 8333 event MUST include:
+5. Donor's client publishes **one kind 8333 event for the whole transaction**, listing every recipient under its own `p` tag. The event MUST include:
 
    ```json
    [
      ["i", "bitcoin:tx:<txid>"],
-     ["p", "<recipient-pubkey>"],
-     ["amount", "<sats-paid-to-that-recipient>"],
+     ["p", "<recipient-1-pubkey>"],
+     ["p", "<recipient-2-pubkey>"],
+     ["p", "<recipient-3-pubkey>"],
+     ["amount", "<total-sats-paid-to-all-recipients>"],
      ["a", "30223:<campaign-author-pubkey>:<campaign-d-tag>"],
      ["K", "30223"],
-     ["alt", "Donation to <campaign-title>: <amount> sats"]
+     ["alt", "Donation to <campaign-title>: <total-amount> sats"]
    ]
    ```
+
+   The `amount` tag is the sum of the outputs paying the listed recipients (i.e. the full donation, excluding the donor's change). Per-recipient amounts are not encoded in the event; clients that need them recompute them from the on-chain transaction by matching each recipient's derived Taproot address against the tx outputs.
 
 This mirrors the community batch-zap pattern documented in the kind 8333 section above, with the campaign's addressable coordinate replacing the community coordinate.
 

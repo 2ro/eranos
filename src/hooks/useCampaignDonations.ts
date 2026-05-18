@@ -17,10 +17,17 @@ export interface CampaignDonationStats {
  * Aggregates donation receipts (kind 8333 events) for a campaign by its
  * addressable coordinate.
  *
- * The returned `totalSats` is the **self-reported** sum of the `amount` tags
- * across deduped transactions. Per the NIP.md spec, a strict client would
- * verify each receipt against the on-chain transaction before counting it.
- * That's left to a future iteration — see TODO inline.
+ * Each kind 8333 event's `amount` tag is the total sats paid to the
+ * recipients listed in that event (see `NIP.md`). New donations publish a
+ * single event per tx covering every recipient; legacy donations published
+ * one event per recipient. In either case, summing `amount` across all
+ * events that tag the campaign yields the campaign's total — the legacy
+ * per-recipient amounts sum to the full donation, and the new per-tx
+ * amount IS the full donation.
+ *
+ * The returned `totalSats` is **self-reported**. Per the NIP.md spec a
+ * strict client would verify each receipt against the on-chain transaction
+ * before counting it; that's left to a future iteration (see TODO inline).
  */
 export function useCampaignDonations(aTag: string | undefined) {
   const { nostr } = useNostr();
@@ -36,7 +43,8 @@ export function useCampaignDonations(aTag: string | undefined) {
         { signal: c.signal },
       );
 
-      const txTotals = new Map<string, number>();
+      let totalSats = 0;
+      const txids = new Set<string>();
       const donors = new Set<string>();
       for (const event of events) {
         const txid = event.tags.find(([n]) => n === 'i')?.[1]?.replace(/^bitcoin:tx:/, '');
@@ -44,30 +52,20 @@ export function useCampaignDonations(aTag: string | undefined) {
         const amount = amountTag ? Number(amountTag) : NaN;
         if (!txid || !Number.isFinite(amount) || amount <= 0) continue;
 
-        // Sum per-recipient amounts within the same tx. Multiple receipts for
-        // the same (txid, recipient) collapse to the largest claimed amount;
-        // multiple receipts for the same txid across different recipients sum.
-        const key = `${txid}:${event.tags.find(([n]) => n === 'p')?.[1] ?? ''}`;
-        const prev = txTotals.get(key) ?? 0;
-        if (amount > prev) txTotals.set(key, amount);
+        totalSats += amount;
+        txids.add(txid);
         donors.add(event.pubkey);
       }
 
       // TODO: verify each txid against mempool.space and sum only the outputs
-      // that pay recipients' derived Taproot addresses. Until then the total
-      // is best-effort and trivially spoofable.
-      const totalSats = Array.from(txTotals.values()).reduce((sum, n) => sum + n, 0);
-
-      const uniqueTxids = new Set<string>();
-      for (const key of txTotals.keys()) {
-        uniqueTxids.add(key.split(':')[0]);
-      }
+      // that pay listed recipients' derived Taproot addresses. Until then the
+      // total is best-effort and trivially spoofable.
 
       const receipts = [...events].sort((a, b) => b.created_at - a.created_at);
 
       return {
         totalSats,
-        txCount: uniqueTxids.size,
+        txCount: txids.size,
         donorCount: donors.size,
         receipts,
       };

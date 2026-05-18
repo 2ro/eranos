@@ -29,11 +29,6 @@ export interface DonateCampaignArgs {
   feeSpeed?: DonationFeeSpeed;
 }
 
-export interface DonateCampaignPublishFailure {
-  pubkey: string;
-  reason: string;
-}
-
 export interface DonateCampaignResult {
   /** The broadcast Bitcoin txid. */
   txid: string;
@@ -43,10 +38,10 @@ export interface DonateCampaignResult {
   recipientCount: number;
   /** Total sent to recipients (donation amount; excludes fee). */
   totalSats: number;
-  /** kind 8333 receipts that successfully published. */
-  publishedReceipts: number;
-  /** kind 8333 receipts that failed to publish (the on-chain tx is still final). */
-  publishFailed: DonateCampaignPublishFailure[];
+  /** Whether the kind 8333 donation receipt published successfully. */
+  receiptPublished: boolean;
+  /** Reason the receipt failed to publish, if any. The on-chain tx is still final. */
+  receiptPublishError?: string;
 }
 
 function feeRateForSpeed(rates: FeeRates, speed: DonationFeeSpeed): number {
@@ -65,14 +60,15 @@ function errorMessage(error: unknown): string {
 /**
  * Mutation hook that sends a single multi-output Bitcoin transaction to all
  * of a campaign's recipients (split per their weights), broadcasts it via
- * mempool.space, and then publishes one kind 8333 onchain-zap receipt per
- * recipient referencing the campaign's addressable coordinate.
+ * mempool.space, and then publishes a single kind 8333 onchain-zap receipt
+ * for the transaction referencing the campaign's addressable coordinate and
+ * listing every recipient under its own `p` tag.
  *
  * Returns an async function that throws on any pre-broadcast failure
  * (insufficient funds, signer not available, dust, etc.). Once the tx is
- * broadcast, the function always resolves: kind 8333 publish failures are
- * reported in {@link DonateCampaignResult.publishFailed} rather than thrown,
- * because the donation itself is already final on-chain.
+ * broadcast, the function always resolves: a kind 8333 publish failure is
+ * reported in {@link DonateCampaignResult.receiptPublished} rather than
+ * thrown, because the donation itself is already final on-chain.
  */
 export function useDonateCampaign() {
   const { user } = useCurrentUser();
@@ -146,33 +142,40 @@ export function useDonateCampaign() {
     const txHex = finalizePsbt(signedHex);
     const txid = await broadcastTransaction(txHex, esploraBaseUrl);
 
-    // Publish one kind 8333 receipt per recipient. The on-chain tx is already
-    // final at this point; we record per-recipient publish failures rather
-    // than throwing so the donor sees a successful result even if one relay
-    // hiccups.
-    const publishFailed: DonateCampaignPublishFailure[] = [];
-    let publishedReceipts = 0;
-    for (const split of splits) {
-      try {
-        await publishEvent({
-          kind: 8333,
-          content: comment,
-          tags: [
-            ['i', `bitcoin:tx:${txid}`],
-            ['p', split.pubkey],
-            ['amount', String(split.amountSats)],
-            ['a', campaign.aTag],
-            ['K', String(campaign.event.kind)],
-            [
-              'alt',
-              `Donation to ${campaign.title}: ${split.amountSats.toLocaleString()} sats`,
-            ],
+    // Publish a single kind 8333 receipt covering the whole transaction. The
+    // event lists every recipient under its own `p` tag; the `amount` tag is
+    // the combined total paid to all recipients (i.e. the full donation,
+    // excluding the donor's change). Per-recipient amounts are recomputed
+    // from the on-chain tx at display time by matching each recipient's
+    // derived Taproot address against the tx outputs.
+    //
+    // The on-chain tx is already final at this point; we record a publish
+    // failure rather than throwing so the donor sees a successful result
+    // even if the relay hiccups.
+    const totalSats = splits.reduce((sum, s) => sum + s.amountSats, 0);
+    let receiptPublished = false;
+    let receiptPublishError: string | undefined;
+    try {
+      await publishEvent({
+        kind: 8333,
+        content: comment,
+        tags: [
+          ['i', `bitcoin:tx:${txid}`],
+          ...splits.map((s) => ['p', s.pubkey]),
+          ['amount', String(totalSats)],
+          ['a', campaign.aTag],
+          ['K', String(campaign.event.kind)],
+          [
+            'alt',
+            splits.length === 1
+              ? `Donation to ${campaign.title}: ${totalSats.toLocaleString()} sats`
+              : `Donation to ${campaign.title}: ${totalSats.toLocaleString()} sats across ${splits.length} recipients`,
           ],
-        });
-        publishedReceipts++;
-      } catch (error) {
-        publishFailed.push({ pubkey: split.pubkey, reason: errorMessage(error) });
-      }
+        ],
+      });
+      receiptPublished = true;
+    } catch (error) {
+      receiptPublishError = errorMessage(error);
     }
 
     // Invalidate caches that depend on UTXOs or donation totals.
@@ -186,9 +189,9 @@ export function useDonateCampaign() {
       txid,
       fee,
       recipientCount: splits.length,
-      totalSats: splits.reduce((sum, s) => sum + s.amountSats, 0),
-      publishedReceipts,
-      publishFailed,
+      totalSats,
+      receiptPublished,
+      receiptPublishError,
     };
   }
 

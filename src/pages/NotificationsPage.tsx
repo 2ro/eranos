@@ -25,7 +25,7 @@ import { nip19 } from 'nostr-tools';
 import { isReplyEvent } from '@/lib/nostrEvents';
 import { useProfileUrl } from '@/hooks/useProfileUrl';
 import { formatNumber } from '@/lib/formatNumber';
-import { getZapAmountSats, getZapSenderPubkey } from '@/lib/zapHelpers';
+import { getZapAmountSats, getZapAmountSatsForRecipient, getZapSenderPubkey } from '@/lib/zapHelpers';
 import { encodeEventAddress } from '@/lib/encodeEvent';
 import { cn } from '@/lib/utils';
 import { ProfileHoverCard } from '@/components/ProfileHoverCard';
@@ -530,8 +530,16 @@ function ActionLink({ event, children }: { event: NostrEvent | undefined; childr
 
 function ZapNotification({ item, isNew }: { item: NotificationItem; isNew: boolean }) {
   const { event } = item;
+  const { user } = useCurrentUser();
 
-  const zapAmount = useMemo(() => getZapAmountSats(event), [event]);
+  // For kind 8333 multi-recipient receipts (campaign donations, batch zaps),
+  // attribute only the viewer's share of the total — otherwise the
+  // notification would credit the user with the full multi-recipient
+  // donation.
+  const zapAmount = useMemo(
+    () => (user ? getZapAmountSatsForRecipient(event, user.pubkey) : getZapAmountSats(event)),
+    [event, user],
+  );
   const senderPubkey = useMemo(() => getZapSenderPubkey(event), [event]);
 
   const amountLabel = zapAmount > 0 ? ` ${formatNumber(zapAmount)} sats` : '';
@@ -596,15 +604,20 @@ function RepostNotificationGroup({ group }: { group: GroupedNotificationItem }) 
 // Zap Notification (grouped)
 // ──────────────────────────────────────
 function ZapNotificationGroup({ group }: { group: GroupedNotificationItem }) {
+  const { user } = useCurrentUser();
   // Sum zap amounts across all actors in the group. Mixes lightning (9735)
   // and on-chain (8333) zaps — both contribute their sat value to the total.
+  // For multi-recipient kind 8333 events we attribute only the viewer's
+  // slice of the total (not the full donation across N recipients).
   const totalSats = useMemo(() => {
     let total = 0;
     for (const item of group.actors) {
-      total += getZapAmountSats(item.event);
+      total += user
+        ? getZapAmountSatsForRecipient(item.event, user.pubkey)
+        : getZapAmountSats(item.event);
     }
     return total;
-  }, [group.actors]);
+  }, [group.actors, user]);
 
   // Extract sender pubkeys from zap events to use as the actor pubkeys
   // (for 9735 the receipt is signed by the LNURL provider; for 8333 the

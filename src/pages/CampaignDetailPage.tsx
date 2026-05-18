@@ -143,41 +143,37 @@ function CampaignDetailContent({ campaign }: { campaign: ParsedCampaign }) {
   // created_at. ThreadedReplyList renders each via NoteCard, which has a
   // dedicated zap-receipt layout that already handles kind 8333.
   //
-  // A single donation produces one kind 8333 receipt per beneficiary (same
-  // txid, same donor), so we dedupe by `(txid, donorPubkey)` and rewrite the
-  // canonical receipt's `amount` tag to the summed total so the card shows
-  // the full donation rather than one beneficiary's share.
+  // New donations produce one kind 8333 event for the whole tx; legacy
+  // donations produced one event per beneficiary sharing the same txid and
+  // donor. To render either as a single donation card, we group by
+  // `(txid, donor)` and sum each group's `amount` tags into the canonical
+  // (newest) event. New-schema donations are a singleton group whose sum
+  // already equals the event's own `amount`; legacy donations collapse
+  // their N events into one card showing the donation total.
   const donationReceipts = useMemo((): NostrEvent[] => {
     if (!stats?.receipts || stats.receipts.length === 0) return [];
 
     type Aggregate = {
       canonical: NostrEvent;
       totalSats: number;
-      perRecipient: Map<string, number>;
     };
     const byDonation = new Map<string, Aggregate>();
 
     for (const receipt of stats.receipts) {
       const txid = receipt.tags.find(([n]) => n === 'i')?.[1]?.replace(/^bitcoin:tx:/, '');
-      const recipientPubkey = receipt.tags.find(([n]) => n === 'p')?.[1];
       const amountTag = receipt.tags.find(([n]) => n === 'amount')?.[1];
       const amount = amountTag ? Number(amountTag) : NaN;
-      if (!txid || !recipientPubkey || !Number.isFinite(amount) || amount <= 0) continue;
+      if (!txid || !Number.isFinite(amount) || amount <= 0) continue;
 
       const key = `${txid}:${receipt.pubkey}`;
       const prev = byDonation.get(key);
-      // Same (txid, donor, recipient) → take the largest claim. Different
-      // recipients on the same donation → sum.
-      const perRecipient = prev?.perRecipient ?? new Map<string, number>();
-      const claim = Math.max(perRecipient.get(recipientPubkey) ?? 0, amount);
-      perRecipient.set(recipientPubkey, claim);
-      const totalSats = Array.from(perRecipient.values()).reduce((s, n) => s + n, 0);
-      // Use the newest receipt as the canonical event (so created_at reflects
-      // the latest activity for the donation).
+      const totalSats = (prev?.totalSats ?? 0) + amount;
+      // Use the newest receipt as the canonical event so created_at reflects
+      // the latest activity for the donation.
       const canonical = prev && prev.canonical.created_at >= receipt.created_at
         ? prev.canonical
         : receipt;
-      byDonation.set(key, { canonical, totalSats, perRecipient });
+      byDonation.set(key, { canonical, totalSats });
     }
 
     // Materialise display events with the summed amount tag.
