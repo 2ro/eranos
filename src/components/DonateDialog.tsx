@@ -136,7 +136,7 @@ export function DonateDialog({ campaign, open, onOpenChange, btcPrice }: DonateD
   const [amountUsd, setAmountUsd] = useState<number>(PRESET_AMOUNTS[1].amountUsd);
   const [customUsd, setCustomUsd] = useState('');
   const [comment, setComment] = useState('');
-  const [feeSpeed, setFeeSpeed] = useState<DonationFeeSpeed>('halfHour');
+  const [feeSpeed, setFeeSpeed] = useState<DonationFeeSpeed>('fastest');
   const [result, setResult] = useState<DonateCampaignResult | null>(null);
 
   // Reset when the dialog reopens for a fresh donation.
@@ -541,6 +541,28 @@ function FormView({
 
 // ─── Confirm view ────────────────────────────────────────────────────────────
 
+function BeneficiarySplitRow({ pubkey, amountSats }: { pubkey: string; amountSats: number }) {
+  const author = useAuthor(pubkey);
+  const metadata = author.data?.metadata;
+  const name = metadata?.display_name || metadata?.name || genUserName(pubkey);
+
+  return (
+    <tr className="border-b last:border-0 border-border/60">
+      <td className="px-3 py-1.5">
+        <div className="flex min-w-0 flex-wrap items-baseline gap-x-2 gap-y-0.5">
+          <span className="font-medium text-foreground truncate">{name}</span>
+          <span className="font-mono text-muted-foreground">
+            {pubkey.slice(0, 8)}…{pubkey.slice(-4)}
+          </span>
+        </div>
+      </td>
+      <td className="px-3 py-1.5 text-right font-medium">
+        {amountSats.toLocaleString()} sats
+      </td>
+    </tr>
+  );
+}
+
 function ConfirmView({
   campaign,
   amountSats,
@@ -692,14 +714,7 @@ function ConfirmView({
           <table className="w-full text-xs">
             <tbody>
               {splits.map((s) => (
-                <tr key={s.pubkey} className="border-b last:border-0 border-border/60">
-                  <td className="px-3 py-1.5 font-mono text-muted-foreground">
-                    {s.pubkey.slice(0, 8)}…{s.pubkey.slice(-4)}
-                  </td>
-                  <td className="px-3 py-1.5 text-right font-medium">
-                    {s.amountSats.toLocaleString()} sats
-                  </td>
-                </tr>
+                <BeneficiarySplitRow key={s.pubkey} pubkey={s.pubkey} amountSats={s.amountSats} />
               ))}
             </tbody>
           </table>
