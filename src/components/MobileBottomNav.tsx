@@ -1,6 +1,5 @@
 import { useCallback, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { useQueryClient } from '@tanstack/react-query';
 import { Bell, Earth, Search, Users } from 'lucide-react';
 import { AgoraBoltIcon } from '@/components/icons/AgoraBoltIcon';
 import { cn } from '@/lib/utils';
@@ -8,9 +7,7 @@ import { selectionChanged } from '@/lib/haptics';
 import { useHasUnreadNotifications } from '@/hooks/useHasUnreadNotifications';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useScrollDirection } from '@/hooks/useScrollDirection';
-import { useAppContext } from '@/hooks/useAppContext';
 import { useLayoutSnapshot } from '@/contexts/LayoutContext';
-import { getSidebarItem } from '@/lib/sidebarItems';
 import { ArcBackground, ARC_UP_OVERHANG_PX } from '@/components/ArcBackground';
 import { MobileSearchSheet } from '@/components/MobileSearchSheet';
 
@@ -55,15 +52,10 @@ function NavItem({ icon: Icon, label, active, badge, onClick, to, size = 'md' }:
 
 export function MobileBottomNav() {
   const location = useLocation();
-  const queryClient = useQueryClient();
   const { user } = useCurrentUser();
   const hasUnread = useHasUnreadNotifications();
   const { scrollContainer, noArcs } = useLayoutSnapshot();
   const { hidden } = useScrollDirection(scrollContainer);
-
-  const { config } = useAppContext();
-  const homeItem = getSidebarItem(config.homePage);
-  const homePath = homeItem?.path ?? '/';
 
   const [searchOpen, setSearchOpen] = useState(false);
 
@@ -73,21 +65,19 @@ export function MobileBottomNav() {
     setSearchOpen((v) => !v);
   }, []);
 
-  const handleFeedClick = useCallback((e: React.MouseEvent) => {
+  const handleWalletClick = useCallback((e: React.MouseEvent) => {
     selectionChanged();
     setSearchOpen(false);
-    if (location.pathname === '/' || location.pathname === homePath) {
+    if (location.pathname === '/wallet') {
       e.preventDefault();
       window.scrollTo({ top: 0, behavior: 'smooth' });
-      void queryClient.invalidateQueries({ queryKey: ['feed'] });
-      void queryClient.invalidateQueries({ queryKey: ['ditto-curated-feed'] });
     }
-  }, [location.pathname, homePath, queryClient]);
+  }, [location.pathname]);
 
   // Hide the nav when search sheet is open so it doesn't compete for space
   const isHidden = hidden || searchOpen;
 
-  const isOnFeed = location.pathname === '/' || location.pathname === homePath;
+  const isOnWallet = location.pathname === '/wallet';
   const isOnCommunities = location.pathname === '/communities' || location.pathname.startsWith('/communities/');
   const isOnWorld = location.pathname === '/world' || location.pathname.startsWith('/world/');
   const isOnNotifications = location.pathname === '/notifications';
@@ -151,11 +141,11 @@ export function MobileBottomNav() {
 
           </div>
 
-          {/* Apex Feed button — Agora bolt mark cradled in the V notch, with label below. */}
+          {/* Apex Wallet button — Agora bolt mark cradled in the V notch. */}
           <Link
-            to={homePath}
-            onClick={handleFeedClick}
-            aria-label={homeItem?.label ?? 'Feed'}
+            to="/wallet"
+            onClick={handleWalletClick}
+            aria-label="Wallet"
             className={cn(
               'absolute left-1/2 -translate-x-1/2 z-10 -top-6',
               'flex items-center',
@@ -165,7 +155,7 @@ export function MobileBottomNav() {
             <AgoraBoltIcon
               className={cn(
                 'size-16 drop-shadow-md',
-                isOnFeed && 'drop-shadow-[0_0_8px_hsl(var(--primary)/0.6)]',
+                isOnWallet && 'drop-shadow-[0_0_8px_hsl(var(--primary)/0.6)]',
               )}
             />
           </Link>
