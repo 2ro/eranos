@@ -4,11 +4,12 @@ import { useSeoMeta } from '@unhead/react';
 import { useQueries } from '@tanstack/react-query';
 import { useNostr } from '@nostrify/react';
 import { nip19 } from 'nostr-tools';
-import { HandHeart, PlusCircle, Sparkles } from 'lucide-react';
+import { HandHeart, PlusCircle } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { CampaignCard, CampaignCardSkeleton } from '@/components/CampaignCard';
+import { HeroGlobe } from '@/components/HeroGlobe';
 import { useCampaigns } from '@/hooks/useCampaigns';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useLayoutOptions } from '@/contexts/LayoutContext';
@@ -19,6 +20,8 @@ import {
   type ParsedCampaign,
 } from '@/lib/campaign';
 import { FEATURED_CAMPAIGN_NADDRS } from '@/lib/featuredCampaigns';
+import { searchCountry } from '@/lib/countries';
+import { getCoordinates } from '@/lib/coordinates';
 
 /**
  * Decodes a featured-campaign naddr and returns its coordinate. Returns
@@ -114,22 +117,54 @@ export function CampaignsPage() {
     [allCampaigns, featuredCoords],
   );
 
+  // Geo-locate campaigns for the hero globe. We match the free-form
+  // `location` field against ISO 3166-1 names/codes and fall back to the
+  // country capital coordinates. Campaigns without a resolvable location
+  // simply don't get a marker.
+  const globeMarkers = useMemo(() => {
+    const out: { key: string; lat: number; lng: number }[] = [];
+    const seen = new Set<string>();
+    for (const c of allCampaigns ?? []) {
+      if (!c.location) continue;
+      const match = searchCountry(c.location);
+      if (!match) continue;
+      const coords = getCoordinates(match.country.code);
+      if (!coords) continue;
+      // Deduplicate by country so a single popular country doesn't pile
+      // dozens of overlapping markers on top of each other.
+      if (seen.has(match.country.code)) continue;
+      seen.add(match.country.code);
+      out.push({ key: c.aTag, lat: coords.latitude, lng: coords.longitude });
+    }
+    return out;
+  }, [allCampaigns]);
+
   return (
     <main className="min-h-screen pb-16">
       {/* Hero */}
       <section className="relative overflow-hidden border-b border-border bg-gradient-to-br from-primary/15 via-background to-secondary/40">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-14 lg:py-20">
+        {/* Slow-spinning globe sits behind the text. Positioned to the right
+            on wider viewports so it doesn't fight the headline for attention,
+            and pulled mostly off-screen on mobile so it still reads as an
+            ambient accent without crowding the copy. */}
+        <div
+          className="pointer-events-none absolute inset-y-0 right-[-30%] sm:right-[-20%] lg:right-[-8%] flex items-center justify-end opacity-60 sm:opacity-70"
+          aria-hidden="true"
+        >
+          <HeroGlobe
+            markers={globeMarkers}
+            className="aspect-square w-[520px] sm:w-[600px] lg:w-[680px] max-w-none"
+          />
+        </div>
+
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 py-14 lg:py-20">
           <div className="max-w-3xl space-y-5">
-            <div className="inline-flex items-center gap-2 rounded-full bg-background/70 backdrop-blur px-3 py-1 border border-border text-xs font-medium">
-              <Sparkles className="size-3.5 text-primary" />
-              Unstoppable fundraising on Nostr
-            </div>
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight leading-[1.1]">
               Connecting activists to unstoppable funding.
             </h1>
             <p className="text-base sm:text-lg text-muted-foreground max-w-2xl">
               Raise Bitcoin directly from supporters around the world. Every donation settles
-              straight to your campaign's beneficiaries — no middlemen, no chargebacks, no
+              straight to your campaign's beneficiaries, with no middlemen, no chargebacks, and no
               platform holding your funds.
             </p>
             <div className="flex flex-wrap gap-3 pt-2">
