@@ -9,15 +9,15 @@ import {
   Check,
   ChevronRight,
   Clock,
-  ImagePlus,
   Info,
   Loader2,
   Megaphone,
   Palette,
   Plus,
-  X,
 } from 'lucide-react';
 
+import { CoverImageField } from '@/components/CoverImageField';
+import { FormSection } from '@/components/FormSection';
 import { TimezoneSwitcher } from '@/components/TimezoneSwitcher';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
@@ -43,11 +43,11 @@ import { Textarea } from '@/components/ui/textarea';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useNostrPublish } from '@/hooks/useNostrPublish';
 import { useToast } from '@/hooks/useToast';
-import { useUploadFile } from '@/hooks/useUploadFile';
 import type { Action } from '@/hooks/useActions';
 import { useLayoutOptions } from '@/contexts/LayoutContext';
 import { countryCodeToFlag, getAllCountries, getGeoDisplayName } from '@/lib/countries';
 import { createCountryIdentifier } from '@/lib/countryIdentifiers';
+import { getTodayDateInput } from '@/lib/dateInput';
 import { DEFAULT_ACTION_COVERS } from '@/lib/defaultActionCovers';
 import { sanitizeUrl } from '@/lib/sanitizeUrl';
 import { cn } from '@/lib/utils';
@@ -90,17 +90,6 @@ function unixSecondsInTimezone(
   return Math.floor((utcGuess + (utcGuess - asWallClock)) / 1000);
 }
 
-/**
- * Today, formatted as a YYYY-MM-DD string in the user's local timezone — the
- * minimum value we accept for the deadline picker so users can't choose a date
- * in the past. Mirrors the helper in CreateCampaignPage.
- */
-function getTodayDateInput(): string {
-  const date = new Date();
-  date.setMinutes(date.getMinutes() - date.getTimezoneOffset());
-  return date.toISOString().slice(0, 10);
-}
-
 export function CreateActionPage() {
   useLayoutOptions({ noMaxWidth: true, rightSidebar: null });
 
@@ -109,7 +98,6 @@ export function CreateActionPage() {
   const [searchParams] = useSearchParams();
   const queryClient = useQueryClient();
   const { mutateAsync: createEvent } = useNostrPublish();
-  const { mutateAsync: uploadFile, isPending: isUploading } = useUploadFile();
   const { toast } = useToast();
 
   const browserTimezone = useMemo(
@@ -169,67 +157,6 @@ export function CreateActionPage() {
     return options;
   }, [pageCountryCode, allCountries]);
 
-  /**
-   * Shared upload path used by both the file-input change handler and the
-   * drag-and-drop handler. Validates the MIME type up front so a stray
-   * dragged-in PDF or video doesn't end up posted to a Blossom server.
-   */
-  const uploadCoverFile = async (file: File) => {
-    if (!/^image\/(png|jpeg|webp)$/.test(file.type)) {
-      toast({
-        title: 'Unsupported file type',
-        description: 'Cover image must be PNG, JPG, or WEBP.',
-        variant: 'destructive',
-      });
-      return;
-    }
-    try {
-      const [[, url]] = await uploadFile(file);
-      setCoverImage(url);
-    } catch (error) {
-      toast({
-        title: 'Upload failed',
-        description: error instanceof Error ? error.message : String(error),
-        variant: 'destructive',
-      });
-    }
-  };
-
-  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    e.currentTarget.value = '';
-    if (!file) return;
-    await uploadCoverFile(file);
-  };
-
-  const [isDraggingCover, setIsDraggingCover] = useState(false);
-
-  const handleCoverDragOver = (e: React.DragEvent<HTMLLabelElement>) => {
-    // Without preventDefault, the browser navigates to the dropped file
-    // instead of letting our onDrop handler claim it.
-    e.preventDefault();
-    if (isUploading) return;
-    e.dataTransfer.dropEffect = 'copy';
-    if (!isDraggingCover) setIsDraggingCover(true);
-  };
-
-  const handleCoverDragLeave = (e: React.DragEvent<HTMLLabelElement>) => {
-    // Only clear the highlight when the cursor actually leaves the label.
-    // Dragging over a child element fires dragleave on the parent in some
-    // browsers, so we re-check relatedTarget.
-    if (e.currentTarget.contains(e.relatedTarget as Node | null)) return;
-    setIsDraggingCover(false);
-  };
-
-  const handleCoverDrop = async (e: React.DragEvent<HTMLLabelElement>) => {
-    e.preventDefault();
-    setIsDraggingCover(false);
-    if (isUploading) return;
-    const file = e.dataTransfer.files?.[0];
-    if (!file) return;
-    await uploadCoverFile(file);
-  };
-
   const submitMutation = useMutation({
     mutationFn: async () => {
       if (!user) throw new Error('You must be logged in to create an action.');
@@ -266,8 +193,9 @@ export function CreateActionPage() {
         tags.push(['i', createCountryIdentifier(selectedCountry.toUpperCase())]);
       }
 
-      if (coverImage) {
-        tags.push(['image', coverImage]);
+      const sanitizedImage = coverImage.trim() ? sanitizeUrl(coverImage.trim()) : undefined;
+      if (sanitizedImage) {
+        tags.push(['image', sanitizedImage]);
       }
 
       if (startDate) {
@@ -494,96 +422,10 @@ export function CreateActionPage() {
 
           {/* Cover image */}
           <FormSection title="Cover image" requirement="Recommended">
-            <label
-              onDragOver={handleCoverDragOver}
-              onDragEnter={handleCoverDragOver}
-              onDragLeave={handleCoverDragLeave}
-              onDrop={handleCoverDrop}
-              className={cn(
-                'relative block h-40 w-full cursor-pointer overflow-hidden rounded-xl border-2 border-dashed border-border bg-gradient-to-br from-muted/40 via-background to-muted/20 motion-safe:transition-colors hover:border-primary sm:h-48',
-                isDraggingCover && 'border-primary bg-primary/5',
-                isUploading && 'opacity-70 pointer-events-none',
-              )}
-            >
-              {sanitizeUrl(coverImage) ? (
-                <>
-                  <img
-                    src={sanitizeUrl(coverImage)}
-                    alt=""
-                    className="absolute inset-0 size-full object-cover"
-                  />
-                  <button
-                    type="button"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      setCoverImage('');
-                    }}
-                    className="absolute top-3 right-3 rounded-full bg-background/85 backdrop-blur p-1.5 hover:bg-background motion-safe:transition-colors"
-                    aria-label="Remove image"
-                  >
-                    <X className="size-4" />
-                  </button>
-                </>
-              ) : (
-                <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 text-muted-foreground">
-                  {isUploading ? (
-                    <>
-                      <Loader2 className="size-8 animate-spin" />
-                      <span className="text-sm">Uploading…</span>
-                    </>
-                  ) : (
-                    <>
-                      <ImagePlus className="size-8" />
-                      <span className="text-sm">Click or drag an image here</span>
-                      <span className="text-xs">PNG, JPG, or WEBP</span>
-                    </>
-                  )}
-                </div>
-              )}
-              <input
-                type="file"
-                accept="image/png,image/jpeg,image/webp"
-                className="sr-only"
-                onChange={handleFileUpload}
-                disabled={isUploading}
-              />
-            </label>
-
-            <div className="relative w-full overflow-hidden">
-              <div className="flex gap-2 overflow-x-auto pb-2 -mx-1 px-1">
-                {DEFAULT_ACTION_COVERS.map((cover) => {
-                  const isActive = coverImage === cover.url;
-                  return (
-                    <button
-                      key={cover.id}
-                      type="button"
-                      onClick={() => setCoverImage(cover.url)}
-                      className={cn(
-                        'relative h-20 w-28 flex-shrink-0 rounded-md overflow-hidden border-2 transition-all',
-                        isActive
-                          ? 'border-primary ring-2 ring-primary/50'
-                          : 'border-border hover:border-primary/50',
-                      )}
-                      title={cover.name}
-                      aria-label={`Use ${cover.name} cover`}
-                    >
-                      <img
-                        src={cover.url}
-                        alt={cover.name}
-                        className="w-full h-full object-cover"
-                      />
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-
-            <Input
-              type="url"
-              inputMode="url"
-              placeholder="Or paste an https:// image URL"
+            <CoverImageField
               value={coverImage}
-              onChange={(e) => setCoverImage(e.target.value)}
+              onChange={setCoverImage}
+              templates={DEFAULT_ACTION_COVERS}
             />
           </FormSection>
 
@@ -677,32 +519,6 @@ export function CreateActionPage() {
         </div>
       </form>
     </main>
-  );
-}
-
-// ─── Layout helpers ──────────────────────────────────────────────────────────
-
-function FormSection({
-  title,
-  requirement,
-  children,
-}: {
-  title: string;
-  requirement: 'Required' | 'Recommended' | 'Optional';
-  children: React.ReactNode;
-}) {
-  return (
-    <section className="space-y-2.5 rounded-xl p-3 sm:p-4">
-      <div className="space-y-0.5">
-        <h2 className="flex items-center gap-2 text-lg font-semibold">
-          {title}
-          <span className="text-xs font-medium text-muted-foreground">
-            {requirement}
-          </span>
-        </h2>
-      </div>
-      <div className="space-y-2.5">{children}</div>
-    </section>
   );
 }
 
