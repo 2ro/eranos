@@ -450,7 +450,7 @@ export function CampaignsPage() {
             <div>
               <h2 className="text-2xl sm:text-3xl font-bold tracking-tight">All campaigns</h2>
               <p className="text-sm text-muted-foreground mt-1">
-                Community-submitted fundraisers, reviewed by Team Soapbox.
+                Community-submitted fundraisers from across Nostr.
               </p>
             </div>
             <Button asChild variant="outline" className="hidden sm:inline-flex">
