@@ -1,10 +1,10 @@
-import { useCallback, useMemo, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { useSeoMeta } from '@unhead/react';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useNostr } from '@nostrify/react';
 import { nip19 } from 'nostr-tools';
-import type { NostrEvent } from '@nostrify/nostrify';
+import type { NostrEvent, NostrMetadata } from '@nostrify/nostrify';
 import {
   AlertTriangle,
   ArrowLeft,
@@ -23,6 +23,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import { parseAuthorEvent } from '@/hooks/useAuthor';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useNostrPublish } from '@/hooks/useNostrPublish';
 import { useToast } from '@/hooks/useToast';
@@ -31,7 +32,10 @@ import { useLayoutOptions } from '@/contexts/LayoutContext';
 import {
   BADGE_DEFINITION_KIND,
   COMMUNITY_DEFINITION_KIND,
+  parseCommunityEvent,
+  type ParsedCommunity,
 } from '@/lib/communityUtils';
+import { fetchFreshEvent } from '@/lib/fetchFreshEvent';
 import { genUserName } from '@/lib/genUserName';
 import { sanitizeUrl } from '@/lib/sanitizeUrl';
 
@@ -50,9 +54,8 @@ function slugify(text: string): string {
 }
 
 /**
- * Build a minimal SearchProfile shell when we only know a pubkey. PersonSearch
- * hands us full profiles, but anywhere we synthesize a pending moderator
- * row (e.g. the founder pinned at the top of the list) we need this stub.
+ * Build a minimal SearchProfile shell when we only know a pubkey. Used as a
+ * fallback row for any moderator whose kind-0 metadata isn't reachable.
  */
 function makeProfileFromPubkey(pubkey: string): SearchProfile {
   return {
@@ -70,30 +73,191 @@ function makeProfileFromPubkey(pubkey: string): SearchProfile {
   };
 }
 
+function makeProfileFromAuthor(
+  pubkey: string,
+  author: { event?: NostrEvent; metadata?: NostrMetadata } | undefined,
+): SearchProfile {
+  if (!author?.event) return makeProfileFromPubkey(pubkey);
+  return {
+    pubkey,
+    metadata: author.metadata ?? {},
+    event: author.event,
+  };
+}
+
+interface EditTarget {
+  pubkey: string;
+  identifier: string;
+  relays?: string[];
+}
+
+/**
+ * Decode an `?edit=<naddr>` query param into a typed target. Returns null
+ * for anything that isn't a valid kind-34550 naddr, which we surface as the
+ * "Invalid edit link" guard card below.
+ */
+function getEditTarget(value: string | null): EditTarget | null {
+  if (!value) return null;
+  try {
+    const decoded = nip19.decode(value);
+    if (decoded.type !== 'naddr' || decoded.data.kind !== COMMUNITY_DEFINITION_KIND) {
+      return null;
+    }
+    return {
+      pubkey: decoded.data.pubkey,
+      identifier: decoded.data.identifier,
+      ...(decoded.data.relays ? { relays: decoded.data.relays } : {}),
+    };
+  } catch {
+    return null;
+  }
+}
+
 export function CreateCommunityPage() {
   useLayoutOptions({ noMaxWidth: true, rightSidebar: null });
 
   const { user } = useCurrentUser();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const queryClient = useQueryClient();
   const { nostr } = useNostr();
   const { mutateAsync: publishEvent } = useNostrPublish();
   const { toast } = useToast();
 
+  const editNaddr = searchParams.get('edit');
+  const editTarget = useMemo(() => getEditTarget(editNaddr), [editNaddr]);
+  const isEditMode = !!editNaddr;
+
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [imageUrl, setImageUrl] = useState('');
-  // Additional moderators on top of the founder, who is always the first
-  // moderator and rendered separately so they can't be removed.
+  // Additional moderators on top of the founder. The founder is implicit —
+  // they're always pubkey #0 in the published moderator list and are not
+  // rendered as a chip here.
   const [moderators, setModerators] = useState<SearchProfile[]>([]);
   const [formError, setFormError] = useState('');
+  const [prepopulatedEventId, setPrepopulatedEventId] = useState<string | null>(null);
+
+  // Fetch the existing community when editing.
+  const editCommunityQuery = useQuery({
+    queryKey: ['community', editTarget?.pubkey ?? '', editTarget?.identifier ?? ''],
+    queryFn: async ({ signal }): Promise<{ event: NostrEvent; community: ParsedCommunity } | null> => {
+      if (!editTarget) return null;
+      const events = await nostr.query(
+        [
+          {
+            kinds: [COMMUNITY_DEFINITION_KIND],
+            authors: [editTarget.pubkey],
+            '#d': [editTarget.identifier],
+            limit: 5,
+          },
+        ],
+        { signal },
+      );
+      if (events.length === 0) return null;
+      const newest = events.reduce((latest, current) =>
+        current.created_at > latest.created_at ? current : latest,
+      );
+      const community = parseCommunityEvent(newest);
+      if (!community) return null;
+      return { event: newest, community };
+    },
+    enabled: isEditMode && !!editTarget,
+    staleTime: 30_000,
+  });
+
+  const editCommunity = isEditMode ? editCommunityQuery.data ?? null : null;
+  const editModeratorPubkeys = useMemo(
+    () => editCommunity?.community.moderatorPubkeys ?? [],
+    [editCommunity],
+  );
+
+  // Resolve kind-0 profiles for the existing moderators so the chip rows
+  // can render avatars and names. Mirrors the campaign edit-recipients
+  // query so we get the same caching behavior.
+  const editModeratorProfiles = useQuery({
+    queryKey: ['community-edit-moderators', editModeratorPubkeys],
+    queryFn: async ({ signal }): Promise<SearchProfile[]> => {
+      const cachedProfiles = new Map<string, SearchProfile>();
+      const missingPubkeys: string[] = [];
+
+      for (const pubkey of editModeratorPubkeys) {
+        const cachedAuthor = queryClient.getQueryData<{ event?: NostrEvent; metadata?: NostrMetadata }>([
+          'author',
+          pubkey,
+        ]);
+        if (cachedAuthor?.event) {
+          cachedProfiles.set(pubkey, makeProfileFromAuthor(pubkey, cachedAuthor));
+        } else {
+          missingPubkeys.push(pubkey);
+        }
+      }
+
+      if (missingPubkeys.length > 0) {
+        const events = await nostr.query(
+          [{ kinds: [0], authors: missingPubkeys, limit: missingPubkeys.length }],
+          { signal },
+        );
+
+        const latestByPubkey = new Map<string, NostrEvent>();
+        for (const event of events) {
+          const existing = latestByPubkey.get(event.pubkey);
+          if (!existing || event.created_at > existing.created_at) {
+            latestByPubkey.set(event.pubkey, event);
+          }
+        }
+
+        for (const pubkey of missingPubkeys) {
+          const event = latestByPubkey.get(pubkey);
+          if (!event) continue;
+          const parsed = parseAuthorEvent(event);
+          queryClient.setQueryData(['author', pubkey], parsed);
+          cachedProfiles.set(pubkey, makeProfileFromAuthor(pubkey, parsed));
+        }
+      }
+
+      return editModeratorPubkeys.map(
+        (pubkey) => cachedProfiles.get(pubkey) ?? makeProfileFromPubkey(pubkey),
+      );
+    },
+    enabled: isEditMode && editModeratorPubkeys.length > 0,
+    staleTime: 5 * 60 * 1000,
+  });
 
   const derivedSlug = useMemo(() => slugify(name), [name]);
+  // The d-tag is immutable once a community is published — the slug shown
+  // in edit mode is whatever the community already has, not a fresh slugify
+  // of the (possibly edited) name.
+  const activeSlug = editCommunity?.community.dTag ?? derivedSlug;
 
   useSeoMeta({
-    title: 'Create community | Agora',
-    description: 'Start a new community on Agora.',
+    title: isEditMode ? 'Edit community | Agora' : 'Create community | Agora',
+    description: isEditMode
+      ? 'Update your community on Agora.'
+      : 'Start a new community on Agora.',
   });
+
+  // Prefill the form when the community loads.
+  useEffect(() => {
+    if (!editCommunity || prepopulatedEventId === editCommunity.event.id) return;
+    setName(editCommunity.community.name);
+    setDescription(editCommunity.community.description);
+    setImageUrl(editCommunity.community.image ?? '');
+    setModerators(editCommunity.community.moderatorPubkeys.map(makeProfileFromPubkey));
+    setPrepopulatedEventId(editCommunity.event.id);
+  }, [editCommunity, prepopulatedEventId]);
+
+  // As kind-0 events resolve, swap pubkey-only stubs for full profiles.
+  useEffect(() => {
+    const profiles = editModeratorProfiles.data;
+    if (!profiles || profiles.length === 0) return;
+    setModerators((prev) =>
+      prev.map((moderator) => {
+        const profile = profiles.find((p) => p.pubkey === moderator.pubkey);
+        return profile ?? moderator;
+      }),
+    );
+  }, [editModeratorProfiles.data]);
 
   const addModerator = useCallback((profile: SearchProfile) => {
     setModerators((prev) =>
@@ -121,24 +285,77 @@ export function CreateCommunityPage() {
   const submitMutation = useMutation({
     mutationFn: async () => {
       if (!user) throw new Error('You must be logged in to create a community.');
+      if (isEditMode && !editCommunity) {
+        throw new Error('Community could not be loaded for editing.');
+      }
+      if (editCommunity && editCommunity.event.pubkey !== user.pubkey) {
+        throw new Error('Only the community founder can edit this community.');
+      }
 
       const trimmedName = name.trim();
       if (!trimmedName) throw new Error('Name is required.');
 
-      const slug = derivedSlug;
+      const slug = activeSlug;
       if (!slug) {
         throw new Error(
           'Name must include letters or numbers so a community URL can be created.',
         );
       }
 
-      // The founder is always pubkey #0 in the moderator list — they
-      // shouldn't end up in the extra-moderators array, but defensively
-      // strip if they did.
-      const extraModerators = moderators.filter(
-        (m) => m.pubkey !== user.pubkey,
-      );
+      // Founder is always implicit and shouldn't be in the extra-moderators
+      // array, but defensively strip if a stale stub snuck in.
+      const extraModerators = moderators.filter((m) => m.pubkey !== user.pubkey);
 
+      const sanitizedImage = imageUrl.trim()
+        ? sanitizeUrl(imageUrl.trim())
+        : undefined;
+
+      // ── Edit branch ────────────────────────────────────────────────────
+      if (isEditMode && editCommunity) {
+        const prev = await fetchFreshEvent(nostr, {
+          kinds: [COMMUNITY_DEFINITION_KIND],
+          authors: [user.pubkey],
+          '#d': [slug],
+        });
+        if (!prev || !parseCommunityEvent(prev)) {
+          throw new Error('Could not find the latest version of this community to update.');
+        }
+
+        // Strip the tag names we're going to rewrite; preserve everything
+        // else (the `a` member-badge tag, any `relay` hints, …).
+        const preserved = prev.tags.filter(
+          ([n, , , role]) =>
+            !['d', 'name', 'description', 'image', 'alt'].includes(n) &&
+            !(n === 'p' && role === 'moderator'),
+        );
+
+        const nextTags: string[][] = [
+          ['d', slug],
+          ['name', trimmedName],
+        ];
+        if (description.trim()) {
+          nextTags.push(['description', description.trim()]);
+        }
+        if (sanitizedImage) {
+          nextTags.push(['image', sanitizedImage]);
+        }
+        nextTags.push(['p', user.pubkey, '', 'moderator']);
+        for (const mod of extraModerators) {
+          nextTags.push(['p', mod.pubkey, '', 'moderator']);
+        }
+        nextTags.push(...preserved);
+        nextTags.push(['alt', `Community: ${trimmedName}`]);
+
+        const updated = await publishEvent({
+          kind: COMMUNITY_DEFINITION_KIND,
+          content: prev.content,
+          tags: nextTags,
+          prev,
+        });
+        return { event: updated, slug, edited: true };
+      }
+
+      // ── Create branch ──────────────────────────────────────────────────
       // d-tag collision check: don't silently overwrite an existing
       // community of yours with the same slug.
       const existing = await nostr.query([
@@ -171,13 +388,7 @@ export function CreateCommunityPage() {
         );
       }
 
-      const sanitizedImage = imageUrl.trim()
-        ? sanitizeUrl(imageUrl.trim())
-        : undefined;
-
       // Mint the implicit "Member of <community>" badge (kind 30009).
-      // Mirrors CreateCommunityDialog so existing badge-award flows on
-      // CommunityDetailPage keep working.
       const badgeEvent: NostrEvent = await publishEvent({
         kind: BADGE_DEFINITION_KIND,
         content: '',
@@ -188,7 +399,6 @@ export function CreateCommunityPage() {
           ['alt', `Badge definition: Member of ${trimmedName}`],
         ],
       });
-
       const badgeATag = `${BADGE_DEFINITION_KIND}:${badgeEvent.pubkey}:${badgeDTag}`;
 
       // Build the kind 34550 community-definition tag set.
@@ -202,9 +412,7 @@ export function CreateCommunityPage() {
       if (sanitizedImage) {
         tags.push(['image', sanitizedImage]);
       }
-      // Member badge reference (NIP-72 style: `a` tag with role "member").
       tags.push(['a', badgeATag, '', 'member']);
-      // Founder is the first moderator.
       tags.push(['p', user.pubkey, '', 'moderator']);
       for (const mod of extraModerators) {
         tags.push(['p', mod.pubkey, '', 'moderator']);
@@ -217,9 +425,9 @@ export function CreateCommunityPage() {
         tags,
       });
 
-      return { event: created, slug };
+      return { event: created, slug, edited: false };
     },
-    onSuccess: async ({ event, slug }) => {
+    onSuccess: async ({ event, slug, edited }) => {
       const naddr = nip19.naddrEncode({
         kind: COMMUNITY_DEFINITION_KIND,
         pubkey: event.pubkey,
@@ -230,6 +438,9 @@ export function CreateCommunityPage() {
         event,
       );
       void queryClient.invalidateQueries({
+        queryKey: ['community', event.pubkey, slug],
+      });
+      void queryClient.invalidateQueries({
         queryKey: ['my-communities'],
         exact: false,
       });
@@ -237,14 +448,14 @@ export function CreateCommunityPage() {
         queryKey: ['community-activity-feed'],
         exact: false,
       });
-      toast({ title: 'Community created!' });
+      toast({ title: edited ? 'Community updated!' : 'Community created!' });
       navigate(`/${naddr}`);
     },
     onError: (error: unknown) => {
       const msg = error instanceof Error ? error.message : String(error);
       setFormError(msg);
       toast({
-        title: 'Could not create community',
+        title: isEditMode ? 'Could not update community' : 'Could not create community',
         description: msg,
         variant: 'destructive',
       });
@@ -272,10 +483,65 @@ export function CreateCommunityPage() {
     );
   }
 
-  // Founder is always rendered first and isn't removable; that mirrors
-  // CreateCommunityDialog (founder is auto-added as the only moderator)
-  // while making the role visible to the user.
-  const founderProfile = makeProfileFromPubkey(user.pubkey);
+  if (isEditMode && !editTarget) {
+    return (
+      <main className="min-h-screen pb-16">
+        <div className="max-w-2xl mx-auto px-4 sm:px-6 py-12">
+          <Card>
+            <CardContent className="py-12 px-8 text-center space-y-4">
+              <AlertTriangle className="size-10 text-muted-foreground/60 mx-auto" />
+              <h2 className="text-xl font-semibold">Invalid edit link</h2>
+              <p className="text-muted-foreground">
+                This community edit link is missing a valid community address.
+              </p>
+              <Button type="button" onClick={() => navigate('/communities/new')}>
+                Start a new community
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
+      </main>
+    );
+  }
+
+  if (isEditMode && editCommunityQuery.isLoading) {
+    return (
+      <main className="min-h-screen pb-16">
+        <div className="max-w-3xl mx-auto px-4 sm:px-6 py-8 lg:py-10">
+          <Card>
+            <CardContent className="py-12 px-8 text-center space-y-3">
+              <Loader2 className="size-8 animate-spin text-muted-foreground mx-auto" />
+              <p className="text-sm text-muted-foreground">Loading community…</p>
+            </CardContent>
+          </Card>
+        </div>
+      </main>
+    );
+  }
+
+  if (
+    isEditMode &&
+    (!editCommunity || editCommunity.event.pubkey !== user.pubkey)
+  ) {
+    return (
+      <main className="min-h-screen pb-16">
+        <div className="max-w-2xl mx-auto px-4 sm:px-6 py-12">
+          <Card>
+            <CardContent className="py-12 px-8 text-center space-y-4">
+              <AlertTriangle className="size-10 text-muted-foreground/60 mx-auto" />
+              <h2 className="text-xl font-semibold">Community cannot be edited</h2>
+              <p className="text-muted-foreground">
+                Only the founder of this community can update it.
+              </p>
+              <Button type="button" onClick={() => navigate(-1)}>
+                Go back
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
+      </main>
+    );
+  }
 
   return (
     <main className="min-h-screen pb-16">
@@ -298,7 +564,7 @@ export function CreateCommunityPage() {
               <ArrowLeft className="size-5" />
             </button>
             <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">
-              Create community
+              {isEditMode ? 'Edit community' : 'Create community'}
             </h1>
           </div>
         </div>
@@ -316,8 +582,9 @@ export function CreateCommunityPage() {
             <p className="text-xs text-muted-foreground">
               URL preview:{' '}
               <span className="font-mono text-foreground">
-                /{derivedSlug || 'your-community-name'}
+                /{activeSlug || 'your-community-name'}
               </span>
+              {isEditMode && ' (kept from original)'}
             </p>
           </FormSection>
 
@@ -342,26 +609,28 @@ export function CreateCommunityPage() {
               <PersonSearch
                 onAdd={addModerator}
                 onAddMany={addModerators}
-                // The founder is always a moderator and not eligible to be
-                // added a second time. Past that, exclude anyone already
-                // queued.
+                // Hide the founder and anyone already queued from search
+                // results so they can't be added twice. The founder isn't
+                // shown as a chip — they're always implicit.
                 excludePubkeys={[user.pubkey, ...moderators.map((m) => m.pubkey)]}
               />
 
-              <Label className="text-xs text-muted-foreground">
-                Moderators ({moderators.length + 1})
-              </Label>
-              <div className="space-y-1.5">
-                <ModeratorRow profile={founderProfile} role="Founder" />
-                {moderators.map((moderator) => (
-                  <ModeratorRow
-                    key={moderator.pubkey}
-                    profile={moderator}
-                    role="Moderator"
-                    onRemove={() => removeModerator(moderator.pubkey)}
-                  />
-                ))}
-              </div>
+              {moderators.length > 0 && (
+                <>
+                  <Label className="text-xs text-muted-foreground">
+                    Moderators ({moderators.length})
+                  </Label>
+                  <div className="space-y-1.5">
+                    {moderators.map((moderator) => (
+                      <ModeratorRow
+                        key={moderator.pubkey}
+                        profile={moderator}
+                        onRemove={() => removeModerator(moderator.pubkey)}
+                      />
+                    ))}
+                  </div>
+                </>
+              )}
             </div>
           </FormSection>
         </div>
@@ -376,18 +645,18 @@ export function CreateCommunityPage() {
         <div className="pt-1">
           <Button
             type="submit"
-            disabled={submitMutation.isPending || !name.trim() || !derivedSlug}
+            disabled={submitMutation.isPending || !name.trim() || !activeSlug}
             className="w-full"
           >
             {submitMutation.isPending ? (
               <>
                 <Loader2 className="size-4 mr-2 animate-spin" />
-                Creating…
+                {isEditMode ? 'Updating…' : 'Creating…'}
               </>
             ) : (
               <>
                 <Users className="size-4 mr-2" />
-                Create community
+                {isEditMode ? 'Update community' : 'Create community'}
               </>
             )}
           </Button>
@@ -401,13 +670,10 @@ export function CreateCommunityPage() {
 
 function ModeratorRow({
   profile,
-  role,
   onRemove,
 }: {
   profile: SearchProfile;
-  role: 'Founder' | 'Moderator';
-  /** Omit to render a non-removable row (e.g. the founder). */
-  onRemove?: () => void;
+  onRemove: () => void;
 }) {
   const displayName =
     profile.metadata.display_name ||
@@ -426,20 +692,17 @@ function ModeratorRow({
         </Avatar>
         <div className="min-w-0 flex-1">
           <div className="truncate text-sm font-medium">{displayName}</div>
-          <div className="text-xs text-muted-foreground">{role}</div>
         </div>
-        {onRemove && (
-          <Button
-            type="button"
-            variant="ghost"
-            size="icon"
-            onClick={onRemove}
-            aria-label={`Remove ${displayName}`}
-            className="shrink-0"
-          >
-            <X className="size-4" />
-          </Button>
-        )}
+        <Button
+          type="button"
+          variant="ghost"
+          size="icon"
+          onClick={onRemove}
+          aria-label={`Remove ${displayName}`}
+          className="shrink-0"
+        >
+          <X className="size-4" />
+        </Button>
       </div>
     </div>
   );

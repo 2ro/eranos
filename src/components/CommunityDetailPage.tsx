@@ -26,7 +26,6 @@ import {
 import type { NostrEvent, NostrMetadata } from '@nostrify/nostrify';
 
 import { AddMemberDialog } from '@/components/AddMemberDialog';
-import { CreateCommunityDialog } from '@/components/CreateCommunityDialog';
 import { CreateCommunityEventDialog } from '@/components/CreateCommunityEventDialog';
 import { CreateActionDialog } from '@/components/CreateActionDialog';
 import { PeopleAvatarStack } from '@/components/PeopleAvatarStack';
@@ -199,7 +198,6 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
   const [goalDialogOpen, setGoalDialogOpen] = useState(false);
   const [actionDialogOpen, setActionDialogOpen] = useState(false);
   const [eventDialogOpen, setEventDialogOpen] = useState(false);
-  const [editCommunityOpen, setEditCommunityOpen] = useState(false);
   const [membersDialogOpen, setMembersDialogOpen] = useState(false);
   const [addMembersDialogOpen, setAddMembersDialogOpen] = useState(false);
   const [badgeDialogOpen, setBadgeDialogOpen] = useState(false);
@@ -694,7 +692,16 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
                                 <Award className="size-4 mr-2" />
                                 Edit badge
                               </DropdownMenuItem>
-                              <DropdownMenuItem onSelect={() => setEditCommunityOpen(true)}>
+                              <DropdownMenuItem
+                                onSelect={() => {
+                                  const naddr = nip19.naddrEncode({
+                                    kind: event.kind,
+                                    pubkey: event.pubkey,
+                                    identifier: community.dTag,
+                                  });
+                                  navigate(`/communities/new?edit=${naddr}`);
+                                }}
+                              >
                                 <Pencil className="size-4 mr-2" />
                                 Edit community
                               </DropdownMenuItem>
@@ -1002,16 +1009,6 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
           communityATag={communityATag}
           open={eventDialogOpen}
           onOpenChange={setEventDialogOpen}
-        />
-      )}
-
-      {/* Edit community dialog — founder only */}
-      {isFounder && community && (
-        <CreateCommunityDialog
-          open={editCommunityOpen}
-          onOpenChange={setEditCommunityOpen}
-          communityEvent={event}
-          community={community}
         />
       )}
       </div>
