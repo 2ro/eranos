@@ -32,6 +32,7 @@ const CreateCampaignPage = lazy(() => import("./pages/CreateCampaignPage").then(
 
 // All other pages: code-split via React.lazy
 const ActionsPage = lazy(() => import("./pages/ActionsPage"));
+const CreateActionPage = lazy(() => import("./pages/CreateActionPage").then(m => ({ default: m.CreateActionPage })));
 const AdvancedSettingsPage = lazy(() => import("./pages/AdvancedSettingsPage").then(m => ({ default: m.AdvancedSettingsPage })));
 const AIChatPage = lazy(() => import("./pages/AIChatPage").then(m => ({ default: m.AIChatPage })));
 const AppearanceSettingsPage = lazy(() => import("./pages/AppearanceSettingsPage").then(m => ({ default: m.AppearanceSettingsPage })));
@@ -304,6 +305,7 @@ export function AppRouter() {
             />
             <Route path="/i/*" element={<ExternalContentPage />} />
             <Route path="/actions" element={<ActionsPage />} />
+            <Route path="/actions/new" element={<CreateActionPage />} />
             <Route path="/agent" element={<AIChatPage />} />
             <Route path="/organizers" element={<OrganizersPage />} />
             <Route path="/dashboard" element={<EventDashboardPage />} />

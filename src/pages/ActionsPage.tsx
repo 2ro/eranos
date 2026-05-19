@@ -1,6 +1,6 @@
 import { useEffect, useState, useMemo } from 'react';
 import { useSeoMeta } from '@unhead/react';
-import { Link as RouterLink } from 'react-router-dom';
+import { Link as RouterLink, useNavigate } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
 import { format } from 'date-fns';
 import { nip19 } from 'nostr-tools';
@@ -18,7 +18,6 @@ import { DEFAULT_ACTION_COVERS, DEFAULT_COVER_IMAGE } from '@/lib/defaultActionC
 import { HOPE_PALETTE } from '@/lib/hopePalette';
 import { useLayoutOptions } from '@/contexts/LayoutContext';
 import { cn } from '@/lib/utils';
-import { CreateActionDialog } from '@/components/CreateActionDialog';
 import { HeroAtmosphere } from '@/components/HeroAtmosphere';
 import { HeroBanner } from '@/components/HeroBanner';
 
@@ -291,16 +290,23 @@ type SortOption = 'recent' | 'bounty' | 'deadline';
 
 export default function ActionsPage() {
   const { user } = useCurrentUser();
+  const navigate = useNavigate();
 
   const [selectedCountry, setSelectedCountry] = useState<string | undefined>(undefined);
   const [sortBy, setSortBy] = useState<SortOption>('recent');
   const [headerCountryPickerOpen, setHeaderCountryPickerOpen] = useState(false);
-  const [createOpen, setCreateOpen] = useState(false);
 
   const { data: actions, isLoading: actionsLoading } = useActions({
     countryCode: selectedCountry,
     limit: 300,
   });
+
+  // Route entry points for "Create action" all pass the currently-selected
+  // country via ?country= so the dedicated page can pre-fill it, matching
+  // the old modal's `countryCode` prop.
+  const createActionHref = selectedCountry
+    ? `/actions/new?country=${encodeURIComponent(selectedCountry)}`
+    : '/actions/new';
 
   // Drive the global FAB from the canonical layout API so we get the same
   // circular Plus button every other page has. `noMaxWidth: true` lets
@@ -308,7 +314,7 @@ export default function ActionsPage() {
   useLayoutOptions({
     noMaxWidth: true,
     showFAB: !!user,
-    onFabClick: () => setCreateOpen(true),
+    fabHref: createActionHref,
   });
 
   const allCountries = useMemo(() => getAllCountries(), []);
@@ -467,7 +473,7 @@ export default function ActionsPage() {
       <ActionsHero
         actionCount={actions?.length ?? 0}
         canCreate={!!user}
-        onCreateAction={() => setCreateOpen(true)}
+        onCreateAction={() => navigate(createActionHref)}
       />
 
       <div className="px-4 max-w-2xl mx-auto pt-6">
@@ -555,7 +561,7 @@ export default function ActionsPage() {
                 </p>
               </div>
               {user && (
-                <Button onClick={() => setCreateOpen(true)} className="rounded-full">
+                <Button onClick={() => navigate(createActionHref)} className="rounded-full">
                   <Plus className="size-4 mr-2" />
                   Create action
                 </Button>
@@ -564,12 +570,6 @@ export default function ActionsPage() {
           </>
         )}
       </div>
-
-      <CreateActionDialog
-        countryCode={selectedCountry}
-        open={createOpen}
-        onOpenChange={setCreateOpen}
-      />
     </main>
   );
 }
