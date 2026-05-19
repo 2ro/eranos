@@ -39,6 +39,7 @@ import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Separator } from '@/components/ui/separator';
 import { Button } from '@/components/ui/button';
 import { BanConfirmDialog } from '@/components/BanConfirmDialog';
+import { NoteContent } from '@/components/NoteContent';
 import { EmojifiedText } from '@/components/CustomEmoji';
 import { ReportDialog } from '@/components/ReportDialog';
 import { CommunityReportDialog } from '@/components/CommunityReportDialog';
@@ -519,13 +520,11 @@ function NoteMoreMenuContent({ event, open, onOpenChange, communityContext, onRe
                 <span className="text-muted-foreground shrink-0">·</span>
                 <span className="text-muted-foreground shrink-0 text-xs">{timeAgo(event.created_at)}</span>
               </div>
-              <div className="mt-0.5 text-sm text-muted-foreground line-clamp-3">
+              <div className="mt-0.5 text-sm text-muted-foreground line-clamp-3 overflow-wrap-anywhere">
                 {/^[A-Za-z0-9+/=_-]{20,}$/.test(event.content.trim()) ? (
                   <span className="italic">Encrypted content</span>
                 ) : (
-                  <p className="text-sm leading-relaxed whitespace-pre-wrap overflow-wrap-anywhere">
-                    {event.content}
-                  </p>
+                  <NoteContent event={event} className="text-sm leading-snug whitespace-normal" disableEmbeds disableNoteEmbeds as="span" />
                 )}
               </div>
             </div>
