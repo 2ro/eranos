@@ -186,27 +186,39 @@ function useLayoutStore(): LayoutStore {
  * Hook for pages to declare their layout options.
  * Call this at the top of a page component to configure the surrounding MainLayout.
  *
- * Two effects collaborate:
+ * Three effects collaborate:
  *
  * 1. **useLayoutEffect (no deps)** — runs after every commit, before paint.
  *    Writes the latest options to the store so MainLayout never paints stale
  *    values. Has no cleanup — the write is idempotent and runs every render.
  *
- * 2. **useEffect ([] deps)** — runs once on mount, returns a cleanup that
- *    fires only on unmount. The cleanup defers the reset to a
- *    requestAnimationFrame so it doesn't race with Suspense transitions:
- *    all pages are lazy-loaded, so the old page unmounts (cleanup fires)
- *    before the new page mounts. If the incoming page also calls
- *    useLayoutOptions, its useLayoutEffect overwrites the store
- *    synchronously before paint — by the time the rAF fires, the store
- *    no longer holds the old snapshot and the reset is skipped.
- *    If the incoming page does NOT call useLayoutOptions (e.g.
- *    PostDetailPage), the rAF fires on the next frame and clears stale
- *    options.
+ * 2. **useEffect ([] deps), setup phase** — clears the `unmounting` ref each
+ *    time the effect re-attaches. This distinguishes a real unmount from a
+ *    Suspense / StrictMode-driven cleanup-then-rerun cycle.
+ *
+ * 3. **useEffect ([] deps), cleanup phase** — flags `unmounting = true` and
+ *    schedules a `requestAnimationFrame`. The rAF only resets the store if
+ *    (a) the hook is still flagged as unmounting (no re-setup happened in
+ *    between, which is what Suspense / StrictMode produce), and (b) the
+ *    store still holds this hook's snapshot (i.e. no other page has written
+ *    over it). Both checks must pass — the snapshot check alone is not
+ *    enough because Suspense unmount + re-setup leaves the store
+ *    unchanged, which the old code would mistake for "no one else wrote"
+ *    and reset.
+ *
+ *    The frame defer is for navigation transitions: lazy pages unmount
+ *    (cleanup fires) before the new page mounts, and we want the incoming
+ *    page's `useLayoutEffect` to overwrite the store before the reset
+ *    decision is made.
  */
 export function useLayoutOptions(options: LayoutOptions): void {
   const store = useLayoutStore();
   const prev = useRef<LayoutOptions | null>(null);
+  // Per-instance mount sentinel. Flipped to `true` only during a real
+  // unmount cleanup. Cleared back to `false` whenever the effect setup
+  // re-runs (Suspense / StrictMode dev-mode double-invoke), so the
+  // deferred rAF below can tell the two cases apart.
+  const unmounting = useRef(false);
 
   // Expand the `fullBleed` preset into its four constituent flags before
   // storing. We strip `fullBleed` itself from the stored object so MainLayout
@@ -233,11 +245,19 @@ export function useLayoutOptions(options: LayoutOptions): void {
     }
   });
 
-  // Unmount-only cleanup — deferred so incoming pages can overwrite first.
+  // Mount/unmount cleanup. The deferred reset only fires when the hook
+  // is genuinely unmounting (Suspense and StrictMode trigger cleanup
+  // followed by a fresh setup — we want to no-op in that case).
   useEffect(() => {
+    // Setup: cancel any in-flight unmount flagged by a previous cleanup.
+    unmounting.current = false;
     return () => {
+      unmounting.current = true;
       const snapshot = prev.current;
       requestAnimationFrame(() => {
+        // Bail if a re-setup re-mounted us in the meantime (Suspense
+        // / StrictMode), or if another page has overwritten the store.
+        if (!unmounting.current) return;
         if (store.getSnapshot() === snapshot) {
           store.reset();
         }
