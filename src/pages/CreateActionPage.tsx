@@ -169,10 +169,20 @@ export function CreateActionPage() {
     return options;
   }, [pageCountryCode, allCountries]);
 
-  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    e.currentTarget.value = '';
-    if (!file) return;
+  /**
+   * Shared upload path used by both the file-input change handler and the
+   * drag-and-drop handler. Validates the MIME type up front so a stray
+   * dragged-in PDF or video doesn't end up posted to a Blossom server.
+   */
+  const uploadCoverFile = async (file: File) => {
+    if (!/^image\/(png|jpeg|webp)$/.test(file.type)) {
+      toast({
+        title: 'Unsupported file type',
+        description: 'Cover image must be PNG, JPG, or WEBP.',
+        variant: 'destructive',
+      });
+      return;
+    }
     try {
       const [[, url]] = await uploadFile(file);
       setCoverImage(url);
@@ -183,6 +193,41 @@ export function CreateActionPage() {
         variant: 'destructive',
       });
     }
+  };
+
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    e.currentTarget.value = '';
+    if (!file) return;
+    await uploadCoverFile(file);
+  };
+
+  const [isDraggingCover, setIsDraggingCover] = useState(false);
+
+  const handleCoverDragOver = (e: React.DragEvent<HTMLLabelElement>) => {
+    // Without preventDefault, the browser navigates to the dropped file
+    // instead of letting our onDrop handler claim it.
+    e.preventDefault();
+    if (isUploading) return;
+    e.dataTransfer.dropEffect = 'copy';
+    if (!isDraggingCover) setIsDraggingCover(true);
+  };
+
+  const handleCoverDragLeave = (e: React.DragEvent<HTMLLabelElement>) => {
+    // Only clear the highlight when the cursor actually leaves the label.
+    // Dragging over a child element fires dragleave on the parent in some
+    // browsers, so we re-check relatedTarget.
+    if (e.currentTarget.contains(e.relatedTarget as Node | null)) return;
+    setIsDraggingCover(false);
+  };
+
+  const handleCoverDrop = async (e: React.DragEvent<HTMLLabelElement>) => {
+    e.preventDefault();
+    setIsDraggingCover(false);
+    if (isUploading) return;
+    const file = e.dataTransfer.files?.[0];
+    if (!file) return;
+    await uploadCoverFile(file);
   };
 
   const submitMutation = useMutation({
@@ -450,8 +495,13 @@ export function CreateActionPage() {
           {/* Cover image */}
           <FormSection title="Cover image" requirement="Recommended">
             <label
+              onDragOver={handleCoverDragOver}
+              onDragEnter={handleCoverDragOver}
+              onDragLeave={handleCoverDragLeave}
+              onDrop={handleCoverDrop}
               className={cn(
                 'relative block h-40 w-full cursor-pointer overflow-hidden rounded-xl border-2 border-dashed border-border bg-gradient-to-br from-muted/40 via-background to-muted/20 motion-safe:transition-colors hover:border-primary sm:h-48',
+                isDraggingCover && 'border-primary bg-primary/5',
                 isUploading && 'opacity-70 pointer-events-none',
               )}
             >
@@ -484,7 +534,7 @@ export function CreateActionPage() {
                   ) : (
                     <>
                       <ImagePlus className="size-8" />
-                      <span className="text-sm">Click to upload a cover image</span>
+                      <span className="text-sm">Click or drag an image here</span>
                       <span className="text-xs">PNG, JPG, or WEBP</span>
                     </>
                   )}
