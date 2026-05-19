@@ -29,6 +29,7 @@ const EmojiPackDialog = lazy(() => import("@/components/EmojiPackDialog").then(m
 // the configurable HomePage delegation from the Twitter-era app is gone.
 const CampaignsPage = lazy(() => import("./pages/CampaignsPage").then(m => ({ default: m.CampaignsPage })));
 const CreateCampaignPage = lazy(() => import("./pages/CreateCampaignPage").then(m => ({ default: m.CreateCampaignPage })));
+const AllCampaignsPage = lazy(() => import("./pages/AllCampaignsPage").then(m => ({ default: m.AllCampaignsPage })));
 
 // All other pages: code-split via React.lazy
 const ActionsPage = lazy(() => import("./pages/ActionsPage"));
@@ -171,6 +172,7 @@ export function AppRouter() {
             <Route path="/feed" element={<Index />} />
             <Route path="/campaigns" element={<Navigate to="/" replace />} />
             <Route path="/campaigns/new" element={<CreateCampaignPage />} />
+            <Route path="/campaigns/all" element={<AllCampaignsPage />} />
             <Route path="/notifications" element={<NotificationsPage />} />
             <Route path="/messages" element={<MessagesPage />} />
             <Route path="/search" element={<SearchPage />} />

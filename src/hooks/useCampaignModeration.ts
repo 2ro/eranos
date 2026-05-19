@@ -11,8 +11,14 @@ const LABEL_KIND = 1985;
 /** Label namespace for Agora's moderation labels. */
 export const AGORA_MODERATION_NAMESPACE = 'agora.moderation';
 
-/** The four possible label values in the moderation namespace. */
-export type ModerationLabel = 'approved' | 'unapproved' | 'hidden' | 'unhidden';
+/** The six possible label values in the moderation namespace. */
+export type ModerationLabel =
+  | 'approved'
+  | 'unapproved'
+  | 'hidden'
+  | 'unhidden'
+  | 'featured'
+  | 'unfeatured';
 
 /** A single label event narrowed to its decision axis. */
 interface AxisDecision {
@@ -24,10 +30,11 @@ interface AxisDecision {
   createdAt: number;
 }
 
-/** Per-campaign rollup of approval + hide state. */
+/** Per-campaign rollup of approval + hide + featured state. */
 export interface CampaignModerationState {
   approval?: AxisDecision; // `approved` or `unapproved`
   hide?: AxisDecision; // `hidden` or `unhidden`
+  featured?: AxisDecision; // `featured` or `unfeatured`
 }
 
 export interface CampaignModerationData {
@@ -37,6 +44,13 @@ export interface CampaignModerationData {
   approvedCoords: Set<string>;
   /** Coordinates where the latest hide label is `hidden`. */
   hiddenCoords: Set<string>;
+  /** Coordinates where the latest featured label is `featured`. */
+  featuredCoords: Set<string>;
+  /**
+   * Map of `coord` -> `created_at` of the latest `featured` label.
+   * Used to sort the home-page featured row newest-first.
+   */
+  featuredOrder: Map<string, number>;
   /** Pubkeys that were considered moderators when the query ran. */
   moderators: string[];
 }
@@ -45,6 +59,8 @@ const EMPTY_DATA: CampaignModerationData = {
   byCoord: new Map(),
   approvedCoords: new Set(),
   hiddenCoords: new Set(),
+  featuredCoords: new Set(),
+  featuredOrder: new Map(),
   moderators: [],
 };
 
@@ -56,6 +72,11 @@ function isApprovalLabel(value: string): value is 'approved' | 'unapproved' {
 /** True if a label value belongs to the hide axis. */
 function isHideLabel(value: string): value is 'hidden' | 'unhidden' {
   return value === 'hidden' || value === 'unhidden';
+}
+
+/** True if a label value belongs to the featured axis. */
+function isFeaturedLabel(value: string): value is 'featured' | 'unfeatured' {
+  return value === 'featured' || value === 'unfeatured';
 }
 
 /**
@@ -81,28 +102,42 @@ function foldLabelEvents(events: NostrEvent[], moderators: string[]): CampaignMo
       if (!state.hide || event.created_at > state.hide.createdAt) {
         state.hide = { label: value, pubkey: event.pubkey, createdAt: event.created_at };
       }
+    } else if (isFeaturedLabel(value)) {
+      if (!state.featured || event.created_at > state.featured.createdAt) {
+        state.featured = { label: value, pubkey: event.pubkey, createdAt: event.created_at };
+      }
     }
     byCoord.set(aTag, state);
   }
 
   const approvedCoords = new Set<string>();
   const hiddenCoords = new Set<string>();
+  const featuredCoords = new Set<string>();
+  const featuredOrder = new Map<string, number>();
   for (const [coord, state] of byCoord) {
     if (state.approval?.label === 'approved') approvedCoords.add(coord);
     if (state.hide?.label === 'hidden') hiddenCoords.add(coord);
+    if (state.featured?.label === 'featured') {
+      featuredCoords.add(coord);
+      featuredOrder.set(coord, state.featured.createdAt);
+    }
   }
 
-  return { byCoord, approvedCoords, hiddenCoords, moderators };
+  return { byCoord, approvedCoords, hiddenCoords, featuredCoords, featuredOrder, moderators };
 }
 
 /**
  * Fetches and folds campaign-moderation label events authored by Team
- * Soapbox members. Returns approval / hide rollups per campaign coordinate.
+ * Soapbox members. Returns approval / hide / featured rollups per campaign
+ * coordinate.
  *
  * **Display rule** consumers should follow:
- * - Show on `/` and Discover iff `approvedCoords.has(coord) && !hiddenCoords.has(coord)`.
+ * - Featured row on `/` iff `featuredCoords.has(coord) && !hiddenCoords.has(coord)`.
+ * - Community Campaigns grid on `/` iff `approvedCoords.has(coord) && !hiddenCoords.has(coord) && !featuredCoords.has(coord)` (featured dedupe).
+ * - Discover shelf iff `approvedCoords.has(coord) && !hiddenCoords.has(coord)`.
  * - "Pending" (moderator-only sections) iff `!approvedCoords.has(coord) && !hiddenCoords.has(coord)`.
  * - "Hidden" (moderator-only sections) iff `hiddenCoords.has(coord)`.
+ * - Featured is independent of Approved at the protocol level; hide always wins.
  *
  * The mutation `moderate({ coord, action })` publishes a single kind 1985
  * event labeling one campaign in the `agora.moderation` namespace. Callers

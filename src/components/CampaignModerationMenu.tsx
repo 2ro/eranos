@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Check, EyeOff, Eye, Loader2, MoreHorizontal, ShieldCheck, ShieldOff } from 'lucide-react';
+import { Check, EyeOff, Eye, Loader2, MoreHorizontal, ShieldCheck, ShieldOff, Sparkles, SparklesIcon } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import {
@@ -24,13 +24,16 @@ interface CampaignModerationMenuProps {
   isApproved: boolean;
   /** Whether the campaign is currently hidden. */
   isHidden: boolean;
+  /** Whether the campaign is currently featured. */
+  isFeatured: boolean;
   className?: string;
 }
 
 /**
- * Per-card kebab menu exposing the four moderation actions:
+ * Per-card kebab menu exposing the six moderation actions:
  *   Approve / Unapprove   (axis = approval)
  *   Hide / Unhide         (axis = hide)
+ *   Feature / Unfeature   (axis = featured)
  *
  * Renders `null` for users who are not Team Soapbox pack members. Sits
  * inside the clickable `CampaignCard` `<Link>`, so the trigger swallows
@@ -42,6 +45,7 @@ export function CampaignModerationMenu({
   campaignTitle,
   isApproved,
   isHidden,
+  isFeatured,
   className,
 }: CampaignModerationMenuProps) {
   const { user } = useCurrentUser();
@@ -117,6 +121,21 @@ export function CampaignModerationMenu({
           >
             <EyeOff className="h-4 w-4 mr-2" />
             Hide
+          </DropdownMenuItem>
+        )}
+        <DropdownMenuSeparator />
+        {isFeatured ? (
+          <DropdownMenuItem onClick={() => runAction('unfeatured', 'Removed from featured')}>
+            <SparklesIcon className="h-4 w-4 mr-2" />
+            Unfeature
+            <span className="ml-auto text-xs text-muted-foreground inline-flex items-center gap-1">
+              <Check className="h-3 w-3" /> Featured
+            </span>
+          </DropdownMenuItem>
+        ) : (
+          <DropdownMenuItem onClick={() => runAction('featured', 'Featured on homepage')}>
+            <Sparkles className="h-4 w-4 mr-2" />
+            Feature
           </DropdownMenuItem>
         )}
       </DropdownMenuContent>

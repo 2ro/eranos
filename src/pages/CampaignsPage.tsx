@@ -1,9 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useSeoMeta } from '@unhead/react';
-import { useQueries } from '@tanstack/react-query';
-import { useNostr } from '@nostrify/react';
-import { nip19 } from 'nostr-tools';
 import { ChevronDown, EyeOff, HandHeart, Hourglass, PlusCircle, ShieldCheck } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
@@ -26,86 +23,18 @@ import { useCampaignModerators } from '@/hooks/useCampaignModerators';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useLayoutOptions } from '@/contexts/LayoutContext';
 import { useAppContext } from '@/hooks/useAppContext';
-import {
-  CAMPAIGN_KIND,
-  parseCampaign,
-  type ParsedCampaign,
-} from '@/lib/campaign';
-import { FEATURED_CAMPAIGN_NADDRS } from '@/lib/featuredCampaigns';
+import { type ParsedCampaign } from '@/lib/campaign';
 import { searchCountry } from '@/lib/countries';
 import { getCoordinates } from '@/lib/coordinates';
 
-/**
- * Decodes a featured-campaign naddr and returns its coordinate. Returns
- * `null` for blank slots, malformed strings, or naddrs pointing at a
- * different kind.
- */
-function parseFeaturedNaddr(naddr: string):
-  | { pubkey: string; identifier: string; relays?: string[] }
-  | null {
-  if (!naddr) return null;
-  try {
-    const decoded = nip19.decode(naddr);
-    if (decoded.type !== 'naddr') return null;
-    if (decoded.data.kind !== CAMPAIGN_KIND) return null;
-    return {
-      pubkey: decoded.data.pubkey,
-      identifier: decoded.data.identifier,
-      relays: decoded.data.relays,
-    };
-  } catch {
-    return null;
-  }
-}
-
-/** Loads the featured campaigns in parallel. Invalid slots resolve to `null`. */
-function useFeaturedCampaigns() {
-  const { nostr } = useNostr();
-
-  const coords = useMemo(
-    () => FEATURED_CAMPAIGN_NADDRS.map((s) => parseFeaturedNaddr(s)),
-    [],
-  );
-
-  const results = useQueries({
-    queries: coords.map((coord, index) => ({
-      queryKey: ['campaign-featured', index, coord?.pubkey ?? '', coord?.identifier ?? ''],
-      queryFn: async (c: { signal: AbortSignal }): Promise<ParsedCampaign | null> => {
-        if (!coord) return null;
-        const events = await nostr.query(
-          [
-            {
-              kinds: [CAMPAIGN_KIND],
-              authors: [coord.pubkey],
-              '#d': [coord.identifier],
-              limit: 5,
-            },
-          ],
-          { signal: c.signal },
-        );
-        if (events.length === 0) return null;
-        const newest = events.reduce((latest, current) =>
-          current.created_at > latest.created_at ? current : latest,
-        );
-        return parseCampaign(newest);
-      },
-      enabled: !!coord,
-      staleTime: 60_000,
-    })),
-  });
-
-  return {
-    campaigns: results.map((r) => r.data ?? null),
-    isLoading: results.some((r) => r.isLoading),
-  };
-}
+/** Cap on how many featured campaigns we render in the home-page row. */
+const MAX_FEATURED = 4;
 
 export function CampaignsPage() {
   useLayoutOptions({ noMaxWidth: true, rightSidebar: null });
 
   const { config } = useAppContext();
   const { user } = useCurrentUser();
-  const { campaigns: featured, isLoading: featuredLoading } = useFeaturedCampaigns();
 
   // Moderator pack + per-campaign label state. The label query is gated on
   // moderators arriving, so during a cold load we render skeleton cards
@@ -114,9 +43,41 @@ export function CampaignsPage() {
   const { data: moderation, isReady: moderationReady } = useCampaignModeration();
   const isMod = !!user && !!moderators && moderators.includes(user.pubkey);
 
-  // The main grid is the approved-and-not-hidden set. We fetch by coordinate
-  // (one filter per author, bundled in one REQ) to avoid pulling the entire
-  // kind-30223 stream when only a handful are surfaced.
+  // Featured slot list — derived from moderation labels. Sorted newest-
+  // featured first, capped at MAX_FEATURED, and hidden coords removed so a
+  // featured-then-hidden campaign disappears from the row.
+  const featuredCoords = useMemo(() => {
+    if (!moderation) return [] as string[];
+    return Array.from(moderation.featuredCoords)
+      .filter((c) => !moderation.hiddenCoords.has(c))
+      .sort((a, b) => (moderation.featuredOrder.get(b) ?? 0) - (moderation.featuredOrder.get(a) ?? 0))
+      .slice(0, MAX_FEATURED);
+  }, [moderation]);
+
+  const { data: featuredCampaigns, isLoading: featuredLoading } = useCampaigns(
+    moderationReady && featuredCoords.length > 0
+      ? { coordinates: featuredCoords, limit: MAX_FEATURED }
+      : { coordinates: [], limit: MAX_FEATURED },
+  );
+
+  // Sort the fetched featured campaigns to match the newest-label order.
+  // `useCampaigns` returns them in network order; we want the row to match
+  // the moderation-label ordering.
+  const orderedFeatured = useMemo<ParsedCampaign[]>(() => {
+    if (!moderation || !featuredCampaigns) return [];
+    const order = moderation.featuredOrder;
+    return [...featuredCampaigns]
+      .filter((c) => featuredCoords.includes(c.aTag) && !c.archived)
+      .sort((a, b) => (order.get(b.aTag) ?? 0) - (order.get(a.aTag) ?? 0))
+      .slice(0, MAX_FEATURED);
+  }, [featuredCampaigns, featuredCoords, moderation]);
+
+  const featuredCoordSet = useMemo(() => new Set(featuredCoords), [featuredCoords]);
+
+  // The community grid is the approved-and-not-hidden set, minus featured
+  // (which gets its own row above). We fetch by coordinate (one filter per
+  // author, bundled in one REQ) to avoid pulling the entire kind-30223
+  // stream when only a handful are surfaced.
   const approvedNotHidden = useMemo(() => {
     if (!moderation) return [] as string[];
     return Array.from(moderation.approvedCoords).filter((c) => !moderation.hiddenCoords.has(c));
@@ -151,33 +112,15 @@ export function CampaignsPage() {
     description: 'Connecting activists to unstoppable funding.',
   });
 
-  // Featured slot list — drop archived featured slots and slots that have
-  // been hidden by a moderator (rare but it'd be jarring to spotlight a
-  // hidden campaign).
-  const visibleFeatured = useMemo(
-    () =>
-      featured.map((c) => {
-        if (!c || c.archived) return null;
-        if (moderation?.hiddenCoords.has(c.aTag)) return null;
-        return c;
-      }),
-    [featured, moderation],
-  );
-
-  const featuredCoords = useMemo(
-    () => new Set(visibleFeatured.filter(Boolean).map((c) => c!.aTag)),
-    [visibleFeatured],
-  );
-
   // Main grid excludes featured (they're shown above) and excludes any
   // hidden coord just in case approvedCoords/hiddenCoords overlap (a mod can
   // approve, another can hide — hide wins).
   const mainGridCampaigns = useMemo(
     () =>
       (approvedCampaigns ?? []).filter(
-        (c) => !featuredCoords.has(c.aTag) && !moderation?.hiddenCoords.has(c.aTag),
+        (c) => !featuredCoordSet.has(c.aTag) && !moderation?.hiddenCoords.has(c.aTag),
       ),
-    [approvedCampaigns, featuredCoords, moderation],
+    [approvedCampaigns, featuredCoordSet, moderation],
   );
 
   // Pending (mod-only): campaigns that exist on the network but lack an
@@ -207,7 +150,7 @@ export function CampaignsPage() {
     );
   }, [isMod, user, moderation, ownCampaigns]);
 
-  // Build the spotlight pool from the hand-picked featured campaigns only.
+  // Build the spotlight pool from the featured campaigns only.
   // New events use NIP-73 `i` country tags; legacy campaigns can still
   // resolve from the old free-form `location` field. A featured campaign
   // without a resolvable country is silently dropped — the globe needs
@@ -239,11 +182,11 @@ export function CampaignsPage() {
       out.push({ key: c.aTag, campaign: c, lat: coords.latitude, lng: coords.longitude });
     };
 
-    for (const c of visibleFeatured) {
-      if (c) add(c);
+    for (const c of orderedFeatured) {
+      add(c);
     }
     return out;
-  }, [visibleFeatured]);
+  }, [orderedFeatured]);
 
   const globeMarkers = useMemo(
     () =>
@@ -428,29 +371,36 @@ export function CampaignsPage() {
       </section>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-10 lg:py-14 space-y-12" id="campaigns">
-        {/* Featured */}
-        <section className="space-y-5">
-          <div className="flex items-end justify-between gap-4">
-            <div>
-              <h2 className="text-2xl sm:text-3xl font-bold tracking-tight">Featured</h2>
-              <p className="text-sm text-muted-foreground mt-1">
-                Hand-picked campaigns from the Agora team.
-              </p>
+        {/* Featured — only rendered when at least one campaign is featured
+            (or the featured query is still loading on first paint). */}
+        {(featuredCoords.length > 0 || (featuredLoading && !moderationReady)) && (
+          <section className="space-y-5">
+            <div className="flex items-end justify-between gap-4">
+              <div>
+                <h2 className="text-2xl sm:text-3xl font-bold tracking-tight">Featured</h2>
+                <p className="text-sm text-muted-foreground mt-1">
+                  Hand-picked campaigns from the Agora team.
+                </p>
+              </div>
             </div>
-          </div>
 
-          <FeaturedRow campaigns={visibleFeatured} isLoading={featuredLoading} />
-        </section>
+            <FeaturedRow
+              campaigns={orderedFeatured}
+              isLoading={featuredLoading || !moderationReady}
+              expectedCount={featuredCoords.length}
+            />
+          </section>
+        )}
 
-        {/* Main grid — approved-and-not-hidden campaigns. Skeletons until
-            the moderator pack + label state both resolve, so we never flash
-            an unmoderated grid. */}
+        {/* Community Campaigns — approved-and-not-hidden, minus featured.
+            Skeletons until the moderator pack + label state both resolve,
+            so we never flash an unmoderated grid. */}
         <section className="space-y-5">
           <div className="flex items-end justify-between gap-4">
             <div>
-              <h2 className="text-2xl sm:text-3xl font-bold tracking-tight">All campaigns</h2>
+              <h2 className="text-2xl sm:text-3xl font-bold tracking-tight">Community Campaigns</h2>
               <p className="text-sm text-muted-foreground mt-1">
-                Community-submitted fundraisers from across Nostr.
+                Community-submitted fundraisers approved by moderators.
               </p>
             </div>
             <Button asChild variant="outline" className="hidden sm:inline-flex">
@@ -472,6 +422,14 @@ export function CampaignsPage() {
               ))}
             </div>
           )}
+
+          {/* "Browse all campaigns" link — reveals the page that includes
+              campaigns not yet moderated (and, optionally, hidden ones). */}
+          <div className="pt-2 text-center sm:text-left">
+            <Button asChild variant="ghost" size="sm">
+              <Link to="/campaigns/all">Browse all campaigns →</Link>
+            </Button>
+          </div>
         </section>
 
         {/* Moderator-only: campaigns awaiting an approval decision. */}
@@ -599,48 +557,61 @@ function ModeratorSection({
   );
 }
 
-/** Renders the two featured slots, gracefully handling empty placeholders. */
+/**
+ * Returns the grid class string for an adaptive featured row.
+ * Mobile stays 1-column; desktop expands to 2/3/4 columns based on count.
+ * Tailwind JIT requires literal class strings, so we spell each variant
+ * out rather than building the class name dynamically.
+ */
+function featuredGridClass(n: number): string {
+  if (n <= 1) return 'grid grid-cols-1 gap-5';
+  if (n === 2) return 'grid grid-cols-1 md:grid-cols-2 gap-5';
+  if (n === 3) return 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5';
+  return 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5';
+}
+
+/** Renders the featured row with an adaptive column count. */
 function FeaturedRow({
   campaigns,
   isLoading,
+  expectedCount,
 }: {
-  campaigns: (ParsedCampaign | null)[];
+  campaigns: ParsedCampaign[];
   isLoading: boolean;
+  /** How many featured slots we expect once data resolves. Drives the skeleton column count. */
+  expectedCount: number;
 }) {
-  // Filter out empty slots — if a slot's naddr is blank we just hide it rather
-  // than show a broken card.
-  const items = campaigns.map((c, i) => ({ campaign: c, index: i }));
-  const hasAnyFeatured = items.some((it) => it.campaign !== null);
-
-  if (isLoading && !hasAnyFeatured) {
+  if (isLoading && campaigns.length === 0) {
+    const skeletonCount = Math.max(1, Math.min(MAX_FEATURED, expectedCount || 2));
     return (
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-        <CampaignCardSkeleton variant="featured" />
-        <CampaignCardSkeleton variant="featured" />
+      <div className={featuredGridClass(skeletonCount)}>
+        {Array.from({ length: skeletonCount }).map((_, i) => (
+          <CampaignCardSkeleton key={i} variant={skeletonCount === 1 ? 'featured' : 'compact'} />
+        ))}
       </div>
     );
   }
 
-  if (!hasAnyFeatured) {
-    return (
-      <Card className="border-dashed">
-        <CardContent className="py-12 px-8 text-center space-y-2">
-          <HandHeart className="size-8 text-muted-foreground/60 mx-auto" />
-          <p className="text-muted-foreground max-w-md mx-auto">
-            Featured campaigns will appear here once the team has selected them.
-          </p>
-        </CardContent>
-      </Card>
-    );
+  if (campaigns.length === 0) {
+    // Defensive — the parent guards on `featuredCoords.length > 0`, but if
+    // a hidden-after-featured race leaves us with no campaigns to render,
+    // collapse silently rather than show an empty card.
+    return null;
   }
 
+  // 1 featured campaign gets the hero `variant="featured"` treatment;
+  // 2-4 use the regular compact card sized to the dynamic grid.
+  const useFeaturedVariant = campaigns.length === 1;
+
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-      {items.map(({ campaign }) =>
-        campaign ? (
-          <CampaignCard key={campaign.aTag} campaign={campaign} variant="featured" />
-        ) : null,
-      )}
+    <div className={featuredGridClass(campaigns.length)}>
+      {campaigns.map((campaign) => (
+        <CampaignCard
+          key={campaign.aTag}
+          campaign={campaign}
+          variant={useFeaturedVariant ? 'featured' : 'compact'}
+        />
+      ))}
     </div>
   );
 }

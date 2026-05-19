@@ -91,9 +91,10 @@ export function CampaignCard({ campaign, variant = 'compact', className }: Campa
   const countryLabel = getCampaignCountryLabel(campaign);
   const tagLabel = getCampaignPrimaryTagLabel(campaign);
 
-  const isFeatured = variant === 'featured';
+  const isFeaturedVariant = variant === 'featured';
   const isApproved = moderation.approvedCoords.has(campaign.aTag);
   const isHidden = moderation.hiddenCoords.has(campaign.aTag);
+  const isFeatured = moderation.featuredCoords.has(campaign.aTag);
 
   return (
     <Link
@@ -106,14 +107,14 @@ export function CampaignCard({ campaign, variant = 'compact', className }: Campa
       <Card
         className={cn(
           'overflow-hidden border-border/70 shadow-sm motion-safe:transition-shadow motion-safe:duration-200 group-hover:shadow-lg h-full flex flex-col',
-          isFeatured && 'sm:flex-row sm:items-stretch',
+          isFeaturedVariant && 'sm:flex-row sm:items-stretch',
         )}
       >
         {/* Cover image */}
         <div
           className={cn(
             'relative w-full bg-gradient-to-br from-primary/15 via-primary/5 to-secondary',
-            isFeatured ? 'aspect-[16/10] sm:aspect-auto sm:w-1/2 sm:min-h-[280px]' : 'aspect-[16/9]',
+            isFeaturedVariant ? 'aspect-[16/10] sm:aspect-auto sm:w-1/2 sm:min-h-[280px]' : 'aspect-[16/9]',
           )}
         >
           {cover ? (
@@ -159,17 +160,18 @@ export function CampaignCard({ campaign, variant = 'compact', className }: Campa
               campaignTitle={campaign.title}
               isApproved={isApproved}
               isHidden={isHidden}
+              isFeatured={isFeatured}
             />
           </div>
         </div>
 
         {/* Body */}
-        <div className={cn('flex flex-col gap-3 p-5', isFeatured && 'sm:w-1/2 sm:p-6')}>
+        <div className={cn('flex flex-col gap-3 p-5', isFeaturedVariant && 'sm:w-1/2 sm:p-6')}>
           <div className="space-y-2">
             <h3
               className={cn(
                 'font-bold leading-tight tracking-tight',
-                isFeatured ? 'text-2xl sm:text-3xl' : 'text-lg',
+                isFeaturedVariant ? 'text-2xl sm:text-3xl' : 'text-lg',
               )}
             >
               {campaign.title}
@@ -178,7 +180,7 @@ export function CampaignCard({ campaign, variant = 'compact', className }: Campa
               <p
                 className={cn(
                   'text-muted-foreground',
-                  isFeatured ? 'text-base line-clamp-3' : 'text-sm line-clamp-2',
+                  isFeaturedVariant ? 'text-base line-clamp-3' : 'text-sm line-clamp-2',
                 )}
               >
                 {campaign.summary}

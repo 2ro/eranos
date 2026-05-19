@@ -129,7 +129,7 @@ export function DiscoverPage() {
           <SectionHeader
             title="Help raise hope"
             seeAllLabel="All campaigns"
-            onSeeAll={() => navigate('/')}
+            onSeeAll={() => navigate('/campaigns/all')}
             className="pb-3 sm:px-6"
           />
           {shelfLoading && shelfCampaigns.length === 0 ? (

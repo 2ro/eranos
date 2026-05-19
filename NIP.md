@@ -22,7 +22,7 @@
 |--------------------------|-----------------------------------------|-----------------------------------------------------------------|
 | Flat Communities | 34550, 30009, 8, 1111, 1984 | One-level badge membership with explicit moderators (NIP-72 ext) |
 | Community Chat | 34550, 1311 | Realtime member chat scoped to a NIP-72 community |
-| Campaign Moderation | 30223, 1985, 39089 | Homepage curation via moderator-signed labels in the `agora.moderation` namespace, gated by a follow-pack moderator roster |
+| Campaign Moderation | 30223, 1985, 39089 | Homepage curation (approved / hidden / featured axes) via moderator-signed labels in the `agora.moderation` namespace, gated by a follow-pack moderator roster |
 
 ### Community Chat
 
@@ -346,14 +346,21 @@ Each label event carries the namespace twice, per NIP-32:
 
 #### Label values
 
-Two independent axes; the newest moderator-signed label per axis per campaign wins.
+Three independent axes; the newest moderator-signed label per axis per campaign wins.
 
-| Axis     | Values                  | Meaning                                                                 |
-|----------|-------------------------|-------------------------------------------------------------------------|
-| approval | `approved`, `unapproved`| `approved` allows the campaign on `/` and Discover. `unapproved` retracts a previous approval. |
-| hide     | `hidden`, `unhidden`    | `hidden` suppresses the campaign even if approved. `unhidden` retracts a previous hide. |
+| Axis     | Values                    | Meaning                                                                 |
+|----------|---------------------------|-------------------------------------------------------------------------|
+| approval | `approved`, `unapproved`  | `approved` allows the campaign on `/` and Discover. `unapproved` retracts a previous approval. |
+| hide     | `hidden`, `unhidden`      | `hidden` suppresses the campaign everywhere it would otherwise appear. `unhidden` retracts a previous hide. |
+| featured | `featured`, `unfeatured`  | `featured` places the campaign in the hand-picked Featured row on `/`. `unfeatured` retracts. |
 
-A campaign is shown on `/` and Discover iff the latest approval label is `approved` AND the latest hide label is not `hidden`. Hide always wins over approval.
+Surfacing rules (hide always wins):
+
+- **Featured row on `/`** — iff the latest featured label is `featured` AND the latest hide label is not `hidden`. Ordered newest-`created_at`-of-`featured`-label first. Featured is independent of Approved at the protocol level; a campaign may be featured without being approved (the home page treats Featured and Approved as deduplicated bins, with Featured taking precedence).
+- **Community Campaigns grid on `/`** — iff approved, not hidden, and not featured (featured campaigns get their own row above).
+- **Discover shelf** — iff approved AND not hidden.
+- **Moderator-only "Pending"** — iff neither approved nor hidden.
+- **Moderator-only "Hidden"** — iff hidden.
 
 #### Event Structure
 
@@ -369,6 +376,8 @@ A campaign is shown on `/` and Discover iff the latest approval label is `approv
   ]
 }
 ```
+
+A `featured` label has the same shape with `["l", "featured", "agora.moderation"]` and `["alt", "Campaign moderation: featured"]`.
 
 Required tags:
 
