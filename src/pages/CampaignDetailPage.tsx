@@ -9,6 +9,7 @@ import {
   Archive,
   ArchiveRestore,
   ChevronLeft,
+  ExternalLink,
   HandHeart,
   MapPin,
   Pencil,
@@ -19,7 +20,10 @@ import {
 import { ArticleContent } from '@/components/ArticleContent';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
-import { BeneficiaryDonateDialog } from '@/components/BeneficiaryDonateDialog';
+import {
+  BeneficiaryDonateDialog,
+  BeneficiaryDonatePanel,
+} from '@/components/BeneficiaryDonateDialog';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -59,7 +63,7 @@ import {
   getCampaignPrimaryTagLabel,
   type ParsedCampaign,
 } from '@/lib/campaign';
-import { satsToUSDWhole } from '@/lib/bitcoin';
+import { nostrPubkeyToBitcoinAddress, satsToUSDWhole } from '@/lib/bitcoin';
 import { formatNumber } from '@/lib/formatNumber';
 import { genUserName } from '@/lib/genUserName';
 import { sanitizeUrl } from '@/lib/sanitizeUrl';
@@ -114,7 +118,6 @@ function CampaignDetailContent({ campaign }: { campaign: ParsedCampaign }) {
   const queryClient = useQueryClient();
 
   const [donateOpen, setDonateOpen] = useState(false);
-  const [beneficiaryDonateOpen, setBeneficiaryDonateOpen] = useState(false);
   const [replyOpen, setReplyOpen] = useState(false);
   const [moreMenuOpen, setMoreMenuOpen] = useState(false);
   const [interactionsOpen, setInteractionsOpen] = useState(false);
@@ -234,6 +237,18 @@ function CampaignDetailContent({ campaign }: { campaign: ParsedCampaign }) {
   const countryLabel = getCampaignCountryLabel(campaign);
   const tagLabel = getCampaignPrimaryTagLabel(campaign);
   const raisedSats = stats?.totalSats ?? 0;
+
+  // Single-beneficiary campaigns inline the recipient's BIP-21 QR + address
+  // directly into the page, and turn the big "Donate" button into an
+  // "Open in wallet" anchor. There's no split to coordinate, so the full
+  // PSBT flow in DonateDialog would be friction.
+  const singleBeneficiary =
+    campaign.recipients.length === 1 ? campaign.recipients[0] : null;
+  const singleBip21 = useMemo(() => {
+    if (!singleBeneficiary) return '';
+    const address = nostrPubkeyToBitcoinAddress(singleBeneficiary.pubkey);
+    return address ? `bitcoin:${address}` : '';
+  }, [singleBeneficiary]);
 
   const isCreator = user?.pubkey === campaign.pubkey;
   const naddr = useMemo(() => encodeCampaignNaddr(campaign), [campaign]);
@@ -449,29 +464,44 @@ function CampaignDetailContent({ campaign }: { campaign: ParsedCampaign }) {
                 )}
 
                 <div className="grid grid-cols-4 gap-2">
-                  <Button
-                    size="lg"
-                    className="w-full col-span-3"
-                    onClick={() => {
-                      // Logged-out donors on a single-beneficiary campaign get
-                      // the simpler per-beneficiary BIP-21 dialog directly —
-                      // there's no split to coordinate, so the multi-step
-                      // PSBT/login flow would be pure friction.
-                      if (!user && campaign.recipients.length === 1) {
-                        setBeneficiaryDonateOpen(true);
-                      } else {
-                        setDonateOpen(true);
-                      }
-                    }}
-                    disabled={deadline?.isPast || campaign.archived}
-                  >
-                    <HandHeart className="size-5 mr-2" />
-                    {campaign.archived
+                  {(() => {
+                    const disabled = deadline?.isPast || campaign.archived;
+                    const label = campaign.archived
                       ? 'Campaign archived'
                       : deadline?.isPast
                         ? 'Campaign ended'
-                        : 'Donate'}
-                  </Button>
+                        : singleBeneficiary
+                          ? 'Open in wallet'
+                          : 'Donate';
+                    const Icon = singleBeneficiary && !disabled ? ExternalLink : HandHeart;
+
+                    // Single-beneficiary, active campaign: the inline QR
+                    // panel is already on the page, so the button becomes
+                    // an "Open in wallet" anchor pointing at the same
+                    // bitcoin: URI.
+                    if (singleBeneficiary && !disabled && singleBip21) {
+                      return (
+                        <Button asChild size="lg" className="w-full col-span-3">
+                          <a href={singleBip21}>
+                            <Icon className="size-5 mr-2" />
+                            {label}
+                          </a>
+                        </Button>
+                      );
+                    }
+
+                    return (
+                      <Button
+                        size="lg"
+                        className="w-full col-span-3"
+                        onClick={() => setDonateOpen(true)}
+                        disabled={disabled}
+                      >
+                        <Icon className="size-5 mr-2" />
+                        {label}
+                      </Button>
+                    );
+                  })()}
 
                   <Button variant="outline" size="lg" className="w-full" onClick={handleShare}>
                     <Share2 className="size-4 mr-2" />
@@ -481,13 +511,23 @@ function CampaignDetailContent({ campaign }: { campaign: ParsedCampaign }) {
 
                 <div className="space-y-2 border-t border-border/60 pt-4">
                   <div className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-                    Beneficiaries
+                    {singleBeneficiary ? 'Beneficiary' : 'Beneficiaries'}
                   </div>
-                  <div className="divide-y divide-border/60">
-                  {campaign.recipients.map((r) => (
-                    <RecipientRow key={r.pubkey} pubkey={r.pubkey} weight={r.weight} />
-                  ))}
-                  </div>
+                  {singleBeneficiary ? (
+                    // One recipient: inline the BIP-21 QR + copyable address
+                    // panel. The campaign organizer is identified at the top
+                    // of the page, so hide the panel's profile row.
+                    <BeneficiaryDonatePanel
+                      pubkey={singleBeneficiary.pubkey}
+                      hideProfile
+                    />
+                  ) : (
+                    <div className="divide-y divide-border/60">
+                    {campaign.recipients.map((r) => (
+                      <RecipientRow key={r.pubkey} pubkey={r.pubkey} weight={r.weight} />
+                    ))}
+                    </div>
+                  )}
                 </div>
 
                 <div className="space-y-2 border-t border-border/60 pt-4">
@@ -617,16 +657,6 @@ function CampaignDetailContent({ campaign }: { campaign: ParsedCampaign }) {
         }}
         btcPrice={btcPrice}
       />
-
-      {/* Single-beneficiary shortcut for logged-out donors. Mounted only when
-          there's exactly one recipient so the pubkey is unambiguous. */}
-      {campaign.recipients.length === 1 && (
-        <BeneficiaryDonateDialog
-          pubkey={campaign.recipients[0].pubkey}
-          open={beneficiaryDonateOpen}
-          onOpenChange={setBeneficiaryDonateOpen}
-        />
-      )}
 
       <ReplyComposeModal
         event={campaign.event}
