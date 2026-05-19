@@ -4,7 +4,6 @@ import {
   Upload,
   Eye,
   EyeOff,
-  Key,
   ChevronDown,
   ChevronUp,
   Loader2,
@@ -21,7 +20,9 @@ import {
 } from '@/components/ui/collapsible';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { QRCodeCanvas } from '@/components/ui/qrcode';
+import { AgoraBoltIcon } from '@/components/icons/AgoraBoltIcon';
 import { toast } from '@/hooks/useToast';
+import { useAppContext } from '@/hooks/useAppContext';
 import {
   useLoginActions,
   generateNostrConnectParams,
@@ -107,6 +108,7 @@ const AuthDialog: React.FC<AuthDialogProps> = ({ isOpen, onClose }) => {
   const [bunkerUri, setBunkerUri] = useState('');
 
   const login = useLoginActions();
+  const { config } = useAppContext();
   // Stable refs so the nostrconnect listening effect below doesn't restart on
   // every parent render. Parents typically pass inline arrow functions for
   // onClose, and useLoginActions returns a fresh object each render — without
@@ -386,7 +388,7 @@ const AuthDialog: React.FC<AuthDialogProps> = ({ isOpen, onClose }) => {
   const getTitle = () => {
     switch (step) {
       case 'welcome':
-        return 'Welcome';
+        return `Welcome to ${config.appName}`;
       case 'generate':
         return 'Create account';
       case 'secure':
@@ -425,8 +427,8 @@ const AuthDialog: React.FC<AuthDialogProps> = ({ isOpen, onClose }) => {
           {/* Welcome step — the unified entry point. */}
           {step === 'welcome' && (
             <div className="space-y-5 text-center">
-              <div className="flex size-32 text-6xl bg-primary/10 rounded-full items-center justify-center mx-auto">
-                🔑
+              <div className="flex justify-center pt-2">
+                <AgoraBoltIcon className="size-20 drop-shadow-md" />
               </div>
 
               <p className="text-sm text-muted-foreground">
@@ -435,14 +437,14 @@ const AuthDialog: React.FC<AuthDialogProps> = ({ isOpen, onClose }) => {
 
               <div className="space-y-2">
                 <Button onClick={() => setStep('generate')} className="w-full h-12">
-                  Create new account
+                  Create a new Nostr account
                 </Button>
                 <Button
                   variant="outline"
                   onClick={() => setStep('login')}
                   className="w-full h-12"
                 >
-                  I already have an account
+                  Log in to an existing account
                 </Button>
               </div>
             </div>
@@ -457,8 +459,8 @@ const AuthDialog: React.FC<AuthDialogProps> = ({ isOpen, onClose }) => {
                     <Loader2 className="w-12 h-12 text-primary animate-spin" />
                   </div>
                 ) : (
-                  <div className="absolute inset-0 rounded-full bg-primary/10 flex items-center justify-center">
-                    <Key className="w-8 h-8 text-primary" />
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <AgoraBoltIcon className="size-16 drop-shadow-md" />
                   </div>
                 )}
               </div>
@@ -492,8 +494,8 @@ const AuthDialog: React.FC<AuthDialogProps> = ({ isOpen, onClose }) => {
           {/* Secure step — show + download nsec. */}
           {step === 'secure' && (
             <div className="space-y-4">
-              <div className="flex size-14 bg-primary/10 rounded-full items-center justify-center mx-auto">
-                <Key className="w-7 h-7 text-primary" />
+              <div className="flex justify-center pt-1">
+                <AgoraBoltIcon className="size-14 drop-shadow-md" />
               </div>
 
               <p className="text-sm text-muted-foreground text-center">
