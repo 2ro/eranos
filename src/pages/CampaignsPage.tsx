@@ -400,7 +400,7 @@ export function CampaignsPage() {
             <div>
               <h2 className="text-2xl sm:text-3xl font-bold tracking-tight">Community Campaigns</h2>
               <p className="text-sm text-muted-foreground mt-1">
-                Community-submitted fundraisers approved by moderators.
+                Help fund the changes worth making.
               </p>
             </div>
             <Button asChild variant="outline" className="hidden sm:inline-flex">
