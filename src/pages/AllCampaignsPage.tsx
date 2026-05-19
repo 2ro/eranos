@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { useSeoMeta } from '@unhead/react';
-import { Clock, EyeOff, Flame, HandHeart, PlusCircle, Search, TrendingUp, X } from 'lucide-react';
+import { Clock, EyeOff, HandHeart, PlusCircle, Search, TrendingUp, X } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -18,31 +18,30 @@ import { cn } from '@/lib/utils';
 import type { ParsedCampaign } from '@/lib/campaign';
 
 const SORT_OPTIONS: { value: CampaignSort; label: string; icon: typeof TrendingUp }[] = [
+  { value: 'none', label: 'Newest', icon: Clock },
   { value: 'top', label: 'Top', icon: TrendingUp },
-  { value: 'hot', label: 'Hot', icon: Flame },
-  { value: 'none', label: 'None', icon: Clock },
 ];
 
-/** Type-guard for the `?sort=` URL param. */
+/** Type-guard for the `?sort=` URL param. Default is `none` (chronological). */
 function parseSort(value: string | null): CampaignSort {
-  if (value === 'hot' || value === 'none') return value;
-  return 'top';
+  return value === 'top' ? 'top' : 'none';
 }
 
 /**
- * Lists every campaign found on relays, with NIP-50 sort (Top / Hot / None)
- * and free-text search.
+ * Lists every campaign found on relays. Two sort modes:
  *
- * Top/Hot/search query Ditto's relay group (the only relay in Agora's pool
- * implementing the NIP-50 sort extension). None with no search uses the
- * default user-configured pool for full coverage.
+ * - **Newest** (default): chronological by `created_at`.
+ * - **Top**: ranked by total sats raised (kind 8333 donation receipts).
  *
- * Hidden campaigns are excluded by default — flip the "Show hidden" toggle
- * to include them. The toggle filters client-side after the relay returns,
- * since Ditto doesn't know about Agora's moderation labels.
+ * Both modes share a free-text search bar that filters across title,
+ * summary, story, location, and category tags client-side.
  *
- * URL state: `?sort=top|hot|none&q=<search>`. Empty values are stripped so
- * the canonical URL stays clean. Useful for sharing search results.
+ * Hidden campaigns are excluded by default — flip the "Show hidden"
+ * toggle to include them. The toggle filters client-side after the
+ * campaign list resolves.
+ *
+ * URL state: `?sort=top&q=<search>`. Default values are stripped so the
+ * canonical URL stays clean. Useful for sharing search results.
  */
 export function AllCampaignsPage() {
   useLayoutOptions({ rightSidebar: null });
@@ -50,32 +49,29 @@ export function AllCampaignsPage() {
 
   // URL state — sort and query live in the URL so results are shareable.
   const [searchParams, setSearchParams] = useSearchParams();
-  const urlSort = parseSort(searchParams.get('sort'));
+  const sort = parseSort(searchParams.get('sort'));
   const urlQuery = searchParams.get('q') ?? '';
 
-  // Sort follows the URL directly (cheap to render, no debouncing needed).
-  const sort = urlSort;
-  // Search input is local-state so typing is responsive; we debounce to the
-  // URL + the query.
+  // Search input is local-state so typing is responsive; we debounce to
+  // the URL + the query.
   const [searchInput, setSearchInput] = useState(urlQuery);
   const debouncedSearch = useDebounce(searchInput, 300);
   const [showHidden, setShowHidden] = useState(false);
 
-  // Sync the debounced search → URL. We strip empty values so the canonical
-  // URL is `/campaigns/all` (not `/campaigns/all?sort=top&q=`).
+  // Sync the debounced search → URL. Empty / default values are stripped
+  // so the canonical URL is `/campaigns/all` (not
+  // `/campaigns/all?sort=none&q=`).
   useEffect(() => {
     const next = new URLSearchParams(searchParams);
     const trimmed = debouncedSearch.trim();
     if (trimmed) next.set('q', trimmed);
     else next.delete('q');
-    if (sort !== 'top') next.set('sort', sort);
-    else next.delete('sort');
     // Only replace history when the params actually change, to avoid
     // looping when the URL is already in sync.
     if (next.toString() !== searchParams.toString()) {
       setSearchParams(next, { replace: true });
     }
-  }, [debouncedSearch, sort, searchParams, setSearchParams]);
+  }, [debouncedSearch, searchParams, setSearchParams]);
 
   // Sync URL → input (e.g. browser back/forward or a deep link).
   useEffect(() => {
@@ -87,7 +83,7 @@ export function AllCampaignsPage() {
 
   const setSort = (value: CampaignSort) => {
     const next = new URLSearchParams(searchParams);
-    if (value !== 'top') next.set('sort', value);
+    if (value === 'top') next.set('sort', 'top');
     else next.delete('sort');
     setSearchParams(next, { replace: true });
   };
@@ -130,11 +126,6 @@ export function AllCampaignsPage() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-10 lg:py-14 space-y-8">
         <header className="space-y-3">
           <h1 className="text-3xl sm:text-4xl font-bold tracking-tight">All Campaigns</h1>
-          <p className="text-muted-foreground max-w-2xl">
-            Every campaign published on Agora, including ones awaiting
-            moderation. Hidden campaigns are excluded by default — toggle
-            below to include them.
-          </p>
         </header>
 
         {/* Toolbar */}
@@ -243,8 +234,8 @@ export function AllCampaignsPage() {
                       No campaigns match &ldquo;{activeQuery}&rdquo;
                     </h2>
                     <p className="text-muted-foreground max-w-sm mx-auto">
-                      Try a different search term, or switch the sort to
-                      None to see every campaign chronologically.
+                      Try a different search term, or clear the search to
+                      see every campaign.
                     </p>
                   </>
                 ) : hiddenCount > 0 && !showHidden ? (
