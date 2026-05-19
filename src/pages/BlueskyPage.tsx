@@ -233,30 +233,39 @@ function BlueskyFeedPost({ post }: { post: BlueskyPost }) {
             )}
 
             {/* Action buttons */}
-            <div className="flex items-center gap-5 mt-3 -ml-2">
+            <div className="flex flex-wrap items-center gap-1 sm:gap-2 mt-3">
               <button
                 type="button"
                 onClick={handleComment}
-                className="inline-flex items-center gap-1.5 p-2 rounded-full text-muted-foreground hover:text-sky-500 hover:bg-sky-500/10 transition-colors"
+                className="inline-flex items-center gap-2 h-9 px-3 rounded-full text-sm font-medium text-muted-foreground hover:text-sky-500 hover:bg-sky-500/10 transition-colors"
                 title="Comment"
               >
                 <MessageCircle className="size-[18px]" />
-                {post.replyCount > 0 && <span className="text-sm tabular-nums">{formatCount(post.replyCount)}</span>}
+                {post.replyCount > 0 ? (
+                  <span className="tabular-nums">{formatCount(post.replyCount)}</span>
+                ) : (
+                  <span className="hidden sm:inline">Comment</span>
+                )}
               </button>
               <button
                 type="button"
                 onClick={handleRepost}
-                className="inline-flex items-center gap-1.5 p-2 rounded-full text-muted-foreground hover:text-green-500 hover:bg-green-500/10 transition-colors"
+                className="inline-flex items-center gap-2 h-9 px-3 rounded-full text-sm font-medium text-muted-foreground hover:text-green-500 hover:bg-green-500/10 transition-colors"
                 title="Share to feed"
               >
                 <Repeat2 className="size-[18px]" />
-                {post.repostCount > 0 && <span className="text-sm tabular-nums">{formatCount(post.repostCount)}</span>}
+                {post.repostCount > 0 ? (
+                  <span className="tabular-nums">{formatCount(post.repostCount)}</span>
+                ) : (
+                  <span className="hidden sm:inline">Repost</span>
+                )}
               </button>
-              <ExternalReactionButton content={externalContent} iconSize="size-[18px]" count={post.likeCount} />
+              <ExternalReactionButton content={externalContent} count={post.likeCount} variant="chip" />
+              <div className="flex-1" />
               <button
                 type="button"
                 onClick={handleShare}
-                className="inline-flex items-center p-2 rounded-full text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors"
+                className="inline-flex items-center justify-center h-9 w-9 rounded-full text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors"
                 title="Share link"
               >
                 <Share2 className="size-[18px]" />

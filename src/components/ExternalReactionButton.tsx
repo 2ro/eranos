@@ -43,6 +43,13 @@ interface ExternalReactionButtonProps {
   count?: number;
   /** Extra class names on the trigger button. */
   className?: string;
+  /**
+   * Visual variant.
+   * - `pill` (default): compact icon-pill matching the legacy action bar.
+   * - `chip`: rounded chip with a label fallback when there's no count,
+   *   matching the GoFundMe-style PostActionBar / NoteCard action row.
+   */
+  variant?: 'pill' | 'chip';
 }
 
 /**
@@ -51,7 +58,7 @@ interface ExternalReactionButtonProps {
  * Includes hover-to-open emoji picker via `QuickReactMenu`, optimistic UI,
  * and displays the user's existing reaction & total count.
  */
-export function ExternalReactionButton({ content, iconSize = 'size-5', count, className }: ExternalReactionButtonProps) {
+export function ExternalReactionButton({ content, iconSize = 'size-5', count, className, variant = 'pill' }: ExternalReactionButtonProps) {
   const { user } = useCurrentUser();
   const { mutate: publishEvent } = useNostrPublish();
   const queryClient = useQueryClient();
@@ -132,7 +139,10 @@ export function ExternalReactionButton({ content, iconSize = 'size-5', count, cl
       <PopoverTrigger asChild>
         <button
           className={cn(
-            'flex items-center gap-1.5 p-2 rounded-full transition-colors',
+            'transition-colors',
+            variant === 'chip'
+              ? 'inline-flex items-center gap-2 h-9 px-3 rounded-full text-sm font-medium'
+              : 'flex items-center gap-1.5 p-2 rounded-full',
             hasReacted
               ? 'text-pink-500'
               : 'text-muted-foreground hover:text-pink-500 hover:bg-pink-500/10',
@@ -155,9 +165,13 @@ export function ExternalReactionButton({ content, iconSize = 'size-5', count, cl
           ) : (
             <Heart className={iconSize} />
           )}
-          {(count ?? reactionCount) > 0 && (
-            <span className="text-sm tabular-nums">{formatNumber(count ?? reactionCount)}</span>
-          )}
+          {(count ?? reactionCount) > 0 ? (
+            <span className={cn('tabular-nums', variant === 'chip' ? '' : 'text-sm')}>
+              {formatNumber(count ?? reactionCount)}
+            </span>
+          ) : variant === 'chip' ? (
+            <span className="hidden sm:inline">React</span>
+          ) : null}
         </button>
       </PopoverTrigger>
       <PopoverContent

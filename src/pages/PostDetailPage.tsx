@@ -9,12 +9,9 @@ import {
   ChevronRight,
   Copy,
   Loader2,
-  MessageCircle,
-  MoreHorizontal,
   Radio,
   Package,
   Rocket,
-  Share2,
   Star,
   Zap,
 } from "lucide-react";
@@ -65,9 +62,7 @@ import { PatchCard } from "@/components/PatchCard";
 import { PodcastDetailContent } from "@/components/PodcastDetailContent";
 import { PollContent } from "@/components/PollContent";
 const PullRequestCard = lazy(() => import("@/components/PullRequestCard").then(m => ({ default: m.PullRequestCard })));
-import { ReactionButton } from "@/components/ReactionButton";
 import { ReplyComposeModal } from "@/components/ReplyComposeModal";
-import { RepostMenu } from "@/components/RepostMenu";
 import { ThreadedReplyList, FlatThreadedReplyList, type ReplyNode } from "@/components/ThreadedReplyList";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -172,7 +167,6 @@ import { useEventInteractions, extractZapAmount, extractZapSender, extractZapMes
 import { useMuteList } from "@/hooks/useMuteList";
 import { useProfileUrl } from "@/hooks/useProfileUrl";
 import { useReplies } from "@/hooks/useReplies";
-import { toast } from "@/hooks/useToast";
 import { useEventStats } from "@/hooks/useTrending";
 import type { Nip85EventStats } from "@/hooks/useNip85Stats";
 import { extractISBNFromEvent } from "@/lib/bookstr";
@@ -180,7 +174,6 @@ import { isCustomEmoji, type ResolvedEmoji } from "@/lib/customEmoji";
 import { getDisplayName } from "@/lib/getDisplayName";
 import { isEventMuted } from "@/lib/muteHelpers";
 import { getParentEventId, getParentEventHints, isReplyEvent } from "@/lib/nostrEvents";
-import { shareOrCopy } from "@/lib/share";
 import { cn } from "@/lib/utils";
 
 interface PostDetailPageProps {
@@ -965,33 +958,6 @@ function PostDetailContent({ event }: { event: NostrEvent }) {
   // via `useCommunityModerationContext()`.
   const communityModContext = useCommunityModerationForEvent(event);
 
-  // NIP-19 encoded event identifier for share URLs
-  const encodedEventId = useMemo(() => {
-    if (event.kind >= 30000 && event.kind < 40000) {
-      const dTag = event.tags.find(([n]) => n === "d")?.[1];
-      if (dTag)
-        return nip19.naddrEncode({
-          kind: event.kind,
-          pubkey: event.pubkey,
-          identifier: dTag,
-        });
-    }
-    if (event.kind >= 10000 && event.kind < 20000) {
-      return nip19.naddrEncode({
-        kind: event.kind,
-        pubkey: event.pubkey,
-        identifier: "",
-      });
-    }
-    return nip19.neventEncode({ id: event.id, author: event.pubkey });
-  }, [event]);
-
-  const handleShare = useCallback(async () => {
-    const url = `${window.location.origin}/${encodedEventId}`;
-    const result = await shareOrCopy(url);
-    if (result === "copied") toast({ title: "Link copied to clipboard" });
-  }, [encodedEventId]);
-
   // Kind detection — mirrors NoteCard
   const isVine = event.kind === 34236;
   const isPoll = event.kind === 1068;
@@ -1417,7 +1383,6 @@ function PostDetailContent({ event }: { event: NostrEvent }) {
 
   const interactionQuoteCount = interactions?.quotes.length ?? 0;
   const quoteCount = interactionQuoteCount || (stats?.quotes ?? 0);
-  const repostTotal = (stats?.reposts ?? 0) + (stats?.quotes ?? 0);
   const hasStats = !!(
     stats?.reposts ||
     quoteCount ||
@@ -1510,55 +1475,12 @@ function PostDetailContent({ event }: { event: NostrEvent }) {
           </div>
 
           {/* Action buttons */}
-          <div className="flex items-center justify-between py-1 mt-2 border-t border-b border-border -mx-4 px-4">
-            <button
-              className="flex items-center gap-1.5 p-2 rounded-full text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors"
-              title="Reply"
-              onClick={() => setReplyOpen(true)}
-            >
-              <MessageCircle className="size-5" />
-              {stats?.replies ? (
-                <span className="text-sm tabular-nums">{formatNumber(stats.replies)}</span>
-              ) : null}
-            </button>
-
-            <RepostMenu event={event}>
-              {(isReposted: boolean) => (
-                <button
-                  className={`flex items-center gap-1.5 p-2 rounded-full transition-colors ${isReposted ? "text-accent hover:text-accent/80 hover:bg-accent/10" : "text-muted-foreground hover:text-accent hover:bg-accent/10"}`}
-                  title={isReposted ? "Undo repost" : "Repost"}
-                >
-                  <RepostIcon className="size-5" />
-                  {repostTotal ? (
-                    <span className="text-sm tabular-nums">{formatNumber(repostTotal)}</span>
-                  ) : null}
-                </button>
-              )}
-            </RepostMenu>
-
-            <ReactionButton
-              eventId={event.id}
-              eventPubkey={event.pubkey}
-              eventKind={event.kind}
-              reactionCount={stats?.reactions}
-            />
-
-            <button
-              className="p-2 rounded-full text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors sidebar:hidden"
-              title="Share"
-              onClick={handleShare}
-            >
-              <Share2 className="size-5" />
-            </button>
-
-            <button
-              className="p-2 rounded-full text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors"
-              title="More"
-              onClick={() => setMoreMenuOpen(true)}
-            >
-              <MoreHorizontal className="size-5" />
-            </button>
-          </div>
+          <PostActionBar
+            event={event}
+            onReply={() => setReplyOpen(true)}
+            onMore={() => setMoreMenuOpen(true)}
+            className="mt-2 pt-3 border-t border-border/60"
+          />
 
           <NoteMoreMenu
             event={event}
@@ -1628,55 +1550,12 @@ function PostDetailContent({ event }: { event: NostrEvent }) {
           </div>
 
           {/* Action buttons */}
-          <div className="flex items-center justify-between py-1 mt-2 border-t border-b border-border -mx-4 px-4">
-            <button
-              className="flex items-center gap-1.5 p-2 rounded-full text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors"
-              title="Reply"
-              onClick={() => setReplyOpen(true)}
-            >
-              <MessageCircle className="size-5" />
-              {stats?.replies ? (
-                <span className="text-sm tabular-nums">{formatNumber(stats.replies)}</span>
-              ) : null}
-            </button>
-
-            <RepostMenu event={event}>
-              {(isReposted: boolean) => (
-                <button
-                  className={`flex items-center gap-1.5 p-2 rounded-full transition-colors ${isReposted ? "text-accent hover:text-accent/80 hover:bg-accent/10" : "text-muted-foreground hover:text-accent hover:bg-accent/10"}`}
-                  title={isReposted ? "Undo repost" : "Repost"}
-                >
-                  <RepostIcon className="size-5" />
-                  {repostTotal ? (
-                    <span className="text-sm tabular-nums">{formatNumber(repostTotal)}</span>
-                  ) : null}
-                </button>
-              )}
-            </RepostMenu>
-
-            <ReactionButton
-              eventId={event.id}
-              eventPubkey={event.pubkey}
-              eventKind={event.kind}
-              reactionCount={stats?.reactions}
-            />
-
-            <button
-              className="p-2 rounded-full text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors sidebar:hidden"
-              title="Share"
-              onClick={handleShare}
-            >
-              <Share2 className="size-5" />
-            </button>
-
-            <button
-              className="p-2 rounded-full text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors"
-              title="More"
-              onClick={() => setMoreMenuOpen(true)}
-            >
-              <MoreHorizontal className="size-5" />
-            </button>
-          </div>
+          <PostActionBar
+            event={event}
+            onReply={() => setReplyOpen(true)}
+            onMore={() => setMoreMenuOpen(true)}
+            className="mt-2 pt-3 border-t border-border/60"
+          />
 
           <NoteMoreMenu
             event={event}
@@ -1752,38 +1631,12 @@ function PostDetailContent({ event }: { event: NostrEvent }) {
             )}
 
             {/* Action buttons — identical to reaction card */}
-            <div className="flex items-center justify-between py-1 mt-2 border-t border-b border-border -mx-4 px-4">
-              <button
-                className="flex items-center gap-1.5 p-2 rounded-full text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors"
-                title="Reply"
-                onClick={() => setReplyOpen(true)}
-              >
-                <MessageCircle className="size-5" />
-                {stats?.replies ? <span className="text-sm tabular-nums">{formatNumber(stats.replies)}</span> : null}
-              </button>
-
-              <RepostMenu event={event}>
-                {(isReposted: boolean) => (
-                  <button
-                    className={`flex items-center gap-1.5 p-2 rounded-full transition-colors ${isReposted ? "text-accent hover:text-accent/80 hover:bg-accent/10" : "text-muted-foreground hover:text-accent hover:bg-accent/10"}`}
-                    title={isReposted ? "Undo repost" : "Repost"}
-                  >
-                    <RepostIcon className="size-5" />
-                    {repostTotal ? <span className="text-sm tabular-nums">{formatNumber(repostTotal)}</span> : null}
-                  </button>
-                )}
-              </RepostMenu>
-
-              <ReactionButton eventId={event.id} eventPubkey={event.pubkey} eventKind={event.kind} reactionCount={stats?.reactions} />
-
-              <button className="p-2 rounded-full text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors sidebar:hidden" title="Share" onClick={handleShare}>
-                <Share2 className="size-5" />
-              </button>
-
-              <button className="p-2 rounded-full text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors" title="More" onClick={() => setMoreMenuOpen(true)}>
-                <MoreHorizontal className="size-5" />
-              </button>
-            </div>
+            <PostActionBar
+              event={event}
+              onReply={() => setReplyOpen(true)}
+              onMore={() => setMoreMenuOpen(true)}
+              className="mt-2 pt-3 border-t border-border/60"
+            />
 
             <NoteMoreMenu event={event} open={moreMenuOpen} onOpenChange={setMoreMenuOpen} />
             <ReplyComposeModal event={event} open={replyOpen} onOpenChange={setReplyOpen} />
@@ -1806,55 +1659,12 @@ function PostDetailContent({ event }: { event: NostrEvent }) {
             </div>
 
             {/* Action buttons */}
-            <div className="flex items-center justify-between py-1 border-t border-b border-border -mx-4 px-4">
-              <button
-                className="flex items-center gap-1.5 p-2 rounded-full text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors"
-                title="Reply"
-                onClick={() => setReplyOpen(true)}
-              >
-                <MessageCircle className="size-5" />
-                {stats?.replies ? (
-                  <span className="text-sm tabular-nums">{formatNumber(stats.replies)}</span>
-                ) : null}
-              </button>
-
-              <RepostMenu event={event}>
-                {(isReposted: boolean) => (
-                  <button
-                    className={`flex items-center gap-1.5 p-2 rounded-full transition-colors ${isReposted ? "text-accent hover:text-accent/80 hover:bg-accent/10" : "text-muted-foreground hover:text-accent hover:bg-accent/10"}`}
-                    title={isReposted ? "Undo repost" : "Repost"}
-                  >
-                    <RepostIcon className="size-5" />
-                    {repostTotal ? (
-                      <span className="text-sm tabular-nums">{formatNumber(repostTotal)}</span>
-                    ) : null}
-                  </button>
-                )}
-              </RepostMenu>
-
-              <ReactionButton
-                eventId={event.id}
-                eventPubkey={event.pubkey}
-                eventKind={event.kind}
-                reactionCount={stats?.reactions}
-              />
-
-              <button
-                className="p-2 rounded-full text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors sidebar:hidden"
-                title="Share"
-                onClick={handleShare}
-              >
-                <Share2 className="size-5" />
-              </button>
-
-              <button
-                className="p-2 rounded-full text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors"
-                title="More"
-                onClick={() => setMoreMenuOpen(true)}
-              >
-                <MoreHorizontal className="size-5" />
-              </button>
-            </div>
+            <PostActionBar
+              event={event}
+              onReply={() => setReplyOpen(true)}
+              onMore={() => setMoreMenuOpen(true)}
+              className="pt-3 border-t border-border/60"
+            />
 
             <NoteMoreMenu event={event} open={moreMenuOpen} onOpenChange={setMoreMenuOpen} />
             <ReplyComposeModal event={event} open={replyOpen} onOpenChange={setReplyOpen} />
@@ -1879,55 +1689,12 @@ function PostDetailContent({ event }: { event: NostrEvent }) {
           </div>
 
           {/* Action buttons — same as standard post detail */}
-          <div className="flex items-center justify-between py-1 border-t border-b border-border -mx-4 px-4">
-            <button
-              className="flex items-center gap-1.5 p-2 rounded-full text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors"
-              title="Reply"
-              onClick={() => setReplyOpen(true)}
-            >
-              <MessageCircle className="size-5" />
-              {stats?.replies ? (
-                <span className="text-sm tabular-nums">{formatNumber(stats.replies)}</span>
-              ) : null}
-            </button>
-
-            <RepostMenu event={event}>
-              {(isReposted: boolean) => (
-                <button
-                  className={`flex items-center gap-1.5 p-2 rounded-full transition-colors ${isReposted ? "text-accent hover:text-accent/80 hover:bg-accent/10" : "text-muted-foreground hover:text-accent hover:bg-accent/10"}`}
-                  title={isReposted ? "Undo repost" : "Reposts"}
-                >
-                  <RepostIcon className="size-5" />
-                  {repostTotal ? (
-                    <span className="text-sm tabular-nums">{formatNumber(repostTotal)}</span>
-                  ) : null}
-                </button>
-              )}
-            </RepostMenu>
-
-            <ReactionButton
-              eventId={event.id}
-              eventPubkey={event.pubkey}
-              eventKind={event.kind}
-              reactionCount={stats?.reactions}
-            />
-
-            <button
-              className="p-2 rounded-full text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors sidebar:hidden"
-              title="Share"
-              onClick={handleShare}
-            >
-              <Share2 className="size-5" />
-            </button>
-
-            <button
-              className="p-2 rounded-full text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors"
-              title="More"
-              onClick={() => setMoreMenuOpen(true)}
-            >
-              <MoreHorizontal className="size-5" />
-            </button>
-          </div>
+          <PostActionBar
+            event={event}
+            onReply={() => setReplyOpen(true)}
+            onMore={() => setMoreMenuOpen(true)}
+            className="mt-2 pt-3 border-t border-border/60"
+          />
 
           <NoteMoreMenu
             event={event}
@@ -2480,12 +2247,13 @@ export function PostDetailSkeleton() {
         </div>
 
         {/* Action buttons */}
-        <div className="flex items-center justify-between py-2 border-t border-b border-border -mx-4 px-4">
-          <Skeleton className="size-[34px] rounded-full" />
-          <Skeleton className="size-[34px] rounded-full" />
-          <Skeleton className="size-[34px] rounded-full" />
-          <Skeleton className="size-[34px] rounded-full" />
-          <Skeleton className="size-[34px] rounded-full" />
+        <div className="flex items-center gap-2 mt-2 pt-3 border-t border-border/60">
+          <Skeleton className="h-9 w-20 rounded-full" />
+          <Skeleton className="h-9 w-20 rounded-full" />
+          <Skeleton className="h-9 w-20 rounded-full" />
+          <div className="flex-1" />
+          <Skeleton className="size-9 rounded-full" />
+          <Skeleton className="size-9 rounded-full" />
         </div>
       </div>
 
