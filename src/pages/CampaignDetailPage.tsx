@@ -360,54 +360,69 @@ function CampaignDetailContent({ campaign }: { campaign: ParsedCampaign }) {
 
             {/* Engagement: stats counters, action bar, threaded replies
                 + donation receipts interleaved. */}
-            <div id="campaign-activity" className="space-y-2 scroll-mt-20">
-              {hasStats && (
-                <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs sm:text-sm text-muted-foreground">
-                  {engagementStats?.reposts ? (
-                    <button
-                      onClick={() => openInteractions('reposts')}
-                      className="hover:underline transition-colors"
-                    >
-                      <span className="font-bold text-foreground">
-                        {formatNumber(engagementStats.reposts)}
-                      </span>{' '}
-                      Repost{engagementStats.reposts !== 1 ? 's' : ''}
-                    </button>
-                  ) : null}
-                  {engagementStats?.quotes ? (
-                    <button
-                      onClick={() => openInteractions('quotes')}
-                      className="hover:underline transition-colors"
-                    >
-                      <span className="font-bold text-foreground">
-                        {formatNumber(engagementStats.quotes)}
-                      </span>{' '}
-                      Quote{engagementStats.quotes !== 1 ? 's' : ''}
-                    </button>
-                  ) : null}
-                  {engagementStats?.reactions ? (
-                    <button
-                      onClick={() => openInteractions('reactions')}
-                      className="hover:underline transition-colors"
-                    >
-                      <span className="font-bold text-foreground">
-                        {formatNumber(engagementStats.reactions)}
-                      </span>{' '}
-                      Like{engagementStats.reactions !== 1 ? 's' : ''}
-                    </button>
+            <div id="campaign-activity" className="scroll-mt-20">
+              <div className="rounded-2xl bg-card border border-border/60 shadow-sm px-4 sm:px-5 py-4 sm:py-5">
+                {hasStats && (
+                  <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs sm:text-sm text-muted-foreground pb-2">
+                    {engagementStats?.reposts ? (
+                      <button
+                        onClick={() => openInteractions('reposts')}
+                        className="hover:underline transition-colors"
+                      >
+                        <span className="font-bold text-foreground">
+                          {formatNumber(engagementStats.reposts)}
+                        </span>{' '}
+                        Repost{engagementStats.reposts !== 1 ? 's' : ''}
+                      </button>
+                    ) : null}
+                    {engagementStats?.quotes ? (
+                      <button
+                        onClick={() => openInteractions('quotes')}
+                        className="hover:underline transition-colors"
+                      >
+                        <span className="font-bold text-foreground">
+                          {formatNumber(engagementStats.quotes)}
+                        </span>{' '}
+                        Quote{engagementStats.quotes !== 1 ? 's' : ''}
+                      </button>
+                    ) : null}
+                    {engagementStats?.reactions ? (
+                      <button
+                        onClick={() => openInteractions('reactions')}
+                        className="hover:underline transition-colors"
+                      >
+                        <span className="font-bold text-foreground">
+                          {formatNumber(engagementStats.reactions)}
+                        </span>{' '}
+                        Like{engagementStats.reactions !== 1 ? 's' : ''}
+                      </button>
+                    ) : null}
+                  </div>
+                )}
+
+                <PostActionBar
+                  event={campaign.event}
+                  replyLabel="Comment"
+                  hideZap
+                  onReply={() => setReplyOpen(true)}
+                  onMore={() => setMoreMenuOpen(true)}
+                  className={hasStats ? 'pt-3 border-t border-border/60' : undefined}
+                />
+              </div>
+
+              <div className="mt-6">
+                <div className="flex items-baseline justify-between gap-3 mb-3 px-1">
+                  <h2 className="text-lg font-semibold tracking-tight">
+                    Comments &amp; donations
+                  </h2>
+                  {engagementStats?.replies ? (
+                    <span className="text-sm text-muted-foreground tabular-nums">
+                      {formatNumber(engagementStats.replies)}{' '}
+                      {engagementStats.replies === 1 ? 'comment' : 'comments'}
+                    </span>
                   ) : null}
                 </div>
-              )}
 
-              <PostActionBar
-                event={campaign.event}
-                replyLabel="Comment"
-                hideZap
-                onReply={() => setReplyOpen(true)}
-                onMore={() => setMoreMenuOpen(true)}
-              />
-
-              <div className="pt-2">
                 {commentsLoading && statsLoading && replyTree.length === 0 ? (
                   <div className="space-y-3">
                     {Array.from({ length: 3 }).map((_, i) => (
@@ -415,13 +430,22 @@ function CampaignDetailContent({ campaign }: { campaign: ParsedCampaign }) {
                     ))}
                   </div>
                 ) : replyTree.length > 0 ? (
-                  <div className="-mx-2 sm:-mx-4">
+                  <div className="-mx-2 sm:-mx-4 rounded-2xl bg-card border border-border/60 overflow-hidden">
                     <ThreadedReplyList roots={replyTree} />
                   </div>
                 ) : (
-                  <div className="py-8 text-center text-sm text-muted-foreground">
-                    No comments yet. Be the first to comment!
-                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setReplyOpen(true)}
+                    className="block w-full rounded-2xl border border-dashed border-border/80 bg-card/50 px-6 py-10 text-center hover:bg-card hover:border-primary/40 transition-colors"
+                  >
+                    <p className="text-base font-medium text-foreground">
+                      No comments yet
+                    </p>
+                    <p className="mt-1 text-sm text-muted-foreground">
+                      Be the first to leave a message of support.
+                    </p>
+                  </button>
                 )}
               </div>
             </div>
