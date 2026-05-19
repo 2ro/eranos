@@ -7,10 +7,6 @@ import { parseCountryIdentifier } from '@/lib/countryIdentifiers';
 /** Addressable kind number for fundraising campaigns (see NIP.md). */
 export const CAMPAIGN_KIND = 30223;
 
-const HIDDEN_CAMPAIGN_COORDS = new Set([
-  `${CAMPAIGN_KIND}:0461fcbecc4c3374439932d6b8f11269ccdb7cc973ad7a50ae362db135a474dd:hello`,
-]);
-
 /** Canonical category slugs shown in the create-campaign form. */
 export const CAMPAIGN_CATEGORIES = [
   'human-rights',
@@ -164,7 +160,6 @@ export function parseCampaign(event: NostrEvent): ParsedCampaign | null {
   const identifier = getTag(event, 'd');
   const title = getTag(event, 'title');
   if (!identifier || !title) return null;
-  if (HIDDEN_CAMPAIGN_COORDS.has(`${CAMPAIGN_KIND}:${event.pubkey}:${identifier}`)) return null;
 
   const seen = new Set<string>();
   const recipients: CampaignRecipient[] = [];

@@ -6,6 +6,7 @@ import { Globe2, HandHeart, Loader2, Users } from 'lucide-react';
 import { useAppContext } from '@/hooks/useAppContext';
 import { useLayoutOptions } from '@/contexts/LayoutContext';
 import { useCampaigns } from '@/hooks/useCampaigns';
+import { useCampaignModeration } from '@/hooks/useCampaignModeration';
 import { useDiscoverCommunities } from '@/hooks/useDiscoverCommunities';
 import { useDiscoverFeed } from '@/hooks/useDiscoverFeed';
 import { useInfiniteScroll } from '@/hooks/useInfiniteScroll';
@@ -71,7 +72,21 @@ export function DiscoverPage() {
       'Campaigns, communities, and conversations from every corner of the globe. Backed by Bitcoin, broadcast on Nostr.',
   });
 
-  const { data: campaigns, isLoading: campaignsLoading } = useCampaigns({ limit: 24 });
+  // Moderator-curated allowlist for the campaigns shelf. Discover surfaces
+  // the same approved-and-not-hidden view as the homepage so the two stay
+  // in sync. Until moderation resolves, `coordinates` is undefined and the
+  // shelf renders skeletons.
+  const { data: moderation, isReady: moderationReady } = useCampaignModeration();
+  const approvedNotHidden = useMemo(() => {
+    if (!moderation) return [] as string[];
+    return Array.from(moderation.approvedCoords).filter(
+      (c) => !moderation.hiddenCoords.has(c),
+    );
+  }, [moderation]);
+
+  const { data: campaigns, isLoading: campaignsLoading } = useCampaigns(
+    moderationReady ? { coordinates: approvedNotHidden, limit: 24 } : { limit: 24 },
+  );
   const { data: communities, isLoading: communitiesLoading } = useDiscoverCommunities({
     limit: 18,
   });
@@ -80,6 +95,10 @@ export function DiscoverPage() {
   // recency. `useCampaigns` already filters archives by default.
   const shelfCampaigns = useMemo(() => (campaigns ?? []).slice(0, 12), [campaigns]);
   const shelfCommunities = useMemo(() => (communities ?? []).slice(0, 12), [communities]);
+
+  // The shelf-loading flag rolls up moderation readiness so we keep
+  // skeletons up while the moderator pack + labels are still in flight.
+  const shelfLoading = campaignsLoading || !moderationReady;
 
   return (
     <main className="min-h-screen pb-16">
@@ -113,7 +132,7 @@ export function DiscoverPage() {
             onSeeAll={() => navigate('/')}
             className="pb-3 sm:px-6"
           />
-          {campaignsLoading && shelfCampaigns.length === 0 ? (
+          {shelfLoading && shelfCampaigns.length === 0 ? (
             <HorizontalScroll className="sm:px-6">
               {Array.from({ length: 4 }).map((_, i) => (
                 <div key={i} className="w-72 shrink-0">

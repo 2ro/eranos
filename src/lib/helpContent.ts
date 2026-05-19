@@ -398,9 +398,9 @@ export function getFAQItem(appName: string, itemId: string): FAQItem | undefined
   return undefined;
 }
 
-/** The Team Soapbox follow pack coordinates (kind 39089 addressable event). */
-export const TEAM_SOAPBOX_PACK = {
-  kind: 39089,
-  pubkey: '932614571afcbad4d17a191ee281e39eebbb41b93fac8fd87829622aeb112f4d',
-  identifier: 'k4p5w0n22suf',
-} as const;
+/**
+ * @deprecated Re-exported from `@/lib/agoraDefaults` as `TEAM_SOAPBOX`.
+ * This alias is kept for one transition pass; new code should import the
+ * canonical constant directly.
+ */
+export { TEAM_SOAPBOX as TEAM_SOAPBOX_PACK } from '@/lib/agoraDefaults';

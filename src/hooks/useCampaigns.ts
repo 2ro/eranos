@@ -20,6 +20,21 @@ interface UseCampaignsOptions {
    */
   recipientPubkeys?: string[];
   /**
+   * Restrict to a specific set of `30223:<pubkey>:<d>` coordinates.
+   *
+   * Used by moderator-curated surfaces (the home page, Discover) that only
+   * want to render campaigns labeled `approved` by a Team Soapbox moderator
+   * — see `useCampaignModeration`.
+   *
+   * Semantics:
+   *  - `undefined` (default): no coordinate restriction.
+   *  - `[]`: return an empty result without issuing a relay request. This is
+   *    a sentinel for "the moderator allowlist is empty" — distinct from
+   *    omitting the option, so consumers don't accidentally fall through to
+   *    the unfiltered behavior while their moderator query loads.
+   */
+  coordinates?: string[];
+  /**
    * Include campaigns that have been archived by their creator
    * (`["status", "archived"]`). Defaults to `false` so archived
    * campaigns never appear in the main fundraisers listing.
@@ -43,23 +58,67 @@ interface UseCampaignsOptions {
  */
 export function useCampaigns(options: UseCampaignsOptions = {}) {
   const { nostr } = useNostr();
-  const { category, countryCode, limit = 60, authors, recipientPubkeys, includeArchived = false } = options;
+  const {
+    category,
+    countryCode,
+    limit = 60,
+    authors,
+    recipientPubkeys,
+    coordinates,
+    includeArchived = false,
+  } = options;
+
+  // Stable cache key for the coordinates option; sort so order doesn't
+  // change the query identity.
+  const coordinatesKey = coordinates ? [...coordinates].sort().join(',') : undefined;
 
   return useQuery({
     queryKey: [
       'campaigns',
-      { category, countryCode, limit, authors, recipientPubkeys, includeArchived },
+      { category, countryCode, limit, authors, recipientPubkeys, coordinatesKey, includeArchived },
     ],
     queryFn: async (c) => {
-      const filter: NostrFilter = { kinds: [CAMPAIGN_KIND], limit };
-      if (category) filter['#t'] = [category];
-      if (countryCode) filter['#i'] = [createCountryIdentifier(countryCode)];
-      if (authors && authors.length > 0) filter.authors = authors;
-      if (recipientPubkeys && recipientPubkeys.length > 0) {
-        filter['#p'] = recipientPubkeys;
+      // Sentinel: empty allowlist = empty result. Skip the relay entirely.
+      if (coordinates && coordinates.length === 0) return [] as ParsedCampaign[];
+
+      // Build the relay filter(s). When `coordinates` is set, we fan out into
+      // one filter per author so we can use the indexed `#d` filter cheaply;
+      // a single REQ carries all the sub-filters server-side.
+      let filters: NostrFilter[];
+      if (coordinates && coordinates.length > 0) {
+        const byAuthor = new Map<string, string[]>();
+        for (const coord of coordinates) {
+          // Expected: `30223:<pubkey>:<d>`
+          const parts = coord.split(':');
+          if (parts.length < 3) continue;
+          const kindPart = Number(parts[0]);
+          if (kindPart !== CAMPAIGN_KIND) continue;
+          const pubkey = parts[1];
+          const dTag = parts.slice(2).join(':');
+          if (!pubkey || !dTag) continue;
+          const list = byAuthor.get(pubkey) ?? [];
+          list.push(dTag);
+          byAuthor.set(pubkey, list);
+        }
+        if (byAuthor.size === 0) return [] as ParsedCampaign[];
+        filters = Array.from(byAuthor, ([author, dTags]) => {
+          const f: NostrFilter = { kinds: [CAMPAIGN_KIND], authors: [author], '#d': dTags };
+          if (category) f['#t'] = [category];
+          if (countryCode) f['#i'] = [createCountryIdentifier(countryCode)];
+          return f;
+        });
+      } else {
+        const filter: NostrFilter = { kinds: [CAMPAIGN_KIND], limit };
+        if (category) filter['#t'] = [category];
+        if (countryCode) filter['#i'] = [createCountryIdentifier(countryCode)];
+        if (authors && authors.length > 0) filter.authors = authors;
+        if (recipientPubkeys && recipientPubkeys.length > 0) {
+          filter['#p'] = recipientPubkeys;
+        }
+        filters = [filter];
       }
 
-      const events = await nostr.query([filter], { signal: c.signal });
+      const events = await nostr.query(filters, { signal: c.signal });
 
       // Dedupe by (pubkey, d) keeping the newest version.
       const latestByCoord = new Map<string, NostrEvent>();

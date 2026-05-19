@@ -22,6 +22,7 @@
 |--------------------------|-----------------------------------------|-----------------------------------------------------------------|
 | Flat Communities | 34550, 30009, 8, 1111, 1984 | One-level badge membership with explicit moderators (NIP-72 ext) |
 | Community Chat | 34550, 1311 | Realtime member chat scoped to a NIP-72 community |
+| Campaign Moderation | 30223, 1985, 39089 | Homepage curation via moderator-signed labels in the `agora.moderation` namespace, gated by a follow-pack moderator roster |
 
 ### Community Chat
 
@@ -327,6 +328,102 @@ Clients MUST verify each kind 8333 event on-chain before counting it toward the 
 - **Dust protection:** when a donor enters an amount that would assign any recipient less than the dust limit, the client MUST block the donation and either suggest the minimum viable total or prompt the donor to remove recipients.
 - **Editability:** the creator MAY republish the same `(kind, pubkey, d)` triple to update the campaign. Clients SHOULD keep `published_at` from the first publish on subsequent edits (NIP-23 convention).
 - **Closing & archiving:** the creator MAY soft-close a campaign by republishing it with a `["status", "archived"]` tag. Clients SHOULD hide archived campaigns from discovery feeds and disable the donate flow, but MUST keep them reachable by direct link so existing donors can still find them and donation history is preserved. The creator can reopen the campaign by republishing without the status tag (or with any other status value). For a hard delete, the creator MAY publish a NIP-09 kind 5 deletion request referencing the campaign's `a` coordinate; clients SHOULD continue to render past donations against the campaign even after deletion.
+
+### Campaign Moderation Labels
+
+Agora curates which kind 30223 campaigns appear on the homepage (`/`) and on Discover (`/discover`) via moderator-signed NIP-32 label events (kind 1985) in a dedicated label namespace. The campaign event itself is never modified — surfacing is purely a client-side rollup of label events.
+
+#### Namespace
+
+```
+agora.moderation
+```
+
+Each label event carries the namespace twice, per NIP-32:
+
+- A capital-`L` "namespace" tag (relay-indexed for queries).
+- A lowercase `l` tag where the 2nd element is the label value and the 3rd is the namespace.
+
+#### Label values
+
+Two independent axes; the newest moderator-signed label per axis per campaign wins.
+
+| Axis     | Values                  | Meaning                                                                 |
+|----------|-------------------------|-------------------------------------------------------------------------|
+| approval | `approved`, `unapproved`| `approved` allows the campaign on `/` and Discover. `unapproved` retracts a previous approval. |
+| hide     | `hidden`, `unhidden`    | `hidden` suppresses the campaign even if approved. `unhidden` retracts a previous hide. |
+
+A campaign is shown on `/` and Discover iff the latest approval label is `approved` AND the latest hide label is not `hidden`. Hide always wins over approval.
+
+#### Event Structure
+
+```json
+{
+  "kind": 1985,
+  "content": "",
+  "tags": [
+    ["L", "agora.moderation"],
+    ["l", "approved", "agora.moderation"],
+    ["a", "30223:<author-pubkey>:<campaign-d-tag>"],
+    ["alt", "Campaign moderation: approved"]
+  ]
+}
+```
+
+Required tags:
+
+- `L` set to `agora.moderation`.
+- `l` with the label value as the 2nd element and `agora.moderation` as the 3rd.
+- `a` referencing the campaign coordinate `30223:<pubkey>:<d>`.
+- `alt` (NIP-31) — clients without label support will display this string.
+
+#### Trust Model
+
+Only label events authored by current members of the **Team Soapbox** follow pack are honored. The pack is a kind 39089 (NIP-51 follow pack) addressable event:
+
+```
+kind:       39089
+pubkey:     932614571afcbad4d17a191ee281e39eebbb41b93fac8fd87829622aeb112f4d
+d-tag:      k4p5w0n22suf
+```
+
+The pack `p` tags are the authoritative moderator list. Anyone may publish a kind 1985 event in the `agora.moderation` namespace, but events from non-pack authors are silently ignored at the relay-filter layer (`authors:` is pinned to the pack `p` tags). This means:
+
+- Self-approval is impossible unless the pack author has added you.
+- A moderator removed from the pack immediately loses moderation authority — campaigns kept alive only by their labels return to "pending" until another moderator approves them.
+- The pack author (single signer) can reset the entire moderator roster by republishing the pack.
+
+#### Querying
+
+Step 1 — fetch the pack:
+
+```json
+{
+  "kinds": [39089],
+  "authors": ["932614571afcbad4d17a191ee281e39eebbb41b93fac8fd87829622aeb112f4d"],
+  "#d": ["k4p5w0n22suf"],
+  "limit": 1
+}
+```
+
+Step 2 — fetch label events from pack members in the namespace:
+
+```json
+{
+  "kinds": [1985],
+  "authors": ["<pack p-tag 1>", "<pack p-tag 2>", "..."],
+  "#L": ["agora.moderation"],
+  "limit": 2000
+}
+```
+
+Step 3 — fold by `(campaign-coord, axis)`, latest-`created_at`-wins. Then fetch only the approved-and-not-hidden campaign coordinates with one filter per author (bundled in a single REQ).
+
+#### Client Behavior
+
+- Clients SHOULD render approve/hide controls only for users whose pubkey appears in the pack.
+- Clients MAY display "Hidden" badges on hidden campaigns when viewed by a moderator, and SHOULD NOT render them at all to non-moderators.
+- Non-moderator authors viewing the homepage SHOULD see their own pending campaigns in a separate explained section so they understand why their campaign isn't yet on the homepage. The campaign URL remains live and donatable regardless of moderation state.
 
 ---
 

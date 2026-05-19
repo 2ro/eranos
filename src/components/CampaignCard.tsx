@@ -6,9 +6,11 @@ import { Badge } from '@/components/ui/badge';
 import { Card } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { Skeleton } from '@/components/ui/skeleton';
+import { CampaignModerationMenu } from '@/components/CampaignModerationMenu';
 import { useAuthor } from '@/hooks/useAuthor';
 import { useBtcPrice } from '@/hooks/useBtcPrice';
 import { useCampaignDonations } from '@/hooks/useCampaignDonations';
+import { useCampaignModeration } from '@/hooks/useCampaignModeration';
 import {
   type ParsedCampaign,
   encodeCampaignNaddr,
@@ -76,6 +78,7 @@ export function CampaignCard({ campaign, variant = 'compact', className }: Campa
   const author = useAuthor(campaign.pubkey);
   const { data: stats } = useCampaignDonations(campaign.aTag);
   const { data: btcPrice } = useBtcPrice();
+  const { data: moderation } = useCampaignModeration();
 
   const naddr = useMemo(() => encodeCampaignNaddr(campaign), [campaign]);
   const cover = sanitizeUrl(campaign.image);
@@ -89,6 +92,8 @@ export function CampaignCard({ campaign, variant = 'compact', className }: Campa
   const tagLabel = getCampaignPrimaryTagLabel(campaign);
 
   const isFeatured = variant === 'featured';
+  const isApproved = moderation.approvedCoords.has(campaign.aTag);
+  const isHidden = moderation.hiddenCoords.has(campaign.aTag);
 
   return (
     <Link
@@ -131,15 +136,31 @@ export function CampaignCard({ campaign, variant = 'compact', className }: Campa
               {tagLabel}
             </Badge>
           )}
-          {campaign.archived && (
-            <Badge
-              variant="secondary"
-              className="absolute top-3 right-3 backdrop-blur bg-background/85 border-border/40"
-            >
-              <Archive className="size-3.5 mr-1" />
-              Archived
-            </Badge>
-          )}
+          <div className="absolute top-3 right-3 flex items-center gap-2">
+            {campaign.archived && (
+              <Badge
+                variant="secondary"
+                className="backdrop-blur bg-background/85 border-border/40"
+              >
+                <Archive className="size-3.5 mr-1" />
+                Archived
+              </Badge>
+            )}
+            {isHidden && (
+              <Badge
+                variant="secondary"
+                className="backdrop-blur bg-destructive/15 text-destructive border-destructive/30"
+              >
+                Hidden
+              </Badge>
+            )}
+            <CampaignModerationMenu
+              coord={campaign.aTag}
+              campaignTitle={campaign.title}
+              isApproved={isApproved}
+              isHidden={isHidden}
+            />
+          </div>
         </div>
 
         {/* Body */}
