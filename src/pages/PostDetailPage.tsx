@@ -51,6 +51,7 @@ import { LiveStreamPage } from "@/components/LiveStreamPage";
 import { MagicDeckContent } from "@/components/MagicDeckContent";
 import { MusicDetailContent } from "@/components/MusicDetailContent";
 import { ActivityCard, EventActionHeader, NoteCard } from "@/components/NoteCard";
+import { FeedCard } from "@/components/FeedCard";
 import { publishedAtAction } from "@/lib/publishedAtAction";
 import { NoteContent } from "@/components/NoteContent";
 import { NsiteCard } from "@/components/NsiteCard";
@@ -439,13 +440,15 @@ function ProfileBadgesDetailView({ event }: { event: NostrEvent }) {
       <NoteCard event={event} />
       <div className="pb-16 sidebar:pb-0">
         {commentsLoading ? (
-          <div className="divide-y divide-border">
+          <FeedCard className="mt-4 divide-y divide-border">
             {Array.from({ length: 3 }).map((_, i) => (
               <ReplyCardSkeleton key={i} />
             ))}
-          </div>
+          </FeedCard>
         ) : orderedReplies.length > 0 ? (
-          <FlatThreadedReplyList replies={orderedReplies} />
+          <FeedCard className="mt-4">
+            <FlatThreadedReplyList replies={orderedReplies} />
+          </FeedCard>
         ) : (
           <div className="py-12 text-center text-muted-foreground text-sm">
             No replies yet. Be the first to reply!
@@ -2065,13 +2068,15 @@ function PostDetailContent({ event }: { event: NostrEvent }) {
       {/* Replies */}
       <div className="pb-16 sidebar:pb-0">
         {repliesLoading ? (
-          <div className="divide-y divide-border">
+          <FeedCard className="mt-4 divide-y divide-border">
             {Array.from({ length: 3 }).map((_, i) => (
               <ReplyCardSkeleton key={i} />
             ))}
-          </div>
+          </FeedCard>
         ) : replyTree.length > 0 ? (
-          <ThreadedReplyList roots={replyTree} />
+          <FeedCard className="mt-4">
+            <ThreadedReplyList roots={replyTree} />
+          </FeedCard>
          ) : !parentEventId ? (
           <div className="py-12 text-center text-muted-foreground text-sm">
             No replies yet. Be the first to reply!
@@ -2258,11 +2263,11 @@ export function PostDetailSkeleton() {
       </div>
 
       {/* Replies skeleton */}
-      <div className="divide-y divide-border">
+      <FeedCard className="mt-4 divide-y divide-border">
         {Array.from({ length: 3 }).map((_, i) => (
           <ReplyCardSkeleton key={i} />
         ))}
-      </div>
+      </FeedCard>
     </div>
   );
 }

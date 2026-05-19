@@ -14,6 +14,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { CampaignCard, CampaignCardSkeleton } from '@/components/CampaignCard';
+import { FeedCard } from '@/components/FeedCard';
 import { NoteCard } from '@/components/NoteCard';
 
 import { DiscoverHero } from '@/components/discovery/DiscoverHero';
@@ -227,11 +228,11 @@ function DiscoverFeed() {
 
   if (isLoading && events.length === 0) {
     return (
-      <div className="mx-4 sm:mx-6 rounded-2xl bg-card border border-border/60 shadow-sm overflow-hidden divide-y divide-border/60">
+      <FeedCard className="divide-y divide-border/60">
         {Array.from({ length: 6 }).map((_, i) => (
           <FeedRowSkeleton key={i} />
         ))}
-      </div>
+      </FeedCard>
     );
   }
 
@@ -256,11 +257,11 @@ function DiscoverFeed() {
           rows supply their own per-row separation; `overflow-hidden`
           clips the last row's border so it tucks under the card's
           bottom edge. */}
-      <div className="mx-4 sm:mx-6 rounded-2xl bg-card border border-border/60 shadow-sm overflow-hidden">
+      <FeedCard>
         {events.map((event) => (
           <DiscoverFeedRow key={event.id} event={event} />
         ))}
-      </div>
+      </FeedCard>
       {hasNextPage ? (
         <div
           ref={scrollRef}

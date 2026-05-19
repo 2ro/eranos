@@ -9,6 +9,7 @@ import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { NoteCard } from '@/components/NoteCard';
+import { FeedCard } from '@/components/FeedCard';
 import { useAuthor } from '@/hooks/useAuthor';
 import { useAuthors } from '@/hooks/useAuthors';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
@@ -508,13 +509,13 @@ function FollowPackView({ addr, relays }: { addr: AddrCoords; relays?: string[] 
           {activeTab === 'feed' ? (
             <PackFeedTab pubkeys={pubkeys} />
           ) : membersLoading ? (
-            <div className="divide-y divide-border">
+            <FeedCard className="mt-2 divide-y divide-border">
               {Array.from({ length: Math.min(pubkeys.length, 8) }).map((_, i) => (
                 <MemberCardSkeleton key={i} />
               ))}
-            </div>
+            </FeedCard>
           ) : (
-            <div className="divide-y divide-border">
+            <FeedCard className="mt-2 divide-y divide-border">
               {pubkeys.map((pk) => {
                 const member = membersMap?.get(pk);
                 const isFollowed = followedPubkeys.has(pk);
@@ -528,7 +529,7 @@ function FollowPackView({ addr, relays }: { addr: AddrCoords; relays?: string[] 
                   />
                 );
               })}
-            </div>
+            </FeedCard>
           )}
         </div>
       </div>

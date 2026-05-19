@@ -5,6 +5,7 @@ import { useParams } from 'react-router-dom';
 import { useNostr } from '@nostrify/react';
 import { useQuery } from '@tanstack/react-query';
 import { NoteCard } from '@/components/NoteCard';
+import { FeedCard } from '@/components/FeedCard';
 import { PageHeader } from '@/components/PageHeader';
 import { SubHeaderBar } from '@/components/SubHeaderBar';
 import { Badge } from '@/components/ui/badge';
@@ -112,7 +113,7 @@ export function RelayPage() {
       {/* Feed section */}
       <div>
         {eventsLoading ? (
-          <div className="divide-y divide-border">
+          <FeedCard className="mt-2 divide-y divide-border">
             {Array.from({ length: 5 }).map((_, i) => (
               <div key={i} className="px-4 py-3">
                 <div className="flex gap-3">
@@ -125,9 +126,11 @@ export function RelayPage() {
                 </div>
               </div>
             ))}
-          </div>
+          </FeedCard>
         ) : filteredEvents && filteredEvents.length > 0 ? (
-          filteredEvents.map((event) => <NoteCard key={event.id} event={event} />)
+          <FeedCard className="mt-2">
+            {filteredEvents.map((event) => <NoteCard key={event.id} event={event} />)}
+          </FeedCard>
         ) : (
           <div className="py-16 text-center text-muted-foreground">
             No events found on this relay.

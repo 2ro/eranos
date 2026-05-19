@@ -13,6 +13,7 @@ import { HeroBanner } from '@/components/HeroBanner';
 import { LoginArea } from '@/components/auth/LoginArea';
 import { MembersOnlyToggle } from '@/components/MembersOnlyToggle';
 import { NoteCard } from '@/components/NoteCard';
+import { FeedCard } from '@/components/FeedCard';
 import { PullToRefresh } from '@/components/PullToRefresh';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -532,13 +533,13 @@ function ActivitiesFeed({ onRefresh }: { onRefresh: () => Promise<void> }) {
     <PullToRefresh onRefresh={onRefresh}>
       <>
         {isLoading ? (
-          <div className="border-t border-border/60 divide-y divide-border/60">
+          <FeedCard className="mt-2 divide-y divide-border/60">
             {Array.from({ length: 5 }).map((_, i) => (
               <NoteCardSkeleton key={i} />
             ))}
-          </div>
+          </FeedCard>
         ) : displayedEvents && displayedEvents.length > 0 ? (
-          <div className="border-t border-border/60 divide-y divide-border/60">
+          <FeedCard className="mt-2">
             {displayedEvents.map((event) => {
               const aTag = getCommunityATag(event);
               const ctx = aTag ? contextByATag.get(aTag) ?? null : null;
@@ -548,7 +549,7 @@ function ActivitiesFeed({ onRefresh }: { onRefresh: () => Promise<void> }) {
                 </CommunityModerationContext.Provider>
               );
             })}
-          </div>
+          </FeedCard>
         ) : membersOnly && activityEvents && activityEvents.length > 0 ? (
           <FeedEmptyState message="No activity from members of your communities yet. Toggle the shield icon to see all community activity." />
         ) : (

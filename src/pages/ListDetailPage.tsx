@@ -21,6 +21,7 @@ import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { NoteCard } from '@/components/NoteCard';
+import { FeedCard } from '@/components/FeedCard';
 import { PageHeader } from '@/components/PageHeader';
 import { AddMembersDialog } from '@/components/AddMembersDialog';
 import { ReplyComposeModal } from '@/components/ReplyComposeModal';
@@ -192,7 +193,7 @@ function ListFeedTab({ list }: { list: UserList }) {
 
   if (isLoading && filteredPosts.length === 0) {
     return (
-      <div className="divide-y divide-border">
+      <FeedCard className="mt-2 divide-y divide-border">
         {Array.from({ length: 5 }).map((_, i) => (
           <div key={i} className="px-4 py-3">
             <div className="flex gap-3">
@@ -205,7 +206,7 @@ function ListFeedTab({ list }: { list: UserList }) {
             </div>
           </div>
         ))}
-      </div>
+      </FeedCard>
     );
   }
 
@@ -218,11 +219,11 @@ function ListFeedTab({ list }: { list: UserList }) {
   }
 
   return (
-    <div>
+    <FeedCard className="mt-2">
       {filteredPosts.map((event) => (
         <NoteCard key={event.id} event={event} />
       ))}
-    </div>
+    </FeedCard>
   );
 }
 
@@ -449,7 +450,7 @@ export function ListDetailPage() {
     return (
       <main>
         <PageHeader onBack={() => navigate(-1)} titleContent={<Skeleton className="h-6 w-32" />} />
-        <div className="divide-y divide-border">
+        <FeedCard className="mt-2 divide-y divide-border">
           {Array.from({ length: 4 }).map((_, i) => (
             <div key={i} className="px-4 py-3">
               <div className="flex gap-3">
@@ -461,7 +462,7 @@ export function ListDetailPage() {
               </div>
             </div>
           ))}
-        </div>
+        </FeedCard>
       </main>
     );
   }

@@ -6,6 +6,7 @@ import { CreateCommunityEventDialog } from "@/components/CreateCommunityEventDia
 import { FeedEmptyState } from "@/components/FeedEmptyState";
 import { KindInfoButton } from "@/components/KindInfoButton";
 import { NoteCard } from "@/components/NoteCard";
+import { FeedCard } from "@/components/FeedCard";
 import { PageHeader } from "@/components/PageHeader";
 import { PullToRefresh } from "@/components/PullToRefresh";
 import { SubHeaderBar } from "@/components/SubHeaderBar";
@@ -146,16 +147,18 @@ export function EventsFeedPage() {
 
       <PullToRefresh onRefresh={handleRefresh}>
         {showSkeleton ? (
-          <div className="divide-y divide-border">
+          <FeedCard className="mt-2 divide-y divide-border">
             {Array.from({ length: 4 }).map((_, i) => (
               <EventCardSkeleton key={i} />
             ))}
-          </div>
+          </FeedCard>
         ) : feedItems.length > 0 ? (
-          <div>
-            {feedItems.map((item) => (
-              <NoteCard key={item.event.id} event={item.event} />
-            ))}
+          <>
+            <FeedCard className="mt-2">
+              {feedItems.map((item) => (
+                <NoteCard key={item.event.id} event={item.event} />
+              ))}
+            </FeedCard>
 
             {hasNextPage && (
               <div ref={scrollRef} className="py-4">
@@ -166,7 +169,7 @@ export function EventsFeedPage() {
                 )}
               </div>
             )}
-          </div>
+          </>
         ) : (
           <FeedEmptyState
             message={

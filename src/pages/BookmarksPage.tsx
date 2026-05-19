@@ -1,6 +1,7 @@
 import { useSeoMeta } from '@unhead/react';
 import { Bookmark } from 'lucide-react';
 import { NoteCard } from '@/components/NoteCard';
+import { FeedCard } from '@/components/FeedCard';
 import { PageHeader } from '@/components/PageHeader';
 import { PullToRefresh } from '@/components/PullToRefresh';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -43,17 +44,17 @@ export function BookmarksPage() {
               <LoginArea className="max-w-60" />
             </div>
           ) : isLoading || (bookmarkedIds.length > 0 && isLoadingEvents) ? (
-            <div className="divide-y divide-border">
+            <FeedCard className="mt-2 divide-y divide-border">
               {Array.from({ length: 4 }).map((_, i) => (
                 <BookmarkSkeleton key={i} />
               ))}
-            </div>
+            </FeedCard>
           ) : events.length > 0 ? (
-            <div>
+            <FeedCard className="mt-2">
               {events.map((event) => (
                 <NoteCard key={event.id} event={event} />
               ))}
-            </div>
+            </FeedCard>
           ) : (
             <div className="py-20 px-8 flex flex-col items-center gap-6 text-center">
               <div className="p-4 rounded-full bg-muted">

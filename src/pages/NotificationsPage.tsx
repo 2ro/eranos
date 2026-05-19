@@ -11,6 +11,7 @@ import { useAppContext } from '@/hooks/useAppContext';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { NoteCard } from '@/components/NoteCard';
+import { FeedCard } from '@/components/FeedCard';
 import { SubHeaderBar } from '@/components/SubHeaderBar';
 import { TabButton } from '@/components/TabButton';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
@@ -240,19 +241,21 @@ export function NotificationsPage() {
             Log in to see your notifications.
           </div>
         ) : isLoading || !hasFetched ? (
-          <div className="divide-y divide-border">
+          <FeedCard className="mt-2 divide-y divide-border">
             {Array.from({ length: 4 }).map((_, i) => (
               <NotificationSkeleton key={i} />
             ))}
-          </div>
+          </FeedCard>
         ) : filteredGroups.length > 0 ? (
-          <div>
-            {filteredGroups.map((group) => (
-              <GroupedNotificationView
-                key={group.key}
-                group={group}
-              />
-            ))}
+          <>
+            <FeedCard className="mt-2">
+              {filteredGroups.map((group) => (
+                <GroupedNotificationView
+                  key={group.key}
+                  group={group}
+                />
+              ))}
+            </FeedCard>
             {hasNextPage && (
               <div ref={scrollRef} className="py-4">
                 {isFetchingNextPage && (
@@ -262,7 +265,7 @@ export function NotificationsPage() {
                 )}
               </div>
             )}
-          </div>
+          </>
         ) : (
           <div className="py-16 text-center text-muted-foreground">
             No notifications yet.

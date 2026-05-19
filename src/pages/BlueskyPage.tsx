@@ -20,6 +20,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { ReplyComposeModal } from '@/components/ReplyComposeModal';
 import { ExternalReactionButton } from '@/components/ExternalReactionButton';
+import { FeedCard } from '@/components/FeedCard';
 import { useAppContext } from '@/hooks/useAppContext';
 import { useBlueskyTrending, type BlueskyPost } from '@/hooks/useBlueskyTrending';
 import { useBlueskyActorSearch, type BlueskyActorResult } from '@/hooks/useBlueskyActorSearch';
@@ -468,7 +469,7 @@ function BlueskySearchBar() {
 
 function BlueskyLoadingSkeleton() {
   return (
-    <div className="divide-y divide-border">
+    <FeedCard className="mt-2 divide-y divide-border">
       {Array.from({ length: 5 }).map((_, i) => (
         <div key={i} className="px-4 py-3">
           <div className="flex gap-3">
@@ -490,7 +491,7 @@ function BlueskyLoadingSkeleton() {
           </div>
         </div>
       ))}
-    </div>
+    </FeedCard>
   );
 }
 
@@ -604,10 +605,12 @@ export function BlueskyPage() {
           <p className="text-muted-foreground text-sm">No posts found.</p>
         </div>
       ) : (
-        <div>
-          {allPosts.map((post) => (
-            <BlueskyFeedPost key={post.uri} post={post} />
-          ))}
+        <>
+          <FeedCard className="mt-2">
+            {allPosts.map((post) => (
+              <BlueskyFeedPost key={post.uri} post={post} />
+            ))}
+          </FeedCard>
 
           {/* Infinite scroll sentinel */}
           {hasNextPage && (
@@ -619,7 +622,7 @@ export function BlueskyPage() {
               )}
             </div>
           )}
-        </div>
+        </>
       )}
     </main>
   );

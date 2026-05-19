@@ -18,6 +18,7 @@ import { Separator } from '@/components/ui/separator';
 import { useLayoutOptions } from '@/contexts/LayoutContext';
 import { ProfileRightSidebar } from '@/components/ProfileRightSidebar';
 import { NoteCard } from '@/components/NoteCard';
+import { FeedCard } from '@/components/FeedCard';
 import { ComposeBox } from '@/components/ComposeBox';
 import { ReplyComposeModal } from '@/components/ReplyComposeModal';
 import { ProfileReactionButton } from '@/components/ProfileReactionButton';
@@ -2155,7 +2156,7 @@ type EditableTab = { label: string; isCore: boolean; tab?: ProfileTab };
                 <p>{displayName} doesn't follow anyone yet, so there are no wall posts to show.</p>
               </div>
             ) : wallPending ? (
-              <div className="divide-y divide-border">
+              <FeedCard className="mt-2 divide-y divide-border">
                 {Array.from({ length: 3 }).map((_, i) => (
                   <div key={i} className="px-4 py-3">
                     <div className="flex gap-3">
@@ -2173,10 +2174,12 @@ type EditableTab = { label: string; isCore: boolean; tab?: ProfileTab };
                     </div>
                   </div>
                 ))}
-              </div>
+              </FeedCard>
             ) : orderedWallReplies.length > 0 ? (
-              <div>
-                <FlatThreadedReplyList replies={orderedWallReplies} />
+              <>
+                <FeedCard className="mt-2">
+                  <FlatThreadedReplyList replies={orderedWallReplies} />
+                </FeedCard>
 
                 {/* Infinite scroll sentinel */}
                 {hasNextWallPage && (
@@ -2186,7 +2189,7 @@ type EditableTab = { label: string; isCore: boolean; tab?: ProfileTab };
                     )}
                   </div>
                 )}
-              </div>
+              </>
             ) : (
               <div className="py-12 text-center text-muted-foreground text-sm">
                 <MessageSquare className="size-12 mx-auto mb-4 opacity-30" />

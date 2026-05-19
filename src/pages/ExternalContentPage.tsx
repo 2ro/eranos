@@ -10,6 +10,7 @@ import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { FlatThreadedReplyList } from '@/components/ThreadedReplyList';
+import { FeedCard } from '@/components/FeedCard';
 import { ComposeBox } from '@/components/ComposeBox';
 import { ReplyComposeModal } from '@/components/ReplyComposeModal';
 import { ExternalReactionButton } from '@/components/ExternalReactionButton';
@@ -475,7 +476,9 @@ export function ExternalContentPage() {
               <CommentsSkeleton />
             ) : orderedReplies.length > 0 ? (
               <>
-                <FlatThreadedReplyList replies={orderedReplies} />
+                <FeedCard className="mt-2">
+                  <FlatThreadedReplyList replies={orderedReplies} />
+                </FeedCard>
                 {hasNextPage && (
                   <div ref={scrollRef} className="py-6 text-center text-xs text-muted-foreground">
                     {isFetchingNextPage ? 'Loading more…' : ''}
@@ -497,7 +500,9 @@ export function ExternalContentPage() {
             {repliesLoading ? (
               <CommentsSkeleton />
             ) : orderedReplies.length > 0 ? (
-              <FlatThreadedReplyList replies={orderedReplies} />
+              <FeedCard className="mt-2">
+                <FlatThreadedReplyList replies={orderedReplies} />
+              </FeedCard>
             ) : (
               <CommentsEmptyState />
             )}
@@ -528,7 +533,9 @@ function ExternalCommentsSection({ commentRoot, orderedReplies, commentsLoading 
         {commentsLoading ? (
           <CommentsSkeleton />
         ) : orderedReplies.length > 0 ? (
-          <FlatThreadedReplyList replies={orderedReplies} />
+          <FeedCard className="mt-2">
+            <FlatThreadedReplyList replies={orderedReplies} />
+          </FeedCard>
         ) : (
           <CommentsEmptyState />
         )}
@@ -539,7 +546,7 @@ function ExternalCommentsSection({ commentRoot, orderedReplies, commentsLoading 
 
 function CommentsSkeleton() {
   return (
-    <div className="divide-y divide-border">
+    <FeedCard className="mt-2 divide-y divide-border">
       {Array.from({ length: 3 }).map((_, i) => (
         <div key={i} className="px-4 py-3">
           <div className="flex gap-3">
@@ -557,7 +564,7 @@ function CommentsSkeleton() {
           </div>
         </div>
       ))}
-    </div>
+    </FeedCard>
   );
 }
 
@@ -631,11 +638,11 @@ function BookContentTabs({ isbn, commentRoot, orderedReplies, commentsLoading }:
           {reviewsLoading ? (
             <CommentsSkeleton />
           ) : reviews.length > 0 ? (
-            <div className="divide-y divide-border">
+            <FeedCard className="mt-2 divide-y divide-border">
               {reviews.map(({ event, review }) => (
                 <BookReviewCard key={event.id} event={event} review={review} />
               ))}
-            </div>
+            </FeedCard>
           ) : (
             <div className="py-12 text-center text-muted-foreground text-sm">
               <Star className="size-12 mx-auto mb-4 opacity-30" />
