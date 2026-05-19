@@ -205,6 +205,7 @@ export function CreateCampaignPage() {
   const [coverUploading, setCoverUploading] = useState(false);
   const [tagInput, setTagInput] = useState('');
   const [goalUsd, setGoalUsd] = useState('');
+  const [goalTouched, setGoalTouched] = useState(false);
   const [deadline, setDeadline] = useState('');
   const [countryQuery, setCountryQuery] = useState('');
   const [countryCode, setCountryCode] = useState('');
@@ -377,8 +378,11 @@ export function CreateCampaignPage() {
       }
 
       // Goal / deadline.
+      // In edit mode, preserve the exact stored sats unless the user changed the field.
       let goalNum: number | undefined;
-      if (goalUsd.trim()) {
+      if (isEditMode && !goalTouched) {
+        goalNum = editCampaign?.goalSats;
+      } else if (goalUsd.trim()) {
         const n = Number(goalUsd.replace(/[, $]/g, ''));
         if (!Number.isFinite(n) || n <= 0) {
           throw new Error('Goal must be a positive USD amount.');
@@ -736,16 +740,30 @@ export function CreateCampaignPage() {
                   inputMode="decimal"
                   placeholder="100,000"
                   value={goalUsd}
-                  onChange={(e) => setGoalUsd(e.target.value)}
+                  onChange={(e) => {
+                    setGoalUsd(e.target.value);
+                    setGoalTouched(true);
+                  }}
                   className="pl-7 pr-14"
                 />
                 <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-xs font-medium text-muted-foreground">
                   USD
                 </span>
               </div>
-              {goalSatsPreview > 0 && btcPrice && (
+              {isEditMode && editCampaign?.goalSats && !goalTouched && (
                 <p className="text-xs text-muted-foreground">
-                  {formatSats(goalSatsPreview)} sats ({satsToUSDWhole(goalSatsPreview, btcPrice)}).
+                  Current saved goal: {formatSats(editCampaign.goalSats)} sats
+                  {btcPrice
+                    ? <> &mdash; about {satsToUSDWhole(editCampaign.goalSats, btcPrice)} today</>
+                    : null
+                  }. Only edit this field if you want to change the goal.
+                </p>
+              )}
+              {(!isEditMode || goalTouched) && goalSatsPreview > 0 && btcPrice && (
+                <p className="text-xs text-muted-foreground">
+                  Your goal will be saved as {formatSats(goalSatsPreview)} sats &mdash; about{' '}
+                  {satsToUSDWhole(goalSatsPreview, btcPrice)} today.
+                  The dollar estimate may change with Bitcoin's price.
                 </p>
               )}
             </FormSection>
