@@ -6,7 +6,6 @@ import { Globe2, HandHeart, Loader2, PlusCircle, Search, Users } from 'lucide-re
 import type { NostrEvent } from '@nostrify/nostrify';
 import { useInView } from 'react-intersection-observer';
 
-import { CreateCommunityDialog } from '@/components/CreateCommunityDialog';
 import { FeedEmptyState } from '@/components/FeedEmptyState';
 import { HeroAtmosphere } from '@/components/HeroAtmosphere';
 import { HeroBanner } from '@/components/HeroBanner';
@@ -71,7 +70,6 @@ export function CommunitiesPage() {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
   const { toast } = useToast();
-  const [createDialogOpen, setCreateDialogOpen] = useState(false);
 
   useLayoutOptions({
     noMaxWidth: true,
@@ -92,7 +90,7 @@ export function CommunitiesPage() {
       });
       return;
     }
-    setCreateDialogOpen(true);
+    navigate('/communities/new');
   };
 
   return (
@@ -140,8 +138,6 @@ export function CommunitiesPage() {
           </div>
         </section>
       </div>
-
-      <CreateCommunityDialog open={createDialogOpen} onOpenChange={setCreateDialogOpen} />
     </main>
   );
 }

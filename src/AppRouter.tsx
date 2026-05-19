@@ -44,6 +44,7 @@ const BookmarksPage = lazy(() => import("./pages/BookmarksPage").then(m => ({ de
 const BooksPage = lazy(() => import("./pages/BooksPage").then(m => ({ default: m.BooksPage })));
 const ChangelogPage = lazy(() => import("./pages/ChangelogPage").then(m => ({ default: m.ChangelogPage })));
 const CommunitiesPage = lazy(() => import("./pages/CommunitiesPage").then(m => ({ default: m.CommunitiesPage })));
+const CreateCommunityPage = lazy(() => import("./pages/CreateCommunityPage").then(m => ({ default: m.CreateCommunityPage })));
 const ContentPage = lazy(() => import("./pages/ContentPage").then(m => ({ default: m.ContentPage })));
 const ContentSettingsPage = lazy(() => import("./pages/ContentSettingsPage").then(m => ({ default: m.ContentSettingsPage })));
 const CSAEPolicyPage = lazy(() => import("./pages/CSAEPolicyPage").then(m => ({ default: m.CSAEPolicyPage })));
@@ -291,6 +292,7 @@ export function AppRouter() {
             <Route path="/bluesky" element={<BlueskyPage />} />
             <Route path="/wikipedia" element={<WikipediaPage />} />
             <Route path="/communities" element={<CommunitiesPage />} />
+            <Route path="/communities/new" element={<CreateCommunityPage />} />
             <Route path="/letters" element={<LettersPage />} />
             <Route path="/letters/compose" element={<LetterComposePage />} />
             <Route path="/settings/letters" element={<LetterPreferencesPage />} />
