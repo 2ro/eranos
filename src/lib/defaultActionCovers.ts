@@ -7,17 +7,12 @@
  * whose author never set an image.
  */
 export const DEFAULT_ACTION_COVERS = [
-  { id: 'cover1', url: '/challenge-covers/cover1.png', name: 'Protest March' },
   { id: 'cover2', url: '/challenge-covers/cover2.png', name: 'Raised Fists' },
-  { id: 'cover3', url: '/challenge-covers/cover3.png', name: 'Unity' },
-  { id: 'cover4', url: '/challenge-covers/cover4.jpeg', name: 'Demonstration' },
   { id: 'cover5', url: '/challenge-covers/cover5.jpeg', name: 'People Power' },
   { id: 'cover6', url: '/challenge-covers/cover6.png', name: 'Solidarity' },
-  { id: 'cover7', url: '/challenge-covers/cover7.png', name: 'Resistance' },
   { id: 'cover8', url: '/challenge-covers/cover8.png', name: 'Freedom' },
   { id: 'cover9', url: '/challenge-covers/cover9.png', name: 'Justice' },
   { id: 'cover10', url: '/challenge-covers/cover10.png', name: 'Revolution' },
-  { id: 'cover11', url: '/challenge-covers/cover11.png', name: 'Change' },
 ] as const;
 
 /** Default cover image when an action has none set. */

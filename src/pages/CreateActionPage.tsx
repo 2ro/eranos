@@ -9,12 +9,13 @@ import {
   Check,
   ChevronRight,
   Clock,
+  ImagePlus,
   Info,
   Loader2,
   Megaphone,
   Palette,
   Plus,
-  Upload,
+  X,
 } from 'lucide-react';
 
 import { TimezoneSwitcher } from '@/components/TimezoneSwitcher';
@@ -47,7 +48,8 @@ import type { Action } from '@/hooks/useActions';
 import { useLayoutOptions } from '@/contexts/LayoutContext';
 import { countryCodeToFlag, getAllCountries, getGeoDisplayName } from '@/lib/countries';
 import { createCountryIdentifier } from '@/lib/countryIdentifiers';
-import { DEFAULT_ACTION_COVERS, DEFAULT_COVER_IMAGE } from '@/lib/defaultActionCovers';
+import { DEFAULT_ACTION_COVERS } from '@/lib/defaultActionCovers';
+import { sanitizeUrl } from '@/lib/sanitizeUrl';
 import { cn } from '@/lib/utils';
 
 /**
@@ -88,6 +90,17 @@ function unixSecondsInTimezone(
   return Math.floor((utcGuess + (utcGuess - asWallClock)) / 1000);
 }
 
+/**
+ * Today, formatted as a YYYY-MM-DD string in the user's local timezone — the
+ * minimum value we accept for the deadline picker so users can't choose a date
+ * in the past. Mirrors the helper in CreateCampaignPage.
+ */
+function getTodayDateInput(): string {
+  const date = new Date();
+  date.setMinutes(date.getMinutes() - date.getTimezoneOffset());
+  return date.toISOString().slice(0, 10);
+}
+
 export function CreateActionPage() {
   useLayoutOptions({ noMaxWidth: true, rightSidebar: null });
 
@@ -112,20 +125,19 @@ export function CreateActionPage() {
 
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
-  const [type, setType] = useState<Action['type']>('photo');
+  const [type, setType] = useState<Action['type']>('action');
   const [bounty, setBounty] = useState('');
   const [startDate, setStartDate] = useState('');
   const [startTime, setStartTime] = useState('');
   const [deadline, setDeadline] = useState('');
   const [deadlineTime, setDeadlineTime] = useState('');
-  const [coverImage, setCoverImage] = useState<string>(DEFAULT_COVER_IMAGE);
+  const [coverImage, setCoverImage] = useState<string>('');
   const [selectedCountry, setSelectedCountry] = useState(pageCountryCode);
   const [timezone, setTimezone] = useState(browserTimezone);
   const [countryPickerOpen, setCountryPickerOpen] = useState(false);
-  const [selectedDefaultId, setSelectedDefaultId] = useState<string | null>(
-    () => DEFAULT_ACTION_COVERS.find((c) => c.url === DEFAULT_COVER_IMAGE)?.id ?? null,
-  );
   const [formError, setFormError] = useState('');
+
+  const minDeadline = useMemo(() => getTodayDateInput(), []);
 
   useSeoMeta({
     title: 'Create action | Agora',
@@ -159,11 +171,11 @@ export function CreateActionPage() {
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
+    e.currentTarget.value = '';
     if (!file) return;
     try {
       const [[, url]] = await uploadFile(file);
       setCoverImage(url);
-      setSelectedDefaultId(null);
     } catch (error) {
       toast({
         title: 'Upload failed',
@@ -225,6 +237,9 @@ export function CreateActionPage() {
       }
 
       if (deadline) {
+        if (deadline < minDeadline) {
+          throw new Error('Deadline cannot be in the past.');
+        }
         const [year, month, day] = deadline.split('-').map(Number);
         const [hours, minutes] = deadlineTime
           ? deadlineTime.split(':').map(Number)
@@ -308,8 +323,76 @@ export function CreateActionPage() {
         </div>
 
         <div className="rounded-2xl bg-card/50 p-2">
+          {/* Title */}
+          <FormSection title="Title" requirement="Required">
+            <Input
+              placeholder="What needs to happen?"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              maxLength={200}
+              required
+            />
+          </FormSection>
+
+          <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+            {/* Type */}
+            <FormSection title="Type" requirement="Required">
+              <Select
+                value={type}
+                onValueChange={(value) => setType(value as Action['type'])}
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="photo">
+                    <div className="flex items-center gap-2">
+                      <Camera className="h-4 w-4" /> Photo
+                    </div>
+                  </SelectItem>
+                  <SelectItem value="art">
+                    <div className="flex items-center gap-2">
+                      <Palette className="h-4 w-4" /> Art
+                    </div>
+                  </SelectItem>
+                  <SelectItem value="info">
+                    <div className="flex items-center gap-2">
+                      <Info className="h-4 w-4" /> Info
+                    </div>
+                  </SelectItem>
+                  <SelectItem value="action">
+                    <div className="flex items-center gap-2">
+                      <Megaphone className="h-4 w-4" /> Action
+                    </div>
+                  </SelectItem>
+                </SelectContent>
+              </Select>
+            </FormSection>
+
+            {/* Bounty */}
+            <FormSection title="Bounty (sats)" requirement="Required">
+              <Input
+                type="number"
+                placeholder="10000"
+                value={bounty}
+                onChange={(e) => setBounty(e.target.value)}
+                min={1}
+              />
+            </FormSection>
+          </div>
+
+          {/* Description */}
+          <FormSection title="Description" requirement="Required">
+            <Textarea
+              placeholder="Explain what submissions should look like, why this matters, and how the bounty will be paid out..."
+              className="min-h-[120px]"
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+            />
+          </FormSection>
+
           {/* Country */}
-          <FormSection title="Country" requirement="Optional">
+          <FormSection title="Country" requirement="Recommended">
             <Popover open={countryPickerOpen} onOpenChange={setCountryPickerOpen}>
               <PopoverTrigger asChild>
                 <Button
@@ -365,27 +448,66 @@ export function CreateActionPage() {
           </FormSection>
 
           {/* Cover image */}
-          <FormSection title="Cover image" requirement="Optional">
-            <div className="relative w-full h-40 sm:h-48 rounded-xl overflow-hidden border border-border">
-              <img
-                src={coverImage || DEFAULT_COVER_IMAGE}
-                alt="Cover preview"
-                className="w-full h-full object-cover"
+          <FormSection title="Cover image" requirement="Recommended">
+            <label
+              className={cn(
+                'relative block h-40 w-full cursor-pointer overflow-hidden rounded-xl border-2 border-dashed border-border bg-gradient-to-br from-muted/40 via-background to-muted/20 motion-safe:transition-colors hover:border-primary sm:h-48',
+                isUploading && 'opacity-70 pointer-events-none',
+              )}
+            >
+              {sanitizeUrl(coverImage) ? (
+                <>
+                  <img
+                    src={sanitizeUrl(coverImage)}
+                    alt=""
+                    className="absolute inset-0 size-full object-cover"
+                  />
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      setCoverImage('');
+                    }}
+                    className="absolute top-3 right-3 rounded-full bg-background/85 backdrop-blur p-1.5 hover:bg-background motion-safe:transition-colors"
+                    aria-label="Remove image"
+                  >
+                    <X className="size-4" />
+                  </button>
+                </>
+              ) : (
+                <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 text-muted-foreground">
+                  {isUploading ? (
+                    <>
+                      <Loader2 className="size-8 animate-spin" />
+                      <span className="text-sm">Uploading…</span>
+                    </>
+                  ) : (
+                    <>
+                      <ImagePlus className="size-8" />
+                      <span className="text-sm">Click to upload a cover image</span>
+                      <span className="text-xs">PNG, JPG, or WEBP</span>
+                    </>
+                  )}
+                </div>
+              )}
+              <input
+                type="file"
+                accept="image/png,image/jpeg,image/webp"
+                className="sr-only"
+                onChange={handleFileUpload}
+                disabled={isUploading}
               />
-            </div>
+            </label>
+
             <div className="relative w-full overflow-hidden">
               <div className="flex gap-2 overflow-x-auto pb-2 -mx-1 px-1">
                 {DEFAULT_ACTION_COVERS.map((cover) => {
-                  const isActive =
-                    selectedDefaultId === cover.id || coverImage === cover.url;
+                  const isActive = coverImage === cover.url;
                   return (
                     <button
                       key={cover.id}
                       type="button"
-                      onClick={() => {
-                        setCoverImage(cover.url);
-                        setSelectedDefaultId(cover.id);
-                      }}
+                      onClick={() => setCoverImage(cover.url)}
                       className={cn(
                         'relative h-20 w-28 flex-shrink-0 rounded-md overflow-hidden border-2 transition-all',
                         isActive
@@ -393,7 +515,7 @@ export function CreateActionPage() {
                           : 'border-border hover:border-primary/50',
                       )}
                       title={cover.name}
-                      aria-label={`Select ${cover.name} cover`}
+                      aria-label={`Use ${cover.name} cover`}
                     >
                       <img
                         src={cover.url}
@@ -405,140 +527,62 @@ export function CreateActionPage() {
                 })}
               </div>
             </div>
-            <div className="flex items-center gap-2">
-              <label
-                htmlFor="cover-upload"
-                className="flex-1 cursor-pointer flex items-center justify-center gap-2 px-4 py-2 border border-border rounded-lg hover:bg-primary/10 transition-colors"
-              >
-                {isUploading ? (
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                ) : (
-                  <Upload className="h-4 w-4" />
-                )}
-                <span className="text-sm">Upload custom</span>
-              </label>
-              <input
-                id="cover-upload"
-                type="file"
-                accept="image/*"
-                className="hidden"
-                onChange={handleFileUpload}
-                disabled={isUploading}
-              />
-            </div>
-          </FormSection>
 
-          {/* Title */}
-          <FormSection title="Title" requirement="Required">
             <Input
-              placeholder="What needs to happen?"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              maxLength={200}
-              required
-            />
-          </FormSection>
-
-          {/* Description */}
-          <FormSection title="Description" requirement="Required">
-            <Textarea
-              placeholder="Explain what submissions should look like, why this matters, and how the bounty will be paid out..."
-              className="min-h-[120px]"
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
+              type="url"
+              inputMode="url"
+              placeholder="Or paste an https:// image URL"
+              value={coverImage}
+              onChange={(e) => setCoverImage(e.target.value)}
             />
           </FormSection>
 
           <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
-            {/* Type */}
-            <FormSection title="Type" requirement="Required">
-              <Select
-                value={type}
-                onValueChange={(value) => setType(value as Action['type'])}
-              >
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="photo">
-                    <div className="flex items-center gap-2">
-                      <Camera className="h-4 w-4" /> Photo
-                    </div>
-                  </SelectItem>
-                  <SelectItem value="art">
-                    <div className="flex items-center gap-2">
-                      <Palette className="h-4 w-4" /> Art
-                    </div>
-                  </SelectItem>
-                  <SelectItem value="info">
-                    <div className="flex items-center gap-2">
-                      <Info className="h-4 w-4" /> Info
-                    </div>
-                  </SelectItem>
-                  <SelectItem value="action">
-                    <div className="flex items-center gap-2">
-                      <Megaphone className="h-4 w-4" /> Action
-                    </div>
-                  </SelectItem>
-                </SelectContent>
-              </Select>
+            {/* Start date */}
+            <FormSection title="Start date" requirement="Optional">
+              <Input
+                type="date"
+                className="w-full min-w-0 [color-scheme:light] dark:[color-scheme:dark] dark:[&::-webkit-calendar-picker-indicator]:invert dark:[&::-webkit-calendar-picker-indicator]:opacity-80"
+                value={startDate}
+                onChange={(e) => setStartDate(e.target.value)}
+              />
+              {startDate && (
+                <Input
+                  type="time"
+                  className="w-full min-w-0 [color-scheme:light] dark:[color-scheme:dark] dark:[&::-webkit-calendar-picker-indicator]:invert dark:[&::-webkit-calendar-picker-indicator]:opacity-80"
+                  value={startTime}
+                  onChange={(e) => setStartTime(e.target.value)}
+                />
+              )}
+              <p className="text-xs text-muted-foreground">
+                {!startDate && 'Defaults to now if not specified'}
+                {startDate && !startTime && 'Starts at midnight'}
+              </p>
             </FormSection>
 
-            {/* Bounty */}
-            <FormSection title="Bounty (sats)" requirement="Required">
+            {/* Deadline */}
+            <FormSection title="Deadline" requirement="Optional">
               <Input
-                type="number"
-                placeholder="10000"
-                value={bounty}
-                onChange={(e) => setBounty(e.target.value)}
-                min={1}
+                type="date"
+                min={minDeadline}
+                className="w-full min-w-0 [color-scheme:light] dark:[color-scheme:dark] dark:[&::-webkit-calendar-picker-indicator]:invert dark:[&::-webkit-calendar-picker-indicator]:opacity-80"
+                value={deadline}
+                onChange={(e) => setDeadline(e.target.value)}
               />
+              {deadline && (
+                <Input
+                  type="time"
+                  className="w-full min-w-0 [color-scheme:light] dark:[color-scheme:dark] dark:[&::-webkit-calendar-picker-indicator]:invert dark:[&::-webkit-calendar-picker-indicator]:opacity-80"
+                  value={deadlineTime}
+                  onChange={(e) => setDeadlineTime(e.target.value)}
+                />
+              )}
+              <p className="text-xs text-muted-foreground">
+                {!deadline && 'Defaults to 48 hours after start'}
+                {deadline && !deadlineTime && 'Ends at 23:59 local time'}
+              </p>
             </FormSection>
           </div>
-
-          {/* Start date */}
-          <FormSection title="Start date" requirement="Optional">
-            <Input
-              type="date"
-              className="w-full min-w-0 [color-scheme:light] dark:[color-scheme:dark] dark:[&::-webkit-calendar-picker-indicator]:invert dark:[&::-webkit-calendar-picker-indicator]:opacity-80"
-              value={startDate}
-              onChange={(e) => setStartDate(e.target.value)}
-            />
-            {startDate && (
-              <Input
-                type="time"
-                className="w-full min-w-0 [color-scheme:light] dark:[color-scheme:dark] dark:[&::-webkit-calendar-picker-indicator]:invert dark:[&::-webkit-calendar-picker-indicator]:opacity-80"
-                value={startTime}
-                onChange={(e) => setStartTime(e.target.value)}
-              />
-            )}
-            <p className="text-xs text-muted-foreground">
-              {!startDate && 'Defaults to now if not specified'}
-              {startDate && !startTime && 'Starts at midnight'}
-            </p>
-          </FormSection>
-
-          {/* Deadline */}
-          <FormSection title="Deadline" requirement="Optional">
-            <Input
-              type="date"
-              className="w-full min-w-0 [color-scheme:light] dark:[color-scheme:dark] dark:[&::-webkit-calendar-picker-indicator]:invert dark:[&::-webkit-calendar-picker-indicator]:opacity-80"
-              value={deadline}
-              onChange={(e) => setDeadline(e.target.value)}
-            />
-            {deadline && (
-              <Input
-                type="time"
-                className="w-full min-w-0 [color-scheme:light] dark:[color-scheme:dark] dark:[&::-webkit-calendar-picker-indicator]:invert dark:[&::-webkit-calendar-picker-indicator]:opacity-80"
-                value={deadlineTime}
-                onChange={(e) => setDeadlineTime(e.target.value)}
-              />
-            )}
-            <p className="text-xs text-muted-foreground">
-              {!deadline && 'Defaults to 48 hours after start'}
-              {deadline && !deadlineTime && 'Ends at 23:59 local time'}
-            </p>
-          </FormSection>
 
           {(startDate || deadline) && (
             <FormSection title="Timezone" requirement="Required">
