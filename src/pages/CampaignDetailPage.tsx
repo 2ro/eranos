@@ -114,6 +114,7 @@ function CampaignDetailContent({ campaign }: { campaign: ParsedCampaign }) {
   const queryClient = useQueryClient();
 
   const [donateOpen, setDonateOpen] = useState(false);
+  const [beneficiaryDonateOpen, setBeneficiaryDonateOpen] = useState(false);
   const [replyOpen, setReplyOpen] = useState(false);
   const [moreMenuOpen, setMoreMenuOpen] = useState(false);
   const [interactionsOpen, setInteractionsOpen] = useState(false);
@@ -451,7 +452,17 @@ function CampaignDetailContent({ campaign }: { campaign: ParsedCampaign }) {
                   <Button
                     size="lg"
                     className="w-full col-span-3"
-                    onClick={() => setDonateOpen(true)}
+                    onClick={() => {
+                      // Logged-out donors on a single-beneficiary campaign get
+                      // the simpler per-beneficiary BIP-21 dialog directly —
+                      // there's no split to coordinate, so the multi-step
+                      // PSBT/login flow would be pure friction.
+                      if (!user && campaign.recipients.length === 1) {
+                        setBeneficiaryDonateOpen(true);
+                      } else {
+                        setDonateOpen(true);
+                      }
+                    }}
                     disabled={deadline?.isPast || campaign.archived}
                   >
                     <HandHeart className="size-5 mr-2" />
@@ -606,6 +617,16 @@ function CampaignDetailContent({ campaign }: { campaign: ParsedCampaign }) {
         }}
         btcPrice={btcPrice}
       />
+
+      {/* Single-beneficiary shortcut for logged-out donors. Mounted only when
+          there's exactly one recipient so the pubkey is unambiguous. */}
+      {campaign.recipients.length === 1 && (
+        <BeneficiaryDonateDialog
+          pubkey={campaign.recipients[0].pubkey}
+          open={beneficiaryDonateOpen}
+          onOpenChange={setBeneficiaryDonateOpen}
+        />
+      )}
 
       <ReplyComposeModal
         event={campaign.event}
