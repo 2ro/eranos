@@ -9,7 +9,6 @@ import {
   Archive,
   ArchiveRestore,
   ChevronLeft,
-  ExternalLink,
   HandHeart,
   MapPin,
   Pencil,
@@ -63,7 +62,7 @@ import {
   getCampaignPrimaryTagLabel,
   type ParsedCampaign,
 } from '@/lib/campaign';
-import { nostrPubkeyToBitcoinAddress, satsToUSDWhole } from '@/lib/bitcoin';
+import { satsToUSDWhole } from '@/lib/bitcoin';
 import { formatNumber } from '@/lib/formatNumber';
 import { genUserName } from '@/lib/genUserName';
 import { sanitizeUrl } from '@/lib/sanitizeUrl';
@@ -239,16 +238,12 @@ function CampaignDetailContent({ campaign }: { campaign: ParsedCampaign }) {
   const raisedSats = stats?.totalSats ?? 0;
 
   // Single-beneficiary campaigns inline the recipient's BIP-21 QR + address
-  // directly into the page, and turn the big "Donate" button into an
-  // "Open in wallet" anchor. There's no split to coordinate, so the full
-  // PSBT flow in DonateDialog would be friction.
+  // + "Open in wallet" button directly into the page (replacing the
+  // beneficiary list). The top primary donate button is dropped — the
+  // inline panel covers it — so there's no PSBT/multi-recipient flow to
+  // coordinate.
   const singleBeneficiary =
     campaign.recipients.length === 1 ? campaign.recipients[0] : null;
-  const singleBip21 = useMemo(() => {
-    if (!singleBeneficiary) return '';
-    const address = nostrPubkeyToBitcoinAddress(singleBeneficiary.pubkey);
-    return address ? `bitcoin:${address}` : '';
-  }, [singleBeneficiary]);
 
   const isCreator = user?.pubkey === campaign.pubkey;
   const naddr = useMemo(() => encodeCampaignNaddr(campaign), [campaign]);
@@ -463,51 +458,36 @@ function CampaignDetailContent({ campaign }: { campaign: ParsedCampaign }) {
                   </>
                 )}
 
-                <div className="grid grid-cols-4 gap-2">
-                  {(() => {
-                    const disabled = deadline?.isPast || campaign.archived;
-                    const label = campaign.archived
-                      ? 'Campaign archived'
-                      : deadline?.isPast
-                        ? 'Campaign ended'
-                        : singleBeneficiary
-                          ? 'Open in wallet'
-                          : 'Donate';
-                    const Icon = singleBeneficiary && !disabled ? ExternalLink : HandHeart;
-
-                    // Single-beneficiary, active campaign: the inline QR
-                    // panel is already on the page, so the button becomes
-                    // an "Open in wallet" anchor pointing at the same
-                    // bitcoin: URI.
-                    if (singleBeneficiary && !disabled && singleBip21) {
-                      return (
-                        <Button asChild size="lg" className="w-full col-span-3">
-                          <a href={singleBip21}>
-                            <Icon className="size-5 mr-2" />
-                            {label}
-                          </a>
-                        </Button>
-                      );
-                    }
-
-                    return (
-                      <Button
-                        size="lg"
-                        className="w-full col-span-3"
-                        onClick={() => setDonateOpen(true)}
-                        disabled={disabled}
-                      >
-                        <Icon className="size-5 mr-2" />
-                        {label}
-                      </Button>
-                    );
-                  })()}
-
+                {singleBeneficiary ? (
+                  // The inline BeneficiaryDonatePanel below already shows the
+                  // "Open in wallet" button right under the address, so there's
+                  // no primary donate button up here. Share spans the row.
                   <Button variant="outline" size="lg" className="w-full" onClick={handleShare}>
                     <Share2 className="size-4 mr-2" />
                     Share
                   </Button>
-                </div>
+                ) : (
+                  <div className="grid grid-cols-4 gap-2">
+                    <Button
+                      size="lg"
+                      className="w-full col-span-3"
+                      onClick={() => setDonateOpen(true)}
+                      disabled={deadline?.isPast || campaign.archived}
+                    >
+                      <HandHeart className="size-5 mr-2" />
+                      {campaign.archived
+                        ? 'Campaign archived'
+                        : deadline?.isPast
+                          ? 'Campaign ended'
+                          : 'Donate'}
+                    </Button>
+
+                    <Button variant="outline" size="lg" className="w-full" onClick={handleShare}>
+                      <Share2 className="size-4 mr-2" />
+                      Share
+                    </Button>
+                  </div>
+                )}
 
                 <div className="space-y-2 border-t border-border/60 pt-4">
                   <div className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">

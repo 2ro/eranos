@@ -128,6 +128,14 @@ export function BeneficiaryDonatePanel({
           )}
         </button>
       </div>
+
+      {/* Open in wallet — relies on the `bitcoin:` URI handler. */}
+      <Button asChild className="w-full">
+        <a href={bip21}>
+          <ExternalLink className="size-4 mr-1.5" />
+          Open in wallet
+        </a>
+      </Button>
     </div>
   );
 }
@@ -153,11 +161,6 @@ export function BeneficiaryDonateDialog({
   const metadata = author.data?.metadata;
   const displayName =
     metadata?.display_name || metadata?.name || genUserName(pubkey);
-  const address = useMemo(
-    () => nostrPubkeyToBitcoinAddress(pubkey),
-    [pubkey],
-  );
-  const bip21 = address ? `bitcoin:${address}` : '';
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -170,20 +173,6 @@ export function BeneficiaryDonateDialog({
         </DialogHeader>
 
         <BeneficiaryDonatePanel pubkey={pubkey} />
-
-        {bip21 ? (
-          // Open in wallet — relies on the `bitcoin:` URI handler.
-          <Button asChild className="w-full">
-            <a href={bip21}>
-              <ExternalLink className="size-4 mr-1.5" />
-              Open in wallet
-            </a>
-          </Button>
-        ) : (
-          <Button onClick={() => onOpenChange(false)} className="w-full">
-            Close
-          </Button>
-        )}
       </DialogContent>
     </Dialog>
   );
