@@ -5,6 +5,74 @@ import type { NostrEvent, NostrFilter } from '@nostrify/nostrify';
 import { CAMPAIGN_KIND, type CampaignCategory, parseCampaign, type ParsedCampaign } from '@/lib/campaign';
 import { createCountryIdentifier } from '@/lib/countryIdentifiers';
 
+interface ParseCampaignEventsOptions {
+  /**
+   * Include campaigns whose latest revision carries `["status", "archived"]`.
+   * Defaults to `false` so archived campaigns never appear in the main
+   * fundraisers listing.
+   */
+  includeArchived?: boolean;
+  /**
+   * When `true`, sort the parsed campaigns newest-`created_at`-first.
+   * When `false`, preserve the order in which events were returned —
+   * critical for NIP-50 relay-scored responses (e.g. `sort:top`, `sort:hot`)
+   * where the relay's score order would be destroyed by a chronological
+   * resort. Defaults to `true`.
+   */
+  sortByCreatedAt?: boolean;
+}
+
+/**
+ * Deduplicate, parse, and (optionally) reorder a flat list of kind 30223
+ * events into `ParsedCampaign` objects.
+ *
+ * For each `(pubkey, d)` pair we keep only the latest event — relays may
+ * return older revisions of an addressable event alongside the current one.
+ * The dedupe step preserves the position of the kept event in the incoming
+ * order, so callers relying on relay-scored ordering (NIP-50) see results
+ * in the relay's order; callers that want chronological can opt in via
+ * `sortByCreatedAt`.
+ */
+export function parseCampaignEvents(
+  events: NostrEvent[],
+  { includeArchived = false, sortByCreatedAt = true }: ParseCampaignEventsOptions = {},
+): ParsedCampaign[] {
+  // Track insertion order keyed by coord so we can preserve relay-scored
+  // order when we don't want to re-sort. `Map` iteration order is insertion
+  // order in ECMAScript.
+  const latestByCoord = new Map<string, NostrEvent>();
+  const orderByCoord: string[] = [];
+
+  for (const event of events) {
+    const d = event.tags.find(([n]) => n === 'd')?.[1];
+    if (!d) continue;
+    const key = `${event.pubkey}:${d}`;
+    const prev = latestByCoord.get(key);
+    if (!prev) {
+      latestByCoord.set(key, event);
+      orderByCoord.push(key);
+    } else if (event.created_at > prev.created_at) {
+      latestByCoord.set(key, event);
+    }
+  }
+
+  const parsed: ParsedCampaign[] = [];
+  for (const key of orderByCoord) {
+    const event = latestByCoord.get(key);
+    if (!event) continue;
+    const campaign = parseCampaign(event);
+    if (!campaign) continue;
+    if (!includeArchived && campaign.archived) continue;
+    parsed.push(campaign);
+  }
+
+  if (sortByCreatedAt) {
+    parsed.sort((a, b) => b.createdAt - a.createdAt);
+  }
+
+  return parsed;
+}
+
 interface UseCampaignsOptions {
   /** Optional category filter (`t` tag). */
   category?: CampaignCategory;
@@ -119,28 +187,7 @@ export function useCampaigns(options: UseCampaignsOptions = {}) {
       }
 
       const events = await nostr.query(filters, { signal: c.signal });
-
-      // Dedupe by (pubkey, d) keeping the newest version.
-      const latestByCoord = new Map<string, NostrEvent>();
-      for (const event of events) {
-        const d = event.tags.find(([n]) => n === 'd')?.[1];
-        if (!d) continue;
-        const key = `${event.pubkey}:${d}`;
-        const prev = latestByCoord.get(key);
-        if (!prev || event.created_at > prev.created_at) {
-          latestByCoord.set(key, event);
-        }
-      }
-
-      const parsed: ParsedCampaign[] = [];
-      for (const event of latestByCoord.values()) {
-        const campaign = parseCampaign(event);
-        if (!campaign) continue;
-        if (!includeArchived && campaign.archived) continue;
-        parsed.push(campaign);
-      }
-      parsed.sort((a, b) => b.createdAt - a.createdAt);
-      return parsed;
+      return parseCampaignEvents(events, { includeArchived, sortByCreatedAt: true });
     },
     staleTime: 30_000,
   });
