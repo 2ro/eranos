@@ -120,6 +120,7 @@ export function CreateActionPage() {
   const [deadline, setDeadline] = useState('');
   const [deadlineTime, setDeadlineTime] = useState('');
   const [coverImage, setCoverImage] = useState<string>('');
+  const [coverUploading, setCoverUploading] = useState(false);
   const [selectedCountry, setSelectedCountry] = useState(pageCountryCode);
   const [timezone, setTimezone] = useState(browserTimezone);
   const [countryPickerOpen, setCountryPickerOpen] = useState(false);
@@ -193,7 +194,11 @@ export function CreateActionPage() {
         tags.push(['i', createCountryIdentifier(selectedCountry.toUpperCase())]);
       }
 
-      const sanitizedImage = coverImage.trim() ? sanitizeUrl(coverImage.trim()) : undefined;
+      const trimmedCoverImage = coverImage.trim();
+      const sanitizedImage = trimmedCoverImage ? sanitizeUrl(trimmedCoverImage) : undefined;
+      if (trimmedCoverImage && !sanitizedImage) {
+        throw new Error('Cover image must be a valid https:// URL.');
+      }
       if (sanitizedImage) {
         tags.push(['image', sanitizedImage]);
       }
@@ -267,6 +272,7 @@ export function CreateActionPage() {
     title.trim().length > 0 &&
     description.trim().length > 0 &&
     bounty.trim().length > 0 &&
+    !coverUploading &&
     !submitMutation.isPending;
 
   return (
@@ -425,6 +431,7 @@ export function CreateActionPage() {
             <CoverImageField
               value={coverImage}
               onChange={setCoverImage}
+              onUploadingChange={setCoverUploading}
               templates={DEFAULT_ACTION_COVERS}
             />
           </FormSection>
@@ -508,6 +515,11 @@ export function CreateActionPage() {
               <>
                 <Loader2 className="size-4 mr-2 animate-spin" />
                 Publishing…
+              </>
+            ) : coverUploading ? (
+              <>
+                <Loader2 className="size-4 mr-2 animate-spin" />
+                Uploading cover…
               </>
             ) : (
               <>

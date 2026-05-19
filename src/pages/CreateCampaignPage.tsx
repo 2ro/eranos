@@ -202,6 +202,7 @@ export function CreateCampaignPage() {
   const [summary, setSummary] = useState('');
   const [story, setStory] = useState('');
   const [imageUrl, setImageUrl] = useState('');
+  const [coverUploading, setCoverUploading] = useState(false);
   const [tagInput, setTagInput] = useState('');
   const [goalUsd, setGoalUsd] = useState('');
   const [deadline, setDeadline] = useState('');
@@ -428,7 +429,11 @@ export function CreateCampaignPage() {
       }
 
       // Validate image URL (must be https).
-      const sanitizedImage = imageUrl.trim() ? sanitizeUrl(imageUrl.trim()) : undefined;
+      const trimmedImageUrl = imageUrl.trim();
+      const sanitizedImage = trimmedImageUrl ? sanitizeUrl(trimmedImageUrl) : undefined;
+      if (trimmedImageUrl && !sanitizedImage) {
+        throw new Error('Cover image must be a valid https:// URL.');
+      }
 
       const tags: string[][] = [
         ['d', slug],
@@ -687,7 +692,11 @@ export function CreateCampaignPage() {
 
           {/* Cover image */}
           <FormSection title="Cover image" requirement="Optional">
-            <CoverImageField value={imageUrl} onChange={setImageUrl} />
+            <CoverImageField
+              value={imageUrl}
+              onChange={setImageUrl}
+              onUploadingChange={setCoverUploading}
+            />
           </FormSection>
 
           {/* Summary */}
@@ -763,11 +772,16 @@ export function CreateCampaignPage() {
         )}
 
         <div className="pt-1">
-          <Button type="submit" disabled={submitMutation.isPending} className="w-full">
+          <Button type="submit" disabled={submitMutation.isPending || coverUploading} className="w-full">
             {submitMutation.isPending ? (
               <>
                 <Loader2 className="size-4 mr-2 animate-spin" />
                 {isEditMode ? 'Updating…' : 'Publishing…'}
+              </>
+            ) : coverUploading ? (
+              <>
+                <Loader2 className="size-4 mr-2 animate-spin" />
+                Uploading cover…
               </>
             ) : (
               <>

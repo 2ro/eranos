@@ -131,6 +131,7 @@ export function CreateCommunityPage() {
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [imageUrl, setImageUrl] = useState('');
+  const [coverUploading, setCoverUploading] = useState(false);
   // Additional moderators on top of the founder. The founder is implicit —
   // they're always pubkey #0 in the published moderator list and are not
   // rendered as a chip here.
@@ -140,10 +141,11 @@ export function CreateCommunityPage() {
 
   // Fetch the existing community when editing.
   const editCommunityQuery = useQuery({
-    queryKey: ['community', editTarget?.pubkey ?? '', editTarget?.identifier ?? ''],
+    queryKey: ['community', editTarget?.pubkey ?? '', editTarget?.identifier ?? '', editTarget?.relays ?? []],
     queryFn: async ({ signal }): Promise<{ event: NostrEvent; community: ParsedCommunity } | null> => {
       if (!editTarget) return null;
-      const events = await nostr.query(
+      const relayPool = editTarget.relays?.length ? nostr.group(editTarget.relays) : nostr;
+      const events = await relayPool.query(
         [
           {
             kinds: [COMMUNITY_DEFINITION_KIND],
@@ -306,13 +308,16 @@ export function CreateCommunityPage() {
       // array, but defensively strip if a stale stub snuck in.
       const extraModerators = moderators.filter((m) => m.pubkey !== user.pubkey);
 
-      const sanitizedImage = imageUrl.trim()
-        ? sanitizeUrl(imageUrl.trim())
-        : undefined;
+      const trimmedImageUrl = imageUrl.trim();
+      const sanitizedImage = trimmedImageUrl ? sanitizeUrl(trimmedImageUrl) : undefined;
+      if (trimmedImageUrl && !sanitizedImage) {
+        throw new Error('Cover image must be a valid https:// URL.');
+      }
 
       // ── Edit branch ────────────────────────────────────────────────────
       if (isEditMode && editCommunity) {
-        const prev = await fetchFreshEvent(nostr, {
+        const relayPool = editTarget?.relays?.length ? nostr.group(editTarget.relays) : nostr;
+        const prev = await fetchFreshEvent(relayPool, {
           kinds: [COMMUNITY_DEFINITION_KIND],
           authors: [user.pubkey],
           '#d': [slug],
@@ -600,7 +605,11 @@ export function CreateCommunityPage() {
 
           {/* Cover image */}
           <FormSection title="Cover image" requirement="Recommended">
-            <CoverImageField value={imageUrl} onChange={setImageUrl} />
+            <CoverImageField
+              value={imageUrl}
+              onChange={setImageUrl}
+              onUploadingChange={setCoverUploading}
+            />
           </FormSection>
 
           {/* Moderators */}
@@ -645,13 +654,18 @@ export function CreateCommunityPage() {
         <div className="pt-1">
           <Button
             type="submit"
-            disabled={submitMutation.isPending || !name.trim() || !activeSlug}
+            disabled={submitMutation.isPending || coverUploading || !name.trim() || !activeSlug}
             className="w-full"
           >
             {submitMutation.isPending ? (
               <>
                 <Loader2 className="size-4 mr-2 animate-spin" />
                 {isEditMode ? 'Updating…' : 'Creating…'}
+              </>
+            ) : coverUploading ? (
+              <>
+                <Loader2 className="size-4 mr-2 animate-spin" />
+                Uploading cover…
               </>
             ) : (
               <>

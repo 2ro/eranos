@@ -469,13 +469,25 @@ export function ZapDialog({ target, children, className }: ZapDialogProps) {
     payWithWebLN,
   };
 
-  // Zap button shows for any logged-in user except when targeting oneself.
-  // On-chain is always available; Lightning is offered as an in-dialog option
-  // when the author has a Lightning address.
-  const canOpenZap = !!user && user.pubkey !== target.pubkey;
-
-  if (!canOpenZap) {
+  if (!user) {
     return <>{children}</>;
+  }
+
+  if (user.pubkey === target.pubkey) {
+    return (
+      <div
+        className={`cursor-pointer ${className || ''}`}
+        onClick={(e) => {
+          e.stopPropagation();
+          toast({
+            title: 'Self-zaps are not supported',
+            description: 'You cannot zap your own post.',
+          });
+        }}
+      >
+        {children}
+      </div>
+    );
   }
 
   return (

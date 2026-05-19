@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { ImagePlus, Loader2, X } from 'lucide-react';
 
 import { Input } from '@/components/ui/input';
@@ -23,6 +23,8 @@ interface CoverImageFieldProps {
   /** Current cover URL (controlled). Empty string means "no cover". */
   value: string;
   onChange: (url: string) => void;
+  /** Notifies parent forms so they can block submit while Blossom upload runs. */
+  onUploadingChange?: (uploading: boolean) => void;
   /** Optional template gallery shown between the dropzone and the URL input. */
   templates?: readonly CoverImageTemplate[];
 }
@@ -43,12 +45,16 @@ interface CoverImageFieldProps {
  * anything other than a well-formed https URL — that's deliberate, since
  * the same value is what gets published in the Nostr event's `image` tag.
  */
-export function CoverImageField({ value, onChange, templates }: CoverImageFieldProps) {
+export function CoverImageField({ value, onChange, onUploadingChange, templates }: CoverImageFieldProps) {
   const { mutateAsync: uploadFile, isPending: isUploading } = useUploadFile();
   const { toast } = useToast();
   const [isDragging, setIsDragging] = useState(false);
 
   const sanitized = sanitizeUrl(value);
+
+  useEffect(() => {
+    onUploadingChange?.(isUploading);
+  }, [isUploading, onUploadingChange]);
 
   /**
    * Shared upload path used by both the file-input change handler and
