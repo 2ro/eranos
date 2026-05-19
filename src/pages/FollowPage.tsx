@@ -9,6 +9,7 @@ import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { NoteCard } from '@/components/NoteCard';
+import { FeedCard } from '@/components/FeedCard';
 import { useAuthor } from '@/hooks/useAuthor';
 import { useAuthors } from '@/hooks/useAuthors';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
@@ -27,8 +28,7 @@ import { AgoraLogo } from '@/components/AgoraLogo';
 import { Nip05Badge } from '@/components/Nip05Badge';
 import { SubHeaderBar } from '@/components/SubHeaderBar';
 import { TabButton } from '@/components/TabButton';
-import { useOnboarding } from '@/hooks/useOnboarding';
-import LoginDialog from '@/components/auth/LoginDialog';
+import AuthDialog from '@/components/auth/AuthDialog';
 import type { FeedItem } from '@/lib/feedUtils';
 import type { AddressPointer } from 'nostr-tools/nip19';
 import NotFound from './NotFound';
@@ -125,7 +125,6 @@ function FollowView({ pubkey }: { pubkey: string }) {
   const displayName = metadata?.name || genUserName(pubkey);
   const profileUrl = useProfileUrl(pubkey, metadata);
   const bannerUrl = metadata?.banner;
-  const { startSignup } = useOnboarding();
 
   const isOwnProfile = user && user.pubkey === pubkey;
   const isAlreadyFollowing = followData?.pubkeys.includes(pubkey) ?? false;
@@ -263,11 +262,9 @@ function FollowView({ pubkey }: { pubkey: string }) {
         </div>
       </div>
 
-      <LoginDialog
+      <AuthDialog
         isOpen={loginOpen}
         onClose={() => setLoginOpen(false)}
-        onLogin={() => setLoginOpen(false)}
-        onSignupClick={startSignup}
       />
     </div>
   );
@@ -287,7 +284,6 @@ function FollowPackView({ addr, relays }: { addr: AddrCoords; relays?: string[] 
   const { mutateAsync: publishEvent } = useNostrPublish();
   const { toast } = useToast();
   const navigate = useNavigate();
-  const { startSignup } = useOnboarding();
   const [loginOpen, setLoginOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<PackTab>('feed');
   const [isFollowingAll, setIsFollowingAll] = useState(false);
@@ -513,13 +509,13 @@ function FollowPackView({ addr, relays }: { addr: AddrCoords; relays?: string[] 
           {activeTab === 'feed' ? (
             <PackFeedTab pubkeys={pubkeys} />
           ) : membersLoading ? (
-            <div className="divide-y divide-border">
+            <FeedCard className="mt-2 divide-y divide-border">
               {Array.from({ length: Math.min(pubkeys.length, 8) }).map((_, i) => (
                 <MemberCardSkeleton key={i} />
               ))}
-            </div>
+            </FeedCard>
           ) : (
-            <div className="divide-y divide-border">
+            <FeedCard className="mt-2 divide-y divide-border">
               {pubkeys.map((pk) => {
                 const member = membersMap?.get(pk);
                 const isFollowed = followedPubkeys.has(pk);
@@ -533,16 +529,14 @@ function FollowPackView({ addr, relays }: { addr: AddrCoords; relays?: string[] 
                   />
                 );
               })}
-            </div>
+            </FeedCard>
           )}
         </div>
       </div>
 
-      <LoginDialog
+      <AuthDialog
         isOpen={loginOpen}
         onClose={() => setLoginOpen(false)}
-        onLogin={() => setLoginOpen(false)}
-        onSignupClick={startSignup}
       />
     </div>
   );

@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useInView } from "react-intersection-observer";
 import { Link } from "react-router-dom";
 import { NoteCard } from "@/components/NoteCard";
+import { FeedCard } from "@/components/FeedCard";
 import { PageHeader } from "@/components/PageHeader";
 import { PullToRefresh } from "@/components/PullToRefresh";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -81,7 +82,7 @@ export function TrendsPage() {
           <h3 className="text-lg font-bold text-foreground">Trending Hashtags</h3>
         </div>
         {trendsLoading ? (
-          <div className="divide-y divide-border">
+          <div className="flex flex-wrap gap-2 px-4 pb-4">
             {Array.from({ length: 5 }).map((_, i) => (
               <TrendSkeleton key={i} />
             ))}
@@ -123,16 +124,18 @@ export function TrendsPage() {
 
         {/* Sorted posts — infinite scroll */}
         {(sortedPending || sortedLoading) && sortedPosts.length === 0 ? (
-          <div className="divide-y divide-border">
+          <FeedCard className="mt-2 divide-y divide-border">
             {Array.from({ length: 5 }).map((_, i) => (
               <PostSkeleton key={i} />
             ))}
-          </div>
+          </FeedCard>
         ) : sortedPosts.length > 0 ? (
-          <div>
-            {sortedPosts.map((event) => (
-              <NoteCard key={event.id} event={event} />
-            ))}
+          <>
+            <FeedCard className="mt-2">
+              {sortedPosts.map((event) => (
+                <NoteCard key={event.id} event={event} />
+              ))}
+            </FeedCard>
             {hasNextSorted && (
               <div ref={sortedScrollRef} className="py-4">
                 {isFetchingNextSorted && (
@@ -142,7 +145,7 @@ export function TrendsPage() {
                 )}
               </div>
             )}
-          </div>
+          </>
         ) : (
           <EmptyState message={`No ${trendSort} posts right now.`} />
         )}
@@ -227,11 +230,7 @@ function PostSkeleton() {
 }
 
 function TrendSkeleton() {
-  return (
-    <div className="px-4 py-3.5">
-      <Skeleton className="h-3 w-14 mb-1.5" />
-      <Skeleton className="h-5 w-28 mb-1" />
-      <Skeleton className="h-3 w-16" />
-    </div>
-  );
+  // Pill-shaped skeleton matching `TrendItem`'s rendered shape so the
+  // page doesn't visually pop when results arrive.
+  return <Skeleton className="h-7 w-24 rounded-full" />;
 }

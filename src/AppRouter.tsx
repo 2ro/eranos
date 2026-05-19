@@ -32,6 +32,7 @@ const CreateCampaignPage = lazy(() => import("./pages/CreateCampaignPage").then(
 
 // All other pages: code-split via React.lazy
 const ActionsPage = lazy(() => import("./pages/ActionsPage"));
+const CreateActionPage = lazy(() => import("./pages/CreateActionPage").then(m => ({ default: m.CreateActionPage })));
 const AdvancedSettingsPage = lazy(() => import("./pages/AdvancedSettingsPage").then(m => ({ default: m.AdvancedSettingsPage })));
 const AIChatPage = lazy(() => import("./pages/AIChatPage").then(m => ({ default: m.AIChatPage })));
 const AppearanceSettingsPage = lazy(() => import("./pages/AppearanceSettingsPage").then(m => ({ default: m.AppearanceSettingsPage })));
@@ -43,6 +44,7 @@ const BookmarksPage = lazy(() => import("./pages/BookmarksPage").then(m => ({ de
 const BooksPage = lazy(() => import("./pages/BooksPage").then(m => ({ default: m.BooksPage })));
 const ChangelogPage = lazy(() => import("./pages/ChangelogPage").then(m => ({ default: m.ChangelogPage })));
 const CommunitiesPage = lazy(() => import("./pages/CommunitiesPage").then(m => ({ default: m.CommunitiesPage })));
+const CreateCommunityPage = lazy(() => import("./pages/CreateCommunityPage").then(m => ({ default: m.CreateCommunityPage })));
 const ContentPage = lazy(() => import("./pages/ContentPage").then(m => ({ default: m.ContentPage })));
 const ContentSettingsPage = lazy(() => import("./pages/ContentSettingsPage").then(m => ({ default: m.ContentSettingsPage })));
 const CSAEPolicyPage = lazy(() => import("./pages/CSAEPolicyPage").then(m => ({ default: m.CSAEPolicyPage })));
@@ -290,6 +292,7 @@ export function AppRouter() {
             <Route path="/bluesky" element={<BlueskyPage />} />
             <Route path="/wikipedia" element={<WikipediaPage />} />
             <Route path="/communities" element={<CommunitiesPage />} />
+            <Route path="/communities/new" element={<CreateCommunityPage />} />
             <Route path="/letters" element={<LettersPage />} />
             <Route path="/letters/compose" element={<LetterComposePage />} />
             <Route path="/settings/letters" element={<LetterPreferencesPage />} />
@@ -304,6 +307,7 @@ export function AppRouter() {
             />
             <Route path="/i/*" element={<ExternalContentPage />} />
             <Route path="/actions" element={<ActionsPage />} />
+            <Route path="/actions/new" element={<CreateActionPage />} />
             <Route path="/agent" element={<AIChatPage />} />
             <Route path="/organizers" element={<OrganizersPage />} />
             <Route path="/dashboard" element={<EventDashboardPage />} />

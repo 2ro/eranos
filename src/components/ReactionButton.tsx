@@ -27,6 +27,14 @@ interface ReactionButtonProps {
   className?: string;
   /** Show a filled heart icon instead of outline. */
   filledHeart?: boolean;
+  /**
+   * Visual variant.
+   * - `pill` (default): compact icon-pill matching the legacy NoteCard
+   *   action bar.
+   * - `chip`: rounded chip with label fallback when there's no count,
+   *   matching the GoFundMe-style PostActionBar / NoteCard action row.
+   */
+  variant?: 'pill' | 'chip';
 }
 
 export function ReactionButton({
@@ -36,6 +44,7 @@ export function ReactionButton({
   reactionCount = 0,
   className,
   filledHeart = false,
+  variant = 'pill',
 }: ReactionButtonProps) {
   const { user } = useCurrentUser();
   const { nostr } = useNostr();
@@ -129,8 +138,10 @@ export function ReactionButton({
       <PopoverTrigger asChild>
         <button
           className={cn(
-            'flex items-center gap-1.5 p-2 rounded-full transition-colors focus:outline-none',
-            'text-muted-foreground hover:text-pink-500 hover:bg-pink-500/10',
+            'transition-colors focus:outline-none',
+            variant === 'chip'
+              ? 'inline-flex items-center gap-2 h-9 px-3 rounded-full text-sm font-medium text-muted-foreground hover:text-pink-500 hover:bg-pink-500/10'
+              : 'flex items-center gap-1.5 p-2 rounded-full text-muted-foreground hover:text-pink-500 hover:bg-pink-500/10',
             className,
             hasReacted && 'text-pink-500',
           )}
@@ -189,13 +200,23 @@ export function ReactionButton({
           {filledHeart ? (
             <Heart className="size-6" fill={hasReacted ? 'currentColor' : 'none'} />
           ) : hasReacted && userReaction ? (
-            <RenderResolvedEmoji emoji={userReaction} className="h-5 w-5 object-contain leading-none translate-y-px" />
+            <RenderResolvedEmoji
+              emoji={userReaction}
+              className={cn(
+                'object-contain leading-none translate-y-px',
+                variant === 'chip' ? 'h-[18px] w-[18px]' : 'h-5 w-5',
+              )}
+            />
           ) : (
-            <Heart className="size-5" />
+            <Heart className={variant === 'chip' ? 'size-[18px]' : 'size-5'} />
           )}
-          {reactionCount > 0 && (
-            <span className={cn('text-sm tabular-nums', hasReacted && 'text-pink-500')}>{formatNumber(reactionCount)}</span>
-          )}
+          {reactionCount > 0 ? (
+            <span className={cn('tabular-nums', variant === 'chip' ? '' : 'text-sm', hasReacted && 'text-pink-500')}>
+              {formatNumber(reactionCount)}
+            </span>
+          ) : variant === 'chip' ? (
+            <span className="hidden sm:inline">React</span>
+          ) : null}
         </button>
       </PopoverTrigger>
       <PopoverContent

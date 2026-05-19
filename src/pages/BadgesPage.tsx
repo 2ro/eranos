@@ -30,6 +30,7 @@ import { BadgeThumbnail } from "@/components/BadgeThumbnail";
 import { CreateBadgeDialog } from "@/components/CreateBadgeDialog";
 import { FeedEmptyState } from "@/components/FeedEmptyState";
 import { NoteCard } from "@/components/NoteCard";
+import { FeedCard } from "@/components/FeedCard";
 import { PageHeader } from "@/components/PageHeader";
 import { PullToRefresh } from "@/components/PullToRefresh";
 import { SortableList, SortableItem } from "@/components/SortableList";
@@ -1087,16 +1088,18 @@ function FollowsFeedTab({ onRefresh }: { onRefresh: () => Promise<void> }) {
   return (
     <PullToRefresh onRefresh={onRefresh}>
       {showSkeleton ? (
-        <div className="divide-y divide-border">
+        <FeedCard className="mt-2 divide-y divide-border">
           {Array.from({ length: 5 }).map((_, i) => (
             <NoteCardSkeleton key={i} />
           ))}
-        </div>
+        </FeedCard>
       ) : feedEvents.length > 0 ? (
-        <div>
-          {feedEvents.map((event) => (
-            <NoteCard key={event.id} event={event} />
-          ))}
+        <>
+          <FeedCard className="mt-2">
+            {feedEvents.map((event) => (
+              <NoteCard key={event.id} event={event} />
+            ))}
+          </FeedCard>
           {hasNextPage && (
             <div ref={scrollRef} className="py-4">
               {isFetchingNextPage && (
@@ -1106,7 +1109,7 @@ function FollowsFeedTab({ onRefresh }: { onRefresh: () => Promise<void> }) {
               )}
             </div>
           )}
-        </div>
+        </>
       ) : (
         <FeedEmptyState message={user ? "No badge activity from people you follow yet." : "No badge activity found yet."} />
       )}

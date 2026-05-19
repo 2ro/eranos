@@ -10,6 +10,7 @@ import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { FlatThreadedReplyList } from '@/components/ThreadedReplyList';
+import { FeedCard } from '@/components/FeedCard';
 import { ComposeBox } from '@/components/ComposeBox';
 import { ReplyComposeModal } from '@/components/ReplyComposeModal';
 import { ExternalReactionButton } from '@/components/ExternalReactionButton';
@@ -419,24 +420,142 @@ export function ExternalContentPage() {
         </div>
       )}
 
-      {/* Country header lives OUTSIDE the px-4 wrapper above so the hero
-          backdrop, gradients, and bottom-anchored title can bleed flush to
-          the column edges — the "you've arrived" feeling depends on the
-          image touching the left/right rails rather than floating in a
-          padded box. */}
-      {content.type === 'iso3166' && <CountryContentHeader code={content.code} />}
-
-      {/* React / share action bar */}
-      <ExternalActionBar
-        content={content}
-        onComment={openCompose}
-        commentCount={orderedReplies.length}
-      />
+      {/* React / share action bar — for non-country pages. Country
+          pages render their own action bar inside the FeedCard below. */}
+      {!isCountry && (
+        <ExternalActionBar
+          content={content}
+          onComment={openCompose}
+          commentCount={orderedReplies.length}
+        />
+      )}
 
       {/* Comment compose dialog (opened via FAB or the Comment button) */}
-      {commentRoot && <ReplyComposeModal event={commentRoot} open={composeOpen} onOpenChange={setComposeOpen} />}
+      {commentRoot && !isCountry && (
+        <ReplyComposeModal event={commentRoot} open={composeOpen} onOpenChange={setComposeOpen} />
+      )}
 
-      {/* ISBN pages get a tabbed interface with Comments + Reviews */}
+      {/* Country pages: the entire surface — cinematic hero, action
+          bar, compose box, pinned posts, recent posts — lives in one
+          rounded FeedCard so the page reads as a single GoFundMe-style
+          card instead of an edge-to-edge Twitter timeline stacked under
+          a hero image. The hero's edge-to-edge bleed becomes
+          edge-to-card-edge, and the action bar / compose box / feeds
+          all share the same surface. */}
+      {isCountry && content.type === 'iso3166' && (
+        <FeedCard className="mt-4">
+          <CountryContentHeader code={content.code} />
+
+          {/* React / share action bar — sits flush with the card edges
+              inside the FeedCard's overflow-hidden clip. */}
+          <ExternalActionBar
+            content={content}
+            onComment={openCompose}
+            commentCount={orderedReplies.length}
+          />
+
+          {/* Comment compose dialog (opened via FAB or the Comment button) */}
+          {commentRoot && <ReplyComposeModal event={commentRoot} open={composeOpen} onOpenChange={setComposeOpen} />}
+
+          {countryCode && (
+            <CountryFeedProvider countryCode={countryCode}>
+              {/* Inline compose box — hideBorder so the bottom seam
+                  comes from the next section's own border or heading
+                  instead of doubling up. Override default
+                  `bg-background/85` with `bg-transparent` so the
+                  composer reads as part of the card surface. */}
+              <ComposeBox compact replyTo={commentRoot} hideBorder className="bg-transparent" />
+
+              {/* Pinned posts (curated by country organizers/admins). */}
+              {(pinnedLoading || filteredPinnedPosts.length > 0) && (
+                <div>
+                  <div className="px-4 sm:px-6 pt-4 pb-2 flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground border-t border-border">
+                    <Pin className="size-3.5" />
+                    <span>Pinned</span>
+                  </div>
+                  {pinnedLoading ? (
+                    <div className="divide-y divide-border">
+                      {Array.from({ length: 2 }).map((_, i) => (
+                        <div key={i} className="px-4 py-3">
+                          <div className="flex gap-3">
+                            <Skeleton className="size-10 rounded-full shrink-0" />
+                            <div className="flex-1 space-y-2">
+                              <div className="flex items-center gap-2">
+                                <Skeleton className="h-4 w-20" />
+                                <Skeleton className="h-3 w-28" />
+                              </div>
+                              <Skeleton className="h-4 w-full" />
+                              <Skeleton className="h-4 w-3/4" />
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div>
+                      {filteredPinnedPosts.map((post) => (
+                        <NoteCard key={post.id} event={post} />
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Recent posts list */}
+              {repliesLoading ? (
+                <div>
+                  <div className="px-4 sm:px-6 pt-4 pb-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground border-t border-border">
+                    Recent
+                  </div>
+                  <div className="divide-y divide-border">
+                    {Array.from({ length: 3 }).map((_, i) => (
+                      <div key={i} className="px-4 py-3">
+                        <div className="flex gap-3">
+                          <Skeleton className="size-10 rounded-full shrink-0" />
+                          <div className="flex-1 space-y-2">
+                            <div className="flex items-center gap-2">
+                              <Skeleton className="h-4 w-20" />
+                              <Skeleton className="h-3 w-28" />
+                            </div>
+                            <Skeleton className="h-4 w-full" />
+                            <Skeleton className="h-4 w-3/4" />
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ) : orderedReplies.length > 0 ? (
+                <>
+                  {filteredPinnedPosts.length > 0 && (
+                    <div className="px-4 sm:px-6 pt-4 pb-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground border-t border-border">
+                      Recent
+                    </div>
+                  )}
+                  <FlatThreadedReplyList replies={orderedReplies} />
+                </>
+              ) : filteredPinnedPosts.length === 0 ? (
+                <div className="py-12 text-center text-muted-foreground text-sm border-t border-border">
+                  <MessageSquare className="size-12 mx-auto mb-4 opacity-30" />
+                  <p className="text-lg font-medium mb-2">No comments yet</p>
+                  <p>Be the first to share your thoughts about this!</p>
+                </div>
+              ) : null}
+            </CountryFeedProvider>
+          )}
+        </FeedCard>
+      )}
+
+      {hasNextPage && isCountry && (
+        <div ref={scrollRef} className="py-6 text-center text-xs text-muted-foreground">
+          {isFetchingNextPage ? 'Loading more…' : ''}
+        </div>
+      )}
+
+      {/* ISBN pages get a tabbed interface with Comments + Reviews.
+          Country pages are handled above (whole-page FeedCard).
+          URL / unknown content types render a simple compose + threaded
+          comments column. */}
       {content.type === 'isbn' ? (
         <BookContentTabs
           isbn={content.value.replace('isbn:', '')}
@@ -444,50 +563,7 @@ export function ExternalContentPage() {
           orderedReplies={orderedReplies}
           commentsLoading={repliesLoading}
         />
-      ) : isCountry && countryCode ? (
-        <CountryFeedProvider countryCode={countryCode}>
-          {/* Inline compose box */}
-          <ComposeBox compact replyTo={commentRoot} />
-
-          {/* Pinned posts (curated by country organizers/admins). Skipped on
-              ISBN/url/unknown content types — only meaningful for country feeds. */}
-          {(pinnedLoading || filteredPinnedPosts.length > 0) && (
-            <div>
-              <div className="px-4 pt-4 pb-2 flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                <Pin className="size-3.5" />
-                <span>Pinned</span>
-              </div>
-              {pinnedLoading ? (
-                <CommentsSkeleton />
-              ) : (
-                <div>
-                  {filteredPinnedPosts.map((post) => (
-                    <NoteCard key={post.id} event={post} />
-                  ))}
-                </div>
-              )}
-            </div>
-          )}
-
-          {/* Recent posts list */}
-          <div>
-            {repliesLoading ? (
-              <CommentsSkeleton />
-            ) : orderedReplies.length > 0 ? (
-              <>
-                <FlatThreadedReplyList replies={orderedReplies} />
-                {hasNextPage && (
-                  <div ref={scrollRef} className="py-6 text-center text-xs text-muted-foreground">
-                    {isFetchingNextPage ? 'Loading more…' : ''}
-                  </div>
-                )}
-              </>
-            ) : filteredPinnedPosts.length === 0 ? (
-              <CommentsEmptyState />
-            ) : null}
-          </div>
-        </CountryFeedProvider>
-      ) : (
+      ) : !isCountry ? (
         <>
           {/* Inline compose box */}
           <ComposeBox compact replyTo={commentRoot} />
@@ -497,13 +573,15 @@ export function ExternalContentPage() {
             {repliesLoading ? (
               <CommentsSkeleton />
             ) : orderedReplies.length > 0 ? (
-              <FlatThreadedReplyList replies={orderedReplies} />
+              <FeedCard className="mt-2">
+                <FlatThreadedReplyList replies={orderedReplies} />
+              </FeedCard>
             ) : (
               <CommentsEmptyState />
             )}
           </div>
         </>
-      )}
+      ) : null}
     </main>
   );
 }
@@ -528,7 +606,9 @@ function ExternalCommentsSection({ commentRoot, orderedReplies, commentsLoading 
         {commentsLoading ? (
           <CommentsSkeleton />
         ) : orderedReplies.length > 0 ? (
-          <FlatThreadedReplyList replies={orderedReplies} />
+          <FeedCard className="mt-2">
+            <FlatThreadedReplyList replies={orderedReplies} />
+          </FeedCard>
         ) : (
           <CommentsEmptyState />
         )}
@@ -539,7 +619,7 @@ function ExternalCommentsSection({ commentRoot, orderedReplies, commentsLoading 
 
 function CommentsSkeleton() {
   return (
-    <div className="divide-y divide-border">
+    <FeedCard className="mt-2 divide-y divide-border">
       {Array.from({ length: 3 }).map((_, i) => (
         <div key={i} className="px-4 py-3">
           <div className="flex gap-3">
@@ -557,7 +637,7 @@ function CommentsSkeleton() {
           </div>
         </div>
       ))}
-    </div>
+    </FeedCard>
   );
 }
 
@@ -631,11 +711,11 @@ function BookContentTabs({ isbn, commentRoot, orderedReplies, commentsLoading }:
           {reviewsLoading ? (
             <CommentsSkeleton />
           ) : reviews.length > 0 ? (
-            <div className="divide-y divide-border">
+            <FeedCard className="mt-2 divide-y divide-border">
               {reviews.map(({ event, review }) => (
                 <BookReviewCard key={event.id} event={event} review={review} />
               ))}
-            </div>
+            </FeedCard>
           ) : (
             <div className="py-12 text-center text-muted-foreground text-sm">
               <Star className="size-12 mx-auto mb-4 opacity-30" />

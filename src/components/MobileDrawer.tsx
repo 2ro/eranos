@@ -9,9 +9,8 @@ import { SidebarMoreMenu } from '@/components/SidebarMoreMenu';
 import { LoginArea } from '@/components/auth/LoginArea';
 import { LinkFooter } from '@/components/LinkFooter';
 import { EmojifiedText } from '@/components/CustomEmoji';
-import LoginDialog from '@/components/auth/LoginDialog';
+import AuthDialog from '@/components/auth/AuthDialog';
 import { FollowQRDialog } from '@/components/FollowQRDialog';
-import { useOnboarding } from '@/hooks/useOnboarding';
 import { genUserName } from '@/lib/genUserName';
 import { VerifiedNip05Text } from '@/components/Nip05Badge';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
@@ -51,7 +50,6 @@ export function MobileDrawer({ open, onOpenChange }: MobileDrawerProps) {
   const [accountExpanded, setAccountExpanded] = useState(false);
   const [loginDialogOpen, setLoginDialogOpen] = useState(false);
   const [followQROpen, setFollowQROpen] = useState(false);
-  const { startSignup } = useOnboarding();
   const { theme, customTheme, themes } = useTheme();
 
   // NIP-38 status
@@ -369,11 +367,9 @@ export function MobileDrawer({ open, onOpenChange }: MobileDrawerProps) {
         </SheetContent>
       </Sheet>
 
-      <LoginDialog
+      <AuthDialog
         isOpen={loginDialogOpen}
         onClose={() => setLoginDialogOpen(false)}
-        onLogin={() => setLoginDialogOpen(false)}
-        onSignupClick={startSignup}
       />
       <FollowQRDialog open={followQROpen} onOpenChange={setFollowQROpen} />
     </>

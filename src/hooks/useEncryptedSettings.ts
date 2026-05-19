@@ -20,7 +20,7 @@ let lastWriteTs: number = 0;
 
 /**
  * Persist the lastSync timestamp from encrypted settings into localStorage
- * so that InitialSyncGate can decide whether to show a spinner on reload.
+ * so callers can tell whether the user has ever synced on this browser.
  * If a local timestamp exists, localStorage is trustworthy and the app can
  * render immediately while NostrSync fetches updates in the background.
  */

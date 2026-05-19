@@ -5,7 +5,7 @@ import { nip19 } from 'nostr-tools';
 import { Check, Copy, HandHeart, LogIn, Send, Sparkles } from 'lucide-react';
 
 import { AgoraLogo } from '@/components/AgoraLogo';
-import LoginDialog from '@/components/auth/LoginDialog';
+import AuthDialog from '@/components/auth/AuthDialog';
 import { CampaignCard, CampaignCardSkeleton } from '@/components/CampaignCard';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -18,7 +18,7 @@ import { useToast } from '@/hooks/useToast';
  * Landing page for someone who already has a Nostr account and was told a
  * campaign was started on their behalf. The page splits cleanly:
  *
- * - Logged out: hero + a single "Sign in" button that opens LoginDialog.
+ * - Logged out: hero + a single "Sign in" button that opens the auth dialog.
  * - Logged in: query for campaigns whose `p` tags include `user.pubkey`
  *   and surface them as a list of CampaignCards, so the user can click
  *   through to view, edit metadata (if they ever take ownership), or just
@@ -54,10 +54,9 @@ export function ClaimPage() {
 
         {user ? <ClaimedCampaigns pubkey={user.pubkey} /> : <ClaimLoggedOut onLogin={() => setLoginOpen(true)} />}
 
-        <LoginDialog
+        <AuthDialog
           isOpen={loginOpen}
           onClose={() => setLoginOpen(false)}
-          onLogin={() => setLoginOpen(false)}
         />
       </div>
     </main>

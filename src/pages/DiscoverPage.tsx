@@ -14,6 +14,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { CampaignCard, CampaignCardSkeleton } from '@/components/CampaignCard';
+import { FeedCard } from '@/components/FeedCard';
 import { NoteCard } from '@/components/NoteCard';
 
 import { DiscoverHero } from '@/components/discovery/DiscoverHero';
@@ -227,11 +228,11 @@ function DiscoverFeed() {
 
   if (isLoading && events.length === 0) {
     return (
-      <div className="border-t border-border/60 divide-y divide-border/60">
+      <FeedCard className="divide-y divide-border/60">
         {Array.from({ length: 6 }).map((_, i) => (
           <FeedRowSkeleton key={i} />
         ))}
-      </div>
+      </FeedCard>
     );
   }
 
@@ -251,11 +252,16 @@ function DiscoverFeed() {
 
   return (
     <>
-      <div className="border-t border-border/60 divide-y divide-border/60">
+      {/* The feed sits inside a soft card, matching the shelves above
+          and the campaign comments card. NoteCard / CampaignCard
+          rows supply their own per-row separation; `overflow-hidden`
+          clips the last row's border so it tucks under the card's
+          bottom edge. */}
+      <FeedCard>
         {events.map((event) => (
           <DiscoverFeedRow key={event.id} event={event} />
         ))}
-      </div>
+      </FeedCard>
       {hasNextPage ? (
         <div
           ref={scrollRef}
@@ -285,7 +291,7 @@ function DiscoverFeedRow({ event }: { event: NostrEvent }) {
     const campaign = parseCampaign(event);
     if (!campaign || campaign.archived) return null;
     return (
-      <div className="p-4 sm:p-5">
+      <div className="p-4 sm:p-5 border-b border-border">
         <CampaignCard campaign={campaign} />
       </div>
     );

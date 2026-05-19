@@ -78,15 +78,16 @@ function ExpandThreadButton({ count, onClick, isLast }: { count: number; onClick
     <button
       onClick={onClick}
       className={cn(
-        "flex items-center gap-3 px-4 pt-0 pb-2.5 w-full hover:bg-secondary/30 transition-colors group",
+        // Soft, GoFundMe-style "Show more" affordance — no cascading dots,
+        // just a thin connector that fades into the label. Sits flush
+        // under the parent comment's avatar column so the eye follows the
+        // thread naturally.
+        "group flex items-center gap-3 w-full px-4 py-2.5 text-left hover:bg-secondary/30 transition-colors",
         isLast && "border-b border-border",
       )}
     >
-      <div className="flex flex-col items-center w-10">
-        <div className="w-0.5 flex-1 mb-1 bg-foreground/20" />
-        <div className="size-1.5 rounded-full bg-foreground/30 my-0.5" />
-        <div className="size-1.5 rounded-full bg-foreground/20 my-0.5" />
-        <div className="size-1.5 rounded-full bg-foreground/10 my-0.5" />
+      <div className="flex justify-center w-10 shrink-0">
+        <div className="w-0.5 h-5 rounded-full bg-foreground/15 group-hover:bg-primary/40 transition-colors" />
       </div>
       <span className="text-sm text-primary font-medium group-hover:underline">
         Show {count} more {count === 1 ? 'reply' : 'replies'}

@@ -1,30 +1,23 @@
 import { useMemo, useState, useRef, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
-import { BookOpen, MessageCircle, MessageSquare, MoreHorizontal, Star, Zap, AlertTriangle } from 'lucide-react';
+import { BookOpen, MessageSquare, Star, AlertTriangle } from 'lucide-react';
 import { nip19 } from 'nostr-tools';
-import { RepostIcon } from '@/components/icons/RepostIcon';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { NoteContent } from '@/components/NoteContent';
-import { ReactionButton } from '@/components/ReactionButton';
-import { RepostMenu } from '@/components/RepostMenu';
+import { PostActionBar } from '@/components/PostActionBar';
 import { ProfileHoverCard } from '@/components/ProfileHoverCard';
 import { EmojifiedText } from '@/components/CustomEmoji';
 import { NoteMoreMenu } from '@/components/NoteMoreMenu';
 import { ReplyComposeModal } from '@/components/ReplyComposeModal';
-import { ZapDialog } from '@/components/ZapDialog';
 import { useAuthor } from '@/hooks/useAuthor';
-import { useCurrentUser } from '@/hooks/useCurrentUser';
-import { useEventStats } from '@/hooks/useTrending';
-import { useUserZap } from '@/hooks/useUserZap';
 import { useProfileUrl } from '@/hooks/useProfileUrl';
 import { useOpenPost } from '@/hooks/useOpenPost';
 import { useBookSummary } from '@/hooks/useBookSummary';
 import { getDisplayName } from '@/lib/getDisplayName';
 import { timeAgo } from '@/lib/timeAgo';
-import { formatNumber } from '@/lib/formatNumber';
 import { cn } from '@/lib/utils';
 import { BOOKSTR_KINDS, extractISBNFromEvent, parseBookReview, ratingToStars } from '@/lib/bookstr';
 import type { NostrEvent } from '@nostrify/nostrify';
@@ -49,17 +42,12 @@ function encodeEventId(event: NostrEvent): string {
 }
 
 export function BookFeedItem({ event, className }: BookFeedItemProps) {
-  const { user } = useCurrentUser();
   const author = useAuthor(event.pubkey);
   const metadata = author.data?.metadata;
   const displayName = getDisplayName(metadata, event.pubkey);
   const profileUrl = useProfileUrl(event.pubkey, metadata);
-  const { data: stats } = useEventStats(event.id, event);
   const [moreMenuOpen, setMoreMenuOpen] = useState(false);
   const [replyOpen, setReplyOpen] = useState(false);
-
-  const canZapAuthor = !!user && user.pubkey !== event.pubkey;
-  const isZapped = useUserZap(canZapAuthor ? event.id : undefined) === true;
 
   const isbn = useMemo(() => extractISBNFromEvent(event), [event]);
   const isReview = event.kind === BOOKSTR_KINDS.BOOK_REVIEW;
@@ -220,60 +208,12 @@ export function BookFeedItem({ event, className }: BookFeedItemProps) {
           {isbn && <InlineBookCard isbn={isbn} />}
 
           {/* Action buttons */}
-          <div className="flex items-center gap-5 mt-3 -ml-2">
-            <button
-              className="flex items-center gap-1.5 p-2 rounded-full text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors"
-              title="Reply"
-              onClick={(e) => { e.stopPropagation(); setReplyOpen(true); }}
-            >
-              <MessageCircle className="size-5" />
-              {stats?.replies ? <span className="text-sm tabular-nums">{formatNumber(stats.replies)}</span> : null}
-            </button>
-
-            <RepostMenu event={event}>
-              {(isReposted: boolean) => (
-                <button
-                  className={`flex items-center gap-1.5 p-2 rounded-full transition-colors ${isReposted ? 'text-accent hover:text-accent/80 hover:bg-accent/10' : 'text-muted-foreground hover:text-accent hover:bg-accent/10'}`}
-                  title={isReposted ? 'Undo repost' : 'Repost'}
-                >
-                  <RepostIcon className="size-5" />
-                  {(stats?.reposts || stats?.quotes) ? <span className="text-sm tabular-nums">{formatNumber((stats?.reposts ?? 0) + (stats?.quotes ?? 0))}</span> : null}
-                </button>
-              )}
-            </RepostMenu>
-
-            <ReactionButton
-              eventId={event.id}
-              eventPubkey={event.pubkey}
-              eventKind={event.kind}
-              reactionCount={stats?.reactions}
-            />
-
-            {canZapAuthor && (
-              <ZapDialog target={event}>
-                <button
-                  className={cn(
-                    'flex items-center gap-1.5 p-2 rounded-full transition-colors',
-                    isZapped
-                      ? 'text-amber-500 hover:text-amber-500/80 hover:bg-amber-500/10'
-                      : 'text-muted-foreground hover:text-amber-500 hover:bg-amber-500/10',
-                  )}
-                  title={isZapped ? 'Zapped' : 'Zap'}
-                >
-                  <Zap className="size-5" fill={isZapped ? 'currentColor' : 'none'} />
-                  {stats?.zapAmount ? <span className="text-sm tabular-nums">{formatNumber(stats.zapAmount)}</span> : null}
-                </button>
-              </ZapDialog>
-            )}
-
-            <button
-              className="p-2 rounded-full text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors"
-              title="More"
-              onClick={(e) => { e.stopPropagation(); setMoreMenuOpen(true); }}
-            >
-              <MoreHorizontal className="size-5" />
-            </button>
-          </div>
+          <PostActionBar
+            event={event}
+            onReply={() => setReplyOpen(true)}
+            onMore={() => setMoreMenuOpen(true)}
+            className="mt-3"
+          />
         </div>
       </div>
 

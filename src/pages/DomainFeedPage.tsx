@@ -4,6 +4,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { useNostr } from '@nostrify/react';
 import { useQuery } from '@tanstack/react-query';
 import { NoteCard } from '@/components/NoteCard';
+import { FeedCard } from '@/components/FeedCard';
 import { ExternalFavicon } from '@/components/ExternalFavicon';
 import { PullToRefresh } from '@/components/PullToRefresh';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -124,7 +125,7 @@ export function DomainFeedPage() {
               <p className="text-xs mt-2">Make sure the domain has a valid /.well-known/nostr.json</p>
             </div>
           ) : isLoading ? (
-            <div className="divide-y divide-border">
+            <FeedCard className="mt-2 divide-y divide-border">
               {Array.from({ length: 5 }).map((_, i) => (
                 <div key={i} className="px-4 py-3">
                   <div className="flex gap-3">
@@ -137,11 +138,11 @@ export function DomainFeedPage() {
                   </div>
                 </div>
               ))}
-            </div>
+            </FeedCard>
           ) : filteredEvents && filteredEvents.length > 0 ? (
-            <div>
+            <FeedCard className="mt-2">
               {filteredEvents.map((event) => <NoteCard key={event.id} event={event} />)}
-            </div>
+            </FeedCard>
           ) : pubkeys && pubkeys.length === 0 ? (
             <div className="py-16 text-center text-muted-foreground">
               No users found on {domain}.

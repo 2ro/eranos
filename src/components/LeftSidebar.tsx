@@ -13,9 +13,8 @@ import { ProfileSearchDropdown } from '@/components/ProfileSearchDropdown';
 import { SidebarNavList } from '@/components/SidebarNavItem';
 import { SidebarMoreMenu } from '@/components/SidebarMoreMenu';
 
-import LoginDialog from '@/components/auth/LoginDialog';
+import AuthDialog from '@/components/auth/AuthDialog';
 import { FollowQRDialog } from '@/components/FollowQRDialog';
-import { useOnboarding } from '@/hooks/useOnboarding';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useLoggedInAccounts, type Account } from '@/hooks/useLoggedInAccounts';
 import { useLoginActions } from '@/hooks/useLoginActions';
@@ -75,7 +74,6 @@ export function LeftSidebar() {
   const hasUnread = useHasUnreadNotifications();
   const userProfileUrl = useProfileUrl(user?.pubkey ?? '', metadata);
   const [loginDialogOpen, setLoginDialogOpen] = useState(false);
-  const { startSignup } = useOnboarding();
   const [accountPopoverOpen, setAccountPopoverOpen] = useState(false);
   const [followQROpen, setFollowQROpen] = useState(false);
   const [editing, setEditing] = useState(false);
@@ -340,7 +338,7 @@ export function LeftSidebar() {
         </div>
       )}
 
-      <LoginDialog isOpen={loginDialogOpen} onClose={() => setLoginDialogOpen(false)} onLogin={() => setLoginDialogOpen(false)} onSignupClick={startSignup} />
+      <AuthDialog isOpen={loginDialogOpen} onClose={() => setLoginDialogOpen(false)} />
       <FollowQRDialog open={followQROpen} onOpenChange={setFollowQROpen} />
     </aside>
   );

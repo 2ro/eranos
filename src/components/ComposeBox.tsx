@@ -132,6 +132,10 @@ interface ComposeBoxProps {
   hideAvatar?: boolean;
   /** If true, suppresses the bottom border. Use when the composer sits directly above a visually distinct section (e.g. tabs with an arc background) that already provides separation. */
   hideBorder?: boolean;
+  /** Extra class names merged onto the outer wrapper. Useful for
+   * overriding the default `bg-background/85` when the composer is
+   * rendered inside a card surface. */
+  className?: string;
   /** Controlled preview mode (for modal usage). */
   previewMode?: boolean;
   /** Callback to notify parent of previewable content changes. */
@@ -202,6 +206,7 @@ export function ComposeBox({
   forceExpanded = false, 
   hideAvatar = false,
   hideBorder = false,
+  className,
   previewMode: controlledPreviewMode,
   onHasPreviewableContentChange,
   initialContent = '',
@@ -1217,6 +1222,7 @@ export function ComposeBox({
       forceExpanded ? "flex-1 min-h-0 rounded-2xl" : "",
       pickerOpen ? "pb-0" : "pb-3",
       !forceExpanded && !hideBorder && "border-b border-border",
+      className,
     )}>
       {/* Preview toggle at top when not controlled and has previewable content */}
       {hasPreviewableContent && controlledPreviewMode === undefined && (

@@ -10,7 +10,6 @@ import {
   AlertTriangle,
   ArrowLeft,
   HandHeart,
-  ImagePlus,
   Loader2,
   MapPin,
   MessageCircle,
@@ -20,6 +19,8 @@ import {
 } from 'lucide-react';
 
 import { PersonSearch } from '@/components/AddMemberDialog';
+import { CoverImageField } from '@/components/CoverImageField';
+import { FormSection } from '@/components/FormSection';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
@@ -33,7 +34,6 @@ import { useCampaign } from '@/hooks/useCampaign';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useNostrPublish } from '@/hooks/useNostrPublish';
 import { useToast } from '@/hooks/useToast';
-import { useUploadFile } from '@/hooks/useUploadFile';
 import type { SearchProfile } from '@/hooks/useSearchProfiles';
 import { useLayoutOptions } from '@/contexts/LayoutContext';
 import { formatSats, satsToUSDWhole, usdToSats } from '@/lib/bitcoin';
@@ -43,6 +43,7 @@ import {
   parseCampaign,
   slugifyCampaignIdentifier,
 } from '@/lib/campaign';
+import { getTodayDateInput } from '@/lib/dateInput';
 import { fetchFreshEvent } from '@/lib/fetchFreshEvent';
 import { genUserName } from '@/lib/genUserName';
 import { sanitizeUrl } from '@/lib/sanitizeUrl';
@@ -185,12 +186,6 @@ function formatDateInput(unixSeconds: number | undefined): string {
   return new Date(unixSeconds * 1000).toISOString().slice(0, 10);
 }
 
-function getTodayDateInput(): string {
-  const date = new Date();
-  date.setMinutes(date.getMinutes() - date.getTimezoneOffset());
-  return date.toISOString().slice(0, 10);
-}
-
 export function CreateCampaignPage() {
   useLayoutOptions({ noMaxWidth: true, rightSidebar: null });
 
@@ -201,13 +196,13 @@ export function CreateCampaignPage() {
   const queryClient = useQueryClient();
   const { nostr } = useNostr();
   const { mutateAsync: publishEvent } = useNostrPublish();
-  const { mutateAsync: uploadFile, isPending: isUploading } = useUploadFile();
   const { toast } = useToast();
 
   const [title, setTitle] = useState('');
   const [summary, setSummary] = useState('');
   const [story, setStory] = useState('');
   const [imageUrl, setImageUrl] = useState('');
+  const [coverUploading, setCoverUploading] = useState(false);
   const [tagInput, setTagInput] = useState('');
   const [goalUsd, setGoalUsd] = useState('');
   const [deadline, setDeadline] = useState('');
@@ -330,21 +325,6 @@ export function CreateCampaignPage() {
     setPrepopulatedGoalEventId(editCampaign.event.id);
   }, [btcPrice, editCampaign, goalUsd, prepopulatedGoalEventId]);
 
-  const handleImagePick = async (file: File) => {
-    try {
-      const tags = await uploadFile(file);
-      const url = tags[0]?.[1];
-      if (!url) throw new Error('Upload returned no URL');
-      setImageUrl(url);
-    } catch (error) {
-      toast({
-        title: 'Upload failed',
-        description: error instanceof Error ? error.message : String(error),
-        variant: 'destructive',
-      });
-    }
-  };
-
   const addRecipient = (profile: SearchProfile) => {
     setRecipients((prev) => prev.some((r) => r.pubkey === profile.pubkey) ? prev : [...prev, profile]);
   };
@@ -449,7 +429,11 @@ export function CreateCampaignPage() {
       }
 
       // Validate image URL (must be https).
-      const sanitizedImage = imageUrl.trim() ? sanitizeUrl(imageUrl.trim()) : undefined;
+      const trimmedImageUrl = imageUrl.trim();
+      const sanitizedImage = trimmedImageUrl ? sanitizeUrl(trimmedImageUrl) : undefined;
+      if (trimmedImageUrl && !sanitizedImage) {
+        throw new Error('Cover image must be a valid https:// URL.');
+      }
 
       const tags: string[][] = [
         ['d', slug],
@@ -708,18 +692,10 @@ export function CreateCampaignPage() {
 
           {/* Cover image */}
           <FormSection title="Cover image" requirement="Optional">
-            <CoverPicker
-              url={imageUrl}
-              isUploading={isUploading}
-              onPick={handleImagePick}
-              onClear={() => setImageUrl('')}
-            />
-            <Input
-              type="url"
-              inputMode="url"
-              placeholder="Or paste an https:// image URL"
+            <CoverImageField
               value={imageUrl}
-              onChange={(e) => setImageUrl(e.target.value)}
+              onChange={setImageUrl}
+              onUploadingChange={setCoverUploading}
             />
           </FormSection>
 
@@ -796,11 +772,16 @@ export function CreateCampaignPage() {
         )}
 
         <div className="pt-1">
-          <Button type="submit" disabled={submitMutation.isPending} className="w-full">
+          <Button type="submit" disabled={submitMutation.isPending || coverUploading} className="w-full">
             {submitMutation.isPending ? (
               <>
                 <Loader2 className="size-4 mr-2 animate-spin" />
                 {isEditMode ? 'Updating…' : 'Publishing…'}
+              </>
+            ) : coverUploading ? (
+              <>
+                <Loader2 className="size-4 mr-2 animate-spin" />
+                Uploading cover…
               </>
             ) : (
               <>
@@ -816,30 +797,6 @@ export function CreateCampaignPage() {
 }
 
 // ─── Layout helpers ──────────────────────────────────────────────────────────
-
-function FormSection({
-  title,
-  requirement,
-  children,
-}: {
-  title: string;
-  requirement: 'Required' | 'Recommended' | 'Optional';
-  children: React.ReactNode;
-}) {
-  return (
-    <section className="space-y-2.5 rounded-xl p-3 sm:p-4">
-      <div className="space-y-0.5">
-        <h2 className="flex items-center gap-2 text-lg font-semibold">
-          {title}
-          <span className="text-xs font-medium text-muted-foreground">
-            {requirement}
-          </span>
-        </h2>
-      </div>
-      <div className="space-y-2.5">{children}</div>
-    </section>
-  );
-}
 
 function CountrySelect({
   query,
@@ -951,70 +908,6 @@ function CountrySelect({
         </p>
       )}
     </div>
-  );
-}
-
-function CoverPicker({
-  url,
-  isUploading,
-  onPick,
-  onClear,
-}: {
-  url: string;
-  isUploading: boolean;
-  onPick: (file: File) => void | Promise<void>;
-  onClear: () => void;
-}) {
-  const sanitized = sanitizeUrl(url);
-  return (
-    <label
-      className={cn(
-        'relative block h-40 w-full cursor-pointer overflow-hidden rounded-xl border-2 border-dashed border-border bg-gradient-to-br from-muted/40 via-background to-muted/20 motion-safe:transition-colors hover:border-primary sm:h-48',
-        isUploading && 'opacity-70 pointer-events-none',
-      )}
-    >
-      {sanitized ? (
-        <>
-          <img src={sanitized} alt="" className="absolute inset-0 size-full object-cover" />
-          <button
-            type="button"
-            onClick={(e) => {
-              e.preventDefault();
-              onClear();
-            }}
-            className="absolute top-3 right-3 rounded-full bg-background/85 backdrop-blur p-1.5 hover:bg-background motion-safe:transition-colors"
-            aria-label="Remove image"
-          >
-            <X className="size-4" />
-          </button>
-        </>
-      ) : (
-        <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 text-muted-foreground">
-          {isUploading ? (
-            <>
-              <Loader2 className="size-8 animate-spin" />
-              <span className="text-sm">Uploading…</span>
-            </>
-          ) : (
-            <>
-              <ImagePlus className="size-8" />
-              <span className="text-sm">Click to upload a cover image</span>
-              <span className="text-xs">PNG, JPG, or WEBP</span>
-            </>
-          )}
-        </div>
-      )}
-      <input
-        type="file"
-        accept="image/png,image/jpeg,image/webp"
-        className="sr-only"
-        onChange={(e) => {
-          const file = e.target.files?.[0];
-          if (file) void onPick(file);
-          e.currentTarget.value = '';
-        }}
-      />
-    </label>
   );
 }
 

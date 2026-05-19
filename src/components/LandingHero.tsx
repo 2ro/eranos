@@ -4,11 +4,10 @@ import { AgoraBoltIcon } from '@/components/icons/AgoraBoltIcon';
 import { Button } from '@/components/ui/button';
 
 interface LandingHeroProps {
-  onLoginClick: () => void;
-  onSignupClick: () => void;
+  onJoinClick: () => void;
 }
 
-export function LandingHero({ onLoginClick, onSignupClick }: LandingHeroProps) {
+export function LandingHero({ onJoinClick }: LandingHeroProps) {
   return (
     <div className="landing-hero">
       {/* ── Hero Header ── */}
@@ -27,11 +26,8 @@ export function LandingHero({ onLoginClick, onSignupClick }: LandingHeroProps) {
         </div>
 
         <div className="flex gap-3 justify-center landing-hero-fade" style={{ animationDelay: '160ms' }}>
-          <Button onClick={onSignupClick} className="rounded-full px-6" size="sm">
-            Sign up
-          </Button>
-          <Button onClick={onLoginClick} variant="outline" className="rounded-full px-6" size="sm">
-            Log in
+          <Button onClick={onJoinClick} className="rounded-full px-6" size="sm">
+            Join
           </Button>
           <Button variant="outline" className="rounded-full px-6" size="sm" asChild>
             <Link to="/help">FAQ</Link>

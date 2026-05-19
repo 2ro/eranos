@@ -122,11 +122,12 @@ export function CampaignsPage() {
     [allCampaigns, featuredCoords],
   );
 
-  // Build the spotlight pool: every campaign that has a country and would
-  // make sense to feature. New events use NIP-73 `i` country tags; legacy
-  // campaigns can still resolve from the old free-form `location` field.
-  // Featured campaigns come first (in their hand-picked order), then
-  // everything else, newest first.
+  // Build the spotlight pool from the hand-picked featured campaigns only.
+  // New events use NIP-73 `i` country tags; legacy campaigns can still
+  // resolve from the old free-form `location` field. A featured campaign
+  // without a resolvable country is silently dropped — the globe needs
+  // coordinates to pin it, and the banner cycles in lockstep with the
+  // globe so the two stay in sync.
   const spotlightables = useMemo(() => {
     type Entry = {
       key: string;
@@ -144,10 +145,9 @@ export function CampaignsPage() {
       if (!countryCode) return;
       const coords = getCoordinates(countryCode);
       if (!coords) return;
-      // Deduplicate by country so a single popular country doesn't pile
-      // dozens of overlapping markers on top of each other. We keep the
-      // first one we see, which — given the iteration order below — means
-      // featured wins, then newest.
+      // Deduplicate by country so two featured campaigns in the same
+      // country don't pile overlapping markers on the globe. Featured
+      // order is preserved — the first one wins.
       if (seenCountry.has(countryCode)) return;
       seenAtag.add(c.aTag);
       seenCountry.add(countryCode);
@@ -157,9 +157,8 @@ export function CampaignsPage() {
     for (const c of visibleFeatured) {
       if (c) add(c);
     }
-    for (const c of allCampaigns ?? []) add(c);
     return out;
-  }, [visibleFeatured, allCampaigns]);
+  }, [visibleFeatured]);
 
   const globeMarkers = useMemo(
     () =>

@@ -26,7 +26,6 @@ import {
 import type { NostrEvent, NostrMetadata } from '@nostrify/nostrify';
 
 import { AddMemberDialog } from '@/components/AddMemberDialog';
-import { CreateCommunityDialog } from '@/components/CreateCommunityDialog';
 import { CreateCommunityEventDialog } from '@/components/CreateCommunityEventDialog';
 import { CreateActionDialog } from '@/components/CreateActionDialog';
 import { PeopleAvatarStack } from '@/components/PeopleAvatarStack';
@@ -48,6 +47,7 @@ import { FollowToggleButton } from '@/components/FollowButton';
 import { CreateGoalDialog } from '@/components/CreateGoalDialog';
 import { MembersOnlyToggle } from '@/components/MembersOnlyToggle';
 import { NoteCard } from '@/components/NoteCard';
+import { FeedCard } from '@/components/FeedCard';
 import { ReplyComposeModal } from '@/components/ReplyComposeModal';
 import { ThreadedReplyList, type ReplyNode } from '@/components/ThreadedReplyList';
 import { useAuthor } from '@/hooks/useAuthor';
@@ -198,7 +198,6 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
   const [goalDialogOpen, setGoalDialogOpen] = useState(false);
   const [actionDialogOpen, setActionDialogOpen] = useState(false);
   const [eventDialogOpen, setEventDialogOpen] = useState(false);
-  const [editCommunityOpen, setEditCommunityOpen] = useState(false);
   const [membersDialogOpen, setMembersDialogOpen] = useState(false);
   const [addMembersDialogOpen, setAddMembersDialogOpen] = useState(false);
   const [badgeDialogOpen, setBadgeDialogOpen] = useState(false);
@@ -693,7 +692,16 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
                                 <Award className="size-4 mr-2" />
                                 Edit badge
                               </DropdownMenuItem>
-                              <DropdownMenuItem onSelect={() => setEditCommunityOpen(true)}>
+                              <DropdownMenuItem
+                                onSelect={() => {
+                                  const naddr = nip19.naddrEncode({
+                                    kind: event.kind,
+                                    pubkey: event.pubkey,
+                                    identifier: community.dTag,
+                                  });
+                                  navigate(`/communities/new?edit=${naddr}`);
+                                }}
+                              >
                                 <Pencil className="size-4 mr-2" />
                                 Edit community
                               </DropdownMenuItem>
@@ -786,11 +794,11 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
               <ComposeBox compact replyTo={event} />
 
               {(commentsLoading || goalsLoading || eventsLoading || actionsLoading) ? (
-                <div className="divide-y divide-border">
+                <FeedCard className="mx-0 sm:mx-0 mt-2 divide-y divide-border">
                   {Array.from({ length: 3 }).map((_, i) => (
                     <ReplyCardSkeleton key={i} />
                   ))}
-                </div>
+                </FeedCard>
               ) : activityItems.length === 0 && pastInitiatives.length === 0 ? (
                 <div className="py-12 text-center text-muted-foreground text-sm px-5">
                   {membersOnly && (
@@ -803,7 +811,7 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
                     : <>No activity yet.{user ? ' Start a discussion, create an action, set a goal, or schedule an event!' : ''}</>}
                 </div>
               ) : (
-                <div className="divide-y divide-border">
+                <FeedCard className="mx-0 sm:mx-0 mt-2">
                   {activityItems.map((item) =>
                     item.kind === 'initiative' ? (
                       <NoteCard key={item.event.id} event={item.event} />
@@ -813,7 +821,7 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
                   )}
 
                   {pastInitiatives.length > 0 && (
-                    <div className="px-5 pt-4 pb-1">
+                    <div className="px-5 pt-4 pb-1 border-t border-border">
                       <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
                         Past
                       </h4>
@@ -822,7 +830,7 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
                   {pastInitiatives.map((e) => (
                     <NoteCard key={e.id} event={e} />
                   ))}
-                </div>
+                </FeedCard>
               )}
             </TabsContent>
 
@@ -1001,16 +1009,6 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
           communityATag={communityATag}
           open={eventDialogOpen}
           onOpenChange={setEventDialogOpen}
-        />
-      )}
-
-      {/* Edit community dialog — founder only */}
-      {isFounder && community && (
-        <CreateCommunityDialog
-          open={editCommunityOpen}
-          onOpenChange={setEditCommunityOpen}
-          communityEvent={event}
-          community={community}
         />
       )}
       </div>

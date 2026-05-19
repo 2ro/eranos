@@ -233,30 +233,39 @@ function BlueskyPostHeader({ author, rkey, url }: { author: string; rkey: string
             )}
 
             {/* Action buttons */}
-            <div className="flex items-center gap-5 mt-3 -ml-2">
+            <div className="flex flex-wrap items-center gap-1 sm:gap-2 mt-3">
               <button
                 type="button"
                 onClick={handleComment}
-                className="inline-flex items-center gap-1.5 p-2 rounded-full text-muted-foreground hover:text-sky-500 hover:bg-sky-500/10 transition-colors"
+                className="inline-flex items-center gap-2 h-9 px-3 rounded-full text-sm font-medium text-muted-foreground hover:text-sky-500 hover:bg-sky-500/10 transition-colors"
                 title="Comment"
               >
                 <MessageCircle className="size-[18px]" />
-                {post.replyCount > 0 && <span className="text-sm tabular-nums">{formatCount(post.replyCount)}</span>}
+                {post.replyCount > 0 ? (
+                  <span className="tabular-nums">{formatCount(post.replyCount)}</span>
+                ) : (
+                  <span className="hidden sm:inline">Comment</span>
+                )}
               </button>
               <button
                 type="button"
                 onClick={handleRepost}
-                className="inline-flex items-center gap-1.5 p-2 rounded-full text-muted-foreground hover:text-green-500 hover:bg-green-500/10 transition-colors"
+                className="inline-flex items-center gap-2 h-9 px-3 rounded-full text-sm font-medium text-muted-foreground hover:text-green-500 hover:bg-green-500/10 transition-colors"
                 title="Share to feed"
               >
                 <Repeat2 className="size-[18px]" />
-                {post.repostCount > 0 && <span className="text-sm tabular-nums">{formatCount(post.repostCount)}</span>}
+                {post.repostCount > 0 ? (
+                  <span className="tabular-nums">{formatCount(post.repostCount)}</span>
+                ) : (
+                  <span className="hidden sm:inline">Repost</span>
+                )}
               </button>
-              <ExternalReactionButton content={externalContent} iconSize="size-[18px]" count={post.likeCount} />
+              <ExternalReactionButton content={externalContent} count={post.likeCount} variant="chip" />
+              <div className="flex-1" />
               <button
                 type="button"
                 onClick={handleShare}
-                className="inline-flex items-center p-2 rounded-full text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors"
+                className="inline-flex items-center justify-center h-9 w-9 rounded-full text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors"
                 title="Share link"
               >
                 <Share2 className="size-[18px]" />
@@ -913,8 +922,8 @@ export function CountryContentHeader({ code }: { code: string }) {
   // the colour palette flips — preserves the cinematic curve while the mood
   // follows the destination.
   const skyOverlay = isDay
-    ? 'bg-[linear-gradient(to_bottom,rgba(254,202,87,0.18)_0%,rgba(255,107,107,0.12)_30%,rgba(0,0,0,0.65)_70%,hsl(var(--background))_100%)]'
-    : 'bg-[linear-gradient(to_bottom,rgba(30,27,75,0.55)_0%,rgba(15,23,42,0.55)_30%,rgba(0,0,0,0.85)_70%,hsl(var(--background))_100%)]';
+    ? 'bg-[linear-gradient(to_bottom,rgba(254,202,87,0.18)_0%,rgba(255,107,107,0.12)_30%,rgba(0,0,0,0.65)_70%,hsl(var(--card))_100%)]'
+    : 'bg-[linear-gradient(to_bottom,rgba(30,27,75,0.55)_0%,rgba(15,23,42,0.55)_30%,rgba(0,0,0,0.85)_70%,hsl(var(--card))_100%)]';
 
   // Whether to show the coat of arms inside the hero. Subdivisions get a
   // thumbnail in the flag slot already (from Wikipedia), so we skip the coat
@@ -927,7 +936,7 @@ export function CountryContentHeader({ code }: { code: string }) {
     // hero replaces the page header (it carries its own back arrow + follow
     // button overlaid on the photo), so no negative top margin is needed to
     // tuck under a sibling header band.
-    <section className="relative isolate overflow-hidden mb-2">
+    <section className="relative isolate overflow-hidden">
       {/* Hero — Wikipedia photo (or gradient fallback) with day/night sky
           overlay that fades into the page background. Aspect ratio scales
           from a compact 2:1 on phones to a cinematic 21:9 on tablets+. */}

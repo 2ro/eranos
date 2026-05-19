@@ -816,53 +816,59 @@ export const NoteCard = memo(function NoteCard({
 
   // ── Shared action buttons (used in all layouts) ──
   const actionButtons = (
-    <div className="flex items-center gap-5 mt-3 -ml-2">
+    <div className="flex flex-wrap items-center gap-1 sm:gap-2 mt-3">
       <button
-        className="flex items-center gap-1.5 p-2 rounded-full text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors"
+        className="inline-flex items-center gap-2 h-9 px-3 rounded-full text-sm font-medium text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors"
         title="Reply"
         onClick={(e) => {
           e.stopPropagation();
           setReplyOpen(true);
         }}
       >
-        <MessageCircle className="size-5" />
-            {stats?.replies ? (
-              <span className="text-sm tabular-nums">{formatNumber(stats.replies)}</span>
+        <MessageCircle className="size-[18px]" />
+        {stats?.replies ? (
+          <span className="tabular-nums">{formatNumber(stats.replies)}</span>
+        ) : null}
+      </button>
+
+      <RepostMenu event={actionTarget}>
+        {(isReposted: boolean) => (
+          <button
+            className={cn(
+              "inline-flex items-center gap-2 h-9 px-3 rounded-full text-sm font-medium transition-colors",
+              isReposted
+                ? "text-accent hover:text-accent/80 hover:bg-accent/10"
+                : "text-muted-foreground hover:text-accent hover:bg-accent/10",
+            )}
+            title={isReposted ? "Undo repost" : "Repost"}
+          >
+            <RepostIcon className="size-[18px]" />
+            {stats?.reposts || stats?.quotes ? (
+              <span className="tabular-nums">
+                {formatNumber((stats?.reposts ?? 0) + (stats?.quotes ?? 0))}
+              </span>
             ) : null}
           </button>
+        )}
+      </RepostMenu>
 
-          <RepostMenu event={actionTarget}>
-            {(isReposted: boolean) => (
-              <button
-                className={`flex items-center gap-1.5 p-2 rounded-full transition-colors ${isReposted ? "text-accent hover:text-accent/80 hover:bg-accent/10" : "text-muted-foreground hover:text-accent hover:bg-accent/10"}`}
-                title={isReposted ? "Undo repost" : "Repost"}
-              >
-                <RepostIcon className="size-5" />
-                {stats?.reposts || stats?.quotes ? (
-                  <span className="text-sm tabular-nums">
-                    {formatNumber((stats?.reposts ?? 0) + (stats?.quotes ?? 0))}
-                  </span>
-                ) : null}
-              </button>
-            )}
-          </RepostMenu>
-
-          <ReactionButton
+      <ReactionButton
         eventId={actionTarget.id}
         eventPubkey={actionTarget.pubkey}
         eventKind={actionTarget.kind}
         reactionCount={stats?.reactions}
+        variant="chip"
       />
 
       {canZapAuthor && (
         <ZapDialog target={actionTarget}>
           <button
-            className="flex items-center gap-1.5 p-2 rounded-full text-muted-foreground hover:text-amber-500 hover:bg-amber-500/10 transition-colors"
+            className="inline-flex items-center gap-2 h-9 px-3 rounded-full text-sm font-medium text-muted-foreground hover:text-amber-500 hover:bg-amber-500/10 transition-colors"
             title="Zap"
           >
-            <Zap className="size-5" />
+            <Zap className="size-[18px]" />
             {stats?.zapAmount ? (
-              <span className="text-sm tabular-nums">
+              <span className="tabular-nums">
                 {formatNumber(stats.zapAmount)}
               </span>
             ) : null}
@@ -870,8 +876,10 @@ export const NoteCard = memo(function NoteCard({
         </ZapDialog>
       )}
 
+      <div className="flex-1" />
+
       <button
-        className="p-2 rounded-full text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors sidebar:hidden"
+        className="inline-flex items-center justify-center h-9 w-9 rounded-full text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors sidebar:hidden"
         title="Share"
         onClick={async (e) => {
           e.stopPropagation();
@@ -881,18 +889,18 @@ export const NoteCard = memo(function NoteCard({
           if (result === "copied") toast({ title: "Link copied to clipboard" });
         }}
       >
-        <Share2 className="size-5" />
+        <Share2 className="size-[18px]" />
       </button>
 
       <button
-        className="p-2 rounded-full text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors"
+        className="inline-flex items-center justify-center h-9 w-9 rounded-full text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors"
         title="More"
         onClick={(e) => {
           e.stopPropagation();
           setMoreMenuOpen(true);
         }}
       >
-        <MoreHorizontal className="size-5" />
+        <MoreHorizontal className="size-[18px]" />
       </button>
     </div>
   );
