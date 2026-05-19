@@ -922,8 +922,8 @@ export function CountryContentHeader({ code }: { code: string }) {
   // the colour palette flips — preserves the cinematic curve while the mood
   // follows the destination.
   const skyOverlay = isDay
-    ? 'bg-[linear-gradient(to_bottom,rgba(254,202,87,0.18)_0%,rgba(255,107,107,0.12)_30%,rgba(0,0,0,0.65)_70%,hsl(var(--background))_100%)]'
-    : 'bg-[linear-gradient(to_bottom,rgba(30,27,75,0.55)_0%,rgba(15,23,42,0.55)_30%,rgba(0,0,0,0.85)_70%,hsl(var(--background))_100%)]';
+    ? 'bg-[linear-gradient(to_bottom,rgba(254,202,87,0.18)_0%,rgba(255,107,107,0.12)_30%,rgba(0,0,0,0.65)_70%,hsl(var(--card))_100%)]'
+    : 'bg-[linear-gradient(to_bottom,rgba(30,27,75,0.55)_0%,rgba(15,23,42,0.55)_30%,rgba(0,0,0,0.85)_70%,hsl(var(--card))_100%)]';
 
   // Whether to show the coat of arms inside the hero. Subdivisions get a
   // thumbnail in the flag slot already (from Wikipedia), so we skip the coat
@@ -936,7 +936,7 @@ export function CountryContentHeader({ code }: { code: string }) {
     // hero replaces the page header (it carries its own back arrow + follow
     // button overlaid on the photo), so no negative top margin is needed to
     // tuck under a sibling header band.
-    <section className="relative isolate overflow-hidden mb-2">
+    <section className="relative isolate overflow-hidden">
       {/* Hero — Wikipedia photo (or gradient fallback) with day/night sky
           overlay that fades into the page background. Aspect ratio scales
           from a compact 2:1 on phones to a cinematic 21:9 on tablets+. */}
