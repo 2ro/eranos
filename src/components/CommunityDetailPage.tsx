@@ -48,6 +48,7 @@ import { FollowToggleButton } from '@/components/FollowButton';
 import { CreateGoalDialog } from '@/components/CreateGoalDialog';
 import { MembersOnlyToggle } from '@/components/MembersOnlyToggle';
 import { NoteCard } from '@/components/NoteCard';
+import { FeedCard } from '@/components/FeedCard';
 import { ReplyComposeModal } from '@/components/ReplyComposeModal';
 import { ThreadedReplyList, type ReplyNode } from '@/components/ThreadedReplyList';
 import { useAuthor } from '@/hooks/useAuthor';
@@ -786,11 +787,11 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
               <ComposeBox compact replyTo={event} />
 
               {(commentsLoading || goalsLoading || eventsLoading || actionsLoading) ? (
-                <div className="divide-y divide-border">
+                <FeedCard className="mx-0 sm:mx-0 mt-2 divide-y divide-border">
                   {Array.from({ length: 3 }).map((_, i) => (
                     <ReplyCardSkeleton key={i} />
                   ))}
-                </div>
+                </FeedCard>
               ) : activityItems.length === 0 && pastInitiatives.length === 0 ? (
                 <div className="py-12 text-center text-muted-foreground text-sm px-5">
                   {membersOnly && (
@@ -803,7 +804,7 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
                     : <>No activity yet.{user ? ' Start a discussion, create an action, set a goal, or schedule an event!' : ''}</>}
                 </div>
               ) : (
-                <div className="divide-y divide-border">
+                <FeedCard className="mx-0 sm:mx-0 mt-2">
                   {activityItems.map((item) =>
                     item.kind === 'initiative' ? (
                       <NoteCard key={item.event.id} event={item.event} />
@@ -813,7 +814,7 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
                   )}
 
                   {pastInitiatives.length > 0 && (
-                    <div className="px-5 pt-4 pb-1">
+                    <div className="px-5 pt-4 pb-1 border-t border-border">
                       <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
                         Past
                       </h4>
@@ -822,7 +823,7 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
                   {pastInitiatives.map((e) => (
                     <NoteCard key={e.id} event={e} />
                   ))}
-                </div>
+                </FeedCard>
               )}
             </TabsContent>
 

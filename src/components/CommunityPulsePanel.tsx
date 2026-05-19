@@ -26,6 +26,7 @@ import { Loader2 } from 'lucide-react';
 import type { NostrFilter } from '@nostrify/nostrify';
 
 import { NoteCard } from '@/components/NoteCard';
+import { FeedCard } from '@/components/FeedCard';
 import { Skeleton } from '@/components/ui/skeleton';
 
 import { useTabFeed } from '@/hooks/useProfileFeed';
@@ -129,7 +130,7 @@ export function CommunityPulsePanel({
 
   if ((isLoading || isMembershipLoading) && feedItems.length === 0) {
     return (
-      <div className="divide-y divide-border">
+      <FeedCard className="mx-0 sm:mx-0 mt-2 divide-y divide-border">
         {Array.from({ length: 5 }).map((_, i) => (
           <div key={i} className="px-4 py-3">
             <div className="flex gap-3">
@@ -142,7 +143,7 @@ export function CommunityPulsePanel({
             </div>
           </div>
         ))}
-      </div>
+      </FeedCard>
     );
   }
 
@@ -155,19 +156,21 @@ export function CommunityPulsePanel({
   }
 
   return (
-    <div>
-      {feedItems.map((item) => (
-        <NoteCard
-          key={item.repostedBy ? `repost-${item.repostedBy}-${item.event.id}` : item.event.id}
-          event={item.event}
-          repostedBy={item.repostedBy}
-        />
-      ))}
+    <>
+      <FeedCard className="mx-0 sm:mx-0 mt-2">
+        {feedItems.map((item) => (
+          <NoteCard
+            key={item.repostedBy ? `repost-${item.repostedBy}-${item.event.id}` : item.event.id}
+            event={item.event}
+            repostedBy={item.repostedBy}
+          />
+        ))}
+      </FeedCard>
       {hasNextPage && (
         <div ref={sentinelRef} className="flex justify-center py-6">
           {isFetchingNextPage && <Loader2 className="size-5 animate-spin text-muted-foreground" />}
         </div>
       )}
-    </div>
+    </>
   );
 }

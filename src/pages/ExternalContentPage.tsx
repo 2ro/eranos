@@ -454,24 +454,29 @@ export function ExternalContentPage() {
               ISBN/url/unknown content types — only meaningful for country feeds. */}
           {(pinnedLoading || filteredPinnedPosts.length > 0) && (
             <div>
-              <div className="px-4 pt-4 pb-2 flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+              <div className="px-4 sm:px-6 pt-4 pb-2 flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                 <Pin className="size-3.5" />
                 <span>Pinned</span>
               </div>
               {pinnedLoading ? (
                 <CommentsSkeleton />
               ) : (
-                <div>
+                <FeedCard className="mt-2">
                   {filteredPinnedPosts.map((post) => (
                     <NoteCard key={post.id} event={post} />
                   ))}
-                </div>
+                </FeedCard>
               )}
             </div>
           )}
 
           {/* Recent posts list */}
           <div>
+            {filteredPinnedPosts.length > 0 && !repliesLoading && orderedReplies.length > 0 && (
+              <div className="px-4 sm:px-6 pt-4 pb-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                Recent
+              </div>
+            )}
             {repliesLoading ? (
               <CommentsSkeleton />
             ) : orderedReplies.length > 0 ? (

@@ -437,7 +437,9 @@ function ProfileBadgesDetailView({ event }: { event: NostrEvent }) {
 
   return (
     <div>
-      <NoteCard event={event} />
+      <FeedCard>
+        <NoteCard event={event} />
+      </FeedCard>
       <div className="pb-16 sidebar:pb-0">
         {commentsLoading ? (
           <FeedCard className="mt-4 divide-y divide-border">
@@ -1396,6 +1398,12 @@ function PostDetailContent({ event }: { event: NostrEvent }) {
   return (
     <CommunityModerationContext.Provider value={communityModContext}>
     <div>
+      {/* Focused post card — ancestor previews, ancestor thread, and the
+          focused event itself share one rounded surface so the page
+          reads as "thread context → this post" instead of an
+          edge-to-edge Twitter timeline. Replies sit in their own
+          FeedCard below. */}
+      <FeedCard>
       {/* Content preview for kind 1111 comments: external content, profile, or community */}
       {externalIdentifier && (
         <ExternalContentPreview identifier={externalIdentifier} />
@@ -2064,6 +2072,7 @@ function PostDetailContent({ event }: { event: NostrEvent }) {
           />
         </article>
       )}
+      </FeedCard>
 
       {/* Replies */}
       <div className="pb-16 sidebar:pb-0">
