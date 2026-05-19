@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { AlertTriangle, Check, Copy, ExternalLink } from 'lucide-react';
 
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -13,6 +14,7 @@ import {
 import { Label } from '@/components/ui/label';
 import { QRCodeCanvas } from '@/components/ui/qrcode';
 import { useAuthor } from '@/hooks/useAuthor';
+import { useProfileUrl } from '@/hooks/useProfileUrl';
 import { useToast } from '@/hooks/useToast';
 import { nostrPubkeyToBitcoinAddress } from '@/lib/bitcoin';
 import { genUserName } from '@/lib/genUserName';
@@ -21,13 +23,6 @@ import { sanitizeUrl } from '@/lib/sanitizeUrl';
 interface BeneficiaryDonatePanelProps {
   /** Hex pubkey of the beneficiary. */
   pubkey: string;
-  /**
-   * If true, the profile preview row (avatar + display name) is hidden.
-   * Use when the surrounding UI already identifies the beneficiary —
-   * e.g. the campaign detail page, which shows the recipient as the
-   * campaign organizer above the panel.
-   */
-  hideProfile?: boolean;
 }
 
 /**
@@ -37,12 +32,16 @@ interface BeneficiaryDonatePanelProps {
  * Used both by `BeneficiaryDonateDialog` (modal context) and embedded
  * directly into the campaign page when there's a single beneficiary.
  *
+ * Always shows the beneficiary's profile preview (avatar + name) as a
+ * link to their Nostr profile — even when the surrounding page also
+ * identifies a campaign organizer, the beneficiary is a distinct party
+ * (the organizer may be running the campaign on someone else's behalf).
+ *
  * Intentionally minimal: no amount input, no PSBT/in-app wallet flow —
  * that's `DonateDialog`'s job.
  */
 export function BeneficiaryDonatePanel({
   pubkey,
-  hideProfile = false,
 }: BeneficiaryDonatePanelProps) {
   const { toast } = useToast();
   const [copied, setCopied] = useState(false);
@@ -52,6 +51,7 @@ export function BeneficiaryDonatePanel({
   const displayName =
     metadata?.display_name || metadata?.name || genUserName(pubkey);
   const picture = sanitizeUrl(metadata?.picture);
+  const profileUrl = useProfileUrl(pubkey, metadata);
 
   const address = useMemo(
     () => nostrPubkeyToBitcoinAddress(pubkey),
@@ -88,19 +88,20 @@ export function BeneficiaryDonatePanel({
 
   return (
     <div className="space-y-4">
-      {!hideProfile && (
-        <div className="flex items-center gap-3">
-          <Avatar className="size-10 ring-1 ring-border">
-            {picture && <AvatarImage src={picture} alt="" />}
-            <AvatarFallback className="bg-primary/20 text-primary text-sm">
-              {displayName.slice(0, 2).toUpperCase()}
-            </AvatarFallback>
-          </Avatar>
-          <div className="min-w-0">
-            <div className="font-medium truncate">{displayName}</div>
-          </div>
+      <Link
+        to={profileUrl}
+        className="flex items-center gap-3 rounded-md -mx-2 px-2 py-1.5 motion-safe:transition-colors hover:bg-muted/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+      >
+        <Avatar className="size-10 ring-1 ring-border">
+          {picture && <AvatarImage src={picture} alt="" />}
+          <AvatarFallback className="bg-primary/20 text-primary text-sm">
+            {displayName.slice(0, 2).toUpperCase()}
+          </AvatarFallback>
+        </Avatar>
+        <div className="min-w-0">
+          <div className="font-medium truncate">{displayName}</div>
         </div>
-      )}
+      </Link>
 
       {/* QR code */}
       <div className="flex justify-center">

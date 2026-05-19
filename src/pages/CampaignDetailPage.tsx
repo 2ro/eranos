@@ -54,6 +54,7 @@ import { useCampaignDonations } from '@/hooks/useCampaignDonations';
 import { useComments } from '@/hooks/useComments';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useEventStats } from '@/hooks/useTrending';
+import { useProfileUrl } from '@/hooks/useProfileUrl';
 import { useToast } from '@/hooks/useToast';
 import { useLayoutOptions } from '@/contexts/LayoutContext';
 import {
@@ -219,6 +220,7 @@ function CampaignDetailContent({ campaign }: { campaign: ParsedCampaign }) {
   const creatorMetadata = author.data?.metadata;
   const creatorName =
     creatorMetadata?.display_name || creatorMetadata?.name || genUserName(campaign.pubkey);
+  const creatorProfileUrl = useProfileUrl(campaign.pubkey, creatorMetadata);
 
   const deadline = campaign.deadline ? formatDeadline(campaign.deadline) : null;
   const countryLabel = getCampaignCountryLabel(campaign);
@@ -326,6 +328,7 @@ function CampaignDetailContent({ campaign }: { campaign: ParsedCampaign }) {
         campaign={campaign}
         cover={cover}
         creatorName={creatorName}
+        creatorProfileUrl={creatorProfileUrl}
         deadline={deadline}
         countryLabel={countryLabel}
         tagLabel={tagLabel}
@@ -499,6 +502,7 @@ interface CampaignHeroProps {
   campaign: ParsedCampaign;
   cover: string | undefined;
   creatorName: string;
+  creatorProfileUrl: string;
   deadline: { label: string; isPast: boolean } | null;
   countryLabel: string | undefined;
   tagLabel: string | undefined;
@@ -514,6 +518,7 @@ function CampaignHero({
   campaign,
   cover,
   creatorName,
+  creatorProfileUrl,
   deadline,
   countryLabel,
   tagLabel,
@@ -601,7 +606,7 @@ function CampaignHero({
               {campaign.title}
             </h1>
             <Link
-              to={`/${campaign.pubkey}`}
+              to={creatorProfileUrl}
               onClick={(e) => e.stopPropagation()}
               className="text-xs sm:text-sm text-white/85 hover:text-white motion-safe:transition-colors"
             >
@@ -805,7 +810,7 @@ function DonateColumn({
 
         {/* Beneficiaries — only shown for multi-beneficiary campaigns.
             The single-beneficiary variant already inlines the recipient
-            via the BIP-21 panel above. */}
+            (with a profile link and avatar) via the BIP-21 panel above. */}
         {!singleBeneficiary && (
           <div className="space-y-2 border-t border-border/60 pt-4">
             <div className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
@@ -906,7 +911,7 @@ function SingleBeneficiaryActions({
 
   return (
     <div className="space-y-3">
-      <BeneficiaryDonatePanel pubkey={pubkey} hideProfile />
+      <BeneficiaryDonatePanel pubkey={pubkey} />
       <Button variant="outline" size="lg" className="w-full" onClick={onShare}>
         <Share2 className="size-4 mr-2" />
         Share
@@ -960,12 +965,13 @@ function RecipientRow({ pubkey, weight }: { pubkey: string; weight: number }) {
   const name = metadata?.display_name || metadata?.name || genUserName(pubkey);
   const picture = sanitizeUrl(metadata?.picture);
   const nip05 = metadata?.nip05;
+  const profileUrl = useProfileUrl(pubkey, metadata);
   const [donateOpen, setDonateOpen] = useState(false);
 
   return (
     <div className="flex items-center gap-2 py-2.5 -mx-2 px-2 rounded-md motion-safe:transition-colors hover:bg-muted/40">
       <Link
-        to={`/${pubkey}`}
+        to={profileUrl}
         className="flex items-center gap-3 min-w-0 flex-1 rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
       >
         <Avatar className="size-9 shrink-0">
