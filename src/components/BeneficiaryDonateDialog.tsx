@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
 import { AlertTriangle, Check, Copy, ExternalLink } from 'lucide-react';
 
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -11,8 +12,11 @@ import {
 } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
 import { QRCodeCanvas } from '@/components/ui/qrcode';
+import { useAuthor } from '@/hooks/useAuthor';
 import { useToast } from '@/hooks/useToast';
 import { nostrPubkeyToBitcoinAddress } from '@/lib/bitcoin';
+import { genUserName } from '@/lib/genUserName';
+import { sanitizeUrl } from '@/lib/sanitizeUrl';
 
 interface BeneficiaryDonateDialogProps {
   /** Hex pubkey of the beneficiary. */
@@ -37,6 +41,12 @@ export function BeneficiaryDonateDialog({
 }: BeneficiaryDonateDialogProps) {
   const { toast } = useToast();
   const [copied, setCopied] = useState(false);
+
+  const author = useAuthor(pubkey);
+  const metadata = author.data?.metadata;
+  const displayName =
+    metadata?.display_name || metadata?.name || genUserName(pubkey);
+  const picture = sanitizeUrl(metadata?.picture);
 
   const address = useMemo(
     () => nostrPubkeyToBitcoinAddress(pubkey),
@@ -66,15 +76,25 @@ export function BeneficiaryDonateDialog({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-md">
-        {/* Radix requires a title + description on every Dialog for screen
-            readers. We hide them visually per the design but keep them in
-            the accessibility tree. */}
-        <DialogHeader className="sr-only">
-          <DialogTitle>Donate with Bitcoin</DialogTitle>
-          <DialogDescription>
+        <DialogHeader>
+          <DialogTitle>Donate to {displayName}</DialogTitle>
+          <DialogDescription className="sr-only">
             Scan the QR code or copy the Bitcoin address below to donate.
           </DialogDescription>
         </DialogHeader>
+
+        {/* Profile preview */}
+        <div className="flex items-center gap-3">
+          <Avatar className="size-10 ring-1 ring-border">
+            {picture && <AvatarImage src={picture} alt="" />}
+            <AvatarFallback className="bg-primary/20 text-primary text-sm">
+              {displayName.slice(0, 2).toUpperCase()}
+            </AvatarFallback>
+          </Avatar>
+          <div className="min-w-0">
+            <div className="font-medium truncate">{displayName}</div>
+          </div>
+        </div>
 
         {address ? (
           <div className="space-y-4">
