@@ -18,20 +18,20 @@ import { cn } from '@/lib/utils';
 import type { ParsedCampaign } from '@/lib/campaign';
 
 const SORT_OPTIONS: { value: CampaignSort; label: string; icon: typeof TrendingUp }[] = [
-  { value: 'none', label: 'Newest', icon: Clock },
   { value: 'top', label: 'Top', icon: TrendingUp },
+  { value: 'none', label: 'New', icon: Clock },
 ];
 
-/** Type-guard for the `?sort=` URL param. Default is `none` (chronological). */
+/** Type-guard for the `?sort=` URL param. Default is `top` (most-zapped). */
 function parseSort(value: string | null): CampaignSort {
-  return value === 'top' ? 'top' : 'none';
+  return value === 'none' ? 'none' : 'top';
 }
 
 /**
  * Lists every campaign found on relays. Two sort modes:
  *
- * - **Newest** (default): chronological by `created_at`.
- * - **Top**: ranked by total sats raised (kind 8333 donation receipts).
+ * - **Top** (default): ranked by total sats raised (kind 8333 donation receipts).
+ * - **New**: chronological by `created_at`.
  *
  * Both modes share a free-text search bar that filters across title,
  * summary, story, location, and category tags client-side.
@@ -40,7 +40,7 @@ function parseSort(value: string | null): CampaignSort {
  * toggle to include them. The toggle filters client-side after the
  * campaign list resolves.
  *
- * URL state: `?sort=top&q=<search>`. Default values are stripped so the
+ * URL state: `?sort=none&q=<search>`. Default values are stripped so the
  * canonical URL stays clean. Useful for sharing search results.
  */
 export function AllCampaignsPage() {
@@ -83,7 +83,7 @@ export function AllCampaignsPage() {
 
   const setSort = (value: CampaignSort) => {
     const next = new URLSearchParams(searchParams);
-    if (value === 'top') next.set('sort', 'top');
+    if (value === 'none') next.set('sort', 'none');
     else next.delete('sort');
     setSearchParams(next, { replace: true });
   };
