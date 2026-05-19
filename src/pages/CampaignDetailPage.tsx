@@ -427,12 +427,18 @@ function CampaignDetailContent({ campaign }: { campaign: ParsedCampaign }) {
             </div>
           </div>
 
-          {/* Desktop-only sticky donate column. max-h + overflow lets the
-              column scroll internally on shorter viewports (e.g. laptops)
-              so a tall donate card with QR + donor list never traps its
-              bottom rows offscreen. */}
-          <aside className="hidden lg:block lg:w-[360px] lg:shrink-0 lg:sticky lg:top-4 lg:self-start lg:max-h-[calc(100vh-2rem)] lg:overflow-y-auto">
-            {donateColumn}
+          {/* Desktop-only donate column. The sticky inner wrapper tracks the
+              viewport while there's room to slide. When the donate card is
+              taller than the viewport (e.g. a campaign with many
+              beneficiaries) the bottom is reachable via the normal page
+              scroll: as the user scrolls down the article, the sticky
+              wrapper rides along until the flex row ends, exposing the
+              bottom of the column. This is preferable to capping the
+              column's height with `max-h` + `overflow-y-auto`, which traps
+              content behind a second scrollbar and visually clips the
+              bottom of the card. */}
+          <aside className="hidden lg:block lg:w-[360px] lg:shrink-0 lg:self-start">
+            <div className="lg:sticky lg:top-4">{donateColumn}</div>
           </aside>
         </div>
       </div>
