@@ -1,15 +1,15 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useSeoMeta } from '@unhead/react';
 import { HandHeart, KeyRound, Sparkles, Wallet, Zap } from 'lucide-react';
 
 import { AgoraLogo } from '@/components/AgoraLogo';
 import { LoginArea } from '@/components/auth/LoginArea';
+import AuthDialog from '@/components/auth/AuthDialog';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { useAppContext } from '@/hooks/useAppContext';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
-import { useOnboarding } from '@/hooks/useOnboarding';
 
 /**
  * Landing page reached from invite links like `https://agora.spot/receive`.
@@ -27,7 +27,7 @@ import { useOnboarding } from '@/hooks/useOnboarding';
 export function ReceivePage() {
   const { user } = useCurrentUser();
   const { config } = useAppContext();
-  const { startSignup } = useOnboarding();
+  const [authDialogOpen, setAuthDialogOpen] = useState(false);
   const navigate = useNavigate();
 
   useSeoMeta({
@@ -71,7 +71,7 @@ export function ReceivePage() {
           </p>
 
           <div className="flex flex-col sm:flex-row gap-3 pt-2">
-            <Button size="lg" onClick={startSignup} className="rounded-full">
+            <Button size="lg" onClick={() => setAuthDialogOpen(true)} className="rounded-full">
               <KeyRound className="size-4 mr-2" />
               Create my account
             </Button>
@@ -135,6 +135,11 @@ export function ReceivePage() {
           </Link>
         </footer>
       </div>
+
+      <AuthDialog
+        isOpen={authDialogOpen}
+        onClose={() => setAuthDialogOpen(false)}
+      />
     </main>
   );
 }

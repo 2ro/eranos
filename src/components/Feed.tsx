@@ -9,8 +9,7 @@ import { PullToRefresh } from '@/components/PullToRefresh';
 import { FeedEmptyState } from '@/components/FeedEmptyState';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Globe2, Loader2, Users } from 'lucide-react';
-import LoginDialog from '@/components/auth/LoginDialog';
-import { useOnboarding } from '@/hooks/useOnboarding';
+import AuthDialog from '@/components/auth/AuthDialog';
 import { useFeed } from '@/hooks/useFeed';
 import { useFollowingFeed } from '@/hooks/useFollowingFeed';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
@@ -85,8 +84,7 @@ export function Feed({ kinds, tagFilters, header, hideCompose, emptyMessage, fee
   })();
 
   const [rawActiveTab, handleSetActiveTab] = useFeedTab<FeedTab>(feedId);
-  const [loginDialogOpen, setLoginDialogOpen] = useState(false);
-  const { startSignup } = useOnboarding();
+  const [authDialogOpen, setAuthDialogOpen] = useState(false);
 
   // Kind-specific pages only support Follows + Global. Clamp any other
   // persisted tab (e.g. 'world', 'communities') back to the appropriate default.
@@ -244,10 +242,7 @@ export function Feed({ kinds, tagFilters, header, hideCompose, emptyMessage, fee
 
       {/* CTA (logged out, main feed only) */}
       {!user && !kinds && (
-        <LandingHero
-          onLoginClick={() => setLoginDialogOpen(true)}
-          onSignupClick={startSignup}
-        />
+        <LandingHero onJoinClick={() => setAuthDialogOpen(true)} />
       )}
 
       {!hideCompose && <ComposeBox compact hideBorder />}
@@ -357,13 +352,11 @@ export function Feed({ kinds, tagFilters, header, hideCompose, emptyMessage, fee
         </PullToRefresh>
       )}
 
-      {/* Login/Signup dialogs (only needed on main feed) */}
+      {/* Auth dialog (only needed on main feed) */}
       {!kinds && (
-        <LoginDialog
-          isOpen={loginDialogOpen}
-          onClose={() => setLoginDialogOpen(false)}
-          onLogin={() => setLoginDialogOpen(false)}
-          onSignupClick={startSignup}
+        <AuthDialog
+          isOpen={authDialogOpen}
+          onClose={() => setAuthDialogOpen(false)}
         />
       )}
     </main>

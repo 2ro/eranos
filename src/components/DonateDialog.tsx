@@ -39,7 +39,7 @@ import {
 } from '@/components/ui/select';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Textarea } from '@/components/ui/textarea';
-import LoginDialog from '@/components/auth/LoginDialog';
+import AuthDialog from '@/components/auth/AuthDialog';
 import { useAuthor } from '@/hooks/useAuthor';
 import { useAppContext } from '@/hooks/useAppContext';
 import { useBitcoinSigner } from '@/hooks/useBitcoinSigner';
@@ -979,10 +979,9 @@ function LoggedOutChooserView({
         </Button>
       </div>
 
-      <LoginDialog
+      <AuthDialog
         isOpen={loginOpen}
-        onClose={() => setLoginOpen(false)}
-        onLogin={() => {
+        onClose={() => {
           // The outer DonateDialog re-renders once `user` becomes truthy and
           // automatically swaps to the FormView for the now-logged-in donor.
           setLoginOpen(false);
