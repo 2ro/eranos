@@ -227,7 +227,7 @@ function DiscoverFeed() {
 
   if (isLoading && events.length === 0) {
     return (
-      <div className="border-t border-border/60 divide-y divide-border/60">
+      <div className="mx-4 sm:mx-6 rounded-2xl bg-card border border-border/60 shadow-sm overflow-hidden divide-y divide-border/60">
         {Array.from({ length: 6 }).map((_, i) => (
           <FeedRowSkeleton key={i} />
         ))}
@@ -251,7 +251,12 @@ function DiscoverFeed() {
 
   return (
     <>
-      <div className="border-t border-border/60 divide-y divide-border/60">
+      {/* The feed sits inside a soft card, matching the shelves above
+          and the campaign comments card. NoteCard / CampaignCard
+          rows supply their own per-row separation; `overflow-hidden`
+          clips the last row's border so it tucks under the card's
+          bottom edge. */}
+      <div className="mx-4 sm:mx-6 rounded-2xl bg-card border border-border/60 shadow-sm overflow-hidden">
         {events.map((event) => (
           <DiscoverFeedRow key={event.id} event={event} />
         ))}
@@ -285,7 +290,7 @@ function DiscoverFeedRow({ event }: { event: NostrEvent }) {
     const campaign = parseCampaign(event);
     if (!campaign || campaign.archived) return null;
     return (
-      <div className="p-4 sm:p-5">
+      <div className="p-4 sm:p-5 border-b border-border">
         <CampaignCard campaign={campaign} />
       </div>
     );
