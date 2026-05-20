@@ -586,13 +586,12 @@ function CommunityCreateActions({
   const createQuery = orgNaddr ? `?org=${orgNaddr}` : '';
 
   return (
-    <section className="rounded-2xl border border-border/60 bg-card shadow-sm overflow-hidden">
+    <section className="rounded-2xl border border-border/60 bg-gradient-to-br from-primary/15 via-primary/5 to-card shadow-sm overflow-hidden">
       <div className="grid gap-0 md:grid-cols-[1.15fr_1.85fr]">
-        <div className="bg-gradient-to-br from-primary/15 via-primary/5 to-transparent px-5 py-5 sm:px-6">
-          <p className="text-xs font-semibold uppercase tracking-wide text-primary">Create</p>
-          <h2 className="mt-1 text-xl font-semibold tracking-tight">Start something for {organizationName}</h2>
+        <div className="px-5 py-5 sm:px-6">
+          <h2 className="text-xl font-semibold tracking-tight">Start Something</h2>
           <p className="mt-2 text-sm text-muted-foreground">
-            Add an official campaign, pledge, or calendar event without leaving this organization page.
+            Add an official campaign, pledge, or event for {organizationName}.
           </p>
         </div>
 
@@ -612,7 +611,7 @@ function CommunityCreateActions({
               <Megaphone className="size-5 shrink-0 text-primary" />
               <span className="min-w-0">
                 <span className="block font-semibold">Pledge</span>
-                <span className="block text-xs font-normal text-muted-foreground">Offer a bounty</span>
+                <span className="block text-xs font-normal text-muted-foreground">Offer help</span>
               </span>
             </Link>
           </Button>
@@ -622,7 +621,7 @@ function CommunityCreateActions({
               <CalendarDays className="size-5 shrink-0 text-primary" />
               <span className="min-w-0">
                 <span className="block font-semibold">Event</span>
-                <span className="block text-xs font-normal text-muted-foreground">Schedule a date</span>
+                <span className="block text-xs font-normal text-muted-foreground">Get together</span>
               </span>
             </Link>
           </Button>
