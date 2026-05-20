@@ -55,11 +55,8 @@ export function HelpPage() {
         />
       </div>
 
-      {/* Team Soapbox follow pack */}
-      <TeamSoapboxCard className="px-4 pt-4 pb-4" />
-
       {/* FAQ heading */}
-      <div className="px-4 pt-4 pb-1">
+      <div className="px-4 pt-6 pb-1">
         <h2 className="text-lg font-bold">Frequently Asked Questions</h2>
         <p className="text-sm text-muted-foreground mt-1">
           Everything else you need to know about Nostr, {config.appName}, and how it all works.
@@ -67,7 +64,10 @@ export function HelpPage() {
       </div>
 
       {/* FAQ accordion sections */}
-      <HelpFAQSection className="px-4 pb-8" />
+      <HelpFAQSection className="px-4 pb-4" />
+
+      {/* Team Soapbox follow pack — at the end, after the FAQ */}
+      <TeamSoapboxCard className="px-4 pt-2 pb-4" />
 
       {/* Privacy policy link */}
       <div className="px-4 pb-8">
