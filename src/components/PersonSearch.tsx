@@ -12,6 +12,7 @@ import { useSearchProfiles, type SearchProfile } from '@/hooks/useSearchProfiles
 import { useSearchPeopleLists, type PeopleListSearchResult } from '@/hooks/useSearchPeopleLists';
 import { parseAuthorEvent } from '@/hooks/useAuthor';
 import { genUserName } from '@/lib/genUserName';
+import { sanitizeUrl } from '@/lib/sanitizeUrl';
 
 function isHexPubkey(value: string): boolean {
   return /^[0-9a-f]{64}$/i.test(value);
@@ -209,6 +210,7 @@ function PeopleListSearchResultItem({ pack, onClick }: { pack: PeopleListSearchR
 function SearchResultItem({ profile, onClick }: { profile: SearchProfile; onClick: (profile: SearchProfile) => void }) {
   const { metadata, pubkey } = profile;
   const displayName = metadata.display_name || metadata.name || genUserName(pubkey);
+  const avatarUrl = sanitizeUrl(metadata.picture);
 
   return (
     <button
@@ -217,7 +219,7 @@ function SearchResultItem({ profile, onClick }: { profile: SearchProfile; onClic
       onMouseDown={(e) => e.preventDefault()}
     >
       <Avatar className="size-8 shrink-0">
-        <AvatarImage src={metadata.picture} alt={displayName} />
+        <AvatarImage src={avatarUrl} alt={displayName} />
         <AvatarFallback className="bg-primary/20 text-primary text-xs">
           {displayName[0]?.toUpperCase() || '?'}
         </AvatarFallback>

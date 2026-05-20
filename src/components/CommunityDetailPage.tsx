@@ -72,6 +72,7 @@ function PersonRow({ pubkey, label, size = 'md' }: { pubkey: string; label?: str
   const metadata: NostrMetadata | undefined = data?.metadata;
   const name = metadata?.display_name || metadata?.name || genUserName(pubkey);
   const profileUrl = useProfileUrl(pubkey, metadata);
+  const avatarUrl = sanitizeUrl(metadata?.picture);
   const avatarCls = size === 'sm' ? 'size-8' : 'size-10';
   const fallbackCls = size === 'sm' ? 'text-xs' : '';
 
@@ -79,7 +80,7 @@ function PersonRow({ pubkey, label, size = 'md' }: { pubkey: string; label?: str
     <div className="flex items-center gap-3 py-1">
       <Link to={profileUrl} className="flex items-center gap-3 group flex-1 min-w-0">
         <Avatar className={cn(avatarCls, 'ring-2 ring-background')}>
-          <AvatarImage src={metadata?.picture} />
+          <AvatarImage src={avatarUrl} />
           <AvatarFallback className={cn('bg-muted text-muted-foreground', fallbackCls)}>
             {name.charAt(0).toUpperCase()}
           </AvatarFallback>
