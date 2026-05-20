@@ -167,14 +167,6 @@ const FAQ_TEMPLATE: FAQCategory[] = [
         ],
       },
       {
-        id: 'why-not-other-crypto',
-        question: 'Why not Monero or another cryptocurrency?',
-        answer: [
-          'Bitcoin is by far the most widely adopted cryptocurrency. That means it\'s the easiest for donors to buy and send, and the easiest for activists to receive, hold, and spend.',
-          'Privacy-focused coins like Monero solve some problems on-chain Bitcoin doesn\'t, but they\'re unsupported by most consumer apps and harder to convert back to local currency. Asking either side of a donation to first acquire a niche cryptocurrency is a barrier {appName} won\'t put in the way.',
-        ],
-      },
-      {
         id: 'why-not-silent-payments',
         question: 'Why doesn\'t {appName} use silent payments?',
         answer: [
@@ -186,8 +178,17 @@ const FAQ_TEMPLATE: FAQCategory[] = [
         id: 'why-not-rotating-addresses',
         question: 'Why doesn\'t {appName} generate a new address for every donation?',
         answer: [
-          'Generating a fresh address per donation would require {appName} to run a server that signs and serves addresses. That server becomes a single point of failure \u2014 someone could shut it down to silence activists.',
-          '{appName} derives each user\'s donation address from their Nostr public key. No server is required, and the platform itself can\'t be turned off to censor anyone.',
+          'Doing this would require {appName} to act as a money-exchanging middleman \u2014 taking custody of the Bitcoin first and then forwarding it on to the activist.',
+          'That would make us a money transmitter, subject to the regulations that come with that, and a single point of failure: shut down {appName}\'s server and you\'ve shut down every donation flowing through it.',
+          'Instead, each user\'s donation address is derived from their Nostr public key. Donors send directly to the activist, {appName} never touches the funds, and the platform itself can\'t be turned off to censor anyone.',
+        ],
+      },
+      {
+        id: 'why-not-other-crypto',
+        question: 'Why not Monero or another cryptocurrency?',
+        answer: [
+          'Bitcoin is by far the most widely adopted cryptocurrency. That means it\'s the easiest for donors to buy and send, and the easiest for activists to receive, hold, and spend.',
+          'Privacy-focused coins like Monero solve some problems on-chain Bitcoin doesn\'t, but they\'re unsupported by most consumer apps and harder to convert back to local currency. Asking either side of a donation to first acquire a niche cryptocurrency is a barrier {appName} won\'t put in the way.',
         ],
       },
     ],
