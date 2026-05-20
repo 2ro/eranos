@@ -1,8 +1,8 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
 import { useSeoMeta } from '@unhead/react';
-import { Globe2, HandHeart, Loader2, PlusCircle, Search, Users } from 'lucide-react';
+import { Globe2, HandHeart, Loader2, PlusCircle, Users } from 'lucide-react';
 import type { NostrEvent } from '@nostrify/nostrify';
 import { useInView } from 'react-intersection-observer';
 
@@ -28,11 +28,11 @@ import { useLayoutOptions } from '@/contexts/LayoutContext';
 import { useAppContext } from '@/hooks/useAppContext';
 import { useCommunityActivityFeed } from '@/hooks/useCommunityActivityFeed';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
-import { useDiscoverCommunities } from '@/hooks/useDiscoverCommunities';
+import { useFeaturedOrganizations } from '@/hooks/useFeaturedOrganizations';
 import { useGlobalActivity } from '@/hooks/useGlobalActivity';
 import { useGlobalDonations } from '@/hooks/useGlobalDonations';
+import { useManageableOrganizations } from '@/hooks/useManageableOrganizations';
 import { useMembersOnlyFilter } from '@/hooks/useMembersOnlyFilter';
-import { useMyCommunities } from '@/hooks/useMyCommunities';
 import { useToast } from '@/hooks/useToast';
 import { formatSatsShort } from '@/lib/formatCampaignAmount';
 
@@ -78,15 +78,15 @@ export function CommunitiesPage() {
   });
 
   useSeoMeta({
-    title: `Communities | ${config.appName}`,
-    description: 'Discover and join flat communities on Nostr',
+    title: `Organizations | ${config.appName}`,
+    description: 'Discover and join organizations on Nostr',
   });
 
   const handleCreateCommunity = () => {
     if (!user) {
       toast({
-        title: 'Log in to create a community',
-        description: 'Community creation publishes a Nostr event from your account.',
+        title: 'Log in to create an organization',
+        description: 'Creating an organization publishes a Nostr event from your account.',
       });
       return;
     }
@@ -99,18 +99,16 @@ export function CommunitiesPage() {
 
       <div className="max-w-5xl mx-auto space-y-2 sm:space-y-4">
         <section className="pt-6">
-          <SectionHeader title="My communities" className="pb-3 sm:px-6" />
+          <SectionHeader title="My organizations" className="pb-3 sm:px-6" />
           <MyCommunitiesShelf onCreateCommunity={handleCreateCommunity} />
         </section>
 
         <section className="pt-4">
           <SectionHeader
-            title="Discover communities"
-            seeAllLabel="Search"
-            onSeeAll={() => navigate('/search?tab=communities')}
+            title="Featured organizations"
             className="pb-3 sm:px-6"
           />
-          <DiscoverCommunitiesShelf />
+          <FeaturedOrganizationsShelf />
         </section>
 
         <section id="community-activity" className="pt-4 pb-8">
@@ -121,7 +119,7 @@ export function CommunitiesPage() {
                   Voices from everywhere
                 </h2>
                 <p className="text-sm text-muted-foreground mt-1 max-w-xl">
-                  New community posts, goals, actions, and definition updates from the spaces you belong to.
+                  New posts, campaigns, pledges, and definition updates from the organizations you belong to.
                 </p>
               </div>
               {user && <MembersOnlyToggle className="shrink-0" />}
@@ -158,7 +156,7 @@ interface TickerStat {
 }
 
 function CommunitiesHero({ onCreateCommunity }: CommunitiesHeroProps) {
-  const { data: communities } = useDiscoverCommunities({ limit: 24 });
+  const { data: featured } = useFeaturedOrganizations();
   const { data: activityByCountry } = useGlobalActivity();
   const { data: donations, isLoading: donationsLoading } = useGlobalDonations();
   const [hueIndex, setHueIndex] = useState(0);
@@ -185,11 +183,11 @@ function CommunitiesHero({ onCreateCommunity }: CommunitiesHeroProps) {
         icon: <HandHeart className="size-5" aria-hidden />,
       });
     }
-    if (communities && communities.length > 0) {
+    if (featured && featured.length > 0) {
       items.push({
-        id: 'communities',
-        value: communities.length.toLocaleString(),
-        label: `${communities.length === 1 ? 'community' : 'communities'} gathering on Nostr`,
+        id: 'organizations',
+        value: featured.length.toLocaleString(),
+        label: `featured ${featured.length === 1 ? 'organization' : 'organizations'} on Nostr`,
         icon: <Users className="size-5" aria-hidden />,
       });
     }
@@ -202,7 +200,7 @@ function CommunitiesHero({ onCreateCommunity }: CommunitiesHeroProps) {
       });
     }
     return items;
-  }, [donations, communities, activityByCountry]);
+  }, [donations, featured, activityByCountry]);
 
   const [tickerIndex, setTickerIndex] = useState(0);
   useEffect(() => {
@@ -251,7 +249,7 @@ function CommunitiesHero({ onCreateCommunity }: CommunitiesHeroProps) {
             <br className="sm:hidden" /> in numbers.
           </h1>
           <p className="text-base sm:text-lg text-white/85 max-w-2xl mx-auto drop-shadow-[0_1px_6px_rgb(0_0_0/0.5)]">
-            Create communities, gather members, and keep up with what your spaces are doing.
+            Create organizations, gather members, and keep up with what your spaces are doing.
           </p>
         </div>
 
@@ -307,7 +305,7 @@ function CommunitiesHero({ onCreateCommunity }: CommunitiesHeroProps) {
             )}
           >
             <PlusCircle className="mr-2" />
-            Create a community
+            Create an organization
           </Button>
         </div>
       </div>
@@ -326,8 +324,8 @@ function MyCommunitiesShelf({ onCreateCommunity }: { onCreateCommunity: () => vo
     return (
       <EmptyShelf
         icon={<Users className="size-7 text-primary/70" />}
-        title="Log in to see your communities"
-        body="Founded, joined, and followed communities will appear here."
+        title="Log in to see your organizations"
+        body="Organizations you've founded or moderate will appear here."
         action={<LoginArea className="max-w-60" />}
       />
     );
@@ -337,7 +335,12 @@ function MyCommunitiesShelf({ onCreateCommunity }: { onCreateCommunity: () => vo
 }
 
 function MyCommunitiesShelfContent({ onCreateCommunity }: { onCreateCommunity: () => void }) {
-  const { data: myCommunities, isLoading } = useMyCommunities();
+  // "My organizations" = NIP-72 community definitions the logged-in user
+  // either founded (author of the kind 34550 event) or is listed as a
+  // moderator on (via a `p` tag with role "moderator"). This matches the
+  // trust model used by the create-flow's implicit org tagging — only
+  // these orgs can publish official campaigns/pledges/events.
+  const { data: manageable, isLoading } = useManageableOrganizations();
 
   if (isLoading) {
     return (
@@ -349,25 +352,17 @@ function MyCommunitiesShelfContent({ onCreateCommunity }: { onCreateCommunity: (
     );
   }
 
-  if (!myCommunities || myCommunities.length === 0) {
+  if (!manageable || manageable.length === 0) {
     return (
       <EmptyShelf
         icon={<Users className="size-7 text-primary/70" />}
-        title="No communities yet"
-        body="Create your own community or discover a space your people are already building."
+        title="No organizations yet"
+        body="Create your own organization to start coordinating campaigns, pledges, and events with your people."
         action={(
-          <div className="flex flex-wrap justify-center gap-2">
-            <Button type="button" onClick={onCreateCommunity} className="rounded-full">
-              <PlusCircle className="size-4 mr-2" />
-              Create a community
-            </Button>
-            <Button asChild variant="outline" className="rounded-full">
-              <Link to="/search?tab=communities">
-                <Search className="size-4 mr-2" />
-                Search communities
-              </Link>
-            </Button>
-          </div>
+          <Button type="button" onClick={onCreateCommunity} className="rounded-full">
+            <PlusCircle className="size-4 mr-2" />
+            Create an organization
+          </Button>
         )}
       />
     );
@@ -375,18 +370,18 @@ function MyCommunitiesShelfContent({ onCreateCommunity }: { onCreateCommunity: (
 
   return (
     <HorizontalScroll className="sm:px-6">
-      {myCommunities.slice(0, 12).map((entry) => (
+      {manageable.slice(0, 12).map((entry) => (
         <CommunityMiniCard key={entry.community.aTag} community={entry.community} />
       ))}
     </HorizontalScroll>
   );
 }
 
-function DiscoverCommunitiesShelf() {
-  const { data: communities, isLoading } = useDiscoverCommunities({ limit: 18 });
-  const shelfCommunities = useMemo(() => (communities ?? []).slice(0, 12), [communities]);
+function FeaturedOrganizationsShelf() {
+  const { data: featured, isLoading } = useFeaturedOrganizations();
+  const hasFeatured = !!featured && featured.length > 0;
 
-  if (isLoading && shelfCommunities.length === 0) {
+  if (isLoading && !hasFeatured) {
     return (
       <HorizontalScroll className="sm:px-6">
         {Array.from({ length: 4 }).map((_, i) => (
@@ -396,25 +391,21 @@ function DiscoverCommunitiesShelf() {
     );
   }
 
-  if (shelfCommunities.length === 0) {
+  if (!hasFeatured) {
     return (
       <EmptyShelf
         icon={<Users className="size-7 text-primary/70" />}
-        title="No communities discovered yet"
-        body="Communities are flat, badge-gated spaces on Nostr. Found one and invite your people."
-        action={(
-          <Button asChild className="rounded-full">
-            <Link to="/search?tab=communities">Search communities</Link>
-          </Button>
-        )}
+        title="No featured organizations available"
+        body="The curated list is currently unreachable. Try refreshing in a moment."
+        action={null}
       />
     );
   }
 
   return (
     <HorizontalScroll className="sm:px-6">
-      {shelfCommunities.map((community) => (
-        <CommunityMiniCard key={community.aTag} community={community} />
+      {featured.map((entry) => (
+        <CommunityMiniCard key={entry.community.aTag} community={entry.community} />
       ))}
     </HorizontalScroll>
   );
@@ -514,9 +505,9 @@ function ActivitiesFeed({ onRefresh }: { onRefresh: () => Promise<void> }) {
             <Users className="size-8 text-primary" />
           </div>
           <div className="space-y-2 max-w-xs">
-            <h3 className="text-xl font-bold">Community activity</h3>
+            <h3 className="text-xl font-bold">Organization activity</h3>
             <p className="text-muted-foreground text-sm">
-              Log in to see activity from your communities.
+              Log in to see activity from your organizations.
             </p>
           </div>
           <LoginArea className="max-w-60" />
@@ -547,7 +538,7 @@ function ActivitiesFeed({ onRefresh }: { onRefresh: () => Promise<void> }) {
             })}
           </FeedCard>
         ) : membersOnly && activityEvents && activityEvents.length > 0 ? (
-          <FeedEmptyState message="No activity from members of your communities yet. Toggle the shield icon to see all community activity." />
+          <FeedEmptyState message="No activity from members of your organizations yet. Toggle the shield icon to see all organization activity." />
         ) : (
           <div className="py-20 px-8 flex flex-col items-center gap-6 text-center">
             <div className="p-4 rounded-full bg-primary/10">
@@ -556,16 +547,8 @@ function ActivitiesFeed({ onRefresh }: { onRefresh: () => Promise<void> }) {
             <div className="space-y-2 max-w-xs">
               <h2 className="text-xl font-bold">No activity yet</h2>
               <p className="text-muted-foreground text-sm">
-                Discover communities to join via the Search page, or create your own with the button above.
+                Browse the featured organizations above, or create your own with the button at the top of the page.
               </p>
-            </div>
-            <div className="flex flex-col gap-2 w-full max-w-xs">
-              <Button asChild className="rounded-full">
-                <Link to="/search?tab=communities">
-                  <Search className="size-4 mr-2" />
-                  Search communities
-                </Link>
-              </Button>
             </div>
           </div>
         )}
