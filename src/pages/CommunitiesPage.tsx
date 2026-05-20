@@ -84,7 +84,7 @@ export function CommunitiesPage() {
           <FeaturedOrganizationsShelf />
         </section>
 
-        <section className="pt-6 sm:px-6">
+        <section className="pt-4 pb-8">
           <OrganizationActivityFeed userOrganizations={userOrganizations} />
         </section>
       </div>
@@ -407,24 +407,32 @@ function OrganizationActivityFeed({ userOrganizations }: { userOrganizations: Us
   const hasOrganizations = !!organizations && organizations.length > 0;
 
   return (
-    <div className="space-y-3">
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <SectionHeader title="Organization activity" />
+    <div className="max-w-2xl mx-auto">
+      <div className="px-4 sm:px-6 mb-3 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+        <div>
+          <h2 className="text-2xl sm:text-3xl font-bold tracking-tight">
+            Organization activity
+          </h2>
+          <p className="text-sm text-muted-foreground mt-1 max-w-xl">
+            Comments, campaigns, pledges, and events from organizations you follow,
+            founded, or moderate.
+          </p>
+        </div>
         <Button
           type="button"
-          variant={membersOnly ? 'default' : 'outline'}
+          variant={membersOnly ? 'default' : 'ghost'}
           size="sm"
           onClick={toggle}
-          className="rounded-full self-start sm:self-auto"
+          className="rounded-full self-start sm:self-auto shrink-0"
         >
           {membersOnly ? <ShieldCheck className="size-4 mr-2" /> : <Shield className="size-4 mr-2" />}
-          Leadership only
+          Members only
         </Button>
       </div>
 
       {!hasOrganizations && !isLoading ? (
-        <Card className="border-dashed">
-          <CardContent className="py-10 px-6 text-center space-y-2">
+        <Card className="border-dashed mx-4 sm:mx-6">
+          <CardContent className="py-12 px-8 text-center space-y-2">
             <p className="text-base font-semibold">No organization activity yet</p>
             <p className="text-sm text-muted-foreground max-w-md mx-auto">
               Follow, found, or moderate an organization to build a feed from its comments and official activity.
@@ -432,7 +440,7 @@ function OrganizationActivityFeed({ userOrganizations }: { userOrganizations: Us
           </CardContent>
         </Card>
       ) : isLoading && feed.events.length === 0 ? (
-        <FeedCard className="divide-y divide-border">
+        <FeedCard className="divide-y divide-border/60">
           {Array.from({ length: 3 }).map((_, i) => <FeedRowSkeleton key={i} />)}
         </FeedCard>
       ) : feed.events.length > 0 ? (
@@ -444,18 +452,24 @@ function OrganizationActivityFeed({ userOrganizations }: { userOrganizations: Us
           </FeedCard>
 
           {feed.hasNextPage && (
-            <div ref={scrollRef} className="py-6 flex justify-center">
-              {feed.isFetchingNextPage && <Loader2 className="size-5 animate-spin text-muted-foreground" />}
+            <div ref={scrollRef} className="flex items-center justify-center py-8 text-muted-foreground">
+              {feed.isFetchingNextPage && <Loader2 className="size-5 animate-spin" aria-hidden />}
+            </div>
+          )}
+
+          {!feed.hasNextPage && (
+            <div className="py-8 text-center text-xs text-muted-foreground">
+              You're caught up. Check back soon for new organization activity.
             </div>
           )}
         </>
       ) : (
-        <Card className="border-dashed">
-          <CardContent className="py-10 px-6 text-center space-y-2">
+        <Card className="border-dashed mx-4 sm:mx-6">
+          <CardContent className="py-12 px-8 text-center space-y-2">
             <p className="text-base font-semibold">No matching activity</p>
             <p className="text-sm text-muted-foreground max-w-md mx-auto">
               {membersOnly
-                ? 'No founder or moderator comments were found. Turn off Leadership only to see all organization comments.'
+                ? 'No member-only activity was found. Turn off Members only to see all organization comments.'
                 : 'No comments or official activity were found for these organizations yet.'}
             </p>
           </CardContent>
