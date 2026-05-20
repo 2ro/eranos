@@ -139,18 +139,12 @@ export function DonateDialog({ campaign, open, onOpenChange, btcPrice }: DonateD
   const [comment, setComment] = useState('');
   const [feeSpeed, setFeeSpeed] = useState<DonationFeeSpeed>('fastest');
   const [result, setResult] = useState<DonateCampaignResult | null>(null);
-  // Public-ledger acknowledgement — mirrors the wallet's Send dialog for
-  // raw on-chain payments. The donation publishes a kind 8333 receipt
-  // tying the donor's Nostr pubkey to the on-chain transaction, so the
-  // privacy implications are at least as strong as a raw send.
-  const [acknowledgedPublic, setAcknowledgedPublic] = useState(false);
 
   // Reset when the dialog reopens for a fresh donation.
   useEffect(() => {
     if (open) {
       setStep('form');
       setResult(null);
-      setAcknowledgedPublic(false);
     }
   }, [open]);
 
@@ -302,8 +296,6 @@ export function DonateDialog({ campaign, open, onOpenChange, btcPrice }: DonateD
             comment={comment}
             feeSpeed={feeSpeed}
             btcPrice={btcPrice}
-            acknowledgedPublic={acknowledgedPublic}
-            onAcknowledgedPublicChange={setAcknowledgedPublic}
             onPresetClick={(amt) => {
               setAmountUsd(amt);
               setCustomUsd('');
@@ -334,8 +326,6 @@ function FormView({
   comment,
   feeSpeed,
   btcPrice,
-  acknowledgedPublic,
-  onAcknowledgedPublicChange,
   onPresetClick,
   onCustomChange,
   onCommentChange,
@@ -354,8 +344,6 @@ function FormView({
   comment: string;
   feeSpeed: DonationFeeSpeed;
   btcPrice?: number;
-  acknowledgedPublic: boolean;
-  onAcknowledgedPublicChange: (acknowledged: boolean) => void;
   onPresetClick: (amt: number) => void;
   onCustomChange: (v: string) => void;
   onCommentChange: (v: string) => void;
@@ -370,7 +358,7 @@ function FormView({
   const senderAddress = user ? nostrPubkeyToBitcoinAddress(user.pubkey) : '';
   const hasPrice = !!btcPrice && Number.isFinite(btcPrice) && btcPrice > 0;
   const validAmount = hasPrice && Number.isFinite(effectiveUsd) && effectiveUsd > 0 && effectiveAmount > 0;
-  const canContinue = validAmount && !belowMin && !tooSmallSplit && acknowledgedPublic;
+  const canContinue = validAmount && !belowMin && !tooSmallSplit;
 
   const { data: utxos } = useQuery({
     queryKey: ['bitcoin-utxos', esploraBaseUrl, senderAddress],
@@ -531,8 +519,8 @@ function FormView({
         )}
 
         <BitcoinPublicDisclaimer
-          acknowledged={acknowledgedPublic}
-          onAcknowledgedChange={onAcknowledgedPublicChange}
+          tone="soft"
+          includeCashOutAdvice={false}
           leadText="Donations are public and can be traced back to you."
         />
 
@@ -1038,9 +1026,6 @@ function ExternalPayView({
   const [usd, setUsd] = useState('');
   const [copiedAddress, setCopiedAddress] = useState(false);
   const [copiedUri, setCopiedUri] = useState(false);
-  // Public-ledger acknowledgement before the donor opens their wallet or
-  // copies a payment URI. Same gate as the wallet's Send dialog.
-  const [acknowledgedPublic, setAcknowledgedPublic] = useState(false);
 
   const address = useMemo(
     () => nostrPubkeyToBitcoinAddress(recipient.pubkey),
@@ -1181,21 +1166,18 @@ function ExternalPayView({
           </button>
         </div>
 
-        {/* Public-ledger disclaimer — must be acknowledged before the
-            donor copies a payment URI or hands off to their wallet. */}
+        {/* Public-ledger notice — informational. Bitcoin is a public
+            ledger, so the donation can be traced back to the donor's
+            wallet. */}
         <BitcoinPublicDisclaimer
-          acknowledged={acknowledgedPublic}
-          onAcknowledgedChange={setAcknowledgedPublic}
+          tone="soft"
+          includeCashOutAdvice={false}
           leadText="Donations are public and can be traced back to you."
         />
 
         {/* Action buttons */}
         <div className="grid grid-cols-2 gap-2">
-          <Button
-            variant="outline"
-            onClick={() => copy(bip21, 'uri')}
-            disabled={!acknowledgedPublic}
-          >
+          <Button variant="outline" onClick={() => copy(bip21, 'uri')}>
             {copiedUri ? (
               <Check className="size-4 mr-1.5 text-green-500" />
             ) : (
@@ -1203,18 +1185,11 @@ function ExternalPayView({
             )}
             Copy payment URI
           </Button>
-          <Button asChild disabled={!acknowledgedPublic}>
+          <Button asChild>
             {/* `bitcoin:` is a registered URI scheme. Most desktop / mobile
                 wallets will intercept it; if none does, the click is a no-op
                 from the user's perspective. */}
-            <a
-              href={acknowledgedPublic ? bip21 : undefined}
-              aria-disabled={!acknowledgedPublic}
-              onClick={(e) => {
-                if (!acknowledgedPublic) e.preventDefault();
-              }}
-              tabIndex={acknowledgedPublic ? undefined : -1}
-            >
+            <a href={bip21}>
               <ExternalLink className="size-4 mr-1.5" />
               Open in wallet
             </a>
