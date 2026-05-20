@@ -584,6 +584,7 @@ function CommunityCreateActions({
   organizationName: string;
 }) {
   const createQuery = orgNaddr ? `?org=${orgNaddr}` : '';
+  const createButtonClassName = 'h-auto justify-start gap-3 px-4 py-3 text-left hover:border-primary/30 hover:bg-primary/10 hover:text-foreground focus-visible:border-primary/40 focus-visible:bg-primary/10';
 
   return (
     <section className="rounded-2xl border border-border/60 bg-gradient-to-br from-primary/15 via-primary/5 to-card shadow-sm overflow-hidden">
@@ -596,7 +597,7 @@ function CommunityCreateActions({
         </div>
 
         <div className="grid gap-2 p-4 sm:grid-cols-3 sm:p-5">
-          <Button asChild variant="outline" className="h-auto justify-start gap-3 px-4 py-3 text-left">
+          <Button asChild variant="outline" className={createButtonClassName}>
             <Link to={`/campaigns/new${createQuery}`}>
               <HandHeart className="size-5 shrink-0 text-primary" />
               <span className="min-w-0">
@@ -606,7 +607,7 @@ function CommunityCreateActions({
             </Link>
           </Button>
 
-          <Button asChild variant="outline" className="h-auto justify-start gap-3 px-4 py-3 text-left">
+          <Button asChild variant="outline" className={createButtonClassName}>
             <Link to={`/pledges/new${createQuery}`}>
               <Megaphone className="size-5 shrink-0 text-primary" />
               <span className="min-w-0">
@@ -616,7 +617,7 @@ function CommunityCreateActions({
             </Link>
           </Button>
 
-          <Button asChild variant="outline" className="h-auto justify-start gap-3 px-4 py-3 text-left">
+          <Button asChild variant="outline" className={createButtonClassName}>
             <Link to={`/events/new${createQuery}`}>
               <CalendarDays className="size-5 shrink-0 text-primary" />
               <span className="min-w-0">
@@ -1032,7 +1033,7 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
               </Button>
             </div>
 
-            {communityATag && (
+            {communityATag && membershipFollow && (
               <CommunityCreateActions
                 orgNaddr={orgNaddr}
                 organizationName={name}
