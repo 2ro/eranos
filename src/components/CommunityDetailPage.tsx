@@ -8,7 +8,6 @@ import {
   HandHeart,
   Info,
   Megaphone,
-  MessageCircle,
   MoreVertical,
   Pencil,
   Shield,
@@ -394,6 +393,70 @@ function OfficialActivityShelves({
   );
 }
 
+function CommunityCreateActions({
+  orgNaddr,
+  organizationName,
+  canCreateEvent,
+  onCreateEvent,
+}: {
+  orgNaddr: string;
+  organizationName: string;
+  canCreateEvent: boolean;
+  onCreateEvent: () => void;
+}) {
+  const createQuery = orgNaddr ? `?org=${orgNaddr}` : '';
+
+  return (
+    <section className="rounded-2xl border border-border/60 bg-card shadow-sm overflow-hidden">
+      <div className="grid gap-0 md:grid-cols-[1.15fr_1.85fr]">
+        <div className="bg-gradient-to-br from-primary/15 via-primary/5 to-transparent px-5 py-5 sm:px-6">
+          <p className="text-xs font-semibold uppercase tracking-wide text-primary">Create</p>
+          <h2 className="mt-1 text-xl font-semibold tracking-tight">Start something for {organizationName}</h2>
+          <p className="mt-2 text-sm text-muted-foreground">
+            Add an official campaign, pledge, or calendar event without leaving this organization page.
+          </p>
+        </div>
+
+        <div className="grid gap-2 p-4 sm:grid-cols-3 sm:p-5">
+          <Button asChild variant="outline" className="h-auto justify-start gap-3 px-4 py-3 text-left">
+            <Link to={`/campaigns/new${createQuery}`}>
+              <HandHeart className="size-5 shrink-0 text-primary" />
+              <span className="min-w-0">
+                <span className="block font-semibold">Campaign</span>
+                <span className="block text-xs font-normal text-muted-foreground">Raise funds</span>
+              </span>
+            </Link>
+          </Button>
+
+          <Button asChild variant="outline" className="h-auto justify-start gap-3 px-4 py-3 text-left">
+            <Link to={`/pledges/new${createQuery}`}>
+              <Megaphone className="size-5 shrink-0 text-primary" />
+              <span className="min-w-0">
+                <span className="block font-semibold">Pledge</span>
+                <span className="block text-xs font-normal text-muted-foreground">Offer a bounty</span>
+              </span>
+            </Link>
+          </Button>
+
+          <Button
+            type="button"
+            variant="outline"
+            className="h-auto justify-start gap-3 px-4 py-3 text-left"
+            onClick={onCreateEvent}
+            disabled={!canCreateEvent}
+          >
+            <CalendarDays className="size-5 shrink-0 text-primary" />
+            <span className="min-w-0">
+              <span className="block font-semibold">Event</span>
+              <span className="block text-xs font-normal text-muted-foreground">Schedule a date</span>
+            </span>
+          </Button>
+        </div>
+      </div>
+    </section>
+  );
+}
+
 // ── Main component ────────────────────────────────────────────────────────────
 
 export function CommunityDetailPage({ event }: { event: NostrEvent }) {
@@ -402,14 +465,9 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
   const { user } = useCurrentUser();
   const { btcPrice } = useBitcoinWallet();
 
-  // ── Tab + FAB state ────────────────────────────────────────────────────────
-  // ── FAB + dialog state ─────────────────────────────────────────────────────
-  // The detail page is single-column now (no tab strip), so the FAB is
-  // always available. \"New post\" opens the reply compose modal against
-  // the community event; campaigns/pledges navigate to dedicated create
-  // pages with `?org=<naddr>`; calendar events still use the in-page
-  // dialog because no dedicated create page exists yet.
-  const [composeOpen, setComposeOpen] = useState(false);
+  // Calendar events still use the in-page dialog because no dedicated create
+  // page exists yet. Campaigns and pledges navigate to their create pages
+  // with `?org=<naddr>` so those forms can resolve the organization context.
   const [eventDialogOpen, setEventDialogOpen] = useState(false);
   const [membersDialogOpen, setMembersDialogOpen] = useState(false);
   const [descriptionDialogOpen, setDescriptionDialogOpen] = useState(false);
@@ -628,56 +686,18 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
     }
   }, [event, toast]);
 
-  // ── FAB menu — single-column page, always available ─────────────────────
-  // \"New post\" composes a NIP-22 comment against the community event.
-  // Campaigns and pledges navigate to dedicated create pages with
-  // `?org=<naddr>`. Calendar events still use the in-page dialog.
-  const fabMenu = useMemo(() => {
-    return [
-      {
-        id: 'new-post',
-        label: 'New post',
-        icon: <MessageCircle className="size-4" />,
-        onSelect: () => setComposeOpen(true),
-      },
-      {
-        id: 'new-campaign',
-        label: 'New campaign',
-        icon: <HandHeart className="size-4" />,
-        onSelect: () => {
-          // Implicit org tagging: the create form reads `?org=` and emits
-          // the `A`/`K`/`P` tags when the current user is founder/mod of
-          // that org. Falls back to a personal publication otherwise.
-          navigate(`/campaigns/new${orgNaddr ? `?org=${orgNaddr}` : ''}`);
-        },
-      },
-      {
-        id: 'new-pledge',
-        label: 'New pledge',
-        icon: <Megaphone className="size-4" />,
-        onSelect: () => {
-          navigate(`/pledges/new${orgNaddr ? `?org=${orgNaddr}` : ''}`);
-        },
-      },
-      {
-        id: 'new-event',
-        label: 'New event',
-        icon: <CalendarDays className="size-4" />,
-        onSelect: () => {
-          // Calendar event creation still happens via the in-page dialog
-          // because there's no dedicated create page yet. The dialog
-          // already emits the uppercase `A` tag and `K: 34550` companion.
-          setEventDialogOpen(true);
-        },
-      },
-    ];
-  }, [navigate, orgNaddr]);
+  const handleCreateEvent = useCallback(() => {
+    if (!user) {
+      toast({ title: 'Log in to create an event' });
+      return;
+    }
+    setEventDialogOpen(true);
+  }, [toast, user]);
 
   useLayoutOptions({
     noMaxWidth: true,
     rightSidebar: null,
-    showFAB: true,
-    fabMenu,
+    showFAB: false,
   });
 
   const moderationCtx = useMemo(
@@ -850,6 +870,15 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
               </Button>
             </div>
 
+            {communityATag && (
+              <CommunityCreateActions
+                orgNaddr={orgNaddr}
+                organizationName={name}
+                canCreateEvent={!!communityATag}
+                onCreateEvent={handleCreateEvent}
+              />
+            )}
+
             {/* Official-activity shelves. Hidden entirely when empty. */}
             <OfficialActivityShelves
               orgNaddr={orgNaddr}
@@ -1020,17 +1049,8 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
         </DialogContent>
       </Dialog>
 
-      {/* FAB-triggered compose modal — used by the \"New post\" FAB item.
-          Composes a NIP-22 reply against the community event itself. */}
-      <ReplyComposeModal
-        event={event}
-        open={composeOpen}
-        onOpenChange={setComposeOpen}
-      />
-
       {/* Reply button on the engagement bar opens the same compose modal,
-          tracked via a separate `replyOpen` slot so the two entry points
-          can't interleave state. */}
+          composing a NIP-22 reply against the community event itself. */}
       <ReplyComposeModal
         event={event}
         open={replyOpen}
@@ -1053,9 +1073,9 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
         initialTab={interactionsTab}
       />
 
-      {/* FAB-triggered calendar event creation dialog. Campaigns and
-          pledges navigate to their dedicated create pages with
-          `?org=<naddr>` so the implicit-tagging flow can resolve. */}
+      {/* Calendar event creation dialog. Campaigns and pledges navigate to
+          their dedicated create pages with `?org=<naddr>` so the
+          implicit-tagging flow can resolve. */}
       {communityATag && (
         <CreateCommunityEventDialog
           communityATag={communityATag}
