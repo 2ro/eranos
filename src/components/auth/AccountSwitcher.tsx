@@ -45,7 +45,7 @@ export function AccountSwitcher({ onAddAccountClick }: AccountSwitcherProps) {
   return (
     <DropdownMenu modal={false} open={isOpen} onOpenChange={setIsOpen}>
       <DropdownMenuTrigger asChild>
-        <button className='flex items-center gap-2 h-10 p-1 pr-2.5 rounded-full hover:bg-accent transition-all text-foreground'>
+        <button className='group flex items-center gap-2 h-10 p-1 pr-2.5 rounded-full hover:bg-accent transition-all text-foreground'>
           {isLoading ? (
             <Skeleton className='w-8 h-8 rounded-full shrink-0' />
           ) : (
@@ -54,7 +54,7 @@ export function AccountSwitcher({ onAddAccountClick }: AccountSwitcherProps) {
               <AvatarFallback>{getDisplayName(currentUser).charAt(0)}</AvatarFallback>
             </Avatar>
           )}
-          <ChevronDown className='w-4 h-4 text-muted-foreground' />
+          <ChevronDown className='w-4 h-4 text-muted-foreground motion-safe:transition-colors group-hover:text-foreground' />
         </button>
       </DropdownMenuTrigger>
       <DropdownMenuContent className='w-56 p-2 animate-scale-in'>
