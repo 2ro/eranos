@@ -8,54 +8,7 @@ import {
 } from '@/components/ui/accordion';
 import { useAppContext } from '@/hooks/useAppContext';
 import { getFAQCategories, type FAQCategory, type FAQItem } from '@/lib/helpContent';
-
-// ── Inline markup renderer ────────────────────────────────────────────────────
-
-/**
- * Very lightweight inline markup: **bold** and [text](url).
- * Returns an array of React nodes.
- */
-function renderInlineMarkup(text: string): React.ReactNode[] {
-  const nodes: React.ReactNode[] = [];
-  // Match **bold** or [text](url)
-  const regex = /\*\*(.+?)\*\*|\[([^\]]+)\]\(([^)]+)\)/g;
-  let lastIndex = 0;
-  let match: RegExpExecArray | null;
-
-  while ((match = regex.exec(text)) !== null) {
-    // Push text before this match
-    if (match.index > lastIndex) {
-      nodes.push(text.slice(lastIndex, match.index));
-    }
-
-    if (match[1] !== undefined) {
-      // **bold**
-      nodes.push(<strong key={match.index} className="font-semibold text-foreground">{match[1]}</strong>);
-    } else if (match[2] !== undefined && match[3] !== undefined) {
-      // [text](url)
-      nodes.push(
-        <a
-          key={match.index}
-          href={match[3]}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-primary underline underline-offset-2 hover:text-primary/80 transition-colors"
-        >
-          {match[2]}
-        </a>,
-      );
-    }
-
-    lastIndex = match.index + match[0].length;
-  }
-
-  // Trailing text
-  if (lastIndex < text.length) {
-    nodes.push(text.slice(lastIndex));
-  }
-
-  return nodes;
-}
+import { renderInlineMarkup } from '@/lib/helpMarkup';
 
 // ── Component ─────────────────────────────────────────────────────────────────
 

@@ -4,42 +4,7 @@ import { Link } from 'react-router-dom';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { useAppContext } from '@/hooks/useAppContext';
 import { getFAQItem } from '@/lib/helpContent';
-
-/**
- * Renders **bold** and [text](url) markup in FAQ answer strings.
- */
-function renderInlineMarkup(text: string): React.ReactNode[] {
-  const nodes: React.ReactNode[] = [];
-  const regex = /\*\*(.+?)\*\*|\[([^\]]+)\]\(([^)]+)\)/g;
-  let lastIndex = 0;
-  let match: RegExpExecArray | null;
-
-  while ((match = regex.exec(text)) !== null) {
-    if (match.index > lastIndex) {
-      nodes.push(text.slice(lastIndex, match.index));
-    }
-    if (match[1] !== undefined) {
-      nodes.push(<strong key={match.index} className="font-semibold text-foreground">{match[1]}</strong>);
-    } else if (match[2] !== undefined && match[3] !== undefined) {
-      nodes.push(
-        <a
-          key={match.index}
-          href={match[3]}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-primary underline underline-offset-2 hover:text-primary/80 transition-colors"
-        >
-          {match[2]}
-        </a>,
-      );
-    }
-    lastIndex = match.index + match[0].length;
-  }
-  if (lastIndex < text.length) {
-    nodes.push(text.slice(lastIndex));
-  }
-  return nodes;
-}
+import { renderInlineMarkup } from '@/lib/helpMarkup';
 
 // ── Component ─────────────────────────────────────────────────────────────────
 
