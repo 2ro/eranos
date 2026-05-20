@@ -48,11 +48,19 @@ export function OrganizationContextChip({
   if (isEditMode) {
     if (!aTag) return null;
     return (
-      <div className="mt-2 ml-9 inline-flex items-center gap-2 rounded-full bg-primary/10 px-3 py-1 text-xs font-medium text-primary">
-        <Users className="size-3.5" />
-        <span className="truncate">
-          {authorizedOrg?.community.name ?? 'Attached to an organization'}
-        </span>
+      <div className="mt-3 ml-9 flex items-start gap-3 rounded-xl border border-primary/30 bg-primary/10 px-4 py-3 text-primary shadow-sm">
+        <div className="mt-0.5 flex size-9 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground">
+          <Users className="size-4" />
+        </div>
+        <div className="min-w-0 space-y-0.5">
+          <p className="text-xs font-semibold uppercase tracking-wide">Attached to organization</p>
+          <p className="truncate text-sm font-semibold text-foreground">
+            {authorizedOrg?.community.name ?? 'Organization'}
+          </p>
+          <p className="text-xs text-muted-foreground">
+            Updates will stay connected to this organization's official activity.
+          </p>
+        </div>
       </div>
     );
   }
@@ -74,9 +82,9 @@ export function OrganizationContextChip({
   // authorization yet. Don't claim "publishing under" until we know.
   if (manageableLoading) {
     return (
-      <p className="mt-2 ml-9 text-xs text-muted-foreground">
+      <div className="mt-3 ml-9 rounded-xl border border-border bg-card px-4 py-3 text-sm text-muted-foreground">
         Checking organization permissions…
-      </p>
+      </div>
     );
   }
 
@@ -92,9 +100,17 @@ export function OrganizationContextChip({
   }
 
   return (
-    <div className="mt-2 ml-9 inline-flex items-center gap-2 rounded-full bg-primary/10 px-3 py-1 text-xs font-medium text-primary">
-      <Users className="size-3.5" />
-      <span className="truncate">Publishing under {authorizedOrg.community.name}</span>
+    <div className="mt-3 ml-9 flex items-start gap-3 rounded-xl border border-primary/30 bg-primary/10 px-4 py-3 text-primary shadow-sm">
+      <div className="mt-0.5 flex size-9 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground">
+        <Users className="size-4" />
+      </div>
+      <div className="min-w-0 space-y-0.5">
+        <p className="text-xs font-semibold uppercase tracking-wide">Publishing as organization</p>
+        <p className="truncate text-sm font-semibold text-foreground">{authorizedOrg.community.name}</p>
+        <p className="text-xs text-muted-foreground">
+          This will appear as official organization activity instead of only under your profile.
+        </p>
+      </div>
     </div>
   );
 }

@@ -388,7 +388,10 @@ export function CreateEventPage() {
 
             <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
               <div className="space-y-1.5">
-                <Label htmlFor="event-start-date">Start date *</Label>
+                <Label htmlFor="event-start-date" className="flex items-center gap-2">
+                  Start date
+                  <span className="text-xs font-medium text-muted-foreground">Required</span>
+                </Label>
                 <Input
                   id="event-start-date"
                   type="date"
@@ -401,7 +404,10 @@ export function CreateEventPage() {
               </div>
 
               <div className="space-y-1.5">
-                <Label htmlFor="event-end-date">End date</Label>
+                <Label htmlFor="event-end-date" className="flex items-center gap-2">
+                  End date
+                  <span className="text-xs font-medium text-muted-foreground">Optional</span>
+                </Label>
                 <Input
                   id="event-end-date"
                   type="date"
