@@ -15,6 +15,7 @@ import {
 
 import { CoverImageField } from '@/components/CoverImageField';
 import { FormSection } from '@/components/FormSection';
+import { OrganizationSelector } from '@/components/OrganizationSelector';
 import { TimezoneSwitcher } from '@/components/TimezoneSwitcher';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
@@ -26,12 +27,13 @@ import { useBitcoinWallet } from '@/hooks/useBitcoinWallet';
 import { useNostrPublish } from '@/hooks/useNostrPublish';
 import { useToast } from '@/hooks/useToast';
 import { useLayoutOptions } from '@/contexts/LayoutContext';
+import { usdToSats } from '@/lib/bitcoin';
+import { COMMUNITY_DEFINITION_KIND } from '@/lib/communityUtils';
 import { COUNTRIES, searchCountries, type CountryEntry } from '@/lib/countries';
 import { createCountryIdentifier } from '@/lib/countryIdentifiers';
 import { getTodayDateInput } from '@/lib/dateInput';
 import { DEFAULT_ACTION_COVERS } from '@/lib/defaultActionCovers';
 import { sanitizeUrl } from '@/lib/sanitizeUrl';
-import { usdToSats } from '@/lib/bitcoin';
 import { cn } from '@/lib/utils';
 
 /**
@@ -122,6 +124,7 @@ export function CreateActionPage() {
   const [coverUploading, setCoverUploading] = useState(false);
   const [countryCode, setCountryCode] = useState(pageCountryCode);
   const [countryQuery, setCountryQuery] = useState(pageCountryCode ? (COUNTRIES[pageCountryCode]?.name ?? pageCountryCode) : '');
+  const [organizationATag, setOrganizationATag] = useState('');
   const [timezone, setTimezone] = useState(browserTimezone);
   const [formError, setFormError] = useState('');
 
@@ -177,6 +180,18 @@ export function CreateActionPage() {
 
       if (countryCode) {
         tags.push(['i', createCountryIdentifier(countryCode.toUpperCase())]);
+      }
+
+      // Organization association (NIP-22 root-scope convention): an
+      // uppercase `A` tag points at the NIP-72 community definition so
+      // the pledge surfaces as official activity on that org's page.
+      // The `K` companion tag records the referenced kind, and `P` hints
+      // at the org founder for clients that batch-resolve authors.
+      if (organizationATag) {
+        const orgAuthor = organizationATag.split(':')[1];
+        tags.push(['A', organizationATag]);
+        tags.push(['K', String(COMMUNITY_DEFINITION_KIND)]);
+        if (orgAuthor) tags.push(['P', orgAuthor]);
       }
 
       const trimmedCoverImage = coverImage.trim();
@@ -319,6 +334,17 @@ export function CreateActionPage() {
                 setCountryCode('');
                 setCountryQuery('');
               }}
+            />
+          </FormSection>
+
+          {/* Organization (optional) — only orgs where the user is founder
+              or moderator are offered. The selected org's uppercase `A`
+              root-scope tag will be added on publish. */}
+          <FormSection title="Organization" requirement="Optional">
+            <OrganizationSelector
+              value={organizationATag}
+              onChange={setOrganizationATag}
+              disabled={submitMutation.isPending}
             />
           </FormSection>
 

@@ -21,6 +21,7 @@ import {
 import { PersonSearch } from '@/components/AddMemberDialog';
 import { CoverImageField } from '@/components/CoverImageField';
 import { FormSection } from '@/components/FormSection';
+import { OrganizationSelector } from '@/components/OrganizationSelector';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
@@ -43,6 +44,7 @@ import {
   parseCampaign,
   slugifyCampaignIdentifier,
 } from '@/lib/campaign';
+import { COMMUNITY_DEFINITION_KIND } from '@/lib/communityUtils';
 import { getTodayDateInput } from '@/lib/dateInput';
 import { fetchFreshEvent } from '@/lib/fetchFreshEvent';
 import { genUserName } from '@/lib/genUserName';
@@ -210,6 +212,7 @@ export function CreateCampaignPage() {
   const [countryQuery, setCountryQuery] = useState('');
   const [countryCode, setCountryCode] = useState('');
   const [recipients, setRecipients] = useState<SearchProfile[]>([]);
+  const [organizationATag, setOrganizationATag] = useState('');
   const [formError, setFormError] = useState('');
   const [prepopulatedEventId, setPrepopulatedEventId] = useState<string | null>(null);
   const [prepopulatedGoalEventId, setPrepopulatedGoalEventId] = useState<string | null>(null);
@@ -303,6 +306,14 @@ export function CreateCampaignPage() {
     setCountryCode(editCountryCode);
     setCountryQuery(editCountryCode ? COUNTRIES[editCountryCode]?.name ?? editCountryCode : '');
     setRecipients(editCampaign.recipients.map((recipient) => makeRecipientProfile(recipient.pubkey)));
+    // Restore the organization root-scope tag (uppercase `A`) so the
+    // selector hydrates with the same org the campaign was originally
+    // attached to. We accept the tag as-is; the publish branch verifies
+    // the current user is still authorized to publish under that org.
+    const existingOrgATag = editCampaign.event.tags.find(
+      ([n, v]) => n === 'A' && typeof v === 'string' && v.startsWith('34550:'),
+    )?.[1] ?? '';
+    setOrganizationATag(existingOrgATag);
     setPrepopulatedEventId(editCampaign.event.id);
   }, [editCampaign, prepopulatedEventId]);
 
@@ -452,6 +463,17 @@ export function CreateCampaignPage() {
       if (resolvedCountryCode) {
         tags.push(['i', createCountryIdentifier(resolvedCountryCode)]);
         tags.push(['k', 'iso3166']);
+      }
+      // Organization association (NIP-22 root-scope convention): an
+      // uppercase `A` tag points at the NIP-72 community definition so
+      // the campaign surfaces as official activity on that org's page.
+      // The `K` companion tag records the referenced kind, and `P` hints
+      // at the org founder for clients that batch-resolve authors.
+      if (organizationATag) {
+        const orgAuthor = organizationATag.split(':')[1];
+        tags.push(['A', organizationATag]);
+        tags.push(['K', String(COMMUNITY_DEFINITION_KIND)]);
+        if (orgAuthor) tags.push(['P', orgAuthor]);
       }
       for (const r of parsedRecipients) {
         tags.push(['p', r.pubkey]);
@@ -632,6 +654,17 @@ export function CreateCampaignPage() {
                 setCountryCode('');
                 setCountryQuery('');
               }}
+            />
+          </FormSection>
+
+          {/* Organization (optional) — only orgs where the user is founder
+              or moderator are offered. The selected org's uppercase `A`
+              root-scope tag will be added on publish. */}
+          <FormSection title="Organization" requirement="Optional">
+            <OrganizationSelector
+              value={organizationATag}
+              onChange={setOrganizationATag}
+              disabled={submitMutation.isPending}
             />
           </FormSection>
 
