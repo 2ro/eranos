@@ -498,7 +498,7 @@ function CampaignsSection({
 
   return (
     <section>
-      <SectionHeader title="Your campaigns" className="pb-1 sm:px-0" />
+      <SectionHeader title="Your campaigns" className="px-0 pb-1 sm:px-0" />
 
       {bothEmpty ? (
         <div className="pt-2">
@@ -593,7 +593,7 @@ function CountriesSection({
         title="Countries you follow"
         seeAllLabel="Explore the world"
         onSeeAll={() => navigate('/world')}
-        className="pb-3 sm:px-0"
+        className="px-0 pb-3 sm:px-0"
       />
       {isLoading ? (
         <div className="flex gap-2 overflow-x-auto scrollbar-none pb-1">
@@ -662,7 +662,7 @@ function CommunitiesSection({
             ? () => navigate('/communities')
             : undefined
         }
-        className="pb-3 sm:px-0"
+        className="px-0 pb-3 sm:px-0"
       />
       {/* Break out of page px-4 on mobile so shelves bleed to screen edges */}
       <div className="-mx-4 sm:mx-0">
