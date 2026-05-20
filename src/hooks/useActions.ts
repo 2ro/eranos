@@ -19,6 +19,7 @@ export interface Action {
   title: string;
   description: string;
   type: 'photo' | 'art' | 'info' | 'action';
+  tags: string[];
   /** Pledged amount in sats. Stored as the legacy `bounty` tag. */
   bounty: number;
   countryCode?: string;
@@ -41,6 +42,10 @@ export function parseAction(event: NostrEvent): Action | null {
   const title = event.tags.find(([name]) => name === 'title')?.[1];
   const typeTag = event.tags.find(([name]) => name === 'challenge-type')?.[1];
   const bountyTag = event.tags.find(([name]) => name === 'bounty')?.[1];
+  const tags = event.tags
+    .filter(([name, value]) => name === 't' && !!value)
+    .map(([, value]) => value)
+    .filter((value) => !['agora-action', 'pathos-challenge', 'agora-challenge'].includes(value));
 
   // Country code from #i tag (iso3166:XX or legacy geo:XX) or location tag fallback.
   const countryCode = (() => {
@@ -70,11 +75,11 @@ export function parseAction(event: NostrEvent): Action | null {
     ? 'Invalid image URL in event (only https URLs are allowed).'
     : undefined;
 
-  if (!dTag || !title || !typeTag || !bountyTag) {
+  if (!dTag || !title || !bountyTag) {
     return null;
   }
 
-  const type = typeTag as Action['type'];
+  const type = (typeTag ?? 'action') as Action['type'];
   if (!['photo', 'art', 'info', 'action'].includes(type)) {
     return null;
   }
@@ -101,6 +106,7 @@ export function parseAction(event: NostrEvent): Action | null {
     title,
     description: event.content,
     type,
+    tags,
     bounty: parseInt(bountyTag, 10) || 0,
     countryCode,
     startTime: startTimestamp,

@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
-import { Camera, Check, ChevronRight, Clock, Info, Loader2, Megaphone, Palette, Plus, Upload } from 'lucide-react';
+import { Check, ChevronRight, Clock, Loader2, Megaphone, Plus, Upload } from 'lucide-react';
 
 import { TimezoneSwitcher } from '@/components/TimezoneSwitcher';
 import { Button } from '@/components/ui/button';
@@ -10,7 +10,6 @@ import { Drawer, DrawerContent, DrawerDescription, DrawerHeader, DrawerTitle } f
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useBtcPrice } from '@/hooks/useBtcPrice';
@@ -18,7 +17,6 @@ import { useIsMobile } from '@/hooks/useIsMobile';
 import { useNostrPublish } from '@/hooks/useNostrPublish';
 import { useToast } from '@/hooks/useToast';
 import { useUploadFile } from '@/hooks/useUploadFile';
-import type { Action } from '@/hooks/useActions';
 import { createCountryIdentifier } from '@/lib/countryIdentifiers';
 import { countryCodeToFlag, getAllCountries, getGeoDisplayName } from '@/lib/countries';
 import { DEFAULT_ACTION_COVERS, DEFAULT_COVER_IMAGE } from '@/lib/defaultActionCovers';
@@ -35,7 +33,7 @@ interface CreateActionDialogProps {
 interface CreateActionFormState {
   title: string;
   description: string;
-  type: Action['type'];
+  tagInput: string;
   pledgeUsd: string;
   startDate: string;
   startTime: string;
@@ -71,6 +69,22 @@ function unixSecondsInTimezone(year: number, month: number, day: number, hours: 
 function parseCommunityAuthor(communityATag: string): string | undefined {
   const [, pubkey] = communityATag.split(':');
   return pubkey || undefined;
+}
+
+function normalizePledgeTag(value: string): string {
+  return value.trim().replace(/^#+/, '').toLowerCase().replace(/\s+/g, '-');
+}
+
+function parsePledgeTagInput(value: string): string[] {
+  const seen = new Set<string>();
+  const tags: string[] = [];
+  for (const part of value.split(',')) {
+    const tag = normalizePledgeTag(part);
+    if (!tag || seen.has(tag)) continue;
+    seen.add(tag);
+    tags.push(tag);
+  }
+  return tags;
 }
 
 function CreateActionForm({
@@ -229,19 +243,11 @@ function CreateActionForm({
 
         <div className="grid grid-cols-2 gap-4">
           <div className="space-y-2">
-            <Label htmlFor="type">Type</Label>
-            <Select value={formData.type} onValueChange={(value) => setFormData({ ...formData, type: value as Action['type'] })}>
-              <SelectTrigger><SelectValue /></SelectTrigger>
-              <SelectContent>
-                <SelectItem value="photo"><div className="flex items-center gap-2"><Camera className="h-4 w-4" /> Photo</div></SelectItem>
-                <SelectItem value="art"><div className="flex items-center gap-2"><Palette className="h-4 w-4" /> Art</div></SelectItem>
-                <SelectItem value="info"><div className="flex items-center gap-2"><Info className="h-4 w-4" /> Info</div></SelectItem>
-                <SelectItem value="action"><div className="flex items-center gap-2"><Megaphone className="h-4 w-4" /> Direct action</div></SelectItem>
-              </SelectContent>
-            </Select>
+            <Label htmlFor="pledge-tags">Tags</Label>
+            <Input id="pledge-tags" placeholder="beach-cleanup, legal-defense" value={formData.tagInput} onChange={(e) => setFormData({ ...formData, tagInput: e.target.value })} />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="pledgeUsd">Amount</Label>
+            <Label htmlFor="pledgeUsd">Pledge</Label>
             <div className="relative">
               <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">
                 $
@@ -314,7 +320,7 @@ export function CreateActionDialog({ countryCode, communityATag, open, onOpenCha
   const [formData, setFormData] = useState<CreateActionFormState>({
     title: '',
     description: '',
-    type: 'photo',
+    tagInput: '',
     pledgeUsd: '',
     startDate: '',
     startTime: '',
@@ -334,14 +340,15 @@ export function CreateActionDialog({ countryCode, communityATag, open, onOpenCha
       const dTag = `${slug || 'pledge'}-${now}`;
       const pledgeSats = usdToSats(Number(formData.pledgeUsd.replace(/[, $]/g, '')), btcPrice);
       if (pledgeSats <= 0) throw new Error('Waiting for BTC/USD price to calculate the pledge amount.');
+      const pledgeTags = parsePledgeTagInput(formData.tagInput);
       const tags: string[][] = [
         ['d', dTag],
         ['title', formData.title],
-        ['challenge-type', formData.type],
         ['bounty', String(pledgeSats)],
         ['t', 'agora-action'],
         ['alt', `Agora pledge: ${formData.title}`],
       ];
+      for (const tag of pledgeTags) tags.push(['t', tag]);
       if (formData.selectedCountry) tags.push(['i', createCountryIdentifier(formData.selectedCountry.toUpperCase())]);
       if (communityATag) {
         const communityAuthor = parseCommunityAuthor(communityATag);
@@ -380,7 +387,7 @@ export function CreateActionDialog({ countryCode, communityATag, open, onOpenCha
       }
 
       setFormData({
-        title: '', description: '', type: 'photo', pledgeUsd: '',
+        title: '', description: '', tagInput: '', pledgeUsd: '',
         startDate: '', startTime: '', deadline: '', time: '',
         coverImage: DEFAULT_COVER_IMAGE,
         selectedCountry: countryCode || '',

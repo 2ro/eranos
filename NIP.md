@@ -555,13 +555,14 @@ Community-scoped pledges inherit the community's moderation context. Clients ren
   "tags": [
     ["d", "plant-a-tree-1729000000000"],
     ["title", "Plant a tree in your neighborhood"],
-    ["challenge-type", "photo"],
     ["bounty", "10000"],
     ["i", "iso3166:US"],
     ["A", "34550:<community-pubkey>:<community-d-tag>"],
     ["K", "34550"],
     ["P", "<community-pubkey>"],
     ["t", "agora-action"],
+    ["t", "tree-planting"],
+    ["t", "local-action"],
     ["image", "https://example.com/cover.jpg"],
     ["start", "1729000000"],
     ["deadline", "1729604800"],
@@ -576,13 +577,12 @@ Community-scoped pledges inherit the community's moderation context. Clients ren
 |------------------|----------|----------------------------------------------------------------------------------------------------------|
 | `d`              | Yes      | Unique identifier (typically slug + timestamp). Forms the addressable coordinate `36639:<pubkey>:<d>`.   |
 | `title`          | Yes      | Short title shown on cards.                                                                              |
-| `challenge-type` | Yes      | One of `photo`, `art`, `info`, `action`. Drives the display icon and submission expectations.            |
 | `bounty`         | Yes      | Pledge amount in **sats**, as an unsigned integer string. Paid out via zaps or donation receipts to chosen submission(s). |
 | `i`              | No       | NIP-73 country identifier: `iso3166:XX` (preferred). Legacy `geo:XX` (length 6, country code only) is accepted as a read alias. Optionally combined with a `location` tag fallback. |
 | `A`              | No       | Community root coordinate for community-scoped pledges, e.g. `34550:<pubkey>:<d-tag>`.                 |
 | `K`              | No       | Root kind hint for community-scoped pledges. Use `34550` when `A` points to a NIP-72 community.         |
-| `P`              | No       | Root author hint for community-scoped actions. Use the community definition author pubkey.              |
-| `t`              | Yes      | Discovery tag. Canonical write value is `agora-action`. Read aliases: `pathos-challenge`, `agora-challenge`. |
+| `P`              | No       | Root author hint for community-scoped pledges. Use the community definition author pubkey.              |
+| `t`              | Yes      | Discovery and category tags. Canonical write value includes `agora-action`; additional `t` tags are optional hashtags/categories. Read aliases: `pathos-challenge`, `agora-challenge`. |
 | `image`          | No       | Cover image URL.                                                                                         |
 | `start`          | No       | Unix timestamp when the pledge becomes active. Defaults to `created_at`.                                 |
 | `deadline`       | No       | Optional Unix timestamp when the pledge expires. Omit for open-ended pledges.                            |
@@ -591,6 +591,10 @@ Community-scoped pledges inherit the community's moderation context. Clients ren
 ### Content
 
 Long-form description of the pledge. Plain text or light markdown. Clients render this as the pledge's body on the detail page.
+
+### Categories
+
+Clients SHOULD use optional `t` tags for filtering and discovery instead of the deprecated `challenge-type` tag. Suggested user-entered tags include values like `beach-cleanup`, `protest-documentation`, `internet-blackout`, `legal-defense`, or `mutual-aid`.
 
 ### Submissions
 

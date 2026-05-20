@@ -2,18 +2,17 @@ import { useEffect, useState, useMemo } from 'react';
 import { useSeoMeta } from '@unhead/react';
 import { Link as RouterLink, useNavigate } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
-import { format } from 'date-fns';
 import { nip19 } from 'nostr-tools';
-import type { NostrMetadata } from '@nostrify/nostrify';
 
 import { useActions, type Action } from '@/hooks/useActions';
 import { useAuthor } from '@/hooks/useAuthor';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useBitcoinWallet } from '@/hooks/useBitcoinWallet';
+import { useComments } from '@/hooks/useComments';
 import { useNostrPublish } from '@/hooks/useNostrPublish';
+import { useSubmissionZapTotals } from '@/hooks/useSubmissionZapTotals';
 import { useToast } from '@/hooks/useToast';
 import { getAllCountries, getGeoDisplayName, countryCodeToFlag } from '@/lib/countries';
-import { CountryFlag } from '@/components/CountryFlag';
 import { getDisplayName } from '@/lib/genUserName';
 import { DEFAULT_ACTION_COVERS, DEFAULT_COVER_IMAGE } from '@/lib/defaultActionCovers';
 import { formatSats, satsToUSDWhole } from '@/lib/bitcoin';
@@ -23,9 +22,10 @@ import { cn } from '@/lib/utils';
 import { HeroAtmosphere } from '@/components/HeroAtmosphere';
 import { HeroBanner } from '@/components/HeroBanner';
 
-import { Card, CardContent } from '@/components/ui/card';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Badge } from '@/components/ui/badge';
+import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { Progress } from '@/components/ui/progress';
 import { Skeleton } from '@/components/ui/skeleton';
 import {
   Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList,
@@ -38,17 +38,10 @@ import {
 } from '@/components/ui/dropdown-menu';
 
 import {
-  Camera, Palette, Info, Clock, Plus, ChevronRight, Loader2,
+  CalendarClock, Clock, HandHeart, MapPin, Plus, ChevronRight, Loader2,
   Link as LinkIcon, Check, MoreHorizontal, Trash2, ListFilter,
-  Calendar, DollarSign, Globe, Megaphone,
+  Calendar, DollarSign, Globe, Megaphone, Target,
 } from 'lucide-react';
-
-const ACTION_ICONS = {
-  photo: Camera,
-  art: Palette,
-  info: Info,
-  action: Megaphone,
-} as const;
 
 function formatPledgeAmount(sats: number, btcPrice: number | undefined): string {
   if (btcPrice) return satsToUSDWhole(sats, btcPrice);
@@ -61,17 +54,15 @@ function formatPledgeAmount(sats: number, btcPrice: number | undefined): string 
 
 function ActionSkeleton() {
   return (
-    <Card className="overflow-hidden">
-      <Skeleton className="h-40 w-full rounded-none" />
-      <CardContent className="space-y-3 pt-4">
-        <Skeleton className="h-6 w-3/4" />
+    <Card className="overflow-hidden border-border/70 shadow-sm h-full flex flex-col">
+      <Skeleton className="aspect-[16/9] w-full rounded-none" />
+      <div className="flex-1 p-5 space-y-3">
+        <Skeleton className="h-5 w-3/4" />
         <Skeleton className="h-4 w-full" />
         <Skeleton className="h-4 w-4/5" />
-        <div className="flex items-center justify-between pt-2">
-          <Skeleton className="h-4 w-20" />
-          <Skeleton className="h-4 w-24" />
-        </div>
-      </CardContent>
+        <Skeleton className="h-2 w-full" />
+        <Skeleton className="h-4 w-2/3" />
+      </div>
     </Card>
   );
 }
@@ -175,12 +166,58 @@ function ActionShareMenu({ action }: { action: Action }) {
   );
 }
 
+function formatDeadline(unixSeconds: number): { label: string; isPast: boolean } {
+  const now = Math.floor(Date.now() / 1000);
+  const diff = unixSeconds - now;
+  if (diff <= 0) return { label: 'Ended', isPast: true };
+  const days = Math.ceil(diff / 86_400);
+  if (days <= 1) return { label: 'Ends today', isPast: false };
+  if (days < 30) return { label: `${days} days left`, isPast: false };
+  const months = Math.round(days / 30);
+  return { label: `${months} mo left`, isPast: false };
+}
+
+function tagLabel(tag: string): string {
+  return tag.replace(/-/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
+}
+
+function PledgeProgress({
+  pledgedSats,
+  fundedSats,
+  btcPrice,
+}: {
+  pledgedSats: number;
+  fundedSats: number;
+  btcPrice: number | undefined;
+}) {
+  const pct = pledgedSats > 0 ? Math.min(100, Math.round((fundedSats / pledgedSats) * 100)) : 0;
+  return (
+    <div className="space-y-1.5">
+      <Progress value={pct} className="h-2" />
+      <div className="flex items-baseline justify-between gap-2 text-sm">
+        <span className="font-semibold">
+          {formatPledgeAmount(fundedSats, btcPrice)}
+          <span className="ml-1 font-normal text-muted-foreground">funded</span>
+        </span>
+        <span className="text-muted-foreground">of {formatPledgeAmount(pledgedSats, btcPrice)} pledged</span>
+      </div>
+    </div>
+  );
+}
+
 function ActionCard({ action, isExpired, btcPrice }: { action: Action; isExpired?: boolean; btcPrice: number | undefined }) {
   const author = useAuthor(action.pubkey);
-  const metadata: NostrMetadata | undefined = author.data?.metadata;
+  const metadata = author.data?.metadata;
   const displayName = getDisplayName(metadata, action.pubkey);
-  const Icon = ACTION_ICONS[action.type];
   const [imageLoadFailed, setImageLoadFailed] = useState(false);
+  const { data: commentsData } = useComments(action.event, 100);
+  const topLevel = useMemo(() => commentsData?.topLevelComments ?? [], [commentsData?.topLevelComments]);
+  const submissionIds = useMemo(() => topLevel.map((c) => c.id), [topLevel]);
+  const { data: zapTotals } = useSubmissionZapTotals(submissionIds);
+  const fundedSats = useMemo(() => {
+    const totals = zapTotals ?? new Map<string, number>();
+    return topLevel.reduce((sum, submission) => sum + (totals.get(submission.id) ?? 0), 0);
+  }, [topLevel, zapTotals]);
 
   const naddr = nip19.naddrEncode({
     kind: 36639,
@@ -194,92 +231,78 @@ function ActionCard({ action, isExpired, btcPrice }: { action: Action; isExpired
     ? action.image
     : DEFAULT_COVER_IMAGE;
 
+  const primaryTag = action.tags[0];
+  const deadline = action.deadline ? formatDeadline(action.deadline) : null;
+  const countryLabel = action.countryCode ? getGeoDisplayName(action.countryCode) : undefined;
+
   return (
-    <RouterLink to={`/${naddr}`} className="block group">
-      <Card
-        className={cn(
-          'overflow-hidden transition-colors',
-          'hover:bg-muted/30',
-          isExpired && 'opacity-70',
-        )}
-      >
-        {/* Cover image — full bleed, modest height */}
-        <div className="relative w-full h-40 overflow-hidden bg-muted">
+    <RouterLink
+      to={`/${naddr}`}
+      className="group block rounded-xl overflow-hidden focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background motion-safe:transition-transform motion-safe:duration-200 motion-safe:hover:-translate-y-0.5"
+    >
+      <Card className={cn('overflow-hidden border-border/70 shadow-sm motion-safe:transition-shadow motion-safe:duration-200 group-hover:shadow-lg h-full flex flex-col', isExpired && 'opacity-75')}>
+        <div className="relative w-full aspect-[16/9] bg-gradient-to-br from-primary/15 via-primary/5 to-secondary">
           <img
             src={coverImage}
-            alt={action.title}
-            className={cn(
-              'w-full h-full object-cover transition-transform duration-300',
-              !isExpired && 'group-hover:scale-[1.02]',
-              isExpired && 'grayscale',
-            )}
+            alt=""
+            className={cn('absolute inset-0 size-full object-cover', isExpired && 'grayscale')}
             onError={() => setImageLoadFailed(true)}
             loading="lazy"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
-
-          {/* Country flag — top-left, sitting on the image */}
-          {action.countryCode && (
-            <CountryFlag
-              code={action.countryCode}
-              emoji={countryCodeToFlag(action.countryCode)}
-              label={getGeoDisplayName(action.countryCode)}
-              className="absolute top-3 left-3 text-2xl drop-shadow-md"
-            />
+          {primaryTag && (
+            <Badge variant="secondary" className="absolute top-3 left-3 backdrop-blur bg-background/80 border-border/40">
+              {tagLabel(primaryTag)}
+            </Badge>
           )}
-
-          {/* Deadline / expired pill — top-right */}
-          {isExpired ? (
-            <div className="absolute top-3 right-3 px-2 py-0.5 rounded-full bg-background/90 text-xs font-medium text-muted-foreground flex items-center gap-1">
-              <Clock className="h-3 w-3" />
-              Expired
-            </div>
-          ) : action.deadline ? (
-            <div className="absolute top-3 right-3 px-2 py-0.5 rounded-full bg-background/90 text-xs font-medium flex items-center gap-1">
-              <Clock className="h-3 w-3" />
-              {format(action.deadline * 1000, 'MMM d')}
-            </div>
-          ) : null}
+          <div className="absolute top-3 right-3 flex items-center gap-2" onClick={(e) => e.preventDefault()}>
+            {isExpired && (
+              <Badge variant="secondary" className="backdrop-blur bg-background/85 border-border/40 text-muted-foreground">
+                Ended
+              </Badge>
+            )}
+            <ActionShareMenu action={action} />
+          </div>
         </div>
 
-        <CardContent className="pt-4 pb-4 space-y-3">
-          <div className="flex items-start gap-2">
-            <Icon className="h-5 w-5 text-primary shrink-0 mt-0.5" />
-            <div className="flex-1 min-w-0">
-              <h3 className={cn(
-                'text-lg font-bold leading-tight line-clamp-2',
-                !isExpired && 'group-hover:text-primary transition-colors',
-              )}>
-                {action.title}
-              </h3>
-            </div>
-            <div onClick={(e) => e.preventDefault()}>
-              <ActionShareMenu action={action} />
-            </div>
+        <div className="flex flex-col gap-3 p-5 flex-1">
+          <div className="space-y-2">
+            <h3 className="font-bold leading-tight tracking-tight text-lg line-clamp-2">
+              {action.title}
+            </h3>
+            {action.description.trim() && (
+              <p className="text-sm text-muted-foreground line-clamp-2">
+                {action.description}
+              </p>
+            )}
           </div>
 
-          <p className={cn(
-            'text-sm line-clamp-3 leading-relaxed',
-            isExpired ? 'text-muted-foreground' : 'text-muted-foreground',
-          )}>
-            {action.description}
-          </p>
+          <div className="flex-1" />
 
-          {/* Meta row: pledge · author. No nested box. */}
-          <div className="flex items-center gap-2 text-sm pt-1 min-w-0">
-            <DollarSign className="h-4 w-4 text-primary shrink-0" />
-            <span className="font-semibold">{formatPledgeAmount(action.bounty, btcPrice)}</span>
-            {btcPrice && <span className="text-muted-foreground text-xs">~{formatSats(action.bounty)} sats</span>}
-            <span className="text-muted-foreground/50">·</span>
-            <Avatar className="h-5 w-5 shrink-0">
-              <AvatarImage src={metadata?.picture} />
-              <AvatarFallback className="text-[9px] bg-muted">
-                {displayName.slice(0, 2).toUpperCase()}
-              </AvatarFallback>
-            </Avatar>
-            <span className="text-muted-foreground text-xs truncate">{displayName}</span>
+          <PledgeProgress pledgedSats={action.bounty} fundedSats={fundedSats} btcPrice={btcPrice} />
+
+          <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 text-xs text-muted-foreground pt-1">
+            <span className="inline-flex items-center gap-1.5">
+              <Target className="size-3.5" />
+              {topLevel.length} {topLevel.length === 1 ? 'submission' : 'submissions'}
+            </span>
+            {countryLabel && (
+              <span className="inline-flex items-center gap-1.5">
+                <MapPin className="size-3.5" />
+                {countryLabel}
+              </span>
+            )}
+            {deadline && (
+              <span className={cn('inline-flex items-center gap-1.5', deadline.isPast && 'text-destructive')}>
+                <CalendarClock className="size-3.5" />
+                {deadline.label}
+              </span>
+            )}
           </div>
-        </CardContent>
+
+          <div className="text-xs text-muted-foreground border-t border-border/60 pt-3 truncate">
+            by <span className="font-medium text-foreground">{displayName}</span>
+          </div>
+        </div>
       </Card>
     </RouterLink>
   );
@@ -480,15 +503,20 @@ export default function ActionsPage() {
         onCreateAction={() => navigate(createActionHref)}
       />
 
-      <div className="px-4 max-w-2xl mx-auto pt-6">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-10 lg:py-14 space-y-12">
         {isLoading ? (
-          <div className="space-y-4">
-            {[...Array(4)].map((_, i) => <ActionSkeleton key={i} />)}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+            {Array.from({ length: 8 }).map((_, i) => <ActionSkeleton key={i} />)}
           </div>
         ) : (actions && actions.length > 0) ? (
           <div className="space-y-8">
-            <div className="flex items-center justify-between">
-              <h2 className="text-xl font-bold">{primarySectionTitle}</h2>
+            <div className="flex items-end justify-between gap-4">
+              <div>
+                <h2 className="text-2xl sm:text-3xl font-bold tracking-tight">{primarySectionTitle}</h2>
+                <p className="text-sm text-muted-foreground mt-1">
+                  Help fund the actions worth making.
+                </p>
+              </div>
               {headerControls}
             </div>
 
@@ -554,28 +582,33 @@ export default function ActionsPage() {
           </div>
         ) : (
           <>
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-xl font-bold">Active pledges</h2>
+            <div className="flex items-end justify-between gap-4 mb-6">
+              <div>
+                <h2 className="text-2xl sm:text-3xl font-bold tracking-tight">Active pledges</h2>
+                <p className="text-sm text-muted-foreground mt-1">
+                  Help fund the actions worth making.
+                </p>
+              </div>
               {headerControls}
             </div>
 
-            <div className="py-20 px-8 flex flex-col items-center gap-6 text-center">
-              <div className="p-4 rounded-full bg-primary/10">
-                <Megaphone className="size-8 text-primary" />
-              </div>
-              <div className="space-y-2 max-w-xs">
-                <h3 className="text-xl font-bold">No pledges yet</h3>
-                <p className="text-muted-foreground text-sm">
+            <Card className="border-dashed">
+              <div className="py-12 px-8 text-center space-y-4">
+                <HandHeart className="size-10 text-muted-foreground/60 mx-auto" />
+                <div className="space-y-1.5">
+                  <h3 className="text-lg font-semibold">No pledges yet</h3>
+                  <p className="text-muted-foreground max-w-sm mx-auto">
                   {selectedCountry ? `Be the first to create a pledge for ${selectedCountryName}.` : 'Be the first to create a pledge.'}
-                </p>
+                  </p>
+                </div>
+                {user && (
+                  <Button onClick={() => navigate(createActionHref)}>
+                    <Plus className="size-4 mr-2" />
+                    Create pledge
+                  </Button>
+                )}
               </div>
-              {user && (
-                <Button onClick={() => navigate(createActionHref)} className="rounded-full">
-                  <Plus className="size-4 mr-2" />
-                  Create pledge
-                </Button>
-              )}
-            </div>
+            </Card>
           </>
         )}
       </div>
@@ -723,8 +756,8 @@ function ActionSection({
   items: Action[]; total: number; visible: number; showAll: boolean; onToggle: () => void; isExpired: boolean; btcPrice: number | undefined;
 }) {
   return (
-    <div className="space-y-4">
-      <div className="space-y-4">
+    <div className="space-y-5">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
         {items.map((action) => (
           <ActionCard
             key={`${action.pubkey}:${action.id}`}
