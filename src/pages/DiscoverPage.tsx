@@ -207,7 +207,7 @@ export function DiscoverPage() {
                 </h2>
                 <p className="text-sm text-muted-foreground mt-1 max-w-xl">
                   New campaigns, posts tagged to a country, comments inside
-                  communities, and on-the-ground actions — one timeline, sorted
+                  communities, and donor pledges — one timeline, sorted
                   by what just happened.
                 </p>
               </div>
@@ -303,7 +303,7 @@ function DiscoverFeed() {
  * Single row inside the Discover feed. Campaign events (kind 30223) get
  * the full `CampaignCard` treatment so their banner and progress show;
  * everything else routes through `NoteCard`, which already handles
- * kind 1111 comments, kind 36639 actions, and the long tail.
+ * kind 1111 comments, kind 36639 pledges, and the long tail.
  */
 function DiscoverFeedRow({ event }: { event: NostrEvent }) {
   if (event.kind === CAMPAIGN_KIND) {

@@ -227,7 +227,7 @@ function resolveFilter(
     }
 
     if (filters.length === 0) {
-      return { error: 'No followed people, communities, hashtags, or countries found for the Following feed.' };
+      return { error: 'No followed people, hashtags, or countries found for the Following feed.' };
     }
 
     return { filters, needsDittoRelay: false, feedLabel: 'following' };

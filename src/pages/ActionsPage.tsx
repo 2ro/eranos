@@ -2,27 +2,26 @@ import { useEffect, useState, useMemo } from 'react';
 import { useSeoMeta } from '@unhead/react';
 import { Link as RouterLink, useNavigate } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
-import { format } from 'date-fns';
 import { nip19 } from 'nostr-tools';
-import type { NostrMetadata } from '@nostrify/nostrify';
 
 import { useActions, type Action } from '@/hooks/useActions';
 import { useAuthor } from '@/hooks/useAuthor';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
+import { useBitcoinWallet } from '@/hooks/useBitcoinWallet';
 import { useNostrPublish } from '@/hooks/useNostrPublish';
 import { useToast } from '@/hooks/useToast';
 import { getAllCountries, getGeoDisplayName, countryCodeToFlag } from '@/lib/countries';
-import { CountryFlag } from '@/components/CountryFlag';
 import { getDisplayName } from '@/lib/genUserName';
 import { DEFAULT_ACTION_COVERS, DEFAULT_COVER_IMAGE } from '@/lib/defaultActionCovers';
+import { formatCompactPledgeDeadline, formatPledgeAmount } from '@/lib/pledges';
 import { HOPE_PALETTE } from '@/lib/hopePalette';
 import { useLayoutOptions } from '@/contexts/LayoutContext';
 import { cn } from '@/lib/utils';
 import { HeroAtmosphere } from '@/components/HeroAtmosphere';
 import { HeroBanner } from '@/components/HeroBanner';
 
-import { Card, CardContent } from '@/components/ui/card';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Badge } from '@/components/ui/badge';
+import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import {
@@ -36,21 +35,10 @@ import {
 } from '@/components/ui/dropdown-menu';
 
 import {
-  Camera, Palette, Info, Clock, Bitcoin, Plus, ChevronRight, Loader2,
+  CalendarClock, Clock, HandHeart, MapPin, Plus, ChevronRight, Loader2,
   Link as LinkIcon, Check, MoreHorizontal, Trash2, ListFilter,
   Calendar, DollarSign, Globe, Megaphone,
 } from 'lucide-react';
-
-const ACTION_ICONS = {
-  photo: Camera,
-  art: Palette,
-  info: Info,
-  action: Megaphone,
-} as const;
-
-function formatSats(sats: number): string {
-  return sats.toLocaleString();
-}
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Skeletons / Cards
@@ -58,17 +46,15 @@ function formatSats(sats: number): string {
 
 function ActionSkeleton() {
   return (
-    <Card className="overflow-hidden">
-      <Skeleton className="h-40 w-full rounded-none" />
-      <CardContent className="space-y-3 pt-4">
-        <Skeleton className="h-6 w-3/4" />
+    <Card className="overflow-hidden border-border/70 shadow-sm h-full flex flex-col">
+      <Skeleton className="aspect-[16/9] w-full rounded-none" />
+      <div className="flex-1 p-5 space-y-3">
+        <Skeleton className="h-5 w-3/4" />
         <Skeleton className="h-4 w-full" />
         <Skeleton className="h-4 w-4/5" />
-        <div className="flex items-center justify-between pt-2">
-          <Skeleton className="h-4 w-20" />
-          <Skeleton className="h-4 w-24" />
-        </div>
-      </CardContent>
+        <Skeleton className="h-2 w-full" />
+        <Skeleton className="h-4 w-2/3" />
+      </div>
     </Card>
   );
 }
@@ -108,7 +94,7 @@ function ActionShareMenu({ action }: { action: Action }) {
     e.stopPropagation();
     if (!user || !isOwner) return;
 
-    const confirmed = window.confirm('Delete this action? This cannot be undone.');
+    const confirmed = window.confirm('Delete this pledge? This cannot be undone.');
     if (!confirmed) return;
 
     setIsDeleting(true);
@@ -117,7 +103,7 @@ function ActionShareMenu({ action }: { action: Action }) {
       // honour a-tag-only deletions for addressable events.
       await createEvent({
         kind: 5,
-        content: 'Deleted action',
+        content: 'Deleted pledge',
         tags: [
           ['e', action.event.id],
           ['a', `36639:${action.pubkey}:${action.id}`],
@@ -125,10 +111,10 @@ function ActionShareMenu({ action }: { action: Action }) {
       });
       await queryClient.invalidateQueries({ queryKey: ['agora-actions'] });
       await queryClient.invalidateQueries({ queryKey: ['agora-action'] });
-      toast({ title: 'Action deleted' });
+      toast({ title: 'Pledge deleted' });
     } catch (error) {
-      console.error('Failed to delete action:', error);
-      toast({ title: 'Failed to delete action', variant: 'destructive' });
+      console.error('Failed to delete pledge:', error);
+      toast({ title: 'Failed to delete pledge', variant: 'destructive' });
     } finally {
       setIsDeleting(false);
     }
@@ -154,7 +140,7 @@ function ActionShareMenu({ action }: { action: Action }) {
               ) : (
                 <Trash2 className="h-4 w-4 mr-2" />
               )}
-              Delete action
+              Delete pledge
             </DropdownMenuItem>
             <DropdownMenuSeparator />
           </>
@@ -172,11 +158,10 @@ function ActionShareMenu({ action }: { action: Action }) {
   );
 }
 
-function ActionCard({ action, isExpired }: { action: Action; isExpired?: boolean }) {
+function ActionCard({ action, isExpired, btcPrice }: { action: Action; isExpired?: boolean; btcPrice: number | undefined }) {
   const author = useAuthor(action.pubkey);
-  const metadata: NostrMetadata | undefined = author.data?.metadata;
+  const metadata = author.data?.metadata;
   const displayName = getDisplayName(metadata, action.pubkey);
-  const Icon = ACTION_ICONS[action.type];
   const [imageLoadFailed, setImageLoadFailed] = useState(false);
 
   const naddr = nip19.naddrEncode({
@@ -191,92 +176,73 @@ function ActionCard({ action, isExpired }: { action: Action; isExpired?: boolean
     ? action.image
     : DEFAULT_COVER_IMAGE;
 
+  const deadline = action.deadline ? formatCompactPledgeDeadline(action.deadline) : null;
+  const countryLabel = action.countryCode ? getGeoDisplayName(action.countryCode) : undefined;
+
   return (
-    <RouterLink to={`/${naddr}`} className="block group">
-      <Card
-        className={cn(
-          'overflow-hidden transition-colors',
-          'hover:bg-muted/30',
-          isExpired && 'opacity-70',
-        )}
-      >
-        {/* Cover image — full bleed, modest height */}
-        <div className="relative w-full h-40 overflow-hidden bg-muted">
+    <RouterLink
+      to={`/${naddr}`}
+      className="group block rounded-xl overflow-hidden focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background motion-safe:transition-transform motion-safe:duration-200 motion-safe:hover:-translate-y-0.5"
+    >
+      <Card className={cn('overflow-hidden border-border/70 shadow-sm motion-safe:transition-shadow motion-safe:duration-200 group-hover:shadow-lg h-full flex flex-col', isExpired && 'opacity-75')}>
+        <div className="relative w-full aspect-[16/9] bg-gradient-to-br from-primary/15 via-primary/5 to-secondary">
           <img
             src={coverImage}
-            alt={action.title}
-            className={cn(
-              'w-full h-full object-cover transition-transform duration-300',
-              !isExpired && 'group-hover:scale-[1.02]',
-              isExpired && 'grayscale',
-            )}
+            alt=""
+            className={cn('absolute inset-0 size-full object-cover', isExpired && 'grayscale')}
             onError={() => setImageLoadFailed(true)}
             loading="lazy"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
-
-          {/* Country flag — top-left, sitting on the image */}
-          {action.countryCode && (
-            <CountryFlag
-              code={action.countryCode}
-              emoji={countryCodeToFlag(action.countryCode)}
-              label={getGeoDisplayName(action.countryCode)}
-              className="absolute top-3 left-3 text-2xl drop-shadow-md"
-            />
-          )}
-
-          {/* Deadline / expired pill — top-right */}
-          {isExpired ? (
-            <div className="absolute top-3 right-3 px-2 py-0.5 rounded-full bg-background/90 text-xs font-medium text-muted-foreground flex items-center gap-1">
-              <Clock className="h-3 w-3" />
-              Expired
-            </div>
-          ) : action.deadline ? (
-            <div className="absolute top-3 right-3 px-2 py-0.5 rounded-full bg-background/90 text-xs font-medium flex items-center gap-1">
-              <Clock className="h-3 w-3" />
-              {format(action.deadline * 1000, 'MMM d')}
-            </div>
-          ) : null}
+          <div className="absolute top-3 right-3 flex items-center gap-2" onClick={(e) => e.preventDefault()}>
+            {isExpired && (
+              <Badge variant="secondary" className="backdrop-blur bg-background/85 border-border/40 text-muted-foreground">
+                Ended
+              </Badge>
+            )}
+            <ActionShareMenu action={action} />
+          </div>
         </div>
 
-        <CardContent className="pt-4 pb-4 space-y-3">
-          <div className="flex items-start gap-2">
-            <Icon className="h-5 w-5 text-primary shrink-0 mt-0.5" />
-            <div className="flex-1 min-w-0">
-              <h3 className={cn(
-                'text-lg font-bold leading-tight line-clamp-2',
-                !isExpired && 'group-hover:text-primary transition-colors',
-              )}>
-                {action.title}
-              </h3>
-            </div>
-            <div onClick={(e) => e.preventDefault()}>
-              <ActionShareMenu action={action} />
-            </div>
+        <div className="flex flex-col gap-3 p-5 flex-1">
+          <div className="space-y-2">
+            <h3 className="font-bold leading-tight tracking-tight text-lg line-clamp-2">
+              {action.title}
+            </h3>
+            {action.description.trim() && (
+              <p className="text-sm text-muted-foreground line-clamp-2">
+                {action.description}
+              </p>
+            )}
           </div>
 
-          <p className={cn(
-            'text-sm line-clamp-3 leading-relaxed',
-            isExpired ? 'text-muted-foreground' : 'text-muted-foreground',
-          )}>
-            {action.description}
-          </p>
+          <div className="flex-1" />
 
-          {/* Meta row: bounty · author. No nested box. */}
-          <div className="flex items-center gap-2 text-sm pt-1 min-w-0">
-            <Bitcoin className="h-4 w-4 text-primary shrink-0" />
-            <span className="font-semibold">{formatSats(action.bounty)}</span>
-            <span className="text-muted-foreground text-xs">sats</span>
-            <span className="text-muted-foreground/50">·</span>
-            <Avatar className="h-5 w-5 shrink-0">
-              <AvatarImage src={metadata?.picture} />
-              <AvatarFallback className="text-[9px] bg-muted">
-                {displayName.slice(0, 2).toUpperCase()}
-              </AvatarFallback>
-            </Avatar>
-            <span className="text-muted-foreground text-xs truncate">{displayName}</span>
+          <div className="rounded-xl border border-primary/20 bg-primary/10 px-4 py-3">
+            <p className="text-xs font-semibold uppercase tracking-wide text-primary">Pledged</p>
+            <p className="mt-1 text-2xl font-bold tracking-tight text-foreground">
+              {formatPledgeAmount(action.bounty, btcPrice)}
+            </p>
           </div>
-        </CardContent>
+
+          <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 text-xs text-muted-foreground pt-1">
+            {countryLabel && (
+              <span className="inline-flex items-center gap-1.5">
+                <MapPin className="size-3.5" />
+                {countryLabel}
+              </span>
+            )}
+            {deadline && (
+              <span className={cn('inline-flex items-center gap-1.5', deadline.isPast && 'text-destructive')}>
+                <CalendarClock className="size-3.5" />
+                {deadline.label}
+              </span>
+            )}
+          </div>
+
+          <div className="text-xs text-muted-foreground border-t border-border/60 pt-3 truncate">
+            by <span className="font-medium text-foreground">{displayName}</span>
+          </div>
+        </div>
       </Card>
     </RouterLink>
   );
@@ -290,6 +256,7 @@ type SortOption = 'recent' | 'bounty' | 'deadline';
 
 export default function ActionsPage() {
   const { user } = useCurrentUser();
+  const { btcPrice } = useBitcoinWallet();
   const navigate = useNavigate();
 
   const [selectedCountry, setSelectedCountry] = useState<string | undefined>(undefined);
@@ -301,12 +268,12 @@ export default function ActionsPage() {
     limit: 300,
   });
 
-  // Route entry points for "Create action" all pass the currently-selected
+  // Route entry points for "Create pledge" all pass the currently-selected
   // country via ?country= so the dedicated page can pre-fill it, matching
   // the old modal's `countryCode` prop.
   const createActionHref = selectedCountry
-    ? `/actions/new?country=${encodeURIComponent(selectedCountry)}`
-    : '/actions/new';
+    ? `/pledges/new?country=${encodeURIComponent(selectedCountry)}`
+    : '/pledges/new';
 
   // Drive the global FAB from the canonical layout API so we get the same
   // circular Plus button every other page has. `noMaxWidth: true` lets
@@ -338,8 +305,8 @@ export default function ActionsPage() {
     : 'Global';
 
   useSeoMeta({
-    title: `Actions${selectedCountry ? ` — ${selectedCountryName}` : ''} | Agora`,
-    description: 'Complete activist actions and earn Bitcoin bounties. Take photos, create art, gather information, and take action for change.',
+    title: `Pledges${selectedCountry ? ` — ${selectedCountryName}` : ''} | Agora`,
+    description: 'Pledge funding for concrete actions, evidence, or outcomes you want to inspire.',
   });
 
   const isLoading = actionsLoading;
@@ -391,12 +358,12 @@ export default function ActionsPage() {
   const hasUpcoming = upcomingActions.length > 0;
   const isOnlyPastView = !hasCurrent && !hasUpcoming && pastActions.length > 0;
   const primarySectionTitle = hasCurrent
-    ? 'Active actions'
+    ? 'Active pledges'
     : hasUpcoming
-      ? 'Upcoming actions'
+      ? 'Upcoming pledges'
     : pastActions.length > 0
-        ? 'Past actions'
-        : 'Actions';
+        ? 'Past pledges'
+        : 'Pledges';
   const deadlineSortLabel = isOnlyPastView ? 'Recently ended' : 'Deadline soon';
 
   const headerControls = (
@@ -414,7 +381,7 @@ export default function ActionsPage() {
             {sortBy === 'recent' && <Check className="ml-auto h-4 w-4" />}
           </DropdownMenuItem>
           <DropdownMenuItem onClick={() => setSortBy('bounty')} className={sortBy === 'bounty' ? 'bg-primary/10' : ''}>
-            <DollarSign className="mr-2 h-4 w-4" /><span>Highest bounty</span>
+            <DollarSign className="mr-2 h-4 w-4" /><span>Highest pledge</span>
             {sortBy === 'bounty' && <Check className="ml-auto h-4 w-4" />}
           </DropdownMenuItem>
           <DropdownMenuItem onClick={() => setSortBy('deadline')} className={sortBy === 'deadline' ? 'bg-primary/10' : ''}>
@@ -476,15 +443,20 @@ export default function ActionsPage() {
         onCreateAction={() => navigate(createActionHref)}
       />
 
-      <div className="px-4 max-w-2xl mx-auto pt-6">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-10 lg:py-14 space-y-12">
         {isLoading ? (
-          <div className="space-y-4">
-            {[...Array(4)].map((_, i) => <ActionSkeleton key={i} />)}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+            {Array.from({ length: 8 }).map((_, i) => <ActionSkeleton key={i} />)}
           </div>
         ) : (actions && actions.length > 0) ? (
           <div className="space-y-8">
-            <div className="flex items-center justify-between">
-              <h2 className="text-xl font-bold">{primarySectionTitle}</h2>
+            <div className="flex items-end justify-between gap-4">
+              <div>
+                <h2 className="text-2xl sm:text-3xl font-bold tracking-tight">{primarySectionTitle}</h2>
+                <p className="text-sm text-muted-foreground mt-1">
+                  Help fund the actions worth making.
+                </p>
+              </div>
               {headerControls}
             </div>
 
@@ -496,6 +468,7 @@ export default function ActionsPage() {
                 showAll={showAllCurrent}
                 onToggle={() => setShowAllCurrent(!showAllCurrent)}
                 isExpired={false}
+                btcPrice={btcPrice}
               />
             ) : hasUpcoming ? (
               <ActionSection
@@ -505,6 +478,7 @@ export default function ActionsPage() {
                 showAll={showAllUpcoming}
                 onToggle={() => setShowAllUpcoming(!showAllUpcoming)}
                 isExpired={false}
+                btcPrice={btcPrice}
               />
             ) : pastActions.length > 0 ? (
               <ActionSection
@@ -514,6 +488,7 @@ export default function ActionsPage() {
                 showAll={showAllPast}
                 onToggle={() => setShowAllPast(!showAllPast)}
                 isExpired
+                btcPrice={btcPrice}
               />
             ) : null}
 
@@ -526,6 +501,7 @@ export default function ActionsPage() {
                   showAll={showAllUpcoming}
                   onToggle={() => setShowAllUpcoming(!showAllUpcoming)}
                   isExpired={false}
+                  btcPrice={btcPrice}
                 />
               </SectionDivider>
             )}
@@ -539,34 +515,40 @@ export default function ActionsPage() {
                   showAll={showAllPast}
                   onToggle={() => setShowAllPast(!showAllPast)}
                   isExpired
+                  btcPrice={btcPrice}
                 />
               </SectionDivider>
             )}
           </div>
         ) : (
           <>
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-xl font-bold">Active actions</h2>
+            <div className="flex items-end justify-between gap-4 mb-6">
+              <div>
+                <h2 className="text-2xl sm:text-3xl font-bold tracking-tight">Active pledges</h2>
+                <p className="text-sm text-muted-foreground mt-1">
+                  Help fund the actions worth making.
+                </p>
+              </div>
               {headerControls}
             </div>
 
-            <div className="py-20 px-8 flex flex-col items-center gap-6 text-center">
-              <div className="p-4 rounded-full bg-primary/10">
-                <Megaphone className="size-8 text-primary" />
+            <Card className="border-dashed">
+              <div className="py-12 px-8 text-center space-y-4">
+                <HandHeart className="size-10 text-muted-foreground/60 mx-auto" />
+                <div className="space-y-1.5">
+                  <h3 className="text-lg font-semibold">No pledges yet</h3>
+                  <p className="text-muted-foreground max-w-sm mx-auto">
+                  {selectedCountry ? `Be the first to create a pledge for ${selectedCountryName}.` : 'Be the first to create a pledge.'}
+                  </p>
+                </div>
+                {user && (
+                  <Button onClick={() => navigate(createActionHref)}>
+                    <Plus className="size-4 mr-2" />
+                    Create pledge
+                  </Button>
+                )}
               </div>
-              <div className="space-y-2 max-w-xs">
-                <h3 className="text-xl font-bold">No actions yet</h3>
-                <p className="text-muted-foreground text-sm">
-                  {selectedCountry ? `Be the first to create an action for ${selectedCountryName}.` : 'Be the first to create an action.'}
-                </p>
-              </div>
-              {user && (
-                <Button onClick={() => navigate(createActionHref)} className="rounded-full">
-                  <Plus className="size-4 mr-2" />
-                  Create action
-                </Button>
-              )}
-            </div>
+            </Card>
           </>
         )}
       </div>
@@ -579,11 +561,11 @@ export default function ActionsPage() {
 // ═══════════════════════════════════════════════════════════════════════════════
 
 /**
- * Banner rotation for the Actions hero. We reuse the same gallery the
- * action create form offers as a default cover, so the hero feels
+ * Banner rotation for the Pledges hero. We reuse the same gallery the
+ * pledge create form offers as a default cover, so the hero feels
  * thematically continuous with the cards below — readers see the
  * vocabulary of imagery they'll be picking from when they create their
- * own action. Filtered to a single source extension where multiple
+ * own pledge. Filtered to a single source extension where multiple
  * exist isn't necessary; the browser handles `.png` / `.jpeg` mixed.
  */
 const ACTIONS_HERO_IMAGES: readonly string[] = DEFAULT_ACTION_COVERS.map(
@@ -591,18 +573,18 @@ const ACTIONS_HERO_IMAGES: readonly string[] = DEFAULT_ACTION_COVERS.map(
 );
 
 interface ActionsHeroProps {
-  /** Number of actions currently loaded — fuels the live stat pill. */
+  /** Number of pledges currently loaded — fuels the live stat pill. */
   actionCount: number;
-  /** When true, the primary CTA opens the create-action dialog. */
+  /** When true, the primary CTA opens the create-pledge page. */
   canCreate: boolean;
   /** Fires when the user clicks the primary CTA. */
   onCreateAction: () => void;
 }
 
 /**
- * Photo-led hero for the Actions index. Same structural recipe as the
+ * Photo-led hero for the Pledges index. Same structural recipe as the
  * Organize hero (rotating banner + atmospheric tint + scrims + overlay
- * copy + glassy CTA), but tuned for action's "dawn / golden hour" vibe:
+ * copy + glassy CTA), but tuned for the pledge page's "dawn / golden hour" vibe:
  * uses {@link HOPE_PALETTE} instead of the cool palette so the warm
  * hues land on top of the protest photography rather than competing
  * with it.
@@ -623,7 +605,7 @@ function ActionsHero({ actionCount, canCreate, onCreateAction }: ActionsHeroProp
   return (
     <section className="relative overflow-hidden border-b border-border bg-secondary/30">
       {/* Rotating photo banner — uses the same gallery offered as default
-          action covers, so the hero previews the visual vocabulary of
+          pledge covers, so the hero previews the visual vocabulary of
           the cards below. Crossfades every 7s and pans slowly between
           cuts. */}
       <HeroBanner images={ACTIONS_HERO_IMAGES} />
@@ -649,22 +631,22 @@ function ActionsHero({ actionCount, canCreate, onCreateAction }: ActionsHeroProp
       <div className="relative max-w-5xl mx-auto px-4 sm:px-6 py-10 sm:py-12 lg:py-14 min-h-[380px] sm:min-h-[420px] lg:min-h-[460px] flex flex-col items-center text-center">
         <div className="relative space-y-3 max-w-3xl">
           <p className="text-xs sm:text-sm font-semibold uppercase tracking-[0.18em] text-white/85 drop-shadow">
-            Act
+            Pledge
           </p>
           <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight leading-[1.05] text-white drop-shadow-[0_2px_12px_rgb(0_0_0/0.55)]">
-            Small acts,
-            <br className="sm:hidden" /> real change.
+            Inspire the change
+            <br className="sm:hidden" /> you want to see.
           </h1>
           <p className="text-base sm:text-lg text-white/85 max-w-2xl mx-auto drop-shadow-[0_1px_6px_rgb(0_0_0/0.5)]">
-            Photograph protests, make art, gather information, organize on the ground.
-            Get paid in Bitcoin when your work moves the needle.
+            Fund concrete actions, evidence, and outcomes. People reply with submissions,
+            and the community rewards the work that moves the goal forward.
           </p>
         </div>
 
         <div className="flex-1 min-h-[100px] sm:min-h-[120px]" aria-hidden="true" />
 
         {/* Live stat pill. Mirrors the Communities hero's pattern but
-            only carries a single fact — the current action count —
+            only carries a single fact — the current pledge count —
             so it stays calm and the headline does the heavy lifting. */}
         <div
           className="relative w-full max-w-md mx-auto rounded-full bg-background/55 backdrop-blur-xl backdrop-saturate-150 border border-white/20 dark:border-white/10 px-5 py-3 shadow-lg shadow-amber-500/10"
@@ -676,7 +658,7 @@ function ActionsHero({ actionCount, canCreate, onCreateAction }: ActionsHeroProp
               {actionCount.toLocaleString()}
             </span>
             <span className="text-xs sm:text-sm text-muted-foreground line-clamp-1">
-              {actionCount === 1 ? 'action in motion right now' : 'actions in motion right now'}
+              {actionCount === 1 ? 'pledge open right now' : 'pledges open right now'}
             </span>
           </div>
         </div>
@@ -697,10 +679,10 @@ function ActionsHero({ actionCount, canCreate, onCreateAction }: ActionsHeroProp
               'motion-safe:transition-colors motion-safe:duration-200',
               'disabled:opacity-60 disabled:cursor-not-allowed',
             )}
-            aria-label={canCreate ? 'Create action' : 'Log in to create an action'}
+            aria-label={canCreate ? 'Create pledge' : 'Log in to create a pledge'}
           >
             <Plus className="mr-2" />
-            Create action
+            Create pledge
           </Button>
         </div>
       </div>
@@ -709,18 +691,19 @@ function ActionsHero({ actionCount, canCreate, onCreateAction }: ActionsHeroProp
 }
 
 function ActionSection({
-  items, total, visible, showAll, onToggle, isExpired,
+  items, total, visible, showAll, onToggle, isExpired, btcPrice,
 }: {
-  items: Action[]; total: number; visible: number; showAll: boolean; onToggle: () => void; isExpired: boolean;
+  items: Action[]; total: number; visible: number; showAll: boolean; onToggle: () => void; isExpired: boolean; btcPrice: number | undefined;
 }) {
   return (
-    <div className="space-y-4">
-      <div className="space-y-4">
+    <div className="space-y-5">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
         {items.map((action) => (
           <ActionCard
             key={`${action.pubkey}:${action.id}`}
             action={action}
             isExpired={isExpired}
+            btcPrice={btcPrice}
           />
         ))}
       </div>

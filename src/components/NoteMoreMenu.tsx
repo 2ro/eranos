@@ -17,7 +17,6 @@ import {
   Check,
   Radio,
   ShieldBan,
-  Ban,
 } from 'lucide-react';
 import {
   Dialog,
@@ -206,7 +205,6 @@ export function NoteMoreMenu({ event, open, onOpenChange }: NoteMoreMenuProps) {
   // These states live here (not in NoteMoreMenuContent) so they persist after the menu closes
   const [reportOpen, setReportOpen] = useState(false);
   const [banContentOpen, setBanContentOpen] = useState(false);
-  const [banMemberOpen, setBanMemberOpen] = useState(false);
   const [addToListOpen, setAddToListOpen] = useState(false);
   const [eventJsonOpen, setEventJsonOpen] = useState(false);
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
@@ -262,10 +260,6 @@ export function NoteMoreMenu({ event, open, onOpenChange }: NoteMoreMenuProps) {
             onOpenChange(false);
             setTimeout(() => setBanContentOpen(true), 150);
           }}
-          onBanMember={() => {
-            onOpenChange(false);
-            setTimeout(() => setBanMemberOpen(true), 150);
-          }}
           onAddToList={() => {
             onOpenChange(false);
             setTimeout(() => setAddToListOpen(true), 150);
@@ -293,23 +287,13 @@ export function NoteMoreMenu({ event, open, onOpenChange }: NoteMoreMenuProps) {
       )}
 
       {communityContext?.canBan && (
-        <>
-          <BanConfirmDialog
-            mode="content"
-            eventId={event.id}
-            targetPubkey={event.pubkey}
-            communityATag={communityContext.communityATag}
-            open={banContentOpen}
-            onOpenChange={setBanContentOpen}
-          />
-          <BanConfirmDialog
-            mode="member"
-            targetPubkey={event.pubkey}
-            communityATag={communityContext.communityATag}
-            open={banMemberOpen}
-            onOpenChange={setBanMemberOpen}
-          />
-        </>
+        <BanConfirmDialog
+          eventId={event.id}
+          targetPubkey={event.pubkey}
+          communityATag={communityContext.communityATag}
+          open={banContentOpen}
+          onOpenChange={setBanContentOpen}
+        />
       )}
 
       <AddToListDialog
@@ -357,13 +341,12 @@ interface NoteMoreMenuContentProps extends NoteMoreMenuProps {
   communityContext?: CommunityMenuContext;
   onReport: () => void;
   onBanContent: () => void;
-  onBanMember: () => void;
   onAddToList: () => void;
   onViewEventJson: () => void;
   onDelete: () => void;
 }
 
-function NoteMoreMenuContent({ event, open, onOpenChange, communityContext, onReport, onBanContent, onBanMember, onAddToList, onViewEventJson, onDelete }: NoteMoreMenuContentProps) {
+function NoteMoreMenuContent({ event, open, onOpenChange, communityContext, onReport, onBanContent, onAddToList, onViewEventJson, onDelete }: NoteMoreMenuContentProps) {
   const navigate = useNavigate();
   const { user } = useCurrentUser();
   const { isBookmarked, toggleBookmark } = useBookmarks();
@@ -592,26 +575,18 @@ function NoteMoreMenuContent({ event, open, onOpenChange, communityContext, onRe
           {!isOwnPost && (
             <MenuItem
               icon={<Flag className="size-5" />}
-              label={communityContext ? 'Report post to community' : `Report @${displayName}`}
+              label={communityContext ? 'Report post to organization' : `Report @${displayName}`}
               onClick={onReport}
               destructive
             />
           )}
           {!isOwnPost && communityContext?.canBan && (
-            <>
-              <MenuItem
-                icon={<ShieldBan className="size-5" />}
-                label="Remove from community"
-                onClick={onBanContent}
-                destructive
-              />
-              <MenuItem
-                icon={<Ban className="size-5" />}
-                label={`Ban @${displayName} from community`}
-                onClick={onBanMember}
-                destructive
-              />
-            </>
+            <MenuItem
+              icon={<ShieldBan className="size-5" />}
+              label="Remove from organization"
+              onClick={onBanContent}
+              destructive
+            />
           )}
           {isOwnPost && (
             <MenuItem

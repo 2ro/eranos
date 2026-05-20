@@ -13,7 +13,7 @@ import {
   X,
 } from 'lucide-react';
 
-import { PersonSearch } from '@/components/AddMemberDialog';
+import { PersonSearch } from '@/components/PersonSearch';
 import { CoverImageField } from '@/components/CoverImageField';
 import { FormSection } from '@/components/FormSection';
 import { Alert, AlertDescription } from '@/components/ui/alert';
@@ -30,7 +30,6 @@ import { useToast } from '@/hooks/useToast';
 import type { SearchProfile } from '@/hooks/useSearchProfiles';
 import { useLayoutOptions } from '@/contexts/LayoutContext';
 import {
-  BADGE_DEFINITION_KIND,
   COMMUNITY_DEFINITION_KIND,
   parseCommunityEvent,
   type ParsedCommunity,
@@ -327,11 +326,15 @@ export function CreateCommunityPage() {
         }
 
         // Strip the tag names we're going to rewrite; preserve everything
-        // else (the `a` member-badge tag, any `relay` hints, …).
+        // else (any `relay` hints, alt-language tags, …). The legacy
+        // `['a', …, 'member']` member-badge tag is no longer relevant
+        // under Agora's founder/moderator-only model — we drop it on
+        // edit so old badge wiring doesn't linger.
         const preserved = prev.tags.filter(
-          ([n, , , role]) =>
+          ([n, v, , role]) =>
             !['d', 'name', 'description', 'image', 'alt'].includes(n) &&
-            !(n === 'p' && role === 'moderator'),
+            !(n === 'p' && role === 'moderator') &&
+            !(n === 'a' && typeof v === 'string' && v.startsWith('30009:') && role === 'member'),
         );
 
         const nextTags: string[][] = [
@@ -344,7 +347,6 @@ export function CreateCommunityPage() {
         if (sanitizedImage) {
           nextTags.push(['image', sanitizedImage]);
         }
-        nextTags.push(['p', user.pubkey, '', 'moderator']);
         for (const mod of extraModerators) {
           nextTags.push(['p', mod.pubkey, '', 'moderator']);
         }
@@ -377,36 +379,10 @@ export function CreateCommunityPage() {
         );
       }
 
-      // Same collision check for the implicitly-minted member badge.
-      const badgeDTag = `${slug}-member`;
-      const existingBadge = await nostr.query([
-        {
-          kinds: [BADGE_DEFINITION_KIND],
-          authors: [user.pubkey],
-          '#d': [badgeDTag],
-          limit: 1,
-        },
-      ]);
-      if (existingBadge.length > 0) {
-        throw new Error(
-          'You already have a member badge with this identifier. Choose a different community name so the badge can be created safely.',
-        );
-      }
-
-      // Mint the implicit "Member of <community>" badge (kind 30009).
-      const badgeEvent: NostrEvent = await publishEvent({
-        kind: BADGE_DEFINITION_KIND,
-        content: '',
-        tags: [
-          ['d', badgeDTag],
-          ['name', 'Member'],
-          ['description', `Member of ${trimmedName}`],
-          ['alt', `Badge definition: Member of ${trimmedName}`],
-        ],
-      });
-      const badgeATag = `${BADGE_DEFINITION_KIND}:${badgeEvent.pubkey}:${badgeDTag}`;
-
-      // Build the kind 34550 community-definition tag set.
+      // Build the kind 34550 community-definition tag set. Agora's
+      // organization model has no badge-based membership any more, so we
+      // do not mint a "Member of …" badge or attach an `a` tag with a
+      // `member` role marker.
       const tags: string[][] = [
         ['d', slug],
         ['name', trimmedName],
@@ -417,8 +393,6 @@ export function CreateCommunityPage() {
       if (sanitizedImage) {
         tags.push(['image', sanitizedImage]);
       }
-      tags.push(['a', badgeATag, '', 'member']);
-      tags.push(['p', user.pubkey, '', 'moderator']);
       for (const mod of extraModerators) {
         tags.push(['p', mod.pubkey, '', 'moderator']);
       }

@@ -19,6 +19,7 @@ import {
 } from 'lucide-react';
 
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import { BitcoinPublicDisclaimer } from '@/components/BitcoinPublicDisclaimer';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -517,13 +518,17 @@ function FormView({
           </Alert>
         )}
 
-        <Alert>
-          <AlertTriangle className="size-4" />
-          <AlertDescription className="text-xs">
-            Bitcoin transactions are public, irreversible, and can take time to confirm. Your
-            on-chain wallet pays the network fee on top of your donation amount.
-          </AlertDescription>
-        </Alert>
+        <BitcoinPublicDisclaimer
+          tone="soft"
+          includeCashOutAdvice={false}
+          leadText="Donations are public and can be traced back to you."
+        />
+
+        <p className="text-center text-xs text-muted-foreground">
+          Bitcoin transactions are irreversible and can take time to confirm.
+          Your on-chain wallet pays the network fee on top of your donation
+          amount.
+        </p>
 
         <div className="flex gap-2">
           <Button variant="outline" onClick={onCancel} className="flex-1">
@@ -1160,6 +1165,15 @@ function ExternalPayView({
             )}
           </button>
         </div>
+
+        {/* Public-ledger notice — informational. Bitcoin is a public
+            ledger, so the donation can be traced back to the donor's
+            wallet. */}
+        <BitcoinPublicDisclaimer
+          tone="soft"
+          includeCashOutAdvice={false}
+          leadText="Donations are public and can be traced back to you."
+        />
 
         {/* Action buttons */}
         <div className="grid grid-cols-2 gap-2">

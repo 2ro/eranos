@@ -355,12 +355,12 @@ export const EXTRA_KINDS: ExtraKindDef[] = [
     showKey: 'showCommunities',
     feedKey: 'feedIncludeCommunities',
     extraFeedKinds: [9041],
-    label: 'Communities',
-    description: 'Flat communities with badge-based membership (NIP-72)',
+    label: 'Organizations',
+    description: 'Agora organizations with founder + moderator trust model (NIP-72)',
     route: 'communities',
     addressable: true,
     section: 'social',
-    blurb: 'Flat communities on Nostr with one member badge, explicit moderators, and community moderation.',
+    blurb: 'Organizations on Nostr with an explicit founder, listed moderators, and event-level moderation.',
   },
   {
     kind: 62,
@@ -608,7 +608,7 @@ const KIND_SPECIFIC_LABELS: Record<number, string> = {
   31990: 'app',
   30063: 'Zapstore release',
   3063: 'Zapstore asset',
-  36639: 'action',
+  36639: 'pledge',
 };
 
 /**

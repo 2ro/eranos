@@ -1810,8 +1810,8 @@ const KIND_HEADER_MAP: Record<number, KindHeaderConfig> = {
   },
   34550: {
     icon: Users,
-    action: (event) => publishedAtAction(event, { created: "created a", updated: "updated a", fallback: "shared a" }),
-    noun: "community",
+    action: (event) => publishedAtAction(event, { created: "created an", updated: "updated an", fallback: "shared an" }),
+    noun: "organization",
     nounRoute: "/communities",
   },
   30009: {
@@ -1898,9 +1898,9 @@ const KIND_HEADER_MAP: Record<number, KindHeaderConfig> = {
   },
   36639: {
     icon: Megaphone,
-    action: (event) => publishedAtAction(event, { created: "posted an", updated: "updated an", fallback: "posted an" }),
-    noun: "action",
-    nounRoute: "/actions",
+    action: (event) => publishedAtAction(event, { created: "created a", updated: "updated a", fallback: "created a" }),
+    noun: "pledge",
+    nounRoute: "/pledges",
   },
   39089: {
     icon: PartyPopper,

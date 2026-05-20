@@ -18,42 +18,27 @@ import {
 } from '@/lib/communityUtils';
 
 // ── Props ─────────────────────────────────────────────────────────────────────
+//
+// Only content-level bans remain. Agora's organization trust model has no
+// "member" tier any more, so banning a user wholesale is no longer
+// modeled — hide each unwanted post individually instead.
 
-interface BanContentProps {
-  /** Ban a specific post. */
-  mode: 'content';
+interface BanConfirmDialogProps {
   /** The event ID to ban. */
   eventId: string;
   /** The event author's pubkey. */
   targetPubkey: string;
-  /** Display name for the dialog description. */
-  displayName?: string;
-}
-
-interface BanMemberProps {
-  /** Ban a member. */
-  mode: 'member';
-  eventId?: never;
-  /** The pubkey of the member to ban. */
-  targetPubkey: string;
-  /** Display name for the dialog description. */
-  displayName?: string;
-}
-
-type BanMode = BanContentProps | BanMemberProps;
-
-type BanConfirmDialogProps = BanMode & {
   /** The community `A` tag coordinate. */
   communityATag: string;
+  /** Display name for the dialog description. */
+  displayName?: string;
   open: boolean;
   onOpenChange: (open: boolean) => void;
-};
+}
 
 export function BanConfirmDialog({
-  mode,
   eventId,
   targetPubkey,
-  displayName,
   communityATag,
   open,
   onOpenChange,
@@ -62,23 +47,15 @@ export function BanConfirmDialog({
   const { mutateAsync: publishEvent, isPending } = useNostrPublish();
   const [reason, setReason] = useState('');
 
-  const title = mode === 'content' ? 'Remove from community' : `Ban ${displayName ? `@${displayName}` : 'member'} from community`;
-  const description = mode === 'content'
-    ? 'This will hide the post from canonical community views.'
-    : `This will ban ${displayName ? `@${displayName}` : 'this member'} from the community. Their recruits remain unaffected.`;
-
   const handleSubmit = async () => {
     try {
-      const tags: string[][] = [];
-
-      if (mode === 'content' && eventId) {
-        tags.push(['e', eventId, 'other']);
-      }
-
-      tags.push(['p', targetPubkey, 'other']);
-      tags.push(['A', communityATag]);
-      tags.push(['L', MODERATION_LABEL_NAMESPACE]);
-      tags.push(['l', MODERATION_BAN_LABEL, MODERATION_LABEL_NAMESPACE]);
+      const tags: string[][] = [
+        ['e', eventId, 'other'],
+        ['p', targetPubkey, 'other'],
+        ['A', communityATag],
+        ['L', MODERATION_LABEL_NAMESPACE],
+        ['l', MODERATION_BAN_LABEL, MODERATION_LABEL_NAMESPACE],
+      ];
 
       await publishEvent({
         kind: REPORT_KIND,
@@ -87,36 +64,23 @@ export function BanConfirmDialog({
       });
 
       // Invalidate community queries so the moderation overlay updates
-      // immediately (removes banned content/members without a page refresh).
-      // The activity feed's key is `['community-activity-feed', <aTagsKey>]`
-      // where aTagsKey is a comma-joined list of the viewer's subscribed A
-      // tags. We match any feed whose aTagsKey contains this communityATag.
-      await Promise.all([
-        queryClient.invalidateQueries({ queryKey: ['community-members', communityATag] }),
-        queryClient.invalidateQueries({
-          predicate: (q) => {
-            const [root, aTagsKey] = q.queryKey;
-            return root === 'community-activity-feed'
-              && typeof aTagsKey === 'string'
-              && aTagsKey.split(',').includes(communityATag);
-          },
-        }),
-      ]);
+      // immediately (removes banned content without a page refresh).
+      await queryClient.invalidateQueries({ queryKey: ['community-members', communityATag] });
 
-      toast({ title: mode === 'content' ? 'Post removed from community' : 'Member banned from community' });
+      toast({ title: 'Post removed from organization' });
       setReason('');
       onOpenChange(false);
     } catch {
-      toast({ title: mode === 'content' ? 'Failed to remove post from community' : 'Failed to ban member from community', variant: 'destructive' });
+      toast({ title: 'Failed to remove post from organization', variant: 'destructive' });
     }
   };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-md rounded-2xl flex flex-col overflow-hidden">
-        <DialogTitle>{title}</DialogTitle>
+        <DialogTitle>Remove from organization</DialogTitle>
         <DialogDescription className="text-sm text-muted-foreground">
-          {description}
+          This will hide the post from canonical organization views.
         </DialogDescription>
 
         <div className="space-y-2">
@@ -146,7 +110,7 @@ export function BanConfirmDialog({
             disabled={isPending}
             className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
           >
-            {isPending ? 'Submitting...' : (mode === 'content' ? 'Remove' : 'Ban')}
+            {isPending ? 'Submitting...' : 'Remove'}
           </Button>
         </div>
       </DialogContent>

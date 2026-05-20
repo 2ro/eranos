@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { AlertTriangle, Check, Copy, ExternalLink } from 'lucide-react';
 
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { BitcoinPublicDisclaimer } from '@/components/BitcoinPublicDisclaimer';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -129,6 +130,15 @@ export function BeneficiaryDonatePanel({
           )}
         </button>
       </div>
+
+      {/* Privacy notice — informational only. Bitcoin is a public
+          ledger, so the donation can be traced back to the donor's
+          wallet. */}
+      <BitcoinPublicDisclaimer
+        tone="soft"
+        includeCashOutAdvice={false}
+        leadText="Donations are public and can be traced back to you."
+      />
 
       {/* Open in wallet — relies on the `bitcoin:` URI handler. */}
       <Button asChild className="w-full">

@@ -30,6 +30,13 @@ export interface FAQCategory {
   label: string;
   description?: string;
   items: FAQItem[];
+  /**
+   * If true, this category is excluded from the default `HelpFAQSection`
+   * render. Used for legacy items kept around so existing `HelpTip` call
+   * sites on other pages don't break, without exposing them in the public
+   * FAQ accordion.
+   */
+  hidden?: boolean;
 }
 
 // ── Data ──────────────────────────────────────────────────────────────────────
@@ -40,307 +47,218 @@ export interface FAQCategory {
  * and friends.
  */
 const FAQ_TEMPLATE: FAQCategory[] = [
-  // ── Getting Started ─────────────────────────────────────────────────────
+  // ── About Agora ─────────────────────────────────────────────────────────
   {
     id: 'getting-started',
-    label: 'Getting Started',
+    label: 'About Agora',
     items: [
       {
         id: 'what-is-ditto',
         question: 'What is {appName}?',
         answer: [
-          '{appName} is a social media platform built on Nostr \u2014 a new kind of open, decentralized network. Think of {appName} as the app you\'re using right now to connect with people, post, and discover content.',
-          'Because {appName} is built on Nostr, your account isn\'t locked to this site. You own your identity and can take it to any other Nostr app.',
+          '{appName} is a platform for sending on-chain Bitcoin donations directly to activists. There\'s no middleman, no payment processor, and no account that can be frozen.',
+          '{appName} is built on Nostr, so your identity isn\'t locked to this site \u2014 you own it.',
         ],
       },
       {
         id: 'what-is-nostr',
         question: 'What is Nostr?',
         answer: [
-          'Nostr is a new kind of social network where **you** own your account, not a company. Think of it like email \u2014 you can use different apps, but your identity stays the same. Nobody can ban you from the entire network.',
-          'Everything you post, every person you follow, and your entire identity is portable. You can take it with you anywhere. To learn more, check out [Nostr 101](https://soapbox.pub/blog/nostr101).',
-        ],
-      },
-      {
-        id: 'login-other-apps',
-        question: 'Can I log into other Nostr apps with my {appName} account?',
-        answer: [
-          'Yes! Your {appName} account **is** a Nostr account. You can use the same keys to log into any Nostr app \u2014 Primal, Damus, Amethyst, Coracle, and many more. Your posts, followers, and profile carry over everywhere.',
-          'Explore the full range of Nostr apps at [nostrapps.com](https://nostrapps.com/).',
+          'Nostr is an open network where **you** own your account, not a company. Your identity is a cryptographic key you control, not a username on someone else\'s server.',
+          'On {appName}, that same key is also what your donation address is derived from \u2014 which is why you can receive Bitcoin without signing up with anyone.',
         ],
       },
       {
         id: 'why-login-different',
         question: 'Why is my sign-in so different and long?',
         answer: [
-          'Instead of a username and password controlled by a company, Nostr uses a pair of cryptographic keys \u2014 like a really secure digital ID.',
-          'Your "public key" (starts with **npub**) is your username that everyone can see. Your "secret key" (starts with **nsec**) is your password. The long string of characters is what makes it virtually impossible to hack.',
+          'Instead of a username and password controlled by a company, Nostr uses a pair of cryptographic keys.',
+          'Your "public key" (starts with **npub**) is your username. Your "secret key" (starts with **nsec**) is your password. The long string is what makes it virtually impossible to guess.',
         ],
       },
       {
         id: 'lose-secret-key',
         question: 'What happens if I lose my secret key?',
         answer: [
-          '**There is no "forgot password" button.** No company stores your key or can reset it for you. If you lose it, your account is gone forever.',
-          'This is the tradeoff for true ownership \u2014 nobody can take your account away, but nobody can recover it either. **Save your secret key somewhere safe right now.** For tips on keeping your key safe, read [Managing Your Nostr Keys](https://soapbox.pub/blog/managing-nostr-keys).',
+          '**There is no "forgot password" button.** Nobody can reset it for you. If you lose it, your account \u2014 and any Bitcoin sitting at your donation address \u2014 is gone forever.',
+          '**Save your secret key somewhere safe right now.** For tips, read [Managing Your Nostr Keys](https://soapbox.pub/blog/managing-nostr-keys).',
         ],
       },
       {
         id: 'manage-secret-key',
         question: 'Can I save my secret key in my phone\'s password manager?',
         answer: [
-          'Yes! You can save it in your device\'s password manager (like iCloud Keychain, 1Password, or Bitwarden). On iPhone, if you save it correctly in Passwords, you can even use Face ID or Touch ID to log in.',
-          'For a full guide on the best ways to store and manage your keys, check out [Managing Your Nostr Keys](https://soapbox.pub/blog/managing-nostr-keys).',
+          'Yes. You can save it in your device\'s password manager (iCloud Keychain, 1Password, Bitwarden, etc.). On iPhone, saving it in Passwords lets you use Face ID or Touch ID to log in.',
+          'For a full guide, see [Managing Your Nostr Keys](https://soapbox.pub/blog/managing-nostr-keys).',
         ],
       },
       {
         id: 'cost-to-use',
         question: 'Does {appName} cost anything?',
         answer: [
-          '**Nope!** {appName} is completely free to use. Zaps (tips) are optional and just for fun. There are no premium tiers, no paywalls, no hidden fees.',
+          '**No.** {appName} takes no platform fee. When you donate, you pay only the Bitcoin network fee that goes to miners \u2014 not to us.',
         ],
       },
       {
-        id: 'beginner-guide',
-        question: 'Is there a step-by-step guide for getting started?',
+        id: 'who-made-this',
+        question: 'Who made {appName}?',
         answer: [
-          'You\'re looking at it! This Help section covers everything you need. Start by saving your secret key, then explore your feed, follow some people, and try posting.',
-          'Don\'t worry about getting everything perfect \u2014 you can always come back here.',
+          '{appName} is built by [Soapbox](https://soapbox.pub), an open-source team building tools for the Nostr ecosystem.',
         ],
       },
     ],
   },
 
-  // ── Apps & Access ───────────────────────────────────────────────────────
-  {
-    id: 'apps-access',
-    label: 'Apps & Access',
-    items: [
-      {
-        id: 'download-app',
-        question: 'Can I download this on the App Store or Google Play?',
-        answer: [
-          'This site works as a web app right from your browser \u2014 no download needed! You can also "Add to Home Screen" on your phone to get an app-like experience.',
-          'On Android, you can download {appName} from [Zap Store](https://zapstore.dev/apps/spot.agora.app), a community-driven app store for the Nostr ecosystem. iOS support is planned for the future \u2014 stay tuned!',
-        ],
-      },
-      {
-        id: 'one-account-many-apps',
-        question: 'Can I use my account on other apps?',
-        answer: [
-          'Yes! That\'s one of the best things about Nostr. Your account isn\'t locked to any single app.',
-          'You can take your keys to Primal, Damus, Amethyst, Coracle, or any other Nostr app and everything carries over \u2014 your posts, your followers, all of it.',
-        ],
-      },
-      {
-        id: 'nostr-app-store',
-        question: 'Is there a Nostr-specific app store?',
-        answer: [
-          'Yes! [Zap Store](https://zapstore.dev/) is a community-driven app store built specifically for the Nostr ecosystem. You can discover and download Nostr apps, and the apps are verified by the community rather than a corporation. {appName} is listed there \u2014 [get it on Zap Store](https://zapstore.dev/apps/spot.agora.app).',
-          'You can also browse a directory of Nostr apps at [nostrapps.com](https://nostrapps.com/).',
-        ],
-      },
-    ],
-  },
-
-  // ── Payments & Zaps ─────────────────────────────────────────────────────
+  // ── Bitcoin Donations on Agora ──────────────────────────────────────────
+  // Merged section combining the practical "how it works" Q&A with the
+  // "why we designed it this way" rationale. On-chain only — Lightning and
+  // zap content is intentionally absent.
   {
     id: 'payments',
-    label: 'Payments & Zaps',
+    label: 'Bitcoin Donations on Agora',
     items: [
-      {
-        id: 'what-are-zaps',
-        question: 'What are zaps?',
-        answer: [
-          'Zaps are tips! They let you send tiny amounts of Bitcoin to someone as a way of saying "great post" or "thanks."',
-          'Think of it like a super-powered Like button that actually sends real money. They use the Lightning Network, which makes them instant and nearly free. To learn more, check out [Understanding Zaps](https://nostr.how/en/zaps).',
-        ],
-      },
       {
         id: 'send-bitcoin-onchain',
         question: 'How does sending Bitcoin work?',
         answer: [
-          'This sends real Bitcoin on-chain, using your Nostr key as your wallet \u2014 no separate account, no top-up.',
-          'Your send pays a small network fee to miners so the transaction gets confirmed. Faster confirmation costs a bit more; {appName} picks a sensible default.',
-          'Once broadcast, it\'s public and irreversible. The creator\'s post gets tagged so they know the Bitcoin came from you.',
-        ],
-      },
-      {
-        id: 'send-bitcoin-lightning',
-        question: 'How does sending Bitcoin over Lightning work?',
-        answer: [
-          'Lightning is a faster, cheaper layer built on top of Bitcoin. Payments settle in seconds and fees are usually fractions of a cent.',
-          'You\'ll pay from your connected Lightning wallet. The creator receives the Bitcoin right away, and the payment is attached to their post as a zap so everyone can see the support.',
-          'To learn more, check out [Understanding Zaps](https://nostr.how/en/zaps).',
+          'You send real Bitcoin on-chain directly to the activist. Your Nostr key is your wallet \u2014 no separate account, no top-up.',
+          'You pay a small network fee to miners so the transaction gets confirmed. Once broadcast, it\'s public and irreversible.',
         ],
       },
       {
         id: 'connect-wallet',
-        question: 'How do I connect a wallet?',
+        question: 'What is the wallet on {appName}?',
         answer: [
-          'To send or receive zaps, you need a Lightning wallet. Great options for beginners include [Alby](https://getalby.com/), [Zeus](https://zeusln.com/), and [Wallet of Satoshi](https://www.walletofsatoshi.com/).',
-          'Once you have one, add your Lightning address to your profile settings, and you\'re ready to go.',
+          'Your {appName} wallet is an on-chain Bitcoin address derived from your Nostr key. There\'s nothing to sign up for \u2014 it exists the moment you have an account.',
+          'Donations sent to you arrive at that address. To spend them, see the **Activist Guide**.',
         ],
       },
       {
-        id: 'only-bitcoin',
-        question: 'Can I only use Bitcoin, or can I use regular money?',
+        id: 'donations-are-public-general',
+        question: 'Are donations on {appName} public?',
         answer: [
-          'Zaps use Bitcoin\'s Lightning Network. If you don\'t have Bitcoin, you can skip zaps entirely \u2014 they\'re completely optional.',
-          'If you\'re curious, most Lightning wallets let you buy small amounts of Bitcoin right inside the app.',
+          'Yes. Every donation \u2014 given or received \u2014 is recorded on the public Bitcoin blockchain and on Nostr. Anyone can see the amounts, the timing, and the addresses involved.',
+          'Read the **Donor Guide** and **Activist Guide** for what this means in practice and how to protect your privacy if you need to.',
+        ],
+      },
+      {
+        id: 'censorship-resistance',
+        question: 'What does "censorship-resistant" mean here?',
+        answer: [
+          'No company sits between a donor and an activist. {appName} doesn\'t hold the funds and can\'t freeze the address.',
+          'As long as the Bitcoin network is running, donations can be sent and received. {appName} itself going offline wouldn\'t stop them.',
+        ],
+      },
+      {
+        id: 'why-onchain',
+        question: 'Why on-chain Bitcoin?',
+        answer: [
+          'On-chain Bitcoin is the most widely supported and censorship-resistant payment rail in the world. Every Bitcoin wallet can send it.',
+          'It requires **zero extra setup** for activists once they have a Nostr account, and **zero extra setup** for donors who already hold Bitcoin. That accessibility is what makes {appName} actually viable for normal people to use every day.',
+          'The tradeoff is that on-chain transactions are public and pay a miner fee. The Donor and Activist guides explain how to handle both.',
+        ],
+      },
+      {
+        id: 'why-not-lightning',
+        question: 'Why doesn\'t {appName} use Lightning?',
+        answer: [
+          'Lightning requires a Lightning wallet. The easiest ones (Wallet of Satoshi, Strike, Breez) are **custodial** \u2014 a company holds the funds and can be shut down, geo-blocked, or pressured into freezing accounts. Non-custodial Lightning is technically demanding and unreliable for newcomers.',
+          'We want {appName} to work for someone whose only Bitcoin experience is a regular consumer app like Cash App, Coinbase, Strike, Venmo, or PayPal. On-chain Bitcoin works with every wallet on the planet.',
+        ],
+      },
+      {
+        id: 'why-not-silent-payments',
+        question: 'Why doesn\'t {appName} use silent payments?',
+        answer: [
+          'Silent payments only work when the **sender\'s** wallet supports them. Most popular consumer apps \u2014 Cash App, Coinbase, Strike, Venmo, PayPal, and nearly every custodial wallet \u2014 do not.',
+          'Asking donors to install new software is a barrier we won\'t put in front of activists who need support.',
+        ],
+      },
+      {
+        id: 'why-not-rotating-addresses',
+        question: 'Why doesn\'t {appName} generate a new address for every donation?',
+        answer: [
+          'Doing this would require {appName} to act as a money-exchanging middleman \u2014 taking custody of the Bitcoin first and then forwarding it on to the activist.',
+          'That would make us a money transmitter, subject to the regulations that come with that, and a single point of failure: shut down {appName}\'s server and you\'ve shut down every donation flowing through it.',
+          'Instead, each user\'s donation address is derived from their Nostr public key. Donors send directly to the activist, {appName} never touches the funds, and the platform itself can\'t be turned off to censor anyone.',
+        ],
+      },
+      {
+        id: 'why-not-other-crypto',
+        question: 'Why not Monero or another cryptocurrency?',
+        answer: [
+          'Bitcoin is by far the most widely adopted cryptocurrency. That means it\'s the easiest for donors to buy and send, and the easiest for activists to receive, hold, and spend.',
+          'Privacy-focused coins like Monero solve some problems on-chain Bitcoin doesn\'t, but they\'re unsupported by most consumer apps and harder to convert back to local currency. Asking either side of a donation to first acquire a niche cryptocurrency is a barrier {appName} won\'t put in the way.',
         ],
       },
     ],
   },
 
-  // ── Content & Safety ────────────────────────────────────────────────────
+  // ── Hidden legacy items ─────────────────────────────────────────────────
+  // Kept so existing HelpTip call sites on other pages don't break, but
+  // excluded from the visible FAQ. {appName} is on-chain only; Lightning,
+  // zaps, and the network/safety topics aren't part of the public help
+  // content right now.
   {
-    id: 'content-safety',
-    label: 'Content & Safety',
+    id: 'legacy',
+    label: 'Legacy',
+    hidden: true,
     items: [
       {
-        id: 'fyp',
-        question: 'Will I have a "For You" page? How do I make my feed relevant?',
+        id: 'send-bitcoin-lightning',
+        question: 'How does sending Bitcoin over Lightning work?',
         answer: [
-          'Your feed shows posts from people you follow \u2014 there\'s no algorithm deciding what you see. The more people you follow, the better your feed gets.',
-          'Use the "Trends" page to discover popular content, and check out Follow Packs (curated groups of people) to quickly fill your feed with interesting voices.',
+          'If a recipient has a Lightning address on their profile, you can send to that. Lightning settles in seconds and fees are tiny.',
+          'Lightning sends don\'t use {appName}\'s donation address \u2014 they go straight to whatever Lightning wallet the recipient set up themselves. {appName}\'s own donation flow is on-chain only.',
+        ],
+      },
+      {
+        id: 'what-are-zaps',
+        question: 'What are zaps?',
+        answer: [
+          'Zaps are small Lightning tips on Nostr, separate from {appName}\'s on-chain donation flow.',
+        ],
+      },
+      {
+        id: 'fyp',
+        question: 'How does the feed work?',
+        answer: [
+          'Your feed shows campaigns and posts from people you follow. There\'s no algorithm deciding what you see.',
         ],
       },
       {
         id: 'what-are-relays',
         question: 'What are relays?',
         answer: [
-          'Relays are the servers that store and deliver your posts. Think of them like different mail carriers \u2014 your messages get sent through them to reach other people.',
-          'You don\'t need to think about relays to use Nostr; the defaults work great. But if you\'re curious, you can add or remove relays in Settings > Network.',
-          'Using multiple relays means your content is backed up in more places, making it harder for anyone to silence you. To dive deeper, read [Understanding Nostr Relays](https://nostr.how/en/relays).',
+          'Relays are the servers that store and deliver Nostr events \u2014 posts, donation receipts, profile info. The defaults work out of the box; you can add or remove relays in Settings > Network.',
         ],
       },
       {
         id: 'what-are-blossom',
         question: 'What are Blossom servers?',
         answer: [
-          'Blossom servers are where your media files (photos, videos, audio) get stored when you upload them. Think of them like cloud storage for your files.',
-          'Different Blossom servers are run by different people in different places. You can manage which servers you use in Settings > Network. To learn more about how Blossom works, read [The Blossom Protocol](https://onnostr.substack.com/p/the-blossom-protocol-supercharging).',
-        ],
-      },
-      {
-        id: 'media-content',
-        question: 'What happens to media I upload? Can it be removed?',
-        answer: [
-          'When you upload media to Nostr, it gets stored on a Blossom server. That server has the right to remove any content for any reason, including based on the laws of their region.',
-          'This is why it\'s important to use multiple Blossom servers, manage your server connections, and make informed choices about where you store your data.',
+          'Blossom servers store media files (campaign images, profile pictures) when you upload them. You can manage which servers you use in Settings > Network.',
         ],
       },
       {
         id: 'report-content',
         question: 'How do I report harmful content?',
         answer: [
-          'To report a post, tap the three-dot menu (**...**) on any post and select "Report." You can also mute or block individual users from the same menu.',
-          'Because Nostr is decentralized, there\'s no single company reviewing reports \u2014 but relay operators can choose to remove content from their servers, and your mute list keeps your feed clean for you.',
-        ],
-      },
-      {
-        id: 'terms-of-service',
-        question: 'Are there terms of service I need to agree to?',
-        answer: [
-          'Nostr itself is a protocol (like email or the web) \u2014 it doesn\'t have terms of service. Individual relays and apps may have their own rules.',
-          'Since no single entity controls the network, the community largely self-moderates. Think of it less like a walled garden and more like the open internet.',
-        ],
-      },
-    ],
-  },
-
-  // ── Profile & Identity ───────────────────────────────────────────────────
-  {
-    id: 'profile-identity',
-    label: 'Profile & Identity',
-    items: [
-      {
-        id: 'profile-fields',
-        question: 'What are profile fields?',
-        answer: [
-          'Profile fields let you add extra info to your profile sidebar — like links, wallet addresses, music, photos, videos, and more. They\'re a way to express yourself and share what matters to you.',
-          'You can add fields from the profile settings page. Each field has a **label** (what it\'s called) and a **value** (the content). For media fields, you can upload files directly and they\'ll render as players or embeds on your profile.',
-        ],
-      },
-      {
-        id: 'profile-fields-music',
-        question: 'What audio formats can I upload for music fields?',
-        answer: [
-          'You can upload audio files in these formats: **MP3**, **OGG**, **WAV**, **FLAC**, **AAC**, **M4A**, and **Opus**. They\'ll appear as a mini audio player on your profile sidebar.',
-        ],
-      },
-      {
-        id: 'profile-fields-media',
-        question: 'What image and video formats are supported?',
-        answer: [
-          'For images: **JPG**, **PNG**, **GIF**, **WebP**, **SVG**, and **AVIF**. For video: **MP4**, **WebM**, and **MOV**.',
-          'Images will display as linked thumbnails, and videos will be embedded inline on your profile.',
-        ],
-      },
-    ],
-  },
-
-  // ── Why is this different from Big Tech? ────────────────────────────────
-  {
-    id: 'big-tech',
-    label: 'Why Is This Different from Big Tech?',
-    items: [
-      {
-        id: 'why-different',
-        question: 'How is this different from Instagram, X, or Facebook?',
-        answer: [
-          'On traditional social media, a company owns your account, controls what you see, and can delete your profile at any time.',
-          'On Nostr, **you** own your identity. No company can lock you out, shadowban you, or shut down your account. Your followers, your posts, and your identity belong to you \u2014 not a corporation. We take this seriously \u2014 read our [ethics pledge](https://soapbox.pub/ethics) to see what we stand for.',
+          'Tap the three-dot menu (**...**) on any post and select "Report." You can mute or block users from the same menu.',
         ],
       },
       {
         id: 'vs-mastodon-bluesky',
-        question: 'How is this different from Mastodon or Bluesky?',
+        question: 'How is Nostr different from Mastodon or Bluesky?',
         answer: [
-          'Mastodon and Bluesky are also alternatives to Big Tech, but they work very differently from Nostr. On Mastodon, your account is tied to a specific server \u2014 if that server shuts down or bans you, you lose your account and have to start over. On Bluesky, the network is technically decentralized but in practice almost everyone depends on a single company (bsky.social), which can block entire servers.',
-          'Nostr is different because your identity is a cryptographic key that **you** control. It\'s not tied to any server, company, or app. No one can delete your account, and you can switch between apps freely while keeping your followers and posts.',
-          'The good news is you don\'t have to choose just one \u2014 bridges like Mostr let you follow people across all three networks. For a deeper comparison, check out [Nostr vs. Fediverse vs. Bluesky](https://soapbox.pub/blog/comparing-protocols).',
+          'On Mastodon, your account lives on a specific server. On Bluesky, most accounts depend on one company. On Nostr, your identity is a key you control, and your donation address goes with you to any Nostr app.',
         ],
       },
       {
-        id: 'what-is-decentralization',
-        question: 'What does "decentralized" actually mean?',
+        id: 'profile-fields',
+        question: 'What are profile fields?',
         answer: [
-          'It means there\'s no single company or server running everything. Nostr is a network of independent relays and apps, all speaking the same language.',
-          'If one relay goes down or kicks you off, your account still works everywhere else. It\'s like the difference between one company owning all the roads vs. having thousands of independent roads anyone can build and use. For more on why this matters, read [The Future Is Decentralized](https://soapbox.pub/blog/future-is-decentralized).',
-        ],
-      },
-      {
-        id: 'censorship-resistance',
-        question: 'What does "censorship-resistant" mean?',
-        answer: [
-          'It means no single person, company, or government can stop you from posting.',
-          'On traditional platforms, one decision by a content moderation team can erase your entire online presence. On Nostr, as long as there\'s at least one relay willing to host your content, you can keep posting. You may lose reach on some relays, but you can never be fully silenced.',
-        ],
-      },
-      {
-        id: 'open-source',
-        question: 'What does "open source" mean, and why does it matter?',
-        answer: [
-          'Open source means the code that powers this app is publicly available for anyone to read, verify, and improve. There are no hidden algorithms, no secret data collection, and no backdoors.',
-          'Anyone can check exactly what the software does. It\'s the digital equivalent of a restaurant with a glass kitchen \u2014 nothing to hide. You can browse the [{appName} source code](https://gitlab.com/soapbox-pub/agora-3) yourself.',
-        ],
-      },
-      {
-        id: 'self-host',
-        question: 'Can I self-host {appName}?',
-        answer: [
-          'Yes! Because {appName} is open source, anyone can run their own instance. You get full control over your server, your data, and your community.',
-          'If you\'re interested, check out the project README for self-hosting and deployment steps.',
-        ],
-      },
-      {
-        id: 'who-made-this',
-        question: 'Who made this?',
-        answer: [
-          'This platform is built by [Soapbox](https://soapbox.pub), a team of developers who believe social media should be owned by its users, not corporations.',
-          'Soapbox builds open-source tools for the Nostr ecosystem. You can learn more about the team and their mission at [soapbox.pub](https://soapbox.pub).',
+          'Profile fields let you add extra info to your profile \u2014 links, wallet addresses, music, photos, videos.',
         ],
       },
     ],
@@ -404,3 +322,193 @@ export function getFAQItem(appName: string, itemId: string): FAQItem | undefined
  * canonical constant directly.
  */
 export { TEAM_SOAPBOX as TEAM_SOAPBOX_PACK } from '@/lib/agoraDefaults';
+
+// ── Donor / Activist guide content ────────────────────────────────────────────
+
+/**
+ * A single section inside a long-form guide page (Donor Guide / Activist
+ * Guide). Each section renders as a Card on the guide page.
+ *
+ * `paragraphs` accept the same inline markup as FAQ answers (**bold** and
+ * [link](url)), rendered by `renderInlineMarkup` from `@/lib/helpMarkup`.
+ *
+ * `pros` / `cons` are optional and render as a bullet pair underneath the
+ * paragraphs. They are used for tradeoff-heavy topics like cash-out methods.
+ */
+export interface GuideSection {
+  /** Stable key, used for React keys and potential deep-linking. */
+  id: string;
+  /** Section heading. */
+  heading: string;
+  /** Body paragraphs, in order. */
+  paragraphs: string[];
+  /** Optional positives, rendered as a green-flavored bullet list. */
+  pros?: string[];
+  /** Optional negatives / caveats, rendered as an amber-flavored bullet list. */
+  cons?: string[];
+}
+
+const DONOR_GUIDE_TEMPLATE: GuideSection[] = [
+  {
+    id: 'how-donating-works',
+    heading: 'How donating works',
+    paragraphs: [
+      'You send real Bitcoin on-chain directly to the activist. {appName} doesn\'t hold or route the money \u2014 the address you\'re paying is derived from the activist\'s Nostr key, so there\'s no middleman in between.',
+      'You pay a small network fee to Bitcoin miners. Once the transaction is broadcast, it\'s public and irreversible.',
+    ],
+  },
+  {
+    id: 'why-public',
+    heading: 'Why your donation is public',
+    paragraphs: [
+      'Bitcoin is a public ledger. Anyone can look up an activist\'s address and see every donation \u2014 the amount, the time, and the address it came from.',
+      'Your sending address can usually be traced back to wherever you bought the Bitcoin \u2014 a consumer app like Cash App, Coinbase, Strike, Venmo, PayPal, Kraken, or Binance. That link is what ties a donation to your real identity.',
+    ],
+  },
+  {
+    id: 'privacy-non-kyc',
+    heading: 'For privacy: use non-KYC Bitcoin',
+    paragraphs: [
+      'Buy Bitcoin peer-to-peer so it isn\'t linked to your government ID. [Bisq](https://bisq.network) and [HodlHodl](https://hodlhodl.com) let you trade on-chain Bitcoin directly with another person. [RoboSats](https://learn.robosats.com) is Lightning-only, so you\'d swap to Lightning with [Boltz](https://boltz.exchange) and then receive on RoboSats.',
+    ],
+    pros: ['No exchange knows who you are.', 'Strongest privacy starting point.'],
+    cons: ['Slower and harder than a consumer app.', 'Requires finding a counterparty.'],
+  },
+  {
+    id: 'privacy-coinjoin',
+    heading: 'For privacy: coinjoin before donating',
+    paragraphs: [
+      'A coinjoin mixes your Bitcoin with other people\'s coins so the output can\'t be linked back to the input. Wallets like [Wasabi](https://wasabiwallet.io), [Sparrow](https://sparrowwallet.com), and [JoinMarket](https://github.com/JoinMarket-Org/joinmarket-clientserver) support this.',
+    ],
+    pros: ['Breaks the on-chain trail from your KYC purchase.', 'Non-custodial \u2014 you keep your keys.'],
+    cons: ['Costs fees and takes time.', 'Fewer maintained tools after the Samourai shutdown.'],
+  },
+  {
+    id: 'fresh-wallet',
+    heading: 'Use a fresh wallet',
+    paragraphs: [
+      'Donate from a wallet that has never touched a KYC exchange or your main identity. Even one shared transaction input can link the wallet back to you.',
+      'Free options include [Sparrow](https://sparrowwallet.com) on desktop and [BlueWallet](https://bluewallet.io) on mobile.',
+    ],
+  },
+  {
+    id: 'vary-amounts',
+    heading: 'Vary amounts and timing',
+    paragraphs: [
+      'Round numbers ($50, $100) and recurring donations create a pattern that\'s easy to fingerprint. Send unusual amounts at irregular times if you want to be harder to track.',
+    ],
+  },
+  {
+    id: 'what-consumer-apps-cant-do',
+    heading: 'What consumer apps can\'t do',
+    paragraphs: [
+      'Consumer apps like Cash App, Coinbase, Strike, Venmo, and PayPal are convenient, but they require ID verification and tie every transaction to your real identity. They can\'t make a donation truly anonymous, no matter how you send it.',
+      'If anonymity matters to you, use a non-custodial wallet you control.',
+    ],
+  },
+];
+
+const ACTIVIST_GUIDE_TEMPLATE: GuideSection[] = [
+  {
+    id: 'how-receiving-works',
+    heading: 'How receiving works',
+    paragraphs: [
+      'Your {appName} donation address is derived from your Nostr public key. Donors send on-chain Bitcoin directly to it. No one stands between you and the funds, and no server can be shut down to stop the donations.',
+    ],
+  },
+  {
+    id: 'why-public',
+    heading: 'Why incoming donations are public',
+    paragraphs: [
+      'Bitcoin is a public ledger. Anyone can look up your address and see every donation \u2014 the amount, the time, and the sending address. Your supporters\' addresses are visible too.',
+    ],
+  },
+  {
+    id: 'dont-keep-funds',
+    heading: 'Don\'t keep funds at your {appName} address',
+    paragraphs: [
+      'Move funds to a wallet you control as soon as practical. Treat your {appName} address like a mailbox, not a savings account.',
+      'Good self-custody wallets to move funds into: [Sparrow](https://sparrowwallet.com), [BlueWallet](https://bluewallet.io), or [Phoenix](https://phoenix.acinq.co) (Lightning).',
+    ],
+  },
+  {
+    id: 'cashout-overview',
+    heading: 'Cashing out privately \u2014 overview',
+    paragraphs: [
+      'To spend donations without revealing who you are, you have to break the on-chain trail before converting to cash. The next sections cover the main paths. Each has tradeoffs in custody, privacy, difficulty, and fees.',
+    ],
+  },
+  {
+    id: 'cashout-lightning-swap',
+    heading: 'Lightning swap (Boltz, Bolt.exchange)',
+    paragraphs: [
+      'Services like [Boltz](https://boltz.exchange) atomic-swap your on-chain Bitcoin into Lightning. Lightning payments are private by default \u2014 they don\'t appear on the public blockchain.',
+    ],
+    pros: ['Instant and non-custodial.', 'Lightning payments aren\'t publicly traceable.'],
+    cons: ['Per-swap limits and swap fees.', 'Depends on the swap service being online.'],
+  },
+  {
+    id: 'cashout-coinjoin',
+    heading: 'Coinjoin',
+    paragraphs: [
+      'A coinjoin mixes your Bitcoin with other users\' coins so the output can\'t be linked to the input. [Wasabi](https://wasabiwallet.io) and [JoinMarket](https://github.com/JoinMarket-Org/joinmarket-clientserver) are the main maintained options after the Samourai shutdown.',
+    ],
+    pros: ['Strong on-chain unlinkability.', 'Non-custodial.'],
+    cons: ['Fees and wait time.', 'Steeper learning curve than a swap.'],
+  },
+  {
+    id: 'cashout-p2p',
+    heading: 'Peer-to-peer exchange',
+    paragraphs: [
+      'Trade Bitcoin for fiat directly with another person. [Bisq](https://bisq.network) and [HodlHodl](https://hodlhodl.com) trade on-chain Bitcoin. [RoboSats](https://learn.robosats.com) is Lightning-only \u2014 swap your on-chain Bitcoin to Lightning first with [Boltz](https://boltz.exchange), then sell on RoboSats. No exchange records your identity either way.',
+    ],
+    pros: ['Cash in hand without KYC.', 'No central exchange knows you.'],
+    cons: ['Slower than an exchange.', 'Requires a willing counterparty.', 'Some learning curve.'],
+  },
+  {
+    id: 'cashout-tumblers',
+    heading: 'Tumblers and centralized mixers',
+    paragraphs: [
+      '**Generally not recommended.** Centralized tumblers are custodial \u2014 you have to trust the operator not to steal your coins or log who sent what. Many are scams or law-enforcement honeypots.',
+      'Coinjoin is the non-custodial alternative and is almost always the better choice.',
+    ],
+  },
+  {
+    id: 'cashout-comparison',
+    heading: 'Quick comparison',
+    paragraphs: [
+      '**Lightning swap (Boltz):** non-custodial \u00b7 medium privacy \u00b7 easy \u00b7 low fees.',
+      '**Coinjoin (Wasabi, JoinMarket):** non-custodial \u00b7 high privacy \u00b7 medium difficulty \u00b7 medium fees.',
+      '**Peer-to-peer (Bisq, HodlHodl, RoboSats via Boltz):** non-custodial \u00b7 high privacy \u00b7 harder \u00b7 variable fees.',
+      '**Tumblers:** custodial \u00b7 unpredictable privacy \u00b7 easy \u00b7 high risk. **Avoid.**',
+    ],
+  },
+  {
+    id: 'donors-can-be-seen',
+    heading: 'Your donation history is visible to future supporters',
+    paragraphs: [
+      'Anyone considering supporting you can look up your address and see the full donation history. Keep in mind how that history reads to a new donor.',
+    ],
+  },
+];
+
+/** Substitute placeholders in a single guide section. */
+function substituteGuideSection(section: GuideSection, appName: string): GuideSection {
+  return {
+    ...section,
+    heading: substitute(section.heading, appName),
+    paragraphs: section.paragraphs.map((p) => substitute(p, appName)),
+    pros: section.pros?.map((p) => substitute(p, appName)),
+    cons: section.cons?.map((c) => substitute(c, appName)),
+  };
+}
+
+/** Donor guide sections with `{appName}` resolved. */
+export function getDonorGuideSections(appName: string): GuideSection[] {
+  return DONOR_GUIDE_TEMPLATE.map((s) => substituteGuideSection(s, appName));
+}
+
+/** Activist guide sections with `{appName}` resolved. */
+export function getActivistGuideSections(appName: string): GuideSection[] {
+  return ACTIVIST_GUIDE_TEMPLATE.map((s) => substituteGuideSection(s, appName));
+}

@@ -46,6 +46,7 @@ const BooksPage = lazy(() => import("./pages/BooksPage").then(m => ({ default: m
 const ChangelogPage = lazy(() => import("./pages/ChangelogPage").then(m => ({ default: m.ChangelogPage })));
 const CommunitiesPage = lazy(() => import("./pages/CommunitiesPage").then(m => ({ default: m.CommunitiesPage })));
 const CreateCommunityPage = lazy(() => import("./pages/CreateCommunityPage").then(m => ({ default: m.CreateCommunityPage })));
+const CreateEventPage = lazy(() => import("./pages/CreateEventPage").then(m => ({ default: m.CreateEventPage })));
 const ContentPage = lazy(() => import("./pages/ContentPage").then(m => ({ default: m.ContentPage })));
 const ContentSettingsPage = lazy(() => import("./pages/ContentSettingsPage").then(m => ({ default: m.ContentSettingsPage })));
 const CSAEPolicyPage = lazy(() => import("./pages/CSAEPolicyPage").then(m => ({ default: m.CSAEPolicyPage })));
@@ -57,6 +58,8 @@ const GeotagPage = lazy(() => import("./pages/GeotagPage").then(m => ({ default:
 const HashtagPage = lazy(() => import("./pages/HashtagPage").then(m => ({ default: m.HashtagPage })));
 const MySquarePage = lazy(() => import("./pages/MySquarePage").then(m => ({ default: m.MySquarePage })));
 const HelpPage = lazy(() => import("./pages/HelpPage").then(m => ({ default: m.HelpPage })));
+const DonorGuidePage = lazy(() => import("./pages/DonorGuidePage").then(m => ({ default: m.DonorGuidePage })));
+const ActivistGuidePage = lazy(() => import("./pages/ActivistGuidePage").then(m => ({ default: m.ActivistGuidePage })));
 const KindFeedPage = lazy(() => import("./pages/KindFeedPage").then(m => ({ default: m.KindFeedPage })));
 const LetterComposePage = lazy(() => import("./pages/LetterComposePage").then(m => ({ default: m.LetterComposePage })));
 const LetterPreferencesPage = lazy(() => import("./pages/LetterPreferencesPage").then(m => ({ default: m.LetterPreferencesPage })));
@@ -201,6 +204,7 @@ export function AppRouter() {
             <Route path="/settings/network" element={<NetworkSettingsPage />} />
             <Route path="/lists" element={<UserListsPage />} />
             <Route path="/events" element={<EventsFeedPage />} />
+            <Route path="/events/new" element={<CreateEventPage />} />
             <Route path="/photos" element={<PhotosFeedPage />} />
             <Route path="/videos" element={<VideosFeedPage />} />
             {/* /streams redirects to /videos for backward compatibility */}
@@ -301,6 +305,8 @@ export function AppRouter() {
             <Route path="/letters/compose" element={<LetterComposePage />} />
             <Route path="/settings/letters" element={<LetterPreferencesPage />} />
             <Route path="/help" element={<HelpPage />} />
+            <Route path="/help/donors" element={<DonorGuidePage />} />
+            <Route path="/help/activists" element={<ActivistGuidePage />} />
             <Route path="/privacy" element={<PrivacyPolicyPage />} />
             <Route path="/safety" element={<CSAEPolicyPage />} />
             <Route path="/changelog" element={<ChangelogPage />} />
@@ -312,6 +318,8 @@ export function AppRouter() {
             <Route path="/i/*" element={<ExternalContentPage />} />
             <Route path="/actions" element={<ActionsPage />} />
             <Route path="/actions/new" element={<CreateActionPage />} />
+            <Route path="/pledges" element={<ActionsPage />} />
+            <Route path="/pledges/new" element={<CreateActionPage />} />
             <Route path="/agent" element={<AIChatPage />} />
             <Route path="/organizers" element={<OrganizersPage />} />
             <Route path="/dashboard" element={<EventDashboardPage />} />
