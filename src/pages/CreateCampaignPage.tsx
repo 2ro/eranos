@@ -603,12 +603,12 @@ export function CreateCampaignPage() {
               maxLength={200}
               required
             />
-            <p className="text-xs text-muted-foreground">
-              URL preview:{' '}
-              <span className="font-mono text-foreground">
-                /{activeIdentifier || 'your-campaign-title'}
+            <p className="text-xs text-muted-foreground flex items-baseline gap-1 min-w-0">
+              <span className="shrink-0">URL preview:</span>
+              <span className="font-mono text-foreground truncate min-w-0">
+                /{activeIdentifier || 'your-campaign-title'}{!isEditMode && derivedIdentifier.length >= 64 && '...'}
               </span>
-              {isEditMode && ' (kept from original)'}
+              {isEditMode && <span className="shrink-0">(kept from original)</span>}
             </p>
           </FormSection>
 

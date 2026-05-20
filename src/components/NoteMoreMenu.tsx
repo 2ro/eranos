@@ -520,11 +520,11 @@ function NoteMoreMenuContent({ event, open, onOpenChange, communityContext, onRe
                 <span className="text-muted-foreground shrink-0">·</span>
                 <span className="text-muted-foreground shrink-0 text-xs">{timeAgo(event.created_at)}</span>
               </div>
-              <div className="mt-0.5 text-sm text-muted-foreground line-clamp-3 max-h-[4.5em] overflow-hidden">
+              <div className="mt-0.5 text-sm text-muted-foreground line-clamp-3 overflow-wrap-anywhere">
                 {/^[A-Za-z0-9+/=_-]{20,}$/.test(event.content.trim()) ? (
                   <span className="italic">Encrypted content</span>
                 ) : (
-                  <NoteContent event={event} className="text-sm leading-relaxed" disableEmbeds />
+                  <NoteContent event={event} className="text-sm leading-snug whitespace-normal" disableEmbeds disableNoteEmbeds as="span" />
                 )}
               </div>
             </div>
