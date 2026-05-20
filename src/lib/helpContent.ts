@@ -30,6 +30,13 @@ export interface FAQCategory {
   label: string;
   description?: string;
   items: FAQItem[];
+  /**
+   * If true, this category is excluded from the default `HelpFAQSection`
+   * render. Used for legacy items kept around so existing `HelpTip` call
+   * sites on other pages don't break, without exposing them in the public
+   * FAQ accordion.
+   */
+  hidden?: boolean;
 }
 
 // ── Data ──────────────────────────────────────────────────────────────────────
@@ -102,25 +109,27 @@ const FAQ_TEMPLATE: FAQCategory[] = [
     ],
   },
 
-  // ── Bitcoin Donations ───────────────────────────────────────────────────
+  // ── Bitcoin Donations on Agora ──────────────────────────────────────────
+  // Merged section combining the practical "how it works" Q&A with the
+  // "why we designed it this way" rationale. On-chain only — Lightning and
+  // zap content is intentionally absent.
   {
     id: 'payments',
-    label: 'Bitcoin Donations',
+    label: 'Bitcoin Donations on Agora',
     items: [
+      {
+        id: 'what-is-agora',
+        question: 'What is {appName} for?',
+        answer: [
+          '{appName} is a Nostr platform for sending on-chain Bitcoin donations directly to activists. No middleman, no payment processor, no account to freeze.',
+        ],
+      },
       {
         id: 'send-bitcoin-onchain',
         question: 'How does sending Bitcoin work?',
         answer: [
           'You send real Bitcoin on-chain directly to the activist. Your Nostr key is your wallet \u2014 no separate account, no top-up.',
           'You pay a small network fee to miners so the transaction gets confirmed. Once broadcast, it\'s public and irreversible.',
-        ],
-      },
-      {
-        id: 'send-bitcoin-lightning',
-        question: 'How does sending Bitcoin over Lightning work?',
-        answer: [
-          'If a recipient has a Lightning address on their profile, you can send to that instead. Lightning settles in seconds and fees are tiny.',
-          'Lightning donations don\'t use {appName}\'s donation address \u2014 they go straight to the Lightning wallet the recipient set up themselves.',
         ],
       },
       {
@@ -132,11 +141,11 @@ const FAQ_TEMPLATE: FAQCategory[] = [
         ],
       },
       {
-        id: 'what-are-zaps',
-        question: 'What are zaps?',
+        id: 'donations-are-public-general',
+        question: 'Are donations on {appName} public?',
         answer: [
-          'Zaps are small Lightning tips on Nostr, separate from {appName}\'s on-chain donation flow. They only work if the recipient has a Lightning address on their profile.',
-          'Zaps are optional. The core donation experience on {appName} is on-chain.',
+          'Yes. Every donation \u2014 given or received \u2014 is recorded on the public Bitcoin blockchain and on Nostr. Anyone can see the amounts, the timing, and the addresses involved.',
+          'Read the **Donor Guide** and **Activist Guide** for what this means in practice and how to protect your privacy if you need to.',
         ],
       },
       {
@@ -145,6 +154,38 @@ const FAQ_TEMPLATE: FAQCategory[] = [
         answer: [
           'No company sits between a donor and an activist. {appName} doesn\'t hold the funds and can\'t freeze the address.',
           'As long as the Bitcoin network is running, donations can be sent and received. {appName} itself going offline wouldn\'t stop them.',
+        ],
+      },
+      {
+        id: 'why-onchain',
+        question: 'Why on-chain Bitcoin?',
+        answer: [
+          'On-chain Bitcoin is the most widely supported and censorship-resistant payment rail in the world. Every Bitcoin wallet can send it.',
+          'The tradeoff is that on-chain transactions are public and pay a miner fee. The Donor and Activist guides explain how to handle both.',
+        ],
+      },
+      {
+        id: 'why-not-lightning',
+        question: 'Why doesn\'t {appName} use Lightning?',
+        answer: [
+          'Lightning requires a Lightning wallet. The easiest ones (like Wallet of Satoshi) are **custodial** \u2014 a company holds the funds and can be shut down or pressured. Non-custodial Lightning is technically demanding and unreliable for newcomers.',
+          'We want {appName} to work for someone whose only Bitcoin experience is Cash App. On-chain Bitcoin works with every wallet on the planet.',
+        ],
+      },
+      {
+        id: 'why-not-silent-payments',
+        question: 'Why doesn\'t {appName} use silent payments?',
+        answer: [
+          'Silent payments only work when the **sender\'s** wallet supports them. Most popular wallets \u2014 Cash App, Strike, and nearly every custodial wallet \u2014 do not.',
+          'Asking donors to install new software is a barrier we won\'t put in front of activists who need support.',
+        ],
+      },
+      {
+        id: 'why-not-rotating-addresses',
+        question: 'Why doesn\'t {appName} generate a new address for every donation?',
+        answer: [
+          'Generating a fresh address per donation would require {appName} to run a server that signs and serves addresses. That server becomes a single point of failure \u2014 someone could shut it down to silence activists.',
+          '{appName} derives each user\'s donation address from their Nostr public key. No server is required, and the platform itself can\'t be turned off to censor anyone.',
         ],
       },
     ],
@@ -203,56 +244,28 @@ const FAQ_TEMPLATE: FAQCategory[] = [
     ],
   },
 
-  // ── About Bitcoin Payments on Agora ─────────────────────────────────────
+  // ── Hidden legacy items ─────────────────────────────────────────────────
+  // Kept so existing HelpTip call sites on other pages don't break, but
+  // excluded from the visible FAQ. {appName} is on-chain only; Lightning
+  // and zaps are not part of the public help content.
   {
-    id: 'agora-design',
-    label: 'About Bitcoin Payments on Agora',
+    id: 'legacy-lightning',
+    label: 'Legacy',
+    hidden: true,
     items: [
       {
-        id: 'what-is-agora',
-        question: 'What is {appName} for?',
+        id: 'send-bitcoin-lightning',
+        question: 'How does sending Bitcoin over Lightning work?',
         answer: [
-          '{appName} is a Nostr platform for sending on-chain Bitcoin donations directly to activists. No middleman, no payment processor, no account to freeze.',
+          'If a recipient has a Lightning address on their profile, you can send to that. Lightning settles in seconds and fees are tiny.',
+          'Lightning sends don\'t use {appName}\'s donation address \u2014 they go straight to whatever Lightning wallet the recipient set up themselves. {appName}\'s own donation flow is on-chain only.',
         ],
       },
       {
-        id: 'donations-are-public-general',
-        question: 'Are donations on {appName} public?',
+        id: 'what-are-zaps',
+        question: 'What are zaps?',
         answer: [
-          'Yes. Every donation \u2014 given or received \u2014 is recorded on the public Bitcoin blockchain and on Nostr. Anyone can see the amounts, the timing, and the addresses involved.',
-          'Read the **Donor Guide** and **Activist Guide** for what this means in practice and how to protect your privacy if you need to.',
-        ],
-      },
-      {
-        id: 'why-not-lightning',
-        question: 'Why doesn\'t {appName} use Lightning?',
-        answer: [
-          'Lightning requires a Lightning wallet. The easiest ones (like Wallet of Satoshi) are **custodial** \u2014 a company holds the funds and can be shut down or pressured. Non-custodial Lightning is technically demanding and unreliable for newcomers.',
-          'We want {appName} to work for someone whose only Bitcoin experience is Cash App. On-chain Bitcoin works with every wallet on the planet.',
-        ],
-      },
-      {
-        id: 'why-not-silent-payments',
-        question: 'Why doesn\'t {appName} use silent payments?',
-        answer: [
-          'Silent payments only work when the **sender\'s** wallet supports them. Most popular wallets \u2014 Cash App, Strike, and nearly every custodial wallet \u2014 do not.',
-          'Asking donors to install new software is a barrier we won\'t put in front of activists who need support.',
-        ],
-      },
-      {
-        id: 'why-not-rotating-addresses',
-        question: 'Why doesn\'t {appName} generate a new address for every donation?',
-        answer: [
-          'Generating a fresh address per donation would require {appName} to run a server that signs and serves addresses. That server becomes a single point of failure \u2014 someone could shut it down to silence activists.',
-          '{appName} derives each user\'s donation address from their Nostr public key. No server is required, and the platform itself can\'t be turned off to censor anyone.',
-        ],
-      },
-      {
-        id: 'why-onchain',
-        question: 'Why on-chain Bitcoin?',
-        answer: [
-          'On-chain Bitcoin is the most widely supported and censorship-resistant payment rail in the world. Every Bitcoin wallet can send it.',
-          'The tradeoff is that on-chain transactions are public and pay a miner fee. The Donor and Activist guides explain how to handle both.',
+          'Zaps are small Lightning tips on Nostr, separate from {appName}\'s on-chain donation flow.',
         ],
       },
     ],

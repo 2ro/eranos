@@ -1,7 +1,9 @@
 import { useSeoMeta } from '@unhead/react';
-import { AlertTriangle, HandHeart } from 'lucide-react';
+import { ArrowLeft, AlertTriangle, HandHeart } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { Button } from '@/components/ui/button';
 import { GuideSectionCard } from '@/components/GuideSectionCard';
 import { PageHeader } from '@/components/PageHeader';
 import { useAppContext } from '@/hooks/useAppContext';
@@ -61,6 +63,16 @@ export function DonorGuidePage() {
         {sections.map((section) => (
           <GuideSectionCard key={section.id} section={section} />
         ))}
+
+        {/* Bottom navigation back to the Help page */}
+        <div className="pt-2">
+          <Button asChild variant="outline" className="w-full">
+            <Link to="/help">
+              <ArrowLeft className="size-4" />
+              Back to Help
+            </Link>
+          </Button>
+        </div>
       </div>
     </main>
   );

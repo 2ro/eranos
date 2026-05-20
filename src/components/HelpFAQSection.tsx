@@ -46,6 +46,13 @@ export function HelpFAQSection({ categories, items, hideHeadings, className }: H
   const filteredCategories = useMemo(() => {
     let cats: FAQCategory[] = getFAQCategories(config.appName);
 
+    // Drop hidden categories from the default render. They still exist in
+    // the underlying template so `HelpTip` can look up individual items by
+    // ID, but they don't show up in the FAQ accordion.
+    if (!categories && !items) {
+      cats = cats.filter((c) => !c.hidden);
+    }
+
     // Filter to specific categories
     if (categories) {
       cats = cats.filter((c) => categories.includes(c.id));
