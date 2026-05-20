@@ -154,6 +154,7 @@ const FAQ_TEMPLATE: FAQCategory[] = [
         question: 'Why on-chain Bitcoin?',
         answer: [
           'On-chain Bitcoin is the most widely supported and censorship-resistant payment rail in the world. Every Bitcoin wallet can send it.',
+          'It requires **zero extra setup** for activists once they have a Nostr account, and **zero extra setup** for donors who already hold Bitcoin. That accessibility is what makes {appName} actually viable for normal people to use every day.',
           'The tradeoff is that on-chain transactions are public and pay a miner fee. The Donor and Activist guides explain how to handle both.',
         ],
       },
@@ -161,8 +162,16 @@ const FAQ_TEMPLATE: FAQCategory[] = [
         id: 'why-not-lightning',
         question: 'Why doesn\'t {appName} use Lightning?',
         answer: [
-          'Lightning requires a Lightning wallet. The easiest ones (like Wallet of Satoshi) are **custodial** \u2014 a company holds the funds and can be shut down or pressured. Non-custodial Lightning is technically demanding and unreliable for newcomers.',
+          'Lightning requires a Lightning wallet. The easiest ones (Wallet of Satoshi, Strike, Breez) are **custodial** \u2014 a company holds the funds and can be shut down, geo-blocked, or pressured into freezing accounts. Non-custodial Lightning is technically demanding and unreliable for newcomers.',
           'We want {appName} to work for someone whose only Bitcoin experience is a regular consumer app like Cash App, Coinbase, Strike, Venmo, or PayPal. On-chain Bitcoin works with every wallet on the planet.',
+        ],
+      },
+      {
+        id: 'why-not-other-crypto',
+        question: 'Why not Monero or another cryptocurrency?',
+        answer: [
+          'Bitcoin is by far the most widely adopted cryptocurrency. That means it\'s the easiest for donors to buy and send, and the easiest for activists to receive, hold, and spend.',
+          'Privacy-focused coins like Monero solve some problems on-chain Bitcoin doesn\'t, but they\'re unsupported by most consumer apps and harder to convert back to local currency. Asking either side of a donation to first acquire a niche cryptocurrency is a barrier {appName} won\'t put in the way.',
         ],
       },
       {

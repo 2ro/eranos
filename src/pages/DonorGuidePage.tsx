@@ -1,12 +1,13 @@
 import { useSeoMeta } from '@unhead/react';
-import { ArrowLeft, AlertTriangle, HandHeart } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { AlertTriangle } from 'lucide-react';
 
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { GuideHero } from '@/components/GuideHero';
 import { GuideSectionCard } from '@/components/GuideSectionCard';
 import { useAppContext } from '@/hooks/useAppContext';
 import { useLayoutOptions } from '@/contexts/LayoutContext';
 import { getDonorGuideSections } from '@/lib/helpContent';
+import { COOL_PALETTE } from '@/lib/hopePalette';
 
 /**
  * Donor Guide — long-form companion to the Help page.
@@ -28,24 +29,15 @@ export function DonorGuidePage() {
 
   return (
     <main className="min-h-screen pb-16 sidebar:pb-0">
-      {/* PWA-style sticky back-to-help nav */}
-      <div className="sticky top-16 z-30 border-b border-border bg-background/85 backdrop-blur supports-[backdrop-filter]:bg-background/70">
-        <div className="flex items-center justify-between gap-3 px-4 py-3">
-          <Link
-            to="/help"
-            className="inline-flex items-center gap-2 rounded-full -ml-1 px-3 py-1.5 text-sm font-medium hover:bg-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring transition-colors"
-          >
-            <ArrowLeft className="size-4" />
-            Back to Help
-          </Link>
-          <div className="flex items-center gap-1.5 text-muted-foreground">
-            <HandHeart className="size-4" />
-            <span className="text-sm font-semibold">Donor Guide</span>
-          </div>
-        </div>
-      </div>
+      <GuideHero
+        eyebrow="Donor Guide"
+        title="Support activists, on your terms."
+        subtitle="Real Bitcoin, sent directly. Here's how it works and how to do it privately."
+        images={DONOR_HERO_IMAGES}
+        palette={COOL_PALETTE}
+      />
 
-      <div className="px-4 pt-4 pb-4 space-y-4">
+      <div className="px-4 pt-4 pb-4 space-y-4 max-w-3xl mx-auto">
         {/* Above-ground recommendation alert */}
         <Alert className="border-amber-500/50 [&>svg]:text-amber-500">
           <AlertTriangle className="size-4" />
@@ -62,12 +54,6 @@ export function DonorGuidePage() {
           </AlertDescription>
         </Alert>
 
-        {/* Short intro */}
-        <p className="text-sm text-muted-foreground">
-          Supporting an activist on {config.appName} means sending real Bitcoin on-chain. Here&apos;s
-          how it works, and how to do it privately if you need to.
-        </p>
-
         {/* Sections */}
         {sections.map((section) => (
           <GuideSectionCard key={section.id} section={section} />
@@ -76,5 +62,18 @@ export function DonorGuidePage() {
     </main>
   );
 }
+
+/**
+ * Hero images for the Donor Guide. Reuses the World Liberty Congress
+ * event photos already in `/public/hero/` — they read as "community of
+ * supporters," which fits a donor-facing page. Same assets used by the
+ * Organize and Communities homepage heroes, so we get free preload
+ * caching across the app.
+ */
+const DONOR_HERO_IMAGES: readonly string[] = [
+  '/hero/wlc-1.webp',
+  '/hero/wlc-2.webp',
+  '/hero/wlc-3.webp',
+];
 
 export default DonorGuidePage;
