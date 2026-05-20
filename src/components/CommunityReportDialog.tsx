@@ -91,7 +91,7 @@ export function CommunityReportDialog({
       <DialogContent className="max-w-md max-h-[85dvh] rounded-2xl flex flex-col overflow-hidden">
         <DialogTitle>Report post</DialogTitle>
         <DialogDescription className="text-sm text-muted-foreground">
-          Select a reason for reporting this post to the community.
+          Select a reason for reporting this post to the organization.
         </DialogDescription>
 
         <div className="flex-1 overflow-y-auto min-h-0 -mx-6 px-6">

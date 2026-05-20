@@ -1,93 +1,56 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { useSeoMeta } from '@unhead/react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import {
   AlertTriangle,
   ArrowLeft,
-  Camera,
-  Check,
-  ChevronRight,
   Clock,
-  Info,
   Loader2,
+  MapPin,
   Megaphone,
-  Palette,
   Plus,
+  X,
 } from 'lucide-react';
 
 import { CoverImageField } from '@/components/CoverImageField';
 import { FormSection } from '@/components/FormSection';
+import { OrganizationContextChip } from '@/components/OrganizationContextChip';
 import { TimezoneSwitcher } from '@/components/TimezoneSwitcher';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-  CommandList,
-} from '@/components/ui/command';
 import { Input } from '@/components/ui/input';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
+import { useBitcoinWallet } from '@/hooks/useBitcoinWallet';
+import { useManageableOrganizations } from '@/hooks/useManageableOrganizations';
 import { useNostrPublish } from '@/hooks/useNostrPublish';
 import { useToast } from '@/hooks/useToast';
-import type { Action } from '@/hooks/useActions';
 import { useLayoutOptions } from '@/contexts/LayoutContext';
-import { countryCodeToFlag, getAllCountries, getGeoDisplayName } from '@/lib/countries';
+import { usdToSats } from '@/lib/bitcoin';
+import { COUNTRIES, searchCountries, type CountryEntry } from '@/lib/countries';
 import { createCountryIdentifier } from '@/lib/countryIdentifiers';
 import { getTodayDateInput } from '@/lib/dateInput';
-import { DEFAULT_ACTION_COVERS } from '@/lib/defaultActionCovers';
+import { createOrganizationAssociationTags, decodeOrganizationParam } from '@/lib/organizationContext';
 import { sanitizeUrl } from '@/lib/sanitizeUrl';
+import { unixSecondsInTimezone } from '@/lib/timezone';
 import { cn } from '@/lib/utils';
 
-/**
- * Convert a wall-clock (Y, M, D, h, m) in an arbitrary IANA timezone to a
- * unix-seconds timestamp. Matches the helper in CreateActionDialog so the
- * page emits identical `start` / `deadline` tags.
- */
-function unixSecondsInTimezone(
-  year: number,
-  month: number,
-  day: number,
-  hours: number,
-  minutes: number,
-  timezone: string,
-): number {
-  const utcGuess = Date.UTC(year, month - 1, day, hours, minutes, 0);
-  const formatter = new Intl.DateTimeFormat('en-US', {
-    timeZone: timezone,
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
-    hour: '2-digit',
-    minute: '2-digit',
-    second: '2-digit',
-    hour12: false,
-  });
-  const parts = Object.fromEntries(
-    formatter.formatToParts(new Date(utcGuess)).map((p) => [p.type, p.value]),
-  );
-  const asWallClock = Date.UTC(
-    Number(parts.year),
-    Number(parts.month) - 1,
-    Number(parts.day),
-    Number(parts.hour) === 24 ? 0 : Number(parts.hour),
-    Number(parts.minute),
-    Number(parts.second),
-  );
-  return Math.floor((utcGuess + (utcGuess - asWallClock)) / 1000);
+function normalizePledgeTag(value: string): string {
+  return value.trim().replace(/^#+/, '').toLowerCase().replace(/\s+/g, '-');
+}
+
+function parsePledgeTagInput(value: string): string[] {
+  const seen = new Set<string>();
+  const tags: string[] = [];
+  for (const part of value.split(',')) {
+    const tag = normalizePledgeTag(part);
+    if (!tag || seen.has(tag)) continue;
+    seen.add(tag);
+    tags.push(tag);
+  }
+  return tags;
 }
 
 export function CreateActionPage() {
@@ -99,79 +62,86 @@ export function CreateActionPage() {
   const queryClient = useQueryClient();
   const { mutateAsync: createEvent } = useNostrPublish();
   const { toast } = useToast();
+  const { btcPrice } = useBitcoinWallet();
 
   const browserTimezone = useMemo(
     () => Intl.DateTimeFormat().resolvedOptions().timeZone,
     [],
   );
 
-  // ?country=XX lets entry points (the Actions hero CTA, the FAB, and the
-  // empty-state button) pre-select whichever country the actions index is
+  // ?country=XX lets entry points (the Pledges hero CTA, the FAB, and the
+  // empty-state button) pre-select whichever country the pledges index is
   // currently filtered to — same behavior as the old modal's `countryCode`
   // prop.
   const pageCountryCode = searchParams.get('country') || '';
 
+  // ── Organization context (implicit) ────────────────────────────────────
+  // `?org=` carries the org coordinate from the entry point — typically
+  // an org detail page CTA. We accept either an `naddr1...` (preferred,
+  // canonical) or a raw `34550:<pubkey>:<d-tag>` coordinate. The form
+  // never exposes a user-editable selector — the pledge is "under the
+  // user" by default, and "under the org" when the user started from
+  // inside that org's page.
+  const orgParam = searchParams.get('org');
+  const orgFromParam = useMemo(() => decodeOrganizationParam(orgParam), [orgParam]);
+  const { data: manageableOrgs, isLoading: manageableOrgsLoading } = useManageableOrganizations();
+  const authorizedOrgFromParam = useMemo(() => {
+    if (!orgFromParam || !manageableOrgs) return null;
+    return manageableOrgs.find((entry) => entry.community.aTag === orgFromParam.aTag) ?? null;
+  }, [orgFromParam, manageableOrgs]);
+
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
-  const [type, setType] = useState<Action['type']>('action');
-  const [bounty, setBounty] = useState('');
-  const [startDate, setStartDate] = useState('');
-  const [startTime, setStartTime] = useState('');
+  const [tagInput, setTagInput] = useState('');
+  const [pledgeUsd, setPledgeUsd] = useState('');
   const [deadline, setDeadline] = useState('');
   const [deadlineTime, setDeadlineTime] = useState('');
   const [coverImage, setCoverImage] = useState<string>('');
   const [coverUploading, setCoverUploading] = useState(false);
-  const [selectedCountry, setSelectedCountry] = useState(pageCountryCode);
+  const [countryCode, setCountryCode] = useState(pageCountryCode);
+  const [countryQuery, setCountryQuery] = useState(pageCountryCode ? (COUNTRIES[pageCountryCode]?.name ?? pageCountryCode) : '');
+  // Effective org coordinate to attach on publish. Sourced only from the
+  // URL — never editable inside the form. Drops to '' when the user
+  // isn't authorized for the param's org.
+  const [organizationATag, setOrganizationATag] = useState('');
   const [timezone, setTimezone] = useState(browserTimezone);
-  const [countryPickerOpen, setCountryPickerOpen] = useState(false);
   const [formError, setFormError] = useState('');
+
+  useEffect(() => {
+    setOrganizationATag(authorizedOrgFromParam?.community.aTag ?? '');
+  }, [authorizedOrgFromParam]);
 
   const minDeadline = useMemo(() => getTodayDateInput(), []);
 
   useSeoMeta({
-    title: 'Create action | Agora',
-    description: 'Create an activist action and offer a Bitcoin bounty on Agora.',
+    title: 'Create pledge | Agora',
+    description: 'Create a donor pledge to inspire concrete action on Agora.',
   });
 
-  const allCountries = useMemo(() => getAllCountries(), []);
-
-  const countryOptions = useMemo(() => {
-    const options: Array<{ value: string; label: string; flag: string }> = [
-      { value: 'none', label: 'No country', flag: '🌍' },
-    ];
-    if (pageCountryCode) {
-      options.push({
-        value: pageCountryCode,
-        label: getGeoDisplayName(pageCountryCode),
-        flag: countryCodeToFlag(pageCountryCode),
-      });
-    }
-    allCountries.forEach((country) => {
-      if (country.code !== pageCountryCode) {
-        options.push({
-          value: country.code,
-          label: country.name,
-          flag: countryCodeToFlag(country.code),
-        });
-      }
-    });
-    return options;
-  }, [pageCountryCode, allCountries]);
+  const pledgeSatsPreview = useMemo(() => {
+    const n = Number(pledgeUsd.replace(/[, $]/g, ''));
+    if (!Number.isFinite(n) || n <= 0) return 0;
+    return usdToSats(n, btcPrice);
+  }, [btcPrice, pledgeUsd]);
 
   const submitMutation = useMutation({
     mutationFn: async () => {
-      if (!user) throw new Error('You must be logged in to create an action.');
+      if (!user) throw new Error('You must be logged in to create a pledge.');
 
       const trimmedTitle = title.trim();
       const trimmedDescription = description.trim();
 
       if (!trimmedTitle) throw new Error('Title is required.');
       if (!trimmedDescription) throw new Error('Description is required.');
-      if (!bounty.trim()) throw new Error('Bounty is required.');
+      if (!pledgeUsd.trim()) throw new Error('Pledge amount is required.');
 
-      const bountyNum = Number(bounty);
-      if (!Number.isFinite(bountyNum) || bountyNum <= 0) {
-        throw new Error('Bounty must be a positive number of sats.');
+      const pledgeUsdNum = Number(pledgeUsd.replace(/[, $]/g, ''));
+      if (!Number.isFinite(pledgeUsdNum) || pledgeUsdNum <= 0) {
+        throw new Error('Pledge amount must be a positive USD amount.');
+      }
+      const pledgeSats = usdToSats(pledgeUsdNum, btcPrice);
+      if (pledgeSats <= 0) {
+        throw new Error('Waiting for BTC/USD price to calculate the pledge amount.');
       }
 
       const now = Date.now();
@@ -179,19 +149,29 @@ export function CreateActionPage() {
         .toLowerCase()
         .replace(/[^a-z0-9]+/g, '-')
         .replace(/(^-|-$)/g, '');
-      const dTag = `${slug || 'action'}-${now}`;
+      const dTag = `${slug || 'pledge'}-${now}`;
+      const pledgeTags = parsePledgeTagInput(tagInput);
 
       const tags: string[][] = [
         ['d', dTag],
         ['title', trimmedTitle],
-        ['challenge-type', type],
-        ['bounty', String(bountyNum)],
+        ['bounty', String(pledgeSats)],
         ['t', 'agora-action'],
-        ['alt', `Agora activist action: ${trimmedTitle}`],
+        ['alt', `Agora pledge: ${trimmedTitle}`],
       ];
+      for (const tag of pledgeTags) tags.push(['t', tag]);
 
-      if (selectedCountry) {
-        tags.push(['i', createCountryIdentifier(selectedCountry.toUpperCase())]);
+      if (countryCode) {
+        tags.push(['i', createCountryIdentifier(countryCode.toUpperCase())]);
+      }
+
+      // Organization association (NIP-22 root-scope convention): an
+      // uppercase `A` tag points at the NIP-72 community definition so
+      // the pledge surfaces as official activity on that org's page.
+      // The `K` companion tag records the referenced kind, and `P` hints
+      // at the org founder for clients that batch-resolve authors.
+      if (organizationATag) {
+        tags.push(...createOrganizationAssociationTags(organizationATag));
       }
 
       const trimmedCoverImage = coverImage.trim();
@@ -201,17 +181,6 @@ export function CreateActionPage() {
       }
       if (sanitizedImage) {
         tags.push(['image', sanitizedImage]);
-      }
-
-      if (startDate) {
-        const [year, month, day] = startDate.split('-').map(Number);
-        const [hours, minutes] = startTime
-          ? startTime.split(':').map(Number)
-          : [0, 0];
-        tags.push([
-          'start',
-          String(unixSecondsInTimezone(year, month, day, hours, minutes, timezone)),
-        ]);
       }
 
       if (deadline) {
@@ -232,15 +201,18 @@ export function CreateActionPage() {
     },
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ['agora-actions'] });
+      if (organizationATag) {
+        await queryClient.invalidateQueries({ queryKey: ['organization-activity', organizationATag] });
+      }
       await queryClient.refetchQueries({ queryKey: ['agora-actions'] });
-      toast({ title: 'Action created' });
-      navigate('/actions');
+      toast({ title: 'Pledge created' });
+      navigate('/pledges');
     },
     onError: (error: unknown) => {
       const msg = error instanceof Error ? error.message : String(error);
       setFormError(msg);
       toast({
-        title: 'Could not create action',
+        title: 'Could not create pledge',
         description: msg,
         variant: 'destructive',
       });
@@ -254,12 +226,12 @@ export function CreateActionPage() {
           <Card>
             <CardContent className="py-12 px-8 text-center space-y-4">
               <Megaphone className="size-10 text-muted-foreground/60 mx-auto" />
-              <h2 className="text-xl font-semibold">Log in to create an action</h2>
+              <h2 className="text-xl font-semibold">Log in to create a pledge</h2>
               <p className="text-muted-foreground">
-                Actions are signed Nostr events. You need a Nostr login to publish one.
+                Pledges are signed Nostr events. You need a Nostr login to publish one.
               </p>
               <Button asChild>
-                <Link to="/actions">Back to actions</Link>
+                <Link to="/pledges">Back to pledges</Link>
               </Button>
             </CardContent>
           </Card>
@@ -271,7 +243,8 @@ export function CreateActionPage() {
   const canSubmit =
     title.trim().length > 0 &&
     description.trim().length > 0 &&
-    bounty.trim().length > 0 &&
+    pledgeUsd.trim().length > 0 &&
+    pledgeSatsPreview > 0 &&
     !coverUploading &&
     !submitMutation.isPending;
 
@@ -296,16 +269,23 @@ export function CreateActionPage() {
               <ArrowLeft className="size-5" />
             </button>
             <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">
-              Create action
+              Create pledge
             </h1>
           </div>
+          <OrganizationContextChip
+            aTag={organizationATag}
+            authorizedOrg={authorizedOrgFromParam}
+            param={orgParam}
+            paramDecoded={orgFromParam}
+            manageableLoading={manageableOrgsLoading}
+          />
         </div>
 
         <div className="rounded-2xl bg-card/50 p-2">
           {/* Title */}
           <FormSection title="Title" requirement="Required">
             <Input
-              placeholder="What needs to happen?"
+              placeholder="Document a beach cleanup"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               maxLength={200}
@@ -313,150 +293,78 @@ export function CreateActionPage() {
             />
           </FormSection>
 
-          <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
-            {/* Type */}
-            <FormSection title="Type" requirement="Required">
-              <Select
-                value={type}
-                onValueChange={(value) => setType(value as Action['type'])}
-              >
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="photo">
-                    <div className="flex items-center gap-2">
-                      <Camera className="h-4 w-4" /> Photo
-                    </div>
-                  </SelectItem>
-                  <SelectItem value="art">
-                    <div className="flex items-center gap-2">
-                      <Palette className="h-4 w-4" /> Art
-                    </div>
-                  </SelectItem>
-                  <SelectItem value="info">
-                    <div className="flex items-center gap-2">
-                      <Info className="h-4 w-4" /> Info
-                    </div>
-                  </SelectItem>
-                  <SelectItem value="action">
-                    <div className="flex items-center gap-2">
-                      <Megaphone className="h-4 w-4" /> Action
-                    </div>
-                  </SelectItem>
-                </SelectContent>
-              </Select>
-            </FormSection>
+          {/* Country */}
+          <FormSection title="Country" requirement="Recommended">
+            <CountrySelect
+              query={countryQuery}
+              selectedCode={countryCode}
+              onQueryChange={(value) => {
+                setCountryQuery(value);
+                const selectedCountry = countryCode ? COUNTRIES[countryCode] : undefined;
+                if (selectedCountry && value !== selectedCountry.name && value.toUpperCase() !== countryCode) {
+                  setCountryCode('');
+                }
+              }}
+              onSelect={(country) => {
+                setCountryCode(country.code);
+                setCountryQuery(country.name);
+              }}
+              onClear={() => {
+                setCountryCode('');
+                setCountryQuery('');
+              }}
+            />
+          </FormSection>
 
-            {/* Bounty */}
-            <FormSection title="Bounty (sats)" requirement="Required">
-              <Input
-                type="number"
-                placeholder="10000"
-                value={bounty}
-                onChange={(e) => setBounty(e.target.value)}
-                min={1}
-              />
-            </FormSection>
-          </div>
+          {/* Tags */}
+          <FormSection title="Tags" requirement="Recommended">
+            <Input
+              id="pledge-tags"
+              value={tagInput}
+              onChange={(e) => setTagInput(e.target.value)}
+              placeholder="beach-cleanup, protest-documentation, internet-blackout"
+            />
+          </FormSection>
+
+          {/* Cover image */}
+          <FormSection title="Cover image" requirement="Optional">
+            <CoverImageField
+              value={coverImage}
+              onChange={setCoverImage}
+              onUploadingChange={setCoverUploading}
+            />
+          </FormSection>
 
           {/* Description */}
           <FormSection title="Description" requirement="Required">
             <Textarea
-              placeholder="Explain what submissions should look like, why this matters, and how the bounty will be paid out..."
-              className="min-h-[120px]"
+              placeholder="Explain the action, evidence, or outcome you want to inspire, what submissions should include, and how you plan to evaluate them..."
+              rows={7}
+              className="font-mono text-sm"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
             />
           </FormSection>
 
-          {/* Country */}
-          <FormSection title="Country" requirement="Recommended">
-            <Popover open={countryPickerOpen} onOpenChange={setCountryPickerOpen}>
-              <PopoverTrigger asChild>
-                <Button
-                  variant="outline"
-                  role="combobox"
-                  aria-expanded={countryPickerOpen}
-                  className="w-full justify-between"
-                >
-                  {selectedCountry ? (
-                    <span className="flex items-center gap-2">
-                      <span>{countryCodeToFlag(selectedCountry)}</span>
-                      <span>{getGeoDisplayName(selectedCountry)}</span>
-                    </span>
-                  ) : (
-                    <span>No country</span>
-                  )}
-                  <ChevronRight className="ml-2 h-4 w-4 shrink-0 opacity-50 rotate-90" />
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-[280px] p-0" align="start" sideOffset={4}>
-                <Command>
-                  <CommandInput placeholder="Search..." />
-                  <CommandList>
-                    <CommandEmpty>No results found.</CommandEmpty>
-                    <CommandGroup>
-                      {countryOptions.map((option) => (
-                        <CommandItem
-                          key={option.value}
-                          value={`${option.label} ${option.value}`}
-                          onSelect={() => {
-                            setSelectedCountry(option.value === 'none' ? '' : option.value);
-                            setCountryPickerOpen(false);
-                          }}
-                          className="gap-2"
-                        >
-                          <span>{option.flag}</span>
-                          <span className="flex-1">{option.label}</span>
-                          <Check
-                            className={cn(
-                              'h-4 w-4',
-                              (selectedCountry || 'none') === option.value
-                                ? 'opacity-100'
-                                : 'opacity-0',
-                            )}
-                          />
-                        </CommandItem>
-                      ))}
-                    </CommandGroup>
-                  </CommandList>
-                </Command>
-              </PopoverContent>
-            </Popover>
-          </FormSection>
-
-          {/* Cover image */}
-          <FormSection title="Cover image" requirement="Recommended">
-            <CoverImageField
-              value={coverImage}
-              onChange={setCoverImage}
-              onUploadingChange={setCoverUploading}
-              templates={DEFAULT_ACTION_COVERS}
-            />
-          </FormSection>
-
           <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
-            {/* Start date */}
-            <FormSection title="Start date" requirement="Optional">
-              <Input
-                type="date"
-                className="w-full min-w-0 [color-scheme:light] dark:[color-scheme:dark] dark:[&::-webkit-calendar-picker-indicator]:invert dark:[&::-webkit-calendar-picker-indicator]:opacity-80"
-                value={startDate}
-                onChange={(e) => setStartDate(e.target.value)}
-              />
-              {startDate && (
+            {/* Pledge amount */}
+            <FormSection title="Pledge" requirement="Required">
+              <div className="relative">
+                <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">
+                  $
+                </span>
                 <Input
-                  type="time"
-                  className="w-full min-w-0 [color-scheme:light] dark:[color-scheme:dark] dark:[&::-webkit-calendar-picker-indicator]:invert dark:[&::-webkit-calendar-picker-indicator]:opacity-80"
-                  value={startTime}
-                  onChange={(e) => setStartTime(e.target.value)}
+                  type="text"
+                  inputMode="decimal"
+                  placeholder="100"
+                  value={pledgeUsd}
+                  onChange={(e) => setPledgeUsd(e.target.value)}
+                  className="pl-7 pr-14"
                 />
-              )}
-              <p className="text-xs text-muted-foreground">
-                {!startDate && 'Defaults to now if not specified'}
-                {startDate && !startTime && 'Starts at midnight'}
-              </p>
+                <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-xs font-medium text-muted-foreground">
+                  USD
+                </span>
+              </div>
             </FormSection>
 
             {/* Deadline */}
@@ -476,14 +384,10 @@ export function CreateActionPage() {
                   onChange={(e) => setDeadlineTime(e.target.value)}
                 />
               )}
-              <p className="text-xs text-muted-foreground">
-                {!deadline && 'Defaults to 48 hours after start'}
-                {deadline && !deadlineTime && 'Ends at 23:59 local time'}
-              </p>
             </FormSection>
           </div>
 
-          {(startDate || deadline) && (
+          {deadline && (
             <FormSection title="Timezone" requirement="Required">
               <div className="bg-muted/30 p-3 rounded-lg border border-border/50 space-y-2 animate-in slide-in-from-top-2 duration-200">
                 <div className="flex items-center gap-2 text-sm font-medium">
@@ -524,13 +428,126 @@ export function CreateActionPage() {
             ) : (
               <>
                 <Plus className="size-4 mr-2" />
-                Create action
+                Create pledge
               </>
             )}
           </Button>
         </div>
       </form>
     </main>
+  );
+}
+
+function CountrySelect({
+  query,
+  selectedCode,
+  onQueryChange,
+  onSelect,
+  onClear,
+}: {
+  query: string;
+  selectedCode: string;
+  onQueryChange: (value: string) => void;
+  onSelect: (country: CountryEntry) => void;
+  onClear: () => void;
+}) {
+  const [open, setOpen] = useState(false);
+  const [selectedIndex, setSelectedIndex] = useState(0);
+  const selectedCountry = selectedCode ? COUNTRIES[selectedCode] : undefined;
+  const results = useMemo(() => searchCountries(query), [query]);
+  const showResults = open && results.length > 0;
+
+  const selectCountry = (country: CountryEntry) => {
+    onSelect(country);
+    setOpen(false);
+    setSelectedIndex(0);
+  };
+
+  return (
+    <div className="space-y-2">
+      <div className="relative">
+        <MapPin className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+        <Input
+          id="pledge-country"
+          value={query}
+          onChange={(e) => {
+            onQueryChange(e.target.value);
+            setOpen(true);
+            setSelectedIndex(0);
+          }}
+          onFocus={() => setOpen(true)}
+          onBlur={() => window.setTimeout(() => setOpen(false), 120)}
+          onKeyDown={(e) => {
+            if (!showResults) return;
+            if (e.key === 'ArrowDown') {
+              e.preventDefault();
+              setSelectedIndex((prev) => (prev + 1) % results.length);
+            } else if (e.key === 'ArrowUp') {
+              e.preventDefault();
+              setSelectedIndex((prev) => (prev - 1 + results.length) % results.length);
+            } else if (e.key === 'Enter') {
+              e.preventDefault();
+              selectCountry(results[selectedIndex]);
+            } else if (e.key === 'Escape') {
+              setOpen(false);
+            }
+          }}
+          className="h-9 rounded-full border-0 bg-secondary pl-10 pr-10 text-sm focus-visible:ring-0 focus-visible:ring-offset-0"
+          placeholder="Search countries, e.g. Venezuela"
+          autoComplete="off"
+          role="combobox"
+          aria-expanded={showResults}
+          aria-controls="pledge-country-results"
+        />
+        {(query || selectedCode) && (
+          <button
+            type="button"
+            onClick={onClear}
+            className="absolute right-2 top-1/2 rounded-full p-1 -translate-y-1/2 text-muted-foreground hover:bg-muted hover:text-foreground motion-safe:transition-colors"
+            aria-label="Clear country"
+          >
+            <X className="size-4" />
+          </button>
+        )}
+
+        {showResults && (
+          <div
+            id="pledge-country-results"
+            role="listbox"
+            className="absolute z-20 mt-2 max-h-[200px] w-full overflow-y-auto rounded-xl border border-border bg-popover py-1 shadow-lg"
+          >
+            {results.map((country, index) => (
+              <button
+                key={country.code}
+                type="button"
+                role="option"
+                aria-selected={index === selectedIndex}
+                onMouseDown={(e) => e.preventDefault()}
+                onClick={() => selectCountry(country)}
+                className={cn(
+                  'flex w-full cursor-pointer items-center gap-3 px-3 py-2 text-left transition-colors hover:bg-secondary/60',
+                  index === selectedIndex && 'bg-secondary/60',
+                )}
+              >
+                <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-secondary text-lg leading-none" role="img" aria-label={`Flag of ${country.name}`}>
+                  {country.flag}
+                </span>
+                <span className="min-w-0 flex-1">
+                  <span className="block truncate text-sm font-semibold">{country.name}</span>
+                  <span className="block text-xs text-muted-foreground">{country.code}</span>
+                </span>
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {selectedCountry && (
+        <p className="text-xs text-muted-foreground">
+          Publishes <span className="font-mono text-foreground">i: iso3166:{selectedCode}</span> for country sorting.
+        </p>
+      )}
+    </div>
   );
 }
 

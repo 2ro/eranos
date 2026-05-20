@@ -1303,7 +1303,7 @@ export function CommunityPreview({ addr }: { addr: { kind: number; pubkey: strin
 
   const communityName = event?.tags.find(([n]) => n === 'name')?.[1]
     || event?.tags.find(([n]) => n === 'd')?.[1]
-    || 'Community';
+    || 'Organization';
   const communityImage = event?.tags.find(([n]) => n === 'image')?.[1];
   const communityDescription = event?.tags.find(([n]) => n === 'description')?.[1];
   const moderatorCount = event?.tags.filter(([n, , , role]) => n === 'p' && role === 'moderator').length ?? 0;
@@ -1347,7 +1347,7 @@ export function CommunityPreview({ addr }: { addr: { kind: number; pubkey: strin
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
           <Users className="size-3 shrink-0" />
-          <span>Community</span>
+          <span>Organization</span>
           {moderatorCount > 0 && (
             <span className="text-muted-foreground/60">&middot; {moderatorCount} mod{moderatorCount !== 1 ? 's' : ''}</span>
           )}
@@ -1461,7 +1461,7 @@ const WELL_KNOWN_KIND_LABELS: Record<number, string> = {
   3063: 'Zapstore Asset',
   15128: 'Nsite',
   35128: 'Nsite',
-  36639: 'Action',
+  36639: 'Pledge',
 };
 
 export function AddressableEventPreview({ addr }: { addr: { kind: number; pubkey: string; identifier: string } }) {

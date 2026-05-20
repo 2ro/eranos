@@ -165,7 +165,7 @@ export function CreateGoalDialog({ communityATag, children, open: controlledOpen
             <Label htmlFor="goal-title">Title</Label>
             <Input
               id="goal-title"
-              placeholder="e.g. Community meetup expenses"
+              placeholder="e.g. Organization meetup expenses"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               required

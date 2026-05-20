@@ -2,12 +2,14 @@ import { Link } from 'react-router-dom';
 import { format } from 'date-fns';
 import { nip19 } from 'nostr-tools';
 import type { NostrEvent } from '@nostrify/nostrify';
-import { Bitcoin, Camera, Clock, Info, Megaphone, Palette } from 'lucide-react';
+import { Camera, Clock, DollarSign, Info, Megaphone, Palette } from 'lucide-react';
 
 import { parseAction, type Action } from '@/hooks/useActions';
+import { useBtcPrice } from '@/hooks/useBtcPrice';
 import { countryCodeToFlag, getGeoDisplayName } from '@/lib/countries';
 import { CountryFlag } from '@/components/CountryFlag';
 import { DEFAULT_COVER_IMAGE } from '@/lib/defaultActionCovers';
+import { formatSats, satsToUSDWhole } from '@/lib/bitcoin';
 import { cn } from '@/lib/utils';
 
 const ACTION_ICONS = {
@@ -26,6 +28,7 @@ function actionNaddr(action: Action): string {
 }
 
 export function ActionContent({ event, compact = true }: { event: NostrEvent; compact?: boolean }) {
+  const { data: btcPrice } = useBtcPrice();
   const action = parseAction(event);
   if (!action) return null;
 
@@ -65,7 +68,7 @@ export function ActionContent({ event, compact = true }: { event: NostrEvent; co
         <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between gap-2 text-white">
           <span className="inline-flex items-center gap-1.5 rounded-full bg-black/45 px-2.5 py-1 text-xs font-semibold backdrop-blur-sm">
             <Icon className="size-3.5" />
-            Action
+            Pledge
           </span>
           {isExpired ? (
             <span className="inline-flex items-center gap-1 rounded-full bg-black/45 px-2.5 py-1 text-xs font-medium backdrop-blur-sm">
@@ -93,9 +96,11 @@ export function ActionContent({ event, compact = true }: { event: NostrEvent; co
           </p>
         )}
         <div className="flex items-center gap-2 text-sm">
-          <Bitcoin className="size-4 shrink-0 text-primary" />
-          <span className="font-semibold">{action.bounty.toLocaleString()}</span>
-          <span className="text-xs text-muted-foreground">sats</span>
+          <DollarSign className="size-4 shrink-0 text-primary" />
+          <span className="font-semibold">
+            {btcPrice ? satsToUSDWhole(action.bounty, btcPrice) : `${formatSats(action.bounty)} sats`}
+          </span>
+          {btcPrice && <span className="text-xs text-muted-foreground">~{formatSats(action.bounty)} sats</span>}
           {action.countryCode && (
             <>
               <span className="text-muted-foreground/50">·</span>

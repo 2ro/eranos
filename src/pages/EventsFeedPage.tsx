@@ -1,8 +1,7 @@
 import type { NostrEvent } from "@nostrify/nostrify";
 import { useSeoMeta } from "@unhead/react";
 import { CalendarDays, Loader2 } from "lucide-react";
-import { useMemo, useState } from "react";
-import { CreateCommunityEventDialog } from "@/components/CreateCommunityEventDialog";
+import { useMemo } from "react";
 import { FeedEmptyState } from "@/components/FeedEmptyState";
 import { KindInfoButton } from "@/components/KindInfoButton";
 import { NoteCard } from "@/components/NoteCard";
@@ -52,7 +51,6 @@ export function EventsFeedPage() {
   const { config } = useAppContext();
   const { user } = useCurrentUser();
   const { muteItems } = useMuteList();
-  const [createOpen, setCreateOpen] = useState(false);
 
   const [activeTab, setActiveTab] = useFeedTab<FeedTab>("events", [
     "follows",
@@ -62,7 +60,7 @@ export function EventsFeedPage() {
   useSeoMeta({ title: `Events | ${config.appName}` });
   useLayoutOptions({
     showFAB: true,
-    onFabClick: () => setCreateOpen(true),
+    fabHref: "/events/new",
     fabIcon: <CalendarDays className="size-5" />,
     hasSubHeader: !!user,
   });
@@ -183,8 +181,6 @@ export function EventsFeedPage() {
           />
         )}
       </PullToRefresh>
-
-      <CreateCommunityEventDialog open={createOpen} onOpenChange={setCreateOpen} />
     </main>
   );
 }

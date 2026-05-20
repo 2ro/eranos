@@ -1,13 +1,13 @@
 import { useNostr } from '@nostrify/react';
 import { useQuery } from '@tanstack/react-query';
-import { extractZapAmount } from '@/hooks/useEventInteractions';
+import { getZapAmountSats } from '@/lib/zapHelpers';
 
 /**
- * Batches a single relay query for kind 9735 zap receipts targeting any of the
- * supplied event IDs, then returns a `Map<eventId, totalSats>` summing the
- * msat amounts per receipt.
+ * Batches a single relay query for zap/donation receipts targeting any of the
+ * supplied submission IDs, then returns a `Map<eventId, totalSats>`.
  *
- * Used by `ActionDetailPage` to rank submissions by total zap amount.
+ * Used by pledge detail pages to rank submissions and calculate open-pool
+ * funding progress. Kind 9735 carries millisats; kind 8333 carries sats.
  */
 export function useSubmissionZapTotals(eventIds: string[]) {
   const { nostr } = useNostr();
@@ -22,7 +22,7 @@ export function useSubmissionZapTotals(eventIds: string[]) {
       const signal = AbortSignal.any([c.signal, AbortSignal.timeout(5000)]);
 
       const receipts = await nostr.query(
-        [{ kinds: [9735], '#e': eventIds, limit: eventIds.length * 50 }],
+        [{ kinds: [9735, 8333], '#e': eventIds, limit: eventIds.length * 50 }],
         { signal },
       );
 
@@ -36,9 +36,8 @@ export function useSubmissionZapTotals(eventIds: string[]) {
         const matching = targetIds.filter((id) => totals.has(id));
         if (matching.length === 0) continue;
 
-        const msats = extractZapAmount(receipt);
-        if (msats <= 0) continue;
-        const sats = Math.floor(msats / 1000);
+        const sats = getZapAmountSats(receipt);
+        if (sats <= 0) continue;
 
         for (const id of matching) {
           totals.set(id, (totals.get(id) ?? 0) + sats);

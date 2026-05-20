@@ -18,9 +18,10 @@ import {
   X,
 } from 'lucide-react';
 
-import { PersonSearch } from '@/components/AddMemberDialog';
+import { PersonSearch } from '@/components/PersonSearch';
 import { CoverImageField } from '@/components/CoverImageField';
 import { FormSection } from '@/components/FormSection';
+import { OrganizationContextChip } from '@/components/OrganizationContextChip';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
@@ -32,6 +33,7 @@ import { parseAuthorEvent } from '@/hooks/useAuthor';
 import { useBitcoinWallet } from '@/hooks/useBitcoinWallet';
 import { useCampaign } from '@/hooks/useCampaign';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
+import { useManageableOrganizations } from '@/hooks/useManageableOrganizations';
 import { useNostrPublish } from '@/hooks/useNostrPublish';
 import { useToast } from '@/hooks/useToast';
 import type { SearchProfile } from '@/hooks/useSearchProfiles';
@@ -46,6 +48,7 @@ import {
 import { getTodayDateInput } from '@/lib/dateInput';
 import { fetchFreshEvent } from '@/lib/fetchFreshEvent';
 import { genUserName } from '@/lib/genUserName';
+import { createOrganizationAssociationTags, decodeOrganizationParam } from '@/lib/organizationContext';
 import { sanitizeUrl } from '@/lib/sanitizeUrl';
 import { COUNTRIES, searchCountries, searchCountry, type CountryEntry } from '@/lib/countries';
 import { createCountryIdentifier } from '@/lib/countryIdentifiers';
@@ -210,6 +213,7 @@ export function CreateCampaignPage() {
   const [countryQuery, setCountryQuery] = useState('');
   const [countryCode, setCountryCode] = useState('');
   const [recipients, setRecipients] = useState<SearchProfile[]>([]);
+  const [organizationATag, setOrganizationATag] = useState('');
   const [formError, setFormError] = useState('');
   const [prepopulatedEventId, setPrepopulatedEventId] = useState<string | null>(null);
   const [prepopulatedGoalEventId, setPrepopulatedGoalEventId] = useState<string | null>(null);
@@ -217,6 +221,36 @@ export function CreateCampaignPage() {
   const editNaddr = searchParams.get('edit');
   const editTarget = useMemo(() => getEditTarget(editNaddr), [editNaddr]);
   const isEditMode = !!editNaddr;
+
+  // ── Organization context (implicit) ────────────────────────────────────
+  // `?org=` carries the org coordinate from the entry point — typically
+  // an org detail page CTA. We accept either an `naddr1...` (preferred,
+  // canonical) or a raw `34550:<pubkey>:<d-tag>` coordinate. The form
+  // never exposes a user-editable selector — the campaign is "under the
+  // user" by default, and "under the org" when the user started from
+  // inside that org's page.
+  const orgParam = searchParams.get('org');
+  const orgFromParam = useMemo(() => decodeOrganizationParam(orgParam), [orgParam]);
+  const { data: manageableOrgs, isLoading: manageableOrgsLoading } = useManageableOrganizations();
+
+  // The org we'll actually attach to the published event. We only honor
+  // the param when the current user is the founder or a moderator of
+  // that org — otherwise drop it silently so a stale link can't forge
+  // an org association.
+  const authorizedOrgFromParam = useMemo(() => {
+    if (!orgFromParam || !manageableOrgs) return null;
+    return manageableOrgs.find((entry) => entry.community.aTag === orgFromParam.aTag) ?? null;
+  }, [orgFromParam, manageableOrgs]);
+  const authorizedOrgForAttachedATag = useMemo(() => {
+    if (!organizationATag || !manageableOrgs) return null;
+    return manageableOrgs.find((entry) => entry.community.aTag === organizationATag) ?? null;
+  }, [manageableOrgs, organizationATag]);
+
+  useEffect(() => {
+    if (isEditMode) return;
+    setOrganizationATag(authorizedOrgFromParam?.community.aTag ?? '');
+  }, [isEditMode, authorizedOrgFromParam]);
+
   const editCampaignQuery = useCampaign({
     pubkey: editTarget?.pubkey ?? '',
     identifier: editTarget?.identifier ?? '',
@@ -303,6 +337,14 @@ export function CreateCampaignPage() {
     setCountryCode(editCountryCode);
     setCountryQuery(editCountryCode ? COUNTRIES[editCountryCode]?.name ?? editCountryCode : '');
     setRecipients(editCampaign.recipients.map((recipient) => makeRecipientProfile(recipient.pubkey)));
+    // Restore the organization root-scope tag (uppercase `A`) so the
+    // selector hydrates with the same org the campaign was originally
+    // attached to. We accept the tag as-is; the publish branch verifies
+    // the current user is still authorized to publish under that org.
+    const existingOrgATag = editCampaign.event.tags.find(
+      ([n, v]) => n === 'A' && typeof v === 'string' && v.startsWith('34550:'),
+    )?.[1] ?? '';
+    setOrganizationATag(existingOrgATag);
     setPrepopulatedEventId(editCampaign.event.id);
   }, [editCampaign, prepopulatedEventId]);
 
@@ -453,6 +495,17 @@ export function CreateCampaignPage() {
         tags.push(['i', createCountryIdentifier(resolvedCountryCode)]);
         tags.push(['k', 'iso3166']);
       }
+      // Organization association (NIP-22 root-scope convention): an
+      // uppercase `A` tag points at the NIP-72 community definition so
+      // the campaign surfaces as official activity on that org's page.
+      // The `K` companion tag records the referenced kind, and `P` hints
+      // at the org founder for clients that batch-resolve authors.
+      const publishOrganizationATag = isEditMode
+        ? authorizedOrgForAttachedATag?.community.aTag ?? ''
+        : organizationATag;
+      if (publishOrganizationATag) {
+        tags.push(...createOrganizationAssociationTags(publishOrganizationATag));
+      }
       for (const r of parsedRecipients) {
         tags.push(['p', r.pubkey]);
       }
@@ -472,6 +525,12 @@ export function CreateCampaignPage() {
     },
     onSuccess: (campaign) => {
       void queryClient.invalidateQueries({ queryKey: ['campaign', campaign.pubkey, campaign.identifier] });
+      const publishOrganizationATag = isEditMode
+        ? authorizedOrgForAttachedATag?.community.aTag ?? ''
+        : organizationATag;
+      if (publishOrganizationATag) {
+        void queryClient.invalidateQueries({ queryKey: ['organization-activity', publishOrganizationATag] });
+      }
       toast({
         title: isEditMode ? 'Campaign updated' : 'Campaign launched',
         description: isEditMode ? 'Your fundraiser changes are live.' : 'Your fundraiser is live.',
@@ -591,6 +650,14 @@ export function CreateCampaignPage() {
               {isEditMode ? 'Edit campaign' : 'Start a campaign'}
             </h1>
           </div>
+          <OrganizationContextChip
+            aTag={isEditMode && organizationATag && !authorizedOrgForAttachedATag && !manageableOrgsLoading ? '' : organizationATag}
+            authorizedOrg={isEditMode ? authorizedOrgForAttachedATag : authorizedOrgFromParam}
+            param={orgParam}
+            paramDecoded={orgFromParam}
+            manageableLoading={manageableOrgsLoading}
+            isEditMode={isEditMode}
+          />
         </div>
 
         <div className="rounded-2xl bg-card/50 p-2">

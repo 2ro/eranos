@@ -19,9 +19,8 @@ interface UseDiscoverCommunitiesOptions {
  * deduped by addressable coordinate. Sorted newest first.
  *
  * The Discover page uses this to surface communities the visitor hasn't
- * joined yet — distinct from `useMyCommunities`, which only returns
- * communities the current user has founded, been awarded into, or
- * bookmarked.
+ * joined yet — distinct from `useManageableOrganizations`, which only
+ * returns communities the current user founded or moderates.
  *
  * Validation is permissive: any community whose `parseCommunityEvent`
  * succeeds (has a `d` tag, etc.) is kept. We do *not* filter by image

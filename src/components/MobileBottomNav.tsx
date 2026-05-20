@@ -107,10 +107,10 @@ export function MobileBottomNav() {
               size="sm"
             />
 
-            {/* Communities */}
+            {/* Organizations */}
             <NavItem
               icon={Users}
-              label="Communities"
+              label="Organize"
               active={isOnCommunities}
               to="/communities"
               onClick={() => { selectionChanged(); setSearchOpen(false); }}

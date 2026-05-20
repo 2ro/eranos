@@ -7,12 +7,6 @@ import { sanitizeUrl } from '@/lib/sanitizeUrl';
 /** NIP-72 community definition (addressable). */
 export const COMMUNITY_DEFINITION_KIND = 34550;
 
-/** NIP-58 badge definition. */
-export const BADGE_DEFINITION_KIND = 30009;
-
-/** NIP-58 badge award. */
-export const BADGE_AWARD_KIND = 8;
-
 /** NIP-56 report. */
 export const REPORT_KIND = 1984;
 
@@ -65,10 +59,6 @@ export interface ParsedCommunity {
   founderPubkey: string;
   /** Moderator pubkeys (from `p` tags with role "moderator"). */
   moderatorPubkeys: string[];
-  /** Member badge `a` tag coordinate (e.g. `30009:<pubkey>:<d-tag>`). */
-  memberBadgeATag?: string;
-  /** Optional relay hint from the community definition's member badge `a` tag. */
-  memberBadgeRelayHint?: string;
   /** Recommended relay URLs. */
   relays: string[];
   /** The `a` tag coordinate for the community: `34550:<pubkey>:<d-tag>`. */
@@ -96,12 +86,6 @@ export function parseCommunityEvent(event: NostrEvent): ParsedCommunity | null {
     .map(([, pubkey]) => pubkey)
     .filter((pubkey): pubkey is string => !!pubkey && pubkey !== event.pubkey && HEX_PUBKEY_RE.test(pubkey))));
 
-  const memberBadgeTag = event.tags.find(
-    ([n, coord, , role]) => n === 'a' && coord?.startsWith('30009:') && role === 'member',
-  );
-  const memberBadgeATag = memberBadgeTag?.[1];
-  const memberBadgeRelayHint = memberBadgeTag?.[2] || undefined;
-
   // Relay URLs
   const relays = event.tags
     .filter(([n]) => n === 'relay')
@@ -115,8 +99,6 @@ export function parseCommunityEvent(event: NostrEvent): ParsedCommunity | null {
     image,
     founderPubkey: event.pubkey,
     moderatorPubkeys,
-    memberBadgeATag,
-    memberBadgeRelayHint,
     relays,
     aTag: `${COMMUNITY_DEFINITION_KIND}:${event.pubkey}:${dTag}`,
   };
@@ -129,15 +111,13 @@ export interface CommunityMember {
   pubkey: string;
   /** Their effective rank in this community. */
   rank: number;
-  /** The badge award event that established membership (undefined for leadership). */
-  awardEvent?: NostrEvent;
-  /** Pubkey of whoever awarded them (undefined for rank 0). */
-  awardedBy?: string;
 }
 
 export interface CommunityMembership {
-  /** Active members with banned members removed. Use this to list community members. */
-  members: CommunityMember[];
+  /** Founder pubkey. */
+  founderPubkey: string;
+  /** Moderator pubkeys (does NOT include the founder). */
+  moderatorPubkeys: string[];
 }
 
 /**
@@ -181,18 +161,22 @@ export function getViewerAuthority(
  * Classification of a community-scoped kind 1984 event.
  *
  * - `content-ban`: Authoritative removal of a specific post (has `e` tag + ban label).
- * - `member-ban`: Authoritative ban of a member (no `e` tag + ban label).
- * - `report`: Soft content warning from a member (NIP-56 report type, no ban label).
+ * - `report`: Soft content warning from a moderator (NIP-56 report type, no ban label).
+ *
+ * Agora's organization trust model only knows founders and moderators —
+ * there is no "member" tier — so banning a user wholesale is not modeled
+ * here. Hide a user by banning each of their posts individually, or by
+ * dropping them from the moderator list.
  */
-export type CommunityReportAction = 'content-ban' | 'member-ban' | 'report';
+export type CommunityReportAction = 'content-ban' | 'report';
 
 export interface CommunityReport {
   /** The original kind 1984 event. */
   event: NostrEvent;
   /** Classified action type. */
   action: CommunityReportAction;
-  /** Targeted event ID (for content-ban and report). Undefined for member-ban. */
-  targetEventId?: string;
+  /** Targeted event ID. */
+  targetEventId: string;
   /** Targeted pubkey. */
   targetPubkey: string;
   /** NIP-56 report type from the `e` or `p` tag (e.g. "nudity", "spam", "other"). */
@@ -214,7 +198,15 @@ export interface CommunityContentBan {
 export interface CommunityModeration {
   /** Content-ban candidates grouped by target event ID. Apply only when target pubkey matches the actual event author. */
   contentBansByEventId: Map<string, CommunityContentBan[]>;
-  /** Set of pubkeys that are member-banned. */
+  /**
+   * Set of pubkeys that are member-banned.
+   *
+   * Always empty in the current organization model — Agora no longer
+   * supports banning whole users from an organization; only event-level
+   * content bans remain. The field is kept on the type so existing
+   * helpers (`isEventAllowedByModeration`, `getViewerAuthority`) keep a
+   * stable shape, but new code should not rely on it being populated.
+   */
   bannedPubkeys: Set<string>;
   /** Reports grouped by target event ID (for content warnings). */
   reportsByEventId: Map<string, CommunityReport[]>;
@@ -231,7 +223,7 @@ export const EMPTY_MODERATION: CommunityModeration = {
 };
 
 /** Empty membership sentinel — no members. */
-export const EMPTY_MEMBERSHIP: CommunityMembership = { members: [] };
+export const EMPTY_MEMBERSHIP: CommunityMembership = { founderPubkey: '', moderatorPubkeys: [] };
 
 /** Empty rank map sentinel — shared frozen instance for default-return paths. */
 export const EMPTY_RANK_MAP: ReadonlyMap<string, CommunityMember> = new Map();
@@ -332,9 +324,11 @@ export function parseCommunityReport(event: NostrEvent): CommunityReport | null 
   const targetPubkey = pTag?.[1];
   if (!targetPubkey || !HEX_PUBKEY_RE.test(targetPubkey)) return null;
 
-  // Extract target event ID (optional — determines content vs member action)
+  // Extract target event ID — required: both content-ban and report
+  // actions target a specific event in Agora's organization model.
   const eTag = event.tags.find(([n]) => n === 'e');
   const targetEventId = eTag?.[1];
+  if (!targetEventId) return null;
 
   // Determine report type from the e or p tag's 3rd element
   const rawType = eTag?.[2] || pTag?.[2] || 'other';
@@ -343,19 +337,7 @@ export function parseCommunityReport(event: NostrEvent): CommunityReport | null 
     : 'other';
 
   const isBan = hasBanLabel(event);
-
-  let action: CommunityReportAction;
-  if (isBan && targetEventId) {
-    action = 'content-ban';
-  } else if (isBan && !targetEventId) {
-    action = 'member-ban';
-  } else if (!isBan && targetEventId) {
-    action = 'report';
-  } else {
-    // No ban label and no e tag — invalid per classification table
-    // (a "report" without a target event has nowhere to attach in the UI)
-    return null;
-  }
+  const action: CommunityReportAction = isBan ? 'content-ban' : 'report';
 
   return {
     event,
@@ -376,23 +358,16 @@ export function parseCommunityReport(event: NostrEvent): CommunityReport | null 
  * moderation state between communities (e.g. when a single relay query
  * returns reports scoped to multiple communities via `#A`).
  *
- * Uses a two-pass approach to prevent banned members from retaining
- * moderation authority:
- *
- * **Pass 1 — Resolve bans (authority-ordered):**
- * Founder/moderators (rank 0) can ban members and non-members. Members
- * (rank 1) can ban only non-members. Processing leadership before members
- * ensures banned members cannot keep moderation authority.
- *
- * **Pass 2 — Resolve reports (filtered):**
- * Processes non-ban reports, skipping any reporter who ended up in the
- * banned set from pass 1. This prevents banned members from polluting the
- * report queue.
+ * In Agora's organization model only the founder and listed moderators
+ * have moderation authority. Reports from anyone else are dropped.
+ * Authoritative content removals (`content-ban`) hide the targeted post;
+ * soft reports attach a content warning without removing the post.
  *
  * @param communityATag - The community's `A` tag value (`34550:<pubkey>:<d>`).
  * @param reports - Candidate kind 1984 events. Events without a matching
  *                  `A` tag are ignored.
- * @param members - Validated membership map (pubkey -> CommunityMember).
+ * @param members - Map of pubkey -> CommunityMember for the founder and
+ *                  current moderators of the community.
  */
 export function resolveCommunityModeration(
   communityATag: string,
@@ -400,16 +375,9 @@ export function resolveCommunityModeration(
   members: Map<string, CommunityMember>,
 ): CommunityModeration {
   const contentBansByEventId = new Map<string, CommunityContentBan[]>();
-  const bannedPubkeys = new Set<string>();
   const reportsByEventId = new Map<string, CommunityReport[]>();
   const allReports: CommunityReport[] = [];
 
-  // Parse every event once. Drop anything that:
-  //  - lacks an `A` tag matching this community (trust-boundary check;
-  //    protects against mixed-community event sets)
-  //  - fails structural classification
-  //  - is not authored by a validated member (membership overlay rules)
-  const parsed: CommunityReport[] = [];
   for (const event of reports) {
     const hasMatchingATag = event.tags.some(
       ([n, v]) => n === 'A' && v === communityATag,
@@ -417,47 +385,11 @@ export function resolveCommunityModeration(
     if (!hasMatchingATag) continue;
     const p = parseCommunityReport(event);
     if (!p) continue;
+    // Only founder/moderators can publish moderation actions against the
+    // organization. Anyone else's kind 1984 is treated as noise.
     if (!members.has(p.reporterPubkey)) continue;
-    parsed.push(p);
-  }
 
-  // ── Pass 1: Resolve bans in authority order ────────────────────────
-  //
-  // Rank 0 means founder/moderator and rank 1 means member. Non-members
-  // are treated as lowest rank (Infinity), so members can only ban
-  // non-members while founder/moderators can ban anyone.
-  //
-  // Candidates are sorted by reporter rank ascending so leadership bans
-  // are resolved before member bans. A reporter banned by an earlier
-  // authoritative action must not retain moderation authority for later
-  // actions in the same pass.
-
-  interface BanCandidate {
-    parsed: CommunityReport;
-    reporterRank: number;
-  }
-
-  const banCandidates: BanCandidate[] = [];
-
-  for (const p of parsed) {
-    if (p.action !== 'content-ban' && p.action !== 'member-ban') continue;
-
-    // Reporter membership is guaranteed by the parse-time filter above.
-    const reporterRank = members.get(p.reporterPubkey)!.rank;
-    const targetRank = members.get(p.targetPubkey)?.rank ?? Infinity;
-
-    // Authority check: strict rank inequality.
-    if (reporterRank >= targetRank) continue;
-
-    banCandidates.push({ parsed: p, reporterRank });
-  }
-
-  banCandidates.sort((a, b) => a.reporterRank - b.reporterRank);
-
-  for (const { parsed: p } of banCandidates) {
-    if (bannedPubkeys.has(p.reporterPubkey)) continue;
-
-    if (p.action === 'content-ban' && p.targetEventId) {
+    if (p.action === 'content-ban') {
       const existing = contentBansByEventId.get(p.targetEventId) ?? [];
       existing.push({
         eventId: p.targetEventId,
@@ -465,98 +397,16 @@ export function resolveCommunityModeration(
         report: p,
       });
       contentBansByEventId.set(p.targetEventId, existing);
-    } else if (p.action === 'member-ban') {
-      bannedPubkeys.add(p.targetPubkey);
+    } else {
+      const existing = reportsByEventId.get(p.targetEventId) ?? [];
+      existing.push(p);
+      reportsByEventId.set(p.targetEventId, existing);
     }
 
     allReports.push(p);
   }
 
-  // ── Pass 2: Attach soft reports, excluding banned reporters ────────
-
-  for (const p of parsed) {
-    if (p.action !== 'report') continue;
-    if (bannedPubkeys.has(p.reporterPubkey)) continue;
-    if (!p.targetEventId) continue; // defensive — 'report' action always has one
-
-    const existing = reportsByEventId.get(p.targetEventId) ?? [];
-    existing.push(p);
-    reportsByEventId.set(p.targetEventId, existing);
-    allReports.push(p);
-  }
-
-  return { contentBansByEventId, bannedPubkeys, reportsByEventId, allReports };
-}
-
-/**
- * Whether a kind 8 badge award is a valid membership award for a community.
- *
- * Three conditions must hold (per NIP.md §Badge Awards):
- * 1. The event is a kind 8 badge award.
- * 2. The award author is the founder or a current moderator of the community.
- * 3. The award contains an `a` tag referencing the community's member badge.
- *
- * This is the single source of truth for award authorization. Both the
- * membership resolver and any discovery path that reaches awards through
- * an unfiltered query (e.g. `#p`-based "communities I belong to" lookups)
- * MUST apply this check before trusting the award.
- */
-export function isAuthorizedAward(award: NostrEvent, community: ParsedCommunity): boolean {
-  if (award.kind !== BADGE_AWARD_KIND) return false;
-  if (!community.memberBadgeATag) return false;
-  if (award.pubkey !== community.founderPubkey && !community.moderatorPubkeys.includes(award.pubkey)) return false;
-  return award.tags.some(([n, v]) => n === 'a' && v === community.memberBadgeATag);
-}
-
-/**
- * Resolve flat community membership from founder/moderators plus membership
- * awards.
- *
- * Each award is validated via `isAuthorizedAward`. Callers SHOULD still query
- * with `authors: [founder, ...moderators]` so the relay indexes the trust
- * boundary, but this resolver enforces the same check client-side so that
- * discovery paths which reach awards by other filters (e.g. `#p` on the
- * viewer) stay consistent.
- */
-export function resolveMembership(
-  community: ParsedCommunity,
-  awardEvents: NostrEvent[],
-): CommunityMembership {
-  const validated = new Map<string, CommunityMember>();
-
-  validated.set(community.founderPubkey, {
-    pubkey: community.founderPubkey,
-    rank: 0,
-  });
-  for (const modPk of community.moderatorPubkeys) {
-    if (!validated.has(modPk)) {
-      validated.set(modPk, { pubkey: modPk, rank: 0 });
-    }
-  }
-
-  for (const award of awardEvents) {
-    if (!isAuthorizedAward(award, community)) continue;
-
-    const recipients = award.tags
-      .filter(([n]) => n === 'p')
-      .map(([, pk]) => pk)
-      .filter((pk): pk is string => !!pk && HEX_PUBKEY_RE.test(pk));
-
-    for (const recipientPk of recipients) {
-      if (validated.has(recipientPk)) continue;
-      validated.set(recipientPk, {
-        pubkey: recipientPk,
-        rank: 1,
-        awardEvent: award,
-        awardedBy: award.pubkey,
-      });
-    }
-  }
-
-  const members = Array.from(validated.values());
-  members.sort((a, b) => a.rank - b.rank);
-
-  return { members };
+  return { contentBansByEventId, bannedPubkeys: new Set(), reportsByEventId, allReports };
 }
 
 /**
@@ -565,4 +415,93 @@ export function resolveMembership(
 export function getCommunityATag(event: NostrEvent): string {
   const dTag = event.tags.find(([n]) => n === 'd')?.[1] ?? '';
   return `${COMMUNITY_DEFINITION_KIND}:${event.pubkey}:${dTag}`;
+}
+
+// ─── Organization role helpers (founder + moderator model) ───────────────────
+//
+// Agora treats NIP-72 communities as "Organizations" with only two trust
+// levels: the founder (event author) and the moderators listed in the kind
+// 34550 event's `p` tags with role "moderator". The badge-award membership
+// layer is no longer part of Agora's product model. These helpers centralize
+// the role checks so callers don't reach into ParsedCommunity tag arrays
+// directly.
+
+/**
+ * Return whether the given pubkey is the organization's founder. The founder
+ * is always the publisher of the kind 34550 event.
+ */
+export function isOrganizationFounder(
+  community: ParsedCommunity,
+  pubkey: string | undefined,
+): boolean {
+  return !!pubkey && community.founderPubkey === pubkey;
+}
+
+/**
+ * Return whether the given pubkey is one of the organization's moderators.
+ * Moderators are pubkeys listed in the kind 34550 event's `p` tags with
+ * role "moderator". The founder is intentionally NOT included here — use
+ * {@link canModerateOrganization} for the broader "founder OR moderator"
+ * check that gates moderation actions.
+ */
+export function isOrganizationModerator(
+  community: ParsedCommunity,
+  pubkey: string | undefined,
+): boolean {
+  return !!pubkey && community.moderatorPubkeys.includes(pubkey);
+}
+
+/**
+ * Only the founder can edit organization metadata (name, description,
+ * cover image, moderator roster). This mirrors NIP-72's implicit rule that
+ * a community definition is a replaceable event keyed on its author —
+ * only the author can publish a new version.
+ */
+export function canEditOrganization(
+  community: ParsedCommunity,
+  pubkey: string | undefined,
+): boolean {
+  return isOrganizationFounder(community, pubkey);
+}
+
+/**
+ * Both founder and moderators can moderate the organization feed — hide
+ * comments, ban users from appearing, dismiss content. Editing the
+ * organization itself is founder-only (see {@link canEditOrganization}).
+ */
+export function canModerateOrganization(
+  community: ParsedCommunity,
+  pubkey: string | undefined,
+): boolean {
+  return (
+    isOrganizationFounder(community, pubkey) ||
+    isOrganizationModerator(community, pubkey)
+  );
+}
+
+/**
+ * Return the list of pubkeys whose campaigns, pledges, and calendar events
+ * Agora should treat as "official" activity for the organization — the
+ * founder plus every listed moderator.
+ *
+ * Agora restricts creation of organization-tagged campaigns / pledges /
+ * events in the client to this set, but anyone could technically publish
+ * a kind 30223 / 36639 / 31922 / 31923 with the organization's uppercase
+ * `A` root-scope tag outside the client. Queries that surface "official"
+ * organization activity MUST pass this list as the `authors` filter so
+ * forged events from non-moderators never reach the UI.
+ *
+ * Returns a deduplicated array preserving founder-first ordering.
+ */
+export function getOrganizationOfficialAuthors(community: ParsedCommunity): string[] {
+  const seen = new Set<string>();
+  const authors: string[] = [];
+  authors.push(community.founderPubkey);
+  seen.add(community.founderPubkey);
+  for (const mod of community.moderatorPubkeys) {
+    if (seen.has(mod)) continue;
+    seen.add(mod);
+    authors.push(mod);
+  }
+  return authors;
 }

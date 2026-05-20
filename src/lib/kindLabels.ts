@@ -132,7 +132,7 @@ export const KIND_LABELS: Record<number, string> = {
   3367: 'Color moment',
 
   // NIP-72
-  4550: 'Community post approval',
+  4550: 'Organization post approval',
 
   // NIP-90 DVM (ranges)
   5000: 'Job request',
@@ -181,7 +181,7 @@ export const KIND_LABELS: Record<number, string> = {
   10002: 'Relay list',
   // NIP-51
   10003: 'Bookmark list',
-  10004: 'Communities list',
+  10004: 'Organizations list',
   10005: 'Public chats list',
   10006: 'Blocked relays list',
   10007: 'Search relays list',
@@ -368,7 +368,7 @@ export const KIND_LABELS: Record<number, string> = {
   // Music
   34139: 'Music playlist',
   // NIP-72
-  34550: 'Community definition',
+  34550: 'Organization definition',
   // NIP-5A
   34128: 'Nsite (legacy)',
   35128: 'Nsite',

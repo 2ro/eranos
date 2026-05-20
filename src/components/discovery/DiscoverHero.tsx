@@ -192,7 +192,7 @@ export function DiscoverHero({ className }: DiscoverHeroProps) {
       items.push({
         id: 'communities',
         value: communities.length.toLocaleString(),
-        label: `${communities.length === 1 ? 'community' : 'communities'} gathering on Nostr`,
+        label: `${communities.length === 1 ? 'organization' : 'organizations'} gathering on Nostr`,
         icon: <Users className="size-5" aria-hidden />,
       });
     }
