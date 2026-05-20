@@ -239,7 +239,7 @@ function PledgeDetailContent({ action }: { action: Action }) {
                   replyLabel="Submit"
                   onReply={() => setReplyOpen(true)}
                   onMore={() => setMoreMenuOpen(true)}
-                  className={hasStats ? 'pt-3' : undefined}
+                  className={hasStats ? 'pt-3 border-t border-border/60' : undefined}
                 />
               </div>
 
