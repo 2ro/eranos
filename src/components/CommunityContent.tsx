@@ -11,7 +11,7 @@ function getTag(tags: string[][], name: string): string | undefined {
 }
 
 function parseCommunityEvent(event: NostrEvent) {
-  const name = getTag(event.tags, 'name') || getTag(event.tags, 'd') || 'Unnamed Community';
+  const name = getTag(event.tags, 'name') || getTag(event.tags, 'd') || 'Unnamed Organization';
   const description = getTag(event.tags, 'description') || '';
   const image = getTag(event.tags, 'image');
 

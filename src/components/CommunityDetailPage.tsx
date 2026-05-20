@@ -421,7 +421,7 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
 
   // Parse community definition
   const community = useMemo(() => parseCommunityEvent(event), [event]);
-  const name = community?.name ?? 'Unnamed Community';
+  const name = community?.name ?? 'Unnamed Organization';
   const description = community?.description ?? '';
   const image = community?.image;
   const cover = sanitizeUrl(image);
@@ -772,7 +772,7 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
                         type="button"
                         onClick={() => setDescriptionDialogOpen(true)}
                         className="-my-1 -mr-1 p-1 rounded-full text-white/75 hover:text-white hover:bg-white/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80 transition-colors"
-                        aria-label="About this community"
+                        aria-label="About this organization"
                       >
                         <Info className="size-4 [text-shadow:none] drop-shadow-[0_1px_2px_rgba(0,0,0,0.85)]" />
                       </button>

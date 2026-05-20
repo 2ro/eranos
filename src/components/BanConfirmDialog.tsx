@@ -67,20 +67,20 @@ export function BanConfirmDialog({
       // immediately (removes banned content without a page refresh).
       await queryClient.invalidateQueries({ queryKey: ['community-members', communityATag] });
 
-      toast({ title: 'Post removed from community' });
+      toast({ title: 'Post removed from organization' });
       setReason('');
       onOpenChange(false);
     } catch {
-      toast({ title: 'Failed to remove post from community', variant: 'destructive' });
+      toast({ title: 'Failed to remove post from organization', variant: 'destructive' });
     }
   };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-md rounded-2xl flex flex-col overflow-hidden">
-        <DialogTitle>Remove from community</DialogTitle>
+        <DialogTitle>Remove from organization</DialogTitle>
         <DialogDescription className="text-sm text-muted-foreground">
-          This will hide the post from canonical community views.
+          This will hide the post from canonical organization views.
         </DialogDescription>
 
         <div className="space-y-2">
