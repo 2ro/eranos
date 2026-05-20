@@ -212,7 +212,7 @@ function PledgeDetailContent({ action }: { action: Action }) {
             <div id="pledge-activity" className="scroll-mt-20">
               <div className="rounded-2xl bg-card border border-border/60 shadow-sm px-4 sm:px-5 py-4 sm:py-5">
                 {hasStats && (
-                  <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs sm:text-sm text-muted-foreground pb-2">
+                  <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs sm:text-sm text-muted-foreground">
                     {engagementStats?.reposts ? (
                       <button onClick={() => openInteractions('reposts')} className="hover:underline transition-colors">
                         <span className="font-bold text-foreground">{engagementStats.reposts.toLocaleString()}</span>{' '}
@@ -239,7 +239,6 @@ function PledgeDetailContent({ action }: { action: Action }) {
                   replyLabel="Submit"
                   onReply={() => setReplyOpen(true)}
                   onMore={() => setMoreMenuOpen(true)}
-                  className={hasStats ? 'pt-3 border-t border-border/60' : undefined}
                 />
               </div>
 
