@@ -369,7 +369,7 @@ const DONOR_GUIDE_TEMPLATE: GuideSection[] = [
     id: 'privacy-non-kyc',
     heading: 'For privacy: use non-KYC Bitcoin',
     paragraphs: [
-      'Buy Bitcoin peer-to-peer so it isn\'t linked to your government ID. Marketplaces like [Bisq](https://bisq.network), [RoboSats](https://learn.robosats.com), and [HodlHodl](https://hodlhodl.com) let you trade directly with another person.',
+      'Buy Bitcoin peer-to-peer so it isn\'t linked to your government ID. [Bisq](https://bisq.network) and [HodlHodl](https://hodlhodl.com) let you trade on-chain Bitcoin directly with another person. [RoboSats](https://learn.robosats.com) is Lightning-only, so you\'d swap to Lightning with [Boltz](https://boltz.exchange) and then receive on RoboSats.',
     ],
     pros: ['No exchange knows who you are.', 'Strongest privacy starting point.'],
     cons: ['Slower and harder than a consumer app.', 'Requires finding a counterparty.'],
@@ -460,7 +460,7 @@ const ACTIVIST_GUIDE_TEMPLATE: GuideSection[] = [
     id: 'cashout-p2p',
     heading: 'Peer-to-peer exchange',
     paragraphs: [
-      'Trade Bitcoin for fiat directly with another person on [Bisq](https://bisq.network), [RoboSats](https://learn.robosats.com), or [HodlHodl](https://hodlhodl.com). No exchange records your identity.',
+      'Trade Bitcoin for fiat directly with another person. [Bisq](https://bisq.network) and [HodlHodl](https://hodlhodl.com) trade on-chain Bitcoin. [RoboSats](https://learn.robosats.com) is Lightning-only \u2014 swap your on-chain Bitcoin to Lightning first with [Boltz](https://boltz.exchange), then sell on RoboSats. No exchange records your identity either way.',
     ],
     pros: ['Cash in hand without KYC.', 'No central exchange knows you.'],
     cons: ['Slower than an exchange.', 'Requires a willing counterparty.', 'Some learning curve.'],
@@ -479,7 +479,7 @@ const ACTIVIST_GUIDE_TEMPLATE: GuideSection[] = [
     paragraphs: [
       '**Lightning swap (Boltz):** non-custodial \u00b7 medium privacy \u00b7 easy \u00b7 low fees.',
       '**Coinjoin (Wasabi, JoinMarket):** non-custodial \u00b7 high privacy \u00b7 medium difficulty \u00b7 medium fees.',
-      '**Peer-to-peer (Bisq, RoboSats):** non-custodial \u00b7 high privacy \u00b7 harder \u00b7 variable fees.',
+      '**Peer-to-peer (Bisq, HodlHodl, RoboSats via Boltz):** non-custodial \u00b7 high privacy \u00b7 harder \u00b7 variable fees.',
       '**Tumblers:** custodial \u00b7 unpredictable privacy \u00b7 easy \u00b7 high risk. **Avoid.**',
     ],
   },
