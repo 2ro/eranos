@@ -39,7 +39,7 @@ import { useCampaigns } from '@/hooks/useCampaigns';
 import { useCountryFollows } from '@/hooks/useCountryFollows';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useNotificationPreview } from '@/hooks/useNotificationPreview';
-import { useMyCommunities, type MyCommunityEntry } from '@/hooks/useMyCommunities';
+import { useUserOrganizations, type UserOrganization } from '@/hooks/useUserOrganizations';
 
 import { satsToUSD, formatBTC } from '@/lib/bitcoin';
 import { COUNTRIES } from '@/lib/countries';
@@ -90,7 +90,7 @@ export function MySquarePage() {
  * Inner component rendered only when a user is logged in. This boundary
  * ensures that `useCampaigns` (which has no internal `enabled` guard)
  * never fires unnecessary `limit: 0` relay requests for logged-out visitors.
- * `useCountryFollows` and `useMyCommunities` already guard internally, but
+ * `useCountryFollows` and `useUserOrganizations` already guard internally, but
  * co-locating all data hooks here keeps the pattern consistent.
  */
 function LoggedInContent({ pubkey }: { pubkey: string }) {
@@ -102,7 +102,7 @@ function LoggedInContent({ pubkey }: { pubkey: string }) {
     { recipientPubkeys: [pubkey], includeArchived: true, limit: 24 },
   );
   const countryFollows = useCountryFollows();
-  const communitiesQuery = useMyCommunities();
+  const communitiesQuery = useUserOrganizations();
 
   return (
     <main className="min-h-screen pb-16">
@@ -646,7 +646,7 @@ function CountriesSection({
 function CommunitiesSection({
   communitiesQuery,
 }: {
-  communitiesQuery: UseQueryResult<MyCommunityEntry[]>;
+  communitiesQuery: { data: UserOrganization[]; isLoading: boolean };
 }) {
   const navigate = useNavigate();
   const communities = communitiesQuery.data;
