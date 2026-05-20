@@ -30,8 +30,7 @@ export function DonorGuidePage() {
   return (
     <main className="min-h-screen pb-16 sidebar:pb-0">
       <GuideHero
-        eyebrow="Donor Guide"
-        title="Support activists, on your terms."
+        title="Donor Guide"
         subtitle="Real Bitcoin, sent directly. Here's how it works and how to do it privately."
         images={DONOR_HERO_IMAGES}
         palette={COOL_PALETTE}

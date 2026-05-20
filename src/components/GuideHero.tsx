@@ -7,8 +7,6 @@ import { HeroBanner } from '@/components/HeroBanner';
 import { HOPE_PALETTE, type HopeHue } from '@/lib/hopePalette';
 
 interface GuideHeroProps {
-  /** Eyebrow label rendered above the headline (e.g. "Donor Guide"). */
-  eyebrow: string;
   /** Large hero headline. */
   title: string;
   /** Short subtitle under the headline. */
@@ -33,7 +31,6 @@ interface GuideHeroProps {
  * primary navigation out — so a separate sticky bar isn't needed.
  */
 export function GuideHero({
-  eyebrow,
   title,
   subtitle,
   images,
@@ -69,9 +66,9 @@ export function GuideHero({
       />
 
       <div className="relative max-w-3xl mx-auto px-4 sm:px-6 py-6 sm:py-8 min-h-[240px] sm:min-h-[280px] flex flex-col">
-        {/* Back-to-Help action sits in the eyebrow row, on the left, so
-            it doubles as both the navigation out and the breadcrumb. */}
-        <div className="flex items-center justify-between gap-3">
+        {/* Back-to-Help action sits on its own row at the top so it
+            doubles as both the navigation out and the breadcrumb. */}
+        <div>
           <Link
             to="/help"
             className="inline-flex items-center gap-1.5 rounded-full bg-black/30 hover:bg-black/45 backdrop-blur-sm border border-white/20 px-3 py-1.5 text-xs sm:text-sm font-medium text-white drop-shadow focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70 transition-colors"
@@ -79,9 +76,6 @@ export function GuideHero({
             <ArrowLeft className="size-3.5" />
             Back to Help
           </Link>
-          <span className="text-xs sm:text-sm font-semibold uppercase tracking-[0.18em] text-white/85 drop-shadow">
-            {eyebrow}
-          </span>
         </div>
 
         {/* Headline + subtitle anchored to the bottom of the hero so the

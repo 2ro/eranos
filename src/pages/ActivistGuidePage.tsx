@@ -31,8 +31,7 @@ export function ActivistGuidePage() {
   return (
     <main className="min-h-screen pb-16 sidebar:pb-0">
       <GuideHero
-        eyebrow="Activist Guide"
-        title="Get paid. Stay free."
+        title="Activist Guide"
         subtitle="How to receive donations on Agora and move funds privately when you need to."
         images={ACTIVIST_HERO_IMAGES}
         palette={HOPE_PALETTE}
