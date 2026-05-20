@@ -177,10 +177,6 @@ function formatDeadline(unixSeconds: number): { label: string; isPast: boolean }
   return { label: `${months} mo left`, isPast: false };
 }
 
-function tagLabel(tag: string): string {
-  return tag.replace(/-/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
-}
-
 function PledgeProgress({
   pledgedSats,
   fundedSats,
@@ -231,7 +227,6 @@ function ActionCard({ action, isExpired, btcPrice }: { action: Action; isExpired
     ? action.image
     : DEFAULT_COVER_IMAGE;
 
-  const primaryTag = action.tags[0];
   const deadline = action.deadline ? formatDeadline(action.deadline) : null;
   const countryLabel = action.countryCode ? getGeoDisplayName(action.countryCode) : undefined;
 
@@ -249,11 +244,6 @@ function ActionCard({ action, isExpired, btcPrice }: { action: Action; isExpired
             onError={() => setImageLoadFailed(true)}
             loading="lazy"
           />
-          {primaryTag && (
-            <Badge variant="secondary" className="absolute top-3 left-3 backdrop-blur bg-background/80 border-border/40">
-              {tagLabel(primaryTag)}
-            </Badge>
-          )}
           <div className="absolute top-3 right-3 flex items-center gap-2" onClick={(e) => e.preventDefault()}>
             {isExpired && (
               <Badge variant="secondary" className="backdrop-blur bg-background/85 border-border/40 text-muted-foreground">
