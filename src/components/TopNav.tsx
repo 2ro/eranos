@@ -4,7 +4,6 @@ import {
   Activity,
   Bell,
   CircleHelp,
-  Earth,
   HandHeart,
   Megaphone,
   Menu,
@@ -37,7 +36,6 @@ interface NavItem {
 
 const NAV_ITEMS: NavItem[] = [
   { label: 'Discover', to: '/discover', icon: HandHeart },
-  { label: 'World', to: '/world', icon: Earth },
   { label: 'Organize', to: '/communities', icon: Users },
   { label: 'Actions', to: '/actions', icon: Megaphone },
 ];
