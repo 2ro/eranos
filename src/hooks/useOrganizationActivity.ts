@@ -52,120 +52,72 @@ function dedupeAddressableLatest(events: NostrEvent[]): NostrEvent[] {
   return [...latest.values()];
 }
 
-/**
- * Fetch campaigns published by an organization's founder or moderators
- * that carry an uppercase `A` root-scope tag referencing this organization.
- *
- * Trust boundary: anyone can technically publish a kind 30223 event with
- * the organization's `A` tag, so this hook MUST author-filter to the
- * founder + moderator set. Without `authors`, forged "official" campaigns
- * would show up on the organization page (see the nostr-security skill,
- * §"Author filtering for trust-sensitive queries").
- */
-export function useOrganizationCampaigns(community: ParsedCommunity | null | undefined) {
-  const { nostr } = useNostr();
-  const officialAuthors = community ? getOrganizationOfficialAuthors(community) : [];
-  const aTag = community?.aTag ?? '';
-  const authorsKey = officialAuthors.join(',');
-
-  return useQuery<ParsedCampaign[]>({
-    queryKey: ['org-campaigns', aTag, authorsKey],
-    queryFn: async ({ signal }) => {
-      if (!community || officialAuthors.length === 0) return [];
-      const combinedSignal = AbortSignal.any([signal, AbortSignal.timeout(8000)]);
-      const events = await nostr.query(
-        [{
-          kinds: [CAMPAIGN_KIND],
-          authors: officialAuthors,
-          '#A': [aTag],
-          limit: 100,
-        }],
-        { signal: combinedSignal },
-      );
-      const parsed: ParsedCampaign[] = [];
-      for (const event of dedupeAddressableLatest(events)) {
-        const campaign = parseCampaign(event);
-        if (!campaign) continue;
-        parsed.push(campaign);
-      }
-      parsed.sort((a, b) => b.createdAt - a.createdAt);
-      return parsed;
-    },
-    enabled: !!community && officialAuthors.length > 0,
-    staleTime: 60_000,
-  });
+export interface OrganizationActivity {
+  campaigns: ParsedCampaign[];
+  pledges: Action[];
+  events: NostrEvent[];
 }
 
 /**
- * Fetch pledges (kind 36639) published by an organization's founder or
- * moderators that carry an uppercase `A` root-scope tag referencing this
- * organization.
+ * Fetch official campaigns, pledges, and calendar events for an organization
+ * in one relay request.
  *
- * Same trust boundary as {@link useOrganizationCampaigns}: must author-filter
- * to the founder + moderator set so non-mod pledges don't show as official.
+ * Trust boundary: anyone can technically publish an event with the
+ * organization's uppercase `A` tag, so this hook MUST author-filter to the
+ * founder + moderator set. Without `authors`, forged "official" activity
+ * would show up on the organization page.
  */
-export function useOrganizationPledges(community: ParsedCommunity | null | undefined) {
+export function useOrganizationActivity(community: ParsedCommunity | null | undefined) {
   const { nostr } = useNostr();
   const officialAuthors = community ? getOrganizationOfficialAuthors(community) : [];
   const aTag = community?.aTag ?? '';
   const authorsKey = officialAuthors.join(',');
 
-  return useQuery<Action[]>({
-    queryKey: ['org-pledges', aTag, authorsKey],
+  return useQuery<OrganizationActivity>({
+    queryKey: ['organization-activity', aTag, authorsKey],
     queryFn: async ({ signal }) => {
-      if (!community || officialAuthors.length === 0) return [];
+      if (!community || officialAuthors.length === 0) {
+        return { campaigns: [], pledges: [], events: [] };
+      }
+
       const combinedSignal = AbortSignal.any([signal, AbortSignal.timeout(8000)]);
       const events = await nostr.query(
         [{
-          kinds: [PLEDGE_KIND],
+          kinds: [CAMPAIGN_KIND, PLEDGE_KIND, ...CALENDAR_EVENT_KINDS],
           authors: officialAuthors,
           '#A': [aTag],
-          limit: 100,
+          limit: 300,
         }],
         { signal: combinedSignal },
       );
+
+      const campaigns: ParsedCampaign[] = [];
       const pledges: Action[] = [];
+      const calendarEvents: NostrEvent[] = [];
+
       for (const event of dedupeAddressableLatest(events)) {
-        const pledge = parseAction(event);
-        if (!pledge) continue;
-        pledges.push(pledge);
+        if (event.kind === CAMPAIGN_KIND) {
+          const campaign = parseCampaign(event);
+          if (campaign) campaigns.push(campaign);
+          continue;
+        }
+
+        if (event.kind === PLEDGE_KIND) {
+          const pledge = parseAction(event);
+          if (pledge) pledges.push(pledge);
+          continue;
+        }
+
+        if (isValidCalendarEvent(event)) {
+          calendarEvents.push(event);
+        }
       }
+
+      campaigns.sort((a, b) => b.createdAt - a.createdAt);
       pledges.sort((a, b) => b.createdAt - a.createdAt);
-      return pledges;
-    },
-    enabled: !!community && officialAuthors.length > 0,
-    staleTime: 60_000,
-  });
-}
+      calendarEvents.sort((a, b) => b.created_at - a.created_at);
 
-/**
- * Fetch upcoming NIP-52 calendar events published by an organization's
- * founder or moderators that carry an uppercase `A` root-scope tag
- * referencing this organization.
- *
- * Same trust boundary as {@link useOrganizationCampaigns}.
- */
-export function useOrganizationEvents(community: ParsedCommunity | null | undefined) {
-  const { nostr } = useNostr();
-  const officialAuthors = community ? getOrganizationOfficialAuthors(community) : [];
-  const aTag = community?.aTag ?? '';
-  const authorsKey = officialAuthors.join(',');
-
-  return useQuery<NostrEvent[]>({
-    queryKey: ['org-events', aTag, authorsKey],
-    queryFn: async ({ signal }) => {
-      if (!community || officialAuthors.length === 0) return [];
-      const combinedSignal = AbortSignal.any([signal, AbortSignal.timeout(8000)]);
-      const events = await nostr.query(
-        [{
-          kinds: CALENDAR_EVENT_KINDS,
-          authors: officialAuthors,
-          '#A': [aTag],
-          limit: 100,
-        }],
-        { signal: combinedSignal },
-      );
-      return dedupeAddressableLatest(events).filter(isValidCalendarEvent);
+      return { campaigns, pledges, events: calendarEvents };
     },
     enabled: !!community && officialAuthors.length > 0,
     staleTime: 60_000,

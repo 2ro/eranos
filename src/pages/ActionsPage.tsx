@@ -8,9 +8,7 @@ import { useActions, type Action } from '@/hooks/useActions';
 import { useAuthor } from '@/hooks/useAuthor';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useBitcoinWallet } from '@/hooks/useBitcoinWallet';
-import { useComments } from '@/hooks/useComments';
 import { useNostrPublish } from '@/hooks/useNostrPublish';
-import { useSubmissionZapTotals } from '@/hooks/useSubmissionZapTotals';
 import { useToast } from '@/hooks/useToast';
 import { getAllCountries, getGeoDisplayName, countryCodeToFlag } from '@/lib/countries';
 import { getDisplayName } from '@/lib/genUserName';
@@ -25,7 +23,6 @@ import { HeroBanner } from '@/components/HeroBanner';
 import { Badge } from '@/components/ui/badge';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Progress } from '@/components/ui/progress';
 import { Skeleton } from '@/components/ui/skeleton';
 import {
   Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList,
@@ -40,7 +37,7 @@ import {
 import {
   CalendarClock, Clock, HandHeart, MapPin, Plus, ChevronRight, Loader2,
   Link as LinkIcon, Check, MoreHorizontal, Trash2, ListFilter,
-  Calendar, DollarSign, Globe, Megaphone, Target,
+  Calendar, DollarSign, Globe, Megaphone,
 } from 'lucide-react';
 
 function formatPledgeAmount(sats: number, btcPrice: number | undefined): string {
@@ -177,43 +174,11 @@ function formatDeadline(unixSeconds: number): { label: string; isPast: boolean }
   return { label: `${months} mo left`, isPast: false };
 }
 
-function PledgeProgress({
-  pledgedSats,
-  fundedSats,
-  btcPrice,
-}: {
-  pledgedSats: number;
-  fundedSats: number;
-  btcPrice: number | undefined;
-}) {
-  const pct = pledgedSats > 0 ? Math.min(100, Math.round((fundedSats / pledgedSats) * 100)) : 0;
-  return (
-    <div className="space-y-1.5">
-      <Progress value={pct} className="h-2" />
-      <div className="flex items-baseline justify-between gap-2 text-sm">
-        <span className="font-semibold">
-          {formatPledgeAmount(fundedSats, btcPrice)}
-          <span className="ml-1 font-normal text-muted-foreground">funded</span>
-        </span>
-        <span className="text-muted-foreground">of {formatPledgeAmount(pledgedSats, btcPrice)} pledged</span>
-      </div>
-    </div>
-  );
-}
-
 function ActionCard({ action, isExpired, btcPrice }: { action: Action; isExpired?: boolean; btcPrice: number | undefined }) {
   const author = useAuthor(action.pubkey);
   const metadata = author.data?.metadata;
   const displayName = getDisplayName(metadata, action.pubkey);
   const [imageLoadFailed, setImageLoadFailed] = useState(false);
-  const { data: commentsData } = useComments(action.event, 100);
-  const topLevel = useMemo(() => commentsData?.topLevelComments ?? [], [commentsData?.topLevelComments]);
-  const submissionIds = useMemo(() => topLevel.map((c) => c.id), [topLevel]);
-  const { data: zapTotals } = useSubmissionZapTotals(submissionIds);
-  const fundedSats = useMemo(() => {
-    const totals = zapTotals ?? new Map<string, number>();
-    return topLevel.reduce((sum, submission) => sum + (totals.get(submission.id) ?? 0), 0);
-  }, [topLevel, zapTotals]);
 
   const naddr = nip19.naddrEncode({
     kind: 36639,
@@ -268,13 +233,14 @@ function ActionCard({ action, isExpired, btcPrice }: { action: Action; isExpired
 
           <div className="flex-1" />
 
-          <PledgeProgress pledgedSats={action.bounty} fundedSats={fundedSats} btcPrice={btcPrice} />
+          <div className="rounded-xl border border-primary/20 bg-primary/10 px-4 py-3">
+            <p className="text-xs font-semibold uppercase tracking-wide text-primary">Pledged</p>
+            <p className="mt-1 text-2xl font-bold tracking-tight text-foreground">
+              {formatPledgeAmount(action.bounty, btcPrice)}
+            </p>
+          </div>
 
           <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 text-xs text-muted-foreground pt-1">
-            <span className="inline-flex items-center gap-1.5">
-              <Target className="size-3.5" />
-              {topLevel.length} {topLevel.length === 1 ? 'submission' : 'submissions'}
-            </span>
             {countryLabel && (
               <span className="inline-flex items-center gap-1.5">
                 <MapPin className="size-3.5" />

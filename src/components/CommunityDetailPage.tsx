@@ -14,7 +14,6 @@ import {
   MoreVertical,
   Pencil,
   Shield,
-  Target,
   Share2,
   UserCheck,
   UserMinus,
@@ -32,7 +31,6 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
-import { Progress } from '@/components/ui/progress';
 import { Skeleton } from '@/components/ui/skeleton';
 import { DonateDialog } from '@/components/DonateDialog';
 import { NoteContent } from '@/components/NoteContent';
@@ -50,15 +48,10 @@ import { useCommunityMembers } from '@/hooks/useCommunityMembers';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useEventStats } from '@/hooks/useTrending';
 import { useNow } from '@/hooks/useNow';
-import {
-  useOrganizationCampaigns,
-  useOrganizationPledges,
-  useOrganizationEvents,
-} from '@/hooks/useOrganizationActivity';
+import { useOrganizationActivity } from '@/hooks/useOrganizationActivity';
 import { useProfileUrl } from '@/hooks/useProfileUrl';
 import { useToast } from '@/hooks/useToast';
 import { useEventRSVPs } from '@/hooks/useEventRSVPs';
-import { useSubmissionZapTotals } from '@/hooks/useSubmissionZapTotals';
 import { CommunityModerationContext } from '@/contexts/CommunityModerationContext';
 import { useLayoutOptions } from '@/contexts/LayoutContext';
 import { applyCommunityModerationToEvents, parseCommunityEvent } from '@/lib/communityUtils';
@@ -237,18 +230,11 @@ function formatPledgeDeadline(unixSeconds: number): { label: string; isPast: boo
   return { label: `${months} mo left`, isPast: false };
 }
 
-function PledgeShelfProgress({ pledgedSats, fundedSats, btcPrice }: { pledgedSats: number; fundedSats: number; btcPrice: number | undefined }) {
-  const pct = pledgedSats > 0 ? Math.min(100, Math.round((fundedSats / pledgedSats) * 100)) : 0;
+function ActivityTypePill({ icon, label }: { icon: React.ReactNode; label: string }) {
   return (
-    <div className="space-y-1.5">
-      <Progress value={pct} className="h-2" />
-      <div className="flex items-baseline justify-between gap-2 text-sm">
-        <span className="font-semibold">
-          {formatPledgeAmount(fundedSats, btcPrice)}
-          <span className="ml-1 font-normal text-muted-foreground">funded</span>
-        </span>
-        <span className="text-muted-foreground">of {formatPledgeAmount(pledgedSats, btcPrice)} pledged</span>
-      </div>
+    <div className="inline-flex items-center gap-1.5 rounded-full border border-border/70 bg-background/95 px-2.5 py-1 text-xs font-semibold text-muted-foreground shadow-sm">
+      {icon}
+      {label}
     </div>
   );
 }
@@ -259,14 +245,6 @@ function PledgeShelfCard({ pledge }: { pledge: Action }) {
   const metadata = author.data?.metadata;
   const displayName = getDisplayName(metadata, pledge.pubkey);
   const [imageLoadFailed, setImageLoadFailed] = useState(false);
-  const { data: commentsData } = useComments(pledge.event, 100);
-  const topLevel = useMemo(() => commentsData?.topLevelComments ?? [], [commentsData?.topLevelComments]);
-  const submissionIds = useMemo(() => topLevel.map((comment) => comment.id), [topLevel]);
-  const { data: zapTotals } = useSubmissionZapTotals(submissionIds);
-  const fundedSats = useMemo(() => {
-    const totals = zapTotals ?? new Map<string, number>();
-    return topLevel.reduce((sum, submission) => sum + (totals.get(submission.id) ?? 0), 0);
-  }, [topLevel, zapTotals]);
 
   const sanitizedCover = sanitizeUrl(pledge.image);
   const coverImage = sanitizedCover && !imageLoadFailed ? sanitizedCover : DEFAULT_COVER_IMAGE;
@@ -282,6 +260,9 @@ function PledgeShelfCard({ pledge }: { pledge: Action }) {
       to={`/${naddr}`}
       className="group block w-[280px] shrink-0 rounded-xl overflow-hidden focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background motion-safe:transition-transform motion-safe:duration-200 motion-safe:hover:-translate-y-0.5"
     >
+      <div className="mb-2">
+        <ActivityTypePill icon={<Megaphone className="size-3.5 text-primary" />} label="Pledge" />
+      </div>
       <Card className="overflow-hidden border-border/70 shadow-sm motion-safe:transition-shadow motion-safe:duration-200 group-hover:shadow-lg h-full flex flex-col">
         <div className="relative w-full aspect-[16/9] bg-gradient-to-br from-primary/15 via-primary/5 to-secondary">
           <img
@@ -314,13 +295,14 @@ function PledgeShelfCard({ pledge }: { pledge: Action }) {
 
           <div className="flex-1" />
 
-          <PledgeShelfProgress pledgedSats={pledge.bounty} fundedSats={fundedSats} btcPrice={btcPrice} />
+          <div className="rounded-xl border border-primary/20 bg-primary/10 px-4 py-3">
+            <p className="text-xs font-semibold uppercase tracking-wide text-primary">Pledged</p>
+            <p className="mt-1 text-2xl font-bold tracking-tight text-foreground">
+              {formatPledgeAmount(pledge.bounty, btcPrice)}
+            </p>
+          </div>
 
           <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 text-xs text-muted-foreground pt-1">
-            <span className="inline-flex items-center gap-1.5">
-              <Target className="size-3.5" />
-              {topLevel.length} {topLevel.length === 1 ? 'submission' : 'submissions'}
-            </span>
             {countryLabel && (
               <span className="inline-flex items-center gap-1.5">
                 <MapPin className="size-3.5" />
@@ -371,6 +353,9 @@ function CalendarEventShelfCard({ event }: { event: NostrEvent }) {
       to={`/${naddr}`}
       className="group block w-[280px] shrink-0 rounded-xl overflow-hidden focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background motion-safe:transition-transform motion-safe:duration-200 motion-safe:hover:-translate-y-0.5"
     >
+      <div className="mb-2">
+        <ActivityTypePill icon={<CalendarDays className="size-3.5 text-primary" />} label="Event" />
+      </div>
       <Card className="overflow-hidden border-border/70 shadow-sm motion-safe:transition-shadow motion-safe:duration-200 group-hover:shadow-lg h-full flex flex-col">
         <div className="relative w-full aspect-[16/9] overflow-hidden bg-gradient-to-br from-primary/15 via-primary/5 to-secondary">
           {coverImage ? (
@@ -560,6 +545,9 @@ function OfficialActivityShelves({
           if (item.type === 'campaign') {
             return (
               <div key={`campaign:${item.id}`} className="w-[280px] shrink-0">
+                <div className="mb-2">
+                  <ActivityTypePill icon={<HandHeart className="size-3.5 text-primary" />} label="Campaign" />
+                </div>
                 <CampaignCard campaign={item.campaign} />
               </div>
             );
@@ -774,9 +762,7 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
   // Author-filtered to founder + moderators (see useOrganizationActivity).
   // These power the campaign/pledge/event shelves rendered above the
   // comments section.
-  const { data: orgCampaigns, isLoading: orgCampaignsLoading } = useOrganizationCampaigns(community);
-  const { data: orgPledges, isLoading: orgPledgesLoading } = useOrganizationPledges(community);
-  const { data: orgEvents, isLoading: orgEventsLoading } = useOrganizationEvents(community);
+  const { data: orgActivity, isLoading: orgActivityLoading } = useOrganizationActivity(community);
   const now = useNow(60_000);
 
   // naddr for this community — used by the create CTAs (passed to create
@@ -1042,12 +1028,12 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
 
             {/* Official-activity shelves. Hidden entirely when empty. */}
             <OfficialActivityShelves
-              campaigns={orgCampaigns ?? []}
-              campaignsLoading={orgCampaignsLoading}
-              pledges={orgPledges ?? []}
-              pledgesLoading={orgPledgesLoading}
-              events={orgEvents ?? []}
-              eventsLoading={orgEventsLoading}
+              campaigns={orgActivity?.campaigns ?? []}
+              campaignsLoading={orgActivityLoading}
+              pledges={orgActivity?.pledges ?? []}
+              pledgesLoading={orgActivityLoading}
+              events={orgActivity?.events ?? []}
+              eventsLoading={orgActivityLoading}
               now={now}
             />
 

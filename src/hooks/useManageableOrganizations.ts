@@ -30,8 +30,7 @@ export interface ManageableOrganization {
  * CreateCampaignPage / CreateActionPage / event creation: only orgs
  * where the user is founder or moderator are offered, so the resulting
  * event's uppercase \`A\` root-scope tag (\`34550:<org-pubkey>:<d>\`) lines
- * up with the trust filter applied by `useOrganizationCampaigns` /
- * `useOrganizationPledges` / `useOrganizationEvents`.
+ * up with the trust filter applied by `useOrganizationActivity`.
  *
  * Two relay reads:
  *
