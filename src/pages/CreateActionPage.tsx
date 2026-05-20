@@ -51,7 +51,7 @@ import { createCountryIdentifier } from '@/lib/countryIdentifiers';
 import { getTodayDateInput } from '@/lib/dateInput';
 import { DEFAULT_ACTION_COVERS } from '@/lib/defaultActionCovers';
 import { sanitizeUrl } from '@/lib/sanitizeUrl';
-import { formatSats, satsToUSDWhole, usdToSats } from '@/lib/bitcoin';
+import { usdToSats } from '@/lib/bitcoin';
 import { cn } from '@/lib/utils';
 
 /**
@@ -137,7 +137,7 @@ export function CreateActionPage() {
   });
 
   const pledgeSatsPreview = useMemo(() => {
-    const n = Number(pledgeUsd);
+    const n = Number(pledgeUsd.replace(/[, $]/g, ''));
     if (!Number.isFinite(n) || n <= 0) return 0;
     return usdToSats(n, btcPrice);
   }, [btcPrice, pledgeUsd]);
@@ -178,7 +178,7 @@ export function CreateActionPage() {
       if (!trimmedDescription) throw new Error('Description is required.');
       if (!pledgeUsd.trim()) throw new Error('Pledge amount is required.');
 
-      const pledgeUsdNum = Number(pledgeUsd);
+      const pledgeUsdNum = Number(pledgeUsd.replace(/[, $]/g, ''));
       if (!Number.isFinite(pledgeUsdNum) || pledgeUsdNum <= 0) {
         throw new Error('Pledge amount must be a positive USD amount.');
       }
@@ -363,20 +363,23 @@ export function CreateActionPage() {
             </FormSection>
 
             {/* Pledge amount */}
-            <FormSection title="Pledge amount (USD)" requirement="Required">
-              <Input
-                type="number"
-                placeholder="100"
-                value={pledgeUsd}
-                onChange={(e) => setPledgeUsd(e.target.value)}
-                min={1}
-                step="0.01"
-              />
-              <p className="text-xs text-muted-foreground">
-                {pledgeSatsPreview > 0 && btcPrice
-                  ? `${formatSats(pledgeSatsPreview)} sats will be stored on the event (${satsToUSDWhole(pledgeSatsPreview, btcPrice)} at the current rate).`
-                  : 'Enter a USD amount. Agora stores the pledge in sats on Nostr.'}
-              </p>
+            <FormSection title="Amount" requirement="Required">
+              <div className="relative">
+                <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">
+                  $
+                </span>
+                <Input
+                  type="text"
+                  inputMode="decimal"
+                  placeholder="100"
+                  value={pledgeUsd}
+                  onChange={(e) => setPledgeUsd(e.target.value)}
+                  className="pl-7 pr-14"
+                />
+                <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-xs font-medium text-muted-foreground">
+                  USD
+                </span>
+              </div>
             </FormSection>
           </div>
 

@@ -22,7 +22,7 @@ import type { Action } from '@/hooks/useActions';
 import { createCountryIdentifier } from '@/lib/countryIdentifiers';
 import { countryCodeToFlag, getAllCountries, getGeoDisplayName } from '@/lib/countries';
 import { DEFAULT_ACTION_COVERS, DEFAULT_COVER_IMAGE } from '@/lib/defaultActionCovers';
-import { formatSats, satsToUSDWhole, usdToSats } from '@/lib/bitcoin';
+import { usdToSats } from '@/lib/bitcoin';
 import { cn } from '@/lib/utils';
 
 interface CreateActionDialogProps {
@@ -241,13 +241,24 @@ function CreateActionForm({
             </Select>
           </div>
           <div className="space-y-2">
-            <Label htmlFor="pledgeUsd">Pledge amount (USD)</Label>
-            <Input id="pledgeUsd" type="number" min={1} step="0.01" placeholder="100" value={formData.pledgeUsd} onChange={(e) => setFormData({ ...formData, pledgeUsd: e.target.value })} />
-            <p className="text-xs text-muted-foreground">
-              {usdToSats(Number(formData.pledgeUsd), btcPrice) > 0 && btcPrice
-                ? `${formatSats(usdToSats(Number(formData.pledgeUsd), btcPrice))} sats will be stored (${satsToUSDWhole(usdToSats(Number(formData.pledgeUsd), btcPrice), btcPrice)} at the current rate).`
-                : 'Agora stores the pledge in sats on Nostr.'}
-            </p>
+            <Label htmlFor="pledgeUsd">Amount</Label>
+            <div className="relative">
+              <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">
+                $
+              </span>
+              <Input
+                id="pledgeUsd"
+                type="text"
+                inputMode="decimal"
+                placeholder="100"
+                value={formData.pledgeUsd}
+                onChange={(e) => setFormData({ ...formData, pledgeUsd: e.target.value })}
+                className="pl-7 pr-14"
+              />
+              <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-xs font-medium text-muted-foreground">
+                USD
+              </span>
+            </div>
           </div>
         </div>
 
@@ -280,7 +291,7 @@ function CreateActionForm({
         )}
       </div>
       <div className="flex flex-col gap-2 p-4 pt-2">
-        <Button onClick={handleSubmit} disabled={!formData.title || !formData.description || !formData.pledgeUsd || usdToSats(Number(formData.pledgeUsd), btcPrice) <= 0 || isSubmitting} className="gap-2 w-full">
+        <Button onClick={handleSubmit} disabled={!formData.title || !formData.description || !formData.pledgeUsd || usdToSats(Number(formData.pledgeUsd.replace(/[, $]/g, '')), btcPrice) <= 0 || isSubmitting} className="gap-2 w-full">
           {isSubmitting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />}
           Create pledge
         </Button>
@@ -321,7 +332,7 @@ export function CreateActionDialog({ countryCode, communityATag, open, onOpenCha
       const now = Date.now();
       const slug = formData.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
       const dTag = `${slug || 'pledge'}-${now}`;
-      const pledgeSats = usdToSats(Number(formData.pledgeUsd), btcPrice);
+      const pledgeSats = usdToSats(Number(formData.pledgeUsd.replace(/[, $]/g, '')), btcPrice);
       if (pledgeSats <= 0) throw new Error('Waiting for BTC/USD price to calculate the pledge amount.');
       const tags: string[][] = [
         ['d', dTag],

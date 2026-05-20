@@ -35,7 +35,7 @@ interface NavItem {
 const NAV_ITEMS: NavItem[] = [
   { label: 'Discover', to: '/discover', icon: HandHeart },
   { label: 'Organize', to: '/communities', icon: Users },
-  { label: 'Actions', to: '/actions', icon: Megaphone },
+  { label: 'Pledge', to: '/pledges', icon: Megaphone },
 ];
 
 interface MobileLinkItem extends NavItem {
