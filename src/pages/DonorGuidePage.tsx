@@ -3,9 +3,7 @@ import { ArrowLeft, AlertTriangle, HandHeart } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { Button } from '@/components/ui/button';
 import { GuideSectionCard } from '@/components/GuideSectionCard';
-import { PageHeader } from '@/components/PageHeader';
 import { useAppContext } from '@/hooks/useAppContext';
 import { useLayoutOptions } from '@/contexts/LayoutContext';
 import { getDonorGuideSections } from '@/lib/helpContent';
@@ -30,13 +28,24 @@ export function DonorGuidePage() {
 
   return (
     <main className="min-h-screen pb-16 sidebar:pb-0">
-      <PageHeader
-        title="Donor Guide"
-        icon={<HandHeart className="size-5" />}
-        backTo="/help"
-      />
+      {/* PWA-style sticky back-to-help nav */}
+      <div className="sticky top-16 z-30 border-b border-border bg-background/85 backdrop-blur supports-[backdrop-filter]:bg-background/70">
+        <div className="flex items-center justify-between gap-3 px-4 py-3">
+          <Link
+            to="/help"
+            className="inline-flex items-center gap-2 rounded-full -ml-1 px-3 py-1.5 text-sm font-medium hover:bg-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring transition-colors"
+          >
+            <ArrowLeft className="size-4" />
+            Back to Help
+          </Link>
+          <div className="flex items-center gap-1.5 text-muted-foreground">
+            <HandHeart className="size-4" />
+            <span className="text-sm font-semibold">Donor Guide</span>
+          </div>
+        </div>
+      </div>
 
-      <div className="px-4 pt-2 pb-4 space-y-4">
+      <div className="px-4 pt-4 pb-4 space-y-4">
         {/* Above-ground recommendation alert */}
         <Alert className="border-amber-500/50 [&>svg]:text-amber-500">
           <AlertTriangle className="size-4" />
@@ -63,16 +72,6 @@ export function DonorGuidePage() {
         {sections.map((section) => (
           <GuideSectionCard key={section.id} section={section} />
         ))}
-
-        {/* Bottom navigation back to the Help page */}
-        <div className="pt-2">
-          <Button asChild variant="outline" className="w-full">
-            <Link to="/help">
-              <ArrowLeft className="size-4" />
-              Back to Help
-            </Link>
-          </Button>
-        </div>
       </div>
     </main>
   );

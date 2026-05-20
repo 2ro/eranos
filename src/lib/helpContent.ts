@@ -162,14 +162,14 @@ const FAQ_TEMPLATE: FAQCategory[] = [
         question: 'Why doesn\'t {appName} use Lightning?',
         answer: [
           'Lightning requires a Lightning wallet. The easiest ones (like Wallet of Satoshi) are **custodial** \u2014 a company holds the funds and can be shut down or pressured. Non-custodial Lightning is technically demanding and unreliable for newcomers.',
-          'We want {appName} to work for someone whose only Bitcoin experience is Cash App. On-chain Bitcoin works with every wallet on the planet.',
+          'We want {appName} to work for someone whose only Bitcoin experience is a regular consumer app like Cash App, Coinbase, Strike, Venmo, or PayPal. On-chain Bitcoin works with every wallet on the planet.',
         ],
       },
       {
         id: 'why-not-silent-payments',
         question: 'Why doesn\'t {appName} use silent payments?',
         answer: [
-          'Silent payments only work when the **sender\'s** wallet supports them. Most popular wallets \u2014 Cash App, Strike, and nearly every custodial wallet \u2014 do not.',
+          'Silent payments only work when the **sender\'s** wallet supports them. Most popular consumer apps \u2014 Cash App, Coinbase, Strike, Venmo, PayPal, and nearly every custodial wallet \u2014 do not.',
           'Asking donors to install new software is a barrier we won\'t put in front of activists who need support.',
         ],
       },
@@ -352,7 +352,7 @@ const DONOR_GUIDE_TEMPLATE: GuideSection[] = [
     heading: 'Why your donation is public',
     paragraphs: [
       'Bitcoin is a public ledger. Anyone can look up an activist\'s address and see every donation \u2014 the amount, the time, and the address it came from.',
-      'Your sending address can usually be traced back to wherever you bought the Bitcoin (Cash App, Coinbase, Strike, etc.). That link is what ties a donation to your real identity.',
+      'Your sending address can usually be traced back to wherever you bought the Bitcoin \u2014 a consumer app like Cash App, Coinbase, Strike, Venmo, PayPal, Kraken, or Binance. That link is what ties a donation to your real identity.',
     ],
   },
   {
@@ -362,7 +362,7 @@ const DONOR_GUIDE_TEMPLATE: GuideSection[] = [
       'Buy Bitcoin peer-to-peer so it isn\'t linked to your government ID. Marketplaces like [Bisq](https://bisq.network), [RoboSats](https://learn.robosats.com), and [HodlHodl](https://hodlhodl.com) let you trade directly with another person.',
     ],
     pros: ['No exchange knows who you are.', 'Strongest privacy starting point.'],
-    cons: ['Slower and harder than Cash App.', 'Requires finding a counterparty.'],
+    cons: ['Slower and harder than a consumer app.', 'Requires finding a counterparty.'],
   },
   {
     id: 'privacy-coinjoin',
@@ -389,10 +389,10 @@ const DONOR_GUIDE_TEMPLATE: GuideSection[] = [
     ],
   },
   {
-    id: 'what-cash-app-cant-do',
-    heading: 'What Cash App and similar apps can\'t do',
+    id: 'what-consumer-apps-cant-do',
+    heading: 'What consumer apps can\'t do',
     paragraphs: [
-      'Cash App, Strike, and most custodial wallets are convenient but tied to your real identity. They can\'t make a donation truly anonymous, no matter how you send it.',
+      'Consumer apps like Cash App, Coinbase, Strike, Venmo, and PayPal are convenient, but they require ID verification and tie every transaction to your real identity. They can\'t make a donation truly anonymous, no matter how you send it.',
       'If anonymity matters to you, use a non-custodial wallet you control.',
     ],
   },
