@@ -2,7 +2,6 @@ import { useMemo, useCallback, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { nip19 } from 'nostr-tools';
 import {
-  Activity as ActivityIcon,
   Award,
   CalendarDays,
   ChevronLeft,
@@ -13,7 +12,6 @@ import {
   MessageCircle,
   MoreVertical,
   Pencil,
-  Radio,
   Shield,
   ShieldBan,
   Share2,
@@ -28,24 +26,21 @@ import { AddMemberDialog } from '@/components/AddMemberDialog';
 import { CampaignCard } from '@/components/CampaignCard';
 import { CreateCommunityEventDialog } from '@/components/CreateCommunityEventDialog';
 import { PeopleAvatarStack } from '@/components/PeopleAvatarStack';
+import { PostActionBar } from '@/components/PostActionBar';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { BanConfirmDialog } from '@/components/BanConfirmDialog';
-import { CommunityChatPanel } from '@/components/CommunityChatPanel';
-import { CommunityPulsePanel } from '@/components/CommunityPulsePanel';
 import { DonateDialog } from '@/components/DonateDialog';
 import { NoteContent } from '@/components/NoteContent';
 import { CommunityBadgeEditorDialog } from '@/components/CommunityBadgePanel';
-import { ComposeBox } from '@/components/ComposeBox';
 import { FollowToggleButton } from '@/components/FollowButton';
+import { InteractionsModal, type InteractionTab } from '@/components/InteractionsModal';
 import { MembersOnlyToggle } from '@/components/MembersOnlyToggle';
-import { NoteCard } from '@/components/NoteCard';
-import { FeedCard } from '@/components/FeedCard';
+import { NoteMoreMenu } from '@/components/NoteMoreMenu';
 import { ReplyComposeModal } from '@/components/ReplyComposeModal';
 import { ThreadedReplyList, type ReplyNode } from '@/components/ThreadedReplyList';
 import { useAuthor } from '@/hooks/useAuthor';
@@ -53,11 +48,9 @@ import { useAuthors } from '@/hooks/useAuthors';
 import { useComments } from '@/hooks/useComments';
 import { useBitcoinWallet } from '@/hooks/useBitcoinWallet';
 import { useCommunityBookmarks } from '@/hooks/useCommunityBookmarks';
-import { useCommunityEvents } from '@/hooks/useCommunityEvents';
-import { useCommunityActions } from '@/hooks/useCommunityActions';
 import { useCommunityMembers } from '@/hooks/useCommunityMembers';
-import { useCommunityGoals } from '@/hooks/useCommunityGoals';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
+import { useEventStats } from '@/hooks/useTrending';
 import { useMembersOnlyFilter } from '@/hooks/useMembersOnlyFilter';
 import { useNow } from '@/hooks/useNow';
 import {
@@ -72,6 +65,7 @@ import { useLayoutOptions } from '@/contexts/LayoutContext';
 import { applyCommunityModerationToEvents, canBanTarget, getViewerAuthority, parseCommunityEvent, type CommunityMember } from '@/lib/communityUtils';
 import type { ParsedCampaign } from '@/lib/campaign';
 import type { Action } from '@/hooks/useActions';
+import { formatNumber } from '@/lib/formatNumber';
 import { genUserName } from '@/lib/genUserName';
 import { sanitizeUrl } from '@/lib/sanitizeUrl';
 import { cn } from '@/lib/utils';
@@ -430,16 +424,23 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
   const [banTargetPubkey, setBanTargetPubkey] = useState<string | null>(null);
 
   // ── Tab + FAB state ────────────────────────────────────────────────────────
-  const [activeTab, setActiveTab] = useState('activity');
+  // ── FAB + dialog state ─────────────────────────────────────────────────────
+  // The detail page is single-column now (no tab strip), so the FAB is
+  // always available. \"New post\" opens the reply compose modal against
+  // the community event; campaigns/pledges navigate to dedicated create
+  // pages with `?org=<naddr>`; calendar events still use the in-page
+  // dialog because no dedicated create page exists yet.
   const [composeOpen, setComposeOpen] = useState(false);
-  // Calendar event creation still uses the in-page dialog (no dedicated
-  // create page yet). Campaigns/pledges navigate to their create pages.
   const [eventDialogOpen, setEventDialogOpen] = useState(false);
   const [membersDialogOpen, setMembersDialogOpen] = useState(false);
   const [addMembersDialogOpen, setAddMembersDialogOpen] = useState(false);
   const [badgeDialogOpen, setBadgeDialogOpen] = useState(false);
   const [descriptionDialogOpen, setDescriptionDialogOpen] = useState(false);
   const [donateOpen, setDonateOpen] = useState(false);
+  const [replyOpen, setReplyOpen] = useState(false);
+  const [moreMenuOpen, setMoreMenuOpen] = useState(false);
+  const [interactionsOpen, setInteractionsOpen] = useState(false);
+  const [interactionsTab, setInteractionsTab] = useState<InteractionTab>('reposts');
 
   // Parse community definition
   const community = useMemo(() => parseCommunityEvent(event), [event]);
@@ -554,16 +555,10 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
   const { data: commentsData, isLoading: commentsLoading } = useComments(event, 500);
   const { membersOnly } = useMembersOnlyFilter();
 
-  // ── Goals (NIP-75) ──────────────────────────────────────────────────────────
-  const { data: goals, isLoading: goalsLoading } = useCommunityGoals(communityATag || undefined);
-  const { data: communityEvents, isLoading: eventsLoading } = useCommunityEvents(communityATag || undefined);
-  const { data: communityActions, isLoading: actionsLoading } = useCommunityActions(communityATag || undefined);
-
   // ── Official activity shelves ─────────────────────────────────────────────
   // Author-filtered to founder + moderators (see useOrganizationActivity).
   // These power the campaign/pledge/event shelves rendered above the
-  // activity feed, distinct from the moderation-filtered `communityActions`
-  // / `communityEvents` queries which include anyone-tagged content.
+  // comments section.
   const { data: orgCampaigns, isLoading: orgCampaignsLoading } = useOrganizationCampaigns(community);
   const { data: orgPledges, isLoading: orgPledgesLoading } = useOrganizationPledges(community);
   const { data: orgEvents, isLoading: orgEventsLoading } = useOrganizationEvents(community);
@@ -583,112 +578,21 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
     });
   }, [community, event.kind, event.pubkey]);
 
-  /** Check if a goal event's `closed_at` deadline has passed. */
-  const isExpired = useCallback((e: NostrEvent): boolean => {
-    const v = e.tags.find(([n]) => n === 'closed_at')?.[1];
-    if (!v) return false;
-    const ts = parseInt(v, 10);
-    return !isNaN(ts) && now > ts;
-  }, [now]);
+  // ── Engagement stats for the community event itself ──────────────────────
+  // Pulled from NIP-85. Used both for the inline counters above the action
+  // bar and for the threaded-comments header. Matches the rhythm of the
+  // campaign and pledge detail pages.
+  const { data: engagementStats, isLoading: statsLoading } = useEventStats(event.id, event);
+  const hasStats =
+    !!engagementStats?.replies ||
+    !!engagementStats?.reposts ||
+    !!engagementStats?.quotes ||
+    !!engagementStats?.reactions;
 
-  const moderatedGoals = useMemo(
-    () => applyCommunityModerationToEvents(goals ?? [], moderation),
-    [goals, moderation],
-  );
-  const activeGoals = useMemo(() => {
-    const all = moderatedGoals.filter((e) => !isExpired(e));
-    if (!membersOnly) return all;
-    return all.filter((e) => rankMap.has(e.pubkey));
-  }, [moderatedGoals, membersOnly, rankMap, isExpired]);
-  const pastGoals = useMemo(() => {
-    const all = moderatedGoals.filter((e) => isExpired(e));
-    const filtered = membersOnly ? all.filter((e) => rankMap.has(e.pubkey)) : all;
-    // Sort by deadline descending so the most recently ended goal appears first.
-    return filtered.sort((a, b) => {
-      const aClose = parseInt(a.tags.find(([n]) => n === 'closed_at')?.[1] ?? '0', 10);
-      const bClose = parseInt(b.tags.find(([n]) => n === 'closed_at')?.[1] ?? '0', 10);
-      return bClose - aClose;
-    });
-  }, [moderatedGoals, membersOnly, rankMap, isExpired]);
-
-  const eventItems = useMemo(() => {
-    const moderated = applyCommunityModerationToEvents(communityEvents ?? [], moderation);
-    const visible = membersOnly ? moderated.filter((e) => rankMap.has(e.pubkey)) : moderated;
-
-    return [...visible].sort((a, b) => {
-      const aStart = getCalendarEventStart(a);
-      const bStart = getCalendarEventStart(b);
-      const aFuture = aStart >= now;
-      const bFuture = bStart >= now;
-      if (aFuture && !bFuture) return -1;
-      if (!aFuture && bFuture) return 1;
-      if (aFuture && bFuture) return aStart - bStart;
-      return bStart - aStart;
-    });
-  }, [communityEvents, moderation, membersOnly, rankMap, now]);
-  const activeEventItems = useMemo(
-    () => eventItems.filter((e) => getCalendarEventEnd(e) >= now),
-    [eventItems, now],
-  );
-  const pastEventItems = useMemo(
-    () => eventItems.filter((e) => getCalendarEventEnd(e) < now),
-    [eventItems, now],
-  );
-
-  const actionEvents = useMemo(() => {
-    const moderated = applyCommunityModerationToEvents((communityActions ?? []).map((a) => a.event), moderation);
-    return membersOnly ? moderated.filter((e) => rankMap.has(e.pubkey)) : moderated;
-  }, [communityActions, moderation, membersOnly, rankMap]);
-  const activeActionEvents = useMemo(
-    () => actionEvents.filter((e) => {
-      const action = communityActions?.find((a) => a.event.id === e.id);
-      if (!action) return false;
-      return !action.deadline || action.deadline > now;
-    }),
-    [actionEvents, communityActions, now],
-  );
-  const pastActionEvents = useMemo(
-    () => actionEvents.filter((e) => {
-      const action = communityActions?.find((a) => a.event.id === e.id);
-      return !!action?.deadline && action.deadline <= now;
-    }),
-    [actionEvents, communityActions, now],
-  );
-
-  // ── Initiatives (Goals + Events merged into one chronological list) ───────
-  // Active items go first, sorted: future events ascending by start date,
-  // then active goals by creation date (newest first). Past items follow.
-  const activeInitiatives = useMemo(() => {
-    const items = [...activeGoals, ...activeEventItems, ...activeActionEvents];
-    return items.sort((a, b) => {
-      const aIsEvent = a.kind === 31922 || a.kind === 31923;
-      const bIsEvent = b.kind === 31922 || b.kind === 31923;
-      if (aIsEvent && bIsEvent) {
-        return getCalendarEventStart(a) - getCalendarEventStart(b);
-      }
-      if (aIsEvent) return -1;
-      if (bIsEvent) return 1;
-      return b.created_at - a.created_at;
-    });
-  }, [activeGoals, activeEventItems, activeActionEvents]);
-
-  const pastInitiatives = useMemo(() => {
-    const items = [...pastGoals, ...pastEventItems, ...pastActionEvents];
-    return items.sort((a, b) => {
-      // Newest-first by the relevant "end" timestamp.
-      const aEnd = a.kind === 36639
-        ? parseInt(a.tags.find(([n]) => n === 'deadline')?.[1] ?? String(a.created_at), 10)
-        : a.kind === 31922 || a.kind === 31923
-        ? getCalendarEventEnd(a)
-        : parseInt(a.tags.find(([n]) => n === 'closed_at')?.[1] ?? String(a.created_at), 10);
-      const bEnd = b.kind === 36639
-        ? parseInt(b.tags.find(([n]) => n === 'deadline')?.[1] ?? String(b.created_at), 10)
-        : b.kind === 31922 || b.kind === 31923
-        ? getCalendarEventEnd(b)
-        : parseInt(b.tags.find(([n]) => n === 'closed_at')?.[1] ?? String(b.created_at), 10);
-      return bEnd - aEnd;
-    });
-  }, [pastGoals, pastEventItems, pastActionEvents]);
+  const openInteractions = useCallback((tab: InteractionTab) => {
+    setInteractionsTab(tab);
+    setInteractionsOpen(true);
+  }, []);
 
   const replyTree = useMemo((): ReplyNode[] => {
     if (!commentsData) return [];
@@ -725,30 +629,6 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
       .map((r) => buildNode(r));
   }, [commentsData, moderation, membersOnly, rankMap]);
 
-  // ── Activity feed — merge active initiatives with top-level discussion
-  // posts into one chronological stream (newest first). Each entry is tagged
-  // so the renderer can dispatch to NoteCard (initiative) or
-  // ThreadedReplyList (discussion subtree).
-  type ActivityItem =
-    | { kind: 'initiative'; event: NostrEvent; ts: number }
-    | { kind: 'discussion'; node: ReplyNode; ts: number };
-
-  const activityItems = useMemo((): ActivityItem[] => {
-    const items: ActivityItem[] = [
-      ...activeInitiatives.map((ev) => ({
-        kind: 'initiative' as const,
-        event: ev,
-        ts: ev.created_at,
-      })),
-      ...replyTree.map((node) => ({
-        kind: 'discussion' as const,
-        node,
-        ts: node.event.created_at,
-      })),
-    ];
-    return items.sort((a, b) => b.ts - a.ts);
-  }, [activeInitiatives, replyTree]);
-
   // ── Share handler ───────────────────────────────────────────────────────────
   const handleShare = useCallback(async () => {
     const d = event.tags.find(([n]) => n === 'd')?.[1] ?? '';
@@ -766,21 +646,17 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
     }
   }, [event, toast]);
 
-  // ── FAB — opens a floating action menu anchored to the FAB itself ─────────
-  // Visible on tabs whose surfaces accept user-authored content.
-  const fabAvailable = activeTab === 'activity';
-
+  // ── FAB menu — single-column page, always available ─────────────────────
+  // \"New post\" composes a NIP-22 comment against the community event.
+  // Campaigns and pledges navigate to dedicated create pages with
+  // `?org=<naddr>`. Calendar events still use the in-page dialog.
   const fabMenu = useMemo(() => {
-    if (!fabAvailable) return undefined;
     return [
       {
         id: 'new-post',
         label: 'New post',
         icon: <MessageCircle className="size-4" />,
-        onSelect: () => {
-          setActiveTab('activity');
-          setComposeOpen(true);
-        },
+        onSelect: () => setComposeOpen(true),
       },
       {
         id: 'new-campaign',
@@ -809,17 +685,16 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
           // Calendar event creation still happens via the in-page dialog
           // because there's no dedicated create page yet. The dialog
           // already emits the uppercase `A` tag and `K: 34550` companion.
-          setActiveTab('activity');
           setEventDialogOpen(true);
         },
       },
     ];
-  }, [fabAvailable, navigate, orgNaddr]);
+  }, [navigate, orgNaddr]);
 
   useLayoutOptions({
     noMaxWidth: true,
     rightSidebar: null,
-    showFAB: fabAvailable,
+    showFAB: true,
     fabMenu,
   });
 
@@ -834,297 +709,271 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
 
   return (
     <main className="min-h-screen pb-16">
-      <div className="max-w-3xl mx-auto px-4 sm:px-6 py-6 lg:py-10">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 pt-4">
         <CommunityModerationContext.Provider value={moderationCtx}>
-          <Tabs value={activeTab} onValueChange={setActiveTab}>
-            <div className="space-y-4">
-              <div className="relative aspect-[16/9] rounded-xl overflow-hidden bg-gradient-to-br from-primary/40 via-primary/20 to-secondary">
-                {cover ? (
-                  <img src={cover} alt="" className="absolute inset-0 size-full object-cover" />
-                ) : (
-                  <div className="absolute inset-0 bg-gradient-to-br from-primary/50 via-primary/25 to-secondary" />
-                )}
-                {!cover && (
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <Users className="size-16 text-primary/40 sm:size-20" />
-                  </div>
-                )}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/25 to-black/45" />
-
-                <div className="absolute left-0 right-0 top-0 z-10 flex items-center justify-between gap-3 px-4 pt-4">
-                  <button
-                    onClick={() => window.history.length > 1 ? navigate(-1) : navigate('/')}
-                    className="p-2.5 -ml-2 rounded-full text-white/90 hover:bg-white/15 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80 motion-safe:transition-colors"
-                    aria-label="Go back"
-                  >
-                    <ChevronLeft className={heroIconClassName} />
-                  </button>
-                  {user && communityATag && (
-                    <FollowToggleButton
-                      size="sm"
-                      isFollowing={communityFollowed}
-                      isPending={toggleCommunityFollow.isPending}
-                      onClick={handleToggleFollow}
-                      icon={<UserPlus className="size-4" />}
-                      followingIcon={
-                        <>
-                          <UserCheck className="size-4 group-hover:hidden group-focus-visible:hidden" />
-                          <UserMinus className="size-4 hidden group-hover:inline group-focus-visible:inline" />
-                        </>
-                      }
-                      hoverToUnfollow
-                      className={cn(
-                        'shadow-none',
-                        !communityFollowed && 'bg-white/95 text-black hover:bg-white',
-                        communityFollowed && 'bg-transparent backdrop-blur-sm border-white/40 text-white hover:bg-destructive/30 hover:text-white hover:border-destructive/60',
-                      )}
-                    />
-                  )}
-                </div>
-
-                <div className="absolute inset-x-0 bottom-0 z-10 space-y-2 p-5 sm:p-6 [text-shadow:0_1px_4px_rgba(0,0,0,0.75),0_2px_10px_rgba(0,0,0,0.45)]">
-                  <div className="flex [text-shadow:none]">
-                    <button
-                      type="button"
-                      onClick={() => setMembersDialogOpen(true)}
-                      className="flex items-center gap-2 -ml-1 px-1 py-1 rounded-md hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80 transition-colors min-w-0"
-                      aria-label="Show all members"
-                    >
-                      <PeopleAvatarStack
-                        pubkeys={allMemberPubkeys}
-                        maxVisible={6}
-                        size="sm"
-                        className="[&_.ring-2]:ring-black/40 pointer-events-none"
-                      />
-                      {allMemberPubkeys.length > 0 && (
-                        <span className="text-xs font-medium text-white/90 [text-shadow:0_1px_3px_rgba(0,0,0,0.7)] truncate">
-                          {allMemberPubkeys.length} member{allMemberPubkeys.length !== 1 ? 's' : ''}
-                        </span>
-                      )}
-                    </button>
-                  </div>
-                  <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
-                    <div className="min-w-0 space-y-2">
-                      <div className="flex items-center gap-1.5 min-w-0">
-                        <h1 className="text-3xl sm:text-4xl font-bold leading-tight tracking-tight text-white truncate">{name}</h1>
-                        {descriptionExpandable && (
-                          <button
-                            type="button"
-                            onClick={() => setDescriptionDialogOpen(true)}
-                            className="-my-1 -mr-1 p-1 rounded-full text-white/75 hover:text-white hover:bg-white/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80 transition-colors"
-                            aria-label="About this community"
-                          >
-                            <Info className="size-4 [text-shadow:none] drop-shadow-[0_1px_2px_rgba(0,0,0,0.85)]" />
-                          </button>
-                        )}
-                      </div>
-                      {descriptionText && (
-                        <p className="max-w-2xl text-base sm:text-lg text-white/90 line-clamp-2">
-                          {descriptionText}
-                        </p>
-                      )}
-                    </div>
-
-                    <div className="flex items-center gap-0.5 shrink-0 [text-shadow:none]">
-                      <MembersOnlyToggle
-                        className="text-white/90 hover:text-white hover:bg-white/15 data-[state=on]:text-white"
-                      />
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <button
-                            type="button"
-                            className={bannerActionClassName}
-                            aria-label="More actions"
-                          >
-                            <MoreVertical className="size-5" />
-                          </button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end" side="top" sideOffset={6} className="min-w-[180px]">
-                          <DropdownMenuItem onSelect={() => setMembersDialogOpen(true)}>
-                            <Users className="size-4 mr-2" />
-                            View members
-                          </DropdownMenuItem>
-                          {canAddMembers && community && (
-                            <DropdownMenuItem onSelect={() => setAddMembersDialogOpen(true)}>
-                              <UserPlus className="size-4 mr-2" />
-                              Add members
-                            </DropdownMenuItem>
-                          )}
-                          {isFounder && community && (
-                            <>
-                              <DropdownMenuItem onSelect={() => setBadgeDialogOpen(true)}>
-                                <Award className="size-4 mr-2" />
-                                Edit badge
-                              </DropdownMenuItem>
-                              <DropdownMenuItem
-                                onSelect={() => {
-                                  const naddr = nip19.naddrEncode({
-                                    kind: event.kind,
-                                    pubkey: event.pubkey,
-                                    identifier: community.dTag,
-                                  });
-                                  navigate(`/communities/new?edit=${naddr}`);
-                                }}
-                              >
-                                <Pencil className="size-4 mr-2" />
-                                Edit community
-                              </DropdownMenuItem>
-                            </>
-                          )}
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </div>
-                  </div>
-                </div>
+          {/* ── Hero ─────────────────────────────────────────────────────── */}
+          <div className="relative aspect-[16/9] sm:aspect-[21/9] rounded-xl overflow-hidden bg-gradient-to-br from-primary/40 via-primary/20 to-secondary">
+            {cover ? (
+              <img src={cover} alt="" className="absolute inset-0 size-full object-cover" />
+            ) : (
+              <div className="absolute inset-0 bg-gradient-to-br from-primary/50 via-primary/25 to-secondary" />
+            )}
+            {!cover && (
+              <div className="absolute inset-0 flex items-center justify-center">
+                <Users className="size-16 text-primary/40 sm:size-20" />
               </div>
+            )}
+            <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/25 to-black/45" />
 
-              <div className="grid grid-cols-4 gap-2">
-                {communityDonationTarget && (
-                  <Button
-                    size="lg"
-                    className="w-full col-span-3"
-                    onClick={() => setDonateOpen(true)}
-                  >
-                    <HandHeart className="size-5 mr-2" />
-                    Donate
-                  </Button>
-                )}
-                <Button
+            <div className="absolute left-0 right-0 top-0 z-10 flex items-center justify-between gap-3 px-4 pt-4">
+              <button
+                onClick={() => window.history.length > 1 ? navigate(-1) : navigate('/')}
+                className="p-2.5 -ml-2 rounded-full text-white/90 hover:bg-white/15 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80 motion-safe:transition-colors"
+                aria-label="Go back"
+              >
+                <ChevronLeft className={heroIconClassName} />
+              </button>
+              {user && communityATag && (
+                <FollowToggleButton
+                  size="sm"
+                  isFollowing={communityFollowed}
+                  isPending={toggleCommunityFollow.isPending}
+                  onClick={handleToggleFollow}
+                  icon={<UserPlus className="size-4" />}
+                  followingIcon={
+                    <>
+                      <UserCheck className="size-4 group-hover:hidden group-focus-visible:hidden" />
+                      <UserMinus className="size-4 hidden group-hover:inline group-focus-visible:inline" />
+                    </>
+                  }
+                  hoverToUnfollow
+                  className={cn(
+                    'shadow-none',
+                    !communityFollowed && 'bg-white/95 text-black hover:bg-white',
+                    communityFollowed && 'bg-transparent backdrop-blur-sm border-white/40 text-white hover:bg-destructive/30 hover:text-white hover:border-destructive/60',
+                  )}
+                />
+              )}
+            </div>
+
+            <div className="absolute inset-x-0 bottom-0 z-10 space-y-2 p-5 sm:p-6 [text-shadow:0_1px_4px_rgba(0,0,0,0.75),0_2px_10px_rgba(0,0,0,0.45)]">
+              <div className="flex [text-shadow:none]">
+                <button
                   type="button"
-                  variant="outline"
-                  size="lg"
-                  className={communityDonationTarget ? 'w-full' : 'col-span-4 w-full'}
-                  onClick={handleShare}
+                  onClick={() => setMembersDialogOpen(true)}
+                  className="flex items-center gap-2 -ml-1 px-1 py-1 rounded-md hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80 transition-colors min-w-0"
+                  aria-label="Show all members"
                 >
-                  <Share2 className="size-4 mr-2" />
-                  Share
+                  <PeopleAvatarStack
+                    pubkeys={allMemberPubkeys}
+                    maxVisible={6}
+                    size="sm"
+                    className="[&_.ring-2]:ring-black/40 pointer-events-none"
+                  />
+                  {allMemberPubkeys.length > 0 && (
+                    <span className="text-xs font-medium text-white/90 [text-shadow:0_1px_3px_rgba(0,0,0,0.7)] truncate">
+                      {allMemberPubkeys.length} member{allMemberPubkeys.length !== 1 ? 's' : ''}
+                    </span>
+                  )}
+                </button>
+              </div>
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+                <div className="min-w-0 space-y-2">
+                  <div className="flex items-center gap-1.5 min-w-0">
+                    <h1 className="text-3xl sm:text-4xl font-bold leading-tight tracking-tight text-white truncate">{name}</h1>
+                    {descriptionExpandable && (
+                      <button
+                        type="button"
+                        onClick={() => setDescriptionDialogOpen(true)}
+                        className="-my-1 -mr-1 p-1 rounded-full text-white/75 hover:text-white hover:bg-white/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80 transition-colors"
+                        aria-label="About this community"
+                      >
+                        <Info className="size-4 [text-shadow:none] drop-shadow-[0_1px_2px_rgba(0,0,0,0.85)]" />
+                      </button>
+                    )}
+                  </div>
+                  {descriptionText && (
+                    <p className="max-w-2xl text-base sm:text-lg text-white/90 line-clamp-2">
+                      {descriptionText}
+                    </p>
+                  )}
+                </div>
+
+                <div className="flex items-center gap-0.5 shrink-0 [text-shadow:none]">
+                  <MembersOnlyToggle
+                    className="text-white/90 hover:text-white hover:bg-white/15 data-[state=on]:text-white"
+                  />
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <button
+                        type="button"
+                        className={bannerActionClassName}
+                        aria-label="More actions"
+                      >
+                        <MoreVertical className="size-5" />
+                      </button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end" side="top" sideOffset={6} className="min-w-[180px]">
+                      <DropdownMenuItem onSelect={() => setMembersDialogOpen(true)}>
+                        <Users className="size-4 mr-2" />
+                        View members
+                      </DropdownMenuItem>
+                      {canAddMembers && community && (
+                        <DropdownMenuItem onSelect={() => setAddMembersDialogOpen(true)}>
+                          <UserPlus className="size-4 mr-2" />
+                          Add members
+                        </DropdownMenuItem>
+                      )}
+                      {isFounder && community && (
+                        <>
+                          <DropdownMenuItem onSelect={() => setBadgeDialogOpen(true)}>
+                            <Award className="size-4 mr-2" />
+                            Edit badge
+                          </DropdownMenuItem>
+                          <DropdownMenuItem
+                            onSelect={() => {
+                              const naddr = nip19.naddrEncode({
+                                kind: event.kind,
+                                pubkey: event.pubkey,
+                                identifier: community.dTag,
+                              });
+                              navigate(`/communities/new?edit=${naddr}`);
+                            }}
+                          >
+                            <Pencil className="size-4 mr-2" />
+                            Edit community
+                          </DropdownMenuItem>
+                        </>
+                      )}
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* ── Body — single column, pledge-detail-style ─────────────────── */}
+          <div className="py-6 lg:py-10 space-y-8">
+            {/* Donate (when there's a member set) and Share buttons. Sits
+                just below the hero like the pledge page's action row. */}
+            <div className={cn('grid gap-2', communityDonationTarget ? 'grid-cols-4' : 'grid-cols-1')}>
+              {communityDonationTarget && (
+                <Button
+                  size="lg"
+                  className="w-full col-span-3"
+                  onClick={() => setDonateOpen(true)}
+                >
+                  <HandHeart className="size-5 mr-2" />
+                  Donate
                 </Button>
+              )}
+              <Button
+                type="button"
+                variant="outline"
+                size="lg"
+                className="w-full"
+                onClick={handleShare}
+              >
+                <Share2 className="size-4 mr-2" />
+                Share
+              </Button>
+            </div>
+
+            {/* Official-activity shelves. Hidden entirely when empty. */}
+            <OfficialActivityShelves
+              orgNaddr={orgNaddr}
+              campaigns={orgCampaigns ?? []}
+              campaignsLoading={orgCampaignsLoading}
+              pledges={orgPledges ?? []}
+              pledgesLoading={orgPledgesLoading}
+              events={orgEvents ?? []}
+              eventsLoading={orgEventsLoading}
+              now={now}
+            />
+
+            {/* Engagement card — stats counters + post action bar. Matches
+                the pledge / campaign detail layout. No funding progress bar
+                here; an organization isn't a fundraising target itself. */}
+            <div id="org-activity" className="scroll-mt-20">
+              <div className="rounded-2xl bg-card border border-border/60 shadow-sm px-4 sm:px-5 py-4 sm:py-5">
+                {hasStats && (
+                  <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs sm:text-sm text-muted-foreground pb-2">
+                    {engagementStats?.reposts ? (
+                      <button onClick={() => openInteractions('reposts')} className="hover:underline transition-colors">
+                        <span className="font-bold text-foreground">{formatNumber(engagementStats.reposts)}</span>{' '}
+                        Repost{engagementStats.reposts !== 1 ? 's' : ''}
+                      </button>
+                    ) : null}
+                    {engagementStats?.quotes ? (
+                      <button onClick={() => openInteractions('quotes')} className="hover:underline transition-colors">
+                        <span className="font-bold text-foreground">{formatNumber(engagementStats.quotes)}</span>{' '}
+                        Quote{engagementStats.quotes !== 1 ? 's' : ''}
+                      </button>
+                    ) : null}
+                    {engagementStats?.reactions ? (
+                      <button onClick={() => openInteractions('reactions')} className="hover:underline transition-colors">
+                        <span className="font-bold text-foreground">{formatNumber(engagementStats.reactions)}</span>{' '}
+                        Like{engagementStats.reactions !== 1 ? 's' : ''}
+                      </button>
+                    ) : null}
+                  </div>
+                )}
+
+                <PostActionBar
+                  event={event}
+                  replyLabel="Comment"
+                  hideZap
+                  onReply={() => setReplyOpen(true)}
+                  onMore={() => setMoreMenuOpen(true)}
+                  className={hasStats ? 'pt-3 border-t border-border/60' : undefined}
+                />
               </div>
 
-              {/* Tab strip — Pulse and Chat are hidden for now while the
-                  organization-first redesign is in progress. The
-                  corresponding `<TabsContent>` panels below are left
-                  intact so the code paths stay verified; users just
-                  can't switch to them from the UI. */}
-              <TabsList className="grid h-auto w-full grid-cols-1 gap-2 rounded-none bg-transparent p-0 shadow-none">
-                <TabsTrigger
-                  value="activity"
-                  className="min-w-0 rounded-lg border border-transparent px-3 py-2 text-muted-foreground shadow-none hover:bg-muted/40 hover:text-foreground data-[state=active]:border-border data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm"
-                >
-                  <ActivityIcon className="size-4 mr-1.5" />
-                  Activity
-                </TabsTrigger>
-                <TabsTrigger value="pulse" className="hidden" aria-hidden tabIndex={-1}>
-                  <Radio className="size-4 mr-1.5" />
-                  Pulse
-                </TabsTrigger>
-                <TabsTrigger value="chat" className="hidden" aria-hidden tabIndex={-1}>
-                  <MessageCircle className="size-4 mr-1.5" />
-                  Chat
-                </TabsTrigger>
-              </TabsList>
+              {/* Comments — NIP-22 thread on the community event itself.
+                  Member-filter aware (see replyTree) and routed through
+                  CommunityModerationContext so per-reply ban actions work. */}
+              <div className="mt-6">
+                <div className="flex items-baseline justify-between gap-3 mb-3 px-1">
+                  <h2 className="text-lg font-semibold tracking-tight">Comments</h2>
+                  {engagementStats?.replies ? (
+                    <span className="text-sm text-muted-foreground tabular-nums">
+                      {formatNumber(engagementStats.replies)}{' '}
+                      {engagementStats.replies === 1 ? 'comment' : 'comments'}
+                    </span>
+                  ) : null}
+                </div>
+
+                {commentsLoading && statsLoading && replyTree.length === 0 ? (
+                  <div className="space-y-3">
+                    {Array.from({ length: 3 }).map((_, i) => (
+                      <ReplyCardSkeleton key={i} />
+                    ))}
+                  </div>
+                ) : replyTree.length > 0 ? (
+                  <div className="-mx-2 sm:-mx-4 rounded-2xl bg-card border border-border/60 overflow-hidden">
+                    <ThreadedReplyList roots={replyTree} />
+                  </div>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => setReplyOpen(true)}
+                    className="block w-full rounded-2xl border border-dashed border-border/80 bg-card/50 px-6 py-10 text-center hover:bg-card hover:border-primary/40 transition-colors"
+                  >
+                    <p className="text-base font-medium text-foreground">
+                      {membersOnly && (commentsData?.topLevelComments?.length ?? 0) > 0
+                        ? 'No comments from members yet'
+                        : 'No comments yet'}
+                    </p>
+                    <p className="mt-1 text-sm text-muted-foreground">
+                      {membersOnly && (commentsData?.topLevelComments?.length ?? 0) > 0
+                        ? 'Toggle the shield icon in the hero to see everything.'
+                        : 'Be the first to start a discussion.'}
+                    </p>
+                  </button>
+                )}
+              </div>
             </div>
-
-          {/* Sublabel for the currently-active tab. Only rendered when the
-              tab has a descriptor to show — keeps the rest of the tab strip
-              clean. */}
-          {activeTab === 'pulse' && (
-            <div className="px-5 py-2 text-xs text-muted-foreground text-center">
-              What members are posting elsewhere across Nostr.
-            </div>
-          )}
-
-            {/* ── Chat tab — community kind-9 messages ── */}
-            <TabsContent value="chat" className="mt-0">
-              {communityATag ? (
-                <CommunityChatPanel
-                  communityATag={communityATag}
-                  moderation={moderation}
-                  rankMap={rankMap}
-                  isMembershipLoading={membersLoading}
-                />
-              ) : (
-                <div className="py-12 text-center text-muted-foreground text-sm px-5">
-                  Community chat is unavailable for this community.
-                </div>
-              )}
-            </TabsContent>
-
-            {/* ── Activity tab — chronological stream of initiatives
-                  (pledges + goals + events) interleaved with threaded NIP-22 discussion,
-                 followed by past initiatives. ── */}
-            <TabsContent value="activity" className="mt-0">
-              <ComposeBox compact replyTo={event} />
-
-              <OfficialActivityShelves
-                orgNaddr={orgNaddr}
-                campaigns={orgCampaigns ?? []}
-                campaignsLoading={orgCampaignsLoading}
-                pledges={orgPledges ?? []}
-                pledgesLoading={orgPledgesLoading}
-                events={orgEvents ?? []}
-                eventsLoading={orgEventsLoading}
-                now={now}
-              />
-
-              {(commentsLoading || goalsLoading || eventsLoading || actionsLoading) ? (
-                <FeedCard className="mx-0 sm:mx-0 mt-2 divide-y divide-border">
-                  {Array.from({ length: 3 }).map((_, i) => (
-                    <ReplyCardSkeleton key={i} />
-                  ))}
-                </FeedCard>
-              ) : activityItems.length === 0 && pastInitiatives.length === 0 ? (
-                <div className="py-12 text-center text-muted-foreground text-sm px-5">
-                  {membersOnly && (
-                    (commentsData && (commentsData.topLevelComments?.length ?? 0) > 0) ||
-                    (goals ?? []).length > 0 ||
-                    (communityActions ?? []).length > 0 ||
-                    (communityEvents ?? []).length > 0
-                  )
-                    ? 'No activity from community members yet. Toggle the shield icon to see everything.'
-                    : <>No activity yet.{user ? ' Start a discussion, create a pledge, set a goal, or schedule an event!' : ''}</>}
-                </div>
-              ) : (
-                <FeedCard className="mx-0 sm:mx-0 mt-2">
-                  {activityItems.map((item) =>
-                    item.kind === 'initiative' ? (
-                      <NoteCard key={item.event.id} event={item.event} />
-                    ) : (
-                      <ThreadedReplyList key={item.node.event.id} roots={[item.node]} />
-                    )
-                  )}
-
-                  {pastInitiatives.length > 0 && (
-                    <div className="px-5 pt-4 pb-1 border-t border-border">
-                      <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
-                        Past
-                      </h4>
-                    </div>
-                  )}
-                  {pastInitiatives.map((e) => (
-                    <NoteCard key={e.id} event={e} />
-                  ))}
-                </FeedCard>
-              )}
-            </TabsContent>
-
-            {/* ── Pulse tab — what community members are posting elsewhere
-                 across Nostr. Excludes events tagged with this community's
-                 `a` reference. ── */}
-            <TabsContent value="pulse" className="mt-0">
-              {communityATag ? (
-                <CommunityPulsePanel
-                  communityATag={communityATag}
-                  memberPubkeys={allMemberPubkeys}
-                  isMembershipLoading={membersLoading}
-                />
-              ) : (
-                <div className="py-12 text-center text-muted-foreground text-sm px-5">
-                  Pulse is unavailable for this community.
-                </div>
-              )}
-            </TabsContent>
-          </Tabs>
+          </div>
         </CommunityModerationContext.Provider>
 
       {communityDonationTarget && (
@@ -1253,11 +1102,37 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
         />
       )}
 
-      {/* FAB-triggered compose modal for the comments tab */}
+      {/* FAB-triggered compose modal — used by the \"New post\" FAB item.
+          Composes a NIP-22 reply against the community event itself. */}
       <ReplyComposeModal
         event={event}
         open={composeOpen}
         onOpenChange={setComposeOpen}
+      />
+
+      {/* Reply button on the engagement bar opens the same compose modal,
+          tracked via a separate `replyOpen` slot so the two entry points
+          can't interleave state. */}
+      <ReplyComposeModal
+        event={event}
+        open={replyOpen}
+        onOpenChange={setReplyOpen}
+      />
+
+      {/* Engagement-bar \"more\" menu — repost / quote / share-this-event. */}
+      <NoteMoreMenu
+        event={event}
+        open={moreMenuOpen}
+        onOpenChange={setMoreMenuOpen}
+      />
+
+      {/* Tapping a repost / quote / like counter on the stats row opens
+          a modal listing the people who took that action. */}
+      <InteractionsModal
+        eventId={event.id}
+        open={interactionsOpen}
+        onOpenChange={setInteractionsOpen}
+        initialTab={interactionsTab}
       />
 
       {/* FAB-triggered calendar event creation dialog. Campaigns and
