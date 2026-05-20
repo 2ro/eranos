@@ -19,7 +19,7 @@ import { useToast } from '@/hooks/useToast';
 import { useUploadFile } from '@/hooks/useUploadFile';
 import { createCountryIdentifier } from '@/lib/countryIdentifiers';
 import { countryCodeToFlag, getAllCountries, getGeoDisplayName } from '@/lib/countries';
-import { DEFAULT_ACTION_COVERS, DEFAULT_COVER_IMAGE } from '@/lib/defaultActionCovers';
+import { DEFAULT_COVER_IMAGE } from '@/lib/defaultActionCovers';
 import { usdToSats } from '@/lib/bitcoin';
 import { cn } from '@/lib/utils';
 
@@ -35,8 +35,6 @@ interface CreateActionFormState {
   description: string;
   tagInput: string;
   pledgeUsd: string;
-  startDate: string;
-  startTime: string;
   deadline: string;
   time: string;
   coverImage: string;
@@ -106,10 +104,6 @@ function CreateActionForm({
   const { data: btcPrice } = useBtcPrice();
   const allCountries = useMemo(() => getAllCountries(), []);
   const [countryPickerOpen, setCountryPickerOpen] = useState(false);
-  const [selectedDefaultId, setSelectedDefaultId] = useState<string | null>(() => {
-    const match = DEFAULT_ACTION_COVERS.find((c) => c.url === formData.coverImage);
-    return match?.id ?? null;
-  });
 
   const countryOptions = useMemo(() => {
     const options: Array<{ value: string; label: string; flag: string }> = [
@@ -136,7 +130,6 @@ function CreateActionForm({
     try {
       const [[, url]] = await uploadFile(file);
       setFormData({ ...formData, coverImage: url });
-      setSelectedDefaultId(null);
     } catch (error) {
       console.error('Failed to upload cover image:', error);
     }
@@ -194,28 +187,6 @@ function CreateActionForm({
           <div className="relative w-full h-32 rounded-lg overflow-hidden border border-border">
             <img src={formData.coverImage || DEFAULT_COVER_IMAGE} alt="Cover preview" className="w-full h-full object-cover" />
           </div>
-          <div className="relative w-full overflow-hidden">
-            <div className="flex gap-2 overflow-x-auto pb-2 -mx-1 px-1">
-              {DEFAULT_ACTION_COVERS.map((cover) => {
-                const isActive = selectedDefaultId === cover.id || formData.coverImage === cover.url;
-                return (
-                  <button
-                    key={cover.id}
-                    type="button"
-                    onClick={() => {
-                      setFormData({ ...formData, coverImage: cover.url });
-                      setSelectedDefaultId(cover.id);
-                    }}
-                    className={cn('relative h-20 w-28 flex-shrink-0 rounded-md overflow-hidden border-2 transition-all', isActive ? 'border-primary ring-2 ring-primary/50' : 'border-border hover:border-primary/50')}
-                    title={cover.name}
-                    aria-label={`Select ${cover.name} cover`}
-                  >
-                    <img src={cover.url} alt={cover.name} className="w-full h-full object-cover" />
-                  </button>
-                );
-              })}
-            </div>
-          </div>
           <div className="flex items-center gap-2">
             <Label htmlFor="cover-upload" className="flex-1 cursor-pointer flex items-center justify-center gap-2 px-4 py-2 border border-border rounded-lg hover:bg-primary/10 transition-colors">
               {isUploading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
@@ -269,16 +240,6 @@ function CreateActionForm({
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="startDate">Start date (optional)</Label>
-          <Input id="startDate" type="date" className="w-full min-w-0" value={formData.startDate} onChange={(e) => setFormData({ ...formData, startDate: e.target.value })} />
-          {formData.startDate && <Input id="startTime" type="time" className="w-full min-w-0" value={formData.startTime} onChange={(e) => setFormData({ ...formData, startTime: e.target.value })} />}
-          <p className="text-xs text-muted-foreground">
-            {!formData.startDate && 'Defaults to now if not specified'}
-            {formData.startDate && !formData.startTime && ' • Starts at midnight'}
-          </p>
-        </div>
-
-        <div className="space-y-2">
           <Label htmlFor="deadline">Deadline (optional)</Label>
           <Input id="deadline" type="date" className="w-full min-w-0" value={formData.deadline} onChange={(e) => setFormData({ ...formData, deadline: e.target.value })} />
           {formData.deadline && <Input id="time" type="time" className="w-full min-w-0" value={formData.time} onChange={(e) => setFormData({ ...formData, time: e.target.value })} />}
@@ -288,11 +249,11 @@ function CreateActionForm({
           </p>
         </div>
 
-        {(formData.startDate || formData.deadline) && (
+        {formData.deadline && (
           <div className="space-y-2 bg-muted/30 p-3 rounded-lg border border-border/50 animate-in slide-in-from-top-2 duration-200">
             <Label className="text-sm font-medium flex items-center gap-2"><Clock className="h-4 w-4" /> Timezone</Label>
             <TimezoneSwitcher value={formData.timezone} onChange={(timezone) => setFormData({ ...formData, timezone })} />
-            <p className="text-xs text-muted-foreground">Start and deadline times will be interpreted in this timezone.</p>
+            <p className="text-xs text-muted-foreground">Deadline time will be interpreted in this timezone.</p>
           </div>
         )}
       </div>
@@ -322,8 +283,6 @@ export function CreateActionDialog({ countryCode, communityATag, open, onOpenCha
     description: '',
     tagInput: '',
     pledgeUsd: '',
-    startDate: '',
-    startTime: '',
     deadline: '',
     time: '',
     coverImage: DEFAULT_COVER_IMAGE,
@@ -357,11 +316,6 @@ export function CreateActionDialog({ countryCode, communityATag, open, onOpenCha
       }
       if (formData.coverImage) tags.push(['image', formData.coverImage]);
 
-      if (formData.startDate) {
-        const [year, month, day] = formData.startDate.split('-').map(Number);
-        const [hours, minutes] = formData.startTime ? formData.startTime.split(':').map(Number) : [0, 0];
-        tags.push(['start', String(unixSecondsInTimezone(year, month, day, hours, minutes, formData.timezone))]);
-      }
       if (formData.deadline) {
         const [year, month, day] = formData.deadline.split('-').map(Number);
         const [hours, minutes] = formData.time ? formData.time.split(':').map(Number) : [23, 59];
@@ -388,7 +342,7 @@ export function CreateActionDialog({ countryCode, communityATag, open, onOpenCha
 
       setFormData({
         title: '', description: '', tagInput: '', pledgeUsd: '',
-        startDate: '', startTime: '', deadline: '', time: '',
+        deadline: '', time: '',
         coverImage: DEFAULT_COVER_IMAGE,
         selectedCountry: countryCode || '',
         timezone: browserTimezone,

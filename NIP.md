@@ -564,7 +564,6 @@ Community-scoped pledges inherit the community's moderation context. Clients ren
     ["t", "tree-planting"],
     ["t", "local-action"],
     ["image", "https://example.com/cover.jpg"],
-    ["start", "1729000000"],
     ["deadline", "1729604800"],
     ["alt", "Agora pledge: Plant a tree in your neighborhood"]
   ]
@@ -584,7 +583,7 @@ Community-scoped pledges inherit the community's moderation context. Clients ren
 | `P`              | No       | Root author hint for community-scoped pledges. Use the community definition author pubkey.              |
 | `t`              | Yes      | Discovery and category tags. Canonical write value includes `agora-action`; additional `t` tags are optional hashtags/categories. Read aliases: `pathos-challenge`, `agora-challenge`. |
 | `image`          | No       | Cover image URL.                                                                                         |
-| `start`          | No       | Unix timestamp when the pledge becomes active. Defaults to `created_at`.                                 |
+| `start`          | No       | Legacy. Unix timestamp when the pledge becomes active. Defaults to `created_at`. New pledges omit it; the `created_at` is the start.    |
 | `deadline`       | No       | Optional Unix timestamp when the pledge expires. Omit for open-ended pledges.                            |
 | `alt`            | Yes      | NIP-31 human-readable fallback. Convention: `"Agora pledge: <title>"`.                                   |
 

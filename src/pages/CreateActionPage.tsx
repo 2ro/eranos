@@ -34,7 +34,6 @@ import { COMMUNITY_DEFINITION_KIND } from '@/lib/communityUtils';
 import { COUNTRIES, searchCountries, type CountryEntry } from '@/lib/countries';
 import { createCountryIdentifier } from '@/lib/countryIdentifiers';
 import { getTodayDateInput } from '@/lib/dateInput';
-import { DEFAULT_ACTION_COVERS } from '@/lib/defaultActionCovers';
 import { sanitizeUrl } from '@/lib/sanitizeUrl';
 import { cn } from '@/lib/utils';
 
@@ -162,8 +161,6 @@ export function CreateActionPage() {
   const [description, setDescription] = useState('');
   const [tagInput, setTagInput] = useState('');
   const [pledgeUsd, setPledgeUsd] = useState('');
-  const [startDate, setStartDate] = useState('');
-  const [startTime, setStartTime] = useState('');
   const [deadline, setDeadline] = useState('');
   const [deadlineTime, setDeadlineTime] = useState('');
   const [coverImage, setCoverImage] = useState<string>('');
@@ -254,17 +251,6 @@ export function CreateActionPage() {
       }
       if (sanitizedImage) {
         tags.push(['image', sanitizedImage]);
-      }
-
-      if (startDate) {
-        const [year, month, day] = startDate.split('-').map(Number);
-        const [hours, minutes] = startTime
-          ? startTime.split(':').map(Number)
-          : [0, 0];
-        tags.push([
-          'start',
-          String(unixSecondsInTimezone(year, month, day, hours, minutes, timezone)),
-        ]);
       }
 
       if (deadline) {
@@ -398,7 +384,7 @@ export function CreateActionPage() {
           </FormSection>
 
           {/* Tags */}
-          <FormSection title="Tags" requirement="Optional">
+          <FormSection title="Tags" requirement="Recommended">
             <Input
               id="pledge-tags"
               value={tagInput}
@@ -413,12 +399,11 @@ export function CreateActionPage() {
               value={coverImage}
               onChange={setCoverImage}
               onUploadingChange={setCoverUploading}
-              templates={DEFAULT_ACTION_COVERS}
             />
           </FormSection>
 
           {/* Description */}
-          <FormSection title="Story" requirement="Required">
+          <FormSection title="Description" requirement="Required">
             <Textarea
               placeholder="Explain the action, evidence, or outcome you want to inspire, what submissions should include, and how you plan to evaluate them..."
               rows={7}
@@ -449,28 +434,6 @@ export function CreateActionPage() {
               </div>
             </FormSection>
 
-            {/* Start date */}
-            <FormSection title="Start date" requirement="Optional">
-              <Input
-                type="date"
-                className="w-full min-w-0 [color-scheme:light] dark:[color-scheme:dark] dark:[&::-webkit-calendar-picker-indicator]:invert dark:[&::-webkit-calendar-picker-indicator]:opacity-80"
-                value={startDate}
-                onChange={(e) => setStartDate(e.target.value)}
-              />
-              {startDate && (
-                <Input
-                  type="time"
-                  className="w-full min-w-0 [color-scheme:light] dark:[color-scheme:dark] dark:[&::-webkit-calendar-picker-indicator]:invert dark:[&::-webkit-calendar-picker-indicator]:opacity-80"
-                  value={startTime}
-                  onChange={(e) => setStartTime(e.target.value)}
-                />
-              )}
-              <p className="text-xs text-muted-foreground">
-                {!startDate && 'Defaults to now if not specified'}
-                {startDate && !startTime && 'Starts at midnight'}
-              </p>
-            </FormSection>
-
             {/* Deadline */}
             <FormSection title="Deadline" requirement="Optional">
               <Input
@@ -495,7 +458,7 @@ export function CreateActionPage() {
             </FormSection>
           </div>
 
-          {(startDate || deadline) && (
+          {deadline && (
             <FormSection title="Timezone" requirement="Required">
               <div className="bg-muted/30 p-3 rounded-lg border border-border/50 space-y-2 animate-in slide-in-from-top-2 duration-200">
                 <div className="flex items-center gap-2 text-sm font-medium">
