@@ -2,15 +2,18 @@ import { useMemo, useCallback, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { nip19 } from 'nostr-tools';
 import {
+  CalendarClock,
   CalendarDays,
   ChevronLeft,
   Crown,
   HandHeart,
   Info,
+  MapPin,
   Megaphone,
   MoreVertical,
   Pencil,
   Shield,
+  Target,
   Share2,
   UserCheck,
   UserMinus,
@@ -25,8 +28,10 @@ import { PostActionBar } from '@/components/PostActionBar';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { Progress } from '@/components/ui/progress';
 import { Skeleton } from '@/components/ui/skeleton';
 import { DonateDialog } from '@/components/DonateDialog';
 import { NoteContent } from '@/components/NoteContent';
@@ -51,13 +56,17 @@ import {
 } from '@/hooks/useOrganizationActivity';
 import { useProfileUrl } from '@/hooks/useProfileUrl';
 import { useToast } from '@/hooks/useToast';
+import { useSubmissionZapTotals } from '@/hooks/useSubmissionZapTotals';
 import { CommunityModerationContext } from '@/contexts/CommunityModerationContext';
 import { useLayoutOptions } from '@/contexts/LayoutContext';
 import { applyCommunityModerationToEvents, parseCommunityEvent } from '@/lib/communityUtils';
 import type { ParsedCampaign } from '@/lib/campaign';
 import type { Action } from '@/hooks/useActions';
+import { formatSats, satsToUSDWhole } from '@/lib/bitcoin';
+import { getGeoDisplayName } from '@/lib/countries';
+import { DEFAULT_COVER_IMAGE } from '@/lib/defaultActionCovers';
 import { formatNumber } from '@/lib/formatNumber';
-import { genUserName } from '@/lib/genUserName';
+import { genUserName, getDisplayName } from '@/lib/genUserName';
 import { sanitizeUrl } from '@/lib/sanitizeUrl';
 import { cn } from '@/lib/utils';
 
@@ -185,8 +194,57 @@ function formatShelfEventDate(event: NostrEvent): string {
   return shelfDateFormatter.format(new Date(ts * 1000));
 }
 
+function formatPledgeAmount(sats: number, btcPrice: number | undefined): string {
+  if (btcPrice) return satsToUSDWhole(sats, btcPrice);
+  return `${formatSats(sats)} sats`;
+}
+
+function formatPledgeDeadline(unixSeconds: number): { label: string; isPast: boolean } {
+  const now = Math.floor(Date.now() / 1000);
+  const diff = unixSeconds - now;
+  if (diff <= 0) return { label: 'Ended', isPast: true };
+  const days = Math.ceil(diff / 86_400);
+  if (days <= 1) return { label: 'Ends today', isPast: false };
+  if (days < 30) return { label: `${days} days left`, isPast: false };
+  const months = Math.round(days / 30);
+  return { label: `${months} mo left`, isPast: false };
+}
+
+function PledgeShelfProgress({ pledgedSats, fundedSats, btcPrice }: { pledgedSats: number; fundedSats: number; btcPrice: number | undefined }) {
+  const pct = pledgedSats > 0 ? Math.min(100, Math.round((fundedSats / pledgedSats) * 100)) : 0;
+  return (
+    <div className="space-y-1.5">
+      <Progress value={pct} className="h-2" />
+      <div className="flex items-baseline justify-between gap-2 text-sm">
+        <span className="font-semibold">
+          {formatPledgeAmount(fundedSats, btcPrice)}
+          <span className="ml-1 font-normal text-muted-foreground">funded</span>
+        </span>
+        <span className="text-muted-foreground">of {formatPledgeAmount(pledgedSats, btcPrice)} pledged</span>
+      </div>
+    </div>
+  );
+}
+
 function PledgeShelfCard({ pledge }: { pledge: Action }) {
-  const cover = sanitizeUrl(pledge.image);
+  const { btcPrice } = useBitcoinWallet();
+  const author = useAuthor(pledge.pubkey);
+  const metadata = author.data?.metadata;
+  const displayName = getDisplayName(metadata, pledge.pubkey);
+  const [imageLoadFailed, setImageLoadFailed] = useState(false);
+  const { data: commentsData } = useComments(pledge.event, 100);
+  const topLevel = useMemo(() => commentsData?.topLevelComments ?? [], [commentsData?.topLevelComments]);
+  const submissionIds = useMemo(() => topLevel.map((comment) => comment.id), [topLevel]);
+  const { data: zapTotals } = useSubmissionZapTotals(submissionIds);
+  const fundedSats = useMemo(() => {
+    const totals = zapTotals ?? new Map<string, number>();
+    return topLevel.reduce((sum, submission) => sum + (totals.get(submission.id) ?? 0), 0);
+  }, [topLevel, zapTotals]);
+
+  const sanitizedCover = sanitizeUrl(pledge.image);
+  const coverImage = sanitizedCover && !imageLoadFailed ? sanitizedCover : DEFAULT_COVER_IMAGE;
+  const deadline = pledge.deadline ? formatPledgeDeadline(pledge.deadline) : null;
+  const countryLabel = pledge.countryCode ? getGeoDisplayName(pledge.countryCode) : undefined;
   const naddr = nip19.naddrEncode({
     kind: pledge.event.kind,
     pubkey: pledge.pubkey,
@@ -195,23 +253,66 @@ function PledgeShelfCard({ pledge }: { pledge: Action }) {
   return (
     <Link
       to={`/${naddr}`}
-      className="group relative flex w-[260px] shrink-0 flex-col overflow-hidden rounded-xl border border-border/60 bg-card shadow-sm motion-safe:transition-shadow hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+      className="group block w-[280px] shrink-0 rounded-xl overflow-hidden focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background motion-safe:transition-transform motion-safe:duration-200 motion-safe:hover:-translate-y-0.5"
     >
-      <div className="relative aspect-[16/9] w-full overflow-hidden bg-gradient-to-br from-primary/15 via-primary/5 to-secondary">
-        {cover ? (
-          <img src={cover} alt="" className="absolute inset-0 size-full object-cover motion-safe:transition-transform group-hover:scale-[1.02]" />
-        ) : (
-          <div className="absolute inset-0 flex items-center justify-center">
-            <Megaphone className="size-10 text-primary/40" />
+      <Card className="overflow-hidden border-border/70 shadow-sm motion-safe:transition-shadow motion-safe:duration-200 group-hover:shadow-lg h-full flex flex-col">
+        <div className="relative w-full aspect-[16/9] bg-gradient-to-br from-primary/15 via-primary/5 to-secondary">
+          <img
+            src={coverImage}
+            alt=""
+            className="absolute inset-0 size-full object-cover"
+            onError={() => setImageLoadFailed(true)}
+            loading="lazy"
+          />
+          {deadline?.isPast && (
+            <div className="absolute right-3 top-3">
+              <Badge variant="secondary" className="backdrop-blur bg-background/85 border-border/40 text-muted-foreground">
+                Ended
+              </Badge>
+            </div>
+          )}
+        </div>
+
+        <div className="flex flex-col gap-3 p-5 flex-1">
+          <div className="space-y-2">
+            <h3 className="font-bold leading-tight tracking-tight text-lg line-clamp-2">
+              {pledge.title}
+            </h3>
+            {pledge.description.trim() && (
+              <p className="text-sm text-muted-foreground line-clamp-2">
+                {pledge.description}
+              </p>
+            )}
           </div>
-        )}
-      </div>
-      <div className="flex-1 px-3 py-3 space-y-1">
-        <h3 className="text-sm font-semibold leading-snug line-clamp-2">{pledge.title}</h3>
-        {pledge.description && (
-          <p className="text-xs text-muted-foreground line-clamp-2">{pledge.description}</p>
-        )}
-      </div>
+
+          <div className="flex-1" />
+
+          <PledgeShelfProgress pledgedSats={pledge.bounty} fundedSats={fundedSats} btcPrice={btcPrice} />
+
+          <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 text-xs text-muted-foreground pt-1">
+            <span className="inline-flex items-center gap-1.5">
+              <Target className="size-3.5" />
+              {topLevel.length} {topLevel.length === 1 ? 'submission' : 'submissions'}
+            </span>
+            {countryLabel && (
+              <span className="inline-flex items-center gap-1.5">
+                <MapPin className="size-3.5" />
+                {countryLabel}
+              </span>
+            )}
+            {deadline && (
+              <span className={cn('inline-flex items-center gap-1.5', deadline.isPast && 'text-destructive')}>
+                <CalendarClock className="size-3.5" />
+                {deadline.label}
+              </span>
+            )}
+          </div>
+
+          <div className="text-xs text-muted-foreground border-t border-border/60 pt-3 truncate">
+            by <span className="font-medium text-foreground">{displayName}</span>
+          </div>
+        </div>
+      </Card>
     </Link>
   );
 }
