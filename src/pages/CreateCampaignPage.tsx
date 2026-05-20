@@ -270,6 +270,10 @@ export function CreateCampaignPage() {
     if (!orgFromParam || !manageableOrgs) return null;
     return manageableOrgs.find((entry) => entry.community.aTag === orgFromParam.aTag) ?? null;
   }, [orgFromParam, manageableOrgs]);
+  const authorizedOrgForAttachedATag = useMemo(() => {
+    if (!organizationATag || !manageableOrgs) return null;
+    return manageableOrgs.find((entry) => entry.community.aTag === organizationATag) ?? null;
+  }, [manageableOrgs, organizationATag]);
 
   useEffect(() => {
     if (isEditMode) return;
@@ -525,9 +529,12 @@ export function CreateCampaignPage() {
       // the campaign surfaces as official activity on that org's page.
       // The `K` companion tag records the referenced kind, and `P` hints
       // at the org founder for clients that batch-resolve authors.
-      if (organizationATag) {
-        const orgAuthor = organizationATag.split(':')[1];
-        tags.push(['A', organizationATag]);
+      const publishOrganizationATag = isEditMode
+        ? authorizedOrgForAttachedATag?.community.aTag ?? ''
+        : organizationATag;
+      if (publishOrganizationATag) {
+        const orgAuthor = publishOrganizationATag.split(':')[1];
+        tags.push(['A', publishOrganizationATag]);
         tags.push(['K', String(COMMUNITY_DEFINITION_KIND)]);
         if (orgAuthor) tags.push(['P', orgAuthor]);
       }
@@ -550,6 +557,12 @@ export function CreateCampaignPage() {
     },
     onSuccess: (campaign) => {
       void queryClient.invalidateQueries({ queryKey: ['campaign', campaign.pubkey, campaign.identifier] });
+      const publishOrganizationATag = isEditMode
+        ? authorizedOrgForAttachedATag?.community.aTag ?? ''
+        : organizationATag;
+      if (publishOrganizationATag) {
+        void queryClient.invalidateQueries({ queryKey: ['organization-activity', publishOrganizationATag] });
+      }
       toast({
         title: isEditMode ? 'Campaign updated' : 'Campaign launched',
         description: isEditMode ? 'Your fundraiser changes are live.' : 'Your fundraiser is live.',
@@ -670,8 +683,8 @@ export function CreateCampaignPage() {
             </h1>
           </div>
           <OrganizationContextChip
-            aTag={organizationATag}
-            authorizedOrg={authorizedOrgFromParam}
+            aTag={isEditMode && organizationATag && !authorizedOrgForAttachedATag && !manageableOrgsLoading ? '' : organizationATag}
+            authorizedOrg={isEditMode ? authorizedOrgForAttachedATag : authorizedOrgFromParam}
             param={orgParam}
             paramDecoded={orgFromParam}
             manageableLoading={manageableOrgsLoading}

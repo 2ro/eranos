@@ -271,6 +271,9 @@ export function CreateActionPage() {
     },
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ['agora-actions'] });
+      if (organizationATag) {
+        await queryClient.invalidateQueries({ queryKey: ['organization-activity', organizationATag] });
+      }
       await queryClient.refetchQueries({ queryKey: ['agora-actions'] });
       toast({ title: 'Pledge created' });
       navigate('/pledges');

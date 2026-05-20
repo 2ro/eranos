@@ -240,7 +240,7 @@ export function CreateEventPage() {
         queryClient.invalidateQueries({ queryKey: ['addr-event', kind, publishedEvent.pubkey, dTag] }),
         ...(organizationATag ? [
           queryClient.invalidateQueries({ queryKey: ['community-events', organizationATag] }),
-          queryClient.invalidateQueries({ queryKey: ['org-events', organizationATag] }),
+          queryClient.invalidateQueries({ queryKey: ['organization-activity', organizationATag] }),
           queryClient.invalidateQueries({
             predicate: (q) => {
               const [root, aTagsKey] = q.queryKey;
