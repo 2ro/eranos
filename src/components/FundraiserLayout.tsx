@@ -1,5 +1,5 @@
 import { Suspense, useCallback, useMemo, useRef, useState } from 'react';
-import { Outlet } from 'react-router-dom';
+import { Link, Outlet } from 'react-router-dom';
 
 import { TopNav } from '@/components/TopNav';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -97,10 +97,10 @@ function SiteFooter() {
       <div className="mx-auto max-w-7xl px-4 sm:px-6 py-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-muted-foreground">
         <span>&copy; {new Date().getFullYear()} Agora. Fundraisers on Nostr.</span>
         <nav className="flex items-center gap-5">
-          <a href="/help" className="hover:text-foreground motion-safe:transition-colors">Help</a>
-          <a href="/privacy" className="hover:text-foreground motion-safe:transition-colors">Privacy</a>
-          <a href="/safety" className="hover:text-foreground motion-safe:transition-colors">Safety</a>
-          <a href="/changelog" className="hover:text-foreground motion-safe:transition-colors">Changelog</a>
+          <Link to="/help" className="hover:text-foreground motion-safe:transition-colors">Help</Link>
+          <Link to="/privacy" className="hover:text-foreground motion-safe:transition-colors">Privacy</Link>
+          <Link to="/safety" className="hover:text-foreground motion-safe:transition-colors">Safety</Link>
+          <Link to="/changelog" className="hover:text-foreground motion-safe:transition-colors">Changelog</Link>
         </nav>
       </div>
     </footer>

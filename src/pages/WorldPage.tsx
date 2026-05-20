@@ -68,13 +68,12 @@ export function WorldPage() {
   });
 
   return (
-    // h-dvh inside the column fills the full viewport on both mobile (where
-    // the column's negative margin pulls content under the translucent top
-    // bar) and desktop (where there's no top/bottom chrome). The floating
-    // discovery button is absolutely positioned inside this wrapper so it
-    // stays scoped to the column and doesn't overlap the docked desktop
-    // discovery panel.
-    <div className="relative w-full h-dvh overflow-hidden bg-muted/20">
+    // The height must account for the sticky TopNav (h-16 = 4rem) so the
+    // map fills exactly the remaining viewport. Using `h-dvh` (100dvh)
+    // would make the page scrollable and let the sticky header overlap the
+    // top of the map — hiding the Leaflet zoom controls. The calc keeps
+    // the page at exactly one viewport with no scroll.
+    <div className="relative w-full h-[calc(100dvh-4rem)] overflow-hidden bg-muted/20">
       <Suspense
         fallback={
           <div className="absolute inset-0">
