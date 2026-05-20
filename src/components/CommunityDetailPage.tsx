@@ -20,7 +20,6 @@ import {
 import type { NostrEvent, NostrMetadata } from '@nostrify/nostrify';
 
 import { CampaignCard } from '@/components/CampaignCard';
-import { CreateCommunityEventDialog } from '@/components/CreateCommunityEventDialog';
 import { PeopleAvatarStack } from '@/components/PeopleAvatarStack';
 import { PostActionBar } from '@/components/PostActionBar';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
@@ -396,13 +395,9 @@ function OfficialActivityShelves({
 function CommunityCreateActions({
   orgNaddr,
   organizationName,
-  canCreateEvent,
-  onCreateEvent,
 }: {
   orgNaddr: string;
   organizationName: string;
-  canCreateEvent: boolean;
-  onCreateEvent: () => void;
 }) {
   const createQuery = orgNaddr ? `?org=${orgNaddr}` : '';
 
@@ -438,18 +433,14 @@ function CommunityCreateActions({
             </Link>
           </Button>
 
-          <Button
-            type="button"
-            variant="outline"
-            className="h-auto justify-start gap-3 px-4 py-3 text-left"
-            onClick={onCreateEvent}
-            disabled={!canCreateEvent}
-          >
-            <CalendarDays className="size-5 shrink-0 text-primary" />
-            <span className="min-w-0">
-              <span className="block font-semibold">Event</span>
-              <span className="block text-xs font-normal text-muted-foreground">Schedule a date</span>
-            </span>
+          <Button asChild variant="outline" className="h-auto justify-start gap-3 px-4 py-3 text-left">
+            <Link to={`/events/new${createQuery}`}>
+              <CalendarDays className="size-5 shrink-0 text-primary" />
+              <span className="min-w-0">
+                <span className="block font-semibold">Event</span>
+                <span className="block text-xs font-normal text-muted-foreground">Schedule a date</span>
+              </span>
+            </Link>
           </Button>
         </div>
       </div>
@@ -465,10 +456,6 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
   const { user } = useCurrentUser();
   const { btcPrice } = useBitcoinWallet();
 
-  // Calendar events still use the in-page dialog because no dedicated create
-  // page exists yet. Campaigns and pledges navigate to their create pages
-  // with `?org=<naddr>` so those forms can resolve the organization context.
-  const [eventDialogOpen, setEventDialogOpen] = useState(false);
   const [membersDialogOpen, setMembersDialogOpen] = useState(false);
   const [descriptionDialogOpen, setDescriptionDialogOpen] = useState(false);
   const [donateOpen, setDonateOpen] = useState(false);
@@ -608,9 +595,9 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
   const { data: orgEvents, isLoading: orgEventsLoading } = useOrganizationEvents(community);
   const now = useNow(60_000);
 
-  // naddr for this community — used by the create CTAs (passed to
-  // `/campaigns/new?org=` and `/pledges/new?org=`) so the create forms can
-  // resolve the implicit org context. Stable per render of the community
+  // naddr for this community — used by the create CTAs (passed to create
+  // pages via `?org=`) so the forms can resolve the implicit org context.
+  // Stable per render of the community
   // event because `event.kind`, `event.pubkey`, and the d-tag don't change
   // within a session.
   const orgNaddr = useMemo(() => {
@@ -685,14 +672,6 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
       toast({ title: 'Failed to copy link', variant: 'destructive' });
     }
   }, [event, toast]);
-
-  const handleCreateEvent = useCallback(() => {
-    if (!user) {
-      toast({ title: 'Log in to create an event' });
-      return;
-    }
-    setEventDialogOpen(true);
-  }, [toast, user]);
 
   useLayoutOptions({
     noMaxWidth: true,
@@ -874,8 +853,6 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
               <CommunityCreateActions
                 orgNaddr={orgNaddr}
                 organizationName={name}
-                canCreateEvent={!!communityATag}
-                onCreateEvent={handleCreateEvent}
               />
             )}
 
@@ -1073,16 +1050,6 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
         initialTab={interactionsTab}
       />
 
-      {/* Calendar event creation dialog. Campaigns and pledges navigate to
-          their dedicated create pages with `?org=<naddr>` so the
-          implicit-tagging flow can resolve. */}
-      {communityATag && (
-        <CreateCommunityEventDialog
-          communityATag={communityATag}
-          open={eventDialogOpen}
-          onOpenChange={setEventDialogOpen}
-        />
-      )}
       </div>
     </main>
   );
