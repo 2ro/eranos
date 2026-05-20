@@ -141,19 +141,6 @@ function getTag(tags: string[][], name: string): string | undefined {
   return tags.find(([n]) => n === name)?.[1];
 }
 
-function getCalendarEventStart(event: NostrEvent): number {
-  const start = getTag(event.tags, 'start');
-  if (!start) return 0;
-
-  if (event.kind === 31922) {
-    const date = new Date(`${start}T00:00:00Z`);
-    return isNaN(date.getTime()) ? 0 : Math.floor(date.getTime() / 1000);
-  }
-
-  const timestamp = parseInt(start, 10);
-  return isNaN(timestamp) ? 0 : timestamp;
-}
-
 function getCalendarEventEnd(event: NostrEvent): number {
   const start = getTag(event.tags, 'start');
   if (!start) return 0;
@@ -460,15 +447,13 @@ function CalendarEventShelfCard({ event }: { event: NostrEvent }) {
 interface OfficialShelfProps {
   title: string;
   count: number;
-  createHref?: string;
-  createLabel?: string;
   isLoading: boolean;
   isEmpty: boolean;
   children: React.ReactNode;
 }
 
-/** Wraps a single shelf row with a title and an optional "+ New" CTA on the right. */
-function OfficialShelf({ title, count, createHref, createLabel, isLoading, isEmpty, children }: OfficialShelfProps) {
+/** Wraps the mixed official activity rail for campaigns, pledges, and events. */
+function OfficialShelf({ title, count, isLoading, isEmpty, children }: OfficialShelfProps) {
   // Suppress entirely when the shelf has nothing to show — keeps the
   // activity feed at the top of the viewport when an org has no
   // campaigns/pledges/events yet.
@@ -482,14 +467,6 @@ function OfficialShelf({ title, count, createHref, createLabel, isLoading, isEmp
             <span className="ml-1.5 text-muted-foreground font-normal">{count}</span>
           )}
         </h2>
-        {createHref && (
-          <Link
-            to={createHref}
-            className="text-xs font-medium text-primary hover:underline focus-visible:outline-none focus-visible:underline"
-          >
-            {createLabel ?? 'New'}
-          </Link>
-        )}
       </div>
       <div className="-mx-4 sm:-mx-6 px-4 sm:px-6 flex gap-3 overflow-x-auto scrollbar-none pb-1">
         {children}
@@ -499,7 +476,6 @@ function OfficialShelf({ title, count, createHref, createLabel, isLoading, isEmp
 }
 
 function OfficialActivityShelves({
-  orgNaddr,
   campaigns,
   campaignsLoading,
   pledges,
@@ -508,7 +484,6 @@ function OfficialActivityShelves({
   eventsLoading,
   now,
 }: {
-  orgNaddr: string;
   campaigns: ParsedCampaign[];
   campaignsLoading: boolean;
   pledges: Action[];
@@ -517,28 +492,50 @@ function OfficialActivityShelves({
   eventsLoading: boolean;
   now: number;
 }) {
-  // Drop archived campaigns; sort newest first (the hook already sorts).
+  // Drop archived campaigns; mixed activity is sorted newest publish first.
   const liveCampaigns = useMemo(
     () => campaigns.filter((c) => !c.archived),
     [campaigns],
   );
 
-  // Drop expired pledges; sort with closest-deadline first, then newest.
+  // Drop expired pledges; mixed activity is sorted newest publish first.
   const livePledges = useMemo(() => {
-    const filtered = pledges.filter((p) => !p.deadline || p.deadline > now);
-    return [...filtered].sort((a, b) => {
-      if (a.deadline && b.deadline) return a.deadline - b.deadline;
-      if (a.deadline) return -1;
-      if (b.deadline) return 1;
-      return b.createdAt - a.createdAt;
-    });
+    return pledges.filter((p) => !p.deadline || p.deadline > now);
   }, [pledges, now]);
 
-  // Drop past events; sort by start ascending (next-up first).
+  // Drop past events; mixed activity is sorted newest publish first.
   const upcomingEvents = useMemo(() => {
-    const filtered = events.filter((e) => getCalendarEventEnd(e) >= now);
-    return [...filtered].sort((a, b) => getCalendarEventStart(a) - getCalendarEventStart(b));
+    return events.filter((e) => getCalendarEventEnd(e) >= now);
   }, [events, now]);
+
+  const mixedActivity = useMemo(() => {
+    const items: Array<
+      | { type: 'campaign'; id: string; createdAt: number; campaign: ParsedCampaign }
+      | { type: 'pledge'; id: string; createdAt: number; pledge: Action }
+      | { type: 'event'; id: string; createdAt: number; event: NostrEvent }
+    > = [
+      ...liveCampaigns.map((campaign) => ({
+        type: 'campaign' as const,
+        id: campaign.aTag,
+        createdAt: campaign.createdAt,
+        campaign,
+      })),
+      ...livePledges.map((pledge) => ({
+        type: 'pledge' as const,
+        id: pledge.event.id,
+        createdAt: pledge.createdAt,
+        pledge,
+      })),
+      ...upcomingEvents.map((event) => ({
+        type: 'event' as const,
+        id: event.id,
+        createdAt: event.created_at,
+        event,
+      })),
+    ];
+
+    return items.sort((a, b) => b.createdAt - a.createdAt);
+  }, [liveCampaigns, livePledges, upcomingEvents]);
 
   // If everything is empty AND nothing is loading, render nothing — the
   // activity feed below already provides its own empty state.
@@ -551,47 +548,29 @@ function OfficialActivityShelves({
     return null;
   }
 
-  const createQuery = orgNaddr ? `?org=${orgNaddr}` : '';
-
   return (
     <div className="space-y-1">
       <OfficialShelf
-        title="Campaigns"
-        count={liveCampaigns.length}
-        createHref={`/campaigns/new${createQuery}`}
-        createLabel="+ New campaign"
-        isLoading={campaignsLoading}
-        isEmpty={liveCampaigns.length === 0}
+        title="Official activity"
+        count={mixedActivity.length}
+        isLoading={campaignsLoading || pledgesLoading || eventsLoading}
+        isEmpty={mixedActivity.length === 0}
       >
-        {liveCampaigns.map((campaign) => (
-          <div key={campaign.aTag} className="w-[280px] shrink-0">
-            <CampaignCard campaign={campaign} />
-          </div>
-        ))}
-      </OfficialShelf>
+        {mixedActivity.map((item) => {
+          if (item.type === 'campaign') {
+            return (
+              <div key={`campaign:${item.id}`} className="w-[280px] shrink-0">
+                <CampaignCard campaign={item.campaign} />
+              </div>
+            );
+          }
 
-      <OfficialShelf
-        title="Pledges"
-        count={livePledges.length}
-        createHref={`/pledges/new${createQuery}`}
-        createLabel="+ New pledge"
-        isLoading={pledgesLoading}
-        isEmpty={livePledges.length === 0}
-      >
-        {livePledges.map((pledge) => (
-          <PledgeShelfCard key={pledge.event.id} pledge={pledge} />
-        ))}
-      </OfficialShelf>
+          if (item.type === 'pledge') {
+            return <PledgeShelfCard key={`pledge:${item.id}`} pledge={item.pledge} />;
+          }
 
-      <OfficialShelf
-        title="Upcoming events"
-        count={upcomingEvents.length}
-        isLoading={eventsLoading}
-        isEmpty={upcomingEvents.length === 0}
-      >
-        {upcomingEvents.map((evt) => (
-          <CalendarEventShelfCard key={evt.id} event={evt} />
-        ))}
+          return <CalendarEventShelfCard key={`event:${item.id}`} event={item.event} />;
+        })}
       </OfficialShelf>
     </div>
   );
@@ -1063,7 +1042,6 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
 
             {/* Official-activity shelves. Hidden entirely when empty. */}
             <OfficialActivityShelves
-              orgNaddr={orgNaddr}
               campaigns={orgCampaigns ?? []}
               campaignsLoading={orgCampaignsLoading}
               pledges={orgPledges ?? []}
