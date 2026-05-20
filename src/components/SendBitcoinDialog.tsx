@@ -27,7 +27,7 @@ import {
 } from '@/components/ui/popover';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
-import { Checkbox } from '@/components/ui/checkbox';
+import { BitcoinPublicDisclaimer } from '@/components/BitcoinPublicDisclaimer';
 import { ZapSuccessScreen } from '@/components/ZapSuccessScreen';
 import { EmojifiedText } from '@/components/CustomEmoji';
 import { getAvatarShape } from '@/lib/avatarShape';
@@ -552,45 +552,15 @@ export function SendBitcoinDialog({ isOpen, onClose, btcPrice }: SendBitcoinDial
 
               {/* Privacy warning for raw Bitcoin addresses */}
               {isRawAddress && (
-                <Alert variant="destructive" className="bg-destructive/5">
-                  <AlertTriangle className="size-4" />
-                  <AlertDescription className="text-xs">
-                    <p>
-                      Money you send is public and can be traced back to you.{' '}
-                      <Popover>
-                        <PopoverTrigger asChild>
-                          <button
-                            type="button"
-                            className="underline underline-offset-2 font-medium hover:opacity-80 focus:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-sm"
-                          >
-                            Learn more
-                          </button>
-                        </PopoverTrigger>
-                        <PopoverContent side="top" align="start" className="w-72 text-xs leading-relaxed">
-                          Bitcoin is a public ledger. Transactions you send can
-                          be traced back to you forever, even after being
-                          exchanged by multiple people. Send it only to those
-                          you wish to support publicly, or cash out at an
-                          exchange.
-                        </PopoverContent>
-                      </Popover>
-                    </p>
-                    <label className="mt-2 flex items-start gap-2 cursor-pointer select-none">
-                      <Checkbox
-                        checked={acknowledgedPublic}
-                        onCheckedChange={(checked) => {
-                          setAcknowledgedPublic(checked === true);
-                          setError('');
-                          // Re-arming required after toggling the acknowledgement.
-                          setConfirmArmed(false);
-                        }}
-                        className="mt-0.5 border-destructive data-[state=checked]:bg-destructive data-[state=checked]:text-destructive-foreground"
-                        aria-label="I understand this transaction is public"
-                      />
-                      <span>I understand this transaction is public.</span>
-                    </label>
-                  </AlertDescription>
-                </Alert>
+                <BitcoinPublicDisclaimer
+                  acknowledged={acknowledgedPublic}
+                  onAcknowledgedChange={(checked) => {
+                    setAcknowledgedPublic(checked);
+                    setError('');
+                    // Re-arming required after toggling the acknowledgement.
+                    setConfirmArmed(false);
+                  }}
+                />
               )}
 
               {/* Send button */}

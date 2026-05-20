@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { AlertTriangle, Check, Copy, ExternalLink } from 'lucide-react';
 
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { BitcoinPublicDisclaimer } from '@/components/BitcoinPublicDisclaimer';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -45,6 +46,11 @@ export function BeneficiaryDonatePanel({
 }: BeneficiaryDonatePanelProps) {
   const { toast } = useToast();
   const [copied, setCopied] = useState(false);
+  // Bitcoin's public ledger means the donation can be linked back to the
+  // donor's wallet forever. Gate the "Open in wallet" CTA on an explicit
+  // acknowledgement — same pattern as the wallet's Send dialog for raw
+  // on-chain payments.
+  const [acknowledgedPublic, setAcknowledgedPublic] = useState(false);
 
   const author = useAuthor(pubkey);
   const metadata = author.data?.metadata;
@@ -130,9 +136,26 @@ export function BeneficiaryDonatePanel({
         </button>
       </div>
 
+      {/* Privacy disclaimer — must be acknowledged before the donor
+          opens their wallet, since opening it triggers the public on-chain
+          payment flow. The copyable address above stays available for
+          users who want to inspect the destination first. */}
+      <BitcoinPublicDisclaimer
+        acknowledged={acknowledgedPublic}
+        onAcknowledgedChange={setAcknowledgedPublic}
+        leadText="Donations are public and can be traced back to you."
+      />
+
       {/* Open in wallet — relies on the `bitcoin:` URI handler. */}
-      <Button asChild className="w-full">
-        <a href={bip21}>
+      <Button asChild className="w-full" disabled={!acknowledgedPublic}>
+        <a
+          href={acknowledgedPublic ? bip21 : undefined}
+          aria-disabled={!acknowledgedPublic}
+          onClick={(e) => {
+            if (!acknowledgedPublic) e.preventDefault();
+          }}
+          tabIndex={acknowledgedPublic ? undefined : -1}
+        >
           <ExternalLink className="size-4 mr-1.5" />
           Open in wallet
         </a>
