@@ -243,10 +243,6 @@ function CreateActionForm({
           <Label htmlFor="deadline">Deadline (optional)</Label>
           <Input id="deadline" type="date" className="w-full min-w-0" value={formData.deadline} onChange={(e) => setFormData({ ...formData, deadline: e.target.value })} />
           {formData.deadline && <Input id="time" type="time" className="w-full min-w-0" value={formData.time} onChange={(e) => setFormData({ ...formData, time: e.target.value })} />}
-          <p className="text-xs text-muted-foreground">
-            {!formData.deadline && 'Open-ended. Add a deadline if urgency matters.'}
-            {formData.deadline && !formData.time && ' • Ends at 23:59 local time'}
-          </p>
         </div>
 
         {formData.deadline && (

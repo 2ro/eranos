@@ -451,10 +451,6 @@ export function CreateActionPage() {
                   onChange={(e) => setDeadlineTime(e.target.value)}
                 />
               )}
-              <p className="text-xs text-muted-foreground">
-                {!deadline && 'Open-ended. Add a deadline if urgency matters.'}
-                {deadline && !deadlineTime && 'Ends at 23:59 local time'}
-              </p>
             </FormSection>
           </div>
 
