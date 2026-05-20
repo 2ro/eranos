@@ -118,13 +118,6 @@ const FAQ_TEMPLATE: FAQCategory[] = [
     label: 'Bitcoin Donations on Agora',
     items: [
       {
-        id: 'what-is-agora',
-        question: 'What is {appName} for?',
-        answer: [
-          '{appName} is a Nostr platform for sending on-chain Bitcoin donations directly to activists. No middleman, no payment processor, no account to freeze.',
-        ],
-      },
-      {
         id: 'send-bitcoin-onchain',
         question: 'How does sending Bitcoin work?',
         answer: [
@@ -191,25 +184,43 @@ const FAQ_TEMPLATE: FAQCategory[] = [
     ],
   },
 
-  // ── Network & Safety ────────────────────────────────────────────────────
+  // ── Hidden legacy items ─────────────────────────────────────────────────
+  // Kept so existing HelpTip call sites on other pages don't break, but
+  // excluded from the visible FAQ. {appName} is on-chain only; Lightning,
+  // zaps, and the network/safety topics aren't part of the public help
+  // content right now.
   {
-    id: 'content-safety',
-    label: 'Network & Safety',
+    id: 'legacy',
+    label: 'Legacy',
+    hidden: true,
     items: [
+      {
+        id: 'send-bitcoin-lightning',
+        question: 'How does sending Bitcoin over Lightning work?',
+        answer: [
+          'If a recipient has a Lightning address on their profile, you can send to that. Lightning settles in seconds and fees are tiny.',
+          'Lightning sends don\'t use {appName}\'s donation address \u2014 they go straight to whatever Lightning wallet the recipient set up themselves. {appName}\'s own donation flow is on-chain only.',
+        ],
+      },
+      {
+        id: 'what-are-zaps',
+        question: 'What are zaps?',
+        answer: [
+          'Zaps are small Lightning tips on Nostr, separate from {appName}\'s on-chain donation flow.',
+        ],
+      },
       {
         id: 'fyp',
         question: 'How does the feed work?',
         answer: [
           'Your feed shows campaigns and posts from people you follow. There\'s no algorithm deciding what you see.',
-          'Use the Trends page or Follow Packs to discover more activists and campaigns.',
         ],
       },
       {
         id: 'what-are-relays',
         question: 'What are relays?',
         answer: [
-          'Relays are the servers that store and deliver Nostr events \u2014 posts, donation receipts, profile info. Think of them like different mail carriers.',
-          'The defaults work out of the box. Using multiple relays means your content is backed up in more places, making it harder for anyone to silence you. To dive deeper, read [Understanding Nostr Relays](https://nostr.how/en/relays).',
+          'Relays are the servers that store and deliver Nostr events \u2014 posts, donation receipts, profile info. The defaults work out of the box; you can add or remove relays in Settings > Network.',
         ],
       },
       {
@@ -230,42 +241,14 @@ const FAQ_TEMPLATE: FAQCategory[] = [
         id: 'vs-mastodon-bluesky',
         question: 'How is Nostr different from Mastodon or Bluesky?',
         answer: [
-          'On Mastodon, your account lives on a specific server \u2014 if it shuts down or bans you, you start over. On Bluesky, most accounts depend on one company.',
-          'On Nostr, your identity is a key you control. No server can lock you out, and your donation address goes with you to any Nostr app.',
+          'On Mastodon, your account lives on a specific server. On Bluesky, most accounts depend on one company. On Nostr, your identity is a key you control, and your donation address goes with you to any Nostr app.',
         ],
       },
       {
         id: 'profile-fields',
         question: 'What are profile fields?',
         answer: [
-          'Profile fields let you add extra info to your profile \u2014 links, wallet addresses, music, photos, videos. Useful for activists who want to share context about their work.',
-        ],
-      },
-    ],
-  },
-
-  // ── Hidden legacy items ─────────────────────────────────────────────────
-  // Kept so existing HelpTip call sites on other pages don't break, but
-  // excluded from the visible FAQ. {appName} is on-chain only; Lightning
-  // and zaps are not part of the public help content.
-  {
-    id: 'legacy-lightning',
-    label: 'Legacy',
-    hidden: true,
-    items: [
-      {
-        id: 'send-bitcoin-lightning',
-        question: 'How does sending Bitcoin over Lightning work?',
-        answer: [
-          'If a recipient has a Lightning address on their profile, you can send to that. Lightning settles in seconds and fees are tiny.',
-          'Lightning sends don\'t use {appName}\'s donation address \u2014 they go straight to whatever Lightning wallet the recipient set up themselves. {appName}\'s own donation flow is on-chain only.',
-        ],
-      },
-      {
-        id: 'what-are-zaps',
-        question: 'What are zaps?',
-        answer: [
-          'Zaps are small Lightning tips on Nostr, separate from {appName}\'s on-chain donation flow.',
+          'Profile fields let you add extra info to your profile \u2014 links, wallet addresses, music, photos, videos.',
         ],
       },
     ],
