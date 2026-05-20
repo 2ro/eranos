@@ -17,8 +17,6 @@ import { dedupeAddressableLatest } from '@/lib/addressableEvents';
  */
 export const FEATURED_ORGANIZATION_AUTHORS = [
   '932614571afcbad4d17a191ee281e39eebbb41b93fac8fd87829622aeb112f4d',
-  'be7358c4fe50148cccafc02ea205d80145e253889aa3958daafa8637047c840e',
-  '3f770d65d3a764a9c5cb503ae123e62ec7598ad035d836e2a810f3877a745b24',
 ] as const;
 
 export interface FeaturedOrganization {
