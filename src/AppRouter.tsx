@@ -55,6 +55,7 @@ const EventsFeedPage = lazy(() => import("./pages/EventsFeedPage").then(m => ({ 
 const ExternalContentPage = lazy(() => import("./pages/ExternalContentPage").then(m => ({ default: m.ExternalContentPage })));
 const GeotagPage = lazy(() => import("./pages/GeotagPage").then(m => ({ default: m.GeotagPage })));
 const HashtagPage = lazy(() => import("./pages/HashtagPage").then(m => ({ default: m.HashtagPage })));
+const MySquarePage = lazy(() => import("./pages/MySquarePage").then(m => ({ default: m.MySquarePage })));
 const HelpPage = lazy(() => import("./pages/HelpPage").then(m => ({ default: m.HelpPage })));
 const KindFeedPage = lazy(() => import("./pages/KindFeedPage").then(m => ({ default: m.KindFeedPage })));
 const LetterComposePage = lazy(() => import("./pages/LetterComposePage").then(m => ({ default: m.LetterComposePage })));
@@ -169,6 +170,7 @@ export function AppRouter() {
           <Route element={<FundraiserLayout />}>
             <Route path="/" element={<CampaignsPage />} />
             <Route path="/discover" element={<DiscoverPage />} />
+            <Route path="/my-square" element={<MySquarePage />} />
             <Route path="/feed" element={<Index />} />
             <Route path="/campaigns" element={<Navigate to="/" replace />} />
             <Route path="/campaigns/new" element={<CreateCampaignPage />} />
