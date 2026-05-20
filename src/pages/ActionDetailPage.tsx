@@ -8,7 +8,6 @@ import {
   CalendarClock,
   ChevronLeft,
   DollarSign,
-  HandHeart,
   Loader2,
   MapPin,
   Share2,
@@ -26,6 +25,7 @@ import { useLayoutOptions } from '@/contexts/LayoutContext';
 import { getDisplayName } from '@/lib/genUserName';
 import { getGeoDisplayName } from '@/lib/countries';
 import { formatSats, satsToUSDWhole } from '@/lib/bitcoin';
+import { DEFAULT_COVER_IMAGE } from '@/lib/defaultActionCovers';
 import { sanitizeUrl } from '@/lib/sanitizeUrl';
 
 import { ArticleContent } from '@/components/ArticleContent';
@@ -316,17 +316,18 @@ interface PledgeHeroProps {
 
 function PledgeHero({ action, cover, creatorName, creatorProfileUrl, deadline, onBack }: PledgeHeroProps) {
   const countryLabel = action.countryCode ? getGeoDisplayName(action.countryCode) : undefined;
+  const [imageLoadFailed, setImageLoadFailed] = useState(false);
+  const coverImage = cover && !imageLoadFailed ? cover : DEFAULT_COVER_IMAGE;
 
   return (
     <div className="max-w-6xl mx-auto px-4 sm:px-6 pt-4">
-      <div className="relative aspect-[16/9] sm:aspect-[21/9] rounded-xl overflow-hidden bg-gradient-to-br from-primary/40 via-primary/20 to-secondary">
-        {cover ? (
-          <img src={cover} alt="" className="absolute inset-0 size-full object-cover" />
-        ) : (
-          <div className="absolute inset-0 flex items-center justify-center">
-            <HandHeart className="size-16 text-primary/40" />
-          </div>
-        )}
+      <div className="relative aspect-[16/9] sm:aspect-[21/9] rounded-xl overflow-hidden bg-gradient-to-br from-primary/15 via-primary/5 to-secondary">
+        <img
+          src={coverImage}
+          alt=""
+          className="absolute inset-0 size-full object-cover"
+          onError={() => setImageLoadFailed(true)}
+        />
         <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/25 to-black/45" />
 
         <div className="absolute left-0 right-0 top-0 z-10 flex items-center justify-between gap-3 px-4 pt-4">
