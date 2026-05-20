@@ -1,11 +1,15 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useSeoMeta } from '@unhead/react';
-import { Globe2, HandHeart, PlusCircle, Users } from 'lucide-react';
+import type { NostrEvent } from '@nostrify/nostrify';
+import { Globe2, HandHeart, Loader2, PlusCircle, Shield, ShieldCheck, Users } from 'lucide-react';
 
+import { CampaignCard } from '@/components/CampaignCard';
+import { FeedCard } from '@/components/FeedCard';
 import { HeroAtmosphere } from '@/components/HeroAtmosphere';
 import { HeroBanner } from '@/components/HeroBanner';
 import { LoginArea } from '@/components/auth/LoginArea';
+import { NoteCard } from '@/components/NoteCard';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -20,8 +24,12 @@ import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useFeaturedOrganizations } from '@/hooks/useFeaturedOrganizations';
 import { useGlobalActivity } from '@/hooks/useGlobalActivity';
 import { useGlobalDonations } from '@/hooks/useGlobalDonations';
+import { useInfiniteScroll } from '@/hooks/useInfiniteScroll';
+import { useOrganizationHomeActivityFeed } from '@/hooks/useOrganizationHomeActivityFeed';
+import { useOrganizationMembersOnlyFilter } from '@/hooks/useOrganizationMembersOnlyFilter';
 import { useToast } from '@/hooks/useToast';
 import { useUserOrganizations } from '@/hooks/useUserOrganizations';
+import { CAMPAIGN_KIND, parseCampaign } from '@/lib/campaign';
 import { formatSatsShort } from '@/lib/formatCampaignAmount';
 
 // ─── Page ──────────────────────────────────────────────────────────────────────
@@ -70,6 +78,10 @@ export function CommunitiesPage() {
             className="pb-3 sm:px-6"
           />
           <FeaturedOrganizationsShelf />
+        </section>
+
+        <section className="pt-6 sm:px-6">
+          <OrganizationActivityFeed />
         </section>
       </div>
     </main>
@@ -342,6 +354,123 @@ function FeaturedOrganizationsShelf() {
         <CommunityMiniCard key={entry.community.aTag} community={entry.community} />
       ))}
     </HorizontalScroll>
+  );
+}
+
+function OrganizationActivityFeed() {
+  const { user } = useCurrentUser();
+  const { data: organizations, isLoading: organizationsLoading } = useUserOrganizations();
+  const { membersOnly, toggle } = useOrganizationMembersOnlyFilter();
+  const feed = useOrganizationHomeActivityFeed(organizations, membersOnly, !!user && !organizationsLoading);
+  const { scrollRef } = useInfiniteScroll({
+    hasNextPage: feed.hasNextPage,
+    isFetchingNextPage: feed.isFetchingNextPage,
+    fetchNextPage: feed.fetchNextPage,
+    pageCount: feed.pageCount,
+  });
+
+  if (!user) {
+    return (
+      <EmptyShelf
+        icon={<Shield className="size-7 text-primary/70" />}
+        title="Log in to see organization activity"
+        body="Comments and official activity from organizations you follow, founded, or moderate will appear here."
+        action={<LoginArea className="max-w-60" />}
+      />
+    );
+  }
+
+  const isLoading = organizationsLoading || feed.isLoading;
+  const hasOrganizations = !!organizations && organizations.length > 0;
+
+  return (
+    <div className="space-y-3">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <SectionHeader title="Organization activity" />
+        <Button
+          type="button"
+          variant={membersOnly ? 'default' : 'outline'}
+          size="sm"
+          onClick={toggle}
+          className="rounded-full self-start sm:self-auto"
+        >
+          {membersOnly ? <ShieldCheck className="size-4 mr-2" /> : <Shield className="size-4 mr-2" />}
+          Leadership only
+        </Button>
+      </div>
+
+      {!hasOrganizations && !isLoading ? (
+        <Card className="border-dashed">
+          <CardContent className="py-10 px-6 text-center space-y-2">
+            <p className="text-base font-semibold">No organization activity yet</p>
+            <p className="text-sm text-muted-foreground max-w-md mx-auto">
+              Follow, found, or moderate an organization to build a feed from its comments and official activity.
+            </p>
+          </CardContent>
+        </Card>
+      ) : isLoading && feed.events.length === 0 ? (
+        <FeedCard className="divide-y divide-border">
+          {Array.from({ length: 3 }).map((_, i) => <FeedRowSkeleton key={i} />)}
+        </FeedCard>
+      ) : feed.events.length > 0 ? (
+        <>
+          <FeedCard>
+            {feed.events.map((event) => (
+              <OrganizationFeedRow key={event.id} event={event} />
+            ))}
+          </FeedCard>
+
+          {feed.hasNextPage && (
+            <div ref={scrollRef} className="py-6 flex justify-center">
+              {feed.isFetchingNextPage && <Loader2 className="size-5 animate-spin text-muted-foreground" />}
+            </div>
+          )}
+        </>
+      ) : (
+        <Card className="border-dashed">
+          <CardContent className="py-10 px-6 text-center space-y-2">
+            <p className="text-base font-semibold">No matching activity</p>
+            <p className="text-sm text-muted-foreground max-w-md mx-auto">
+              {membersOnly
+                ? 'No founder or moderator comments were found. Turn off Leadership only to see all organization comments.'
+                : 'No comments or official activity were found for these organizations yet.'}
+            </p>
+          </CardContent>
+        </Card>
+      )}
+    </div>
+  );
+}
+
+function OrganizationFeedRow({ event }: { event: NostrEvent }) {
+  if (event.kind === CAMPAIGN_KIND) {
+    const campaign = parseCampaign(event);
+    if (!campaign || campaign.archived) return null;
+    return (
+      <div className="p-4 sm:p-5 border-b border-border">
+        <CampaignCard campaign={campaign} />
+      </div>
+    );
+  }
+
+  return <NoteCard event={event} />;
+}
+
+function FeedRowSkeleton() {
+  return (
+    <div className="px-4 py-3">
+      <div className="flex items-center gap-3">
+        <Skeleton className="size-11 rounded-full shrink-0" />
+        <div className="min-w-0 space-y-1.5 flex-1">
+          <Skeleton className="h-4 w-28" />
+          <Skeleton className="h-3 w-36" />
+        </div>
+      </div>
+      <div className="mt-3 space-y-1.5">
+        <Skeleton className="h-4 w-full" />
+        <Skeleton className="h-4 w-4/5" />
+      </div>
+    </div>
   );
 }
 
