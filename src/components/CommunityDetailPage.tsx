@@ -5,6 +5,7 @@ import {
   CalendarClock,
   CalendarDays,
   ChevronLeft,
+  Clock,
   Crown,
   HandHeart,
   Info,
@@ -56,6 +57,7 @@ import {
 } from '@/hooks/useOrganizationActivity';
 import { useProfileUrl } from '@/hooks/useProfileUrl';
 import { useToast } from '@/hooks/useToast';
+import { useEventRSVPs } from '@/hooks/useEventRSVPs';
 import { useSubmissionZapTotals } from '@/hooks/useSubmissionZapTotals';
 import { CommunityModerationContext } from '@/contexts/CommunityModerationContext';
 import { useLayoutOptions } from '@/contexts/LayoutContext';
@@ -194,6 +196,44 @@ function formatShelfEventDate(event: NostrEvent): string {
   return shelfDateFormatter.format(new Date(ts * 1000));
 }
 
+function formatShelfEventTime(event: NostrEvent): string {
+  if (event.kind === 31922) return 'All day';
+
+  const start = getTag(event.tags, 'start');
+  if (!start) return '';
+
+  const startTs = parseInt(start, 10);
+  if (!Number.isFinite(startTs) || startTs <= 0) return '';
+
+  const end = getTag(event.tags, 'end');
+  const endTs = end ? parseInt(end, 10) : undefined;
+  const timezone = getTag(event.tags, 'start_tzid');
+  const timeFormatter = new Intl.DateTimeFormat(undefined, {
+    hour: 'numeric',
+    minute: '2-digit',
+    ...(timezone ? { timeZone: timezone } : {}),
+  });
+  const startLabel = timeFormatter.format(new Date(startTs * 1000));
+  if (!endTs || !Number.isFinite(endTs) || endTs <= startTs) return startLabel;
+  return `${startLabel} - ${timeFormatter.format(new Date(endTs * 1000))}`;
+}
+
+function parseShelfLocation(raw: string): string {
+  const trimmed = raw.trim();
+  if (!trimmed.startsWith('{')) return raw;
+  try {
+    const parsed: unknown = JSON.parse(trimmed);
+    if (!parsed || typeof parsed !== 'object') return raw;
+    const record = parsed as Record<string, unknown>;
+    if (typeof record.description === 'string' && record.description) return record.description;
+    if (typeof record.name === 'string' && record.name) return record.name;
+    if (typeof record.address === 'string' && record.address) return record.address;
+  } catch {
+    return raw;
+  }
+  return raw;
+}
+
 function formatPledgeAmount(sats: number, btcPrice: number | undefined): string {
   if (btcPrice) return satsToUSDWhole(sats, btcPrice);
   return `${formatSats(sats)} sats`;
@@ -318,11 +358,22 @@ function PledgeShelfCard({ pledge }: { pledge: Action }) {
 }
 
 function CalendarEventShelfCard({ event }: { event: NostrEvent }) {
+  const author = useAuthor(event.pubkey);
+  const metadata = author.data?.metadata;
+  const displayName = getDisplayName(metadata, event.pubkey);
+  const [imageLoadFailed, setImageLoadFailed] = useState(false);
   const title = getTag(event.tags, 'title') ?? 'Untitled event';
   const image = sanitizeUrl(getTag(event.tags, 'image'));
-  const location = getTag(event.tags, 'location');
+  const coverImage = image && !imageLoadFailed ? image : undefined;
+  const summary = getTag(event.tags, 'summary') || event.content;
+  const locationRaw = getTag(event.tags, 'location');
+  const location = locationRaw ? parseShelfLocation(locationRaw) : undefined;
   const dateLabel = formatShelfEventDate(event);
+  const timeLabel = formatShelfEventTime(event);
   const d = getTag(event.tags, 'd') ?? '';
+  const eventCoord = `${event.kind}:${event.pubkey}:${d}`;
+  const rsvps = useEventRSVPs(d ? eventCoord : undefined);
+  const interestedCount = rsvps.accepted.length + rsvps.tentative.length;
   const naddr = nip19.naddrEncode({
     kind: event.kind,
     pubkey: event.pubkey,
@@ -331,24 +382,77 @@ function CalendarEventShelfCard({ event }: { event: NostrEvent }) {
   return (
     <Link
       to={`/${naddr}`}
-      className="group relative flex w-[260px] shrink-0 flex-col overflow-hidden rounded-xl border border-border/60 bg-card shadow-sm motion-safe:transition-shadow hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+      className="group block w-[280px] shrink-0 rounded-xl overflow-hidden focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background motion-safe:transition-transform motion-safe:duration-200 motion-safe:hover:-translate-y-0.5"
     >
-      <div className="relative aspect-[16/9] w-full overflow-hidden bg-gradient-to-br from-primary/15 via-primary/5 to-secondary">
-        {image ? (
-          <img src={image} alt="" className="absolute inset-0 size-full object-cover motion-safe:transition-transform group-hover:scale-[1.02]" />
-        ) : (
-          <div className="absolute inset-0 flex items-center justify-center">
-            <CalendarDays className="size-10 text-primary/40" />
-          </div>
-        )}
-      </div>
-      <div className="flex-1 px-3 py-3 space-y-1">
-        <h3 className="text-sm font-semibold leading-snug line-clamp-2">{title}</h3>
-        <div className="flex items-center gap-2 text-xs text-muted-foreground">
-          {dateLabel && <span className="tabular-nums">{dateLabel}</span>}
-          {location && <span className="truncate">· {location}</span>}
+      <Card className="overflow-hidden border-border/70 shadow-sm motion-safe:transition-shadow motion-safe:duration-200 group-hover:shadow-lg h-full flex flex-col">
+        <div className="relative w-full aspect-[16/9] overflow-hidden bg-gradient-to-br from-primary/15 via-primary/5 to-secondary">
+          {coverImage ? (
+            <img
+              src={coverImage}
+              alt=""
+              className="absolute inset-0 size-full object-cover"
+              onError={() => setImageLoadFailed(true)}
+              loading="lazy"
+            />
+          ) : (
+            <div className="absolute inset-0 flex items-center justify-center">
+              <CalendarDays className="size-12 text-primary/40" />
+            </div>
+          )}
+          {dateLabel && (
+            <div className="absolute left-3 top-3 rounded-lg bg-background/90 px-2.5 py-1.5 text-xs font-semibold text-foreground shadow-sm backdrop-blur">
+              {dateLabel}
+            </div>
+          )}
         </div>
-      </div>
+
+        <div className="flex flex-col gap-3 p-5 flex-1">
+          <div className="space-y-2">
+            <h3 className="font-bold leading-tight tracking-tight text-lg line-clamp-2">
+              {title}
+            </h3>
+            {summary.trim() && (
+              <p className="text-sm text-muted-foreground line-clamp-2">
+                {summary}
+              </p>
+            )}
+          </div>
+
+          <div className="flex-1" />
+
+          <div className="grid gap-2 rounded-lg bg-muted/35 p-3 text-sm">
+            {timeLabel && (
+              <span className="inline-flex min-w-0 items-center gap-2 text-foreground">
+                <Clock className="size-4 shrink-0 text-primary" />
+                <span className="truncate">{timeLabel}</span>
+              </span>
+            )}
+            {location && (
+              <span className="inline-flex min-w-0 items-center gap-2 text-muted-foreground">
+                <MapPin className="size-4 shrink-0" />
+                <span className="truncate">{location}</span>
+              </span>
+            )}
+          </div>
+
+          <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 text-xs text-muted-foreground pt-1">
+            <span className="inline-flex items-center gap-1.5">
+              <Users className="size-3.5" />
+              {interestedCount} {interestedCount === 1 ? 'person' : 'people'} interested
+            </span>
+            {event.kind === 31922 ? (
+              <span className="inline-flex items-center gap-1.5">
+                <CalendarDays className="size-3.5" />
+                All-day
+              </span>
+            ) : null}
+          </div>
+
+          <div className="text-xs text-muted-foreground border-t border-border/60 pt-3 truncate">
+            by <span className="font-medium text-foreground">{displayName}</span>
+          </div>
+        </div>
+      </Card>
     </Link>
   );
 }
