@@ -9,13 +9,24 @@ import { getPaginationCursor } from '@/lib/feedUtils';
 
 const PLEDGE_KIND = 36639;
 const CALENDAR_EVENT_KINDS = [31922, 31923];
+const OFFICIAL_ACTIVITY_KINDS = [CAMPAIGN_KIND, PLEDGE_KIND, ...CALENDAR_EVENT_KINDS];
+const OFFICIAL_ACTIVITY_KIND_SET = new Set(OFFICIAL_ACTIVITY_KINDS);
 const COMMENTS_PAGE_SIZE = 60;
 const OFFICIAL_PAGE_SIZE = 40;
 
 interface OrganizationFeedPage {
   events: NostrEvent[];
-  rawCount: number;
-  oldestTimestamp: number | null;
+  commentsRawCount: number;
+  officialRawCount: number;
+  commentsOldestTimestamp: number | null;
+  officialOldestTimestamp: number | null;
+}
+
+interface OrganizationFeedPageParam {
+  commentsUntil?: number;
+  officialUntil?: number;
+  commentsDone?: boolean;
+  officialDone?: boolean;
 }
 
 function getEventOrganizationATag(event: NostrEvent): string | undefined {
@@ -63,29 +74,52 @@ export function useOrganizationHomeActivityFeed(
     queryKey: ['organization-home-activity-feed', aTagsKey, membersOnly],
     queryFn: async ({ pageParam, signal }) => {
       if (aTags.length === 0) {
-        return { events: [], rawCount: 0, oldestTimestamp: null };
+        return {
+          events: [],
+          commentsRawCount: 0,
+          officialRawCount: 0,
+          commentsOldestTimestamp: null,
+          officialOldestTimestamp: null,
+        };
       }
 
-      const until = pageParam as number | undefined;
-      const filters: NostrFilter[] = [
-        {
+      const cursor = pageParam as OrganizationFeedPageParam | undefined;
+      const filters: NostrFilter[] = [];
+
+      if (!cursor?.commentsDone) {
+        filters.push({
           kinds: [1111],
           '#A': aTags,
           ...(membersOnly && officialAuthors.length > 0 ? { authors: officialAuthors } : {}),
           limit: COMMENTS_PAGE_SIZE,
-          ...(until ? { until } : {}),
-        },
-        {
-          kinds: [CAMPAIGN_KIND, PLEDGE_KIND, ...CALENDAR_EVENT_KINDS],
+          ...(cursor?.commentsUntil ? { until: cursor.commentsUntil } : {}),
+        });
+      }
+
+      if (!cursor?.officialDone && officialAuthors.length > 0) {
+        filters.push({
+          kinds: OFFICIAL_ACTIVITY_KINDS,
           authors: officialAuthors,
           '#A': aTags,
           limit: OFFICIAL_PAGE_SIZE,
-          ...(until ? { until } : {}),
-        },
-      ];
+          ...(cursor?.officialUntil ? { until: cursor.officialUntil } : {}),
+        });
+      }
+
+      if (filters.length === 0) {
+        return {
+          events: [],
+          commentsRawCount: 0,
+          officialRawCount: 0,
+          commentsOldestTimestamp: null,
+          officialOldestTimestamp: null,
+        };
+      }
 
       const combinedSignal = AbortSignal.any([signal, AbortSignal.timeout(8000)]);
       const raw = await nostr.query(filters, { signal: combinedSignal });
+      const rawComments = raw.filter((event) => event.kind === 1111);
+      const rawOfficial = raw.filter((event) => OFFICIAL_ACTIVITY_KIND_SET.has(event.kind));
       const seen = new Set<string>();
       const events: NostrEvent[] = [];
 
@@ -108,24 +142,36 @@ export function useOrganizationHomeActivityFeed(
         events.push(event);
       }
 
-      const page = events.slice(0, COMMENTS_PAGE_SIZE);
-      for (const event of page) {
+      for (const event of events) {
         if (!queryClient.getQueryData(['event', event.id])) {
           queryClient.setQueryData(['event', event.id], event);
         }
       }
 
       return {
-        events: page,
-        rawCount: raw.length,
-        oldestTimestamp: raw.length > 0 ? getPaginationCursor(raw) : null,
+        events,
+        commentsRawCount: rawComments.length,
+        officialRawCount: rawOfficial.length,
+        commentsOldestTimestamp: rawComments.length > 0 ? getPaginationCursor(rawComments) : null,
+        officialOldestTimestamp: rawOfficial.length > 0 ? getPaginationCursor(rawOfficial) : null,
       };
     },
     getNextPageParam: (lastPage) => {
-      if (lastPage.rawCount < OFFICIAL_PAGE_SIZE || !lastPage.oldestTimestamp) return undefined;
-      return lastPage.oldestTimestamp - 1;
+      const commentsCursor = lastPage.commentsOldestTimestamp;
+      const officialCursor = lastPage.officialOldestTimestamp;
+      const commentsDone = lastPage.commentsRawCount < COMMENTS_PAGE_SIZE || commentsCursor === null;
+      const officialDone = lastPage.officialRawCount < OFFICIAL_PAGE_SIZE || officialCursor === null;
+
+      if (commentsDone && officialDone) return undefined;
+
+      return {
+        commentsDone,
+        officialDone,
+        commentsUntil: commentsDone ? undefined : commentsCursor - 1,
+        officialUntil: officialDone ? undefined : officialCursor - 1,
+      } satisfies OrganizationFeedPageParam;
     },
-    initialPageParam: undefined as number | undefined,
+    initialPageParam: undefined as OrganizationFeedPageParam | undefined,
     enabled: enabled && aTags.length > 0,
     staleTime: 60_000,
     placeholderData: (prev) => prev,
