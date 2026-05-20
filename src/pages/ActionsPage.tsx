@@ -13,7 +13,7 @@ import { useToast } from '@/hooks/useToast';
 import { getAllCountries, getGeoDisplayName, countryCodeToFlag } from '@/lib/countries';
 import { getDisplayName } from '@/lib/genUserName';
 import { DEFAULT_ACTION_COVERS, DEFAULT_COVER_IMAGE } from '@/lib/defaultActionCovers';
-import { formatSats, satsToUSDWhole } from '@/lib/bitcoin';
+import { formatCompactPledgeDeadline, formatPledgeAmount } from '@/lib/pledges';
 import { HOPE_PALETTE } from '@/lib/hopePalette';
 import { useLayoutOptions } from '@/contexts/LayoutContext';
 import { cn } from '@/lib/utils';
@@ -39,11 +39,6 @@ import {
   Link as LinkIcon, Check, MoreHorizontal, Trash2, ListFilter,
   Calendar, DollarSign, Globe, Megaphone,
 } from 'lucide-react';
-
-function formatPledgeAmount(sats: number, btcPrice: number | undefined): string {
-  if (btcPrice) return satsToUSDWhole(sats, btcPrice);
-  return `${formatSats(sats)} sats`;
-}
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Skeletons / Cards
@@ -163,17 +158,6 @@ function ActionShareMenu({ action }: { action: Action }) {
   );
 }
 
-function formatDeadline(unixSeconds: number): { label: string; isPast: boolean } {
-  const now = Math.floor(Date.now() / 1000);
-  const diff = unixSeconds - now;
-  if (diff <= 0) return { label: 'Ended', isPast: true };
-  const days = Math.ceil(diff / 86_400);
-  if (days <= 1) return { label: 'Ends today', isPast: false };
-  if (days < 30) return { label: `${days} days left`, isPast: false };
-  const months = Math.round(days / 30);
-  return { label: `${months} mo left`, isPast: false };
-}
-
 function ActionCard({ action, isExpired, btcPrice }: { action: Action; isExpired?: boolean; btcPrice: number | undefined }) {
   const author = useAuthor(action.pubkey);
   const metadata = author.data?.metadata;
@@ -192,7 +176,7 @@ function ActionCard({ action, isExpired, btcPrice }: { action: Action; isExpired
     ? action.image
     : DEFAULT_COVER_IMAGE;
 
-  const deadline = action.deadline ? formatDeadline(action.deadline) : null;
+  const deadline = action.deadline ? formatCompactPledgeDeadline(action.deadline) : null;
   const countryLabel = action.countryCode ? getGeoDisplayName(action.countryCode) : undefined;
 
   return (

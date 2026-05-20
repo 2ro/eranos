@@ -24,8 +24,8 @@ import { useToast } from '@/hooks/useToast';
 import { useLayoutOptions } from '@/contexts/LayoutContext';
 import { getDisplayName } from '@/lib/genUserName';
 import { getGeoDisplayName } from '@/lib/countries';
-import { formatSats, satsToUSDWhole } from '@/lib/bitcoin';
 import { DEFAULT_COVER_IMAGE } from '@/lib/defaultActionCovers';
+import { formatPledgeAmount } from '@/lib/pledges';
 import { sanitizeUrl } from '@/lib/sanitizeUrl';
 
 import { ArticleContent } from '@/components/ArticleContent';
@@ -42,11 +42,6 @@ import {
 } from '@/components/InteractionsModal';
 import { ThreadedReplyList, type ReplyNode } from '@/components/ThreadedReplyList';
 import NotFound from '@/pages/NotFound';
-
-function formatPledgeAmount(sats: number, btcPrice: number | undefined): string {
-  if (btcPrice) return satsToUSDWhole(sats, btcPrice);
-  return `${formatSats(sats)} sats`;
-}
 
 function formatDeadline(unixSeconds: number): { label: string; isPast: boolean } {
   const now = Math.floor(Date.now() / 1000);

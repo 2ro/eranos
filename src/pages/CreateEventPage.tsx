@@ -22,9 +22,10 @@ import { useManageableOrganizations } from '@/hooks/useManageableOrganizations';
 import { useNostrPublish } from '@/hooks/useNostrPublish';
 import { usePublishRSVP } from '@/hooks/usePublishRSVP';
 import { useToast } from '@/hooks/useToast';
-import { COMMUNITY_DEFINITION_KIND } from '@/lib/communityUtils';
 import { getTodayDateInput } from '@/lib/dateInput';
+import { createOrganizationAssociationTags, decodeOrganizationParam } from '@/lib/organizationContext';
 import { sanitizeUrl } from '@/lib/sanitizeUrl';
+import { unixSecondsInTimezone } from '@/lib/timezone';
 
 function slugify(text: string): string {
   return text
@@ -39,63 +40,6 @@ function addDays(date: string, days: number): string {
   const parsed = new Date(`${date}T00:00:00Z`);
   parsed.setUTCDate(parsed.getUTCDate() + days);
   return parsed.toISOString().slice(0, 10);
-}
-
-/** Convert a wall-clock value in an IANA timezone to unix seconds. */
-function unixSecondsInTimezone(
-  year: number,
-  month: number,
-  day: number,
-  hours: number,
-  minutes: number,
-  timezone: string,
-): number {
-  const utcGuess = Date.UTC(year, month - 1, day, hours, minutes, 0);
-  const formatter = new Intl.DateTimeFormat('en-US', {
-    timeZone: timezone,
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
-    hour: '2-digit',
-    minute: '2-digit',
-    second: '2-digit',
-    hour12: false,
-  });
-  const parts = Object.fromEntries(
-    formatter.formatToParts(new Date(utcGuess)).map((p) => [p.type, p.value]),
-  );
-  const asWallClock = Date.UTC(
-    Number(parts.year),
-    Number(parts.month) - 1,
-    Number(parts.day),
-    Number(parts.hour) === 24 ? 0 : Number(parts.hour),
-    Number(parts.minute),
-    Number(parts.second),
-  );
-  return Math.floor((utcGuess + (utcGuess - asWallClock)) / 1000);
-}
-
-/**
- * Decode the optional `?org=` query parameter. Accepts either an `naddr1...`
- * pointing at a kind 34550 organization definition or a raw coordinate.
- */
-function decodeOrgParam(value: string | null): { aTag: string } | null {
-  if (!value) return null;
-
-  const hexCoord = /^34550:[0-9a-f]{64}:.+$/i;
-  if (hexCoord.test(value)) {
-    return { aTag: value };
-  }
-
-  try {
-    const decoded = nip19.decode(value);
-    if (decoded.type !== 'naddr' || decoded.data.kind !== COMMUNITY_DEFINITION_KIND) return null;
-    return {
-      aTag: `${COMMUNITY_DEFINITION_KIND}:${decoded.data.pubkey}:${decoded.data.identifier}`,
-    };
-  } catch {
-    return null;
-  }
 }
 
 export function CreateEventPage() {
@@ -116,7 +60,7 @@ export function CreateEventPage() {
   const minStartDate = useMemo(() => getTodayDateInput(), []);
 
   const orgParam = searchParams.get('org');
-  const orgFromParam = useMemo(() => decodeOrgParam(orgParam), [orgParam]);
+  const orgFromParam = useMemo(() => decodeOrganizationParam(orgParam), [orgParam]);
   const { data: manageableOrgs, isLoading: manageableOrgsLoading } = useManageableOrganizations();
   const authorizedOrgFromParam = useMemo(() => {
     if (!orgFromParam || !manageableOrgs) return null;
@@ -166,9 +110,7 @@ export function CreateEventPage() {
       ];
 
       if (organizationATag) {
-        const orgAuthor = organizationATag.split(':')[1];
-        tags.push(['A', organizationATag], ['K', String(COMMUNITY_DEFINITION_KIND)]);
-        if (orgAuthor) tags.push(['P', orgAuthor]);
+        tags.push(...createOrganizationAssociationTags(organizationATag));
       }
 
       if (trimmedDescription) {

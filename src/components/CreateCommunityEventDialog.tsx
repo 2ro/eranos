@@ -23,6 +23,7 @@ import { useNostrPublish } from '@/hooks/useNostrPublish';
 import { usePublishRSVP } from '@/hooks/usePublishRSVP';
 import { useToast } from '@/hooks/useToast';
 import { fetchFreshEvent } from '@/lib/fetchFreshEvent';
+import { createOrganizationAssociationTags } from '@/lib/organizationContext';
 import { sanitizeUrl } from '@/lib/sanitizeUrl';
 
 interface CreateCommunityEventDialogProps {
@@ -78,11 +79,6 @@ function formatLocalDateTimeFields(timestamp: string): { date: string; time: str
 
 function toLocalTimestamp(date: string, time: string): number {
   return Math.floor(new Date(`${date}T${time}:00`).getTime() / 1000);
-}
-
-function parseCommunityAuthor(communityATag: string): string | undefined {
-  const [, pubkey] = communityATag.split(':');
-  return pubkey || undefined;
 }
 
 export function CreateCommunityEventDialog({ communityATag, open, onOpenChange, event }: CreateCommunityEventDialogProps) {
@@ -248,11 +244,7 @@ export function CreateCommunityEventDialog({ communityATag, open, onOpenChange, 
       ];
 
       if (effectiveCommunityATag) {
-        const communityAuthor = parseCommunityAuthor(effectiveCommunityATag);
-        tags.push(['A', effectiveCommunityATag], ['K', '34550']);
-        if (communityAuthor) {
-          tags.push(['P', communityAuthor]);
-        }
+        tags.push(...createOrganizationAssociationTags(effectiveCommunityATag));
       }
 
       if (description.trim()) {
@@ -339,6 +331,7 @@ export function CreateCommunityEventDialog({ communityATag, open, onOpenChange, 
         queryClient.invalidateQueries({ queryKey: ['addr-event', kind, publishedEvent.pubkey, dTag] }),
         ...(effectiveCommunityATag ? [
           queryClient.invalidateQueries({ queryKey: ['community-events', effectiveCommunityATag] }),
+          queryClient.invalidateQueries({ queryKey: ['organization-activity', effectiveCommunityATag] }),
           queryClient.invalidateQueries({
           predicate: (q) => {
             const [root, aTagsKey] = q.queryKey;

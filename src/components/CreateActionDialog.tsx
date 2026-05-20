@@ -20,6 +20,8 @@ import { useUploadFile } from '@/hooks/useUploadFile';
 import { createCountryIdentifier } from '@/lib/countryIdentifiers';
 import { countryCodeToFlag, getAllCountries, getGeoDisplayName } from '@/lib/countries';
 import { DEFAULT_COVER_IMAGE } from '@/lib/defaultActionCovers';
+import { createOrganizationAssociationTags } from '@/lib/organizationContext';
+import { unixSecondsInTimezone } from '@/lib/timezone';
 import { usdToSats } from '@/lib/bitcoin';
 import { cn } from '@/lib/utils';
 
@@ -40,33 +42,6 @@ interface CreateActionFormState {
   coverImage: string;
   selectedCountry: string;
   timezone: string;
-}
-
-function unixSecondsInTimezone(year: number, month: number, day: number, hours: number, minutes: number, timezone: string): number {
-  const utcGuess = Date.UTC(year, month - 1, day, hours, minutes, 0);
-  const formatter = new Intl.DateTimeFormat('en-US', {
-    timeZone: timezone,
-    year: 'numeric', month: '2-digit', day: '2-digit',
-    hour: '2-digit', minute: '2-digit', second: '2-digit',
-    hour12: false,
-  });
-  const parts = Object.fromEntries(
-    formatter.formatToParts(new Date(utcGuess)).map((p) => [p.type, p.value]),
-  );
-  const asWallClock = Date.UTC(
-    Number(parts.year),
-    Number(parts.month) - 1,
-    Number(parts.day),
-    Number(parts.hour) === 24 ? 0 : Number(parts.hour),
-    Number(parts.minute),
-    Number(parts.second),
-  );
-  return Math.floor((utcGuess + (utcGuess - asWallClock)) / 1000);
-}
-
-function parseCommunityAuthor(communityATag: string): string | undefined {
-  const [, pubkey] = communityATag.split(':');
-  return pubkey || undefined;
 }
 
 function normalizePledgeTag(value: string): string {
@@ -306,9 +281,7 @@ export function CreateActionDialog({ countryCode, communityATag, open, onOpenCha
       for (const tag of pledgeTags) tags.push(['t', tag]);
       if (formData.selectedCountry) tags.push(['i', createCountryIdentifier(formData.selectedCountry.toUpperCase())]);
       if (communityATag) {
-        const communityAuthor = parseCommunityAuthor(communityATag);
-        tags.push(['A', communityATag], ['K', '34550']);
-        if (communityAuthor) tags.push(['P', communityAuthor]);
+        tags.push(...createOrganizationAssociationTags(communityATag));
       }
       if (formData.coverImage) tags.push(['image', formData.coverImage]);
 

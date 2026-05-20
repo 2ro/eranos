@@ -3,6 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import type { NostrEvent } from '@nostrify/nostrify';
 
 import { parseCampaign, type ParsedCampaign, CAMPAIGN_KIND } from '@/lib/campaign';
+import { dedupeAddressableLatest } from '@/lib/addressableEvents';
 import {
   getOrganizationOfficialAuthors,
   type ParsedCommunity,
@@ -31,25 +32,6 @@ function isValidCalendarEvent(event: NostrEvent): boolean {
   if (event.kind === 31922) return /^\d{4}-\d{2}-\d{2}$/.test(start);
   const startTs = parseInt(start, 10);
   return Number.isFinite(startTs) && startTs > 0;
-}
-
-/**
- * Latest-wins dedupe for addressable events by `(pubkey, d-tag)`. Relays
- * occasionally return both the current revision and older copies of an
- * addressable event in the same response — we always want the newest.
- */
-function dedupeAddressableLatest(events: NostrEvent[]): NostrEvent[] {
-  const latest = new Map<string, NostrEvent>();
-  for (const event of events) {
-    const d = getTag(event.tags, 'd');
-    if (!d) continue;
-    const key = `${event.pubkey}:${d}`;
-    const prev = latest.get(key);
-    if (!prev || event.created_at > prev.created_at) {
-      latest.set(key, event);
-    }
-  }
-  return [...latest.values()];
 }
 
 export interface OrganizationActivity {

@@ -9,6 +9,7 @@ import {
   parseCommunityEvent,
   type ParsedCommunity,
 } from '@/lib/communityUtils';
+import { dedupeAddressableLatest } from '@/lib/addressableEvents';
 
 export interface ManageableOrganization {
   /** The parsed community definition. */
@@ -61,22 +62,8 @@ export function useManageableOrganizations() {
         ),
       ]);
 
-      // Dedupe by (pubkey, d-tag) keeping the newest revision of each
-      // addressable event. Relays sometimes return stale revisions
-      // alongside the current one.
-      const latestByCoord = new Map<string, NostrEvent>();
-      for (const event of [...foundedEvents, ...pTaggedEvents]) {
-        const d = event.tags.find(([n]) => n === 'd')?.[1];
-        if (!d) continue;
-        const key = `${event.pubkey}:${d}`;
-        const prev = latestByCoord.get(key);
-        if (!prev || event.created_at > prev.created_at) {
-          latestByCoord.set(key, event);
-        }
-      }
-
       const entries: ManageableOrganization[] = [];
-      for (const event of latestByCoord.values()) {
+      for (const event of dedupeAddressableLatest([...foundedEvents, ...pTaggedEvents])) {
         const community = parseCommunityEvent(event);
         if (!community) continue;
 

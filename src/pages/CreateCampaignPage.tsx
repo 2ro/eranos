@@ -45,10 +45,10 @@ import {
   parseCampaign,
   slugifyCampaignIdentifier,
 } from '@/lib/campaign';
-import { COMMUNITY_DEFINITION_KIND } from '@/lib/communityUtils';
 import { getTodayDateInput } from '@/lib/dateInput';
 import { fetchFreshEvent } from '@/lib/fetchFreshEvent';
 import { genUserName } from '@/lib/genUserName';
+import { createOrganizationAssociationTags, decodeOrganizationParam } from '@/lib/organizationContext';
 import { sanitizeUrl } from '@/lib/sanitizeUrl';
 import { COUNTRIES, searchCountries, searchCountry, type CountryEntry } from '@/lib/countries';
 import { createCountryIdentifier } from '@/lib/countryIdentifiers';
@@ -121,35 +121,6 @@ function getEditTarget(value: string | null): EditTarget | null {
       pubkey: decoded.data.pubkey,
       identifier: decoded.data.identifier,
       ...(decoded.data.relays ? { relays: decoded.data.relays } : {}),
-    };
-  } catch {
-    return null;
-  }
-}
-
-/**
- * Decode the optional `?org=` query parameter. Accepts either an
- * `naddr1...` pointing at a kind 34550 community definition (canonical)
- * or a raw `34550:<pubkey>:<d-tag>` coordinate. Returns null when the
- * value is missing, malformed, or points at a non-community kind.
- *
- * The form only honors the resolved coordinate when the current user is
- * the founder or a moderator of that organization, so a stale link can't
- * silently mint an org-tagged event.
- */
-function decodeOrgParam(value: string | null): { aTag: string } | null {
-  if (!value) return null;
-
-  const hexCoord = /^34550:[0-9a-f]{64}:.+$/i;
-  if (hexCoord.test(value)) {
-    return { aTag: value };
-  }
-
-  try {
-    const decoded = nip19.decode(value);
-    if (decoded.type !== 'naddr' || decoded.data.kind !== 34550) return null;
-    return {
-      aTag: `34550:${decoded.data.pubkey}:${decoded.data.identifier}`,
     };
   } catch {
     return null;
@@ -259,7 +230,7 @@ export function CreateCampaignPage() {
   // user" by default, and "under the org" when the user started from
   // inside that org's page.
   const orgParam = searchParams.get('org');
-  const orgFromParam = useMemo(() => decodeOrgParam(orgParam), [orgParam]);
+  const orgFromParam = useMemo(() => decodeOrganizationParam(orgParam), [orgParam]);
   const { data: manageableOrgs, isLoading: manageableOrgsLoading } = useManageableOrganizations();
 
   // The org we'll actually attach to the published event. We only honor
@@ -533,10 +504,7 @@ export function CreateCampaignPage() {
         ? authorizedOrgForAttachedATag?.community.aTag ?? ''
         : organizationATag;
       if (publishOrganizationATag) {
-        const orgAuthor = publishOrganizationATag.split(':')[1];
-        tags.push(['A', publishOrganizationATag]);
-        tags.push(['K', String(COMMUNITY_DEFINITION_KIND)]);
-        if (orgAuthor) tags.push(['P', orgAuthor]);
+        tags.push(...createOrganizationAssociationTags(publishOrganizationATag));
       }
       for (const r of parsedRecipients) {
         tags.push(['p', r.pubkey]);

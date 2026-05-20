@@ -57,11 +57,11 @@ import { useLayoutOptions } from '@/contexts/LayoutContext';
 import { applyCommunityModerationToEvents, parseCommunityEvent } from '@/lib/communityUtils';
 import type { ParsedCampaign } from '@/lib/campaign';
 import type { Action } from '@/hooks/useActions';
-import { formatSats, satsToUSDWhole } from '@/lib/bitcoin';
 import { getGeoDisplayName } from '@/lib/countries';
 import { DEFAULT_COVER_IMAGE } from '@/lib/defaultActionCovers';
 import { formatNumber } from '@/lib/formatNumber';
 import { genUserName, getDisplayName } from '@/lib/genUserName';
+import { formatCompactPledgeDeadline, formatPledgeAmount } from '@/lib/pledges';
 import { sanitizeUrl } from '@/lib/sanitizeUrl';
 import { cn } from '@/lib/utils';
 
@@ -215,22 +215,6 @@ function parseShelfLocation(raw: string): string {
   return raw;
 }
 
-function formatPledgeAmount(sats: number, btcPrice: number | undefined): string {
-  if (btcPrice) return satsToUSDWhole(sats, btcPrice);
-  return `${formatSats(sats)} sats`;
-}
-
-function formatPledgeDeadline(unixSeconds: number): { label: string; isPast: boolean } {
-  const now = Math.floor(Date.now() / 1000);
-  const diff = unixSeconds - now;
-  if (diff <= 0) return { label: 'Ended', isPast: true };
-  const days = Math.ceil(diff / 86_400);
-  if (days <= 1) return { label: 'Ends today', isPast: false };
-  if (days < 30) return { label: `${days} days left`, isPast: false };
-  const months = Math.round(days / 30);
-  return { label: `${months} mo left`, isPast: false };
-}
-
 function ActivityTypePill({ icon, label }: { icon: React.ReactNode; label: string }) {
   return (
     <div className="inline-flex items-center gap-1.5 rounded-full border border-border/70 bg-background/95 px-2.5 py-1 text-xs font-semibold text-muted-foreground shadow-sm">
@@ -249,7 +233,7 @@ function PledgeShelfCard({ pledge }: { pledge: Action }) {
 
   const sanitizedCover = sanitizeUrl(pledge.image);
   const coverImage = sanitizedCover && !imageLoadFailed ? sanitizedCover : DEFAULT_COVER_IMAGE;
-  const deadline = pledge.deadline ? formatPledgeDeadline(pledge.deadline) : null;
+  const deadline = pledge.deadline ? formatCompactPledgeDeadline(pledge.deadline) : null;
   const countryLabel = pledge.countryCode ? getGeoDisplayName(pledge.countryCode) : undefined;
   const naddr = nip19.naddrEncode({
     kind: pledge.event.kind,
