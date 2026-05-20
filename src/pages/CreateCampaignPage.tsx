@@ -21,7 +21,7 @@ import {
 import { PersonSearch } from '@/components/AddMemberDialog';
 import { CoverImageField } from '@/components/CoverImageField';
 import { FormSection } from '@/components/FormSection';
-import { OrganizationSelector } from '@/components/OrganizationSelector';
+import { OrganizationContextChip } from '@/components/OrganizationContextChip';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
@@ -33,6 +33,7 @@ import { parseAuthorEvent } from '@/hooks/useAuthor';
 import { useBitcoinWallet } from '@/hooks/useBitcoinWallet';
 import { useCampaign } from '@/hooks/useCampaign';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
+import { useManageableOrganizations } from '@/hooks/useManageableOrganizations';
 import { useNostrPublish } from '@/hooks/useNostrPublish';
 import { useToast } from '@/hooks/useToast';
 import type { SearchProfile } from '@/hooks/useSearchProfiles';
@@ -120,6 +121,35 @@ function getEditTarget(value: string | null): EditTarget | null {
       pubkey: decoded.data.pubkey,
       identifier: decoded.data.identifier,
       ...(decoded.data.relays ? { relays: decoded.data.relays } : {}),
+    };
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Decode the optional `?org=` query parameter. Accepts either an
+ * `naddr1...` pointing at a kind 34550 community definition (canonical)
+ * or a raw `34550:<pubkey>:<d-tag>` coordinate. Returns null when the
+ * value is missing, malformed, or points at a non-community kind.
+ *
+ * The form only honors the resolved coordinate when the current user is
+ * the founder or a moderator of that organization, so a stale link can't
+ * silently mint an org-tagged event.
+ */
+function decodeOrgParam(value: string | null): { aTag: string } | null {
+  if (!value) return null;
+
+  const hexCoord = /^34550:[0-9a-f]{64}:.+$/i;
+  if (hexCoord.test(value)) {
+    return { aTag: value };
+  }
+
+  try {
+    const decoded = nip19.decode(value);
+    if (decoded.type !== 'naddr' || decoded.data.kind !== 34550) return null;
+    return {
+      aTag: `34550:${decoded.data.pubkey}:${decoded.data.identifier}`,
     };
   } catch {
     return null;
@@ -220,6 +250,32 @@ export function CreateCampaignPage() {
   const editNaddr = searchParams.get('edit');
   const editTarget = useMemo(() => getEditTarget(editNaddr), [editNaddr]);
   const isEditMode = !!editNaddr;
+
+  // ── Organization context (implicit) ────────────────────────────────────
+  // `?org=` carries the org coordinate from the entry point — typically
+  // an org detail page CTA. We accept either an `naddr1...` (preferred,
+  // canonical) or a raw `34550:<pubkey>:<d-tag>` coordinate. The form
+  // never exposes a user-editable selector — the campaign is "under the
+  // user" by default, and "under the org" when the user started from
+  // inside that org's page.
+  const orgParam = searchParams.get('org');
+  const orgFromParam = useMemo(() => decodeOrgParam(orgParam), [orgParam]);
+  const { data: manageableOrgs, isLoading: manageableOrgsLoading } = useManageableOrganizations();
+
+  // The org we'll actually attach to the published event. We only honor
+  // the param when the current user is the founder or a moderator of
+  // that org — otherwise drop it silently so a stale link can't forge
+  // an org association.
+  const authorizedOrgFromParam = useMemo(() => {
+    if (!orgFromParam || !manageableOrgs) return null;
+    return manageableOrgs.find((entry) => entry.community.aTag === orgFromParam.aTag) ?? null;
+  }, [orgFromParam, manageableOrgs]);
+
+  useEffect(() => {
+    if (isEditMode) return;
+    setOrganizationATag(authorizedOrgFromParam?.community.aTag ?? '');
+  }, [isEditMode, authorizedOrgFromParam]);
+
   const editCampaignQuery = useCampaign({
     pubkey: editTarget?.pubkey ?? '',
     identifier: editTarget?.identifier ?? '',
@@ -613,6 +669,14 @@ export function CreateCampaignPage() {
               {isEditMode ? 'Edit campaign' : 'Start a campaign'}
             </h1>
           </div>
+          <OrganizationContextChip
+            aTag={organizationATag}
+            authorizedOrg={authorizedOrgFromParam}
+            param={orgParam}
+            paramDecoded={orgFromParam}
+            manageableLoading={manageableOrgsLoading}
+            isEditMode={isEditMode}
+          />
         </div>
 
         <div className="rounded-2xl bg-card/50 p-2">
@@ -654,17 +718,6 @@ export function CreateCampaignPage() {
                 setCountryCode('');
                 setCountryQuery('');
               }}
-            />
-          </FormSection>
-
-          {/* Organization (optional) — only orgs where the user is founder
-              or moderator are offered. The selected org's uppercase `A`
-              root-scope tag will be added on publish. */}
-          <FormSection title="Organization" requirement="Optional">
-            <OrganizationSelector
-              value={organizationATag}
-              onChange={setOrganizationATag}
-              disabled={submitMutation.isPending}
             />
           </FormSection>
 

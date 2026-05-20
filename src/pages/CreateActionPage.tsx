@@ -1,7 +1,8 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { useSeoMeta } from '@unhead/react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { nip19 } from 'nostr-tools';
 import {
   AlertTriangle,
   ArrowLeft,
@@ -15,7 +16,7 @@ import {
 
 import { CoverImageField } from '@/components/CoverImageField';
 import { FormSection } from '@/components/FormSection';
-import { OrganizationSelector } from '@/components/OrganizationSelector';
+import { OrganizationContextChip } from '@/components/OrganizationContextChip';
 import { TimezoneSwitcher } from '@/components/TimezoneSwitcher';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
@@ -24,6 +25,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useBitcoinWallet } from '@/hooks/useBitcoinWallet';
+import { useManageableOrganizations } from '@/hooks/useManageableOrganizations';
 import { useNostrPublish } from '@/hooks/useNostrPublish';
 import { useToast } from '@/hooks/useToast';
 import { useLayoutOptions } from '@/contexts/LayoutContext';
@@ -90,6 +92,35 @@ function parsePledgeTagInput(value: string): string[] {
   return tags;
 }
 
+/**
+ * Decode the optional `?org=` query parameter. Accepts either an
+ * `naddr1...` pointing at a kind 34550 community definition (canonical)
+ * or a raw `34550:<pubkey>:<d-tag>` coordinate. Returns null when the
+ * value is missing, malformed, or points at a non-community kind.
+ *
+ * The pledge form only honors the resolved coordinate when the current
+ * user is the founder or a moderator of that organization, so a stale
+ * link can't silently mint an org-tagged event.
+ */
+function decodeOrgParam(value: string | null): { aTag: string } | null {
+  if (!value) return null;
+
+  const hexCoord = /^34550:[0-9a-f]{64}:.+$/i;
+  if (hexCoord.test(value)) {
+    return { aTag: value };
+  }
+
+  try {
+    const decoded = nip19.decode(value);
+    if (decoded.type !== 'naddr' || decoded.data.kind !== 34550) return null;
+    return {
+      aTag: `34550:${decoded.data.pubkey}:${decoded.data.identifier}`,
+    };
+  } catch {
+    return null;
+  }
+}
+
 export function CreateActionPage() {
   useLayoutOptions({ noMaxWidth: true, rightSidebar: null });
 
@@ -112,6 +143,21 @@ export function CreateActionPage() {
   // prop.
   const pageCountryCode = searchParams.get('country') || '';
 
+  // ── Organization context (implicit) ────────────────────────────────────
+  // `?org=` carries the org coordinate from the entry point — typically
+  // an org detail page CTA. We accept either an `naddr1...` (preferred,
+  // canonical) or a raw `34550:<pubkey>:<d-tag>` coordinate. The form
+  // never exposes a user-editable selector — the pledge is "under the
+  // user" by default, and "under the org" when the user started from
+  // inside that org's page.
+  const orgParam = searchParams.get('org');
+  const orgFromParam = useMemo(() => decodeOrgParam(orgParam), [orgParam]);
+  const { data: manageableOrgs, isLoading: manageableOrgsLoading } = useManageableOrganizations();
+  const authorizedOrgFromParam = useMemo(() => {
+    if (!orgFromParam || !manageableOrgs) return null;
+    return manageableOrgs.find((entry) => entry.community.aTag === orgFromParam.aTag) ?? null;
+  }, [orgFromParam, manageableOrgs]);
+
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [tagInput, setTagInput] = useState('');
@@ -124,9 +170,16 @@ export function CreateActionPage() {
   const [coverUploading, setCoverUploading] = useState(false);
   const [countryCode, setCountryCode] = useState(pageCountryCode);
   const [countryQuery, setCountryQuery] = useState(pageCountryCode ? (COUNTRIES[pageCountryCode]?.name ?? pageCountryCode) : '');
+  // Effective org coordinate to attach on publish. Sourced only from the
+  // URL — never editable inside the form. Drops to '' when the user
+  // isn't authorized for the param's org.
   const [organizationATag, setOrganizationATag] = useState('');
   const [timezone, setTimezone] = useState(browserTimezone);
   const [formError, setFormError] = useState('');
+
+  useEffect(() => {
+    setOrganizationATag(authorizedOrgFromParam?.community.aTag ?? '');
+  }, [authorizedOrgFromParam]);
 
   const minDeadline = useMemo(() => getTodayDateInput(), []);
 
@@ -300,6 +353,13 @@ export function CreateActionPage() {
               Create pledge
             </h1>
           </div>
+          <OrganizationContextChip
+            aTag={organizationATag}
+            authorizedOrg={authorizedOrgFromParam}
+            param={orgParam}
+            paramDecoded={orgFromParam}
+            manageableLoading={manageableOrgsLoading}
+          />
         </div>
 
         <div className="rounded-2xl bg-card/50 p-2">
@@ -334,17 +394,6 @@ export function CreateActionPage() {
                 setCountryCode('');
                 setCountryQuery('');
               }}
-            />
-          </FormSection>
-
-          {/* Organization (optional) — only orgs where the user is founder
-              or moderator are offered. The selected org's uppercase `A`
-              root-scope tag will be added on publish. */}
-          <FormSection title="Organization" requirement="Optional">
-            <OrganizationSelector
-              value={organizationATag}
-              onChange={setOrganizationATag}
-              disabled={submitMutation.isPending}
             />
           </FormSection>
 
