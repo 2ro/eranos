@@ -6,15 +6,11 @@ import type { NostrEvent, NostrMetadata } from '@nostrify/nostrify';
 import {
   ArrowLeft,
   CalendarClock,
-  Camera,
   ChevronLeft,
   DollarSign,
   HandHeart,
-  Info,
   Loader2,
   MapPin,
-  Megaphone,
-  Palette,
   Share2,
 } from 'lucide-react';
 
@@ -33,7 +29,6 @@ import { formatSats, satsToUSDWhole } from '@/lib/bitcoin';
 import { sanitizeUrl } from '@/lib/sanitizeUrl';
 
 import { ArticleContent } from '@/components/ArticleContent';
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
@@ -47,13 +42,6 @@ import {
 } from '@/components/InteractionsModal';
 import { ThreadedReplyList, type ReplyNode } from '@/components/ThreadedReplyList';
 import NotFound from '@/pages/NotFound';
-
-const ACTION_ICONS = {
-  photo: Camera,
-  art: Palette,
-  info: Info,
-  action: Megaphone,
-} as const;
 
 function formatPledgeAmount(sats: number, btcPrice: number | undefined): string {
   if (btcPrice) return satsToUSDWhole(sats, btcPrice);
@@ -152,7 +140,6 @@ function PledgeDetailContent({ action }: { action: Action }) {
   const creatorProfileUrl = useProfileUrl(action.pubkey, metadata);
   const deadline = action.deadline ? formatDeadline(action.deadline) : null;
   const cover = sanitizeUrl(action.image);
-  const remainingSats = Math.max(0, action.bounty - fundedSats);
   const progressValue = action.bounty > 0 ? Math.min(100, Math.round((fundedSats / action.bounty) * 100)) : 0;
   const hasStats =
     !!engagementStats?.replies ||
@@ -212,7 +199,6 @@ function PledgeDetailContent({ action }: { action: Action }) {
               action={action}
               btcPrice={btcPrice}
               fundedSats={fundedSats}
-              remainingSats={remainingSats}
               progressValue={progressValue}
               submissionsCount={topLevel.length}
               isLoading={zapsLoading}
@@ -253,7 +239,7 @@ function PledgeDetailContent({ action }: { action: Action }) {
                   replyLabel="Submit"
                   onReply={() => setReplyOpen(true)}
                   onMore={() => setMoreMenuOpen(true)}
-                  className={hasStats ? 'pt-3 border-t border-border/60' : undefined}
+                  className={hasStats ? 'pt-3' : undefined}
                 />
               </div>
 
@@ -297,7 +283,6 @@ function PledgeDetailContent({ action }: { action: Action }) {
                 action={action}
                 btcPrice={btcPrice}
                 fundedSats={fundedSats}
-                remainingSats={remainingSats}
                 progressValue={progressValue}
                 submissionsCount={topLevel.length}
                 isLoading={zapsLoading}
@@ -330,7 +315,6 @@ interface PledgeHeroProps {
 }
 
 function PledgeHero({ action, cover, creatorName, creatorProfileUrl, deadline, onBack }: PledgeHeroProps) {
-  const Icon = ACTION_ICONS[action.type];
   const countryLabel = action.countryCode ? getGeoDisplayName(action.countryCode) : undefined;
 
   return (
@@ -356,10 +340,6 @@ function PledgeHero({ action, cover, creatorName, creatorProfileUrl, deadline, o
         </div>
 
         <div className="absolute inset-x-0 bottom-0 z-10 space-y-2 p-5 sm:p-6 [text-shadow:0_1px_4px_rgba(0,0,0,0.75),0_2px_10px_rgba(0,0,0,0.45)]">
-          <Badge variant="secondary" className="bg-background/85 text-foreground border-border/40 backdrop-blur [text-shadow:none]">
-            <Icon className="size-3.5 mr-1.5" />
-            Pledge
-          </Badge>
           <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
             <h1 className="text-3xl sm:text-4xl font-bold leading-tight tracking-tight text-white">
               {action.title}
@@ -391,11 +371,6 @@ function PledgeHero({ action, cover, creatorName, creatorProfileUrl, deadline, o
               </span>
             )}
           </div>
-          {action.description && (
-            <p className="max-w-2xl text-base sm:text-lg text-white/90 line-clamp-3">
-              {action.description}
-            </p>
-          )}
         </div>
       </div>
     </div>
@@ -406,7 +381,6 @@ function PledgeFundingCard({
   action,
   btcPrice,
   fundedSats,
-  remainingSats,
   progressValue,
   submissionsCount,
   isLoading,
@@ -415,7 +389,6 @@ function PledgeFundingCard({
   action: Action;
   btcPrice: number | undefined;
   fundedSats: number;
-  remainingSats: number;
   progressValue: number;
   submissionsCount: number;
   isLoading: boolean;
@@ -444,16 +417,6 @@ function PledgeFundingCard({
               </div>
             </div>
             <Progress value={progressValue} className="h-2" />
-            <div className="grid grid-cols-2 gap-3 text-sm">
-              <div className="rounded-lg bg-muted/40 p-3">
-                <div className="text-xs text-muted-foreground">Remaining</div>
-                <div className="font-semibold">{formatPledgeAmount(remainingSats, btcPrice)}</div>
-              </div>
-              <div className="rounded-lg bg-muted/40 p-3">
-                <div className="text-xs text-muted-foreground">Stored as</div>
-                <div className="font-semibold">{formatSats(action.bounty)} sats</div>
-              </div>
-            </div>
             <p className="text-xs text-muted-foreground leading-relaxed">
               This pledge is trust-based. Funding progress sums zaps and donation receipts on top-level submissions.
             </p>
