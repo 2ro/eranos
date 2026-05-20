@@ -1461,7 +1461,7 @@ const WELL_KNOWN_KIND_LABELS: Record<number, string> = {
   3063: 'Zapstore Asset',
   15128: 'Nsite',
   35128: 'Nsite',
-  36639: 'Action',
+  36639: 'Pledge',
 };
 
 export function AddressableEventPreview({ addr }: { addr: { kind: number; pubkey: string; identifier: string } }) {

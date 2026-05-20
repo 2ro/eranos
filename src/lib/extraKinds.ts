@@ -608,7 +608,7 @@ const KIND_SPECIFIC_LABELS: Record<number, string> = {
   31990: 'app',
   30063: 'Zapstore release',
   3063: 'Zapstore asset',
-  36639: 'action',
+  36639: 'pledge',
 };
 
 /**

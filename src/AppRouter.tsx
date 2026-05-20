@@ -310,6 +310,8 @@ export function AppRouter() {
             <Route path="/i/*" element={<ExternalContentPage />} />
             <Route path="/actions" element={<ActionsPage />} />
             <Route path="/actions/new" element={<CreateActionPage />} />
+            <Route path="/pledges" element={<ActionsPage />} />
+            <Route path="/pledges/new" element={<CreateActionPage />} />
             <Route path="/agent" element={<AIChatPage />} />
             <Route path="/organizers" element={<OrganizersPage />} />
             <Route path="/dashboard" element={<EventDashboardPage />} />

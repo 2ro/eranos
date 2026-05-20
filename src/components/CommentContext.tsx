@@ -149,7 +149,7 @@ const KIND_LABELS: Record<number, string> = {
   34550: 'a community',
   9041: 'a goal',
   35128: 'an nsite',
-  36639: 'an action',
+  36639: 'a pledge',
   36787: 'a track',
   37381: 'a Magic deck',
   37516: 'a treasure',

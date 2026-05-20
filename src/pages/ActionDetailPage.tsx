@@ -1,27 +1,51 @@
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { useSeoMeta } from '@unhead/react';
-import { format } from 'date-fns';
-import { Link as RouterLink } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { nip19 } from 'nostr-tools';
-import { Camera, Palette, Info, Megaphone, Clock, Bitcoin, Loader2, MessageSquare, Trophy, ArrowLeft } from 'lucide-react';
-import type { NostrMetadata } from '@nostrify/nostrify';
+import type { NostrEvent, NostrMetadata } from '@nostrify/nostrify';
+import {
+  ArrowLeft,
+  CalendarClock,
+  Camera,
+  ChevronLeft,
+  DollarSign,
+  HandHeart,
+  Info,
+  Loader2,
+  MapPin,
+  Megaphone,
+  Palette,
+  Share2,
+} from 'lucide-react';
 
 import { useAction, type Action } from '@/hooks/useActions';
 import { useAuthor } from '@/hooks/useAuthor';
+import { useBitcoinWallet } from '@/hooks/useBitcoinWallet';
 import { useComments } from '@/hooks/useComments';
+import { useEventStats } from '@/hooks/useTrending';
+import { useProfileUrl } from '@/hooks/useProfileUrl';
 import { useSubmissionZapTotals } from '@/hooks/useSubmissionZapTotals';
-import { useAddrEvent, type AddrCoords } from '@/hooks/useEvent';
+import { useToast } from '@/hooks/useToast';
+import { useLayoutOptions } from '@/contexts/LayoutContext';
 import { getDisplayName } from '@/lib/genUserName';
-import { getGeoDisplayName, countryCodeToFlag } from '@/lib/countries';
-import { CountryFlag } from '@/components/CountryFlag';
-import { parseCommunityEvent } from '@/lib/communityUtils';
-import { cn } from '@/lib/utils';
+import { getGeoDisplayName } from '@/lib/countries';
+import { formatSats, satsToUSDWhole } from '@/lib/bitcoin';
+import { sanitizeUrl } from '@/lib/sanitizeUrl';
 
+import { ArticleContent } from '@/components/ArticleContent';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Progress } from '@/components/ui/progress';
 import { Skeleton } from '@/components/ui/skeleton';
-import { ComposeBox } from '@/components/ComposeBox';
-import { NoteCard } from '@/components/NoteCard';
+import { PostActionBar } from '@/components/PostActionBar';
+import { ReplyComposeModal } from '@/components/ReplyComposeModal';
+import { NoteMoreMenu } from '@/components/NoteMoreMenu';
+import {
+  InteractionsModal,
+  type InteractionTab,
+} from '@/components/InteractionsModal';
+import { ThreadedReplyList, type ReplyNode } from '@/components/ThreadedReplyList';
 import NotFound from '@/pages/NotFound';
 
 const ACTION_ICONS = {
@@ -31,14 +55,21 @@ const ACTION_ICONS = {
   action: Megaphone,
 } as const;
 
-function getCommunityAddr(action: Action): AddrCoords | undefined {
-  const aTag = action.event.tags.find(([name, value]) => name === 'A' && value?.startsWith('34550:'))?.[1];
-  if (!aTag) return undefined;
-  const [kind, pubkey, ...identifierParts] = aTag.split(':');
-  const parsedKind = Number(kind);
-  const identifier = identifierParts.join(':');
-  if (parsedKind !== 34550 || !pubkey || !identifier) return undefined;
-  return { kind: parsedKind, pubkey, identifier };
+function formatPledgeAmount(sats: number, btcPrice: number | undefined): string {
+  if (btcPrice) return satsToUSDWhole(sats, btcPrice);
+  return `${formatSats(sats)} sats`;
+}
+
+function formatDeadline(unixSeconds: number): { label: string; isPast: boolean } {
+  const now = Math.floor(Date.now() / 1000);
+  const diff = unixSeconds - now;
+  if (diff <= 0) {
+    return { label: `Ended ${new Date(unixSeconds * 1000).toLocaleDateString()}`, isPast: true };
+  }
+  const days = Math.ceil(diff / 86_400);
+  if (days <= 1) return { label: 'Ends today', isPast: false };
+  if (days < 60) return { label: `${days} days left`, isPast: false };
+  return { label: `Ends ${new Date(unixSeconds * 1000).toLocaleDateString()}`, isPast: false };
 }
 
 interface ActionDetailPageProps {
@@ -47,284 +78,475 @@ interface ActionDetailPageProps {
 }
 
 export function ActionDetailPage({ pubkey, identifier }: ActionDetailPageProps) {
+  useLayoutOptions({ noMaxWidth: true, rightSidebar: null });
+
   const { data: action, isLoading, isError } = useAction(pubkey, identifier);
 
   useSeoMeta({
-    title: action ? `${action.title} | Agora Action` : 'Action | Agora',
+    title: action ? `${action.title} | Agora Pledge` : 'Pledge | Agora',
     description: action?.description?.slice(0, 200),
   });
 
-  if (isLoading) {
-    return (
-      <main>
-        <DetailHeader />
-        <div className="px-4 max-w-3xl mx-auto space-y-4">
-          <Skeleton className="w-full h-56 rounded-2xl" />
-          <Skeleton className="h-8 w-3/4" />
-          <Skeleton className="h-4 w-1/2" />
-          <Skeleton className="h-24 w-full" />
-        </div>
-      </main>
-    );
-  }
+  if (isLoading) return <PledgeDetailSkeleton />;
+  if (isError || !action) return <NotFound />;
 
-  if (isError || !action) {
-    return <NotFound />;
-  }
-
-  return (
-    <main>
-      <DetailHeader />
-      <article className="px-4 max-w-3xl mx-auto space-y-6 pb-24">
-        <ActionHeader action={action} />
-        <ActionBounty action={action} />
-        <ActionDescription action={action} />
-        <SubmissionsSection action={action} />
-      </article>
-    </main>
-  );
+  return <PledgeDetailContent action={action} />;
 }
 
-function DetailHeader() {
-  return (
-    <div className="flex items-center gap-4 px-4 py-4 bg-background/85">
-      <RouterLink
-        to="/actions"
-        className="p-2 -ml-2 rounded-full hover:bg-secondary transition-colors sidebar:hidden"
-        aria-label="Back to actions"
-      >
-        <ArrowLeft className="size-5" />
-      </RouterLink>
-      <div className="flex items-center gap-2 flex-1 min-w-0">
-        <Megaphone className="size-5 text-primary" />
-        <h1 className="text-lg font-semibold truncate">Action</h1>
-      </div>
-    </div>
-  );
-}
-
-function ActionHeader({ action }: { action: Action }) {
+function PledgeDetailContent({ action }: { action: Action }) {
+  const { btcPrice } = useBitcoinWallet();
   const author = useAuthor(action.pubkey);
-  const communityAddr = useMemo(() => getCommunityAddr(action), [action]);
-  const communityEvent = useAddrEvent(communityAddr).data;
-  const community = communityEvent ? parseCommunityEvent(communityEvent) : null;
-  const metadata: NostrMetadata | undefined = author.data?.metadata;
-  const displayName = getDisplayName(metadata, action.pubkey);
-  const Icon = ACTION_ICONS[action.type];
-  const now = Date.now() / 1000;
-  const isExpired = !!action.deadline && action.deadline <= now;
+  const navigate = useNavigate();
+  const { toast } = useToast();
+  const { data: engagementStats } = useEventStats(action.event.id, action.event);
+  const { data: commentsData, isLoading: commentsLoading } = useComments(action.event, 500);
 
-  return (
-    <div className="space-y-4">
-      {action.image && (
-        <div className="relative w-full h-56 sm:h-64 overflow-hidden rounded-2xl border border-border">
-          <img src={action.image} alt={action.title} className="w-full h-full object-cover" />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
-          <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-primary/80 via-primary to-primary/80" />
-        </div>
-      )}
-      <div className="flex items-start gap-4">
-        <div className="p-3 rounded-xl bg-gradient-to-br from-primary/20 to-primary/20 border-2 border-primary/40 shadow-md flex-shrink-0">
-          <Icon className="h-7 w-7 text-primary" />
-        </div>
-        <div className="flex-1 min-w-0">
-          <h1 className="text-2xl sm:text-3xl font-black leading-tight">{action.title}</h1>
-          <div className="flex items-center gap-2 mt-2 flex-wrap">
-            {action.countryCode && (
-              <>
-                <CountryFlag
-                  code={action.countryCode}
-                  emoji={countryCodeToFlag(action.countryCode)}
-                  label={getGeoDisplayName(action.countryCode)}
-                  className="text-xl"
-                />
-                <span className="text-sm text-muted-foreground">{getGeoDisplayName(action.countryCode)}</span>
-              </>
-            )}
-            {community && communityAddr && (
-              <RouterLink
-                to={`/${nip19.naddrEncode(communityAddr)}`}
-                className="inline-flex items-center gap-1 rounded-md bg-primary/10 px-2 py-1 text-xs font-semibold text-primary hover:bg-primary/15"
-              >
-                <Megaphone className="h-3 w-3" />
-                {community.name}
-              </RouterLink>
-            )}
-            {isExpired ? (
-              <span className="px-2 py-1 rounded-md bg-muted text-muted-foreground text-xs font-semibold flex items-center gap-1">
-                <Clock className="h-3 w-3" /> Expired
-              </span>
-            ) : action.deadline ? (
-              <span className="px-2 py-1 rounded-md bg-accent/10 border border-accent/30 text-accent text-xs font-semibold flex items-center gap-1">
-                <Clock className="h-3 w-3" /> {format(action.deadline * 1000, 'MMM d, yyyy HH:mm')}
-              </span>
-            ) : null}
-          </div>
-        </div>
-      </div>
-      <div className="flex items-center gap-3 text-sm text-muted-foreground">
-        <Avatar className="h-8 w-8">
-          <AvatarImage src={metadata?.picture} />
-          <AvatarFallback>{displayName.slice(0, 2).toUpperCase()}</AvatarFallback>
-        </Avatar>
-        <span>
-          Posted by <span className="font-medium text-foreground">{displayName}</span>
-        </span>
-      </div>
-    </div>
-  );
-}
-
-function ActionBounty({ action }: { action: Action }) {
-  return (
-    <Card className="border-2 border-primary/40 bg-gradient-to-r from-primary/10 to-primary/5">
-      <CardContent className="py-4 flex items-center gap-3">
-        <Bitcoin className="h-7 w-7 text-primary flex-shrink-0" />
-        <div className="flex-1">
-          <div className="text-xs text-muted-foreground uppercase tracking-wider font-semibold">
-            Bounty
-          </div>
-          <div className="font-black text-2xl">
-            {action.bounty.toLocaleString()}
-            <span className="text-sm font-medium text-muted-foreground ml-1">sats</span>
-          </div>
-        </div>
-        <p className="text-xs text-muted-foreground hidden sm:block max-w-[220px] text-right">
-          Submissions are ranked by total zaps. Organizers pay out the bounty by zapping winning submissions.
-        </p>
-      </CardContent>
-    </Card>
-  );
-}
-
-function ActionDescription({ action }: { action: Action }) {
-  if (!action.description.trim()) return null;
-  return (
-    <div className="prose prose-sm max-w-none whitespace-pre-wrap break-words text-foreground/90 leading-relaxed">
-      {action.description}
-    </div>
-  );
-}
-
-function SubmissionsSection({ action }: { action: Action }) {
-  const { data: commentsData, isLoading: commentsLoading } = useComments(action.event);
+  const [replyOpen, setReplyOpen] = useState(false);
+  const [moreMenuOpen, setMoreMenuOpen] = useState(false);
+  const [interactionsOpen, setInteractionsOpen] = useState(false);
+  const [interactionsTab, setInteractionsTab] = useState<InteractionTab>('reposts');
 
   const topLevel = useMemo(
     () => commentsData?.topLevelComments ?? [],
     [commentsData?.topLevelComments],
   );
   const submissionIds = useMemo(() => topLevel.map((c) => c.id), [topLevel]);
-  const { data: zapTotals } = useSubmissionZapTotals(submissionIds);
+  const { data: zapTotals, isLoading: zapsLoading } = useSubmissionZapTotals(submissionIds);
 
-  // Sort submissions by total sats zapped (descending), with submission
-  // creation time as the tie-breaker (newest first).
-  const ranked = useMemo(() => {
+  const fundedSats = useMemo(() => {
     const totals = zapTotals ?? new Map<string, number>();
-    return [...topLevel].sort((a, b) => {
-      const aSats = totals.get(a.id) ?? 0;
-      const bSats = totals.get(b.id) ?? 0;
-      if (bSats !== aSats) return bSats - aSats;
-      return b.created_at - a.created_at;
-    });
+    return topLevel.reduce((sum, submission) => sum + (totals.get(submission.id) ?? 0), 0);
   }, [topLevel, zapTotals]);
 
+  const replyTree = useMemo((): ReplyNode[] => {
+    const totals = zapTotals ?? new Map<string, number>();
+
+    const buildNode = (ev: NostrEvent): ReplyNode => {
+      const allChildren = commentsData?.getDirectReplies(ev.id) ?? [];
+      if (allChildren.length <= 1) {
+        return {
+          event: ev,
+          children: allChildren.map((c) => buildNode(c)),
+        };
+      }
+      const [first, ...rest] = allChildren;
+      return {
+        event: ev,
+        children: [buildNode(first)],
+        hiddenChildren: rest.map((c) => buildNode(c)),
+      };
+    };
+
+    return [...topLevel]
+      .sort((a, b) => {
+        const aSats = totals.get(a.id) ?? 0;
+        const bSats = totals.get(b.id) ?? 0;
+        if (bSats !== aSats) return bSats - aSats;
+        return b.created_at - a.created_at;
+      })
+      .map((c) => buildNode(c));
+  }, [commentsData, topLevel, zapTotals]);
+
+  const metadata: NostrMetadata | undefined = author.data?.metadata;
+  const creatorName = getDisplayName(metadata, action.pubkey);
+  const creatorProfileUrl = useProfileUrl(action.pubkey, metadata);
+  const deadline = action.deadline ? formatDeadline(action.deadline) : null;
+  const cover = sanitizeUrl(action.image);
+  const remainingSats = Math.max(0, action.bounty - fundedSats);
+  const progressValue = action.bounty > 0 ? Math.min(100, Math.round((fundedSats / action.bounty) * 100)) : 0;
+  const hasStats =
+    !!engagementStats?.replies ||
+    !!engagementStats?.reposts ||
+    !!engagementStats?.quotes ||
+    !!engagementStats?.reactions;
+
+  const naddr = nip19.naddrEncode({
+    kind: 36639,
+    pubkey: action.pubkey,
+    identifier: action.id,
+  });
+
+  const storyEvent = useMemo(
+    () => ({
+      ...action.event,
+      tags: action.event.tags.filter(([name]) => !['image', 'title', 't'].includes(name)),
+    }),
+    [action.event],
+  );
+
+  const openInteractions = (tab: InteractionTab) => {
+    setInteractionsTab(tab);
+    setInteractionsOpen(true);
+  };
+
+  const handleShare = async () => {
+    const url = `${window.location.origin}/${naddr}`;
+    try {
+      const nav = typeof navigator !== 'undefined' ? navigator : undefined;
+      if (nav?.share) {
+        await nav.share({ title: action.title, text: action.description, url });
+      } else if (nav?.clipboard) {
+        await nav.clipboard.writeText(url);
+        toast({ title: 'Link copied to clipboard' });
+      }
+    } catch {
+      // User likely cancelled the share sheet; nothing to do.
+    }
+  };
+
   return (
-    <section className="space-y-4">
-      <header className="flex items-center justify-between gap-3 pt-2">
-        <h2 className="text-lg font-semibold flex items-center gap-2">
-          <Trophy className="h-5 w-5 text-primary" />
-          Submissions
-          {topLevel.length > 0 && (
-            <span className="text-sm text-muted-foreground font-normal">({topLevel.length})</span>
-          )}
-        </h2>
-      </header>
+    <main className="min-h-screen pb-16">
+      <PledgeHero
+        action={action}
+        cover={cover}
+        creatorName={creatorName}
+        creatorProfileUrl={creatorProfileUrl}
+        deadline={deadline}
+        onBack={() => navigate(-1)}
+      />
 
-      <ComposeBox compact replyTo={action.event} placeholder="Submit your contribution…" />
-
-      {commentsLoading ? (
-        <SubmissionsSkeleton />
-      ) : ranked.length === 0 ? (
-        <SubmissionsEmptyState />
-      ) : (
-        <div className="space-y-3">
-          {ranked.map((submission, index) => (
-            <RankedSubmission
-              key={submission.id}
-              event={submission}
-              rank={index + 1}
-              sats={zapTotals?.get(submission.id) ?? 0}
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 py-6 lg:py-10">
+        <div className="lg:flex lg:gap-8 lg:items-start">
+          <div className="lg:hidden mb-6">
+            <PledgeFundingCard
+              action={action}
+              btcPrice={btcPrice}
+              fundedSats={fundedSats}
+              remainingSats={remainingSats}
+              progressValue={progressValue}
+              submissionsCount={topLevel.length}
+              isLoading={zapsLoading}
+              onShare={handleShare}
             />
-          ))}
+          </div>
+
+          <div className="flex-1 min-w-0 space-y-8">
+            <PledgeStory storyEvent={storyEvent} hasContent={action.description.trim().length > 0} />
+
+            <div id="pledge-activity" className="scroll-mt-20">
+              <div className="rounded-2xl bg-card border border-border/60 shadow-sm px-4 sm:px-5 py-4 sm:py-5">
+                {hasStats && (
+                  <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs sm:text-sm text-muted-foreground pb-2">
+                    {engagementStats?.reposts ? (
+                      <button onClick={() => openInteractions('reposts')} className="hover:underline transition-colors">
+                        <span className="font-bold text-foreground">{engagementStats.reposts.toLocaleString()}</span>{' '}
+                        Repost{engagementStats.reposts !== 1 ? 's' : ''}
+                      </button>
+                    ) : null}
+                    {engagementStats?.quotes ? (
+                      <button onClick={() => openInteractions('quotes')} className="hover:underline transition-colors">
+                        <span className="font-bold text-foreground">{engagementStats.quotes.toLocaleString()}</span>{' '}
+                        Quote{engagementStats.quotes !== 1 ? 's' : ''}
+                      </button>
+                    ) : null}
+                    {engagementStats?.reactions ? (
+                      <button onClick={() => openInteractions('reactions')} className="hover:underline transition-colors">
+                        <span className="font-bold text-foreground">{engagementStats.reactions.toLocaleString()}</span>{' '}
+                        Like{engagementStats.reactions !== 1 ? 's' : ''}
+                      </button>
+                    ) : null}
+                  </div>
+                )}
+
+                <PostActionBar
+                  event={action.event}
+                  replyLabel="Submit"
+                  onReply={() => setReplyOpen(true)}
+                  onMore={() => setMoreMenuOpen(true)}
+                  className={hasStats ? 'pt-3 border-t border-border/60' : undefined}
+                />
+              </div>
+
+              <div className="mt-6">
+                <div className="flex items-baseline justify-between gap-3 mb-3 px-1">
+                  <h2 className="text-lg font-semibold tracking-tight">Submissions</h2>
+                  {topLevel.length > 0 ? (
+                    <span className="text-sm text-muted-foreground tabular-nums">
+                      {topLevel.length.toLocaleString()} {topLevel.length === 1 ? 'submission' : 'submissions'}
+                    </span>
+                  ) : null}
+                </div>
+
+                {commentsLoading && replyTree.length === 0 ? (
+                  <div className="space-y-3">
+                    {Array.from({ length: 3 }).map((_, i) => <PledgeReplySkeleton key={i} />)}
+                  </div>
+                ) : replyTree.length > 0 ? (
+                  <div className="-mx-2 sm:-mx-4 rounded-2xl bg-card border border-border/60 overflow-hidden">
+                    <ThreadedReplyList roots={replyTree} />
+                  </div>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => setReplyOpen(true)}
+                    className="block w-full rounded-2xl border border-dashed border-border/80 bg-card/50 px-6 py-10 text-center hover:bg-card hover:border-primary/40 transition-colors"
+                  >
+                    <p className="text-base font-medium text-foreground">No submissions yet</p>
+                    <p className="mt-1 text-sm text-muted-foreground">
+                      Be the first to reply with proof, evidence, or completed work.
+                    </p>
+                  </button>
+                )}
+              </div>
+            </div>
+          </div>
+
+          <aside className="hidden lg:block lg:w-[360px] lg:shrink-0 lg:self-start">
+            <div className="lg:sticky lg:top-4">
+              <PledgeFundingCard
+                action={action}
+                btcPrice={btcPrice}
+                fundedSats={fundedSats}
+                remainingSats={remainingSats}
+                progressValue={progressValue}
+                submissionsCount={topLevel.length}
+                isLoading={zapsLoading}
+                onShare={handleShare}
+              />
+            </div>
+          </aside>
         </div>
-      )}
-    </section>
+      </div>
+
+      <ReplyComposeModal event={action.event} open={replyOpen} onOpenChange={setReplyOpen} />
+      <NoteMoreMenu event={action.event} open={moreMenuOpen} onOpenChange={setMoreMenuOpen} />
+      <InteractionsModal
+        eventId={action.event.id}
+        open={interactionsOpen}
+        onOpenChange={setInteractionsOpen}
+        initialTab={interactionsTab}
+      />
+    </main>
   );
 }
 
-function RankedSubmission({
-  event, rank, sats,
-}: { event: import('@nostrify/nostrify').NostrEvent; rank: number; sats: number }) {
+interface PledgeHeroProps {
+  action: Action;
+  cover: string | undefined;
+  creatorName: string;
+  creatorProfileUrl: string;
+  deadline: { label: string; isPast: boolean } | null;
+  onBack: () => void;
+}
+
+function PledgeHero({ action, cover, creatorName, creatorProfileUrl, deadline, onBack }: PledgeHeroProps) {
+  const Icon = ACTION_ICONS[action.type];
+  const countryLabel = action.countryCode ? getGeoDisplayName(action.countryCode) : undefined;
+
   return (
-    <div className="rounded-xl border border-border overflow-hidden">
-      <div className="flex items-center gap-2 px-4 py-2 bg-muted/40 text-xs font-semibold">
-        <span className={cn(
-          'inline-flex items-center justify-center rounded-full px-2 py-0.5 text-[11px]',
-          rank === 1 && 'bg-amber-500/20 text-amber-600 dark:text-amber-400',
-          rank === 2 && 'bg-zinc-400/20 text-zinc-700 dark:text-zinc-300',
-          rank === 3 && 'bg-orange-500/20 text-orange-700 dark:text-orange-400',
-          rank > 3 && 'bg-muted text-muted-foreground',
-        )}>
-          #{rank}
-        </span>
-        <span className="flex items-center gap-1 text-muted-foreground">
-          <Bitcoin className="size-3" />
-          <span className="text-foreground font-bold">{sats.toLocaleString()}</span>
-          sats zapped
-        </span>
+    <div className="max-w-6xl mx-auto px-4 sm:px-6 pt-4">
+      <div className="relative aspect-[16/9] sm:aspect-[21/9] rounded-xl overflow-hidden bg-gradient-to-br from-primary/40 via-primary/20 to-secondary">
+        {cover ? (
+          <img src={cover} alt="" className="absolute inset-0 size-full object-cover" />
+        ) : (
+          <div className="absolute inset-0 flex items-center justify-center">
+            <HandHeart className="size-16 text-primary/40" />
+          </div>
+        )}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/25 to-black/45" />
+
+        <div className="absolute left-0 right-0 top-0 z-10 flex items-center justify-between gap-3 px-4 pt-4">
+          <button
+            onClick={onBack}
+            className="p-2.5 -ml-2 rounded-full text-white/90 hover:bg-white/15 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80 motion-safe:transition-colors"
+            aria-label="Go back"
+          >
+            <ChevronLeft className="size-6 drop-shadow-[0_1px_2px_rgba(0,0,0,0.85)]" />
+          </button>
+        </div>
+
+        <div className="absolute inset-x-0 bottom-0 z-10 space-y-2 p-5 sm:p-6 [text-shadow:0_1px_4px_rgba(0,0,0,0.75),0_2px_10px_rgba(0,0,0,0.45)]">
+          <Badge variant="secondary" className="bg-background/85 text-foreground border-border/40 backdrop-blur [text-shadow:none]">
+            <Icon className="size-3.5 mr-1.5" />
+            Pledge
+          </Badge>
+          <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
+            <h1 className="text-3xl sm:text-4xl font-bold leading-tight tracking-tight text-white">
+              {action.title}
+            </h1>
+            <Link
+              to={creatorProfileUrl}
+              onClick={(e) => e.stopPropagation()}
+              className="text-xs sm:text-sm text-white/85 hover:text-white motion-safe:transition-colors"
+            >
+              by <span className="font-medium">{creatorName}</span>
+            </Link>
+          </div>
+          <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 text-xs sm:text-sm font-medium text-white/85">
+            {countryLabel && (
+              <span className="inline-flex items-center gap-1.5">
+                <MapPin className="size-3.5 sm:size-4" />
+                {countryLabel}
+              </span>
+            )}
+            {deadline ? (
+              <span className="inline-flex items-center gap-1.5">
+                <CalendarClock className="size-3.5 sm:size-4" />
+                {deadline.label}
+              </span>
+            ) : (
+              <span className="inline-flex items-center gap-1.5">
+                <CalendarClock className="size-3.5 sm:size-4" />
+                Open-ended
+              </span>
+            )}
+          </div>
+          {action.description && (
+            <p className="max-w-2xl text-base sm:text-lg text-white/90 line-clamp-3">
+              {action.description}
+            </p>
+          )}
+        </div>
       </div>
-      <NoteCard event={event} />
     </div>
   );
 }
 
-function SubmissionsSkeleton() {
+function PledgeFundingCard({
+  action,
+  btcPrice,
+  fundedSats,
+  remainingSats,
+  progressValue,
+  submissionsCount,
+  isLoading,
+  onShare,
+}: {
+  action: Action;
+  btcPrice: number | undefined;
+  fundedSats: number;
+  remainingSats: number;
+  progressValue: number;
+  submissionsCount: number;
+  isLoading: boolean;
+  onShare: () => void;
+}) {
   return (
-    <div className="space-y-3">
-      {Array.from({ length: 3 }).map((_, i) => (
-        <div key={i} className="rounded-xl border border-border p-4 flex gap-3">
-          <Skeleton className="size-10 rounded-full" />
-          <div className="flex-1 space-y-2">
-            <Skeleton className="h-4 w-1/3" />
-            <Skeleton className="h-4 w-full" />
-            <Skeleton className="h-4 w-4/5" />
+    <Card className="overflow-hidden">
+      <CardContent className="p-5 space-y-5">
+        {isLoading ? (
+          <Skeleton className="h-28 w-full" />
+        ) : (
+          <div className="space-y-3">
+            <div className="space-y-1">
+              <div className="text-2xl font-bold tracking-tight">
+                {formatPledgeAmount(fundedSats, btcPrice)}
+                <span className="ml-1.5 text-sm font-normal text-muted-foreground">funded</span>
+              </div>
+              <div className="text-xs text-muted-foreground">
+                of {formatPledgeAmount(action.bounty, btcPrice)} pledged
+                {submissionsCount > 0 && (
+                  <>
+                    {' · '}
+                    {submissionsCount.toLocaleString()} {submissionsCount === 1 ? 'submission' : 'submissions'}
+                  </>
+                )}
+              </div>
+            </div>
+            <Progress value={progressValue} className="h-2" />
+            <div className="grid grid-cols-2 gap-3 text-sm">
+              <div className="rounded-lg bg-muted/40 p-3">
+                <div className="text-xs text-muted-foreground">Remaining</div>
+                <div className="font-semibold">{formatPledgeAmount(remainingSats, btcPrice)}</div>
+              </div>
+              <div className="rounded-lg bg-muted/40 p-3">
+                <div className="text-xs text-muted-foreground">Stored as</div>
+                <div className="font-semibold">{formatSats(action.bounty)} sats</div>
+              </div>
+            </div>
+            <p className="text-xs text-muted-foreground leading-relaxed">
+              This pledge is trust-based. Funding progress sums zaps and donation receipts on top-level submissions.
+            </p>
+          </div>
+        )}
+
+        <Button variant="outline" size="lg" className="w-full" onClick={onShare}>
+          <Share2 className="size-4 mr-2" />
+          Share
+        </Button>
+      </CardContent>
+    </Card>
+  );
+}
+
+function PledgeStory({ storyEvent, hasContent }: { storyEvent: NostrEvent; hasContent: boolean }) {
+  if (!hasContent) {
+    return (
+      <article className="prose prose-neutral dark:prose-invert max-w-none">
+        <p className="text-muted-foreground italic">
+          The pledger hasn't written details for this pledge yet.
+        </p>
+      </article>
+    );
+  }
+
+  return (
+    <article className="prose prose-neutral dark:prose-invert max-w-none">
+      <ArticleContent event={storyEvent} />
+    </article>
+  );
+}
+
+function PledgeReplySkeleton() {
+  return (
+    <div className="py-3 border-b border-border last:border-b-0">
+      <div className="flex gap-3">
+        <Skeleton className="size-10 rounded-full shrink-0" />
+        <div className="flex-1 space-y-2">
+          <Skeleton className="h-4 w-32" />
+          <Skeleton className="h-4 w-full" />
+          <Skeleton className="h-4 w-2/3" />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function PledgeDetailSkeleton() {
+  return (
+    <main className="min-h-screen pb-16">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 pt-4">
+        <Skeleton className="aspect-[16/9] sm:aspect-[21/9] w-full rounded-xl" />
+      </div>
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 py-6 lg:py-10">
+        <div className="lg:flex lg:gap-8 lg:items-start">
+          <div className="flex-1 min-w-0 space-y-4">
+            <Skeleton className="h-10 w-2/3" />
+            <Skeleton className="h-5 w-full" />
+            <Skeleton className="h-5 w-4/5" />
+            <Skeleton className="h-5 w-5/6" />
+          </div>
+          <div className="hidden lg:block lg:w-[360px] lg:shrink-0 space-y-3">
+            <Skeleton className="h-48 w-full rounded-xl" />
           </div>
         </div>
-      ))}
-    </div>
-  );
-}
-
-function SubmissionsEmptyState() {
-  return (
-    <div className="py-10 text-center text-muted-foreground text-sm border border-dashed border-border rounded-xl">
-      <MessageSquare className="size-10 mx-auto mb-3 opacity-30" />
-      <p className="text-base font-medium mb-1">No submissions yet</p>
-      <p className="text-xs">Be the first to take action and earn part of the bounty.</p>
-    </div>
+      </div>
+    </main>
   );
 }
 
 /** Loader-state subcomponent used when the addressable coordinate is still
- *  being decoded (e.g. by NIP19Page). */
+ * being decoded (e.g. by NIP19Page). */
 export function ActionDetailLoading() {
   return (
     <main>
-      <DetailHeader />
+      <div className="flex items-center gap-4 px-4 py-4 bg-background/85">
+        <Link
+          to="/pledges"
+          className="p-2 -ml-2 rounded-full hover:bg-secondary transition-colors sidebar:hidden"
+          aria-label="Back to pledges"
+        >
+          <ArrowLeft className="size-5" />
+        </Link>
+        <div className="flex items-center gap-2 flex-1 min-w-0">
+          <DollarSign className="size-5 text-primary" />
+          <h1 className="text-lg font-semibold truncate">Pledge</h1>
+        </div>
+      </div>
       <div className="px-4 max-w-3xl mx-auto space-y-4 py-6">
         <div className="flex items-center gap-3">
           <Loader2 className="size-5 animate-spin text-primary" />
-          <span className="text-sm text-muted-foreground">Loading action…</span>
+          <span className="text-sm text-muted-foreground">Loading pledge…</span>
         </div>
       </div>
     </main>

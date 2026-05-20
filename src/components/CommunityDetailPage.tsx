@@ -533,7 +533,7 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
       },
       {
         id: 'new-action',
-        label: 'New action',
+        label: 'New pledge',
         icon: <Megaphone className="size-4" />,
         onSelect: () => {
           setActiveTab('activity');
@@ -788,7 +788,7 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
             </TabsContent>
 
             {/* ── Activity tab — chronological stream of initiatives
-                  (actions + goals + events) interleaved with threaded NIP-22 discussion,
+                  (pledges + goals + events) interleaved with threaded NIP-22 discussion,
                  followed by past initiatives. ── */}
             <TabsContent value="activity" className="mt-0">
               <ComposeBox compact replyTo={event} />
@@ -808,7 +808,7 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
                     (communityEvents ?? []).length > 0
                   )
                     ? 'No activity from community members yet. Toggle the shield icon to see everything.'
-                    : <>No activity yet.{user ? ' Start a discussion, create an action, set a goal, or schedule an event!' : ''}</>}
+                    : <>No activity yet.{user ? ' Start a discussion, create a pledge, set a goal, or schedule an event!' : ''}</>}
                 </div>
               ) : (
                 <FeedCard className="mx-0 sm:mx-0 mt-2">

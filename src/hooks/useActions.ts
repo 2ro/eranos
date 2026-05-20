@@ -4,7 +4,7 @@ import type { NostrEvent, NostrFilter } from '@nostrify/nostrify';
 import { sanitizeUrl } from '@/lib/sanitizeUrl';
 
 /**
- * Activist Action (kind 36639) — see `NIP.md`.
+ * Pledge (kind 36639) — see `NIP.md`.
  *
  * Ported from Pathos with two adjustments:
  *  - Discovery `t` tag is canonically `agora-action`. Read aliases include
@@ -19,11 +19,12 @@ export interface Action {
   title: string;
   description: string;
   type: 'photo' | 'art' | 'info' | 'action';
+  /** Pledged amount in sats. Stored as the legacy `bounty` tag. */
   bounty: number;
   countryCode?: string;
   /** Unix timestamp — when action becomes active. Defaults to created_at. */
   startTime?: number;
-  /** Unix timestamp — when action expires. Defaults to start + 48h. */
+  /** Optional Unix timestamp — when pledge expires. Open-ended when omitted. */
   deadline?: number;
   /** Cover image URL. */
   image?: string;
@@ -87,14 +88,11 @@ export function parseAction(event: NostrEvent): Action | null {
     startTimestamp = event.created_at;
   }
 
-  // Deadline: use the tag if valid, otherwise fall back to start + 48h.
+  // Deadline: use only a valid tag. Pledges are open-ended when omitted.
   let deadlineTimestamp: number | undefined;
   if (deadlineTag) {
     const parsed = parseInt(deadlineTag, 10);
-    deadlineTimestamp =
-      !isNaN(parsed) && parsed > 0 ? parsed : startTimestamp + 48 * 60 * 60;
-  } else {
-    deadlineTimestamp = startTimestamp + 48 * 60 * 60;
+    deadlineTimestamp = !isNaN(parsed) && parsed > 0 ? parsed : undefined;
   }
 
   return {
@@ -124,12 +122,12 @@ interface UseActionsOptions {
 }
 
 /**
- * Returns activist actions (kind 36639), sorted into:
- *   current actions first (highest bounty, then newest),
+ * Returns pledges (kind 36639), sorted into:
+ *   current pledges first (highest pledge, then newest),
  *   then upcoming (soonest start first),
  *   then past (most recently expired first).
  *
- * Actions are user-generated. Country filtering only applies when a country
+ * Pledges are user-generated. Country filtering only applies when a country
  * code is provided.
  */
 export function useActions({ countryCode, limit = 50 }: UseActionsOptions = {}) {

@@ -3,7 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 
 import { parseAction, type Action } from '@/hooks/useActions';
 
-/** Fetches kind 36639 actions scoped to a community via the uppercase `A` tag. */
+/** Fetches kind 36639 pledges scoped to a community via the uppercase `A` tag. */
 export function useCommunityActions(communityATag: string | undefined) {
   const { nostr } = useNostr();
 

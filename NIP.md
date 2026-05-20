@@ -14,7 +14,7 @@
 |-------|----------------------------|----------------------------------------------------------------|
 | 30223 | Campaign                   | Fundraising campaign with a list of on-chain Bitcoin recipients |
 | 30385 | Community Stats Snapshot   | Pre-computed per-country / global community leaderboards       |
-| 36639 | Activist Action            | Country-scoped activist challenge with a sats bounty           |
+| 36639 | Pledge                     | Donor pledge for concrete submissions, stored as sats           |
 
 ### Agora Protocols
 
@@ -532,19 +532,19 @@ After resolution (assuming `$follows` = `["pk1", "pk2"]`):
 
 ---
 
-## Kind 36639: Activist Action
+## Kind 36639: Pledge
 
 ### Summary
 
-Addressable event kind for publishing **activist actions**. An action is a task — take a photo, make art, gather information, or take direct action — with an optional country scope, optional community scope, and an optional sats bounty paid out via NIP-57 zaps to the best **submissions**.
+Addressable event kind for publishing **pledges**. A pledge is donor intent to fund a concrete action, evidence request, or outcome — take a photo, make art, gather information, clean a beach, or take direct action — with an optional country scope, optional community scope, and a sats-denominated pledge amount paid out via zaps or donation receipts to the best **submissions**.
 
-Submissions are **NIP-22 comments** (kind 1111) authored under the action's coordinate, ranked by zap totals. There is no separate submission kind; an earlier draft (kind 36640) was deprecated in favor of NIP-22 reuse.
+Submissions are **NIP-22 comments** (kind 1111) authored under the pledge's coordinate, ranked by zap totals. There is no separate submission kind; an earlier draft (kind 36640) was deprecated in favor of NIP-22 reuse.
 
 ### Trust model
 
-Actions are user-generated. Anyone can publish a kind 36639 event, and Agora displays valid actions without platform-admin or country-organizer author filtering.
+Pledges are user-generated. Anyone can publish a kind 36639 event, and Agora displays valid pledges without platform-admin or country-organizer author filtering.
 
-Community-scoped actions inherit the community's moderation context. Clients rendering a specific community SHOULD query by the community `A` tag and apply that community's moderation and membership filters.
+Community-scoped pledges inherit the community's moderation context. Clients rendering a specific community SHOULD query by the community `A` tag and apply that community's moderation and membership filters.
 
 ### Event Structure
 
@@ -565,7 +565,7 @@ Community-scoped actions inherit the community's moderation context. Clients ren
     ["image", "https://example.com/cover.jpg"],
     ["start", "1729000000"],
     ["deadline", "1729604800"],
-    ["alt", "Agora activist action: Plant a tree in your neighborhood"]
+    ["alt", "Agora pledge: Plant a tree in your neighborhood"]
   ]
 }
 ```
@@ -577,32 +577,32 @@ Community-scoped actions inherit the community's moderation context. Clients ren
 | `d`              | Yes      | Unique identifier (typically slug + timestamp). Forms the addressable coordinate `36639:<pubkey>:<d>`.   |
 | `title`          | Yes      | Short title shown on cards.                                                                              |
 | `challenge-type` | Yes      | One of `photo`, `art`, `info`, `action`. Drives the display icon and submission expectations.            |
-| `bounty`         | Yes      | Bounty in **sats**, as an unsigned integer string. Paid out via zaps to the chosen submission(s).        |
+| `bounty`         | Yes      | Pledge amount in **sats**, as an unsigned integer string. Paid out via zaps or donation receipts to chosen submission(s). |
 | `i`              | No       | NIP-73 country identifier: `iso3166:XX` (preferred). Legacy `geo:XX` (length 6, country code only) is accepted as a read alias. Optionally combined with a `location` tag fallback. |
-| `A`              | No       | Community root coordinate for community-scoped actions, e.g. `34550:<pubkey>:<d-tag>`.                 |
-| `K`              | No       | Root kind hint for community-scoped actions. Use `34550` when `A` points to a NIP-72 community.         |
+| `A`              | No       | Community root coordinate for community-scoped pledges, e.g. `34550:<pubkey>:<d-tag>`.                 |
+| `K`              | No       | Root kind hint for community-scoped pledges. Use `34550` when `A` points to a NIP-72 community.         |
 | `P`              | No       | Root author hint for community-scoped actions. Use the community definition author pubkey.              |
 | `t`              | Yes      | Discovery tag. Canonical write value is `agora-action`. Read aliases: `pathos-challenge`, `agora-challenge`. |
 | `image`          | No       | Cover image URL.                                                                                         |
-| `start`          | No       | Unix timestamp when the action becomes active. Defaults to `created_at`.                                 |
-| `deadline`       | No       | Unix timestamp when the action expires. Defaults to `start + 48h`.                                       |
-| `alt`            | Yes      | NIP-31 human-readable fallback. Convention: `"Agora activist action: <title>"`.                          |
+| `start`          | No       | Unix timestamp when the pledge becomes active. Defaults to `created_at`.                                 |
+| `deadline`       | No       | Optional Unix timestamp when the pledge expires. Omit for open-ended pledges.                            |
+| `alt`            | Yes      | NIP-31 human-readable fallback. Convention: `"Agora pledge: <title>"`.                                   |
 
 ### Content
 
-Long-form description of the action. Plain text or light markdown. Clients render this as the action's body on the detail page.
+Long-form description of the pledge. Plain text or light markdown. Clients render this as the pledge's body on the detail page.
 
 ### Submissions
 
-Submissions are kind 1111 NIP-22 comments addressed to the action's coordinate (`["A", "36639:<pubkey>:<d>"]` and `["P", "<pubkey>"]`). Clients SHOULD:
+Submissions are kind 1111 NIP-22 comments addressed to the pledge's coordinate (`["A", "36639:<pubkey>:<d>"]` and `["P", "<pubkey>"]`). Clients SHOULD:
 
-- Sort top-level submissions by **total zap amount** (sum of NIP-57 zap receipts on each submission), descending.
-- Show the bounty as the prize pool that organizers can distribute to top submissions via zaps.
-- Hide submissions with `created_at` after the action's `deadline` for "past" leaderboards (or surface them separately as "late submissions").
+- Sort top-level submissions by **total funded amount** (sum of kind 9735 zap receipts and kind 8333 donation receipts on each submission), descending.
+- Show the pledge amount, total funded, and remaining amount as a trust-based progress indicator. There is no escrow guarantee.
+- Hide submissions with `created_at` after the pledge's `deadline` for "past" leaderboards (or surface them separately as "late submissions"). Open-ended pledges have no deadline cutoff.
 
 ### Discovery
 
-Clients querying actions globally:
+Clients querying pledges globally:
 
 ```json
 { "kinds": [36639], "#t": ["agora-action", "pathos-challenge", "agora-challenge"], "limit": 50 }

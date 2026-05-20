@@ -9,12 +9,14 @@ import type { NostrMetadata } from '@nostrify/nostrify';
 import { useActions, type Action } from '@/hooks/useActions';
 import { useAuthor } from '@/hooks/useAuthor';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
+import { useBitcoinWallet } from '@/hooks/useBitcoinWallet';
 import { useNostrPublish } from '@/hooks/useNostrPublish';
 import { useToast } from '@/hooks/useToast';
 import { getAllCountries, getGeoDisplayName, countryCodeToFlag } from '@/lib/countries';
 import { CountryFlag } from '@/components/CountryFlag';
 import { getDisplayName } from '@/lib/genUserName';
 import { DEFAULT_ACTION_COVERS, DEFAULT_COVER_IMAGE } from '@/lib/defaultActionCovers';
+import { formatSats, satsToUSDWhole } from '@/lib/bitcoin';
 import { HOPE_PALETTE } from '@/lib/hopePalette';
 import { useLayoutOptions } from '@/contexts/LayoutContext';
 import { cn } from '@/lib/utils';
@@ -36,7 +38,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 
 import {
-  Camera, Palette, Info, Clock, Bitcoin, Plus, ChevronRight, Loader2,
+  Camera, Palette, Info, Clock, Plus, ChevronRight, Loader2,
   Link as LinkIcon, Check, MoreHorizontal, Trash2, ListFilter,
   Calendar, DollarSign, Globe, Megaphone,
 } from 'lucide-react';
@@ -48,8 +50,9 @@ const ACTION_ICONS = {
   action: Megaphone,
 } as const;
 
-function formatSats(sats: number): string {
-  return sats.toLocaleString();
+function formatPledgeAmount(sats: number, btcPrice: number | undefined): string {
+  if (btcPrice) return satsToUSDWhole(sats, btcPrice);
+  return `${formatSats(sats)} sats`;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -108,7 +111,7 @@ function ActionShareMenu({ action }: { action: Action }) {
     e.stopPropagation();
     if (!user || !isOwner) return;
 
-    const confirmed = window.confirm('Delete this action? This cannot be undone.');
+    const confirmed = window.confirm('Delete this pledge? This cannot be undone.');
     if (!confirmed) return;
 
     setIsDeleting(true);
@@ -117,7 +120,7 @@ function ActionShareMenu({ action }: { action: Action }) {
       // honour a-tag-only deletions for addressable events.
       await createEvent({
         kind: 5,
-        content: 'Deleted action',
+        content: 'Deleted pledge',
         tags: [
           ['e', action.event.id],
           ['a', `36639:${action.pubkey}:${action.id}`],
@@ -125,10 +128,10 @@ function ActionShareMenu({ action }: { action: Action }) {
       });
       await queryClient.invalidateQueries({ queryKey: ['agora-actions'] });
       await queryClient.invalidateQueries({ queryKey: ['agora-action'] });
-      toast({ title: 'Action deleted' });
+      toast({ title: 'Pledge deleted' });
     } catch (error) {
-      console.error('Failed to delete action:', error);
-      toast({ title: 'Failed to delete action', variant: 'destructive' });
+      console.error('Failed to delete pledge:', error);
+      toast({ title: 'Failed to delete pledge', variant: 'destructive' });
     } finally {
       setIsDeleting(false);
     }
@@ -154,7 +157,7 @@ function ActionShareMenu({ action }: { action: Action }) {
               ) : (
                 <Trash2 className="h-4 w-4 mr-2" />
               )}
-              Delete action
+              Delete pledge
             </DropdownMenuItem>
             <DropdownMenuSeparator />
           </>
@@ -172,7 +175,7 @@ function ActionShareMenu({ action }: { action: Action }) {
   );
 }
 
-function ActionCard({ action, isExpired }: { action: Action; isExpired?: boolean }) {
+function ActionCard({ action, isExpired, btcPrice }: { action: Action; isExpired?: boolean; btcPrice: number | undefined }) {
   const author = useAuthor(action.pubkey);
   const metadata: NostrMetadata | undefined = author.data?.metadata;
   const displayName = getDisplayName(metadata, action.pubkey);
@@ -262,11 +265,11 @@ function ActionCard({ action, isExpired }: { action: Action; isExpired?: boolean
             {action.description}
           </p>
 
-          {/* Meta row: bounty · author. No nested box. */}
+          {/* Meta row: pledge · author. No nested box. */}
           <div className="flex items-center gap-2 text-sm pt-1 min-w-0">
-            <Bitcoin className="h-4 w-4 text-primary shrink-0" />
-            <span className="font-semibold">{formatSats(action.bounty)}</span>
-            <span className="text-muted-foreground text-xs">sats</span>
+            <DollarSign className="h-4 w-4 text-primary shrink-0" />
+            <span className="font-semibold">{formatPledgeAmount(action.bounty, btcPrice)}</span>
+            {btcPrice && <span className="text-muted-foreground text-xs">~{formatSats(action.bounty)} sats</span>}
             <span className="text-muted-foreground/50">·</span>
             <Avatar className="h-5 w-5 shrink-0">
               <AvatarImage src={metadata?.picture} />
@@ -290,6 +293,7 @@ type SortOption = 'recent' | 'bounty' | 'deadline';
 
 export default function ActionsPage() {
   const { user } = useCurrentUser();
+  const { btcPrice } = useBitcoinWallet();
   const navigate = useNavigate();
 
   const [selectedCountry, setSelectedCountry] = useState<string | undefined>(undefined);
@@ -301,12 +305,12 @@ export default function ActionsPage() {
     limit: 300,
   });
 
-  // Route entry points for "Create action" all pass the currently-selected
+  // Route entry points for "Create pledge" all pass the currently-selected
   // country via ?country= so the dedicated page can pre-fill it, matching
   // the old modal's `countryCode` prop.
   const createActionHref = selectedCountry
-    ? `/actions/new?country=${encodeURIComponent(selectedCountry)}`
-    : '/actions/new';
+    ? `/pledges/new?country=${encodeURIComponent(selectedCountry)}`
+    : '/pledges/new';
 
   // Drive the global FAB from the canonical layout API so we get the same
   // circular Plus button every other page has. `noMaxWidth: true` lets
@@ -338,8 +342,8 @@ export default function ActionsPage() {
     : 'Global';
 
   useSeoMeta({
-    title: `Actions${selectedCountry ? ` — ${selectedCountryName}` : ''} | Agora`,
-    description: 'Complete activist actions and earn Bitcoin bounties. Take photos, create art, gather information, and take action for change.',
+    title: `Pledges${selectedCountry ? ` — ${selectedCountryName}` : ''} | Agora`,
+    description: 'Pledge funding for concrete actions, evidence, or outcomes you want to inspire.',
   });
 
   const isLoading = actionsLoading;
@@ -391,12 +395,12 @@ export default function ActionsPage() {
   const hasUpcoming = upcomingActions.length > 0;
   const isOnlyPastView = !hasCurrent && !hasUpcoming && pastActions.length > 0;
   const primarySectionTitle = hasCurrent
-    ? 'Active actions'
+    ? 'Active pledges'
     : hasUpcoming
-      ? 'Upcoming actions'
+      ? 'Upcoming pledges'
     : pastActions.length > 0
-        ? 'Past actions'
-        : 'Actions';
+        ? 'Past pledges'
+        : 'Pledges';
   const deadlineSortLabel = isOnlyPastView ? 'Recently ended' : 'Deadline soon';
 
   const headerControls = (
@@ -414,7 +418,7 @@ export default function ActionsPage() {
             {sortBy === 'recent' && <Check className="ml-auto h-4 w-4" />}
           </DropdownMenuItem>
           <DropdownMenuItem onClick={() => setSortBy('bounty')} className={sortBy === 'bounty' ? 'bg-primary/10' : ''}>
-            <DollarSign className="mr-2 h-4 w-4" /><span>Highest bounty</span>
+            <DollarSign className="mr-2 h-4 w-4" /><span>Highest pledge</span>
             {sortBy === 'bounty' && <Check className="ml-auto h-4 w-4" />}
           </DropdownMenuItem>
           <DropdownMenuItem onClick={() => setSortBy('deadline')} className={sortBy === 'deadline' ? 'bg-primary/10' : ''}>
@@ -496,6 +500,7 @@ export default function ActionsPage() {
                 showAll={showAllCurrent}
                 onToggle={() => setShowAllCurrent(!showAllCurrent)}
                 isExpired={false}
+                btcPrice={btcPrice}
               />
             ) : hasUpcoming ? (
               <ActionSection
@@ -505,6 +510,7 @@ export default function ActionsPage() {
                 showAll={showAllUpcoming}
                 onToggle={() => setShowAllUpcoming(!showAllUpcoming)}
                 isExpired={false}
+                btcPrice={btcPrice}
               />
             ) : pastActions.length > 0 ? (
               <ActionSection
@@ -514,6 +520,7 @@ export default function ActionsPage() {
                 showAll={showAllPast}
                 onToggle={() => setShowAllPast(!showAllPast)}
                 isExpired
+                btcPrice={btcPrice}
               />
             ) : null}
 
@@ -526,6 +533,7 @@ export default function ActionsPage() {
                   showAll={showAllUpcoming}
                   onToggle={() => setShowAllUpcoming(!showAllUpcoming)}
                   isExpired={false}
+                  btcPrice={btcPrice}
                 />
               </SectionDivider>
             )}
@@ -539,6 +547,7 @@ export default function ActionsPage() {
                   showAll={showAllPast}
                   onToggle={() => setShowAllPast(!showAllPast)}
                   isExpired
+                  btcPrice={btcPrice}
                 />
               </SectionDivider>
             )}
@@ -546,7 +555,7 @@ export default function ActionsPage() {
         ) : (
           <>
             <div className="flex items-center justify-between mb-6">
-              <h2 className="text-xl font-bold">Active actions</h2>
+              <h2 className="text-xl font-bold">Active pledges</h2>
               {headerControls}
             </div>
 
@@ -555,15 +564,15 @@ export default function ActionsPage() {
                 <Megaphone className="size-8 text-primary" />
               </div>
               <div className="space-y-2 max-w-xs">
-                <h3 className="text-xl font-bold">No actions yet</h3>
+                <h3 className="text-xl font-bold">No pledges yet</h3>
                 <p className="text-muted-foreground text-sm">
-                  {selectedCountry ? `Be the first to create an action for ${selectedCountryName}.` : 'Be the first to create an action.'}
+                  {selectedCountry ? `Be the first to create a pledge for ${selectedCountryName}.` : 'Be the first to create a pledge.'}
                 </p>
               </div>
               {user && (
                 <Button onClick={() => navigate(createActionHref)} className="rounded-full">
                   <Plus className="size-4 mr-2" />
-                  Create action
+                  Create pledge
                 </Button>
               )}
             </div>
@@ -579,11 +588,11 @@ export default function ActionsPage() {
 // ═══════════════════════════════════════════════════════════════════════════════
 
 /**
- * Banner rotation for the Actions hero. We reuse the same gallery the
- * action create form offers as a default cover, so the hero feels
+ * Banner rotation for the Pledges hero. We reuse the same gallery the
+ * pledge create form offers as a default cover, so the hero feels
  * thematically continuous with the cards below — readers see the
  * vocabulary of imagery they'll be picking from when they create their
- * own action. Filtered to a single source extension where multiple
+ * own pledge. Filtered to a single source extension where multiple
  * exist isn't necessary; the browser handles `.png` / `.jpeg` mixed.
  */
 const ACTIONS_HERO_IMAGES: readonly string[] = DEFAULT_ACTION_COVERS.map(
@@ -591,18 +600,18 @@ const ACTIONS_HERO_IMAGES: readonly string[] = DEFAULT_ACTION_COVERS.map(
 );
 
 interface ActionsHeroProps {
-  /** Number of actions currently loaded — fuels the live stat pill. */
+  /** Number of pledges currently loaded — fuels the live stat pill. */
   actionCount: number;
-  /** When true, the primary CTA opens the create-action dialog. */
+  /** When true, the primary CTA opens the create-pledge page. */
   canCreate: boolean;
   /** Fires when the user clicks the primary CTA. */
   onCreateAction: () => void;
 }
 
 /**
- * Photo-led hero for the Actions index. Same structural recipe as the
+ * Photo-led hero for the Pledges index. Same structural recipe as the
  * Organize hero (rotating banner + atmospheric tint + scrims + overlay
- * copy + glassy CTA), but tuned for action's "dawn / golden hour" vibe:
+ * copy + glassy CTA), but tuned for the pledge page's "dawn / golden hour" vibe:
  * uses {@link HOPE_PALETTE} instead of the cool palette so the warm
  * hues land on top of the protest photography rather than competing
  * with it.
@@ -623,7 +632,7 @@ function ActionsHero({ actionCount, canCreate, onCreateAction }: ActionsHeroProp
   return (
     <section className="relative overflow-hidden border-b border-border bg-secondary/30">
       {/* Rotating photo banner — uses the same gallery offered as default
-          action covers, so the hero previews the visual vocabulary of
+          pledge covers, so the hero previews the visual vocabulary of
           the cards below. Crossfades every 7s and pans slowly between
           cuts. */}
       <HeroBanner images={ACTIONS_HERO_IMAGES} />
@@ -649,22 +658,22 @@ function ActionsHero({ actionCount, canCreate, onCreateAction }: ActionsHeroProp
       <div className="relative max-w-5xl mx-auto px-4 sm:px-6 py-10 sm:py-12 lg:py-14 min-h-[380px] sm:min-h-[420px] lg:min-h-[460px] flex flex-col items-center text-center">
         <div className="relative space-y-3 max-w-3xl">
           <p className="text-xs sm:text-sm font-semibold uppercase tracking-[0.18em] text-white/85 drop-shadow">
-            Act
+            Pledge
           </p>
           <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight leading-[1.05] text-white drop-shadow-[0_2px_12px_rgb(0_0_0/0.55)]">
-            Small acts,
-            <br className="sm:hidden" /> real change.
+            Inspire the change
+            <br className="sm:hidden" /> you want to see.
           </h1>
           <p className="text-base sm:text-lg text-white/85 max-w-2xl mx-auto drop-shadow-[0_1px_6px_rgb(0_0_0/0.5)]">
-            Photograph protests, make art, gather information, organize on the ground.
-            Get paid in Bitcoin when your work moves the needle.
+            Fund concrete actions, evidence, and outcomes. People reply with submissions,
+            and the community rewards the work that moves the goal forward.
           </p>
         </div>
 
         <div className="flex-1 min-h-[100px] sm:min-h-[120px]" aria-hidden="true" />
 
         {/* Live stat pill. Mirrors the Communities hero's pattern but
-            only carries a single fact — the current action count —
+            only carries a single fact — the current pledge count —
             so it stays calm and the headline does the heavy lifting. */}
         <div
           className="relative w-full max-w-md mx-auto rounded-full bg-background/55 backdrop-blur-xl backdrop-saturate-150 border border-white/20 dark:border-white/10 px-5 py-3 shadow-lg shadow-amber-500/10"
@@ -676,7 +685,7 @@ function ActionsHero({ actionCount, canCreate, onCreateAction }: ActionsHeroProp
               {actionCount.toLocaleString()}
             </span>
             <span className="text-xs sm:text-sm text-muted-foreground line-clamp-1">
-              {actionCount === 1 ? 'action in motion right now' : 'actions in motion right now'}
+              {actionCount === 1 ? 'pledge open right now' : 'pledges open right now'}
             </span>
           </div>
         </div>
@@ -697,10 +706,10 @@ function ActionsHero({ actionCount, canCreate, onCreateAction }: ActionsHeroProp
               'motion-safe:transition-colors motion-safe:duration-200',
               'disabled:opacity-60 disabled:cursor-not-allowed',
             )}
-            aria-label={canCreate ? 'Create action' : 'Log in to create an action'}
+            aria-label={canCreate ? 'Create pledge' : 'Log in to create a pledge'}
           >
             <Plus className="mr-2" />
-            Create action
+            Create pledge
           </Button>
         </div>
       </div>
@@ -709,9 +718,9 @@ function ActionsHero({ actionCount, canCreate, onCreateAction }: ActionsHeroProp
 }
 
 function ActionSection({
-  items, total, visible, showAll, onToggle, isExpired,
+  items, total, visible, showAll, onToggle, isExpired, btcPrice,
 }: {
-  items: Action[]; total: number; visible: number; showAll: boolean; onToggle: () => void; isExpired: boolean;
+  items: Action[]; total: number; visible: number; showAll: boolean; onToggle: () => void; isExpired: boolean; btcPrice: number | undefined;
 }) {
   return (
     <div className="space-y-4">
@@ -721,6 +730,7 @@ function ActionSection({
             key={`${action.pubkey}:${action.id}`}
             action={action}
             isExpired={isExpired}
+            btcPrice={btcPrice}
           />
         ))}
       </div>

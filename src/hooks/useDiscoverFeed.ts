@@ -17,9 +17,8 @@ const DISCOVER_PAGE_SIZE = 30;
  *    countries (`#K = iso3166`) and comments scoped to communities
  *    (`#K = 34550`). Together these are "posts from the world" + "voices
  *    inside the communities".
- *  - **36639** — Agora actions (challenges / civic calls). Always
- *    included because they're the most action-oriented signal on the
- *    network.
+ *  - **36639** — Agora pledges (challenges / civic calls). Always
+ *    included because they're the most action-oriented funding signal.
  *
  * We deliberately *exclude* free-form kind 1 notes here — the Discover
  * page is the place to see content that's tagged to a real-world thread
@@ -30,7 +29,7 @@ const DISCOVER_PAGE_SIZE = 30;
 /** Tag scopes we accept on kind 1111 comments. */
 const COMMENT_K_SCOPES = ['iso3166', 'geo', '34550'];
 
-/** Aliases we accept on kind 36639 action `t` tags. */
+/** Aliases we accept on kind 36639 pledge `t` tags. */
 const ACTION_T_ALIASES = ['agora-action', 'pathos-challenge', 'agora-challenge'];
 
 /**
@@ -57,7 +56,7 @@ function filterDiscoverEvents(events: NostrEvent[]): NostrEvent[] {
 /**
  * Public infinite feed for the Discover page. Streams together new
  * campaigns, world-tagged comments, community comments, and Agora
- * actions, paginated by `created_at` cursor.
+ * pledges, paginated by `created_at` cursor.
  *
  * Each page issues exactly one relay request (the union of all relevant
  * filters) to stay inside per-page rate budgets — the same pattern
@@ -91,7 +90,7 @@ export function useDiscoverFeed(enabled = true) {
           limit: DISCOVER_PAGE_SIZE,
           ...(until && { until }),
         },
-        // Agora actions.
+        // Agora pledges.
         {
           kinds: [36639],
           '#t': ACTION_T_ALIASES,

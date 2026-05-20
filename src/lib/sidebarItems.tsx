@@ -174,7 +174,7 @@ export const SIDEBAR_ITEMS: SidebarItemDef[] = [
   { id: "help", label: "Help", path: "/help", icon: LifeBuoy },
   { id: "agent", label: "Agent", path: "/agent", icon: Bot },
   // Content types
-  { id: "actions", label: "Actions", path: "/actions", icon: Megaphone },
+  { id: "actions", label: "Pledges", path: "/pledges", icon: Megaphone },
   { id: "events", label: "Events", path: "/events", icon: CalendarDays },
   { id: "photos", label: "Photos", path: "/photos", icon: Camera },
   { id: "videos", label: "Videos", path: "/videos", icon: Film },

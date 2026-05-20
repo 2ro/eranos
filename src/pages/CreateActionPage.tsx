@@ -41,6 +41,7 @@ import {
 } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
+import { useBitcoinWallet } from '@/hooks/useBitcoinWallet';
 import { useNostrPublish } from '@/hooks/useNostrPublish';
 import { useToast } from '@/hooks/useToast';
 import type { Action } from '@/hooks/useActions';
@@ -50,6 +51,7 @@ import { createCountryIdentifier } from '@/lib/countryIdentifiers';
 import { getTodayDateInput } from '@/lib/dateInput';
 import { DEFAULT_ACTION_COVERS } from '@/lib/defaultActionCovers';
 import { sanitizeUrl } from '@/lib/sanitizeUrl';
+import { formatSats, satsToUSDWhole, usdToSats } from '@/lib/bitcoin';
 import { cn } from '@/lib/utils';
 
 /**
@@ -99,14 +101,15 @@ export function CreateActionPage() {
   const queryClient = useQueryClient();
   const { mutateAsync: createEvent } = useNostrPublish();
   const { toast } = useToast();
+  const { btcPrice } = useBitcoinWallet();
 
   const browserTimezone = useMemo(
     () => Intl.DateTimeFormat().resolvedOptions().timeZone,
     [],
   );
 
-  // ?country=XX lets entry points (the Actions hero CTA, the FAB, and the
-  // empty-state button) pre-select whichever country the actions index is
+  // ?country=XX lets entry points (the Pledges hero CTA, the FAB, and the
+  // empty-state button) pre-select whichever country the pledges index is
   // currently filtered to — same behavior as the old modal's `countryCode`
   // prop.
   const pageCountryCode = searchParams.get('country') || '';
@@ -114,7 +117,7 @@ export function CreateActionPage() {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [type, setType] = useState<Action['type']>('action');
-  const [bounty, setBounty] = useState('');
+  const [pledgeUsd, setPledgeUsd] = useState('');
   const [startDate, setStartDate] = useState('');
   const [startTime, setStartTime] = useState('');
   const [deadline, setDeadline] = useState('');
@@ -129,9 +132,15 @@ export function CreateActionPage() {
   const minDeadline = useMemo(() => getTodayDateInput(), []);
 
   useSeoMeta({
-    title: 'Create action | Agora',
-    description: 'Create an activist action and offer a Bitcoin bounty on Agora.',
+    title: 'Create pledge | Agora',
+    description: 'Create a donor pledge to inspire concrete action on Agora.',
   });
+
+  const pledgeSatsPreview = useMemo(() => {
+    const n = Number(pledgeUsd);
+    if (!Number.isFinite(n) || n <= 0) return 0;
+    return usdToSats(n, btcPrice);
+  }, [btcPrice, pledgeUsd]);
 
   const allCountries = useMemo(() => getAllCountries(), []);
 
@@ -160,18 +169,22 @@ export function CreateActionPage() {
 
   const submitMutation = useMutation({
     mutationFn: async () => {
-      if (!user) throw new Error('You must be logged in to create an action.');
+      if (!user) throw new Error('You must be logged in to create a pledge.');
 
       const trimmedTitle = title.trim();
       const trimmedDescription = description.trim();
 
       if (!trimmedTitle) throw new Error('Title is required.');
       if (!trimmedDescription) throw new Error('Description is required.');
-      if (!bounty.trim()) throw new Error('Bounty is required.');
+      if (!pledgeUsd.trim()) throw new Error('Pledge amount is required.');
 
-      const bountyNum = Number(bounty);
-      if (!Number.isFinite(bountyNum) || bountyNum <= 0) {
-        throw new Error('Bounty must be a positive number of sats.');
+      const pledgeUsdNum = Number(pledgeUsd);
+      if (!Number.isFinite(pledgeUsdNum) || pledgeUsdNum <= 0) {
+        throw new Error('Pledge amount must be a positive USD amount.');
+      }
+      const pledgeSats = usdToSats(pledgeUsdNum, btcPrice);
+      if (pledgeSats <= 0) {
+        throw new Error('Waiting for BTC/USD price to calculate the pledge amount.');
       }
 
       const now = Date.now();
@@ -179,15 +192,15 @@ export function CreateActionPage() {
         .toLowerCase()
         .replace(/[^a-z0-9]+/g, '-')
         .replace(/(^-|-$)/g, '');
-      const dTag = `${slug || 'action'}-${now}`;
+      const dTag = `${slug || 'pledge'}-${now}`;
 
       const tags: string[][] = [
         ['d', dTag],
         ['title', trimmedTitle],
         ['challenge-type', type],
-        ['bounty', String(bountyNum)],
+        ['bounty', String(pledgeSats)],
         ['t', 'agora-action'],
-        ['alt', `Agora activist action: ${trimmedTitle}`],
+        ['alt', `Agora pledge: ${trimmedTitle}`],
       ];
 
       if (selectedCountry) {
@@ -233,14 +246,14 @@ export function CreateActionPage() {
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ['agora-actions'] });
       await queryClient.refetchQueries({ queryKey: ['agora-actions'] });
-      toast({ title: 'Action created' });
-      navigate('/actions');
+      toast({ title: 'Pledge created' });
+      navigate('/pledges');
     },
     onError: (error: unknown) => {
       const msg = error instanceof Error ? error.message : String(error);
       setFormError(msg);
       toast({
-        title: 'Could not create action',
+        title: 'Could not create pledge',
         description: msg,
         variant: 'destructive',
       });
@@ -254,12 +267,12 @@ export function CreateActionPage() {
           <Card>
             <CardContent className="py-12 px-8 text-center space-y-4">
               <Megaphone className="size-10 text-muted-foreground/60 mx-auto" />
-              <h2 className="text-xl font-semibold">Log in to create an action</h2>
+              <h2 className="text-xl font-semibold">Log in to create a pledge</h2>
               <p className="text-muted-foreground">
-                Actions are signed Nostr events. You need a Nostr login to publish one.
+                Pledges are signed Nostr events. You need a Nostr login to publish one.
               </p>
               <Button asChild>
-                <Link to="/actions">Back to actions</Link>
+                <Link to="/pledges">Back to pledges</Link>
               </Button>
             </CardContent>
           </Card>
@@ -271,7 +284,8 @@ export function CreateActionPage() {
   const canSubmit =
     title.trim().length > 0 &&
     description.trim().length > 0 &&
-    bounty.trim().length > 0 &&
+    pledgeUsd.trim().length > 0 &&
+    pledgeSatsPreview > 0 &&
     !coverUploading &&
     !submitMutation.isPending;
 
@@ -296,7 +310,7 @@ export function CreateActionPage() {
               <ArrowLeft className="size-5" />
             </button>
             <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">
-              Create action
+              Create pledge
             </h1>
           </div>
         </div>
@@ -341,29 +355,35 @@ export function CreateActionPage() {
                   </SelectItem>
                   <SelectItem value="action">
                     <div className="flex items-center gap-2">
-                      <Megaphone className="h-4 w-4" /> Action
+                      <Megaphone className="h-4 w-4" /> Direct action
                     </div>
                   </SelectItem>
                 </SelectContent>
               </Select>
             </FormSection>
 
-            {/* Bounty */}
-            <FormSection title="Bounty (sats)" requirement="Required">
+            {/* Pledge amount */}
+            <FormSection title="Pledge amount (USD)" requirement="Required">
               <Input
                 type="number"
-                placeholder="10000"
-                value={bounty}
-                onChange={(e) => setBounty(e.target.value)}
+                placeholder="100"
+                value={pledgeUsd}
+                onChange={(e) => setPledgeUsd(e.target.value)}
                 min={1}
+                step="0.01"
               />
+              <p className="text-xs text-muted-foreground">
+                {pledgeSatsPreview > 0 && btcPrice
+                  ? `${formatSats(pledgeSatsPreview)} sats will be stored on the event (${satsToUSDWhole(pledgeSatsPreview, btcPrice)} at the current rate).`
+                  : 'Enter a USD amount. Agora stores the pledge in sats on Nostr.'}
+              </p>
             </FormSection>
           </div>
 
           {/* Description */}
           <FormSection title="Description" requirement="Required">
             <Textarea
-              placeholder="Explain what submissions should look like, why this matters, and how the bounty will be paid out..."
+              placeholder="Explain the action, evidence, or outcome you want to inspire, what submissions should include, and how you plan to evaluate them..."
               className="min-h-[120px]"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
@@ -477,7 +497,7 @@ export function CreateActionPage() {
                 />
               )}
               <p className="text-xs text-muted-foreground">
-                {!deadline && 'Defaults to 48 hours after start'}
+                {!deadline && 'Open-ended. Add a deadline if urgency matters.'}
                 {deadline && !deadlineTime && 'Ends at 23:59 local time'}
               </p>
             </FormSection>
@@ -524,7 +544,7 @@ export function CreateActionPage() {
             ) : (
               <>
                 <Plus className="size-4 mr-2" />
-                Create action
+                Create pledge
               </>
             )}
           </Button>

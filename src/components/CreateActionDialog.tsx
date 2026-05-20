@@ -13,6 +13,7 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
+import { useBtcPrice } from '@/hooks/useBtcPrice';
 import { useIsMobile } from '@/hooks/useIsMobile';
 import { useNostrPublish } from '@/hooks/useNostrPublish';
 import { useToast } from '@/hooks/useToast';
@@ -21,6 +22,7 @@ import type { Action } from '@/hooks/useActions';
 import { createCountryIdentifier } from '@/lib/countryIdentifiers';
 import { countryCodeToFlag, getAllCountries, getGeoDisplayName } from '@/lib/countries';
 import { DEFAULT_ACTION_COVERS, DEFAULT_COVER_IMAGE } from '@/lib/defaultActionCovers';
+import { formatSats, satsToUSDWhole, usdToSats } from '@/lib/bitcoin';
 import { cn } from '@/lib/utils';
 
 interface CreateActionDialogProps {
@@ -34,7 +36,7 @@ interface CreateActionFormState {
   title: string;
   description: string;
   type: Action['type'];
-  bounty: string;
+  pledgeUsd: string;
   startDate: string;
   startTime: string;
   deadline: string;
@@ -87,6 +89,7 @@ function CreateActionForm({
   pageCountryCode?: string;
 }) {
   const { mutateAsync: uploadFile, isPending: isUploading } = useUploadFile();
+  const { data: btcPrice } = useBtcPrice();
   const allCountries = useMemo(() => getAllCountries(), []);
   const [countryPickerOpen, setCountryPickerOpen] = useState(false);
   const [selectedDefaultId, setSelectedDefaultId] = useState<string | null>(() => {
@@ -217,7 +220,7 @@ function CreateActionForm({
           <Label htmlFor="description">Description</Label>
           <Textarea
             id="description"
-            placeholder="Explain what submissions should look like, why this matters, and how the bounty will be paid out..."
+            placeholder="Explain the action, evidence, or outcome you want to inspire and what submissions should include..."
             className="min-h-[80px]"
             value={formData.description}
             onChange={(e) => setFormData({ ...formData, description: e.target.value })}
@@ -233,13 +236,18 @@ function CreateActionForm({
                 <SelectItem value="photo"><div className="flex items-center gap-2"><Camera className="h-4 w-4" /> Photo</div></SelectItem>
                 <SelectItem value="art"><div className="flex items-center gap-2"><Palette className="h-4 w-4" /> Art</div></SelectItem>
                 <SelectItem value="info"><div className="flex items-center gap-2"><Info className="h-4 w-4" /> Info</div></SelectItem>
-                <SelectItem value="action"><div className="flex items-center gap-2"><Megaphone className="h-4 w-4" /> Action</div></SelectItem>
+                <SelectItem value="action"><div className="flex items-center gap-2"><Megaphone className="h-4 w-4" /> Direct action</div></SelectItem>
               </SelectContent>
             </Select>
           </div>
           <div className="space-y-2">
-            <Label htmlFor="bounty">Bounty (sats)</Label>
-            <Input id="bounty" type="number" placeholder="10000" value={formData.bounty} onChange={(e) => setFormData({ ...formData, bounty: e.target.value })} />
+            <Label htmlFor="pledgeUsd">Pledge amount (USD)</Label>
+            <Input id="pledgeUsd" type="number" min={1} step="0.01" placeholder="100" value={formData.pledgeUsd} onChange={(e) => setFormData({ ...formData, pledgeUsd: e.target.value })} />
+            <p className="text-xs text-muted-foreground">
+              {usdToSats(Number(formData.pledgeUsd), btcPrice) > 0 && btcPrice
+                ? `${formatSats(usdToSats(Number(formData.pledgeUsd), btcPrice))} sats will be stored (${satsToUSDWhole(usdToSats(Number(formData.pledgeUsd), btcPrice), btcPrice)} at the current rate).`
+                : 'Agora stores the pledge in sats on Nostr.'}
+            </p>
           </div>
         </div>
 
@@ -258,7 +266,7 @@ function CreateActionForm({
           <Input id="deadline" type="date" className="w-full min-w-0" value={formData.deadline} onChange={(e) => setFormData({ ...formData, deadline: e.target.value })} />
           {formData.deadline && <Input id="time" type="time" className="w-full min-w-0" value={formData.time} onChange={(e) => setFormData({ ...formData, time: e.target.value })} />}
           <p className="text-xs text-muted-foreground">
-            {!formData.deadline && 'Defaults to 48 hours after start'}
+            {!formData.deadline && 'Open-ended. Add a deadline if urgency matters.'}
             {formData.deadline && !formData.time && ' • Ends at 23:59 local time'}
           </p>
         </div>
@@ -272,9 +280,9 @@ function CreateActionForm({
         )}
       </div>
       <div className="flex flex-col gap-2 p-4 pt-2">
-        <Button onClick={handleSubmit} disabled={!formData.title || !formData.description || !formData.bounty || isSubmitting} className="gap-2 w-full">
+        <Button onClick={handleSubmit} disabled={!formData.title || !formData.description || !formData.pledgeUsd || usdToSats(Number(formData.pledgeUsd), btcPrice) <= 0 || isSubmitting} className="gap-2 w-full">
           {isSubmitting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />}
-          Create action
+          Create pledge
         </Button>
         <Button variant="outline" onClick={onCancel} className="w-full">Cancel</Button>
       </div>
@@ -286,6 +294,7 @@ export function CreateActionDialog({ countryCode, communityATag, open, onOpenCha
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { user } = useCurrentUser();
   const { mutateAsync: createEvent } = useNostrPublish();
+  const { data: btcPrice } = useBtcPrice();
   const queryClient = useQueryClient();
   const isMobile = useIsMobile();
   const { toast } = useToast();
@@ -295,7 +304,7 @@ export function CreateActionDialog({ countryCode, communityATag, open, onOpenCha
     title: '',
     description: '',
     type: 'photo',
-    bounty: '',
+    pledgeUsd: '',
     startDate: '',
     startTime: '',
     deadline: '',
@@ -311,14 +320,16 @@ export function CreateActionDialog({ countryCode, communityATag, open, onOpenCha
     try {
       const now = Date.now();
       const slug = formData.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
-      const dTag = `${slug || 'action'}-${now}`;
+      const dTag = `${slug || 'pledge'}-${now}`;
+      const pledgeSats = usdToSats(Number(formData.pledgeUsd), btcPrice);
+      if (pledgeSats <= 0) throw new Error('Waiting for BTC/USD price to calculate the pledge amount.');
       const tags: string[][] = [
         ['d', dTag],
         ['title', formData.title],
         ['challenge-type', formData.type],
-        ['bounty', formData.bounty],
+        ['bounty', String(pledgeSats)],
         ['t', 'agora-action'],
-        ['alt', `Agora activist action: ${formData.title}`],
+        ['alt', `Agora pledge: ${formData.title}`],
       ];
       if (formData.selectedCountry) tags.push(['i', createCountryIdentifier(formData.selectedCountry.toUpperCase())]);
       if (communityATag) {
@@ -358,17 +369,17 @@ export function CreateActionDialog({ countryCode, communityATag, open, onOpenCha
       }
 
       setFormData({
-        title: '', description: '', type: 'photo', bounty: '',
+        title: '', description: '', type: 'photo', pledgeUsd: '',
         startDate: '', startTime: '', deadline: '', time: '',
         coverImage: DEFAULT_COVER_IMAGE,
         selectedCountry: countryCode || '',
         timezone: browserTimezone,
       });
       onOpenChange(false);
-      toast({ title: 'Action created' });
+      toast({ title: 'Pledge created' });
     } catch (error) {
-      console.error('Failed to create action:', error);
-      toast({ title: 'Failed to create action', variant: 'destructive' });
+      console.error('Failed to create pledge:', error);
+      toast({ title: 'Failed to create pledge', variant: 'destructive' });
     } finally {
       setIsSubmitting(false);
     }
@@ -377,17 +388,17 @@ export function CreateActionDialog({ countryCode, communityATag, open, onOpenCha
   if (!user) return null;
 
   const description = communityATag
-    ? 'New community action. You can optionally choose a country below.'
+    ? 'New community pledge. You can optionally choose a country below.'
     : countryCode
-    ? `New action for ${getGeoDisplayName(countryCode)}.`
-    : 'New action. You can optionally choose a country below.';
+    ? `New pledge for ${getGeoDisplayName(countryCode)}.`
+    : 'New pledge. You can optionally choose a country below.';
 
   if (isMobile) {
     return (
       <Drawer open={open} onOpenChange={onOpenChange}>
         <DrawerContent className="h-[85dvh] max-h-[85dvh]">
           <DrawerHeader className="text-left">
-            <DrawerTitle className="flex items-center gap-2"><Megaphone className="h-5 w-5 text-primary" /> Create action</DrawerTitle>
+            <DrawerTitle className="flex items-center gap-2"><Megaphone className="h-5 w-5 text-primary" /> Create pledge</DrawerTitle>
             <DrawerDescription>{description}</DrawerDescription>
           </DrawerHeader>
           <div className="overflow-y-auto flex-1 pb-safe">
@@ -402,7 +413,7 @@ export function CreateActionDialog({ countryCode, communityATag, open, onOpenCha
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-md sm:max-w-lg md:max-w-2xl max-h-[85vh] w-[calc(100vw-2rem)] sm:w-full overflow-hidden flex flex-col p-0">
         <DialogHeader className="px-6 pt-6 pb-4 flex-shrink-0">
-          <DialogTitle className="flex items-center gap-2"><Megaphone className="h-5 w-5 text-primary" /> Create action</DialogTitle>
+          <DialogTitle className="flex items-center gap-2"><Megaphone className="h-5 w-5 text-primary" /> Create pledge</DialogTitle>
           <DialogDescription>{description}</DialogDescription>
         </DialogHeader>
         <div className="overflow-y-auto overflow-x-hidden flex-1 min-h-0">
