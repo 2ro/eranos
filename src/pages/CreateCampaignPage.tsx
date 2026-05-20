@@ -18,7 +18,7 @@ import {
   X,
 } from 'lucide-react';
 
-import { PersonSearch } from '@/components/AddMemberDialog';
+import { PersonSearch } from '@/components/PersonSearch';
 import { CoverImageField } from '@/components/CoverImageField';
 import { FormSection } from '@/components/FormSection';
 import { OrganizationContextChip } from '@/components/OrganizationContextChip';

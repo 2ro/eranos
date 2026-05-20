@@ -60,7 +60,7 @@ function filterDiscoverEvents(events: NostrEvent[]): NostrEvent[] {
  *
  * Each page issues exactly one relay request (the union of all relevant
  * filters) to stay inside per-page rate budgets — the same pattern
- * `useWorldFeed` and `useCommunityActivityFeed` use.
+ * `useWorldFeed` uses.
  *
  * Returns the standard `useInfiniteQuery` surface plus a flattened
  * `events` list for convenient consumption.

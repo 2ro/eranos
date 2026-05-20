@@ -7,30 +7,35 @@ import {
   type CommunityMembership,
   type CommunityModeration,
   type ParsedCommunity,
-  BADGE_AWARD_KIND,
   EMPTY_MEMBERSHIP,
   EMPTY_MODERATION,
   EMPTY_RANK_MAP,
   REPORT_KIND,
   resolveCommunityModeration,
-  resolveMembership,
 } from '@/lib/communityUtils';
 import { queryAll } from '@/lib/queryAll';
 
 interface CommunityMembersResult {
-  /** Resolved membership with banned members removed. Use `members` to list active community members. */
+  /** Founder + moderators of the organization. */
   membership: CommunityMembership;
-  /** Resolved moderation data (bans, reports, content warnings). */
+  /** Resolved moderation data (content bans and soft reports). */
   moderation: CommunityModeration;
-  /** Flat authority lookup before moderation overlay. Includes banned members. Used for authority checks only — do NOT use to list active members. */
+  /** Flat authority lookup keyed by pubkey. Includes founder + every moderator. */
   rankMap: Map<string, CommunityMember>;
 }
 
 /**
- * Fetch and resolve flat membership and moderation state for a community.
+ * Resolve the founder/moderator roster and active moderation state for an
+ * organization.
  *
- * Queries founder/moderator-authored membership awards (kind 8), then
- * queries member-authored reports and bans (kind 1984).
+ * Agora's organization model has only two trust levels — founder (kind
+ * 34550 author) and moderators (`p` tags with `moderator` role on that
+ * event). Both are read directly from the parsed community; no separate
+ * relay query is needed for membership.
+ *
+ * The hook still queries kind 1984 moderation events scoped to this
+ * organization so the UI can hide content-banned posts and surface soft
+ * reports as content warnings.
  */
 export function useCommunityMembers(community: ParsedCommunity | null | undefined) {
   const { nostr } = useNostr();
@@ -48,47 +53,30 @@ export function useCommunityMembers(community: ParsedCommunity | null | undefine
 
       const combinedSignal = AbortSignal.any([signal, AbortSignal.timeout(10_000)]);
 
-      const awardAuthors = [community.founderPubkey, ...community.moderatorPubkeys];
-
-      // Exhaustive paging: awards and reports are unbounded sets that grow
-      // with the community. `queryAll` pages with `until` until the relay
-      // drains, capped at 5_000 events / 10 pages so worst-case cost is
-      // bounded. See src/lib/queryAll.ts.
-      const awards = community.memberBadgeATag
-        ? await queryAll(
-          nostr,
-          { kinds: [BADGE_AWARD_KIND], authors: awardAuthors, '#a': [community.memberBadgeATag], limit: 500 },
-          { signal: combinedSignal },
-        )
-        : [];
-
-      // Step 1-2: Resolve full membership (needed for authority checks)
-      const fullMembership = resolveMembership(community, awards);
-
-      // Build authority lookup for checks (includes members even if later banned).
+      // Authority roster: founder (rank 0) + every listed moderator (rank 0).
+      // Rank is retained so legacy helpers (canBanTarget, getViewerAuthority)
+      // keep working with a uniform shape even though only one tier exists.
       const rankMap = new Map<string, CommunityMember>();
-      for (const m of fullMembership.members) {
-        rankMap.set(m.pubkey, m);
+      rankMap.set(community.founderPubkey, { pubkey: community.founderPubkey, rank: 0 });
+      for (const modPk of community.moderatorPubkeys) {
+        if (rankMap.has(modPk)) continue;
+        rankMap.set(modPk, { pubkey: modPk, rank: 0 });
       }
 
-      const reportAuthors = fullMembership.members.map((member) => member.pubkey);
+      // Moderation reports: paginate so an organization with a long history
+      // of moderation actions still loads completely. `queryAll` caps the
+      // total per `src/lib/queryAll.ts`.
       const reports = await queryAll(
         nostr,
-        { kinds: [REPORT_KIND], authors: reportAuthors, '#A': [community.aTag], limit: 500 },
+        { kinds: [REPORT_KIND], authors: [...rankMap.keys()], '#A': [community.aTag], limit: 500 },
         { signal: combinedSignal },
       );
 
-      // Step 3: Resolve moderation using the flat membership map. The resolver
-      // filters by `A` tag internally; we pass all reports as-is since
-      // the relay query already scoped them to this community.
       const moderation = resolveCommunityModeration(community.aTag, reports, rankMap);
 
-      // Step 4: Apply moderation overlay — filter banned members from the
-      // already-computed membership.
       const membership: CommunityMembership = {
-        members: fullMembership.members.filter(
-          (m) => !moderation.bannedPubkeys.has(m.pubkey),
-        ),
+        founderPubkey: community.founderPubkey,
+        moderatorPubkeys: community.moderatorPubkeys,
       };
 
       return { membership, moderation, rankMap };
@@ -97,7 +85,6 @@ export function useCommunityMembers(community: ParsedCommunity | null | undefine
     staleTime: 2 * 60_000,
   });
 
-  // Provide backward-compatible access to the membership data
   return useMemo(() => ({
     data: query.data?.membership,
     moderation: query.data?.moderation ?? EMPTY_MODERATION,

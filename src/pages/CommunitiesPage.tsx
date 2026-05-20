@@ -1,73 +1,34 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useQueryClient } from '@tanstack/react-query';
 import { useSeoMeta } from '@unhead/react';
-import { Globe2, HandHeart, Loader2, PlusCircle, Users } from 'lucide-react';
-import type { NostrEvent } from '@nostrify/nostrify';
-import { useInView } from 'react-intersection-observer';
+import { Globe2, HandHeart, PlusCircle, Users } from 'lucide-react';
 
-import { FeedEmptyState } from '@/components/FeedEmptyState';
 import { HeroAtmosphere } from '@/components/HeroAtmosphere';
 import { HeroBanner } from '@/components/HeroBanner';
 import { LoginArea } from '@/components/auth/LoginArea';
-import { MembersOnlyToggle } from '@/components/MembersOnlyToggle';
-import { NoteCard } from '@/components/NoteCard';
-import { FeedCard } from '@/components/FeedCard';
-import { PullToRefresh } from '@/components/PullToRefresh';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
-import { CommunityModerationContext, type CommunityModerationContextValue } from '@/contexts/CommunityModerationContext';
 import { HorizontalScroll } from '@/components/discovery/HorizontalScroll';
 import { CommunityMiniCard, CommunityMiniCardSkeleton } from '@/components/discovery/CommunityMiniCard';
 import { SectionHeader } from '@/components/discovery/SectionHeader';
-import { COMMUNITY_DEFINITION_KIND, EMPTY_MODERATION } from '@/lib/communityUtils';
 import { COOL_PALETTE } from '@/lib/hopePalette';
 import { cn } from '@/lib/utils';
 import { useLayoutOptions } from '@/contexts/LayoutContext';
 import { useAppContext } from '@/hooks/useAppContext';
-import { useCommunityActivityFeed } from '@/hooks/useCommunityActivityFeed';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useFeaturedOrganizations } from '@/hooks/useFeaturedOrganizations';
 import { useGlobalActivity } from '@/hooks/useGlobalActivity';
 import { useGlobalDonations } from '@/hooks/useGlobalDonations';
 import { useManageableOrganizations } from '@/hooks/useManageableOrganizations';
-import { useMembersOnlyFilter } from '@/hooks/useMembersOnlyFilter';
 import { useToast } from '@/hooks/useToast';
 import { formatSatsShort } from '@/lib/formatCampaignAmount';
-
-// ─── Skeletons ─────────────────────────────────────────────────────────────────
-
-function NoteCardSkeleton() {
-  return (
-    <div className="px-4 py-3 border-b border-border">
-      <div className="flex items-center gap-3">
-        <Skeleton className="size-11 rounded-full shrink-0" />
-        <div className="min-w-0 space-y-1.5">
-          <Skeleton className="h-4 w-28" />
-          <Skeleton className="h-3 w-36" />
-        </div>
-      </div>
-      <div className="mt-2 space-y-1.5">
-        <Skeleton className="h-4 w-full" />
-        <Skeleton className="h-4 w-4/5" />
-      </div>
-      <div className="flex items-center gap-6 mt-3 -ml-2">
-        <Skeleton className="h-4 w-8" />
-        <Skeleton className="h-4 w-8" />
-        <Skeleton className="h-4 w-8" />
-        <Skeleton className="h-4 w-8" />
-      </div>
-    </div>
-  );
-}
 
 // ─── Page ──────────────────────────────────────────────────────────────────────
 
 export function CommunitiesPage() {
   const { config } = useAppContext();
   const { user } = useCurrentUser();
-  const queryClient = useQueryClient();
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -97,7 +58,7 @@ export function CommunitiesPage() {
     <main className="min-h-screen pb-16 sidebar:pb-0">
       <CommunitiesHero onCreateCommunity={handleCreateCommunity} />
 
-      <div className="max-w-5xl mx-auto space-y-2 sm:space-y-4">
+      <div className="max-w-5xl mx-auto space-y-2 sm:space-y-4 pb-8">
         <section className="pt-6">
           <SectionHeader title="My organizations" className="pb-3 sm:px-6" />
           <MyCommunitiesShelf onCreateCommunity={handleCreateCommunity} />
@@ -109,31 +70,6 @@ export function CommunitiesPage() {
             className="pb-3 sm:px-6"
           />
           <FeaturedOrganizationsShelf />
-        </section>
-
-        <section id="community-activity" className="pt-4 pb-8">
-          <div className="max-w-2xl mx-auto">
-            <div className="px-4 sm:px-6 mb-3 flex items-end justify-between gap-4">
-              <div>
-                <h2 className="text-2xl sm:text-3xl font-bold tracking-tight">
-                  Voices from everywhere
-                </h2>
-                <p className="text-sm text-muted-foreground mt-1 max-w-xl">
-                  New posts, campaigns, pledges, and definition updates from the organizations you belong to.
-                </p>
-              </div>
-              {user && <MembersOnlyToggle className="shrink-0" />}
-            </div>
-
-            <ActivitiesFeed
-              onRefresh={() =>
-                queryClient.invalidateQueries({
-                  queryKey: ['community-activity-feed'],
-                  exact: false,
-                })
-              }
-            />
-          </div>
         </section>
       </div>
     </main>
@@ -435,129 +371,5 @@ function EmptyShelf({
         </CardContent>
       </Card>
     </div>
-  );
-}
-
-// ═══════════════════════════════════════════════════════════════════════════════
-// Activities feed
-// ═══════════════════════════════════════════════════════════════════════════════
-
-/** Extract the community a-tag from an event (uppercase A for NIP-22, lowercase a with 34550: prefix for goals). */
-function getCommunityATag(event: NostrEvent): string | undefined {
-  return event.tags.find(([n]) => n === 'A')?.[1]
-    ?? event.tags.find(([n, v]) => n === 'a' && v?.startsWith('34550:'))?.[1];
-}
-
-function ActivitiesFeed({ onRefresh }: { onRefresh: () => Promise<void> }) {
-  const { user } = useCurrentUser();
-  const {
-    data: activityEvents,
-    isLoading,
-    moderationByATag,
-    rankMapByATag,
-    hasNextPage,
-    isFetchingNextPage,
-    fetchNextPage,
-  } = useCommunityActivityFeed();
-  const { membersOnly } = useMembersOnlyFilter();
-  const { ref: scrollRef, inView } = useInView({ threshold: 0, rootMargin: '400px' });
-
-  useEffect(() => {
-    if (inView && hasNextPage && !isFetchingNextPage) {
-      fetchNextPage();
-    }
-  }, [inView, hasNextPage, isFetchingNextPage, fetchNextPage]);
-
-  // Build per-community context values for NoteMoreMenu moderation actions.
-  // Keyed by community A tag — each NoteCard is wrapped in its own provider.
-  const contextByATag = useMemo(() => {
-    const map = new Map<string, CommunityModerationContextValue>();
-    for (const [aTag, rankMap] of rankMapByATag) {
-      const moderation = moderationByATag.get(aTag) ?? EMPTY_MODERATION;
-      map.set(aTag, { communityATag: aTag, moderation, rankMap });
-    }
-    return map;
-  }, [moderationByATag, rankMapByATag]);
-
-  // Apply the members-only presentation filter. Community definitions
-  // (kind 34550) are never filtered — they represent the community itself,
-  // not user-generated content. Only community-scoped content (kind 1111
-  // and future kinds) is filtered to authored-by-member when the toggle
-  // is active, matching the NIP's canonical-author guidance.
-  const displayedEvents = useMemo(() => {
-    if (!activityEvents) return activityEvents;
-    if (!membersOnly) return activityEvents;
-    return activityEvents.filter((event) => {
-      if (event.kind === COMMUNITY_DEFINITION_KIND) return true;
-      const aTag = getCommunityATag(event);
-      if (!aTag) return true; // No community scope — pass through
-      const rankMap = rankMapByATag.get(aTag);
-      if (!rankMap) return true; // Moderation data not resolved — avoid hiding
-      return rankMap.has(event.pubkey);
-    });
-  }, [activityEvents, membersOnly, rankMapByATag]);
-
-  if (!user) {
-    return (
-      <Card className="border-dashed mx-4 sm:mx-6">
-        <CardContent className="py-12 px-8 text-center space-y-4 flex flex-col items-center">
-          <div className="p-4 rounded-full bg-primary/10">
-            <Users className="size-8 text-primary" />
-          </div>
-          <div className="space-y-2 max-w-xs">
-            <h3 className="text-xl font-bold">Organization activity</h3>
-            <p className="text-muted-foreground text-sm">
-              Log in to see activity from your organizations.
-            </p>
-          </div>
-          <LoginArea className="max-w-60" />
-        </CardContent>
-      </Card>
-    );
-  }
-
-  return (
-    <PullToRefresh onRefresh={onRefresh}>
-      <>
-        {isLoading ? (
-          <FeedCard className="mt-2 divide-y divide-border/60">
-            {Array.from({ length: 5 }).map((_, i) => (
-              <NoteCardSkeleton key={i} />
-            ))}
-          </FeedCard>
-        ) : displayedEvents && displayedEvents.length > 0 ? (
-          <FeedCard className="mt-2">
-            {displayedEvents.map((event) => {
-              const aTag = getCommunityATag(event);
-              const ctx = aTag ? contextByATag.get(aTag) ?? null : null;
-              return (
-                <CommunityModerationContext.Provider key={event.id} value={ctx}>
-                  <NoteCard event={event} />
-                </CommunityModerationContext.Provider>
-              );
-            })}
-          </FeedCard>
-        ) : membersOnly && activityEvents && activityEvents.length > 0 ? (
-          <FeedEmptyState message="No activity from members of your organizations yet. Toggle the shield icon to see all organization activity." />
-        ) : (
-          <div className="py-20 px-8 flex flex-col items-center gap-6 text-center">
-            <div className="p-4 rounded-full bg-primary/10">
-              <Users className="size-8 text-primary" />
-            </div>
-            <div className="space-y-2 max-w-xs">
-              <h2 className="text-xl font-bold">No activity yet</h2>
-              <p className="text-muted-foreground text-sm">
-                Browse the featured organizations above, or create your own with the button at the top of the page.
-              </p>
-            </div>
-          </div>
-        )}
-        {!isLoading && hasNextPage && (
-          <div ref={scrollRef} className="py-4 flex justify-center">
-            {isFetchingNextPage && <Loader2 className="size-5 animate-spin text-muted-foreground" />}
-          </div>
-        )}
-      </>
-    </PullToRefresh>
   );
 }

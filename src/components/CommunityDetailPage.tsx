@@ -2,7 +2,6 @@ import { useMemo, useCallback, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { nip19 } from 'nostr-tools';
 import {
-  Award,
   CalendarDays,
   ChevronLeft,
   Crown,
@@ -13,7 +12,6 @@ import {
   MoreVertical,
   Pencil,
   Shield,
-  ShieldBan,
   Share2,
   UserCheck,
   UserMinus,
@@ -22,7 +20,6 @@ import {
 } from 'lucide-react';
 import type { NostrEvent, NostrMetadata } from '@nostrify/nostrify';
 
-import { AddMemberDialog } from '@/components/AddMemberDialog';
 import { CampaignCard } from '@/components/CampaignCard';
 import { CreateCommunityEventDialog } from '@/components/CreateCommunityEventDialog';
 import { PeopleAvatarStack } from '@/components/PeopleAvatarStack';
@@ -33,13 +30,10 @@ import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Skeleton } from '@/components/ui/skeleton';
-import { BanConfirmDialog } from '@/components/BanConfirmDialog';
 import { DonateDialog } from '@/components/DonateDialog';
 import { NoteContent } from '@/components/NoteContent';
-import { CommunityBadgeEditorDialog } from '@/components/CommunityBadgePanel';
 import { FollowToggleButton } from '@/components/FollowButton';
 import { InteractionsModal, type InteractionTab } from '@/components/InteractionsModal';
-import { MembersOnlyToggle } from '@/components/MembersOnlyToggle';
 import { NoteMoreMenu } from '@/components/NoteMoreMenu';
 import { ReplyComposeModal } from '@/components/ReplyComposeModal';
 import { ThreadedReplyList, type ReplyNode } from '@/components/ThreadedReplyList';
@@ -51,7 +45,6 @@ import { useCommunityBookmarks } from '@/hooks/useCommunityBookmarks';
 import { useCommunityMembers } from '@/hooks/useCommunityMembers';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useEventStats } from '@/hooks/useTrending';
-import { useMembersOnlyFilter } from '@/hooks/useMembersOnlyFilter';
 import { useNow } from '@/hooks/useNow';
 import {
   useOrganizationCampaigns,
@@ -62,7 +55,7 @@ import { useProfileUrl } from '@/hooks/useProfileUrl';
 import { useToast } from '@/hooks/useToast';
 import { CommunityModerationContext } from '@/contexts/CommunityModerationContext';
 import { useLayoutOptions } from '@/contexts/LayoutContext';
-import { applyCommunityModerationToEvents, canBanTarget, getViewerAuthority, parseCommunityEvent, type CommunityMember } from '@/lib/communityUtils';
+import { applyCommunityModerationToEvents, parseCommunityEvent } from '@/lib/communityUtils';
 import type { ParsedCampaign } from '@/lib/campaign';
 import type { Action } from '@/hooks/useActions';
 import { formatNumber } from '@/lib/formatNumber';
@@ -72,7 +65,7 @@ import { cn } from '@/lib/utils';
 
 // ── Sub-components ────────────────────────────────────────────────────────────
 
-function PersonRow({ pubkey, label, size = 'md', onBan }: { pubkey: string; label?: string; size?: 'sm' | 'md'; onBan?: () => void }) {
+function PersonRow({ pubkey, label, size = 'md' }: { pubkey: string; label?: string; size?: 'sm' | 'md' }) {
   const { data } = useAuthor(pubkey);
   const metadata: NostrMetadata | undefined = data?.metadata;
   const name = metadata?.display_name || metadata?.name || genUserName(pubkey);
@@ -99,16 +92,6 @@ function PersonRow({ pubkey, label, size = 'md', onBan }: { pubkey: string; labe
           <Badge variant="secondary" className="ml-auto capitalize text-xs shrink-0">{label}</Badge>
         )}
       </Link>
-      {onBan && (
-        <button
-          onClick={(e) => { e.stopPropagation(); onBan(); }}
-          className="p-1.5 rounded-full text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors shrink-0"
-          aria-label="Ban from community"
-          title="Ban from community"
-        >
-          <ShieldBan className="size-4" />
-        </button>
-      )}
     </div>
   );
 }
@@ -419,10 +402,6 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
   const { user } = useCurrentUser();
   const { btcPrice } = useBitcoinWallet();
 
-  // ── Member ban dialog state ────────────────────────────────────────────────
-  const [banDialogOpen, setBanDialogOpen] = useState(false);
-  const [banTargetPubkey, setBanTargetPubkey] = useState<string | null>(null);
-
   // ── Tab + FAB state ────────────────────────────────────────────────────────
   // ── FAB + dialog state ─────────────────────────────────────────────────────
   // The detail page is single-column now (no tab strip), so the FAB is
@@ -433,8 +412,6 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
   const [composeOpen, setComposeOpen] = useState(false);
   const [eventDialogOpen, setEventDialogOpen] = useState(false);
   const [membersDialogOpen, setMembersDialogOpen] = useState(false);
-  const [addMembersDialogOpen, setAddMembersDialogOpen] = useState(false);
-  const [badgeDialogOpen, setBadgeDialogOpen] = useState(false);
   const [descriptionDialogOpen, setDescriptionDialogOpen] = useState(false);
   const [donateOpen, setDonateOpen] = useState(false);
   const [replyOpen, setReplyOpen] = useState(false);
@@ -483,11 +460,19 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
   }), [description, event.id, event.pubkey, event.created_at]);
 
   // ── Members ─────────────────────────────────────────────────────────────────
-  const { data: membership, moderation, rankMap, isLoading: membersLoading } = useCommunityMembers(community);
-  const viewerMember = user ? getViewerAuthority(user.pubkey, rankMap, moderation) : undefined;
+  // Agora's organization model has only two trust tiers — founder and
+  // moderators. The "membership" list shown in the hero / members dialog
+  // is therefore exactly that roster, read directly from the parsed
+  // community. `useCommunityMembers` still resolves moderation state
+  // (content bans, reports) used by the comment thread below.
+  const { moderation, rankMap, isLoading: membersLoading } = useCommunityMembers(community);
 
   const communityDonationTarget = useMemo<ParsedCampaign | null>(() => {
-    if (!community || !membership || membership.members.length === 0) return null;
+    if (!community) return null;
+    const recipients = [
+      { pubkey: community.founderPubkey, weight: 1 },
+      ...community.moderatorPubkeys.map((pubkey) => ({ pubkey, weight: 1 })),
+    ];
     return {
       event,
       pubkey: event.pubkey,
@@ -499,18 +484,16 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
       image: community.image,
       category: 'community',
       tags: ['community'],
-      recipients: membership.members.map((member) => ({
-        pubkey: member.pubkey,
-        weight: 1,
-      })),
+      recipients,
       createdAt: event.created_at,
       archived: false,
     };
-  }, [community, membership, event]);
+  }, [community, event]);
 
-  // Founder can add moderators + members; moderators (rank 0) can add members
+  // Only the founder can edit organization metadata. Moderators can
+  // moderate content via the community context but don't get the
+  // "Edit community" action.
   const isFounder = !!user && user.pubkey === event.pubkey;
-  const canAddMembers = isFounder || (!!viewerMember && viewerMember.rank === 0);
 
   // NIP-51 kind 10004 is the standard Communities list. In the UI this is
   // presented as following a community.
@@ -519,41 +502,44 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
     toggleBookmark: toggleCommunityFollow,
   } = useCommunityBookmarks();
   const savedCommunityFollow = !!communityATag && isCommunitySaved(communityATag);
-  const membershipFollow = isFounder || !!viewerMember;
+  const isModerator = !!user && community
+    ? community.moderatorPubkeys.includes(user.pubkey)
+    : false;
+  const membershipFollow = isFounder || isModerator;
   const communityFollowed = membershipFollow || savedCommunityFollow;
   const handleToggleFollow = useCallback(() => {
     if (!user || !communityATag || toggleCommunityFollow.isPending) return;
     if (membershipFollow) {
-      toast({ title: isFounder ? 'You founded this community' : 'You are already a member of this community' });
+      toast({ title: isFounder ? 'You founded this organization' : 'You moderate this organization' });
       return;
     }
     toggleCommunityFollow.mutate({ aTag: communityATag });
   }, [user, communityATag, toggleCommunityFollow, membershipFollow, isFounder, toast]);
 
-  // Batch-fetch profiles for all members
-  const allMemberPubkeys = useMemo(
-    () => membership?.members.map((m) => m.pubkey) ?? [],
-    [membership],
-  );
-  useAuthors(allMemberPubkeys);
+  // Founder + moderator pubkeys for the avatar stack + members dialog.
+  // Founder always first; moderators in their listed order.
+  const leadershipPubkeys = useMemo<string[]>(() => {
+    if (!community) return [];
+    return [community.founderPubkey, ...community.moderatorPubkeys];
+  }, [community]);
+  useAuthors(leadershipPubkeys);
 
+  // Single section now — founder + moderators are all "Leadership".
+  // Members no longer exist in the organization model.
   const memberSections = useMemo(() => {
-    if (!membership) return [];
-    const leadership: CommunityMember[] = [];
-    const members: CommunityMember[] = [];
-    for (const member of membership.members) {
-      if (member.rank === 0) leadership.push(member);
-      else members.push(member);
-    }
-    return [
-      { key: 'leadership', label: 'Leadership', members: leadership },
-      { key: 'members', label: 'Members', members },
-    ].filter((section) => section.members.length > 0);
-  }, [membership]);
+    if (!community || leadershipPubkeys.length === 0) return [];
+    return [{
+      key: 'leadership',
+      label: 'Leadership',
+      members: leadershipPubkeys.map((pubkey) => ({
+        pubkey,
+        isFounder: pubkey === community.founderPubkey,
+      })),
+    }];
+  }, [community, leadershipPubkeys]);
 
   // ── Comments (NIP-22 on the community event) ───────────────────────────────
   const { data: commentsData, isLoading: commentsLoading } = useComments(event, 500);
-  const { membersOnly } = useMembersOnlyFilter();
 
   // ── Official activity shelves ─────────────────────────────────────────────
   // Author-filtered to founder + moderators (see useOrganizationActivity).
@@ -598,15 +584,11 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
     if (!commentsData) return [];
     const topLevel = commentsData.topLevelComments ?? [];
 
-    // Filter: omit banned events and posts by banned members, then optionally
-    // restrict to validated members when the "members only" toggle is
-    // active. The member filter is a presentation-layer opt-in — the NIP
-    // lists it as a MAY feature, so users default to seeing everything.
-    const applyModeration = (events: NostrEvent[]): NostrEvent[] => {
-      const moderated = applyCommunityModerationToEvents(events, moderation);
-      if (!membersOnly) return moderated;
-      return moderated.filter((ev) => rankMap.has(ev.pubkey));
-    };
+    // Filter: omit content-banned posts. Moderation is applied by founder
+    // and moderators only; non-moderator kind 1984 events are dropped at
+    // the resolver level so there's nothing to filter beyond bans here.
+    const applyModeration = (events: NostrEvent[]): NostrEvent[] =>
+      applyCommunityModerationToEvents(events, moderation);
 
     const buildNode = (ev: NostrEvent): ReplyNode => {
       const allChildren = applyModeration(commentsData.getDirectReplies(ev.id) ?? []);
@@ -627,7 +609,7 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
     return applyModeration([...topLevel])
       .sort((a, b) => b.created_at - a.created_at)
       .map((r) => buildNode(r));
-  }, [commentsData, moderation, membersOnly, rankMap]);
+  }, [commentsData, moderation]);
 
   // ── Share handler ───────────────────────────────────────────────────────────
   const handleShare = useCallback(async () => {
@@ -762,17 +744,21 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
                   type="button"
                   onClick={() => setMembersDialogOpen(true)}
                   className="flex items-center gap-2 -ml-1 px-1 py-1 rounded-md hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80 transition-colors min-w-0"
-                  aria-label="Show all members"
+                  aria-label="Show leadership"
                 >
                   <PeopleAvatarStack
-                    pubkeys={allMemberPubkeys}
+                    pubkeys={leadershipPubkeys}
                     maxVisible={6}
                     size="sm"
                     className="[&_.ring-2]:ring-black/40 pointer-events-none"
                   />
-                  {allMemberPubkeys.length > 0 && (
+                  {leadershipPubkeys.length > 0 && (
                     <span className="text-xs font-medium text-white/90 [text-shadow:0_1px_3px_rgba(0,0,0,0.7)] truncate">
-                      {allMemberPubkeys.length} member{allMemberPubkeys.length !== 1 ? 's' : ''}
+                      {(() => {
+                        const modCount = community?.moderatorPubkeys.length ?? 0;
+                        if (modCount === 0) return 'Founder';
+                        return `Founder + ${modCount} moderator${modCount === 1 ? '' : 's'}`;
+                      })()}
                     </span>
                   )}
                 </button>
@@ -800,9 +786,6 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
                 </div>
 
                 <div className="flex items-center gap-0.5 shrink-0 [text-shadow:none]">
-                  <MembersOnlyToggle
-                    className="text-white/90 hover:text-white hover:bg-white/15 data-[state=on]:text-white"
-                  />
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                       <button
@@ -816,34 +799,22 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
                     <DropdownMenuContent align="end" side="top" sideOffset={6} className="min-w-[180px]">
                       <DropdownMenuItem onSelect={() => setMembersDialogOpen(true)}>
                         <Users className="size-4 mr-2" />
-                        View members
+                        View leadership
                       </DropdownMenuItem>
-                      {canAddMembers && community && (
-                        <DropdownMenuItem onSelect={() => setAddMembersDialogOpen(true)}>
-                          <UserPlus className="size-4 mr-2" />
-                          Add members
-                        </DropdownMenuItem>
-                      )}
                       {isFounder && community && (
-                        <>
-                          <DropdownMenuItem onSelect={() => setBadgeDialogOpen(true)}>
-                            <Award className="size-4 mr-2" />
-                            Edit badge
-                          </DropdownMenuItem>
-                          <DropdownMenuItem
-                            onSelect={() => {
-                              const naddr = nip19.naddrEncode({
-                                kind: event.kind,
-                                pubkey: event.pubkey,
-                                identifier: community.dTag,
-                              });
-                              navigate(`/communities/new?edit=${naddr}`);
-                            }}
-                          >
-                            <Pencil className="size-4 mr-2" />
-                            Edit community
-                          </DropdownMenuItem>
-                        </>
+                        <DropdownMenuItem
+                          onSelect={() => {
+                            const naddr = nip19.naddrEncode({
+                              kind: event.kind,
+                              pubkey: event.pubkey,
+                              identifier: community.dTag,
+                            });
+                            navigate(`/communities/new?edit=${naddr}`);
+                          }}
+                        >
+                          <Pencil className="size-4 mr-2" />
+                          Edit organization
+                        </DropdownMenuItem>
                       )}
                     </DropdownMenuContent>
                   </DropdownMenu>
@@ -960,14 +931,10 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
                     className="block w-full rounded-2xl border border-dashed border-border/80 bg-card/50 px-6 py-10 text-center hover:bg-card hover:border-primary/40 transition-colors"
                   >
                     <p className="text-base font-medium text-foreground">
-                      {membersOnly && (commentsData?.topLevelComments?.length ?? 0) > 0
-                        ? 'No comments from members yet'
-                        : 'No comments yet'}
+                      No comments yet
                     </p>
                     <p className="mt-1 text-sm text-muted-foreground">
-                      {membersOnly && (commentsData?.topLevelComments?.length ?? 0) > 0
-                        ? 'Toggle the shield icon in the hero to see everything.'
-                        : 'Be the first to start a discussion.'}
+                      Be the first to start a discussion.
                     </p>
                   </button>
                 )}
@@ -1006,15 +973,15 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
         </DialogContent>
       </Dialog>
 
-      {/* Members dialog — opened from the avatar stack or overflow menu. */}
+      {/* Leadership dialog — opened from the avatar stack or overflow menu. */}
       <Dialog open={membersDialogOpen} onOpenChange={setMembersDialogOpen}>
         <DialogContent className="max-w-lg max-h-[85vh] flex flex-col overflow-hidden p-0 gap-0">
           <DialogHeader className="px-5 pt-5 pb-3 border-b border-border shrink-0">
             <DialogTitle className="flex items-center gap-2">
               <Users className="size-5" />
-              Members
-              {allMemberPubkeys.length > 0 && (
-                <span className="text-muted-foreground font-normal text-sm">({allMemberPubkeys.length})</span>
+              Leadership
+              {leadershipPubkeys.length > 0 && (
+                <span className="text-muted-foreground font-normal text-sm">({leadershipPubkeys.length})</span>
               )}
             </DialogTitle>
           </DialogHeader>
@@ -1024,7 +991,7 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
               <MembersSkeleton />
             ) : memberSections.length === 0 ? (
               <div className="py-12 text-center text-muted-foreground text-sm px-5">
-                No members found.
+                No leadership found.
               </div>
             ) : (
               <div className="divide-y divide-border">
@@ -1036,27 +1003,14 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
                       <span className="text-muted-foreground/60 font-normal">({members.length})</span>
                     </h3>
                     <div className="space-y-0.5">
-                      {members.map((m) => {
-                        let roleLabel: string | undefined;
-                        if (m.rank === 0) {
-                          roleLabel = m.pubkey === event.pubkey ? 'Founder' : 'Moderator';
-                        }
-                        const canBanMember = viewerMember
-                          && m.pubkey !== user?.pubkey
-                          && canBanTarget(viewerMember, m);
-                        return (
-                          <PersonRow
-                            key={m.pubkey}
-                            pubkey={m.pubkey}
-                            label={roleLabel}
-                            size="sm"
-                            onBan={canBanMember ? () => {
-                              setBanTargetPubkey(m.pubkey);
-                              setBanDialogOpen(true);
-                            } : undefined}
-                          />
-                        );
-                      })}
+                      {members.map((m) => (
+                        <PersonRow
+                          key={m.pubkey}
+                          pubkey={m.pubkey}
+                          label={m.isFounder ? 'Founder' : 'Moderator'}
+                          size="sm"
+                        />
+                      ))}
                     </div>
                   </section>
                 ))}
@@ -1065,42 +1019,6 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
           </div>
         </DialogContent>
       </Dialog>
-
-      {/* Add members dialog — founder/moderator only. */}
-      {canAddMembers && community && (
-        <AddMemberDialog
-          open={addMembersDialogOpen}
-          onOpenChange={setAddMembersDialogOpen}
-          communityEvent={event}
-          community={community}
-          isFounder={isFounder}
-          existingMemberPubkeys={allMemberPubkeys}
-        />
-      )}
-
-      {/* Member badge editor — founder only. */}
-      {isFounder && community && (
-        <CommunityBadgeEditorDialog
-          open={badgeDialogOpen}
-          onOpenChange={setBadgeDialogOpen}
-          communityEvent={event}
-          community={community}
-        />
-      )}
-
-      {/* Member ban confirmation dialog */}
-      {banTargetPubkey && communityATag && (
-        <BanConfirmDialog
-          mode="member"
-          targetPubkey={banTargetPubkey}
-          communityATag={communityATag}
-          open={banDialogOpen}
-          onOpenChange={(open) => {
-            setBanDialogOpen(open);
-            if (!open) setBanTargetPubkey(null);
-          }}
-        />
-      )}
 
       {/* FAB-triggered compose modal — used by the \"New post\" FAB item.
           Composes a NIP-22 reply against the community event itself. */}
