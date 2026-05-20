@@ -566,3 +566,92 @@ export function getCommunityATag(event: NostrEvent): string {
   const dTag = event.tags.find(([n]) => n === 'd')?.[1] ?? '';
   return `${COMMUNITY_DEFINITION_KIND}:${event.pubkey}:${dTag}`;
 }
+
+// ─── Organization role helpers (founder + moderator model) ───────────────────
+//
+// Agora treats NIP-72 communities as "Organizations" with only two trust
+// levels: the founder (event author) and the moderators listed in the kind
+// 34550 event's `p` tags with role "moderator". The badge-award membership
+// layer is no longer part of Agora's product model. These helpers centralize
+// the role checks so callers don't reach into ParsedCommunity tag arrays
+// directly.
+
+/**
+ * Return whether the given pubkey is the organization's founder. The founder
+ * is always the publisher of the kind 34550 event.
+ */
+export function isOrganizationFounder(
+  community: ParsedCommunity,
+  pubkey: string | undefined,
+): boolean {
+  return !!pubkey && community.founderPubkey === pubkey;
+}
+
+/**
+ * Return whether the given pubkey is one of the organization's moderators.
+ * Moderators are pubkeys listed in the kind 34550 event's `p` tags with
+ * role "moderator". The founder is intentionally NOT included here — use
+ * {@link canModerateOrganization} for the broader "founder OR moderator"
+ * check that gates moderation actions.
+ */
+export function isOrganizationModerator(
+  community: ParsedCommunity,
+  pubkey: string | undefined,
+): boolean {
+  return !!pubkey && community.moderatorPubkeys.includes(pubkey);
+}
+
+/**
+ * Only the founder can edit organization metadata (name, description,
+ * cover image, moderator roster). This mirrors NIP-72's implicit rule that
+ * a community definition is a replaceable event keyed on its author —
+ * only the author can publish a new version.
+ */
+export function canEditOrganization(
+  community: ParsedCommunity,
+  pubkey: string | undefined,
+): boolean {
+  return isOrganizationFounder(community, pubkey);
+}
+
+/**
+ * Both founder and moderators can moderate the organization feed — hide
+ * comments, ban users from appearing, dismiss content. Editing the
+ * organization itself is founder-only (see {@link canEditOrganization}).
+ */
+export function canModerateOrganization(
+  community: ParsedCommunity,
+  pubkey: string | undefined,
+): boolean {
+  return (
+    isOrganizationFounder(community, pubkey) ||
+    isOrganizationModerator(community, pubkey)
+  );
+}
+
+/**
+ * Return the list of pubkeys whose campaigns, pledges, and calendar events
+ * Agora should treat as "official" activity for the organization — the
+ * founder plus every listed moderator.
+ *
+ * Agora restricts creation of organization-tagged campaigns / pledges /
+ * events in the client to this set, but anyone could technically publish
+ * a kind 30223 / 36639 / 31922 / 31923 with the organization's uppercase
+ * `A` root-scope tag outside the client. Queries that surface "official"
+ * organization activity MUST pass this list as the `authors` filter so
+ * forged events from non-moderators never reach the UI.
+ *
+ * Returns a deduplicated array preserving founder-first ordering.
+ */
+export function getOrganizationOfficialAuthors(community: ParsedCommunity): string[] {
+  const seen = new Set<string>();
+  const authors: string[] = [];
+  authors.push(community.founderPubkey);
+  seen.add(community.founderPubkey);
+  for (const mod of community.moderatorPubkeys) {
+    if (seen.has(mod)) continue;
+    seen.add(mod);
+    authors.push(mod);
+  }
+  return authors;
+}
