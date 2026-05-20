@@ -20,8 +20,8 @@ import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useFeaturedOrganizations } from '@/hooks/useFeaturedOrganizations';
 import { useGlobalActivity } from '@/hooks/useGlobalActivity';
 import { useGlobalDonations } from '@/hooks/useGlobalDonations';
-import { useManageableOrganizations } from '@/hooks/useManageableOrganizations';
 import { useToast } from '@/hooks/useToast';
+import { useUserOrganizations } from '@/hooks/useUserOrganizations';
 import { formatSatsShort } from '@/lib/formatCampaignAmount';
 
 // ─── Page ──────────────────────────────────────────────────────────────────────
@@ -271,12 +271,10 @@ function MyCommunitiesShelf({ onCreateCommunity }: { onCreateCommunity: () => vo
 }
 
 function MyCommunitiesShelfContent({ onCreateCommunity }: { onCreateCommunity: () => void }) {
-  // "My organizations" = NIP-72 community definitions the logged-in user
-  // either founded (author of the kind 34550 event) or is listed as a
-  // moderator on (via a `p` tag with role "moderator"). This matches the
-  // trust model used by the create-flow's implicit org tagging — only
-  // these orgs can publish official campaigns/pledges/events.
-  const { data: manageable, isLoading } = useManageableOrganizations();
+  // "My organizations" = orgs the user founded, moderates, or follows.
+  // Sorting is founder first, moderator second, followed-only last, with
+  // newest community definition revisions first inside each bucket.
+  const { data: organizations, isLoading } = useUserOrganizations();
 
   if (isLoading) {
     return (
@@ -288,7 +286,7 @@ function MyCommunitiesShelfContent({ onCreateCommunity }: { onCreateCommunity: (
     );
   }
 
-  if (!manageable || manageable.length === 0) {
+  if (!organizations || organizations.length === 0) {
     return (
       <EmptyShelf
         icon={<Users className="size-7 text-primary/70" />}
@@ -306,7 +304,7 @@ function MyCommunitiesShelfContent({ onCreateCommunity }: { onCreateCommunity: (
 
   return (
     <HorizontalScroll className="sm:px-6">
-      {manageable.slice(0, 12).map((entry) => (
+      {organizations.slice(0, 18).map((entry) => (
         <CommunityMiniCard key={entry.community.aTag} community={entry.community} />
       ))}
     </HorizontalScroll>
