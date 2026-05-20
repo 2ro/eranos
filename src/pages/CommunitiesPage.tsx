@@ -37,6 +37,7 @@ import { formatSatsShort } from '@/lib/formatCampaignAmount';
 export function CommunitiesPage() {
   const { config } = useAppContext();
   const { user } = useCurrentUser();
+  const userOrganizations = useUserOrganizations();
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -69,7 +70,10 @@ export function CommunitiesPage() {
       <div className="max-w-5xl mx-auto space-y-2 sm:space-y-4 pb-8">
         <section className="pt-6">
           <SectionHeader title="My organizations" className="pb-3 sm:px-6" />
-          <MyCommunitiesShelf onCreateCommunity={handleCreateCommunity} />
+          <MyCommunitiesShelf
+            userOrganizations={userOrganizations}
+            onCreateCommunity={handleCreateCommunity}
+          />
         </section>
 
         <section className="pt-4">
@@ -81,7 +85,7 @@ export function CommunitiesPage() {
         </section>
 
         <section className="pt-6 sm:px-6">
-          <OrganizationActivityFeed />
+          <OrganizationActivityFeed userOrganizations={userOrganizations} />
         </section>
       </div>
     </main>
@@ -265,7 +269,15 @@ function CommunitiesHero({ onCreateCommunity }: CommunitiesHeroProps) {
 // Community shelves
 // ═══════════════════════════════════════════════════════════════════════════════
 
-function MyCommunitiesShelf({ onCreateCommunity }: { onCreateCommunity: () => void }) {
+type UserOrganizationsResult = ReturnType<typeof useUserOrganizations>;
+
+function MyCommunitiesShelf({
+  userOrganizations,
+  onCreateCommunity,
+}: {
+  userOrganizations: UserOrganizationsResult;
+  onCreateCommunity: () => void;
+}) {
   const { user } = useCurrentUser();
 
   if (!user) {
@@ -279,14 +291,25 @@ function MyCommunitiesShelf({ onCreateCommunity }: { onCreateCommunity: () => vo
     );
   }
 
-  return <MyCommunitiesShelfContent onCreateCommunity={onCreateCommunity} />;
+  return (
+    <MyCommunitiesShelfContent
+      userOrganizations={userOrganizations}
+      onCreateCommunity={onCreateCommunity}
+    />
+  );
 }
 
-function MyCommunitiesShelfContent({ onCreateCommunity }: { onCreateCommunity: () => void }) {
+function MyCommunitiesShelfContent({
+  userOrganizations,
+  onCreateCommunity,
+}: {
+  userOrganizations: UserOrganizationsResult;
+  onCreateCommunity: () => void;
+}) {
   // "My organizations" = orgs the user founded, moderates, or follows.
   // Sorting is founder first, moderator second, followed-only last, with
   // newest community definition revisions first inside each bucket.
-  const { data: organizations, isLoading } = useUserOrganizations();
+  const { data: organizations, isLoading } = userOrganizations;
 
   if (isLoading) {
     return (
@@ -357,9 +380,9 @@ function FeaturedOrganizationsShelf() {
   );
 }
 
-function OrganizationActivityFeed() {
+function OrganizationActivityFeed({ userOrganizations }: { userOrganizations: UserOrganizationsResult }) {
   const { user } = useCurrentUser();
-  const { data: organizations, isLoading: organizationsLoading } = useUserOrganizations();
+  const { data: organizations, isLoading: organizationsLoading } = userOrganizations;
   const { membersOnly, toggle } = useOrganizationMembersOnlyFilter();
   const feed = useOrganizationHomeActivityFeed(organizations, membersOnly, !!user && !organizationsLoading);
   const { scrollRef } = useInfiniteScroll({

@@ -113,6 +113,8 @@ export function useCommunityBookmarks() {
       queryClient.invalidateQueries({ queryKey: ['community-bookmarks', user?.pubkey] });
       queryClient.invalidateQueries({ queryKey: ['my-communities'] });
       queryClient.invalidateQueries({ queryKey: ['community-activity-feed'] });
+      queryClient.invalidateQueries({ queryKey: ['followed-organizations'] });
+      queryClient.invalidateQueries({ queryKey: ['organization-home-activity-feed'] });
       queryClient.invalidateQueries({ queryKey: ['following-feed'] });
       toast({
         title: removed ? 'Community unfollowed' : 'Community followed',
