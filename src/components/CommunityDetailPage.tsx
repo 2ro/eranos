@@ -17,7 +17,6 @@ import {
   Shield,
   ShieldBan,
   Share2,
-  Target,
   UserCheck,
   UserMinus,
   UserPlus,
@@ -26,8 +25,8 @@ import {
 import type { NostrEvent, NostrMetadata } from '@nostrify/nostrify';
 
 import { AddMemberDialog } from '@/components/AddMemberDialog';
+import { CampaignCard } from '@/components/CampaignCard';
 import { CreateCommunityEventDialog } from '@/components/CreateCommunityEventDialog';
-import { CreateActionDialog } from '@/components/CreateActionDialog';
 import { PeopleAvatarStack } from '@/components/PeopleAvatarStack';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
@@ -44,7 +43,6 @@ import { NoteContent } from '@/components/NoteContent';
 import { CommunityBadgeEditorDialog } from '@/components/CommunityBadgePanel';
 import { ComposeBox } from '@/components/ComposeBox';
 import { FollowToggleButton } from '@/components/FollowButton';
-import { CreateGoalDialog } from '@/components/CreateGoalDialog';
 import { MembersOnlyToggle } from '@/components/MembersOnlyToggle';
 import { NoteCard } from '@/components/NoteCard';
 import { FeedCard } from '@/components/FeedCard';
@@ -62,12 +60,18 @@ import { useCommunityGoals } from '@/hooks/useCommunityGoals';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useMembersOnlyFilter } from '@/hooks/useMembersOnlyFilter';
 import { useNow } from '@/hooks/useNow';
+import {
+  useOrganizationCampaigns,
+  useOrganizationPledges,
+  useOrganizationEvents,
+} from '@/hooks/useOrganizationActivity';
 import { useProfileUrl } from '@/hooks/useProfileUrl';
 import { useToast } from '@/hooks/useToast';
 import { CommunityModerationContext } from '@/contexts/CommunityModerationContext';
 import { useLayoutOptions } from '@/contexts/LayoutContext';
 import { applyCommunityModerationToEvents, canBanTarget, getViewerAuthority, parseCommunityEvent, type CommunityMember } from '@/lib/communityUtils';
 import type { ParsedCampaign } from '@/lib/campaign';
+import type { Action } from '@/hooks/useActions';
 import { genUserName } from '@/lib/genUserName';
 import { sanitizeUrl } from '@/lib/sanitizeUrl';
 import { cn } from '@/lib/utils';
@@ -180,6 +184,239 @@ function getCalendarEventEnd(event: NostrEvent): number {
   return isNaN(endTs) ? 0 : endTs;
 }
 
+// ── Official-activity shelves ────────────────────────────────────────────────
+// Horizontal scroll rails for an organization's official campaigns,
+// pledges, and calendar events. All three datasets are author-filtered
+// to founder + moderators upstream in `useOrganizationActivity`; here we
+// only apply lightweight presentation filters (e.g. drop past events).
+
+const shelfDateFormatter = new Intl.DateTimeFormat(undefined, {
+  month: 'short',
+  day: 'numeric',
+});
+
+function formatShelfEventDate(event: NostrEvent): string {
+  const start = getTag(event.tags, 'start');
+  if (!start) return '';
+  if (event.kind === 31922) {
+    // All-day event: `YYYY-MM-DD`. Parse as UTC to avoid timezone drift on
+    // dates that fall near midnight in the local zone.
+    const date = new Date(`${start}T00:00:00Z`);
+    if (Number.isNaN(date.getTime())) return '';
+    return shelfDateFormatter.format(date);
+  }
+  const ts = parseInt(start, 10);
+  if (!Number.isFinite(ts) || ts <= 0) return '';
+  return shelfDateFormatter.format(new Date(ts * 1000));
+}
+
+function PledgeShelfCard({ pledge }: { pledge: Action }) {
+  const cover = sanitizeUrl(pledge.image);
+  const naddr = nip19.naddrEncode({
+    kind: pledge.event.kind,
+    pubkey: pledge.pubkey,
+    identifier: pledge.id,
+  });
+  return (
+    <Link
+      to={`/${naddr}`}
+      className="group relative flex w-[260px] shrink-0 flex-col overflow-hidden rounded-xl border border-border/60 bg-card shadow-sm motion-safe:transition-shadow hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+    >
+      <div className="relative aspect-[16/9] w-full overflow-hidden bg-gradient-to-br from-primary/15 via-primary/5 to-secondary">
+        {cover ? (
+          <img src={cover} alt="" className="absolute inset-0 size-full object-cover motion-safe:transition-transform group-hover:scale-[1.02]" />
+        ) : (
+          <div className="absolute inset-0 flex items-center justify-center">
+            <Megaphone className="size-10 text-primary/40" />
+          </div>
+        )}
+      </div>
+      <div className="flex-1 px-3 py-3 space-y-1">
+        <h3 className="text-sm font-semibold leading-snug line-clamp-2">{pledge.title}</h3>
+        {pledge.description && (
+          <p className="text-xs text-muted-foreground line-clamp-2">{pledge.description}</p>
+        )}
+      </div>
+    </Link>
+  );
+}
+
+function CalendarEventShelfCard({ event }: { event: NostrEvent }) {
+  const title = getTag(event.tags, 'title') ?? 'Untitled event';
+  const image = sanitizeUrl(getTag(event.tags, 'image'));
+  const location = getTag(event.tags, 'location');
+  const dateLabel = formatShelfEventDate(event);
+  const d = getTag(event.tags, 'd') ?? '';
+  const naddr = nip19.naddrEncode({
+    kind: event.kind,
+    pubkey: event.pubkey,
+    identifier: d,
+  });
+  return (
+    <Link
+      to={`/${naddr}`}
+      className="group relative flex w-[260px] shrink-0 flex-col overflow-hidden rounded-xl border border-border/60 bg-card shadow-sm motion-safe:transition-shadow hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+    >
+      <div className="relative aspect-[16/9] w-full overflow-hidden bg-gradient-to-br from-primary/15 via-primary/5 to-secondary">
+        {image ? (
+          <img src={image} alt="" className="absolute inset-0 size-full object-cover motion-safe:transition-transform group-hover:scale-[1.02]" />
+        ) : (
+          <div className="absolute inset-0 flex items-center justify-center">
+            <CalendarDays className="size-10 text-primary/40" />
+          </div>
+        )}
+      </div>
+      <div className="flex-1 px-3 py-3 space-y-1">
+        <h3 className="text-sm font-semibold leading-snug line-clamp-2">{title}</h3>
+        <div className="flex items-center gap-2 text-xs text-muted-foreground">
+          {dateLabel && <span className="tabular-nums">{dateLabel}</span>}
+          {location && <span className="truncate">· {location}</span>}
+        </div>
+      </div>
+    </Link>
+  );
+}
+
+interface OfficialShelfProps {
+  title: string;
+  count: number;
+  createHref?: string;
+  createLabel?: string;
+  isLoading: boolean;
+  isEmpty: boolean;
+  children: React.ReactNode;
+}
+
+/** Wraps a single shelf row with a title and an optional "+ New" CTA on the right. */
+function OfficialShelf({ title, count, createHref, createLabel, isLoading, isEmpty, children }: OfficialShelfProps) {
+  // Suppress entirely when the shelf has nothing to show — keeps the
+  // activity feed at the top of the viewport when an org has no
+  // campaigns/pledges/events yet.
+  if (!isLoading && isEmpty) return null;
+  return (
+    <section className="mt-4">
+      <div className="flex items-baseline justify-between gap-3 px-1 pb-2">
+        <h2 className="text-sm font-semibold tracking-tight">
+          {title}
+          {count > 0 && (
+            <span className="ml-1.5 text-muted-foreground font-normal">{count}</span>
+          )}
+        </h2>
+        {createHref && (
+          <Link
+            to={createHref}
+            className="text-xs font-medium text-primary hover:underline focus-visible:outline-none focus-visible:underline"
+          >
+            {createLabel ?? 'New'}
+          </Link>
+        )}
+      </div>
+      <div className="-mx-4 sm:-mx-6 px-4 sm:px-6 flex gap-3 overflow-x-auto scrollbar-none pb-1">
+        {children}
+      </div>
+    </section>
+  );
+}
+
+function OfficialActivityShelves({
+  orgNaddr,
+  campaigns,
+  campaignsLoading,
+  pledges,
+  pledgesLoading,
+  events,
+  eventsLoading,
+  now,
+}: {
+  orgNaddr: string;
+  campaigns: ParsedCampaign[];
+  campaignsLoading: boolean;
+  pledges: Action[];
+  pledgesLoading: boolean;
+  events: NostrEvent[];
+  eventsLoading: boolean;
+  now: number;
+}) {
+  // Drop archived campaigns; sort newest first (the hook already sorts).
+  const liveCampaigns = useMemo(
+    () => campaigns.filter((c) => !c.archived),
+    [campaigns],
+  );
+
+  // Drop expired pledges; sort with closest-deadline first, then newest.
+  const livePledges = useMemo(() => {
+    const filtered = pledges.filter((p) => !p.deadline || p.deadline > now);
+    return [...filtered].sort((a, b) => {
+      if (a.deadline && b.deadline) return a.deadline - b.deadline;
+      if (a.deadline) return -1;
+      if (b.deadline) return 1;
+      return b.createdAt - a.createdAt;
+    });
+  }, [pledges, now]);
+
+  // Drop past events; sort by start ascending (next-up first).
+  const upcomingEvents = useMemo(() => {
+    const filtered = events.filter((e) => getCalendarEventEnd(e) >= now);
+    return [...filtered].sort((a, b) => getCalendarEventStart(a) - getCalendarEventStart(b));
+  }, [events, now]);
+
+  // If everything is empty AND nothing is loading, render nothing — the
+  // activity feed below already provides its own empty state.
+  if (
+    !campaignsLoading && !pledgesLoading && !eventsLoading &&
+    liveCampaigns.length === 0 &&
+    livePledges.length === 0 &&
+    upcomingEvents.length === 0
+  ) {
+    return null;
+  }
+
+  const createQuery = orgNaddr ? `?org=${orgNaddr}` : '';
+
+  return (
+    <div className="space-y-1">
+      <OfficialShelf
+        title="Campaigns"
+        count={liveCampaigns.length}
+        createHref={`/campaigns/new${createQuery}`}
+        createLabel="+ New campaign"
+        isLoading={campaignsLoading}
+        isEmpty={liveCampaigns.length === 0}
+      >
+        {liveCampaigns.map((campaign) => (
+          <div key={campaign.aTag} className="w-[280px] shrink-0">
+            <CampaignCard campaign={campaign} />
+          </div>
+        ))}
+      </OfficialShelf>
+
+      <OfficialShelf
+        title="Pledges"
+        count={livePledges.length}
+        createHref={`/pledges/new${createQuery}`}
+        createLabel="+ New pledge"
+        isLoading={pledgesLoading}
+        isEmpty={livePledges.length === 0}
+      >
+        {livePledges.map((pledge) => (
+          <PledgeShelfCard key={pledge.event.id} pledge={pledge} />
+        ))}
+      </OfficialShelf>
+
+      <OfficialShelf
+        title="Upcoming events"
+        count={upcomingEvents.length}
+        isLoading={eventsLoading}
+        isEmpty={upcomingEvents.length === 0}
+      >
+        {upcomingEvents.map((evt) => (
+          <CalendarEventShelfCard key={evt.id} event={evt} />
+        ))}
+      </OfficialShelf>
+    </div>
+  );
+}
+
 // ── Main component ────────────────────────────────────────────────────────────
 
 export function CommunityDetailPage({ event }: { event: NostrEvent }) {
@@ -195,8 +432,8 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
   // ── Tab + FAB state ────────────────────────────────────────────────────────
   const [activeTab, setActiveTab] = useState('activity');
   const [composeOpen, setComposeOpen] = useState(false);
-  const [goalDialogOpen, setGoalDialogOpen] = useState(false);
-  const [actionDialogOpen, setActionDialogOpen] = useState(false);
+  // Calendar event creation still uses the in-page dialog (no dedicated
+  // create page yet). Campaigns/pledges navigate to their create pages.
   const [eventDialogOpen, setEventDialogOpen] = useState(false);
   const [membersDialogOpen, setMembersDialogOpen] = useState(false);
   const [addMembersDialogOpen, setAddMembersDialogOpen] = useState(false);
@@ -321,7 +558,30 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
   const { data: goals, isLoading: goalsLoading } = useCommunityGoals(communityATag || undefined);
   const { data: communityEvents, isLoading: eventsLoading } = useCommunityEvents(communityATag || undefined);
   const { data: communityActions, isLoading: actionsLoading } = useCommunityActions(communityATag || undefined);
+
+  // ── Official activity shelves ─────────────────────────────────────────────
+  // Author-filtered to founder + moderators (see useOrganizationActivity).
+  // These power the campaign/pledge/event shelves rendered above the
+  // activity feed, distinct from the moderation-filtered `communityActions`
+  // / `communityEvents` queries which include anyone-tagged content.
+  const { data: orgCampaigns, isLoading: orgCampaignsLoading } = useOrganizationCampaigns(community);
+  const { data: orgPledges, isLoading: orgPledgesLoading } = useOrganizationPledges(community);
+  const { data: orgEvents, isLoading: orgEventsLoading } = useOrganizationEvents(community);
   const now = useNow(60_000);
+
+  // naddr for this community — used by the create CTAs (passed to
+  // `/campaigns/new?org=` and `/pledges/new?org=`) so the create forms can
+  // resolve the implicit org context. Stable per render of the community
+  // event because `event.kind`, `event.pubkey`, and the d-tag don't change
+  // within a session.
+  const orgNaddr = useMemo(() => {
+    if (!community) return '';
+    return nip19.naddrEncode({
+      kind: event.kind,
+      pubkey: event.pubkey,
+      identifier: community.dTag,
+    });
+  }, [community, event.kind, event.pubkey]);
 
   /** Check if a goal event's `closed_at` deadline has passed. */
   const isExpired = useCallback((e: NostrEvent): boolean => {
@@ -523,21 +783,22 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
         },
       },
       {
-        id: 'new-goal',
-        label: 'New goal',
-        icon: <Target className="size-4" />,
+        id: 'new-campaign',
+        label: 'New campaign',
+        icon: <HandHeart className="size-4" />,
         onSelect: () => {
-          setActiveTab('activity');
-          setGoalDialogOpen(true);
+          // Implicit org tagging: the create form reads `?org=` and emits
+          // the `A`/`K`/`P` tags when the current user is founder/mod of
+          // that org. Falls back to a personal publication otherwise.
+          navigate(`/campaigns/new${orgNaddr ? `?org=${orgNaddr}` : ''}`);
         },
       },
       {
-        id: 'new-action',
+        id: 'new-pledge',
         label: 'New pledge',
         icon: <Megaphone className="size-4" />,
         onSelect: () => {
-          setActiveTab('activity');
-          setActionDialogOpen(true);
+          navigate(`/pledges/new${orgNaddr ? `?org=${orgNaddr}` : ''}`);
         },
       },
       {
@@ -545,12 +806,15 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
         label: 'New event',
         icon: <CalendarDays className="size-4" />,
         onSelect: () => {
+          // Calendar event creation still happens via the in-page dialog
+          // because there's no dedicated create page yet. The dialog
+          // already emits the uppercase `A` tag and `K: 34550` companion.
           setActiveTab('activity');
           setEventDialogOpen(true);
         },
       },
     ];
-  }, [fabAvailable]);
+  }, [fabAvailable, navigate, orgNaddr]);
 
   useLayoutOptions({
     noMaxWidth: true,
@@ -737,7 +1001,12 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
                 </Button>
               </div>
 
-              <TabsList className="grid h-auto w-full grid-cols-3 gap-2 rounded-none bg-transparent p-0 shadow-none">
+              {/* Tab strip — Pulse and Chat are hidden for now while the
+                  organization-first redesign is in progress. The
+                  corresponding `<TabsContent>` panels below are left
+                  intact so the code paths stay verified; users just
+                  can't switch to them from the UI. */}
+              <TabsList className="grid h-auto w-full grid-cols-1 gap-2 rounded-none bg-transparent p-0 shadow-none">
                 <TabsTrigger
                   value="activity"
                   className="min-w-0 rounded-lg border border-transparent px-3 py-2 text-muted-foreground shadow-none hover:bg-muted/40 hover:text-foreground data-[state=active]:border-border data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm"
@@ -745,17 +1014,11 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
                   <ActivityIcon className="size-4 mr-1.5" />
                   Activity
                 </TabsTrigger>
-                <TabsTrigger
-                  value="pulse"
-                  className="min-w-0 rounded-lg border border-transparent px-3 py-2 text-muted-foreground shadow-none hover:bg-muted/40 hover:text-foreground data-[state=active]:border-border data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm"
-                >
+                <TabsTrigger value="pulse" className="hidden" aria-hidden tabIndex={-1}>
                   <Radio className="size-4 mr-1.5" />
                   Pulse
                 </TabsTrigger>
-                <TabsTrigger
-                  value="chat"
-                  className="min-w-0 rounded-lg border border-transparent px-3 py-2 text-muted-foreground shadow-none hover:bg-muted/40 hover:text-foreground data-[state=active]:border-border data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm"
-                >
+                <TabsTrigger value="chat" className="hidden" aria-hidden tabIndex={-1}>
                   <MessageCircle className="size-4 mr-1.5" />
                   Chat
                 </TabsTrigger>
@@ -792,6 +1055,17 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
                  followed by past initiatives. ── */}
             <TabsContent value="activity" className="mt-0">
               <ComposeBox compact replyTo={event} />
+
+              <OfficialActivityShelves
+                orgNaddr={orgNaddr}
+                campaigns={orgCampaigns ?? []}
+                campaignsLoading={orgCampaignsLoading}
+                pledges={orgPledges ?? []}
+                pledgesLoading={orgPledgesLoading}
+                events={orgEvents ?? []}
+                eventsLoading={orgEventsLoading}
+                now={now}
+              />
 
               {(commentsLoading || goalsLoading || eventsLoading || actionsLoading) ? (
                 <FeedCard className="mx-0 sm:mx-0 mt-2 divide-y divide-border">
@@ -986,24 +1260,9 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
         onOpenChange={setComposeOpen}
       />
 
-      {/* FAB-triggered goal creation dialog for the goals tab */}
-      {communityATag && (
-        <CreateGoalDialog
-          communityATag={communityATag}
-          open={goalDialogOpen}
-          onOpenChange={setGoalDialogOpen}
-        />
-      )}
-
-      {/* FAB-triggered event creation dialog for the events tab */}
-      {communityATag && (
-        <CreateActionDialog
-          communityATag={communityATag}
-          open={actionDialogOpen}
-          onOpenChange={setActionDialogOpen}
-        />
-      )}
-
+      {/* FAB-triggered calendar event creation dialog. Campaigns and
+          pledges navigate to their dedicated create pages with
+          `?org=<naddr>` so the implicit-tagging flow can resolve. */}
       {communityATag && (
         <CreateCommunityEventDialog
           communityATag={communityATag}
