@@ -21,6 +21,9 @@ const COMMENT_ROOT_KINDS = [String(CAMPAIGN_KIND), String(PLEDGE_KIND)];
 const WORLD_K_TAGS = ['iso3166', 'geo'];
 const PLEDGE_T_ALIASES = ['agora-action', 'pathos-challenge', 'agora-challenge'];
 const AGORA_T_TAGS = ['agora', 'Agora'];
+const IGNORED_AGORA_NOTE_AUTHORS = new Set([
+  '4fe14ef28934b4093d71d43a8c9e9ec42ab4243febfff38470bfef05f51992ec',
+]);
 
 interface AgoraFeedPage {
   events: NostrEvent[];
@@ -55,6 +58,7 @@ function isRelevantAgoraEvent(event: NostrEvent): boolean {
   }
 
   if (event.kind === NOTE_KIND) {
+    if (IGNORED_AGORA_NOTE_AUTHORS.has(event.pubkey)) return false;
     return hasTagValue(event, 't', AGORA_T_TAGS);
   }
 
