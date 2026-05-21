@@ -5,7 +5,6 @@ import { useQueryClient } from '@tanstack/react-query';
 import type { NostrEvent } from '@nostrify/nostrify';
 import {
   CalendarClock,
-  Tag,
   Archive,
   ArchiveRestore,
   ChevronLeft,
@@ -673,13 +672,6 @@ function CampaignHero({
             </Badge>
           )}
 
-          {tagLabel && (
-            <div className="text-xs sm:text-sm font-semibold uppercase tracking-[0.14em] text-white/75 inline-flex items-center gap-2">
-              <Tag className="size-3.5" />
-              {tagLabel}
-            </div>
-          )}
-
           <h1 className="text-3xl sm:text-5xl lg:text-6xl font-bold leading-[1.05] tracking-tight text-white max-w-4xl">
             {campaign.title}
           </h1>
@@ -709,8 +701,13 @@ function CampaignHero({
             </span>
           </Link>
 
-          {(countryLabel || deadline || campaign.recipients.length > 0) && (
+          {(tagLabel || countryLabel || deadline || campaign.recipients.length > 0) && (
             <div className="flex flex-wrap items-center gap-x-5 gap-y-1.5 pt-1 text-xs sm:text-sm font-medium text-white/85">
+              {tagLabel && (
+                <span className="font-semibold uppercase tracking-[0.12em] text-white/80">
+                  {tagLabel}
+                </span>
+              )}
               {countryLabel && (
                 <span className="inline-flex items-center gap-1.5">
                   <MapPin className="size-4" />
