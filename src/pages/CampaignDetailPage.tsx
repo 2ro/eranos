@@ -14,6 +14,7 @@ import {
   Pencil,
   Pin,
   Share2,
+  ShieldCheck,
   Users,
 } from 'lucide-react';
 
@@ -619,7 +620,8 @@ function CampaignActivityItemHeader({
           </span>
         )}
         {isCampaignAuthor && (
-          <span className="inline-flex items-center rounded-full bg-primary/10 px-2 py-0.5 font-medium text-primary">
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-2 py-0.5 font-medium text-primary">
+            <ShieldCheck className="size-3" />
             Campaigner
           </span>
         )}
