@@ -74,6 +74,8 @@ export interface ExtraKindDef {
   blurb?: string;
   /** External sites where users can create or participate in this kind of content. */
   sites?: ExtraKindSite[];
+  /** If true, this kind is part of the Agora-curated content set and surfaces in the settings UI. */
+  agora?: boolean;
 }
 
 /** All supported extra content kinds, ordered by section (feed → media → social → whimsy). */
@@ -88,6 +90,7 @@ export const EXTRA_KINDS: ExtraKindDef[] = [
     addressable: false,
     section: 'feed',
     feedOnly: true,
+    agora: true,
   },
   {
     kind: 1111,
@@ -98,6 +101,7 @@ export const EXTRA_KINDS: ExtraKindDef[] = [
     addressable: false,
     section: 'feed',
     feedOnly: true,
+    agora: true,
   },
   {
     kind: 6,
@@ -108,6 +112,7 @@ export const EXTRA_KINDS: ExtraKindDef[] = [
     addressable: false,
     section: 'feed',
     feedOnly: true,
+    agora: true,
   },
   {
     kind: 16,
@@ -118,6 +123,7 @@ export const EXTRA_KINDS: ExtraKindDef[] = [
     addressable: false,
     section: 'feed',
     feedOnly: true,
+    agora: true,
   },
   {
     kind: 7,
@@ -128,6 +134,7 @@ export const EXTRA_KINDS: ExtraKindDef[] = [
     addressable: false,
     section: 'feed',
     feedOnly: true,
+    agora: true,
   },
   {
     kind: 9735,
@@ -137,10 +144,11 @@ export const EXTRA_KINDS: ExtraKindDef[] = [
     // toggle so users don't have to think about which rail was used.
     extraFeedKinds: [8333],
     label: 'Zaps',
-    description: 'People zapping posts (Lightning and on-chain Bitcoin). Disabled by default.',
+    description: 'People zapping posts (Lightning and on-chain Bitcoin).',
     addressable: false,
     section: 'feed',
     feedOnly: true,
+    agora: true,
   },
   {
     kind: 30023,
@@ -153,6 +161,7 @@ export const EXTRA_KINDS: ExtraKindDef[] = [
     addressable: true,
     section: 'feed',
     blurb: 'Blog posts, essays, and guides. Write and publish long-form articles.',
+    agora: true,
   },
   // Media
   {
@@ -167,6 +176,7 @@ export const EXTRA_KINDS: ExtraKindDef[] = [
     section: 'media',
     blurb: 'Instagram-style photo posts. Share images with captions and tags.',
     sites: [{ url: 'https://nostr.build', name: 'nostr.build' }],
+    agora: true,
   },
   {
     kind: 21,
@@ -179,6 +189,7 @@ export const EXTRA_KINDS: ExtraKindDef[] = [
     section: 'media',
     blurb: 'Watch and discover videos and live streams in a YouTube/Twitch-style interface.',
     sites: [{ url: 'https://zap.stream', name: 'zap.stream' }, { url: 'https://vidstr.shakespeare.wtf', name: 'Vidstr' }],
+    agora: true,
     subKinds: [
       {
         kind: 21,
@@ -208,6 +219,7 @@ export const EXTRA_KINDS: ExtraKindDef[] = [
     section: 'media',
     feedOnly: true,
     blurb: 'Record and share short voice messages, up to 60 seconds long.',
+    agora: true,
   },
   {
     kind: 34236,
@@ -306,6 +318,7 @@ export const EXTRA_KINDS: ExtraKindDef[] = [
     section: 'social',
     blurb: 'Events and meetups on Nostr. RSVP and see who else is going. Create and manage events on Plektos.',
     sites: [{ url: 'https://plektos.app', name: 'Plektos' }],
+    agora: true,
   },
   {
     kind: 1063,
@@ -332,6 +345,7 @@ export const EXTRA_KINDS: ExtraKindDef[] = [
     section: 'social',
     blurb: 'Ask a question, let people vote. Create polls from a polling app.',
     sites: [{ url: 'https://pollerama.fun' }],
+    agora: true,
   },
   {
     kind: 39089,
@@ -361,6 +375,7 @@ export const EXTRA_KINDS: ExtraKindDef[] = [
     addressable: true,
     section: 'social',
     blurb: 'Organizations on Nostr with an explicit founder, listed moderators, and event-level moderation.',
+    agora: true,
   },
   {
     kind: 62,
@@ -420,8 +435,9 @@ export const EXTRA_KINDS: ExtraKindDef[] = [
     description: 'Badges and awards (NIP-58)',
     route: 'badges',
     addressable: true,
-    section: 'whimsy',
+    section: 'social',
     blurb: 'Discover badges created on Nostr. Badge issuers award them for recognition, participation, or appreciation.',
+    agora: true,
     subKinds: [
       {
         kind: 30009,
@@ -490,6 +506,7 @@ export const EXTRA_KINDS: ExtraKindDef[] = [
     addressable: false,
     section: 'social',
     blurb: "Highlights are excerpts people find valuable — a paragraph from an article, a passage from a blog post, or a quote from anywhere on the web. Browse what people are reading and what's resonating.",
+    agora: true,
   },
   // Birdstar (feed-only — external app, no Ditto page)
   {

@@ -56,7 +56,7 @@ const hardcodedConfig: AppConfig = {
     feedIncludeReposts: true,
     feedIncludeGenericReposts: true,
     feedIncludeReactions: false,
-    feedIncludeZaps: false,
+    feedIncludeZaps: true,
     feedIncludeArticles: true,
     showArticles: true,
     showHighlights: true,

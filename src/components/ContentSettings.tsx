@@ -206,7 +206,7 @@ function ContentTypeRow({ def }: { def: ExtraKindDef }) {
 function NotesFeedSettings() {
   return (
     <>
-      {FEED_KINDS.map((def) => (
+      {FEED_KINDS.filter((def) => def.agora).map((def) => (
         <ContentTypeRow key={def.id} def={def} />
       ))}
     </>
@@ -217,7 +217,7 @@ function FeedSettingsFormInternals() {
   return (
     <>
       {SECTION_ORDER.map((section) => {
-        const sectionKinds = EXTRA_KINDS.filter((def) => def.section === section);
+        const sectionKinds = EXTRA_KINDS.filter((def) => def.section === section && def.agora);
         if (sectionKinds.length === 0) return null;
         return (
           <div key={section}>
