@@ -308,7 +308,8 @@ export interface AppConfig {
    * every wallet address and observe balance over time. Default is Trezor's
    * public mirror; users who care can self-host.
    *
-   * Default: `"https://btc1.trezor.io"`.
+   * Default: `"https://btc.trezor.io"` — the canonical endpoint Trezor
+   * Suite itself uses.
    */
   blockbookBaseUrl: string;
   /**

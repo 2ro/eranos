@@ -152,7 +152,7 @@ const hardcodedConfig: AppConfig = {
     'https://mempool.emzy.de/api',
     'https://blockstream.info/api',
   ],
-  blockbookBaseUrl: 'https://btc1.trezor.io',
+  blockbookBaseUrl: 'https://btc.trezor.io',
   sidebarWidgets: [
     { id: 'trends' },
     { id: 'hot-posts' },

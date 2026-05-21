@@ -5,7 +5,7 @@
 // Trezor Blockbook exposes both a REST API and a WebSocket API at the same
 // host. We use the WebSocket API exclusively because:
 //
-//   1. CORS — `btc1.trezor.io` (and the other public mirrors) do not send
+//   1. CORS — `btc.trezor.io` (and the other public mirrors) do not send
 //      `Access-Control-Allow-Origin`, so browsers reject every REST response.
 //      WebSocket upgrades are not preflighted and have no same-origin
 //      requirement on the response side, so they Just Work from any origin.
@@ -46,8 +46,8 @@
 /**
  * Convert a Blockbook HTTP(S) base URL into the matching WebSocket URL.
  *
- *     https://btc1.trezor.io        → wss://btc1.trezor.io/websocket
- *     https://btc1.trezor.io/       → wss://btc1.trezor.io/websocket
+ *     https://btc.trezor.io         → wss://btc.trezor.io/websocket
+ *     https://btc.trezor.io/        → wss://btc.trezor.io/websocket
  *     wss://example.com/websocket   → wss://example.com/websocket   (unchanged)
  */
 function toWebsocketUrl(baseUrl: string): string {

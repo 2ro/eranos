@@ -268,7 +268,7 @@ function blockbookUtxoToSpendable(
  * (xpub snapshot + UTXO list).
  *
  * @param account     HD account; supplies the xpub descriptor.
- * @param baseUrl     Blockbook base URL (e.g. `https://btc1.trezor.io`).
+ * @param baseUrl     Blockbook base URL (e.g. `https://btc.trezor.io`).
  * @param signal      Optional abort signal.
  */
 export async function scanAccount(
