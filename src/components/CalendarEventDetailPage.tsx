@@ -1,8 +1,8 @@
 import { useMemo, useCallback, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import {
-  ArrowLeft,
   CalendarDays,
+  ChevronLeft,
   MapPin,
   Clock,
   Users,
@@ -18,7 +18,8 @@ import type { NostrEvent, NostrMetadata } from '@nostrify/nostrify';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Separator } from '@/components/ui/separator';
+import { Card, CardContent } from '@/components/ui/card';
+import { DetailCommentComposer } from '@/components/DetailCommentComposer';
 import { NoteContent } from '@/components/NoteContent';
 import { NoteMoreMenu } from '@/components/NoteMoreMenu';
 import { PostActionBar } from '@/components/PostActionBar';
@@ -36,6 +37,7 @@ import { usePublishRSVP } from '@/hooks/usePublishRSVP';
 import { useProfileUrl } from '@/hooks/useProfileUrl';
 import { useToast } from '@/hooks/useToast';
 import { genUserName } from '@/lib/genUserName';
+import { openUrl } from '@/lib/downloadFile';
 import { sanitizeUrl } from '@/lib/sanitizeUrl';
 import { cn } from '@/lib/utils';
 
@@ -126,6 +128,26 @@ function formatDetailDate(event: NostrEvent): string {
   return startStr;
 }
 
+function formatCalendarHeroDate(event: NostrEvent): string | null {
+  const startRaw = getTag(event.tags, 'start');
+  if (!startRaw) return null;
+
+  if (event.kind === 31922) {
+    const [year, month, day] = startRaw.split('-').map(Number);
+    const date = new Date(year, month - 1, day);
+    if (isNaN(date.getTime())) return startRaw;
+    return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+  }
+
+  const timestamp = Number(startRaw);
+  if (!Number.isFinite(timestamp)) return startRaw;
+  const startTzid = getTag(event.tags, 'start_tzid');
+  return new Date(timestamp * 1000).toLocaleDateString('en-US', {
+    month: 'short', day: 'numeric', year: 'numeric',
+    ...(startTzid ? { timeZone: startTzid } : {}),
+  });
+}
+
 const ROLE_ORDER = ['host', 'speaker', 'moderator', 'participant'];
 function roleSort(a: string, b: string): number {
   const ai = ROLE_ORDER.indexOf(a.toLowerCase());
@@ -162,6 +184,15 @@ function PersonRow({ pubkey, label, size = 'md' }: { pubkey: string; label?: str
   );
 }
 
+function EventDetailRow({ icon, children }: { icon: React.ReactNode; children: React.ReactNode }) {
+  return (
+    <div className="flex items-start gap-3 rounded-xl bg-muted/40 px-3 py-3">
+      <div className="mt-0.5 text-primary shrink-0">{icon}</div>
+      <div className="min-w-0 text-sm leading-relaxed">{children}</div>
+    </div>
+  );
+}
+
 // --- Main Component ---
 
 export function CalendarEventDetailPage({ event }: { event: NostrEvent }) {
@@ -170,7 +201,7 @@ export function CalendarEventDetailPage({ event }: { event: NostrEvent }) {
   const { toast } = useToast();
 
   const title = getTag(event.tags, 'title') ?? 'Untitled Event';
-  const image = getTag(event.tags, 'image');
+  const image = sanitizeUrl(getTag(event.tags, 'image'));
   const locationRaw = getTag(event.tags, 'location');
   const location = locationRaw ? parseLocation(locationRaw) : undefined;
   const summary = getTag(event.tags, 'summary');
@@ -179,6 +210,7 @@ export function CalendarEventDetailPage({ event }: { event: NostrEvent }) {
 
   const eventCoord = useMemo(() => getEventCoord(event), [event]);
   const dateStr = useMemo(() => formatDetailDate(event), [event]);
+  const heroDate = useMemo(() => formatCalendarHeroDate(event), [event]);
 
   // Participants grouped by role
   const participantsByRole = useMemo(() => {
@@ -240,202 +272,274 @@ export function CalendarEventDetailPage({ event }: { event: NostrEvent }) {
   }, [eventCoord, event.pubkey, myRsvp.status, publishRSVP, toast]);
 
   const showRSVP = !!user;
+  const attendeeCount = rsvps.accepted.length + rsvps.tentative.length;
 
   return (
-    <div className="max-w-2xl mx-auto pb-16">
-      {/* ── Standard top bar ── */}
-      <div className="flex items-center gap-4 px-4 pt-4 pb-5">
-        <button
-          onClick={() => window.history.length > 1 ? navigate(-1) : navigate('/')}
-          className="p-1.5 -ml-1.5 rounded-full hover:bg-secondary/60 transition-colors"
-          aria-label="Go back"
-        >
-          <ArrowLeft className="size-5" />
-        </button>
-        <h1 className="text-xl font-bold flex-1">Event Details</h1>
-        {canEdit && (
-          <button
-            className="p-2 rounded-full hover:bg-secondary/60 transition-colors"
-            onClick={() => setEditOpen(true)}
-            aria-label="Edit event"
-          >
-            <Pencil className="size-5" />
-          </button>
-        )}
-      </div>
-
-      {/* ── Cover image ── */}
-      {image ? (
-        <div className="aspect-[2/1] w-full overflow-hidden">
-          <img src={image} alt={title} className="w-full h-full object-cover" />
-        </div>
-      ) : (
-        <div className="aspect-[3/1] w-full bg-gradient-to-br from-primary/15 via-primary/5 to-transparent flex items-center justify-center">
-          <CalendarDays className="size-20 text-primary/20" />
-        </div>
-      )}
-
-      {/* ── Content ── */}
-      <div className="px-5 mt-5 space-y-5">
-        {/* Title */}
-        <h2 className="text-2xl font-bold leading-tight tracking-tight">{title}</h2>
-        {/* Organizer row */}
-        <div className="flex items-center gap-3">
-          <div className="flex-1 min-w-0">
-            <PersonRow pubkey={event.pubkey} />
-          </div>
-        </div>
-
-        {/* Date & Location — sidebar-style pills */}
-        <div className="flex flex-col gap-0.5">
-          <div className="flex items-center gap-4 px-3 py-3 rounded-full bg-background/85">
-            <Clock className="size-5 text-primary shrink-0" />
-            <span className="text-sm">{dateStr}</span>
-          </div>
-          {location && (
-            <div className="flex items-center gap-4 px-3 py-3 rounded-full bg-background/85">
-              <MapPin className="size-5 text-primary shrink-0" />
-              <span className="text-sm">{location}</span>
+    <main className="min-h-screen pb-16">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 pt-4">
+        <div className="relative aspect-[16/9] sm:aspect-[21/9] rounded-t-xl rounded-b-none overflow-hidden bg-gradient-to-br from-primary/30 via-primary/15 to-secondary">
+          {image ? (
+            <img src={image} alt="" className="absolute inset-0 size-full object-cover" />
+          ) : (
+            <div className="absolute inset-0 flex items-center justify-center">
+              <CalendarDays className="size-16 sm:size-20 text-primary/40" />
             </div>
           )}
-        </div>
+          <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/25 to-black/45" />
 
-        {/* Hashtags */}
-        {hashtags.length > 0 && (
-          <div className="flex flex-wrap gap-2">
-            {hashtags.map((tag) => (
-              <Link key={tag} to={`/t/${tag}`}>
-                <Badge variant="secondary" className="cursor-pointer hover:bg-secondary/80 text-xs px-2.5 py-0.5">
-                  #{tag}
-                </Badge>
-              </Link>
-            ))}
+          <div className="absolute left-0 right-0 top-0 z-10 flex items-center justify-between gap-3 px-4 pt-4">
+            <button
+              onClick={() => window.history.length > 1 ? navigate(-1) : navigate('/')}
+              className="p-2.5 -ml-2 rounded-full text-white/90 hover:bg-white/15 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80 motion-safe:transition-colors"
+              aria-label="Go back"
+            >
+              <ChevronLeft className="size-6 drop-shadow-[0_1px_2px_rgba(0,0,0,0.85)]" />
+            </button>
+            {canEdit && (
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                onClick={() => setEditOpen(true)}
+                className="rounded-full bg-transparent text-white/90 shadow-none hover:bg-white/15 hover:text-white focus-visible:ring-white/80"
+              >
+                <Pencil className="size-4 mr-2" />
+                Edit
+              </Button>
+            )}
           </div>
-        )}
 
-        {/* Description */}
-        {(event.content || summary) && (
-          <>
-            <Separator />
-            <section className="space-y-2">
-              <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">About</h2>
-              {event.content ? (
-                <NoteContent event={event} className="text-sm leading-relaxed text-foreground" hideEmbedImages={!!image} />
-              ) : (
-                <p className="text-sm leading-relaxed text-muted-foreground">{summary}</p>
+          <div className="absolute inset-x-0 bottom-0 z-10 space-y-2 p-5 sm:p-6 [text-shadow:0_1px_4px_rgba(0,0,0,0.75),0_2px_10px_rgba(0,0,0,0.45)]">
+            <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
+              <h1 className="text-3xl sm:text-4xl font-bold leading-tight tracking-tight text-white">
+                {title}
+              </h1>
+              <span className="text-xs sm:text-sm text-white/85">calendar event</span>
+            </div>
+            <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 text-xs sm:text-sm font-medium text-white/85">
+              {heroDate && (
+                <span className="inline-flex items-center gap-1.5">
+                  <CalendarDays className="size-3.5 sm:size-4" />
+                  {heroDate}
+                </span>
+              )}
+              {location && (
+                <span className="inline-flex items-center gap-1.5">
+                  <MapPin className="size-3.5 sm:size-4" />
+                  {location}
+                </span>
+              )}
+              {attendeeCount > 0 && (
+                <span className="inline-flex items-center gap-1.5">
+                  <Users className="size-3.5 sm:size-4" />
+                  {attendeeCount} interested
+                </span>
+              )}
+            </div>
+            {summary && (
+              <p className="max-w-2xl text-base sm:text-lg text-white/90 line-clamp-3">
+                {summary}
+              </p>
+            )}
+          </div>
+        </div>
+      </div>
+
+      <div className="max-w-6xl mx-auto px-4 sm:px-6">
+        <div className="rounded-b-xl rounded-t-none bg-card border border-t-0 border-border/60 shadow-sm px-4 sm:px-5 py-3">
+          <PostActionBar
+            event={event}
+            replyLabel="Comment"
+            onReply={() => setReplyOpen(true)}
+            onMore={() => setMoreMenuOpen(true)}
+          />
+        </div>
+      </div>
+
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 py-6 lg:py-10">
+        <div className="lg:flex lg:gap-8 lg:items-start">
+          <div className="flex-1 min-w-0 space-y-8">
+            <section className="space-y-5">
+              <div>
+                <div className="text-sm font-medium text-muted-foreground mb-3">Hosted by</div>
+                <PersonRow pubkey={event.pubkey} />
+              </div>
+
+              {hashtags.length > 0 && (
+                <div className="flex flex-wrap gap-2">
+                  {hashtags.map((tag) => (
+                    <Link key={tag} to={`/t/${tag}`}>
+                      <Badge variant="secondary" className="cursor-pointer hover:bg-secondary/80 text-xs px-2.5 py-0.5">
+                        #{tag}
+                      </Badge>
+                    </Link>
+                  ))}
+                </div>
+              )}
+
+              {(event.content || summary) && (
+                <article className="prose prose-neutral dark:prose-invert max-w-none">
+                  {event.content ? (
+                    <NoteContent event={event} hideEmbedImages={!!image} />
+                  ) : (
+                    <p className="text-muted-foreground">{summary}</p>
+                  )}
+                </article>
               )}
             </section>
-          </>
-        )}
 
-        {/* External links */}
-        {links.length > 0 && (
-          <div className="flex flex-col gap-0.5">
-            {links.map((url) => (
-              <a
-                key={url}
-                href={url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center gap-4 px-3 py-3 rounded-full bg-background/85 hover:bg-secondary/60 transition-colors"
-              >
-                <LinkIcon className="size-5 text-primary shrink-0" />
-                <span className="text-sm truncate flex-1">{url.replace(/^https?:\/\//, '')}</span>
-                <ExternalLink className="size-4 text-muted-foreground shrink-0" />
-              </a>
-            ))}
+            <section id="event-comments" className="scroll-mt-20">
+              <div className="flex items-baseline justify-between gap-3 mb-3 px-1">
+                <h2 className="text-lg font-semibold tracking-tight">Comments</h2>
+                {replyTree.length > 0 ? (
+                  <span className="text-sm text-muted-foreground tabular-nums">
+                    {replyTree.length.toLocaleString()} {replyTree.length === 1 ? 'comment' : 'comments'}
+                  </span>
+                ) : null}
+              </div>
+
+              <DetailCommentComposer event={event} className="mb-3" />
+
+              {commentsLoading ? (
+                <div className="space-y-3">
+                  {Array.from({ length: 3 }).map((_, i) => (
+                    <div key={i} className="rounded-2xl bg-card border border-border/60 px-4 py-3">
+                      <div className="flex gap-3">
+                        <Skeleton className="size-10 rounded-full shrink-0" />
+                        <div className="flex-1 space-y-2">
+                          <Skeleton className="h-4 w-32" />
+                          <Skeleton className="h-4 w-full" />
+                          <Skeleton className="h-4 w-2/3" />
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : replyTree.length > 0 ? (
+                <div className="rounded-2xl bg-card border border-border/60 overflow-hidden">
+                  <ThreadedReplyList roots={replyTree} />
+                </div>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => setReplyOpen(true)}
+                  className="block w-full rounded-2xl border border-dashed border-border/80 bg-card/50 px-6 py-10 text-center hover:bg-card hover:border-primary/40 transition-colors"
+                >
+                  <p className="text-base font-medium text-foreground">No comments yet</p>
+                  <p className="mt-1 text-sm text-muted-foreground">Be the first to comment.</p>
+                </button>
+              )}
+            </section>
           </div>
-        )}
 
-        {/* Participants */}
-        {participantsByRole.length > 0 && (
-          <>
-            <Separator />
-            <section className="space-y-3">
-              <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide flex items-center gap-2">
-                <Users className="size-4" /> Participants
-              </h2>
-              <div className="space-y-2">
-                {participantsByRole.map(([role, pubkeys]) =>
-                  pubkeys.map((pk) => <PersonRow key={pk} pubkey={pk} label={role} size="sm" />),
-                )}
-              </div>
-            </section>
-          </>
-        )}
-
-        {/* Attendees */}
-        {rsvps.total > 0 && (
-          <>
-            <Separator />
-            <section className="space-y-3">
-              <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide flex items-center gap-2">
-                <Users className="size-4" /> Attendees
-              </h2>
-              <div className="space-y-2.5">
-                {([
-                  ['Going', rsvps.accepted, 'border-green-500/50 bg-green-500/5 text-green-600'],
-                  ['Interested', rsvps.tentative, 'border-amber-500/50 bg-amber-500/5 text-amber-600'],
-                  ["Can't Go", rsvps.declined, 'border-muted-foreground/30 bg-muted/30 text-muted-foreground'],
-                ] as const).map(([label, pks, cls]) => pks.length > 0 && (
-                  <div key={label} className="flex items-center gap-3">
-                    <Badge variant="outline" className={cn(cls, 'shrink-0 text-xs')}>{label} ({pks.length})</Badge>
-                    <RSVPAvatars pubkeys={pks} maxVisible={8} size="sm" />
+          <aside className="mt-8 lg:mt-0 lg:w-[360px] lg:shrink-0 lg:self-start">
+            <div className="lg:sticky lg:top-4 space-y-4">
+              <Card className="overflow-hidden">
+                <CardContent className="p-5 space-y-5">
+                  <div className="space-y-3">
+                    <EventDetailRow icon={<Clock className="size-5" />}>
+                      {dateStr}
+                    </EventDetailRow>
+                    {location && (
+                      <EventDetailRow icon={<MapPin className="size-5" />}>
+                        {location}
+                      </EventDetailRow>
+                    )}
                   </div>
-                ))}
-              </div>
-            </section>
-          </>
-        )}
 
-        {/* RSVP section */}
-        {showRSVP && (
-          <>
-            <Separator />
-            <section className="space-y-3">
-              <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide flex items-center gap-2">
-                <Check className="size-4" /> RSVP
-              </h2>
-              <div className="flex gap-2">
-                <Button
-                  size="sm"
-                  variant={myRsvp.status === 'accepted' ? 'default' : 'outline'}
-                  disabled={publishRSVP.isPending}
-                  className={cn('flex-1 rounded-full', myRsvp.status === 'accepted' && 'bg-green-600 hover:bg-green-700 text-white')}
-                  onClick={() => handleRSVP('accepted')}
-                >
-                  <Check className="size-3.5 mr-1.5" /> Going
-                </Button>
-                <Button
-                  size="sm"
-                  variant={myRsvp.status === 'tentative' ? 'default' : 'outline'}
-                  disabled={publishRSVP.isPending}
-                  className={cn('flex-1 rounded-full', myRsvp.status === 'tentative' && 'bg-amber-500 hover:bg-amber-600 text-white')}
-                  onClick={() => handleRSVP('tentative')}
-                >
-                  <Star className="size-3.5 mr-1.5" /> Interested
-                </Button>
-                <Button
-                  size="sm"
-                  variant={myRsvp.status === 'declined' ? 'default' : 'outline'}
-                  disabled={publishRSVP.isPending}
-                  className={cn('flex-1 rounded-full', myRsvp.status === 'declined' && 'bg-destructive hover:bg-destructive/90 text-destructive-foreground')}
-                  onClick={() => handleRSVP('declined')}
-                >
-                  <XIcon className="size-3.5 mr-1.5" /> Can't Go
-                </Button>
-              </div>
-            </section>
-          </>
-        )}
+                  {showRSVP && (
+                    <div className="space-y-3 border-t border-border/60 pt-4">
+                      <div className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">RSVP</div>
+                      <div className="grid grid-cols-3 gap-2">
+                        <Button
+                          size="sm"
+                          variant={myRsvp.status === 'accepted' ? 'default' : 'outline'}
+                          disabled={publishRSVP.isPending}
+                          className={cn('rounded-full px-2', myRsvp.status === 'accepted' && 'bg-green-600 hover:bg-green-700 text-white')}
+                          onClick={() => handleRSVP('accepted')}
+                        >
+                          <Check className="size-3.5 mr-1" />
+                          Going
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant={myRsvp.status === 'tentative' ? 'default' : 'outline'}
+                          disabled={publishRSVP.isPending}
+                          className={cn('rounded-full px-2', myRsvp.status === 'tentative' && 'bg-amber-500 hover:bg-amber-600 text-white')}
+                          onClick={() => handleRSVP('tentative')}
+                        >
+                          <Star className="size-3.5 mr-1" />
+                          Maybe
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant={myRsvp.status === 'declined' ? 'default' : 'outline'}
+                          disabled={publishRSVP.isPending}
+                          className={cn('rounded-full px-2', myRsvp.status === 'declined' && 'bg-destructive hover:bg-destructive/90 text-destructive-foreground')}
+                          onClick={() => handleRSVP('declined')}
+                        >
+                          <XIcon className="size-3.5 mr-1" />
+                          No
+                        </Button>
+                      </div>
+                    </div>
+                  )}
 
-        <PostActionBar
-          event={event}
-          replyLabel="Comments"
-          onReply={() => setReplyOpen(true)}
-          onMore={() => setMoreMenuOpen(true)}
-          className="-mx-5 px-5"
-        />
+                  {rsvps.total > 0 && (
+                    <div className="space-y-3 border-t border-border/60 pt-4">
+                      <div className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Attendees</div>
+                      <div className="space-y-3">
+                        {([
+                          ['Going', rsvps.accepted, 'border-green-500/50 bg-green-500/5 text-green-600'],
+                          ['Interested', rsvps.tentative, 'border-amber-500/50 bg-amber-500/5 text-amber-600'],
+                          ["Can't Go", rsvps.declined, 'border-muted-foreground/30 bg-muted/30 text-muted-foreground'],
+                        ] as const).map(([label, pks, cls]) => pks.length > 0 && (
+                          <div key={label} className="space-y-2">
+                            <Badge variant="outline" className={cn(cls, 'shrink-0 text-xs')}>{label} ({pks.length})</Badge>
+                            <RSVPAvatars pubkeys={pks} maxVisible={8} size="sm" />
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {links.length > 0 && (
+                    <div className="space-y-2 border-t border-border/60 pt-4">
+                      <div className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Links</div>
+                      <div className="space-y-1">
+                        {links.map((url) => (
+                          <button
+                            key={url}
+                            type="button"
+                            onClick={() => void openUrl(url)}
+                            className="flex w-full items-center gap-2 rounded-lg px-2 py-2 text-left text-sm hover:bg-muted/50 transition-colors"
+                          >
+                            <LinkIcon className="size-4 text-primary shrink-0" />
+                            <span className="truncate flex-1">{url.replace(/^https?:\/\//, '')}</span>
+                            <ExternalLink className="size-3.5 text-muted-foreground shrink-0" />
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+
+              {participantsByRole.length > 0 && (
+                <Card>
+                  <CardContent className="p-5 space-y-3">
+                    <div className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Participants</div>
+                    <div className="space-y-2">
+                      {participantsByRole.map(([role, pubkeys]) =>
+                        pubkeys.map((pk) => <PersonRow key={`${role}-${pk}`} pubkey={pk} label={role} size="sm" />),
+                      )}
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
+            </div>
+          </aside>
+        </div>
 
         <NoteMoreMenu event={event} open={moreMenuOpen} onOpenChange={setMoreMenuOpen} />
         <ReplyComposeModal event={event} open={replyOpen} onOpenChange={setReplyOpen} />
@@ -446,32 +550,7 @@ export function CalendarEventDetailPage({ event }: { event: NostrEvent }) {
             event={event}
           />
         )}
-
-        <section>
-          {commentsLoading ? (
-            <div className="space-y-3">
-              {Array.from({ length: 3 }).map((_, i) => (
-                <div key={i} className="flex gap-3">
-                  <Skeleton className="size-10 rounded-full shrink-0" />
-                  <div className="flex-1 space-y-2">
-                    <Skeleton className="h-4 w-32" />
-                    <Skeleton className="h-4 w-full" />
-                    <Skeleton className="h-4 w-2/3" />
-                  </div>
-                </div>
-              ))}
-            </div>
-          ) : replyTree.length > 0 ? (
-            <div className="-mx-5">
-              <ThreadedReplyList roots={replyTree} />
-            </div>
-          ) : (
-            <div className="py-8 text-center text-muted-foreground text-sm">
-              No comments yet. Be the first to comment!
-            </div>
-          )}
-        </section>
       </div>
-    </div>
+    </main>
   );
 }
