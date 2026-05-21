@@ -466,7 +466,7 @@ export function CreateCampaignPage() {
         </div>
 
         <div className="rounded-2xl bg-card/50 p-2">
-          {/* Title & identifier */}
+          {/* Title */}
           <FormSection title="Title" requirement="Required">
             <Input
               value={title}
@@ -475,13 +475,6 @@ export function CreateCampaignPage() {
               maxLength={200}
               required
             />
-            <p className="text-xs text-muted-foreground flex items-baseline gap-1 min-w-0">
-              <span className="shrink-0">URL preview:</span>
-              <span className="font-mono text-foreground truncate min-w-0">
-                /{activeIdentifier || 'your-campaign-title'}{!isEditMode && derivedIdentifier.length >= 64 && '...'}
-              </span>
-              {isEditMode && <span className="shrink-0">(kept from original)</span>}
-            </p>
           </FormSection>
 
           {/* Wallet (required) */}
