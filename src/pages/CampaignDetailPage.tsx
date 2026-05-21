@@ -107,19 +107,6 @@ function collectReplyEvents(nodes: ReplyNode[], out = new Map<string, NostrEvent
   return out;
 }
 
-function removePinnedReplyNodes(nodes: ReplyNode[], pinnedIds: Set<string>): ReplyNode[] {
-  return nodes.flatMap((node): ReplyNode[] => {
-    if (pinnedIds.has(node.event.id)) return [];
-    return [{
-      ...node,
-      children: removePinnedReplyNodes(node.children, pinnedIds),
-      hiddenChildren: node.hiddenChildren
-        ? removePinnedReplyNodes(node.hiddenChildren, pinnedIds)
-        : undefined,
-    }];
-  });
-}
-
 export function CampaignDetailPage({ pubkey, identifier, relays }: CampaignDetailPageProps) {
   // Drop the default 600px column cap and the default right widget sidebar
   // — this page renders its own GoFundMe-style 2-column layout (article on
@@ -230,20 +217,14 @@ function CampaignDetailContent({ campaign }: { campaign: ParsedCampaign }) {
     );
   }, [commentsData, donationReceipts]);
 
-  const pinnedIdSet = useMemo(() => new Set(pinnedIds), [pinnedIds]);
   const feedEventsById = useMemo(() => collectReplyEvents(replyTree), [replyTree]);
 
-  const activityTree = useMemo((): ReplyNode[] => {
-    const pinnedEventNodes = pinnedIds
+  const pinnedNodes = useMemo((): ReplyNode[] => {
+    return pinnedIds
       .map((id) => feedEventsById.get(id) ?? pinnedEvents.find((event) => event.id === id))
       .filter((event): event is NostrEvent => !!event)
       .map((event): ReplyNode => ({ event, children: [] }));
-
-    return [
-      ...pinnedEventNodes,
-      ...removePinnedReplyNodes(replyTree, pinnedIdSet),
-    ];
-  }, [feedEventsById, pinnedEvents, pinnedIdSet, pinnedIds, replyTree]);
+  }, [feedEventsById, pinnedEvents, pinnedIds]);
 
   const cover = sanitizeUrl(campaign.image);
   const creatorMetadata = author.data?.metadata;
@@ -381,6 +362,26 @@ function CampaignDetailContent({ campaign }: { campaign: ParsedCampaign }) {
         </div>
       </div>
 
+      {pinnedNodes.length > 0 && (
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 pt-6">
+          <div className="-mx-2 sm:-mx-4 rounded-2xl bg-card border border-border/60 overflow-hidden">
+            <ThreadedReplyList
+              roots={pinnedNodes}
+              renderItemHeader={(event) => (
+                <CampaignActivityItemHeader
+                  event={event}
+                  isCampaignAuthor={event.pubkey === campaign.pubkey}
+                  canManagePins={canManagePins}
+                  isPinned={isPinned(event.id)}
+                  pinPending={togglePin.isPending}
+                  onTogglePin={() => handleTogglePin(event)}
+                />
+              )}
+            />
+          </div>
+        </div>
+      )}
+
       {/* Two-column body. On mobile the right column collapses inline
           immediately below the hero so the donate CTA stays above the
           fold. On lg+ the right column sticks to the viewport edge of
@@ -426,10 +427,10 @@ function CampaignDetailContent({ campaign }: { campaign: ParsedCampaign }) {
                       <CampaignReplySkeleton key={i} />
                     ))}
                   </div>
-                ) : activityTree.length > 0 ? (
+                ) : replyTree.length > 0 ? (
                   <div className="-mx-2 sm:-mx-4 rounded-2xl bg-card border border-border/60 overflow-hidden">
                     <ThreadedReplyList
-                      roots={activityTree}
+                      roots={replyTree}
                       renderItemHeader={(event) => (
                         <CampaignActivityItemHeader
                           event={event}
@@ -437,17 +438,7 @@ function CampaignDetailContent({ campaign }: { campaign: ParsedCampaign }) {
                           canManagePins={canManagePins}
                           isPinned={isPinned(event.id)}
                           pinPending={togglePin.isPending}
-                          onTogglePin={() => {
-                            const wasPinned = isPinned(event.id);
-                            togglePin.mutate(event.id, {
-                              onSuccess: () => {
-                                toast({ title: wasPinned ? 'Unpinned from campaign' : 'Pinned to campaign' });
-                              },
-                              onError: () => {
-                                toast({ title: 'Failed to update campaign pins', variant: 'destructive' });
-                              },
-                            });
-                          }}
+                          onTogglePin={() => handleTogglePin(event)}
                         />
                       )}
                     />
@@ -535,6 +526,18 @@ function CampaignDetailContent({ campaign }: { campaign: ParsedCampaign }) {
       </AlertDialog>
     </main>
   );
+
+  function handleTogglePin(event: NostrEvent) {
+    const wasPinned = isPinned(event.id);
+    togglePin.mutate(event.id, {
+      onSuccess: () => {
+        toast({ title: wasPinned ? 'Unpinned from campaign' : 'Pinned to campaign' });
+      },
+      onError: () => {
+        toast({ title: 'Failed to update campaign pins', variant: 'destructive' });
+      },
+    });
+  }
 }
 
 function CampaignActivityItemHeader({
