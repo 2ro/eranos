@@ -575,7 +575,7 @@ function CampaignHero({
     // viewport for an immersive first impression instead of being a
     // strip; on larger screens we cap it so the page content below
     // stays visible.
-    <header className="relative isolate w-full overflow-hidden bg-gradient-to-br from-primary/40 via-primary/20 to-secondary min-h-[78svh] sm:min-h-0 sm:aspect-[21/9] lg:aspect-[24/9]">
+    <header className="relative isolate w-full overflow-hidden bg-gradient-to-br from-primary/40 via-primary/20 to-secondary min-h-[92svh] sm:min-h-0 sm:aspect-[16/9] lg:aspect-[18/9]">
       {cover ? (
         <img
           src={cover}
@@ -588,13 +588,13 @@ function CampaignHero({
         </div>
       )}
 
-      {/* Single, smooth dark gradient anchored at the bottom — no
-          middle band, no top wash. The image stays vibrant at the
-          top while the overlay text gets a clean reading surface
-          underneath. */}
+      {/* Tall, deep bottom gradient covering ~80% of the hero so the
+          overlay text sits on a near-opaque base no matter how busy
+          the photo is. Image stays vibrant only in the very top of
+          the banner. */}
       <div
         aria-hidden
-        className="absolute inset-x-0 bottom-0 top-1/3 bg-gradient-to-t from-black/85 via-black/55 to-transparent"
+        className="absolute inset-x-0 bottom-0 top-[20%] bg-gradient-to-t from-black/95 via-black/80 to-transparent"
       />
       {/* Subtle top scrim purely to keep the back/admin buttons
           legible against bright skies, beaches, etc. */}
@@ -660,16 +660,22 @@ function CampaignHero({
           keeps the title comfortably above the home-indicator on
           notched phones. Drop-shadow on text gives extra contrast on
           busy photos without darkening the gradient further. */}
-      <div className="absolute inset-x-0 bottom-0 z-10 px-5 sm:px-6 pb-[max(env(safe-area-inset-bottom),1.5rem)] pt-12 sm:pt-16">
-        <div className="max-w-6xl mx-auto space-y-3 sm:space-y-4 [text-shadow:0_1px_3px_rgba(0,0,0,0.55)]">
+      <div className="absolute inset-x-0 bottom-0 z-10 px-5 sm:px-6 pb-[max(env(safe-area-inset-bottom),1.75rem)] pt-16 sm:pt-20">
+        <div className="max-w-6xl mx-auto [text-shadow:0_1px_3px_rgba(0,0,0,0.7)]">
           {campaign.archived && (
             <Badge
               variant="secondary"
-              className="bg-background/85 text-foreground border-border/40 backdrop-blur [text-shadow:none]"
+              className="mb-4 bg-background/85 text-foreground border-border/40 backdrop-blur [text-shadow:none]"
             >
               <Archive className="size-3.5 mr-1.5" />
               Archived
             </Badge>
+          )}
+
+          {tagLabel && (
+            <div className="mb-5 sm:mb-6 text-xs sm:text-sm font-semibold uppercase tracking-[0.18em] text-white/80">
+              {tagLabel}
+            </div>
           )}
 
           <h1 className="text-3xl sm:text-5xl lg:text-6xl font-bold leading-[1.05] tracking-tight text-white max-w-4xl">
@@ -677,7 +683,7 @@ function CampaignHero({
           </h1>
 
           {campaign.summary && (
-            <p className="text-base sm:text-lg lg:text-xl leading-relaxed text-white/90 max-w-2xl line-clamp-4 sm:line-clamp-none">
+            <p className="mt-4 text-base sm:text-lg lg:text-xl leading-relaxed text-white/90 max-w-2xl line-clamp-4 sm:line-clamp-none">
               {campaign.summary}
             </p>
           )}
@@ -685,7 +691,7 @@ function CampaignHero({
           <Link
             to={creatorProfileUrl}
             onClick={(e) => e.stopPropagation()}
-            className="inline-flex items-center gap-2.5 pt-1 text-sm sm:text-base text-white/90 hover:text-white motion-safe:transition-colors group [text-shadow:none]"
+            className="mt-5 inline-flex items-center gap-2.5 text-sm sm:text-base text-white/90 hover:text-white motion-safe:transition-colors group [text-shadow:none]"
           >
             <Avatar className="size-8 sm:size-9 ring-2 ring-white/30">
               {creatorPicture && <AvatarImage src={creatorPicture} alt="" />}
@@ -693,7 +699,7 @@ function CampaignHero({
                 {initials}
               </AvatarFallback>
             </Avatar>
-            <span className="[text-shadow:0_1px_3px_rgba(0,0,0,0.55)]">
+            <span className="[text-shadow:0_1px_3px_rgba(0,0,0,0.7)]">
               by{' '}
               <span className="font-semibold underline-offset-4 group-hover:underline">
                 {creatorName}
@@ -701,13 +707,8 @@ function CampaignHero({
             </span>
           </Link>
 
-          {(tagLabel || countryLabel || deadline || campaign.recipients.length > 0) && (
-            <div className="flex flex-wrap items-center gap-x-5 gap-y-1.5 pt-1 text-xs sm:text-sm font-medium text-white/85">
-              {tagLabel && (
-                <span className="font-semibold uppercase tracking-[0.12em] text-white/80">
-                  {tagLabel}
-                </span>
-              )}
+          {(countryLabel || deadline || campaign.recipients.length > 0) && (
+            <div className="mt-3 flex flex-wrap items-center gap-x-5 gap-y-1.5 text-xs sm:text-sm font-medium text-white/85">
               {countryLabel && (
                 <span className="inline-flex items-center gap-1.5">
                   <MapPin className="size-4" />
