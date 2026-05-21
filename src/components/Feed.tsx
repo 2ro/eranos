@@ -20,6 +20,7 @@ import { useMuteList } from '@/hooks/useMuteList';
 import { useTabFeed } from '@/hooks/useProfileFeed';
 import { useSavedFeeds } from '@/hooks/useSavedFeeds';
 import { useResolveTabFilter } from '@/hooks/useResolveTabFilter';
+import { useAgoraFeed } from '@/hooks/useAgoraFeed';
 import { useWorldFeed } from '@/hooks/useWorldFeed';
 import { shouldHideFeedEvent } from '@/lib/feedUtils';
 import { HOPE_PALETTE } from '@/lib/hopePalette';
@@ -32,7 +33,7 @@ import { cn } from '@/lib/utils';
 import type { FeedItem } from '@/lib/feedUtils';
 import type { SavedFeed } from '@/contexts/AppContext';
 
-type CoreFeedTab = 'follows' | 'network' | 'global' | 'communities' | 'world';
+type CoreFeedTab = 'follows' | 'network' | 'global' | 'communities' | 'world' | 'agora';
 type FeedTab = CoreFeedTab | string; // string = saved feed id
 
 interface FeedProps {
@@ -166,9 +167,13 @@ export function Feed({ kinds, tagFilters, header, hideCompose, emptyMessage, fee
   // Is the world feed active?
   const isWorldActive = useWorldForLoggedOut || !!useWorldTab;
 
+  // When the Agora tab is active, show the mixed Agora activity feed.
+  // Disabled on kind-specific pages — the Agora tab is not shown there.
+  const isAgoraActive = activeTab === 'agora' && !kinds && !useWorldForLoggedOut;
+
   // Standard feed query (used when logged in, or on kind-specific pages, or core tabs)
   const isHomeFollowingActive = activeTab === 'follows' && !isKindSpecificPage && !tagFilters;
-  const isCoreFeedTab = activeTab === 'follows' || activeTab === 'network' || activeTab === 'global' || activeTab === 'communities' || activeTab === 'world';
+  const isCoreFeedTab = activeTab === 'follows' || activeTab === 'network' || activeTab === 'global' || activeTab === 'communities' || activeTab === 'world' || activeTab === 'agora';
   type UseFeedTab = 'follows' | 'network' | 'global' | 'communities';
   const feedTabForQuery: UseFeedTab =
     activeTab === 'follows'
@@ -177,14 +182,16 @@ export function Feed({ kinds, tagFilters, header, hideCompose, emptyMessage, fee
         ? (activeTab as UseFeedTab)
       : 'global';
   const standardFeedOptions = (kinds || tagFilters)
-    ? { kinds, tagFilters, enabled: !isHomeFollowingActive }
-    : { enabled: !isHomeFollowingActive };
+    ? { kinds, tagFilters, enabled: !isHomeFollowingActive && !isAgoraActive }
+    : { enabled: !isHomeFollowingActive && !isAgoraActive };
   const feedQuery = useFeed(
-    isCoreFeedTab && !isWorldActive ? feedTabForQuery : 'global',
+    isCoreFeedTab && !isWorldActive && !isAgoraActive ? feedTabForQuery : 'global',
     standardFeedOptions,
   );
 
   const followingFeed = useFollowingFeed(isHomeFollowingActive);
+
+  const agoraFeed = useAgoraFeed(isAgoraActive);
 
   // World feed: all country-tagged events with diversity cap + live streaming.
   const worldFeed = useWorldFeed(isWorldActive);
@@ -194,10 +201,12 @@ export function Feed({ kinds, tagFilters, header, hideCompose, emptyMessage, fee
   const queryKey = useMemo(
     () => isWorldActive
       ? ['world-feed']
-      : isHomeFollowingActive
-        ? [['feed', 'network'], ['community-activity-feed'], ['following-country-feed']]
-        : ['feed', activeTab],
-    [isWorldActive, isHomeFollowingActive, activeTab],
+      : isAgoraActive
+        ? ['agora-feed']
+        : isHomeFollowingActive
+          ? [['feed', 'network'], ['community-activity-feed'], ['following-country-feed']]
+          : ['feed', activeTab],
+    [isWorldActive, isAgoraActive, isHomeFollowingActive, activeTab],
   );
 
   const handleRefresh = usePageRefresh(queryKey);
@@ -217,16 +226,16 @@ export function Feed({ kinds, tagFilters, header, hideCompose, emptyMessage, fee
   } = isHomeFollowingActive ? followingFeed : feedQuery;
 
   // Unify pagination interface
-  const fetchNextPage = isWorldActive ? worldFeed.fetchNextPage : fetchNextPageStandard;
-  const hasNextPage = isWorldActive ? worldFeed.hasNextPage : hasNextPageStandard;
-  const isFetchingNextPage = isWorldActive ? worldFeed.isFetchingNextPage : isFetchingNextPageStandard;
+  const fetchNextPage = isWorldActive ? worldFeed.fetchNextPage : isAgoraActive ? agoraFeed.fetchNextPage : fetchNextPageStandard;
+  const hasNextPage = isWorldActive ? worldFeed.hasNextPage : isAgoraActive ? agoraFeed.hasNextPage : hasNextPageStandard;
+  const isFetchingNextPage = isWorldActive ? worldFeed.isFetchingNextPage : isAgoraActive ? agoraFeed.isFetchingNextPage : isFetchingNextPageStandard;
 
   // Auto-fetch page 2 as soon as page 1 arrives for smoother scrolling
   useEffect(() => {
-    if (!isHomeFollowingActive && !isWorldActive && hasNextPage && !isFetchingNextPage && rawData?.pages?.length === 1) {
+    if (!isHomeFollowingActive && !isWorldActive && !isAgoraActive && hasNextPage && !isFetchingNextPage && rawData?.pages?.length === 1) {
       fetchNextPage();
     }
-  }, [isHomeFollowingActive, isWorldActive, hasNextPage, isFetchingNextPage, rawData?.pages?.length, fetchNextPage]);
+  }, [isHomeFollowingActive, isWorldActive, isAgoraActive, hasNextPage, isFetchingNextPage, rawData?.pages?.length, fetchNextPage]);
 
   // Intersection observer for infinite scroll
   const { ref: scrollRef, inView } = useInView({
@@ -247,6 +256,10 @@ export function Feed({ kinds, tagFilters, header, hideCompose, emptyMessage, fee
       return worldFeed.events.map((event): FeedItem => ({ event, sortTimestamp: event.created_at }));
     }
 
+    if (isAgoraActive) {
+      return agoraFeed.events.map((event): FeedItem => ({ event, sortTimestamp: event.created_at }));
+    }
+
     if (!rawData?.pages) return [];
     const seen = new Set<string>();
 
@@ -260,12 +273,14 @@ export function Feed({ kinds, tagFilters, header, hideCompose, emptyMessage, fee
         if (muteItems.length > 0 && isEventMuted(item.event, muteItems)) return false;
         return true;
       });
-  }, [isWorldActive, worldFeed.events, rawData?.pages, muteItems]);
+  }, [isWorldActive, isAgoraActive, worldFeed.events, agoraFeed.events, rawData?.pages, muteItems]);
 
   // Show skeletons while loading.
   const showSkeleton = isWorldActive
     ? worldFeed.isLoading
-    : (isPending || (isLoading && !rawData));
+    : isAgoraActive
+      ? agoraFeed.isLoading
+      : (isPending || (isLoading && !rawData));
 
   const showSavedFeedTabs = user && !isKindSpecificPage && !tagFilters;
   const useGlobeBackdrop = feedId === 'home' && !kinds && !tagFilters && !header;
@@ -304,6 +319,9 @@ export function Feed({ kinds, tagFilters, header, hideCompose, emptyMessage, fee
             )}
             {!isKindSpecificPage && showWorldFeed && (
               <TabButton label="World" active={activeTab === 'world'} onClick={() => handleSetActiveTab('world')} />
+            )}
+            {!isKindSpecificPage && !tagFilters && (
+              <TabButton label="Agora" active={activeTab === 'agora'} onClick={() => handleSetActiveTab('agora')} />
             )}
             {!isKindSpecificPage && showCommunityFeed && (
               <TabButton label={communityLabel} active={activeTab === 'communities'} onClick={() => handleSetActiveTab('communities')} />
@@ -387,7 +405,9 @@ export function Feed({ kinds, tagFilters, header, hideCompose, emptyMessage, fee
                       ? 'Your feed is empty. Follow some people to see their posts here.'
                       : activeTab === 'world'
                         ? 'No world posts yet. Check back soon for global activity.'
-                        : 'No posts found. Check your relay connections or come back soon.'
+                        : activeTab === 'agora'
+                          ? 'No Agora activity found. Check your relay connections or come back soon.'
+                          : 'No posts found. Check your relay connections or come back soon.'
                   )
                 }
                 showDiscover={!emptyMessage && (activeTab === 'follows' || activeTab === 'network')}
