@@ -417,7 +417,7 @@ function CampaignDetailContent({ campaign }: { campaign: ParsedCampaign }) {
 
                 <DetailCommentComposer
                   event={campaign.event}
-                  className="mb-3 mx-0 sm:mx-0"
+                  className="mb-3"
                   onSuccess={() => queryClient.invalidateQueries({ queryKey: ['nostr', 'comments'] })}
                 />
 

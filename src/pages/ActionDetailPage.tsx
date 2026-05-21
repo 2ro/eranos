@@ -220,7 +220,7 @@ function PledgeDetailContent({ action }: { action: Action }) {
                     {Array.from({ length: 3 }).map((_, i) => <PledgeReplySkeleton key={i} />)}
                   </div>
                 ) : replyTree.length > 0 ? (
-                  <div className="-mx-2 sm:-mx-4 rounded-2xl bg-card border border-border/60 overflow-hidden">
+                  <div className="rounded-2xl bg-card border border-border/60 overflow-hidden">
                     <ThreadedReplyList roots={replyTree} />
                   </div>
                 ) : (

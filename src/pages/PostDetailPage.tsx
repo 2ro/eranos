@@ -2098,13 +2098,13 @@ function PostDetailContent({ event }: { event: NostrEvent }) {
         />
 
         {repliesLoading ? (
-          <div className="-mx-2 sm:-mx-4 rounded-2xl bg-card border border-border/60 shadow-sm overflow-hidden divide-y divide-border">
+          <div className="rounded-2xl bg-card border border-border/60 shadow-sm overflow-hidden divide-y divide-border">
             {Array.from({ length: 3 }).map((_, i) => (
               <ReplyCardSkeleton key={i} />
             ))}
           </div>
         ) : replyTree.length > 0 ? (
-          <div className="-mx-2 sm:-mx-4 rounded-2xl bg-card border border-border/60 shadow-sm overflow-hidden">
+          <div className="rounded-2xl bg-card border border-border/60 shadow-sm overflow-hidden">
             <ThreadedReplyList roots={replyTree} />
           </div>
         ) : (

@@ -1,7 +1,6 @@
 import type { NostrEvent } from '@nostrify/nostrify';
 
 import { ComposeBox } from '@/components/ComposeBox';
-import { cn } from '@/lib/utils';
 
 interface DetailCommentComposerProps {
   event: NostrEvent;
@@ -17,7 +16,7 @@ export function DetailCommentComposer({
   className,
 }: DetailCommentComposerProps) {
   return (
-    <div className={cn('-mx-2 sm:-mx-4', className)}>
+    <div className={className}>
       <ComposeBox
         compact
         defaultExpanded
