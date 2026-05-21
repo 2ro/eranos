@@ -39,6 +39,7 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { DonateDialog } from '@/components/DonateDialog';
+import { DetailCommentComposer } from '@/components/DetailCommentComposer';
 import { PostActionBar } from '@/components/PostActionBar';
 import { ReplyComposeModal } from '@/components/ReplyComposeModal';
 import { NoteMoreMenu } from '@/components/NoteMoreMenu';
@@ -412,6 +413,12 @@ function CampaignDetailContent({ campaign }: { campaign: ParsedCampaign }) {
                     </span>
                   ) : null}
                 </div>
+
+                <DetailCommentComposer
+                  event={campaign.event}
+                  className="mb-3"
+                  onSuccess={() => queryClient.invalidateQueries({ queryKey: ['nostr', 'comments'] })}
+                />
 
                 {commentsLoading && statsLoading && replyTree.length === 0 ? (
                   <div className="space-y-3">
