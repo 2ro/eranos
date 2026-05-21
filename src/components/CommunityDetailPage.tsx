@@ -833,7 +833,7 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
       <div className="max-w-6xl mx-auto px-4 sm:px-6 pt-4">
         <CommunityModerationContext.Provider value={moderationCtx}>
           {/* ── Hero ─────────────────────────────────────────────────────── */}
-          <div className="relative aspect-[16/9] sm:aspect-[21/9] rounded-xl overflow-hidden bg-gradient-to-br from-primary/40 via-primary/20 to-secondary">
+          <div className="relative aspect-[16/9] sm:aspect-[21/9] rounded-t-xl rounded-b-none overflow-hidden bg-gradient-to-br from-primary/40 via-primary/20 to-secondary">
             {cover ? (
               <img src={cover} alt="" className="absolute inset-0 size-full object-cover" />
             ) : (
@@ -962,7 +962,7 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
             </div>
           </div>
 
-          <div className="mt-3 rounded-2xl bg-card border border-border/60 shadow-sm px-4 sm:px-5 py-3">
+          <div className="rounded-b-xl rounded-t-none bg-card border border-t-0 border-border/60 shadow-sm px-4 sm:px-5 py-3">
             <PostActionBar
               event={event}
               replyLabel="Comment"

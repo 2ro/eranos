@@ -170,8 +170,8 @@ function PledgeDetailContent({ action }: { action: Action }) {
         onBack={() => navigate(-1)}
       />
 
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 mt-3">
-        <div className="rounded-2xl bg-card border border-border/60 shadow-sm px-4 sm:px-5 py-3">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6">
+        <div className="rounded-b-xl rounded-t-none bg-card border border-t-0 border-border/60 shadow-sm px-4 sm:px-5 py-3">
           <PostActionBar
             event={action.event}
             replyLabel="Submit"
@@ -277,7 +277,7 @@ function PledgeHero({ action, cover, creatorName, creatorProfileUrl, deadline, o
 
   return (
     <div className="max-w-6xl mx-auto px-4 sm:px-6 pt-4">
-      <div className="relative aspect-[16/9] sm:aspect-[21/9] rounded-xl overflow-hidden bg-gradient-to-br from-primary/15 via-primary/5 to-secondary">
+      <div className="relative aspect-[16/9] sm:aspect-[21/9] rounded-t-xl rounded-b-none overflow-hidden bg-gradient-to-br from-primary/15 via-primary/5 to-secondary">
         <img
           src={coverImage}
           alt=""
