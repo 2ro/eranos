@@ -47,7 +47,6 @@ const ChangelogPage = lazy(() => import("./pages/ChangelogPage").then(m => ({ de
 const CommunitiesPage = lazy(() => import("./pages/CommunitiesPage").then(m => ({ default: m.CommunitiesPage })));
 const CreateCommunityPage = lazy(() => import("./pages/CreateCommunityPage").then(m => ({ default: m.CreateCommunityPage })));
 const CreateEventPage = lazy(() => import("./pages/CreateEventPage").then(m => ({ default: m.CreateEventPage })));
-const ContentPage = lazy(() => import("./pages/ContentPage").then(m => ({ default: m.ContentPage })));
 const ContentSettingsPage = lazy(() => import("./pages/ContentSettingsPage").then(m => ({ default: m.ContentSettingsPage })));
 const CSAEPolicyPage = lazy(() => import("./pages/CSAEPolicyPage").then(m => ({ default: m.CSAEPolicyPage })));
 const DiscoverPage = lazy(() => import("./pages/DiscoverPage").then(m => ({ default: m.DiscoverPage })));
@@ -187,7 +186,6 @@ export function AppRouter() {
             <Route path="/settings/appearance" element={<AppearanceSettingsPage />} />
             <Route path="/settings/profile" element={<ProfileSettings />} />
             <Route path="/settings/feed" element={<ContentSettingsPage />} />
-            <Route path="/settings/content" element={<ContentPage />} />
             <Route path="/settings/wallet" element={<WalletSettingsPage />} />
             <Route
               path="/settings/notifications"

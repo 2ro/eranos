@@ -1,7 +1,7 @@
-import { useState } from 'react';
+import { useState, type ReactNode } from 'react';
 import {
   Users, Download, Loader2, X, Pencil, Home, Globe, MapPin,
-  Palette, Trash2, Plus, UserX, Hash, MessageSquareOff, ExternalLink, ShieldAlert,
+  Trash2, Plus, UserX, Hash, MessageSquareOff, ExternalLink,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -25,214 +25,105 @@ import { useAuthor } from '@/hooks/useAuthor';
 import { FeedEditModal } from '@/components/FeedEditModal';
 import { buildKindOptions } from '@/lib/feedFilterUtils';
 import { genUserName } from '@/lib/genUserName';
-import { EXTRA_KINDS, FEED_KINDS, SECTION_ORDER, SECTION_LABELS } from '@/lib/extraKinds';
-import { CONTENT_KIND_ICONS, SIDEBAR_ITEMS } from '@/lib/sidebarItems';
-import type { SavedFeed, TabFilter, ContentWarningPolicy } from '@/contexts/AppContext';
-import type { ExtraKindDef, SubKindDef } from '@/lib/extraKinds';
+import { EXTRA_KINDS } from '@/lib/extraKinds';
+import { SIDEBAR_ITEMS } from '@/lib/sidebarItems';
+import type { FeedSettings, SavedFeed, TabFilter, ContentWarningPolicy } from '@/contexts/AppContext';
+import type { ExtraKindDef } from '@/lib/extraKinds';
 
 export function ContentSettings() {
   return (
-    <div>
-      {/* Intro */}
-      <div className="px-3 pt-2 pb-4">
-        <h2 className="text-sm font-semibold">What You See</h2>
-        <p className="text-xs text-muted-foreground mt-1 leading-relaxed">
-          Customize your feed, choose what content appears, and control what you want to hide.
-        </p>
-      </div>
-
-      {/* Homepage Section */}
+    <div className="space-y-8">
       <HomePageSetting />
 
-      {/* Feed Tabs Section */}
-      <div>
-        <div className="relative px-3 py-3.5">
-          <h2 className="text-base font-semibold">Home Feed Tabs</h2>
-          <div className="absolute bottom-0 left-0 right-0 h-1 bg-primary rounded-full" />
-        </div>
-        <div className="pb-4">
-          <FeedTabsSection />
-        </div>
-      </div>
+      <Section title="Saved Feeds">
+        <FeedTabsSection />
+      </Section>
 
-      {/* Notes Section */}
-      <div>
-        <div className="relative px-3 py-3.5">
-          <h2 className="text-base font-semibold">Basic Home Feed Options</h2>
-          <div className="absolute bottom-0 left-0 right-0 h-1 bg-primary rounded-full" />
-        </div>
-        <div className="pb-4">
-          <div className="px-3 pt-3 pb-4">
-            <p className="text-xs text-muted-foreground leading-relaxed">
-              Core content types that appear in your feed.
-            </p>
-          </div>
+      <Section title="Content in Home Feed">
+        <FlatContentList />
+      </Section>
 
-          {/* Column headers */}
-          <div className="flex items-center justify-end gap-2 px-3 pb-2 border-b border-border">
-            <span className="text-[11px] font-medium text-muted-foreground w-[52px] text-center">Feed</span>
-          </div>
+      <Section title="Muted">
+        <MuteSettingsInternals />
+      </Section>
 
-          <NotesFeedSettings />
-        </div>
-      </div>
-
-      {/* Other Stuff Section */}
-      <div>
-        <div className="relative px-3 py-3.5">
-          <h2 className="text-base font-semibold">Show More Content Types in Home Feed</h2>
-          <div className="absolute bottom-0 left-0 right-0 h-1 bg-primary rounded-full" />
-        </div>
-        <div className="pb-4">
-          {/* Intro section for Other Stuff */}
-          <div className="px-3 pt-3 pb-4">
-            <h3 className="text-sm font-semibold">Other Stuff</h3>
-            <p className="text-xs text-muted-foreground mt-1 leading-relaxed">
-              Nostr isn't just text posts — people publish all kinds of things. Pick what shows up in your sidebar and feed.
-            </p>
-          </div>
-
-          {/* Column headers */}
-          <div className="flex items-center justify-end gap-2 px-3 pb-2 border-b border-border">
-            <span className="text-[11px] font-medium text-muted-foreground w-[52px] text-center">Feed</span>
-          </div>
-
-          {/* Content type rows - reuse the internals from FeedSettingsForm */}
-          <FeedSettingsFormInternals />
-        </div>
-      </div>
-
+      <Section title="Sensitive Content">
+        <SensitiveContentSection />
+      </Section>
     </div>
   );
 }
 
-
-
-function KindBadge({ kind }: { kind: number }) {
+function Section({ title, children }: { title: string; children: ReactNode }) {
   return (
-    <span className="text-[10px] font-mono text-muted-foreground/60 shrink-0">
-      [{kind}]
-    </span>
+    <section>
+      <h2 className="text-base font-semibold px-3 pb-2 border-b border-border">{title}</h2>
+      <div className="pt-2">{children}</div>
+    </section>
   );
 }
 
-function SubKindRow({ sub }: { sub: SubKindDef }) {
-  const { feedSettings, updateFeedSettings } = useFeedSettings();
-  const { updateSettings } = useEncryptedSettings();
-  const { user } = useCurrentUser();
-
-  const handleToggle = async (key: string, value: boolean) => {
-    updateFeedSettings({ [key]: value });
-    if (user) {
-      await updateSettings.mutateAsync({ feedSettings: { ...feedSettings, [key]: value } });
-    }
-  };
+function FlatContentList() {
+  // Flat, ordered list of curated kinds. No section grouping, no sub-rows, no kind badges.
+  const orderedIds = [
+    'posts', 'replies', 'reposts', 'articles', 'highlights',
+    'photos', 'videos', 'voice',
+    'events', 'polls', 'communities', 'badges',
+    'reactions', 'zaps',
+  ];
+  const byId = new Map(EXTRA_KINDS.map((def) => [def.id, def]));
+  // Replies is id 'comments' in the registry; alias here for readability.
+  byId.set('replies', byId.get('comments')!);
+  const rows = orderedIds.map((id) => byId.get(id)).filter((d): d is ExtraKindDef => !!d && !!d.agora);
 
   return (
-    <div className="flex items-center justify-between py-2.5 pl-12 pr-3 transition-colors">
-      <div className="min-w-0">
-        <span className="text-sm">{sub.label}</span>
-        <p className="text-xs text-muted-foreground mt-0.5">
-          <KindBadge kind={sub.kind} />{' '}{sub.description}
-        </p>
-      </div>
-      <div className="flex items-center gap-2 shrink-0">
-        <div className="w-[52px] flex justify-center">
-          <Switch
-            checked={feedSettings[sub.feedKey]}
-            onCheckedChange={(checked) => handleToggle(sub.feedKey, checked)}
-            className="scale-90"
-          />
-        </div>
-      </div>
-    </div>
+    <ul className="divide-y divide-border">
+      {rows.map((def) => (
+        <li key={def.id}>
+          <ContentTypeRow def={def} />
+        </li>
+      ))}
+    </ul>
   );
 }
+
+
 
 function ContentTypeRow({ def }: { def: ExtraKindDef }) {
   const { feedSettings, updateFeedSettings } = useFeedSettings();
   const { updateSettings } = useEncryptedSettings();
   const { user } = useCurrentUser();
-  const IconComponent = CONTENT_KIND_ICONS[def.id] ?? Palette;
-  const icon = <IconComponent className="size-5" />;
-  const hasSubKinds = !!def.subKinds;
 
-  const handleToggle = async (key: string, value: boolean) => {
-    updateFeedSettings({ [key]: value });
+  // Toggle key: prefer the feed inclusion key; fall back to the sidebar visibility key
+  // for kinds that have no direct feed key of their own (e.g. parent kinds with sub-kinds).
+  const toggleKey: keyof FeedSettings | undefined = def.feedKey ?? def.showKey;
+  if (!toggleKey) return null;
+
+  const checked = feedSettings[toggleKey] !== false;
+
+  const handleToggle = async (value: boolean) => {
+    const next: Partial<FeedSettings> = { [toggleKey]: value };
+    // Parent kinds with sub-kinds: toggle all sub-kind feed keys together so the
+    // single parent switch governs everything below it.
+    if (def.subKinds) {
+      for (const sub of def.subKinds) {
+        next[sub.feedKey] = value;
+      }
+    }
+    updateFeedSettings(next);
     if (user) {
-      await updateSettings.mutateAsync({ feedSettings: { ...feedSettings, [key]: value } });
+      await updateSettings.mutateAsync({ feedSettings: { ...feedSettings, ...next } });
     }
   };
 
   return (
-    <div className="border-b border-border last:border-b-0">
-      <div className="flex items-center justify-between py-3.5 px-3">
-        <div className="flex items-center gap-3 min-w-0">
-          <span className="text-muted-foreground shrink-0">{icon}</span>
-          <div className="min-w-0">
-            <span className="text-sm font-medium">{def.label}</span>
-            <p className="text-xs text-muted-foreground mt-0.5">
-              <KindBadge kind={def.kind} />{' '}{def.description}
-            </p>
-          </div>
-        </div>
-        <div className="flex items-center gap-2 shrink-0">
-          <div className="w-[52px] flex justify-center">
-            {!hasSubKinds && def.feedKey ? (
-              <Switch
-                checked={feedSettings[def.feedKey]}
-                onCheckedChange={(checked) => handleToggle(def.feedKey!, checked)}
-              />
-            ) : !hasSubKinds && def.feedOnly && def.showKey ? (
-              <Switch
-                checked={feedSettings[def.showKey] !== false}
-                onCheckedChange={(checked) => handleToggle(def.showKey!, checked)}
-              />
-            ) : null}
-          </div>
-        </div>
+    <div className="flex items-center justify-between gap-4 py-3.5 px-3">
+      <div className="min-w-0">
+        <span className="text-sm font-medium">{def.label}</span>
+        <p className="text-xs text-muted-foreground mt-0.5">{def.description}</p>
       </div>
-
-      {hasSubKinds && def.subKinds && def.subKinds.map((sub) => (
-        <SubKindRow
-          key={sub.feedKey}
-          sub={sub}
-        />
-      ))}
+      <Switch checked={checked} onCheckedChange={handleToggle} className="shrink-0" />
     </div>
-  );
-}
-
-function NotesFeedSettings() {
-  return (
-    <>
-      {FEED_KINDS.filter((def) => def.agora).map((def) => (
-        <ContentTypeRow key={def.id} def={def} />
-      ))}
-    </>
-  );
-}
-
-function FeedSettingsFormInternals() {
-  return (
-    <>
-      {SECTION_ORDER.map((section) => {
-        const sectionKinds = EXTRA_KINDS.filter((def) => def.section === section && def.agora);
-        if (sectionKinds.length === 0) return null;
-        return (
-          <div key={section}>
-            <div className="px-3 pt-4 pb-2">
-              <span className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
-                {SECTION_LABELS[section]}
-              </span>
-            </div>
-            {sectionKinds.map((def) => (
-              <ContentTypeRow key={def.id} def={def} />
-            ))}
-          </div>
-        );
-      })}
-    </>
   );
 }
 
@@ -915,16 +806,10 @@ export function SensitiveContentSection() {
   return (
     <div>
       {/* Intro */}
-      <div className="flex items-center gap-4 px-3 pt-3 pb-4">
-        <div className="w-40 shrink-0 flex items-center justify-center">
-          <ShieldAlert className="size-16 text-muted-foreground/40" />
-        </div>
-        <div className="min-w-0">
-          <h3 className="text-sm font-semibold">Content Warnings</h3>
-          <p className="text-xs text-muted-foreground mt-1 leading-relaxed">
-            Some posts are tagged with content warnings (NIP-36) by their authors. This can include NSFW material, spoilers, or other sensitive content.
-          </p>
-        </div>
+      <div className="px-3 pt-3 pb-4">
+        <p className="text-xs text-muted-foreground leading-relaxed">
+          Some posts are tagged by their authors as sensitive — NSFW, graphic, or otherwise needing a content warning. Choose how to handle them.
+        </p>
       </div>
 
       {/* Policy options — consistent row style with other settings */}

@@ -37,14 +37,8 @@ const settingsSections: SettingsSection[] = [
   {
     id: 'feed',
     label: 'Home Feed',
-    description: 'Choose which post types appear in your home feed.',
+    description: 'Choose which post types appear in your home feed, and manage muted users, hashtags, and sensitive content.',
     path: '/settings/feed',
-  },
-  {
-    id: 'content',
-    label: 'Content',
-    description: 'Muted users, hashtags, and sensitive-content handling.',
-    path: '/settings/content',
   },
   {
     id: 'network',
