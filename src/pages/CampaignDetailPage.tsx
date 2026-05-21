@@ -344,7 +344,7 @@ function CampaignDetailContent({ campaign }: { campaign: ParsedCampaign }) {
           immediately below the hero so the donate CTA stays above the
           fold. On lg+ the right column sticks to the viewport edge of
           the main content while the article scrolls. */}
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 py-6 lg:py-10">
+      <div className="max-w-6xl mx-auto px-5 sm:px-6 lg:px-0 py-6 lg:py-10">
         <div className="lg:flex lg:gap-8 lg:items-start">
           {/* Mobile-only inline donate card */}
           <div className="lg:hidden mb-6">{donateColumn}</div>
@@ -605,7 +605,7 @@ function CampaignHero({
           same max-w-6xl column as the overlay text below so the back
           button aligns with the title's left edge. Chip-style
           backdrops so they read on any image without an opaque pill. */}
-      <div className="absolute inset-x-0 top-0 z-10 px-5 sm:px-6 pt-[max(env(safe-area-inset-top),1rem)]">
+      <div className="absolute inset-x-0 top-0 z-10 px-5 sm:px-6 lg:px-0 pt-[max(env(safe-area-inset-top),1rem)]">
         <div className="max-w-6xl mx-auto flex items-center justify-between gap-3">
           <button
             onClick={onBack}
@@ -662,7 +662,7 @@ function CampaignHero({
           keeps the title comfortably above the home-indicator on
           notched phones. Drop-shadow on text gives extra contrast on
           busy photos without darkening the gradient further. */}
-      <div className="absolute inset-x-0 bottom-0 z-10 px-5 sm:px-6 pb-[max(env(safe-area-inset-bottom),1.75rem)] pt-16 sm:pt-20">
+      <div className="absolute inset-x-0 bottom-0 z-10 px-5 sm:px-6 lg:px-0 pb-[max(env(safe-area-inset-bottom),1.75rem)] pt-16 sm:pt-20">
         <div className="max-w-6xl mx-auto [text-shadow:0_1px_3px_rgba(0,0,0,0.7)]">
           {campaign.archived && (
             <Badge
@@ -1107,7 +1107,7 @@ function CampaignDetailSkeleton() {
   return (
     <main className="min-h-screen pb-16">
       <Skeleton className="w-full min-h-[78svh] sm:min-h-0 sm:aspect-[21/9] lg:aspect-[24/9] rounded-none" />
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 py-6 lg:py-10">
+      <div className="max-w-6xl mx-auto px-5 sm:px-6 lg:px-0 py-6 lg:py-10">
         <div className="lg:flex lg:gap-8 lg:items-start">
           <div className="flex-1 min-w-0 space-y-3">
             <Skeleton className="h-5 w-full" />
