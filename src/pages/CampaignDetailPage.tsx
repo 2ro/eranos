@@ -619,8 +619,8 @@ function CampaignActivityItemHeader({
           </span>
         )}
         {isCampaignAuthor && (
-          <span className="inline-flex items-center rounded-full bg-amber-500/10 px-2 py-0.5 font-medium text-amber-700 dark:text-amber-300">
-            Campaign author
+          <span className="inline-flex items-center rounded-full bg-primary/10 px-2 py-0.5 font-medium text-primary">
+            Campaigner
           </span>
         )}
       </div>
