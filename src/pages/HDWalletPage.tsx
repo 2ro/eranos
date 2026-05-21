@@ -2,7 +2,6 @@ import { useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useSeoMeta } from '@unhead/react';
 import {
-  Bitcoin,
   Copy,
   Check,
   RefreshCw,
@@ -276,15 +275,6 @@ export function HDWalletPage() {
             </TxAccordion>
           </>
         )}
-
-        {/* Standard wallet link */}
-        <Link
-          to="/wallet"
-          className="text-xs text-muted-foreground hover:text-foreground underline-offset-4 hover:underline transition-colors flex items-center gap-1"
-        >
-          <Bitcoin className="size-3" />
-          Standard single-address wallet
-        </Link>
       </div>
     </main>
   );
