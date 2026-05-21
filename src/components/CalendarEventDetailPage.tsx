@@ -286,6 +286,122 @@ export function CalendarEventDetailPage({ event }: { event: NostrEvent }) {
 
   const showRSVP = !!user;
   const attendeeCount = rsvps.accepted.length + rsvps.tentative.length;
+  const rsvpStatusLabel = myRsvp.status === 'accepted'
+    ? 'You are going'
+    : myRsvp.status === 'tentative'
+      ? 'You are interested'
+      : myRsvp.status === 'declined'
+        ? "You can't go"
+        : 'Choose your RSVP';
+
+  const eventDetailsCard = (
+    <Card className="overflow-hidden">
+      <CardContent className="p-5 space-y-5">
+        <div className="space-y-3">
+          <EventDetailRow icon={<Clock className="size-5" />}>
+            {dateStr}
+          </EventDetailRow>
+          {location && (
+            <EventDetailRow icon={<MapPin className="size-5" />}>
+              {location}
+            </EventDetailRow>
+          )}
+        </div>
+
+        {showRSVP && (
+          <div className="space-y-3 border-t border-border/60 pt-4">
+            <div className="flex items-center justify-between gap-3">
+              <div className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">RSVP</div>
+              <span className="text-xs font-medium text-muted-foreground">{rsvpStatusLabel}</span>
+            </div>
+            <div className="grid grid-cols-3 gap-2">
+              <Button
+                size="sm"
+                variant={myRsvp.status === 'accepted' ? 'default' : 'outline'}
+                disabled={publishRSVP.isPending}
+                className={cn('rounded-full px-2', myRsvp.status === 'accepted' && 'bg-green-600 hover:bg-green-700 text-white')}
+                onClick={() => handleRSVP('accepted')}
+              >
+                <Check className="size-3.5 mr-1" />
+                Going
+              </Button>
+              <Button
+                size="sm"
+                variant={myRsvp.status === 'tentative' ? 'default' : 'outline'}
+                disabled={publishRSVP.isPending}
+                className={cn('rounded-full px-2', myRsvp.status === 'tentative' && 'bg-amber-500 hover:bg-amber-600 text-white')}
+                onClick={() => handleRSVP('tentative')}
+              >
+                <Star className="size-3.5 mr-1" />
+                Interested
+              </Button>
+              <Button
+                size="sm"
+                variant={myRsvp.status === 'declined' ? 'default' : 'outline'}
+                disabled={publishRSVP.isPending}
+                className={cn('rounded-full px-2', myRsvp.status === 'declined' && 'bg-destructive hover:bg-destructive/90 text-destructive-foreground')}
+                onClick={() => handleRSVP('declined')}
+              >
+                <XIcon className="size-3.5 mr-1" />
+                Can't Go
+              </Button>
+            </div>
+          </div>
+        )}
+
+        {rsvps.total > 0 && (
+          <div className="space-y-3 border-t border-border/60 pt-4">
+            <div className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Attendees</div>
+            <div className="space-y-3">
+              {([
+                ['Going', rsvps.accepted, 'border-green-500/50 bg-green-500/5 text-green-600'],
+                ['Interested', rsvps.tentative, 'border-amber-500/50 bg-amber-500/5 text-amber-600'],
+                ["Can't Go", rsvps.declined, 'border-muted-foreground/30 bg-muted/30 text-muted-foreground'],
+              ] as const).map(([label, pks, cls]) => pks.length > 0 && (
+                <div key={label} className="space-y-2">
+                  <Badge variant="outline" className={cn(cls, 'shrink-0 text-xs')}>{label} ({pks.length})</Badge>
+                  <RSVPAvatars pubkeys={pks} maxVisible={8} size="sm" />
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {links.length > 0 && (
+          <div className="space-y-2 border-t border-border/60 pt-4">
+            <div className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Links</div>
+            <div className="space-y-1">
+              {links.map((url) => (
+                <button
+                  key={url}
+                  type="button"
+                  onClick={() => void openUrl(url)}
+                  className="flex w-full items-center gap-2 rounded-lg px-2 py-2 text-left text-sm hover:bg-muted/50 transition-colors"
+                >
+                  <LinkIcon className="size-4 text-primary shrink-0" />
+                  <span className="truncate flex-1">{url.replace(/^https?:\/\//, '')}</span>
+                  <ExternalLink className="size-3.5 text-muted-foreground shrink-0" />
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+      </CardContent>
+    </Card>
+  );
+
+  const participantsCard = participantsByRole.length > 0 ? (
+    <Card>
+      <CardContent className="p-5 space-y-3">
+        <div className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Participants</div>
+        <div className="space-y-2">
+          {participantsByRole.map(([role, pubkeys]) =>
+            pubkeys.map((pk) => <PersonRow key={`${role}-${pk}`} pubkey={pk} label={role} size="sm" />),
+          )}
+        </div>
+      </CardContent>
+    </Card>
+  ) : null;
 
   return (
     <main className="min-h-screen pb-16">
@@ -388,6 +504,11 @@ export function CalendarEventDetailPage({ event }: { event: NostrEvent }) {
       )}
 
       <div className="max-w-6xl mx-auto px-4 sm:px-6 py-6 lg:py-10">
+        <div className="lg:hidden mb-6 space-y-4">
+          {eventDetailsCard}
+          {participantsCard}
+        </div>
+
         <div className="lg:flex lg:gap-8 lg:items-start">
           <div className="flex-1 min-w-0 space-y-8">
             <section className="space-y-5">
@@ -473,111 +594,10 @@ export function CalendarEventDetailPage({ event }: { event: NostrEvent }) {
             </section>
           </div>
 
-          <aside className="mt-8 lg:mt-0 lg:w-[360px] lg:shrink-0 lg:self-start">
+          <aside className="hidden lg:block lg:w-[360px] lg:shrink-0 lg:self-start">
             <div className="lg:sticky lg:top-4 space-y-4">
-              <Card className="overflow-hidden">
-                <CardContent className="p-5 space-y-5">
-                  <div className="space-y-3">
-                    <EventDetailRow icon={<Clock className="size-5" />}>
-                      {dateStr}
-                    </EventDetailRow>
-                    {location && (
-                      <EventDetailRow icon={<MapPin className="size-5" />}>
-                        {location}
-                      </EventDetailRow>
-                    )}
-                  </div>
-
-                  {showRSVP && (
-                    <div className="space-y-3 border-t border-border/60 pt-4">
-                      <div className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">RSVP</div>
-                      <div className="grid grid-cols-3 gap-2">
-                        <Button
-                          size="sm"
-                          variant={myRsvp.status === 'accepted' ? 'default' : 'outline'}
-                          disabled={publishRSVP.isPending}
-                          className={cn('rounded-full px-2', myRsvp.status === 'accepted' && 'bg-green-600 hover:bg-green-700 text-white')}
-                          onClick={() => handleRSVP('accepted')}
-                        >
-                          <Check className="size-3.5 mr-1" />
-                          Going
-                        </Button>
-                        <Button
-                          size="sm"
-                          variant={myRsvp.status === 'tentative' ? 'default' : 'outline'}
-                          disabled={publishRSVP.isPending}
-                          className={cn('rounded-full px-2', myRsvp.status === 'tentative' && 'bg-amber-500 hover:bg-amber-600 text-white')}
-                          onClick={() => handleRSVP('tentative')}
-                        >
-                          <Star className="size-3.5 mr-1" />
-                          Maybe
-                        </Button>
-                        <Button
-                          size="sm"
-                          variant={myRsvp.status === 'declined' ? 'default' : 'outline'}
-                          disabled={publishRSVP.isPending}
-                          className={cn('rounded-full px-2', myRsvp.status === 'declined' && 'bg-destructive hover:bg-destructive/90 text-destructive-foreground')}
-                          onClick={() => handleRSVP('declined')}
-                        >
-                          <XIcon className="size-3.5 mr-1" />
-                          No
-                        </Button>
-                      </div>
-                    </div>
-                  )}
-
-                  {rsvps.total > 0 && (
-                    <div className="space-y-3 border-t border-border/60 pt-4">
-                      <div className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Attendees</div>
-                      <div className="space-y-3">
-                        {([
-                          ['Going', rsvps.accepted, 'border-green-500/50 bg-green-500/5 text-green-600'],
-                          ['Interested', rsvps.tentative, 'border-amber-500/50 bg-amber-500/5 text-amber-600'],
-                          ["Can't Go", rsvps.declined, 'border-muted-foreground/30 bg-muted/30 text-muted-foreground'],
-                        ] as const).map(([label, pks, cls]) => pks.length > 0 && (
-                          <div key={label} className="space-y-2">
-                            <Badge variant="outline" className={cn(cls, 'shrink-0 text-xs')}>{label} ({pks.length})</Badge>
-                            <RSVPAvatars pubkeys={pks} maxVisible={8} size="sm" />
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-
-                  {links.length > 0 && (
-                    <div className="space-y-2 border-t border-border/60 pt-4">
-                      <div className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Links</div>
-                      <div className="space-y-1">
-                        {links.map((url) => (
-                          <button
-                            key={url}
-                            type="button"
-                            onClick={() => void openUrl(url)}
-                            className="flex w-full items-center gap-2 rounded-lg px-2 py-2 text-left text-sm hover:bg-muted/50 transition-colors"
-                          >
-                            <LinkIcon className="size-4 text-primary shrink-0" />
-                            <span className="truncate flex-1">{url.replace(/^https?:\/\//, '')}</span>
-                            <ExternalLink className="size-3.5 text-muted-foreground shrink-0" />
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
-
-              {participantsByRole.length > 0 && (
-                <Card>
-                  <CardContent className="p-5 space-y-3">
-                    <div className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Participants</div>
-                    <div className="space-y-2">
-                      {participantsByRole.map(([role, pubkeys]) =>
-                        pubkeys.map((pk) => <PersonRow key={`${role}-${pk}`} pubkey={pk} label={role} size="sm" />),
-                      )}
-                    </div>
-                  </CardContent>
-                </Card>
-              )}
+              {eventDetailsCard}
+              {participantsCard}
             </div>
           </aside>
         </div>
