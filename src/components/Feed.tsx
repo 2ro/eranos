@@ -50,13 +50,16 @@ interface FeedProps {
   feedId?: string;
 }
 
+const FEED_BACKDROP_HUE_INTERVAL_MS = 45_000;
+const FEED_BACKDROP_HUE_FADE_MS = 18_000;
+
 function FeedGlobeBackground() {
   const [hueIndex, setHueIndex] = useState(0);
 
   useEffect(() => {
     const id = window.setInterval(() => {
       setHueIndex((i) => (i + 1) % HOPE_PALETTE.length);
-    }, 9_000);
+    }, FEED_BACKDROP_HUE_INTERVAL_MS);
     return () => window.clearInterval(id);
   }, []);
 
@@ -64,8 +67,8 @@ function FeedGlobeBackground() {
 
   return (
     <div className="fixed inset-0 z-0 pointer-events-none overflow-hidden bg-secondary/30" aria-hidden="true">
-      <HeroAtmosphere hue={activeHue} />
-      <div className="absolute inset-0 bg-gradient-to-b from-background/10 via-background/35 to-background/88" />
+      <HeroAtmosphere hue={activeHue} fadeMs={FEED_BACKDROP_HUE_FADE_MS} className="opacity-55" />
+      <div className="absolute inset-0 bg-gradient-to-b from-background/15 via-background/30 to-background/80" />
       <div className="absolute inset-0 flex items-center justify-center">
         <HeroGlobe
           hue={activeHue}
@@ -73,6 +76,7 @@ function FeedGlobeBackground() {
           style={{ width: 'clamp(460px, 72dvw, 820px)' }}
         />
       </div>
+      <div className="absolute inset-0 bg-background/30" />
     </div>
   );
 }

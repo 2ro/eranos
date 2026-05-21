@@ -22,6 +22,8 @@ interface HeroAtmosphereProps {
    * warm palette is the wrong vibe.
    */
   hue?: HopeHue;
+  /** Crossfade duration in milliseconds. Defaults to the campaign hero timing. */
+  fadeMs?: number;
   /** Extra classes for the outer wrapper. */
   className?: string;
 }
@@ -51,7 +53,7 @@ const FADE_MS = 1500;
  * the old one, matching the timing of the photo crossfade so the whole
  * hero blooms together.
  */
-export function HeroAtmosphere({ seed, hue: hueOverride, className }: HeroAtmosphereProps) {
+export function HeroAtmosphere({ seed, hue: hueOverride, fadeMs = FADE_MS, className }: HeroAtmosphereProps) {
   const idRef = useRef(0);
   const [layers, setLayers] = useState<AtmosphereLayer[]>([]);
   const lastHueRef = useRef<string | null>(null);
@@ -68,9 +70,9 @@ export function HeroAtmosphere({ seed, hue: hueOverride, className }: HeroAtmosp
     // safely past, so the DOM never accumulates stale gradients.
     const timeout = window.setTimeout(() => {
       setLayers((prev) => prev.filter((l) => l.id === id));
-    }, FADE_MS + 50);
+    }, fadeMs + 50);
     return () => window.clearTimeout(timeout);
-  }, [seed, hueOverride]);
+  }, [seed, hueOverride, fadeMs]);
 
   return (
     <div className={cn('absolute inset-0 pointer-events-none', className)} aria-hidden="true">
@@ -82,7 +84,7 @@ export function HeroAtmosphere({ seed, hue: hueOverride, className }: HeroAtmosp
             className="absolute inset-0"
             style={{
               opacity: isTop ? 1 : 0,
-              transition: `opacity ${FADE_MS}ms ease-in-out`,
+              transition: `opacity ${fadeMs}ms ease-in-out`,
             }}
           >
             {/* Warm directional scrim — pulls the photo toward the active
