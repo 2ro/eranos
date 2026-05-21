@@ -16,10 +16,10 @@ import { useAppContext } from '@/hooks/useAppContext';
  */
 export function useBtcPrice() {
   const { config } = useAppContext();
-  const { esploraBaseUrl } = config;
+  const { esploraApis } = config;
   return useQuery({
-    queryKey: ['btc-price', esploraBaseUrl],
-    queryFn: () => fetchBtcPrice(esploraBaseUrl),
+    queryKey: ['btc-price', esploraApis],
+    queryFn: ({ signal }) => fetchBtcPrice(esploraApis, signal),
     refetchInterval: 60_000,
     staleTime: 30_000,
   });

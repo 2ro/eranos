@@ -354,22 +354,22 @@ function FormView({
   const recipientCount = campaign.recipients.length;
   const { user } = useCurrentUser();
   const { config } = useAppContext();
-  const { esploraBaseUrl } = config;
+  const { esploraApis } = config;
   const senderAddress = user ? nostrPubkeyToBitcoinAddress(user.pubkey) : '';
   const hasPrice = !!btcPrice && Number.isFinite(btcPrice) && btcPrice > 0;
   const validAmount = hasPrice && Number.isFinite(effectiveUsd) && effectiveUsd > 0 && effectiveAmount > 0;
   const canContinue = validAmount && !belowMin && !tooSmallSplit;
 
   const { data: utxos } = useQuery({
-    queryKey: ['bitcoin-utxos', esploraBaseUrl, senderAddress],
-    queryFn: () => fetchUTXOs(senderAddress, esploraBaseUrl),
+    queryKey: ['bitcoin-utxos', esploraApis, senderAddress],
+    queryFn: ({ signal }) => fetchUTXOs(senderAddress, esploraApis, signal),
     enabled: !!senderAddress && validAmount,
     staleTime: 30_000,
   });
 
   const { data: feeRates } = useQuery({
-    queryKey: ['bitcoin-fee-rates', esploraBaseUrl],
-    queryFn: () => getFeeRates(esploraBaseUrl),
+    queryKey: ['bitcoin-fee-rates', esploraApis],
+    queryFn: ({ signal }) => getFeeRates(esploraApis, signal),
     enabled: validAmount,
     staleTime: 30_000,
   });
@@ -589,7 +589,7 @@ function ConfirmView({
 }) {
   const { user } = useCurrentUser();
   const { config } = useAppContext();
-  const { esploraBaseUrl } = config;
+  const { esploraApis } = config;
   const senderAddress = user ? nostrPubkeyToBitcoinAddress(user.pubkey) : '';
   const splits = useMemo(() => {
     try {
@@ -600,15 +600,15 @@ function ConfirmView({
   }, [campaign.recipients, amountSats, user?.pubkey]);
 
   const { data: utxos, isLoading: utxosLoading, isError: utxosError } = useQuery({
-    queryKey: ['bitcoin-utxos', esploraBaseUrl, senderAddress],
-    queryFn: () => fetchUTXOs(senderAddress, esploraBaseUrl),
+    queryKey: ['bitcoin-utxos', esploraApis, senderAddress],
+    queryFn: ({ signal }) => fetchUTXOs(senderAddress, esploraApis, signal),
     enabled: !!senderAddress && amountSats > 0,
     staleTime: 30_000,
   });
 
   const { data: feeRates, isLoading: feeRatesLoading, isError: feeRatesError } = useQuery({
-    queryKey: ['bitcoin-fee-rates', esploraBaseUrl],
-    queryFn: () => getFeeRates(esploraBaseUrl),
+    queryKey: ['bitcoin-fee-rates', esploraApis],
+    queryFn: ({ signal }) => getFeeRates(esploraApis, signal),
     enabled: amountSats > 0,
     staleTime: 30_000,
   });

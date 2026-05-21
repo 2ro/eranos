@@ -256,7 +256,15 @@ export const AppConfigSchema = z.object({
   imageQuality: z.enum(['compressed', 'original']),
   curatorPubkey: z.string().regex(/^[0-9a-f]{64}$/i).optional(),
   sandboxDomain: z.string().optional(),
-  esploraBaseUrl: z.string().url(),
+  /**
+   * Ordered list of Esplora REST roots tried in failover order. Accepts the
+   * legacy single-string form and normalizes it to a one-element array so
+   * existing localStorage configs keep working.
+   */
+  esploraApis: z.union([
+    z.string().url().transform((s) => [s]),
+    z.array(z.string().url()).min(1),
+  ]),
   currencyDisplay: z.enum(['usd', 'sats']).optional(),
   sidebarWidgets: z.array(z.object({
     id: z.string(),

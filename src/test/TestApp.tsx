@@ -117,7 +117,7 @@ export function TestApp({ children }: TestAppProps) {
     autoplayVideos: false,
     imageQuality: 'compressed',
     sandboxDomain: 'iframe.diy',
-    esploraBaseUrl: 'https://mempool.space/api',
+    esploraApis: ['https://mempool.space/api'],
     sidebarWidgets: [],
     aiBaseURL: 'https://ai.shakespeare.diy/v1',
     aiApiKey: '',

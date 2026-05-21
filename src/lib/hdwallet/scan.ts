@@ -83,7 +83,7 @@ function isUsed(data: AddressData): boolean {
 async function scanChain(
   account: HdAccount,
   chain: 0 | 1,
-  esploraBaseUrl: string,
+  esploraApis: string[],
   signal?: AbortSignal,
 ): Promise<ChainScanResult> {
   const chainNode = chain === RECEIVE_CHAIN ? account.receiveNode : account.changeNode;
@@ -115,7 +115,7 @@ async function scanChain(
     const dataResults = await Promise.all(
       batch.map(async (d) => {
         signal?.throwIfAborted();
-        const data = await fetchAddressData(d.address, esploraBaseUrl);
+        const data = await fetchAddressData(d.address, esploraApis, signal);
         return { d, data };
       }),
     );
@@ -124,7 +124,7 @@ async function scanChain(
       if (isUsed(data)) {
         // Used — reset gap counter, fetch UTXOs for spending.
         signal?.throwIfAborted();
-        const utxos = await fetchUTXOs(d.address, esploraBaseUrl);
+        const utxos = await fetchUTXOs(d.address, esploraApis, signal);
         const sa: ScannedAddress = { derived: d, data, utxos };
         used.push(sa);
         if (utxos.length > 0 || data.totalBalance > 0) withBalance.push(sa);
@@ -154,18 +154,18 @@ async function scanChain(
  * results.
  *
  * @param account          The derived HD account.
- * @param esploraBaseUrl   Esplora REST root, no trailing slash.
+ * @param esploraApis   Ordered list of Esplora REST roots tried with failover.
  * @param signal           Optional abort signal.
  */
 export async function scanAccount(
   account: HdAccount,
-  esploraBaseUrl: string,
+  esploraApis: string[],
   signal?: AbortSignal,
 ): Promise<AccountScanResult> {
   // Both chains in parallel — they're independent of each other.
   const [receive, change] = await Promise.all([
-    scanChain(account, RECEIVE_CHAIN, esploraBaseUrl, signal),
-    scanChain(account, CHANGE_CHAIN, esploraBaseUrl, signal),
+    scanChain(account, RECEIVE_CHAIN, esploraApis, signal),
+    scanChain(account, CHANGE_CHAIN, esploraApis, signal),
   ]);
 
   const addressMap = new Map<string, DerivedAddress>();
@@ -222,7 +222,7 @@ export interface HdTransaction {
  */
 export async function fetchHdTransactions(
   result: AccountScanResult,
-  esploraBaseUrl: string,
+  esploraApis: string[],
   signal?: AbortSignal,
 ): Promise<HdTransaction[]> {
   const allUsed = [...result.receive.used, ...result.change.used];
@@ -233,7 +233,7 @@ export async function fetchHdTransactions(
   const perAddress = await Promise.all(
     allUsed.map(async (sa) => {
       signal?.throwIfAborted();
-      const txs = await fetchTransactions(sa.derived.address, esploraBaseUrl);
+      const txs = await fetchTransactions(sa.derived.address, esploraApis, signal);
       return txs.map((tx) => ({
         ...tx,
         // `fetchTransactions` returns Math.abs(net); recover the signed value.

@@ -76,7 +76,7 @@ export function useDonateCampaign() {
   const { mutateAsync: publishEvent } = useNostrPublish();
   const queryClient = useQueryClient();
   const { config } = useAppContext();
-  const { esploraBaseUrl } = config;
+  const { esploraApis } = config;
 
   async function donateToCampaign({
     campaign,
@@ -116,7 +116,7 @@ export function useDonateCampaign() {
       return { address, amountSats: s.amountSats };
     });
 
-    const [utxos, rates] = await Promise.all([fetchUTXOs(senderAddress, esploraBaseUrl), getFeeRates(esploraBaseUrl)]);
+    const [utxos, rates] = await Promise.all([fetchUTXOs(senderAddress, esploraApis), getFeeRates(esploraApis)]);
     if (utxos.length === 0) {
       throw new Error('Your Bitcoin wallet has no spendable funds.');
     }
@@ -140,7 +140,7 @@ export function useDonateCampaign() {
     }
 
     const txHex = finalizePsbt(signedHex);
-    const txid = await broadcastTransaction(txHex, esploraBaseUrl);
+    const txid = await broadcastTransaction(txHex, esploraApis);
 
     // Publish a single kind 8333 receipt covering the whole transaction. The
     // event lists every recipient under its own `p` tag; the `amount` tag is

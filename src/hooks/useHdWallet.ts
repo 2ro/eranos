@@ -86,7 +86,7 @@ export interface UseHdWalletResult {
  */
 export function useHdWallet(): UseHdWalletResult {
   const { config } = useAppContext();
-  const { esploraBaseUrl } = config;
+  const { esploraApis } = config;
   const availability = useHdWalletAccess();
   const queryClient = useQueryClient();
 
@@ -101,7 +101,7 @@ export function useHdWallet(): UseHdWalletResult {
   );
 
   // ── Scan query ───────────────────────────────────────────────
-  const scanKey = ['hdwallet-scan', esploraBaseUrl, pubkey];
+  const scanKey = ['hdwallet-scan', esploraApis, pubkey];
   const {
     data: scan,
     isLoading: scanLoading,
@@ -112,7 +112,7 @@ export function useHdWallet(): UseHdWalletResult {
     queryKey: scanKey,
     queryFn: async ({ signal }) => {
       if (!account) throw new Error('HD wallet account unavailable');
-      return scanAccount(account, esploraBaseUrl, signal);
+      return scanAccount(account, esploraApis, signal);
     },
     enabled: !!account,
     refetchInterval: REFRESH_INTERVAL_MS,
@@ -125,10 +125,10 @@ export function useHdWallet(): UseHdWalletResult {
     isFetching: txFetching,
     refetch: refetchTxs,
   } = useQuery<HdTransaction[]>({
-    queryKey: ['hdwallet-txs', esploraBaseUrl, pubkey, scan?.receive.used.length, scan?.change.used.length],
+    queryKey: ['hdwallet-txs', esploraApis, pubkey, scan?.receive.used.length, scan?.change.used.length],
     queryFn: async ({ signal }) => {
       if (!scan) return [];
-      return fetchHdTransactions(scan, esploraBaseUrl, signal);
+      return fetchHdTransactions(scan, esploraApis, signal);
     },
     enabled: !!scan,
     refetchInterval: REFRESH_INTERVAL_MS,

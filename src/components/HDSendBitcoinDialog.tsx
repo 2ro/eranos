@@ -166,7 +166,7 @@ export function HDSendBitcoinDialog({ isOpen, onClose, btcPrice }: HDSendBitcoin
   const availability = useHdWalletAccess();
   const { scan, refetch: refetchWallet } = useHdWallet();
   const { config } = useAppContext();
-  const { esploraBaseUrl } = config;
+  const { esploraApis } = config;
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -188,8 +188,8 @@ export function HDSendBitcoinDialog({ isOpen, onClose, btcPrice }: HDSendBitcoin
 
   // ── Fee rates ────────────────────────────────────────────────
   const { data: feeRates } = useQuery({
-    queryKey: ['bitcoin-fee-rates', esploraBaseUrl],
-    queryFn: () => getFeeRates(esploraBaseUrl),
+    queryKey: ['bitcoin-fee-rates', esploraApis],
+    queryFn: ({ signal }) => getFeeRates(esploraApis, signal),
     enabled: isOpen && isReady,
     staleTime: 30_000,
   });
@@ -313,7 +313,7 @@ export function HDSendBitcoinDialog({ isOpen, onClose, btcPrice }: HDSendBitcoin
       const txHex = finalizeHdPsbt(signedHex);
 
       setProgress('broadcasting');
-      const txid = await broadcastTransaction(txHex, esploraBaseUrl);
+      const txid = await broadcastTransaction(txHex, esploraApis);
 
       return { txid, amountSats, fee: built.fee };
     },
