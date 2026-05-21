@@ -1,436 +1,394 @@
 import type { AddressData, Transaction, UTXO } from '@/lib/bitcoin';
 import {
+  accountToBip86Descriptor,
   CHANGE_CHAIN,
   type DerivedAddress,
   deriveAddress,
   type HdAccount,
   RECEIVE_CHAIN,
 } from './derivation';
-import { type AddressSnapshot, fetchAddressSnapshot } from './snapshot';
+import {
+  type BlockbookTx,
+  type BlockbookUtxo,
+  type BlockbookXpubAddress,
+  type BlockbookXpubResponse,
+  fetchXpubSnapshot,
+  fetchXpubUtxos,
+} from './blockbook';
+import type { HdSpendableUtxo } from './transaction';
 
 // ---------------------------------------------------------------------------
-// Gap-limit chain scanning
+// HD wallet scan — Blockbook backend
 // ---------------------------------------------------------------------------
 //
-// BIP44 gap limit: a wallet considers a chain "fully scanned" after observing
-// `GAP_LIMIT` consecutive addresses that have never been used (zero history).
-// Industry standard is 20.
+// Blockbook indexes the entire xpub server-side, so what was a multi-call
+// gap-limit walk + per-address polling collapses to a single HTTP call:
 //
-// Two modes:
+//     GET /api/v2/xpub/<tr(xpub)>?details=txs&tokens=used
 //
-//   - **Cold scan** (no `prev`): walks both chains from index 0 until the gap
-//     is hit. Used on first ever load.
+// The response carries:
+//   - account-level balance (confirmed + mempool)
+//   - a `tokens` array of used derived addresses, each with its BIP32 path
+//   - a `transactions` array (newest first) for the entire wallet
 //
-//   - **Warm scan** (with `prev`): polls only the addresses we already knew
-//     were used (to pick up new activity), plus a tail window starting at the
-//     last `firstUnusedIndex`. As long as that tail stays clean, we never
-//     re-probe addresses past it. If something showed up on a previously-
-//     unused address, the scan extends forward incrementally until the gap
-//     is again satisfied.
+// We translate that into the existing `AccountScanResult` shape so the rest
+// of the wallet code (UTXO selector, signer, page UI) doesn't need to know
+// where the data came from.
 //
-// We batch requests with `Promise.all` of size `SCAN_BATCH_SIZE` to amortise
-// round-trip latency while still bounding fan-out on the Esplora server.
+// UTXOs are fetched as a second call to `/api/v2/utxo/<descriptor>` because
+// Blockbook only inlines them in the xpub response when `details=tokenBalances`
+// is set with a specific tokens parameter, and even then they're per-address
+// rather than the flat list our coin selector wants. Two HTTP calls total
+// per refresh — still a huge improvement over the previous ~50+.
 // ---------------------------------------------------------------------------
 
-/** Standard BIP44 gap limit. */
-export const GAP_LIMIT = 20;
-
-/**
- * Number of addresses fetched per request batch.
- *
- * Each batch is one `Promise.all` round of `fetchAddressSnapshot` calls.
- * Public Esplora endpoints (mempool.space) have aggressive per-IP rate
- * limits — a single burst of >5 concurrent requests is enough to start
- * seeing 429s. Keep this conservative.
- */
-const SCAN_BATCH_SIZE = 3;
-
-/**
- * Minimum delay between consecutive batches, in milliseconds. Spaces out
- * burst traffic so a cold scan (~20 batches across two chains) takes ~5s
- * but never trips the rate limiter.
- */
-const INTER_BATCH_DELAY_MS = 250;
-
-/** Hard ceiling on addresses scanned per chain. Protects against bugs/loops. */
-const MAX_INDEX = 10_000;
-
-/**
- * Sleep helper that resolves early on abort. Used to space batches inside a
- * single chain scan without leaving the abort signal blocked.
- */
-function sleep(ms: number, signal?: AbortSignal): Promise<void> {
-  if (ms <= 0) return Promise.resolve();
-  return new Promise((resolve, reject) => {
-    const timer = setTimeout(() => {
-      signal?.removeEventListener('abort', onAbort);
-      resolve();
-    }, ms);
-    const onAbort = () => {
-      clearTimeout(timer);
-      reject(signal!.reason ?? new DOMException('Aborted', 'AbortError'));
-    };
-    if (signal?.aborted) {
-      onAbort();
-    } else {
-      signal?.addEventListener('abort', onAbort, { once: true });
-    }
-  });
-}
-
-/** Information about a single derived address that has been observed. */
+/** A scanned address with everything the UI / coin selector needs. */
 export interface ScannedAddress {
   derived: DerivedAddress;
   data: AddressData;
   utxos: UTXO[];
-  /** All transactions touching this address (from the snapshot). */
+  /** All transactions touching this address. */
   txs: Transaction[];
-  /** Whether the address's history is capped (see `AddressSnapshot.historyCapped`). */
-  historyCapped: boolean;
 }
 
-/** Full scan result for a single chain (receive or change). */
+/** Per-chain scan result. */
 export interface ChainScanResult {
-  /** All addresses with any history (tx_count > 0 on either confirmed or mempool). */
+  /** Used addresses on this chain (path index ascending). */
   used: ScannedAddress[];
-  /** All addresses currently holding spendable UTXOs (incl. unconfirmed). */
+  /** Subset of `used` with non-zero balance or active UTXOs. */
   withBalance: ScannedAddress[];
-  /** Index of the first address with no history (the "next" address to advertise). */
+  /** Index of the first never-used address. */
   firstUnusedIndex: number;
-  /** Whether the scan hit MAX_INDEX without finding a clean gap. */
-  hitMaxIndex: boolean;
 }
 
-/** Combined receive+change scan result for an entire account. */
+/** Combined receive + change scan result. */
 export interface AccountScanResult {
   receive: ChainScanResult;
   change: ChainScanResult;
-  /** All UTXOs across both chains. */
-  utxos: Array<UTXO & { address: string; chain: 0 | 1; index: number }>;
-  /** Confirmed + pending balance in satoshis, summed across both chains. */
+  /** Flat UTXO list across both chains, annotated for the signer. */
+  utxos: HdSpendableUtxo[];
+  /** Confirmed + mempool balance in sats. */
   totalBalance: number;
-  /** Sum of `pendingBalance` across all addresses (positive = incoming, negative = outgoing). */
+  /** Mempool delta in sats (positive = incoming, negative = outgoing). */
   pendingBalance: number;
-  /** Map from address → derived metadata. Used by the tx aggregator and signer. */
+  /** Map from derived address → metadata. */
   addressMap: Map<string, DerivedAddress>;
 }
 
-/**
- * Has this address ever been used? "Used" means it has any history at all,
- * confirmed or in the mempool. We treat the address as advertised-and-burned
- * the moment a sender touches it.
- */
-function isUsed(data: AddressData): boolean {
-  return data.txCount > 0 || data.pendingTxCount > 0;
-}
-
-/** Adapt a snapshot result into the ScannedAddress shape. */
-function toScanned(derived: DerivedAddress, snap: AddressSnapshot): ScannedAddress {
-  return {
-    derived,
-    data: snap.data,
-    utxos: snap.utxos,
-    txs: snap.txs,
-    historyCapped: snap.historyCapped,
-  };
-}
-
-// ---------------------------------------------------------------------------
-// Forward gap-walker
-// ---------------------------------------------------------------------------
-
-/**
- * Walk a chain forward from `startIndex` until `GAP_LIMIT` consecutive unused
- * addresses are observed. Returns the addresses we found used along the way
- * plus the new `firstUnusedIndex`. The caller decides whether to merge this
- * into a prior result (warm scan) or use it as the entire result (cold scan).
- */
-async function walkForwardFromIndex(
-  account: HdAccount,
-  chain: 0 | 1,
-  startIndex: number,
-  esploraApis: string[],
-  signal: AbortSignal | undefined,
-): Promise<{ used: ScannedAddress[]; firstUnusedIndex: number; hitMaxIndex: boolean }> {
-  const chainNode = chain === RECEIVE_CHAIN ? account.receiveNode : account.changeNode;
-
-  const used: ScannedAddress[] = [];
-  let firstUnusedIndex = startIndex;
-  let firstUnusedSet = false;
-  let consecutiveUnused = 0;
-  let index = startIndex;
-  let hitMaxIndex = false;
-  let isFirstBatch = true;
-
-  while (consecutiveUnused < GAP_LIMIT) {
-    if (index >= MAX_INDEX) {
-      hitMaxIndex = true;
-      break;
-    }
-
-    // Build the next batch of addresses.
-    const batch: DerivedAddress[] = [];
-    const remainingGap = GAP_LIMIT - consecutiveUnused;
-    for (let i = 0; i < SCAN_BATCH_SIZE && i < remainingGap && index + i < MAX_INDEX; i++) {
-      batch.push(deriveAddress(chainNode, chain, index + i));
-    }
-    if (batch.length === 0) break;
-
-    // Inter-batch pacing: skip the sleep on the first batch (we want
-    // immediate progress on the very first request) but space out all
-    // subsequent batches to keep us under public-Esplora rate limits.
-    if (!isFirstBatch) await sleep(INTER_BATCH_DELAY_MS, signal);
-    isFirstBatch = false;
-
-    // One round trip per address — fetchAddressSnapshot replaces the
-    // previous three calls (balance + utxos + txs).
-    const snaps = await Promise.all(
-      batch.map(async (d) => {
-        signal?.throwIfAborted();
-        return { d, snap: await fetchAddressSnapshot(d.address, esploraApis, signal) };
-      }),
-    );
-
-    for (const { d, snap } of snaps) {
-      if (isUsed(snap.data)) {
-        used.push(toScanned(d, snap));
-        consecutiveUnused = 0;
-        // Do not move firstUnusedIndex past this — we want the earliest gap.
-      } else {
-        if (!firstUnusedSet) {
-          firstUnusedIndex = d.index;
-          firstUnusedSet = true;
-        }
-        consecutiveUnused++;
-      }
-    }
-
-    index += batch.length;
-  }
-
-  if (!firstUnusedSet) firstUnusedIndex = index;
-
-  return { used, firstUnusedIndex, hitMaxIndex };
-}
-
-// ---------------------------------------------------------------------------
-// Per-chain scan
-// ---------------------------------------------------------------------------
-
-/**
- * Re-fetch snapshots for an already-known set of used addresses in parallel.
- * Used during a warm scan to catch new incoming/outgoing activity on
- * previously-observed addresses.
- */
-async function refreshKnownUsed(
-  account: HdAccount,
-  chain: 0 | 1,
-  knownIndexes: number[],
-  esploraApis: string[],
-  signal: AbortSignal | undefined,
-): Promise<{ refreshed: ScannedAddress[]; nowUnused: number[] }> {
-  if (knownIndexes.length === 0) return { refreshed: [], nowUnused: [] };
-  const chainNode = chain === RECEIVE_CHAIN ? account.receiveNode : account.changeNode;
-
-  const refreshed: ScannedAddress[] = [];
-  const nowUnused: number[] = [];
-
-  // Fire requests in chunks of SCAN_BATCH_SIZE to keep fan-out bounded.
-  let isFirstBatch = true;
-  for (let i = 0; i < knownIndexes.length; i += SCAN_BATCH_SIZE) {
-    const slice = knownIndexes.slice(i, i + SCAN_BATCH_SIZE);
-
-    // Same inter-batch pacing as the forward walk.
-    if (!isFirstBatch) await sleep(INTER_BATCH_DELAY_MS, signal);
-    isFirstBatch = false;
-
-    const snaps = await Promise.all(
-      slice.map(async (idx) => {
-        signal?.throwIfAborted();
-        const d = deriveAddress(chainNode, chain, idx);
-        const snap = await fetchAddressSnapshot(d.address, esploraApis, signal);
-        return { d, snap };
-      }),
-    );
-    for (const { d, snap } of snaps) {
-      if (isUsed(snap.data)) {
-        refreshed.push(toScanned(d, snap));
-      } else {
-        // An address we previously saw used now reports no history. This
-        // shouldn't happen on mainnet (txs don't un-broadcast). We log it
-        // and treat it as "still belonged to our set" in case of an Esplora
-        // backend desync.
-        nowUnused.push(d.index);
-      }
-    }
-  }
-
-  return { refreshed, nowUnused };
-}
-
-/**
- * Scan a single chain. If `prev` is supplied, performs an **incremental**
- * scan: just refresh known-used addresses and walk a small tail starting at
- * the previous `firstUnusedIndex`. Otherwise performs a cold scan from 0.
- */
-async function scanChain(
-  account: HdAccount,
-  chain: 0 | 1,
-  esploraApis: string[],
-  signal: AbortSignal | undefined,
-  prev?: ChainScanResult,
-): Promise<ChainScanResult> {
-  // ── Cold path ──────────────────────────────────────────────
-  if (!prev) {
-    const walk = await walkForwardFromIndex(account, chain, 0, esploraApis, signal);
-    return buildChainResult(walk.used, walk.firstUnusedIndex, walk.hitMaxIndex);
-  }
-
-  // ── Warm path ──────────────────────────────────────────────
-  //
-  // (a) Refresh every previously-known used address.
-  // (b) Walk forward from prev.firstUnusedIndex. If everything in the tail
-  //     is still unused (the common case) we observe GAP_LIMIT and exit
-  //     quickly. If something showed up, walk extends naturally.
-  //
-  // We run (a) then (b) **serially** rather than in parallel so the
-  // intra-batch concurrency cap (SCAN_BATCH_SIZE) really is the system-wide
-  // concurrency cap. Running them in parallel would double the burst at
-  // exactly the moment we're trying to stay under public Esplora limits.
-  const knownIndexes = prev.used.map((sa) => sa.derived.index);
-  const refreshResult = await refreshKnownUsed(account, chain, knownIndexes, esploraApis, signal);
-  const forwardWalk = await walkForwardFromIndex(account, chain, prev.firstUnusedIndex, esploraApis, signal);
-
-  // Merge: known-used (refreshed) + anything new from the forward walk.
-  // Deduplicate by index in case a known-used index sat exactly at the
-  // forward-walk start (shouldn't happen — knownIndexes are all < prev.firstUnusedIndex
-  // by construction — but be defensive).
-  const byIndex = new Map<number, ScannedAddress>();
-  for (const sa of refreshResult.refreshed) byIndex.set(sa.derived.index, sa);
-  for (const sa of forwardWalk.used) byIndex.set(sa.derived.index, sa);
-  const merged = Array.from(byIndex.values()).sort(
-    (a, b) => a.derived.index - b.derived.index,
-  );
-
-  return buildChainResult(merged, forwardWalk.firstUnusedIndex, forwardWalk.hitMaxIndex);
-}
-
-function buildChainResult(
-  used: ScannedAddress[],
-  firstUnusedIndex: number,
-  hitMaxIndex: boolean,
-): ChainScanResult {
-  const withBalance = used.filter(
-    (sa) => sa.utxos.length > 0 || sa.data.totalBalance > 0,
-  );
-  return { used, withBalance, firstUnusedIndex, hitMaxIndex };
-}
-
-// ---------------------------------------------------------------------------
-// Public API
-// ---------------------------------------------------------------------------
-
-/**
- * Scan both chains (receive and change) for an HD account.
- *
- * If `prev` is supplied, performs an incremental scan that only re-probes
- * addresses we already knew were used plus a small forward gap. Otherwise
- * does a cold full scan.
- *
- * @param account          The derived HD account.
- * @param esploraApis      Ordered list of Esplora REST roots (failover handled).
- * @param signal           Optional abort signal.
- * @param prev             Previous scan result, if any — enables incremental mode.
- */
-export async function scanAccount(
-  account: HdAccount,
-  esploraApis: string[],
-  signal?: AbortSignal,
-  prev?: AccountScanResult,
-): Promise<AccountScanResult> {
-  // Serialise the two chains rather than running them with Promise.all. The
-  // chains are independent of each other, but running them in parallel
-  // doubles the in-flight request count (2 × SCAN_BATCH_SIZE), which is the
-  // exact burst that trips public Esplora rate limits. Scanning receive
-  // then change adds a few hundred ms of wall time and is the better trade.
-  const receive = await scanChain(account, RECEIVE_CHAIN, esploraApis, signal, prev?.receive);
-  const change = await scanChain(account, CHANGE_CHAIN, esploraApis, signal, prev?.change);
-
-  const addressMap = new Map<string, DerivedAddress>();
-  for (const sa of receive.used) addressMap.set(sa.derived.address, sa.derived);
-  for (const sa of change.used) addressMap.set(sa.derived.address, sa.derived);
-
-  const utxos: AccountScanResult['utxos'] = [];
-  let totalBalance = 0;
-  let pendingBalance = 0;
-
-  for (const chainResult of [receive, change]) {
-    for (const sa of chainResult.used) {
-      totalBalance += sa.data.totalBalance;
-      pendingBalance += sa.data.pendingBalance;
-      for (const u of sa.utxos) {
-        utxos.push({
-          ...u,
-          address: sa.derived.address,
-          chain: sa.derived.chain,
-          index: sa.derived.index,
-        });
-      }
-    }
-  }
-
-  return { receive, change, utxos, totalBalance, pendingBalance, addressMap };
-}
-
-// ---------------------------------------------------------------------------
-// Aggregated transaction history
-// ---------------------------------------------------------------------------
-
-/**
- * Aggregated transaction record for an HD wallet. Unlike the per-address
- * `Transaction` from `bitcoin.ts`, this one merges all on-chain activity
- * across every owned address so a single send-with-change tx shows up as one
- * row rather than two.
- */
+/** Aggregated wallet-level transaction row. */
 export interface HdTransaction {
   txid: string;
-  /** Net satoshi change across the entire wallet (positive = received, negative = sent). */
+  /** Net wallet-level satoshi change, absolute. */
   amount: number;
-  /** Send or receive (based on net amount sign). */
   type: 'receive' | 'send';
   confirmed: boolean;
   timestamp?: number;
 }
 
+// ---------------------------------------------------------------------------
+// Path parsing
+// ---------------------------------------------------------------------------
+
 /**
- * Build the wallet-level transaction history from a scan result.
+ * Parse a BIP32 path like `m/86'/0'/0'/0/3` and return the trailing
+ * `chain`/`index` pair. Returns `null` for any path we don't recognise.
  *
- * Each scanned address already carries its tx list (returned by the same
- * snapshot fetch that built the balance), so this function does **no
- * additional network calls** — it just merges and sorts in memory.
+ * Blockbook may return paths in either fully-prefixed or shortened form
+ * depending on whether we passed an xpub or a descriptor. We only need
+ * the final two components to identify a leaf.
+ */
+function parseChainIndex(path: string): { chain: 0 | 1; index: number } | null {
+  const parts = path.split('/');
+  if (parts.length < 2) return null;
+  const chainStr = parts[parts.length - 2];
+  const indexStr = parts[parts.length - 1];
+  const chain = Number(chainStr);
+  const index = Number(indexStr);
+  if (chain !== 0 && chain !== 1) return null;
+  if (!Number.isInteger(index) || index < 0) return null;
+  return { chain: chain as 0 | 1, index };
+}
+
+// ---------------------------------------------------------------------------
+// Translation: Blockbook → our types
+// ---------------------------------------------------------------------------
+
+/**
+ * Convert a single Blockbook `tokens[]` entry into a `ScannedAddress` stub.
  *
- * A transaction that touches multiple owned addresses (e.g. send-with-change)
- * is merged into one record whose `amount` is the net wallet-level change.
+ * The transactions list lives at the top level of the xpub response and is
+ * stitched in by `bucketTransactionsByAddress` below — at this stage we just
+ * carry the per-address stats.
+ */
+function tokenToScannedAddress(
+  account: HdAccount,
+  token: BlockbookXpubAddress,
+): ScannedAddress | null {
+  const ci = parseChainIndex(token.path);
+  if (!ci) return null;
+
+  // Always re-derive the address locally rather than trusting the server.
+  // If Blockbook were compromised it could otherwise feed us an address it
+  // controls; the local derivation is the trust root.
+  const chainNode = ci.chain === CHANGE_CHAIN ? account.changeNode : account.receiveNode;
+  const derived = deriveAddress(chainNode, ci.chain, ci.index);
+  if (derived.address !== token.name) {
+    // Server-derived address doesn't match what our xpub produces — refuse
+    // to use this row. (Almost certainly a misconfigured backend or a bug;
+    // never trust an unverified address derived elsewhere.)
+    console.warn(
+      `Blockbook returned mismatched address for path ${token.path}: ` +
+        `expected ${derived.address}, got ${token.name}`,
+    );
+    return null;
+  }
+
+  const confirmed = Number(token.balance);
+  // Blockbook doesn't break out mempool balance per token (only on the
+  // account-level response). We treat the per-address pending balance as 0
+  // here; the account-level `unconfirmedBalance` is what shows in the UI.
+  const totalReceived = Number(token.totalReceived);
+  const totalSent = Number(token.totalSent);
+
+  const data: AddressData = {
+    balance: confirmed,
+    pendingBalance: 0,
+    totalBalance: confirmed,
+    totalReceived,
+    totalSent,
+    txCount: token.transfers,
+    pendingTxCount: 0,
+  };
+
+  return { derived, data, utxos: [], txs: [] };
+}
+
+/**
+ * Convert a Blockbook tx row into a simplified per-address `Transaction`.
+ *
+ * `address` is the address whose tx-list view we're computing. The net
+ * effect is "sats received by `address` minus sats sent by `address`".
+ */
+function blockbookTxToPerAddress(tx: BlockbookTx, address: string): Transaction {
+  let totalOut = 0; // sats this address received
+  let totalIn = 0; // sats this address spent
+
+  for (const vout of tx.vout) {
+    if (vout.addresses?.includes(address)) {
+      totalOut += Number(vout.value) || 0;
+    }
+  }
+  for (const vin of tx.vin) {
+    if (vin.addresses?.includes(address)) {
+      totalIn += Number(vin.value) || 0;
+    }
+  }
+
+  const net = totalOut - totalIn;
+  const confirmed = tx.confirmations > 0;
+
+  return {
+    txid: tx.txid,
+    amount: Math.abs(net),
+    type: net >= 0 ? 'receive' : 'send',
+    confirmed,
+    timestamp: tx.blockTime,
+  };
+}
+
+/** Bucket every tx into the address arrays it touches (within our wallet). */
+function bucketTransactionsByAddress(
+  transactions: BlockbookTx[],
+  scannedByAddress: Map<string, ScannedAddress>,
+): void {
+  for (const tx of transactions) {
+    // Each tx may touch multiple of our addresses (e.g. send-with-change).
+    // For each one, push a per-address simplified row.
+    const touched = new Set<string>();
+    for (const v of tx.vout) {
+      for (const a of v.addresses ?? []) {
+        if (scannedByAddress.has(a)) touched.add(a);
+      }
+    }
+    for (const v of tx.vin) {
+      for (const a of v.addresses ?? []) {
+        if (scannedByAddress.has(a)) touched.add(a);
+      }
+    }
+    for (const address of touched) {
+      const entry = scannedByAddress.get(address);
+      if (!entry) continue;
+      entry.txs.push(blockbookTxToPerAddress(tx, address));
+    }
+  }
+}
+
+/**
+ * Convert a Blockbook UTXO into our `HdSpendableUtxo` with chain/index
+ * recovered from the BIP32 path. Skips entries we can't parse or whose
+ * derived address fails the safety check.
+ */
+function blockbookUtxoToSpendable(
+  account: HdAccount,
+  u: BlockbookUtxo,
+): HdSpendableUtxo | null {
+  if (!u.path || !u.address) return null;
+  const ci = parseChainIndex(u.path);
+  if (!ci) return null;
+  const chainNode = ci.chain === CHANGE_CHAIN ? account.changeNode : account.receiveNode;
+  const derived = deriveAddress(chainNode, ci.chain, ci.index);
+  if (derived.address !== u.address) {
+    console.warn(
+      `Blockbook UTXO address mismatch: path ${u.path} → ${derived.address}, ` +
+        `but UTXO claims ${u.address}`,
+    );
+    return null;
+  }
+  const confirmed = u.confirmations > 0;
+  return {
+    txid: u.txid,
+    vout: u.vout,
+    value: Number(u.value),
+    status: {
+      confirmed,
+      block_height: u.height,
+    },
+    address: u.address,
+    chain: ci.chain,
+    index: ci.index,
+  };
+}
+
+// ---------------------------------------------------------------------------
+// Combined scan
+// ---------------------------------------------------------------------------
+
+/**
+ * Fetch + parse the full wallet snapshot from Blockbook in two HTTP calls
+ * (xpub snapshot + UTXO list).
+ *
+ * @param account     HD account; supplies the xpub descriptor.
+ * @param baseUrl     Blockbook base URL (e.g. `https://btc1.trezor.io`).
+ * @param signal      Optional abort signal.
+ */
+export async function scanAccount(
+  account: HdAccount,
+  baseUrl: string,
+  signal?: AbortSignal,
+): Promise<AccountScanResult> {
+  const descriptor = accountToBip86Descriptor(account);
+
+  // Two independent calls — fan out.
+  const [xpubResponse, utxos]: [BlockbookXpubResponse, BlockbookUtxo[]] = await Promise.all([
+    fetchXpubSnapshot(baseUrl, descriptor, signal),
+    fetchXpubUtxos(baseUrl, descriptor, signal),
+  ]);
+
+  // ── Build per-address scan entries from `tokens` ─────────────
+  const scannedByAddress = new Map<string, ScannedAddress>();
+  const receiveByIndex = new Map<number, ScannedAddress>();
+  const changeByIndex = new Map<number, ScannedAddress>();
+
+  for (const token of xpubResponse.tokens ?? []) {
+    if (token.type !== 'XPUBAddress') continue;
+    const sa = tokenToScannedAddress(account, token);
+    if (!sa) continue;
+    scannedByAddress.set(sa.derived.address, sa);
+    if (sa.derived.chain === RECEIVE_CHAIN) {
+      receiveByIndex.set(sa.derived.index, sa);
+    } else {
+      changeByIndex.set(sa.derived.index, sa);
+    }
+  }
+
+  // ── Attach per-address tx rows from the top-level `transactions` ──
+  bucketTransactionsByAddress(xpubResponse.transactions ?? [], scannedByAddress);
+
+  // ── UTXOs ────────────────────────────────────────────────────
+  const spendable: HdSpendableUtxo[] = [];
+  for (const u of utxos) {
+    const s = blockbookUtxoToSpendable(account, u);
+    if (s) {
+      spendable.push(s);
+      const map = s.chain === RECEIVE_CHAIN ? receiveByIndex : changeByIndex;
+      const entry = map.get(s.index);
+      if (entry) {
+        entry.utxos.push({
+          txid: s.txid,
+          vout: s.vout,
+          value: s.value,
+          status: s.status,
+        });
+      }
+    }
+  }
+
+  // ── Resolve firstUnusedIndex per chain ───────────────────────
+  //
+  // Blockbook returns `tokens` for *used* addresses only. The next unused
+  // index on a chain is therefore max(usedIndex) + 1, or 0 if none used.
+  function nextUnused(byIndex: Map<number, ScannedAddress>): number {
+    if (byIndex.size === 0) return 0;
+    let max = -1;
+    for (const idx of byIndex.keys()) if (idx > max) max = idx;
+    return max + 1;
+  }
+
+  // ── Build the per-chain result objects ───────────────────────
+  function buildChain(byIndex: Map<number, ScannedAddress>): ChainScanResult {
+    const used = Array.from(byIndex.values()).sort(
+      (a, b) => a.derived.index - b.derived.index,
+    );
+    const withBalance = used.filter(
+      (sa) => sa.utxos.length > 0 || sa.data.totalBalance > 0,
+    );
+    return { used, withBalance, firstUnusedIndex: nextUnused(byIndex) };
+  }
+
+  const receive = buildChain(receiveByIndex);
+  const change = buildChain(changeByIndex);
+
+  const addressMap = new Map<string, DerivedAddress>();
+  for (const sa of scannedByAddress.values()) addressMap.set(sa.derived.address, sa.derived);
+
+  const totalBalance =
+    (Number(xpubResponse.balance) || 0) + (Number(xpubResponse.unconfirmedBalance) || 0);
+  const pendingBalance = Number(xpubResponse.unconfirmedBalance) || 0;
+
+  return {
+    receive,
+    change,
+    utxos: spendable,
+    totalBalance,
+    pendingBalance,
+    addressMap,
+  };
+}
+
+// ---------------------------------------------------------------------------
+// Aggregated transaction history (derived; no extra network calls)
+// ---------------------------------------------------------------------------
+
+/**
+ * Build the wallet-level merged transaction list from per-address tx rows
+ * already collected by `scanAccount`. A tx touching multiple owned addresses
+ * (e.g. send-with-change) is summed once.
  */
 export function buildHdTransactions(result: AccountScanResult): HdTransaction[] {
   const allUsed = [...result.receive.used, ...result.change.used];
   if (allUsed.length === 0) return [];
 
-  // Merge by txid — sum signed amounts so that send-with-change collapses.
-  const merged = new Map<string, {
-    txid: string;
-    netSats: number;
-    confirmed: boolean;
-    timestamp?: number;
-  }>();
+  const merged = new Map<
+    string,
+    { txid: string; netSats: number; confirmed: boolean; timestamp?: number }
+  >();
 
   for (const sa of allUsed) {
     for (const tx of sa.txs) {
-      // `Transaction.amount` is Math.abs(net); recover the signed value.
-      const signedAmount = tx.type === 'receive' ? tx.amount : -tx.amount;
+      const signed = tx.type === 'receive' ? tx.amount : -tx.amount;
       const existing = merged.get(tx.txid);
       if (existing) {
-        existing.netSats += signedAmount;
+        existing.netSats += signed;
         existing.confirmed = existing.confirmed || tx.confirmed;
         if (tx.timestamp && (!existing.timestamp || tx.timestamp < existing.timestamp)) {
           existing.timestamp = tx.timestamp;
@@ -438,7 +396,7 @@ export function buildHdTransactions(result: AccountScanResult): HdTransaction[] 
       } else {
         merged.set(tx.txid, {
           txid: tx.txid,
-          netSats: signedAmount,
+          netSats: signed,
           confirmed: tx.confirmed,
           timestamp: tx.timestamp,
         });
@@ -454,7 +412,6 @@ export function buildHdTransactions(result: AccountScanResult): HdTransaction[] 
     timestamp: m.timestamp,
   }));
 
-  // Sort newest first; unconfirmed go to the top.
   out.sort((a, b) => {
     if (!a.timestamp && !b.timestamp) return 0;
     if (!a.timestamp) return -1;

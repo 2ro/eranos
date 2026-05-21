@@ -32,15 +32,17 @@ import { useHdWalletAccess } from '@/hooks/useHdWalletAccess';
 import { useHdWallet } from '@/hooks/useHdWallet';
 import { notificationSuccess } from '@/lib/haptics';
 import {
-  broadcastTransaction,
   estimateFee,
-  getFeeRates,
   isLargeAmount,
   nostrPubkeyToBitcoinAddress,
   satsToUSD,
   validateBitcoinAddress,
-  type FeeRates,
 } from '@/lib/bitcoin';
+import {
+  broadcastBlockbookTx,
+  type BlockbookFeeRates,
+  fetchFeeRates,
+} from '@/lib/hdwallet/blockbook';
 import {
   buildHdUnsignedPsbt,
   finalizeHdPsbt,
@@ -66,7 +68,7 @@ const FEE_SPEED_LABELS: Record<FeeSpeed, string> = {
 
 const FEE_SPEED_ORDER: FeeSpeed[] = ['fastest', 'halfHour', 'hour', 'economy'];
 
-function getRateForSpeed(rates: FeeRates, speed: FeeSpeed): number {
+function getRateForSpeed(rates: BlockbookFeeRates, speed: FeeSpeed): number {
   switch (speed) {
     case 'fastest': return rates.fastestFee;
     case 'halfHour': return rates.halfHourFee;
@@ -75,7 +77,7 @@ function getRateForSpeed(rates: FeeRates, speed: FeeSpeed): number {
   }
 }
 
-function getUniqueFeeSpeeds(rates: FeeRates | undefined): FeeSpeed[] {
+function getUniqueFeeSpeeds(rates: BlockbookFeeRates | undefined): FeeSpeed[] {
   if (!rates) return FEE_SPEED_ORDER;
   const seen = new Set<number>();
   const result: FeeSpeed[] = [];
@@ -166,7 +168,7 @@ export function HDSendBitcoinDialog({ isOpen, onClose, btcPrice }: HDSendBitcoin
   const availability = useHdWalletAccess();
   const { scan, refetch: refetchWallet } = useHdWallet();
   const { config } = useAppContext();
-  const { esploraApis } = config;
+  const { blockbookBaseUrl } = config;
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -188,8 +190,8 @@ export function HDSendBitcoinDialog({ isOpen, onClose, btcPrice }: HDSendBitcoin
 
   // ── Fee rates ────────────────────────────────────────────────
   const { data: feeRates } = useQuery({
-    queryKey: ['bitcoin-fee-rates', esploraApis],
-    queryFn: ({ signal }) => getFeeRates(esploraApis, signal),
+    queryKey: ['blockbook-fee-rates', blockbookBaseUrl],
+    queryFn: ({ signal }) => fetchFeeRates(blockbookBaseUrl, signal),
     enabled: isOpen && isReady,
     staleTime: 30_000,
   });
@@ -313,17 +315,14 @@ export function HDSendBitcoinDialog({ isOpen, onClose, btcPrice }: HDSendBitcoin
       const txHex = finalizeHdPsbt(signedHex);
 
       setProgress('broadcasting');
-      const txid = await broadcastTransaction(txHex, esploraApis);
+      const txid = await broadcastBlockbookTx(blockbookBaseUrl, txHex);
 
       return { txid, amountSats, fee: built.fee };
     },
     onSuccess: (result) => {
       notificationSuccess();
       setSuccess(result);
-      // Invalidate HD wallet caches and the legacy single-address ones too
-      // (some screens still read them).
       queryClient.invalidateQueries({ queryKey: ['hdwallet-scan'] });
-      queryClient.invalidateQueries({ queryKey: ['hdwallet-txs'] });
       void refetchWallet();
     },
     onError: (err) => {

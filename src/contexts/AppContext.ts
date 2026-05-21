@@ -292,6 +292,26 @@ export interface AppConfig {
    */
   esploraApis: string[];
   /**
+   * Base URL for Trezor's Blockbook API, used exclusively by the HD wallet at
+   * `/hdwallet`. Blockbook's xpub endpoint (`/api/v2/xpub/<descriptor>`) lets
+   * the HD wallet scan, balance, and pull tx history for the entire account
+   * in a single HTTP call, where the equivalent Esplora workflow would be
+   * dozens of per-address calls.
+   *
+   * No version segment, no trailing slash. The endpoint must be a real
+   * Blockbook instance — Esplora-compatible servers do NOT speak the
+   * `/api/v2/xpub/` path. There is no failover list and no automatic
+   * fallback; HD wallet errors are surfaced to the user.
+   *
+   * **Privacy note**: the full account xpub is sent to this server on every
+   * request. Whoever operates the configured Blockbook instance can link
+   * every wallet address and observe balance over time. Default is Trezor's
+   * public mirror; users who care can self-host.
+   *
+   * Default: `"https://btc1.trezor.io"`.
+   */
+  blockbookBaseUrl: string;
+  /**
    * Display preference for monetary amounts (zap totals, balances, send forms).
    * - "usd" (default): convert sats to USD using the live BTC price.
    * - "sats": always show raw satoshi counts.

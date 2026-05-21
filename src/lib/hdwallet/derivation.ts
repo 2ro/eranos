@@ -118,6 +118,22 @@ export function deriveAccountFromNsec(nsecBytes: Uint8Array): HdAccount {
   return { accountNode, receiveNode, changeNode };
 }
 
+/**
+ * Build the BIP86 output descriptor `tr(<xpub>)` for the supplied account.
+ *
+ * Blockbook accepts this form natively for `/api/v2/xpub/<descriptor>` and
+ * uses it to derive Taproot addresses on both the receive (0) and change (1)
+ * chains automatically. The raw base58 xpub by itself would default Blockbook
+ * to BIP44 (legacy P2PKH); the `tr(...)` wrapper is what selects BIP86.
+ *
+ * The descriptor is URL-encoded by the caller before being put in the path —
+ * `tr(...)` contains parens that must be percent-escaped.
+ */
+export function accountToBip86Descriptor(account: HdAccount): string {
+  const xpub = account.accountNode.publicExtendedKey;
+  return `tr(${xpub})`;
+}
+
 // ---------------------------------------------------------------------------
 // Address derivation
 // ---------------------------------------------------------------------------

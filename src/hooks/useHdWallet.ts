@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useRef } from 'react';
+import { useCallback, useMemo } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 
 import { useAppContext } from '@/hooks/useAppContext';
@@ -11,23 +11,16 @@ import {
   type HdTransaction,
   scanAccount,
 } from '@/lib/hdwallet/scan';
-import {
-  fromPersistedScan,
-  type PersistedScan,
-  scanCacheKey,
-  toPersistedScan,
-} from '@/lib/hdwallet/cache';
-import { secureStorage } from '@/lib/secureStorage';
 
 // ---------------------------------------------------------------------------
 // Persisted UI cursor (per user)
 // ---------------------------------------------------------------------------
 //
 // We persist a single integer per user: the "preferred receive index" — the
-// index of the address we are *currently advertising* on the wallet page.
-// The chain-scan source of truth is the relay-derived `firstUnusedIndex`,
-// but if the user explicitly bumps to a fresh address (or rotates back),
-// we honour that until the chain catches up.
+// index of the address we are currently advertising on the wallet page.
+// The chain-scan source of truth is `firstUnusedIndex` (from Blockbook), but
+// if the user explicitly bumps to a fresh address we honour that until the
+// chain catches up.
 
 const CURSOR_KEY = (pubkey: string) => `hdwallet:cursor:${pubkey}`;
 
@@ -43,13 +36,12 @@ const DEFAULT_CURSOR: PersistedCursor = { receiveIndex: 0 };
 // ---------------------------------------------------------------------------
 
 /**
- * Re-scan every 2 minutes. On-chain activity is slow; the incremental scan
- * (warm scan only re-fetches known-used addresses + a small gap tail) keeps
- * the per-refresh request count low even at 2-minute polling. Combined with
- * `fetchAddressSnapshot` collapsing 3 calls into 1 per used address, a
- * steady-state wallet with 5 used addresses uses ~5 requests/refresh.
+ * Re-scan every 60 seconds. With Blockbook, a refresh is exactly 2 HTTP
+ * calls (`/xpub` + `/utxo`) regardless of wallet size, so a faster refresh
+ * is cheap. We pick 60s as a UX compromise between immediacy and politeness
+ * to the public Blockbook host.
  */
-const REFRESH_INTERVAL_MS = 120_000;
+const REFRESH_INTERVAL_MS = 60_000;
 
 // ---------------------------------------------------------------------------
 // Return shape
@@ -66,11 +58,11 @@ export interface UseHdWalletResult {
   transactions?: HdTransaction[];
   /** Confirmed + pending balance in sats. */
   totalBalance: number;
-  /** Pending (mempool) balance in sats. May be negative for outgoing. */
+  /** Pending (mempool) balance in sats. */
   pendingBalance: number;
   /** Initial scan in progress. */
   isLoading: boolean;
-  /** Either scan or tx-history loading. */
+  /** Scan currently fetching (initial or background refresh). */
   isFetching: boolean;
   /** Scan error, if any. */
   error: unknown;
@@ -81,65 +73,28 @@ export interface UseHdWalletResult {
 }
 
 // ---------------------------------------------------------------------------
-// Cache hydration
-// ---------------------------------------------------------------------------
-
-/**
- * Read the persisted scan skeleton for the given pubkey directly from the
- * platform's storage layer (Keychain on native, localStorage on web). Used
- * inside `queryFn` to avoid the previous useEffect/useRef hydration race —
- * by the time the query fires, `pubkey` is guaranteed non-empty (we gate the
- * query on that), so the read is deterministic and synchronous.
- *
- * Returns `undefined` when:
- *   - the key is absent (first ever scan for this account),
- *   - the stored value is corrupt JSON,
- *   - or the stored schema version is from a previous incompatible build.
- *
- * Any of those falls back to a cold scan, which then writes a fresh
- * skeleton back out.
- */
-async function readPersistedPrev(pubkey: string): Promise<AccountScanResult | undefined> {
-  try {
-    const raw = await secureStorage.getItem(scanCacheKey(pubkey));
-    if (!raw) return undefined;
-    const parsed = JSON.parse(raw) as PersistedScan;
-    return fromPersistedScan(parsed);
-  } catch (err) {
-    console.warn('Failed to load HD wallet cache, falling back to cold scan:', err);
-    return undefined;
-  }
-}
-
-// ---------------------------------------------------------------------------
 // Hook
 // ---------------------------------------------------------------------------
 
 /**
- * Top-level HD wallet hook. Returns the cached scan, balance, transactions,
- * and the current receive address.
+ * Top-level HD wallet hook backed by Trezor's Blockbook indexer.
  *
- * Performance:
+ * The entire scan (balance, used addresses, tx history, UTXOs) comes from
+ * two HTTP calls to the configured Blockbook server:
  *
- *   - The first scan ever is a cold gap-limit walk (full BIP44 scan).
- *   - Subsequent scans are **incremental**: the persisted skeleton
- *     (`PersistedScan`) is read directly inside `queryFn`, fed to
- *     `scanAccount` as `prev`, and the scan only re-fetches known-used
- *     addresses plus a small tail past `firstUnusedIndex` — typically << 10
- *     requests for a steady-state wallet.
- *   - Per-refresh request count is further halved by `fetchAddressSnapshot`,
- *     which derives balance, UTXOs, **and** tx history from a single
- *     `/address/:addr/txs` call (down from 3 separate calls).
- *   - Tx history aggregation runs in memory from the snapshot data — no
- *     additional round trips.
+ *   - `GET /api/v2/xpub/<tr(xpub)>?details=txs&tokens=used`
+ *   - `GET /api/v2/utxo/<tr(xpub)>`
  *
- * The hook is safe to call regardless of login state — it returns
- * `availability.status !== 'available'` for non-nsec users without doing any
- * derivation or network work.
+ * No fallback to other indexers, no client-side gap-limit walking. If
+ * Blockbook is unreachable the wallet surfaces the error.
+ *
+ * The hook is safe to call regardless of login state — non-nsec logins
+ * return `availability.status !== 'available'` without doing any derivation
+ * or network work.
  */
 export function useHdWallet(): UseHdWalletResult {
   const { config } = useAppContext();
-  const { esploraApis } = config;
+  const { blockbookBaseUrl } = config;
   const availability = useHdWalletAccess();
   const queryClient = useQueryClient();
 
@@ -152,20 +107,8 @@ export function useHdWallet(): UseHdWalletResult {
     DEFAULT_CURSOR,
   );
 
-  // ── In-memory live cache ─────────────────────────────────────
-  //
-  // After a successful scan we hold the full result here so the *next*
-  // refresh (every 2 minutes, or on manual refetch) doesn't need to re-read
-  // the persisted skeleton. The persisted copy still gets updated for
-  // page-reload survival.
-  const livePrevRef = useRef<AccountScanResult | undefined>(undefined);
-
   // ── Scan query ───────────────────────────────────────────────
-  //
-  // CRITICAL: `enabled` requires a non-empty pubkey *and* an account. The
-  // empty-pubkey false-start (render 1, before useCurrentUser resolves) is
-  // what previously caused the cold-scan-on-every-refresh bug.
-  const scanKey = ['hdwallet-scan', esploraApis, pubkey];
+  const scanKey = ['hdwallet-scan', blockbookBaseUrl, pubkey];
   const {
     data: scan,
     isLoading: scanLoading,
@@ -176,31 +119,15 @@ export function useHdWallet(): UseHdWalletResult {
     queryKey: scanKey,
     queryFn: async ({ signal }) => {
       if (!account || !pubkey) throw new Error('HD wallet account unavailable');
-
-      // Prefer the in-memory prev from a previous successful scan; otherwise
-      // hydrate from the platform's storage layer. Either path runs entirely
-      // synchronously on web (secureStorage.getItem reads localStorage
-      // directly) and async-but-fast on native.
-      const prev = livePrevRef.current ?? (await readPersistedPrev(pubkey));
-
-      const result = await scanAccount(account, esploraApis, signal, prev);
-
-      // Update both caches before returning. The persisted write is
-      // fire-and-forget on native (no await needed for correctness).
-      livePrevRef.current = result;
-      void secureStorage.setItem(scanCacheKey(pubkey), JSON.stringify(toPersistedScan(result)))
-        .catch((err) => console.warn('Failed to persist HD wallet cache:', err));
-
-      return result;
+      return scanAccount(account, blockbookBaseUrl, signal);
     },
     enabled: !!account && pubkey !== '',
     refetchInterval: REFRESH_INTERVAL_MS,
     staleTime: REFRESH_INTERVAL_MS / 2,
-    // Avoid a refetch storm when the user tabs back in mid-interval.
     refetchOnWindowFocus: false,
   });
 
-  // ── Transaction history (derived, no extra fetches) ──────────
+  // ── Transaction history (derived; zero extra fetches) ────────
   const transactions = useMemo<HdTransaction[] | undefined>(() => {
     if (!scan) return undefined;
     return buildHdTransactions(scan);

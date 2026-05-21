@@ -265,6 +265,7 @@ export const AppConfigSchema = z.object({
     z.string().url().transform((s) => [s]),
     z.array(z.string().url()).min(1),
   ]),
+  blockbookBaseUrl: z.string().url(),
   currencyDisplay: z.enum(['usd', 'sats']).optional(),
   sidebarWidgets: z.array(z.object({
     id: z.string(),
