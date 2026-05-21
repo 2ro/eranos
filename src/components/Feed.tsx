@@ -271,8 +271,9 @@ export function Feed({ kinds, tagFilters, header, hideCompose, emptyMessage, fee
   const showSavedFeedTabs = user && !isKindSpecificPage && !tagFilters;
   const useGlobeBackdrop = feedId === 'home' && !kinds && !tagFilters && !header;
   const translucentCardClassName = useGlobeBackdrop
-    ? 'bg-background/70 border-border/50 hover:bg-background/80'
+    ? 'bg-transparent border-border/50 hover:bg-transparent'
     : undefined;
+  const transparentFeedSurfaceClassName = useGlobeBackdrop ? 'bg-transparent' : undefined;
 
   return (
     <main className={cn('flex-1 min-w-0 min-h-dvh', useGlobeBackdrop && 'relative isolate overflow-x-clip')}>
@@ -286,11 +287,11 @@ export function Feed({ kinds, tagFilters, header, hideCompose, emptyMessage, fee
           <LandingHero onJoinClick={() => setAuthDialogOpen(true)} />
         )}
 
-        {!hideCompose && <ComposeBox compact hideBorder />}
+        {!hideCompose && <ComposeBox compact hideBorder className={transparentFeedSurfaceClassName} />}
 
         {/* Tabs (logged in) */}
         {user && (
-          <SubHeaderBar>
+          <SubHeaderBar backgroundFillClassName={transparentFeedSurfaceClassName && 'fill-transparent'}>
             <TabButton label={isKindSpecificPage || tagFilters ? 'Follows' : 'Following'} active={activeTab === 'follows'} onClick={() => handleSetActiveTab('follows')} />
             {!isKindSpecificPage && !tagFilters && (
               <TabButton label="Network" active={activeTab === 'network'} onClick={() => handleSetActiveTab('network')} />
