@@ -67,7 +67,12 @@ export function BitcoinPublicDisclaimer({
       role={isSoft ? 'note' : 'alert'}
       className={cn(
         isSoft
-          ? 'border-amber-300/60 bg-amber-50 text-amber-900 dark:border-amber-500/30 dark:bg-amber-500/10 dark:text-amber-100'
+          // Use the project's foreground token (not raw amber-900) so
+          // the text always contrasts against the page in both light
+          // and dark themes. The faint amber tint keeps the
+          // "informational notice" cue without leaning on hard-coded
+          // amber text that disappears on the wrong backdrop.
+          ? 'border-amber-500/30 bg-amber-500/10 text-foreground'
           : 'border-destructive/50 bg-destructive/5 text-destructive dark:border-destructive',
       )}
     >
