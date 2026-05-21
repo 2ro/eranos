@@ -351,7 +351,7 @@ export function CampaignsPage() {
                   variant="outline"
                   size="lg"
                   asChild
-                  className="rounded-full bg-background/60 backdrop-blur h-12 px-6 text-base"
+                  className="rounded-full bg-background/70 backdrop-blur h-12 px-6 text-base text-foreground"
                 >
                   <a href="#campaigns">Explore campaigns</a>
                 </Button>
