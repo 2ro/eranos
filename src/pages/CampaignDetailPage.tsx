@@ -12,6 +12,7 @@ import {
   HandHeart,
   MapPin,
   Pencil,
+  Pin,
   Share2,
   Users,
 } from 'lucide-react';
@@ -51,6 +52,7 @@ import { useAuthor } from '@/hooks/useAuthor';
 import { useBitcoinWallet } from '@/hooks/useBitcoinWallet';
 import { useCampaign } from '@/hooks/useCampaign';
 import { useCampaignDonations } from '@/hooks/useCampaignDonations';
+import { useCampaignPinnedEvents } from '@/hooks/useCampaignPinnedEvents';
 import { useComments } from '@/hooks/useComments';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useEventStats } from '@/hooks/useTrending';
@@ -96,6 +98,28 @@ function formatDeadline(unixSeconds: number): { label: string; isPast: boolean }
   if (days <= 1) return { label: 'Ends today', isPast: false };
   if (days < 60) return { label: `${days} days left`, isPast: false };
   return { label: `Ends ${new Date(unixSeconds * 1000).toLocaleDateString()}`, isPast: false };
+}
+
+function collectReplyEvents(nodes: ReplyNode[], out = new Map<string, NostrEvent>()): Map<string, NostrEvent> {
+  for (const node of nodes) {
+    out.set(node.event.id, node.event);
+    collectReplyEvents(node.children, out);
+    if (node.hiddenChildren) collectReplyEvents(node.hiddenChildren, out);
+  }
+  return out;
+}
+
+function removePinnedReplyNodes(nodes: ReplyNode[], pinnedIds: Set<string>): ReplyNode[] {
+  return nodes.flatMap((node): ReplyNode[] => {
+    if (pinnedIds.has(node.event.id)) return [];
+    return [{
+      ...node,
+      children: removePinnedReplyNodes(node.children, pinnedIds),
+      hiddenChildren: node.hiddenChildren
+        ? removePinnedReplyNodes(node.hiddenChildren, pinnedIds)
+        : undefined,
+    }];
+  });
 }
 
 export function CampaignDetailPage({ pubkey, identifier, relays }: CampaignDetailPageProps) {
@@ -146,6 +170,13 @@ function CampaignDetailContent({ campaign }: { campaign: ParsedCampaign }) {
     campaign.event,
     500,
   );
+  const {
+    pinnedIds,
+    pinnedEvents,
+    isPinned,
+    canManagePins,
+    togglePin,
+  } = useCampaignPinnedEvents(campaign.aTag, campaign.pubkey);
 
   // Aggregate kind 8333 donation receipts by `(txid, donor)` so each
   // donation surfaces as a single event in the donor list and the inline
@@ -207,6 +238,21 @@ function CampaignDetailContent({ campaign }: { campaign: ParsedCampaign }) {
       (a, b) => b.event.created_at - a.event.created_at,
     );
   }, [commentsData, donationReceipts]);
+
+  const pinnedIdSet = useMemo(() => new Set(pinnedIds), [pinnedIds]);
+  const feedEventsById = useMemo(() => collectReplyEvents(replyTree), [replyTree]);
+
+  const activityTree = useMemo((): ReplyNode[] => {
+    const pinnedEventNodes = pinnedIds
+      .map((id) => feedEventsById.get(id) ?? pinnedEvents.find((event) => event.id === id))
+      .filter((event): event is NostrEvent => !!event)
+      .map((event): ReplyNode => ({ event, children: [] }));
+
+    return [
+      ...pinnedEventNodes,
+      ...removePinnedReplyNodes(replyTree, pinnedIdSet),
+    ];
+  }, [feedEventsById, pinnedEvents, pinnedIdSet, pinnedIds, replyTree]);
 
   // Engagement counters above the action bar. Zaps are intentionally excluded
   // for campaigns — donations are on-chain (kind 8333), so showing a zap
@@ -429,9 +475,31 @@ function CampaignDetailContent({ campaign }: { campaign: ParsedCampaign }) {
                       <CampaignReplySkeleton key={i} />
                     ))}
                   </div>
-                ) : replyTree.length > 0 ? (
+                ) : activityTree.length > 0 ? (
                   <div className="-mx-2 sm:-mx-4 rounded-2xl bg-card border border-border/60 overflow-hidden">
-                    <ThreadedReplyList roots={replyTree} />
+                    <ThreadedReplyList
+                      roots={activityTree}
+                      renderItemHeader={(event) => (
+                        <CampaignActivityItemHeader
+                          event={event}
+                          isCampaignAuthor={event.pubkey === campaign.pubkey}
+                          canManagePins={canManagePins}
+                          isPinned={isPinned(event.id)}
+                          pinPending={togglePin.isPending}
+                          onTogglePin={() => {
+                            const wasPinned = isPinned(event.id);
+                            togglePin.mutate(event.id, {
+                              onSuccess: () => {
+                                toast({ title: wasPinned ? 'Unpinned from campaign' : 'Pinned to campaign' });
+                              },
+                              onError: () => {
+                                toast({ title: 'Failed to update campaign pins', variant: 'destructive' });
+                              },
+                            });
+                          }}
+                        />
+                      )}
+                    />
                   </div>
                 ) : (
                   <button
@@ -521,6 +589,60 @@ function CampaignDetailContent({ campaign }: { campaign: ParsedCampaign }) {
         </AlertDialogContent>
       </AlertDialog>
     </main>
+  );
+}
+
+function CampaignActivityItemHeader({
+  event,
+  isCampaignAuthor,
+  canManagePins,
+  isPinned,
+  pinPending,
+  onTogglePin,
+}: {
+  event: NostrEvent;
+  isCampaignAuthor: boolean;
+  canManagePins: boolean;
+  isPinned: boolean;
+  pinPending: boolean;
+  onTogglePin: () => void;
+}) {
+  if (!isCampaignAuthor && !canManagePins && !isPinned) return null;
+
+  return (
+    <div className="flex items-center justify-between gap-3 px-4 pt-3 pb-0 text-xs text-muted-foreground">
+      <div className="flex flex-wrap items-center gap-2">
+        {isPinned && (
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-2 py-0.5 font-medium text-primary">
+            <Pin className="size-3 rotate-45 fill-current" />
+            Pinned
+          </span>
+        )}
+        {isCampaignAuthor && (
+          <span className="inline-flex items-center rounded-full bg-amber-500/10 px-2 py-0.5 font-medium text-amber-700 dark:text-amber-300">
+            Campaign author
+          </span>
+        )}
+      </div>
+      {canManagePins && (
+        <button
+          type="button"
+          onClick={(e) => {
+            e.stopPropagation();
+            onTogglePin();
+          }}
+          disabled={pinPending}
+          className={cn(
+            'inline-flex items-center gap-1.5 rounded-full px-2 py-0.5 font-medium transition-colors hover:bg-primary/10 hover:text-primary disabled:cursor-not-allowed disabled:opacity-60',
+            isPinned && 'text-primary',
+          )}
+          aria-label={`${isPinned ? 'Unpin' : 'Pin'} campaign activity from ${event.id}`}
+        >
+          <Pin className={cn('size-3 rotate-45', isPinned && 'fill-current')} />
+          {isPinned ? 'Unpin' : 'Pin'}
+        </button>
+      )}
+    </div>
   );
 }
 

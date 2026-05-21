@@ -322,6 +322,32 @@ This mirrors the community batch-zap pattern documented in the kind 8333 section
 
 Clients MUST verify each kind 8333 event on-chain before counting it toward the campaign total, per the verification rules in the kind 8333 section.
 
+**Fetch pinned campaign activity:**
+
+Campaign creators MAY pin important activity feed events (comments, updates, or donation receipts) with a NIP-78 app-specific data event (`kind: 30078`) authored by the campaign creator. The `d` tag is scoped to the campaign coordinate:
+
+```json
+{
+  "kind": 30078,
+  "pubkey": "<campaign-creator-pubkey>",
+  "content": "{\"pinnedEvents\":[\"<event-id-2>\",\"<event-id-1>\"]}",
+  "tags": [
+    ["d", "agora-campaign-pins:30223:<creator-pubkey>:<slug>"],
+    ["a", "30223:<creator-pubkey>:<slug>"],
+    ["k", "30223"],
+    ["alt", "Pinned campaign activity"]
+  ]
+}
+```
+
+Clients SHOULD query the pin list with:
+
+```json
+{ "kinds": [30078], "authors": ["<creator-pubkey>"], "#d": ["agora-campaign-pins:30223:<creator-pubkey>:<slug>"], "limit": 1 }
+```
+
+The `pinnedEvents` array is ordered newest pin first. Pinning an already-pinned event removes it. Clients SHOULD ignore pin lists not authored by the campaign creator.
+
 ### Client Behavior
 
 - **Recipient validity:** clients SHOULD reject `p` tag entries whose pubkey is not 64 hex characters and SHOULD ignore weights that are not positive finite decimals.
