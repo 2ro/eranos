@@ -58,7 +58,6 @@ import { ChestIcon } from "@/components/icons/ChestIcon";
 import { RepostIcon } from "@/components/icons/RepostIcon";
 import { LiveStreamPlayer } from "@/components/LiveStreamPlayer";
 import { MagicDeckContent } from "@/components/MagicDeckContent";
-import { Nip05Badge } from "@/components/Nip05Badge";
 import { NoteContent } from "@/components/NoteContent";
 import { NoteMoreMenu } from "@/components/NoteMoreMenu";
 import { PatchCard } from "@/components/PatchCard";
@@ -86,7 +85,6 @@ import { ZapDialog } from "@/components/ZapDialog";
 import { useAppContext } from "@/hooks/useAppContext";
 import { useAuthor } from "@/hooks/useAuthor";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
-import { useNip05Verify } from "@/hooks/useNip05Verify";
 import { useOpenPost } from "@/hooks/useOpenPost";
 import { useProfileUrl } from "@/hooks/useProfileUrl";
 import { toast } from "@/hooks/useToast";
@@ -398,11 +396,6 @@ export const NoteCard = memo(function NoteCard({
   const metadata = author.data?.metadata;
   const actionMetadata = actionEvent ? actionAuthor.data?.metadata : metadata;
   const displayName = getDisplayName(metadata, event.pubkey);
-  const nip05 = metadata?.nip05;
-  const { data: nip05Verified, isPending: nip05Pending } = useNip05Verify(
-    nip05,
-    event.pubkey,
-  );
   const profileUrl = useProfileUrl(event.pubkey, metadata);
   const encodedId = useMemo(() => encodeEventId(actionTarget), [actionTarget]);
   const { data: stats } = useEventStats(actionTarget.id, actionTarget);
@@ -776,12 +769,6 @@ export const NoteCard = memo(function NoteCard({
         )}
       </div>
       <div className="flex items-center gap-1 text-sm text-muted-foreground min-w-0 pr-2">
-        {nip05 && nip05Pending && <Skeleton className="h-3 w-24" />}
-        {nip05 && nip05Pending && <span className="shrink-0">·</span>}
-        {nip05 && nip05Verified && (
-          <Nip05Badge nip05={nip05} pubkey={event.pubkey} />
-        )}
-        {nip05 && nip05Verified && <span className="shrink-0">·</span>}
         <span className="shrink-0 hover:underline whitespace-nowrap">
           {timeAgo(event.created_at)}
         </span>
