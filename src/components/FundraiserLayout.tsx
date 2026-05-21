@@ -1,6 +1,7 @@
 import { Suspense, useCallback, useMemo, useRef, useState } from 'react';
 import { Link, Outlet } from 'react-router-dom';
 
+import { FloatingComposeButton } from '@/components/FloatingComposeButton';
 import { TopNav } from '@/components/TopNav';
 import { Skeleton } from '@/components/ui/skeleton';
 import {
@@ -48,7 +49,7 @@ function PageSkeleton() {
 function FundraiserLayoutInner() {
   const centerColumnRef = useRef<HTMLDivElement>(null);
   const [centerColumnEl, setCenterColumnEl] = useState<HTMLElement | null>(null);
-  const { noMaxWidth, wrapperClassName } = useLayoutSnapshot();
+  const { noMaxWidth, wrapperClassName, showFAB = false, fabKind = 1, fabHref, onFabClick, fabIcon, fabMenu } = useLayoutSnapshot();
 
   // Mobile drawer is owned by TopNav now, so consumers of `useOpenDrawer`
   // become no-ops. Keeping the context shape avoids touching every page that
@@ -82,6 +83,14 @@ function FundraiserLayoutInner() {
                 <Outlet />
               </div>
             </Suspense>
+
+            {showFAB && (
+              <div className="fixed bottom-fab right-6 z-30 pointer-events-none sidebar:bottom-8 sidebar:right-8">
+                <div className="pointer-events-auto">
+                  <FloatingComposeButton kind={fabKind} href={fabHref} onFabClick={onFabClick} icon={fabIcon} menu={fabMenu} />
+                </div>
+              </div>
+            )}
 
             <SiteFooter />
           </div>
