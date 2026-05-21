@@ -364,7 +364,7 @@ function CampaignDetailContent({ campaign }: { campaign: ParsedCampaign }) {
 
       {pinnedNodes.length > 0 && (
         <div className="max-w-6xl mx-auto px-4 sm:px-6 pt-6">
-          <div className="-mx-2 sm:-mx-4 rounded-2xl bg-card border border-border/60 overflow-hidden">
+          <div className="rounded-2xl bg-card border border-border/60 overflow-hidden">
             <ThreadedReplyList
               roots={pinnedNodes}
               renderItemHeader={(event) => (
@@ -417,7 +417,7 @@ function CampaignDetailContent({ campaign }: { campaign: ParsedCampaign }) {
 
                 <DetailCommentComposer
                   event={campaign.event}
-                  className="mb-3"
+                  className="mb-3 mx-0 sm:mx-0"
                   onSuccess={() => queryClient.invalidateQueries({ queryKey: ['nostr', 'comments'] })}
                 />
 
@@ -428,7 +428,7 @@ function CampaignDetailContent({ campaign }: { campaign: ParsedCampaign }) {
                     ))}
                   </div>
                 ) : replyTree.length > 0 ? (
-                  <div className="-mx-2 sm:-mx-4 rounded-2xl bg-card border border-border/60 overflow-hidden">
+                  <div className="rounded-2xl bg-card border border-border/60 overflow-hidden">
                     <ThreadedReplyList
                       roots={replyTree}
                       renderItemHeader={(event) => (
