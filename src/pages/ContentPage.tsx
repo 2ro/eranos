@@ -4,7 +4,6 @@ import { RotateCcw } from 'lucide-react';
 import { MuteSettingsInternals, SensitiveContentSection } from '@/components/ContentSettings';
 import { MuteListRecoveryDialog } from '@/components/MuteListRecoveryDialog';
 import { PageHeader } from '@/components/PageHeader';
-import { IntroImage } from '@/components/IntroImage';
 import { HelpTip } from '@/components/HelpTip';
 import { Button } from '@/components/ui/button';
 import { useAppContext } from '@/hooks/useAppContext';
@@ -36,15 +35,12 @@ export function ContentPage() {
         }
       />
 
-      {/* Lead image — Muted Content */}
-      <div className="flex items-center gap-4 px-7 py-5">
-        <IntroImage src="/mute-intro.png" size="w-28" />
-        <div className="min-w-0">
-          <h2 className="text-base font-semibold">Content Control</h2>
-          <p className="text-xs text-muted-foreground mt-1 leading-relaxed">
-            Hide posts from specific users, hashtags, words, or entire threads. All mutes are encrypted and private.
-          </p>
-        </div>
+      {/* Intro */}
+      <div className="px-7 py-5">
+        <h2 className="text-base font-semibold">Content Control</h2>
+        <p className="text-xs text-muted-foreground mt-1 leading-relaxed">
+          Hide posts from specific users, hashtags, words, or entire threads. All mutes are encrypted and private.
+        </p>
       </div>
 
       <div className="p-4 space-y-0">

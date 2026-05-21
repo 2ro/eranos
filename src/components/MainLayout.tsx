@@ -4,10 +4,8 @@ import { LeftSidebar } from '@/components/LeftSidebar';
 import { MobileTopBar } from '@/components/MobileTopBar';
 import { MobileDrawer } from '@/components/MobileDrawer';
 import { FloatingComposeButton } from '@/components/FloatingComposeButton';
-import { CursorFireEffect } from '@/components/CursorFireEffect';
 import { Skeleton } from '@/components/ui/skeleton';
 import { CenterColumnContext, DrawerContext, LayoutStore, LayoutStoreContext, NavHiddenContext, useLayoutSnapshot } from '@/contexts/LayoutContext';
-import { useAppContext } from '@/hooks/useAppContext';
 import { useScrollDirection } from '@/hooks/useScrollDirection';
 import { cn } from '@/lib/utils';
 
@@ -55,15 +53,11 @@ function MainLayoutInner() {
   const openDrawer = useCallback(() => setDrawerOpen(true), []);
   const centerColumnRef = useRef<HTMLDivElement>(null);
   const [centerColumnEl, setCenterColumnEl] = useState<HTMLElement | null>(null);
-  const { config } = useAppContext();
   const { hidden: navHidden } = useScrollDirection(scrollContainer);
   return (
     <CenterColumnContext.Provider value={centerColumnEl}>
     <DrawerContext.Provider value={openDrawer}>
     <NavHiddenContext.Provider value={navHidden}>
-      {/* Magic Mouse fire particle overlay */}
-      {config.magicMouse && <CursorFireEffect />}
-
       {/* Mobile top bar - only on small screens, hidden when page requests immersive mode */}
       {!hideTopBar && <MobileTopBar onAvatarClick={() => setDrawerOpen(true)} hasSubHeader={hasSubHeader} />}
 

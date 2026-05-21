@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { IntroImage } from '@/components/IntroImage';
 import {
   Users, Download, Loader2, X, Pencil, Home, Globe, MapPin,
   Palette, Trash2, Plus, UserX, Hash, MessageSquareOff, ExternalLink, ShieldAlert,
@@ -86,14 +85,11 @@ export function ContentSettings() {
         </div>
         <div className="pb-4">
           {/* Intro section for Other Stuff */}
-          <div className="flex items-center gap-4 px-3 pt-3 pb-4">
-            <IntroImage src="/feed-intro.png" />
-            <div className="min-w-0">
-              <h3 className="text-sm font-semibold">Other Stuff</h3>
-              <p className="text-xs text-muted-foreground mt-1 leading-relaxed">
-                Nostr isn't just text posts — people publish all kinds of things. Pick what shows up in your sidebar and feed.
-              </p>
-            </div>
+          <div className="px-3 pt-3 pb-4">
+            <h3 className="text-sm font-semibold">Other Stuff</h3>
+            <p className="text-xs text-muted-foreground mt-1 leading-relaxed">
+              Nostr isn't just text posts — people publish all kinds of things. Pick what shows up in your sidebar and feed.
+            </p>
           </div>
 
           {/* Column headers */}
@@ -407,14 +403,11 @@ function FeedTabsSection() {
   return (
     <div>
       {/* Intro section for Feed Tabs */}
-      <div className="flex items-center gap-4 px-3 pt-3 pb-4">
-        <IntroImage src="/community-intro.png" />
-        <div className="min-w-0">
-          <h3 className="text-sm font-semibold">Feed Navigation</h3>
-          <p className="text-xs text-muted-foreground mt-1 leading-relaxed">
-            Manage which feed tabs appear in your navigation and follow communities by domain.
-          </p>
-        </div>
+      <div className="px-3 pt-3 pb-4">
+        <h3 className="text-sm font-semibold">Feed Navigation</h3>
+        <p className="text-xs text-muted-foreground mt-1 leading-relaxed">
+          Manage which feed tabs appear in your navigation and follow communities by domain.
+        </p>
       </div>
 
       {/* Feed Tab Toggles */}

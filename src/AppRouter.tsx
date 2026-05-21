@@ -63,7 +63,6 @@ const KindFeedPage = lazy(() => import("./pages/KindFeedPage").then(m => ({ defa
 const LetterComposePage = lazy(() => import("./pages/LetterComposePage").then(m => ({ default: m.LetterComposePage })));
 const LetterPreferencesPage = lazy(() => import("./pages/LetterPreferencesPage").then(m => ({ default: m.LetterPreferencesPage })));
 const LettersPage = lazy(() => import("./pages/LettersPage").then(m => ({ default: m.LettersPage })));
-const MagicSettingsPage = lazy(() => import("./pages/MagicSettingsPage").then(m => ({ default: m.MagicSettingsPage })));
 const MusicPage = lazy(() => import("./pages/MusicPage").then(m => ({ default: m.MusicPage })));
 const NetworkSettingsPage = lazy(() => import("./pages/NetworkSettingsPage").then(m => ({ default: m.NetworkSettingsPage })));
 const NIP19Page = lazy(() => import("./pages/NIP19Page").then(m => ({ default: m.NIP19Page })));
@@ -198,7 +197,6 @@ export function AppRouter() {
               path="/settings/advanced"
               element={<AdvancedSettingsPage />}
             />
-            <Route path="/settings/magic" element={<MagicSettingsPage />} />
             <Route path="/settings/network" element={<NetworkSettingsPage />} />
             <Route path="/lists" element={<UserListsPage />} />
             <Route path="/events" element={<EventsFeedPage />} />

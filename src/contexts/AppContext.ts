@@ -208,8 +208,6 @@ export interface AppConfig {
   clientName?: string;
   /** NIP-19 `naddr1…` identifying this client's kind 31990 handler event. Decoded at publish time to produce the `31990:<pubkey>:<d-tag>` addr and relay hint for the "client" tag per NIP-89. */
   client?: string;
-  /** Enable Magic Mouse mode: cursor/finger emanates magical fire in the primary color */
-  magicMouse: boolean;
   /** Current theme */
   theme: Theme;
   /** Custom theme config (colors, fonts, background). Only used when theme === "custom". */

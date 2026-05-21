@@ -107,7 +107,6 @@ export function TestApp({ children }: TestAppProps) {
     faviconUrl: "https://ditto.pub/api/favicon/{hostname}",
     linkPreviewUrl: "https://ditto.pub/api/link-preview/{url}",
     corsProxy: "https://proxy.shakespeare.diy/?url={href}",
-    magicMouse: false,
     contentWarningPolicy: "blur",
     sentryDsn: "",
     sentryEnabled: false,
