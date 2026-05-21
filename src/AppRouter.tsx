@@ -87,6 +87,7 @@ const VinesFeedPage = lazy(() => import("./pages/VinesFeedPage").then(m => ({ de
 const WalletPage = lazy(() => import("./pages/WalletPage").then(m => ({ default: m.WalletPage })));
 const WalletRecoveryPage = lazy(() => import("./pages/WalletRecoveryPage").then(m => ({ default: m.WalletRecoveryPage })));
 const WalletSettingsPage = lazy(() => import("./pages/WalletSettingsPage").then(m => ({ default: m.WalletSettingsPage })));
+const HDWalletPage = lazy(() => import("./pages/HDWalletPage").then(m => ({ default: m.HDWalletPage })));
 const WebxdcFeedPage = lazy(() => import("./pages/WebxdcFeedPage").then(m => ({ default: m.WebxdcFeedPage })));
 const WikipediaPage = lazy(() => import("./pages/WikipediaPage").then(m => ({ default: m.WikipediaPage })));
 const WorldPage = lazy(() => import("./pages/WorldPage").then(m => ({ default: m.WorldPage })));
@@ -287,6 +288,7 @@ export function AppRouter() {
             />
             <Route path="/wallet" element={<WalletPage />} />
             <Route path="/wallet/recovery" element={<WalletRecoveryPage />} />
+            <Route path="/hdwallet" element={<HDWalletPage />} />
             <Route path="/bitcoin" element={<Navigate to="/wallet" replace />} />
             <Route path="/bookmarks" element={<BookmarksPage />} />
             <Route path="/ai-chat" element={<AIChatPage />} />
