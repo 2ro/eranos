@@ -13,6 +13,7 @@ import {
   MapPin,
   Pencil,
   Share2,
+  ShieldCheck,
   Users,
 } from 'lucide-react';
 
@@ -37,14 +38,12 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { DonateDialog } from '@/components/DonateDialog';
+import { DetailCommentComposer } from '@/components/DetailCommentComposer';
 import { PostActionBar } from '@/components/PostActionBar';
+import { PinnedCommentHeader } from '@/components/PinnedCommentHeader';
 import { ReplyComposeModal } from '@/components/ReplyComposeModal';
 import { NoteMoreMenu } from '@/components/NoteMoreMenu';
 import { Progress } from '@/components/ui/progress';
-import {
-  InteractionsModal,
-  type InteractionTab,
-} from '@/components/InteractionsModal';
 import { ThreadedReplyList, type ReplyNode } from '@/components/ThreadedReplyList';
 import { useArchiveCampaign } from '@/hooks/useArchiveCampaign';
 import { useAuthor } from '@/hooks/useAuthor';
@@ -54,6 +53,7 @@ import { useCampaignDonations } from '@/hooks/useCampaignDonations';
 import { useComments } from '@/hooks/useComments';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useEventStats } from '@/hooks/useTrending';
+import { usePinnedEventComments } from '@/hooks/usePinnedEventComments';
 import { useProfileUrl } from '@/hooks/useProfileUrl';
 import { useToast } from '@/hooks/useToast';
 import { useLayoutOptions } from '@/contexts/LayoutContext';
@@ -98,6 +98,15 @@ function formatDeadline(unixSeconds: number): { label: string; isPast: boolean }
   return { label: `Ends ${new Date(unixSeconds * 1000).toLocaleDateString()}`, isPast: false };
 }
 
+function collectReplyEvents(nodes: ReplyNode[], out = new Map<string, NostrEvent>()): Map<string, NostrEvent> {
+  for (const node of nodes) {
+    out.set(node.event.id, node.event);
+    collectReplyEvents(node.children, out);
+    if (node.hiddenChildren) collectReplyEvents(node.hiddenChildren, out);
+  }
+  return out;
+}
+
 export function CampaignDetailPage({ pubkey, identifier, relays }: CampaignDetailPageProps) {
   // Drop the default 600px column cap and the default right widget sidebar
   // — this page renders its own GoFundMe-style 2-column layout (article on
@@ -128,17 +137,10 @@ function CampaignDetailContent({ campaign }: { campaign: ParsedCampaign }) {
   const [donateOpen, setDonateOpen] = useState(false);
   const [replyOpen, setReplyOpen] = useState(false);
   const [moreMenuOpen, setMoreMenuOpen] = useState(false);
-  const [interactionsOpen, setInteractionsOpen] = useState(false);
   const [storyExpanded, setStoryExpanded] = useState(false);
-  const [interactionsTab, setInteractionsTab] = useState<InteractionTab>('reposts');
   const [archiveConfirmOpen, setArchiveConfirmOpen] = useState(false);
 
   const archiveMutation = useArchiveCampaign();
-
-  const openInteractions = (tab: InteractionTab) => {
-    setInteractionsTab(tab);
-    setInteractionsOpen(true);
-  };
 
   const { data: engagementStats } = useEventStats(campaign.event.id, campaign.event);
 
@@ -146,6 +148,13 @@ function CampaignDetailContent({ campaign }: { campaign: ParsedCampaign }) {
     campaign.event,
     500,
   );
+  const {
+    pinnedIds,
+    pinnedEvents,
+    isPinned,
+    canManagePins,
+    togglePin,
+  } = usePinnedEventComments(campaign.aTag, campaign.pubkey);
 
   // Aggregate kind 8333 donation receipts by `(txid, donor)` so each
   // donation surfaces as a single event in the donor list and the inline
@@ -208,14 +217,15 @@ function CampaignDetailContent({ campaign }: { campaign: ParsedCampaign }) {
     );
   }, [commentsData, donationReceipts]);
 
-  // Engagement counters above the action bar. Zaps are intentionally excluded
-  // for campaigns — donations are on-chain (kind 8333), so showing a zap
-  // count here would suggest the wrong CTA.
-  const hasStats =
-    !!engagementStats?.replies ||
-    !!engagementStats?.reposts ||
-    !!engagementStats?.quotes ||
-    !!engagementStats?.reactions;
+  const feedEventsById = useMemo(() => collectReplyEvents(replyTree), [replyTree]);
+
+  const pinnedNodes = useMemo((): ReplyNode[] => {
+    return pinnedIds
+      .map((id) => feedEventsById.get(id) ?? pinnedEvents.find((event) => event.id === id))
+      .filter((event): event is NostrEvent => !!event)
+      .map((event): ReplyNode => ({ event, children: [] }));
+  }, [feedEventsById, pinnedEvents, pinnedIds]);
+
   const cover = sanitizeUrl(campaign.image);
   const creatorMetadata = author.data?.metadata;
   const creatorName =
@@ -340,6 +350,37 @@ function CampaignDetailContent({ campaign }: { campaign: ParsedCampaign }) {
         onReopen={handleToggleArchive}
       />
 
+      <div className="max-w-6xl mx-auto px-4 sm:px-6">
+        <div className="rounded-b-xl rounded-t-none bg-card border border-t-0 border-border/60 shadow-sm px-4 sm:px-5 py-3">
+          <PostActionBar
+            event={campaign.event}
+            replyLabel="Comment"
+            hideZap
+            onReply={() => setReplyOpen(true)}
+            onMore={() => setMoreMenuOpen(true)}
+          />
+        </div>
+      </div>
+
+      {pinnedNodes.length > 0 && (
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 pt-6">
+          <div className="rounded-2xl bg-card border border-border/60 overflow-hidden">
+            <ThreadedReplyList
+              roots={pinnedNodes}
+              renderItemHeader={(event) => (
+                <CampaignPinHeader
+                  isCampaignAuthor={event.pubkey === campaign.pubkey}
+                  canManagePins={canManagePins}
+                  isPinned={isPinned(event.id)}
+                  pinPending={togglePin.isPending}
+                  onTogglePin={() => handleTogglePin(event)}
+                />
+              )}
+            />
+          </div>
+        </div>
+      )}
+
       {/* Two-column body. On mobile the right column collapses inline
           immediately below the hero so the donate CTA stays above the
           fold. On lg+ the right column sticks to the viewport edge of
@@ -358,59 +399,9 @@ function CampaignDetailContent({ campaign }: { campaign: ParsedCampaign }) {
               onToggle={() => setStoryExpanded((v) => !v)}
             />
 
-            {/* Engagement: stats counters, action bar, threaded replies
-                + donation receipts interleaved. */}
+            {/* Activity: threaded replies + donation receipts interleaved. */}
             <div id="campaign-activity" className="scroll-mt-20">
-              <div className="rounded-2xl bg-card border border-border/60 shadow-sm px-4 sm:px-5 py-4 sm:py-5">
-                {hasStats && (
-                  <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs sm:text-sm text-muted-foreground pb-2">
-                    {engagementStats?.reposts ? (
-                      <button
-                        onClick={() => openInteractions('reposts')}
-                        className="hover:underline transition-colors"
-                      >
-                        <span className="font-bold text-foreground">
-                          {formatNumber(engagementStats.reposts)}
-                        </span>{' '}
-                        Repost{engagementStats.reposts !== 1 ? 's' : ''}
-                      </button>
-                    ) : null}
-                    {engagementStats?.quotes ? (
-                      <button
-                        onClick={() => openInteractions('quotes')}
-                        className="hover:underline transition-colors"
-                      >
-                        <span className="font-bold text-foreground">
-                          {formatNumber(engagementStats.quotes)}
-                        </span>{' '}
-                        Quote{engagementStats.quotes !== 1 ? 's' : ''}
-                      </button>
-                    ) : null}
-                    {engagementStats?.reactions ? (
-                      <button
-                        onClick={() => openInteractions('reactions')}
-                        className="hover:underline transition-colors"
-                      >
-                        <span className="font-bold text-foreground">
-                          {formatNumber(engagementStats.reactions)}
-                        </span>{' '}
-                        Like{engagementStats.reactions !== 1 ? 's' : ''}
-                      </button>
-                    ) : null}
-                  </div>
-                )}
-
-                <PostActionBar
-                  event={campaign.event}
-                  replyLabel="Comment"
-                  hideZap
-                  onReply={() => setReplyOpen(true)}
-                  onMore={() => setMoreMenuOpen(true)}
-                  className={hasStats ? 'pt-3 border-t border-border/60' : undefined}
-                />
-              </div>
-
-              <div className="mt-6">
+              <div>
                 <div className="flex items-baseline justify-between gap-3 mb-3 px-1">
                   <h2 className="text-lg font-semibold tracking-tight">
                     Comments &amp; donations
@@ -423,6 +414,12 @@ function CampaignDetailContent({ campaign }: { campaign: ParsedCampaign }) {
                   ) : null}
                 </div>
 
+                <DetailCommentComposer
+                  event={campaign.event}
+                  className="mb-3"
+                  onSuccess={() => queryClient.invalidateQueries({ queryKey: ['nostr', 'comments'] })}
+                />
+
                 {commentsLoading && statsLoading && replyTree.length === 0 ? (
                   <div className="space-y-3">
                     {Array.from({ length: 3 }).map((_, i) => (
@@ -430,8 +427,19 @@ function CampaignDetailContent({ campaign }: { campaign: ParsedCampaign }) {
                     ))}
                   </div>
                 ) : replyTree.length > 0 ? (
-                  <div className="-mx-2 sm:-mx-4 rounded-2xl bg-card border border-border/60 overflow-hidden">
-                    <ThreadedReplyList roots={replyTree} />
+                  <div className="rounded-2xl bg-card border border-border/60 overflow-hidden">
+                    <ThreadedReplyList
+                      roots={replyTree}
+                      renderItemHeader={(event) => (
+                        <CampaignPinHeader
+                          isCampaignAuthor={event.pubkey === campaign.pubkey}
+                          canManagePins={canManagePins}
+                          isPinned={isPinned(event.id)}
+                          pinPending={togglePin.isPending}
+                          onTogglePin={() => handleTogglePin(event)}
+                        />
+                      )}
+                    />
                   </div>
                 ) : (
                   <button
@@ -489,12 +497,6 @@ function CampaignDetailContent({ campaign }: { campaign: ParsedCampaign }) {
         open={moreMenuOpen}
         onOpenChange={setMoreMenuOpen}
       />
-      <InteractionsModal
-        eventId={campaign.event.id}
-        open={interactionsOpen}
-        onOpenChange={setInteractionsOpen}
-        initialTab={interactionsTab}
-      />
 
       <AlertDialog open={archiveConfirmOpen} onOpenChange={setArchiveConfirmOpen}>
         <AlertDialogContent>
@@ -521,6 +523,48 @@ function CampaignDetailContent({ campaign }: { campaign: ParsedCampaign }) {
         </AlertDialogContent>
       </AlertDialog>
     </main>
+  );
+
+  function handleTogglePin(event: NostrEvent) {
+    const wasPinned = isPinned(event.id);
+    togglePin.mutate(event.id, {
+      onSuccess: () => {
+        toast({ title: wasPinned ? 'Unpinned from campaign' : 'Pinned to campaign' });
+      },
+      onError: () => {
+        toast({ title: 'Failed to update campaign pins', variant: 'destructive' });
+      },
+    });
+  }
+}
+
+function CampaignPinHeader({
+  isCampaignAuthor,
+  canManagePins,
+  isPinned,
+  pinPending,
+  onTogglePin,
+}: {
+  isCampaignAuthor: boolean;
+  canManagePins: boolean;
+  isPinned: boolean;
+  pinPending: boolean;
+  onTogglePin: () => void;
+}) {
+  return (
+    <PinnedCommentHeader
+      isPinned={isPinned}
+      canManagePins={canManagePins}
+      pinPending={pinPending}
+      onTogglePin={onTogglePin}
+    >
+      {isCampaignAuthor && (
+        <span className="inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-2 py-0.5 font-medium text-primary">
+          <ShieldCheck className="size-3" />
+          Campaigner
+        </span>
+      )}
+    </PinnedCommentHeader>
   );
 }
 
@@ -561,7 +605,7 @@ function CampaignHero({
 }: CampaignHeroProps) {
   return (
     <div className="max-w-6xl mx-auto px-4 sm:px-6 pt-4">
-      <div className="relative aspect-[16/9] sm:aspect-[21/9] rounded-xl overflow-hidden bg-gradient-to-br from-primary/40 via-primary/20 to-secondary">
+      <div className="relative aspect-[16/9] sm:aspect-[21/9] rounded-t-xl rounded-b-none overflow-hidden bg-gradient-to-br from-primary/40 via-primary/20 to-secondary">
         {cover ? (
           <img src={cover} alt="" className="absolute inset-0 size-full object-cover" />
         ) : (

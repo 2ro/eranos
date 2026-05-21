@@ -1,4 +1,5 @@
 import type { NostrEvent } from '@nostrify/nostrify';
+import type { ReactNode } from 'react';
 import { useState } from 'react';
 import { NoteCard } from '@/components/NoteCard';
 import { cn } from '@/lib/utils';
@@ -14,17 +15,17 @@ export interface ReplyNode {
 }
 
 /** Renders a fully threaded reply tree with collapsible deep branches. */
-export function ThreadedReplyList({ roots }: { roots: ReplyNode[] }) {
+export function ThreadedReplyList({ roots, renderItemHeader }: { roots: ReplyNode[]; renderItemHeader?: (event: NostrEvent) => ReactNode }) {
   return (
     <div>
       {roots.map((node) => (
-        <ReplyThread key={node.event.id} node={node} depth={0} />
+        <ReplyThread key={node.event.id} node={node} depth={0} renderItemHeader={renderItemHeader} />
       ))}
     </div>
   );
 }
 
-function ReplyThread({ node, depth, depthless }: { node: ReplyNode; depth: number; depthless?: boolean }) {
+function ReplyThread({ node, depth, depthless, renderItemHeader }: { node: ReplyNode; depth: number; depthless?: boolean; renderItemHeader?: (event: NostrEvent) => ReactNode }) {
   const [expanded, setExpanded] = useState(false);
   const [showHidden, setShowHidden] = useState(false);
   const hasChildren = node.children.length > 0;
@@ -34,6 +35,7 @@ function ReplyThread({ node, depth, depthless }: { node: ReplyNode; depth: numbe
   if (shouldCollapse) {
     return (
       <div>
+        {renderItemHeader?.(node.event)}
         <NoteCard event={node.event} threaded />
         <ExpandThreadButton count={countDescendants(node)} onClick={() => setExpanded(true)} isLast />
       </div>
@@ -41,7 +43,12 @@ function ReplyThread({ node, depth, depthless }: { node: ReplyNode; depth: numbe
   }
 
   if (!hasChildren) {
-    return <NoteCard event={node.event} />;
+    return (
+      <div>
+        {renderItemHeader?.(node.event)}
+        <NoteCard event={node.event} />
+      </div>
+    );
   }
 
   // Once expanded past the depth cap, skip further caps for this subtree
@@ -49,6 +56,7 @@ function ReplyThread({ node, depth, depthless }: { node: ReplyNode; depth: numbe
 
   return (
     <div>
+      {renderItemHeader?.(node.event)}
       <NoteCard event={node.event} threaded />
       {/* Show hidden sibling count between parent and first child */}
       {hiddenCount > 0 && !showHidden && (
@@ -56,10 +64,13 @@ function ReplyThread({ node, depth, depthless }: { node: ReplyNode; depth: numbe
       )}
       {/* Revealed hidden siblings render as threaded items before the inline child */}
       {showHidden && node.hiddenChildren!.map((child) => (
-        <NoteCard key={child.event.id} event={child.event} threaded threadedLineClassName="bg-primary/30" />
+        <div key={child.event.id}>
+          {renderItemHeader?.(child.event)}
+          <NoteCard event={child.event} threaded threadedLineClassName="bg-primary/30" />
+        </div>
       ))}
       {node.children.map((child) => (
-        <ReplyThread key={child.event.id} node={child} depth={depth + 1} depthless={childDepthless} />
+        <ReplyThread key={child.event.id} node={child} depth={depth + 1} depthless={childDepthless} renderItemHeader={renderItemHeader} />
       ))}
     </div>
   );

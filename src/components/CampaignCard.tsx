@@ -1,4 +1,5 @@
 import { useMemo } from 'react';
+import type { ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import { CalendarClock, HandHeart, MapPin, Target, Users, Archive } from 'lucide-react';
 
@@ -68,13 +69,15 @@ interface CampaignCardProps {
   /** Visual variant: `compact` for grid items, `featured` for hero placement. */
   variant?: 'compact' | 'featured';
   className?: string;
+  /** Optional footer affordance rendered opposite the author line. */
+  footerBadge?: ReactNode;
 }
 
 /**
  * Renders a single campaign as a clickable card. The whole card is a
  * `<Link>` to the campaign's naddr-based detail route.
  */
-export function CampaignCard({ campaign, variant = 'compact', className }: CampaignCardProps) {
+export function CampaignCard({ campaign, variant = 'compact', className, footerBadge }: CampaignCardProps) {
   const author = useAuthor(campaign.pubkey);
   const { data: stats } = useCampaignDonations(campaign.aTag);
   const { data: btcPrice } = useBtcPrice();
@@ -224,8 +227,11 @@ export function CampaignCard({ campaign, variant = 'compact', className }: Campa
             )}
           </div>
 
-          <div className="text-xs text-muted-foreground border-t border-border/60 pt-3 truncate">
-            by <span className="font-medium text-foreground">{creatorName}</span>
+          <div className="flex items-center justify-between gap-3 border-t border-border/60 pt-3 text-xs text-muted-foreground">
+            <div className="truncate">
+              by <span className="font-medium text-foreground">{creatorName}</span>
+            </div>
+            {footerBadge && <div className="shrink-0">{footerBadge}</div>}
           </div>
         </div>
       </Card>

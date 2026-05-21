@@ -25,6 +25,8 @@ import type { NostrEvent, NostrMetadata } from '@nostrify/nostrify';
 import { CampaignCard } from '@/components/CampaignCard';
 import { PeopleAvatarStack } from '@/components/PeopleAvatarStack';
 import { PostActionBar } from '@/components/PostActionBar';
+import { DetailCommentComposer } from '@/components/DetailCommentComposer';
+import { PinnedCommentHeader } from '@/components/PinnedCommentHeader';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -35,7 +37,6 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { DonateDialog } from '@/components/DonateDialog';
 import { NoteContent } from '@/components/NoteContent';
 import { FollowToggleButton } from '@/components/FollowButton';
-import { InteractionsModal, type InteractionTab } from '@/components/InteractionsModal';
 import { NoteMoreMenu } from '@/components/NoteMoreMenu';
 import { ReplyComposeModal } from '@/components/ReplyComposeModal';
 import { ThreadedReplyList, type ReplyNode } from '@/components/ThreadedReplyList';
@@ -49,6 +50,7 @@ import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useEventStats } from '@/hooks/useTrending';
 import { useNow } from '@/hooks/useNow';
 import { useOrganizationActivity } from '@/hooks/useOrganizationActivity';
+import { usePinnedEventComments } from '@/hooks/usePinnedEventComments';
 import { useProfileUrl } from '@/hooks/useProfileUrl';
 import { useToast } from '@/hooks/useToast';
 import { useEventRSVPs } from '@/hooks/useEventRSVPs';
@@ -217,7 +219,7 @@ function parseShelfLocation(raw: string): string {
 
 function ActivityTypePill({ icon, label }: { icon: React.ReactNode; label: string }) {
   return (
-    <div className="inline-flex items-center gap-1.5 rounded-full border border-border/70 bg-background/95 px-2.5 py-1 text-xs font-semibold text-muted-foreground shadow-sm">
+    <div className="inline-flex items-center gap-1.5 rounded-full border border-border/70 bg-background/95 px-2.5 py-1 text-xs font-semibold text-muted-foreground">
       {icon}
       {label}
     </div>
@@ -243,11 +245,8 @@ function PledgeShelfCard({ pledge }: { pledge: Action }) {
   return (
     <Link
       to={`/${naddr}`}
-      className="group block w-[280px] shrink-0 rounded-xl overflow-hidden focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background motion-safe:transition-transform motion-safe:duration-200 motion-safe:hover:-translate-y-0.5"
+      className="group block h-[430px] w-[280px] shrink-0 rounded-xl overflow-hidden focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background motion-safe:transition-transform motion-safe:duration-200 motion-safe:hover:-translate-y-0.5"
     >
-      <div className="mb-2">
-        <ActivityTypePill icon={<Megaphone className="size-3.5 text-primary" />} label="Pledge" />
-      </div>
       <Card className="overflow-hidden border-border/70 shadow-sm motion-safe:transition-shadow motion-safe:duration-200 group-hover:shadow-lg h-full flex flex-col">
         <div className="relative w-full aspect-[16/9] bg-gradient-to-br from-primary/15 via-primary/5 to-secondary">
           <img
@@ -302,8 +301,11 @@ function PledgeShelfCard({ pledge }: { pledge: Action }) {
             )}
           </div>
 
-          <div className="text-xs text-muted-foreground border-t border-border/60 pt-3 truncate">
-            by <span className="font-medium text-foreground">{displayName}</span>
+          <div className="flex items-center justify-between gap-3 border-t border-border/60 pt-3 text-xs text-muted-foreground">
+            <div className="truncate">
+              by <span className="font-medium text-foreground">{displayName}</span>
+            </div>
+            <ActivityTypePill icon={<Megaphone className="size-3.5 text-primary" />} label="Pledge" />
           </div>
         </div>
       </Card>
@@ -336,11 +338,8 @@ function CalendarEventShelfCard({ event }: { event: NostrEvent }) {
   return (
     <Link
       to={`/${naddr}`}
-      className="group block w-[280px] shrink-0 rounded-xl overflow-hidden focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background motion-safe:transition-transform motion-safe:duration-200 motion-safe:hover:-translate-y-0.5"
+      className="group block h-[430px] w-[280px] shrink-0 rounded-xl overflow-hidden focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background motion-safe:transition-transform motion-safe:duration-200 motion-safe:hover:-translate-y-0.5"
     >
-      <div className="mb-2">
-        <ActivityTypePill icon={<CalendarDays className="size-3.5 text-primary" />} label="Event" />
-      </div>
       <Card className="overflow-hidden border-border/70 shadow-sm motion-safe:transition-shadow motion-safe:duration-200 group-hover:shadow-lg h-full flex flex-col">
         <div className="relative w-full aspect-[16/9] overflow-hidden bg-gradient-to-br from-primary/15 via-primary/5 to-secondary">
           {coverImage ? (
@@ -405,8 +404,11 @@ function CalendarEventShelfCard({ event }: { event: NostrEvent }) {
             ) : null}
           </div>
 
-          <div className="text-xs text-muted-foreground border-t border-border/60 pt-3 truncate">
-            by <span className="font-medium text-foreground">{displayName}</span>
+          <div className="flex items-center justify-between gap-3 border-t border-border/60 pt-3 text-xs text-muted-foreground">
+            <div className="truncate">
+              by <span className="font-medium text-foreground">{displayName}</span>
+            </div>
+            <ActivityTypePill icon={<CalendarDays className="size-3.5 text-primary" />} label="Event" />
           </div>
         </div>
       </Card>
@@ -438,7 +440,7 @@ function OfficialShelf({ title, count, isLoading, isEmpty, children }: OfficialS
           )}
         </h2>
       </div>
-      <div className="-mx-4 sm:-mx-6 px-4 sm:px-6 flex gap-3 overflow-x-auto scrollbar-none pb-1">
+      <div className="-mx-4 sm:-mx-6 px-4 sm:px-6 flex items-stretch gap-3 overflow-x-auto scrollbar-none pb-1">
         {children}
       </div>
     </section>
@@ -529,11 +531,12 @@ function OfficialActivityShelves({
         {mixedActivity.map((item) => {
           if (item.type === 'campaign') {
             return (
-              <div key={`campaign:${item.id}`} className="w-[280px] shrink-0">
-                <div className="mb-2">
-                  <ActivityTypePill icon={<HandHeart className="size-3.5 text-primary" />} label="Campaign" />
-                </div>
-                <CampaignCard campaign={item.campaign} />
+              <div key={`campaign:${item.id}`} className="h-[430px] w-[280px] shrink-0">
+                <CampaignCard
+                  campaign={item.campaign}
+                  className="h-full"
+                  footerBadge={<ActivityTypePill icon={<HandHeart className="size-3.5 text-primary" />} label="Campaign" />}
+                />
               </div>
             );
           }
@@ -618,8 +621,6 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
   const [donateOpen, setDonateOpen] = useState(false);
   const [replyOpen, setReplyOpen] = useState(false);
   const [moreMenuOpen, setMoreMenuOpen] = useState(false);
-  const [interactionsOpen, setInteractionsOpen] = useState(false);
-  const [interactionsTab, setInteractionsTab] = useState<InteractionTab>('reposts');
 
   // Parse community definition
   const community = useMemo(() => parseCommunityEvent(event), [event]);
@@ -742,6 +743,12 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
 
   // ── Comments (NIP-22 on the community event) ───────────────────────────────
   const { data: commentsData, isLoading: commentsLoading } = useComments(event, 500);
+  const {
+    pinnedEvents,
+    isPinned,
+    canManagePins,
+    togglePin,
+  } = usePinnedEventComments(communityATag || undefined, event.pubkey);
 
   // ── Official activity shelves ─────────────────────────────────────────────
   // Author-filtered to founder + moderators (see useOrganizationActivity).
@@ -765,21 +772,8 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
   }, [community, event.kind, event.pubkey]);
 
   // ── Engagement stats for the community event itself ──────────────────────
-  // Pulled from NIP-85. Used both for the inline counters above the action
-  // bar and for the threaded-comments header. Matches the rhythm of the
-  // campaign and pledge detail pages.
+  // Pulled from NIP-85 for the threaded-comments header.
   const { data: engagementStats, isLoading: statsLoading } = useEventStats(event.id, event);
-  const hasStats =
-    !!engagementStats?.replies ||
-    !!engagementStats?.reposts ||
-    !!engagementStats?.quotes ||
-    !!engagementStats?.reactions;
-
-  const openInteractions = useCallback((tab: InteractionTab) => {
-    setInteractionsTab(tab);
-    setInteractionsOpen(true);
-  }, []);
-
   const replyTree = useMemo((): ReplyNode[] => {
     if (!commentsData) return [];
     const topLevel = commentsData.topLevelComments ?? [];
@@ -810,6 +804,11 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
       .sort((a, b) => b.created_at - a.created_at)
       .map((r) => buildNode(r));
   }, [commentsData, moderation]);
+
+  const pinnedNodes = useMemo(
+    () => pinnedEvents.map((event): ReplyNode => ({ event, children: [] })),
+    [pinnedEvents],
+  );
 
   // ── Share handler ───────────────────────────────────────────────────────────
   const handleShare = useCallback(async () => {
@@ -848,7 +847,7 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
       <div className="max-w-6xl mx-auto px-4 sm:px-6 pt-4">
         <CommunityModerationContext.Provider value={moderationCtx}>
           {/* ── Hero ─────────────────────────────────────────────────────── */}
-          <div className="relative aspect-[16/9] sm:aspect-[21/9] rounded-xl overflow-hidden bg-gradient-to-br from-primary/40 via-primary/20 to-secondary">
+          <div className="relative aspect-[16/9] sm:aspect-[21/9] rounded-t-xl rounded-b-none overflow-hidden bg-gradient-to-br from-primary/40 via-primary/20 to-secondary">
             {cover ? (
               <img src={cover} alt="" className="absolute inset-0 size-full object-cover" />
             ) : (
@@ -977,6 +976,34 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
             </div>
           </div>
 
+          <div className="rounded-b-xl rounded-t-none bg-card border border-t-0 border-border/60 shadow-sm px-4 sm:px-5 py-3">
+            <PostActionBar
+              event={event}
+              replyLabel="Comment"
+              hideZap
+              onReply={() => setReplyOpen(true)}
+              onMore={() => setMoreMenuOpen(true)}
+            />
+          </div>
+
+          {pinnedNodes.length > 0 && (
+            <div className="pt-6">
+              <div className="rounded-2xl bg-card border border-border/60 overflow-hidden">
+                <ThreadedReplyList
+                  roots={pinnedNodes}
+                  renderItemHeader={(event) => (
+                    <OrganizationPinHeader
+                      isPinned={isPinned(event.id)}
+                      canManagePins={canManagePins}
+                      pinPending={togglePin.isPending}
+                      onTogglePin={() => handleTogglePin(event)}
+                    />
+                  )}
+                />
+              </div>
+            </div>
+          )}
+
           {/* ── Body — single column, pledge-detail-style ─────────────────── */}
           <div className="py-6 lg:py-10 space-y-8">
             {/* Donate (when there's a member set) and Share buttons. Sits
@@ -1022,48 +1049,9 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
               now={now}
             />
 
-            {/* Engagement card — stats counters + post action bar. Matches
-                the pledge / campaign detail layout. No funding progress bar
-                here; an organization isn't a fundraising target itself. */}
+            {/* Comments — NIP-22 thread on the community event itself. */}
             <div id="org-activity" className="scroll-mt-20">
-              <div className="rounded-2xl bg-card border border-border/60 shadow-sm px-4 sm:px-5 py-4 sm:py-5">
-                {hasStats && (
-                  <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs sm:text-sm text-muted-foreground pb-2">
-                    {engagementStats?.reposts ? (
-                      <button onClick={() => openInteractions('reposts')} className="hover:underline transition-colors">
-                        <span className="font-bold text-foreground">{formatNumber(engagementStats.reposts)}</span>{' '}
-                        Repost{engagementStats.reposts !== 1 ? 's' : ''}
-                      </button>
-                    ) : null}
-                    {engagementStats?.quotes ? (
-                      <button onClick={() => openInteractions('quotes')} className="hover:underline transition-colors">
-                        <span className="font-bold text-foreground">{formatNumber(engagementStats.quotes)}</span>{' '}
-                        Quote{engagementStats.quotes !== 1 ? 's' : ''}
-                      </button>
-                    ) : null}
-                    {engagementStats?.reactions ? (
-                      <button onClick={() => openInteractions('reactions')} className="hover:underline transition-colors">
-                        <span className="font-bold text-foreground">{formatNumber(engagementStats.reactions)}</span>{' '}
-                        Like{engagementStats.reactions !== 1 ? 's' : ''}
-                      </button>
-                    ) : null}
-                  </div>
-                )}
-
-                <PostActionBar
-                  event={event}
-                  replyLabel="Comment"
-                  hideZap
-                  onReply={() => setReplyOpen(true)}
-                  onMore={() => setMoreMenuOpen(true)}
-                  className={hasStats ? 'pt-3 border-t border-border/60' : undefined}
-                />
-              </div>
-
-              {/* Comments — NIP-22 thread on the community event itself.
-                  Member-filter aware (see replyTree) and routed through
-                  CommunityModerationContext so per-reply ban actions work. */}
-              <div className="mt-6">
+              <div>
                 <div className="flex items-baseline justify-between gap-3 mb-3 px-1">
                   <h2 className="text-lg font-semibold tracking-tight">Comments</h2>
                   {engagementStats?.replies ? (
@@ -1074,6 +1062,8 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
                   ) : null}
                 </div>
 
+                <DetailCommentComposer event={event} className="mb-3" />
+
                 {commentsLoading && statsLoading && replyTree.length === 0 ? (
                   <div className="space-y-3">
                     {Array.from({ length: 3 }).map((_, i) => (
@@ -1081,8 +1071,18 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
                     ))}
                   </div>
                 ) : replyTree.length > 0 ? (
-                  <div className="-mx-2 sm:-mx-4 rounded-2xl bg-card border border-border/60 overflow-hidden">
-                    <ThreadedReplyList roots={replyTree} />
+                  <div className="rounded-2xl bg-card border border-border/60 overflow-hidden">
+                    <ThreadedReplyList
+                      roots={replyTree}
+                      renderItemHeader={(event) => (
+                        <OrganizationPinHeader
+                          isPinned={isPinned(event.id)}
+                          canManagePins={canManagePins}
+                          pinPending={togglePin.isPending}
+                          onTogglePin={() => handleTogglePin(event)}
+                        />
+                      )}
+                    />
                   </div>
                 ) : (
                   <button
@@ -1195,16 +1195,40 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
         onOpenChange={setMoreMenuOpen}
       />
 
-      {/* Tapping a repost / quote / like counter on the stats row opens
-          a modal listing the people who took that action. */}
-      <InteractionsModal
-        eventId={event.id}
-        open={interactionsOpen}
-        onOpenChange={setInteractionsOpen}
-        initialTab={interactionsTab}
-      />
-
       </div>
     </main>
+  );
+
+  function handleTogglePin(event: NostrEvent) {
+    const wasPinned = isPinned(event.id);
+    togglePin.mutate(event.id, {
+      onSuccess: () => {
+        toast({ title: wasPinned ? 'Unpinned from organization' : 'Pinned to organization' });
+      },
+      onError: () => {
+        toast({ title: 'Failed to update organization pins', variant: 'destructive' });
+      },
+    });
+  }
+}
+
+function OrganizationPinHeader({
+  isPinned,
+  canManagePins,
+  pinPending,
+  onTogglePin,
+}: {
+  isPinned: boolean;
+  canManagePins: boolean;
+  pinPending: boolean;
+  onTogglePin: () => void;
+}) {
+  return (
+    <PinnedCommentHeader
+      isPinned={isPinned}
+      canManagePins={canManagePins}
+      pinPending={pinPending}
+      onTogglePin={onTogglePin}
+    />
   );
 }
