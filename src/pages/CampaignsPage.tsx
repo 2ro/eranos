@@ -271,7 +271,7 @@ export function CampaignsPage() {
         <div className="absolute inset-0 pointer-events-none">
           <div className="relative max-w-7xl mx-auto h-full px-4 sm:px-6">
             <div className="absolute inset-y-0 right-4 sm:right-6 flex items-center">
-              <div className="pointer-events-auto translate-x-[40%] sm:translate-x-[38%] lg:translate-x-[38%] opacity-90">
+              <div className="pointer-events-auto hero-globe-mask translate-x-[40%] sm:translate-x-[38%] lg:translate-x-[38%] opacity-90">
                 <HeroGlobe
                   markers={globeMarkers}
                   selectedKey={highlightedMarkerKey}
@@ -305,12 +305,12 @@ export function CampaignsPage() {
         {/* Foreground content — headline + CTAs at the top, spotlight info
             at the bottom. Shares the `max-w-7xl mx-auto` container with the
             globe so everything aligns to the same left/right axis. */}
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 py-14 lg:py-20 min-h-[560px] sm:min-h-[600px] lg:min-h-[640px] flex flex-col">
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 py-14 lg:py-20 min-h-[560px] sm:min-h-[600px] lg:min-h-[640px] flex flex-col text-white">
           <div className="relative space-y-5 max-w-2xl">
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight leading-[1.1] drop-shadow-sm">
+            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight leading-[1.1] hero-text-shadow">
               Connecting activists to unstoppable funding.
             </h1>
-            <p className="text-base sm:text-lg text-foreground/80 max-w-2xl">
+            <p className="text-base sm:text-lg text-white/85 max-w-2xl hero-text-shadow-soft">
               Raise Bitcoin directly from supporters around the world. Every donation settles
               straight to your campaign's beneficiaries, with no middlemen, no chargebacks, and no
               platform holding your funds.
@@ -351,7 +351,7 @@ export function CampaignsPage() {
                   variant="outline"
                   size="lg"
                   asChild
-                  className="rounded-full bg-background/60 backdrop-blur h-12 px-6 text-base"
+                  className="rounded-full bg-background/70 backdrop-blur h-12 px-6 text-base text-foreground"
                 >
                   <a href="#campaigns">Explore campaigns</a>
                 </Button>

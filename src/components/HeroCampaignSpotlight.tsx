@@ -63,10 +63,9 @@ export function HeroCampaignSpotlight({
   return (
     <div
       className={cn(
-        // Compact text block over the photo. Light text + subtle drop
-        // shadow for legibility, no card chrome — modeled after the
-        // Treasures hero overlay: tight, dense, low-key.
-        'space-y-1.5 text-foreground [text-shadow:0_1px_2px_rgb(0_0_0/0.4)]',
+        // Compact text block over the photo — always white regardless of
+        // theme since the hero is always a dark-scrimed photo.
+        'space-y-1.5 text-white hero-text-shadow-soft',
         className,
       )}
     >
@@ -75,7 +74,7 @@ export function HeroCampaignSpotlight({
       </p>
 
       {campaign.summary && (
-        <p className="text-xs text-foreground/80 line-clamp-2 max-w-xs">
+        <p className="text-xs text-white/80 line-clamp-2 max-w-xs">
           {campaign.summary}
         </p>
       )}
@@ -101,12 +100,12 @@ export function HeroCampaignSpotlight({
               </div>
             )}
             <div className="flex items-baseline justify-between gap-2 text-[11px] [text-shadow:none]">
-              <span className="font-semibold text-foreground">
+              <span className="font-semibold text-white">
                 {formatCampaignAmount(raised, btcPrice)}
-                {!hasGoal && <span className="ml-1 font-normal text-foreground/70">raised</span>}
+                {!hasGoal && <span className="ml-1 font-normal text-white/70">raised</span>}
               </span>
               {hasGoal && (
-                <span className="text-foreground/70">
+                <span className="text-white/70">
                   of {formatCampaignAmount(goal!, btcPrice)} goal
                 </span>
               )}
@@ -115,7 +114,7 @@ export function HeroCampaignSpotlight({
         );
       })()}
 
-      <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] text-foreground/75 pt-0.5">
+      <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] text-white/75 pt-0.5">
         <span className="inline-flex items-center gap-1.5">
           <Avatar className="size-4 ring-1 ring-white/40">
             {authorPicture && <AvatarImage src={authorPicture} alt="" />}

@@ -86,10 +86,16 @@ export function CampaignHeroBackground({ imageUrl, className }: CampaignHeroBack
         );
       })}
 
-      {/* Warm tint + dark gradient — keeps foreground text legible without
-          completely washing the photo out. */}
-      <div className="absolute inset-0 bg-gradient-to-t from-background/85 via-background/55 to-background/40" />
-      <div className="absolute inset-0 bg-gradient-to-br from-primary/25 via-transparent to-secondary/30" />
+      {/* Dark vertical scrim — strong at the bottom (spotlight card) and
+          lighter at the top so the photo still reads. Uses black instead of
+          background so the overlay is consistent across light/dark themes. */}
+      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/45 to-black/15" />
+      {/* Warm primary tint — gives the hero its brand feel. */}
+      <div className="absolute inset-0 bg-gradient-to-br from-primary/20 via-transparent to-primary/10" />
+
+      {/* Left wash — mobile only, where the globe arc crosses the headline.
+          Dark so white headline text has a reliable backdrop. */}
+      <div className="absolute inset-0 bg-gradient-to-r from-black/75 via-black/35 to-transparent sm:hidden" />
 
       {/* Film grain — same trick as Treasures' HeroGallery. Helps the
           composited globe + photo feel like one image. */}
