@@ -12,7 +12,6 @@ import {
   HandHeart,
   MapPin,
   Pencil,
-  Pin,
   Share2,
   ShieldCheck,
   Users,
@@ -41,6 +40,7 @@ import {
 import { DonateDialog } from '@/components/DonateDialog';
 import { DetailCommentComposer } from '@/components/DetailCommentComposer';
 import { PostActionBar } from '@/components/PostActionBar';
+import { PinnedCommentHeader } from '@/components/PinnedCommentHeader';
 import { ReplyComposeModal } from '@/components/ReplyComposeModal';
 import { NoteMoreMenu } from '@/components/NoteMoreMenu';
 import { Progress } from '@/components/ui/progress';
@@ -50,10 +50,10 @@ import { useAuthor } from '@/hooks/useAuthor';
 import { useBitcoinWallet } from '@/hooks/useBitcoinWallet';
 import { useCampaign } from '@/hooks/useCampaign';
 import { useCampaignDonations } from '@/hooks/useCampaignDonations';
-import { useCampaignPinnedEvents } from '@/hooks/useCampaignPinnedEvents';
 import { useComments } from '@/hooks/useComments';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useEventStats } from '@/hooks/useTrending';
+import { usePinnedEventComments } from '@/hooks/usePinnedEventComments';
 import { useProfileUrl } from '@/hooks/useProfileUrl';
 import { useToast } from '@/hooks/useToast';
 import { useLayoutOptions } from '@/contexts/LayoutContext';
@@ -154,7 +154,7 @@ function CampaignDetailContent({ campaign }: { campaign: ParsedCampaign }) {
     isPinned,
     canManagePins,
     togglePin,
-  } = useCampaignPinnedEvents(campaign.aTag, campaign.pubkey);
+  } = usePinnedEventComments(campaign.aTag, campaign.pubkey);
 
   // Aggregate kind 8333 donation receipts by `(txid, donor)` so each
   // donation surfaces as a single event in the donor list and the inline
@@ -368,8 +368,7 @@ function CampaignDetailContent({ campaign }: { campaign: ParsedCampaign }) {
             <ThreadedReplyList
               roots={pinnedNodes}
               renderItemHeader={(event) => (
-                <CampaignActivityItemHeader
-                  event={event}
+                <CampaignPinHeader
                   isCampaignAuthor={event.pubkey === campaign.pubkey}
                   canManagePins={canManagePins}
                   isPinned={isPinned(event.id)}
@@ -432,8 +431,7 @@ function CampaignDetailContent({ campaign }: { campaign: ParsedCampaign }) {
                     <ThreadedReplyList
                       roots={replyTree}
                       renderItemHeader={(event) => (
-                        <CampaignActivityItemHeader
-                          event={event}
+                        <CampaignPinHeader
                           isCampaignAuthor={event.pubkey === campaign.pubkey}
                           canManagePins={canManagePins}
                           isPinned={isPinned(event.id)}
@@ -540,58 +538,33 @@ function CampaignDetailContent({ campaign }: { campaign: ParsedCampaign }) {
   }
 }
 
-function CampaignActivityItemHeader({
-  event,
+function CampaignPinHeader({
   isCampaignAuthor,
   canManagePins,
   isPinned,
   pinPending,
   onTogglePin,
 }: {
-  event: NostrEvent;
   isCampaignAuthor: boolean;
   canManagePins: boolean;
   isPinned: boolean;
   pinPending: boolean;
   onTogglePin: () => void;
 }) {
-  if (!isCampaignAuthor && !canManagePins && !isPinned) return null;
-
   return (
-    <div className="flex items-center justify-between gap-3 px-4 pt-3 pb-0 text-xs text-muted-foreground">
-      <div className="flex flex-wrap items-center gap-2">
-        {isPinned && (
-          <span className="inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-2 py-0.5 font-medium text-primary">
-            <Pin className="size-3 rotate-45 fill-current" />
-            Pinned
-          </span>
-        )}
-        {isCampaignAuthor && (
-          <span className="inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-2 py-0.5 font-medium text-primary">
-            <ShieldCheck className="size-3" />
-            Campaigner
-          </span>
-        )}
-      </div>
-      {canManagePins && (
-        <button
-          type="button"
-          onClick={(e) => {
-            e.stopPropagation();
-            onTogglePin();
-          }}
-          disabled={pinPending}
-          className={cn(
-            'inline-flex items-center gap-1.5 rounded-full px-2 py-0.5 font-medium transition-colors hover:bg-primary/10 hover:text-primary disabled:cursor-not-allowed disabled:opacity-60',
-            isPinned && 'text-primary',
-          )}
-          aria-label={`${isPinned ? 'Unpin' : 'Pin'} campaign activity from ${event.id}`}
-        >
-          <Pin className={cn('size-3 rotate-45', isPinned && 'fill-current')} />
-          {isPinned ? 'Unpin' : 'Pin'}
-        </button>
+    <PinnedCommentHeader
+      isPinned={isPinned}
+      canManagePins={canManagePins}
+      pinPending={pinPending}
+      onTogglePin={onTogglePin}
+    >
+      {isCampaignAuthor && (
+        <span className="inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-2 py-0.5 font-medium text-primary">
+          <ShieldCheck className="size-3" />
+          Campaigner
+        </span>
       )}
-    </div>
+    </PinnedCommentHeader>
   );
 }
 

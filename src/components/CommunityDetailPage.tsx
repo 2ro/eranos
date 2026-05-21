@@ -26,6 +26,7 @@ import { CampaignCard } from '@/components/CampaignCard';
 import { PeopleAvatarStack } from '@/components/PeopleAvatarStack';
 import { PostActionBar } from '@/components/PostActionBar';
 import { DetailCommentComposer } from '@/components/DetailCommentComposer';
+import { PinnedCommentHeader } from '@/components/PinnedCommentHeader';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -49,6 +50,7 @@ import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useEventStats } from '@/hooks/useTrending';
 import { useNow } from '@/hooks/useNow';
 import { useOrganizationActivity } from '@/hooks/useOrganizationActivity';
+import { usePinnedEventComments } from '@/hooks/usePinnedEventComments';
 import { useProfileUrl } from '@/hooks/useProfileUrl';
 import { useToast } from '@/hooks/useToast';
 import { useEventRSVPs } from '@/hooks/useEventRSVPs';
@@ -741,6 +743,12 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
 
   // ── Comments (NIP-22 on the community event) ───────────────────────────────
   const { data: commentsData, isLoading: commentsLoading } = useComments(event, 500);
+  const {
+    pinnedEvents,
+    isPinned,
+    canManagePins,
+    togglePin,
+  } = usePinnedEventComments(communityATag || undefined, event.pubkey);
 
   // ── Official activity shelves ─────────────────────────────────────────────
   // Author-filtered to founder + moderators (see useOrganizationActivity).
@@ -796,6 +804,11 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
       .sort((a, b) => b.created_at - a.created_at)
       .map((r) => buildNode(r));
   }, [commentsData, moderation]);
+
+  const pinnedNodes = useMemo(
+    () => pinnedEvents.map((event): ReplyNode => ({ event, children: [] })),
+    [pinnedEvents],
+  );
 
   // ── Share handler ───────────────────────────────────────────────────────────
   const handleShare = useCallback(async () => {
@@ -973,6 +986,24 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
             />
           </div>
 
+          {pinnedNodes.length > 0 && (
+            <div className="pt-6">
+              <div className="rounded-2xl bg-card border border-border/60 overflow-hidden">
+                <ThreadedReplyList
+                  roots={pinnedNodes}
+                  renderItemHeader={(event) => (
+                    <OrganizationPinHeader
+                      isPinned={isPinned(event.id)}
+                      canManagePins={canManagePins}
+                      pinPending={togglePin.isPending}
+                      onTogglePin={() => handleTogglePin(event)}
+                    />
+                  )}
+                />
+              </div>
+            </div>
+          )}
+
           {/* ── Body — single column, pledge-detail-style ─────────────────── */}
           <div className="py-6 lg:py-10 space-y-8">
             {/* Donate (when there's a member set) and Share buttons. Sits
@@ -1041,7 +1072,17 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
                   </div>
                 ) : replyTree.length > 0 ? (
                   <div className="rounded-2xl bg-card border border-border/60 overflow-hidden">
-                    <ThreadedReplyList roots={replyTree} />
+                    <ThreadedReplyList
+                      roots={replyTree}
+                      renderItemHeader={(event) => (
+                        <OrganizationPinHeader
+                          isPinned={isPinned(event.id)}
+                          canManagePins={canManagePins}
+                          pinPending={togglePin.isPending}
+                          onTogglePin={() => handleTogglePin(event)}
+                        />
+                      )}
+                    />
                   </div>
                 ) : (
                   <button
@@ -1156,5 +1197,38 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
 
       </div>
     </main>
+  );
+
+  function handleTogglePin(event: NostrEvent) {
+    const wasPinned = isPinned(event.id);
+    togglePin.mutate(event.id, {
+      onSuccess: () => {
+        toast({ title: wasPinned ? 'Unpinned from organization' : 'Pinned to organization' });
+      },
+      onError: () => {
+        toast({ title: 'Failed to update organization pins', variant: 'destructive' });
+      },
+    });
+  }
+}
+
+function OrganizationPinHeader({
+  isPinned,
+  canManagePins,
+  pinPending,
+  onTogglePin,
+}: {
+  isPinned: boolean;
+  canManagePins: boolean;
+  pinPending: boolean;
+  onTogglePin: () => void;
+}) {
+  return (
+    <PinnedCommentHeader
+      isPinned={isPinned}
+      canManagePins={canManagePins}
+      pinPending={pinPending}
+      onTogglePin={onTogglePin}
+    />
   );
 }

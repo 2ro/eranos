@@ -34,9 +34,11 @@ import { Progress } from '@/components/ui/progress';
 import { Skeleton } from '@/components/ui/skeleton';
 import { DetailCommentComposer } from '@/components/DetailCommentComposer';
 import { PostActionBar } from '@/components/PostActionBar';
+import { PinnedCommentHeader } from '@/components/PinnedCommentHeader';
 import { ReplyComposeModal } from '@/components/ReplyComposeModal';
 import { NoteMoreMenu } from '@/components/NoteMoreMenu';
 import { ThreadedReplyList, type ReplyNode } from '@/components/ThreadedReplyList';
+import { usePinnedEventComments } from '@/hooks/usePinnedEventComments';
 import NotFound from '@/pages/NotFound';
 
 function formatDeadline(unixSeconds: number): { label: string; isPast: boolean } {
@@ -78,6 +80,13 @@ function PledgeDetailContent({ action }: { action: Action }) {
   const navigate = useNavigate();
   const { toast } = useToast();
   const { data: commentsData, isLoading: commentsLoading } = useComments(action.event, 500);
+  const rootATag = `36639:${action.pubkey}:${action.id}`;
+  const {
+    pinnedEvents,
+    isPinned,
+    canManagePins,
+    togglePin,
+  } = usePinnedEventComments(rootATag, action.pubkey);
 
   const [replyOpen, setReplyOpen] = useState(false);
   const [moreMenuOpen, setMoreMenuOpen] = useState(false);
@@ -122,6 +131,11 @@ function PledgeDetailContent({ action }: { action: Action }) {
       })
       .map((c) => buildNode(c));
   }, [commentsData, topLevel, zapTotals]);
+
+  const pinnedNodes = useMemo(
+    () => pinnedEvents.map((event): ReplyNode => ({ event, children: [] })),
+    [pinnedEvents],
+  );
 
   const metadata: NostrMetadata | undefined = author.data?.metadata;
   const creatorName = getDisplayName(metadata, action.pubkey);
@@ -181,6 +195,24 @@ function PledgeDetailContent({ action }: { action: Action }) {
         </div>
       </div>
 
+      {pinnedNodes.length > 0 && (
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 pt-6">
+          <div className="rounded-2xl bg-card border border-border/60 overflow-hidden">
+            <ThreadedReplyList
+              roots={pinnedNodes}
+              renderItemHeader={(event) => (
+                <PledgePinHeader
+                  isPinned={isPinned(event.id)}
+                  canManagePins={canManagePins}
+                  pinPending={togglePin.isPending}
+                  onTogglePin={() => handleTogglePin(event)}
+                />
+              )}
+            />
+          </div>
+        </div>
+      )}
+
       <div className="max-w-6xl mx-auto px-4 sm:px-6 py-6 lg:py-10">
         <div className="lg:flex lg:gap-8 lg:items-start">
           <div className="lg:hidden mb-6">
@@ -221,7 +253,17 @@ function PledgeDetailContent({ action }: { action: Action }) {
                   </div>
                 ) : replyTree.length > 0 ? (
                   <div className="rounded-2xl bg-card border border-border/60 overflow-hidden">
-                    <ThreadedReplyList roots={replyTree} />
+                    <ThreadedReplyList
+                      roots={replyTree}
+                      renderItemHeader={(event) => (
+                        <PledgePinHeader
+                          isPinned={isPinned(event.id)}
+                          canManagePins={canManagePins}
+                          pinPending={togglePin.isPending}
+                          onTogglePin={() => handleTogglePin(event)}
+                        />
+                      )}
+                    />
                   </div>
                 ) : (
                   <button
@@ -258,6 +300,39 @@ function PledgeDetailContent({ action }: { action: Action }) {
       <ReplyComposeModal event={action.event} open={replyOpen} onOpenChange={setReplyOpen} />
       <NoteMoreMenu event={action.event} open={moreMenuOpen} onOpenChange={setMoreMenuOpen} />
     </main>
+  );
+
+  function handleTogglePin(event: NostrEvent) {
+    const wasPinned = isPinned(event.id);
+    togglePin.mutate(event.id, {
+      onSuccess: () => {
+        toast({ title: wasPinned ? 'Unpinned from pledge' : 'Pinned to pledge' });
+      },
+      onError: () => {
+        toast({ title: 'Failed to update pledge pins', variant: 'destructive' });
+      },
+    });
+  }
+}
+
+function PledgePinHeader({
+  isPinned,
+  canManagePins,
+  pinPending,
+  onTogglePin,
+}: {
+  isPinned: boolean;
+  canManagePins: boolean;
+  pinPending: boolean;
+  onTogglePin: () => void;
+}) {
+  return (
+    <PinnedCommentHeader
+      isPinned={isPinned}
+      canManagePins={canManagePins}
+      pinPending={pinPending}
+      onTogglePin={onTogglePin}
+    />
   );
 }
 

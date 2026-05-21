@@ -23,6 +23,7 @@ import { DetailCommentComposer } from '@/components/DetailCommentComposer';
 import { NoteContent } from '@/components/NoteContent';
 import { NoteMoreMenu } from '@/components/NoteMoreMenu';
 import { PostActionBar } from '@/components/PostActionBar';
+import { PinnedCommentHeader } from '@/components/PinnedCommentHeader';
 import { ReplyComposeModal } from '@/components/ReplyComposeModal';
 import { CreateCommunityEventDialog } from '@/components/CreateCommunityEventDialog';
 import { RSVPAvatars } from '@/components/RSVPAvatars';
@@ -34,6 +35,7 @@ import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useEventRSVPs } from '@/hooks/useEventRSVPs';
 import { useMyRSVP } from '@/hooks/useMyRSVP';
 import { usePublishRSVP } from '@/hooks/usePublishRSVP';
+import { usePinnedEventComments } from '@/hooks/usePinnedEventComments';
 import { useProfileUrl } from '@/hooks/useProfileUrl';
 import { useToast } from '@/hooks/useToast';
 import { genUserName } from '@/lib/genUserName';
@@ -232,6 +234,12 @@ export function CalendarEventDetailPage({ event }: { event: NostrEvent }) {
   const myRsvp = useMyRSVP(eventCoord);
   const publishRSVP = usePublishRSVP();
   const { data: commentsData, isLoading: commentsLoading } = useComments(event, 500);
+  const {
+    pinnedEvents,
+    isPinned,
+    canManagePins,
+    togglePin,
+  } = usePinnedEventComments(eventCoord, event.pubkey);
   const [replyOpen, setReplyOpen] = useState(false);
   const [moreMenuOpen, setMoreMenuOpen] = useState(false);
   const [editOpen, setEditOpen] = useState(false);
@@ -256,6 +264,11 @@ export function CalendarEventDetailPage({ event }: { event: NostrEvent }) {
       .sort((a, b) => a.created_at - b.created_at)
       .map((comment) => buildNode(comment));
   }, [commentsData]);
+
+  const pinnedNodes = useMemo(
+    () => pinnedEvents.map((event): ReplyNode => ({ event, children: [] })),
+    [pinnedEvents],
+  );
 
   const handleRSVP = useCallback(async (status: 'accepted' | 'declined' | 'tentative') => {
     if (status === myRsvp.status) return;
@@ -356,6 +369,24 @@ export function CalendarEventDetailPage({ event }: { event: NostrEvent }) {
         </div>
       </div>
 
+      {pinnedNodes.length > 0 && (
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 pt-6">
+          <div className="rounded-2xl bg-card border border-border/60 overflow-hidden">
+            <ThreadedReplyList
+              roots={pinnedNodes}
+              renderItemHeader={(event) => (
+                <EventPinHeader
+                  isPinned={isPinned(event.id)}
+                  canManagePins={canManagePins}
+                  pinPending={togglePin.isPending}
+                  onTogglePin={() => handleTogglePin(event)}
+                />
+              )}
+            />
+          </div>
+        </div>
+      )}
+
       <div className="max-w-6xl mx-auto px-4 sm:px-6 py-6 lg:py-10">
         <div className="lg:flex lg:gap-8 lg:items-start">
           <div className="flex-1 min-w-0 space-y-8">
@@ -417,7 +448,17 @@ export function CalendarEventDetailPage({ event }: { event: NostrEvent }) {
                 </div>
               ) : replyTree.length > 0 ? (
                 <div className="rounded-2xl bg-card border border-border/60 overflow-hidden">
-                  <ThreadedReplyList roots={replyTree} />
+                  <ThreadedReplyList
+                    roots={replyTree}
+                    renderItemHeader={(event) => (
+                      <EventPinHeader
+                        isPinned={isPinned(event.id)}
+                        canManagePins={canManagePins}
+                        pinPending={togglePin.isPending}
+                        onTogglePin={() => handleTogglePin(event)}
+                      />
+                    )}
+                  />
                 </div>
               ) : (
                 <button
@@ -552,5 +593,38 @@ export function CalendarEventDetailPage({ event }: { event: NostrEvent }) {
         )}
       </div>
     </main>
+  );
+
+  function handleTogglePin(event: NostrEvent) {
+    const wasPinned = isPinned(event.id);
+    togglePin.mutate(event.id, {
+      onSuccess: () => {
+        toast({ title: wasPinned ? 'Unpinned from event' : 'Pinned to event' });
+      },
+      onError: () => {
+        toast({ title: 'Failed to update event pins', variant: 'destructive' });
+      },
+    });
+  }
+}
+
+function EventPinHeader({
+  isPinned,
+  canManagePins,
+  pinPending,
+  onTogglePin,
+}: {
+  isPinned: boolean;
+  canManagePins: boolean;
+  pinPending: boolean;
+  onTogglePin: () => void;
+}) {
+  return (
+    <PinnedCommentHeader
+      isPinned={isPinned}
+      canManagePins={canManagePins}
+      pinPending={pinPending}
+      onTogglePin={onTogglePin}
+    />
   );
 }
