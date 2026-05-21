@@ -38,13 +38,6 @@ export interface PersistedScan {
   change: PersistedChainScan;
 }
 
-/** Empty scan — used as the default until we hear from the network. */
-export const EMPTY_PERSISTED_SCAN: PersistedScan = {
-  version: SCHEMA_VERSION,
-  receive: { usedIndexes: [], firstUnusedIndex: 0 },
-  change: { usedIndexes: [], firstUnusedIndex: 0 },
-};
-
 /** Returns localStorage / Keychain key for the given user pubkey. */
 export function scanCacheKey(pubkey: string): string {
   return `hdwallet:scan:${pubkey}`;

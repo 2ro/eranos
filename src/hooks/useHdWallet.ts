@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef } from 'react';
+import { useCallback, useMemo, useRef } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 
 import { useAppContext } from '@/hooks/useAppContext';
@@ -12,12 +12,12 @@ import {
   scanAccount,
 } from '@/lib/hdwallet/scan';
 import {
-  EMPTY_PERSISTED_SCAN,
   fromPersistedScan,
   type PersistedScan,
   scanCacheKey,
   toPersistedScan,
 } from '@/lib/hdwallet/cache';
+import { secureStorage } from '@/lib/secureStorage';
 
 // ---------------------------------------------------------------------------
 // Persisted UI cursor (per user)
@@ -47,8 +47,7 @@ const DEFAULT_CURSOR: PersistedCursor = { receiveIndex: 0 };
  * (warm scan only re-fetches known-used addresses + a small gap tail) keeps
  * the per-refresh request count low even at 2-minute polling. Combined with
  * `fetchAddressSnapshot` collapsing 3 calls into 1 per used address, a
- * steady-state wallet with 5 used addresses now uses ~5 requests/refresh
- * instead of the previous ~50+.
+ * steady-state wallet with 5 used addresses uses ~5 requests/refresh.
  */
 const REFRESH_INTERVAL_MS = 120_000;
 
@@ -82,6 +81,37 @@ export interface UseHdWalletResult {
 }
 
 // ---------------------------------------------------------------------------
+// Cache hydration
+// ---------------------------------------------------------------------------
+
+/**
+ * Read the persisted scan skeleton for the given pubkey directly from the
+ * platform's storage layer (Keychain on native, localStorage on web). Used
+ * inside `queryFn` to avoid the previous useEffect/useRef hydration race —
+ * by the time the query fires, `pubkey` is guaranteed non-empty (we gate the
+ * query on that), so the read is deterministic and synchronous.
+ *
+ * Returns `undefined` when:
+ *   - the key is absent (first ever scan for this account),
+ *   - the stored value is corrupt JSON,
+ *   - or the stored schema version is from a previous incompatible build.
+ *
+ * Any of those falls back to a cold scan, which then writes a fresh
+ * skeleton back out.
+ */
+async function readPersistedPrev(pubkey: string): Promise<AccountScanResult | undefined> {
+  try {
+    const raw = await secureStorage.getItem(scanCacheKey(pubkey));
+    if (!raw) return undefined;
+    const parsed = JSON.parse(raw) as PersistedScan;
+    return fromPersistedScan(parsed);
+  } catch (err) {
+    console.warn('Failed to load HD wallet cache, falling back to cold scan:', err);
+    return undefined;
+  }
+}
+
+// ---------------------------------------------------------------------------
 // Hook
 // ---------------------------------------------------------------------------
 
@@ -92,17 +122,16 @@ export interface UseHdWalletResult {
  * Performance:
  *
  *   - The first scan ever is a cold gap-limit walk (full BIP44 scan).
- *   - Subsequent scans are **incremental**: we persist the used-address
- *     skeleton in secure storage and feed it back as `prev` to
- *     `scanAccount`. The scan then only re-fetches known-used addresses
- *     plus a small tail past `firstUnusedIndex` — typically << 10 requests
- *     for a steady-state wallet.
+ *   - Subsequent scans are **incremental**: the persisted skeleton
+ *     (`PersistedScan`) is read directly inside `queryFn`, fed to
+ *     `scanAccount` as `prev`, and the scan only re-fetches known-used
+ *     addresses plus a small tail past `firstUnusedIndex` — typically << 10
+ *     requests for a steady-state wallet.
  *   - Per-refresh request count is further halved by `fetchAddressSnapshot`,
  *     which derives balance, UTXOs, **and** tx history from a single
  *     `/address/:addr/txs` call (down from 3 separate calls).
  *   - Tx history aggregation runs in memory from the snapshot data — no
- *     additional round trips. (Previous implementation re-fetched
- *     `/address/:addr/txs` separately on every refresh.)
+ *     additional round trips.
  *
  * The hook is safe to call regardless of login state — it returns
  * `availability.status !== 'available'` for non-nsec users without doing any
@@ -123,29 +152,19 @@ export function useHdWallet(): UseHdWalletResult {
     DEFAULT_CURSOR,
   );
 
-  // ── Persisted scan skeleton ──────────────────────────────────
+  // ── In-memory live cache ─────────────────────────────────────
   //
-  // Loaded lazily — when secure storage is on native it's async. We feed
-  // whatever is loaded back into `scanAccount` as `prev` on every fetch so
-  // the warm scan runs even on the very first call after page reload.
-  const [persistedScan, setPersistedScan, persistedScanReady] = useSecureLocalStorage<PersistedScan>(
-    pubkey ? scanCacheKey(pubkey) : 'hdwallet:scan:none',
-    EMPTY_PERSISTED_SCAN,
-  );
-
-  // Track the "live" prev that's threaded through the scan, so the
-  // *result* of one scan informs the *prev* of the next without forcing a
-  // re-render on every successful fetch.
+  // After a successful scan we hold the full result here so the *next*
+  // refresh (every 2 minutes, or on manual refetch) doesn't need to re-read
+  // the persisted skeleton. The persisted copy still gets updated for
+  // page-reload survival.
   const livePrevRef = useRef<AccountScanResult | undefined>(undefined);
 
-  // Hydrate `livePrev` from the persisted skeleton the first time it loads.
-  useEffect(() => {
-    if (!persistedScanReady) return;
-    if (livePrevRef.current) return;
-    livePrevRef.current = fromPersistedScan(persistedScan);
-  }, [persistedScanReady, persistedScan]);
-
   // ── Scan query ───────────────────────────────────────────────
+  //
+  // CRITICAL: `enabled` requires a non-empty pubkey *and* an account. The
+  // empty-pubkey false-start (render 1, before useCurrentUser resolves) is
+  // what previously caused the cold-scan-on-every-refresh bug.
   const scanKey = ['hdwallet-scan', esploraApis, pubkey];
   const {
     data: scan,
@@ -156,15 +175,25 @@ export function useHdWallet(): UseHdWalletResult {
   } = useQuery<AccountScanResult>({
     queryKey: scanKey,
     queryFn: async ({ signal }) => {
-      if (!account) throw new Error('HD wallet account unavailable');
-      const result = await scanAccount(account, esploraApis, signal, livePrevRef.current);
-      // Update our in-memory prev for the next refresh, and asynchronously
-      // persist the new skeleton.
+      if (!account || !pubkey) throw new Error('HD wallet account unavailable');
+
+      // Prefer the in-memory prev from a previous successful scan; otherwise
+      // hydrate from the platform's storage layer. Either path runs entirely
+      // synchronously on web (secureStorage.getItem reads localStorage
+      // directly) and async-but-fast on native.
+      const prev = livePrevRef.current ?? (await readPersistedPrev(pubkey));
+
+      const result = await scanAccount(account, esploraApis, signal, prev);
+
+      // Update both caches before returning. The persisted write is
+      // fire-and-forget on native (no await needed for correctness).
       livePrevRef.current = result;
-      setPersistedScan(toPersistedScan(result));
+      void secureStorage.setItem(scanCacheKey(pubkey), JSON.stringify(toPersistedScan(result)))
+        .catch((err) => console.warn('Failed to persist HD wallet cache:', err));
+
       return result;
     },
-    enabled: !!account && persistedScanReady,
+    enabled: !!account && pubkey !== '',
     refetchInterval: REFRESH_INTERVAL_MS,
     staleTime: REFRESH_INTERVAL_MS / 2,
     // Avoid a refetch storm when the user tabs back in mid-interval.
@@ -172,9 +201,6 @@ export function useHdWallet(): UseHdWalletResult {
   });
 
   // ── Transaction history (derived, no extra fetches) ──────────
-  //
-  // The address snapshots already contain every tx that touched each used
-  // address. We just merge them in memory whenever the scan result changes.
   const transactions = useMemo<HdTransaction[] | undefined>(() => {
     if (!scan) return undefined;
     return buildHdTransactions(scan);

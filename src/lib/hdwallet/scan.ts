@@ -35,11 +35,48 @@ import { type AddressSnapshot, fetchAddressSnapshot } from './snapshot';
 /** Standard BIP44 gap limit. */
 export const GAP_LIMIT = 20;
 
-/** Number of addresses fetched per request batch. */
-const SCAN_BATCH_SIZE = 5;
+/**
+ * Number of addresses fetched per request batch.
+ *
+ * Each batch is one `Promise.all` round of `fetchAddressSnapshot` calls.
+ * Public Esplora endpoints (mempool.space) have aggressive per-IP rate
+ * limits — a single burst of >5 concurrent requests is enough to start
+ * seeing 429s. Keep this conservative.
+ */
+const SCAN_BATCH_SIZE = 3;
+
+/**
+ * Minimum delay between consecutive batches, in milliseconds. Spaces out
+ * burst traffic so a cold scan (~20 batches across two chains) takes ~5s
+ * but never trips the rate limiter.
+ */
+const INTER_BATCH_DELAY_MS = 250;
 
 /** Hard ceiling on addresses scanned per chain. Protects against bugs/loops. */
 const MAX_INDEX = 10_000;
+
+/**
+ * Sleep helper that resolves early on abort. Used to space batches inside a
+ * single chain scan without leaving the abort signal blocked.
+ */
+function sleep(ms: number, signal?: AbortSignal): Promise<void> {
+  if (ms <= 0) return Promise.resolve();
+  return new Promise((resolve, reject) => {
+    const timer = setTimeout(() => {
+      signal?.removeEventListener('abort', onAbort);
+      resolve();
+    }, ms);
+    const onAbort = () => {
+      clearTimeout(timer);
+      reject(signal!.reason ?? new DOMException('Aborted', 'AbortError'));
+    };
+    if (signal?.aborted) {
+      onAbort();
+    } else {
+      signal?.addEventListener('abort', onAbort, { once: true });
+    }
+  });
+}
 
 /** Information about a single derived address that has been observed. */
 export interface ScannedAddress {
@@ -123,6 +160,7 @@ async function walkForwardFromIndex(
   let consecutiveUnused = 0;
   let index = startIndex;
   let hitMaxIndex = false;
+  let isFirstBatch = true;
 
   while (consecutiveUnused < GAP_LIMIT) {
     if (index >= MAX_INDEX) {
@@ -137,6 +175,12 @@ async function walkForwardFromIndex(
       batch.push(deriveAddress(chainNode, chain, index + i));
     }
     if (batch.length === 0) break;
+
+    // Inter-batch pacing: skip the sleep on the first batch (we want
+    // immediate progress on the very first request) but space out all
+    // subsequent batches to keep us under public-Esplora rate limits.
+    if (!isFirstBatch) await sleep(INTER_BATCH_DELAY_MS, signal);
+    isFirstBatch = false;
 
     // One round trip per address — fetchAddressSnapshot replaces the
     // previous three calls (balance + utxos + txs).
@@ -192,8 +236,14 @@ async function refreshKnownUsed(
   const nowUnused: number[] = [];
 
   // Fire requests in chunks of SCAN_BATCH_SIZE to keep fan-out bounded.
+  let isFirstBatch = true;
   for (let i = 0; i < knownIndexes.length; i += SCAN_BATCH_SIZE) {
     const slice = knownIndexes.slice(i, i + SCAN_BATCH_SIZE);
+
+    // Same inter-batch pacing as the forward walk.
+    if (!isFirstBatch) await sleep(INTER_BATCH_DELAY_MS, signal);
+    isFirstBatch = false;
+
     const snaps = await Promise.all(
       slice.map(async (idx) => {
         signal?.throwIfAborted();
@@ -238,15 +288,18 @@ async function scanChain(
 
   // ── Warm path ──────────────────────────────────────────────
   //
-  // (a) Refresh every previously-known used address in parallel.
+  // (a) Refresh every previously-known used address.
   // (b) Walk forward from prev.firstUnusedIndex. If everything in the tail
   //     is still unused (the common case) we observe GAP_LIMIT and exit
   //     quickly. If something showed up, walk extends naturally.
+  //
+  // We run (a) then (b) **serially** rather than in parallel so the
+  // intra-batch concurrency cap (SCAN_BATCH_SIZE) really is the system-wide
+  // concurrency cap. Running them in parallel would double the burst at
+  // exactly the moment we're trying to stay under public Esplora limits.
   const knownIndexes = prev.used.map((sa) => sa.derived.index);
-  const [refreshResult, forwardWalk] = await Promise.all([
-    refreshKnownUsed(account, chain, knownIndexes, esploraApis, signal),
-    walkForwardFromIndex(account, chain, prev.firstUnusedIndex, esploraApis, signal),
-  ]);
+  const refreshResult = await refreshKnownUsed(account, chain, knownIndexes, esploraApis, signal);
+  const forwardWalk = await walkForwardFromIndex(account, chain, prev.firstUnusedIndex, esploraApis, signal);
 
   // Merge: known-used (refreshed) + anything new from the forward walk.
   // Deduplicate by index in case a known-used index sat exactly at the
@@ -295,11 +348,13 @@ export async function scanAccount(
   signal?: AbortSignal,
   prev?: AccountScanResult,
 ): Promise<AccountScanResult> {
-  // Both chains in parallel — they're independent.
-  const [receive, change] = await Promise.all([
-    scanChain(account, RECEIVE_CHAIN, esploraApis, signal, prev?.receive),
-    scanChain(account, CHANGE_CHAIN, esploraApis, signal, prev?.change),
-  ]);
+  // Serialise the two chains rather than running them with Promise.all. The
+  // chains are independent of each other, but running them in parallel
+  // doubles the in-flight request count (2 × SCAN_BATCH_SIZE), which is the
+  // exact burst that trips public Esplora rate limits. Scanning receive
+  // then change adds a few hundred ms of wall time and is the better trade.
+  const receive = await scanChain(account, RECEIVE_CHAIN, esploraApis, signal, prev?.receive);
+  const change = await scanChain(account, CHANGE_CHAIN, esploraApis, signal, prev?.change);
 
   const addressMap = new Map<string, DerivedAddress>();
   for (const sa of receive.used) addressMap.set(sa.derived.address, sa.derived);
