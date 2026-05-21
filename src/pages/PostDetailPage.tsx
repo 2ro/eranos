@@ -37,6 +37,7 @@ const CustomNipCard = lazy(() => import("@/components/CustomNipCard").then(m => 
 import { FileMetadataContent } from "@/components/FileMetadataContent";
 import { FollowPackContent } from "@/components/FollowPackContent";
 import { GoalCard } from "@/components/GoalCard";
+import { DetailCommentComposer } from "@/components/DetailCommentComposer";
 import { FollowPackDetailContent } from "@/components/FollowPackDetailContent";
 import { FoundLogContent } from "@/components/FoundLogContent";
 import { GeocacheContent } from "@/components/GeocacheContent";
@@ -436,8 +437,8 @@ function ProfileBadgesDetailView({ event }: { event: NostrEvent }) {
   }, [commentsData, muteItems]);
 
   return (
-    <div>
-      <FeedCard>
+    <div className="max-w-6xl mx-auto px-4 sm:px-6">
+      <FeedCard className="mx-0">
         <NoteCard event={event} />
       </FeedCard>
       <div className="pb-16 sidebar:pb-0">
@@ -1397,13 +1398,13 @@ function PostDetailContent({ event }: { event: NostrEvent }) {
 
   return (
     <CommunityModerationContext.Provider value={communityModContext}>
-    <div>
+    <div className="max-w-6xl mx-auto px-4 sm:px-6">
       {/* Focused post card — ancestor previews, ancestor thread, and the
           focused event itself share one rounded surface so the page
           reads as "thread context → this post" instead of an
           edge-to-edge Twitter timeline. Replies sit in their own
           FeedCard below. */}
-      <FeedCard>
+      <FeedCard className="mx-0">
       {/* Content preview for kind 1111 comments: external content, profile, or community */}
       {externalIdentifier && (
         <ExternalContentPreview identifier={externalIdentifier} />
@@ -2075,22 +2076,51 @@ function PostDetailContent({ event }: { event: NostrEvent }) {
       </FeedCard>
 
       {/* Replies */}
-      <div className="pb-16 sidebar:pb-0">
+      <div className="mt-6 pb-16 sidebar:pb-0">
+        <div className="flex items-baseline justify-between gap-3 mb-3 px-1">
+          <h2 className="text-lg font-semibold tracking-tight">
+            {isKind1 ? 'Replies' : 'Comments'}
+          </h2>
+          {replyTree.length > 0 ? (
+            <span className="text-sm text-muted-foreground tabular-nums">
+              {formatNumber(replyTree.length)}{' '}
+              {replyTree.length === 1
+                ? isKind1 ? 'reply' : 'comment'
+                : isKind1 ? 'replies' : 'comments'}
+            </span>
+          ) : null}
+        </div>
+
+        <DetailCommentComposer
+          event={event}
+          className="mb-3"
+          placeholder={isKind1 ? 'Write a reply...' : "What's on your mind?"}
+        />
+
         {repliesLoading ? (
-          <FeedCard className="mt-4 divide-y divide-border">
+          <div className="rounded-2xl bg-card border border-border/60 shadow-sm overflow-hidden divide-y divide-border">
             {Array.from({ length: 3 }).map((_, i) => (
               <ReplyCardSkeleton key={i} />
             ))}
-          </FeedCard>
-        ) : replyTree.length > 0 ? (
-          <FeedCard className="mt-4">
-            <ThreadedReplyList roots={replyTree} />
-          </FeedCard>
-         ) : !parentEventId ? (
-          <div className="py-12 text-center text-muted-foreground text-sm">
-            No replies yet. Be the first to reply!
           </div>
-        ) : null}
+        ) : replyTree.length > 0 ? (
+          <div className="rounded-2xl bg-card border border-border/60 shadow-sm overflow-hidden">
+            <ThreadedReplyList roots={replyTree} />
+          </div>
+        ) : (
+          <button
+            type="button"
+            onClick={() => setReplyOpen(true)}
+            className="block w-full rounded-2xl border border-dashed border-border/80 bg-card/50 px-6 py-10 text-center hover:bg-card hover:border-primary/40 transition-colors"
+          >
+            <p className="text-base font-medium text-foreground">
+              No {isKind1 ? 'replies' : 'comments'} yet
+            </p>
+            <p className="mt-1 text-sm text-muted-foreground">
+              Be the first to {isKind1 ? 'reply' : 'start the discussion'}.
+            </p>
+          </button>
+        )}
       </div>
     </div>
     </CommunityModerationContext.Provider>

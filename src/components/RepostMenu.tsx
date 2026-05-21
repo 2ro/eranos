@@ -1,4 +1,4 @@
-import { Quote, Rocket, Undo2 } from 'lucide-react';
+import { Megaphone, Quote, Undo2 } from 'lucide-react';
 import { RepostIcon } from '@/components/icons/RepostIcon';
 import { useState } from 'react';
 import type { NostrEvent } from '@nostrify/nostrify';
@@ -195,7 +195,7 @@ export function RepostMenu({ event, children }: RepostMenuProps) {
         }}
         className="flex items-center gap-3 w-full px-4 py-3 text-[15px] text-foreground hover:bg-secondary/60 transition-colors"
       >
-        <Rocket className="size-5" />
+        <Megaphone className="size-5" />
         <span>Boost</span>
       </button>
     </div>

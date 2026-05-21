@@ -322,6 +322,32 @@ This mirrors the community batch-zap pattern documented in the kind 8333 section
 
 Clients MUST verify each kind 8333 event on-chain before counting it toward the campaign total, per the verification rules in the kind 8333 section.
 
+**Fetch pinned event comments:**
+
+Event owners MAY pin important comments or activity feed events with a NIP-78 app-specific data event (`kind: 30078`) authored by the root event owner. The `d` tag is scoped to the root event coordinate. Agora uses this for campaigns (`30223`), pledges (`36639`), organizations (`34550`), and calendar events (`31922` / `31923`).
+
+```json
+{
+  "kind": 30078,
+  "pubkey": "<root-event-author-pubkey>",
+  "content": "{\"pinnedEvents\":[\"<event-id-2>\",\"<event-id-1>\"]}",
+  "tags": [
+    ["d", "agora-pinned-comments:<kind>:<root-event-author-pubkey>:<d-tag>"],
+    ["a", "<kind>:<root-event-author-pubkey>:<d-tag>"],
+    ["k", "<kind>"],
+    ["alt", "Pinned event comments"]
+  ]
+}
+```
+
+Clients SHOULD query the pin list with:
+
+```json
+{ "kinds": [30078], "authors": ["<root-event-author-pubkey>"], "#d": ["agora-pinned-comments:<kind>:<root-event-author-pubkey>:<d-tag>"], "limit": 1 }
+```
+
+The `pinnedEvents` array is ordered newest pin first. Pinning an already-pinned event removes it. Clients SHOULD ignore pin lists not authored by the root event owner.
+
 ### Client Behavior
 
 - **Recipient validity:** clients SHOULD reject `p` tag entries whose pubkey is not 64 hex characters and SHOULD ignore weights that are not positive finite decimals.
