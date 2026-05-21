@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useInView } from 'react-intersection-observer';
 import { usePageRefresh } from '@/hooks/usePageRefresh';
 import { ComposeBox } from '@/components/ComposeBox';
+import { HeroAtmosphere } from '@/components/HeroAtmosphere';
 import { HeroGlobe } from '@/components/HeroGlobe';
 import { LandingHero } from '@/components/LandingHero';
 import { NoteCard } from '@/components/NoteCard';
@@ -59,12 +60,15 @@ function FeedGlobeBackground() {
     return () => window.clearInterval(id);
   }, []);
 
+  const activeHue = HOPE_PALETTE[hueIndex];
+
   return (
-    <div className="fixed inset-0 z-0 pointer-events-none overflow-hidden" aria-hidden="true">
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,hsl(var(--primary)/0.20),transparent_46%),linear-gradient(to_bottom,hsl(var(--background)/0.20),hsl(var(--background)/0.86))]" />
+    <div className="fixed inset-0 z-0 pointer-events-none overflow-hidden bg-secondary/30" aria-hidden="true">
+      <HeroAtmosphere hue={activeHue} />
+      <div className="absolute inset-0 bg-gradient-to-b from-background/10 via-background/35 to-background/88" />
       <div className="absolute inset-0 flex items-center justify-center">
         <HeroGlobe
-          hue={HOPE_PALETTE[hueIndex]}
+          hue={activeHue}
           className="aspect-square max-w-none opacity-70 drop-shadow-2xl"
           style={{ width: 'clamp(460px, 72dvw, 820px)' }}
         />
@@ -263,7 +267,7 @@ export function Feed({ kinds, tagFilters, header, hideCompose, emptyMessage, fee
   const showSavedFeedTabs = user && !isKindSpecificPage && !tagFilters;
   const useGlobeBackdrop = feedId === 'home' && !kinds && !tagFilters && !header;
   const translucentCardClassName = useGlobeBackdrop
-    ? 'bg-background/70 supports-[backdrop-filter]:backdrop-blur-xl border-border/50 hover:bg-background/80'
+    ? 'bg-background/70 border-border/50 hover:bg-background/80'
     : undefined;
 
   return (
