@@ -1,10 +1,4 @@
-import {
-  type AddressData,
-  fetchAddressData,
-  fetchTransactions,
-  fetchUTXOs,
-  type UTXO,
-} from '@/lib/bitcoin';
+import type { AddressData, Transaction, UTXO } from '@/lib/bitcoin';
 import {
   CHANGE_CHAIN,
   type DerivedAddress,
@@ -12,6 +6,7 @@ import {
   type HdAccount,
   RECEIVE_CHAIN,
 } from './derivation';
+import { type AddressSnapshot, fetchAddressSnapshot } from './snapshot';
 
 // ---------------------------------------------------------------------------
 // Gap-limit chain scanning
@@ -21,8 +16,20 @@ import {
 // `GAP_LIMIT` consecutive addresses that have never been used (zero history).
 // Industry standard is 20.
 //
-// We scan in batches of `SCAN_BATCH_SIZE` to amortise round-trip latency
-// while still bounding fan-out on the Esplora server.
+// Two modes:
+//
+//   - **Cold scan** (no `prev`): walks both chains from index 0 until the gap
+//     is hit. Used on first ever load.
+//
+//   - **Warm scan** (with `prev`): polls only the addresses we already knew
+//     were used (to pick up new activity), plus a tail window starting at the
+//     last `firstUnusedIndex`. As long as that tail stays clean, we never
+//     re-probe addresses past it. If something showed up on a previously-
+//     unused address, the scan extends forward incrementally until the gap
+//     is again satisfied.
+//
+// We batch requests with `Promise.all` of size `SCAN_BATCH_SIZE` to amortise
+// round-trip latency while still bounding fan-out on the Esplora server.
 // ---------------------------------------------------------------------------
 
 /** Standard BIP44 gap limit. */
@@ -39,6 +46,10 @@ export interface ScannedAddress {
   derived: DerivedAddress;
   data: AddressData;
   utxos: UTXO[];
+  /** All transactions touching this address (from the snapshot). */
+  txs: Transaction[];
+  /** Whether the address's history is capped (see `AddressSnapshot.historyCapped`). */
+  historyCapped: boolean;
 }
 
 /** Full scan result for a single chain (receive or change). */
@@ -76,24 +87,41 @@ function isUsed(data: AddressData): boolean {
   return data.txCount > 0 || data.pendingTxCount > 0;
 }
 
+/** Adapt a snapshot result into the ScannedAddress shape. */
+function toScanned(derived: DerivedAddress, snap: AddressSnapshot): ScannedAddress {
+  return {
+    derived,
+    data: snap.data,
+    utxos: snap.utxos,
+    txs: snap.txs,
+    historyCapped: snap.historyCapped,
+  };
+}
+
+// ---------------------------------------------------------------------------
+// Forward gap-walker
+// ---------------------------------------------------------------------------
+
 /**
- * Scan a single chain (receive or change) until `GAP_LIMIT` consecutive
- * unused addresses are observed.
+ * Walk a chain forward from `startIndex` until `GAP_LIMIT` consecutive unused
+ * addresses are observed. Returns the addresses we found used along the way
+ * plus the new `firstUnusedIndex`. The caller decides whether to merge this
+ * into a prior result (warm scan) or use it as the entire result (cold scan).
  */
-async function scanChain(
+async function walkForwardFromIndex(
   account: HdAccount,
   chain: 0 | 1,
+  startIndex: number,
   esploraApis: string[],
-  signal?: AbortSignal,
-): Promise<ChainScanResult> {
+  signal: AbortSignal | undefined,
+): Promise<{ used: ScannedAddress[]; firstUnusedIndex: number; hitMaxIndex: boolean }> {
   const chainNode = chain === RECEIVE_CHAIN ? account.receiveNode : account.changeNode;
 
   const used: ScannedAddress[] = [];
-  const withBalance: ScannedAddress[] = [];
-  let firstUnusedIndex = 0;
+  let firstUnusedIndex = startIndex;
   let firstUnusedSet = false;
   let consecutiveUnused = 0;
-  let index = 0;
+  let index = startIndex;
   let hitMaxIndex = false;
 
   while (consecutiveUnused < GAP_LIMIT) {
@@ -102,35 +130,28 @@ async function scanChain(
       break;
     }
 
-    // Build the next batch of addresses to scan.
+    // Build the next batch of addresses.
     const batch: DerivedAddress[] = [];
-    for (let i = 0; i < SCAN_BATCH_SIZE && consecutiveUnused + i < GAP_LIMIT && index + i < MAX_INDEX; i++) {
+    const remainingGap = GAP_LIMIT - consecutiveUnused;
+    for (let i = 0; i < SCAN_BATCH_SIZE && i < remainingGap && index + i < MAX_INDEX; i++) {
       batch.push(deriveAddress(chainNode, chain, index + i));
     }
     if (batch.length === 0) break;
 
-    // Fetch address data in parallel. UTXOs are only fetched for addresses
-    // that turn out to be used — we avoid speculative UTXO calls for the
-    // ~20 "tail" addresses at the end of every scan.
-    const dataResults = await Promise.all(
+    // One round trip per address — fetchAddressSnapshot replaces the
+    // previous three calls (balance + utxos + txs).
+    const snaps = await Promise.all(
       batch.map(async (d) => {
         signal?.throwIfAborted();
-        const data = await fetchAddressData(d.address, esploraApis, signal);
-        return { d, data };
+        return { d, snap: await fetchAddressSnapshot(d.address, esploraApis, signal) };
       }),
     );
 
-    for (const { d, data } of dataResults) {
-      if (isUsed(data)) {
-        // Used — reset gap counter, fetch UTXOs for spending.
-        signal?.throwIfAborted();
-        const utxos = await fetchUTXOs(d.address, esploraApis, signal);
-        const sa: ScannedAddress = { derived: d, data, utxos };
-        used.push(sa);
-        if (utxos.length > 0 || data.totalBalance > 0) withBalance.push(sa);
+    for (const { d, snap } of snaps) {
+      if (isUsed(snap.data)) {
+        used.push(toScanned(d, snap));
         consecutiveUnused = 0;
-        // Do NOT update firstUnusedIndex here — we want the first index that
-        // has never been used, so it stays pointed at the earliest gap.
+        // Do not move firstUnusedIndex past this — we want the earliest gap.
       } else {
         if (!firstUnusedSet) {
           firstUnusedIndex = d.index;
@@ -143,29 +164,141 @@ async function scanChain(
     index += batch.length;
   }
 
-  // Edge case: the chain has zero used addresses. firstUnusedIndex stays 0.
-  if (!firstUnusedSet) firstUnusedIndex = 0;
+  if (!firstUnusedSet) firstUnusedIndex = index;
 
-  return { used, withBalance, firstUnusedIndex, hitMaxIndex };
+  return { used, firstUnusedIndex, hitMaxIndex };
+}
+
+// ---------------------------------------------------------------------------
+// Per-chain scan
+// ---------------------------------------------------------------------------
+
+/**
+ * Re-fetch snapshots for an already-known set of used addresses in parallel.
+ * Used during a warm scan to catch new incoming/outgoing activity on
+ * previously-observed addresses.
+ */
+async function refreshKnownUsed(
+  account: HdAccount,
+  chain: 0 | 1,
+  knownIndexes: number[],
+  esploraApis: string[],
+  signal: AbortSignal | undefined,
+): Promise<{ refreshed: ScannedAddress[]; nowUnused: number[] }> {
+  if (knownIndexes.length === 0) return { refreshed: [], nowUnused: [] };
+  const chainNode = chain === RECEIVE_CHAIN ? account.receiveNode : account.changeNode;
+
+  const refreshed: ScannedAddress[] = [];
+  const nowUnused: number[] = [];
+
+  // Fire requests in chunks of SCAN_BATCH_SIZE to keep fan-out bounded.
+  for (let i = 0; i < knownIndexes.length; i += SCAN_BATCH_SIZE) {
+    const slice = knownIndexes.slice(i, i + SCAN_BATCH_SIZE);
+    const snaps = await Promise.all(
+      slice.map(async (idx) => {
+        signal?.throwIfAborted();
+        const d = deriveAddress(chainNode, chain, idx);
+        const snap = await fetchAddressSnapshot(d.address, esploraApis, signal);
+        return { d, snap };
+      }),
+    );
+    for (const { d, snap } of snaps) {
+      if (isUsed(snap.data)) {
+        refreshed.push(toScanned(d, snap));
+      } else {
+        // An address we previously saw used now reports no history. This
+        // shouldn't happen on mainnet (txs don't un-broadcast). We log it
+        // and treat it as "still belonged to our set" in case of an Esplora
+        // backend desync.
+        nowUnused.push(d.index);
+      }
+    }
+  }
+
+  return { refreshed, nowUnused };
 }
 
 /**
- * Scan both chains (receive and change) for an HD account and aggregate the
- * results.
+ * Scan a single chain. If `prev` is supplied, performs an **incremental**
+ * scan: just refresh known-used addresses and walk a small tail starting at
+ * the previous `firstUnusedIndex`. Otherwise performs a cold scan from 0.
+ */
+async function scanChain(
+  account: HdAccount,
+  chain: 0 | 1,
+  esploraApis: string[],
+  signal: AbortSignal | undefined,
+  prev?: ChainScanResult,
+): Promise<ChainScanResult> {
+  // ── Cold path ──────────────────────────────────────────────
+  if (!prev) {
+    const walk = await walkForwardFromIndex(account, chain, 0, esploraApis, signal);
+    return buildChainResult(walk.used, walk.firstUnusedIndex, walk.hitMaxIndex);
+  }
+
+  // ── Warm path ──────────────────────────────────────────────
+  //
+  // (a) Refresh every previously-known used address in parallel.
+  // (b) Walk forward from prev.firstUnusedIndex. If everything in the tail
+  //     is still unused (the common case) we observe GAP_LIMIT and exit
+  //     quickly. If something showed up, walk extends naturally.
+  const knownIndexes = prev.used.map((sa) => sa.derived.index);
+  const [refreshResult, forwardWalk] = await Promise.all([
+    refreshKnownUsed(account, chain, knownIndexes, esploraApis, signal),
+    walkForwardFromIndex(account, chain, prev.firstUnusedIndex, esploraApis, signal),
+  ]);
+
+  // Merge: known-used (refreshed) + anything new from the forward walk.
+  // Deduplicate by index in case a known-used index sat exactly at the
+  // forward-walk start (shouldn't happen — knownIndexes are all < prev.firstUnusedIndex
+  // by construction — but be defensive).
+  const byIndex = new Map<number, ScannedAddress>();
+  for (const sa of refreshResult.refreshed) byIndex.set(sa.derived.index, sa);
+  for (const sa of forwardWalk.used) byIndex.set(sa.derived.index, sa);
+  const merged = Array.from(byIndex.values()).sort(
+    (a, b) => a.derived.index - b.derived.index,
+  );
+
+  return buildChainResult(merged, forwardWalk.firstUnusedIndex, forwardWalk.hitMaxIndex);
+}
+
+function buildChainResult(
+  used: ScannedAddress[],
+  firstUnusedIndex: number,
+  hitMaxIndex: boolean,
+): ChainScanResult {
+  const withBalance = used.filter(
+    (sa) => sa.utxos.length > 0 || sa.data.totalBalance > 0,
+  );
+  return { used, withBalance, firstUnusedIndex, hitMaxIndex };
+}
+
+// ---------------------------------------------------------------------------
+// Public API
+// ---------------------------------------------------------------------------
+
+/**
+ * Scan both chains (receive and change) for an HD account.
+ *
+ * If `prev` is supplied, performs an incremental scan that only re-probes
+ * addresses we already knew were used plus a small forward gap. Otherwise
+ * does a cold full scan.
  *
  * @param account          The derived HD account.
- * @param esploraApis   Ordered list of Esplora REST roots tried with failover.
+ * @param esploraApis      Ordered list of Esplora REST roots (failover handled).
  * @param signal           Optional abort signal.
+ * @param prev             Previous scan result, if any — enables incremental mode.
  */
 export async function scanAccount(
   account: HdAccount,
   esploraApis: string[],
   signal?: AbortSignal,
+  prev?: AccountScanResult,
 ): Promise<AccountScanResult> {
-  // Both chains in parallel — they're independent of each other.
+  // Both chains in parallel — they're independent.
   const [receive, change] = await Promise.all([
-    scanChain(account, RECEIVE_CHAIN, esploraApis, signal),
-    scanChain(account, CHANGE_CHAIN, esploraApis, signal),
+    scanChain(account, RECEIVE_CHAIN, esploraApis, signal, prev?.receive),
+    scanChain(account, CHANGE_CHAIN, esploraApis, signal, prev?.change),
   ]);
 
   const addressMap = new Map<string, DerivedAddress>();
@@ -215,32 +348,18 @@ export interface HdTransaction {
 }
 
 /**
- * Fetch per-address transaction lists for every used address and combine
- * them by txid. A single transaction that hits multiple owned addresses
- * (e.g. send-with-change) is merged into one record whose `amount` is the
- * net wallet-level change.
+ * Build the wallet-level transaction history from a scan result.
+ *
+ * Each scanned address already carries its tx list (returned by the same
+ * snapshot fetch that built the balance), so this function does **no
+ * additional network calls** — it just merges and sorts in memory.
+ *
+ * A transaction that touches multiple owned addresses (e.g. send-with-change)
+ * is merged into one record whose `amount` is the net wallet-level change.
  */
-export async function fetchHdTransactions(
-  result: AccountScanResult,
-  esploraApis: string[],
-  signal?: AbortSignal,
-): Promise<HdTransaction[]> {
+export function buildHdTransactions(result: AccountScanResult): HdTransaction[] {
   const allUsed = [...result.receive.used, ...result.change.used];
   if (allUsed.length === 0) return [];
-
-  // Fetch each address's tx list in parallel. Each call returns a simplified
-  // per-address view from `fetchTransactions` (net positive/negative).
-  const perAddress = await Promise.all(
-    allUsed.map(async (sa) => {
-      signal?.throwIfAborted();
-      const txs = await fetchTransactions(sa.derived.address, esploraApis, signal);
-      return txs.map((tx) => ({
-        ...tx,
-        // `fetchTransactions` returns Math.abs(net); recover the signed value.
-        signedAmount: tx.type === 'receive' ? tx.amount : -tx.amount,
-      }));
-    }),
-  );
 
   // Merge by txid — sum signed amounts so that send-with-change collapses.
   const merged = new Map<string, {
@@ -250,21 +369,21 @@ export async function fetchHdTransactions(
     timestamp?: number;
   }>();
 
-  for (const list of perAddress) {
-    for (const tx of list) {
+  for (const sa of allUsed) {
+    for (const tx of sa.txs) {
+      // `Transaction.amount` is Math.abs(net); recover the signed value.
+      const signedAmount = tx.type === 'receive' ? tx.amount : -tx.amount;
       const existing = merged.get(tx.txid);
       if (existing) {
-        existing.netSats += tx.signedAmount;
-        // Once confirmed, stay confirmed.
+        existing.netSats += signedAmount;
         existing.confirmed = existing.confirmed || tx.confirmed;
-        // Prefer the earliest known timestamp.
         if (tx.timestamp && (!existing.timestamp || tx.timestamp < existing.timestamp)) {
           existing.timestamp = tx.timestamp;
         }
       } else {
         merged.set(tx.txid, {
           txid: tx.txid,
-          netSats: tx.signedAmount,
+          netSats: signedAmount,
           confirmed: tx.confirmed,
           timestamp: tx.timestamp,
         });
@@ -280,7 +399,7 @@ export async function fetchHdTransactions(
     timestamp: m.timestamp,
   }));
 
-  // Sort newest first. Unconfirmed (no timestamp) go to the top.
+  // Sort newest first; unconfirmed go to the top.
   out.sort((a, b) => {
     if (!a.timestamp && !b.timestamp) return 0;
     if (!a.timestamp) return -1;

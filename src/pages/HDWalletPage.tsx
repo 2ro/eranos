@@ -35,6 +35,7 @@ export function HDWalletPage() {
     totalBalance,
     pendingBalance,
     isLoading,
+    isFetching,
     error,
     refetch,
     nextReceiveAddress,
@@ -162,17 +163,30 @@ export function HDWalletPage() {
           </div>
         )}
 
-        {/* Send button */}
+        {/* Send + refresh */}
         {!isLoading && !error && (
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => setSendOpen(true)}
-            className="rounded-full"
-          >
-            <Send className="size-3.5 mr-1.5" />
-            Send
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setSendOpen(true)}
+              className="rounded-full"
+            >
+              <Send className="size-3.5 mr-1.5" />
+              Send
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => refetch()}
+              disabled={isFetching}
+              className="rounded-full"
+              aria-label="Refresh balance"
+              title="Refresh balance"
+            >
+              <RefreshCw className={`size-3.5 ${isFetching ? 'animate-spin' : ''}`} />
+            </Button>
+          </div>
         )}
 
         <HDSendBitcoinDialog
