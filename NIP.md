@@ -12,7 +12,7 @@
 
 | Kind  | Name                       | Description                                                    |
 |-------|----------------------------|----------------------------------------------------------------|
-| 30223 | Campaign                   | Fundraising campaign with a list of on-chain Bitcoin recipients |
+| 33863 | Campaign                   | Self-authored fundraising campaign with a single Bitcoin wallet endpoint (`bc1...` or `sp1...`) |
 | 30385 | Community Stats Snapshot   | Pre-computed per-country / global community leaderboards       |
 | 36639 | Pledge                     | Donor pledge for concrete submissions, stored as sats           |
 
@@ -22,7 +22,7 @@
 |--------------------------|-----------------------------------------|-----------------------------------------------------------------|
 | Flat Communities | 34550, 30009, 8, 1111, 1984 | One-level badge membership with explicit moderators (NIP-72 ext) |
 | Community Chat | 34550, 1311 | Realtime member chat scoped to a NIP-72 community |
-| Campaign Moderation | 30223, 1985, 39089 | Homepage curation (approved / hidden / featured axes) via moderator-signed labels in the `agora.moderation` namespace, gated by a follow-pack moderator roster |
+| Campaign Moderation | 33863, 1985, 39089 | Homepage curation (approved / hidden / featured axes) via moderator-signed labels in the `agora.moderation` namespace, gated by a follow-pack moderator roster |
 
 ### Community Chat
 
@@ -89,25 +89,44 @@ Single-recipient zap (the common case — tipping a post or profile):
 }
 ```
 
-Multi-recipient zap (one transaction paying multiple recipients — campaign donations, community splits):
+Multi-recipient zap (one transaction paying multiple recipients — community splits):
 
 ```json
 {
   "kind": 8333,
   "pubkey": "<sender-pubkey>",
-  "content": "Great campaign!",
+  "content": "Great community!",
   "tags": [
     ["i", "bitcoin:tx:<txid>"],
     ["p", "<recipient-1-pubkey>"],
     ["p", "<recipient-2-pubkey>"],
     ["p", "<recipient-3-pubkey>"],
     ["amount", "<total-sats-paid-to-all-listed-recipients>"],
-    ["a", "30223:<campaign-author>:<campaign-d-tag>"],
-    ["K", "30223"],
+    ["a", "34550:<community-author>:<community-d-tag>"],
+    ["K", "34550"],
     ["alt", "Donation: 75000 sats across 3 recipients"]
   ]
 }
 ```
+
+Campaign donation (one transaction paying a single campaign wallet — see Kind 33863 below):
+
+```json
+{
+  "kind": 8333,
+  "pubkey": "<donor-pubkey>",
+  "content": "Keep up the good work.",
+  "tags": [
+    ["i", "bitcoin:tx:<txid>"],
+    ["amount", "<sats-paid-to-campaign-wallet>"],
+    ["a", "33863:<campaign-author>:<campaign-d-tag>"],
+    ["K", "33863"],
+    ["alt", "Donation to Save the Last Bookstore: 25000 sats"]
+  ]
+}
+```
+
+Campaign donation receipts MUST NOT include `p` tags — campaigns no longer have Nostr-identity recipients, only a `w` wallet endpoint. Verification matches tx outputs against the campaign's declared `w` address rather than derived Taproot addresses (see *Verification* and Kind 33863 below).
 
 ### Content
 
@@ -165,13 +184,25 @@ For addressable events, use `"#a": ["<kind>:<pubkey>:<d-tag>"]` instead. For pro
 
 **Verification (REQUIRED before trusting amounts):**
 
-Clients MUST verify a kind 8333 event on-chain before counting it toward a zap total or displaying its amount. The `amount` tag is self-reported by the sender and would otherwise be trivially spoofable. To verify:
+Clients MUST verify a kind 8333 event on-chain before counting it toward a zap total or displaying its amount. The `amount` tag is self-reported by the sender and would otherwise be trivially spoofable. Verification has two modes depending on the event shape:
+
+*Identity-recipient mode* (the event has `p` tags — profile zaps, event zaps, community splits):
 
 1. Extract the txid from the `i` tag.
 2. Fetch the transaction from a Bitcoin data source (e.g. a mempool.space-compatible Esplora API).
 3. For each `p` tag, derive the recipient's expected Taproot address.
 4. Sum the values of all outputs in the transaction that pay any of the derived recipient addresses. This is the **verified amount**. Change outputs paying back to the **sender's** derived Taproot address MUST NOT be counted toward the verified amount — only outputs to listed recipients.
-5. If the verified amount is 0 (no listed recipient received anything in the tx), the event SHOULD be discarded.
+
+*Campaign-wallet mode* (the event has an `a` tag pointing at a kind 33863 campaign and no `p` tags):
+
+1. Extract the txid from the `i` tag and the campaign coordinate from the `a` tag.
+2. Fetch the campaign event and read its `w` tag to get the campaign's declared bech32(m) wallet address. Reject the receipt if `w` is missing, malformed, or starts with `sp1` (silent-payment campaigns do not publish receipts; see Kind 33863).
+3. Fetch the transaction from a Bitcoin data source.
+4. Sum the values of all outputs in the transaction that pay the campaign's `w` address. This is the **verified amount**.
+
+In both modes:
+
+5. If the verified amount is 0, the event SHOULD be discarded.
 6. If the sender's `amount` tag exceeds the verified amount, clients MAY discard the event or MAY display the smaller verified amount (capping). Clients MUST NOT display or count the claimed amount when it exceeds the verified amount.
 7. Unconfirmed transactions MAY be displayed as pending; clients MAY require confirmation before counting them toward public totals. Because unconfirmed transactions can be evicted (RBF, double-spend), clients SHOULD either exclude them from aggregate zap totals or clearly label them as pending.
 
@@ -199,40 +230,54 @@ The two zap kinds are complementary. Clients SHOULD sum verified amounts from bo
 
 ---
 
-## Kind 30223: Campaign
+## Kind 33863: Campaign
 
 ### Summary
 
-Addressable event representing a **fundraising campaign**. A campaign carries the marketing-style metadata you would expect on GoFundMe, Kickstarter, or GiveSendGo (title, summary, cover image, story, category, goal, optional deadline, and recommended country), and — most importantly — a list of recipient pubkeys (`p` tags) that share the proceeds of any donation.
+Addressable event representing a **self-authored fundraising campaign**. A campaign carries marketing-style metadata (title, summary, banner image, markdown story, optional goal, optional deadline, optional country) and exactly one Bitcoin wallet endpoint declared in a `w` tag. The wallet endpoint is either a public on-chain bech32(m) address (`bc1q…`, `bc1p…`) or a silent-payment code (`sp1…`, per BIP-352). The mode is inferred from the prefix — the client renders the corresponding QR code and adjusts the donation-progress UI accordingly.
 
-Donations are sent as a **single Bitcoin on-chain transaction** with one output per recipient. The donor's wallet derives each recipient's Taproot address from their pubkey via BIP-340/BIP-341 (the same scheme used by kind 8333 onchain zaps), so the campaign event itself does not need to carry Bitcoin addresses. After broadcasting the funding tx, the donor's client publishes one kind 8333 event referencing the `txid`, listing every campaign recipient under its own `p` tag, and tagging the campaign via `a` / `K`. The donation then shows up in the campaign's totals and in each recipient's profile zap history (the `#p` filter matches every listed recipient).
+The author of the event is also the beneficiary. Campaigns are never authored on behalf of someone else; the event creator owns the wallet declared in `w` and receives the donations. To stop accepting donations, the creator publishes a NIP-09 kind 5 deletion request referencing the campaign's `a` coordinate.
 
-The kind is addressable so the creator can edit the story, image, goal, deadline, and recipient list over the life of the campaign without minting new identifiers. The `d` tag is the campaign's slug.
+The kind is addressable so the creator can edit the story, banner, goal, deadline, and wallet over the life of the campaign without minting new identifiers. The `d` tag is the campaign's slug.
 
 ### Event Structure
 
 ```json
 {
-  "kind": 30223,
+  "kind": 33863,
   "pubkey": "<creator-pubkey>",
   "content": "<markdown story>",
   "tags": [
-    ["d", "save-the-bookstore"],
+    ["d", "save-the-last-bookstore"],
+
     ["title", "Save the Last Bookstore"],
     ["summary", "Help our 40-year-old neighborhood bookstore make rent through winter."],
-    ["image", "https://example.com/cover.jpg"],
-    ["t", "human-rights"],
-    ["t", "legal-defense"],
-    ["goal", "10000000"],
+    ["banner", "https://blossom.example/abc123.jpg"],
+    ["imeta",
+      "url https://blossom.example/abc123.jpg",
+      "m image/jpeg",
+      "x abc123def456...",
+      "dim 1600x900",
+      "blurhash LKO2?U%2Tw=w]~RBVZRi};RPxuwH",
+      "alt Storefront of the Last Bookstore at dusk"
+    ],
+    ["alt", "Fundraising campaign: Save the Last Bookstore"],
+
+    ["w", "bc1p7w2k3xq9...xyz"],
+
+    ["goal", "25000"],
     ["deadline", "1735689600"],
-    ["i", "iso3166:VE"],
-    ["k", "iso3166"],
-    ["p", "<recipient-1-hex-pubkey>", "wss://relay.example", "2"],
-    ["p", "<recipient-2-hex-pubkey>", "wss://relay.example", "1"],
-    ["p", "<recipient-3-hex-pubkey>"],
-    ["alt", "Fundraising campaign: Save the Last Bookstore"]
+
+    ["i", "iso3166-1:US"],
+    ["k", "iso3166-1"]
   ]
 }
+```
+
+A silent-payment campaign is identical except the `w` tag carries an `sp1…` code:
+
+```json
+["w", "sp1qq...verylongsilentpaymentcode..."]
 ```
 
 ### Content
@@ -241,90 +286,105 @@ The `content` field is the **campaign story**, formatted as Markdown. Clients SH
 
 ### Tags
 
-| Tag        | Required | Description                                                                                                                                                       |
-|------------|----------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `d`        | Yes      | Campaign slug, unique per author. Forms the addressable coordinate `30223:<pubkey>:<d>`.                                                                          |
-| `title`    | Yes      | Display title of the campaign (plain text, max ~200 chars).                                                                                                       |
-| `summary`  | Recommended | Short one-paragraph tagline shown in feed cards and previews.                                                                                                  |
-| `image`    | Recommended | HTTPS URL of the cover image (jpg/png/webp). Clients MUST sanitize and verify the URL before rendering.                                                       |
-| `t`        | Recommended | Topic tag for discovery and filtering (e.g. `human-rights`, `legal-defense`, `independent-media`). Multiple `t` tags MAY be used. Clients SHOULD normalize user-entered tag labels by removing a leading `#`, lowercasing, and replacing whitespace with hyphens. |
-| `goal`     | Recommended | Fundraising goal in **satoshis** (decimal integer). Omit if the campaign has no fixed goal.                                                                       |
-| `deadline` | Optional | Unix timestamp (seconds) at which the campaign closes. After the deadline, clients SHOULD show the campaign as ended but MAY still accept donations.              |
-| `i`        | Recommended | NIP-73 country identifier for sorting and discovery. SHOULD be `iso3166:<code>` with an uppercase ISO 3166-1 alpha-2 country code (e.g. `iso3166:VE`).              |
-| `k`        | Recommended if `i` is present | NIP-73 external content kind. For country identifiers this SHOULD be `iso3166`.                                                        |
-| `location` | Legacy | Human-readable location string used by older campaign events. New events SHOULD prefer `i` + `k` country tags. Clients MAY display this as a fallback only.          |
-| `status`   | Optional | Lifecycle status. The only defined value is `archived`, which marks the campaign closed without deleting it. Other values SHOULD be ignored. See *Closing & archiving* below. |
-| `p`        | Yes (≥1) | Recipient pubkey. The 2nd element is the hex pubkey; the 3rd (optional) is a relay hint; the 4th (optional) is a positive decimal **weight** for split allocation. |
-| `alt`      | Recommended | NIP-31 human-readable fallback.                                                                                                                                   |
+| Tag       | Required | Description                                                                                                                                                                                                                  |
+|-----------|----------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `d`       | Yes      | Campaign slug, unique per author. Forms the addressable coordinate `33863:<pubkey>:<d>`.                                                                                                                                     |
+| `title`   | Yes      | Display title of the campaign (plain text, max ~200 chars).                                                                                                                                                                  |
+| `w`       | Yes      | Bitcoin wallet endpoint. The 2nd element is a single bech32(m) string: a mainnet on-chain address starting with `bc1q` (P2WPKH/P2WSH) or `bc1p` (P2TR), **or** a silent-payment code starting with `sp1` per BIP-352. Exactly one `w` tag per campaign. |
+| `summary` | Recommended | Short one-paragraph tagline shown in feed cards and previews.                                                                                                                                                              |
+| `banner`  | Recommended | HTTPS URL of the wide banner image. Clients MUST sanitize the URL (see `sanitizeUrl()` in `nostr-security`) before rendering, and SHOULD pair the URL with a NIP-92 `imeta` tag for dimensions, blurhash, MIME type, and SHA-256. |
+| `imeta`   | Recommended | NIP-92 media metadata for the banner. The first `url <value>` pair MUST match the `banner` URL; clients SHOULD ignore an `imeta` whose URL does not match.                                                                  |
+| `goal`    | Optional | Fundraising goal in **integer US Dollars** (no unit suffix, no decimals). Clients MAY display an estimated sat-equivalent at view time using a live exchange rate.                                                          |
+| `deadline`| Optional | Unix timestamp (seconds) at which the campaign closes for new donations. After the deadline, clients SHOULD show the campaign as ended but MAY still accept donations.                                                       |
+| `i`       | Recommended | NIP-73 country identifier. SHOULD be `iso3166-1:<code>` with an uppercase ISO 3166-1 alpha-2 country code (e.g. `iso3166-1:VE`).                                                                                          |
+| `k`       | Recommended if `i` is present | NIP-73 external content kind. For country identifiers this SHOULD be `iso3166-1`.                                                                                                              |
+| `alt`     | Recommended | NIP-31 human-readable fallback.                                                                                                                                                                                            |
 
-### Recipient Split Rules
+### Wallet Modes
 
-When a donor sends an amount `T` in satoshis to a campaign:
+The prefix of the `w` value selects one of two donation modes. Clients MUST detect the mode from the prefix; the event carries no other mode discriminator.
 
-1. Read all `p` tags from the campaign event.
-2. Parse the weight of each `p` tag from the 4th element. If absent, malformed, or non-positive, the weight defaults to **1**.
-3. Compute each recipient's share as `floor(T * weight_i / sum_of_weights)` satoshis.
-4. Any remainder from rounding (at most N−1 sats) MAY be appended to the largest share or kept by the donor as change — clients SHOULD prefer appending the remainder to the largest share so the full amount reaches the campaign.
-5. If any computed share is below the Bitcoin dust limit (546 sats for P2TR), the donor's client MUST refuse the donation and surface a minimum-amount error.
+| Prefix              | Mode      | Description                                                                                                                              |
+|---------------------|-----------|------------------------------------------------------------------------------------------------------------------------------------------|
+| `bc1q…` / `bc1p…`   | On-chain  | Public mainnet bech32(m) address. Donations are traceable; clients show a progress bar, total raised, and donation list.                |
+| `sp1…`              | Silent payment | BIP-352 silent-payment code. Donations are **unlinkable by design**. Clients MUST hide all aggregate totals and progress UI (see below). |
 
-Equal splits are the default: omit the weight on every `p` tag, and all recipients receive `floor(T / N)` sats each.
+Other prefixes (`tb1…`, `bcrt1…`, `tsp1…`, lightning invoices, etc.) MUST be rejected at parse time; the campaign does not render.
 
-### Donation Flow
+Clients SHOULD validate the bech32(m) checksum of the `w` value, not just its prefix.
 
-1. Donor opens the campaign and chooses an amount in sats (preset or custom).
-2. Donor's client computes per-recipient amounts using the split rules above.
-3. Donor's client builds a **single PSBT** with one output per recipient (paying each recipient's derived Taproot address) plus a change output back to the donor.
-4. Donor signs the PSBT with their Nostr key (Taproot key-path spend) and broadcasts the resulting transaction.
-5. Donor's client publishes **one kind 8333 event for the whole transaction**, listing every recipient under its own `p` tag. The event MUST include:
+### Client Behavior by Mode
+
+| UI element                  | On-chain (`bc1`)                                                | Silent payment (`sp1`)                                |
+|-----------------------------|-----------------------------------------------------------------|-------------------------------------------------------|
+| QR code                     | bech32(m) address QR (or BIP-21 `bitcoin:` URI)                 | SP code QR (BIP-352 / BIP-21 SP extension)             |
+| "Raised X" / progress bar   | Shown, computed from verified kind 8333 receipts                | **Hidden.** Replaced with a "Private campaign — totals are not public" notice. |
+| Donor / recent-donation list| Shown                                                           | **Hidden.**                                            |
+| Goal display                | Shown as USD target with optional sat-equivalent estimate       | Shown as USD target; no progress computation           |
+| Donation receipt published  | Donor's client publishes a kind 8333 receipt (see below)        | **No receipt published.** Publishing one would defeat SP unlinkability and is forbidden. |
+
+For silent-payment campaigns, clients MUST NOT attempt to scan the chain, MUST NOT publish receipts, and MUST NOT display any aggregate that could leak donation activity. The only signal the public sees is the campaign event itself.
+
+### Donation Flow — On-chain (`bc1`)
+
+1. Donor opens the campaign and chooses an amount.
+2. Donor's client constructs and broadcasts a Bitcoin transaction paying the campaign's `w` address.
+3. After broadcast, the donor's client publishes a single kind 8333 receipt:
 
    ```json
    [
      ["i", "bitcoin:tx:<txid>"],
-     ["p", "<recipient-1-pubkey>"],
-     ["p", "<recipient-2-pubkey>"],
-     ["p", "<recipient-3-pubkey>"],
-     ["amount", "<total-sats-paid-to-all-recipients>"],
-     ["a", "30223:<campaign-author-pubkey>:<campaign-d-tag>"],
-     ["K", "30223"],
+     ["amount", "<sats-paid-to-campaign-wallet>"],
+     ["a", "33863:<campaign-author-pubkey>:<campaign-d-tag>"],
+     ["K", "33863"],
      ["alt", "Donation to <campaign-title>: <total-amount> sats"]
    ]
    ```
 
-   The `amount` tag is the sum of the outputs paying the listed recipients (i.e. the full donation, excluding the donor's change). Per-recipient amounts are not encoded in the event; clients that need them recompute them from the on-chain transaction by matching each recipient's derived Taproot address against the tx outputs.
+   The receipt MUST NOT carry `p` tags — campaigns are not Nostr-identity recipients. The `amount` tag is the sum of tx outputs paying the campaign's `w` address (excluding the donor's change output).
 
-This mirrors the community batch-zap pattern documented in the kind 8333 section above, with the campaign's addressable coordinate replacing the community coordinate.
+4. The receipt is published **after** the tx is broadcast; the txid is already final at that point. A receipt-publish failure does not roll back the donation — the on-chain transaction stands.
+
+### Donation Flow — Silent Payment (`sp1`)
+
+1. Donor opens the campaign and chooses an amount.
+2. Donor's client uses the campaign's SP code to derive a fresh, one-time Taproot output script per BIP-352.
+3. Donor broadcasts a Bitcoin transaction paying that derived output.
+4. **No Nostr event is published.** The campaign owner discovers the donation by scanning the chain locally with their SP private key.
+
+Silent-payment unlinkability is the entire point of this mode. Clients MUST NOT publish receipts, MUST NOT advertise the donation in any other Nostr event (replies, mentions, etc.) on the donor's behalf, and MUST NOT correlate the donor's pubkey with the campaign in any persisted client telemetry.
 
 ### Querying
 
 **List campaigns (newest first):**
 
 ```json
-{ "kinds": [30223], "limit": 50 }
-```
-
-**Filter by category:**
-
-```json
-{ "kinds": [30223], "#t": ["medical"], "limit": 50 }
+{ "kinds": [33863], "limit": 50 }
 ```
 
 **Fetch a specific campaign:**
 
 ```json
-{ "kinds": [30223], "authors": ["<creator-pubkey>"], "#d": ["<slug>"], "limit": 1 }
+{ "kinds": [33863], "authors": ["<creator-pubkey>"], "#d": ["<slug>"], "limit": 1 }
 ```
 
-**Aggregate donations for a campaign:**
+**Aggregate donations for an on-chain campaign:**
 
 ```json
-{ "kinds": [8333], "#a": ["30223:<creator-pubkey>:<slug>"], "limit": 500 }
+{ "kinds": [8333], "#a": ["33863:<creator-pubkey>:<slug>"], "limit": 500 }
 ```
 
-Clients MUST verify each kind 8333 event on-chain before counting it toward the campaign total, per the verification rules in the kind 8333 section.
+Clients MUST verify each kind 8333 event on-chain before counting it toward the campaign total, per the *Campaign-wallet mode* verification rules in the kind 8333 section.
+
+**Filter by country:**
+
+```json
+{ "kinds": [33863], "#i": ["iso3166-1:VE"], "limit": 50 }
+```
 
 **Fetch pinned event comments:**
 
-Event owners MAY pin important comments or activity feed events with a NIP-78 app-specific data event (`kind: 30078`) authored by the root event owner. The `d` tag is scoped to the root event coordinate. Agora uses this for campaigns (`30223`), pledges (`36639`), organizations (`34550`), and calendar events (`31922` / `31923`).
+Event owners MAY pin important comments or activity feed events with a NIP-78 app-specific data event (`kind: 30078`) authored by the root event owner. The `d` tag is scoped to the root event coordinate. Agora uses this for campaigns (`33863`), pledges (`36639`), organizations (`34550`), and calendar events (`31922` / `31923`).
 
 ```json
 {
@@ -350,14 +410,15 @@ The `pinnedEvents` array is ordered newest pin first. Pinning an already-pinned 
 
 ### Client Behavior
 
-- **Recipient validity:** clients SHOULD reject `p` tag entries whose pubkey is not 64 hex characters and SHOULD ignore weights that are not positive finite decimals.
-- **Dust protection:** when a donor enters an amount that would assign any recipient less than the dust limit, the client MUST block the donation and either suggest the minimum viable total or prompt the donor to remove recipients.
-- **Editability:** the creator MAY republish the same `(kind, pubkey, d)` triple to update the campaign. Clients SHOULD keep `published_at` from the first publish on subsequent edits (NIP-23 convention).
-- **Closing & archiving:** the creator MAY soft-close a campaign by republishing it with a `["status", "archived"]` tag. Clients SHOULD hide archived campaigns from discovery feeds and disable the donate flow, but MUST keep them reachable by direct link so existing donors can still find them and donation history is preserved. The creator can reopen the campaign by republishing without the status tag (or with any other status value). For a hard delete, the creator MAY publish a NIP-09 kind 5 deletion request referencing the campaign's `a` coordinate; clients SHOULD continue to render past donations against the campaign even after deletion.
+- **Wallet validity:** clients MUST reject events whose `w` tag is missing, present more than once, or whose value does not pass bech32(m) checksum validation for one of the supported prefixes. Invalid campaigns do not render.
+- **Editability:** the creator MAY republish the same `(33863, pubkey, d)` triple to update any field, including the `w` wallet endpoint. Clients SHOULD keep `published_at` from the first publish on subsequent edits (NIP-23 convention).
+- **Closing a campaign:** there is no `status` tag. To stop accepting donations, the creator publishes a NIP-09 kind 5 deletion request referencing the campaign's `a` coordinate. Clients SHOULD honor the deletion by removing the campaign from discovery feeds. Historical kind 8333 receipts MAY still be rendered against the (now-deleted) campaign coordinate so donors can find their past donations.
+- **No category, no topics:** kind 33863 events MUST NOT carry `t` tags or NIP-32 category labels in any `agora.*` namespace. Campaigns are individual stories; discovery happens via search (NIP-50 against title/summary/content), country (`#i`), and moderator curation (below).
+- **Migration:** kind 33863 has no relationship to any earlier campaign kind. Clients MUST NOT read, merge, or migrate events of any other kind into the kind 33863 namespace.
 
 ### Campaign Moderation Labels
 
-Agora curates which kind 30223 campaigns appear on the homepage (`/`) and on the Support directory (`/campaigns/all`) via moderator-signed NIP-32 label events (kind 1985) in a dedicated label namespace. The campaign event itself is never modified — surfacing is purely a client-side rollup of label events.
+Agora curates which kind 33863 campaigns appear on the homepage (`/`) and on the Support directory (`/campaigns/all`) via moderator-signed NIP-32 label events (kind 1985) in a dedicated label namespace. The campaign event itself is never modified — surfacing is purely a client-side rollup of label events.
 
 #### Namespace
 
@@ -397,7 +458,7 @@ Surfacing rules (hide always wins):
   "tags": [
     ["L", "agora.moderation"],
     ["l", "approved", "agora.moderation"],
-    ["a", "30223:<author-pubkey>:<campaign-d-tag>"],
+    ["a", "33863:<author-pubkey>:<campaign-d-tag>"],
     ["alt", "Campaign moderation: approved"]
   ]
 }
@@ -409,7 +470,7 @@ Required tags:
 
 - `L` set to `agora.moderation`.
 - `l` with the label value as the 2nd element and `agora.moderation` as the 3rd.
-- `a` referencing the campaign coordinate `30223:<pubkey>:<d>`.
+- `a` referencing the campaign coordinate `33863:<pubkey>:<d>`.
 - `alt` (NIP-31) — clients without label support will display this string.
 
 #### Trust Model
@@ -422,7 +483,7 @@ pubkey:     932614571afcbad4d17a191ee281e39eebbb41b93fac8fd87829622aeb112f4d
 d-tag:      k4p5w0n22suf
 ```
 
-The pack `p` tags are the authoritative moderator list. Anyone may publish a kind 1985 event in the `agora.moderation` namespace, but events from non-pack authors are silently ignored at the relay-filter layer (`authors:` is pinned to the pack `p` tags). This means:
+The pack `p` tags are the authoritative moderator list. Clients MUST pin `authors:` on their label REQ to the pack `p` tags; events from non-pack authors MUST be ignored. This means:
 
 - Self-approval is impossible unless the pack author has added you.
 - A moderator removed from the pack immediately loses moderation authority — campaigns kept alive only by their labels return to "pending" until another moderator approves them.
