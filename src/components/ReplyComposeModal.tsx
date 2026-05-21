@@ -13,6 +13,8 @@ import { ComposeBox, type ExternalReplyRoot } from '@/components/ComposeBox';
 import { LinkEmbed } from '@/components/LinkEmbed';
 import { cn } from '@/lib/utils';
 
+const AGORA_DEFAULT_NOTE_TAGS = [['t', 'agora']];
+
 interface ReplyComposeModalProps {
   /** The event being replied to, a URL for commenting on web content, or a NIP-73 identifier (e.g. `bitcoin:tx:...`, `isbn:...`). When `null`, the modal acts as a "New post" composer. */
   event?: NostrEvent | ExternalReplyRoot | null;
@@ -160,6 +162,7 @@ export function ReplyComposeModal({ event, quotedEvent, open, onOpenChange, onSu
               onHasPreviewableContentChange={setHasPreviewableContent}
               initialContent={initialContent}
               initialMode={initialMode}
+              defaultTags={!isReply && !isQuote && initialMode !== 'poll' ? AGORA_DEFAULT_NOTE_TAGS : undefined}
             />
           </div>
         </PortalContainerProvider>

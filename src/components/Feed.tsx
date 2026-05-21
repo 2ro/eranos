@@ -53,6 +53,7 @@ interface FeedProps {
 
 const FEED_BACKDROP_HUE_INTERVAL_MS = 45_000;
 const FEED_BACKDROP_HUE_FADE_MS = 18_000;
+const AGORA_DEFAULT_NOTE_TAGS = [['t', 'agora']];
 
 function FeedGlobeBackground() {
   const [hueIndex, setHueIndex] = useState(0);
@@ -302,7 +303,7 @@ export function Feed({ kinds, tagFilters, header, hideCompose, emptyMessage, fee
           <LandingHero onJoinClick={() => setAuthDialogOpen(true)} />
         )}
 
-        {!hideCompose && <ComposeBox compact hideBorder className={transparentFeedSurfaceClassName} />}
+        {!hideCompose && <ComposeBox compact hideBorder className={transparentFeedSurfaceClassName} defaultTags={AGORA_DEFAULT_NOTE_TAGS} />}
 
         {/* Tabs (logged in) */}
         {user && (

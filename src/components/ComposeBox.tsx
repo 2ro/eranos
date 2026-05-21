@@ -156,6 +156,8 @@ interface ComposeBoxProps {
   hidePoll?: boolean;
   /** Label for the primary submit button. */
   submitLabel?: string;
+  /** Tags added to new top-level kind 1 notes without putting them in content. */
+  defaultTags?: string[][];
 }
 
 /** Circular progress ring for character count. */
@@ -214,6 +216,7 @@ export function ComposeBox({
   customPublish,
   hidePoll = false,
   submitLabel = 'Post!',
+  defaultTags = [],
 }: ComposeBoxProps) {
   const { user, metadata, isLoading: isProfileLoading } = useCurrentUser();
   const userProfileUrl = useProfileUrl(user?.pubkey ?? '', metadata);
@@ -1111,7 +1114,7 @@ export function ComposeBox({
         await createEvent({
           kind: 1,
           content: finalContent,
-          tags,
+          tags: [...defaultTags, ...tags],
           created_at: Math.floor(Date.now() / 1000),
         });
       }
