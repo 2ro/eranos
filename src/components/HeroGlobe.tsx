@@ -313,8 +313,8 @@ export function HeroGlobe({
             <stop offset="100%" stopColor={hue.glow} stopOpacity="0" />
           </radialGradient>
           {/* Soft highlight in the upper-left to sell the sphere shape. */}
-          <radialGradient id="hero-globe-highlight" cx="28%" cy="22%" r="38%">
-            <stop offset="0%" stopColor="hsl(50 100% 98% / 0.85)" />
+          <radialGradient id="hero-globe-highlight" cx="30%" cy="25%" r="35%">
+            <stop offset="0%" stopColor="hsl(50 100% 98% / 0.58)" />
             <stop offset="100%" stopColor="hsl(50 100% 98% / 0)" />
           </radialGradient>
           {/* Marker glow halo. Soft, warm, no pulsing. */}

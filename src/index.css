@@ -753,3 +753,28 @@
   .hero-pan-right, .hero-pan-left { animation: none; }
   .hero-globe-halo-breath { animation: none; opacity: 0.42; }
 }
+
+/* Dark drop-shadow for hero copy — photo backgrounds are always colorful,
+   so we want a dark shadow regardless of light/dark theme. */
+.hero-text-shadow {
+  text-shadow:
+    0 2px 8px rgba(0, 0, 0, 0.8),
+    0 0 20px rgba(0, 0, 0, 0.45);
+}
+
+.hero-text-shadow-soft {
+  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.65);
+}
+
+/* On mobile the globe sits under the headline — soften its left edge. */
+.hero-globe-mask {
+  -webkit-mask-image: linear-gradient(to right, transparent 0%, black 48%, black 100%);
+  mask-image: linear-gradient(to right, transparent 0%, black 48%, black 100%);
+}
+
+@media (min-width: 640px) {
+  .hero-globe-mask {
+    -webkit-mask-image: none;
+    mask-image: none;
+  }
+}
