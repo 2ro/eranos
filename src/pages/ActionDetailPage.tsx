@@ -17,7 +17,6 @@ import { useAction, type Action } from '@/hooks/useActions';
 import { useAuthor } from '@/hooks/useAuthor';
 import { useBitcoinWallet } from '@/hooks/useBitcoinWallet';
 import { useComments } from '@/hooks/useComments';
-import { useEventStats } from '@/hooks/useTrending';
 import { useProfileUrl } from '@/hooks/useProfileUrl';
 import { useSubmissionZapTotals } from '@/hooks/useSubmissionZapTotals';
 import { useToast } from '@/hooks/useToast';
@@ -33,13 +32,10 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { Skeleton } from '@/components/ui/skeleton';
+import { DetailCommentComposer } from '@/components/DetailCommentComposer';
 import { PostActionBar } from '@/components/PostActionBar';
 import { ReplyComposeModal } from '@/components/ReplyComposeModal';
 import { NoteMoreMenu } from '@/components/NoteMoreMenu';
-import {
-  InteractionsModal,
-  type InteractionTab,
-} from '@/components/InteractionsModal';
 import { ThreadedReplyList, type ReplyNode } from '@/components/ThreadedReplyList';
 import NotFound from '@/pages/NotFound';
 
@@ -81,13 +77,10 @@ function PledgeDetailContent({ action }: { action: Action }) {
   const author = useAuthor(action.pubkey);
   const navigate = useNavigate();
   const { toast } = useToast();
-  const { data: engagementStats } = useEventStats(action.event.id, action.event);
   const { data: commentsData, isLoading: commentsLoading } = useComments(action.event, 500);
 
   const [replyOpen, setReplyOpen] = useState(false);
   const [moreMenuOpen, setMoreMenuOpen] = useState(false);
-  const [interactionsOpen, setInteractionsOpen] = useState(false);
-  const [interactionsTab, setInteractionsTab] = useState<InteractionTab>('reposts');
 
   const topLevel = useMemo(
     () => commentsData?.topLevelComments ?? [],
@@ -136,11 +129,6 @@ function PledgeDetailContent({ action }: { action: Action }) {
   const deadline = action.deadline ? formatDeadline(action.deadline) : null;
   const cover = sanitizeUrl(action.image);
   const progressValue = action.bounty > 0 ? Math.min(100, Math.round((fundedSats / action.bounty) * 100)) : 0;
-  const hasStats =
-    !!engagementStats?.replies ||
-    !!engagementStats?.reposts ||
-    !!engagementStats?.quotes ||
-    !!engagementStats?.reactions;
 
   const naddr = nip19.naddrEncode({
     kind: 36639,
@@ -155,11 +143,6 @@ function PledgeDetailContent({ action }: { action: Action }) {
     }),
     [action.event],
   );
-
-  const openInteractions = (tab: InteractionTab) => {
-    setInteractionsTab(tab);
-    setInteractionsOpen(true);
-  };
 
   const handleShare = async () => {
     const url = `${window.location.origin}/${naddr}`;
@@ -187,6 +170,17 @@ function PledgeDetailContent({ action }: { action: Action }) {
         onBack={() => navigate(-1)}
       />
 
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 mt-3">
+        <div className="rounded-2xl bg-card border border-border/60 shadow-sm px-4 sm:px-5 py-3">
+          <PostActionBar
+            event={action.event}
+            replyLabel="Submit"
+            onReply={() => setReplyOpen(true)}
+            onMore={() => setMoreMenuOpen(true)}
+          />
+        </div>
+      </div>
+
       <div className="max-w-6xl mx-auto px-4 sm:px-6 py-6 lg:py-10">
         <div className="lg:flex lg:gap-8 lg:items-start">
           <div className="lg:hidden mb-6">
@@ -205,39 +199,7 @@ function PledgeDetailContent({ action }: { action: Action }) {
             <PledgeStory storyEvent={storyEvent} hasContent={action.description.trim().length > 0} />
 
             <div id="pledge-activity" className="scroll-mt-20">
-              <div className="rounded-2xl bg-card border border-border/60 shadow-sm px-4 sm:px-5 py-4 sm:py-5">
-                {hasStats && (
-                  <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs sm:text-sm text-muted-foreground">
-                    {engagementStats?.reposts ? (
-                      <button onClick={() => openInteractions('reposts')} className="hover:underline transition-colors">
-                        <span className="font-bold text-foreground">{engagementStats.reposts.toLocaleString()}</span>{' '}
-                        Repost{engagementStats.reposts !== 1 ? 's' : ''}
-                      </button>
-                    ) : null}
-                    {engagementStats?.quotes ? (
-                      <button onClick={() => openInteractions('quotes')} className="hover:underline transition-colors">
-                        <span className="font-bold text-foreground">{engagementStats.quotes.toLocaleString()}</span>{' '}
-                        Quote{engagementStats.quotes !== 1 ? 's' : ''}
-                      </button>
-                    ) : null}
-                    {engagementStats?.reactions ? (
-                      <button onClick={() => openInteractions('reactions')} className="hover:underline transition-colors">
-                        <span className="font-bold text-foreground">{engagementStats.reactions.toLocaleString()}</span>{' '}
-                        Like{engagementStats.reactions !== 1 ? 's' : ''}
-                      </button>
-                    ) : null}
-                  </div>
-                )}
-
-                <PostActionBar
-                  event={action.event}
-                  replyLabel="Submit"
-                  onReply={() => setReplyOpen(true)}
-                  onMore={() => setMoreMenuOpen(true)}
-                />
-              </div>
-
-              <div className="mt-6">
+              <div>
                 <div className="flex items-baseline justify-between gap-3 mb-3 px-1">
                   <h2 className="text-lg font-semibold tracking-tight">Submissions</h2>
                   {topLevel.length > 0 ? (
@@ -246,6 +208,12 @@ function PledgeDetailContent({ action }: { action: Action }) {
                     </span>
                   ) : null}
                 </div>
+
+                <DetailCommentComposer
+                  event={action.event}
+                  placeholder="Share proof, evidence, or completed work..."
+                  className="mb-3"
+                />
 
                 {commentsLoading && replyTree.length === 0 ? (
                   <div className="space-y-3">
@@ -289,12 +257,6 @@ function PledgeDetailContent({ action }: { action: Action }) {
 
       <ReplyComposeModal event={action.event} open={replyOpen} onOpenChange={setReplyOpen} />
       <NoteMoreMenu event={action.event} open={moreMenuOpen} onOpenChange={setMoreMenuOpen} />
-      <InteractionsModal
-        eventId={action.event.id}
-        open={interactionsOpen}
-        onOpenChange={setInteractionsOpen}
-        initialTab={interactionsTab}
-      />
     </main>
   );
 }

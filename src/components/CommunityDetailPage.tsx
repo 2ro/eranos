@@ -25,6 +25,7 @@ import type { NostrEvent, NostrMetadata } from '@nostrify/nostrify';
 import { CampaignCard } from '@/components/CampaignCard';
 import { PeopleAvatarStack } from '@/components/PeopleAvatarStack';
 import { PostActionBar } from '@/components/PostActionBar';
+import { DetailCommentComposer } from '@/components/DetailCommentComposer';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -35,7 +36,6 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { DonateDialog } from '@/components/DonateDialog';
 import { NoteContent } from '@/components/NoteContent';
 import { FollowToggleButton } from '@/components/FollowButton';
-import { InteractionsModal, type InteractionTab } from '@/components/InteractionsModal';
 import { NoteMoreMenu } from '@/components/NoteMoreMenu';
 import { ReplyComposeModal } from '@/components/ReplyComposeModal';
 import { ThreadedReplyList, type ReplyNode } from '@/components/ThreadedReplyList';
@@ -618,8 +618,6 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
   const [donateOpen, setDonateOpen] = useState(false);
   const [replyOpen, setReplyOpen] = useState(false);
   const [moreMenuOpen, setMoreMenuOpen] = useState(false);
-  const [interactionsOpen, setInteractionsOpen] = useState(false);
-  const [interactionsTab, setInteractionsTab] = useState<InteractionTab>('reposts');
 
   // Parse community definition
   const community = useMemo(() => parseCommunityEvent(event), [event]);
@@ -765,21 +763,8 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
   }, [community, event.kind, event.pubkey]);
 
   // ── Engagement stats for the community event itself ──────────────────────
-  // Pulled from NIP-85. Used both for the inline counters above the action
-  // bar and for the threaded-comments header. Matches the rhythm of the
-  // campaign and pledge detail pages.
+  // Pulled from NIP-85 for the threaded-comments header.
   const { data: engagementStats, isLoading: statsLoading } = useEventStats(event.id, event);
-  const hasStats =
-    !!engagementStats?.replies ||
-    !!engagementStats?.reposts ||
-    !!engagementStats?.quotes ||
-    !!engagementStats?.reactions;
-
-  const openInteractions = useCallback((tab: InteractionTab) => {
-    setInteractionsTab(tab);
-    setInteractionsOpen(true);
-  }, []);
-
   const replyTree = useMemo((): ReplyNode[] => {
     if (!commentsData) return [];
     const topLevel = commentsData.topLevelComments ?? [];
@@ -977,6 +962,16 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
             </div>
           </div>
 
+          <div className="mt-3 rounded-2xl bg-card border border-border/60 shadow-sm px-4 sm:px-5 py-3">
+            <PostActionBar
+              event={event}
+              replyLabel="Comment"
+              hideZap
+              onReply={() => setReplyOpen(true)}
+              onMore={() => setMoreMenuOpen(true)}
+            />
+          </div>
+
           {/* ── Body — single column, pledge-detail-style ─────────────────── */}
           <div className="py-6 lg:py-10 space-y-8">
             {/* Donate (when there's a member set) and Share buttons. Sits
@@ -1022,48 +1017,9 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
               now={now}
             />
 
-            {/* Engagement card — stats counters + post action bar. Matches
-                the pledge / campaign detail layout. No funding progress bar
-                here; an organization isn't a fundraising target itself. */}
+            {/* Comments — NIP-22 thread on the community event itself. */}
             <div id="org-activity" className="scroll-mt-20">
-              <div className="rounded-2xl bg-card border border-border/60 shadow-sm px-4 sm:px-5 py-4 sm:py-5">
-                {hasStats && (
-                  <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs sm:text-sm text-muted-foreground pb-2">
-                    {engagementStats?.reposts ? (
-                      <button onClick={() => openInteractions('reposts')} className="hover:underline transition-colors">
-                        <span className="font-bold text-foreground">{formatNumber(engagementStats.reposts)}</span>{' '}
-                        Repost{engagementStats.reposts !== 1 ? 's' : ''}
-                      </button>
-                    ) : null}
-                    {engagementStats?.quotes ? (
-                      <button onClick={() => openInteractions('quotes')} className="hover:underline transition-colors">
-                        <span className="font-bold text-foreground">{formatNumber(engagementStats.quotes)}</span>{' '}
-                        Quote{engagementStats.quotes !== 1 ? 's' : ''}
-                      </button>
-                    ) : null}
-                    {engagementStats?.reactions ? (
-                      <button onClick={() => openInteractions('reactions')} className="hover:underline transition-colors">
-                        <span className="font-bold text-foreground">{formatNumber(engagementStats.reactions)}</span>{' '}
-                        Like{engagementStats.reactions !== 1 ? 's' : ''}
-                      </button>
-                    ) : null}
-                  </div>
-                )}
-
-                <PostActionBar
-                  event={event}
-                  replyLabel="Comment"
-                  hideZap
-                  onReply={() => setReplyOpen(true)}
-                  onMore={() => setMoreMenuOpen(true)}
-                  className={hasStats ? 'pt-3 border-t border-border/60' : undefined}
-                />
-              </div>
-
-              {/* Comments — NIP-22 thread on the community event itself.
-                  Member-filter aware (see replyTree) and routed through
-                  CommunityModerationContext so per-reply ban actions work. */}
-              <div className="mt-6">
+              <div>
                 <div className="flex items-baseline justify-between gap-3 mb-3 px-1">
                   <h2 className="text-lg font-semibold tracking-tight">Comments</h2>
                   {engagementStats?.replies ? (
@@ -1073,6 +1029,8 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
                     </span>
                   ) : null}
                 </div>
+
+                <DetailCommentComposer event={event} className="mb-3" />
 
                 {commentsLoading && statsLoading && replyTree.length === 0 ? (
                   <div className="space-y-3">
@@ -1193,15 +1151,6 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
         event={event}
         open={moreMenuOpen}
         onOpenChange={setMoreMenuOpen}
-      />
-
-      {/* Tapping a repost / quote / like counter on the stats row opens
-          a modal listing the people who took that action. */}
-      <InteractionsModal
-        eventId={event.id}
-        open={interactionsOpen}
-        onOpenChange={setInteractionsOpen}
-        initialTab={interactionsTab}
       />
 
       </div>
