@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { ArrowRight, MapPin } from 'lucide-react';
+import { ArrowRight, MapPin, ShieldCheck } from 'lucide-react';
 
 import { Skeleton } from '@/components/ui/skeleton';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -10,7 +10,7 @@ import { useAuthor } from '@/hooks/useAuthor';
 import { genUserName } from '@/lib/genUserName';
 import { useCampaignDonations } from '@/hooks/useCampaignDonations';
 import { useBtcPrice } from '@/hooks/useBtcPrice';
-import { formatCampaignAmount } from '@/lib/formatCampaignAmount';
+import { formatCampaignAmount, formatUsdGoal, satsToUsd } from '@/lib/formatCampaignAmount';
 
 interface HeroCampaignSpotlightProps {
   /** Campaign to feature. `null` renders the empty placeholder. */
@@ -39,7 +39,7 @@ export function HeroCampaignSpotlight({
   // when there's no campaign yet we pass an empty pubkey and ignore the
   // (no-op) result below. Same for donations + BTC price.
   const author = useAuthor(campaign?.pubkey ?? '');
-  const { data: stats } = useCampaignDonations(campaign?.aTag);
+  const { data: stats } = useCampaignDonations(campaign ?? undefined);
   const { data: btcPrice } = useBtcPrice();
 
   if (isLoading && !campaign) {
@@ -59,6 +59,7 @@ export function HeroCampaignSpotlight({
   const authorName = meta?.display_name || meta?.name || genUserName(campaign.pubkey);
   const authorPicture = sanitizeUrl(meta?.picture);
   const countryLabel = getCampaignCountryLabel(campaign);
+  const isSilentPayment = campaign.wallet.mode === 'sp';
 
   return (
     <div
@@ -83,12 +84,28 @@ export function HeroCampaignSpotlight({
           so we can tune the bar for legibility on top of a photo: dark
           translucent track, glowing primary fill. When the campaign has no
           goal tag, the bar is omitted entirely and we only show the raised
-          total. */}
-      {(() => {
+          total. Silent-payment campaigns hide totals by design (per
+          NIP.md Kind 33863). */}
+      {isSilentPayment ? (
+        <div className="space-y-1.5 pt-1 max-w-xs">
+          <div className="inline-flex items-center gap-1.5 text-[11px] text-white/85 [text-shadow:none]">
+            <ShieldCheck className="size-3" />
+            <span>Private campaign — totals not public</span>
+          </div>
+          {campaign.goalUsd && campaign.goalUsd > 0 && (
+            <div className="text-[11px] text-white/70 [text-shadow:none]">
+              Target: {formatUsdGoal(campaign.goalUsd)}
+            </div>
+          )}
+        </div>
+      ) : (() => {
         const raised = stats?.totalSats ?? 0;
-        const goal = campaign.goalSats;
+        const goal = campaign.goalUsd;
         const hasGoal = !!goal && goal > 0;
-        const pct = hasGoal ? Math.min(100, Math.round((raised / goal!) * 100)) : 0;
+        const raisedUsd = satsToUsd(raised, btcPrice);
+        const pct = hasGoal && raisedUsd !== undefined
+          ? Math.min(100, Math.round((raisedUsd / goal!) * 100))
+          : 0;
         return (
           <div className="space-y-1.5 pt-1 max-w-xs">
             {hasGoal && (
@@ -106,7 +123,7 @@ export function HeroCampaignSpotlight({
               </span>
               {hasGoal && (
                 <span className="text-white/70">
-                  of {formatCampaignAmount(goal!, btcPrice)} goal
+                  of {formatUsdGoal(goal!)} goal
                 </span>
               )}
             </div>

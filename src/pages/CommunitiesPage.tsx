@@ -482,7 +482,7 @@ function OrganizationActivityFeed({ userOrganizations }: { userOrganizations: Us
 function OrganizationFeedRow({ event }: { event: NostrEvent }) {
   if (event.kind === CAMPAIGN_KIND) {
     const campaign = parseCampaign(event);
-    if (!campaign || campaign.archived) return null;
+    if (!campaign) return null;
     return (
       <div className="p-4 sm:p-5 border-b border-border">
         <CampaignCard campaign={campaign} />

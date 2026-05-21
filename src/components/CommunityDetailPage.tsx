@@ -34,7 +34,6 @@ import { Card } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Skeleton } from '@/components/ui/skeleton';
-import { DonateDialog } from '@/components/DonateDialog';
 import { NoteContent } from '@/components/NoteContent';
 import { FollowToggleButton } from '@/components/FollowButton';
 import { NoteMoreMenu } from '@/components/NoteMoreMenu';
@@ -464,11 +463,9 @@ function OfficialActivityShelves({
   eventsLoading: boolean;
   now: number;
 }) {
-  // Drop archived campaigns; mixed activity is sorted newest publish first.
-  const liveCampaigns = useMemo(
-    () => campaigns.filter((c) => !c.archived),
-    [campaigns],
-  );
+  // All loaded campaigns. Closure is via NIP-09 deletion (relay-level),
+  // so anything that reached us is current.
+  const liveCampaigns = campaigns;
 
   // Drop expired pledges; mixed activity is sorted newest publish first.
   const livePledges = useMemo(() => {
@@ -614,11 +611,8 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
   const navigate = useNavigate();
   const { toast } = useToast();
   const { user } = useCurrentUser();
-  const { btcPrice } = useBitcoinWallet();
-
   const [membersDialogOpen, setMembersDialogOpen] = useState(false);
   const [descriptionDialogOpen, setDescriptionDialogOpen] = useState(false);
-  const [donateOpen, setDonateOpen] = useState(false);
   const [replyOpen, setReplyOpen] = useState(false);
   const [moreMenuOpen, setMoreMenuOpen] = useState(false);
 
@@ -669,29 +663,6 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
   // community. `useCommunityMembers` still resolves moderation state
   // (content bans, reports) used by the comment thread below.
   const { moderation, rankMap, isLoading: membersLoading } = useCommunityMembers(community);
-
-  const communityDonationTarget = useMemo<ParsedCampaign | null>(() => {
-    if (!community) return null;
-    const recipients = [
-      { pubkey: community.founderPubkey, weight: 1 },
-      ...community.moderatorPubkeys.map((pubkey) => ({ pubkey, weight: 1 })),
-    ];
-    return {
-      event,
-      pubkey: event.pubkey,
-      identifier: community.dTag,
-      aTag: community.aTag,
-      title: community.name,
-      summary: community.description,
-      story: community.description,
-      image: community.image,
-      category: 'community',
-      tags: ['community'],
-      recipients,
-      createdAt: event.created_at,
-      archived: false,
-    };
-  }, [community, event]);
 
   // Only the founder can edit organization metadata. Moderators can
   // moderate content via the community context but don't get the
@@ -1008,17 +979,7 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
           <div className="py-6 lg:py-10 space-y-8">
             {/* Donate (when there's a member set) and Share buttons. Sits
                 just below the hero like the pledge page's action row. */}
-            <div className={cn('grid gap-2', communityDonationTarget ? 'grid-cols-4' : 'grid-cols-1')}>
-              {communityDonationTarget && (
-                <Button
-                  size="lg"
-                  className="w-full col-span-3"
-                  onClick={() => setDonateOpen(true)}
-                >
-                  <HandHeart className="size-5 mr-2" />
-                  Donate
-                </Button>
-              )}
+            <div className="grid gap-2 grid-cols-1">
               <Button
                 type="button"
                 variant="outline"
@@ -1102,15 +1063,6 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
             </div>
           </div>
         </CommunityModerationContext.Provider>
-
-      {communityDonationTarget && (
-        <DonateDialog
-          campaign={communityDonationTarget}
-          open={donateOpen}
-          onOpenChange={setDonateOpen}
-          btcPrice={btcPrice}
-        />
-      )}
 
       {/* Description dialog — opened by clicking the truncated description in
           the banner. Renders the full raw description plus a clickable

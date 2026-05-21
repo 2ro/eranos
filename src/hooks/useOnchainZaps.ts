@@ -4,6 +4,7 @@ import type { NostrEvent } from '@nostrify/nostrify';
 
 import { fetchTxDetail, nostrPubkeyToBitcoinAddress } from '@/lib/bitcoin';
 import { useAppContext } from '@/hooks/useAppContext';
+import { CAMPAIGN_KIND, parseCampaign } from '@/lib/campaign';
 /** A single verified on-chain zap, with the amount that actually paid the recipient(s) on-chain. */
 export interface OnchainZapEntry {
   /** The kind 8333 event. */
@@ -13,15 +14,18 @@ export interface OnchainZapEntry {
   /** Pubkey of the sender (the 8333 event author). */
   senderPubkey: string;
   /**
-   * Pubkeys of the recipients (one per `p` tag). For legacy single-recipient
-   * events this has length 1; for multi-output events (campaign donations,
-   * community batch zaps) it has one entry per recipient.
+   * Pubkeys of the recipients (one per `p` tag). For identity zaps this has
+   * length 1 (or more for batch community zaps). For campaign donations
+   * (kind 33863 targets) this is always empty — campaigns are not
+   * Nostr-identity recipients and the receipt carries no `p` tags.
    */
   recipientPubkeys: string[];
   /**
-   * Verified total in sats — sum of tx outputs that pay any of the listed
-   * recipients' derived Taproot addresses. Excludes the sender's change
-   * output even if some helpful soul tagged the sender as a recipient.
+   * Verified total in sats — sum of tx outputs paying any expected
+   * destination. In identity-recipient mode this is "any of the listed
+   * recipients' derived Taproot addresses." In campaign-wallet mode
+   * (target is a kind 33863 campaign) it is "outputs paying the campaign's
+   * `w` address." Excludes the sender's change output in either case.
    */
   amountSats: number;
   /** Sender's self-reported amount tag (may differ from verified). */
@@ -54,9 +58,9 @@ export function extractOnchainZapClaimedAmount(event: NostrEvent): number {
 /**
  * Parse the recipient pubkey(s) from a kind 8333 event.
  *
- * Legacy single-recipient events have exactly one `p` tag; multi-output
- * events (campaigns, community batch zaps) list every recipient under its
- * own `p` tag. Returns the pubkeys in `p`-tag order, deduplicated.
+ * Identity-recipient events carry one or more `p` tags; campaign-donation
+ * events carry none (a campaign is not a Nostr identity). Returns the
+ * pubkeys in `p`-tag order, deduplicated.
  */
 export function extractOnchainZapRecipients(event: NostrEvent): string[] {
   const seen = new Set<string>();
@@ -83,40 +87,81 @@ export function extractOnchainZapRecipient(event: NostrEvent): string {
 }
 
 /**
+ * Returns the addressable coordinate from the receipt's `a` tag if it
+ * points at a kind 33863 campaign, or null otherwise.
+ */
+function extractCampaignTarget(event: NostrEvent): string | null {
+  const aTag = event.tags.find(([n]) => n === 'a')?.[1];
+  if (typeof aTag !== 'string') return null;
+  if (!aTag.startsWith(`${CAMPAIGN_KIND}:`)) return null;
+  return aTag;
+}
+
+/**
  * Verify a kind 8333 on-chain zap event against the Bitcoin blockchain.
  *
- * Returns the verified amount (sum of tx outputs paying any listed
- * recipient's derived Taproot address) and confirmation status. Returns
- * `null` if the event is malformed or the transaction cannot be verified.
+ * Returns the verified amount (sum of tx outputs paying the expected
+ * destination) and confirmation status. Returns `null` if the event is
+ * malformed or the transaction cannot be verified.
  *
- * A verified amount of 0 means the transaction exists but does not pay
- * any listed recipient — callers should discard such events.
+ * Verification has two modes depending on the event shape:
  *
- * @param event       The kind 8333 event to verify.
+ * - **Identity-recipient mode** — event has one or more `p` tags and no
+ *   campaign `a` tag. The expected destinations are the recipients'
+ *   derived Taproot addresses (`nostrPubkeyToBitcoinAddress`).
+ * - **Campaign-wallet mode** — event has an `a` tag pointing at a kind
+ *   33863 campaign and no `p` tags. The expected destination is the
+ *   campaign's declared `w` bech32(m) address. Silent-payment campaigns
+ *   (`w` starts with `sp1…`) cannot be verified on-chain by definition
+ *   and are rejected.
+ *
+ * @param event           The kind 8333 event to verify.
  * @param esploraBaseUrl  Esplora REST root used to fetch the tx detail.
+ * @param campaignWallet  When the receipt targets a kind 33863 campaign,
+ *                        the campaign's `w` value. Required for campaign-wallet
+ *                        mode; ignored otherwise.
  */
 export async function verifyOnchainZap(
   event: NostrEvent,
   esploraBaseUrl: string,
+  campaignWallet?: string,
 ): Promise<OnchainZapEntry | null> {
   const txid = extractOnchainZapTxid(event);
-  const recipientPubkeys = extractOnchainZapRecipients(event);
-  if (!txid || recipientPubkeys.length === 0) return null;
+  if (!txid) return null;
 
-  // Reject self-zaps: the sender already controls each derived destination
-  // address, so any output paying the sender is change. We strip the sender
-  // from the recipient set rather than discarding the whole event so a tx
-  // that pays the sender plus legitimate recipients still verifies for the
-  // others.
-  const externalRecipients = recipientPubkeys.filter((p) => p !== event.pubkey);
-  if (externalRecipients.length === 0) return null;
+  const campaignTarget = extractCampaignTarget(event);
 
-  const recipientAddresses = new Set<string>();
-  for (const pubkey of externalRecipients) {
-    const address = nostrPubkeyToBitcoinAddress(pubkey);
-    if (address) recipientAddresses.add(address);
+  // Determine the set of expected destination addresses for verification.
+  const expectedAddresses = new Set<string>();
+  let recipientPubkeys: string[] = [];
+
+  if (campaignTarget) {
+    // Campaign-wallet mode: match outputs against the campaign's declared
+    // `w` address. Silent-payment campaigns publish no receipts, so a
+    // receipt referencing an `sp1…` campaign is malformed.
+    if (!campaignWallet) return null;
+    if (campaignWallet.startsWith('sp1')) return null;
+    expectedAddresses.add(campaignWallet);
+    // No identity recipients in this mode.
+  } else {
+    // Identity-recipient mode.
+    const recipients = extractOnchainZapRecipients(event);
+    if (recipients.length === 0) return null;
+
+    // Reject self-zaps: the sender already controls each derived destination
+    // address, so any output paying the sender is change. Strip the sender
+    // from the recipient set rather than discarding the whole event so a tx
+    // that pays the sender plus legitimate recipients still verifies for
+    // the others.
+    recipientPubkeys = recipients.filter((p) => p !== event.pubkey);
+    if (recipientPubkeys.length === 0) return null;
+
+    for (const pubkey of recipientPubkeys) {
+      const address = nostrPubkeyToBitcoinAddress(pubkey);
+      if (address) expectedAddresses.add(address);
+    }
+    if (expectedAddresses.size === 0) return null;
   }
-  if (recipientAddresses.size === 0) return null;
 
   let detail;
   try {
@@ -126,7 +171,7 @@ export async function verifyOnchainZap(
   }
 
   const amountSats = detail.outputs
-    .filter((o) => o.address && recipientAddresses.has(o.address))
+    .filter((o) => o.address && expectedAddresses.has(o.address))
     .reduce((sum, o) => sum + o.value, 0);
 
   if (amountSats === 0) return null;
@@ -139,7 +184,7 @@ export async function verifyOnchainZap(
     event,
     txid,
     senderPubkey: event.pubkey,
-    recipientPubkeys: externalRecipients,
+    recipientPubkeys,
     amountSats: effectiveClaim,
     claimedAmountSats: claimed,
     comment: event.content,
@@ -151,6 +196,11 @@ export async function verifyOnchainZap(
 /**
  * Query all kind 8333 on-chain zaps targeting a specific event, then verify
  * each one on-chain. Returns only verified entries (deduped by txid).
+ *
+ * When the target is a kind 33863 campaign, verification matches against
+ * the campaign's `w` wallet address rather than derived recipient
+ * addresses. Silent-payment campaigns (`w` starts with `sp1…`) return an
+ * empty list — donations to those campaigns are unlinkable by design.
  */
 export function useOnchainZaps(target: NostrEvent | undefined) {
   const { nostr } = useNostr();
@@ -161,6 +211,14 @@ export function useOnchainZaps(target: NostrEvent | undefined) {
     ? target.tags.find(([n]) => n === 'd')?.[1] ?? ''
     : '';
   const aCoord = isAddressable && target ? `${target.kind}:${target.pubkey}:${dTag}` : '';
+
+  // If the target is a campaign, parse its `w` wallet for campaign-wallet
+  // mode verification. Silent-payment campaigns short-circuit to "no
+  // verifiable donations" — we don't issue any verifier queries.
+  const campaignWallet = target && target.kind === CAMPAIGN_KIND
+    ? parseCampaign(target)?.wallet
+    : undefined;
+  const isSilentPayment = campaignWallet?.mode === 'sp';
 
   // Step 1: fetch the raw kind 8333 events for this target
   const eventsQuery = useQuery({
@@ -196,16 +254,17 @@ export function useOnchainZaps(target: NostrEvent | undefined) {
 
       return Array.from(byTxid.values());
     },
-    enabled: !!target,
+    enabled: !!target && !isSilentPayment,
     staleTime: 30_000,
   });
 
   // Step 2: verify each event on-chain (parallel, cached per event)
   const events = eventsQuery.data ?? [];
+  const walletValue = campaignWallet?.value;
   const verifications = useQueries({
     queries: events.map((event) => ({
-      queryKey: ['onchain-zaps', 'verify', esploraBaseUrl, event.id],
-      queryFn: () => verifyOnchainZap(event, esploraBaseUrl),
+      queryKey: ['onchain-zaps', 'verify', esploraBaseUrl, event.id, walletValue ?? ''],
+      queryFn: () => verifyOnchainZap(event, esploraBaseUrl, walletValue),
       staleTime: 60_000,
     })),
   });
@@ -218,7 +277,7 @@ export function useOnchainZaps(target: NostrEvent | undefined) {
   verified.sort((a, b) => b.amountSats - a.amountSats);
 
   const totalSats = verified.reduce((s, v) => s + v.amountSats, 0);
-  const isLoading = eventsQuery.isLoading || verifications.some((v) => v.isLoading);
+  const isLoading = !isSilentPayment && (eventsQuery.isLoading || verifications.some((v) => v.isLoading));
 
   return {
     zaps: verified,
@@ -236,17 +295,35 @@ export function useOnchainZaps(target: NostrEvent | undefined) {
  *
  * Returns `undefined` while loading, `null` if the event fails verification
  * (invalid tx, wrong recipient, self-zap, etc.), or the entry.
+ *
+ * If the receipt targets a kind 33863 campaign, pass the campaign's `w`
+ * value as `campaignWallet` so the verifier can match outputs against the
+ * campaign address. Without it, campaign-targeted receipts always fail
+ * verification (no `p` tags, no fallback).
  */
-export function useVerifiedOnchainZap(event: NostrEvent | undefined): OnchainZapEntry | null | undefined {
+export function useVerifiedOnchainZap(
+  event: NostrEvent | undefined,
+  campaignWallet?: string,
+): OnchainZapEntry | null | undefined {
   const { config } = useAppContext();
   const { esploraBaseUrl } = config;
   const txid = event ? extractOnchainZapTxid(event) : null;
-  const hasRecipient = event ? extractOnchainZapRecipients(event).length > 0 : false;
+  const targetsCampaign = event ? !!extractCampaignTarget(event) : false;
+  const hasIdentityRecipient = event ? extractOnchainZapRecipients(event).length > 0 : false;
+
+  // Enable verification when:
+  // - we have a txid AND
+  // - either the receipt targets a campaign AND we know the wallet, OR
+  // - the receipt has an identity recipient (`p` tag).
+  const enabled = !!event && !!txid && (
+    (targetsCampaign && !!campaignWallet)
+    || (!targetsCampaign && hasIdentityRecipient)
+  );
 
   const { data } = useQuery({
-    queryKey: ['onchain-zaps', 'verify', esploraBaseUrl, event?.id ?? ''],
-    queryFn: () => verifyOnchainZap(event!, esploraBaseUrl),
-    enabled: !!event && !!txid && hasRecipient,
+    queryKey: ['onchain-zaps', 'verify', esploraBaseUrl, event?.id ?? '', campaignWallet ?? ''],
+    queryFn: () => verifyOnchainZap(event!, esploraBaseUrl, campaignWallet),
+    enabled,
     staleTime: 60_000,
   });
 

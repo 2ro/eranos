@@ -486,7 +486,7 @@ export function canModerateOrganization(
  *
  * Agora restricts creation of organization-tagged campaigns / pledges /
  * events in the client to this set, but anyone could technically publish
- * a kind 30223 / 36639 / 31922 / 31923 with the organization's uppercase
+ * a kind 33863 / 36639 / 31922 / 31923 with the organization's uppercase
  * `A` root-scope tag outside the client. Queries that surface "official"
  * organization activity MUST pass this list as the `authors` filter so
  * forged events from non-moderators never reach the UI.

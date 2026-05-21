@@ -30,7 +30,7 @@ interface CampaignScore {
 const EMPTY_SCORE: CampaignScore = { totalSats: 0, donorCount: 0 };
 
 /**
- * Loads kind 30223 campaigns with optional Top ranking (most-zapped first)
+ * Loads kind 33863 campaigns with optional Top ranking (most-zapped first)
  * and free-text search applied client-side.
  *
  * **Why client-side rather than NIP-50?** Ditto's `sort:top` / `sort:hot`
@@ -46,7 +46,7 @@ const EMPTY_SCORE: CampaignScore = { totalSats: 0, donorCount: 0 };
  * - **Full relay coverage** — we fetch from the user's default pool, not
  *   just Ditto, so campaigns published anywhere are discoverable.
  * - **Search that actually matches** — substring across title, summary,
- *   story, location, and category tags.
+ *   and story.
  *
  * Tradeoff: we fetch up to `limit` (default 200) campaigns regardless of
  * search, then filter in JavaScript. At current campaign volume this is
@@ -70,7 +70,7 @@ export function useAllCampaigns({
         [{ kinds: [CAMPAIGN_KIND], limit }],
         { signal: AbortSignal.any([c.signal, AbortSignal.timeout(10_000)]) },
       );
-      return parseCampaignEvents(events, { includeArchived: false, sortByCreatedAt: true });
+      return parseCampaignEvents(events, { sortByCreatedAt: true });
     },
     staleTime: 30_000,
   });
@@ -185,9 +185,5 @@ function matchesQuery(campaign: ParsedCampaign, lowerQuery: string): boolean {
   if (campaign.title.toLowerCase().includes(lowerQuery)) return true;
   if (campaign.summary.toLowerCase().includes(lowerQuery)) return true;
   if (campaign.story.toLowerCase().includes(lowerQuery)) return true;
-  // Location and `t` tags are short but worth matching so users can type
-  // "kenya" or "mutual aid" and get useful results.
-  if (campaign.location?.toLowerCase().includes(lowerQuery)) return true;
-  if (campaign.tags.some((t) => t.toLowerCase().includes(lowerQuery))) return true;
   return false;
 }

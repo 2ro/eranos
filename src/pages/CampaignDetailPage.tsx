@@ -5,24 +5,21 @@ import { useQueryClient } from '@tanstack/react-query';
 import type { NostrEvent } from '@nostrify/nostrify';
 import {
   CalendarClock,
-  Archive,
-  ArchiveRestore,
   ChevronLeft,
   HandHeart,
   MapPin,
   Pencil,
   Share2,
   ShieldCheck,
-  Users,
+  Trash2,
 } from 'lucide-react';
 
 import { ArticleContent } from '@/components/ArticleContent';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import {
-  BeneficiaryDonateDialog,
-  BeneficiaryDonatePanel,
-} from '@/components/BeneficiaryDonateDialog';
+  CampaignWalletDonatePanel,
+} from '@/components/CampaignWalletDonatePanel';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -45,13 +42,13 @@ import { ReplyComposeModal } from '@/components/ReplyComposeModal';
 import { NoteMoreMenu } from '@/components/NoteMoreMenu';
 import { Progress } from '@/components/ui/progress';
 import { ThreadedReplyList, type ReplyNode } from '@/components/ThreadedReplyList';
-import { useArchiveCampaign } from '@/hooks/useArchiveCampaign';
 import { useAuthor } from '@/hooks/useAuthor';
 import { useBitcoinWallet } from '@/hooks/useBitcoinWallet';
 import { useCampaign } from '@/hooks/useCampaign';
 import { useCampaignDonations } from '@/hooks/useCampaignDonations';
 import { useComments } from '@/hooks/useComments';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
+import { useDeleteEvent } from '@/hooks/useDeleteEvent';
 import { useEventStats } from '@/hooks/useTrending';
 import { usePinnedEventComments } from '@/hooks/usePinnedEventComments';
 import { useProfileUrl } from '@/hooks/useProfileUrl';
@@ -60,10 +57,10 @@ import { useLayoutOptions } from '@/contexts/LayoutContext';
 import {
   encodeCampaignNaddr,
   getCampaignCountryLabel,
-  getCampaignPrimaryTagLabel,
   type ParsedCampaign,
 } from '@/lib/campaign';
 import { satsToUSDWhole } from '@/lib/bitcoin';
+import { formatUsdGoal } from '@/lib/formatCampaignAmount';
 import { formatNumber } from '@/lib/formatNumber';
 import { genUserName } from '@/lib/genUserName';
 import { sanitizeUrl } from '@/lib/sanitizeUrl';
@@ -128,7 +125,7 @@ function CampaignDetailContent({ campaign }: { campaign: ParsedCampaign }) {
   const { user } = useCurrentUser();
   const { btcPrice } = useBitcoinWallet();
   const author = useAuthor(campaign.pubkey);
-  const { data: stats, isLoading: statsLoading } = useCampaignDonations(campaign.aTag);
+  const { data: stats, isLoading: statsLoading } = useCampaignDonations(campaign);
   const navigate = useNavigate();
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -138,9 +135,9 @@ function CampaignDetailContent({ campaign }: { campaign: ParsedCampaign }) {
   const [moreMenuOpen, setMoreMenuOpen] = useState(false);
   const [interactionsOpen, setInteractionsOpen] = useState(false);
   const [interactionsTab, setInteractionsTab] = useState<InteractionTab>('reposts');
-  const [archiveConfirmOpen, setArchiveConfirmOpen] = useState(false);
+  const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
 
-  const archiveMutation = useArchiveCampaign();
+  const deleteMutation = useDeleteEvent();
 
   const { data: engagementStats } = useEventStats(campaign.event.id, campaign.event);
 
@@ -241,7 +238,7 @@ function CampaignDetailContent({ campaign }: { campaign: ParsedCampaign }) {
       .map((event): ReplyNode => ({ event, children: [] }));
   }, [feedEventsById, pinnedEvents, pinnedIds]);
 
-  const cover = sanitizeUrl(campaign.image);
+  const cover = sanitizeUrl(campaign.banner);
   const creatorMetadata = author.data?.metadata;
   const creatorName =
     creatorMetadata?.display_name || creatorMetadata?.name || genUserName(campaign.pubkey);
@@ -249,25 +246,14 @@ function CampaignDetailContent({ campaign }: { campaign: ParsedCampaign }) {
 
   const deadline = campaign.deadline ? formatDeadline(campaign.deadline) : null;
   const countryLabel = getCampaignCountryLabel(campaign);
-  const tagLabel = getCampaignPrimaryTagLabel(campaign);
   const raisedSats = stats?.totalSats ?? 0;
-
-  // The donate column has two visual variants: single-beneficiary
-  // campaigns inline the recipient's BIP-21 QR + address + "Open in
-  // wallet" (no in-app PSBT flow needed for a single recipient), and
-  // multi-beneficiary campaigns show the "Donate" button that opens
-  // DonateDialog plus a per-recipient list with their own donate
-  // buttons. The rest of the column (raised stats, share, donor list)
-  // is shared between both.
-  const singleBeneficiary =
-    campaign.recipients.length === 1 ? campaign.recipients[0] : null;
 
   const isCreator = user?.pubkey === campaign.pubkey;
   const naddr = useMemo(() => encodeCampaignNaddr(campaign), [campaign]);
   const storyEvent = useMemo(
     () => ({
       ...campaign.event,
-      tags: campaign.event.tags.filter(([name]) => !['image', 'summary', 'title', 't'].includes(name)),
+      tags: campaign.event.tags.filter(([name]) => !['banner', 'imeta', 'summary', 'title', 'w'].includes(name)),
     }),
     [campaign.event],
   );
@@ -293,23 +279,30 @@ function CampaignDetailContent({ campaign }: { campaign: ParsedCampaign }) {
     }
   };
 
-  const handleToggleArchive = () => {
-    archiveMutation.mutate(
-      { campaign, archived: !campaign.archived },
+  const handleDeleteCampaign = () => {
+    deleteMutation.mutate(
       {
-        onSuccess: (updated) => {
+        eventId: campaign.event.id,
+        eventKind: campaign.event.kind,
+        eventPubkey: campaign.pubkey,
+        eventDTag: campaign.identifier,
+      },
+      {
+        onSuccess: () => {
           toast({
-            title: updated.archived ? 'Campaign archived' : 'Campaign reopened',
-            description: updated.archived
-              ? 'Hidden from the main fundraisers feed. Donors with the link can still view it.'
-              : 'Visible in the main fundraisers feed again.',
+            title: 'Campaign deleted',
+            description:
+              'A deletion request was published. Well-behaved relays will drop the campaign from feeds.',
           });
-          setArchiveConfirmOpen(false);
+          setDeleteConfirmOpen(false);
+          void queryClient.invalidateQueries({ queryKey: ['campaign', campaign.pubkey, campaign.identifier] });
+          void queryClient.invalidateQueries({ queryKey: ['campaigns'] });
+          navigate('/');
         },
         onError: (error: unknown) => {
           const msg = error instanceof Error ? error.message : String(error);
           toast({
-            title: campaign.archived ? 'Could not reopen campaign' : 'Could not archive campaign',
+            title: 'Could not delete campaign',
             description: msg,
             variant: 'destructive',
           });
@@ -334,7 +327,6 @@ function CampaignDetailContent({ campaign }: { campaign: ParsedCampaign }) {
   const donateColumn = (
     <DonateColumn
       campaign={campaign}
-      singleBeneficiary={singleBeneficiary}
       raisedSats={raisedSats}
       statsLoading={statsLoading}
       btcPrice={btcPrice}
@@ -359,13 +351,11 @@ function CampaignDetailContent({ campaign }: { campaign: ParsedCampaign }) {
         creatorPicture={sanitizeUrl(creatorMetadata?.picture)}
         deadline={deadline}
         countryLabel={countryLabel}
-        tagLabel={tagLabel}
         isCreator={isCreator}
         naddr={naddr}
-        archiveDisabled={archiveMutation.isPending}
+        deleteDisabled={deleteMutation.isPending}
         onBack={() => navigate(-1)}
-        onArchive={() => setArchiveConfirmOpen(true)}
-        onReopen={handleToggleArchive}
+        onDelete={() => setDeleteConfirmOpen(true)}
         onReply={() => setReplyOpen(true)}
         onMore={() => setMoreMenuOpen(true)}
       />
@@ -549,26 +539,29 @@ function CampaignDetailContent({ campaign }: { campaign: ParsedCampaign }) {
         initialTab={interactionsTab}
       />
 
-      <AlertDialog open={archiveConfirmOpen} onOpenChange={setArchiveConfirmOpen}>
+      <AlertDialog open={deleteConfirmOpen} onOpenChange={setDeleteConfirmOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Archive this campaign?</AlertDialogTitle>
+            <AlertDialogTitle>Delete this campaign?</AlertDialogTitle>
             <AlertDialogDescription>
-              The campaign will be hidden from the main fundraisers feed and no
-              new donations can be made. Anyone with the link can still view it,
-              and past donations stay attached. You can reopen it at any time.
+              This publishes a NIP-09 deletion request. Well-behaved relays
+              will drop the campaign from feeds and direct links. Past
+              donation receipts stay on-chain regardless. This action cannot
+              be undone — to keep accepting donations, edit the campaign
+              instead.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel disabled={archiveMutation.isPending}>Cancel</AlertDialogCancel>
+            <AlertDialogCancel disabled={deleteMutation.isPending}>Cancel</AlertDialogCancel>
             <AlertDialogAction
               onClick={(e) => {
                 e.preventDefault();
-                handleToggleArchive();
+                handleDeleteCampaign();
               }}
-              disabled={archiveMutation.isPending}
+              disabled={deleteMutation.isPending}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
             >
-              {archiveMutation.isPending ? 'Archiving…' : 'Archive'}
+              {deleteMutation.isPending ? 'Deleting…' : 'Delete'}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
@@ -635,13 +628,11 @@ interface CampaignHeroProps {
   creatorPicture: string | undefined;
   deadline: { label: string; isPast: boolean } | null;
   countryLabel: string | undefined;
-  tagLabel: string | undefined;
   isCreator: boolean;
   naddr: string;
-  archiveDisabled: boolean;
+  deleteDisabled: boolean;
   onBack: () => void;
-  onArchive: () => void;
-  onReopen: () => void;
+  onDelete: () => void;
   onReply: () => void;
   onMore: () => void;
 }
@@ -654,13 +645,11 @@ function CampaignHero({
   creatorPicture,
   deadline,
   countryLabel,
-  tagLabel,
   isCreator,
   naddr,
-  archiveDisabled,
+  deleteDisabled,
   onBack,
-  onArchive,
-  onReopen,
+  onDelete,
   onReply,
   onMore,
 }: CampaignHeroProps) {
@@ -728,29 +717,16 @@ function CampaignHero({
                   <span className="hidden sm:inline">Edit</span>
                 </Link>
               </Button>
-              {campaign.archived ? (
-                <Button
-                  type="button"
-                  size="sm"
-                  onClick={onReopen}
-                  disabled={archiveDisabled}
-                  className="h-10 rounded-full bg-black/30 text-white backdrop-blur-md shadow-none hover:bg-black/45 focus-visible:ring-white/80"
-                >
-                  <ArchiveRestore className="size-4 sm:mr-2" />
-                  <span className="hidden sm:inline">Reopen</span>
-                </Button>
-              ) : (
-                <Button
-                  type="button"
-                  size="sm"
-                  onClick={onArchive}
-                  disabled={archiveDisabled}
-                  className="h-10 rounded-full bg-black/30 text-white backdrop-blur-md shadow-none hover:bg-black/45 focus-visible:ring-white/80"
-                >
-                  <Archive className="size-4 sm:mr-2" />
-                  <span className="hidden sm:inline">Archive</span>
-                </Button>
-              )}
+              <Button
+                type="button"
+                size="sm"
+                onClick={onDelete}
+                disabled={deleteDisabled}
+                className="h-10 rounded-full bg-black/30 text-white backdrop-blur-md shadow-none hover:bg-destructive/70 focus-visible:ring-white/80"
+              >
+                <Trash2 className="size-4 sm:mr-2" />
+                <span className="hidden sm:inline">Delete</span>
+              </Button>
             </div>
           )}
         </div>
@@ -764,20 +740,14 @@ function CampaignHero({
           busy photos without darkening the gradient further. */}
       <div className="absolute inset-x-0 bottom-0 z-10 px-5 sm:px-6 lg:px-0 pb-[max(env(safe-area-inset-bottom),1.75rem)] pt-16 sm:pt-20">
         <div className="max-w-6xl mx-auto [text-shadow:0_1px_3px_rgba(0,0,0,0.7)]">
-          {campaign.archived && (
+          {campaign.wallet.mode === 'sp' && (
             <Badge
               variant="secondary"
               className="mb-4 bg-background/85 text-foreground border-border/40 backdrop-blur [text-shadow:none]"
             >
-              <Archive className="size-3.5 mr-1.5" />
-              Archived
+              <ShieldCheck className="size-3.5 mr-1.5" />
+              Private campaign
             </Badge>
-          )}
-
-          {tagLabel && (
-            <div className="mb-5 sm:mb-6 text-xs sm:text-sm font-semibold uppercase tracking-[0.18em] text-white/80">
-              {tagLabel}
-            </div>
           )}
 
           <h1 className="text-3xl sm:text-5xl lg:text-6xl font-bold leading-[1.05] tracking-tight text-white max-w-4xl">
@@ -809,7 +779,7 @@ function CampaignHero({
             </span>
           </Link>
 
-          {(countryLabel || deadline || campaign.recipients.length > 0) && (
+          {(countryLabel || deadline) && (
             <div className="mt-3 flex flex-wrap items-center gap-x-5 gap-y-1.5 text-xs sm:text-sm font-medium text-white/85">
               {countryLabel && (
                 <span className="inline-flex items-center gap-1.5">
@@ -823,11 +793,6 @@ function CampaignHero({
                   {deadline.label}
                 </span>
               )}
-              <span className="inline-flex items-center gap-1.5">
-                <Users className="size-4" />
-                {campaign.recipients.length}{' '}
-                {campaign.recipients.length === 1 ? 'recipient' : 'recipients'}
-              </span>
             </div>
           )}
 
@@ -899,8 +864,6 @@ function CampaignStory({
 
 interface DonateColumnProps {
   campaign: ParsedCampaign;
-  /** The lone recipient when there's exactly one beneficiary; null otherwise. */
-  singleBeneficiary: ParsedCampaign['recipients'][number] | null;
   raisedSats: number;
   statsLoading: boolean;
   btcPrice: number | undefined;
@@ -915,7 +878,6 @@ interface DonateColumnProps {
 
 function DonateColumn({
   campaign,
-  singleBeneficiary,
   raisedSats,
   statsLoading,
   btcPrice,
@@ -925,12 +887,9 @@ function DonateColumn({
   onShare,
   onSeeAll,
 }: DonateColumnProps) {
-  const ended = deadline?.isPast || campaign.archived;
-  const endedLabel = campaign.archived
-    ? 'Campaign archived'
-    : deadline?.isPast
-      ? 'Campaign ended'
-      : null;
+  const ended = !!deadline?.isPast;
+  const endedLabel = ended ? 'Campaign ended' : null;
+  const isSilentPayment = campaign.wallet.mode === 'sp';
 
   return (
     // On mobile we drop the Card chrome (no border, no shadow, no
@@ -940,8 +899,21 @@ function DonateColumn({
     // card framing so the column reads as a proper aside.
     <Card className="overflow-hidden border-0 shadow-none bg-transparent lg:border lg:shadow-sm lg:bg-card">
       <CardContent className="p-0 lg:p-5 space-y-5">
-        {/* Raised stats + progress */}
-        {statsLoading ? (
+        {/* Raised stats + progress. Silent-payment campaigns hide all
+            aggregate numbers by design (per NIP.md Kind 33863). */}
+        {isSilentPayment ? (
+          <div className="space-y-1">
+            <div className="inline-flex items-center gap-1.5 text-sm font-medium text-muted-foreground">
+              <ShieldCheck className="size-4 text-primary" />
+              Private campaign — totals not public
+            </div>
+            {campaign.goalUsd && campaign.goalUsd > 0 && (
+              <div className="text-xs text-muted-foreground">
+                Target: {formatUsdGoal(campaign.goalUsd)}
+              </div>
+            )}
+          </div>
+        ) : statsLoading ? (
           <Skeleton className="h-16 w-full" />
         ) : (
           <div className="space-y-3">
@@ -952,9 +924,9 @@ function DonateColumn({
                   raised
                 </span>
               </div>
-              {campaign.goalSats ? (
+              {campaign.goalUsd ? (
                 <div className="text-xs text-muted-foreground">
-                  of {formatSatsFull(campaign.goalSats, btcPrice)} goal
+                  of {formatUsdGoal(campaign.goalUsd)} goal
                   {donations.length > 0 && (
                     <>
                       {' · '}
@@ -970,11 +942,11 @@ function DonateColumn({
                 </div>
               ) : null}
             </div>
-            {campaign.goalSats && (
+            {campaign.goalUsd && raisedUsd(raisedSats, btcPrice) !== undefined && (
               <Progress
                 value={Math.min(
                   100,
-                  Math.round((raisedSats / campaign.goalSats) * 100),
+                  Math.round((raisedUsd(raisedSats, btcPrice)! / campaign.goalUsd) * 100),
                 )}
                 className="h-2"
               />
@@ -982,41 +954,50 @@ function DonateColumn({
           </div>
         )}
 
-        {/* Primary actions — variant fork is here */}
-        {singleBeneficiary ? (
-          <SingleBeneficiaryActions
-            pubkey={singleBeneficiary.pubkey}
-            ended={ended}
-            endedLabel={endedLabel}
-            onShare={onShare}
-          />
+        {/* Primary actions */}
+        {ended ? (
+          <div className="space-y-2">
+            <Button size="lg" className="w-full" disabled>
+              <HandHeart className="size-5 mr-2" />
+              {endedLabel ?? 'Donate'}
+            </Button>
+            <Button variant="outline" size="lg" className="w-full" onClick={onShare}>
+              <Share2 className="size-4 mr-2" />
+              Share
+            </Button>
+          </div>
+        ) : isSilentPayment ? (
+          // SP mode: external wallet only. The in-app PSBT signer doesn't
+          // support BIP-352, so we point the donor at the QR/code panel.
+          <div className="space-y-3">
+            <CampaignWalletDonatePanel wallet={campaign.wallet} campaignTitle={campaign.title} />
+            <Button variant="outline" size="lg" className="w-full" onClick={onShare}>
+              <Share2 className="size-4 mr-2" />
+              Share
+            </Button>
+          </div>
         ) : (
-          <MultiBeneficiaryActions
-            ended={ended}
-            endedLabel={endedLabel}
-            onDonateClick={onDonateClick}
-            onShare={onShare}
-          />
-        )}
-
-        {/* Beneficiaries — only shown for multi-beneficiary campaigns.
-            The single-beneficiary variant already inlines the recipient
-            (with a profile link and avatar) via the BIP-21 panel above. */}
-        {!singleBeneficiary && (
-          <div className="space-y-2 border-t border-border/60 pt-4">
-            <div className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-              Beneficiaries
-            </div>
-            <div className="divide-y divide-border/60">
-              {campaign.recipients.map((r) => (
-                <RecipientRow key={r.pubkey} pubkey={r.pubkey} weight={r.weight} />
-              ))}
-            </div>
+          // On-chain mode: in-app PSBT donate button + external wallet panel.
+          <div className="space-y-3">
+            <Button
+              size="lg"
+              className="w-full"
+              onClick={onDonateClick}
+            >
+              <HandHeart className="size-5 mr-2" />
+              Donate
+            </Button>
+            <CampaignWalletDonatePanel wallet={campaign.wallet} campaignTitle={campaign.title} />
+            <Button variant="outline" size="lg" className="w-full" onClick={onShare}>
+              <Share2 className="size-4 mr-2" />
+              Share
+            </Button>
           </div>
         )}
 
-        {/* Latest donors preview */}
-        {donations.length > 0 && (
+        {/* Latest donors preview (on-chain only; SP campaigns hide all
+            donor signals by design). */}
+        {!isSilentPayment && donations.length > 0 && (
           <div className="space-y-2 border-t border-border/60 pt-4">
             <div className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
               Recent donations
@@ -1037,78 +1018,10 @@ function DonateColumn({
   );
 }
 
-/** Donate / Share pair for multi-beneficiary campaigns. */
-function MultiBeneficiaryActions({
-  ended,
-  endedLabel,
-  onDonateClick,
-  onShare,
-}: {
-  ended: boolean;
-  endedLabel: string | null;
-  onDonateClick: () => void;
-  onShare: () => void;
-}) {
-  return (
-    <div className="space-y-2">
-      <Button
-        size="lg"
-        className="w-full"
-        onClick={onDonateClick}
-        disabled={ended}
-      >
-        <HandHeart className="size-5 mr-2" />
-        {endedLabel ?? 'Donate'}
-      </Button>
-      <Button variant="outline" size="lg" className="w-full" onClick={onShare}>
-        <Share2 className="size-4 mr-2" />
-        Share
-      </Button>
-    </div>
-  );
-}
-
-/** BIP-21 QR + address + open-in-wallet panel for single-beneficiary
- *  campaigns. The panel's "Open in wallet" button is the primary CTA,
- *  so we don't render a separate Donate button above it — just Share
- *  beneath. When the campaign has ended, the panel is suppressed and a
- *  disabled "Campaign ended/archived" button takes its place so the
- *  page still communicates state. */
-function SingleBeneficiaryActions({
-  pubkey,
-  ended,
-  endedLabel,
-  onShare,
-}: {
-  pubkey: string;
-  ended: boolean;
-  endedLabel: string | null;
-  onShare: () => void;
-}) {
-  if (ended) {
-    return (
-      <div className="space-y-2">
-        <Button size="lg" className="w-full" disabled>
-          <HandHeart className="size-5 mr-2" />
-          {endedLabel ?? 'Donate'}
-        </Button>
-        <Button variant="outline" size="lg" className="w-full" onClick={onShare}>
-          <Share2 className="size-4 mr-2" />
-          Share
-        </Button>
-      </div>
-    );
-  }
-
-  return (
-    <div className="space-y-3">
-      <BeneficiaryDonatePanel pubkey={pubkey} />
-      <Button variant="outline" size="lg" className="w-full" onClick={onShare}>
-        <Share2 className="size-4 mr-2" />
-        Share
-      </Button>
-    </div>
-  );
+/** Convert sats to USD via the live BTC price; undefined when price unknown. */
+function raisedUsd(sats: number, btcPrice: number | undefined): number | undefined {
+  if (!btcPrice || !Number.isFinite(btcPrice) || btcPrice <= 0) return undefined;
+  return (sats / 100_000_000) * btcPrice;
 }
 
 /** Compact donor list: monogram, amount, relative time. Shows up to the
@@ -1143,59 +1056,6 @@ function DonorPreviewList({
         );
       })}
     </ul>
-  );
-}
-
-// ─────────────────────────────────────────────────────────────────────
-// Beneficiary row (multi-beneficiary campaigns)
-// ─────────────────────────────────────────────────────────────────────
-
-function RecipientRow({ pubkey, weight }: { pubkey: string; weight: number }) {
-  const author = useAuthor(pubkey);
-  const metadata = author.data?.metadata;
-  const name = metadata?.display_name || metadata?.name || genUserName(pubkey);
-  const picture = sanitizeUrl(metadata?.picture);
-  const nip05 = metadata?.nip05;
-  const profileUrl = useProfileUrl(pubkey, metadata);
-  const [donateOpen, setDonateOpen] = useState(false);
-
-  return (
-    <div className="flex items-center gap-2 py-2.5 -mx-2 px-2 rounded-md motion-safe:transition-colors hover:bg-muted/40">
-      <Link
-        to={profileUrl}
-        className="flex items-center gap-3 min-w-0 flex-1 rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-      >
-        <Avatar className="size-9 shrink-0">
-          {picture && <AvatarImage src={picture} alt="" />}
-          <AvatarFallback>{name.slice(0, 2).toUpperCase()}</AvatarFallback>
-        </Avatar>
-        <div className="min-w-0 flex-1">
-          <div className="font-medium text-sm truncate">{name}</div>
-          {nip05 && (
-            <div className="text-xs text-muted-foreground truncate">{nip05}</div>
-          )}
-        </div>
-        {weight !== 1 && (
-          <Badge variant="outline" className="shrink-0">
-            weight {weight}
-          </Badge>
-        )}
-      </Link>
-      <Button
-        size="sm"
-        variant="outline"
-        className="shrink-0"
-        onClick={() => setDonateOpen(true)}
-        aria-label={`Donate to ${name}`}
-      >
-        Donate
-      </Button>
-      <BeneficiaryDonateDialog
-        pubkey={pubkey}
-        open={donateOpen}
-        onOpenChange={setDonateOpen}
-      />
-    </div>
   );
 }
 

@@ -25,7 +25,7 @@ const ReplyComposeModal = lazy(() => import("@/components/ReplyComposeModal").th
 const EmojiPackDialog = lazy(() => import("@/components/EmojiPackDialog").then(m => ({ default: m.EmojiPackDialog })));
 
 // Campaigns: home + create. (Campaign detail is dispatched from NIP19Page
-// when an naddr resolves to kind 30223.) The campaigns list IS the homepage;
+// when an naddr resolves to kind 33863.) The campaigns list IS the homepage;
 // the configurable HomePage delegation from the Twitter-era app is gone.
 const CampaignsPage = lazy(() => import("./pages/CampaignsPage").then(m => ({ default: m.CampaignsPage })));
 const CreateCampaignPage = lazy(() => import("./pages/CreateCampaignPage").then(m => ({ default: m.CreateCampaignPage })));
@@ -89,7 +89,6 @@ const WikipediaPage = lazy(() => import("./pages/WikipediaPage").then(m => ({ de
 const WorldPage = lazy(() => import("./pages/WorldPage").then(m => ({ default: m.WorldPage })));
 const FollowPage = lazy(() => import("./pages/FollowPage").then(m => ({ default: m.FollowPage })));
 const ReceivePage = lazy(() => import("./pages/ReceivePage").then(m => ({ default: m.ReceivePage })));
-const ClaimPage = lazy(() => import("./pages/ClaimPage").then(m => ({ default: m.ClaimPage })));
 const RemoteLoginSuccessPage = lazy(() => import("./pages/RemoteLoginSuccessPage").then(m => ({ default: m.RemoteLoginSuccessPage })));
 
 const pollsDef = getExtraKindDef("polls")!;
@@ -163,7 +162,6 @@ export function AppRouter() {
           {/* Auto-follow deep link: fullscreen immersive (no sidebars/nav) */}
           <Route path="/follow/:npub" element={<FollowPage />} />
           <Route path="/receive" element={<ReceivePage />} />
-          <Route path="/claim" element={<ClaimPage />} />
 
           {/* All routes share the persistent FundraiserLayout (top nav + footer) */}
           <Route element={<FundraiserLayout />}>

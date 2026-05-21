@@ -106,7 +106,7 @@ export function getTargetEventId(event: NostrEvent): string | undefined {
  * returns undefined for those — callers that need the kind in that case must
  * fetch the target event themselves.
  *
- * Used to distinguish on-chain donations to campaigns (kind 30223) from
+ * Used to distinguish on-chain donations to campaigns (kind 33863) from
  * other zap targets so the UI can label them as "donated" rather than the
  * generic "sent / zapped".
  */

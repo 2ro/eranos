@@ -25,6 +25,14 @@ interface CoverImageFieldProps {
   onChange: (url: string) => void;
   /** Notifies parent forms so they can block submit while Blossom upload runs. */
   onUploadingChange?: (uploading: boolean) => void;
+  /**
+   * Fires after a successful Blossom upload with the NIP-94-style tag
+   * array returned by `useUploadFile`:
+   * `[["url", "<url>"], ["x", "<sha256>"], ["ox", "<sha256>"], ["size", "<bytes>"], ["m", "image/jpeg"]]`.
+   * Parents that want to publish a paired NIP-92 `imeta` tag in their
+   * Nostr event should convert this array — see Kind 33863 publishing.
+   */
+  onUploadComplete?: (nip94Tags: string[][]) => void;
   /** Optional template gallery shown between the dropzone and the URL input. */
   templates?: readonly CoverImageTemplate[];
 }
@@ -45,7 +53,7 @@ interface CoverImageFieldProps {
  * anything other than a well-formed https URL — that's deliberate, since
  * the same value is what gets published in the Nostr event's `image` tag.
  */
-export function CoverImageField({ value, onChange, onUploadingChange, templates }: CoverImageFieldProps) {
+export function CoverImageField({ value, onChange, onUploadingChange, onUploadComplete, templates }: CoverImageFieldProps) {
   const { mutateAsync: uploadFile, isPending: isUploading } = useUploadFile();
   const { toast } = useToast();
   const [isDragging, setIsDragging] = useState(false);
@@ -71,8 +79,21 @@ export function CoverImageField({ value, onChange, onUploadingChange, templates 
       return;
     }
     try {
-      const [[, url]] = await uploadFile(file);
+      const tags = await uploadFile(file);
+      const [[, url]] = tags;
       onChange(url);
+      // Forward the raw NIP-94 tag array to the parent so it can build a
+      // paired NIP-92 imeta tag. The URL inside the tags is what Blossom
+      // returned; the parent's `value` may pick up an appended extension
+      // via the useUploadFile post-processing, but the sha256 ("x") still
+      // identifies the same byte stream.
+      if (onUploadComplete) {
+        // Replace the URL in the first tag with the extension-corrected
+        // value the parent now holds (matches the rendered banner src).
+        const adjusted = tags.map((t) => [...t]);
+        if (adjusted[0]?.[0] === 'url') adjusted[0][1] = url;
+        onUploadComplete(adjusted);
+      }
     } catch (error) {
       toast({
         title: 'Upload failed',
