@@ -224,7 +224,16 @@ export function Feed({ kinds, tagFilters, header, hideCompose, emptyMessage, fee
           <LandingHero onJoinClick={() => setAuthDialogOpen(true)} />
         )}
 
-        {!hideCompose && <ComposeBox compact hideBorder className={transparentFeedSurfaceClassName} defaultTags={AGORA_DEFAULT_NOTE_TAGS} />}
+        {!hideCompose && (
+          <ComposeBox
+            compact
+            hideBorder
+            className={transparentFeedSurfaceClassName}
+            defaultTags={AGORA_DEFAULT_NOTE_TAGS}
+            defaultExpanded
+            placeholder="What's happening?"
+          />
+        )}
 
         {/* Tabs are only kept for specialized feed pages. The home feed is Agora-only. */}
         {user && (isKindSpecificPage || tagFilters) && (

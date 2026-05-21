@@ -158,6 +158,8 @@ interface ComposeBoxProps {
   submitLabel?: string;
   /** Tags added to new top-level kind 1 notes without putting them in content. */
   defaultTags?: string[][];
+  /** If true, the composer starts expanded without taking modal/flex behavior. */
+  defaultExpanded?: boolean;
 }
 
 /** Circular progress ring for character count. */
@@ -217,6 +219,7 @@ export function ComposeBox({
   hidePoll = false,
   submitLabel = 'Post!',
   defaultTags = [],
+  defaultExpanded = false,
 }: ComposeBoxProps) {
   const { user, metadata, isLoading: isProfileLoading } = useCurrentUser();
   const userProfileUrl = useProfileUrl(user?.pubkey ?? '', metadata);
@@ -251,7 +254,7 @@ export function ComposeBox({
       return '';
     }
   });
-  const [expanded, setExpanded] = useState(false);
+  const [expanded, setExpanded] = useState(defaultExpanded);
   const [cwEnabled, setCwEnabled] = useState(false);
   const [cwText, setCwText] = useState('');
   const [pickerOpen, setPickerOpen] = useState(false);
@@ -308,7 +311,7 @@ export function ComposeBox({
     setContent('');
     setCwEnabled(false);
     setCwText('');
-    setExpanded(false);
+    setExpanded(defaultExpanded);
     setPickerOpen(false);
     setTrayOpen(false);
     setInternalPreviewMode(false);
@@ -323,7 +326,7 @@ export function ComposeBox({
     setDestination('world');
     // Clear the auto-saved draft
     try { localStorage.removeItem(draftKey); } catch { /* ignore */ }
-  }, [initialMode, draftKey]);
+  }, [initialMode, draftKey, defaultExpanded]);
 
   // Use controlled preview mode if provided, otherwise use internal state
   const previewMode = controlledPreviewMode !== undefined ? controlledPreviewMode : internalPreviewMode;
