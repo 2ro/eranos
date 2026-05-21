@@ -2,64 +2,36 @@ import * as bitcoin from 'bitcoinjs-lib';
 import { toXOnly } from 'bitcoinjs-lib';
 import { HDKey } from '@scure/bip32';
 import { bech32m } from '@scure/base';
-import { extract as hkdfExtract, expand as hkdfExpand } from '@noble/hashes/hkdf';
-import { sha256 } from '@noble/hashes/sha2';
 import * as ecc from '@bitcoinerlab/secp256k1';
 import { ECPairFactory, type ECPairAPI } from 'ecpair';
 
 // ---------------------------------------------------------------------------
-// Nostr-derived HD wallet (proposed NIP — "NostrWallet")
+// Nostr-derived HD wallet
 // ---------------------------------------------------------------------------
 //
 // Every Bitcoin-key derivation in this module starts from the user's 32-byte
-// Nostr secret key (nsec), stretched through a two-step HKDF-SHA-256:
+// Nostr secret key (nsec), used directly as the BIP-32 master seed:
 //
-//     PRK            = HKDF-Extract(salt = "NostrWallet", IKM = nsec)
-//     seed_<purpose> = HKDF-Expand(PRK, info = "NostrWallet/<Purpose>", L = 64)
+//     master = HMAC-SHA512("Bitcoin seed", nsec)
 //
-// Each `seed_<purpose>` is then handed to a standard BIP-32 master derivation
-// (`HMAC-SHA512("Bitcoin seed", seed)`, performed internally by
-// `HDKey.fromMasterSeed`). After that point, derivations are bog-standard
-// BIP-32 / BIP-86 / BIP-352 with no Nostr-specific tweaks.
+// (`@scure/bip32`'s `HDKey.fromMasterSeed` performs this HMAC internally.)
+// From there, the Taproot single-key wallet (BIP-86) and the silent-payments
+// wallet (BIP-352) branch off at their standard hardened paths under the
+// shared master. BIP-32's hardened derivation guarantees that exposure of
+// one branch's keys does not reveal the master or sibling branches.
 //
-// Why HKDF (not raw nsec → BIP-32)?
+// For silent payments, this matches NIP-SP §2.2 exactly — any
+// NIP-SP-compliant client recovers the same `sp1q…` from the same nsec.
 //
-//   1. **Cross-protocol domain separation.** The nsec is also used for
-//      Schnorr signing, NIP-04 ECDH, and NIP-44 ECDH. A future cryptanalytic
-//      result against any of those that *wouldn't* have touched
-//      independently-derived keys would otherwise propagate to the wallet.
-//      The fixed salt `"NostrWallet"` ensures the Bitcoin sub-system is
-//      cryptographically isolated from every other use of nsec.
-//
-//   2. **Intra-Bitcoin sub-domain separation.** The Taproot single-key
-//      wallet (BIP-86) and the silent-payments wallet (BIP-352) each get
-//      their own `info`-distinguished seed, so neither's BIP-32 master
-//      reveals anything about the other.
-//
-//   3. **Recoverability.** The salt and info strings are protocol constants,
-//      not per-app secrets, so the same nsec recovers the same wallet from
-//      any "NostrWallet"-compliant client.
-//
-// **Note on interop with NIP-SP §2.2.** NIP-SP (draft) currently specifies
-// that the nsec is itself the BIP-32 seed for silent payments. This module
-// deliberately does *not* implement that — see the discussion in the
-// silent-payments section below.
-//
-// Registered purposes:
-//
-//     "NostrWallet/Bip32"          — generic BIP-32 master for BIP-44/49/84/86
-//     "NostrWallet/SilentPayments" — BIP-352 master
+// Cross-protocol caveat: the nsec is also used for Schnorr signing, NIP-04
+// ECDH, and NIP-44 ECDH. Reusing it as a BIP-32 seed is a deliberate
+// trade-off — we get spec compliance and recoverability from `nsec` alone,
+// at the cost of cross-protocol domain separation that an HKDF-stretched
+// design would provide. In practice the operations on `nsec` in these
+// protocols are independent enough that no known interaction leaks the
+// scalar through any one of them.
 //
 // ---------------------------------------------------------------------------
-
-/** HKDF salt — protocol identifier for the proposed "NostrWallet" NIP. */
-const HKDF_SALT = 'NostrWallet';
-
-/** HKDF info tag for the generic BIP-32 hierarchy (BIP-44/49/84/86). */
-const HKDF_INFO_BIP32 = 'NostrWallet/Bip32';
-
-/** HKDF info tag for BIP-352 silent payments. */
-const HKDF_INFO_SILENT_PAYMENTS = 'NostrWallet/SilentPayments';
 
 // ---------------------------------------------------------------------------
 // HD wallet derivation (BIP86 — Taproot single-key, key-path-only)
@@ -111,45 +83,23 @@ function getECPair(): ECPairAPI {
 }
 
 // ---------------------------------------------------------------------------
-// Seed derivation (two-step HKDF: extract once, expand per purpose)
+// Seed derivation
 // ---------------------------------------------------------------------------
 
 /**
- * Run HKDF-Extract over the nsec with the protocol salt. The returned PRK is
- * the input to every per-purpose `HKDF-Expand` below.
+ * Build the BIP-32 master node from a raw Nostr secret key.
  *
- * Extract is `HMAC-SHA256(salt, IKM)` — deterministic for a given nsec, no
- * randomness, no per-device state. Cheap; could be cached by the caller if
- * many seeds are derived in one session.
+ * The 32 bytes of nsec are the BIP-32 seed; `HDKey.fromMasterSeed` performs
+ * the standard `HMAC-SHA512("Bitcoin seed", seed)` master step internally.
+ * This is the same construction NIP-SP §2.2 specifies for silent payments,
+ * and the BIP-86 wallet shares the same master node (branched off by
+ * BIP-32's hardened derivation at the purpose level).
  */
-function nsecToPrk(nsecBytes: Uint8Array): Uint8Array {
+function nsecToBip32Root(nsecBytes: Uint8Array): HDKey {
   if (nsecBytes.length !== 32) {
     throw new Error('nsec must be 32 bytes');
   }
-  return hkdfExtract(sha256, nsecBytes, HKDF_SALT);
-}
-
-/**
- * Derive a 64-byte BIP-32 seed for the given purpose. Pass the result to
- * `HDKey.fromMasterSeed` (which runs the standard BIP-32 master HMAC
- * internally).
- *
- * The `info` parameter is a protocol-defined ASCII tag (e.g.
- * `"NostrWallet/Bip32"`). Different tags produce cryptographically
- * independent seeds.
- */
-function nsecToBip32SeedForPurpose(nsecBytes: Uint8Array, info: string): Uint8Array {
-  const prk = nsecToPrk(nsecBytes);
-  return hkdfExpand(sha256, prk, info, 64);
-}
-
-/**
- * Derive the 64-byte BIP-32 seed for the generic Bitcoin wallet branch
- * (BIP-44/49/84/86). Exported for callers that want to plug their own
- * BIP-32 derivation library in instead of `@scure/bip32`.
- */
-export function nsecToBip32Seed(nsecBytes: Uint8Array): Uint8Array {
-  return nsecToBip32SeedForPurpose(nsecBytes, HKDF_INFO_BIP32);
+  return HDKey.fromMasterSeed(nsecBytes);
 }
 
 // ---------------------------------------------------------------------------
@@ -173,8 +123,7 @@ export interface HdAccount {
  * scanning, prefer `deriveWatchOnlyAccount` which only needs the xpub.
  */
 export function deriveAccountFromNsec(nsecBytes: Uint8Array): HdAccount {
-  const seed = nsecToBip32Seed(nsecBytes);
-  const root = HDKey.fromMasterSeed(seed);
+  const root = nsecToBip32Root(nsecBytes);
   const accountNode = root.derive(BIP86_ACCOUNT_PATH);
   const receiveNode = accountNode.deriveChild(RECEIVE_CHAIN);
   const changeNode = accountNode.deriveChild(CHANGE_CHAIN);
@@ -317,38 +266,20 @@ export function deriveLeafTaprootSigner(
 // spend. There is no `change` / `index` hierarchy — the address is the public
 // half of a (scan_key, spend_key) keypair.
 //
-// Derivation paths per BIP-352 §"Key Derivation":
+// Derivation paths per BIP-352 §"Key Derivation" / NIP-SP §2.2:
 //
-//     spend: m / 352' / 0' / 0' / 0' / 0
-//     scan:  m / 352' / 0' / 0' / 1' / 0
+//     master = HMAC-SHA512("Bitcoin seed", nsec)
+//     spend  = master / 352' / 0' / 0' / 0' / 0
+//     scan   = master / 352' / 0' / 0' / 1' / 0
 //
 // (`352'` = purpose, `0'` = mainnet coin type, `0'` = account, `0'`/`1'` =
 // spend vs scan, final `0` = key index. We only expose key index 0; there is
 // no need to advance it since the address itself is intended to be reused.)
 //
-// Seed independence from the BIP-86 wallet:
-//
-//   SP uses its own HKDF info tag (`"NostrWallet/SilentPayments"`) so the
-//   BIP-32 master here is cryptographically independent of the BIP-86
-//   master derived above. Either branch's keys can leak without exposing
-//   the other.
-//
-// **Divergence from NIP-SP §2.2.** NIP-SP (draft) specifies that the nsec
-// itself is the BIP-32 seed for silent payments — i.e. no HKDF step. This
-// module deliberately runs the same HKDF-Extract-then-Expand pipeline used
-// for the BIP-86 wallet, because:
-//
-//   1. Domain separation from every other use of nsec (Schnorr, NIP-04,
-//      NIP-44) is preserved.
-//   2. NIP-SP is not yet finalized or adopted; this is the design we
-//      believe should land in the spec.
-//
-// The cost is that an `sp1q…` derived here will not match an `sp1q…`
-// derived by a NIP-SP §2.2 implementation from the same nsec. Senders use
-// the recipient's published kind 10352 declaration to find the address
-// regardless, so cross-client receive still works — but a user importing
-// their nsec into a §2.2-only client will see a different address than
-// they had here.
+// The nsec is used directly as the BIP-32 seed (no HKDF stretch), exactly
+// as NIP-SP §2.2 specifies. This makes the resulting `sp1q…` address
+// interoperable with every NIP-SP-compliant client: a user importing their
+// nsec into any other NIP-SP implementation will see the same address.
 //
 // Encoding:
 //
@@ -402,20 +333,19 @@ export interface SilentPaymentAddress {
  */
 
 /**
- * Derive the BIP-352 silent payment receive address from the user's nsec.
+ * Derive the BIP-352 / NIP-SP silent payment receive address from the user's nsec.
  *
- * The seed is HKDF-expanded with the `"NostrWallet/SilentPayments"` info
- * tag, giving a BIP-32 master that is cryptographically independent of the
- * BIP-86 wallet's master. See the section header above for the deliberate
- * divergence from NIP-SP §2.2.
+ * Per NIP-SP §2.2, the nsec is the BIP-32 master seed — fed directly to
+ * `HMAC-SHA512("Bitcoin seed", nsec)` (which `HDKey.fromMasterSeed`
+ * performs internally). The same `sp1q…` is recoverable from the same nsec
+ * in any NIP-SP-compliant client.
  *
  * @param nsecBytes 32-byte raw Nostr secret key.
  * @returns The bech32m-encoded silent payment address plus the underlying
  *          scan and spend pubkeys (hex) for debugging / future scan support.
  */
 export function deriveSilentPaymentAddress(nsecBytes: Uint8Array): SilentPaymentAddress {
-  const seed = nsecToBip32SeedForPurpose(nsecBytes, HKDF_INFO_SILENT_PAYMENTS);
-  const root = HDKey.fromMasterSeed(seed);
+  const root = nsecToBip32Root(nsecBytes);
 
   const spendNode = root.derive(SP_SPEND_PATH);
   const scanNode = root.derive(SP_SCAN_PATH);
