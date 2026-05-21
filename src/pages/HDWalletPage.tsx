@@ -19,6 +19,13 @@ import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { LoginArea } from '@/components/auth/LoginArea';
 import { QRCodeCanvas } from '@/components/ui/qrcode';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from '@/components/ui/dialog';
 import { HDSendBitcoinDialog } from '@/components/HDSendBitcoinDialog';
 import { useAppContext } from '@/hooks/useAppContext';
 import { useHdWallet } from '@/hooks/useHdWallet';
@@ -45,6 +52,7 @@ export function HDWalletPage() {
   const [copiedAddress, setCopiedAddress] = useState(false);
   const [txOpen, setTxOpen] = useState(false);
   const [sendOpen, setSendOpen] = useState(false);
+  const [receiveOpen, setReceiveOpen] = useState(false);
 
   useSeoMeta({
     title: `HD Wallet | ${config.appName}`,
@@ -144,9 +152,19 @@ export function HDWalletPage() {
             </Button>
           </div>
         ) : (
-          <div className="flex flex-col items-center space-y-1">
-            <span className="text-4xl font-bold tracking-tight">
+          <button
+            type="button"
+            onClick={() => refetch()}
+            disabled={isFetching}
+            className="flex flex-col items-center space-y-1 group cursor-pointer disabled:cursor-default rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring px-4 py-2"
+            aria-label="Refresh balance"
+            title="Click to refresh balance"
+          >
+            <span className="text-4xl font-bold tracking-tight group-hover:opacity-80 transition-opacity flex items-center gap-2">
               {btcPrice ? satsToUSD(totalBalance, btcPrice) : '---'}
+              {isFetching && (
+                <RefreshCw className="size-5 animate-spin text-muted-foreground" />
+              )}
             </span>
             <span className="text-sm text-muted-foreground">
               {formatBTC(totalBalance)} BTC
@@ -160,10 +178,10 @@ export function HDWalletPage() {
                   : 'pending'}
               </span>
             )}
-          </div>
+          </button>
         )}
 
-        {/* Send + refresh */}
+        {/* Send + Receive */}
         {!isLoading && !error && (
           <div className="flex items-center gap-2">
             <Button
@@ -176,15 +194,14 @@ export function HDWalletPage() {
               Send
             </Button>
             <Button
-              variant="ghost"
+              variant="outline"
               size="sm"
-              onClick={() => refetch()}
-              disabled={isFetching}
+              onClick={() => setReceiveOpen(true)}
               className="rounded-full"
-              aria-label="Refresh balance"
-              title="Refresh balance"
+              disabled={!address}
             >
-              <RefreshCw className={`size-3.5 ${isFetching ? 'animate-spin' : ''}`} />
+              <ArrowDownLeft className="size-3.5 mr-1.5" />
+              Receive
             </Button>
           </div>
         )}
@@ -195,38 +212,49 @@ export function HDWalletPage() {
           btcPrice={btcPrice}
         />
 
-        {/* QR Code + address */}
-        {address && (
-          <>
-            <div className="rounded-2xl bg-white p-4 shadow-sm">
-              <QRCodeCanvas value={address} size={200} level="M" />
-            </div>
+        {/* Receive Dialog */}
+        <Dialog open={receiveOpen} onOpenChange={setReceiveOpen}>
+          <DialogContent className="sm:max-w-sm">
+            <DialogHeader>
+              <DialogTitle>Receive Bitcoin</DialogTitle>
+              <DialogDescription>
+                Share this address to receive bitcoin. A fresh address is used
+                each time for privacy.
+              </DialogDescription>
+            </DialogHeader>
 
-            <div className="flex flex-col items-center gap-2">
-              <button
-                onClick={copyAddress}
-                className="flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-mono text-muted-foreground hover:bg-muted/50 transition-colors cursor-pointer"
-              >
-                {truncatedAddress}
-                {copiedAddress ? (
-                  <Check className="size-3.5 text-green-500" />
-                ) : (
-                  <Copy className="size-3.5" />
-                )}
-              </button>
-              <div className="flex items-center gap-3 text-xs text-muted-foreground">
-                <span>Address #{currentReceiveAddress?.index ?? 0}</span>
-                <span aria-hidden>·</span>
+            {address && (
+              <div className="flex flex-col items-center gap-4 pt-2">
+                <div className="rounded-2xl bg-white p-4 shadow-sm">
+                  <QRCodeCanvas value={address} size={200} level="M" />
+                </div>
+
                 <button
-                  onClick={() => nextReceiveAddress()}
-                  className="hover:text-foreground underline-offset-4 hover:underline transition-colors cursor-pointer"
+                  onClick={copyAddress}
+                  className="flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-mono text-muted-foreground hover:bg-muted/50 transition-colors cursor-pointer"
                 >
-                  New address
+                  {truncatedAddress}
+                  {copiedAddress ? (
+                    <Check className="size-3.5 text-green-500" />
+                  ) : (
+                    <Copy className="size-3.5" />
+                  )}
                 </button>
+
+                <div className="flex items-center gap-3 text-xs text-muted-foreground">
+                  <span>Address #{currentReceiveAddress?.index ?? 0}</span>
+                  <span aria-hidden>·</span>
+                  <button
+                    onClick={() => nextReceiveAddress()}
+                    className="hover:text-foreground underline-offset-4 hover:underline transition-colors cursor-pointer"
+                  >
+                    New address
+                  </button>
+                </div>
               </div>
-            </div>
-          </>
-        )}
+            )}
+          </DialogContent>
+        </Dialog>
 
         {/* Transactions */}
         {transactions && transactions.length > 0 && (
