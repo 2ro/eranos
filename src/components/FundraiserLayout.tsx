@@ -85,7 +85,7 @@ function FundraiserLayoutInner() {
             </Suspense>
 
             {showFAB && (
-              <div className="fixed bottom-fab right-6 z-30 pointer-events-none sidebar:bottom-8 sidebar:right-[max(1.5rem,calc((100vw-48rem)/2-7rem))]">
+              <div className="fixed bottom-fab right-6 z-30 pointer-events-none sidebar:right-[max(1.5rem,calc((100vw-48rem)/2-7rem))]">
                 <div className="pointer-events-auto">
                   <FloatingComposeButton kind={fabKind} href={fabHref} onFabClick={onFabClick} icon={fabIcon} menu={fabMenu} />
                 </div>

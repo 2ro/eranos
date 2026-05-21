@@ -60,9 +60,9 @@
     overflow-wrap: anywhere;
   }
   
-  /* FAB bottom offset: clears bottom nav + safe area inset on mobile */
+  /* FAB bottom offset: no bottom nav, only clear safe area on native shells. */
   .bottom-fab {
-    bottom: calc(1.5rem + var(--bottom-nav-height) + var(--safe-area-inset-bottom, env(safe-area-inset-bottom, 0px)));
+    bottom: calc(2rem + var(--safe-area-inset-bottom, env(safe-area-inset-bottom, 0px)));
   }
 
   /* Position above mobile bottom nav + safe area + arc overhang (28px) */
