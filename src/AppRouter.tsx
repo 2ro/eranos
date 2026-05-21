@@ -49,7 +49,6 @@ const CreateCommunityPage = lazy(() => import("./pages/CreateCommunityPage").the
 const CreateEventPage = lazy(() => import("./pages/CreateEventPage").then(m => ({ default: m.CreateEventPage })));
 const ContentSettingsPage = lazy(() => import("./pages/ContentSettingsPage").then(m => ({ default: m.ContentSettingsPage })));
 const CSAEPolicyPage = lazy(() => import("./pages/CSAEPolicyPage").then(m => ({ default: m.CSAEPolicyPage })));
-const DiscoverPage = lazy(() => import("./pages/DiscoverPage").then(m => ({ default: m.DiscoverPage })));
 const DomainFeedPage = lazy(() => import("./pages/DomainFeedPage").then(m => ({ default: m.DomainFeedPage })));
 const EventsFeedPage = lazy(() => import("./pages/EventsFeedPage").then(m => ({ default: m.EventsFeedPage })));
 const ExternalContentPage = lazy(() => import("./pages/ExternalContentPage").then(m => ({ default: m.ExternalContentPage })));
@@ -169,7 +168,6 @@ export function AppRouter() {
           {/* All routes share the persistent FundraiserLayout (top nav + footer) */}
           <Route element={<FundraiserLayout />}>
             <Route path="/" element={<CampaignsPage />} />
-            <Route path="/discover" element={<DiscoverPage />} />
             <Route path="/feed" element={<Index />} />
             <Route path="/campaigns" element={<Navigate to="/" replace />} />
             <Route path="/campaigns/new" element={<CreateCampaignPage />} />

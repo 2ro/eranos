@@ -357,7 +357,7 @@ The `pinnedEvents` array is ordered newest pin first. Pinning an already-pinned 
 
 ### Campaign Moderation Labels
 
-Agora curates which kind 30223 campaigns appear on the homepage (`/`) and on Discover (`/discover`) via moderator-signed NIP-32 label events (kind 1985) in a dedicated label namespace. The campaign event itself is never modified — surfacing is purely a client-side rollup of label events.
+Agora curates which kind 30223 campaigns appear on the homepage (`/`) and on the Support directory (`/campaigns/all`) via moderator-signed NIP-32 label events (kind 1985) in a dedicated label namespace. The campaign event itself is never modified — surfacing is purely a client-side rollup of label events.
 
 #### Namespace
 
