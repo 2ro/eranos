@@ -214,8 +214,6 @@ export function ReactionButton({
             <span className={cn('tabular-nums', variant === 'chip' ? '' : 'text-sm', hasReacted && 'text-pink-500')}>
               {formatNumber(reactionCount)}
             </span>
-          ) : variant === 'chip' ? (
-            <span className="hidden sm:inline">React</span>
           ) : null}
         </button>
       </PopoverTrigger>

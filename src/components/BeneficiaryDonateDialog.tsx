@@ -12,7 +12,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { Label } from '@/components/ui/label';
 import { QRCodeCanvas } from '@/components/ui/qrcode';
 import { useAuthor } from '@/hooks/useAuthor';
 import { useProfileUrl } from '@/hooks/useProfileUrl';
@@ -88,48 +87,71 @@ export function BeneficiaryDonatePanel({
   }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-5">
+      {/* Beneficiary header — bigger avatar + a clear "Sending to"
+          eyebrow above the name so the reader knows exactly who's
+          receiving the donation. Avatar links to the profile. */}
       <Link
         to={profileUrl}
-        className="flex items-center gap-3 rounded-md -mx-2 px-2 py-1.5 motion-safe:transition-colors hover:bg-muted/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+        className="flex items-center gap-3 rounded-lg -mx-2 px-2 py-2 motion-safe:transition-colors hover:bg-muted/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
       >
-        <Avatar className="size-10 ring-1 ring-border">
+        <Avatar className="size-12 ring-2 ring-primary/20">
           {picture && <AvatarImage src={picture} alt="" />}
-          <AvatarFallback className="bg-primary/20 text-primary text-sm">
+          <AvatarFallback className="bg-primary/20 text-primary font-semibold">
             {displayName.slice(0, 2).toUpperCase()}
           </AvatarFallback>
         </Avatar>
         <div className="min-w-0">
-          <div className="font-medium truncate">{displayName}</div>
+          <div className="text-[11px] uppercase tracking-[0.12em] font-semibold text-muted-foreground">
+            Supporting
+          </div>
+          <div className="font-semibold text-base truncate leading-tight">
+            {displayName}
+          </div>
         </div>
       </Link>
 
-      {/* QR code */}
+      {/* QR — large, centered on a clean white tile with the Agora
+          logo embedded in an orange circular badge in the center.
+          Error-correction level H tolerates the centered occlusion
+          (~30% of modules can be missing and the code still scans).
+          No nested panel around it — the QR is its own visual anchor. */}
       <div className="flex justify-center">
-        <div className="rounded-2xl bg-white p-4 shadow-sm">
-          <QRCodeCanvas value={bip21} size={200} level="M" />
+        <div className="relative rounded-2xl bg-white p-4 shadow-sm">
+          <QRCodeCanvas value={bip21} size={280} level="H" />
+          <div
+            aria-hidden
+            className="absolute inset-0 flex items-center justify-center pointer-events-none"
+          >
+            <div className="rounded-full bg-primary p-2.5 ring-4 ring-white">
+              <img
+                src="/logo.svg"
+                alt=""
+                className="size-9 object-contain"
+                draggable={false}
+              />
+            </div>
+          </div>
         </div>
       </div>
 
-      {/* Copyable address */}
-      <div className="space-y-2">
-        <Label className="text-xs text-muted-foreground uppercase tracking-wide">
-          Bitcoin address
-        </Label>
-        <button
-          type="button"
-          onClick={copyAddress}
-          className="w-full flex items-center justify-between gap-2 rounded-lg border bg-muted/40 px-3 py-2.5 font-mono text-xs break-all text-left hover:bg-muted/60 motion-safe:transition-colors"
-          aria-label="Copy Bitcoin address"
-        >
-          <span className="break-all">{address}</span>
-          {copied ? (
-            <Check className="size-4 text-green-500 shrink-0" />
-          ) : (
-            <Copy className="size-4 text-muted-foreground shrink-0" />
-          )}
-        </button>
-      </div>
+      {/* Copyable address — single line, tap to copy. No wrapping
+          container; sits flush with the rest of the column. */}
+      <button
+        type="button"
+        onClick={copyAddress}
+        className="w-full flex items-center gap-2 rounded-lg border bg-muted/40 px-3 py-2.5 font-mono text-xs text-left hover:bg-muted/60 motion-safe:transition-colors"
+        aria-label="Copy Bitcoin address"
+      >
+        <span className="flex-1 min-w-0 truncate" title={address}>
+          {address}
+        </span>
+        {copied ? (
+          <Check className="size-4 text-green-500 shrink-0" />
+        ) : (
+          <Copy className="size-4 text-muted-foreground shrink-0" />
+        )}
+      </button>
 
       {/* Privacy notice — informational only. Bitcoin is a public
           ledger, so the donation can be traced back to the donor's
