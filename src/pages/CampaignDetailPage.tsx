@@ -68,7 +68,6 @@ import { formatNumber } from '@/lib/formatNumber';
 import { genUserName } from '@/lib/genUserName';
 import { sanitizeUrl } from '@/lib/sanitizeUrl';
 import { timeAgo } from '@/lib/timeAgo';
-import { cn } from '@/lib/utils';
 import NotFound from './NotFound';
 
 interface CampaignDetailPageProps {
@@ -129,7 +128,6 @@ function CampaignDetailContent({ campaign }: { campaign: ParsedCampaign }) {
   const [replyOpen, setReplyOpen] = useState(false);
   const [moreMenuOpen, setMoreMenuOpen] = useState(false);
   const [interactionsOpen, setInteractionsOpen] = useState(false);
-  const [storyExpanded, setStoryExpanded] = useState(false);
   const [interactionsTab, setInteractionsTab] = useState<InteractionTab>('reposts');
   const [archiveConfirmOpen, setArchiveConfirmOpen] = useState(false);
 
@@ -323,12 +321,15 @@ function CampaignDetailContent({ campaign }: { campaign: ParsedCampaign }) {
 
   return (
     <main className="min-h-screen pb-16">
-      {/* Cover hero stretches edge-to-edge on every breakpoint. */}
+      {/* Full-bleed cover hero. Title, creator, meta, summary, and the
+          back/admin buttons all live ON the image — the banner is the
+          page's emotional entry point. */}
       <CampaignHero
         campaign={campaign}
         cover={cover}
         creatorName={creatorName}
         creatorProfileUrl={creatorProfileUrl}
+        creatorPicture={sanitizeUrl(creatorMetadata?.picture)}
         deadline={deadline}
         countryLabel={countryLabel}
         tagLabel={tagLabel}
@@ -354,14 +355,16 @@ function CampaignDetailContent({ campaign }: { campaign: ParsedCampaign }) {
             <CampaignStory
               storyEvent={storyEvent}
               hasContent={campaign.story.trim().length > 0}
-              expanded={storyExpanded}
-              onToggle={() => setStoryExpanded((v) => !v)}
             />
 
             {/* Engagement: stats counters, action bar, threaded replies
-                + donation receipts interleaved. */}
+                + donation receipts interleaved. Rendered flush with the
+                story (no card chrome) so the page reads as one
+                continuous flow — story → counters → action chips →
+                comments — rather than a stack of disconnected boxes.
+                A subtle top border separates it from the story above. */}
             <div id="campaign-activity" className="scroll-mt-20">
-              <div className="rounded-2xl bg-card border border-border/60 shadow-sm px-4 sm:px-5 py-4 sm:py-5">
+              <div className="border-t border-border/60 pt-4">
                 {hasStats && (
                   <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs sm:text-sm text-muted-foreground pb-2">
                     {engagementStats?.reposts ? (
@@ -406,7 +409,6 @@ function CampaignDetailContent({ campaign }: { campaign: ParsedCampaign }) {
                   hideZap
                   onReply={() => setReplyOpen(true)}
                   onMore={() => setMoreMenuOpen(true)}
-                  className={hasStats ? 'pt-3 border-t border-border/60' : undefined}
                 />
               </div>
 
@@ -525,7 +527,11 @@ function CampaignDetailContent({ campaign }: { campaign: ParsedCampaign }) {
 }
 
 // ─────────────────────────────────────────────────────────────────────
-// Hero
+// Hero — full-bleed cover with title, creator, meta, summary, and the
+// back / admin controls all overlaid on the image. The banner is the
+// page's emotional entry point: the photo carries the campaign's story
+// at a glance, and the overlay text makes the pitch readable without
+// taking the reader off the image.
 // ─────────────────────────────────────────────────────────────────────
 
 interface CampaignHeroProps {
@@ -533,6 +539,7 @@ interface CampaignHeroProps {
   cover: string | undefined;
   creatorName: string;
   creatorProfileUrl: string;
+  creatorPicture: string | undefined;
   deadline: { label: string; isPast: boolean } | null;
   countryLabel: string | undefined;
   tagLabel: string | undefined;
@@ -549,6 +556,7 @@ function CampaignHero({
   cover,
   creatorName,
   creatorProfileUrl,
+  creatorPicture,
   deadline,
   countryLabel,
   tagLabel,
@@ -559,69 +567,102 @@ function CampaignHero({
   onArchive,
   onReopen,
 }: CampaignHeroProps) {
+  const initials = creatorName.slice(0, 2).toUpperCase();
+
   return (
-    <div className="max-w-6xl mx-auto px-4 sm:px-6 pt-4">
-      <div className="relative aspect-[16/9] sm:aspect-[21/9] rounded-xl overflow-hidden bg-gradient-to-br from-primary/40 via-primary/20 to-secondary">
-        {cover ? (
-          <img src={cover} alt="" className="absolute inset-0 size-full object-cover" />
-        ) : (
-          <div className="absolute inset-0 flex items-center justify-center">
-            <HandHeart className="size-16 text-primary/40" />
+    // True full-bleed: no max-width wrapper, no horizontal padding, no
+    // rounded corners — the image touches every edge on every
+    // breakpoint. Height is generous on mobile so the banner fills the
+    // viewport for an immersive first impression instead of being a
+    // strip; on larger screens we cap it so the page content below
+    // stays visible.
+    <header className="relative isolate w-full overflow-hidden bg-gradient-to-br from-primary/40 via-primary/20 to-secondary min-h-[78svh] sm:min-h-0 sm:aspect-[21/9] lg:aspect-[24/9]">
+      {cover ? (
+        <img
+          src={cover}
+          alt=""
+          className="absolute inset-0 size-full object-cover"
+        />
+      ) : (
+        <div className="absolute inset-0 flex items-center justify-center">
+          <HandHeart className="size-20 text-primary/40" />
+        </div>
+      )}
+
+      {/* Single, smooth dark gradient anchored at the bottom — no
+          middle band, no top wash. The image stays vibrant at the
+          top while the overlay text gets a clean reading surface
+          underneath. */}
+      <div
+        aria-hidden
+        className="absolute inset-x-0 bottom-0 top-1/3 bg-gradient-to-t from-black/85 via-black/55 to-transparent"
+      />
+      {/* Subtle top scrim purely to keep the back/admin buttons
+          legible against bright skies, beaches, etc. */}
+      <div
+        aria-hidden
+        className="absolute inset-x-0 top-0 h-24 bg-gradient-to-b from-black/45 to-transparent"
+      />
+
+      {/* Top controls — back left, admin right. Use chip-style
+          backdrops so they read on any image without an opaque pill. */}
+      <div className="absolute inset-x-0 top-0 z-10 flex items-center justify-between gap-3 px-4 pt-[max(env(safe-area-inset-top),1rem)] sm:px-6">
+        <button
+          onClick={onBack}
+          className="inline-flex items-center gap-1.5 h-10 pl-2 pr-3.5 rounded-full bg-black/30 text-white backdrop-blur-md hover:bg-black/45 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80 motion-safe:transition-colors"
+          aria-label="Go back"
+        >
+          <ChevronLeft className="size-5" />
+          <span className="text-sm font-medium hidden sm:inline">Back</span>
+        </button>
+
+        {isCreator && (
+          <div className="flex items-center gap-1.5">
+            <Button
+              asChild
+              size="sm"
+              className="h-10 rounded-full bg-black/30 text-white backdrop-blur-md shadow-none hover:bg-black/45 focus-visible:ring-white/80"
+            >
+              <Link to={`/campaigns/new?edit=${encodeURIComponent(naddr)}`}>
+                <Pencil className="size-4 sm:mr-2" />
+                <span className="hidden sm:inline">Edit</span>
+              </Link>
+            </Button>
+            {campaign.archived ? (
+              <Button
+                type="button"
+                size="sm"
+                onClick={onReopen}
+                disabled={archiveDisabled}
+                className="h-10 rounded-full bg-black/30 text-white backdrop-blur-md shadow-none hover:bg-black/45 focus-visible:ring-white/80"
+              >
+                <ArchiveRestore className="size-4 sm:mr-2" />
+                <span className="hidden sm:inline">Reopen</span>
+              </Button>
+            ) : (
+              <Button
+                type="button"
+                size="sm"
+                onClick={onArchive}
+                disabled={archiveDisabled}
+                className="h-10 rounded-full bg-black/30 text-white backdrop-blur-md shadow-none hover:bg-black/45 focus-visible:ring-white/80"
+              >
+                <Archive className="size-4 sm:mr-2" />
+                <span className="hidden sm:inline">Archive</span>
+              </Button>
+            )}
           </div>
         )}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/25 to-black/45" />
+      </div>
 
-        <div className="absolute left-0 right-0 top-0 z-10 flex items-center justify-between gap-3 px-4 pt-4">
-          <button
-            onClick={onBack}
-            className="p-2.5 -ml-2 rounded-full text-white/90 hover:bg-white/15 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80 motion-safe:transition-colors"
-            aria-label="Go back"
-          >
-            <ChevronLeft className="size-6 drop-shadow-[0_1px_2px_rgba(0,0,0,0.85)]" />
-          </button>
-          {isCreator && (
-            <div className="flex items-center gap-1.5">
-              <Button
-                asChild
-                variant="ghost"
-                size="sm"
-                className="rounded-full bg-transparent text-white/90 shadow-none hover:bg-white/15 hover:text-white focus-visible:ring-white/80"
-              >
-                <Link to={`/campaigns/new?edit=${encodeURIComponent(naddr)}`}>
-                  <Pencil className="size-4 mr-2" />
-                  Edit
-                </Link>
-              </Button>
-              {campaign.archived ? (
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="sm"
-                  onClick={onReopen}
-                  disabled={archiveDisabled}
-                  className="rounded-full bg-transparent text-white/90 shadow-none hover:bg-white/15 hover:text-white focus-visible:ring-white/80"
-                >
-                  <ArchiveRestore className="size-4 mr-2" />
-                  Reopen
-                </Button>
-              ) : (
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="sm"
-                  onClick={onArchive}
-                  disabled={archiveDisabled}
-                  className="rounded-full bg-transparent text-white/90 shadow-none hover:bg-white/15 hover:text-white focus-visible:ring-white/80"
-                >
-                  <Archive className="size-4 mr-2" />
-                  Archive
-                </Button>
-              )}
-            </div>
-          )}
-        </div>
-
-        <div className="absolute inset-x-0 bottom-0 z-10 space-y-2 p-5 sm:p-6 [text-shadow:0_1px_4px_rgba(0,0,0,0.75),0_2px_10px_rgba(0,0,0,0.45)]">
+      {/* Overlay content — sits at the bottom of the image, contained
+          to the 6xl column on desktop so it lines up with the body
+          content below. Generous bottom padding (incl. safe-area)
+          keeps the title comfortably above the home-indicator on
+          notched phones. Drop-shadow on text gives extra contrast on
+          busy photos without darkening the gradient further. */}
+      <div className="absolute inset-x-0 bottom-0 z-10 px-5 sm:px-6 pb-[max(env(safe-area-inset-bottom),1.5rem)] pt-12 sm:pt-16">
+        <div className="max-w-6xl mx-auto space-y-3 sm:space-y-4 [text-shadow:0_1px_3px_rgba(0,0,0,0.55)]">
           {campaign.archived && (
             <Badge
               variant="secondary"
@@ -631,51 +672,67 @@ function CampaignHero({
               Archived
             </Badge>
           )}
-          <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
-            <h1 className="text-3xl sm:text-4xl font-bold leading-tight tracking-tight text-white">
-              {campaign.title}
-            </h1>
-            <Link
-              to={creatorProfileUrl}
-              onClick={(e) => e.stopPropagation()}
-              className="text-xs sm:text-sm text-white/85 hover:text-white motion-safe:transition-colors"
-            >
-              by <span className="font-medium">{creatorName}</span>
-            </Link>
-          </div>
-          <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 text-xs sm:text-sm font-medium text-white/85">
-            {tagLabel && (
-              <span className="inline-flex items-center gap-1.5">
-                <Tag className="size-3.5 sm:size-4" />
-                {tagLabel}
-              </span>
-            )}
-            {countryLabel && (
-              <span className="inline-flex items-center gap-1.5">
-                <MapPin className="size-3.5 sm:size-4" />
-                {countryLabel}
-              </span>
-            )}
-            {deadline && (
-              <span className="inline-flex items-center gap-1.5">
-                <CalendarClock className="size-3.5 sm:size-4" />
-                {deadline.label}
-              </span>
-            )}
-            <span className="inline-flex items-center gap-1.5">
-              <Users className="size-3.5 sm:size-4" />
-              {campaign.recipients.length}{' '}
-              {campaign.recipients.length === 1 ? 'recipient' : 'recipients'}
-            </span>
-          </div>
+
+          {tagLabel && (
+            <div className="text-xs sm:text-sm font-semibold uppercase tracking-[0.14em] text-white/75 inline-flex items-center gap-2">
+              <Tag className="size-3.5" />
+              {tagLabel}
+            </div>
+          )}
+
+          <h1 className="text-3xl sm:text-5xl lg:text-6xl font-bold leading-[1.05] tracking-tight text-white max-w-4xl">
+            {campaign.title}
+          </h1>
+
           {campaign.summary && (
-            <p className="max-w-2xl text-base sm:text-lg text-white/90 line-clamp-3">
+            <p className="text-base sm:text-lg lg:text-xl leading-relaxed text-white/90 max-w-2xl line-clamp-4 sm:line-clamp-none">
               {campaign.summary}
             </p>
           )}
+
+          <Link
+            to={creatorProfileUrl}
+            onClick={(e) => e.stopPropagation()}
+            className="inline-flex items-center gap-2.5 pt-1 text-sm sm:text-base text-white/90 hover:text-white motion-safe:transition-colors group [text-shadow:none]"
+          >
+            <Avatar className="size-8 sm:size-9 ring-2 ring-white/30">
+              {creatorPicture && <AvatarImage src={creatorPicture} alt="" />}
+              <AvatarFallback className="text-xs bg-white/15 text-white">
+                {initials}
+              </AvatarFallback>
+            </Avatar>
+            <span className="[text-shadow:0_1px_3px_rgba(0,0,0,0.55)]">
+              by{' '}
+              <span className="font-semibold underline-offset-4 group-hover:underline">
+                {creatorName}
+              </span>
+            </span>
+          </Link>
+
+          {(countryLabel || deadline || campaign.recipients.length > 0) && (
+            <div className="flex flex-wrap items-center gap-x-5 gap-y-1.5 pt-1 text-xs sm:text-sm font-medium text-white/85">
+              {countryLabel && (
+                <span className="inline-flex items-center gap-1.5">
+                  <MapPin className="size-4" />
+                  {countryLabel}
+                </span>
+              )}
+              {deadline && (
+                <span className="inline-flex items-center gap-1.5">
+                  <CalendarClock className="size-4" />
+                  {deadline.label}
+                </span>
+              )}
+              <span className="inline-flex items-center gap-1.5">
+                <Users className="size-4" />
+                {campaign.recipients.length}{' '}
+                {campaign.recipients.length === 1 ? 'recipient' : 'recipients'}
+              </span>
+            </div>
+          )}
         </div>
       </div>
-    </div>
+    </header>
   );
 }
 
@@ -686,54 +743,38 @@ function CampaignHero({
 function CampaignStory({
   storyEvent,
   hasContent,
-  expanded,
-  onToggle,
 }: {
   storyEvent: NostrEvent;
   hasContent: boolean;
-  expanded: boolean;
-  onToggle: () => void;
+  // expanded/onToggle retained on the call site for backwards-compat
+  // but no longer used — the story shows in full. A fundraiser pitch
+  // is the entire point of the page; hiding most of it behind a
+  // fade-out gradient buries the message.
+  expanded?: boolean;
+  onToggle?: () => void;
 }) {
   if (!hasContent) {
     return (
-      <article className="prose prose-neutral dark:prose-invert max-w-none">
+      <div className="rounded-2xl border border-dashed border-border/80 bg-card/40 px-6 py-10 text-center">
         <p className="text-muted-foreground italic">
           The organizer hasn't written a story for this campaign yet.
         </p>
-      </article>
+      </div>
     );
   }
 
   return (
-    <div className="space-y-2">
-      <div
-        className={cn(
-          'relative overflow-hidden',
-          // Clip the story preview to ~6 lines on mobile / ~12 lines on
-          // desktop when collapsed. The aside donate column is taller
-          // than 6 lines, so giving the article more space when sticky
-          // beside it keeps the page from feeling top-heavy.
-          !expanded && 'max-h-[18rem] sm:max-h-[24rem]',
-        )}
+    <section aria-labelledby="campaign-story-heading" className="space-y-3">
+      <h2
+        id="campaign-story-heading"
+        className="text-xs font-semibold uppercase tracking-[0.12em] text-muted-foreground"
       >
-        <article className="prose prose-neutral dark:prose-invert max-w-none">
-          <ArticleContent event={storyEvent} />
-        </article>
-        {!expanded && (
-          <div
-            aria-hidden
-            className="pointer-events-none absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-background to-transparent"
-          />
-        )}
-      </div>
-      <button
-        type="button"
-        onClick={onToggle}
-        className="text-sm font-medium text-primary hover:underline motion-safe:transition-colors"
-      >
-        {expanded ? 'Show less' : 'Read more'}
-      </button>
-    </div>
+        The story
+      </h2>
+      <article className="prose prose-neutral dark:prose-invert max-w-none prose-p:leading-relaxed prose-p:text-foreground/90 prose-headings:tracking-tight prose-img:rounded-xl">
+        <ArticleContent event={storyEvent} />
+      </article>
+    </section>
   );
 }
 
@@ -1060,13 +1101,10 @@ function CampaignReplySkeleton() {
 function CampaignDetailSkeleton() {
   return (
     <main className="min-h-screen pb-16">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 pt-4">
-        <Skeleton className="aspect-[16/9] sm:aspect-[21/9] w-full rounded-xl" />
-      </div>
+      <Skeleton className="w-full min-h-[78svh] sm:min-h-0 sm:aspect-[21/9] lg:aspect-[24/9] rounded-none" />
       <div className="max-w-6xl mx-auto px-4 sm:px-6 py-6 lg:py-10">
         <div className="lg:flex lg:gap-8 lg:items-start">
-          <div className="flex-1 min-w-0 space-y-4">
-            <Skeleton className="h-10 w-2/3" />
+          <div className="flex-1 min-w-0 space-y-3">
             <Skeleton className="h-5 w-full" />
             <Skeleton className="h-5 w-4/5" />
             <Skeleton className="h-5 w-5/6" />
