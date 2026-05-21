@@ -217,7 +217,7 @@ function parseShelfLocation(raw: string): string {
 
 function ActivityTypePill({ icon, label }: { icon: React.ReactNode; label: string }) {
   return (
-    <div className="inline-flex items-center gap-1.5 rounded-full border border-border/70 bg-background/95 px-2.5 py-1 text-xs font-semibold text-muted-foreground shadow-sm">
+    <div className="inline-flex items-center gap-1.5 rounded-full border border-border/70 bg-background/95 px-2.5 py-1 text-xs font-semibold text-muted-foreground">
       {icon}
       {label}
     </div>
@@ -243,11 +243,8 @@ function PledgeShelfCard({ pledge }: { pledge: Action }) {
   return (
     <Link
       to={`/${naddr}`}
-      className="group block w-[280px] shrink-0 rounded-xl overflow-hidden focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background motion-safe:transition-transform motion-safe:duration-200 motion-safe:hover:-translate-y-0.5"
+      className="group block h-[430px] w-[280px] shrink-0 rounded-xl overflow-hidden focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background motion-safe:transition-transform motion-safe:duration-200 motion-safe:hover:-translate-y-0.5"
     >
-      <div className="mb-2">
-        <ActivityTypePill icon={<Megaphone className="size-3.5 text-primary" />} label="Pledge" />
-      </div>
       <Card className="overflow-hidden border-border/70 shadow-sm motion-safe:transition-shadow motion-safe:duration-200 group-hover:shadow-lg h-full flex flex-col">
         <div className="relative w-full aspect-[16/9] bg-gradient-to-br from-primary/15 via-primary/5 to-secondary">
           <img
@@ -302,8 +299,11 @@ function PledgeShelfCard({ pledge }: { pledge: Action }) {
             )}
           </div>
 
-          <div className="text-xs text-muted-foreground border-t border-border/60 pt-3 truncate">
-            by <span className="font-medium text-foreground">{displayName}</span>
+          <div className="flex items-center justify-between gap-3 border-t border-border/60 pt-3 text-xs text-muted-foreground">
+            <div className="truncate">
+              by <span className="font-medium text-foreground">{displayName}</span>
+            </div>
+            <ActivityTypePill icon={<Megaphone className="size-3.5 text-primary" />} label="Pledge" />
           </div>
         </div>
       </Card>
@@ -336,11 +336,8 @@ function CalendarEventShelfCard({ event }: { event: NostrEvent }) {
   return (
     <Link
       to={`/${naddr}`}
-      className="group block w-[280px] shrink-0 rounded-xl overflow-hidden focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background motion-safe:transition-transform motion-safe:duration-200 motion-safe:hover:-translate-y-0.5"
+      className="group block h-[430px] w-[280px] shrink-0 rounded-xl overflow-hidden focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background motion-safe:transition-transform motion-safe:duration-200 motion-safe:hover:-translate-y-0.5"
     >
-      <div className="mb-2">
-        <ActivityTypePill icon={<CalendarDays className="size-3.5 text-primary" />} label="Event" />
-      </div>
       <Card className="overflow-hidden border-border/70 shadow-sm motion-safe:transition-shadow motion-safe:duration-200 group-hover:shadow-lg h-full flex flex-col">
         <div className="relative w-full aspect-[16/9] overflow-hidden bg-gradient-to-br from-primary/15 via-primary/5 to-secondary">
           {coverImage ? (
@@ -405,8 +402,11 @@ function CalendarEventShelfCard({ event }: { event: NostrEvent }) {
             ) : null}
           </div>
 
-          <div className="text-xs text-muted-foreground border-t border-border/60 pt-3 truncate">
-            by <span className="font-medium text-foreground">{displayName}</span>
+          <div className="flex items-center justify-between gap-3 border-t border-border/60 pt-3 text-xs text-muted-foreground">
+            <div className="truncate">
+              by <span className="font-medium text-foreground">{displayName}</span>
+            </div>
+            <ActivityTypePill icon={<CalendarDays className="size-3.5 text-primary" />} label="Event" />
           </div>
         </div>
       </Card>
@@ -438,7 +438,7 @@ function OfficialShelf({ title, count, isLoading, isEmpty, children }: OfficialS
           )}
         </h2>
       </div>
-      <div className="-mx-4 sm:-mx-6 px-4 sm:px-6 flex gap-3 overflow-x-auto scrollbar-none pb-1">
+      <div className="-mx-4 sm:-mx-6 px-4 sm:px-6 flex items-stretch gap-3 overflow-x-auto scrollbar-none pb-1">
         {children}
       </div>
     </section>
@@ -529,11 +529,12 @@ function OfficialActivityShelves({
         {mixedActivity.map((item) => {
           if (item.type === 'campaign') {
             return (
-              <div key={`campaign:${item.id}`} className="w-[280px] shrink-0">
-                <div className="mb-2">
-                  <ActivityTypePill icon={<HandHeart className="size-3.5 text-primary" />} label="Campaign" />
-                </div>
-                <CampaignCard campaign={item.campaign} />
+              <div key={`campaign:${item.id}`} className="h-[430px] w-[280px] shrink-0">
+                <CampaignCard
+                  campaign={item.campaign}
+                  className="h-full"
+                  footerBadge={<ActivityTypePill icon={<HandHeart className="size-3.5 text-primary" />} label="Campaign" />}
+                />
               </div>
             );
           }
