@@ -522,3 +522,46 @@ export async function fetchBlockbookStatus(
 ): Promise<BlockbookStatus> {
   return getSocket(baseUrl).send<BlockbookStatus>('getInfo', {}, signal);
 }
+
+// ---------------------------------------------------------------------------
+// getCurrentFiatRates — spot BTC → fiat exchange rate
+// ---------------------------------------------------------------------------
+//
+// Blockbook tracks fiat rates for the coin it serves. The WS API takes a
+// list of ISO currency codes and returns a `{ ts, rates: { [ccy]: number } }`
+// payload. We use this so /hdwallet's USD display sources from the same
+// server as its balance and tx data — no extra HTTP dependency on
+// mempool.space.
+// ---------------------------------------------------------------------------
+
+interface BlockbookFiatRatesResponse {
+  /** Unix seconds the rate snapshot was published. */
+  ts?: number;
+  /** ISO currency code → BTC/<ccy> exchange rate (BTC value of one unit). */
+  rates?: Record<string, number>;
+}
+
+/**
+ * Fetch the current BTC price in the requested fiat currency.
+ *
+ * @param baseUrl   Blockbook base URL (HTTP or WSS form).
+ * @param currency  ISO currency code, lower-case (e.g. `'usd'`). Default `'usd'`.
+ * @param signal    Optional abort signal.
+ * @throws when the response is missing or doesn't include the requested currency.
+ */
+export async function fetchBlockbookBtcPrice(
+  baseUrl: string,
+  currency = 'usd',
+  signal?: AbortSignal,
+): Promise<number> {
+  const data = await getSocket(baseUrl).send<BlockbookFiatRatesResponse>(
+    'getCurrentFiatRates',
+    { currencies: [currency] },
+    signal,
+  );
+  const rate = data?.rates?.[currency];
+  if (typeof rate !== 'number' || !Number.isFinite(rate) || rate <= 0) {
+    throw new Error(`Blockbook fiat rate for "${currency}" unavailable`);
+  }
+  return rate;
+}

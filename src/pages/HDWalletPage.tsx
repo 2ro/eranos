@@ -22,7 +22,7 @@ import { QRCodeCanvas } from '@/components/ui/qrcode';
 import { HDSendBitcoinDialog } from '@/components/HDSendBitcoinDialog';
 import { useAppContext } from '@/hooks/useAppContext';
 import { useHdWallet } from '@/hooks/useHdWallet';
-import { useBtcPrice } from '@/hooks/useBtcPrice';
+import { useHdBtcPrice } from '@/hooks/useHdBtcPrice';
 import { satsToUSD, formatBTC } from '@/lib/bitcoin';
 import type { HdTransaction } from '@/lib/hdwallet/scan';
 
@@ -40,7 +40,7 @@ export function HDWalletPage() {
     refetch,
     nextReceiveAddress,
   } = useHdWallet();
-  const { data: btcPrice } = useBtcPrice();
+  const { data: btcPrice } = useHdBtcPrice();
 
   const [copiedAddress, setCopiedAddress] = useState(false);
   const [txOpen, setTxOpen] = useState(false);
