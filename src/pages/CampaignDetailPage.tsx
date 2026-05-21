@@ -431,9 +431,7 @@ function CampaignDetailContent({ campaign }: { campaign: ParsedCampaign }) {
                     ))}
                   </div>
                 ) : replyTree.length > 0 ? (
-                  <div className="-mx-2 sm:-mx-4 rounded-2xl bg-card border border-border/60 overflow-hidden">
-                    <ThreadedReplyList roots={replyTree} />
-                  </div>
+                  <ThreadedReplyList roots={replyTree} />
                 ) : (
                   <button
                     type="button"
@@ -575,7 +573,7 @@ function CampaignHero({
     // viewport for an immersive first impression instead of being a
     // strip; on larger screens we cap it so the page content below
     // stays visible.
-    <header className="relative isolate w-full overflow-hidden bg-gradient-to-br from-primary/40 via-primary/20 to-secondary min-h-[92svh] sm:min-h-0 sm:aspect-[16/9] lg:aspect-[18/9]">
+    <header className="relative isolate w-full overflow-hidden bg-gradient-to-br from-primary/40 via-primary/20 to-secondary min-h-[92svh] sm:min-h-0 sm:aspect-[21/9] lg:aspect-[3/1]">
       {cover ? (
         <img
           src={cover}
@@ -603,55 +601,59 @@ function CampaignHero({
         className="absolute inset-x-0 top-0 h-24 bg-gradient-to-b from-black/45 to-transparent"
       />
 
-      {/* Top controls — back left, admin right. Use chip-style
+      {/* Top controls — back left, admin right. Contained to the
+          same max-w-6xl column as the overlay text below so the back
+          button aligns with the title's left edge. Chip-style
           backdrops so they read on any image without an opaque pill. */}
-      <div className="absolute inset-x-0 top-0 z-10 flex items-center justify-between gap-3 px-4 pt-[max(env(safe-area-inset-top),1rem)] sm:px-6">
-        <button
-          onClick={onBack}
-          className="inline-flex items-center gap-1.5 h-10 pl-2 pr-3.5 rounded-full bg-black/30 text-white backdrop-blur-md hover:bg-black/45 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80 motion-safe:transition-colors"
-          aria-label="Go back"
-        >
-          <ChevronLeft className="size-5" />
-          <span className="text-sm font-medium hidden sm:inline">Back</span>
-        </button>
+      <div className="absolute inset-x-0 top-0 z-10 px-5 sm:px-6 pt-[max(env(safe-area-inset-top),1rem)]">
+        <div className="max-w-6xl mx-auto flex items-center justify-between gap-3">
+          <button
+            onClick={onBack}
+            className="inline-flex items-center gap-1.5 h-10 pl-2 pr-3.5 rounded-full bg-black/30 text-white backdrop-blur-md hover:bg-black/45 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80 motion-safe:transition-colors"
+            aria-label="Go back"
+          >
+            <ChevronLeft className="size-5" />
+            <span className="text-sm font-medium hidden sm:inline">Back</span>
+          </button>
 
-        {isCreator && (
-          <div className="flex items-center gap-1.5">
-            <Button
-              asChild
-              size="sm"
-              className="h-10 rounded-full bg-black/30 text-white backdrop-blur-md shadow-none hover:bg-black/45 focus-visible:ring-white/80"
-            >
-              <Link to={`/campaigns/new?edit=${encodeURIComponent(naddr)}`}>
-                <Pencil className="size-4 sm:mr-2" />
-                <span className="hidden sm:inline">Edit</span>
-              </Link>
-            </Button>
-            {campaign.archived ? (
+          {isCreator && (
+            <div className="flex items-center gap-1.5">
               <Button
-                type="button"
+                asChild
                 size="sm"
-                onClick={onReopen}
-                disabled={archiveDisabled}
                 className="h-10 rounded-full bg-black/30 text-white backdrop-blur-md shadow-none hover:bg-black/45 focus-visible:ring-white/80"
               >
-                <ArchiveRestore className="size-4 sm:mr-2" />
-                <span className="hidden sm:inline">Reopen</span>
+                <Link to={`/campaigns/new?edit=${encodeURIComponent(naddr)}`}>
+                  <Pencil className="size-4 sm:mr-2" />
+                  <span className="hidden sm:inline">Edit</span>
+                </Link>
               </Button>
-            ) : (
-              <Button
-                type="button"
-                size="sm"
-                onClick={onArchive}
-                disabled={archiveDisabled}
-                className="h-10 rounded-full bg-black/30 text-white backdrop-blur-md shadow-none hover:bg-black/45 focus-visible:ring-white/80"
-              >
-                <Archive className="size-4 sm:mr-2" />
-                <span className="hidden sm:inline">Archive</span>
-              </Button>
-            )}
-          </div>
-        )}
+              {campaign.archived ? (
+                <Button
+                  type="button"
+                  size="sm"
+                  onClick={onReopen}
+                  disabled={archiveDisabled}
+                  className="h-10 rounded-full bg-black/30 text-white backdrop-blur-md shadow-none hover:bg-black/45 focus-visible:ring-white/80"
+                >
+                  <ArchiveRestore className="size-4 sm:mr-2" />
+                  <span className="hidden sm:inline">Reopen</span>
+                </Button>
+              ) : (
+                <Button
+                  type="button"
+                  size="sm"
+                  onClick={onArchive}
+                  disabled={archiveDisabled}
+                  className="h-10 rounded-full bg-black/30 text-white backdrop-blur-md shadow-none hover:bg-black/45 focus-visible:ring-white/80"
+                >
+                  <Archive className="size-4 sm:mr-2" />
+                  <span className="hidden sm:inline">Archive</span>
+                </Button>
+              )}
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Overlay content — sits at the bottom of the image, contained
@@ -816,8 +818,13 @@ function DonateColumn({
       : null;
 
   return (
-    <Card className="overflow-hidden">
-      <CardContent className="p-5 space-y-5">
+    // On mobile we drop the Card chrome (no border, no shadow, no
+    // rounded background) so the donate content flows inline with the
+    // page instead of being a floating box stacked between the hero
+    // and the story. On lg+ the sticky right sidebar reinstates the
+    // card framing so the column reads as a proper aside.
+    <Card className="overflow-hidden border-0 shadow-none bg-transparent lg:border lg:shadow-sm lg:bg-card">
+      <CardContent className="p-0 lg:p-5 space-y-5">
         {/* Raised stats + progress */}
         {statsLoading ? (
           <Skeleton className="h-16 w-full" />

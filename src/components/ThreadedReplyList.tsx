@@ -16,7 +16,13 @@ export interface ReplyNode {
 /** Renders a fully threaded reply tree with collapsible deep branches. */
 export function ThreadedReplyList({ roots }: { roots: ReplyNode[] }) {
   return (
-    <div>
+    // Drop the trailing border on the last comment in the list — when
+    // the surrounding page doesn't wrap us in a card, that border
+    // floats orphaned below the final note. Two selectors are needed
+    // because the last root may be either a bare <article> (no
+    // children) or a <div> wrapping an <article> chain. `!important`
+    // overrides NoteCard's own `border-b border-border` utility.
+    <div className="[&>article:last-child]:!border-b-transparent [&>div:last-child_article]:!border-b-transparent">
       {roots.map((node) => (
         <ReplyThread key={node.event.id} node={node} depth={0} />
       ))}

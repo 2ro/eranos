@@ -111,7 +111,9 @@ export function BeneficiaryDonatePanel({
         </div>
       </div>
 
-      {/* Copyable address */}
+      {/* Copyable address. Truncated to a single line so it doesn't
+          wrap into a multi-row block on mobile — tap the row to copy
+          the full address. */}
       <div className="space-y-2">
         <Label className="text-xs text-muted-foreground uppercase tracking-wide">
           Bitcoin address
@@ -119,10 +121,12 @@ export function BeneficiaryDonatePanel({
         <button
           type="button"
           onClick={copyAddress}
-          className="w-full flex items-center justify-between gap-2 rounded-lg border bg-muted/40 px-3 py-2.5 font-mono text-xs break-all text-left hover:bg-muted/60 motion-safe:transition-colors"
+          className="w-full flex items-center gap-2 rounded-lg border bg-muted/40 px-3 py-2.5 font-mono text-xs text-left hover:bg-muted/60 motion-safe:transition-colors"
           aria-label="Copy Bitcoin address"
         >
-          <span className="break-all">{address}</span>
+          <span className="flex-1 min-w-0 truncate" title={address}>
+            {address}
+          </span>
           {copied ? (
             <Check className="size-4 text-green-500 shrink-0" />
           ) : (
