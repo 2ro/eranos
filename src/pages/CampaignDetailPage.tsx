@@ -43,10 +43,6 @@ import { PostActionBar } from '@/components/PostActionBar';
 import { ReplyComposeModal } from '@/components/ReplyComposeModal';
 import { NoteMoreMenu } from '@/components/NoteMoreMenu';
 import { Progress } from '@/components/ui/progress';
-import {
-  InteractionsModal,
-  type InteractionTab,
-} from '@/components/InteractionsModal';
 import { ThreadedReplyList, type ReplyNode } from '@/components/ThreadedReplyList';
 import { useArchiveCampaign } from '@/hooks/useArchiveCampaign';
 import { useAuthor } from '@/hooks/useAuthor';
@@ -153,17 +149,10 @@ function CampaignDetailContent({ campaign }: { campaign: ParsedCampaign }) {
   const [donateOpen, setDonateOpen] = useState(false);
   const [replyOpen, setReplyOpen] = useState(false);
   const [moreMenuOpen, setMoreMenuOpen] = useState(false);
-  const [interactionsOpen, setInteractionsOpen] = useState(false);
   const [storyExpanded, setStoryExpanded] = useState(false);
-  const [interactionsTab, setInteractionsTab] = useState<InteractionTab>('reposts');
   const [archiveConfirmOpen, setArchiveConfirmOpen] = useState(false);
 
   const archiveMutation = useArchiveCampaign();
-
-  const openInteractions = (tab: InteractionTab) => {
-    setInteractionsTab(tab);
-    setInteractionsOpen(true);
-  };
 
   const { data: engagementStats } = useEventStats(campaign.event.id, campaign.event);
 
@@ -255,14 +244,6 @@ function CampaignDetailContent({ campaign }: { campaign: ParsedCampaign }) {
     ];
   }, [feedEventsById, pinnedEvents, pinnedIdSet, pinnedIds, replyTree]);
 
-  // Engagement counters above the action bar. Zaps are intentionally excluded
-  // for campaigns — donations are on-chain (kind 8333), so showing a zap
-  // count here would suggest the wrong CTA.
-  const hasStats =
-    !!engagementStats?.replies ||
-    !!engagementStats?.reposts ||
-    !!engagementStats?.quotes ||
-    !!engagementStats?.reactions;
   const cover = sanitizeUrl(campaign.image);
   const creatorMetadata = author.data?.metadata;
   const creatorName =
@@ -387,6 +368,18 @@ function CampaignDetailContent({ campaign }: { campaign: ParsedCampaign }) {
         onReopen={handleToggleArchive}
       />
 
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 mt-3">
+        <div className="rounded-2xl bg-card border border-border/60 shadow-sm px-4 sm:px-5 py-3">
+          <PostActionBar
+            event={campaign.event}
+            replyLabel="Comment"
+            hideZap
+            onReply={() => setReplyOpen(true)}
+            onMore={() => setMoreMenuOpen(true)}
+          />
+        </div>
+      </div>
+
       {/* Two-column body. On mobile the right column collapses inline
           immediately below the hero so the donate CTA stays above the
           fold. On lg+ the right column sticks to the viewport edge of
@@ -405,59 +398,9 @@ function CampaignDetailContent({ campaign }: { campaign: ParsedCampaign }) {
               onToggle={() => setStoryExpanded((v) => !v)}
             />
 
-            {/* Engagement: stats counters, action bar, threaded replies
-                + donation receipts interleaved. */}
+            {/* Activity: threaded replies + donation receipts interleaved. */}
             <div id="campaign-activity" className="scroll-mt-20">
-              <div className="rounded-2xl bg-card border border-border/60 shadow-sm px-4 sm:px-5 py-4 sm:py-5">
-                {hasStats && (
-                  <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs sm:text-sm text-muted-foreground pb-2">
-                    {engagementStats?.reposts ? (
-                      <button
-                        onClick={() => openInteractions('reposts')}
-                        className="hover:underline transition-colors"
-                      >
-                        <span className="font-bold text-foreground">
-                          {formatNumber(engagementStats.reposts)}
-                        </span>{' '}
-                        Repost{engagementStats.reposts !== 1 ? 's' : ''}
-                      </button>
-                    ) : null}
-                    {engagementStats?.quotes ? (
-                      <button
-                        onClick={() => openInteractions('quotes')}
-                        className="hover:underline transition-colors"
-                      >
-                        <span className="font-bold text-foreground">
-                          {formatNumber(engagementStats.quotes)}
-                        </span>{' '}
-                        Quote{engagementStats.quotes !== 1 ? 's' : ''}
-                      </button>
-                    ) : null}
-                    {engagementStats?.reactions ? (
-                      <button
-                        onClick={() => openInteractions('reactions')}
-                        className="hover:underline transition-colors"
-                      >
-                        <span className="font-bold text-foreground">
-                          {formatNumber(engagementStats.reactions)}
-                        </span>{' '}
-                        Like{engagementStats.reactions !== 1 ? 's' : ''}
-                      </button>
-                    ) : null}
-                  </div>
-                )}
-
-                <PostActionBar
-                  event={campaign.event}
-                  replyLabel="Comment"
-                  hideZap
-                  onReply={() => setReplyOpen(true)}
-                  onMore={() => setMoreMenuOpen(true)}
-                  className={hasStats ? 'pt-3 border-t border-border/60' : undefined}
-                />
-              </div>
-
-              <div className="mt-6">
+              <div>
                 <div className="flex items-baseline justify-between gap-3 mb-3 px-1">
                   <h2 className="text-lg font-semibold tracking-tight">
                     Comments &amp; donations
@@ -557,12 +500,6 @@ function CampaignDetailContent({ campaign }: { campaign: ParsedCampaign }) {
         event={campaign.event}
         open={moreMenuOpen}
         onOpenChange={setMoreMenuOpen}
-      />
-      <InteractionsModal
-        eventId={campaign.event.id}
-        open={interactionsOpen}
-        onOpenChange={setInteractionsOpen}
-        initialTab={interactionsTab}
       />
 
       <AlertDialog open={archiveConfirmOpen} onOpenChange={setArchiveConfirmOpen}>
