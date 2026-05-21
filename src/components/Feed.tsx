@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useInView } from 'react-intersection-observer';
 import { usePageRefresh } from '@/hooks/usePageRefresh';
 import { ComposeBox } from '@/components/ComposeBox';
+import { HeroGlobe } from '@/components/HeroGlobe';
 import { LandingHero } from '@/components/LandingHero';
 import { NoteCard } from '@/components/NoteCard';
 import { PullToRefresh } from '@/components/PullToRefresh';
@@ -20,6 +21,7 @@ import { useSavedFeeds } from '@/hooks/useSavedFeeds';
 import { useResolveTabFilter } from '@/hooks/useResolveTabFilter';
 import { useWorldFeed } from '@/hooks/useWorldFeed';
 import { shouldHideFeedEvent } from '@/lib/feedUtils';
+import { HOPE_PALETTE } from '@/lib/hopePalette';
 import { isEventMuted } from '@/lib/muteHelpers';
 import { SubHeaderBar } from '@/components/SubHeaderBar';
 import { TabButton } from '@/components/TabButton';
@@ -45,6 +47,30 @@ interface FeedProps {
   emptyMessage?: string;
   /** Unique identifier for this feed page, used to persist the active tab in sessionStorage. Defaults to 'home'. */
   feedId?: string;
+}
+
+function FeedGlobeBackground() {
+  const [hueIndex, setHueIndex] = useState(0);
+
+  useEffect(() => {
+    const id = window.setInterval(() => {
+      setHueIndex((i) => (i + 1) % HOPE_PALETTE.length);
+    }, 9_000);
+    return () => window.clearInterval(id);
+  }, []);
+
+  return (
+    <div className="fixed inset-0 z-0 pointer-events-none overflow-hidden" aria-hidden="true">
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,hsl(var(--primary)/0.20),transparent_46%),linear-gradient(to_bottom,hsl(var(--background)/0.20),hsl(var(--background)/0.86))]" />
+      <div className="absolute inset-0 flex items-center justify-center">
+        <HeroGlobe
+          hue={HOPE_PALETTE[hueIndex]}
+          className="aspect-square max-w-none opacity-70 drop-shadow-2xl"
+          style={{ width: 'clamp(460px, 72dvw, 820px)' }}
+        />
+      </div>
+    </div>
+  );
 }
 
 export function Feed({ kinds, tagFilters, header, hideCompose, emptyMessage, feedId = 'home' }: FeedProps = {}) {
@@ -235,136 +261,145 @@ export function Feed({ kinds, tagFilters, header, hideCompose, emptyMessage, fee
     : (isPending || (isLoading && !rawData));
 
   const showSavedFeedTabs = user && !isKindSpecificPage && !tagFilters;
+  const useGlobeBackdrop = feedId === 'home' && !kinds && !tagFilters && !header;
+  const translucentCardClassName = useGlobeBackdrop
+    ? 'bg-background/70 supports-[backdrop-filter]:backdrop-blur-xl border-border/50 hover:bg-background/80'
+    : undefined;
 
   return (
-    <main className="flex-1 min-w-0 min-h-dvh">
-      {header}
+    <main className={cn('flex-1 min-w-0 min-h-dvh', useGlobeBackdrop && 'relative isolate overflow-x-clip')}>
+      {useGlobeBackdrop && <FeedGlobeBackground />}
 
-      {/* CTA (logged out, main feed only) */}
-      {!user && !kinds && (
-        <LandingHero onJoinClick={() => setAuthDialogOpen(true)} />
-      )}
+      <div className={cn(useGlobeBackdrop && 'relative z-10')}>
+        {header}
 
-      {!hideCompose && <ComposeBox compact hideBorder />}
+        {/* CTA (logged out, main feed only) */}
+        {!user && !kinds && (
+          <LandingHero onJoinClick={() => setAuthDialogOpen(true)} />
+        )}
 
-      {/* Tabs (logged in) */}
-      {user && (
-        <SubHeaderBar>
-          <TabButton label={isKindSpecificPage || tagFilters ? 'Follows' : 'Following'} active={activeTab === 'follows'} onClick={() => handleSetActiveTab('follows')} />
-          {!isKindSpecificPage && !tagFilters && (
-            <TabButton label="Network" active={activeTab === 'network'} onClick={() => handleSetActiveTab('network')} />
-          )}
-          {!isKindSpecificPage && showWorldFeed && (
-            <TabButton label="World" active={activeTab === 'world'} onClick={() => handleSetActiveTab('world')} />
-          )}
-          {!isKindSpecificPage && showCommunityFeed && (
-            <TabButton label={communityLabel} active={activeTab === 'communities'} onClick={() => handleSetActiveTab('communities')} />
-          )}
-          {(isKindSpecificPage || showGlobalFeed) && (
-            <TabButton label="Global" active={activeTab === 'global'} onClick={() => handleSetActiveTab('global')} />
-          )}
-          {showSavedFeedTabs && savedFeeds.map((feed) => (
-            <TabButton
-              key={feed.id}
-              label={feed.label}
-              active={activeTab === feed.id}
-              onClick={() => handleSetActiveTab(feed.id)}
-            />
-          ))}
-        </SubHeaderBar>
-      )}
+        {!hideCompose && <ComposeBox compact hideBorder />}
 
-      {/* Feed content — saved feed tab gets its own stream */}
-      {activeSavedFeed ? (
-        <SavedFeedContent feed={activeSavedFeed} />
-      ) : (
-        <PullToRefresh onRefresh={isWorldActive ? handleWorldRefresh : handleRefresh}>
-          {/* "X new posts" pill for World tab */}
-          {isWorldActive && worldFeed.newPostCount > 0 && (
-            <div
-              className={cn(
-                'sticky new-posts-pill z-10 flex justify-center pointer-events-none',
-                'max-sidebar:transition-opacity max-sidebar:duration-300 max-sidebar:ease-in-out',
-                navHidden && 'max-sidebar:opacity-0 max-sidebar:pointer-events-none',
-              )}
-              style={{ marginBottom: '-3rem' }}
-            >
-              <button
-                onClick={() => {
-                  worldFeed.flushStreamBuffer();
-                  window.scrollTo({ top: 0, behavior: 'smooth' });
-                }}
-                className="pointer-events-auto px-4 py-1.5 rounded-full bg-primary text-primary-foreground text-sm font-medium shadow-lg hover:bg-primary/90 transition-colors animate-in fade-in slide-in-from-top-2 duration-300"
+        {/* Tabs (logged in) */}
+        {user && (
+          <SubHeaderBar>
+            <TabButton label={isKindSpecificPage || tagFilters ? 'Follows' : 'Following'} active={activeTab === 'follows'} onClick={() => handleSetActiveTab('follows')} />
+            {!isKindSpecificPage && !tagFilters && (
+              <TabButton label="Network" active={activeTab === 'network'} onClick={() => handleSetActiveTab('network')} />
+            )}
+            {!isKindSpecificPage && showWorldFeed && (
+              <TabButton label="World" active={activeTab === 'world'} onClick={() => handleSetActiveTab('world')} />
+            )}
+            {!isKindSpecificPage && showCommunityFeed && (
+              <TabButton label={communityLabel} active={activeTab === 'communities'} onClick={() => handleSetActiveTab('communities')} />
+            )}
+            {(isKindSpecificPage || showGlobalFeed) && (
+              <TabButton label="Global" active={activeTab === 'global'} onClick={() => handleSetActiveTab('global')} />
+            )}
+            {showSavedFeedTabs && savedFeeds.map((feed) => (
+              <TabButton
+                key={feed.id}
+                label={feed.label}
+                active={activeTab === feed.id}
+                onClick={() => handleSetActiveTab(feed.id)}
+              />
+            ))}
+          </SubHeaderBar>
+        )}
+
+        {/* Feed content — saved feed tab gets its own stream */}
+        {activeSavedFeed ? (
+          <SavedFeedContent feed={activeSavedFeed} cardClassName={translucentCardClassName} />
+        ) : (
+          <PullToRefresh onRefresh={isWorldActive ? handleWorldRefresh : handleRefresh}>
+            {/* "X new posts" pill for World tab */}
+            {isWorldActive && worldFeed.newPostCount > 0 && (
+              <div
+                className={cn(
+                  'sticky new-posts-pill z-10 flex justify-center pointer-events-none',
+                  'max-sidebar:transition-opacity max-sidebar:duration-300 max-sidebar:ease-in-out',
+                  navHidden && 'max-sidebar:opacity-0 max-sidebar:pointer-events-none',
+                )}
+                style={{ marginBottom: '-3rem' }}
               >
-                {worldFeed.newPostCount} new post{worldFeed.newPostCount !== 1 ? 's' : ''}
-              </button>
-            </div>
-          )}
-          {showSkeleton ? (
-            <div className="divide-y divide-border">
-              {Array.from({ length: 5 }).map((_, i) => (
-                <NoteCardSkeleton key={i} />
-              ))}
-            </div>
-          ) : feedItems.length > 0 ? (
-            <div>
-              {feedItems.map((item: FeedItem) => (
-                <NoteCard
-                  key={item.repostedBy ? `repost-${item.repostedBy}-${item.event.id}` : item.event.id}
-                  event={item.event}
-                  repostedBy={item.repostedBy}
-                  highlight={isWorldActive && worldFeed.flushedIds.has(item.event.id)}
-                />
-              ))}
-              {hasNextPage && (
-                <div ref={scrollRef} className="py-4">
-                  {isFetchingNextPage && (
-                    <div className="flex justify-center">
-                      <Loader2 className="size-5 animate-spin text-muted-foreground" />
-                    </div>
-                  )}
-                </div>
-              )}
-            </div>
-          ) : isHomeFollowingActive && !emptyMessage ? (
-            <FollowingEmptyState onExploreWorld={() => navigate('/world')} />
-          ) : activeTab === 'network' && !emptyMessage ? (
-            <NetworkEmptyState onDiscoverPeople={() => navigate('/packs')} />
-          ) : (
-            <FeedEmptyState
-              message={
-                emptyMessage ?? (
-                  activeTab === 'follows' || activeTab === 'network'
-                    ? 'Your feed is empty. Follow some people to see their posts here.'
-                    : activeTab === 'world'
-                      ? 'No world posts yet. Check back soon for global activity.'
-                      : 'No posts found. Check your relay connections or come back soon.'
-                )
-              }
-              showDiscover={!emptyMessage && (activeTab === 'follows' || activeTab === 'network')}
-              onSwitchToGlobal={
-                (activeTab === 'follows' || activeTab === 'network') && showGlobalFeed
-                  ? () => handleSetActiveTab('global')
-                  : undefined
-              }
-            />
-          )}
-        </PullToRefresh>
-      )}
+                <button
+                  onClick={() => {
+                    worldFeed.flushStreamBuffer();
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                  }}
+                  className="pointer-events-auto px-4 py-1.5 rounded-full bg-primary text-primary-foreground text-sm font-medium shadow-lg hover:bg-primary/90 transition-colors animate-in fade-in slide-in-from-top-2 duration-300"
+                >
+                  {worldFeed.newPostCount} new post{worldFeed.newPostCount !== 1 ? 's' : ''}
+                </button>
+              </div>
+            )}
+            {showSkeleton ? (
+              <div className="divide-y divide-border">
+                {Array.from({ length: 5 }).map((_, i) => (
+                  <NoteCardSkeleton key={i} className={translucentCardClassName} />
+                ))}
+              </div>
+            ) : feedItems.length > 0 ? (
+              <div>
+                {feedItems.map((item: FeedItem) => (
+                  <NoteCard
+                    key={item.repostedBy ? `repost-${item.repostedBy}-${item.event.id}` : item.event.id}
+                    event={item.event}
+                    repostedBy={item.repostedBy}
+                    highlight={isWorldActive && worldFeed.flushedIds.has(item.event.id)}
+                    className={translucentCardClassName}
+                  />
+                ))}
+                {hasNextPage && (
+                  <div ref={scrollRef} className="py-4">
+                    {isFetchingNextPage && (
+                      <div className="flex justify-center">
+                        <Loader2 className="size-5 animate-spin text-muted-foreground" />
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+            ) : isHomeFollowingActive && !emptyMessage ? (
+              <FollowingEmptyState onExploreWorld={() => navigate('/world')} />
+            ) : activeTab === 'network' && !emptyMessage ? (
+              <NetworkEmptyState onDiscoverPeople={() => navigate('/packs')} />
+            ) : (
+              <FeedEmptyState
+                message={
+                  emptyMessage ?? (
+                    activeTab === 'follows' || activeTab === 'network'
+                      ? 'Your feed is empty. Follow some people to see their posts here.'
+                      : activeTab === 'world'
+                        ? 'No world posts yet. Check back soon for global activity.'
+                        : 'No posts found. Check your relay connections or come back soon.'
+                  )
+                }
+                showDiscover={!emptyMessage && (activeTab === 'follows' || activeTab === 'network')}
+                onSwitchToGlobal={
+                  (activeTab === 'follows' || activeTab === 'network') && showGlobalFeed
+                    ? () => handleSetActiveTab('global')
+                    : undefined
+                }
+              />
+            )}
+          </PullToRefresh>
+        )}
 
-      {/* Auth dialog (only needed on main feed) */}
-      {!kinds && (
-        <AuthDialog
-          isOpen={authDialogOpen}
-          onClose={() => setAuthDialogOpen(false)}
-        />
-      )}
+        {/* Auth dialog (only needed on main feed) */}
+        {!kinds && (
+          <AuthDialog
+            isOpen={authDialogOpen}
+            onClose={() => setAuthDialogOpen(false)}
+          />
+        )}
+      </div>
     </main>
   );
 }
 
 /** Renders a saved search feed using useTabFeed (TanStack Query cached, infinite scroll). */
-function SavedFeedContent({ feed }: { feed: SavedFeed }) {
+function SavedFeedContent({ feed, cardClassName }: { feed: SavedFeed; cardClassName?: string }) {
   const { ref: scrollRef, inView } = useInView({ threshold: 0, rootMargin: '400px' });
   const { user } = useCurrentUser();
   const { muteItems } = useMuteList();
@@ -435,7 +470,7 @@ function SavedFeedContent({ feed }: { feed: SavedFeed }) {
     return (
       <div className="divide-y divide-border">
         {Array.from({ length: 5 }).map((_, i) => (
-          <NoteCardSkeleton key={i} />
+          <NoteCardSkeleton key={i} className={cardClassName} />
         ))}
       </div>
     );
@@ -457,6 +492,7 @@ function SavedFeedContent({ feed }: { feed: SavedFeed }) {
             key={item.repostedBy ? `repost-${item.repostedBy}-${item.event.id}` : item.event.id}
             event={item.event}
             repostedBy={item.repostedBy}
+            className={cardClassName}
           />
         ))}
         {hasNextPage && (
@@ -474,9 +510,9 @@ function SavedFeedContent({ feed }: { feed: SavedFeed }) {
   );
 }
 
-function NoteCardSkeleton() {
+function NoteCardSkeleton({ className }: { className?: string }) {
   return (
-    <div className="px-4 py-3 border-b border-border">
+    <div className={cn('px-4 py-3 border-b border-border', className)}>
       <div className="flex items-center gap-3">
         <Skeleton className="size-11 rounded-full shrink-0" />
         <div className="min-w-0 space-y-1.5">
