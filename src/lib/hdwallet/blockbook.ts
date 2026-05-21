@@ -1,15 +1,19 @@
 // ---------------------------------------------------------------------------
-// Blockbook HTTP client (Trezor's Bitcoin indexer)
+// Blockbook WebSocket client (Trezor's Bitcoin indexer)
 // ---------------------------------------------------------------------------
 //
-// Blockbook exposes an xpub-aware HTTP API:
+// Trezor Blockbook exposes both a REST API and a WebSocket API at the same
+// host. We use the WebSocket API exclusively because:
 //
-//     GET /api/v2/xpub/<descriptor>?details=txs&tokens=used
-//
-// returns the entire wallet's balance, derived used-address list, and tx
-// history in a single response. This is what Trezor Suite uses and is
-// dramatically cheaper than the per-address Esplora dance — one HTTP call
-// instead of dozens.
+//   1. CORS — `btc1.trezor.io` (and the other public mirrors) do not send
+//      `Access-Control-Allow-Origin`, so browsers reject every REST response.
+//      WebSocket upgrades are not preflighted and have no same-origin
+//      requirement on the response side, so they Just Work from any origin.
+//   2. Efficiency — a single persistent connection multiplexes every request
+//      we make for a wallet session (snapshot, utxos, fee, broadcast) instead
+//      of paying TCP+TLS setup costs per request.
+//   3. Parity — Trezor Suite itself uses WebSocket; it is the production
+//      transport. The REST API is a thin compatibility layer.
 //
 // We support exactly one Blockbook base URL (no failover list). If the
 // server is down or unreachable, errors are surfaced to the user; there is
@@ -19,67 +23,240 @@
 // (wrapped as `tr(xpub)` descriptor). Whoever operates the configured
 // endpoint can link every wallet address and observe balance/spending
 // over time. This is the trade-off for the single-call architecture.
+//
+// ---------------------------------------------------------------------------
+// Wire protocol (Blockbook WebSocket)
+// ---------------------------------------------------------------------------
+//
+// Endpoint:   wss://<host>/websocket
+//
+// Request:    { "id": "<string>", "method": "<name>", "params": { ... } }
+// Response:   { "id": "<echoed>", "data": <payload-or-error> }
+//
+// On error, `data` is shaped `{ "error": { "message": "<reason>" } }`.
+//
+// We map: HTTP base URL → WS URL by replacing the scheme (`http`→`ws`,
+// `https`→`wss`) and appending `/websocket` if not already present.
 // ---------------------------------------------------------------------------
 
-/** Strip a trailing slash so callers don't have to think about it. */
-function normalizeBase(url: string): string {
-  return url.endsWith('/') ? url.slice(0, -1) : url;
+// ---------------------------------------------------------------------------
+// URL transform
+// ---------------------------------------------------------------------------
+
+/**
+ * Convert a Blockbook HTTP(S) base URL into the matching WebSocket URL.
+ *
+ *     https://btc1.trezor.io        → wss://btc1.trezor.io/websocket
+ *     https://btc1.trezor.io/       → wss://btc1.trezor.io/websocket
+ *     wss://example.com/websocket   → wss://example.com/websocket   (unchanged)
+ */
+function toWebsocketUrl(baseUrl: string): string {
+  let url = baseUrl.trim();
+  if (url.startsWith('https://')) {
+    url = 'wss://' + url.slice('https://'.length);
+  } else if (url.startsWith('http://')) {
+    url = 'ws://' + url.slice('http://'.length);
+  }
+  if (url.endsWith('/')) url = url.slice(0, -1);
+  if (!url.endsWith('/websocket')) url += '/websocket';
+  return url;
 }
 
-/** Wrap fetch with caller-supplied abort signal and a sane default timeout. */
-const DEFAULT_TIMEOUT_MS = 20_000;
+// ---------------------------------------------------------------------------
+// Socket pool — one persistent connection per configured base URL
+// ---------------------------------------------------------------------------
 
-async function blockbookFetch(
-  baseUrl: string,
-  path: string,
-  init: RequestInit & { signal?: AbortSignal } = {},
-): Promise<Response> {
-  const url = `${normalizeBase(baseUrl)}${path}`;
-  const { signal: callerSignal, ...rest } = init;
+const DEFAULT_TIMEOUT_MS = 30_000;
+const IDLE_DISCONNECT_MS = 90_000;
+const CONNECT_TIMEOUT_MS = 15_000;
 
-  // Compose caller-abort + timeout into a single signal.
-  const timeoutCtrl = new AbortController();
-  const timer = setTimeout(() => timeoutCtrl.abort(), DEFAULT_TIMEOUT_MS);
-
-  let signal: AbortSignal;
-  if (typeof AbortSignal !== 'undefined' && typeof AbortSignal.any === 'function') {
-    signal = callerSignal
-      ? AbortSignal.any([callerSignal, timeoutCtrl.signal])
-      : timeoutCtrl.signal;
-  } else if (callerSignal) {
-    if (callerSignal.aborted) timeoutCtrl.abort();
-    else callerSignal.addEventListener('abort', () => timeoutCtrl.abort(), { once: true });
-    signal = timeoutCtrl.signal;
-  } else {
-    signal = timeoutCtrl.signal;
-  }
-
-  try {
-    return await fetch(url, { ...rest, signal });
-  } finally {
-    clearTimeout(timer);
-  }
+interface PendingRequest {
+  resolve: (data: unknown) => void;
+  reject: (err: Error) => void;
+  timer: ReturnType<typeof setTimeout>;
+  abortHandler?: () => void;
+  signal?: AbortSignal;
 }
 
-async function readErrorBody(response: Response): Promise<string> {
-  try {
-    const text = await response.text();
-    // Blockbook errors are usually `{ "error": "..." }`
-    try {
-      const parsed = JSON.parse(text) as { error?: string | { message?: string } };
-      if (typeof parsed.error === 'string') return parsed.error;
-      if (typeof parsed.error?.message === 'string') return parsed.error.message;
-    } catch {
-      // not JSON, fall through
+class BlockbookSocket {
+  private ws?: WebSocket;
+  private connectPromise?: Promise<WebSocket>;
+  private nextId = 1;
+  private readonly pending = new Map<string, PendingRequest>();
+  private idleTimer?: ReturnType<typeof setTimeout>;
+
+  constructor(private readonly url: string) {}
+
+  private resetIdleTimer() {
+    if (this.idleTimer) clearTimeout(this.idleTimer);
+    this.idleTimer = setTimeout(() => {
+      if (this.pending.size === 0) this.disconnect('idle');
+    }, IDLE_DISCONNECT_MS);
+  }
+
+  private disconnect(reason: string) {
+    if (this.idleTimer) {
+      clearTimeout(this.idleTimer);
+      this.idleTimer = undefined;
     }
-    return text.slice(0, 200) || `HTTP ${response.status}`;
-  } catch {
-    return `HTTP ${response.status}`;
+    const ws = this.ws;
+    this.ws = undefined;
+    this.connectPromise = undefined;
+    if (ws && ws.readyState !== WebSocket.CLOSED) {
+      try { ws.close(1000, reason); } catch { /* ignore */ }
+    }
+  }
+
+  /** Fail every in-flight request with the given error. */
+  private failAll(err: Error) {
+    for (const [, p] of this.pending) {
+      clearTimeout(p.timer);
+      if (p.signal && p.abortHandler) p.signal.removeEventListener('abort', p.abortHandler);
+      p.reject(err);
+    }
+    this.pending.clear();
+  }
+
+  private async connect(): Promise<WebSocket> {
+    if (this.ws && this.ws.readyState === WebSocket.OPEN) return this.ws;
+    if (this.connectPromise) return this.connectPromise;
+
+    this.connectPromise = new Promise<WebSocket>((resolve, reject) => {
+      let ws: WebSocket;
+      try {
+        ws = new WebSocket(this.url);
+      } catch (err) {
+        reject(err instanceof Error ? err : new Error(String(err)));
+        return;
+      }
+
+      const connectTimer = setTimeout(() => {
+        try { ws.close(); } catch { /* ignore */ }
+        reject(new Error('Blockbook WebSocket connect timed out'));
+      }, CONNECT_TIMEOUT_MS);
+
+      ws.addEventListener('open', () => {
+        clearTimeout(connectTimer);
+        this.ws = ws;
+        this.resetIdleTimer();
+        resolve(ws);
+      }, { once: true });
+
+      ws.addEventListener('error', () => {
+        clearTimeout(connectTimer);
+        const err = new Error(`Blockbook WebSocket error (${this.url})`);
+        this.failAll(err);
+        this.disconnect('error');
+        reject(err);
+      }, { once: true });
+
+      ws.addEventListener('close', (ev) => {
+        clearTimeout(connectTimer);
+        const err = new Error(
+          `Blockbook WebSocket closed${ev.code ? ` (${ev.code})` : ''}${ev.reason ? `: ${ev.reason}` : ''}`,
+        );
+        this.failAll(err);
+        if (this.ws === ws) this.disconnect('close');
+      });
+
+      ws.addEventListener('message', (ev) => {
+        this.onMessage(ev.data);
+      });
+    }).finally(() => {
+      this.connectPromise = undefined;
+    });
+
+    return this.connectPromise;
+  }
+
+  private onMessage(raw: unknown) {
+    if (typeof raw !== 'string') return;
+    let parsed: { id?: string; data?: unknown };
+    try {
+      parsed = JSON.parse(raw) as { id?: string; data?: unknown };
+    } catch {
+      return;
+    }
+    if (!parsed.id) return;
+    const pending = this.pending.get(parsed.id);
+    if (!pending) return; // late or duplicate response
+    this.pending.delete(parsed.id);
+    clearTimeout(pending.timer);
+    if (pending.signal && pending.abortHandler) {
+      pending.signal.removeEventListener('abort', pending.abortHandler);
+    }
+    this.resetIdleTimer();
+
+    const data = parsed.data as { error?: { message?: string } } | undefined;
+    if (data && typeof data === 'object' && 'error' in data && data.error) {
+      const msg = typeof data.error.message === 'string' ? data.error.message : 'Blockbook error';
+      pending.reject(new Error(msg));
+      return;
+    }
+    pending.resolve(parsed.data);
+  }
+
+  /** Send a JSON-RPC-style message and await the matching response. */
+  async send<T>(method: string, params: Record<string, unknown> = {}, signal?: AbortSignal): Promise<T> {
+    if (signal?.aborted) throw new Error('Request aborted');
+
+    const ws = await this.connect();
+    const id = String(this.nextId++);
+    const req = JSON.stringify({ id, method, params });
+
+    return new Promise<T>((resolve, reject) => {
+      const timer = setTimeout(() => {
+        if (this.pending.delete(id)) {
+          if (signal && abortHandler) signal.removeEventListener('abort', abortHandler);
+          reject(new Error(`Blockbook ${method} timed out`));
+        }
+      }, DEFAULT_TIMEOUT_MS);
+
+      const abortHandler = signal
+        ? () => {
+            if (this.pending.delete(id)) {
+              clearTimeout(timer);
+              signal.removeEventListener('abort', abortHandler!);
+              reject(new Error('Request aborted'));
+            }
+          }
+        : undefined;
+      if (signal && abortHandler) signal.addEventListener('abort', abortHandler, { once: true });
+
+      this.pending.set(id, {
+        resolve: (data) => resolve(data as T),
+        reject,
+        timer,
+        abortHandler,
+        signal,
+      });
+
+      try {
+        ws.send(req);
+      } catch (err) {
+        this.pending.delete(id);
+        clearTimeout(timer);
+        if (signal && abortHandler) signal.removeEventListener('abort', abortHandler);
+        reject(err instanceof Error ? err : new Error(String(err)));
+      }
+    });
   }
 }
 
+const sockets = new Map<string, BlockbookSocket>();
+
+function getSocket(baseUrl: string): BlockbookSocket {
+  const wsUrl = toWebsocketUrl(baseUrl);
+  let s = sockets.get(wsUrl);
+  if (!s) {
+    s = new BlockbookSocket(wsUrl);
+    sockets.set(wsUrl, s);
+  }
+  return s;
+}
+
 // ---------------------------------------------------------------------------
-// /api/v2/xpub/<descriptor>?details=txs
+// getAccountInfo — full xpub snapshot
 // ---------------------------------------------------------------------------
 
 /** A used-address record returned inside the xpub response under `tokens`. */
@@ -140,7 +317,7 @@ export interface BlockbookTx {
   fees?: string;
 }
 
-/** Top-level response from `GET /api/v2/xpub/<descriptor>?details=txs`. */
+/** Response from the `getAccountInfo` WS method (mirrors REST `/api/v2/xpub`). */
 export interface BlockbookXpubResponse {
   page?: number;
   totalPages?: number;
@@ -166,18 +343,18 @@ export interface BlockbookXpubResponse {
 }
 
 /**
- * Fetch the full xpub snapshot from Blockbook in a single HTTP call.
+ * Fetch the full xpub snapshot from Blockbook in a single WebSocket call.
  *
- * @param baseUrl     Blockbook base URL (no trailing slash, no path).
- * @param descriptor  Output descriptor, e.g. `tr(xpub6...)`. The function
- *                    handles URL-encoding internally.
+ * @param baseUrl     Blockbook base URL (HTTP or WSS). The function converts
+ *                    `https://host` → `wss://host/websocket` internally.
+ * @param descriptor  Output descriptor, e.g. `tr(xpub6...)`.
  * @param signal      Optional abort signal.
  *
- * Query parameters used:
+ * Params sent:
  *   - `details=txs`     — include the full tx list (default would be `txids`).
  *   - `tokens=used`     — restrict the `tokens` array to addresses with
- *                         at least one tx (we never need fully-derived empty
- *                         ones; Blockbook does the gap-limit walk for us).
+ *                         at least one tx (Blockbook does the gap-limit walk
+ *                         for us).
  *   - `pageSize=1000`   — max page size; covers any practical HD wallet.
  */
 export async function fetchXpubSnapshot(
@@ -185,16 +362,20 @@ export async function fetchXpubSnapshot(
   descriptor: string,
   signal?: AbortSignal,
 ): Promise<BlockbookXpubResponse> {
-  const path = `/api/v2/xpub/${encodeURIComponent(descriptor)}?details=txs&tokens=used&pageSize=1000`;
-  const response = await blockbookFetch(baseUrl, path, { signal });
-  if (!response.ok) {
-    throw new Error(`Blockbook xpub fetch failed: ${await readErrorBody(response)}`);
-  }
-  return response.json() as Promise<BlockbookXpubResponse>;
+  return getSocket(baseUrl).send<BlockbookXpubResponse>(
+    'getAccountInfo',
+    {
+      descriptor,
+      details: 'txs',
+      tokens: 'used',
+      pageSize: 1000,
+    },
+    signal,
+  );
 }
 
 // ---------------------------------------------------------------------------
-// /api/v2/utxo/<descriptor>
+// getAccountUtxo
 // ---------------------------------------------------------------------------
 
 /** A UTXO row from Blockbook (xpub endpoint includes `address` + `path`). */
@@ -229,54 +410,12 @@ export async function fetchXpubUtxos(
   descriptor: string,
   signal?: AbortSignal,
 ): Promise<BlockbookUtxo[]> {
-  const path = `/api/v2/utxo/${encodeURIComponent(descriptor)}`;
-  const response = await blockbookFetch(baseUrl, path, { signal });
-  if (!response.ok) {
-    throw new Error(`Blockbook utxo fetch failed: ${await readErrorBody(response)}`);
-  }
-  return response.json() as Promise<BlockbookUtxo[]>;
+  return getSocket(baseUrl).send<BlockbookUtxo[]>('getAccountUtxo', { descriptor }, signal);
 }
 
 // ---------------------------------------------------------------------------
-// /api/v2/estimatefee/<blocks> — fee rate for a confirmation target
+// estimateFee — fee rates for the four UI buckets in a single call
 // ---------------------------------------------------------------------------
-
-/**
- * Blockbook returns fee estimates in **BTC/kB** (a string, e.g.
- * `"0.00012345"`). We convert to sat/vB at the call site since the rest of
- * the wallet code works in sat/vB integers.
- */
-interface BlockbookFeeResponse {
-  /** BTC/kB as a string. Bitcoin Core's `estimatesmartfee` output. */
-  result: string;
-}
-
-/**
- * Fetch a fee-rate estimate for the given confirmation target (in blocks).
- * Returns sat/vB rounded up to the nearest integer; never returns < 1.
- */
-export async function fetchFeeRate(
-  baseUrl: string,
-  blocks: number,
-  signal?: AbortSignal,
-): Promise<number> {
-  const path = `/api/v2/estimatefee/${blocks}`;
-  const response = await blockbookFetch(baseUrl, path, { signal });
-  if (!response.ok) {
-    throw new Error(`Blockbook estimatefee failed: ${await readErrorBody(response)}`);
-  }
-  const data = (await response.json()) as BlockbookFeeResponse;
-  const btcPerKb = parseFloat(data.result);
-  if (!Number.isFinite(btcPerKb) || btcPerKb <= 0) {
-    // Bitcoin Core returns -1 when it doesn't have enough data; fall back
-    // to the relay minimum rather than throwing.
-    return 1;
-  }
-  // BTC/kB → sat/vB:
-  //   1 BTC = 1e8 sats, 1 kB = 1000 vB
-  //   sat/vB = btcPerKb * 1e8 / 1000 = btcPerKb * 1e5
-  return Math.max(1, Math.ceil(btcPerKb * 1e5));
-}
 
 /** Fee rate estimates for the four UI-exposed speed buckets. */
 export interface BlockbookFeeRates {
@@ -291,75 +430,95 @@ export interface BlockbookFeeRates {
 }
 
 /**
- * Fetch all four fee tiers in one call (one HTTP request per tier, in
- * parallel). Wraps {@link fetchFeeRate}.
+ * WS `estimateFee` response: one entry per requested block target, in
+ * request order. `feePerUnit` is sat/vB as a decimal string. Unlike the
+ * REST `estimatefee` endpoint (which returns BTC/kB), no unit conversion
+ * is needed.
+ */
+interface BlockbookFeeEntry {
+  feePerUnit?: string;
+  /** Some chains return additional fields we don't use. */
+  [key: string]: unknown;
+}
+
+function parseFeePerUnit(entry: BlockbookFeeEntry | undefined): number {
+  if (!entry || typeof entry.feePerUnit !== 'string') return 1;
+  const n = parseFloat(entry.feePerUnit);
+  if (!Number.isFinite(n) || n <= 0) return 1;
+  return Math.max(1, Math.ceil(n));
+}
+
+/**
+ * Fetch all four fee tiers in one WebSocket call.
+ *
+ * The WS API accepts a `blocks` array and returns an array of fee entries
+ * in the same order — far more efficient than four REST round-trips.
  */
 export async function fetchFeeRates(
   baseUrl: string,
   signal?: AbortSignal,
 ): Promise<BlockbookFeeRates> {
-  const [fastestFee, halfHourFee, hourFee, economyFee] = await Promise.all([
-    fetchFeeRate(baseUrl, 1, signal),
-    fetchFeeRate(baseUrl, 3, signal),
-    fetchFeeRate(baseUrl, 6, signal),
-    fetchFeeRate(baseUrl, 144, signal),
-  ]);
-  return { fastestFee, halfHourFee, hourFee, economyFee };
+  const blocks = [1, 3, 6, 144];
+  const result = await getSocket(baseUrl).send<BlockbookFeeEntry[]>(
+    'estimateFee',
+    { blocks },
+    signal,
+  );
+  const arr = Array.isArray(result) ? result : [];
+  return {
+    fastestFee: parseFeePerUnit(arr[0]),
+    halfHourFee: parseFeePerUnit(arr[1]),
+    hourFee: parseFeePerUnit(arr[2]),
+    economyFee: parseFeePerUnit(arr[3]),
+  };
 }
 
 // ---------------------------------------------------------------------------
-// /api/v2/sendtx — broadcast
+// sendTransaction — broadcast
 // ---------------------------------------------------------------------------
 
-/** Successful broadcast response. */
 interface BlockbookSendResponse {
   result: string;
 }
 
 /**
  * Broadcast a signed transaction. Returns the txid on success.
- *
- * Uses POST with the hex body. The trailing slash on `/api/v2/sendtx/` is
- * mandatory per the Blockbook API documentation.
  */
 export async function broadcastBlockbookTx(
   baseUrl: string,
   txHex: string,
   signal?: AbortSignal,
 ): Promise<string> {
-  const response = await blockbookFetch(baseUrl, `/api/v2/sendtx/`, {
-    method: 'POST',
-    body: txHex,
+  const data = await getSocket(baseUrl).send<BlockbookSendResponse>(
+    'sendTransaction',
+    { hex: txHex },
     signal,
-  });
-  if (!response.ok) {
-    throw new Error(`Broadcast failed: ${await readErrorBody(response)}`);
+  );
+  if (!data || typeof data.result !== 'string') {
+    throw new Error('Broadcast failed: malformed response');
   }
-  const data = (await response.json()) as BlockbookSendResponse;
   return data.result;
 }
 
 // ---------------------------------------------------------------------------
-// /api/status — health check (used to warn the user when the endpoint is
-//                misconfigured; not currently called from anywhere)
+// getInfo — health check
 // ---------------------------------------------------------------------------
 
-/** Subset of the `/api/status` response we care about. */
+/** Subset of the `getInfo` response we care about. */
 export interface BlockbookStatus {
-  blockbook: {
-    coin: string;
-    inSync: boolean;
-    bestHeight: number;
-  };
+  name?: string;
+  shortcut?: string;
+  decimals?: number;
+  version?: string;
+  bestHeight?: number;
+  bestHash?: string;
+  block0Hash?: string;
+  testnet?: boolean;
 }
 
 export async function fetchBlockbookStatus(
   baseUrl: string,
   signal?: AbortSignal,
 ): Promise<BlockbookStatus> {
-  const response = await blockbookFetch(baseUrl, `/api/status`, { signal });
-  if (!response.ok) {
-    throw new Error(`Blockbook status failed: ${await readErrorBody(response)}`);
-  }
-  return response.json() as Promise<BlockbookStatus>;
+  return getSocket(baseUrl).send<BlockbookStatus>('getInfo', {}, signal);
 }
