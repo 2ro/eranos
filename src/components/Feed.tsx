@@ -74,9 +74,10 @@ function FeedGlobeBackground() {
         <HeroGlobe
           hue={activeHue}
           className="aspect-square max-w-none opacity-70 drop-shadow-2xl"
-          style={{ width: 'clamp(460px, 72dvw, 820px)' }}
+          style={{ width: 'clamp(552px, 86.4dvw, 984px)' }}
         />
       </div>
+      <div className="absolute inset-0 bg-background/70" />
     </div>
   );
 }
@@ -293,14 +294,7 @@ export function Feed({ kinds, tagFilters, header, hideCompose, emptyMessage, fee
     <main className={cn('flex-1 min-w-0 min-h-dvh', useGlobeBackdrop && 'relative isolate overflow-x-clip')}>
       {useGlobeBackdrop && <FeedGlobeBackground />}
 
-      <div className={cn(useGlobeBackdrop && 'relative z-10 isolate min-h-dvh')}>
-        {useGlobeBackdrop && (
-          <div
-            className="absolute inset-y-0 left-1/2 -z-10 w-screen -translate-x-1/2 bg-background/65"
-            aria-hidden="true"
-          />
-        )}
-
+      <div className={cn(useGlobeBackdrop && 'relative z-10')}>
         {header}
 
         {/* CTA (logged out, main feed only) */}
