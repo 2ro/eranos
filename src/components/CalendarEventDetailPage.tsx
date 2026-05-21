@@ -285,7 +285,8 @@ export function CalendarEventDetailPage({ event }: { event: NostrEvent }) {
   }, [eventCoord, event.pubkey, myRsvp.status, publishRSVP, toast]);
 
   const showRSVP = !!user;
-  const attendeeCount = rsvps.accepted.length + rsvps.tentative.length;
+  const attendingCount = rsvps.accepted.length;
+  const interestedCount = rsvps.tentative.length;
   const rsvpStatusLabel = myRsvp.status === 'accepted'
     ? 'You are going'
     : myRsvp.status === 'tentative'
@@ -297,6 +298,22 @@ export function CalendarEventDetailPage({ event }: { event: NostrEvent }) {
   const eventDetailsCard = (
     <Card className="overflow-hidden">
       <CardContent className="p-5 space-y-5">
+        <div className="space-y-3">
+          <div className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Hosted by</div>
+          <PersonRow pubkey={event.pubkey} size="sm" />
+        </div>
+
+        {(event.content || summary) && (
+          <div className="space-y-2 border-t border-border/60 pt-4">
+            <div className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Description</div>
+            {event.content ? (
+              <NoteContent event={event} className="text-sm leading-relaxed text-foreground" hideEmbedImages={!!image} disableEmbeds disableNoteEmbeds />
+            ) : (
+              <p className="text-sm leading-relaxed text-muted-foreground">{summary}</p>
+            )}
+          </div>
+        )}
+
         <div className="space-y-3">
           <EventDetailRow icon={<Clock className="size-5" />}>
             {dateStr}
@@ -443,7 +460,6 @@ export function CalendarEventDetailPage({ event }: { event: NostrEvent }) {
               <h1 className="text-3xl sm:text-4xl font-bold leading-tight tracking-tight text-white">
                 {title}
               </h1>
-              <span className="text-xs sm:text-sm text-white/85">calendar event</span>
             </div>
             <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 text-xs sm:text-sm font-medium text-white/85">
               {heroDate && (
@@ -458,10 +474,16 @@ export function CalendarEventDetailPage({ event }: { event: NostrEvent }) {
                   {location}
                 </span>
               )}
-              {attendeeCount > 0 && (
+              {attendingCount > 0 && (
                 <span className="inline-flex items-center gap-1.5">
                   <Users className="size-3.5 sm:size-4" />
-                  {attendeeCount} interested
+                  {attendingCount} attending
+                </span>
+              )}
+              {interestedCount > 0 && (
+                <span className="inline-flex items-center gap-1.5">
+                  <Users className="size-3.5 sm:size-4" />
+                  {interestedCount} interested
                 </span>
               )}
             </div>
@@ -512,11 +534,6 @@ export function CalendarEventDetailPage({ event }: { event: NostrEvent }) {
         <div className="lg:flex lg:gap-8 lg:items-start">
           <div className="flex-1 min-w-0 space-y-8">
             <section className="space-y-5">
-              <div>
-                <div className="text-sm font-medium text-muted-foreground mb-3">Hosted by</div>
-                <PersonRow pubkey={event.pubkey} />
-              </div>
-
               {hashtags.length > 0 && (
                 <div className="flex flex-wrap gap-2">
                   {hashtags.map((tag) => (
