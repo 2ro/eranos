@@ -25,6 +25,7 @@ import {
   DialogTitle,
   DialogDescription,
 } from '@/components/ui/dialog';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { HDSendBitcoinDialog } from '@/components/HDSendBitcoinDialog';
 import { useAppContext } from '@/hooks/useAppContext';
 import { useHdWallet } from '@/hooks/useHdWallet';
@@ -37,6 +38,7 @@ export function HDWalletPage() {
   const {
     availability,
     currentReceiveAddress,
+    silentPaymentAddress,
     transactions,
     totalBalance,
     pendingBalance,
@@ -49,6 +51,7 @@ export function HDWalletPage() {
   const { data: btcPrice } = useHdBtcPrice();
 
   const [copiedAddress, setCopiedAddress] = useState(false);
+  const [copiedSp, setCopiedSp] = useState(false);
   const [txOpen, setTxOpen] = useState(false);
   const [sendOpen, setSendOpen] = useState(false);
   const [receiveOpen, setReceiveOpen] = useState(false);
@@ -59,6 +62,7 @@ export function HDWalletPage() {
   });
 
   const address = currentReceiveAddress?.address ?? '';
+  const spAddress = silentPaymentAddress?.address ?? '';
 
   const copyAddress = async () => {
     if (!address) return;
@@ -71,8 +75,23 @@ export function HDWalletPage() {
     }
   };
 
+  const copySpAddress = async () => {
+    if (!spAddress) return;
+    try {
+      await navigator.clipboard.writeText(spAddress);
+      setCopiedSp(true);
+      setTimeout(() => setCopiedSp(false), 2000);
+    } catch {
+      // clipboard unavailable
+    }
+  };
+
   const truncatedAddress = address
     ? `${address.slice(0, 12)}...${address.slice(-8)}`
+    : '';
+
+  const truncatedSpAddress = spAddress
+    ? `${spAddress.slice(0, 12)}...${spAddress.slice(-8)}`
     : '';
 
   // ── Logged out ────────────────────────────────────────────────
@@ -217,41 +236,91 @@ export function HDWalletPage() {
             <DialogHeader>
               <DialogTitle>Receive Bitcoin</DialogTitle>
               <DialogDescription>
-                Share this address to receive bitcoin. A fresh address is used
-                each time for privacy.
+                Share an address to receive bitcoin.
               </DialogDescription>
             </DialogHeader>
 
-            {address && (
-              <div className="flex flex-col items-center gap-4 pt-2">
-                <div className="rounded-2xl bg-white p-4 shadow-sm">
-                  <QRCodeCanvas value={address} size={200} level="M" />
-                </div>
+            <Tabs defaultValue="onchain" className="w-full">
+              <TabsList className="grid w-full grid-cols-2">
+                <TabsTrigger value="onchain">On-chain</TabsTrigger>
+                <TabsTrigger value="silent" disabled={!spAddress}>
+                  Silent payment
+                </TabsTrigger>
+              </TabsList>
 
-                <button
-                  onClick={copyAddress}
-                  className="flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-mono text-muted-foreground hover:bg-muted/50 transition-colors cursor-pointer"
-                >
-                  {truncatedAddress}
-                  {copiedAddress ? (
-                    <Check className="size-3.5 text-green-500" />
-                  ) : (
-                    <Copy className="size-3.5" />
-                  )}
-                </button>
+              {/* ── On-chain (BIP86 single-use) ──────────────── */}
+              <TabsContent value="onchain" className="mt-4">
+                {address && (
+                  <div className="flex flex-col items-center gap-4">
+                    <p className="text-xs text-muted-foreground text-center max-w-xs">
+                      Fresh address each time. Bump to a new index after sharing
+                      for privacy.
+                    </p>
 
-                <div className="flex items-center gap-3 text-xs text-muted-foreground">
-                  <span>Address #{currentReceiveAddress?.index ?? 0}</span>
-                  <span aria-hidden>·</span>
-                  <button
-                    onClick={() => nextReceiveAddress()}
-                    className="hover:text-foreground underline-offset-4 hover:underline transition-colors cursor-pointer"
-                  >
-                    New address
-                  </button>
-                </div>
-              </div>
-            )}
+                    <div className="rounded-2xl bg-white p-4 shadow-sm">
+                      <QRCodeCanvas value={address} size={200} level="M" />
+                    </div>
+
+                    <button
+                      onClick={copyAddress}
+                      className="flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-mono text-muted-foreground hover:bg-muted/50 transition-colors cursor-pointer"
+                    >
+                      {truncatedAddress}
+                      {copiedAddress ? (
+                        <Check className="size-3.5 text-green-500" />
+                      ) : (
+                        <Copy className="size-3.5" />
+                      )}
+                    </button>
+
+                    <div className="flex items-center gap-3 text-xs text-muted-foreground">
+                      <span>Address #{currentReceiveAddress?.index ?? 0}</span>
+                      <span aria-hidden>·</span>
+                      <button
+                        onClick={() => nextReceiveAddress()}
+                        className="hover:text-foreground underline-offset-4 hover:underline transition-colors cursor-pointer"
+                      >
+                        New address
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </TabsContent>
+
+              {/* ── Silent payment (BIP-352 static) ──────────── */}
+              <TabsContent value="silent" className="mt-4">
+                {spAddress && (
+                  <div className="flex flex-col items-center gap-4">
+                    <p className="text-xs text-muted-foreground text-center max-w-xs">
+                      Static receive identifier. Share once and reuse forever —
+                      senders derive a unique on-chain address per payment.
+                    </p>
+
+                    <div className="rounded-2xl bg-white p-4 shadow-sm">
+                      <QRCodeCanvas value={spAddress} size={220} level="L" />
+                    </div>
+
+                    <button
+                      onClick={copySpAddress}
+                      className="flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-mono text-muted-foreground hover:bg-muted/50 transition-colors cursor-pointer"
+                    >
+                      {truncatedSpAddress}
+                      {copiedSp ? (
+                        <Check className="size-3.5 text-green-500" />
+                      ) : (
+                        <Copy className="size-3.5" />
+                      )}
+                    </button>
+
+                    <p className="text-xs text-orange-500 dark:text-orange-400 text-center max-w-xs">
+                      Receive-only. This wallet doesn't yet scan for incoming
+                      silent payments — funds sent here won't show up in your
+                      balance until silent payment support is wired in.
+                    </p>
+                  </div>
+                )}
+              </TabsContent>
+            </Tabs>
           </DialogContent>
         </Dialog>
 

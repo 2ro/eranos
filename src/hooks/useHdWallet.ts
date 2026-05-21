@@ -4,7 +4,12 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useAppContext } from '@/hooks/useAppContext';
 import { useSecureLocalStorage } from '@/hooks/useSecureLocalStorage';
 import { useHdWalletAccess, type HdWalletAvailability } from '@/hooks/useHdWalletAccess';
-import { deriveReceiveAddress, type DerivedAddress } from '@/lib/hdwallet/derivation';
+import {
+  deriveReceiveAddress,
+  deriveSilentPaymentAddress,
+  type DerivedAddress,
+  type SilentPaymentAddress,
+} from '@/lib/hdwallet/derivation';
 import {
   type AccountScanResult,
   buildHdTransactions,
@@ -52,6 +57,12 @@ export interface UseHdWalletResult {
   availability: HdWalletAvailability;
   /** Currently-advertised receive address (the one the UI shows). */
   currentReceiveAddress?: DerivedAddress;
+  /**
+   * BIP-352 silent payment address (`sp1q…`) for this wallet. Static — a
+   * single identifier the user can publish and reuse forever. Undefined
+   * unless `availability.status === 'available'`.
+   */
+  silentPaymentAddress?: SilentPaymentAddress;
   /** Full scan result — UTXOs, used addresses, etc. */
   scan?: AccountScanResult;
   /** Aggregated wallet-level transaction history (newest first). */
@@ -100,6 +111,7 @@ export function useHdWallet(): UseHdWalletResult {
 
   const pubkey = availability.status === 'available' ? availability.pubkey : '';
   const account = availability.status === 'available' ? availability.account : undefined;
+  const nsecBytes = availability.status === 'available' ? availability.nsecBytes : undefined;
 
   // ── Persisted receive cursor ─────────────────────────────────
   const [cursor, setCursor] = useSecureLocalStorage<PersistedCursor>(
@@ -141,6 +153,12 @@ export function useHdWallet(): UseHdWalletResult {
     return deriveReceiveAddress(account, resolved);
   }, [account, scan, cursor.receiveIndex]);
 
+  // ── Silent payment address (static; depends only on nsec) ────
+  const silentPaymentAddress = useMemo<SilentPaymentAddress | undefined>(() => {
+    if (!nsecBytes) return undefined;
+    return deriveSilentPaymentAddress(nsecBytes);
+  }, [nsecBytes]);
+
   // ── Advance to next receive address ──────────────────────────
   const nextReceiveAddress = useCallback((): DerivedAddress | undefined => {
     if (!account) return undefined;
@@ -160,6 +178,7 @@ export function useHdWallet(): UseHdWalletResult {
   return {
     availability,
     currentReceiveAddress,
+    silentPaymentAddress,
     scan,
     transactions,
     totalBalance: scan?.totalBalance ?? 0,
