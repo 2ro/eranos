@@ -145,6 +145,15 @@ export interface HdUnsignedPsbt {
    * `P_k`, which differs from the original `sp1…` string the user typed.
    */
   resolvedRecipientAddress: string;
+  /**
+   * The silent-payment UTXOs (by `(txid, vout)`) actually consumed by this
+   * PSBT, in input order. Empty when the build selected no SP inputs. The
+   * caller uses this to prune the spent UTXOs from local SP storage after
+   * a successful broadcast — Blockbook's xpub scan can't observe SP
+   * outputs, so the wallet has to do this bookkeeping itself, otherwise
+   * the balance would still count them.
+   */
+  consumedSpUtxos: Array<{ txid: string; vout: number }>;
 }
 
 /** Per-input descriptor stored alongside the PSBT for signing dispatch. */
@@ -462,6 +471,7 @@ export function buildHdSpendPsbt(args: BuildHdSpendArgs): HdUnsignedPsbt {
 
   const tx = new btc.Transaction();
   const inputDescriptors: HdInputDescriptor[] = [];
+  const consumedSpUtxos: Array<{ txid: string; vout: number }> = [];
 
   // For SP recipients we need each input's tweaked private key to derive
   // the per-recipient output P_k. Compute and stash them up front so we
@@ -535,6 +545,7 @@ export function buildHdSpendPsbt(args: BuildHdSpendArgs): HdUnsignedPsbt {
         // signer in `signHdPsbt` writes `tapKeySig` directly instead.
       });
       inputDescriptors.push({ kind: 'sp', tweakHex: utxo.tweakHex });
+      consumedSpUtxos.push({ txid: utxo.txid, vout: utxo.vout });
 
       if (recipient.kind === 'sp') {
         // d_k is also the BIP-352 input scalar — it's already the actual
@@ -593,6 +604,7 @@ export function buildHdSpendPsbt(args: BuildHdSpendArgs): HdUnsignedPsbt {
     changeAddress,
     inputDescriptors,
     resolvedRecipientAddress,
+    consumedSpUtxos,
   };
 }
 

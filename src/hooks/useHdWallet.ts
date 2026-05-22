@@ -90,6 +90,12 @@ export interface UseHdWalletResult {
   refetch: () => Promise<unknown>;
   /** Advance the receive cursor to the next unused address. Persisted. */
   nextReceiveAddress: () => DerivedAddress | undefined;
+  /**
+   * Drop the given SP UTXOs from local storage and republish so other
+   * devices stay in sync. Call after a successful spend that consumed
+   * silent-payment UTXOs — see `useHdWalletSp.pruneSpentUtxos`.
+   */
+  pruneSpentSilentPaymentUtxos: (spent: ReadonlyArray<{ txid: string; vout: number }>) => void;
 }
 
 // ---------------------------------------------------------------------------
@@ -263,5 +269,6 @@ export function useHdWallet(): UseHdWalletResult {
     error: scanError,
     refetch,
     nextReceiveAddress,
+    pruneSpentSilentPaymentUtxos: sp.pruneSpentUtxos,
   };
 }

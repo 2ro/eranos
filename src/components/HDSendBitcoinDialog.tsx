@@ -173,6 +173,14 @@ interface SendResult {
   txid: string;
   amountSats: number;
   fee: number;
+  /**
+   * Silent-payment UTXOs (`(txid, vout)`) consumed by the broadcast tx.
+   * Pruned from local SP storage in `onSuccess` — otherwise the wallet
+   * would keep treating them as spendable and the displayed balance would
+   * jump *up* after the spend (because the BIP-86 change credits to
+   * Blockbook's xpub balance while the SP entries remain locally).
+   */
+  consumedSpUtxos: Array<{ txid: string; vout: number }>;
 }
 
 /**
@@ -190,6 +198,7 @@ export function HDSendBitcoinDialog({ isOpen, onClose, btcPrice }: HDSendBitcoin
     silentPaymentBalance,
     silentPaymentStorage,
     refetch: refetchWallet,
+    pruneSpentSilentPaymentUtxos,
   } = useHdWallet();
   const { config } = useAppContext();
   const { blockbookBaseUrl } = config;
@@ -388,16 +397,23 @@ export function HDSendBitcoinDialog({ isOpen, onClose, btcPrice }: HDSendBitcoin
       setProgress('broadcasting');
       const txid = await broadcastBlockbookTx(blockbookBaseUrl, txHex);
 
-      return { txid, amountSats, fee: built.fee };
+      return { txid, amountSats, fee: built.fee, consumedSpUtxos: built.consumedSpUtxos };
     },
     onSuccess: (result) => {
       notificationSuccess();
       setSuccess(result);
       queryClient.invalidateQueries({ queryKey: ['hdwallet-scan'] });
-      // SP storage is keyed by `(txid, vout)`; the next scan will mark
-      // spent UTXOs as gone. Invalidate the doc query so the optimistic
-      // copy is dropped in favour of the relay copy on the next scan.
-      queryClient.invalidateQueries({ queryKey: ['hdwallet-sp-doc'] });
+      // Remove the SP UTXOs we just spent from local storage and
+      // republish the NIP-78 doc. Blockbook's xpub scan can't see SP
+      // outputs, so without this the spent UTXOs would linger forever:
+      // the balance would still count them, the coin selector would try
+      // to spend them again (resulting in "missing/spent input" broadcast
+      // errors), and the wallet would appear to *gain* money on each SP
+      // spend (BIP-86 change is observed by Blockbook, but the consumed
+      // SP value is not subtracted locally).
+      if (result.consumedSpUtxos.length > 0) {
+        pruneSpentSilentPaymentUtxos(result.consumedSpUtxos);
+      }
       void refetchWallet();
     },
     onError: (err) => {

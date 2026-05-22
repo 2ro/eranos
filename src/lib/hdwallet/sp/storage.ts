@@ -206,5 +206,24 @@ export function spStorageBalance(doc: SPStorageDocument): number {
   return total;
 }
 
+/**
+ * Remove the given `(txid, vout)` entries from a UTXO list. Used after a
+ * successful spend to drop the SP UTXOs the wallet just consumed — without
+ * this, `spStorageBalance` would still count them, the coin selector would
+ * still treat them as spendable, and the wallet's overall balance would
+ * appear to *increase* after the spend (because the BIP-86 change output
+ * lands in Blockbook's xpub balance while the consumed SP entries remain
+ * locally tracked). Matching the published-document semantics here keeps
+ * other devices in sync via the next NIP-78 republish.
+ */
+export function pruneSpUtxos(
+  existing: ReadonlyArray<SPStoredUtxo>,
+  spent: ReadonlyArray<{ txid: string; vout: number }>,
+): SPStoredUtxo[] {
+  if (spent.length === 0) return existing.slice();
+  const spentKeys = new Set(spent.map((s) => `${s.txid}:${s.vout}`));
+  return existing.filter((u) => !spentKeys.has(`${u.txid}:${u.vout}`));
+}
+
 // Re-export hex helpers for callers that want to read tweak bytes back.
 export { hexToBytes, bytesToHex };

@@ -18,6 +18,7 @@ import {
   matchedUtxoToStored,
   mergeUtxos,
   parseSPStorage,
+  pruneSpUtxos,
   serializeSPStorage,
   type SPStorageDocument,
   type SPStoredUtxo,
@@ -82,6 +83,18 @@ export interface UseHdWalletSpResult {
   scanRecent: () => Promise<void>;
   /** Abort an in-flight scan. */
   cancelScan: () => void;
+
+  /**
+   * Drop the given SP UTXOs from local storage and republish the NIP-78
+   * document so other devices stay in sync.
+   *
+   * Called by the send flow after a successful broadcast — Blockbook's
+   * xpub-scoped scan can't observe silent-payment outputs, so without
+   * this the wallet has no way to learn that an SP UTXO it just spent is
+   * gone. Failure to call it (or to publish) results in stale balance and
+   * subsequent double-spend attempts.
+   */
+  pruneSpentUtxos: (spent: ReadonlyArray<{ txid: string; vout: number }>) => void;
 }
 
 const EMPTY_RESULT: UseHdWalletSpResult = {
@@ -92,6 +105,7 @@ const EMPTY_RESULT: UseHdWalletSpResult = {
   scanRange: async () => {},
   scanRecent: async () => {},
   cancelScan: () => {},
+  pruneSpentUtxos: () => {},
 };
 
 export function useHdWalletSp(): UseHdWalletSpResult {
@@ -215,8 +229,17 @@ export function useHdWalletSp(): UseHdWalletSpResult {
   }, [enabled, storageDocQuery.data]);
 
   // ── Mutation: persist a new document to relays ───────────────
+  //
+  // Optionally accepts a list of `(txid, vout)` entries that were spent
+  // locally; these are stripped from the remote-merged document too, so
+  // the canonical published copy actually loses the spent UTXOs instead
+  // of having them merged back in by `mergeUtxos` (which is insert-only).
   const publishStorage = useMutation({
-    mutationFn: async (next: SPStorageDocument) => {
+    mutationFn: async (args: {
+      next: SPStorageDocument;
+      spent?: ReadonlyArray<{ txid: string; vout: number }>;
+    }) => {
+      const { next, spent } = args;
       if (!user) throw new Error('not logged in');
       if (!user.signer.nip44) throw new Error('signer does not support NIP-44');
       // Always read-modify-write off the freshest event so a concurrent device
@@ -231,10 +254,15 @@ export function useHdWalletSp(): UseHdWalletSpResult {
         try {
           const decrypted = await user.signer.nip44.decrypt(user.pubkey, prev.content);
           const remote = parseSPStorage(decrypted);
+          // Prune any spent UTXOs from the remote *before* the merge —
+          // otherwise insert-only `mergeUtxos` would re-add them.
+          const remoteUtxos = spent && spent.length > 0
+            ? pruneSpUtxos(remote.utxos, spent)
+            : remote.utxos;
           merged = {
             version: SP_STORAGE_VERSION,
             scanHeight: Math.max(remote.scanHeight, next.scanHeight),
-            utxos: mergeUtxos(remote.utxos, next.utxos),
+            utxos: mergeUtxos(remoteUtxos, next.utxos),
           };
         } catch {
           // Treat undecryptable remote as empty rather than blocking the write.
@@ -285,7 +313,7 @@ export function useHdWalletSp(): UseHdWalletSpResult {
     }
     const doc = optimisticRef.current;
     if (!doc) return;
-    publishStorage.mutate(doc);
+    publishStorage.mutate({ next: doc });
   }, [publishStorage]);
 
   const scheduleRepublish = useCallback(() => {
@@ -293,7 +321,7 @@ export function useHdWalletSp(): UseHdWalletSpResult {
     republishTimerRef.current = setTimeout(() => {
       republishTimerRef.current = null;
       const doc = optimisticRef.current;
-      if (doc) publishStorage.mutate(doc);
+      if (doc) publishStorage.mutate({ next: doc });
     }, 5000);
   }, [publishStorage]);
 
@@ -434,6 +462,57 @@ export function useHdWalletSp(): UseHdWalletSpResult {
 
   const balance = useMemo(() => (storage ? spStorageBalance(storage) : 0), [storage]);
 
+  // Keep a stable ref to the latest storage so callbacks called from outside
+  // the React render cycle (e.g. the send dialog's mutation success handler)
+  // see the freshest UTXO set without forcing the callback to re-create.
+  const storageRef = useRef<SPStorageDocument | undefined>(storage);
+  storageRef.current = storage;
+
+  // ── Prune spent SP UTXOs after a successful broadcast ────────
+  //
+  // The send flow consumes one or more SP UTXOs but Blockbook's xpub scan
+  // can't observe them — they sit in the NIP-78 doc forever unless we
+  // remove them explicitly. Without this, `balance` would keep counting
+  // the spent UTXOs and the coin selector would offer them again on the
+  // next send (producing a "missing/spent input" broadcast failure), all
+  // while Blockbook's view of the BIP-86 change credits to total balance,
+  // so the wallet appears to *gain* money after a spend.
+  const pruneSpentUtxos = useCallback<UseHdWalletSpResult['pruneSpentUtxos']>(
+    (spent) => {
+      if (!spent.length) return;
+      // Cancel any pending debounced republish — its document snapshot
+      // doesn't know about the prune.
+      if (republishTimerRef.current) {
+        clearTimeout(republishTimerRef.current);
+        republishTimerRef.current = null;
+      }
+      const base = storageRef.current ?? optimisticRef.current;
+      if (!base) return;
+      const next: SPStorageDocument = {
+        version: SP_STORAGE_VERSION,
+        scanHeight: base.scanHeight,
+        utxos: pruneSpUtxos(base.utxos, spent),
+      };
+      optimisticRef.current = next;
+      setOptimisticVersion((v) => v + 1);
+      // Also write the pruned doc directly into the doc-query cache so
+      // the `storage` memo doesn't briefly fall back to the unpruned
+      // relay copy while the publish round-trip is in flight (the
+      // optimistic-preference heuristic uses `utxos.length` to decide
+      // freshness, and a prune *shrinks* the list).
+      const eventId = queryClient.getQueryData<{ id?: string } | null>([
+        'hdwallet-sp-event',
+        pubkey,
+        dTag,
+      ])?.id;
+      if (eventId) {
+        queryClient.setQueryData(['hdwallet-sp-doc', eventId], next);
+      }
+      publishStorage.mutate({ next, spent });
+    },
+    [publishStorage, queryClient, pubkey, dTag],
+  );
+
   // ── Backfill missing block timestamps ────────────────────────
   //
   // Older docs (written before SP UTXOs carried `time`) and any UTXOs that
@@ -497,7 +576,7 @@ export function useHdWalletSp(): UseHdWalletSpResult {
       // republish so other devices pick up the backfilled timestamps.
       optimisticRef.current = next;
       setOptimisticVersion((v) => v + 1);
-      publishStorage.mutate(next);
+      publishStorage.mutate({ next });
     })();
 
     return () => controller.abort();
@@ -524,5 +603,6 @@ export function useHdWalletSp(): UseHdWalletSpResult {
     scanRange,
     scanRecent,
     cancelScan,
+    pruneSpentUtxos,
   };
 }
