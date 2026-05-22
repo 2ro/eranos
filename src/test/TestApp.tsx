@@ -119,6 +119,7 @@ export function TestApp({ children }: TestAppProps) {
     sandboxDomain: 'iframe.diy',
     esploraApis: ['https://mempool.space/api'],
     blockbookBaseUrl: 'https://btc.trezor.io',
+    bip352IndexerUrl: '',
     sidebarWidgets: [],
     aiBaseURL: 'https://ai.shakespeare.diy/v1',
     aiApiKey: '',

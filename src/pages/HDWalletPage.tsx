@@ -12,6 +12,7 @@ import {
   ShieldOff,
   ArrowRight,
   KeyRound,
+  Radar,
 } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
@@ -27,8 +28,10 @@ import {
 } from '@/components/ui/dialog';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { HDSendBitcoinDialog } from '@/components/HDSendBitcoinDialog';
+import { HDSilentPaymentScanDialog } from '@/components/HDSilentPaymentScanDialog';
 import { useAppContext } from '@/hooks/useAppContext';
 import { useHdWallet } from '@/hooks/useHdWallet';
+import { useHdWalletSp } from '@/hooks/useHdWalletSp';
 import { useHdBtcPrice } from '@/hooks/useHdBtcPrice';
 import { satsToUSD, formatBTC } from '@/lib/bitcoin';
 import type { HdTransaction } from '@/lib/hdwallet/scan';
@@ -48,6 +51,7 @@ export function HDWalletPage() {
     refetch,
     nextReceiveAddress,
   } = useHdWallet();
+  const sp = useHdWalletSp();
   const { data: btcPrice } = useHdBtcPrice();
 
   const [copiedAddress, setCopiedAddress] = useState(false);
@@ -55,6 +59,7 @@ export function HDWalletPage() {
   const [txOpen, setTxOpen] = useState(false);
   const [sendOpen, setSendOpen] = useState(false);
   const [receiveOpen, setReceiveOpen] = useState(false);
+  const [spScanOpen, setSpScanOpen] = useState(false);
 
   useSeoMeta({
     title: `HD Wallet | ${config.appName}`,
@@ -230,6 +235,8 @@ export function HDWalletPage() {
           btcPrice={btcPrice}
         />
 
+        <HDSilentPaymentScanDialog open={spScanOpen} onOpenChange={setSpScanOpen} />
+
         {/* Receive Dialog */}
         <Dialog open={receiveOpen} onOpenChange={setReceiveOpen}>
           <DialogContent className="sm:max-w-sm">
@@ -312,11 +319,37 @@ export function HDWalletPage() {
                       )}
                     </button>
 
-                    <p className="text-xs text-orange-500 dark:text-orange-400 text-center max-w-xs">
-                      Receive-only. This wallet doesn't yet scan for incoming
-                      silent payments — funds sent here won't show up in your
-                      balance until silent payment support is wired in.
-                    </p>
+                    {sp.unavailableReason === 'no-indexer' ? (
+                      <p className="text-xs text-orange-500 dark:text-orange-400 text-center max-w-xs">
+                        Scanning disabled — no BIP-352 indexer configured. Set{' '}
+                        <span className="font-mono">bip352IndexerUrl</span> in your app config to
+                        detect incoming silent payments.
+                      </p>
+                    ) : sp.enabled ? (
+                      <div className="flex flex-col items-center gap-2 w-full">
+                        {sp.balance > 0 && (
+                          <p className="text-xs text-muted-foreground text-center">
+                            Silent payment balance:{' '}
+                            <span className="text-foreground font-medium">
+                              {btcPrice
+                                ? satsToUSD(sp.balance, btcPrice)
+                                : `${formatBTC(sp.balance)} BTC`}
+                            </span>
+                          </p>
+                        )}
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => setSpScanOpen(true)}
+                          className="rounded-full"
+                        >
+                          <Radar className="size-3.5 mr-1.5" />
+                          {sp.storage?.scanHeight && sp.storage.scanHeight > 0
+                            ? 'Scan for new payments'
+                            : 'Scan for payments'}
+                        </Button>
+                      </div>
+                    ) : null}
                   </div>
                 )}
               </TabsContent>
@@ -380,6 +413,7 @@ function formatTxDate(timestamp?: number): string {
 
 function TxRow({ tx, btcPrice }: { tx: HdTransaction; btcPrice?: number }) {
   const isReceive = tx.type === 'receive';
+  const isSilent = tx.source === 'silent-payment';
   return (
     <Link
       to={`/i/bitcoin:tx:${tx.txid}`}
@@ -396,7 +430,18 @@ function TxRow({ tx, btcPrice }: { tx: HdTransaction; btcPrice?: number }) {
             : <ArrowUpRight className="size-4" />}
         </div>
         <div>
-          <p className="text-sm font-medium">{isReceive ? 'Received' : 'Sent'}</p>
+          <p className="text-sm font-medium flex items-center gap-1.5">
+            {isReceive ? 'Received' : 'Sent'}
+            {isSilent && (
+              <span
+                className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-1.5 py-0.5 text-[10px] font-medium text-primary"
+                title="Detected via BIP-352 silent payment scan"
+              >
+                <Radar className="size-2.5" />
+                silent
+              </span>
+            )}
+          </p>
           <p className="text-xs text-muted-foreground">{formatTxDate(tx.timestamp)}</p>
         </div>
       </div>

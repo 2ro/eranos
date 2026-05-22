@@ -4,6 +4,7 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useAppContext } from '@/hooks/useAppContext';
 import { useSecureLocalStorage } from '@/hooks/useSecureLocalStorage';
 import { useHdWalletAccess, type HdWalletAvailability } from '@/hooks/useHdWalletAccess';
+import { useHdWalletSp } from '@/hooks/useHdWalletSp';
 import {
   deriveReceiveAddress,
   deriveSilentPaymentAddress,
@@ -16,6 +17,7 @@ import {
   type HdTransaction,
   scanAccount,
 } from '@/lib/hdwallet/scan';
+import type { SPStorageDocument } from '@/lib/hdwallet/sp/storage';
 
 // ---------------------------------------------------------------------------
 // Persisted UI cursor (per user)
@@ -71,6 +73,13 @@ export interface UseHdWalletResult {
   totalBalance: number;
   /** Pending (mempool) balance in sats. */
   pendingBalance: number;
+  /**
+   * Confirmed balance of silent-payment UTXOs only, in sats. Already included
+   * in `totalBalance` — this field is exposed for the UI breakdown.
+   */
+  silentPaymentBalance: number;
+  /** The persisted SP UTXO document, if loaded. */
+  silentPaymentStorage?: SPStorageDocument;
   /** Initial scan in progress. */
   isLoading: boolean;
   /** Scan currently fetching (initial or background refresh). */
@@ -108,6 +117,7 @@ export function useHdWallet(): UseHdWalletResult {
   const { blockbookBaseUrl } = config;
   const availability = useHdWalletAccess();
   const queryClient = useQueryClient();
+  const sp = useHdWalletSp();
 
   const pubkey = availability.status === 'available' ? availability.pubkey : '';
   const account = availability.status === 'available' ? availability.account : undefined;
@@ -140,10 +150,58 @@ export function useHdWallet(): UseHdWalletResult {
   });
 
   // ── Transaction history (derived; zero extra fetches) ────────
+  //
+  // Combines BIP-86 transactions (scanned from Blockbook) with silent-payment
+  // receives (discovered by the BIP-352 scanner). SP UTXOs don't carry a
+  // wall-clock timestamp — BlindBit only exposes block heights — so we
+  // synthesise an approximate timestamp from height using a fixed anchor
+  // (block 800,000 ≈ 2023-07-23T00:00:00Z, average 10-minute spacing). This
+  // is good enough for sort-order and the relative-time UI ("2d ago"); a more
+  // accurate solution would require an extra Blockbook block-header call
+  // per SP tx, which isn't worth the round-trip cost today.
   const transactions = useMemo<HdTransaction[] | undefined>(() => {
-    if (!scan) return undefined;
-    return buildHdTransactions(scan);
-  }, [scan]);
+    if (!scan && !sp.storage) return undefined;
+
+    const bip86 = scan ? buildHdTransactions(scan) : [];
+
+    // Group SP UTXOs by txid and sum to keep the row shape consistent with
+    // the rest of the wallet (one row per tx, not per output).
+    const spByTxid = new Map<string, { amount: number; height: number }>();
+    for (const u of sp.storage?.utxos ?? []) {
+      const existing = spByTxid.get(u.txid);
+      if (existing) {
+        existing.amount += u.value;
+        // Same tx → same block; keep first.
+      } else {
+        spByTxid.set(u.txid, { amount: u.value, height: u.height });
+      }
+    }
+
+    const HEIGHT_ANCHOR = 800_000;
+    const TIMESTAMP_ANCHOR = 1_690_070_400; // 2023-07-23T00:00:00Z (block 800,000)
+    const SECONDS_PER_BLOCK = 600;
+
+    const spRows: HdTransaction[] = Array.from(spByTxid.entries()).map(([txid, info]) => ({
+      txid,
+      amount: info.amount,
+      type: 'receive',
+      // SP UTXOs come from confirmed P2TR outputs in mined blocks — mempool
+      // SP detection isn't supported by BlindBit (you need a confirmed block
+      // to derive `input_hash`), so any UTXO we've persisted is confirmed.
+      confirmed: true,
+      timestamp: TIMESTAMP_ANCHOR + (info.height - HEIGHT_ANCHOR) * SECONDS_PER_BLOCK,
+      source: 'silent-payment',
+    }));
+
+    const merged = [...bip86, ...spRows];
+    merged.sort((a, b) => {
+      if (!a.timestamp && !b.timestamp) return 0;
+      if (!a.timestamp) return -1;
+      if (!b.timestamp) return 1;
+      return b.timestamp - a.timestamp;
+    });
+    return merged;
+  }, [scan, sp.storage]);
 
   // ── Current receive address ──────────────────────────────────
   const currentReceiveAddress = useMemo<DerivedAddress | undefined>(() => {
@@ -181,8 +239,10 @@ export function useHdWallet(): UseHdWalletResult {
     silentPaymentAddress,
     scan,
     transactions,
-    totalBalance: scan?.totalBalance ?? 0,
+    totalBalance: (scan?.totalBalance ?? 0) + sp.balance,
     pendingBalance: scan?.pendingBalance ?? 0,
+    silentPaymentBalance: sp.balance,
+    silentPaymentStorage: sp.storage,
     isLoading: scanLoading,
     isFetching: scanFetching,
     error: scanError,

@@ -83,6 +83,14 @@ export interface HdTransaction {
   type: 'receive' | 'send';
   confirmed: boolean;
   timestamp?: number;
+  /**
+   * Which scan path discovered this transaction. Used by the UI to render a
+   * "silent payment" indicator on SP receives. `'bip86'` covers both receive
+   * and change addresses on the BIP-86 chains; `'silent-payment'` covers
+   * UTXOs detected by the BIP-352 scanner. Optional for back-compat with
+   * persisted UI state that pre-dates the field.
+   */
+  source?: 'bip86' | 'silent-payment';
 }
 
 // ---------------------------------------------------------------------------
@@ -410,6 +418,7 @@ export function buildHdTransactions(result: AccountScanResult): HdTransaction[] 
     type: m.netSats >= 0 ? 'receive' : 'send',
     confirmed: m.confirmed,
     timestamp: m.timestamp,
+    source: 'bip86',
   }));
 
   out.sort((a, b) => {

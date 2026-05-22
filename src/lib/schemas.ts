@@ -266,6 +266,14 @@ export const AppConfigSchema = z.object({
     z.array(z.string().url()).min(1),
   ]),
   blockbookBaseUrl: z.string().url(),
+  /**
+   * BIP-352 tweak-data indexer URL. Empty string disables silent-payment
+   * scanning. When set, must be a valid http(s) URL with no trailing slash.
+   */
+  bip352IndexerUrl: z.union([
+    z.literal(''),
+    z.string().url(),
+  ]).optional().default(''),
   currencyDisplay: z.enum(['usd', 'sats']).optional(),
   sidebarWidgets: z.array(z.object({
     id: z.string(),

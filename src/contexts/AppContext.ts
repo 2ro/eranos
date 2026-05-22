@@ -313,6 +313,34 @@ export interface AppConfig {
    */
   blockbookBaseUrl: string;
   /**
+   * Base URL of a BIP-352 tweak-data indexer (BlindBit Oracle v2-compatible),
+   * used by the HD wallet at `/hdwallet` to detect incoming silent payments.
+   *
+   * The wallet derives the scan private key `bscan` locally from the user's
+   * nsec and finishes the BIP-352 ECDH step itself; only public per-tx tweak
+   * data and Taproot outputs come over the wire. `bscan` MUST NEVER leave the
+   * device.
+   *
+   * Endpoints consumed (all public, no auth):
+   *   - `GET /info`               → tip height
+   *   - `GET /tweaks/:height`     → 33-byte compressed tweaks
+   *   - `GET /utxos/:height`      → P2TR outputs in the block
+   *
+   * No version segment, no trailing slash. Default is an empty string, which
+   * disables silent-payment scanning entirely — the wallet still displays the
+   * static `sp1q…` receive address, but never resolves balances or history.
+   * Set this to a self-hosted or trusted BlindBit endpoint to enable scanning.
+   *
+   * **Privacy note**: the indexer never sees `bscan`, but it does observe the
+   * sequence of block heights you ask about. If you scan a contiguous range
+   * (history backfill) that signal is uninformative; for live ongoing scans
+   * the indexer can correlate your IP with the wallet's last-known tip.
+   * Self-hosting is the strongest mitigation.
+   *
+   * Default: `""` (disabled).
+   */
+  bip352IndexerUrl: string;
+  /**
    * Display preference for monetary amounts (zap totals, balances, send forms).
    * - "usd" (default): convert sats to USD using the live BTC price.
    * - "sats": always show raw satoshi counts.

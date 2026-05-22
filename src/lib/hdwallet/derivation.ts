@@ -325,6 +325,37 @@ export interface SilentPaymentAddress {
 }
 
 /**
+ * Receive-side silent-payment key material, including the *private* scan key.
+ *
+ * Per BIP-352 / NIP-SP §5, scanning the chain for incoming silent payments
+ * requires `bscan` (the 32-byte scan private scalar) to complete the ECDH
+ * step locally: `shared = bscan · tweak`. Because `bscan` is derived under
+ * a hardened branch, disclosing it does not reveal the master nsec or the
+ * spend private key — it grants only "see incoming payments" capability.
+ * BIP-352 explicitly contemplates handing `bscan` to a remote scan helper
+ * for that reason (we don't do that here; `bscan` stays on the device).
+ *
+ * `bspend` is **deliberately omitted** from this struct. The HD wallet is
+ * receive-only with respect to silent payments; we never sign SP inputs, so
+ * the spend private key never needs to be materialised. If spend support is
+ * added later, a dedicated helper should derive `bspend` at signing time.
+ */
+export interface SilentPaymentKeys {
+  /** 33-byte compressed scan pubkey. */
+  Bscan: Uint8Array;
+  /** 33-byte compressed spend pubkey. */
+  Bspend: Uint8Array;
+  /**
+   * 32-byte scan private scalar. MUST stay on the device — disclosure grants
+   * watch-only privacy break (every incoming SP payment becomes observable).
+   * Does NOT enable spending.
+   */
+  bscan: Uint8Array;
+  /** Bech32m-encoded `sp1q…` address built from `(Bscan, Bspend)`. */
+  address: string;
+}
+
+/**
  * Convert an 8-bit byte array to 5-bit words for bech32m encoding.
  *
  * Inlined here rather than imported because `@scure/base` only exposes the
@@ -372,6 +403,51 @@ export function deriveSilentPaymentAddress(nsecBytes: Uint8Array): SilentPayment
     address,
     scanPubkeyHex: Buffer.from(scanPubkey).toString('hex'),
     spendPubkeyHex: Buffer.from(spendPubkey).toString('hex'),
+  };
+}
+
+/**
+ * Same derivation as {@link deriveSilentPaymentAddress}, but additionally
+ * returns the *scan private key* `bscan`. Required by the BIP-352 receiver-side
+ * scanner (`src/lib/hdwallet/sp/`) which must compute `shared = bscan · tweak`
+ * locally to detect incoming silent payments.
+ *
+ * `bspend` is **not** returned — see {@link SilentPaymentKeys} for the
+ * receive-only rationale. Disclosure of `bscan` alone never lets an attacker
+ * spend; it only lets them see the wallet's incoming SP payments.
+ */
+export function deriveSilentPaymentKeys(nsecBytes: Uint8Array): SilentPaymentKeys {
+  const root = nsecToBip32Root(nsecBytes);
+
+  const spendNode = root.derive(SP_SPEND_PATH);
+  const scanNode = root.derive(SP_SCAN_PATH);
+
+  const Bspend = spendNode.publicKey;
+  const Bscan = scanNode.publicKey;
+  const bscan = scanNode.privateKey;
+  if (!Bspend || !Bscan || !bscan) {
+    throw new Error('Failed to derive silent payment keys');
+  }
+  if (Bspend.length !== 33 || Bscan.length !== 33) {
+    throw new Error('Expected compressed (33-byte) silent payment pubkeys');
+  }
+  if (bscan.length !== 32) {
+    throw new Error('Expected 32-byte silent payment scan private key');
+  }
+
+  // Payload: scan_pubkey || spend_pubkey (per BIP-352).
+  const payload = new Uint8Array(66);
+  payload.set(Bscan, 0);
+  payload.set(Bspend, 33);
+  const words = [SILENT_PAYMENT_VERSION, ...bech32m.toWords(payload)];
+  const address = bech32m.encode(SILENT_PAYMENT_HRP, words, BECH32M_MAX_LENGTH);
+
+  // Defensive copies — @scure/bip32 holds internal references.
+  return {
+    Bscan: new Uint8Array(Bscan),
+    Bspend: new Uint8Array(Bspend),
+    bscan: new Uint8Array(bscan),
+    address,
   };
 }
 
