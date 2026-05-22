@@ -70,11 +70,11 @@ export function CampaignWalletDonatePanel({
             aria-hidden
             className="absolute inset-0 flex items-center justify-center pointer-events-none"
           >
-            <div className="rounded-full bg-primary p-2.5 ring-4 ring-white">
+            <div className="rounded-full bg-primary p-2 ring-[6px] ring-white">
               <img
                 src="/logo.svg"
                 alt=""
-                className="size-9 object-contain"
+                className="size-16 object-contain brightness-0 invert"
                 draggable={false}
               />
             </div>
@@ -121,7 +121,7 @@ export function CampaignWalletDonatePanel({
           wallets. Older wallets that don't know about SP will ignore
           the parameter and either refuse the link or show an error — at
           which point the donor falls back to copy/paste anyway. */}
-      <Button asChild className="w-full">
+      <Button asChild className="w-full text-white">
         <a href={qrPayload}>
           <ExternalLink className="size-4 mr-1.5" />
           Open in wallet

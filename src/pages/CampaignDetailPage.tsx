@@ -981,7 +981,7 @@ function DonateColumn({
           <div className="space-y-3">
             <Button
               size="lg"
-              className="w-full"
+              className="w-full text-white"
               onClick={onDonateClick}
             >
               <HandHeart className="size-5 mr-2" />
