@@ -36,3 +36,18 @@ export function withAgoraTag(tags: string[][]): string[][] {
   );
   return hasAgora ? tags : [...tags, ['t', 'agora']];
 }
+
+/**
+ * Returns `true` when an event carries Agora's `["t", "agora"]` marker
+ * (case-insensitive on the value).
+ *
+ * Use to client-side filter discovery surfaces — e.g. the moderator
+ * "Pending review" list on `/communities` only surfaces orgs minted
+ * through Agora's create flow, so reviewers aren't drowning in every
+ * kind 34550 community on the network.
+ */
+export function hasAgoraTag(tags: string[][]): boolean {
+  return tags.some(
+    ([name, value]) => name === 't' && value?.toLowerCase() === 'agora',
+  );
+}

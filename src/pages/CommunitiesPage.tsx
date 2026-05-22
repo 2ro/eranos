@@ -30,6 +30,7 @@ import { useGlobalDonations } from '@/hooks/useGlobalDonations';
 import { useOrganizationModeration } from '@/hooks/useOrganizationModeration';
 import { useToast } from '@/hooks/useToast';
 import { useUserOrganizations } from '@/hooks/useUserOrganizations';
+import { hasAgoraTag } from '@/lib/agoraNoteTags';
 import { formatSatsShort } from '@/lib/formatCampaignAmount';
 import type { ParsedCommunity } from '@/lib/communityUtils';
 
@@ -131,6 +132,12 @@ function ModeratorReviewSections() {
     if (!moderation || !allOrgs) return [] as ParsedCommunity[];
     return allOrgs.filter(
       (org) =>
+        // Restrict the review queue to orgs minted through Agora's create
+        // flow. Without this gate, every kind 34550 community on the
+        // network would appear here — including badge-gated NIP-72
+        // communities, music scenes, etc. — none of which Agora moderators
+        // should be expected to triage.
+        hasAgoraTag(org.tags) &&
         !moderation.approvedCoords.has(org.aTag) &&
         !moderation.hiddenCoords.has(org.aTag),
     );
