@@ -1,5 +1,6 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { cn } from '@/lib/utils';
+import { useNavHidden } from '@/contexts/LayoutContext';
 
 export interface ProfileTabsProps {
   tabs: Array<{ id: string; label: string }>;
@@ -27,6 +28,7 @@ export function ProfileTabs({ tabs, activeTab, onChange }: ProfileTabsProps) {
   const trackRef = useRef<HTMLDivElement>(null);
   const tabRefs = useRef<Map<string, HTMLButtonElement>>(new Map());
   const [indicator, setIndicator] = useState<{ left: number; width: number } | null>(null);
+  const navHidden = useNavHidden();
 
   // Measure the active tab and update the underline indicator.
   useLayoutEffect(() => {
@@ -72,6 +74,14 @@ export function ProfileTabs({ tabs, activeTab, onChange }: ProfileTabsProps) {
         // matches the existing app convention so it sits flush with the
         // mobile top nav. On desktop the chrome shifts and we use top-0.
         'sticky top-mobile-bar sidebar:top-0 z-10',
+        // On mobile, slide out of view together with the MobileTopBar when
+        // the user scrolls down — otherwise the tabs sit at `top-mobile-bar`
+        // while the top bar slides away, leaving a translucent gap above
+        // them, and when the top bar slides back in it visibly crosses over
+        // the top of the tab bar (top bar is z-20, tabs z-10). Mirrors the
+        // global `SubHeaderBar`'s default behavior.
+        'max-sidebar:transition-transform max-sidebar:duration-300 max-sidebar:ease-in-out',
+        navHidden && 'nav-hidden-slide',
         // Visual separation — translucent backdrop so feed content doesn't
         // bleed through, with a single hairline border below.
         'bg-background/80 backdrop-blur supports-[backdrop-filter]:bg-background/60',
