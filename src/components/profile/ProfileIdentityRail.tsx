@@ -26,7 +26,6 @@ import { CampaignCard, CampaignCardSkeleton } from '@/components/CampaignCard';
 import { CommunityMiniCard, CommunityMiniCardSkeleton } from '@/components/discovery/CommunityMiniCard';
 import { EmojifiedText } from '@/components/CustomEmoji';
 import { FollowToggleButton } from '@/components/FollowButton';
-import { LinkFooter } from '@/components/LinkFooter';
 import { Nip05Badge } from '@/components/Nip05Badge';
 import { ProfileReactionButton } from '@/components/ProfileReactionButton';
 import { OrganizationsAllDialog } from '@/components/profile/OrganizationsAllDialog';
@@ -251,8 +250,6 @@ export function ProfileIdentityRail({
           <div className="space-y-3">{fieldsContent}</div>
         </section>
       )}
-
-      <LinkFooter />
       </div>
     </div>
   );
