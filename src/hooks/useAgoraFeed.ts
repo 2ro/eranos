@@ -3,8 +3,10 @@ import { useInfiniteQuery } from '@tanstack/react-query';
 import type { NostrEvent, NostrFilter } from '@nostrify/nostrify';
 
 import { useContentFilters } from '@/hooks/useContentFilters';
+import { useFeedSettings } from '@/hooks/useFeedSettings';
 import { useMuteList } from '@/hooks/useMuteList';
 import { CAMPAIGN_KIND } from '@/lib/campaign';
+import { getEnabledFeedKinds } from '@/lib/extraKinds';
 import { getPaginationCursor, shouldHideFeedEvent } from '@/lib/feedUtils';
 import { isEventMuted } from '@/lib/muteHelpers';
 
@@ -132,11 +134,15 @@ export interface UseAgoraFeedOptions {
    */
   authors?: string[];
   /**
-   * When true, also include the author(s)' kind 1 / 6 notes regardless of
-   * the `t:agora` marker — i.e. a unified "everything this person has
-   * done on the network" feed. Only meaningful in combination with
-   * `authors`; setting it without `authors` would flood the feed with all
-   * kind-1 notes on every relay and is silently ignored.
+   * When true, also include events authored by `authors` in any of the
+   * user's enabled "feed kinds" (notes, reposts, articles, photos,
+   * videos, polls, etc. — see {@link getEnabledFeedKinds}) regardless
+   * of the `t:agora` marker. Produces a unified "everything this person
+   * has done on the network" feed.
+   *
+   * Only meaningful in combination with `authors`; setting it without
+   * `authors` would flood the feed with all kind-1 notes on every relay
+   * and is silently ignored.
    *
    * Used by the profile page to merge the legacy Posts tab into the
    * Activity tab. Off by default so the strict Agora home feed isn't
@@ -150,6 +156,7 @@ export function useAgoraFeed(enabled: boolean, options?: UseAgoraFeedOptions) {
   const { nostr } = useNostr();
   const { muteItems } = useMuteList();
   const { shouldFilterEvent } = useContentFilters();
+  const { feedSettings } = useFeedSettings();
 
   const authors = options?.authors;
   const authorsKey = authors ? [...authors].sort().join(',') : '';
@@ -157,12 +164,22 @@ export function useAgoraFeed(enabled: boolean, options?: UseAgoraFeedOptions) {
   // (e.g. the user follows nobody) — skip the query entirely.
   const authorsEmpty = authors !== undefined && authors.length === 0;
   const queryEnabled = enabled && !authorsEmpty;
-  // Author-scoped kind 1/6 inclusion only makes sense when at least one
+  // Author-scoped notes inclusion only makes sense when at least one
   // author is set; ignore the option otherwise (see option doc).
   const includeAuthorNotes = !!options?.includeAuthorNotes && !!authors && authors.length > 0;
+  // Pull the user's enabled "feed kinds" — same set the legacy Posts tab
+  // used. Includes notes (1), reposts (6), articles (30023), photos (20),
+  // videos (21/22), polls, etc. — every kind the user opted to see in
+  // mixed feeds. Memoize via stable cache-key so changing settings refetch.
+  const authorNoteKinds = includeAuthorNotes ? getEnabledFeedKinds(feedSettings) : [];
+  // Always include kind 1 / 6 even if the user disabled them in feed
+  // settings — a profile feed without notes is broken.
+  if (includeAuthorNotes && !authorNoteKinds.includes(1)) authorNoteKinds.push(1);
+  if (includeAuthorNotes && !authorNoteKinds.includes(6)) authorNoteKinds.push(6);
+  const authorNoteKindsKey = [...authorNoteKinds].sort((a, b) => a - b).join(',');
 
   const query = useInfiniteQuery<AgoraFeedPage, Error>({
-    queryKey: ['agora-feed', authorsKey, includeAuthorNotes],
+    queryKey: ['agora-feed', authorsKey, includeAuthorNotes, authorNoteKindsKey],
     queryFn: async ({ pageParam, signal: querySignal }) => {
       const signal = AbortSignal.any([querySignal, AbortSignal.timeout(8_000)]);
       const until = pageParam as number | undefined;
@@ -180,12 +197,15 @@ export function useAgoraFeed(enabled: boolean, options?: UseAgoraFeedOptions) {
         { kinds: [NOTE_KIND], '#t': AGORA_T_TAGS, limit: Math.ceil(AGORA_PAGE_SIZE / 2), ...authorsFilter, ...(until && { until }) },
       ];
 
-      // Author-scoped notes — every kind 1 or 6 from this author, no
-      // `t:agora` requirement. Powers the unified profile feed where the
-      // "Posts" tab has been folded into "Activity".
-      if (includeAuthorNotes) {
+      // Author-scoped notes — every enabled feed kind from this author,
+      // no `t:agora` requirement. Powers the unified profile feed where
+      // the legacy Posts tab has been folded into Activity. The kind set
+      // mirrors the user's feed settings (notes, reposts, articles,
+      // photos, videos, polls, etc.) so a profile shows everything the
+      // person has done across the network.
+      if (includeAuthorNotes && authorNoteKinds.length > 0) {
         filters.push({
-          kinds: [NOTE_KIND, 6],
+          kinds: authorNoteKinds,
           ...authorsFilter,
           limit: AGORA_PAGE_SIZE,
           ...(until && { until }),
@@ -193,14 +213,16 @@ export function useAgoraFeed(enabled: boolean, options?: UseAgoraFeedOptions) {
       }
 
       const raw = await nostr.query(filters, { signal });
-      // When author-notes are included, accept any kind 1/6 event authored
-      // by one of the requested authors regardless of the strict Agora
-      // gate. The strong author scope is the trust anchor.
+      // When author-notes are included, accept any event of an enabled
+      // feed kind authored by one of the requested authors regardless of
+      // the strict Agora gate. The strong author scope is the trust
+      // anchor.
       const authorSet = new Set(authors ?? []);
+      const authorKindSet = new Set(authorNoteKinds);
       const filtered = raw.filter((event) => {
         if (isRelevantAgoraEvent(event)) return true;
         if (!includeAuthorNotes) return false;
-        if (event.kind !== NOTE_KIND && event.kind !== 6) return false;
+        if (!authorKindSet.has(event.kind)) return false;
         if (shouldHideFeedEvent(event)) return false;
         return authorSet.has(event.pubkey);
       });
