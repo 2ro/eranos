@@ -25,6 +25,7 @@ import {
 import type { NostrEvent, NostrMetadata } from '@nostrify/nostrify';
 
 import { CampaignCard } from '@/components/CampaignCard';
+import { DetailReplySkeleton } from '@/components/DetailStory';
 import { PeopleAvatarStack } from '@/components/PeopleAvatarStack';
 import { PostActionBar } from '@/components/PostActionBar';
 import { DetailCommentComposer } from '@/components/DetailCommentComposer';
@@ -126,21 +127,6 @@ function MembersSkeleton() {
           <Skeleton className="h-5 w-16 rounded-full" />
         </div>
       ))}
-    </div>
-  );
-}
-
-function ReplyCardSkeleton() {
-  return (
-    <div className="px-4 py-3 border-b border-border">
-      <div className="flex gap-3">
-        <Skeleton className="size-10 rounded-full shrink-0" />
-        <div className="flex-1 space-y-2">
-          <Skeleton className="h-4 w-32" />
-          <Skeleton className="h-4 w-full" />
-          <Skeleton className="h-4 w-2/3" />
-        </div>
-      </div>
     </div>
   );
 }
@@ -1046,6 +1032,7 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
                   event={event}
                   replyLabel="Comment"
                   hideZap
+                  showShareInSidebar
                   onReply={() => setReplyOpen(true)}
                   onMore={() => setMoreMenuOpen(true)}
                 />
@@ -1091,53 +1078,53 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
 
                 {/* Comments — NIP-22 thread on the community event itself. */}
                 <div id="org-activity" className="scroll-mt-20">
-                <div className="flex items-baseline justify-between gap-3 mb-3 px-1">
-                  <h2 className="text-lg font-semibold tracking-tight">Comments</h2>
-                  {engagementStats?.replies ? (
-                    <span className="text-sm text-muted-foreground tabular-nums">
-                      {formatNumber(engagementStats.replies)}{' '}
-                      {engagementStats.replies === 1 ? 'comment' : 'comments'}
-                    </span>
-                  ) : null}
+                  <div className="mt-6">
+                    <div className="flex items-baseline justify-between gap-3 mb-3 px-1">
+                      <h2 className="text-lg font-semibold tracking-tight">Comments</h2>
+                      {engagementStats?.replies ? (
+                        <span className="text-sm text-muted-foreground tabular-nums">
+                          {formatNumber(engagementStats.replies)}{' '}
+                          {engagementStats.replies === 1 ? 'comment' : 'comments'}
+                        </span>
+                      ) : null}
+                    </div>
+
+                    <DetailCommentComposer event={event} className="mb-3" />
+
+                    {commentsLoading && statsLoading && replyTree.length === 0 ? (
+                      <div className="space-y-3">
+                        {Array.from({ length: 3 }).map((_, i) => (
+                          <DetailReplySkeleton key={i} />
+                        ))}
+                      </div>
+                    ) : replyTree.length > 0 ? (
+                      <ThreadedReplyList
+                        roots={replyTree}
+                        renderItemHeader={(event) => (
+                          <OrganizationPinHeader
+                            isPinned={isPinned(event.id)}
+                            canManagePins={canManagePins}
+                            pinPending={togglePin.isPending}
+                            onTogglePin={() => handleTogglePin(event)}
+                          />
+                        )}
+                      />
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={() => setReplyOpen(true)}
+                        className="block w-full rounded-2xl border border-dashed border-border/80 bg-card/50 px-6 py-10 text-center hover:bg-card hover:border-primary/40 transition-colors"
+                      >
+                        <p className="text-base font-medium text-foreground">
+                          No comments yet
+                        </p>
+                        <p className="mt-1 text-sm text-muted-foreground">
+                          Be the first to start a discussion.
+                        </p>
+                      </button>
+                    )}
+                  </div>
                 </div>
-
-                <DetailCommentComposer event={event} className="mb-3" />
-
-                {commentsLoading && statsLoading && replyTree.length === 0 ? (
-                  <div className="space-y-3">
-                    {Array.from({ length: 3 }).map((_, i) => (
-                      <ReplyCardSkeleton key={i} />
-                    ))}
-                  </div>
-                ) : replyTree.length > 0 ? (
-                  <div className="rounded-2xl bg-card border border-border/60 overflow-hidden">
-                    <ThreadedReplyList
-                      roots={replyTree}
-                      renderItemHeader={(event) => (
-                        <OrganizationPinHeader
-                          isPinned={isPinned(event.id)}
-                          canManagePins={canManagePins}
-                          pinPending={togglePin.isPending}
-                          onTogglePin={() => handleTogglePin(event)}
-                        />
-                      )}
-                    />
-                  </div>
-                ) : (
-                  <button
-                    type="button"
-                    onClick={() => setReplyOpen(true)}
-                    className="block w-full rounded-2xl border border-dashed border-border/80 bg-card/50 px-6 py-10 text-center hover:bg-card hover:border-primary/40 transition-colors"
-                  >
-                    <p className="text-base font-medium text-foreground">
-                      No comments yet
-                    </p>
-                    <p className="mt-1 text-sm text-muted-foreground">
-                      Be the first to start a discussion.
-                    </p>
-                  </button>
-                )}
-              </div>
               </div>
 
               <aside className="hidden lg:block lg:w-[360px] lg:shrink-0 lg:self-start">
