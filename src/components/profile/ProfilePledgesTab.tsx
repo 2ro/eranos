@@ -142,15 +142,12 @@ function ProfilePledgeCard({
       to={`/${naddr}`}
       className="group block rounded-xl overflow-hidden focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background motion-safe:transition-transform motion-safe:duration-200 motion-safe:hover:-translate-y-0.5"
     >
-      <Card className={cn(
-        'overflow-hidden border-border/70 shadow-sm motion-safe:transition-shadow motion-safe:duration-200 group-hover:shadow-lg h-full flex flex-col',
-        isExpired && 'opacity-75',
-      )}>
+      <Card className="overflow-hidden border-border/70 shadow-sm motion-safe:transition-shadow motion-safe:duration-200 group-hover:shadow-lg h-full flex flex-col">
         <div className="relative w-full aspect-[16/9] bg-gradient-to-br from-primary/15 via-primary/5 to-secondary">
           <img
             src={coverImage}
             alt=""
-            className={cn('absolute inset-0 size-full object-cover', isExpired && 'grayscale')}
+            className="absolute inset-0 size-full object-cover"
             onError={() => setImageLoadFailed(true)}
             loading="lazy"
           />

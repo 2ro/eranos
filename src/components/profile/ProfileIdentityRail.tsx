@@ -676,16 +676,13 @@ function RailPledgeCard({
       to={`/${naddr}`}
       className="group block rounded-xl overflow-hidden focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
     >
-      <Card className={cn(
-        'overflow-hidden border-border/70 shadow-sm motion-safe:transition-shadow group-hover:shadow-md',
-        isExpired && 'opacity-75',
-      )}>
+      <Card className="overflow-hidden border-border/70 shadow-sm motion-safe:transition-shadow group-hover:shadow-md">
         <div className="relative aspect-[16/9] bg-gradient-to-br from-primary/15 via-primary/5 to-secondary">
           <img
             src={cover}
             alt=""
             loading="lazy"
-            className={cn('absolute inset-0 size-full object-cover', isExpired && 'grayscale')}
+            className="absolute inset-0 size-full object-cover"
           />
           {isExpired && (
             <Badge
