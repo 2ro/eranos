@@ -74,14 +74,20 @@ export function ProfileTabs({ tabs, activeTab, onChange }: ProfileTabsProps) {
         // matches the existing app convention so it sits flush with the
         // mobile top nav. On desktop the chrome shifts and we use top-0.
         'sticky top-mobile-bar sidebar:top-0 z-10',
-        // On mobile, slide out of view together with the MobileTopBar when
-        // the user scrolls down — otherwise the tabs sit at `top-mobile-bar`
-        // while the top bar slides away, leaving a translucent gap above
-        // them, and when the top bar slides back in it visibly crosses over
-        // the top of the tab bar (top bar is z-20, tabs z-10). Mirrors the
-        // global `SubHeaderBar`'s default behavior.
-        'max-sidebar:transition-transform max-sidebar:duration-300 max-sidebar:ease-in-out',
-        navHidden && 'nav-hidden-slide',
+        // On mobile, fade + slide fully out of view when the user scrolls
+        // down — otherwise the tabs sit at `top-mobile-bar` while the top
+        // bar slides away, leaving a translucent gap above them, and when
+        // the top bar slides back in it visibly crosses over the top of
+        // the tab bar (top bar is z-20, tabs z-10).
+        //
+        // We can't simply use the shared `.nav-hidden-slide` utility (as
+        // the global `SubHeaderBar` does) because the profile tab bar is
+        // notably taller than other sub-headers and visibly gets clipped
+        // by the top bar mid-transition. Pair the slide with an opacity
+        // fade so the bar isn't visibly intersecting the top bar as it
+        // animates.
+        'max-sidebar:transition-[transform,opacity] max-sidebar:duration-300 max-sidebar:ease-in-out',
+        navHidden && 'nav-hidden-slide max-sidebar:opacity-0',
         // Visual separation — translucent backdrop so feed content doesn't
         // bleed through, with a single hairline border below.
         'bg-background/80 backdrop-blur supports-[backdrop-filter]:bg-background/60',
