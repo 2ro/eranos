@@ -46,12 +46,14 @@ import { PageHeader } from '@/components/PageHeader';
 import { isRepostKind, parseRepostContent } from '@/lib/feedUtils';
 import { nip19 } from 'nostr-tools';
 
-type TabType = 'communities' | 'posts' | 'accounts';
+type TabType = 'activity' | 'posts' | 'accounts';
 
-const VALID_TABS: TabType[] = ['communities', 'posts', 'accounts'];
+const VALID_TABS: TabType[] = ['activity', 'posts', 'accounts'];
 
 function parseTab(value: string | null): TabType {
-  return VALID_TABS.includes(value as TabType) ? (value as TabType) : 'communities';
+  // Back-compat: ?tab=communities used to be the default tab; alias it to activity.
+  if (value === 'communities') return 'activity';
+  return VALID_TABS.includes(value as TabType) ? (value as TabType) : 'activity';
 }
 
 const VALID_AUTHOR_SCOPES = ['anyone', 'follows', 'people'] as const;
@@ -188,7 +190,7 @@ export function SearchPage() {
   const setActiveTab = useCallback((tab: TabType) => {
     setSearchParams((prev) => {
       const next = new URLSearchParams(prev);
-      if (tab === 'communities') {
+      if (tab === 'activity') {
         next.delete('tab');
       } else {
         next.set('tab', tab);
@@ -370,7 +372,7 @@ export function SearchPage() {
     <main className="flex-1 min-w-0">
       <PageHeader title="Search" icon={<SearchIcon className="size-5" />} />
       <SubHeaderBar>
-        <TabButton label="Communities" active={activeTab === 'communities'} onClick={() => setActiveTab('communities')} />
+        <TabButton label="Activity" active={activeTab === 'activity'} onClick={() => setActiveTab('activity')} />
         <TabButton label="Posts" active={activeTab === 'posts'} onClick={() => setActiveTab('posts')} />
         <TabButton label="Accounts" active={activeTab === 'accounts'} onClick={() => setActiveTab('accounts')} />
       </SubHeaderBar>
@@ -383,8 +385,8 @@ export function SearchPage() {
             onDebouncedChange={setDebouncedSearchQuery}
           />
 
-          {/* Filter popover (posts & communities tabs) */}
-          {(activeTab === 'posts' || activeTab === 'communities') && (
+          {/* Filter popover (posts & activity tabs) */}
+          {(activeTab === 'posts' || activeTab === 'activity') && (
             <Popover open={filtersOpen} onOpenChange={setFiltersOpen}>
               <PopoverTrigger asChild>
                 <button
@@ -505,7 +507,7 @@ export function SearchPage() {
                   </div>
                 </div>
 
-                {/* Posts-only filters (hidden on communities tab) */}
+                {/* Posts-only filters (hidden on activity tab) */}
                 {activeTab === 'posts' && (
                   <>
                     <Separator />
@@ -591,8 +593,8 @@ export function SearchPage() {
           )}
         </div>
 
-        {/* Active filter summary chips (posts & communities tabs) */}
-        {(activeTab === 'posts' || activeTab === 'communities') && activeFilterLabels.length > 0 && (
+        {/* Active filter summary chips (posts & activity tabs) */}
+        {(activeTab === 'posts' || activeTab === 'activity') && activeFilterLabels.length > 0 && (
           <div className="flex flex-wrap gap-1.5 mt-2">
             {activeFilterLabels.map((label) => (
               <Badge key={label} variant="secondary" className="text-xs font-normal">
@@ -608,8 +610,8 @@ export function SearchPage() {
           </div>
         )}
 
-        {/* NIP-50 search query debug block (posts & communities tabs) */}
-        {(activeTab === 'posts' || activeTab === 'communities') && debouncedSearchQuery.trim() && (
+        {/* NIP-50 search query debug block (posts & activity tabs) */}
+        {(activeTab === 'posts' || activeTab === 'activity') && debouncedSearchQuery.trim() && (
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
@@ -629,9 +631,9 @@ export function SearchPage() {
       </div>
 
       <PullToRefresh onRefresh={handleRefresh}>
-        {/* ─── Communities Tab ─── */}
-        {activeTab === 'communities' && (
-          <CommunitiesSearchTab
+        {/* ─── Activity Tab ─── */}
+        {activeTab === 'activity' && (
+          <ActivitySearchTab
             searchQuery={debouncedSearchQuery}
             includeReplies={includeReplies}
             mediaType={mediaType}
@@ -988,8 +990,10 @@ function SearchInput({
   );
 }
 
-/** Communities tab — isolated component so useStreamPosts only subscribes when active. */
-function CommunitiesSearchTab({
+/** Activity tab — isolated component so useStreamPosts only subscribes when active.
+ *  Pins kinds to [33863 Campaigns, 36639 Pledges] — the non-kind-1 Agora content
+ *  stream. Kind 1 posts (and reposts of them) live on the Posts tab instead. */
+function ActivitySearchTab({
   searchQuery,
   includeReplies,
   mediaType,
@@ -1017,7 +1021,7 @@ function CommunitiesSearchTab({
     mediaType,
     language,
     protocols,
-    kindsOverride: [34550],
+    kindsOverride: [33863, 36639],
     authorPubkeys,
     sort,
   });
@@ -1045,13 +1049,13 @@ function CommunitiesSearchTab({
   if (searchQuery.trim()) {
     return (
       <EmptyState
-        message="No communities found matching your search."
+        message="No campaigns or pledges found matching your search."
         activeFilters={activeFilterLabels}
         onResetFilters={hasActiveFilters ? resetFilters : undefined}
       />
     );
   }
 
-  return <EmptyState message="Search for communities or browse the latest." />;
+  return <EmptyState message="Search for campaigns and pledges, or browse the latest." />;
 }
 
