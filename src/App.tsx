@@ -153,7 +153,7 @@ const hardcodedConfig: AppConfig = {
     'https://blockstream.info/api',
   ],
   blockbookBaseUrl: 'https://btc.trezor.io',
-  bip352IndexerUrl: '',
+  bip352IndexerUrl: 'https://silentpayments.dev/blindbit/mainnet',
   sidebarWidgets: [
     { id: 'trends' },
     { id: 'hot-posts' },

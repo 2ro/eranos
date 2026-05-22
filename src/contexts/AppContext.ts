@@ -326,18 +326,21 @@ export interface AppConfig {
    *   - `GET /tweaks/:height`     → 33-byte compressed tweaks
    *   - `GET /utxos/:height`      → P2TR outputs in the block
    *
-   * No version segment, no trailing slash. Default is an empty string, which
-   * disables silent-payment scanning entirely — the wallet still displays the
-   * static `sp1q…` receive address, but never resolves balances or history.
-   * Set this to a self-hosted or trusted BlindBit endpoint to enable scanning.
+   * No version segment, no trailing slash. An empty string disables silent
+   * payment scanning entirely (the wallet still displays the static `sp1q…`
+   * receive address, but never resolves balances or history).
    *
    * **Privacy note**: the indexer never sees `bscan`, but it does observe the
-   * sequence of block heights you ask about. If you scan a contiguous range
-   * (history backfill) that signal is uninformative; for live ongoing scans
-   * the indexer can correlate your IP with the wallet's last-known tip.
-   * Self-hosting is the strongest mitigation.
+   * sequence of block heights you ask about, paired with your IP. For a
+   * backfill scan over a contiguous range that signal is uninformative; for
+   * live ongoing scans the operator can correlate your IP with the wallet's
+   * last-known tip. Self-hosting (or pointing this at a trusted endpoint) is
+   * the strongest mitigation.
    *
-   * Default: `""` (disabled).
+   * Default: `"https://silentpayments.dev/blindbit/mainnet"` — the same
+   * public BlindBit Oracle the Dana wallet (cygnet3/dana) uses. Operated by
+   * the silentpayments.dev project, no authentication, no rate-limiting
+   * announced. Override via `agora.json` for a self-hosted endpoint.
    */
   bip352IndexerUrl: string;
   /**
