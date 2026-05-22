@@ -970,7 +970,7 @@ function DonateColumn({
           // SP mode: external wallet only. The in-app PSBT signer doesn't
           // support BIP-352, so we point the donor at the QR/code panel.
           <div className="space-y-3">
-            <CampaignWalletDonatePanel wallet={campaign.wallet} campaignTitle={campaign.title} />
+            <CampaignWalletDonatePanel wallet={campaign.wallet} />
             <Button variant="outline" size="lg" className="w-full" onClick={onShare}>
               <Share2 className="size-4 mr-2" />
               Share
@@ -987,7 +987,7 @@ function DonateColumn({
               <HandHeart className="size-5 mr-2" />
               Donate
             </Button>
-            <CampaignWalletDonatePanel wallet={campaign.wallet} campaignTitle={campaign.title} />
+            <CampaignWalletDonatePanel wallet={campaign.wallet} />
             <Button variant="outline" size="lg" className="w-full" onClick={onShare}>
               <Share2 className="size-4 mr-2" />
               Share

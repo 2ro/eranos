@@ -10,8 +10,6 @@ import type { CampaignWallet } from '@/lib/campaign';
 interface CampaignWalletDonatePanelProps {
   /** Parsed wallet endpoint declared by the campaign's `w` tag. */
   wallet: CampaignWallet;
-  /** Optional campaign title used in toast/copy messages. */
-  campaignTitle?: string;
 }
 
 /**
@@ -32,7 +30,6 @@ interface CampaignWalletDonatePanelProps {
  */
 export function CampaignWalletDonatePanel({
   wallet,
-  campaignTitle,
 }: CampaignWalletDonatePanelProps) {
   const { toast } = useToast();
   const [copied, setCopied] = useState(false);
@@ -114,8 +111,7 @@ export function CampaignWalletDonatePanel({
           <ShieldCheck className="size-4 shrink-0 mt-0.5 text-primary" />
           <span>
             Silent-payment campaigns are unlinkable by design. Your donation
-            cannot be tied to the campaign by anyone other than the
-            organizer{campaignTitle ? ` (${campaignTitle})` : ''}.
+            cannot be tied to the campaign by anyone other than the organizer.
           </span>
         </div>
       )}
