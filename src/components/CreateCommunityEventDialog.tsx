@@ -240,7 +240,7 @@ export function CreateCommunityEventDialog({ communityATag, open, onOpenChange, 
       const tags: string[][] = [
         ['d', dTag],
         ['title', trimmedTitle],
-        ['alt', `${isCommunityEvent ? 'Organization event' : 'Calendar event'}: ${trimmedTitle}`],
+        ['alt', `${isCommunityEvent ? 'Group event' : 'Calendar event'}: ${trimmedTitle}`],
         ...preservedTags,
       ];
 

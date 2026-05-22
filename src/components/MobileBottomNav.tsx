@@ -78,7 +78,10 @@ export function MobileBottomNav() {
   const isHidden = hidden || searchOpen;
 
   const isOnWallet = location.pathname === '/wallet';
-  const isOnCommunities = location.pathname === '/communities' || location.pathname.startsWith('/communities/');
+  const isOnCommunities = location.pathname === '/groups'
+    || location.pathname.startsWith('/groups/')
+    || location.pathname === '/communities'
+    || location.pathname.startsWith('/communities/');
   const isOnWorld = location.pathname === '/world' || location.pathname.startsWith('/world/');
   const isOnNotifications = location.pathname === '/notifications';
 
@@ -112,7 +115,7 @@ export function MobileBottomNav() {
               icon={Users}
               label="Groups"
               active={isOnCommunities}
-              to="/communities"
+              to="/groups"
               onClick={() => { selectionChanged(); setSearchOpen(false); }}
             />
 

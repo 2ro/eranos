@@ -233,10 +233,10 @@ export function CreateCommunityPage() {
   const activeSlug = editCommunity?.community.dTag ?? derivedSlug;
 
   useSeoMeta({
-    title: isEditMode ? 'Edit community | Agora' : 'Create community | Agora',
+    title: isEditMode ? 'Edit group | Agora' : 'Create group | Agora',
     description: isEditMode
-      ? 'Update your community on Agora.'
-      : 'Start a new community on Agora.',
+      ? 'Update your group on Agora.'
+      : 'Start a new group on Agora.',
   });
 
   // Prefill the form when the community loads.
@@ -286,12 +286,12 @@ export function CreateCommunityPage() {
 
   const submitMutation = useMutation({
     mutationFn: async () => {
-      if (!user) throw new Error('You must be logged in to create a community.');
+      if (!user) throw new Error('You must be logged in to create a group.');
       if (isEditMode && !editCommunity) {
-        throw new Error('Community could not be loaded for editing.');
+        throw new Error('Group could not be loaded for editing.');
       }
       if (editCommunity && editCommunity.event.pubkey !== user.pubkey) {
-        throw new Error('Only the community founder can edit this community.');
+        throw new Error('Only the group founder can edit this group.');
       }
 
       const trimmedName = name.trim();
@@ -300,7 +300,7 @@ export function CreateCommunityPage() {
       const slug = activeSlug;
       if (!slug) {
         throw new Error(
-          'Name must include letters or numbers so a community URL can be created.',
+          'Name must include letters or numbers so a group URL can be created.',
         );
       }
 
@@ -323,7 +323,7 @@ export function CreateCommunityPage() {
           '#d': [slug],
         });
         if (!prev || !parseCommunityEvent(prev)) {
-          throw new Error('Could not find the latest version of this community to update.');
+          throw new Error('Could not find the latest version of this group to update.');
         }
 
         // Strip the tag names we're going to rewrite; preserve everything
@@ -352,7 +352,7 @@ export function CreateCommunityPage() {
           nextTags.push(['p', mod.pubkey, '', 'moderator']);
         }
         nextTags.push(...preserved);
-        nextTags.push(['alt', `Community: ${trimmedName}`]);
+        nextTags.push(['alt', `Group: ${trimmedName}`]);
 
         const updated = await publishEvent({
           kind: COMMUNITY_DEFINITION_KIND,
@@ -376,7 +376,7 @@ export function CreateCommunityPage() {
       ]);
       if (existing.length > 0) {
         throw new Error(
-          `You already have a community with the identifier "${slug}". Choose another name.`,
+          `You already have a group with the identifier "${slug}". Choose another name.`,
         );
       }
 
@@ -397,7 +397,7 @@ export function CreateCommunityPage() {
       for (const mod of extraModerators) {
         tags.push(['p', mod.pubkey, '', 'moderator']);
       }
-      tags.push(['alt', `Community: ${trimmedName}`]);
+      tags.push(['alt', `Group: ${trimmedName}`]);
 
       const created = await publishEvent({
         kind: COMMUNITY_DEFINITION_KIND,
@@ -428,14 +428,14 @@ export function CreateCommunityPage() {
         queryKey: ['community-activity-feed'],
         exact: false,
       });
-      toast({ title: edited ? 'Community updated!' : 'Community created!' });
+      toast({ title: edited ? 'Group updated!' : 'Group created!' });
       navigate(`/${naddr}`);
     },
     onError: (error: unknown) => {
       const msg = error instanceof Error ? error.message : String(error);
       setFormError(msg);
       toast({
-        title: isEditMode ? 'Could not update community' : 'Could not create community',
+        title: isEditMode ? 'Could not update group' : 'Could not create group',
         description: msg,
         variant: 'destructive',
       });
@@ -449,12 +449,12 @@ export function CreateCommunityPage() {
           <Card>
             <CardContent className="py-12 px-8 text-center space-y-4">
               <Users className="size-10 text-muted-foreground/60 mx-auto" />
-              <h2 className="text-xl font-semibold">Log in to start a community</h2>
+              <h2 className="text-xl font-semibold">Log in to start a group</h2>
               <p className="text-muted-foreground">
-                Communities are signed Nostr events. You need a Nostr login to publish one.
+                Groups are signed Nostr events. You need a Nostr login to publish one.
               </p>
               <Button asChild>
-                <Link to="/communities">Back to communities</Link>
+                <Link to="/groups">Back to groups</Link>
               </Button>
             </CardContent>
           </Card>
@@ -472,10 +472,10 @@ export function CreateCommunityPage() {
               <AlertTriangle className="size-10 text-muted-foreground/60 mx-auto" />
               <h2 className="text-xl font-semibold">Invalid edit link</h2>
               <p className="text-muted-foreground">
-                This community edit link is missing a valid community address.
+                This group edit link is missing a valid group address.
               </p>
-              <Button type="button" onClick={() => navigate('/communities/new')}>
-                Start a new community
+              <Button type="button" onClick={() => navigate('/groups/new')}>
+                Start a new group
               </Button>
             </CardContent>
           </Card>
@@ -491,7 +491,7 @@ export function CreateCommunityPage() {
           <Card>
             <CardContent className="py-12 px-8 text-center space-y-3">
               <Loader2 className="size-8 animate-spin text-muted-foreground mx-auto" />
-              <p className="text-sm text-muted-foreground">Loading community…</p>
+              <p className="text-sm text-muted-foreground">Loading group…</p>
             </CardContent>
           </Card>
         </div>
@@ -509,9 +509,9 @@ export function CreateCommunityPage() {
           <Card>
             <CardContent className="py-12 px-8 text-center space-y-4">
               <AlertTriangle className="size-10 text-muted-foreground/60 mx-auto" />
-              <h2 className="text-xl font-semibold">Community cannot be edited</h2>
+              <h2 className="text-xl font-semibold">Group cannot be edited</h2>
               <p className="text-muted-foreground">
-                Only the founder of this community can update it.
+                Only the founder of this group can update it.
               </p>
               <Button type="button" onClick={() => navigate(-1)}>
                 Go back
@@ -544,7 +544,7 @@ export function CreateCommunityPage() {
               <ArrowLeft className="size-5" />
             </button>
             <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">
-              {isEditMode ? 'Edit community' : 'Create community'}
+              {isEditMode ? 'Edit group' : 'Create group'}
             </h1>
           </div>
         </div>
@@ -562,7 +562,7 @@ export function CreateCommunityPage() {
             <p className="text-xs text-muted-foreground">
               URL preview:{' '}
               <span className="font-mono text-foreground">
-                /{activeSlug || 'your-community-name'}
+                /{activeSlug || 'your-group-name'}
               </span>
               {isEditMode && ' (kept from original)'}
             </p>
@@ -573,7 +573,7 @@ export function CreateCommunityPage() {
             <Textarea
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              placeholder="What is this community about?"
+              placeholder="What is this group about?"
               rows={3}
             />
           </FormSection>
@@ -645,7 +645,7 @@ export function CreateCommunityPage() {
             ) : (
               <>
                 <Users className="size-4 mr-2" />
-                {isEditMode ? 'Update community' : 'Create community'}
+                {isEditMode ? 'Update group' : 'Create group'}
               </>
             )}
           </Button>

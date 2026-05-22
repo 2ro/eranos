@@ -1794,9 +1794,9 @@ const KIND_HEADER_MAP: Record<number, KindHeaderConfig> = {
   },
   34550: {
     icon: Users,
-    action: (event) => publishedAtAction(event, { created: "created an", updated: "updated an", fallback: "shared an" }),
-    noun: "organization",
-    nounRoute: "/communities",
+    action: (event) => publishedAtAction(event, { created: "created a", updated: "updated a", fallback: "shared a" }),
+    noun: "group",
+    nounRoute: "/groups",
   },
   33863: {
     icon: HandHeart,

@@ -101,7 +101,7 @@ function CommunityModerationMenuInner({
         <Button
           variant="ghost"
           size="icon"
-          aria-label="Moderate organization"
+          aria-label="Moderate group"
           className={className ?? 'h-8 w-8 bg-background/80 backdrop-blur text-muted-foreground hover:text-foreground'}
         >
           {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : <MoreHorizontal className="h-4 w-4" />}
@@ -121,7 +121,7 @@ function CommunityModerationMenuInner({
             </span>
           </DropdownMenuItem>
         ) : (
-          <DropdownMenuItem onClick={() => runAction('featured', 'Featured organization')}>
+          <DropdownMenuItem onClick={() => runAction('featured', 'Featured group')}>
             <Sparkles className="h-4 w-4 mr-2" />
             Feature
           </DropdownMenuItem>

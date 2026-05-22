@@ -14,7 +14,7 @@ const REPORT_TYPE_LABELS: Record<Nip56ReportType, string> = {
   illegal: 'illegal content',
   malware: 'malware',
   impersonation: 'impersonation',
-  other: 'organization guidelines',
+  other: 'group guidelines',
 };
 
 interface CommunityContentWarningProps {
@@ -68,8 +68,8 @@ export function CommunityContentWarning({ event, children, className }: Communit
             <p className="text-sm font-medium text-foreground">Reported Content</p>
             <p className="text-xs text-muted-foreground leading-relaxed">
               {reporterCount === 1
-                ? `Reported by an organization moderator for ${typeLabels}.`
-                : `Reported by ${reporterCount} organization moderators for ${typeLabels}.`}
+                ? `Reported by a group moderator for ${typeLabels}.`
+                : `Reported by ${reporterCount} group moderators for ${typeLabels}.`}
             </p>
           </div>
           <Button

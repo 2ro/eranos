@@ -193,7 +193,7 @@ export const SIDEBAR_ITEMS: SidebarItemDef[] = [
   { id: "emojis", label: "Emojis", path: "/emojis", icon: SmilePlus },
   { id: "development", label: "Development", path: "/development", icon: Code },
   { id: "badges", label: "Badges", path: "/badges", icon: Award },
-  { id: "communities", label: "Groups", path: "/communities", icon: Users },
+  { id: "communities", label: "Groups", path: "/groups", icon: Users },
   { id: "world", label: "World", path: "/world", icon: Earth },
 ];
 

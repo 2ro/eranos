@@ -333,7 +333,7 @@ export function CreateActionDialog({ countryCode, communityATag, open, onOpenCha
   if (!user) return null;
 
   const description = communityATag
-    ? 'New organization pledge. You can optionally choose a country below.'
+    ? 'New group pledge. You can optionally choose a country below.'
     : countryCode
     ? `New pledge for ${getGeoDisplayName(countryCode)}.`
     : 'New pledge. You can optionally choose a country below.';

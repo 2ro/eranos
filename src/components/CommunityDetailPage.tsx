@@ -634,7 +634,7 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
 
   // Parse community definition
   const community = useMemo(() => parseCommunityEvent(event), [event]);
-  const name = community?.name ?? 'Unnamed Organization';
+  const name = community?.name ?? 'Unnamed Group';
   const description = community?.description ?? '';
   const image = community?.image;
   const cover = sanitizeUrl(image);
@@ -700,7 +700,7 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
   const handleToggleFollow = useCallback(() => {
     if (!user || !communityATag || toggleCommunityFollow.isPending) return;
     if (membershipFollow) {
-      toast({ title: isFounder ? 'You founded this organization' : 'You moderate this organization' });
+      toast({ title: isFounder ? 'You founded this group' : 'You moderate this group' });
       return;
     }
     toggleCommunityFollow.mutate({ aTag: communityATag });
@@ -833,9 +833,9 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
       {
         onSuccess: () => {
           toast({
-            title: 'Organization deleted',
+            title: 'Group deleted',
             description:
-              'A deletion request was published. Well-behaved relays will drop the organization from feeds.',
+              'A deletion request was published. Well-behaved relays will drop the group from feeds.',
           });
           setDeleteConfirmOpen(false);
           void queryClient.invalidateQueries({
@@ -845,12 +845,12 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
           void queryClient.invalidateQueries({ queryKey: ['manageable-organizations'] });
           void queryClient.invalidateQueries({ queryKey: ['featured-organizations'] });
           void queryClient.invalidateQueries({ queryKey: ['followed-organizations'] });
-          navigate('/communities');
+          navigate('/groups');
         },
         onError: (error: unknown) => {
           const msg = error instanceof Error ? error.message : String(error);
           toast({
-            title: 'Could not delete organization',
+            title: 'Could not delete group',
             description: msg,
             variant: 'destructive',
           });
@@ -957,7 +957,7 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
                         type="button"
                         onClick={() => setDescriptionDialogOpen(true)}
                         className="-my-1 -mr-1 p-1 rounded-full text-white/75 hover:text-white hover:bg-white/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80 transition-colors"
-                        aria-label="About this organization"
+                        aria-label="About this group"
                       >
                         <Info className="size-4 [text-shadow:none] drop-shadow-[0_1px_2px_rgba(0,0,0,0.85)]" />
                       </button>
@@ -994,11 +994,11 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
                               pubkey: event.pubkey,
                               identifier: community.dTag,
                             });
-                            navigate(`/communities/new?edit=${naddr}`);
+                            navigate(`/groups/new?edit=${naddr}`);
                           }}
                         >
                           <Pencil className="size-4 mr-2" />
-                          Edit organization
+                          Edit group
                         </DropdownMenuItem>
                       )}
                       {isFounder && community && (
@@ -1010,7 +1010,7 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
                           className="text-destructive focus:text-destructive focus:bg-destructive/10"
                         >
                           <Trash2 className="size-4 mr-2" />
-                          Delete organization
+                          Delete group
                         </DropdownMenuItem>
                       )}
                     </DropdownMenuContent>
@@ -1227,15 +1227,15 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
       <AlertDialog open={deleteConfirmOpen} onOpenChange={setDeleteConfirmOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Delete this organization?</AlertDialogTitle>
+            <AlertDialogTitle>Delete this group?</AlertDialogTitle>
             <AlertDialogDescription>
               This publishes a NIP-09 deletion request for{' '}
               <span className="font-medium text-foreground">{name}</span>.
-              Well-behaved relays will drop the organization from feeds and
+              Well-behaved relays will drop the group from feeds and
               direct links. Campaigns, pledges, and posts published under
-              the organization stay on-chain regardless. This action cannot
+              the group stay on-chain regardless. This action cannot
               be undone — to change the name, banner, or moderators, edit
-              the organization instead.
+              the group instead.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
@@ -1262,10 +1262,10 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
     const wasPinned = isPinned(event.id);
     togglePin.mutate(event.id, {
       onSuccess: () => {
-        toast({ title: wasPinned ? 'Unpinned from organization' : 'Pinned to organization' });
+        toast({ title: wasPinned ? 'Unpinned from group' : 'Pinned to group' });
       },
       onError: () => {
-        toast({ title: 'Failed to update organization pins', variant: 'destructive' });
+        toast({ title: 'Failed to update group pins', variant: 'destructive' });
       },
     });
   }

@@ -1275,7 +1275,7 @@ export function CommunityPreview({ addr }: { addr: { kind: number; pubkey: strin
 
   const communityName = event?.tags.find(([n]) => n === 'name')?.[1]
     || event?.tags.find(([n]) => n === 'd')?.[1]
-    || 'Organization';
+    || 'Group';
   const communityImage = event?.tags.find(([n]) => n === 'image')?.[1];
   const communityDescription = event?.tags.find(([n]) => n === 'description')?.[1];
   const moderatorCount = event?.tags.filter(([n, , , role]) => n === 'p' && role === 'moderator').length ?? 0;
@@ -1319,7 +1319,7 @@ export function CommunityPreview({ addr }: { addr: { kind: number; pubkey: strin
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
           <Users className="size-3 shrink-0" />
-          <span>Organization</span>
+          <span>Group</span>
           {moderatorCount > 0 && (
             <span className="text-muted-foreground/60">&middot; {moderatorCount} mod{moderatorCount !== 1 ? 's' : ''}</span>
           )}

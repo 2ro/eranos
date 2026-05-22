@@ -53,12 +53,12 @@ export function OrganizationContextChip({
           <Users className="size-4" />
         </div>
         <div className="min-w-0 space-y-0.5">
-          <p className="text-xs font-semibold uppercase tracking-wide">Attached to organization</p>
+          <p className="text-xs font-semibold uppercase tracking-wide">Attached to group</p>
           <p className="truncate text-sm font-semibold text-foreground">
-            {authorizedOrg?.community.name ?? 'Organization'}
+            {authorizedOrg?.community.name ?? 'Group'}
           </p>
           <p className="text-xs text-muted-foreground">
-            Updates will stay connected to this organization's official activity.
+            Updates will stay connected to this group's official activity.
           </p>
         </div>
       </div>
@@ -73,7 +73,7 @@ export function OrganizationContextChip({
   if (!paramDecoded) {
     return (
       <p className="mt-2 ml-9 text-xs text-muted-foreground">
-        Couldn't read the organization in the link. Publishing under your account.
+        Couldn't read the group in the link. Publishing under your account.
       </p>
     );
   }
@@ -83,7 +83,7 @@ export function OrganizationContextChip({
   if (manageableLoading) {
     return (
       <div className="mt-3 ml-9 rounded-xl border border-border bg-card px-4 py-3 text-sm text-muted-foreground">
-        Checking organization permissions…
+        Checking group permissions…
       </div>
     );
   }
@@ -94,7 +94,7 @@ export function OrganizationContextChip({
   if (!authorizedOrg) {
     return (
       <p className="mt-2 ml-9 text-xs text-muted-foreground">
-        You aren't a founder or moderator of that organization. Publishing under your account.
+        You aren't a founder or moderator of that group. Publishing under your account.
       </p>
     );
   }
@@ -105,10 +105,10 @@ export function OrganizationContextChip({
         <Users className="size-4" />
       </div>
       <div className="min-w-0 space-y-0.5">
-        <p className="text-xs font-semibold uppercase tracking-wide">Publishing as organization</p>
+        <p className="text-xs font-semibold uppercase tracking-wide">Publishing as group</p>
         <p className="truncate text-sm font-semibold text-foreground">{authorizedOrg.community.name}</p>
         <p className="text-xs text-muted-foreground">
-          This will appear as official organization activity instead of only under your profile.
+          This will appear as official group activity instead of only under your profile.
         </p>
       </div>
     </div>

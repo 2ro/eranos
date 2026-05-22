@@ -107,7 +107,7 @@ export function CreateEventPage() {
       const tags: string[][] = [
         ['d', dTag],
         ['title', trimmedTitle],
-        ['alt', `${organizationATag ? 'Organization event' : 'Calendar event'}: ${trimmedTitle}`],
+        ['alt', `${organizationATag ? 'Group event' : 'Calendar event'}: ${trimmedTitle}`],
       ];
 
       if (organizationATag) {
