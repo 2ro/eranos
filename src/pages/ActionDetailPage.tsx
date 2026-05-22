@@ -27,12 +27,13 @@ import { DEFAULT_COVER_IMAGE } from '@/lib/defaultActionCovers';
 import { formatPledgeAmount } from '@/lib/pledges';
 import { sanitizeUrl } from '@/lib/sanitizeUrl';
 
-import { ArticleContent } from '@/components/ArticleContent';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { Skeleton } from '@/components/ui/skeleton';
 import { DetailCommentComposer } from '@/components/DetailCommentComposer';
+import { DetailReplySkeleton, DetailStory } from '@/components/DetailStory';
 import { PostActionBar } from '@/components/PostActionBar';
 import { PinnedCommentHeader } from '@/components/PinnedCommentHeader';
 import { ReplyComposeModal } from '@/components/ReplyComposeModal';
@@ -140,6 +141,7 @@ function PledgeDetailContent({ action }: { action: Action }) {
   const metadata: NostrMetadata | undefined = author.data?.metadata;
   const creatorName = getDisplayName(metadata, action.pubkey);
   const creatorProfileUrl = useProfileUrl(action.pubkey, metadata);
+  const creatorPicture = sanitizeUrl(metadata?.picture);
   const deadline = action.deadline ? formatDeadline(action.deadline) : null;
   const cover = sanitizeUrl(action.image);
   const progressValue = action.bounty > 0 ? Math.min(100, Math.round((fundedSats / action.bounty) * 100)) : 0;
@@ -180,20 +182,12 @@ function PledgeDetailContent({ action }: { action: Action }) {
         cover={cover}
         creatorName={creatorName}
         creatorProfileUrl={creatorProfileUrl}
+        creatorPicture={creatorPicture}
         deadline={deadline}
         onBack={() => navigate(-1)}
+        onReply={() => setReplyOpen(true)}
+        onMore={() => setMoreMenuOpen(true)}
       />
-
-      <div className="max-w-6xl mx-auto px-4 sm:px-6">
-        <div className="rounded-b-xl rounded-t-none bg-card border border-t-0 border-border/60 shadow-sm px-4 sm:px-5 py-3">
-          <PostActionBar
-            event={action.event}
-            replyLabel="Submit"
-            onReply={() => setReplyOpen(true)}
-            onMore={() => setMoreMenuOpen(true)}
-          />
-        </div>
-      </div>
 
       {pinnedNodes.length > 0 && (
         <div className="max-w-6xl mx-auto px-4 sm:px-6 pt-6">
@@ -213,7 +207,7 @@ function PledgeDetailContent({ action }: { action: Action }) {
         </div>
       )}
 
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 py-6 lg:py-10">
+      <div className="max-w-6xl mx-auto px-5 sm:px-6 lg:px-0 py-6 lg:py-10">
         <div className="lg:flex lg:gap-8 lg:items-start">
           <div className="lg:hidden mb-6">
             <PledgeFundingCard
@@ -249,7 +243,7 @@ function PledgeDetailContent({ action }: { action: Action }) {
 
                 {commentsLoading && replyTree.length === 0 ? (
                   <div className="space-y-3">
-                    {Array.from({ length: 3 }).map((_, i) => <PledgeReplySkeleton key={i} />)}
+                    {Array.from({ length: 3 }).map((_, i) => <DetailReplySkeleton key={i} />)}
                   </div>
                 ) : replyTree.length > 0 ? (
                   <div className="rounded-2xl bg-card border border-border/60 overflow-hidden">
@@ -341,71 +335,115 @@ interface PledgeHeroProps {
   cover: string | undefined;
   creatorName: string;
   creatorProfileUrl: string;
+  creatorPicture: string | undefined;
   deadline: { label: string; isPast: boolean } | null;
   onBack: () => void;
+  onReply: () => void;
+  onMore: () => void;
 }
 
-function PledgeHero({ action, cover, creatorName, creatorProfileUrl, deadline, onBack }: PledgeHeroProps) {
+function PledgeHero({
+  action,
+  cover,
+  creatorName,
+  creatorProfileUrl,
+  creatorPicture,
+  deadline,
+  onBack,
+  onReply,
+  onMore,
+}: PledgeHeroProps) {
   const countryLabel = action.countryCode ? getGeoDisplayName(action.countryCode) : undefined;
   const [imageLoadFailed, setImageLoadFailed] = useState(false);
   const coverImage = cover && !imageLoadFailed ? cover : DEFAULT_COVER_IMAGE;
+  const initials = creatorName.slice(0, 2).toUpperCase();
 
   return (
-    <div className="max-w-6xl mx-auto px-4 sm:px-6 pt-4">
-      <div className="relative aspect-[16/9] sm:aspect-[21/9] rounded-t-xl rounded-b-none overflow-hidden bg-gradient-to-br from-primary/15 via-primary/5 to-secondary">
-        <img
-          src={coverImage}
-          alt=""
-          className="absolute inset-0 size-full object-cover"
-          onError={() => setImageLoadFailed(true)}
-        />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/25 to-black/45" />
+    <header className="relative isolate w-full overflow-hidden bg-gradient-to-br from-primary/35 via-primary/15 to-secondary min-h-[92svh] sm:min-h-0 sm:aspect-[21/9] lg:aspect-[3/1]">
+      <img
+        src={coverImage}
+        alt=""
+        className="absolute inset-0 size-full object-cover"
+        onError={() => setImageLoadFailed(true)}
+      />
 
-        <div className="absolute left-0 right-0 top-0 z-10 flex items-center justify-between gap-3 px-4 pt-4">
+      <div
+        aria-hidden
+        className="absolute inset-x-0 bottom-0 top-[20%] bg-gradient-to-t from-black/95 via-black/80 to-transparent"
+      />
+      <div
+        aria-hidden
+        className="absolute inset-x-0 top-0 h-24 bg-gradient-to-b from-black/45 to-transparent"
+      />
+
+      <div className="absolute inset-x-0 top-0 z-10 px-5 sm:px-6 lg:px-0 pt-[max(env(safe-area-inset-top),1rem)]">
+        <div className="max-w-6xl mx-auto flex items-center justify-between gap-3">
           <button
             onClick={onBack}
-            className="p-2.5 -ml-2 rounded-full text-white/90 hover:bg-white/15 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80 motion-safe:transition-colors"
+            className="inline-flex items-center gap-1.5 h-10 pl-2 pr-3.5 rounded-full bg-black/30 text-white backdrop-blur-md hover:bg-black/45 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80 motion-safe:transition-colors"
             aria-label="Go back"
           >
-            <ChevronLeft className="size-6 drop-shadow-[0_1px_2px_rgba(0,0,0,0.85)]" />
+            <ChevronLeft className="size-5" />
+            <span className="text-sm font-medium hidden sm:inline">Back</span>
           </button>
         </div>
+      </div>
 
-        <div className="absolute inset-x-0 bottom-0 z-10 space-y-2 p-5 sm:p-6 [text-shadow:0_1px_4px_rgba(0,0,0,0.75),0_2px_10px_rgba(0,0,0,0.45)]">
-          <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
-            <h1 className="text-3xl sm:text-4xl font-bold leading-tight tracking-tight text-white">
-              {action.title}
-            </h1>
-            <Link
-              to={creatorProfileUrl}
-              onClick={(e) => e.stopPropagation()}
-              className="text-xs sm:text-sm text-white/85 hover:text-white motion-safe:transition-colors"
-            >
-              by <span className="font-medium">{creatorName}</span>
-            </Link>
-          </div>
-          <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 text-xs sm:text-sm font-medium text-white/85">
+      <div className="absolute inset-x-0 bottom-0 z-10 px-5 sm:px-6 lg:px-0 pb-[max(env(safe-area-inset-bottom),1.75rem)] pt-16 sm:pt-20">
+        <div className="max-w-6xl mx-auto [text-shadow:0_1px_3px_rgba(0,0,0,0.7)]">
+          <h1 className="text-3xl sm:text-5xl lg:text-6xl font-bold leading-[1.05] tracking-tight text-white max-w-4xl">
+            {action.title}
+          </h1>
+
+          {action.description && (
+            <p className="mt-4 text-base sm:text-lg lg:text-xl leading-relaxed text-white/90 max-w-2xl line-clamp-4 sm:line-clamp-none">
+              {action.description}
+            </p>
+          )}
+
+          <Link
+            to={creatorProfileUrl}
+            onClick={(e) => e.stopPropagation()}
+            className="mt-5 inline-flex items-center gap-2.5 text-sm sm:text-base text-white/90 hover:text-white motion-safe:transition-colors group [text-shadow:none]"
+          >
+            <Avatar className="size-8 sm:size-9 ring-2 ring-white/30">
+              {creatorPicture && <AvatarImage src={creatorPicture} alt="" />}
+              <AvatarFallback className="text-xs bg-white/15 text-white">
+                {initials}
+              </AvatarFallback>
+            </Avatar>
+            <span className="[text-shadow:0_1px_3px_rgba(0,0,0,0.7)]">
+              by{' '}
+              <span className="font-semibold underline-offset-4 group-hover:underline">
+                {creatorName}
+              </span>
+            </span>
+          </Link>
+
+          <div className="mt-3 flex flex-wrap items-center gap-x-5 gap-y-1.5 text-xs sm:text-sm font-medium text-white/85">
             {countryLabel && (
               <span className="inline-flex items-center gap-1.5">
-                <MapPin className="size-3.5 sm:size-4" />
+                <MapPin className="size-4" />
                 {countryLabel}
               </span>
             )}
-            {deadline ? (
-              <span className="inline-flex items-center gap-1.5">
-                <CalendarClock className="size-3.5 sm:size-4" />
-                {deadline.label}
-              </span>
-            ) : (
-              <span className="inline-flex items-center gap-1.5">
-                <CalendarClock className="size-3.5 sm:size-4" />
-                Open-ended
-              </span>
-            )}
+            <span className="inline-flex items-center gap-1.5">
+              <CalendarClock className="size-4" />
+              {deadline ? deadline.label : 'Open-ended'}
+            </span>
+          </div>
+
+          <div className="mt-4 pt-3 border-t border-white/15 [&_button]:!text-white/90 [&_button:hover]:!text-white [&_button:hover]:!bg-white/15 [&_button]:transition-colors [text-shadow:none]">
+            <PostActionBar
+              event={action.event}
+              replyLabel="Submit"
+              onReply={onReply}
+              onMore={onMore}
+            />
           </div>
         </div>
       </div>
-    </div>
+    </header>
   );
 }
 
@@ -427,8 +465,8 @@ function PledgeFundingCard({
   onShare: () => void;
 }) {
   return (
-    <Card className="overflow-hidden">
-      <CardContent className="p-5 space-y-5">
+    <Card className="overflow-hidden border-0 shadow-none bg-transparent lg:border lg:shadow-sm lg:bg-card">
+      <CardContent className="p-0 lg:p-5 space-y-5">
         {isLoading ? (
           <Skeleton className="h-28 w-full" />
         ) : (
@@ -465,51 +503,28 @@ function PledgeFundingCard({
 }
 
 function PledgeStory({ storyEvent, hasContent }: { storyEvent: NostrEvent; hasContent: boolean }) {
-  if (!hasContent) {
-    return (
-      <article className="prose prose-neutral dark:prose-invert max-w-none">
-        <p className="text-muted-foreground italic">
-          The pledger hasn't written details for this pledge yet.
-        </p>
-      </article>
-    );
-  }
-
   return (
-    <article className="prose prose-neutral dark:prose-invert max-w-none">
-      <ArticleContent event={storyEvent} />
-    </article>
-  );
-}
-
-function PledgeReplySkeleton() {
-  return (
-    <div className="py-3 border-b border-border last:border-b-0">
-      <div className="flex gap-3">
-        <Skeleton className="size-10 rounded-full shrink-0" />
-        <div className="flex-1 space-y-2">
-          <Skeleton className="h-4 w-32" />
-          <Skeleton className="h-4 w-full" />
-          <Skeleton className="h-4 w-2/3" />
-        </div>
-      </div>
-    </div>
+    <DetailStory
+      event={storyEvent}
+      hasContent={hasContent}
+      heading="The pledge"
+      headingId="pledge-story-heading"
+      emptyText="The pledger hasn't written details for this pledge yet."
+    />
   );
 }
 
 function PledgeDetailSkeleton() {
   return (
     <main className="min-h-screen pb-16">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 pt-4">
-        <Skeleton className="aspect-[16/9] sm:aspect-[21/9] w-full rounded-xl" />
-      </div>
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 py-6 lg:py-10">
+      <Skeleton className="w-full min-h-[78svh] sm:min-h-0 sm:aspect-[21/9] lg:aspect-[24/9] rounded-none" />
+      <div className="max-w-6xl mx-auto px-5 sm:px-6 lg:px-0 py-6 lg:py-10">
         <div className="lg:flex lg:gap-8 lg:items-start">
-          <div className="flex-1 min-w-0 space-y-4">
-            <Skeleton className="h-10 w-2/3" />
+          <div className="flex-1 min-w-0 space-y-3">
             <Skeleton className="h-5 w-full" />
             <Skeleton className="h-5 w-4/5" />
             <Skeleton className="h-5 w-5/6" />
+            <Skeleton className="h-5 w-3/4" />
           </div>
           <div className="hidden lg:block lg:w-[360px] lg:shrink-0 space-y-3">
             <Skeleton className="h-48 w-full rounded-xl" />

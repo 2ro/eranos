@@ -14,7 +14,6 @@ import {
   Trash2,
 } from 'lucide-react';
 
-import { ArticleContent } from '@/components/ArticleContent';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import {
   CampaignWalletDonatePanel,
@@ -33,6 +32,7 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { DetailCommentComposer } from '@/components/DetailCommentComposer';
+import { DetailReplySkeleton, DetailStory } from '@/components/DetailStory';
 import { InteractionsModal, type InteractionTab } from '@/components/InteractionsModal';
 import { PostActionBar } from '@/components/PostActionBar';
 import { PinnedCommentHeader } from '@/components/PinnedCommentHeader';
@@ -469,7 +469,7 @@ function CampaignDetailContent({ campaign }: { campaign: ParsedCampaign }) {
                 {commentsLoading && statsLoading && replyTree.length === 0 ? (
                   <div className="space-y-3">
                     {Array.from({ length: 3 }).map((_, i) => (
-                      <CampaignReplySkeleton key={i} />
+                      <DetailReplySkeleton key={i} />
                     ))}
                   </div>
                 ) : replyTree.length > 0 ? (
@@ -813,35 +813,15 @@ function CampaignStory({
 }: {
   storyEvent: NostrEvent;
   hasContent: boolean;
-  // expanded/onToggle retained on the call site for backwards-compat
-  // but no longer used — the story shows in full. A fundraiser pitch
-  // is the entire point of the page; hiding most of it behind a
-  // fade-out gradient buries the message.
-  expanded?: boolean;
-  onToggle?: () => void;
 }) {
-  if (!hasContent) {
-    return (
-      <div className="rounded-2xl border border-dashed border-border/80 bg-card/40 px-6 py-10 text-center">
-        <p className="text-muted-foreground italic">
-          The organizer hasn't written a story for this campaign yet.
-        </p>
-      </div>
-    );
-  }
-
   return (
-    <section aria-labelledby="campaign-story-heading" className="space-y-3">
-      <h2
-        id="campaign-story-heading"
-        className="text-xs font-semibold uppercase tracking-[0.12em] text-muted-foreground"
-      >
-        The story
-      </h2>
-      <article className="prose prose-neutral dark:prose-invert max-w-none prose-p:leading-relaxed prose-p:text-foreground/90 prose-headings:tracking-tight prose-img:rounded-xl">
-        <ArticleContent event={storyEvent} />
-      </article>
-    </section>
+    <DetailStory
+      event={storyEvent}
+      hasContent={hasContent}
+      heading="The story"
+      headingId="campaign-story-heading"
+      emptyText="The organizer hasn't written a story for this campaign yet."
+    />
   );
 }
 
@@ -1026,21 +1006,6 @@ function DonorPreviewList({
 // ─────────────────────────────────────────────────────────────────────
 // Skeletons
 // ─────────────────────────────────────────────────────────────────────
-
-function CampaignReplySkeleton() {
-  return (
-    <div className="py-3 border-b border-border last:border-b-0">
-      <div className="flex gap-3">
-        <Skeleton className="size-10 rounded-full shrink-0" />
-        <div className="flex-1 space-y-2">
-          <Skeleton className="h-4 w-32" />
-          <Skeleton className="h-4 w-full" />
-          <Skeleton className="h-4 w-2/3" />
-        </div>
-      </div>
-    </div>
-  );
-}
 
 function CampaignDetailSkeleton() {
   return (
