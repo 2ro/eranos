@@ -72,8 +72,6 @@ export interface ProfileIdentityRailProps {
   campaigns: ParsedCampaign[];
   /** Aggregated campaign + raised stats for the stat block. */
   campaignStats: ProfileCampaignStats;
-  /** Pledges (kind 36639) created by this profile. */
-  pledgesCount: number;
   /**
    * The profile's pledges (kind 36639) — used to surface the latest one
    * in the rail when the profile has no campaigns. The rail picks the
@@ -135,7 +133,6 @@ export function ProfileIdentityRail({
   fieldsContent,
   campaigns,
   campaignStats,
-  pledgesCount,
   pledges,
   btcPrice,
   followersCount,
@@ -234,11 +231,10 @@ export function ProfileIdentityRail({
         onDonate={onDonate}
       />
 
-      {/* Stats: Followers + Following inline; Pledges + Raised below. */}
+      {/* Stats: Followers + Following inline; Raised below if applicable. */}
       <StatList
         followersCount={followersCount}
         followingCount={followingCount}
-        pledgesCount={pledgesCount}
         totalRaisedSats={campaignStats.totalRaisedSats}
         btcPrice={btcPrice}
         onFollowersOpen={onFollowersOpen}
@@ -452,7 +448,6 @@ function ActionBar({
 function StatList({
   followersCount,
   followingCount,
-  pledgesCount,
   totalRaisedSats,
   btcPrice,
   onFollowersOpen,
@@ -461,16 +456,16 @@ function StatList({
 }: {
   followersCount: number;
   followingCount: number;
-  pledgesCount: number;
   totalRaisedSats: number;
   btcPrice: number | undefined;
   onFollowersOpen: () => void;
   onFollowingOpen: () => void;
   onTabChange: (id: string) => void;
 }) {
-  // Secondary stat rows (one per row). Followers / Following live inline at
-  // the top; the campaign count was dropped because the rail's Campaigns
-  // section already displays the user's campaigns directly below.
+  // Secondary stat rows (one per row). Followers / Following live inline
+  // at the top. Campaigns and Pledges are intentionally not surfaced as
+  // counts here — the rail's Campaigns and (when relevant) Pledges
+  // sections below already show the underlying content directly.
   const rows: Array<{
     icon?: ReactNode;
     label: string;
@@ -478,13 +473,6 @@ function StatList({
     onClick?: () => void;
     show: boolean;
   }> = [
-    {
-      icon: <HandHeart className="size-3.5 text-primary" />,
-      label: pledgesCount === 1 ? 'Pledge' : 'Pledges',
-      value: formatNumber(pledgesCount),
-      onClick: () => onTabChange('pledges'),
-      show: pledgesCount > 0,
-    },
     {
       icon: <Bitcoin className="size-3.5 text-primary" />,
       label: 'Raised',

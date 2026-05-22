@@ -1091,10 +1091,6 @@ function FollowersListModal({ pubkey, open, onOpenChange, displayName }: Followe
   // Pledges (kind 36639) authored by this user. Filters the global pledges
   // list rather than issuing a separate per-author query.
   const { data: allActions } = useActions({ limit: 100 });
-  const profileActionsCount = useMemo(() => {
-    if (!pubkey || !allActions) return 0;
-    return allActions.filter((a) => a.pubkey === pubkey).length;
-  }, [allActions, pubkey]);
 
   // Donate dialog state. The header "Donate" button (only shown when the
   // profile has at least one campaign) opens this dialog. When the user
@@ -1242,7 +1238,6 @@ function FollowersListModal({ pubkey, open, onOpenChange, displayName }: Followe
                   ))}
                   campaigns={profileCampaignStats.campaigns}
                   campaignStats={profileCampaignStats}
-                  pledgesCount={profileActionsCount}
                   pledges={(allActions ?? []).filter((a) => a.pubkey === pubkey)}
                   btcPrice={btcPrice}
                   followersCount={followersCount}
