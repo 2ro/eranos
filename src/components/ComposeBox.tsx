@@ -1,6 +1,6 @@
 import { lazy, Suspense, useState, useRef, useCallback, useMemo, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Paperclip, Smile, AlertTriangle, X, Loader2, Mic, Square, Sticker, BarChart3, Plus, ChevronLeft, Check, HelpCircle } from 'lucide-react';
+import { Paperclip, Smile, AlertTriangle, X, Loader2, Mic, Square, Sticker, BarChart3, Plus, ChevronLeft, Check, Globe, HelpCircle } from 'lucide-react';
 import { nip19 } from 'nostr-tools';
 import { encode as blurhashEncode } from 'blurhash';
 import type { NostrEvent } from '@nostrify/nostrify';
@@ -19,6 +19,14 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import {
+  CommandDialog,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from '@/components/ui/command';
 import { useCustomEmojis } from '@/hooks/useCustomEmojis';
 import { useFeedSettings } from '@/hooks/useFeedSettings';
 import { GifPicker } from '@/components/GifPicker';
@@ -36,7 +44,7 @@ import { usePostComment } from '@/hooks/usePostComment';
 import { useUploadFile } from '@/hooks/useUploadFile';
 import { useCountryFollows } from '@/hooks/useCountryFollows';
 import { useDefaultPostCountry } from '@/hooks/useDefaultPostCountry';
-import { getCountryInfo } from '@/lib/countries';
+import { COUNTRY_LIST, getCountryInfo } from '@/lib/countries';
 import { createCountryIdentifier } from '@/lib/countryIdentifiers';
 import { useQueryClient } from '@tanstack/react-query';
 import { useToast } from '@/hooks/useToast';
@@ -285,11 +293,14 @@ export function ComposeBox({
   // from the home feed (no replyTo, not a custom-kind publish). When a
   // country code is selected, the post is published as a NIP-22 kind
   // 1111 comment rooted on that country instead of a plain kind 1 note.
-  // Dropdown lists only the countries the user follows, with "Global"
-  // always at the top.
+  //
+  // The dropdown shows: Global + the countries the user follows (quick
+  // picks) + a "Choose another country…" item that opens a searchable
+  // dialog over the full country list. So a user can post about any
+  // country, even one they don't follow.
   const { followedCountries } = useCountryFollows();
   const canChooseDestination =
-    !replyTo && !customPublish && mode === 'post' && !!user && followedCountries.length > 0;
+    !replyTo && !customPublish && mode === 'post' && !!user;
   /**
    * User's saved default destination (persisted to localStorage). Used as
    * the initial value of `destination` on every fresh compose, and updated
@@ -298,21 +309,23 @@ export function ComposeBox({
   const [defaultPostCountry, setDefaultPostCountry] = useDefaultPostCountry();
   /** `'world'` for a regular kind-1 note, or an ISO 3166 country code for a kind-1111 community post. */
   const [destination, setDestination] = useState<'world' | string>(defaultPostCountry);
+  /** Open state for the "Choose another country" searchable picker dialog. */
+  const [countryPickerOpen, setCountryPickerOpen] = useState(false);
   const selectedCountryCode = destination !== 'world' ? destination : null;
   const selectedCountryInfo = selectedCountryCode ? getCountryInfo(selectedCountryCode) : null;
-  // If the user unfollows the currently-selected country mid-session,
-  // snap back to world so we don't try to publish a kind 1111 with
-  // a root the user no longer cares about. Also clear it from the saved
-  // default if it matched, so the next compose doesn't try to restore an
-  // invalid country.
+  // Snap back to world if the currently selected destination is an
+  // invalid ISO code (e.g. a previously-followed country that was later
+  // removed from the country directory). Picking a non-followed but
+  // valid country is allowed — users can post about any country via the
+  // "Choose another country" picker, so following is not a prerequisite.
   useEffect(() => {
-    if (selectedCountryCode && !followedCountries.includes(selectedCountryCode)) {
+    if (selectedCountryCode && !getCountryInfo(selectedCountryCode)) {
       setDestination('world');
       if (defaultPostCountry === selectedCountryCode) {
         setDefaultPostCountry('world');
       }
     }
-  }, [selectedCountryCode, followedCountries, defaultPostCountry, setDefaultPostCountry]);
+  }, [selectedCountryCode, defaultPostCountry, setDefaultPostCountry]);
   const [pollOptions, setPollOptions] = useState([
     { id: pollOptionId(), label: '' },
     { id: pollOptionId(), label: '' },
@@ -1585,7 +1598,7 @@ export function ComposeBox({
                   {selectedCountryInfo?.flag ?? '🌍'}
                 </span>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="min-w-[220px]">
+              <DropdownMenuContent align="end" className="min-w-[240px]">
                 <DropdownMenuItem
                   onSelect={() => setDestination('world')}
                   className="cursor-pointer"
@@ -1598,25 +1611,53 @@ export function ComposeBox({
                     <Check className="size-4 text-primary" aria-hidden />
                   )}
                 </DropdownMenuItem>
-                {followedCountries.map((code) => {
-                  const info = getCountryInfo(code);
-                  if (!info) return null;
-                  return (
-                    <DropdownMenuItem
-                      key={code}
-                      onSelect={() => setDestination(code)}
-                      className="cursor-pointer"
-                    >
-                      <span className="inline-flex items-center gap-2 flex-1">
-                        <span aria-hidden="true">{info.flag}</span>
-                        <span>{info.name}</span>
-                      </span>
-                      {destination === code && (
-                        <Check className="size-4 text-primary" aria-hidden />
-                      )}
-                    </DropdownMenuItem>
-                  );
-                })}
+                {/* Build the quick-pick list. Followed countries appear first;
+                    if the user has selected an ad-hoc country via the
+                    searchable picker that they don't follow, show it too so
+                    they have a one-tap way back to it. De-duplicates by code. */}
+                {(() => {
+                  const codes = new Set<string>();
+                  const quickPicks: string[] = [];
+                  for (const code of followedCountries) {
+                    if (!codes.has(code) && getCountryInfo(code)) {
+                      codes.add(code);
+                      quickPicks.push(code);
+                    }
+                  }
+                  if (selectedCountryCode && !codes.has(selectedCountryCode) && getCountryInfo(selectedCountryCode)) {
+                    quickPicks.push(selectedCountryCode);
+                  }
+                  return quickPicks.map((code) => {
+                    const info = getCountryInfo(code);
+                    if (!info) return null;
+                    return (
+                      <DropdownMenuItem
+                        key={code}
+                        onSelect={() => setDestination(code)}
+                        className="cursor-pointer"
+                      >
+                        <span className="inline-flex items-center gap-2 flex-1">
+                          <span aria-hidden="true">{info.flag}</span>
+                          <span>{info.name}</span>
+                        </span>
+                        {destination === code && (
+                          <Check className="size-4 text-primary" aria-hidden />
+                        )}
+                      </DropdownMenuItem>
+                    );
+                  });
+                })()}
+                <DropdownMenuSeparator />
+                <DropdownMenuItem
+                  onSelect={(e) => {
+                    e.preventDefault();
+                    setCountryPickerOpen(true);
+                  }}
+                  className="cursor-pointer text-sm"
+                >
+                  <Globe className="size-4 mr-2 text-muted-foreground" aria-hidden />
+                  Choose another country…
+                </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 {destination === defaultPostCountry ? (
                   <div className="px-2 py-1.5 text-xs text-muted-foreground">
@@ -1647,6 +1688,54 @@ export function ComposeBox({
                 )}
               </DropdownMenuContent>
             </DropdownMenu>
+
+            {/* Searchable picker over the full country list. Opened from the
+                "Choose another country…" item in the destination dropdown,
+                so users can post to any country without having to follow it
+                first. */}
+            <CommandDialog
+              open={countryPickerOpen}
+              onOpenChange={setCountryPickerOpen}
+            >
+              <CommandInput placeholder="Search countries..." />
+              <CommandList>
+                <CommandEmpty>No countries found.</CommandEmpty>
+                <CommandGroup>
+                  <CommandItem
+                    value="Global 🌍"
+                    onSelect={() => {
+                      setDestination('world');
+                      setCountryPickerOpen(false);
+                    }}
+                  >
+                    <span aria-hidden="true" className="mr-2">🌍</span>
+                    <span>Global</span>
+                    {destination === 'world' && (
+                      <Check className="ml-auto size-4 text-primary" aria-hidden />
+                    )}
+                  </CommandItem>
+                  {COUNTRY_LIST.map((country) => (
+                    <CommandItem
+                      key={country.code}
+                      // Include code + name in the searchable value so users
+                      // can type either "iran" or "IR".
+                      value={`${country.name} ${country.code}`}
+                      onSelect={() => {
+                        setDestination(country.code);
+                        setCountryPickerOpen(false);
+                      }}
+                    >
+                      <span aria-hidden="true" className="mr-2">{country.flag}</span>
+                      <span>{country.name}</span>
+                      <span className="ml-2 text-xs text-muted-foreground">{country.code}</span>
+                      {destination === country.code && (
+                        <Check className="ml-auto size-4 text-primary" aria-hidden />
+                      )}
+                    </CommandItem>
+                  ))}
+                </CommandGroup>
+              </CommandList>
+            </CommandDialog>
           </div>
         )}
 
@@ -1847,7 +1936,7 @@ export function ComposeBox({
                   <Button
                     onClick={handlePollSubmit}
                     disabled={!isPollValid || isPollPending || !user}
-                    className="rounded-full px-5 font-bold"
+                    className="rounded-full px-5 font-bold text-white"
                     size="sm"
                   >
                     {isPollPending ? 'Publishing...' : 'Publish poll'}
@@ -1856,7 +1945,7 @@ export function ComposeBox({
                   <Button
                     onClick={handleSubmit}
                     disabled={!content.trim() || isPending || isCommentPending || !user || charCount > MAX_CHARS}
-                    className="rounded-full px-5 font-bold"
+                    className="rounded-full px-5 font-bold text-white"
                     size="sm"
                   >
                     {isPending || isCommentPending ? 'Posting...' : submitLabel}
