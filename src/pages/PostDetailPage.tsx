@@ -52,7 +52,6 @@ import { LiveStreamPage } from "@/components/LiveStreamPage";
 import { MagicDeckContent } from "@/components/MagicDeckContent";
 import { MusicDetailContent } from "@/components/MusicDetailContent";
 import { ActivityCard, EventActionHeader, NoteCard } from "@/components/NoteCard";
-import { FeedCard } from "@/components/FeedCard";
 import { publishedAtAction } from "@/lib/publishedAtAction";
 import { NoteContent } from "@/components/NoteContent";
 import { NsiteCard } from "@/components/NsiteCard";
@@ -437,21 +436,19 @@ function ProfileBadgesDetailView({ event }: { event: NostrEvent }) {
   }, [commentsData, muteItems]);
 
   return (
-    <div className="max-w-6xl mx-auto px-4 sm:px-6">
-      <FeedCard className="mx-0">
-        <NoteCard event={event} />
-      </FeedCard>
+    <div>
+      <NoteCard event={event} />
       <div className="pb-16 sidebar:pb-0">
         {commentsLoading ? (
-          <FeedCard className="mt-4 divide-y divide-border">
+          <div className="mt-4 divide-y divide-border">
             {Array.from({ length: 3 }).map((_, i) => (
               <ReplyCardSkeleton key={i} />
             ))}
-          </FeedCard>
+          </div>
         ) : orderedReplies.length > 0 ? (
-          <FeedCard className="mt-4">
+          <div className="mt-4">
             <FlatThreadedReplyList replies={orderedReplies} />
-          </FeedCard>
+          </div>
         ) : (
           <div className="py-12 text-center text-muted-foreground text-sm">
             No replies yet. Be the first to reply!
@@ -1398,13 +1395,10 @@ function PostDetailContent({ event }: { event: NostrEvent }) {
 
   return (
     <CommunityModerationContext.Provider value={communityModContext}>
-    <div className="max-w-6xl mx-auto px-4 sm:px-6">
-      {/* Focused post card — ancestor previews, ancestor thread, and the
-          focused event itself share one rounded surface so the page
-          reads as "thread context → this post" instead of an
-          edge-to-edge Twitter timeline. Replies sit in their own
-          FeedCard below. */}
-      <FeedCard className="mx-0">
+    <div>
+      {/* Focused post — ancestor previews, ancestor thread, and the
+          focused event render edge-to-edge to match the Activity feed
+          and the Search results. */}
       {/* Content preview for kind 1111 comments: external content, profile, or community */}
       {externalIdentifier && (
         <ExternalContentPreview identifier={externalIdentifier} />
@@ -2073,7 +2067,6 @@ function PostDetailContent({ event }: { event: NostrEvent }) {
           />
         </article>
       )}
-      </FeedCard>
 
       {/* Replies */}
       <div className="mt-6 pb-16 sidebar:pb-0">
@@ -2302,11 +2295,11 @@ export function PostDetailSkeleton() {
       </div>
 
       {/* Replies skeleton */}
-      <FeedCard className="mt-4 divide-y divide-border">
+      <div className="mt-4 divide-y divide-border">
         {Array.from({ length: 3 }).map((_, i) => (
           <ReplyCardSkeleton key={i} />
         ))}
-      </FeedCard>
+      </div>
     </div>
   );
 }
