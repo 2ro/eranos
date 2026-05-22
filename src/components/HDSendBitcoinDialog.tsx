@@ -166,7 +166,7 @@ interface SendResult {
  */
 export function HDSendBitcoinDialog({ isOpen, onClose, btcPrice }: HDSendBitcoinDialogProps) {
   const availability = useHdWalletAccess();
-  const { scan, refetch: refetchWallet } = useHdWallet();
+  const { scan, silentPaymentBalance, refetch: refetchWallet } = useHdWallet();
   const { config } = useAppContext();
   const { blockbookBaseUrl } = config;
   const { toast } = useToast();
@@ -204,6 +204,14 @@ export function HDSendBitcoinDialog({ isOpen, onClose, btcPrice }: HDSendBitcoin
   // ── Owned UTXO set ───────────────────────────────────────────
   const ownedUtxos: HdSpendableUtxo[] = useMemo(() => scan?.utxos ?? [], [scan]);
   const totalBalance = useMemo(() => ownedUtxos.reduce((s, u) => s + u.value, 0), [ownedUtxos]);
+
+  // Silent-payment UTXOs are scanned and displayed on /hdwallet but cannot
+  // yet be spent by this dialog: the BIP-352 receive output uses a tweaked
+  // private key not derivable from the BIP-86 (chain, index) pair the PSBT
+  // signer expects. Detect the case where the wallet's _only_ funds are SP
+  // funds so we can surface a clear explanation instead of leaving the user
+  // with a silently-disabled Send button.
+  const onlyHasSpFunds = totalBalance === 0 && silentPaymentBalance > 0;
 
   // ── USD → sats ───────────────────────────────────────────────
   const amountSats = useMemo(() => {
@@ -574,6 +582,20 @@ export function HDSendBitcoinDialog({ isOpen, onClose, btcPrice }: HDSendBitcoin
               <Alert variant="destructive" className="py-2">
                 <AlertTriangle className="size-3.5" />
                 <AlertDescription className="text-xs">{error}</AlertDescription>
+              </Alert>
+            )}
+
+            {/* Silent-payment-only balance: the PSBT signer can't yet spend
+                BIP-352 outputs, so explain why Send is disabled instead of
+                leaving the button greyed out with no feedback. */}
+            {onlyHasSpFunds && (
+              <Alert className="py-2">
+                <AlertTriangle className="size-3.5" />
+                <AlertDescription className="text-xs">
+                  Your balance is held in silent-payment outputs. Spending
+                  them isn't supported yet — receive on-chain bitcoin to
+                  your regular receive address to send.
+                </AlertDescription>
               </Alert>
             )}
 
