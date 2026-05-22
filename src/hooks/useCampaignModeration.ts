@@ -105,6 +105,13 @@ export function useCampaignModeration() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['campaign-moderation'] });
+      // Moderation decisions (approve / hide / feature) gate which campaigns
+      // surface on the home page, discover shelf, and community grids — so
+      // the list queries need to refetch too, otherwise the moderator's UI
+      // still shows the old approval state until refresh.
+      queryClient.invalidateQueries({ queryKey: ['campaigns'] });
+      queryClient.invalidateQueries({ queryKey: ['campaigns-all'] });
+      queryClient.invalidateQueries({ queryKey: ['campaigns-all-scores'] });
     },
   });
 
