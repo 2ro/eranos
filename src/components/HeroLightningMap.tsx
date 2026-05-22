@@ -37,11 +37,29 @@ function HeroLightningMapImpl({ className }: { className?: string }) {
   const landPaths = useMemo(() => {
     return LAND_RINGS.map((ring, idx) => {
       // Rings are flat [lng, lat, lng, lat, ...]. Convert to an SVG path.
+      //
+      // Antimeridian handling: a few rings (notably Russia and Antarctica
+      // in the Natural Earth source) cross the ±180° seam. The data stores
+      // those rings as a single polygon whose longitude jumps from +180 to
+      // -180 (or vice versa) in one step. Drawn naively with a continuous
+      // `L` command, that jump renders as a long horizontal slash spanning
+      // the whole equirectangular viewBox — the "two lines" sitting at
+      // ~lat 41 and ~lat 77 across the map are exactly Russia's bounding
+      // edges drawn by such a connection.
+      //
+      // Detect any longitude step > 180° and close + restart the subpath
+      // with `M` instead, so the two halves of the country render in their
+      // actual hemispheres without a connecting line through the middle.
       let d = '';
+      let prevLng: number | null = null;
       for (let i = 0; i < ring.length; i += 2) {
         const lng = ring[i];
         const lat = ring[i + 1];
-        d += i === 0 ? `M${lng.toFixed(2)} ${(-lat).toFixed(2)}` : `L${lng.toFixed(2)} ${(-lat).toFixed(2)}`;
+        const isFirst = i === 0;
+        const wraps = prevLng !== null && Math.abs(lng - prevLng) > 180;
+        const cmd = isFirst || wraps ? 'M' : 'L';
+        d += `${cmd}${lng.toFixed(2)} ${(-lat).toFixed(2)}`;
+        prevLng = lng;
       }
       d += 'Z';
       return <path key={idx} d={d} />;
@@ -74,7 +92,7 @@ function HeroLightningMapImpl({ className }: { className?: string }) {
         className="absolute -inset-[10%]"
         style={{
           background:
-            'radial-gradient(60% 55% at 62% 45%, hsl(24 100% 55% / 0.32) 0%, hsl(24 95% 50% / 0.18) 28%, hsl(220 30% 8% / 0) 65%)',
+            'radial-gradient(60% 55% at 62% 45%, hsl(24 100% 55% / 0.12) 0%, hsl(24 95% 50% / 0.07) 28%, hsl(220 30% 8% / 0) 65%)',
         }}
       />
 
@@ -84,11 +102,14 @@ function HeroLightningMapImpl({ className }: { className?: string }) {
         className="absolute inset-0 w-full h-full"
       >
         <defs>
-          {/* Land fill — very low alpha brand-orange so the continents
-              read as faint glowing outlines on the dark backdrop. */}
+          {/* Land fill — brand-orange wash, fully opaque. The transparency
+              lives on the wrapping <g opacity=…> below so that overlapping
+              country polygons don't stack their alpha at shared borders
+              (which is what painted the visible "latitude line" along the
+              equator and other country seams). */}
           <linearGradient id={arcId('land')} x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="hsl(24 80% 50%)" stopOpacity="0.12" />
-            <stop offset="100%" stopColor="hsl(24 70% 45%)" stopOpacity="0.06" />
+            <stop offset="0%" stopColor="hsl(24 80% 50%)" />
+            <stop offset="100%" stopColor="hsl(24 70% 45%)" />
           </linearGradient>
 
           {/* Arc gradient — bright at midpoint, fading at endpoints, so
@@ -120,14 +141,21 @@ function HeroLightningMapImpl({ className }: { className?: string }) {
           </radialGradient>
         </defs>
 
-        {/* Land — single fill, single stroke, drawn as one group so the
-            browser batches it. Stroke is what makes the continents legible
-            on near-black; fill is just a quiet wash. */}
+        {/* Land. Each country is its own ring; rendered as separate paths
+            with semi-transparent fill, every shared country border doubles
+            up where polygons overlap. The most jarring of those overlaps
+            falls along the equator (Kenya/Tanzania, DRC/Angola, Indonesian
+            islands) and reads as a horizontal "latitude line."
+
+            Fix: paint each country with a fully-opaque fill, then put the
+            transparency on the wrapping <g opacity=…>. SVG group opacity
+            renders the children into an offscreen buffer first and then
+            composites the buffer at the group's alpha, so internal overlaps
+            don't stack. No stroke for the same reason. */}
         <g
           fill={`url(#${arcId('land')})`}
-          stroke="hsl(24 75% 50% / 0.32)"
-          strokeWidth="0.18"
-          strokeLinejoin="round"
+          stroke="none"
+          opacity="0.18"
         >
           {landPaths}
         </g>
@@ -135,31 +163,39 @@ function HeroLightningMapImpl({ className }: { className?: string }) {
         {/* Arcs. Each arc is a quadratic Bézier with the control point
             lifted above the great-circle path, giving the curved silhouette
             from the reference. Stroke-dasharray + animated stroke-dashoffset
-            produces the flowing-energy effect. */}
+            produces the flowing-energy effect.
+
+            `vector-effect="non-scaling-stroke"` keeps the stroke at a fixed
+            pixel width regardless of viewBox-to-screen scale, which is what
+            kills the line jitter — without it, sub-pixel stroke widths in
+            user-space combine with the SVG glow filter to shimmer at any
+            responsive size. */}
         <g
           fill="none"
           stroke={`url(#${arcId('arc')})`}
-          strokeWidth="0.45"
+          strokeWidth="1.5"
           strokeLinecap="round"
+          vectorEffect="non-scaling-stroke"
           filter={`url(#${arcId('glow')})`}
         >
           {CURATED_ARCS.map((arc, i) => {
             const [x1, y1] = [arc.from[0], -arc.from[1]];
             const [x2, y2] = [arc.to[0], -arc.to[1]];
-            // Lift the control point perpendicular to the chord. The lift
-            // amount scales with chord length so short arcs stay tight
-            // and trans-oceanic arcs sweep dramatically.
-            const dx = x2 - x1;
-            const dy = y2 - y1;
-            const len = Math.hypot(dx, dy);
-            const lift = Math.min(45, len * 0.32);
+            // Lift the control point above the chord, scaled with chord
+            // length so short arcs stay tight and trans-oceanic arcs
+            // sweep dramatically.
+            const len = Math.hypot(x2 - x1, y2 - y1);
+            const lift = Math.min(60, len * 0.42);
             const mx = (x1 + x2) / 2;
             const my = (y1 + y2) / 2;
-            // Control point biased "north" (negative y in SVG space) so
-            // arcs always curve upward over the equator. Looks more
-            // intentional than projecting the true great-circle.
+            // Push the lift toward whichever hemisphere the chord midpoint
+            // already favors, so equator-crossing arcs sweep clearly into
+            // their dominant hemisphere instead of all stacking through
+            // y=0. Pure equatorial midpoints (my≈0) default to lifting
+            // north (negative y in SVG space).
+            const direction = my > 0 ? 1 : -1;
             const cx = mx;
-            const cy = my - lift;
+            const cy = my + lift * direction;
             return (
               <path
                 key={i}
@@ -203,27 +239,6 @@ function HeroLightningMapImpl({ className }: { className?: string }) {
           })}
         </g>
       </svg>
-
-      {/* Left-edge gradient mask — ensures the headline column always has
-          a quiet zone behind it regardless of where arcs land. This is
-          what replaces the old hero-text-shadow: structural legibility,
-          not a per-character text effect. */}
-      <div
-        className="absolute inset-y-0 left-0 w-2/3 lg:w-1/2"
-        style={{
-          background:
-            'linear-gradient(to right, hsl(220 25% 6% / 0.92) 0%, hsl(220 25% 6% / 0.65) 35%, hsl(220 25% 6% / 0) 100%)',
-        }}
-      />
-
-      {/* Bottom vignette — anchors the hero to the page below and softens
-          the map texture as it meets the next section. */}
-      <div
-        className="absolute inset-x-0 bottom-0 h-24"
-        style={{
-          background: 'linear-gradient(to bottom, hsl(220 25% 6% / 0) 0%, hsl(220 25% 6% / 0.85) 100%)',
-        }}
-      />
     </div>
   );
 }

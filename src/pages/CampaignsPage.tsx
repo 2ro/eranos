@@ -164,9 +164,37 @@ export function CampaignsPage() {
 
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 py-16 lg:py-24 min-h-[440px] sm:min-h-[480px] lg:min-h-[520px] flex flex-col justify-center">
           <div className="space-y-6 max-w-2xl">
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight leading-[1.05]">
-              Connecting activists to{' '}
-              <span className="text-primary">unstoppable funding.</span>
+            <h1
+              className="font-display italic text-6xl sm:text-7xl lg:text-8xl font-normal tracking-wide leading-none uppercase"
+              style={{
+                // Bebas Neue only ships at weight 400. Paint a stroke the
+                // same color as the fill to fatten the letterforms without
+                // the fuzz a synthetic-bold transform would produce.
+                WebkitTextStroke: '0.022em currentColor',
+              }}
+            >
+              Connecting activists to
+              {/* "unstoppable" gets a solid brand-orange highlighter
+                  block on its own line. The negative left margin
+                  (`-ml-1.5`) pulls the box's left edge back by exactly
+                  the box's own horizontal padding so the U sits flush
+                  with the column's left edge instead of being inset by
+                  the highlighter's padding. */}
+              <br />
+              {/* Asymmetric padding: zero on the left so "unstoppable"'s
+                  U sits flush with the column edge (matching the row
+                  above), but extra padding on the right so the orange
+                  box extends past the word's trailing edge as a
+                  deliberate visual flourish. The inner text is then
+                  nudged slightly leftward (negative left margin on the
+                  inner element) so the U optically aligns with the
+                  "C" in "Connecting" — Bebas Neue's italic skew shifts
+                  the visual left edge of the U rightward of its
+                  geometric box. */}
+              <span className="inline-block w-fit pl-0 pr-3 bg-primary text-white leading-[0.95] align-baseline">
+                <span className="-ml-1 inline-block">unstoppable</span>
+              </span>{' '}
+              funding.
             </h1>
             <p className="text-base sm:text-lg text-white/80 max-w-xl">
               Raise Bitcoin directly from supporters around the world. Every donation

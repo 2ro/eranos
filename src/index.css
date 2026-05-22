@@ -720,16 +720,17 @@
 .hero-pan-left  { animation: heroPanLeft 28s ease-in-out infinite; }
 
 /* Lightning-arc flow on the home hero. Each path is dashed and the
-   dash offset animates negative, producing the illusion of energy
-   traveling along the arc. Dash size and animation length are tuned
-   so the flow reads as continuous (not blinky) at any arc length. */
+   dash offset animates by exactly one full dash period, so the loop
+   point is visually identical to the start point — no snap, no
+   visible restart. Dash sizes are in screen pixels because the arcs
+   use `vector-effect: non-scaling-stroke`. */
 @keyframes heroArcFlow {
   0%   { stroke-dashoffset: 0; }
-  100% { stroke-dashoffset: -36; }
+  100% { stroke-dashoffset: -16; }
 }
 .hero-arc-flow {
-  stroke-dasharray: 1.2 4.5;
-  animation: heroArcFlow 4.5s linear infinite;
+  stroke-dasharray: 6 10;
+  animation: heroArcFlow 2.4s linear infinite;
 }
 
 /* City-node pulse used on the home hero. The dot itself doesn't move;

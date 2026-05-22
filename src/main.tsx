@@ -25,6 +25,7 @@ import './index.css';
 import './i18n';
 
 import '@fontsource-variable/inter';
+import '@fontsource/bebas-neue/400.css';
 
 // ─── Native status bar theming (Android APK / iOS) ───────────────────────────
 // Keeps the OS top chrome in sync with the active app theme.
