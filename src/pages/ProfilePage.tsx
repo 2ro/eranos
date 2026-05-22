@@ -28,10 +28,8 @@ import { usePinnedNotes } from '@/hooks/usePinnedNotes';
 import { useFollowList, useFollowActions } from '@/hooks/useFollowActions';
 import { useMuteList } from '@/hooks/useMuteList';
 import { isEventMuted } from '@/lib/muteHelpers';
-import { useProfileFeed, useProfileLikes as useProfileLikesInfinite, filterByTab } from '@/hooks/useProfileFeed';
+import { useProfileFeed, filterByTab } from '@/hooks/useProfileFeed';
 import type { ProfileTab as CoreProfileTab } from '@/hooks/useProfileFeed';
-import { useProfileMedia } from '@/hooks/useProfileMedia';
-import { MediaCollage, MediaCollageSkeleton } from '@/components/MediaCollage';
 import { useProfileSupplementary } from '@/hooks/useProfileData';
 import { useNip05Resolve } from '@/hooks/useNip05Resolve';
 import { genUserName } from '@/lib/genUserName';
@@ -63,9 +61,8 @@ import { ProfileIdentityRail } from '@/components/profile/ProfileIdentityRail';
 import { ProfileCampaignsTab } from '@/components/profile/ProfileCampaignsTab';
 import { ProfilePledgesTab } from '@/components/profile/ProfilePledgesTab';
 import { ProfileActivityTab } from '@/components/profile/ProfileActivityTab';
+import { ProfileTabs } from '@/components/profile/ProfileTabs';
 import type { ParsedCampaign } from '@/lib/campaign';
-import { SubHeaderBar } from '@/components/SubHeaderBar';
-import { TabButton } from '@/components/TabButton';
 import type { AddrCoords } from '@/hooks/useEvent';
 import { sanitizeUrl } from '@/lib/sanitizeUrl';
 import { impactMedium } from '@/lib/haptics';
@@ -866,13 +863,12 @@ function ProfileBannerImage({ src, onClick }: { src: string; onClick: () => void
 
 // ----- Main Component -----
 
-const DEFAULT_TAB_LABELS = ['Activity', 'Campaigns', 'Pledges', 'Posts', 'Media', 'Badges', 'Likes'];
+const DEFAULT_TAB_LABELS = ['Activity', 'Campaigns', 'Pledges', 'Posts'];
 
 // Map from display label → internal tab id for core tabs
 const CORE_TAB_IDS: Record<string, string> = {
   'Activity': 'activity', 'Campaigns': 'campaigns', 'Pledges': 'pledges',
   'Posts': 'posts', 'Posts & replies': 'replies',
-  'Media': 'media', 'Badges': 'badges', 'Likes': 'likes',
 };
 
 export function ProfilePage() {
@@ -886,7 +882,6 @@ export function ProfilePage() {
   const queryClient = useQueryClient();
 
   const [activeTab, setActiveTab] = useState<CoreProfileTab | string>('activity');
-  const [sidebarMediaUrl, setSidebarMediaUrl] = useState<string | null>(null);
   const [moreMenuOpen, setMoreMenuOpen] = useState(false);
   const [followQROpen, setFollowQROpen] = useState(false);
   const [followingModalOpen, setFollowingModalOpen] = useState(false);
@@ -1089,7 +1084,7 @@ function FollowersListModal({ pubkey, open, onOpenChange, displayName }: Followe
   // Keep the active tab in sync if it ever falls out of the recognized set
   // (e.g. on first mount, or if a user navigates with a stale tab id).
   useEffect(() => {
-    const isCoreTab = ['campaigns', 'pledges', 'activity', 'posts', 'replies', 'media', 'badges', 'likes'].includes(activeTab);
+    const isCoreTab = ['campaigns', 'pledges', 'activity', 'posts', 'replies'].includes(activeTab);
     if (!isCoreTab) {
       setActiveTab(firstTabId);
     }
@@ -1107,7 +1102,7 @@ function FollowersListModal({ pubkey, open, onOpenChange, displayName }: Followe
     isFetchingNextPage: isFetchingNextFeedPage,
   } = useProfileFeed(
     pubkey,
-    (['posts', 'replies', 'media', 'likes', 'badges'].includes(activeTab) ? activeTab : 'posts') as CoreProfileTab,
+    (['posts', 'replies'].includes(activeTab) ? activeTab : 'posts') as CoreProfileTab,
     true,
   );
 
@@ -1139,24 +1134,6 @@ function FollowersListModal({ pubkey, open, onOpenChange, displayName }: Followe
     title: `${displayName} | ${config.appName}`,
     description: metadata?.about || 'Nostr profile',
   });
-
-  // Profile media — NIP-50 `media:true` search via the configured read pool.
-  const {
-    data: mediaData,
-    isPending: mediaPending,
-    fetchNextPage: fetchNextMediaPage,
-    hasNextPage: hasNextMediaPage,
-    isFetchingNextPage: isFetchingNextMediaPage,
-  } = useProfileMedia(pubkey, true);
-
-  // Infinite-scroll likes
-  const {
-    data: likesData,
-    isPending: likesPending,
-    fetchNextPage: fetchNextLikesPage,
-    hasNextPage: hasNextLikesPage,
-    isFetchingNextPage: isFetchingNextLikesPage,
-  } = useProfileLikesInfinite(pubkey, activeTab === 'likes');
 
   // Follow list (cached, for display checks only)
   const { data: followData } = useFollowList();
@@ -1256,41 +1233,6 @@ function FollowersListModal({ pubkey, open, onOpenChange, displayName }: Followe
     return items;
   }, [feedData?.pages, muteItems]);
 
-  // Flatten media pages for the sidebar and media tab
-  const mediaEvents = useMemo(() => {
-    if (!mediaData?.pages) return [];
-    const seen = new Set<string>();
-    const events: NostrEvent[] = [];
-    for (const page of mediaData.pages) {
-      for (const event of page.events) {
-        if (!seen.has(event.id)) {
-          seen.add(event.id);
-          events.push(event);
-        }
-      }
-    }
-    return events;
-  }, [mediaData?.pages]);
-
-  // Profile badges are queried inside ProfileIdentityRail; the page no
-  // longer needs to fetch them at this level.
-
-  // Flatten likes pages and deduplicate
-  const likedItems = useMemo(() => {
-    if (!likesData?.pages) return [];
-    const seen = new Set<string>();
-    const items: NostrEvent[] = [];
-    for (const page of likesData.pages) {
-      for (const event of page.events) {
-        if (!seen.has(event.id)) {
-          seen.add(event.id);
-          items.push(event);
-        }
-      }
-    }
-    return items;
-  }, [likesData?.pages]);
-
   // Infinite scroll sentinel
   const { ref: scrollRef, inView } = useInView({
     threshold: 0,
@@ -1298,45 +1240,21 @@ function FollowersListModal({ pubkey, open, onOpenChange, displayName }: Followe
 
   useEffect(() => {
     if (!inView) return;
-    if (activeTab === 'likes') {
-      if (hasNextLikesPage && !isFetchingNextLikesPage) {
-        fetchNextLikesPage();
-      }
-    } else if (activeTab === 'media') {
-      if (hasNextMediaPage && !isFetchingNextMediaPage) {
-        fetchNextMediaPage();
-      }
-    } else {
-      if (hasNextFeedPage && !isFetchingNextFeedPage) {
-        fetchNextFeedPage();
-      }
+    if (hasNextFeedPage && !isFetchingNextFeedPage) {
+      fetchNextFeedPage();
     }
-  }, [inView, activeTab, hasNextFeedPage, isFetchingNextFeedPage, fetchNextFeedPage, hasNextLikesPage, isFetchingNextLikesPage, fetchNextLikesPage, hasNextMediaPage, isFetchingNextMediaPage, fetchNextMediaPage]);
+  }, [inView, hasNextFeedPage, isFetchingNextFeedPage, fetchNextFeedPage]);
 
   const authorEvent = metadataEvent;
 
-  // For likes, convert NostrEvents to FeedItems
-  const likedFeedItems: FeedItem[] = useMemo(() => 
-    likedItems.map(event => ({ event, sortTimestamp: event.created_at })),
-    [likedItems]
-  );
-
-  // For media, convert media events to FeedItems
-  const mediaFeedItems: FeedItem[] = useMemo(() =>
-    mediaEvents.map(event => ({ event, sortTimestamp: event.created_at })),
-    [mediaEvents]
-  );
-
-  // Whether the active tab is one of the legacy feed-driven core tabs that
-  // pulls items out of useProfileFeed / useProfileLikes / useProfileMedia /
-  // useWallComments. The new Agora-native core tabs (overview / campaigns /
-  // pledges / activity) have their own renderers below and intentionally
-  // bypass this fallthrough.
-  const isCoreProfileTab = activeTab === 'posts' || activeTab === 'replies' || activeTab === 'media' || activeTab === 'likes' || activeTab === 'badges';
-  const currentItems = activeTab === 'likes' ? likedFeedItems : activeTab === 'media' ? mediaFeedItems : filterByTab(feedItems, isCoreProfileTab ? (activeTab as CoreProfileTab) : 'posts');
-  const currentLoading = activeTab === 'likes' ? likesPending : activeTab === 'media' ? mediaPending : feedPending;
-  const hasMore = activeTab === 'likes' ? hasNextLikesPage : activeTab === 'media' ? hasNextMediaPage : hasNextFeedPage;
-  const isFetchingMore = activeTab === 'likes' ? isFetchingNextLikesPage : activeTab === 'media' ? isFetchingNextMediaPage : isFetchingNextFeedPage;
+  // The Posts and Posts & replies tabs are the only feed-driven core tabs
+  // remaining; the Agora-native tabs (Activity / Campaigns / Pledges) have
+  // their own renderers below and bypass this fallthrough.
+  const isCoreProfileTab = activeTab === 'posts' || activeTab === 'replies';
+  const currentItems = filterByTab(feedItems, isCoreProfileTab ? (activeTab as CoreProfileTab) : 'posts');
+  const currentLoading = feedPending;
+  const hasMore = hasNextFeedPage;
+  const isFetchingMore = isFetchingNextFeedPage;
 
   // Auto-fetch next page when client-side filtering (e.g. removing replies
   // from the "posts" tab) leaves fewer visible items than the page size.
@@ -1344,11 +1262,10 @@ function FollowersListModal({ pubkey, open, onOpenChange, displayName }: Followe
   const MIN_VISIBLE_ITEMS = 5;
   useEffect(() => {
     if (currentLoading || isFetchingMore) return;
-    if (activeTab === 'likes' || activeTab === 'media') return;
     if (currentItems.length < MIN_VISIBLE_ITEMS && hasNextFeedPage && !isFetchingNextFeedPage) {
       fetchNextFeedPage();
     }
-  }, [currentItems.length, currentLoading, isFetchingMore, activeTab, hasNextFeedPage, isFetchingNextFeedPage, fetchNextFeedPage]);
+  }, [currentItems.length, currentLoading, isFetchingMore, hasNextFeedPage, isFetchingNextFeedPage, fetchNextFeedPage]);
 
   const handleRefresh = useCallback(async () => {
     if (!pubkey) return;
@@ -1361,8 +1278,6 @@ function FollowersListModal({ pubkey, open, onOpenChange, displayName }: Followe
           (tag === 'author' && key[1] === pubkey) ||
           (tag === 'profile-supplementary' && key[1] === pubkey) ||
           (tag === 'profile-feed' && key[1] === pubkey) ||
-          (tag === 'profile-media' && key[1] === pubkey) ||
-          (tag === 'profile-likes-infinite' && key[1] === pubkey) ||
           (tag === 'profile-pinned-events' && key[1] === pubkey)
         );
       },
@@ -1474,10 +1389,7 @@ function FollowersListModal({ pubkey, open, onOpenChange, displayName }: Followe
                   onMoreMenuOpen={() => setMoreMenuOpen(true)}
                   onFollowQROpen={() => setFollowQROpen(true)}
                   onToggleFollow={handleToggleFollow}
-                  onTabChange={(id) => {
-                    setActiveTab(id);
-                    if (id === 'media') setSidebarMediaUrl(null);
-                  }}
+                  onTabChange={(id) => setActiveTab(id)}
                   onDonate={openDonateForCampaign}
                   canFollow={!!user}
                   authorEvent={authorEvent}
@@ -1489,26 +1401,12 @@ function FollowersListModal({ pubkey, open, onOpenChange, displayName }: Followe
                 `min-w-0` is critical inside a grid track so long unbroken
                 text doesn't push the column wider than its fraction. */}
             <section className="min-w-0">
-              {/* Tabs — fixed Agora-first set with an overflow `⋯` for the
-                  legacy social tabs. Identical for owner and visitor.
-                  Sticks to the top of this column as the user scrolls. */}
-              <SubHeaderBar pinned>
-                {viewTabs.map((tab) => {
-                  const tabId = CORE_TAB_IDS[tab.label] ?? tab.label;
-                  return (
-                    <TabButton
-                      key={tab.label}
-                      label={tab.label}
-                      active={activeTab === tabId}
-                      onClick={() => {
-                        setActiveTab(tabId);
-                        if (tab.label === 'Media') setSidebarMediaUrl(null);
-                      }}
-                      className="flex-initial shrink-0 px-4"
-                    />
-                  );
-                })}
-              </SubHeaderBar>
+              {/* Profile tabs — sticky at top of this column. */}
+              <ProfileTabs
+                tabs={viewTabs.map((t) => ({ id: CORE_TAB_IDS[t.label] ?? t.label, label: t.label }))}
+                activeTab={activeTab}
+                onChange={setActiveTab}
+              />
 
               {/* Campaigns tab. */}
               {activeTab === 'campaigns' && pubkey && (
@@ -1571,38 +1469,8 @@ function FollowersListModal({ pubkey, open, onOpenChange, displayName }: Followe
                 </div>
               )}
 
-              {/* Media tab. */}
-              {activeTab === 'media' && (
-                <div>
-                  {mediaPending ? (
-                    <MediaCollageSkeleton count={15} />
-                  ) : mediaEvents.length > 0 ? (
-                    <>
-                      <MediaCollage
-                        events={mediaEvents}
-                        initialOpenUrl={sidebarMediaUrl ?? undefined}
-                        onInitialOpenConsumed={() => setSidebarMediaUrl(null)}
-                        hasNextPage={hasNextMediaPage}
-                        isFetchingNextPage={isFetchingNextMediaPage}
-                        onNearEnd={() => { if (hasNextMediaPage && !isFetchingNextMediaPage) fetchNextMediaPage(); }}
-                      />
-                      {hasNextMediaPage && (
-                        <div ref={scrollRef} className="h-px" />
-                      )}
-                    </>
-                  ) : (
-                    <div className="py-12 text-center text-muted-foreground">No media posts yet.</div>
-                  )}
-                </div>
-              )}
-
-              {/* Badges tab. */}
-              {activeTab === 'badges' && pubkey && (
-                <ProfileBadgesTab pubkey={pubkey} displayName={displayName} />
-              )}
-
-              {/* Posts / Replies / Likes — generic feed renderer. */}
-              {isCoreProfileTab && activeTab !== 'media' && activeTab !== 'badges' && (
+              {/* Posts / Replies — generic feed renderer. */}
+              {isCoreProfileTab && (
                 <div>
                   {currentLoading ? (
                     <div className="space-y-0">
@@ -1640,7 +1508,6 @@ function FollowersListModal({ pubkey, open, onOpenChange, displayName }: Followe
                     <div className="py-12 text-center text-muted-foreground">
                       {activeTab === 'posts' && 'No posts yet.'}
                       {activeTab === 'replies' && 'No posts or replies yet.'}
-                      {activeTab === 'likes' && 'No likes yet.'}
                     </div>
                   )}
                 </div>
@@ -1714,162 +1581,6 @@ function FollowersListModal({ pubkey, open, onOpenChange, displayName }: Followe
 
       </PullToRefresh>
       </main>
-  );
-}
-
-// ─── Profile Badges Tab ───────────────────────────────────────────────────────
-
-function ProfileBadgesTab({ pubkey, displayName }: { pubkey: string; displayName: string }) {
-  const { nostr } = useNostr();
-
-  // Fetch the user's profile badges event (both new kind 10008 and legacy 30008)
-  const profileBadgesQuery = useQuery({
-    queryKey: ['profile-badges', pubkey],
-    queryFn: async () => {
-      const events = await nostr.query([
-        { kinds: [10008], authors: [pubkey], limit: 1 },
-        { kinds: [30008], authors: [pubkey], '#d': ['profile_badges'], limit: 1 },
-      ]);
-      if (events.length === 0) return null;
-      // Pick the most recent event across both kinds
-      return events.reduce((latest, current) =>
-        current.created_at > latest.created_at ? current : latest,
-      );
-    },
-    staleTime: 2 * 60_000,
-  });
-
-  // Parse badge references from the profile badges event
-  const badgeRefs = useMemo(() => {
-    if (!profileBadgesQuery.data) return [];
-    const tags = profileBadgesQuery.data.tags;
-    const refs: Array<{ aTag: string; eTag?: string; pubkey: string; identifier: string }> = [];
-
-    for (let i = 0; i < tags.length; i++) {
-      if (tags[i][0] === 'a' && tags[i][1]) {
-        const aTag = tags[i][1];
-        const parts = aTag.split(':');
-        if (parts.length < 3 || parts[0] !== '30009') continue;
-
-        const bPubkey = parts[1];
-        const identifier = parts.slice(2).join(':');
-
-        let eTag: string | undefined;
-        if (i + 1 < tags.length && tags[i + 1][0] === 'e') {
-          eTag = tags[i + 1][1];
-        }
-
-        refs.push({ aTag, eTag, pubkey: bPubkey, identifier });
-      }
-    }
-    // Deduplicate by aTag — keep first occurrence only
-    const seen = new Set<string>();
-    return refs.filter((r) => {
-      if (seen.has(r.aTag)) return false;
-      seen.add(r.aTag);
-      return true;
-    });
-  }, [profileBadgesQuery.data]);
-
-  // Fetch all referenced badge definitions
-  const badgeDefsQuery = useQuery({
-    queryKey: ['badge-definitions-profile', pubkey, badgeRefs.map((r) => r.aTag).join(',')],
-    queryFn: async () => {
-      if (badgeRefs.length === 0) return [];
-      const filters = badgeRefs.map((ref) => ({
-        kinds: [30009 as const],
-        authors: [ref.pubkey],
-        '#d': [ref.identifier],
-        limit: 1,
-      }));
-      return nostr.query(filters);
-    },
-    enabled: badgeRefs.length > 0,
-    staleTime: 5 * 60_000,
-  });
-
-  // Build a lookup map from a-tag to parsed badge data
-  const badgeMap = useMemo(() => {
-    const map = new Map<string, { name: string; image?: string; description?: string }>();
-    if (!badgeDefsQuery.data) return map;
-    for (const event of badgeDefsQuery.data) {
-      const d = event.tags.find(([n]) => n === 'd')?.[1];
-      if (!d) continue;
-      const aTag = `30009:${event.pubkey}:${d}`;
-      const name = event.tags.find(([n]) => n === 'name')?.[1] || d;
-      const thumbTag = event.tags.find(([n]) => n === 'thumb');
-      const imageTag = event.tags.find(([n]) => n === 'image');
-      const image = thumbTag?.[1] ?? imageTag?.[1];
-      const description = event.tags.find(([n]) => n === 'description')?.[1];
-      map.set(aTag, { name, image, description });
-    }
-    return map;
-  }, [badgeDefsQuery.data]);
-
-  if (profileBadgesQuery.isLoading) {
-    return (
-      <div className="p-6">
-        <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-4">
-          {Array.from({ length: 8 }).map((_, i) => (
-            <div key={i} className="flex flex-col items-center gap-2">
-              <Skeleton className="size-16 rounded-xl" />
-              <Skeleton className="h-3 w-16" />
-            </div>
-          ))}
-        </div>
-      </div>
-    );
-  }
-
-  if (badgeRefs.length === 0) {
-    return (
-      <div className="py-12 text-center text-muted-foreground">
-        <Award className="size-12 mx-auto mb-4 opacity-30" />
-        <p className="text-lg font-medium mb-2">No badges yet</p>
-        <p className="text-sm">{displayName} hasn't accepted any badges.</p>
-      </div>
-    );
-  }
-
-  return (
-    <div className="p-4">
-      <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-4">
-        {badgeRefs.map((ref, idx) => {
-          const badge = badgeMap.get(ref.aTag);
-          const isLoading = badgeDefsQuery.isLoading;
-          const badgeUrl = `/${nip19.naddrEncode({ kind: 30009, pubkey: ref.pubkey, identifier: ref.identifier })}`;
-
-          return (
-            <Link
-              key={`${ref.aTag}-${idx}`}
-              to={badgeUrl}
-              className="flex flex-col items-center gap-2 group"
-              title={badge?.description || badge?.name || ref.identifier}
-              onClick={(e) => e.stopPropagation()}
-            >
-              {isLoading ? (
-                <Skeleton className="size-16 rounded-xl" />
-              ) : badge?.image ? (
-                <img
-                  src={badge.image}
-                  alt={badge.name}
-                  className="size-16 rounded-xl object-cover border border-border bg-secondary/30 transition-transform group-hover:scale-105"
-                  loading="lazy"
-                  decoding="async"
-                />
-              ) : (
-                <div className="size-16 rounded-xl border border-border bg-secondary/30 flex items-center justify-center transition-transform group-hover:scale-105">
-                  <Award className="size-7 text-muted-foreground" />
-                </div>
-              )}
-              <span className="text-xs text-muted-foreground text-center leading-tight line-clamp-2 max-w-[5rem] group-hover:text-foreground transition-colors">
-                {isLoading ? <Skeleton className="h-3 w-14" /> : (badge?.name || ref.identifier)}
-              </span>
-            </Link>
-          );
-        })}
-      </div>
-    </div>
   );
 }
 
