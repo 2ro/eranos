@@ -1,5 +1,6 @@
 import { useMemo, useCallback, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { useQueryClient } from '@tanstack/react-query';
 import { nip19 } from 'nostr-tools';
 import {
   CalendarClock,
@@ -15,6 +16,7 @@ import {
   Pencil,
   Shield,
   Share2,
+  Trash2,
   UserCheck,
   UserMinus,
   UserPlus,
@@ -28,6 +30,16 @@ import { PostActionBar } from '@/components/PostActionBar';
 import { DetailCommentComposer } from '@/components/DetailCommentComposer';
 import { PinnedCommentHeader } from '@/components/PinnedCommentHeader';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -46,6 +58,7 @@ import { useBitcoinWallet } from '@/hooks/useBitcoinWallet';
 import { useCommunityBookmarks } from '@/hooks/useCommunityBookmarks';
 import { useCommunityMembers } from '@/hooks/useCommunityMembers';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
+import { useDeleteEvent } from '@/hooks/useDeleteEvent';
 import { useEventStats } from '@/hooks/useTrending';
 import { useNow } from '@/hooks/useNow';
 import { useOrganizationActivity } from '@/hooks/useOrganizationActivity';
@@ -609,12 +622,15 @@ function CommunityCreateActions({
 
 export function CommunityDetailPage({ event }: { event: NostrEvent }) {
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const { toast } = useToast();
   const { user } = useCurrentUser();
   const [membersDialogOpen, setMembersDialogOpen] = useState(false);
   const [descriptionDialogOpen, setDescriptionDialogOpen] = useState(false);
   const [replyOpen, setReplyOpen] = useState(false);
   const [moreMenuOpen, setMoreMenuOpen] = useState(false);
+  const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
+  const deleteMutation = useDeleteEvent();
 
   // Parse community definition
   const community = useMemo(() => parseCommunityEvent(event), [event]);
@@ -798,6 +814,51 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
     }
   }, [event, toast]);
 
+  // ── Delete handler ─────────────────────────────────────────────────────────
+  // Founder-only. Publishes a NIP-09 kind 5 deletion request referencing the
+  // community definition (kind 34550) by both `e` and `a` tags so relays can
+  // drop it from both id-based and addressable lookups. After the request
+  // ships we invalidate every org-related cache so the page the user lands
+  // on (`/communities`) shows the deletion immediately, even if some relays
+  // haven't propagated yet.
+  const handleDeleteOrganization = useCallback(() => {
+    if (!community) return;
+    deleteMutation.mutate(
+      {
+        eventId: event.id,
+        eventKind: event.kind,
+        eventPubkey: event.pubkey,
+        eventDTag: community.dTag,
+      },
+      {
+        onSuccess: () => {
+          toast({
+            title: 'Organization deleted',
+            description:
+              'A deletion request was published. Well-behaved relays will drop the organization from feeds.',
+          });
+          setDeleteConfirmOpen(false);
+          void queryClient.invalidateQueries({
+            queryKey: ['addr-event', event.kind, event.pubkey, community.dTag],
+          });
+          void queryClient.invalidateQueries({ queryKey: ['community-definition', community.aTag] });
+          void queryClient.invalidateQueries({ queryKey: ['manageable-organizations'] });
+          void queryClient.invalidateQueries({ queryKey: ['featured-organizations'] });
+          void queryClient.invalidateQueries({ queryKey: ['followed-organizations'] });
+          navigate('/communities');
+        },
+        onError: (error: unknown) => {
+          const msg = error instanceof Error ? error.message : String(error);
+          toast({
+            title: 'Could not delete organization',
+            description: msg,
+            variant: 'destructive',
+          });
+        },
+      },
+    );
+  }, [community, deleteMutation, event, navigate, queryClient, toast]);
+
   useLayoutOptions({
     noMaxWidth: true,
     rightSidebar: null,
@@ -938,6 +999,18 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
                         >
                           <Pencil className="size-4 mr-2" />
                           Edit organization
+                        </DropdownMenuItem>
+                      )}
+                      {isFounder && community && (
+                        <DropdownMenuItem
+                          onSelect={(e) => {
+                            e.preventDefault();
+                            setDeleteConfirmOpen(true);
+                          }}
+                          className="text-destructive focus:text-destructive focus:bg-destructive/10"
+                        >
+                          <Trash2 className="size-4 mr-2" />
+                          Delete organization
                         </DropdownMenuItem>
                       )}
                     </DropdownMenuContent>
@@ -1146,6 +1219,40 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
         open={moreMenuOpen}
         onOpenChange={setMoreMenuOpen}
       />
+
+      {/* Founder-only delete confirmation. NIP-09 is advisory — relays decide
+          whether to honor the request — so the copy makes the limitation
+          explicit and steers founders toward "Edit organization" if they
+          just want to change something. */}
+      <AlertDialog open={deleteConfirmOpen} onOpenChange={setDeleteConfirmOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete this organization?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This publishes a NIP-09 deletion request for{' '}
+              <span className="font-medium text-foreground">{name}</span>.
+              Well-behaved relays will drop the organization from feeds and
+              direct links. Campaigns, pledges, and posts published under
+              the organization stay on-chain regardless. This action cannot
+              be undone — to change the name, banner, or moderators, edit
+              the organization instead.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={deleteMutation.isPending}>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={(e) => {
+                e.preventDefault();
+                handleDeleteOrganization();
+              }}
+              disabled={deleteMutation.isPending}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              {deleteMutation.isPending ? 'Deleting…' : 'Delete'}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
       </div>
     </main>
