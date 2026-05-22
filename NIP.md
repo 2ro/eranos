@@ -24,6 +24,53 @@
 | Community Chat | 34550, 1311 | Realtime member chat scoped to a NIP-72 community |
 | Campaign Moderation | 33863, 1985, 39089 | Homepage curation (approved / hidden / featured axes) via moderator-signed labels in the `agora.moderation` namespace, gated by a follow-pack moderator roster |
 
+### Agora Content Marker
+
+Every event Agora publishes that represents a first-class Agora object carries the single-letter tag `["t", "agora"]`. This marker enables the Agora activity feed to filter strictly server-side via the relay-indexed `#t` filter (multi-letter tags like the NIP-89 `client` tag are not indexed by relays and are therefore unsuitable for this purpose).
+
+#### Tagged kinds
+
+| Kind  | Object              | Where tagged                                                  |
+|-------|---------------------|---------------------------------------------------------------|
+| 1     | Note (top-level, reply, quote) | `ComposeBox` default for top-level kind 1 publishes |
+| 1111  | NIP-22 comment      | `usePostComment` (all comments authored in Agora)             |
+| 8333  | Onchain zap         | `useOnchainZap`, `useDonateCampaign`, `SendBitcoinDialog`     |
+| 9041  | Zap goal            | `CreateGoalDialog`                                            |
+| 33863 | Campaign            | `CreateCampaignPage`                                          |
+| 31922 | Date calendar event | `CreateEventPage`, `CreateCommunityEventDialog`               |
+| 31923 | Time calendar event | `CreateEventPage`, `CreateCommunityEventDialog`               |
+| 34550 | Community           | `CreateCommunityPage`                                         |
+| 36639 | Pledge              | `CreateActionPage`                                            |
+
+The tag is added at publish time via the `withAgoraTag` helper in `src/lib/agoraNoteTags.ts`, which dedupes against any user-supplied `t:agora` tag.
+
+#### Untagged kinds (intentional)
+
+Reactions, reposts, follow lists, profile metadata, lists, settings, badges, vanish requests, encrypted DMs, and live chat are user-state or response events rather than first-class Agora content. Tagging them would pollute `#agora` hashtag surfaces without adding value to the activity feed.
+
+Untagged on purpose: 0, 3, 6, 7, 8, 16, 62, 1311, 30009, 10000-series, 30078, and any NIP-04 / NIP-44 encrypted kind.
+
+#### Querying
+
+The Agora activity feed combines a `t:agora`-strict layer with an intentionally cross-client world layer:
+
+```json
+[
+  { "kinds": [33863, 36639, 34550, 8333], "#t": ["agora", "Agora"] },
+  { "kinds": [1111], "#t": ["agora", "Agora"], "#K": ["33863", "36639", "34550"] },
+  { "kinds": [1111, 1068], "#k": ["iso3166", "geo"] },
+  { "kinds": [1], "#t": ["agora", "Agora"] }
+]
+```
+
+The first two filters surface only Agora-created content. The third surfaces all country/geo-rooted comments and polls regardless of origin — the world layer is intentionally cross-client. The fourth captures any kind 1 note carrying `#agora` (including hashtags users type themselves), which preserves viral / opt-in discovery.
+
+Clients filter both case variants (`agora` and `Agora`) because Nostr `t` tags are conventionally lowercase but some clients normalize hashtags to title case.
+
+#### Backward compatibility
+
+Events published before this marker was adopted do not carry `t:agora` and therefore do not appear in the Agora activity feed. They remain reachable by direct link and via kind-specific directories (e.g. the moderator-curated `/campaigns/all`). Authors who wish to surface a legacy event in the feed can republish it (any edit through the Agora UI will add the marker automatically).
+
 ### Community Chat
 
 Agora uses NIP-53 live chat messages (`kind:1311`) for realtime chat inside a NIP-72 community. Messages are scoped directly to the community definition's address using an `a` tag:

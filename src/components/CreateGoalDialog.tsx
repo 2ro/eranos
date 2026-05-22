@@ -20,6 +20,7 @@ import { getEffectiveRelays } from '@/lib/appRelays';
 import { sanitizeUrl } from '@/lib/sanitizeUrl';
 import { useQueryClient } from '@tanstack/react-query';
 import { ZAP_GOAL_KIND } from '@/lib/goalUtils';
+import { withAgoraTag } from '@/lib/agoraNoteTags';
 
 interface CreateGoalDialogProps {
   /** The community `a` tag coordinate (e.g. `34550:<pubkey>:<d-tag>`). */
@@ -116,7 +117,7 @@ export function CreateGoalDialog({ communityATag, children, open: controlledOpen
       await publishEvent({
         kind: ZAP_GOAL_KIND,
         content: title.trim(),
-        tags,
+        tags: withAgoraTag(tags),
       });
 
       // Refresh the goals tab and the community activity feed

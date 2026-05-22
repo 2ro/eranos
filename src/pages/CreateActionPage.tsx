@@ -36,6 +36,7 @@ import { createOrganizationAssociationTags, decodeOrganizationParam } from '@/li
 import { sanitizeUrl } from '@/lib/sanitizeUrl';
 import { unixSecondsInTimezone } from '@/lib/timezone';
 import { cn } from '@/lib/utils';
+import { withAgoraTag } from '@/lib/agoraNoteTags';
 
 function normalizePledgeTag(value: string): string {
   return value.trim().replace(/^#+/, '').toLowerCase().replace(/\s+/g, '-');
@@ -197,7 +198,7 @@ export function CreateActionPage() {
         ]);
       }
 
-      await createEvent({ kind: 36639, content: trimmedDescription, tags });
+      await createEvent({ kind: 36639, content: trimmedDescription, tags: withAgoraTag(tags) });
     },
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ['agora-actions'] });

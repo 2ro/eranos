@@ -14,6 +14,7 @@ import {
 } from '@/lib/bitcoin';
 import type { FeeRates } from '@/lib/bitcoin';
 import { CAMPAIGN_KIND, type ParsedCampaign } from '@/lib/campaign';
+import { withAgoraTag } from '@/lib/agoraNoteTags';
 
 /** Supported on-chain fee speeds (mirrors {@link SendBitcoinDialog}). */
 export type DonationFeeSpeed = 'fastest' | 'halfHour' | 'hour' | 'economy';
@@ -156,13 +157,13 @@ export function useDonateCampaign() {
       await publishEvent({
         kind: 8333,
         content: comment,
-        tags: [
+        tags: withAgoraTag([
           ['i', `bitcoin:tx:${txid}`],
           ['amount', String(amountSats)],
           ['a', campaign.aTag],
           ['K', String(CAMPAIGN_KIND)],
           ['alt', `Donation to ${campaign.title}: ${amountSats.toLocaleString()} sats`],
-        ],
+        ]),
       });
       receiptPublished = true;
     } catch (error) {

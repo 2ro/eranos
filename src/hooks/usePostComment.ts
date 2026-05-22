@@ -1,5 +1,6 @@
 import { useMutation, useQueryClient, type InfiniteData } from '@tanstack/react-query';
 import { useNostrPublish } from '@/hooks/useNostrPublish';
+import { withAgoraTag } from '@/lib/agoraNoteTags';
 import { NKinds, type NostrEvent } from '@nostrify/nostrify';
 
 interface PaginatedFeedPage {
@@ -45,7 +46,7 @@ export function usePostComment() {
       const event = await publishEvent({
         kind: 1111,
         content,
-        tags,
+        tags: withAgoraTag(tags),
       });
 
       return event;

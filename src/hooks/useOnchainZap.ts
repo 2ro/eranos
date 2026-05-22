@@ -8,6 +8,7 @@ import { useNostrPublish } from '@/hooks/useNostrPublish';
 import { useToast } from '@/hooks/useToast';
 import { useAppContext } from '@/hooks/useAppContext';
 import { notificationSuccess } from '@/lib/haptics';
+import { withAgoraTag } from '@/lib/agoraNoteTags';
 import {
   nostrPubkeyToBitcoinAddress,
   fetchUTXOs,
@@ -162,7 +163,7 @@ export function useOnchainZap(
       const event = await publishEvent({
         kind: 8333,
         content: comment,
-        tags,
+        tags: withAgoraTag(tags),
       });
 
       return { txid, amountSats, fee, event };

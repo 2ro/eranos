@@ -41,6 +41,7 @@ import { getTodayDateInput } from '@/lib/dateInput';
 import { fetchFreshEvent } from '@/lib/fetchFreshEvent';
 import { createOrganizationAssociationTags, decodeOrganizationParam } from '@/lib/organizationContext';
 import { sanitizeUrl } from '@/lib/sanitizeUrl';
+import { withAgoraTag } from '@/lib/agoraNoteTags';
 import { COUNTRIES, searchCountries, type CountryEntry } from '@/lib/countries';
 import { createCountryIdentifier } from '@/lib/countryIdentifiers';
 import { cn } from '@/lib/utils';
@@ -318,7 +319,7 @@ export function CreateCampaignPage() {
       const published = await publishEvent({
         kind: CAMPAIGN_KIND,
         content: story,
-        tags,
+        tags: withAgoraTag(tags),
         prev: prev ?? undefined,
       });
 
