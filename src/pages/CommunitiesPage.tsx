@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useSeoMeta } from '@unhead/react';
-import { Globe2, HandHeart, PlusCircle, Users } from 'lucide-react';
+import { ChevronDown, ChevronUp, Globe2, HandHeart, PlusCircle, Users } from 'lucide-react';
 
 import { HeroAtmosphere } from '@/components/HeroAtmosphere';
 import { HeroBanner } from '@/components/HeroBanner';
@@ -9,7 +9,7 @@ import { LoginArea } from '@/components/auth/LoginArea';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
-import { HorizontalScroll } from '@/components/discovery/HorizontalScroll';
+import { CommunityGrid } from '@/components/discovery/CommunityGrid';
 import { CommunityMiniCard, CommunityMiniCardSkeleton } from '@/components/discovery/CommunityMiniCard';
 import { SectionHeader } from '@/components/discovery/SectionHeader';
 import { COOL_PALETTE } from '@/lib/hopePalette';
@@ -298,14 +298,15 @@ function MyCommunitiesShelfContent({
   // Sorting is founder first, moderator second, followed-only last, with
   // newest community definition revisions first inside each bucket.
   const { data: organizations, isLoading } = userOrganizations;
+  const [expanded, setExpanded] = useState(false);
 
   if (isLoading) {
     return (
-      <HorizontalScroll className="sm:px-6">
+      <CommunityGrid>
         {Array.from({ length: 4 }).map((_, i) => (
-          <CommunityMiniCardSkeleton key={i} />
+          <CommunityMiniCardSkeleton key={i} className="w-full" />
         ))}
-      </HorizontalScroll>
+      </CommunityGrid>
     );
   }
 
@@ -325,12 +326,45 @@ function MyCommunitiesShelfContent({
     );
   }
 
+  const COLLAPSED_COUNT = 4;
+  const visible = expanded ? organizations : organizations.slice(0, COLLAPSED_COUNT);
+  const canExpand = organizations.length > COLLAPSED_COUNT;
+
   return (
-    <HorizontalScroll className="sm:px-6">
-      {organizations.slice(0, 18).map((entry) => (
-        <CommunityMiniCard key={entry.community.aTag} community={entry.community} />
-      ))}
-    </HorizontalScroll>
+    <div className="space-y-4">
+      <CommunityGrid>
+        {visible.map((entry) => (
+          <CommunityMiniCard
+            key={entry.community.aTag}
+            community={entry.community}
+            className="w-full"
+          />
+        ))}
+      </CommunityGrid>
+      {canExpand && (
+        <div className="flex justify-center px-4 sm:px-6">
+          <Button
+            type="button"
+            variant="ghost"
+            onClick={() => setExpanded((v) => !v)}
+            className="rounded-full text-sm"
+            aria-expanded={expanded}
+          >
+            {expanded ? (
+              <>
+                <ChevronUp className="size-4 mr-1.5" />
+                Show less
+              </>
+            ) : (
+              <>
+                <ChevronDown className="size-4 mr-1.5" />
+                Show {organizations.length - COLLAPSED_COUNT} more
+              </>
+            )}
+          </Button>
+        </div>
+      )}
+    </div>
   );
 }
 
@@ -340,11 +374,11 @@ function FeaturedOrganizationsShelf() {
 
   if (isLoading && !hasFeatured) {
     return (
-      <HorizontalScroll className="sm:px-6">
-        {Array.from({ length: 4 }).map((_, i) => (
-          <CommunityMiniCardSkeleton key={i} />
+      <CommunityGrid>
+        {Array.from({ length: 8 }).map((_, i) => (
+          <CommunityMiniCardSkeleton key={i} className="w-full" />
         ))}
-      </HorizontalScroll>
+      </CommunityGrid>
     );
   }
 
@@ -360,11 +394,15 @@ function FeaturedOrganizationsShelf() {
   }
 
   return (
-    <HorizontalScroll className="sm:px-6">
+    <CommunityGrid>
       {featured.map((entry) => (
-        <CommunityMiniCard key={entry.community.aTag} community={entry.community} />
+        <CommunityMiniCard
+          key={entry.community.aTag}
+          community={entry.community}
+          className="w-full"
+        />
       ))}
-    </HorizontalScroll>
+    </CommunityGrid>
   );
 }
 
