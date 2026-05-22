@@ -1243,6 +1243,7 @@ function FollowersListModal({ pubkey, open, onOpenChange, displayName }: Followe
                   campaigns={profileCampaignStats.campaigns}
                   campaignStats={profileCampaignStats}
                   pledgesCount={profileActionsCount}
+                  pledges={(allActions ?? []).filter((a) => a.pubkey === pubkey)}
                   btcPrice={btcPrice}
                   followersCount={followersCount}
                   followingCount={profileFollowing?.count ?? 0}

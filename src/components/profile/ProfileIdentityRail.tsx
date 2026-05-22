@@ -1,7 +1,8 @@
 import type { ReactNode } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, Link as RouterLink } from 'react-router-dom';
 import {
   Bitcoin,
+  CalendarClock,
   Globe,
   HandHeart,
   Megaphone,
@@ -9,11 +10,13 @@ import {
   QrCode,
   Users,
 } from 'lucide-react';
+import { nip19 } from 'nostr-tools';
 import type { NostrEvent, NostrMetadata } from '@nostrify/nostrify';
 
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -37,6 +40,10 @@ import { formatCampaignAmount } from '@/lib/formatCampaignAmount';
 import { formatNumber } from '@/lib/formatNumber';
 import { sanitizeUrl } from '@/lib/sanitizeUrl';
 import { cn } from '@/lib/utils';
+import type { Action } from '@/hooks/useActions';
+import { DEFAULT_COVER_IMAGE } from '@/lib/defaultActionCovers';
+import { formatCompactPledgeDeadline, formatPledgeAmount } from '@/lib/pledges';
+import { getGeoDisplayName } from '@/lib/countries';
 
 export interface ProfileIdentityRailProps {
   pubkey: string;
@@ -67,6 +74,12 @@ export interface ProfileIdentityRailProps {
   campaignStats: ProfileCampaignStats;
   /** Pledges (kind 36639) created by this profile. */
   pledgesCount: number;
+  /**
+   * The profile's pledges (kind 36639) — used to surface the latest one
+   * in the rail when the profile has no campaigns. The rail picks the
+   * newest by `createdAt` itself, so callers can pass the unsorted list.
+   */
+  pledges: Action[];
   /** Spot BTC price for the Raised stat row. */
   btcPrice: number | undefined;
 
@@ -123,6 +136,7 @@ export function ProfileIdentityRail({
   campaigns,
   campaignStats,
   pledgesCount,
+  pledges,
   btcPrice,
   followersCount,
   followingCount,
@@ -239,6 +253,18 @@ export function ProfileIdentityRail({
         isLoading={campaignStats.isVerifying && campaigns.length === 0}
         onSeeAll={() => onTabChange('campaigns')}
       />
+
+      {/* Latest pledge — surfaced as a fallback when this profile has
+          nothing in the Campaigns slot, so the rail still has a piece of
+          first-class Agora content above the orgs/fields sections. */}
+      {campaigns.length === 0 && pledges.length > 0 && (
+        <RailLatestPledgeSection
+          pledges={pledges}
+          btcPrice={btcPrice}
+          showSeeAll={pledges.length > 1}
+          onSeeAll={() => onTabChange('pledges')}
+        />
+      )}
 
       {/* Organizations */}
       <RailOrganizationsSection pubkey={pubkey} />
@@ -575,6 +601,126 @@ function RailCampaignsSection({
         </button>
       )}
     </section>
+  );
+}
+
+// ─── Rail Latest Pledge Section ─────────────────────────────────────────────
+
+/**
+ * Compact "latest pledge" card shown in the rail when the profile has
+ * no campaigns. Picks the newest pledge from the supplied list (sorted
+ * by `createdAt` descending) and renders it as a single small card with
+ * cover, title, pledged amount, country, and deadline.
+ */
+function RailLatestPledgeSection({
+  pledges,
+  btcPrice,
+  showSeeAll,
+  onSeeAll,
+}: {
+  pledges: Action[];
+  btcPrice: number | undefined;
+  showSeeAll: boolean;
+  onSeeAll: () => void;
+}) {
+  // Pick the newest pledge by created_at. The page query is roughly
+  // newest-first already, but sorting here keeps the rail correct
+  // regardless of upstream order.
+  const latest = [...pledges].sort((a, b) => b.createdAt - a.createdAt)[0];
+  if (!latest) return null;
+
+  return (
+    <section className="space-y-3">
+      <RailSectionHeader
+        icon={<HandHeart className="size-4 text-primary" />}
+        title="Latest pledge"
+      />
+      <RailPledgeCard action={latest} btcPrice={btcPrice} />
+      {showSeeAll && (
+        <button
+          type="button"
+          onClick={onSeeAll}
+          className="text-sm text-primary hover:underline font-medium"
+        >
+          See all {pledges.length} pledges →
+        </button>
+      )}
+    </section>
+  );
+}
+
+/**
+ * Compact pledge card sized for the rail's narrow column. Smaller cover
+ * aspect, tighter padding, and a single-line pledged amount that doesn't
+ * dominate the rail.
+ */
+function RailPledgeCard({
+  action,
+  btcPrice,
+}: {
+  action: Action;
+  btcPrice: number | undefined;
+}) {
+  const naddr = nip19.naddrEncode({
+    kind: 36639,
+    pubkey: action.pubkey,
+    identifier: action.id,
+  });
+  const cover = sanitizeUrl(action.image) ?? DEFAULT_COVER_IMAGE;
+  const deadline = action.deadline ? formatCompactPledgeDeadline(action.deadline) : null;
+  const isExpired = !!deadline?.isPast;
+  const countryLabel = action.countryCode ? getGeoDisplayName(action.countryCode) : undefined;
+
+  return (
+    <RouterLink
+      to={`/${naddr}`}
+      className="group block rounded-xl overflow-hidden focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+    >
+      <Card className={cn(
+        'overflow-hidden border-border/70 shadow-sm motion-safe:transition-shadow group-hover:shadow-md',
+        isExpired && 'opacity-75',
+      )}>
+        <div className="relative aspect-[16/9] bg-gradient-to-br from-primary/15 via-primary/5 to-secondary">
+          <img
+            src={cover}
+            alt=""
+            loading="lazy"
+            className={cn('absolute inset-0 size-full object-cover', isExpired && 'grayscale')}
+          />
+          {isExpired && (
+            <Badge
+              variant="secondary"
+              className="absolute top-2 right-2 backdrop-blur bg-background/85 border-border/40 text-[10px] uppercase tracking-wide text-muted-foreground"
+            >
+              Ended
+            </Badge>
+          )}
+        </div>
+        <div className="p-3 space-y-1.5">
+          <h3 className="font-semibold text-sm leading-snug line-clamp-2">{action.title}</h3>
+          <div className="flex items-baseline justify-between gap-2 text-xs">
+            <span className="text-muted-foreground uppercase tracking-wide font-semibold">Pledged</span>
+            <span className="text-foreground font-bold tabular-nums">
+              {formatPledgeAmount(action.bounty, btcPrice)}
+            </span>
+          </div>
+          {(countryLabel || deadline) && (
+            <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] text-muted-foreground pt-0.5">
+              {deadline && (
+                <span className={cn(
+                  'inline-flex items-center gap-1',
+                  deadline.isPast && 'text-destructive',
+                )}>
+                  <CalendarClock className="size-3" />
+                  {deadline.label}
+                </span>
+              )}
+              {countryLabel && <span className="truncate">{countryLabel}</span>}
+            </div>
+          )}
+        </div>
+      </Card>
+    </RouterLink>
   );
 }
 
