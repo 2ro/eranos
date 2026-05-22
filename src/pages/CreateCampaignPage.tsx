@@ -909,18 +909,11 @@ function WalletDisclaimer({
     );
   }
 
-  // 'custom' with empty or invalid input — keep the existing inline
-  // hint so the format is discoverable.
+  // 'custom' with empty input — no hint. The placeholder inside the
+  // input ("bc1p…  or  sp1…") already conveys the expected format.
   const trimmed = walletInput.trim();
   if (source === 'custom' && !trimmed) {
-    return (
-      <p className="mt-2 text-xs text-muted-foreground">
-        Use a mainnet bech32 address (<span className="font-mono">bc1q…</span> /{' '}
-        <span className="font-mono">bc1p…</span>) for a public, traceable campaign,
-        or a BIP-352 silent-payment code (<span className="font-mono">sp1…</span>)
-        for a private campaign where totals are hidden.
-      </p>
-    );
+    return null;
   }
   if (source === 'custom' && !parsed) {
     return (
