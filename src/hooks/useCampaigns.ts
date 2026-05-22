@@ -2,16 +2,10 @@ import { useNostr } from '@nostrify/react';
 import { useQuery } from '@tanstack/react-query';
 import type { NostrEvent, NostrFilter } from '@nostrify/nostrify';
 
-import { CAMPAIGN_KIND, type CampaignCategory, parseCampaign, type ParsedCampaign } from '@/lib/campaign';
+import { CAMPAIGN_KIND, parseCampaign, type ParsedCampaign } from '@/lib/campaign';
 import { createCountryIdentifier } from '@/lib/countryIdentifiers';
 
 interface ParseCampaignEventsOptions {
-  /**
-   * Include campaigns whose latest revision carries `["status", "archived"]`.
-   * Defaults to `false` so archived campaigns never appear in the main
-   * fundraisers listing.
-   */
-  includeArchived?: boolean;
   /**
    * When `true`, sort the parsed campaigns newest-`created_at`-first.
    * When `false`, preserve the order in which events were returned —
@@ -23,7 +17,7 @@ interface ParseCampaignEventsOptions {
 }
 
 /**
- * Deduplicate, parse, and (optionally) reorder a flat list of kind 30223
+ * Deduplicate, parse, and (optionally) reorder a flat list of kind 33863
  * events into `ParsedCampaign` objects.
  *
  * For each `(pubkey, d)` pair we keep only the latest event — relays may
@@ -35,7 +29,7 @@ interface ParseCampaignEventsOptions {
  */
 export function parseCampaignEvents(
   events: NostrEvent[],
-  { includeArchived = false, sortByCreatedAt = true }: ParseCampaignEventsOptions = {},
+  { sortByCreatedAt = true }: ParseCampaignEventsOptions = {},
 ): ParsedCampaign[] {
   // Track insertion order keyed by coord so we can preserve relay-scored
   // order when we don't want to re-sort. `Map` iteration order is insertion
@@ -62,7 +56,6 @@ export function parseCampaignEvents(
     if (!event) continue;
     const campaign = parseCampaign(event);
     if (!campaign) continue;
-    if (!includeArchived && campaign.archived) continue;
     parsed.push(campaign);
   }
 
@@ -74,8 +67,6 @@ export function parseCampaignEvents(
 }
 
 interface UseCampaignsOptions {
-  /** Optional category filter (`t` tag). */
-  category?: CampaignCategory;
   /** Optional ISO 3166-1 alpha-2 country filter (`i` tag). */
   countryCode?: string;
   /** Maximum number of events to fetch from relays. Default: 60. */
@@ -83,12 +74,7 @@ interface UseCampaignsOptions {
   /** Authors to fetch from, e.g. for a profile's campaigns. */
   authors?: string[];
   /**
-   * Restrict to campaigns whose recipient `p` tags include any of these
-   * pubkeys. Used by the /claim page to find campaigns set up *for* a user.
-   */
-  recipientPubkeys?: string[];
-  /**
-   * Restrict to a specific set of `30223:<pubkey>:<d>` coordinates.
+   * Restrict to a specific set of `33863:<pubkey>:<d>` coordinates.
    *
    * Used by moderator-curated surfaces (the home page, Discover) that only
    * want to render campaigns labeled `approved` by a Team Soapbox moderator
@@ -102,24 +88,19 @@ interface UseCampaignsOptions {
    *    the unfiltered behavior while their moderator query loads.
    */
   coordinates?: string[];
-  /**
-   * Include campaigns that have been archived by their creator
-   * (`["status", "archived"]`). Defaults to `false` so archived
-   * campaigns never appear in the main fundraisers listing.
-   */
-  includeArchived?: boolean;
 }
 
 /**
- * Loads kind 30223 campaign events and returns them as fully-parsed
+ * Loads kind 33863 campaign events and returns them as fully-parsed
  * {@link ParsedCampaign} objects, newest first.
  *
- * Campaigns that fail validation (missing title, no recipients, etc.) are
+ * Campaigns that fail validation (missing title, no `w` wallet, etc.) are
  * dropped so the UI never has to defensively check for missing fields.
  *
- * Archived campaigns (`status=archived`) are excluded by default. Pass
- * `includeArchived: true` to load them — used by the author's own profile
- * view so they can see and reopen their own archives.
+ * To stop a campaign from appearing the creator publishes a NIP-09 kind 5
+ * deletion request referencing the campaign's `a` coordinate; well-behaved
+ * relays honor the deletion and the campaign drops out of result sets
+ * automatically.
  *
  * For each `(pubkey, d)` pair we keep only the latest event — relays may
  * return older revisions of an addressable event alongside the current one.
@@ -127,13 +108,10 @@ interface UseCampaignsOptions {
 export function useCampaigns(options: UseCampaignsOptions = {}) {
   const { nostr } = useNostr();
   const {
-    category,
     countryCode,
     limit = 60,
     authors,
-    recipientPubkeys,
     coordinates,
-    includeArchived = false,
   } = options;
 
   // Stable cache key for the coordinates option; sort so order doesn't
@@ -143,7 +121,7 @@ export function useCampaigns(options: UseCampaignsOptions = {}) {
   return useQuery({
     queryKey: [
       'campaigns',
-      { category, countryCode, limit, authors, recipientPubkeys, coordinatesKey, includeArchived },
+      { countryCode, limit, authors, coordinatesKey },
     ],
     queryFn: async (c) => {
       // Sentinel: empty allowlist = empty result. Skip the relay entirely.
@@ -156,7 +134,7 @@ export function useCampaigns(options: UseCampaignsOptions = {}) {
       if (coordinates && coordinates.length > 0) {
         const byAuthor = new Map<string, string[]>();
         for (const coord of coordinates) {
-          // Expected: `30223:<pubkey>:<d>`
+          // Expected: `33863:<pubkey>:<d>`
           const parts = coord.split(':');
           if (parts.length < 3) continue;
           const kindPart = Number(parts[0]);
@@ -171,23 +149,18 @@ export function useCampaigns(options: UseCampaignsOptions = {}) {
         if (byAuthor.size === 0) return [] as ParsedCampaign[];
         filters = Array.from(byAuthor, ([author, dTags]) => {
           const f: NostrFilter = { kinds: [CAMPAIGN_KIND], authors: [author], '#d': dTags };
-          if (category) f['#t'] = [category];
           if (countryCode) f['#i'] = [createCountryIdentifier(countryCode)];
           return f;
         });
       } else {
         const filter: NostrFilter = { kinds: [CAMPAIGN_KIND], limit };
-        if (category) filter['#t'] = [category];
         if (countryCode) filter['#i'] = [createCountryIdentifier(countryCode)];
         if (authors && authors.length > 0) filter.authors = authors;
-        if (recipientPubkeys && recipientPubkeys.length > 0) {
-          filter['#p'] = recipientPubkeys;
-        }
         filters = [filter];
       }
 
       const events = await nostr.query(filters, { signal: c.signal });
-      return parseCampaignEvents(events, { includeArchived, sortByCreatedAt: true });
+      return parseCampaignEvents(events, { sortByCreatedAt: true });
     },
     staleTime: 30_000,
   });

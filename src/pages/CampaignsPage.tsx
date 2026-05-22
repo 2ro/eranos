@@ -24,7 +24,7 @@ import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useLayoutOptions } from '@/contexts/LayoutContext';
 import { useAppContext } from '@/hooks/useAppContext';
 import { type ParsedCampaign } from '@/lib/campaign';
-import { searchCountry } from '@/lib/countries';
+
 import { getCoordinates } from '@/lib/coordinates';
 
 /** Cap on how many featured campaigns we render in the home-page row. */
@@ -67,7 +67,7 @@ export function CampaignsPage() {
     if (!moderation || !featuredCampaigns) return [];
     const order = moderation.featuredOrder;
     return [...featuredCampaigns]
-      .filter((c) => featuredCoords.includes(c.aTag) && !c.archived)
+      .filter((c) => featuredCoords.includes(c.aTag))
       .sort((a, b) => (order.get(b.aTag) ?? 0) - (order.get(a.aTag) ?? 0))
       .slice(0, MAX_FEATURED);
   }, [featuredCampaigns, featuredCoords, moderation]);
@@ -150,12 +150,10 @@ export function CampaignsPage() {
     );
   }, [isMod, user, moderation, ownCampaigns]);
 
-  // Build the spotlight pool from the featured campaigns only.
-  // New events use NIP-73 `i` country tags; legacy campaigns can still
-  // resolve from the old free-form `location` field. A featured campaign
-  // without a resolvable country is silently dropped — the globe needs
-  // coordinates to pin it, and the banner cycles in lockstep with the
-  // globe so the two stay in sync.
+  // Build the spotlight pool from the featured campaigns only. A featured
+  // campaign without a resolvable country is silently dropped — the globe
+  // needs coordinates to pin it, and the banner cycles in lockstep with
+  // the globe so the two stay in sync.
   const spotlightables = useMemo(() => {
     type Entry = {
       key: string;
@@ -169,7 +167,7 @@ export function CampaignsPage() {
 
     const add = (c: ParsedCampaign) => {
       if (seenAtag.has(c.aTag)) return;
-      const countryCode = c.countryCode ?? (c.location ? searchCountry(c.location)?.country.code : undefined);
+      const countryCode = c.countryCode;
       if (!countryCode) return;
       const coords = getCoordinates(countryCode);
       if (!coords) return;
@@ -257,7 +255,7 @@ export function CampaignsPage() {
           Inspired by the Treasures HeroGallery pattern: the photo IS the
           background, everything else floats over it. */}
       <section className="relative overflow-hidden border-b border-border bg-secondary/40">
-        <CampaignHeroBackground imageUrl={spotlightCampaign?.image} />
+        <CampaignHeroBackground imageUrl={spotlightCampaign?.banner} />
 
         {/* Per-campaign hopeful color atmosphere. Sits on top of the
             photo and below the globe so its mix-blend-mode: screen layers

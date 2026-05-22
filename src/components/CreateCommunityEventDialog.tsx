@@ -25,6 +25,7 @@ import { useToast } from '@/hooks/useToast';
 import { fetchFreshEvent } from '@/lib/fetchFreshEvent';
 import { createOrganizationAssociationTags } from '@/lib/organizationContext';
 import { sanitizeUrl } from '@/lib/sanitizeUrl';
+import { withAgoraTag } from '@/lib/agoraNoteTags';
 
 interface CreateCommunityEventDialogProps {
   communityATag?: string;
@@ -307,7 +308,7 @@ export function CreateCommunityEventDialog({ communityATag, open, onOpenChange, 
       const publishedEvent = await publishEvent({
         kind,
         content: description.trim(),
-        tags,
+        tags: withAgoraTag(tags),
         prev: prev ?? undefined,
       });
 

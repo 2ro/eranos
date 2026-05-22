@@ -27,6 +27,13 @@ interface StreamPostsOptions {
    * Each entry accepts raw hex or npub-encoded pubkeys.
    */
   authorPubkeys?: string[];
+  /**
+   * When set, narrows results to events whose NIP-89 `client` tag's first
+   * value matches this string. Relays that index the multi-letter `client`
+   * tag (e.g. Ditto's relay) honor this server-side; on relays that don't,
+   * the filter is silently dropped on their end and results are unfiltered.
+   */
+  clientName?: string;
   /** NIP-50 sort preference. 'recent' = default (no sort: term). */
   sort?: 'recent' | 'hot' | 'trending';
 }
@@ -295,9 +302,16 @@ export function useStreamPosts(query: string, options: StreamPostsOptions) {
       streamFilter.authors = resolvedAuthorPubkeys;
     }
 
+    // NIP-89 client tag filter (Ditto relay indexes the multi-letter `client`
+    // tag; other relays silently ignore the constraint).
+    if (options.clientName) {
+      searchFilter['#client'] = [options.clientName];
+      streamFilter['#client'] = [options.clientName];
+    }
+
     return { searchFilter, streamFilter };
   // eslint-disable-next-line react-hooks/exhaustive-deps -- enabledKinds is stabilized via kindsKey; options.protocols via protocolsKey; kindsOverride via kindsOverrideKey; authorPubkeys via authorPubkeysKey
-  }, [query, isDedicatedKindQuery, kindsKey, options.language, options.mediaType, protocolsKey, kindsOverrideKey, authorPubkeysKey, options.sort]);
+  }, [query, isDedicatedKindQuery, kindsKey, options.language, options.mediaType, protocolsKey, kindsOverrideKey, authorPubkeysKey, options.sort, options.clientName]);
 
   // Shared ref for the event map and known IDs — persists across initial fetch + pagination
   const eventMapRef = useRef(new Map<string, NostrEvent>());

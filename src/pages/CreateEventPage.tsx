@@ -26,6 +26,7 @@ import { getTodayDateInput } from '@/lib/dateInput';
 import { createOrganizationAssociationTags, decodeOrganizationParam } from '@/lib/organizationContext';
 import { sanitizeUrl } from '@/lib/sanitizeUrl';
 import { unixSecondsInTimezone } from '@/lib/timezone';
+import { withAgoraTag } from '@/lib/agoraNoteTags';
 
 function slugify(text: string): string {
   return text
@@ -164,7 +165,7 @@ export function CreateEventPage() {
       const publishedEvent = await publishEvent({
         kind,
         content: trimmedDescription,
-        tags,
+        tags: withAgoraTag(tags),
       });
 
       const eventCoord = `${kind}:${user.pubkey}:${dTag}`;

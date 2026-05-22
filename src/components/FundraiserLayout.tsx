@@ -102,7 +102,7 @@ function FundraiserLayoutInner() {
 
 function SiteFooter() {
   return (
-    <footer className="border-t border-border bg-background mt-auto">
+    <footer className="bg-background mt-auto pt-12">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 py-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-muted-foreground">
         <span>&copy; {new Date().getFullYear()} Agora. Fundraisers on Nostr.</span>
         <nav className="flex items-center gap-5">

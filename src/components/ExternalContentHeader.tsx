@@ -3,8 +3,7 @@ import { Link } from 'react-router-dom';
 import { ArrowLeft, BookOpen, Coins, ExternalLink, FileText, Globe, Landmark, Languages, MapPin, Megaphone, MessageCircle, Package, Pause, Play, Repeat2, Share2, User, UserCheck, UserMinus, UserPlus, Users } from 'lucide-react';
 import { nip19 } from 'nostr-tools';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
-import { Skeleton } from '@/components/ui/skeleton';
-import { ExternalFavicon } from '@/components/ExternalFavicon';
+import { Skeleton } from '@/components/ui/skeleton';import { ExternalFavicon } from '@/components/ExternalFavicon';
 import { ExternalReactionButton } from '@/components/ExternalReactionButton';
 import { FollowToggleButton } from '@/components/FollowButton';
 import { LinkEmbed } from '@/components/LinkEmbed';
@@ -22,7 +21,6 @@ import { useAuthor } from '@/hooks/useAuthor';
 import { useCountryFollows } from '@/hooks/useCountryFollows';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useProfileUrl } from '@/hooks/useProfileUrl';
-import { useWeather } from '@/hooks/useWeather';
 import { useToast } from '@/hooks/useToast';
 import { genUserName } from '@/lib/genUserName';
 import { getCountryInfo, getWikipediaTitle } from '@/lib/countries';
@@ -638,9 +636,11 @@ function WikipediaExtract({ extract, articleUrl }: { extract: string; articleUrl
  * above the Wikipedia extract doesn't draw against a phantom row.
  */
 function WeatherVitalsRow({ code, facts }: { code: string; facts: CountryFacts | undefined }) {
-  const { data: weather, isLoading } = useWeather(code);
-  const capital = facts?.capital ?? null;
-
+  // Weather has been removed; this row now renders only the country vitals
+  // (population / languages / currency). The legacy name is preserved so
+  // the mount call sites don't churn — the row still vanishes when there
+  // are no vitals to show, matching the original behavior.
+  void code;
   const vitals: { key: string; icon: React.ReactNode; label: string; value: string }[] = [];
   if (facts) {
     if (facts.population !== null) {
@@ -670,40 +670,17 @@ function WeatherVitalsRow({ code, facts }: { code: string; facts: CountryFacts |
     }
   }
 
-  if (isLoading && vitals.length === 0) {
-    return (
-      <div className="px-4 py-2 flex items-center gap-3">
-        <Skeleton className="size-6 rounded-md" />
-        <Skeleton className="h-4 w-40" />
-      </div>
-    );
-  }
+  if (vitals.length === 0) return null;
 
-  const hasWeatherSide = !!weather || !!capital;
-  const hasVitalsSide = vitals.length > 0;
-  if (!hasWeatherSide && !hasVitalsSide) return null;
+  const capital = facts?.capital ?? null;
+  const hasCapitalSide = !!capital;
 
   return (
     <div className="px-4 py-2 flex flex-wrap items-center justify-between gap-x-4 gap-y-1.5 text-sm">
-      {/* Left group — weather + capital. */}
-      {hasWeatherSide && (
+      {/* Left group — capital. */}
+      {hasCapitalSide && (
         <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1 min-w-0">
-          {weather && (
-            <>
-              <span className="flex items-baseline gap-2 text-foreground">
-                <span className="text-xl leading-none" role="img" aria-label={weather.description}>
-                  {weather.icon}
-                </span>
-                <span className="font-bold tabular-nums">{weather.temperature}°</span>
-              </span>
-              <span className="text-muted-foreground">{weather.description}</span>
-            </>
-          )}
           {capital && (
-            // The country's capital is the stable national place anchor for
-            // the header. The weather-station city is intentionally omitted
-            // — it's often a smaller, less-recognised town nearby and
-            // duplicates a less-meaningful place name on the same line.
             <span className="flex items-center gap-1 text-muted-foreground/80 text-xs">
               <Landmark className="size-3 shrink-0" />
               <span>{capital}</span>
@@ -712,28 +689,21 @@ function WeatherVitalsRow({ code, facts }: { code: string; facts: CountryFacts |
         </div>
       )}
 
-      {/* Right group — vitals (population, language, currency). On narrow
-          viewports this wraps onto its own line under the weather group
-          rather than getting crushed beside it. Styled to match the
-          capital chip on the left (text-xs muted-foreground/80 with a
-          size-3 icon) so the row reads as a single uniform metadata
-          strip rather than two competing weights. */}
-      {hasVitalsSide && (
-        <ul className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground/80 min-w-0">
-          {vitals.map((item) => (
-            <li
-              key={item.key}
-              className="flex items-center gap-1 min-w-0"
-              title={`${item.label}: ${item.value}`}
-            >
-              {item.icon}
-              <span className="truncate max-w-[14ch] sm:max-w-[18ch]">
-                {item.value}
-              </span>
-            </li>
-          ))}
-        </ul>
-      )}
+      {/* Right group — vitals (population, language, currency). */}
+      <ul className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground/80 min-w-0">
+        {vitals.map((item) => (
+          <li
+            key={item.key}
+            className="flex items-center gap-1 min-w-0"
+            title={`${item.label}: ${item.value}`}
+          >
+            {item.icon}
+            <span className="truncate max-w-[14ch] sm:max-w-[18ch]">
+              {item.value}
+            </span>
+          </li>
+        ))}
+      </ul>
     </div>
   );
 }
@@ -877,7 +847,6 @@ export function CountryContentHeader({ code }: { code: string }) {
   // Country facts are only fetched for sovereign countries (alpha-2 codes);
   // the hook's internal guard returns `null` for subdivisions like `US-CA`.
   const { data: facts } = useCountryFacts(info?.subdivision ? null : code);
-  const { data: weather } = useWeather(code);
   const { user } = useCurrentUser();
   const { isFollowingCountry, toggleCountryFollow, isPending } = useCountryFollows();
   const { toast } = useToast();
@@ -916,7 +885,10 @@ export function CountryContentHeader({ code }: { code: string }) {
   // map or administrative photo, which contradicts the editorial choice
   // to surface Tibet as a country in its own right.
   const heroImage = customFlagAsset(code) ?? wiki?.originalImage?.source ?? wiki?.thumbnail?.source ?? null;
-  const isDay = weather?.isDay ?? true;
+  // Always render the daytime sky overlay. Previously we keyed this off the
+  // live `weather.isDay` flag to flip into a night palette; weather has been
+  // removed so we default to the warm amber/rose daytime tint.
+  const isDay = true;
   // Sky-tint gradient layered above the hero photo. Warm amber/rose during
   // local daytime, deep indigo/violet at night. Same gradient shape, only
   // the colour palette flips — preserves the cinematic curve while the mood

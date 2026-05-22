@@ -45,6 +45,7 @@ import { useNip05Resolve } from '@/hooks/useNip05Resolve';
 import { detectIdentifier, type IdentifierMatch } from '@/lib/nostrIdentifier';
 import { isNostrId } from '@/lib/nostrId';
 import { notificationSuccess } from '@/lib/haptics';
+import { withAgoraTag } from '@/lib/agoraNoteTags';
 import {
   nostrPubkeyToBitcoinAddress,
   validateBitcoinAddress,
@@ -333,12 +334,12 @@ export function SendBitcoinDialog({ isOpen, onClose, btcPrice }: SendBitcoinDial
           await publishEvent({
             kind: 8333,
             content: '',
-            tags: [
+            tags: withAgoraTag([
               ['i', `bitcoin:tx:${txid}`],
               ['p', recipient.pubkey],
               ['amount', String(amountSats)],
               ['alt', `On-chain zap: ${amountSats.toLocaleString()} sats`],
-            ],
+            ]),
           });
         } catch (err) {
           // The Bitcoin transaction already broadcast — the kind 8333 is a

@@ -6,6 +6,7 @@ import {
   FileText,
   GitBranch,
   GitPullRequest,
+  HandHeart,
   Mail,
   Megaphone,
   MessageCircle,
@@ -33,13 +34,14 @@ import {
 } from "@/components/AudioKindContent";
 import { ActionContent } from "@/components/ActionContent";
 import { BadgeContent } from "@/components/BadgeContent";
+import { CampaignNoteCardContent } from "@/components/CampaignNoteCardContent";
 import { CommunityContent } from "@/components/CommunityContent";
 import { CalendarEventContent } from "@/components/CalendarEventContent";
 import {
   ColorMomentContent,
   ColorMomentEyeButton,
 } from "@/components/ColorMomentContent";
-import { CommentContext, CountryCommentPill, CountryFlagBackdrop } from "@/components/CommentContext";
+import { CommentContext, CountryCommentPill } from "@/components/CommentContext";
 import { CommunityContentWarning } from "@/components/CommunityContentWarning";
 import { ContentWarningGuard } from "@/components/ContentWarningGuard";
 import { EmojifiedText, ReactionEmoji } from "@/components/CustomEmoji";
@@ -58,7 +60,6 @@ import { ChestIcon } from "@/components/icons/ChestIcon";
 import { RepostIcon } from "@/components/icons/RepostIcon";
 import { LiveStreamPlayer } from "@/components/LiveStreamPlayer";
 import { MagicDeckContent } from "@/components/MagicDeckContent";
-import { Nip05Badge } from "@/components/Nip05Badge";
 import { NoteContent } from "@/components/NoteContent";
 import { NoteMoreMenu } from "@/components/NoteMoreMenu";
 import { PatchCard } from "@/components/PatchCard";
@@ -86,7 +87,6 @@ import { ZapDialog } from "@/components/ZapDialog";
 import { useAppContext } from "@/hooks/useAppContext";
 import { useAuthor } from "@/hooks/useAuthor";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
-import { useNip05Verify } from "@/hooks/useNip05Verify";
 import { useOpenPost } from "@/hooks/useOpenPost";
 import { useProfileUrl } from "@/hooks/useProfileUrl";
 import { toast } from "@/hooks/useToast";
@@ -398,11 +398,6 @@ export const NoteCard = memo(function NoteCard({
   const metadata = author.data?.metadata;
   const actionMetadata = actionEvent ? actionAuthor.data?.metadata : metadata;
   const displayName = getDisplayName(metadata, event.pubkey);
-  const nip05 = metadata?.nip05;
-  const { data: nip05Verified, isPending: nip05Pending } = useNip05Verify(
-    nip05,
-    event.pubkey,
-  );
   const profileUrl = useProfileUrl(event.pubkey, metadata);
   const encodedId = useMemo(() => encodeEventId(actionTarget), [actionTarget]);
   const { data: stats } = useEventStats(actionTarget.id, actionTarget);
@@ -474,6 +469,7 @@ export const NoteCard = memo(function NoteCard({
   const isCommunity = event.kind === 34550;
   const isZapGoal = event.kind === 9041;
   const isAction = event.kind === 36639;
+  const isCampaign = event.kind === 33863;
   const isReaction = event.kind === 7;
   const isPollVote = event.kind === 1018;
   const isRepost = event.kind === 6 || event.kind === 16;
@@ -520,6 +516,7 @@ export const NoteCard = memo(function NoteCard({
     !isCommunity &&
     !isZapGoal &&
     !isAction &&
+    !isCampaign &&
     !isReaction &&
     !isPollVote &&
     !isRepost &&
@@ -683,6 +680,9 @@ export const NoteCard = memo(function NoteCard({
         ) : isAction ? (
           <ActionContent event={event} />
 
+        ) : isCampaign ? (
+          <CampaignNoteCardContent event={event} />
+
         ) : isVoiceMessage ? (
           <VoiceMessagePlayer event={event} />
         ) : isCalendarEvent ? (
@@ -776,12 +776,6 @@ export const NoteCard = memo(function NoteCard({
         )}
       </div>
       <div className="flex items-center gap-1 text-sm text-muted-foreground min-w-0 pr-2">
-        {nip05 && nip05Pending && <Skeleton className="h-3 w-24" />}
-        {nip05 && nip05Pending && <span className="shrink-0">·</span>}
-        {nip05 && nip05Verified && (
-          <Nip05Badge nip05={nip05} pubkey={event.pubkey} />
-        )}
-        {nip05 && nip05Verified && <span className="shrink-0">·</span>}
         <span className="shrink-0 hover:underline whitespace-nowrap">
           {timeAgo(event.created_at)}
         </span>
@@ -1111,9 +1105,6 @@ export const NoteCard = memo(function NoteCard({
         onClick={handleCardClick}
         onAuxClick={handleAuxClick}
       >
-        <CountryFlagBackdrop event={event} />
-        {/* Foreground wrapper — `relative` lifts the entire post above the
-            absolute backdrop layer rendered by CountryFlagBackdrop. */}
         <div className="relative">
           {threadedKindHeader && (
             <div>
@@ -1164,9 +1155,6 @@ export const NoteCard = memo(function NoteCard({
       onClick={handleCardClick}
       onAuxClick={handleAuxClick}
     >
-      <CountryFlagBackdrop event={event} />
-      {/* Foreground wrapper — `relative` lifts the entire post above the
-          absolute backdrop layer rendered by CountryFlagBackdrop. */}
       <div className="relative">
         <div>
           {/* Action header — repost takes priority, otherwise derived from event kind */}
@@ -1206,17 +1194,13 @@ export const NoteCard = memo(function NoteCard({
             })()
           )}
 
-          {/* Header: avatar + name/handle stacked. The country pill is
-              appended outside this flag-mode wrapper as a flex sibling, so
-              it keeps its own surface treatment. */}
+          {/* Header: avatar + name/handle with the country pill anchored
+              right. The pill is a flex sibling of the author row so it
+              keeps its own surface treatment regardless of context. */}
           <div className="flex items-center gap-3">
             {avatarElement}
             {authorInfo}
             {isColor && <ColorMomentEyeButton event={event} />}
-            {/* Country pill — rendered outside the flag-mode color flip via
-                `[&]:` to escape the parent's color rules. It's wrapped in
-                its own flex slot so the row layout matches the non-flag
-                case (pill anchored right). */}
             <CountryCommentPill
               event={event}
               className="shrink-0 [text-shadow:none]"
@@ -1813,6 +1797,12 @@ const KIND_HEADER_MAP: Record<number, KindHeaderConfig> = {
     action: (event) => publishedAtAction(event, { created: "created an", updated: "updated an", fallback: "shared an" }),
     noun: "organization",
     nounRoute: "/communities",
+  },
+  33863: {
+    icon: HandHeart,
+    action: (event) => publishedAtAction(event, { created: "launched a", updated: "updated a", fallback: "shared a" }),
+    noun: "campaign",
+    nounRoute: "/campaigns/all",
   },
   30009: {
     icon: Award,

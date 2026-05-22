@@ -25,7 +25,7 @@ const ReplyComposeModal = lazy(() => import("@/components/ReplyComposeModal").th
 const EmojiPackDialog = lazy(() => import("@/components/EmojiPackDialog").then(m => ({ default: m.EmojiPackDialog })));
 
 // Campaigns: home + create. (Campaign detail is dispatched from NIP19Page
-// when an naddr resolves to kind 30223.) The campaigns list IS the homepage;
+// when an naddr resolves to kind 33863.) The campaigns list IS the homepage;
 // the configurable HomePage delegation from the Twitter-era app is gone.
 const CampaignsPage = lazy(() => import("./pages/CampaignsPage").then(m => ({ default: m.CampaignsPage })));
 const CreateCampaignPage = lazy(() => import("./pages/CreateCampaignPage").then(m => ({ default: m.CreateCampaignPage })));
@@ -47,10 +47,8 @@ const ChangelogPage = lazy(() => import("./pages/ChangelogPage").then(m => ({ de
 const CommunitiesPage = lazy(() => import("./pages/CommunitiesPage").then(m => ({ default: m.CommunitiesPage })));
 const CreateCommunityPage = lazy(() => import("./pages/CreateCommunityPage").then(m => ({ default: m.CreateCommunityPage })));
 const CreateEventPage = lazy(() => import("./pages/CreateEventPage").then(m => ({ default: m.CreateEventPage })));
-const ContentPage = lazy(() => import("./pages/ContentPage").then(m => ({ default: m.ContentPage })));
 const ContentSettingsPage = lazy(() => import("./pages/ContentSettingsPage").then(m => ({ default: m.ContentSettingsPage })));
 const CSAEPolicyPage = lazy(() => import("./pages/CSAEPolicyPage").then(m => ({ default: m.CSAEPolicyPage })));
-const DiscoverPage = lazy(() => import("./pages/DiscoverPage").then(m => ({ default: m.DiscoverPage })));
 const DomainFeedPage = lazy(() => import("./pages/DomainFeedPage").then(m => ({ default: m.DomainFeedPage })));
 const EventsFeedPage = lazy(() => import("./pages/EventsFeedPage").then(m => ({ default: m.EventsFeedPage })));
 const ExternalContentPage = lazy(() => import("./pages/ExternalContentPage").then(m => ({ default: m.ExternalContentPage })));
@@ -63,7 +61,6 @@ const KindFeedPage = lazy(() => import("./pages/KindFeedPage").then(m => ({ defa
 const LetterComposePage = lazy(() => import("./pages/LetterComposePage").then(m => ({ default: m.LetterComposePage })));
 const LetterPreferencesPage = lazy(() => import("./pages/LetterPreferencesPage").then(m => ({ default: m.LetterPreferencesPage })));
 const LettersPage = lazy(() => import("./pages/LettersPage").then(m => ({ default: m.LettersPage })));
-const MagicSettingsPage = lazy(() => import("./pages/MagicSettingsPage").then(m => ({ default: m.MagicSettingsPage })));
 const MusicPage = lazy(() => import("./pages/MusicPage").then(m => ({ default: m.MusicPage })));
 const NetworkSettingsPage = lazy(() => import("./pages/NetworkSettingsPage").then(m => ({ default: m.NetworkSettingsPage })));
 const NIP19Page = lazy(() => import("./pages/NIP19Page").then(m => ({ default: m.NIP19Page })));
@@ -93,7 +90,6 @@ const WikipediaPage = lazy(() => import("./pages/WikipediaPage").then(m => ({ de
 const WorldPage = lazy(() => import("./pages/WorldPage").then(m => ({ default: m.WorldPage })));
 const FollowPage = lazy(() => import("./pages/FollowPage").then(m => ({ default: m.FollowPage })));
 const ReceivePage = lazy(() => import("./pages/ReceivePage").then(m => ({ default: m.ReceivePage })));
-const ClaimPage = lazy(() => import("./pages/ClaimPage").then(m => ({ default: m.ClaimPage })));
 const RemoteLoginSuccessPage = lazy(() => import("./pages/RemoteLoginSuccessPage").then(m => ({ default: m.RemoteLoginSuccessPage })));
 
 const pollsDef = getExtraKindDef("polls")!;
@@ -167,12 +163,10 @@ export function AppRouter() {
           {/* Auto-follow deep link: fullscreen immersive (no sidebars/nav) */}
           <Route path="/follow/:npub" element={<FollowPage />} />
           <Route path="/receive" element={<ReceivePage />} />
-          <Route path="/claim" element={<ClaimPage />} />
 
           {/* All routes share the persistent FundraiserLayout (top nav + footer) */}
           <Route element={<FundraiserLayout />}>
             <Route path="/" element={<CampaignsPage />} />
-            <Route path="/discover" element={<DiscoverPage />} />
             <Route path="/feed" element={<Index />} />
             <Route path="/campaigns" element={<Navigate to="/" replace />} />
             <Route path="/campaigns/new" element={<CreateCampaignPage />} />
@@ -189,7 +183,6 @@ export function AppRouter() {
             <Route path="/settings/appearance" element={<AppearanceSettingsPage />} />
             <Route path="/settings/profile" element={<ProfileSettings />} />
             <Route path="/settings/feed" element={<ContentSettingsPage />} />
-            <Route path="/settings/content" element={<ContentPage />} />
             <Route path="/settings/wallet" element={<WalletSettingsPage />} />
             <Route
               path="/settings/notifications"
@@ -199,7 +192,6 @@ export function AppRouter() {
               path="/settings/advanced"
               element={<AdvancedSettingsPage />}
             />
-            <Route path="/settings/magic" element={<MagicSettingsPage />} />
             <Route path="/settings/network" element={<NetworkSettingsPage />} />
             <Route path="/lists" element={<UserListsPage />} />
             <Route path="/events" element={<EventsFeedPage />} />

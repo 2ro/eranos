@@ -1,10 +1,10 @@
 import type React from 'react';
-import { type ReactNode, useMemo, useState } from 'react';
+import { type ReactNode, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { nip19 } from 'nostr-tools';
 import {
   Award, BarChart3, Bird, BookOpen, Camera, Clapperboard, FileText, Film,
-  GitBranch, GitPullRequest, Highlighter, Mail, MapPin, Megaphone, MessageSquare, Mic, Music,
+  GitBranch, GitPullRequest, HandHeart, Highlighter, Mail, MapPin, Megaphone, MessageSquare, Mic, Music,
   Package, Palette, PartyPopper, Podcast, Radio, Rocket, SmilePlus,
   Stars, Target, Users, UserCheck, Vote, Zap,
 } from 'lucide-react';
@@ -29,13 +29,11 @@ import { useLinkPreview } from '@/hooks/useLinkPreview';
 import { useScryfallCard } from '@/hooks/useScryfallCard';
 import { getDisplayName } from '@/lib/getDisplayName';
 import { genUserName } from '@/lib/genUserName';
-import { getCountryInfo, getWikipediaTitle } from '@/lib/countries';
+import { getCountryInfo } from '@/lib/countries';
 import { CountryFlag } from '@/components/CountryFlag';
-import { customFlagAsset, hasCustomFlag } from '@/lib/customFlags';
+import { hasCustomFlag } from '@/lib/customFlags';
 import { useCountryFeed } from '@/contexts/CountryFeedContext';
 import { cn } from '@/lib/utils';
-import { useFlagPalette } from '@/lib/flagPalette';
-import { useWikipediaSummary } from '@/hooks/useWikipediaSummary';
 import { extractGathererCard, type GathererCard } from '@/lib/linkEmbed';
 import { cardPrimaryImage } from '@/lib/scryfall';
 
@@ -148,6 +146,7 @@ const KIND_LABELS: Record<number, string> = {
   34236: 'a divine',
   34550: 'an organization',
   9041: 'a goal',
+  33863: 'a campaign',
   35128: 'an nsite',
   36639: 'a pledge',
   36787: 'a track',
@@ -205,6 +204,7 @@ const KIND_ICONS: Partial<Record<number, React.ComponentType<{ className?: strin
   39089: PartyPopper,
   3367: Palette,
   9041: Target,
+  33863: HandHeart,
   9735: Zap,
   9802: Highlighter,
   2473: Bird,
@@ -247,6 +247,7 @@ const KIND_SUFFIXES: Partial<Record<number, string>> = {
   37516: 'treasure',
   30621: 'constellation',
   34550: 'organization',
+  33863: 'campaign',
   30054: 'episode',
   30055: 'trailer',
   34139: 'playlist',
@@ -912,10 +913,9 @@ function useCountryRootContext(event: NostrEvent): { iTag: string; code: string 
 }
 
 /**
- * Whether the given event is rendering with country chrome (pill + flag
- * backdrop) in the current context. Useful for sibling components that want
- * to coordinate styling — e.g. NoteCard switching its text to white when a
- * flag is showing through behind the author row.
+ * Whether the given event is rendering with country chrome (the corner
+ * flag pill) in the current context. Useful for sibling components that
+ * want to coordinate styling.
  */
 // eslint-disable-next-line react-refresh/only-export-components
 export function useIsCountryRooted(event: NostrEvent): boolean {
@@ -939,100 +939,11 @@ export function CountryCommentPill({ event, className }: { event: NostrEvent; cl
 }
 
 /**
- * Decorative flag backdrop for country-rooted kind-1111 posts. Renders the
- * country's Wikipedia lead image (the flag, for country articles) faded
- * behind the post, echoing the country detail page's hero
- * (`CountryContentHeader` in `ExternalContentHeader.tsx`) but scaled down
- * to a card. Pairs with `CountryCommentPill`.
- *
- * Designed to be rendered as the first child of a `relative overflow-hidden`
- * parent. The wrapper is absolutely positioned at `z-0`; its foreground
- * siblings must declare `relative` (any positioned value works) so they
- * paint above the backdrop. Pointer events are disabled so the post body
- * stays fully interactive.
- *
- * The Wikipedia summary fetch is cached for 24 h across all cards
- * referencing the same country code, so a feed of N Venezuelan posts only
- * pays the network cost once.
- *
- * Visibility rules: see `useCountryRootContext` (identical to the pill).
+ * Decorative flag backdrop for country-rooted kind-1111 posts has been
+ * removed in favor of a cleaner card surface. The `CountryCommentPill`
+ * in the upper-right of the header is now the sole country chrome for
+ * world posts.
  */
-export function CountryFlagBackdrop({ event }: { event: NostrEvent }) {
-  const ctx = useCountryRootContext(event);
-  const info = ctx ? getCountryInfo(ctx.code) : null;
-  const wikiTitle = ctx ? getWikipediaTitle(ctx.code) : null;
-  const { data: wiki } = useWikipediaSummary(wikiTitle);
-  // Sample dominant colors from the flag emoji at render time. Used as the
-  // fallback gradient while Wikipedia is still resolving and after image
-  // load failures, so the backdrop never reverts to a giant blurred emoji.
-  const palette = useFlagPalette(info?.flag);
-  // Track image load failures so we cleanly fall back to the flag-color
-  // gradient. Wikipedia hosts these PNGs from upload.wikimedia.org which is
-  // generally CORS-friendly, but hotlink-protection or transient 4xx
-  // responses can still happen.
-  const [imageFailed, setImageFailed] = useState(false);
-
-  if (!ctx) return null;
-
-  // Bundled-asset override: for codes with a curated flag SVG (currently
-  // CN-XZ / Tibet) we skip Wikipedia entirely — its lead image is often
-  // a parent-country map or an administrative-region inset, neither of
-  // which reads as a flag behind a note. The Snow Lion SVG is what the
-  // post is editorially "about", so it earns the backdrop slot.
-  const bundledAsset = customFlagAsset(ctx.code);
-  // For country articles Wikipedia returns the flag as the page's lead image
-  // — the same source used by `CountryContentHeader`. Prefer the original
-  // (full-resolution) over the 330px thumbnail; the thumbnail gets upscaled
-  // and looks fuzzy when stretched across a full-width feed card.
-  const flagImage = !imageFailed
-    ? (bundledAsset ?? wiki?.originalImage?.source ?? wiki?.thumbnail?.source ?? null)
-    : null;
-
-  // Pre-built gradient using the palette (sampled from the flag emoji at
-  // mount). Used as the fallback when Wikipedia hasn't returned an image or
-  // its image failed to load. Single-color palettes get duplicated so
-  // linear-gradient still has two stops.
-  const paletteGradient =
-    palette && palette.length > 0
-      ? `linear-gradient(135deg, ${palette.length === 1 ? `${palette[0]}, ${palette[0]}` : palette.join(', ')})`
-      : null;
-
-  return (
-    <div aria-hidden className="pointer-events-none absolute inset-0 z-0 overflow-hidden">
-      <div className="absolute top-0 left-0 right-0 h-64 sm:h-72">
-        {flagImage ? (
-          // Full-width flag banner across the top of the card. A mask-image
-          // gradient fades the image to nothing at its bottom edge, so the
-          // flag dissolves into the card with no hard seam.
-          <img
-            src={flagImage}
-            alt=""
-            decoding="async"
-            onError={() => setImageFailed(true)}
-            className="w-full h-full object-cover opacity-20 select-none"
-            style={{
-              maskImage: 'linear-gradient(to bottom, black 0%, black 35%, transparent 100%)',
-              WebkitMaskImage: 'linear-gradient(to bottom, black 0%, black 35%, transparent 100%)',
-            }}
-          />
-        ) : paletteGradient ? (
-          // Wikipedia not yet resolved (or its image failed) — paint the
-          // flag-color gradient as a placeholder/fallback. Same opacity and
-          // mask shape as the image so the visual swap is seamless when the
-          // image arrives.
-          <div
-            className="absolute inset-0 opacity-20"
-            style={{
-              backgroundImage: paletteGradient,
-              maskImage: 'linear-gradient(to bottom, black 0%, black 35%, transparent 100%)',
-              WebkitMaskImage: 'linear-gradient(to bottom, black 0%, black 35%, transparent 100%)',
-            }}
-          />
-        ) : null}
-      </div>
-    </div>
-  );
-}
 
 /**
  * Body-level comment context for ISO 3166 roots — intentionally renders

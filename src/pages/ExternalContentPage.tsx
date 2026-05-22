@@ -23,12 +23,10 @@ import {
   BookContentHeader,
   CountryContentHeader,
 } from '@/components/ExternalContentHeader';
-import { PrecipitationEffect } from '@/components/PrecipitationEffect';
 import { parseExternalUri, headerLabel, seoTitle, type ExternalContent } from '@/lib/externalContent';
 import { ratingToStars } from '@/lib/bookstr';
 import { formatNumber } from '@/lib/formatNumber';
 import { useAppContext } from '@/hooks/useAppContext';
-import { useWeather, getPrecipitation } from '@/hooks/useWeather';
 import { useComments } from '@/hooks/useComments';
 import { usePaginatedFeed } from '@/hooks/usePaginatedFeed';
 import { useInfiniteScroll } from '@/hooks/useInfiniteScroll';
@@ -361,11 +359,6 @@ export function ExternalContentPage() {
   // FAB opens the comment compose dialog
   const [composeOpen, setComposeOpen] = useState(false);
   const openCompose = useCallback(() => setComposeOpen(true), []);
-  const { data: weather } = useWeather(countryCode);
-  const precipitation = useMemo(() => {
-    if (!weather) return null;
-    return getPrecipitation(weather.weatherCode);
-  }, [weather]);
 
   useLayoutOptions({
     showFAB: true,
@@ -378,11 +371,6 @@ export function ExternalContentPage() {
 
   return (
     <main className="">
-      {/* Precipitation overlay for country pages */}
-      {precipitation?.type && (
-        <PrecipitationEffect type={precipitation.type} intensity={precipitation.intensity} />
-      )}
-
       {/* Non-sticky transparent header — skipped on country pages because
           the country hero carries its own back arrow overlaid on the
           photo, which lets the cinematic banner reach all the way to the

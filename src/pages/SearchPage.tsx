@@ -4,11 +4,7 @@ import {
   SlidersHorizontal,
   Search as SearchIcon,
   UserRoundCheck,
-  User,
   RotateCcw,
-  BookmarkPlus,
-  Check,
-  Loader2,
   Globe, Users, UserSearch,
   Clock, Flame, TrendingUp,
 } from 'lucide-react';
@@ -16,7 +12,6 @@ import { useState, useMemo, useEffect, useCallback, useRef } from 'react';
 import { useInView } from 'react-intersection-observer';
 import { Link, useSearchParams } from 'react-router-dom';
 import { NoteCard } from '@/components/NoteCard';
-import { FeedCard } from '@/components/FeedCard';
 import { PullToRefresh } from '@/components/PullToRefresh';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
@@ -35,10 +30,6 @@ import { KindPicker, AuthorChip, AuthorFilterDropdown } from '@/components/Saved
 import { useSearchProfiles } from '@/hooks/useSearchProfiles';
 import { useAuthor } from '@/hooks/useAuthor';
 import { useStreamPosts } from '@/hooks/useStreamPosts';
-import { useSavedFeeds } from '@/hooks/useSavedFeeds';
-import { useCurrentUser } from '@/hooks/useCurrentUser';
-import { useProfileTabs } from '@/hooks/useProfileTabs';
-import { usePublishProfileTabs } from '@/hooks/usePublishProfileTabs';
 import { useFollowList } from '@/hooks/useFollowActions';
 import { useUserLists, useMatchedListId } from '@/hooks/useUserLists';
 import { useFollowPacks } from '@/hooks/useFollowPacks';
@@ -50,18 +41,20 @@ import { VerifiedNip05Text } from '@/components/Nip05Badge';
 import { SubHeaderBar } from '@/components/SubHeaderBar';
 import { TabButton } from '@/components/TabButton';
 import { cn, parseKindFilter } from '@/lib/utils';
-import type { TabFilter } from '@/contexts/AppContext';
 import { useLayoutOptions, useNavHidden } from '@/contexts/LayoutContext';
 import { PageHeader } from '@/components/PageHeader';
 import { isRepostKind, parseRepostContent } from '@/lib/feedUtils';
 import { nip19 } from 'nostr-tools';
 
-type TabType = 'communities' | 'posts' | 'accounts';
+type TabType = 'agora' | 'posts' | 'accounts';
 
-const VALID_TABS: TabType[] = ['communities', 'posts', 'accounts'];
+const VALID_TABS: TabType[] = ['agora', 'posts', 'accounts'];
 
 function parseTab(value: string | null): TabType {
-  return VALID_TABS.includes(value as TabType) ? (value as TabType) : 'communities';
+  // Back-compat: ?tab=communities and ?tab=activity used to be the default tab;
+  // alias them both to agora.
+  if (value === 'communities' || value === 'activity') return 'agora';
+  return VALID_TABS.includes(value as TabType) ? (value as TabType) : 'agora';
 }
 
 const VALID_AUTHOR_SCOPES = ['anyone', 'follows', 'people'] as const;
@@ -75,7 +68,7 @@ const DEFAULT_FILTERS = {
   mediaType: 'all' as const,
   language: 'global',
   platform: 'nostr' as const,
-  kindFilter: 'all',
+  kindFilter: 'agora',
   customKindText: '',
   authorScope: 'anyone' as AuthorScope,
   sort: 'recent' as SortPref,
@@ -198,7 +191,7 @@ export function SearchPage() {
   const setActiveTab = useCallback((tab: TabType) => {
     setSearchParams((prev) => {
       const next = new URLSearchParams(prev);
-      if (tab === 'communities') {
+      if (tab === 'agora') {
         next.delete('tab');
       } else {
         next.set('tab', tab);
@@ -262,15 +255,18 @@ export function SearchPage() {
   const allKindNumbers = useMemo(() => kindOptions.map((o) => Number(o.value)), [kindOptions]);
 
   // Resolve kindsOverride from the current kind filter state.
-  // "all" means every kind in the picker list, not undefined (which would let
-  // useStreamPosts fall back to only the user's enabled feed-settings kinds).
+  // "all" means every kind in the picker list, not undefined (which would
+  // let useStreamPosts fall back to only the user's enabled feed-settings
+  // kinds). "agora" expands to the curated Agora preset set.
   const kindsOverride = useMemo<number[]>(
     () => kindFilter === 'all' ? allKindNumbers : (parseKindFilter(kindFilter, customKindText) ?? allKindNumbers),
     [kindFilter, customKindText, allKindNumbers],
   );
 
-  // Detect kind + media type conflict: a specific kind is selected AND a media type is set
-  const hasKindMediaConflict = kindFilter !== 'all' && kindsOverride.length > 0 && mediaType !== 'all';
+  // Detect kind + media type conflict: a non-broad kind is selected AND a
+  // media type is set. "all" and "agora" are both broad selections that
+  // don't conflict with media filters.
+  const hasKindMediaConflict = kindFilter !== 'all' && kindFilter !== 'agora' && kindsOverride.length > 0 && mediaType !== 'all';
 
   // Determine if any filter differs from the default
   const hasActiveFilters = !includeReplies || mediaType !== DEFAULT_FILTERS.mediaType ||
@@ -302,7 +298,7 @@ export function SearchPage() {
       : ['protocol:nostr'];
     if (debouncedSearchQuery.trim()) parts.push(debouncedSearchQuery.trim());
     if (language !== 'global') parts.push(`language:${language}`);
-    const isDedicatedKindQuery = kindFilter === 'all' && (mediaType === 'vines' || mediaType === 'images' || mediaType === 'videos');
+    const isDedicatedKindQuery = (kindFilter === 'all' || kindFilter === 'agora') && (mediaType === 'vines' || mediaType === 'images' || mediaType === 'videos');
     if (!isDedicatedKindQuery && !hasKindMediaConflict) {
       if (mediaType === 'images') { parts.push('media:true'); parts.push('video:false'); }
       else if (mediaType === 'videos') parts.push('video:true');
@@ -321,7 +317,13 @@ export function SearchPage() {
     if (language !== 'global') labels.push(language.toUpperCase());
     if (platform !== 'nostr') labels.push({ activitypub: 'Mastodon', atproto: 'Bluesky' }[platform] ?? platform);
     if (sort !== 'recent') labels.push(sort === 'hot' ? 'Hot' : 'Trending');
-    if (kindFilter !== 'all' && kindFilter !== 'custom') {
+    if (kindFilter === 'agora') {
+      // 'agora' is the default — no chip needed.
+    } else if (kindFilter === 'all') {
+      labels.push('All kinds');
+    } else if (kindFilter === 'custom') {
+      if (customKindText) labels.push(`Kind: ${customKindText}`);
+    } else {
       const kindValues = kindFilter.split(',').filter(Boolean);
       if (kindValues.length === 1) {
         const opt = kindOptions.find(o => o.value === kindValues[0]);
@@ -330,8 +332,6 @@ export function SearchPage() {
       } else if (kindValues.length > 1) {
         labels.push(`${kindValues.length} kinds`);
       }
-    } else if (kindFilter === 'custom' && customKindText) {
-      labels.push(`Kind: ${customKindText}`);
     }
     if (authorScope === 'follows') labels.push('My follows');
     if (authorScope === 'people' && authorPubkeys.length > 0) labels.push(`${authorPubkeys.length} author${authorPubkeys.length > 1 ? 's' : ''}`);
@@ -339,60 +339,12 @@ export function SearchPage() {
   }, [includeReplies, mediaType, language, platform, sort, kindFilter, customKindText, authorScope, authorPubkeys, kindOptions]);
 
   // Hooks
-  const { user } = useCurrentUser();
   const { data: followData } = useFollowList();
   const followPubkeys = useMemo(() => followData?.pubkeys ?? [], [followData?.pubkeys]);
   const { lists } = useUserLists();
   const { data: followPacks = [] } = useFollowPacks();
-  const { savedFeeds, addSavedFeed, isPending: isSavingFeed } = useSavedFeeds();
-  const profileTabsQuery = useProfileTabs(user?.pubkey);
-  const { publishProfileTabs, isPending: isPublishingTabs } = usePublishProfileTabs();
-  const [savePopoverOpen, setSavePopoverOpen] = useState(false);
-  const [saveFeedLabel, setSaveFeedLabel] = useState('');
-  const [savedJustNow, setSavedJustNow] = useState(false);
 
   const listPickerValue = useMatchedListId(authorPubkeys);
-
-  // 'people' scope with explicit authors = user-specific; not eligible for profile tab
-  const isAuthorSpecific = authorScope === 'people' && authorPubkeys.length > 0;
-
-  // Build a standard NIP-01 TabFilter from the current search state
-  const currentFilter = useMemo<TabFilter>(() => {
-    const filter: TabFilter = {};
-    if (debouncedSearchQuery.trim()) filter.search = debouncedSearchQuery.trim();
-    if (kindsOverride && kindsOverride.length > 0) filter.kinds = kindsOverride;
-    if (authorScope === 'people' && authorPubkeys.length > 0) filter.authors = authorPubkeys;
-    return filter;
-  }, [debouncedSearchQuery, kindsOverride, authorScope, authorPubkeys]);
-
-  const alreadySaved = savedFeeds.some(
-    (f) => JSON.stringify(f.filter) === JSON.stringify(currentFilter),
-  );
-
-  const handleSaveFeed = async () => {
-    if (!saveFeedLabel.trim() || isSavingFeed) return;
-    const varsToSave = authorScope === 'follows' && user
-      ? [{ name: '$follows', tagName: 'p', pointer: `a:3:${user.pubkey}:` }]
-      : [];
-    await addSavedFeed(saveFeedLabel, currentFilter, varsToSave);
-    setSavePopoverOpen(false);
-    setSaveFeedLabel('');
-    setSavedJustNow(true);
-    setTimeout(() => setSavedJustNow(false), 2000);
-  };
-
-  const handleSaveProfileTab = async () => {
-    if (!saveFeedLabel.trim() || isPublishingTabs || !user) return;
-    const existing = profileTabsQuery.data ?? { tabs: [], vars: [] };
-    await publishProfileTabs({
-      tabs: [...existing.tabs, { label: saveFeedLabel.trim(), filter: currentFilter }],
-      vars: existing.vars,
-    });
-    setSavePopoverOpen(false);
-    setSaveFeedLabel('');
-    setSavedJustNow(true);
-    setTimeout(() => setSavedJustNow(false), 2000);
-  };
 
   // Resolve author pubkeys for the stream
   const streamAuthorPubkeys = authorScope === 'follows'
@@ -421,8 +373,8 @@ export function SearchPage() {
     <main className="flex-1 min-w-0">
       <PageHeader title="Search" icon={<SearchIcon className="size-5" />} />
       <SubHeaderBar>
-        <TabButton label="Communities" active={activeTab === 'communities'} onClick={() => setActiveTab('communities')} />
-        <TabButton label="Posts" active={activeTab === 'posts'} onClick={() => setActiveTab('posts')} />
+        <TabButton label="Agora" active={activeTab === 'agora'} onClick={() => setActiveTab('agora')} />
+        <TabButton label="Nostr" active={activeTab === 'posts'} onClick={() => setActiveTab('posts')} />
         <TabButton label="Accounts" active={activeTab === 'accounts'} onClick={() => setActiveTab('accounts')} />
       </SubHeaderBar>
 
@@ -434,81 +386,8 @@ export function SearchPage() {
             onDebouncedChange={setDebouncedSearchQuery}
           />
 
-          {/* Add to feed button (posts & communities tabs) */}
-          {(activeTab === 'posts' || activeTab === 'communities') && user && (
-            <div className={cn(!debouncedSearchQuery.trim() && !hasActiveFilters ? 'hidden' : undefined)}>
-              <Popover open={savePopoverOpen} onOpenChange={(o) => {
-                setSavePopoverOpen(o);
-                if (o && !saveFeedLabel) {
-                  if (debouncedSearchQuery.trim()) {
-                    setSaveFeedLabel(debouncedSearchQuery.trim());
-                  } else if (listPickerValue) {
-                    const matched =
-                      listPickerValue.startsWith('set:')
-                        ? lists.find((l) => l.id === listPickerValue.slice(4))?.title
-                        : followPacks.find((p) => p.id === listPickerValue.slice(5))?.title;
-                    if (matched) setSaveFeedLabel(matched);
-                  }
-                }
-              }}>
-                <PopoverTrigger asChild>
-                  <button
-                    className={cn(
-                      'shrink-0 h-10 w-10 rounded-lg border flex items-center justify-center transition-colors',
-                      alreadySaved || savedJustNow
-                        ? 'border-primary bg-primary/10 text-primary'
-                        : 'border-border bg-secondary/50 hover:bg-secondary text-muted-foreground hover:text-foreground',
-                    )}
-                    style={{ outline: 'none' }}
-                    aria-label="Add to feed"
-                  >
-                    {savedJustNow ? <Check className="size-4" /> : <BookmarkPlus className="size-4" />}
-                  </button>
-                </PopoverTrigger>
-                <PopoverContent align="end" className="w-64 p-3 space-y-3">
-                  <p className="font-semibold text-sm">Save as tab</p>
-
-                  {alreadySaved ? (
-                    <p className="text-sm text-muted-foreground">Already saved.</p>
-                  ) : (
-                    <>
-                      <Input
-                        placeholder="Tab name…"
-                        value={saveFeedLabel}
-                        onChange={(e) => setSaveFeedLabel(e.target.value)}
-                        onKeyDown={(e) => { if (e.key === 'Enter') handleSaveFeed(); }}
-                        className="bg-secondary/50 border-border focus-visible:ring-1 text-base md:text-sm"
-                        autoFocus
-                      />
-                      <div className="space-y-1">
-                        <SaveDestinationRow
-                          icon={<BookmarkPlus className="size-4 text-muted-foreground" />}
-                          label="Home feed"
-                          description="Tab on your home page"
-                          onClick={() => handleSaveFeed()}
-                          disabled={!saveFeedLabel.trim() || isSavingFeed || isPublishingTabs}
-                          loading={isSavingFeed}
-                        />
-                        {!isAuthorSpecific && (
-                          <SaveDestinationRow
-                            icon={<User className="size-4 text-muted-foreground" />}
-                            label="Profile tab"
-                            description="Your posts matching this search"
-                            onClick={() => handleSaveProfileTab()}
-                            disabled={!saveFeedLabel.trim() || isSavingFeed || isPublishingTabs}
-                            loading={isPublishingTabs}
-                          />
-                        )}
-                      </div>
-                    </>
-                  )}
-                </PopoverContent>
-              </Popover>
-            </div>
-          )}
-
-          {/* Filter popover (posts & communities tabs) */}
-          {(activeTab === 'posts' || activeTab === 'communities') && (
+          {/* Filter popover (posts & agora tabs) */}
+          {(activeTab === 'posts' || activeTab === 'agora') && (
             <Popover open={filtersOpen} onOpenChange={setFiltersOpen}>
               <PopoverTrigger asChild>
                 <button
@@ -629,7 +508,7 @@ export function SearchPage() {
                   </div>
                 </div>
 
-                {/* Posts-only filters (hidden on communities tab) */}
+                {/* Posts-only filters (hidden on agora tab) */}
                 {activeTab === 'posts' && (
                   <>
                     <Separator />
@@ -715,8 +594,8 @@ export function SearchPage() {
           )}
         </div>
 
-        {/* Active filter summary chips (posts & communities tabs) */}
-        {(activeTab === 'posts' || activeTab === 'communities') && activeFilterLabels.length > 0 && (
+        {/* Active filter summary chips (posts & agora tabs) */}
+        {(activeTab === 'posts' || activeTab === 'agora') && activeFilterLabels.length > 0 && (
           <div className="flex flex-wrap gap-1.5 mt-2">
             {activeFilterLabels.map((label) => (
               <Badge key={label} variant="secondary" className="text-xs font-normal">
@@ -732,8 +611,8 @@ export function SearchPage() {
           </div>
         )}
 
-        {/* NIP-50 search query debug block (posts & communities tabs) */}
-        {(activeTab === 'posts' || activeTab === 'communities') && debouncedSearchQuery.trim() && (
+        {/* NIP-50 search query debug block (posts & agora tabs) */}
+        {(activeTab === 'posts' || activeTab === 'agora') && debouncedSearchQuery.trim() && (
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
@@ -753,9 +632,9 @@ export function SearchPage() {
       </div>
 
       <PullToRefresh onRefresh={handleRefresh}>
-        {/* ─── Communities Tab ─── */}
-        {activeTab === 'communities' && (
-          <CommunitiesSearchTab
+        {/* ─── Agora Tab ─── */}
+        {activeTab === 'agora' && (
+          <AgoraSearchTab
             searchQuery={debouncedSearchQuery}
             includeReplies={includeReplies}
             mediaType={mediaType}
@@ -797,13 +676,13 @@ export function SearchPage() {
             )}
             {/* Post results — stream */}
             {postsLoading && posts.length === 0 ? (
-              <FeedCard className="mt-2 divide-y divide-border">
+              <div className="mt-2 divide-y divide-border">
                 {Array.from({ length: 5 }).map((_, i) => (
                   <PostSkeleton key={i} />
                 ))}
-              </FeedCard>
+              </div>
             ) : posts.length > 0 ? (
-              <FeedCard className="mt-2">
+              <div className="mt-2">
                 {posts.map((event) => {
                   const isNew = flushedIds.has(event.id);
                   if (isRepostKind(event.kind)) {
@@ -815,15 +694,15 @@ export function SearchPage() {
                   }
                   return <NoteCard key={event.id} event={event} highlight={isNew} />;
                 })}
-              </FeedCard>
+              </div>
             ) : debouncedSearchQuery.trim() ? (
               <EmptyState
-                message="No posts found matching your search."
+                message="No results found matching your search."
                 activeFilters={activeFilterLabels}
                 onResetFilters={hasActiveFilters ? resetFilters : undefined}
               />
             ) : (
-              <EmptyState message="Enter a search query to find posts." />
+              <EmptyState message="Enter a search query to find Nostr content." />
             )}
           </>
         )}
@@ -834,17 +713,17 @@ export function SearchPage() {
             <div>
               {debouncedSearchQuery.trim() ? (
                 profilesLoading ? (
-                  <FeedCard className="mt-2 divide-y divide-border">
+                  <div className="mt-2 divide-y divide-border">
                     {Array.from({ length: 5 }).map((_, i) => (
                       <AccountSkeleton key={i} />
                     ))}
-                  </FeedCard>
+                  </div>
                 ) : profiles && profiles.length > 0 ? (
-                  <FeedCard className="mt-2 divide-y divide-border">
+                  <div className="mt-2 divide-y divide-border">
                     {profiles.map((profile) => (
                       <AccountItem key={profile.pubkey} profile={profile} isFollowed={followedPubkeys.has(profile.pubkey)} />
                     ))}
-                  </FeedCard>
+                  </div>
                 ) : (
                   <EmptyState message="No accounts found matching your search." />
                 )
@@ -930,7 +809,7 @@ function FollowsList() {
   }
 
   return (
-    <FeedCard className="mt-2 divide-y divide-border">
+    <div className="mt-2 divide-y divide-border">
       {visiblePubkeys.map((pubkey) => (
         <FollowItem key={pubkey} pubkey={pubkey} />
       ))}
@@ -941,7 +820,7 @@ function FollowsList() {
           ))}
         </div>
       )}
-    </FeedCard>
+    </div>
   );
 }
 
@@ -1112,8 +991,12 @@ function SearchInput({
   );
 }
 
-/** Communities tab — isolated component so useStreamPosts only subscribes when active. */
-function CommunitiesSearchTab({
+/** Agora tab — isolated component so useStreamPosts only subscribes when active.
+ *  Pins kinds to [33863 Campaigns, 36639 Pledges, 34550 Groups/Communities] —
+ *  the non-kind-1 Agora content stream — and narrows to events whose NIP-89
+ *  `client` tag is the running app name (e.g. "Agora"). Kind 1 posts and the
+ *  unconstrained Nostr firehose live on the Nostr tab instead. */
+function AgoraSearchTab({
   searchQuery,
   includeReplies,
   mediaType,
@@ -1136,71 +1019,49 @@ function CommunitiesSearchTab({
   hasActiveFilters: boolean;
   resetFilters: () => void;
 }) {
+  const { config } = useAppContext();
+  const clientName = config.clientName ?? config.appName;
   const { posts, isLoading: postsLoading } = useStreamPosts(searchQuery, {
     includeReplies,
     mediaType,
     language,
     protocols,
-    kindsOverride: [34550],
+    kindsOverride: [33863, 36639, 34550],
     authorPubkeys,
     sort,
+    clientName,
   });
 
   if (postsLoading && posts.length === 0) {
     return (
-      <FeedCard className="mt-2 divide-y divide-border">
+      <div className="mt-2 divide-y divide-border">
         {Array.from({ length: 5 }).map((_, i) => (
           <PostSkeleton key={i} />
         ))}
-      </FeedCard>
+      </div>
     );
   }
 
   if (posts.length > 0) {
     return (
-      <FeedCard className="mt-2">
+      <div className="mt-2">
         {posts.map((event) => (
           <NoteCard key={event.id} event={event} />
         ))}
-      </FeedCard>
+      </div>
     );
   }
 
   if (searchQuery.trim()) {
     return (
       <EmptyState
-        message="No communities found matching your search."
+        message="No Agora campaigns, pledges, or groups found matching your search."
         activeFilters={activeFilterLabels}
         onResetFilters={hasActiveFilters ? resetFilters : undefined}
       />
     );
   }
 
-  return <EmptyState message="Search for communities or browse the latest." />;
-}
-
-function SaveDestinationRow({
-  icon, label, description, onClick, disabled, loading,
-}: {
-  icon: React.ReactNode;
-  label: string;
-  description: string;
-  onClick: () => void;
-  disabled: boolean;
-  loading: boolean;
-}) {
-  return (
-    <button
-      onClick={onClick}
-      disabled={disabled}
-      className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-secondary/60 disabled:opacity-40 disabled:pointer-events-none transition-colors text-left"
-    >
-      <span className="shrink-0">{loading ? <Loader2 className="size-4 animate-spin text-muted-foreground" /> : icon}</span>
-      <span className="flex-1 min-w-0">
-        <span className="block text-sm font-medium">{label}</span>
-        <span className="block text-xs text-muted-foreground">{description}</span>
-      </span>
-    </button>
-  );
+  return <EmptyState message="Search Agora campaigns, pledges, and groups, or browse the latest." />;
 }
 

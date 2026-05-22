@@ -1,5 +1,5 @@
 import { useState, type ComponentType } from 'react';
-import { Link, NavLink } from 'react-router-dom';
+import { Link, NavLink, useNavigate } from 'react-router-dom';
 import {
   Activity,
   Bell,
@@ -33,8 +33,9 @@ interface NavItem {
 }
 
 const NAV_ITEMS: NavItem[] = [
-  { label: 'Discover', to: '/discover', icon: HandHeart },
-  { label: 'Organize', to: '/communities', icon: Users },
+  { label: 'Activity', to: '/feed', icon: Activity },
+  { label: 'Campaigns', to: '/campaigns/all', icon: HandHeart },
+  { label: 'Groups', to: '/communities', icon: Users },
   { label: 'Pledge', to: '/pledges', icon: Megaphone },
 ];
 
@@ -53,6 +54,9 @@ export function TopNav() {
   const { user } = useCurrentUser();
   const { orderedItems } = useFeedSettings();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const navigate = useNavigate();
+
+  const goToSearch = () => navigate('/search');
 
   return (
     <header className="sticky top-0 z-40 w-full border-b border-border bg-background/85 backdrop-blur supports-[backdrop-filter]:bg-background/70">
@@ -88,6 +92,18 @@ export function TopNav() {
 
         {/* Right cluster */}
         <div className="flex items-center gap-2 sm:gap-3">
+          {/* Search — navigates to the /search page. Visible on all
+              breakpoints so users can always reach search from the chrome. */}
+          <button
+            type="button"
+            onClick={goToSearch}
+            className="shrink-0 size-9 rounded-full flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-secondary motion-safe:transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+            aria-label="Search"
+            title="Search"
+          >
+            <Search className="size-5" />
+          </button>
+
           {/* LoginArea handles both logged-in (account avatar dropdown) and
               logged-out (Log in / Sign up) states. We render it inline-flex
               and let it style its own children. */}

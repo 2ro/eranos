@@ -5,25 +5,25 @@ import { isSignerCapabilityError, reportSignerUnsupported, useBitcoinSigner } fr
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useNostrPublish } from '@/hooks/useNostrPublish';
 import {
-  BITCOIN_DUST_LIMIT,
   broadcastTransaction,
-  buildUnsignedMultiOutputPsbt,
+  buildUnsignedPsbt,
   fetchUTXOs,
   finalizePsbt,
   getFeeRates,
   nostrPubkeyToBitcoinAddress,
 } from '@/lib/bitcoin';
 import type { FeeRates } from '@/lib/bitcoin';
-import { minDonationForSplit, type ParsedCampaign, splitDonation } from '@/lib/campaign';
+import { CAMPAIGN_KIND, type ParsedCampaign } from '@/lib/campaign';
+import { withAgoraTag } from '@/lib/agoraNoteTags';
 
 /** Supported on-chain fee speeds (mirrors {@link SendBitcoinDialog}). */
 export type DonationFeeSpeed = 'fastest' | 'halfHour' | 'hour' | 'economy';
 
 export interface DonateCampaignArgs {
   campaign: ParsedCampaign;
-  /** Total donation amount in satoshis. Split across recipients per the campaign weights. */
+  /** Donation amount in satoshis. */
   amountSats: number;
-  /** Optional public comment included in each kind 8333 receipt. */
+  /** Optional public comment included in the kind 8333 receipt. */
   comment?: string;
   /** Fee speed for the on-chain tx. Default: `halfHour`. */
   feeSpeed?: DonationFeeSpeed;
@@ -34,9 +34,7 @@ export interface DonateCampaignResult {
   txid: string;
   /** On-chain fee paid in satoshis. */
   fee: number;
-  /** Number of recipients that received funds in the tx. */
-  recipientCount: number;
-  /** Total sent to recipients (donation amount; excludes fee). */
+  /** Sats paid to the campaign wallet (excludes fee and donor change). */
   totalSats: number;
   /** Whether the kind 8333 donation receipt published successfully. */
   receiptPublished: boolean;
@@ -58,17 +56,29 @@ function errorMessage(error: unknown): string {
 }
 
 /**
- * Mutation hook that sends a single multi-output Bitcoin transaction to all
- * of a campaign's recipients (split per their weights), broadcasts it via
- * mempool.space, and then publishes a single kind 8333 onchain-zap receipt
- * for the transaction referencing the campaign's addressable coordinate and
- * listing every recipient under its own `p` tag.
+ * Mutation hook that donates to a campaign by paying its declared wallet
+ * endpoint with a single Bitcoin transaction, then publishing a kind 8333
+ * donation receipt referencing the campaign's addressable coordinate.
  *
- * Returns an async function that throws on any pre-broadcast failure
- * (insufficient funds, signer not available, dust, etc.). Once the tx is
- * broadcast, the function always resolves: a kind 8333 publish failure is
- * reported in {@link DonateCampaignResult.receiptPublished} rather than
- * thrown, because the donation itself is already final on-chain.
+ * The campaign's `w` tag drives the destination:
+ *
+ * - **on-chain** (`bc1q…` / `bc1p…`) — the donor's client builds a
+ *   single-output PSBT paying the campaign address, broadcasts it, then
+ *   publishes a kind 8333 receipt with no `p` tags (campaigns are not
+ *   Nostr-identity recipients; verification matches tx outputs against
+ *   the campaign's `w` address).
+ * - **silent payment** (`sp1…`) — this hook refuses the request.
+ *   Donating to a silent-payment campaign requires a BIP-352-aware
+ *   wallet that derives a fresh one-time output from the SP code; the
+ *   in-app Taproot signer does not support that. Donors are directed to
+ *   an external wallet via a copy/QR affordance instead, and no Nostr
+ *   event is ever published.
+ *
+ * Throws on any pre-broadcast failure (insufficient funds, signer not
+ * available, SP mode, etc.). Once the tx is broadcast, the function
+ * always resolves: a kind 8333 publish failure is reported in
+ * {@link DonateCampaignResult.receiptPublished} rather than thrown,
+ * because the donation itself is already final on-chain.
  */
 export function useDonateCampaign() {
   const { user } = useCurrentUser();
@@ -92,29 +102,20 @@ export function useDonateCampaign() {
       throw new Error('Enter a valid donation amount in satoshis.');
     }
 
-    // Split the donation across the campaign's payable recipients.
-    const splits = splitDonation(campaign.recipients, amountSats, user.pubkey);
-
-    // Dust guard: every output must clear the BIP-141 dust limit for P2TR.
-    const tooSmall = splits.find((s) => s.amountSats < BITCOIN_DUST_LIMIT);
-    if (tooSmall) {
-      const min = minDonationForSplit(campaign.recipients, user.pubkey, BITCOIN_DUST_LIMIT);
+    if (campaign.wallet.mode === 'sp') {
       throw new Error(
-        `Donation is too small to split: each recipient would get less than the dust limit (${BITCOIN_DUST_LIMIT} sats). Minimum: ${min.toLocaleString()} sats.`,
+        'This campaign uses silent payments. Donate from an external BIP-352-capable wallet using the QR code.',
       );
     }
 
-    // Build the multi-output PSBT.
+    // Donor cannot donate to their own campaign (the tx output would just
+    // pay the donor's own wallet — an obvious foot-gun).
+    if (campaign.pubkey === user.pubkey) {
+      throw new Error('You cannot donate to your own campaign.');
+    }
+
     const senderAddress = nostrPubkeyToBitcoinAddress(user.pubkey);
     if (!senderAddress) throw new Error('Failed to derive your Bitcoin address.');
-
-    const outputs = splits.map((s) => {
-      const address = nostrPubkeyToBitcoinAddress(s.pubkey);
-      if (!address) {
-        throw new Error(`Failed to derive Bitcoin address for ${s.pubkey.slice(0, 8)}…`);
-      }
-      return { address, amountSats: s.amountSats };
-    });
 
     const [utxos, rates] = await Promise.all([fetchUTXOs(senderAddress, esploraApis), getFeeRates(esploraApis)]);
     if (utxos.length === 0) {
@@ -124,9 +125,10 @@ export function useDonateCampaign() {
     let signedHex: string;
     let fee: number;
     try {
-      const unsigned = buildUnsignedMultiOutputPsbt(
+      const unsigned = buildUnsignedPsbt(
         user.pubkey,
-        outputs,
+        campaign.wallet.value,
+        amountSats,
         utxos,
         feeRateForSpeed(rates, feeSpeed),
       );
@@ -142,36 +144,23 @@ export function useDonateCampaign() {
     const txHex = finalizePsbt(signedHex);
     const txid = await broadcastTransaction(txHex, esploraApis);
 
-    // Publish a single kind 8333 receipt covering the whole transaction. The
-    // event lists every recipient under its own `p` tag; the `amount` tag is
-    // the combined total paid to all recipients (i.e. the full donation,
-    // excluding the donor's change). Per-recipient amounts are recomputed
-    // from the on-chain tx at display time by matching each recipient's
-    // derived Taproot address against the tx outputs.
-    //
-    // The on-chain tx is already final at this point; we record a publish
-    // failure rather than throwing so the donor sees a successful result
-    // even if the relay hiccups.
-    const totalSats = splits.reduce((sum, s) => sum + s.amountSats, 0);
+    // Publish the kind 8333 receipt. Per NIP.md §Kind 33863 §Donation flow,
+    // campaign donation receipts MUST NOT carry `p` tags — the recipient is
+    // the campaign's `w` wallet, not a Nostr identity. Viewers verify by
+    // matching tx outputs against the campaign's `w` address.
     let receiptPublished = false;
     let receiptPublishError: string | undefined;
     try {
       await publishEvent({
         kind: 8333,
         content: comment,
-        tags: [
+        tags: withAgoraTag([
           ['i', `bitcoin:tx:${txid}`],
-          ...splits.map((s) => ['p', s.pubkey]),
-          ['amount', String(totalSats)],
+          ['amount', String(amountSats)],
           ['a', campaign.aTag],
-          ['K', String(campaign.event.kind)],
-          [
-            'alt',
-            splits.length === 1
-              ? `Donation to ${campaign.title}: ${totalSats.toLocaleString()} sats`
-              : `Donation to ${campaign.title}: ${totalSats.toLocaleString()} sats across ${splits.length} recipients`,
-          ],
-        ],
+          ['K', String(CAMPAIGN_KIND)],
+          ['alt', `Donation to ${campaign.title}: ${amountSats.toLocaleString()} sats`],
+        ]),
       });
       receiptPublished = true;
     } catch (error) {
@@ -188,8 +177,7 @@ export function useDonateCampaign() {
     return {
       txid,
       fee,
-      recipientCount: splits.length,
-      totalSats,
+      totalSats: amountSats,
       receiptPublished,
       receiptPublishError,
     };

@@ -1,7 +1,6 @@
 import { useSeoMeta } from '@unhead/react';
 import { Monitor, Moon, Sun } from 'lucide-react';
 import { PageHeader } from '@/components/PageHeader';
-import { IntroImage } from '@/components/IntroImage';
 import { useAppContext } from '@/hooks/useAppContext';
 import { useTheme } from '@/hooks/useTheme';
 import { cn } from '@/lib/utils';
@@ -64,14 +63,11 @@ export function AppearanceSettingsPage() {
 
       <div className="p-4">
         {/* Intro */}
-        <div className="flex items-center gap-4 px-3 pt-2 pb-6">
-          <IntroImage src="/theme-intro.png" />
-          <div className="min-w-0">
-            <h2 className="text-sm font-semibold">Color Mode</h2>
-            <p className="text-xs text-muted-foreground mt-1 leading-relaxed">
-              Pick your preferred color mode. System will automatically match your device's light or dark setting.
-            </p>
-          </div>
+        <div className="px-3 pt-2 pb-6">
+          <h2 className="text-sm font-semibold">Color Mode</h2>
+          <p className="text-xs text-muted-foreground mt-1 leading-relaxed">
+            Pick your preferred color mode. System will automatically match your device's light or dark setting.
+          </p>
         </div>
 
         {/* Theme options */}

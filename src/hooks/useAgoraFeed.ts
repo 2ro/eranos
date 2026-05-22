@@ -10,16 +10,16 @@ import { isEventMuted } from '@/lib/muteHelpers';
 
 const AGORA_PAGE_SIZE = 25;
 const PLEDGE_KIND = 36639;
+const COMMUNITY_KIND = 34550;
 const POLL_KIND = 1068;
 const COMMENT_KIND = 1111;
 const NOTE_KIND = 1;
 const ONCHAIN_ZAP_KIND = 8333;
 const LIGHTNING_ZAP_KIND = 9735;
 
-const AGORA_ENTITY_KINDS = [CAMPAIGN_KIND, PLEDGE_KIND, ONCHAIN_ZAP_KIND];
-const COMMENT_ROOT_KINDS = [String(CAMPAIGN_KIND), String(PLEDGE_KIND)];
+const AGORA_ENTITY_KINDS = [CAMPAIGN_KIND, PLEDGE_KIND, COMMUNITY_KIND, ONCHAIN_ZAP_KIND];
+const COMMENT_ROOT_KINDS = [String(CAMPAIGN_KIND), String(PLEDGE_KIND), String(COMMUNITY_KIND)];
 const WORLD_K_TAGS = ['iso3166', 'geo'];
-const PLEDGE_T_ALIASES = ['agora-action', 'pathos-challenge', 'agora-challenge'];
 const AGORA_T_TAGS = ['agora', 'Agora'];
 const IGNORED_AGORA_NOTE_AUTHORS = new Set([
   '4fe14ef28934b4093d71d43a8c9e9ec42ab4243febfff38470bfef05f51992ec',
@@ -40,26 +40,47 @@ function hasTagValue(event: NostrEvent, name: string, values: readonly string[])
   return tagValues(event, name).some((value) => accepted.has(value.toLowerCase()));
 }
 
+function hasAgoraTag(event: NostrEvent): boolean {
+  return hasTagValue(event, 't', AGORA_T_TAGS);
+}
+
+function isWorldComment(event: NostrEvent): boolean {
+  return event.kind === COMMENT_KIND && hasTagValue(event, 'k', WORLD_K_TAGS);
+}
+
+function isWorldPoll(event: NostrEvent): boolean {
+  return event.kind === POLL_KIND && hasTagValue(event, 'k', WORLD_K_TAGS);
+}
+
+/**
+ * Strict Agora filter — accepts an event only if it is genuinely Agora-created
+ * content (carries the `t:agora` marker) OR is a world-layer event (country-
+ * rooted comment / poll), which is intentionally surfaced cross-client.
+ *
+ * See `src/lib/agoraNoteTags.ts` and `NIP.md` (§ Agora Content Marker).
+ */
 function isRelevantAgoraEvent(event: NostrEvent): boolean {
   if (shouldHideFeedEvent(event)) return false;
 
-  if (event.kind === CAMPAIGN_KIND) return true;
+  // World-layer posts are kept regardless of the Agora marker.
+  if (isWorldComment(event) || isWorldPoll(event)) return true;
 
-  if (event.kind === PLEDGE_KIND) {
-    return hasTagValue(event, 't', PLEDGE_T_ALIASES);
-  }
+  // Everything else must carry the Agora content marker.
+  if (!hasAgoraTag(event)) return false;
+
+  if (event.kind === CAMPAIGN_KIND) return true;
+  if (event.kind === COMMUNITY_KIND) return true;
+  if (event.kind === PLEDGE_KIND) return true;
 
   if (event.kind === COMMENT_KIND) {
-    return hasTagValue(event, 'K', COMMENT_ROOT_KINDS) || hasTagValue(event, 'k', WORLD_K_TAGS);
-  }
-
-  if (event.kind === POLL_KIND) {
-    return hasTagValue(event, 'k', WORLD_K_TAGS);
+    // Comment must reference an Agora entity root (campaign / pledge / community).
+    return hasTagValue(event, 'K', COMMENT_ROOT_KINDS)
+      || tagValues(event, 'A').some((value) => value.startsWith(`${COMMUNITY_KIND}:`));
   }
 
   if (event.kind === NOTE_KIND) {
     if (IGNORED_AGORA_NOTE_AUTHORS.has(event.pubkey)) return false;
-    return hasTagValue(event, 't', AGORA_T_TAGS);
+    return true; // already verified `t:agora` above
   }
 
   if (event.kind === ONCHAIN_ZAP_KIND || event.kind === LIGHTNING_ZAP_KIND) {
@@ -71,7 +92,7 @@ function isRelevantAgoraEvent(event: NostrEvent): boolean {
 
 function isAgoraAddress(value: string): boolean {
   const kind = value.split(':')[0];
-  return kind === String(CAMPAIGN_KIND) || kind === String(PLEDGE_KIND);
+  return kind === String(CAMPAIGN_KIND) || kind === String(PLEDGE_KIND) || kind === String(COMMUNITY_KIND);
 }
 
 function getAddressableCoordinate(event: NostrEvent): string | undefined {
@@ -102,35 +123,61 @@ function extractDonationTargets(events: NostrEvent[]): { coordinates: string[]; 
   };
 }
 
-/** Mixed Agora activity feed: campaigns, pledges, world posts, #Agora notes, and donation receipts. */
-export function useAgoraFeed(enabled: boolean) {
+export interface UseAgoraFeedOptions {
+  /**
+   * Restrict the feed to events authored by these pubkeys. Applied as an
+   * `authors:` filter on every relay query (server-side filtering). Empty
+   * array disables the query — used for "Following" mode when the user
+   * follows nobody.
+   */
+  authors?: string[];
+}
+
+/** Strict Agora activity feed: campaigns, pledges, communities, world posts, #Agora notes, and donations. */
+export function useAgoraFeed(enabled: boolean, options?: UseAgoraFeedOptions) {
   const { nostr } = useNostr();
   const { muteItems } = useMuteList();
   const { shouldFilterEvent } = useContentFilters();
 
+  const authors = options?.authors;
+  const authorsKey = authors ? [...authors].sort().join(',') : '';
+  // If `authors` is provided but empty, the feed is intentionally empty
+  // (e.g. the user follows nobody) — skip the query entirely.
+  const authorsEmpty = authors !== undefined && authors.length === 0;
+  const queryEnabled = enabled && !authorsEmpty;
+
   const query = useInfiniteQuery<AgoraFeedPage, Error>({
-    queryKey: ['agora-feed'],
+    queryKey: ['agora-feed', authorsKey],
     queryFn: async ({ pageParam, signal: querySignal }) => {
       const signal = AbortSignal.any([querySignal, AbortSignal.timeout(8_000)]);
       const until = pageParam as number | undefined;
+      const authorsFilter = authors && authors.length > 0 ? { authors } : {};
 
       const filters: NostrFilter[] = [
-        { kinds: AGORA_ENTITY_KINDS, limit: AGORA_PAGE_SIZE, ...(until && { until }) },
-        { kinds: [COMMENT_KIND], '#K': COMMENT_ROOT_KINDS, limit: AGORA_PAGE_SIZE, ...(until && { until }) },
-        { kinds: [COMMENT_KIND, POLL_KIND], '#k': WORLD_K_TAGS, limit: AGORA_PAGE_SIZE, ...(until && { until }) },
-        { kinds: [NOTE_KIND], '#t': AGORA_T_TAGS, limit: Math.ceil(AGORA_PAGE_SIZE / 2), ...(until && { until }) },
+        // Agora entity kinds — strict `t:agora` required.
+        { kinds: AGORA_ENTITY_KINDS, '#t': AGORA_T_TAGS, limit: AGORA_PAGE_SIZE, ...authorsFilter, ...(until && { until }) },
+        // Comments on Agora entities — strict `t:agora` required.
+        { kinds: [COMMENT_KIND], '#t': AGORA_T_TAGS, '#K': COMMENT_ROOT_KINDS, limit: AGORA_PAGE_SIZE, ...authorsFilter, ...(until && { until }) },
+        // World layer — country/geo-rooted comments and polls. Intentionally
+        // cross-client; the `#k=iso3166|geo` filter is the entire gate.
+        { kinds: [COMMENT_KIND, POLL_KIND], '#k': WORLD_K_TAGS, limit: AGORA_PAGE_SIZE, ...authorsFilter, ...(until && { until }) },
+        // `#Agora`-tagged kind 1 notes — accepts any author opting in via the tag.
+        { kinds: [NOTE_KIND], '#t': AGORA_T_TAGS, limit: Math.ceil(AGORA_PAGE_SIZE / 2), ...authorsFilter, ...(until && { until }) },
       ];
 
       const raw = await nostr.query(filters, { signal });
       const filtered = raw.filter(isRelevantAgoraEvent);
       const { coordinates, eventIds } = extractDonationTargets(filtered);
 
+      // Donation enrichment: pull lightning + onchain zaps that reference
+      // the Agora entities visible on this page. Donation events must also
+      // carry the Agora marker to be included (per `isRelevantAgoraEvent`).
       const donationFilters: NostrFilter[] = [];
       if (coordinates.length > 0) {
-        donationFilters.push({ kinds: [LIGHTNING_ZAP_KIND, ONCHAIN_ZAP_KIND], '#a': coordinates, limit: coordinates.length * 10 });
+        donationFilters.push({ kinds: [LIGHTNING_ZAP_KIND, ONCHAIN_ZAP_KIND], '#t': AGORA_T_TAGS, '#a': coordinates, limit: coordinates.length * 10 });
       }
       if (eventIds.length > 0) {
-        donationFilters.push({ kinds: [LIGHTNING_ZAP_KIND, ONCHAIN_ZAP_KIND], '#e': eventIds, limit: eventIds.length * 10 });
+        donationFilters.push({ kinds: [LIGHTNING_ZAP_KIND, ONCHAIN_ZAP_KIND], '#t': AGORA_T_TAGS, '#e': eventIds, limit: eventIds.length * 10 });
       }
 
       const donationEvents = donationFilters.length > 0
@@ -141,7 +188,7 @@ export function useAgoraFeed(enabled: boolean) {
       const combined = [
         ...filtered,
         // Donation enrichment is already scoped by exact #a/#e targets from this page.
-        ...donationEvents.filter((event) => !shouldHideFeedEvent(event)),
+        ...donationEvents.filter((event) => !shouldHideFeedEvent(event) && hasAgoraTag(event)),
       ]
         .filter((event) => {
           if (seen.has(event.id)) return false;
@@ -166,7 +213,7 @@ export function useAgoraFeed(enabled: boolean) {
       if (lastPage.totalFetched < AGORA_PAGE_SIZE || !lastPage.oldestTimestamp) return undefined;
       return lastPage.oldestTimestamp - 1;
     },
-    enabled,
+    enabled: queryEnabled,
     staleTime: 30_000,
     placeholderData: (prev) => prev,
   });
@@ -183,9 +230,9 @@ export function useAgoraFeed(enabled: boolean) {
 
   return {
     events,
-    isLoading: query.isPending,
+    isLoading: queryEnabled ? query.isPending : false,
     isFetchingNextPage: query.isFetchingNextPage,
-    hasNextPage: query.hasNextPage,
+    hasNextPage: !authorsEmpty && query.hasNextPage,
     fetchNextPage: query.fetchNextPage,
     pageCount: query.data?.pages.length,
   };

@@ -2,13 +2,13 @@ import { useState, useEffect, useMemo } from 'react';
 import { useInView } from 'react-intersection-observer';
 import { usePageRefresh } from '@/hooks/usePageRefresh';
 import { ComposeBox } from '@/components/ComposeBox';
-import { HeroAtmosphere } from '@/components/HeroAtmosphere';
-import { HeroGlobe } from '@/components/HeroGlobe';
 import { LandingHero } from '@/components/LandingHero';
 import { NoteCard } from '@/components/NoteCard';
 import { PullToRefresh } from '@/components/PullToRefresh';
 import { FeedEmptyState } from '@/components/FeedEmptyState';
+import { FeedModeSwitcher } from '@/components/FeedModeSwitcher';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Button } from '@/components/ui/button';
 import { Loader2 } from 'lucide-react';
 import AuthDialog from '@/components/auth/AuthDialog';
 import { useFeed } from '@/hooks/useFeed';
@@ -16,9 +16,8 @@ import { useFollowingFeed } from '@/hooks/useFollowingFeed';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useFeedTab } from '@/hooks/useFeedTab';
 import { useMuteList } from '@/hooks/useMuteList';
-import { useAgoraFeed } from '@/hooks/useAgoraFeed';
+import { useMixedFeed, type FeedMode } from '@/hooks/useMixedFeed';
 import { shouldHideFeedEvent } from '@/lib/feedUtils';
-import { HOPE_PALETTE } from '@/lib/hopePalette';
 import { isEventMuted } from '@/lib/muteHelpers';
 import { SubHeaderBar } from '@/components/SubHeaderBar';
 import { TabButton } from '@/components/TabButton';
@@ -39,40 +38,14 @@ interface FeedProps {
   hideCompose?: boolean;
   /** Message shown when the feed is empty. */
   emptyMessage?: string;
-  /** Unique identifier for this feed page, used to persist the active tab in sessionStorage. Defaults to 'home'. */
+  /** Unique identifier for this feed page, used to persist the active tab/mode in localStorage. Defaults to 'home'. */
   feedId?: string;
 }
 
-const FEED_BACKDROP_HUE_INTERVAL_MS = 45_000;
-const FEED_BACKDROP_HUE_FADE_MS = 18_000;
-const AGORA_DEFAULT_NOTE_TAGS = [['t', 'agora']];
+const FEED_MODES: readonly FeedMode[] = ['agora', 'all-nostr', 'following'] as const;
 
-function FeedGlobeBackground() {
-  const [hueIndex, setHueIndex] = useState(0);
-
-  useEffect(() => {
-    const id = window.setInterval(() => {
-      setHueIndex((i) => (i + 1) % HOPE_PALETTE.length);
-    }, FEED_BACKDROP_HUE_INTERVAL_MS);
-    return () => window.clearInterval(id);
-  }, []);
-
-  const activeHue = HOPE_PALETTE[hueIndex];
-
-  return (
-    <div className="fixed inset-0 z-0 pointer-events-none overflow-hidden bg-secondary/30" aria-hidden="true">
-      <HeroAtmosphere hue={activeHue} fadeMs={FEED_BACKDROP_HUE_FADE_MS} className="opacity-55" />
-      <div className="absolute inset-0 bg-gradient-to-b from-background/10 via-background/20 to-background/55" />
-      <div className="absolute inset-0 flex items-center justify-center">
-        <HeroGlobe
-          hue={activeHue}
-          className="aspect-square max-w-none opacity-70 drop-shadow-2xl"
-          style={{ width: 'clamp(552px, 86.4dvw, 984px)' }}
-        />
-      </div>
-      <div className="absolute inset-0 bg-background/70" />
-    </div>
-  );
+function isFeedMode(value: string): value is FeedMode {
+  return (FEED_MODES as readonly string[]).includes(value);
 }
 
 export function Feed({ kinds, tagFilters, header, hideCompose, emptyMessage, feedId = 'home' }: FeedProps = {}) {
@@ -83,14 +56,19 @@ export function Feed({ kinds, tagFilters, header, hideCompose, emptyMessage, fee
   const [authDialogOpen, setAuthDialogOpen] = useState(false);
   const isHomeAgoraFeed = !kinds && !tagFilters;
 
-  // The home feed is Agora-only. Specialized feed pages keep Follows + Global.
+  // For the home /feed page we use a three-mode picker instead of the
+  // Follows/Global tab pair. Mode persists via the same useFeedTab storage,
+  // keyed under the same feedId.
+  const homeFeedMode: FeedMode = (() => {
+    if (!isHomeAgoraFeed) return 'agora';
+    if (isFeedMode(rawActiveTab)) return rawActiveTab;
+    // Legacy values get coerced to the Agora default.
+    return 'agora';
+  })();
+
+  // Specialized feed pages keep the original Follows + Global tabs.
   const activeTab: FeedTab = (() => {
-    if (isHomeAgoraFeed) return 'agora';
-    if (!kinds) {
-      if (rawActiveTab === 'global') return 'global';
-      if (rawActiveTab === 'follows' && user) return 'follows';
-      return user ? 'follows' : 'global';
-    }
+    if (isHomeAgoraFeed) return homeFeedMode;
     if (rawActiveTab === 'global') return 'global';
     if (rawActiveTab === 'follows' && user) return 'follows';
     return user ? 'follows' : 'global';
@@ -106,43 +84,48 @@ export function Feed({ kinds, tagFilters, header, hideCompose, emptyMessage, fee
     }
   }, [rawActiveTab, handleSetActiveTab]);
 
+  const handleModeChange = (mode: FeedMode) => {
+    handleSetActiveTab(mode);
+  };
+
   // Kind-specific pages (e.g. Development, WebXDC) only show Follows + Global tabs.
   const isKindSpecificPage = !!kinds;
 
-  // When the Agora tab is active, show the mixed Agora activity feed.
-  // Disabled on kind-specific pages — the Agora tab is not shown there.
-  const isAgoraActive = isHomeAgoraFeed;
+  // -------------------------------------------------------------------------
+  // Home feed (mixed-mode): drives off useMixedFeed.
+  // -------------------------------------------------------------------------
+  const mixedFeed = useMixedFeed(homeFeedMode, isHomeAgoraFeed);
 
-  // Standard feed query (used when logged in, or on kind-specific pages, or core tabs)
-  const isHomeFollowingActive = activeTab === 'follows' && !isKindSpecificPage && !tagFilters;
+  // -------------------------------------------------------------------------
+  // Specialized feed pages: original Follows/Global behavior.
+  // -------------------------------------------------------------------------
+  const isHomeFollowingActive = activeTab === 'follows' && !isKindSpecificPage && !tagFilters && !isHomeAgoraFeed;
   const isCoreFeedTab = activeTab === 'follows' || activeTab === 'network' || activeTab === 'global' || activeTab === 'communities' || activeTab === 'world' || activeTab === 'agora';
   type UseFeedTab = 'follows' | 'network' | 'global' | 'communities';
   const feedTabForQuery: UseFeedTab =
     activeTab === 'follows'
-      ? (isHomeFollowingActive ? 'network' : 'network')
+      ? 'network'
       : activeTab === 'network' || activeTab === 'global' || activeTab === 'communities'
         ? (activeTab as UseFeedTab)
       : 'global';
   const standardFeedOptions = (kinds || tagFilters)
-    ? { kinds, tagFilters, enabled: !isHomeFollowingActive && !isAgoraActive }
-    : { enabled: !isHomeFollowingActive && !isAgoraActive };
+    ? { kinds, tagFilters, enabled: !isHomeFollowingActive && !isHomeAgoraFeed }
+    : { enabled: !isHomeFollowingActive && !isHomeAgoraFeed };
   const feedQuery = useFeed(
-    isCoreFeedTab && !isAgoraActive ? feedTabForQuery : 'global',
+    isCoreFeedTab && !isHomeAgoraFeed ? feedTabForQuery : 'global',
     standardFeedOptions,
   );
 
   const followingFeed = useFollowingFeed(isHomeFollowingActive);
 
-  const agoraFeed = useAgoraFeed(isAgoraActive);
-
   // For non-world tabs, use the standard feed query
   const queryKey = useMemo(
-    () => isAgoraActive
-        ? ['agora-feed']
+    () => isHomeAgoraFeed
+        ? ['mixed-feed', homeFeedMode]
         : isHomeFollowingActive
           ? [['feed', 'network'], ['community-activity-feed'], ['following-country-feed']]
           : ['feed', activeTab],
-    [isAgoraActive, isHomeFollowingActive, activeTab],
+    [isHomeAgoraFeed, homeFeedMode, isHomeFollowingActive, activeTab],
   );
 
   const handleRefresh = usePageRefresh(queryKey);
@@ -157,16 +140,16 @@ export function Feed({ kinds, tagFilters, header, hideCompose, emptyMessage, fee
   } = isHomeFollowingActive ? followingFeed : feedQuery;
 
   // Unify pagination interface
-  const fetchNextPage = isAgoraActive ? agoraFeed.fetchNextPage : fetchNextPageStandard;
-  const hasNextPage = isAgoraActive ? agoraFeed.hasNextPage : hasNextPageStandard;
-  const isFetchingNextPage = isAgoraActive ? agoraFeed.isFetchingNextPage : isFetchingNextPageStandard;
+  const fetchNextPage = isHomeAgoraFeed ? mixedFeed.fetchNextPage : fetchNextPageStandard;
+  const hasNextPage = isHomeAgoraFeed ? mixedFeed.hasNextPage : hasNextPageStandard;
+  const isFetchingNextPage = isHomeAgoraFeed ? mixedFeed.isFetchingNextPage : isFetchingNextPageStandard;
 
   // Auto-fetch page 2 as soon as page 1 arrives for smoother scrolling
   useEffect(() => {
-    if (!isHomeFollowingActive && !isAgoraActive && hasNextPage && !isFetchingNextPage && rawData?.pages?.length === 1) {
+    if (!isHomeFollowingActive && !isHomeAgoraFeed && hasNextPage && !isFetchingNextPage && rawData?.pages?.length === 1) {
       fetchNextPage();
     }
-  }, [isHomeFollowingActive, isAgoraActive, hasNextPage, isFetchingNextPage, rawData?.pages?.length, fetchNextPage]);
+  }, [isHomeFollowingActive, isHomeAgoraFeed, hasNextPage, isFetchingNextPage, rawData?.pages?.length, fetchNextPage]);
 
   // Intersection observer for infinite scroll
   const { ref: scrollRef, inView } = useInView({
@@ -182,8 +165,8 @@ export function Feed({ kinds, tagFilters, header, hideCompose, emptyMessage, fee
 
   // Flatten, deduplicate, and filter muted content.
   const feedItems = useMemo(() => {
-    if (isAgoraActive) {
-      return agoraFeed.events.map((event): FeedItem => ({ event, sortTimestamp: event.created_at }));
+    if (isHomeAgoraFeed) {
+      return mixedFeed.items;
     }
 
     if (!rawData?.pages) return [];
@@ -199,24 +182,29 @@ export function Feed({ kinds, tagFilters, header, hideCompose, emptyMessage, fee
         if (muteItems.length > 0 && isEventMuted(item.event, muteItems)) return false;
         return true;
       });
-  }, [isAgoraActive, agoraFeed.events, rawData?.pages, muteItems]);
+  }, [isHomeAgoraFeed, mixedFeed.items, rawData?.pages, muteItems]);
 
   // Show skeletons while loading.
-  const showSkeleton = isAgoraActive
-      ? agoraFeed.isLoading
+  const showSkeleton = isHomeAgoraFeed
+      ? mixedFeed.isLoading && feedItems.length === 0
       : (isPending || (isLoading && !rawData));
 
-  const useGlobeBackdrop = feedId === 'home' && !kinds && !tagFilters && !header;
-  const translucentCardClassName = useGlobeBackdrop
-    ? 'bg-transparent border-border/50 hover:bg-transparent'
-    : undefined;
-  const transparentFeedSurfaceClassName = useGlobeBackdrop ? 'bg-transparent' : undefined;
+  // Per-mode empty-state copy for the home feed.
+  const homeEmptyMessage = (() => {
+    if (homeFeedMode === 'agora') {
+      return "Quiet moment on Agora. New campaigns, pledges, donations, and posts will appear here as they happen.";
+    }
+    if (homeFeedMode === 'following') {
+      return user
+        ? "Your follow feed is empty. Follow some people to see what they're up to, or switch to Agora or All Nostr."
+        : "Log in to see posts from people you follow.";
+    }
+    return 'Nothing to show. Check your relay connections or try again in a moment.';
+  })();
 
   return (
-    <main className={cn('flex-1 min-w-0 min-h-dvh', useGlobeBackdrop && 'relative isolate overflow-x-clip')}>
-      {useGlobeBackdrop && <FeedGlobeBackground />}
-
-      <div className={cn(useGlobeBackdrop && 'relative z-10')}>
+    <main className="flex-1 min-w-0 min-h-dvh bg-background">
+      <div>
         {header}
 
         {/* CTA (logged out, main feed only) */}
@@ -224,20 +212,31 @@ export function Feed({ kinds, tagFilters, header, hideCompose, emptyMessage, fee
           <LandingHero onJoinClick={() => setAuthDialogOpen(true)} />
         )}
 
+        {/* Home-feed mode switcher: top-left, anchors the page visually */}
+        {isHomeAgoraFeed && (
+          <div className="px-4 pt-5 pb-3 sm:pt-6">
+            <FeedModeSwitcher
+              value={homeFeedMode}
+              onChange={handleModeChange}
+              followingAvailable={!!user}
+              onLoginRequested={() => setAuthDialogOpen(true)}
+            />
+          </div>
+        )}
+
         {!hideCompose && (
           <ComposeBox
             compact
-            hideBorder
-            className={transparentFeedSurfaceClassName}
-            defaultTags={AGORA_DEFAULT_NOTE_TAGS}
+            hideBorder={isHomeAgoraFeed}
             defaultExpanded
             placeholder="What's happening?"
           />
         )}
 
-        {/* Tabs are only kept for specialized feed pages. The home feed is Agora-only. */}
+        {/* Tabs are only kept for specialized feed pages. The home feed uses
+            the FeedModeSwitcher above. */}
         {user && (isKindSpecificPage || tagFilters) && (
-          <SubHeaderBar backgroundFillClassName={transparentFeedSurfaceClassName && 'fill-transparent'}>
+          <SubHeaderBar>
             <TabButton label={isKindSpecificPage || tagFilters ? 'Follows' : 'Following'} active={activeTab === 'follows'} onClick={() => handleSetActiveTab('follows')} />
             <TabButton label="Global" active={activeTab === 'global'} onClick={() => handleSetActiveTab('global')} />
           </SubHeaderBar>
@@ -247,7 +246,7 @@ export function Feed({ kinds, tagFilters, header, hideCompose, emptyMessage, fee
           {showSkeleton ? (
             <div className="divide-y divide-border">
               {Array.from({ length: 5 }).map((_, i) => (
-                <NoteCardSkeleton key={i} className={translucentCardClassName} />
+                <NoteCardSkeleton key={i} />
               ))}
             </div>
           ) : feedItems.length > 0 ? (
@@ -257,7 +256,6 @@ export function Feed({ kinds, tagFilters, header, hideCompose, emptyMessage, fee
                   key={item.repostedBy ? `repost-${item.repostedBy}-${item.event.id}` : item.event.id}
                   event={item.event}
                   repostedBy={item.repostedBy}
-                  className={translucentCardClassName}
                 />
               ))}
               {hasNextPage && (
@@ -270,15 +268,20 @@ export function Feed({ kinds, tagFilters, header, hideCompose, emptyMessage, fee
                 </div>
               )}
             </div>
+          ) : isHomeAgoraFeed ? (
+            <HomeFeedEmptyState
+              mode={homeFeedMode}
+              message={homeEmptyMessage}
+              onSwitchToAgora={homeFeedMode !== 'agora' ? () => handleModeChange('agora') : undefined}
+              onLoginClick={!user && homeFeedMode === 'following' ? () => setAuthDialogOpen(true) : undefined}
+            />
           ) : (
             <FeedEmptyState
               message={
                 emptyMessage ?? (
                   activeTab === 'follows'
                     ? 'Your feed is empty. Follow some people to see their posts here.'
-                    : activeTab === 'agora'
-                      ? 'No Agora activity found. Check your relay connections or come back soon.'
-                      : 'No posts found. Check your relay connections or come back soon.'
+                    : 'No posts found. Check your relay connections or come back soon.'
                 )
               }
               showDiscover={!emptyMessage && activeTab === 'follows'}
@@ -300,6 +303,37 @@ export function Feed({ kinds, tagFilters, header, hideCompose, emptyMessage, fee
         )}
       </div>
     </main>
+  );
+}
+
+interface HomeFeedEmptyStateProps {
+  mode: FeedMode;
+  message: string;
+  onSwitchToAgora?: () => void;
+  onLoginClick?: () => void;
+}
+
+function HomeFeedEmptyState({ mode, message, onSwitchToAgora, onLoginClick }: HomeFeedEmptyStateProps) {
+  return (
+    <div className="py-20 px-8 flex flex-col items-center text-center">
+      <p className="text-muted-foreground max-w-sm leading-relaxed">{message}</p>
+      <div className="flex flex-col gap-2 mt-6 w-full max-w-xs">
+        {onLoginClick && (
+          <Button className="rounded-full" onClick={onLoginClick}>
+            Log in
+          </Button>
+        )}
+        {onSwitchToAgora && (
+          <Button
+            variant={mode === 'following' ? 'default' : 'ghost'}
+            className="rounded-full"
+            onClick={onSwitchToAgora}
+          >
+            Browse the Agora feed
+          </Button>
+        )}
+      </div>
+    </div>
   );
 }
 

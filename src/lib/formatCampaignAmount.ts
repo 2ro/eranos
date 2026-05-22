@@ -25,3 +25,23 @@ export function formatCampaignAmount(sats: number, btcPrice: number | undefined)
   if (btcPrice) return satsToUSDWhole(sats, btcPrice);
   return formatSatsShort(sats);
 }
+
+/**
+ * Formats an integer USD amount (the campaign goal unit per NIP.md Kind
+ * 33863). Uses thousands separators and a leading `$`. Negative or
+ * non-finite values render as `$0`.
+ */
+export function formatUsdGoal(usd: number): string {
+  if (!Number.isFinite(usd) || usd <= 0) return '$0';
+  return `$${Math.floor(usd).toLocaleString()}`;
+}
+
+/**
+ * Convert sats to USD using a live BTC/USD price. Returns `undefined` if
+ * the price isn't available — callers should fall back to the sats
+ * representation in that case.
+ */
+export function satsToUsd(sats: number, btcPrice: number | undefined): number | undefined {
+  if (!btcPrice || !Number.isFinite(btcPrice) || btcPrice <= 0) return undefined;
+  return (sats / 100_000_000) * btcPrice;
+}

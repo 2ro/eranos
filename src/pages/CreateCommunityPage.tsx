@@ -37,6 +37,7 @@ import {
 import { fetchFreshEvent } from '@/lib/fetchFreshEvent';
 import { genUserName } from '@/lib/genUserName';
 import { sanitizeUrl } from '@/lib/sanitizeUrl';
+import { withAgoraTag } from '@/lib/agoraNoteTags';
 
 /**
  * Convert text into a URL-safe slug for the NIP-72 community's d-tag.
@@ -401,7 +402,7 @@ export function CreateCommunityPage() {
       const created = await publishEvent({
         kind: COMMUNITY_DEFINITION_KIND,
         content: '',
-        tags,
+        tags: withAgoraTag(tags),
       });
 
       return { event: created, slug, edited: false };

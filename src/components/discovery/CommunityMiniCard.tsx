@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 import { Users } from 'lucide-react';
 import { nip19 } from 'nostr-tools';
 
+import { CommunityModerationOverlay } from '@/components/CommunityModerationMenu';
 import { Card } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useAuthor } from '@/hooks/useAuthor';
@@ -29,6 +30,13 @@ interface CommunityMiniCardProps {
  *  - founder avatar + display name in a muted row.
  *
  * Kept narrow enough to fit ~4 cards across a desktop content column.
+ *
+ * Moderators (Team Soapbox pack members) see a kebab menu overlaid on the
+ * banner exposing the Feature / Hide actions plus a Hidden badge when the
+ * org is currently hidden. Non-moderators see no overlay — the whole
+ * moderation pipeline (including the heavy `useOrganizationModeration`
+ * query) is bypassed for them so grids of dozens of cards don't fan out
+ * a per-card cache subscription on every viewer.
  */
 export function CommunityMiniCard({ community, className }: CommunityMiniCardProps) {
   const founder = useAuthor(community.founderPubkey);
@@ -67,6 +75,11 @@ export function CommunityMiniCard({ community, className }: CommunityMiniCardPro
               <Users className="size-10 text-primary/40" />
             </div>
           )}
+          {/* Moderator overlay (Hidden badge + kebab). Renders `null` for
+              non-moderators, which is why this component owns the
+              `useOrganizationModeration` subscription rather than the
+              card — keeps non-mod grids free of the heavy label query. */}
+          <CommunityModerationOverlay coord={community.aTag} organizationName={community.name} />
         </div>
         <div className="flex flex-col gap-2 p-3.5 flex-1">
           <h3 className="font-semibold leading-tight text-sm tracking-tight line-clamp-1">
