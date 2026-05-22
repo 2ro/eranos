@@ -17,6 +17,7 @@ import {
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { BitcoinPublicDisclaimer } from '@/components/BitcoinPublicDisclaimer';
 import { Button } from '@/components/ui/button';
+import { CampaignWalletDonatePanel } from '@/components/CampaignWalletDonatePanel';
 import {
   Dialog,
   DialogContent,
@@ -712,13 +713,14 @@ function SignerUnsupportedView({
       <DialogHeader>
         <DialogTitle>Donate to {campaign.title}</DialogTitle>
         <DialogDescription>
-          Your current login can't sign Bitcoin transactions in the app. You
-          can still pay from any external Bitcoin wallet — scan the QR code
-          on the campaign page or open the wallet link directly.
+          Scan the QR code with your phone's Bitcoin wallet, or tap "Open in
+          wallet" to send your donation. You choose the amount in your wallet.
         </DialogDescription>
       </DialogHeader>
 
-      <Button size="lg" className="w-full" onClick={onClose}>
+      <CampaignWalletDonatePanel wallet={campaign.wallet} />
+
+      <Button variant="outline" size="lg" className="w-full" onClick={onClose}>
         Close
       </Button>
     </>
