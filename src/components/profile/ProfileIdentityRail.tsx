@@ -271,7 +271,7 @@ function AvatarBlock({
   return (
     <div className="relative">
       <button
-        className="focus:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded-full -mt-28 md:-mt-32 block"
+        className="relative z-10 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded-full -mt-16 md:-mt-20 block"
         onClick={() => picture && onLightbox(picture)}
         disabled={!picture}
       >
@@ -684,7 +684,7 @@ function RailSectionHeader({
 function RailSkeleton() {
   return (
     <div className="flex flex-col gap-5">
-      <Skeleton className="size-28 md:size-32 rounded-full -mt-28 md:-mt-32 border-4 border-background" />
+      <Skeleton className="size-28 md:size-32 rounded-full -mt-16 md:-mt-20 border-4 border-background" />
       <div className="space-y-2">
         <Skeleton className="h-6 w-40" />
         <Skeleton className="h-4 w-32" />
