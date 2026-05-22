@@ -54,7 +54,7 @@ import { ThreadedReplyList, type ReplyNode } from '@/components/ThreadedReplyLis
 import { useAuthor } from '@/hooks/useAuthor';
 import { useAuthors } from '@/hooks/useAuthors';
 import { useComments } from '@/hooks/useComments';
-import { useBitcoinWallet } from '@/hooks/useBitcoinWallet';
+import { useBtcPrice } from '@/hooks/useBtcPrice';
 import { useCommunityBookmarks } from '@/hooks/useCommunityBookmarks';
 import { useCommunityMembers } from '@/hooks/useCommunityMembers';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
@@ -239,7 +239,7 @@ function ActivityTypePill({ icon, label }: { icon: React.ReactNode; label: strin
 }
 
 function PledgeShelfCard({ pledge }: { pledge: Action }) {
-  const { btcPrice } = useBitcoinWallet();
+  const { data: btcPrice } = useBtcPrice();
   const author = useAuthor(pledge.pubkey);
   const metadata = author.data?.metadata;
   const displayName = getDisplayName(metadata, pledge.pubkey);

@@ -75,7 +75,7 @@ export function useOnchainZap(
   const { mutateAsync: publishEvent } = useNostrPublish();
   const { toast } = useToast();
   const { config } = useAppContext();
-  const { esploraBaseUrl } = config;
+  const { esploraApis } = config;
   const queryClient = useQueryClient();
 
   const [isZapping, setIsZapping] = useState(false);
@@ -105,8 +105,8 @@ export function useOnchainZap(
 
       // Fetch UTXOs and fee rates
       const [utxos, rates] = await Promise.all([
-        fetchUTXOs(senderAddress, esploraBaseUrl),
-        getFeeRates(esploraBaseUrl),
+        fetchUTXOs(senderAddress, esploraApis),
+        getFeeRates(esploraApis),
       ]);
 
       if (utxos.length === 0) {
@@ -138,7 +138,7 @@ export function useOnchainZap(
 
       // Broadcast
       setProgress('broadcasting');
-      const txid = await broadcastTransaction(txHex, esploraBaseUrl);
+      const txid = await broadcastTransaction(txHex, esploraApis);
 
       // Publish kind 8333 event
       setProgress('publishing');

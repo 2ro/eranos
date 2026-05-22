@@ -53,7 +53,7 @@ export function useCampaignDonations(campaign: ParsedCampaign | undefined): {
 } {
   const { nostr } = useNostr();
   const { config } = useAppContext();
-  const { esploraBaseUrl } = config;
+  const { esploraApis } = config;
 
   const aTag = campaign?.aTag;
   const wallet = campaign?.wallet;
@@ -95,8 +95,9 @@ export function useCampaignDonations(campaign: ParsedCampaign | undefined): {
   const walletValue = wallet?.value;
   const verifications = useQueries({
     queries: dedupedByTxid.map((event) => ({
-      queryKey: ['onchain-zaps', 'verify', esploraBaseUrl, event.id, walletValue ?? ''],
-      queryFn: () => verifyOnchainZap(event, esploraBaseUrl, walletValue),
+      queryKey: ['onchain-zaps', 'verify', esploraApis, event.id, walletValue ?? ''],
+      queryFn: ({ signal }: { signal: AbortSignal }) =>
+        verifyOnchainZap(event, esploraApis, walletValue, signal),
       staleTime: 60_000,
       enabled: !!walletValue && !isSilentPayment,
     })),

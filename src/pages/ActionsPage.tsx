@@ -7,7 +7,7 @@ import { nip19 } from 'nostr-tools';
 import { useActions, type Action } from '@/hooks/useActions';
 import { useAuthor } from '@/hooks/useAuthor';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
-import { useBitcoinWallet } from '@/hooks/useBitcoinWallet';
+import { useBtcPrice } from '@/hooks/useBtcPrice';
 import { useNostrPublish } from '@/hooks/useNostrPublish';
 import { useToast } from '@/hooks/useToast';
 import { getAllCountries, getGeoDisplayName, countryCodeToFlag } from '@/lib/countries';
@@ -256,7 +256,7 @@ type SortOption = 'recent' | 'bounty' | 'deadline';
 
 export default function ActionsPage() {
   const { user } = useCurrentUser();
-  const { btcPrice } = useBitcoinWallet();
+  const { data: btcPrice } = useBtcPrice();
   const navigate = useNavigate();
 
   const [selectedCountry, setSelectedCountry] = useState<string | undefined>(undefined);

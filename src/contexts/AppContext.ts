@@ -269,12 +269,78 @@ export interface AppConfig {
   /** Wildcard domain used for iframe sandboxing (e.g. "iframe.diy"). Default: "iframe.diy". */
   sandboxDomain: string;
   /**
-   * Base URL for the Esplora-compatible Bitcoin REST API. Used by the wallet,
-   * on-chain zap flows, and NIP-73 Bitcoin tx/address pages. The standard
-   * Esplora REST root (no version segment). The mempool.space `/v1/prices`
-   * extension is appended by the price call. Default: "https://mempool.space/api".
+   * Ordered list of base URLs for Esplora-compatible Bitcoin REST APIs. Used
+   * by the wallet, on-chain zap flows, and NIP-73 Bitcoin tx/address pages.
+   * Each URL is the standard Esplora REST root (no version segment, no
+   * trailing slash). The list is tried in order with exponential-backoff
+   * failover on `429` / `5xx` responses — see `src/lib/esplora.ts`.
+   *
+   * The first entry is treated as the primary. The mempool.space `/v1/prices`
+   * extension is appended by the price call; endpoints that don't speak it
+   * (e.g. Blockstream's Esplora) are silently skipped via a `404` soft-failover.
+   *
+   * Default:
+   * ```
+   * [
+   *   'https://mempool.space/api',
+   *   'https://mempool.emzy.de/api',
+   *   'https://blockstream.info/api',
+   * ]
+   * ```
    */
-  esploraBaseUrl: string;
+  esploraApis: string[];
+  /**
+   * Base URL for Trezor's Blockbook API, used exclusively by the HD wallet at
+   * `/wallet`. Blockbook's xpub endpoint (`/api/v2/xpub/<descriptor>`) lets
+   * the HD wallet scan, balance, and pull tx history for the entire account
+   * in a single HTTP call, where the equivalent Esplora workflow would be
+   * dozens of per-address calls.
+   *
+   * No version segment, no trailing slash. The endpoint must be a real
+   * Blockbook instance — Esplora-compatible servers do NOT speak the
+   * `/api/v2/xpub/` path. There is no failover list and no automatic
+   * fallback; HD wallet errors are surfaced to the user.
+   *
+   * **Privacy note**: the full account xpub is sent to this server on every
+   * request. Whoever operates the configured Blockbook instance can link
+   * every wallet address and observe balance over time. Default is Trezor's
+   * public mirror; users who care can self-host.
+   *
+   * Default: `"https://btc.trezor.io"` — the canonical endpoint Trezor
+   * Suite itself uses.
+   */
+  blockbookBaseUrl: string;
+  /**
+   * Base URL of a BIP-352 tweak-data indexer (BlindBit Oracle v2-compatible),
+   * used by the HD wallet at `/wallet` to detect incoming silent payments.
+   *
+   * The wallet derives the scan private key `bscan` locally from the user's
+   * nsec and finishes the BIP-352 ECDH step itself; only public per-tx tweak
+   * data and Taproot outputs come over the wire. `bscan` MUST NEVER leave the
+   * device.
+   *
+   * Endpoints consumed (all public, no auth):
+   *   - `GET /info`               → tip height
+   *   - `GET /tweaks/:height`     → 33-byte compressed tweaks
+   *   - `GET /utxos/:height`      → P2TR outputs in the block
+   *
+   * No version segment, no trailing slash. An empty string disables silent
+   * payment scanning entirely (the wallet still displays the static `sp1q…`
+   * receive address, but never resolves balances or history).
+   *
+   * **Privacy note**: the indexer never sees `bscan`, but it does observe the
+   * sequence of block heights you ask about, paired with your IP. For a
+   * backfill scan over a contiguous range that signal is uninformative; for
+   * live ongoing scans the operator can correlate your IP with the wallet's
+   * last-known tip. Self-hosting (or pointing this at a trusted endpoint) is
+   * the strongest mitigation.
+   *
+   * Default: `"https://silentpayments.dev/blindbit/mainnet"` — the same
+   * public BlindBit Oracle the Dana wallet (cygnet3/dana) uses. Operated by
+   * the silentpayments.dev project, no authentication, no rate-limiting
+   * announced. Override via `agora.json` for a self-hosted endpoint.
+   */
+  bip352IndexerUrl: string;
   /**
    * Display preference for monetary amounts (zap totals, balances, send forms).
    * - "usd" (default): convert sats to USD using the live BTC price.

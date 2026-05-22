@@ -86,7 +86,7 @@ export function useDonateCampaign() {
   const { mutateAsync: publishEvent } = useNostrPublish();
   const queryClient = useQueryClient();
   const { config } = useAppContext();
-  const { esploraBaseUrl } = config;
+  const { esploraApis } = config;
 
   async function donateToCampaign({
     campaign,
@@ -117,10 +117,7 @@ export function useDonateCampaign() {
     const senderAddress = nostrPubkeyToBitcoinAddress(user.pubkey);
     if (!senderAddress) throw new Error('Failed to derive your Bitcoin address.');
 
-    const [utxos, rates] = await Promise.all([
-      fetchUTXOs(senderAddress, esploraBaseUrl),
-      getFeeRates(esploraBaseUrl),
-    ]);
+    const [utxos, rates] = await Promise.all([fetchUTXOs(senderAddress, esploraApis), getFeeRates(esploraApis)]);
     if (utxos.length === 0) {
       throw new Error('Your Bitcoin wallet has no spendable funds.');
     }
@@ -145,7 +142,7 @@ export function useDonateCampaign() {
     }
 
     const txHex = finalizePsbt(signedHex);
-    const txid = await broadcastTransaction(txHex, esploraBaseUrl);
+    const txid = await broadcastTransaction(txHex, esploraApis);
 
     // Publish the kind 8333 receipt. Per NIP.md §Kind 33863 §Donation flow,
     // campaign donation receipts MUST NOT carry `p` tags — the recipient is

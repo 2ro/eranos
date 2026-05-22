@@ -116,15 +116,17 @@ function extractCampaignTarget(event: NostrEvent): string | null {
  *   and are rejected.
  *
  * @param event           The kind 8333 event to verify.
- * @param esploraBaseUrl  Esplora REST root used to fetch the tx detail.
+ * @param esploraApis     Ordered list of Esplora REST roots tried with failover.
  * @param campaignWallet  When the receipt targets a kind 33863 campaign,
  *                        the campaign's `w` value. Required for campaign-wallet
  *                        mode; ignored otherwise.
+ * @param signal          Optional abort signal (e.g. from TanStack Query).
  */
 export async function verifyOnchainZap(
   event: NostrEvent,
-  esploraBaseUrl: string,
+  esploraApis: string[],
   campaignWallet?: string,
+  signal?: AbortSignal,
 ): Promise<OnchainZapEntry | null> {
   const txid = extractOnchainZapTxid(event);
   if (!txid) return null;
@@ -165,7 +167,7 @@ export async function verifyOnchainZap(
 
   let detail;
   try {
-    detail = await fetchTxDetail(txid, esploraBaseUrl);
+    detail = await fetchTxDetail(txid, esploraApis, signal);
   } catch {
     return null;
   }
@@ -205,7 +207,7 @@ export async function verifyOnchainZap(
 export function useOnchainZaps(target: NostrEvent | undefined) {
   const { nostr } = useNostr();
   const { config } = useAppContext();
-  const { esploraBaseUrl } = config;
+  const { esploraApis } = config;
   const isAddressable = target && target.kind >= 30000 && target.kind < 40000;
   const dTag = isAddressable
     ? target.tags.find(([n]) => n === 'd')?.[1] ?? ''
@@ -263,8 +265,9 @@ export function useOnchainZaps(target: NostrEvent | undefined) {
   const walletValue = campaignWallet?.value;
   const verifications = useQueries({
     queries: events.map((event) => ({
-      queryKey: ['onchain-zaps', 'verify', esploraBaseUrl, event.id, walletValue ?? ''],
-      queryFn: () => verifyOnchainZap(event, esploraBaseUrl, walletValue),
+      queryKey: ['onchain-zaps', 'verify', esploraApis, event.id, walletValue ?? ''],
+      queryFn: ({ signal }: { signal: AbortSignal }) =>
+        verifyOnchainZap(event, esploraApis, walletValue, signal),
       staleTime: 60_000,
     })),
   });
@@ -306,7 +309,7 @@ export function useVerifiedOnchainZap(
   campaignWallet?: string,
 ): OnchainZapEntry | null | undefined {
   const { config } = useAppContext();
-  const { esploraBaseUrl } = config;
+  const { esploraApis } = config;
   const txid = event ? extractOnchainZapTxid(event) : null;
   const targetsCampaign = event ? !!extractCampaignTarget(event) : false;
   const hasIdentityRecipient = event ? extractOnchainZapRecipients(event).length > 0 : false;
@@ -321,8 +324,8 @@ export function useVerifiedOnchainZap(
   );
 
   const { data } = useQuery({
-    queryKey: ['onchain-zaps', 'verify', esploraBaseUrl, event?.id ?? '', campaignWallet ?? ''],
-    queryFn: () => verifyOnchainZap(event!, esploraBaseUrl, campaignWallet),
+    queryKey: ['onchain-zaps', 'verify', esploraApis, event?.id ?? '', campaignWallet ?? ''],
+    queryFn: ({ signal }) => verifyOnchainZap(event!, esploraApis, campaignWallet, signal),
     enabled,
     staleTime: 60_000,
   });

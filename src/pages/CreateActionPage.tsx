@@ -23,7 +23,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
-import { useBitcoinWallet } from '@/hooks/useBitcoinWallet';
+import { useBtcPrice } from '@/hooks/useBtcPrice';
 import { useManageableOrganizations } from '@/hooks/useManageableOrganizations';
 import { useNostrPublish } from '@/hooks/useNostrPublish';
 import { useToast } from '@/hooks/useToast';
@@ -63,7 +63,7 @@ export function CreateActionPage() {
   const queryClient = useQueryClient();
   const { mutateAsync: createEvent } = useNostrPublish();
   const { toast } = useToast();
-  const { btcPrice } = useBitcoinWallet();
+  const { data: btcPrice } = useBtcPrice();
 
   const browserTimezone = useMemo(
     () => Intl.DateTimeFormat().resolvedOptions().timeZone,

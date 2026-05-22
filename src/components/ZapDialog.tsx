@@ -289,7 +289,7 @@ export function ZapDialog({ target, children, className }: ZapDialogProps) {
   const { toast } = useToast();
   const { webln, activeNWC } = useWallet();
   const { config } = useAppContext();
-  const { esploraBaseUrl } = config;
+  const { esploraApis } = config;
 
   // Success state: populated by either zap rail's onSuccess callback.
   // When set, we replace the tab UI with <ZapSuccessScreen />.
@@ -323,8 +323,8 @@ export function ZapDialog({ target, children, className }: ZapDialogProps) {
   const amountInputRef = useRef<HTMLInputElement>(null);
 
   const { data: btcPrice } = useQuery({
-    queryKey: ['btc-price', esploraBaseUrl],
-    queryFn: () => fetchBtcPrice(esploraBaseUrl),
+    queryKey: ['btc-price', esploraApis],
+    queryFn: ({ signal }) => fetchBtcPrice(esploraApis, signal),
     staleTime: 30_000,
   });
 

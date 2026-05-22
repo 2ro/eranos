@@ -465,21 +465,21 @@ function ConfirmView({
 }: ConfirmViewProps) {
   const { user } = useCurrentUser();
   const { config } = useAppContext();
-  const { esploraBaseUrl } = config;
+  const { esploraApis } = config;
 
   const senderAddress = user ? nostrPubkeyToBitcoinAddress(user.pubkey) : null;
 
   // Pre-fetch UTXOs + fee rates so the confirm screen can show an
   // accurate fee estimate before the donor commits.
   const utxosQuery = useQuery({
-    queryKey: ['bitcoin-utxos', senderAddress, esploraBaseUrl],
-    queryFn: () => fetchUTXOs(senderAddress!, esploraBaseUrl),
+    queryKey: ['bitcoin-utxos', senderAddress, esploraApis],
+    queryFn: ({ signal }) => fetchUTXOs(senderAddress!, esploraApis, signal),
     enabled: !!senderAddress,
     staleTime: 30_000,
   });
   const feeRatesQuery = useQuery({
-    queryKey: ['bitcoin-fee-rates', esploraBaseUrl],
-    queryFn: () => getFeeRates(esploraBaseUrl),
+    queryKey: ['bitcoin-fee-rates', esploraApis],
+    queryFn: ({ signal }) => getFeeRates(esploraApis, signal),
     staleTime: 30_000,
   });
 

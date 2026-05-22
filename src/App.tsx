@@ -146,7 +146,13 @@ const hardcodedConfig: AppConfig = {
   imageQuality: 'compressed',
   curatorPubkey: '932614571afcbad4d17a191ee281e39eebbb41b93fac8fd87829622aeb112f4d',
   sandboxDomain: 'iframe.diy',
-  esploraBaseUrl: 'https://mempool.space/api',
+  esploraApis: [
+    'https://mempool.space/api',
+    'https://mempool.emzy.de/api',
+    'https://blockstream.info/api',
+  ],
+  blockbookBaseUrl: 'https://btc.trezor.io',
+  bip352IndexerUrl: 'https://silentpayments.dev/blindbit/mainnet',
   sidebarWidgets: [
     { id: 'trends' },
     { id: 'hot-posts' },
