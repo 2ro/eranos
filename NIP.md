@@ -463,9 +463,16 @@ The `pinnedEvents` array is ordered newest pin first. Pinning an already-pinned 
 - **No category, no topics:** kind 33863 events MUST NOT carry `t` tags or NIP-32 category labels in any `agora.*` namespace. Campaigns are individual stories; discovery happens via search (NIP-50 against title/summary/content), country (`#i`), and moderator curation (below).
 - **Migration:** kind 33863 has no relationship to any earlier campaign kind. Clients MUST NOT read, merge, or migrate events of any other kind into the kind 33863 namespace.
 
-### Campaign Moderation Labels
+### Agora Moderation Labels
 
-Agora curates which kind 33863 campaigns appear on the homepage (`/`) and on the Support directory (`/campaigns/all`) via moderator-signed NIP-32 label events (kind 1985) in a dedicated label namespace. The campaign event itself is never modified — surfacing is purely a client-side rollup of label events.
+Agora curates which kind 33863 campaigns appear on the homepage (`/`) and on the Support directory (`/campaigns/all`), and which kind 34550 organizations appear in the Featured shelf on `/communities`, via moderator-signed NIP-32 label events (kind 1985) in a dedicated label namespace. The labeled event itself is never modified — surfacing is purely a client-side rollup of label events.
+
+Campaigns and organizations share a single label namespace and a single moderator pack (Team Soapbox); the only thing distinguishing the two streams is the kind prefix on the `a` tag of each label:
+
+- `33863:<author-pubkey>:<d>` — campaign (kind 33863, see "Open Campaigns" above).
+- `34550:<author-pubkey>:<d>` — organization (kind 34550, NIP-72 community definition).
+
+A client surfacing campaigns MUST filter folded labels to those whose `a` tag starts with `33863:`. A client surfacing organizations MUST filter to `34550:`. Mixing the two streams would let a moderator's `featured` label on a campaign appear to feature an unrelated organization with the same `d` tag, or vice versa.
 
 #### Namespace
 
@@ -480,21 +487,29 @@ Each label event carries the namespace twice, per NIP-32:
 
 #### Label values
 
-Three independent axes; the newest moderator-signed label per axis per campaign wins.
+Three independent axes; the newest moderator-signed label per axis per coordinate wins.
 
 | Axis     | Values                    | Meaning                                                                 |
 |----------|---------------------------|-------------------------------------------------------------------------|
-| approval | `approved`, `unapproved`  | `approved` allows the campaign on `/` and Discover. `unapproved` retracts a previous approval. |
-| hide     | `hidden`, `unhidden`      | `hidden` suppresses the campaign everywhere it would otherwise appear. `unhidden` retracts a previous hide. |
-| featured | `featured`, `unfeatured`  | `featured` places the campaign in the hand-picked Featured row on `/`. `unfeatured` retracts. |
+| approval | `approved`, `unapproved`  | `approved` allows the campaign/organization on its discovery surfaces. `unapproved` retracts a previous approval. |
+| hide     | `hidden`, `unhidden`      | `hidden` suppresses the campaign/organization everywhere it would otherwise appear. `unhidden` retracts a previous hide. |
+| featured | `featured`, `unfeatured`  | `featured` places the campaign in the hand-picked Featured row on `/`, or the organization in the Featured shelf on `/communities`. `unfeatured` retracts. |
 
 Surfacing rules (hide always wins):
+
+**Campaigns**
 
 - **Featured row on `/`** — iff the latest featured label is `featured` AND the latest hide label is not `hidden`. Ordered newest-`created_at`-of-`featured`-label first. Featured is independent of Approved at the protocol level; a campaign may be featured without being approved (the home page treats Featured and Approved as deduplicated bins, with Featured taking precedence).
 - **Community Campaigns grid on `/`** — iff approved, not hidden, and not featured (featured campaigns get their own row above).
 - **Discover shelf** — iff approved AND not hidden.
 - **Moderator-only "Pending"** — iff neither approved nor hidden.
 - **Moderator-only "Hidden"** — iff hidden.
+
+**Organizations**
+
+- **Featured shelf on `/communities`** — iff the latest featured label is `featured` AND the latest hide label is not `hidden`. Ordered newest-`created_at`-of-`featured`-label first.
+- **"My organizations" shelf on `/communities`** — intentionally ignores all moderation labels. A user's own founded, moderated, or followed organizations always render regardless of label state.
+- **Hide enforcement on other organization discovery surfaces** — clients SHOULD suppress `hidden` organizations from any future "All organizations" / browse surface for non-moderators. Moderators MAY see hidden organizations with a "Hidden" treatment so they can unhide.
 
 #### Event Structure
 
@@ -511,14 +526,27 @@ Surfacing rules (hide always wins):
 }
 ```
 
-A `featured` label has the same shape with `["l", "featured", "agora.moderation"]` and `["alt", "Campaign moderation: featured"]`.
+An organization label has the same shape with a kind 34550 `a` tag:
+
+```json
+{
+  "kind": 1985,
+  "content": "",
+  "tags": [
+    ["L", "agora.moderation"],
+    ["l", "featured", "agora.moderation"],
+    ["a", "34550:<author-pubkey>:<organization-d-tag>"],
+    ["alt", "Organization moderation: featured"]
+  ]
+}
+```
 
 Required tags:
 
 - `L` set to `agora.moderation`.
 - `l` with the label value as the 2nd element and `agora.moderation` as the 3rd.
-- `a` referencing the campaign coordinate `33863:<pubkey>:<d>`.
-- `alt` (NIP-31) — clients without label support will display this string.
+- `a` referencing the target coordinate (`33863:<pubkey>:<d>` for a campaign, `34550:<pubkey>:<d>` for an organization).
+- `alt` (NIP-31) — clients without label support will display this string. The `alt` value SHOULD identify the surface (e.g. `Campaign moderation: featured` or `Organization moderation: featured`) so non-Agora clients can read it.
 
 #### Trust Model
 
@@ -533,8 +561,10 @@ d-tag:      k4p5w0n22suf
 The pack `p` tags are the authoritative moderator list. Clients MUST pin `authors:` on their label REQ to the pack `p` tags; events from non-pack authors MUST be ignored. This means:
 
 - Self-approval is impossible unless the pack author has added you.
-- A moderator removed from the pack immediately loses moderation authority — campaigns kept alive only by their labels return to "pending" until another moderator approves them.
+- A moderator removed from the pack immediately loses moderation authority — campaigns/organizations kept alive only by their labels return to "pending" until another moderator approves them.
 - The pack author (single signer) can reset the entire moderator roster by republishing the pack.
+
+The same moderator set governs both campaign and organization labels. Carving out per-surface moderator subsets is out of scope; clients that need that distinction would have to introduce a second follow pack and a second label namespace.
 
 #### Querying
 
@@ -560,13 +590,14 @@ Step 2 — fetch label events from pack members in the namespace:
 }
 ```
 
-Step 3 — fold by `(campaign-coord, axis)`, latest-`created_at`-wins. Then fetch only the approved-and-not-hidden campaign coordinates with one filter per author (bundled in a single REQ).
+Step 3 — fold by `(coord, axis)`, latest-`created_at`-wins, filtering to the relevant kind prefix (`33863:` for campaigns or `34550:` for organizations). Then fetch the targeted events themselves — one filter per author (bundled in a single REQ) keyed by their d-tags.
 
 #### Client Behavior
 
-- Clients SHOULD render approve/hide controls only for users whose pubkey appears in the pack.
-- Clients MAY display "Hidden" badges on hidden campaigns when viewed by a moderator, and SHOULD NOT render them at all to non-moderators.
+- Clients SHOULD render approve/hide/feature controls only for users whose pubkey appears in the pack.
+- Clients MAY display "Hidden" badges on hidden campaigns/organizations when viewed by a moderator, and SHOULD NOT render them at all to non-moderators.
 - Non-moderator authors viewing the homepage SHOULD see their own pending campaigns in a separate explained section so they understand why their campaign isn't yet on the homepage. The campaign URL remains live and donatable regardless of moderation state.
+- Organization authors are not shown an equivalent "pending" surface today — organizations are visible at their NIP-19 route regardless of moderation, and the only moderation surface is the Featured shelf.
 
 ---
 

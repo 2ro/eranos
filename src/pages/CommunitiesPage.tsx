@@ -386,8 +386,8 @@ function FeaturedOrganizationsShelf() {
     return (
       <EmptyShelf
         icon={<Users className="size-7 text-primary/70" />}
-        title="No featured organizations available"
-        body="The curated list is currently unreachable. Try refreshing in a moment."
+        title="No featured organizations yet"
+        body="Agora moderators feature standout organizations here. Check back soon."
         action={null}
       />
     );

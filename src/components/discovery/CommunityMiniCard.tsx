@@ -1,10 +1,13 @@
 import { Link } from 'react-router-dom';
-import { Users } from 'lucide-react';
+import { EyeOff, Users } from 'lucide-react';
 import { nip19 } from 'nostr-tools';
 
+import { CommunityModerationMenu } from '@/components/CommunityModerationMenu';
+import { Badge } from '@/components/ui/badge';
 import { Card } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useAuthor } from '@/hooks/useAuthor';
+import { useOrganizationModeration } from '@/hooks/useOrganizationModeration';
 import { genUserName } from '@/lib/genUserName';
 import { sanitizeUrl } from '@/lib/sanitizeUrl';
 import { cn } from '@/lib/utils';
@@ -29,6 +32,10 @@ interface CommunityMiniCardProps {
  *  - founder avatar + display name in a muted row.
  *
  * Kept narrow enough to fit ~4 cards across a desktop content column.
+ *
+ * Moderators (Team Soapbox pack members) see a kebab menu overlaid on the
+ * banner exposing the Approve / Hide / Feature actions. Non-moderators see
+ * no overlay at all because `CommunityModerationMenu` returns `null`.
  */
 export function CommunityMiniCard({ community, className }: CommunityMiniCardProps) {
   const founder = useAuthor(community.founderPubkey);
@@ -44,6 +51,15 @@ export function CommunityMiniCard({ community, className }: CommunityMiniCardPro
     pubkey: community.founderPubkey,
     identifier: community.dTag,
   });
+
+  // Per-card moderation state. Reads from the shared TanStack cache; the
+  // underlying query is fetched once per page render no matter how many
+  // cards mount this hook.
+  const { data: moderation } = useOrganizationModeration();
+  const coord = community.aTag;
+  const isApproved = moderation.approvedCoords.has(coord);
+  const isHidden = moderation.hiddenCoords.has(coord);
+  const isFeatured = moderation.featuredCoords.has(coord);
 
   return (
     <Link
@@ -67,6 +83,28 @@ export function CommunityMiniCard({ community, className }: CommunityMiniCardPro
               <Users className="size-10 text-primary/40" />
             </div>
           )}
+          {/* Moderator overlay. Mirrors `CampaignCard`: Hidden badge sits to
+              the left of the kebab so moderators can see the state at a
+              glance. Both render `null` for non-moderators or unlabelled
+              orgs. */}
+          <div className="absolute top-2 right-2 flex items-center gap-1.5">
+            {isHidden && (
+              <Badge
+                variant="secondary"
+                className="backdrop-blur bg-destructive/15 text-destructive border-destructive/30 h-6 px-1.5 text-[10px]"
+              >
+                <EyeOff className="size-3 mr-1" />
+                Hidden
+              </Badge>
+            )}
+            <CommunityModerationMenu
+              coord={coord}
+              organizationName={community.name}
+              isApproved={isApproved}
+              isHidden={isHidden}
+              isFeatured={isFeatured}
+            />
+          </div>
         </div>
         <div className="flex flex-col gap-2 p-3.5 flex-1">
           <h3 className="font-semibold leading-tight text-sm tracking-tight line-clamp-1">
