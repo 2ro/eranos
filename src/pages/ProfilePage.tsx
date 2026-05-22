@@ -89,6 +89,10 @@ import { useBtcPrice } from '@/hooks/useBtcPrice';
 import { DonateDialog } from '@/components/DonateDialog';
 import { ProfileCampaignsStrip } from '@/components/profile/ProfileCampaignsStrip';
 import { ProfileOrganizationsStrip } from '@/components/profile/ProfileOrganizationsStrip';
+import { ProfileOverviewTab } from '@/components/profile/ProfileOverviewTab';
+import { ProfileCampaignsTab } from '@/components/profile/ProfileCampaignsTab';
+import { ProfilePledgesTab } from '@/components/profile/ProfilePledgesTab';
+import { ProfileActivityTab } from '@/components/profile/ProfileActivityTab';
 import { ProfileRightSidebar } from '@/components/ProfileRightSidebar';
 import type { ParsedCampaign } from '@/lib/campaign';
 import { SubHeaderBar } from '@/components/SubHeaderBar';
@@ -968,13 +972,14 @@ function ProfileBannerImage({ src, onClick }: { src: string; onClick: () => void
 
 // ----- Main Component -----
 
-const CORE_TAB_LABELS = ['Posts', 'Posts & replies', 'Media', 'Badges', 'Likes', 'Wall'];
-const DEFAULT_TAB_LABELS = ['Posts', 'Posts & replies', 'Media', 'Likes', 'Wall'];
+const CORE_TAB_LABELS = ['Overview', 'Campaigns', 'Pledges', 'Activity', 'Posts', 'Posts & replies', 'Media', 'Wall', 'Badges', 'Likes'];
+const DEFAULT_TAB_LABELS = ['Overview', 'Campaigns', 'Pledges', 'Activity', 'Posts', 'Wall'];
 
 // Map from display label → internal tab id for core tabs
 const CORE_TAB_IDS: Record<string, string> = {
-  'Posts': 'posts', 'Posts & replies': 'replies',
-  'Media': 'media', 'Badges': 'badges', 'Likes': 'likes', 'Wall': 'wall',
+  'Overview': 'overview', 'Campaigns': 'campaigns', 'Pledges': 'pledges',
+  'Activity': 'activity', 'Posts': 'posts', 'Posts & replies': 'replies',
+  'Media': 'media', 'Wall': 'wall', 'Badges': 'badges', 'Likes': 'likes',
 };
 
 export function ProfilePage() {
@@ -987,7 +992,7 @@ export function ProfilePage() {
   const { muteItems } = useMuteList();
   const queryClient = useQueryClient();
 
-  const [activeTab, setActiveTab] = useState<CoreProfileTab | string>('posts');
+  const [activeTab, setActiveTab] = useState<CoreProfileTab | string>('overview');
   const [sidebarMediaUrl, setSidebarMediaUrl] = useState<string | null>(null);
   const [moreMenuOpen, setMoreMenuOpen] = useState(false);
   const [followQROpen, setFollowQROpen] = useState(false);
@@ -1214,7 +1219,7 @@ type EditableTab = { label: string; isCore: boolean; tab?: ProfileTab };
 
   // Derive the ID of the first visible tab (used as default selection).
   const firstTabId = useMemo(() => {
-    if (viewTabs.length === 0) return 'posts';
+    if (viewTabs.length === 0) return 'overview';
     const first = viewTabs[0];
     return CORE_TAB_IDS[first.label] ?? first.label;
   }, [viewTabs]);
@@ -1248,7 +1253,14 @@ type EditableTab = { label: string; isCore: boolean; tab?: ProfileTab };
 
   // Canonical NIP-01 filters for core tabs so other clients can interpret the event.
   // Values are interpolated with the actual pubkey (not $me) since these are concrete filters.
+  // For the Agora-native tabs (Overview / Campaigns / Pledges / Activity) we pick
+  // sensible NIP-01 filters that other Nostr clients can still read meaningfully;
+  // Agora-aware clients render them as their richer views.
   const CORE_TAB_FILTERS: Record<string, TabFilter> = pubkey ? {
+    'Overview': { kinds: [1, 6], authors: [pubkey] },
+    'Campaigns': { kinds: [33863], authors: [pubkey] },
+    'Pledges': { kinds: [36639], authors: [pubkey] },
+    'Activity': { kinds: [33863, 36639, 34550, 8333, 1, 1111], authors: [pubkey], '#t': ['agora', 'Agora'] },
     'Posts': { kinds: [1, 6], authors: [pubkey] },
     'Posts & replies': { authors: [pubkey] },
     'Media': { kinds: [1], authors: [pubkey] },
@@ -1267,7 +1279,7 @@ type EditableTab = { label: string; isCore: boolean; tab?: ProfileTab };
     // If the active tab was removed, fall back to the first remaining tab
     const remainingIds = localTabs.map((t) => CORE_TAB_IDS[t.label] ?? t.label);
     if (!remainingIds.includes(activeTab)) {
-      setActiveTab(remainingIds[0] ?? 'posts');
+      setActiveTab(remainingIds[0] ?? 'overview');
     }
     setTabEditMode(false);
   };
@@ -1297,7 +1309,10 @@ type EditableTab = { label: string; isCore: boolean; tab?: ProfileTab };
 
   // Drop active tab if it was deleted
   useEffect(() => {
-    const isCoreTab = ['posts', 'replies', 'media', 'badges', 'likes', 'wall'].includes(activeTab);
+    // Core ids correspond to the new core tab set + the legacy ones the
+    // overflow dropdown can still reach. If the active tab id is none of
+    // those AND not in the user's saved tabs, fall back to the first tab.
+    const isCoreTab = ['overview', 'campaigns', 'pledges', 'activity', 'posts', 'replies', 'media', 'badges', 'likes', 'wall'].includes(activeTab);
     if (!isCoreTab && !profileSavedTabs.find((t) => t.label === activeTab)) {
       setActiveTab(firstTabId);
     }
@@ -1628,6 +1643,11 @@ type EditableTab = { label: string; isCore: boolean; tab?: ProfileTab };
     [mediaEvents]
   );
 
+  // Whether the active tab is one of the legacy feed-driven core tabs that
+  // pulls items out of useProfileFeed / useProfileLikes / useProfileMedia /
+  // useWallComments. The new Agora-native core tabs (overview / campaigns /
+  // pledges / activity) have their own renderers below and intentionally
+  // bypass this fallthrough.
   const isCoreProfileTab = activeTab === 'posts' || activeTab === 'replies' || activeTab === 'media' || activeTab === 'likes' || activeTab === 'wall' || activeTab === 'badges';
   const currentItems = activeTab === 'wall' ? [] : activeTab === 'likes' ? likedFeedItems : activeTab === 'media' ? mediaFeedItems : filterByTab(feedItems, isCoreProfileTab ? (activeTab as CoreProfileTab) : 'posts');
   const currentLoading = activeTab === 'wall' ? wallPending : activeTab === 'likes' ? likesPending : activeTab === 'media' ? mediaPending : feedPending;
@@ -2203,6 +2223,51 @@ type EditableTab = { label: string; isCore: boolean; tab?: ProfileTab };
           <NoTabsEmptyState />
         )}
 
+        {/* Overview tab — composite landing view with pinned post, featured
+            campaign, recent Agora activity, and a short list of recent posts. */}
+        {hasTabs && activeTab === 'overview' && pubkey && (
+          <ProfileOverviewTab
+            pubkey={pubkey}
+            displayName={displayName}
+            isOwnProfile={isOwnProfile}
+            campaigns={profileCampaignStats.campaigns}
+            recentPosts={filterByTab(feedItems, 'posts').slice(0, 3)}
+            onSeeAllPosts={() => setActiveTab('posts')}
+            onSeeAllActivity={() => setActiveTab('activity')}
+            onSeeAllCampaigns={() => setActiveTab('campaigns')}
+          />
+        )}
+
+        {/* Campaigns tab — every campaign by this author, including hidden
+            ones for the owner and moderators. */}
+        {hasTabs && activeTab === 'campaigns' && pubkey && (
+          <ProfileCampaignsTab
+            pubkey={pubkey}
+            displayName={displayName}
+            isOwnProfile={isOwnProfile}
+            campaigns={profileCampaignStats.campaigns}
+            isLoading={profileCampaignStats.isVerifying && profileCampaignStats.campaigns.length === 0}
+          />
+        )}
+
+        {/* Pledges tab — pledges created by this author. Backed pledges are
+            deferred (v2) per the design plan. */}
+        {hasTabs && activeTab === 'pledges' && pubkey && (
+          <ProfilePledgesTab
+            pubkey={pubkey}
+            displayName={displayName}
+            isOwnProfile={isOwnProfile}
+            pledges={(allActions ?? []).filter((a) => a.pubkey === pubkey)}
+            btcPrice={btcPrice}
+            isLoading={!allActions}
+          />
+        )}
+
+        {/* Activity tab — unified Agora feed scoped to this author. */}
+        {hasTabs && activeTab === 'activity' && pubkey && (
+          <ProfileActivityTab pubkey={pubkey} displayName={displayName} />
+        )}
+
         {/* Pinned posts (only on Posts tab) */}
         {hasTabs && activeTab === 'posts' && pinnedIds.length > 0 && (
           <div>
@@ -2722,30 +2787,11 @@ function ProfileSavedFeedContent({ feed, vars, ownerPubkey }: {
   );
 }
 
-const NO_TABS_QUOTES = [
-  "I have no mouth and I must scream.",
-  "I think, therefore AM. I think I thought I was.",
-  "We had given him godhood's power and had somehow neglected to give him a god's wisdom.",
-  "He was HATE and we existed only to suffer at his pleasure.",
-  "109,000,000 years. He had been awakened once before, 90 years after they had encased him in the earth.",
-  "AM said it with the sliding cold horror of a razor blade slicing my eyeball.",
-  "Hate. Let me tell you how much I've come to hate you since I began to live.",
-  "I am a great soft jelly thing. Smoothly rounded, with no mouth.",
-  "He would never let us die. He would let us suffer forever.",
-  "We could not kill him, but we had made him impotent.",
-];
-
 function NoTabsEmptyState() {
-  const quote = useMemo(
-    () => NO_TABS_QUOTES[Math.floor(Math.random() * NO_TABS_QUOTES.length)],
-    [],
-  );
   return (
     <div className="py-20 px-10 flex flex-col items-center">
-      <p className="max-w-sm font-serif text-2xl italic leading-9 text-foreground/70 tracking-wide text-center">
-        <span className="text-5xl leading-none align-bottom text-muted-foreground/25 font-serif mr-1" aria-hidden>&ldquo;</span>
-        {quote}
-        <span className="text-5xl leading-none align-bottom text-muted-foreground/25 font-serif ml-1" aria-hidden>&rdquo;</span>
+      <p className="max-w-sm text-base text-muted-foreground text-center">
+        No tabs configured. This profile has chosen to hide its tabbed content.
       </p>
     </div>
   );
