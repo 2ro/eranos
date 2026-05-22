@@ -431,9 +431,14 @@ export interface BlockbookFeeRates {
 
 /**
  * WS `estimateFee` response: one entry per requested block target, in
- * request order. `feePerUnit` is sat/vB as a decimal string. Unlike the
- * REST `estimatefee` endpoint (which returns BTC/kB), no unit conversion
- * is needed.
+ * request order. `feePerUnit` is sat/**kB** for Bitcoin-type chains —
+ * the same unit as Bitcoin Core's `estimatesmartfee` after BTC→sat
+ * conversion. The TypeScript declaration in `blockbook-api.ts`
+ * describes it as "sat/byte", but Blockbook's Go source is explicit
+ * (`// fee is in sats/kB` in `api/worker.go`) and confirmed against a
+ * live mainnet endpoint where the field is ~3000 at typical mempool
+ * conditions. Dividing by 1000 yields the sat/vB value we use
+ * everywhere else in the wallet.
  */
 interface BlockbookFeeEntry {
   feePerUnit?: string;
@@ -443,9 +448,11 @@ interface BlockbookFeeEntry {
 
 function parseFeePerUnit(entry: BlockbookFeeEntry | undefined): number {
   if (!entry || typeof entry.feePerUnit !== 'string') return 1;
-  const n = parseFloat(entry.feePerUnit);
-  if (!Number.isFinite(n) || n <= 0) return 1;
-  return Math.max(1, Math.ceil(n));
+  const satsPerKb = parseFloat(entry.feePerUnit);
+  if (!Number.isFinite(satsPerKb) || satsPerKb <= 0) return 1;
+  // sat/kB → sat/vB. Round up so we never underpay relative to the
+  // backend's recommendation (which can cause stuck transactions).
+  return Math.max(1, Math.ceil(satsPerKb / 1000));
 }
 
 /**
