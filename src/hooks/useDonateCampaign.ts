@@ -184,7 +184,9 @@ export function useDonateCampaign() {
       queryClient.invalidateQueries({ queryKey: ['organization-activity', orgATag] });
     }
     // Campaign list views (and per-campaign progress bars) read totals via
-    // useCampaignDonations, so refresh those too.
+    // useCampaignDonations, which keys its address-balance lookup under
+    // ['bitcoin-balance', 'campaign', …]. The broader ['bitcoin-balance']
+    // invalidation above already covers it.
     queryClient.invalidateQueries({ queryKey: ['campaigns'] });
     queryClient.invalidateQueries({ queryKey: ['campaigns-all'] });
     // Donations (kind 8333 receipts) surface in the home Agora activity

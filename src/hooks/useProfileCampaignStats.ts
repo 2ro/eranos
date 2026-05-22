@@ -1,25 +1,20 @@
-import { useNostr } from '@nostrify/react';
 import { useQueries } from '@tanstack/react-query';
-import type { NostrEvent } from '@nostrify/nostrify';
 
 import { useCampaigns } from '@/hooks/useCampaigns';
 import { useAppContext } from '@/hooks/useAppContext';
-import {
-  extractOnchainZapTxid,
-  verifyOnchainZap,
-} from '@/hooks/useOnchainZaps';
+import { fetchAddressData } from '@/lib/bitcoin';
 import type { ParsedCampaign } from '@/lib/campaign';
 
 export interface ProfileCampaignStats {
   /** Total number of non-deleted campaigns authored by this pubkey. */
   campaignCount: number;
   /**
-   * Sum of verified on-chain donations across all of this user's
-   * campaigns, in sats. Silent-payment campaigns contribute 0 by design
-   * (donations are unlinkable, no receipts are published).
+   * Sum of cumulative on-chain receipts (`chain_stats.funded_txo_sum`)
+   * across all of this user's on-chain campaigns, in sats. Silent-payment
+   * campaigns contribute 0 by design (donations are unlinkable).
    */
   totalRaisedSats: number;
-  /** True while donation verification queries are still resolving. */
+  /** True while underlying address-balance queries are still resolving. */
   isVerifying: boolean;
   /** The raw campaigns list, for reuse by the chip click handler. */
   campaigns: ParsedCampaign[];
@@ -28,18 +23,17 @@ export interface ProfileCampaignStats {
 /**
  * Aggregate campaign and donation stats for a single profile.
  *
- * Mirrors {@link useCampaignDonations} per campaign — fetches kind 8333
- * receipts targeting each `a` coord, dedupes by txid, and verifies each
- * one on-chain against the campaign's `w` address before counting it
- * toward the total. Silent-payment campaigns are excluded from the
- * verification fan-out (their donations are intentionally unlinkable).
+ * Mirrors {@link useCampaignDonations} per campaign — fans out a balance
+ * lookup against each on-chain campaign's `w` address via the configured
+ * Esplora endpoint (default: mempool.space) and sums `totalReceived`
+ * across them. Silent-payment campaigns are excluded (their donations
+ * are intentionally unlinkable).
  *
  * Lazy: returns 0 / empty until the campaigns list resolves, then fans
- * out receipt fetches in parallel. Suitable for header stat chips where
+ * out balance fetches in parallel. Suitable for header stat chips where
  * an in-flight number is fine.
  */
 export function useProfileCampaignStats(pubkey: string | undefined): ProfileCampaignStats {
-  const { nostr } = useNostr();
   const { config } = useAppContext();
   const { esploraApis } = config;
 
@@ -48,59 +42,28 @@ export function useProfileCampaignStats(pubkey: string | undefined): ProfileCamp
   );
   const campaigns = pubkey ? (campaignsQuery.data ?? []) : [];
 
-  // Fan out: one receipt fetch per on-chain campaign.
+  // Fan out: one balance lookup per on-chain campaign address.
   const onchainCampaigns = campaigns.filter((c) => c.wallet?.mode === 'onchain');
-  const receiptsQueries = useQueries({
+  const balanceQueries = useQueries({
     queries: onchainCampaigns.map((campaign) => ({
-      queryKey: ['campaign-donations', 'events', campaign.aTag],
-      queryFn: async ({ signal }: { signal: AbortSignal }): Promise<NostrEvent[]> => {
-        return nostr.query(
-          [{ kinds: [8333], '#a': [campaign.aTag], limit: 500 }],
-          { signal },
-        );
-      },
-      staleTime: 15_000,
-    })),
-  });
-
-  // Flatten the receipts and dedupe by txid (prefer earliest, like
-  // useCampaignDonations does). Track which campaign each txid belongs to
-  // so we can verify against the right wallet.
-  const verificationInputs: Array<{ campaign: ParsedCampaign; event: NostrEvent }> = [];
-  const seenByCampaign = new Map<string, Set<string>>();
-  for (let i = 0; i < onchainCampaigns.length; i++) {
-    const campaign = onchainCampaigns[i];
-    const receipts = receiptsQueries[i]?.data ?? [];
-    const sortedAsc = [...receipts].sort((a, b) => a.created_at - b.created_at);
-    const seenTxids = new Set<string>();
-    for (const event of sortedAsc) {
-      const txid = extractOnchainZapTxid(event);
-      if (!txid) continue;
-      if (seenTxids.has(txid)) continue;
-      seenTxids.add(txid);
-      verificationInputs.push({ campaign, event });
-    }
-    seenByCampaign.set(campaign.aTag, seenTxids);
-  }
-
-  const verifications = useQueries({
-    queries: verificationInputs.map(({ campaign, event }) => ({
-      queryKey: ['onchain-zaps', 'verify', esploraApis, event.id, campaign.wallet?.value ?? ''],
-      queryFn: () => verifyOnchainZap(event, esploraApis, campaign.wallet?.value),
-      staleTime: 60_000,
+      // Share the cache key with useCampaignDonations so both surfaces
+      // refresh together when useDonateCampaign invalidates
+      // ['bitcoin-balance'].
+      queryKey: ['bitcoin-balance', 'campaign', esploraApis, campaign.wallet?.value ?? ''],
+      queryFn: ({ signal }: { signal: AbortSignal }) =>
+        fetchAddressData(campaign.wallet!.value, esploraApis, signal),
+      staleTime: 30_000,
       enabled: !!campaign.wallet?.value,
     })),
   });
 
-  const totalRaisedSats = verifications.reduce(
-    (sum, v) => sum + (v.data?.amountSats ?? 0),
+  const totalRaisedSats = balanceQueries.reduce(
+    (sum, q) => sum + (q.data?.totalReceived ?? 0),
     0,
   );
 
   const isVerifying =
-    campaignsQuery.isLoading ||
-    receiptsQueries.some((q) => q.isLoading) ||
-    verifications.some((v) => v.isLoading);
+    campaignsQuery.isLoading || balanceQueries.some((q) => q.isLoading);
 
   return {
     campaignCount: campaigns.length,

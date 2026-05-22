@@ -1,9 +1,7 @@
 import { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Megaphone } from 'lucide-react';
-import { useNostr } from '@nostrify/react';
 import { useQueries } from '@tanstack/react-query';
-import type { NostrEvent } from '@nostrify/nostrify';
 
 import { CampaignCard, CampaignCardSkeleton } from '@/components/CampaignCard';
 import { Button } from '@/components/ui/button';
@@ -12,10 +10,7 @@ import { useCampaignModeration } from '@/hooks/useCampaignModeration';
 import { useCampaignModerators } from '@/hooks/useCampaignModerators';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useAppContext } from '@/hooks/useAppContext';
-import {
-  extractOnchainZapTxid,
-  verifyOnchainZap,
-} from '@/hooks/useOnchainZaps';
+import { fetchAddressData } from '@/lib/bitcoin';
 import type { ParsedCampaign } from '@/lib/campaign';
 
 interface ProfileCampaignsTabProps {
@@ -144,68 +139,35 @@ export function ProfileCampaignsTab({
 }
 
 /**
- * Sorts the visible campaigns by verified sats raised (descending) by
- * fanning out one receipts query + per-receipt verification across all
- * campaigns at once. Uses `useQueries`, so the hook call count is
- * deterministic per render (one queries-tuple, not one hook per campaign)
- * and the rules of hooks hold.
+ * Sorts the visible campaigns by sats raised (descending) by fanning
+ * out one address-balance query per on-chain campaign. Uses `useQueries`,
+ * so the hook call count is deterministic per render (one queries-tuple,
+ * not one hook per campaign) and the rules of hooks hold.
  *
- * Caches share keys with `useCampaignDonations` so the verifier results
+ * Caches share keys with `useCampaignDonations` so the balance results
  * are reused across the profile and any other view of the same campaign.
  */
 function SortedByTopGrid({ campaigns }: { campaigns: ParsedCampaign[] }) {
-  const { nostr } = useNostr();
   const { config } = useAppContext();
   const { esploraApis } = config;
 
-  // Only on-chain campaigns can have verifiable totals. SP campaigns sort to 0.
+  // Only on-chain campaigns can have observable totals. SP campaigns sort to 0.
   const onchain = campaigns.filter((c) => c.wallet?.mode === 'onchain');
 
-  // Step 1: one receipts query per on-chain campaign.
-  const receiptsQueries = useQueries({
+  const balanceQueries = useQueries({
     queries: onchain.map((campaign) => ({
-      queryKey: ['campaign-donations', 'events', campaign.aTag],
-      queryFn: async ({ signal }: { signal: AbortSignal }): Promise<NostrEvent[]> => {
-        return nostr.query(
-          [{ kinds: [8333], '#a': [campaign.aTag], limit: 500 }],
-          { signal },
-        );
-      },
-      staleTime: 15_000,
+      queryKey: ['bitcoin-balance', 'campaign', esploraApis, campaign.wallet?.value ?? ''],
+      queryFn: ({ signal }: { signal: AbortSignal }) =>
+        fetchAddressData(campaign.wallet!.value, esploraApis, signal),
+      staleTime: 30_000,
+      enabled: !!campaign.wallet?.value,
     })),
   });
 
-  // Step 2: dedupe receipts by txid (earliest wins, matching useCampaignDonations).
-  const verificationInputs: Array<{ aTag: string; wallet: string; event: NostrEvent }> = [];
-  for (let i = 0; i < onchain.length; i++) {
-    const campaign = onchain[i];
-    const wallet = campaign.wallet?.value;
-    if (!wallet) continue;
-    const receipts = receiptsQueries[i]?.data ?? [];
-    const ascending = [...receipts].sort((a, b) => a.created_at - b.created_at);
-    const seenTxids = new Set<string>();
-    for (const event of ascending) {
-      const txid = extractOnchainZapTxid(event);
-      if (!txid || seenTxids.has(txid)) continue;
-      seenTxids.add(txid);
-      verificationInputs.push({ aTag: campaign.aTag, wallet, event });
-    }
-  }
-
-  const verifications = useQueries({
-    queries: verificationInputs.map(({ wallet, event }) => ({
-      queryKey: ['onchain-zaps', 'verify', esploraApis, event.id, wallet],
-      queryFn: () => verifyOnchainZap(event, esploraApis, wallet),
-      staleTime: 60_000,
-    })),
-  });
-
-  // Step 3: sum verified sats per campaign aTag.
   const totalsByCoord = new Map<string, number>();
-  for (let i = 0; i < verifications.length; i++) {
-    const { aTag } = verificationInputs[i];
-    const sats = verifications[i].data?.amountSats ?? 0;
-    totalsByCoord.set(aTag, (totalsByCoord.get(aTag) ?? 0) + sats);
+  for (let i = 0; i < onchain.length; i++) {
+    const sats = balanceQueries[i]?.data?.totalReceived ?? 0;
+    totalsByCoord.set(onchain[i].aTag, sats);
   }
 
   const sorted = [...campaigns].sort(
