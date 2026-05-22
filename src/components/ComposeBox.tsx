@@ -50,6 +50,7 @@ import { DITTO_RELAY } from '@/lib/appRelays';
 import { resizeImage } from '@/lib/resizeImage';
 import { extractHashtags } from '@/lib/hashtag';
 import { useIsMobile } from '@/hooks/useIsMobile';
+import { AGORA_DEFAULT_NOTE_TAGS } from '@/lib/agoraNoteTags';
 
 const MAX_CHARS = 5000;
 
@@ -156,7 +157,15 @@ interface ComposeBoxProps {
   hidePoll?: boolean;
   /** Label for the primary submit button. */
   submitLabel?: string;
-  /** Tags added to new top-level kind 1 notes without putting them in content. */
+  /**
+   * Tags added to new top-level kind 1 notes without putting them in content.
+   *
+   * Defaults to {@link AGORA_DEFAULT_NOTE_TAGS} (the silent `t:agora` tag) when
+   * the composer is producing a top-level kind 1 note (no replyTo, not a quote,
+   * not poll mode, no custom publish, no country-scoped destination). Replies,
+   * quotes, polls, comments, and custom-kind publishes do not receive these
+   * tags regardless of this prop. Pass `[]` to opt out explicitly.
+   */
   defaultTags?: string[][];
   /** If true, the composer starts expanded without taking modal/flex behavior. */
   defaultExpanded?: boolean;
@@ -218,7 +227,7 @@ export function ComposeBox({
   customPublish,
   hidePoll = false,
   submitLabel = 'Post!',
-  defaultTags = [],
+  defaultTags,
   defaultExpanded = false,
 }: ComposeBoxProps) {
   const { user, metadata, isLoading: isProfileLoading } = useCurrentUser();
@@ -1114,10 +1123,14 @@ export function ComposeBox({
         const countryRoot = new URL(createCountryIdentifier(selectedCountryCode));
         await postComment({ root: countryRoot, reply: undefined, content: finalContent, tags });
       } else {
+        // Top-level kind 1 note. If the caller hasn't supplied `defaultTags`,
+        // auto-attach the silent Agora tag so the post surfaces in the Agora
+        // activity feed. Callers can opt out by passing `defaultTags={[]}`.
+        const effectiveDefaultTags = defaultTags ?? AGORA_DEFAULT_NOTE_TAGS;
         await createEvent({
           kind: 1,
           content: finalContent,
-          tags: [...defaultTags, ...tags],
+          tags: [...effectiveDefaultTags, ...tags],
           created_at: Math.floor(Date.now() / 1000),
         });
       }

@@ -5,8 +5,7 @@ import { getStorageKey } from '@/lib/storageKey';
 
 /**
  * Manages the active feed tab for a specific feed page, persisting
- * the selection in sessionStorage so it survives navigation within
- * the same browser session.
+ * the selection in localStorage so it survives reloads and new sessions.
  *
  * Each feed page should pass a unique `feedId` (e.g. 'home', 'vines', 'videos').
  *
@@ -24,17 +23,17 @@ export function useFeedTab<T extends string = string>(
   const [activeTab, setActiveTab] = useState<T>(() => {
     const defaultTab = (user ? 'follows' : 'world') as T;
     try {
-      const stored = sessionStorage.getItem(key);
+      const stored = localStorage.getItem(key);
       if (stored) {
         if (feedId === 'home' && stored === 'network') {
-          sessionStorage.setItem(key, defaultTab);
+          localStorage.setItem(key, defaultTab);
           return defaultTab;
         }
         if (!validTabs || validTabs.includes(stored as T)) {
           return stored as T;
         }
       }
-    } catch { /* sessionStorage unavailable */ }
+    } catch { /* localStorage unavailable */ }
     // Validate the default tab against validTabs. If it's not in the list,
     // fall back to the last valid tab (typically 'global').
     if (validTabs && !validTabs.includes(defaultTab)) {
@@ -45,7 +44,7 @@ export function useFeedTab<T extends string = string>(
 
   const setTab = useCallback((tab: T) => {
     setActiveTab(tab);
-    try { sessionStorage.setItem(key, tab); } catch { /* ignore */ }
+    try { localStorage.setItem(key, tab); } catch { /* ignore */ }
   }, [key]);
 
   return [activeTab, setTab];

@@ -33,6 +33,7 @@ interface NavItem {
 }
 
 const NAV_ITEMS: NavItem[] = [
+  { label: 'Feed', to: '/feed', icon: Activity },
   { label: 'Support', to: '/campaigns/all', icon: HandHeart },
   { label: 'Organize', to: '/communities', icon: Users },
   { label: 'Pledge', to: '/pledges', icon: Megaphone },

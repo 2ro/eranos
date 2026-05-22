@@ -10,14 +10,15 @@ import { isEventMuted } from '@/lib/muteHelpers';
 
 const AGORA_PAGE_SIZE = 25;
 const PLEDGE_KIND = 36639;
+const COMMUNITY_KIND = 34550;
 const POLL_KIND = 1068;
 const COMMENT_KIND = 1111;
 const NOTE_KIND = 1;
 const ONCHAIN_ZAP_KIND = 8333;
 const LIGHTNING_ZAP_KIND = 9735;
 
-const AGORA_ENTITY_KINDS = [CAMPAIGN_KIND, PLEDGE_KIND, ONCHAIN_ZAP_KIND];
-const COMMENT_ROOT_KINDS = [String(CAMPAIGN_KIND), String(PLEDGE_KIND)];
+const AGORA_ENTITY_KINDS = [CAMPAIGN_KIND, PLEDGE_KIND, COMMUNITY_KIND, ONCHAIN_ZAP_KIND];
+const COMMENT_ROOT_KINDS = [String(CAMPAIGN_KIND), String(PLEDGE_KIND), String(COMMUNITY_KIND)];
 const WORLD_K_TAGS = ['iso3166', 'geo'];
 const PLEDGE_T_ALIASES = ['agora-action', 'pathos-challenge', 'agora-challenge'];
 const AGORA_T_TAGS = ['agora', 'Agora'];
@@ -40,17 +41,26 @@ function hasTagValue(event: NostrEvent, name: string, values: readonly string[])
   return tagValues(event, name).some((value) => accepted.has(value.toLowerCase()));
 }
 
+function isCommunityScopedComment(event: NostrEvent): boolean {
+  return tagValues(event, 'A').some((value) => value.startsWith(`${COMMUNITY_KIND}:`));
+}
+
 function isRelevantAgoraEvent(event: NostrEvent): boolean {
   if (shouldHideFeedEvent(event)) return false;
 
   if (event.kind === CAMPAIGN_KIND) return true;
+  if (event.kind === COMMUNITY_KIND) return true;
 
   if (event.kind === PLEDGE_KIND) {
     return hasTagValue(event, 't', PLEDGE_T_ALIASES);
   }
 
   if (event.kind === COMMENT_KIND) {
-    return hasTagValue(event, 'K', COMMENT_ROOT_KINDS) || hasTagValue(event, 'k', WORLD_K_TAGS);
+    return (
+      hasTagValue(event, 'K', COMMENT_ROOT_KINDS)
+      || hasTagValue(event, 'k', WORLD_K_TAGS)
+      || isCommunityScopedComment(event)
+    );
   }
 
   if (event.kind === POLL_KIND) {
@@ -71,7 +81,7 @@ function isRelevantAgoraEvent(event: NostrEvent): boolean {
 
 function isAgoraAddress(value: string): boolean {
   const kind = value.split(':')[0];
-  return kind === String(CAMPAIGN_KIND) || kind === String(PLEDGE_KIND);
+  return kind === String(CAMPAIGN_KIND) || kind === String(PLEDGE_KIND) || kind === String(COMMUNITY_KIND);
 }
 
 function getAddressableCoordinate(event: NostrEvent): string | undefined {
@@ -102,29 +112,50 @@ function extractDonationTargets(events: NostrEvent[]): { coordinates: string[]; 
   };
 }
 
-/** Mixed Agora activity feed: campaigns, pledges, world posts, #Agora notes, and donation receipts. */
-export function useAgoraFeed(enabled: boolean) {
+export interface UseAgoraFeedOptions {
+  /**
+   * Restrict the feed to events authored by these pubkeys. Applied as an
+   * `authors:` filter on every relay query (server-side filtering). Empty
+   * array disables the query — used for "Following" mode when the user
+   * follows nobody.
+   */
+  authors?: string[];
+}
+
+/** Mixed Agora activity feed: campaigns, pledges, communities, world posts, #Agora notes, and donation receipts. */
+export function useAgoraFeed(enabled: boolean, options?: UseAgoraFeedOptions) {
   const { nostr } = useNostr();
   const { muteItems } = useMuteList();
   const { shouldFilterEvent } = useContentFilters();
 
+  const authors = options?.authors;
+  const authorsKey = authors ? [...authors].sort().join(',') : '';
+  // If `authors` is provided but empty, the feed is intentionally empty
+  // (e.g. the user follows nobody) — skip the query entirely.
+  const authorsEmpty = authors !== undefined && authors.length === 0;
+  const queryEnabled = enabled && !authorsEmpty;
+
   const query = useInfiniteQuery<AgoraFeedPage, Error>({
-    queryKey: ['agora-feed'],
+    queryKey: ['agora-feed', authorsKey],
     queryFn: async ({ pageParam, signal: querySignal }) => {
       const signal = AbortSignal.any([querySignal, AbortSignal.timeout(8_000)]);
       const until = pageParam as number | undefined;
+      const authorsFilter = authors && authors.length > 0 ? { authors } : {};
 
       const filters: NostrFilter[] = [
-        { kinds: AGORA_ENTITY_KINDS, limit: AGORA_PAGE_SIZE, ...(until && { until }) },
-        { kinds: [COMMENT_KIND], '#K': COMMENT_ROOT_KINDS, limit: AGORA_PAGE_SIZE, ...(until && { until }) },
-        { kinds: [COMMENT_KIND, POLL_KIND], '#k': WORLD_K_TAGS, limit: AGORA_PAGE_SIZE, ...(until && { until }) },
-        { kinds: [NOTE_KIND], '#t': AGORA_T_TAGS, limit: Math.ceil(AGORA_PAGE_SIZE / 2), ...(until && { until }) },
+        { kinds: AGORA_ENTITY_KINDS, limit: AGORA_PAGE_SIZE, ...authorsFilter, ...(until && { until }) },
+        { kinds: [COMMENT_KIND], '#K': COMMENT_ROOT_KINDS, limit: AGORA_PAGE_SIZE, ...authorsFilter, ...(until && { until }) },
+        { kinds: [COMMENT_KIND, POLL_KIND], '#k': WORLD_K_TAGS, limit: AGORA_PAGE_SIZE, ...authorsFilter, ...(until && { until }) },
+        { kinds: [NOTE_KIND], '#t': AGORA_T_TAGS, limit: Math.ceil(AGORA_PAGE_SIZE / 2), ...authorsFilter, ...(until && { until }) },
       ];
 
       const raw = await nostr.query(filters, { signal });
       const filtered = raw.filter(isRelevantAgoraEvent);
       const { coordinates, eventIds } = extractDonationTargets(filtered);
 
+      // Donation enrichment intentionally ignores the `authors` filter so
+      // we still see who donated to the campaigns/pledges that your follows
+      // created. Authors-filtering donations would hide most activity.
       const donationFilters: NostrFilter[] = [];
       if (coordinates.length > 0) {
         donationFilters.push({ kinds: [LIGHTNING_ZAP_KIND, ONCHAIN_ZAP_KIND], '#a': coordinates, limit: coordinates.length * 10 });
@@ -166,7 +197,7 @@ export function useAgoraFeed(enabled: boolean) {
       if (lastPage.totalFetched < AGORA_PAGE_SIZE || !lastPage.oldestTimestamp) return undefined;
       return lastPage.oldestTimestamp - 1;
     },
-    enabled,
+    enabled: queryEnabled,
     staleTime: 30_000,
     placeholderData: (prev) => prev,
   });
@@ -183,9 +214,9 @@ export function useAgoraFeed(enabled: boolean) {
 
   return {
     events,
-    isLoading: query.isPending,
+    isLoading: queryEnabled ? query.isPending : false,
     isFetchingNextPage: query.isFetchingNextPage,
-    hasNextPage: query.hasNextPage,
+    hasNextPage: !authorsEmpty && query.hasNextPage,
     fetchNextPage: query.fetchNextPage,
     pageCount: query.data?.pages.length,
   };
