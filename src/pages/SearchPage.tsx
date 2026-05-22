@@ -4,11 +4,7 @@ import {
   SlidersHorizontal,
   Search as SearchIcon,
   UserRoundCheck,
-  User,
   RotateCcw,
-  BookmarkPlus,
-  Check,
-  Loader2,
   Globe, Users, UserSearch,
   Clock, Flame, TrendingUp,
 } from 'lucide-react';
@@ -35,10 +31,6 @@ import { KindPicker, AuthorChip, AuthorFilterDropdown } from '@/components/Saved
 import { useSearchProfiles } from '@/hooks/useSearchProfiles';
 import { useAuthor } from '@/hooks/useAuthor';
 import { useStreamPosts } from '@/hooks/useStreamPosts';
-import { useSavedFeeds } from '@/hooks/useSavedFeeds';
-import { useCurrentUser } from '@/hooks/useCurrentUser';
-import { useProfileTabs } from '@/hooks/useProfileTabs';
-import { usePublishProfileTabs } from '@/hooks/usePublishProfileTabs';
 import { useFollowList } from '@/hooks/useFollowActions';
 import { useUserLists, useMatchedListId } from '@/hooks/useUserLists';
 import { useFollowPacks } from '@/hooks/useFollowPacks';
@@ -50,7 +42,6 @@ import { VerifiedNip05Text } from '@/components/Nip05Badge';
 import { SubHeaderBar } from '@/components/SubHeaderBar';
 import { TabButton } from '@/components/TabButton';
 import { cn, parseKindFilter } from '@/lib/utils';
-import type { TabFilter } from '@/contexts/AppContext';
 import { useLayoutOptions, useNavHidden } from '@/contexts/LayoutContext';
 import { PageHeader } from '@/components/PageHeader';
 import { isRepostKind, parseRepostContent } from '@/lib/feedUtils';
@@ -339,60 +330,12 @@ export function SearchPage() {
   }, [includeReplies, mediaType, language, platform, sort, kindFilter, customKindText, authorScope, authorPubkeys, kindOptions]);
 
   // Hooks
-  const { user } = useCurrentUser();
   const { data: followData } = useFollowList();
   const followPubkeys = useMemo(() => followData?.pubkeys ?? [], [followData?.pubkeys]);
   const { lists } = useUserLists();
   const { data: followPacks = [] } = useFollowPacks();
-  const { savedFeeds, addSavedFeed, isPending: isSavingFeed } = useSavedFeeds();
-  const profileTabsQuery = useProfileTabs(user?.pubkey);
-  const { publishProfileTabs, isPending: isPublishingTabs } = usePublishProfileTabs();
-  const [savePopoverOpen, setSavePopoverOpen] = useState(false);
-  const [saveFeedLabel, setSaveFeedLabel] = useState('');
-  const [savedJustNow, setSavedJustNow] = useState(false);
 
   const listPickerValue = useMatchedListId(authorPubkeys);
-
-  // 'people' scope with explicit authors = user-specific; not eligible for profile tab
-  const isAuthorSpecific = authorScope === 'people' && authorPubkeys.length > 0;
-
-  // Build a standard NIP-01 TabFilter from the current search state
-  const currentFilter = useMemo<TabFilter>(() => {
-    const filter: TabFilter = {};
-    if (debouncedSearchQuery.trim()) filter.search = debouncedSearchQuery.trim();
-    if (kindsOverride && kindsOverride.length > 0) filter.kinds = kindsOverride;
-    if (authorScope === 'people' && authorPubkeys.length > 0) filter.authors = authorPubkeys;
-    return filter;
-  }, [debouncedSearchQuery, kindsOverride, authorScope, authorPubkeys]);
-
-  const alreadySaved = savedFeeds.some(
-    (f) => JSON.stringify(f.filter) === JSON.stringify(currentFilter),
-  );
-
-  const handleSaveFeed = async () => {
-    if (!saveFeedLabel.trim() || isSavingFeed) return;
-    const varsToSave = authorScope === 'follows' && user
-      ? [{ name: '$follows', tagName: 'p', pointer: `a:3:${user.pubkey}:` }]
-      : [];
-    await addSavedFeed(saveFeedLabel, currentFilter, varsToSave);
-    setSavePopoverOpen(false);
-    setSaveFeedLabel('');
-    setSavedJustNow(true);
-    setTimeout(() => setSavedJustNow(false), 2000);
-  };
-
-  const handleSaveProfileTab = async () => {
-    if (!saveFeedLabel.trim() || isPublishingTabs || !user) return;
-    const existing = profileTabsQuery.data ?? { tabs: [], vars: [] };
-    await publishProfileTabs({
-      tabs: [...existing.tabs, { label: saveFeedLabel.trim(), filter: currentFilter }],
-      vars: existing.vars,
-    });
-    setSavePopoverOpen(false);
-    setSaveFeedLabel('');
-    setSavedJustNow(true);
-    setTimeout(() => setSavedJustNow(false), 2000);
-  };
 
   // Resolve author pubkeys for the stream
   const streamAuthorPubkeys = authorScope === 'follows'
@@ -433,79 +376,6 @@ export function SearchPage() {
             initialValue={debouncedSearchQuery}
             onDebouncedChange={setDebouncedSearchQuery}
           />
-
-          {/* Add to feed button (posts & communities tabs) */}
-          {(activeTab === 'posts' || activeTab === 'communities') && user && (
-            <div className={cn(!debouncedSearchQuery.trim() && !hasActiveFilters ? 'hidden' : undefined)}>
-              <Popover open={savePopoverOpen} onOpenChange={(o) => {
-                setSavePopoverOpen(o);
-                if (o && !saveFeedLabel) {
-                  if (debouncedSearchQuery.trim()) {
-                    setSaveFeedLabel(debouncedSearchQuery.trim());
-                  } else if (listPickerValue) {
-                    const matched =
-                      listPickerValue.startsWith('set:')
-                        ? lists.find((l) => l.id === listPickerValue.slice(4))?.title
-                        : followPacks.find((p) => p.id === listPickerValue.slice(5))?.title;
-                    if (matched) setSaveFeedLabel(matched);
-                  }
-                }
-              }}>
-                <PopoverTrigger asChild>
-                  <button
-                    className={cn(
-                      'shrink-0 h-10 w-10 rounded-lg border flex items-center justify-center transition-colors',
-                      alreadySaved || savedJustNow
-                        ? 'border-primary bg-primary/10 text-primary'
-                        : 'border-border bg-secondary/50 hover:bg-secondary text-muted-foreground hover:text-foreground',
-                    )}
-                    style={{ outline: 'none' }}
-                    aria-label="Add to feed"
-                  >
-                    {savedJustNow ? <Check className="size-4" /> : <BookmarkPlus className="size-4" />}
-                  </button>
-                </PopoverTrigger>
-                <PopoverContent align="end" className="w-64 p-3 space-y-3">
-                  <p className="font-semibold text-sm">Save as tab</p>
-
-                  {alreadySaved ? (
-                    <p className="text-sm text-muted-foreground">Already saved.</p>
-                  ) : (
-                    <>
-                      <Input
-                        placeholder="Tab name…"
-                        value={saveFeedLabel}
-                        onChange={(e) => setSaveFeedLabel(e.target.value)}
-                        onKeyDown={(e) => { if (e.key === 'Enter') handleSaveFeed(); }}
-                        className="bg-secondary/50 border-border focus-visible:ring-1 text-base md:text-sm"
-                        autoFocus
-                      />
-                      <div className="space-y-1">
-                        <SaveDestinationRow
-                          icon={<BookmarkPlus className="size-4 text-muted-foreground" />}
-                          label="Home feed"
-                          description="Tab on your home page"
-                          onClick={() => handleSaveFeed()}
-                          disabled={!saveFeedLabel.trim() || isSavingFeed || isPublishingTabs}
-                          loading={isSavingFeed}
-                        />
-                        {!isAuthorSpecific && (
-                          <SaveDestinationRow
-                            icon={<User className="size-4 text-muted-foreground" />}
-                            label="Profile tab"
-                            description="Your posts matching this search"
-                            onClick={() => handleSaveProfileTab()}
-                            disabled={!saveFeedLabel.trim() || isSavingFeed || isPublishingTabs}
-                            loading={isPublishingTabs}
-                          />
-                        )}
-                      </div>
-                    </>
-                  )}
-                </PopoverContent>
-              </Popover>
-            </div>
-          )}
 
           {/* Filter popover (posts & communities tabs) */}
           {(activeTab === 'posts' || activeTab === 'communities') && (
@@ -1177,30 +1047,5 @@ function CommunitiesSearchTab({
   }
 
   return <EmptyState message="Search for communities or browse the latest." />;
-}
-
-function SaveDestinationRow({
-  icon, label, description, onClick, disabled, loading,
-}: {
-  icon: React.ReactNode;
-  label: string;
-  description: string;
-  onClick: () => void;
-  disabled: boolean;
-  loading: boolean;
-}) {
-  return (
-    <button
-      onClick={onClick}
-      disabled={disabled}
-      className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-secondary/60 disabled:opacity-40 disabled:pointer-events-none transition-colors text-left"
-    >
-      <span className="shrink-0">{loading ? <Loader2 className="size-4 animate-spin text-muted-foreground" /> : icon}</span>
-      <span className="flex-1 min-w-0">
-        <span className="block text-sm font-medium">{label}</span>
-        <span className="block text-xs text-muted-foreground">{description}</span>
-      </span>
-    </button>
-  );
 }
 
