@@ -783,7 +783,12 @@ function WalletSourceSelect({
         <SelectTrigger className="h-12">
           <SelectValue placeholder="Choose a wallet">
             {value === 'custom' ? (
-              <span className="text-sm">Custom</span>
+              <span className="inline-flex items-center gap-2">
+                <span className="inline-flex size-7 shrink-0 items-center justify-center rounded-full bg-muted text-muted-foreground">
+                  <Wallet className="size-3.5" />
+                </span>
+                <span className="text-sm">Custom</span>
+              </span>
             ) : (
               <span className="inline-flex items-center gap-2">
                 <Avatar className="size-7 shrink-0">
@@ -805,13 +810,8 @@ function WalletSourceSelect({
                 <AvatarImage src={picture} alt={displayName} />
                 <AvatarFallback>{initial}</AvatarFallback>
               </Avatar>
-              <span className="flex flex-col">
-                <span className="text-sm">
-                  {displayName ? `${displayName}'s wallet` : 'Your wallet'}
-                </span>
-                <span className="text-[11px] text-muted-foreground">
-                  A new on-chain address per campaign
-                </span>
+              <span className="text-sm">
+                {displayName ? `${displayName}'s wallet` : 'Your wallet'}
               </span>
             </span>
           </SelectItem>
@@ -821,22 +821,17 @@ function WalletSourceSelect({
                 <AvatarImage src={picture} alt={displayName} />
                 <AvatarFallback>{initial}</AvatarFallback>
               </Avatar>
-              <span className="flex flex-col">
-                <span className="text-sm">
-                  {displayName ? `${displayName}'s private wallet` : 'Your private wallet'}
-                </span>
-                <span className="text-[11px] text-muted-foreground">
-                  Static silent-payment code
-                </span>
+              <span className="text-sm">
+                {displayName ? `${displayName}'s private wallet` : 'Your private wallet'}
               </span>
             </span>
           </SelectItem>
           <SelectItem value="custom">
-            <span className="flex flex-col">
-              <span className="text-sm">Custom</span>
-              <span className="text-[11px] text-muted-foreground">
-                Paste any mainnet bc1… or sp1… address
+            <span className="inline-flex items-center gap-2">
+              <span className="inline-flex size-7 shrink-0 items-center justify-center rounded-full bg-muted text-muted-foreground">
+                <Wallet className="size-3.5" />
               </span>
+              <span className="text-sm">Custom</span>
             </span>
           </SelectItem>
         </SelectContent>
