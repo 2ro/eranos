@@ -6,7 +6,7 @@ import { useNostr } from '@nostrify/react';
 import { useInfiniteQuery, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useSeoMeta } from '@unhead/react';
 import { nip19 } from 'nostr-tools';
-import { Zap, Flame, MoreHorizontal, ClipboardCopy, ExternalLink, VolumeX, Flag, Bitcoin, Pin, X, QrCode, Check, Copy, Loader2, Download, Pencil, Trash2, RotateCcw, MessageSquare, Globe, Mail, Plus, GripVertical, ListPlus, Award, PanelLeft } from 'lucide-react';
+import { Zap, MoreHorizontal, ClipboardCopy, ExternalLink, VolumeX, Flag, Bitcoin, Pin, X, QrCode, Check, Copy, Loader2, Download, Pencil, Trash2, RotateCcw, MessageSquare, Globe, Mail, Plus, GripVertical, ListPlus, Award, PanelLeft, HandHeart, Megaphone } from 'lucide-react';
 
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
@@ -16,7 +16,6 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSepara
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
 import { useLayoutOptions } from '@/contexts/LayoutContext';
-import { ProfileRightSidebar } from '@/components/ProfileRightSidebar';
 import { NoteCard } from '@/components/NoteCard';
 import { FeedCard } from '@/components/FeedCard';
 import { ComposeBox } from '@/components/ComposeBox';
@@ -83,6 +82,12 @@ import {
 } from '@dnd-kit/sortable';
 import { CSS as DndCSS } from '@dnd-kit/utilities';
 import { formatNumber } from '@/lib/formatNumber';
+import { formatCampaignAmount } from '@/lib/formatCampaignAmount';
+import { useProfileCampaignStats } from '@/hooks/useProfileCampaignStats';
+import { useActions } from '@/hooks/useActions';
+import { useBtcPrice } from '@/hooks/useBtcPrice';
+import { DonateDialog } from '@/components/DonateDialog';
+import type { ParsedCampaign } from '@/lib/campaign';
 import { SubHeaderBar } from '@/components/SubHeaderBar';
 import { useActiveTabIndicator } from '@/components/SubHeaderBarContext';
 import { TabButton } from '@/components/TabButton';
@@ -96,32 +101,6 @@ import type { NostrEvent } from '@nostrify/nostrify';
 import QRCode from 'qrcode';
 import { isWeatherFieldLabel } from '@/lib/weatherStation';
 import { WeatherStationCard } from '@/components/WeatherStationCard';
-
-const STREAK_WINDOW_HOURS = 24;
-const STREAK_DISPLAY_LIMIT = 99;
-
-/** Calculate posting streak: consecutive kind 1 posts within 24-hour windows. */
-function calculateStreak(posts: NostrEvent[]): number {
-  if (!posts || posts.length === 0) return 0;
-
-  const kind1Posts = posts.filter((e) => e.kind === 1);
-  if (kind1Posts.length === 0) return 0;
-
-  const sorted = [...kind1Posts].sort((a, b) => b.created_at - a.created_at);
-  const windowSeconds = STREAK_WINDOW_HOURS * 3600;
-
-  let streak = 1;
-  for (let i = 0; i < sorted.length - 1; i++) {
-    const gap = sorted[i].created_at - sorted[i + 1].created_at;
-    if (gap <= windowSeconds) {
-      streak++;
-    } else {
-      break;
-    }
-  }
-
-  return streak;
-}
 
 /** Parse the custom "fields" array from kind 0 metadata content. */
 function parseProfileFields(content: string): Array<{ label: string; value: string }> {
@@ -1369,7 +1348,7 @@ type EditableTab = { label: string; isCore: boolean; tab?: ProfileTab };
     description: metadata?.about || 'Nostr profile',
   });
 
-  // Profile media — dedicated search query via relay.ditto.pub (video:true image:true)
+  // Profile media — NIP-50 `media:true` search via the configured read pool.
   const {
     data: mediaData,
     isPending: mediaPending,
@@ -1431,6 +1410,28 @@ type EditableTab = { label: string; isCore: boolean; tab?: ProfileTab };
   // NIP-85 user stats (followers count)
   const { data: userStats } = useNip85UserStats(pubkey);
   const followersCount = userStats?.followers ?? 0;
+
+  // Agora stat sources: campaigns + raised totals, and pledges count.
+  const profileCampaignStats = useProfileCampaignStats(pubkey);
+  const { data: btcPrice } = useBtcPrice();
+  // Pledges (kind 36639) authored by this user. Filters the global pledges
+  // list rather than issuing a separate per-author query.
+  const { data: allActions } = useActions({ limit: 100 });
+  const profileActionsCount = useMemo(() => {
+    if (!pubkey || !allActions) return 0;
+    return allActions.filter((a) => a.pubkey === pubkey).length;
+  }, [allActions, pubkey]);
+
+  // Donate dialog state. The header "Donate" button (only shown when the
+  // profile has at least one campaign) opens this dialog. When the user
+  // has multiple campaigns the action bar surfaces a dropdown that picks
+  // which campaign to donate to first.
+  const [donateOpen, setDonateOpen] = useState(false);
+  const [donateCampaign, setDonateCampaign] = useState<ParsedCampaign | null>(null);
+  const openDonateForCampaign = useCallback((campaign: ParsedCampaign) => {
+    setDonateCampaign(campaign);
+    setDonateOpen(true);
+  }, []);
 
   const isOwnProfile = user?.pubkey === pubkey;
   const { feedSettings } = useFeedSettings();
@@ -1584,17 +1585,6 @@ type EditableTab = { label: string; isCore: boolean; tab?: ProfileTab };
     }));
   }, [wallComments, pubkey]);
 
-  const streak = useMemo(() => {
-    if (!feedData?.pages) return 0;
-    const events: NostrEvent[] = [];
-    for (const page of feedData.pages) {
-      for (const item of page.items) {
-        events.push(item.event);
-      }
-    }
-    return calculateStreak(events);
-  }, [feedData?.pages]);
-
   // Infinite scroll sentinel
   const { ref: scrollRef, inView } = useInView({
     threshold: 0,
@@ -1675,13 +1665,12 @@ type EditableTab = { label: string; isCore: boolean; tab?: ProfileTab };
 
   const openWallCompose = useCallback(() => setWallComposeOpen(true), []);
 
-  const handleSidebarMediaClick = useCallback((url: string) => {
-    setActiveTab('media');
-    setSidebarMediaUrl(url);
-  }, []);
-
+  // ProfilePage opts out of FundraiserLayout's default `max-w-3xl` cap so it
+  // can run a wider canvas (banner full-bleed, contained `max-w-6xl` content
+  // column) matching CampaignsPage / CommunityDetailPage. FundraiserLayout has
+  // no right-sidebar slot, so any `rightSidebar` option here would be ignored.
   useLayoutOptions(pubkey ? {
-    rightSidebar: <ProfileRightSidebar fields={fields} pubkey={pubkey} onMediaClick={handleSidebarMediaClick} />,
+    noMaxWidth: true,
     showFAB: !(activeTab === 'wall' && !profileFollowsMe),
     onFabClick: activeTab === 'wall' ? openWallCompose : undefined,
     hasSubHeader: true,
@@ -1691,9 +1680,9 @@ type EditableTab = { label: string; isCore: boolean; tab?: ProfileTab };
     // If we're resolving a NIP-05, show loading state
     if (isNip05Param && nip05Loading) {
       return (
-        <main className="flex-1 min-w-0">
+        <main className="min-h-screen pb-16">
           <div className="h-36 md:h-48 bg-secondary animate-pulse" />
-          <div className="px-4 pb-4">
+          <div className="max-w-6xl mx-auto px-4 sm:px-6 pb-4">
             <div className="flex justify-between items-start -mt-12 md:-mt-16 mb-3">
               <Skeleton className="size-24 md:size-32 rounded-full border-4 border-background" />
             </div>
@@ -1706,8 +1695,8 @@ type EditableTab = { label: string; isCore: boolean; tab?: ProfileTab };
     // If NIP-05 resolved to null (not found), show error
     if (isNip05Param && !nip05Loading) {
       return (
-        <main className="flex-1 min-w-0">
-          <div className="p-8 text-center text-muted-foreground">
+        <main className="min-h-screen pb-16">
+          <div className="max-w-6xl mx-auto p-8 text-center text-muted-foreground">
             <p>User not found: {npub}</p>
             <p className="text-xs mt-2">Could not resolve this NIP-05 identifier.</p>
           </div>
@@ -1715,8 +1704,8 @@ type EditableTab = { label: string; isCore: boolean; tab?: ProfileTab };
       );
     }
     return (
-      <main className="flex-1 min-w-0">
-        <div className="p-8 text-center text-muted-foreground">
+      <main className="min-h-screen pb-16">
+        <div className="max-w-6xl mx-auto p-8 text-center text-muted-foreground">
           <p>User not found.</p>
         </div>
       </main>
@@ -1724,9 +1713,9 @@ type EditableTab = { label: string; isCore: boolean; tab?: ProfileTab };
   }
 
   return (
-    <main className="flex-1 min-w-0">
+    <main className="min-h-screen pb-16">
       <PullToRefresh onRefresh={handleRefresh}>
-        {/* Banner */}
+        {/* Banner — kept full-bleed, outside the constrained content container. */}
           <div className="h-36 md:h-48 bg-secondary relative">
             {author.isLoading ? (
               <Skeleton className="w-full h-full rounded-none" />
@@ -1741,8 +1730,12 @@ type EditableTab = { label: string; isCore: boolean; tab?: ProfileTab };
 
           </div>
 
+          {/* Constrained content canvas — wider than FundraiserLayout's default
+              max-w-3xl, narrower than the campaign directory. Banner stays
+              outside this container so it remains full-bleed. */}
+          <div className="max-w-6xl mx-auto">
           {/* Profile info */}
-          <div className="px-4 pb-4">
+          <div className="px-4 sm:px-6 pb-4">
           {author.isLoading ? (
             <>
               <div className="flex justify-between items-start -mt-12 md:-mt-16 mb-3">
@@ -1833,6 +1826,53 @@ type EditableTab = { label: string; isCore: boolean; tab?: ProfileTab };
                       disabled={!user}
                     />
                   )}
+                  {/* Donate button — only shown when the profile has at least one
+                      on-chain campaign. SP-only campaigns are excluded because
+                      DonateDialog only supports on-chain donations; donors hit
+                      the campaign detail page directly for SP. */}
+                  {!isOwnProfile && (() => {
+                    const onchain = profileCampaignStats.campaigns.filter(
+                      (c) => c.wallet?.mode === 'onchain',
+                    );
+                    if (onchain.length === 0) return null;
+                    if (onchain.length === 1) {
+                      return (
+                        <Button
+                          onClick={() => openDonateForCampaign(onchain[0])}
+                          className="rounded-full font-bold gap-1.5"
+                        >
+                          <HandHeart className="size-4" />
+                          Donate
+                        </Button>
+                      );
+                    }
+                    return (
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button className="rounded-full font-bold gap-1.5">
+                            <HandHeart className="size-4" />
+                            Donate
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end" className="w-72">
+                          {onchain.map((c) => (
+                            <DropdownMenuItem
+                              key={c.aTag}
+                              onClick={() => openDonateForCampaign(c)}
+                              className="flex flex-col items-start gap-0.5"
+                            >
+                              <span className="font-medium truncate w-full">{c.title}</span>
+                              {c.goalUsd ? (
+                                <span className="text-xs text-muted-foreground">
+                                  Goal ${c.goalUsd.toLocaleString()}
+                                </span>
+                              ) : null}
+                            </DropdownMenuItem>
+                          ))}
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    );
+                  })()}
                 </div>
               </div>
 
@@ -1859,7 +1899,9 @@ type EditableTab = { label: string; isCore: boolean; tab?: ProfileTab };
               )}
 
                {/* Followers / Following count + Streak indicator */}
-               <div className="flex items-center gap-4 mt-2">
+               {/* Stat chips: Followers · Following · Campaigns · Pledges · Raised.
+                   Wraps to multiple rows on narrow viewports; single row from sm+. */}
+               <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 mt-2">
                 {followersCount > 0 && (
                   <button
                     className="flex items-center gap-1 hover:opacity-80 transition-opacity"
@@ -1880,16 +1922,38 @@ type EditableTab = { label: string; isCore: boolean; tab?: ProfileTab };
                     <span className="text-sm text-muted-foreground">following</span>
                   </button>
                 )}
-                {streak > 1 && (
-                  <div
-                    className="flex items-center gap-1 text-accent"
-                    title={`${streak > STREAK_DISPLAY_LIMIT ? `${STREAK_DISPLAY_LIMIT}+` : streak} posts within ${STREAK_WINDOW_HOURS}h windows`}
+                {profileCampaignStats.campaignCount > 0 && (
+                  <button
+                    className="flex items-center gap-1 hover:opacity-80 transition-opacity"
+                    onClick={() => setActiveTab('campaigns')}
+                    title={`${profileCampaignStats.campaignCount} campaigns`}
                   >
-                    <Flame className="size-4 fill-accent" />
-                    <span className="text-sm font-bold tabular-nums">
-                      {streak > STREAK_DISPLAY_LIMIT ? `${STREAK_DISPLAY_LIMIT}+` : streak}
-                    </span>
-                  </div>
+                    <Megaphone className="size-3.5 text-primary" />
+                    <span className="text-sm font-bold tabular-nums text-primary">{formatNumber(profileCampaignStats.campaignCount)}</span>
+                    <span className="text-sm text-muted-foreground">{profileCampaignStats.campaignCount === 1 ? 'campaign' : 'campaigns'}</span>
+                  </button>
+                )}
+                {profileActionsCount > 0 && (
+                  <button
+                    className="flex items-center gap-1 hover:opacity-80 transition-opacity"
+                    onClick={() => setActiveTab('pledges')}
+                    title={`${profileActionsCount} pledges`}
+                  >
+                    <HandHeart className="size-3.5 text-primary" />
+                    <span className="text-sm font-bold tabular-nums text-primary">{formatNumber(profileActionsCount)}</span>
+                    <span className="text-sm text-muted-foreground">{profileActionsCount === 1 ? 'pledge' : 'pledges'}</span>
+                  </button>
+                )}
+                {profileCampaignStats.totalRaisedSats > 0 && (
+                  <button
+                    className="flex items-center gap-1 hover:opacity-80 transition-opacity"
+                    onClick={() => setActiveTab('campaigns')}
+                    title="Total raised across campaigns"
+                  >
+                    <Bitcoin className="size-3.5 text-primary" />
+                    <span className="text-sm font-bold tabular-nums text-primary">{formatCampaignAmount(profileCampaignStats.totalRaisedSats, btcPrice)}</span>
+                    <span className="text-sm text-muted-foreground">raised</span>
+                  </button>
                 )}
               </div>
 
@@ -2329,6 +2393,24 @@ type EditableTab = { label: string; isCore: boolean; tab?: ProfileTab };
           />
         )}
 
+        {/* Donate dialog — driven by the header Donate button and (later)
+            campaign cards / dropdown rows. Resets the active campaign on
+            close so reopening starts fresh. */}
+        {donateCampaign && (
+          <DonateDialog
+            campaign={donateCampaign}
+            open={donateOpen}
+            onOpenChange={(open) => {
+              setDonateOpen(open);
+              if (!open) {
+                // Invalidate donations cache so the new total reflects in stats.
+                queryClient.invalidateQueries({ queryKey: ['campaign-donations', 'events', donateCampaign.aTag] });
+              }
+            }}
+            btcPrice={btcPrice}
+          />
+        )}
+
         {/* Image lightbox for avatar/banner */}
         {lightboxImage && (
           <ProfileImageLightbox
@@ -2337,6 +2419,7 @@ type EditableTab = { label: string; isCore: boolean; tab?: ProfileTab };
           />
         )}
 
+        </div>
       </PullToRefresh>
       </main>
   );

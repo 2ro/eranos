@@ -202,7 +202,7 @@ export const EditProfileForm: React.FC<EditProfileFormProps> = ({ onValuesChange
       // Combine existing metadata with new values
       const data: Record<string, unknown> = { ...metadata, ...standardMetadata };
 
-      // Strip any legacy avatar shape data from old Ditto-style profiles
+      // Strip any legacy avatar-shape field carried over from older clients.
       delete data.shape;
 
       // Clean up empty values in standard metadata
