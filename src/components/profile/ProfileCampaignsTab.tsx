@@ -156,7 +156,7 @@ export function ProfileCampaignsTab({
 function SortedByTopGrid({ campaigns }: { campaigns: ParsedCampaign[] }) {
   const { nostr } = useNostr();
   const { config } = useAppContext();
-  const { esploraBaseUrl } = config;
+  const { esploraApis } = config;
 
   // Only on-chain campaigns can have verifiable totals. SP campaigns sort to 0.
   const onchain = campaigns.filter((c) => c.wallet?.mode === 'onchain');
@@ -194,8 +194,8 @@ function SortedByTopGrid({ campaigns }: { campaigns: ParsedCampaign[] }) {
 
   const verifications = useQueries({
     queries: verificationInputs.map(({ wallet, event }) => ({
-      queryKey: ['onchain-zaps', 'verify', esploraBaseUrl, event.id, wallet],
-      queryFn: () => verifyOnchainZap(event, esploraBaseUrl, wallet),
+      queryKey: ['onchain-zaps', 'verify', esploraApis, event.id, wallet],
+      queryFn: () => verifyOnchainZap(event, esploraApis, wallet),
       staleTime: 60_000,
     })),
   });

@@ -41,7 +41,7 @@ export interface ProfileCampaignStats {
 export function useProfileCampaignStats(pubkey: string | undefined): ProfileCampaignStats {
   const { nostr } = useNostr();
   const { config } = useAppContext();
-  const { esploraBaseUrl } = config;
+  const { esploraApis } = config;
 
   const campaignsQuery = useCampaigns(
     pubkey ? { authors: [pubkey], limit: 100 } : { authors: [], limit: 0 },
@@ -85,8 +85,8 @@ export function useProfileCampaignStats(pubkey: string | undefined): ProfileCamp
 
   const verifications = useQueries({
     queries: verificationInputs.map(({ campaign, event }) => ({
-      queryKey: ['onchain-zaps', 'verify', esploraBaseUrl, event.id, campaign.wallet?.value ?? ''],
-      queryFn: () => verifyOnchainZap(event, esploraBaseUrl, campaign.wallet?.value),
+      queryKey: ['onchain-zaps', 'verify', esploraApis, event.id, campaign.wallet?.value ?? ''],
+      queryFn: () => verifyOnchainZap(event, esploraApis, campaign.wallet?.value),
       staleTime: 60_000,
       enabled: !!campaign.wallet?.value,
     })),
