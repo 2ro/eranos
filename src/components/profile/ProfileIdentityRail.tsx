@@ -392,6 +392,16 @@ export function ProfileOverviewSections({
 }: ProfileOverviewSectionsProps) {
   return (
     <div className={cn('flex flex-col gap-5', className)}>
+      {/* Profile fields (rendered upstream) — placed first so the
+          profile's own freeform metadata (links, addresses, etc.) is
+          the first thing visitors read, ahead of campaigns/orgs. */}
+      {fields.length > 0 && (
+        <section className="space-y-3">
+          <RailSectionHeader icon={null} title="Profile" />
+          <div className="space-y-3">{fieldsContent}</div>
+        </section>
+      )}
+
       {/* Active campaigns */}
       <RailCampaignsSection
         campaigns={campaigns}
@@ -402,7 +412,7 @@ export function ProfileOverviewSections({
 
       {/* Latest pledge — surfaced as a fallback when this profile has
           nothing in the Campaigns slot, so the rail still has a piece of
-          first-class Agora content above the orgs/fields sections. */}
+          first-class Agora content in the campaigns slot. */}
       {campaigns.length === 0 && pledges.length > 0 && (
         <RailLatestPledgeSection
           pledges={pledges}
@@ -414,14 +424,6 @@ export function ProfileOverviewSections({
 
       {/* Organizations */}
       {showOrganizations && <RailOrganizationsSection pubkey={pubkey} />}
-
-      {/* Profile fields (rendered upstream) */}
-      {fields.length > 0 && (
-        <section className="space-y-3">
-          <RailSectionHeader icon={null} title="Profile" />
-          <div className="space-y-3">{fieldsContent}</div>
-        </section>
-      )}
     </div>
   );
 }
