@@ -225,7 +225,7 @@ function PledgeDetailContent({ action }: { action: Action }) {
             <PledgeStory storyEvent={storyEvent} hasContent={action.description.trim().length > 0} />
 
             <div id="pledge-activity" className="scroll-mt-20">
-              <div>
+              <div className="mt-6">
                 <div className="flex items-baseline justify-between gap-3 mb-3 px-1">
                   <h2 className="text-lg font-semibold tracking-tight">Submissions</h2>
                   {topLevel.length > 0 ? (
@@ -246,19 +246,17 @@ function PledgeDetailContent({ action }: { action: Action }) {
                     {Array.from({ length: 3 }).map((_, i) => <DetailReplySkeleton key={i} />)}
                   </div>
                 ) : replyTree.length > 0 ? (
-                  <div className="rounded-2xl bg-card border border-border/60 overflow-hidden">
-                    <ThreadedReplyList
-                      roots={replyTree}
-                      renderItemHeader={(event) => (
-                        <PledgePinHeader
-                          isPinned={isPinned(event.id)}
-                          canManagePins={canManagePins}
-                          pinPending={togglePin.isPending}
-                          onTogglePin={() => handleTogglePin(event)}
-                        />
-                      )}
-                    />
-                  </div>
+                  <ThreadedReplyList
+                    roots={replyTree}
+                    renderItemHeader={(event) => (
+                      <PledgePinHeader
+                        isPinned={isPinned(event.id)}
+                        canManagePins={canManagePins}
+                        pinPending={togglePin.isPending}
+                        onTogglePin={() => handleTogglePin(event)}
+                      />
+                    )}
+                  />
                 ) : (
                   <button
                     type="button"
