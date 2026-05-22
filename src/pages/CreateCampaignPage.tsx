@@ -893,7 +893,7 @@ function WalletDisclaimer({
         <BitcoinPublicDisclaimer
           tone="soft"
           includeCashOutAdvice={false}
-          leadText="Donations are public and can be traced back to you."
+          leadText="Donations are public and can be traced."
           popoverText={
             <>
               Bitcoin is a public ledger. Transactions sent to this
