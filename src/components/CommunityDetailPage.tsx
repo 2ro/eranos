@@ -6,6 +6,7 @@ import {
   CalendarClock,
   CalendarDays,
   ChevronLeft,
+  ChevronRight,
   Clock,
   Crown,
   HandHeart,
@@ -946,25 +947,31 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
             <section className="max-w-6xl mx-auto px-5 sm:px-6 lg:px-0 pt-6">
               <div className="space-y-5 border-b border-border/60 pb-6">
                 {leadershipPubkeys.length > 0 && (
-                  <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                    <div className="space-y-2">
-                      <div className="text-xs font-semibold uppercase tracking-[0.12em] text-muted-foreground">
-                        Members
+                  <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+                    <div className="space-y-3">
+                      <div className="space-y-1">
+                        <div className="text-xs font-semibold uppercase tracking-[0.12em] text-muted-foreground">
+                          Members
+                        </div>
+                        <div className="text-sm text-muted-foreground">
+                          {leadershipPubkeys.length.toLocaleString()} {leadershipPubkeys.length === 1 ? 'member' : 'members'} stewarding this group
+                        </div>
                       </div>
-                      <div className="inline-flex items-center gap-3">
-                        <PeopleAvatarStack
-                          pubkeys={leadershipPubkeys}
-                          maxVisible={8}
-                          size="lg"
-                        />
-                        <span className="text-sm font-medium text-muted-foreground">
-                          {leadershipPubkeys.length.toLocaleString()} {leadershipPubkeys.length === 1 ? 'member' : 'members'}
-                        </span>
-                      </div>
+                      <PeopleAvatarStack
+                        pubkeys={leadershipPubkeys}
+                        maxVisible={8}
+                        size="xl"
+                        className="[&_span]:text-sm"
+                      />
                     </div>
-                    <Button type="button" variant="outline" size="sm" onClick={() => setMembersDialogOpen(true)}>
-                      <Users className="size-4 mr-2" />
+                    <Button
+                      type="button"
+                      variant="link"
+                      className="h-auto justify-start p-0 text-sm font-medium sm:mb-1"
+                      onClick={() => setMembersDialogOpen(true)}
+                    >
                       View members
+                      <ChevronRight className="ml-1 size-4" />
                     </Button>
                   </div>
                 )}

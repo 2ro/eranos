@@ -9,13 +9,14 @@ import { useAuthors } from '@/hooks/useAuthors';
 import { genUserName } from '@/lib/genUserName';
 import { cn } from '@/lib/utils';
 
-type AvatarSize = 'sm' | 'md' | 'lg';
+type AvatarSize = 'sm' | 'md' | 'lg' | 'xl';
 
 /** Tailwind size classes per avatar size. */
 const sizeClasses: Record<AvatarSize, string> = {
   sm: 'size-6',
   md: 'size-7',
   lg: 'size-9',
+  xl: 'size-11',
 };
 
 /** Tailwind negative-space class for overlap amount. */
@@ -23,6 +24,7 @@ const overlapClasses: Record<AvatarSize, string> = {
   sm: '-space-x-1.5',
   md: '-space-x-2',
   lg: '-space-x-3',
+  xl: '-space-x-3.5',
 };
 
 /** Fallback text size per avatar size. */
@@ -30,6 +32,7 @@ const fallbackTextClasses: Record<AvatarSize, string> = {
   sm: 'text-[10px]',
   md: 'text-[10px]',
   lg: 'text-xs',
+  xl: 'text-sm',
 };
 
 interface PeopleAvatarStackProps {
