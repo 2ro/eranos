@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useSeoMeta } from '@unhead/react';
 import { ChevronDown, EyeOff, HandHeart, Hourglass, PlusCircle, ShieldCheck } from 'lucide-react';
@@ -11,11 +11,7 @@ import {
   CollapsibleTrigger,
 } from '@/components/ui/collapsible';
 import { CampaignCard, CampaignCardSkeleton } from '@/components/CampaignCard';
-import { HeroGlobe } from '@/components/HeroGlobe';
-import { HeroCampaignSpotlight } from '@/components/HeroCampaignSpotlight';
-import { CampaignHeroBackground } from '@/components/CampaignHeroBackground';
-import { HeroAtmosphere } from '@/components/HeroAtmosphere';
-import { hopeHueFor } from '@/lib/hopePalette';
+import { HeroLightningMap } from '@/components/HeroLightningMap';
 import { cn } from '@/lib/utils';
 import { useCampaigns } from '@/hooks/useCampaigns';
 import { useCampaignModeration } from '@/hooks/useCampaignModeration';
@@ -24,8 +20,6 @@ import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useLayoutOptions } from '@/contexts/LayoutContext';
 import { useAppContext } from '@/hooks/useAppContext';
 import { type ParsedCampaign } from '@/lib/campaign';
-
-import { getCoordinates } from '@/lib/coordinates';
 
 /** Cap on how many featured campaigns we render in the home-page row. */
 const MAX_FEATURED = 4;
@@ -150,194 +144,70 @@ export function CampaignsPage() {
     );
   }, [isMod, user, moderation, ownCampaigns]);
 
-  // Build the spotlight pool from the featured campaigns only. A featured
-  // campaign without a resolvable country is silently dropped — the globe
-  // needs coordinates to pin it, and the banner cycles in lockstep with
-  // the globe so the two stay in sync.
-  const spotlightables = useMemo(() => {
-    type Entry = {
-      key: string;
-      campaign: ParsedCampaign;
-      lat: number;
-      lng: number;
-    };
-    const out: Entry[] = [];
-    const seenAtag = new Set<string>();
-    const seenCountry = new Set<string>();
-
-    const add = (c: ParsedCampaign) => {
-      if (seenAtag.has(c.aTag)) return;
-      const countryCode = c.countryCode;
-      if (!countryCode) return;
-      const coords = getCoordinates(countryCode);
-      if (!coords) return;
-      // Deduplicate by country so two featured campaigns in the same
-      // country don't pile overlapping markers on the globe. Featured
-      // order is preserved — the first one wins.
-      if (seenCountry.has(countryCode)) return;
-      seenAtag.add(c.aTag);
-      seenCountry.add(countryCode);
-      out.push({ key: c.aTag, campaign: c, lat: coords.latitude, lng: coords.longitude });
-    };
-
-    for (const c of orderedFeatured) {
-      add(c);
-    }
-    return out;
-  }, [orderedFeatured]);
-
-  const globeMarkers = useMemo(
-    () =>
-      spotlightables.map((s) => ({
-        key: s.key,
-        lat: s.lat,
-        lng: s.lng,
-        label: s.campaign.title,
-      })),
-    [spotlightables],
-  );
-
-  // Selection lives here so the globe and the spotlight card stay in sync.
-  // `null` means "auto-cycle through the spotlightables"; clicking a marker
-  // pins the selection until the user clicks a different one.
-  const [selectedKey, setSelectedKey] = useState<string | null>(null);
-  // A separate cursor advances when no marker is selected, so cycling
-  // continues to drive the spotlight even while the user is reading.
-  const [cycleIndex, setCycleIndex] = useState(0);
-
-  useEffect(() => {
-    if (selectedKey !== null) return;
-    if (spotlightables.length <= 1) return;
-    const id = window.setInterval(() => {
-      setCycleIndex((i) => (i + 1) % spotlightables.length);
-    }, 6_000);
-    return () => window.clearInterval(id);
-  }, [selectedKey, spotlightables.length]);
-
-  // Resolve the spotlight to actually display.
-  const spotlightCampaign = useMemo(() => {
-    if (selectedKey) {
-      return spotlightables.find((s) => s.key === selectedKey)?.campaign ?? null;
-    }
-    if (spotlightables.length === 0) return null;
-    return spotlightables[cycleIndex % spotlightables.length].campaign;
-  }, [selectedKey, cycleIndex, spotlightables]);
-
-  // The key the globe should highlight matches whatever the card shows.
-  const highlightedMarkerKey = useMemo(() => {
-    if (selectedKey) return selectedKey;
-    if (spotlightables.length === 0) return null;
-    return spotlightables[cycleIndex % spotlightables.length].key;
-  }, [selectedKey, cycleIndex, spotlightables]);
-
-  // Active "hopeful" hue keyed to the spotlit campaign. Both the
-  // surrounding atmosphere and the globe consume this so the entire
-  // hero shifts color together as campaigns cycle.
-  const activeHue = useMemo(
-    () => hopeHueFor(spotlightCampaign?.aTag),
-    [spotlightCampaign?.aTag],
-  );
-
   return (
     <main className="min-h-screen pb-16">
       {/* Hero.
 
-          Layered, back-to-front:
-            1. CampaignHeroBackground — full-bleed crossfading banner image
-               from the currently-spotlit campaign, with a warm tint + film
-               grain so headlines stay legible.
-            2. HeroGlobe — large slow-spinning globe anchored to the right,
-               heart markers click-select campaigns.
-            3. Headline column — title + paragraph + CTAs, top-left.
-            4. HeroCampaignSpotlight — title + summary + "View campaign"
-               button for the active campaign, bottom-right.
+          Dark, brand-driven, type-led. Three layers:
+            1. Near-black backdrop (`bg-[hsl(220_25%_6%)]`) — the canvas
+               every other element sits on. No campaign photo, no random
+               hue cycling: the hero looks the same on every visit, so
+               quality doesn't depend on which campaign is featured.
+            2. HeroLightningMap — decorative dark world map with curated
+               glowing brand-orange arcs and pulsing city nodes. Pure SVG,
+               negligible render cost, animations honor reduced-motion.
+            3. Headline column on the left, lifted by a left-edge gradient
+               inside HeroLightningMap so type stays readable without any
+               text-shadow at all. */}
+      <section className="relative overflow-hidden border-b border-border bg-[hsl(220_25%_6%)] text-white">
+        <HeroLightningMap />
 
-          Inspired by the Treasures HeroGallery pattern: the photo IS the
-          background, everything else floats over it. */}
-      <section className="relative overflow-hidden border-b border-border bg-secondary/40">
-        <CampaignHeroBackground imageUrl={spotlightCampaign?.banner} />
-
-        {/* Per-campaign hopeful color atmosphere. Sits on top of the
-            photo and below the globe so its mix-blend-mode: screen layers
-            can warm the darks back up — the photo ends up tinted toward
-            the active hue without losing headline contrast. */}
-        <HeroAtmosphere seed={spotlightCampaign?.aTag} />
-
-        {/* Globe — center sits a little to the left of the TopNav account
-            switcher anchor so a larger slice of the sphere reads inside
-            the hero rather than off the right edge. */}
-        <div className="absolute inset-0 pointer-events-none">
-          <div className="relative max-w-7xl mx-auto h-full px-4 sm:px-6">
-            <div className="absolute inset-y-0 right-4 sm:right-6 flex items-center">
-              <div className="pointer-events-auto hero-globe-mask translate-x-[40%] sm:translate-x-[38%] lg:translate-x-[38%] opacity-90">
-                <HeroGlobe
-                  markers={globeMarkers}
-                  selectedKey={highlightedMarkerKey}
-                  onMarkerClick={(key) =>
-                    // Toggle off when the user re-clicks the active
-                    // marker, restoring the auto-cycle.
-                    setSelectedKey((prev) => (prev === key ? null : key))
-                  }
-                  hue={activeHue}
-                  // Fluid sizing scaled to dynamic viewport width (dvw),
-                  // clamped so it never shrinks below phone-comfortable
-                  // nor balloons on ultra-wide monitors.
-                  className="aspect-square max-w-none drop-shadow-2xl"
-                  style={{ width: 'clamp(620px, 58dvw, 820px)' }}
-                />
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Readability scrim. Layered *above* the globe so the headline
-            area stays legible even when a slice of the sphere sits behind
-            it. Only shown on tablet and below — at lg+ the globe sits
-            outside the headline column, so the scrim would just mute the
-            photo for no benefit. */}
-        <div
-          className="absolute inset-0 pointer-events-none bg-gradient-to-r from-black/55 via-black/30 to-transparent lg:hidden"
-          aria-hidden="true"
-        />
-
-        {/* Foreground content — headline + CTAs at the top, spotlight info
-            at the bottom. Shares the `max-w-7xl mx-auto` container with the
-            globe so everything aligns to the same left/right axis. */}
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 py-14 lg:py-20 min-h-[560px] sm:min-h-[600px] lg:min-h-[640px] flex flex-col text-white">
-          <div className="relative space-y-5 max-w-2xl">
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight leading-[1.1] hero-text-shadow">
-              Connecting activists to unstoppable funding.
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 py-16 lg:py-24 min-h-[440px] sm:min-h-[480px] lg:min-h-[520px] flex flex-col justify-center">
+          <div className="space-y-6 max-w-2xl">
+            <h1
+              className="font-display italic text-6xl sm:text-7xl lg:text-8xl font-normal tracking-wide leading-none uppercase"
+              style={{
+                // Bebas Neue only ships at weight 400. Paint a stroke the
+                // same color as the fill to fatten the letterforms without
+                // the fuzz a synthetic-bold transform would produce.
+                WebkitTextStroke: '0.022em currentColor',
+              }}
+            >
+              Connecting activists to
+              {/* "unstoppable" gets a solid brand-orange highlighter
+                  block on its own line. The negative left margin
+                  (`-ml-1.5`) pulls the box's left edge back by exactly
+                  the box's own horizontal padding so the U sits flush
+                  with the column's left edge instead of being inset by
+                  the highlighter's padding. */}
+              <br />
+              {/* Asymmetric padding: zero on the left so "unstoppable"'s
+                  U sits flush with the column edge (matching the row
+                  above), but extra padding on the right so the orange
+                  box extends past the word's trailing edge as a
+                  deliberate visual flourish. The inner text is then
+                  nudged slightly leftward (negative left margin on the
+                  inner element) so the U optically aligns with the
+                  "C" in "Connecting" — Bebas Neue's italic skew shifts
+                  the visual left edge of the U rightward of its
+                  geometric box. */}
+              <span className="inline-block w-fit pl-0 pr-3 pt-1 pb-0 -mt-1 -mb-3 bg-primary text-white leading-[0.8] align-baseline">
+                <span className="-ml-1 inline-block">unstoppable</span>
+              </span>{' '}
+              funding.
             </h1>
-            <p className="text-base sm:text-lg text-white/85 max-w-2xl hero-text-shadow-soft">
-              Raise Bitcoin directly from supporters around the world. Every donation settles
-              straight to your campaign's beneficiaries, with no middlemen, no chargebacks, and no
-              platform holding your funds.
+            <p className="text-base sm:text-lg text-white/80 max-w-xl">
+              Raise Bitcoin directly from supporters around the world. Every donation
+              settles straight to your campaign's beneficiaries, with no middlemen, no
+              chargebacks, and no platform holding your funds.
             </p>
-            <div className="flex flex-wrap gap-3 pt-2">
-              {/* Primary CTA — clean translucent glass pill with a hint
-                  of warmth bleeding through. The hopefulness comes from
-                  the photo + atmosphere underneath plus a soft warm
-                  shadow, not from added gloss. */}
+            <div className="flex flex-wrap gap-3 pt-1">
+              {/* Primary CTA — solid brand-orange pill. The dark hero gives
+                  the brand color the spotlight without competing with it. */}
               <Button
                 size="lg"
                 asChild
-                className={cn(
-                  // A touch larger than the default lg button — enough
-                  // weight to read as primary, not enough to feel chunky.
-                  'relative rounded-full text-white font-semibold text-base h-12 px-7 [&_svg]:size-[18px]',
-                  // Subtle warm-tinted glass body, kept more transparent.
-                  // Hover lifts the tint a hair without changing the pill
-                  // character — no shadow bloom, no halo.
-                  'bg-gradient-to-br from-white/14 via-amber-100/10 to-rose-100/10 hover:from-white/20 hover:via-amber-100/14 hover:to-rose-100/14',
-                  'backdrop-blur-xl backdrop-saturate-150',
-                  'border border-white/25 hover:border-white/35',
-                  // Single hair-thin inner highlight + a warm-tinted
-                  // realistic drop shadow that ties the button to the
-                  // hopeful palette. Hover only nudges the shadow.
-                  'shadow-[inset_0_0_0_1px_rgb(255_255_255/0.08),0_10px_28px_-12px_hsl(24_85%_45%/0.4)]',
-                  'hover:shadow-[inset_0_0_0_1px_rgb(255_255_255/0.12),0_12px_32px_-10px_hsl(24_85%_45%/0.5)]',
-                  'motion-safe:transition-colors motion-safe:duration-200',
-                )}
+                className="rounded-full text-primary-foreground font-semibold text-base h-12 px-7 [&_svg]:size-[18px] motion-safe:transition-colors"
               >
                 <Link to="/campaigns/new">
                   <PlusCircle className="mr-2" />
@@ -349,22 +219,13 @@ export function CampaignsPage() {
                   variant="outline"
                   size="lg"
                   asChild
-                  className="rounded-full bg-background/70 backdrop-blur h-12 px-6 text-base text-foreground"
+                  className="rounded-full h-12 px-6 text-base border-white/30 bg-white/5 text-white hover:bg-white/10 hover:text-white hover:border-white/50"
                 >
                   <a href="#campaigns">Explore campaigns</a>
                 </Button>
               )}
             </div>
           </div>
-
-          {(spotlightCampaign || (featuredLoading && spotlightables.length === 0)) && (
-            <div className="relative mt-auto pt-10 max-w-sm">
-              <HeroCampaignSpotlight
-                campaign={spotlightCampaign}
-                isLoading={featuredLoading && spotlightables.length === 0}
-              />
-            </div>
-          )}
         </div>
       </section>
 

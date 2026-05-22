@@ -82,6 +82,16 @@ interface ProfileRightSidebarProps {
   onMediaClick?: (url: string) => void;
   /** Override the root element's className (e.g. to show on mobile). */
   className?: string;
+  /**
+   * Layout variant.
+   *
+   * - `'rail'` (default) — legacy 1/4-width fixed sidebar with full-height
+   *   sticky scrolling. Designed for the old MainLayout shell.
+   * - `'inline'` — fills its parent's width with no positioning, so it can
+   *   be slotted into a grid cell or another container that manages
+   *   layout (e.g. the ProfilePage two-column body).
+   */
+  variant?: 'rail' | 'inline';
 }
 
 interface MediaItem {
@@ -495,7 +505,7 @@ function sidebarJustifiedLayout(items: MediaItem[]): { items: MediaItem[]; heigh
   return rows;
 }
 
-export function ProfileRightSidebar({ fields, pubkey, onMediaClick, className }: ProfileRightSidebarProps) {
+export function ProfileRightSidebar({ fields, pubkey, onMediaClick, className, variant = 'rail' }: ProfileRightSidebarProps) {
   const { config } = useAppContext();
   const { nostr } = useNostr();
 
@@ -534,8 +544,12 @@ export function ProfileRightSidebar({ fields, pubkey, onMediaClick, className }:
 
   const sidebarRows = useMemo(() => sidebarJustifiedLayout(media), [media]);
 
+  const rootClass = variant === 'inline'
+    ? 'flex flex-col w-full'
+    : 'w-1/4 max-w-[300px] shrink-0 hidden lg:flex flex-col sticky top-0 h-screen overflow-y-auto pt-2 pb-3 px-3';
+
   return (
-    <aside className={cn("w-1/4 max-w-[300px] shrink-0 hidden lg:flex flex-col sticky top-0 h-screen overflow-y-auto pt-2 pb-3 px-3", className)}>
+    <aside className={cn(rootClass, className)}>
       {/* Media Section — only shown when pubkey prop is provided */}
       {pubkey !== undefined && <section className="mb-6 bg-background/85 rounded-xl p-3 -mx-1">
         <h2 className="text-xl font-bold mb-3" style={{ fontFamily: 'var(--title-font-family, inherit)' }}>Media</h2>
