@@ -1,13 +1,18 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useSeoMeta } from '@unhead/react';
-import { ChevronDown, ChevronUp, Globe2, HandHeart, PlusCircle, Users } from 'lucide-react';
+import { ChevronDown, ChevronUp, EyeOff, Globe2, HandHeart, Hourglass, PlusCircle, Users } from 'lucide-react';
 
 import { HeroAtmosphere } from '@/components/HeroAtmosphere';
 import { HeroBanner } from '@/components/HeroBanner';
 import { LoginArea } from '@/components/auth/LoginArea';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from '@/components/ui/collapsible';
 import { Skeleton } from '@/components/ui/skeleton';
 import { CommunityGrid } from '@/components/discovery/CommunityGrid';
 import { CommunityMiniCard, CommunityMiniCardSkeleton } from '@/components/discovery/CommunityMiniCard';
@@ -16,13 +21,17 @@ import { COOL_PALETTE } from '@/lib/hopePalette';
 import { cn } from '@/lib/utils';
 import { useLayoutOptions } from '@/contexts/LayoutContext';
 import { useAppContext } from '@/hooks/useAppContext';
+import { useCampaignModerators } from '@/hooks/useCampaignModerators';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
+import { useDiscoverCommunities } from '@/hooks/useDiscoverCommunities';
 import { useFeaturedOrganizations } from '@/hooks/useFeaturedOrganizations';
 import { useGlobalActivity } from '@/hooks/useGlobalActivity';
 import { useGlobalDonations } from '@/hooks/useGlobalDonations';
+import { useOrganizationModeration } from '@/hooks/useOrganizationModeration';
 import { useToast } from '@/hooks/useToast';
 import { useUserOrganizations } from '@/hooks/useUserOrganizations';
 import { formatSatsShort } from '@/lib/formatCampaignAmount';
+import type { ParsedCommunity } from '@/lib/communityUtils';
 
 // ─── Page ──────────────────────────────────────────────────────────────────────
 
@@ -32,6 +41,13 @@ export function CommunitiesPage() {
   const userOrganizations = useUserOrganizations();
   const navigate = useNavigate();
   const { toast } = useToast();
+
+  // Moderator gate. Reuses the campaign moderator pack (Team Soapbox) —
+  // see useOrganizationModeration for why the same pack governs both
+  // surfaces. The `isMod` boolean drives the visibility of the two
+  // collapsible review sections at the bottom of the page.
+  const { data: moderators } = useCampaignModerators();
+  const isMod = !!user && !!moderators && moderators.includes(user.pubkey);
 
   useLayoutOptions({
     noMaxWidth: true,
@@ -75,8 +91,157 @@ export function CommunitiesPage() {
           />
           <FeaturedOrganizationsShelf />
         </section>
+
+        {/* Moderator-only review sections. Mirrors the home page's
+            "Pending approval" and "Hidden" rails for campaigns — collapsed
+            by default when long, so moderators can scan the queue without
+            it dominating the page. */}
+        {isMod && <ModeratorReviewSections />}
       </div>
     </main>
+  );
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// Moderator review sections
+// ═══════════════════════════════════════════════════════════════════════════════
+
+/**
+ * Renders the "Pending review" and "Hidden" rails for moderators only.
+ * Pulls a recent slice of kind 34550 organizations via the existing
+ * discovery hook and folds against the moderation rollup:
+ *
+ * - **Pending review** — orgs with no approve/hide label yet (neither
+ *   `approved` nor `hidden`).
+ * - **Hidden** — orgs whose latest hide-axis label is `hidden`. Featured
+ *   orgs that get hidden show up here too; the moderation menu on the
+ *   card lets a moderator unhide.
+ *
+ * Mirrors the campaign side's `ModeratorSection` pattern (collapsible,
+ * defaults to open when the list is short).
+ */
+function ModeratorReviewSections() {
+  // Wider pull than the public discovery shelf so reviewers see deeper
+  // history. Bumping the limit further would just add network cost —
+  // anything truly old can be reviewed by visiting it directly.
+  const { data: allOrgs, isLoading } = useDiscoverCommunities({ limit: 200 });
+  const { data: moderation, isReady } = useOrganizationModeration();
+
+  const pendingOrgs = useMemo(() => {
+    if (!moderation || !allOrgs) return [] as ParsedCommunity[];
+    return allOrgs.filter(
+      (org) =>
+        !moderation.approvedCoords.has(org.aTag) &&
+        !moderation.hiddenCoords.has(org.aTag),
+    );
+  }, [moderation, allOrgs]);
+
+  const hiddenOrgs = useMemo(() => {
+    if (!moderation || !allOrgs) return [] as ParsedCommunity[];
+    return allOrgs.filter((org) => moderation.hiddenCoords.has(org.aTag));
+  }, [moderation, allOrgs]);
+
+  const sectionsLoading = isLoading || !isReady;
+
+  return (
+    <>
+      <ModeratorOrgSection
+        icon={<Hourglass className="size-4" />}
+        title="Pending review"
+        description="Organizations on the network that no Team Soapbox moderator has approved or hidden yet. Featuring or approving moves them out of this list."
+        count={pendingOrgs.length}
+        orgs={pendingOrgs}
+        isLoading={sectionsLoading}
+        emptyText="Nothing awaiting review."
+      />
+      <ModeratorOrgSection
+        icon={<EyeOff className="size-4" />}
+        title="Hidden"
+        description="Organizations suppressed from public discovery. Use the kebab menu on a card to unhide."
+        count={hiddenOrgs.length}
+        orgs={hiddenOrgs}
+        isLoading={sectionsLoading}
+        emptyText="No organizations are currently hidden."
+      />
+    </>
+  );
+}
+
+/**
+ * Collapsible moderator-only section listing organizations in a particular
+ * moderation state (pending / hidden). Defaults to expanded when the list
+ * is short (≤ 6 items), collapsed otherwise — same heuristic as the
+ * campaign version.
+ */
+function ModeratorOrgSection({
+  icon,
+  title,
+  description,
+  count,
+  orgs,
+  isLoading,
+  emptyText,
+}: {
+  icon: React.ReactNode;
+  title: string;
+  description: string;
+  count: number;
+  orgs: ParsedCommunity[];
+  isLoading: boolean;
+  emptyText: string;
+}) {
+  const [open, setOpen] = useState(count <= 6);
+
+  return (
+    <Collapsible open={open} onOpenChange={setOpen} asChild>
+      <section className="pt-4 pb-2">
+        <CollapsibleTrigger asChild>
+          <button
+            type="button"
+            className="flex w-full items-end justify-between gap-4 rounded-lg text-left px-4 sm:px-6 pb-3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+          >
+            <div>
+              <h2 className="text-xl sm:text-2xl font-bold tracking-tight inline-flex items-center gap-2">
+                <span className="text-muted-foreground">{icon}</span>
+                {title}
+                <span className="text-sm font-medium text-muted-foreground">({count})</span>
+              </h2>
+              <p className="text-sm text-muted-foreground mt-1 max-w-2xl">{description}</p>
+            </div>
+            <ChevronDown
+              className={cn(
+                'size-5 text-muted-foreground motion-safe:transition-transform shrink-0',
+                open && 'rotate-180',
+              )}
+              aria-hidden
+            />
+          </button>
+        </CollapsibleTrigger>
+        <CollapsibleContent>
+          {isLoading && orgs.length === 0 ? (
+            <CommunityGrid>
+              {Array.from({ length: 4 }).map((_, i) => (
+                <CommunityMiniCardSkeleton key={i} className="w-full" />
+              ))}
+            </CommunityGrid>
+          ) : orgs.length === 0 ? (
+            <div className="px-4 sm:px-6">
+              <Card className="border-dashed">
+                <CardContent className="py-8 text-center text-sm text-muted-foreground">
+                  {emptyText}
+                </CardContent>
+              </Card>
+            </div>
+          ) : (
+            <CommunityGrid>
+              {orgs.map((org) => (
+                <CommunityMiniCard key={org.aTag} community={org} className="w-full" />
+              ))}
+            </CommunityGrid>
+          )}
+        </CollapsibleContent>
+      </section>
+    </Collapsible>
   );
 }
 
