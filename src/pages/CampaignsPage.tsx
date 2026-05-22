@@ -191,7 +191,7 @@ export function CampaignsPage() {
                   "C" in "Connecting" — Bebas Neue's italic skew shifts
                   the visual left edge of the U rightward of its
                   geometric box. */}
-              <span className="inline-block w-fit pl-0 pr-3 bg-primary text-white leading-[0.95] align-baseline">
+              <span className="inline-block w-fit pl-0 pr-3 pt-1 pb-0 -mt-1 -mb-3 bg-primary text-white leading-[0.8] align-baseline">
                 <span className="-ml-1 inline-block">unstoppable</span>
               </span>{' '}
               funding.
