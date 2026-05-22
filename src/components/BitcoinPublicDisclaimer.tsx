@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import { AlertTriangle } from 'lucide-react';
 
 import { Alert, AlertDescription } from '@/components/ui/alert';
@@ -41,6 +42,14 @@ interface BitcoinPublicDisclaimerProps {
    * Defaults to `true` for backwards compatibility.
    */
   includeCashOutAdvice?: boolean;
+  /**
+   * Override the popover body. When set, replaces the entire "Bitcoin
+   * is a public ledger…" paragraph (including the cash-out advice). Use
+   * when the calling surface has a meaningfully different audience —
+   * e.g. a campaign *creator* configuring a receive address, vs. the
+   * sender flow this component was originally written for.
+   */
+  popoverText?: ReactNode;
 }
 
 /**
@@ -56,6 +65,7 @@ export function BitcoinPublicDisclaimer({
   leadText = 'Money you send is public and can be traced back to you.',
   tone = 'destructive',
   includeCashOutAdvice = true,
+  popoverText,
 }: BitcoinPublicDisclaimerProps) {
   const showCheckbox = onAcknowledgedChange !== undefined;
   const isSoft = tone === 'soft';
@@ -93,11 +103,15 @@ export function BitcoinPublicDisclaimer({
               </button>
             </PopoverTrigger>
             <PopoverContent side="top" align="start" className="w-72 text-xs leading-relaxed">
-              Bitcoin is a public ledger. Transactions you send can
-              be traced back to you forever, even after being
-              exchanged by multiple people. Send it only to those
-              you wish to support publicly
-              {includeCashOutAdvice ? ', or cash out at an exchange.' : '.'}
+              {popoverText ?? (
+                <>
+                  Bitcoin is a public ledger. Transactions you send can
+                  be traced back to you forever, even after being
+                  exchanged by multiple people. Send it only to those
+                  you wish to support publicly
+                  {includeCashOutAdvice ? ', or cash out at an exchange.' : '.'}
+                </>
+              )}
             </PopoverContent>
           </Popover>
         </p>

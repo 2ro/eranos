@@ -11,7 +11,6 @@ import {
   HandHeart,
   Loader2,
   MapPin,
-  ShieldCheck,
   Wallet,
   X,
 } from 'lucide-react';
@@ -19,13 +18,25 @@ import {
 import { CoverImageField } from '@/components/CoverImageField';
 import { FormSection } from '@/components/FormSection';
 import { OrganizationContextChip } from '@/components/OrganizationContextChip';
+import { BitcoinPublicDisclaimer } from '@/components/BitcoinPublicDisclaimer';
+import { BitcoinPrivateDisclaimer } from '@/components/BitcoinPrivateDisclaimer';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
+import { useAuthor } from '@/hooks/useAuthor';
 import { useCampaign } from '@/hooks/useCampaign';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
+import { useHdWallet } from '@/hooks/useHdWallet';
 import { useManageableOrganizations } from '@/hooks/useManageableOrganizations';
 import { useNostrPublish } from '@/hooks/useNostrPublish';
 import { useToast } from '@/hooks/useToast';
@@ -39,6 +50,7 @@ import {
 } from '@/lib/campaign';
 import { getTodayDateInput } from '@/lib/dateInput';
 import { fetchFreshEvent } from '@/lib/fetchFreshEvent';
+import { genUserName } from '@/lib/genUserName';
 import { createOrganizationAssociationTags, decodeOrganizationParam } from '@/lib/organizationContext';
 import { sanitizeUrl } from '@/lib/sanitizeUrl';
 import { withAgoraTag } from '@/lib/agoraNoteTags';
@@ -107,6 +119,14 @@ export function CreateCampaignPage() {
   const { nostr } = useNostr();
   const { mutateAsync: publishEvent } = useNostrPublish();
   const { toast } = useToast();
+  const hdWallet = useHdWallet();
+  const hdWalletAvailable = hdWallet.availability.status === 'available';
+  const silentPaymentSupported = hdWalletAvailable && !!hdWallet.silentPaymentAddress;
+  const userAuthor = useAuthor(user?.pubkey);
+  const userMetadata = userAuthor.data?.metadata;
+  const userDisplayName = user
+    ? (userMetadata?.name ?? userMetadata?.display_name ?? genUserName(user.pubkey))
+    : '';
 
   const [title, setTitle] = useState('');
   const [summary, setSummary] = useState('');
@@ -116,6 +136,22 @@ export function CreateCampaignPage() {
   const [bannerNip94Tags, setBannerNip94Tags] = useState<string[][] | null>(null);
   const [coverUploading, setCoverUploading] = useState(false);
   const [walletInput, setWalletInput] = useState('');
+  /**
+   * Which "source" supplies the campaign's wallet endpoint:
+   *
+   * - `'public'`  — derive a fresh on-chain (bc1p…) address from the
+   *   user's HD wallet at submit time, advancing the persistent
+   *   receive-index cursor by 1.
+   * - `'private'` — use the user's static silent-payment code (sp1…).
+   * - `'custom'`  — paste any mainnet bech32(m) address (bc1q/bc1p/sp1).
+   *
+   * The two HD-wallet sources are only selectable when the user is
+   * logged in with an nsec (the wallet derives from the raw secret
+   * key). In edit mode we always start in `'custom'` so a re-publish
+   * doesn't silently burn a new index — switching wallets on an
+   * existing campaign is an explicit user choice.
+   */
+  const [walletSource, setWalletSource] = useState<'public' | 'private' | 'custom'>('custom');
   const [goalUsd, setGoalUsd] = useState('');
   const [deadline, setDeadline] = useState('');
   const [countryQuery, setCountryQuery] = useState('');
@@ -146,6 +182,19 @@ export function CreateCampaignPage() {
     if (isEditMode) return;
     setOrganizationATag(authorizedOrgFromParam?.community.aTag ?? '');
   }, [isEditMode, authorizedOrgFromParam]);
+
+  // When the HD wallet becomes available on a fresh campaign, default to
+  // the user's on-chain wallet. Skipped in edit mode (we always stay on
+  // 'custom' with the pre-filled value — see the edit-prepopulation
+  // effect below) and once the user has interacted, so re-renders that
+  // re-derive `hdWalletAvailable` don't override an explicit choice.
+  const [walletSourceTouched, setWalletSourceTouched] = useState(false);
+  useEffect(() => {
+    if (isEditMode || walletSourceTouched) return;
+    if (hdWalletAvailable && walletSource === 'custom') {
+      setWalletSource('public');
+    }
+  }, [isEditMode, walletSourceTouched, hdWalletAvailable, walletSource]);
 
   const editCampaignQuery = useCampaign({
     pubkey: editTarget?.pubkey ?? '',
@@ -179,6 +228,11 @@ export function CreateCampaignPage() {
     // tags below if the URL is unchanged.
     setBannerNip94Tags(null);
     setWalletInput(editCampaign.wallet.value);
+    // Edit mode always starts in 'custom' with the existing value
+    // pre-filled. We don't try to auto-detect whether the stored `w`
+    // tag came from the user's HD wallet — switching wallets is an
+    // explicit choice the user must make.
+    setWalletSource('custom');
     setGoalUsd(editCampaign.goalUsd !== undefined ? String(editCampaign.goalUsd) : '');
     setDeadline(formatDateInput(editCampaign.deadline));
     const editCountryCode = editCampaign.countryCode ?? '';
@@ -207,9 +261,31 @@ export function CreateCampaignPage() {
         throw new Error('Identifier must be lowercase letters, numbers, and hyphens.');
       }
 
-      // Validate wallet — required.
-      const wallet = parseCampaignWallet(walletInput);
-      if (!wallet) {
+      // Validate wallet — required. For `walletSource === 'public'` we
+      // defer the actual cursor advance until just before publish so a
+      // late validation failure (banner, deadline, d-tag collision)
+      // doesn't burn an HD wallet index. For 'private' and 'custom'
+      // there's no mutation, so resolve them immediately.
+      let resolvedWalletValue: string;
+      if (walletSource === 'public') {
+        if (!hdWalletAvailable) {
+          throw new Error('Built-in wallet is unavailable for this login. Choose Custom and paste an address.');
+        }
+        // Placeholder — overwritten just before tags are built below.
+        resolvedWalletValue = '';
+      } else if (walletSource === 'private') {
+        if (!silentPaymentSupported || !hdWallet.silentPaymentAddress) {
+          throw new Error('Silent-payment address is unavailable for this login.');
+        }
+        resolvedWalletValue = hdWallet.silentPaymentAddress.address;
+      } else {
+        resolvedWalletValue = walletInput;
+      }
+
+      // 'public' wallets skip this check (they'll be parsed after the
+      // cursor advances below). 'private' and 'custom' are parsed now.
+      let wallet = walletSource === 'public' ? null : parseCampaignWallet(resolvedWalletValue);
+      if (walletSource !== 'public' && !wallet) {
         throw new Error(
           'Wallet endpoint is required. Provide a Bitcoin mainnet address (bc1q… / bc1p…) or a silent-payment code (sp1…).',
         );
@@ -299,6 +375,23 @@ export function CreateCampaignPage() {
         if (imeta) tags.push(imeta);
       }
       tags.push(['alt', `Fundraising campaign: ${trimmedTitle}`]);
+
+      // Last step before the `w` tag: advance the HD wallet cursor if
+      // the user chose the public wallet source. This is deliberately
+      // the *last* mutation we do before publishing so a validation
+      // failure earlier in this function doesn't burn an index.
+      if (walletSource === 'public') {
+        const next = hdWallet.nextReceiveAddress();
+        if (!next) {
+          throw new Error('Could not derive a fresh on-chain address from your wallet.');
+        }
+        wallet = parseCampaignWallet(next.address);
+        if (!wallet) {
+          throw new Error('Derived wallet address failed validation. Please try Custom instead.');
+        }
+      }
+      // Type narrowing — by this point both branches have set `wallet`.
+      if (!wallet) throw new Error('Wallet endpoint is required.');
       tags.push(['w', wallet.value]);
       if (goalNum !== undefined) tags.push(['goal', String(goalNum)]);
       if (deadlineNum !== undefined) tags.push(['deadline', String(deadlineNum)]);
@@ -480,20 +573,41 @@ export function CreateCampaignPage() {
 
           {/* Wallet (required) */}
           <FormSection title="Bitcoin wallet" requirement="Required">
-            <div className="relative">
-              <Wallet className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
-              <Input
-                id="campaign-wallet"
-                value={walletInput}
-                onChange={(e) => setWalletInput(e.target.value.trim())}
-                placeholder="bc1p…  or  sp1…"
-                className="pl-9 font-mono text-xs"
-                spellCheck={false}
-                autoComplete="off"
-                autoCorrect="off"
-              />
-            </div>
-            <WalletHint walletInput={walletInput} parsed={parsedWallet} />
+            <WalletSourceSelect
+              value={walletSource}
+              onChange={(next) => {
+                setWalletSource(next);
+                setWalletSourceTouched(true);
+              }}
+              hdWalletAvailable={hdWalletAvailable}
+              silentPaymentSupported={silentPaymentSupported}
+              displayName={userDisplayName}
+              picture={userMetadata?.picture}
+            />
+
+            {walletSource === 'custom' && (
+              <div className="relative mt-2">
+                <Wallet className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+                <Input
+                  id="campaign-wallet"
+                  value={walletInput}
+                  onChange={(e) => setWalletInput(e.target.value.trim())}
+                  placeholder="bc1p…  or  sp1…"
+                  className="pl-9 font-mono text-xs"
+                  spellCheck={false}
+                  autoComplete="off"
+                  autoCorrect="off"
+                />
+              </div>
+            )}
+
+            <WalletDisclaimer
+              source={walletSource}
+              walletInput={walletInput}
+              parsed={parsedWallet}
+              hdWalletAvailable={hdWalletAvailable}
+              silentPaymentSupported={silentPaymentSupported}
+            />
           </FormSection>
 
           {/* Country */}
@@ -635,17 +749,177 @@ export function CreateCampaignPage() {
 
 // ─── Layout helpers ──────────────────────────────────────────────────────────
 
-function WalletHint({
+/**
+ * Dropdown for choosing where the campaign's wallet endpoint comes
+ * from. Renders three options:
+ *
+ *  1. The user's HD wallet (a fresh `bc1p…` per campaign).
+ *  2. The user's silent-payment code (a static `sp1…`).
+ *  3. Custom — pastes any mainnet bech32(m) address.
+ *
+ * The HD-wallet options are disabled when the active login doesn't
+ * support the built-in wallet (extension/bunker logins, since the
+ * derivation needs the raw nsec).
+ */
+function WalletSourceSelect({
+  value,
+  onChange,
+  hdWalletAvailable,
+  silentPaymentSupported,
+  displayName,
+  picture,
+}: {
+  value: 'public' | 'private' | 'custom';
+  onChange: (value: 'public' | 'private' | 'custom') => void;
+  hdWalletAvailable: boolean;
+  silentPaymentSupported: boolean;
+  displayName: string;
+  picture?: string;
+}) {
+  const initial = displayName.charAt(0).toUpperCase() || '?';
+  return (
+    <div className="space-y-1.5">
+      <Select value={value} onValueChange={(v) => onChange(v as 'public' | 'private' | 'custom')}>
+        <SelectTrigger className="h-12">
+          <SelectValue placeholder="Choose a wallet">
+            {value === 'custom' ? (
+              <span className="text-sm">Custom</span>
+            ) : (
+              <span className="inline-flex items-center gap-2">
+                <Avatar className="size-7 shrink-0">
+                  <AvatarImage src={picture} alt={displayName} />
+                  <AvatarFallback>{initial}</AvatarFallback>
+                </Avatar>
+                <span className="truncate text-sm">
+                  {displayName ? `${displayName}'s` : 'Your'}{' '}
+                  {value === 'private' ? 'private wallet' : 'wallet'}
+                </span>
+              </span>
+            )}
+          </SelectValue>
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="public" disabled={!hdWalletAvailable}>
+            <span className="inline-flex items-center gap-2">
+              <Avatar className="size-7 shrink-0">
+                <AvatarImage src={picture} alt={displayName} />
+                <AvatarFallback>{initial}</AvatarFallback>
+              </Avatar>
+              <span className="flex flex-col">
+                <span className="text-sm">
+                  {displayName ? `${displayName}'s wallet` : 'Your wallet'}
+                </span>
+                <span className="text-[11px] text-muted-foreground">
+                  A new on-chain address per campaign
+                </span>
+              </span>
+            </span>
+          </SelectItem>
+          <SelectItem value="private" disabled={!silentPaymentSupported}>
+            <span className="inline-flex items-center gap-2">
+              <Avatar className="size-7 shrink-0">
+                <AvatarImage src={picture} alt={displayName} />
+                <AvatarFallback>{initial}</AvatarFallback>
+              </Avatar>
+              <span className="flex flex-col">
+                <span className="text-sm">
+                  {displayName ? `${displayName}'s private wallet` : 'Your private wallet'}
+                </span>
+                <span className="text-[11px] text-muted-foreground">
+                  Static silent-payment code
+                </span>
+              </span>
+            </span>
+          </SelectItem>
+          <SelectItem value="custom">
+            <span className="flex flex-col">
+              <span className="text-sm">Custom</span>
+              <span className="text-[11px] text-muted-foreground">
+                Paste any mainnet bc1… or sp1… address
+              </span>
+            </span>
+          </SelectItem>
+        </SelectContent>
+      </Select>
+      {!hdWalletAvailable && (
+        <p className="text-[11px] text-muted-foreground">
+          Log in with a Nostr secret key to use a built-in wallet.
+        </p>
+      )}
+    </div>
+  );
+}
+
+/**
+ * Soft disclaimer rendered below the wallet field. Switches on the
+ * effective wallet mode:
+ *
+ *  - **on-chain** (HD-wallet "public" source, or a `bc1…` custom
+ *    address) → public-ledger privacy notice.
+ *  - **silent payment** (HD-wallet "private" source, or an `sp1…`
+ *    custom address) → "experimental but private" notice.
+ *
+ * For an empty / invalid custom field we fall back to the same inline
+ * help text that lived in `WalletHint` before this dropdown existed,
+ * so users typing an address still see the format hint.
+ */
+function WalletDisclaimer({
+  source,
   walletInput,
   parsed,
+  hdWalletAvailable,
+  silentPaymentSupported,
 }: {
+  source: 'public' | 'private' | 'custom';
   walletInput: string;
   parsed: ReturnType<typeof parseCampaignWallet>;
+  hdWalletAvailable: boolean;
+  silentPaymentSupported: boolean;
 }) {
-  const trimmed = walletInput.trim();
-  if (!trimmed) {
+  // Resolve the effective mode. For 'public' / 'private' we trust the
+  // selected source. For 'custom' we look at the parsed input.
+  let mode: 'onchain' | 'sp' | null;
+  if (source === 'public') {
+    mode = hdWalletAvailable ? 'onchain' : null;
+  } else if (source === 'private') {
+    mode = silentPaymentSupported ? 'sp' : null;
+  } else {
+    mode = parsed?.mode ?? null;
+  }
+
+  if (mode === 'onchain') {
     return (
-      <p className="text-xs text-muted-foreground">
+      <div className="mt-2">
+        <BitcoinPublicDisclaimer
+          tone="soft"
+          includeCashOutAdvice={false}
+          leadText="Donations are public and can be traced back to you."
+          popoverText={
+            <>
+              Bitcoin is a public ledger. Transactions sent to this
+              wallet will be visible to everyone. Funds you send from
+              it can be traced back to you and your donors, even after
+              being exchanged by multiple people.
+            </>
+          }
+        />
+      </div>
+    );
+  }
+  if (mode === 'sp') {
+    return (
+      <div className="mt-2">
+        <BitcoinPrivateDisclaimer />
+      </div>
+    );
+  }
+
+  // 'custom' with empty or invalid input — keep the existing inline
+  // hint so the format is discoverable.
+  const trimmed = walletInput.trim();
+  if (source === 'custom' && !trimmed) {
+    return (
+      <p className="mt-2 text-xs text-muted-foreground">
         Use a mainnet bech32 address (<span className="font-mono">bc1q…</span> /{' '}
         <span className="font-mono">bc1p…</span>) for a public, traceable campaign,
         or a BIP-352 silent-payment code (<span className="font-mono">sp1…</span>)
@@ -653,28 +927,15 @@ function WalletHint({
       </p>
     );
   }
-  if (!parsed) {
+  if (source === 'custom' && !parsed) {
     return (
-      <p className="text-xs text-destructive">
+      <p className="mt-2 text-xs text-destructive">
         Not a recognized mainnet wallet endpoint. Provide a <span className="font-mono">bc1q…</span>,{' '}
         <span className="font-mono">bc1p…</span>, or <span className="font-mono">sp1…</span> string.
       </p>
     );
   }
-  if (parsed.mode === 'onchain') {
-    return (
-      <p className="text-xs text-muted-foreground inline-flex items-center gap-1.5">
-        <Wallet className="size-3.5" />
-        Public on-chain address. Donations are traceable; the campaign page shows progress and totals.
-      </p>
-    );
-  }
-  return (
-    <p className="text-xs text-muted-foreground inline-flex items-center gap-1.5">
-      <ShieldCheck className="size-3.5" />
-      Silent payment. Donations are unlinkable by design; totals will not be shown to anyone.
-    </p>
-  );
+  return null;
 }
 
 function CountrySelect({
