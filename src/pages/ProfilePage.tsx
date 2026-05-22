@@ -3,10 +3,10 @@ import { createPortal } from 'react-dom';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useInView } from 'react-intersection-observer';
 import { useNostr } from '@nostrify/react';
-import { useInfiniteQuery, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useInfiniteQuery, useQueryClient } from '@tanstack/react-query';
 import { useSeoMeta } from '@unhead/react';
 import { nip19 } from 'nostr-tools';
-import { Zap, ClipboardCopy, ExternalLink, VolumeX, Flag, Bitcoin, Pin, X, QrCode, Check, Copy, Loader2, Download, Trash2, RotateCcw, Mail, ListPlus, Award, PanelLeft } from 'lucide-react';
+import { Zap, ClipboardCopy, ExternalLink, VolumeX, Flag, Bitcoin, X, QrCode, Check, Copy, Loader2, Download, Trash2, RotateCcw, Mail, ListPlus, Award, PanelLeft } from 'lucide-react';
 
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
@@ -15,7 +15,6 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
 import { useLayoutOptions } from '@/contexts/LayoutContext';
-import { NoteCard } from '@/components/NoteCard';
 import { ZapDialog } from '@/components/ZapDialog';
 import { ExternalFavicon } from '@/components/ExternalFavicon';
 import { VerifiedNip05Text } from '@/components/Nip05Badge';
@@ -23,12 +22,9 @@ import { useAppContext } from '@/hooks/useAppContext';
 import { useAuthor } from '@/hooks/useAuthor';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useToast } from '@/hooks/useToast';
-import { usePinnedNotes } from '@/hooks/usePinnedNotes';
 
 import { useFollowList, useFollowActions } from '@/hooks/useFollowActions';
 import { useMuteList } from '@/hooks/useMuteList';
-import { isEventMuted } from '@/lib/muteHelpers';
-import { useProfileFeed, filterByTab } from '@/hooks/useProfileFeed';
 import type { ProfileTab as CoreProfileTab } from '@/hooks/useProfileFeed';
 import { useProfileSupplementary } from '@/hooks/useProfileData';
 import { useNip05Resolve } from '@/hooks/useNip05Resolve';
@@ -68,7 +64,6 @@ import { sanitizeUrl } from '@/lib/sanitizeUrl';
 import { impactMedium } from '@/lib/haptics';
 import { cn } from '@/lib/utils';
 
-import type { FeedItem } from '@/lib/feedUtils';
 import type { NostrEvent } from '@nostrify/nostrify';
 import QRCode from 'qrcode';
 import { isWeatherFieldLabel } from '@/lib/weatherStation';
@@ -682,30 +677,6 @@ function WeatherFieldInline({ value }: { value: string }) {
   return <WeatherStationCard value={value} compact />;
 }
 
-// ----- Pinned Label -----
-
-function PinnedLabel({ isOwn, onUnpin }: { isOwn: boolean; onUnpin: () => void }) {
-  if (isOwn) {
-    return (
-      <button
-        className="group flex items-center gap-1.5 text-xs text-muted-foreground px-4 pt-3 pb-0 hover:text-destructive transition-colors"
-        onClick={(e) => { e.stopPropagation(); onUnpin(); }}
-      >
-        <Pin className="size-3 rotate-45" />
-        <span className="group-hover:hidden">Pinned</span>
-        <span className="hidden group-hover:inline">Unpin?</span>
-      </button>
-    );
-  }
-
-  return (
-    <div className="flex items-center gap-1.5 text-xs text-muted-foreground px-4 pt-3 pb-0">
-      <Pin className="size-3 rotate-45" />
-      <span>Pinned</span>
-    </div>
-  );
-}
-
 // ----- Profile Image Lightbox -----
 
 function ProfileImageLightbox({ imageUrl, onClose }: { imageUrl: string; onClose: () => void }) {
@@ -863,22 +834,19 @@ function ProfileBannerImage({ src, onClick }: { src: string; onClick: () => void
 
 // ----- Main Component -----
 
-const DEFAULT_TAB_LABELS = ['Activity', 'Campaigns', 'Pledges', 'Posts'];
+const DEFAULT_TAB_LABELS = ['Activity', 'Campaigns', 'Pledges'];
 
 // Map from display label → internal tab id for core tabs
 const CORE_TAB_IDS: Record<string, string> = {
   'Activity': 'activity', 'Campaigns': 'campaigns', 'Pledges': 'pledges',
-  'Posts': 'posts', 'Posts & replies': 'replies',
 };
 
 export function ProfilePage() {
   const { config } = useAppContext();
   const params = useParams();
   const npub = params.npub ?? params.nip19;
-  const { nostr } = useNostr();
   const { user } = useCurrentUser();
   const { toast } = useToast();
-  const { muteItems } = useMuteList();
   const queryClient = useQueryClient();
 
   const [activeTab, setActiveTab] = useState<CoreProfileTab | string>('activity');
@@ -1084,29 +1052,14 @@ function FollowersListModal({ pubkey, open, onOpenChange, displayName }: Followe
   // Keep the active tab in sync if it ever falls out of the recognized set
   // (e.g. on first mount, or if a user navigates with a stale tab id).
   useEffect(() => {
-    const isCoreTab = ['campaigns', 'pledges', 'activity', 'posts', 'replies'].includes(activeTab);
+    const isCoreTab = ['campaigns', 'pledges', 'activity'].includes(activeTab);
     if (!isCoreTab) {
       setActiveTab(firstTabId);
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [firstTabId]);
 
-  // Infinite-scroll profile feed (posts/replies/media).
-  // The first page piggybacks kind 0, seeding the author cache so the
-  // profile header renders from the same relay round-trip as the feed.
-  const {
-    data: feedData,
-    isPending: feedPending,
-    fetchNextPage: fetchNextFeedPage,
-    hasNextPage: hasNextFeedPage,
-    isFetchingNextPage: isFetchingNextFeedPage,
-  } = useProfileFeed(
-    pubkey,
-    (['posts', 'replies'].includes(activeTab) ? activeTab : 'posts') as CoreProfileTab,
-    true,
-  );
-
-  // Kind 0 — resolved from the author cache (seeded by the feed query above).
+  // Kind 0 — resolved from the author cache.
   const author = useAuthor(pubkey);
   const metadata = author.data?.metadata;
   const bannerUrl = sanitizeUrl(metadata?.banner);
@@ -1176,22 +1129,6 @@ function FollowersListModal({ pubkey, open, onOpenChange, displayName }: Followe
   const isOwnProfile = user?.pubkey === pubkey;
   const { feedSettings } = useFeedSettings();
 
-  const { togglePin } = usePinnedNotes(isOwnProfile ? pubkey : undefined);
-
-  const pinnedIds = useMemo(() => supplementary?.pinnedIds ?? [], [supplementary?.pinnedIds]);
-
-  const { data: pinnedEvents = [], isLoading: pinnedEventsLoading } = useQuery({
-    queryKey: ['profile-pinned-events', pubkey, pinnedIds],
-    queryFn: async ({ signal }) => {
-      const events = await nostr.query(
-        [{ ids: pinnedIds, limit: pinnedIds.length }],
-        { signal: AbortSignal.any([signal, AbortSignal.timeout(5000)]) },
-      );
-      return events.sort((a, b) => pinnedIds.indexOf(a.id) - pinnedIds.indexOf(b.id));
-    },
-    enabled: pinnedIds.length > 0,
-    staleTime: 5 * 60 * 1000,
-  });
   const isFollowing = useMemo(() => {
     if (!pubkey || !followData?.pubkeys) return false;
     return followData.pubkeys.includes(pubkey);
@@ -1213,59 +1150,7 @@ function FollowersListModal({ pubkey, open, onOpenChange, displayName }: Followe
     }
   };
 
-  // Flatten feed pages, deduplicate, and filter muted content.
-  // Tab filtering is applied downstream in `currentItems` so the base
-  // list stays stable across tab switches and doesn't momentarily empty.
-  const feedItems = useMemo(() => {
-    if (!feedData?.pages) return [];
-    const seen = new Set<string>();
-    const items: FeedItem[] = [];
-    for (const page of feedData.pages) {
-      for (const item of page.items) {
-        const key = item.repostedBy ? `repost-${item.repostedBy}-${item.event.id}` : item.event.id;
-        if (!seen.has(key)) {
-          seen.add(key);
-          if (muteItems.length > 0 && isEventMuted(item.event, muteItems)) continue;
-          items.push(item);
-        }
-      }
-    }
-    return items;
-  }, [feedData?.pages, muteItems]);
-
-  // Infinite scroll sentinel
-  const { ref: scrollRef, inView } = useInView({
-    threshold: 0,
-  });
-
-  useEffect(() => {
-    if (!inView) return;
-    if (hasNextFeedPage && !isFetchingNextFeedPage) {
-      fetchNextFeedPage();
-    }
-  }, [inView, hasNextFeedPage, isFetchingNextFeedPage, fetchNextFeedPage]);
-
   const authorEvent = metadataEvent;
-
-  // The Posts and Posts & replies tabs are the only feed-driven core tabs
-  // remaining; the Agora-native tabs (Activity / Campaigns / Pledges) have
-  // their own renderers below and bypass this fallthrough.
-  const isCoreProfileTab = activeTab === 'posts' || activeTab === 'replies';
-  const currentItems = filterByTab(feedItems, isCoreProfileTab ? (activeTab as CoreProfileTab) : 'posts');
-  const currentLoading = feedPending;
-  const hasMore = hasNextFeedPage;
-  const isFetchingMore = isFetchingNextFeedPage;
-
-  // Auto-fetch next page when client-side filtering (e.g. removing replies
-  // from the "posts" tab) leaves fewer visible items than the page size.
-  // This prevents the user from seeing a near-empty page with a large gap.
-  const MIN_VISIBLE_ITEMS = 5;
-  useEffect(() => {
-    if (currentLoading || isFetchingMore) return;
-    if (currentItems.length < MIN_VISIBLE_ITEMS && hasNextFeedPage && !isFetchingNextFeedPage) {
-      fetchNextFeedPage();
-    }
-  }, [currentItems.length, currentLoading, isFetchingMore, hasNextFeedPage, isFetchingNextFeedPage, fetchNextFeedPage]);
 
   const handleRefresh = useCallback(async () => {
     if (!pubkey) return;
@@ -1277,8 +1162,7 @@ function FollowersListModal({ pubkey, open, onOpenChange, displayName }: Followe
         return (
           (tag === 'author' && key[1] === pubkey) ||
           (tag === 'profile-supplementary' && key[1] === pubkey) ||
-          (tag === 'profile-feed' && key[1] === pubkey) ||
-          (tag === 'profile-pinned-events' && key[1] === pubkey)
+          (tag === 'agora-feed')
         );
       },
     });
@@ -1434,83 +1318,6 @@ function FollowersListModal({ pubkey, open, onOpenChange, displayName }: Followe
               {/* Activity — Agora feed scoped to this author. */}
               {activeTab === 'activity' && pubkey && (
                 <ProfileActivityTab pubkey={pubkey} displayName={displayName} />
-              )}
-
-              {/* Pinned posts (only on Posts tab) */}
-              {activeTab === 'posts' && pinnedIds.length > 0 && (
-                <div>
-                  {pinnedEventsLoading ? (
-                    pinnedIds.map((id) => (
-                      <div key={`pinned-skeleton-${id}`} className="relative">
-                        <PinnedLabel isOwn={isOwnProfile} onUnpin={() => {}} />
-                        <div className="px-4 py-3 border-b border-border">
-                          <div className="flex gap-3">
-                            <Skeleton className="size-11 rounded-full" />
-                            <div className="flex-1 space-y-2">
-                              <Skeleton className="h-4 w-48" />
-                              <Skeleton className="h-4 w-full" />
-                              <Skeleton className="h-4 w-3/4" />
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    ))
-                  ) : (
-                    pinnedEvents.map((event) => (
-                      <div key={`pinned-${event.id}`} className="relative hover:bg-secondary/30 transition-colors">
-                        <PinnedLabel
-                          isOwn={isOwnProfile}
-                          onUnpin={() => togglePin.mutate(event.id)}
-                        />
-                        <NoteCard event={event} className="hover:bg-transparent" />
-                      </div>
-                    ))
-                  )}
-                </div>
-              )}
-
-              {/* Posts / Replies — generic feed renderer. */}
-              {isCoreProfileTab && (
-                <div>
-                  {currentLoading ? (
-                    <div className="space-y-0">
-                      {Array.from({ length: 3 }).map((_, i) => (
-                        <div key={i} className="px-4 py-3 border-b border-border">
-                          <div className="flex gap-3">
-                            <Skeleton className="size-11 rounded-full" />
-                            <div className="flex-1 space-y-2">
-                              <Skeleton className="h-4 w-48" />
-                              <Skeleton className="h-4 w-full" />
-                              <Skeleton className="h-4 w-3/4" />
-                            </div>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  ) : currentItems.length > 0 ? (
-                    <div>
-                      {currentItems.map((item) => (
-                        <NoteCard
-                          key={item.repostedBy ? `repost-${item.repostedBy}-${item.event.id}` : item.event.id}
-                          event={item.event}
-                          repostedBy={item.repostedBy}
-                        />
-                      ))}
-                      {hasMore && (
-                        <div ref={scrollRef} className="flex justify-center py-6">
-                          {isFetchingMore && (
-                            <Loader2 className="size-5 animate-spin text-muted-foreground" />
-                          )}
-                        </div>
-                      )}
-                    </div>
-                  ) : (
-                    <div className="py-12 text-center text-muted-foreground">
-                      {activeTab === 'posts' && 'No posts yet.'}
-                      {activeTab === 'replies' && 'No posts or replies yet.'}
-                    </div>
-                  )}
-                </div>
               )}
             </section>
           </div>

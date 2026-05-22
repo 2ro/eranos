@@ -13,13 +13,19 @@ interface ProfileActivityTabProps {
 }
 
 /**
- * Unified Agora activity feed scoped to one author.
+ * Unified profile feed scoped to one author.
  *
- * Pipes {@link useAgoraFeed} through with `authors=[pubkey]`, so the
- * relay-side filter does the work — the result is a mixed-kind timeline
- * of this author's campaigns, pledges, communities, Agora-marked notes,
- * comments, and on-chain zap receipts. `NoteCard` renders all of these
- * kinds; rendering details live there.
+ * Pipes {@link useAgoraFeed} through with `authors=[pubkey]` AND
+ * `includeAuthorNotes: true`, so the relay-side filter pulls in:
+ *
+ *  - Agora-marked content (campaigns, pledges, communities, marked notes,
+ *    Agora-rooted comments, donation receipts), and
+ *  - every kind 1 / 6 note this author has published, regardless of the
+ *    `t:agora` marker.
+ *
+ * The two sources merge into a single chronological timeline so the
+ * profile shows "everything this person has done on the network." Replaces
+ * the previous separate Activity + Posts tabs.
  *
  * Single-column inside the tab area because the timeline is mixed-kind
  * and benefits from full-width cards.
@@ -31,7 +37,7 @@ export function ProfileActivityTab({ pubkey, displayName }: ProfileActivityTabPr
     isFetchingNextPage,
     hasNextPage,
     fetchNextPage,
-  } = useAgoraFeed(true, { authors: [pubkey] });
+  } = useAgoraFeed(true, { authors: [pubkey], includeAuthorNotes: true });
 
   const { ref: scrollRef, inView } = useInView({ threshold: 0 });
 
@@ -65,8 +71,8 @@ export function ProfileActivityTab({ pubkey, displayName }: ProfileActivityTabPr
           <div className="py-12 px-8 text-center">
             <Sparkles className="size-10 mx-auto mb-3 text-muted-foreground/40" />
             <p className="text-muted-foreground max-w-sm mx-auto">
-              No Agora activity from {displayName} yet. Campaigns, pledges,
-              and on-chain donations show up here.
+              No activity from {displayName} yet. Posts, campaigns, pledges,
+              and donations all show up here.
             </p>
           </div>
         </Card>
