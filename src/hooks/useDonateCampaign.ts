@@ -172,7 +172,21 @@ export function useDonateCampaign() {
     queryClient.invalidateQueries({ queryKey: ['bitcoin-balance'] });
     queryClient.invalidateQueries({ queryKey: ['bitcoin-txs'] });
     queryClient.invalidateQueries({ queryKey: ['onchain-zaps'] });
-    queryClient.invalidateQueries({ queryKey: ['campaign-donations', campaign.aTag] });
+    // The receipts query in useCampaignDonations is keyed
+    // ['campaign-donations', 'events', aTag]; also invalidate the looser
+    // ['campaign-donations'] prefix so any related downstream queries refresh.
+    queryClient.invalidateQueries({ queryKey: ['campaign-donations', 'events', campaign.aTag] });
+    queryClient.invalidateQueries({ queryKey: ['campaign-donations'] });
+    // The campaign may be attached to an organization via an `A` tag; refresh
+    // the org's activity feed so the donation shows up there too.
+    const orgATag = campaign.event.tags.find(([n]) => n === 'A')?.[1];
+    if (orgATag) {
+      queryClient.invalidateQueries({ queryKey: ['organization-activity', orgATag] });
+    }
+    // Campaign list views (and per-campaign progress bars) read totals via
+    // useCampaignDonations, so refresh those too.
+    queryClient.invalidateQueries({ queryKey: ['campaigns'] });
+    queryClient.invalidateQueries({ queryKey: ['campaigns-all'] });
 
     return {
       txid,

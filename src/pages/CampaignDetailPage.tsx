@@ -516,7 +516,8 @@ function CampaignDetailContent({ campaign }: { campaign: ParsedCampaign }) {
         onOpenChange={(open) => {
           setDonateOpen(open);
           if (!open) {
-            queryClient.invalidateQueries({ queryKey: ['campaign-donations', campaign.aTag] });
+            queryClient.invalidateQueries({ queryKey: ['campaign-donations', 'events', campaign.aTag] });
+            queryClient.invalidateQueries({ queryKey: ['campaign-donations'] });
           }
         }}
         btcPrice={btcPrice}
