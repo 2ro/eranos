@@ -87,6 +87,9 @@ import { useProfileCampaignStats } from '@/hooks/useProfileCampaignStats';
 import { useActions } from '@/hooks/useActions';
 import { useBtcPrice } from '@/hooks/useBtcPrice';
 import { DonateDialog } from '@/components/DonateDialog';
+import { ProfileCampaignsStrip } from '@/components/profile/ProfileCampaignsStrip';
+import { ProfileOrganizationsStrip } from '@/components/profile/ProfileOrganizationsStrip';
+import { ProfileRightSidebar } from '@/components/ProfileRightSidebar';
 import type { ParsedCampaign } from '@/lib/campaign';
 import { SubHeaderBar } from '@/components/SubHeaderBar';
 import { useActiveTabIndicator } from '@/components/SubHeaderBarContext';
@@ -1984,9 +1987,9 @@ type EditableTab = { label: string; isCore: boolean; tab?: ProfileTab };
                 </div>
               )}
 
-              {/* Profile fields shown inline on mobile (sidebar is hidden below xl) */}
+              {/* Profile fields shown inline on mobile/tablet (sidebar appears at lg+). */}
               {fields.length > 0 && (
-                <div className="mt-4 space-y-3 xl:hidden">
+                <div className="mt-4 space-y-3 lg:hidden">
                   {fields.map((field, i) => (
                     <ProfileFieldInline key={i} field={field} />
                   ))}
@@ -1997,6 +2000,21 @@ type EditableTab = { label: string; isCore: boolean; tab?: ProfileTab };
             </>
           )}
         </div>
+
+        {/* Agora hero strips — full-width within the constrained content
+            canvas. Each strip self-collapses when empty, so a Nostr-native
+            profile with no Agora activity stays compact. */}
+        {pubkey && (
+          <div className="px-4 sm:px-6">
+            <ProfileCampaignsStrip
+              campaigns={profileCampaignStats.campaigns}
+              isLoading={profileCampaignStats.isVerifying && profileCampaignStats.campaigns.length === 0}
+              isOwnProfile={isOwnProfile}
+              onSeeAll={() => setActiveTab('campaigns')}
+            />
+            <ProfileOrganizationsStrip pubkey={pubkey} />
+          </div>
+        )}
 
         {/* Tabs */}
         <SubHeaderBar pinned>
@@ -2138,6 +2156,35 @@ type EditableTab = { label: string; isCore: boolean; tab?: ProfileTab };
             </div>
           )}
         </SubHeaderBar>
+
+        {/* Two-column body — sticky identity rail on the left (≥ lg), tab
+            content on the right. Below lg the rail is hidden and tab content
+            flows full-width; the identity it would carry (profile fields,
+            media) is already visible inline in the header on mobile and via
+            the dedicated Media tab. */}
+        <div className="grid lg:grid-cols-[300px_minmax(0,1fr)] gap-6 lg:gap-8 pt-4">
+          {/* Left rail — only mounts at lg+, inlined into a grid cell because
+              FundraiserLayout has no built-in right-sidebar slot. The legacy
+              `w-1/4 sticky h-screen` styling is overridden so the aside fits
+              the grid cell and sticks correctly inside the page scroll. */}
+          {pubkey && (
+            <aside className="hidden lg:block lg:sticky lg:top-4 lg:self-start lg:max-h-[calc(100vh-2rem)] lg:overflow-y-auto">
+              <ProfileRightSidebar
+                fields={fields}
+                pubkey={pubkey}
+                variant="inline"
+                onMediaClick={(url) => {
+                  setActiveTab('media');
+                  setSidebarMediaUrl(url);
+                }}
+              />
+            </aside>
+          )}
+
+          {/* Tab-content column — `min-w-0` is critical inside a grid track
+              so long unbroken text doesn't push the column wider than its
+              fraction allowance. */}
+          <section className="min-w-0">
 
         {/* Add/edit single tab modal */}
         {pubkey && (
@@ -2355,6 +2402,9 @@ type EditableTab = { label: string; isCore: boolean; tab?: ProfileTab };
           )}
         </div>
         )}
+
+          </section>
+        </div>
 
         {/* Profile More Menu */}
         {pubkey && (
