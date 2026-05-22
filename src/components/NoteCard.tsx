@@ -39,7 +39,7 @@ import {
   ColorMomentContent,
   ColorMomentEyeButton,
 } from "@/components/ColorMomentContent";
-import { CommentContext, CountryCommentPill, CountryFlagBackdrop } from "@/components/CommentContext";
+import { CommentContext, CountryCommentPill } from "@/components/CommentContext";
 import { CommunityContentWarning } from "@/components/CommunityContentWarning";
 import { ContentWarningGuard } from "@/components/ContentWarningGuard";
 import { EmojifiedText, ReactionEmoji } from "@/components/CustomEmoji";
@@ -1098,9 +1098,6 @@ export const NoteCard = memo(function NoteCard({
         onClick={handleCardClick}
         onAuxClick={handleAuxClick}
       >
-        <CountryFlagBackdrop event={event} />
-        {/* Foreground wrapper — `relative` lifts the entire post above the
-            absolute backdrop layer rendered by CountryFlagBackdrop. */}
         <div className="relative">
           {threadedKindHeader && (
             <div>
@@ -1151,9 +1148,6 @@ export const NoteCard = memo(function NoteCard({
       onClick={handleCardClick}
       onAuxClick={handleAuxClick}
     >
-      <CountryFlagBackdrop event={event} />
-      {/* Foreground wrapper — `relative` lifts the entire post above the
-          absolute backdrop layer rendered by CountryFlagBackdrop. */}
       <div className="relative">
         <div>
           {/* Action header — repost takes priority, otherwise derived from event kind */}
@@ -1193,17 +1187,13 @@ export const NoteCard = memo(function NoteCard({
             })()
           )}
 
-          {/* Header: avatar + name/handle stacked. The country pill is
-              appended outside this flag-mode wrapper as a flex sibling, so
-              it keeps its own surface treatment. */}
+          {/* Header: avatar + name/handle with the country pill anchored
+              right. The pill is a flex sibling of the author row so it
+              keeps its own surface treatment regardless of context. */}
           <div className="flex items-center gap-3">
             {avatarElement}
             {authorInfo}
             {isColor && <ColorMomentEyeButton event={event} />}
-            {/* Country pill — rendered outside the flag-mode color flip via
-                `[&]:` to escape the parent's color rules. It's wrapped in
-                its own flex slot so the row layout matches the non-flag
-                case (pill anchored right). */}
             <CountryCommentPill
               event={event}
               className="shrink-0 [text-shadow:none]"
