@@ -95,6 +95,8 @@ export interface ProfileCardProps {
   onRemoveAvatar?: () => void;
   /** Show NIP-05 row (default true) */
   showNip05?: boolean;
+  /** Show NIP-58 badge showcase row (default true). */
+  showBadges?: boolean;
   /** When provided, render an editable profile fields section below bio */
   extraFields?: ProfileField[];
   onExtraFieldsChange?: (fields: ProfileField[]) => void;
@@ -107,6 +109,7 @@ export function ProfileCard({
   onPickImage,
   onRemoveAvatar,
   showNip05 = true,
+  showBadges = true,
   extraFields,
   onExtraFieldsChange,
 }: ProfileCardProps) {
@@ -332,7 +335,7 @@ export function ProfileCard({
       </div>
 
       {/* Badge showcase */}
-      {(badgeRefs.length > 0 || badgesLoading) && (
+      {showBadges && (badgeRefs.length > 0 || badgesLoading) && (
         <div className="px-4 pb-3">
           <BadgeShowcaseGrid
             items={badgeRefs.map((ref) => ({

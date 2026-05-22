@@ -714,6 +714,7 @@ export function ProfileSettings() {
             onChange={handleCardChange}
             onPickImage={handlePickImage}
             onRemoveAvatar={() => form.setValue('picture', '', { shouldDirty: true })}
+            showBadges={false}
           />
 
           {isUploading && (

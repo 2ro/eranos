@@ -6,7 +6,7 @@ import { useNostr } from '@nostrify/react';
 import { useInfiniteQuery, useQueryClient } from '@tanstack/react-query';
 import { useSeoMeta } from '@unhead/react';
 import { nip19 } from 'nostr-tools';
-import { Zap, ClipboardCopy, ExternalLink, VolumeX, Flag, Bitcoin, X, QrCode, Check, Copy, Loader2, Download, Trash2, RotateCcw, Mail, ListPlus, Award, PanelLeft } from 'lucide-react';
+import { Zap, ClipboardCopy, ExternalLink, VolumeX, Flag, Bitcoin, X, QrCode, Check, Copy, Loader2, Download, RotateCcw, Mail, ListPlus, Award } from 'lucide-react';
 
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
@@ -104,9 +104,6 @@ function ProfileMoreMenu({ pubkey, displayName, open, onOpenChange, isOwnProfile
   const npubEncoded = useMemo(() => nip19.npubEncode(pubkey), [pubkey]);
   const { addMute, removeMute, isMuted } = useMuteList();
   const userMuted = isMuted('pubkey', pubkey);
-  const { addToSidebar, removeFromSidebar, orderedItems } = useFeedSettings();
-  const sidebarId = `nostr:${npubEncoded}`;
-  const isInSidebar = orderedItems.includes(sidebarId);
   const [reportOpen, setReportOpen] = useState(false);
   const [addToListOpen, setAddToListOpen] = useState(false);
   const [recoveryOpen, setRecoveryOpen] = useState(false);
@@ -153,17 +150,6 @@ function ProfileMoreMenu({ pubkey, displayName, open, onOpenChange, isOwnProfile
   const handleReport = () => openAfterClose(setReportOpen);
   const handleAddToList = () => openAfterClose(setAddToListOpen);
 
-  const handleToggleSidebar = () => {
-    if (isInSidebar) {
-      removeFromSidebar(sidebarId);
-      toast({ title: 'Removed from sidebar' });
-    } else {
-      addToSidebar(sidebarId);
-      toast({ title: 'Added to sidebar' });
-    }
-    close();
-  };
-
   const handleRecovery = () => openAfterClose(setRecoveryOpen);
   const handleGiveBadge = () => openAfterClose(setGiveBadgeOpen);
   const handleWriteLetter = () => {
@@ -196,11 +182,6 @@ function ProfileMoreMenu({ pubkey, displayName, open, onOpenChange, isOwnProfile
             icon={<ListPlus className="size-5" />}
             label="Add to list"
             onClick={handleAddToList}
-          />
-          <MenuRow
-            icon={isInSidebar ? <Trash2 className="size-5" /> : <PanelLeft className="size-5" />}
-            label={isInSidebar ? 'Remove from sidebar' : 'Add to sidebar'}
-            onClick={handleToggleSidebar}
           />
         </div>
 
