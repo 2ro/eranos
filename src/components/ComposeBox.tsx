@@ -910,6 +910,11 @@ export function ComposeBox({
 
       // Reset state
       queryClient.invalidateQueries({ queryKey: ['feed'] });
+      // Voice messages can surface in the home Agora activity feed (via
+      // the `t:Agora` marker on root messages and through the comment
+      // path on replies). Refresh both home feed queries.
+      queryClient.invalidateQueries({ queryKey: ['agora-feed'] });
+      queryClient.invalidateQueries({ queryKey: ['mixed-feed'] });
       if (replyTo) {
         if (isExternalRoot(replyTo)) {
           queryClient.invalidateQueries({ queryKey: ['nostr', 'comments'] });
@@ -1183,6 +1188,12 @@ export function ComposeBox({
         );
       }
       queryClient.invalidateQueries({ queryKey: ['feed'] });
+      // Top-level kind 1 posts with the silent Agora tag (the default for
+      // user-authored notes) surface in the home Agora activity feed
+      // (useAgoraFeed / mixed-feed). Invalidate both so the post appears
+      // there without a refresh — over-invalidation is cheap here.
+      queryClient.invalidateQueries({ queryKey: ['agora-feed'] });
+      queryClient.invalidateQueries({ queryKey: ['mixed-feed'] });
       // Top-level kind 1 posts surface on country pages too. Country posts
       // route through `usePostComment` (which handles its own invalidation),
       // but the top-level branch above publishes via `createEvent`, so we
@@ -1275,6 +1286,10 @@ export function ComposeBox({
       await createEvent({ kind: 1068, content: finalContent, tags });
       resetComposeState();
       queryClient.invalidateQueries({ queryKey: ['feed'] });
+      // World-layer polls (iso3166 root) and Agora-marked polls surface
+      // in the home Agora activity feed.
+      queryClient.invalidateQueries({ queryKey: ['agora-feed'] });
+      queryClient.invalidateQueries({ queryKey: ['mixed-feed'] });
       // Polls published with an iso3166 root surface on the country feed.
       if (replyTo instanceof URL && replyTo.protocol === 'iso3166:') {
         const countryCode = replyTo.pathname.toUpperCase();

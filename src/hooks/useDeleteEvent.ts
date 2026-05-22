@@ -28,6 +28,9 @@ const FEED_INVALIDATION_PREFIXES: ReadonlySet<string> = new Set([
   'agora-feed',
   'agora-feed-paginated',
   'agora-feed-new-posts',
+  // Home mixed-mode feed (composes useAgoraFeed + useNostrLayer)
+  'mixed-feed',
+  'nostr-layer',
   // Profile + likes
   'profile-feed',
   'profile-likes-infinite',

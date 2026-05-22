@@ -309,6 +309,9 @@ export function CreateActionDialog({ countryCode, communityATag, open, onOpenCha
           }),
         ]);
       }
+      // Pledges (kind 36639) surface in the home Agora activity feed.
+      await queryClient.invalidateQueries({ queryKey: ['agora-feed'] });
+      await queryClient.invalidateQueries({ queryKey: ['mixed-feed'] });
 
       setFormData({
         title: '', description: '', tagInput: '', pledgeUsd: '',

@@ -347,6 +347,10 @@ export function CreateCampaignPage() {
         void queryClient.invalidateQueries({ queryKey: ['agora-feed-paginated', campaign.countryCode] });
         void queryClient.invalidateQueries({ queryKey: ['agora-feed-new-posts', campaign.countryCode] });
       }
+      // Campaigns (kind 33863) also surface in the home Agora activity
+      // feed regardless of country code.
+      void queryClient.invalidateQueries({ queryKey: ['agora-feed'] });
+      void queryClient.invalidateQueries({ queryKey: ['mixed-feed'] });
       toast({
         title: isEditMode ? 'Campaign updated' : 'Campaign launched',
         description: isEditMode ? 'Your fundraiser changes are live.' : 'Your fundraiser is live.',

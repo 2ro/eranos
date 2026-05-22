@@ -187,6 +187,11 @@ export function useDonateCampaign() {
     // useCampaignDonations, so refresh those too.
     queryClient.invalidateQueries({ queryKey: ['campaigns'] });
     queryClient.invalidateQueries({ queryKey: ['campaigns-all'] });
+    // Donations (kind 8333 receipts) surface in the home Agora activity
+    // feed (useAgoraFeed). Without invalidating it the new donation only
+    // appears after a manual refresh.
+    queryClient.invalidateQueries({ queryKey: ['agora-feed'] });
+    queryClient.invalidateQueries({ queryKey: ['mixed-feed'] });
 
     return {
       txid,

@@ -60,6 +60,46 @@ export function usePostComment() {
         queryKey: ['nostr', 'comments', rootKey]
       });
 
+      // The home Agora activity feed (useAgoraFeed) surfaces NIP-22 comments
+      // whose root is an Agora entity (campaign / pledge / community) or a
+      // world-layer iso3166 / geo root. Invalidate it on every comment so
+      // the freshly-posted comment shows up there without a page refresh.
+      // The key shape is ['agora-feed', authorsKey, ...] — prefix sweep
+      // covers every authors variant the user may have mounted.
+      queryClient.invalidateQueries({ queryKey: ['agora-feed'] });
+      // The mixed home feed (Feed.tsx homeFeedMode === 'agora') flattens
+      // useAgoraFeed events; invalidating the underlying source query is
+      // enough because the mixed selector recomputes from it.
+      queryClient.invalidateQueries({ queryKey: ['mixed-feed'] });
+
+      // Comments attached to a campaign / pledge / community (or to any
+      // event that itself carries an organization `A` tag) need to refresh
+      // the organization-activity shelf so they show up on the org page.
+      if (isEvent(root)) {
+        const orgATag = root.tags.find(([n]) => n === 'A')?.[1];
+        if (orgATag) {
+          queryClient.invalidateQueries({ queryKey: ['organization-activity', orgATag] });
+        }
+        // Predicate-match the community activity feed too — it's keyed
+        // ['community-activity-feed', aTagsKey] where aTagsKey is a
+        // comma-joined list of subscribed A tags.
+        if (orgATag) {
+          queryClient.invalidateQueries({
+            predicate: (q) => {
+              const [key, aTagsKey] = q.queryKey;
+              return key === 'community-activity-feed'
+                && typeof aTagsKey === 'string'
+                && aTagsKey.split(',').includes(orgATag);
+            },
+          });
+        }
+        // Comments on a campaign also need the campaign's per-page comment
+        // cache to refresh (it uses ['event-comments', aTag]).
+        const rootDTag = root.tags.find(([n]) => n === 'd')?.[1] ?? '';
+        const rootATag = `${root.kind}:${root.pubkey}:${rootDTag}`;
+        queryClient.invalidateQueries({ queryKey: ['event-comments', rootATag] });
+      }
+
       if (countryCode) {
         queryClient.setQueriesData<InfiniteData<PaginatedFeedPage>>(
           { queryKey: ['agora-feed-paginated', countryCode] },

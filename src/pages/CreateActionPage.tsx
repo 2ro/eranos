@@ -205,6 +205,9 @@ export function CreateActionPage() {
       if (organizationATag) {
         await queryClient.invalidateQueries({ queryKey: ['organization-activity', organizationATag] });
       }
+      // Pledges (kind 36639) surface in the home Agora activity feed.
+      await queryClient.invalidateQueries({ queryKey: ['agora-feed'] });
+      await queryClient.invalidateQueries({ queryKey: ['mixed-feed'] });
       await queryClient.refetchQueries({ queryKey: ['agora-actions'] });
       toast({ title: 'Pledge created' });
       navigate('/pledges');
