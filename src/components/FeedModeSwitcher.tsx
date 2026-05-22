@@ -18,29 +18,13 @@ import { cn } from '@/lib/utils';
 interface FeedModeOption {
   mode: FeedMode;
   label: string;
-  description: string;
   icon: ComponentType<{ className?: string }>;
 }
 
 const OPTIONS: FeedModeOption[] = [
-  {
-    mode: 'agora',
-    label: 'Agora',
-    description: 'Campaigns, pledges, donations, and Agora posts',
-    icon: Sparkles,
-  },
-  {
-    mode: 'all-nostr',
-    label: 'All Nostr',
-    description: 'Everything on Nostr, plus Agora activity',
-    icon: Globe,
-  },
-  {
-    mode: 'following',
-    label: 'Following',
-    description: 'People you follow, plus their Agora activity',
-    icon: Users,
-  },
+  { mode: 'agora', label: 'Agora', icon: Sparkles },
+  { mode: 'all-nostr', label: 'All Nostr', icon: Globe },
+  { mode: 'following', label: 'Following', icon: Users },
 ];
 
 interface FeedModeSwitcherProps {
@@ -57,8 +41,8 @@ interface FeedModeSwitcherProps {
  * The primary feed-mode picker rendered at the top-left of the home feed page.
  *
  * Visually anchored as the page heading — the active mode label is the largest
- * text on the page. Clicking opens a dropdown menu offering the three modes;
- * the active one is marked with a check.
+ * text on the page. Clicking opens a compact dropdown menu offering the three
+ * modes; the active one is marked with a check.
  *
  * Logged-out users see "Following" greyed out; clicking it invokes
  * {@link FeedModeSwitcherProps.onLoginRequested} to surface the auth dialog.
@@ -91,7 +75,7 @@ export function FeedModeSwitcher({
           aria-hidden
         />
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="start" sideOffset={8} className="w-72 p-2">
+      <DropdownMenuContent align="start" sideOffset={8} className="w-56 p-1.5">
         {OPTIONS.map((opt) => {
           const Icon = opt.icon;
           const isActive = opt.mode === value;
@@ -112,19 +96,14 @@ export function FeedModeSwitcher({
               key={opt.mode}
               onSelect={handleSelect}
               className={cn(
-                'flex items-start gap-3 rounded-md px-3 py-2.5 cursor-pointer',
+                'flex items-center gap-3 rounded-md px-3 py-2 cursor-pointer',
                 disabled && 'opacity-60 data-[disabled]:opacity-60',
               )}
               data-disabled={disabled || undefined}
             >
-              <Icon className="size-5 shrink-0 mt-0.5 text-muted-foreground" aria-hidden />
-              <div className="flex-1 min-w-0">
-                <div className="text-sm font-semibold leading-tight">{opt.label}</div>
-                <div className="text-xs text-muted-foreground mt-0.5 leading-snug">
-                  {opt.description}
-                </div>
-              </div>
-              {isActive && <Check className="size-4 shrink-0 mt-1 text-primary" aria-hidden />}
+              <Icon className="size-4 shrink-0 text-muted-foreground" aria-hidden />
+              <span className="flex-1 text-sm font-medium">{opt.label}</span>
+              {isActive && <Check className="size-4 shrink-0 text-primary" aria-hidden />}
             </DropdownMenuItem>
           );
 

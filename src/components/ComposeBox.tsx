@@ -1,6 +1,6 @@
 import { lazy, Suspense, useState, useRef, useCallback, useMemo, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Paperclip, Smile, AlertTriangle, X, Loader2, Mic, Square, Sticker, BarChart3, Plus, ChevronLeft, HelpCircle } from 'lucide-react';
+import { Paperclip, Smile, AlertTriangle, X, Loader2, Mic, Square, Sticker, BarChart3, Plus, ChevronLeft, Check, HelpCircle } from 'lucide-react';
 import { nip19 } from 'nostr-tools';
 import { encode as blurhashEncode } from 'blurhash';
 import type { NostrEvent } from '@nostrify/nostrify';
@@ -12,7 +12,13 @@ import { Input } from '@/components/ui/input';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { Select, SelectContent, SelectItem, SelectTrigger } from '@/components/ui/select';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import { useCustomEmojis } from '@/hooks/useCustomEmojis';
 import { useFeedSettings } from '@/hooks/useFeedSettings';
 import { GifPicker } from '@/components/GifPicker';
@@ -29,6 +35,7 @@ import { useNostrPublish } from '@/hooks/useNostrPublish';
 import { usePostComment } from '@/hooks/usePostComment';
 import { useUploadFile } from '@/hooks/useUploadFile';
 import { useCountryFollows } from '@/hooks/useCountryFollows';
+import { useDefaultPostCountry } from '@/hooks/useDefaultPostCountry';
 import { getCountryInfo } from '@/lib/countries';
 import { createCountryIdentifier } from '@/lib/countryIdentifiers';
 import { useQueryClient } from '@tanstack/react-query';
@@ -283,18 +290,29 @@ export function ComposeBox({
   const { followedCountries } = useCountryFollows();
   const canChooseDestination =
     !replyTo && !customPublish && mode === 'post' && !!user && followedCountries.length > 0;
+  /**
+   * User's saved default destination (persisted to localStorage). Used as
+   * the initial value of `destination` on every fresh compose, and updated
+   * when the user clicks "Set as default" in the destination menu.
+   */
+  const [defaultPostCountry, setDefaultPostCountry] = useDefaultPostCountry();
   /** `'world'` for a regular kind-1 note, or an ISO 3166 country code for a kind-1111 community post. */
-  const [destination, setDestination] = useState<'world' | string>('world');
+  const [destination, setDestination] = useState<'world' | string>(defaultPostCountry);
   const selectedCountryCode = destination !== 'world' ? destination : null;
   const selectedCountryInfo = selectedCountryCode ? getCountryInfo(selectedCountryCode) : null;
   // If the user unfollows the currently-selected country mid-session,
   // snap back to world so we don't try to publish a kind 1111 with
-  // a root the user no longer cares about.
+  // a root the user no longer cares about. Also clear it from the saved
+  // default if it matched, so the next compose doesn't try to restore an
+  // invalid country.
   useEffect(() => {
     if (selectedCountryCode && !followedCountries.includes(selectedCountryCode)) {
       setDestination('world');
+      if (defaultPostCountry === selectedCountryCode) {
+        setDefaultPostCountry('world');
+      }
     }
-  }, [selectedCountryCode, followedCountries]);
+  }, [selectedCountryCode, followedCountries, defaultPostCountry, setDefaultPostCountry]);
   const [pollOptions, setPollOptions] = useState([
     { id: pollOptionId(), label: '' },
     { id: pollOptionId(), label: '' },
@@ -332,10 +350,10 @@ export function ComposeBox({
     setUploadedFileGroups(new Map());
     setWebxdcUuids(new Map());
     setWebxdcMetas(new Map());
-    setDestination('world');
+    setDestination(defaultPostCountry);
     // Clear the auto-saved draft
     try { localStorage.removeItem(draftKey); } catch { /* ignore */ }
-  }, [initialMode, draftKey, defaultExpanded]);
+  }, [initialMode, draftKey, defaultExpanded, defaultPostCountry]);
 
   // Use controlled preview mode if provided, otherwise use internal state
   const previewMode = controlledPreviewMode !== undefined ? controlledPreviewMode : internalPreviewMode;
@@ -1550,14 +1568,14 @@ export function ComposeBox({
                 })()}
               </PopoverContent>
             </Popover>
-            <Select value={destination} onValueChange={setDestination}>
-              <SelectTrigger
+            <DropdownMenu>
+              <DropdownMenuTrigger
                 aria-label="Post destination"
                 className={cn(
-                  'h-8 w-auto gap-1.5 px-2.5 py-1 text-base leading-none',
-                  'border-0 bg-muted/50 hover:bg-muted shadow-none',
-                  'focus:ring-2 focus:ring-primary/50 focus:ring-offset-0',
-                  'rounded-lg',
+                  'inline-flex items-center justify-center h-8 w-auto gap-1.5 px-2.5 py-1 text-base leading-none',
+                  'bg-muted/50 hover:bg-muted shadow-none',
+                  'focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:ring-offset-0',
+                  'rounded-lg motion-safe:transition-colors',
                 )}
               >
                 {/* Show just the flag in the trigger to keep the row
@@ -1566,28 +1584,69 @@ export function ComposeBox({
                 <span aria-hidden="true">
                   {selectedCountryInfo?.flag ?? '🌍'}
                 </span>
-              </SelectTrigger>
-              <SelectContent align="end" className="min-w-[180px]">
-                <SelectItem value="world">
-                  <span className="inline-flex items-center gap-2">
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="min-w-[220px]">
+                <DropdownMenuItem
+                  onSelect={() => setDestination('world')}
+                  className="cursor-pointer"
+                >
+                  <span className="inline-flex items-center gap-2 flex-1">
                     <span aria-hidden="true">🌍</span>
                     <span>Global</span>
                   </span>
-                </SelectItem>
+                  {destination === 'world' && (
+                    <Check className="size-4 text-primary" aria-hidden />
+                  )}
+                </DropdownMenuItem>
                 {followedCountries.map((code) => {
                   const info = getCountryInfo(code);
                   if (!info) return null;
                   return (
-                    <SelectItem key={code} value={code}>
-                      <span className="inline-flex items-center gap-2">
+                    <DropdownMenuItem
+                      key={code}
+                      onSelect={() => setDestination(code)}
+                      className="cursor-pointer"
+                    >
+                      <span className="inline-flex items-center gap-2 flex-1">
                         <span aria-hidden="true">{info.flag}</span>
                         <span>{info.name}</span>
                       </span>
-                    </SelectItem>
+                      {destination === code && (
+                        <Check className="size-4 text-primary" aria-hidden />
+                      )}
+                    </DropdownMenuItem>
                   );
                 })}
-              </SelectContent>
-            </Select>
+                <DropdownMenuSeparator />
+                {destination === defaultPostCountry ? (
+                  <div className="px-2 py-1.5 text-xs text-muted-foreground">
+                    {(() => {
+                      if (defaultPostCountry === 'world') return 'Global is your default';
+                      const info = getCountryInfo(defaultPostCountry);
+                      return info ? `${info.name} is your default` : 'This is your default';
+                    })()}
+                  </div>
+                ) : (
+                  <DropdownMenuItem
+                    onSelect={() => {
+                      setDefaultPostCountry(destination);
+                      const info = destination === 'world'
+                        ? null
+                        : getCountryInfo(destination);
+                      toast({
+                        title: 'Default updated',
+                        description: info
+                          ? `New posts will go to ${info.name} by default.`
+                          : 'New posts will be global by default.',
+                      });
+                    }}
+                    className="cursor-pointer text-sm"
+                  >
+                    Set as default
+                  </DropdownMenuItem>
+                )}
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         )}
 
