@@ -9,6 +9,7 @@ import {
   AlertTriangle,
   ArrowLeft,
   Loader2,
+  MapPin,
   Users,
   X,
 } from 'lucide-react';
@@ -35,8 +36,12 @@ import {
   type ParsedCommunity,
 } from '@/lib/communityUtils';
 import { fetchFreshEvent } from '@/lib/fetchFreshEvent';
+import { COUNTRIES, searchCountries, type CountryEntry } from '@/lib/countries';
+import { parseContentTagInput } from '@/lib/contentTags';
+import { createCountryIdentifier } from '@/lib/countryIdentifiers';
 import { genUserName } from '@/lib/genUserName';
 import { sanitizeUrl } from '@/lib/sanitizeUrl';
+import { cn } from '@/lib/utils';
 import { withAgoraTag } from '@/lib/agoraNoteTags';
 
 /**
@@ -131,6 +136,9 @@ export function CreateCommunityPage() {
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [imageUrl, setImageUrl] = useState('');
+  const [countryCode, setCountryCode] = useState('');
+  const [countryQuery, setCountryQuery] = useState('');
+  const [tagInput, setTagInput] = useState('');
   const [coverUploading, setCoverUploading] = useState(false);
   // Additional moderators on top of the founder. The founder is implicit —
   // they're always pubkey #0 in the published moderator list and are not
@@ -245,6 +253,10 @@ export function CreateCommunityPage() {
     setName(editCommunity.community.name);
     setDescription(editCommunity.community.description);
     setImageUrl(editCommunity.community.image ?? '');
+    const editCountryCode = editCommunity.community.countryCode ?? '';
+    setCountryCode(editCountryCode);
+    setCountryQuery(editCountryCode ? COUNTRIES[editCountryCode]?.name ?? editCountryCode : '');
+    setTagInput(editCommunity.community.topicTags.join(', '));
     setModerators(editCommunity.community.moderatorPubkeys.map(makeProfileFromPubkey));
     setPrepopulatedEventId(editCommunity.event.id);
   }, [editCommunity, prepopulatedEventId]);
@@ -313,6 +325,7 @@ export function CreateCommunityPage() {
       if (trimmedImageUrl && !sanitizedImage) {
         throw new Error('Cover image must be a valid https:// URL.');
       }
+      const contentTags = parseContentTagInput(tagInput);
 
       // ── Edit branch ────────────────────────────────────────────────────
       if (isEditMode && editCommunity) {
@@ -333,7 +346,7 @@ export function CreateCommunityPage() {
         // edit so old badge wiring doesn't linger.
         const preserved = prev.tags.filter(
           ([n, v, , role]) =>
-            !['d', 'name', 'description', 'image', 'alt'].includes(n) &&
+            !['d', 'name', 'description', 'image', 'alt', 'i', 'k', 't'].includes(n) &&
             !(n === 'p' && role === 'moderator') &&
             !(n === 'a' && typeof v === 'string' && v.startsWith('30009:') && role === 'member'),
         );
@@ -351,13 +364,18 @@ export function CreateCommunityPage() {
         for (const mod of extraModerators) {
           nextTags.push(['p', mod.pubkey, '', 'moderator']);
         }
+        if (countryCode) {
+          nextTags.push(['i', createCountryIdentifier(countryCode)]);
+          nextTags.push(['k', 'iso3166']);
+        }
+        for (const tag of contentTags) nextTags.push(['t', tag]);
         nextTags.push(...preserved);
         nextTags.push(['alt', `Group: ${trimmedName}`]);
 
         const updated = await publishEvent({
           kind: COMMUNITY_DEFINITION_KIND,
           content: prev.content,
-          tags: nextTags,
+          tags: withAgoraTag(nextTags),
           prev,
         });
         return { event: updated, slug, edited: true };
@@ -397,6 +415,11 @@ export function CreateCommunityPage() {
       for (const mod of extraModerators) {
         tags.push(['p', mod.pubkey, '', 'moderator']);
       }
+      if (countryCode) {
+        tags.push(['i', createCountryIdentifier(countryCode)]);
+        tags.push(['k', 'iso3166']);
+      }
+      for (const tag of contentTags) tags.push(['t', tag]);
       tags.push(['alt', `Group: ${trimmedName}`]);
 
       const created = await publishEvent({
@@ -578,6 +601,39 @@ export function CreateCommunityPage() {
             />
           </FormSection>
 
+          {/* Country */}
+          <FormSection title="Country" requirement="Optional">
+            <CountrySelect
+              query={countryQuery}
+              selectedCode={countryCode}
+              onQueryChange={(value) => {
+                setCountryQuery(value);
+                const selectedCountry = countryCode ? COUNTRIES[countryCode] : undefined;
+                if (selectedCountry && value !== selectedCountry.name && value.toUpperCase() !== countryCode) {
+                  setCountryCode('');
+                }
+              }}
+              onSelect={(country) => {
+                setCountryCode(country.code);
+                setCountryQuery(country.name);
+              }}
+              onClear={() => {
+                setCountryCode('');
+                setCountryQuery('');
+              }}
+            />
+          </FormSection>
+
+          {/* Tags */}
+          <FormSection title="Tags" requirement="Optional">
+            <Input
+              id="group-tags"
+              value={tagInput}
+              onChange={(e) => setTagInput(e.target.value)}
+              placeholder="mutual-aid, local-news, digital-rights"
+            />
+          </FormSection>
+
           {/* Cover image */}
           <FormSection title="Cover image" requirement="Recommended">
             <CoverImageField
@@ -656,6 +712,119 @@ export function CreateCommunityPage() {
 }
 
 // ─── Layout helpers ──────────────────────────────────────────────────────────
+
+function CountrySelect({
+  query,
+  selectedCode,
+  onQueryChange,
+  onSelect,
+  onClear,
+}: {
+  query: string;
+  selectedCode: string;
+  onQueryChange: (value: string) => void;
+  onSelect: (country: CountryEntry) => void;
+  onClear: () => void;
+}) {
+  const [open, setOpen] = useState(false);
+  const [selectedIndex, setSelectedIndex] = useState(0);
+  const selectedCountry = selectedCode ? COUNTRIES[selectedCode] : undefined;
+  const results = useMemo(() => searchCountries(query), [query]);
+  const showResults = open && results.length > 0;
+
+  const selectCountry = (country: CountryEntry) => {
+    onSelect(country);
+    setOpen(false);
+    setSelectedIndex(0);
+  };
+
+  return (
+    <div className="space-y-2">
+      <div className="relative">
+        <MapPin className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+        <Input
+          id="group-country"
+          value={query}
+          onChange={(e) => {
+            onQueryChange(e.target.value);
+            setOpen(true);
+            setSelectedIndex(0);
+          }}
+          onFocus={() => setOpen(true)}
+          onBlur={() => window.setTimeout(() => setOpen(false), 120)}
+          onKeyDown={(e) => {
+            if (!showResults) return;
+            if (e.key === 'ArrowDown') {
+              e.preventDefault();
+              setSelectedIndex((prev) => (prev + 1) % results.length);
+            } else if (e.key === 'ArrowUp') {
+              e.preventDefault();
+              setSelectedIndex((prev) => (prev - 1 + results.length) % results.length);
+            } else if (e.key === 'Enter') {
+              e.preventDefault();
+              selectCountry(results[selectedIndex]);
+            } else if (e.key === 'Escape') {
+              setOpen(false);
+            }
+          }}
+          className="h-9 rounded-full border-0 bg-secondary pl-10 pr-10 text-sm focus-visible:ring-0 focus-visible:ring-offset-0"
+          placeholder="Search countries, e.g. Venezuela"
+          autoComplete="off"
+          role="combobox"
+          aria-expanded={showResults}
+          aria-controls="group-country-results"
+        />
+        {(query || selectedCode) && (
+          <button
+            type="button"
+            onClick={onClear}
+            className="absolute right-2 top-1/2 rounded-full p-1 -translate-y-1/2 text-muted-foreground hover:bg-muted hover:text-foreground motion-safe:transition-colors"
+            aria-label="Clear country"
+          >
+            <X className="size-4" />
+          </button>
+        )}
+
+        {showResults && (
+          <div
+            id="group-country-results"
+            role="listbox"
+            className="absolute z-20 mt-2 max-h-[200px] w-full overflow-y-auto rounded-xl border border-border bg-popover py-1 shadow-lg"
+          >
+            {results.map((country, index) => (
+              <button
+                key={country.code}
+                type="button"
+                role="option"
+                aria-selected={index === selectedIndex}
+                onMouseDown={(e) => e.preventDefault()}
+                onClick={() => selectCountry(country)}
+                className={cn(
+                  'flex w-full cursor-pointer items-center gap-3 px-3 py-2 text-left transition-colors hover:bg-secondary/60',
+                  index === selectedIndex && 'bg-secondary/60',
+                )}
+              >
+                <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-secondary text-lg leading-none" role="img" aria-label={`Flag of ${country.name}`}>
+                  {country.flag}
+                </span>
+                <span className="min-w-0 flex-1">
+                  <span className="block truncate text-sm font-semibold">{country.name}</span>
+                  <span className="block text-xs text-muted-foreground">{country.code}</span>
+                </span>
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {selectedCountry && (
+        <p className="text-xs text-muted-foreground">
+          Publishes <span className="font-mono text-foreground">i: iso3166:{selectedCode}</span> for country sorting.
+        </p>
+      )}
+    </div>
+  );
+}
 
 function ModeratorRow({
   profile,
