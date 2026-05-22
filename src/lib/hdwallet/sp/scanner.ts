@@ -42,8 +42,21 @@ export interface ScanTweakEntry {
    * Candidate Taproot outputs. Each output carries its txid so the matched
    * UTXO can be attributed correctly even when the indexer pools outputs
    * from multiple txs against the same tweak.
+   *
+   * `spent` is the indexer's view of whether the output has been consumed
+   * by a later transaction. Default scans ignore spent outputs entirely
+   * (the orchestrator filters them out before they reach here). When the
+   * caller opts into recovering history, spent outputs are included and
+   * the orchestrator routes their matches into the spent archive instead
+   * of the active set.
    */
-  outputs: ReadonlyArray<{ txid: string; vout: number; xonlyPk: Uint8Array; value: number }>;
+  outputs: ReadonlyArray<{
+    txid: string;
+    vout: number;
+    xonlyPk: Uint8Array;
+    value: number;
+    spent?: boolean;
+  }>;
 }
 
 /** A UTXO the scanner determined belongs to us. */
@@ -58,6 +71,13 @@ export interface SPMatchedUtxo {
   tweak: Uint8Array;
   /** Output index within the transaction's SP output set (k = 0, 1, …). */
   k: number;
+  /**
+   * True if the matching candidate output was marked spent by the indexer
+   * at scan time. The orchestrator uses this to route the match into the
+   * archive instead of the active set — preserves history (for the tx
+   * list) without offering a spent UTXO to the coin selector.
+   */
+  spent?: boolean;
 }
 
 /**
@@ -115,6 +135,7 @@ export function scanTransaction(
       height: entry.height,
       tweak: tk,
       k,
+      ...(o.spent ? { spent: true } : {}),
     });
     remaining.delete(matchedIdx);
     k += 1;

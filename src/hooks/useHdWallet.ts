@@ -172,15 +172,36 @@ export function useHdWallet(): UseHdWalletResult {
   const transactions = useMemo<HdTransaction[] | undefined>(() => {
     if (!scan && !sp.storage) return undefined;
 
-    const bip86 = scan ? buildHdTransactions(scan) : [];
+    // Build the SP outpoint → value map (active + archived) so the BIP-86
+    // tx classifier can detect transactions that spent our SP UTXOs and
+    // mark them as sends instead of mis-attributing the BIP-86 change
+    // output as an unsolicited receive.
+    const spOutpoints = new Map<string, number>();
+    const archivedSpUtxos = sp.storage?.spent ?? [];
+    for (const u of sp.storage?.utxos ?? []) {
+      spOutpoints.set(`${u.txid}:${u.vout}`, u.value);
+    }
+    for (const u of archivedSpUtxos) {
+      // Don't clobber a value already recorded from the active set (in the
+      // unlikely event of overlap).
+      if (!spOutpoints.has(`${u.txid}:${u.vout}`)) {
+        spOutpoints.set(`${u.txid}:${u.vout}`, u.value);
+      }
+    }
+
+    const bip86 = scan ? buildHdTransactions(scan, spOutpoints) : [];
 
     // Group SP UTXOs by txid and sum to keep the row shape consistent with
-    // the rest of the wallet (one row per tx, not per output).
+    // the rest of the wallet (one row per tx, not per output). Include
+    // archived (spent) UTXOs so the receive history doesn't disappear when
+    // a UTXO is later spent — the original receive is still real wallet
+    // activity worth showing.
     const spByTxid = new Map<
       string,
       { amount: number; height: number; time?: number }
     >();
-    for (const u of sp.storage?.utxos ?? []) {
+    const allSpUtxos = [...(sp.storage?.utxos ?? []), ...archivedSpUtxos];
+    for (const u of allSpUtxos) {
       const existing = spByTxid.get(u.txid);
       if (existing) {
         existing.amount += u.value;

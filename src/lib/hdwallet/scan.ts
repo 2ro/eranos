@@ -73,6 +73,15 @@ export interface AccountScanResult {
   pendingBalance: number;
   /** Map from derived address → metadata. */
   addressMap: Map<string, DerivedAddress>;
+  /**
+   * Raw Blockbook tx rows from the xpub response, retained verbatim so
+   * `buildHdTransactions` can do per-tx accounting with `vin`/`vout`
+   * visibility — required to detect SP-input spends (Blockbook doesn't
+   * mark SP outpoints as ours, so the per-address tx-row summary in
+   * `ScannedAddress.txs` would mis-classify those spends as receives of
+   * change).
+   */
+  rawTransactions: BlockbookTx[];
 }
 
 /** Aggregated wallet-level transaction row. */
@@ -370,6 +379,7 @@ export async function scanAccount(
     totalBalance,
     pendingBalance,
     addressMap,
+    rawTransactions: xpubResponse.transactions ?? [],
   };
 }
 
@@ -378,48 +388,86 @@ export async function scanAccount(
 // ---------------------------------------------------------------------------
 
 /**
- * Build the wallet-level merged transaction list from per-address tx rows
- * already collected by `scanAccount`. A tx touching multiple owned addresses
- * (e.g. send-with-change) is summed once.
+ * Build the wallet-level merged transaction list from the raw Blockbook tx
+ * rows. Produces one row per txid, summing wallet inflows and outflows to
+ * compute net direction (`receive` if net ≥ 0, `send` otherwise) and
+ * absolute amount.
+ *
+ * `spOutpoints` lets the caller surface silent-payment UTXOs the wallet
+ * owns (`txid:vout` keys). Without this argument, a tx whose input is one
+ * of our SP UTXOs would be mis-classified as a receive — Blockbook can't
+ * mark SP outpoints as belonging to the wallet (they're not under the
+ * xpub), so any BIP-86 change credit looks like an unsolicited receive.
+ * Pass the union of active + archived SP outpoints so historical spends
+ * stay correctly classified after the SP UTXO is gone from the active set.
  */
-export function buildHdTransactions(result: AccountScanResult): HdTransaction[] {
-  const allUsed = [...result.receive.used, ...result.change.used];
-  if (allUsed.length === 0) return [];
+export function buildHdTransactions(
+  result: AccountScanResult,
+  spOutpoints?: ReadonlyMap<string, number>,
+): HdTransaction[] {
+  const ourAddresses = new Set<string>();
+  for (const sa of result.receive.used) ourAddresses.add(sa.derived.address);
+  for (const sa of result.change.used) ourAddresses.add(sa.derived.address);
 
-  const merged = new Map<
-    string,
-    { txid: string; netSats: number; confirmed: boolean; timestamp?: number }
-  >();
+  const out: HdTransaction[] = [];
+  for (const tx of result.rawTransactions) {
+    let inflowsBip86 = 0;
+    let outflowsBip86 = 0;
+    let outflowsSp = 0;
 
-  for (const sa of allUsed) {
-    for (const tx of sa.txs) {
-      const signed = tx.type === 'receive' ? tx.amount : -tx.amount;
-      const existing = merged.get(tx.txid);
-      if (existing) {
-        existing.netSats += signed;
-        existing.confirmed = existing.confirmed || tx.confirmed;
-        if (tx.timestamp && (!existing.timestamp || tx.timestamp < existing.timestamp)) {
-          existing.timestamp = tx.timestamp;
+    // Sum vouts paying to our BIP-86 addresses.
+    for (const v of tx.vout) {
+      const value = Number(v.value) || 0;
+      if (!value) continue;
+      for (const a of v.addresses ?? []) {
+        if (ourAddresses.has(a)) {
+          inflowsBip86 += value;
+          break;
         }
-      } else {
-        merged.set(tx.txid, {
-          txid: tx.txid,
-          netSats: signed,
-          confirmed: tx.confirmed,
-          timestamp: tx.timestamp,
-        });
       }
     }
-  }
 
-  const out: HdTransaction[] = Array.from(merged.values()).map((m) => ({
-    txid: m.txid,
-    amount: Math.abs(m.netSats),
-    type: m.netSats >= 0 ? 'receive' : 'send',
-    confirmed: m.confirmed,
-    timestamp: m.timestamp,
-    source: 'bip86',
-  }));
+    // Sum vins consuming our BIP-86 UTXOs (by address membership), and SP
+    // UTXOs (by outpoint membership).
+    for (const v of tx.vin) {
+      const value = Number(v.value) || 0;
+      let attributed = false;
+      for (const a of v.addresses ?? []) {
+        if (ourAddresses.has(a)) {
+          outflowsBip86 += value;
+          attributed = true;
+          break;
+        }
+      }
+      if (attributed) continue;
+      if (
+        spOutpoints &&
+        typeof v.txid === 'string' &&
+        typeof v.vout === 'number'
+      ) {
+        const spValue = spOutpoints.get(`${v.txid}:${v.vout}`);
+        if (spValue !== undefined) {
+          // Trust the wallet's own stored value for SP inputs — Blockbook
+          // doesn't always populate `vin.value` for taproot inputs.
+          outflowsSp += spValue || value;
+        }
+      }
+    }
+
+    // A tx with no wallet involvement at all shouldn't be in the xpub
+    // response, but defensively skip if so.
+    if (inflowsBip86 === 0 && outflowsBip86 === 0 && outflowsSp === 0) continue;
+
+    const net = inflowsBip86 - outflowsBip86 - outflowsSp;
+    out.push({
+      txid: tx.txid,
+      amount: Math.abs(net),
+      type: net >= 0 ? 'receive' : 'send',
+      confirmed: tx.confirmations > 0,
+      timestamp: tx.blockTime,
+      source: 'bip86',
+    });
+  }
 
   out.sort((a, b) => {
     if (!a.timestamp && !b.timestamp) return 0;

@@ -75,6 +75,14 @@ interface ParsedUtxo {
   vout: number;
   xonlyPk: Uint8Array;
   value: number;
+  /**
+   * True if BlindBit marked this row as already spent at the time of fetch.
+   * The default scan path filters these out; the "include spent" path keeps
+   * them so historical receives whose UTXOs were later spent can be
+   * recovered into the archive (and used by the tx classifier to attribute
+   * the spending tx as a send).
+   */
+  spent: boolean;
 }
 
 function parseUtxoRow(raw: BlindBitUtxoRow): ParsedUtxo | null {
@@ -89,6 +97,7 @@ function parseUtxoRow(raw: BlindBitUtxoRow): ParsedUtxo | null {
     vout: raw.vout,
     xonlyPk: xonly,
     value: raw.value,
+    spent: raw.spent === true,
   };
 }
 
@@ -133,6 +142,7 @@ async function fetchUtxosForBlock(
   root: string,
   height: number,
   signal?: AbortSignal,
+  includeSpent = false,
 ): Promise<ParsedUtxo[]> {
   const r = await fetch(`${root}/utxos/${height}`, { signal });
   if (!r.ok) throw new Error(`BIP-352 /utxos/${height} returned ${r.status}`);
@@ -142,9 +152,12 @@ async function fetchUtxosForBlock(
   }
   const out: ParsedUtxo[] = [];
   for (const raw of data as BlindBitUtxoRow[]) {
-    // Filter out already-spent rows so we don't add them to the wallet's
-    // active UTXO set just to have a future reconcile pass prune them.
-    if (raw && raw.spent === true) continue;
+    // Default: filter out already-spent rows so we don't add them to the
+    // wallet's active UTXO set just to have a future reconcile pass prune
+    // them. The "recover history" flow flips this filter off so the
+    // scanner can identify outputs we received and then later spent, and
+    // route them into the `spent` archive.
+    if (!includeSpent && raw && raw.spent === true) continue;
     const parsed = parseUtxoRow(raw);
     if (parsed) out.push(parsed);
   }
@@ -189,12 +202,13 @@ export async function fetchBlockEntries(
   baseUrl: string,
   height: number,
   signal?: AbortSignal,
+  includeSpent = false,
 ): Promise<ScanTweakEntry[]> {
   const root = requireBase(baseUrl);
   const tweaks = await fetchTweaksForBlock(root, height, signal);
   if (tweaks.length === 0) return [];
   if (signal?.aborted) return [];
-  const utxos = await fetchUtxosForBlock(root, height, signal);
+  const utxos = await fetchUtxosForBlock(root, height, signal, includeSpent);
   if (utxos.length === 0) return [];
 
   const sharedOutputs: ScanTweakEntry['outputs'] = utxos;

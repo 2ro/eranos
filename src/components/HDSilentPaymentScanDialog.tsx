@@ -9,6 +9,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Progress } from '@/components/ui/progress';
@@ -34,11 +35,13 @@ export function HDSilentPaymentScanDialog({ open, onOpenChange }: HDSilentPaymen
   const [from, setFrom] = useState('');
   const [to, setTo] = useState('');
   const [touched, setTouched] = useState(false);
+  const [includeSpent, setIncludeSpent] = useState(false);
 
   // Seed defaults whenever the dialog opens or upstream data changes.
   useEffect(() => {
     if (!open) {
       setTouched(false);
+      setIncludeSpent(false);
       return;
     }
     if (touched) return;
@@ -60,6 +63,7 @@ export function HDSilentPaymentScanDialog({ open, onOpenChange }: HDSilentPaymen
     await sp.scanRange({
       fromHeight: fromNum,
       toHeight: to === '' ? undefined : toNum,
+      includeSpent,
     });
   };
 
@@ -139,6 +143,35 @@ export function HDSilentPaymentScanDialog({ open, onOpenChange }: HDSilentPaymen
               )}
             </p>
           )}
+
+          {/*
+            * "Include already-spent" deep-rescan toggle. Off by default
+            * because the normal scan path doesn't want already-spent
+            * outputs cluttering the active UTXO set. Turn on to recover
+            * historical receive rows whose UTXOs were later spent and
+            * subsequently pruned from local storage — matches against
+            * spent outputs are routed straight into the `spent` archive,
+            * which powers both the receive-history rows and the
+            * send-vs-receive classifier in the tx list.
+            */}
+          <div className="flex items-start gap-2">
+            <Checkbox
+              id="sp-include-spent"
+              checked={includeSpent}
+              onCheckedChange={(v) => setIncludeSpent(v === true)}
+              disabled={sp.isScanning}
+              className="mt-0.5"
+            />
+            <div className="space-y-0.5">
+              <Label htmlFor="sp-include-spent" className="text-xs cursor-pointer">
+                Include already-spent
+              </Label>
+              <p className="text-xs text-muted-foreground">
+                Also detect silent payments that have since been spent. Use when
+                rebuilding receive history after a missed scan or a reset.
+              </p>
+            </div>
+          </div>
 
           {sp.isScanning && sp.scanProgress && (
             <div className="space-y-2">

@@ -87,8 +87,20 @@ export interface SPStorageDocument {
    * `scanHeight + 1`. `0` means "never scanned".
    */
   scanHeight: number;
-  /** All discovered SP UTXOs the wallet has not pruned as spent. */
+  /** All discovered SP UTXOs the wallet still considers spendable. */
   utxos: SPStoredUtxo[];
+  /**
+   * SP UTXOs that have been confirmed spent (either by the local send flow
+   * or by the manual reconcile pass). Retained here — rather than deleted —
+   * so the transaction-history UI can still show the original receive, and
+   * the Blockbook-tx classifier can attribute later spends correctly
+   * (Blockbook can't tell us an input came from our wallet for SP inputs,
+   * because their scriptpubkey isn't under the xpub).
+   *
+   * Optional for backward compatibility with pre-archive docs; readers
+   * should default to `[]`.
+   */
+  spent?: SPStoredUtxo[];
 }
 
 /** Empty document used as the starting state. */
@@ -96,6 +108,7 @@ export const EMPTY_SP_STORAGE: SPStorageDocument = {
   version: SP_STORAGE_VERSION,
   scanHeight: 0,
   utxos: [],
+  spent: [],
 };
 
 // ---------------------------------------------------------------------------
@@ -119,9 +132,16 @@ export function parseSPStorage(plaintext: string): SPStorageDocument {
   const scanHeight = typeof obj.scanHeight === 'number' && Number.isInteger(obj.scanHeight) && obj.scanHeight >= 0
     ? obj.scanHeight
     : 0;
-  const utxosRaw = Array.isArray(obj.utxos) ? obj.utxos : [];
-  const utxos: SPStoredUtxo[] = [];
-  for (const u of utxosRaw) {
+  const utxos = parseUtxoArray(obj.utxos);
+  const spent = parseUtxoArray(obj.spent);
+  return { version: SP_STORAGE_VERSION, scanHeight, utxos, spent };
+}
+
+/** Shared validator for both the active and archived UTXO lists. */
+function parseUtxoArray(raw: unknown): SPStoredUtxo[] {
+  const rows = Array.isArray(raw) ? raw : [];
+  const out: SPStoredUtxo[] = [];
+  for (const u of rows) {
     if (!u || typeof u !== 'object') continue;
     const row = u as Record<string, unknown>;
     if (typeof row.txid !== 'string' || !/^[0-9a-f]{64}$/.test(row.txid)) continue;
@@ -134,7 +154,7 @@ export function parseSPStorage(plaintext: string): SPStorageDocument {
       typeof row.time === 'number' && Number.isInteger(row.time) && row.time > 0
         ? row.time
         : undefined;
-    utxos.push({
+    out.push({
       txid: row.txid,
       vout: row.vout,
       value: row.value,
@@ -144,7 +164,7 @@ export function parseSPStorage(plaintext: string): SPStorageDocument {
       ...(time !== undefined ? { time } : {}),
     });
   }
-  return { version: SP_STORAGE_VERSION, scanHeight, utxos };
+  return out;
 }
 
 /** Serialise a document for encryption — pretty-printed for slightly better diff-ability. */
@@ -153,6 +173,9 @@ export function serializeSPStorage(doc: SPStorageDocument): string {
     version: SP_STORAGE_VERSION,
     scanHeight: doc.scanHeight,
     utxos: doc.utxos,
+    // Always emit `spent` (as `[]` when empty) so downstream consumers can
+    // rely on it being present after a round-trip.
+    spent: doc.spent ?? [],
   });
 }
 
@@ -223,6 +246,54 @@ export function pruneSpUtxos(
   if (spent.length === 0) return existing.slice();
   const spentKeys = new Set(spent.map((s) => `${s.txid}:${s.vout}`));
   return existing.filter((u) => !spentKeys.has(`${u.txid}:${u.vout}`));
+}
+
+/**
+ * Move the given `(txid, vout)` entries from a document's active `utxos`
+ * list to its `spent` archive, deduplicated against any existing archive
+ * entries.
+ *
+ * The archive is what powers the receive-history row for outputs we no
+ * longer hold AND the send-vs-receive classifier in
+ * `buildHdTransactions` (a Blockbook tx whose input is one of our
+ * archived SP UTXOs is a send, not a receive of change).
+ *
+ * Entries listed in `spent` that aren't in `existing.utxos` are silently
+ * skipped — the active set wins as the source of truth for what to move.
+ */
+export function archiveSpentUtxos(
+  doc: SPStorageDocument,
+  spent: ReadonlyArray<{ txid: string; vout: number }>,
+): SPStorageDocument {
+  if (spent.length === 0) return doc;
+  const spentKeys = new Set(spent.map((s) => `${s.txid}:${s.vout}`));
+  const remaining: SPStoredUtxo[] = [];
+  const toArchive: SPStoredUtxo[] = [];
+  for (const u of doc.utxos) {
+    if (spentKeys.has(`${u.txid}:${u.vout}`)) {
+      toArchive.push(u);
+    } else {
+      remaining.push(u);
+    }
+  }
+  if (toArchive.length === 0) return doc;
+
+  // Deduplicate the archive by `(txid, vout)`, keeping the existing entry
+  // when both exist (preserves any timestamps backfilled previously).
+  const existingArchive = doc.spent ?? [];
+  const archiveByKey = new Map<string, SPStoredUtxo>();
+  for (const u of existingArchive) archiveByKey.set(`${u.txid}:${u.vout}`, u);
+  for (const u of toArchive) {
+    const k = `${u.txid}:${u.vout}`;
+    if (!archiveByKey.has(k)) archiveByKey.set(k, u);
+  }
+
+  return {
+    version: SP_STORAGE_VERSION,
+    scanHeight: doc.scanHeight,
+    utxos: remaining,
+    spent: Array.from(archiveByKey.values()),
+  };
 }
 
 // Re-export hex helpers for callers that want to read tweak bytes back.

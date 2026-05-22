@@ -15,6 +15,7 @@ import { fetchBlockEntries, fetchTipHeight } from '@/lib/hdwallet/sp/indexer';
 import { scanBatch, type SPMatchedUtxo } from '@/lib/hdwallet/sp/scanner';
 import {
   EMPTY_SP_STORAGE,
+  archiveSpentUtxos,
   matchedUtxoToStored,
   mergeUtxos,
   parseSPStorage,
@@ -84,8 +85,20 @@ export interface UseHdWalletSpResult {
   /** Tip height as reported by the indexer (cached, lightly refreshed). */
   tipHeight?: number;
 
-  /** Scan a contiguous block range. `toHeight` defaults to current tip. */
-  scanRange: (args: { fromHeight: number; toHeight?: number }) => Promise<void>;
+  /**
+   * Scan a contiguous block range. `toHeight` defaults to current tip.
+   *
+   * `includeSpent` opts into a deeper rescan that also considers UTXOs
+   * already spent on-chain. Matches against spent outputs land in the
+   * `spent` archive rather than the active set — useful for recovering
+   * historical receive rows when the wallet's local doc was pruned
+   * without archiving (e.g. by a build that predates the archive logic).
+   */
+  scanRange: (args: {
+    fromHeight: number;
+    toHeight?: number;
+    includeSpent?: boolean;
+  }) => Promise<void>;
   /** Scan the most recent `DEFAULT_RECENT_SCAN_BLOCKS` blocks (or fewer if newer). */
   scanRecent: () => Promise<void>;
   /** Abort an in-flight scan. */
@@ -259,7 +272,14 @@ export function useHdWalletSp(): UseHdWalletSpResult {
     const loaded = storageDocQuery.data;
     const opt = optimisticRef.current;
     if (!opt) return loaded;
-    if (opt.scanHeight >= loaded.scanHeight && opt.utxos.length >= loaded.utxos.length) {
+    // Heuristic: optimistic wins when it's caught up scan-wise AND it
+    // accounts for at least as many entries (active + archived) as the
+    // loaded copy. The combined-count check matters because prunes shrink
+    // `utxos` while growing `spent`, and deep rescans grow `spent` without
+    // touching `utxos`.
+    const optTotal = opt.utxos.length + (opt.spent?.length ?? 0);
+    const loadedTotal = loaded.utxos.length + (loaded.spent?.length ?? 0);
+    if (opt.scanHeight >= loaded.scanHeight && optTotal >= loadedTotal) {
       return opt;
     }
     return loaded;
@@ -296,10 +316,36 @@ export function useHdWalletSp(): UseHdWalletSpResult {
           const remoteUtxos = spent && spent.length > 0
             ? pruneSpUtxos(remote.utxos, spent)
             : remote.utxos;
+          // Merge the spent archive: union both sides' archives, plus the
+          // entries we just pruned out of `remote.utxos`. Without this a
+          // racing relay copy could resurrect a row in `utxos` that the
+          // local prune already classified as spent, or drop archive
+          // entries the local copy intentionally retained for history.
+          const localArchive = next.spent ?? [];
+          const remoteArchive = remote.spent ?? [];
+          const archiveByKey = new Map<string, SPStoredUtxo>();
+          for (const u of remoteArchive) archiveByKey.set(`${u.txid}:${u.vout}`, u);
+          for (const u of localArchive) {
+            if (!archiveByKey.has(`${u.txid}:${u.vout}`)) {
+              archiveByKey.set(`${u.txid}:${u.vout}`, u);
+            }
+          }
+          // Pull pruned-from-remote rows into the archive too — they're
+          // outpoints we know are spent but the remote didn't realise.
+          if (spent && spent.length > 0) {
+            const spentKeys = new Set(spent.map((s) => `${s.txid}:${s.vout}`));
+            for (const u of remote.utxos) {
+              const k = `${u.txid}:${u.vout}`;
+              if (spentKeys.has(k) && !archiveByKey.has(k)) {
+                archiveByKey.set(k, u);
+              }
+            }
+          }
           merged = {
             version: SP_STORAGE_VERSION,
             scanHeight: Math.max(remote.scanHeight, next.scanHeight),
             utxos: mergeUtxos(remoteUtxos, next.utxos),
+            spent: Array.from(archiveByKey.values()),
           };
         } catch {
           // Treat undecryptable remote as empty rather than blocking the write.
@@ -364,7 +410,7 @@ export function useHdWalletSp(): UseHdWalletSpResult {
 
   // ── The core scan loop ───────────────────────────────────────
   const scanRange = useCallback<UseHdWalletSpResult['scanRange']>(
-    async ({ fromHeight, toHeight }) => {
+    async ({ fromHeight, toHeight, includeSpent = false }) => {
       if (!enabled || !keys) return;
       if (!storage) return; // Wait for the first load — caller can retry.
       if (!Number.isInteger(fromHeight) || fromHeight < 0) {
@@ -392,11 +438,12 @@ export function useHdWalletSp(): UseHdWalletSpResult {
       });
 
       // Seed the optimistic doc from the current snapshot so we don't lose
-      // existing UTXOs while scanning a sparse range.
+      // existing UTXOs (or archive entries) while scanning a sparse range.
       optimisticRef.current = {
         version: SP_STORAGE_VERSION,
         scanHeight: storage.scanHeight,
         utxos: storage.utxos.slice(),
+        spent: (storage.spent ?? []).slice(),
       };
 
       let matchesFound = 0;
@@ -406,7 +453,12 @@ export function useHdWalletSp(): UseHdWalletSpResult {
         for (let h = fromHeight; h <= resolvedTo; h++) {
           if (controller.signal.aborted) break;
 
-          const entries = await fetchBlockEntries(indexerUrl, h, controller.signal);
+          const entries = await fetchBlockEntries(
+            indexerUrl,
+            h,
+            controller.signal,
+            includeSpent,
+          );
           let blockMatches: SPMatchedUtxo[] = [];
           if (entries.length > 0) {
             blockMatches = await scanBatch(entries, keys.bscan, keys.Bspend, {
@@ -435,15 +487,27 @@ export function useHdWalletSp(): UseHdWalletSpResult {
               }
             }
 
-            const opt = optimisticRef.current!;
-            const fresh: SPStoredUtxo[] = blockMatches.map((m) => {
+            // Partition matches into "still unspent" (active set) and
+            // "already spent at scan time" (archive). The archive entries
+            // are essential for the tx-history classifier to attribute the
+            // spending tx as a wallet send — without them a deep rescan is
+            // useless for history recovery.
+            const freshActive: SPStoredUtxo[] = [];
+            const freshArchive: SPStoredUtxo[] = [];
+            for (const m of blockMatches) {
               const stored = matchedUtxoToStored(m);
-              return blockTime !== undefined ? { ...stored, time: blockTime } : stored;
-            });
+              const stamped =
+                blockTime !== undefined ? { ...stored, time: blockTime } : stored;
+              if (m.spent) freshArchive.push(stamped);
+              else freshActive.push(stamped);
+            }
+
+            const opt = optimisticRef.current!;
             optimisticRef.current = {
               version: SP_STORAGE_VERSION,
               scanHeight: opt.scanHeight,
-              utxos: mergeUtxos(opt.utxos, fresh),
+              utxos: mergeUtxos(opt.utxos, freshActive),
+              spent: mergeUtxos(opt.spent ?? [], freshArchive),
             };
             matchesFound += blockMatches.length;
           }
@@ -525,11 +589,12 @@ export function useHdWalletSp(): UseHdWalletSpResult {
       }
       const base = storageRef.current ?? optimisticRef.current;
       if (!base) return;
-      const next: SPStorageDocument = {
-        version: SP_STORAGE_VERSION,
-        scanHeight: base.scanHeight,
-        utxos: pruneSpUtxos(base.utxos, spent),
-      };
+      // Archive (don't delete) the pruned entries so the transaction-history
+      // UI can still show their original receive row, and the send-vs-
+      // receive classifier in `buildHdTransactions` can attribute any
+      // future Blockbook tx that referenced one of these outpoints as a
+      // wallet send.
+      const next: SPStorageDocument = archiveSpentUtxos(base, spent);
       optimisticRef.current = next;
       setOptimisticVersion((v) => v + 1);
       // Also write the pruned doc directly into the doc-query cache so
