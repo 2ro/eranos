@@ -12,7 +12,6 @@ import { useState, useMemo, useEffect, useCallback, useRef } from 'react';
 import { useInView } from 'react-intersection-observer';
 import { Link, useSearchParams } from 'react-router-dom';
 import { NoteCard } from '@/components/NoteCard';
-import { FeedCard } from '@/components/FeedCard';
 import { PullToRefresh } from '@/components/PullToRefresh';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
@@ -667,13 +666,13 @@ export function SearchPage() {
             )}
             {/* Post results — stream */}
             {postsLoading && posts.length === 0 ? (
-              <FeedCard className="mt-2 divide-y divide-border">
+              <div className="mt-2 divide-y divide-border">
                 {Array.from({ length: 5 }).map((_, i) => (
                   <PostSkeleton key={i} />
                 ))}
-              </FeedCard>
+              </div>
             ) : posts.length > 0 ? (
-              <FeedCard className="mt-2">
+              <div className="mt-2">
                 {posts.map((event) => {
                   const isNew = flushedIds.has(event.id);
                   if (isRepostKind(event.kind)) {
@@ -685,7 +684,7 @@ export function SearchPage() {
                   }
                   return <NoteCard key={event.id} event={event} highlight={isNew} />;
                 })}
-              </FeedCard>
+              </div>
             ) : debouncedSearchQuery.trim() ? (
               <EmptyState
                 message="No posts found matching your search."
@@ -704,17 +703,17 @@ export function SearchPage() {
             <div>
               {debouncedSearchQuery.trim() ? (
                 profilesLoading ? (
-                  <FeedCard className="mt-2 divide-y divide-border">
+                  <div className="mt-2 divide-y divide-border">
                     {Array.from({ length: 5 }).map((_, i) => (
                       <AccountSkeleton key={i} />
                     ))}
-                  </FeedCard>
+                  </div>
                 ) : profiles && profiles.length > 0 ? (
-                  <FeedCard className="mt-2 divide-y divide-border">
+                  <div className="mt-2 divide-y divide-border">
                     {profiles.map((profile) => (
                       <AccountItem key={profile.pubkey} profile={profile} isFollowed={followedPubkeys.has(profile.pubkey)} />
                     ))}
-                  </FeedCard>
+                  </div>
                 ) : (
                   <EmptyState message="No accounts found matching your search." />
                 )
@@ -800,7 +799,7 @@ function FollowsList() {
   }
 
   return (
-    <FeedCard className="mt-2 divide-y divide-border">
+    <div className="mt-2 divide-y divide-border">
       {visiblePubkeys.map((pubkey) => (
         <FollowItem key={pubkey} pubkey={pubkey} />
       ))}
@@ -811,7 +810,7 @@ function FollowsList() {
           ))}
         </div>
       )}
-    </FeedCard>
+    </div>
   );
 }
 
@@ -1018,21 +1017,21 @@ function CommunitiesSearchTab({
 
   if (postsLoading && posts.length === 0) {
     return (
-      <FeedCard className="mt-2 divide-y divide-border">
+      <div className="mt-2 divide-y divide-border">
         {Array.from({ length: 5 }).map((_, i) => (
           <PostSkeleton key={i} />
         ))}
-      </FeedCard>
+      </div>
     );
   }
 
   if (posts.length > 0) {
     return (
-      <FeedCard className="mt-2">
+      <div className="mt-2">
         {posts.map((event) => (
           <NoteCard key={event.id} event={event} />
         ))}
-      </FeedCard>
+      </div>
     );
   }
 
