@@ -6,7 +6,7 @@ import { useNostr } from '@nostrify/react';
 import { useInfiniteQuery, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useSeoMeta } from '@unhead/react';
 import { nip19 } from 'nostr-tools';
-import { Zap, MoreHorizontal, ClipboardCopy, ExternalLink, VolumeX, Flag, Bitcoin, Pin, X, QrCode, Check, Copy, Loader2, Download, Trash2, RotateCcw, MessageSquare, Globe, Mail, ListPlus, Award, PanelLeft, HandHeart, Megaphone } from 'lucide-react';
+import { Zap, MoreHorizontal, ClipboardCopy, ExternalLink, VolumeX, Flag, Bitcoin, Pin, X, QrCode, Check, Copy, Loader2, Download, Trash2, RotateCcw, MessageSquare, Mail, ListPlus, Award, PanelLeft } from 'lucide-react';
 
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
@@ -20,11 +20,9 @@ import { NoteCard } from '@/components/NoteCard';
 import { FeedCard } from '@/components/FeedCard';
 import { ComposeBox } from '@/components/ComposeBox';
 import { ReplyComposeModal } from '@/components/ReplyComposeModal';
-import { ProfileReactionButton } from '@/components/ProfileReactionButton';
-import { FollowToggleButton } from '@/components/FollowButton';
 import { ZapDialog } from '@/components/ZapDialog';
 import { ExternalFavicon } from '@/components/ExternalFavicon';
-import { Nip05Badge, VerifiedNip05Text } from '@/components/Nip05Badge';
+import { VerifiedNip05Text } from '@/components/Nip05Badge';
 import { useAppContext } from '@/hooks/useAppContext';
 import { useAuthor } from '@/hooks/useAuthor';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
@@ -47,7 +45,6 @@ import { genUserName } from '@/lib/genUserName';
 import { canZap } from '@/lib/canZap';
 import { openUrl } from '@/lib/downloadFile';
 import { EmojifiedText } from '@/components/CustomEmoji';
-import { BioContent } from '@/components/BioContent';
 import { EmbeddedNote } from '@/components/EmbeddedNote';
 import { EmbeddedNaddr } from '@/components/EmbeddedNaddr';
 import { PullToRefresh } from '@/components/PullToRefresh';
@@ -64,22 +61,15 @@ import { useFeedSettings } from '@/hooks/useFeedSettings';
 import { FollowQRDialog } from '@/components/FollowQRDialog';
 import { ProfileRecoveryDialog } from '@/components/ProfileRecoveryDialog';
 import { GiveBadgeDialog } from '@/components/GiveBadgeDialog';
-import { BadgeThumbnail } from '@/components/BadgeThumbnail';
-import { useProfileBadges } from '@/hooks/useProfileBadges';
-import { useBadgeDefinitions } from '@/hooks/useBadgeDefinitions';
-import { formatNumber } from '@/lib/formatNumber';
-import { formatCampaignAmount } from '@/lib/formatCampaignAmount';
 import { useProfileCampaignStats } from '@/hooks/useProfileCampaignStats';
 import { useActions } from '@/hooks/useActions';
 import { useBtcPrice } from '@/hooks/useBtcPrice';
 import { DonateDialog } from '@/components/DonateDialog';
-import { ProfileCampaignsStrip } from '@/components/profile/ProfileCampaignsStrip';
-import { ProfileOrganizationsStrip } from '@/components/profile/ProfileOrganizationsStrip';
+import { ProfileIdentityRail } from '@/components/profile/ProfileIdentityRail';
 import { ProfileOverviewTab } from '@/components/profile/ProfileOverviewTab';
 import { ProfileCampaignsTab } from '@/components/profile/ProfileCampaignsTab';
 import { ProfilePledgesTab } from '@/components/profile/ProfilePledgesTab';
 import { ProfileActivityTab } from '@/components/profile/ProfileActivityTab';
-import { ProfileRightSidebar } from '@/components/ProfileRightSidebar';
 import type { ParsedCampaign } from '@/lib/campaign';
 import { SubHeaderBar } from '@/components/SubHeaderBar';
 import { TabButton } from '@/components/TabButton';
@@ -1327,10 +1317,8 @@ function FollowersListModal({ pubkey, open, onOpenChange, displayName }: Followe
     return events;
   }, [mediaData?.pages]);
 
-  // Profile badges for bio section
-  const { refs: badgeRefs } = useProfileBadges(pubkey);
-  const firstBadgeRefs = useMemo(() => badgeRefs.slice(0, 5), [badgeRefs]);
-  const { badgeMap } = useBadgeDefinitions(firstBadgeRefs);
+  // Profile badges are queried inside ProfileIdentityRail; the page no
+  // longer needs to fetch them at this level.
 
   // Flatten likes pages and deduplicate
   const likedItems = useMemo(() => {
@@ -1530,625 +1518,358 @@ function FollowersListModal({ pubkey, open, onOpenChange, displayName }: Followe
   return (
     <main className="min-h-screen pb-16">
       <PullToRefresh onRefresh={handleRefresh}>
-        {/* Banner — kept full-bleed, outside the constrained content container. */}
-          <div className="h-36 md:h-48 bg-secondary relative">
-            {author.isLoading ? (
-              <Skeleton className="w-full h-full rounded-none" />
-            ) : bannerUrl ? (
-              <ProfileBannerImage
-                src={bannerUrl}
-                onClick={() => setLightboxImage(bannerUrl)}
-              />
-            ) : (
-              <div className="absolute inset-0 bg-gradient-to-br from-accent/10 via-transparent to-primary/5" />
-            )}
-
-          </div>
-
-          {/* Constrained content canvas — wider than FundraiserLayout's default
-              max-w-3xl, narrower than the campaign directory. Banner stays
-              outside this container so it remains full-bleed. */}
-          <div className="max-w-7xl mx-auto">
-          {/* Profile info */}
-          <div className="px-4 sm:px-6 pb-4">
+        {/* Banner — full-bleed at the top of the page. The avatar lives in
+            the identity rail below and overlaps this banner via -mt-16. */}
+        <div className="h-36 md:h-48 bg-secondary relative">
           {author.isLoading ? (
-            <>
-              <div className="flex justify-between items-start -mt-12 md:-mt-16 mb-3">
-                <Skeleton className="size-24 md:size-32 rounded-full border-4 border-background" />
-              </div>
-              <div className="space-y-2">
-                <Skeleton className="h-6 w-40" />
-                <Skeleton className="h-4 w-28" />
-                <Skeleton className="h-4 w-full mt-2" />
-                <Skeleton className="h-4 w-3/4" />
-              </div>
-            </>
+            <Skeleton className="w-full h-full rounded-none" />
+          ) : bannerUrl ? (
+            <ProfileBannerImage
+              src={bannerUrl}
+              onClick={() => setLightboxImage(bannerUrl)}
+            />
           ) : (
-            <>
-              <div className="flex justify-between items-start -mt-12 md:-mt-16 mb-3">
-                <div className="relative">
-                  <button
-                    className="focus:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded-full"
-                    onClick={() => metadata?.picture && setLightboxImage(metadata.picture)}
-                    disabled={!metadata?.picture}
-                  >
-                    <Avatar className={cn('size-24 md:size-32 border-4 border-background', metadata?.picture && 'cursor-pointer')}>
-                      <AvatarImage src={metadata?.picture} alt={displayName} />
-                      <AvatarFallback className="bg-primary/20 text-primary text-2xl md:text-3xl">
-                        {displayName[0].toUpperCase()}
-                      </AvatarFallback>
-                    </Avatar>
-                  </button>
+            <div className="absolute inset-0 bg-gradient-to-br from-accent/10 via-transparent to-primary/5" />
+          )}
+        </div>
 
-                  {/* NIP-38 thought bubble — floats beside the avatar over the banner */}
-                  {feedSettings.showUserStatuses !== false && profileStatus.status && (
-                    <div className="absolute top-3 md:top-4 left-[calc(100%+8px)] z-10 max-w-[280px] md:max-w-[360px] animate-in fade-in slide-in-from-left-1 duration-300">
-                      <div className="relative bg-background/90 backdrop-blur-sm border border-border rounded-xl px-3 py-1.5 shadow-lg">
-                        <p className="text-xs md:text-sm text-foreground italic truncate pr-1">
-                          {profileStatus.url ? (
-                            <a href={profileStatus.url} target="_blank" rel="noopener noreferrer" className="hover:underline">
-                              {profileStatus.status}
-                            </a>
-                          ) : (
-                            profileStatus.status
-                          )}
-                        </p>
-                        {/* Speech bubble triangle tail — bottom-left corner, points diagonally down-left toward avatar */}
-                        <div className="absolute -bottom-[7px] left-1 size-0 border-t-[8px] border-t-border border-r-[8px] border-r-transparent" />
-                        <div className="absolute -bottom-[5.5px] left-1 size-0 border-t-[7px] border-t-background border-r-[7px] border-r-transparent" />
-                      </div>
-                    </div>
-                  )}
-                </div>
-                <div className="flex items-center gap-2 mt-14 md:mt-20">
-                  {/* More menu */}
-                  <Button
-                    variant="outline"
-                    size="icon"
-                    className="rounded-full size-10"
-                    onClick={() => setMoreMenuOpen(true)}
-                    title="More options"
-                  >
-                    <MoreHorizontal className="size-5" />
-                  </Button>
-                  {/* Follow QR code button (own profile only) */}
-                  {isOwnProfile && (
-                    <Button
-                      variant="outline"
-                      size="icon"
-                      className="rounded-full size-10"
-                      title="Share follow link"
-                      onClick={() => setFollowQROpen(true)}
-                    >
-                      <QrCode className="size-5" />
-                    </Button>
-                  )}
-                  {/* Profile reaction button */}
-                  {!isOwnProfile && authorEvent && (
-                    <ProfileReactionButton profileEvent={authorEvent} />
-                  )}
-                  {isOwnProfile ? (
-                    <Link to="/settings/profile">
-                      <Button variant="outline" className="rounded-full font-bold">
-                        Edit profile
-                      </Button>
-                    </Link>
-                  ) : (
-                    <FollowToggleButton
-                      isFollowing={isFollowing}
-                      isPending={followPending}
-                      onClick={handleToggleFollow}
-                      disabled={!user}
-                    />
-                  )}
-                  {/* Donate button — only shown when the profile has at least one
-                      on-chain campaign. SP-only campaigns are excluded because
-                      DonateDialog only supports on-chain donations; donors hit
-                      the campaign detail page directly for SP. */}
-                  {!isOwnProfile && (() => {
-                    const onchain = profileCampaignStats.campaigns.filter(
-                      (c) => c.wallet?.mode === 'onchain',
-                    );
-                    if (onchain.length === 0) return null;
-                    if (onchain.length === 1) {
-                      return (
-                        <Button
-                          onClick={() => openDonateForCampaign(onchain[0])}
-                          className="rounded-full font-bold gap-1.5"
-                        >
-                          <HandHeart className="size-4" />
-                          Donate
-                        </Button>
-                      );
-                    }
-                    return (
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button className="rounded-full font-bold gap-1.5">
-                            <HandHeart className="size-4" />
-                            Donate
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end" className="w-72">
-                          {onchain.map((c) => (
-                            <DropdownMenuItem
-                              key={c.aTag}
-                              onClick={() => openDonateForCampaign(c)}
-                              className="flex flex-col items-start gap-0.5"
-                            >
-                              <span className="font-medium truncate w-full">{c.title}</span>
-                              {c.goalUsd ? (
-                                <span className="text-xs text-muted-foreground">
-                                  Goal ${c.goalUsd.toLocaleString()}
-                                </span>
-                              ) : null}
-                            </DropdownMenuItem>
-                          ))}
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    );
-                  })()}
-                </div>
-              </div>
+        {/* Two-column profile body — identity rail on the left runs the
+            full height of the page (sticky on lg+), tabs + content on the
+            right are the only thing that changes when the user navigates.
+            Below lg the grid collapses to a single column and the rail
+            stacks above the tabs, which read top-down like a document. */}
+        <div className="max-w-7xl mx-auto px-4 sm:px-6">
+          <div className="grid lg:grid-cols-[340px_minmax(0,1fr)] gap-6 lg:gap-10">
 
-              <h2 className="text-xl font-bold truncate">
-                {metadataEvent ? (
-                  <EmojifiedText tags={metadataEvent.tags}>{displayName}</EmojifiedText>
-                ) : displayName}
-              </h2>
-              {metadata?.nip05 && (
-                <Nip05Badge nip05={metadata.nip05} pubkey={pubkey ?? ''} className="text-sm text-muted-foreground" />
-              )}
-              {metadata?.website && sanitizeUrl(metadata.website.startsWith('http') ? metadata.website : `https://${metadata.website}`) && (
-                <div className="flex items-center gap-1.5 text-sm text-muted-foreground mt-0.5">
-                  <Globe className="size-3.5 text-muted-foreground shrink-0" />
-                  <a
-                    href={sanitizeUrl(metadata.website.startsWith('http') ? metadata.website : `https://${metadata.website}`)}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="truncate text-primary hover:underline"
-                  >
-                    {metadata.website.replace(/^https?:\/\//, '').replace(/\/$/, '')}
-                  </a>
-                </div>
-              )}
-
-               {/* Followers / Following count + Streak indicator */}
-               {/* Stat chips: Followers · Following · Campaigns · Pledges · Raised.
-                   Wraps to multiple rows on narrow viewports; single row from sm+. */}
-               <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 mt-2">
-                {followersCount > 0 && (
-                  <button
-                    className="flex items-center gap-1 hover:opacity-80 transition-opacity"
-                    onClick={() => setFollowersModalOpen(true)}
-                    title={`${followersCount} followers`}
-                  >
-                    <span className="text-sm font-bold tabular-nums text-primary">{formatNumber(followersCount)}</span>
-                    <span className="text-sm text-muted-foreground">followers</span>
-                  </button>
-                )}
-                {profileFollowing && profileFollowing.count > 0 && (
-                  <button
-                    className="flex items-center gap-1 hover:opacity-80 transition-opacity"
-                    onClick={() => setFollowingModalOpen(true)}
-                    title={`${profileFollowing.count} following`}
-                  >
-                    <span className="text-sm font-bold tabular-nums text-primary">{formatNumber(profileFollowing.count)}</span>
-                    <span className="text-sm text-muted-foreground">following</span>
-                  </button>
-                )}
-                {profileCampaignStats.campaignCount > 0 && (
-                  <button
-                    className="flex items-center gap-1 hover:opacity-80 transition-opacity"
-                    onClick={() => setActiveTab('campaigns')}
-                    title={`${profileCampaignStats.campaignCount} campaigns`}
-                  >
-                    <Megaphone className="size-3.5 text-primary" />
-                    <span className="text-sm font-bold tabular-nums text-primary">{formatNumber(profileCampaignStats.campaignCount)}</span>
-                    <span className="text-sm text-muted-foreground">{profileCampaignStats.campaignCount === 1 ? 'campaign' : 'campaigns'}</span>
-                  </button>
-                )}
-                {profileActionsCount > 0 && (
-                  <button
-                    className="flex items-center gap-1 hover:opacity-80 transition-opacity"
-                    onClick={() => setActiveTab('pledges')}
-                    title={`${profileActionsCount} pledges`}
-                  >
-                    <HandHeart className="size-3.5 text-primary" />
-                    <span className="text-sm font-bold tabular-nums text-primary">{formatNumber(profileActionsCount)}</span>
-                    <span className="text-sm text-muted-foreground">{profileActionsCount === 1 ? 'pledge' : 'pledges'}</span>
-                  </button>
-                )}
-                {profileCampaignStats.totalRaisedSats > 0 && (
-                  <button
-                    className="flex items-center gap-1 hover:opacity-80 transition-opacity"
-                    onClick={() => setActiveTab('campaigns')}
-                    title="Total raised across campaigns"
-                  >
-                    <Bitcoin className="size-3.5 text-primary" />
-                    <span className="text-sm font-bold tabular-nums text-primary">{formatCampaignAmount(profileCampaignStats.totalRaisedSats, btcPrice)}</span>
-                    <span className="text-sm text-muted-foreground">raised</span>
-                  </button>
-                )}
-              </div>
-
-              {metadata?.about && (
-                <p className="mt-3 text-sm whitespace-pre-wrap break-words overflow-hidden">
-                  <BioContent tags={metadataEvent?.tags}>{metadata.about}</BioContent>
-                </p>
-              )}
-
-              {/* Badge preview */}
-              {badgeRefs.length > 0 && (
-                <div className="flex items-center gap-1.5 mt-2">
-                  {firstBadgeRefs.map((ref) => {
-                    const badge = badgeMap.get(ref.aTag);
-                    if (!badge) return null;
-                    return (
-                      <Link
-                        key={ref.aTag}
-                        to={`/${nip19.naddrEncode({ kind: 30009, pubkey: ref.pubkey, identifier: ref.identifier })}`}
-                      >
-                        <BadgeThumbnail badge={badge} size={32} />
-                      </Link>
-                    );
-                  })}
-                  {badgeRefs.length > 5 && (
-                    <span className="text-[10px] text-muted-foreground font-medium">+{badgeRefs.length - 5}</span>
-                  )}
-                </div>
-              )}
-
-              {/* Profile fields shown inline on mobile/tablet (sidebar appears at lg+). */}
-              {fields.length > 0 && (
-                <div className="mt-4 space-y-3 lg:hidden">
-                  {fields.map((field, i) => (
+            {/* Left column — identity rail. Sticky to the top of the page
+                scroll on lg+ so it stays present while the right column
+                feeds new tab content underneath. */}
+            {pubkey && (
+              <aside className="lg:sticky lg:top-4 lg:self-start lg:max-h-[calc(100vh-2rem)] lg:overflow-y-auto pb-4">
+                <ProfileIdentityRail
+                  pubkey={pubkey}
+                  isOwnProfile={isOwnProfile}
+                  metadata={metadata}
+                  metadataEvent={metadataEvent}
+                  displayName={displayName}
+                  isAuthorLoading={author.isLoading}
+                  bannerUrl={bannerUrl}
+                  status={feedSettings.showUserStatuses !== false && profileStatus.status
+                    ? { text: profileStatus.status, url: profileStatus.url ?? undefined }
+                    : undefined}
+                  fields={fields}
+                  fieldsContent={fields.map((field, i) => (
                     <ProfileFieldInline key={i} field={field} />
                   ))}
-                </div>
+                  campaigns={profileCampaignStats.campaigns}
+                  campaignStats={profileCampaignStats}
+                  pledgesCount={profileActionsCount}
+                  btcPrice={btcPrice}
+                  followersCount={followersCount}
+                  followingCount={profileFollowing?.count ?? 0}
+                  isFollowing={isFollowing}
+                  followPending={followPending}
+                  onLightbox={(url) => setLightboxImage(url)}
+                  onFollowersOpen={() => setFollowersModalOpen(true)}
+                  onFollowingOpen={() => setFollowingModalOpen(true)}
+                  onMoreMenuOpen={() => setMoreMenuOpen(true)}
+                  onFollowQROpen={() => setFollowQROpen(true)}
+                  onToggleFollow={handleToggleFollow}
+                  onTabChange={(id) => {
+                    setActiveTab(id);
+                    if (id === 'media') setSidebarMediaUrl(null);
+                  }}
+                  onDonate={openDonateForCampaign}
+                  canFollow={!!user}
+                  authorEvent={authorEvent}
+                />
+              </aside>
+            )}
+
+            {/* Right column — tab navigation and the active tab's content.
+                `min-w-0` is critical inside a grid track so long unbroken
+                text doesn't push the column wider than its fraction. */}
+            <section className="min-w-0">
+              {/* Tabs — fixed Agora-first set with an overflow `⋯` for the
+                  legacy social tabs. Identical for owner and visitor.
+                  Sticks to the top of this column as the user scrolls. */}
+              <SubHeaderBar pinned>
+                {viewTabs.map((tab) => {
+                  const tabId = CORE_TAB_IDS[tab.label] ?? tab.label;
+                  return (
+                    <TabButton
+                      key={tab.label}
+                      label={tab.label}
+                      active={activeTab === tabId}
+                      onClick={() => {
+                        setActiveTab(tabId);
+                        if (tab.label === 'Media') setSidebarMediaUrl(null);
+                      }}
+                      className="flex-initial shrink-0 px-4"
+                    />
+                  );
+                })}
+
+                {/* Overflow menu — exposes the non-default core tabs
+                    (Posts & replies, Media, Badges, Likes). */}
+                {(() => {
+                  const missingDefaults = CORE_TAB_LABELS.filter(
+                    (label) => !DEFAULT_TAB_LABELS.includes(label),
+                  );
+                  if (missingDefaults.length === 0) return null;
+                  return (
+                    <div className="flex items-center shrink-0 ml-auto">
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <button
+                            className="px-2.5 py-3.5 text-muted-foreground hover:text-foreground hover:bg-secondary/40 transition-colors"
+                            aria-label="More tabs"
+                          >
+                            <MoreHorizontal className="size-4" />
+                          </button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end" className="w-48">
+                          {missingDefaults.map((label) => {
+                            const tabId = CORE_TAB_IDS[label] ?? label;
+                            return (
+                              <DropdownMenuItem key={label} onClick={() => setActiveTab(tabId)}>
+                                {label}
+                              </DropdownMenuItem>
+                            );
+                          })}
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </div>
+                  );
+                })()}
+              </SubHeaderBar>
+
+              {/* Overview — composite landing view. */}
+              {activeTab === 'overview' && pubkey && (
+                <ProfileOverviewTab
+                  pubkey={pubkey}
+                  displayName={displayName}
+                  isOwnProfile={isOwnProfile}
+                  recentPosts={filterByTab(feedItems, 'posts').slice(0, 3)}
+                  onSeeAllPosts={() => setActiveTab('posts')}
+                  onSeeAllActivity={() => setActiveTab('activity')}
+                />
               )}
 
+              {/* Campaigns tab. */}
+              {activeTab === 'campaigns' && pubkey && (
+                <ProfileCampaignsTab
+                  pubkey={pubkey}
+                  displayName={displayName}
+                  isOwnProfile={isOwnProfile}
+                  campaigns={profileCampaignStats.campaigns}
+                  isLoading={profileCampaignStats.isVerifying && profileCampaignStats.campaigns.length === 0}
+                />
+              )}
 
-            </>
-          )}
-        </div>
+              {/* Pledges tab. */}
+              {activeTab === 'pledges' && pubkey && (
+                <ProfilePledgesTab
+                  pubkey={pubkey}
+                  displayName={displayName}
+                  isOwnProfile={isOwnProfile}
+                  pledges={(allActions ?? []).filter((a) => a.pubkey === pubkey)}
+                  btcPrice={btcPrice}
+                  isLoading={!allActions}
+                />
+              )}
 
-        {/* Agora hero strips — full-width within the constrained content
-            canvas. Each strip self-collapses when empty, so a Nostr-native
-            profile with no Agora activity stays compact. */}
-        {pubkey && (
-          <div className="px-4 sm:px-6">
-            <ProfileCampaignsStrip
-              campaigns={profileCampaignStats.campaigns}
-              isLoading={profileCampaignStats.isVerifying && profileCampaignStats.campaigns.length === 0}
-              isOwnProfile={isOwnProfile}
-              onSeeAll={() => setActiveTab('campaigns')}
-            />
-            <ProfileOrganizationsStrip pubkey={pubkey} />
-          </div>
-        )}
+              {/* Activity — Agora feed scoped to this author. */}
+              {activeTab === 'activity' && pubkey && (
+                <ProfileActivityTab pubkey={pubkey} displayName={displayName} />
+              )}
 
-        {/* Tabs — fixed Agora-first set with an overflow `⋯` for the
-            legacy social tabs. Identical for owner and visitor. */}
-        <SubHeaderBar pinned>
-          {viewTabs.map((tab) => {
-            const tabId = CORE_TAB_IDS[tab.label] ?? tab.label;
-            return (
-              <TabButton
-                key={tab.label}
-                label={tab.label}
-                active={activeTab === tabId}
-                onClick={() => {
-                  setActiveTab(tabId);
-                  if (tab.label === 'Media') setSidebarMediaUrl(null);
-                }}
-                className="flex-initial shrink-0 px-4"
-              />
-            );
-          })}
-
-          {/* Overflow menu — exposes the non-default core tabs
-              (Posts & replies, Media, Badges, Likes) so power users can
-              still reach them. */}
-          {(() => {
-            const missingDefaults = CORE_TAB_LABELS.filter(
-              (label) => !DEFAULT_TAB_LABELS.includes(label),
-            );
-            if (missingDefaults.length === 0) return null;
-            return (
-              <div className="flex items-center shrink-0 ml-auto">
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <button
-                      className="px-2.5 py-3.5 text-muted-foreground hover:text-foreground hover:bg-secondary/40 transition-colors"
-                      aria-label="More tabs"
-                    >
-                      <MoreHorizontal className="size-4" />
-                    </button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end" className="w-48">
-                    {missingDefaults.map((label) => {
-                      const tabId = CORE_TAB_IDS[label] ?? label;
-                      return (
-                        <DropdownMenuItem key={label} onClick={() => setActiveTab(tabId)}>
-                          {label}
-                        </DropdownMenuItem>
-                      );
-                    })}
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </div>
-            );
-          })()}
-        </SubHeaderBar>
-
-        {/* Two-column body — tab content on the left fills the canvas, a
-            sticky supplementary rail on the right (≥ lg) carries profile
-            fields and the media collage. Below lg the rail is hidden and
-            the tab content flows full-width; its content is reachable via
-            the inline fields under the header and the dedicated Media tab. */}
-        <div className="grid lg:grid-cols-[minmax(0,1fr)_320px] gap-6 lg:gap-8 pt-4">
-          {/* Tab-content column — `min-w-0` is critical inside a grid track
-              so long unbroken text doesn't push the column wider than its
-              fraction allowance. */}
-          <section className="min-w-0">
-
-        {/* Overview tab — composite landing view with pinned post, featured
-            campaign, recent Agora activity, and a short list of recent posts. */}
-        {activeTab === 'overview' && pubkey && (
-          <ProfileOverviewTab
-            pubkey={pubkey}
-            displayName={displayName}
-            isOwnProfile={isOwnProfile}
-            campaigns={profileCampaignStats.campaigns}
-            recentPosts={filterByTab(feedItems, 'posts').slice(0, 3)}
-            onSeeAllPosts={() => setActiveTab('posts')}
-            onSeeAllActivity={() => setActiveTab('activity')}
-            onSeeAllCampaigns={() => setActiveTab('campaigns')}
-          />
-        )}
-
-        {/* Campaigns tab — every campaign by this author, including hidden
-            ones for the owner and moderators. */}
-        {activeTab === 'campaigns' && pubkey && (
-          <ProfileCampaignsTab
-            pubkey={pubkey}
-            displayName={displayName}
-            isOwnProfile={isOwnProfile}
-            campaigns={profileCampaignStats.campaigns}
-            isLoading={profileCampaignStats.isVerifying && profileCampaignStats.campaigns.length === 0}
-          />
-        )}
-
-        {/* Pledges tab — pledges created by this author. Backed pledges are
-            deferred (v2) per the design plan. */}
-        {activeTab === 'pledges' && pubkey && (
-          <ProfilePledgesTab
-            pubkey={pubkey}
-            displayName={displayName}
-            isOwnProfile={isOwnProfile}
-            pledges={(allActions ?? []).filter((a) => a.pubkey === pubkey)}
-            btcPrice={btcPrice}
-            isLoading={!allActions}
-          />
-        )}
-
-        {/* Activity tab — unified Agora feed scoped to this author. */}
-        {activeTab === 'activity' && pubkey && (
-          <ProfileActivityTab pubkey={pubkey} displayName={displayName} />
-        )}
-
-        {/* Pinned posts (only on Posts tab) */}
-        {activeTab === 'posts' && pinnedIds.length > 0 && (
-          <div>
-            {pinnedEventsLoading ? (
-              pinnedIds.map((id) => (
-                <div key={`pinned-skeleton-${id}`} className="relative">
-                  <PinnedLabel isOwn={isOwnProfile} onUnpin={() => {}} />
-                  <div className="px-4 py-3 border-b border-border">
-                    <div className="flex gap-3">
-                      <Skeleton className="size-11 rounded-full" />
-                      <div className="flex-1 space-y-2">
-                        <Skeleton className="h-4 w-48" />
-                        <Skeleton className="h-4 w-full" />
-                        <Skeleton className="h-4 w-3/4" />
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              ))
-            ) : (
-              pinnedEvents.map((event) => (
-                <div key={`pinned-${event.id}`} className="relative hover:bg-secondary/30 transition-colors">
-                  <PinnedLabel
-                    isOwn={isOwnProfile}
-                    onUnpin={() => togglePin.mutate(event.id)}
-                  />
-                  <NoteCard event={event} className="hover:bg-transparent" />
-                </div>
-              ))
-            )}
-          </div>
-        )}
-
-        {/* Wall tab content */}
-        {activeTab === 'wall' && (
-          <div>
-            {/* Inline compose box for wall comments (only shown if the profile owner follows you) */}
-            {wallReplyTarget && profileFollowsMe && (
-              <ComposeBox
-                compact
-                replyTo={wallReplyTarget}
-                placeholder={`Write on ${displayName}'s wall`}
-                onSuccess={() => queryClient.invalidateQueries({ queryKey: ['wall-comments', pubkey] })}
-              />
-            )}
-
-            {/* Wall compose modal (for FAB) */}
-            {wallReplyTarget && profileFollowsMe && (
-              <ReplyComposeModal
-                event={wallReplyTarget}
-                open={wallComposeOpen}
-                onOpenChange={setWallComposeOpen}
-                placeholder={`Write on ${displayName}'s wall`}
-                onSuccess={() => queryClient.invalidateQueries({ queryKey: ['wall-comments', pubkey] })}
-              />
-            )}
-
-            {!wallFollowList || wallFollowList.length === 0 ? (
-              <div className="py-12 text-center text-muted-foreground text-sm">
-                <MessageSquare className="size-12 mx-auto mb-4 opacity-30" />
-                <p className="text-lg font-medium mb-2">No wall posts yet</p>
-                <p>{displayName} doesn't follow anyone yet, so there are no wall posts to show.</p>
-              </div>
-            ) : wallPending ? (
-              <FeedCard className="mt-2 divide-y divide-border">
-                {Array.from({ length: 3 }).map((_, i) => (
-                  <div key={i} className="px-4 py-3">
-                    <div className="flex gap-3">
-                      <Skeleton className="size-10 rounded-full shrink-0" />
-                      <div className="flex-1 space-y-2">
-                        <div className="flex items-center gap-2">
-                          <Skeleton className="h-4 w-20" />
-                          <Skeleton className="h-3 w-28" />
-                        </div>
-                        <div className="space-y-1.5">
-                          <Skeleton className="h-4 w-full" />
-                          <Skeleton className="h-4 w-3/4" />
+              {/* Pinned posts (only on Posts tab) */}
+              {activeTab === 'posts' && pinnedIds.length > 0 && (
+                <div>
+                  {pinnedEventsLoading ? (
+                    pinnedIds.map((id) => (
+                      <div key={`pinned-skeleton-${id}`} className="relative">
+                        <PinnedLabel isOwn={isOwnProfile} onUnpin={() => {}} />
+                        <div className="px-4 py-3 border-b border-border">
+                          <div className="flex gap-3">
+                            <Skeleton className="size-11 rounded-full" />
+                            <div className="flex-1 space-y-2">
+                              <Skeleton className="h-4 w-48" />
+                              <Skeleton className="h-4 w-full" />
+                              <Skeleton className="h-4 w-3/4" />
+                            </div>
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  </div>
-                ))}
-              </FeedCard>
-            ) : orderedWallReplies.length > 0 ? (
-              <>
-                <FeedCard className="mt-2">
-                  <FlatThreadedReplyList replies={orderedWallReplies} />
-                </FeedCard>
-
-                {/* Infinite scroll sentinel */}
-                {hasNextWallPage && (
-                  <div ref={scrollRef} className="flex justify-center py-6">
-                    {isFetchingNextWallPage && (
-                      <Loader2 className="size-5 animate-spin text-muted-foreground" />
-                    )}
-                  </div>
-                )}
-              </>
-            ) : (
-              <div className="py-12 text-center text-muted-foreground text-sm">
-                <MessageSquare className="size-12 mx-auto mb-4 opacity-30" />
-                <p className="text-lg font-medium mb-2">No wall posts yet</p>
-                {profileFollowsMe ? (
-                  <p>Be the first to write on {displayName}'s wall!</p>
-                ) : user ? (
-                  <p>{displayName} must follow you before you can post on their wall.</p>
-                ) : (
-                  <p>Log in to write on {displayName}'s wall.</p>
-                )}
-              </div>
-            )}
-          </div>
-        )}
-
-        {/* Media tab — 3-column grid with lightbox */}
-        {activeTab === 'media' && (
-          <div>
-            {mediaPending ? (
-              <MediaCollageSkeleton count={15} />
-            ) : mediaEvents.length > 0 ? (
-              <>
-                <MediaCollage
-                  events={mediaEvents}
-                  initialOpenUrl={sidebarMediaUrl ?? undefined}
-                  onInitialOpenConsumed={() => setSidebarMediaUrl(null)}
-                  hasNextPage={hasNextMediaPage}
-                  isFetchingNextPage={isFetchingNextMediaPage}
-                  onNearEnd={() => { if (hasNextMediaPage && !isFetchingNextMediaPage) fetchNextMediaPage(); }}
-                />
-                {hasNextMediaPage && (
-                  <div ref={scrollRef} className="h-px" />
-                )}
-              </>
-            ) : (
-              <div className="py-12 text-center text-muted-foreground">No media posts yet.</div>
-            )}
-          </div>
-        )}
-
-        {/* Badges tab — grid of accepted NIP-58 badges */}
-        {activeTab === 'badges' && pubkey && (
-          <ProfileBadgesTab pubkey={pubkey} displayName={displayName} />
-        )}
-
-        {/* Tab content (posts / replies / likes) */}
-        {isCoreProfileTab && activeTab !== 'wall' && activeTab !== 'media' && activeTab !== 'badges' && (
-        <div>
-          {currentLoading ? (
-            <div className="space-y-0">
-              {Array.from({ length: 3 }).map((_, i) => (
-                <div key={i} className="px-4 py-3 border-b border-border">
-                  <div className="flex gap-3">
-                    <Skeleton className="size-11 rounded-full" />
-                    <div className="flex-1 space-y-2">
-                      <Skeleton className="h-4 w-48" />
-                      <Skeleton className="h-4 w-full" />
-                      <Skeleton className="h-4 w-3/4" />
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          ) : currentItems.length > 0 ? (
-            <div>
-              {currentItems.map((item) => (
-                <NoteCard 
-                  key={item.repostedBy ? `repost-${item.repostedBy}-${item.event.id}` : item.event.id}
-                  event={item.event}
-                  repostedBy={item.repostedBy}
-                />
-              ))}
-
-              {/* Infinite scroll sentinel */}
-              {hasMore && (
-                <div ref={scrollRef} className="flex justify-center py-6">
-                  {isFetchingMore && (
-                    <Loader2 className="size-5 animate-spin text-muted-foreground" />
+                    ))
+                  ) : (
+                    pinnedEvents.map((event) => (
+                      <div key={`pinned-${event.id}`} className="relative hover:bg-secondary/30 transition-colors">
+                        <PinnedLabel
+                          isOwn={isOwnProfile}
+                          onUnpin={() => togglePin.mutate(event.id)}
+                        />
+                        <NoteCard event={event} className="hover:bg-transparent" />
+                      </div>
+                    ))
                   )}
                 </div>
               )}
-            </div>
-          ) : (
-            <div className="py-12 text-center text-muted-foreground">
-              {activeTab === 'posts' && 'No posts yet.'}
-              {activeTab === 'replies' && 'No posts or replies yet.'}
-              {activeTab === 'likes' && 'No likes yet.'}
-            </div>
-          )}
-        </div>
-        )}
 
-          </section>
+              {/* Wall tab content */}
+              {activeTab === 'wall' && (
+                <div>
+                  {wallReplyTarget && profileFollowsMe && (
+                    <ComposeBox
+                      compact
+                      replyTo={wallReplyTarget}
+                      placeholder={`Write on ${displayName}'s wall`}
+                      onSuccess={() => queryClient.invalidateQueries({ queryKey: ['wall-comments', pubkey] })}
+                    />
+                  )}
 
-          {/* Right rail — only mounts at lg+, inlined into the grid cell
-              because FundraiserLayout has no built-in right-sidebar slot.
-              The legacy `w-1/4 sticky h-screen` styling is overridden via
-              variant="inline" so the aside fits the grid cell and sticks
-              correctly inside the page scroll. */}
-          {pubkey && (
-            <aside className="hidden lg:block lg:sticky lg:top-4 lg:self-start lg:max-h-[calc(100vh-2rem)] lg:overflow-y-auto">
-              <ProfileRightSidebar
-                fields={fields}
-                pubkey={pubkey}
-                variant="inline"
-                onMediaClick={(url) => {
-                  setActiveTab('media');
-                  setSidebarMediaUrl(url);
-                }}
-              />
-            </aside>
-          )}
+                  {wallReplyTarget && profileFollowsMe && (
+                    <ReplyComposeModal
+                      event={wallReplyTarget}
+                      open={wallComposeOpen}
+                      onOpenChange={setWallComposeOpen}
+                      placeholder={`Write on ${displayName}'s wall`}
+                      onSuccess={() => queryClient.invalidateQueries({ queryKey: ['wall-comments', pubkey] })}
+                    />
+                  )}
+
+                  {!wallFollowList || wallFollowList.length === 0 ? (
+                    <div className="py-12 text-center text-muted-foreground text-sm">
+                      <MessageSquare className="size-12 mx-auto mb-4 opacity-30" />
+                      <p className="text-lg font-medium mb-2">No wall posts yet</p>
+                      <p>{displayName} doesn't follow anyone yet, so there are no wall posts to show.</p>
+                    </div>
+                  ) : wallPending ? (
+                    <FeedCard className="mt-2 divide-y divide-border">
+                      {Array.from({ length: 3 }).map((_, i) => (
+                        <div key={i} className="px-4 py-3">
+                          <div className="flex gap-3">
+                            <Skeleton className="size-10 rounded-full shrink-0" />
+                            <div className="flex-1 space-y-2">
+                              <div className="flex items-center gap-2">
+                                <Skeleton className="h-4 w-20" />
+                                <Skeleton className="h-3 w-28" />
+                              </div>
+                              <div className="space-y-1.5">
+                                <Skeleton className="h-4 w-full" />
+                                <Skeleton className="h-4 w-3/4" />
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </FeedCard>
+                  ) : orderedWallReplies.length > 0 ? (
+                    <>
+                      <FeedCard className="mt-2">
+                        <FlatThreadedReplyList replies={orderedWallReplies} />
+                      </FeedCard>
+                      {hasNextWallPage && (
+                        <div ref={scrollRef} className="flex justify-center py-6">
+                          {isFetchingNextWallPage && (
+                            <Loader2 className="size-5 animate-spin text-muted-foreground" />
+                          )}
+                        </div>
+                      )}
+                    </>
+                  ) : (
+                    <div className="py-12 text-center text-muted-foreground text-sm">
+                      <MessageSquare className="size-12 mx-auto mb-4 opacity-30" />
+                      <p className="text-lg font-medium mb-2">No wall posts yet</p>
+                      {profileFollowsMe ? (
+                        <p>Be the first to write on {displayName}'s wall!</p>
+                      ) : user ? (
+                        <p>{displayName} must follow you before you can post on their wall.</p>
+                      ) : (
+                        <p>Log in to write on {displayName}'s wall.</p>
+                      )}
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Media tab. */}
+              {activeTab === 'media' && (
+                <div>
+                  {mediaPending ? (
+                    <MediaCollageSkeleton count={15} />
+                  ) : mediaEvents.length > 0 ? (
+                    <>
+                      <MediaCollage
+                        events={mediaEvents}
+                        initialOpenUrl={sidebarMediaUrl ?? undefined}
+                        onInitialOpenConsumed={() => setSidebarMediaUrl(null)}
+                        hasNextPage={hasNextMediaPage}
+                        isFetchingNextPage={isFetchingNextMediaPage}
+                        onNearEnd={() => { if (hasNextMediaPage && !isFetchingNextMediaPage) fetchNextMediaPage(); }}
+                      />
+                      {hasNextMediaPage && (
+                        <div ref={scrollRef} className="h-px" />
+                      )}
+                    </>
+                  ) : (
+                    <div className="py-12 text-center text-muted-foreground">No media posts yet.</div>
+                  )}
+                </div>
+              )}
+
+              {/* Badges tab. */}
+              {activeTab === 'badges' && pubkey && (
+                <ProfileBadgesTab pubkey={pubkey} displayName={displayName} />
+              )}
+
+              {/* Posts / Replies / Likes — generic feed renderer. */}
+              {isCoreProfileTab && activeTab !== 'wall' && activeTab !== 'media' && activeTab !== 'badges' && (
+                <div>
+                  {currentLoading ? (
+                    <div className="space-y-0">
+                      {Array.from({ length: 3 }).map((_, i) => (
+                        <div key={i} className="px-4 py-3 border-b border-border">
+                          <div className="flex gap-3">
+                            <Skeleton className="size-11 rounded-full" />
+                            <div className="flex-1 space-y-2">
+                              <Skeleton className="h-4 w-48" />
+                              <Skeleton className="h-4 w-full" />
+                              <Skeleton className="h-4 w-3/4" />
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : currentItems.length > 0 ? (
+                    <div>
+                      {currentItems.map((item) => (
+                        <NoteCard
+                          key={item.repostedBy ? `repost-${item.repostedBy}-${item.event.id}` : item.event.id}
+                          event={item.event}
+                          repostedBy={item.repostedBy}
+                        />
+                      ))}
+                      {hasMore && (
+                        <div ref={scrollRef} className="flex justify-center py-6">
+                          {isFetchingMore && (
+                            <Loader2 className="size-5 animate-spin text-muted-foreground" />
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  ) : (
+                    <div className="py-12 text-center text-muted-foreground">
+                      {activeTab === 'posts' && 'No posts yet.'}
+                      {activeTab === 'replies' && 'No posts or replies yet.'}
+                      {activeTab === 'likes' && 'No likes yet.'}
+                    </div>
+                  )}
+                </div>
+              )}
+            </section>
+          </div>
         </div>
 
         {/* Profile More Menu */}
@@ -2214,7 +1935,6 @@ function FollowersListModal({ pubkey, open, onOpenChange, displayName }: Followe
           />
         )}
 
-        </div>
       </PullToRefresh>
       </main>
   );

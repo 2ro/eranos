@@ -6,66 +6,48 @@ import { ArrowRight, Megaphone, Sparkles, MessageCircle } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { CampaignCard } from '@/components/CampaignCard';
 import { NoteCard } from '@/components/NoteCard';
 import { useAgoraFeed } from '@/hooks/useAgoraFeed';
 import type { FeedItem } from '@/lib/feedUtils';
-import type { ParsedCampaign } from '@/lib/campaign';
 
 interface ProfileOverviewTabProps {
   pubkey: string;
   displayName: string;
   isOwnProfile: boolean;
-  campaigns: ParsedCampaign[];
   /** Recent posts (kind 1 / 6) by this user, already filtered upstream. */
   recentPosts: FeedItem[];
   onSeeAllPosts: () => void;
   onSeeAllActivity: () => void;
-  onSeeAllCampaigns: () => void;
 }
 
 /**
- * Overview is the default landing tab for a profile — a composite of
- * the highest-signal sections so a visitor sees what someone is *doing*
- * on Agora before they decide which detail tab to drill into.
+ * Overview is the default landing tab for a profile.
  *
- * Sections (each renders only when there's content):
+ * The identity rail to the left already carries this user's active
+ * campaigns and organizations as standing facts. Overview therefore
+ * doesn't repeat them — it focuses on what the user has *been doing*:
  *
- *  1. Featured campaign  — the user's campaign with the most raised so far.
- *  2. Recent activity   — first 5–8 items from useAgoraFeed scoped to this
- *     author. Mixed kinds (campaigns, pledges, comments, zaps, etc.).
- *  3. Recent posts       — first 3 kind 1 / 6 notes for the "still Nostr"
- *     touchpoint.
+ *   1. Recent activity — first 5–8 items from useAgoraFeed scoped to
+ *      this author. Mixed kinds (campaigns, pledges, comments, zaps).
+ *   2. Recent posts    — first 3 kind 1 / 6 notes for the "still Nostr"
+ *      touchpoint.
  *
- * If all sections are empty we show a friendly empty state with own-profile
- * CTAs to start a campaign or write a post.
+ * If both sections are empty we show a friendly empty state with
+ * own-profile CTAs.
  */
 export function ProfileOverviewTab({
   pubkey,
   displayName,
   isOwnProfile,
-  campaigns,
   recentPosts,
   onSeeAllPosts,
   onSeeAllActivity,
-  onSeeAllCampaigns,
 }: ProfileOverviewTabProps) {
   const { events: activityEvents, fetchNextPage, hasNextPage, isFetchingNextPage } =
     useAgoraFeed(true, { authors: [pubkey] });
 
-  // Choose a single highlight campaign — first non-hidden one (campaigns are
-  // sorted newest-first by useCampaigns). The Strip above already lists all
-  // visible ones, so Overview just spotlights one.
-  const featured = campaigns[0];
-
-  // Trim activity to a preview. `useAgoraFeed` already returns enriched
-  // donation events alongside Agora entities; the first ~8 are typically
-  // the freshest activity beats.
   const previewActivity = useMemo(() => activityEvents.slice(0, 8), [activityEvents]);
 
-  // Light infinite-load: if the Overview is the only tab the user looks at
-  // and they scroll near the bottom, pull a second page so the visible
-  // preview stays fresh. The full timeline still lives in the Activity tab.
   const { ref: sentinelRef, inView } = useInView({ threshold: 0 });
   useEffect(() => {
     if (inView && hasNextPage && !isFetchingNextPage && activityEvents.length < 8) {
@@ -73,10 +55,9 @@ export function ProfileOverviewTab({
     }
   }, [inView, hasNextPage, isFetchingNextPage, fetchNextPage, activityEvents.length]);
 
-  const hasFeatured = !!featured;
   const hasActivity = previewActivity.length > 0;
   const hasPosts = recentPosts.length > 0;
-  const isFullyEmpty = !hasFeatured && !hasActivity && !hasPosts;
+  const isFullyEmpty = !hasActivity && !hasPosts;
 
   if (isFullyEmpty) {
     return (
@@ -110,19 +91,6 @@ export function ProfileOverviewTab({
 
   return (
     <div className="px-4 sm:px-6 py-6 space-y-8" data-pubkey={pubkey}>
-      {/* Featured campaign — single wide card, click-through to the campaign. */}
-      {hasFeatured && (
-        <section>
-          <SectionHeader
-            icon={<Megaphone className="size-5 text-primary" />}
-            title="Featured campaign"
-            onSeeAll={campaigns.length > 1 ? onSeeAllCampaigns : undefined}
-            seeAllLabel="All campaigns"
-          />
-          <CampaignCard campaign={featured} />
-        </section>
-      )}
-
       {/* Recent activity — mixed-kind list from the Agora feed. */}
       {hasActivity && (
         <section>
@@ -139,7 +107,7 @@ export function ProfileOverviewTab({
               ))}
             </div>
           </Card>
-          {/* Off-screen sentinel that pulls another page lazily so the
+          {/* Off-screen sentinel that lazily pulls another page so the
               Overview preview isn't visibly empty for active users. */}
           <div ref={sentinelRef} aria-hidden className="h-1" />
         </section>

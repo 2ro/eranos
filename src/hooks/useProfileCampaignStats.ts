@@ -10,7 +10,7 @@ import {
 } from '@/hooks/useOnchainZaps';
 import type { ParsedCampaign } from '@/lib/campaign';
 
-interface ProfileCampaignStats {
+export interface ProfileCampaignStats {
   /** Total number of non-deleted campaigns authored by this pubkey. */
   campaignCount: number;
   /**
