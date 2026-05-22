@@ -171,7 +171,7 @@ export function KindPicker({ value, options, onChange }: {
     return { presetOptions: preset, otherOptions: other };
   }, [filtered, presetSet, search]);
 
-  const selected = value === 'all' || value === 'custom' ? null : options.find((o) => o.value === value);
+  const selected = value === 'all' || value === 'agora' || value === 'custom' ? null : options.find((o) => o.value === value);
   const SelectedIcon = selected?.icon;
 
   const handleSelect = (v: string) => { onChange(v); setOpen(false); setSearch(''); };
@@ -189,7 +189,13 @@ export function KindPicker({ value, options, onChange }: {
             ? <SelectedIcon className="size-3.5 shrink-0 text-muted-foreground" />
             : <Hash className="size-3.5 shrink-0 text-muted-foreground" />}
           <span className="flex-1 truncate">
-            {value === 'all' ? 'All' : value === 'custom' ? 'Custom...' : (selected?.label ?? value)}
+            {value === 'all'
+              ? 'All kinds'
+              : value === 'agora'
+                ? 'Agora content'
+                : value === 'custom'
+                  ? 'Custom...'
+                  : (selected?.label ?? value)}
           </span>
           <ChevronDown className="size-3 shrink-0 text-muted-foreground" />
         </button>
@@ -217,7 +223,12 @@ export function KindPicker({ value, options, onChange }: {
         </div>
         {canScrollUp && <KindScrollCaret direction="up" onMouseEnter={() => startScroll('up')} onMouseLeave={stopScroll} />}
         <div ref={refCallback} className="overflow-y-auto flex-1 min-h-0" onScroll={onScroll}>
-          {!search && <KindPickerItem icon={null} label="All kinds" active={value === 'all'} onClick={() => handleSelect('all')} />}
+          {!search && (
+            <>
+              <KindPickerItem icon={null} label="Agora content" active={value === 'agora'} onClick={() => handleSelect('agora')} />
+              <KindPickerItem icon={null} label="All kinds" active={value === 'all'} onClick={() => handleSelect('all')} />
+            </>
+          )}
           {!search && presetOptions.length > 0 && (
             <>
               <div className="px-2.5 pt-2 pb-1 text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">

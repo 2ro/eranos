@@ -65,7 +65,7 @@ const DEFAULT_FILTERS = {
   mediaType: 'all' as const,
   language: 'global',
   platform: 'nostr' as const,
-  kindFilter: 'all',
+  kindFilter: 'agora',
   customKindText: '',
   authorScope: 'anyone' as AuthorScope,
   sort: 'recent' as SortPref,
@@ -252,15 +252,18 @@ export function SearchPage() {
   const allKindNumbers = useMemo(() => kindOptions.map((o) => Number(o.value)), [kindOptions]);
 
   // Resolve kindsOverride from the current kind filter state.
-  // "all" means every kind in the picker list, not undefined (which would let
-  // useStreamPosts fall back to only the user's enabled feed-settings kinds).
+  // "all" means every kind in the picker list, not undefined (which would
+  // let useStreamPosts fall back to only the user's enabled feed-settings
+  // kinds). "agora" expands to the curated Agora preset set.
   const kindsOverride = useMemo<number[]>(
     () => kindFilter === 'all' ? allKindNumbers : (parseKindFilter(kindFilter, customKindText) ?? allKindNumbers),
     [kindFilter, customKindText, allKindNumbers],
   );
 
-  // Detect kind + media type conflict: a specific kind is selected AND a media type is set
-  const hasKindMediaConflict = kindFilter !== 'all' && kindsOverride.length > 0 && mediaType !== 'all';
+  // Detect kind + media type conflict: a non-broad kind is selected AND a
+  // media type is set. "all" and "agora" are both broad selections that
+  // don't conflict with media filters.
+  const hasKindMediaConflict = kindFilter !== 'all' && kindFilter !== 'agora' && kindsOverride.length > 0 && mediaType !== 'all';
 
   // Determine if any filter differs from the default
   const hasActiveFilters = !includeReplies || mediaType !== DEFAULT_FILTERS.mediaType ||
@@ -292,7 +295,7 @@ export function SearchPage() {
       : ['protocol:nostr'];
     if (debouncedSearchQuery.trim()) parts.push(debouncedSearchQuery.trim());
     if (language !== 'global') parts.push(`language:${language}`);
-    const isDedicatedKindQuery = kindFilter === 'all' && (mediaType === 'vines' || mediaType === 'images' || mediaType === 'videos');
+    const isDedicatedKindQuery = (kindFilter === 'all' || kindFilter === 'agora') && (mediaType === 'vines' || mediaType === 'images' || mediaType === 'videos');
     if (!isDedicatedKindQuery && !hasKindMediaConflict) {
       if (mediaType === 'images') { parts.push('media:true'); parts.push('video:false'); }
       else if (mediaType === 'videos') parts.push('video:true');
@@ -311,7 +314,13 @@ export function SearchPage() {
     if (language !== 'global') labels.push(language.toUpperCase());
     if (platform !== 'nostr') labels.push({ activitypub: 'Mastodon', atproto: 'Bluesky' }[platform] ?? platform);
     if (sort !== 'recent') labels.push(sort === 'hot' ? 'Hot' : 'Trending');
-    if (kindFilter !== 'all' && kindFilter !== 'custom') {
+    if (kindFilter === 'agora') {
+      // 'agora' is the default — no chip needed.
+    } else if (kindFilter === 'all') {
+      labels.push('All kinds');
+    } else if (kindFilter === 'custom') {
+      if (customKindText) labels.push(`Kind: ${customKindText}`);
+    } else {
       const kindValues = kindFilter.split(',').filter(Boolean);
       if (kindValues.length === 1) {
         const opt = kindOptions.find(o => o.value === kindValues[0]);
@@ -320,8 +329,6 @@ export function SearchPage() {
       } else if (kindValues.length > 1) {
         labels.push(`${kindValues.length} kinds`);
       }
-    } else if (kindFilter === 'custom' && customKindText) {
-      labels.push(`Kind: ${customKindText}`);
     }
     if (authorScope === 'follows') labels.push('My follows');
     if (authorScope === 'people' && authorPubkeys.length > 0) labels.push(`${authorPubkeys.length} author${authorPubkeys.length > 1 ? 's' : ''}`);
