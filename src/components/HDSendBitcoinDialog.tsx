@@ -32,7 +32,6 @@ import { useHdWalletAccess } from '@/hooks/useHdWalletAccess';
 import { useHdWallet } from '@/hooks/useHdWallet';
 import { notificationSuccess } from '@/lib/haptics';
 import {
-  estimateFee,
   isLargeAmount,
   nostrPubkeyToBitcoinAddress,
   satsToUSD,
@@ -47,6 +46,7 @@ import {
   buildHdUnsignedPsbt,
   finalizeHdPsbt,
   type HdSpendableUtxo,
+  previewHdFee,
   signHdPsbt,
 } from '@/lib/hdwallet/transaction';
 import { useQuery } from '@tanstack/react-query';
@@ -213,20 +213,24 @@ export function HDSendBitcoinDialog({ isOpen, onClose, btcPrice }: HDSendBitcoin
     return Math.round((usd / btcPrice) * 100_000_000);
   }, [usdAmount, btcPrice]);
 
-  // ── Fee estimate (uses a conservative input count) ───────────
+  // ── Fee estimate (matches the actual coin selection) ────────
   //
-  // We don't yet know coin selection will use _all_ UTXOs, but using the
-  // full count is the safe over-estimate (real fee will be ≤ this).
+  // Crucially we do NOT use `ownedUtxos.length` as the input count: an HD
+  // wallet typically has many UTXOs across many addresses, but a real send
+  // only consumes the minimal set the coin selector picks. Using the full
+  // count would over-estimate fees by 10x or more on an active wallet, and
+  // would also make the UI think we're insufficient when we're not.
   const estimatedFeeSats = useMemo(() => {
     if (!ownedUtxos.length || !currentFeeRate || !amountSats) return 0;
-    const fee2 = estimateFee(ownedUtxos.length, 2, currentFeeRate);
-    const change = totalBalance - amountSats - fee2;
-    const numOutputs = change > 546 ? 2 : 1;
-    return estimateFee(ownedUtxos.length, numOutputs, currentFeeRate);
-  }, [ownedUtxos.length, currentFeeRate, amountSats, totalBalance]);
+    return previewHdFee(ownedUtxos, amountSats, currentFeeRate);
+  }, [ownedUtxos, currentFeeRate, amountSats]);
 
   const totalSats = amountSats + estimatedFeeSats;
-  const insufficient = totalBalance > 0 && totalSats > totalBalance;
+  // `previewHdFee` returns 0 when the coin selector can't cover `amount + fee`.
+  // Treat that as insufficient so the UI doesn't claim a 0-sat fee is fine.
+  const selectionFailed =
+    amountSats > 0 && !!currentFeeRate && ownedUtxos.length > 0 && estimatedFeeSats === 0;
+  const insufficient = selectionFailed || (totalBalance > 0 && totalSats > totalBalance);
   const showBalance = insufficient || (amountSats > 0 && totalBalance === 0);
 
   // Auto-tune fee speed to keep fees < 40% of the send amount, unless the
@@ -241,14 +245,11 @@ export function HDSendBitcoinDialog({ isOpen, onClose, btcPrice }: HDSendBitcoin
     let target: FeeSpeed = uniqueSpeeds[uniqueSpeeds.length - 1];
     for (const speed of uniqueSpeeds) {
       const rate = getRateForSpeed(feeRates, speed);
-      const fee2 = estimateFee(ownedUtxos.length, 2, rate);
-      const change = totalBalance - amountSats - fee2;
-      const outputs = change > 546 ? 2 : 1;
-      const fee = estimateFee(ownedUtxos.length, outputs, rate);
-      if (fee <= threshold) { target = speed; break; }
+      const fee = previewHdFee(ownedUtxos, amountSats, rate);
+      if (fee > 0 && fee <= threshold) { target = speed; break; }
     }
     setFeeSpeed((prev) => (prev === target ? prev : target));
-  }, [amountSats, feeRates, ownedUtxos.length, totalBalance]);
+  }, [amountSats, feeRates, ownedUtxos, totalBalance]);
 
   const handleFeeSpeedChange = useCallback((speed: FeeSpeed) => {
     feeSpeedUserChanged.current = true;
@@ -264,8 +265,14 @@ export function HDSendBitcoinDialog({ isOpen, onClose, btcPrice }: HDSendBitcoin
 
   useEffect(() => {
     setConfirmArmed(false);
-    setAcknowledgedPublic(false);
   }, [amountSats, currentFeeRate, btcPrice, recipient?.address]);
+
+  // Reset the privacy acknowledgement only when the recipient changes —
+  // not when the user adjusts the amount or fee tier. Toggling between
+  // fee speeds should not silently uncheck the warning.
+  useEffect(() => {
+    setAcknowledgedPublic(false);
+  }, [recipient?.address]);
 
   const requiresArm = isLarge || isRawAddress;
 
@@ -403,7 +410,7 @@ export function HDSendBitcoinDialog({ isOpen, onClose, btcPrice }: HDSendBitcoin
   // ── Render ───────────────────────────────────────────────────
   return (
     <Dialog open={isOpen} onOpenChange={(v) => { if (!v) handleClose(); }}>
-      <DialogContent className="sm:max-w-md p-0 gap-0 overflow-hidden">
+      <DialogContent className="sm:max-w-md p-0 gap-0 overflow-hidden [&>button]:hidden">
         <DialogTitle className="sr-only">Send Bitcoin</DialogTitle>
 
         {success ? (
@@ -522,6 +529,8 @@ export function HDSendBitcoinDialog({ isOpen, onClose, btcPrice }: HDSendBitcoin
                   >
                     {estimatedFeeSats > 0 && btcPrice ? (
                       <>≈ {satsToUSD(estimatedFeeSats, btcPrice)}</>
+                    ) : currentFeeRate ? (
+                      <>{currentFeeRate} sat/vB</>
                     ) : (
                       <>—</>
                     )}

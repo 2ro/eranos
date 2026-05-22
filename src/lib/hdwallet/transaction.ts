@@ -100,6 +100,40 @@ function selectUtxos(
   return null;
 }
 
+/**
+ * Estimate the fee for a hypothetical spend without building a PSBT.
+ *
+ * Mirrors the input-selection used by `selectUtxos` so the UI fee preview
+ * matches what the actual transaction will pay. Crucially, this is _not_
+ * the same as `estimateFee(allUtxos.length, …)` — an HD wallet typically
+ * has many UTXOs across many addresses, but a real send only consumes the
+ * minimal set that covers `target + fee`.
+ *
+ * Returns `0` when:
+ *   - `target` is non-positive,
+ *   - the wallet is empty, or
+ *   - the balance is insufficient to cover `target + fee` (the caller
+ *     should branch on `insufficient` separately and not surface a fee).
+ */
+export function previewHdFee(
+  utxos: readonly HdSpendableUtxo[],
+  target: number,
+  feeRate: number,
+): number {
+  if (!Number.isFinite(target) || target <= 0) return 0;
+  if (!Number.isFinite(feeRate) || feeRate <= 0) return 0;
+  if (!utxos.length) return 0;
+
+  const selection = selectUtxos(utxos, target, feeRate);
+  if (!selection) return 0;
+
+  const { selected, total } = selection;
+  const feeWithChange = estimateFee(selected.length, 2, feeRate);
+  const changeIfKept = total - target - feeWithChange;
+  const numOutputs = changeIfKept >= BITCOIN_DUST_LIMIT ? 2 : 1;
+  return estimateFee(selected.length, numOutputs, feeRate);
+}
+
 // ---------------------------------------------------------------------------
 // PSBT build
 // ---------------------------------------------------------------------------
