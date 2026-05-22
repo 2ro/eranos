@@ -33,7 +33,6 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-import { DonateDialog } from '@/components/DonateDialog';
 import { DetailCommentComposer } from '@/components/DetailCommentComposer';
 import { InteractionsModal, type InteractionTab } from '@/components/InteractionsModal';
 import { PostActionBar } from '@/components/PostActionBar';
@@ -130,7 +129,6 @@ function CampaignDetailContent({ campaign }: { campaign: ParsedCampaign }) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  const [donateOpen, setDonateOpen] = useState(false);
   const [replyOpen, setReplyOpen] = useState(false);
   const [moreMenuOpen, setMoreMenuOpen] = useState(false);
   const [interactionsOpen, setInteractionsOpen] = useState(false);
@@ -345,7 +343,6 @@ function CampaignDetailContent({ campaign }: { campaign: ParsedCampaign }) {
       btcPrice={btcPrice}
       donations={donationReceipts}
       deadline={deadline}
-      onDonateClick={() => setDonateOpen(true)}
       onShare={handleShare}
       onSeeAll={scrollToActivity}
     />
@@ -522,19 +519,6 @@ function CampaignDetailContent({ campaign }: { campaign: ParsedCampaign }) {
           </aside>
         </div>
       </div>
-
-      <DonateDialog
-        campaign={campaign}
-        open={donateOpen}
-        onOpenChange={(open) => {
-          setDonateOpen(open);
-          if (!open) {
-            queryClient.invalidateQueries({ queryKey: ['campaign-donations', 'events', campaign.aTag] });
-            queryClient.invalidateQueries({ queryKey: ['campaign-donations'] });
-          }
-        }}
-        btcPrice={btcPrice}
-      />
 
       <ReplyComposeModal
         event={campaign.event}
@@ -884,7 +868,6 @@ interface DonateColumnProps {
   /** Aggregated kind 8333 donation events, newest first. */
   donations: NostrEvent[];
   deadline: { label: string; isPast: boolean } | null;
-  onDonateClick: () => void;
   onShare: () => void;
   /** Scroll the inline activity list into view (donations + comments). */
   onSeeAll: () => void;
@@ -897,7 +880,6 @@ function DonateColumn({
   btcPrice,
   donations,
   deadline,
-  onDonateClick,
   onShare,
   onSeeAll,
 }: DonateColumnProps) {
@@ -980,27 +962,11 @@ function DonateColumn({
               Share
             </Button>
           </div>
-        ) : isSilentPayment ? (
-          // SP mode: external wallet only. The in-app PSBT signer doesn't
-          // support BIP-352, so we point the donor at the QR/code panel.
-          <div className="space-y-3">
-            <CampaignWalletDonatePanel wallet={campaign.wallet} />
-            <Button variant="outline" size="lg" className="w-full" onClick={onShare}>
-              <Share2 className="size-4 mr-2" />
-              Share
-            </Button>
-          </div>
         ) : (
-          // On-chain mode: in-app PSBT donate button + external wallet panel.
+          // Donors pay from an external wallet via the QR/address panel.
+          // Both on-chain and silent-payment campaigns route through the
+          // same UX — Agora no longer runs an in-app PSBT signer.
           <div className="space-y-3">
-            <Button
-              size="lg"
-              className="w-full text-white"
-              onClick={onDonateClick}
-            >
-              <HandHeart className="size-5 mr-2" />
-              Donate
-            </Button>
             <CampaignWalletDonatePanel wallet={campaign.wallet} />
             <Button variant="outline" size="lg" className="w-full" onClick={onShare}>
               <Share2 className="size-4 mr-2" />
