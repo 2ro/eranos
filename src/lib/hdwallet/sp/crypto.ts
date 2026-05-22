@@ -1,5 +1,63 @@
 import { sha256 } from '@noble/hashes/sha256';
-import * as ecc from '@bitcoinerlab/secp256k1';
+import { secp256k1 } from '@noble/curves/secp256k1.js';
+import { bytesToNumberBE } from '@noble/curves/utils.js';
+
+// ---------------------------------------------------------------------------
+// secp256k1 point helpers
+// ---------------------------------------------------------------------------
+//
+// `@scure/btc-signer` doesn't expose generic point math (only ECDSA / Schnorr
+// signing). For BIP-352 we need three operations on raw secp256k1 points:
+//
+//   * `tk · G`            — base-point multiplication by a tagged-hash scalar
+//   * `Bspend + tk · G`   — point addition
+//   * `bscan · tweak`     — arbitrary-point multiplication by `bscan`
+//
+// These are provided by `@noble/curves/secp256k1.Point` (`BASE`, `multiply`,
+// `add`, `fromBytes`, `toBytes`). The output is always compressed (33-byte
+// SEC1) to match the previous `@bitcoinerlab/secp256k1` API the scanner
+// expects.
+//
+// Noble's `multiply` is strict — it throws on scalars 0 or ≥ n. Tagged-hash
+// outputs in that range are astronomically rare (negligible probability for
+// random keys), but if it ever happens the wallet should fail closed rather
+// than silently produce the point at infinity. The previous backend returned
+// `null` in those cases and we wrapped it in a "Failed to compute" throw;
+// the explicit try/catch below preserves that contract.
+// ---------------------------------------------------------------------------
+
+const { Point } = secp256k1;
+
+/**
+ * Compute `scalar · G` and return the 33-byte compressed point. Throws if the
+ * scalar is invalid for the secp256k1 subgroup (0 or ≥ n).
+ */
+function pointFromScalarCompressed(scalar: Uint8Array): Uint8Array {
+  return Point.BASE.multiply(bytesToNumberBE(scalar)).toBytes(true);
+}
+
+/**
+ * Compute `scalar · P` and return the 33-byte compressed point. Throws if the
+ * scalar is invalid (0 or ≥ n) or `P` is malformed.
+ *
+ * Exported for the BIP-352 scanner, which uses it to perform the receiver-side
+ * ECDH step `shared = bscan · tweak`.
+ */
+export function pointMultiplyCompressed(P: Uint8Array, scalar: Uint8Array): Uint8Array {
+  return Point.fromBytes(P).multiply(bytesToNumberBE(scalar)).toBytes(true);
+}
+
+/**
+ * Compute `A + B` and return the 33-byte compressed point. Throws if either
+ * input is malformed or the result is the point at infinity (which is
+ * indistinguishable from a "no output" answer and should never happen with
+ * honest inputs).
+ */
+function pointAddCompressed(A: Uint8Array, B: Uint8Array): Uint8Array {
+  const sum = Point.fromBytes(A).add(Point.fromBytes(B));
+  if (sum.is0()) throw new Error('Point addition produced the point at infinity');
+  return sum.toBytes(true);
+}
 
 // ---------------------------------------------------------------------------
 // BIP-352 silent-payments cryptographic primitives — receive-only subset
@@ -122,15 +180,22 @@ export function derivePkAtIndex(
 
   const tk = taggedHash('BIP0352/SharedSecret', concat(shared, ser32BE(k)));
 
-  const tG = ecc.pointFromScalar(tk, true);
-  if (!tG) throw new Error('Failed to compute tₖ · G');
-  const Pk = ecc.pointAdd(Bspend, tG, true);
-  if (!Pk) throw new Error('Failed to compute Pₖ');
+  let tG: Uint8Array;
+  try {
+    tG = pointFromScalarCompressed(tk);
+  } catch {
+    throw new Error('Failed to compute tₖ · G');
+  }
+  let Pk: Uint8Array;
+  try {
+    Pk = pointAddCompressed(Bspend, tG);
+  } catch {
+    throw new Error('Failed to compute Pₖ');
+  }
 
-  const full = new Uint8Array(Pk);
   return {
-    xonlyPk: full.slice(1, 33),
-    fullPk: full,
+    xonlyPk: Pk.slice(1, 33),
+    fullPk: Pk,
     tweak: tk,
   };
 }
@@ -155,11 +220,19 @@ export function derivePkFromStoredTweak(
   if (Bspend.length !== 33) throw new Error('Bspend must be 33-byte compressed');
   if (tweak.length !== 32) throw new Error('tweak must be 32 bytes');
 
-  const tG = ecc.pointFromScalar(tweak, true);
-  if (!tG) throw new Error('Failed to compute tₖ · G');
-  const Pk = ecc.pointAdd(Bspend, tG, true);
-  if (!Pk) throw new Error('Failed to compute Pₖ');
-  return new Uint8Array(Pk.slice(1, 33));
+  let tG: Uint8Array;
+  try {
+    tG = pointFromScalarCompressed(tweak);
+  } catch {
+    throw new Error('Failed to compute tₖ · G');
+  }
+  let Pk: Uint8Array;
+  try {
+    Pk = pointAddCompressed(Bspend, tG);
+  } catch {
+    throw new Error('Failed to compute Pₖ');
+  }
+  return Pk.slice(1, 33);
 }
 
 // ---------------------------------------------------------------------------

@@ -1,5 +1,5 @@
-import * as bitcoin from 'bitcoinjs-lib';
-import * as ecc from '@bitcoinerlab/secp256k1';
+import { hex } from '@scure/base';
+import * as btc from '@scure/btc-signer';
 
 import {
   BITCOIN_DUST_LIMIT,
@@ -10,7 +10,7 @@ import {
 import {
   CHANGE_CHAIN,
   deriveAddress,
-  deriveLeafTaprootSigner,
+  deriveLeafPrivateKey,
   type HdAccount,
   HD_WALLET_NETWORK,
 } from './derivation';
@@ -52,6 +52,18 @@ export interface HdUnsignedPsbt {
   changeAddress?: string;
   /** Per-input (chain, index) so signing knows which key to derive. */
   inputDerivations: Array<{ chain: 0 | 1; index: number }>;
+}
+
+// ---------------------------------------------------------------------------
+// PSBT hex helpers (private)
+// ---------------------------------------------------------------------------
+
+function txToPsbtHex(tx: btc.Transaction): string {
+  return hex.encode(tx.toPSBT());
+}
+
+function psbtFromHex(psbtHex: string): btc.Transaction {
+  return btc.Transaction.fromPSBT(hex.decode(psbtHex));
 }
 
 // ---------------------------------------------------------------------------
@@ -194,8 +206,7 @@ export function buildHdUnsignedPsbt(
     );
   }
 
-  bitcoin.initEccLib(ecc);
-  const psbt = new bitcoin.Psbt({ network: HD_WALLET_NETWORK });
+  const tx = new btc.Transaction();
   const inputDerivations: HdUnsignedPsbt['inputDerivations'] = [];
 
   for (const utxo of selected) {
@@ -213,34 +224,32 @@ export function buildHdUnsignedPsbt(
           `expected ${derived.address}, got ${utxo.address}`,
       );
     }
-    const internalPubkey = Buffer.from(derived.internalPubkeyHex, 'hex');
+    const internalPubkey = hex.decode(derived.internalPubkeyHex);
+    const payment = btc.p2tr(internalPubkey, undefined, HD_WALLET_NETWORK);
 
-    psbt.addInput({
-      hash: utxo.txid,
+    tx.addInput({
+      txid: utxo.txid,
       index: utxo.vout,
       witnessUtxo: {
-        script: bitcoin.payments.p2tr({
-          internalPubkey,
-          network: HD_WALLET_NETWORK,
-        }).output!,
-        value: BigInt(utxo.value),
+        script: payment.script,
+        amount: BigInt(utxo.value),
       },
       tapInternalKey: internalPubkey,
     });
     inputDerivations.push({ chain: utxo.chain, index: utxo.index });
   }
 
-  psbt.addOutput({ address: toAddress, value: BigInt(amountSats) });
+  tx.addOutputAddress(toAddress, BigInt(amountSats), HD_WALLET_NETWORK);
 
   let changeAddress: string | undefined;
   if (hasChange) {
     const changeDerived = deriveAddress(account.changeNode, CHANGE_CHAIN, nextChangeIndex);
     changeAddress = changeDerived.address;
-    psbt.addOutput({ address: changeAddress, value: BigInt(change) });
+    tx.addOutputAddress(changeAddress, BigInt(change), HD_WALLET_NETWORK);
   }
 
   return {
-    psbtHex: psbt.toHex(),
+    psbtHex: txToPsbtHex(tx),
     fee,
     hasChange,
     changeAddress,
@@ -253,10 +262,14 @@ export function buildHdUnsignedPsbt(
 // ---------------------------------------------------------------------------
 
 /**
- * Sign every input in a PSBT using its corresponding HD-derived tweaked key.
+ * Sign every input in a PSBT using its corresponding HD-derived private key.
  *
  * `inputDerivations` MUST be aligned 1:1 with the PSBT's inputs in order.
  * (`buildHdUnsignedPsbt` returns them in the right order.)
+ *
+ * Each derived 32-byte leaf private key is passed directly to `signIdx`,
+ * which detects the `tapInternalKey` on the input and internally applies the
+ * BIP-341 TapTweak before producing a Schnorr key-path signature.
  *
  * @returns Hex-encoded signed (but not finalised) PSBT.
  */
@@ -265,33 +278,36 @@ export function signHdPsbt(
   inputDerivations: ReadonlyArray<{ chain: 0 | 1; index: number }>,
   account: HdAccount,
 ): string {
-  bitcoin.initEccLib(ecc);
-  const psbt = bitcoin.Psbt.fromHex(psbtHex, { network: HD_WALLET_NETWORK });
+  const tx = psbtFromHex(psbtHex);
 
-  if (psbt.inputCount !== inputDerivations.length) {
+  if (tx.inputsLength !== inputDerivations.length) {
     throw new Error(
-      `PSBT input count (${psbt.inputCount}) does not match derivations ` +
+      `PSBT input count (${tx.inputsLength}) does not match derivations ` +
         `length (${inputDerivations.length}).`,
     );
   }
 
-  for (let i = 0; i < psbt.inputCount; i++) {
+  for (let i = 0; i < tx.inputsLength; i++) {
     const { chain, index } = inputDerivations[i];
-    const tweakedSigner = deriveLeafTaprootSigner(account, chain, index);
-    psbt.signInput(i, tweakedSigner);
+    const privKey = deriveLeafPrivateKey(account, chain, index);
+    try {
+      tx.signIdx(privKey, i);
+    } finally {
+      // Best-effort wipe of the local copy.
+      privKey.fill(0);
+    }
   }
 
-  return psbt.toHex();
+  return txToPsbtHex(tx);
 }
 
 /**
  * Finalise a signed PSBT and extract the raw transaction hex.
  */
 export function finalizeHdPsbt(psbtHex: string): string {
-  bitcoin.initEccLib(ecc);
-  const psbt = bitcoin.Psbt.fromHex(psbtHex, { network: HD_WALLET_NETWORK });
-  psbt.finalizeAllInputs();
-  return psbt.extractTransaction().toHex();
+  const tx = psbtFromHex(psbtHex);
+  tx.finalize();
+  return hex.encode(tx.extract());
 }
 
 /**

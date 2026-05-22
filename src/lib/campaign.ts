@@ -1,9 +1,9 @@
 import type { NostrEvent } from '@nostrify/nostrify';
-import * as bitcoin from 'bitcoinjs-lib';
 import { nip19 } from 'nostr-tools';
 
 import { COUNTRIES } from '@/lib/countries';
 import { parseCountryIdentifier } from '@/lib/countryIdentifiers';
+import { validateBitcoinAddress } from '@/lib/bitcoin';
 
 /**
  * Addressable kind number for fundraising campaigns (see NIP.md, Kind 33863).
@@ -114,9 +114,9 @@ function getCountryCode(event: NostrEvent): string | undefined {
  *
  * Mode is inferred from the bech32 HRP/prefix:
  *
- * - `bc1q…` / `bc1p…` → mainnet on-chain (validated via bitcoinjs-lib).
+ * - `bc1q…` / `bc1p…` → mainnet on-chain (validated via @scure/btc-signer).
  * - `sp1…` → BIP-352 silent-payment code (validated via prefix + bech32m
- *   checksum from `@scure/base`-style parsing in `bitcoinjs-lib`).
+ *   checksum at the donor's wallet when it derives the payment output).
  *
  * Any other prefix (`tb1…`, `bcrt1…`, `tsp1…`, `lnbc…`, etc.) is rejected.
  */
@@ -127,20 +127,16 @@ export function parseCampaignWallet(value: string | undefined): CampaignWallet |
 
   // On-chain mainnet: bc1q (segwit v0) or bc1p (Taproot v1).
   if (/^bc1[qp]/i.test(trimmed)) {
-    try {
-      bitcoin.address.toOutputScript(trimmed, bitcoin.networks.bitcoin);
-    } catch {
-      return null;
-    }
+    if (!validateBitcoinAddress(trimmed)) return null;
     return { value: trimmed, mode: 'onchain' };
   }
 
   // Silent payments: sp1 followed by bech32m payload (mainnet only).
   if (/^sp1[02-9ac-hj-np-z]+$/i.test(trimmed)) {
-    // bitcoinjs-lib doesn't currently parse BIP-352 codes, so we accept any
-    // bech32m-shaped sp1 string. The checksum is verified by the donor's
-    // wallet when it derives the payment output; an invalid code there
-    // simply fails the donation flow.
+    // @scure/btc-signer's address decoder doesn't currently parse BIP-352
+    // codes, so we accept any bech32m-shaped sp1 string. The checksum is
+    // verified by the donor's wallet when it derives the payment output; an
+    // invalid code there simply fails the donation flow.
     return { value: trimmed, mode: 'sp' };
   }
 

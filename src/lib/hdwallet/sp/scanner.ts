@@ -1,6 +1,4 @@
-import * as ecc from '@bitcoinerlab/secp256k1';
-
-import { bytesEqual, derivePkAtIndex } from './crypto';
+import { bytesEqual, derivePkAtIndex, pointMultiplyCompressed } from './crypto';
 
 // ---------------------------------------------------------------------------
 // BIP-352 receiver-side per-transaction scanner
@@ -83,14 +81,18 @@ export function scanTransaction(
 
   // shared = bscan · tweak  ==  bscan · (input_hash · A)  ==  input_hash · a · Bscan
   // — the same shared secret the sender computed.
-  const shared = ecc.pointMultiply(entry.tweak, bscan, true);
-  if (!shared) return [];
+  let shared: Uint8Array;
+  try {
+    shared = pointMultiplyCompressed(entry.tweak, bscan);
+  } catch {
+    return [];
+  }
 
   if (entry.outputs.length === 0) return [];
 
   const remaining = new Set<number>(entry.outputs.map((_, i) => i));
   const matches: SPMatchedUtxo[] = [];
-  const sharedBytes = new Uint8Array(shared);
+  const sharedBytes = shared;
 
   let k = 0;
   while (remaining.size > 0) {

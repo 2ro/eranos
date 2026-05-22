@@ -1,9 +1,6 @@
-import * as bitcoin from 'bitcoinjs-lib';
-import { toXOnly } from 'bitcoinjs-lib';
 import { HDKey } from '@scure/bip32';
-import { bech32m } from '@scure/base';
-import * as ecc from '@bitcoinerlab/secp256k1';
-import { ECPairFactory, type ECPairAPI } from 'ecpair';
+import { bech32m, hex } from '@scure/base';
+import * as btc from '@scure/btc-signer';
 
 // ---------------------------------------------------------------------------
 // Nostr-derived HD wallet
@@ -59,28 +56,7 @@ export const RECEIVE_CHAIN = 0;
 export const CHANGE_CHAIN = 1;
 
 /** Network — mainnet only. Testnet support is intentionally omitted. */
-const NETWORK = bitcoin.networks.bitcoin;
-
-// ---------------------------------------------------------------------------
-// ECC initialisation (lazy)
-// ---------------------------------------------------------------------------
-
-let _ECPair: ECPairAPI | null = null;
-let _eccInitialized = false;
-
-/** Initialize bitcoinjs-lib's ECC backend exactly once. */
-function ensureEcc(): void {
-  if (!_eccInitialized) {
-    bitcoin.initEccLib(ecc);
-    _eccInitialized = true;
-  }
-}
-
-function getECPair(): ECPairAPI {
-  ensureEcc();
-  if (!_ECPair) _ECPair = ECPairFactory(ecc);
-  return _ECPair;
-}
+const NETWORK = btc.NETWORK;
 
 // ---------------------------------------------------------------------------
 // Seed derivation
@@ -170,7 +146,6 @@ export interface DerivedAddress {
  * accurate.
  */
 export function deriveAddress(chainNode: HDKey, chain: 0 | 1, index: number): DerivedAddress {
-  ensureEcc();
   if (!Number.isInteger(index) || index < 0) {
     throw new Error(`Invalid address index: ${index}`);
   }
@@ -178,19 +153,19 @@ export function deriveAddress(chainNode: HDKey, chain: 0 | 1, index: number): De
   const child = chainNode.deriveChild(index);
   const pubkey = child.publicKey;
   if (!pubkey) throw new Error('HDKey is missing a public key');
+  if (pubkey.length !== 33) {
+    throw new Error('Expected compressed (33-byte) child pubkey');
+  }
 
   // BIP86: drop the parity byte to get the 32-byte x-only key.
-  const internalPubkey = Buffer.from(toXOnly(Buffer.from(pubkey)));
+  const internalPubkey = pubkey.slice(1, 33);
 
-  const { address } = bitcoin.payments.p2tr({
-    internalPubkey,
-    network: NETWORK,
-  });
+  const { address } = btc.p2tr(internalPubkey, undefined, NETWORK);
   if (!address) throw new Error('Failed to derive P2TR address');
 
   return {
     address,
-    internalPubkeyHex: internalPubkey.toString('hex'),
+    internalPubkeyHex: hex.encode(internalPubkey),
     chain,
     index,
     path: `${BIP86_ACCOUNT_PATH}/${chain}/${index}`,
@@ -217,6 +192,11 @@ export function deriveChangeAddress(account: HdAccount, index: number): DerivedA
  * The caller is responsible for zeroing the returned buffer when done (best
  * effort — JS does not guarantee this). This function is the only place where
  * leaf private keys are materialised.
+ *
+ * `@scure/btc-signer.signIdx` accepts this raw private key directly and, for
+ * inputs that carry a `tapInternalKey`, internally applies the BIP-341
+ * TapTweak before producing a Schnorr signature. There is no need to expose a
+ * pre-tweaked signer object the way the bitcoinjs-lib/ecpair stack did.
  */
 export function deriveLeafPrivateKey(
   account: HdAccount,
@@ -230,29 +210,6 @@ export function deriveLeafPrivateKey(
   }
   // Defensive copy — @scure/bip32 holds an internal reference.
   return new Uint8Array(child.privateKey);
-}
-
-/**
- * Compute the BIP-341 TapTweaked signing keypair for a given leaf. Returns an
- * ECPair instance whose private scalar is `priv + H_tapTweak(P)` mod n.
- *
- * Used by the PSBT signer.
- */
-export function deriveLeafTaprootSigner(
-  account: HdAccount,
-  chain: 0 | 1,
-  index: number,
-): ReturnType<ECPairAPI['fromPrivateKey']> {
-  const ECPair = getECPair();
-  const privKey = deriveLeafPrivateKey(account, chain, index);
-  try {
-    const keyPair = ECPair.fromPrivateKey(Buffer.from(privKey));
-    const internalPubkey = toXOnly(keyPair.publicKey);
-    return keyPair.tweak(bitcoin.crypto.taggedHash('TapTweak', internalPubkey));
-  } finally {
-    // Best-effort wipe of the local copy.
-    privKey.fill(0);
-  }
 }
 
 // ---------------------------------------------------------------------------
@@ -356,14 +313,6 @@ export interface SilentPaymentKeys {
 }
 
 /**
- * Convert an 8-bit byte array to 5-bit words for bech32m encoding.
- *
- * Inlined here rather than imported because `@scure/base` only exposes the
- * inverse direction (`fromWords`) and the bytes-to-words conversion as
- * `toWords`. We use `toWords` directly via the library.
- */
-
-/**
  * Derive the BIP-352 / NIP-SP silent payment receive address from the user's nsec.
  *
  * Per NIP-SP §2.2, the nsec is the BIP-32 master seed — fed directly to
@@ -401,8 +350,8 @@ export function deriveSilentPaymentAddress(nsecBytes: Uint8Array): SilentPayment
 
   return {
     address,
-    scanPubkeyHex: Buffer.from(scanPubkey).toString('hex'),
-    spendPubkeyHex: Buffer.from(spendPubkey).toString('hex'),
+    scanPubkeyHex: hex.encode(scanPubkey),
+    spendPubkeyHex: hex.encode(spendPubkey),
   };
 }
 
