@@ -160,11 +160,17 @@ function contrastForeground(bgHsl: string): string {
 
 /**
  * Derive all Tailwind theme tokens from 3 core colors.
- * The Tailwind "accent" token mirrors "primary".
+ *
+ * The Tailwind "accent" token is the *hover/focus surface* used by
+ * dropdown items, ghost buttons, calendar cells, command palettes,
+ * etc. — it must stay a muted neutral tint, NOT the brand primary.
+ * (The shadcn defaults set `accent` to a muted surface for exactly
+ * this reason; using `primary` here paints every menu hover state
+ * with the loud brand color.)
  *
  * @param background - Background HSL string
  * @param text       - Text/foreground HSL string
- * @param primary    - Primary accent HSL string (also used as Tailwind accent)
+ * @param primary    - Primary accent HSL string (buttons, links, focus rings)
  */
 export function deriveTokensFromCore(
   background: string,
@@ -178,6 +184,14 @@ export function deriveTokensFromCore(
   const popover = dark ? lighten(background, 2) : background;
   const secondarySurface = dark ? lighten(background, 8) : darken(background, 4);
   const muted = dark ? lighten(background, 8) : darken(background, 4);
+  // Accent is the *interactive* surface (dropdown item hover, ghost
+  // button hover, calendar cells, command palettes). It sits one
+  // perceptible step beyond secondary/muted so it reads as "this is
+  // where my cursor is" without bleeding into resting-state elements
+  // that already use `bg-muted` (avatar fallbacks, badges, code chips).
+  // Without this gap, a hovered menu item containing an avatar makes
+  // the avatar disappear into the row.
+  const accent = dark ? lighten(background, 14) : darken(background, 8);
   const border = dark ? formatHsl(parseHsl(primary).h, parseHsl(primary).s * 0.4, 30) : formatHsl(parseHsl(primary).h, parseHsl(primary).s * 0.5, 82);
   const input = border;
 
@@ -212,8 +226,8 @@ export function deriveTokensFromCore(
     secondaryForeground: secondarySurfaceFg,
     muted,
     mutedForeground: mutedFg,
-    accent: primary,
-    accentForeground: primaryFg,
+    accent,
+    accentForeground: text,
     destructive,
     destructiveForeground: destructiveFg,
     border,
