@@ -6,6 +6,7 @@ import {
   FileText,
   GitBranch,
   GitPullRequest,
+  HandHeart,
   Mail,
   Megaphone,
   MessageCircle,
@@ -33,6 +34,7 @@ import {
 } from "@/components/AudioKindContent";
 import { ActionContent } from "@/components/ActionContent";
 import { BadgeContent } from "@/components/BadgeContent";
+import { CampaignNoteCardContent } from "@/components/CampaignNoteCardContent";
 import { CommunityContent } from "@/components/CommunityContent";
 import { CalendarEventContent } from "@/components/CalendarEventContent";
 import {
@@ -467,6 +469,7 @@ export const NoteCard = memo(function NoteCard({
   const isCommunity = event.kind === 34550;
   const isZapGoal = event.kind === 9041;
   const isAction = event.kind === 36639;
+  const isCampaign = event.kind === 33863;
   const isReaction = event.kind === 7;
   const isPollVote = event.kind === 1018;
   const isRepost = event.kind === 6 || event.kind === 16;
@@ -513,6 +516,7 @@ export const NoteCard = memo(function NoteCard({
     !isCommunity &&
     !isZapGoal &&
     !isAction &&
+    !isCampaign &&
     !isReaction &&
     !isPollVote &&
     !isRepost &&
@@ -675,6 +679,9 @@ export const NoteCard = memo(function NoteCard({
 
         ) : isAction ? (
           <ActionContent event={event} />
+
+        ) : isCampaign ? (
+          <CampaignNoteCardContent event={event} />
 
         ) : isVoiceMessage ? (
           <VoiceMessagePlayer event={event} />
@@ -1790,6 +1797,12 @@ const KIND_HEADER_MAP: Record<number, KindHeaderConfig> = {
     action: (event) => publishedAtAction(event, { created: "created an", updated: "updated an", fallback: "shared an" }),
     noun: "organization",
     nounRoute: "/communities",
+  },
+  33863: {
+    icon: HandHeart,
+    action: (event) => publishedAtAction(event, { created: "launched a", updated: "updated a", fallback: "shared a" }),
+    noun: "campaign",
+    nounRoute: "/campaigns/all",
   },
   30009: {
     icon: Award,

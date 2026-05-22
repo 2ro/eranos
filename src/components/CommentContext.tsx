@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 import { nip19 } from 'nostr-tools';
 import {
   Award, BarChart3, Bird, BookOpen, Camera, Clapperboard, FileText, Film,
-  GitBranch, GitPullRequest, Highlighter, Mail, MapPin, Megaphone, MessageSquare, Mic, Music,
+  GitBranch, GitPullRequest, HandHeart, Highlighter, Mail, MapPin, Megaphone, MessageSquare, Mic, Music,
   Package, Palette, PartyPopper, Podcast, Radio, Rocket, SmilePlus,
   Stars, Target, Users, UserCheck, Vote, Zap,
 } from 'lucide-react';
@@ -146,6 +146,7 @@ const KIND_LABELS: Record<number, string> = {
   34236: 'a divine',
   34550: 'an organization',
   9041: 'a goal',
+  33863: 'a campaign',
   35128: 'an nsite',
   36639: 'a pledge',
   36787: 'a track',
@@ -203,6 +204,7 @@ const KIND_ICONS: Partial<Record<number, React.ComponentType<{ className?: strin
   39089: PartyPopper,
   3367: Palette,
   9041: Target,
+  33863: HandHeart,
   9735: Zap,
   9802: Highlighter,
   2473: Bird,
@@ -245,6 +247,7 @@ const KIND_SUFFIXES: Partial<Record<number, string>> = {
   37516: 'treasure',
   30621: 'constellation',
   34550: 'organization',
+  33863: 'campaign',
   30054: 'episode',
   30055: 'trailer',
   34139: 'playlist',
