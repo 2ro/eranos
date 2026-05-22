@@ -179,6 +179,63 @@ export function HDSilentPaymentScanDialog({ open, onOpenChange }: HDSilentPaymen
             </div>
           )}
 
+          {/* ── Reconcile spent UTXOs ──────────────────────────── */}
+          {/*
+            * Manual fix-up path for SP UTXOs that were spent outside the
+            * local send flow — different device, or a build that predates
+            * the send-time prune logic. Walks the stored set, asks
+            * Blockbook for each output's spent status, and drops the spent
+            * ones. Capped at 50 UTXOs per click; subsequent clicks pick up
+            * any remainder.
+            */}
+          {sp.storage && sp.storage.utxos.length > 0 && (
+            <div className="space-y-2 border-t pt-3">
+              <div className="space-y-1">
+                <Label className="text-xs">Reconcile spent UTXOs</Label>
+                <p className="text-xs text-muted-foreground">
+                  Checks each stored silent-payment UTXO against Blockbook and removes any
+                  that have been spent. Use this if the balance is higher than it should
+                  be after a send.
+                </p>
+              </div>
+
+              {sp.reconcileProgress && !sp.reconcileError && (
+                <p className="text-xs text-muted-foreground">
+                  {sp.isReconciling
+                    ? `Checking ${sp.reconcileProgress.checked} / ${sp.reconcileProgress.total}…`
+                    : `Checked ${sp.reconcileProgress.checked} UTXO${
+                        sp.reconcileProgress.checked === 1 ? '' : 's'
+                      } · pruned ${sp.reconcileProgress.prunedSoFar}.`}
+                </p>
+              )}
+
+              {sp.reconcileError && (
+                <div className="flex items-start gap-2 text-xs text-destructive">
+                  <AlertCircle className="size-4 shrink-0 mt-0.5" />
+                  <p>{sp.reconcileError.message}</p>
+                </div>
+              )}
+
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  void sp.reconcileSpentUtxos();
+                }}
+                disabled={sp.isReconciling || sp.isScanning}
+              >
+                {sp.isReconciling ? (
+                  <>
+                    <Loader2 className="size-3 animate-spin mr-2" />
+                    Reconciling…
+                  </>
+                ) : (
+                  'Reconcile now'
+                )}
+              </Button>
+            </div>
+          )}
+
           <div className="flex justify-end gap-2 pt-2">
             {sp.isScanning ? (
               <Button variant="outline" onClick={() => sp.cancelScan()}>

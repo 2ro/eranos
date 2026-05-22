@@ -10,7 +10,7 @@ import {
   deriveSilentPaymentKeys,
   type SilentPaymentKeys,
 } from '@/lib/hdwallet/derivation';
-import { fetchBlockTime } from '@/lib/hdwallet/blockbook';
+import { fetchBlockTime, fetchUtxoSpentStatus } from '@/lib/hdwallet/blockbook';
 import { fetchBlockEntries, fetchTipHeight } from '@/lib/hdwallet/sp/indexer';
 import { scanBatch, type SPMatchedUtxo } from '@/lib/hdwallet/sp/scanner';
 import {
@@ -45,6 +45,13 @@ import {
 
 /** Default scan window when the user clicks "Scan recent" with no explicit bounds. */
 const DEFAULT_RECENT_SCAN_BLOCKS = 144; // ~24 hours of mainnet blocks.
+
+/**
+ * Maximum distinct txids to check per manual reconcile click. Bounds the
+ * Blockbook WS fan-out on wallets with many stored SP UTXOs — remaining
+ * entries are picked up on subsequent clicks.
+ */
+const MAX_RECONCILE_UTXOS = 50;
 
 export interface UseHdWalletSpResult {
   /** Whether the feature is usable. False when not logged in with nsec, or no indexer configured. */
@@ -95,6 +102,34 @@ export interface UseHdWalletSpResult {
    * subsequent double-spend attempts.
    */
   pruneSpentUtxos: (spent: ReadonlyArray<{ txid: string; vout: number }>) => void;
+
+  /** Progress for an in-flight reconcile (or the last completed one). */
+  reconcileProgress?: {
+    /** Number of UTXOs queued for checking this run. */
+    total: number;
+    /** UTXOs whose Blockbook lookup has completed. */
+    checked: number;
+    /** UTXOs flagged as spent and pruned. */
+    prunedSoFar: number;
+  };
+  /** True while a reconcile pass is in flight. */
+  isReconciling: boolean;
+  /** Error from the most recent reconcile, cleared on next start. */
+  reconcileError?: Error;
+
+  /**
+   * Walk the stored SP UTXO set, ask Blockbook whether each one is still
+   * unspent, and prune any that are spent. Capped at 50 distinct txids per
+   * call to bound network fan-out — remaining entries are reconciled on
+   * the next click.
+   *
+   * Exists because Blockbook's xpub scan can't observe SP outputs, so a
+   * UTXO spent outside the local send flow (different device, pre-fix
+   * build) would otherwise linger in the encrypted NIP-78 doc forever.
+   *
+   * Resolves with the number of UTXOs pruned this pass.
+   */
+  reconcileSpentUtxos: () => Promise<number>;
 }
 
 const EMPTY_RESULT: UseHdWalletSpResult = {
@@ -106,6 +141,8 @@ const EMPTY_RESULT: UseHdWalletSpResult = {
   scanRecent: async () => {},
   cancelScan: () => {},
   pruneSpentUtxos: () => {},
+  isReconciling: false,
+  reconcileSpentUtxos: async () => 0,
 };
 
 export function useHdWalletSp(): UseHdWalletSpResult {
@@ -513,6 +550,89 @@ export function useHdWalletSp(): UseHdWalletSpResult {
     [publishStorage, queryClient, pubkey, dTag],
   );
 
+  // ── Manual reconcile of spent SP UTXOs against Blockbook ─────
+  //
+  // The send flow's prune (above) only catches UTXOs the *current* session
+  // spends. Anything spent before this code shipped — or spent on another
+  // device — sits in the encrypted NIP-78 doc forever, inflating the
+  // displayed balance and offering already-spent inputs to the next send.
+  //
+  // This action lets the user manually walk the stored set, ask Blockbook
+  // for each output's spent status, and drop the spent ones. Manual rather
+  // than on-load because we don't want to fire ≤50 WS calls on every wallet
+  // page mount; the scan dialog already exists as a "fix-up" UI surface.
+  const [isReconciling, setIsReconciling] = useState(false);
+  const [reconcileProgress, setReconcileProgress] = useState<
+    UseHdWalletSpResult['reconcileProgress']
+  >();
+  const [reconcileError, setReconcileError] = useState<Error | undefined>();
+  const reconcileAbortRef = useRef<AbortController | null>(null);
+
+  const reconcileSpentUtxos = useCallback<
+    UseHdWalletSpResult['reconcileSpentUtxos']
+  >(async () => {
+    if (!enabled || !blockbookUrl) return 0;
+    const current = storageRef.current;
+    if (!current || current.utxos.length === 0) return 0;
+
+    // Cap fan-out to MAX_RECONCILE_UTXOS distinct txids. We iterate the
+    // stored UTXO list (insertion order) and keep candidates until we hit
+    // the cap; remaining UTXOs are reconciled on the next click.
+    const distinctTxids = new Set<string>();
+    const candidates: Array<{ txid: string; vout: number }> = [];
+    for (const u of current.utxos) {
+      if (!distinctTxids.has(u.txid) && distinctTxids.size >= MAX_RECONCILE_UTXOS) {
+        continue;
+      }
+      distinctTxids.add(u.txid);
+      candidates.push({ txid: u.txid, vout: u.vout });
+    }
+    if (candidates.length === 0) return 0;
+
+    // Abort any prior in-flight reconcile (e.g. user double-clicked).
+    reconcileAbortRef.current?.abort();
+    const controller = new AbortController();
+    reconcileAbortRef.current = controller;
+
+    setReconcileError(undefined);
+    setIsReconciling(true);
+    setReconcileProgress({ total: candidates.length, checked: 0, prunedSoFar: 0 });
+
+    try {
+      const spentMap = await fetchUtxoSpentStatus(
+        blockbookUrl,
+        candidates,
+        controller.signal,
+      );
+      if (controller.signal.aborted) return 0;
+
+      const spent: Array<{ txid: string; vout: number }> = [];
+      for (const c of candidates) {
+        if (spentMap.get(`${c.txid}:${c.vout}`) === true) spent.push(c);
+      }
+      setReconcileProgress({
+        total: candidates.length,
+        checked: candidates.length,
+        prunedSoFar: spent.length,
+      });
+
+      if (spent.length > 0) {
+        pruneSpentUtxos(spent);
+      }
+      return spent.length;
+    } catch (err) {
+      if (controller.signal.aborted) return 0;
+      const e = err instanceof Error ? err : new Error(String(err));
+      setReconcileError(e);
+      throw e;
+    } finally {
+      setIsReconciling(false);
+      if (reconcileAbortRef.current === controller) {
+        reconcileAbortRef.current = null;
+      }
+    }
+  }, [enabled, blockbookUrl, pruneSpentUtxos]);
+
   // ── Backfill missing block timestamps ────────────────────────
   //
   // Older docs (written before SP UTXOs carried `time`) and any UTXOs that
@@ -604,5 +724,9 @@ export function useHdWalletSp(): UseHdWalletSpResult {
     scanRecent,
     cancelScan,
     pruneSpentUtxos,
+    isReconciling,
+    reconcileProgress,
+    reconcileError,
+    reconcileSpentUtxos,
   };
 }

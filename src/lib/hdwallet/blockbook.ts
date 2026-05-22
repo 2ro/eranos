@@ -508,6 +508,97 @@ export async function broadcastBlockbookTx(
 }
 
 // ---------------------------------------------------------------------------
+// getTransaction — per-vout spent status
+// ---------------------------------------------------------------------------
+//
+// Used by the silent-payments orchestrator to reconcile the persisted SP
+// UTXO set against on-chain reality: a stored UTXO whose `(txid, vout)` is
+// reported `spent: true` by Blockbook is pruned from the encrypted NIP-78
+// doc. This is the only mechanism that learns about SP UTXOs spent from a
+// *different* device or by a pre-fix build — Blockbook's xpub scan can't
+// observe SP outputs (they aren't under the BIP-86 hierarchy), so the
+// chain-scan side has no way to mark them gone.
+
+/** A vout entry in the Blockbook `getTransaction` response. */
+interface BlockbookTxVout {
+  /** Output index (0-based). */
+  n: number;
+  /** Value in sats, as a string. */
+  value?: string;
+  /** True if this output has been spent in a later transaction. */
+  spent?: boolean;
+}
+
+/** Subset of the `getTransaction` response we consume. */
+export interface BlockbookTransaction {
+  txid: string;
+  vout: BlockbookTxVout[];
+}
+
+/**
+ * Fetch a transaction by txid. Returns the full Blockbook response
+ * including per-vout `spent` flags — the field the wallet uses to learn
+ * whether a stored SP UTXO is still unspent.
+ */
+export async function fetchBlockbookTransaction(
+  baseUrl: string,
+  txid: string,
+  signal?: AbortSignal,
+): Promise<BlockbookTransaction> {
+  return getSocket(baseUrl).send<BlockbookTransaction>(
+    'getTransaction',
+    { txid },
+    signal,
+  );
+}
+
+/**
+ * For each `(txid, vout)` in `utxos`, ask Blockbook whether that output is
+ * spent. Returns a map keyed `"txid:vout"` → boolean.
+ *
+ * Fires one WS call per distinct txid (typically equal to `utxos.length`
+ * since most txids contribute a single SP output to us). Individual lookup
+ * failures are logged and skipped — the caller should treat absence from
+ * the map as "unknown, leave the UTXO in place" rather than "assumed
+ * unspent" or "assumed spent".
+ */
+export async function fetchUtxoSpentStatus(
+  baseUrl: string,
+  utxos: ReadonlyArray<{ txid: string; vout: number }>,
+  signal?: AbortSignal,
+): Promise<Map<string, boolean>> {
+  // Group requested vouts by txid so we only make one WS call per tx.
+  const byTxid = new Map<string, Set<number>>();
+  for (const u of utxos) {
+    let vouts = byTxid.get(u.txid);
+    if (!vouts) {
+      vouts = new Set();
+      byTxid.set(u.txid, vouts);
+    }
+    vouts.add(u.vout);
+  }
+
+  const result = new Map<string, boolean>();
+  for (const [txid, vouts] of byTxid) {
+    if (signal?.aborted) return result;
+    try {
+      const tx = await fetchBlockbookTransaction(baseUrl, txid, signal);
+      const voutArr = Array.isArray(tx.vout) ? tx.vout : [];
+      for (const v of voutArr) {
+        if (typeof v.n !== 'number' || !vouts.has(v.n)) continue;
+        if (typeof v.spent !== 'boolean') continue;
+        result.set(`${txid}:${v.n}`, v.spent);
+      }
+    } catch (err) {
+      // Best-effort: one failed lookup shouldn't sink the reconcile pass.
+      // The unknown UTXO stays in place and gets retried next time.
+      console.warn(`Failed to check spent status for ${txid}:`, err);
+    }
+  }
+  return result;
+}
+
+// ---------------------------------------------------------------------------
 // getInfo — health check
 // ---------------------------------------------------------------------------
 
