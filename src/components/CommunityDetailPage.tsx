@@ -1,4 +1,4 @@
-import { useMemo, useCallback, useState } from 'react';
+import { useMemo, useCallback, useEffect, useRef, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
 import { nip19 } from 'nostr-tools';
@@ -613,6 +613,8 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
   const { user } = useCurrentUser();
   const [membersDialogOpen, setMembersDialogOpen] = useState(false);
   const [descriptionExpanded, setDescriptionExpanded] = useState(false);
+  const [descriptionCanExpand, setDescriptionCanExpand] = useState(false);
+  const descriptionPreviewRef = useRef<HTMLDivElement>(null);
   const [replyOpen, setReplyOpen] = useState(false);
   const [moreMenuOpen, setMoreMenuOpen] = useState(false);
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
@@ -627,6 +629,21 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
   const communityATag = community?.aTag ?? '';
 
   const descriptionText = description.trim();
+
+  useEffect(() => {
+    if (!descriptionText) {
+      setDescriptionCanExpand(false);
+      return;
+    }
+    if (descriptionExpanded) return;
+
+    const id = window.requestAnimationFrame(() => {
+      const el = descriptionPreviewRef.current;
+      setDescriptionCanExpand(!!el && el.scrollHeight > el.clientHeight + 1);
+    });
+
+    return () => window.cancelAnimationFrame(id);
+  }, [descriptionExpanded, descriptionText]);
 
   /**
    * Synthesize a kind-1 pseudo-event so we can hand the description off to
@@ -830,6 +847,8 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
   // ── Render ──────────────────────────────────────────────────────────────────
   const bannerActionClassName = 'p-2.5 rounded-full bg-black/30 text-white/90 backdrop-blur-md hover:text-white hover:bg-black/45 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80 disabled:opacity-50 disabled:pointer-events-none transition-colors';
   const canCreateOfficial = !!communityATag && membershipFollow;
+  const visibleMemberCount = Math.min(leadershipPubkeys.length, 6);
+  const hiddenMemberCount = Math.max(0, leadershipPubkeys.length - visibleMemberCount);
   const groupActionColumn = canCreateOfficial ? (
     <GroupActionColumn
       orgNaddr={orgNaddr}
@@ -949,19 +968,15 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
                 {leadershipPubkeys.length > 0 && (
                   <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
                     <div className="space-y-3">
-                      <div className="space-y-1">
-                        <div className="text-xs font-semibold uppercase tracking-[0.12em] text-muted-foreground">
-                          Members
-                        </div>
-                        <div className="text-sm text-muted-foreground">
-                          {leadershipPubkeys.length.toLocaleString()} {leadershipPubkeys.length === 1 ? 'member' : 'members'} stewarding this group
-                        </div>
+                      <div className="text-xs font-semibold uppercase tracking-[0.12em] text-muted-foreground">
+                        Members
                       </div>
                       <PeopleAvatarStack
                         pubkeys={leadershipPubkeys}
-                        maxVisible={8}
-                        size="xl"
-                        className="[&_span]:text-sm"
+                        maxVisible={visibleMemberCount}
+                        size="comment"
+                        forceCircle
+                        showOverflowCount={false}
                       />
                     </div>
                     <Button
@@ -970,6 +985,11 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
                       className="h-auto justify-start p-0 text-sm font-medium sm:mb-1"
                       onClick={() => setMembersDialogOpen(true)}
                     >
+                      {hiddenMemberCount > 0 && (
+                        <span className="mr-2 text-muted-foreground">
+                          +{hiddenMemberCount.toLocaleString()} more
+                        </span>
+                      )}
                       View members
                       <ChevronRight className="ml-1 size-4" />
                     </Button>
@@ -983,25 +1003,28 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
                     </div>
                     <div className="relative">
                       <div
+                        ref={descriptionPreviewRef}
                         className={cn(
                           'text-[15px] sm:text-base leading-relaxed text-foreground/90 break-words',
-                          !descriptionExpanded && 'max-h-28 overflow-hidden',
+                          !descriptionExpanded && 'max-h-[6.5rem] overflow-hidden',
                         )}
                       >
                         <NoteContent event={descriptionPseudoEvent} disableEmbeds disableNoteEmbeds />
                       </div>
-                      {!descriptionExpanded && (
+                      {!descriptionExpanded && descriptionCanExpand && (
                         <div className="pointer-events-none absolute inset-x-0 bottom-0 h-12 bg-gradient-to-t from-background to-transparent" />
                       )}
                     </div>
-                    <Button
-                      type="button"
-                      variant="link"
-                      className="h-auto p-0 text-sm"
-                      onClick={() => setDescriptionExpanded((expanded) => !expanded)}
-                    >
-                      {descriptionExpanded ? 'Show less' : 'Read more'}
-                    </Button>
+                    {descriptionCanExpand && (
+                      <Button
+                        type="button"
+                        variant="link"
+                        className="h-auto p-0 text-sm"
+                        onClick={() => setDescriptionExpanded((expanded) => !expanded)}
+                      >
+                        {descriptionExpanded ? 'Show less' : 'Read more'}
+                      </Button>
+                    )}
                   </div>
                 )}
               </div>
