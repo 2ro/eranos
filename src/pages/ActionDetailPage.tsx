@@ -435,6 +435,8 @@ function PledgeHero({
             <PostActionBar
               event={action.event}
               replyLabel="Submit"
+              hideZap
+              showShareInSidebar
               onReply={onReply}
               onMore={onMore}
             />

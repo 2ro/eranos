@@ -793,6 +793,7 @@ function CampaignHero({
               event={campaign.event}
               replyLabel="Comment"
               hideZap
+              showShareInSidebar
               onReply={onReply}
               onMore={onMore}
             />
