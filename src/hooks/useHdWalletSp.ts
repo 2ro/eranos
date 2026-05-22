@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useNostr } from '@nostrify/react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
@@ -10,6 +10,7 @@ import {
   deriveSilentPaymentKeys,
   type SilentPaymentKeys,
 } from '@/lib/hdwallet/derivation';
+import { fetchBlockTime } from '@/lib/hdwallet/blockbook';
 import { fetchBlockEntries, fetchTipHeight } from '@/lib/hdwallet/sp/indexer';
 import { scanBatch, type SPMatchedUtxo } from '@/lib/hdwallet/sp/scanner';
 import {
@@ -19,6 +20,7 @@ import {
   parseSPStorage,
   serializeSPStorage,
   type SPStorageDocument,
+  type SPStoredUtxo,
   spStorageBalance,
   spStorageDTag,
   SP_STORAGE_VERSION,
@@ -100,6 +102,7 @@ export function useHdWalletSp(): UseHdWalletSpResult {
   const queryClient = useQueryClient();
 
   const indexerUrl = (config.bip352IndexerUrl ?? '').trim();
+  const blockbookUrl = (config.blockbookBaseUrl ?? '').trim();
   const pubkey = access.status === 'available' ? access.pubkey : '';
   const nsecBytes = access.status === 'available' ? access.nsecBytes : undefined;
 
@@ -348,8 +351,30 @@ export function useHdWalletSp(): UseHdWalletSpResult {
 
           // Merge matches into the optimistic doc.
           if (blockMatches.length > 0) {
+            // Fetch the real block timestamp from Blockbook so we can stamp
+            // every fresh UTXO with `time`. The HD wallet's UI falls back to
+            // a synthetic `block-height × 600s` estimate when this is
+            // missing, but that estimate drifts noticeably (often days) on
+            // recent blocks because real average block time is shorter than
+            // 600s, leading to "X days ago" labels that flip into the
+            // future. A single Blockbook lookup per matched block is cheap
+            // and fixes it.
+            let blockTime: number | undefined;
+            if (blockbookUrl) {
+              try {
+                blockTime = await fetchBlockTime(blockbookUrl, h, controller.signal);
+              } catch (err) {
+                // Best-effort: don't fail the whole scan because Blockbook
+                // is unreachable. The synthetic fallback still renders.
+                console.warn(`Failed to fetch block time for height ${h}:`, err);
+              }
+            }
+
             const opt = optimisticRef.current!;
-            const fresh = blockMatches.map(matchedUtxoToStored);
+            const fresh: SPStoredUtxo[] = blockMatches.map((m) => {
+              const stored = matchedUtxoToStored(m);
+              return blockTime !== undefined ? { ...stored, time: blockTime } : stored;
+            });
             optimisticRef.current = {
               version: SP_STORAGE_VERSION,
               scanHeight: opt.scanHeight,
@@ -397,7 +422,7 @@ export function useHdWalletSp(): UseHdWalletSpResult {
         }
       }
     },
-    [enabled, keys, storage, tipHeight, indexerUrl, scheduleRepublish, flushRepublish],
+    [enabled, keys, storage, tipHeight, indexerUrl, blockbookUrl, scheduleRepublish, flushRepublish],
   );
 
   const scanRecent = useCallback<UseHdWalletSpResult['scanRecent']>(async () => {
@@ -408,6 +433,78 @@ export function useHdWalletSp(): UseHdWalletSpResult {
   }, [enabled, indexerUrl, tipHeight, scanRange]);
 
   const balance = useMemo(() => (storage ? spStorageBalance(storage) : 0), [storage]);
+
+  // ── Backfill missing block timestamps ────────────────────────
+  //
+  // Older docs (written before SP UTXOs carried `time`) and any UTXOs that
+  // were stamped while Blockbook was unreachable arrive here without a
+  // timestamp, so the UI is forced to use the synthetic
+  // `block-height × 600s` estimate. That estimate drifts ~12 days into the
+  // future at current heights and renders as e.g. "-11d ago".
+  //
+  // Fix it once per session: on the first storage load that contains any
+  // un-stamped UTXOs, fetch their block timestamps from Blockbook,
+  // de-duplicated by height, and re-publish the document.
+  //
+  // Bounded to avoid hammering Blockbook on a wallet with hundreds of
+  // historical UTXOs — remaining entries get backfilled on subsequent
+  // sessions.
+  const backfillRanRef = useRef(false);
+  useEffect(() => {
+    if (!enabled) return;
+    if (!blockbookUrl) return;
+    if (!storage) return;
+    if (backfillRanRef.current) return;
+    if (isScanning) return; // Don't race with an in-flight scan.
+
+    const missing = storage.utxos.filter((u) => u.time === undefined);
+    if (missing.length === 0) {
+      backfillRanRef.current = true;
+      return;
+    }
+
+    backfillRanRef.current = true;
+    const controller = new AbortController();
+    const MAX_HEIGHTS = 50;
+
+    (async () => {
+      const heights = Array.from(new Set(missing.map((u) => u.height))).slice(0, MAX_HEIGHTS);
+      const heightTimes = new Map<number, number>();
+      for (const h of heights) {
+        if (controller.signal.aborted) return;
+        try {
+          const t = await fetchBlockTime(blockbookUrl, h, controller.signal);
+          heightTimes.set(h, t);
+        } catch (err) {
+          // Skip this height; it will retry on a future session.
+          console.warn(`Failed to backfill block time for height ${h}:`, err);
+        }
+      }
+      if (heightTimes.size === 0) return;
+      if (controller.signal.aborted) return;
+
+      const next: SPStorageDocument = {
+        version: SP_STORAGE_VERSION,
+        scanHeight: storage.scanHeight,
+        utxos: storage.utxos.map((u) => {
+          if (u.time !== undefined) return u;
+          const t = heightTimes.get(u.height);
+          return t !== undefined ? { ...u, time: t } : u;
+        }),
+      };
+
+      // Mirror the scan-loop pattern: update the optimistic copy and
+      // republish so other devices pick up the backfilled timestamps.
+      optimisticRef.current = next;
+      setOptimisticVersion((v) => v + 1);
+      publishStorage.mutate(next);
+    })();
+
+    return () => controller.abort();
+    // We deliberately depend only on `storage` and the static URLs — running
+    // once per fresh load is the goal.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [enabled, blockbookUrl, storage]);
 
   // ── Assemble the public shape ───────────────────────────────
   if (!enabled) {

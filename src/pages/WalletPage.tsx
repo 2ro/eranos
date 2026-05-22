@@ -189,7 +189,9 @@ function formatTxDate(timestamp?: number): string {
 
   const date = new Date(timestamp * 1000);
   const now = new Date();
-  const diffMs = now.getTime() - date.getTime();
+  // Clamp negative diffs (timestamp slightly in the future) to "Today"
+  // rather than rendering "-1d ago".
+  const diffMs = Math.max(0, now.getTime() - date.getTime());
   const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
 
   if (diffDays === 0) return 'Today';

@@ -68,6 +68,14 @@ export interface SPStoredUtxo {
   tweak: string;
   /** Per-tx output index within the SP output set (`k = 0, 1, …`). */
   k: number;
+  /**
+   * Real block timestamp in unix seconds, sourced from Blockbook's `getBlock`.
+   * Optional for backward compatibility — pre-2026 docs were written without
+   * this field, and the wallet falls back to a synthetic estimate from
+   * `height` when it's missing. New writes always populate it; the
+   * orchestrator backfills missing entries opportunistically on scan.
+   */
+  time?: number;
 }
 
 /** The full persisted document, after NIP-44 decrypt + JSON parse. */
@@ -122,6 +130,10 @@ export function parseSPStorage(plaintext: string): SPStorageDocument {
     if (typeof row.height !== 'number' || !Number.isInteger(row.height) || row.height < 0) continue;
     if (typeof row.tweak !== 'string' || !/^[0-9a-f]{64}$/.test(row.tweak)) continue;
     if (typeof row.k !== 'number' || !Number.isInteger(row.k) || row.k < 0) continue;
+    const time =
+      typeof row.time === 'number' && Number.isInteger(row.time) && row.time > 0
+        ? row.time
+        : undefined;
     utxos.push({
       txid: row.txid,
       vout: row.vout,
@@ -129,6 +141,7 @@ export function parseSPStorage(plaintext: string): SPStorageDocument {
       height: row.height,
       tweak: row.tweak,
       k: row.k,
+      ...(time !== undefined ? { time } : {}),
     });
   }
   return { version: SP_STORAGE_VERSION, scanHeight, utxos };
@@ -162,7 +175,10 @@ export function matchedUtxoToStored(m: SPMatchedUtxo): SPStoredUtxo {
 /**
  * Merge a batch of newly-discovered UTXOs into the persisted set, de-duplicated
  * by `(txid, vout)`. New entries overwrite existing ones with the same key —
- * useful if a re-scan corrects a previously-mis-recorded height/value.
+ * useful if a re-scan corrects a previously-mis-recorded height/value. The
+ * one exception: if the new entry has no `time` but the existing one does,
+ * the existing `time` is preserved (a re-scan without a Blockbook lookup
+ * shouldn't undo a previously-backfilled real timestamp).
  */
 export function mergeUtxos(
   existing: ReadonlyArray<SPStoredUtxo>,
@@ -171,7 +187,15 @@ export function mergeUtxos(
   const key = (u: SPStoredUtxo) => `${u.txid}:${u.vout}`;
   const map = new Map<string, SPStoredUtxo>();
   for (const u of existing) map.set(key(u), u);
-  for (const u of fresh) map.set(key(u), u);
+  for (const u of fresh) {
+    const k = key(u);
+    const prior = map.get(k);
+    if (prior && prior.time !== undefined && u.time === undefined) {
+      map.set(k, { ...u, time: prior.time });
+    } else {
+      map.set(k, u);
+    }
+  }
   return Array.from(map.values());
 }
 

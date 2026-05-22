@@ -404,7 +404,13 @@ function formatTxDate(timestamp?: number): string {
   if (!timestamp) return 'Pending';
   const date = new Date(timestamp * 1000);
   const now = new Date();
-  const diffDays = Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60 * 24));
+  // Clamp negative diffs (timestamp slightly in the future) to "Today" rather
+  // than rendering "-1d ago". Real block timestamps can run a few seconds
+  // ahead of the local clock, and synthetic estimates may overshoot.
+  const diffDays = Math.max(
+    0,
+    Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60 * 24)),
+  );
   if (diffDays === 0) return 'Today';
   if (diffDays === 1) return 'Yesterday';
   if (diffDays < 7) return `${diffDays}d ago`;

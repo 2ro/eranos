@@ -524,6 +524,54 @@ export async function fetchBlockbookStatus(
 }
 
 // ---------------------------------------------------------------------------
+// getBlock — block-header timestamp lookup
+// ---------------------------------------------------------------------------
+//
+// Used by the silent-payments orchestrator to stamp persisted SP UTXOs with
+// the real block timestamp (instead of a synthetic estimate from block
+// height × 600s, which drifts noticeably as cumulative average block time
+// diverges from 10 minutes).
+//
+// We request `pageSize: 1` because we only need the block header — the full
+// tx list can be megabytes for a busy block and we throw it away. Blockbook
+// still returns `time` at the top level of the response either way.
+// ---------------------------------------------------------------------------
+
+interface BlockbookBlockResponse {
+  /** Block height. */
+  height?: unknown;
+  /** Block timestamp in unix seconds. */
+  time?: unknown;
+}
+
+/**
+ * Fetch the unix-seconds timestamp of a block by height.
+ *
+ * Throws if the response is missing the `time` field — the wallet uses a
+ * clamped synthetic estimate as a fallback so a transient lookup failure
+ * doesn't break the UI.
+ */
+export async function fetchBlockTime(
+  baseUrl: string,
+  height: number,
+  signal?: AbortSignal,
+): Promise<number> {
+  if (!Number.isInteger(height) || height < 0) {
+    throw new Error(`Invalid block height: ${height}`);
+  }
+  const data = await getSocket(baseUrl).send<BlockbookBlockResponse>(
+    'getBlock',
+    { id: String(height), page: 1, pageSize: 1 },
+    signal,
+  );
+  const t = data?.time;
+  if (typeof t !== 'number' || !Number.isFinite(t) || t <= 0) {
+    throw new Error(`Blockbook getBlock(${height}) missing valid \`time\``);
+  }
+  return Math.floor(t);
+}
+
+// ---------------------------------------------------------------------------
 // getCurrentFiatRates — spot BTC → fiat exchange rate
 // ---------------------------------------------------------------------------
 //

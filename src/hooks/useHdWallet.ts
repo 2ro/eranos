@@ -152,13 +152,17 @@ export function useHdWallet(): UseHdWalletResult {
   // ── Transaction history (derived; zero extra fetches) ────────
   //
   // Combines BIP-86 transactions (scanned from Blockbook) with silent-payment
-  // receives (discovered by the BIP-352 scanner). SP UTXOs don't carry a
-  // wall-clock timestamp — BlindBit only exposes block heights — so we
-  // synthesise an approximate timestamp from height using a fixed anchor
-  // (block 800,000 ≈ 2023-07-23T00:00:00Z, average 10-minute spacing). This
-  // is good enough for sort-order and the relative-time UI ("2d ago"); a more
-  // accurate solution would require an extra Blockbook block-header call
-  // per SP tx, which isn't worth the round-trip cost today.
+  // receives (discovered by the BIP-352 scanner). SP UTXOs carry a real
+  // block timestamp when one is available (sourced from Blockbook by the
+  // SP orchestrator at scan time, or backfilled on subsequent loads). When
+  // a UTXO is missing `time` — older docs written before this field
+  // existed, or scans that ran while Blockbook was unreachable — we fall
+  // back to a synthetic estimate from height using a fixed anchor
+  // (block 800,000 ≈ 2023-07-23T00:00:00Z, average 10-minute spacing).
+  // The synthetic estimate is clamped to "now" so it never reports a future
+  // timestamp (real average block time is shorter than 600s, so the naive
+  // estimate drifts noticeably ahead of wall-clock as cumulative blocks
+  // accumulate).
   const transactions = useMemo<HdTransaction[] | undefined>(() => {
     if (!scan && !sp.storage) return undefined;
 
@@ -166,32 +170,43 @@ export function useHdWallet(): UseHdWalletResult {
 
     // Group SP UTXOs by txid and sum to keep the row shape consistent with
     // the rest of the wallet (one row per tx, not per output).
-    const spByTxid = new Map<string, { amount: number; height: number }>();
+    const spByTxid = new Map<
+      string,
+      { amount: number; height: number; time?: number }
+    >();
     for (const u of sp.storage?.utxos ?? []) {
       const existing = spByTxid.get(u.txid);
       if (existing) {
         existing.amount += u.value;
-        // Same tx → same block; keep first.
+        // Same tx → same block; prefer any concrete time we find.
+        if (existing.time === undefined && u.time !== undefined) {
+          existing.time = u.time;
+        }
       } else {
-        spByTxid.set(u.txid, { amount: u.value, height: u.height });
+        spByTxid.set(u.txid, { amount: u.value, height: u.height, time: u.time });
       }
     }
 
     const HEIGHT_ANCHOR = 800_000;
     const TIMESTAMP_ANCHOR = 1_690_070_400; // 2023-07-23T00:00:00Z (block 800,000)
     const SECONDS_PER_BLOCK = 600;
+    const nowSeconds = Math.floor(Date.now() / 1000);
 
-    const spRows: HdTransaction[] = Array.from(spByTxid.entries()).map(([txid, info]) => ({
-      txid,
-      amount: info.amount,
-      type: 'receive',
-      // SP UTXOs come from confirmed P2TR outputs in mined blocks — mempool
-      // SP detection isn't supported by BlindBit (you need a confirmed block
-      // to derive `input_hash`), so any UTXO we've persisted is confirmed.
-      confirmed: true,
-      timestamp: TIMESTAMP_ANCHOR + (info.height - HEIGHT_ANCHOR) * SECONDS_PER_BLOCK,
-      source: 'silent-payment',
-    }));
+    const spRows: HdTransaction[] = Array.from(spByTxid.entries()).map(([txid, info]) => {
+      const synthetic = TIMESTAMP_ANCHOR + (info.height - HEIGHT_ANCHOR) * SECONDS_PER_BLOCK;
+      const timestamp = info.time ?? Math.min(synthetic, nowSeconds);
+      return {
+        txid,
+        amount: info.amount,
+        type: 'receive',
+        // SP UTXOs come from confirmed P2TR outputs in mined blocks — mempool
+        // SP detection isn't supported by BlindBit (you need a confirmed block
+        // to derive `input_hash`), so any UTXO we've persisted is confirmed.
+        confirmed: true,
+        timestamp,
+        source: 'silent-payment',
+      };
+    });
 
     const merged = [...bip86, ...spRows];
     merged.sort((a, b) => {
