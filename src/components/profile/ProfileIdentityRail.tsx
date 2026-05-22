@@ -157,8 +157,18 @@ export function ProfileIdentityRail({
   const onchainCampaigns = campaigns.filter((c) => c.wallet?.mode === 'onchain');
 
   return (
-    <div className="flex flex-col gap-5">
-      {/* Avatar — overlaps the banner from inside the rail. */}
+    // Two-layer structure so the rail can scroll independently on lg+
+    // without clipping the avatar that pokes above the rail's top edge:
+    //   - Outer flex column owns the avatar (which uses -mt-16 to overlap
+    //     the banner). It must NOT clip overflow.
+    //   - Inner div carries the rest of the rail and is the scroll
+    //     container: `lg:flex-1 lg:min-h-0 lg:overflow-y-auto` makes it
+    //     fill the remaining height of the sticky aside and scroll
+    //     internally so the page's main scroll only drives the feed.
+    <div className="flex flex-col h-full">
+      {/* Avatar — overlaps the banner from inside the rail. Sits OUTSIDE
+          the scroll container so its negative-margin overhang is never
+          clipped by `overflow-y-auto`. */}
       <AvatarBlock
         metadata={metadata}
         displayName={displayName}
@@ -166,9 +176,10 @@ export function ProfileIdentityRail({
         onLightbox={onLightbox}
       />
 
-      {/* Identity: name + NIP-05 + website + bio */}
-      <div className="space-y-1.5">
-        <h1 className="text-xl font-bold leading-tight break-words">
+      <div className="flex flex-col gap-5 mt-5 lg:flex-1 lg:min-h-0 lg:overflow-y-auto pb-4">
+        {/* Identity: name + NIP-05 + website + bio */}
+        <div className="space-y-1.5">
+          <h1 className="text-xl font-bold leading-tight break-words">
           {metadataEvent ? (
             <EmojifiedText tags={metadataEvent.tags}>{displayName}</EmojifiedText>
           ) : displayName}
@@ -242,6 +253,7 @@ export function ProfileIdentityRail({
       )}
 
       <LinkFooter />
+      </div>
     </div>
   );
 }
