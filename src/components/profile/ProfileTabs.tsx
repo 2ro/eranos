@@ -76,12 +76,11 @@ export function ProfileTabs({ tabs, activeTab, onChange }: ProfileTabsProps) {
         // bleed through, with a single hairline border below.
         'bg-background/80 backdrop-blur supports-[backdrop-filter]:bg-background/60',
         'border-b border-border/60',
-        '-mx-4 sm:-mx-6 lg:mx-0',
       )}
     >
       <div
         ref={trackRef}
-        className="relative flex overflow-x-auto scrollbar-none px-4 sm:px-6 lg:px-0"
+        className="relative flex overflow-x-auto scrollbar-none"
       >
         {tabs.map((tab) => {
           const active = tab.id === activeTab;
