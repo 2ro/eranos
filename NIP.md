@@ -487,13 +487,13 @@ Each label event carries the namespace twice, per NIP-32:
 
 #### Label values
 
-Three independent axes; the newest moderator-signed label per axis per coordinate wins.
+Three independent axes are defined; the newest moderator-signed label per axis per coordinate wins. **Campaigns** use all three axes (`approval`, `hide`, `featured`). **Organizations** use only two — `hide` and `featured` — because every Agora-tagged organization is publicly visible by default; there is no approval gate for orgs. Moderators MUST NOT publish `approved` or `unapproved` labels against kind 34550 coordinates, and clients MUST ignore any such labels they receive.
 
-| Axis     | Values                    | Meaning                                                                 |
-|----------|---------------------------|-------------------------------------------------------------------------|
-| approval | `approved`, `unapproved`  | `approved` allows the campaign/organization on its discovery surfaces. `unapproved` retracts a previous approval. |
-| hide     | `hidden`, `unhidden`      | `hidden` suppresses the campaign/organization everywhere it would otherwise appear. `unhidden` retracts a previous hide. |
-| featured | `featured`, `unfeatured`  | `featured` places the campaign in the hand-picked Featured row on `/`, or the organization in the Featured shelf on `/communities`. `unfeatured` retracts. |
+| Axis     | Values                    | Surfaces       | Meaning                                                                 |
+|----------|---------------------------|----------------|-------------------------------------------------------------------------|
+| approval | `approved`, `unapproved`  | campaigns only | `approved` allows the campaign on its discovery surfaces. `unapproved` retracts a previous approval. |
+| hide     | `hidden`, `unhidden`      | both           | `hidden` suppresses the campaign/organization everywhere it would otherwise appear. `unhidden` retracts a previous hide. |
+| featured | `featured`, `unfeatured`  | both           | `featured` places the campaign in the hand-picked Featured row on `/`, or the organization in the Featured shelf on `/communities`. `unfeatured` retracts. |
 
 Surfacing rules (hide always wins):
 
@@ -509,6 +509,8 @@ Surfacing rules (hide always wins):
 
 - **Featured shelf on `/communities`** — iff the latest featured label is `featured` AND the latest hide label is not `hidden`. Ordered newest-`created_at`-of-`featured`-label first.
 - **"My organizations" shelf on `/communities`** — intentionally ignores all moderation labels. A user's own founded, moderated, or followed organizations always render regardless of label state.
+- **Moderator-only "Needs review"** — iff `t:agora` AND not featured AND not hidden. Surfaces orgs minted through Agora's create flow that haven't been triaged into Featured or Hidden yet.
+- **Moderator-only "Hidden"** — iff hidden.
 - **Hide enforcement on other organization discovery surfaces** — clients SHOULD suppress `hidden` organizations from any future "All organizations" / browse surface for non-moderators. Moderators MAY see hidden organizations with a "Hidden" treatment so they can unhide.
 
 #### Event Structure

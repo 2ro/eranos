@@ -18,7 +18,7 @@ export type OrganizationModerationData = ModerationData;
 
 /**
  * Fetches and folds organization-moderation label events authored by Team
- * Soapbox members. Returns approval / hide / featured rollups per community
+ * Soapbox members. Returns hide / featured rollups per community
  * coordinate (`34550:<pubkey>:<d>`).
  *
  * Organizations ride the same `agora.moderation` namespace and the same
@@ -26,6 +26,15 @@ export type OrganizationModerationData = ModerationData;
  * tag points at a kind 34550 coordinate. The relay-side query is identical
  * to the campaign side (we fetch every namespace-tagged label authored by
  * moderators) — the surface separation is purely client-side.
+ *
+ * **Two-axis model.** Unlike campaigns, organizations don't have an
+ * `approved` axis. Every Agora-tagged organization is publicly visible
+ * by default; moderation reduces to `featured` (lift into the curated
+ * shelf) and `hidden` (suppress from public discovery). The shared
+ * fold helper still tracks `approvedCoords` for type symmetry with the
+ * campaign hook, but the org UI never emits or reads it — moderators
+ * SHOULD NOT publish `approved` / `unapproved` labels against kind
+ * 34550 coordinates.
  *
  * **Display rule** consumers should follow:
  * - Featured shelf on `/communities` iff
@@ -35,8 +44,7 @@ export type OrganizationModerationData = ModerationData;
  *   orgs with a dimmed treatment.
  * - "My organizations" intentionally ignores moderation — a user's own
  *   founded / moderated / followed orgs always render regardless of label.
- * - Featured is independent of Approved at the protocol level; hide always
- *   wins over both.
+ * - Hide always wins over featured.
  *
  * The mutation `moderate({ coord, action })` publishes a single kind 1985
  * event labeling one organization in the `agora.moderation` namespace.
@@ -74,13 +82,27 @@ export function useOrganizationModeration() {
       );
       return foldModerationLabels(events, moderators, COMMUNITY_DEFINITION_KIND);
     },
-    staleTime: 30_000,
+    // Moderation labels change slowly — moderators feature or hide on
+    // human timescales, not seconds. A generous staleTime keeps repeat
+    // visits to /communities instant (no relay round-trip on remount),
+    // and explicit invalidation in the `moderate` mutation below catches
+    // local changes immediately. The hour-long gcTime survives tab
+    // switches and back-button navigation without refetching.
+    staleTime: 5 * 60_000,
+    gcTime: 60 * 60_000,
   });
 
   const moderate = useMutation({
     mutationFn: async ({ coord, action }: { coord: string; action: ModerationLabel }) => {
       if (!coord.startsWith(`${COMMUNITY_DEFINITION_KIND}:`)) {
         throw new Error(`Coordinate must start with ${COMMUNITY_DEFINITION_KIND}:`);
+      }
+      // Organizations use a two-axis model — only `featured` / `unfeatured`
+      // / `hidden` / `unhidden` are valid here. Reject `approved` /
+      // `unapproved` defensively so a stray UI bug can't poison the
+      // label stream with axis-mixed events.
+      if (action === 'approved' || action === 'unapproved') {
+        throw new Error(`Organizations do not support the ${action} label`);
       }
       return publishEvent({
         kind: LABEL_KIND,

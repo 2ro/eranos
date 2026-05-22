@@ -46,7 +46,11 @@ export function CommunitiesPage() {
   // Moderator gate. Reuses the campaign moderator pack (Team Soapbox) —
   // see useOrganizationModeration for why the same pack governs both
   // surfaces. The `isMod` boolean drives the visibility of the two
-  // collapsible review sections at the bottom of the page.
+  // collapsible review sections at the bottom of the page; the heavy
+  // discovery + moderation queries that power them are themselves
+  // mounted INSIDE the moderator-only subtree so non-mod viewers don't
+  // pay the cost of fetching 200 orgs and folding labels just to never
+  // render anything.
   const { data: moderators } = useCampaignModerators();
   const isMod = !!user && !!moderators && moderators.includes(user.pubkey);
 
@@ -93,10 +97,12 @@ export function CommunitiesPage() {
           <FeaturedOrganizationsShelf />
         </section>
 
-        {/* Moderator-only review sections. Mirrors the home page's
-            "Pending approval" and "Hidden" rails for campaigns — collapsed
-            by default when long, so moderators can scan the queue without
-            it dominating the page. */}
+        {/* Moderator-only review sections: "Needs review" and "Hidden".
+            Organizations have a two-axis moderation model (featured /
+            hidden — no approval gate), so anything not yet labelled
+            simply lives in the public Featured-or-not space. The Needs
+            review queue surfaces unlabelled Agora-tagged orgs so
+            moderators can pick what to feature or hide. */}
         {isMod && <ModeratorReviewSections />}
       </div>
     </main>
@@ -108,18 +114,21 @@ export function CommunitiesPage() {
 // ═══════════════════════════════════════════════════════════════════════════════
 
 /**
- * Renders the "Pending review" and "Hidden" rails for moderators only.
- * Pulls a recent slice of kind 34550 organizations via the existing
- * discovery hook and folds against the moderation rollup:
+ * Renders the "Needs review" and "Hidden" rails for moderators only.
  *
- * - **Pending review** — orgs with no approve/hide label yet (neither
- *   `approved` nor `hidden`).
- * - **Hidden** — orgs whose latest hide-axis label is `hidden`. Featured
- *   orgs that get hidden show up here too; the moderation menu on the
- *   card lets a moderator unhide.
+ * Organizations don't have an `approved` axis (unlike campaigns) — every
+ * Agora-tagged org is publicly visible by default. Moderation reduces to:
  *
- * Mirrors the campaign side's `ModeratorSection` pattern (collapsible,
- * defaults to open when the list is short).
+ * - **Needs review** — orgs minted through Agora (carry `t:agora`) that
+ *   have no featured or hidden label yet. These are candidates for
+ *   either lifting into Featured or suppressing with Hidden.
+ * - **Hidden** — orgs whose latest hide-axis label is `hidden`.
+ *
+ * The component owns its own data fetches (discovery pool + moderation
+ * rollup) so the page can mount it conditionally on `isMod` and skip
+ * both queries entirely for the overwhelmingly common non-moderator
+ * case. Mirrors the campaign side's `ModeratorSection` pattern
+ * (collapsible, defaults to open when the list is short).
  */
 function ModeratorReviewSections() {
   // Wider pull than the public discovery shelf so reviewers see deeper
@@ -128,7 +137,7 @@ function ModeratorReviewSections() {
   const { data: allOrgs, isLoading } = useDiscoverCommunities({ limit: 200 });
   const { data: moderation, isReady } = useOrganizationModeration();
 
-  const pendingOrgs = useMemo(() => {
+  const needsReviewOrgs = useMemo(() => {
     if (!moderation || !allOrgs) return [] as ParsedCommunity[];
     return allOrgs.filter(
       (org) =>
@@ -138,7 +147,7 @@ function ModeratorReviewSections() {
         // communities, music scenes, etc. — none of which Agora moderators
         // should be expected to triage.
         hasAgoraTag(org.tags) &&
-        !moderation.approvedCoords.has(org.aTag) &&
+        !moderation.featuredCoords.has(org.aTag) &&
         !moderation.hiddenCoords.has(org.aTag),
     );
   }, [moderation, allOrgs]);
@@ -154,10 +163,10 @@ function ModeratorReviewSections() {
     <>
       <ModeratorOrgSection
         icon={<Hourglass className="size-4" />}
-        title="Pending review"
-        description="Organizations on the network that no Team Soapbox moderator has approved or hidden yet. Featuring or approving moves them out of this list."
-        count={pendingOrgs.length}
-        orgs={pendingOrgs}
+        title="Needs review"
+        description="Agora organizations that haven't been featured or hidden yet. Lift one into the Featured shelf or suppress it with Hide."
+        count={needsReviewOrgs.length}
+        orgs={needsReviewOrgs}
         isLoading={sectionsLoading}
         emptyText="Nothing awaiting review."
       />

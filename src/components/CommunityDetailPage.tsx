@@ -55,7 +55,6 @@ import { useAuthor } from '@/hooks/useAuthor';
 import { useAuthors } from '@/hooks/useAuthors';
 import { useComments } from '@/hooks/useComments';
 import { useBitcoinWallet } from '@/hooks/useBitcoinWallet';
-import { useCampaignModeration } from '@/hooks/useCampaignModeration';
 import { useCommunityBookmarks } from '@/hooks/useCommunityBookmarks';
 import { useCommunityMembers } from '@/hooks/useCommunityMembers';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
@@ -460,37 +459,6 @@ function OfficialShelf({ title, count, isLoading, isEmpty, children }: OfficialS
   );
 }
 
-/**
- * Dedicated grid for an organization's moderator-approved campaigns.
- *
- * Mirrors the home-page "Community Campaigns" rail: an `ApprovedCoords ∩
- * !HiddenCoords` filter is applied upstream (see `approvedOrgCampaigns`
- * memo in `CommunityDetailPage`), and the result is rendered as a
- * full-width responsive grid using the same `CampaignCard` component.
- * Sits above the mixed-activity shelf so approved campaigns get
- * top-billing on the org page just like they do site-wide.
- */
-function ApprovedCampaignsSection({ campaigns }: { campaigns: ParsedCampaign[] }) {
-  return (
-    <section className="space-y-3">
-      <div className="flex items-baseline justify-between gap-3 px-1">
-        <h2 className="text-lg font-semibold tracking-tight inline-flex items-center gap-2">
-          <HandHeart className="size-5 text-primary/80" />
-          Approved campaigns
-          <span className="text-sm font-medium text-muted-foreground">
-            ({campaigns.length})
-          </span>
-        </h2>
-      </div>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        {campaigns.map((campaign) => (
-          <CampaignCard key={campaign.aTag} campaign={campaign} />
-        ))}
-      </div>
-    </section>
-  );
-}
-
 function OfficialActivityShelves({
   campaigns,
   campaignsLoading,
@@ -775,47 +743,6 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
   // comments section.
   const { data: orgActivity, isLoading: orgActivityLoading } = useOrganizationActivity(community);
   const now = useNow(60_000);
-
-  // Campaign moderation rollup. Used to split the org's campaigns into:
-  //
-  //   - "Approved campaigns" — moderator-approved and not hidden, rendered
-  //     in their own grid section above the mixed-activity rail. Mirrors
-  //     the home page's "Community Campaigns" rule.
-  //   - "Other activity" — everything else (pending or hidden campaigns,
-  //     plus pledges and calendar events), folded into the existing mixed
-  //     activity shelf. Hidden campaigns still appear here for the
-  //     org's own moderators/founder; non-moderators won't see hidden
-  //     entries in any case because the home-page moderation gate is
-  //     advisory-only at this point.
-  //
-  // We split client-side rather than re-querying because
-  // `useOrganizationActivity` already author-restricts to the org's
-  // official authors, which is the trust boundary that matters.
-  const { data: campaignModeration } = useCampaignModeration();
-  const approvedOrgCampaigns = useMemo(() => {
-    const campaigns = orgActivity?.campaigns ?? [];
-    if (!campaignModeration) return [] as ParsedCampaign[];
-    return campaigns
-      .filter(
-        (c) =>
-          campaignModeration.approvedCoords.has(c.aTag) &&
-          !campaignModeration.hiddenCoords.has(c.aTag),
-      )
-      .sort((a, b) => b.createdAt - a.createdAt);
-  }, [orgActivity, campaignModeration]);
-
-  const approvedOrgCampaignSet = useMemo(
-    () => new Set(approvedOrgCampaigns.map((c) => c.aTag)),
-    [approvedOrgCampaigns],
-  );
-
-  // Campaigns NOT in the approved-and-not-hidden bucket. Pending campaigns
-  // and any moderator-hidden campaigns end up here, alongside pledges and
-  // events, in the mixed activity rail.
-  const otherOrgCampaigns = useMemo(() => {
-    const campaigns = orgActivity?.campaigns ?? [];
-    return campaigns.filter((c) => !approvedOrgCampaignSet.has(c.aTag));
-  }, [orgActivity, approvedOrgCampaignSet]);
 
   // naddr for this community — used by the create CTAs (passed to create
   // pages via `?org=`) so the forms can resolve the implicit org context.
@@ -1145,19 +1072,9 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
               />
             )}
 
-            {/* Approved campaigns — moderator-approved fundraisers for
-                this org, mirroring the home page's "Community Campaigns"
-                rule. Only shown when there's at least one approved
-                campaign so unmoderated orgs don't render an empty section. */}
-            {approvedOrgCampaigns.length > 0 && (
-              <ApprovedCampaignsSection campaigns={approvedOrgCampaigns} />
-            )}
-
-            {/* Official-activity shelves. Hidden entirely when empty.
-                Campaigns already shown in the Approved Campaigns grid
-                above are excluded here so they don't double-render. */}
+            {/* Official-activity shelves. Hidden entirely when empty. */}
             <OfficialActivityShelves
-              campaigns={otherOrgCampaigns}
+              campaigns={orgActivity?.campaigns ?? []}
               campaignsLoading={orgActivityLoading}
               pledges={orgActivity?.pledges ?? []}
               pledgesLoading={orgActivityLoading}

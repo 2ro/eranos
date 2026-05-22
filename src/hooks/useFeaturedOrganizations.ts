@@ -123,9 +123,13 @@ export function useFeaturedOrganizations() {
       }
       return ordered;
     },
-    // Short — featured rows churn whenever moderators act, and the
-    // moderation hook invalidates this key on mutation anyway. Keep the
-    // staleness floor tight so background refetches catch external updates.
-    staleTime: 30_000,
+    // Featured org definitions don't change often — orgs publish a
+    // new revision when their banner or description changes, not minute
+    // to minute — so a generous staleTime makes back-navigation to
+    // /communities feel instant. The moderation hook explicitly
+    // invalidates this key on mutation, so moderator-driven churn is
+    // still visible immediately.
+    staleTime: 5 * 60_000,
+    gcTime: 60 * 60_000,
   });
 }

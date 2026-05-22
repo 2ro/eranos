@@ -17,7 +17,6 @@ import {
 import { ArticleContent } from '@/components/ArticleContent';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
-import { CampaignModerationMenu } from '@/components/CampaignModerationMenu';
 import {
   CampaignWalletDonatePanel,
 } from '@/components/CampaignWalletDonatePanel';
@@ -47,7 +46,6 @@ import { useAuthor } from '@/hooks/useAuthor';
 import { useBitcoinWallet } from '@/hooks/useBitcoinWallet';
 import { useCampaign } from '@/hooks/useCampaign';
 import { useCampaignDonations } from '@/hooks/useCampaignDonations';
-import { useCampaignModeration } from '@/hooks/useCampaignModeration';
 import { useComments } from '@/hooks/useComments';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useDeleteEvent } from '@/hooks/useDeleteEvent';
@@ -657,16 +655,6 @@ function CampaignHero({
 }: CampaignHeroProps) {
   const initials = creatorName.slice(0, 2).toUpperCase();
 
-  // Per-campaign moderation rollup. Cheap cache read — every other surface
-  // that renders moderation state shares the same query under the hood.
-  // `CampaignModerationMenu` self-gates on Team Soapbox membership and
-  // returns `null` for non-moderators, so non-mod viewers see nothing in
-  // the slot.
-  const { data: moderation } = useCampaignModeration();
-  const isApproved = moderation.approvedCoords.has(campaign.aTag);
-  const isHidden = moderation.hiddenCoords.has(campaign.aTag);
-  const isFeatured = moderation.featuredCoords.has(campaign.aTag);
-
   return (
     // True full-bleed: no max-width wrapper, no horizontal padding, no
     // rounded corners — the image touches every edge on every
@@ -717,45 +705,30 @@ function CampaignHero({
             <span className="text-sm font-medium hidden sm:inline">Back</span>
           </button>
 
-          {/* Right-side controls. Two independent groups stack here:
-              creator actions (Edit/Delete) and a moderator kebab. The
-              moderation menu self-gates on Team Soapbox membership and
-              returns null for non-moderators, so non-mod creators just
-              see Edit/Delete and non-creators see only the kebab. */}
-          <div className="flex items-center gap-1.5">
-            {isCreator && (
-              <>
-                <Button
-                  asChild
-                  size="sm"
-                  className="h-10 rounded-full bg-black/30 text-white backdrop-blur-md shadow-none hover:bg-black/45 focus-visible:ring-white/80"
-                >
-                  <Link to={`/campaigns/new?edit=${encodeURIComponent(naddr)}`}>
-                    <Pencil className="size-4 sm:mr-2" />
-                    <span className="hidden sm:inline">Edit</span>
-                  </Link>
-                </Button>
-                <Button
-                  type="button"
-                  size="sm"
-                  onClick={onDelete}
-                  disabled={deleteDisabled}
-                  className="h-10 rounded-full bg-black/30 text-white backdrop-blur-md shadow-none hover:bg-destructive/70 focus-visible:ring-white/80"
-                >
-                  <Trash2 className="size-4 sm:mr-2" />
-                  <span className="hidden sm:inline">Delete</span>
-                </Button>
-              </>
-            )}
-            <CampaignModerationMenu
-              coord={campaign.aTag}
-              campaignTitle={campaign.title}
-              isApproved={isApproved}
-              isHidden={isHidden}
-              isFeatured={isFeatured}
-              className="h-10 w-10 rounded-full bg-black/30 text-white backdrop-blur-md shadow-none hover:bg-black/45 focus-visible:ring-white/80"
-            />
-          </div>
+          {isCreator && (
+            <div className="flex items-center gap-1.5">
+              <Button
+                asChild
+                size="sm"
+                className="h-10 rounded-full bg-black/30 text-white backdrop-blur-md shadow-none hover:bg-black/45 focus-visible:ring-white/80"
+              >
+                <Link to={`/campaigns/new?edit=${encodeURIComponent(naddr)}`}>
+                  <Pencil className="size-4 sm:mr-2" />
+                  <span className="hidden sm:inline">Edit</span>
+                </Link>
+              </Button>
+              <Button
+                type="button"
+                size="sm"
+                onClick={onDelete}
+                disabled={deleteDisabled}
+                className="h-10 rounded-full bg-black/30 text-white backdrop-blur-md shadow-none hover:bg-destructive/70 focus-visible:ring-white/80"
+              >
+                <Trash2 className="size-4 sm:mr-2" />
+                <span className="hidden sm:inline">Delete</span>
+              </Button>
+            </div>
+          )}
         </div>
       </div>
 
