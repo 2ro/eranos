@@ -1,5 +1,6 @@
 import { clsx, type ClassValue } from "clsx"
 import { twMerge } from "tailwind-merge"
+import { AGORA_PRESET_KIND_VALUES } from "./feedFilterUtils"
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
@@ -9,12 +10,15 @@ export function cn(...inputs: ClassValue[]) {
  * Parse a kindFilter string into an array of kind numbers.
  * Supports:
  * - 'all' → undefined (no override)
+ * - 'agora' → the AGORA_PRESET_KIND_VALUES set (Campaigns, Pledges,
+ *             Communities, Posts, Articles, Events, Polls, Photos, Videos)
  * - 'custom' → parse customKindText as comma/space-separated numbers
  * - Single kind number (e.g. '1') → [1]
  * - Comma-separated kind numbers (e.g. '1,30023,20') → [1, 30023, 20]
  */
 export function parseKindFilter(kindFilter: string, customKindText?: string): number[] | undefined {
   if (kindFilter === 'all' || kindFilter === '') return undefined;
+  if (kindFilter === 'agora') return AGORA_PRESET_KIND_VALUES.map(Number);
   if (kindFilter === 'custom') {
     if (!customKindText) return undefined;
     const parsed = customKindText.trim().split(/[\s,]+/).map(Number).filter((n) => Number.isInteger(n) && n > 0);
