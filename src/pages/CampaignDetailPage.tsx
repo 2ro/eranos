@@ -297,6 +297,19 @@ function CampaignDetailContent({ campaign }: { campaign: ParsedCampaign }) {
           setDeleteConfirmOpen(false);
           void queryClient.invalidateQueries({ queryKey: ['campaign', campaign.pubkey, campaign.identifier] });
           void queryClient.invalidateQueries({ queryKey: ['campaigns'] });
+          void queryClient.invalidateQueries({ queryKey: ['campaigns-all'] });
+          // Campaigns may be attached to an organization via an `A` tag;
+          // refresh the org's activity shelf so the deleted campaign drops
+          // off without a page refresh.
+          const orgATag = campaign.event.tags.find(([n]) => n === 'A')?.[1];
+          if (orgATag) {
+            void queryClient.invalidateQueries({ queryKey: ['organization-activity', orgATag] });
+          }
+          // Country-tagged campaigns surface in the country feed.
+          if (campaign.countryCode) {
+            void queryClient.invalidateQueries({ queryKey: ['agora-feed-paginated', campaign.countryCode] });
+            void queryClient.invalidateQueries({ queryKey: ['agora-feed-new-posts', campaign.countryCode] });
+          }
           navigate('/');
         },
         onError: (error: unknown) => {
@@ -516,7 +529,8 @@ function CampaignDetailContent({ campaign }: { campaign: ParsedCampaign }) {
         onOpenChange={(open) => {
           setDonateOpen(open);
           if (!open) {
-            queryClient.invalidateQueries({ queryKey: ['campaign-donations', campaign.aTag] });
+            queryClient.invalidateQueries({ queryKey: ['campaign-donations', 'events', campaign.aTag] });
+            queryClient.invalidateQueries({ queryKey: ['campaign-donations'] });
           }
         }}
         btcPrice={btcPrice}

@@ -3,7 +3,6 @@ import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useInView } from 'react-intersection-observer';
 import { nip19 } from 'nostr-tools';
 import { UserPlus, Loader2, CheckCircle2 } from 'lucide-react';
-import { useNostr } from '@nostrify/react';
 
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
@@ -17,9 +16,7 @@ import { useFollowList, useFollowActions } from '@/hooks/useFollowActions';
 import { useToast } from '@/hooks/useToast';
 import { useProfileUrl } from '@/hooks/useProfileUrl';
 import { useProfileFeed, filterByTab } from '@/hooks/useProfileFeed';
-import { useNostrPublish } from '@/hooks/useNostrPublish';
 import { useAddrEvent, type AddrCoords } from '@/hooks/useEvent';
-import { fetchFreshEvent } from '@/lib/fetchFreshEvent';
 import { parsePackEvent } from '@/lib/packUtils';
 import { PackFeedTab, MemberCard, MemberCardSkeleton } from '@/components/FollowPackDetailContent';
 import { genUserName } from '@/lib/genUserName';
@@ -278,10 +275,9 @@ type PackTab = 'feed' | 'members';
 
 function FollowPackView({ addr, relays }: { addr: AddrCoords; relays?: string[] }) {
   const { data: event, isLoading: eventLoading } = useAddrEvent(addr, relays);
-  const { nostr } = useNostr();
   const { user } = useCurrentUser();
   const { data: followList } = useFollowList();
-  const { mutateAsync: publishEvent } = useNostrPublish();
+  const { followMany } = useFollowActions();
   const { toast } = useToast();
   const navigate = useNavigate();
   const [loginOpen, setLoginOpen] = useState(false);
@@ -309,35 +305,12 @@ function FollowPackView({ addr, relays }: { addr: AddrCoords; relays?: string[] 
 
   const bannerUrl = image || authorMeta?.banner;
 
-  /** Follow All using fetch-fresh -> modify -> publish pattern. */
+  /** Follow All using the shared useFollowActions.followMany mutation. */
   const handleFollowAll = useCallback(async () => {
     if (!user) return;
     setIsFollowingAll(true);
     try {
-      // 1. Fetch freshest kind 3 from relays (not cache)
-      const prev = await fetchFreshEvent(nostr, {
-        kinds: [3],
-        authors: [user.pubkey],
-      });
-
-      // 2. Separate p-tags from non-p-tags to preserve relay hints, petnames, etc.
-      const existingPTags = prev?.tags.filter(([n]) => n === 'p') ?? [];
-      const nonPTags = prev?.tags.filter(([n]) => n !== 'p') ?? [];
-      const existingPubkeys = new Set(existingPTags.map(([, pk]) => pk));
-
-      // 3. Merge: add new pubkeys that aren't already followed
-      const newPTags = pubkeys
-        .filter((pk) => !existingPubkeys.has(pk))
-        .map((pk) => ['p', pk]);
-      const added = newPTags.length;
-
-      // 4. Publish with prev for published_at preservation
-      await publishEvent({
-        kind: 3,
-        content: prev?.content ?? '',
-        tags: [...nonPTags, ...existingPTags, ...newPTags],
-        prev: prev ?? undefined,
-      });
+      const added = await followMany(pubkeys);
 
       toast({
         title: allFollowed ? 'Already following all!' : 'Following all!',
@@ -355,7 +328,7 @@ function FollowPackView({ addr, relays }: { addr: AddrCoords; relays?: string[] 
     } finally {
       setIsFollowingAll(false);
     }
-  }, [user, pubkeys, nostr, publishEvent, toast, allFollowed]);
+  }, [user, pubkeys, followMany, toast, allFollowed]);
 
   if (eventLoading) {
     return (

@@ -49,7 +49,8 @@ import { createCountryIdentifier } from '@/lib/countryIdentifiers';
 import { useQueryClient } from '@tanstack/react-query';
 import { useToast } from '@/hooks/useToast';
 import { useAppContext } from '@/hooks/useAppContext';
-import type { EventStats } from '@/hooks/useTrending';
+import type { Nip85EventStats } from '@/hooks/useNip85Stats';
+import { invalidateEventStats } from '@/lib/invalidateEventStats';
 import { cn } from '@/lib/utils';
 import { notificationSuccess } from '@/lib/haptics';
 import { extractVideoUrls, extractAudioUrls, IMETA_MEDIA_URL_REGEX, IMETA_MEDIA_URL_TEST_REGEX, mimeFromExt } from '@/lib/mediaUrls';
@@ -258,6 +259,7 @@ export function ComposeBox({
   const { toast } = useToast();
   const { config } = useAppContext();
   const imageQuality = config.imageQuality;
+  const statsPubkey = config.nip85StatsPubkey;
   const isMobile = useIsMobile();
 
   // Build a stable localStorage key based on compose context.
@@ -908,6 +910,11 @@ export function ComposeBox({
 
       // Reset state
       queryClient.invalidateQueries({ queryKey: ['feed'] });
+      // Voice messages can surface in the home Agora activity feed (via
+      // the `t:Agora` marker on root messages and through the comment
+      // path on replies). Refresh both home feed queries.
+      queryClient.invalidateQueries({ queryKey: ['agora-feed'] });
+      queryClient.invalidateQueries({ queryKey: ['mixed-feed'] });
       if (replyTo) {
         if (isExternalRoot(replyTo)) {
           queryClient.invalidateQueries({ queryKey: ['nostr', 'comments'] });
@@ -916,7 +923,13 @@ export function ComposeBox({
           if (replyTo.kind !== 1) {
             queryClient.invalidateQueries({ queryKey: ['nostr', 'comments'] });
           }
+          // Bump comment count on the parent event so the UI updates.
+          invalidateEventStats(queryClient, replyTo, statsPubkey);
         }
+      } else if (canChooseDestination && selectedCountryCode) {
+        // Root voice message published to a country community feed.
+        queryClient.invalidateQueries({ queryKey: ['agora-feed-paginated', selectedCountryCode] });
+        queryClient.invalidateQueries({ queryKey: ['agora-feed-new-posts', selectedCountryCode] });
       }
       notificationSuccess();
       toast({ title: 'Voice message sent!', description: 'Your voice message has been published.' });
@@ -926,7 +939,7 @@ export function ComposeBox({
     } finally {
       setIsPublishingVoice(false);
     }
-  }, [user, voiceRecorder, uploadFile, buildContentWarningTags, customPublish, createEvent, onPublished, replyTo, queryClient, toast, onSuccess]);
+  }, [user, voiceRecorder, uploadFile, buildContentWarningTags, customPublish, createEvent, onPublished, replyTo, queryClient, toast, onSuccess, canChooseDestination, selectedCountryCode, statsPubkey]);
 
   const handleSubmit = async () => {
     if (!content.trim() || !user || charCount > MAX_CHARS) return;
@@ -1167,13 +1180,36 @@ export function ComposeBox({
       }
 
       resetComposeState();
-      // Optimistically bump the reply count on the parent event
+      // Optimistically bump the comment count on the parent event
       if (replyTo && !isExternalRoot(replyTo)) {
-        queryClient.setQueryData<EventStats>(['event-stats', replyTo.id], (prev) =>
-          prev ? { ...prev, replies: prev.replies + 1 } : prev,
+        queryClient.setQueryData<Nip85EventStats | null>(
+          ['nip85-event-stats', replyTo.id, statsPubkey],
+          (prev) => prev ? { ...prev, commentCount: prev.commentCount + 1 } : prev,
         );
       }
       queryClient.invalidateQueries({ queryKey: ['feed'] });
+      // Top-level kind 1 posts with the silent Agora tag (the default for
+      // user-authored notes) surface in the home Agora activity feed
+      // (useAgoraFeed / mixed-feed). Invalidate both so the post appears
+      // there without a refresh — over-invalidation is cheap here.
+      queryClient.invalidateQueries({ queryKey: ['agora-feed'] });
+      queryClient.invalidateQueries({ queryKey: ['mixed-feed'] });
+      // Top-level kind 1 posts surface on country pages too. Country posts
+      // route through `usePostComment` (which handles its own invalidation),
+      // but the top-level branch above publishes via `createEvent`, so we
+      // need to invalidate the country feed keys here. `selectedCountryCode`
+      // is null for global posts, in which case nothing extra needs to
+      // refresh (the global Agora feed is served by relays, not a per-country
+      // query). For drafts attached to a specific country via customPublish
+      // we conservatively invalidate the broader prefix.
+      if (canChooseDestination && selectedCountryCode && !replyTo) {
+        queryClient.invalidateQueries({ queryKey: ['agora-feed-paginated', selectedCountryCode] });
+        queryClient.invalidateQueries({ queryKey: ['agora-feed-new-posts', selectedCountryCode] });
+        setTimeout(() => {
+          queryClient.invalidateQueries({ queryKey: ['agora-feed-paginated', selectedCountryCode] });
+          queryClient.invalidateQueries({ queryKey: ['agora-feed-new-posts', selectedCountryCode] });
+        }, 3000);
+      }
       if (replyTo) {
         if (isExternalRoot(replyTo)) {
           queryClient.invalidateQueries({ queryKey: ['nostr', 'comments'] });
@@ -1188,7 +1224,7 @@ export function ComposeBox({
         }
       }
       if (quotedEvent) {
-        queryClient.invalidateQueries({ queryKey: ['event-stats', quotedEvent.id] });
+        invalidateEventStats(queryClient, quotedEvent, statsPubkey);
         queryClient.invalidateQueries({ queryKey: ['event-interactions', quotedEvent.id] });
       }
       notificationSuccess();
@@ -1250,6 +1286,19 @@ export function ComposeBox({
       await createEvent({ kind: 1068, content: finalContent, tags });
       resetComposeState();
       queryClient.invalidateQueries({ queryKey: ['feed'] });
+      // World-layer polls (iso3166 root) and Agora-marked polls surface
+      // in the home Agora activity feed.
+      queryClient.invalidateQueries({ queryKey: ['agora-feed'] });
+      queryClient.invalidateQueries({ queryKey: ['mixed-feed'] });
+      // Polls published with an iso3166 root surface on the country feed.
+      if (replyTo instanceof URL && replyTo.protocol === 'iso3166:') {
+        const countryCode = replyTo.pathname.toUpperCase();
+        queryClient.invalidateQueries({ queryKey: ['agora-feed-paginated', countryCode] });
+        queryClient.invalidateQueries({ queryKey: ['agora-feed-new-posts', countryCode] });
+      } else if (canChooseDestination && selectedCountryCode) {
+        queryClient.invalidateQueries({ queryKey: ['agora-feed-paginated', selectedCountryCode] });
+        queryClient.invalidateQueries({ queryKey: ['agora-feed-new-posts', selectedCountryCode] });
+      }
       notificationSuccess();
       toast({ title: 'Poll published!' });
       onSuccess?.();

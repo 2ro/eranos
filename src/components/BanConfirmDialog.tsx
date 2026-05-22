@@ -64,8 +64,25 @@ export function BanConfirmDialog({
       });
 
       // Invalidate community queries so the moderation overlay updates
-      // immediately (removes banned content without a page refresh).
-      await queryClient.invalidateQueries({ queryKey: ['community-members', communityATag] });
+      // immediately (removes banned content without a page refresh). The
+      // activity feed's key is `['community-activity-feed', <aTagsKey>]`
+      // where aTagsKey is a comma-joined list of the viewer's subscribed A
+      // tags. Predicate-match any feed whose aTagsKey contains this
+      // communityATag so the banned post disappears immediately.
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ['community-members', communityATag] }),
+        queryClient.invalidateQueries({
+          predicate: (q) => {
+            const [root, aTagsKey] = q.queryKey;
+            return root === 'community-activity-feed'
+              && typeof aTagsKey === 'string'
+              && aTagsKey.split(',').includes(communityATag);
+          },
+        }),
+        // Also refresh the organization-activity feed shown on the org
+        // detail page (used by the pledge/campaign shelves).
+        queryClient.invalidateQueries({ queryKey: ['organization-activity', communityATag] }),
+      ]);
 
       toast({ title: 'Post removed from organization' });
       setReason('');

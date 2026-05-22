@@ -109,8 +109,27 @@ function ActionShareMenu({ action }: { action: Action }) {
           ['a', `36639:${action.pubkey}:${action.id}`],
         ],
       });
-      await queryClient.invalidateQueries({ queryKey: ['agora-actions'] });
-      await queryClient.invalidateQueries({ queryKey: ['agora-action'] });
+      // Extract any organization `A` tag the pledge was associated with so
+      // the org's activity shelf and community feeds refresh too.
+      const orgATag = action.event.tags.find(([n]) => n === 'A')?.[1];
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ['agora-actions'] }),
+        queryClient.invalidateQueries({ queryKey: ['agora-action'] }),
+        ...(orgATag
+          ? [
+              queryClient.invalidateQueries({ queryKey: ['organization-activity', orgATag] }),
+              queryClient.invalidateQueries({ queryKey: ['community-actions', orgATag] }),
+              queryClient.invalidateQueries({
+                predicate: (q) => {
+                  const [root, aTagsKey] = q.queryKey;
+                  return root === 'community-activity-feed'
+                    && typeof aTagsKey === 'string'
+                    && aTagsKey.split(',').includes(orgATag);
+                },
+              }),
+            ]
+          : []),
+      ]);
       toast({ title: 'Pledge deleted' });
     } catch (error) {
       console.error('Failed to delete pledge:', error);

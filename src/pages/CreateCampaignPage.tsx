@@ -424,12 +424,26 @@ export function CreateCampaignPage() {
     },
     onSuccess: (campaign) => {
       void queryClient.invalidateQueries({ queryKey: ['campaign', campaign.pubkey, campaign.identifier] });
+      // Refresh the campaign list queries used by the home/discover/profile
+      // views so a newly launched (or just-edited) campaign shows up without
+      // a manual reload.
+      void queryClient.invalidateQueries({ queryKey: ['campaigns'] });
+      void queryClient.invalidateQueries({ queryKey: ['campaigns-all'] });
       const publishOrganizationATag = isEditMode
         ? authorizedOrgForAttachedATag?.community.aTag ?? ''
         : organizationATag;
       if (publishOrganizationATag) {
         void queryClient.invalidateQueries({ queryKey: ['organization-activity', publishOrganizationATag] });
       }
+      // Campaigns carrying a country code surface on that country's feed.
+      if (campaign.countryCode) {
+        void queryClient.invalidateQueries({ queryKey: ['agora-feed-paginated', campaign.countryCode] });
+        void queryClient.invalidateQueries({ queryKey: ['agora-feed-new-posts', campaign.countryCode] });
+      }
+      // Campaigns (kind 33863) also surface in the home Agora activity
+      // feed regardless of country code.
+      void queryClient.invalidateQueries({ queryKey: ['agora-feed'] });
+      void queryClient.invalidateQueries({ queryKey: ['mixed-feed'] });
       toast({
         title: isEditMode ? 'Campaign updated' : 'Campaign launched',
         description: isEditMode ? 'Your fundraiser changes are live.' : 'Your fundraiser is live.',

@@ -15,12 +15,9 @@ import { useAuthor } from '@/hooks/useAuthor';
 import { useAuthors } from '@/hooks/useAuthors';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useFollowList, useFollowActions } from '@/hooks/useFollowActions';
-import { useNostrPublish } from '@/hooks/useNostrPublish';
 import { useStreamPosts } from '@/hooks/useStreamPosts';
 import { useMuteList } from '@/hooks/useMuteList';
 import { isEventMuted } from '@/lib/muteHelpers';
-import { useNostr } from '@nostrify/react';
-import { fetchFreshEvent } from '@/lib/fetchFreshEvent';
 import { genUserName } from '@/lib/genUserName';
 import { parsePackEvent } from '@/lib/packUtils';
 import { VerifiedNip05Text } from '@/components/Nip05Badge';
@@ -139,10 +136,9 @@ export function PackMembersTab({
  */
 export function FollowPackDetailContent({ event }: { event: NostrEvent }) {
   const { toast } = useToast();
-  const { nostr } = useNostr();
   const { user } = useCurrentUser();
   const { data: followList } = useFollowList();
-  const { mutateAsync: publishEvent } = useNostrPublish();
+  const { followMany } = useFollowActions();
 
   const author = useAuthor(event.pubkey);
   const metadata = author.data?.metadata;
@@ -175,27 +171,7 @@ export function FollowPackDetailContent({ event }: { event: NostrEvent }) {
 
     setIsFollowingAll(true);
     try {
-      // 1. Fetch freshest kind 3 from relays (not cache)
-      const prev = await fetchFreshEvent(nostr, { kinds: [3], authors: [user.pubkey] });
-
-      // 2. Separate p-tags from non-p-tags to preserve relay hints, petnames, etc.
-      const existingPTags = prev?.tags.filter(([n]) => n === 'p') ?? [];
-      const nonPTags = prev?.tags.filter(([n]) => n !== 'p') ?? [];
-      const existingPubkeys = new Set(existingPTags.map(([, pk]) => pk));
-
-      // 3. Merge: add new pubkeys that aren't already followed
-      const newPTags = pubkeys
-        .filter((pk) => !existingPubkeys.has(pk))
-        .map((pk) => ['p', pk]);
-      const added = newPTags.length;
-
-      // 4. Publish with prev for published_at preservation
-      await publishEvent({
-        kind: 3,
-        content: prev?.content ?? '',
-        tags: [...nonPTags, ...existingPTags, ...newPTags],
-        prev: prev ?? undefined,
-      });
+      const added = await followMany(pubkeys);
 
       toast({
         title: 'Following all!',
@@ -213,7 +189,7 @@ export function FollowPackDetailContent({ event }: { event: NostrEvent }) {
     } finally {
       setIsFollowingAll(false);
     }
-  }, [user, pubkeys, nostr, publishEvent, toast]);
+  }, [user, pubkeys, followMany, toast]);
 
   const handleCopyLink = useCallback(() => {
     const dTag = event.tags.find(([n]) => n === 'd')?.[1] ?? '';

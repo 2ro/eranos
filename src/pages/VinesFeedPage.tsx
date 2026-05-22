@@ -41,7 +41,9 @@ import { useNostrPublish } from "@/hooks/useNostrPublish";
 import { useProfileUrl } from "@/hooks/useProfileUrl";
 import { useRepostStatus } from "@/hooks/useRepostStatus";
 import { useStreamKind } from "@/hooks/useStreamKind";
-import { type EventStats, useEventStats } from "@/hooks/useTrending";
+import { useEventStats } from "@/hooks/useTrending";
+import type { Nip85EventStats } from "@/hooks/useNip85Stats";
+import { invalidateEventStats } from "@/lib/invalidateEventStats";
 import { useUserZap } from "@/hooks/useUserZap";
 import { useUserReaction } from "@/hooks/useUserReaction";
 import { DITTO_RELAY } from "@/lib/appRelays";
@@ -143,6 +145,9 @@ export function VineHeartButton({
 	const userReaction = useUserReaction(event.id);
 	const { mutate: publishEvent } = useNostrPublish();
 	const queryClient = useQueryClient();
+	const { config } = useAppContext();
+	const statsPubkey = config.nip85StatsPubkey;
+	const statsKey = ["nip85-event-stats", event.id, statsPubkey] as const;
 	const hasReacted = !!userReaction;
 
 	const handleClick = (e: React.MouseEvent) => {
@@ -151,14 +156,11 @@ export function VineHeartButton({
 		impactLight();
 
 		// Optimistically update stats cache
-		const prevStats = queryClient.getQueryData<EventStats>([
-			"event-stats",
-			event.id,
-		]);
+		const prevStats = queryClient.getQueryData<Nip85EventStats | null>(statsKey);
 		if (prevStats) {
-			queryClient.setQueryData<EventStats>(["event-stats", event.id], {
+			queryClient.setQueryData<Nip85EventStats | null>(statsKey, {
 				...prevStats,
-				reactions: prevStats.reactions + 1,
+				reactionCount: prevStats.reactionCount + 1,
 			});
 		}
 		// Optimistically mark user as having reacted
@@ -175,13 +177,15 @@ export function VineHeartButton({
 				],
 			},
 			{
+				onSuccess: () => {
+					setTimeout(() => {
+						invalidateEventStats(queryClient, event, statsPubkey);
+					}, 3000);
+				},
 				onError: () => {
 					// Revert optimistic updates
 					if (prevStats) {
-						queryClient.setQueryData<EventStats>(
-							["event-stats", event.id],
-							prevStats,
-						);
+						queryClient.setQueryData<Nip85EventStats | null>(statsKey, prevStats);
 					}
 					queryClient.removeQueries({ queryKey: ["user-reaction", event.id] });
 				},
@@ -218,6 +222,9 @@ export function VineRepostButton({
 	const { mutate: publishEvent } = useNostrPublish();
 	const { mutate: deleteEvent } = useDeleteEvent();
 	const queryClient = useQueryClient();
+	const { config } = useAppContext();
+	const statsPubkey = config.nip85StatsPubkey;
+	const statsKey = ["nip85-event-stats", event.id, statsPubkey] as const;
 	const repostEventId = useRepostStatus(event.id);
 	const isReposted = !!repostEventId;
 
@@ -227,17 +234,14 @@ export function VineRepostButton({
 		impactLight();
 
 		const repostKind = getRepostKind(event.kind);
-		const prevStats = queryClient.getQueryData<EventStats>([
-			"event-stats",
-			event.id,
-		]);
+		const prevStats = queryClient.getQueryData<Nip85EventStats | null>(statsKey);
 
 		if (isReposted && repostEventId) {
 			// Undo repost
 			if (prevStats) {
-				queryClient.setQueryData<EventStats>(["event-stats", event.id], {
+				queryClient.setQueryData<Nip85EventStats | null>(statsKey, {
 					...prevStats,
-					reposts: Math.max(0, prevStats.reposts - 1),
+					repostCount: Math.max(0, prevStats.repostCount - 1),
 				});
 			}
 			const prevRepostStatus = queryClient.getQueryData([
@@ -249,12 +253,14 @@ export function VineRepostButton({
 			deleteEvent(
 				{ eventId: repostEventId, eventKind: repostKind },
 				{
+					onSuccess: () => {
+						setTimeout(() => {
+							invalidateEventStats(queryClient, event, statsPubkey);
+						}, 3000);
+					},
 					onError: () => {
 						if (prevStats)
-							queryClient.setQueryData<EventStats>(
-								["event-stats", event.id],
-								prevStats,
-							);
+							queryClient.setQueryData<Nip85EventStats | null>(statsKey, prevStats);
 						queryClient.setQueryData(
 							["user-repost", event.id],
 							prevRepostStatus,
@@ -265,9 +271,9 @@ export function VineRepostButton({
 		} else {
 			// Repost
 			if (prevStats) {
-				queryClient.setQueryData<EventStats>(["event-stats", event.id], {
+				queryClient.setQueryData<Nip85EventStats | null>(statsKey, {
 					...prevStats,
-					reposts: prevStats.reposts + 1,
+					repostCount: prevStats.repostCount + 1,
 				});
 			}
 			queryClient.setQueryData(["user-repost", event.id], "optimistic");
@@ -287,12 +293,14 @@ export function VineRepostButton({
 			publishEvent(
 				{ kind: repostKind, content: "", tags },
 				{
+					onSuccess: () => {
+						setTimeout(() => {
+							invalidateEventStats(queryClient, event, statsPubkey);
+						}, 3000);
+					},
 					onError: () => {
 						if (prevStats)
-							queryClient.setQueryData<EventStats>(
-								["event-stats", event.id],
-								prevStats,
-							);
+							queryClient.setQueryData<Nip85EventStats | null>(statsKey, prevStats);
 						queryClient.setQueryData(["user-repost", event.id], null);
 					},
 				},
