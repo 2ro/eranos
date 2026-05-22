@@ -1545,7 +1545,7 @@ function FollowersListModal({ pubkey, open, onOpenChange, displayName }: Followe
                 scroll on lg+ so it stays present while the right column
                 feeds new tab content underneath. */}
             {pubkey && (
-              <aside className="lg:sticky lg:top-4 lg:self-start lg:max-h-[calc(100vh-2rem)] lg:overflow-y-auto pb-4">
+              <aside className="lg:sticky lg:top-4 lg:self-start pb-4">
                 <ProfileIdentityRail
                   pubkey={pubkey}
                   isOwnProfile={isOwnProfile}
