@@ -11,7 +11,6 @@ import { useAppContext } from '@/hooks/useAppContext';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { NoteCard } from '@/components/NoteCard';
-import { FeedCard } from '@/components/FeedCard';
 import { SubHeaderBar } from '@/components/SubHeaderBar';
 import { TabButton } from '@/components/TabButton';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
@@ -241,21 +240,21 @@ export function NotificationsPage() {
             Log in to see your notifications.
           </div>
         ) : isLoading || !hasFetched ? (
-          <FeedCard className="mt-2 divide-y divide-border">
+          <div className="divide-y divide-border">
             {Array.from({ length: 4 }).map((_, i) => (
               <NotificationSkeleton key={i} />
             ))}
-          </FeedCard>
+          </div>
         ) : filteredGroups.length > 0 ? (
           <>
-            <FeedCard className="mt-2">
+            <div>
               {filteredGroups.map((group) => (
                 <GroupedNotificationView
                   key={group.key}
                   group={group}
                 />
               ))}
-            </FeedCard>
+            </div>
             {hasNextPage && (
               <div ref={scrollRef} className="py-4">
                 {isFetchingNextPage && (

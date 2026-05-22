@@ -13,8 +13,11 @@ export interface ProfileTabsProps {
  *
  * A focused alternative to the global `SubHeaderBar` — no arc decoration,
  * no hover slice tracking, no FAB-aware spacing. Just a clean horizontal
- * row with an animated underline marking the active tab. Designed for the
- * 4-tab profile case (Activity / Campaigns / Pledges / Posts).
+ * row with an animated underline marking the active tab. Used in two
+ * shapes on the profile page: a 3-tab content set on desktop (Activity /
+ * Campaigns / Pledges, alongside the sticky identity rail) and a 5-tab
+ * set on mobile (Overview / Activity / Campaigns / Community / Pledges,
+ * since the rail collapses into the Overview / Community tabs).
  *
  * Behavior:
  *  - Sticks to the top of its containing scroll context. The parent column

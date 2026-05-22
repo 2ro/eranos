@@ -72,8 +72,6 @@ export interface ProfileIdentityRailProps {
   campaigns: ParsedCampaign[];
   /** Aggregated campaign + raised stats for the stat block. */
   campaignStats: ProfileCampaignStats;
-  /** Pledges (kind 36639) created by this profile. */
-  pledgesCount: number;
   /**
    * The profile's pledges (kind 36639) — used to surface the latest one
    * in the rail when the profile has no campaigns. The rail picks the
@@ -135,7 +133,6 @@ export function ProfileIdentityRail({
   fieldsContent,
   campaigns,
   campaignStats,
-  pledgesCount,
   pledges,
   btcPrice,
   followersCount,
@@ -182,7 +179,7 @@ export function ProfileIdentityRail({
       {/* Avatar — overlaps the banner from inside the rail. Sits OUTSIDE
           the scroll container so its negative-margin overhang is never
           clipped by `overflow-y-auto`. */}
-      <AvatarBlock
+      <ProfileAvatarBlock
         metadata={metadata}
         displayName={displayName}
         status={status}
@@ -190,9 +187,113 @@ export function ProfileIdentityRail({
       />
 
       <div className="flex flex-col gap-5 mt-5 lg:flex-1 lg:min-h-0 lg:overflow-y-auto pb-4">
-        {/* Identity: name + NIP-05 + website + bio */}
-        <div className="space-y-1.5">
-          <h1 className="text-xl font-bold leading-tight break-words">
+        <ProfileIdentityHeader
+          pubkey={pubkey}
+          isOwnProfile={isOwnProfile}
+          metadata={metadata}
+          metadataEvent={metadataEvent}
+          displayName={displayName}
+          websiteHref={websiteHref}
+          isFollowing={isFollowing}
+          followPending={followPending}
+          canFollow={canFollow}
+          followersCount={followersCount}
+          followingCount={followingCount}
+          totalRaisedSats={campaignStats.totalRaisedSats}
+          btcPrice={btcPrice}
+          onchainCampaigns={onchainCampaigns}
+          onToggleFollow={onToggleFollow}
+          onMoreMenuOpen={onMoreMenuOpen}
+          onFollowQROpen={onFollowQROpen}
+          onDonate={onDonate}
+          onFollowersOpen={onFollowersOpen}
+          onFollowingOpen={onFollowingOpen}
+          onTabChange={onTabChange}
+          authorEvent={authorEvent}
+        />
+        <ProfileOverviewSections
+          pubkey={pubkey}
+          isOwnProfile={isOwnProfile}
+          campaigns={campaigns}
+          campaignStats={campaignStats}
+          pledges={pledges}
+          btcPrice={btcPrice}
+          fields={fields}
+          fieldsContent={fieldsContent}
+          onTabChange={onTabChange}
+        />
+      </div>
+    </div>
+  );
+}
+
+// ─── Identity header (name / bio / actions / stats) ─────────────────────────
+
+export interface ProfileIdentityHeaderProps {
+  pubkey: string;
+  isOwnProfile: boolean;
+  metadata: NostrMetadata | undefined;
+  metadataEvent: NostrEvent | undefined;
+  displayName: string;
+  /** Pre-sanitized website URL (`undefined` if none / unsafe). */
+  websiteHref: string | undefined;
+  isFollowing: boolean;
+  followPending: boolean;
+  canFollow: boolean;
+  followersCount: number;
+  followingCount: number;
+  totalRaisedSats: number;
+  btcPrice: number | undefined;
+  onchainCampaigns: ParsedCampaign[];
+  onToggleFollow: () => void;
+  onMoreMenuOpen: () => void;
+  onFollowQROpen: () => void;
+  onDonate: (campaign: ParsedCampaign) => void;
+  onFollowersOpen: () => void;
+  onFollowingOpen: () => void;
+  onTabChange: (tabId: string) => void;
+  authorEvent: NostrEvent | undefined;
+  className?: string;
+}
+
+/**
+ * The fixed identity block: name, NIP-05, website, bio, action bar, and
+ * top-level stat row (Followers / Following / Raised).
+ *
+ * Rendered inside `ProfileIdentityRail` on desktop and directly above the
+ * tab bar on mobile. Does NOT include the avatar — that lives outside any
+ * scroll container so its `-mt-16` overhang into the banner isn't clipped.
+ */
+export function ProfileIdentityHeader({
+  pubkey,
+  isOwnProfile,
+  metadata,
+  metadataEvent,
+  displayName,
+  websiteHref,
+  isFollowing,
+  followPending,
+  canFollow,
+  followersCount,
+  followingCount,
+  totalRaisedSats,
+  btcPrice,
+  onchainCampaigns,
+  onToggleFollow,
+  onMoreMenuOpen,
+  onFollowQROpen,
+  onDonate,
+  onFollowersOpen,
+  onFollowingOpen,
+  onTabChange,
+  authorEvent,
+  className,
+}: ProfileIdentityHeaderProps) {
+  return (
+    <div className={cn('flex flex-col gap-5', className)}>
+      {/* Identity: name + NIP-05 + website + bio */}
+      <div className="space-y-1.5">
+        <h1 className="text-xl font-bold leading-tight break-words">
           {metadataEvent ? (
             <EmojifiedText tags={metadataEvent.tags}>{displayName}</EmojifiedText>
           ) : displayName}
@@ -234,17 +335,72 @@ export function ProfileIdentityRail({
         onDonate={onDonate}
       />
 
-      {/* Stats: Followers + Following inline; Pledges + Raised below. */}
+      {/* Stats: Followers + Following inline; Raised below if applicable. */}
       <StatList
         followersCount={followersCount}
         followingCount={followingCount}
-        pledgesCount={pledgesCount}
-        totalRaisedSats={campaignStats.totalRaisedSats}
+        totalRaisedSats={totalRaisedSats}
         btcPrice={btcPrice}
         onFollowersOpen={onFollowersOpen}
         onFollowingOpen={onFollowingOpen}
         onTabChange={onTabChange}
       />
+    </div>
+  );
+}
+
+// ─── Overview sections (campaigns / latest pledge / orgs / fields) ──────────
+
+export interface ProfileOverviewSectionsProps {
+  pubkey: string;
+  isOwnProfile: boolean;
+  campaigns: ParsedCampaign[];
+  campaignStats: ProfileCampaignStats;
+  pledges: Action[];
+  btcPrice: number | undefined;
+  fields: { label: string; value: string }[];
+  fieldsContent: ReactNode;
+  onTabChange: (tabId: string) => void;
+  /** Render the Organizations grid inline (default true). Set false on
+   *  mobile when "Community" is a dedicated tab and orgs should not also
+   *  appear inside Overview. */
+  showOrganizations?: boolean;
+  className?: string;
+}
+
+/**
+ * The collection of secondary rail sections: active campaigns, a fallback
+ * "latest pledge" card when there are no campaigns, organizations the
+ * profile founded/moderates, and freeform kind-0 profile fields.
+ *
+ * On desktop these stack inside the identity rail. On mobile they become
+ * the content of the "Overview" tab (with `showOrganizations={false}` so
+ * the organizations list moves into the dedicated "Community" tab).
+ */
+export function ProfileOverviewSections({
+  pubkey,
+  isOwnProfile,
+  campaigns,
+  campaignStats,
+  pledges,
+  btcPrice,
+  fields,
+  fieldsContent,
+  onTabChange,
+  showOrganizations = true,
+  className,
+}: ProfileOverviewSectionsProps) {
+  return (
+    <div className={cn('flex flex-col gap-5', className)}>
+      {/* Profile fields (rendered upstream) — placed first so the
+          profile's own freeform metadata (links, addresses, etc.) is
+          the first thing visitors read, ahead of campaigns/orgs. */}
+      {fields.length > 0 && (
+        <section className="space-y-3">
+          <RailSectionHeader icon={null} title="Profile" />
+          <div className="space-y-3">{fieldsContent}</div>
+        </section>
+      )}
 
       {/* Active campaigns */}
       <RailCampaignsSection
@@ -256,7 +412,7 @@ export function ProfileIdentityRail({
 
       {/* Latest pledge — surfaced as a fallback when this profile has
           nothing in the Campaigns slot, so the rail still has a piece of
-          first-class Agora content above the orgs/fields sections. */}
+          first-class Agora content in the campaigns slot. */}
       {campaigns.length === 0 && pledges.length > 0 && (
         <RailLatestPledgeSection
           pledges={pledges}
@@ -267,33 +423,50 @@ export function ProfileIdentityRail({
       )}
 
       {/* Organizations */}
-      <RailOrganizationsSection pubkey={pubkey} />
+      {showOrganizations && <RailOrganizationsSection pubkey={pubkey} />}
+    </div>
+  );
+}
 
-      {/* Profile fields (rendered upstream) */}
-      {fields.length > 0 && (
-        <section className="space-y-3">
-          <RailSectionHeader icon={null} title="Profile" />
-          <div className="space-y-3">{fieldsContent}</div>
-        </section>
-      )}
-      </div>
+/**
+ * Standalone organizations section — same `RailOrganizationsSection`
+ * content used inside the rail's overview, but exposed as a top-level
+ * export so the mobile "Community" tab can render it directly.
+ *
+ * The rendering is identical to the rail's version (same grid, same
+ * "See all" overflow dialog). Wrapping it in its own export keeps the
+ * tab content honest about where the data is coming from and lets us
+ * swap in a richer layout later without touching ProfilePage.
+ */
+export function ProfileOrganizationsSection({ pubkey, className }: { pubkey: string; className?: string }) {
+  return (
+    <div className={cn('flex flex-col gap-5', className)}>
+      <RailOrganizationsSection pubkey={pubkey} />
     </div>
   );
 }
 
 // ─── Avatar block ────────────────────────────────────────────────────────────
 
-function AvatarBlock({
-  metadata,
-  displayName,
-  status,
-  onLightbox,
-}: {
+export interface ProfileAvatarBlockProps {
   metadata: NostrMetadata | undefined;
   displayName: string;
   status: { text: string | undefined; url: string | undefined } | undefined;
   onLightbox: (url: string) => void;
-}) {
+}
+
+/**
+ * Avatar + NIP-38 status bubble. Always rendered as the first thing below
+ * the banner; the avatar uses `-mt-16 md:-mt-20` to overlap into the banner
+ * area. Must NOT be wrapped in any element with `overflow: hidden` /
+ * `overflow-y: auto` or the overhang will be clipped.
+ */
+export function ProfileAvatarBlock({
+  metadata,
+  displayName,
+  status,
+  onLightbox,
+}: ProfileAvatarBlockProps) {
   const picture = metadata?.picture;
   return (
     <div className="relative">
@@ -452,7 +625,6 @@ function ActionBar({
 function StatList({
   followersCount,
   followingCount,
-  pledgesCount,
   totalRaisedSats,
   btcPrice,
   onFollowersOpen,
@@ -461,16 +633,16 @@ function StatList({
 }: {
   followersCount: number;
   followingCount: number;
-  pledgesCount: number;
   totalRaisedSats: number;
   btcPrice: number | undefined;
   onFollowersOpen: () => void;
   onFollowingOpen: () => void;
   onTabChange: (id: string) => void;
 }) {
-  // Secondary stat rows (one per row). Followers / Following live inline at
-  // the top; the campaign count was dropped because the rail's Campaigns
-  // section already displays the user's campaigns directly below.
+  // Secondary stat rows (one per row). Followers / Following live inline
+  // at the top. Campaigns and Pledges are intentionally not surfaced as
+  // counts here — the rail's Campaigns and (when relevant) Pledges
+  // sections below already show the underlying content directly.
   const rows: Array<{
     icon?: ReactNode;
     label: string;
@@ -478,13 +650,6 @@ function StatList({
     onClick?: () => void;
     show: boolean;
   }> = [
-    {
-      icon: <HandHeart className="size-3.5 text-primary" />,
-      label: pledgesCount === 1 ? 'Pledge' : 'Pledges',
-      value: formatNumber(pledgesCount),
-      onClick: () => onTabChange('pledges'),
-      show: pledgesCount > 0,
-    },
     {
       icon: <Bitcoin className="size-3.5 text-primary" />,
       label: 'Raised',

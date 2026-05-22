@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import type { ReactNode } from 'react';
 import { createPortal } from 'react-dom';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useInView } from 'react-intersection-observer';
@@ -50,10 +51,18 @@ import { FollowQRDialog } from '@/components/FollowQRDialog';
 import { ProfileRecoveryDialog } from '@/components/ProfileRecoveryDialog';
 import { GiveBadgeDialog } from '@/components/GiveBadgeDialog';
 import { useProfileCampaignStats } from '@/hooks/useProfileCampaignStats';
+import type { ProfileCampaignStats } from '@/hooks/useProfileCampaignStats';
 import { useActions } from '@/hooks/useActions';
+import type { Action } from '@/hooks/useActions';
 import { useBtcPrice } from '@/hooks/useBtcPrice';
 import { DonateDialog } from '@/components/DonateDialog';
-import { ProfileIdentityRail } from '@/components/profile/ProfileIdentityRail';
+import {
+  ProfileIdentityRail,
+  ProfileAvatarBlock,
+  ProfileIdentityHeader,
+  ProfileOverviewSections,
+  ProfileOrganizationsSection,
+} from '@/components/profile/ProfileIdentityRail';
 import { ProfileCampaignsTab } from '@/components/profile/ProfileCampaignsTab';
 import { ProfilePledgesTab } from '@/components/profile/ProfilePledgesTab';
 import { ProfileActivityTab } from '@/components/profile/ProfileActivityTab';
@@ -813,14 +822,135 @@ function ProfileBannerImage({ src, onClick }: { src: string; onClick: () => void
   );
 }
 
+// ----- Tab content router -----
+
+interface ProfileTabContentProps {
+  activeTab: string;
+  pubkey: string;
+  displayName: string;
+  isOwnProfile: boolean;
+  profileCampaignStats: ProfileCampaignStats;
+  allActions: Action[] | undefined;
+  btcPrice: number | undefined;
+  campaigns: ParsedCampaign[];
+  pledges: Action[];
+  fields: { label: string; value: string }[];
+  fieldsContent: ReactNode;
+  onTabChange: (tabId: string) => void;
+}
+
+/**
+ * Single source of truth for tab body rendering — used by both the
+ * desktop and mobile layouts. Desktop only ever passes one of
+ * `activity` / `campaigns` / `pledges`; mobile additionally passes
+ * `overview` and `community`.
+ */
+function ProfileTabContent({
+  activeTab,
+  pubkey,
+  displayName,
+  isOwnProfile,
+  profileCampaignStats,
+  allActions,
+  btcPrice,
+  campaigns,
+  pledges,
+  fields,
+  fieldsContent,
+  onTabChange,
+}: ProfileTabContentProps) {
+  if (activeTab === 'overview') {
+    return (
+      <div className="pt-5">
+        <ProfileOverviewSections
+          pubkey={pubkey}
+          isOwnProfile={isOwnProfile}
+          campaigns={campaigns}
+          campaignStats={profileCampaignStats}
+          pledges={pledges}
+          btcPrice={btcPrice}
+          fields={fields}
+          fieldsContent={fieldsContent}
+          onTabChange={onTabChange}
+          // Organizations has its own tab on mobile.
+          showOrganizations={false}
+        />
+      </div>
+    );
+  }
+
+  if (activeTab === 'community') {
+    return (
+      <div className="pt-5">
+        <ProfileOrganizationsSection pubkey={pubkey} />
+      </div>
+    );
+  }
+
+  if (activeTab === 'campaigns') {
+    return (
+      <ProfileCampaignsTab
+        pubkey={pubkey}
+        displayName={displayName}
+        isOwnProfile={isOwnProfile}
+        campaigns={profileCampaignStats.campaigns}
+        isLoading={profileCampaignStats.isVerifying && profileCampaignStats.campaigns.length === 0}
+      />
+    );
+  }
+
+  if (activeTab === 'pledges') {
+    return (
+      <ProfilePledgesTab
+        pubkey={pubkey}
+        displayName={displayName}
+        isOwnProfile={isOwnProfile}
+        pledges={pledges}
+        btcPrice={btcPrice}
+        isLoading={!allActions}
+      />
+    );
+  }
+
+  // Default — activity.
+  return <ProfileActivityTab pubkey={pubkey} displayName={displayName} />;
+}
+
 // ----- Main Component -----
 
-const DEFAULT_TAB_LABELS = ['Activity', 'Campaigns', 'Pledges'];
+// Desktop (lg+) keeps the focused 3-tab content set; the rail to the
+// left already shows the profile's Overview information (campaigns,
+// orgs, fields), so duplicating it as a tab would be redundant.
+const DESKTOP_TAB_LABELS = ['Activity', 'Campaigns', 'Pledges'];
 
-// Map from display label → internal tab id for core tabs
+// Below lg the left rail is unavailable, so its content becomes the
+// default "Overview" tab and organizations get their own "Community"
+// tab. Order matters — "Overview" is the default on first mount.
+const MOBILE_TAB_LABELS = ['Overview', 'Activity', 'Campaigns', 'Community', 'Pledges'];
+
+// Map from display label → internal tab id.
 const CORE_TAB_IDS: Record<string, string> = {
-  'Activity': 'activity', 'Campaigns': 'campaigns', 'Pledges': 'pledges',
+  'Overview': 'overview',
+  'Activity': 'activity',
+  'Campaigns': 'campaigns',
+  'Community': 'community',
+  'Pledges': 'pledges',
 };
+
+const KNOWN_TAB_IDS = new Set(['overview', 'activity', 'campaigns', 'community', 'pledges']);
+const DESKTOP_TAB_IDS = new Set(['activity', 'campaigns', 'pledges']);
+
+/**
+ * Read the viewport at first render to pick the initial active tab.
+ * `lg` is Tailwind's 1024px breakpoint and matches the grid boundary
+ * where the desktop two-column layout kicks in. Doing this in
+ * `useState`'s initializer (instead of `useEffect`) avoids a flash of
+ * "activity" on mobile before the effect runs.
+ */
+function getInitialActiveTab(): string {
+  if (typeof window === 'undefined' || !window.matchMedia) return 'activity';
+  return window.matchMedia('(min-width: 1024px)').matches ? 'activity' : 'overview';
+}
 
 export function ProfilePage() {
   const { config } = useAppContext();
@@ -830,7 +960,7 @@ export function ProfilePage() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  const [activeTab, setActiveTab] = useState<CoreProfileTab | string>('activity');
+  const [activeTab, setActiveTab] = useState<CoreProfileTab | string>(getInitialActiveTab);
   const [moreMenuOpen, setMoreMenuOpen] = useState(false);
   const [followQROpen, setFollowQROpen] = useState(false);
   const [followingModalOpen, setFollowingModalOpen] = useState(false);
@@ -1016,29 +1146,43 @@ function FollowersListModal({ pubkey, open, onOpenChange, displayName }: Followe
   );
 }
 
-  // Static tab list — the same Agora-first defaults for every profile.
-  // The page no longer reads or writes kind 16769.
-  const viewTabs = useMemo(
-    () => DEFAULT_TAB_LABELS.map((label) => ({ label })),
+  // Two tab lists — mobile (Overview + Community visible) and desktop
+  // (only the three content tabs; the rail covers Overview / Community
+  // visually). Both `ProfileTabs` instances feed the same `activeTab`,
+  // so cross-breakpoint navigation (e.g. clicking "See all" in the
+  // mobile Overview tab) Just Works.
+  const desktopTabs = useMemo(
+    () => DESKTOP_TAB_LABELS.map((label) => ({ id: CORE_TAB_IDS[label], label })),
+    [],
+  );
+  const mobileTabs = useMemo(
+    () => MOBILE_TAB_LABELS.map((label) => ({ id: CORE_TAB_IDS[label], label })),
     [],
   );
 
-  // Derive the ID of the first visible tab (used as default selection).
-  const firstTabId = useMemo(() => {
-    if (viewTabs.length === 0) return 'activity';
-    const first = viewTabs[0];
-    return CORE_TAB_IDS[first.label] ?? first.label;
-  }, [viewTabs]);
-
-  // Keep the active tab in sync if it ever falls out of the recognized set
-  // (e.g. on first mount, or if a user navigates with a stale tab id).
+  // Keep the active tab in sync if it ever falls out of the recognized
+  // set. The desktop case also redirects mobile-only tabs (`overview`,
+  // `community`) back to `activity` so a user resizing from mobile to
+  // desktop while on Overview doesn't end up looking at an empty
+  // content column (the rail already shows what they were viewing).
   useEffect(() => {
-    const isCoreTab = ['campaigns', 'pledges', 'activity'].includes(activeTab);
-    if (!isCoreTab) {
-      setActiveTab(firstTabId);
+    const isKnown = KNOWN_TAB_IDS.has(activeTab);
+    if (!isKnown) {
+      setActiveTab(getInitialActiveTab());
+      return;
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [firstTabId]);
+    if (typeof window === 'undefined' || !window.matchMedia) return;
+    const desktopMq = window.matchMedia('(min-width: 1024px)');
+    const onChange = () => {
+      if (desktopMq.matches && !DESKTOP_TAB_IDS.has(activeTab)) {
+        // Resizing from mobile → desktop while on a mobile-only tab.
+        setActiveTab('activity');
+      }
+    };
+    onChange();
+    desktopMq.addEventListener('change', onChange);
+    return () => desktopMq.removeEventListener('change', onChange);
+  }, [activeTab]);
 
   // Kind 0 — resolved from the author cache.
   const author = useAuthor(pubkey);
@@ -1091,10 +1235,6 @@ function FollowersListModal({ pubkey, open, onOpenChange, displayName }: Followe
   // Pledges (kind 36639) authored by this user. Filters the global pledges
   // list rather than issuing a separate per-author query.
   const { data: allActions } = useActions({ limit: 100 });
-  const profileActionsCount = useMemo(() => {
-    if (!pubkey || !allActions) return 0;
-    return allActions.filter((a) => a.pubkey === pubkey).length;
-  }, [allActions, pubkey]);
 
   // Donate dialog state. The header "Donate" button (only shown when the
   // profile has at least one campaign) opens this dialog. When the user
@@ -1212,17 +1352,20 @@ function FollowersListModal({ pubkey, open, onOpenChange, displayName }: Followe
           )}
         </div>
 
-        {/* Two-column profile body — identity rail on the left runs the
-            full height of the page (sticky on lg+), tabs + content on the
-            right are the only thing that changes when the user navigates.
-            Below lg the grid collapses to a single column and the rail
-            stacks above the tabs, which read top-down like a document. */}
+        {/* Two layouts share the same banner above. Desktop (lg+) keeps
+            the original two-column grid with the sticky identity rail on
+            the left; mobile reshapes the page so the avatar + identity
+            header sit directly above a 5-tab bar (Overview is the
+            default tab and surfaces what the rail would have shown).
+            Toggled by `hidden`/`lg:hidden` instead of `useIsMobile` so
+            there's no first-render flicker. */}
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
-          <div className="grid lg:grid-cols-[340px_minmax(0,1fr)] gap-6 lg:gap-10">
 
+          {/* ─── Desktop layout (lg+) ─── */}
+          <div className="hidden lg:grid lg:grid-cols-[340px_minmax(0,1fr)] gap-6 lg:gap-10">
             {/* Left column — identity rail. Sticky to the top of the page
-                scroll on lg+ so it stays present while the right column
-                feeds new tab content underneath. */}
+                scroll so it stays present while the right column feeds
+                new tab content underneath. */}
             {pubkey && (
               <aside className="lg:sticky lg:top-4 lg:self-start lg:h-[calc(100vh-2rem)] pb-4">
                 <ProfileIdentityRail
@@ -1242,7 +1385,6 @@ function FollowersListModal({ pubkey, open, onOpenChange, displayName }: Followe
                   ))}
                   campaigns={profileCampaignStats.campaigns}
                   campaignStats={profileCampaignStats}
-                  pledgesCount={profileActionsCount}
                   pledges={(allActions ?? []).filter((a) => a.pubkey === pubkey)}
                   btcPrice={btcPrice}
                   followersCount={followersCount}
@@ -1267,42 +1409,123 @@ function FollowersListModal({ pubkey, open, onOpenChange, displayName }: Followe
                 `min-w-0` is critical inside a grid track so long unbroken
                 text doesn't push the column wider than its fraction. */}
             <section className="min-w-0">
-              {/* Profile tabs — sticky at top of this column. */}
               <ProfileTabs
-                tabs={viewTabs.map((t) => ({ id: CORE_TAB_IDS[t.label] ?? t.label, label: t.label }))}
-                activeTab={activeTab}
+                tabs={desktopTabs}
+                activeTab={DESKTOP_TAB_IDS.has(activeTab) ? activeTab : 'activity'}
                 onChange={setActiveTab}
               />
-
-              {/* Campaigns tab. */}
-              {activeTab === 'campaigns' && pubkey && (
-                <ProfileCampaignsTab
+              {pubkey && (
+                <ProfileTabContent
+                  activeTab={DESKTOP_TAB_IDS.has(activeTab) ? activeTab : 'activity'}
                   pubkey={pubkey}
                   displayName={displayName}
                   isOwnProfile={isOwnProfile}
-                  campaigns={profileCampaignStats.campaigns}
-                  isLoading={profileCampaignStats.isVerifying && profileCampaignStats.campaigns.length === 0}
-                />
-              )}
-
-              {/* Pledges tab. */}
-              {activeTab === 'pledges' && pubkey && (
-                <ProfilePledgesTab
-                  pubkey={pubkey}
-                  displayName={displayName}
-                  isOwnProfile={isOwnProfile}
-                  pledges={(allActions ?? []).filter((a) => a.pubkey === pubkey)}
+                  profileCampaignStats={profileCampaignStats}
+                  allActions={allActions}
                   btcPrice={btcPrice}
-                  isLoading={!allActions}
+                  campaigns={profileCampaignStats.campaigns}
+                  pledges={(allActions ?? []).filter((a) => a.pubkey === pubkey)}
+                  fields={fields}
+                  fieldsContent={fields.map((field, i) => (
+                    <ProfileFieldInline key={i} field={field} />
+                  ))}
+                  onTabChange={setActiveTab}
                 />
-              )}
-
-              {/* Activity — Agora feed scoped to this author. */}
-              {activeTab === 'activity' && pubkey && (
-                <ProfileActivityTab pubkey={pubkey} displayName={displayName} />
               )}
             </section>
           </div>
+
+          {/* ─── Mobile layout (<lg) ─── */}
+          {pubkey && (
+            <div className="lg:hidden">
+              {author.isLoading ? (
+                <div className="flex flex-col gap-5 pt-2">
+                  <Skeleton className="size-28 md:size-32 rounded-full -mt-16 md:-mt-20 border-4 border-background" />
+                  <div className="space-y-2">
+                    <Skeleton className="h-6 w-40" />
+                    <Skeleton className="h-4 w-32" />
+                    <Skeleton className="h-4 w-full mt-2" />
+                    <Skeleton className="h-4 w-3/4" />
+                  </div>
+                  <Skeleton className="h-10 w-full rounded-full" />
+                </div>
+              ) : (
+                <>
+                  {/* Avatar sits outside any subsequent scroll/overflow
+                      container so the `-mt-16` overhang into the banner
+                      isn't clipped. */}
+                  <ProfileAvatarBlock
+                    metadata={metadata}
+                    displayName={displayName}
+                    status={feedSettings.showUserStatuses !== false && profileStatus.status
+                      ? { text: profileStatus.status, url: profileStatus.url ?? undefined }
+                      : undefined}
+                    onLightbox={(url) => setLightboxImage(url)}
+                  />
+
+                  {/* Persistent identity header above the tab bar — name,
+                      bio, action bar, and the top-level stats row. */}
+                  <ProfileIdentityHeader
+                    className="mt-5"
+                    pubkey={pubkey}
+                    isOwnProfile={isOwnProfile}
+                    metadata={metadata}
+                    metadataEvent={metadataEvent}
+                    displayName={displayName}
+                    websiteHref={(() => {
+                      if (!metadata?.website) return undefined;
+                      const candidate = metadata.website.startsWith('http')
+                        ? metadata.website
+                        : `https://${metadata.website}`;
+                      return sanitizeUrl(candidate);
+                    })()}
+                    isFollowing={isFollowing}
+                    followPending={followPending}
+                    canFollow={!!user}
+                    followersCount={followersCount}
+                    followingCount={profileFollowing?.count ?? 0}
+                    totalRaisedSats={profileCampaignStats.totalRaisedSats}
+                    btcPrice={btcPrice}
+                    onchainCampaigns={profileCampaignStats.campaigns.filter((c) => c.wallet?.mode === 'onchain')}
+                    onToggleFollow={handleToggleFollow}
+                    onMoreMenuOpen={() => setMoreMenuOpen(true)}
+                    onFollowQROpen={() => setFollowQROpen(true)}
+                    onDonate={openDonateForCampaign}
+                    onFollowersOpen={() => setFollowersModalOpen(true)}
+                    onFollowingOpen={() => setFollowingModalOpen(true)}
+                    onTabChange={setActiveTab}
+                    authorEvent={authorEvent}
+                  />
+
+                  {/* Tab bar — sticky to the top of the page scroll once
+                      it leaves the viewport. Sits right below the stats. */}
+                  <div className="mt-5 min-w-0">
+                    <ProfileTabs
+                      tabs={mobileTabs}
+                      activeTab={activeTab}
+                      onChange={setActiveTab}
+                    />
+                    <ProfileTabContent
+                      activeTab={activeTab}
+                      pubkey={pubkey}
+                      displayName={displayName}
+                      isOwnProfile={isOwnProfile}
+                      profileCampaignStats={profileCampaignStats}
+                      allActions={allActions}
+                      btcPrice={btcPrice}
+                      campaigns={profileCampaignStats.campaigns}
+                      pledges={(allActions ?? []).filter((a) => a.pubkey === pubkey)}
+                      fields={fields}
+                      fieldsContent={fields.map((field, i) => (
+                        <ProfileFieldInline key={i} field={field} />
+                      ))}
+                      onTabChange={setActiveTab}
+                    />
+                  </div>
+                </>
+              )}
+            </div>
+          )}
         </div>
 
         {/* Profile More Menu */}
