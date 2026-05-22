@@ -312,7 +312,7 @@ export function CalendarEventDetailPage({ event }: { event: NostrEvent }) {
         : 'Choose your RSVP';
 
   const eventDetailsCard = (
-    <Card className="overflow-hidden border-0 bg-transparent shadow-none lg:border lg:bg-card lg:shadow-sm">
+    <Card className="rounded-none border-0 bg-transparent shadow-none lg:rounded-xl lg:border lg:bg-card lg:shadow-sm">
       <CardContent className="p-0 lg:p-5 space-y-5">
         <div className="space-y-3">
           <div className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Hosted by</div>
