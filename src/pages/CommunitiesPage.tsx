@@ -363,7 +363,7 @@ function CommunitiesHero({ onCreateCommunity }: CommunitiesHeroProps) {
       <div className="relative max-w-5xl mx-auto px-4 sm:px-6 py-10 sm:py-12 lg:py-14 min-h-[380px] sm:min-h-[420px] lg:min-h-[460px] flex flex-col items-center text-center">
         <div className="relative space-y-3 max-w-3xl">
           <p className="text-xs sm:text-sm font-semibold uppercase tracking-[0.18em] text-white/85 drop-shadow">
-            Organize
+            Groups
           </p>
           <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight leading-[1.05] text-white drop-shadow-[0_2px_12px_rgb(0_0_0/0.55)]">
             Strength

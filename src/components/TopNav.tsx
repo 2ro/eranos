@@ -34,8 +34,8 @@ interface NavItem {
 
 const NAV_ITEMS: NavItem[] = [
   { label: 'Activity', to: '/feed', icon: Activity },
-  { label: 'Support', to: '/campaigns/all', icon: HandHeart },
-  { label: 'Organize', to: '/communities', icon: Users },
+  { label: 'Campaigns', to: '/campaigns/all', icon: HandHeart },
+  { label: 'Groups', to: '/communities', icon: Users },
   { label: 'Pledge', to: '/pledges', icon: Megaphone },
 ];
 
