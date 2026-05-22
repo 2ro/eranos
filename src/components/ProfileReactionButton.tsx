@@ -1,14 +1,17 @@
 import { useState, useRef, useCallback } from 'react';
 import { SmilePlus } from 'lucide-react';
+import { useQueryClient } from '@tanstack/react-query';
 
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { QuickReactMenu } from '@/components/QuickReactMenu';
 import { Button } from '@/components/ui/button';
+import { useAppContext } from '@/hooks/useAppContext';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useNostrPublish } from '@/hooks/useNostrPublish';
 import { useEmojiUsage } from '@/hooks/useEmojiUsage';
 import { useToast } from '@/hooks/useToast';
 import { impactLight } from '@/lib/haptics';
+import { invalidateEventStats } from '@/lib/invalidateEventStats';
 import type { NostrEvent } from '@nostrify/nostrify';
 
 interface ProfileReactionButtonProps {
@@ -28,6 +31,9 @@ export function ProfileReactionButton({ profileEvent, className }: ProfileReacti
   const { mutate: publishEvent } = useNostrPublish();
   const { trackEmojiUsage } = useEmojiUsage();
   const { toast } = useToast();
+  const queryClient = useQueryClient();
+  const { config } = useAppContext();
+  const statsPubkey = config.nip85StatsPubkey;
   const [menuOpen, setMenuOpen] = useState(false);
   const pickerExpandedRef = useRef(false);
   const justClosedRef = useRef(false);
@@ -56,10 +62,23 @@ export function ProfileReactionButton({ profileEvent, className }: ProfileReacti
       {
         onSuccess: () => {
           toast({ title: 'Reaction sent!' });
+          // Bump reaction count on the profile. Profile reactions target the
+          // kind 0 event by id, so useNip85EventStats refresh covers it. Also
+          // refresh the addressable `0:<pubkey>:` key in case any consumer
+          // reads profile stats via useNip85AddrStats.
+          setTimeout(() => {
+            invalidateEventStats(queryClient, profileEvent, statsPubkey);
+            queryClient.invalidateQueries({
+              queryKey: ['nip85-addr-stats', `0:${profileEvent.pubkey}:`, statsPubkey],
+            });
+            queryClient.invalidateQueries({
+              queryKey: ['nip85-addr-stats', `0:${profileEvent.pubkey}:`],
+            });
+          }, 3000);
         },
       },
     );
-  }, [user, profileEvent, publishEvent, trackEmojiUsage, toast]);
+  }, [user, profileEvent, publishEvent, trackEmojiUsage, toast, queryClient, statsPubkey]);
 
   if (!user) return null;
 

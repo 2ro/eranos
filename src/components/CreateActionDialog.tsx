@@ -298,6 +298,7 @@ export function CreateActionDialog({ countryCode, communityATag, open, onOpenCha
       if (communityATag) {
         await Promise.all([
           queryClient.invalidateQueries({ queryKey: ['community-actions', communityATag] }),
+          queryClient.invalidateQueries({ queryKey: ['organization-activity', communityATag] }),
           queryClient.invalidateQueries({
             predicate: (q) => {
               const [root, aTagsKey] = q.queryKey;
