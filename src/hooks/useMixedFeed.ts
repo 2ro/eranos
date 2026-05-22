@@ -153,6 +153,31 @@ export function useMixedFeed(mode: FeedMode, enabled: boolean) {
     [agoraFeed.events],
   );
 
+  // When the Nostr layer is active, clip the Agora layer to the recency
+  // window the Nostr layer has already loaded. Without this, the Nostr
+  // firehose advances its `until` cursor by minutes per page while the
+  // (sparser) Agora layer covers weeks per page — so at the bottom of
+  // the merged feed only Agora items remain, giving the impression that
+  // the "All Nostr" feed has degenerated back into the Agora-only feed.
+  //
+  // The clip floor is the oldest Nostr item we've loaded. Agora items
+  // older than that are held back until the Nostr layer paginates far
+  // enough to keep them company.
+  const nostrFloor = useMemo<number | null>(() => {
+    if (!useNostr || nostrItems.length === 0) return null;
+    let oldest = nostrItems[0].sortTimestamp;
+    for (const item of nostrItems) {
+      if (item.sortTimestamp < oldest) oldest = item.sortTimestamp;
+    }
+    return oldest;
+  }, [useNostr, nostrItems]);
+
+  const visibleAgoraItems = useMemo<FeedItem[]>(() => {
+    if (!useNostr) return agoraItems;
+    if (nostrFloor === null) return [];
+    return agoraItems.filter((item) => item.sortTimestamp >= nostrFloor);
+  }, [useNostr, agoraItems, nostrFloor]);
+
   // Merge both layers, dedupe by event id, apply mute filter, sort newest-first.
   const items = useMemo<FeedItem[]>(() => {
     const seen = new Map<string, FeedItem>();
@@ -166,25 +191,55 @@ export function useMixedFeed(mode: FeedMode, enabled: boolean) {
         seen.set(key, item);
       }
     };
-    for (const item of agoraItems) consider(item);
+    for (const item of visibleAgoraItems) consider(item);
     for (const item of nostrItems) consider(item);
     return Array.from(seen.values()).sort((a, b) => b.sortTimestamp - a.sortTimestamp);
-  }, [agoraItems, nostrItems, muteItems]);
+  }, [visibleAgoraItems, nostrItems, muteItems]);
 
-  // Unified pagination — advance both layers in lockstep when more is available.
+  // Unified pagination. The Agora layer is sparser than Nostr, so it
+  // exhausts its pages first. Once that happens, only Nostr keeps
+  // advancing — which is fine because we already clip Agora to the
+  // Nostr recency window. We only fetch Agora when the Nostr floor is
+  // about to dip below the Agora floor (i.e. we're about to scroll into
+  // a region where the Agora buffer is empty).
   const agoraHasNext = agoraFeed.hasNextPage;
   const agoraFetchNext = agoraFeed.fetchNextPage;
   const nostrHasNext = nostrLayer.hasNextPage;
   const nostrFetchNext = nostrLayer.fetchNextPage;
 
-  const fetchNextPage = useCallback(async () => {
-    await Promise.all([
-      agoraHasNext ? agoraFetchNext() : Promise.resolve(),
-      useNostr && nostrHasNext ? nostrFetchNext() : Promise.resolve(),
-    ]);
-  }, [agoraHasNext, agoraFetchNext, useNostr, nostrHasNext, nostrFetchNext]);
+  // Oldest Agora item currently loaded — used to decide whether we need
+  // to fetch more Agora when the Nostr cursor advances past it.
+  const agoraFloor = useMemo<number | null>(() => {
+    if (agoraItems.length === 0) return null;
+    let oldest = agoraItems[0].sortTimestamp;
+    for (const item of agoraItems) {
+      if (item.sortTimestamp < oldest) oldest = item.sortTimestamp;
+    }
+    return oldest;
+  }, [agoraItems]);
 
-  const hasNextPage = !!agoraHasNext || (useNostr && !!nostrHasNext);
+  const fetchNextPage = useCallback(async () => {
+    if (!useNostr) {
+      // Pure Agora mode — just advance Agora.
+      if (agoraHasNext) await agoraFetchNext();
+      return;
+    }
+    // Mixed mode: always advance Nostr (it's the dense layer driving the
+    // scroll). Only advance Agora if its floor is at or above the Nostr
+    // floor — i.e. the Agora buffer is on the verge of being uncovered
+    // by further Nostr pagination. Otherwise we'd fetch Agora pages we
+    // can't display yet because they fall below the visible window.
+    const advanceAgora =
+      agoraHasNext && agoraFloor !== null && nostrFloor !== null && agoraFloor >= nostrFloor;
+    await Promise.all([
+      nostrHasNext ? nostrFetchNext() : Promise.resolve(),
+      advanceAgora ? agoraFetchNext() : Promise.resolve(),
+    ]);
+  }, [useNostr, agoraHasNext, agoraFetchNext, agoraFloor, nostrHasNext, nostrFetchNext, nostrFloor]);
+
+  const hasNextPage = useNostr
+    ? !!nostrHasNext || !!agoraHasNext
+    : !!agoraHasNext;
   const isFetchingNextPage = agoraFeed.isFetchingNextPage
     || (useNostr && nostrLayer.isFetchingNextPage);
   const isLoading = agoraFeed.isLoading || (useNostr && nostrLayer.isPending);
