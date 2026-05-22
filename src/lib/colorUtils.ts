@@ -150,10 +150,19 @@ function darken(hsl: string, amount: number): string {
   return formatHsl(h, s, Math.max(0, l - amount));
 }
 
-/** Get a contrast foreground (white or dark) for a given background. */
+/** Get a contrast foreground (white or dark) for a given background.
+ *
+ * Picks white text when the background's relative luminance is below ~0.55
+ * (covers most saturated brand colors — orange, red, blue, purple, green — at
+ * mid lightness), and dark text only for genuinely light backgrounds (pale
+ * pastels, white). The previous threshold (luminance < 0.2 = dark) classified
+ * almost every saturated mid-lightness color as "light" and painted dark text
+ * on top, which looks washed-out on the orange brand primary. */
 function contrastForeground(bgHsl: string): string {
-  const dark = isDarkTheme(bgHsl);
-  return dark ? '0 0% 100%' : '222.2 84% 4.9%';
+  const { h, s, l } = parseHsl(bgHsl);
+  const [r, g, b] = hslToRgb(h, s, l);
+  const luminance = getLuminance(r, g, b);
+  return luminance < 0.55 ? '0 0% 100%' : '222.2 84% 4.9%';
 }
 
 // ─── Auto-Derive Full Token Set from Core Colors ──────────────────────
