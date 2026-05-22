@@ -704,7 +704,8 @@
 }
 
 /* Slow Ken-Burns-style pan for full-bleed hero images. The image is
-   oversized (scale 1.12) so the translation never reveals the edge. */
+   oversized (scale 1.12) so the translation never reveals the edge.
+   Used by HeroBanner on Communities/Actions/Guide pages. */
 @keyframes heroPanRight {
   0%   { transform: scale(1.12) translateX(-1.5%); }
   50%  { transform: scale(1.12) translateX(1.5%); }
@@ -718,43 +719,36 @@
 .hero-pan-right { animation: heroPanRight 28s ease-in-out infinite; }
 .hero-pan-left  { animation: heroPanLeft 28s ease-in-out infinite; }
 
-/* Slow breathing glow used on the hero globe's outer halo so the beacon
-   feels alive rather than statically pasted. The radius itself doesn't
-   change — only opacity — so the layout stays rock-stable. Range is
-   intentionally narrow + low so the halo is felt, not seen. */
-@keyframes heroGlobeHaloBreath {
-  0%   { opacity: 0.32; }
-  50%  { opacity: 0.55; }
-  100% { opacity: 0.32; }
+/* Lightning-arc flow on the home hero. Each path is dashed and the
+   dash offset animates negative, producing the illusion of energy
+   traveling along the arc. Dash size and animation length are tuned
+   so the flow reads as continuous (not blinky) at any arc length. */
+@keyframes heroArcFlow {
+  0%   { stroke-dashoffset: 0; }
+  100% { stroke-dashoffset: -36; }
 }
-.hero-globe-halo-breath { animation: heroGlobeHaloBreath 6.5s ease-in-out infinite; }
+.hero-arc-flow {
+  stroke-dasharray: 1.2 4.5;
+  animation: heroArcFlow 4.5s linear infinite;
+}
+
+/* City-node pulse used on the home hero. The dot itself doesn't move;
+   we just breathe the halo's opacity so the location reads as a live
+   beacon. Offsets are staggered per-node from the JSX so the field
+   pulses organically rather than in lockstep. */
+@keyframes heroNodePulse {
+  0%   { opacity: 0.35; transform: scale(0.85); }
+  50%  { opacity: 0.95; transform: scale(1.15); }
+  100% { opacity: 0.35; transform: scale(0.85); }
+}
+.hero-node-pulse {
+  transform-origin: center;
+  transform-box: fill-box;
+  animation: heroNodePulse 3.2s ease-in-out infinite;
+}
 
 @media (prefers-reduced-motion: reduce) {
   .hero-pan-right, .hero-pan-left { animation: none; }
-  .hero-globe-halo-breath { animation: none; opacity: 0.42; }
-}
-
-/* Dark drop-shadow for hero copy — photo backgrounds are always colorful,
-   so we want a dark shadow regardless of light/dark theme. */
-.hero-text-shadow {
-  text-shadow:
-    0 2px 8px rgba(0, 0, 0, 0.8),
-    0 0 20px rgba(0, 0, 0, 0.45);
-}
-
-.hero-text-shadow-soft {
-  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.65);
-}
-
-/* On mobile the globe sits under the headline — soften its left edge. */
-.hero-globe-mask {
-  -webkit-mask-image: linear-gradient(to right, transparent 0%, black 48%, black 100%);
-  mask-image: linear-gradient(to right, transparent 0%, black 48%, black 100%);
-}
-
-@media (min-width: 640px) {
-  .hero-globe-mask {
-    -webkit-mask-image: none;
-    mask-image: none;
-  }
+  .hero-arc-flow { animation: none; stroke-dasharray: none; }
+  .hero-node-pulse { animation: none; opacity: 0.7; }
 }
