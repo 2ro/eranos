@@ -555,49 +555,75 @@ function GroupActionColumn({
   organizationName: string;
 }) {
   const createQuery = orgNaddr ? `?org=${orgNaddr}` : '';
-  const actionButtonClassName = 'h-auto justify-start gap-3 px-4 py-3 text-left';
 
   return (
-    <Card className="overflow-hidden border-0 bg-transparent shadow-none lg:border lg:bg-card lg:shadow-sm">
-      <CardContent className="space-y-5 p-0 lg:p-5">
-        <div className="space-y-3">
-          <div className="space-y-1">
-            <h2 className="text-lg font-semibold tracking-tight">Start something</h2>
-            <p className="text-sm text-muted-foreground">
-              Add an official campaign, pledge, or event for {organizationName}.
+    <Card className="overflow-hidden border-primary/15 bg-gradient-to-br from-card via-card to-primary/5 shadow-sm">
+      <CardContent className="relative space-y-4 p-4 sm:p-5">
+        <div aria-hidden className="absolute -right-12 -top-12 size-32 rounded-full bg-primary/10 blur-3xl" />
+        <div aria-hidden className="absolute -bottom-16 left-8 size-28 rounded-full bg-secondary/20 blur-3xl" />
+
+        <div className="relative flex items-start justify-between gap-3">
+          <div className="space-y-1.5">
+            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary">Official tools</p>
+            <h2 className="text-xl font-semibold tracking-tight">Start something</h2>
+            <p className="text-sm leading-5 text-muted-foreground">
+              Give {organizationName} a concrete next step.
             </p>
           </div>
-          <div className="grid gap-2">
-            <Button asChild variant="outline" className={actionButtonClassName}>
-              <Link to={`/campaigns/new${createQuery}`}>
-                <HandHeart className="size-5 shrink-0 text-primary" />
-                <span className="min-w-0">
-                  <span className="block font-semibold">Campaign</span>
-                  <span className="block text-xs font-normal text-muted-foreground">Raise funds</span>
-                </span>
-              </Link>
-            </Button>
-
-            <Button asChild variant="outline" className={actionButtonClassName}>
-              <Link to={`/pledges/new${createQuery}`}>
-                <Megaphone className="size-5 shrink-0 text-primary" />
-                <span className="min-w-0">
-                  <span className="block font-semibold">Pledge</span>
-                  <span className="block text-xs font-normal text-muted-foreground">Offer help</span>
-                </span>
-              </Link>
-            </Button>
-
-            <Button asChild variant="outline" className={actionButtonClassName}>
-              <Link to={`/events/new${createQuery}`}>
-                <CalendarDays className="size-5 shrink-0 text-primary" />
-                <span className="min-w-0">
-                  <span className="block font-semibold">Event</span>
-                  <span className="block text-xs font-normal text-muted-foreground">Get together</span>
-                </span>
-              </Link>
-            </Button>
+          <div className="hidden rounded-full border border-primary/15 bg-primary/10 p-2 text-primary sm:block lg:hidden xl:block">
+            <Users className="size-5" />
           </div>
+        </div>
+
+        <div className="relative grid grid-cols-2 gap-3">
+          <Link
+            to={`/campaigns/new${createQuery}`}
+            className="group col-span-2 overflow-hidden rounded-2xl border border-primary/20 bg-primary text-primary-foreground shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background motion-reduce:hover:translate-y-0"
+          >
+            <div className="relative min-h-32 p-4">
+              <div aria-hidden className="absolute -right-8 -top-8 size-28 rounded-full bg-white/15" />
+              <div className="relative flex h-full flex-col justify-between gap-6">
+                <div className="flex items-start justify-between gap-3">
+                  <span className="rounded-full bg-white/15 p-2 backdrop-blur">
+                    <HandHeart className="size-5" />
+                  </span>
+                  <ChevronRight className="size-5 transition-transform group-hover:translate-x-0.5" />
+                </div>
+                <span>
+                  <span className="block text-lg font-semibold">Launch a campaign</span>
+                  <span className="mt-1 block text-sm text-primary-foreground/80">Raise funds with an official group page.</span>
+                </span>
+              </div>
+            </div>
+          </Link>
+
+          <Link
+            to={`/pledges/new${createQuery}`}
+            className="group rounded-2xl border border-border/70 bg-background/70 p-4 shadow-sm transition-all hover:-translate-y-0.5 hover:border-primary/30 hover:bg-primary/5 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background motion-reduce:hover:translate-y-0"
+          >
+            <span className="mb-5 flex items-center justify-between gap-2">
+              <span className="rounded-full bg-primary/10 p-2 text-primary">
+                <Megaphone className="size-4" />
+              </span>
+              <ChevronRight className="size-4 text-muted-foreground transition-transform group-hover:translate-x-0.5 group-hover:text-primary" />
+            </span>
+            <span className="block font-semibold">Pledge</span>
+            <span className="mt-1 block text-xs leading-4 text-muted-foreground">Offer help people can act on.</span>
+          </Link>
+
+          <Link
+            to={`/events/new${createQuery}`}
+            className="group rounded-2xl border border-border/70 bg-background/70 p-4 shadow-sm transition-all hover:-translate-y-0.5 hover:border-primary/30 hover:bg-primary/5 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background motion-reduce:hover:translate-y-0"
+          >
+            <span className="mb-5 flex items-center justify-between gap-2">
+              <span className="rounded-full bg-primary/10 p-2 text-primary">
+                <CalendarDays className="size-4" />
+              </span>
+              <ChevronRight className="size-4 text-muted-foreground transition-transform group-hover:translate-x-0.5 group-hover:text-primary" />
+            </span>
+            <span className="block font-semibold">Event</span>
+            <span className="mt-1 block text-xs leading-4 text-muted-foreground">Bring supporters together.</span>
+          </Link>
         </div>
       </CardContent>
     </Card>
