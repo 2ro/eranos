@@ -9,13 +9,11 @@ import {
   Clock,
   Crown,
   HandHeart,
-  Info,
   MapPin,
   Megaphone,
   MoreVertical,
   Pencil,
   Shield,
-  Share2,
   Trash2,
   UserCheck,
   UserMinus,
@@ -551,15 +549,9 @@ function OfficialActivityShelves({
 function GroupActionColumn({
   orgNaddr,
   organizationName,
-  canCreate,
-  onShare,
-  onLeadership,
 }: {
   orgNaddr: string;
   organizationName: string;
-  canCreate: boolean;
-  onShare: () => void;
-  onLeadership: () => void;
 }) {
   const createQuery = orgNaddr ? `?org=${orgNaddr}` : '';
   const actionButtonClassName = 'h-auto justify-start gap-3 px-4 py-3 text-left';
@@ -567,58 +559,45 @@ function GroupActionColumn({
   return (
     <Card className="overflow-hidden border-0 bg-transparent shadow-none lg:border lg:bg-card lg:shadow-sm">
       <CardContent className="space-y-5 p-0 lg:p-5">
-        <div className="space-y-2">
-          <Button type="button" variant="outline" size="lg" className="w-full" onClick={onShare}>
-            <Share2 className="size-4 mr-2" />
-            Share
-          </Button>
-          <Button type="button" variant="outline" size="lg" className="w-full" onClick={onLeadership}>
-            <Users className="size-4 mr-2" />
-            View leadership
-          </Button>
-        </div>
-
-        {canCreate && (
-          <div className="space-y-3 border-t border-border/60 pt-4">
-            <div className="space-y-1">
-              <h2 className="text-lg font-semibold tracking-tight">Start something</h2>
-              <p className="text-sm text-muted-foreground">
-                Add an official campaign, pledge, or event for {organizationName}.
-              </p>
-            </div>
-            <div className="grid gap-2">
-              <Button asChild variant="outline" className={actionButtonClassName}>
-                <Link to={`/campaigns/new${createQuery}`}>
-                  <HandHeart className="size-5 shrink-0 text-primary" />
-                  <span className="min-w-0">
-                    <span className="block font-semibold">Campaign</span>
-                    <span className="block text-xs font-normal text-muted-foreground">Raise funds</span>
-                  </span>
-                </Link>
-              </Button>
-
-              <Button asChild variant="outline" className={actionButtonClassName}>
-                <Link to={`/pledges/new${createQuery}`}>
-                  <Megaphone className="size-5 shrink-0 text-primary" />
-                  <span className="min-w-0">
-                    <span className="block font-semibold">Pledge</span>
-                    <span className="block text-xs font-normal text-muted-foreground">Offer help</span>
-                  </span>
-                </Link>
-              </Button>
-
-              <Button asChild variant="outline" className={actionButtonClassName}>
-                <Link to={`/events/new${createQuery}`}>
-                  <CalendarDays className="size-5 shrink-0 text-primary" />
-                  <span className="min-w-0">
-                    <span className="block font-semibold">Event</span>
-                    <span className="block text-xs font-normal text-muted-foreground">Get together</span>
-                  </span>
-                </Link>
-              </Button>
-            </div>
+        <div className="space-y-3">
+          <div className="space-y-1">
+            <h2 className="text-lg font-semibold tracking-tight">Start something</h2>
+            <p className="text-sm text-muted-foreground">
+              Add an official campaign, pledge, or event for {organizationName}.
+            </p>
           </div>
-        )}
+          <div className="grid gap-2">
+            <Button asChild variant="outline" className={actionButtonClassName}>
+              <Link to={`/campaigns/new${createQuery}`}>
+                <HandHeart className="size-5 shrink-0 text-primary" />
+                <span className="min-w-0">
+                  <span className="block font-semibold">Campaign</span>
+                  <span className="block text-xs font-normal text-muted-foreground">Raise funds</span>
+                </span>
+              </Link>
+            </Button>
+
+            <Button asChild variant="outline" className={actionButtonClassName}>
+              <Link to={`/pledges/new${createQuery}`}>
+                <Megaphone className="size-5 shrink-0 text-primary" />
+                <span className="min-w-0">
+                  <span className="block font-semibold">Pledge</span>
+                  <span className="block text-xs font-normal text-muted-foreground">Offer help</span>
+                </span>
+              </Link>
+            </Button>
+
+            <Button asChild variant="outline" className={actionButtonClassName}>
+              <Link to={`/events/new${createQuery}`}>
+                <CalendarDays className="size-5 shrink-0 text-primary" />
+                <span className="min-w-0">
+                  <span className="block font-semibold">Event</span>
+                  <span className="block text-xs font-normal text-muted-foreground">Get together</span>
+                </span>
+              </Link>
+            </Button>
+          </div>
+        </div>
       </CardContent>
     </Card>
   );
@@ -632,7 +611,7 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
   const { toast } = useToast();
   const { user } = useCurrentUser();
   const [membersDialogOpen, setMembersDialogOpen] = useState(false);
-  const [descriptionDialogOpen, setDescriptionDialogOpen] = useState(false);
+  const [descriptionExpanded, setDescriptionExpanded] = useState(false);
   const [replyOpen, setReplyOpen] = useState(false);
   const [moreMenuOpen, setMoreMenuOpen] = useState(false);
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
@@ -646,20 +625,7 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
   const cover = sanitizeUrl(image);
   const communityATag = community?.aTag ?? '';
 
-  // Extract website URL from description
-  const descriptionUrl = useMemo(() => {
-    const urlMatch = description.match(/https?:\/\/[^\s]+/);
-    return sanitizeUrl(urlMatch?.[0]);
-  }, [description]);
-
-  const descriptionText = useMemo(() => {
-    if (!descriptionUrl) return description;
-    return description.replace(new RegExp(`\\s*${descriptionUrl.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\s*$`), '').trim();
-  }, [description, descriptionUrl]);
-
-  // Whether to render the description info button next to the title — true
-  // whenever there's any description text or a stripped trailing URL.
-  const descriptionExpandable = !!descriptionText || !!descriptionUrl;
+  const descriptionText = description.trim();
 
   /**
    * Synthesize a kind-1 pseudo-event so we can hand the description off to
@@ -674,14 +640,14 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
     kind: 1,
     created_at: event.created_at,
     tags: [],
-    content: description,
+    content: descriptionText,
     sig: '',
-  }), [description, event.id, event.pubkey, event.created_at]);
+  }), [descriptionText, event.id, event.pubkey, event.created_at]);
 
   // ── Members ─────────────────────────────────────────────────────────────────
   // Agora's organization model has only two trust tiers — founder and
-  // moderators. The "membership" list shown in the hero / members dialog
-  // is therefore exactly that roster, read directly from the parsed
+  // moderators. The member preview and dialog show exactly that roster,
+  // read directly from the parsed
   // community. `useCommunityMembers` still resolves moderation state
   // (content bans, reports) used by the comment thread below.
   const { moderation, rankMap, isLoading: membersLoading } = useCommunityMembers(community);
@@ -721,7 +687,8 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
   useAuthors(leadershipPubkeys);
 
   // Single section now — founder + moderators are all "Leadership".
-  // Members no longer exist in the organization model.
+  // The UI labels this roster as members, but the underlying org model is
+  // founder + moderators only.
   const memberSections = useMemo(() => {
     if (!community || leadershipPubkeys.length === 0) return [];
     return [{
@@ -803,23 +770,6 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
     [pinnedEvents],
   );
 
-  // ── Share handler ───────────────────────────────────────────────────────────
-  const handleShare = useCallback(async () => {
-    const d = event.tags.find(([n]) => n === 'd')?.[1] ?? '';
-    const naddr = nip19.naddrEncode({
-      kind: event.kind,
-      pubkey: event.pubkey,
-      identifier: d,
-    });
-    const url = `${window.location.origin}/${naddr}`;
-    try {
-      await navigator.clipboard.writeText(url);
-      toast({ title: 'Link copied to clipboard' });
-    } catch {
-      toast({ title: 'Failed to copy link', variant: 'destructive' });
-    }
-  }, [event, toast]);
-
   // ── Delete handler ─────────────────────────────────────────────────────────
   // Founder-only. Publishes a NIP-09 kind 5 deletion request referencing the
   // community definition (kind 34550) by both `e` and `a` tags so relays can
@@ -878,15 +828,13 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
 
   // ── Render ──────────────────────────────────────────────────────────────────
   const bannerActionClassName = 'p-2.5 rounded-full bg-black/30 text-white/90 backdrop-blur-md hover:text-white hover:bg-black/45 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80 disabled:opacity-50 disabled:pointer-events-none transition-colors';
-  const groupActionColumn = (
+  const canCreateOfficial = !!communityATag && membershipFollow;
+  const groupActionColumn = canCreateOfficial ? (
     <GroupActionColumn
       orgNaddr={orgNaddr}
       organizationName={name}
-      canCreate={!!communityATag && membershipFollow}
-      onShare={handleShare}
-      onLeadership={() => setMembersDialogOpen(true)}
     />
-  );
+  ) : null;
 
   return (
     <main className="min-h-screen pb-16">
@@ -936,18 +884,14 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
                     )}
                   />
                 )}
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <button type="button" className={bannerActionClassName} aria-label="More actions">
-                      <MoreVertical className="size-5" />
-                    </button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end" sideOffset={6} className="min-w-[180px]">
-                    <DropdownMenuItem onSelect={() => setMembersDialogOpen(true)}>
-                      <Users className="size-4 mr-2" />
-                      View leadership
-                    </DropdownMenuItem>
-                    {isFounder && community && (
+                {isFounder && community && (
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <button type="button" className={bannerActionClassName} aria-label="More actions">
+                        <MoreVertical className="size-5" />
+                      </button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end" sideOffset={6} className="min-w-[180px]">
                       <DropdownMenuItem
                         onSelect={() => {
                           const naddr = nip19.naddrEncode({
@@ -961,8 +905,6 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
                         <Pencil className="size-4 mr-2" />
                         Edit group
                       </DropdownMenuItem>
-                    )}
-                    {isFounder && community && (
                       <DropdownMenuItem
                         onSelect={(e) => {
                           e.preventDefault();
@@ -973,59 +915,18 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
                         <Trash2 className="size-4 mr-2" />
                         Delete group
                       </DropdownMenuItem>
-                    )}
-                  </DropdownMenuContent>
-                </DropdownMenu>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                )}
               </div>
             </div>
           </div>
 
           <div className="absolute inset-x-0 bottom-0 z-10 px-5 sm:px-6 lg:px-0 pb-[max(env(safe-area-inset-bottom),1.75rem)] pt-16 sm:pt-20">
             <div className="max-w-6xl mx-auto [text-shadow:0_1px_3px_rgba(0,0,0,0.7)]">
-              <button
-                type="button"
-                onClick={() => setMembersDialogOpen(true)}
-                className="mb-4 inline-flex max-w-full items-center gap-2 rounded-md py-1 pr-2 text-white/90 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80 [text-shadow:none] motion-safe:transition-colors"
-                aria-label="Show leadership"
-              >
-                <PeopleAvatarStack
-                  pubkeys={leadershipPubkeys}
-                  maxVisible={6}
-                  size="sm"
-                  className="[&_.ring-2]:ring-black/40 pointer-events-none"
-                />
-                {leadershipPubkeys.length > 0 && (
-                  <span className="truncate text-xs font-medium [text-shadow:0_1px_3px_rgba(0,0,0,0.7)]">
-                    {(() => {
-                      const modCount = community?.moderatorPubkeys.length ?? 0;
-                      if (modCount === 0) return 'Founder';
-                      return `Founder + ${modCount} moderator${modCount === 1 ? '' : 's'}`;
-                    })()}
-                  </span>
-                )}
-              </button>
-
-              <div className="flex items-start gap-2">
-                <h1 className="max-w-4xl text-3xl sm:text-5xl lg:text-6xl font-bold leading-[1.05] tracking-tight text-white">
-                  {name}
-                </h1>
-                {descriptionExpandable && (
-                  <button
-                    type="button"
-                    onClick={() => setDescriptionDialogOpen(true)}
-                    className="mt-1 rounded-full p-1 text-white/75 hover:bg-white/15 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80 [text-shadow:none] motion-safe:transition-colors sm:mt-2"
-                    aria-label="About this group"
-                  >
-                    <Info className="size-4 drop-shadow-[0_1px_2px_rgba(0,0,0,0.85)]" />
-                  </button>
-                )}
-              </div>
-
-              {descriptionText && (
-                <p className="mt-4 max-w-2xl text-base sm:text-lg lg:text-xl leading-relaxed text-white/90 line-clamp-4 sm:line-clamp-none">
-                  {descriptionText}
-                </p>
-              )}
+              <h1 className="max-w-4xl text-3xl sm:text-5xl lg:text-6xl font-bold leading-[1.05] tracking-tight text-white">
+                {name}
+              </h1>
 
               <div className="mt-4 border-t border-white/15 pt-3 [text-shadow:none] [&_button]:!text-white/90 [&_button:hover]:!bg-white/15 [&_button:hover]:!text-white [&_button]:transition-colors">
                 <PostActionBar
@@ -1040,6 +941,65 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
             </div>
           </div>
         </header>
+
+          {(leadershipPubkeys.length > 0 || descriptionText) && (
+            <section className="max-w-6xl mx-auto px-5 sm:px-6 lg:px-0 pt-6">
+              <div className="space-y-5 border-b border-border/60 pb-6">
+                {leadershipPubkeys.length > 0 && (
+                  <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                    <div className="space-y-2">
+                      <div className="text-xs font-semibold uppercase tracking-[0.12em] text-muted-foreground">
+                        Members
+                      </div>
+                      <div className="inline-flex items-center gap-3">
+                        <PeopleAvatarStack
+                          pubkeys={leadershipPubkeys}
+                          maxVisible={8}
+                          size="lg"
+                        />
+                        <span className="text-sm font-medium text-muted-foreground">
+                          {leadershipPubkeys.length.toLocaleString()} {leadershipPubkeys.length === 1 ? 'member' : 'members'}
+                        </span>
+                      </div>
+                    </div>
+                    <Button type="button" variant="outline" size="sm" onClick={() => setMembersDialogOpen(true)}>
+                      <Users className="size-4 mr-2" />
+                      View members
+                    </Button>
+                  </div>
+                )}
+
+                {descriptionText && (
+                  <div className="space-y-2">
+                    <div className="text-xs font-semibold uppercase tracking-[0.12em] text-muted-foreground">
+                      About
+                    </div>
+                    <div className="relative">
+                      <div
+                        className={cn(
+                          'text-[15px] sm:text-base leading-relaxed text-foreground/90 break-words',
+                          !descriptionExpanded && 'max-h-28 overflow-hidden',
+                        )}
+                      >
+                        <NoteContent event={descriptionPseudoEvent} disableEmbeds disableNoteEmbeds />
+                      </div>
+                      {!descriptionExpanded && (
+                        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-12 bg-gradient-to-t from-background to-transparent" />
+                      )}
+                    </div>
+                    <Button
+                      type="button"
+                      variant="link"
+                      className="h-auto p-0 text-sm"
+                      onClick={() => setDescriptionExpanded((expanded) => !expanded)}
+                    >
+                      {descriptionExpanded ? 'Show less' : 'Read more'}
+                    </Button>
+                  </div>
+                )}
+              </div>
+            </section>
+          )}
 
           {pinnedNodes.length > 0 && (
             <div className="max-w-6xl mx-auto px-5 sm:px-6 lg:px-0 pt-6">
@@ -1062,7 +1022,7 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
           {/* ── Body — campaign-detail-style two-column layout ───────────── */}
           <div className="max-w-6xl mx-auto px-5 sm:px-6 lg:px-0 py-6 lg:py-10">
             <div className="lg:flex lg:gap-8 lg:items-start">
-              <div className="lg:hidden mb-6">{groupActionColumn}</div>
+              {groupActionColumn && <div className="lg:hidden mb-6">{groupActionColumn}</div>}
 
               <div className="flex-1 min-w-0 space-y-8">
                 {/* Official-activity shelves. Hidden entirely when empty. */}
@@ -1127,41 +1087,22 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
                 </div>
               </div>
 
-              <aside className="hidden lg:block lg:w-[360px] lg:shrink-0 lg:self-start">
-                <div className="lg:sticky lg:top-4">{groupActionColumn}</div>
-              </aside>
+              {groupActionColumn && (
+                <aside className="hidden lg:block lg:w-[360px] lg:shrink-0 lg:self-start">
+                  <div className="lg:sticky lg:top-4">{groupActionColumn}</div>
+                </aside>
+              )}
             </div>
           </div>
       </CommunityModerationContext.Provider>
 
-      {/* Description dialog — opened by clicking the truncated description in
-          the banner. Renders the full raw description plus a clickable
-          website link when the description ends with a URL. */}
-      <Dialog open={descriptionDialogOpen} onOpenChange={setDescriptionDialogOpen}>
-        <DialogContent className="max-w-lg max-h-[85vh] flex flex-col overflow-hidden p-0 gap-0">
-          <DialogHeader className="px-5 pt-5 pb-3 border-b border-border shrink-0">
-            <DialogTitle>About {name}</DialogTitle>
-          </DialogHeader>
-          <div className="px-5 py-4 overflow-y-auto">
-            {description ? (
-              <NoteContent
-                event={descriptionPseudoEvent}
-                className="text-sm leading-relaxed break-words"
-              />
-            ) : (
-              <p className="text-sm text-muted-foreground">No description provided.</p>
-            )}
-          </div>
-        </DialogContent>
-      </Dialog>
-
-      {/* Leadership dialog — opened from the avatar stack or overflow menu. */}
+      {/* Leadership dialog — opened from the below-hero member section. */}
       <Dialog open={membersDialogOpen} onOpenChange={setMembersDialogOpen}>
         <DialogContent className="max-w-lg max-h-[85vh] flex flex-col overflow-hidden p-0 gap-0">
           <DialogHeader className="px-5 pt-5 pb-3 border-b border-border shrink-0">
             <DialogTitle className="flex items-center gap-2">
               <Users className="size-5" />
-              Leadership
+              Members
               {leadershipPubkeys.length > 0 && (
                 <span className="text-muted-foreground font-normal text-sm">({leadershipPubkeys.length})</span>
               )}
@@ -1173,7 +1114,7 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
               <MembersSkeleton />
             ) : memberSections.length === 0 ? (
               <div className="py-12 text-center text-muted-foreground text-sm px-5">
-                No leadership found.
+                No members found.
               </div>
             ) : (
               <div className="divide-y divide-border">
