@@ -35,7 +35,6 @@ import {
   isLargeAmount,
   nostrPubkeyToBitcoinAddress,
   satsToUSD,
-  validateBitcoinAddress,
 } from '@/lib/bitcoin';
 import {
   broadcastBlockbookTx,
@@ -43,9 +42,12 @@ import {
   fetchFeeRates,
 } from '@/lib/hdwallet/blockbook';
 import {
-  buildHdUnsignedPsbt,
+  buildHdSpendPsbt,
   finalizeHdPsbt,
+  type HdInput,
+  type HdSpendableSpUtxo,
   type HdSpendableUtxo,
+  parseHdRecipient,
   previewHdFee,
   signHdPsbt,
 } from '@/lib/hdwallet/transaction';
@@ -93,17 +95,31 @@ function getUniqueFeeSpeeds(rates: BlockbookFeeRates | undefined): FeeSpeed[] {
 // ---------------------------------------------------------------------------
 
 interface ResolvedRecipient {
-  /** Final P2TR/P2WPKH/etc. address used as the PSBT output. */
+  /**
+   * Final P2TR/P2WPKH/etc. address used as the PSBT output.
+   *
+   * For silent-payment (`sp1…`) recipients this is the original `sp1…`
+   * string — the real on-chain `P_k` is derived at build time, after coin
+   * selection. The dialog never displays this value directly when
+   * `kind === 'sp'`; it's kept here so {@link buildHdSpendPsbt} can route
+   * by recipient kind.
+   */
   address: string;
   /** Optional Nostr pubkey when the recipient was an npub/nprofile. */
   pubkey?: string;
   /** Raw text the user typed (for re-display). */
   raw: string;
+  /**
+   * Recipient kind. `'address'` for bare Bitcoin addresses (including
+   * Nostr-derived ones); `'sp'` for BIP-352 silent-payment addresses.
+   */
+  kind: 'address' | 'sp';
 }
 
 /**
  * Parse the recipient input as one of:
  *   - bare Bitcoin address (mainnet, any standard type)
+ *   - silent-payment address (`sp1…`, mainnet, v0)
  *   - npub1… → P2TR derived from the Nostr pubkey
  *   - nprofile1… → P2TR derived from the encoded pubkey
  *
@@ -114,9 +130,13 @@ function resolveRecipient(input: string): ResolvedRecipient | null {
   const trimmed = input.trim();
   if (!trimmed) return null;
 
-  // Try bare Bitcoin address first — common case.
-  if (validateBitcoinAddress(trimmed)) {
-    return { address: trimmed, raw: trimmed };
+  // Try bare Bitcoin / silent-payment via the unified parser.
+  const parsed = parseHdRecipient(trimmed);
+  if (parsed) {
+    if (parsed.kind === 'address') {
+      return { address: parsed.address, raw: trimmed, kind: 'address' };
+    }
+    return { address: parsed.spAddress, raw: trimmed, kind: 'sp' };
   }
 
   // Try NIP-19 npub / nprofile.
@@ -125,10 +145,10 @@ function resolveRecipient(input: string): ResolvedRecipient | null {
       const decoded = nip19.decode(trimmed);
       if (decoded.type === 'npub') {
         const address = nostrPubkeyToBitcoinAddress(decoded.data);
-        if (address) return { address, pubkey: decoded.data, raw: trimmed };
+        if (address) return { address, pubkey: decoded.data, raw: trimmed, kind: 'address' };
       } else if (decoded.type === 'nprofile') {
         const address = nostrPubkeyToBitcoinAddress(decoded.data.pubkey);
-        if (address) return { address, pubkey: decoded.data.pubkey, raw: trimmed };
+        if (address) return { address, pubkey: decoded.data.pubkey, raw: trimmed, kind: 'address' };
       }
     } catch {
       // fall through
@@ -165,7 +185,12 @@ interface SendResult {
  */
 export function HDSendBitcoinDialog({ isOpen, onClose, btcPrice }: HDSendBitcoinDialogProps) {
   const availability = useHdWalletAccess();
-  const { scan, silentPaymentBalance, refetch: refetchWallet } = useHdWallet();
+  const {
+    scan,
+    silentPaymentBalance,
+    silentPaymentStorage,
+    refetch: refetchWallet,
+  } = useHdWallet();
   const { config } = useAppContext();
   const { blockbookBaseUrl } = config;
   const { toast } = useToast();
@@ -201,16 +226,34 @@ export function HDSendBitcoinDialog({ isOpen, onClose, btcPrice }: HDSendBitcoin
   }, [feeRates, feeSpeed]);
 
   // ── Owned UTXO set ───────────────────────────────────────────
-  const ownedUtxos: HdSpendableUtxo[] = useMemo(() => scan?.utxos ?? [], [scan]);
-  const totalBalance = useMemo(() => ownedUtxos.reduce((s, u) => s + u.value, 0), [ownedUtxos]);
-
-  // Silent-payment UTXOs are scanned and displayed on /wallet but cannot
-  // yet be spent by this dialog: the BIP-352 receive output uses a tweaked
-  // private key not derivable from the BIP-86 (chain, index) pair the PSBT
-  // signer expects. Detect the case where the wallet's _only_ funds are SP
-  // funds so we can surface a clear explanation instead of leaving the user
-  // with a silently-disabled Send button.
-  const onlyHasSpFunds = totalBalance === 0 && silentPaymentBalance > 0;
+  //
+  // Combines BIP-86 UTXOs scanned from Blockbook with silent-payment UTXOs
+  // discovered by the BIP-352 scanner and persisted via NIP-78. Both can
+  // fund a send; the PSBT builder dispatches per-input.
+  const bip86Utxos: HdSpendableUtxo[] = useMemo(() => scan?.utxos ?? [], [scan]);
+  const spUtxos: HdSpendableSpUtxo[] = useMemo(
+    () =>
+      (silentPaymentStorage?.utxos ?? []).map((u) => ({
+        txid: u.txid,
+        vout: u.vout,
+        value: u.value,
+        tweakHex: u.tweak,
+        k: u.k,
+        height: u.height,
+      })),
+    [silentPaymentStorage],
+  );
+  const ownedInputs: HdInput[] = useMemo(
+    () => [
+      ...bip86Utxos.map<HdInput>((utxo) => ({ kind: 'bip86', utxo })),
+      ...spUtxos.map<HdInput>((utxo) => ({ kind: 'sp', utxo })),
+    ],
+    [bip86Utxos, spUtxos],
+  );
+  const totalBalance = useMemo(
+    () => bip86Utxos.reduce((s, u) => s + u.value, 0) + silentPaymentBalance,
+    [bip86Utxos, silentPaymentBalance],
+  );
 
   // ── USD → sats ───────────────────────────────────────────────
   const amountSats = useMemo(() => {
@@ -222,21 +265,21 @@ export function HDSendBitcoinDialog({ isOpen, onClose, btcPrice }: HDSendBitcoin
 
   // ── Fee estimate (matches the actual coin selection) ────────
   //
-  // Crucially we do NOT use `ownedUtxos.length` as the input count: an HD
+  // Crucially we do NOT use `ownedInputs.length` as the input count: an HD
   // wallet typically has many UTXOs across many addresses, but a real send
   // only consumes the minimal set the coin selector picks. Using the full
   // count would over-estimate fees by 10x or more on an active wallet, and
   // would also make the UI think we're insufficient when we're not.
   const estimatedFeeSats = useMemo(() => {
-    if (!ownedUtxos.length || !currentFeeRate || !amountSats) return 0;
-    return previewHdFee(ownedUtxos, amountSats, currentFeeRate);
-  }, [ownedUtxos, currentFeeRate, amountSats]);
+    if (!ownedInputs.length || !currentFeeRate || !amountSats) return 0;
+    return previewHdFee(ownedInputs, amountSats, currentFeeRate);
+  }, [ownedInputs, currentFeeRate, amountSats]);
 
   const totalSats = amountSats + estimatedFeeSats;
   // `previewHdFee` returns 0 when the coin selector can't cover `amount + fee`.
   // Treat that as insufficient so the UI doesn't claim a 0-sat fee is fine.
   const selectionFailed =
-    amountSats > 0 && !!currentFeeRate && ownedUtxos.length > 0 && estimatedFeeSats === 0;
+    amountSats > 0 && !!currentFeeRate && ownedInputs.length > 0 && estimatedFeeSats === 0;
   const insufficient = selectionFailed || (totalBalance > 0 && totalSats > totalBalance);
   const showBalance = insufficient || (amountSats > 0 && totalBalance === 0);
 
@@ -244,7 +287,7 @@ export function HDSendBitcoinDialog({ isOpen, onClose, btcPrice }: HDSendBitcoin
   // user has manually overridden.
   useEffect(() => {
     if (feeSpeedUserChanged.current) return;
-    if (!ownedUtxos.length || !feeRates || amountSats <= 0) return;
+    if (!ownedInputs.length || !feeRates || amountSats <= 0) return;
 
     const uniqueSpeeds = getUniqueFeeSpeeds(feeRates);
     const threshold = amountSats * 0.4;
@@ -252,11 +295,11 @@ export function HDSendBitcoinDialog({ isOpen, onClose, btcPrice }: HDSendBitcoin
     let target: FeeSpeed = uniqueSpeeds[uniqueSpeeds.length - 1];
     for (const speed of uniqueSpeeds) {
       const rate = getRateForSpeed(feeRates, speed);
-      const fee = previewHdFee(ownedUtxos, amountSats, rate);
+      const fee = previewHdFee(ownedInputs, amountSats, rate);
       if (fee > 0 && fee <= threshold) { target = speed; break; }
     }
     setFeeSpeed((prev) => (prev === target ? prev : target));
-  }, [amountSats, feeRates, ownedUtxos, totalBalance]);
+  }, [amountSats, feeRates, ownedInputs, totalBalance]);
 
   const handleFeeSpeedChange = useCallback((speed: FeeSpeed) => {
     feeSpeedUserChanged.current = true;
@@ -266,7 +309,12 @@ export function HDSendBitcoinDialog({ isOpen, onClose, btcPrice }: HDSendBitcoin
 
   // ── Two-tap arm + raw-address disclaimer ─────────────────────
   const isLarge = isLargeAmount(totalSats, btcPrice);
-  const isRawAddress = !!recipient && !recipient.pubkey;
+  // SP recipients (`sp1…`) produce a fresh, unlinkable Taproot output per
+  // payment — they do NOT have the privacy concern of a reused on-chain
+  // address. The public disclaimer is only needed for bare BTC addresses
+  // typed in directly (no Nostr identity attached, no SP).
+  const isRawAddress =
+    !!recipient && recipient.kind === 'address' && !recipient.pubkey;
   const [confirmArmed, setConfirmArmed] = useState(false);
   const [acknowledgedPublic, setAcknowledgedPublic] = useState(false);
 
@@ -304,8 +352,8 @@ export function HDSendBitcoinDialog({ isOpen, onClose, btcPrice }: HDSendBitcoin
       if (availability.status !== 'available') {
         throw new Error('HD wallet is not available for this login type.');
       }
-      if (!recipient) throw new Error('Enter a Bitcoin address or npub.');
-      if (!ownedUtxos.length) throw new Error('No spendable Bitcoin in this wallet.');
+      if (!recipient) throw new Error('Enter a Bitcoin address, sp1… address, or npub.');
+      if (!ownedInputs.length) throw new Error('No spendable Bitcoin in this wallet.');
       if (!feeRates) throw new Error('Fee rates not loaded.');
       if (recipient.pubkey === availability.pubkey) throw new Error("You can't send to yourself.");
       if (amountSats <= 0) throw new Error('Enter an amount.');
@@ -315,17 +363,26 @@ export function HDSendBitcoinDialog({ isOpen, onClose, btcPrice }: HDSendBitcoin
       const nextChangeIndex = scan?.change.firstUnusedIndex ?? 0;
 
       setProgress('building');
-      const built = buildHdUnsignedPsbt(
-        availability.account,
-        ownedUtxos,
-        recipient.address,
+      const built = buildHdSpendPsbt({
+        account: availability.account,
+        inputs: ownedInputs,
+        recipient:
+          recipient.kind === 'sp'
+            ? { kind: 'sp', spAddress: recipient.address }
+            : { kind: 'address', address: recipient.address },
         amountSats,
-        rate,
+        feeRate: rate,
         nextChangeIndex,
-      );
+        nsecBytes: availability.nsecBytes,
+      });
 
       setProgress('signing');
-      const signedHex = signHdPsbt(built.psbtHex, built.inputDerivations, availability.account);
+      const signedHex = signHdPsbt(
+        built.psbtHex,
+        built.inputDescriptors,
+        availability.account,
+        availability.nsecBytes,
+      );
       const txHex = finalizeHdPsbt(signedHex);
 
       setProgress('broadcasting');
@@ -337,6 +394,10 @@ export function HDSendBitcoinDialog({ isOpen, onClose, btcPrice }: HDSendBitcoin
       notificationSuccess();
       setSuccess(result);
       queryClient.invalidateQueries({ queryKey: ['hdwallet-scan'] });
+      // SP storage is keyed by `(txid, vout)`; the next scan will mark
+      // spent UTXOs as gone. Invalidate the doc query so the optimistic
+      // copy is dropped in favour of the relay copy on the next scan.
+      queryClient.invalidateQueries({ queryKey: ['hdwallet-sp-doc'] });
       void refetchWallet();
     },
     onError: (err) => {
@@ -350,11 +411,11 @@ export function HDSendBitcoinDialog({ isOpen, onClose, btcPrice }: HDSendBitcoin
     if (availability.status !== 'available') {
       setError('HD wallet is not available for this login type.'); return;
     }
-    if (!recipient) { setError('Enter a Bitcoin address or npub.'); return; }
+    if (!recipient) { setError('Enter a Bitcoin address, sp1… address, or npub.'); return; }
     if (recipient.pubkey === availability.pubkey) { setError("You can't send to yourself."); return; }
     if (!btcPrice) { setError('Waiting for BTC price…'); return; }
     if (amountSats <= 0) { setError('Enter an amount.'); return; }
-    if (!ownedUtxos.length) { setError("You don't have any Bitcoin yet."); return; }
+    if (!ownedInputs.length) { setError("You don't have any Bitcoin yet."); return; }
     if (insufficient) { setError('Not enough Bitcoin for this amount + network fee.'); return; }
     if (isRawAddress && !acknowledgedPublic) {
       setError('Acknowledge the privacy warning before sending.'); return;
@@ -366,7 +427,7 @@ export function HDSendBitcoinDialog({ isOpen, onClose, btcPrice }: HDSendBitcoin
     recipient,
     btcPrice,
     amountSats,
-    ownedUtxos.length,
+    ownedInputs.length,
     insufficient,
     isRawAddress,
     acknowledgedPublic,
@@ -411,7 +472,7 @@ export function HDSendBitcoinDialog({ isOpen, onClose, btcPrice }: HDSendBitcoin
     !btcPrice ||
     amountSats <= 0 ||
     insufficient ||
-    !ownedUtxos.length ||
+    !ownedInputs.length ||
     (isRawAddress && !acknowledgedPublic);
 
   // ── Render ───────────────────────────────────────────────────
@@ -501,14 +562,16 @@ export function HDSendBitcoinDialog({ isOpen, onClose, btcPrice }: HDSendBitcoin
                 id="hd-recipient-input"
                 value={recipientInput}
                 onChange={(e) => setRecipientInput(e.target.value)}
-                placeholder="bc1… or npub…"
+                placeholder="bc1…, sp1…, or npub…"
                 autoComplete="off"
                 spellCheck={false}
                 className="font-mono text-sm"
               />
               {recipient && (
                 <p className="text-xs text-muted-foreground">
-                  {recipient.pubkey ? (
+                  {recipient.kind === 'sp' ? (
+                    <>Sending via a silent payment — the recipient gets a fresh, unlinkable on-chain address.</>
+                  ) : recipient.pubkey ? (
                     <>Sending to a Nostr user&apos;s on-chain address.</>
                   ) : (
                     <>Sending to a raw Bitcoin address.</>
@@ -581,20 +644,6 @@ export function HDSendBitcoinDialog({ isOpen, onClose, btcPrice }: HDSendBitcoin
               <Alert variant="destructive" className="py-2">
                 <AlertTriangle className="size-3.5" />
                 <AlertDescription className="text-xs">{error}</AlertDescription>
-              </Alert>
-            )}
-
-            {/* Silent-payment-only balance: the PSBT signer can't yet spend
-                BIP-352 outputs, so explain why Send is disabled instead of
-                leaving the button greyed out with no feedback. */}
-            {onlyHasSpFunds && (
-              <Alert className="py-2">
-                <AlertTriangle className="size-3.5" />
-                <AlertDescription className="text-xs">
-                  Your balance is held in silent-payment outputs. Spending
-                  them isn't supported yet — receive on-chain bitcoin to
-                  your regular receive address to send.
-                </AlertDescription>
               </Alert>
             )}
 
