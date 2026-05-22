@@ -837,6 +837,7 @@ const NsecLoginForm: React.FC<NsecLoginFormProps> = ({
       onSubmit();
     }}
     className="space-y-3"
+    data-nsec-allowed
   >
     <Input
       type="password"
