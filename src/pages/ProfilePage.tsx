@@ -6,20 +6,16 @@ import { useNostr } from '@nostrify/react';
 import { useInfiniteQuery, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useSeoMeta } from '@unhead/react';
 import { nip19 } from 'nostr-tools';
-import { Zap, MoreHorizontal, ClipboardCopy, ExternalLink, VolumeX, Flag, Bitcoin, Pin, X, QrCode, Check, Copy, Loader2, Download, Trash2, RotateCcw, MessageSquare, Mail, ListPlus, Award, PanelLeft } from 'lucide-react';
+import { Zap, ClipboardCopy, ExternalLink, VolumeX, Flag, Bitcoin, Pin, X, QrCode, Check, Copy, Loader2, Download, Trash2, RotateCcw, Mail, ListPlus, Award, PanelLeft } from 'lucide-react';
 
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
 import { useLayoutOptions } from '@/contexts/LayoutContext';
 import { NoteCard } from '@/components/NoteCard';
-import { FeedCard } from '@/components/FeedCard';
-import { ComposeBox } from '@/components/ComposeBox';
-import { ReplyComposeModal } from '@/components/ReplyComposeModal';
 import { ZapDialog } from '@/components/ZapDialog';
 import { ExternalFavicon } from '@/components/ExternalFavicon';
 import { VerifiedNip05Text } from '@/components/Nip05Badge';
@@ -37,8 +33,6 @@ import type { ProfileTab as CoreProfileTab } from '@/hooks/useProfileFeed';
 import { useProfileMedia } from '@/hooks/useProfileMedia';
 import { MediaCollage, MediaCollageSkeleton } from '@/components/MediaCollage';
 import { useProfileSupplementary } from '@/hooks/useProfileData';
-import { useWallComments } from '@/hooks/useWallComments';
-import { FlatThreadedReplyList } from '@/components/ThreadedReplyList';
 import { useNip05Resolve } from '@/hooks/useNip05Resolve';
 import { genUserName } from '@/lib/genUserName';
 
@@ -66,7 +60,6 @@ import { useActions } from '@/hooks/useActions';
 import { useBtcPrice } from '@/hooks/useBtcPrice';
 import { DonateDialog } from '@/components/DonateDialog';
 import { ProfileIdentityRail } from '@/components/profile/ProfileIdentityRail';
-import { ProfileOverviewTab } from '@/components/profile/ProfileOverviewTab';
 import { ProfileCampaignsTab } from '@/components/profile/ProfileCampaignsTab';
 import { ProfilePledgesTab } from '@/components/profile/ProfilePledgesTab';
 import { ProfileActivityTab } from '@/components/profile/ProfileActivityTab';
@@ -873,14 +866,13 @@ function ProfileBannerImage({ src, onClick }: { src: string; onClick: () => void
 
 // ----- Main Component -----
 
-const CORE_TAB_LABELS = ['Overview', 'Campaigns', 'Pledges', 'Activity', 'Posts', 'Posts & replies', 'Media', 'Wall', 'Badges', 'Likes'];
-const DEFAULT_TAB_LABELS = ['Overview', 'Campaigns', 'Pledges', 'Activity', 'Posts', 'Wall'];
+const DEFAULT_TAB_LABELS = ['Activity', 'Campaigns', 'Pledges', 'Posts', 'Media', 'Badges', 'Likes'];
 
 // Map from display label → internal tab id for core tabs
 const CORE_TAB_IDS: Record<string, string> = {
-  'Overview': 'overview', 'Campaigns': 'campaigns', 'Pledges': 'pledges',
-  'Activity': 'activity', 'Posts': 'posts', 'Posts & replies': 'replies',
-  'Media': 'media', 'Wall': 'wall', 'Badges': 'badges', 'Likes': 'likes',
+  'Activity': 'activity', 'Campaigns': 'campaigns', 'Pledges': 'pledges',
+  'Posts': 'posts', 'Posts & replies': 'replies',
+  'Media': 'media', 'Badges': 'badges', 'Likes': 'likes',
 };
 
 export function ProfilePage() {
@@ -893,7 +885,7 @@ export function ProfilePage() {
   const { muteItems } = useMuteList();
   const queryClient = useQueryClient();
 
-  const [activeTab, setActiveTab] = useState<CoreProfileTab | string>('overview');
+  const [activeTab, setActiveTab] = useState<CoreProfileTab | string>('activity');
   const [sidebarMediaUrl, setSidebarMediaUrl] = useState<string | null>(null);
   const [moreMenuOpen, setMoreMenuOpen] = useState(false);
   const [followQROpen, setFollowQROpen] = useState(false);
@@ -1089,7 +1081,7 @@ function FollowersListModal({ pubkey, open, onOpenChange, displayName }: Followe
 
   // Derive the ID of the first visible tab (used as default selection).
   const firstTabId = useMemo(() => {
-    if (viewTabs.length === 0) return 'overview';
+    if (viewTabs.length === 0) return 'activity';
     const first = viewTabs[0];
     return CORE_TAB_IDS[first.label] ?? first.label;
   }, [viewTabs]);
@@ -1097,7 +1089,7 @@ function FollowersListModal({ pubkey, open, onOpenChange, displayName }: Followe
   // Keep the active tab in sync if it ever falls out of the recognized set
   // (e.g. on first mount, or if a user navigates with a stale tab id).
   useEffect(() => {
-    const isCoreTab = ['overview', 'campaigns', 'pledges', 'activity', 'posts', 'replies', 'media', 'badges', 'likes', 'wall'].includes(activeTab);
+    const isCoreTab = ['campaigns', 'pledges', 'activity', 'posts', 'replies', 'media', 'badges', 'likes'].includes(activeTab);
     if (!isCoreTab) {
       setActiveTab(firstTabId);
     }
@@ -1115,7 +1107,7 @@ function FollowersListModal({ pubkey, open, onOpenChange, displayName }: Followe
     isFetchingNextPage: isFetchingNextFeedPage,
   } = useProfileFeed(
     pubkey,
-    (['posts', 'replies', 'media', 'likes', 'wall', 'badges'].includes(activeTab) ? activeTab : 'posts') as CoreProfileTab,
+    (['posts', 'replies', 'media', 'likes', 'badges'].includes(activeTab) ? activeTab : 'posts') as CoreProfileTab,
     true,
   );
 
@@ -1166,35 +1158,6 @@ function FollowersListModal({ pubkey, open, onOpenChange, displayName }: Followe
     isFetchingNextPage: isFetchingNextLikesPage,
   } = useProfileLikesInfinite(pubkey, activeTab === 'likes');
 
-  // Wall comments (NIP-22 kind 1111 on user's kind 0, filtered by their follow list)
-  const wallFollowList = useMemo(() => supplementary?.following, [supplementary?.following]);
-  const {
-    data: wallData,
-    isPending: wallPending,
-    fetchNextPage: fetchNextWallPage,
-    hasNextPage: hasNextWallPage,
-    isFetchingNextPage: isFetchingNextWallPage,
-  } = useWallComments(pubkey, wallFollowList);
-
-  // Synthetic kind 0 event for the ComposeBox replyTo (NIP-22 comments on the profile)
-  const wallReplyTarget = useMemo((): NostrEvent | undefined => {
-    if (!pubkey) return undefined;
-    // Use the real kind 0 event if available, otherwise build a minimal synthetic one
-    if (metadataEvent) return metadataEvent;
-    return {
-      id: '',
-      kind: 0,
-      pubkey,
-      content: '',
-      created_at: 0,
-      sig: '',
-      tags: [],
-    };
-  }, [pubkey, metadataEvent]);
-
-  // Wall compose modal state (for FAB on wall tab)
-  const [wallComposeOpen, setWallComposeOpen] = useState(false);
-
   // Follow list (cached, for display checks only)
   const { data: followData } = useFollowList();
 
@@ -1236,14 +1199,6 @@ function FollowersListModal({ pubkey, open, onOpenChange, displayName }: Followe
   const isOwnProfile = user?.pubkey === pubkey;
   const { feedSettings } = useFeedSettings();
 
-  // Does the profile owner follow the current user?
-  // Wall posts are only visible to people the profile owner follows,
-  // so we hide the compose box if the profile owner doesn't follow us.
-  const profileFollowsMe = useMemo(() => {
-    if (!user?.pubkey || !wallFollowList) return false;
-    if (isOwnProfile) return true;
-    return wallFollowList.includes(user.pubkey);
-  }, [user?.pubkey, wallFollowList, isOwnProfile]);
   const { togglePin } = usePinnedNotes(isOwnProfile ? pubkey : undefined);
 
   const pinnedIds = useMemo(() => supplementary?.pinnedIds ?? [], [supplementary?.pinnedIds]);
@@ -1336,53 +1291,6 @@ function FollowersListModal({ pubkey, open, onOpenChange, displayName }: Followe
     return items;
   }, [likesData?.pages]);
 
-  // Flatten wall pages and deduplicate
-  const wallComments = useMemo(() => {
-    if (!wallData?.pages) return [];
-    const seen = new Set<string>();
-    const items: NostrEvent[] = [];
-    for (const page of wallData.pages) {
-      for (const comment of page.comments) {
-        if (!seen.has(comment.id)) {
-          seen.add(comment.id);
-          if (muteItems.length > 0 && isEventMuted(comment, muteItems)) continue;
-          items.push(comment);
-        }
-      }
-    }
-    return items;
-  }, [wallData?.pages, muteItems]);
-
-  // Pair each wall comment with its first direct sub-reply (same pattern as PostDetailPage replies).
-  // useWallComments queries #A (uppercase root tag) which returns all depth levels per NIP-22,
-  // so separate top-level from sub-replies using the lowercase `a` tag, then build the lookup
-  // from the already-fetched, follow-filtered wallComments — no extra query needed.
-  const orderedWallReplies = useMemo(() => {
-    const rootATag = pubkey ? `0:${pubkey}:` : '';
-    const topLevel: NostrEvent[] = [];
-    // Map from parent comment id → direct child comments
-    const childrenByParent = new Map<string, NostrEvent[]>();
-
-    for (const comment of wallComments) {
-      const isTopLevel = comment.tags.some(([name, val]) => name === 'a' && val === rootATag);
-      if (isTopLevel) {
-        topLevel.push(comment);
-      } else {
-        const parentId = comment.tags.find(([name]) => name === 'e')?.[1];
-        if (parentId) {
-          const siblings = childrenByParent.get(parentId) ?? [];
-          siblings.push(comment);
-          childrenByParent.set(parentId, siblings);
-        }
-      }
-    }
-
-    return topLevel.map((comment) => ({
-      reply: comment,
-      firstSubReply: childrenByParent.get(comment.id)?.[0],
-    }));
-  }, [wallComments, pubkey]);
-
   // Infinite scroll sentinel
   const { ref: scrollRef, inView } = useInView({
     threshold: 0,
@@ -1398,16 +1306,12 @@ function FollowersListModal({ pubkey, open, onOpenChange, displayName }: Followe
       if (hasNextMediaPage && !isFetchingNextMediaPage) {
         fetchNextMediaPage();
       }
-    } else if (activeTab === 'wall') {
-      if (hasNextWallPage && !isFetchingNextWallPage) {
-        fetchNextWallPage();
-      }
     } else {
       if (hasNextFeedPage && !isFetchingNextFeedPage) {
         fetchNextFeedPage();
       }
     }
-  }, [inView, activeTab, hasNextFeedPage, isFetchingNextFeedPage, fetchNextFeedPage, hasNextLikesPage, isFetchingNextLikesPage, fetchNextLikesPage, hasNextMediaPage, isFetchingNextMediaPage, fetchNextMediaPage, hasNextWallPage, isFetchingNextWallPage, fetchNextWallPage]);
+  }, [inView, activeTab, hasNextFeedPage, isFetchingNextFeedPage, fetchNextFeedPage, hasNextLikesPage, isFetchingNextLikesPage, fetchNextLikesPage, hasNextMediaPage, isFetchingNextMediaPage, fetchNextMediaPage]);
 
   const authorEvent = metadataEvent;
 
@@ -1428,11 +1332,11 @@ function FollowersListModal({ pubkey, open, onOpenChange, displayName }: Followe
   // useWallComments. The new Agora-native core tabs (overview / campaigns /
   // pledges / activity) have their own renderers below and intentionally
   // bypass this fallthrough.
-  const isCoreProfileTab = activeTab === 'posts' || activeTab === 'replies' || activeTab === 'media' || activeTab === 'likes' || activeTab === 'wall' || activeTab === 'badges';
-  const currentItems = activeTab === 'wall' ? [] : activeTab === 'likes' ? likedFeedItems : activeTab === 'media' ? mediaFeedItems : filterByTab(feedItems, isCoreProfileTab ? (activeTab as CoreProfileTab) : 'posts');
-  const currentLoading = activeTab === 'wall' ? wallPending : activeTab === 'likes' ? likesPending : activeTab === 'media' ? mediaPending : feedPending;
-  const hasMore = activeTab === 'wall' ? hasNextWallPage : activeTab === 'likes' ? hasNextLikesPage : activeTab === 'media' ? hasNextMediaPage : hasNextFeedPage;
-  const isFetchingMore = activeTab === 'wall' ? isFetchingNextWallPage : activeTab === 'likes' ? isFetchingNextLikesPage : activeTab === 'media' ? isFetchingNextMediaPage : isFetchingNextFeedPage;
+  const isCoreProfileTab = activeTab === 'posts' || activeTab === 'replies' || activeTab === 'media' || activeTab === 'likes' || activeTab === 'badges';
+  const currentItems = activeTab === 'likes' ? likedFeedItems : activeTab === 'media' ? mediaFeedItems : filterByTab(feedItems, isCoreProfileTab ? (activeTab as CoreProfileTab) : 'posts');
+  const currentLoading = activeTab === 'likes' ? likesPending : activeTab === 'media' ? mediaPending : feedPending;
+  const hasMore = activeTab === 'likes' ? hasNextLikesPage : activeTab === 'media' ? hasNextMediaPage : hasNextFeedPage;
+  const isFetchingMore = activeTab === 'likes' ? isFetchingNextLikesPage : activeTab === 'media' ? isFetchingNextMediaPage : isFetchingNextFeedPage;
 
   // Auto-fetch next page when client-side filtering (e.g. removing replies
   // from the "posts" tab) leaves fewer visible items than the page size.
@@ -1440,7 +1344,7 @@ function FollowersListModal({ pubkey, open, onOpenChange, displayName }: Followe
   const MIN_VISIBLE_ITEMS = 5;
   useEffect(() => {
     if (currentLoading || isFetchingMore) return;
-    if (activeTab === 'wall' || activeTab === 'likes' || activeTab === 'media') return;
+    if (activeTab === 'likes' || activeTab === 'media') return;
     if (currentItems.length < MIN_VISIBLE_ITEMS && hasNextFeedPage && !isFetchingNextFeedPage) {
       fetchNextFeedPage();
     }
@@ -1459,14 +1363,11 @@ function FollowersListModal({ pubkey, open, onOpenChange, displayName }: Followe
           (tag === 'profile-feed' && key[1] === pubkey) ||
           (tag === 'profile-media' && key[1] === pubkey) ||
           (tag === 'profile-likes-infinite' && key[1] === pubkey) ||
-          (tag === 'profile-pinned-events' && key[1] === pubkey) ||
-          (tag === 'wall-comments' && key[1] === pubkey)
+          (tag === 'profile-pinned-events' && key[1] === pubkey)
         );
       },
     });
   }, [queryClient, pubkey]);
-
-  const openWallCompose = useCallback(() => setWallComposeOpen(true), []);
 
   // ProfilePage opts out of FundraiserLayout's default `max-w-3xl` cap so it
   // can run a wider canvas (banner full-bleed, contained `max-w-7xl` content
@@ -1474,8 +1375,6 @@ function FollowersListModal({ pubkey, open, onOpenChange, displayName }: Followe
   // no right-sidebar slot, so any `rightSidebar` option here would be ignored.
   useLayoutOptions(pubkey ? {
     noMaxWidth: true,
-    showFAB: !(activeTab === 'wall' && !profileFollowsMe),
-    onFabClick: activeTab === 'wall' ? openWallCompose : undefined,
     hasSubHeader: true,
   } : {});
 
@@ -1609,52 +1508,7 @@ function FollowersListModal({ pubkey, open, onOpenChange, displayName }: Followe
                     />
                   );
                 })}
-
-                {/* Overflow menu — exposes the non-default core tabs
-                    (Posts & replies, Media, Badges, Likes). */}
-                {(() => {
-                  const missingDefaults = CORE_TAB_LABELS.filter(
-                    (label) => !DEFAULT_TAB_LABELS.includes(label),
-                  );
-                  if (missingDefaults.length === 0) return null;
-                  return (
-                    <div className="flex items-center shrink-0 ml-auto">
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <button
-                            className="px-2.5 py-3.5 text-muted-foreground hover:text-foreground hover:bg-secondary/40 transition-colors"
-                            aria-label="More tabs"
-                          >
-                            <MoreHorizontal className="size-4" />
-                          </button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end" className="w-48">
-                          {missingDefaults.map((label) => {
-                            const tabId = CORE_TAB_IDS[label] ?? label;
-                            return (
-                              <DropdownMenuItem key={label} onClick={() => setActiveTab(tabId)}>
-                                {label}
-                              </DropdownMenuItem>
-                            );
-                          })}
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </div>
-                  );
-                })()}
               </SubHeaderBar>
-
-              {/* Overview — composite landing view. */}
-              {activeTab === 'overview' && pubkey && (
-                <ProfileOverviewTab
-                  pubkey={pubkey}
-                  displayName={displayName}
-                  isOwnProfile={isOwnProfile}
-                  recentPosts={filterByTab(feedItems, 'posts').slice(0, 3)}
-                  onSeeAllPosts={() => setActiveTab('posts')}
-                  onSeeAllActivity={() => setActiveTab('activity')}
-                />
-              )}
 
               {/* Campaigns tab. */}
               {activeTab === 'campaigns' && pubkey && (
@@ -1717,83 +1571,6 @@ function FollowersListModal({ pubkey, open, onOpenChange, displayName }: Followe
                 </div>
               )}
 
-              {/* Wall tab content */}
-              {activeTab === 'wall' && (
-                <div>
-                  {wallReplyTarget && profileFollowsMe && (
-                    <ComposeBox
-                      compact
-                      replyTo={wallReplyTarget}
-                      placeholder={`Write on ${displayName}'s wall`}
-                      onSuccess={() => queryClient.invalidateQueries({ queryKey: ['wall-comments', pubkey] })}
-                    />
-                  )}
-
-                  {wallReplyTarget && profileFollowsMe && (
-                    <ReplyComposeModal
-                      event={wallReplyTarget}
-                      open={wallComposeOpen}
-                      onOpenChange={setWallComposeOpen}
-                      placeholder={`Write on ${displayName}'s wall`}
-                      onSuccess={() => queryClient.invalidateQueries({ queryKey: ['wall-comments', pubkey] })}
-                    />
-                  )}
-
-                  {!wallFollowList || wallFollowList.length === 0 ? (
-                    <div className="py-12 text-center text-muted-foreground text-sm">
-                      <MessageSquare className="size-12 mx-auto mb-4 opacity-30" />
-                      <p className="text-lg font-medium mb-2">No wall posts yet</p>
-                      <p>{displayName} doesn't follow anyone yet, so there are no wall posts to show.</p>
-                    </div>
-                  ) : wallPending ? (
-                    <FeedCard className="mt-2 divide-y divide-border">
-                      {Array.from({ length: 3 }).map((_, i) => (
-                        <div key={i} className="px-4 py-3">
-                          <div className="flex gap-3">
-                            <Skeleton className="size-10 rounded-full shrink-0" />
-                            <div className="flex-1 space-y-2">
-                              <div className="flex items-center gap-2">
-                                <Skeleton className="h-4 w-20" />
-                                <Skeleton className="h-3 w-28" />
-                              </div>
-                              <div className="space-y-1.5">
-                                <Skeleton className="h-4 w-full" />
-                                <Skeleton className="h-4 w-3/4" />
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      ))}
-                    </FeedCard>
-                  ) : orderedWallReplies.length > 0 ? (
-                    <>
-                      <FeedCard className="mt-2">
-                        <FlatThreadedReplyList replies={orderedWallReplies} />
-                      </FeedCard>
-                      {hasNextWallPage && (
-                        <div ref={scrollRef} className="flex justify-center py-6">
-                          {isFetchingNextWallPage && (
-                            <Loader2 className="size-5 animate-spin text-muted-foreground" />
-                          )}
-                        </div>
-                      )}
-                    </>
-                  ) : (
-                    <div className="py-12 text-center text-muted-foreground text-sm">
-                      <MessageSquare className="size-12 mx-auto mb-4 opacity-30" />
-                      <p className="text-lg font-medium mb-2">No wall posts yet</p>
-                      {profileFollowsMe ? (
-                        <p>Be the first to write on {displayName}'s wall!</p>
-                      ) : user ? (
-                        <p>{displayName} must follow you before you can post on their wall.</p>
-                      ) : (
-                        <p>Log in to write on {displayName}'s wall.</p>
-                      )}
-                    </div>
-                  )}
-                </div>
-              )}
-
               {/* Media tab. */}
               {activeTab === 'media' && (
                 <div>
@@ -1825,7 +1602,7 @@ function FollowersListModal({ pubkey, open, onOpenChange, displayName }: Followe
               )}
 
               {/* Posts / Replies / Likes — generic feed renderer. */}
-              {isCoreProfileTab && activeTab !== 'wall' && activeTab !== 'media' && activeTab !== 'badges' && (
+              {isCoreProfileTab && activeTab !== 'media' && activeTab !== 'badges' && (
                 <div>
                   {currentLoading ? (
                     <div className="space-y-0">

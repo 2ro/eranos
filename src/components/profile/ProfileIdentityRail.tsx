@@ -1,6 +1,5 @@
 import type { ReactNode } from 'react';
 import { Link } from 'react-router-dom';
-import { nip19 } from 'nostr-tools';
 import {
   Bitcoin,
   Globe,
@@ -22,7 +21,6 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Skeleton } from '@/components/ui/skeleton';
-import { BadgeThumbnail } from '@/components/BadgeThumbnail';
 import { BioContent } from '@/components/BioContent';
 import { CampaignCard, CampaignCardSkeleton } from '@/components/CampaignCard';
 import { CommunityMiniCard, CommunityMiniCardSkeleton } from '@/components/discovery/CommunityMiniCard';
@@ -32,9 +30,7 @@ import { LinkFooter } from '@/components/LinkFooter';
 import { Nip05Badge } from '@/components/Nip05Badge';
 import { ProfileReactionButton } from '@/components/ProfileReactionButton';
 import { OrganizationsAllDialog } from '@/components/profile/OrganizationsAllDialog';
-import { useBadgeDefinitions } from '@/hooks/useBadgeDefinitions';
 import { useCampaignModeration } from '@/hooks/useCampaignModeration';
-import { useProfileBadges } from '@/hooks/useProfileBadges';
 import { useProfileOrganizations, type ProfileOrganization } from '@/hooks/useProfileOrganizations';
 import type { ProfileCampaignStats } from '@/hooks/useProfileCampaignStats';
 import type { ParsedCampaign } from '@/lib/campaign';
@@ -200,9 +196,6 @@ export function ProfileIdentityRail({
         )}
       </div>
 
-      {/* Badge preview */}
-      <BadgePreviewRow pubkey={pubkey} />
-
       {/* Action bar — wraps onto multiple rows in a 340px-wide rail. */}
       <ActionBar
         isOwnProfile={isOwnProfile}
@@ -217,11 +210,10 @@ export function ProfileIdentityRail({
         onDonate={onDonate}
       />
 
-      {/* Vertical stat list */}
+      {/* Stats: Followers + Following inline; Pledges + Raised below. */}
       <StatList
         followersCount={followersCount}
         followingCount={followingCount}
-        campaignCount={campaignStats.campaignCount}
         pledgesCount={pledgesCount}
         totalRaisedSats={campaignStats.totalRaisedSats}
         btcPrice={btcPrice}
@@ -425,7 +417,6 @@ function ActionBar({
 function StatList({
   followersCount,
   followingCount,
-  campaignCount,
   pledgesCount,
   totalRaisedSats,
   btcPrice,
@@ -435,7 +426,6 @@ function StatList({
 }: {
   followersCount: number;
   followingCount: number;
-  campaignCount: number;
   pledgesCount: number;
   totalRaisedSats: number;
   btcPrice: number | undefined;
@@ -443,6 +433,9 @@ function StatList({
   onFollowingOpen: () => void;
   onTabChange: (id: string) => void;
 }) {
+  // Secondary stat rows (one per row). Followers / Following live inline at
+  // the top; the campaign count was dropped because the rail's Campaigns
+  // section already displays the user's campaigns directly below.
   const rows: Array<{
     icon?: ReactNode;
     label: string;
@@ -450,25 +443,6 @@ function StatList({
     onClick?: () => void;
     show: boolean;
   }> = [
-    {
-      label: 'Followers',
-      value: formatNumber(followersCount),
-      onClick: onFollowersOpen,
-      show: followersCount > 0,
-    },
-    {
-      label: 'Following',
-      value: formatNumber(followingCount),
-      onClick: onFollowingOpen,
-      show: followingCount > 0,
-    },
-    {
-      icon: <Megaphone className="size-3.5 text-primary" />,
-      label: campaignCount === 1 ? 'Campaign' : 'Campaigns',
-      value: formatNumber(campaignCount),
-      onClick: () => onTabChange('campaigns'),
-      show: campaignCount > 0,
-    },
     {
       icon: <HandHeart className="size-3.5 text-primary" />,
       label: pledgesCount === 1 ? 'Pledge' : 'Pledges',
@@ -485,52 +459,54 @@ function StatList({
     },
   ].filter((r) => r.show);
 
-  if (rows.length === 0) return null;
+  const hasFollowRow = followersCount > 0 || followingCount > 0;
+  if (!hasFollowRow && rows.length === 0) return null;
 
   return (
-    <div className="rounded-xl border border-border/60 bg-card/40 divide-y divide-border/60">
-      {rows.map((row) => (
-        <button
-          key={row.label}
-          onClick={row.onClick}
-          className="w-full flex items-center justify-between gap-3 px-3 py-2 text-sm hover:bg-secondary/40 transition-colors first:rounded-t-xl last:rounded-b-xl"
-        >
-          <span className="flex items-center gap-2 text-muted-foreground">
-            {row.icon}
-            {row.label}
-          </span>
-          <span className="font-semibold tabular-nums text-foreground">{row.value}</span>
-        </button>
-      ))}
-    </div>
-  );
-}
+    <div className="space-y-2">
+      {/* Followers + Following on a single horizontal row. */}
+      {hasFollowRow && (
+        <div className="flex items-center gap-5 text-sm">
+          {followersCount > 0 && (
+            <button
+              onClick={onFollowersOpen}
+              className="flex items-baseline gap-1.5 hover:opacity-80 transition-opacity"
+              title={`${followersCount} followers`}
+            >
+              <span className="font-bold tabular-nums text-foreground">{formatNumber(followersCount)}</span>
+              <span className="text-muted-foreground">Followers</span>
+            </button>
+          )}
+          {followingCount > 0 && (
+            <button
+              onClick={onFollowingOpen}
+              className="flex items-baseline gap-1.5 hover:opacity-80 transition-opacity"
+              title={`${followingCount} following`}
+            >
+              <span className="font-bold tabular-nums text-foreground">{formatNumber(followingCount)}</span>
+              <span className="text-muted-foreground">Following</span>
+            </button>
+          )}
+        </div>
+      )}
 
-// ─── Badge preview row ──────────────────────────────────────────────────────
-
-function BadgePreviewRow({ pubkey }: { pubkey: string }) {
-  const { refs: badgeRefs } = useProfileBadges(pubkey);
-  const firstBadgeRefs = badgeRefs.slice(0, 5);
-  const { badgeMap } = useBadgeDefinitions(firstBadgeRefs);
-
-  if (badgeRefs.length === 0) return null;
-
-  return (
-    <div className="flex items-center gap-1.5 flex-wrap">
-      {firstBadgeRefs.map((ref) => {
-        const badge = badgeMap.get(ref.aTag);
-        if (!badge) return null;
-        return (
-          <Link
-            key={ref.aTag}
-            to={`/${nip19.naddrEncode({ kind: 30009, pubkey: ref.pubkey, identifier: ref.identifier })}`}
-          >
-            <BadgeThumbnail badge={badge} size={32} />
-          </Link>
-        );
-      })}
-      {badgeRefs.length > 5 && (
-        <span className="text-[10px] text-muted-foreground font-medium">+{badgeRefs.length - 5}</span>
+      {/* Secondary stat rows. */}
+      {rows.length > 0 && (
+        <div className="rounded-xl border border-border/60 bg-card/40 divide-y divide-border/60">
+          {rows.map((row) => (
+            <button
+              key={row.label}
+              onClick={row.onClick}
+              className="w-full flex items-center justify-between gap-3 px-3 py-2 text-sm hover:bg-secondary/40 transition-colors first:rounded-t-xl last:rounded-b-xl"
+            >
+              <span className="flex items-center gap-2 text-muted-foreground">
+                {row.icon}
+                {row.label}
+              </span>
+              <span className="font-semibold tabular-nums text-foreground">{row.value}</span>
+            </button>
+          ))}
+        </div>
       )}
     </div>
   );
