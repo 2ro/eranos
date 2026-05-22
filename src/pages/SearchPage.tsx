@@ -46,14 +46,15 @@ import { PageHeader } from '@/components/PageHeader';
 import { isRepostKind, parseRepostContent } from '@/lib/feedUtils';
 import { nip19 } from 'nostr-tools';
 
-type TabType = 'activity' | 'posts' | 'accounts';
+type TabType = 'agora' | 'posts' | 'accounts';
 
-const VALID_TABS: TabType[] = ['activity', 'posts', 'accounts'];
+const VALID_TABS: TabType[] = ['agora', 'posts', 'accounts'];
 
 function parseTab(value: string | null): TabType {
-  // Back-compat: ?tab=communities used to be the default tab; alias it to activity.
-  if (value === 'communities') return 'activity';
-  return VALID_TABS.includes(value as TabType) ? (value as TabType) : 'activity';
+  // Back-compat: ?tab=communities and ?tab=activity used to be the default tab;
+  // alias them both to agora.
+  if (value === 'communities' || value === 'activity') return 'agora';
+  return VALID_TABS.includes(value as TabType) ? (value as TabType) : 'agora';
 }
 
 const VALID_AUTHOR_SCOPES = ['anyone', 'follows', 'people'] as const;
@@ -190,7 +191,7 @@ export function SearchPage() {
   const setActiveTab = useCallback((tab: TabType) => {
     setSearchParams((prev) => {
       const next = new URLSearchParams(prev);
-      if (tab === 'activity') {
+      if (tab === 'agora') {
         next.delete('tab');
       } else {
         next.set('tab', tab);
@@ -372,8 +373,8 @@ export function SearchPage() {
     <main className="flex-1 min-w-0">
       <PageHeader title="Search" icon={<SearchIcon className="size-5" />} />
       <SubHeaderBar>
-        <TabButton label="Activity" active={activeTab === 'activity'} onClick={() => setActiveTab('activity')} />
-        <TabButton label="Posts" active={activeTab === 'posts'} onClick={() => setActiveTab('posts')} />
+        <TabButton label="Agora" active={activeTab === 'agora'} onClick={() => setActiveTab('agora')} />
+        <TabButton label="Nostr" active={activeTab === 'posts'} onClick={() => setActiveTab('posts')} />
         <TabButton label="Accounts" active={activeTab === 'accounts'} onClick={() => setActiveTab('accounts')} />
       </SubHeaderBar>
 
@@ -385,8 +386,8 @@ export function SearchPage() {
             onDebouncedChange={setDebouncedSearchQuery}
           />
 
-          {/* Filter popover (posts & activity tabs) */}
-          {(activeTab === 'posts' || activeTab === 'activity') && (
+          {/* Filter popover (posts & agora tabs) */}
+          {(activeTab === 'posts' || activeTab === 'agora') && (
             <Popover open={filtersOpen} onOpenChange={setFiltersOpen}>
               <PopoverTrigger asChild>
                 <button
@@ -507,7 +508,7 @@ export function SearchPage() {
                   </div>
                 </div>
 
-                {/* Posts-only filters (hidden on activity tab) */}
+                {/* Posts-only filters (hidden on agora tab) */}
                 {activeTab === 'posts' && (
                   <>
                     <Separator />
@@ -593,8 +594,8 @@ export function SearchPage() {
           )}
         </div>
 
-        {/* Active filter summary chips (posts & activity tabs) */}
-        {(activeTab === 'posts' || activeTab === 'activity') && activeFilterLabels.length > 0 && (
+        {/* Active filter summary chips (posts & agora tabs) */}
+        {(activeTab === 'posts' || activeTab === 'agora') && activeFilterLabels.length > 0 && (
           <div className="flex flex-wrap gap-1.5 mt-2">
             {activeFilterLabels.map((label) => (
               <Badge key={label} variant="secondary" className="text-xs font-normal">
@@ -610,8 +611,8 @@ export function SearchPage() {
           </div>
         )}
 
-        {/* NIP-50 search query debug block (posts & activity tabs) */}
-        {(activeTab === 'posts' || activeTab === 'activity') && debouncedSearchQuery.trim() && (
+        {/* NIP-50 search query debug block (posts & agora tabs) */}
+        {(activeTab === 'posts' || activeTab === 'agora') && debouncedSearchQuery.trim() && (
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
@@ -631,9 +632,9 @@ export function SearchPage() {
       </div>
 
       <PullToRefresh onRefresh={handleRefresh}>
-        {/* ─── Activity Tab ─── */}
-        {activeTab === 'activity' && (
-          <ActivitySearchTab
+        {/* ─── Agora Tab ─── */}
+        {activeTab === 'agora' && (
+          <AgoraSearchTab
             searchQuery={debouncedSearchQuery}
             includeReplies={includeReplies}
             mediaType={mediaType}
@@ -696,12 +697,12 @@ export function SearchPage() {
               </div>
             ) : debouncedSearchQuery.trim() ? (
               <EmptyState
-                message="No posts found matching your search."
+                message="No results found matching your search."
                 activeFilters={activeFilterLabels}
                 onResetFilters={hasActiveFilters ? resetFilters : undefined}
               />
             ) : (
-              <EmptyState message="Enter a search query to find posts." />
+              <EmptyState message="Enter a search query to find Nostr content." />
             )}
           </>
         )}
@@ -990,10 +991,12 @@ function SearchInput({
   );
 }
 
-/** Activity tab — isolated component so useStreamPosts only subscribes when active.
- *  Pins kinds to [33863 Campaigns, 36639 Pledges] — the non-kind-1 Agora content
- *  stream. Kind 1 posts (and reposts of them) live on the Posts tab instead. */
-function ActivitySearchTab({
+/** Agora tab — isolated component so useStreamPosts only subscribes when active.
+ *  Pins kinds to [33863 Campaigns, 36639 Pledges, 34550 Groups/Communities] —
+ *  the non-kind-1 Agora content stream — and narrows to events whose NIP-89
+ *  `client` tag is the running app name (e.g. "Agora"). Kind 1 posts and the
+ *  unconstrained Nostr firehose live on the Nostr tab instead. */
+function AgoraSearchTab({
   searchQuery,
   includeReplies,
   mediaType,
@@ -1016,14 +1019,17 @@ function ActivitySearchTab({
   hasActiveFilters: boolean;
   resetFilters: () => void;
 }) {
+  const { config } = useAppContext();
+  const clientName = config.clientName ?? config.appName;
   const { posts, isLoading: postsLoading } = useStreamPosts(searchQuery, {
     includeReplies,
     mediaType,
     language,
     protocols,
-    kindsOverride: [33863, 36639],
+    kindsOverride: [33863, 36639, 34550],
     authorPubkeys,
     sort,
+    clientName,
   });
 
   if (postsLoading && posts.length === 0) {
@@ -1049,13 +1055,13 @@ function ActivitySearchTab({
   if (searchQuery.trim()) {
     return (
       <EmptyState
-        message="No campaigns or pledges found matching your search."
+        message="No Agora campaigns, pledges, or groups found matching your search."
         activeFilters={activeFilterLabels}
         onResetFilters={hasActiveFilters ? resetFilters : undefined}
       />
     );
   }
 
-  return <EmptyState message="Search for campaigns and pledges, or browse the latest." />;
+  return <EmptyState message="Search Agora campaigns, pledges, and groups, or browse the latest." />;
 }
 
