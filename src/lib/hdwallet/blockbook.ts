@@ -584,7 +584,7 @@ export async function fetchBlockTime(
 //
 // Blockbook tracks fiat rates for the coin it serves. The WS API takes a
 // list of ISO currency codes and returns a `{ ts, rates: { [ccy]: number } }`
-// payload. We use this so /hdwallet's USD display sources from the same
+// payload. We use this so /wallet's USD display sources from the same
 // server as its balance and tx data — no extra HTTP dependency on
 // mempool.space.
 // ---------------------------------------------------------------------------

@@ -15,7 +15,7 @@ import {
 
 import { useAction, type Action } from '@/hooks/useActions';
 import { useAuthor } from '@/hooks/useAuthor';
-import { useBitcoinWallet } from '@/hooks/useBitcoinWallet';
+import { useBtcPrice } from '@/hooks/useBtcPrice';
 import { useComments } from '@/hooks/useComments';
 import { useProfileUrl } from '@/hooks/useProfileUrl';
 import { useSubmissionZapTotals } from '@/hooks/useSubmissionZapTotals';
@@ -75,7 +75,7 @@ export function ActionDetailPage({ pubkey, identifier }: ActionDetailPageProps) 
 }
 
 function PledgeDetailContent({ action }: { action: Action }) {
-  const { btcPrice } = useBitcoinWallet();
+  const { data: btcPrice } = useBtcPrice();
   const author = useAuthor(action.pubkey);
   const navigate = useNavigate();
   const { toast } = useToast();

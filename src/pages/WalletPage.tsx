@@ -1,103 +1,204 @@
 import { useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useSeoMeta } from '@unhead/react';
-import { Bitcoin, Copy, Check, RefreshCw, ChevronDown, ArrowDownLeft, ArrowUpRight, Send } from 'lucide-react';
+import {
+  Copy,
+  Check,
+  RefreshCw,
+  ChevronDown,
+  ArrowDownLeft,
+  ArrowUpRight,
+  Send,
+  ShieldOff,
+  KeyRound,
+  Radar,
+} from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { LoginArea } from '@/components/auth/LoginArea';
 import { QRCodeCanvas } from '@/components/ui/qrcode';
-import { SendBitcoinDialog } from '@/components/SendBitcoinDialog';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from '@/components/ui/dialog';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { HDSendBitcoinDialog } from '@/components/HDSendBitcoinDialog';
+import { HDSilentPaymentScanDialog } from '@/components/HDSilentPaymentScanDialog';
 import { useAppContext } from '@/hooks/useAppContext';
-import { useCurrentUser } from '@/hooks/useCurrentUser';
-import { useBitcoinWallet } from '@/hooks/useBitcoinWallet';
+import { useHdWallet } from '@/hooks/useHdWallet';
+import { useHdWalletSp } from '@/hooks/useHdWalletSp';
+import { useHdBtcPrice } from '@/hooks/useHdBtcPrice';
 import { satsToUSD, formatBTC } from '@/lib/bitcoin';
-import type { Transaction } from '@/lib/bitcoin';
+import type { HdTransaction } from '@/lib/hdwallet/scan';
 
 export function WalletPage() {
   const { config } = useAppContext();
-  const { user } = useCurrentUser();
-  const { bitcoinAddress, addressData, btcPrice, transactions, isLoading, error, refetch } = useBitcoinWallet();
+  const {
+    availability,
+    currentReceiveAddress,
+    silentPaymentAddress,
+    transactions,
+    totalBalance,
+    pendingBalance,
+    isLoading,
+    isFetching,
+    error,
+    refetch,
+    nextReceiveAddress,
+  } = useHdWallet();
+  const sp = useHdWalletSp();
+  const { data: btcPrice } = useHdBtcPrice();
 
   const [copiedAddress, setCopiedAddress] = useState(false);
+  const [copiedSp, setCopiedSp] = useState(false);
   const [txOpen, setTxOpen] = useState(false);
   const [sendOpen, setSendOpen] = useState(false);
+  const [receiveOpen, setReceiveOpen] = useState(false);
+  const [spScanOpen, setSpScanOpen] = useState(false);
 
   useSeoMeta({
     title: `Wallet | ${config.appName}`,
-    description: 'Your Bitcoin Taproot wallet derived from your Nostr identity.',
+    description: 'Hierarchical-deterministic Bitcoin wallet derived from your Nostr nsec.',
   });
 
+  const address = currentReceiveAddress?.address ?? '';
+  const spAddress = silentPaymentAddress?.address ?? '';
+
   const copyAddress = async () => {
-    if (!bitcoinAddress) return;
+    if (!address) return;
     try {
-      await navigator.clipboard.writeText(bitcoinAddress);
+      await navigator.clipboard.writeText(address);
       setCopiedAddress(true);
       setTimeout(() => setCopiedAddress(false), 2000);
     } catch {
-      // clipboard API not available
+      // clipboard unavailable
     }
   };
 
-  const truncatedAddress = bitcoinAddress
-    ? `${bitcoinAddress.slice(0, 12)}...${bitcoinAddress.slice(-8)}`
+  const copySpAddress = async () => {
+    if (!spAddress) return;
+    try {
+      await navigator.clipboard.writeText(spAddress);
+      setCopiedSp(true);
+      setTimeout(() => setCopiedSp(false), 2000);
+    } catch {
+      // clipboard unavailable
+    }
+  };
+
+  const truncatedAddress = address
+    ? `${address.slice(0, 12)}...${address.slice(-8)}`
     : '';
 
-  return (
-    <main>
-      {!user ? (
+  const truncatedSpAddress = spAddress
+    ? `${spAddress.slice(0, 12)}...${spAddress.slice(-8)}`
+    : '';
+
+  // ── Logged out ────────────────────────────────────────────────
+  if (availability.status === 'logged-out') {
+    return (
+      <main>
         <div className="py-20 px-8 flex flex-col items-center gap-6 text-center">
           <div className="p-4 rounded-full bg-primary/10">
-            <Bitcoin className="size-8 text-primary" />
+            <KeyRound className="size-8 text-primary" />
           </div>
           <div className="space-y-2 max-w-xs">
-            <h2 className="text-xl font-bold">Your Bitcoin Wallet</h2>
+            <h2 className="text-xl font-bold">Bitcoin Wallet</h2>
             <p className="text-muted-foreground text-sm">
-              Log in to see your Bitcoin Taproot address derived from your Nostr identity.
+              A hierarchical wallet derived from your Nostr identity. Fresh address per receive,
+              full transaction history, no address reuse.
+            </p>
+            <p className="text-muted-foreground text-xs pt-2">
+              Requires login with an nsec (your Nostr private key).
             </p>
           </div>
           <LoginArea className="max-w-60" />
         </div>
-      ) : (
-        <div className="flex flex-col items-center px-4 pt-8 pb-4 space-y-6 max-w-sm mx-auto">
-          {/* Balance */}
-          {isLoading ? (
-            <div className="flex flex-col items-center space-y-2">
-              <Skeleton className="h-10 w-40 rounded-lg" />
-              <Skeleton className="h-4 w-24 rounded" />
-            </div>
-          ) : error ? (
-            <div className="text-center space-y-3">
-              <p className="text-sm text-destructive">Failed to load balance</p>
-              <Button variant="outline" size="sm" onClick={() => refetch()}>
-                <RefreshCw className="size-3.5 mr-1.5" />
-                Retry
-              </Button>
-            </div>
-          ) : addressData ? (
-            <div className="flex flex-col items-center space-y-1">
-              <span className="text-4xl font-bold tracking-tight">
-                {btcPrice
-                  ? satsToUSD(addressData.totalBalance, btcPrice)
-                  : '---'}
-              </span>
-              <span className="text-sm text-muted-foreground">
-                {formatBTC(addressData.totalBalance)} BTC
-              </span>
+      </main>
+    );
+  }
 
-              {addressData.pendingBalance !== 0 && (
-                <span className="flex items-center gap-1 text-xs text-orange-500 dark:text-orange-400 pt-1">
-                  <RefreshCw className="size-3 animate-spin" />
-                  {btcPrice
-                    ? `${satsToUSD(addressData.pendingBalance, btcPrice)} pending`
-                    : 'pending'}
-                </span>
+  // ── Logged in, but signer doesn't expose the secret key ─────
+  if (availability.status === 'unsupported') {
+    return (
+      <main>
+        <div className="py-20 px-8 flex flex-col items-center gap-6 text-center max-w-md mx-auto">
+          <div className="p-4 rounded-full bg-muted">
+            <ShieldOff className="size-8 text-muted-foreground" />
+          </div>
+          <div className="space-y-2">
+            <h2 className="text-xl font-bold">Wallet unavailable</h2>
+            <p className="text-muted-foreground text-sm">
+              {availability.loginType === 'extension'
+                ? 'Your browser extension keeps your secret key isolated, so we can\'t derive child keys for your wallet.'
+                : availability.loginType === 'bunker'
+                  ? 'Your remote signer (NIP-46 bunker) keeps your secret key on the bunker side, so we can\'t derive child keys for your wallet.'
+                  : "Your login type doesn't expose the secret key needed to derive your wallet."}
+            </p>
+            <p className="text-muted-foreground text-sm pt-2">
+              Log out and sign in again with your nsec to use the wallet.
+            </p>
+          </div>
+        </div>
+      </main>
+    );
+  }
+
+  // ── Available — full HD wallet UI ────────────────────────────
+  return (
+    <main>
+      <div className="flex flex-col items-center px-4 pt-8 pb-4 space-y-6 max-w-sm mx-auto">
+        {/* Balance */}
+        {isLoading ? (
+          <div className="flex flex-col items-center space-y-2">
+            <Skeleton className="h-10 w-40 rounded-lg" />
+            <Skeleton className="h-4 w-24 rounded" />
+          </div>
+        ) : error ? (
+          <div className="text-center space-y-3">
+            <p className="text-sm text-destructive">Failed to scan wallet</p>
+            <Button variant="outline" size="sm" onClick={() => refetch()}>
+              <RefreshCw className="size-3.5 mr-1.5" />
+              Retry
+            </Button>
+          </div>
+        ) : (
+          <button
+            type="button"
+            onClick={() => refetch()}
+            disabled={isFetching}
+            className="flex flex-col items-center space-y-1 group cursor-pointer disabled:cursor-default rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring px-4 py-2"
+            aria-label="Refresh balance"
+            title="Click to refresh balance"
+          >
+            <span className="text-4xl font-bold tracking-tight group-hover:opacity-80 transition-opacity flex items-center gap-2">
+              {btcPrice ? satsToUSD(totalBalance, btcPrice) : '---'}
+              {isFetching && (
+                <RefreshCw className="size-5 animate-spin text-muted-foreground" />
               )}
-            </div>
-          ) : null}
+            </span>
+            <span className="text-sm text-muted-foreground">
+              {formatBTC(totalBalance)} BTC
+            </span>
 
-          {/* Send button */}
-          {addressData && (
+            {pendingBalance !== 0 && (
+              <span className="flex items-center gap-1 text-xs text-orange-500 dark:text-orange-400 pt-1">
+                <RefreshCw className="size-3 animate-spin" />
+                {btcPrice
+                  ? `${satsToUSD(Math.abs(pendingBalance), btcPrice)} pending`
+                  : 'pending'}
+              </span>
+            )}
+          </button>
+        )}
+
+        {/* Send + Receive */}
+        {!isLoading && !error && (
+          <div className="flex items-center gap-2">
             <Button
               variant="outline"
               size="sm"
@@ -107,70 +208,178 @@ export function WalletPage() {
               <Send className="size-3.5 mr-1.5" />
               Send
             </Button>
-          )}
-
-          <SendBitcoinDialog
-            isOpen={sendOpen}
-            onClose={() => setSendOpen(false)}
-            btcPrice={btcPrice}
-          />
-
-          {/* QR Code */}
-          <div className="rounded-2xl bg-white p-4 shadow-sm">
-            <QRCodeCanvas value={bitcoinAddress} size={200} level="M" />
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setReceiveOpen(true)}
+              className="rounded-full"
+              disabled={!address}
+            >
+              <ArrowDownLeft className="size-3.5 mr-1.5" />
+              Receive
+            </Button>
           </div>
+        )}
 
-          {/* Address + copy */}
-          <button
-            onClick={copyAddress}
-            className="flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-mono text-muted-foreground hover:bg-muted/50 transition-colors cursor-pointer"
-          >
-            {truncatedAddress}
-            {copiedAddress ? (
-              <Check className="size-3.5 text-green-500" />
-            ) : (
-              <Copy className="size-3.5" />
-            )}
-          </button>
+        <HDSendBitcoinDialog
+          isOpen={sendOpen}
+          onClose={() => setSendOpen(false)}
+          btcPrice={btcPrice}
+        />
 
-          {/* Transactions */}
-          {transactions && transactions.length > 0 && (
-            <>
-              <button
-                onClick={() => setTxOpen((o) => !o)}
-                className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
-              >
-                Transactions
-                <ChevronDown className={`size-3 transition-transform duration-200 ${txOpen ? 'rotate-180' : ''}`} />
-              </button>
+        <HDSilentPaymentScanDialog open={spScanOpen} onOpenChange={setSpScanOpen} />
 
-              <TxAccordion open={txOpen}>
-                <div className="w-full divide-y">
-                  {transactions.map((tx) => (
-                    <TxRow key={tx.txid} tx={tx} btcPrice={btcPrice} />
-                  ))}
-                </div>
-              </TxAccordion>
-            </>
-          )}
+        {/* Receive Dialog */}
+        <Dialog open={receiveOpen} onOpenChange={setReceiveOpen}>
+          <DialogContent className="sm:max-w-sm">
+            <DialogHeader>
+              <DialogTitle>Receive Bitcoin</DialogTitle>
+              <DialogDescription>
+                Share an address to receive bitcoin.
+              </DialogDescription>
+            </DialogHeader>
 
-          {/* Recovery link for users with funds in a legacy Lightning wallet. */}
-          <Link
-            to="/wallet/recovery"
-            className="text-xs text-muted-foreground hover:text-foreground underline-offset-4 hover:underline transition-colors"
-          >
-            Looking for your old wallet?
-          </Link>
-        </div>
-      )}
+            <Tabs defaultValue="onchain" className="w-full">
+              <TabsList className="grid w-full grid-cols-2">
+                <TabsTrigger value="onchain">On-chain</TabsTrigger>
+                <TabsTrigger value="silent" disabled={!spAddress}>
+                  Silent payment
+                </TabsTrigger>
+              </TabsList>
+
+              {/* ── On-chain (BIP86 single-use) ──────────────── */}
+              <TabsContent value="onchain" className="mt-4">
+                {address && (
+                  <div className="flex flex-col items-center gap-4">
+                    <p className="text-xs text-muted-foreground text-center max-w-xs">
+                      Fresh address each time. Bump to a new index after sharing
+                      for privacy.
+                    </p>
+
+                    <div className="rounded-2xl bg-white p-4 shadow-sm">
+                      <QRCodeCanvas value={address} size={200} level="M" />
+                    </div>
+
+                    <button
+                      onClick={copyAddress}
+                      className="flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-mono text-muted-foreground hover:bg-muted/50 transition-colors cursor-pointer"
+                    >
+                      {truncatedAddress}
+                      {copiedAddress ? (
+                        <Check className="size-3.5 text-green-500" />
+                      ) : (
+                        <Copy className="size-3.5" />
+                      )}
+                    </button>
+
+                    <div className="flex items-center gap-3 text-xs text-muted-foreground">
+                      <span>Address #{currentReceiveAddress?.index ?? 0}</span>
+                      <span aria-hidden>·</span>
+                      <button
+                        onClick={() => nextReceiveAddress()}
+                        className="hover:text-foreground underline-offset-4 hover:underline transition-colors cursor-pointer"
+                      >
+                        New address
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </TabsContent>
+
+              {/* ── Silent payment (BIP-352 static) ──────────── */}
+              <TabsContent value="silent" className="mt-4">
+                {spAddress && (
+                  <div className="flex flex-col items-center gap-4">
+                    <p className="text-xs text-muted-foreground text-center max-w-xs">
+                      Static receive identifier. Share once and reuse forever —
+                      senders derive a unique on-chain address per payment.
+                    </p>
+
+                    <div className="rounded-2xl bg-white p-4 shadow-sm">
+                      <QRCodeCanvas value={spAddress} size={220} level="L" />
+                    </div>
+
+                    <button
+                      onClick={copySpAddress}
+                      className="flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-mono text-muted-foreground hover:bg-muted/50 transition-colors cursor-pointer"
+                    >
+                      {truncatedSpAddress}
+                      {copiedSp ? (
+                        <Check className="size-3.5 text-green-500" />
+                      ) : (
+                        <Copy className="size-3.5" />
+                      )}
+                    </button>
+
+                    {sp.unavailableReason === 'no-indexer' ? (
+                      <p className="text-xs text-orange-500 dark:text-orange-400 text-center max-w-xs">
+                        Scanning disabled — no BIP-352 indexer configured. Set{' '}
+                        <span className="font-mono">bip352IndexerUrl</span> in your app config to
+                        detect incoming silent payments.
+                      </p>
+                    ) : sp.enabled ? (
+                      <div className="flex flex-col items-center gap-2 w-full">
+                        {sp.balance > 0 && (
+                          <p className="text-xs text-muted-foreground text-center">
+                            Silent payment balance:{' '}
+                            <span className="text-foreground font-medium">
+                              {btcPrice
+                                ? satsToUSD(sp.balance, btcPrice)
+                                : `${formatBTC(sp.balance)} BTC`}
+                            </span>
+                          </p>
+                        )}
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => setSpScanOpen(true)}
+                          className="rounded-full"
+                        >
+                          <Radar className="size-3.5 mr-1.5" />
+                          {sp.storage?.scanHeight && sp.storage.scanHeight > 0
+                            ? 'Scan for new payments'
+                            : 'Scan for payments'}
+                        </Button>
+                      </div>
+                    ) : null}
+                  </div>
+                )}
+              </TabsContent>
+            </Tabs>
+          </DialogContent>
+        </Dialog>
+
+        {/* Transactions */}
+        {transactions && transactions.length > 0 && (
+          <>
+            <button
+              onClick={() => setTxOpen((o) => !o)}
+              className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+            >
+              Transactions
+              <ChevronDown className={`size-3 transition-transform duration-200 ${txOpen ? 'rotate-180' : ''}`} />
+            </button>
+
+            <TxAccordion open={txOpen}>
+              <div className="w-full divide-y">
+                {transactions.map((tx) => (
+                  <TxRow key={tx.txid} tx={tx} btcPrice={btcPrice} />
+                ))}
+              </div>
+            </TxAccordion>
+          </>
+        )}
+      </div>
     </main>
   );
 }
 
-/** Accordion wrapper using grid-template-rows for smooth height animation. */
+// ---------------------------------------------------------------------------
+// Helpers (mirrors WalletPage.tsx)
+// ---------------------------------------------------------------------------
+
 function TxAccordion({ open, children }: { open: boolean; children: React.ReactNode }) {
   const contentRef = useRef<HTMLDivElement>(null);
-
   return (
     <div
       className="w-full grid transition-[grid-template-rows] duration-300 ease-in-out"
@@ -183,32 +392,30 @@ function TxAccordion({ open, children }: { open: boolean; children: React.ReactN
   );
 }
 
-/** Format a unix timestamp as a relative or absolute date. */
 function formatTxDate(timestamp?: number): string {
   if (!timestamp) return 'Pending';
-
   const date = new Date(timestamp * 1000);
   const now = new Date();
-  // Clamp negative diffs (timestamp slightly in the future) to "Today"
-  // rather than rendering "-1d ago".
-  const diffMs = Math.max(0, now.getTime() - date.getTime());
-  const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
-
+  // Clamp negative diffs (timestamp slightly in the future) to "Today" rather
+  // than rendering "-1d ago". Real block timestamps can run a few seconds
+  // ahead of the local clock, and synthetic estimates may overshoot.
+  const diffDays = Math.max(
+    0,
+    Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60 * 24)),
+  );
   if (diffDays === 0) return 'Today';
   if (diffDays === 1) return 'Yesterday';
   if (diffDays < 7) return `${diffDays}d ago`;
-
   return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
 }
 
-/** Single transaction row. */
-function TxRow({ tx, btcPrice }: { tx: Transaction; btcPrice?: number }) {
+function TxRow({ tx, btcPrice }: { tx: HdTransaction; btcPrice?: number }) {
   const isReceive = tx.type === 'receive';
-
+  const isSilent = tx.source === 'silent-payment';
   return (
     <Link
       to={`/i/bitcoin:tx:${tx.txid}`}
-      className="flex items-center justify-between py-3 px-1 hover:bg-muted/50 transition-colors rounded-lg -mx-1 px-2"
+      className="flex items-center justify-between py-3 hover:bg-muted/50 transition-colors rounded-lg -mx-1 px-2"
     >
       <div className="flex items-center gap-3">
         <div className={`flex items-center justify-center size-8 rounded-full ${
@@ -221,7 +428,18 @@ function TxRow({ tx, btcPrice }: { tx: Transaction; btcPrice?: number }) {
             : <ArrowUpRight className="size-4" />}
         </div>
         <div>
-          <p className="text-sm font-medium">{isReceive ? 'Received' : 'Sent'}</p>
+          <p className="text-sm font-medium flex items-center gap-1.5">
+            {isReceive ? 'Received' : 'Sent'}
+            {isSilent && (
+              <span
+                className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-1.5 py-0.5 text-[10px] font-medium text-primary"
+                title="Detected via BIP-352 silent payment scan"
+              >
+                <Radar className="size-2.5" />
+                silent
+              </span>
+            )}
+          </p>
           <p className="text-xs text-muted-foreground">{formatTxDate(tx.timestamp)}</p>
         </div>
       </div>
@@ -230,13 +448,9 @@ function TxRow({ tx, btcPrice }: { tx: Transaction; btcPrice?: number }) {
           isReceive ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'
         }`}>
           {isReceive ? '+' : '-'}
-          {btcPrice
-            ? satsToUSD(tx.amount, btcPrice)
-            : `${formatBTC(tx.amount)} BTC`}
+          {btcPrice ? satsToUSD(tx.amount, btcPrice) : `${formatBTC(tx.amount)} BTC`}
         </p>
-        <p className="text-xs text-muted-foreground">
-          {formatBTC(tx.amount)} BTC
-        </p>
+        <p className="text-xs text-muted-foreground">{formatBTC(tx.amount)} BTC</p>
       </div>
     </Link>
   );

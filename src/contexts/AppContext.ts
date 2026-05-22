@@ -291,7 +291,7 @@ export interface AppConfig {
   esploraApis: string[];
   /**
    * Base URL for Trezor's Blockbook API, used exclusively by the HD wallet at
-   * `/hdwallet`. Blockbook's xpub endpoint (`/api/v2/xpub/<descriptor>`) lets
+   * `/wallet`. Blockbook's xpub endpoint (`/api/v2/xpub/<descriptor>`) lets
    * the HD wallet scan, balance, and pull tx history for the entire account
    * in a single HTTP call, where the equivalent Esplora workflow would be
    * dozens of per-address calls.
@@ -312,7 +312,7 @@ export interface AppConfig {
   blockbookBaseUrl: string;
   /**
    * Base URL of a BIP-352 tweak-data indexer (BlindBit Oracle v2-compatible),
-   * used by the HD wallet at `/hdwallet` to detect incoming silent payments.
+   * used by the HD wallet at `/wallet` to detect incoming silent payments.
    *
    * The wallet derives the scan private key `bscan` locally from the user's
    * nsec and finishes the BIP-352 ECDH step itself; only public per-tx tweak

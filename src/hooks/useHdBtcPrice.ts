@@ -9,7 +9,7 @@ import { useAppContext } from '@/hooks/useAppContext';
  *
  * Why a dedicated hook instead of the app-wide {@link useBtcPrice}?
  *
- * `/hdwallet` deliberately isolates its network surface to the single
+ * `/wallet` deliberately isolates its network surface to the single
  * Blockbook endpoint the user has configured — no Esplora, no
  * mempool.space `/v1/prices`. This hook keeps that contract: if Blockbook
  * is reachable, the HD wallet has everything it needs; if it isn't,

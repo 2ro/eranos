@@ -43,7 +43,7 @@ import { NoteMoreMenu } from '@/components/NoteMoreMenu';
 import { Progress } from '@/components/ui/progress';
 import { ThreadedReplyList, type ReplyNode } from '@/components/ThreadedReplyList';
 import { useAuthor } from '@/hooks/useAuthor';
-import { useBitcoinWallet } from '@/hooks/useBitcoinWallet';
+import { useBtcPrice } from '@/hooks/useBtcPrice';
 import { useCampaign } from '@/hooks/useCampaign';
 import { useCampaignDonations } from '@/hooks/useCampaignDonations';
 import { useComments } from '@/hooks/useComments';
@@ -123,7 +123,7 @@ export function CampaignDetailPage({ pubkey, identifier, relays }: CampaignDetai
 
 function CampaignDetailContent({ campaign }: { campaign: ParsedCampaign }) {
   const { user } = useCurrentUser();
-  const { btcPrice } = useBitcoinWallet();
+  const { data: btcPrice } = useBtcPrice();
   const author = useAuthor(campaign.pubkey);
   const { data: stats, isLoading: statsLoading } = useCampaignDonations(campaign);
   const navigate = useNavigate();

@@ -104,7 +104,7 @@ interface ResolvedRecipient {
 /**
  * Parse the recipient input as one of:
  *   - bare Bitcoin address (mainnet, any standard type)
- *   - npub1… → P2TR derived from the Nostr pubkey (matches /wallet's mapping)
+ *   - npub1… → P2TR derived from the Nostr pubkey
  *   - nprofile1… → P2TR derived from the encoded pubkey
  *
  * Returns `null` for unparseable input. The caller should treat `null` as
@@ -156,12 +156,11 @@ interface SendResult {
 }
 
 /**
- * "Send Bitcoin" dialog for the HD wallet at `/hdwallet`.
+ * "Send Bitcoin" dialog for the HD wallet at `/wallet`.
  *
- * Mirrors the UX of `SendBitcoinDialog` for visual consistency — large
- * editable USD amount, preset chips, fee speed picker, two-tap arming for
- * large amounts, privacy disclaimer for raw addresses — but uses the HD
- * wallet's UTXO set across many addresses, signs with per-input HD-derived
+ * Provides a large editable USD amount, preset chips, fee speed picker, two-tap
+ * arming for large amounts, and a privacy disclaimer for raw addresses. Uses
+ * the HD wallet's UTXO set across many addresses, signs with per-input HD-derived
  * keys, and emits change to a fresh internal address.
  */
 export function HDSendBitcoinDialog({ isOpen, onClose, btcPrice }: HDSendBitcoinDialogProps) {
@@ -205,7 +204,7 @@ export function HDSendBitcoinDialog({ isOpen, onClose, btcPrice }: HDSendBitcoin
   const ownedUtxos: HdSpendableUtxo[] = useMemo(() => scan?.utxos ?? [], [scan]);
   const totalBalance = useMemo(() => ownedUtxos.reduce((s, u) => s + u.value, 0), [ownedUtxos]);
 
-  // Silent-payment UTXOs are scanned and displayed on /hdwallet but cannot
+  // Silent-payment UTXOs are scanned and displayed on /wallet but cannot
   // yet be spent by this dialog: the BIP-352 receive output uses a tweaked
   // private key not derivable from the BIP-86 (chain, index) pair the PSBT
   // signer expects. Detect the case where the wallet's _only_ funds are SP
