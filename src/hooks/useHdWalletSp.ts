@@ -382,8 +382,18 @@ export function useHdWalletSp(): UseHdWalletSpResult {
   const [scanError, setScanError] = useState<Error | undefined>();
   const [isScanning, setIsScanning] = useState(false);
   const scanAbortRef = useRef<AbortController | null>(null);
-  // Debounce timer for republishing storage during a long scan.
+  // Throttle timer for republishing storage during a long scan. Armed once
+  // when there's unpublished progress; subsequent `scheduleRepublish` calls
+  // while the timer is armed are no-ops. This guarantees a publish at least
+  // every `REPUBLISH_THROTTLE_MS` during a continuous scan — unlike a
+  // trailing debounce, which keeps resetting and may never fire.
   const republishTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  // True when `optimisticRef.current` contains a *match* that hasn't been
+  // republished yet. Scan-height advancement alone does NOT set this — we
+  // don't want to fire a relay event every 5s during a 10k-block walk over
+  // empty blocks. The final flush in `scanRange`'s `finally` publishes
+  // unconditionally so the advanced `scanHeight` still gets checkpointed.
+  const republishDirtyRef = useRef(false);
 
   const cancelScan = useCallback(() => {
     scanAbortRef.current?.abort();
@@ -396,16 +406,26 @@ export function useHdWalletSp(): UseHdWalletSpResult {
     }
     const doc = optimisticRef.current;
     if (!doc) return;
+    republishDirtyRef.current = false;
     publishStorage.mutate({ next: doc });
   }, [publishStorage]);
 
+  const REPUBLISH_THROTTLE_MS = 5000;
   const scheduleRepublish = useCallback(() => {
-    if (republishTimerRef.current) clearTimeout(republishTimerRef.current);
+    // Already armed — let the existing timer fire. This is the difference
+    // from a debounce: we don't reset on every call, so a tight scan loop
+    // still publishes on the original schedule.
+    if (republishTimerRef.current) return;
+    // Nothing worth publishing — don't arm.
+    if (!republishDirtyRef.current) return;
     republishTimerRef.current = setTimeout(() => {
       republishTimerRef.current = null;
       const doc = optimisticRef.current;
-      if (doc) publishStorage.mutate({ next: doc });
-    }, 5000);
+      if (!doc) return;
+      if (!republishDirtyRef.current) return;
+      republishDirtyRef.current = false;
+      publishStorage.mutate({ next: doc });
+    }, REPUBLISH_THROTTLE_MS);
   }, [publishStorage]);
 
   // ── The core scan loop ───────────────────────────────────────
@@ -510,6 +530,10 @@ export function useHdWalletSp(): UseHdWalletSpResult {
               spent: mergeUtxos(opt.spent ?? [], freshArchive),
             };
             matchesFound += blockMatches.length;
+            // New matches landed — arm the throttle so they reach relays
+            // within `REPUBLISH_THROTTLE_MS` even if the user closes the
+            // tab before the scan finishes.
+            republishDirtyRef.current = true;
           }
 
           // Forward the scan cursor as long as we advance contiguously from
@@ -532,8 +556,11 @@ export function useHdWalletSp(): UseHdWalletSpResult {
           // Bump the optimistic-version state so `storage` recomputes.
           setOptimisticVersion((v) => v + 1);
 
-          // Coalesce relay republishes so a 10k-block scan doesn't fire 10k
-          // events at the user's signer.
+          // Throttled relay republish — fires at most once per
+          // `REPUBLISH_THROTTLE_MS`, and only when new matches have landed
+          // since the last publish. Guarantees the user loses at most one
+          // throttle window of progress if they close the tab mid-scan,
+          // without flooding their signer on empty-block walks.
           scheduleRepublish();
         }
       } catch (err) {
@@ -581,12 +608,14 @@ export function useHdWalletSp(): UseHdWalletSpResult {
   const pruneSpentUtxos = useCallback<UseHdWalletSpResult['pruneSpentUtxos']>(
     (spent) => {
       if (!spent.length) return;
-      // Cancel any pending debounced republish — its document snapshot
-      // doesn't know about the prune.
+      // Cancel any pending throttled republish — its document snapshot
+      // doesn't know about the prune. We're about to publish a strictly
+      // newer doc below, so the throttle's pending payload would be stale.
       if (republishTimerRef.current) {
         clearTimeout(republishTimerRef.current);
         republishTimerRef.current = null;
       }
+      republishDirtyRef.current = false;
       const base = storageRef.current ?? optimisticRef.current;
       if (!base) return;
       // Archive (don't delete) the pruned entries so the transaction-history
