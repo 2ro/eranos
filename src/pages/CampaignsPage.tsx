@@ -207,7 +207,7 @@ export function CampaignsPage() {
               <Button
                 size="lg"
                 asChild
-                className="rounded-full text-primary-foreground font-semibold text-base h-12 px-7 [&_svg]:size-[18px] motion-safe:transition-colors"
+                className="rounded-full text-white font-semibold text-base h-12 px-7 [&_svg]:size-[18px] motion-safe:transition-colors"
               >
                 <Link to="/campaigns/new">
                   <PlusCircle className="mr-2" />
