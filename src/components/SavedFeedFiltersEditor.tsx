@@ -44,7 +44,7 @@ type KindOption = {
 
 // ─── Kind options (built once) ───────────────────────────────────────────────
 
-import { buildKindOptions } from '@/lib/feedFilterUtils';
+import { buildKindOptions, AGORA_PRESET_KIND_VALUES } from '@/lib/feedFilterUtils';
 
 // ─── useScrollCarets ─────────────────────────────────────────────────────────
 
@@ -152,6 +152,25 @@ export function KindPicker({ value, options, onChange }: {
     );
   }, [options, search]);
 
+  // Partition into Agora preset (top of picker) and the rest.
+  // When the user is searching, we skip the partition and show a flat list.
+  const presetSet = useMemo(() => new Set(AGORA_PRESET_KIND_VALUES), []);
+  const { presetOptions, otherOptions } = useMemo(() => {
+    if (search) return { presetOptions: [], otherOptions: filtered };
+    const preset: KindOption[] = [];
+    const other: KindOption[] = [];
+    // Preserve AGORA_PRESET_KIND_VALUES order for the preset section.
+    const byValue = new Map(filtered.map((o) => [o.value, o]));
+    for (const v of AGORA_PRESET_KIND_VALUES) {
+      const opt = byValue.get(v);
+      if (opt) preset.push(opt);
+    }
+    for (const o of filtered) {
+      if (!presetSet.has(o.value)) other.push(o);
+    }
+    return { presetOptions: preset, otherOptions: other };
+  }, [filtered, presetSet, search]);
+
   const selected = value === 'all' || value === 'custom' ? null : options.find((o) => o.value === value);
   const SelectedIcon = selected?.icon;
 
@@ -199,7 +218,22 @@ export function KindPicker({ value, options, onChange }: {
         {canScrollUp && <KindScrollCaret direction="up" onMouseEnter={() => startScroll('up')} onMouseLeave={stopScroll} />}
         <div ref={refCallback} className="overflow-y-auto flex-1 min-h-0" onScroll={onScroll}>
           {!search && <KindPickerItem icon={null} label="All kinds" active={value === 'all'} onClick={() => handleSelect('all')} />}
-          {filtered.map((opt) => (
+          {!search && presetOptions.length > 0 && (
+            <>
+              <div className="px-2.5 pt-2 pb-1 text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
+                Agora content
+              </div>
+              {presetOptions.map((opt) => (
+                <KindPickerItem key={opt.value} icon={opt.icon ?? null} label={opt.label} active={value === opt.value} onClick={() => handleSelect(opt.value)} />
+              ))}
+              {otherOptions.length > 0 && (
+                <div className="px-2.5 pt-2 pb-1 text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
+                  All kinds
+                </div>
+              )}
+            </>
+          )}
+          {otherOptions.map((opt) => (
             <KindPickerItem key={opt.value} icon={opt.icon ?? null} label={opt.label} active={value === opt.value} onClick={() => handleSelect(opt.value)} />
           ))}
           {(!search || 'custom'.includes(search.toLowerCase())) && (
