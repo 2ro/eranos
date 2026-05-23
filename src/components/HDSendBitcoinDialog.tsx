@@ -1,5 +1,6 @@
 import { useState, useCallback, useMemo, useRef, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { nip19 } from 'nostr-tools';
 import {
   AlertTriangle,
@@ -60,13 +61,6 @@ import { useQuery } from '@tanstack/react-query';
 const USD_PRESETS = [1, 5, 10, 25, 100];
 
 type FeeSpeed = 'fastest' | 'halfHour' | 'hour' | 'economy';
-
-const FEE_SPEED_LABELS: Record<FeeSpeed, string> = {
-  fastest: '~10 min',
-  halfHour: '~30 min',
-  hour: '~1 hour',
-  economy: '~1 day',
-};
 
 const FEE_SPEED_ORDER: FeeSpeed[] = ['fastest', 'halfHour', 'hour', 'economy'];
 
@@ -192,6 +186,7 @@ interface SendResult {
  * keys, and emits change to a fresh internal address.
  */
 export function HDSendBitcoinDialog({ isOpen, onClose, btcPrice }: HDSendBitcoinDialogProps) {
+  const { t } = useTranslation();
   const availability = useHdWalletAccess();
   const {
     scan,
@@ -206,6 +201,16 @@ export function HDSendBitcoinDialog({ isOpen, onClose, btcPrice }: HDSendBitcoin
   const queryClient = useQueryClient();
 
   const isReady = availability.status === 'available';
+
+  const feeSpeedLabels: Record<FeeSpeed, string> = useMemo(
+    () => ({
+      fastest: t('walletSend.feeSpeed.fastest'),
+      halfHour: t('walletSend.feeSpeed.halfHour'),
+      hour: t('walletSend.feeSpeed.hour'),
+      economy: t('walletSend.feeSpeed.economy'),
+    }),
+    [t],
+  );
 
   // ── Form state ───────────────────────────────────────────────
   const [recipientInput, setRecipientInput] = useState('');
@@ -359,14 +364,14 @@ export function HDSendBitcoinDialog({ isOpen, onClose, btcPrice }: HDSendBitcoin
   const sendMutation = useMutation<SendResult, Error, void>({
     mutationFn: async () => {
       if (availability.status !== 'available') {
-        throw new Error('HD wallet is not available for this login type.');
+        throw new Error(t('walletSend.errors.unavailable'));
       }
-      if (!recipient) throw new Error('Enter a Bitcoin address, sp1… address, or npub.');
-      if (!ownedInputs.length) throw new Error('No spendable Bitcoin in this wallet.');
-      if (!feeRates) throw new Error('Fee rates not loaded.');
-      if (recipient.pubkey === availability.pubkey) throw new Error("You can't send to yourself.");
-      if (amountSats <= 0) throw new Error('Enter an amount.');
-      if (insufficient) throw new Error('Not enough Bitcoin for this amount + network fee.');
+      if (!recipient) throw new Error(t('walletSend.errors.enterRecipient'));
+      if (!ownedInputs.length) throw new Error(t('walletSend.errors.noSpendable'));
+      if (!feeRates) throw new Error(t('walletSend.errors.feesNotLoaded'));
+      if (recipient.pubkey === availability.pubkey) throw new Error(t('walletSend.errors.cantSendToSelf'));
+      if (amountSats <= 0) throw new Error(t('walletSend.errors.enterAmount'));
+      if (insufficient) throw new Error(t('walletSend.errors.insufficient'));
 
       const rate = getRateForSpeed(feeRates, feeSpeed);
       const nextChangeIndex = scan?.change.firstUnusedIndex ?? 0;
@@ -417,7 +422,7 @@ export function HDSendBitcoinDialog({ isOpen, onClose, btcPrice }: HDSendBitcoin
       void refetchWallet();
     },
     onError: (err) => {
-      toast({ title: 'Transaction failed', description: err.message, variant: 'destructive' });
+      toast({ title: t('walletSend.toast.failedTitle'), description: err.message, variant: 'destructive' });
     },
     onSettled: () => setProgress('idle'),
   });
@@ -425,20 +430,21 @@ export function HDSendBitcoinDialog({ isOpen, onClose, btcPrice }: HDSendBitcoin
   const handleSend = useCallback(() => {
     setError('');
     if (availability.status !== 'available') {
-      setError('HD wallet is not available for this login type.'); return;
+      setError(t('walletSend.errors.unavailable')); return;
     }
-    if (!recipient) { setError('Enter a Bitcoin address, sp1… address, or npub.'); return; }
-    if (recipient.pubkey === availability.pubkey) { setError("You can't send to yourself."); return; }
-    if (!btcPrice) { setError('Waiting for BTC price…'); return; }
-    if (amountSats <= 0) { setError('Enter an amount.'); return; }
-    if (!ownedInputs.length) { setError("You don't have any Bitcoin yet."); return; }
-    if (insufficient) { setError('Not enough Bitcoin for this amount + network fee.'); return; }
+    if (!recipient) { setError(t('walletSend.errors.enterRecipient')); return; }
+    if (recipient.pubkey === availability.pubkey) { setError(t('walletSend.errors.cantSendToSelf')); return; }
+    if (!btcPrice) { setError(t('walletSend.errors.waitingPrice')); return; }
+    if (amountSats <= 0) { setError(t('walletSend.errors.enterAmount')); return; }
+    if (!ownedInputs.length) { setError(t('walletSend.errors.noneYet')); return; }
+    if (insufficient) { setError(t('walletSend.errors.insufficient')); return; }
     if (isRawAddress && !acknowledgedPublic) {
-      setError('Acknowledge the privacy warning before sending.'); return;
+      setError(t('walletSend.errors.acknowledgePrivacy')); return;
     }
     if (requiresArm && !confirmArmed) { setConfirmArmed(true); return; }
     sendMutation.mutate();
   }, [
+    t,
     availability,
     recipient,
     btcPrice,
@@ -472,14 +478,14 @@ export function HDSendBitcoinDialog({ isOpen, onClose, btcPrice }: HDSendBitcoin
   const sendButtonLabel = (() => {
     if (sendMutation.isPending) {
       switch (progress) {
-        case 'building': return 'Building transaction…';
-        case 'signing': return 'Signing…';
-        case 'broadcasting': return 'Broadcasting…';
-        default: return 'Sending…';
+        case 'building': return t('walletSend.progress.building');
+        case 'signing': return t('walletSend.progress.signing');
+        case 'broadcasting': return t('walletSend.progress.broadcasting');
+        default: return t('walletSend.progress.sending');
       }
     }
-    if (confirmArmed) return 'Tap again to confirm';
-    return 'Send Bitcoin';
+    if (confirmArmed) return t('walletSend.tapAgainToConfirm');
+    return t('walletSend.send');
   })();
 
   const sendDisabled =
@@ -495,7 +501,7 @@ export function HDSendBitcoinDialog({ isOpen, onClose, btcPrice }: HDSendBitcoin
   return (
     <Dialog open={isOpen} onOpenChange={(v) => { if (!v) handleClose(); }}>
       <DialogContent className="sm:max-w-md p-0 gap-0 overflow-hidden [&>button]:hidden">
-        <DialogTitle className="sr-only">Send Bitcoin</DialogTitle>
+        <DialogTitle className="sr-only">{t('walletSend.title')}</DialogTitle>
 
         {success ? (
           <SuccessScreen
@@ -508,11 +514,11 @@ export function HDSendBitcoinDialog({ isOpen, onClose, btcPrice }: HDSendBitcoin
           <div className="grid gap-5 px-6 py-6">
             {/* Header */}
             <div className="flex items-center justify-between">
-              <h2 className="text-base font-semibold">Send Bitcoin</h2>
+              <h2 className="text-base font-semibold">{t('walletSend.title')}</h2>
               <button
                 onClick={handleClose}
                 className="text-muted-foreground hover:text-foreground transition-colors"
-                aria-label="Close"
+                aria-label={t('common.close')}
               >
                 <X className="size-4" />
               </button>
@@ -545,7 +551,7 @@ export function HDSendBitcoinDialog({ isOpen, onClose, btcPrice }: HDSendBitcoin
               )}
               {amountSats > 0 && btcPrice && (
                 <span className="text-xs text-muted-foreground mt-1 tabular-nums">
-                  ≈ {amountSats.toLocaleString()} sats
+                  {t('walletSend.approxSats', { sats: amountSats.toLocaleString() })}
                 </span>
               )}
             </div>
@@ -572,26 +578,24 @@ export function HDSendBitcoinDialog({ isOpen, onClose, btcPrice }: HDSendBitcoin
             {/* Recipient */}
             <div className="grid gap-1">
               <label className="text-xs text-muted-foreground" htmlFor="hd-recipient-input">
-                Recipient
+                {t('walletSend.recipient.label')}
               </label>
               <Input
                 id="hd-recipient-input"
                 value={recipientInput}
                 onChange={(e) => setRecipientInput(e.target.value)}
-                placeholder="bc1…, sp1…, or npub…"
+                placeholder={t('walletSend.recipient.placeholder')}
                 autoComplete="off"
                 spellCheck={false}
                 className="font-mono text-sm"
               />
               {recipient && (
                 <p className="text-xs text-muted-foreground">
-                  {recipient.kind === 'sp' ? (
-                    <>Sending via a silent payment — the recipient gets a fresh, unlinkable on-chain address.</>
-                  ) : recipient.pubkey ? (
-                    <>Sending to a Nostr user&apos;s on-chain address.</>
-                  ) : (
-                    <>Sending to a raw Bitcoin address.</>
-                  )}
+                  {recipient.kind === 'sp'
+                    ? t('walletSend.recipient.sendingSp')
+                    : recipient.pubkey
+                      ? t('walletSend.recipient.sendingNostr')
+                      : t('walletSend.recipient.sendingRaw')}
                 </p>
               )}
             </div>
@@ -606,7 +610,7 @@ export function HDSendBitcoinDialog({ isOpen, onClose, btcPrice }: HDSendBitcoin
 
             {/* Fee speed */}
             <div className="flex items-center justify-between text-xs">
-              <span className="text-muted-foreground">Network fee</span>
+              <span className="text-muted-foreground">{t('walletSend.networkFee')}</span>
               <Popover open={feePopoverOpen} onOpenChange={setFeePopoverOpen}>
                 <PopoverTrigger asChild>
                   <button
@@ -616,12 +620,12 @@ export function HDSendBitcoinDialog({ isOpen, onClose, btcPrice }: HDSendBitcoin
                     {estimatedFeeSats > 0 && btcPrice ? (
                       <>≈ {satsToUSD(estimatedFeeSats, btcPrice)}</>
                     ) : currentFeeRate ? (
-                      <>{currentFeeRate} sat/vB</>
+                      <>{t('walletSend.satPerVB', { rate: currentFeeRate })}</>
                     ) : (
                       <>—</>
                     )}
                     <span className="opacity-60">·</span>
-                    {FEE_SPEED_LABELS[feeSpeed]}
+                    {feeSpeedLabels[feeSpeed]}
                   </button>
                 </PopoverTrigger>
                 <PopoverContent className="w-44 p-1" align="end">
@@ -636,10 +640,10 @@ export function HDSendBitcoinDialog({ isOpen, onClose, btcPrice }: HDSendBitcoin
                           feeSpeed === speed && 'bg-muted',
                         )}
                       >
-                        <span>{FEE_SPEED_LABELS[speed]}</span>
+                        <span>{feeSpeedLabels[speed]}</span>
                         {feeRates && (
                           <span className="text-muted-foreground tabular-nums">
-                            {getRateForSpeed(feeRates, speed)} sat/vB
+                            {t('walletSend.satPerVB', { rate: getRateForSpeed(feeRates, speed) })}
                           </span>
                         )}
                       </button>
@@ -651,7 +655,10 @@ export function HDSendBitcoinDialog({ isOpen, onClose, btcPrice }: HDSendBitcoin
 
             {showBalance && totalBalance > 0 && btcPrice && (
               <p className="text-xs text-muted-foreground text-center">
-                Available: {satsToUSD(totalBalance, btcPrice)} ({totalBalance.toLocaleString()} sats)
+                {t('walletSend.available', {
+                  usd: satsToUSD(totalBalance, btcPrice),
+                  sats: totalBalance.toLocaleString(),
+                })}
               </p>
             )}
 
@@ -695,6 +702,7 @@ interface SuccessScreenProps {
 }
 
 function SuccessScreen({ txid, amountSats, btcPrice, onClose }: SuccessScreenProps) {
+  const { t } = useTranslation();
   const usdDisplay = btcPrice ? satsToUSD(amountSats, btcPrice) : '';
 
   return (
@@ -721,9 +729,9 @@ function SuccessScreen({ txid, amountSats, btcPrice, onClose }: SuccessScreenPro
       </div>
 
       <div className="grid gap-1">
-        <h2 className="text-lg font-semibold tracking-tight">Bitcoin sent</h2>
+        <h2 className="text-lg font-semibold tracking-tight">{t('walletSend.success.title')}</h2>
         <div className="text-4xl font-bold tabular-nums bg-gradient-to-br from-amber-500 to-orange-600 bg-clip-text text-transparent">
-          {usdDisplay || `${amountSats.toLocaleString()} sats`}
+          {usdDisplay || t('walletSend.success.satsAmount', { sats: amountSats.toLocaleString() })}
         </div>
       </div>
 
@@ -731,10 +739,10 @@ function SuccessScreen({ txid, amountSats, btcPrice, onClose }: SuccessScreenPro
         <Button type="button" variant="outline" asChild className="w-full">
           <Link to={`/i/bitcoin:tx:${txid}`} onClick={onClose}>
             <ExternalLink className="size-4 mr-2" />
-            View transaction
+            {t('walletSend.success.viewTransaction')}
           </Link>
         </Button>
-        <Button type="button" onClick={onClose} className="w-full">Done</Button>
+        <Button type="button" onClick={onClose} className="w-full">{t('walletSend.success.done')}</Button>
       </div>
     </div>
   );

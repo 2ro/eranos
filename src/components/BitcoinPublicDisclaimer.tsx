@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react';
 import { AlertTriangle } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -62,13 +63,15 @@ interface BitcoinPublicDisclaimerProps {
 export function BitcoinPublicDisclaimer({
   acknowledged,
   onAcknowledgedChange,
-  leadText = 'Money you send is public and can be traced back to you.',
+  leadText,
   tone = 'destructive',
   includeCashOutAdvice = true,
   popoverText,
 }: BitcoinPublicDisclaimerProps) {
+  const { t } = useTranslation();
   const showCheckbox = onAcknowledgedChange !== undefined;
   const isSoft = tone === 'soft';
+  const resolvedLeadText = leadText ?? t('bitcoinPublic.lead');
 
   return (
     <Alert
@@ -92,25 +95,21 @@ export function BitcoinPublicDisclaimer({
       {!isSoft && <AlertTriangle className="size-4 text-destructive" />}
       <AlertDescription className="text-xs">
         <p>
-          {leadText}{' '}
+          {resolvedLeadText}{' '}
           <Popover>
             <PopoverTrigger asChild>
               <button
                 type="button"
                 className="underline underline-offset-2 font-medium hover:opacity-80 focus:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-sm"
               >
-                Learn more
+                {t('bitcoinPublic.learnMore')}
               </button>
             </PopoverTrigger>
             <PopoverContent side="top" align="start" className="w-72 text-xs leading-relaxed">
               {popoverText ?? (
-                <>
-                  Bitcoin is a public ledger. Transactions you send can
-                  be traced back to you forever, even after being
-                  exchanged by multiple people. Send it only to those
-                  you wish to support publicly
-                  {includeCashOutAdvice ? ', or cash out at an exchange.' : '.'}
-                </>
+                includeCashOutAdvice
+                  ? t('bitcoinPublic.bodyWithCashOut')
+                  : t('bitcoinPublic.body')
               )}
             </PopoverContent>
           </Popover>
@@ -126,9 +125,9 @@ export function BitcoinPublicDisclaimer({
                   ? 'border-amber-600 data-[state=checked]:bg-amber-600 data-[state=checked]:text-white dark:border-amber-400 dark:data-[state=checked]:bg-amber-500'
                   : 'border-destructive data-[state=checked]:bg-destructive data-[state=checked]:text-destructive-foreground',
               )}
-              aria-label="I understand this transaction is public"
+              aria-label={t('bitcoinPublic.iUnderstand')}
             />
-            <span>I understand this transaction is public.</span>
+            <span>{t('bitcoinPublic.iUnderstand')}</span>
           </label>
         )}
       </AlertDescription>

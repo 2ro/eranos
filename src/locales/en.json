@@ -690,5 +690,61 @@
       "activeChangedTitle": "Active wallet changed",
       "activeChangedDesc": "The selected wallet is now active for zaps."
     }
+  },
+  "walletSend": {
+    "title": "Send Bitcoin",
+    "send": "Send Bitcoin",
+    "tapAgainToConfirm": "Tap again to confirm",
+    "approxSats": "≈ {{sats}} sats",
+    "satPerVB": "{{rate}} sat/vB",
+    "networkFee": "Network fee",
+    "available": "Available: {{usd}} ({{sats}} sats)",
+    "recipient": {
+      "label": "Recipient",
+      "placeholder": "bc1…, sp1…, or npub…",
+      "sendingSp": "Sending via a silent payment — the recipient gets a fresh, unlinkable on-chain address.",
+      "sendingNostr": "Sending to a Nostr user's on-chain address.",
+      "sendingRaw": "Sending to a raw Bitcoin address."
+    },
+    "feeSpeed": {
+      "fastest": "~10 min",
+      "halfHour": "~30 min",
+      "hour": "~1 hour",
+      "economy": "~1 day"
+    },
+    "progress": {
+      "building": "Building transaction…",
+      "signing": "Signing…",
+      "broadcasting": "Broadcasting…",
+      "sending": "Sending…"
+    },
+    "errors": {
+      "unavailable": "HD wallet is not available for this login type.",
+      "enterRecipient": "Enter a Bitcoin address, sp1… address, or npub.",
+      "noSpendable": "No spendable Bitcoin in this wallet.",
+      "feesNotLoaded": "Fee rates not loaded.",
+      "cantSendToSelf": "You can't send to yourself.",
+      "enterAmount": "Enter an amount.",
+      "insufficient": "Not enough Bitcoin for this amount + network fee.",
+      "waitingPrice": "Waiting for BTC price…",
+      "noneYet": "You don't have any Bitcoin yet.",
+      "acknowledgePrivacy": "Acknowledge the privacy warning before sending."
+    },
+    "toast": {
+      "failedTitle": "Transaction failed"
+    },
+    "success": {
+      "title": "Bitcoin sent",
+      "satsAmount": "{{sats}} sats",
+      "viewTransaction": "View transaction",
+      "done": "Done"
+    }
+  },
+  "bitcoinPublic": {
+    "lead": "Money you send is public and can be traced back to you.",
+    "learnMore": "Learn more",
+    "body": "Bitcoin is a public ledger. Transactions you send can be traced back to you forever, even after being exchanged by multiple people. Send it only to those you wish to support publicly.",
+    "bodyWithCashOut": "Bitcoin is a public ledger. Transactions you send can be traced back to you forever, even after being exchanged by multiple people. Send it only to those you wish to support publicly, or cash out at an exchange.",
+    "iUnderstand": "I understand this transaction is public."
   }
 }

@@ -690,5 +690,61 @@
       "activeChangedTitle": "Cartera activa cambiada",
       "activeChangedDesc": "La cartera seleccionada ahora está activa para los zaps."
     }
+  },
+  "walletSend": {
+    "title": "Enviar Bitcoin",
+    "send": "Enviar Bitcoin",
+    "tapAgainToConfirm": "Toca de nuevo para confirmar",
+    "approxSats": "≈ {{sats}} sats",
+    "satPerVB": "{{rate}} sat/vB",
+    "networkFee": "Comisión de red",
+    "available": "Disponible: {{usd}} ({{sats}} sats)",
+    "recipient": {
+      "label": "Destinatario",
+      "placeholder": "bc1…, sp1… o npub…",
+      "sendingSp": "Enviando mediante un pago silencioso: el destinatario recibe una dirección nueva y no enlazable en la cadena.",
+      "sendingNostr": "Enviando a la dirección en cadena de un usuario de Nostr.",
+      "sendingRaw": "Enviando a una dirección de Bitcoin sin asociar."
+    },
+    "feeSpeed": {
+      "fastest": "~10 min",
+      "halfHour": "~30 min",
+      "hour": "~1 hora",
+      "economy": "~1 día"
+    },
+    "progress": {
+      "building": "Construyendo la transacción…",
+      "signing": "Firmando…",
+      "broadcasting": "Transmitiendo…",
+      "sending": "Enviando…"
+    },
+    "errors": {
+      "unavailable": "La cartera HD no está disponible para este tipo de inicio de sesión.",
+      "enterRecipient": "Introduce una dirección de Bitcoin, una dirección sp1… o un npub.",
+      "noSpendable": "No hay Bitcoin gastable en esta cartera.",
+      "feesNotLoaded": "No se cargaron las tasas de comisión.",
+      "cantSendToSelf": "No puedes enviarte a ti mismo.",
+      "enterAmount": "Introduce una cantidad.",
+      "insufficient": "No hay Bitcoin suficiente para esta cantidad + la comisión de red.",
+      "waitingPrice": "Esperando el precio del BTC…",
+      "noneYet": "Aún no tienes Bitcoin.",
+      "acknowledgePrivacy": "Acepta la advertencia de privacidad antes de enviar."
+    },
+    "toast": {
+      "failedTitle": "La transacción falló"
+    },
+    "success": {
+      "title": "Bitcoin enviado",
+      "satsAmount": "{{sats}} sats",
+      "viewTransaction": "Ver transacción",
+      "done": "Hecho"
+    }
+  },
+  "bitcoinPublic": {
+    "lead": "El dinero que envías es público y puede rastrearse hasta ti.",
+    "learnMore": "Más información",
+    "body": "Bitcoin es un libro contable público. Las transacciones que envías pueden rastrearse hasta ti para siempre, incluso después de ser intercambiadas por varias personas. Envíalo solo a quienes quieras apoyar públicamente.",
+    "bodyWithCashOut": "Bitcoin es un libro contable público. Las transacciones que envías pueden rastrearse hasta ti para siempre, incluso después de ser intercambiadas por varias personas. Envíalo solo a quienes quieras apoyar públicamente, o convíertelo a moneda fíat en una casa de cambio.",
+    "iUnderstand": "Entiendo que esta transacción es pública."
   }
 }
