@@ -858,5 +858,77 @@
       "constellation": "星座",
       "followPack": "关注包"
     }
+  },
+  "notifSettings": {
+    "seoTitle": "通知",
+    "seoDescription": "配置你的通知偏好",
+    "title": "通知",
+    "subtitle": "自定义你接收哪些通知。",
+    "pushHeading": "推送通知",
+    "enablePush": {
+      "label": "启用推送通知",
+      "description": "在你的帖子上有活动时接收通知"
+    },
+    "unsupported": "你的浏览器不支持推送通知。",
+    "denied": "通知已被屏蔽。请更新你的浏览器设置以允许本站发送通知。",
+    "deliveryMethod": {
+      "heading": "送达方式",
+      "intro": "选择如何将通知发送到你的设备。",
+      "push": {
+        "label": "推送",
+        "description": "标准通知。没有持续的状态栏图标。"
+      },
+      "persistent": {
+        "label": "持续",
+        "description": "在后台直接轮询中继以获取新通知。在不支持推送通知的设备上使用此选项可获得可靠的送达。"
+      }
+    },
+    "notifyAbout": {
+      "heading": "通知我",
+      "filterHeading": "过滤",
+      "typesHeading": "类型",
+      "onlyFollowing": {
+        "label": "仅来自我关注的人",
+        "description": "隐藏来自你未关注的账户的通知"
+      }
+    },
+    "types": {
+      "reactions": {
+        "label": "回应",
+        "description": "有人回应你的帖子时"
+      },
+      "reposts": {
+        "label": "转发",
+        "description": "有人转发你的笔记时"
+      },
+      "zaps": {
+        "label": "Zap",
+        "description": "有人通过 Lightning 或链上给你 zap 时"
+      },
+      "mentions": {
+        "label": "提及",
+        "description": "有人在笔记中提到你时"
+      },
+      "comments": {
+        "label": "评论和回复",
+        "description": "有人评论或回复你的帖子时"
+      },
+      "badges": {
+        "label": "徽章授予",
+        "description": "有人给你颁发徽章时"
+      },
+      "letters": {
+        "label": "信件",
+        "description": "有人给你寄信时"
+      },
+      "highlights": {
+        "label": "高亮",
+        "description": "有人高亮你的内容时"
+      }
+    },
+    "toast": {
+      "enableFailedTitle": "启用通知失败",
+      "enableFailedDesc": "请重试。"
+    }
   }
 }

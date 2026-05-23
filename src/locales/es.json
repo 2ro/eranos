@@ -858,5 +858,77 @@
       "constellation": "constelación",
       "followPack": "paquete de seguimientos"
     }
+  },
+  "notifSettings": {
+    "seoTitle": "Notificaciones",
+    "seoDescription": "Configura tus preferencias de notificaciones",
+    "title": "Notificaciones",
+    "subtitle": "Personaliza qué notificaciones recibes.",
+    "pushHeading": "Notificaciones push",
+    "enablePush": {
+      "label": "Activar notificaciones push",
+      "description": "Recibe notificaciones sobre la actividad de tus publicaciones"
+    },
+    "unsupported": "Tu navegador no admite notificaciones push.",
+    "denied": "Las notificaciones están bloqueadas. Actualiza la configuración de tu navegador para permitir notificaciones de este sitio.",
+    "deliveryMethod": {
+      "heading": "Método de entrega",
+      "intro": "Elige cómo se entregan las notificaciones a tu dispositivo.",
+      "push": {
+        "label": "Push",
+        "description": "Notificaciones estándar. Sin icono persistente en la barra de estado."
+      },
+      "persistent": {
+        "label": "Persistente",
+        "description": "Consulta los relés directamente en segundo plano para recibir nuevas notificaciones. Usa esto para una entrega fiable en dispositivos que no admiten notificaciones push."
+      }
+    },
+    "notifyAbout": {
+      "heading": "Notificarme sobre",
+      "filterHeading": "Filtro",
+      "typesHeading": "Tipos",
+      "onlyFollowing": {
+        "label": "Solo de personas a las que sigo",
+        "description": "Oculta las notificaciones de cuentas que no sigues"
+      }
+    },
+    "types": {
+      "reactions": {
+        "label": "Reacciones",
+        "description": "Cuando alguien reacciona a tus publicaciones"
+      },
+      "reposts": {
+        "label": "Reposteos",
+        "description": "Cuando alguien repostea tus notas"
+      },
+      "zaps": {
+        "label": "Zaps",
+        "description": "Cuando alguien te envía un zap por Lightning o en cadena"
+      },
+      "mentions": {
+        "label": "Menciones",
+        "description": "Cuando alguien te menciona en una nota"
+      },
+      "comments": {
+        "label": "Comentarios y respuestas",
+        "description": "Cuando alguien comenta o responde a tus publicaciones"
+      },
+      "badges": {
+        "label": "Concesiones de insignias",
+        "description": "Cuando alguien te otorga una insignia"
+      },
+      "letters": {
+        "label": "Cartas",
+        "description": "Cuando alguien te envía una carta"
+      },
+      "highlights": {
+        "label": "Resaltados",
+        "description": "Cuando alguien resalta tu contenido"
+      }
+    },
+    "toast": {
+      "enableFailedTitle": "Error al activar las notificaciones",
+      "enableFailedDesc": "Por favor, inténtalo de nuevo."
+    }
   }
 }

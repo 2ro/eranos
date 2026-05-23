@@ -858,5 +858,77 @@
       "constellation": "constellation",
       "followPack": "follow pack"
     }
+  },
+  "notifSettings": {
+    "seoTitle": "Notifications",
+    "seoDescription": "Configure your notification preferences",
+    "title": "Notifications",
+    "subtitle": "Customize which notifications you receive.",
+    "pushHeading": "Push Notifications",
+    "enablePush": {
+      "label": "Enable Push Notifications",
+      "description": "Receive notifications for activity on your posts"
+    },
+    "unsupported": "Your browser does not support push notifications.",
+    "denied": "Notifications are blocked. Update your browser settings to allow notifications from this site.",
+    "deliveryMethod": {
+      "heading": "Delivery Method",
+      "intro": "Choose how notifications are delivered to your device.",
+      "push": {
+        "label": "Push",
+        "description": "Standard notifications. No persistent status bar icon."
+      },
+      "persistent": {
+        "label": "Persistent",
+        "description": "Polls relays directly in the background for new notifications. Use this for reliable delivery on devices without push notification support."
+      }
+    },
+    "notifyAbout": {
+      "heading": "Notify Me About",
+      "filterHeading": "Filter",
+      "typesHeading": "Types",
+      "onlyFollowing": {
+        "label": "Only from people I follow",
+        "description": "Hide notifications from accounts you don't follow"
+      }
+    },
+    "types": {
+      "reactions": {
+        "label": "Reactions",
+        "description": "When someone reacts to your posts"
+      },
+      "reposts": {
+        "label": "Reposts",
+        "description": "When someone reposts your notes"
+      },
+      "zaps": {
+        "label": "Zaps",
+        "description": "When someone sends you a lightning or on-chain zap"
+      },
+      "mentions": {
+        "label": "Mentions",
+        "description": "When someone mentions you in a note"
+      },
+      "comments": {
+        "label": "Comments & Replies",
+        "description": "When someone comments on or replies to your posts"
+      },
+      "badges": {
+        "label": "Badge Awards",
+        "description": "When someone awards you a badge"
+      },
+      "letters": {
+        "label": "Letters",
+        "description": "When someone sends you a letter"
+      },
+      "highlights": {
+        "label": "Highlights",
+        "description": "When someone highlights your content"
+      }
+    },
+    "toast": {
+      "enableFailedTitle": "Failed to enable notifications",
+      "enableFailedDesc": "Please try again."
+    }
   }
 }

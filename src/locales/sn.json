@@ -858,5 +858,77 @@
       "constellation": "mwiriri wenyeredzi",
       "followPack": "paketi yokutevera"
     }
+  },
+  "notifSettings": {
+    "seoTitle": "Zviziviso",
+    "seoDescription": "Gadzira zvido zvako zvezviziviso",
+    "title": "Zviziviso",
+    "subtitle": "Gadzira kuti ndezvipi zviziviso zvauchawana.",
+    "pushHeading": "Zviziviso Zvepush",
+    "enablePush": {
+      "label": "Vhura zviziviso zvepush",
+      "description": "Gamuchira zviziviso pamusoro pemabasa pazvinyorwa zvako"
+    },
+    "unsupported": "Browser yako haitsigire zviziviso zvepush.",
+    "denied": "Zviziviso zvakavharirwa. Vandudza zvirongwa zvebrowser yako kuti zvibvumire zviziviso kubva pasaiti iyi.",
+    "deliveryMethod": {
+      "heading": "Nzira yokuendesa",
+      "intro": "Sarudza kuti zviziviso zvinoendeswa sei kumudziyo wako.",
+      "push": {
+        "label": "Push",
+        "description": "Zviziviso zvakajairika. Hapana mucherechedzo unogara pabar yemamiriro."
+      },
+      "persistent": {
+        "label": "Inogara",
+        "description": "Inobvunza marelays zvakananga shure kweimwe nzvimbo zvichida zviziviso zvitsva. Shandisa izvi kuti uwane kuendeswa kunovimbika pamidziyo isina rutsigiro rwezviziviso zvepush."
+      }
+    },
+    "notifyAbout": {
+      "heading": "Ndizivise pamusoro pe",
+      "filterHeading": "Sefa",
+      "typesHeading": "Mhando",
+      "onlyFollowing": {
+        "label": "Chete kubva kuvanhu vandinotevera",
+        "description": "Vanza zviziviso kubva kuma akaundi auwanga usingatevere"
+      }
+    },
+    "types": {
+      "reactions": {
+        "label": "Mhinduro",
+        "description": "Kana mumwe munhu adavira kuzvinyorwa zvako"
+      },
+      "reposts": {
+        "label": "Kudzokorora",
+        "description": "Kana mumwe munhu adzokorora nhau dzako"
+      },
+      "zaps": {
+        "label": "Zaps",
+        "description": "Kana mumwe munhu akutumira zap kuburikidza neLightning kana pacheni"
+      },
+      "mentions": {
+        "label": "Kudomwa",
+        "description": "Kana mumwe munhu akudoma munhau"
+      },
+      "comments": {
+        "label": "Mhinduro nemibvunzo",
+        "description": "Kana mumwe munhu apa mhinduro kana kudavira kuzvinyorwa zvako"
+      },
+      "badges": {
+        "label": "Kupiwa mabadge",
+        "description": "Kana mumwe munhu akakupa badge"
+      },
+      "letters": {
+        "label": "Tsamba",
+        "description": "Kana mumwe munhu akutumira tsamba"
+      },
+      "highlights": {
+        "label": "Kusimudzira",
+        "description": "Kana mumwe munhu akasimudzira zviri muzvinyorwa zvako"
+      }
+    },
+    "toast": {
+      "enableFailedTitle": "Kuvhura zviziviso kwakundikana",
+      "enableFailedDesc": "Ndapota edzazve."
+    }
   }
 }
