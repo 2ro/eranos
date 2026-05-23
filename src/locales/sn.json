@@ -57,6 +57,30 @@
     "goHome": "Enda kumba"
   },
   "campaigns": {
+    "home": {
+      "seoTitle": "Mishandirapamwe yekuunganidza mari",
+      "seoDescription": "Tinobatanidza vatsigiri vetsika nemari isingadziviswi.",
+      "heroTagline": "Mari <0>isingadziviswi</0> kuvatsigiri vetsika.",
+      "heroBody": "Unganidza Bitcoin yakananga kubva kuvatsigiri vepasi rose. Mupiro mumwe nemumwe unobva wapinda muchikwama chako, pasina vamiririri, pasina kudzoreredza, uye pasina platform inobata mari yako.",
+      "startCampaign": "Tanga mushandirapamwe",
+      "howItWorks": "Mashandire awo",
+      "exploreCampaigns": "Tarisa mishandirapamwe",
+      "featured": "Yakasarudzwa",
+      "featuredDesc": "Mishandirapamwe yakasarudzwa neboka re{{appName}}.",
+      "community": "Mishandirapamwe yeNharaunda",
+      "communityDesc": "Batsira kupa mari kushanduko dzakakodzera.",
+      "browseAll": "Tarisa mishandirapamwe yose →",
+      "pending": "Yakamirira kutenderwa",
+      "pendingDesc": "Mishandirapamwe iri panetwork isati yatenderwa kana kuvanzwa naani zvake muTeam Soapbox.",
+      "pendingEmpty": "Hapana chinomirira kutariswa.",
+      "hidden": "Yakavanzwa",
+      "hiddenDesc": "Mishandirapamwe yakabviswa papeji rekutanga reveruzhinji. Shandisa menu pakadhi kuti uibvise pakuvanzwa.",
+      "hiddenEmpty": "Parizvino hapana mushandirapamwe wakavanzwa.",
+      "yourCampaigns": "Mishandirapamwe yako",
+      "yourCampaignsDesc": "Mishandirapamwe yako iri panetwork yeNostr uye mipiro inoshanda kuburikidza nemurawu wemushandirapamwe. Inoonekwa papeji rekutanga kana muoni weTeam Soapbox aitenderera.",
+      "empty": "Hapana mishandirapamwe parizvino",
+      "emptyHint": "Iva wekutanga kutanga kuunganidza mari pa{{appName}}. Taura nyaya yako, sarudza vanobatsirwa, uchipa rwumwe rwekugovera."
+    },
     "all": {
       "title": "Mishandirapamwe Yose",
       "seoTitle": "Mishandirapamwe yose",

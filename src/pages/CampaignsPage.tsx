@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useSeoMeta } from '@unhead/react';
+import { Trans, useTranslation } from 'react-i18next';
 import { ArrowRight, ChevronDown, EyeOff, HandHeart, Hourglass, PlusCircle, ShieldCheck } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
@@ -24,7 +25,7 @@ import { type ParsedCampaign } from '@/lib/campaign';
 const MAX_FEATURED = 4;
 
 export function CampaignsPage() {
-
+  const { t } = useTranslation();
   const { config } = useAppContext();
   const { user } = useCurrentUser();
 
@@ -100,8 +101,8 @@ export function CampaignsPage() {
   });
 
   useSeoMeta({
-    title: `Fundraisers | ${config.appName}`,
-    description: 'Connecting activists to unstoppable funding.',
+    title: `${t('campaigns.home.seoTitle')} | ${config.appName}`,
+    description: t('campaigns.home.seoDescription'),
   });
 
   // Main grid excludes featured (they're shown above) and excludes any
@@ -171,33 +172,25 @@ export function CampaignsPage() {
                 WebkitTextStroke: '0.022em currentColor',
               }}
             >
-              Connecting activists to
-              {/* "unstoppable" gets a solid brand-orange highlighter
-                  block on its own line. The negative left margin
-                  (`-ml-1.5`) pulls the box's left edge back by exactly
-                  the box's own horizontal padding so the U sits flush
-                  with the column's left edge instead of being inset by
-                  the highlighter's padding. */}
-              <br />
-              {/* Asymmetric padding: zero on the left so "unstoppable"'s
-                  U sits flush with the column edge (matching the row
-                  above), but extra padding on the right so the orange
-                  box extends past the word's trailing edge as a
-                  deliberate visual flourish. The inner text is then
-                  nudged slightly leftward (negative left margin on the
-                  inner element) so the U optically aligns with the
-                  "C" in "Connecting" — Bebas Neue's italic skew shifts
-                  the visual left edge of the U rightward of its
-                  geometric box. */}
-              <span className="inline-block w-fit pl-0 pr-3 pt-1 pb-0 -mt-1 -mb-3 bg-primary text-white leading-[0.8] align-baseline">
-                <span className="-ml-1 inline-block">unstoppable</span>
-              </span>{' '}
-              funding.
+              <Trans
+                i18nKey="campaigns.home.heroTagline"
+                components={{
+                  // Index 0: orange highlighter block. Wraps the
+                  // emphasized word(s) from the translation; the word
+                  // itself is supplied as the component's children by
+                  // i18next at render time. The English-only optical
+                  // tweak (negative inner-span margin to compensate
+                  // for Bebas Neue italic skew) is dropped because it
+                  // assumed the word started with a wide italic "u" —
+                  // not portable across translations.
+                  0: (
+                    <span className="inline-block w-fit pl-1 pr-3 pt-1 pb-0 -mt-1 -mb-3 bg-primary text-white leading-[0.8] align-baseline" />
+                  ),
+                }}
+              />
             </h1>
             <p className="text-base sm:text-lg text-white/80 max-w-xl">
-              Raise Bitcoin directly from supporters around the world. Every donation
-              settles straight to your wallet, with no middlemen, no
-              chargebacks, and no platform holding your funds.
+              {t('campaigns.home.heroBody')}
             </p>
             <div className="flex flex-wrap gap-3 pt-1">
               {/* Primary CTA — solid brand-orange pill. The dark hero gives
@@ -209,7 +202,7 @@ export function CampaignsPage() {
               >
                 <Link to="/campaigns/new">
                   <PlusCircle className="mr-2" />
-                  Start a campaign
+                  {t('campaigns.home.startCampaign')}
                 </Link>
               </Button>
               <Button
@@ -219,8 +212,8 @@ export function CampaignsPage() {
                 className="rounded-full h-12 px-6 text-base border-white/30 bg-white/5 text-white hover:bg-white/10 hover:text-white hover:border-white/50 [&_svg]:size-[18px]"
               >
                 <Link to="/about">
-                  How it works
-                  <ArrowRight className="ml-2" />
+                  {t('campaigns.home.howItWorks')}
+                  <ArrowRight className="ml-2 rtl:rotate-180" />
                 </Link>
               </Button>
               {!user && (
@@ -230,7 +223,7 @@ export function CampaignsPage() {
                   asChild
                   className="rounded-full h-12 px-6 text-base border-white/30 bg-white/5 text-white hover:bg-white/10 hover:text-white hover:border-white/50"
                 >
-                  <a href="#campaigns">Explore campaigns</a>
+                  <a href="#campaigns">{t('campaigns.home.exploreCampaigns')}</a>
                 </Button>
               )}
             </div>
@@ -245,9 +238,9 @@ export function CampaignsPage() {
           <section className="space-y-5">
             <div className="flex items-end justify-between gap-4">
               <div>
-                <h2 className="text-2xl sm:text-3xl font-bold tracking-tight">Featured</h2>
+                <h2 className="text-2xl sm:text-3xl font-bold tracking-tight">{t('campaigns.home.featured')}</h2>
                 <p className="text-sm text-muted-foreground mt-1">
-                  Hand-picked campaigns from the Agora team.
+                  {t('campaigns.home.featuredDesc', { appName: config.appName })}
                 </p>
               </div>
             </div>
@@ -266,15 +259,15 @@ export function CampaignsPage() {
         <section className="space-y-5">
           <div className="flex items-end justify-between gap-4">
             <div>
-              <h2 className="text-2xl sm:text-3xl font-bold tracking-tight">Community Campaigns</h2>
+              <h2 className="text-2xl sm:text-3xl font-bold tracking-tight">{t('campaigns.home.community')}</h2>
               <p className="text-sm text-muted-foreground mt-1">
-                Help fund the changes worth making.
+                {t('campaigns.home.communityDesc')}
               </p>
             </div>
             <Button asChild variant="outline" className="hidden sm:inline-flex">
               <Link to="/campaigns/new">
                 <PlusCircle className="size-4 mr-2" />
-                Start a campaign
+                {t('campaigns.home.startCampaign')}
               </Link>
             </Button>
           </div>
@@ -295,7 +288,7 @@ export function CampaignsPage() {
               campaigns not yet moderated (and, optionally, hidden ones). */}
           <div className="pt-2 text-center sm:text-left">
             <Button asChild variant="ghost" size="sm">
-              <Link to="/campaigns/all">Browse all campaigns →</Link>
+              <Link to="/campaigns/all">{t('campaigns.home.browseAll')}</Link>
             </Button>
           </div>
         </section>
@@ -304,12 +297,12 @@ export function CampaignsPage() {
         {isMod && (
           <ModeratorSection
             icon={<Hourglass className="size-4" />}
-            title="Pending approval"
-            description="Campaigns on the network that no Team Soapbox moderator has approved or hidden yet."
+            title={t('campaigns.home.pending')}
+            description={t('campaigns.home.pendingDesc')}
             count={pendingCampaigns.length}
             campaigns={pendingCampaigns}
             isLoading={allLoading}
-            emptyText="Nothing awaiting review."
+            emptyText={t('campaigns.home.pendingEmpty')}
           />
         )}
 
@@ -317,12 +310,12 @@ export function CampaignsPage() {
         {isMod && (
           <ModeratorSection
             icon={<EyeOff className="size-4" />}
-            title="Hidden"
-            description="Campaigns suppressed from the public homepage. Use the kebab menu on a card to unhide."
+            title={t('campaigns.home.hidden')}
+            description={t('campaigns.home.hiddenDesc')}
             count={hiddenCampaigns.length}
             campaigns={hiddenCampaigns}
             isLoading={allLoading}
-            emptyText="No campaigns are currently hidden."
+            emptyText={t('campaigns.home.hiddenEmpty')}
           />
         )}
 
@@ -334,12 +327,10 @@ export function CampaignsPage() {
             <div>
               <h2 className="text-2xl sm:text-3xl font-bold tracking-tight inline-flex items-center gap-2">
                 <ShieldCheck className="size-6 text-primary/70" />
-                Your campaigns
+                {t('campaigns.home.yourCampaigns')}
               </h2>
               <p className="text-sm text-muted-foreground mt-1 max-w-2xl">
-                Your campaigns are live on Nostr and donations work via the
-                campaign link. They appear on the homepage once a Team
-                Soapbox moderator approves them.
+                {t('campaigns.home.yourCampaignsDesc')}
               </p>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
@@ -495,21 +486,22 @@ function CampaignGridSkeleton() {
 }
 
 function EmptyState() {
+  const { t } = useTranslation();
+  const { config } = useAppContext();
   return (
     <Card className="border-dashed">
       <CardContent className="py-12 px-8 text-center space-y-4">
         <HandHeart className="size-10 text-muted-foreground/60 mx-auto" />
         <div className="space-y-1.5">
-          <h3 className="text-lg font-semibold">No campaigns yet</h3>
+          <h3 className="text-lg font-semibold">{t('campaigns.home.empty')}</h3>
           <p className="text-muted-foreground max-w-sm mx-auto">
-            Be the first to start a fundraiser on Agora. Tell your story, choose your
-            beneficiaries, and share the link.
+            {t('campaigns.home.emptyHint', { appName: config.appName })}
           </p>
         </div>
         <Button asChild>
           <Link to="/campaigns/new">
             <PlusCircle className="size-4 mr-2" />
-            Start a campaign
+            {t('campaigns.home.startCampaign')}
           </Link>
         </Button>
       </CardContent>

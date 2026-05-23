@@ -57,6 +57,30 @@
     "goHome": "Go home"
   },
   "campaigns": {
+    "home": {
+      "seoTitle": "Fundraisers",
+      "seoDescription": "Connecting activists to unstoppable funding.",
+      "heroTagline": "Connecting activists to <0>unstoppable</0> funding.",
+      "heroBody": "Raise Bitcoin directly from supporters around the world. Every donation settles straight to your wallet, with no middlemen, no chargebacks, and no platform holding your funds.",
+      "startCampaign": "Start a campaign",
+      "howItWorks": "How it works",
+      "exploreCampaigns": "Explore campaigns",
+      "featured": "Featured",
+      "featuredDesc": "Hand-picked campaigns from the {{appName}} team.",
+      "community": "Community Campaigns",
+      "communityDesc": "Help fund the changes worth making.",
+      "browseAll": "Browse all campaigns →",
+      "pending": "Pending approval",
+      "pendingDesc": "Campaigns on the network that no Team Soapbox moderator has approved or hidden yet.",
+      "pendingEmpty": "Nothing awaiting review.",
+      "hidden": "Hidden",
+      "hiddenDesc": "Campaigns suppressed from the public homepage. Use the kebab menu on a card to unhide.",
+      "hiddenEmpty": "No campaigns are currently hidden.",
+      "yourCampaigns": "Your campaigns",
+      "yourCampaignsDesc": "Your campaigns are live on Nostr and donations work via the campaign link. They appear on the homepage once a Team Soapbox moderator approves them.",
+      "empty": "No campaigns yet",
+      "emptyHint": "Be the first to start a fundraiser on {{appName}}. Tell your story, choose your beneficiaries, and share the link."
+    },
     "all": {
       "title": "All Campaigns",
       "seoTitle": "All campaigns",

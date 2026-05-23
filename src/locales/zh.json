@@ -57,6 +57,30 @@
     "goHome": "返回首页"
   },
   "campaigns": {
+    "home": {
+      "seoTitle": "众筹活动",
+      "seoDescription": "为活动人士连接<0>不可阻挡</0>的资金。",
+      "heroTagline": "为活动人士连接<0>不可阻挡</0>的资金。",
+      "heroBody": "直接从世界各地的支持者那里筹集比特币。每一笔捐款都直达你的钱包,没有中间人、没有撤单、没有平台扣押你的资金。",
+      "startCampaign": "发起活动",
+      "howItWorks": "运作方式",
+      "exploreCampaigns": "浏览活动",
+      "featured": "精选",
+      "featuredDesc": "由 {{appName}} 团队精心挑选的活动。",
+      "community": "社区活动",
+      "communityDesc": "为值得做的改变提供资金。",
+      "browseAll": "浏览所有活动 →",
+      "pending": "等待审批",
+      "pendingDesc": "网络上尚未被任何 Soapbox 团队版主批准或隐藏的活动。",
+      "pendingEmpty": "没有等待审查的内容。",
+      "hidden": "已隐藏",
+      "hiddenDesc": "已从公共首页隐藏的活动。使用卡片上的菜单可以取消隐藏。",
+      "hiddenEmpty": "当前没有被隐藏的活动。",
+      "yourCampaigns": "你的活动",
+      "yourCampaignsDesc": "你的活动已在 Nostr 上线,通过活动链接可以接收捐款。一旦 Soapbox 团队版主批准,它们将出现在首页。",
+      "empty": "暂无活动",
+      "emptyHint": "成为在 {{appName}} 发起众筹的第一人。讲述你的故事、选择受益人、并分享链接。"
+    },
     "all": {
       "title": "所有活动",
       "seoTitle": "所有活动",
