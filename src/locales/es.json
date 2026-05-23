@@ -930,5 +930,95 @@
       "enableFailedTitle": "Error al activar las notificaciones",
       "enableFailedDesc": "Por favor, inténtalo de nuevo."
     }
+  },
+  "search": {
+    "seoTitle": "Buscar",
+    "seoDescription": "Buscar en Nostr",
+    "title": "Buscar",
+    "inputPlaceholder": "Buscar",
+    "filtersAria": "Filtros de búsqueda",
+    "tabs": {
+      "agora": "Ágora",
+      "nostr": "Nostr",
+      "accounts": "Cuentas"
+    },
+    "filters": {
+      "title": "Filtros",
+      "reset": "Restablecer",
+      "from": "De",
+      "sort": "Ordenar",
+      "media": "Multimedia",
+      "protocol": "Protocolo",
+      "language": "Idioma",
+      "kind": "Tipo",
+      "kindCustomPlaceholder": "p.ej. 1, 30023",
+      "includeReplies": "Incluir respuestas",
+      "authorScope": {
+        "anyone": "Cualquiera",
+        "follows": "Sigo",
+        "people": "Personas"
+      },
+      "sortOptions": {
+        "recent": "Recientes",
+        "hot": "Populares",
+        "trending": "Tendencia"
+      },
+      "mediaOptions": {
+        "all": "Todo",
+        "images": "Imágenes",
+        "videos": "Videos",
+        "shorts": "Cortos",
+        "none": "Sin multimedia"
+      },
+      "protocolOptions": {
+        "nostr": "Nostr",
+        "mastodon": "Mastodon",
+        "bluesky": "Bluesky"
+      },
+      "langOptions": {
+        "global": "Global",
+        "en": "Inglés",
+        "es": "Español",
+        "fr": "Francés",
+        "de": "Alemán",
+        "ja": "Japonés",
+        "zh": "Chino"
+      }
+    },
+    "chips": {
+      "noReplies": "Sin respuestas",
+      "images": "Imágenes",
+      "videos": "Videos",
+      "shortsAndDivines": "Cortos y Divines",
+      "noMedia": "Sin multimedia",
+      "mastodon": "Mastodon",
+      "bluesky": "Bluesky",
+      "hot": "Populares",
+      "trending": "Tendencia",
+      "allKinds": "Todos los tipos",
+      "customKind": "Tipo: {{kind}}",
+      "kindNumber": "Tipo {{kind}}",
+      "kindsCount_one": "{{count}} tipo",
+      "kindsCount_other": "{{count}} tipos",
+      "myFollows": "A quienes sigo",
+      "authorsCount_one": "{{count}} autor",
+      "authorsCount_other": "{{count}} autores"
+    },
+    "clear": "Limpiar",
+    "searchLabel": "búsqueda:",
+    "newPosts_one": "{{count}} publicación nueva",
+    "newPosts_other": "{{count}} publicaciones nuevas",
+    "following": "Siguiendo",
+    "botAccount": "Cuenta de bot",
+    "empty": {
+      "posts": "No se encontraron resultados para tu búsqueda.",
+      "postsPrompt": "Introduce una consulta para buscar contenido de Nostr.",
+      "accounts": "No se encontraron cuentas para tu búsqueda.",
+      "followsPrompt": "Busca personas por nombre o dirección NIP-05.",
+      "agora": "No se encontraron campañas, pledges ni grupos de Ágora para tu búsqueda.",
+      "agoraPrompt": "Busca campañas, pledges y grupos de Ágora, o explora lo más reciente.",
+      "activeFilters": "Filtros activos:",
+      "clearAll": "Limpiar todos los filtros"
+    }
   }
 }

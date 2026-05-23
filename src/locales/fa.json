@@ -930,5 +930,95 @@
       "enableFailedTitle": "فعال‌سازی اعلان‌ها ناموفق بود",
       "enableFailedDesc": "لطفاً دوباره تلاش کنید."
     }
+  },
+  "search": {
+    "seoTitle": "جستجو",
+    "seoDescription": "جستجو در Nostr",
+    "title": "جستجو",
+    "inputPlaceholder": "جستجو",
+    "filtersAria": "فیلترهای جستجو",
+    "tabs": {
+      "agora": "آگورا",
+      "nostr": "Nostr",
+      "accounts": "حساب‌ها"
+    },
+    "filters": {
+      "title": "فیلترها",
+      "reset": "بازنشانی",
+      "from": "از",
+      "sort": "مرتب‌سازی",
+      "media": "رسانه",
+      "protocol": "پروتکل",
+      "language": "زبان",
+      "kind": "نوع",
+      "kindCustomPlaceholder": "مثال: ۱، ۳۰۰۲۳",
+      "includeReplies": "شامل پاسخ‌ها",
+      "authorScope": {
+        "anyone": "هرکس",
+        "follows": "دنبال‌شده‌ها",
+        "people": "افراد"
+      },
+      "sortOptions": {
+        "recent": "اخیر",
+        "hot": "داغ",
+        "trending": "پرطرفدار"
+      },
+      "mediaOptions": {
+        "all": "همه",
+        "images": "تصاویر",
+        "videos": "ویدیوها",
+        "shorts": "کوتاه",
+        "none": "بدون رسانه"
+      },
+      "protocolOptions": {
+        "nostr": "Nostr",
+        "mastodon": "Mastodon",
+        "bluesky": "Bluesky"
+      },
+      "langOptions": {
+        "global": "سراسری",
+        "en": "انگلیسی",
+        "es": "اسپانیایی",
+        "fr": "فرانسوی",
+        "de": "آلمانی",
+        "ja": "ژاپنی",
+        "zh": "چینی"
+      }
+    },
+    "chips": {
+      "noReplies": "بدون پاسخ",
+      "images": "تصاویر",
+      "videos": "ویدیوها",
+      "shortsAndDivines": "کوتاه‌ها و Divines",
+      "noMedia": "بدون رسانه",
+      "mastodon": "Mastodon",
+      "bluesky": "Bluesky",
+      "hot": "داغ",
+      "trending": "پرطرفدار",
+      "allKinds": "همهٔ انواع",
+      "customKind": "نوع: {{kind}}",
+      "kindNumber": "نوع {{kind}}",
+      "kindsCount_one": "{{count}} نوع",
+      "kindsCount_other": "{{count}} نوع",
+      "myFollows": "دنبال‌شدگانم",
+      "authorsCount_one": "{{count}} نویسنده",
+      "authorsCount_other": "{{count}} نویسنده"
+    },
+    "clear": "پاک‌سازی",
+    "searchLabel": "جستجو:",
+    "newPosts_one": "{{count}} پست جدید",
+    "newPosts_other": "{{count}} پست جدید",
+    "following": "دنبال‌شده",
+    "botAccount": "حساب بات",
+    "empty": {
+      "posts": "هیچ نتیجه‌ای مطابق جستجوی شما پیدا نشد.",
+      "postsPrompt": "برای یافتن محتوای Nostr یک عبارت جستجو وارد کنید.",
+      "accounts": "هیچ حسابی مطابق جستجوی شما پیدا نشد.",
+      "followsPrompt": "افراد را با نام یا نشانی NIP-05 جستجو کنید.",
+      "agora": "هیچ کمپین، pledge یا گروهی از آگورا مطابق جستجوی شما پیدا نشد.",
+      "agoraPrompt": "کمپین‌ها، pledgeها و گروه‌های آگورا را جستجو کنید یا جدیدترین‌ها را مرور کنید.",
+      "activeFilters": "فیلترهای فعال:",
+      "clearAll": "پاک کردن همهٔ فیلترها"
+    }
   }
 }

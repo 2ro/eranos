@@ -930,5 +930,95 @@
       "enableFailedTitle": "د خبرتیاوو فعالول ناکام شول",
       "enableFailedDesc": "مهرباني وکړئ بیا هڅه وکړئ."
     }
+  },
+  "search": {
+    "seoTitle": "لټون",
+    "seoDescription": "په Nostr کې لټون",
+    "title": "لټون",
+    "inputPlaceholder": "لټون",
+    "filtersAria": "د لټون فلټرونه",
+    "tabs": {
+      "agora": "اګورا",
+      "nostr": "Nostr",
+      "accounts": "حسابونه"
+    },
+    "filters": {
+      "title": "فلټرونه",
+      "reset": "بیا تنظیمول",
+      "from": "له",
+      "sort": "ترتیبول",
+      "media": "رسنۍ",
+      "protocol": "پروتوکول",
+      "language": "ژبه",
+      "kind": "ډول",
+      "kindCustomPlaceholder": "بېلګه: 1, 30023",
+      "includeReplies": "ځوابونه شامل کړئ",
+      "authorScope": {
+        "anyone": "هرڅوک",
+        "follows": "تعقیب شوي",
+        "people": "خلک"
+      },
+      "sortOptions": {
+        "recent": "اوسني",
+        "hot": "ګرم",
+        "trending": "مشهور"
+      },
+      "mediaOptions": {
+        "all": "ټول",
+        "images": "انځورونه",
+        "videos": "ویډیوګانې",
+        "shorts": "لنډونه",
+        "none": "پرته له رسنۍ"
+      },
+      "protocolOptions": {
+        "nostr": "Nostr",
+        "mastodon": "Mastodon",
+        "bluesky": "Bluesky"
+      },
+      "langOptions": {
+        "global": "نړیوال",
+        "en": "انګلیسي",
+        "es": "هسپانوي",
+        "fr": "فرانسوي",
+        "de": "الماني",
+        "ja": "جاپاني",
+        "zh": "چیني"
+      }
+    },
+    "chips": {
+      "noReplies": "بې ځوابه",
+      "images": "انځورونه",
+      "videos": "ویډیوګانې",
+      "shortsAndDivines": "لنډونه او Divines",
+      "noMedia": "پرته له رسنۍ",
+      "mastodon": "Mastodon",
+      "bluesky": "Bluesky",
+      "hot": "ګرم",
+      "trending": "مشهور",
+      "allKinds": "ټول ډولونه",
+      "customKind": "ډول: {{kind}}",
+      "kindNumber": "ډول {{kind}}",
+      "kindsCount_one": "{{count}} ډول",
+      "kindsCount_other": "{{count}} ډولونه",
+      "myFollows": "زما تعقیب شوي",
+      "authorsCount_one": "{{count}} لیکوال",
+      "authorsCount_other": "{{count}} لیکوالان"
+    },
+    "clear": "پاکول",
+    "searchLabel": "لټون:",
+    "newPosts_one": "{{count}} نوی پوسټ",
+    "newPosts_other": "{{count}} نوي پوسټونه",
+    "following": "تعقیب کیږي",
+    "botAccount": "د بوټ حساب",
+    "empty": {
+      "posts": "ستاسو د لټون سره مطابق هېڅ پایلې ونه موندل شوې.",
+      "postsPrompt": "د Nostr د منځپانګې موندلو لپاره د لټون عبارت دننه کړئ.",
+      "accounts": "ستاسو د لټون سره مطابق هېڅ حسابونه ونه موندل شول.",
+      "followsPrompt": "د نوم یا د NIP-05 پته په واسطه د خلکو لټون وکړئ.",
+      "agora": "ستاسو د لټون سره مطابق د Agora کمپاینونه، pledges، یا ډلې ونه موندل شوې.",
+      "agoraPrompt": "د Agora کمپاینونه، pledges، او ډلې ولټوئ، یا تازه یې وګورئ.",
+      "activeFilters": "فعال فلټرونه:",
+      "clearAll": "ټول فلټرونه پاک کړئ"
+    }
   }
 }

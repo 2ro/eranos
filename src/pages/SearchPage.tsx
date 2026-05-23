@@ -1,4 +1,5 @@
 import { useSeoMeta } from '@unhead/react';
+import { useTranslation } from 'react-i18next';
 import { useAppContext } from '@/hooks/useAppContext';
 import {
   SlidersHorizontal,
@@ -80,11 +81,12 @@ function parseBoolParam(value: string | null, defaultVal: boolean): boolean {
 }
 
 export function SearchPage() {
+  const { t } = useTranslation();
   const { config } = useAppContext();
 
   useSeoMeta({
-    title: `Search | ${config.appName}`,
-    description: 'Search Nostr',
+    title: `${t('search.seoTitle')} | ${config.appName}`,
+    description: t('search.seoDescription'),
   });
 
 
@@ -310,31 +312,41 @@ export function SearchPage() {
   // Active filter labels for the summary / empty state hints
   const activeFilterLabels = useMemo(() => {
     const labels: string[] = [];
-    if (!includeReplies) labels.push('No replies');
-    if (mediaType !== 'all') labels.push({ images: 'Images', videos: 'Videos', vines: 'Shorts & Divines', none: 'No media' }[mediaType] ?? mediaType);
+    if (!includeReplies) labels.push(t('search.chips.noReplies'));
+    if (mediaType !== 'all') labels.push({
+      images: t('search.chips.images'),
+      videos: t('search.chips.videos'),
+      vines: t('search.chips.shortsAndDivines'),
+      none: t('search.chips.noMedia'),
+    }[mediaType] ?? mediaType);
     if (language !== 'global') labels.push(language.toUpperCase());
-    if (platform !== 'nostr') labels.push({ activitypub: 'Mastodon', atproto: 'Bluesky' }[platform] ?? platform);
-    if (sort !== 'recent') labels.push(sort === 'hot' ? 'Hot' : 'Trending');
+    if (platform !== 'nostr') labels.push({
+      activitypub: t('search.chips.mastodon'),
+      atproto: t('search.chips.bluesky'),
+    }[platform] ?? platform);
+    if (sort !== 'recent') labels.push(sort === 'hot' ? t('search.chips.hot') : t('search.chips.trending'));
     if (kindFilter === 'agora') {
       // 'agora' is the default — no chip needed.
     } else if (kindFilter === 'all') {
-      labels.push('All kinds');
+      labels.push(t('search.chips.allKinds'));
     } else if (kindFilter === 'custom') {
-      if (customKindText) labels.push(`Kind: ${customKindText}`);
+      if (customKindText) labels.push(t('search.chips.customKind', { kind: customKindText }));
     } else {
       const kindValues = kindFilter.split(',').filter(Boolean);
       if (kindValues.length === 1) {
         const opt = kindOptions.find(o => o.value === kindValues[0]);
         if (opt) labels.push(opt.label);
-        else labels.push(`Kind ${kindValues[0]}`);
+        else labels.push(t('search.chips.kindNumber', { kind: kindValues[0] }));
       } else if (kindValues.length > 1) {
-        labels.push(`${kindValues.length} kinds`);
+        labels.push(t('search.chips.kindsCount', { count: kindValues.length }));
       }
     }
-    if (authorScope === 'follows') labels.push('My follows');
-    if (authorScope === 'people' && authorPubkeys.length > 0) labels.push(`${authorPubkeys.length} author${authorPubkeys.length > 1 ? 's' : ''}`);
+    if (authorScope === 'follows') labels.push(t('search.chips.myFollows'));
+    if (authorScope === 'people' && authorPubkeys.length > 0) {
+      labels.push(t('search.chips.authorsCount', { count: authorPubkeys.length }));
+    }
     return labels;
-  }, [includeReplies, mediaType, language, platform, sort, kindFilter, customKindText, authorScope, authorPubkeys, kindOptions]);
+  }, [t, includeReplies, mediaType, language, platform, sort, kindFilter, customKindText, authorScope, authorPubkeys, kindOptions]);
 
   // Hooks
   const { data: followData } = useFollowList();
@@ -369,11 +381,11 @@ export function SearchPage() {
 
   return (
     <main className="flex-1 min-w-0">
-      <PageHeader title="Search" icon={<SearchIcon className="size-5" />} />
+      <PageHeader title={t('search.title')} icon={<SearchIcon className="size-5" />} />
       <SubHeaderBar>
-        <TabButton label="Agora" active={activeTab === 'agora'} onClick={() => setActiveTab('agora')} />
-        <TabButton label="Nostr" active={activeTab === 'posts'} onClick={() => setActiveTab('posts')} />
-        <TabButton label="Accounts" active={activeTab === 'accounts'} onClick={() => setActiveTab('accounts')} />
+        <TabButton label={t('search.tabs.agora')} active={activeTab === 'agora'} onClick={() => setActiveTab('agora')} />
+        <TabButton label={t('search.tabs.nostr')} active={activeTab === 'posts'} onClick={() => setActiveTab('posts')} />
+        <TabButton label={t('search.tabs.accounts')} active={activeTab === 'accounts'} onClick={() => setActiveTab('accounts')} />
       </SubHeaderBar>
 
       {/* Search input bar — always rendered right after tabs, like ComposeBox on Feed */}
@@ -398,33 +410,33 @@ export function SearchPage() {
                         : 'border-border',
                   )}
                   style={{ outline: 'none' }}
-                  aria-label="Search filters"
+                  aria-label={t('search.filtersAria')}
                 >
                   <SlidersHorizontal className="size-4" />
                 </button>
               </PopoverTrigger>
               <PopoverContent align="end" className="w-80 p-3 space-y-3">
                 <div className="flex items-center justify-between">
-                  <span className="font-semibold text-sm">Filters</span>
+                  <span className="font-semibold text-sm">{t('search.filters.title')}</span>
                   {hasActiveFilters && (
                     <button
                       className="text-xs text-muted-foreground hover:text-foreground flex items-center gap-1 transition-colors"
                       onClick={resetFilters}
                     >
                       <RotateCcw className="size-3" />
-                      Reset
+                      {t('search.filters.reset')}
                     </button>
                   )}
                 </div>
 
                 {/* Author scope */}
                 <div className="space-y-1.5">
-                  <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">From</span>
+                  <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">{t('search.filters.from')}</span>
                   <div className="flex rounded-lg border border-border overflow-hidden">
                     {([
-                      ['anyone', 'Anyone', Globe],
-                      ['follows', 'Follows', Users],
-                      ['people', 'People', UserSearch],
+                      ['anyone', t('search.filters.authorScope.anyone'), Globe],
+                      ['follows', t('search.filters.authorScope.follows'), Users],
+                      ['people', t('search.filters.authorScope.people'), UserSearch],
                     ] as const).map(([scope, label, Icon]) => (
                       <button
                         key={scope}
@@ -482,12 +494,12 @@ export function SearchPage() {
 
                 {/* Sort */}
                 <div className="space-y-1.5">
-                  <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Sort</span>
+                  <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">{t('search.filters.sort')}</span>
                   <div className="flex rounded-lg border border-border overflow-hidden">
                     {([
-                      ['recent', 'Recent', Clock],
-                      ['hot', 'Hot', Flame],
-                      ['trending', 'Trending', TrendingUp],
+                      ['recent', t('search.filters.sortOptions.recent'), Clock],
+                      ['hot', t('search.filters.sortOptions.hot'), Flame],
+                      ['trending', t('search.filters.sortOptions.trending'), TrendingUp],
                     ] as const).map(([s, label, Icon]) => (
                       <button
                         key={s}
@@ -514,30 +526,30 @@ export function SearchPage() {
                     {/* Media + Protocol */}
                     <div className="grid grid-cols-2 gap-2">
                       <div className="space-y-1.5">
-                        <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide flex items-center gap-1">Media</span>
+                        <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide flex items-center gap-1">{t('search.filters.media')}</span>
                         <Select value={mediaType} onValueChange={(v) => setMediaType(v)}>
                           <SelectTrigger className="w-full bg-secondary/50 h-8 text-base md:text-xs">
                             <SelectValue />
                           </SelectTrigger>
                           <SelectContent>
-                            <SelectItem value="all">All</SelectItem>
-                            <SelectItem value="images">Images</SelectItem>
-                            <SelectItem value="videos">Videos</SelectItem>
-                            <SelectItem value="vines">Shorts</SelectItem>
-                            <SelectItem value="none">No media</SelectItem>
+                            <SelectItem value="all">{t('search.filters.mediaOptions.all')}</SelectItem>
+                            <SelectItem value="images">{t('search.filters.mediaOptions.images')}</SelectItem>
+                            <SelectItem value="videos">{t('search.filters.mediaOptions.videos')}</SelectItem>
+                            <SelectItem value="vines">{t('search.filters.mediaOptions.shorts')}</SelectItem>
+                            <SelectItem value="none">{t('search.filters.mediaOptions.none')}</SelectItem>
                           </SelectContent>
                         </Select>
                       </div>
                       <div className="space-y-1.5">
-                        <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide flex items-center gap-1">Protocol <HelpTip faqId="vs-mastodon-bluesky" iconSize="size-3" /></span>
+                        <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide flex items-center gap-1">{t('search.filters.protocol')} <HelpTip faqId="vs-mastodon-bluesky" iconSize="size-3" /></span>
                         <Select value={platform} onValueChange={(v) => setPlatform(v)}>
                           <SelectTrigger className="w-full bg-secondary/50 h-8 text-base md:text-xs">
                             <SelectValue />
                           </SelectTrigger>
                           <SelectContent>
-                            <SelectItem value="nostr">Nostr</SelectItem>
-                            <SelectItem value="activitypub">Mastodon</SelectItem>
-                            <SelectItem value="atproto">Bluesky</SelectItem>
+                            <SelectItem value="nostr">{t('search.filters.protocolOptions.nostr')}</SelectItem>
+                            <SelectItem value="activitypub">{t('search.filters.protocolOptions.mastodon')}</SelectItem>
+                            <SelectItem value="atproto">{t('search.filters.protocolOptions.bluesky')}</SelectItem>
                           </SelectContent>
                         </Select>
                       </div>
@@ -546,24 +558,24 @@ export function SearchPage() {
                     {/* Language + Kind */}
                     <div className="grid grid-cols-2 gap-2">
                       <div className="space-y-1.5">
-                        <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide flex items-center gap-1">Language</span>
+                        <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide flex items-center gap-1">{t('search.filters.language')}</span>
                         <Select value={language} onValueChange={(v) => setLanguage(v)}>
                           <SelectTrigger className="w-full bg-secondary/50 h-8 text-base md:text-xs">
                             <SelectValue />
                           </SelectTrigger>
                           <SelectContent>
-                            <SelectItem value="global">Global</SelectItem>
-                            <SelectItem value="en">English</SelectItem>
-                            <SelectItem value="es">Spanish</SelectItem>
-                            <SelectItem value="fr">French</SelectItem>
-                            <SelectItem value="de">German</SelectItem>
-                            <SelectItem value="ja">Japanese</SelectItem>
-                            <SelectItem value="zh">Chinese</SelectItem>
+                            <SelectItem value="global">{t('search.filters.langOptions.global')}</SelectItem>
+                            <SelectItem value="en">{t('search.filters.langOptions.en')}</SelectItem>
+                            <SelectItem value="es">{t('search.filters.langOptions.es')}</SelectItem>
+                            <SelectItem value="fr">{t('search.filters.langOptions.fr')}</SelectItem>
+                            <SelectItem value="de">{t('search.filters.langOptions.de')}</SelectItem>
+                            <SelectItem value="ja">{t('search.filters.langOptions.ja')}</SelectItem>
+                            <SelectItem value="zh">{t('search.filters.langOptions.zh')}</SelectItem>
                           </SelectContent>
                         </Select>
                       </div>
                       <div className="space-y-1.5">
-                        <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide flex items-center gap-1">Kind</span>
+                        <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide flex items-center gap-1">{t('search.filters.kind')}</span>
                         <KindPicker value={kindFilter} options={kindOptions} onChange={(v) => setKindFilter(v)} />
                       </div>
                     </div>
@@ -572,7 +584,7 @@ export function SearchPage() {
                       <Input
                         type="text"
                         inputMode="numeric"
-                        placeholder="e.g. 1, 30023"
+                        placeholder={t('search.filters.kindCustomPlaceholder')}
                         value={customKindText}
                         onChange={(e) => setCustomKindText(e.target.value)}
                         className="bg-secondary/50 border-border focus-visible:ring-1 rounded-lg text-base md:text-xs h-8"
@@ -582,7 +594,7 @@ export function SearchPage() {
                     {/* Include replies toggle */}
                     <Separator />
                     <div className="flex items-center justify-between">
-                      <span className="text-xs font-medium text-muted-foreground">Include replies</span>
+                      <span className="text-xs font-medium text-muted-foreground">{t('search.filters.includeReplies')}</span>
                       <Switch checked={includeReplies} onCheckedChange={setIncludeReplies} className="scale-90" />
                     </div>
                   </>
@@ -604,7 +616,7 @@ export function SearchPage() {
               onClick={resetFilters}
               className="text-xs text-muted-foreground hover:text-foreground underline underline-offset-2 transition-colors"
             >
-              Clear
+              {t('search.clear')}
             </button>
           </div>
         )}
@@ -616,7 +628,7 @@ export function SearchPage() {
               <TooltipTrigger asChild>
                 <div className="mt-2 px-3 py-2 rounded-md bg-secondary/40 border border-border cursor-default">
                   <p className="text-xs text-muted-foreground font-mono truncate">
-                    <span className="text-muted-foreground/60 mr-1">search:</span>
+                    <span className="text-muted-foreground/60 mr-1">{t('search.searchLabel')}</span>
                     {nip50SearchString}
                   </p>
                 </div>
@@ -667,7 +679,7 @@ export function SearchPage() {
                   }}
                   className="pointer-events-auto px-4 py-1.5 rounded-full bg-primary text-primary-foreground text-sm font-medium shadow-lg hover:bg-primary/90 transition-colors animate-in fade-in slide-in-from-top-2 duration-300"
                 >
-                  {newPostCount} new post{newPostCount !== 1 ? 's' : ''}
+                  {t('search.newPosts', { count: newPostCount })}
                 </button>
               </div>
             )}
@@ -694,12 +706,12 @@ export function SearchPage() {
               </div>
             ) : debouncedSearchQuery.trim() ? (
               <EmptyState
-                message="No results found matching your search."
+                message={t('search.empty.posts')}
                 activeFilters={activeFilterLabels}
                 onResetFilters={hasActiveFilters ? resetFilters : undefined}
               />
             ) : (
-              <EmptyState message="Enter a search query to find Nostr content." />
+              <EmptyState message={t('search.empty.postsPrompt')} />
             )}
           </>
         )}
@@ -722,7 +734,7 @@ export function SearchPage() {
                     ))}
                   </div>
                 ) : (
-                  <EmptyState message="No accounts found matching your search." />
+                  <EmptyState message={t('search.empty.accounts')} />
                 )
               ) : (
                 <FollowsList />
@@ -738,6 +750,7 @@ export function SearchPage() {
 /* ── Shared sub-components ── */
 
 function AccountItem({ profile, isFollowed }: { profile: { pubkey: string; metadata: Record<string, unknown>; event?: { tags: string[][] } }; isFollowed: boolean }) {
+  const { t } = useTranslation();
   const npub = useMemo(() => nip19.npubEncode(profile.pubkey), [profile.pubkey]);
   const metadata = profile.metadata as { name?: string; nip05?: string; picture?: string; about?: string; bot?: boolean };
   const displayName = metadata?.name || genUserName(profile.pubkey);
@@ -758,7 +771,7 @@ function AccountItem({ profile, isFollowed }: { profile: { pubkey: string; metad
         {isFollowed && (
           <span
             className="absolute -bottom-0.5 -right-0.5 size-[18px] rounded-full bg-primary flex items-center justify-center ring-2 ring-background"
-            title="Following"
+            title={t('search.following')}
           >
             <UserRoundCheck className="size-2.5 text-primary-foreground" strokeWidth={3} />
           </span>
@@ -769,7 +782,7 @@ function AccountItem({ profile, isFollowed }: { profile: { pubkey: string; metad
           <p className="font-bold text-[15px] truncate">
             <EmojifiedText tags={tags}>{displayName}</EmojifiedText>
           </p>
-          {metadata?.bot && <span className="text-xs" title="Bot account">🤖</span>}
+          {metadata?.bot && <span className="text-xs" title={t('search.botAccount')}>🤖</span>}
         </div>
         {metadata?.nip05 && (
           <VerifiedNip05Text nip05={metadata.nip05} pubkey={profile.pubkey} className="text-sm text-muted-foreground truncate block" />
@@ -787,6 +800,7 @@ function AccountItem({ profile, isFollowed }: { profile: { pubkey: string; metad
 const FOLLOWS_PAGE_SIZE = 30;
 
 function FollowsList() {
+  const { t } = useTranslation();
   const { data: followData } = useFollowList();
   const pubkeys = useMemo(() => followData?.pubkeys ?? [], [followData]);
   const [visibleCount, setVisibleCount] = useState(FOLLOWS_PAGE_SIZE);
@@ -802,7 +816,7 @@ function FollowsList() {
   }, [inView, hasMore, pubkeys.length]);
 
   if (pubkeys.length === 0) {
-    return <EmptyState message="Search for people by name or NIP-05 address." />;
+    return <EmptyState message={t('search.empty.followsPrompt')} />;
   }
 
   return (
@@ -822,6 +836,7 @@ function FollowsList() {
 }
 
 function FollowItem({ pubkey }: { pubkey: string }) {
+  const { t } = useTranslation();
   const author = useAuthor(pubkey);
   const metadata = author.data?.metadata;
   const npub = useMemo(() => nip19.npubEncode(pubkey), [pubkey]);
@@ -846,7 +861,7 @@ function FollowItem({ pubkey }: { pubkey: string }) {
         </Avatar>
         <span
           className="absolute -bottom-0.5 -right-0.5 size-[18px] rounded-full bg-primary flex items-center justify-center ring-2 ring-background"
-          title="Following"
+          title={t('search.following')}
         >
           <UserRoundCheck className="size-2.5 text-primary-foreground" strokeWidth={3} />
         </span>
@@ -856,7 +871,7 @@ function FollowItem({ pubkey }: { pubkey: string }) {
           <p className="font-bold text-[15px] truncate">
             <EmojifiedText tags={tags}>{displayName}</EmojifiedText>
           </p>
-          {metadata?.bot && <span className="text-xs" title="Bot account">🤖</span>}
+          {metadata?.bot && <span className="text-xs" title={t('search.botAccount')}>🤖</span>}
         </div>
         {metadata?.nip05 && (
           <VerifiedNip05Text nip05={metadata.nip05} pubkey={pubkey} className="text-sm text-muted-foreground truncate block" />
@@ -880,12 +895,13 @@ function EmptyState({
   activeFilters?: string[];
   onResetFilters?: () => void;
 }) {
+  const { t } = useTranslation();
   return (
     <div className="py-16 px-8 text-center">
       <p className="text-muted-foreground">{message}</p>
       {activeFilters && activeFilters.length > 0 && (
         <div className="mt-3">
-          <p className="text-xs text-muted-foreground/70 mb-2">Active filters:</p>
+          <p className="text-xs text-muted-foreground/70 mb-2">{t('search.empty.activeFilters')}</p>
           <div className="flex flex-wrap justify-center gap-1.5">
             {activeFilters.map((label) => (
               <Badge key={label} variant="secondary" className="text-xs font-normal">
@@ -898,7 +914,7 @@ function EmptyState({
               onClick={onResetFilters}
               className="mt-3 text-xs text-primary hover:underline underline-offset-2 transition-colors"
             >
-              Clear all filters
+              {t('search.empty.clearAll')}
             </button>
           )}
         </div>
@@ -959,6 +975,7 @@ function SearchInput({
   onDebouncedChange: (value: string) => void;
   className?: string;
 }) {
+  const { t } = useTranslation();
   const [value, setValue] = useState(initialValue);
   const onDebouncedChangeRef = useRef(onDebouncedChange);
   onDebouncedChangeRef.current = onDebouncedChange;
@@ -978,7 +995,7 @@ function SearchInput({
     <div className={cn('relative flex-1', className)}>
       <Input
         type="text"
-        placeholder="Search"
+        placeholder={t('search.inputPlaceholder')}
         value={value}
         onChange={(e) => setValue(e.target.value)}
         className="pr-10 bg-secondary/50 border-border focus-visible:ring-1 rounded-lg"
@@ -1016,6 +1033,7 @@ function AgoraSearchTab({
   hasActiveFilters: boolean;
   resetFilters: () => void;
 }) {
+  const { t } = useTranslation();
   const { config } = useAppContext();
   const clientName = config.clientName ?? config.appName;
   const { posts, isLoading: postsLoading } = useStreamPosts(searchQuery, {
@@ -1052,13 +1070,13 @@ function AgoraSearchTab({
   if (searchQuery.trim()) {
     return (
       <EmptyState
-        message="No Agora campaigns, pledges, or groups found matching your search."
+        message={t('search.empty.agora')}
         activeFilters={activeFilterLabels}
         onResetFilters={hasActiveFilters ? resetFilters : undefined}
       />
     );
   }
 
-  return <EmptyState message="Search Agora campaigns, pledges, and groups, or browse the latest." />;
+  return <EmptyState message={t('search.empty.agoraPrompt')} />;
 }
 

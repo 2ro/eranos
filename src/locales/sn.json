@@ -930,5 +930,95 @@
       "enableFailedTitle": "Kuvhura zviziviso kwakundikana",
       "enableFailedDesc": "Ndapota edzazve."
     }
+  },
+  "search": {
+    "seoTitle": "Tsvaga",
+    "seoDescription": "Tsvaga Nostr",
+    "title": "Tsvaga",
+    "inputPlaceholder": "Tsvaga",
+    "filtersAria": "Mafilter ekutsvaga",
+    "tabs": {
+      "agora": "Agora",
+      "nostr": "Nostr",
+      "accounts": "Maakaundi"
+    },
+    "filters": {
+      "title": "Mafilter",
+      "reset": "Dzosera",
+      "from": "Kubva",
+      "sort": "Ronga",
+      "media": "Media",
+      "protocol": "Protocol",
+      "language": "Mutauro",
+      "kind": "Mhando",
+      "kindCustomPlaceholder": "semuenzaniso 1, 30023",
+      "includeReplies": "Sanganisira mhinduro",
+      "authorScope": {
+        "anyone": "Ani naani",
+        "follows": "Vandinotevera",
+        "people": "Vanhu"
+      },
+      "sortOptions": {
+        "recent": "Itsva",
+        "hot": "Inopisa",
+        "trending": "Yakakurumbira"
+      },
+      "mediaOptions": {
+        "all": "Zvese",
+        "images": "Mifananidzo",
+        "videos": "Mavhidhiyo",
+        "shorts": "Zvipfupi",
+        "none": "Hapana media"
+      },
+      "protocolOptions": {
+        "nostr": "Nostr",
+        "mastodon": "Mastodon",
+        "bluesky": "Bluesky"
+      },
+      "langOptions": {
+        "global": "YeNyika",
+        "en": "Chirungu",
+        "es": "Chispanish",
+        "fr": "Chifrench",
+        "de": "Chigerman",
+        "ja": "Chijapanese",
+        "zh": "ChiChinese"
+      }
+    },
+    "chips": {
+      "noReplies": "Hapana mhinduro",
+      "images": "Mifananidzo",
+      "videos": "Mavhidhiyo",
+      "shortsAndDivines": "Zvipfupi neDivines",
+      "noMedia": "Hapana media",
+      "mastodon": "Mastodon",
+      "bluesky": "Bluesky",
+      "hot": "Inopisa",
+      "trending": "Yakakurumbira",
+      "allKinds": "Mhando dzese",
+      "customKind": "Mhando: {{kind}}",
+      "kindNumber": "Mhando {{kind}}",
+      "kindsCount_one": "{{count}} mhando",
+      "kindsCount_other": "{{count}} mhando",
+      "myFollows": "Vandinotevera",
+      "authorsCount_one": "{{count}} munyori",
+      "authorsCount_other": "{{count}} vanyori"
+    },
+    "clear": "Bvisa",
+    "searchLabel": "tsvaga:",
+    "newPosts_one": "{{count}} chinyorwa chitsva",
+    "newPosts_other": "{{count}} zvinyorwa zvitsva",
+    "following": "Anotevera",
+    "botAccount": "Akaundi yebot",
+    "empty": {
+      "posts": "Hapana mhinduro dzakawanikwa dzinoenderana nokutsvaga kwako.",
+      "postsPrompt": "Isa mubvunzo wokutsvaga kuti uwane zviri muNostr.",
+      "accounts": "Hapana maakaundi akawanikwa anoenderana nokutsvaga kwako.",
+      "followsPrompt": "Tsvaga vanhu nezita kana kero yeNIP-05.",
+      "agora": "Hapana macampaign, pledges, kana mapoka eAgora akawanikwa anoenderana nokutsvaga kwako.",
+      "agoraPrompt": "Tsvaga macampaign, pledges, nemapoka eAgora, kana kutarisa zvitsva.",
+      "activeFilters": "Mafilter anoshanda:",
+      "clearAll": "Bvisa mafilter ese"
+    }
   }
 }

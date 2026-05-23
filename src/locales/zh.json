@@ -930,5 +930,95 @@
       "enableFailedTitle": "启用通知失败",
       "enableFailedDesc": "请重试。"
     }
+  },
+  "search": {
+    "seoTitle": "搜索",
+    "seoDescription": "搜索 Nostr",
+    "title": "搜索",
+    "inputPlaceholder": "搜索",
+    "filtersAria": "搜索过滤器",
+    "tabs": {
+      "agora": "Agora",
+      "nostr": "Nostr",
+      "accounts": "账号"
+    },
+    "filters": {
+      "title": "过滤器",
+      "reset": "重置",
+      "from": "来自",
+      "sort": "排序",
+      "media": "媒体",
+      "protocol": "协议",
+      "language": "语言",
+      "kind": "类型",
+      "kindCustomPlaceholder": "例如 1, 30023",
+      "includeReplies": "包含回复",
+      "authorScope": {
+        "anyone": "任何人",
+        "follows": "我的关注",
+        "people": "指定的人"
+      },
+      "sortOptions": {
+        "recent": "最新",
+        "hot": "热门",
+        "trending": "趋势"
+      },
+      "mediaOptions": {
+        "all": "全部",
+        "images": "图片",
+        "videos": "视频",
+        "shorts": "短片",
+        "none": "无媒体"
+      },
+      "protocolOptions": {
+        "nostr": "Nostr",
+        "mastodon": "Mastodon",
+        "bluesky": "Bluesky"
+      },
+      "langOptions": {
+        "global": "全球",
+        "en": "英语",
+        "es": "西班牙语",
+        "fr": "法语",
+        "de": "德语",
+        "ja": "日语",
+        "zh": "中文"
+      }
+    },
+    "chips": {
+      "noReplies": "不含回复",
+      "images": "图片",
+      "videos": "视频",
+      "shortsAndDivines": "短片与 Divines",
+      "noMedia": "无媒体",
+      "mastodon": "Mastodon",
+      "bluesky": "Bluesky",
+      "hot": "热门",
+      "trending": "趋势",
+      "allKinds": "所有类型",
+      "customKind": "类型：{{kind}}",
+      "kindNumber": "类型 {{kind}}",
+      "kindsCount_one": "{{count}} 种类型",
+      "kindsCount_other": "{{count}} 种类型",
+      "myFollows": "我的关注",
+      "authorsCount_one": "{{count}} 位作者",
+      "authorsCount_other": "{{count}} 位作者"
+    },
+    "clear": "清除",
+    "searchLabel": "搜索：",
+    "newPosts_one": "{{count}} 条新帖子",
+    "newPosts_other": "{{count}} 条新帖子",
+    "following": "关注中",
+    "botAccount": "机器人账号",
+    "empty": {
+      "posts": "没有找到匹配你搜索的结果。",
+      "postsPrompt": "输入搜索关键词以查找 Nostr 内容。",
+      "accounts": "没有找到匹配你搜索的账号。",
+      "followsPrompt": "通过名字或 NIP-05 地址搜索用户。",
+      "agora": "没有找到匹配你搜索的 Agora 竞选、pledge 或群组。",
+      "agoraPrompt": "搜索 Agora 的竞选、pledge 和群组，或浏览最新内容。",
+      "activeFilters": "已生效的过滤器：",
+      "clearAll": "清除所有过滤器"
+    }
   }
 }

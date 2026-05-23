@@ -930,5 +930,95 @@
       "enableFailedTitle": "فشل تفعيل الإشعارات",
       "enableFailedDesc": "يرجى المحاولة مرة أخرى."
     }
+  },
+  "search": {
+    "seoTitle": "بحث",
+    "seoDescription": "البحث في Nostr",
+    "title": "بحث",
+    "inputPlaceholder": "بحث",
+    "filtersAria": "مرشحات البحث",
+    "tabs": {
+      "agora": "أغورا",
+      "nostr": "Nostr",
+      "accounts": "الحسابات"
+    },
+    "filters": {
+      "title": "المرشحات",
+      "reset": "إعادة تعيين",
+      "from": "من",
+      "sort": "الترتيب",
+      "media": "الوسائط",
+      "protocol": "البروتوكول",
+      "language": "اللغة",
+      "kind": "النوع",
+      "kindCustomPlaceholder": "مثال: 1، 30023",
+      "includeReplies": "تضمين الردود",
+      "authorScope": {
+        "anyone": "أي شخص",
+        "follows": "المتابَعون",
+        "people": "أشخاص"
+      },
+      "sortOptions": {
+        "recent": "الأحدث",
+        "hot": "الأكثر تفاعلاً",
+        "trending": "الرائج"
+      },
+      "mediaOptions": {
+        "all": "الكل",
+        "images": "الصور",
+        "videos": "فيديوهات",
+        "shorts": "فيديوهات قصيرة",
+        "none": "بدون وسائط"
+      },
+      "protocolOptions": {
+        "nostr": "Nostr",
+        "mastodon": "Mastodon",
+        "bluesky": "Bluesky"
+      },
+      "langOptions": {
+        "global": "عالمي",
+        "en": "الإنجليزية",
+        "es": "الإسبانية",
+        "fr": "الفرنسية",
+        "de": "الألمانية",
+        "ja": "اليابانية",
+        "zh": "الصينية"
+      }
+    },
+    "chips": {
+      "noReplies": "بدون ردود",
+      "images": "الصور",
+      "videos": "فيديوهات",
+      "shortsAndDivines": "الفيديوهات القصيرة وDivines",
+      "noMedia": "بدون وسائط",
+      "mastodon": "Mastodon",
+      "bluesky": "Bluesky",
+      "hot": "الأكثر تفاعلاً",
+      "trending": "الرائج",
+      "allKinds": "جميع الأنواع",
+      "customKind": "النوع: {{kind}}",
+      "kindNumber": "النوع {{kind}}",
+      "kindsCount_one": "نوع واحد",
+      "kindsCount_other": "{{count}} أنواع",
+      "myFollows": "الذين أتابعهم",
+      "authorsCount_one": "مؤلف واحد",
+      "authorsCount_other": "{{count}} مؤلفين"
+    },
+    "clear": "مسح",
+    "searchLabel": "بحث:",
+    "newPosts_one": "منشور جديد واحد",
+    "newPosts_other": "{{count}} منشورات جديدة",
+    "following": "متابَع",
+    "botAccount": "حساب بوت",
+    "empty": {
+      "posts": "لا توجد نتائج تطابق بحثك.",
+      "postsPrompt": "أدخل استعلام بحث للعثور على محتوى Nostr.",
+      "accounts": "لم يتم العثور على حسابات تطابق بحثك.",
+      "followsPrompt": "ابحث عن أشخاص بالاسم أو بعنوان NIP-05.",
+      "agora": "لم يتم العثور على حملات أو تعهّدات أو مجموعات Agora تطابق بحثك.",
+      "agoraPrompt": "ابحث في حملات وتعهّدات ومجموعات Agora، أو تصفّح الأحدث.",
+      "activeFilters": "المرشحات الفعّالة:",
+      "clearAll": "مسح جميع المرشحات"
+    }
   }
 }

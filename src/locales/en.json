@@ -930,5 +930,95 @@
       "enableFailedTitle": "Failed to enable notifications",
       "enableFailedDesc": "Please try again."
     }
+  },
+  "search": {
+    "seoTitle": "Search",
+    "seoDescription": "Search Nostr",
+    "title": "Search",
+    "inputPlaceholder": "Search",
+    "filtersAria": "Search filters",
+    "tabs": {
+      "agora": "Agora",
+      "nostr": "Nostr",
+      "accounts": "Accounts"
+    },
+    "filters": {
+      "title": "Filters",
+      "reset": "Reset",
+      "from": "From",
+      "sort": "Sort",
+      "media": "Media",
+      "protocol": "Protocol",
+      "language": "Language",
+      "kind": "Kind",
+      "kindCustomPlaceholder": "e.g. 1, 30023",
+      "includeReplies": "Include replies",
+      "authorScope": {
+        "anyone": "Anyone",
+        "follows": "Follows",
+        "people": "People"
+      },
+      "sortOptions": {
+        "recent": "Recent",
+        "hot": "Hot",
+        "trending": "Trending"
+      },
+      "mediaOptions": {
+        "all": "All",
+        "images": "Images",
+        "videos": "Videos",
+        "shorts": "Shorts",
+        "none": "No media"
+      },
+      "protocolOptions": {
+        "nostr": "Nostr",
+        "mastodon": "Mastodon",
+        "bluesky": "Bluesky"
+      },
+      "langOptions": {
+        "global": "Global",
+        "en": "English",
+        "es": "Spanish",
+        "fr": "French",
+        "de": "German",
+        "ja": "Japanese",
+        "zh": "Chinese"
+      }
+    },
+    "chips": {
+      "noReplies": "No replies",
+      "images": "Images",
+      "videos": "Videos",
+      "shortsAndDivines": "Shorts & Divines",
+      "noMedia": "No media",
+      "mastodon": "Mastodon",
+      "bluesky": "Bluesky",
+      "hot": "Hot",
+      "trending": "Trending",
+      "allKinds": "All kinds",
+      "customKind": "Kind: {{kind}}",
+      "kindNumber": "Kind {{kind}}",
+      "kindsCount_one": "{{count}} kind",
+      "kindsCount_other": "{{count}} kinds",
+      "myFollows": "My follows",
+      "authorsCount_one": "{{count}} author",
+      "authorsCount_other": "{{count}} authors"
+    },
+    "clear": "Clear",
+    "searchLabel": "search:",
+    "newPosts_one": "{{count}} new post",
+    "newPosts_other": "{{count}} new posts",
+    "following": "Following",
+    "botAccount": "Bot account",
+    "empty": {
+      "posts": "No results found matching your search.",
+      "postsPrompt": "Enter a search query to find Nostr content.",
+      "accounts": "No accounts found matching your search.",
+      "followsPrompt": "Search for people by name or NIP-05 address.",
+      "agora": "No Agora campaigns, pledges, or groups found matching your search.",
+      "agoraPrompt": "Search Agora campaigns, pledges, and groups, or browse the latest.",
+      "activeFilters": "Active filters:",
+      "clearAll": "Clear all filters"
+    }
   }
 }

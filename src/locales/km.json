@@ -930,5 +930,95 @@
       "enableFailedTitle": "ការបើកការជូនដំណឹងបរាជ័យ",
       "enableFailedDesc": "សូមព្យាយាមម្ដងទៀត។"
     }
+  },
+  "search": {
+    "seoTitle": "ស្វែងរក",
+    "seoDescription": "ស្វែងរក Nostr",
+    "title": "ស្វែងរក",
+    "inputPlaceholder": "ស្វែងរក",
+    "filtersAria": "តម្រងស្វែងរក",
+    "tabs": {
+      "agora": "អាហ្គូរ៉ា",
+      "nostr": "Nostr",
+      "accounts": "គណនី"
+    },
+    "filters": {
+      "title": "តម្រង",
+      "reset": "កំណត់ឡើងវិញ",
+      "from": "ពី",
+      "sort": "តម្រៀប",
+      "media": "មេឌា",
+      "protocol": "ប្រូតូកូល",
+      "language": "ភាសា",
+      "kind": "ប្រភេទ",
+      "kindCustomPlaceholder": "ឧ. 1, 30023",
+      "includeReplies": "រួមបញ្ចូលការឆ្លើយតប",
+      "authorScope": {
+        "anyone": "អ្នកណាក៏បាន",
+        "follows": "ដែលខ្ញុំតាមដាន",
+        "people": "មនុស្ស"
+      },
+      "sortOptions": {
+        "recent": "ថ្មីៗ",
+        "hot": "ក្ដៅ",
+        "trending": "និន្នាការ"
+      },
+      "mediaOptions": {
+        "all": "ទាំងអស់",
+        "images": "រូបភាព",
+        "videos": "វីដេអូ",
+        "shorts": "ខ្លី",
+        "none": "គ្មានមេឌា"
+      },
+      "protocolOptions": {
+        "nostr": "Nostr",
+        "mastodon": "Mastodon",
+        "bluesky": "Bluesky"
+      },
+      "langOptions": {
+        "global": "សកល",
+        "en": "អង់គ្លេស",
+        "es": "អេស្ប៉ាញ",
+        "fr": "បារាំង",
+        "de": "អាល្លឺម៉ង់",
+        "ja": "ជប៉ុន",
+        "zh": "ចិន"
+      }
+    },
+    "chips": {
+      "noReplies": "គ្មានការឆ្លើយតប",
+      "images": "រូបភាព",
+      "videos": "វីដេអូ",
+      "shortsAndDivines": "ខ្លី និង Divines",
+      "noMedia": "គ្មានមេឌា",
+      "mastodon": "Mastodon",
+      "bluesky": "Bluesky",
+      "hot": "ក្ដៅ",
+      "trending": "និន្នាការ",
+      "allKinds": "គ្រប់ប្រភេទ",
+      "customKind": "ប្រភេទ៖ {{kind}}",
+      "kindNumber": "ប្រភេទ {{kind}}",
+      "kindsCount_one": "{{count}} ប្រភេទ",
+      "kindsCount_other": "{{count}} ប្រភេទ",
+      "myFollows": "អ្នកដែលខ្ញុំតាមដាន",
+      "authorsCount_one": "{{count}} អ្នកនិពន្ធ",
+      "authorsCount_other": "{{count}} អ្នកនិពន្ធ"
+    },
+    "clear": "លុប",
+    "searchLabel": "ស្វែងរក៖",
+    "newPosts_one": "ការបង្ហោះថ្មី {{count}}",
+    "newPosts_other": "ការបង្ហោះថ្មី {{count}}",
+    "following": "កំពុងតាមដាន",
+    "botAccount": "គណនីបូត",
+    "empty": {
+      "posts": "រកមិនឃើញលទ្ធផលដែលត្រូវនឹងការស្វែងរករបស់អ្នកទេ។",
+      "postsPrompt": "បញ្ចូលពាក្យស្វែងរកដើម្បីរកមាតិកា Nostr។",
+      "accounts": "រកមិនឃើញគណនីដែលត្រូវនឹងការស្វែងរករបស់អ្នកទេ។",
+      "followsPrompt": "ស្វែងរកមនុស្សតាមឈ្មោះ ឬអាសយដ្ឋាន NIP-05។",
+      "agora": "រកមិនឃើញយុទ្ធនាការ pledges ឬក្រុម Agora ដែលត្រូវនឹងការស្វែងរករបស់អ្នកទេ។",
+      "agoraPrompt": "ស្វែងរកយុទ្ធនាការ pledges និងក្រុម Agora ឬរុករកអ្វីដែលថ្មីបំផុត។",
+      "activeFilters": "តម្រងសកម្ម៖",
+      "clearAll": "លុបតម្រងទាំងអស់"
+    }
   }
 }
