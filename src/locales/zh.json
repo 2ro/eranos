@@ -182,6 +182,42 @@
       "storyEmpty": "发起人尚未为此悬赏撰写详情。"
     }
   },
+  "groups": {
+    "list": {
+      "seoTitle": "群组",
+      "seoDescription": "在 Nostr 上发现并加入群组",
+      "heroKicker": "群组",
+      "heroHeading": "众志",
+      "heroHeadingLine2": "成城。",
+      "heroBody": "创建群组、聚集成员，并随时了解你的空间在做什么。",
+      "createGroup": "创建群组",
+      "createGroupLoginTitle": "登录以创建群组",
+      "createGroupLoginBody": "创建群组会从你的账号发布一个 Nostr 事件。",
+      "myGroups": "我的群组",
+      "featuredGroups": "精选群组",
+      "loginToSeeTitle": "登录以查看你的群组",
+      "loginToSeeBody": "你创建或管理的群组会显示在这里。",
+      "noGroupsTitle": "还没有群组",
+      "noGroupsBody": "创建你自己的群组，与你的伙伴一起协调活动、悬赏和事件。",
+      "noFeaturedTitle": "暂无精选群组",
+      "noFeaturedBody": "{{appName}} 管理员会在这里推荐出色的群组。请稍后再来。",
+      "connectingRelays": "正在连接中继……",
+      "showLess": "收起",
+      "showMore": "再显示 {{count}} 个",
+      "needsReview": "待审核",
+      "needsReviewDesc": "尚未被推荐或隐藏的 {{appName}} 群组。把它们提升到精选栏，或用「隐藏」抑制。",
+      "needsReviewEmpty": "没有待审核的内容。",
+      "hidden": "已隐藏",
+      "hiddenDesc": "从公开发现中抑制的群组。使用卡片上的菜单取消隐藏。",
+      "hiddenEmpty": "目前没有隐藏的群组。",
+      "tickerCampaignsRaised_one": "在 {{count}} 个活动中链上募得",
+      "tickerCampaignsRaised_other": "在 {{count}} 个活动中链上募得",
+      "tickerFeaturedGroups_one": "个 Nostr 精选群组",
+      "tickerFeaturedGroups_other": "个 Nostr 精选群组",
+      "tickerCountries_one": "个国家今天发帖",
+      "tickerCountries_other": "个国家今天发帖"
+    }
+  },
   "campaigns": {
     "home": {
       "seoTitle": "众筹活动",

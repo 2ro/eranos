@@ -182,6 +182,42 @@
       "storyEmpty": "Akapa chitsidziro haasati anyora rondedzero yechitsidziro ichi."
     }
   },
+  "groups": {
+    "list": {
+      "seoTitle": "Mapoka",
+      "seoDescription": "Wana woziva uye joiner mapoka paNostr",
+      "heroKicker": "Mapoka",
+      "heroHeading": "Simba",
+      "heroHeadingLine2": "riri muhuwandu.",
+      "heroBody": "Gadzira mapoka, unganidza nhengo, uye ramba uchitarisa zviri kuitika munzvimbo dzako.",
+      "createGroup": "Gadzira boka",
+      "createGroupLoginTitle": "Pinda kuti ugadzire boka",
+      "createGroupLoginBody": "Kugadzira boka kunoburitsa chiitiko cheNostr kubva muakaundi yako.",
+      "myGroups": "Mapoka angu",
+      "featuredGroups": "Mapoka anokurumbira",
+      "loginToSeeTitle": "Pinda kuti uone mapoka ako",
+      "loginToSeeBody": "Mapoka awakatanga kana aunotungamira achaonekwa pano.",
+      "noGroupsTitle": "Hapana mapoka parizvino",
+      "noGroupsBody": "Gadzira boka rako kuti utange kurongedza mishandirapamwe, zvitsidziro, nezviitiko nevanhu vako.",
+      "noFeaturedTitle": "Hapana mapoka anokurumbira parizvino",
+      "noFeaturedBody": "Vatungamiri ve{{appName}} vanonyora mapoka akakurumbira pano. Dzoka pasinaapfuura nguva.",
+      "connectingRelays": "Kubatanidza kunorelays…",
+      "showLess": "Ratidza zvishoma",
+      "showMore": "Ratidza {{count}} zvimwe",
+      "needsReview": "Inoda kuongororwa",
+      "needsReviewDesc": "Mapoka e{{appName}} asati anyorwa kana kuvanzwa. Simudza rimwe kushelf yanokurumbira kana kuriderera nokuvigwa.",
+      "needsReviewEmpty": "Hapana chiri kumirira kuongororwa.",
+      "hidden": "Akavanzwa",
+      "hiddenDesc": "Mapoka akadzvinyirirwa kubva mukuwanikwa pachena. Shandisa menu yekebab pakadhi kuti ubvise kuvanzwa.",
+      "hiddenEmpty": "Hapana mapoka akavanzwa parizvino.",
+      "tickerCampaignsRaised_one": "yakaunganidzwa pachain kuburikidza ne{{count}} campaign",
+      "tickerCampaignsRaised_other": "yakaunganidzwa pachain kuburikidza ne{{count}} campaigns",
+      "tickerFeaturedGroups_one": "boka rinokurumbira paNostr",
+      "tickerFeaturedGroups_other": "mapoka anokurumbira paNostr",
+      "tickerCountries_one": "nyika iri kuburitsa nhasi",
+      "tickerCountries_other": "nyika dziri kuburitsa nhasi"
+    }
+  },
   "campaigns": {
     "home": {
       "seoTitle": "Mishandirapamwe yekuunganidza mari",

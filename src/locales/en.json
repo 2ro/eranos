@@ -182,6 +182,42 @@
       "storyEmpty": "The pledger hasn't written details for this pledge yet."
     }
   },
+  "groups": {
+    "list": {
+      "seoTitle": "Groups",
+      "seoDescription": "Discover and join groups on Nostr",
+      "heroKicker": "Groups",
+      "heroHeading": "Strength",
+      "heroHeadingLine2": "in numbers.",
+      "heroBody": "Create groups, gather members, and keep up with what your spaces are doing.",
+      "createGroup": "Create a group",
+      "createGroupLoginTitle": "Log in to create a group",
+      "createGroupLoginBody": "Creating a group publishes a Nostr event from your account.",
+      "myGroups": "My groups",
+      "featuredGroups": "Featured groups",
+      "loginToSeeTitle": "Log in to see your groups",
+      "loginToSeeBody": "Groups you've founded or moderate will appear here.",
+      "noGroupsTitle": "No groups yet",
+      "noGroupsBody": "Create your own group to start coordinating campaigns, pledges, and events with your people.",
+      "noFeaturedTitle": "No featured groups yet",
+      "noFeaturedBody": "{{appName}} moderators feature standout groups here. Check back soon.",
+      "connectingRelays": "Connecting to relays…",
+      "showLess": "Show less",
+      "showMore": "Show {{count}} more",
+      "needsReview": "Needs review",
+      "needsReviewDesc": "{{appName}} groups that haven't been featured or hidden yet. Lift one into the Featured shelf or suppress it with Hide.",
+      "needsReviewEmpty": "Nothing awaiting review.",
+      "hidden": "Hidden",
+      "hiddenDesc": "Groups suppressed from public discovery. Use the kebab menu on a card to unhide.",
+      "hiddenEmpty": "No groups are currently hidden.",
+      "tickerCampaignsRaised_one": "raised on-chain across {{count}} campaign",
+      "tickerCampaignsRaised_other": "raised on-chain across {{count}} campaigns",
+      "tickerFeaturedGroups_one": "featured group on Nostr",
+      "tickerFeaturedGroups_other": "featured groups on Nostr",
+      "tickerCountries_one": "country posting today",
+      "tickerCountries_other": "countries posting today"
+    }
+  },
   "campaigns": {
     "home": {
       "seoTitle": "Fundraisers",

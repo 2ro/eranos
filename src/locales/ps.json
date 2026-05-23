@@ -182,6 +182,42 @@
       "storyEmpty": "ژمنه کوونکي تر اوسه د دې ژمنې لپاره جزئیات نه دي لیکلي."
     }
   },
+  "groups": {
+    "list": {
+      "seoTitle": "ډلې",
+      "seoDescription": "په Nostr کې ډلې وموندئ او ورسره یوځای شئ",
+      "heroKicker": "ډلې",
+      "heroHeading": "ځواک",
+      "heroHeadingLine2": "په شمېر کې دی.",
+      "heroBody": "ډلې جوړې کړئ، غړي راټول کړئ، او د خپلو فضاوو په اړه خبر اوسئ.",
+      "createGroup": "د ډلې جوړول",
+      "createGroupLoginTitle": "د ډلې جوړولو لپاره ننوځئ",
+      "createGroupLoginBody": "د ډلې جوړول ستاسو له حساب څخه د Nostr پیښه خپروي.",
+      "myGroups": "زما ډلې",
+      "featuredGroups": "ځانګړې ډلې",
+      "loginToSeeTitle": "د خپلو ډلو لیدلو لپاره ننوځئ",
+      "loginToSeeBody": "هغه ډلې چې تاسو یې جوړې کړي یا یې اداره کوئ به دلته راڅرګندې شي.",
+      "noGroupsTitle": "تر اوسه ډلې نشته",
+      "noGroupsBody": "د خپلو خلکو سره د کمپاینونو، ژمنو او پیښو د همغږي کولو لپاره خپله ډله جوړه کړئ.",
+      "noFeaturedTitle": "تر اوسه ځانګړې ډلې نشته",
+      "noFeaturedBody": "د {{appName}} ادارېدونکي دلته بې‌جوړې ډلې ځانګړي کوي. ډېر ژر بیرته وګورئ.",
+      "connectingRelays": "ریلې سره نښلول…",
+      "showLess": "لږ ښودل",
+      "showMore": "{{count}} نور ښودل",
+      "needsReview": "بیاکتنه ته اړتیا لري",
+      "needsReviewDesc": "د {{appName}} ډلې چې تر اوسه نه ځانګړې شوې او نه پټې شوې. یو یې ځانګړو ته پورته کړئ یا یې په پټولو سره ضعیف کړئ.",
+      "needsReviewEmpty": "د بیاکتنې په تمه څه نشته.",
+      "hidden": "پټې",
+      "hiddenDesc": "د عامه موندنې څخه پټې ډلې. د کارت په کباب مینو کاپي کې د پټولو لرې کولو لپاره وکاروئ.",
+      "hiddenEmpty": "اوس مهال هیڅ ډله پټه نه ده.",
+      "tickerCampaignsRaised_one": "په {{count}} کمپاین کې پر چین راټول شوي",
+      "tickerCampaignsRaised_other": "په {{count}} کمپاینونو کې پر چین راټول شوي",
+      "tickerFeaturedGroups_one": "په Nostr کې ځانګړې ډله",
+      "tickerFeaturedGroups_other": "په Nostr کې ځانګړې ډلې",
+      "tickerCountries_one": "نن ورځ خپروونکی هیواد",
+      "tickerCountries_other": "نن ورځ خپروونکي هیوادونه"
+    }
+  },
   "campaigns": {
     "home": {
       "seoTitle": "د مرستو راټولولو کمپاینونه",

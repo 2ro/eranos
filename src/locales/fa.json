@@ -182,6 +182,42 @@
       "storyEmpty": "متعهد هنوز جزئیاتی برای این تعهد ننوشته است."
     }
   },
+  "groups": {
+    "list": {
+      "seoTitle": "گروه‌ها",
+      "seoDescription": "گروه‌ها را در Nostr کشف و به آن‌ها بپیوندید",
+      "heroKicker": "گروه‌ها",
+      "heroHeading": "قدرت",
+      "heroHeadingLine2": "در شمار است.",
+      "heroBody": "گروه بسازید، اعضا را گرد هم آورید و از اتفاقات فضاهای خود باخبر بمانید.",
+      "createGroup": "ساخت گروه",
+      "createGroupLoginTitle": "برای ساخت گروه وارد شوید",
+      "createGroupLoginBody": "ساخت گروه یک رویداد Nostr از حساب شما منتشر می‌کند.",
+      "myGroups": "گروه‌های من",
+      "featuredGroups": "گروه‌های ویژه",
+      "loginToSeeTitle": "برای دیدن گروه‌هایت وارد شو",
+      "loginToSeeBody": "گروه‌هایی که ساخته‌ای یا مدیریت می‌کنی اینجا ظاهر می‌شوند.",
+      "noGroupsTitle": "هنوز گروهی نیست",
+      "noGroupsBody": "گروه خودت را بساز تا کمپین‌ها، تعهدها و رویدادها را با مردمت هماهنگ کنی.",
+      "noFeaturedTitle": "هنوز گروه ویژه‌ای نیست",
+      "noFeaturedBody": "مدیران {{appName}} گروه‌های برجسته را اینجا معرفی می‌کنند. به‌زودی سر بزن.",
+      "connectingRelays": "در حال اتصال به رله‌ها…",
+      "showLess": "نمایش کمتر",
+      "showMore": "نمایش {{count}} مورد دیگر",
+      "needsReview": "نیازمند بررسی",
+      "needsReviewDesc": "گروه‌های {{appName}} که هنوز ویژه یا پنهان نشده‌اند. آن‌ها را به قفسهٔ ویژه ببر یا با پنهان‌سازی سرکوب کن.",
+      "needsReviewEmpty": "چیزی منتظر بررسی نیست.",
+      "hidden": "پنهان",
+      "hiddenDesc": "گروه‌های پنهان‌شده از کشف عمومی. از منوی کبابی روی کارت برای آشکارسازی استفاده کن.",
+      "hiddenEmpty": "در حال حاضر گروه پنهانی وجود ندارد.",
+      "tickerCampaignsRaised_one": "روی زنجیره در {{count}} کمپین جمع‌آوری‌شده",
+      "tickerCampaignsRaised_other": "روی زنجیره در {{count}} کمپین جمع‌آوری‌شده",
+      "tickerFeaturedGroups_one": "گروه ویژه در Nostr",
+      "tickerFeaturedGroups_other": "گروه ویژه در Nostr",
+      "tickerCountries_one": "کشور امروز در حال انتشار",
+      "tickerCountries_other": "کشور امروز در حال انتشار"
+    }
+  },
   "campaigns": {
     "home": {
       "seoTitle": "کمپین‌های جذب کمک مالی",

@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useSeoMeta } from '@unhead/react';
+import { useTranslation } from 'react-i18next';
 import { ChevronDown, ChevronUp, EyeOff, Globe2, HandHeart, Hourglass, PlusCircle, Users } from 'lucide-react';
 
 import { HeroAtmosphere } from '@/components/HeroAtmosphere';
@@ -36,6 +37,7 @@ import type { ParsedCommunity } from '@/lib/communityUtils';
 // ─── Page ──────────────────────────────────────────────────────────────────────
 
 export function CommunitiesPage() {
+  const { t } = useTranslation();
   const { config } = useAppContext();
   const { user } = useCurrentUser();
   const userOrganizations = useUserOrganizations();
@@ -54,15 +56,15 @@ export function CommunitiesPage() {
   const isMod = !!user && !!moderators && moderators.includes(user.pubkey);
 
   useSeoMeta({
-    title: `Groups | ${config.appName}`,
-    description: 'Discover and join groups on Nostr',
+    title: `${t('groups.list.seoTitle')} | ${config.appName}`,
+    description: t('groups.list.seoDescription'),
   });
 
   const handleCreateCommunity = () => {
     if (!user) {
       toast({
-        title: 'Log in to create a group',
-        description: 'Creating a group publishes a Nostr event from your account.',
+        title: t('groups.list.createGroupLoginTitle'),
+        description: t('groups.list.createGroupLoginBody'),
       });
       return;
     }
@@ -75,7 +77,7 @@ export function CommunitiesPage() {
 
       <div className="max-w-5xl mx-auto space-y-2 sm:space-y-4 pb-8">
         <section className="pt-6">
-          <SectionHeader title="My groups" className="pb-3 sm:px-6" />
+          <SectionHeader title={t('groups.list.myGroups')} className="pb-3 sm:px-6" />
           <MyCommunitiesShelf
             userOrganizations={userOrganizations}
             onCreateCommunity={handleCreateCommunity}
@@ -84,7 +86,7 @@ export function CommunitiesPage() {
 
         <section className="pt-4 pb-8">
           <SectionHeader
-            title="Featured groups"
+            title={t('groups.list.featuredGroups')}
             className="pb-3 sm:px-6"
           />
           <FeaturedOrganizationsShelf />
@@ -124,6 +126,8 @@ export function CommunitiesPage() {
  * (collapsible, defaults to open when the list is short).
  */
 function ModeratorReviewSections() {
+  const { t } = useTranslation();
+  const { config } = useAppContext();
   // Wider pull than the public discovery shelf so reviewers see deeper
   // history. Bumping the limit further would just add network cost —
   // anything truly old can be reviewed by visiting it directly.
@@ -156,21 +160,21 @@ function ModeratorReviewSections() {
     <>
       <ModeratorOrgSection
         icon={<Hourglass className="size-4" />}
-        title="Needs review"
-        description="Agora groups that haven't been featured or hidden yet. Lift one into the Featured shelf or suppress it with Hide."
+        title={t('groups.list.needsReview')}
+        description={t('groups.list.needsReviewDesc', { appName: config.appName })}
         count={needsReviewOrgs.length}
         orgs={needsReviewOrgs}
         isLoading={sectionsLoading}
-        emptyText="Nothing awaiting review."
+        emptyText={t('groups.list.needsReviewEmpty')}
       />
       <ModeratorOrgSection
         icon={<EyeOff className="size-4" />}
-        title="Hidden"
-        description="Groups suppressed from public discovery. Use the kebab menu on a card to unhide."
+        title={t('groups.list.hidden')}
+        description={t('groups.list.hiddenDesc')}
         count={hiddenOrgs.length}
         orgs={hiddenOrgs}
         isLoading={sectionsLoading}
-        emptyText="No groups are currently hidden."
+        emptyText={t('groups.list.hiddenEmpty')}
       />
     </>
   );
@@ -270,6 +274,7 @@ interface TickerStat {
 }
 
 function CommunitiesHero({ onCreateCommunity }: CommunitiesHeroProps) {
+  const { t } = useTranslation();
   const { data: featured } = useFeaturedOrganizations();
   const { data: activityByCountry } = useGlobalActivity();
   const { data: donations, isLoading: donationsLoading } = useGlobalDonations();
@@ -291,9 +296,7 @@ function CommunitiesHero({ onCreateCommunity }: CommunitiesHeroProps) {
       items.push({
         id: 'sats',
         value: formatSatsShort(donations.totalSats),
-        label: `raised on-chain across ${donations.campaignCount.toLocaleString()} ${
-          donations.campaignCount === 1 ? 'campaign' : 'campaigns'
-        }`,
+        label: t('groups.list.tickerCampaignsRaised', { count: donations.campaignCount }),
         icon: <HandHeart className="size-5" aria-hidden />,
       });
     }
@@ -301,7 +304,7 @@ function CommunitiesHero({ onCreateCommunity }: CommunitiesHeroProps) {
       items.push({
         id: 'groups',
         value: featured.length.toLocaleString(),
-        label: `featured ${featured.length === 1 ? 'group' : 'groups'} on Nostr`,
+        label: t('groups.list.tickerFeaturedGroups', { count: featured.length }),
         icon: <Users className="size-5" aria-hidden />,
       });
     }
@@ -309,12 +312,12 @@ function CommunitiesHero({ onCreateCommunity }: CommunitiesHeroProps) {
       items.push({
         id: 'countries',
         value: activityByCountry.size.toLocaleString(),
-        label: `${activityByCountry.size === 1 ? 'country' : 'countries'} posting today`,
+        label: t('groups.list.tickerCountries', { count: activityByCountry.size }),
         icon: <Globe2 className="size-5" aria-hidden />,
       });
     }
     return items;
-  }, [donations, featured, activityByCountry]);
+  }, [donations, featured, activityByCountry, t]);
 
   const [tickerIndex, setTickerIndex] = useState(0);
   useEffect(() => {
@@ -356,14 +359,14 @@ function CommunitiesHero({ onCreateCommunity }: CommunitiesHeroProps) {
       <div className="relative max-w-5xl mx-auto px-4 sm:px-6 py-10 sm:py-12 lg:py-14 min-h-[380px] sm:min-h-[420px] lg:min-h-[460px] flex flex-col items-center text-center">
         <div className="relative space-y-3 max-w-3xl">
           <p className="text-xs sm:text-sm font-semibold uppercase tracking-[0.18em] text-white/85 drop-shadow">
-            Groups
+            {t('groups.list.heroKicker')}
           </p>
           <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight leading-[1.05] text-white drop-shadow-[0_2px_12px_rgb(0_0_0/0.55)]">
-            Strength
-            <br className="sm:hidden" /> in numbers.
+            {t('groups.list.heroHeading')}
+            <br className="sm:hidden" /> {t('groups.list.heroHeadingLine2')}
           </h1>
           <p className="text-base sm:text-lg text-white/85 max-w-2xl mx-auto drop-shadow-[0_1px_6px_rgb(0_0_0/0.5)]">
-            Create groups, gather members, and keep up with what your spaces are doing.
+            {t('groups.list.heroBody')}
           </p>
         </div>
 
@@ -396,7 +399,7 @@ function CommunitiesHero({ onCreateCommunity }: CommunitiesHeroProps) {
                 </>
               ) : (
                 <span className="text-xs text-muted-foreground">
-                  Connecting to relays…
+                  {t('groups.list.connectingRelays')}
                 </span>
               )}
             </div>
@@ -419,7 +422,7 @@ function CommunitiesHero({ onCreateCommunity }: CommunitiesHeroProps) {
             )}
           >
             <PlusCircle className="mr-2" />
-            Create a group
+            {t('groups.list.createGroup')}
           </Button>
         </div>
       </div>
@@ -440,14 +443,15 @@ function MyCommunitiesShelf({
   userOrganizations: UserOrganizationsResult;
   onCreateCommunity: () => void;
 }) {
+  const { t } = useTranslation();
   const { user } = useCurrentUser();
 
   if (!user) {
     return (
       <EmptyShelf
         icon={<Users className="size-7 text-primary/70" />}
-        title="Log in to see your groups"
-        body="Groups you've founded or moderate will appear here."
+        title={t('groups.list.loginToSeeTitle')}
+        body={t('groups.list.loginToSeeBody')}
         action={<LoginArea className="max-w-60" />}
       />
     );
@@ -468,6 +472,7 @@ function MyCommunitiesShelfContent({
   userOrganizations: UserOrganizationsResult;
   onCreateCommunity: () => void;
 }) {
+  const { t } = useTranslation();
   // "My organizations" = orgs the user founded, moderates, or follows.
   // Sorting is founder first, moderator second, followed-only last, with
   // newest community definition revisions first inside each bucket.
@@ -488,12 +493,12 @@ function MyCommunitiesShelfContent({
     return (
       <EmptyShelf
         icon={<Users className="size-7 text-primary/70" />}
-        title="No groups yet"
-        body="Create your own group to start coordinating campaigns, pledges, and events with your people."
+        title={t('groups.list.noGroupsTitle')}
+        body={t('groups.list.noGroupsBody')}
         action={(
           <Button type="button" onClick={onCreateCommunity} className="rounded-full">
             <PlusCircle className="size-4 mr-2" />
-            Create a group
+            {t('groups.list.createGroup')}
           </Button>
         )}
       />
@@ -527,12 +532,12 @@ function MyCommunitiesShelfContent({
             {expanded ? (
               <>
                 <ChevronUp className="size-4 mr-1.5" />
-                Show less
+                {t('groups.list.showLess')}
               </>
             ) : (
               <>
                 <ChevronDown className="size-4 mr-1.5" />
-                Show {organizations.length - COLLAPSED_COUNT} more
+                {t('groups.list.showMore', { count: organizations.length - COLLAPSED_COUNT })}
               </>
             )}
           </Button>
@@ -543,6 +548,8 @@ function MyCommunitiesShelfContent({
 }
 
 function FeaturedOrganizationsShelf() {
+  const { t } = useTranslation();
+  const { config } = useAppContext();
   const { data: featured, isLoading } = useFeaturedOrganizations();
   const hasFeatured = !!featured && featured.length > 0;
 
@@ -560,8 +567,8 @@ function FeaturedOrganizationsShelf() {
     return (
       <EmptyShelf
         icon={<Users className="size-7 text-primary/70" />}
-        title="No featured groups yet"
-        body="Agora moderators feature standout groups here. Check back soon."
+        title={t('groups.list.noFeaturedTitle')}
+        body={t('groups.list.noFeaturedBody', { appName: config.appName })}
         action={null}
       />
     );

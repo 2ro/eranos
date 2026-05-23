@@ -182,6 +182,42 @@
       "storyEmpty": "Quien hizo la promesa aún no ha escrito los detalles."
     }
   },
+  "groups": {
+    "list": {
+      "seoTitle": "Grupos",
+      "seoDescription": "Descubre y únete a grupos en Nostr",
+      "heroKicker": "Grupos",
+      "heroHeading": "La fuerza",
+      "heroHeadingLine2": "está en el número.",
+      "heroBody": "Crea grupos, reúne miembros y mantente al tanto de lo que hacen tus espacios.",
+      "createGroup": "Crear un grupo",
+      "createGroupLoginTitle": "Inicia sesión para crear un grupo",
+      "createGroupLoginBody": "Crear un grupo publica un evento de Nostr desde tu cuenta.",
+      "myGroups": "Mis grupos",
+      "featuredGroups": "Grupos destacados",
+      "loginToSeeTitle": "Inicia sesión para ver tus grupos",
+      "loginToSeeBody": "Los grupos que fundaste o moderas aparecerán aquí.",
+      "noGroupsTitle": "Aún no hay grupos",
+      "noGroupsBody": "Crea tu propio grupo para coordinar campañas, promesas y eventos con tu gente.",
+      "noFeaturedTitle": "Aún no hay grupos destacados",
+      "noFeaturedBody": "Los moderadores de {{appName}} destacan grupos notables aquí. Vuelve pronto.",
+      "connectingRelays": "Conectando con los relés…",
+      "showLess": "Mostrar menos",
+      "showMore": "Mostrar {{count}} más",
+      "needsReview": "Pendiente de revisión",
+      "needsReviewDesc": "Grupos de {{appName}} que aún no han sido destacados ni ocultados. Súbelos a la sección destacada o suprímelos con Ocultar.",
+      "needsReviewEmpty": "Nada pendiente de revisión.",
+      "hidden": "Ocultos",
+      "hiddenDesc": "Grupos suprimidos del descubrimiento público. Usa el menú de la tarjeta para mostrarlos de nuevo.",
+      "hiddenEmpty": "No hay grupos ocultos actualmente.",
+      "tickerCampaignsRaised_one": "recaudado en cadena en {{count}} campaña",
+      "tickerCampaignsRaised_other": "recaudado en cadena en {{count}} campañas",
+      "tickerFeaturedGroups_one": "grupo destacado en Nostr",
+      "tickerFeaturedGroups_other": "grupos destacados en Nostr",
+      "tickerCountries_one": "país publicando hoy",
+      "tickerCountries_other": "países publicando hoy"
+    }
+  },
   "campaigns": {
     "home": {
       "seoTitle": "Recaudaciones",

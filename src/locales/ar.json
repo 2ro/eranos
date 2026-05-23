@@ -182,6 +182,42 @@
       "storyEmpty": "لم يكتب صاحب التعهد التفاصيل بعد."
     }
   },
+  "groups": {
+    "list": {
+      "seoTitle": "المجموعات",
+      "seoDescription": "اكتشف المجموعات على Nostr وانضم إليها",
+      "heroKicker": "المجموعات",
+      "heroHeading": "القوة",
+      "heroHeadingLine2": "في الأعداد.",
+      "heroBody": "أنشئ مجموعات، اجمع الأعضاء، وتابع ما تفعله مساحاتك.",
+      "createGroup": "إنشاء مجموعة",
+      "createGroupLoginTitle": "سجّل الدخول لإنشاء مجموعة",
+      "createGroupLoginBody": "إنشاء مجموعة يَنشر حدث Nostr من حسابك.",
+      "myGroups": "مجموعاتي",
+      "featuredGroups": "المجموعات المميزة",
+      "loginToSeeTitle": "سجّل الدخول لرؤية مجموعاتك",
+      "loginToSeeBody": "ستظهر هنا المجموعات التي أسستها أو التي تشرف عليها.",
+      "noGroupsTitle": "لا توجد مجموعات بعد",
+      "noGroupsBody": "أنشئ مجموعتك الخاصة لتنسيق الحملات والتعهدات والفعاليات مع أهلك.",
+      "noFeaturedTitle": "لا توجد مجموعات مميزة بعد",
+      "noFeaturedBody": "يميّز مشرفو {{appName}} المجموعات البارزة هنا. عُد قريبًا.",
+      "connectingRelays": "جارٍ الاتصال بالمرحّلات…",
+      "showLess": "عرض أقل",
+      "showMore": "عرض {{count}} المزيد",
+      "needsReview": "بحاجة إلى مراجعة",
+      "needsReviewDesc": "مجموعات {{appName}} التي لم تُميَّز ولم تُخفَ بعد. ارفعها إلى رف المميزة أو أخفِها بزر الإخفاء.",
+      "needsReviewEmpty": "لا شيء بانتظار المراجعة.",
+      "hidden": "مخفية",
+      "hiddenDesc": "مجموعات مُخفاة عن الاكتشاف العام. استخدم قائمة الكباب على البطاقة لإلغاء الإخفاء.",
+      "hiddenEmpty": "لا توجد مجموعات مخفية حاليًا.",
+      "tickerCampaignsRaised_one": "جُمعت على السلسلة عبر حملة {{count}}",
+      "tickerCampaignsRaised_other": "جُمعت على السلسلة عبر {{count}} حملة",
+      "tickerFeaturedGroups_one": "مجموعة مميزة على Nostr",
+      "tickerFeaturedGroups_other": "مجموعات مميزة على Nostr",
+      "tickerCountries_one": "بلد ينشر اليوم",
+      "tickerCountries_other": "بلدًا تنشر اليوم"
+    }
+  },
   "campaigns": {
     "home": {
       "seoTitle": "حملات تمويل",
