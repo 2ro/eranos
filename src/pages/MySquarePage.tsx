@@ -67,9 +67,9 @@ import type { ParsedCampaign } from '@/lib/campaign';
  * All data hooks are called once in `LoggedInContent` and passed down so
  * TanStack Query subscriptions are shared rather than duplicated.
  *
- * Total cost: 3-5 Nostr relay round-trips + 2 Blockbook HTTP calls
- * (xpub + utxo, cached 60s) + 1 Esplora price call + 1 notification
- * preview query.
+ * Total cost: campaign, country, and community relay queries; one
+ * lightweight notification preview query; and wallet + price lookups
+ * (all cached by their respective hooks).
  */
 export function MySquarePage() {
   const { config } = useAppContext();
@@ -308,7 +308,7 @@ function WalletSummaryCard() {
       </div>
 
       {!walletAvailable ? (
-        <p className="text-sm text-muted-foreground">View wallet</p>
+        <p className="text-sm text-muted-foreground">Wallet details</p>
       ) : isLoading ? (
         <div className="space-y-1.5">
           <Skeleton className="h-7 w-24 rounded" />
