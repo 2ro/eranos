@@ -2,6 +2,7 @@ import { useRef, useEffect, useState, useCallback } from 'react';
 import type Hls from 'hls.js';
 import { Play, Pause, Volume1, Volume2, VolumeX, Expand, Minimize } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useAppContext } from '@/hooks/useAppContext';
 import { usePlayerControls } from '@/hooks/usePlayerControls';
 
 interface LiveStreamPlayerProps {
@@ -18,6 +19,11 @@ export function LiveStreamPlayer({ src, poster, className, title, artist }: Live
   const videoRef = useRef<HTMLVideoElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const hlsRef = useRef<Hls | null>(null);
+  const { config } = useAppContext();
+
+  // Live streams normally autoplay (muted), but in low-bandwidth mode we
+  // start paused so the user has to tap to begin pulling HLS segments.
+  const shouldAutoPlay = !config.lowBandwidthMode;
 
   const [isPlaying, setIsPlaying] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
@@ -213,7 +219,7 @@ export function LiveStreamPlayer({ src, poster, className, title, artist }: Live
         poster={poster}
         className="w-full h-full object-contain cursor-pointer"
         playsInline
-        autoPlay
+        autoPlay={shouldAutoPlay}
         muted
         {...({ 'webkit-playsinline': 'true' } as React.HTMLAttributes<HTMLVideoElement>)}
         onClick={handleVideoClick}

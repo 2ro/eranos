@@ -100,6 +100,8 @@ export interface EncryptedSettings {
   linkPreviewUrl?: string;
   /** Autoplay videos in feeds and previews (muted) */
   autoplayVideos?: boolean;
+  /** Low-bandwidth mode (overrides autoplay, defers media, etc.) */
+  lowBandwidthMode?: boolean;
   /** Sentry DSN for error reporting (empty string = disabled) */
   sentryDsn?: string;
   /** Saved feed tabs created from the search page. */

@@ -8,6 +8,7 @@ import { ExternalFavicon } from '@/components/ExternalFavicon';
 import { EmojifiedText } from '@/components/CustomEmoji';
 import { BioContent } from '@/components/BioContent';
 import { useAuthor } from '@/hooks/useAuthor';
+import { useImageProxy } from '@/hooks/useImageProxy';
 import { useUserStatus } from '@/hooks/useUserStatus';
 import { genUserName } from '@/lib/genUserName';
 import { formatNip05Display, getNip05Domain } from '@/lib/nip05';
@@ -42,6 +43,7 @@ function ProfileHoverCardBody({ pubkey }: { pubkey: string }) {
   const nip05Display = nip05Verified && nip05 ? formatNip05Display(nip05) : undefined;
   const { status: userStatus, url: statusUrl } = useUserStatus(pubkey);
   const { refs: badgeRefs } = useProfileBadges(pubkey);
+  const proxy = useImageProxy();
   const firstFive = badgeRefs.slice(0, 5);
   const { badgeMap } = useBadgeDefinitions(firstFive);
 
@@ -55,7 +57,7 @@ function ProfileHoverCardBody({ pubkey }: { pubkey: string }) {
       <div className="h-16 bg-secondary relative">
         {metadata?.banner && (
           <img
-            src={metadata.banner}
+            src={proxy(metadata.banner, 400)}
             alt=""
             className="w-full h-full object-cover"
             loading="lazy"
@@ -73,7 +75,7 @@ function ProfileHoverCardBody({ pubkey }: { pubkey: string }) {
         <div className="-mt-8 mb-2">
           <Link to={profileUrl} onClick={(e) => e.stopPropagation()}>
             <Avatar className="size-16 border-3 border-background">
-              <AvatarImage src={metadata?.picture} alt={displayName} />
+              <AvatarImage src={metadata?.picture} alt={displayName} proxyWidth={128} />
               <AvatarFallback className="bg-primary/20 text-primary text-lg">
                 {displayName[0]?.toUpperCase()}
               </AvatarFallback>

@@ -1,5 +1,6 @@
 import * as React from "react"
 
+import { useImageProxy } from "@/hooks/useImageProxy"
 import { cn } from "@/lib/utils"
 import { type AvatarShape, isEmoji, getAvatarMaskUrl, isValidAvatarShape } from "@/lib/avatarShape"
 
@@ -77,23 +78,40 @@ Avatar.displayName = "Avatar"
  * Renders the <img> immediately with absolute positioning so it covers
  * the fallback. No hidden Image() verification — the browser renders
  * the image progressively as it downloads.
+ *
+ * The `src` is routed through the configured image proxy at `proxyWidth`
+ * (default 96 — enough for retina up to 48px display). Pass a larger value
+ * on the profile-header avatar (e.g. 256). On proxy failure the component
+ * transparently falls back to the original URL.
  */
+export interface AvatarImageProps extends React.ImgHTMLAttributes<HTMLImageElement> {
+  /** Target width passed to the image proxy. Defaults to 96. */
+  proxyWidth?: number;
+}
+
 const AvatarImage = React.forwardRef<
   HTMLImageElement,
-  React.ImgHTMLAttributes<HTMLImageElement>
->(({ className, onError, ...props }, ref) => {
+  AvatarImageProps
+>(({ className, onError, proxyWidth = 96, ...props }, ref) => {
   const [hasError, setHasError] = React.useState(false)
+  const [proxyFailed, setProxyFailed] = React.useState(false)
   const hasSrcRef = React.useContext(AvatarHasSrcContext)
+  const proxy = useImageProxy()
   const src = props.src
 
-  // Reset error when src changes
+  // Reset error and proxy-failed state when src changes
   const prevSrc = React.useRef(src)
   if (src !== prevSrc.current) {
     prevSrc.current = src
     if (hasError) setHasError(false)
+    if (proxyFailed) setProxyFailed(false)
   }
 
-  const showImage = !hasError && !!src
+  const proxied = src ? proxy(src, proxyWidth) : src
+  const usingProxy = proxied !== src
+  const finalSrc = proxyFailed || !usingProxy ? src : proxied
+
+  const showImage = !hasError && !!finalSrc
 
   // Signal to AvatarFallback synchronously during this render frame
   if (showImage) {
@@ -106,9 +124,15 @@ const AvatarImage = React.forwardRef<
     <img
       {...props}
       ref={ref}
+      src={finalSrc}
       alt=""
       className={cn("absolute inset-0 h-full w-full object-cover", className)}
       onError={(e) => {
+        // First failure with the proxy: swap to the original URL silently.
+        if (usingProxy && !proxyFailed) {
+          setProxyFailed(true)
+          return
+        }
         setHasError(true)
         onError?.(e)
       }}

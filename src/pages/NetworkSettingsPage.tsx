@@ -1,14 +1,19 @@
 import { useSeoMeta } from '@unhead/react';
 import { Navigate } from 'react-router-dom';
-import { useTranslation } from 'react-i18next';
+import { Trans, useTranslation } from 'react-i18next';
 import { PageHeader } from '@/components/PageHeader';
 import { RelayListManager } from '@/components/RelayListManager';
 import { BlossomSettings } from '@/components/BlossomSettings';
 import { HelpTip } from '@/components/HelpTip';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Switch } from '@/components/ui/switch';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useAppContext } from '@/hooks/useAppContext';
 import { cn } from '@/lib/utils';
+
+const DEFAULT_IMAGE_PROXY = 'https://wsrv.nl';
 
 export function NetworkSettingsPage() {
   const { t } = useTranslation();
@@ -52,6 +57,105 @@ export function NetworkSettingsPage() {
           <p className="text-xs text-muted-foreground mt-1 leading-relaxed">
             {t('settings.network.connectionsIntro')}
           </p>
+        </div>
+
+        {/* Low-Bandwidth Mode */}
+        <div>
+          <div className="relative px-3 py-3.5">
+            <h2 className="text-base font-semibold">{t('settings.network.lowBandwidthHeading')}</h2>
+            <div className="absolute bottom-0 left-0 right-0 h-1 bg-primary rounded-full" />
+          </div>
+          <div className="pt-4 pb-4 px-3 space-y-4">
+            <div className="flex items-start justify-between gap-3">
+              <div className="space-y-1 min-w-0">
+                <Label htmlFor="low-bandwidth" className="text-sm font-medium">
+                  {t('settings.network.reduceDataUsage')}
+                </Label>
+                <p className="text-xs text-muted-foreground leading-relaxed">
+                  {t('settings.network.reduceDataUsageDesc')}
+                </p>
+              </div>
+              <Switch
+                id="low-bandwidth"
+                checked={config.lowBandwidthMode}
+                onCheckedChange={(checked) =>
+                  updateConfig((prev) => ({ ...prev, lowBandwidthMode: checked }))
+                }
+              />
+            </div>
+
+            {/* Image Proxy — independent of Low-Bandwidth. Controls whether
+                images are fetched from a downsizing proxy. */}
+            <div className="space-y-3">
+              <div className="flex items-start justify-between gap-3">
+                <div className="space-y-1 min-w-0">
+                  <Label htmlFor="image-proxy" className="text-sm font-medium">
+                    {t('settings.network.useImageProxy')}
+                  </Label>
+                  <p className="text-xs text-muted-foreground leading-relaxed">
+                    {t('settings.network.useImageProxyDesc')}
+                  </p>
+                </div>
+                <Switch
+                  id="image-proxy"
+                  checked={!!config.imageProxy}
+                  onCheckedChange={(checked) =>
+                    updateConfig((prev) => ({
+                      ...prev,
+                      imageProxy: checked ? DEFAULT_IMAGE_PROXY : '',
+                    }))
+                  }
+                />
+              </div>
+
+              {config.imageProxy && (
+                <div className="space-y-2">
+                  <Label htmlFor="image-proxy-url" className="text-xs font-medium text-muted-foreground">
+                    {t('settings.network.proxyUrl')}
+                  </Label>
+                  <div className="flex items-center gap-2">
+                    <Input
+                      id="image-proxy-url"
+                      type="url"
+                      value={config.imageProxy}
+                      onChange={(e) =>
+                        updateConfig((prev) => ({ ...prev, imageProxy: e.target.value }))
+                      }
+                      placeholder={DEFAULT_IMAGE_PROXY}
+                      className="font-mono text-xs"
+                    />
+                    {config.imageProxy !== DEFAULT_IMAGE_PROXY && (
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        onClick={() =>
+                          updateConfig((prev) => ({ ...prev, imageProxy: DEFAULT_IMAGE_PROXY }))
+                        }
+                      >
+                        {t('settings.network.reset')}
+                      </Button>
+                    )}
+                  </div>
+                  <p className="text-xs text-muted-foreground leading-relaxed">
+                    <Trans
+                      i18nKey="settings.network.proxyApiDesc"
+                      components={{
+                        0: (
+                          <a
+                            href="https://github.com/weserv/images"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="underline hover:text-foreground"
+                          />
+                        ),
+                      }}
+                    />
+                  </p>
+                </div>
+              )}
+            </div>
+          </div>
         </div>
 
         {/* Relays */}
