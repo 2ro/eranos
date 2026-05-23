@@ -1,12 +1,14 @@
 import { useState, useCallback, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
-import { ChevronLeft, ChevronRight, X, Download } from 'lucide-react';
+import { ChevronLeft, ChevronRight, X, Download, Image as ImageIcon } from 'lucide-react';
 import { Blurhash } from 'react-blurhash';
 import { cn } from '@/lib/utils';
 import { isValidBlurhash } from '@/lib/blurhash';
 import { openUrl } from '@/lib/downloadFile';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useBlossomFallback } from '@/hooks/useBlossomFallback';
+import { useAppContext } from '@/hooks/useAppContext';
+import { useImageProxy } from '@/hooks/useImageProxy';
 import { VideoPlayer } from '@/components/VideoPlayer';
 import { AudioVisualizer } from '@/components/AudioVisualizer';
 import { useAuthor } from '@/hooks/useAuthor';
@@ -176,8 +178,23 @@ function GridImage({
 }) {
   const [loaded, setLoaded] = useState(false);
   const [probedAspectRatio, setProbedAspectRatio] = useState<string | undefined>(undefined);
+  const [proxyFailed, setProxyFailed] = useState(false);
   const imgRef = useRef<HTMLImageElement>(null);
   const { src, onError } = useBlossomFallback(url);
+  const { config } = useAppContext();
+  const proxy = useImageProxy();
+
+  // In gated mode (low-bandwidth + no proxy) the user must tap to load the
+  // image. We also fall back to the placeholder if the proxy errors and the
+  // user is low-bandwidth, so we don't silently fetch the original.
+  const hasProxy = Boolean(config.imageProxy);
+  const lowBandwidth = config.lowBandwidthMode;
+  const shouldGate = lowBandwidth && !hasProxy;
+  const [revealed, setRevealed] = useState(!shouldGate);
+
+  const proxied = proxy(src, 600);
+  const usingProxy = proxied !== src;
+  const finalSrc = proxyFailed || !usingProxy ? src : proxied;
 
   // If the image is already cached by the browser, onLoad may have
   // fired before the ref was attached. Check on mount.
@@ -227,8 +244,9 @@ function GridImage({
       style={containerStyle}
       onClick={onOpen}
     >
-      {/* Placeholder shown while the image is loading */}
-      {!loaded && (
+      {/* Placeholder shown while the image is loading, or as a tap-to-load
+          gate when low-bandwidth mode is on without a proxy. */}
+      {(!loaded || !revealed) && (
         isValidBlurhash(blurhash) ? (
           // Blurhash canvas fills the container via CSS — pass small integer decode
           // resolution; the canvas is stretched to 100%×100% by the style prop.
@@ -250,29 +268,52 @@ function GridImage({
           <Skeleton className="absolute inset-0 w-full h-full rounded-none" />
         )
       )}
-      <img
-        ref={imgRef}
-        src={src}
-        alt=""
-        width={dimensions?.width}
-        height={dimensions?.height}
-        className={cn(
-          'absolute inset-0 w-full h-full object-cover transition-all duration-300 hover:scale-[1.02]',
-          loaded ? 'opacity-100' : 'opacity-0',
-        )}
-        loading="lazy"
-        onLoad={(e) => {
-          setLoaded(true);
-          if (!dim) {
-            const img = e.currentTarget;
-            if (img.naturalWidth && img.naturalHeight) {
-              setProbedAspectRatio(`${img.naturalWidth} / ${img.naturalHeight}`);
+      {!revealed && (
+        <div
+          role="presentation"
+          className="absolute inset-0 z-10 flex items-center justify-center"
+          onClick={(e) => { e.stopPropagation(); setRevealed(true); }}
+        >
+          <span className="flex items-center gap-2 rounded-full bg-background/80 px-3.5 py-1.5 text-xs font-medium text-foreground backdrop-blur-sm">
+            <ImageIcon className="size-3.5" aria-hidden />
+            Load image
+          </span>
+        </div>
+      )}
+      {revealed && (
+        <img
+          ref={imgRef}
+          src={finalSrc}
+          alt=""
+          width={dimensions?.width}
+          height={dimensions?.height}
+          className={cn(
+            'absolute inset-0 w-full h-full object-cover transition-all duration-300 hover:scale-[1.02]',
+            loaded ? 'opacity-100' : 'opacity-0',
+          )}
+          loading="lazy"
+          onLoad={(e) => {
+            setLoaded(true);
+            if (!dim) {
+              const img = e.currentTarget;
+              if (img.naturalWidth && img.naturalHeight) {
+                setProbedAspectRatio(`${img.naturalWidth} / ${img.naturalHeight}`);
+              }
             }
-          }
-        }}
-        onError={onError}
-      />
-      {/* "+N" overlay on last visible image */}
+          }}
+          onError={() => {
+            // Proxy failed: in low-bandwidth mode, re-gate so we don't load the
+            // original until the user explicitly asks. Otherwise fall through
+            // to original via Blossom fallback chain.
+            if (usingProxy && !proxyFailed) {
+              if (lowBandwidth) setRevealed(false);
+              setProxyFailed(true);
+              return;
+            }
+            onError();
+          }}
+        />
+      )}      {/* "+N" overlay on last visible image */}
       {overflow > 0 && (
         <div className="absolute inset-0 bg-black/50 flex items-center justify-center backdrop-blur-[2px]">
           <span className="text-white text-2xl font-bold">+{overflow}</span>
@@ -659,8 +700,16 @@ function LightboxImage({ url, isLoaded, onLoad, onSwipeBlocked, onZoomChange }: 
   onZoomChange?: (zoomed: boolean) => void;
 }) {
   const { src, onError } = useBlossomFallback(url);
+  const proxy = useImageProxy();
   const imgRef = useRef<HTMLImageElement>(null);
   const wrapRef = useRef<HTMLDivElement>(null);
+
+  // Proxy lightbox images at 1200 — large enough to look sharp, much
+  // smaller than original. On proxy failure, fall back to the original URL.
+  const [proxyFailed, setProxyFailed] = useState(false);
+  const proxied = proxy(src, 1200);
+  const usingProxy = proxied !== src;
+  const finalSrc = proxyFailed || !usingProxy ? src : proxied;
 
   // Zoom/pan state — mutated directly on DOM for 60fps
   const scale = useRef(1);
@@ -872,14 +921,22 @@ function LightboxImage({ url, isLoaded, onLoad, onSwipeBlocked, onZoomChange }: 
       <div ref={wrapRef} style={{ transformOrigin: 'center center', willChange: 'transform', width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
         <img
           ref={imgRef}
-          src={src}
+          src={finalSrc}
           alt=""
           className={cn(
             'block max-w-full max-h-full object-contain select-none transition-opacity duration-300',
             isLoaded ? 'opacity-100' : 'opacity-0',
           )}
           onLoad={handleLoaded}
-          onError={onError}
+          onError={() => {
+            // First failure: proxy was wrong/down. Swap to original and try
+            // once more before invoking the Blossom-fallback chain.
+            if (usingProxy && !proxyFailed) {
+              setProxyFailed(true);
+              return;
+            }
+            onError();
+          }}
           draggable={false}
         />
       </div>

@@ -5,6 +5,7 @@ import { nip19 } from 'nostr-tools';
 import type { NostrEvent } from '@nostrify/nostrify';
 import { useAudioPlayer } from '@/contexts/audioPlayerContextDef';
 import { useAuthor } from '@/hooks/useAuthor';
+import { useImageProxy } from '@/hooks/useImageProxy';
 import { parseMusicTrack, toAudioTrack } from '@/lib/musicHelpers';
 import { sanitizeUrl } from '@/lib/sanitizeUrl';
 import { formatTime } from '@/lib/formatTime';
@@ -33,6 +34,7 @@ export function MusicTrackRow({ event, index }: MusicTrackRowProps) {
   const player = useAudioPlayer();
   const parsed = useMemo(() => parseMusicTrack(event), [event]);
   const author = useAuthor(event.pubkey);
+  const proxy = useImageProxy();
   const [imgError, setImgError] = useState(false);
 
   const naddrPath = useMemo(() => {
@@ -88,7 +90,7 @@ export function MusicTrackRow({ event, index }: MusicTrackRowProps) {
       {/* Artwork */}
       <div className="size-12 rounded-lg overflow-hidden shrink-0 bg-muted">
         {parsed.artwork && !imgError ? (
-          <img src={parsed.artwork} alt={parsed.title} className="size-full object-cover" loading="lazy" onError={() => setImgError(true)} />
+          <img src={proxy(parsed.artwork, 96)} alt={parsed.title} className="size-full object-cover" loading="lazy" onError={() => setImgError(true)} />
         ) : (
           <div className="size-full flex items-center justify-center bg-primary/10">
             <Music className="size-5 text-primary/30" />

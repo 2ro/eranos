@@ -479,7 +479,7 @@ export function ProfileAvatarBlock({
           'size-28 md:size-32 border-4 border-background shadow-lg',
           picture && 'cursor-pointer',
         )}>
-          <AvatarImage src={picture} alt={displayName} />
+          <AvatarImage src={picture} alt={displayName} proxyWidth={256} />
           <AvatarFallback className="bg-primary/20 text-primary text-3xl">
             {displayName[0]?.toUpperCase() ?? '?'}
           </AvatarFallback>

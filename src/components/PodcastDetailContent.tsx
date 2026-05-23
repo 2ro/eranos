@@ -9,6 +9,7 @@ import { ArrowLeft, Play, Pause, Podcast, Zap, Clock } from 'lucide-react';
 import { RepostIcon } from '@/components/icons/RepostIcon';
 import type { NostrEvent } from '@nostrify/nostrify';
 import { useAuthor } from '@/hooks/useAuthor';
+import { useImageProxy } from '@/hooks/useImageProxy';
 import { useProfileUrl } from '@/hooks/useProfileUrl';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useEventStats } from '@/hooks/useTrending';
@@ -49,6 +50,7 @@ function EpisodeDetail({ event }: { event: NostrEvent }) {
   const navigate = useNavigate();
   const player = useAudioPlayer();
   const parsed = useMemo(() => parsePodcastEpisode(event), [event]);
+  const proxy = useImageProxy();
 
   const author = useAuthor(event.pubkey);
   const metadata = author.data?.metadata;
@@ -107,7 +109,7 @@ function EpisodeDetail({ event }: { event: NostrEvent }) {
         {/* Artwork */}
         <div className="shrink-0 w-32 sm:w-40 aspect-square rounded-2xl overflow-hidden bg-muted shadow-lg">
           {parsed?.artwork ? (
-            <img src={parsed.artwork} alt={parsed.title} className="w-full h-full object-cover" />
+            <img src={proxy(parsed.artwork, 320)} alt={parsed.title} className="w-full h-full object-cover" />
           ) : (
             <div className="w-full h-full flex items-center justify-center bg-primary/10">
               <Podcast className="size-12 text-primary/30" />

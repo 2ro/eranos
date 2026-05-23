@@ -1,18 +1,30 @@
 import { useState, useEffect } from 'react';
 import type Hls from 'hls.js';
 
+import { useAppContext } from '@/hooks/useAppContext';
+
 /**
  * Extracts a thumbnail frame from a video URL by loading it off-screen,
  * drawing the first frame to a canvas, and returning a data URL.
  * Works reliably on Android WebView where preload="metadata" doesn't render a visible frame.
+ *
+ * In low-bandwidth mode the frame-grab is skipped entirely — the hook
+ * returns whatever `poster` was passed in (often undefined). For posterless
+ * videos the player will show a generic placeholder rather than spending
+ * bytes on a background fetch.
  */
 export function useVideoThumbnail(src: string, poster: string | undefined): string | undefined {
+  const { config } = useAppContext();
   const [thumbnail, setThumbnail] = useState<string | undefined>(poster);
 
   useEffect(() => {
     // Skip if we already have a poster image
     if (poster) return;
     if (!src) return;
+    // Skip the background video fetch entirely in low-bandwidth mode —
+    // pulling segment data off the network just to draw a frame is
+    // exactly what we're trying to avoid.
+    if (config.lowBandwidthMode) return;
 
     let cancelled = false;
 
@@ -135,7 +147,7 @@ export function useVideoThumbnail(src: string, poster: string | undefined): stri
     // Regular video file
     const cleanupDirect = grabFrameFromUrl(src);
     return () => { cancelled = true; cleanupDirect(); };
-  }, [src, poster]);
+  }, [src, poster, config.lowBandwidthMode]);
 
   return thumbnail;
 }

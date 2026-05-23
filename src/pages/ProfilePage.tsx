@@ -19,6 +19,7 @@ import { ZapDialog } from '@/components/ZapDialog';
 import { ExternalFavicon } from '@/components/ExternalFavicon';
 import { VerifiedNip05Text } from '@/components/Nip05Badge';
 import { useAppContext } from '@/hooks/useAppContext';
+import { useImageProxy } from '@/hooks/useImageProxy';
 import { useAuthor } from '@/hooks/useAuthor';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useToast } from '@/hooks/useToast';
@@ -758,11 +759,14 @@ function ProfileBannerImage({ src, onClick }: { src: string; onClick: () => void
   const [useBlobFallback, setUseBlobFallback] = useState(false);
   const [blobUrl, setBlobUrl] = useState<string>();
   const [failed, setFailed] = useState(false);
+  const [proxyFailed, setProxyFailed] = useState(false);
+  const proxy = useImageProxy();
 
   useEffect(() => {
     setUseBlobFallback(false);
     setBlobUrl(undefined);
     setFailed(false);
+    setProxyFailed(false);
   }, [src]);
 
   useEffect(() => {
@@ -791,7 +795,15 @@ function ProfileBannerImage({ src, onClick }: { src: string; onClick: () => void
     return () => controller.abort();
   }, [src, useBlobFallback]);
 
-  const imageSrc = blobUrl ?? (useBlobFallback ? undefined : src);
+  // Route the displayed src through the image proxy at banner width. The
+  // proxy serves permissive CORS so the CORP/blob fallback usually isn't
+  // needed when the proxy is on. If the proxy itself errors, swap to the
+  // original src (which may then trigger the blob fallback).
+  const proxied = proxy(src, 1200);
+  const usingProxy = proxied !== src;
+  const displaySrc = proxyFailed || !usingProxy ? src : proxied;
+
+  const imageSrc = blobUrl ?? (useBlobFallback ? undefined : displaySrc);
 
   if (failed) {
     return <div className="absolute inset-0 bg-gradient-to-br from-accent/10 via-transparent to-primary/5" />;
@@ -811,6 +823,11 @@ function ProfileBannerImage({ src, onClick }: { src: string; onClick: () => void
           decoding="async"
           onClick={onClick}
           onError={() => {
+            // First failure with the proxy → drop back to the original URL.
+            if (usingProxy && !proxyFailed && !blobUrl && !useBlobFallback) {
+              setProxyFailed(true);
+              return;
+            }
             if (blobUrl) {
               setFailed(true);
             } else {

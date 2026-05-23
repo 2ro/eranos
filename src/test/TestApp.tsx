@@ -113,6 +113,8 @@ export function TestApp({ children }: TestAppProps) {
     savedFeeds: [],
     autoplayVideos: false,
     imageQuality: 'compressed',
+    imageProxy: '',
+    lowBandwidthMode: false,
     esploraApis: ['https://mempool.space/api'],
     blockbookBaseUrl: 'https://btc.trezor.io',
     bip352IndexerUrl: '',

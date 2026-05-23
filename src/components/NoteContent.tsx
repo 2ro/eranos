@@ -10,6 +10,7 @@ import { LinkEmbed } from '@/components/LinkEmbed';
 import { EmbeddedNote } from '@/components/EmbeddedNote';
 import { EmbeddedNaddr } from '@/components/EmbeddedNaddr';
 import { LightningInvoiceCard } from '@/components/LightningInvoiceCard';
+import { ProxiedImage } from '@/components/ProxiedImage';
 import { VideoPlayer } from '@/components/VideoPlayer';
 import { AudioVisualizer } from '@/components/AudioVisualizer';
 import { Lightbox, ImageGallery } from '@/components/ImageGallery';
@@ -846,13 +847,15 @@ function InlineImage({ url, onClick }: { url: string; onClick: (e: React.MouseEv
       onClick={onClick}
     >
       <div className={cn('relative w-full rounded-lg overflow-hidden', !loaded && 'bg-muted')} style={!loaded ? { minHeight: 200 } : undefined}>
-        <img
+        <ProxiedImage
           src={src}
+          width={600}
+          gated
           alt=""
           className="block w-full h-auto rounded-lg hover:opacity-90 transition-opacity"
           loading="lazy"
           onLoad={() => setLoaded(true)}
-          onError={() => { setLoaded(true); onError(); }}
+          onLoadError={() => { setLoaded(true); onError(); }}
         />
       </div>
     </button>

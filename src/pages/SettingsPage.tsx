@@ -36,7 +36,7 @@ const settingsSections: SettingsSection[] = [
   {
     id: 'network',
     label: 'Network',
-    description: 'Relays and file upload servers.',
+    description: 'Data usage, relays, and file upload servers.',
     path: '/settings/network',
     requiresAuth: true,
   },
