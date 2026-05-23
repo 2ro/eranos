@@ -524,8 +524,8 @@ const AuthDialog: React.FC<AuthDialogProps> = ({ isOpen, onClose }) => {
                 </Button>
               </div>
 
-              <div className="p-3 rounded-lg bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-800">
-                <p className="text-xs text-amber-900 dark:text-amber-300">
+              <div className="p-3 rounded-lg bg-primary/10 border border-primary/25">
+                <p className="text-xs text-foreground">
                   This key is your only way to access your account. If you lose it, you lose the account.
                 </p>
               </div>
