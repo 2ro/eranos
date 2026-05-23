@@ -34,6 +34,7 @@ const HashtagPage = lazy(() => import("./pages/HashtagPage").then(m => ({ defaul
 const AboutPage = lazy(() => import("./pages/AboutPage").then(m => ({ default: m.AboutPage })));
 const DonorGuidePage = lazy(() => import("./pages/DonorGuidePage").then(m => ({ default: m.DonorGuidePage })));
 const ActivistGuidePage = lazy(() => import("./pages/ActivistGuidePage").then(m => ({ default: m.ActivistGuidePage })));
+const LanguageSettingsPage = lazy(() => import("./pages/LanguageSettingsPage").then(m => ({ default: m.LanguageSettingsPage })));
 const NetworkSettingsPage = lazy(() => import("./pages/NetworkSettingsPage").then(m => ({ default: m.NetworkSettingsPage })));
 const NIP19Page = lazy(() => import("./pages/NIP19Page").then(m => ({ default: m.NIP19Page })));
 const NotificationSettings = lazy(() => import("./pages/NotificationSettings").then(m => ({ default: m.NotificationSettings })));
@@ -125,6 +126,7 @@ export function AppRouter() {
           <Route path="/g/:geohash" element={<GeotagPage />} />
           <Route path="/settings" element={<SettingsPage />} />
           <Route path="/settings/appearance" element={<AppearanceSettingsPage />} />
+          <Route path="/settings/language" element={<LanguageSettingsPage />} />
           <Route path="/settings/profile" element={<ProfileSettings />} />
           <Route path="/settings/wallet" element={<WalletSettingsPage />} />
           <Route path="/settings/notifications" element={<NotificationSettings />} />

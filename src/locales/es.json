@@ -1,0 +1,73 @@
+{
+  "common": {
+    "loading": "Cargando…",
+    "error": "Error",
+    "success": "Éxito",
+    "cancel": "Cancelar",
+    "save": "Guardar",
+    "delete": "Eliminar",
+    "edit": "Editar",
+    "close": "Cerrar",
+    "back": "Atrás",
+    "next": "Siguiente",
+    "refresh": "Actualizar",
+    "search": "Buscar",
+    "filter": "Filtrar",
+    "clear": "Borrar",
+    "submit": "Enviar",
+    "confirm": "Confirmar",
+    "copied": "Copiado",
+    "goBack": "Volver",
+    "tryAgain": "Por favor, inténtalo de nuevo."
+  },
+  "settings": {
+    "title": "Ajustes",
+    "description": "Administra tus ajustes de {{appName}}",
+    "deleteAccount": "Eliminar cuenta",
+    "sections": {
+      "profile": "Perfil",
+      "profileDesc": "Nombre, biografía, avatar y verificación.",
+      "appearance": "Apariencia",
+      "appearanceDesc": "Modo sistema, claro u oscuro.",
+      "language": "Idioma",
+      "languageDesc": "Elige el idioma usado en toda la aplicación.",
+      "network": "Red",
+      "networkDesc": "Relés y servidores de subida de archivos.",
+      "notifications": "Notificaciones",
+      "notificationsDesc": "Preferencias de notificaciones push.",
+      "advanced": "Avanzado",
+      "advancedDesc": "Cartera, sistema y opciones para usuarios avanzados.",
+      "organizers": "Organizadores",
+      "organizersDesc": "Designa organizadores nacionales que pueden fijar publicaciones."
+    },
+    "organizers": "Organizadores",
+    "signInToManage": "Inicia sesión para administrar",
+    "loginRequired": "Necesitas iniciar sesión para administrar organizadores."
+  },
+  "language": {
+    "title": "Idioma",
+    "subtitle": "Elige el idioma usado en toda la aplicación.",
+    "intro": "Selecciona tu idioma preferido. La aplicación cambiará al instante y recordará tu elección en este dispositivo.",
+    "translationNote": "Las traducciones están en curso. El texto sin traducir aparecerá en inglés."
+  },
+  "organizers": {
+    "appoint": "Designar Organizador",
+    "appointDesc": "Otorga a un usuario permiso para fijar publicaciones en una sección de país específica.",
+    "appointing": "Designando…",
+    "appointed": "Organizador designado",
+    "appointedSuccess": "Organizador designado para {{country}}",
+    "userNpub": "npub del usuario",
+    "country": "País",
+    "selectCountry": "Selecciona un país",
+    "invalidNpub": "Formato de npub no válido",
+    "alreadyOrganizer": "Este usuario ya es organizador de ese país",
+    "current": "Organizadores actuales",
+    "noOrganizers": "Aún no hay organizadores designados.",
+    "removed": "Organizador eliminado",
+    "removedSuccess": "Se eliminó a {{name}} de {{country}}",
+    "refreshed": "Actualizado",
+    "refreshedDesc": "Lista de organizadores actualizada desde los relés.",
+    "adminRequired": "Se requiere acceso de administrador",
+    "adminRequiredDesc": "Solo los administradores de la plataforma pueden designar o eliminar organizadores."
+  }
+}

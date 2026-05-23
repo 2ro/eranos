@@ -2,6 +2,7 @@ import { useSeoMeta } from '@unhead/react';
 import { lazy, Suspense, useState } from 'react';
 import { ChevronRight, Settings } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { PageHeader } from '@/components/PageHeader';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useAppContext } from '@/hooks/useAppContext';
@@ -11,8 +12,10 @@ const RequestToVanishDialog = lazy(() => import('@/components/RequestToVanishDia
 
 interface SettingsSection {
   id: string;
-  label: string;
-  description: string;
+  /** i18n key under `settings.sections.*` for the row label. */
+  labelKey: string;
+  /** i18n key under `settings.sections.*` for the row description. */
+  descriptionKey: string;
   path: string;
   requiresAuth?: boolean;
   /** When true, only shown to platform admins (see `isAdmin` in `@/lib/admins`). */
@@ -22,41 +25,47 @@ interface SettingsSection {
 const settingsSections: SettingsSection[] = [
   {
     id: 'profile',
-    label: 'Profile',
-    description: 'Display name, bio, avatar, and verification.',
+    labelKey: 'settings.sections.profile',
+    descriptionKey: 'settings.sections.profileDesc',
     path: '/settings/profile',
     requiresAuth: true,
   },
   {
     id: 'appearance',
-    label: 'Appearance',
-    description: 'System, light, or dark mode.',
+    labelKey: 'settings.sections.appearance',
+    descriptionKey: 'settings.sections.appearanceDesc',
     path: '/settings/appearance',
   },
   {
+    id: 'language',
+    labelKey: 'settings.sections.language',
+    descriptionKey: 'settings.sections.languageDesc',
+    path: '/settings/language',
+  },
+  {
     id: 'network',
-    label: 'Network',
-    description: 'Relays and file upload servers.',
+    labelKey: 'settings.sections.network',
+    descriptionKey: 'settings.sections.networkDesc',
     path: '/settings/network',
     requiresAuth: true,
   },
   {
     id: 'notifications',
-    label: 'Notifications',
-    description: 'Push notification preferences.',
+    labelKey: 'settings.sections.notifications',
+    descriptionKey: 'settings.sections.notificationsDesc',
     path: '/settings/notifications',
     requiresAuth: true,
   },
   {
     id: 'advanced',
-    label: 'Advanced',
-    description: 'Wallet, system, and power-user options.',
+    labelKey: 'settings.sections.advanced',
+    descriptionKey: 'settings.sections.advancedDesc',
     path: '/settings/advanced',
   },
   {
     id: 'organizers',
-    label: 'Organizers',
-    description: 'Appoint country organizers who can pin posts to country feeds.',
+    labelKey: 'settings.sections.organizers',
+    descriptionKey: 'settings.sections.organizersDesc',
     path: '/organizers',
     requiresAuth: true,
     requiresAdmin: true,
@@ -64,6 +73,7 @@ const settingsSections: SettingsSection[] = [
 ];
 
 export function SettingsPage() {
+  const { t } = useTranslation();
   const { user } = useCurrentUser();
   const { config } = useAppContext();
   const navigate = useNavigate();
@@ -71,8 +81,8 @@ export function SettingsPage() {
 
 
   useSeoMeta({
-    title: `Settings | ${config.appName}`,
-    description: `Manage your ${config.appName} settings`,
+    title: `${t('settings.title')} | ${config.appName}`,
+    description: t('settings.description', { appName: config.appName }),
   });
 
   const visibleSections = settingsSections.filter((section) => {
@@ -83,10 +93,10 @@ export function SettingsPage() {
 
   return (
     <main className="min-h-screen pb-16 sidebar:pb-0">
-      <PageHeader title="Settings" icon={<Settings className="size-5" />} backTo="/" />
+      <PageHeader title={t('settings.title')} icon={<Settings className="size-5" />} backTo="/" />
 
       {/* Settings list */}
-      <nav aria-label="Settings" className="px-4 sm:px-6 pt-2">
+      <nav aria-label={t('settings.title')} className="px-4 sm:px-6 pt-2">
         <ul className="divide-y divide-border">
           {visibleSections.map((section) => (
             <li key={section.id}>
@@ -96,12 +106,12 @@ export function SettingsPage() {
                 className="flex w-full items-center gap-4 px-2 py-4 text-left transition-colors hover:bg-muted/40 focus-visible:bg-muted/40 focus-visible:outline-none"
               >
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-semibold">{section.label}</p>
+                  <p className="text-sm font-semibold">{t(section.labelKey)}</p>
                   <p className="text-xs text-muted-foreground mt-0.5">
-                    {section.description}
+                    {t(section.descriptionKey)}
                   </p>
                 </div>
-                <ChevronRight className="size-4 text-muted-foreground shrink-0" aria-hidden="true" />
+                <ChevronRight className="size-4 text-muted-foreground shrink-0 rtl:rotate-180" aria-hidden="true" />
               </button>
             </li>
           ))}
@@ -116,7 +126,7 @@ export function SettingsPage() {
             onClick={() => setDeleteAccountOpen(true)}
             className="text-xs font-medium text-destructive hover:underline focus-visible:underline focus-visible:outline-none"
           >
-            Delete account
+            {t('settings.deleteAccount')}
           </button>
         </div>
       )}

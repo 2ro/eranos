@@ -1,0 +1,73 @@
+{
+  "common": {
+    "loading": "Inotakura…",
+    "error": "Kukanganisa",
+    "success": "Zvabudirira",
+    "cancel": "Kanzura",
+    "save": "Chengeta",
+    "delete": "Bvisa",
+    "edit": "Gadzirisa",
+    "close": "Vhara",
+    "back": "Dzokera",
+    "next": "Inotevera",
+    "refresh": "Vandudza",
+    "search": "Tsvaga",
+    "filter": "Sefa",
+    "clear": "Bvisa",
+    "submit": "Tumira",
+    "confirm": "Simbisa",
+    "copied": "Zvakopwa",
+    "goBack": "Dzokera",
+    "tryAgain": "Ndapota edza zvakare."
+  },
+  "settings": {
+    "title": "Marongero",
+    "description": "Tarisira marongero ako e{{appName}}",
+    "deleteAccount": "Bvisa akaunti",
+    "sections": {
+      "profile": "Profile",
+      "profileDesc": "Zita rinoratidzwa, nhoroondo, mufananidzo, nokutsigirwa.",
+      "appearance": "Maonero",
+      "appearanceDesc": "System, chiedza, kana rima.",
+      "language": "Mutauro",
+      "languageDesc": "Sarudza mutauro unoshandiswa muapp yose.",
+      "network": "Network",
+      "networkDesc": "Marelays nemaserver ekuisa mafaira.",
+      "notifications": "Zviziviso",
+      "notificationsDesc": "Zvinodiwa zveziviso dze push.",
+      "advanced": "Zvepamusoro",
+      "advancedDesc": "Chikwama, system, nesarudzo dzevanyanzvi.",
+      "organizers": "Vagadziri",
+      "organizersDesc": "Sarudza vagadziri venyika vanogona kuomesa zvitumbi pamufuto wenyika."
+    },
+    "organizers": "Vagadziri",
+    "signInToManage": "Pinda kuti utarise",
+    "loginRequired": "Unofanira kupinda kuti utarise vagadziri."
+  },
+  "language": {
+    "title": "Mutauro",
+    "subtitle": "Sarudza mutauro unoshandiswa muapp yose.",
+    "intro": "Sarudza mutauro waunoda. App ichachinja ipapo ipapo uye icharangarira sarudzo yako pamudziyo uyu.",
+    "translationNote": "Shanduro dzichiri kuitwa. Mavara asina kushandurwa anozoonekwa muChirungu."
+  },
+  "organizers": {
+    "appoint": "Sarudza Mugadziri",
+    "appointDesc": "Ipa muridzi mvumo yekuomesa zvitumbi pamufuto wenyika yakatarwa.",
+    "appointing": "Kusarudza…",
+    "appointed": "Mugadziri asarudzwa",
+    "appointedSuccess": "Mugadziri asarudzirwa {{country}}",
+    "userNpub": "npub yemushandisi",
+    "country": "Nyika",
+    "selectCountry": "Sarudza nyika",
+    "invalidNpub": "Maitiro e npub haashande",
+    "alreadyOrganizer": "Muridzi uyu atova mugadziri wenyika iyoyo",
+    "current": "Vagadziri Vazvino",
+    "noOrganizers": "Hapana vagadziri vakasarudzwa parizvino.",
+    "removed": "Mugadziri abviswa",
+    "removedSuccess": "{{name}} abviswa kubva ku{{country}}",
+    "refreshed": "Zvavandudzwa",
+    "refreshedDesc": "Rondedzero yevagadziri yavandudzwa kubva kumarelays.",
+    "adminRequired": "Mvumo yeadmin inodikanwa",
+    "adminRequiredDesc": "Vatariri vechikuva chete ndivo vanogona kusarudza kana kubvisa vagadziri."
+  }
+}
