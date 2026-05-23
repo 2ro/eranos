@@ -43,17 +43,23 @@ export function useProfileCampaignStats(pubkey: string | undefined): ProfileCamp
   const campaigns = pubkey ? (campaignsQuery.data ?? []) : [];
 
   // Fan out: one balance lookup per on-chain campaign address.
-  const onchainCampaigns = campaigns.filter((c) => c.wallet?.mode === 'onchain');
+  // Campaigns may carry both an on-chain and a silent-payment endpoint;
+  // we only meter the on-chain one (silent-payment donations are
+  // unlinkable by design).
+  const onchainCampaigns = campaigns.flatMap((c) => {
+    const address = c.wallets?.onchain?.value;
+    return address ? [{ campaign: c, address }] : [];
+  });
   const balanceQueries = useQueries({
-    queries: onchainCampaigns.map((campaign) => ({
+    queries: onchainCampaigns.map(({ address }) => ({
       // Share the cache key with useCampaignDonations so both surfaces
       // refresh together when useDonateCampaign invalidates
       // ['bitcoin-balance'].
-      queryKey: ['bitcoin-balance', 'campaign', esploraApis, campaign.wallet?.value ?? ''],
+      queryKey: ['bitcoin-balance', 'campaign', esploraApis, address],
       queryFn: ({ signal }: { signal: AbortSignal }) =>
-        fetchAddressData(campaign.wallet!.value, esploraApis, signal),
+        fetchAddressData(address, esploraApis, signal),
       staleTime: 30_000,
-      enabled: !!campaign.wallet?.value,
+      enabled: !!address,
     })),
   });
 

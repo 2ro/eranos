@@ -3,8 +3,8 @@ import { Link, NavLink, useNavigate } from 'react-router-dom';
 import {
   Activity,
   Bell,
-  CircleHelp,
   HandHeart,
+  Info,
   LayoutDashboard,
   Megaphone,
   Menu,
@@ -36,7 +36,7 @@ interface NavItem {
 const NAV_ITEMS: NavItem[] = [
   { label: 'Activity', to: '/feed', icon: Activity },
   { label: 'Campaigns', to: '/campaigns/all', icon: HandHeart },
-  { label: 'Groups', to: '/communities', icon: Users },
+  { label: 'Groups', to: '/groups', icon: Users },
   { label: 'Pledge', to: '/pledges', icon: Megaphone },
 ];
 
@@ -210,7 +210,7 @@ function getProfileMenuItems({
     { label: 'Profile', to: `/${nip19.npubEncode(userPubkey)}`, icon: User },
     { label: 'Search', to: '/search', icon: Search },
     { label: 'Settings', to: '/settings', icon: Settings },
-    { label: 'Help', to: '/help', icon: CircleHelp },
+    { label: 'About', to: '/about', icon: Info },
   ];
 }
 

@@ -21,6 +21,7 @@ import { useAuthor } from '@/hooks/useAuthor';
 import { useCountryFollows } from '@/hooks/useCountryFollows';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useProfileUrl } from '@/hooks/useProfileUrl';
+import { useShareOrigin } from '@/hooks/useShareOrigin';
 import { useToast } from '@/hooks/useToast';
 import { genUserName } from '@/lib/genUserName';
 import { getCountryInfo, getWikipediaTitle } from '@/lib/countries';
@@ -83,6 +84,7 @@ function BlueskyPostHeader({ author, rkey, url }: { author: string; rkey: string
   const { toast } = useToast();
 
   const profileUrl = `/i/${encodeURIComponent(`https://bsky.app/profile/${post?.handle ?? author}`)}`;
+  const shareOrigin = useShareOrigin();
   const externalContent = useMemo(() => parseExternalUri(url), [url]);
 
   const [shareOpen, setShareOpen] = useState(false);
@@ -100,12 +102,12 @@ function BlueskyPostHeader({ author, rkey, url }: { author: string; rkey: string
 
   const handleShare = useCallback(async (e: React.MouseEvent) => {
     e.stopPropagation();
-    const fullUrl = `${window.location.origin}/i/${encodeURIComponent(url)}`;
+    const fullUrl = `${shareOrigin}/i/${encodeURIComponent(url)}`;
     const result = await shareOrCopy(fullUrl);
     if (result === 'copied') {
       toast({ title: 'Link copied' });
     }
-  }, [url, toast]);
+  }, [shareOrigin, url, toast]);
 
   if (isLoading) {
     return (
@@ -1275,7 +1277,7 @@ export function CommunityPreview({ addr }: { addr: { kind: number; pubkey: strin
 
   const communityName = event?.tags.find(([n]) => n === 'name')?.[1]
     || event?.tags.find(([n]) => n === 'd')?.[1]
-    || 'Organization';
+    || 'Group';
   const communityImage = event?.tags.find(([n]) => n === 'image')?.[1];
   const communityDescription = event?.tags.find(([n]) => n === 'description')?.[1];
   const moderatorCount = event?.tags.filter(([n, , , role]) => n === 'p' && role === 'moderator').length ?? 0;
@@ -1319,7 +1321,7 @@ export function CommunityPreview({ addr }: { addr: { kind: number; pubkey: strin
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
           <Users className="size-3 shrink-0" />
-          <span>Organization</span>
+          <span>Group</span>
           {moderatorCount > 0 && (
             <span className="text-muted-foreground/60">&middot; {moderatorCount} mod{moderatorCount !== 1 ? 's' : ''}</span>
           )}

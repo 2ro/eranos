@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { Activity, Radio, Settings } from 'lucide-react';
-import { useLayoutOptions } from '@/contexts/LayoutContext';
 import { PageHeader } from '@/components/PageHeader';
 import { Card, CardContent } from '@/components/ui/card';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -26,7 +25,6 @@ export function EventDashboardPage() {
   const [configOpen, setConfigOpen] = useState(false);
 
   // Use wider layout — removes 600px cap but keeps sidebar shell
-  useLayoutOptions({ noMaxWidth: true, rightSidebar: null });
 
   const {
     kpis, timeSeries, leaderboard, distribution, participants, activity,

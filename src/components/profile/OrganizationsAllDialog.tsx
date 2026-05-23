@@ -40,7 +40,7 @@ export function OrganizationsAllDialog({ orgs, children }: OrganizationsAllDialo
         <DialogHeader className="px-6 pt-6">
           <DialogTitle className="flex items-center gap-2">
             <Users className="size-5 text-primary" />
-            All organizations
+            All groups
             <span className="text-sm font-normal text-muted-foreground">({orgs.length})</span>
           </DialogTitle>
         </DialogHeader>

@@ -527,7 +527,7 @@ function ConfirmView({
         <Row
           label="To wallet"
           value={
-            <span className="font-mono text-xs break-all">{campaign.wallet.value}</span>
+            <span className="font-mono text-xs break-all">{campaign.wallets.onchain?.value ?? ''}</span>
           }
         />
         <Row
@@ -718,7 +718,7 @@ function SignerUnsupportedView({
         </DialogDescription>
       </DialogHeader>
 
-      <CampaignWalletDonatePanel wallet={campaign.wallet} />
+      <CampaignWalletDonatePanel wallets={campaign.wallets} />
 
       <Button variant="outline" size="lg" className="w-full" onClick={onClose}>
         Close

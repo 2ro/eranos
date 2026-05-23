@@ -214,13 +214,15 @@ export function useOnchainZaps(target: NostrEvent | undefined) {
     : '';
   const aCoord = isAddressable && target ? `${target.kind}:${target.pubkey}:${dTag}` : '';
 
-  // If the target is a campaign, parse its `w` wallet for campaign-wallet
-  // mode verification. Silent-payment campaigns short-circuit to "no
-  // verifiable donations" — we don't issue any verifier queries.
-  const campaignWallet = target && target.kind === CAMPAIGN_KIND
-    ? parseCampaign(target)?.wallet
+  // If the target is a campaign, parse its on-chain `w` endpoint for
+  // campaign-wallet mode verification. A campaign without an on-chain
+  // endpoint (silent-payment-only) short-circuits to "no verifiable
+  // donations" — we don't issue any verifier queries.
+  const campaignOnchain = target && target.kind === CAMPAIGN_KIND
+    ? parseCampaign(target)?.wallets.onchain
     : undefined;
-  const isSilentPayment = campaignWallet?.mode === 'sp';
+  const isCampaign = target?.kind === CAMPAIGN_KIND;
+  const skipCampaignVerification = isCampaign && !campaignOnchain;
 
   // Step 1: fetch the raw kind 8333 events for this target
   const eventsQuery = useQuery({
@@ -256,13 +258,13 @@ export function useOnchainZaps(target: NostrEvent | undefined) {
 
       return Array.from(byTxid.values());
     },
-    enabled: !!target && !isSilentPayment,
+    enabled: !!target && !skipCampaignVerification,
     staleTime: 30_000,
   });
 
   // Step 2: verify each event on-chain (parallel, cached per event)
   const events = eventsQuery.data ?? [];
-  const walletValue = campaignWallet?.value;
+  const walletValue = campaignOnchain?.value;
   const verifications = useQueries({
     queries: events.map((event) => ({
       queryKey: ['onchain-zaps', 'verify', esploraApis, event.id, walletValue ?? ''],
@@ -280,7 +282,7 @@ export function useOnchainZaps(target: NostrEvent | undefined) {
   verified.sort((a, b) => b.amountSats - a.amountSats);
 
   const totalSats = verified.reduce((s, v) => s + v.amountSats, 0);
-  const isLoading = !isSilentPayment && (eventsQuery.isLoading || verifications.some((v) => v.isLoading));
+  const isLoading = !skipCampaignVerification && (eventsQuery.isLoading || verifications.some((v) => v.isLoading));
 
   return {
     zaps: verified,

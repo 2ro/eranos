@@ -19,7 +19,6 @@ import { CommunityMiniCard, CommunityMiniCardSkeleton } from '@/components/disco
 import { SectionHeader } from '@/components/discovery/SectionHeader';
 import { COOL_PALETTE } from '@/lib/hopePalette';
 import { cn } from '@/lib/utils';
-import { useLayoutOptions } from '@/contexts/LayoutContext';
 import { useAppContext } from '@/hooks/useAppContext';
 import { useCampaignModerators } from '@/hooks/useCampaignModerators';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
@@ -54,26 +53,20 @@ export function CommunitiesPage() {
   const { data: moderators } = useCampaignModerators();
   const isMod = !!user && !!moderators && moderators.includes(user.pubkey);
 
-  useLayoutOptions({
-    noMaxWidth: true,
-    rightSidebar: null,
-    showFAB: false,
-  });
-
   useSeoMeta({
-    title: `Organizations | ${config.appName}`,
-    description: 'Discover and join organizations on Nostr',
+    title: `Groups | ${config.appName}`,
+    description: 'Discover and join groups on Nostr',
   });
 
   const handleCreateCommunity = () => {
     if (!user) {
       toast({
-        title: 'Log in to create an organization',
-        description: 'Creating an organization publishes a Nostr event from your account.',
+        title: 'Log in to create a group',
+        description: 'Creating a group publishes a Nostr event from your account.',
       });
       return;
     }
-    navigate('/communities/new');
+    navigate('/groups/new');
   };
 
   return (
@@ -82,7 +75,7 @@ export function CommunitiesPage() {
 
       <div className="max-w-5xl mx-auto space-y-2 sm:space-y-4 pb-8">
         <section className="pt-6">
-          <SectionHeader title="My organizations" className="pb-3 sm:px-6" />
+          <SectionHeader title="My groups" className="pb-3 sm:px-6" />
           <MyCommunitiesShelf
             userOrganizations={userOrganizations}
             onCreateCommunity={handleCreateCommunity}
@@ -91,7 +84,7 @@ export function CommunitiesPage() {
 
         <section className="pt-4 pb-8">
           <SectionHeader
-            title="Featured organizations"
+            title="Featured groups"
             className="pb-3 sm:px-6"
           />
           <FeaturedOrganizationsShelf />
@@ -164,7 +157,7 @@ function ModeratorReviewSections() {
       <ModeratorOrgSection
         icon={<Hourglass className="size-4" />}
         title="Needs review"
-        description="Agora organizations that haven't been featured or hidden yet. Lift one into the Featured shelf or suppress it with Hide."
+        description="Agora groups that haven't been featured or hidden yet. Lift one into the Featured shelf or suppress it with Hide."
         count={needsReviewOrgs.length}
         orgs={needsReviewOrgs}
         isLoading={sectionsLoading}
@@ -173,11 +166,11 @@ function ModeratorReviewSections() {
       <ModeratorOrgSection
         icon={<EyeOff className="size-4" />}
         title="Hidden"
-        description="Organizations suppressed from public discovery. Use the kebab menu on a card to unhide."
+        description="Groups suppressed from public discovery. Use the kebab menu on a card to unhide."
         count={hiddenOrgs.length}
         orgs={hiddenOrgs}
         isLoading={sectionsLoading}
-        emptyText="No organizations are currently hidden."
+        emptyText="No groups are currently hidden."
       />
     </>
   );
@@ -306,9 +299,9 @@ function CommunitiesHero({ onCreateCommunity }: CommunitiesHeroProps) {
     }
     if (featured && featured.length > 0) {
       items.push({
-        id: 'organizations',
+        id: 'groups',
         value: featured.length.toLocaleString(),
-        label: `featured ${featured.length === 1 ? 'organization' : 'organizations'} on Nostr`,
+        label: `featured ${featured.length === 1 ? 'group' : 'groups'} on Nostr`,
         icon: <Users className="size-5" aria-hidden />,
       });
     }
@@ -370,7 +363,7 @@ function CommunitiesHero({ onCreateCommunity }: CommunitiesHeroProps) {
             <br className="sm:hidden" /> in numbers.
           </h1>
           <p className="text-base sm:text-lg text-white/85 max-w-2xl mx-auto drop-shadow-[0_1px_6px_rgb(0_0_0/0.5)]">
-            Create organizations, gather members, and keep up with what your spaces are doing.
+            Create groups, gather members, and keep up with what your spaces are doing.
           </p>
         </div>
 
@@ -426,7 +419,7 @@ function CommunitiesHero({ onCreateCommunity }: CommunitiesHeroProps) {
             )}
           >
             <PlusCircle className="mr-2" />
-            Create an organization
+            Create a group
           </Button>
         </div>
       </div>
@@ -453,8 +446,8 @@ function MyCommunitiesShelf({
     return (
       <EmptyShelf
         icon={<Users className="size-7 text-primary/70" />}
-        title="Log in to see your organizations"
-        body="Organizations you've founded or moderate will appear here."
+        title="Log in to see your groups"
+        body="Groups you've founded or moderate will appear here."
         action={<LoginArea className="max-w-60" />}
       />
     );
@@ -495,12 +488,12 @@ function MyCommunitiesShelfContent({
     return (
       <EmptyShelf
         icon={<Users className="size-7 text-primary/70" />}
-        title="No organizations yet"
-        body="Create your own organization to start coordinating campaigns, pledges, and events with your people."
+        title="No groups yet"
+        body="Create your own group to start coordinating campaigns, pledges, and events with your people."
         action={(
           <Button type="button" onClick={onCreateCommunity} className="rounded-full">
             <PlusCircle className="size-4 mr-2" />
-            Create an organization
+            Create a group
           </Button>
         )}
       />
@@ -567,8 +560,8 @@ function FeaturedOrganizationsShelf() {
     return (
       <EmptyShelf
         icon={<Users className="size-7 text-primary/70" />}
-        title="No featured organizations yet"
-        body="Agora moderators feature standout organizations here. Check back soon."
+        title="No featured groups yet"
+        body="Agora moderators feature standout groups here. Check back soon."
         action={null}
       />
     );

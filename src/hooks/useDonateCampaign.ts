@@ -102,11 +102,12 @@ export function useDonateCampaign() {
       throw new Error('Enter a valid donation amount in satoshis.');
     }
 
-    if (campaign.wallet.mode === 'sp') {
+    if (!campaign.wallets.onchain) {
       throw new Error(
-        'This campaign uses silent payments. Donate from an external BIP-352-capable wallet using the QR code.',
+        'This campaign uses silent payments only. Donate from an external BIP-352-capable wallet using the QR code.',
       );
     }
+    const onchainAddress = campaign.wallets.onchain.value;
 
     // Donor cannot donate to their own campaign (the tx output would just
     // pay the donor's own wallet — an obvious foot-gun).
@@ -127,7 +128,7 @@ export function useDonateCampaign() {
     try {
       const unsigned = buildUnsignedPsbt(
         user.pubkey,
-        campaign.wallet.value,
+        onchainAddress,
         amountSats,
         utxos,
         feeRateForSpeed(rates, feeSpeed),

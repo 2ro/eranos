@@ -7,18 +7,12 @@ import { BlueskyEmbed } from '@/components/BlueskyEmbed';
 import { ExternalFavicon } from '@/components/ExternalFavicon';
 import { LinkPreview } from '@/components/LinkPreview';
 import { MastodonEmbed } from '@/components/MastodonEmbed';
-import { RedditEmbed } from '@/components/RedditEmbed';
-import { SpotifyEmbed } from '@/components/SpotifyEmbed';
-import { TweetEmbed } from '@/components/TweetEmbed';
 import { YouTubeEmbed } from '@/components/YouTubeEmbed';
 import { useLinkPreview } from '@/hooks/useLinkPreview';
 import {
   extractYouTubeId,
-  extractTweetId,
   extractBlueskyPost,
   extractMastodonPost,
-  extractSpotifyEmbed,
-  extractRedditPost,
   extractArchiveOrgId,
 } from '@/lib/linkEmbed';
 import { cn } from '@/lib/utils';
@@ -41,36 +35,27 @@ interface LinkEmbedProps {
 /**
  * Unified link embed component. Given a URL, renders the appropriate embed:
  * - YouTube URLs → `YouTubeEmbed` (click-to-play facade)
- * - Twitter/X tweet URLs → `TweetEmbed` (iframe embed)
  * - Bluesky post URLs → `BlueskyEmbed` (native card via Bluesky API)
  * - Mastodon post URLs → `MastodonEmbed` (native card via Mastodon API)
+ * - archive.org item URLs → `ArchiveOrgEmbed`
  * - Everything else → `LinkPreview` (OEmbed link preview card)
  */
 export function LinkEmbed({ url, className, navigateToComments, showActions = true, hideImage }: LinkEmbedProps) {
   const youtubeId = useMemo(() => extractYouTubeId(url), [url]);
-  const tweetId = useMemo(() => extractTweetId(url), [url]);
   const blueskyPost = useMemo(() => extractBlueskyPost(url), [url]);
   const mastodonUrl = useMemo(() => extractMastodonPost(url), [url]);
-  const spotifyEmbed = useMemo(() => extractSpotifyEmbed(url), [url]);
-  const redditUrl = useMemo(() => extractRedditPost(url), [url]);
   const archiveOrgId = useMemo(() => extractArchiveOrgId(url), [url]);
 
   let embed: React.ReactNode;
 
   if (youtubeId) {
     embed = <YouTubeEmbed videoId={youtubeId} />;
-  } else if (tweetId) {
-    embed = <TweetEmbed tweetId={tweetId} />;
   } else if (blueskyPost) {
     // BlueskyEmbed has built-in /i/ navigation, no DiscussBar needed
     return <BlueskyEmbed author={blueskyPost.author} rkey={blueskyPost.rkey} hideImage={hideImage} className={className} />;
   } else if (mastodonUrl) {
     // MastodonEmbed has built-in /i/ navigation, no DiscussBar needed
     return <MastodonEmbed url={mastodonUrl} className={className} />;
-  } else if (spotifyEmbed) {
-    embed = <SpotifyEmbed type={spotifyEmbed.type} id={spotifyEmbed.id} />;
-  } else if (redditUrl) {
-    embed = <RedditEmbed url={redditUrl} />;
   } else if (archiveOrgId) {
     embed = <ArchiveOrgEmbed identifier={archiveOrgId} />;
   } else {

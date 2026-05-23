@@ -128,7 +128,9 @@ export function CampaignCard({ campaign, variant = 'compact', className, footerB
   const deadline = campaign.deadline ? formatDeadline(campaign.deadline) : null;
   const raisedSats = stats?.totalSats ?? 0;
   const countryLabel = getCampaignCountryLabel(campaign);
-  const isSilentPayment = campaign.wallet.mode === 'sp';
+  // SP-only campaigns hide aggregate totals; dual-endpoint campaigns
+  // show on-chain aggregates per spec.
+  const isSilentPayment = !campaign.wallets.onchain;
 
   const isFeaturedVariant = variant === 'featured';
   const isApproved = moderation.approvedCoords.has(campaign.aTag);
@@ -167,15 +169,6 @@ export function CampaignCard({ campaign, variant = 'compact', className, footerB
             <div className="absolute inset-0 flex items-center justify-center">
               <HandHeart className="size-12 text-primary/40" />
             </div>
-          )}
-          {isSilentPayment && (
-            <Badge
-              variant="secondary"
-              className="absolute top-3 left-3 backdrop-blur bg-background/80 border-border/40"
-            >
-              <ShieldCheck className="size-3.5 mr-1" />
-              Private
-            </Badge>
           )}
           <div className="absolute top-3 right-3 flex items-center gap-2">
             {isHidden && (

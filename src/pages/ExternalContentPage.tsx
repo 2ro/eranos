@@ -41,7 +41,6 @@ import { useProfileUrl } from '@/hooks/useProfileUrl';
 import { useMuteList } from '@/hooks/useMuteList';
 import { isEventMuted } from '@/lib/muteHelpers';
 import { useLinkPreview } from '@/hooks/useLinkPreview';
-import { useLayoutOptions } from '@/contexts/LayoutContext';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useFeedSettings } from '@/hooks/useFeedSettings';
 import { useWikipediaSummary } from '@/hooks/useWikipediaSummary';
@@ -359,11 +358,6 @@ export function ExternalContentPage() {
   // FAB opens the comment compose dialog
   const [composeOpen, setComposeOpen] = useState(false);
   const openCompose = useCallback(() => setComposeOpen(true), []);
-
-  useLayoutOptions({
-    showFAB: true,
-    onFabClick: openCompose,
-  });
 
   if (!content || !uri) {
     return <NotFound />;

@@ -41,7 +41,6 @@ import { VerifiedNip05Text } from '@/components/Nip05Badge';
 import { SubHeaderBar } from '@/components/SubHeaderBar';
 import { TabButton } from '@/components/TabButton';
 import { cn, parseKindFilter } from '@/lib/utils';
-import { useLayoutOptions, useNavHidden } from '@/contexts/LayoutContext';
 import { PageHeader } from '@/components/PageHeader';
 import { isRepostKind, parseRepostContent } from '@/lib/feedUtils';
 import { nip19 } from 'nostr-tools';
@@ -88,8 +87,7 @@ export function SearchPage() {
     description: 'Search Nostr',
   });
 
-  useLayoutOptions({ hasSubHeader: true });
-  const navHidden = useNavHidden();
+
 
   const [searchParams, setSearchParams] = useSearchParams();
 
@@ -659,7 +657,6 @@ export function SearchPage() {
                 className={cn(
                   'sticky new-posts-pill z-10 flex justify-center pointer-events-none',
                   'max-sidebar:transition-opacity max-sidebar:duration-300 max-sidebar:ease-in-out',
-                  navHidden && 'max-sidebar:opacity-0 max-sidebar:pointer-events-none',
                 )}
                 style={{ marginBottom: '-3rem' }}
               >

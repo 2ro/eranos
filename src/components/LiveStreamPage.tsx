@@ -4,7 +4,6 @@ import { Users, Radio, Zap, Clock, ChevronDown, ChevronUp } from 'lucide-react';
 import type { NostrEvent } from '@nostrify/nostrify';
 import { useSeoMeta } from '@unhead/react';
 
-import { useLayoutOptions } from '@/contexts/LayoutContext';
 import { PageHeader } from '@/components/PageHeader';
 import { LiveStreamPlayer } from '@/components/LiveStreamPlayer';
 import { LiveStreamChat } from '@/components/LiveStreamChat';
@@ -119,16 +118,8 @@ export function LiveStreamPage({ event }: LiveStreamPageProps) {
     };
   }, []);
 
-  const chatSidebar = (
-    <aside className="hidden lg:flex lg:flex-col lg:w-[340px] lg:shrink-0 h-screen sticky top-0">
-      <LiveStreamChat aTag={aTag} className="h-full" />
-    </aside>
-  );
-
   const hasDetails = !!(summary || hashtags.length > 0 || participants.length > 0);
   const hasExpandable = hasDescription || hasDetails;
-
-  useLayoutOptions({ rightSidebar: chatSidebar, noOverscroll: true });
 
   /** Details block — always visible on desktop, expandable on mobile.
    *  On mobile this also includes the author row.

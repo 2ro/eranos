@@ -20,14 +20,13 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { DetailCommentComposer } from '@/components/DetailCommentComposer';
-import { NoteContent } from '@/components/NoteContent';
+import { DetailReplySkeleton, DetailStory } from '@/components/DetailStory';
 import { NoteMoreMenu } from '@/components/NoteMoreMenu';
 import { PostActionBar } from '@/components/PostActionBar';
 import { PinnedCommentHeader } from '@/components/PinnedCommentHeader';
 import { ReplyComposeModal } from '@/components/ReplyComposeModal';
 import { CreateCommunityEventDialog } from '@/components/CreateCommunityEventDialog';
 import { RSVPAvatars } from '@/components/RSVPAvatars';
-import { Skeleton } from '@/components/ui/skeleton';
 import { ThreadedReplyList, type ReplyNode } from '@/components/ThreadedReplyList';
 import { useComments } from '@/hooks/useComments';
 import { useAuthor } from '@/hooks/useAuthor';
@@ -164,13 +163,14 @@ function PersonRow({ pubkey, label, size = 'md' }: { pubkey: string; label?: str
   const metadata: NostrMetadata | undefined = data?.metadata;
   const name = metadata?.display_name || metadata?.name || genUserName(pubkey);
   const profileUrl = useProfileUrl(pubkey, metadata);
+  const avatarUrl = sanitizeUrl(metadata?.picture);
   const avatarCls = size === 'sm' ? 'size-8' : 'size-11';
   const fallbackCls = size === 'sm' ? 'text-xs' : '';
 
   return (
     <Link to={profileUrl} className="flex items-center gap-3 group">
       <Avatar className={cn(avatarCls, 'ring-2 ring-background')}>
-        <AvatarImage src={metadata?.picture} />
+        <AvatarImage src={avatarUrl} />
         <AvatarFallback className={cn('bg-muted text-muted-foreground', fallbackCls)}>
           {name.charAt(0).toUpperCase()}
         </AvatarFallback>
@@ -198,9 +198,11 @@ function EventDetailRow({ icon, children }: { icon: React.ReactNode; children: R
 // --- Main Component ---
 
 export function CalendarEventDetailPage({ event }: { event: NostrEvent }) {
+
   const navigate = useNavigate();
   const { user } = useCurrentUser();
   const { toast } = useToast();
+  const author = useAuthor(event.pubkey);
 
   const title = getTag(event.tags, 'title') ?? 'Untitled Event';
   const image = sanitizeUrl(getTag(event.tags, 'image'));
@@ -213,6 +215,11 @@ export function CalendarEventDetailPage({ event }: { event: NostrEvent }) {
   const eventCoord = useMemo(() => getEventCoord(event), [event]);
   const dateStr = useMemo(() => formatDetailDate(event), [event]);
   const heroDate = useMemo(() => formatCalendarHeroDate(event), [event]);
+  const organizerMetadata: NostrMetadata | undefined = author.data?.metadata;
+  const organizerName = organizerMetadata?.display_name || organizerMetadata?.name || genUserName(event.pubkey);
+  const organizerProfileUrl = useProfileUrl(event.pubkey, organizerMetadata);
+  const organizerPicture = sanitizeUrl(organizerMetadata?.picture);
+  const organizerInitials = organizerName.slice(0, 2).toUpperCase();
 
   // Participants grouped by role
   const participantsByRole = useMemo(() => {
@@ -270,6 +277,12 @@ export function CalendarEventDetailPage({ event }: { event: NostrEvent }) {
     [pinnedEvents],
   );
 
+  const storyEvent = useMemo<NostrEvent>(() => ({
+    ...event,
+    tags: event.tags.filter(([name]) => !['image', 'summary', 'title', 't'].includes(name)),
+    content: event.content || summary || '',
+  }), [event, summary]);
+
   const handleRSVP = useCallback(async (status: 'accepted' | 'declined' | 'tentative') => {
     if (status === myRsvp.status) return;
     try {
@@ -295,38 +308,11 @@ export function CalendarEventDetailPage({ event }: { event: NostrEvent }) {
         ? "You can't go"
         : 'Choose your RSVP';
 
-  const eventDetailsCard = (
-    <Card className="overflow-hidden">
-      <CardContent className="p-5 space-y-5">
-        <div className="space-y-3">
-          <div className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Hosted by</div>
-          <PersonRow pubkey={event.pubkey} size="sm" />
-        </div>
-
-        {(event.content || summary) && (
-          <div className="space-y-2 border-t border-border/60 pt-4">
-            <div className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Description</div>
-            {event.content ? (
-              <NoteContent event={event} className="text-sm leading-relaxed text-foreground" hideEmbedImages={!!image} disableEmbeds disableNoteEmbeds />
-            ) : (
-              <p className="text-sm leading-relaxed text-muted-foreground">{summary}</p>
-            )}
-          </div>
-        )}
-
-        <div className="space-y-3">
-          <EventDetailRow icon={<Clock className="size-5" />}>
-            {dateStr}
-          </EventDetailRow>
-          {location && (
-            <EventDetailRow icon={<MapPin className="size-5" />}>
-              {location}
-            </EventDetailRow>
-          )}
-        </div>
-
+  const eventDetailsCard = (showRSVP || rsvps.total > 0 || links.length > 0) ? (
+    <Card className="rounded-none border-0 bg-transparent shadow-none lg:rounded-xl lg:border lg:bg-card lg:shadow-sm">
+      <CardContent className="p-0 lg:p-5 space-y-5">
         {showRSVP && (
-          <div className="space-y-3 border-t border-border/60 pt-4">
+          <div className="space-y-3">
             <div className="flex items-center justify-between gap-3">
               <div className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">RSVP</div>
               <span className="text-xs font-medium text-muted-foreground">{rsvpStatusLabel}</span>
@@ -367,7 +353,7 @@ export function CalendarEventDetailPage({ event }: { event: NostrEvent }) {
         )}
 
         {rsvps.total > 0 && (
-          <div className="space-y-3 border-t border-border/60 pt-4">
+          <div className={cn('space-y-3', showRSVP && 'border-t border-border/60 pt-4')}>
             <div className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Attendees</div>
             <div className="space-y-3">
               {([
@@ -385,7 +371,7 @@ export function CalendarEventDetailPage({ event }: { event: NostrEvent }) {
         )}
 
         {links.length > 0 && (
-          <div className="space-y-2 border-t border-border/60 pt-4">
+          <div className={cn('space-y-2', (showRSVP || rsvps.total > 0) && 'border-t border-border/60 pt-4')}>
             <div className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Links</div>
             <div className="space-y-1">
               {links.map((url) => (
@@ -405,11 +391,11 @@ export function CalendarEventDetailPage({ event }: { event: NostrEvent }) {
         )}
       </CardContent>
     </Card>
-  );
+  ) : null;
 
   const participantsCard = participantsByRole.length > 0 ? (
-    <Card>
-      <CardContent className="p-5 space-y-3">
+    <Card className="border-0 bg-transparent shadow-none lg:border lg:bg-card lg:shadow-sm">
+      <CardContent className="p-0 lg:p-5 space-y-3">
         <div className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Participants</div>
         <div className="space-y-2">
           {participantsByRole.map(([role, pubkeys]) =>
@@ -419,93 +405,110 @@ export function CalendarEventDetailPage({ event }: { event: NostrEvent }) {
       </CardContent>
     </Card>
   ) : null;
+  const hasSideCards = !!eventDetailsCard || !!participantsCard;
 
   return (
     <main className="min-h-screen pb-16">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 pt-4">
-        <div className="relative aspect-[16/9] sm:aspect-[21/9] rounded-t-xl rounded-b-none overflow-hidden bg-gradient-to-br from-primary/30 via-primary/15 to-secondary">
-          {image ? (
-            <img src={image} alt="" className="absolute inset-0 size-full object-cover" />
-          ) : (
-            <div className="absolute inset-0 flex items-center justify-center">
-              <CalendarDays className="size-16 sm:size-20 text-primary/40" />
-            </div>
-          )}
-          <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/25 to-black/45" />
+      <header className="relative isolate w-full overflow-hidden bg-gradient-to-br from-primary/35 via-primary/15 to-secondary min-h-[92svh] sm:min-h-0 sm:aspect-[21/9] lg:aspect-[3/1]">
+        {image ? (
+          <img src={image} alt="" className="absolute inset-0 size-full object-cover" />
+        ) : (
+          <div className="absolute inset-0 flex items-center justify-center">
+            <CalendarDays className="size-20 text-primary/40" />
+          </div>
+        )}
+        <div aria-hidden className="absolute inset-x-0 bottom-0 top-[20%] bg-gradient-to-t from-black/95 via-black/80 to-transparent" />
+        <div aria-hidden className="absolute inset-x-0 top-0 h-24 bg-gradient-to-b from-black/45 to-transparent" />
 
-          <div className="absolute left-0 right-0 top-0 z-10 flex items-center justify-between gap-3 px-4 pt-4">
+        <div className="absolute inset-x-0 top-0 z-10 px-5 sm:px-6 lg:px-0 pt-[max(env(safe-area-inset-top),1rem)]">
+          <div className="max-w-6xl mx-auto flex items-center justify-between gap-3">
             <button
               onClick={() => window.history.length > 1 ? navigate(-1) : navigate('/')}
-              className="p-2.5 -ml-2 rounded-full text-white/90 hover:bg-white/15 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80 motion-safe:transition-colors"
+              className="inline-flex items-center gap-1.5 h-10 pl-2 pr-3.5 rounded-full bg-black/30 text-white backdrop-blur-md hover:bg-black/45 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80 motion-safe:transition-colors"
               aria-label="Go back"
             >
-              <ChevronLeft className="size-6 drop-shadow-[0_1px_2px_rgba(0,0,0,0.85)]" />
+              <ChevronLeft className="size-5" />
+              <span className="text-sm font-medium hidden sm:inline">Back</span>
             </button>
             {canEdit && (
               <Button
                 type="button"
-                variant="ghost"
                 size="sm"
                 onClick={() => setEditOpen(true)}
-                className="rounded-full bg-transparent text-white/90 shadow-none hover:bg-white/15 hover:text-white focus-visible:ring-white/80"
+                className="h-10 rounded-full bg-black/30 text-white backdrop-blur-md shadow-none hover:bg-black/45 focus-visible:ring-white/80"
               >
                 <Pencil className="size-4 mr-2" />
                 Edit
               </Button>
             )}
           </div>
+        </div>
 
-          <div className="absolute inset-x-0 bottom-0 z-10 space-y-2 p-5 sm:p-6 [text-shadow:0_1px_4px_rgba(0,0,0,0.75),0_2px_10px_rgba(0,0,0,0.45)]">
-            <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
-              <h1 className="text-3xl sm:text-4xl font-bold leading-tight tracking-tight text-white">
-                {title}
-              </h1>
-            </div>
-            <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 text-xs sm:text-sm font-medium text-white/85">
+        <div className="absolute inset-x-0 bottom-0 z-10 px-5 sm:px-6 lg:px-0 pb-[max(env(safe-area-inset-bottom),1.75rem)] pt-16 sm:pt-20">
+          <div className="max-w-6xl mx-auto [text-shadow:0_1px_3px_rgba(0,0,0,0.7)]">
+            <h1 className="text-3xl sm:text-5xl lg:text-6xl font-bold leading-[1.05] tracking-tight text-white max-w-4xl">
+              {title}
+            </h1>
+
+            <Link
+              to={organizerProfileUrl}
+              onClick={(e) => e.stopPropagation()}
+              className="mt-5 inline-flex items-center gap-2.5 text-sm sm:text-base text-white/90 hover:text-white motion-safe:transition-colors group [text-shadow:none]"
+            >
+              <Avatar className="size-8 sm:size-9 ring-2 ring-white/30">
+                {organizerPicture && <AvatarImage src={organizerPicture} alt="" />}
+                <AvatarFallback className="text-xs bg-white/15 text-white">
+                  {organizerInitials}
+                </AvatarFallback>
+              </Avatar>
+              <span className="[text-shadow:0_1px_3px_rgba(0,0,0,0.7)]">
+                hosted by{' '}
+                <span className="font-semibold underline-offset-4 group-hover:underline">
+                  {organizerName}
+                </span>
+              </span>
+            </Link>
+
+            <div className="mt-3 flex flex-wrap items-center gap-x-5 gap-y-1.5 text-xs sm:text-sm font-medium text-white/85">
               {heroDate && (
                 <span className="inline-flex items-center gap-1.5">
-                  <CalendarDays className="size-3.5 sm:size-4" />
+                  <CalendarDays className="size-4" />
                   {heroDate}
                 </span>
               )}
               {location && (
                 <span className="inline-flex items-center gap-1.5">
-                  <MapPin className="size-3.5 sm:size-4" />
+                  <MapPin className="size-4" />
                   {location}
                 </span>
               )}
               {attendingCount > 0 && (
                 <span className="inline-flex items-center gap-1.5">
-                  <Users className="size-3.5 sm:size-4" />
+                  <Users className="size-4" />
                   {attendingCount} attending
                 </span>
               )}
               {interestedCount > 0 && (
                 <span className="inline-flex items-center gap-1.5">
-                  <Users className="size-3.5 sm:size-4" />
+                  <Users className="size-4" />
                   {interestedCount} interested
                 </span>
               )}
             </div>
-            {summary && (
-              <p className="max-w-2xl text-base sm:text-lg text-white/90 line-clamp-3">
-                {summary}
-              </p>
-            )}
+
+            <div className="mt-4 pt-3 border-t border-white/15 [&_button]:!text-white/90 [&_button:hover]:!text-white [&_button:hover]:!bg-white/15 [&_button]:transition-colors [text-shadow:none]">
+              <PostActionBar
+                event={event}
+                replyLabel="Comment"
+                hideZap
+                showShareInSidebar
+                onReply={() => setReplyOpen(true)}
+                onMore={() => setMoreMenuOpen(true)}
+              />
+            </div>
           </div>
         </div>
-      </div>
-
-      <div className="max-w-6xl mx-auto px-4 sm:px-6">
-        <div className="rounded-b-xl rounded-t-none bg-card border border-t-0 border-border/60 shadow-sm px-4 sm:px-5 py-3">
-          <PostActionBar
-            event={event}
-            replyLabel="Comment"
-            onReply={() => setReplyOpen(true)}
-            onMore={() => setMoreMenuOpen(true)}
-          />
-        </div>
-      </div>
+      </header>
 
       {pinnedNodes.length > 0 && (
         <div className="max-w-6xl mx-auto px-4 sm:px-6 pt-6">
@@ -525,15 +528,21 @@ export function CalendarEventDetailPage({ event }: { event: NostrEvent }) {
         </div>
       )}
 
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 py-6 lg:py-10">
-        <div className="lg:hidden mb-6 space-y-4">
-          {eventDetailsCard}
-          {participantsCard}
-        </div>
-
+      <div className="max-w-6xl mx-auto px-5 sm:px-6 lg:px-0 py-6 lg:py-10">
         <div className="lg:flex lg:gap-8 lg:items-start">
           <div className="flex-1 min-w-0 space-y-8">
             <section className="space-y-5">
+              <div className="grid gap-3 sm:grid-cols-2">
+                <EventDetailRow icon={<Clock className="size-5" />}>
+                  {dateStr}
+                </EventDetailRow>
+                {location && (
+                  <EventDetailRow icon={<MapPin className="size-5" />}>
+                    {location}
+                  </EventDetailRow>
+                )}
+              </div>
+
               {hashtags.length > 0 && (
                 <div className="flex flex-wrap gap-2">
                   {hashtags.map((tag) => (
@@ -546,46 +555,42 @@ export function CalendarEventDetailPage({ event }: { event: NostrEvent }) {
                 </div>
               )}
 
-              {(event.content || summary) && (
-                <article className="prose prose-neutral dark:prose-invert max-w-none">
-                  {event.content ? (
-                    <NoteContent event={event} hideEmbedImages={!!image} />
-                  ) : (
-                    <p className="text-muted-foreground">{summary}</p>
-                  )}
-                </article>
-              )}
+              <DetailStory
+                event={storyEvent}
+                hasContent={storyEvent.content.trim().length > 0}
+                heading="Description"
+                headingId="event-details-heading"
+                emptyText="The organizer hasn't added a description for this event yet."
+              />
             </section>
 
-            <section id="event-comments" className="scroll-mt-20">
-              <div className="flex items-baseline justify-between gap-3 mb-3 px-1">
-                <h2 className="text-lg font-semibold tracking-tight">Comments</h2>
-                {replyTree.length > 0 ? (
-                  <span className="text-sm text-muted-foreground tabular-nums">
-                    {replyTree.length.toLocaleString()} {replyTree.length === 1 ? 'comment' : 'comments'}
-                  </span>
-                ) : null}
+            {hasSideCards && (
+              <div className="lg:hidden space-y-4">
+                {eventDetailsCard}
+                {participantsCard}
               </div>
+            )}
 
-              <DetailCommentComposer event={event} className="mb-3" />
-
-              {commentsLoading ? (
-                <div className="space-y-3">
-                  {Array.from({ length: 3 }).map((_, i) => (
-                    <div key={i} className="rounded-2xl bg-card border border-border/60 px-4 py-3">
-                      <div className="flex gap-3">
-                        <Skeleton className="size-10 rounded-full shrink-0" />
-                        <div className="flex-1 space-y-2">
-                          <Skeleton className="h-4 w-32" />
-                          <Skeleton className="h-4 w-full" />
-                          <Skeleton className="h-4 w-2/3" />
-                        </div>
-                      </div>
-                    </div>
-                  ))}
+            <section id="event-comments" className="scroll-mt-20">
+              <div className="mt-6">
+                <div className="flex items-baseline justify-between gap-3 mb-3 px-1">
+                  <h2 className="text-lg font-semibold tracking-tight">Comments</h2>
+                  {replyTree.length > 0 ? (
+                    <span className="text-sm text-muted-foreground tabular-nums">
+                      {replyTree.length.toLocaleString()} {replyTree.length === 1 ? 'comment' : 'comments'}
+                    </span>
+                  ) : null}
                 </div>
-              ) : replyTree.length > 0 ? (
-                <div className="rounded-2xl bg-card border border-border/60 overflow-hidden">
+
+                <DetailCommentComposer event={event} className="mb-3" />
+
+                {commentsLoading ? (
+                  <div className="space-y-3">
+                    {Array.from({ length: 3 }).map((_, i) => (
+                      <DetailReplySkeleton key={i} />
+                    ))}
+                  </div>
+                ) : replyTree.length > 0 ? (
                   <ThreadedReplyList
                     roots={replyTree}
                     renderItemHeader={(event) => (
@@ -597,26 +602,28 @@ export function CalendarEventDetailPage({ event }: { event: NostrEvent }) {
                       />
                     )}
                   />
-                </div>
-              ) : (
-                <button
-                  type="button"
-                  onClick={() => setReplyOpen(true)}
-                  className="block w-full rounded-2xl border border-dashed border-border/80 bg-card/50 px-6 py-10 text-center hover:bg-card hover:border-primary/40 transition-colors"
-                >
-                  <p className="text-base font-medium text-foreground">No comments yet</p>
-                  <p className="mt-1 text-sm text-muted-foreground">Be the first to comment.</p>
-                </button>
-              )}
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => setReplyOpen(true)}
+                    className="block w-full rounded-2xl border border-dashed border-border/80 bg-card/50 px-6 py-10 text-center hover:bg-card hover:border-primary/40 transition-colors"
+                  >
+                    <p className="text-base font-medium text-foreground">No comments yet</p>
+                    <p className="mt-1 text-sm text-muted-foreground">Be the first to comment.</p>
+                  </button>
+                )}
+              </div>
             </section>
           </div>
 
-          <aside className="hidden lg:block lg:w-[360px] lg:shrink-0 lg:self-start">
-            <div className="lg:sticky lg:top-4 space-y-4">
-              {eventDetailsCard}
-              {participantsCard}
-            </div>
-          </aside>
+          {hasSideCards && (
+            <aside className="hidden lg:block lg:w-[360px] lg:shrink-0 lg:self-start">
+              <div className="lg:sticky lg:top-4 space-y-4">
+                {eventDetailsCard}
+                {participantsCard}
+              </div>
+            </aside>
+          )}
         </div>
 
         <NoteMoreMenu event={event} open={moreMenuOpen} onOpenChange={setMoreMenuOpen} />

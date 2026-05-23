@@ -84,20 +84,20 @@ export function BanConfirmDialog({
         queryClient.invalidateQueries({ queryKey: ['organization-activity', communityATag] }),
       ]);
 
-      toast({ title: 'Post removed from organization' });
+      toast({ title: 'Post removed from group' });
       setReason('');
       onOpenChange(false);
     } catch {
-      toast({ title: 'Failed to remove post from organization', variant: 'destructive' });
+      toast({ title: 'Failed to remove post from group', variant: 'destructive' });
     }
   };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-md rounded-2xl flex flex-col overflow-hidden">
-        <DialogTitle>Remove from organization</DialogTitle>
+        <DialogTitle>Remove from group</DialogTitle>
         <DialogDescription className="text-sm text-muted-foreground">
-          This will hide the post from canonical organization views.
+          This will hide the post from canonical group views.
         </DialogDescription>
 
         <div className="space-y-2">

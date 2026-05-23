@@ -12,7 +12,6 @@
  *
  * Labels are bare noun phrases (no articles, no verbs) so each consumer can
  * add its own grammar:
- *   - NsitePermissionPrompt: "Sign: Short text note"
  *   - CommentContext:         "a short text note"
  *   - NotificationsPage:      "reacted to your short text note"
  *   - signerWithNudge:        "Approve post in signer" (uses its own override)
@@ -266,10 +265,6 @@ export const KIND_LABELS: Record<number, string> = {
   28934: 'Join request',
   28935: 'Invite request',
   28936: 'Leave request',
-
-  // Webxdc
-  4932: 'Webxdc sync',
-  20932: 'Webxdc sync',
 
   // ---- Addressable events (30000+) ----
 

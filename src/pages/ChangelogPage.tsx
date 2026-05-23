@@ -6,7 +6,6 @@ import { PageHeader } from '@/components/PageHeader';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { useAppContext } from '@/hooks/useAppContext';
-import { useLayoutOptions } from '@/contexts/LayoutContext';
 import { parseChangelog } from '@/lib/changelog';
 import type { ChangelogCategory, ChangelogEntry } from '@/lib/changelog';
 
@@ -39,7 +38,6 @@ export function ChangelogPage() {
   const [content, setContent] = useState<string | null>(null);
   const [error, setError] = useState(false);
 
-  useLayoutOptions({});
 
   useSeoMeta({
     title: `Changelog | ${config.appName}`,

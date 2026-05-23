@@ -1,12 +1,10 @@
 import type { NostrEvent } from "@nostrify/nostrify";
-import { ExternalLink, FileText, Globe, Pin, PinOff, Play, Server } from "lucide-react";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { ExternalLink, FileText, Globe, Pin, PinOff, Server } from "lucide-react";
+import { useCallback } from "react";
 
 import { Button } from "@/components/ui/button";
 import { ExternalFavicon } from "@/components/ExternalFavicon";
-import { NsitePreviewDialog } from "@/components/NsitePreviewDialog";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useNsitePlayer } from "@/contexts/NsitePlayerContext";
 import { useFeedSettings } from "@/hooks/useFeedSettings";
 import { useLinkPreview } from "@/hooks/useLinkPreview";
 import { toast } from "@/hooks/useToast";
@@ -16,16 +14,10 @@ import { cn } from "@/lib/utils";
 
 interface NsiteCardProps {
 	event: NostrEvent;
-	/**
-	 * When set, automatically open the nsite preview. Change the value
-	 * (e.g. increment a counter) to re-trigger even if the component is
-	 * already mounted. `undefined` / `0` = don't auto-play.
-	 */
-	autoPlayKey?: number;
 }
 
 /** Renders an nsite deployment card with a rich link preview. */
-export function NsiteCard({ event, autoPlayKey }: NsiteCardProps) {
+export function NsiteCard({ event }: NsiteCardProps) {
 	const title = event.tags.find(([n]) => n === "title")?.[1];
 	const description = event.tags.find(([n]) => n === "description")?.[1];
 	const dTag = event.tags.find(([n]) => n === "d")?.[1];
@@ -46,14 +38,6 @@ export function NsiteCard({ event, autoPlayKey }: NsiteCardProps) {
 	const image = preview?.thumbnail_url;
 	const previewTitle = preview?.title;
 
-	const { activeSubdomain, setActiveSubdomain } = useNsitePlayer();
-	const [previewOpen, setPreviewOpen] = useState(!!autoPlayKey);
-
-	// Ref tracks the latest activeSubdomain so the unmount cleanup can
-	// guard against clearing a *different* nsite's active state.
-	const activeRef = useRef(activeSubdomain);
-	activeRef.current = activeSubdomain;
-
 	const handleTogglePin = useCallback(() => {
 		if (!sidebarUri) return;
 		if (isPinned) {
@@ -65,38 +49,11 @@ export function NsiteCard({ event, autoPlayKey }: NsiteCardProps) {
 		}
 	}, [sidebarUri, isPinned, addToSidebar, removeFromSidebar]);
 
-	// Sync open/close state with the global NsitePlayerContext.
-	const handlePreviewOpenChange = useCallback((open: boolean) => {
-		setPreviewOpen(open);
-		setActiveSubdomain(open ? nsiteSubdomain : null);
-	}, [nsiteSubdomain, setActiveSubdomain]);
-
-	// Open the player when autoPlayKey changes (e.g. sidebar clicked again).
-	useEffect(() => {
-		if (autoPlayKey) {
-			handlePreviewOpenChange(true);
-		}
-	}, [autoPlayKey, handlePreviewOpenChange]);
-
-	// Register on mount if auto-playing, and clean up on unmount.
-	useEffect(() => {
-		if (previewOpen) {
-			setActiveSubdomain(nsiteSubdomain);
-		}
-		return () => {
-			// Only clear if we are still the active subdomain.
-			if (activeRef.current === nsiteSubdomain) {
-				setActiveSubdomain(null);
-			}
-		};
-	}, []); // eslint-disable-line react-hooks/exhaustive-deps
-
 	if (isLoading) {
 		return <NsiteCardSkeleton />;
 	}
 
 	return (
-		<>
 		<div
 			className={cn(
 				"group mt-2 rounded-2xl border border-border overflow-hidden",
@@ -164,14 +121,6 @@ export function NsiteCard({ event, autoPlayKey }: NsiteCardProps) {
 
 			{/* Action row */}
 			<div className="px-3.5 pb-2.5 flex items-center gap-2">
-				<Button
-					size="sm"
-					className="h-7 text-xs"
-					onClick={(e) => { e.stopPropagation(); handlePreviewOpenChange(true); }}
-				>
-					<Play className="size-3 mr-1" />
-					Run
-				</Button>
 				{sourceUrl ? (
 					<Button asChild size="sm" variant="secondary" className="h-7 text-xs">
 						<a
@@ -210,15 +159,6 @@ export function NsiteCard({ event, autoPlayKey }: NsiteCardProps) {
 				)}
 			</div>
 		</div>
-
-	<NsitePreviewDialog
-		event={event}
-		appName={previewTitle || displayName || "nsite"}
-		appPicture={undefined}
-		open={previewOpen}
-		onOpenChange={handlePreviewOpenChange}
-	/>
-		</>
 	);
 }
 

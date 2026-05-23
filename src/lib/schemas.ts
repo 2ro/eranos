@@ -162,8 +162,6 @@ export const FeedSettingsSchema = z.looseObject({
   feedIncludeStreams: z.boolean().optional(),
   showDecks: z.boolean().optional(),
   feedIncludeDecks: z.boolean().optional(),
-  showWebxdc: z.boolean().optional(),
-  feedIncludeWebxdc: z.boolean().optional(),
   feedIncludeVoiceMessages: z.boolean().optional(),
   showEmojiPacks: z.boolean().optional(),
   feedIncludeEmojiPacks: z.boolean().optional(),
@@ -254,7 +252,6 @@ export const AppConfigSchema = z.object({
   autoplayVideos: z.boolean(),
   imageQuality: z.enum(['compressed', 'original']),
   curatorPubkey: z.string().regex(/^[0-9a-f]{64}$/i).optional(),
-  sandboxDomain: z.string().optional(),
   /**
    * Ordered list of Esplora REST roots tried in failover order. Accepts the
    * legacy single-string form and normalizes it to a one-element array so

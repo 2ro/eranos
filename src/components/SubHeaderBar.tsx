@@ -2,7 +2,6 @@ import { useState, useRef, useEffect, useCallback } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { ArcBackground } from '@/components/ArcBackground';
-import { useNavHidden } from '@/contexts/LayoutContext';
 import { SubHeaderBarContext } from '@/components/SubHeaderBarContext';
 
 interface HoverSlice {
@@ -20,7 +19,10 @@ interface SubHeaderBarProps {
   backgroundFillClassName?: string;
   /** Replace the decorative arc with a plain rectangle. */
   noArc?: boolean;
-  /** Keep the bar visible when the mobile top bar hides (slides to top-0 instead of off-screen). */
+  /**
+   * Legacy prop from the mobile-top-bar era — kept for API compatibility.
+   * Currently unused since the persistent FundraiserLayout has no hide-on-scroll behavior.
+   */
   pinned?: boolean;
 }
 
@@ -29,20 +31,11 @@ interface SubHeaderBarProps {
  * SVG shape. Eliminates the sub-pixel seam between a bg-background/80 container
  * and a separate SVG arc overlay that can appear during scroll/animation.
  *
- * Used by all tab bars (Feed, Search, Notifications, etc.) and the MobileTopBar
- * fallback arc.
+ * Used by all tab bars (Feed, Search, Notifications, etc.).
  */
-export function SubHeaderBar({ children, className, innerClassName, backgroundFillClassName, noArc: _noArc, pinned }: SubHeaderBarProps) {
+export function SubHeaderBar({ children, className, innerClassName, backgroundFillClassName, noArc: _noArc, pinned: _pinned }: SubHeaderBarProps) {
   const [hover, setHover] = useState<HoverSlice | null>(null);
   const [active, setActive] = useState<HoverSlice | null>(null);
-  const navHidden = useNavHidden();
-
-  // Track whether the sticky bar has actually reached the top of the viewport
-  // by watching getBoundingClientRect().top on scroll. We show the safe-area
-  // padding only once the bar's top edge is at or above the safe-area boundary,
-  // preventing the spacer from appearing while the bar is still mid-page.
-  const barRef = useRef<HTMLDivElement>(null);
-  const [atTop, setAtTop] = useState(false);
 
   // Horizontal overflow scroll arrows (desktop only)
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -82,51 +75,11 @@ export function SubHeaderBar({ children, className, innerClassName, backgroundFi
     el.scrollBy({ left: direction === 'left' ? -amount : amount, behavior: 'smooth' });
   };
 
-  useEffect(() => {
-    if (!pinned) return;
-
-    // Measure safe-area-inset-top once by reading it via a throw-away element.
-    const probe = document.createElement('div');
-    probe.style.cssText = 'position:fixed;top:var(--safe-area-inset-top,env(safe-area-inset-top,0px));left:0;width:0;height:0;visibility:hidden;pointer-events:none';
-    document.body.appendChild(probe);
-    const safeAreaTop = probe.getBoundingClientRect().top;
-    document.body.removeChild(probe);
-
-    const check = () => {
-      const bar = barRef.current;
-      if (!bar) return;
-      setAtTop(bar.getBoundingClientRect().top <= safeAreaTop);
-    };
-
-    window.addEventListener('scroll', check, { passive: true });
-    check();
-    return () => window.removeEventListener('scroll', check);
-  }, [pinned]);
-
-  const showSafeAreaPadding = pinned && navHidden && atTop;
-
   return (
     <SubHeaderBarContext.Provider value={{ onHover: setHover, onActive: setActive, scrollContainerRef: scrollRef }}>
       <div
-        ref={barRef}
-        className={cn(
-          'relative sticky top-mobile-bar sidebar:top-0 z-10',
-          pinned
-            ? 'max-sidebar:transition-[top,padding-top] max-sidebar:duration-300 max-sidebar:ease-in-out'
-            : 'max-sidebar:transition-transform max-sidebar:duration-300 max-sidebar:ease-in-out',
-          navHidden && (pinned ? 'max-sidebar:!top-0' : 'nav-hidden-slide'),
-          showSafeAreaPadding && 'max-sidebar:safe-area-top',
-          className,
-        )}
+        className={cn('relative sticky top-mobile-bar sidebar:top-0 z-10', className)}
       >
-        {/* Safe-area fill — visible only when pinned and bar is at the top, covers the
-            padding zone above the tabs with the same translucent bg as the MobileTopBar. */}
-        {showSafeAreaPadding && (
-          <div
-            className="absolute top-0 left-0 right-0 bg-background/85 sidebar:hidden"
-            style={{ height: 'var(--safe-area-inset-top, env(safe-area-inset-top, 0px))' }}
-          />
-        )}
         {/* Inner wrapper holds the ArcBackground and tab content. */}
         <div className="relative">
           <ArcBackground variant="rect" fillClassName={backgroundFillClassName} />

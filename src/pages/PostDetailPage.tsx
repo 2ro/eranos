@@ -21,6 +21,7 @@ import { Link, useNavigate } from "react-router-dom";
 /** Lazy-loaded markdown-heavy components — keeps react-markdown + unified pipeline out of the detail page bundle. */
 const ArticleContent = lazy(() => import("@/components/ArticleContent").then(m => ({ default: m.ArticleContent })));
 import { BadgeDetailContent } from "@/components/BadgeDetailContent";
+import { BadgeAwardCard } from "@/components/BadgeAwardCard";
 import { CalendarEventDetailPage } from "@/components/CalendarEventDetailPage";
 import { CommunityDetailPage } from "@/components/CommunityDetailPage";
 
@@ -104,6 +105,9 @@ const CALENDAR_EVENT_KINDS = new Set([31922, 31923]);
 /** NIP-58 Badge Definition. */
 const BADGE_DEFINITION_KIND = 30009;
 
+/** NIP-58 Badge Award. */
+const BADGE_AWARD_KIND = 8;
+
 /** NIP-58 Profile Badges (new replaceable kind). */
 const BADGE_PROFILE_KIND_NEW = 10008;
 
@@ -130,6 +134,7 @@ function shellTitleForKind(kind?: number): string {
   if (kind === 1617) return "Patch";
   if (kind === 1618) return "Pull Request";
   if (kind === 30817) return "Custom NIP";
+  if (kind === BADGE_AWARD_KIND) return "Badge Award";
   if (kind === BADGE_DEFINITION_KIND) return "Badge Details";
   if (kind === BADGE_PROFILE_KIND_NEW || kind === BADGE_PROFILE_KIND_LEGACY) return "Badge Collection";
   if (kind === BOOK_REVIEW_KIND) return "Book Review";
@@ -994,6 +999,7 @@ function PostDetailContent({ event }: { event: NostrEvent }) {
   const isZap = event.kind === 9735;
   const isZapGoal = event.kind === 9041;
   const isProfile = event.kind === 0;
+  const isBadgeAward = event.kind === BADGE_AWARD_KIND;
   const isDevKind = isGitRepo || isPatch || isPullRequest || isCustomNip || isNsite;
   const isTextNote =
     !isVine &&
@@ -1023,7 +1029,8 @@ function PostDetailContent({ event }: { event: NostrEvent }) {
     !isVanish &&
     !isZap &&
     !isZapGoal &&
-    !isProfile;
+    !isProfile &&
+    !isBadgeAward;
 
   const { data: stats } = useEventStats(event.id, event);
   const { data: interactions } = useEventInteractions(event.id);
@@ -1912,6 +1919,8 @@ function PostDetailContent({ event }: { event: NostrEvent }) {
               <EncryptedLetterContent event={event} />
             ) : isZapGoal ? (
               <GoalCard event={event} />
+            ) : isBadgeAward ? (
+              <BadgeAwardCard event={event} />
             ) : isVine ||
               isPoll ||
               isGeocache ||

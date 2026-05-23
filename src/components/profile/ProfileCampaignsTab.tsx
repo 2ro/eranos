@@ -151,23 +151,26 @@ function SortedByTopGrid({ campaigns }: { campaigns: ParsedCampaign[] }) {
   const { config } = useAppContext();
   const { esploraApis } = config;
 
-  // Only on-chain campaigns can have observable totals. SP campaigns sort to 0.
-  const onchain = campaigns.filter((c) => c.wallet?.mode === 'onchain');
+  // Only on-chain campaigns can have observable totals. SP-only campaigns sort to 0.
+  const onchain = campaigns.flatMap((c) => {
+    const address = c.wallets?.onchain?.value;
+    return address ? [{ campaign: c, address }] : [];
+  });
 
   const balanceQueries = useQueries({
-    queries: onchain.map((campaign) => ({
-      queryKey: ['bitcoin-balance', 'campaign', esploraApis, campaign.wallet?.value ?? ''],
+    queries: onchain.map(({ address }) => ({
+      queryKey: ['bitcoin-balance', 'campaign', esploraApis, address],
       queryFn: ({ signal }: { signal: AbortSignal }) =>
-        fetchAddressData(campaign.wallet!.value, esploraApis, signal),
+        fetchAddressData(address, esploraApis, signal),
       staleTime: 30_000,
-      enabled: !!campaign.wallet?.value,
+      enabled: !!address,
     })),
   });
 
   const totalsByCoord = new Map<string, number>();
   for (let i = 0; i < onchain.length; i++) {
     const sats = balanceQueries[i]?.data?.totalReceived ?? 0;
-    totalsByCoord.set(onchain[i].aTag, sats);
+    totalsByCoord.set(onchain[i].campaign.aTag, sats);
   }
 
   const sorted = [...campaigns].sort(

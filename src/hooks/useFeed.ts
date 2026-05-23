@@ -36,7 +36,7 @@ interface UseFeedOptions {
   kinds?: number[];
   /** Override the follows author list. Used by scoped member feeds. */
   authors?: string[];
-  /** Additional tag filters to apply (e.g. `{ '#m': ['application/x-webxdc'] }`). */
+  /** Additional tag filters to apply (e.g. `{ '#m': ['image/jpeg'] }`). */
   tagFilters?: Record<string, string[]>;
   /** Whether the query should run. */
   enabled?: boolean;

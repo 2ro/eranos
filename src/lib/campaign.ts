@@ -36,6 +36,18 @@ export interface CampaignWallet {
 }
 
 /**
+ * The full set of wallet endpoints declared by a campaign. A campaign may
+ * carry up to one endpoint per mode; at least one must be present, but
+ * both modes may be present simultaneously (the QR code combines them).
+ */
+export interface CampaignWallets {
+  /** On-chain mainnet bech32(m) address, if declared. */
+  onchain?: CampaignWallet;
+  /** BIP-352 silent-payment code, if declared. */
+  sp?: CampaignWallet;
+}
+
+/**
  * NIP-92 imeta block parsed from a campaign event. Pairs with the
  * `banner` tag (`url` MUST match the banner URL — clients ignore an
  * imeta whose URL does not match).
@@ -73,8 +85,8 @@ export interface ParsedCampaign {
   banner?: string;
   /** NIP-92 imeta for the banner. Only present when the imeta's `url` matches the banner. */
   bannerImeta?: CampaignBannerImeta;
-  /** Bitcoin wallet endpoint (required). */
-  wallet: CampaignWallet;
+  /** Bitcoin wallet endpoints (at least one is present). */
+  wallets: CampaignWallets;
   /** Fundraising goal in **integer US Dollars**, or `undefined` if not set. */
   goalUsd?: number;
   /** Deadline (Unix seconds), or `undefined` if not set. */
@@ -88,6 +100,17 @@ export interface ParsedCampaign {
 /** Returns the first value of a tag, or undefined. */
 function getTag(event: NostrEvent, name: string): string | undefined {
   return event.tags.find(([n]) => n === name)?.[1];
+}
+
+/** Returns all values of a tag in declaration order. */
+function getTagValues(event: NostrEvent, name: string): string[] {
+  const values: string[] = [];
+  for (const tag of event.tags) {
+    if (tag[0] !== name) continue;
+    if (typeof tag[1] !== 'string') continue;
+    values.push(tag[1]);
+  }
+  return values;
 }
 
 /** Parses a positive integer string. Returns undefined on failure. */
@@ -144,6 +167,29 @@ export function parseCampaignWallet(value: string | undefined): CampaignWallet |
 }
 
 /**
+ * Parse all of a campaign's `w` tags into a {@link CampaignWallets}
+ * struct. Returns `null` if the campaign carries no `w` tags, any
+ * individual `w` value fails {@link parseCampaignWallet}, or more than
+ * one `w` value is present for the same mode (the spec permits at most
+ * one endpoint per mode).
+ */
+export function parseCampaignWallets(values: string[]): CampaignWallets | null {
+  if (values.length === 0) return null;
+  const wallets: CampaignWallets = {};
+  for (const raw of values) {
+    const parsed = parseCampaignWallet(raw);
+    if (!parsed) return null;
+    if (wallets[parsed.mode]) {
+      // Two endpoints of the same mode is invalid per NIP.md.
+      return null;
+    }
+    wallets[parsed.mode] = parsed;
+  }
+  if (!wallets.onchain && !wallets.sp) return null;
+  return wallets;
+}
+
+/**
  * Parse the NIP-92 `imeta` tag whose `url` matches the campaign's banner.
  * Returns `undefined` if no matching imeta is found.
  */
@@ -190,8 +236,8 @@ export function parseCampaign(event: NostrEvent): ParsedCampaign | null {
   const title = getTag(event, 'title');
   if (!identifier || !title) return null;
 
-  const wallet = parseCampaignWallet(getTag(event, 'w'));
-  if (!wallet) return null;
+  const wallets = parseCampaignWallets(getTagValues(event, 'w'));
+  if (!wallets) return null;
 
   // Banner — only accept https URLs. Formal sanitizeUrl pass happens at
   // the render site (this lib runs in tests without DOM); strip non-https
@@ -210,7 +256,7 @@ export function parseCampaign(event: NostrEvent): ParsedCampaign | null {
     story: event.content,
     banner,
     bannerImeta,
-    wallet,
+    wallets,
     goalUsd: parsePositiveInt(getTag(event, 'goal')),
     deadline: parsePositiveInt(getTag(event, 'deadline')),
     countryCode: getCountryCode(event),

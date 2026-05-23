@@ -14,9 +14,7 @@ import {
   Trash2,
 } from 'lucide-react';
 
-import { ArticleContent } from '@/components/ArticleContent';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Badge } from '@/components/ui/badge';
 import {
   CampaignWalletDonatePanel,
 } from '@/components/CampaignWalletDonatePanel';
@@ -34,6 +32,7 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { DetailCommentComposer } from '@/components/DetailCommentComposer';
+import { DetailReplySkeleton, DetailStory } from '@/components/DetailStory';
 import { InteractionsModal, type InteractionTab } from '@/components/InteractionsModal';
 import { PostActionBar } from '@/components/PostActionBar';
 import { PinnedCommentHeader } from '@/components/PinnedCommentHeader';
@@ -51,8 +50,8 @@ import { useDeleteEvent } from '@/hooks/useDeleteEvent';
 import { useEventStats } from '@/hooks/useTrending';
 import { usePinnedEventComments } from '@/hooks/usePinnedEventComments';
 import { useProfileUrl } from '@/hooks/useProfileUrl';
+import { useShareOrigin } from '@/hooks/useShareOrigin';
 import { useToast } from '@/hooks/useToast';
-import { useLayoutOptions } from '@/contexts/LayoutContext';
 import {
   encodeCampaignNaddr,
   getCampaignCountryLabel,
@@ -110,7 +109,6 @@ export function CampaignDetailPage({ pubkey, identifier, relays }: CampaignDetai
   // with the article on mobile (where the sidebar slot is invisible
   // anyway). Keeping everything in one Outlet lets us inline the donate
   // column below the hero on small screens.
-  useLayoutOptions({ noMaxWidth: true, rightSidebar: null });
 
   const { data: campaign, isLoading, isError } = useCampaign({ pubkey, identifier, relays });
 
@@ -127,6 +125,7 @@ function CampaignDetailContent({ campaign }: { campaign: ParsedCampaign }) {
   const { data: stats, isLoading: statsLoading } = useCampaignDonations(campaign);
   const navigate = useNavigate();
   const { toast } = useToast();
+  const shareOrigin = useShareOrigin();
   const queryClient = useQueryClient();
 
   const [replyOpen, setReplyOpen] = useState(false);
@@ -263,7 +262,7 @@ function CampaignDetailContent({ campaign }: { campaign: ParsedCampaign }) {
   });
 
   const handleShare = async () => {
-    const url = `${window.location.origin}/${naddr}`;
+    const url = `${shareOrigin}/${naddr}`;
     try {
       const nav = typeof navigator !== 'undefined' ? navigator : undefined;
       if (nav?.share) {
@@ -470,7 +469,7 @@ function CampaignDetailContent({ campaign }: { campaign: ParsedCampaign }) {
                 {commentsLoading && statsLoading && replyTree.length === 0 ? (
                   <div className="space-y-3">
                     {Array.from({ length: 3 }).map((_, i) => (
-                      <CampaignReplySkeleton key={i} />
+                      <DetailReplySkeleton key={i} />
                     ))}
                   </div>
                 ) : replyTree.length > 0 ? (
@@ -738,16 +737,6 @@ function CampaignHero({
           busy photos without darkening the gradient further. */}
       <div className="absolute inset-x-0 bottom-0 z-10 px-5 sm:px-6 lg:px-0 pb-[max(env(safe-area-inset-bottom),1.75rem)] pt-16 sm:pt-20">
         <div className="max-w-6xl mx-auto [text-shadow:0_1px_3px_rgba(0,0,0,0.7)]">
-          {campaign.wallet.mode === 'sp' && (
-            <Badge
-              variant="secondary"
-              className="mb-4 bg-background/85 text-foreground border-border/40 backdrop-blur [text-shadow:none]"
-            >
-              <ShieldCheck className="size-3.5 mr-1.5" />
-              Private campaign
-            </Badge>
-          )}
-
           <h1 className="text-3xl sm:text-5xl lg:text-6xl font-bold leading-[1.05] tracking-tight text-white max-w-4xl">
             {campaign.title}
           </h1>
@@ -804,6 +793,7 @@ function CampaignHero({
               event={campaign.event}
               replyLabel="Comment"
               hideZap
+              showShareInSidebar
               onReply={onReply}
               onMore={onMore}
             />
@@ -824,35 +814,15 @@ function CampaignStory({
 }: {
   storyEvent: NostrEvent;
   hasContent: boolean;
-  // expanded/onToggle retained on the call site for backwards-compat
-  // but no longer used — the story shows in full. A fundraiser pitch
-  // is the entire point of the page; hiding most of it behind a
-  // fade-out gradient buries the message.
-  expanded?: boolean;
-  onToggle?: () => void;
 }) {
-  if (!hasContent) {
-    return (
-      <div className="rounded-2xl border border-dashed border-border/80 bg-card/40 px-6 py-10 text-center">
-        <p className="text-muted-foreground italic">
-          The organizer hasn't written a story for this campaign yet.
-        </p>
-      </div>
-    );
-  }
-
   return (
-    <section aria-labelledby="campaign-story-heading" className="space-y-3">
-      <h2
-        id="campaign-story-heading"
-        className="text-xs font-semibold uppercase tracking-[0.12em] text-muted-foreground"
-      >
-        The story
-      </h2>
-      <article className="prose prose-neutral dark:prose-invert max-w-none prose-p:leading-relaxed prose-p:text-foreground/90 prose-headings:tracking-tight prose-img:rounded-xl">
-        <ArticleContent event={storyEvent} />
-      </article>
-    </section>
+    <DetailStory
+      event={storyEvent}
+      hasContent={hasContent}
+      heading="The story"
+      headingId="campaign-story-heading"
+      emptyText="The organizer hasn't written a story for this campaign yet."
+    />
   );
 }
 
@@ -885,7 +855,7 @@ function DonateColumn({
 }: DonateColumnProps) {
   const ended = !!deadline?.isPast;
   const endedLabel = ended ? 'Campaign ended' : null;
-  const isSilentPayment = campaign.wallet.mode === 'sp';
+  const isSilentPayment = !campaign.wallets.onchain;
 
   return (
     // On mobile we drop the Card chrome (no border, no shadow, no
@@ -896,19 +866,14 @@ function DonateColumn({
     <Card className="overflow-hidden border-0 shadow-none bg-transparent lg:border lg:shadow-sm lg:bg-card">
       <CardContent className="p-0 lg:p-5 space-y-5">
         {/* Raised stats + progress. Silent-payment campaigns hide all
-            aggregate numbers by design (per NIP.md Kind 33863). */}
+            aggregate numbers by design (per NIP.md Kind 33863) — only
+            the goal target (if any) is shown. */}
         {isSilentPayment ? (
-          <div className="space-y-1">
-            <div className="inline-flex items-center gap-1.5 text-sm font-medium text-muted-foreground">
-              <ShieldCheck className="size-4 text-primary" />
-              Private campaign — totals not public
+          campaign.goalUsd && campaign.goalUsd > 0 ? (
+            <div className="text-xs text-muted-foreground">
+              Target: {formatUsdGoal(campaign.goalUsd)}
             </div>
-            {campaign.goalUsd && campaign.goalUsd > 0 && (
-              <div className="text-xs text-muted-foreground">
-                Target: {formatUsdGoal(campaign.goalUsd)}
-              </div>
-            )}
-          </div>
+          ) : null
         ) : statsLoading ? (
           <Skeleton className="h-16 w-full" />
         ) : (
@@ -967,7 +932,7 @@ function DonateColumn({
           // Both on-chain and silent-payment campaigns route through the
           // same UX — Agora no longer runs an in-app PSBT signer.
           <div className="space-y-3">
-            <CampaignWalletDonatePanel wallet={campaign.wallet} />
+            <CampaignWalletDonatePanel wallets={campaign.wallets} />
             <Button variant="outline" size="lg" className="w-full" onClick={onShare}>
               <Share2 className="size-4 mr-2" />
               Share
@@ -1042,21 +1007,6 @@ function DonorPreviewList({
 // ─────────────────────────────────────────────────────────────────────
 // Skeletons
 // ─────────────────────────────────────────────────────────────────────
-
-function CampaignReplySkeleton() {
-  return (
-    <div className="py-3 border-b border-border last:border-b-0">
-      <div className="flex gap-3">
-        <Skeleton className="size-10 rounded-full shrink-0" />
-        <div className="flex-1 space-y-2">
-          <Skeleton className="h-4 w-32" />
-          <Skeleton className="h-4 w-full" />
-          <Skeleton className="h-4 w-2/3" />
-        </div>
-      </div>
-    </div>
-  );
-}
 
 function CampaignDetailSkeleton() {
   return (
