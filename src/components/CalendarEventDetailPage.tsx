@@ -21,7 +21,6 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { DetailCommentComposer } from '@/components/DetailCommentComposer';
 import { DetailReplySkeleton, DetailStory } from '@/components/DetailStory';
-import { NoteContent } from '@/components/NoteContent';
 import { NoteMoreMenu } from '@/components/NoteMoreMenu';
 import { PostActionBar } from '@/components/PostActionBar';
 import { PinnedCommentHeader } from '@/components/PinnedCommentHeader';
@@ -311,38 +310,11 @@ export function CalendarEventDetailPage({ event }: { event: NostrEvent }) {
         ? "You can't go"
         : 'Choose your RSVP';
 
-  const eventDetailsCard = (
+  const eventDetailsCard = (showRSVP || rsvps.total > 0 || links.length > 0) ? (
     <Card className="rounded-none border-0 bg-transparent shadow-none lg:rounded-xl lg:border lg:bg-card lg:shadow-sm">
       <CardContent className="p-0 lg:p-5 space-y-5">
-        <div className="space-y-3">
-          <div className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Hosted by</div>
-          <PersonRow pubkey={event.pubkey} size="sm" />
-        </div>
-
-        {(event.content || summary) && (
-          <div className="space-y-2 border-t border-border/60 pt-4">
-            <div className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Description</div>
-            {event.content ? (
-              <NoteContent event={event} className="text-sm leading-relaxed text-foreground" hideEmbedImages={!!image} disableEmbeds disableNoteEmbeds />
-            ) : (
-              <p className="text-sm leading-relaxed text-muted-foreground">{summary}</p>
-            )}
-          </div>
-        )}
-
-        <div className="space-y-3">
-          <EventDetailRow icon={<Clock className="size-5" />}>
-            {dateStr}
-          </EventDetailRow>
-          {location && (
-            <EventDetailRow icon={<MapPin className="size-5" />}>
-              {location}
-            </EventDetailRow>
-          )}
-        </div>
-
         {showRSVP && (
-          <div className="space-y-3 border-t border-border/60 pt-4">
+          <div className="space-y-3">
             <div className="flex items-center justify-between gap-3">
               <div className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">RSVP</div>
               <span className="text-xs font-medium text-muted-foreground">{rsvpStatusLabel}</span>
@@ -383,7 +355,7 @@ export function CalendarEventDetailPage({ event }: { event: NostrEvent }) {
         )}
 
         {rsvps.total > 0 && (
-          <div className="space-y-3 border-t border-border/60 pt-4">
+          <div className={cn('space-y-3', showRSVP && 'border-t border-border/60 pt-4')}>
             <div className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Attendees</div>
             <div className="space-y-3">
               {([
@@ -401,7 +373,7 @@ export function CalendarEventDetailPage({ event }: { event: NostrEvent }) {
         )}
 
         {links.length > 0 && (
-          <div className="space-y-2 border-t border-border/60 pt-4">
+          <div className={cn('space-y-2', (showRSVP || rsvps.total > 0) && 'border-t border-border/60 pt-4')}>
             <div className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Links</div>
             <div className="space-y-1">
               {links.map((url) => (
@@ -421,7 +393,7 @@ export function CalendarEventDetailPage({ event }: { event: NostrEvent }) {
         )}
       </CardContent>
     </Card>
-  );
+  ) : null;
 
   const participantsCard = participantsByRole.length > 0 ? (
     <Card className="border-0 bg-transparent shadow-none lg:border lg:bg-card lg:shadow-sm">
@@ -435,6 +407,7 @@ export function CalendarEventDetailPage({ event }: { event: NostrEvent }) {
       </CardContent>
     </Card>
   ) : null;
+  const hasSideCards = !!eventDetailsCard || !!participantsCard;
 
   return (
     <main className="min-h-screen pb-16">
@@ -558,14 +531,20 @@ export function CalendarEventDetailPage({ event }: { event: NostrEvent }) {
       )}
 
       <div className="max-w-6xl mx-auto px-5 sm:px-6 lg:px-0 py-6 lg:py-10">
-        <div className="lg:hidden mb-6 space-y-4">
-          {eventDetailsCard}
-          {participantsCard}
-        </div>
-
         <div className="lg:flex lg:gap-8 lg:items-start">
           <div className="flex-1 min-w-0 space-y-8">
             <section className="space-y-5">
+              <div className="grid gap-3 sm:grid-cols-2">
+                <EventDetailRow icon={<Clock className="size-5" />}>
+                  {dateStr}
+                </EventDetailRow>
+                {location && (
+                  <EventDetailRow icon={<MapPin className="size-5" />}>
+                    {location}
+                  </EventDetailRow>
+                )}
+              </div>
+
               {hashtags.length > 0 && (
                 <div className="flex flex-wrap gap-2">
                   {hashtags.map((tag) => (
@@ -581,11 +560,18 @@ export function CalendarEventDetailPage({ event }: { event: NostrEvent }) {
               <DetailStory
                 event={storyEvent}
                 hasContent={storyEvent.content.trim().length > 0}
-                heading="Details"
+                heading="Description"
                 headingId="event-details-heading"
-                emptyText="The organizer hasn't added details for this event yet."
+                emptyText="The organizer hasn't added a description for this event yet."
               />
             </section>
+
+            {hasSideCards && (
+              <div className="lg:hidden space-y-4">
+                {eventDetailsCard}
+                {participantsCard}
+              </div>
+            )}
 
             <section id="event-comments" className="scroll-mt-20">
               <div className="mt-6">
@@ -632,12 +618,14 @@ export function CalendarEventDetailPage({ event }: { event: NostrEvent }) {
             </section>
           </div>
 
-          <aside className="hidden lg:block lg:w-[360px] lg:shrink-0 lg:self-start">
-            <div className="lg:sticky lg:top-4 space-y-4">
-              {eventDetailsCard}
-              {participantsCard}
-            </div>
-          </aside>
+          {hasSideCards && (
+            <aside className="hidden lg:block lg:w-[360px] lg:shrink-0 lg:self-start">
+              <div className="lg:sticky lg:top-4 space-y-4">
+                {eventDetailsCard}
+                {participantsCard}
+              </div>
+            </aside>
+          )}
         </div>
 
         <NoteMoreMenu event={event} open={moreMenuOpen} onOpenChange={setMoreMenuOpen} />
