@@ -57,7 +57,7 @@ export function HelpTip({ faqId, iconSize = 'size-4', className }: HelpTipProps)
 
         {/* Link to full FAQ */}
         <Link
-          to="/help"
+          to="/about#faq"
           className="block text-xs text-primary hover:text-primary/80 font-medium transition-colors"
         >
           View all FAQs &rarr;

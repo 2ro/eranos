@@ -18,7 +18,7 @@ import {
   HandHeart,
   HelpCircle,
   Highlighter,
-  LifeBuoy,
+  Info,
   List,
   MessageSquare,
   MessageSquareMore,
@@ -160,7 +160,7 @@ export const SIDEBAR_ITEMS: SidebarItemDef[] = [
   },
   { id: "settings", label: "Settings", path: "/settings", icon: Settings },
   { id: "changelog", label: "Changelog", path: "/changelog", icon: ScrollText },
-  { id: "help", label: "Help", path: "/help", icon: LifeBuoy },
+  { id: "help", label: "About", path: "/about", icon: Info },
   { id: "agent", label: "Agent", path: "/agent", icon: Bot },
   // Content types
   { id: "actions", label: "Pledges", path: "/pledges", icon: Megaphone },
