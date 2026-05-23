@@ -246,11 +246,21 @@ export function AboutPage() {
         </div>
       </section>
 
-      {/* ── 2. How it works, in three steps (light cream) ──────────────── */}
+      {/* ── 2. How it works, in three steps (light cream / dark navy) ──── */}
       <section
         id="how-it-works"
-        className="relative bg-[#faf8f4] py-20 md:py-28 overflow-hidden"
+        className="relative bg-[#faf8f4] dark:bg-[#0a0c14] py-20 md:py-28 overflow-hidden"
       >
+        {/* Subtle world-map texture in dark mode only */}
+        <div
+          aria-hidden
+          className="hidden dark:block absolute inset-0 opacity-[0.06] pointer-events-none"
+          style={{
+            backgroundImage: "url('/about/world-map-bg.png')",
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+          }}
+        />
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <SectionHeader
             eyebrow="How it works"
@@ -284,8 +294,18 @@ export function AboutPage() {
         </div>
       </section>
 
-      {/* ── 3. Two ways to get paid (white) ─────────────────────────────── */}
-      <section className="relative bg-white py-20 md:py-28 overflow-hidden">
+      {/* ── 3. Two ways to get paid (white / dark navy variant) ─────────── */}
+      <section className="relative bg-white dark:bg-[#13181f] py-20 md:py-28 overflow-hidden">
+        {/* Subtle world-map texture in dark mode only */}
+        <div
+          aria-hidden
+          className="hidden dark:block absolute inset-0 opacity-[0.05] pointer-events-none"
+          style={{
+            backgroundImage: "url('/about/world-map-bg.png')",
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+          }}
+        />
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <SectionHeader
             eyebrow="Bitcoin · One QR, two options"
@@ -353,11 +373,11 @@ export function AboutPage() {
                 </p>
               }
               tradeoffBullets={[
-                <strong className="text-gray-800">Few wallets support it.</strong>,
-                <strong className="text-gray-800">Receiving is slow.</strong>,
-                <strong className="text-gray-800">No push notifications.</strong>,
-                <strong className="text-gray-800">Wallets are still buggy.</strong>,
-                <strong className="text-gray-800">
+                <strong className="text-gray-800 dark:text-gray-100">Few wallets support it.</strong>,
+                <strong className="text-gray-800 dark:text-gray-100">Receiving is slow.</strong>,
+                <strong className="text-gray-800 dark:text-gray-100">No push notifications.</strong>,
+                <strong className="text-gray-800 dark:text-gray-100">Wallets are still buggy.</strong>,
+                <strong className="text-gray-800 dark:text-gray-100">
                   Donation counts aren't public.
                 </strong>,
               ]}
@@ -369,16 +389,16 @@ export function AboutPage() {
               question, "how is this actually different from existing
               crowdfunding sites?", by name-checking the failure modes
               of centralized and even other Bitcoin-based options. */}
-          <div className="mt-10 max-w-5xl mx-auto rounded-2xl border border-primary/20 bg-gradient-to-br from-white to-primary/5 p-6 sm:p-8">
+          <div className="mt-10 max-w-5xl mx-auto rounded-2xl border border-primary/20 dark:border-primary/30 bg-gradient-to-br from-white to-primary/5 dark:from-white/[0.04] dark:to-primary/[0.08] p-6 sm:p-8">
             <div className="flex flex-col sm:flex-row items-start gap-5 mb-6">
-              <div className="size-12 shrink-0 rounded-xl bg-primary/10 border border-primary/30 flex items-center justify-center">
+              <div className="size-12 shrink-0 rounded-xl bg-primary/10 dark:bg-primary/20 border border-primary/30 flex items-center justify-center">
                 <ShieldCheck className="size-6 text-primary" />
               </div>
               <div>
-                <h3 className="text-xl sm:text-2xl font-bold tracking-tight text-gray-900 mb-1.5">
+                <h3 className="text-xl sm:text-2xl font-bold tracking-tight text-gray-900 dark:text-white mb-1.5">
                   No custody. No middleman.
                 </h3>
-                <p className="text-gray-600 leading-relaxed text-[15px]">
+                <p className="text-gray-600 dark:text-gray-300 leading-relaxed text-[15px]">
                   {appName} never holds funds. Donations move
                   wallet-to-wallet on Bitcoin. There's no server standing
                   between donor and activist on either option. If {appName}{' '}
@@ -388,7 +408,7 @@ export function AboutPage() {
             </div>
 
             {/* Comparison grid */}
-            <ul className="grid sm:grid-cols-3 gap-5 sm:gap-6 pt-5 border-t border-primary/10">
+            <ul className="grid sm:grid-cols-3 gap-5 sm:gap-6 pt-5 border-t border-primary/10 dark:border-white/10">
               <ComparisonItem
                 heading="Unlike GoFundMe"
                 body="No platform can freeze your donations, demand refunds, or terminate your campaign over policy disagreements."
@@ -406,10 +426,10 @@ export function AboutPage() {
         </div>
       </section>
 
-      {/* ── 4. Need help? FAQ (cream, integrated as three chapters) ───── */}
+      {/* ── 4. Need help? FAQ (cream / dark navy, integrated as three chapters) ───── */}
       <section
         id="faq"
-        className="bg-[#f5f1eb] py-20 md:py-28 scroll-mt-16"
+        className="bg-[#f5f1eb] dark:bg-[#0a0c14] py-20 md:py-28 scroll-mt-16"
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <SectionHeader
@@ -432,8 +452,8 @@ export function AboutPage() {
         </div>
       </section>
 
-      {/* ── 5. Pick the side you're on (white) ──────────────────────────── */}
-      <section className="bg-white py-20 md:py-28">
+      {/* ── 5. Pick the side you're on (white / dark navy variant) ────────── */}
+      <section className="bg-white dark:bg-[#13181f] py-20 md:py-28">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <SectionHeader
             eyebrow="Guides"
@@ -554,10 +574,10 @@ function FAQChapter({ number, title, description, categoryId }: FAQChapterProps)
           {number}
         </span>
         <div>
-          <h3 className="text-xl sm:text-2xl font-bold tracking-tight text-gray-900 leading-snug">
+          <h3 className="text-xl sm:text-2xl font-bold tracking-tight text-gray-900 dark:text-white leading-snug">
             {title}
           </h3>
-          <p className="text-sm sm:text-base text-gray-600 mt-1 leading-relaxed">
+          <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400 mt-1 leading-relaxed">
             {description}
           </p>
         </div>
@@ -592,7 +612,9 @@ function ComparisonItem({ heading, body, theme = 'light' }: ComparisonItemProps)
       <p
         className={cn(
           'text-sm leading-relaxed',
-          theme === 'dark' ? 'text-gray-300' : 'text-gray-600',
+          theme === 'dark'
+            ? 'text-gray-300'
+            : 'text-gray-600 dark:text-gray-300',
         )}
       >
         {body}
@@ -624,7 +646,9 @@ function SectionHeader({
       <h2
         className={cn(
           'text-2xl sm:text-3xl font-bold tracking-tight mb-4',
-          theme === 'dark' ? 'text-white' : 'text-gray-900',
+          theme === 'dark'
+            ? 'text-white'
+            : 'text-gray-900 dark:text-white',
         )}
       >
         {title}
@@ -633,7 +657,9 @@ function SectionHeader({
         <p
           className={cn(
             'text-base sm:text-lg leading-relaxed',
-            theme === 'dark' ? 'text-gray-400' : 'text-gray-600',
+            theme === 'dark'
+              ? 'text-gray-400'
+              : 'text-gray-600 dark:text-gray-400',
           )}
         >
           {lede}
@@ -653,7 +679,7 @@ interface StepCardProps {
 
 function StepCard({ number, image, imageAlt, title, body }: StepCardProps) {
   return (
-    <div className="relative bg-white rounded-2xl overflow-hidden border border-gray-200 shadow-sm transition-all duration-300 motion-safe:hover:-translate-y-1 hover:shadow-md">
+    <div className="relative bg-white dark:bg-[#1c2230] rounded-2xl overflow-hidden border border-gray-200 dark:border-white/10 shadow-sm transition-all duration-300 motion-safe:hover:-translate-y-1 hover:shadow-md dark:hover:shadow-[0_8px_24px_rgba(0,0,0,0.4)]">
       <div className="aspect-[4/3] bg-[#0a0c14] relative overflow-hidden">
         <img
           src={image}
@@ -669,10 +695,10 @@ function StepCard({ number, image, imageAlt, title, body }: StepCardProps) {
         </div>
       </div>
       <div className="p-6 sm:p-7">
-        <h3 className="text-xl font-bold tracking-tight text-gray-900 mb-3 leading-snug">
+        <h3 className="text-xl font-bold tracking-tight text-gray-900 dark:text-white mb-3 leading-snug">
           {title}
         </h3>
-        <p className="text-gray-600 leading-relaxed text-[15px]">{body}</p>
+        <p className="text-gray-600 dark:text-gray-300 leading-relaxed text-[15px]">{body}</p>
       </div>
     </div>
   );
@@ -716,7 +742,7 @@ function RailCard({
     accent === 'orange' ? 'text-emerald-600' : 'text-indigo-600';
 
   return (
-    <div className="rounded-2xl border border-gray-200 bg-white shadow-sm overflow-hidden flex flex-col">
+    <div className="rounded-2xl border border-gray-200 dark:border-white/10 bg-white dark:bg-[#1c2230] shadow-sm overflow-hidden flex flex-col">
       {/* Gradient header strip */}
       <div className={cn('bg-gradient-to-r px-6 py-5 text-white', headerGradient)}>
         <div className="flex items-center gap-2 mb-1">
@@ -731,10 +757,10 @@ function RailCard({
       {/* Body */}
       <div className="p-6 space-y-5 flex-1 flex flex-col">
         <div>
-          <h3 className="text-xl sm:text-2xl font-bold tracking-tight text-gray-900 mb-2 leading-snug">
+          <h3 className="text-xl sm:text-2xl font-bold tracking-tight text-gray-900 dark:text-white mb-2 leading-snug">
             {title}
           </h3>
-          <p className="text-gray-600 leading-relaxed text-[15px]">
+          <p className="text-gray-600 dark:text-gray-300 leading-relaxed text-[15px]">
             {description}
           </p>
         </div>
@@ -743,24 +769,24 @@ function RailCard({
           {bullets.map((b, i) => (
             <li key={i} className="flex items-start gap-2.5">
               <CircleCheck className={cn('size-4 shrink-0 mt-0.5', checkColor)} />
-              <span className="text-gray-700 text-sm leading-snug">{b}</span>
+              <span className="text-gray-700 dark:text-gray-300 text-sm leading-snug">{b}</span>
             </li>
           ))}
         </ul>
 
         {/* Trade-off block */}
-        <div className="mt-auto pt-5 border-t border-gray-100">
+        <div className="mt-auto pt-5 border-t border-gray-100 dark:border-white/10">
           <div className="flex items-center gap-2 mb-2">
             {tradeoffEmphasized ? (
-              <AlertTriangle className="size-4 text-amber-600" />
+              <AlertTriangle className="size-4 text-amber-600 dark:text-amber-400" />
             ) : (
               <span aria-hidden className="size-2 rounded-full bg-amber-500" />
             )}
-            <span className="text-xs font-bold uppercase tracking-widest text-amber-700">
+            <span className="text-xs font-bold uppercase tracking-widest text-amber-700 dark:text-amber-400">
               {tradeoffTitle}
             </span>
           </div>
-          <div className="text-sm text-gray-600 leading-relaxed space-y-2.5">
+          <div className="text-sm text-gray-600 dark:text-gray-300 leading-relaxed space-y-2.5">
             {tradeoffIntro}
             {tradeoffBullets && tradeoffBullets.length > 0 && (
               <ul className="space-y-2 pt-1">
@@ -815,10 +841,10 @@ function GuideCard({
   return (
     <Link
       to={to}
-      className="group rounded-2xl border border-gray-200 bg-white shadow-sm overflow-hidden flex flex-col transition-all duration-300 motion-safe:hover:-translate-y-1 hover:shadow-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
+      className="group rounded-2xl border border-gray-200 dark:border-white/10 bg-white dark:bg-[#1c2230] shadow-sm overflow-hidden flex flex-col transition-all duration-300 motion-safe:hover:-translate-y-1 hover:shadow-xl dark:hover:shadow-[0_8px_24px_rgba(0,0,0,0.4)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
     >
       {/* Image header */}
-      <div className="aspect-[16/9] bg-gray-100 relative overflow-hidden">
+      <div className="aspect-[16/9] bg-gray-100 dark:bg-[#0a0c14] relative overflow-hidden">
         <img
           src={image}
           alt={imageAlt}
@@ -843,15 +869,15 @@ function GuideCard({
 
       {/* Body */}
       <div className="p-7 sm:p-8 flex flex-col flex-1">
-        <h3 className="text-xl font-bold tracking-tight text-gray-900 mb-2 leading-snug">
+        <h3 className="text-xl font-bold tracking-tight text-gray-900 dark:text-white mb-2 leading-snug">
           {title}
         </h3>
-        <p className="text-gray-600 mb-5 leading-relaxed">{description}</p>
+        <p className="text-gray-600 dark:text-gray-300 mb-5 leading-relaxed">{description}</p>
         <ul className="space-y-2.5 mb-7">
           {bullets.map((b, i) => (
             <li key={i} className="flex items-start gap-2.5">
               <CircleCheck className={cn('size-4 shrink-0 mt-0.5', accentText)} />
-              <span className="text-gray-700 text-sm leading-snug">{b}</span>
+              <span className="text-gray-700 dark:text-gray-300 text-sm leading-snug">{b}</span>
             </li>
           ))}
         </ul>

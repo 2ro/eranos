@@ -9,6 +9,12 @@ export default {
 		"./app/**/*.{ts,tsx}",
 		"./src/**/*.{ts,tsx}",
 	],
+	// Drive `dark:` variants from the `.dark` class on <html>, which
+	// useTheme writes when the user picks a dark theme inside the app.
+	// Without this, Tailwind defaults to `media` and `dark:` utilities
+	// only fire from the OS `prefers-color-scheme` — which means the
+	// in-app theme toggle has no effect on `dark:` rules.
+	darkMode: 'class',
 	prefix: "",
 	theme: {
 		container: {

@@ -136,7 +136,7 @@ export function HelpFAQSection({
                     'rounded-full px-4 py-2 text-sm font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50',
                     active
                       ? 'bg-primary text-primary-foreground shadow-sm'
-                      : 'bg-white text-gray-700 border border-gray-200 hover:border-gray-300 hover:bg-gray-50',
+                      : 'bg-white dark:bg-[#1c2230] text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-white/10 hover:border-gray-300 dark:hover:border-white/20 hover:bg-gray-50 dark:hover:bg-[#252b3a]',
                   )}
                   aria-pressed={active}
                 >
@@ -220,17 +220,17 @@ function FAQAccordionItem({
     return (
       <AccordionItem
         value={item.id}
-        className="group relative border-b-0 rounded-lg bg-white border border-gray-200 shadow-sm mb-3 overflow-hidden transition-colors hover:border-primary/40 data-[state=open]:border-primary/50 data-[state=open]:shadow-md"
+        className="group relative border-b-0 rounded-lg bg-white dark:bg-[#1c2230] border border-gray-200 dark:border-white/10 shadow-sm mb-3 overflow-hidden transition-colors hover:border-primary/40 data-[state=open]:border-primary/50 data-[state=open]:shadow-md"
       >
         {/* Left accent rule: orange when open, transparent otherwise */}
         <span
           aria-hidden
           className="absolute left-0 top-0 bottom-0 w-1 bg-transparent group-hover:bg-primary/30 group-data-[state=open]:bg-primary transition-colors"
         />
-        <AccordionTrigger className="text-left text-base sm:text-lg font-bold tracking-tight leading-snug hover:no-underline gap-3 px-5 sm:px-6 py-5">
+        <AccordionTrigger className="text-left text-base sm:text-lg font-bold tracking-tight leading-snug hover:no-underline gap-3 px-5 sm:px-6 py-5 text-gray-900 dark:text-white">
           {item.question}
         </AccordionTrigger>
-        <AccordionContent className="text-[15px] leading-relaxed text-gray-600 space-y-3 px-5 sm:px-6 pb-5 -mt-1">
+        <AccordionContent className="text-[15px] leading-relaxed text-gray-600 dark:text-gray-300 space-y-3 px-5 sm:px-6 pb-5 -mt-1">
           {item.answer.map((paragraph, i) => (
             <p key={i}>{renderInlineMarkup(paragraph)}</p>
           ))}
@@ -260,13 +260,13 @@ function FAQAccordionItem({
  */
 function FAQCard({ item }: { item: FAQItem }) {
   return (
-    <div className="mb-6 break-inside-avoid rounded-2xl border border-gray-200 bg-white shadow-sm">
+    <div className="mb-6 break-inside-avoid rounded-2xl border border-gray-200 dark:border-white/10 bg-white dark:bg-[#1c2230] shadow-sm">
       <Accordion type="single" collapsible>
         <AccordionItem value={item.id} className="border-b-0">
-          <AccordionTrigger className="text-left font-display font-semibold text-gray-900 text-lg leading-snug hover:no-underline px-5 py-4 gap-3">
+          <AccordionTrigger className="text-left font-display font-semibold text-gray-900 dark:text-white text-lg leading-snug hover:no-underline px-5 py-4 gap-3">
             {item.question}
           </AccordionTrigger>
-          <AccordionContent className="text-[15px] leading-relaxed text-gray-600 space-y-3 px-5 pb-5">
+          <AccordionContent className="text-[15px] leading-relaxed text-gray-600 dark:text-gray-300 space-y-3 px-5 pb-5">
             {item.answer.map((paragraph, i) => (
               <p key={i}>{renderInlineMarkup(paragraph)}</p>
             ))}
