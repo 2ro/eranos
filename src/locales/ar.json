@@ -20,6 +20,26 @@
     "goBack": "العودة",
     "tryAgain": "يرجى المحاولة مرة أخرى."
   },
+  "nav": {
+    "openMenu": "فتح القائمة",
+    "closeMenu": "إغلاق القائمة",
+    "brandHome": "الصفحة الرئيسية لـ {{appName}}",
+    "activity": "النشاط",
+    "campaigns": "الحملات",
+    "groups": "المجموعات",
+    "pledge": "التعهدات",
+    "search": "بحث",
+    "dashboard": "لوحة التحكم",
+    "wallet": "المحفظة",
+    "notifications": "الإشعارات",
+    "profile": "الملف الشخصي",
+    "settings": "الإعدادات",
+    "about": "حول",
+    "privacy": "الخصوصية",
+    "safety": "السلامة",
+    "changelog": "سجل التغييرات",
+    "footerTagline": "© {{year}} {{appName}}. حملات تمويل على Nostr."
+  },
   "settings": {
     "title": "الإعدادات",
     "description": "إدارة إعدادات {{appName}} الخاصة بك",

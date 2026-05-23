@@ -20,6 +20,26 @@
     "goBack": "Volver",
     "tryAgain": "Por favor, inténtalo de nuevo."
   },
+  "nav": {
+    "openMenu": "Abrir menú",
+    "closeMenu": "Cerrar menú",
+    "brandHome": "Inicio de {{appName}}",
+    "activity": "Actividad",
+    "campaigns": "Campañas",
+    "groups": "Grupos",
+    "pledge": "Promesas",
+    "search": "Buscar",
+    "dashboard": "Panel",
+    "wallet": "Cartera",
+    "notifications": "Notificaciones",
+    "profile": "Perfil",
+    "settings": "Ajustes",
+    "about": "Acerca de",
+    "privacy": "Privacidad",
+    "safety": "Seguridad",
+    "changelog": "Novedades",
+    "footerTagline": "© {{year}} {{appName}}. Recaudaciones en Nostr."
+  },
   "settings": {
     "title": "Ajustes",
     "description": "Administra tus ajustes de {{appName}}",

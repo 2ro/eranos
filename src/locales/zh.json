@@ -20,6 +20,26 @@
     "goBack": "返回",
     "tryAgain": "请重试。"
   },
+  "nav": {
+    "openMenu": "打开菜单",
+    "closeMenu": "关闭菜单",
+    "brandHome": "{{appName}} 首页",
+    "activity": "动态",
+    "campaigns": "活动",
+    "groups": "群组",
+    "pledge": "承诺",
+    "search": "搜索",
+    "dashboard": "仪表板",
+    "wallet": "钱包",
+    "notifications": "通知",
+    "profile": "个人资料",
+    "settings": "设置",
+    "about": "关于",
+    "privacy": "隐私",
+    "safety": "安全",
+    "changelog": "更新日志",
+    "footerTagline": "© {{year}} {{appName}}。Nostr 上的众筹活动。"
+  },
   "settings": {
     "title": "设置",
     "description": "管理你的 {{appName}} 设置",

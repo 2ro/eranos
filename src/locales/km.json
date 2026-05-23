@@ -20,6 +20,26 @@
     "goBack": "ត្រឡប់ក្រោយ",
     "tryAgain": "សូមព្យាយាមម្តងទៀត។"
   },
+  "nav": {
+    "openMenu": "បើកម៉ឺនុយ",
+    "closeMenu": "បិទម៉ឺនុយ",
+    "brandHome": "ទំព័រដើម {{appName}}",
+    "activity": "សកម្មភាព",
+    "campaigns": "យុទ្ធនាការ",
+    "groups": "ក្រុម",
+    "pledge": "ការសន្យា",
+    "search": "ស្វែងរក",
+    "dashboard": "ផ្ទាំងគ្រប់គ្រង",
+    "wallet": "កាបូប",
+    "notifications": "ការជូនដំណឹង",
+    "profile": "ប្រវត្តិរូប",
+    "settings": "ការកំណត់",
+    "about": "អំពី",
+    "privacy": "ភាពឯកជន",
+    "safety": "សុវត្ថិភាព",
+    "changelog": "កំណត់ហេតុការផ្លាស់ប្តូរ",
+    "footerTagline": "© {{year}} {{appName}}។ ការប្រមូលមូលនិធិលើ Nostr។"
+  },
   "settings": {
     "title": "ការកំណត់",
     "description": "គ្រប់គ្រងការកំណត់ {{appName}} របស់អ្នក",

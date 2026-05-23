@@ -20,6 +20,26 @@
     "goBack": "Go back",
     "tryAgain": "Please try again."
   },
+  "nav": {
+    "openMenu": "Open menu",
+    "closeMenu": "Close menu",
+    "brandHome": "{{appName}} home",
+    "activity": "Activity",
+    "campaigns": "Campaigns",
+    "groups": "Groups",
+    "pledge": "Pledge",
+    "search": "Search",
+    "dashboard": "Dashboard",
+    "wallet": "Wallet",
+    "notifications": "Notifications",
+    "profile": "Profile",
+    "settings": "Settings",
+    "about": "About",
+    "privacy": "Privacy",
+    "safety": "Safety",
+    "changelog": "Changelog",
+    "footerTagline": "© {{year}} {{appName}}. Fundraisers on Nostr."
+  },
   "settings": {
     "title": "Settings",
     "description": "Manage your {{appName}} settings",

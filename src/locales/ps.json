@@ -20,6 +20,26 @@
     "goBack": "بېرته تلل",
     "tryAgain": "مهرباني وکړئ بیا هڅه وکړئ."
   },
+  "nav": {
+    "openMenu": "د مینو پرانیستل",
+    "closeMenu": "د مینو تړل",
+    "brandHome": "د {{appName}} کور پاڼه",
+    "activity": "فعالیت",
+    "campaigns": "کمپاینونه",
+    "groups": "ډلې",
+    "pledge": "ژمنې",
+    "search": "لټون",
+    "dashboard": "ډیشبورډ",
+    "wallet": "بټوه",
+    "notifications": "خبرتیاوې",
+    "profile": "پروفایل",
+    "settings": "تنظیمات",
+    "about": "په اړه",
+    "privacy": "محرمیت",
+    "safety": "خوندیتوب",
+    "changelog": "د بدلونونو لاګ",
+    "footerTagline": "© {{year}} {{appName}}. د Nostr پر سر د مرستو راټولولو کمپاینونه."
+  },
   "settings": {
     "title": "تنظیمات",
     "description": "د {{appName}} تنظیماتو اداره کول",

@@ -20,6 +20,26 @@
     "goBack": "بازگشت",
     "tryAgain": "لطفاً دوباره تلاش کنید."
   },
+  "nav": {
+    "openMenu": "باز کردن منو",
+    "closeMenu": "بستن منو",
+    "brandHome": "صفحه اصلی {{appName}}",
+    "activity": "فعالیت",
+    "campaigns": "کمپین‌ها",
+    "groups": "گروه‌ها",
+    "pledge": "تعهدها",
+    "search": "جستجو",
+    "dashboard": "داشبورد",
+    "wallet": "کیف پول",
+    "notifications": "اعلان‌ها",
+    "profile": "نمایه",
+    "settings": "تنظیمات",
+    "about": "درباره",
+    "privacy": "حریم خصوصی",
+    "safety": "ایمنی",
+    "changelog": "تغییرات",
+    "footerTagline": "© {{year}} {{appName}}. کمپین‌های جذب کمک مالی روی Nostr."
+  },
   "settings": {
     "title": "تنظیمات",
     "description": "مدیریت تنظیمات {{appName}} شما",

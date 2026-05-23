@@ -20,6 +20,26 @@
     "goBack": "Dzokera",
     "tryAgain": "Ndapota edza zvakare."
   },
+  "nav": {
+    "openMenu": "Vhura menu",
+    "closeMenu": "Vhara menu",
+    "brandHome": "Kumba kwe{{appName}}",
+    "activity": "Zviitiko",
+    "campaigns": "Mishandirapamwe",
+    "groups": "Mapoka",
+    "pledge": "Zvivimbiso",
+    "search": "Tsvaga",
+    "dashboard": "Dashboard",
+    "wallet": "Chikwama",
+    "notifications": "Zviziviso",
+    "profile": "Profile",
+    "settings": "Marongero",
+    "about": "Nezve",
+    "privacy": "Akavanzika",
+    "safety": "Kuchengetedzeka",
+    "changelog": "Rondedzero yeshanduko",
+    "footerTagline": "© {{year}} {{appName}}. Mishandirapamwe yekuunganidza mari paNostr."
+  },
   "settings": {
     "title": "Marongero",
     "description": "Tarisira marongero ako e{{appName}}",
