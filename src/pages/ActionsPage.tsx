@@ -9,6 +9,7 @@ import { useAuthor } from '@/hooks/useAuthor';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useBtcPrice } from '@/hooks/useBtcPrice';
 import { useNostrPublish } from '@/hooks/useNostrPublish';
+import { useShareOrigin } from '@/hooks/useShareOrigin';
 import { useToast } from '@/hooks/useToast';
 import { getAllCountries, getGeoDisplayName, countryCodeToFlag } from '@/lib/countries';
 import { getDisplayName } from '@/lib/genUserName';
@@ -63,6 +64,7 @@ function ActionShareMenu({ action }: { action: Action }) {
   const { user } = useCurrentUser();
   const { mutateAsync: createEvent } = useNostrPublish();
   const { toast } = useToast();
+  const shareOrigin = useShareOrigin();
   const queryClient = useQueryClient();
   const [copied, setCopied] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -75,7 +77,7 @@ function ActionShareMenu({ action }: { action: Action }) {
     identifier: action.id,
   });
 
-  const actionUrl = `${window.location.origin}/${naddr}`;
+  const actionUrl = `${shareOrigin}/${naddr}`;
 
   const handleCopyLink = async () => {
     try {

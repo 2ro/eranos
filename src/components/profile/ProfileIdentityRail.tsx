@@ -894,7 +894,7 @@ function RailOrganizationsSection({ pubkey }: { pubkey: string }) {
   if (isLoading && orgs.length === 0) {
     return (
       <section className="space-y-3">
-        <RailSectionHeader icon={<Users className="size-4 text-primary" />} title="Organizations" />
+        <RailSectionHeader icon={<Users className="size-4 text-primary" />} title="Groups" />
         <div className="grid grid-cols-2 gap-3">
           {Array.from({ length: 2 }).map((_, i) => (
             <CommunityMiniCardSkeleton key={i} className="w-full" />
@@ -913,7 +913,7 @@ function RailOrganizationsSection({ pubkey }: { pubkey: string }) {
     <section className="space-y-3">
       <RailSectionHeader
         icon={<Users className="size-4 text-primary" />}
-        title="Organizations"
+        title="Groups"
         count={orgs.length}
       />
       <div className="grid grid-cols-2 gap-3">

@@ -15,6 +15,7 @@ import { useAuthor } from '@/hooks/useAuthor';
 import { useAuthors } from '@/hooks/useAuthors';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useFollowList, useFollowActions } from '@/hooks/useFollowActions';
+import { useShareOrigin } from '@/hooks/useShareOrigin';
 import { useStreamPosts } from '@/hooks/useStreamPosts';
 import { useMuteList } from '@/hooks/useMuteList';
 import { isEventMuted } from '@/lib/muteHelpers';
@@ -137,6 +138,7 @@ export function PackMembersTab({
 export function FollowPackDetailContent({ event }: { event: NostrEvent }) {
   const { toast } = useToast();
   const { user } = useCurrentUser();
+  const shareOrigin = useShareOrigin();
   const { data: followList } = useFollowList();
   const { followMany } = useFollowActions();
 
@@ -194,11 +196,11 @@ export function FollowPackDetailContent({ event }: { event: NostrEvent }) {
   const handleCopyLink = useCallback(() => {
     const dTag = event.tags.find(([n]) => n === 'd')?.[1] ?? '';
     const naddr = nip19.naddrEncode({ kind: event.kind, pubkey: event.pubkey, identifier: dTag });
-    navigator.clipboard.writeText(`${window.location.origin}/${naddr}`);
+    navigator.clipboard.writeText(`${shareOrigin}/${naddr}`);
     setCopied(true);
     toast({ title: 'Link copied!' });
     setTimeout(() => setCopied(false), 2000);
-  }, [event, toast]);
+  }, [event, shareOrigin, toast]);
 
   return (
     <>

@@ -33,6 +33,7 @@ import {
   PodcastTrailerContent,
 } from "@/components/AudioKindContent";
 import { ActionContent } from "@/components/ActionContent";
+import { BadgeAwardCard } from "@/components/BadgeAwardCard";
 import { BadgeContent } from "@/components/BadgeContent";
 import { CampaignNoteCardContent } from "@/components/CampaignNoteCardContent";
 import { CommunityContent } from "@/components/CommunityContent";
@@ -89,6 +90,7 @@ import { useAuthor } from "@/hooks/useAuthor";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { useOpenPost } from "@/hooks/useOpenPost";
 import { useProfileUrl } from "@/hooks/useProfileUrl";
+import { useShareOrigin } from "@/hooks/useShareOrigin";
 import { toast } from "@/hooks/useToast";
 import { useEventStats } from "@/hooks/useTrending";
 import { canZap } from "@/lib/canZap";
@@ -381,6 +383,7 @@ export const NoteCard = memo(function NoteCard({
   const actionTarget = actionEvent ?? event;
   const { config } = useAppContext();
   const { user } = useCurrentUser();
+  const shareOrigin = useShareOrigin();
   const author = useAuthor(event.pubkey);
   const actionAuthor = useAuthor(actionEvent?.pubkey);
   // Kind 9735 (Lightning zap) sender lives in the receipt's `P` tag / embedded
@@ -465,7 +468,8 @@ export const NoteCard = memo(function NoteCard({
   const isEmojiPack = event.kind === 30030;
   const isBadgeDefinition = event.kind === 30009;
   const isProfileBadges = event.kind === 10008 || event.kind === 30008;
-  const isBadge = isBadgeDefinition || isProfileBadges;
+  const isBadgeAward = event.kind === 8;
+  const isBadge = isBadgeDefinition || isProfileBadges || isBadgeAward;
   const isCommunity = event.kind === 34550;
   const isZapGoal = event.kind === 9041;
   const isAction = event.kind === 36639;
@@ -672,6 +676,8 @@ export const NoteCard = memo(function NoteCard({
           <BadgeContent event={event} />
         ) : isProfileBadges ? (
           <ProfileBadgesContent event={event} />
+        ) : isBadgeAward ? (
+          <BadgeAwardCard event={event} />
         ) : isCommunity ? (
           <CommunityContent event={event} />
         ) : isZapGoal ? (
@@ -878,7 +884,7 @@ export const NoteCard = memo(function NoteCard({
         onClick={async (e) => {
           e.stopPropagation();
           impactLight();
-          const url = `${window.location.origin}/${encodedId}`;
+          const url = `${shareOrigin}/${encodedId}`;
           const result = await shareOrCopy(url);
           if (result === "copied") toast({ title: "Link copied to clipboard" });
         }}
@@ -1794,15 +1800,21 @@ const KIND_HEADER_MAP: Record<number, KindHeaderConfig> = {
   },
   34550: {
     icon: Users,
-    action: (event) => publishedAtAction(event, { created: "created an", updated: "updated an", fallback: "shared an" }),
-    noun: "organization",
-    nounRoute: "/communities",
+    action: (event) => publishedAtAction(event, { created: "created a", updated: "updated a", fallback: "shared a" }),
+    noun: "group",
+    nounRoute: "/groups",
   },
   33863: {
     icon: HandHeart,
     action: (event) => publishedAtAction(event, { created: "launched a", updated: "updated a", fallback: "shared a" }),
     noun: "campaign",
     nounRoute: "/campaigns/all",
+  },
+  8: {
+    icon: Award,
+    action: "awarded a",
+    noun: "badge",
+    nounRoute: "/badges",
   },
   30009: {
     icon: Award,

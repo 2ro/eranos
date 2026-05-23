@@ -19,9 +19,10 @@ import { Capacitor } from '@capacitor/core';
 import { SavePassword } from '@capgo/capacitor-autofill-save-password';
 
 import { downloadTextFile } from '@/lib/downloadFile';
+import { AGORA_HOST } from '@/lib/appUrls';
 
 /** The domain used for Shared Web Credentials on iOS. */
-const CREDENTIAL_DOMAIN = 'agora.spot';
+const CREDENTIAL_DOMAIN = AGORA_HOST;
 
 /** Whether the browser supports PasswordCredential (Chromium-only). */
 export function supportsPasswordCredential(): boolean {

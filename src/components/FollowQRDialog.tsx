@@ -1,15 +1,14 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { nip19 } from 'nostr-tools';
-import QRCode from 'qrcode';
 import { Copy, Check } from 'lucide-react';
 
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
+import { QRCodeCanvas } from '@/components/ui/qrcode';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useAuthor } from '@/hooks/useAuthor';
 import { useShareOrigin } from '@/hooks/useShareOrigin';
 import { genUserName } from '@/lib/genUserName';
-import { getThemedQRColors } from '@/lib/qrColors';
 
 interface FollowQRDialogProps {
   open: boolean;
@@ -20,29 +19,15 @@ export function FollowQRDialog({ open, onOpenChange }: FollowQRDialogProps) {
   const { user } = useCurrentUser();
   const author = useAuthor(user?.pubkey ?? '');
   const shareOrigin = useShareOrigin();
-  const [qrDataUrl, setQrDataUrl] = useState<string>('');
   const [copied, setCopied] = useState(false);
 
   const metadata = author.data?.metadata;
   const displayName = user ? metadata?.name || metadata?.display_name || genUserName(user.pubkey) : '';
 
   const npub = user ? nip19.npubEncode(user.pubkey) : '';
-  const followUrl = npub ? `${shareOrigin}/follow/${npub}` : '';
-
-  useEffect(() => {
-    if (!followUrl || !open) return;
-
-    const { dark, light } = getThemedQRColors();
-
-    QRCode.toDataURL(followUrl, {
-      width: 400,
-      margin: 2,
-      color: { dark, light },
-      errorCorrectionLevel: 'M',
-    })
-      .then(setQrDataUrl)
-      .catch(console.error);
-  }, [followUrl, open]);
+  const nip05 = metadata?.nip05?.trim();
+  const followIdentifier = nip05 || npub;
+  const followUrl = followIdentifier ? `${shareOrigin}/follow/${followIdentifier}` : '';
 
   const handleCopy = async () => {
     try {
@@ -75,16 +60,24 @@ export function FollowQRDialog({ open, onOpenChange }: FollowQRDialogProps) {
         </div>
 
         {/* QR code */}
-        {qrDataUrl ? (
-          <img
-            src={qrDataUrl}
-            alt="Follow QR code"
-            className="w-full rounded-xl border border-border"
-            style={{ imageRendering: 'pixelated' }}
-          />
-        ) : (
-          <div className="w-full aspect-square rounded-xl border border-border bg-muted animate-pulse" />
-        )}
+        <div className="flex justify-center">
+          <div className="relative rounded-2xl bg-white p-4 shadow-sm">
+            <QRCodeCanvas value={followUrl} size={280} level="H" />
+            <div
+              aria-hidden
+              className="absolute inset-0 flex items-center justify-center pointer-events-none"
+            >
+              <div className="rounded-full bg-primary p-2 ring-[6px] ring-white">
+                <img
+                  src="/logo.svg"
+                  alt=""
+                  className="size-16 object-contain brightness-0 invert"
+                  draggable={false}
+                />
+              </div>
+            </div>
+          </div>
+        </div>
 
         {/* Copy link */}
         <button

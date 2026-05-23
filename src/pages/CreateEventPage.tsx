@@ -6,6 +6,7 @@ import { nip19 } from 'nostr-tools';
 import { AlertTriangle, ArrowLeft, CalendarDays, Clock, Loader2, Plus } from 'lucide-react';
 
 import { CoverImageField } from '@/components/CoverImageField';
+import { CountrySelect } from '@/components/CountrySelect';
 import { FormSection } from '@/components/FormSection';
 import { OrganizationContextChip } from '@/components/OrganizationContextChip';
 import { TimezoneSwitcher } from '@/components/TimezoneSwitcher';
@@ -23,10 +24,13 @@ import { useNostrPublish } from '@/hooks/useNostrPublish';
 import { usePublishRSVP } from '@/hooks/usePublishRSVP';
 import { useToast } from '@/hooks/useToast';
 import { getTodayDateInput } from '@/lib/dateInput';
+import { COUNTRIES } from '@/lib/countries';
+import { createCountryIdentifier } from '@/lib/countryIdentifiers';
 import { createOrganizationAssociationTags, decodeOrganizationParam } from '@/lib/organizationContext';
 import { sanitizeUrl } from '@/lib/sanitizeUrl';
 import { unixSecondsInTimezone } from '@/lib/timezone';
 import { withAgoraTag } from '@/lib/agoraNoteTags';
+import { parseContentTagInput } from '@/lib/contentTags';
 
 function slugify(text: string): string {
   return text
@@ -59,6 +63,8 @@ export function CreateEventPage() {
     [],
   );
   const minStartDate = useMemo(() => getTodayDateInput(), []);
+  const pageCountryCode = (searchParams.get('country') || '').toUpperCase();
+  const initialCountryCode = COUNTRIES[pageCountryCode] ? pageCountryCode : '';
 
   const orgParam = searchParams.get('org');
   const orgFromParam = useMemo(() => decodeOrganizationParam(orgParam), [orgParam]);
@@ -78,7 +84,10 @@ export function CreateEventPage() {
   const [startTime, setStartTime] = useState('');
   const [endDate, setEndDate] = useState('');
   const [endTime, setEndTime] = useState('');
+  const [countryCode, setCountryCode] = useState(initialCountryCode);
+  const [countryQuery, setCountryQuery] = useState(initialCountryCode ? COUNTRIES[initialCountryCode].name : '');
   const [location, setLocation] = useState('');
+  const [tagInput, setTagInput] = useState('');
   const [timezone, setTimezone] = useState(browserTimezone);
   const [formError, setFormError] = useState('');
 
@@ -96,6 +105,7 @@ export function CreateEventPage() {
       const trimmedTitle = title.trim();
       const trimmedDescription = description.trim();
       const trimmedLocation = location.trim();
+      const contentTags = parseContentTagInput(tagInput);
 
       if (!trimmedTitle) throw new Error('Title is required.');
       if (!startDate) throw new Error('Start date is required.');
@@ -107,7 +117,7 @@ export function CreateEventPage() {
       const tags: string[][] = [
         ['d', dTag],
         ['title', trimmedTitle],
-        ['alt', `${organizationATag ? 'Organization event' : 'Calendar event'}: ${trimmedTitle}`],
+        ['alt', `${organizationATag ? 'Group event' : 'Calendar event'}: ${trimmedTitle}`],
       ];
 
       if (organizationATag) {
@@ -121,6 +131,12 @@ export function CreateEventPage() {
       if (trimmedLocation) {
         tags.push(['location', trimmedLocation]);
       }
+
+      if (countryCode) {
+        tags.push(['i', createCountryIdentifier(countryCode)]);
+      }
+
+      for (const tag of contentTags) tags.push(['t', tag]);
 
       const trimmedCoverImage = coverImage.trim();
       const sanitizedImage = trimmedCoverImage ? sanitizeUrl(trimmedCoverImage) : undefined;
@@ -398,11 +414,43 @@ export function CreateEventPage() {
             )}
           </FormSection>
 
-          <FormSection title="Location" requirement="Recommended">
+          <FormSection title="Country" requirement="Recommended">
+            <CountrySelect
+              id="event-country"
+              query={countryQuery}
+              selectedCode={countryCode}
+              onQueryChange={(value) => {
+                setCountryQuery(value);
+                const selectedCountry = countryCode ? COUNTRIES[countryCode] : undefined;
+                if (selectedCountry && value !== selectedCountry.name && value.toUpperCase() !== countryCode) {
+                  setCountryCode('');
+                }
+              }}
+              onSelect={(country) => {
+                setCountryCode(country.code);
+                setCountryQuery(country.name);
+              }}
+              onClear={() => {
+                setCountryCode('');
+                setCountryQuery('');
+              }}
+            />
+          </FormSection>
+
+          <FormSection title="Location details" requirement="Recommended">
             <Input
               placeholder="Address, venue, or video call link"
               value={location}
               onChange={(e) => setLocation(e.target.value)}
+            />
+          </FormSection>
+
+          <FormSection title="Tags" requirement="Recommended">
+            <Input
+              id="event-tags"
+              value={tagInput}
+              onChange={(e) => setTagInput(e.target.value)}
+              placeholder="mutual-aid, workshop, local-news"
             />
           </FormSection>
         </div>

@@ -53,6 +53,7 @@ import { createOrganizationAssociationTags, decodeOrganizationParam } from '@/li
 import { sanitizeUrl } from '@/lib/sanitizeUrl';
 import { withAgoraTag } from '@/lib/agoraNoteTags';
 import { COUNTRIES, searchCountries, type CountryEntry } from '@/lib/countries';
+import { getEditableContentTags, parseContentTagInput } from '@/lib/contentTags';
 import { createCountryIdentifier } from '@/lib/countryIdentifiers';
 import { cn } from '@/lib/utils';
 
@@ -160,6 +161,7 @@ export function CreateCampaignPage() {
   const [deadline, setDeadline] = useState('');
   const [countryQuery, setCountryQuery] = useState('');
   const [countryCode, setCountryCode] = useState('');
+  const [tagInput, setTagInput] = useState('');
   const [organizationATag, setOrganizationATag] = useState('');
   const [formError, setFormError] = useState('');
   const [prepopulatedEventId, setPrepopulatedEventId] = useState<string | null>(null);
@@ -276,6 +278,7 @@ export function CreateCampaignPage() {
     const editCountryCode = editCampaign.countryCode ?? '';
     setCountryCode(editCountryCode);
     setCountryQuery(editCountryCode ? COUNTRIES[editCountryCode]?.name ?? editCountryCode : '');
+    setTagInput(getEditableContentTags(editCampaign.event.tags).join(', '));
     const existingOrgATag = editCampaign.event.tags.find(
       ([n, v]) => n === 'A' && typeof v === 'string' && v.startsWith('34550:'),
     )?.[1] ?? '';
@@ -384,6 +387,7 @@ export function CreateCampaignPage() {
       }
 
       const resolvedCountryCode = countryCode;
+      const contentTags = parseContentTagInput(tagInput);
 
       let prev: NostrEvent | null = null;
       if (isEditMode) {
@@ -474,8 +478,9 @@ export function CreateCampaignPage() {
       if (deadlineNum !== undefined) tags.push(['deadline', String(deadlineNum)]);
       if (resolvedCountryCode) {
         tags.push(['i', createCountryIdentifier(resolvedCountryCode)]);
-        tags.push(['k', 'iso3166-1']);
+        tags.push(['k', 'iso3166']);
       }
+      for (const tag of contentTags) tags.push(['t', tag]);
       // Organization association (NIP-22 root-scope convention): an
       // uppercase `A` tag points at the NIP-72 community definition so
       // the campaign surfaces as official activity on that org's page.
@@ -702,6 +707,16 @@ export function CreateCampaignPage() {
                 setCountryCode('');
                 setCountryQuery('');
               }}
+            />
+          </FormSection>
+
+          {/* Tags */}
+          <FormSection title="Tags" requirement="Optional">
+            <Input
+              id="campaign-tags"
+              value={tagInput}
+              onChange={(e) => setTagInput(e.target.value)}
+              placeholder="legal-defense, mutual-aid, local-news"
             />
           </FormSection>
 
@@ -1131,7 +1146,7 @@ function CountrySelect({
 
       {selectedCountry && (
         <p className="text-xs text-muted-foreground">
-          Publishes <span className="font-mono text-foreground">i: iso3166-1:{selectedCode}</span> for country sorting.
+          Publishes <span className="font-mono text-foreground">i: iso3166:{selectedCode}</span> for country sorting.
         </p>
       )}
     </div>

@@ -111,12 +111,7 @@ export function ProfileTabs({ tabs, activeTab, onChange }: ProfileTabsProps) {
                 else tabRefs.current.delete(tab.id);
               }}
               onClick={() => {
-                if (active) {
-                  window.scrollTo({ top: 0, behavior: 'smooth' });
-                } else {
-                  window.scrollTo({ top: 0 });
-                  onChange(tab.id);
-                }
+                if (!active) onChange(tab.id);
               }}
               className={cn(
                 'relative shrink-0 px-4 py-3.5 text-sm font-medium whitespace-nowrap',

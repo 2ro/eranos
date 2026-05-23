@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useSeoMeta } from '@unhead/react';
-import { ChevronDown, EyeOff, HandHeart, Hourglass, PlusCircle, ShieldCheck } from 'lucide-react';
+import { ArrowRight, ChevronDown, EyeOff, HandHeart, Hourglass, PlusCircle, ShieldCheck } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -198,7 +198,7 @@ export function CampaignsPage() {
             </h1>
             <p className="text-base sm:text-lg text-white/80 max-w-xl">
               Raise Bitcoin directly from supporters around the world. Every donation
-              settles straight to your campaign's beneficiaries, with no middlemen, no
+              settles straight to your wallet, with no middlemen, no
               chargebacks, and no platform holding your funds.
             </p>
             <div className="flex flex-wrap gap-3 pt-1">
@@ -212,6 +212,17 @@ export function CampaignsPage() {
                 <Link to="/campaigns/new">
                   <PlusCircle className="mr-2" />
                   Start a campaign
+                </Link>
+              </Button>
+              <Button
+                variant="outline"
+                size="lg"
+                asChild
+                className="rounded-full h-12 px-6 text-base border-white/30 bg-white/5 text-white hover:bg-white/10 hover:text-white hover:border-white/50 [&_svg]:size-[18px]"
+              >
+                <Link to="/help">
+                  How it works
+                  <ArrowRight className="ml-2" />
                 </Link>
               </Button>
               {!user && (

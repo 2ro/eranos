@@ -18,6 +18,7 @@ import { useNostrPublish } from '@/hooks/useNostrPublish';
 import { useToast } from '@/hooks/useToast';
 import { useUploadFile } from '@/hooks/useUploadFile';
 import { createCountryIdentifier } from '@/lib/countryIdentifiers';
+import { parseContentTagInput } from '@/lib/contentTags';
 import { countryCodeToFlag, getAllCountries, getGeoDisplayName } from '@/lib/countries';
 import { DEFAULT_COVER_IMAGE } from '@/lib/defaultActionCovers';
 import { createOrganizationAssociationTags } from '@/lib/organizationContext';
@@ -42,22 +43,6 @@ interface CreateActionFormState {
   coverImage: string;
   selectedCountry: string;
   timezone: string;
-}
-
-function normalizePledgeTag(value: string): string {
-  return value.trim().replace(/^#+/, '').toLowerCase().replace(/\s+/g, '-');
-}
-
-function parsePledgeTagInput(value: string): string[] {
-  const seen = new Set<string>();
-  const tags: string[] = [];
-  for (const part of value.split(',')) {
-    const tag = normalizePledgeTag(part);
-    if (!tag || seen.has(tag)) continue;
-    seen.add(tag);
-    tags.push(tag);
-  }
-  return tags;
 }
 
 function CreateActionForm({
@@ -270,7 +255,7 @@ export function CreateActionDialog({ countryCode, communityATag, open, onOpenCha
       const dTag = `${slug || 'pledge'}-${now}`;
       const pledgeSats = usdToSats(Number(formData.pledgeUsd.replace(/[, $]/g, '')), btcPrice);
       if (pledgeSats <= 0) throw new Error('Waiting for BTC/USD price to calculate the pledge amount.');
-      const pledgeTags = parsePledgeTagInput(formData.tagInput);
+      const pledgeTags = parseContentTagInput(formData.tagInput);
       const tags: string[][] = [
         ['d', dTag],
         ['title', formData.title],
@@ -333,7 +318,7 @@ export function CreateActionDialog({ countryCode, communityATag, open, onOpenCha
   if (!user) return null;
 
   const description = communityATag
-    ? 'New organization pledge. You can optionally choose a country below.'
+    ? 'New group pledge. You can optionally choose a country below.'
     : countryCode
     ? `New pledge for ${getGeoDisplayName(countryCode)}.`
     : 'New pledge. You can optionally choose a country below.';

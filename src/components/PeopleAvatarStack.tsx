@@ -9,13 +9,14 @@ import { useAuthors } from '@/hooks/useAuthors';
 import { genUserName } from '@/lib/genUserName';
 import { cn } from '@/lib/utils';
 
-type AvatarSize = 'sm' | 'md' | 'lg';
+type AvatarSize = 'sm' | 'md' | 'lg' | 'comment';
 
 /** Tailwind size classes per avatar size. */
 const sizeClasses: Record<AvatarSize, string> = {
   sm: 'size-6',
   md: 'size-7',
   lg: 'size-9',
+  comment: 'size-10',
 };
 
 /** Tailwind negative-space class for overlap amount. */
@@ -23,6 +24,7 @@ const overlapClasses: Record<AvatarSize, string> = {
   sm: '-space-x-1.5',
   md: '-space-x-2',
   lg: '-space-x-3',
+  comment: '-space-x-3',
 };
 
 /** Fallback text size per avatar size. */
@@ -30,6 +32,7 @@ const fallbackTextClasses: Record<AvatarSize, string> = {
   sm: 'text-[10px]',
   md: 'text-[10px]',
   lg: 'text-xs',
+  comment: 'text-xs',
 };
 
 interface PeopleAvatarStackProps {
@@ -39,6 +42,10 @@ interface PeopleAvatarStackProps {
   maxVisible?: number;
   /** Avatar size preset. Default 'md'. */
   size?: AvatarSize;
+  /** Render every avatar as a circle, ignoring user-selected shapes. */
+  forceCircle?: boolean;
+  /** Whether to render the built-in "+N more" suffix. Defaults to true. */
+  showOverflowCount?: boolean;
   /** Class applied to the outer container. */
   className?: string;
 }
@@ -54,6 +61,8 @@ export function PeopleAvatarStack({
   pubkeys,
   maxVisible = 6,
   size = 'md',
+  forceCircle = false,
+  showOverflowCount = true,
   className,
 }: PeopleAvatarStackProps) {
   const previewPubkeys = useMemo(() => pubkeys.slice(0, maxVisible), [pubkeys, maxVisible]);
@@ -70,7 +79,7 @@ export function PeopleAvatarStack({
           const member = membersMap?.get(pk);
           const displayName =
             member?.metadata?.name || member?.metadata?.display_name || genUserName(pk);
-          const shape = getAvatarShape(member?.metadata);
+          const shape = forceCircle ? undefined : getAvatarShape(member?.metadata);
           return (
             <Tooltip key={pk}>
               <TooltipTrigger asChild>
@@ -102,7 +111,7 @@ export function PeopleAvatarStack({
           );
         })}
       </div>
-      {overflow > 0 && (
+      {showOverflowCount && overflow > 0 && (
         <span className="text-xs text-muted-foreground">
           +{overflow} more
         </span>

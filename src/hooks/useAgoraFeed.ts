@@ -1,13 +1,13 @@
 import { useNostr } from '@nostrify/react';
 import { useInfiniteQuery } from '@tanstack/react-query';
-import type { NostrEvent, NostrFilter } from '@nostrify/nostrify';
+import type { NostrEvent, NostrFilter, NPool } from '@nostrify/nostrify';
 
 import { useContentFilters } from '@/hooks/useContentFilters';
 import { useFeedSettings } from '@/hooks/useFeedSettings';
 import { useMuteList } from '@/hooks/useMuteList';
 import { CAMPAIGN_KIND } from '@/lib/campaign';
 import { getEnabledFeedKinds } from '@/lib/extraKinds';
-import { getPaginationCursor, shouldHideFeedEvent } from '@/lib/feedUtils';
+import { getPaginationCursor, isRepostKind, parseRepostContent, shouldHideFeedEvent, type FeedItem } from '@/lib/feedUtils';
 import { isEventMuted } from '@/lib/muteHelpers';
 
 const AGORA_PAGE_SIZE = 25;
@@ -29,8 +29,54 @@ const IGNORED_AGORA_NOTE_AUTHORS = new Set([
 
 interface AgoraFeedPage {
   events: NostrEvent[];
+  items: FeedItem[];
   oldestTimestamp: number | null;
   totalFetched: number;
+}
+
+async function buildFeedItems(events: NostrEvent[], nostr: NPool, signal: AbortSignal): Promise<FeedItem[]> {
+  const now = Math.floor(Date.now() / 1000);
+  const items: FeedItem[] = [];
+  const repostMissingIds: string[] = [];
+  const repostMap = new Map<string, NostrEvent>();
+
+  for (const event of events) {
+    if (!isRepostKind(event.kind)) {
+      items.push({ event, sortTimestamp: event.created_at });
+      continue;
+    }
+
+    const embedded = parseRepostContent(event);
+    if (embedded && embedded.created_at <= now) {
+      items.push({ event: embedded, repostedBy: event.pubkey, repostEvent: event, sortTimestamp: event.created_at });
+      continue;
+    }
+
+    const repostedId = event.tags.find(([name]) => name === 'e')?.[1];
+    if (repostedId) {
+      repostMissingIds.push(repostedId);
+      repostMap.set(repostedId, event);
+    }
+  }
+
+  if (repostMissingIds.length > 0) {
+    try {
+      const originals = await nostr.query(
+        [{ ids: repostMissingIds, limit: repostMissingIds.length }],
+        { signal },
+      );
+      for (const original of originals) {
+        const repost = repostMap.get(original.id);
+        if (repost && original.created_at <= now && !shouldHideFeedEvent(original)) {
+          items.push({ event: original, repostedBy: repost.pubkey, repostEvent: repost, sortTimestamp: repost.created_at });
+        }
+      }
+    } catch {
+      // timeout or abort — skip missing reposts
+    }
+  }
+
+  return items.sort((a, b) => b.sortTimestamp - a.sortTimestamp);
 }
 
 function tagValues(event: NostrEvent, name: string): string[] {
@@ -176,6 +222,7 @@ export function useAgoraFeed(enabled: boolean, options?: UseAgoraFeedOptions) {
   // settings — a profile feed without notes is broken.
   if (includeAuthorNotes && !authorNoteKinds.includes(1)) authorNoteKinds.push(1);
   if (includeAuthorNotes && !authorNoteKinds.includes(6)) authorNoteKinds.push(6);
+  if (includeAuthorNotes && !authorNoteKinds.includes(16)) authorNoteKinds.push(16);
   const authorNoteKindsKey = [...authorNoteKinds].sort((a, b) => a - b).join(',');
 
   const query = useInfiniteQuery<AgoraFeedPage, Error>({
@@ -259,10 +306,12 @@ export function useAgoraFeed(enabled: boolean, options?: UseAgoraFeedOptions) {
         .sort((a, b) => b.created_at - a.created_at);
 
       const page = combined.slice(0, AGORA_PAGE_SIZE);
+      const items = await buildFeedItems(page, nostr, signal);
       const oldestTimestamp = page.length > 0 ? getPaginationCursor(page) : null;
 
       return {
         events: page,
+        items,
         oldestTimestamp,
         totalFetched: combined.length,
       };
@@ -279,16 +328,25 @@ export function useAgoraFeed(enabled: boolean, options?: UseAgoraFeedOptions) {
 
   const seen = new Set<string>();
   const events: NostrEvent[] = [];
+  const seenItems = new Set<string>();
+  const items: FeedItem[] = [];
   for (const page of query.data?.pages ?? []) {
     for (const event of page.events) {
       if (seen.has(event.id)) continue;
       seen.add(event.id);
       events.push(event);
     }
+    for (const item of page.items) {
+      const key = item.repostedBy ? `repost-${item.repostedBy}-${item.event.id}` : item.event.id;
+      if (seenItems.has(key)) continue;
+      seenItems.add(key);
+      items.push(item);
+    }
   }
 
   return {
     events,
+    items,
     isLoading: queryEnabled ? query.isPending : false,
     isFetchingNextPage: query.isFetchingNextPage,
     hasNextPage: !authorsEmpty && query.hasNextPage,

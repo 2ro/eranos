@@ -1,4 +1,4 @@
-import { useMemo, useCallback, useState } from 'react';
+import { useMemo, useCallback, useEffect, useRef, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
 import { nip19 } from 'nostr-tools';
@@ -6,16 +6,15 @@ import {
   CalendarClock,
   CalendarDays,
   ChevronLeft,
+  ChevronRight,
   Clock,
   Crown,
   HandHeart,
-  Info,
   MapPin,
   Megaphone,
   MoreVertical,
   Pencil,
   Shield,
-  Share2,
   Trash2,
   UserCheck,
   UserMinus,
@@ -25,6 +24,7 @@ import {
 import type { NostrEvent, NostrMetadata } from '@nostrify/nostrify';
 
 import { CampaignCard } from '@/components/CampaignCard';
+import { DetailReplySkeleton } from '@/components/DetailStory';
 import { PeopleAvatarStack } from '@/components/PeopleAvatarStack';
 import { PostActionBar } from '@/components/PostActionBar';
 import { DetailCommentComposer } from '@/components/DetailCommentComposer';
@@ -42,7 +42,7 @@ import {
 } from '@/components/ui/alert-dialog';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -126,21 +126,6 @@ function MembersSkeleton() {
           <Skeleton className="h-5 w-16 rounded-full" />
         </div>
       ))}
-    </div>
-  );
-}
-
-function ReplyCardSkeleton() {
-  return (
-    <div className="px-4 py-3 border-b border-border">
-      <div className="flex gap-3">
-        <Skeleton className="size-10 rounded-full shrink-0" />
-        <div className="flex-1 space-y-2">
-          <Skeleton className="h-4 w-32" />
-          <Skeleton className="h-4 w-full" />
-          <Skeleton className="h-4 w-2/3" />
-        </div>
-      </div>
     </div>
   );
 }
@@ -562,7 +547,7 @@ function OfficialActivityShelves({
   );
 }
 
-function CommunityCreateActions({
+function GroupActionColumn({
   orgNaddr,
   organizationName,
 }: {
@@ -570,51 +555,78 @@ function CommunityCreateActions({
   organizationName: string;
 }) {
   const createQuery = orgNaddr ? `?org=${orgNaddr}` : '';
-  const createButtonClassName = 'h-auto justify-start gap-3 px-4 py-3 text-left hover:border-primary/30 hover:bg-primary/10 hover:text-foreground focus-visible:border-primary/40 focus-visible:bg-primary/10';
 
   return (
-    <section className="rounded-2xl border border-border/60 bg-gradient-to-br from-primary/15 via-primary/5 to-card shadow-sm overflow-hidden">
-      <div className="grid gap-0 md:grid-cols-[1.15fr_1.85fr]">
-        <div className="px-5 py-5 sm:px-6">
-          <h2 className="text-xl font-semibold tracking-tight">Start Something</h2>
-          <p className="mt-2 text-sm text-muted-foreground">
-            Add an official campaign, pledge, or event for {organizationName}.
-          </p>
+    <Card className="overflow-hidden border-primary/15 bg-gradient-to-br from-card via-card to-primary/5 shadow-sm">
+      <CardContent className="relative space-y-4 p-4 sm:p-5">
+        <div aria-hidden className="absolute -right-12 -top-12 size-32 rounded-full bg-primary/10 blur-3xl" />
+        <div aria-hidden className="absolute -bottom-16 left-8 size-28 rounded-full bg-secondary/20 blur-3xl" />
+
+        <div className="relative flex items-start justify-between gap-3">
+          <div className="space-y-1.5">
+            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary">Official tools</p>
+            <h2 className="text-xl font-semibold tracking-tight">Start something</h2>
+            <p className="text-sm leading-5 text-muted-foreground">
+              Give {organizationName} a concrete next step.
+            </p>
+          </div>
+          <div className="hidden rounded-full border border-primary/15 bg-primary/10 p-2 text-primary sm:block lg:hidden xl:block">
+            <Users className="size-5" />
+          </div>
         </div>
 
-        <div className="grid gap-2 p-4 sm:grid-cols-3 sm:p-5">
-          <Button asChild variant="outline" className={createButtonClassName}>
-            <Link to={`/campaigns/new${createQuery}`}>
-              <HandHeart className="size-5 shrink-0 text-primary" />
-              <span className="min-w-0">
-                <span className="block font-semibold">Campaign</span>
-                <span className="block text-xs font-normal text-muted-foreground">Raise funds</span>
-              </span>
-            </Link>
-          </Button>
+        <div className="relative grid grid-cols-2 gap-3">
+          <Link
+            to={`/campaigns/new${createQuery}`}
+            className="group col-span-2 overflow-hidden rounded-2xl border border-primary/20 bg-primary text-primary-foreground shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background motion-reduce:hover:translate-y-0"
+          >
+            <div className="relative min-h-32 p-4">
+              <div aria-hidden className="absolute -right-8 -top-8 size-28 rounded-full bg-white/15" />
+              <div className="relative flex h-full flex-col justify-between gap-6">
+                <div className="flex items-start justify-between gap-3">
+                  <span className="rounded-full bg-white/15 p-2 backdrop-blur">
+                    <HandHeart className="size-5" />
+                  </span>
+                  <ChevronRight className="size-5 transition-transform group-hover:translate-x-0.5" />
+                </div>
+                <span>
+                  <span className="block text-lg font-semibold">Launch a campaign</span>
+                  <span className="mt-1 block text-sm text-primary-foreground/80">Raise funds with an official group page.</span>
+                </span>
+              </div>
+            </div>
+          </Link>
 
-          <Button asChild variant="outline" className={createButtonClassName}>
-            <Link to={`/pledges/new${createQuery}`}>
-              <Megaphone className="size-5 shrink-0 text-primary" />
-              <span className="min-w-0">
-                <span className="block font-semibold">Pledge</span>
-                <span className="block text-xs font-normal text-muted-foreground">Offer help</span>
+          <Link
+            to={`/pledges/new${createQuery}`}
+            className="group rounded-2xl border border-border/70 bg-background/70 p-4 shadow-sm transition-all hover:-translate-y-0.5 hover:border-primary/30 hover:bg-primary/5 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background motion-reduce:hover:translate-y-0"
+          >
+            <span className="mb-5 flex items-center justify-between gap-2">
+              <span className="rounded-full bg-primary/10 p-2 text-primary">
+                <Megaphone className="size-4" />
               </span>
-            </Link>
-          </Button>
+              <ChevronRight className="size-4 text-muted-foreground transition-transform group-hover:translate-x-0.5 group-hover:text-primary" />
+            </span>
+            <span className="block font-semibold">Pledge</span>
+            <span className="mt-1 block text-xs leading-4 text-muted-foreground">Offer help people can act on.</span>
+          </Link>
 
-          <Button asChild variant="outline" className={createButtonClassName}>
-            <Link to={`/events/new${createQuery}`}>
-              <CalendarDays className="size-5 shrink-0 text-primary" />
-              <span className="min-w-0">
-                <span className="block font-semibold">Event</span>
-                <span className="block text-xs font-normal text-muted-foreground">Get together</span>
+          <Link
+            to={`/events/new${createQuery}`}
+            className="group rounded-2xl border border-border/70 bg-background/70 p-4 shadow-sm transition-all hover:-translate-y-0.5 hover:border-primary/30 hover:bg-primary/5 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background motion-reduce:hover:translate-y-0"
+          >
+            <span className="mb-5 flex items-center justify-between gap-2">
+              <span className="rounded-full bg-primary/10 p-2 text-primary">
+                <CalendarDays className="size-4" />
               </span>
-            </Link>
-          </Button>
+              <ChevronRight className="size-4 text-muted-foreground transition-transform group-hover:translate-x-0.5 group-hover:text-primary" />
+            </span>
+            <span className="block font-semibold">Event</span>
+            <span className="mt-1 block text-xs leading-4 text-muted-foreground">Bring supporters together.</span>
+          </Link>
         </div>
-      </div>
-    </section>
+      </CardContent>
+    </Card>
   );
 }
 
@@ -626,7 +638,9 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
   const { toast } = useToast();
   const { user } = useCurrentUser();
   const [membersDialogOpen, setMembersDialogOpen] = useState(false);
-  const [descriptionDialogOpen, setDescriptionDialogOpen] = useState(false);
+  const [descriptionExpanded, setDescriptionExpanded] = useState(false);
+  const [descriptionCanExpand, setDescriptionCanExpand] = useState(false);
+  const descriptionPreviewRef = useRef<HTMLDivElement>(null);
   const [replyOpen, setReplyOpen] = useState(false);
   const [moreMenuOpen, setMoreMenuOpen] = useState(false);
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
@@ -634,26 +648,35 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
 
   // Parse community definition
   const community = useMemo(() => parseCommunityEvent(event), [event]);
-  const name = community?.name ?? 'Unnamed Organization';
+  const name = community?.name ?? 'Unnamed Group';
   const description = community?.description ?? '';
   const image = community?.image;
   const cover = sanitizeUrl(image);
   const communityATag = community?.aTag ?? '';
+  const founder = useAuthor(event.pubkey);
+  const founderMetadata: NostrMetadata | undefined = founder.data?.metadata;
+  const founderName = getDisplayName(founderMetadata, event.pubkey);
+  const founderProfileUrl = useProfileUrl(event.pubkey, founderMetadata);
+  const founderPicture = sanitizeUrl(founderMetadata?.picture);
+  const founderInitials = founderName.slice(0, 2).toUpperCase();
+  const countryLabel = community?.countryCode ? getGeoDisplayName(community.countryCode) : undefined;
 
-  // Extract website URL from description
-  const descriptionUrl = useMemo(() => {
-    const urlMatch = description.match(/https?:\/\/[^\s]+/);
-    return sanitizeUrl(urlMatch?.[0]);
-  }, [description]);
+  const descriptionText = description.trim();
 
-  const descriptionText = useMemo(() => {
-    if (!descriptionUrl) return description;
-    return description.replace(new RegExp(`\\s*${descriptionUrl.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\s*$`), '').trim();
-  }, [description, descriptionUrl]);
+  useEffect(() => {
+    if (!descriptionText) {
+      setDescriptionCanExpand(false);
+      return;
+    }
+    if (descriptionExpanded) return;
 
-  // Whether to render the description info button next to the title — true
-  // whenever there's any description text or a stripped trailing URL.
-  const descriptionExpandable = !!descriptionText || !!descriptionUrl;
+    const id = window.requestAnimationFrame(() => {
+      const el = descriptionPreviewRef.current;
+      setDescriptionCanExpand(!!el && el.scrollHeight > el.clientHeight + 1);
+    });
+
+    return () => window.cancelAnimationFrame(id);
+  }, [descriptionExpanded, descriptionText]);
 
   /**
    * Synthesize a kind-1 pseudo-event so we can hand the description off to
@@ -668,14 +691,14 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
     kind: 1,
     created_at: event.created_at,
     tags: [],
-    content: description,
+    content: descriptionText,
     sig: '',
-  }), [description, event.id, event.pubkey, event.created_at]);
+  }), [descriptionText, event.id, event.pubkey, event.created_at]);
 
   // ── Members ─────────────────────────────────────────────────────────────────
   // Agora's organization model has only two trust tiers — founder and
-  // moderators. The "membership" list shown in the hero / members dialog
-  // is therefore exactly that roster, read directly from the parsed
+  // moderators. The member preview and dialog show exactly that roster,
+  // read directly from the parsed
   // community. `useCommunityMembers` still resolves moderation state
   // (content bans, reports) used by the comment thread below.
   const { moderation, rankMap, isLoading: membersLoading } = useCommunityMembers(community);
@@ -700,7 +723,7 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
   const handleToggleFollow = useCallback(() => {
     if (!user || !communityATag || toggleCommunityFollow.isPending) return;
     if (membershipFollow) {
-      toast({ title: isFounder ? 'You founded this organization' : 'You moderate this organization' });
+      toast({ title: isFounder ? 'You founded this group' : 'You moderate this group' });
       return;
     }
     toggleCommunityFollow.mutate({ aTag: communityATag });
@@ -715,7 +738,8 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
   useAuthors(leadershipPubkeys);
 
   // Single section now — founder + moderators are all "Leadership".
-  // Members no longer exist in the organization model.
+  // The UI labels this roster as members, but the underlying org model is
+  // founder + moderators only.
   const memberSections = useMemo(() => {
     if (!community || leadershipPubkeys.length === 0) return [];
     return [{
@@ -797,23 +821,6 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
     [pinnedEvents],
   );
 
-  // ── Share handler ───────────────────────────────────────────────────────────
-  const handleShare = useCallback(async () => {
-    const d = event.tags.find(([n]) => n === 'd')?.[1] ?? '';
-    const naddr = nip19.naddrEncode({
-      kind: event.kind,
-      pubkey: event.pubkey,
-      identifier: d,
-    });
-    const url = `${window.location.origin}/${naddr}`;
-    try {
-      await navigator.clipboard.writeText(url);
-      toast({ title: 'Link copied to clipboard' });
-    } catch {
-      toast({ title: 'Failed to copy link', variant: 'destructive' });
-    }
-  }, [event, toast]);
-
   // ── Delete handler ─────────────────────────────────────────────────────────
   // Founder-only. Publishes a NIP-09 kind 5 deletion request referencing the
   // community definition (kind 34550) by both `e` and `a` tags so relays can
@@ -833,9 +840,9 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
       {
         onSuccess: () => {
           toast({
-            title: 'Organization deleted',
+            title: 'Group deleted',
             description:
-              'A deletion request was published. Well-behaved relays will drop the organization from feeds.',
+              'A deletion request was published. Well-behaved relays will drop the group from feeds.',
           });
           setDeleteConfirmOpen(false);
           void queryClient.invalidateQueries({
@@ -845,12 +852,12 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
           void queryClient.invalidateQueries({ queryKey: ['manageable-organizations'] });
           void queryClient.invalidateQueries({ queryKey: ['featured-organizations'] });
           void queryClient.invalidateQueries({ queryKey: ['followed-organizations'] });
-          navigate('/communities');
+          navigate('/groups');
         },
         onError: (error: unknown) => {
           const msg = error instanceof Error ? error.message : String(error);
           toast({
-            title: 'Could not delete organization',
+            title: 'Could not delete group',
             description: msg,
             variant: 'destructive',
           });
@@ -871,167 +878,222 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
   );
 
   // ── Render ──────────────────────────────────────────────────────────────────
-  const heroIconClassName = 'size-6 text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.85)]';
-  const bannerActionClassName = 'p-2.5 rounded-full text-white/90 hover:text-white hover:bg-white/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80 disabled:opacity-50 disabled:pointer-events-none transition-colors';
+  const bannerActionClassName = 'p-2.5 rounded-full bg-black/30 text-white/90 backdrop-blur-md hover:text-white hover:bg-black/45 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80 disabled:opacity-50 disabled:pointer-events-none transition-colors';
+  const canCreateOfficial = !!communityATag && membershipFollow;
+  const visibleMemberCount = Math.min(leadershipPubkeys.length, 6);
+  const hiddenMemberCount = Math.max(0, leadershipPubkeys.length - visibleMemberCount);
+  const groupActionColumn = canCreateOfficial ? (
+    <GroupActionColumn
+      orgNaddr={orgNaddr}
+      organizationName={name}
+    />
+  ) : null;
 
   return (
     <main className="min-h-screen pb-16">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 pt-4">
-        <CommunityModerationContext.Provider value={moderationCtx}>
-          {/* ── Hero ─────────────────────────────────────────────────────── */}
-          <div className="relative aspect-[16/9] sm:aspect-[21/9] rounded-t-xl rounded-b-none overflow-hidden bg-gradient-to-br from-primary/40 via-primary/20 to-secondary">
-            {cover ? (
-              <img src={cover} alt="" className="absolute inset-0 size-full object-cover" />
-            ) : (
-              <div className="absolute inset-0 bg-gradient-to-br from-primary/50 via-primary/25 to-secondary" />
-            )}
-            {!cover && (
-              <div className="absolute inset-0 flex items-center justify-center">
-                <Users className="size-16 text-primary/40 sm:size-20" />
-              </div>
-            )}
-            <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/25 to-black/45" />
+      <CommunityModerationContext.Provider value={moderationCtx}>
+        {/* ── Hero ─────────────────────────────────────────────────────── */}
+        <header className="relative isolate w-full overflow-hidden bg-gradient-to-br from-primary/40 via-primary/20 to-secondary min-h-[78svh] sm:min-h-0 sm:aspect-[21/9] lg:aspect-[3/1]">
+          {cover ? (
+            <img src={cover} alt="" className="absolute inset-0 size-full object-cover" />
+          ) : (
+            <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-primary/50 via-primary/25 to-secondary">
+              <Users className="size-20 text-primary/40" />
+            </div>
+          )}
+          <div aria-hidden className="absolute inset-x-0 bottom-0 top-[18%] bg-gradient-to-t from-black/95 via-black/80 to-transparent" />
+          <div aria-hidden className="absolute inset-x-0 top-0 h-24 bg-gradient-to-b from-black/45 to-transparent" />
 
-            <div className="absolute left-0 right-0 top-0 z-10 flex items-center justify-between gap-3 px-4 pt-4">
+          <div className="absolute inset-x-0 top-0 z-10 px-5 sm:px-6 lg:px-0 pt-[max(env(safe-area-inset-top),1rem)]">
+            <div className="max-w-6xl mx-auto flex items-center justify-between gap-3">
               <button
                 onClick={() => window.history.length > 1 ? navigate(-1) : navigate('/')}
-                className="p-2.5 -ml-2 rounded-full text-white/90 hover:bg-white/15 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80 motion-safe:transition-colors"
+                className="inline-flex h-10 items-center gap-1.5 rounded-full bg-black/30 pl-2 pr-3.5 text-white backdrop-blur-md hover:bg-black/45 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80 motion-safe:transition-colors"
                 aria-label="Go back"
               >
-                <ChevronLeft className={heroIconClassName} />
+                <ChevronLeft className="size-5" />
+                <span className="hidden text-sm font-medium sm:inline">Back</span>
               </button>
-              {user && communityATag && (
-                <FollowToggleButton
-                  size="sm"
-                  isFollowing={communityFollowed}
-                  isPending={toggleCommunityFollow.isPending}
-                  onClick={handleToggleFollow}
-                  icon={<UserPlus className="size-4" />}
-                  followingIcon={
-                    <>
-                      <UserCheck className="size-4 group-hover:hidden group-focus-visible:hidden" />
-                      <UserMinus className="size-4 hidden group-hover:inline group-focus-visible:inline" />
-                    </>
-                  }
-                  hoverToUnfollow
-                  className={cn(
-                    'shadow-none',
-                    !communityFollowed && 'bg-white/95 text-black hover:bg-white',
-                    communityFollowed && 'bg-transparent backdrop-blur-sm border-white/40 text-white hover:bg-destructive/30 hover:text-white hover:border-destructive/60',
-                  )}
-                />
-              )}
-            </div>
 
-            <div className="absolute inset-x-0 bottom-0 z-10 space-y-2 p-5 sm:p-6 [text-shadow:0_1px_4px_rgba(0,0,0,0.75),0_2px_10px_rgba(0,0,0,0.45)]">
-              <div className="flex [text-shadow:none]">
-                <button
-                  type="button"
-                  onClick={() => setMembersDialogOpen(true)}
-                  className="flex items-center gap-2 -ml-1 px-1 py-1 rounded-md hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80 transition-colors min-w-0"
-                  aria-label="Show leadership"
-                >
-                  <PeopleAvatarStack
-                    pubkeys={leadershipPubkeys}
-                    maxVisible={6}
+              <div className="flex items-center gap-1.5">
+                {user && communityATag && (
+                  <FollowToggleButton
                     size="sm"
-                    className="[&_.ring-2]:ring-black/40 pointer-events-none"
-                  />
-                  {leadershipPubkeys.length > 0 && (
-                    <span className="text-xs font-medium text-white/90 [text-shadow:0_1px_3px_rgba(0,0,0,0.7)] truncate">
-                      {(() => {
-                        const modCount = community?.moderatorPubkeys.length ?? 0;
-                        if (modCount === 0) return 'Founder';
-                        return `Founder + ${modCount} moderator${modCount === 1 ? '' : 's'}`;
-                      })()}
-                    </span>
-                  )}
-                </button>
-              </div>
-              <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
-                <div className="min-w-0 space-y-2">
-                  <div className="flex items-center gap-1.5 min-w-0">
-                    <h1 className="text-3xl sm:text-4xl font-bold leading-tight tracking-tight text-white truncate">{name}</h1>
-                    {descriptionExpandable && (
-                      <button
-                        type="button"
-                        onClick={() => setDescriptionDialogOpen(true)}
-                        className="-my-1 -mr-1 p-1 rounded-full text-white/75 hover:text-white hover:bg-white/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80 transition-colors"
-                        aria-label="About this organization"
-                      >
-                        <Info className="size-4 [text-shadow:none] drop-shadow-[0_1px_2px_rgba(0,0,0,0.85)]" />
-                      </button>
+                    isFollowing={communityFollowed}
+                    isPending={toggleCommunityFollow.isPending}
+                    onClick={handleToggleFollow}
+                    icon={<UserPlus className="size-4" />}
+                    followingIcon={
+                      <>
+                        <UserCheck className="size-4 group-hover:hidden group-focus-visible:hidden" />
+                        <UserMinus className="size-4 hidden group-hover:inline group-focus-visible:inline" />
+                      </>
+                    }
+                    hoverToUnfollow
+                    className={cn(
+                      'h-10 rounded-full shadow-none backdrop-blur-md',
+                      !communityFollowed && 'bg-white/95 text-black hover:bg-white',
+                      communityFollowed && 'bg-black/30 border-white/40 text-white hover:bg-destructive/70 hover:text-white hover:border-destructive/60',
                     )}
-                  </div>
-                  {descriptionText && (
-                    <p className="max-w-2xl text-base sm:text-lg text-white/90 line-clamp-2">
-                      {descriptionText}
-                    </p>
-                  )}
-                </div>
-
-                <div className="flex items-center gap-0.5 shrink-0 [text-shadow:none]">
+                  />
+                )}
+                {isFounder && community && (
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <button
-                        type="button"
-                        className={bannerActionClassName}
-                        aria-label="More actions"
-                      >
+                      <button type="button" className={bannerActionClassName} aria-label="More actions">
                         <MoreVertical className="size-5" />
                       </button>
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end" side="top" sideOffset={6} className="min-w-[180px]">
-                      <DropdownMenuItem onSelect={() => setMembersDialogOpen(true)}>
-                        <Users className="size-4 mr-2" />
-                        View leadership
+                    <DropdownMenuContent align="end" sideOffset={6} className="min-w-[180px]">
+                      <DropdownMenuItem
+                        onSelect={() => {
+                          const naddr = nip19.naddrEncode({
+                            kind: event.kind,
+                            pubkey: event.pubkey,
+                            identifier: community.dTag,
+                          });
+                          navigate(`/groups/new?edit=${naddr}`);
+                        }}
+                      >
+                        <Pencil className="size-4 mr-2" />
+                        Edit group
                       </DropdownMenuItem>
-                      {isFounder && community && (
-                        <DropdownMenuItem
-                          onSelect={() => {
-                            const naddr = nip19.naddrEncode({
-                              kind: event.kind,
-                              pubkey: event.pubkey,
-                              identifier: community.dTag,
-                            });
-                            navigate(`/communities/new?edit=${naddr}`);
-                          }}
-                        >
-                          <Pencil className="size-4 mr-2" />
-                          Edit organization
-                        </DropdownMenuItem>
-                      )}
-                      {isFounder && community && (
-                        <DropdownMenuItem
-                          onSelect={(e) => {
-                            e.preventDefault();
-                            setDeleteConfirmOpen(true);
-                          }}
-                          className="text-destructive focus:text-destructive focus:bg-destructive/10"
-                        >
-                          <Trash2 className="size-4 mr-2" />
-                          Delete organization
-                        </DropdownMenuItem>
-                      )}
+                      <DropdownMenuItem
+                        onSelect={(e) => {
+                          e.preventDefault();
+                          setDeleteConfirmOpen(true);
+                        }}
+                        className="text-destructive focus:text-destructive focus:bg-destructive/10"
+                      >
+                        <Trash2 className="size-4 mr-2" />
+                        Delete group
+                      </DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
-                </div>
+                )}
               </div>
             </div>
           </div>
 
-          <div className="rounded-b-xl rounded-t-none bg-card border border-t-0 border-border/60 shadow-sm px-4 sm:px-5 py-3">
-            <PostActionBar
-              event={event}
-              replyLabel="Comment"
-              hideZap
-              onReply={() => setReplyOpen(true)}
-              onMore={() => setMoreMenuOpen(true)}
-            />
+          <div className="absolute inset-x-0 bottom-0 z-10 px-5 sm:px-6 lg:px-0 pb-[max(env(safe-area-inset-bottom),1.75rem)] pt-16 sm:pt-20">
+            <div className="max-w-6xl mx-auto [text-shadow:0_1px_3px_rgba(0,0,0,0.7)]">
+              <h1 className="max-w-4xl text-3xl sm:text-5xl lg:text-6xl font-bold leading-[1.05] tracking-tight text-white">
+                {name}
+              </h1>
+
+              <div className="mt-5 flex flex-wrap items-center gap-x-5 gap-y-3 text-sm sm:text-base text-white/90">
+                <Link
+                  to={founderProfileUrl}
+                  onClick={(e) => e.stopPropagation()}
+                  className="inline-flex items-center gap-2.5 hover:text-white motion-safe:transition-colors group [text-shadow:none]"
+                >
+                  <Avatar className="size-8 sm:size-9 ring-2 ring-white/30">
+                    {founderPicture && <AvatarImage src={founderPicture} alt="" />}
+                    <AvatarFallback className="bg-white/15 text-xs text-white">
+                      {founderInitials}
+                    </AvatarFallback>
+                  </Avatar>
+                  <span className="[text-shadow:0_1px_3px_rgba(0,0,0,0.7)]">
+                    by{' '}
+                    <span className="font-semibold underline-offset-4 group-hover:underline">
+                      {founderName}
+                    </span>
+                  </span>
+                </Link>
+
+                {countryLabel && (
+                  <span className="inline-flex items-center gap-1.5 text-xs sm:text-sm font-medium text-white/85">
+                    <MapPin className="size-4" />
+                    {countryLabel}
+                  </span>
+                )}
+              </div>
+
+              <div className="mt-4 border-t border-white/15 pt-3 [text-shadow:none] [&_button]:!text-white/90 [&_button:hover]:!bg-white/15 [&_button:hover]:!text-white [&_button]:transition-colors">
+                <PostActionBar
+                  event={event}
+                  replyLabel="Comment"
+                  hideZap
+                  showShareInSidebar
+                  onReply={() => setReplyOpen(true)}
+                  onMore={() => setMoreMenuOpen(true)}
+                />
+              </div>
+            </div>
           </div>
+        </header>
+
+          {(leadershipPubkeys.length > 0 || descriptionText) && (
+            <section className="max-w-6xl mx-auto px-5 sm:px-6 lg:px-0 pt-6">
+              <div className="space-y-5 border-b border-border/60 pb-6">
+                {leadershipPubkeys.length > 0 && (
+                  <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+                    <div className="space-y-3">
+                      <div className="text-xs font-semibold uppercase tracking-[0.12em] text-muted-foreground">
+                        Members
+                      </div>
+                      <PeopleAvatarStack
+                        pubkeys={leadershipPubkeys}
+                        maxVisible={visibleMemberCount}
+                        size="comment"
+                        forceCircle
+                        showOverflowCount={false}
+                      />
+                    </div>
+                    <Button
+                      type="button"
+                      variant="link"
+                      className="h-auto justify-start p-0 text-sm font-medium sm:mb-1"
+                      onClick={() => setMembersDialogOpen(true)}
+                    >
+                      {hiddenMemberCount > 0 && (
+                        <span className="mr-2 text-muted-foreground">
+                          +{hiddenMemberCount.toLocaleString()} more
+                        </span>
+                      )}
+                      View members
+                      <ChevronRight className="ml-1 size-4" />
+                    </Button>
+                  </div>
+                )}
+
+                {descriptionText && (
+                  <div className="space-y-2">
+                    <div className="text-xs font-semibold uppercase tracking-[0.12em] text-muted-foreground">
+                      About
+                    </div>
+                    <div className="relative">
+                      <div
+                        ref={descriptionPreviewRef}
+                        className={cn(
+                          'text-[15px] sm:text-base leading-relaxed text-foreground/90 break-words',
+                          !descriptionExpanded && 'max-h-[6.5rem] overflow-hidden',
+                        )}
+                      >
+                        <NoteContent event={descriptionPseudoEvent} disableEmbeds disableNoteEmbeds />
+                      </div>
+                      {!descriptionExpanded && descriptionCanExpand && (
+                        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-12 bg-gradient-to-t from-background to-transparent" />
+                      )}
+                    </div>
+                    {descriptionCanExpand && (
+                      <Button
+                        type="button"
+                        variant="link"
+                        className="h-auto p-0 text-sm"
+                        onClick={() => setDescriptionExpanded((expanded) => !expanded)}
+                      >
+                        {descriptionExpanded ? 'Show less' : 'Read more'}
+                      </Button>
+                    )}
+                  </div>
+                )}
+              </div>
+            </section>
+          )}
 
           {pinnedNodes.length > 0 && (
-            <div className="pt-6">
+            <div className="max-w-6xl mx-auto px-5 sm:px-6 lg:px-0 pt-6">
               <div className="rounded-2xl bg-card border border-border/60 overflow-hidden">
                 <ThreadedReplyList
                   roots={pinnedNodes}
@@ -1048,123 +1110,90 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
             </div>
           )}
 
-          {/* ── Body — single column, pledge-detail-style ─────────────────── */}
-          <div className="py-6 lg:py-10 space-y-8">
-            {/* Donate (when there's a member set) and Share buttons. Sits
-                just below the hero like the pledge page's action row. */}
-            <div className="grid gap-2 grid-cols-1">
-              <Button
-                type="button"
-                variant="outline"
-                size="lg"
-                className="w-full"
-                onClick={handleShare}
-              >
-                <Share2 className="size-4 mr-2" />
-                Share
-              </Button>
-            </div>
+          {/* ── Body — campaign-detail-style two-column layout ───────────── */}
+          <div className="max-w-6xl mx-auto px-5 sm:px-6 lg:px-0 py-6 lg:py-10">
+            <div className="lg:flex lg:gap-8 lg:items-start">
+              {groupActionColumn && <div className="lg:hidden mb-6">{groupActionColumn}</div>}
 
-            {communityATag && membershipFollow && (
-              <CommunityCreateActions
-                orgNaddr={orgNaddr}
-                organizationName={name}
-              />
-            )}
+              <div className="flex-1 min-w-0 space-y-8">
+                {/* Official-activity shelves. Hidden entirely when empty. */}
+                <OfficialActivityShelves
+                  campaigns={orgActivity?.campaigns ?? []}
+                  campaignsLoading={orgActivityLoading}
+                  pledges={orgActivity?.pledges ?? []}
+                  pledgesLoading={orgActivityLoading}
+                  events={orgActivity?.events ?? []}
+                  eventsLoading={orgActivityLoading}
+                  now={now}
+                />
 
-            {/* Official-activity shelves. Hidden entirely when empty. */}
-            <OfficialActivityShelves
-              campaigns={orgActivity?.campaigns ?? []}
-              campaignsLoading={orgActivityLoading}
-              pledges={orgActivity?.pledges ?? []}
-              pledgesLoading={orgActivityLoading}
-              events={orgActivity?.events ?? []}
-              eventsLoading={orgActivityLoading}
-              now={now}
-            />
+                {/* Comments — NIP-22 thread on the community event itself. */}
+                <div id="org-activity" className="scroll-mt-20">
+                  <div className="mt-6">
+                    <div className="flex items-baseline justify-between gap-3 mb-3 px-1">
+                      <h2 className="text-lg font-semibold tracking-tight">Comments</h2>
+                      {engagementStats?.replies ? (
+                        <span className="text-sm text-muted-foreground tabular-nums">
+                          {formatNumber(engagementStats.replies)}{' '}
+                          {engagementStats.replies === 1 ? 'comment' : 'comments'}
+                        </span>
+                      ) : null}
+                    </div>
 
-            {/* Comments — NIP-22 thread on the community event itself. */}
-            <div id="org-activity" className="scroll-mt-20">
-              <div>
-                <div className="flex items-baseline justify-between gap-3 mb-3 px-1">
-                  <h2 className="text-lg font-semibold tracking-tight">Comments</h2>
-                  {engagementStats?.replies ? (
-                    <span className="text-sm text-muted-foreground tabular-nums">
-                      {formatNumber(engagementStats.replies)}{' '}
-                      {engagementStats.replies === 1 ? 'comment' : 'comments'}
-                    </span>
-                  ) : null}
+                    <DetailCommentComposer event={event} className="mb-3" />
+
+                    {commentsLoading && statsLoading && replyTree.length === 0 ? (
+                      <div className="space-y-3">
+                        {Array.from({ length: 3 }).map((_, i) => (
+                          <DetailReplySkeleton key={i} />
+                        ))}
+                      </div>
+                    ) : replyTree.length > 0 ? (
+                      <ThreadedReplyList
+                        roots={replyTree}
+                        renderItemHeader={(event) => (
+                          <OrganizationPinHeader
+                            isPinned={isPinned(event.id)}
+                            canManagePins={canManagePins}
+                            pinPending={togglePin.isPending}
+                            onTogglePin={() => handleTogglePin(event)}
+                          />
+                        )}
+                      />
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={() => setReplyOpen(true)}
+                        className="block w-full rounded-2xl border border-dashed border-border/80 bg-card/50 px-6 py-10 text-center hover:bg-card hover:border-primary/40 transition-colors"
+                      >
+                        <p className="text-base font-medium text-foreground">
+                          No comments yet
+                        </p>
+                        <p className="mt-1 text-sm text-muted-foreground">
+                          Be the first to start a discussion.
+                        </p>
+                      </button>
+                    )}
+                  </div>
                 </div>
-
-                <DetailCommentComposer event={event} className="mb-3" />
-
-                {commentsLoading && statsLoading && replyTree.length === 0 ? (
-                  <div className="space-y-3">
-                    {Array.from({ length: 3 }).map((_, i) => (
-                      <ReplyCardSkeleton key={i} />
-                    ))}
-                  </div>
-                ) : replyTree.length > 0 ? (
-                  <div className="rounded-2xl bg-card border border-border/60 overflow-hidden">
-                    <ThreadedReplyList
-                      roots={replyTree}
-                      renderItemHeader={(event) => (
-                        <OrganizationPinHeader
-                          isPinned={isPinned(event.id)}
-                          canManagePins={canManagePins}
-                          pinPending={togglePin.isPending}
-                          onTogglePin={() => handleTogglePin(event)}
-                        />
-                      )}
-                    />
-                  </div>
-                ) : (
-                  <button
-                    type="button"
-                    onClick={() => setReplyOpen(true)}
-                    className="block w-full rounded-2xl border border-dashed border-border/80 bg-card/50 px-6 py-10 text-center hover:bg-card hover:border-primary/40 transition-colors"
-                  >
-                    <p className="text-base font-medium text-foreground">
-                      No comments yet
-                    </p>
-                    <p className="mt-1 text-sm text-muted-foreground">
-                      Be the first to start a discussion.
-                    </p>
-                  </button>
-                )}
               </div>
+
+              {groupActionColumn && (
+                <aside className="hidden lg:block lg:w-[360px] lg:shrink-0 lg:self-start">
+                  <div className="lg:sticky lg:top-4">{groupActionColumn}</div>
+                </aside>
+              )}
             </div>
           </div>
-        </CommunityModerationContext.Provider>
+      </CommunityModerationContext.Provider>
 
-      {/* Description dialog — opened by clicking the truncated description in
-          the banner. Renders the full raw description plus a clickable
-          website link when the description ends with a URL. */}
-      <Dialog open={descriptionDialogOpen} onOpenChange={setDescriptionDialogOpen}>
-        <DialogContent className="max-w-lg max-h-[85vh] flex flex-col overflow-hidden p-0 gap-0">
-          <DialogHeader className="px-5 pt-5 pb-3 border-b border-border shrink-0">
-            <DialogTitle>About {name}</DialogTitle>
-          </DialogHeader>
-          <div className="px-5 py-4 overflow-y-auto">
-            {description ? (
-              <NoteContent
-                event={descriptionPseudoEvent}
-                className="text-sm leading-relaxed break-words"
-              />
-            ) : (
-              <p className="text-sm text-muted-foreground">No description provided.</p>
-            )}
-          </div>
-        </DialogContent>
-      </Dialog>
-
-      {/* Leadership dialog — opened from the avatar stack or overflow menu. */}
+      {/* Leadership dialog — opened from the below-hero member section. */}
       <Dialog open={membersDialogOpen} onOpenChange={setMembersDialogOpen}>
         <DialogContent className="max-w-lg max-h-[85vh] flex flex-col overflow-hidden p-0 gap-0">
           <DialogHeader className="px-5 pt-5 pb-3 border-b border-border shrink-0">
             <DialogTitle className="flex items-center gap-2">
               <Users className="size-5" />
-              Leadership
+              Members
               {leadershipPubkeys.length > 0 && (
                 <span className="text-muted-foreground font-normal text-sm">({leadershipPubkeys.length})</span>
               )}
@@ -1176,7 +1205,7 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
               <MembersSkeleton />
             ) : memberSections.length === 0 ? (
               <div className="py-12 text-center text-muted-foreground text-sm px-5">
-                No leadership found.
+                No members found.
               </div>
             ) : (
               <div className="divide-y divide-border">
@@ -1227,15 +1256,15 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
       <AlertDialog open={deleteConfirmOpen} onOpenChange={setDeleteConfirmOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Delete this organization?</AlertDialogTitle>
+            <AlertDialogTitle>Delete this group?</AlertDialogTitle>
             <AlertDialogDescription>
               This publishes a NIP-09 deletion request for{' '}
               <span className="font-medium text-foreground">{name}</span>.
-              Well-behaved relays will drop the organization from feeds and
+              Well-behaved relays will drop the group from feeds and
               direct links. Campaigns, pledges, and posts published under
-              the organization stay on-chain regardless. This action cannot
+              the group stay on-chain regardless. This action cannot
               be undone — to change the name, banner, or moderators, edit
-              the organization instead.
+              the group instead.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
@@ -1253,8 +1282,6 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-
-      </div>
     </main>
   );
 
@@ -1262,10 +1289,10 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
     const wasPinned = isPinned(event.id);
     togglePin.mutate(event.id, {
       onSuccess: () => {
-        toast({ title: wasPinned ? 'Unpinned from organization' : 'Pinned to organization' });
+        toast({ title: wasPinned ? 'Unpinned from group' : 'Pinned to group' });
       },
       onError: () => {
-        toast({ title: 'Failed to update organization pins', variant: 'destructive' });
+        toast({ title: 'Failed to update group pins', variant: 'destructive' });
       },
     });
   }

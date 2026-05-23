@@ -24,6 +24,7 @@ import { useMuteList, type MuteListItem } from '@/hooks/useMuteList';
 import { useAuthor } from '@/hooks/useAuthor';
 import { FeedEditModal } from '@/components/FeedEditModal';
 import { buildKindOptions } from '@/lib/feedFilterUtils';
+import { AGORA_HOST } from '@/lib/appUrls';
 import { genUserName } from '@/lib/genUserName';
 import { EXTRA_KINDS } from '@/lib/extraKinds';
 import { SIDEBAR_ITEMS } from '@/lib/sidebarItems';
@@ -391,7 +392,7 @@ function FeedTabsSection() {
         {!community ? (
           <div className="flex gap-2">
             <Input
-              placeholder="agora.spot"
+              placeholder={AGORA_HOST}
               value={communityDomain}
               onChange={(e) => setCommunityDomain(e.target.value)}
               onKeyDown={(e) => {

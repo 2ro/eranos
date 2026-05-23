@@ -451,7 +451,7 @@ export function ComposeBox({
   // ensure the textarea keeps focus.  The height change re-render can
   // occasionally drop focus on desktop browsers.  On iOS the native tap
   // already handles focus, so this is mainly a desktop safety net.
-  const wasExpanded = useRef(false);
+  const wasExpanded = useRef(defaultExpanded);
   useEffect(() => {
     if (expanded && !wasExpanded.current) {
       textareaRef.current?.focus();

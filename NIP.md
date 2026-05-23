@@ -316,8 +316,10 @@ The kind is addressable so the creator can edit the story, banner, goal, deadlin
     ["goal", "25000"],
     ["deadline", "1735689600"],
 
-    ["i", "iso3166-1:US"],
-    ["k", "iso3166-1"]
+    ["i", "iso3166:US"],
+    ["k", "iso3166"],
+    ["t", "legal-defense"],
+    ["t", "mutual-aid"]
   ]
 }
 ```
@@ -350,8 +352,9 @@ The `content` field is the **campaign story**, formatted as Markdown. Clients SH
 | `imeta`   | Recommended | NIP-92 media metadata for the banner. The first `url <value>` pair MUST match the `banner` URL; clients SHOULD ignore an `imeta` whose URL does not match.                                                                  |
 | `goal`    | Optional | Fundraising goal in **integer US Dollars** (no unit suffix, no decimals). Clients MAY display an estimated sat-equivalent at view time using a live exchange rate.                                                          |
 | `deadline`| Optional | Unix timestamp (seconds) at which the campaign closes for new donations. After the deadline, clients SHOULD show the campaign as ended but MAY still accept donations.                                                       |
-| `i`       | Recommended | NIP-73 country identifier. SHOULD be `iso3166-1:<code>` with an uppercase ISO 3166-1 alpha-2 country code (e.g. `iso3166-1:VE`).                                                                                          |
-| `k`       | Recommended if `i` is present | NIP-73 external content kind. For country identifiers this SHOULD be `iso3166-1`.                                                                                                              |
+| `i`       | Recommended | NIP-73 country identifier. SHOULD be `iso3166:<code>` with an uppercase ISO 3166-1 alpha-2 country code (e.g. `iso3166:VE`).                                                                                          |
+| `k`       | Recommended if `i` is present | NIP-73 external content kind. For country identifiers this SHOULD be `iso3166`.                                                                                                              |
+| `t`       | Optional | User-entered discovery/category tags. Agora also adds `t:agora` as the app marker; other `t` values are freeform topics such as `legal-defense` or `mutual-aid`. |
 | `alt`     | Recommended | NIP-31 human-readable fallback.                                                                                                                                                                                            |
 
 ### Wallet Modes
@@ -445,7 +448,7 @@ Clients MUST verify each kind 8333 event on-chain before counting it toward the 
 **Filter by country:**
 
 ```json
-{ "kinds": [33863], "#i": ["iso3166-1:VE"], "limit": 50 }
+{ "kinds": [33863], "#i": ["iso3166:VE"], "limit": 50 }
 ```
 
 **Fetch pinned event comments:**
@@ -479,7 +482,7 @@ The `pinnedEvents` array is ordered newest pin first. Pinning an already-pinned 
 - **Wallet validity:** clients MUST reject events that carry no `w` tag, that carry more than one `w` tag of the same mode (e.g., two `bc1…` addresses), or whose `w` values fail bech32(m) checksum validation for one of the supported prefixes. Invalid campaigns do not render.
 - **Editability:** the creator MAY republish the same `(33863, pubkey, d)` triple to update any field, including the `w` wallet endpoint. Clients SHOULD keep `published_at` from the first publish on subsequent edits (NIP-23 convention).
 - **Closing a campaign:** there is no `status` tag. To stop accepting donations, the creator publishes a NIP-09 kind 5 deletion request referencing the campaign's `a` coordinate. Clients SHOULD honor the deletion by removing the campaign from discovery feeds. Historical kind 8333 receipts MAY still be rendered against the (now-deleted) campaign coordinate so donors can find their past donations.
-- **No category, no topics:** kind 33863 events MUST NOT carry `t` tags or NIP-32 category labels in any `agora.*` namespace. Campaigns are individual stories; discovery happens via search (NIP-50 against title/summary/content), country (`#i`), and moderator curation (below).
+- **Categories:** clients MAY use user-entered `t` tags for topic filtering and discovery. Agora reserves `t:agora` as its app marker but does not reserve any other topic namespace.
 - **Migration:** kind 33863 has no relationship to any earlier campaign kind. Clients MUST NOT read, merge, or migrate events of any other kind into the kind 33863 namespace.
 
 ### Agora Moderation Labels
@@ -991,6 +994,9 @@ A kind `34550` event defines the community, extending [NIP-72](https://github.co
 | `image` | No | Image URL. |
 | `a` | Yes (1) | Member badge definition reference with role marker `"member"`. |
 | `p` | No | Moderator pubkeys. The 4th element SHOULD be `"moderator"`. |
+| `i` | No | Agora extension: NIP-73 country identifier (`iso3166:XX`) for country-scoped group discovery. This is not part of NIP-72. |
+| `k` | Recommended if `i` is present | Agora extension: external content kind hint. Use `iso3166` for country identifiers. |
+| `t` | No | Agora extension: user-entered discovery/category tags. Agora also adds `t:agora` as the app marker. |
 | `relay` | No | Recommended relay URL for community content (per [NIP-72](https://github.com/nostr-protocol/nips/blob/master/72.md)). |
 | `alt` | No | [NIP-31](https://github.com/nostr-protocol/nips/blob/master/31.md) description. |
 
@@ -1016,6 +1022,10 @@ The fourth element is a strict protocol marker, not a display label. Communities
     ["image", "https://example.com/clan-banner.jpg"],
     ["a", "30009:<founder-pubkey>:a1b2c3d4-...-member", "", "member"],
     ["p", "<co-moderator-pubkey>", "", "moderator"],
+    ["i", "iso3166:US"],
+    ["k", "iso3166"],
+    ["t", "local-news"],
+    ["t", "mutual-aid"],
     ["relay", "wss://relay.example.com"],
     ["alt", "Community: The Arbiter's Guard"]
   ]

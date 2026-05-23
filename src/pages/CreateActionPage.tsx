@@ -30,6 +30,7 @@ import { useToast } from '@/hooks/useToast';
 import { useLayoutOptions } from '@/contexts/LayoutContext';
 import { usdToSats } from '@/lib/bitcoin';
 import { COUNTRIES, searchCountries, type CountryEntry } from '@/lib/countries';
+import { parseContentTagInput } from '@/lib/contentTags';
 import { createCountryIdentifier } from '@/lib/countryIdentifiers';
 import { getTodayDateInput } from '@/lib/dateInput';
 import { createOrganizationAssociationTags, decodeOrganizationParam } from '@/lib/organizationContext';
@@ -37,22 +38,6 @@ import { sanitizeUrl } from '@/lib/sanitizeUrl';
 import { unixSecondsInTimezone } from '@/lib/timezone';
 import { cn } from '@/lib/utils';
 import { withAgoraTag } from '@/lib/agoraNoteTags';
-
-function normalizePledgeTag(value: string): string {
-  return value.trim().replace(/^#+/, '').toLowerCase().replace(/\s+/g, '-');
-}
-
-function parsePledgeTagInput(value: string): string[] {
-  const seen = new Set<string>();
-  const tags: string[] = [];
-  for (const part of value.split(',')) {
-    const tag = normalizePledgeTag(part);
-    if (!tag || seen.has(tag)) continue;
-    seen.add(tag);
-    tags.push(tag);
-  }
-  return tags;
-}
 
 export function CreateActionPage() {
   useLayoutOptions({ noMaxWidth: true, rightSidebar: null });
@@ -151,7 +136,7 @@ export function CreateActionPage() {
         .replace(/[^a-z0-9]+/g, '-')
         .replace(/(^-|-$)/g, '');
       const dTag = `${slug || 'pledge'}-${now}`;
-      const pledgeTags = parsePledgeTagInput(tagInput);
+      const pledgeTags = parseContentTagInput(tagInput);
 
       const tags: string[][] = [
         ['d', dTag],

@@ -1,5 +1,7 @@
 import type { NostrEvent } from '@nostrify/nostrify';
 
+import { getEditableContentTags } from '@/lib/contentTags';
+import { parseCountryIdentifier } from '@/lib/countryIdentifiers';
 import { sanitizeUrl } from '@/lib/sanitizeUrl';
 
 // ── Kind constants ────────────────────────────────────────────────────────────
@@ -61,6 +63,10 @@ export interface ParsedCommunity {
   moderatorPubkeys: string[];
   /** Recommended relay URLs. */
   relays: string[];
+  /** ISO 3166-1 alpha-2 country code parsed from an Agora `i` tag extension. */
+  countryCode?: string;
+  /** User-editable topic/category `t` tags, excluding Agora's app marker. */
+  topicTags: string[];
   /** The `a` tag coordinate for the community: `34550:<pubkey>:<d-tag>`. */
   aTag: string;
   /**
@@ -85,6 +91,9 @@ export function parseCommunityEvent(event: NostrEvent): ParsedCommunity | null {
   const description = event.tags.find(([n]) => n === 'description')?.[1] || '';
   const rawImage = event.tags.find(([n]) => n === 'image')?.[1];
   const image = sanitizeUrl(rawImage);
+  const countryCode = event.tags
+    .map(([name, value]) => name === 'i' && value ? parseCountryIdentifier(value) : undefined)
+    .find((code): code is string => !!code && /^[A-Z]{2}$/.test(code));
 
   // Moderators: p tags with "moderator" role (4th element)
   const moderatorPubkeys = Array.from(new Set(event.tags
@@ -106,6 +115,8 @@ export function parseCommunityEvent(event: NostrEvent): ParsedCommunity | null {
     founderPubkey: event.pubkey,
     moderatorPubkeys,
     relays,
+    countryCode,
+    topicTags: getEditableContentTags(event.tags),
     aTag: `${COMMUNITY_DEFINITION_KIND}:${event.pubkey}:${dTag}`,
     tags: event.tags,
   };

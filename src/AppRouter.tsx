@@ -289,8 +289,10 @@ export function AppRouter() {
             <Route path="/archive" element={<ArchivePage />} />
             <Route path="/bluesky" element={<BlueskyPage />} />
             <Route path="/wikipedia" element={<WikipediaPage />} />
-            <Route path="/communities" element={<CommunitiesPage />} />
-            <Route path="/communities/new" element={<CreateCommunityPage />} />
+            <Route path="/groups" element={<CommunitiesPage />} />
+            <Route path="/groups/new" element={<CreateCommunityPage />} />
+            <Route path="/communities" element={<Navigate to="/groups" replace />} />
+            <Route path="/communities/new" element={<Navigate to="/groups/new" replace />} />
             <Route path="/letters" element={<LettersPage />} />
             <Route path="/letters/compose" element={<LetterComposePage />} />
             <Route path="/settings/letters" element={<LetterPreferencesPage />} />
