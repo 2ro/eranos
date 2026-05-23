@@ -50,6 +50,7 @@ import { useDeleteEvent } from '@/hooks/useDeleteEvent';
 import { useEventStats } from '@/hooks/useTrending';
 import { usePinnedEventComments } from '@/hooks/usePinnedEventComments';
 import { useProfileUrl } from '@/hooks/useProfileUrl';
+import { useShareOrigin } from '@/hooks/useShareOrigin';
 import { useToast } from '@/hooks/useToast';
 import { useLayoutOptions } from '@/contexts/LayoutContext';
 import {
@@ -126,6 +127,7 @@ function CampaignDetailContent({ campaign }: { campaign: ParsedCampaign }) {
   const { data: stats, isLoading: statsLoading } = useCampaignDonations(campaign);
   const navigate = useNavigate();
   const { toast } = useToast();
+  const shareOrigin = useShareOrigin();
   const queryClient = useQueryClient();
 
   const [replyOpen, setReplyOpen] = useState(false);
@@ -262,7 +264,7 @@ function CampaignDetailContent({ campaign }: { campaign: ParsedCampaign }) {
   });
 
   const handleShare = async () => {
-    const url = `${window.location.origin}/${naddr}`;
+    const url = `${shareOrigin}/${naddr}`;
     try {
       const nav = typeof navigator !== 'undefined' ? navigator : undefined;
       if (nav?.share) {

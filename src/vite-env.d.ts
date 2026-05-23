@@ -10,9 +10,8 @@ interface ImportMetaEnv {
   /**
    * Canonical origin used when generating shareable URLs (QR codes, copy-link,
    * remote-login callbacks, etc). Overridden by `shareOrigin` in `ditto.json`
-   * and by user config in localStorage. Falls back to `window.location.origin`
-   * when unset. Primarily useful for native (Capacitor) builds, where
-   * `window.location.origin` is `capacitor://localhost` or `https://localhost`.
+   * and by user config in localStorage. Falls back to Agora's canonical
+   * production origin when unset.
    */
   readonly VITE_SHARE_ORIGIN?: string;
   /** Semver version from package.json (e.g., "2.0.0"). */

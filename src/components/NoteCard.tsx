@@ -89,6 +89,7 @@ import { useAuthor } from "@/hooks/useAuthor";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { useOpenPost } from "@/hooks/useOpenPost";
 import { useProfileUrl } from "@/hooks/useProfileUrl";
+import { useShareOrigin } from "@/hooks/useShareOrigin";
 import { toast } from "@/hooks/useToast";
 import { useEventStats } from "@/hooks/useTrending";
 import { canZap } from "@/lib/canZap";
@@ -381,6 +382,7 @@ export const NoteCard = memo(function NoteCard({
   const actionTarget = actionEvent ?? event;
   const { config } = useAppContext();
   const { user } = useCurrentUser();
+  const shareOrigin = useShareOrigin();
   const author = useAuthor(event.pubkey);
   const actionAuthor = useAuthor(actionEvent?.pubkey);
   // Kind 9735 (Lightning zap) sender lives in the receipt's `P` tag / embedded
@@ -878,7 +880,7 @@ export const NoteCard = memo(function NoteCard({
         onClick={async (e) => {
           e.stopPropagation();
           impactLight();
-          const url = `${window.location.origin}/${encodedId}`;
+          const url = `${shareOrigin}/${encodedId}`;
           const result = await shareOrCopy(url);
           if (result === "copied") toast({ title: "Link copied to clipboard" });
         }}

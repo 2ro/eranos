@@ -10,6 +10,7 @@ import { ZapDialog } from '@/components/ZapDialog';
 import { useAuthor } from '@/hooks/useAuthor';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useEventStats } from '@/hooks/useTrending';
+import { useShareOrigin } from '@/hooks/useShareOrigin';
 import { useToast } from '@/hooks/useToast';
 import { canZap } from '@/lib/canZap';
 import { formatNumber } from '@/lib/formatNumber';
@@ -44,6 +45,7 @@ export function PostActionBar({
 }: PostActionBarProps) {
   const { toast } = useToast();
   const { user } = useCurrentUser();
+  const shareOrigin = useShareOrigin();
   const author = useAuthor(event.pubkey);
   const metadata = author.data?.metadata;
   // TODO: Enable zapping split-recipient NIP-75 goals once zap split payments are supported.
@@ -62,10 +64,10 @@ export function PostActionBar({
     } else {
       encoded = nip19.neventEncode({ id: event.id, author: event.pubkey });
     }
-    const url = `${window.location.origin}/${encoded}`;
+    const url = `${shareOrigin}/${encoded}`;
     const result = await shareOrCopy(url);
     if (result === 'copied') toast({ title: 'Link copied to clipboard' });
-  }, [event, toast]);
+  }, [event, shareOrigin, toast]);
 
   return (
     <div

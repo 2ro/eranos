@@ -13,6 +13,7 @@ import { useAuthor } from '@/hooks/useAuthor';
 import { useAuthors } from '@/hooks/useAuthors';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useFollowList, useFollowActions } from '@/hooks/useFollowActions';
+import { useNip05Resolve } from '@/hooks/useNip05Resolve';
 import { useToast } from '@/hooks/useToast';
 import { useProfileUrl } from '@/hooks/useProfileUrl';
 import { useProfileFeed, filterByTab } from '@/hooks/useProfileFeed';
@@ -522,10 +523,28 @@ function FollowPackView({ addr, relays }: { addr: AddrCoords; relays?: string[] 
 /** Kinds accepted as follow packs/sets at /follow URLs. */
 const FOLLOW_PACK_SET_KINDS = new Set([30000, 39089]);
 
+function isNip05Identifier(value: string): boolean {
+  if (value.includes('@')) return true;
+  return value.includes('.') && !value.startsWith('npub1') && !value.startsWith('nprofile1');
+}
+
 export function FollowPage() {
   const { npub } = useParams<{ npub: string }>();
+  const isNip05 = !!npub && isNip05Identifier(npub);
+  const { data: nip05Pubkey, isPending: nip05Loading } = useNip05Resolve(isNip05 ? npub : undefined);
 
   if (!npub) return <NotFound />;
+
+  if (isNip05) {
+    if (nip05Loading) {
+      return (
+        <div className="min-h-screen flex items-center justify-center text-muted-foreground">
+          <Loader2 className="size-5 animate-spin" />
+        </div>
+      );
+    }
+    return nip05Pubkey ? <FollowView pubkey={nip05Pubkey} /> : <NotFound />;
+  }
 
   // Try decoding as a NIP-19 identifier
   let decoded;

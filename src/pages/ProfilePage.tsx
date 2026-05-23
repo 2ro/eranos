@@ -45,6 +45,7 @@ import { VideoPlayer } from '@/components/VideoPlayer';
 
 import { useUserStatus } from '@/hooks/useUserStatus';
 import { useNip85UserStats } from '@/hooks/useNip85Stats';
+import { useShareOrigin } from '@/hooks/useShareOrigin';
 import { useFeedSettings } from '@/hooks/useFeedSettings';
 
 import { FollowQRDialog } from '@/components/FollowQRDialog';
@@ -109,6 +110,7 @@ interface ProfileMoreMenuProps {
 function ProfileMoreMenu({ pubkey, displayName, open, onOpenChange, isOwnProfile, authorEvent }: ProfileMoreMenuProps) {
   const { toast } = useToast();
   const { user } = useCurrentUser();
+  const shareOrigin = useShareOrigin();
   const navigate = useNavigate();
   const npubEncoded = useMemo(() => nip19.npubEncode(pubkey), [pubkey]);
   const { addMute, removeMute, isMuted } = useMuteList();
@@ -136,7 +138,7 @@ function ProfileMoreMenu({ pubkey, displayName, open, onOpenChange, isOwnProfile
   };
 
   const handleCopyLink = () => {
-    const url = `${window.location.origin}/${npubEncoded}`;
+    const url = `${shareOrigin}/${npubEncoded}`;
     navigator.clipboard.writeText(url);
     toast({ title: 'Profile link copied to clipboard' });
     close();

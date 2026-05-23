@@ -196,9 +196,8 @@ export interface AppConfig {
   appId: string;
   /**
    * Canonical origin used when generating shareable URLs (QR codes, copy-link,
-   * remote-login callbacks, etc). Falls back to `window.location.origin` when
-   * unset. Configure this in `ditto.json` for native builds, where
-   * `window.location.origin` is `capacitor://localhost` or `https://localhost`.
+   * remote-login callbacks, etc). Falls back to Agora's canonical production
+   * origin when unset.
    * Must NOT include a trailing slash.
    */
   shareOrigin?: string;

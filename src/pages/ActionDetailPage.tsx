@@ -18,6 +18,7 @@ import { useAuthor } from '@/hooks/useAuthor';
 import { useBtcPrice } from '@/hooks/useBtcPrice';
 import { useComments } from '@/hooks/useComments';
 import { useProfileUrl } from '@/hooks/useProfileUrl';
+import { useShareOrigin } from '@/hooks/useShareOrigin';
 import { useSubmissionZapTotals } from '@/hooks/useSubmissionZapTotals';
 import { useToast } from '@/hooks/useToast';
 import { useLayoutOptions } from '@/contexts/LayoutContext';
@@ -80,6 +81,7 @@ function PledgeDetailContent({ action }: { action: Action }) {
   const author = useAuthor(action.pubkey);
   const navigate = useNavigate();
   const { toast } = useToast();
+  const shareOrigin = useShareOrigin();
   const { data: commentsData, isLoading: commentsLoading } = useComments(action.event, 500);
   const rootATag = `36639:${action.pubkey}:${action.id}`;
   const {
@@ -161,7 +163,7 @@ function PledgeDetailContent({ action }: { action: Action }) {
   );
 
   const handleShare = async () => {
-    const url = `${window.location.origin}/${naddr}`;
+    const url = `${shareOrigin}/${naddr}`;
     try {
       const nav = typeof navigator !== 'undefined' ? navigator : undefined;
       if (nav?.share) {

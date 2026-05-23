@@ -21,6 +21,7 @@ import { useAuthor } from '@/hooks/useAuthor';
 import { useCountryFollows } from '@/hooks/useCountryFollows';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useProfileUrl } from '@/hooks/useProfileUrl';
+import { useShareOrigin } from '@/hooks/useShareOrigin';
 import { useToast } from '@/hooks/useToast';
 import { genUserName } from '@/lib/genUserName';
 import { getCountryInfo, getWikipediaTitle } from '@/lib/countries';
@@ -83,6 +84,7 @@ function BlueskyPostHeader({ author, rkey, url }: { author: string; rkey: string
   const { toast } = useToast();
 
   const profileUrl = `/i/${encodeURIComponent(`https://bsky.app/profile/${post?.handle ?? author}`)}`;
+  const shareOrigin = useShareOrigin();
   const externalContent = useMemo(() => parseExternalUri(url), [url]);
 
   const [shareOpen, setShareOpen] = useState(false);
@@ -100,12 +102,12 @@ function BlueskyPostHeader({ author, rkey, url }: { author: string; rkey: string
 
   const handleShare = useCallback(async (e: React.MouseEvent) => {
     e.stopPropagation();
-    const fullUrl = `${window.location.origin}/i/${encodeURIComponent(url)}`;
+    const fullUrl = `${shareOrigin}/i/${encodeURIComponent(url)}`;
     const result = await shareOrCopy(fullUrl);
     if (result === 'copied') {
       toast({ title: 'Link copied' });
     }
-  }, [url, toast]);
+  }, [shareOrigin, url, toast]);
 
   if (isLoading) {
     return (

@@ -1,6 +1,8 @@
 import { Link } from 'react-router-dom';
 import { Info, BookOpen, Shield, Code, ScrollText } from 'lucide-react';
 
+import { AGORA_ORIGIN } from '@/lib/appUrls';
+
 interface LinkFooterProps {
   /** Optional callback fired when an internal (React Router) link is clicked. */
   onNavigate?: () => void;
@@ -16,7 +18,7 @@ export function LinkFooter({ onNavigate }: LinkFooterProps) {
     <footer className="mt-auto pt-3 pb-3 -mx-1 sidebar:bg-background/85 sidebar:rounded-xl sidebar:p-3">
       <nav className="flex items-center justify-center gap-0.5 flex-wrap" aria-label="Footer links">
         <a
-          href="https://agora.spot"
+          href={AGORA_ORIGIN}
           className={chipClass}
           target="_blank"
           rel="noopener noreferrer"
@@ -26,7 +28,7 @@ export function LinkFooter({ onNavigate }: LinkFooterProps) {
         </a>
 
         <a
-          href="https://agora.spot"
+          href={AGORA_ORIGIN}
           className={chipClass}
           target="_blank"
           rel="noopener noreferrer"

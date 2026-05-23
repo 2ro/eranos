@@ -16,6 +16,7 @@ import { useToast } from '@/hooks/useToast';
 import { getRepostKind } from '@/lib/feedUtils';
 import { DITTO_RELAY } from '@/lib/appRelays';
 import { encodeEventAddress } from '@/lib/encodeEvent';
+import { buildAgoraUrl } from '@/lib/appUrls';
 import type { Nip85EventStats } from '@/hooks/useNip85Stats';
 import { invalidateEventStats } from '@/lib/invalidateEventStats';
 
@@ -153,7 +154,7 @@ export function RepostMenu({ event, children }: RepostMenuProps) {
   };
 
   const handleBoost = () => {
-    setQuoteInitialContent(`\n\nhttps://agora.spot/${encodeEventAddress(event)}`);
+    setQuoteInitialContent(`\n\n${buildAgoraUrl(encodeEventAddress(event))}`);
     setOpen(false);
     setQuoteOpen(true);
   };
