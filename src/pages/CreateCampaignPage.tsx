@@ -19,8 +19,6 @@ import {
 import { CoverImageField } from '@/components/CoverImageField';
 import { FormSection } from '@/components/FormSection';
 import { OrganizationContextChip } from '@/components/OrganizationContextChip';
-import { BitcoinPublicDisclaimer } from '@/components/BitcoinPublicDisclaimer';
-import { BitcoinPrivateDisclaimer } from '@/components/BitcoinPrivateDisclaimer';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
@@ -859,16 +857,6 @@ function WalletPicker({
   parsedCustomSp: ReturnType<typeof parseCampaignWallet>;
 }) {
   const initial = displayName.charAt(0).toUpperCase() || '?';
-  // The on-chain disclaimer fires whenever the campaign will publish an
-  // on-chain endpoint — either via "My wallet" or a valid typed bc1.
-  const willPublishOnchain =
-    (useMyWallet && hdWalletAvailable) ||
-    (showCustomFields && parsedCustomOnchain?.mode === 'onchain');
-  // The SP disclaimer fires whenever the campaign will publish an SP
-  // endpoint — either via "My private wallet" or a valid typed sp1.
-  const willPublishSp =
-    (useMyPrivateWallet && silentPaymentSupported) ||
-    (showCustomFields && parsedCustomSp?.mode === 'sp');
 
   return (
     <div className="space-y-3">
@@ -939,27 +927,6 @@ function WalletPicker({
           Log in with a Nostr secret key to use a built-in wallet, or enter a Bitcoin address below.
         </p>
       )}
-
-      {willPublishOnchain && (
-        <BitcoinPublicDisclaimer
-          tone="soft"
-          includeCashOutAdvice={false}
-          leadText={
-            willPublishSp
-              ? 'Donations to the Bitcoin address are public and can be traced.'
-              : 'Donations are public and can be traced.'
-          }
-          popoverText={
-            <>
-              Bitcoin is a public ledger. Transactions sent to this
-              wallet will be visible to everyone. Funds you send from
-              it can be traced back to you and your donors, even after
-              being exchanged by multiple people.
-            </>
-          }
-        />
-      )}
-      {willPublishSp && <BitcoinPrivateDisclaimer />}
     </div>
   );
 }
