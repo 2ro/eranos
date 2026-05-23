@@ -541,5 +541,55 @@
     "refreshedDesc": "Lista de organizadores actualizada desde los relés.",
     "adminRequired": "Se requiere acceso de administrador",
     "adminRequiredDesc": "Solo los administradores de la plataforma pueden designar o eliminar organizadores."
+  },
+  "wallet": {
+    "seoTitle": "Cartera",
+    "seoDescription": "Cartera Bitcoin determinística jerárquica derivada de tu nsec de Nostr.",
+    "loggedOut": {
+      "title": "Cartera de Bitcoin",
+      "description": "Una cartera jerárquica derivada de tu identidad de Nostr. Dirección nueva en cada cobro, historial completo de transacciones, sin reutilización de direcciones.",
+      "requiresNsec": "Requiere iniciar sesión con un nsec (tu clave privada de Nostr)."
+    },
+    "unsupported": {
+      "title": "Cartera no disponible",
+      "extension": "Tu extensión del navegador mantiene aislada tu clave secreta, así que no podemos derivar claves hijas para tu cartera.",
+      "bunker": "Tu firmante remoto (búnker NIP-46) guarda tu clave secreta del lado del búnker, así que no podemos derivar claves hijas para tu cartera.",
+      "other": "Tu tipo de inicio de sesión no expone la clave secreta necesaria para derivar tu cartera.",
+      "instructions": "Cierra sesión y vuelve a iniciar sesión con tu nsec para usar la cartera."
+    },
+    "scanFailed": "Error al escanear la cartera",
+    "retry": "Reintentar",
+    "refreshBalance": "Actualizar saldo",
+    "refreshBalanceTitle": "Haz clic para actualizar el saldo",
+    "amountPending": "{{amount}} pendiente",
+    "pending": "pendiente",
+    "send": "Enviar",
+    "receive": "Recibir",
+    "transactions": "Transacciones",
+    "receiveDialog": {
+      "title": "Recibir Bitcoin",
+      "description": "Comparte una dirección para recibir bitcoin.",
+      "onChain": "En cadena",
+      "silentPayment": "Pago silencioso",
+      "onChainIntro": "Dirección nueva cada vez. Pasa a un nuevo índice después de compartirla para preservar tu privacidad.",
+      "addressIndex": "Dirección n.º {{index}}",
+      "newAddress": "Nueva dirección",
+      "silentIntro": "Identificador de recepción estático. Compártelo una vez y reutilízalo para siempre: los remitentes derivan una dirección única en cadena para cada pago.",
+      "noIndexer": "Escaneo desactivado: no hay indexador BIP-352 configurado. Define <0>bip352IndexerUrl</0> en la configuración de tu aplicación para detectar pagos silenciosos entrantes.",
+      "silentBalance": "Saldo de pago silencioso: <0>{{amount}}</0>",
+      "scanForNew": "Buscar nuevos pagos",
+      "scanForPayments": "Buscar pagos"
+    },
+    "tx": {
+      "pending": "Pendiente",
+      "today": "Hoy",
+      "yesterday": "Ayer",
+      "daysAgo_one": "hace {{count}}d",
+      "daysAgo_other": "hace {{count}}d",
+      "received": "Recibido",
+      "sent": "Enviado",
+      "silentBadge": "silencioso",
+      "silentDetectedTitle": "Detectado mediante el escaneo de pagos silenciosos BIP-352"
+    }
   }
 }

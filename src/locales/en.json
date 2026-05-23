@@ -541,5 +541,55 @@
     "refreshedDesc": "Organizer list refreshed from relays.",
     "adminRequired": "Admin access required",
     "adminRequiredDesc": "Only platform admins can appoint or remove organizers."
+  },
+  "wallet": {
+    "seoTitle": "Wallet",
+    "seoDescription": "Hierarchical-deterministic Bitcoin wallet derived from your Nostr nsec.",
+    "loggedOut": {
+      "title": "Bitcoin Wallet",
+      "description": "A hierarchical wallet derived from your Nostr identity. Fresh address per receive, full transaction history, no address reuse.",
+      "requiresNsec": "Requires login with an nsec (your Nostr private key)."
+    },
+    "unsupported": {
+      "title": "Wallet unavailable",
+      "extension": "Your browser extension keeps your secret key isolated, so we can't derive child keys for your wallet.",
+      "bunker": "Your remote signer (NIP-46 bunker) keeps your secret key on the bunker side, so we can't derive child keys for your wallet.",
+      "other": "Your login type doesn't expose the secret key needed to derive your wallet.",
+      "instructions": "Log out and sign in again with your nsec to use the wallet."
+    },
+    "scanFailed": "Failed to scan wallet",
+    "retry": "Retry",
+    "refreshBalance": "Refresh balance",
+    "refreshBalanceTitle": "Click to refresh balance",
+    "amountPending": "{{amount}} pending",
+    "pending": "pending",
+    "send": "Send",
+    "receive": "Receive",
+    "transactions": "Transactions",
+    "receiveDialog": {
+      "title": "Receive Bitcoin",
+      "description": "Share an address to receive bitcoin.",
+      "onChain": "On-chain",
+      "silentPayment": "Silent payment",
+      "onChainIntro": "Fresh address each time. Bump to a new index after sharing for privacy.",
+      "addressIndex": "Address #{{index}}",
+      "newAddress": "New address",
+      "silentIntro": "Static receive identifier. Share once and reuse forever — senders derive a unique on-chain address per payment.",
+      "noIndexer": "Scanning disabled — no BIP-352 indexer configured. Set <0>bip352IndexerUrl</0> in your app config to detect incoming silent payments.",
+      "silentBalance": "Silent payment balance: <0>{{amount}}</0>",
+      "scanForNew": "Scan for new payments",
+      "scanForPayments": "Scan for payments"
+    },
+    "tx": {
+      "pending": "Pending",
+      "today": "Today",
+      "yesterday": "Yesterday",
+      "daysAgo_one": "{{count}}d ago",
+      "daysAgo_other": "{{count}}d ago",
+      "received": "Received",
+      "sent": "Sent",
+      "silentBadge": "silent",
+      "silentDetectedTitle": "Detected via BIP-352 silent payment scan"
+    }
   }
 }

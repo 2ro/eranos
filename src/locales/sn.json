@@ -541,5 +541,55 @@
     "refreshedDesc": "Rondedzero yevagadziri yavandudzwa kubva kumarelays.",
     "adminRequired": "Mvumo yeadmin inodikanwa",
     "adminRequiredDesc": "Vatariri vechikuva chete ndivo vanogona kusarudza kana kubvisa vagadziri."
+  },
+  "wallet": {
+    "seoTitle": "Chikwama",
+    "seoDescription": "Chikwama cheBitcoin chenhevedzano chinobva pa nsec yako yeNostr.",
+    "loggedOut": {
+      "title": "Chikwama cheBitcoin",
+      "description": "Chikwama chenhevedzano chinobva pamuviri wako weNostr. Kero itsva pakugamuchira kwoga kwoga, nhoroondo yakazara yezvinoitwa, pasina kushandiswazve kwemakero.",
+      "requiresNsec": "Inoda kupinda nensec (kiyi yako yakavanzika yeNostr)."
+    },
+    "unsupported": {
+      "title": "Chikwama hachiwanike",
+      "extension": "Yekuwedzera yebrowser yako inochengeta kiyi yako yakavanzika yakaparadzaniswa, saka hatigoni kubvisa makiyi evana kuchikwama chako.",
+      "bunker": "Mubatsiri wako weakure (NIP-46 bunker) anochengeta kiyi yako yakavanzika kudivi rebunker, saka hatigoni kubvisa makiyi evana kuchikwama chako.",
+      "other": "Mhando yako yekupinda haiburitse kiyi yakavanzika inodiwa kuti tibvise chikwama chako.",
+      "instructions": "Buda wodzosera kupinda nensec yako kuti ushandise chikwama."
+    },
+    "scanFailed": "Kuongorora chikwama kwakundikana",
+    "retry": "Edzazve",
+    "refreshBalance": "Vandudza bharanzi",
+    "refreshBalanceTitle": "Dzvanya kuvandudza bharanzi",
+    "amountPending": "{{amount}} zvichakamirira",
+    "pending": "zvichakamirira",
+    "send": "Tumira",
+    "receive": "Gamuchira",
+    "transactions": "Zvinoitwa",
+    "receiveDialog": {
+      "title": "Gamuchira Bitcoin",
+      "description": "Govera kero yokugamuchira bitcoin.",
+      "onChain": "PaCheni",
+      "silentPayment": "Mubhadharo wakanyararira",
+      "onChainIntro": "Kero itsva nguva dzese. Chinjira kune index itsva mushure mokugovera kuti uchengetedze privacy.",
+      "addressIndex": "Kero #{{index}}",
+      "newAddress": "Kero itsva",
+      "silentIntro": "Chiratidzo chokugamuchira chakamira. Govera kamwe woshandisazve nokusingaperi — vatumiri vanobvisa kero yakasiyana pacheni pamubhadharo woga woga.",
+      "noIndexer": "Kuongorora kwadzimwa — hapana muongorori weBIP-352 wakaiswa. Isa <0>bip352IndexerUrl</0> mukurongedzwa kweapp yako kuti uone mibhadharo yakanyararira inopinda.",
+      "silentBalance": "Bharanzi remubhadharo wakanyararira: <0>{{amount}}</0>",
+      "scanForNew": "Tsvaga mibhadharo mitsva",
+      "scanForPayments": "Tsvaga mibhadharo"
+    },
+    "tx": {
+      "pending": "Zvichakamirira",
+      "today": "Nhasi",
+      "yesterday": "Nezuro",
+      "daysAgo_one": "mazuva {{count}} apfuura",
+      "daysAgo_other": "mazuva {{count}} apfuura",
+      "received": "Zvagamuchirwa",
+      "sent": "Zvatumirwa",
+      "silentBadge": "wakanyararira",
+      "silentDetectedTitle": "Zvakaonekwa kuburikidza nokuongorora kwemubhadharo wakanyararira weBIP-352"
+    }
   }
 }

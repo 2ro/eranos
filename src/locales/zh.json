@@ -541,5 +541,55 @@
     "refreshedDesc": "已从中继刷新组织者列表。",
     "adminRequired": "需要管理员权限",
     "adminRequiredDesc": "只有平台管理员才能任命或移除组织者。"
+  },
+  "wallet": {
+    "seoTitle": "钱包",
+    "seoDescription": "由你的 Nostr nsec 派生出的分层确定性比特币钱包。",
+    "loggedOut": {
+      "title": "比特币钱包",
+      "description": "一个由你的 Nostr 身份派生出的分层钱包。每次收款都使用新地址，完整的交易历史，地址不复用。",
+      "requiresNsec": "需要使用 nsec（你的 Nostr 私钥）登录。"
+    },
+    "unsupported": {
+      "title": "钱包不可用",
+      "extension": "你的浏览器扩展将密钥隔离保存，因此我们无法为你的钱包派生子密钥。",
+      "bunker": "你的远程签名器（NIP-46 bunker）将密钥保存在 bunker 一侧，因此我们无法为你的钱包派生子密钥。",
+      "other": "你的登录方式不暴露派生钱包所需的密钥。",
+      "instructions": "请退出并使用 nsec 重新登录以使用钱包。"
+    },
+    "scanFailed": "扫描钱包失败",
+    "retry": "重试",
+    "refreshBalance": "刷新余额",
+    "refreshBalanceTitle": "点击刷新余额",
+    "amountPending": "{{amount}} 待确认",
+    "pending": "待确认",
+    "send": "发送",
+    "receive": "接收",
+    "transactions": "交易",
+    "receiveDialog": {
+      "title": "接收比特币",
+      "description": "分享一个地址以接收比特币。",
+      "onChain": "链上",
+      "silentPayment": "静默支付",
+      "onChainIntro": "每次都生成新地址。分享后请切换到新索引以保护隐私。",
+      "addressIndex": "地址 #{{index}}",
+      "newAddress": "新地址",
+      "silentIntro": "静态接收标识符。一次分享，永久复用——发送方为每笔支付派生唯一的链上地址。",
+      "noIndexer": "扫描已禁用——未配置 BIP-352 索引器。在应用配置中设置 <0>bip352IndexerUrl</0> 以检测传入的静默支付。",
+      "silentBalance": "静默支付余额：<0>{{amount}}</0>",
+      "scanForNew": "扫描新支付",
+      "scanForPayments": "扫描支付"
+    },
+    "tx": {
+      "pending": "待确认",
+      "today": "今天",
+      "yesterday": "昨天",
+      "daysAgo_one": "{{count}} 天前",
+      "daysAgo_other": "{{count}} 天前",
+      "received": "已收到",
+      "sent": "已发送",
+      "silentBadge": "静默",
+      "silentDetectedTitle": "通过 BIP-352 静默支付扫描检测到"
+    }
   }
 }
