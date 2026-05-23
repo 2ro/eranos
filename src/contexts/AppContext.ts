@@ -284,8 +284,9 @@ export interface AppConfig {
    * - Background video frame-grabbing for posters is skipped.
    * - Images that would normally load inline (post images, galleries,
    *   banners, link preview thumbnails, video posters) show a tap-to-load
-   *   placeholder when the image proxy is also disabled. With the proxy on,
-   *   images still load — the proxy is doing the bandwidth work.
+   *   placeholder. The image proxy setting is independent — if the proxy
+   *   is on, the tap loads the proxied (smaller) version; if off, the tap
+   *   loads the original.
    *
    * Default: false.
    */

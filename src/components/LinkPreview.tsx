@@ -35,9 +35,9 @@ export function LinkPreview({ url, className, hideImage, navigateToComments, sho
   const proxy = useImageProxy();
   const { config } = useAppContext();
 
-  // In low-bandwidth mode without a proxy, suppress the preview thumbnail —
-  // the card still renders the title/description/domain, just no image.
-  const suppressImage = hideImage || (config.lowBandwidthMode && !config.imageProxy);
+  // In low-bandwidth mode, suppress the preview thumbnail — the card still
+  // renders the title/description/domain, just no image.
+  const suppressImage = hideImage || config.lowBandwidthMode;
 
   if (isLoading) {
     return <LinkPreviewSkeleton className={className} />;

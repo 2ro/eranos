@@ -184,12 +184,11 @@ function GridImage({
   const { config } = useAppContext();
   const proxy = useImageProxy();
 
-  // In gated mode (low-bandwidth + no proxy) the user must tap to load the
-  // image. We also fall back to the placeholder if the proxy errors and the
-  // user is low-bandwidth, so we don't silently fetch the original.
-  const hasProxy = Boolean(config.imageProxy);
+  // In gated mode (low-bandwidth) the user must tap to load the image. We
+  // also fall back to the placeholder if the proxy errors and the user is
+  // low-bandwidth, so we don't silently fetch the original.
   const lowBandwidth = config.lowBandwidthMode;
-  const shouldGate = lowBandwidth && !hasProxy;
+  const shouldGate = lowBandwidth;
   const [revealed, setRevealed] = useState(!shouldGate);
 
   const proxied = proxy(src, 600);
@@ -245,7 +244,7 @@ function GridImage({
       onClick={onOpen}
     >
       {/* Placeholder shown while the image is loading, or as a tap-to-load
-          gate when low-bandwidth mode is on without a proxy. */}
+          gate when low-bandwidth mode is on. */}
       {(!loaded || !revealed) && (
         isValidBlurhash(blurhash) ? (
           // Blurhash canvas fills the container via CSS — pass small integer decode

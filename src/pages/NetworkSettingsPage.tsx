@@ -57,8 +57,9 @@ export function NetworkSettingsPage() {
                   Reduce data usage
                 </Label>
                 <p className="text-xs text-muted-foreground leading-relaxed">
-                  For metered or slow connections. Videos won't autoplay and
-                  background video previews are skipped.
+                  For metered or slow connections. Videos won't autoplay,
+                  background video previews are skipped, and images wait for
+                  a tap before loading.
                 </p>
               </div>
               <Switch
@@ -70,8 +71,8 @@ export function NetworkSettingsPage() {
               />
             </div>
 
-            {/* Image Proxy — sub-setting of Low-Bandwidth. Controls how
-                images are handled while low-bandwidth mode is on. */}
+            {/* Image Proxy — independent of Low-Bandwidth. Controls whether
+                images are fetched from a downsizing proxy. */}
             <div className="space-y-3">
               <div className="flex items-start justify-between gap-3">
                 <div className="space-y-1 min-w-0">
@@ -81,8 +82,6 @@ export function NetworkSettingsPage() {
                   <p className="text-xs text-muted-foreground leading-relaxed">
                     Fetches smaller WebP versions of images instead of full-resolution
                     originals.
-                    {config.lowBandwidthMode &&
-                      ' Without the proxy, low-bandwidth mode will wait for a tap before loading any image.'}
                   </p>
                 </div>
                 <Switch

@@ -13,11 +13,10 @@ interface ProxiedImageProps extends Omit<ImgHTMLAttributes<HTMLImageElement>, 's
   /** Blurhash from the event's imeta tag, surfaced when a placeholder is shown. */
   blurhash?: string;
   /**
-   * When `true` and `lowBandwidthMode` is enabled but no proxy is configured,
-   * render a tap-to-load placeholder instead of loading the image immediately.
-   * Set this on feed/gallery surfaces; leave it off for contexts where the
-   * user has already opted in to viewing the image (lightbox, avatars, hover
-   * cards).
+   * When `true` and `lowBandwidthMode` is enabled, render a tap-to-load
+   * placeholder instead of loading the image immediately. Set this on
+   * feed/gallery surfaces; leave it off for contexts where the user has
+   * already opted in to viewing the image (lightbox, avatars, hover cards).
    *
    * Defaults to `false`.
    */
@@ -38,9 +37,9 @@ interface ProxiedImageProps extends Omit<ImgHTMLAttributes<HTMLImageElement>, 's
  *      tap-to-load placeholder so we don't silently load the original
  *      megabytes. Otherwise falls back to the original URL.
  *
- *   2. **Proxy disabled + low-bandwidth + `gated`** — renders the placeholder
- *      up front. The user taps to load the image (proxied if available,
- *      original otherwise).
+ *   2. **Low-bandwidth + `gated`** — renders the placeholder up front.
+ *      The user taps to load the image (proxied if available, original
+ *      otherwise).
  *
  * Avatars, lightbox images, and other "already-consented" surfaces should
  * pass `gated={false}` (the default) so they always load.
@@ -58,13 +57,11 @@ export function ProxiedImage({
   const { config } = useAppContext();
   const proxy = useImageProxy();
 
-  const hasProxy = Boolean(config.imageProxy);
   const lowBandwidth = config.lowBandwidthMode;
 
-  // Whether to gate behind a tap-to-load placeholder. Only applies when
-  // the user is in low-bandwidth mode AND the proxy is disabled — otherwise
-  // images load normally (proxy is doing the bandwidth work).
-  const shouldGate = gated && lowBandwidth && !hasProxy;
+  // Whether to gate behind a tap-to-load placeholder. Applies whenever the
+  // user is in low-bandwidth mode — the proxy setting is independent.
+  const shouldGate = gated && lowBandwidth;
 
   const [revealed, setRevealed] = useState(!shouldGate);
   const [proxyFailed, setProxyFailed] = useState(false);
@@ -78,7 +75,7 @@ export function ProxiedImage({
   const finalSrc = !usingProxy || proxyFailed ? src : proxiedSrc;
 
   // Show placeholder when:
-  //   - user hasn't revealed (gated + low-bandwidth + no proxy)
+  //   - user hasn't revealed (gated + low-bandwidth)
   //   - proxy failed in a gated context while user is low-bandwidth
   //     (don't silently load original bytes the user didn't ask for)
   //
