@@ -1,5 +1,6 @@
 import { useSeoMeta } from '@unhead/react';
 import { Navigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { PageHeader } from '@/components/PageHeader';
 import { RelayListManager } from '@/components/RelayListManager';
 import { BlossomSettings } from '@/components/BlossomSettings';
@@ -10,17 +11,23 @@ import { useAppContext } from '@/hooks/useAppContext';
 import { cn } from '@/lib/utils';
 
 export function NetworkSettingsPage() {
+  const { t } = useTranslation();
   const { user } = useCurrentUser();
   const { config, updateConfig } = useAppContext();
 
   useSeoMeta({
-    title: `Network | Settings | ${config.appName}`,
-    description: 'Manage relays and file upload servers',
+    title: `${t('settings.network.title')} | ${t('settings.title')} | ${config.appName}`,
+    description: t('settings.network.subtitle'),
   });
 
   if (!user) {
     return <Navigate to="/settings" replace />;
   }
+
+  const uploadQualityOptions = [
+    { value: 'compressed', labelKey: 'settings.network.compressed' },
+    { value: 'original', labelKey: 'settings.network.original' },
+  ] as const;
 
   return (
     <main className="">
@@ -30,9 +37,9 @@ export function NetworkSettingsPage() {
         alwaysShowBack
         titleContent={
           <div className="flex-1 min-w-0">
-            <h1 className="text-xl font-bold flex items-center gap-1.5">Network <HelpTip faqId="what-is-nostr" /></h1>
+            <h1 className="text-xl font-bold flex items-center gap-1.5">{t('settings.network.title')} <HelpTip faqId="what-is-nostr" /></h1>
             <p className="text-sm text-muted-foreground mt-0.5">
-              Relays are servers that store and distribute content across the Nostr network. Blossom servers handle file uploads.
+              {t('settings.network.subtitle')}
             </p>
           </div>
         }
@@ -41,16 +48,16 @@ export function NetworkSettingsPage() {
       <div className="p-4">
         {/* Intro */}
         <div className="px-3 pt-2 pb-4">
-          <h2 className="text-sm font-semibold">Network Connections</h2>
+          <h2 className="text-sm font-semibold">{t('settings.network.connectionsHeading')}</h2>
           <p className="text-xs text-muted-foreground mt-1 leading-relaxed">
-            Manage your relay connections. Relays are servers that store and distribute Nostr events across the network.
+            {t('settings.network.connectionsIntro')}
           </p>
         </div>
 
         {/* Relays */}
         <div>
           <div className="relative px-3 py-3.5">
-            <h2 className="text-base font-semibold flex items-center gap-1.5">Relays <HelpTip faqId="what-are-relays" /></h2>
+            <h2 className="text-base font-semibold flex items-center gap-1.5">{t('settings.network.relays')} <HelpTip faqId="what-are-relays" /></h2>
             <div className="absolute bottom-0 left-0 right-0 h-1 bg-primary rounded-full" />
           </div>
           <div className="pt-2 pb-4">
@@ -61,7 +68,7 @@ export function NetworkSettingsPage() {
         {/* Blossom Servers */}
         <div>
           <div className="relative px-3 py-3.5">
-            <h2 className="text-base font-semibold flex items-center gap-1.5">Blossom Servers <HelpTip faqId="what-are-blossom" /></h2>
+            <h2 className="text-base font-semibold flex items-center gap-1.5">{t('settings.network.blossomServers')} <HelpTip faqId="what-are-blossom" /></h2>
             <div className="absolute bottom-0 left-0 right-0 h-1 bg-primary rounded-full" />
           </div>
           <div className="pt-2 pb-4">
@@ -72,29 +79,29 @@ export function NetworkSettingsPage() {
         {/* Image Upload Quality */}
         <div>
           <div className="relative px-3 py-3.5">
-            <h2 className="text-base font-semibold">Image Uploads</h2>
+            <h2 className="text-base font-semibold">{t('settings.network.imageUploads')}</h2>
             <div className="absolute bottom-0 left-0 right-0 h-1 bg-primary rounded-full" />
           </div>
           <div className="pt-4 pb-4 px-3 space-y-3">
             <div className="space-y-1.5">
-              <Label className="text-sm font-medium">Upload quality</Label>
+              <Label className="text-sm font-medium">{t('settings.network.uploadQuality')}</Label>
               <p className="text-xs text-muted-foreground leading-relaxed">
-                Compressed resizes large images and picks the smallest format. Original uploads images exactly as-is.
+                {t('settings.network.uploadQualityDesc')}
               </p>
             </div>
             <div className="inline-flex items-center gap-0.5 p-1 bg-muted/50 rounded-lg">
-              {(['compressed', 'original'] as const).map((value) => (
+              {uploadQualityOptions.map((option) => (
                 <button
-                  key={value}
-                  onClick={() => updateConfig((prev) => ({ ...prev, imageQuality: value }))}
+                  key={option.value}
+                  onClick={() => updateConfig((prev) => ({ ...prev, imageQuality: option.value }))}
                   className={cn(
-                    'px-4 py-1.5 text-sm font-medium rounded-md transition-all capitalize',
-                    config.imageQuality === value
+                    'px-4 py-1.5 text-sm font-medium rounded-md transition-all',
+                    config.imageQuality === option.value
                       ? 'bg-background text-foreground shadow-sm'
                       : 'text-muted-foreground hover:text-foreground',
                   )}
                 >
-                  {value}
+                  {t(option.labelKey)}
                 </button>
               ))}
             </div>

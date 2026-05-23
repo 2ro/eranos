@@ -69,7 +69,43 @@
     },
     "organizers": "组织者",
     "signInToManage": "登录以管理",
-    "loginRequired": "你需要登录才能管理组织者。"
+    "loginRequired": "你需要登录才能管理组织者。",
+    "appearance": {
+      "title": "外观",
+      "subtitle": "选择应用的外观。",
+      "intro": "选择你喜欢的颜色模式。「跟随系统」将自动匹配你设备的浅色或深色设置。",
+      "colorMode": "颜色模式",
+      "system": "跟随系统",
+      "systemDesc": "跟随你的设备设置",
+      "light": "浅色",
+      "lightDesc": "始终使用浅色模式",
+      "dark": "深色",
+      "darkDesc": "始终使用深色模式"
+    },
+    "network": {
+      "title": "网络",
+      "subtitle": "中继是在 Nostr 网络上存储和分发内容的服务器。Blossom 服务器负责文件上传。",
+      "connectionsHeading": "网络连接",
+      "connectionsIntro": "管理你的中继连接。中继是在整个网络上存储和分发 Nostr 事件的服务器。",
+      "relays": "中继",
+      "blossomServers": "Blossom 服务器",
+      "imageUploads": "图片上传",
+      "uploadQuality": "上传质量",
+      "uploadQualityDesc": "「压缩」会调整大图尺寸并选择最小的格式。「原始」按原样上传图片。",
+      "compressed": "压缩",
+      "original": "原始"
+    },
+    "advanced": {
+      "title": "高级",
+      "subtitle": "钱包连接、系统配置和其他面向高级用户的选项。",
+      "intro": "钱包连接、系统配置和其他高级选项。",
+      "powerUserHeading": "高级用户设置",
+      "wallet": "钱包"
+    },
+    "wallet": {
+      "title": "钱包",
+      "subtitle": "管理钱包连接和支付"
+    }
   },
   "language": {
     "title": "语言",

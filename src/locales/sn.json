@@ -69,7 +69,43 @@
     },
     "organizers": "Vagadziri",
     "signInToManage": "Pinda kuti utarise",
-    "loginRequired": "Unofanira kupinda kuti utarise vagadziri."
+    "loginRequired": "Unofanira kupinda kuti utarise vagadziri.",
+    "appearance": {
+      "title": "Maonero",
+      "subtitle": "Sarudza kuti app inoonekwa sei.",
+      "intro": "Sarudza mode yeruvara waunoda. «System» ichaenderana zvakazvimirira nemamiriro echiedza kana erima emudziyo wako.",
+      "colorMode": "Mode yeruvara",
+      "system": "System",
+      "systemDesc": "Inotevera marongero emudziyo wako",
+      "light": "Chiedza",
+      "lightDesc": "Shandisa mode yechiedza nguva dzose",
+      "dark": "Rima",
+      "darkDesc": "Shandisa mode yerima nguva dzose"
+    },
+    "network": {
+      "title": "Network",
+      "subtitle": "Marelays ndiwo maserver anochengeta nokuparadzira zviri mukati menetwork yeNostr. Maserver eBlossom anobata kuiswa kwemafaira.",
+      "connectionsHeading": "Mibatanidzwa yeNetwork",
+      "connectionsIntro": "Tarisira mibatanidzwa yako yemarelays. Marelays maserver anochengeta nokuparadzira zviitiko zveNostr panetwork yose.",
+      "relays": "Marelays",
+      "blossomServers": "Maserver eBlossom",
+      "imageUploads": "Kuiswa kwemifananidzo",
+      "uploadQuality": "Quality yekuisa",
+      "uploadQualityDesc": "«Compressed» inopfupisa mifananidzo mikuru ichisarudza format diki. «Original» inoisa mifananidzo sezvairi.",
+      "compressed": "Compressed",
+      "original": "Original"
+    },
+    "advanced": {
+      "title": "Zvepamusoro",
+      "subtitle": "Mibatanidzwa yechikwama, marongero esystem, nezvimwe zvinotenderwa kuvashandisi venyanzvi.",
+      "intro": "Mibatanidzwa yechikwama, marongero esystem, nezvimwe zvepamusoro.",
+      "powerUserHeading": "Marongero evashandisi venyanzvi",
+      "wallet": "Chikwama"
+    },
+    "wallet": {
+      "title": "Chikwama",
+      "subtitle": "Tarisira mibatanidzwa yechikwama nemibhadharo"
+    }
   },
   "language": {
     "title": "Mutauro",

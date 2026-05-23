@@ -69,7 +69,43 @@
     },
     "organizers": "Organizadores",
     "signInToManage": "Inicia sesión para administrar",
-    "loginRequired": "Necesitas iniciar sesión para administrar organizadores."
+    "loginRequired": "Necesitas iniciar sesión para administrar organizadores.",
+    "appearance": {
+      "title": "Apariencia",
+      "subtitle": "Elige cómo se ve la aplicación.",
+      "intro": "Elige tu modo de color preferido. «Sistema» seguirá automáticamente la configuración clara u oscura de tu dispositivo.",
+      "colorMode": "Modo de color",
+      "system": "Sistema",
+      "systemDesc": "Sigue la configuración de tu dispositivo",
+      "light": "Claro",
+      "lightDesc": "Usar siempre modo claro",
+      "dark": "Oscuro",
+      "darkDesc": "Usar siempre modo oscuro"
+    },
+    "network": {
+      "title": "Red",
+      "subtitle": "Los relés son servidores que almacenan y distribuyen contenido en la red Nostr. Los servidores Blossom gestionan las subidas de archivos.",
+      "connectionsHeading": "Conexiones de red",
+      "connectionsIntro": "Administra tus conexiones de relé. Los relés son servidores que almacenan y distribuyen eventos de Nostr a través de la red.",
+      "relays": "Relés",
+      "blossomServers": "Servidores Blossom",
+      "imageUploads": "Subidas de imágenes",
+      "uploadQuality": "Calidad de subida",
+      "uploadQualityDesc": "«Comprimida» redimensiona las imágenes grandes y elige el formato más pequeño. «Original» sube las imágenes tal cual.",
+      "compressed": "Comprimida",
+      "original": "Original"
+    },
+    "advanced": {
+      "title": "Avanzado",
+      "subtitle": "Conexiones de cartera, configuración del sistema y otras opciones para usuarios avanzados.",
+      "intro": "Conexiones de cartera, configuración del sistema y otras opciones avanzadas.",
+      "powerUserHeading": "Ajustes avanzados",
+      "wallet": "Cartera"
+    },
+    "wallet": {
+      "title": "Cartera",
+      "subtitle": "Administra conexiones de cartera y pagos"
+    }
   },
   "language": {
     "title": "Idioma",

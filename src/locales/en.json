@@ -69,7 +69,43 @@
     },
     "organizers": "Organizers",
     "signInToManage": "Sign in to manage",
-    "loginRequired": "You need to be signed in to manage organizers."
+    "loginRequired": "You need to be signed in to manage organizers.",
+    "appearance": {
+      "title": "Appearance",
+      "subtitle": "Choose how the app looks.",
+      "intro": "Pick your preferred color mode. System will automatically match your device's light or dark setting.",
+      "colorMode": "Color Mode",
+      "system": "System",
+      "systemDesc": "Follows your device setting",
+      "light": "Light",
+      "lightDesc": "Always use light mode",
+      "dark": "Dark",
+      "darkDesc": "Always use dark mode"
+    },
+    "network": {
+      "title": "Network",
+      "subtitle": "Relays are servers that store and distribute content across the Nostr network. Blossom servers handle file uploads.",
+      "connectionsHeading": "Network Connections",
+      "connectionsIntro": "Manage your relay connections. Relays are servers that store and distribute Nostr events across the network.",
+      "relays": "Relays",
+      "blossomServers": "Blossom Servers",
+      "imageUploads": "Image Uploads",
+      "uploadQuality": "Upload quality",
+      "uploadQualityDesc": "Compressed resizes large images and picks the smallest format. Original uploads images exactly as-is.",
+      "compressed": "Compressed",
+      "original": "Original"
+    },
+    "advanced": {
+      "title": "Advanced",
+      "subtitle": "Wallet connections, system configuration, and other advanced options for power users.",
+      "intro": "Wallet connections, system configuration, and other advanced options.",
+      "powerUserHeading": "Power User Settings",
+      "wallet": "Wallet"
+    },
+    "wallet": {
+      "title": "Wallet",
+      "subtitle": "Manage wallet connections and payments"
+    }
   },
   "language": {
     "title": "Language",
