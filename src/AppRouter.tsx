@@ -12,6 +12,7 @@ import {
   LayoutStore,
   LayoutStoreContext,
   NavHiddenContext,
+  useLayoutSnapshot,
 } from "@/contexts/LayoutContext";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Link } from "react-router-dom";
@@ -95,35 +96,51 @@ function SiteFooter() {
 /**
  * Persistent app shell. GoFundMe-style top-nav-only chrome wrapping the
  * full-width route outlet.
+ *
+ * Pages that need to escape the default `max-w-3xl` cap (e.g. campaign /
+ * action detail pages with their own immersive layouts) opt out via
+ * `useLayoutOptions({ noMaxWidth: true })`. Pages can also pass
+ * `wrapperClassName` to append extra classes to the center column.
  */
-function FundraiserLayout() {
-  const store = useMemo(() => new LayoutStore(), []);
+function FundraiserLayoutInner() {
   const centerColumnRef = useRef<HTMLDivElement>(null);
   const [centerColumnEl, setCenterColumnEl] = useState<HTMLElement | null>(null);
+  const { noMaxWidth, wrapperClassName } = useLayoutSnapshot();
 
   return (
+    <CenterColumnContext.Provider value={centerColumnEl}>
+      <DrawerContext.Provider value={() => {}}>
+        <NavHiddenContext.Provider value={false}>
+          <div className="min-h-dvh flex flex-col bg-background">
+            <TopNav />
+            <Suspense fallback={<PageSkeleton />}>
+              <div
+                ref={(el) => {
+                  centerColumnRef.current = el;
+                  setCenterColumnEl(el);
+                }}
+                className={cn(
+                  "flex-1 min-w-0 w-full mx-auto",
+                  !noMaxWidth && "max-w-3xl",
+                  wrapperClassName,
+                )}
+              >
+                <Outlet />
+              </div>
+            </Suspense>
+            <SiteFooter />
+          </div>
+        </NavHiddenContext.Provider>
+      </DrawerContext.Provider>
+    </CenterColumnContext.Provider>
+  );
+}
+
+function FundraiserLayout() {
+  const store = useMemo(() => new LayoutStore(), []);
+  return (
     <LayoutStoreContext.Provider value={store}>
-      <CenterColumnContext.Provider value={centerColumnEl}>
-        <DrawerContext.Provider value={() => {}}>
-          <NavHiddenContext.Provider value={false}>
-            <div className="min-h-dvh flex flex-col bg-background">
-              <TopNav />
-              <Suspense fallback={<PageSkeleton />}>
-                <div
-                  ref={(el) => {
-                    centerColumnRef.current = el;
-                    setCenterColumnEl(el);
-                  }}
-                  className={cn("flex-1 min-w-0 w-full mx-auto max-w-3xl")}
-                >
-                  <Outlet />
-                </div>
-              </Suspense>
-              <SiteFooter />
-            </div>
-          </NavHiddenContext.Provider>
-        </DrawerContext.Provider>
-      </CenterColumnContext.Provider>
+      <FundraiserLayoutInner />
     </LayoutStoreContext.Provider>
   );
 }
