@@ -54,11 +54,6 @@ type IconComponent = React.ComponentType<{ className?: string }>;
 /** Sentinel ID used to represent a visual divider in the sidebar order. */
 export const SIDEBAR_DIVIDER_ID = "divider";
 
-/** Returns true if the given sidebar order ID is a divider sentinel. */
-export function isSidebarDivider(id: string): boolean {
-  return id === SIDEBAR_DIVIDER_ID;
-}
-
 /** Returns true if the given sidebar order ID is a `nostr:` URI. */
 export function isNostrUri(id: string): boolean {
   return id.startsWith("nostr:");
@@ -67,16 +62,6 @@ export function isNostrUri(id: string): boolean {
 /** Returns true if the given sidebar order ID is an `nsite://` URI. */
 export function isNsiteUri(id: string): boolean {
   return id.startsWith("nsite://");
-}
-
-/** Extracts the nsite subdomain from an `nsite://` URI. */
-export function nsiteUriToSubdomain(uri: string): string {
-  return uri.slice("nsite://".length);
-}
-
-/** Extracts the NIP-19 bech32 identifier from a `nostr:` URI. Returns the raw string if not a nostr: URI. */
-export function nostrUriToNip19(uri: string): string {
-  return uri.startsWith("nostr:") ? uri.slice(6) : uri;
 }
 
 /**
@@ -111,11 +96,15 @@ export interface SidebarItemDef {
 // ── Registry ──────────────────────────────────────────────────────────────────
 
 /**
- * Single source of truth for all sidebar items.
+ * Single source of truth for known sidebar-capable items.
  *
- * Every item that can appear in the sidebar — whether it's a system page like
- * "Feed" or a Nostr content type like "Vines" — lives here with a consistent
- * shape. The order here is the default display order for fresh installs.
+ * Most of these no longer have dedicated pages after the fundraiser-platform
+ * refocus, but the registry is still consumed by:
+ *   - `useFeedSettings` to validate `sidebarOrder` entries persisted by older
+ *     installs.
+ *   - `ProfileSearchDropdown` to surface label-matching suggestions.
+ *   - `CONTENT_KIND_ICONS` below to expose icons for use elsewhere (e.g.
+ *     ExternalContentHeader, extraKinds, feedFilterUtils).
  */
 export const SIDEBAR_ITEMS: SidebarItemDef[] = [
   // System pages
@@ -195,23 +184,11 @@ export const SIDEBAR_ITEMS: SidebarItemDef[] = [
   { id: "badges", label: "Badges", path: "/badges", icon: Award },
   { id: "communities", label: "Groups", path: "/groups", icon: Users },
   { id: "world", label: "World", path: "/world", icon: Earth },
-];
-
-/**
- * Sidebar items that are addable from their own page but omitted from the
- * default/sidebar customization option list.
- */
-const OPTIONAL_SIDEBAR_ITEMS: SidebarItemDef[] = [
   { id: "dashboard", label: "Dashboard", path: "/dashboard", icon: Activity },
 ];
 
-const ALL_SIDEBAR_ITEMS = [...SIDEBAR_ITEMS, ...OPTIONAL_SIDEBAR_ITEMS];
-
 /** Set of all known sidebar item IDs for quick lookup. */
-export const SIDEBAR_ITEM_IDS = new Set(ALL_SIDEBAR_ITEMS.map((s) => s.id));
-
-/** Map from ID to definition for O(1) lookup. */
-const SIDEBAR_ITEM_MAP = new Map(ALL_SIDEBAR_ITEMS.map((s) => [s.id, s]));
+export const SIDEBAR_ITEM_IDS = new Set(SIDEBAR_ITEMS.map((s) => s.id));
 
 /**
  * Icons for content types used outside the sidebar (e.g. ContentSettings).
@@ -254,46 +231,13 @@ export const CONTENT_KIND_ICONS: Record<string, IconComponent> = {
 
 // ── Lookups ───────────────────────────────────────────────────────────────────
 
-/** Get the sidebar item definition by ID, or undefined if unknown. */
-export function getSidebarItem(id: string): SidebarItemDef | undefined {
-  return SIDEBAR_ITEM_MAP.get(id);
-}
-
-/** Returns the icon element for a sidebar item ID at the given size. */
-export function sidebarItemIcon(
-  id: string,
-  size = "size-6",
-): React.ReactElement {
-  const Icon = SIDEBAR_ITEM_MAP.get(id)?.icon ?? Palette;
-  return <Icon className={size} />;
-}
-
-/** Lookup display label for a sidebar item ID. */
-export function itemLabel(id: string): string {
-  return SIDEBAR_ITEM_MAP.get(id)?.label ?? id;
-}
-
-/** Lookup navigation path for a sidebar item ID. */
-export function itemPath(
-  id: string,
-  profilePath?: string,
-  homePage?: string,
-): string {
-  if (id === "profile" && profilePath) return profilePath;
-  if (homePage && id === homePage) return "/";
-  return SIDEBAR_ITEM_MAP.get(id)?.path ?? `/${id}`;
-}
-
 /**
  * Search sidebar items by label. Matches when the query is a prefix of the
  * full label or of any word within the label (e.g. "arch" matches "Archive"
  * and "Internet Archive" but not "Search"). Whole-label prefix matches are
- * sorted before word-boundary matches. Auth-requiring items are excluded
- * when the user is not logged in.
+ * sorted before word-boundary matches.
  */
-export function searchSidebarItems(
-  query: string,
-): SidebarItemDef[] {
+export function searchSidebarItems(query: string): SidebarItemDef[] {
   const q = query.trim().toLowerCase();
   if (q.length === 0) return [];
 
@@ -314,45 +258,4 @@ export function searchSidebarItems(
   }
 
   return [...prefixMatches, ...wordMatches];
-}
-
-/** Check if a sidebar item is active given the current location. */
-export function isItemActive(
-  id: string,
-  pathname: string,
-  _search: string,
-  profilePath?: string,
-  homePage?: string,
-): boolean {
-  // Nostr URI items: active when pathname matches /<nip19>
-  if (isNostrUri(id)) {
-    const nip19Id = nostrUriToNip19(id);
-    return pathname === `/${nip19Id}`;
-  }
-
-  // Nsite URI items: active when the nsite preview is open for this subdomain.
-  // The pathname will be the naddr of the nsite event, which we can't cheaply
-  // derive here without async resolution. For now, nsite items are never
-  // highlighted as "active" via pathname — the visual indication comes from
-  // the nsite preview panel being open.
-  if (isNsiteUri(id)) {
-    return false;
-  }
-
-  // External content items: active when pathname matches /i/<encoded-value>
-  if (isExternalUri(id)) {
-    return pathname === `/i/${encodeURIComponent(id)}` || pathname === `/i/${id}`;
-  }
-
-  if (id === "profile") return !!profilePath && pathname === profilePath;
-  if (id === "settings") return pathname.startsWith("/settings");
-
-  const itemDef = SIDEBAR_ITEM_MAP.get(id);
-  const itemPathname = itemDef?.path ?? `/${id}`;
-
-  // Homepage item is active at both "/" and its own path
-  if (homePage && id === homePage)
-    return pathname === "/" || pathname === itemPathname;
-
-  return pathname === itemPathname;
 }
