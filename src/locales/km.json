@@ -50,6 +50,11 @@
   "feed": {
     "indexTagline": "ខ្លឹមសាររបស់អ្នក។ ស្ទីលរបស់អ្នក។ ច្បាប់របស់អ្នក។"
   },
+  "forms": {
+    "required": "ត្រូវការ",
+    "recommended": "ណែនាំ",
+    "optional": "ស្រេចចិត្ត"
+  },
   "notFound": {
     "title": "404 - រកមិនឃើញទំព័រ",
     "description": "មិនអាចរកឃើញទំព័រដែលអ្នកកំពុងរក។",
@@ -104,6 +109,45 @@
       "deleted": "បានលុបការសន្យា",
       "deletedContent": "ការសន្យាដែលបានលុប",
       "deleteFailed": "លុបការសន្យាបរាជ័យ"
+    },
+    "create": {
+      "seoTitle": "បង្កើតការសន្យា",
+      "seoDescription": "បង្កើតការសន្យារបស់អ្នកបរិច្ចាគ ដើម្បីជំរុញសកម្មភាពជាក់ស្តែងនៅលើ {{appName}}។",
+      "loginGateTitle": "ចូលដើម្បីបង្កើតការសន្យា",
+      "loginGateBody": "ការសន្យាគឺជាព្រឹត្តិការណ៍ Nostr ដែលបានចុះហត្ថលេខា។ អ្នកត្រូវការការចូល Nostr ដើម្បីផ្សព្វផ្សាយ។",
+      "backToPledges": "ត្រឡប់ទៅការសន្យា",
+      "heading": "បង្កើតការសន្យា",
+      "title": "ចំណងជើង",
+      "titlePlaceholder": "កត់ត្រាការសម្អាតឆ្នេរ",
+      "country": "ប្រទេស",
+      "countryPlaceholder": "ស្វែងរកប្រទេស ឧ. វេណេស៊ុយអេឡា",
+      "countryClearAria": "សម្អាតប្រទេស",
+      "flagOfAria": "ទង់ជាតិ {{name}}",
+      "countryHint": "ផ្សព្វផ្សាយ <0>i: iso3166:{{code}}</0> សម្រាប់តម្រៀបតាមប្រទេស។",
+      "tags": "ស្លាក",
+      "tagsPlaceholder": "សម្អាត-ឆ្នេរ, កត់ត្រា-បាតុកម្ម, ដាច់-អ៊ីនធឺណិត",
+      "coverImage": "រូបភាពគម្រប",
+      "description": "ការពិពណ៌នា",
+      "descriptionPlaceholder": "ពន្យល់សកម្មភាព ភស្តុតាង ឬលទ្ធផលដែលអ្នកចង់ជំរុញ អ្វីដែលការដាក់ស្នើគួរមាន និងរបៀបដែលអ្នកគ្រោងវាយតម្លៃពួកវា...",
+      "pledge": "ការសន្យា",
+      "pledgeAmountPlaceholder": "100",
+      "deadline": "ពេលកំណត់",
+      "timezone": "តំបន់ពេលវេលា",
+      "timezoneNote": "ពេលវេលាចាប់ផ្តើម និងពេលកំណត់នឹងត្រូវបានបកស្រាយក្នុងតំបន់ពេលវេលានេះ។",
+      "submit": "បង្កើតការសន្យា",
+      "publishing": "កំពុងផ្សព្វផ្សាយ…",
+      "uploadingCover": "កំពុងផ្ទុកគម្រប…",
+      "altText": "ការសន្យា {{appName}}៖ {{title}}",
+      "successToast": "បានបង្កើតការសន្យា",
+      "errorToast": "មិនអាចបង្កើតការសន្យា",
+      "errorLoginRequired": "អ្នកត្រូវចូលដើម្បីបង្កើតការសន្យា។",
+      "errorTitleRequired": "ត្រូវការចំណងជើង។",
+      "errorDescriptionRequired": "ត្រូវការការពិពណ៌នា។",
+      "errorPledgeRequired": "ត្រូវការចំនួនការសន្យា។",
+      "errorPledgeInvalid": "ចំនួនការសន្យាត្រូវតែជាចំនួនវិជ្ជមានជា USD។",
+      "errorPriceUnavailable": "កំពុងរង់ចាំតម្លៃ BTC/USD ដើម្បីគណនាចំនួនការសន្យា។",
+      "errorCoverInvalid": "រូបភាពគម្របត្រូវតែជា URL https:// ត្រឹមត្រូវ។",
+      "errorDeadlinePast": "ពេលកំណត់មិនអាចស្ថិតក្នុងអតីតកាល។"
     }
   },
   "campaigns": {

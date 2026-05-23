@@ -50,6 +50,11 @@
   "feed": {
     "indexTagline": "محتواك. أسلوبك. قواعدك."
   },
+  "forms": {
+    "required": "مطلوب",
+    "recommended": "موصى به",
+    "optional": "اختياري"
+  },
   "notFound": {
     "title": "404 - الصفحة غير موجودة",
     "description": "تعذّر العثور على الصفحة التي تبحث عنها.",
@@ -104,6 +109,45 @@
       "deleted": "تم حذف التعهد",
       "deletedContent": "تعهد محذوف",
       "deleteFailed": "تعذّر حذف التعهد"
+    },
+    "create": {
+      "seoTitle": "إنشاء تعهد",
+      "seoDescription": "أنشئ تعهد مانح لإلهام عمل ملموس على {{appName}}.",
+      "loginGateTitle": "سجّل الدخول لإنشاء تعهد",
+      "loginGateBody": "التعهدات أحداث Nostr موقّعة. تحتاج إلى تسجيل دخول Nostr لنشر تعهد.",
+      "backToPledges": "العودة إلى التعهدات",
+      "heading": "إنشاء تعهد",
+      "title": "العنوان",
+      "titlePlaceholder": "توثيق تنظيف شاطئ",
+      "country": "البلد",
+      "countryPlaceholder": "ابحث عن البلدان، مثل فنزويلا",
+      "countryClearAria": "مسح البلد",
+      "flagOfAria": "علم {{name}}",
+      "countryHint": "يُنشر <0>i: iso3166:{{code}}</0> للترتيب حسب البلد.",
+      "tags": "الوسوم",
+      "tagsPlaceholder": "تنظيف-شاطئ، توثيق-احتجاج، انقطاع-إنترنت",
+      "coverImage": "صورة الغلاف",
+      "description": "الوصف",
+      "descriptionPlaceholder": "اشرح الفعل أو الدليل أو النتيجة التي تريد إلهامها، وما الذي يجب أن تتضمنه المساهمات، وكيف تخطط لتقييمها...",
+      "pledge": "التعهد",
+      "pledgeAmountPlaceholder": "100",
+      "deadline": "الموعد النهائي",
+      "timezone": "المنطقة الزمنية",
+      "timezoneNote": "سيتم تفسير أوقات البدء والموعد النهائي بهذه المنطقة الزمنية.",
+      "submit": "إنشاء تعهد",
+      "publishing": "جارٍ النشر…",
+      "uploadingCover": "جارٍ رفع الغلاف…",
+      "altText": "تعهد {{appName}}: {{title}}",
+      "successToast": "تم إنشاء التعهد",
+      "errorToast": "تعذّر إنشاء التعهد",
+      "errorLoginRequired": "يجب تسجيل الدخول لإنشاء تعهد.",
+      "errorTitleRequired": "العنوان مطلوب.",
+      "errorDescriptionRequired": "الوصف مطلوب.",
+      "errorPledgeRequired": "مبلغ التعهد مطلوب.",
+      "errorPledgeInvalid": "يجب أن يكون مبلغ التعهد مبلغًا موجبًا بالدولار.",
+      "errorPriceUnavailable": "في انتظار سعر BTC/USD لحساب مبلغ التعهد.",
+      "errorCoverInvalid": "يجب أن تكون صورة الغلاف رابط https:// صالحًا.",
+      "errorDeadlinePast": "لا يمكن أن يكون الموعد النهائي في الماضي."
     }
   },
   "campaigns": {

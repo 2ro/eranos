@@ -50,6 +50,11 @@
   "feed": {
     "indexTagline": "你的内容。你的风格。你的规则。"
   },
+  "forms": {
+    "required": "必填",
+    "recommended": "建议",
+    "optional": "可选"
+  },
   "notFound": {
     "title": "404 - 找不到页面",
     "description": "找不到你要查找的页面。",
@@ -104,6 +109,45 @@
       "deleted": "已删除悬赏",
       "deletedContent": "已删除的悬赏",
       "deleteFailed": "删除悬赏失败"
+    },
+    "create": {
+      "seoTitle": "创建悬赏",
+      "seoDescription": "创建一个捐赠者悬赏，在 {{appName}} 上激发具体的行动。",
+      "loginGateTitle": "登录以创建悬赏",
+      "loginGateBody": "悬赏是签名的 Nostr 事件。你需要 Nostr 登录才能发布。",
+      "backToPledges": "返回悬赏",
+      "heading": "创建悬赏",
+      "title": "标题",
+      "titlePlaceholder": "记录一次海滩清理",
+      "country": "国家",
+      "countryPlaceholder": "搜索国家，例如委内瑞拉",
+      "countryClearAria": "清除国家",
+      "flagOfAria": "{{name}} 国旗",
+      "countryHint": "发布 <0>i: iso3166:{{code}}</0> 用于按国家排序。",
+      "tags": "标签",
+      "tagsPlaceholder": "海滩清理, 抗议记录, 网络中断",
+      "coverImage": "封面图片",
+      "description": "描述",
+      "descriptionPlaceholder": "说明你想激发的行动、证据或成果，提交应该包含什么，以及你打算如何评估它们……",
+      "pledge": "悬赏",
+      "pledgeAmountPlaceholder": "100",
+      "deadline": "截止日期",
+      "timezone": "时区",
+      "timezoneNote": "开始时间和截止时间将以此时区解释。",
+      "submit": "创建悬赏",
+      "publishing": "发布中……",
+      "uploadingCover": "上传封面中……",
+      "altText": "{{appName}} 悬赏：{{title}}",
+      "successToast": "已创建悬赏",
+      "errorToast": "无法创建悬赏",
+      "errorLoginRequired": "你必须登录才能创建悬赏。",
+      "errorTitleRequired": "标题为必填项。",
+      "errorDescriptionRequired": "描述为必填项。",
+      "errorPledgeRequired": "悬赏金额为必填项。",
+      "errorPledgeInvalid": "悬赏金额必须是正的 USD 金额。",
+      "errorPriceUnavailable": "正在等待 BTC/USD 价格以计算悬赏金额。",
+      "errorCoverInvalid": "封面图片必须是有效的 https:// URL。",
+      "errorDeadlinePast": "截止日期不能在过去。"
     }
   },
   "campaigns": {

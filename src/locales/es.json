@@ -50,6 +50,11 @@
   "feed": {
     "indexTagline": "Tu contenido. Tu estilo. Tus reglas."
   },
+  "forms": {
+    "required": "Obligatorio",
+    "recommended": "Recomendado",
+    "optional": "Opcional"
+  },
   "notFound": {
     "title": "404 - Página no encontrada",
     "description": "No se pudo encontrar la página que buscas.",
@@ -104,6 +109,45 @@
       "deleted": "Promesa eliminada",
       "deletedContent": "Promesa eliminada",
       "deleteFailed": "No se pudo eliminar la promesa"
+    },
+    "create": {
+      "seoTitle": "Crear promesa",
+      "seoDescription": "Crea una promesa de donante para inspirar acciones concretas en {{appName}}.",
+      "loginGateTitle": "Inicia sesión para crear una promesa",
+      "loginGateBody": "Las promesas son eventos firmados de Nostr. Necesitas una sesión de Nostr para publicar una.",
+      "backToPledges": "Volver a promesas",
+      "heading": "Crear promesa",
+      "title": "Título",
+      "titlePlaceholder": "Documentar una limpieza de playa",
+      "country": "País",
+      "countryPlaceholder": "Buscar países, p. ej. Venezuela",
+      "countryClearAria": "Borrar país",
+      "flagOfAria": "Bandera de {{name}}",
+      "countryHint": "Publica <0>i: iso3166:{{code}}</0> para el orden por país.",
+      "tags": "Etiquetas",
+      "tagsPlaceholder": "limpieza-playa, documentación-protesta, apagón-internet",
+      "coverImage": "Imagen de portada",
+      "description": "Descripción",
+      "descriptionPlaceholder": "Explica la acción, las pruebas o el resultado que quieres inspirar, qué deben incluir las propuestas y cómo planeas evaluarlas...",
+      "pledge": "Promesa",
+      "pledgeAmountPlaceholder": "100",
+      "deadline": "Plazo",
+      "timezone": "Zona horaria",
+      "timezoneNote": "Las horas de inicio y plazo se interpretarán en esta zona horaria.",
+      "submit": "Crear promesa",
+      "publishing": "Publicando…",
+      "uploadingCover": "Subiendo portada…",
+      "altText": "Promesa en {{appName}}: {{title}}",
+      "successToast": "Promesa creada",
+      "errorToast": "No se pudo crear la promesa",
+      "errorLoginRequired": "Debes iniciar sesión para crear una promesa.",
+      "errorTitleRequired": "El título es obligatorio.",
+      "errorDescriptionRequired": "La descripción es obligatoria.",
+      "errorPledgeRequired": "La cantidad prometida es obligatoria.",
+      "errorPledgeInvalid": "La cantidad prometida debe ser un valor positivo en USD.",
+      "errorPriceUnavailable": "Esperando el precio BTC/USD para calcular la cantidad prometida.",
+      "errorCoverInvalid": "La imagen de portada debe ser una URL https:// válida.",
+      "errorDeadlinePast": "El plazo no puede estar en el pasado."
     }
   },
   "campaigns": {

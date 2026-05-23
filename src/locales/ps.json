@@ -50,6 +50,11 @@
   "feed": {
     "indexTagline": "ستاسو مینځپانګه. ستاسو سټایل. ستاسو قواعد."
   },
+  "forms": {
+    "required": "اړين",
+    "recommended": "وړاندیز شوی",
+    "optional": "اختیاري"
+  },
   "notFound": {
     "title": "۴۰۴ - پاڼه ونه موندل شوه",
     "description": "هغه پاڼه چې لټوئ ونه موندل شوه.",
@@ -104,6 +109,45 @@
       "deleted": "ژمنه ړنګه شوه",
       "deletedContent": "ړنګه شوې ژمنه",
       "deleteFailed": "د ژمنې ړنګول پاتې راغلل"
+    },
+    "create": {
+      "seoTitle": "د ژمنې جوړول",
+      "seoDescription": "په {{appName}} کې د ټاکلې کړنې د الهامولو لپاره د بسپنه ورکوونکي ژمنه جوړه کړئ.",
+      "loginGateTitle": "د ژمنې جوړولو لپاره ننوځئ",
+      "loginGateBody": "ژمنې د لاسلیک‌شویو Nostr پیښو په توګه دي. د ژمنې د خپرولو لپاره د Nostr ننوتلو ته اړتیا لرئ.",
+      "backToPledges": "ژمنو ته بیرته",
+      "heading": "د ژمنې جوړول",
+      "title": "سرلیک",
+      "titlePlaceholder": "د ساحل پاکولو مستندول",
+      "country": "هیواد",
+      "countryPlaceholder": "د هیوادونو لټون، لکه ونزویلا",
+      "countryClearAria": "هیواد پاکول",
+      "flagOfAria": "د {{name}} بیرغ",
+      "countryHint": "د هیواد د ترتیب لپاره <0>i: iso3166:{{code}}</0> خپریږي.",
+      "tags": "ټګونه",
+      "tagsPlaceholder": "ساحل-پاکول، اعتراض-مستندول، انټرنیټ-بندیدل",
+      "coverImage": "د پوښ انځور",
+      "description": "تشریح",
+      "descriptionPlaceholder": "هغه کړنه، شواهد یا پایله چې غواړئ الهام ورکړئ، د وړاندیزونو لپاره څه شیان دي او څنګه به یې ارزوئ تشریح کړئ...",
+      "pledge": "ژمنه",
+      "pledgeAmountPlaceholder": "100",
+      "deadline": "وروستۍ نېټه",
+      "timezone": "د وخت زون",
+      "timezoneNote": "د پیل او وروستۍ نېټې وختونه به په دې وخت زون کې تفسیر شي.",
+      "submit": "ژمنه جوړول",
+      "publishing": "خپرول…",
+      "uploadingCover": "د پوښ پورته کول…",
+      "altText": "د {{appName}} ژمنه: {{title}}",
+      "successToast": "ژمنه جوړه شوه",
+      "errorToast": "ژمنه نه جوړیږي",
+      "errorLoginRequired": "د ژمنې جوړولو لپاره باید ننوځئ.",
+      "errorTitleRequired": "سرلیک اړین دی.",
+      "errorDescriptionRequired": "تشریح اړینه ده.",
+      "errorPledgeRequired": "د ژمنې اندازه اړینه ده.",
+      "errorPledgeInvalid": "د ژمنې اندازه باید د ډالر په مثبته بڼه وي.",
+      "errorPriceUnavailable": "د BTC/USD نرخ ته انتظار باسئ ترڅو د ژمنې اندازه محاسبه شي.",
+      "errorCoverInvalid": "د پوښ انځور باید د https:// سمه نښه وي.",
+      "errorDeadlinePast": "وروستۍ نېټه نشي کولی په تېر وخت کې وي."
     }
   },
   "campaigns": {

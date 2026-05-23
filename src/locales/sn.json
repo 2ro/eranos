@@ -50,6 +50,11 @@
   "feed": {
     "indexTagline": "Zviri zvako. Mafambisirwo ako. Mitemo yako."
   },
+  "forms": {
+    "required": "Zvinodikanwa",
+    "recommended": "Zvinokurudzirwa",
+    "optional": "Zvichisarudzwa"
+  },
   "notFound": {
     "title": "404 - Peji harina kuwanikwa",
     "description": "Peji yauri kutsvaga haina kuwanikwa.",
@@ -104,6 +109,45 @@
       "deleted": "Chitsidziro chabviswa",
       "deletedContent": "Chitsidziro chakabviswa",
       "deleteFailed": "Yatadza kubvisa chitsidziro"
+    },
+    "create": {
+      "seoTitle": "Gadzira chitsidziro",
+      "seoDescription": "Gadzira chitsidziro chemupi kuti ukurudzire chiito chinokosha pa{{appName}}.",
+      "loginGateTitle": "Pinda kuti ugadzire chitsidziro",
+      "loginGateBody": "Zvitsidziro zviitiko zveNostr zvakasaina. Unoda kupinda muNostr kuti uburitse chimwe.",
+      "backToPledges": "Dzokera kuzvitsidziro",
+      "heading": "Gadzira chitsidziro",
+      "title": "Musoro",
+      "titlePlaceholder": "Nyora kuchenesa kwemhenderekedzo",
+      "country": "Nyika",
+      "countryPlaceholder": "Tsvaga nyika, semuenzaniso Venezuela",
+      "countryClearAria": "Bvisa nyika",
+      "flagOfAria": "Mureza we{{name}}",
+      "countryHint": "Zvinoburitsa <0>i: iso3166:{{code}}</0> yekuronga nenyika.",
+      "tags": "Marebhuro",
+      "tagsPlaceholder": "kuchenesa-mhenderekedzo, nyore-mhirizhonga, kudzima-internet",
+      "coverImage": "Mufananidzo wepamusoro",
+      "description": "Tsanangudzo",
+      "descriptionPlaceholder": "Tsanangura chiito, humbowo, kana mhedzisiro yauri kuda kukurudzira, zvinofanira kuva muzvirongwa, uye uchazviongorora sei...",
+      "pledge": "Chitsidziro",
+      "pledgeAmountPlaceholder": "100",
+      "deadline": "Mugumo",
+      "timezone": "Nzvimbo yenguva",
+      "timezoneNote": "Nguva yekutanga neyemugumo zvichaverengerwa munzvimbo yenguva iyi.",
+      "submit": "Gadzira chitsidziro",
+      "publishing": "Kuburitsa…",
+      "uploadingCover": "Kuisa mufananidzo…",
+      "altText": "Chitsidziro che{{appName}}: {{title}}",
+      "successToast": "Chitsidziro chagadzirwa",
+      "errorToast": "Hachina kugadzirika chitsidziro",
+      "errorLoginRequired": "Unofanira kunge wakapinda kuti ugadzire chitsidziro.",
+      "errorTitleRequired": "Musoro unodiwa.",
+      "errorDescriptionRequired": "Tsanangudzo inodiwa.",
+      "errorPledgeRequired": "Mari yechitsidziro inodiwa.",
+      "errorPledgeInvalid": "Mari yechitsidziro inofanira kunge iri USD inopfuura zero.",
+      "errorPriceUnavailable": "Kumirira mutengo weBTC/USD kuti ubatanidze mari yechitsidziro.",
+      "errorCoverInvalid": "Mufananidzo wepamusoro unofanira kuva URL ye https:// chaiyo.",
+      "errorDeadlinePast": "Mugumo haungavi munguva yapfuura."
     }
   },
   "campaigns": {

@@ -50,6 +50,11 @@
   "feed": {
     "indexTagline": "محتوای شما. سبک شما. قوانین شما."
   },
+  "forms": {
+    "required": "الزامی",
+    "recommended": "توصیه‌شده",
+    "optional": "اختیاری"
+  },
   "notFound": {
     "title": "۴۰۴ - صفحه پیدا نشد",
     "description": "صفحه‌ای که به دنبال آن هستید پیدا نشد.",
@@ -104,6 +109,45 @@
       "deleted": "تعهد حذف شد",
       "deletedContent": "تعهد حذف‌شده",
       "deleteFailed": "حذف تعهد ناموفق بود"
+    },
+    "create": {
+      "seoTitle": "ایجاد تعهد",
+      "seoDescription": "برای الهام‌بخشی به کنشی مشخص در {{appName}}، یک تعهد اهداکننده بسازید.",
+      "loginGateTitle": "برای ایجاد تعهد وارد شوید",
+      "loginGateBody": "تعهدها رویدادهای امضاشدهٔ Nostr هستند. برای انتشار یک تعهد به ورود Nostr نیاز دارید.",
+      "backToPledges": "بازگشت به تعهدها",
+      "heading": "ایجاد تعهد",
+      "title": "عنوان",
+      "titlePlaceholder": "مستندسازی پاکسازی ساحل",
+      "country": "کشور",
+      "countryPlaceholder": "جستجوی کشور، مثلاً ونزوئلا",
+      "countryClearAria": "پاک کردن کشور",
+      "flagOfAria": "پرچم {{name}}",
+      "countryHint": "<0>i: iso3166:{{code}}</0> برای مرتب‌سازی بر اساس کشور منتشر می‌شود.",
+      "tags": "برچسب‌ها",
+      "tagsPlaceholder": "پاکسازی-ساحل، مستندسازی-اعتراض، قطعی-اینترنت",
+      "coverImage": "تصویر جلد",
+      "description": "توضیح",
+      "descriptionPlaceholder": "کنش، شواهد یا پیامدی که می‌خواهید الهام‌بخش شوید، آنچه پاسخ‌ها باید شامل باشد و نحوهٔ ارزیابی آن‌ها را شرح دهید...",
+      "pledge": "تعهد",
+      "pledgeAmountPlaceholder": "100",
+      "deadline": "مهلت",
+      "timezone": "منطقهٔ زمانی",
+      "timezoneNote": "زمان شروع و مهلت در این منطقهٔ زمانی تفسیر می‌شوند.",
+      "submit": "ایجاد تعهد",
+      "publishing": "در حال انتشار…",
+      "uploadingCover": "در حال بارگذاری جلد…",
+      "altText": "تعهد {{appName}}: {{title}}",
+      "successToast": "تعهد ایجاد شد",
+      "errorToast": "ایجاد تعهد ممکن نشد",
+      "errorLoginRequired": "برای ایجاد تعهد باید وارد شوید.",
+      "errorTitleRequired": "عنوان الزامی است.",
+      "errorDescriptionRequired": "توضیح الزامی است.",
+      "errorPledgeRequired": "مبلغ تعهد الزامی است.",
+      "errorPledgeInvalid": "مبلغ تعهد باید یک مقدار مثبت به دلار باشد.",
+      "errorPriceUnavailable": "در انتظار قیمت BTC/USD برای محاسبهٔ مبلغ تعهد.",
+      "errorCoverInvalid": "تصویر جلد باید یک نشانی https:// معتبر باشد.",
+      "errorDeadlinePast": "مهلت نمی‌تواند در گذشته باشد."
     }
   },
   "campaigns": {
