@@ -27,7 +27,7 @@ interface GuideHeroProps {
  * Same structural recipe as the Organize / Actions homepage heroes
  * ({@link HeroBanner} + {@link HeroAtmosphere} + scrims + overlay copy),
  * but tuned smaller because these are sub-pages, not primary destinations.
- * Also embeds a "Back to Help" link in the top-left as the page's
+ * Also embeds a "Back to About" link in the top-left as the page's
  * primary navigation out — so a separate sticky bar isn't needed.
  */
 export function GuideHero({
@@ -65,16 +65,16 @@ export function GuideHero({
         aria-hidden="true"
       />
 
-      <div className="relative max-w-3xl mx-auto px-4 sm:px-6 py-6 sm:py-8 min-h-[240px] sm:min-h-[280px] flex flex-col">
-        {/* Back-to-Help action sits on its own row at the top so it
+      <div className="relative max-w-3xl lg:max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 min-h-[240px] sm:min-h-[280px] lg:min-h-[320px] flex flex-col">
+        {/* Back-to-About action sits on its own row at the top so it
             doubles as both the navigation out and the breadcrumb. */}
         <div>
           <Link
-            to="/help"
+            to="/about"
             className="inline-flex items-center gap-1.5 rounded-full bg-black/30 hover:bg-black/45 backdrop-blur-sm border border-white/20 px-3 py-1.5 text-xs sm:text-sm font-medium text-white drop-shadow focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70 transition-colors"
           >
             <ArrowLeft className="size-3.5" />
-            Back to Help
+            Back to About
           </Link>
         </div>
 

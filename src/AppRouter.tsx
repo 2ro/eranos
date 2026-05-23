@@ -31,7 +31,7 @@ const CSAEPolicyPage = lazy(() => import("./pages/CSAEPolicyPage").then(m => ({ 
 const ExternalContentPage = lazy(() => import("./pages/ExternalContentPage").then(m => ({ default: m.ExternalContentPage })));
 const GeotagPage = lazy(() => import("./pages/GeotagPage").then(m => ({ default: m.GeotagPage })));
 const HashtagPage = lazy(() => import("./pages/HashtagPage").then(m => ({ default: m.HashtagPage })));
-const HelpPage = lazy(() => import("./pages/HelpPage").then(m => ({ default: m.HelpPage })));
+const AboutPage = lazy(() => import("./pages/AboutPage").then(m => ({ default: m.AboutPage })));
 const DonorGuidePage = lazy(() => import("./pages/DonorGuidePage").then(m => ({ default: m.DonorGuidePage })));
 const ActivistGuidePage = lazy(() => import("./pages/ActivistGuidePage").then(m => ({ default: m.ActivistGuidePage })));
 const NetworkSettingsPage = lazy(() => import("./pages/NetworkSettingsPage").then(m => ({ default: m.NetworkSettingsPage })));
@@ -74,7 +74,7 @@ function SiteFooter() {
       <div className="mx-auto max-w-7xl px-4 sm:px-6 py-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-muted-foreground">
         <span>&copy; {new Date().getFullYear()} Agora. Fundraisers on Nostr.</span>
         <nav className="flex items-center gap-5">
-          <Link to="/help" className="hover:text-foreground motion-safe:transition-colors">Help</Link>
+          <Link to="/about" className="hover:text-foreground motion-safe:transition-colors">About</Link>
           <Link to="/privacy" className="hover:text-foreground motion-safe:transition-colors">Privacy</Link>
           <Link to="/safety" className="hover:text-foreground motion-safe:transition-colors">Safety</Link>
           <Link to="/changelog" className="hover:text-foreground motion-safe:transition-colors">Changelog</Link>
@@ -133,9 +133,12 @@ export function AppRouter() {
           <Route path="/wallet" element={<WalletPage />} />
           <Route path="/wallet/recovery" element={<WalletRecoveryPage />} />
           <Route path="/bitcoin" element={<Navigate to="/wallet" replace />} />
-          <Route path="/help" element={<HelpPage />} />
-          <Route path="/help/donors" element={<DonorGuidePage />} />
-          <Route path="/help/activists" element={<ActivistGuidePage />} />
+          {/* Legacy /help routes redirect to /about so existing links keep
+              working. The About page and the two guides themselves live
+              under the wide layout below. */}
+          <Route path="/help" element={<Navigate to="/about" replace />} />
+          <Route path="/help/donors" element={<Navigate to="/about/donors" replace />} />
+          <Route path="/help/activists" element={<Navigate to="/about/activists" replace />} />
           <Route path="/privacy" element={<PrivacyPolicyPage />} />
           <Route path="/safety" element={<CSAEPolicyPage />} />
           <Route path="/changelog" element={<ChangelogPage />} />
@@ -158,6 +161,11 @@ export function AppRouter() {
           <Route path="/pledges/new" element={<CreateActionPage />} />
           <Route path="/dashboard" element={<EventDashboardPage />} />
           <Route path="/i/*" element={<ExternalContentPage />} />
+          {/* About page + Donor / Activist guides. Full-bleed landing-style
+              layouts that render their own internal max-widths. */}
+          <Route path="/about" element={<AboutPage />} />
+          <Route path="/about/donors" element={<DonorGuidePage />} />
+          <Route path="/about/activists" element={<ActivistGuidePage />} />
           {/* NIP-19 route for npub1, note1, naddr1, nevent1, nprofile1.
               Goes through the wide layout because the dispatch may resolve to
               a profile, campaign, action, or community page — all of which

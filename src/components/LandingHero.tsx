@@ -30,7 +30,7 @@ export function LandingHero({ onJoinClick }: LandingHeroProps) {
             Join
           </Button>
           <Button variant="outline" className="rounded-full px-6" size="sm" asChild>
-            <Link to="/help">FAQ</Link>
+            <Link to="/about#faq">FAQ</Link>
           </Button>
         </div>
       </div>

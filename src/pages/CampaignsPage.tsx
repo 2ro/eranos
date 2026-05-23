@@ -218,7 +218,7 @@ export function CampaignsPage() {
                 asChild
                 className="rounded-full h-12 px-6 text-base border-white/30 bg-white/5 text-white hover:bg-white/10 hover:text-white hover:border-white/50 [&_svg]:size-[18px]"
               >
-                <Link to="/help">
+                <Link to="/about">
                   How it works
                   <ArrowRight className="ml-2" />
                 </Link>

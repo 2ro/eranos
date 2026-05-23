@@ -3,8 +3,8 @@ import { Link, NavLink, useNavigate } from 'react-router-dom';
 import {
   Activity,
   Bell,
-  CircleHelp,
   HandHeart,
+  Info,
   Megaphone,
   Menu,
   Search,
@@ -208,7 +208,7 @@ function getProfileMenuItems({
     { label: 'Profile', to: `/${nip19.npubEncode(userPubkey)}`, icon: User },
     { label: 'Search', to: '/search', icon: Search },
     { label: 'Settings', to: '/settings', icon: Settings },
-    { label: 'Help', to: '/help', icon: CircleHelp },
+    { label: 'About', to: '/about', icon: Info },
   ];
 }
 

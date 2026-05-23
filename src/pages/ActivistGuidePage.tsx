@@ -1,20 +1,26 @@
 import { useSeoMeta } from '@unhead/react';
-import { AlertTriangle } from 'lucide-react';
 
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { GuideHero } from '@/components/GuideHero';
-import { GuideSectionCard } from '@/components/GuideSectionCard';
+import {
+  CalloutCard,
+  GuideProse,
+  GuideSteps,
+  GuideTLDR,
+  OptionGrid,
+  PaymentComparisonTable,
+} from '@/components/guide';
 import { useAppContext } from '@/hooks/useAppContext';
 import { DEFAULT_ACTION_COVERS } from '@/lib/defaultActionCovers';
-import { getActivistGuideSections } from '@/lib/helpContent';
+import { getActivistGuideBlocks, type GuideBlock } from '@/lib/helpContent';
 import { HOPE_PALETTE } from '@/lib/hopePalette';
 
 /**
- * Activist Guide — long-form companion to the Help page.
+ * Activist Guide. The long-form companion to the About page.
  *
- * Explains how receiving donations works on Agora, why incoming donations
- * are public, and the main paths for cashing out privately. Linked from
- * `/help` as one of the two large guide buttons.
+ * The page body is composed from a typed sequence of `GuideBlock`s
+ * defined in `src/lib/helpContent.ts`. Each block kind has a dedicated
+ * component; this page just hands each block to the right one. Linked
+ * from `/about` as one of the two large guide buttons.
  */
 export function ActivistGuidePage() {
   const { config } = useAppContext();
@@ -24,48 +30,48 @@ export function ActivistGuidePage() {
     description: `How to receive donations on ${config.appName} and cash out privately.`,
   });
 
-  const sections = getActivistGuideSections(config.appName);
+  const blocks = getActivistGuideBlocks(config.appName);
 
   return (
     <main className="min-h-screen pb-16 sidebar:pb-0">
       <GuideHero
         title="Activist Guide"
-        subtitle="How to receive donations on Agora and move funds privately when you need to."
+        subtitle="Pick what to accept, receive donations, cash out. Plain English, no walls of text."
         images={ACTIVIST_HERO_IMAGES}
         palette={HOPE_PALETTE}
       />
 
-      <div className="px-4 pt-4 pb-4 space-y-4 max-w-3xl mx-auto">
-        {/* Above-ground recommendation alert */}
-        <Alert className="border-amber-500/50 [&>svg]:text-amber-500">
-          <AlertTriangle className="size-4" />
-          <AlertTitle className="text-amber-700 dark:text-amber-400">
-            Recommended for above-ground activism
-          </AlertTitle>
-          <AlertDescription className="text-foreground/80">
-            <p>
-              {config.appName} is recommended only for above-ground activism. Every donation you
-              receive is recorded publicly on the Bitcoin blockchain and on Nostr. If you or your
-              donors require extreme privacy &mdash; including protection from state actors
-              &mdash; additional steps are needed to protect yourself and the people supporting you.
-              Read the sections below before accepting donations.
-            </p>
-          </AlertDescription>
-        </Alert>
-
-        {/* Sections */}
-        {sections.map((section) => (
-          <GuideSectionCard key={section.id} section={section} />
+      <div className="px-4 pt-6 pb-4 space-y-6 max-w-3xl mx-auto sm:px-6 lg:max-w-4xl">
+        {blocks.map((block, i) => (
+          <GuideBlockRenderer key={i} block={block} />
         ))}
       </div>
     </main>
   );
 }
 
+/** Dispatches a single block to the correct visual component. */
+function GuideBlockRenderer({ block }: { block: GuideBlock }) {
+  switch (block.kind) {
+    case 'tldr':
+      return <GuideTLDR block={block} />;
+    case 'steps':
+      return <GuideSteps block={block} />;
+    case 'paymentComparison':
+      return <PaymentComparisonTable block={block} />;
+    case 'callout':
+      return <CalloutCard block={block} />;
+    case 'optionGrid':
+      return <OptionGrid block={block} />;
+    case 'prose':
+      return <GuideProse block={block} />;
+  }
+}
+
 /**
  * Hero images for the Activist Guide. Reuses the protest / action cover
- * gallery already used by the Actions page hero — raised fists, people
- * power, freedom imagery — so the page reads as belonging to activists,
+ * gallery already used by the Actions page hero (raised fists, people
+ * power, freedom imagery) so the page reads as belonging to activists,
  * not just generic "users."
  */
 const ACTIVIST_HERO_IMAGES: readonly string[] = DEFAULT_ACTION_COVERS.map(
