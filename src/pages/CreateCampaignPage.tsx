@@ -8,7 +8,6 @@ import { nip19 } from 'nostr-tools';
 import {
   AlertTriangle,
   ArrowLeft,
-  Check,
   HandHeart,
   Loader2,
   MapPin,
@@ -24,6 +23,13 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { useAuthor } from '@/hooks/useAuthor';
 import { useCampaign } from '@/hooks/useCampaign';
@@ -128,29 +134,28 @@ export function CreateCampaignPage() {
   const [bannerNip94Tags, setBannerNip94Tags] = useState<string[][] | null>(null);
   const [coverUploading, setCoverUploading] = useState(false);
   /**
-   * Wallet form state. The campaign's published `w` tags are the
-   * combination of:
+   * Wallet form state.
    *
-   *  - The HD wallet's fresh receive address (advanced at submit time)
-   *    when {@link useMyWallet} is on.
-   *  - The user's static silent-payment code when
-   *    {@link useMyPrivateWallet} is on.
-   *  - Anything the user typed into {@link customOnchain} /
-   *    {@link customSp} (when the "Add another address" disclosure is
-   *    open).
+   * - {@link walletSource} picks the top-level source: `'mine'` (the
+   *   user's HD wallet, only selectable when nsec is available) or
+   *   `'custom'` (paste any mainnet bech32(m) endpoint).
+   * - {@link mineAccept} picks which donation types the HD-wallet
+   *   campaign accepts:
+   *     - `'all'` — publishes both a fresh on-chain address and the
+   *       static silent-payment code.
+   *     - `'public'` — on-chain only (advances the HD receive cursor).
+   *     - `'private'` — silent-payment only.
+   * - {@link customOnchain} / {@link customSp} are the typed values
+   *   when {@link walletSource} is `'custom'`. At least one of them
+   *   must parse to a valid endpoint of the matching mode.
    *
-   * A custom input always wins for its mode — so a user who types a
-   * cold-storage `bc1p…` while leaving {@link useMyWallet} on publishes
-   * the typed address (and we do NOT advance the HD cursor for that
-   * publish). At least one of the four sources must resolve to a valid
-   * wallet endpoint.
+   * Without nsec access the dropdown is hidden entirely; the user
+   * sees only the two custom inputs.
    */
-  const [useMyWallet, setUseMyWallet] = useState(false);
-  const [useMyPrivateWallet, setUseMyPrivateWallet] = useState(false);
+  const [walletSource, setWalletSource] = useState<'mine' | 'custom'>('custom');
+  const [mineAccept, setMineAccept] = useState<'all' | 'public' | 'private'>('all');
   const [customOnchain, setCustomOnchain] = useState('');
   const [customSp, setCustomSp] = useState('');
-  /** Whether the "Add another address" disclosure is expanded. */
-  const [showCustomFields, setShowCustomFields] = useState(false);
   const [goalUsd, setGoalUsd] = useState('');
   const [deadline, setDeadline] = useState('');
   const [countryQuery, setCountryQuery] = useState('');
@@ -183,29 +188,39 @@ export function CreateCampaignPage() {
   }, [isEditMode, authorizedOrgFromParam]);
 
   // When the HD wallet becomes available on a fresh campaign, default
-  // both chips on. Skipped in edit mode (we always start with chips
-  // off and the existing values pre-filled into the custom inputs —
-  // see the edit-prepopulation effect below) and once the user has
-  // interacted, so re-renders that re-derive `hdWalletAvailable` don't
-  // override an explicit choice. We wait until silent-payment support
-  // is resolved (both `hdWalletAvailable` and `silentPaymentSupported`
-  // derive from the same nsec, so they normally land in the same
-  // render) so the SP chip toggles on by default too.
+  // the source to "My wallet". Skipped in edit mode (we always start
+  // in 'custom' with the existing values pre-filled — see the
+  // edit-prepopulation effect below) and once the defaults have been
+  // applied, so re-renders that re-derive `hdWalletAvailable` don't
+  // override an explicit user choice.
   const [walletDefaultsApplied, setWalletDefaultsApplied] = useState(false);
   useEffect(() => {
     if (isEditMode || walletDefaultsApplied) return;
     if (!hdWalletAvailable) return;
-    setUseMyWallet(true);
-    if (silentPaymentSupported) setUseMyPrivateWallet(true);
+    setWalletSource('mine');
+    setMineAccept(silentPaymentSupported ? 'all' : 'public');
     setWalletDefaultsApplied(true);
   }, [isEditMode, walletDefaultsApplied, hdWalletAvailable, silentPaymentSupported]);
 
-  // Without nsec access, the chips are hidden and the custom inputs are
-  // the only way to declare wallets. Make sure the disclosure is open
-  // in that case so the inputs are visible.
+  // Without nsec access, the dropdown is hidden and `walletSource` is
+  // pinned to `'custom'`. Guard against a stale `'mine'` from a prior
+  // logged-in session if the user signs out without unmounting the
+  // page.
   useEffect(() => {
-    if (!hdWalletAvailable) setShowCustomFields(true);
-  }, [hdWalletAvailable]);
+    if (!hdWalletAvailable && walletSource !== 'custom') {
+      setWalletSource('custom');
+    }
+  }, [hdWalletAvailable, walletSource]);
+
+  // If silent-payment support disappears (e.g., login switched to a
+  // login type that can't derive SP), coerce a stale 'all' / 'private'
+  // selection to 'public' so the submit handler never has to
+  // apologize for a UI choice the user can't actually make.
+  useEffect(() => {
+    if (!silentPaymentSupported && mineAccept !== 'public') {
+      setMineAccept('public');
+    }
+  }, [silentPaymentSupported, mineAccept]);
 
   const editCampaignQuery = useCampaign({
     pubkey: editTarget?.pubkey ?? '',
@@ -247,17 +262,14 @@ export function CreateCampaignPage() {
     // already on the event. We'll re-emit it from the original event
     // tags below if the URL is unchanged.
     setBannerNip94Tags(null);
-    // Edit mode always starts with both chips off, the existing
-    // endpoints pre-filled into the custom inputs, and the disclosure
-    // open. We don't try to auto-detect whether the stored `w` tags
-    // came from the user's HD wallet — switching wallets is an
+    // Edit mode always starts in 'custom' with the existing endpoints
+    // pre-filled. We don't try to auto-detect whether the stored `w`
+    // tags came from the user's HD wallet — switching wallets is an
     // explicit choice the user must make, and the cursor must not be
     // burned on a no-op edit.
-    setUseMyWallet(false);
-    setUseMyPrivateWallet(false);
+    setWalletSource('custom');
     setCustomOnchain(editCampaign.wallets.onchain?.value ?? '');
     setCustomSp(editCampaign.wallets.sp?.value ?? '');
-    setShowCustomFields(true);
     setWalletDefaultsApplied(true);
     setGoalUsd(editCampaign.goalUsd !== undefined ? String(editCampaign.goalUsd) : '');
     setDeadline(formatDateInput(editCampaign.deadline));
@@ -287,57 +299,61 @@ export function CreateCampaignPage() {
         throw new Error('Identifier must be lowercase letters, numbers, and hyphens.');
       }
 
-      // Resolve the campaign's `w` endpoints. For each mode, a typed
-      // value in the disclosure wins; otherwise the corresponding chip
-      // (when on) contributes the HD-derived value. We validate any
-      // typed values up-front so a malformed input is reported before
-      // any irreversible work (no cursor burn, no relay round-trips).
-      // The HD cursor advance happens later, just before the `w` tag
-      // is appended, so a failure between here and there doesn't
-      // silently consume a receive index.
-      const customOnchainTrimmed = customOnchain.trim();
-      const customSpTrimmed = customSp.trim();
-
+      // Resolve the campaign's `w` endpoints.
+      //
+      // - 'mine'   → derive from the user's HD wallet. {@link mineAccept}
+      //   selects which modes are published. The on-chain receive
+      //   index is advanced later (just before the `w` tag is
+      //   appended) so a validation failure between here and there
+      //   doesn't burn an index.
+      // - 'custom' → validate the typed values up-front. At least one
+      //   must parse to its expected mode.
+      //
+      // `willUseHdOnchain` and `spWallet` are the resolved targets;
+      // `customOnchainWallet` is populated when 'custom' is selected
+      // and the bc1 field parses.
       let customOnchainWallet = null as ReturnType<typeof parseCampaignWallet>;
-      if (showCustomFields && customOnchainTrimmed) {
-        customOnchainWallet = parseCampaignWallet(customOnchainTrimmed);
-        if (!customOnchainWallet || customOnchainWallet.mode !== 'onchain') {
-          throw new Error(
-            'The on-chain address is not a recognized mainnet bech32(m) address (bc1q… / bc1p…).',
-          );
-        }
-      }
-
       let customSpWallet = null as ReturnType<typeof parseCampaignWallet>;
-      if (showCustomFields && customSpTrimmed) {
-        customSpWallet = parseCampaignWallet(customSpTrimmed);
-        if (!customSpWallet || customSpWallet.mode !== 'sp') {
-          throw new Error(
-            'The silent-payment code is not a recognized BIP-352 code (sp1…).',
-          );
+      let willUseHdOnchain = false;
+      let spWallet = null as ReturnType<typeof parseCampaignWallet>;
+
+      if (walletSource === 'mine') {
+        if (!hdWalletAvailable) {
+          throw new Error('Built-in wallet is unavailable for this login.');
         }
+        const wantsOnchain = mineAccept === 'all' || mineAccept === 'public';
+        const wantsSp = mineAccept === 'all' || mineAccept === 'private';
+        if (wantsSp && !silentPaymentSupported) {
+          throw new Error('Silent-payment address is unavailable for this login.');
+        }
+        willUseHdOnchain = wantsOnchain;
+        if (wantsSp && hdWallet.silentPaymentAddress) {
+          spWallet = parseCampaignWallet(hdWallet.silentPaymentAddress.address);
+        }
+      } else {
+        // 'custom'
+        const customOnchainTrimmed = customOnchain.trim();
+        const customSpTrimmed = customSp.trim();
+        if (customOnchainTrimmed) {
+          customOnchainWallet = parseCampaignWallet(customOnchainTrimmed);
+          if (!customOnchainWallet || customOnchainWallet.mode !== 'onchain') {
+            throw new Error(
+              'The on-chain address is not a recognized mainnet bech32(m) address (bc1q… / bc1p…).',
+            );
+          }
+        }
+        if (customSpTrimmed) {
+          customSpWallet = parseCampaignWallet(customSpTrimmed);
+          if (!customSpWallet || customSpWallet.mode !== 'sp') {
+            throw new Error(
+              'The silent-payment code is not a recognized BIP-352 code (sp1…).',
+            );
+          }
+        }
+        spWallet = customSpWallet;
       }
 
-      // For each mode, choose the effective endpoint: custom wins,
-      // otherwise the chip (if on) supplies its value. The HD-derived
-      // onchain address is *not* derived yet — see the deferred step
-      // near the `w` tag.
-      const willUseHdOnchain = useMyWallet && !customOnchainWallet;
-      const spWallet =
-        customSpWallet ??
-        (useMyPrivateWallet && hdWallet.silentPaymentAddress
-          ? parseCampaignWallet(hdWallet.silentPaymentAddress.address)
-          : null);
-
-      if (useMyWallet && !customOnchainWallet && !hdWalletAvailable) {
-        throw new Error('Built-in wallet is unavailable for this login.');
-      }
-      if (useMyPrivateWallet && !customSpWallet && !silentPaymentSupported) {
-        throw new Error('Silent-payment address is unavailable for this login.');
-      }
-
-      // At least one endpoint must resolve. If neither the on-chain nor
-      // the SP path will produce a value, bail before any work.
+      // At least one endpoint must resolve.
       if (!willUseHdOnchain && !customOnchainWallet && !spWallet) {
         throw new Error(
           'Provide at least one wallet endpoint — a Bitcoin mainnet address (bc1q… / bc1p…) or a silent-payment code (sp1…).',
@@ -429,11 +445,11 @@ export function CreateCampaignPage() {
       }
       tags.push(['alt', `Fundraising campaign: ${trimmedTitle}`]);
 
-      // Last step before the `w` tags: advance the HD wallet cursor if
-      // the user chose to use the HD on-chain wallet AND didn't
-      // override it with a typed value. This is deliberately the *last*
-      // mutation we do before publishing so a validation failure
-      // earlier in this function doesn't burn an index.
+      // Last step before the `w` tags: advance the HD wallet cursor
+      // if the user chose 'mine' and the selected accept mode includes
+      // on-chain. Deliberately the *last* mutation we do before
+      // publishing so a validation failure earlier in this function
+      // doesn't burn an index.
       let onchainWallet = customOnchainWallet;
       if (!onchainWallet && willUseHdOnchain) {
         const next = hdWallet.nextReceiveAddress();
@@ -653,12 +669,10 @@ export function CreateCampaignPage() {
               silentPaymentSupported={silentPaymentSupported}
               displayName={userDisplayName}
               picture={userMetadata?.picture}
-              useMyWallet={useMyWallet}
-              onToggleMyWallet={() => setUseMyWallet((v) => !v)}
-              useMyPrivateWallet={useMyPrivateWallet}
-              onToggleMyPrivateWallet={() => setUseMyPrivateWallet((v) => !v)}
-              showCustomFields={showCustomFields}
-              onToggleCustomFields={() => setShowCustomFields((v) => !v)}
+              walletSource={walletSource}
+              onWalletSourceChange={setWalletSource}
+              mineAccept={mineAccept}
+              onMineAcceptChange={setMineAccept}
               customOnchain={customOnchain}
               onCustomOnchainChange={setCustomOnchain}
               parsedCustomOnchain={parsedCustomOnchain}
@@ -808,30 +822,33 @@ export function CreateCampaignPage() {
 // ─── Layout helpers ──────────────────────────────────────────────────────────
 
 /**
- * Wallet picker for the campaign form. Renders two avatar chips ("My
- * wallet" / "My private wallet") for nsec users plus a collapsible
- * "Add another address" disclosure with bc1 and sp1 inputs.
+ * Wallet picker for the campaign form.
  *
- * Without nsec access, the chips are hidden and the two custom inputs
- * are shown unconditionally — that's the only path to a wallet
- * endpoint for users who logged in via extension or bunker.
+ * For nsec users we render two dropdowns:
  *
- * The disclosure is always rendered; toggling it controls whether the
- * custom inputs contribute to the published `w` tags. A typed value
- * wins over the corresponding chip's HD-derived value (so a user can
- * publish a cold-storage `bc1p…` even with "My wallet" still ticked).
+ *  1. **Source** — "My wallet" (default) or "Custom".
+ *  2. **Accept** — only shown when source is "My wallet". Picks which
+ *     donation types the HD-wallet campaign accepts: all, public only,
+ *     or private only.
+ *
+ * For users without nsec access (extension / bunker logins) the
+ * dropdowns are skipped entirely and we show the two custom inputs
+ * directly — that's the only path to a wallet endpoint for those
+ * logins.
+ *
+ * When source is "Custom" the user can fill the on-chain address, the
+ * silent-payment code, or both. At least one must parse to a valid
+ * endpoint of its mode.
  */
 function WalletPicker({
   hdWalletAvailable,
   silentPaymentSupported,
   displayName,
   picture,
-  useMyWallet,
-  onToggleMyWallet,
-  useMyPrivateWallet,
-  onToggleMyPrivateWallet,
-  showCustomFields,
-  onToggleCustomFields,
+  walletSource,
+  onWalletSourceChange,
+  mineAccept,
+  onMineAcceptChange,
   customOnchain,
   onCustomOnchainChange,
   parsedCustomOnchain,
@@ -843,12 +860,10 @@ function WalletPicker({
   silentPaymentSupported: boolean;
   displayName: string;
   picture?: string;
-  useMyWallet: boolean;
-  onToggleMyWallet: () => void;
-  useMyPrivateWallet: boolean;
-  onToggleMyPrivateWallet: () => void;
-  showCustomFields: boolean;
-  onToggleCustomFields: () => void;
+  walletSource: 'mine' | 'custom';
+  onWalletSourceChange: (value: 'mine' | 'custom') => void;
+  mineAccept: 'all' | 'public' | 'private';
+  onMineAcceptChange: (value: 'all' | 'public' | 'private') => void;
   customOnchain: string;
   onCustomOnchainChange: (value: string) => void;
   parsedCustomOnchain: ReturnType<typeof parseCampaignWallet>;
@@ -857,47 +872,82 @@ function WalletPicker({
   parsedCustomSp: ReturnType<typeof parseCampaignWallet>;
 }) {
   const initial = displayName.charAt(0).toUpperCase() || '?';
+  const myWalletLabel = displayName ? `${displayName}'s wallet` : 'My wallet';
 
   return (
     <div className="space-y-3">
-      {hdWalletAvailable && (
-        <div className="flex flex-wrap gap-2">
-          <WalletChip
-            selected={useMyWallet}
-            onToggle={onToggleMyWallet}
-            label={displayName ? `${displayName}'s wallet` : 'My wallet'}
-            picture={picture}
-            initial={initial}
-          />
-          <WalletChip
-            selected={useMyPrivateWallet && silentPaymentSupported}
-            onToggle={onToggleMyPrivateWallet}
-            disabled={!silentPaymentSupported}
-            label={displayName ? `${displayName}'s private wallet` : 'My private wallet'}
-            picture={picture}
-            initial={initial}
-          />
-        </div>
-      )}
+      {hdWalletAvailable ? (
+        <>
+          <Select value={walletSource} onValueChange={(v) => onWalletSourceChange(v as 'mine' | 'custom')}>
+            <SelectTrigger className="h-12">
+              <SelectValue placeholder="Choose a wallet">
+                {walletSource === 'custom' ? (
+                  <span className="inline-flex items-center gap-2">
+                    <span className="inline-flex size-7 shrink-0 items-center justify-center rounded-full bg-muted text-muted-foreground">
+                      <Wallet className="size-3.5" />
+                    </span>
+                    <span className="text-sm">Custom</span>
+                  </span>
+                ) : (
+                  <span className="inline-flex items-center gap-2">
+                    <Avatar className="size-7 shrink-0">
+                      <AvatarImage src={picture} alt={displayName} />
+                      <AvatarFallback>{initial}</AvatarFallback>
+                    </Avatar>
+                    <span className="truncate text-sm">{myWalletLabel}</span>
+                  </span>
+                )}
+              </SelectValue>
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="mine">
+                <span className="inline-flex items-center gap-2">
+                  <Avatar className="size-7 shrink-0">
+                    <AvatarImage src={picture} alt={displayName} />
+                    <AvatarFallback>{initial}</AvatarFallback>
+                  </Avatar>
+                  <span className="text-sm">{myWalletLabel}</span>
+                </span>
+              </SelectItem>
+              <SelectItem value="custom">
+                <span className="inline-flex items-center gap-2">
+                  <span className="inline-flex size-7 shrink-0 items-center justify-center rounded-full bg-muted text-muted-foreground">
+                    <Wallet className="size-3.5" />
+                  </span>
+                  <span className="text-sm">Custom</span>
+                </span>
+              </SelectItem>
+            </SelectContent>
+          </Select>
 
-      {hdWalletAvailable && (
-        <button
-          type="button"
-          onClick={onToggleCustomFields}
-          className="text-xs font-medium text-muted-foreground hover:text-foreground motion-safe:transition-colors"
-          aria-expanded={showCustomFields}
-        >
-          {showCustomFields ? '− Hide custom addresses' : '+ Add another address'}
-        </button>
-      )}
-
-      {showCustomFields && (
-        <div className="space-y-3 pt-1">
-          {!hdWalletAvailable && (
-            <p className="text-xs text-muted-foreground">
-              Enter a Bitcoin address, a silent-payment code, or both. At least one is required.
-            </p>
+          {walletSource === 'mine' && (
+            <Select
+              value={mineAccept}
+              onValueChange={(v) => onMineAcceptChange(v as 'all' | 'public' | 'private')}
+            >
+              <SelectTrigger className="h-10">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all" disabled={!silentPaymentSupported}>
+                  Accept all payment types
+                </SelectItem>
+                <SelectItem value="public">Accept public payments only</SelectItem>
+                <SelectItem value="private" disabled={!silentPaymentSupported}>
+                  Accept private payments only
+                </SelectItem>
+              </SelectContent>
+            </Select>
           )}
+        </>
+      ) : (
+        <p className="text-xs text-muted-foreground">
+          Enter a Bitcoin address, a silent-payment code, or both. At least one is required.
+        </p>
+      )}
+
+      {walletSource === 'custom' && (
+        <div className="space-y-3 pt-1">
           <CustomWalletInput
             id="campaign-wallet-onchain"
             label="Bitcoin address"
@@ -918,56 +968,7 @@ function WalletPicker({
           />
         </div>
       )}
-
-      {!hdWalletAvailable && !showCustomFields && (
-        // Defensive — the effect on mount forces showCustomFields=true
-        // when nsec is unavailable. This branch shouldn't render, but
-        // we surface a hint just in case.
-        <p className="text-xs text-muted-foreground">
-          Log in with a Nostr secret key to use a built-in wallet, or enter a Bitcoin address below.
-        </p>
-      )}
     </div>
-  );
-}
-
-/** Avatar-style toggle chip used for "My wallet" / "My private wallet". */
-function WalletChip({
-  selected,
-  onToggle,
-  disabled,
-  label,
-  picture,
-  initial,
-}: {
-  selected: boolean;
-  onToggle: () => void;
-  disabled?: boolean;
-  label: string;
-  picture?: string;
-  initial: string;
-}) {
-  return (
-    <button
-      type="button"
-      onClick={onToggle}
-      disabled={disabled}
-      aria-pressed={selected}
-      className={cn(
-        'inline-flex items-center gap-2 rounded-full border pl-1 pr-3 py-1 text-sm motion-safe:transition-colors',
-        selected
-          ? 'border-primary bg-primary/10 text-foreground'
-          : 'border-border bg-card text-muted-foreground hover:bg-secondary',
-        disabled && 'opacity-50 cursor-not-allowed hover:bg-card',
-      )}
-    >
-      <Avatar className="size-7 shrink-0">
-        <AvatarImage src={picture} alt="" />
-        <AvatarFallback>{initial}</AvatarFallback>
-      </Avatar>
-      <span className="truncate max-w-[200px]">{label}</span>
-      {selected && <Check className="size-3.5 text-primary shrink-0" />}
-    </button>
   );
 }
 
