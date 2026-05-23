@@ -21,11 +21,10 @@ import { useAddrEvent, type AddrCoords } from '@/hooks/useEvent';
 import { parsePackEvent } from '@/lib/packUtils';
 import { PackFeedTab, MemberCard, MemberCardSkeleton } from '@/components/FollowPackDetailContent';
 import { genUserName } from '@/lib/genUserName';
-import { ArcBackground, ARC_OVERHANG_PX } from '@/components/ArcBackground';
-import { AgoraLogo } from '@/components/AgoraLogo';
 import { Nip05Badge } from '@/components/Nip05Badge';
 import { SubHeaderBar } from '@/components/SubHeaderBar';
 import { TabButton } from '@/components/TabButton';
+import { TopNav } from '@/components/TopNav';
 import AuthDialog from '@/components/auth/AuthDialog';
 import type { FeedItem } from '@/lib/feedUtils';
 import type { AddressPointer } from 'nostr-tools/nip19';
@@ -152,9 +151,12 @@ function FollowView({ pubkey }: { pubkey: string }) {
   }, [user, isOwnProfile, isAlreadyFollowing, followData, isPending, pubkey, follow, displayName, toast]);
 
   return (
-    <div className="h-dvh flex flex-col bg-background/85">
-      {/* Profile header (not scrollable) */}
-      <div className="shrink-0">
+    <div className="min-h-screen bg-background/85">
+      <TopNav />
+
+      <main>
+      {/* Profile header */}
+      <div className="border-b border-border bg-background/85">
         {/* Banner — matches ProfilePage: clean edge, no gradient */}
         <div className="h-36 md:h-48 bg-secondary relative">
           {author.isLoading ? (
@@ -164,16 +166,10 @@ function FollowView({ pubkey }: { pubkey: string }) {
           ) : (
             <div className="absolute inset-0 bg-gradient-to-br from-accent/10 via-transparent to-primary/5" />
           )}
-          <Link to="/" className="absolute top-3 left-3">
-            <div className="bg-background/85 rounded-full">
-              <AgoraLogo size={48} />
-            </div>
-          </Link>
         </div>
 
         {/* Profile card */}
-        <div className="bg-background/85">
-        <div className="flex flex-col items-center px-4 -mt-12 md:-mt-16 relative z-10 max-w-2xl mx-auto w-full" style={{ paddingBottom: ARC_OVERHANG_PX + 16 }}>
+        <div className="flex flex-col items-center px-4 -mt-12 pb-6 md:-mt-16 relative z-10 max-w-2xl mx-auto w-full">
           {/* Avatar — matches ProfilePage border treatment */}
           <div className="relative">
             <Avatar className="size-24 md:size-32 border-4 border-background shadow-lg">
@@ -244,21 +240,17 @@ function FollowView({ pubkey }: { pubkey: string }) {
                 </div>
               </div>
             ) : null}
-           </div>
-        </div>
+          </div>
         </div>
       </div>
 
-      {/* Feed scrollbox */}
-      <div className="flex-1 min-h-0 overflow-y-auto relative" style={{ marginTop: -ARC_OVERHANG_PX }}>
-        {/* Arc with bg — sits at the top of the scroll area, overlapping the gap */}
-        <div className="sticky top-0 z-10 pointer-events-none" style={{ height: ARC_OVERHANG_PX }}>
-          <ArcBackground variant="down" />
-        </div>
-        <div className="max-w-2xl mx-auto w-full bg-background/85" style={{ paddingTop: ARC_OVERHANG_PX }}>
+      {/* Feed */}
+      <div>
+        <div className="max-w-2xl mx-auto w-full bg-background/85">
           <ProfileFeed pubkey={pubkey} />
         </div>
       </div>
+      </main>
 
       <AuthDialog
         isOpen={loginOpen}
@@ -333,17 +325,13 @@ function FollowPackView({ addr, relays }: { addr: AddrCoords; relays?: string[] 
 
   if (eventLoading) {
     return (
-      <div className="h-dvh flex flex-col bg-background/85">
-        <div className="shrink-0">
+      <div className="min-h-screen bg-background/85">
+        <TopNav />
+        <div>
           <div className="h-36 md:h-48 bg-secondary relative">
             <Skeleton className="w-full h-full rounded-none" />
-            <Link to="/" className="absolute top-3 left-3">
-              <div className="bg-background/85 rounded-full">
-                <AgoraLogo size={48} />
-              </div>
-            </Link>
           </div>
-          <div className="bg-background/85">
+          <div className="border-b border-border bg-background/85">
             <div className="flex flex-col items-center px-4 pt-6 pb-6 max-w-2xl mx-auto w-full space-y-3">
               <Skeleton className="h-6 w-48" />
               <Skeleton className="h-4 w-32" />
@@ -359,9 +347,11 @@ function FollowPackView({ addr, relays }: { addr: AddrCoords; relays?: string[] 
   if (!event) return <NotFound />;
 
   return (
-    <div className="h-dvh flex flex-col bg-background/85">
-      {/* Header (not scrollable) */}
-      <div className="shrink-0">
+    <div className="min-h-screen bg-background/85">
+      <TopNav />
+
+      {/* Header */}
+      <div className="border-b border-border bg-background/85">
         {/* Banner */}
         <div className="h-36 md:h-48 bg-secondary relative">
           {bannerUrl ? (
@@ -369,16 +359,10 @@ function FollowPackView({ addr, relays }: { addr: AddrCoords; relays?: string[] 
           ) : (
             <div className="absolute inset-0 bg-gradient-to-br from-accent/10 via-transparent to-primary/5" />
           )}
-          <Link to="/" className="absolute top-3 left-3">
-            <div className="bg-background/85 rounded-full">
-              <AgoraLogo size={48} />
-            </div>
-          </Link>
         </div>
 
         {/* Pack info */}
-        <div className="bg-background/85">
-          <div className="flex flex-col items-center px-4 -mt-6 pb-4 relative z-10 max-w-2xl mx-auto w-full">
+        <div className="flex flex-col items-center px-4 -mt-6 pb-4 relative z-10 max-w-2xl mx-auto w-full">
             {/* Avatar stack (first 5 members) */}
             <div className="flex -space-x-3 mb-3">
               {pubkeys.slice(0, 5).map((pk) => {
@@ -467,19 +451,18 @@ function FollowPackView({ addr, relays }: { addr: AddrCoords; relays?: string[] 
                 </div>
               )}
             </div>
-          </div>
         </div>
       </div>
 
       {/* Tab bar */}
-      <SubHeaderBar className="shrink-0" innerClassName="max-w-2xl mx-auto">
+      <SubHeaderBar innerClassName="max-w-2xl mx-auto">
         <TabButton label="Feed" active={activeTab === 'feed'} onClick={() => setActiveTab('feed')} />
         <TabButton label={`Members (${pubkeys.length})`} active={activeTab === 'members'} onClick={() => setActiveTab('members')} />
       </SubHeaderBar>
 
-      {/* Tab content (scrollable) */}
-      <div className="flex-1 min-h-0 overflow-y-auto">
-        <div className="max-w-2xl mx-auto w-full bg-background/85" style={{ paddingTop: ARC_OVERHANG_PX }}>
+      {/* Tab content */}
+      <div>
+        <div className="max-w-2xl mx-auto w-full bg-background/85 pt-2">
           {activeTab === 'feed' ? (
             <PackFeedTab pubkeys={pubkeys} />
           ) : membersLoading ? (
