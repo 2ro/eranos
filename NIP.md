@@ -281,7 +281,7 @@ The two zap kinds are complementary. Clients SHOULD sum verified amounts from bo
 
 ### Summary
 
-Addressable event representing a **self-authored fundraising campaign**. A campaign carries marketing-style metadata (title, summary, banner image, markdown story, optional goal, optional deadline, optional country) and exactly one Bitcoin wallet endpoint declared in a `w` tag. The wallet endpoint is either a public on-chain bech32(m) address (`bc1q…`, `bc1p…`) or a silent-payment code (`sp1…`, per BIP-352). The mode is inferred from the prefix — the client renders the corresponding QR code and adjusts the donation-progress UI accordingly.
+Addressable event representing a **self-authored fundraising campaign**. A campaign carries marketing-style metadata (title, summary, banner image, markdown story, optional goal, optional deadline, optional country) and one or two Bitcoin wallet endpoints declared in `w` tags. Each wallet endpoint is either a public on-chain bech32(m) address (`bc1q…`, `bc1p…`) or a silent-payment code (`sp1…`, per BIP-352). The mode of each endpoint is inferred from the prefix — the client renders a QR code that combines the present endpoints and adjusts the donation-progress UI accordingly. A campaign MAY declare **at most one** endpoint per mode (at most one on-chain address and at most one silent-payment code).
 
 The author of the event is also the beneficiary. Campaigns are never authored on behalf of someone else; the event creator owns the wallet declared in `w` and receives the donations. To stop accepting donations, the creator publishes a NIP-09 kind 5 deletion request referencing the campaign's `a` coordinate.
 
@@ -311,6 +311,7 @@ The kind is addressable so the creator can edit the story, banner, goal, deadlin
     ["alt", "Fundraising campaign: Save the Last Bookstore"],
 
     ["w", "bc1p7w2k3xq9...xyz"],
+    ["w", "sp1qq...verylongsilentpaymentcode..."],
 
     ["goal", "25000"],
     ["deadline", "1735689600"],
@@ -321,10 +322,16 @@ The kind is addressable so the creator can edit the story, banner, goal, deadlin
 }
 ```
 
-A silent-payment campaign is identical except the `w` tag carries an `sp1…` code:
+A silent-payment-only campaign omits the `bc1…` `w` tag and carries only the `sp1…`:
 
 ```json
 ["w", "sp1qq...verylongsilentpaymentcode..."]
+```
+
+An on-chain-only campaign omits the `sp1…` `w` tag and carries only the `bc1…`:
+
+```json
+["w", "bc1p7w2k3xq9...xyz"]
 ```
 
 ### Content
@@ -337,7 +344,7 @@ The `content` field is the **campaign story**, formatted as Markdown. Clients SH
 |-----------|----------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | `d`       | Yes      | Campaign slug, unique per author. Forms the addressable coordinate `33863:<pubkey>:<d>`.                                                                                                                                     |
 | `title`   | Yes      | Display title of the campaign (plain text, max ~200 chars).                                                                                                                                                                  |
-| `w`       | Yes      | Bitcoin wallet endpoint. The 2nd element is a single bech32(m) string: a mainnet on-chain address starting with `bc1q` (P2WPKH/P2WSH) or `bc1p` (P2TR), **or** a silent-payment code starting with `sp1` per BIP-352. Exactly one `w` tag per campaign. |
+| `w`       | Yes      | Bitcoin wallet endpoint. The 2nd element is a single bech32(m) string: a mainnet on-chain address starting with `bc1q` (P2WPKH/P2WSH) or `bc1p` (P2TR), **or** a silent-payment code starting with `sp1` per BIP-352. A campaign MUST carry at least one `w` tag and MAY carry up to two — at most one per mode (on-chain and silent payment). |
 | `summary` | Recommended | Short one-paragraph tagline shown in feed cards and previews.                                                                                                                                                              |
 | `banner`  | Recommended | HTTPS URL of the wide banner image. Clients MUST sanitize the URL (see `sanitizeUrl()` in `nostr-security`) before rendering, and SHOULD pair the URL with a NIP-92 `imeta` tag for dimensions, blurhash, MIME type, and SHA-256. |
 | `imeta`   | Recommended | NIP-92 media metadata for the banner. The first `url <value>` pair MUST match the `banner` URL; clients SHOULD ignore an `imeta` whose URL does not match.                                                                  |
@@ -349,28 +356,40 @@ The `content` field is the **campaign story**, formatted as Markdown. Clients SH
 
 ### Wallet Modes
 
-The prefix of the `w` value selects one of two donation modes. Clients MUST detect the mode from the prefix; the event carries no other mode discriminator.
+The prefix of each `w` value selects one of two donation modes. Clients MUST detect the mode from the prefix; the event carries no other mode discriminator. When a campaign carries both an on-chain and a silent-payment endpoint, the client SHOULD present a single combined QR (see "Combined QR" below) so a scan offers the donor's wallet whichever endpoint it supports, while still rendering on-chain aggregate UI from the on-chain endpoint and the silent-payment privacy notice from the silent-payment endpoint.
 
 | Prefix              | Mode      | Description                                                                                                                              |
 |---------------------|-----------|------------------------------------------------------------------------------------------------------------------------------------------|
 | `bc1q…` / `bc1p…`   | On-chain  | Public mainnet bech32(m) address. Donations are traceable; clients show a progress bar, total raised, and donation list.                |
 | `sp1…`              | Silent payment | BIP-352 silent-payment code. Donations are **unlinkable by design**. Clients MUST hide all aggregate totals and progress UI (see below). |
 
-Other prefixes (`tb1…`, `bcrt1…`, `tsp1…`, lightning invoices, etc.) MUST be rejected at parse time; the campaign does not render.
+Other prefixes (`tb1…`, `bcrt1…`, `tsp1…`, lightning invoices, etc.) MUST be rejected at parse time; the campaign does not render. A campaign carrying two `w` tags of the same mode (e.g., two `bc1…` addresses) is invalid and MUST NOT render — only one endpoint per mode is permitted.
 
-Clients SHOULD validate the bech32(m) checksum of the `w` value, not just its prefix.
+Clients SHOULD validate the bech32(m) checksum of each `w` value, not just its prefix.
+
+### Combined QR
+
+When a campaign declares both endpoints, clients SHOULD render a single BIP-21 URI that combines them:
+
+```
+bitcoin:<bc1-address>?sp=<sp1-code>
+```
+
+BIP-352-aware wallets pick the `sp=` parameter and use the silent-payment flow; legacy wallets fall back to the on-chain address. Clients MAY also surface each endpoint's raw string as a copyable affordance so donors who prefer one over the other can choose explicitly. A single-endpoint campaign uses the standard form: `bitcoin:<bc1-address>` (on-chain only) or `bitcoin:?sp=<sp1-code>` (silent payment only).
 
 ### Client Behavior by Mode
 
-| UI element                  | On-chain (`bc1`)                                                | Silent payment (`sp1`)                                |
-|-----------------------------|-----------------------------------------------------------------|-------------------------------------------------------|
-| QR code                     | bech32(m) address QR (or BIP-21 `bitcoin:` URI)                 | SP code QR (BIP-352 / BIP-21 SP extension)             |
-| "Raised X" / progress bar   | Shown, computed from verified kind 8333 receipts                | **Hidden.** Replaced with a "Private campaign — totals are not public" notice. |
-| Donor / recent-donation list| Shown                                                           | **Hidden.**                                            |
-| Goal display                | Shown as USD target with optional sat-equivalent estimate       | Shown as USD target; no progress computation           |
-| Donation receipt published  | Donor's client publishes a kind 8333 receipt (see below)        | **No receipt published.** Publishing one would defeat SP unlinkability and is forbidden. |
+Each endpoint type drives its own UI elements independently. A dual-endpoint campaign shows the on-chain aggregate UI (computed from the on-chain endpoint) **and** the silent-payment privacy notice (because at least some donations may flow through the SP endpoint and not be visible in any aggregate).
 
-For silent-payment campaigns, clients MUST NOT attempt to scan the chain, MUST NOT publish receipts, and MUST NOT display any aggregate that could leak donation activity. The only signal the public sees is the campaign event itself.
+| UI element                  | On-chain (`bc1`) present                                        | Silent payment (`sp1`) present                        |
+|-----------------------------|-----------------------------------------------------------------|-------------------------------------------------------|
+| QR code                     | bech32(m) address in BIP-21 `bitcoin:` URI                      | SP code in BIP-21 `?sp=` extension (combined with on-chain address when both are present) |
+| "Raised X" / progress bar   | Shown, computed from verified kind 8333 receipts against the on-chain address | **Not contributed.** When the on-chain endpoint is absent, aggregate UI is hidden entirely. |
+| Donor / recent-donation list| Shown                                                           | **Not contributed.**                                   |
+| Goal display                | Shown as USD target with optional sat-equivalent estimate       | Shown as USD target; no progress computation when on-chain endpoint is absent |
+| Donation receipt published  | Donor's client publishes a kind 8333 receipt against the on-chain endpoint (see below) | **No receipt published.** Publishing one would defeat SP unlinkability and is forbidden. |
+
+For campaigns with **only** a silent-payment endpoint (no on-chain endpoint), clients MUST NOT attempt to scan the chain, MUST NOT publish receipts, and MUST NOT display any aggregate that could leak donation activity. For dual-endpoint campaigns, the on-chain aggregate UI is permitted but clients SHOULD render a privacy notice indicating that silent-payment donations are not reflected in the totals.
 
 ### Donation Flow — On-chain (`bc1`)
 
@@ -457,7 +476,7 @@ The `pinnedEvents` array is ordered newest pin first. Pinning an already-pinned 
 
 ### Client Behavior
 
-- **Wallet validity:** clients MUST reject events whose `w` tag is missing, present more than once, or whose value does not pass bech32(m) checksum validation for one of the supported prefixes. Invalid campaigns do not render.
+- **Wallet validity:** clients MUST reject events that carry no `w` tag, that carry more than one `w` tag of the same mode (e.g., two `bc1…` addresses), or whose `w` values fail bech32(m) checksum validation for one of the supported prefixes. Invalid campaigns do not render.
 - **Editability:** the creator MAY republish the same `(33863, pubkey, d)` triple to update any field, including the `w` wallet endpoint. Clients SHOULD keep `published_at` from the first publish on subsequent edits (NIP-23 convention).
 - **Closing a campaign:** there is no `status` tag. To stop accepting donations, the creator publishes a NIP-09 kind 5 deletion request referencing the campaign's `a` coordinate. Clients SHOULD honor the deletion by removing the campaign from discovery feeds. Historical kind 8333 receipts MAY still be rendered against the (now-deleted) campaign coordinate so donors can find their past donations.
 - **No category, no topics:** kind 33863 events MUST NOT carry `t` tags or NIP-32 category labels in any `agora.*` namespace. Campaigns are individual stories; discovery happens via search (NIP-50 against title/summary/content), country (`#i`), and moderator curation (below).

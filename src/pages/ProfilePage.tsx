@@ -1486,7 +1486,7 @@ function FollowersListModal({ pubkey, open, onOpenChange, displayName }: Followe
                     followingCount={profileFollowing?.count ?? 0}
                     totalRaisedSats={profileCampaignStats.totalRaisedSats}
                     btcPrice={btcPrice}
-                    onchainCampaigns={profileCampaignStats.campaigns.filter((c) => c.wallet?.mode === 'onchain')}
+                    onchainCampaigns={profileCampaignStats.campaigns.filter((c) => !!c.wallets?.onchain)}
                     onToggleFollow={handleToggleFollow}
                     onMoreMenuOpen={() => setMoreMenuOpen(true)}
                     onFollowQROpen={() => setFollowQROpen(true)}

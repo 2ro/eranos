@@ -67,10 +67,13 @@ export function useCampaignDonations(campaign: ParsedCampaign | undefined): {
   const { esploraApis } = config;
 
   const aTag = campaign?.aTag;
-  const wallet = campaign?.wallet;
-  const isSilentPayment = wallet?.mode === 'sp';
-  const isOnchain = wallet?.mode === 'onchain';
-  const walletValue = wallet?.value;
+  const wallets = campaign?.wallets;
+  // For dual-endpoint campaigns the on-chain endpoint drives aggregate UI
+  // (silent-payment donations are unlinkable and never contribute to totals).
+  // A campaign without an on-chain endpoint shows no aggregates.
+  const onchainWallet = wallets?.onchain;
+  const hasOnchain = !!onchainWallet;
+  const walletValue = onchainWallet?.value;
 
   // Headline number: query the address balance directly from Esplora.
   // `totalReceived` is `chain_stats.funded_txo_sum` — sats ever sent to
@@ -78,13 +81,14 @@ export function useCampaignDonations(campaign: ParsedCampaign | undefined): {
   const addressQuery = useQuery({
     queryKey: ['bitcoin-balance', 'campaign', esploraApis, walletValue ?? ''],
     queryFn: ({ signal }) => fetchAddressData(walletValue!, esploraApis, signal),
-    enabled: !!walletValue && isOnchain,
+    enabled: !!walletValue && hasOnchain,
     staleTime: 30_000,
     refetchInterval: 30_000,
   });
 
-  // Donor list / breakdown: fetch kind 8333 receipts. Disabled for SP
-  // campaigns (no receipts are published by design).
+  // Donor list / breakdown: fetch kind 8333 receipts. Disabled when the
+  // campaign has no on-chain endpoint (silent-payment-only campaigns never
+  // publish receipts by design).
   const receiptsQuery = useQuery({
     queryKey: ['campaign-donations', 'events', aTag ?? ''],
     queryFn: async ({ signal }): Promise<NostrEvent[]> => {
@@ -95,7 +99,7 @@ export function useCampaignDonations(campaign: ParsedCampaign | undefined): {
       );
       return events;
     },
-    enabled: !!aTag && !isSilentPayment,
+    enabled: !!aTag && hasOnchain,
     staleTime: 15_000,
   });
 
@@ -123,7 +127,7 @@ export function useCampaignDonations(campaign: ParsedCampaign | undefined): {
       queryFn: ({ signal }: { signal: AbortSignal }) =>
         verifyOnchainZap(event, esploraApis, walletValue, signal),
       staleTime: 60_000,
-      enabled: !!walletValue && !isSilentPayment,
+      enabled: !!walletValue && hasOnchain,
     })),
   });
 
@@ -131,7 +135,7 @@ export function useCampaignDonations(campaign: ParsedCampaign | undefined): {
     .map((v) => v.data)
     .filter((v): v is OnchainZapEntry => !!v);
 
-  const totalSats = isOnchain ? (addressQuery.data?.totalReceived ?? 0) : 0;
+  const totalSats = hasOnchain ? (addressQuery.data?.totalReceived ?? 0) : 0;
 
   const txids = new Set<string>();
   const donors = new Set<string>();
@@ -143,7 +147,7 @@ export function useCampaignDonations(campaign: ParsedCampaign | undefined): {
   const sortedReceipts = [...receipts].sort((a, b) => b.created_at - a.created_at);
 
   const isVerifying =
-    !isSilentPayment &&
+    hasOnchain &&
     (addressQuery.isLoading ||
       receiptsQuery.isLoading ||
       verifications.some((v) => v.isLoading));

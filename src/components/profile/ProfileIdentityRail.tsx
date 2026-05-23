@@ -164,7 +164,7 @@ export function ProfileIdentityRail({
     return sanitizeUrl(candidate);
   })();
 
-  const onchainCampaigns = campaigns.filter((c) => c.wallet?.mode === 'onchain');
+  const onchainCampaigns = campaigns.filter((c) => !!c.wallets?.onchain);
 
   return (
     // Two-layer structure so the rail can scroll independently on lg+

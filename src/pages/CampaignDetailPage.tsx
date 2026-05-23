@@ -738,7 +738,7 @@ function CampaignHero({
           busy photos without darkening the gradient further. */}
       <div className="absolute inset-x-0 bottom-0 z-10 px-5 sm:px-6 lg:px-0 pb-[max(env(safe-area-inset-bottom),1.75rem)] pt-16 sm:pt-20">
         <div className="max-w-6xl mx-auto [text-shadow:0_1px_3px_rgba(0,0,0,0.7)]">
-          {campaign.wallet.mode === 'sp' && (
+          {!campaign.wallets.onchain && (
             <Badge
               variant="secondary"
               className="mb-4 bg-background/85 text-foreground border-border/40 backdrop-blur [text-shadow:none]"
@@ -885,7 +885,7 @@ function DonateColumn({
 }: DonateColumnProps) {
   const ended = !!deadline?.isPast;
   const endedLabel = ended ? 'Campaign ended' : null;
-  const isSilentPayment = campaign.wallet.mode === 'sp';
+  const isSilentPayment = !campaign.wallets.onchain;
 
   return (
     // On mobile we drop the Card chrome (no border, no shadow, no
@@ -967,7 +967,7 @@ function DonateColumn({
           // Both on-chain and silent-payment campaigns route through the
           // same UX — Agora no longer runs an in-app PSBT signer.
           <div className="space-y-3">
-            <CampaignWalletDonatePanel wallet={campaign.wallet} />
+            <CampaignWalletDonatePanel wallets={campaign.wallets} />
             <Button variant="outline" size="lg" className="w-full" onClick={onShare}>
               <Share2 className="size-4 mr-2" />
               Share

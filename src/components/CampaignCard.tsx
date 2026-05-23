@@ -128,7 +128,9 @@ export function CampaignCard({ campaign, variant = 'compact', className, footerB
   const deadline = campaign.deadline ? formatDeadline(campaign.deadline) : null;
   const raisedSats = stats?.totalSats ?? 0;
   const countryLabel = getCampaignCountryLabel(campaign);
-  const isSilentPayment = campaign.wallet.mode === 'sp';
+  // SP-only campaigns hide aggregate totals; dual-endpoint campaigns
+  // show on-chain aggregates per spec.
+  const isSilentPayment = !campaign.wallets.onchain;
 
   const isFeaturedVariant = variant === 'featured';
   const isApproved = moderation.approvedCoords.has(campaign.aTag);
