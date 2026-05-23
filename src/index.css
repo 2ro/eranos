@@ -3,16 +3,65 @@
 @tailwind utilities;
 
 @layer base {
+  /*
+   * Agora's built-in color tokens. These are hardcoded and ship with the
+   * bundle — there is no runtime injection path, no remote theme loader,
+   * no localStorage-driven CSS-variable mutation. The only thing that
+   * changes at runtime is the `.dark` class on <html>, set by
+   * AppProvider based on the resolved theme preference.
+   *
+   * If you want to recolor the app, edit these values directly.
+   */
   :root {
     --radius: 0.75rem;
-    --success: 142 72% 29%;
-    --success-foreground: 138 60% 94%;
     /* Mobile chrome dimensions — referenced by layout utility classes below */
     --top-bar-height: 2.5rem;   /* MobileTopBar h-10 = 40px */
     --bottom-nav-height: 2.75rem; /* MobileBottomNav h-11 = 44px */
+
+    /* ── Light theme tokens ───────────────────────────────────────────── */
+    --background: 0 0% 100%;
+    --foreground: 222 47% 11%;
+    --card: 0 0% 100%;
+    --card-foreground: 222 47% 11%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222 47% 11%;
+    --primary: 24 100% 50%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 0 0% 96%;
+    --secondary-foreground: 222 47% 11%;
+    --muted: 0 0% 96%;
+    --muted-foreground: 222 17% 46%;
+    --accent: 0 0% 92%;
+    --accent-foreground: 222 47% 11%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 24 50% 82%;
+    --input: 24 50% 82%;
+    --ring: 24 100% 50%;
+    --success: 142 72% 29%;
+    --success-foreground: 138 60% 94%;
   }
 
   .dark {
+    --background: 0 0% 10%;
+    --foreground: 0 0% 95%;
+    --card: 0 0% 12%;
+    --card-foreground: 0 0% 95%;
+    --popover: 0 0% 12%;
+    --popover-foreground: 0 0% 95%;
+    --primary: 24 100% 50%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 0 0% 18%;
+    --secondary-foreground: 0 0% 95%;
+    --muted: 0 0% 18%;
+    --muted-foreground: 0 0% 65%;
+    --accent: 0 0% 24%;
+    --accent-foreground: 0 0% 95%;
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 95%;
+    --border: 24 40% 30%;
+    --input: 24 40% 30%;
+    --ring: 24 100% 50%;
     --success: 142 60% 22%;
     --success-foreground: 138 60% 94%;
   }

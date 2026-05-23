@@ -7,7 +7,6 @@ import { useAppContext } from '@/hooks/useAppContext';
 import { useCurrentUser } from './useCurrentUser';
 import { fetchFreshEvent } from '@/lib/fetchFreshEvent';
 import type { Theme, FeedSettings, ContentWarningPolicy, SavedFeed, WidgetConfig } from '@/contexts/AppContext';
-import type { ThemeConfig } from '@/themes';
 import type { ContentFilter } from './useContentFilters';
 import type { LetterPreferences } from '@/lib/letterTypes';
 import { EncryptedSettingsSchema } from '@/lib/schemas';
@@ -46,8 +45,6 @@ export function setLocalSettingsSync(pubkey: string, lastSync: number): void {
 export interface EncryptedSettings {
   /** App theme preference */
   theme?: Theme;
-  /** Custom theme config (colors, fonts, background) */
-  customTheme?: ThemeConfig;
   /** Whether to use app default relays in addition to user relays */
   useAppRelays?: boolean;
   /** Whether to include the user's personal NIP-65 relay list in the effective relay set. */

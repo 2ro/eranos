@@ -25,10 +25,7 @@ import { BadgeAwardCard } from "@/components/BadgeAwardCard";
 import { CalendarEventDetailPage } from "@/components/CalendarEventDetailPage";
 import { CommunityDetailPage } from "@/components/CommunityDetailPage";
 
-import {
-  ColorMomentContent,
-  ColorMomentEyeButton,
-} from "@/components/ColorMomentContent";
+import { ColorMomentContent } from "@/components/ColorMomentContent";
 import {
   EmojifiedText,
   ReactionEmoji,
@@ -1840,7 +1837,6 @@ function PostDetailContent({ event }: { event: NostrEvent }) {
                     🤖
                   </span>
                 )}
-                {isColor && <ColorMomentEyeButton event={event} />}
               </>
             )}
           </div>

@@ -1,12 +1,16 @@
 import { createContext } from "react";
-import type { ThemeConfig, ThemesConfig } from "@/themes";
 
 /**
- * A builtin theme whose colors are defined at build time.
+ * The app theme preference.
+ *
  * "system" resolves to "light" or "dark" based on OS preference.
- * "custom" uses user-defined token values stored in `customTheme`.
+ *
+ * Agora's colors are hardcoded in `src/index.css` and cannot be customized
+ * at runtime. This used to support a `"custom"` value that loaded
+ * user-defined colors, fonts, and backgrounds from localStorage / Nostr
+ * events; that capability has been removed entirely for security reasons.
  */
-export type Theme = "light" | "dark" | "system" | "custom";
+export type Theme = "light" | "dark" | "system";
 
 /**
  * How to handle events with a NIP-36 content-warning tag.
@@ -205,10 +209,6 @@ export interface AppConfig {
   client?: string;
   /** Current theme */
   theme: Theme;
-  /** Custom theme config (colors, fonts, background). Only used when theme === "custom". */
-  customTheme?: ThemeConfig;
-  /** Configured light and dark themes. Overrides the builtin themes when set. */
-  themes?: ThemesConfig;
   /** NIP-65 relay list metadata */
   relayMetadata: RelayMetadata;
   /** Whether to use app default relays in addition to user relays */

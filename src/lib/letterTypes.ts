@@ -1,6 +1,6 @@
 import type { NostrEvent } from '@nostrify/nostrify';
 import { sanitizeUrl } from '@/lib/sanitizeUrl';
-import { sanitizeCssString } from '@/lib/fontLoader';
+import { sanitizeCssString } from '@/lib/cssSanitize';
 
 export const LETTER_KIND = 8211;
 export const COLOR_MOMENT_KIND = 3367;

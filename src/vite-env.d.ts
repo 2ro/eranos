@@ -2,7 +2,7 @@
 
 // Fontsource packages export CSS — they have no TS declarations
 declare module '@fontsource-variable/*';
-declare module '@fontsource/comic-relief/*';
+declare module '@fontsource/*';
 
 interface ImportMetaEnv {
   /** Hex pubkey of the nostr-push server for Web Push notifications. */

@@ -38,10 +38,7 @@ import { BadgeContent } from "@/components/BadgeContent";
 import { CampaignNoteCardContent } from "@/components/CampaignNoteCardContent";
 import { CommunityContent } from "@/components/CommunityContent";
 import { CalendarEventContent } from "@/components/CalendarEventContent";
-import {
-  ColorMomentContent,
-  ColorMomentEyeButton,
-} from "@/components/ColorMomentContent";
+import { ColorMomentContent } from "@/components/ColorMomentContent";
 import { CommentContext, CountryCommentPill } from "@/components/CommentContext";
 import { CommunityContentWarning } from "@/components/CommunityContentWarning";
 import { ContentWarningGuard } from "@/components/ContentWarningGuard";
@@ -1206,7 +1203,6 @@ export const NoteCard = memo(function NoteCard({
           <div className="flex items-center gap-3">
             {avatarElement}
             {authorInfo}
-            {isColor && <ColorMomentEyeButton event={event} />}
             <CountryCommentPill
               event={event}
               className="shrink-0 [text-shadow:none]"

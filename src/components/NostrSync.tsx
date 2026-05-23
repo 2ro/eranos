@@ -217,10 +217,6 @@ export function NostrSync() {
               updates.theme = "system";
               changed = true;
             }
-            if (current.customTheme !== undefined) {
-              updates.customTheme = undefined;
-              changed = true;
-            }
             // Reset sidebar order and homepage to the app defaults so the previous
             // user's layout doesn't bleed into the new account.
             if ((current.sidebarOrder ?? []).length > 0) {
@@ -289,27 +285,6 @@ export function NostrSync() {
           updates.theme = "system";
           changed = true;
         }
-        if (current.customTheme !== undefined) {
-          updates.customTheme = undefined;
-          changed = true;
-        }
-      }
-
-      if (
-        encryptedSettings.customTheme &&
-        JSON.stringify(encryptedSettings.customTheme) !==
-          JSON.stringify(current.customTheme)
-      ) {
-        updates.customTheme = encryptedSettings.customTheme;
-        changed = true;
-      } else if (
-        isSwitch &&
-        !encryptedSettings.customTheme &&
-        current.customTheme !== undefined
-      ) {
-        // Clear stale custom theme from the previous account.
-        updates.customTheme = undefined;
-        changed = true;
       }
 
       if (

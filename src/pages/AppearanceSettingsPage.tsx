@@ -38,9 +38,6 @@ export function AppearanceSettingsPage() {
   const { config } = useAppContext();
   const { theme, setTheme } = useTheme();
 
-  // Treat "custom" as "system" for display since we're simplifying to 3 options
-  const activeTheme = theme === 'custom' ? 'system' : theme;
-
   useSeoMeta({
     title: `Appearance | Settings | ${config.appName}`,
     description: 'Choose between system, light, and dark mode',
@@ -79,7 +76,7 @@ export function AppearanceSettingsPage() {
               className={cn(
                 'w-full flex items-center gap-4 px-4 py-3.5 rounded-xl border-2 transition-all duration-200',
                 'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
-                activeTheme === option.value
+                theme === option.value
                   ? 'border-primary bg-primary/5 shadow-sm'
                   : 'border-border/50 hover:border-primary/40 hover:bg-muted/30',
               )}
@@ -87,7 +84,7 @@ export function AppearanceSettingsPage() {
               <div
                 className={cn(
                   'flex items-center justify-center size-10 rounded-lg transition-colors',
-                  activeTheme === option.value
+                  theme === option.value
                     ? 'bg-primary text-primary-foreground'
                     : 'bg-muted text-muted-foreground',
                 )}
@@ -97,7 +94,7 @@ export function AppearanceSettingsPage() {
               <div className="flex-1 text-left min-w-0">
                 <p className={cn(
                   'text-sm font-semibold',
-                  activeTheme === option.value ? 'text-foreground' : 'text-foreground',
+                  theme === option.value ? 'text-foreground' : 'text-foreground',
                 )}>
                   {option.label}
                 </p>
@@ -105,7 +102,7 @@ export function AppearanceSettingsPage() {
                   {option.description}
                 </p>
               </div>
-              {activeTheme === option.value && (
+              {theme === option.value && (
                 <div className="size-2.5 rounded-full bg-primary shrink-0 animate-in fade-in zoom-in duration-200" />
               )}
             </button>
