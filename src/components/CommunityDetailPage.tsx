@@ -868,8 +868,6 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
 
   useLayoutOptions({
     noMaxWidth: true,
-    rightSidebar: null,
-    showFAB: false,
   });
 
   const moderationCtx = useMemo(

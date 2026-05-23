@@ -8,7 +8,6 @@ import { nip19 } from 'nostr-tools';
 import { useNostrLogin } from '@nostrify/react/login';
 
 import { saveNsec } from '@/lib/credentialManager';
-import { useLayoutOptions } from '@/contexts/LayoutContext';
 import { Navigate } from 'react-router-dom';
 import { useForm, useFieldArray } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -638,11 +637,6 @@ export function ProfileSettings() {
       toast({ title: 'Error', description: 'Failed to save profile.', variant: 'destructive' });
     }
   };
-
-  // Inject live sidebar preview into the app's right sidebar slot
-  useLayoutOptions({
-    rightSidebar: <ProfileRightSidebar fields={previewFields} pubkey={user?.pubkey} />,
-  });
 
   if (!user) return <Navigate to="/settings" replace />;
 

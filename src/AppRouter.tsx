@@ -8,10 +8,8 @@ import { useCurrentUser } from "./hooks/useCurrentUser";
 import { useProfileUrl } from "./hooks/useProfileUrl";
 import {
   CenterColumnContext,
-  DrawerContext,
   LayoutStore,
   LayoutStoreContext,
-  NavHiddenContext,
   useLayoutSnapshot,
 } from "@/contexts/LayoutContext";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -109,29 +107,25 @@ function FundraiserLayoutInner() {
 
   return (
     <CenterColumnContext.Provider value={centerColumnEl}>
-      <DrawerContext.Provider value={() => {}}>
-        <NavHiddenContext.Provider value={false}>
-          <div className="min-h-dvh flex flex-col bg-background">
-            <TopNav />
-            <Suspense fallback={<PageSkeleton />}>
-              <div
-                ref={(el) => {
-                  centerColumnRef.current = el;
-                  setCenterColumnEl(el);
-                }}
-                className={cn(
-                  "flex-1 min-w-0 w-full mx-auto",
-                  !noMaxWidth && "max-w-3xl",
-                  wrapperClassName,
-                )}
-              >
-                <Outlet />
-              </div>
-            </Suspense>
-            <SiteFooter />
+      <div className="min-h-dvh flex flex-col bg-background">
+        <TopNav />
+        <Suspense fallback={<PageSkeleton />}>
+          <div
+            ref={(el) => {
+              centerColumnRef.current = el;
+              setCenterColumnEl(el);
+            }}
+            className={cn(
+              "flex-1 min-w-0 w-full mx-auto",
+              !noMaxWidth && "max-w-3xl",
+              wrapperClassName,
+            )}
+          >
+            <Outlet />
           </div>
-        </NavHiddenContext.Provider>
-      </DrawerContext.Provider>
+        </Suspense>
+        <SiteFooter />
+      </div>
     </CenterColumnContext.Provider>
   );
 }

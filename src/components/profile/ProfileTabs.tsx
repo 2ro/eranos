@@ -1,6 +1,5 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { cn } from '@/lib/utils';
-import { useNavHidden } from '@/contexts/LayoutContext';
 
 export interface ProfileTabsProps {
   tabs: Array<{ id: string; label: string }>;
@@ -31,7 +30,6 @@ export function ProfileTabs({ tabs, activeTab, onChange }: ProfileTabsProps) {
   const trackRef = useRef<HTMLDivElement>(null);
   const tabRefs = useRef<Map<string, HTMLButtonElement>>(new Map());
   const [indicator, setIndicator] = useState<{ left: number; width: number } | null>(null);
-  const navHidden = useNavHidden();
 
   // Measure the active tab and update the underline indicator.
   useLayoutEffect(() => {
@@ -90,7 +88,6 @@ export function ProfileTabs({ tabs, activeTab, onChange }: ProfileTabsProps) {
         // fade so the bar isn't visibly intersecting the top bar as it
         // animates.
         'max-sidebar:transition-[transform,opacity] max-sidebar:duration-300 max-sidebar:ease-in-out',
-        navHidden && 'nav-hidden-slide max-sidebar:opacity-0',
         // Visual separation — translucent backdrop so feed content doesn't
         // bleed through, with a single hairline border below.
         'bg-background/80 backdrop-blur supports-[backdrop-filter]:bg-background/60',

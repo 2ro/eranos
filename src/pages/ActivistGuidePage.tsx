@@ -5,7 +5,6 @@ import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { GuideHero } from '@/components/GuideHero';
 import { GuideSectionCard } from '@/components/GuideSectionCard';
 import { useAppContext } from '@/hooks/useAppContext';
-import { useLayoutOptions } from '@/contexts/LayoutContext';
 import { DEFAULT_ACTION_COVERS } from '@/lib/defaultActionCovers';
 import { getActivistGuideSections } from '@/lib/helpContent';
 import { HOPE_PALETTE } from '@/lib/hopePalette';
@@ -19,7 +18,6 @@ import { HOPE_PALETTE } from '@/lib/hopePalette';
  */
 export function ActivistGuidePage() {
   const { config } = useAppContext();
-  useLayoutOptions({});
 
   useSeoMeta({
     title: `Activist Guide | ${config.appName}`,

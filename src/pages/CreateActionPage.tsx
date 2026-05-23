@@ -40,7 +40,7 @@ import { cn } from '@/lib/utils';
 import { withAgoraTag } from '@/lib/agoraNoteTags';
 
 export function CreateActionPage() {
-  useLayoutOptions({ noMaxWidth: true, rightSidebar: null });
+  useLayoutOptions({ noMaxWidth: true });
 
   const { user } = useCurrentUser();
   const navigate = useNavigate();

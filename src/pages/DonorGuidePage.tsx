@@ -5,7 +5,6 @@ import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { GuideHero } from '@/components/GuideHero';
 import { GuideSectionCard } from '@/components/GuideSectionCard';
 import { useAppContext } from '@/hooks/useAppContext';
-import { useLayoutOptions } from '@/contexts/LayoutContext';
 import { getDonorGuideSections } from '@/lib/helpContent';
 import { COOL_PALETTE } from '@/lib/hopePalette';
 
@@ -18,7 +17,6 @@ import { COOL_PALETTE } from '@/lib/hopePalette';
  */
 export function DonorGuidePage() {
   const { config } = useAppContext();
-  useLayoutOptions({});
 
   useSeoMeta({
     title: `Donor Guide | ${config.appName}`,

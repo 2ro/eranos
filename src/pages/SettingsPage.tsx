@@ -5,7 +5,6 @@ import { Link, useNavigate } from 'react-router-dom';
 import { PageHeader } from '@/components/PageHeader';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useAppContext } from '@/hooks/useAppContext';
-import { useLayoutOptions } from '@/contexts/LayoutContext';
 import { isAdmin } from '@/lib/admins';
 
 const RequestToVanishDialog = lazy(() => import('@/components/RequestToVanishDialog').then(m => ({ default: m.RequestToVanishDialog })));
@@ -70,7 +69,6 @@ export function SettingsPage() {
   const navigate = useNavigate();
   const [deleteAccountOpen, setDeleteAccountOpen] = useState(false);
 
-  useLayoutOptions({});
 
   useSeoMeta({
     title: `Settings | ${config.appName}`,

@@ -26,7 +26,7 @@ export function EventDashboardPage() {
   const [configOpen, setConfigOpen] = useState(false);
 
   // Use wider layout — removes 600px cap but keeps sidebar shell
-  useLayoutOptions({ noMaxWidth: true, rightSidebar: null });
+  useLayoutOptions({ noMaxWidth: true });
 
   const {
     kpis, timeSeries, leaderboard, distribution, participants, activity,

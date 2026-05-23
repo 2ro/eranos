@@ -199,7 +199,7 @@ function EventDetailRow({ icon, children }: { icon: React.ReactNode; children: R
 // --- Main Component ---
 
 export function CalendarEventDetailPage({ event }: { event: NostrEvent }) {
-  useLayoutOptions({ noMaxWidth: true, rightSidebar: null });
+  useLayoutOptions({ noMaxWidth: true });
 
   const navigate = useNavigate();
   const { user } = useCurrentUser();

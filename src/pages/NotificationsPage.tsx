@@ -42,7 +42,6 @@ import { BadgeThumbnail } from '@/components/BadgeThumbnail';
 import { BadgeContent } from '@/components/BadgeContent';
 import type { BadgeData } from '@/lib/parseBadgeDefinition';
 import { PageHeader } from '@/components/PageHeader';
-import { useLayoutOptions } from '@/contexts/LayoutContext';
 
 type NotificationTab = 'all' | 'mentions';
 
@@ -143,7 +142,7 @@ export function NotificationsPage() {
     description: 'Your Nostr notifications',
   });
 
-  useLayoutOptions({ hasSubHeader: true });
+
 
   const [activeTab, setActiveTab] = useState<NotificationTab>('all');
   const { user } = useCurrentUser();

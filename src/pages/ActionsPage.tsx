@@ -301,8 +301,6 @@ export default function ActionsPage() {
   // the hero banner span the full content column.
   useLayoutOptions({
     noMaxWidth: true,
-    showFAB: !!user,
-    fabHref: createActionHref,
   });
 
   const allCountries = useMemo(() => getAllCountries(), []);

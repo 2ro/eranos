@@ -109,7 +109,7 @@ function buildImetaFromNip94(nip94Tags: string[][]): string[] {
 }
 
 export function CreateCampaignPage() {
-  useLayoutOptions({ noMaxWidth: true, rightSidebar: null });
+  useLayoutOptions({ noMaxWidth: true });
 
   const { user } = useCurrentUser();
   const navigate = useNavigate();

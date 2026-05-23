@@ -61,7 +61,7 @@ interface ActionDetailPageProps {
 }
 
 export function ActionDetailPage({ pubkey, identifier }: ActionDetailPageProps) {
-  useLayoutOptions({ noMaxWidth: true, rightSidebar: null });
+  useLayoutOptions({ noMaxWidth: true });
 
   const { data: action, isLoading, isError } = useAction(pubkey, identifier);
 

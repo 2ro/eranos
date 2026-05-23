@@ -45,7 +45,6 @@ import { toast } from '@/hooks/useToast';
 import { useFeedSettings } from '@/hooks/useFeedSettings';
 import { SubHeaderBar } from '@/components/SubHeaderBar';
 import { TabButton } from '@/components/TabButton';
-import { useLayoutOptions } from '@/contexts/LayoutContext';
 import type { NostrEvent } from '@nostrify/nostrify';
 import type { UserList } from '@/hooks/useUserLists';
 import NotFound from './NotFound';
@@ -297,8 +296,6 @@ export function ListDetailPage() {
   const [cloning, setCloning] = useState(false);
   const [quoteOpen, setQuoteOpen] = useState(false);
   const { addToSidebar, removeFromSidebar, orderedItems } = useFeedSettings();
-
-  useLayoutOptions({ hasSubHeader: true });
 
   // Decode the naddr to get the d-tag identifier and author
   const decoded = useMemo(() => {

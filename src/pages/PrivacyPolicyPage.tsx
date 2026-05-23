@@ -3,11 +3,9 @@ import { Shield } from 'lucide-react';
 
 import { PageHeader } from '@/components/PageHeader';
 import { useAppContext } from '@/hooks/useAppContext';
-import { useLayoutOptions } from '@/contexts/LayoutContext';
 
 export function PrivacyPolicyPage() {
   const { config } = useAppContext();
-  useLayoutOptions({});
 
   useSeoMeta({
     title: `Privacy Policy | ${config.appName}`,

@@ -49,7 +49,7 @@ export function AllCampaignsPage() {
   // same width budget the Pledge index gets. The inner `max-w-7xl`
   // wrapper still keeps the content from sprawling on ultrawide
   // monitors.
-  useLayoutOptions({ noMaxWidth: true, rightSidebar: null });
+  useLayoutOptions({ noMaxWidth: true });
   const { config } = useAppContext();
 
   // URL state — sort and query live in the URL so results are shareable.

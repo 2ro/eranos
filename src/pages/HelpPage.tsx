@@ -4,14 +4,12 @@ import { Link } from 'react-router-dom';
 
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { useAppContext } from '@/hooks/useAppContext';
-import { useLayoutOptions } from '@/contexts/LayoutContext';
 import { PageHeader } from '@/components/PageHeader';
 import { TeamSoapboxCard } from '@/components/TeamSoapboxCard';
 import { HelpFAQSection } from '@/components/HelpFAQSection';
 
 export function HelpPage() {
   const { config } = useAppContext();
-  useLayoutOptions({});
 
   useSeoMeta({
     title: `Help | ${config.appName}`,

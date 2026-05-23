@@ -119,7 +119,7 @@ function getEditTarget(value: string | null): EditTarget | null {
 }
 
 export function CreateCommunityPage() {
-  useLayoutOptions({ noMaxWidth: true, rightSidebar: null });
+  useLayoutOptions({ noMaxWidth: true });
 
   const { user } = useCurrentUser();
   const navigate = useNavigate();

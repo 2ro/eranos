@@ -25,7 +25,7 @@ import { type ParsedCampaign } from '@/lib/campaign';
 const MAX_FEATURED = 4;
 
 export function CampaignsPage() {
-  useLayoutOptions({ noMaxWidth: true, rightSidebar: null });
+  useLayoutOptions({ noMaxWidth: true });
 
   const { config } = useAppContext();
   const { user } = useCurrentUser();

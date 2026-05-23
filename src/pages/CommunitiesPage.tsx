@@ -56,8 +56,6 @@ export function CommunitiesPage() {
 
   useLayoutOptions({
     noMaxWidth: true,
-    rightSidebar: null,
-    showFAB: false,
   });
 
   useSeoMeta({

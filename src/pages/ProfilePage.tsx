@@ -1297,7 +1297,6 @@ function FollowersListModal({ pubkey, open, onOpenChange, displayName }: Followe
   // no right-sidebar slot, so any `rightSidebar` option here would be ignored.
   useLayoutOptions(pubkey ? {
     noMaxWidth: true,
-    hasSubHeader: true,
   } : {});
 
   if (!pubkey) {
