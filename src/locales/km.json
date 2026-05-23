@@ -1020,5 +1020,124 @@
       "activeFilters": "តម្រងសកម្ម៖",
       "clearAll": "លុបតម្រងទាំងអស់"
     }
+  },
+  "profile": {
+    "seoDescriptionFallback": "ប្រវត្តិរូប Nostr",
+    "anonymous": "អនាមិក",
+    "userNotFound": "មិនបានរកឃើញអ្នកប្រើ។",
+    "userNotFoundNip05": "មិនបានរកឃើញអ្នកប្រើ៖ {{handle}}",
+    "couldNotResolveNip05": "មិនអាចបកស្រាយឧបករណ៍សម្គាល់ NIP-05 នេះបានទេ។",
+    "tabs": {
+      "overview": "ទិដ្ឋភាពទូទៅ",
+      "activity": "សកម្មភាព",
+      "campaigns": "យុទ្ធនាការ",
+      "groups": "ក្រុម",
+      "pledges": "ការសន្យា"
+    },
+    "header": {
+      "editProfile": "កែប្រវត្តិរូប",
+      "shareFollowLink": "ចែករំលែកតំណតាមដាន",
+      "moreOptions": "ជម្រើសច្រើនទៀត",
+      "donate": "បរិច្ចាគ",
+      "campaignGoal": "គោលដៅ ${{amount}}"
+    },
+    "stats": {
+      "followers": "អ្នកតាមដាន",
+      "following": "កំពុងតាមដាន",
+      "raised": "បានប្រមូល",
+      "followersTitle_one": "អ្នកតាមដាន {{count}} នាក់",
+      "followersTitle_other": "អ្នកតាមដាន {{count}} នាក់",
+      "followingTitle": "កំពុងតាមដាន {{count}}"
+    },
+    "sections": {
+      "profile": "ប្រវត្តិរូប",
+      "campaigns": "យុទ្ធនាការ",
+      "latestPledge": "ការសន្យាចុងក្រោយ",
+      "groups": "ក្រុម",
+      "seeAllCampaigns_one": "មើលយុទ្ធនាការទាំងអស់ {{count}} →",
+      "seeAllCampaigns_other": "មើលយុទ្ធនាការទាំងអស់ {{count}} →",
+      "viewCampaignsTab": "មើលផ្ទាំងយុទ្ធនាការ →",
+      "seeAllPledges_one": "មើលការសន្យាទាំងអស់ {{count}} →",
+      "seeAllPledges_other": "មើលការសន្យាទាំងអស់ {{count}} →",
+      "seeAllGroups": "មើលទាំងអស់ {{count}} →"
+    },
+    "badges": {
+      "founder": "ស្ថាបនិក",
+      "moderator": "អ្នកសម្របសម្រួល",
+      "mod": "អ្នកសម្របសម្រួល",
+      "ended": "បានបញ្ចប់",
+      "pledged": "បានសន្យា"
+    },
+    "moreMenu": {
+      "title": "ជម្រើសប្រវត្តិរូប",
+      "copyPubkey": "ចម្លងសោសាធារណៈ",
+      "copyLink": "ចម្លងតំណប្រវត្តិរូប",
+      "addToList": "បន្ថែមទៅបញ្ជី",
+      "shareFollowLink": "ចែករំលែកតំណតាមដាន",
+      "profileRecovery": "ការសង្គ្រោះប្រវត្តិរូប",
+      "zap": "Zap",
+      "awardBadge": "ផ្តល់សញ្ញាសម្គាល់",
+      "writeLetter": "សរសេរសំបុត្រ",
+      "mute": "បិទសំឡេង @{{name}}",
+      "unmute": "បើកសំឡេង @{{name}}",
+      "report": "រាយការណ៍ @{{name}}",
+      "close": "បិទ"
+    },
+    "toast": {
+      "pubkeyCopied": "បានចម្លងសោសាធារណៈទៅក្ដារតម្បៀតខ្ទាស់",
+      "linkCopied": "បានចម្លងតំណប្រវត្តិរូបទៅក្ដារតម្បៀតខ្ទាស់",
+      "muted": "បានបិទសំឡេង @{{name}}",
+      "unmuted": "បានបើកសំឡេង @{{name}}",
+      "muteFailed": "បរាជ័យក្នុងការបិទសំឡេងអ្នកប្រើ",
+      "unmuteFailed": "បរាជ័យក្នុងការបើកសំឡេង",
+      "followed": "កំពុងតាមដាន @{{name}}",
+      "unfollowed": "បានឈប់តាមដាន @{{name}}",
+      "followFailed": "បរាជ័យក្នុងការធ្វើបច្ចុប្បន្នភាពបញ្ជីតាមដាន",
+      "btcAddressCopied": "បានចម្លងអាសយដ្ឋាន Bitcoin ទៅក្ដារតម្បៀតខ្ទាស់"
+    },
+    "followingModal": {
+      "title": "{{name}} កំពុងតាមដាន",
+      "empty": "មិនទាន់តាមដាននរណាម្នាក់ទេ។"
+    },
+    "followersModal": {
+      "title": "អ្នកតាមដាន​ {{name}}",
+      "empty": "មិនបានរកឃើញអ្នកតាមដាន។"
+    },
+    "bitcoinModal": {
+      "title": "Bitcoin",
+      "qrAlt": "QR Code Bitcoin",
+      "copyAddress": "ចម្លងអាសយដ្ឋាន",
+      "showQr": "បង្ហាញ QR Code",
+      "viewOnMempool": "មើលលើ mempool.space"
+    },
+    "lightbox": {
+      "openOriginal": "បើកដើម",
+      "close": "បិទ (Esc)",
+      "imageAlt": "រូបភាពប្រវត្តិរូប"
+    },
+    "activity": {
+      "empty": "មិនមានសកម្មភាពពី {{name}} នៅឡើយទេ។ ការប្រកាស យុទ្ធនាការ ការសន្យា និងការបរិច្ចាគទាំងអស់នឹងបង្ហាញនៅទីនេះ។"
+    },
+    "campaigns": {
+      "count_one": "យុទ្ធនាការ {{count}}",
+      "count_other": "យុទ្ធនាការ {{count}}",
+      "sortNew": "ថ្មី",
+      "sortTop": "កំពូល",
+      "showHidden": "បង្ហាញបានលាក់",
+      "hideHidden": "លាក់បានលាក់",
+      "emptySelf": "អ្នកមិនទាន់បានបើកយុទ្ធនាការនៅឡើយ។",
+      "emptyOther": "{{name}} មិនទាន់បានបើកយុទ្ធនាការនៅឡើយ។",
+      "startLink": "ចាប់ផ្តើមយុទ្ធនាការ →"
+    },
+    "pledgesTab": {
+      "active": "សកម្ម",
+      "ended": "បានបញ្ចប់",
+      "emptySelf": "អ្នកមិនទាន់បានបង្កើតការសន្យានៅឡើយ។",
+      "emptyOther": "{{name}} មិនទាន់បានបង្កើតការសន្យានៅឡើយ។",
+      "createLink": "បង្កើតការសន្យា →"
+    },
+    "groupsDialog": {
+      "title": "ក្រុមទាំងអស់"
+    }
   }
 }

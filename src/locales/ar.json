@@ -1020,5 +1020,124 @@
       "activeFilters": "المرشحات الفعّالة:",
       "clearAll": "مسح جميع المرشحات"
     }
+  },
+  "profile": {
+    "seoDescriptionFallback": "ملف Nostr",
+    "anonymous": "مجهول",
+    "userNotFound": "لم يتم العثور على المستخدم.",
+    "userNotFoundNip05": "لم يتم العثور على المستخدم: {{handle}}",
+    "couldNotResolveNip05": "تعذّر تحليل معرّف NIP-05 هذا.",
+    "tabs": {
+      "overview": "نظرة عامة",
+      "activity": "النشاط",
+      "campaigns": "الحملات",
+      "groups": "المجموعات",
+      "pledges": "التعهدات"
+    },
+    "header": {
+      "editProfile": "تعديل الملف الشخصي",
+      "shareFollowLink": "مشاركة رابط المتابعة",
+      "moreOptions": "المزيد من الخيارات",
+      "donate": "تبرّع",
+      "campaignGoal": "الهدف ${{amount}}"
+    },
+    "stats": {
+      "followers": "المتابعون",
+      "following": "المتابَعون",
+      "raised": "تم جمعه",
+      "followersTitle_one": "{{count}} متابع",
+      "followersTitle_other": "{{count}} متابع",
+      "followingTitle": "يتابع {{count}}"
+    },
+    "sections": {
+      "profile": "الملف الشخصي",
+      "campaigns": "الحملات",
+      "latestPledge": "آخر تعهّد",
+      "groups": "المجموعات",
+      "seeAllCampaigns_one": "عرض {{count}} حملة ←",
+      "seeAllCampaigns_other": "عرض جميع الحملات ({{count}}) ←",
+      "viewCampaignsTab": "عرض علامة الحملات ←",
+      "seeAllPledges_one": "عرض {{count}} تعهّد ←",
+      "seeAllPledges_other": "عرض جميع التعهدات ({{count}}) ←",
+      "seeAllGroups": "عرض الكل ({{count}}) ←"
+    },
+    "badges": {
+      "founder": "مؤسّس",
+      "moderator": "مشرف",
+      "mod": "مشرف",
+      "ended": "انتهت",
+      "pledged": "تم التعهّد"
+    },
+    "moreMenu": {
+      "title": "خيارات الملف الشخصي",
+      "copyPubkey": "نسخ المفتاح العام",
+      "copyLink": "نسخ رابط الملف الشخصي",
+      "addToList": "إضافة إلى قائمة",
+      "shareFollowLink": "مشاركة رابط المتابعة",
+      "profileRecovery": "استرداد الملف الشخصي",
+      "zap": "Zap",
+      "awardBadge": "منح شارة",
+      "writeLetter": "كتابة رسالة",
+      "mute": "كتم @{{name}}",
+      "unmute": "إلغاء كتم @{{name}}",
+      "report": "الإبلاغ عن @{{name}}",
+      "close": "إغلاق"
+    },
+    "toast": {
+      "pubkeyCopied": "تم نسخ المفتاح العام إلى الحافظة",
+      "linkCopied": "تم نسخ رابط الملف الشخصي إلى الحافظة",
+      "muted": "تم كتم @{{name}}",
+      "unmuted": "تم إلغاء كتم @{{name}}",
+      "muteFailed": "فشل كتم المستخدم",
+      "unmuteFailed": "فشل إلغاء الكتم",
+      "followed": "أصبحت تتابع @{{name}}",
+      "unfollowed": "ألغيت متابعة @{{name}}",
+      "followFailed": "فشل تحديث قائمة المتابعة",
+      "btcAddressCopied": "تم نسخ عنوان البيتكوين إلى الحافظة"
+    },
+    "followingModal": {
+      "title": "من يتابعهم {{name}}",
+      "empty": "لا يتابع أحدًا حتى الآن."
+    },
+    "followersModal": {
+      "title": "متابعو {{name}}",
+      "empty": "لا يوجد متابعون."
+    },
+    "bitcoinModal": {
+      "title": "بيتكوين",
+      "qrAlt": "رمز QR للبيتكوين",
+      "copyAddress": "نسخ العنوان",
+      "showQr": "إظهار رمز QR",
+      "viewOnMempool": "عرض على mempool.space"
+    },
+    "lightbox": {
+      "openOriginal": "فتح الأصلية",
+      "close": "إغلاق (Esc)",
+      "imageAlt": "صورة الملف الشخصي"
+    },
+    "activity": {
+      "empty": "لا توجد نشاطات من {{name}} حتى الآن. ستظهر هنا المنشورات والحملات والتعهدات والتبرعات."
+    },
+    "campaigns": {
+      "count_one": "{{count}} حملة",
+      "count_other": "{{count}} حملة",
+      "sortNew": "الأحدث",
+      "sortTop": "الأكثر",
+      "showHidden": "عرض المخفية",
+      "hideHidden": "إخفاء المخفية",
+      "emptySelf": "لم تطلق أي حملة بعد.",
+      "emptyOther": "لم يطلق {{name}} أي حملة بعد.",
+      "startLink": "ابدأ حملة ←"
+    },
+    "pledgesTab": {
+      "active": "نشطة",
+      "ended": "منتهية",
+      "emptySelf": "لم تنشئ تعهّدًا بعد.",
+      "emptyOther": "لم ينشئ {{name}} تعهّدًا بعد.",
+      "createLink": "أنشئ تعهّدًا ←"
+    },
+    "groupsDialog": {
+      "title": "كل المجموعات"
+    }
   }
 }

@@ -1020,5 +1020,124 @@
       "activeFilters": "已生效的过滤器：",
       "clearAll": "清除所有过滤器"
     }
+  },
+  "profile": {
+    "seoDescriptionFallback": "Nostr 资料",
+    "anonymous": "匿名",
+    "userNotFound": "未找到用户。",
+    "userNotFoundNip05": "未找到用户：{{handle}}",
+    "couldNotResolveNip05": "无法解析此 NIP-05 标识符。",
+    "tabs": {
+      "overview": "概览",
+      "activity": "动态",
+      "campaigns": "活动",
+      "groups": "群组",
+      "pledges": "承诺"
+    },
+    "header": {
+      "editProfile": "编辑资料",
+      "shareFollowLink": "分享关注链接",
+      "moreOptions": "更多选项",
+      "donate": "捐赠",
+      "campaignGoal": "目标 ${{amount}}"
+    },
+    "stats": {
+      "followers": "粉丝",
+      "following": "关注中",
+      "raised": "已筹集",
+      "followersTitle_one": "{{count}} 位粉丝",
+      "followersTitle_other": "{{count}} 位粉丝",
+      "followingTitle": "关注 {{count}} 人"
+    },
+    "sections": {
+      "profile": "资料",
+      "campaigns": "活动",
+      "latestPledge": "最新承诺",
+      "groups": "群组",
+      "seeAllCampaigns_one": "查看全部 {{count}} 个活动 →",
+      "seeAllCampaigns_other": "查看全部 {{count}} 个活动 →",
+      "viewCampaignsTab": "查看活动标签 →",
+      "seeAllPledges_one": "查看全部 {{count}} 个承诺 →",
+      "seeAllPledges_other": "查看全部 {{count}} 个承诺 →",
+      "seeAllGroups": "查看全部 {{count}} 个 →"
+    },
+    "badges": {
+      "founder": "创始人",
+      "moderator": "版主",
+      "mod": "版主",
+      "ended": "已结束",
+      "pledged": "已承诺"
+    },
+    "moreMenu": {
+      "title": "资料选项",
+      "copyPubkey": "复制公钥",
+      "copyLink": "复制资料链接",
+      "addToList": "添加到列表",
+      "shareFollowLink": "分享关注链接",
+      "profileRecovery": "资料恢复",
+      "zap": "Zap",
+      "awardBadge": "颁发徽章",
+      "writeLetter": "写信",
+      "mute": "静音 @{{name}}",
+      "unmute": "取消静音 @{{name}}",
+      "report": "举报 @{{name}}",
+      "close": "关闭"
+    },
+    "toast": {
+      "pubkeyCopied": "公钥已复制到剪贴板",
+      "linkCopied": "资料链接已复制到剪贴板",
+      "muted": "已静音 @{{name}}",
+      "unmuted": "已取消静音 @{{name}}",
+      "muteFailed": "静音用户失败",
+      "unmuteFailed": "取消静音失败",
+      "followed": "已关注 @{{name}}",
+      "unfollowed": "已取消关注 @{{name}}",
+      "followFailed": "更新关注列表失败",
+      "btcAddressCopied": "比特币地址已复制到剪贴板"
+    },
+    "followingModal": {
+      "title": "{{name}} 关注的人",
+      "empty": "还没有关注任何人。"
+    },
+    "followersModal": {
+      "title": "{{name}} 的粉丝",
+      "empty": "没有找到粉丝。"
+    },
+    "bitcoinModal": {
+      "title": "比特币",
+      "qrAlt": "比特币二维码",
+      "copyAddress": "复制地址",
+      "showQr": "显示二维码",
+      "viewOnMempool": "在 mempool.space 查看"
+    },
+    "lightbox": {
+      "openOriginal": "打开原图",
+      "close": "关闭 (Esc)",
+      "imageAlt": "资料图片"
+    },
+    "activity": {
+      "empty": "{{name}} 暂无动态。帖子、活动、承诺和捐赠都会显示在这里。"
+    },
+    "campaigns": {
+      "count_one": "{{count}} 个活动",
+      "count_other": "{{count}} 个活动",
+      "sortNew": "最新",
+      "sortTop": "热门",
+      "showHidden": "显示隐藏",
+      "hideHidden": "隐藏",
+      "emptySelf": "你还没有发起任何活动。",
+      "emptyOther": "{{name}} 还没有发起任何活动。",
+      "startLink": "发起活动 →"
+    },
+    "pledgesTab": {
+      "active": "进行中",
+      "ended": "已结束",
+      "emptySelf": "你还没有创建承诺。",
+      "emptyOther": "{{name}} 还没有创建承诺。",
+      "createLink": "创建承诺 →"
+    },
+    "groupsDialog": {
+      "title": "所有群组"
+    }
   }
 }

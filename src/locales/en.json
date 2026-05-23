@@ -1020,5 +1020,124 @@
       "activeFilters": "Active filters:",
       "clearAll": "Clear all filters"
     }
+  },
+  "profile": {
+    "seoDescriptionFallback": "Nostr profile",
+    "anonymous": "Anonymous",
+    "userNotFound": "User not found.",
+    "userNotFoundNip05": "User not found: {{handle}}",
+    "couldNotResolveNip05": "Could not resolve this NIP-05 identifier.",
+    "tabs": {
+      "overview": "Overview",
+      "activity": "Activity",
+      "campaigns": "Campaigns",
+      "groups": "Groups",
+      "pledges": "Pledges"
+    },
+    "header": {
+      "editProfile": "Edit profile",
+      "shareFollowLink": "Share follow link",
+      "moreOptions": "More options",
+      "donate": "Donate",
+      "campaignGoal": "Goal ${{amount}}"
+    },
+    "stats": {
+      "followers": "Followers",
+      "following": "Following",
+      "raised": "Raised",
+      "followersTitle_one": "{{count}} follower",
+      "followersTitle_other": "{{count}} followers",
+      "followingTitle": "{{count}} following"
+    },
+    "sections": {
+      "profile": "Profile",
+      "campaigns": "Campaigns",
+      "latestPledge": "Latest pledge",
+      "groups": "Groups",
+      "seeAllCampaigns_one": "See all {{count}} campaign →",
+      "seeAllCampaigns_other": "See all {{count}} campaigns →",
+      "viewCampaignsTab": "View campaigns tab →",
+      "seeAllPledges_one": "See all {{count}} pledge →",
+      "seeAllPledges_other": "See all {{count}} pledges →",
+      "seeAllGroups": "See all {{count}} →"
+    },
+    "badges": {
+      "founder": "Founder",
+      "moderator": "Moderator",
+      "mod": "Mod",
+      "ended": "Ended",
+      "pledged": "Pledged"
+    },
+    "moreMenu": {
+      "title": "Profile options",
+      "copyPubkey": "Copy public key",
+      "copyLink": "Copy profile link",
+      "addToList": "Add to list",
+      "shareFollowLink": "Share follow link",
+      "profileRecovery": "Profile recovery",
+      "zap": "Zap",
+      "awardBadge": "Award badge",
+      "writeLetter": "Write a letter",
+      "mute": "Mute @{{name}}",
+      "unmute": "Unmute @{{name}}",
+      "report": "Report @{{name}}",
+      "close": "Close"
+    },
+    "toast": {
+      "pubkeyCopied": "Public key copied to clipboard",
+      "linkCopied": "Profile link copied to clipboard",
+      "muted": "Muted @{{name}}",
+      "unmuted": "Unmuted @{{name}}",
+      "muteFailed": "Failed to mute user",
+      "unmuteFailed": "Failed to unmute user",
+      "followed": "Followed @{{name}}",
+      "unfollowed": "Unfollowed @{{name}}",
+      "followFailed": "Failed to update follow list",
+      "btcAddressCopied": "Bitcoin address copied to clipboard"
+    },
+    "followingModal": {
+      "title": "{{name}} follows",
+      "empty": "Not following anyone yet."
+    },
+    "followersModal": {
+      "title": "{{name}}'s followers",
+      "empty": "No followers found."
+    },
+    "bitcoinModal": {
+      "title": "Bitcoin",
+      "qrAlt": "Bitcoin QR",
+      "copyAddress": "Copy address",
+      "showQr": "Show QR code",
+      "viewOnMempool": "View on mempool.space"
+    },
+    "lightbox": {
+      "openOriginal": "Open original",
+      "close": "Close (Esc)",
+      "imageAlt": "Profile image"
+    },
+    "activity": {
+      "empty": "No activity from {{name}} yet. Posts, campaigns, pledges, and donations all show up here."
+    },
+    "campaigns": {
+      "count_one": "{{count}} campaign",
+      "count_other": "{{count}} campaigns",
+      "sortNew": "New",
+      "sortTop": "Top",
+      "showHidden": "Show hidden",
+      "hideHidden": "Hide hidden",
+      "emptySelf": "You haven't launched a campaign yet.",
+      "emptyOther": "{{name}} hasn't launched a campaign yet.",
+      "startLink": "Start a campaign →"
+    },
+    "pledgesTab": {
+      "active": "Active",
+      "ended": "Ended",
+      "emptySelf": "You haven't created a pledge yet.",
+      "emptyOther": "{{name}} hasn't created a pledge yet.",
+      "createLink": "Create a pledge →"
+    },
+    "groupsDialog": {
+      "title": "All groups"
+    }
   }
 }

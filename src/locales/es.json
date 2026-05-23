@@ -1020,5 +1020,124 @@
       "activeFilters": "Filtros activos:",
       "clearAll": "Limpiar todos los filtros"
     }
+  },
+  "profile": {
+    "seoDescriptionFallback": "Perfil de Nostr",
+    "anonymous": "Anónimo",
+    "userNotFound": "Usuario no encontrado.",
+    "userNotFoundNip05": "Usuario no encontrado: {{handle}}",
+    "couldNotResolveNip05": "No se pudo resolver este identificador NIP-05.",
+    "tabs": {
+      "overview": "Resumen",
+      "activity": "Actividad",
+      "campaigns": "Campañas",
+      "groups": "Grupos",
+      "pledges": "Promesas"
+    },
+    "header": {
+      "editProfile": "Editar perfil",
+      "shareFollowLink": "Compartir enlace para seguir",
+      "moreOptions": "Más opciones",
+      "donate": "Donar",
+      "campaignGoal": "Meta ${{amount}}"
+    },
+    "stats": {
+      "followers": "Seguidores",
+      "following": "Siguiendo",
+      "raised": "Recaudado",
+      "followersTitle_one": "{{count}} seguidor",
+      "followersTitle_other": "{{count}} seguidores",
+      "followingTitle": "Siguiendo a {{count}}"
+    },
+    "sections": {
+      "profile": "Perfil",
+      "campaigns": "Campañas",
+      "latestPledge": "Última promesa",
+      "groups": "Grupos",
+      "seeAllCampaigns_one": "Ver {{count}} campaña →",
+      "seeAllCampaigns_other": "Ver las {{count}} campañas →",
+      "viewCampaignsTab": "Ver pestaña de campañas →",
+      "seeAllPledges_one": "Ver {{count}} promesa →",
+      "seeAllPledges_other": "Ver las {{count}} promesas →",
+      "seeAllGroups": "Ver los {{count}} →"
+    },
+    "badges": {
+      "founder": "Fundador",
+      "moderator": "Moderador",
+      "mod": "Mod",
+      "ended": "Finalizada",
+      "pledged": "Prometido"
+    },
+    "moreMenu": {
+      "title": "Opciones del perfil",
+      "copyPubkey": "Copiar clave pública",
+      "copyLink": "Copiar enlace del perfil",
+      "addToList": "Agregar a lista",
+      "shareFollowLink": "Compartir enlace para seguir",
+      "profileRecovery": "Recuperación del perfil",
+      "zap": "Zap",
+      "awardBadge": "Otorgar insignia",
+      "writeLetter": "Escribir una carta",
+      "mute": "Silenciar a @{{name}}",
+      "unmute": "Dejar de silenciar a @{{name}}",
+      "report": "Reportar a @{{name}}",
+      "close": "Cerrar"
+    },
+    "toast": {
+      "pubkeyCopied": "Clave pública copiada al portapapeles",
+      "linkCopied": "Enlace del perfil copiado al portapapeles",
+      "muted": "Silenciaste a @{{name}}",
+      "unmuted": "Ya no silencias a @{{name}}",
+      "muteFailed": "No se pudo silenciar al usuario",
+      "unmuteFailed": "No se pudo quitar el silencio",
+      "followed": "Ahora sigues a @{{name}}",
+      "unfollowed": "Dejaste de seguir a @{{name}}",
+      "followFailed": "No se pudo actualizar la lista de seguidos",
+      "btcAddressCopied": "Dirección de Bitcoin copiada al portapapeles"
+    },
+    "followingModal": {
+      "title": "A quién sigue {{name}}",
+      "empty": "Aún no sigue a nadie."
+    },
+    "followersModal": {
+      "title": "Seguidores de {{name}}",
+      "empty": "No se encontraron seguidores."
+    },
+    "bitcoinModal": {
+      "title": "Bitcoin",
+      "qrAlt": "Código QR de Bitcoin",
+      "copyAddress": "Copiar dirección",
+      "showQr": "Mostrar código QR",
+      "viewOnMempool": "Ver en mempool.space"
+    },
+    "lightbox": {
+      "openOriginal": "Abrir original",
+      "close": "Cerrar (Esc)",
+      "imageAlt": "Imagen de perfil"
+    },
+    "activity": {
+      "empty": "Aún no hay actividad de {{name}}. Aquí aparecerán sus publicaciones, campañas, promesas y donaciones."
+    },
+    "campaigns": {
+      "count_one": "{{count}} campaña",
+      "count_other": "{{count}} campañas",
+      "sortNew": "Nuevas",
+      "sortTop": "Top",
+      "showHidden": "Mostrar ocultas",
+      "hideHidden": "Ocultar ocultas",
+      "emptySelf": "Aún no has lanzado ninguna campaña.",
+      "emptyOther": "{{name}} aún no ha lanzado ninguna campaña.",
+      "startLink": "Iniciar una campaña →"
+    },
+    "pledgesTab": {
+      "active": "Activas",
+      "ended": "Finalizadas",
+      "emptySelf": "Aún no has creado una promesa.",
+      "emptyOther": "{{name}} aún no ha creado una promesa.",
+      "createLink": "Crear una promesa →"
+    },
+    "groupsDialog": {
+      "title": "Todos los grupos"
+    }
   }
 }

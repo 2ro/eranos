@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Link, Link as RouterLink } from 'react-router-dom';
 import {
   Bitcoin,
@@ -390,6 +391,7 @@ export function ProfileOverviewSections({
   showOrganizations = true,
   className,
 }: ProfileOverviewSectionsProps) {
+  const { t } = useTranslation();
   return (
     <div className={cn('flex flex-col gap-5', className)}>
       {/* Profile fields (rendered upstream) — placed first so the
@@ -397,7 +399,7 @@ export function ProfileOverviewSections({
           the first thing visitors read, ahead of campaigns/orgs. */}
       {fields.length > 0 && (
         <section className="space-y-3">
-          <RailSectionHeader icon={null} title="Profile" />
+          <RailSectionHeader icon={null} title={t('profile.sections.profile')} />
           <div className="space-y-3">{fieldsContent}</div>
         </section>
       )}
@@ -534,20 +536,21 @@ function ActionBar({
   onchainCampaigns: ParsedCampaign[];
   onDonate: (campaign: ParsedCampaign) => void;
 }) {
+  const { t } = useTranslation();
   return (
     <div className="flex flex-wrap items-center gap-2">
       {isOwnProfile ? (
         <>
           <Link to="/settings/profile" className="flex-1 min-w-[140px]">
             <Button variant="outline" className="rounded-full font-bold w-full">
-              Edit profile
+              {t('profile.header.editProfile')}
             </Button>
           </Link>
           <Button
             variant="outline"
             size="icon"
             className="rounded-full size-10"
-            title="Share follow link"
+            title={t('profile.header.shareFollowLink')}
             onClick={onFollowQROpen}
           >
             <QrCode className="size-5" />
@@ -557,7 +560,7 @@ function ActionBar({
             size="icon"
             className="rounded-full size-10"
             onClick={onMoreMenuOpen}
-            title="More options"
+            title={t('profile.header.moreOptions')}
           >
             <MoreHorizontal className="size-5" />
           </Button>
@@ -576,14 +579,14 @@ function ActionBar({
               className="rounded-full font-bold gap-1.5"
             >
               <HandHeart className="size-4" />
-              Donate
+              {t('profile.header.donate')}
             </Button>
           ) : onchainCampaigns.length > 1 ? (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button className="rounded-full font-bold gap-1.5">
                   <HandHeart className="size-4" />
-                  Donate
+                  {t('profile.header.donate')}
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="start" className="w-72">
@@ -596,7 +599,7 @@ function ActionBar({
                     <span className="font-medium truncate w-full">{c.title}</span>
                     {c.goalUsd ? (
                       <span className="text-xs text-muted-foreground">
-                        Goal ${c.goalUsd.toLocaleString()}
+                        {t('profile.header.campaignGoal', { amount: c.goalUsd.toLocaleString() })}
                       </span>
                     ) : null}
                   </DropdownMenuItem>
@@ -610,7 +613,7 @@ function ActionBar({
             size="icon"
             className="rounded-full size-10"
             onClick={onMoreMenuOpen}
-            title="More options"
+            title={t('profile.header.moreOptions')}
           >
             <MoreHorizontal className="size-5" />
           </Button>
@@ -639,6 +642,7 @@ function StatList({
   onFollowingOpen: () => void;
   onTabChange: (id: string) => void;
 }) {
+  const { t } = useTranslation();
   // Secondary stat rows (one per row). Followers / Following live inline
   // at the top. Campaigns and Pledges are intentionally not surfaced as
   // counts here — the rail's Campaigns and (when relevant) Pledges
@@ -652,7 +656,7 @@ function StatList({
   }> = [
     {
       icon: <Bitcoin className="size-3.5 text-primary" />,
-      label: 'Raised',
+      label: t('profile.stats.raised'),
       value: formatCampaignAmount(totalRaisedSats, btcPrice),
       onClick: () => onTabChange('campaigns'),
       show: totalRaisedSats > 0,
@@ -671,20 +675,20 @@ function StatList({
             <button
               onClick={onFollowersOpen}
               className="flex items-baseline gap-1.5 hover:opacity-80 transition-opacity"
-              title={`${followersCount} followers`}
+              title={t('profile.stats.followersTitle', { count: followersCount })}
             >
               <span className="font-bold tabular-nums text-foreground">{formatNumber(followersCount)}</span>
-              <span className="text-muted-foreground">Followers</span>
+              <span className="text-muted-foreground">{t('profile.stats.followers')}</span>
             </button>
           )}
           {followingCount > 0 && (
             <button
               onClick={onFollowingOpen}
               className="flex items-baseline gap-1.5 hover:opacity-80 transition-opacity"
-              title={`${followingCount} following`}
+              title={t('profile.stats.followingTitle', { count: followingCount })}
             >
               <span className="font-bold tabular-nums text-foreground">{formatNumber(followingCount)}</span>
-              <span className="text-muted-foreground">Following</span>
+              <span className="text-muted-foreground">{t('profile.stats.following')}</span>
             </button>
           )}
         </div>
@@ -725,6 +729,7 @@ function RailCampaignsSection({
   isLoading: boolean;
   onSeeAll: () => void;
 }) {
+  const { t } = useTranslation();
   const { data: moderation } = useCampaignModeration();
   const visible = isOwnProfile
     ? campaigns
@@ -733,7 +738,7 @@ function RailCampaignsSection({
   if (isLoading && visible.length === 0) {
     return (
       <section className="space-y-3">
-        <RailSectionHeader icon={<Megaphone className="size-4 text-primary" />} title="Campaigns" />
+        <RailSectionHeader icon={<Megaphone className="size-4 text-primary" />} title={t('profile.sections.campaigns')} />
         <CampaignCardSkeleton />
       </section>
     );
@@ -748,7 +753,7 @@ function RailCampaignsSection({
     <section className="space-y-3">
       <RailSectionHeader
         icon={<Megaphone className="size-4 text-primary" />}
-        title="Campaigns"
+        title={t('profile.sections.campaigns')}
         count={visible.length}
       />
       <div className="space-y-3">
@@ -762,7 +767,7 @@ function RailCampaignsSection({
           onClick={onSeeAll}
           className="text-sm text-primary hover:underline font-medium"
         >
-          {more > 0 ? `See all ${visible.length} campaigns →` : 'View campaigns tab →'}
+          {more > 0 ? t('profile.sections.seeAllCampaigns', { count: visible.length }) : t('profile.sections.viewCampaignsTab')}
         </button>
       )}
     </section>
@@ -788,6 +793,7 @@ function RailLatestPledgeSection({
   showSeeAll: boolean;
   onSeeAll: () => void;
 }) {
+  const { t } = useTranslation();
   // Pick the newest pledge by created_at. The page query is roughly
   // newest-first already, but sorting here keeps the rail correct
   // regardless of upstream order.
@@ -798,7 +804,7 @@ function RailLatestPledgeSection({
     <section className="space-y-3">
       <RailSectionHeader
         icon={<HandHeart className="size-4 text-primary" />}
-        title="Latest pledge"
+        title={t('profile.sections.latestPledge')}
       />
       <RailPledgeCard action={latest} btcPrice={btcPrice} />
       {showSeeAll && (
@@ -807,7 +813,7 @@ function RailLatestPledgeSection({
           onClick={onSeeAll}
           className="text-sm text-primary hover:underline font-medium"
         >
-          See all {pledges.length} pledges →
+          {t('profile.sections.seeAllPledges', { count: pledges.length })}
         </button>
       )}
     </section>
@@ -826,6 +832,7 @@ function RailPledgeCard({
   action: Action;
   btcPrice: number | undefined;
 }) {
+  const { t } = useTranslation();
   const naddr = nip19.naddrEncode({
     kind: 36639,
     pubkey: action.pubkey,
@@ -854,14 +861,14 @@ function RailPledgeCard({
               variant="secondary"
               className="absolute top-2 right-2 backdrop-blur bg-background/85 border-border/40 text-[10px] uppercase tracking-wide text-muted-foreground"
             >
-              Ended
+              {t('profile.badges.ended')}
             </Badge>
           )}
         </div>
         <div className="p-3 space-y-1.5">
           <h3 className="font-semibold text-sm leading-snug line-clamp-2">{action.title}</h3>
           <div className="flex items-baseline justify-between gap-2 text-xs">
-            <span className="text-muted-foreground uppercase tracking-wide font-semibold">Pledged</span>
+            <span className="text-muted-foreground uppercase tracking-wide font-semibold">{t('profile.badges.pledged')}</span>
             <span className="text-foreground font-bold tabular-nums">
               {formatPledgeAmount(action.bounty, btcPrice)}
             </span>
@@ -889,12 +896,13 @@ function RailPledgeCard({
 // ─── Rail Organizations Section ─────────────────────────────────────────────
 
 function RailOrganizationsSection({ pubkey }: { pubkey: string }) {
+  const { t } = useTranslation();
   const { data: orgs, isLoading } = useProfileOrganizations(pubkey);
 
   if (isLoading && orgs.length === 0) {
     return (
       <section className="space-y-3">
-        <RailSectionHeader icon={<Users className="size-4 text-primary" />} title="Groups" />
+        <RailSectionHeader icon={<Users className="size-4 text-primary" />} title={t('profile.sections.groups')} />
         <div className="grid grid-cols-2 gap-3">
           {Array.from({ length: 2 }).map((_, i) => (
             <CommunityMiniCardSkeleton key={i} className="w-full" />
@@ -913,7 +921,7 @@ function RailOrganizationsSection({ pubkey }: { pubkey: string }) {
     <section className="space-y-3">
       <RailSectionHeader
         icon={<Users className="size-4 text-primary" />}
-        title="Groups"
+        title={t('profile.sections.groups')}
         count={orgs.length}
       />
       <div className="grid grid-cols-2 gap-3">
@@ -927,7 +935,7 @@ function RailOrganizationsSection({ pubkey }: { pubkey: string }) {
             type="button"
             className="text-sm text-primary hover:underline font-medium"
           >
-            See all {orgs.length} →
+            {t('profile.sections.seeAllGroups', { count: orgs.length })}
           </button>
         </OrganizationsAllDialog>
       )}
@@ -936,6 +944,7 @@ function RailOrganizationsSection({ pubkey }: { pubkey: string }) {
 }
 
 function RailOrgCell({ entry }: { entry: ProfileOrganization }) {
+  const { t } = useTranslation();
   return (
     <div className="relative">
       <CommunityMiniCard community={entry.community} className="w-full" />
@@ -946,7 +955,7 @@ function RailOrgCell({ entry }: { entry: ProfileOrganization }) {
           entry.isFounder ? 'text-primary' : 'text-foreground',
         )}
       >
-        {entry.isFounder ? 'Founder' : 'Mod'}
+        {entry.isFounder ? t('profile.badges.founder') : t('profile.badges.mod')}
       </Badge>
     </div>
   );

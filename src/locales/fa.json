@@ -1020,5 +1020,124 @@
       "activeFilters": "فیلترهای فعال:",
       "clearAll": "پاک کردن همهٔ فیلترها"
     }
+  },
+  "profile": {
+    "seoDescriptionFallback": "نمایه Nostr",
+    "anonymous": "ناشناس",
+    "userNotFound": "کاربر پیدا نشد.",
+    "userNotFoundNip05": "کاربر پیدا نشد: {{handle}}",
+    "couldNotResolveNip05": "این شناسه NIP-05 قابل حل نیست.",
+    "tabs": {
+      "overview": "مرور",
+      "activity": "فعالیت",
+      "campaigns": "کارزارها",
+      "groups": "گروه‌ها",
+      "pledges": "تعهدها"
+    },
+    "header": {
+      "editProfile": "ویرایش نمایه",
+      "shareFollowLink": "اشتراک‌گذاری لینک دنبال‌کردن",
+      "moreOptions": "گزینه‌های بیشتر",
+      "donate": "اهدا کنید",
+      "campaignGoal": "هدف ${{amount}}"
+    },
+    "stats": {
+      "followers": "دنبال‌کنندگان",
+      "following": "دنبال‌شوندگان",
+      "raised": "جمع‌آوری‌شده",
+      "followersTitle_one": "{{count}} دنبال‌کننده",
+      "followersTitle_other": "{{count}} دنبال‌کننده",
+      "followingTitle": "{{count}} دنبال‌شونده"
+    },
+    "sections": {
+      "profile": "نمایه",
+      "campaigns": "کارزارها",
+      "latestPledge": "تازه‌ترین تعهد",
+      "groups": "گروه‌ها",
+      "seeAllCampaigns_one": "مشاهده {{count}} کارزار ←",
+      "seeAllCampaigns_other": "مشاهده همه {{count}} کارزار ←",
+      "viewCampaignsTab": "نمایش تب کارزارها ←",
+      "seeAllPledges_one": "مشاهده {{count}} تعهد ←",
+      "seeAllPledges_other": "مشاهده همه {{count}} تعهد ←",
+      "seeAllGroups": "مشاهده همه {{count}} ←"
+    },
+    "badges": {
+      "founder": "بنیان‌گذار",
+      "moderator": "ناظر",
+      "mod": "ناظر",
+      "ended": "پایان‌یافته",
+      "pledged": "تعهد شد"
+    },
+    "moreMenu": {
+      "title": "گزینه‌های نمایه",
+      "copyPubkey": "کپی کلید عمومی",
+      "copyLink": "کپی لینک نمایه",
+      "addToList": "افزودن به فهرست",
+      "shareFollowLink": "اشتراک‌گذاری لینک دنبال‌کردن",
+      "profileRecovery": "بازیابی نمایه",
+      "zap": "Zap",
+      "awardBadge": "اعطای نشان",
+      "writeLetter": "نوشتن نامه",
+      "mute": "بی‌صدا کردن @{{name}}",
+      "unmute": "خارج‌کردن از بی‌صدا @{{name}}",
+      "report": "گزارش @{{name}}",
+      "close": "بستن"
+    },
+    "toast": {
+      "pubkeyCopied": "کلید عمومی در کلیپ‌بورد کپی شد",
+      "linkCopied": "لینک نمایه در کلیپ‌بورد کپی شد",
+      "muted": "@{{name}} بی‌صدا شد",
+      "unmuted": "@{{name}} از بی‌صدا خارج شد",
+      "muteFailed": "بی‌صدا کردن کاربر ناموفق بود",
+      "unmuteFailed": "خارج‌کردن از بی‌صدا ناموفق بود",
+      "followed": "اکنون @{{name}} را دنبال می‌کنید",
+      "unfollowed": "دنبال‌کردن @{{name}} لغو شد",
+      "followFailed": "به‌روزرسانی فهرست دنبال‌شوندگان ناموفق بود",
+      "btcAddressCopied": "نشانی بیت‌کوین در کلیپ‌بورد کپی شد"
+    },
+    "followingModal": {
+      "title": "{{name}} دنبال می‌کند",
+      "empty": "هنوز کسی را دنبال نمی‌کند."
+    },
+    "followersModal": {
+      "title": "دنبال‌کنندگان {{name}}",
+      "empty": "هیچ دنبال‌کننده‌ای یافت نشد."
+    },
+    "bitcoinModal": {
+      "title": "بیت‌کوین",
+      "qrAlt": "کد QR بیت‌کوین",
+      "copyAddress": "کپی نشانی",
+      "showQr": "نمایش کد QR",
+      "viewOnMempool": "مشاهده در mempool.space"
+    },
+    "lightbox": {
+      "openOriginal": "باز کردن نسخه اصلی",
+      "close": "بستن (Esc)",
+      "imageAlt": "تصویر نمایه"
+    },
+    "activity": {
+      "empty": "{{name}} هنوز فعالیتی ندارد. پست‌ها، کارزارها، تعهدها و اهداها در این‌جا نمایش داده می‌شوند."
+    },
+    "campaigns": {
+      "count_one": "{{count}} کارزار",
+      "count_other": "{{count}} کارزار",
+      "sortNew": "جدید",
+      "sortTop": "برتر",
+      "showHidden": "نمایش پنهان‌ها",
+      "hideHidden": "پنهان‌سازی پنهان‌ها",
+      "emptySelf": "هنوز کارزاری راه‌اندازی نکرده‌اید.",
+      "emptyOther": "{{name}} هنوز کارزاری راه‌اندازی نکرده است.",
+      "startLink": "راه‌اندازی کارزار ←"
+    },
+    "pledgesTab": {
+      "active": "فعال",
+      "ended": "پایان‌یافته",
+      "emptySelf": "هنوز تعهدی ایجاد نکرده‌اید.",
+      "emptyOther": "{{name}} هنوز تعهدی ایجاد نکرده است.",
+      "createLink": "ایجاد تعهد ←"
+    },
+    "groupsDialog": {
+      "title": "همه گروه‌ها"
+    }
   }
 }

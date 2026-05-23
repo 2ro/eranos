@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Link as RouterLink } from 'react-router-dom';
 import { CalendarClock, HandHeart, MapPin } from 'lucide-react';
 import { nip19 } from 'nostr-tools';
@@ -39,6 +40,7 @@ export function ProfilePledgesTab({
   btcPrice,
   isLoading,
 }: ProfilePledgesTabProps) {
+  const { t } = useTranslation();
   const now = Math.floor(Date.now() / 1000);
 
   // Loading skeleton until the first list resolves.
@@ -58,15 +60,15 @@ export function ProfilePledgesTab({
             <HandHeart className="size-10 mx-auto mb-3 text-muted-foreground/40" />
             <p className="text-muted-foreground max-w-sm mx-auto">
               {isOwnProfile
-                ? "You haven't created a pledge yet."
-                : `${displayName} hasn't created a pledge yet.`}
+                ? t('profile.pledgesTab.emptySelf')
+                : t('profile.pledgesTab.emptyOther', { name: displayName })}
             </p>
             {isOwnProfile && (
               <RouterLink
                 to="/pledges/new"
                 className="inline-block mt-4 text-sm font-medium text-primary hover:underline"
               >
-                Create a pledge →
+                {t('profile.pledgesTab.createLink')}
               </RouterLink>
             )}
           </div>
@@ -89,7 +91,7 @@ export function ProfilePledgesTab({
         <section>
           {ended.length > 0 && (
             <h3 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground mb-3">
-              Active
+              {t('profile.pledgesTab.active')}
             </h3>
           )}
           <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-5">
@@ -103,7 +105,7 @@ export function ProfilePledgesTab({
       {ended.length > 0 && (
         <section>
           <h3 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground mb-3">
-            Ended
+            {t('profile.pledgesTab.ended')}
           </h3>
           <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-5">
             {ended.map((pledge) => (
@@ -125,6 +127,7 @@ function ProfilePledgeCard({
   isExpired?: boolean;
   btcPrice: number | undefined;
 }) {
+  const { t } = useTranslation();
   const [imageLoadFailed, setImageLoadFailed] = useState(false);
 
   const naddr = nip19.naddrEncode({
@@ -156,7 +159,7 @@ function ProfilePledgeCard({
               variant="secondary"
               className="absolute top-3 right-3 backdrop-blur bg-background/85 border-border/40 text-muted-foreground"
             >
-              Ended
+              {t('profile.badges.ended')}
             </Badge>
           )}
         </div>
@@ -172,7 +175,7 @@ function ProfilePledgeCard({
           <div className="flex-1" />
 
           <div className="rounded-xl border border-primary/20 bg-primary/10 px-4 py-3">
-            <p className="text-xs font-semibold uppercase tracking-wide text-primary">Pledged</p>
+            <p className="text-xs font-semibold uppercase tracking-wide text-primary">{t('profile.badges.pledged')}</p>
             <p className="mt-1 text-2xl font-bold tracking-tight text-foreground">
               {formatPledgeAmount(action.bounty, btcPrice)}
             </p>

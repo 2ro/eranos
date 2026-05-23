@@ -1020,5 +1020,124 @@
       "activeFilters": "Mafilter anoshanda:",
       "clearAll": "Bvisa mafilter ese"
     }
+  },
+  "profile": {
+    "seoDescriptionFallback": "Pfungidziro yeNostr",
+    "anonymous": "Asingazivikanwe",
+    "userNotFound": "Mushandisi haana kuwanikwa.",
+    "userNotFoundNip05": "Mushandisi haana kuwanikwa: {{handle}}",
+    "couldNotResolveNip05": "Hatina kukwanisa kuziva chiratidzo cheNIP-05 ichi.",
+    "tabs": {
+      "overview": "Pfupiso",
+      "activity": "Zviitiko",
+      "campaigns": "Mishando",
+      "groups": "Mapoka",
+      "pledges": "Zvivimbiso"
+    },
+    "header": {
+      "editProfile": "Gadziridza pfungidziro",
+      "shareFollowLink": "Govera link yokutevera",
+      "moreOptions": "Zvimwe zvisarudzo",
+      "donate": "Ipa",
+      "campaignGoal": "Chinangwa ${{amount}}"
+    },
+    "stats": {
+      "followers": "Vateveri",
+      "following": "Vari kuteverwa",
+      "raised": "Yakaunganidzwa",
+      "followersTitle_one": "Mutevedzeri {{count}}",
+      "followersTitle_other": "Vateveri {{count}}",
+      "followingTitle": "Anotevera {{count}}"
+    },
+    "sections": {
+      "profile": "Pfungidziro",
+      "campaigns": "Mishando",
+      "latestPledge": "Chivimbiso chechikuru",
+      "groups": "Mapoka",
+      "seeAllCampaigns_one": "Ona mushando {{count}} →",
+      "seeAllCampaigns_other": "Ona mishando yose {{count}} →",
+      "viewCampaignsTab": "Ona tabhu yemishando →",
+      "seeAllPledges_one": "Ona chivimbiso {{count}} →",
+      "seeAllPledges_other": "Ona zvivimbiso zvose {{count}} →",
+      "seeAllGroups": "Ona zvose {{count}} →"
+    },
+    "badges": {
+      "founder": "Mutangi",
+      "moderator": "Mutariri",
+      "mod": "Mutariri",
+      "ended": "Zvapera",
+      "pledged": "Chakavimbiswa"
+    },
+    "moreMenu": {
+      "title": "Zvisarudzo zvepfungidziro",
+      "copyPubkey": "Kopa kiyi yeruzhinji",
+      "copyLink": "Kopa link yepfungidziro",
+      "addToList": "Wedzera kurondedzero",
+      "shareFollowLink": "Govera link yokutevera",
+      "profileRecovery": "Kudzosa pfungidziro",
+      "zap": "Zap",
+      "awardBadge": "Ipa ratidziro",
+      "writeLetter": "Nyora tsamba",
+      "mute": "Nyararisa @{{name}}",
+      "unmute": "Bvisa kunyararisa @{{name}}",
+      "report": "Mhan'arira @{{name}}",
+      "close": "Vhara"
+    },
+    "toast": {
+      "pubkeyCopied": "Kiyi yeruzhinji yakopwa muclipboard",
+      "linkCopied": "Link yepfungidziro yakopwa muclipboard",
+      "muted": "Wanyararisa @{{name}}",
+      "unmuted": "Wabvisa kunyararisa @{{name}}",
+      "muteFailed": "Hazvina kubudirira kunyararisa mushandisi",
+      "unmuteFailed": "Hazvina kubudirira kubvisa kunyararisa",
+      "followed": "Iye zvino unotevera @{{name}}",
+      "unfollowed": "Wamira kutevera @{{name}}",
+      "followFailed": "Hazvina kubudirira kugadziridza rondedzero yokutevera",
+      "btcAddressCopied": "Kero yeBitcoin yakopwa muclipboard"
+    },
+    "followingModal": {
+      "title": "Vanoteverwa na{{name}}",
+      "empty": "Haasati atevera munhu."
+    },
+    "followersModal": {
+      "title": "Vateveri va{{name}}",
+      "empty": "Hapana vateveri vakawanikwa."
+    },
+    "bitcoinModal": {
+      "title": "Bitcoin",
+      "qrAlt": "Kodhi yeQR yeBitcoin",
+      "copyAddress": "Kopa kero",
+      "showQr": "Ratidza kodhi yeQR",
+      "viewOnMempool": "Ona pamempool.space"
+    },
+    "lightbox": {
+      "openOriginal": "Vhura yekutanga",
+      "close": "Vhara (Esc)",
+      "imageAlt": "Mufananidzo wepfungidziro"
+    },
+    "activity": {
+      "empty": "Hapana zviitiko zva{{name}} parizvino. Zvinyorwa, mishando, zvivimbiso, nezvipo zvose zvinoratidzwa pano."
+    },
+    "campaigns": {
+      "count_one": "Mushando {{count}}",
+      "count_other": "Mishando {{count}}",
+      "sortNew": "Itsva",
+      "sortTop": "Pamusoro",
+      "showHidden": "Ratidza zvakavanzika",
+      "hideHidden": "Vanza zvakavanzika",
+      "emptySelf": "Hauna kutanga mushando.",
+      "emptyOther": "{{name}} haana kutanga mushando.",
+      "startLink": "Tanga mushando →"
+    },
+    "pledgesTab": {
+      "active": "Zviri kuitika",
+      "ended": "Zvapera",
+      "emptySelf": "Hauna kugadzira chivimbiso.",
+      "emptyOther": "{{name}} haana kugadzira chivimbiso.",
+      "createLink": "Gadzira chivimbiso →"
+    },
+    "groupsDialog": {
+      "title": "Mapoka ose"
+    }
   }
 }

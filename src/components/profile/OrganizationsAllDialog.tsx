@@ -1,4 +1,5 @@
 import { useState, type ReactNode } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Users } from 'lucide-react';
 
 import { Badge } from '@/components/ui/badge';
@@ -31,6 +32,7 @@ interface OrganizationsAllDialogProps {
  * directly without pulling in the strip's full file.
  */
 export function OrganizationsAllDialog({ orgs, children }: OrganizationsAllDialogProps) {
+  const { t } = useTranslation();
   const [open, setOpen] = useState(false);
 
   return (
@@ -40,7 +42,7 @@ export function OrganizationsAllDialog({ orgs, children }: OrganizationsAllDialo
         <DialogHeader className="px-6 pt-6">
           <DialogTitle className="flex items-center gap-2">
             <Users className="size-5 text-primary" />
-            All groups
+            {t('profile.groupsDialog.title')}
             <span className="text-sm font-normal text-muted-foreground">({orgs.length})</span>
           </DialogTitle>
         </DialogHeader>
@@ -56,7 +58,7 @@ export function OrganizationsAllDialog({ orgs, children }: OrganizationsAllDialo
                     entry.isFounder ? 'text-primary' : 'text-foreground',
                   )}
                 >
-                  {entry.isFounder ? 'Founder' : 'Moderator'}
+                  {entry.isFounder ? t('profile.badges.founder') : t('profile.badges.moderator')}
                 </Badge>
               </div>
             ))}
@@ -64,7 +66,7 @@ export function OrganizationsAllDialog({ orgs, children }: OrganizationsAllDialo
         </ScrollArea>
         <div className="px-6 pb-6 pt-2 flex justify-end">
           <Button variant="outline" size="sm" onClick={() => setOpen(false)}>
-            Close
+            {t('common.close')}
           </Button>
         </div>
       </DialogContent>

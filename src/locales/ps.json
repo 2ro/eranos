@@ -1020,5 +1020,124 @@
       "activeFilters": "فعال فلټرونه:",
       "clearAll": "ټول فلټرونه پاک کړئ"
     }
+  },
+  "profile": {
+    "seoDescriptionFallback": "د Nostr پروفایل",
+    "anonymous": "ناڅرګند",
+    "userNotFound": "کارن ونه موندل شو.",
+    "userNotFoundNip05": "کارن ونه موندل شو: {{handle}}",
+    "couldNotResolveNip05": "د NIP-05 پیژندونکی نه شو حل کیدلی.",
+    "tabs": {
+      "overview": "بیاکتنه",
+      "activity": "فعالیت",
+      "campaigns": "کمپاینونه",
+      "groups": "ډلې",
+      "pledges": "ژمنې"
+    },
+    "header": {
+      "editProfile": "د پروفایل سمول",
+      "shareFollowLink": "د تعقیب لینک شریک کړئ",
+      "moreOptions": "نور انتخابونه",
+      "donate": "ډالۍ ورکړئ",
+      "campaignGoal": "هدف ${{amount}}"
+    },
+    "stats": {
+      "followers": "تعقیبوونکي",
+      "following": "تعقیب‌شوي",
+      "raised": "راټول شوی",
+      "followersTitle_one": "{{count}} تعقیبوونکی",
+      "followersTitle_other": "{{count}} تعقیبوونکي",
+      "followingTitle": "{{count}} تعقیبوي"
+    },
+    "sections": {
+      "profile": "پروفایل",
+      "campaigns": "کمپاینونه",
+      "latestPledge": "وروستۍ ژمنه",
+      "groups": "ډلې",
+      "seeAllCampaigns_one": "ټول {{count}} کمپاین وګورئ ←",
+      "seeAllCampaigns_other": "ټول {{count}} کمپاینونه وګورئ ←",
+      "viewCampaignsTab": "د کمپاینونو ټب وګورئ ←",
+      "seeAllPledges_one": "ټول {{count}} ژمنه وګورئ ←",
+      "seeAllPledges_other": "ټول {{count}} ژمنې وګورئ ←",
+      "seeAllGroups": "ټول {{count}} وګورئ ←"
+    },
+    "badges": {
+      "founder": "بنسټګر",
+      "moderator": "څارونکی",
+      "mod": "څارونکی",
+      "ended": "پای ته رسیدلی",
+      "pledged": "ژمنه شوې"
+    },
+    "moreMenu": {
+      "title": "د پروفایل انتخابونه",
+      "copyPubkey": "عمومي کیلي کاپي کړئ",
+      "copyLink": "د پروفایل لینک کاپي کړئ",
+      "addToList": "لیست ته اضافه کړئ",
+      "shareFollowLink": "د تعقیب لینک شریک کړئ",
+      "profileRecovery": "د پروفایل بیا رغونه",
+      "zap": "Zap",
+      "awardBadge": "نښان ورکړئ",
+      "writeLetter": "لیک ولیکئ",
+      "mute": "@{{name}} غلی کړئ",
+      "unmute": "د @{{name}} غلی توب لرې کړئ",
+      "report": "د @{{name}} راپور",
+      "close": "بند کړئ"
+    },
+    "toast": {
+      "pubkeyCopied": "عمومي کیلي کلیپ بورډ ته کاپي شوه",
+      "linkCopied": "د پروفایل لینک کلیپ بورډ ته کاپي شو",
+      "muted": "@{{name}} غلی شو",
+      "unmuted": "د @{{name}} غلی توب لرې شو",
+      "muteFailed": "د کارن غلی کول ناکام شو",
+      "unmuteFailed": "د غلی توب لرې کول ناکام شو",
+      "followed": "اوس @{{name}} تعقیبوئ",
+      "unfollowed": "د @{{name}} تعقیب پای ته ورسید",
+      "followFailed": "د تعقیب لیست تازه کول ناکام شو",
+      "btcAddressCopied": "د بټکوین پته کلیپ بورډ ته کاپي شوه"
+    },
+    "followingModal": {
+      "title": "{{name}} تعقیبوي",
+      "empty": "تر اوسه يې څوک نه دي تعقیب کړي."
+    },
+    "followersModal": {
+      "title": "د {{name}} تعقیبوونکي",
+      "empty": "هیڅ تعقیبوونکی ونه موندل شو."
+    },
+    "bitcoinModal": {
+      "title": "بټکوین",
+      "qrAlt": "د بټکوین QR کوډ",
+      "copyAddress": "پته کاپي کړئ",
+      "showQr": "QR کوډ ښکاره کړئ",
+      "viewOnMempool": "په mempool.space کې وګورئ"
+    },
+    "lightbox": {
+      "openOriginal": "اصلي خلاص کړئ",
+      "close": "بند کړئ (Esc)",
+      "imageAlt": "د پروفایل انځور"
+    },
+    "activity": {
+      "empty": "د {{name}} لخوا تر اوسه هیڅ فعالیت نشته. پوستونه، کمپاینونه، ژمنې او ډالۍ ټول دلته ښکاري."
+    },
+    "campaigns": {
+      "count_one": "{{count}} کمپاین",
+      "count_other": "{{count}} کمپاینونه",
+      "sortNew": "نوي",
+      "sortTop": "غوره",
+      "showHidden": "پټ ښکاره کړئ",
+      "hideHidden": "پټ پټ کړئ",
+      "emptySelf": "تاسو لا تر اوسه کوم کمپاین نه دی پیل کړی.",
+      "emptyOther": "{{name}} لا تر اوسه کوم کمپاین نه دی پیل کړی.",
+      "startLink": "کمپاین پیل کړئ ←"
+    },
+    "pledgesTab": {
+      "active": "فعال",
+      "ended": "پای ته رسیدلی",
+      "emptySelf": "تاسو لا تر اوسه ژمنه نه ده جوړه کړې.",
+      "emptyOther": "{{name}} لا تر اوسه ژمنه نه ده جوړه کړې.",
+      "createLink": "ژمنه جوړه کړئ ←"
+    },
+    "groupsDialog": {
+      "title": "ټولې ډلې"
+    }
   }
 }
