@@ -35,12 +35,6 @@ const settingsSections: SettingsSection[] = [
     path: '/settings/appearance',
   },
   {
-    id: 'feed',
-    label: 'Home Feed',
-    description: 'Choose which post types appear in your home feed, and manage muted users, hashtags, and sensitive content.',
-    path: '/settings/feed',
-  },
-  {
     id: 'network',
     label: 'Network',
     description: 'Relays and file upload servers.',
