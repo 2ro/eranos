@@ -246,11 +246,21 @@ export function AboutPage() {
         </div>
       </section>
 
-      {/* ── 2. How it works, in three steps (light cream / dark slate) ──── */}
+      {/* ── 2. How it works, in three steps (light cream / dark navy) ──── */}
       <section
         id="how-it-works"
-        className="relative bg-[#faf8f4] dark:bg-[#11151c] py-20 md:py-28 overflow-hidden"
+        className="relative bg-[#faf8f4] dark:bg-[#0a0c14] py-20 md:py-28 overflow-hidden"
       >
+        {/* Subtle world-map texture in dark mode only */}
+        <div
+          aria-hidden
+          className="hidden dark:block absolute inset-0 opacity-[0.06] pointer-events-none"
+          style={{
+            backgroundImage: "url('/about/world-map-bg.png')",
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+          }}
+        />
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <SectionHeader
             eyebrow="How it works"
@@ -284,8 +294,18 @@ export function AboutPage() {
         </div>
       </section>
 
-      {/* ── 3. Two ways to get paid (white / dark slate) ────────────────── */}
-      <section className="relative bg-white dark:bg-[#0e1218] py-20 md:py-28 overflow-hidden">
+      {/* ── 3. Two ways to get paid (white / dark navy variant) ─────────── */}
+      <section className="relative bg-white dark:bg-[#13181f] py-20 md:py-28 overflow-hidden">
+        {/* Subtle world-map texture in dark mode only */}
+        <div
+          aria-hidden
+          className="hidden dark:block absolute inset-0 opacity-[0.05] pointer-events-none"
+          style={{
+            backgroundImage: "url('/about/world-map-bg.png')",
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+          }}
+        />
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <SectionHeader
             eyebrow="Bitcoin · One QR, two options"
@@ -406,10 +426,10 @@ export function AboutPage() {
         </div>
       </section>
 
-      {/* ── 4. Need help? FAQ (cream / dark slate, integrated as three chapters) ───── */}
+      {/* ── 4. Need help? FAQ (cream / dark navy, integrated as three chapters) ───── */}
       <section
         id="faq"
-        className="bg-[#f5f1eb] dark:bg-[#11151c] py-20 md:py-28 scroll-mt-16"
+        className="bg-[#f5f1eb] dark:bg-[#0a0c14] py-20 md:py-28 scroll-mt-16"
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <SectionHeader
@@ -432,8 +452,8 @@ export function AboutPage() {
         </div>
       </section>
 
-      {/* ── 5. Pick the side you're on (white / dark slate) ─────────────── */}
-      <section className="bg-white dark:bg-[#0e1218] py-20 md:py-28">
+      {/* ── 5. Pick the side you're on (white / dark navy variant) ────────── */}
+      <section className="bg-white dark:bg-[#13181f] py-20 md:py-28">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <SectionHeader
             eyebrow="Guides"
@@ -659,7 +679,7 @@ interface StepCardProps {
 
 function StepCard({ number, image, imageAlt, title, body }: StepCardProps) {
   return (
-    <div className="relative bg-white dark:bg-[#1a1f29] rounded-2xl overflow-hidden border border-gray-200 dark:border-white/10 shadow-sm transition-all duration-300 motion-safe:hover:-translate-y-1 hover:shadow-md dark:hover:shadow-[0_8px_24px_rgba(0,0,0,0.4)]">
+    <div className="relative bg-white dark:bg-[#1c2230] rounded-2xl overflow-hidden border border-gray-200 dark:border-white/10 shadow-sm transition-all duration-300 motion-safe:hover:-translate-y-1 hover:shadow-md dark:hover:shadow-[0_8px_24px_rgba(0,0,0,0.4)]">
       <div className="aspect-[4/3] bg-[#0a0c14] relative overflow-hidden">
         <img
           src={image}
@@ -722,7 +742,7 @@ function RailCard({
     accent === 'orange' ? 'text-emerald-600' : 'text-indigo-600';
 
   return (
-    <div className="rounded-2xl border border-gray-200 dark:border-white/10 bg-white dark:bg-[#1a1f29] shadow-sm overflow-hidden flex flex-col">
+    <div className="rounded-2xl border border-gray-200 dark:border-white/10 bg-white dark:bg-[#1c2230] shadow-sm overflow-hidden flex flex-col">
       {/* Gradient header strip */}
       <div className={cn('bg-gradient-to-r px-6 py-5 text-white', headerGradient)}>
         <div className="flex items-center gap-2 mb-1">
@@ -821,7 +841,7 @@ function GuideCard({
   return (
     <Link
       to={to}
-      className="group rounded-2xl border border-gray-200 dark:border-white/10 bg-white dark:bg-[#1a1f29] shadow-sm overflow-hidden flex flex-col transition-all duration-300 motion-safe:hover:-translate-y-1 hover:shadow-xl dark:hover:shadow-[0_8px_24px_rgba(0,0,0,0.4)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
+      className="group rounded-2xl border border-gray-200 dark:border-white/10 bg-white dark:bg-[#1c2230] shadow-sm overflow-hidden flex flex-col transition-all duration-300 motion-safe:hover:-translate-y-1 hover:shadow-xl dark:hover:shadow-[0_8px_24px_rgba(0,0,0,0.4)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
     >
       {/* Image header */}
       <div className="aspect-[16/9] bg-gray-100 dark:bg-[#0a0c14] relative overflow-hidden">
