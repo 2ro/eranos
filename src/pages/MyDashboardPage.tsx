@@ -23,7 +23,6 @@ import {
   CommunityMiniCard,
   CommunityMiniCardSkeleton,
 } from '@/components/discovery/CommunityMiniCard';
-import { HorizontalScroll } from '@/components/discovery/HorizontalScroll';
 import { SectionHeader } from '@/components/discovery/SectionHeader';
 import { CountryFlag } from '@/components/CountryFlag';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
@@ -628,6 +627,15 @@ function CommunitiesSection({
 }
 
 // ─── Shared helpers ──────────────────────────────────────────────────────────
+
+/** File-local horizontal scroll container for shelf sections. */
+function HorizontalScroll({ children, className }: { children: React.ReactNode; className?: string }) {
+  return (
+    <div className={cn('flex gap-3 overflow-x-auto scrollbar-none px-4 pb-1', className)}>
+      {children}
+    </div>
+  );
+}
 
 function CampaignShelfSkeleton() {
   return (
