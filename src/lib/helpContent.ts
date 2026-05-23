@@ -61,38 +61,6 @@ const FAQ_TEMPLATE: FAQCategory[] = [
         ],
       },
       {
-        id: 'what-is-nostr',
-        question: 'What is Nostr?',
-        answer: [
-          'Nostr is an open network where **you** own your account, not a company. Your identity is a cryptographic key you control, not a username on someone else\'s server.',
-          'On {appName}, that same key is also what your donation address is derived from \u2014 which is why you can receive Bitcoin without signing up with anyone.',
-        ],
-      },
-      {
-        id: 'why-login-different',
-        question: 'Why is my sign-in so different and long?',
-        answer: [
-          'Instead of a username and password controlled by a company, Nostr uses a pair of cryptographic keys.',
-          'Your "public key" (starts with **npub**) is your username. Your "secret key" (starts with **nsec**) is your password. The long string is what makes it virtually impossible to guess.',
-        ],
-      },
-      {
-        id: 'lose-secret-key',
-        question: 'What happens if I lose my secret key?',
-        answer: [
-          '**There is no "forgot password" button.** Nobody can reset it for you. If you lose it, your account \u2014 and any Bitcoin sitting at your donation address \u2014 is gone forever.',
-          '**Save your secret key somewhere safe right now.** For tips, read [Managing Your Nostr Keys](https://soapbox.pub/blog/managing-nostr-keys).',
-        ],
-      },
-      {
-        id: 'manage-secret-key',
-        question: 'Can I save my secret key in my phone\'s password manager?',
-        answer: [
-          'Yes. You can save it in your device\'s password manager (iCloud Keychain, 1Password, Bitwarden, etc.). On iPhone, saving it in Passwords lets you use Face ID or Touch ID to log in.',
-          'For a full guide, see [Managing Your Nostr Keys](https://soapbox.pub/blog/managing-nostr-keys).',
-        ],
-      },
-      {
         id: 'cost-to-use',
         question: 'Does {appName} cost anything?',
         answer: [
@@ -164,20 +132,20 @@ const FAQ_TEMPLATE: FAQCategory[] = [
         ],
       },
       {
-        id: 'why-not-lightning',
-        question: 'Why doesn\'t {appName} use Lightning?',
-        answer: [
-          'Lightning requires a Lightning wallet. The easiest ones (Wallet of Satoshi, Strike, Breez) are **custodial** \u2014 a company holds the funds and can be shut down, geo-blocked, or pressured into freezing accounts. Non-custodial Lightning is technically demanding and unreliable for newcomers.',
-          'We want {appName} to work for someone whose only Bitcoin experience is a regular consumer app like Cash App, Coinbase, Strike, Venmo, or PayPal. On-chain Bitcoin works with every wallet on the planet.',
-        ],
-      },
-      {
         id: 'why-not-silent-payments',
         question: 'Does {appName} support silent payments?',
         answer: [
           'Yes. When an activist creates a campaign they can accept silent payments alongside, or instead of, public Bitcoin payments. Silent-payment donations still settle on-chain, but the transaction can\'t be linked back to the activist\'s donation code \u2014 so they don\'t appear in public donor lists or totals.',
           'Sending a silent payment requires a wallet that supports BIP-352. Most consumer apps don\'t yet, but [Ditto Wallet](https://ditto.pub) and [Dana](https://github.com/cygnet3/dana/releases/download/v0.7.4/app-live-release.apk) do.',
           'When a campaign accepts both kinds of payment, {appName} encodes them in a single QR code. Silent-payment-capable wallets pay privately; everyone else pays the public address. No donor is shut out, and no activist is forced to choose between reach and privacy.',
+        ],
+      },
+      {
+        id: 'why-not-lightning',
+        question: 'Why doesn\'t {appName} use Lightning?',
+        answer: [
+          'Lightning requires a Lightning wallet. The easiest ones (Wallet of Satoshi, Strike, Breez) are **custodial** \u2014 a company holds the funds and can be shut down, geo-blocked, or pressured into freezing accounts. Non-custodial Lightning is technically demanding and unreliable for newcomers.',
+          'We want {appName} to work for someone whose only Bitcoin experience is a regular consumer app like Cash App, Coinbase, Strike, Venmo, or PayPal. On-chain Bitcoin works with every wallet on the planet.',
         ],
       },
       {
@@ -195,6 +163,50 @@ const FAQ_TEMPLATE: FAQCategory[] = [
         answer: [
           'Bitcoin is by far the most widely adopted cryptocurrency. That means it\'s the easiest for donors to buy and send, and the easiest for activists to receive, hold, and spend.',
           'Privacy-focused coins like Monero offer different privacy tradeoffs than Bitcoin, but they\'re unsupported by most consumer apps and harder to convert back to local currency. Asking either side of a donation to first acquire a niche cryptocurrency is a barrier {appName} won\'t put in the way. For Bitcoin donations themselves, silent payments cover the unlinkability use case without leaving the Bitcoin ecosystem.',
+        ],
+      },
+    ],
+  },
+
+  // ── About Nostr ─────────────────────────────────────────────────────────
+  // Protocol-level questions: what Nostr is, how the npub/nsec key pair
+  // works, and what to do with your secret key. Placed after the payments
+  // section so newcomers see "what is Agora / why Bitcoin" first, and only
+  // dig into Nostr's identity model once they care.
+  {
+    id: 'about-nostr',
+    label: 'About Nostr',
+    items: [
+      {
+        id: 'what-is-nostr',
+        question: 'What is Nostr?',
+        answer: [
+          'Nostr is an open network where **you** own your account, not a company. Your identity is a cryptographic key you control, not a username on someone else\'s server.',
+          'On {appName}, that same key is also what your donation address is derived from \u2014 which is why you can receive Bitcoin without signing up with anyone.',
+        ],
+      },
+      {
+        id: 'why-login-different',
+        question: 'Why is my sign-in so different and long?',
+        answer: [
+          'Instead of a username and password controlled by a company, Nostr uses a pair of cryptographic keys.',
+          'Your "public key" (starts with **npub**) is your username. Your "secret key" (starts with **nsec**) is your password. The long string is what makes it virtually impossible to guess.',
+        ],
+      },
+      {
+        id: 'lose-secret-key',
+        question: 'What happens if I lose my secret key?',
+        answer: [
+          '**There is no "forgot password" button.** Nobody can reset it for you. If you lose it, your account \u2014 and any Bitcoin sitting at your donation address \u2014 is gone forever.',
+          '**Save your secret key somewhere safe right now.** For tips, read [Managing Your Nostr Keys](https://soapbox.pub/blog/managing-nostr-keys).',
+        ],
+      },
+      {
+        id: 'manage-secret-key',
+        question: 'Can I save my secret key in my phone\'s password manager?',
+        answer: [
+          'Yes. You can save it in your device\'s password manager (iCloud Keychain, 1Password, Bitwarden, etc.). On iPhone, saving it in Passwords lets you use Face ID or Touch ID to log in.',
+          'For a full guide, see [Managing Your Nostr Keys](https://soapbox.pub/blog/managing-nostr-keys).',
         ],
       },
     ],
