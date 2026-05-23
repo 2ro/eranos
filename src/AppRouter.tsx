@@ -54,7 +54,7 @@ const EventsFeedPage = lazy(() => import("./pages/EventsFeedPage").then(m => ({ 
 const ExternalContentPage = lazy(() => import("./pages/ExternalContentPage").then(m => ({ default: m.ExternalContentPage })));
 const GeotagPage = lazy(() => import("./pages/GeotagPage").then(m => ({ default: m.GeotagPage })));
 const HashtagPage = lazy(() => import("./pages/HashtagPage").then(m => ({ default: m.HashtagPage })));
-const MySquarePage = lazy(() => import("./pages/MySquarePage").then(m => ({ default: m.MySquarePage })));
+const MyDashboardPage = lazy(() => import("./pages/MyDashboardPage").then(m => ({ default: m.MyDashboardPage })));
 const HelpPage = lazy(() => import("./pages/HelpPage").then(m => ({ default: m.HelpPage })));
 const DonorGuidePage = lazy(() => import("./pages/DonorGuidePage").then(m => ({ default: m.DonorGuidePage })));
 const ActivistGuidePage = lazy(() => import("./pages/ActivistGuidePage").then(m => ({ default: m.ActivistGuidePage })));
@@ -167,7 +167,7 @@ export function AppRouter() {
           {/* All routes share the persistent FundraiserLayout (top nav + footer) */}
           <Route element={<FundraiserLayout />}>
             <Route path="/" element={<CampaignsPage />} />
-            <Route path="/my-square" element={<MySquarePage />} />
+            <Route path="/my-dashboard" element={<MyDashboardPage />} />
             <Route path="/feed" element={<Index />} />
             <Route path="/campaigns" element={<Navigate to="/" replace />} />
             <Route path="/campaigns/new" element={<CreateCampaignPage />} />

@@ -50,7 +50,7 @@ import { getZapSenderPubkey, getZapAmountSats } from '@/lib/zapHelpers';
 import type { ParsedCampaign } from '@/lib/campaign';
 
 /**
- * `/my-square` — **My Square**: the logged-in user's personal home base.
+ * `/my-dashboard` — **My Dashboard**: the logged-in user's personal home base.
  *
  * Three visual zones:
  *
@@ -71,12 +71,12 @@ import type { ParsedCampaign } from '@/lib/campaign';
  * lightweight notification preview query; and wallet + price lookups
  * (all cached by their respective hooks).
  */
-export function MySquarePage() {
+export function MyDashboardPage() {
   const { config } = useAppContext();
   const { user } = useCurrentUser();
 
   useSeoMeta({
-    title: `My Square | ${config.appName}`,
+    title: `My Dashboard | ${config.appName}`,
     description:
       'Your campaigns, communities, and causes in one place.',
   });
@@ -164,7 +164,7 @@ function LoggedOutState() {
         <Megaphone className="size-8 text-primary" />
       </div>
       <div className="space-y-2 max-w-xs">
-        <h2 className="text-xl font-bold">My Square</h2>
+        <h2 className="text-xl font-bold">My Dashboard</h2>
         <p className="text-muted-foreground text-sm">
           Log in to see your campaigns, communities, and countries in one place.
         </p>
@@ -693,4 +693,4 @@ function SectionError({ label }: { label: string }) {
   );
 }
 
-export default MySquarePage;
+export default MyDashboardPage;

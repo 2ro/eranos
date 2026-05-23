@@ -5,6 +5,7 @@ import {
   Bell,
   CircleHelp,
   HandHeart,
+  LayoutDashboard,
   Megaphone,
   Menu,
   Search,
@@ -203,6 +204,7 @@ function getProfileMenuItems({
 
   return [
     ...(showDashboard ? [{ label: 'Dashboard', to: '/dashboard', icon: Activity }] : []),
+    { label: 'My Dashboard', to: '/my-dashboard', icon: LayoutDashboard },
     { label: 'Wallet', to: '/wallet', icon: Wallet },
     { label: 'Notifications', to: '/notifications', icon: Bell },
     { label: 'Profile', to: `/${nip19.npubEncode(userPubkey)}`, icon: User },
