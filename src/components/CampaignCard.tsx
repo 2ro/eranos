@@ -170,15 +170,6 @@ export function CampaignCard({ campaign, variant = 'compact', className, footerB
               <HandHeart className="size-12 text-primary/40" />
             </div>
           )}
-          {isSilentPayment && (
-            <Badge
-              variant="secondary"
-              className="absolute top-3 left-3 backdrop-blur bg-background/80 border-border/40"
-            >
-              <ShieldCheck className="size-3.5 mr-1" />
-              Private
-            </Badge>
-          )}
           <div className="absolute top-3 right-3 flex items-center gap-2">
             {isHidden && (
               <Badge

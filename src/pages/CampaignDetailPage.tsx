@@ -16,7 +16,6 @@ import {
 
 import { ArticleContent } from '@/components/ArticleContent';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Badge } from '@/components/ui/badge';
 import {
   CampaignWalletDonatePanel,
 } from '@/components/CampaignWalletDonatePanel';
@@ -738,16 +737,6 @@ function CampaignHero({
           busy photos without darkening the gradient further. */}
       <div className="absolute inset-x-0 bottom-0 z-10 px-5 sm:px-6 lg:px-0 pb-[max(env(safe-area-inset-bottom),1.75rem)] pt-16 sm:pt-20">
         <div className="max-w-6xl mx-auto [text-shadow:0_1px_3px_rgba(0,0,0,0.7)]">
-          {!campaign.wallets.onchain && (
-            <Badge
-              variant="secondary"
-              className="mb-4 bg-background/85 text-foreground border-border/40 backdrop-blur [text-shadow:none]"
-            >
-              <ShieldCheck className="size-3.5 mr-1.5" />
-              Private campaign
-            </Badge>
-          )}
-
           <h1 className="text-3xl sm:text-5xl lg:text-6xl font-bold leading-[1.05] tracking-tight text-white max-w-4xl">
             {campaign.title}
           </h1>
@@ -896,19 +885,14 @@ function DonateColumn({
     <Card className="overflow-hidden border-0 shadow-none bg-transparent lg:border lg:shadow-sm lg:bg-card">
       <CardContent className="p-0 lg:p-5 space-y-5">
         {/* Raised stats + progress. Silent-payment campaigns hide all
-            aggregate numbers by design (per NIP.md Kind 33863). */}
+            aggregate numbers by design (per NIP.md Kind 33863) — only
+            the goal target (if any) is shown. */}
         {isSilentPayment ? (
-          <div className="space-y-1">
-            <div className="inline-flex items-center gap-1.5 text-sm font-medium text-muted-foreground">
-              <ShieldCheck className="size-4 text-primary" />
-              Private campaign — totals not public
+          campaign.goalUsd && campaign.goalUsd > 0 ? (
+            <div className="text-xs text-muted-foreground">
+              Target: {formatUsdGoal(campaign.goalUsd)}
             </div>
-            {campaign.goalUsd && campaign.goalUsd > 0 && (
-              <div className="text-xs text-muted-foreground">
-                Target: {formatUsdGoal(campaign.goalUsd)}
-              </div>
-            )}
-          </div>
+          ) : null
         ) : statsLoading ? (
           <Skeleton className="h-16 w-full" />
         ) : (
