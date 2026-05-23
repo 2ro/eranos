@@ -591,5 +591,64 @@
       "silentBadge": "静默",
       "silentDetectedTitle": "通过 BIP-352 静默支付扫描检测到"
     }
+  },
+  "walletRecovery": {
+    "seoTitle": "恢复旧钱包",
+    "seoDescription": "从之前的 Lightning 钱包中恢复资金，并将其转入你由 Nostr 派生的比特币地址。",
+    "title": "恢复旧钱包",
+    "heading": "恢复你的旧钱包",
+    "subheading": "如果你之前在 Lightning 钱包中有资金，你可以将其全部转入由你的 Nostr 派生出的比特币地址。旧钱包不会被恢复——这是一次性的单向转移。",
+    "backToWallet": "返回钱包",
+    "loggedOut": {
+      "title": "登录以恢复",
+      "description": "请使用拥有旧 Lightning 钱包的 Nostr 身份登录，以便将资金转入其比特币地址。"
+    },
+    "destination": {
+      "title": "资金将被发送到",
+      "description": "你由 Nostr 派生的 Taproot 地址。"
+    },
+    "phrase": {
+      "title": "恢复短语",
+      "description": "粘贴你旧钱包的 12 词恢复短语。",
+      "checkingRelays": "正在中继上查找加密备份…",
+      "backupFoundTitle": "在你的中继上找到备份",
+      "backupFoundDesc": "我们在此账号发布的事件中找到了你旧钱包恢复短语的加密备份。",
+      "decryptAndUse": "解密并使用",
+      "placeholder": "word1 word2 word3 …",
+      "warning": "只粘贴你信任的恢复短语。任何拥有此短语的人都可以花费资金。转移完成后，请从你复制过它的任何地方删除它。",
+      "sweepButton": "将资金转入我的比特币地址"
+    },
+    "sweeping": {
+      "working": "处理中…",
+      "dontClose": "请不要关闭此标签页。旧钱包同步并广播交易可能需要最多一分钟。"
+    },
+    "success": {
+      "title": "恢复完成",
+      "sent": "已向你的比特币地址发送 {{sats}} sats。",
+      "viewTransaction": "查看交易"
+    },
+    "error": {
+      "title": "恢复失败",
+      "tryAgain": "重试"
+    },
+    "errors": {
+      "noNip44": "你的签名器不支持读取中继备份所需的 NIP-44 解密。请改为手动粘贴你的 12 词恢复短语。",
+      "decryptFailed": "无法解密中继备份。请改为手动粘贴你的 12 词恢复短语。",
+      "decryptGeneric": "解密中继备份失败。",
+      "invalidWordCount": "恢复短语必须是 12 或 24 个单词。",
+      "noBalance": "你的旧钱包没有可花费的余额。没有可以恢复的内容。",
+      "sweepGeneric": "恢复失败。请重试。"
+    },
+    "progress": {
+      "loadingSdk": "正在加载钱包 SDK…",
+      "connecting": "正在连接你的旧钱包…",
+      "checkingBalance": "正在查看余额…",
+      "preparingTransfer": "正在准备转移 {{sats}} sats…",
+      "broadcasting": "正在广播交易…"
+    },
+    "toast": {
+      "backupLoadedTitle": "已加载备份",
+      "backupLoadedDesc": "已从你的中继解密恢复短语。"
+    }
   }
 }

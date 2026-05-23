@@ -591,5 +591,64 @@
       "silentBadge": "silencioso",
       "silentDetectedTitle": "Detectado mediante el escaneo de pagos silenciosos BIP-352"
     }
+  },
+  "walletRecovery": {
+    "seoTitle": "Recuperar cartera antigua",
+    "seoDescription": "Recupera los fondos de una cartera Lightning anterior y transfiérelos a tu dirección de Bitcoin derivada de Nostr.",
+    "title": "Recuperar cartera antigua",
+    "heading": "Recupera tu cartera antigua",
+    "subheading": "Si antes tenías fondos en la cartera Lightning, puedes barrerlos a tu dirección de Bitcoin derivada de Nostr. Tu cartera anterior no se restaura — es una transferencia única y en un solo sentido.",
+    "backToWallet": "Volver a la cartera",
+    "loggedOut": {
+      "title": "Inicia sesión para recuperar",
+      "description": "Inicia sesión con la identidad de Nostr que poseía la antigua cartera Lightning para que los fondos puedan moverse a su dirección de Bitcoin."
+    },
+    "destination": {
+      "title": "Los fondos se enviarán a",
+      "description": "Tu dirección Taproot derivada de Nostr."
+    },
+    "phrase": {
+      "title": "Frase de recuperación",
+      "description": "Pega la frase de recuperación de 12 palabras de tu cartera antigua.",
+      "checkingRelays": "Buscando una copia de seguridad cifrada en tus relés…",
+      "backupFoundTitle": "Copia de seguridad encontrada en tus relés",
+      "backupFoundDesc": "Encontramos una copia de seguridad cifrada de la frase de recuperación de tu cartera antigua publicada desde esta cuenta.",
+      "decryptAndUse": "Descifrar y usar",
+      "placeholder": "palabra1 palabra2 palabra3 …",
+      "warning": "Pega solo una frase de recuperación de confianza. Cualquiera que tenga esta frase puede gastar los fondos. Cuando termine el barrido, bórrala de cualquier sitio donde la hayas copiado.",
+      "sweepButton": "Barrer fondos a mi dirección de Bitcoin"
+    },
+    "sweeping": {
+      "working": "Trabajando…",
+      "dontClose": "No cierres esta pestaña. Esto puede tardar hasta un minuto mientras la cartera antigua se sincroniza y se transmite la transacción."
+    },
+    "success": {
+      "title": "Recuperación completada",
+      "sent": "Se enviaron {{sats}} sats a tu dirección de Bitcoin.",
+      "viewTransaction": "Ver transacción"
+    },
+    "error": {
+      "title": "La recuperación falló",
+      "tryAgain": "Intentar de nuevo"
+    },
+    "errors": {
+      "noNip44": "Tu firmante no admite el descifrado NIP-44, que es necesario para leer la copia de seguridad del relé. Pega tu frase de recuperación de 12 palabras manualmente.",
+      "decryptFailed": "No se pudo descifrar la copia de seguridad del relé. Pega tu frase de recuperación de 12 palabras manualmente.",
+      "decryptGeneric": "Error al descifrar la copia de seguridad del relé.",
+      "invalidWordCount": "La frase de recuperación debe tener 12 o 24 palabras.",
+      "noBalance": "Tu cartera antigua no tiene saldo gastable. No hay nada que recuperar.",
+      "sweepGeneric": "La recuperación falló. Por favor, inténtalo de nuevo."
+    },
+    "progress": {
+      "loadingSdk": "Cargando el SDK de la cartera…",
+      "connecting": "Conectando con tu cartera antigua…",
+      "checkingBalance": "Comprobando el saldo…",
+      "preparingTransfer": "Preparando la transferencia de {{sats}} sats…",
+      "broadcasting": "Transmitiendo la transacción…"
+    },
+    "toast": {
+      "backupLoadedTitle": "Copia de seguridad cargada",
+      "backupLoadedDesc": "Frase de recuperación descifrada desde tus relés."
+    }
   }
 }

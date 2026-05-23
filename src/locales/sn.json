@@ -591,5 +591,64 @@
       "silentBadge": "wakanyararira",
       "silentDetectedTitle": "Zvakaonekwa kuburikidza nokuongorora kwemubhadharo wakanyararira weBIP-352"
     }
+  },
+  "walletRecovery": {
+    "seoTitle": "Garisa chikwama chekare",
+    "seoDescription": "Garisa mari kubva muchikwama chekare cheLightning uye uitumira kukero yako yeBitcoin yakabva paNostr.",
+    "title": "Garisa chikwama chekare",
+    "heading": "Garisa chikwama chako chekare",
+    "subheading": "Kana iwe wakambova nemari muchikwama cheLightning, unogona kuibvisa wese uchiitumira kukero yako yeBitcoin yakabva paNostr. Chikwama chako chekare hachidzosererwi — uku kutumira kwekamwe chete uye nzira imwe.",
+    "backToWallet": "Dzokera kuchikwama",
+    "loggedOut": {
+      "title": "Pinda kuti ugarise",
+      "description": "Pinda nemuviri weNostr waiva mwene wechikwama chekare cheLightning kuti mari ibviswe ichiendeswa kukero yacho yeBitcoin."
+    },
+    "destination": {
+      "title": "Mari ichatumirwa kunzvimbo iyi",
+      "description": "Kero yako yeTaproot yakabva paNostr."
+    },
+    "phrase": {
+      "title": "Mutsara wekugarisa",
+      "description": "Isa mutsara wekugarisa wemashoko gumi nemaviri kubva muchikwama chako chekare.",
+      "checkingRelays": "Kutarisa marelays ako kuti tiwane backup yakavharirwa nekiyi…",
+      "backupFoundTitle": "Backup yawanikwa pamarelays ako",
+      "backupFoundDesc": "Takawana backup yakavharirwa nekiyi yemutsara wekugarisa wechikwama chako chekare yakatumirwa kubva paakaundi ino.",
+      "decryptAndUse": "Vhura uchishandise",
+      "placeholder": "shoko1 shoko2 shoko3 …",
+      "warning": "Isa chete mutsara wekugarisa wamunovimba nawo. Ani naani anewo mutsara uyu anogona kushandisa mari. Kutumira kana kwapera, idzima panzvimbo dzese pawakaikopa.",
+      "sweepButton": "Tumira mari kukero yangu yeBitcoin"
+    },
+    "sweeping": {
+      "working": "Inoshanda…",
+      "dontClose": "Usavhare tabhu ino. Izvi zvinogona kutora kanosvika neminiti chikwama chekare chichiita synchronization uye zvinoitwa zvichitumirwa."
+    },
+    "success": {
+      "title": "Kugarisa kwapera",
+      "sent": "Yatumira {{sats}} sats kukero yako yeBitcoin.",
+      "viewTransaction": "Tarisa chinoitwa"
+    },
+    "error": {
+      "title": "Kugarisa kwakundikana",
+      "tryAgain": "Edzazve"
+    },
+    "errors": {
+      "noNip44": "Musainiri wako haatsigire kuvhura kweNIP-44 kunodiwa kuverenga backup yerelay. Isa zvako mutsara wekugarisa wemashoko gumi nemaviri nemaoko.",
+      "decryptFailed": "Hatina kukwanisa kuvhura backup yerelay. Isa zvako mutsara wekugarisa wemashoko gumi nemaviri nemaoko.",
+      "decryptGeneric": "Kuvhura backup yerelay kwakundikana.",
+      "invalidWordCount": "Mutsara wekugarisa unofanira kuva nemashoko gumi nemaviri kana makumi maviri nemana.",
+      "noBalance": "Chikwama chako chekare hachina bharanzi inogona kushandiswa. Hapana chinhu chekuti chigariswe.",
+      "sweepGeneric": "Kugarisa kwakundikana. Ndapota edzazve."
+    },
+    "progress": {
+      "loadingSdk": "Kuloda SDK yechikwama…",
+      "connecting": "Kubatanidza kuchikwama chako chekare…",
+      "checkingBalance": "Kutarisa bharanzi…",
+      "preparingTransfer": "Kugadzirira kutumira {{sats}} sats…",
+      "broadcasting": "Kuparadzira chinoitwa…"
+    },
+    "toast": {
+      "backupLoadedTitle": "Backup yaloda",
+      "backupLoadedDesc": "Mutsara wekugarisa wakavhurwa kubva pamarelays ako."
+    }
   }
 }

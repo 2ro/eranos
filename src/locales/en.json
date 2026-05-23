@@ -591,5 +591,64 @@
       "silentBadge": "silent",
       "silentDetectedTitle": "Detected via BIP-352 silent payment scan"
     }
+  },
+  "walletRecovery": {
+    "seoTitle": "Recover Old Wallet",
+    "seoDescription": "Recover funds from a previous Lightning wallet and transfer them to your Nostr-derived Bitcoin address.",
+    "title": "Recover Old Wallet",
+    "heading": "Recover your old wallet",
+    "subheading": "If you previously held funds in the Lightning wallet, you can sweep them to your Nostr-derived Bitcoin address. Your old wallet is not restored — this is a one-time, one-way transfer.",
+    "backToWallet": "Back to wallet",
+    "loggedOut": {
+      "title": "Log in to recover",
+      "description": "Log in with the Nostr identity that owned the old Lightning wallet so the funds can be swept to its Bitcoin address."
+    },
+    "destination": {
+      "title": "Funds will be sent to",
+      "description": "Your Nostr-derived Taproot address."
+    },
+    "phrase": {
+      "title": "Recovery phrase",
+      "description": "Paste the 12-word recovery phrase from your old wallet.",
+      "checkingRelays": "Checking your relays for an encrypted backup…",
+      "backupFoundTitle": "Backup found on your relays",
+      "backupFoundDesc": "We found an encrypted backup of your old wallet's recovery phrase published from this account.",
+      "decryptAndUse": "Decrypt and use it",
+      "placeholder": "word1 word2 word3 …",
+      "warning": "Only paste a recovery phrase you trust. Anyone with this phrase can spend the funds. After the sweep completes, delete it from any place you copied it from.",
+      "sweepButton": "Sweep funds to my Bitcoin address"
+    },
+    "sweeping": {
+      "working": "Working…",
+      "dontClose": "Don't close this tab. This can take up to a minute while the old wallet syncs and the transaction is broadcast."
+    },
+    "success": {
+      "title": "Recovery complete",
+      "sent": "Sent {{sats}} sats to your Bitcoin address.",
+      "viewTransaction": "View transaction"
+    },
+    "error": {
+      "title": "Recovery failed",
+      "tryAgain": "Try again"
+    },
+    "errors": {
+      "noNip44": "Your signer does not support NIP-44 decryption, which is required to read the relay backup. Paste your 12-word recovery phrase manually instead.",
+      "decryptFailed": "Could not decrypt the relay backup. Paste your 12-word recovery phrase manually instead.",
+      "decryptGeneric": "Failed to decrypt relay backup.",
+      "invalidWordCount": "Recovery phrase must be 12 or 24 words.",
+      "noBalance": "Your old wallet has no spendable balance. There is nothing to recover.",
+      "sweepGeneric": "Recovery failed. Please try again."
+    },
+    "progress": {
+      "loadingSdk": "Loading wallet SDK…",
+      "connecting": "Connecting to your old wallet…",
+      "checkingBalance": "Checking balance…",
+      "preparingTransfer": "Preparing transfer of {{sats}} sats…",
+      "broadcasting": "Broadcasting transaction…"
+    },
+    "toast": {
+      "backupLoadedTitle": "Backup loaded",
+      "backupLoadedDesc": "Recovery phrase decrypted from your relays."
+    }
   }
 }
