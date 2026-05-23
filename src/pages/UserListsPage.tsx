@@ -24,7 +24,6 @@ import {
 import {
   Dialog, DialogContent, DialogDescription, DialogTitle, DialogTrigger,
 } from '@/components/ui/dialog';
-import { IntroImage } from '@/components/IntroImage';
 import { PageHeader } from '@/components/PageHeader';
 import { useAppContext } from '@/hooks/useAppContext';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
@@ -234,14 +233,11 @@ export function UserListsPage() {
 
       <div className="p-4">
         {/* Intro block */}
-        <div className="flex items-center gap-4 px-3 pt-2 pb-4">
-          <IntroImage src="/lists-intro.png" />
-          <div className="min-w-0">
-            <h2 className="text-sm font-semibold">Lists</h2>
-            <p className="text-xs text-muted-foreground mt-1 leading-relaxed">
-              Group people into named lists. Use any list as the source for a custom feed, or filter searches by list members.
-            </p>
-          </div>
+        <div className="px-3 pt-2 pb-4">
+          <h2 className="text-sm font-semibold">Lists</h2>
+          <p className="text-xs text-muted-foreground mt-1 leading-relaxed">
+            Group people into named lists. Use any list as the source for a custom feed, or filter searches by list members.
+          </p>
         </div>
 
         {/* Create new list */}

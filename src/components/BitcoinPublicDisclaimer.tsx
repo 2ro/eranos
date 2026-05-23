@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import { AlertTriangle } from 'lucide-react';
 
 import { Alert, AlertDescription } from '@/components/ui/alert';
@@ -41,6 +42,14 @@ interface BitcoinPublicDisclaimerProps {
    * Defaults to `true` for backwards compatibility.
    */
   includeCashOutAdvice?: boolean;
+  /**
+   * Override the popover body. When set, replaces the entire "Bitcoin
+   * is a public ledger…" paragraph (including the cash-out advice). Use
+   * when the calling surface has a meaningfully different audience —
+   * e.g. a campaign *creator* configuring a receive address, vs. the
+   * sender flow this component was originally written for.
+   */
+  popoverText?: ReactNode;
 }
 
 /**
@@ -56,6 +65,7 @@ export function BitcoinPublicDisclaimer({
   leadText = 'Money you send is public and can be traced back to you.',
   tone = 'destructive',
   includeCashOutAdvice = true,
+  popoverText,
 }: BitcoinPublicDisclaimerProps) {
   const showCheckbox = onAcknowledgedChange !== undefined;
   const isSoft = tone === 'soft';
@@ -67,7 +77,12 @@ export function BitcoinPublicDisclaimer({
       role={isSoft ? 'note' : 'alert'}
       className={cn(
         isSoft
-          ? 'border-amber-300/60 bg-amber-50 text-amber-900 dark:border-amber-500/30 dark:bg-amber-500/10 dark:text-amber-100'
+          // Use the project's foreground token (not raw amber-900) so
+          // the text always contrasts against the page in both light
+          // and dark themes. The faint amber tint keeps the
+          // "informational notice" cue without leaning on hard-coded
+          // amber text that disappears on the wrong backdrop.
+          ? 'border-amber-500/30 bg-amber-500/10 text-foreground'
           : 'border-destructive/50 bg-destructive/5 text-destructive dark:border-destructive',
       )}
     >
@@ -88,11 +103,15 @@ export function BitcoinPublicDisclaimer({
               </button>
             </PopoverTrigger>
             <PopoverContent side="top" align="start" className="w-72 text-xs leading-relaxed">
-              Bitcoin is a public ledger. Transactions you send can
-              be traced back to you forever, even after being
-              exchanged by multiple people. Send it only to those
-              you wish to support publicly
-              {includeCashOutAdvice ? ', or cash out at an exchange.' : '.'}
+              {popoverText ?? (
+                <>
+                  Bitcoin is a public ledger. Transactions you send can
+                  be traced back to you forever, even after being
+                  exchanged by multiple people. Send it only to those
+                  you wish to support publicly
+                  {includeCashOutAdvice ? ', or cash out at an exchange.' : '.'}
+                </>
+              )}
             </PopoverContent>
           </Popover>
         </p>

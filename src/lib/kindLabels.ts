@@ -295,7 +295,6 @@ export const KIND_LABELS: Record<number, string> = {
   // NIP-23
   30023: 'Article',
   30024: 'Draft long-form content',
-  30223: 'Campaign',
   // NIP-30
   30030: 'Emoji set',
   // NKBIP-01
@@ -360,6 +359,8 @@ export const KIND_LABELS: Record<number, string> = {
   // Corny Chat
   32388: 'User room favorites',
   33388: 'High scores',
+  // Agora
+  33863: 'Campaign',
   // NIP-71
   34235: 'Addressable video',
   34236: 'Addressable short video',

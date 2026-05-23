@@ -3,77 +3,65 @@ import { nip19 } from 'nostr-tools';
 
 import { COUNTRIES } from '@/lib/countries';
 import { parseCountryIdentifier } from '@/lib/countryIdentifiers';
+import { validateBitcoinAddress } from '@/lib/bitcoin';
 
-/** Addressable kind number for fundraising campaigns (see NIP.md). */
-export const CAMPAIGN_KIND = 30223;
+/**
+ * Addressable kind number for fundraising campaigns (see NIP.md, Kind 33863).
+ *
+ * Campaigns are self-authored — the event author owns the wallet declared
+ * in the `w` tag and is the sole beneficiary of donations. There is no
+ * recipient list, no split logic, and no on-behalf-of authorship.
+ */
+export const CAMPAIGN_KIND = 33863;
 
-/** Canonical category slugs shown in the create-campaign form. */
-export const CAMPAIGN_CATEGORIES = [
-  'human-rights',
-  'civil-liberties',
-  'democracy',
-  'political-prisoners',
-  'legal-defense',
-  'independent-media',
-  'humanitarian-aid',
-  'emergency-relief',
-  'education',
-  'community',
-  'medical-aid',
-  'other',
-] as const;
+/**
+ * Two ways a campaign can accept donations, distinguished by the `w` tag's
+ * bech32(m) prefix:
+ *
+ * - **`onchain`** — the wallet is a public mainnet on-chain bech32(m)
+ *   address (`bc1q…` segwit v0 or `bc1p…` Taproot). Donations are
+ *   traceable; clients show progress, totals, and recent donations.
+ * - **`sp`** — the wallet is a BIP-352 silent-payment code (`sp1…`).
+ *   Donations are unlinkable by design; clients MUST hide all aggregate
+ *   UI and MUST NOT publish donation receipts.
+ */
+export type CampaignWalletMode = 'onchain' | 'sp';
 
-export type CampaignCategory = typeof CAMPAIGN_CATEGORIES[number];
+/** Parsed wallet endpoint declared by a campaign's `w` tag. */
+export interface CampaignWallet {
+  /** Raw bech32(m) string as it appears in the `w` tag. */
+  value: string;
+  /** Mode derived from the prefix. */
+  mode: CampaignWalletMode;
+}
 
-/** Human-readable labels for category slugs. */
-export const CAMPAIGN_CATEGORY_LABELS: Record<CampaignCategory, string> = {
-  'human-rights': 'Human Rights',
-  'civil-liberties': 'Civil Liberties',
-  democracy: 'Democracy & Free Elections',
-  'political-prisoners': 'Political Prisoners',
-  'legal-defense': 'Legal Defense',
-  'independent-media': 'Independent Media',
-  'humanitarian-aid': 'Humanitarian Aid',
-  'emergency-relief': 'Emergency Relief',
-  education: 'Education & Training',
-  community: 'Community Organizing',
-  'medical-aid': 'Medical Aid',
-  other: 'Other',
-};
-
-const LEGACY_CAMPAIGN_CATEGORY_ALIASES: Record<string, CampaignCategory> = {
-  medical: 'medical-aid',
-  emergency: 'emergency-relief',
-  animals: 'humanitarian-aid',
-  sports: 'community',
-  creative: 'community',
-  business: 'community',
-  faith: 'community',
-  memorial: 'other',
-};
-
-/** A 64-character lowercase hex string (Nostr pubkey or event id). */
-const HEX_64_RE = /^[0-9a-f]{64}$/;
-
-/** A campaign recipient parsed from a single `p` tag. */
-export interface CampaignRecipient {
-  /** Lowercase hex pubkey. */
-  pubkey: string;
-  /** Optional relay hint provided in the `p` tag. */
-  relay?: string;
-  /** Positive split weight. Defaults to 1 when the `p` tag does not supply one. */
-  weight: number;
+/**
+ * NIP-92 imeta block parsed from a campaign event. Pairs with the
+ * `banner` tag (`url` MUST match the banner URL — clients ignore an
+ * imeta whose URL does not match).
+ */
+export interface CampaignBannerImeta {
+  url: string;
+  /** MIME type, e.g. `image/jpeg`. */
+  m?: string;
+  /** SHA-256 of the file (lowercase hex). */
+  x?: string;
+  /** `WIDTHxHEIGHT` as published, kept verbatim. */
+  dim?: string;
+  blurhash?: string;
+  /** Accessibility alt text for the banner (distinct from event-level NIP-31 alt). */
+  alt?: string;
 }
 
 /** A fully-parsed campaign with everything the UI needs. */
 export interface ParsedCampaign {
   /** The original event. */
   event: NostrEvent;
-  /** Campaign creator's hex pubkey. */
+  /** Campaign creator's hex pubkey (the beneficiary). */
   pubkey: string;
   /** The campaign's `d` tag (slug). */
   identifier: string;
-  /** Addressable coordinate `30223:<pubkey>:<d>`. */
+  /** Addressable coordinate `33863:<pubkey>:<d>`. */
   aTag: string;
   /** Campaign title. */
   title: string;
@@ -81,31 +69,20 @@ export interface ParsedCampaign {
   summary: string;
   /** Markdown story (the event content). */
   story: string;
-  /** Sanitized HTTPS cover image URL, or `undefined` if missing/invalid. */
-  image?: string;
-  /** Category slug from the first `t` tag matching a known category, or `undefined`. */
-  category?: CampaignCategory;
-  /** Campaign tags parsed from all `t` tags, in event order. */
-  tags: string[];
-  /** Goal in satoshis, or `undefined` if not set. */
-  goalSats?: number;
+  /** Sanitized HTTPS banner URL, or `undefined` if missing/invalid. */
+  banner?: string;
+  /** NIP-92 imeta for the banner. Only present when the imeta's `url` matches the banner. */
+  bannerImeta?: CampaignBannerImeta;
+  /** Bitcoin wallet endpoint (required). */
+  wallet: CampaignWallet;
+  /** Fundraising goal in **integer US Dollars**, or `undefined` if not set. */
+  goalUsd?: number;
   /** Deadline (Unix seconds), or `undefined` if not set. */
   deadline?: number;
-  /** Human-readable location string. */
-  location?: string;
   /** ISO 3166-1 alpha-2 country code parsed from a NIP-73 `i` tag. */
   countryCode?: string;
-  /** Validated recipient list (always at least one). */
-  recipients: CampaignRecipient[];
   /** Created-at from the event. */
   createdAt: number;
-  /**
-   * True when the creator has marked the campaign closed via
-   * `["status", "archived"]`. Archived campaigns are hidden from main
-   * listings but still load by direct link so existing donors can find
-   * them and donation history is preserved.
-   */
-  archived: boolean;
 }
 
 /** Returns the first value of a tag, or undefined. */
@@ -130,29 +107,81 @@ function getCountryCode(event: NostrEvent): string | undefined {
   return undefined;
 }
 
-function getCampaignTags(event: NostrEvent): string[] {
-  const seen = new Set<string>();
-  const tags: string[] = [];
-  for (const [name, value] of event.tags) {
-    if (name !== 't' || typeof value !== 'string') continue;
-    const tag = value.trim();
-    if (!tag || seen.has(tag)) continue;
-    seen.add(tag);
-    tags.push(tag);
+/**
+ * Parse a campaign wallet endpoint, returning the parsed wallet on success
+ * or `null` if the string is missing, malformed, or for a network we
+ * don't accept (testnet, regtest, etc.).
+ *
+ * Mode is inferred from the bech32 HRP/prefix:
+ *
+ * - `bc1q…` / `bc1p…` → mainnet on-chain (validated via @scure/btc-signer).
+ * - `sp1…` → BIP-352 silent-payment code (validated via prefix + bech32m
+ *   checksum at the donor's wallet when it derives the payment output).
+ *
+ * Any other prefix (`tb1…`, `bcrt1…`, `tsp1…`, `lnbc…`, etc.) is rejected.
+ */
+export function parseCampaignWallet(value: string | undefined): CampaignWallet | null {
+  if (typeof value !== 'string') return null;
+  const trimmed = value.trim();
+  if (!trimmed) return null;
+
+  // On-chain mainnet: bc1q (segwit v0) or bc1p (Taproot v1).
+  if (/^bc1[qp]/i.test(trimmed)) {
+    if (!validateBitcoinAddress(trimmed)) return null;
+    return { value: trimmed, mode: 'onchain' };
   }
-  return tags;
+
+  // Silent payments: sp1 followed by bech32m payload (mainnet only).
+  if (/^sp1[02-9ac-hj-np-z]+$/i.test(trimmed)) {
+    // @scure/btc-signer's address decoder doesn't currently parse BIP-352
+    // codes, so we accept any bech32m-shaped sp1 string. The checksum is
+    // verified by the donor's wallet when it derives the payment output; an
+    // invalid code there simply fails the donation flow.
+    return { value: trimmed, mode: 'sp' };
+  }
+
+  return null;
 }
 
 /**
- * Parses a kind 30223 event into a strongly-typed campaign, or returns
- * `null` if the event is missing required fields (title, `d` tag, or at
- * least one valid recipient).
- *
- * `p` tag rules:
- * - 2nd element MUST be a 64-char lowercase hex pubkey.
- * - 3rd element is treated as a relay hint when it looks like a relay URL.
- * - 4th element is a positive decimal weight; missing/invalid -> 1.
- * - Duplicate pubkeys collapse to the first occurrence.
+ * Parse the NIP-92 `imeta` tag whose `url` matches the campaign's banner.
+ * Returns `undefined` if no matching imeta is found.
+ */
+function getBannerImeta(event: NostrEvent, bannerUrl: string | undefined): CampaignBannerImeta | undefined {
+  if (!bannerUrl) return undefined;
+
+  for (const tag of event.tags) {
+    if (tag[0] !== 'imeta') continue;
+    // Each entry after the tag name is a space-separated `key value` pair.
+    const fields: Record<string, string> = {};
+    for (let i = 1; i < tag.length; i++) {
+      const entry = tag[i];
+      if (typeof entry !== 'string') continue;
+      const spaceIdx = entry.indexOf(' ');
+      if (spaceIdx <= 0) continue;
+      const key = entry.slice(0, spaceIdx);
+      const val = entry.slice(spaceIdx + 1);
+      fields[key] = val;
+    }
+    if (fields.url !== bannerUrl) continue;
+
+    return {
+      url: fields.url,
+      m: fields.m,
+      x: fields.x,
+      dim: fields.dim,
+      blurhash: fields.blurhash,
+      alt: fields.alt,
+    };
+  }
+
+  return undefined;
+}
+
+/**
+ * Parses a kind 33863 event into a strongly-typed campaign, or returns
+ * `null` if the event is missing a required field (kind, `d`, `title`, or
+ * a valid `w` wallet endpoint).
  */
 export function parseCampaign(event: NostrEvent): ParsedCampaign | null {
   if (event.kind !== CAMPAIGN_KIND) return null;
@@ -161,49 +190,15 @@ export function parseCampaign(event: NostrEvent): ParsedCampaign | null {
   const title = getTag(event, 'title');
   if (!identifier || !title) return null;
 
-  const seen = new Set<string>();
-  const recipients: CampaignRecipient[] = [];
-  for (const tag of event.tags) {
-    if (tag[0] !== 'p') continue;
-    const pubkey = tag[1];
-    if (typeof pubkey !== 'string' || !HEX_64_RE.test(pubkey)) continue;
-    if (seen.has(pubkey)) continue;
-    seen.add(pubkey);
+  const wallet = parseCampaignWallet(getTag(event, 'w'));
+  if (!wallet) return null;
 
-    const maybeRelay = typeof tag[2] === 'string' && tag[2].startsWith('ws') ? tag[2] : undefined;
-    const rawWeight = typeof tag[3] === 'string' ? Number(tag[3]) : NaN;
-    const weight = Number.isFinite(rawWeight) && rawWeight > 0 ? rawWeight : 1;
-
-    recipients.push({ pubkey, relay: maybeRelay, weight });
-  }
-
-  if (recipients.length === 0) return null;
-
-  // Category from the first `t` tag whose value is a recognized slug.
-  let category: CampaignCategory | undefined;
-  for (const [name, value] of event.tags) {
-    if (name !== 't' || typeof value !== 'string') continue;
-    if ((CAMPAIGN_CATEGORIES as readonly string[]).includes(value)) {
-      category = value as CampaignCategory;
-      break;
-    }
-    const legacyCategory = LEGACY_CAMPAIGN_CATEGORY_ALIASES[value];
-    if (legacyCategory) {
-      category = legacyCategory;
-      break;
-    }
-  }
-
-  // Image — only accept https URLs. We do the formal sanitizeUrl pass at the
-  // render site (since this lib runs in tests without DOM); strip non-https here.
-  const rawImage = getTag(event, 'image');
-  const image = rawImage && /^https:\/\//i.test(rawImage) ? rawImage : undefined;
-
-  // Status tag. We only recognize `archived` today; any other value is
-  // ignored so future statuses (e.g. `paused`, `funded`) don't accidentally
-  // get treated as archived.
-  const archived = getTag(event, 'status') === 'archived';
-  const tags = getCampaignTags(event);
+  // Banner — only accept https URLs. Formal sanitizeUrl pass happens at
+  // the render site (this lib runs in tests without DOM); strip non-https
+  // here so the parsed value is safe to interpolate into a fetch().
+  const rawBanner = getTag(event, 'banner');
+  const banner = rawBanner && /^https:\/\//i.test(rawBanner) ? rawBanner : undefined;
+  const bannerImeta = getBannerImeta(event, banner);
 
   return {
     event,
@@ -213,117 +208,21 @@ export function parseCampaign(event: NostrEvent): ParsedCampaign | null {
     title: title.trim(),
     summary: getTag(event, 'summary')?.trim() ?? '',
     story: event.content,
-    image,
-    category,
-    tags,
-    goalSats: parsePositiveInt(getTag(event, 'goal')),
+    banner,
+    bannerImeta,
+    wallet,
+    goalUsd: parsePositiveInt(getTag(event, 'goal')),
     deadline: parsePositiveInt(getTag(event, 'deadline')),
-    location: getTag(event, 'location')?.trim() || undefined,
     countryCode: getCountryCode(event),
-    recipients,
     createdAt: event.created_at,
-    archived,
   };
 }
 
-/** Human display for a campaign's structured country, falling back to legacy location text. */
+/** Human display for a campaign's country code, including the flag emoji. */
 export function getCampaignCountryLabel(campaign: ParsedCampaign): string | undefined {
   const country = campaign.countryCode ? COUNTRIES[campaign.countryCode] : undefined;
-  if (country) return `${country.flag} ${country.name}`;
-  return campaign.location;
-}
-
-export function getCampaignPrimaryTagLabel(campaign: ParsedCampaign): string | undefined {
-  const firstTag = campaign.tags[0] ?? campaign.category;
-  if (!firstTag) return undefined;
-  if ((CAMPAIGN_CATEGORIES as readonly string[]).includes(firstTag)) {
-    return CAMPAIGN_CATEGORY_LABELS[firstTag as CampaignCategory];
-  }
-  const legacyCategory = LEGACY_CAMPAIGN_CATEGORY_ALIASES[firstTag];
-  if (legacyCategory) return CAMPAIGN_CATEGORY_LABELS[legacyCategory];
-  return firstTag.replace(/-/g, ' ').replace(/\b\w/g, (char) => char.toUpperCase());
-}
-
-/** Output of {@link splitDonation}: per-recipient amounts in sats. */
-export interface DonationSplit {
-  pubkey: string;
-  weight: number;
-  /** Whole satoshis allocated to this recipient. */
-  amountSats: number;
-}
-
-/**
- * Splits a donation across the campaign's recipients according to each
- * recipient's weight (defaulting to equal shares when weights are uniform).
- *
- * Rules:
- * 1. Each recipient's share is `floor(totalSats * weight / sumOfWeights)`.
- * 2. Any rounding remainder is appended to the recipient with the largest
- *    weight (ties broken by original `p` tag order) so the entire donation
- *    reaches the campaign.
- * 3. Self-donations (recipient pubkey equals donor pubkey) are dropped from
- *    the output. The donor's share would be a no-op output paying their own
- *    Taproot address and only inflates the on-chain fee.
- *
- * Throws if `totalSats` is not a positive finite integer, or if there are no
- * non-self recipients.
- */
-export function splitDonation(
-  recipients: CampaignRecipient[],
-  totalSats: number,
-  donorPubkey: string | undefined,
-): DonationSplit[] {
-  if (!Number.isFinite(totalSats) || !Number.isInteger(totalSats) || totalSats <= 0) {
-    throw new Error('Donation amount must be a positive integer (satoshis).');
-  }
-
-  const payable = recipients.filter((r) => r.pubkey !== donorPubkey);
-  if (payable.length === 0) {
-    throw new Error('No eligible recipients (donor cannot donate to themselves).');
-  }
-
-  const totalWeight = payable.reduce((sum, r) => sum + r.weight, 0);
-  if (totalWeight <= 0) {
-    throw new Error('Recipient weights must sum to a positive number.');
-  }
-
-  const splits: DonationSplit[] = payable.map((r) => ({
-    pubkey: r.pubkey,
-    weight: r.weight,
-    amountSats: Math.floor((totalSats * r.weight) / totalWeight),
-  }));
-
-  const allocated = splits.reduce((sum, s) => sum + s.amountSats, 0);
-  const remainder = totalSats - allocated;
-  if (remainder > 0) {
-    let largestIdx = 0;
-    for (let i = 1; i < splits.length; i++) {
-      if (splits[i].weight > splits[largestIdx].weight) largestIdx = i;
-    }
-    splits[largestIdx].amountSats += remainder;
-  }
-
-  return splits;
-}
-
-/**
- * Computes the smallest donation total (in sats) where every recipient
- * receives at least `dustLimit` sats. Used to surface a helpful minimum
- * before the donor tries to sign a PSBT that would throw on dust.
- */
-export function minDonationForSplit(
-  recipients: CampaignRecipient[],
-  donorPubkey: string | undefined,
-  dustLimit: number,
-): number {
-  const payable = recipients.filter((r) => r.pubkey !== donorPubkey);
-  if (payable.length === 0) return dustLimit;
-
-  const totalWeight = payable.reduce((sum, r) => sum + r.weight, 0);
-  const smallestShare = Math.min(...payable.map((r) => r.weight));
-  // Need: floor(T * smallestShare / totalWeight) >= dustLimit
-  // -> T >= ceil(dustLimit * totalWeight / smallestShare)
-  return Math.ceil((dustLimit * totalWeight) / smallestShare);
+  if (!country) return undefined;
+  return `${country.flag} ${country.name}`;
 }
 
 /** Encodes a campaign's addressable coordinate as a NIP-19 `naddr1...` string. */

@@ -60,9 +60,9 @@
     overflow-wrap: anywhere;
   }
   
-  /* FAB bottom offset: clears bottom nav + safe area inset on mobile */
+  /* FAB bottom offset: no bottom nav, only clear safe area on native shells. */
   .bottom-fab {
-    bottom: calc(1.5rem + var(--bottom-nav-height) + var(--safe-area-inset-bottom, env(safe-area-inset-bottom, 0px)));
+    bottom: calc(2rem + var(--safe-area-inset-bottom, env(safe-area-inset-bottom, 0px)));
   }
 
   /* Position above mobile bottom nav + safe area + arc overhang (28px) */
@@ -240,26 +240,6 @@
 
 .animate-ping-3 {
   animation: ping-3 4s ease-out forwards;
-}
-
-/* Slow continuous pulse for nagging buttons */
-@keyframes pulse-slow {
-  0%, 100% { transform: scale(1); opacity: 0.5; }
-  50% { transform: scale(1.8); opacity: 0; }
-}
-
-.animate-pulse-slow {
-  animation: pulse-slow 2.5s ease-in-out infinite;
-}
-
-/* Eerie sigil glow pulse */
-@keyframes sigil-glow {
-  0%, 100% { opacity: 0.12; filter: drop-shadow(0 0 4px hsl(var(--primary) / 0.3)); }
-  50%       { opacity: 0.28; filter: drop-shadow(0 0 12px hsl(var(--primary) / 0.6)) drop-shadow(0 0 24px hsl(var(--primary) / 0.25)); }
-}
-
-.animate-sigil-glow {
-  animation: sigil-glow 4s ease-in-out infinite;
 }
 
 /* Eyeball blink animation - eyelid sweeps down then back up */
@@ -724,7 +704,8 @@
 }
 
 /* Slow Ken-Burns-style pan for full-bleed hero images. The image is
-   oversized (scale 1.12) so the translation never reveals the edge. */
+   oversized (scale 1.12) so the translation never reveals the edge.
+   Used by HeroBanner on Communities/Actions/Guide pages. */
 @keyframes heroPanRight {
   0%   { transform: scale(1.12) translateX(-1.5%); }
   50%  { transform: scale(1.12) translateX(1.5%); }
@@ -738,18 +719,37 @@
 .hero-pan-right { animation: heroPanRight 28s ease-in-out infinite; }
 .hero-pan-left  { animation: heroPanLeft 28s ease-in-out infinite; }
 
-/* Slow breathing glow used on the hero globe's outer halo so the beacon
-   feels alive rather than statically pasted. The radius itself doesn't
-   change — only opacity — so the layout stays rock-stable. Range is
-   intentionally narrow + low so the halo is felt, not seen. */
-@keyframes heroGlobeHaloBreath {
-  0%   { opacity: 0.32; }
-  50%  { opacity: 0.55; }
-  100% { opacity: 0.32; }
+/* Lightning-arc flow on the home hero. Each path is dashed and the
+   dash offset animates by exactly one full dash period, so the loop
+   point is visually identical to the start point — no snap, no
+   visible restart. Dash sizes are in screen pixels because the arcs
+   use `vector-effect: non-scaling-stroke`. */
+@keyframes heroArcFlow {
+  0%   { stroke-dashoffset: 0; }
+  100% { stroke-dashoffset: -16; }
 }
-.hero-globe-halo-breath { animation: heroGlobeHaloBreath 6.5s ease-in-out infinite; }
+.hero-arc-flow {
+  stroke-dasharray: 6 10;
+  animation: heroArcFlow 2.4s linear infinite;
+}
+
+/* City-node pulse used on the home hero. The dot itself doesn't move;
+   we just breathe the halo's opacity so the location reads as a live
+   beacon. Offsets are staggered per-node from the JSX so the field
+   pulses organically rather than in lockstep. */
+@keyframes heroNodePulse {
+  0%   { opacity: 0.35; transform: scale(0.85); }
+  50%  { opacity: 0.95; transform: scale(1.15); }
+  100% { opacity: 0.35; transform: scale(0.85); }
+}
+.hero-node-pulse {
+  transform-origin: center;
+  transform-box: fill-box;
+  animation: heroNodePulse 3.2s ease-in-out infinite;
+}
 
 @media (prefers-reduced-motion: reduce) {
   .hero-pan-right, .hero-pan-left { animation: none; }
-  .hero-globe-halo-breath { animation: none; opacity: 0.42; }
+  .hero-arc-flow { animation: none; stroke-dasharray: none; }
+  .hero-node-pulse { animation: none; opacity: 0.7; }
 }

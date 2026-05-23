@@ -1,6 +1,7 @@
 import { Suspense, useCallback, useMemo, useRef, useState } from 'react';
 import { Link, Outlet } from 'react-router-dom';
 
+import { FloatingComposeButton } from '@/components/FloatingComposeButton';
 import { TopNav } from '@/components/TopNav';
 import { Skeleton } from '@/components/ui/skeleton';
 import {
@@ -48,7 +49,7 @@ function PageSkeleton() {
 function FundraiserLayoutInner() {
   const centerColumnRef = useRef<HTMLDivElement>(null);
   const [centerColumnEl, setCenterColumnEl] = useState<HTMLElement | null>(null);
-  const { noMaxWidth, wrapperClassName } = useLayoutSnapshot();
+  const { noMaxWidth, wrapperClassName, showFAB = false, fabKind = 1, fabHref, onFabClick, fabIcon, fabMenu } = useLayoutSnapshot();
 
   // Mobile drawer is owned by TopNav now, so consumers of `useOpenDrawer`
   // become no-ops. Keeping the context shape avoids touching every page that
@@ -83,6 +84,14 @@ function FundraiserLayoutInner() {
               </div>
             </Suspense>
 
+            {showFAB && (
+              <div className="fixed bottom-fab right-6 z-30 pointer-events-none sidebar:right-[max(1.5rem,calc((100vw-48rem)/2-7rem))]">
+                <div className="pointer-events-auto">
+                  <FloatingComposeButton kind={fabKind} href={fabHref} onFabClick={onFabClick} icon={fabIcon} menu={fabMenu} />
+                </div>
+              </div>
+            )}
+
             <SiteFooter />
           </div>
         </NavHiddenContext.Provider>
@@ -93,7 +102,7 @@ function FundraiserLayoutInner() {
 
 function SiteFooter() {
   return (
-    <footer className="border-t border-border bg-background mt-auto">
+    <footer className="bg-background mt-auto pt-12">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 py-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-muted-foreground">
         <span>&copy; {new Date().getFullYear()} Agora. Fundraisers on Nostr.</span>
         <nav className="flex items-center gap-5">

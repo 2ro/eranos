@@ -44,7 +44,12 @@ function parseSort(value: string | null): CampaignSort {
  * canonical URL stays clean. Useful for sharing search results.
  */
 export function AllCampaignsPage() {
-  useLayoutOptions({ rightSidebar: null });
+  // `noMaxWidth: true` drops MainLayout's default `sidebar:max-w-[600px]`
+  // cap so the campaign grid can spread to 3-4 columns on desktop, the
+  // same width budget the Pledge index gets. The inner `max-w-7xl`
+  // wrapper still keeps the content from sprawling on ultrawide
+  // monitors.
+  useLayoutOptions({ noMaxWidth: true, rightSidebar: null });
   const { config } = useAppContext();
 
   // URL state — sort and query live in the URL so results are shareable.
@@ -216,10 +221,13 @@ export function AllCampaignsPage() {
           </div>
         </div>
 
-        {/* Grid — capped at 2 columns per row regardless of viewport. */}
+        {/* Grid — widens to 3 columns at lg and 4 at xl so desktop users
+            can scan more campaigns at once, matching the Pledge index's
+            card density. Mobile and small tablets stay single / double
+            column so the cards keep their tappable size. */}
         {showSkeleton ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-            {Array.from({ length: 4 }).map((_, i) => (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+            {Array.from({ length: 8 }).map((_, i) => (
               <CampaignCardSkeleton key={i} />
             ))}
           </div>
@@ -265,7 +273,7 @@ export function AllCampaignsPage() {
             </CardContent>
           </Card>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
             {visible.map((campaign) => (
               <CampaignCard key={campaign.aTag} campaign={campaign} />
             ))}

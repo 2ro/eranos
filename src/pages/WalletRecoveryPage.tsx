@@ -261,8 +261,8 @@ export function WalletRecoveryPage() {
                 className="font-mono text-sm"
               />
 
-              <Alert variant="default" className="border-amber-500/50 bg-amber-500/5 text-amber-900 dark:text-amber-100">
-                <AlertTriangle className="size-4 !text-amber-500" />
+              <Alert variant="default" className="border-amber-300/60 bg-amber-50 text-amber-950 dark:border-amber-500/30 dark:bg-amber-950/50 dark:text-amber-100">
+                <AlertTriangle className="size-4 !text-amber-600 dark:!text-amber-400" />
                 <AlertDescription className="text-xs">
                   Only paste a recovery phrase you trust. Anyone with this phrase can spend the funds. After the sweep completes, delete it from any place you copied it from.
                 </AlertDescription>

@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback } from 'react';
+import { useState, useRef, useCallback, useMemo } from 'react';
 import { Heart } from 'lucide-react';
 import { useQueryClient } from '@tanstack/react-query';
 import { useNostr } from '@nostrify/react';
@@ -6,13 +6,15 @@ import { useNostr } from '@nostrify/react';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { QuickReactMenu } from '@/components/QuickReactMenu';
 import { RenderResolvedEmoji } from '@/components/CustomEmoji';
+import { useAppContext } from '@/hooks/useAppContext';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useUserReaction } from '@/hooks/useUserReaction';
 import { useNostrPublish } from '@/hooks/useNostrPublish';
+import type { Nip85EventStats } from '@/hooks/useNip85Stats';
 import { formatNumber } from '@/lib/formatNumber';
 import { impactLight } from '@/lib/haptics';
+import { invalidateEventStats } from '@/lib/invalidateEventStats';
 import { cn } from '@/lib/utils';
-import type { EventStats } from '@/hooks/useTrending';
 
 interface ReactionButtonProps {
   /** The event ID being reacted to. */
@@ -50,6 +52,12 @@ export function ReactionButton({
   const { nostr } = useNostr();
   const { mutate: publishEvent } = useNostrPublish();
   const queryClient = useQueryClient();
+  const { config } = useAppContext();
+  const statsPubkey = config.nip85StatsPubkey;
+  const statsKey = useMemo(
+    () => ['nip85-event-stats', eventId, statsPubkey] as const,
+    [eventId, statsPubkey],
+  );
   const [menuOpen, setMenuOpen] = useState(false);
   const closeTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const justClosedRef = useRef(false);
@@ -76,14 +84,14 @@ export function ReactionButton({
 
     // Snapshot for rollback
     const prevReaction = queryClient.getQueryData(['user-reaction', eventId]);
-    const prevStats = queryClient.getQueryData<EventStats>(['event-stats', eventId]);
+    const prevStats = queryClient.getQueryData<Nip85EventStats | null>(statsKey);
 
     // Optimistic update: clear reaction and decrement count
     queryClient.setQueryData(['user-reaction', eventId], null);
     if (prevStats) {
-      queryClient.setQueryData<EventStats>(['event-stats', eventId], {
+      queryClient.setQueryData<Nip85EventStats | null>(statsKey, {
         ...prevStats,
-        reactions: Math.max(0, prevStats.reactions - 1),
+        reactionCount: Math.max(0, prevStats.reactionCount - 1),
       });
     }
 
@@ -92,7 +100,7 @@ export function ReactionButton({
       {
         onSuccess: () => {
           setTimeout(() => {
-            queryClient.invalidateQueries({ queryKey: ['event-stats', eventId] });
+            invalidateEventStats(queryClient, eventId, statsPubkey);
             queryClient.invalidateQueries({ queryKey: ['event-interactions', eventId] });
             queryClient.invalidateQueries({ queryKey: ['user-reaction', eventId] });
           }, 3000);
@@ -101,12 +109,12 @@ export function ReactionButton({
           // Rollback
           queryClient.setQueryData(['user-reaction', eventId], prevReaction);
           if (prevStats) {
-            queryClient.setQueryData<EventStats>(['event-stats', eventId], prevStats);
+            queryClient.setQueryData<Nip85EventStats | null>(statsKey, prevStats);
           }
         },
       },
     );
-  }, [user, nostr, eventId, publishEvent, queryClient]);
+  }, [user, nostr, eventId, publishEvent, queryClient, statsPubkey, statsKey]);
 
   const handleMouseEnter = useCallback(() => {
     if (!user) return;
@@ -163,12 +171,12 @@ export function ReactionButton({
             if (hasReacted) return;
             impactLight();
             setMenuOpen(false);
-            const prevStats = queryClient.getQueryData<EventStats>(['event-stats', eventId]);
+            const prevStats = queryClient.getQueryData<Nip85EventStats | null>(statsKey);
             queryClient.setQueryData(['user-reaction', eventId], { content: '❤️' });
             if (prevStats) {
-              queryClient.setQueryData<EventStats>(['event-stats', eventId], {
+              queryClient.setQueryData<Nip85EventStats | null>(statsKey, {
                 ...prevStats,
-                reactions: prevStats.reactions + 1,
+                reactionCount: prevStats.reactionCount + 1,
               });
             }
             publishEvent(
@@ -180,7 +188,7 @@ export function ReactionButton({
               {
                 onSuccess: () => {
                   setTimeout(() => {
-                    queryClient.invalidateQueries({ queryKey: ['event-stats', eventId] });
+                    invalidateEventStats(queryClient, eventId, statsPubkey);
                     queryClient.invalidateQueries({ queryKey: ['event-interactions', eventId] });
                     queryClient.invalidateQueries({ queryKey: ['user-reaction', eventId] });
                   }, 3000);
@@ -188,7 +196,7 @@ export function ReactionButton({
                 onError: () => {
                   queryClient.setQueryData(['user-reaction', eventId], null);
                   if (prevStats) {
-                    queryClient.setQueryData<EventStats>(['event-stats', eventId], prevStats);
+                    queryClient.setQueryData<Nip85EventStats | null>(statsKey, prevStats);
                   }
                 },
               },
@@ -214,8 +222,6 @@ export function ReactionButton({
             <span className={cn('tabular-nums', variant === 'chip' ? '' : 'text-sm', hasReacted && 'text-pink-500')}>
               {formatNumber(reactionCount)}
             </span>
-          ) : variant === 'chip' ? (
-            <span className="hidden sm:inline">React</span>
           ) : null}
         </button>
       </PopoverTrigger>

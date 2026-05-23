@@ -1,6 +1,7 @@
 import { useMemo } from 'react';
+import type { ReactNode } from 'react';
 import { Link } from 'react-router-dom';
-import { CalendarClock, HandHeart, MapPin, Target, Users, Archive } from 'lucide-react';
+import { CalendarClock, EyeOff, HandHeart, MapPin, ShieldCheck, Target } from 'lucide-react';
 
 import { Badge } from '@/components/ui/badge';
 import { Card } from '@/components/ui/card';
@@ -15,9 +16,8 @@ import {
   type ParsedCampaign,
   encodeCampaignNaddr,
   getCampaignCountryLabel,
-  getCampaignPrimaryTagLabel,
 } from '@/lib/campaign';
-import { formatCampaignAmount } from '@/lib/formatCampaignAmount';
+import { formatCampaignAmount, formatUsdGoal, satsToUsd } from '@/lib/formatCampaignAmount';
 import { genUserName } from '@/lib/genUserName';
 import { sanitizeUrl } from '@/lib/sanitizeUrl';
 import { cn } from '@/lib/utils';
@@ -33,20 +33,32 @@ function formatDeadline(unixSeconds: number): { label: string; isPast: boolean }
   return { label: `${months} mo left`, isPast: false };
 }
 
-/** Short helper rendered both inline (cards) and in the detail page. */
+/**
+ * Short helper rendered both inline (cards) and in the detail page.
+ *
+ * Per NIP.md Kind 33863, the campaign **goal** is integer USD and the
+ * **raised** total is the sum of verified sats. We render both in the
+ * goal's unit (USD) for consistency, converting the sats total at view
+ * time using the live BTC price. While the price is loading the raised
+ * amount falls back to sats.
+ */
 export function CampaignProgress({
   raisedSats,
-  goalSats,
+  goalUsd,
   btcPrice,
   className,
 }: {
   raisedSats: number;
-  goalSats?: number;
+  goalUsd?: number;
   btcPrice?: number;
   className?: string;
 }) {
-  const hasGoal = !!goalSats && goalSats > 0;
-  const pct = hasGoal ? Math.min(100, Math.round((raisedSats / goalSats!) * 100)) : 0;
+  const hasGoal = !!goalUsd && goalUsd > 0;
+  const raisedUsd = satsToUsd(raisedSats, btcPrice);
+  const pct = hasGoal && raisedUsd !== undefined
+    ? Math.min(100, Math.round((raisedUsd / goalUsd!) * 100))
+    : 0;
+
   return (
     <div className={cn('space-y-1.5', className)}>
       {hasGoal && <Progress value={pct} className="h-2" />}
@@ -56,9 +68,34 @@ export function CampaignProgress({
           {!hasGoal && <span className="ml-1 font-normal text-muted-foreground">raised</span>}
         </span>
         {hasGoal && (
-          <span className="text-muted-foreground">of {formatCampaignAmount(goalSats!, btcPrice)} goal</span>
+          <span className="text-muted-foreground">of {formatUsdGoal(goalUsd!)} goal</span>
         )}
       </div>
+    </div>
+  );
+}
+
+/**
+ * Replaces {@link CampaignProgress} for silent-payment campaigns, where
+ * on-chain totals are unobservable by design. Shows the goal as a target
+ * (if set) but no progress bar or raised amount.
+ */
+export function CampaignPrivateNotice({
+  goalUsd,
+  className,
+}: {
+  goalUsd?: number;
+  className?: string;
+}) {
+  return (
+    <div className={cn('space-y-1.5 text-sm', className)}>
+      <div className="flex items-center gap-1.5 text-muted-foreground">
+        <ShieldCheck className="size-3.5" />
+        <span>Private campaign — totals are not public</span>
+      </div>
+      {goalUsd && goalUsd > 0 && (
+        <div className="text-xs text-muted-foreground">Target: {formatUsdGoal(goalUsd)}</div>
+      )}
     </div>
   );
 }
@@ -68,20 +105,22 @@ interface CampaignCardProps {
   /** Visual variant: `compact` for grid items, `featured` for hero placement. */
   variant?: 'compact' | 'featured';
   className?: string;
+  /** Optional footer affordance rendered opposite the author line. */
+  footerBadge?: ReactNode;
 }
 
 /**
  * Renders a single campaign as a clickable card. The whole card is a
  * `<Link>` to the campaign's naddr-based detail route.
  */
-export function CampaignCard({ campaign, variant = 'compact', className }: CampaignCardProps) {
+export function CampaignCard({ campaign, variant = 'compact', className, footerBadge }: CampaignCardProps) {
   const author = useAuthor(campaign.pubkey);
-  const { data: stats } = useCampaignDonations(campaign.aTag);
+  const { data: stats } = useCampaignDonations(campaign);
   const { data: btcPrice } = useBtcPrice();
   const { data: moderation } = useCampaignModeration();
 
   const naddr = useMemo(() => encodeCampaignNaddr(campaign), [campaign]);
-  const cover = sanitizeUrl(campaign.image);
+  const cover = sanitizeUrl(campaign.banner);
   const creatorName =
     author.data?.metadata?.display_name ||
     author.data?.metadata?.name ||
@@ -89,7 +128,7 @@ export function CampaignCard({ campaign, variant = 'compact', className }: Campa
   const deadline = campaign.deadline ? formatDeadline(campaign.deadline) : null;
   const raisedSats = stats?.totalSats ?? 0;
   const countryLabel = getCampaignCountryLabel(campaign);
-  const tagLabel = getCampaignPrimaryTagLabel(campaign);
+  const isSilentPayment = campaign.wallet.mode === 'sp';
 
   const isFeaturedVariant = variant === 'featured';
   const isApproved = moderation.approvedCoords.has(campaign.aTag);
@@ -129,29 +168,22 @@ export function CampaignCard({ campaign, variant = 'compact', className }: Campa
               <HandHeart className="size-12 text-primary/40" />
             </div>
           )}
-          {tagLabel && (
+          {isSilentPayment && (
             <Badge
               variant="secondary"
               className="absolute top-3 left-3 backdrop-blur bg-background/80 border-border/40"
             >
-              {tagLabel}
+              <ShieldCheck className="size-3.5 mr-1" />
+              Private
             </Badge>
           )}
           <div className="absolute top-3 right-3 flex items-center gap-2">
-            {campaign.archived && (
-              <Badge
-                variant="secondary"
-                className="backdrop-blur bg-background/85 border-border/40"
-              >
-                <Archive className="size-3.5 mr-1" />
-                Archived
-              </Badge>
-            )}
             {isHidden && (
               <Badge
                 variant="secondary"
                 className="backdrop-blur bg-destructive/15 text-destructive border-destructive/30"
               >
+                <EyeOff className="size-3.5 mr-1" />
                 Hidden
               </Badge>
             )}
@@ -190,16 +222,15 @@ export function CampaignCard({ campaign, variant = 'compact', className }: Campa
 
           <div className="flex-1" />
 
-          <CampaignProgress raisedSats={raisedSats} goalSats={campaign.goalSats} btcPrice={btcPrice} />
+          {isSilentPayment ? (
+            <CampaignPrivateNotice goalUsd={campaign.goalUsd} />
+          ) : (
+            <CampaignProgress raisedSats={raisedSats} goalUsd={campaign.goalUsd} btcPrice={btcPrice} />
+          )}
 
           {/* Meta row */}
           <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 text-xs text-muted-foreground pt-1">
-            <span className="inline-flex items-center gap-1.5">
-              <Users className="size-3.5" />
-              {campaign.recipients.length}{' '}
-              {campaign.recipients.length === 1 ? 'recipient' : 'recipients'}
-            </span>
-            {stats && stats.donorCount > 0 && (
+            {!isSilentPayment && stats && stats.donorCount > 0 && (
               <span className="inline-flex items-center gap-1.5">
                 <Target className="size-3.5" />
                 {stats.donorCount} {stats.donorCount === 1 ? 'donor' : 'donors'}
@@ -224,8 +255,11 @@ export function CampaignCard({ campaign, variant = 'compact', className }: Campa
             )}
           </div>
 
-          <div className="text-xs text-muted-foreground border-t border-border/60 pt-3 truncate">
-            by <span className="font-medium text-foreground">{creatorName}</span>
+          <div className="flex items-center justify-between gap-3 border-t border-border/60 pt-3 text-xs text-muted-foreground">
+            <div className="truncate">
+              by <span className="font-medium text-foreground">{creatorName}</span>
+            </div>
+            {footerBadge && <div className="shrink-0">{footerBadge}</div>}
           </div>
         </div>
       </Card>

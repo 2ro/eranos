@@ -8,11 +8,9 @@ import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useNostr } from '@nostrify/react';
-import { fetchFreshEvent } from '@/lib/fetchFreshEvent';
 import { useAuthors } from '@/hooks/useAuthors';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
-import { useFollowList } from '@/hooks/useFollowActions';
-import { useNostrPublish } from '@/hooks/useNostrPublish';
+import { useFollowActions, useFollowList } from '@/hooks/useFollowActions';
 import { useToast } from '@/hooks/useToast';
 import { genUserName } from '@/lib/genUserName';
 import { TEAM_SOAPBOX_PACK } from '@/lib/helpContent';
@@ -26,7 +24,7 @@ export function TeamSoapboxCard({ className }: { className?: string }) {
   const { nostr } = useNostr();
   const { user } = useCurrentUser();
   const { data: followList } = useFollowList();
-  const { mutateAsync: publishEvent } = useNostrPublish();
+  const { followMany } = useFollowActions();
   const { toast } = useToast();
 
   const [event, setEvent] = useState<NostrEvent | null>(null);
@@ -87,27 +85,7 @@ export function TeamSoapboxCard({ className }: { className?: string }) {
 
     setIsFollowingAll(true);
     try {
-      // 1. Fetch freshest kind 3 from relays (not cache)
-      const prev = await fetchFreshEvent(nostr, { kinds: [3], authors: [user.pubkey] });
-
-      // 2. Separate p-tags from non-p-tags to preserve relay hints, petnames, etc.
-      const existingPTags = prev?.tags.filter(([n]) => n === 'p') ?? [];
-      const nonPTags = prev?.tags.filter(([n]) => n !== 'p') ?? [];
-      const existingPubkeys = new Set(existingPTags.map(([, pk]) => pk));
-
-      // 3. Merge: add new pubkeys that aren't already followed
-      const newPTags = pubkeys
-        .filter((pk) => !existingPubkeys.has(pk))
-        .map((pk) => ['p', pk]);
-      const added = newPTags.length;
-
-      // 4. Publish with prev for published_at preservation
-      await publishEvent({
-        kind: 3,
-        content: prev?.content ?? '',
-        tags: [...nonPTags, ...existingPTags, ...newPTags],
-        prev: prev ?? undefined,
-      });
+      const added = await followMany(pubkeys);
 
       toast({
         title: 'Following Team Soapbox!',
@@ -125,7 +103,7 @@ export function TeamSoapboxCard({ className }: { className?: string }) {
     } finally {
       setIsFollowingAll(false);
     }
-  }, [user, event, pubkeys, nostr, publishEvent, toast]);
+  }, [user, event, pubkeys, followMany, toast]);
 
   if (loading) {
     return <TeamSoapboxCardSkeleton className={className} />;

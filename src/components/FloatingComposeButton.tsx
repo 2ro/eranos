@@ -1,6 +1,7 @@
 import { lazy, Suspense, useState } from 'react';
-import { Plus, Construction } from 'lucide-react';
+import { Construction } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { LogoIcon } from '@/components/icons/LogoIcon';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -41,26 +42,43 @@ export function FloatingComposeButton({ kind = 1, href, onFabClick, icon, menu }
     return null;
   }
 
-  const renderedIcon = icon ?? <Plus strokeWidth={4} size={16} />;
+  const hasCustomIcon = icon !== undefined;
+  const renderedIcon = icon;
+  const logoButtonClassName = "relative size-20 text-primary transition-transform hover:scale-105 active:scale-95 disabled:opacity-40 disabled:pointer-events-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 rounded-sm";
+  const logoButtonStyle = { filter: 'drop-shadow(0 3px 10px hsl(var(--primary) / 0.28))' };
 
   // ── Menu mode — anchor a Popover to the FAB itself ────────────────────────
   if (menu && menu.length > 0) {
     return (
       <Popover open={menuOpen} onOpenChange={setMenuOpen}>
         <PopoverTrigger asChild>
-          <button
-            type="button"
-            aria-label="Add"
-            aria-expanded={menuOpen}
-            aria-haspopup="menu"
-            className="relative size-16 transition-transform hover:scale-105 active:scale-95 disabled:opacity-40 disabled:pointer-events-none"
-            style={{ filter: 'drop-shadow(0 2px 8px hsl(var(--primary) / 0.25))' }}
-          >
-            <div className="absolute inset-0 bg-primary rounded-full" />
-            <span className="absolute inset-0 flex items-center justify-center text-primary-foreground">
-              {renderedIcon}
-            </span>
-          </button>
+          {hasCustomIcon ? (
+            <button
+              type="button"
+              aria-label="Add"
+              aria-expanded={menuOpen}
+              aria-haspopup="menu"
+              className="relative size-16 transition-transform hover:scale-105 active:scale-95 disabled:opacity-40 disabled:pointer-events-none"
+              style={{ filter: 'drop-shadow(0 2px 8px hsl(var(--primary) / 0.25))' }}
+            >
+              <div className="absolute inset-0 bg-primary rounded-full" />
+              <span className="absolute inset-0 flex items-center justify-center text-primary-foreground">
+                {renderedIcon}
+              </span>
+            </button>
+          ) : (
+            <button
+              type="button"
+              aria-label="Add"
+              aria-expanded={menuOpen}
+              aria-haspopup="menu"
+              className={logoButtonClassName}
+              style={logoButtonStyle}
+            >
+              <span className="absolute inset-[-8%] rounded-full bg-primary/15 blur-xl" aria-hidden />
+              <LogoIcon className="relative size-full" />
+            </button>
+          )}
         </PopoverTrigger>
         <PopoverContent
           side="top"
@@ -108,10 +126,23 @@ export function FloatingComposeButton({ kind = 1, href, onFabClick, icon, menu }
 
   return (
     <>
-      <FabButton
-        onClick={handleClick}
-        icon={renderedIcon}
-      />
+      {hasCustomIcon ? (
+        <FabButton
+          onClick={handleClick}
+          icon={renderedIcon}
+        />
+      ) : (
+        <button
+          type="button"
+          onClick={handleClick}
+          aria-label="Add"
+          className={logoButtonClassName}
+          style={logoButtonStyle}
+        >
+          <span className="absolute inset-[-8%] rounded-full bg-primary/15 blur-xl" aria-hidden />
+          <LogoIcon className="relative size-full" />
+        </button>
+      )}
 
       {/* Kind 1: Compose modal (lazy-loaded) */}
       {kind === 1 && composeOpen && (

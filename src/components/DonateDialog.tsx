@@ -1,13 +1,10 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Link } from 'react-router-dom';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import {
   AlertTriangle,
   ArrowUpRight,
   Check,
   ChevronLeft,
-  Copy,
-  ExternalLink,
   HandHeart,
   Heart,
   Loader2,
@@ -15,12 +12,12 @@ import {
   Sparkle,
   Sparkles,
   Star,
-  Wallet,
 } from 'lucide-react';
 
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { BitcoinPublicDisclaimer } from '@/components/BitcoinPublicDisclaimer';
 import { Button } from '@/components/ui/button';
+import { CampaignWalletDonatePanel } from '@/components/CampaignWalletDonatePanel';
 import {
   Dialog,
   DialogContent,
@@ -30,7 +27,6 @@ import {
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { QRCodeCanvas } from '@/components/ui/qrcode';
 import {
   Select,
   SelectContent,
@@ -41,7 +37,6 @@ import {
 import { Skeleton } from '@/components/ui/skeleton';
 import { Textarea } from '@/components/ui/textarea';
 import AuthDialog from '@/components/auth/AuthDialog';
-import { useAuthor } from '@/hooks/useAuthor';
 import { useAppContext } from '@/hooks/useAppContext';
 import { useBitcoinSigner } from '@/hooks/useBitcoinSigner';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
@@ -59,11 +54,8 @@ import {
   type FeeRates,
 } from '@/lib/bitcoin';
 import {
-  minDonationForSplit,
   type ParsedCampaign,
-  splitDonation,
 } from '@/lib/campaign';
-import { genUserName } from '@/lib/genUserName';
 import { cn } from '@/lib/utils';
 
 /**
@@ -79,15 +71,11 @@ const PRESET_AMOUNTS: readonly { amountUsd: number; icon: React.ComponentType<{ 
 ];
 
 function parseUsdInput(input: string): number {
-  return Number(input.replace(/[, $]/g, ''));
+  const cleaned = input.replace(/[, $]/g, '').trim();
+  if (!cleaned) return 0;
+  const n = Number(cleaned);
+  return Number.isFinite(n) && n > 0 ? n : 0;
 }
-
-const FEE_SPEED_LABELS: Record<DonationFeeSpeed, string> = {
-  fastest: 'Fastest (~10 min)',
-  halfHour: 'Half hour',
-  hour: 'One hour',
-  economy: 'Economy (~1 day)',
-};
 
 function feeRateForSpeed(rates: FeeRates, speed: DonationFeeSpeed): number {
   return {
@@ -99,22 +87,14 @@ function feeRateForSpeed(rates: FeeRates, speed: DonationFeeSpeed): number {
 }
 
 function estimateDonationFee({
-  inputCount,
-  outputCount,
-  totalBalance,
-  amountSats,
   feeRate,
+  utxoCount,
 }: {
-  inputCount: number;
-  outputCount: number;
-  totalBalance: number;
-  amountSats: number;
   feeRate: number;
+  utxoCount: number;
 }): number {
-  const feeWithChange = estimateFee(inputCount, outputCount + 1, feeRate);
-  const changeWithChange = totalBalance - amountSats - feeWithChange;
-  const hasChange = changeWithChange >= BITCOIN_DUST_LIMIT;
-  return estimateFee(inputCount, outputCount + (hasChange ? 1 : 0), feeRate);
+  // Single recipient + change output.
+  return estimateFee(utxoCount, 2, feeRate);
 }
 
 interface DonateDialogProps {
@@ -127,6 +107,17 @@ interface DonateDialogProps {
 
 type Step = 'form' | 'confirm' | 'success';
 
+/**
+ * Donate dialog for **on-chain** (`bc1q…` / `bc1p…`) campaigns. The
+ * campaign's `w` wallet endpoint is the single output destination —
+ * there are no recipient splits, no per-recipient previews, and no
+ * dust math beyond the one-output PSBT.
+ *
+ * Silent-payment campaigns (`sp1…`) never open this dialog; their
+ * detail-page donate column points directly at the SP code via the
+ * `CampaignWalletDonatePanel` so donors can scan/copy and pay from a
+ * BIP-352-aware external wallet.
+ */
 export function DonateDialog({ campaign, open, onOpenChange, btcPrice }: DonateDialogProps) {
   const { user } = useCurrentUser();
   const { canSignPsbt } = useBitcoinSigner();
@@ -148,26 +139,12 @@ export function DonateDialog({ campaign, open, onOpenChange, btcPrice }: DonateD
     }
   }, [open]);
 
-  const minDonation = useMemo(() => {
-    return minDonationForSplit(campaign.recipients, user?.pubkey, BITCOIN_DUST_LIMIT);
-  }, [campaign.recipients, user?.pubkey]);
-
   const effectiveUsd = customUsd.trim()
     ? parseUsdInput(customUsd)
     : amountUsd;
   const effectiveAmount = usdToSats(effectiveUsd, btcPrice);
 
-  const splitPreview = useMemo(() => {
-    if (!Number.isFinite(effectiveAmount) || effectiveAmount <= 0) return null;
-    try {
-      return splitDonation(campaign.recipients, effectiveAmount, user?.pubkey);
-    } catch {
-      return null;
-    }
-  }, [campaign.recipients, effectiveAmount, user?.pubkey]);
-
-  const belowMin = Number.isFinite(effectiveAmount) && effectiveAmount < minDonation;
-  const tooSmallSplit = splitPreview?.some((s) => s.amountSats < BITCOIN_DUST_LIMIT) ?? false;
+  const belowDust = Number.isFinite(effectiveAmount) && effectiveAmount > 0 && effectiveAmount < BITCOIN_DUST_LIMIT;
 
   const donateMutation = useMutation({
     mutationFn: async () =>
@@ -209,21 +186,12 @@ export function DonateDialog({ campaign, open, onOpenChange, btcPrice }: DonateD
   };
 
   // ── Logged-out flow ──
-  //
-  // The ideal path is always to log in and donate through the campaign, so the
-  // donation publishes a kind 8333 receipt and counts toward the goal. As a
-  // secondary path, single-recipient campaigns can be paid externally from any
-  // Bitcoin wallet — the funds reach the recipient but no Nostr receipt is
-  // published, so the donation won't appear in Agora's totals. Multi-recipient
-  // campaigns only support the log-in path (the split needs the donor's
-  // signature on a single PSBT with N outputs).
   if (open && !user) {
     return (
       <Dialog open={open} onOpenChange={handleClose}>
         <DialogContent className="sm:max-w-md max-h-[90vh] overflow-y-auto">
           <LoggedOutChooserView
             campaign={campaign}
-            btcPrice={btcPrice}
             onClose={handleClose}
           />
         </DialogContent>
@@ -231,37 +199,15 @@ export function DonateDialog({ campaign, open, onOpenChange, btcPrice }: DonateD
     );
   }
 
+  // Logged-in but the signer can't build a PSBT (e.g. NIP-07 extension
+  // without signPsbt). Direct the donor at the external-wallet panel on
+  // the page — the in-app flow simply isn't possible without a PSBT
+  // signer.
   if (open && !canSignPsbt) {
-    // Logged-in but the signer can't build a PSBT (e.g. NIP-07 extension
-    // without signPsbt). Single-recipient campaigns can still be paid from
-    // any external wallet; multi-recipient ones cannot.
-    if (campaign.recipients.length === 1) {
-      return (
-        <Dialog open={open} onOpenChange={handleClose}>
-          <DialogContent className="sm:max-w-md max-h-[90vh] overflow-y-auto">
-            <ExternalPayView
-              campaign={campaign}
-              btcPrice={btcPrice}
-              onClose={handleClose}
-            />
-          </DialogContent>
-        </Dialog>
-      );
-    }
-
     return (
       <Dialog open={open} onOpenChange={handleClose}>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              <AlertTriangle className="size-5 text-orange-500" />
-              Donating not available
-            </DialogTitle>
-            <DialogDescription>
-              Your current login can't sign Bitcoin transactions for the multi-recipient split. Log in with your secret key (nsec) or a signer that supports <code className="font-mono text-xs">signPsbt</code> to donate.
-            </DialogDescription>
-          </DialogHeader>
-          <Button onClick={handleClose}>Close</Button>
+        <DialogContent className="sm:max-w-md max-h-[90vh] overflow-y-auto">
+          <SignerUnsupportedView campaign={campaign} onClose={handleClose} />
         </DialogContent>
       </Dialog>
     );
@@ -269,42 +215,51 @@ export function DonateDialog({ campaign, open, onOpenChange, btcPrice }: DonateD
 
   return (
     <Dialog open={open} onOpenChange={handleClose}>
-      <DialogContent className="sm:max-w-md">
-        {step === 'success' && result ? (
-          <SuccessView campaign={campaign} result={result} btcPrice={btcPrice} onClose={handleClose} />
-        ) : step === 'confirm' ? (
+      <DialogContent className="sm:max-w-md max-h-[90vh] overflow-y-auto">
+        {step === 'form' && (
+          <FormView
+            campaign={campaign}
+            amountUsd={amountUsd}
+            customUsd={customUsd}
+            comment={comment}
+            feeSpeed={feeSpeed}
+            effectiveAmount={effectiveAmount}
+            effectiveUsd={effectiveUsd}
+            belowDust={belowDust}
+            btcPrice={btcPrice}
+            isPending={donateMutation.isPending}
+            onAmountChange={(usd) => {
+              setAmountUsd(usd);
+              setCustomUsd('');
+            }}
+            onCustomChange={setCustomUsd}
+            onCommentChange={setComment}
+            onFeeSpeedChange={setFeeSpeed}
+            onContinue={() => setStep('confirm')}
+            onClose={handleClose}
+          />
+        )}
+
+        {step === 'confirm' && (
           <ConfirmView
             campaign={campaign}
             amountSats={effectiveAmount}
-            feeSpeed={feeSpeed}
+            effectiveUsd={effectiveUsd}
             comment={comment}
+            feeSpeed={feeSpeed}
             btcPrice={btcPrice}
             isPending={donateMutation.isPending}
             onBack={() => setStep('form')}
-            onConfirm={() => donateMutation.mutate()}
+            onSubmit={() => donateMutation.mutate()}
           />
-        ) : (
-          <FormView
+        )}
+
+        {step === 'success' && result && (
+          <SuccessView
             campaign={campaign}
-            presetAmountUsd={amountUsd}
-            customUsd={customUsd}
-            effectiveUsd={effectiveUsd}
-            effectiveAmount={effectiveAmount}
-            minDonation={minDonation}
-            belowMin={belowMin}
-            tooSmallSplit={tooSmallSplit}
-            comment={comment}
-            feeSpeed={feeSpeed}
+            result={result}
             btcPrice={btcPrice}
-            onPresetClick={(amt) => {
-              setAmountUsd(amt);
-              setCustomUsd('');
-            }}
-            onCustomChange={(v) => setCustomUsd(v)}
-            onCommentChange={setComment}
-            onFeeSpeedChange={setFeeSpeed}
-            onNext={() => setStep('confirm')}
-            onCancel={handleClose}
+            onClose={handleClose}
           />
         )}
       </DialogContent>
@@ -312,455 +267,325 @@ export function DonateDialog({ campaign, open, onOpenChange, btcPrice }: DonateD
   );
 }
 
-// ─── Form view ───────────────────────────────────────────────────────────────
+// ─────────────────────────────────────────────────────────────────────
+// Form step
+// ─────────────────────────────────────────────────────────────────────
+
+interface FormViewProps {
+  campaign: ParsedCampaign;
+  amountUsd: number;
+  customUsd: string;
+  comment: string;
+  feeSpeed: DonationFeeSpeed;
+  effectiveAmount: number;
+  effectiveUsd: number;
+  belowDust: boolean;
+  btcPrice: number | undefined;
+  isPending: boolean;
+  onAmountChange: (usd: number) => void;
+  onCustomChange: (value: string) => void;
+  onCommentChange: (value: string) => void;
+  onFeeSpeedChange: (speed: DonationFeeSpeed) => void;
+  onContinue: () => void;
+  onClose: () => void;
+}
 
 function FormView({
   campaign,
-  presetAmountUsd,
+  amountUsd,
   customUsd,
-  effectiveUsd,
-  effectiveAmount,
-  minDonation,
-  belowMin,
-  tooSmallSplit,
   comment,
   feeSpeed,
+  effectiveAmount,
+  effectiveUsd,
+  belowDust,
   btcPrice,
-  onPresetClick,
+  isPending,
+  onAmountChange,
   onCustomChange,
   onCommentChange,
   onFeeSpeedChange,
-  onNext,
-  onCancel,
-}: {
-  campaign: ParsedCampaign;
-  presetAmountUsd: number;
-  customUsd: string;
-  effectiveUsd: number;
-  effectiveAmount: number;
-  minDonation: number;
-  belowMin: boolean;
-  tooSmallSplit: boolean;
-  comment: string;
-  feeSpeed: DonationFeeSpeed;
-  btcPrice?: number;
-  onPresetClick: (amt: number) => void;
-  onCustomChange: (v: string) => void;
-  onCommentChange: (v: string) => void;
-  onFeeSpeedChange: (v: DonationFeeSpeed) => void;
-  onNext: () => void;
-  onCancel: () => void;
-}) {
-  const recipientCount = campaign.recipients.length;
-  const { user } = useCurrentUser();
-  const { config } = useAppContext();
-  const { esploraBaseUrl } = config;
-  const senderAddress = user ? nostrPubkeyToBitcoinAddress(user.pubkey) : '';
-  const hasPrice = !!btcPrice && Number.isFinite(btcPrice) && btcPrice > 0;
-  const validAmount = hasPrice && Number.isFinite(effectiveUsd) && effectiveUsd > 0 && effectiveAmount > 0;
-  const canContinue = validAmount && !belowMin && !tooSmallSplit;
-
-  const { data: utxos } = useQuery({
-    queryKey: ['bitcoin-utxos', esploraBaseUrl, senderAddress],
-    queryFn: () => fetchUTXOs(senderAddress, esploraBaseUrl),
-    enabled: !!senderAddress && validAmount,
-    staleTime: 30_000,
-  });
-
-  const { data: feeRates } = useQuery({
-    queryKey: ['bitcoin-fee-rates', esploraBaseUrl],
-    queryFn: () => getFeeRates(esploraBaseUrl),
-    enabled: validAmount,
-    staleTime: 30_000,
-  });
-
-  const totalBalance = useMemo(() => utxos?.reduce((sum, utxo) => sum + utxo.value, 0) ?? 0, [utxos]);
-  const feeEstimates = useMemo(() => {
-    if (!utxos?.length || !feeRates || !validAmount) return {};
-
-    let outputCount = recipientCount;
-    try {
-      outputCount = splitDonation(campaign.recipients, effectiveAmount, user?.pubkey).length;
-    } catch {
-      return {};
-    }
-
-    return (Object.keys(FEE_SPEED_LABELS) as DonationFeeSpeed[]).reduce<Partial<Record<DonationFeeSpeed, number>>>((acc, speed) => {
-      acc[speed] = estimateDonationFee({
-        inputCount: utxos.length,
-        outputCount,
-        totalBalance,
-        amountSats: effectiveAmount,
-        feeRate: feeRateForSpeed(feeRates, speed),
-      });
-      return acc;
-    }, {});
-  }, [utxos, feeRates, validAmount, recipientCount, campaign.recipients, effectiveAmount, user?.pubkey, totalBalance]);
+  onContinue,
+}: FormViewProps) {
+  const usingCustom = customUsd.trim().length > 0;
+  const canContinue = effectiveAmount > 0 && !belowDust;
 
   return (
     <>
       <DialogHeader>
-        <DialogTitle className="flex items-center gap-2">
-          <HandHeart className="size-5 text-primary" />
-          Donate to {campaign.title}
-        </DialogTitle>
+        <DialogTitle>Donate to {campaign.title}</DialogTitle>
         <DialogDescription>
-          Your donation is sent as one Bitcoin transaction split across {recipientCount}{' '}
-          {recipientCount === 1 ? 'recipient' : 'recipients'}.
+          Send Bitcoin to the campaign's wallet from your in-app balance.
         </DialogDescription>
       </DialogHeader>
 
-      <div className="space-y-4">
-        {/* Preset grid */}
-        <div className="space-y-2">
-          <Label>Amount (USD)</Label>
-          <div className="grid grid-cols-5 gap-2">
-            {PRESET_AMOUNTS.map(({ amountUsd: amount, icon: Icon, label }) => {
-              const selected = !customUsd && amount === presetAmountUsd;
+      <div className="space-y-5 py-2">
+        {/* Preset amounts */}
+        <div>
+          <Label className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+            Amount
+          </Label>
+          <div className="mt-2 grid grid-cols-3 sm:grid-cols-5 gap-2">
+            {PRESET_AMOUNTS.map(({ amountUsd: usd, icon: Icon, label }) => {
+              const selected = !usingCustom && amountUsd === usd;
               return (
                 <button
-                  key={amount}
+                  key={usd}
                   type="button"
-                  onClick={() => onPresetClick(amount)}
+                  onClick={() => onAmountChange(usd)}
                   className={cn(
-                    'flex flex-col items-center justify-center gap-1 rounded-lg border p-2 text-xs font-medium motion-safe:transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary',
+                    'flex flex-col items-center gap-1 rounded-lg border px-2 py-2.5 text-xs font-semibold motion-safe:transition-colors',
                     selected
-                      ? 'border-primary bg-primary/10 text-foreground'
-                      : 'border-border hover:bg-secondary text-muted-foreground hover:text-foreground',
+                      ? 'border-primary bg-primary/10 text-primary'
+                      : 'border-border bg-card hover:bg-muted/60',
                   )}
-                  aria-pressed={selected}
                 >
                   <Icon className="size-4" />
-                  <span>{label}</span>
+                  {label}
                 </button>
               );
             })}
           </div>
         </div>
 
-        {/* Custom override */}
-        <div className="space-y-2">
-          <Label htmlFor="donate-custom">Or enter a custom amount (USD)</Label>
-          <Input
-            id="donate-custom"
-            type="text"
-            inputMode="decimal"
-            placeholder={btcPrice ? `Min ${satsToUSD(minDonation, btcPrice)}` : 'Enter USD amount'}
-            value={customUsd}
-            onChange={(e) => onCustomChange(e.target.value)}
-          />
-          <div className="flex justify-between text-xs text-muted-foreground">
-            <span>
-              {validAmount
-                ? `${satsToUSD(effectiveAmount, btcPrice)} · ${formatSats(effectiveAmount)} sats`
-                : btcPrice
-                  ? `Minimum: ${satsToUSD(minDonation, btcPrice)} (${minDonation.toLocaleString()} sats)`
-                  : 'Waiting for BTC/USD price'}
+        {/* Custom amount */}
+        <div className="space-y-1.5">
+          <Label htmlFor="donate-custom" className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+            Or custom (USD)
+          </Label>
+          <div className="relative">
+            <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">
+              $
             </span>
-            <span>
-              {recipientCount > 1 && validAmount
-                ? `≈ ${formatSats(Math.floor(effectiveAmount / recipientCount))} sats per recipient`
-                : ''}
-            </span>
+            <Input
+              id="donate-custom"
+              type="text"
+              inputMode="decimal"
+              placeholder="50"
+              value={customUsd}
+              onChange={(e) => onCustomChange(e.target.value)}
+              className="pl-7"
+            />
           </div>
+          {effectiveAmount > 0 && (
+            <div className="text-xs text-muted-foreground">
+              ≈ {formatSats(effectiveAmount)} sats
+              {btcPrice && effectiveUsd > 0 && (
+                <> · ${effectiveUsd.toLocaleString()} at current price</>
+              )}
+            </div>
+          )}
         </div>
 
-        {/* Optional comment */}
-        <div className="space-y-2">
-          <Label htmlFor="donate-comment">Comment (optional)</Label>
+        {/* Comment */}
+        <div className="space-y-1.5">
+          <Label htmlFor="donate-comment" className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+            Public comment (optional)
+          </Label>
           <Textarea
             id="donate-comment"
-            placeholder="Say a few words…"
             value={comment}
             onChange={(e) => onCommentChange(e.target.value)}
+            placeholder="Stay strong."
             rows={2}
             maxLength={280}
           />
         </div>
 
         {/* Fee speed */}
-        <div className="space-y-2">
-          <Label>Arrival</Label>
+        <div className="space-y-1.5">
+          <Label className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+            Confirmation speed
+          </Label>
           <Select value={feeSpeed} onValueChange={(v) => onFeeSpeedChange(v as DonationFeeSpeed)}>
             <SelectTrigger>
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              {(Object.keys(FEE_SPEED_LABELS) as DonationFeeSpeed[]).map((speed) => (
-                <SelectItem key={speed} value={speed}>
-                  {FEE_SPEED_LABELS[speed]}
-                  {btcPrice && feeEstimates[speed] !== undefined
-                    ? ` · ${satsToUSD(feeEstimates[speed], btcPrice)} fee`
-                    : ''}
-                </SelectItem>
-              ))}
+              <SelectItem value="fastest">Fastest (~10 min)</SelectItem>
+              <SelectItem value="halfHour">Half hour</SelectItem>
+              <SelectItem value="hour">Hour</SelectItem>
+              <SelectItem value="economy">Economy (cheapest)</SelectItem>
             </SelectContent>
           </Select>
         </div>
 
-        {(belowMin || tooSmallSplit) && validAmount && (
+        {belowDust && (
           <Alert variant="destructive">
             <AlertTriangle className="size-4" />
             <AlertDescription>
-              That's too small to split across {recipientCount} recipients (each output must be at
-              least {BITCOIN_DUST_LIMIT.toLocaleString()} sats). Minimum donation:{' '}
-              {minDonation.toLocaleString()} sats.
+              Amount is below the Bitcoin dust limit ({BITCOIN_DUST_LIMIT.toLocaleString()} sats).
+              Choose a larger amount.
             </AlertDescription>
           </Alert>
         )}
 
-        {!hasPrice && (
-          <Alert>
-            <AlertTriangle className="size-4" />
-            <AlertDescription className="text-xs">
-              Waiting for the BTC/USD price before converting your USD donation to sats.
-            </AlertDescription>
-          </Alert>
-        )}
-
-        <BitcoinPublicDisclaimer
-          tone="soft"
-          includeCashOutAdvice={false}
-          leadText="Donations are public and can be traced back to you."
-        />
-
-        <p className="text-center text-xs text-muted-foreground">
-          Bitcoin transactions are irreversible and can take time to confirm.
-          Your on-chain wallet pays the network fee on top of your donation
-          amount.
-        </p>
-
-        <div className="flex gap-2">
-          <Button variant="outline" onClick={onCancel} className="flex-1">
-            Cancel
-          </Button>
-          <Button onClick={onNext} disabled={!canContinue} className="flex-1">
-            <ArrowUpRight className="size-4 mr-1.5" />
-            Review
-          </Button>
-        </div>
+        <BitcoinPublicDisclaimer tone="soft" />
       </div>
+
+      <Button
+        size="lg"
+        className="w-full"
+        onClick={onContinue}
+        disabled={!canContinue || isPending}
+      >
+        Review donation
+        <ArrowUpRight className="size-4 ml-1.5" />
+      </Button>
     </>
   );
 }
 
-// ─── Confirm view ────────────────────────────────────────────────────────────
+// ─────────────────────────────────────────────────────────────────────
+// Confirm step
+// ─────────────────────────────────────────────────────────────────────
 
-function BeneficiarySplitRow({ pubkey, amountSats }: { pubkey: string; amountSats: number }) {
-  const author = useAuthor(pubkey);
-  const metadata = author.data?.metadata;
-  const name = metadata?.display_name || metadata?.name || genUserName(pubkey);
-
-  return (
-    <tr className="border-b last:border-0 border-border/60">
-      <td className="px-3 py-1.5">
-        <div className="flex min-w-0 flex-wrap items-baseline gap-x-2 gap-y-0.5">
-          <span className="font-medium text-foreground truncate">{name}</span>
-          <span className="font-mono text-muted-foreground">
-            {pubkey.slice(0, 8)}…{pubkey.slice(-4)}
-          </span>
-        </div>
-      </td>
-      <td className="px-3 py-1.5 text-right font-medium">
-        {amountSats.toLocaleString()} sats
-      </td>
-    </tr>
-  );
+interface ConfirmViewProps {
+  campaign: ParsedCampaign;
+  amountSats: number;
+  effectiveUsd: number;
+  comment: string;
+  feeSpeed: DonationFeeSpeed;
+  btcPrice: number | undefined;
+  isPending: boolean;
+  onBack: () => void;
+  onSubmit: () => void;
 }
 
 function ConfirmView({
   campaign,
   amountSats,
-  feeSpeed,
+  effectiveUsd,
   comment,
+  feeSpeed,
   btcPrice,
   isPending,
   onBack,
-  onConfirm,
-}: {
-  campaign: ParsedCampaign;
-  amountSats: number;
-  feeSpeed: DonationFeeSpeed;
-  comment: string;
-  btcPrice?: number;
-  isPending: boolean;
-  onBack: () => void;
-  onConfirm: () => void;
-}) {
+  onSubmit,
+}: ConfirmViewProps) {
   const { user } = useCurrentUser();
   const { config } = useAppContext();
-  const { esploraBaseUrl } = config;
-  const senderAddress = user ? nostrPubkeyToBitcoinAddress(user.pubkey) : '';
-  const splits = useMemo(() => {
-    try {
-      return splitDonation(campaign.recipients, amountSats, user?.pubkey);
-    } catch {
-      return [];
-    }
-  }, [campaign.recipients, amountSats, user?.pubkey]);
+  const { esploraApis } = config;
 
-  const { data: utxos, isLoading: utxosLoading, isError: utxosError } = useQuery({
-    queryKey: ['bitcoin-utxos', esploraBaseUrl, senderAddress],
-    queryFn: () => fetchUTXOs(senderAddress, esploraBaseUrl),
-    enabled: !!senderAddress && amountSats > 0,
+  const senderAddress = user ? nostrPubkeyToBitcoinAddress(user.pubkey) : null;
+
+  // Pre-fetch UTXOs + fee rates so the confirm screen can show an
+  // accurate fee estimate before the donor commits.
+  const utxosQuery = useQuery({
+    queryKey: ['bitcoin-utxos', senderAddress, esploraApis],
+    queryFn: ({ signal }) => fetchUTXOs(senderAddress!, esploraApis, signal),
+    enabled: !!senderAddress,
+    staleTime: 30_000,
+  });
+  const feeRatesQuery = useQuery({
+    queryKey: ['bitcoin-fee-rates', esploraApis],
+    queryFn: ({ signal }) => getFeeRates(esploraApis, signal),
     staleTime: 30_000,
   });
 
-  const { data: feeRates, isLoading: feeRatesLoading, isError: feeRatesError } = useQuery({
-    queryKey: ['bitcoin-fee-rates', esploraBaseUrl],
-    queryFn: () => getFeeRates(esploraBaseUrl),
-    enabled: amountSats > 0,
-    staleTime: 30_000,
-  });
-
-  const totalBalance = useMemo(() => utxos?.reduce((sum, utxo) => sum + utxo.value, 0) ?? 0, [utxos]);
-  const estimatedFee = useMemo(() => {
-    if (!utxos?.length || !feeRates || splits.length === 0) return undefined;
-
+  const feeEstimate = useMemo(() => {
+    const utxos = utxosQuery.data;
+    const rates = feeRatesQuery.data;
+    if (!utxos || !rates) return null;
     return estimateDonationFee({
-      inputCount: utxos.length,
-      outputCount: splits.length,
-      totalBalance,
-      amountSats,
-      feeRate: feeRateForSpeed(feeRates, feeSpeed),
+      feeRate: feeRateForSpeed(rates, feeSpeed),
+      utxoCount: utxos.length,
     });
-  }, [utxos, feeRates, splits.length, feeSpeed, totalBalance, amountSats]);
-  const feeLoading = utxosLoading || feeRatesLoading;
-  const feeError = utxosError || feeRatesError;
-  const noSpendableFunds = !!utxos && utxos.length === 0;
-  const insufficientFunds = estimatedFee !== undefined && totalBalance < amountSats + estimatedFee;
-  const canConfirm = !isPending && estimatedFee !== undefined && !feeError && !noSpendableFunds && !insufficientFunds;
-  const formatReviewAmount = (sats: number) => (
-    btcPrice ? (
-      <>
-        {satsToUSD(sats, btcPrice)}
-        <span className="ml-2 text-xs text-muted-foreground">({formatSats(sats)} sats)</span>
-      </>
-    ) : `${formatSats(sats)} sats`
-  );
+  }, [utxosQuery.data, feeRatesQuery.data, feeSpeed]);
 
   return (
     <>
       <DialogHeader>
-        <DialogTitle className="flex items-center gap-2">
-          <HandHeart className="size-5 text-primary" />
-          Confirm Donation
-        </DialogTitle>
-        <DialogDescription>Review the split before broadcasting.</DialogDescription>
+        <button
+          type="button"
+          onClick={onBack}
+          className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground motion-safe:transition-colors -ml-1"
+          disabled={isPending}
+        >
+          <ChevronLeft className="size-4" />
+          Back
+        </button>
+        <DialogTitle>Confirm donation</DialogTitle>
+        <DialogDescription>
+          Review the details before signing the transaction.
+        </DialogDescription>
       </DialogHeader>
 
-      <div className="space-y-4">
-        <div className="rounded-lg bg-muted/50 p-4 space-y-1">
-          <Label className="text-xs text-muted-foreground">Campaign</Label>
-          <p className="font-medium truncate">{campaign.title}</p>
-        </div>
-
-        <div className="space-y-1">
-          <div className="flex justify-between text-sm">
-            <span className="text-muted-foreground">Donation amount</span>
-            <span className="font-medium">
-              {formatReviewAmount(amountSats)}
+      <div className="space-y-4 py-2">
+        <Row label="Campaign" value={campaign.title} />
+        <Row
+          label="Amount"
+          value={
+            <span>
+              <span className="font-semibold">{formatSats(amountSats)} sats</span>
+              {btcPrice && effectiveUsd > 0 && (
+                <span className="ml-2 text-xs text-muted-foreground">≈ ${effectiveUsd.toLocaleString()}</span>
+              )}
             </span>
-          </div>
-          <div className="flex justify-between text-sm">
-            <span className="text-muted-foreground">Network fee</span>
-            <span className="font-medium">
-              {estimatedFee !== undefined
-                ? formatReviewAmount(estimatedFee)
-                : feeLoading
-                  ? 'Calculating…'
-                  : noSpendableFunds
-                    ? 'No spendable funds'
-                    : 'Unavailable'}
-            </span>
-          </div>
-          {estimatedFee !== undefined && (
-            <div className="flex justify-between text-sm">
-              <span className="text-muted-foreground">Total</span>
-              <span className="font-medium">
-                {formatReviewAmount(amountSats + estimatedFee)}
-              </span>
-            </div>
-          )}
-          <div className="flex justify-between text-sm">
-            <span className="text-muted-foreground">Arrival</span>
-            <span className="font-medium">{FEE_SPEED_LABELS[feeSpeed]}</span>
-          </div>
-        </div>
-
-        {feeError && (
-          <Alert variant="destructive">
-            <AlertTriangle className="size-4" />
-            <AlertDescription className="text-xs">
-              Could not estimate the network fee. Check your connection and try again.
-            </AlertDescription>
-          </Alert>
-        )}
-
-        {noSpendableFunds && (
-          <Alert variant="destructive">
-            <AlertTriangle className="size-4" />
-            <AlertDescription className="text-xs">
-              Your Bitcoin wallet has no spendable funds.
-            </AlertDescription>
-          </Alert>
-        )}
-
-        {insufficientFunds && estimatedFee !== undefined && (
-          <Alert variant="destructive">
-            <AlertTriangle className="size-4" />
-            <AlertDescription className="text-xs">
-              Insufficient funds. This donation needs {(amountSats + estimatedFee).toLocaleString()} sats including the network fee.
-            </AlertDescription>
-          </Alert>
-        )}
-
-        <div className="rounded-lg border border-border max-h-40 overflow-auto">
-          <table className="w-full text-xs">
-            <tbody>
-              {splits.map((s) => (
-                <BeneficiarySplitRow key={s.pubkey} pubkey={s.pubkey} amountSats={s.amountSats} />
-              ))}
-            </tbody>
-          </table>
-        </div>
-
-        {comment && (
-          <div className="rounded-lg bg-muted/40 p-3">
-            <Label className="text-xs text-muted-foreground">Your comment</Label>
-            <p className="text-sm whitespace-pre-wrap break-words mt-1">{comment}</p>
-          </div>
-        )}
-
-        <p className="text-center text-xs text-muted-foreground">
-          The fee is locked into the transaction when you sign. Confirmation time can still vary with mempool conditions.
-        </p>
-
-        <div className="flex gap-2">
-          <Button variant="outline" onClick={onBack} disabled={isPending} className="flex-1">
-            <ChevronLeft className="size-4 mr-1" />
-            Back
-          </Button>
-          <Button onClick={onConfirm} disabled={!canConfirm} className="flex-1">
-            {isPending ? (
-              <>
-                <Loader2 className="size-4 mr-1.5 animate-spin" />
-                Sending…
-              </>
+          }
+        />
+        <Row
+          label="To wallet"
+          value={
+            <span className="font-mono text-xs break-all">{campaign.wallet.value}</span>
+          }
+        />
+        <Row
+          label="Network fee"
+          value={
+            feeEstimate === null ? (
+              <Skeleton className="h-4 w-20" />
             ) : (
-              <>
-                <HandHeart className="size-4 mr-1.5" />
-                Donate {btcPrice ? satsToUSD(amountSats, btcPrice) : `${formatSats(amountSats)} sats`}
-              </>
-            )}
-          </Button>
-        </div>
+              <span>
+                <span className="font-semibold">{formatSats(feeEstimate)} sats</span>
+                {btcPrice && (
+                  <span className="ml-2 text-xs text-muted-foreground">
+                    ≈ ${satsToUSD(feeEstimate, btcPrice)}
+                  </span>
+                )}
+              </span>
+            )
+          }
+        />
+        {comment.trim() && (
+          <Row label="Comment" value={<span className="italic">"{comment}"</span>} />
+        )}
       </div>
+
+      <Button
+        size="lg"
+        className="w-full"
+        onClick={onSubmit}
+        disabled={isPending || feeEstimate === null}
+      >
+        {isPending ? (
+          <>
+            <Loader2 className="size-4 mr-2 animate-spin" />
+            Sending donation…
+          </>
+        ) : (
+          <>
+            <HandHeart className="size-5 mr-2" />
+            Send donation
+          </>
+        )}
+      </Button>
     </>
   );
 }
 
-// ─── Success view ────────────────────────────────────────────────────────────
+function Row({ label, value }: { label: string; value: React.ReactNode }) {
+  return (
+    <div className="flex items-start justify-between gap-3 text-sm">
+      <span className="shrink-0 text-muted-foreground">{label}</span>
+      <span className="text-right min-w-0">{value}</span>
+    </div>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────────────
+// Success step
+// ─────────────────────────────────────────────────────────────────────
 
 function SuccessView({
   campaign,
@@ -770,446 +595,142 @@ function SuccessView({
 }: {
   campaign: ParsedCampaign;
   result: DonateCampaignResult;
-  btcPrice?: number;
+  btcPrice: number | undefined;
   onClose: () => void;
 }) {
-  const txPath = `/i/bitcoin:tx:${result.txid}`;
-  const formatSuccessAmount = (sats: number) => (
-    btcPrice ? (
-      <>
-        {satsToUSD(sats, btcPrice)}
-        <span className="ml-2 text-xs text-muted-foreground">({formatSats(sats)} sats)</span>
-      </>
-    ) : `${formatSats(sats)} sats`
-  );
-
   return (
     <>
       <DialogHeader>
-        <DialogTitle className="flex items-center gap-2 text-green-700 dark:text-green-300">
-          <Check className="size-5" />
-          Donation Sent
-        </DialogTitle>
-        <DialogDescription>
-          Thanks for supporting <span className="font-medium">{campaign.title}</span>.
+        <div className="mx-auto rounded-full bg-primary/15 p-3 mb-2">
+          <Check className="size-8 text-primary" />
+        </div>
+        <DialogTitle className="text-center">Thank you!</DialogTitle>
+        <DialogDescription className="text-center">
+          Your donation to <span className="font-semibold text-foreground">{campaign.title}</span> is on its way.
         </DialogDescription>
       </DialogHeader>
 
-      <div className="space-y-4">
-        <div className="rounded-lg border border-green-200 bg-green-50 p-4 space-y-1.5 dark:border-green-800 dark:bg-green-950/40">
-          <Label className="text-xs text-green-800 dark:text-green-200">Transaction ID</Label>
-          <Link
-            to={txPath}
-            onClick={onClose}
-            className="block break-all font-mono text-xs leading-relaxed text-green-950 underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-700 dark:text-green-50 dark:focus-visible:ring-green-300"
-          >
-            {result.txid}
-          </Link>
-        </div>
-
-        <div className="space-y-1 text-sm">
-          <div className="flex justify-between">
-            <span className="text-muted-foreground">Amount sent</span>
-            <span className="font-medium">
-              {btcPrice ? satsToUSD(result.totalSats, btcPrice) : `${formatSats(result.totalSats)} sats`}
+      <div className="space-y-3 py-2">
+        <Row
+          label="Amount"
+          value={
+            <span className="font-semibold">
+              {formatSats(result.totalSats)} sats
+              {btcPrice && (
+                <span className="ml-2 text-xs text-muted-foreground">
+                  ≈ ${satsToUSD(result.totalSats, btcPrice)}
+                </span>
+              )}
             </span>
-          </div>
-          <div className="flex justify-between">
-            <span className="text-muted-foreground">Network fee</span>
-            <span className="font-medium">{formatSuccessAmount(result.fee)}</span>
-          </div>
-          <div className="flex justify-between">
-            <span className="text-muted-foreground">Recipients paid</span>
-            <span className="font-medium">{result.recipientCount}</span>
-          </div>
-        </div>
-
-        {!result.receiptPublished && (
-          <Alert>
-            <AlertTriangle className="size-4" />
-            <AlertDescription className="text-xs">
-              The Bitcoin tx is final, but the kind 8333 receipt didn't publish. Your donation still
-              counts.
-            </AlertDescription>
-          </Alert>
-        )}
-
-        <div className="flex gap-2">
-          <Button variant="outline" className="flex-1" asChild>
-            <Link to={txPath} onClick={onClose}>
-              View Transaction
-            </Link>
-          </Button>
-          <Button className="flex-1 bg-green-700 text-white hover:bg-green-800 dark:bg-green-300 dark:text-green-950 dark:hover:bg-green-200" onClick={onClose}>
-            Done
-          </Button>
-        </div>
+          }
+        />
+        <Row
+          label="Network fee"
+          value={<span>{formatSats(result.fee)} sats</span>}
+        />
+        <Row
+          label="Transaction"
+          value={
+            <a
+              href={`https://mempool.space/tx/${result.txid}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="font-mono text-xs text-primary hover:underline break-all"
+            >
+              {result.txid.slice(0, 16)}…
+            </a>
+          }
+        />
       </div>
+
+      <Button size="lg" className="w-full" onClick={onClose}>
+        Done
+      </Button>
     </>
   );
 }
 
-/** Skeleton placeholder for the donate button while resolving auth. */
-export function DonateButtonSkeleton() {
-  return <Skeleton className="h-10 w-32" />;
-}
+// ─────────────────────────────────────────────────────────────────────
+// Logged-out chooser
+// ─────────────────────────────────────────────────────────────────────
 
-// ─── Logged-out chooser view ────────────────────────────────────────────────
-
-/**
- * Shown when a logged-out user clicks Donate. Frames the choice clearly:
- *
- * 1. **Recommended**: log in and donate through Agora so the donation
- *    publishes a kind 8333 receipt and counts toward the campaign goal.
- * 2. **Secondary** (single-recipient campaigns only): pay the recipient
- *    directly with any Bitcoin wallet. Funds reach the recipient but the
- *    donation won't appear in Agora's totals or donor list.
- *
- * Multi-recipient campaigns hide the secondary option because the split
- * fundamentally requires a single PSBT signed by the donor.
- */
 function LoggedOutChooserView({
   campaign,
-  btcPrice,
   onClose,
 }: {
   campaign: ParsedCampaign;
-  btcPrice?: number;
   onClose: () => void;
 }) {
-  const [view, setView] = useState<'choose' | 'external'>('choose');
-  const [loginOpen, setLoginOpen] = useState(false);
-
-  const singleRecipient = campaign.recipients.length === 1;
-  const firstRecipient = campaign.recipients[0];
-  const recipientAuthor = useAuthor(firstRecipient.pubkey);
-  const recipientName = singleRecipient
-    ? recipientAuthor.data?.metadata?.display_name ||
-      recipientAuthor.data?.metadata?.name ||
-      genUserName(firstRecipient.pubkey)
-    : '';
-
-  if (view === 'external') {
-    return (
-      <ExternalPayView
-        campaign={campaign}
-        btcPrice={btcPrice}
-        onBack={() => setView('choose')}
-        onClose={onClose}
-      />
-    );
-  }
+  const [authOpen, setAuthOpen] = useState(false);
 
   return (
     <>
       <DialogHeader>
-        <DialogTitle className="flex items-center gap-2">
-          <HandHeart className="size-5 text-primary" />
-          Log in to donate to this campaign
-        </DialogTitle>
+        <DialogTitle>Donate to {campaign.title}</DialogTitle>
         <DialogDescription>
-          Donations made through Agora publish a Nostr receipt that counts
-          toward <span className="font-medium">{campaign.title}</span>'s goal and
-          appears in the donor list.
+          Log in to donate from your in-app wallet, or scan the QR on the
+          campaign page to pay from any external Bitcoin wallet.
         </DialogDescription>
       </DialogHeader>
 
-      <div className="space-y-3">
-        {/* Primary path — log in */}
-        <button
-          type="button"
-          onClick={() => setLoginOpen(true)}
-          className="w-full text-left rounded-xl border-2 border-primary bg-primary/5 p-4 hover:bg-primary/10 motion-safe:transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+      <div className="space-y-3 py-2">
+        <Button
+          size="lg"
+          className="w-full"
+          onClick={() => setAuthOpen(true)}
         >
-          <div className="flex items-start gap-3">
-            <div className="rounded-full bg-primary/15 p-2 shrink-0">
-              <LogIn className="size-5 text-primary" />
-            </div>
-            <div className="min-w-0 flex-1">
-              <div className="flex items-center gap-2 flex-wrap">
-                <span className="font-semibold">Log in & donate</span>
-                <span className="text-[10px] font-semibold uppercase tracking-wide px-1.5 py-0.5 rounded-full bg-primary text-primary-foreground">
-                  Recommended
-                </span>
-              </div>
-              <p className="mt-1 text-sm text-muted-foreground">
-                Your donation counts toward the campaign goal and shows up in the donor list.
-                {!singleRecipient &&
-                  ` Required for this campaign because it splits across ${campaign.recipients.length} recipients.`}
-              </p>
-            </div>
-            <ArrowUpRight className="size-4 text-muted-foreground shrink-0 mt-1" />
-          </div>
-        </button>
-
-        {/* Secondary path — external pay, single recipient only */}
-        {singleRecipient && (
-          <button
-            type="button"
-            onClick={() => setView('external')}
-            className="w-full text-left rounded-xl border border-border bg-background p-4 hover:bg-muted/50 motion-safe:transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
-          >
-            <div className="flex items-start gap-3">
-              <div className="rounded-full bg-muted p-2 shrink-0">
-                <Wallet className="size-5 text-muted-foreground" />
-              </div>
-              <div className="min-w-0 flex-1">
-                <div className="font-semibold">
-                  Donate to {recipientName} directly
-                </div>
-                <p className="mt-1 text-sm text-muted-foreground">
-                  Pay {recipientName} from any Bitcoin wallet. It{' '}
-                  <span className="font-medium text-foreground">won't count</span> toward the
-                  campaign goal, but {recipientName} will still receive it.
-                </p>
-              </div>
-              <ArrowUpRight className="size-4 text-muted-foreground shrink-0 mt-1" />
-            </div>
-          </button>
-        )}
-
-        {!singleRecipient && (
-          <Alert>
-            <AlertTriangle className="size-4" />
-            <AlertDescription className="text-xs">
-              This campaign splits each donation across {campaign.recipients.length} recipients in
-              one transaction, which requires your signature. Direct payments aren't available for
-              multi-recipient campaigns.
-            </AlertDescription>
-          </Alert>
-        )}
-
-        <Button variant="ghost" onClick={onClose} className="w-full">
-          Cancel
+          <LogIn className="size-4 mr-2" />
+          Log in to donate
+        </Button>
+        <Button
+          variant="outline"
+          size="lg"
+          className="w-full"
+          onClick={onClose}
+        >
+          Pay from external wallet instead
         </Button>
       </div>
 
-      <AuthDialog
-        isOpen={loginOpen}
-        onClose={() => {
-          // The outer DonateDialog re-renders once `user` becomes truthy and
-          // automatically swaps to the FormView for the now-logged-in donor.
-          setLoginOpen(false);
-        }}
-      />
+      <AuthDialog isOpen={authOpen} onClose={() => setAuthOpen(false)} />
     </>
   );
 }
 
-// ─── External-pay view (logged-out, single recipient) ────────────────────────
+// ─────────────────────────────────────────────────────────────────────
+// Signer-unsupported fallback
+// ─────────────────────────────────────────────────────────────────────
 
-/**
- * Renders address + QR + BIP-21 deep link for a single-recipient campaign so
- * donors can pay from any Bitcoin wallet without logging into Agora.
- *
- * Caveat surfaced to the donor: because no kind 8333 receipt is published,
- * the donation will not appear in Agora's donation totals or donor list. The
- * funds still reach the recipient on-chain; only the social-layer attestation
- * is missing.
- */
-function ExternalPayView({
+function SignerUnsupportedView({
   campaign,
-  btcPrice,
-  onBack,
   onClose,
 }: {
   campaign: ParsedCampaign;
-  btcPrice?: number;
-  /** When provided, renders a back affordance returning to the chooser. */
-  onBack?: () => void;
   onClose: () => void;
 }) {
-  const recipient = campaign.recipients[0];
-  const author = useAuthor(recipient.pubkey);
-  const { toast } = useToast();
-
-  const [usd, setUsd] = useState('');
-  const [copiedAddress, setCopiedAddress] = useState(false);
-  const [copiedUri, setCopiedUri] = useState(false);
-
-  const address = useMemo(
-    () => nostrPubkeyToBitcoinAddress(recipient.pubkey),
-    [recipient.pubkey],
-  );
-
-  const metadata = author.data?.metadata;
-  const recipientName =
-    metadata?.display_name || metadata?.name || genUserName(recipient.pubkey);
-
-  const parsedUsd = usd.trim() ? parseUsdInput(usd) : NaN;
-  const hasPrice = !!btcPrice && Number.isFinite(btcPrice) && btcPrice > 0;
-  const amountSats =
-    Number.isFinite(parsedUsd) && parsedUsd > 0 && hasPrice
-      ? usdToSats(parsedUsd, btcPrice)
-      : 0;
-  const amountBtc = amountSats > 0 ? amountSats / 100_000_000 : 0;
-
-  // BIP-21 URI. `amount` is in BTC with up to 8 decimals, no trailing zeros.
-  // We only include it when the donor entered a positive USD amount AND we
-  // have a price to convert with — otherwise we omit it so the wallet can
-  // prompt for any amount.
-  const bip21 = useMemo(() => {
-    if (!address) return '';
-    if (amountBtc > 0) {
-      // Trim trailing zeros after the decimal, but keep up to 8 places.
-      const fixed = amountBtc.toFixed(8).replace(/\.?0+$/, '');
-      return `bitcoin:${address}?amount=${fixed}`;
-    }
-    return `bitcoin:${address}`;
-  }, [address, amountBtc]);
-
-  const copy = async (value: string, marker: 'address' | 'uri') => {
-    if (!value) return;
-    try {
-      await navigator.clipboard.writeText(value);
-      if (marker === 'address') {
-        setCopiedAddress(true);
-        setTimeout(() => setCopiedAddress(false), 1500);
-      } else {
-        setCopiedUri(true);
-        setTimeout(() => setCopiedUri(false), 1500);
-      }
-      toast({ title: marker === 'address' ? 'Address copied' : 'Payment URI copied' });
-    } catch {
-      toast({
-        title: 'Copy failed',
-        description: 'Select and copy the address manually.',
-        variant: 'destructive',
-      });
-    }
-  };
-
-  if (!address) {
-    return (
-      <>
-        <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
-            <AlertTriangle className="size-5 text-orange-500" />
-            Address unavailable
-          </DialogTitle>
-          <DialogDescription>
-            We couldn't derive a Bitcoin address for this recipient. Try again later or contact the
-            campaign creator.
-          </DialogDescription>
-        </DialogHeader>
-        <Button onClick={onClose}>Close</Button>
-      </>
-    );
-  }
-
   return (
     <>
       <DialogHeader>
-        {onBack && (
-          <button
-            type="button"
-            onClick={onBack}
-            className="self-start -ml-1 inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground motion-safe:transition-colors mb-1"
-          >
-            <ChevronLeft className="size-3.5" />
-            Back
-          </button>
-        )}
-        <DialogTitle className="flex items-center gap-2">
-          <Wallet className="size-5 text-primary" />
-          Pay with any Bitcoin wallet
-        </DialogTitle>
+        <DialogTitle>Donate to {campaign.title}</DialogTitle>
         <DialogDescription>
-          Scan the QR code or copy the address below to donate to{' '}
-          <span className="font-medium">{recipientName}</span> from your existing wallet.
+          Scan the QR code with your phone's Bitcoin wallet, or tap "Open in
+          wallet" to send your donation. You choose the amount in your wallet.
         </DialogDescription>
       </DialogHeader>
 
-      <div className="space-y-4">
-        {/* Optional amount input — informs the BIP-21 URI / QR */}
-        <div className="space-y-2">
-          <Label htmlFor="external-pay-amount">Amount (USD, optional)</Label>
-          <Input
-            id="external-pay-amount"
-            type="text"
-            inputMode="decimal"
-            placeholder={hasPrice ? 'Leave blank to choose in your wallet' : 'Waiting for BTC price…'}
-            value={usd}
-            onChange={(e) => setUsd(e.target.value)}
-            disabled={!hasPrice}
-          />
-          <p className="text-xs text-muted-foreground">
-            {amountSats > 0
-              ? `${formatSats(amountSats)} sats · embedded in the QR code below`
-              : 'Without an amount, your wallet will prompt you to enter one when it scans the QR code.'}
-          </p>
-        </div>
+      <CampaignWalletDonatePanel wallet={campaign.wallet} />
 
-        {/* QR code */}
-        <div className="flex justify-center">
-          <div className="rounded-2xl bg-white p-4 shadow-sm">
-            <QRCodeCanvas value={bip21} size={200} level="M" />
-          </div>
-        </div>
-
-        {/* Address (copyable) */}
-        <div className="space-y-2">
-          <Label className="text-xs text-muted-foreground uppercase tracking-wide">
-            Bitcoin address
-          </Label>
-          <button
-            type="button"
-            onClick={() => copy(address, 'address')}
-            className="w-full flex items-center justify-between gap-2 rounded-lg border bg-muted/40 px-3 py-2.5 font-mono text-xs break-all text-left hover:bg-muted/60 motion-safe:transition-colors"
-          >
-            <span className="break-all">{address}</span>
-            {copiedAddress ? (
-              <Check className="size-4 text-green-500 shrink-0" />
-            ) : (
-              <Copy className="size-4 text-muted-foreground shrink-0" />
-            )}
-          </button>
-        </div>
-
-        {/* Public-ledger notice — informational. Bitcoin is a public
-            ledger, so the donation can be traced back to the donor's
-            wallet. */}
-        <BitcoinPublicDisclaimer
-          tone="soft"
-          includeCashOutAdvice={false}
-          leadText="Donations are public and can be traced back to you."
-        />
-
-        {/* Action buttons */}
-        <div className="grid grid-cols-2 gap-2">
-          <Button variant="outline" onClick={() => copy(bip21, 'uri')}>
-            {copiedUri ? (
-              <Check className="size-4 mr-1.5 text-green-500" />
-            ) : (
-              <Copy className="size-4 mr-1.5" />
-            )}
-            Copy payment URI
-          </Button>
-          <Button asChild>
-            {/* `bitcoin:` is a registered URI scheme. Most desktop / mobile
-                wallets will intercept it; if none does, the click is a no-op
-                from the user's perspective. */}
-            <a href={bip21}>
-              <ExternalLink className="size-4 mr-1.5" />
-              Open in wallet
-            </a>
-          </Button>
-        </div>
-
-        {/* Heads-up: donation won't appear in Agora's totals */}
-        <Alert>
-          <AlertTriangle className="size-4" />
-          <AlertDescription className="text-xs">
-            Payments made this way go straight to the recipient on Bitcoin but won't show up in
-            this campaign's donor list or progress bar. To have your donation counted on Agora,{' '}
-            <span className="font-medium">log in</span> and donate through the app.
-          </AlertDescription>
-        </Alert>
-
-        <Button onClick={onClose} className="w-full">
-          Done
-        </Button>
-      </div>
+      <Button variant="outline" size="lg" className="w-full" onClick={onClose}>
+        Close
+      </Button>
     </>
   );
+}
+
+// ─────────────────────────────────────────────────────────────────────
+// Loading skeleton (for callers that need a placeholder button)
+// ─────────────────────────────────────────────────────────────────────
+
+export function DonateButtonSkeleton() {
+  return <Skeleton className="h-11 w-full rounded-md" />;
 }

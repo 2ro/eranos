@@ -16,6 +16,8 @@ interface SubHeaderBarProps {
   className?: string;
   /** Extra classes on the inner flex container holding the tabs. */
   innerClassName?: string;
+  /** Extra classes on the SVG background fill. */
+  backgroundFillClassName?: string;
   /** Replace the decorative arc with a plain rectangle. */
   noArc?: boolean;
   /** Keep the bar visible when the mobile top bar hides (slides to top-0 instead of off-screen). */
@@ -30,7 +32,7 @@ interface SubHeaderBarProps {
  * Used by all tab bars (Feed, Search, Notifications, etc.) and the MobileTopBar
  * fallback arc.
  */
-export function SubHeaderBar({ children, className, innerClassName, noArc: _noArc, pinned }: SubHeaderBarProps) {
+export function SubHeaderBar({ children, className, innerClassName, backgroundFillClassName, noArc: _noArc, pinned }: SubHeaderBarProps) {
   const [hover, setHover] = useState<HoverSlice | null>(null);
   const [active, setActive] = useState<HoverSlice | null>(null);
   const navHidden = useNavHidden();
@@ -127,7 +129,7 @@ export function SubHeaderBar({ children, className, innerClassName, noArc: _noAr
         )}
         {/* Inner wrapper holds the ArcBackground and tab content. */}
         <div className="relative">
-          <ArcBackground variant="rect" />
+          <ArcBackground variant="rect" fillClassName={backgroundFillClassName} />
           {/* Per-tab hover highlight: a flat-bottomed slab clipped to the hovered tab's x-slice */}
           {hover && (
             <svg

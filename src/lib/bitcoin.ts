@@ -1,8 +1,9 @@
-import * as bitcoin from 'bitcoinjs-lib';
-import { toXOnly } from 'bitcoinjs-lib';
+import { hex } from '@scure/base';
+import { schnorr } from '@noble/curves/secp256k1.js';
+import * as btc from '@scure/btc-signer';
 import { nip19 } from 'nostr-tools';
-import * as ecc from '@bitcoinerlab/secp256k1';
-import { ECPairFactory, type ECPairAPI } from 'ecpair';
+
+import { esploraFetch } from './esplora';
 
 // ---------------------------------------------------------------------------
 // Constants
@@ -28,26 +29,35 @@ const VBYTES_PER_OUTPUT = 43;
 /** Estimated vBytes for transaction overhead (version, locktime, etc.). */
 const VBYTES_OVERHEAD = 10.5;
 
-// ---------------------------------------------------------------------------
-// ECC initialisation (lazy)
-// ---------------------------------------------------------------------------
+/** Mainnet network constant for @scure/btc-signer. */
+const NETWORK = btc.NETWORK;
 
-let _ECPair: ECPairAPI | null = null;
-
-function getECPair(): ECPairAPI {
-  if (!_ECPair) {
-    bitcoin.initEccLib(ecc);
-    _ECPair = ECPairFactory(ecc);
-  }
-  return _ECPair;
-}
+// ---------------------------------------------------------------------------
+// Pubkey validation
+// ---------------------------------------------------------------------------
 
 /**
  * Strict 32-byte hex validator. Rejects anything that isn't exactly 64
  * lowercase-or-uppercase hex characters.
  */
-function isValidPubkeyHex(hex: string): boolean {
-  return typeof hex === 'string' && /^[0-9a-fA-F]{64}$/.test(hex);
+function isValidPubkeyHex(hexStr: string): boolean {
+  return typeof hexStr === 'string' && /^[0-9a-fA-F]{64}$/.test(hexStr);
+}
+
+/**
+ * Check that a 32-byte x-only key is actually a valid secp256k1 point.
+ *
+ * BIP-340 specifies that an x-only pubkey is valid iff `lift_x(P) ≠ ∞`. Noble's
+ * `schnorr.utils.lift_x` throws when the x-coordinate is not on the curve, so
+ * we use it as a curve-membership check.
+ */
+function isOnCurve(xonly: Uint8Array): boolean {
+  try {
+    schnorr.utils.lift_x(BigInt('0x' + hex.encode(xonly)));
+    return true;
+  } catch {
+    return false;
+  }
 }
 
 /**
@@ -64,13 +74,10 @@ export function nostrPubkeyToBitcoinAddress(pubkeyHex: string): string {
   if (!isValidPubkeyHex(pubkeyHex)) return '';
 
   try {
-    const pubkeyBuffer = Buffer.from(pubkeyHex, 'hex');
+    const internalPubkey = hex.decode(pubkeyHex.toLowerCase());
+    if (!isOnCurve(internalPubkey)) return '';
 
-    const { address } = bitcoin.payments.p2tr({
-      internalPubkey: pubkeyBuffer,
-      network: bitcoin.networks.bitcoin,
-    });
-
+    const { address } = btc.p2tr(internalPubkey, undefined, NETWORK);
     return address || '';
   } catch (error) {
     console.error('Error generating Bitcoin address:', error);
@@ -117,10 +124,15 @@ export interface AddressData {
  * Esplora-compatible REST API (e.g. mempool.space, Blockstream).
  *
  * @param address    The Bitcoin address to look up.
- * @param baseUrl    Esplora REST root, no trailing slash (e.g. `https://mempool.space/api`).
+ * @param baseUrls   Ordered list of Esplora REST roots tried with failover.
+ * @param signal     Optional abort signal (e.g. from TanStack Query).
  */
-export async function fetchAddressData(address: string, baseUrl: string): Promise<AddressData> {
-  const response = await fetch(`${baseUrl}/address/${address}`);
+export async function fetchAddressData(
+  address: string,
+  baseUrls: string[],
+  signal?: AbortSignal,
+): Promise<AddressData> {
+  const response = await esploraFetch(baseUrls, `/address/${address}`, { signal });
 
   if (!response.ok) {
     throw new Error('Failed to fetch balance');
@@ -169,12 +181,20 @@ export function formatSats(sats: number): string {
  *
  * Note: the `/v1/prices` endpoint is a mempool.space extension to the
  * standard Esplora REST surface. Backends like Blockstream's Esplora do
- * not expose it.
+ * not expose it — those endpoints return `404` and the failover client
+ * silently advances to the next URL (without penalising the endpoint).
  *
- * @param baseUrl    Esplora REST root, no trailing slash (e.g. `https://mempool.space/api`).
+ * @param baseUrls   Ordered list of Esplora REST roots tried with failover.
+ * @param signal     Optional abort signal (e.g. from TanStack Query).
  */
-export async function fetchBtcPrice(baseUrl: string): Promise<number> {
-  const response = await fetch(`${baseUrl}/v1/prices`);
+export async function fetchBtcPrice(baseUrls: string[], signal?: AbortSignal): Promise<number> {
+  const response = await esploraFetch(baseUrls, `/v1/prices`, {
+    // /v1/prices is a mempool.space extension — 404 means "endpoint doesn't
+    // speak this path", not "the endpoint is dead". Soft-failover to the
+    // next URL without putting this one in cool-down.
+    skipStatuses: [404],
+    signal,
+  });
 
   if (!response.ok) {
     throw new Error('Failed to fetch BTC price');
@@ -260,10 +280,15 @@ export interface Transaction {
  * Returns simplified transactions with net amount relative to the address.
  *
  * @param address    The Bitcoin address to look up.
- * @param baseUrl    Esplora REST root, no trailing slash.
+ * @param baseUrls   Ordered list of Esplora REST roots tried with failover.
+ * @param signal     Optional abort signal (e.g. from TanStack Query).
  */
-export async function fetchTransactions(address: string, baseUrl: string): Promise<Transaction[]> {
-  const response = await fetch(`${baseUrl}/address/${address}/txs`);
+export async function fetchTransactions(
+  address: string,
+  baseUrls: string[],
+  signal?: AbortSignal,
+): Promise<Transaction[]> {
+  const response = await esploraFetch(baseUrls, `/address/${address}/txs`, { signal });
 
   if (!response.ok) {
     throw new Error('Failed to fetch transactions');
@@ -350,10 +375,15 @@ export interface TxDetail {
  * Fetch full transaction details from an Esplora-compatible API.
  *
  * @param txid       The transaction ID (hex).
- * @param baseUrl    Esplora REST root, no trailing slash.
+ * @param baseUrls   Ordered list of Esplora REST roots tried with failover.
+ * @param signal     Optional abort signal (e.g. from TanStack Query).
  */
-export async function fetchTxDetail(txid: string, baseUrl: string): Promise<TxDetail> {
-  const response = await fetch(`${baseUrl}/tx/${txid}`);
+export async function fetchTxDetail(
+  txid: string,
+  baseUrls: string[],
+  signal?: AbortSignal,
+): Promise<TxDetail> {
+  const response = await esploraFetch(baseUrls, `/tx/${txid}`, { signal });
   if (!response.ok) throw new Error('Failed to fetch transaction');
 
   const tx = await response.json();
@@ -429,12 +459,17 @@ export interface AddressDetail {
  * Fetch full address details (balance + recent txs) from an Esplora-compatible API.
  *
  * @param address    The Bitcoin address to look up.
- * @param baseUrl    Esplora REST root, no trailing slash.
+ * @param baseUrls   Ordered list of Esplora REST roots tried with failover.
+ * @param signal     Optional abort signal (e.g. from TanStack Query).
  */
-export async function fetchAddressDetail(address: string, baseUrl: string): Promise<AddressDetail> {
+export async function fetchAddressDetail(
+  address: string,
+  baseUrls: string[],
+  signal?: AbortSignal,
+): Promise<AddressDetail> {
   const [addrData, txs] = await Promise.all([
-    fetchAddressData(address, baseUrl),
-    fetchTransactions(address, baseUrl),
+    fetchAddressData(address, baseUrls, signal),
+    fetchTransactions(address, baseUrls, signal),
   ]);
 
   return {
@@ -466,10 +501,15 @@ export interface UTXO {
  * Fetch UTXOs for a Bitcoin address from an Esplora-compatible API.
  *
  * @param address    The Bitcoin address to look up.
- * @param baseUrl    Esplora REST root, no trailing slash.
+ * @param baseUrls   Ordered list of Esplora REST roots tried with failover.
+ * @param signal     Optional abort signal (e.g. from TanStack Query).
  */
-export async function fetchUTXOs(address: string, baseUrl: string): Promise<UTXO[]> {
-  const response = await fetch(`${baseUrl}/address/${address}/utxo`);
+export async function fetchUTXOs(
+  address: string,
+  baseUrls: string[],
+  signal?: AbortSignal,
+): Promise<UTXO[]> {
+  const response = await esploraFetch(baseUrls, `/address/${address}/utxo`, { signal });
   if (!response.ok) throw new Error('Failed to fetch UTXOs');
   return response.json();
 }
@@ -491,10 +531,11 @@ export interface FeeRates {
 /**
  * Fetch recommended fee rates (sat/vB) from an Esplora-compatible API.
  *
- * @param baseUrl    Esplora REST root, no trailing slash.
+ * @param baseUrls   Ordered list of Esplora REST roots tried with failover.
+ * @param signal     Optional abort signal (e.g. from TanStack Query).
  */
-export async function getFeeRates(baseUrl: string): Promise<FeeRates> {
-  const response = await fetch(`${baseUrl}/fee-estimates`);
+export async function getFeeRates(baseUrls: string[], signal?: AbortSignal): Promise<FeeRates> {
+  const response = await esploraFetch(baseUrls, `/fee-estimates`, { signal });
   if (!response.ok) throw new Error('Failed to fetch fee estimates');
 
   const data = await response.json();
@@ -526,7 +567,7 @@ export function estimateFee(numInputs: number, numOutputs: number, feeRate: numb
  */
 export function validateBitcoinAddress(address: string): boolean {
   try {
-    bitcoin.address.toOutputScript(address, bitcoin.networks.bitcoin);
+    btc.Address(NETWORK).decode(address);
     return true;
   } catch {
     return false;
@@ -537,13 +578,24 @@ export function validateBitcoinAddress(address: string): boolean {
  * Broadcast a signed transaction hex to the Bitcoin network via an
  * Esplora-compatible API. Returns the txid.
  *
+ * Broadcast is idempotent at the Bitcoin protocol layer — re-broadcasting a
+ * tx that's already in mempool is harmless — so we let the failover client
+ * retry across endpoints normally. The first endpoint that accepts the tx
+ * wins.
+ *
  * @param txHex      The signed transaction hex.
- * @param baseUrl    Esplora REST root, no trailing slash.
+ * @param baseUrls   Ordered list of Esplora REST roots tried with failover.
+ * @param signal     Optional abort signal (e.g. from TanStack Query).
  */
-export async function broadcastTransaction(txHex: string, baseUrl: string): Promise<string> {
-  const response = await fetch(`${baseUrl}/tx`, {
+export async function broadcastTransaction(
+  txHex: string,
+  baseUrls: string[],
+  signal?: AbortSignal,
+): Promise<string> {
+  const response = await esploraFetch(baseUrls, `/tx`, {
     method: 'POST',
     body: txHex,
+    signal,
   });
 
   if (!response.ok) {
@@ -576,6 +628,24 @@ export interface UnsignedPsbt {
   fee: number;
 }
 
+// ---------------------------------------------------------------------------
+// PSBT helpers (private)
+// ---------------------------------------------------------------------------
+
+/**
+ * Serialise a PSBT-shaped Transaction to hex. We carry hex strings across the
+ * signer boundary because the existing public API (and NIP-46 `sign_psbt`)
+ * speaks hex.
+ */
+function txToPsbtHex(tx: btc.Transaction): string {
+  return hex.encode(tx.toPSBT());
+}
+
+/** Parse a hex-encoded PSBT into a fresh Transaction. */
+function psbtFromHex(psbtHex: string): btc.Transaction {
+  return btc.Transaction.fromPSBT(hex.decode(psbtHex));
+}
+
 /**
  * Build an unsigned Taproot PSBT ready for signing.
  *
@@ -596,29 +666,24 @@ export function buildUnsignedPsbt(
   utxos: UTXO[],
   feeRate: number,
 ): UnsignedPsbt {
-  const internalPubkey = Buffer.from(senderPubkeyHex, 'hex');
+  const internalPubkey = hex.decode(senderPubkeyHex);
 
   // Derive change address (same Taproot address as sender)
-  const { address: changeAddress } = bitcoin.payments.p2tr({
-    internalPubkey,
-    network: bitcoin.networks.bitcoin,
-  });
+  const senderPayment = btc.p2tr(internalPubkey, undefined, NETWORK);
+  const changeAddress = senderPayment.address;
   if (!changeAddress) throw new Error('Failed to derive change address');
 
   // Build PSBT, add all UTXOs as inputs
-  const psbt = new bitcoin.Psbt({ network: bitcoin.networks.bitcoin });
+  const tx = new btc.Transaction();
   let totalInput = 0;
 
   for (const utxo of utxos) {
-    psbt.addInput({
-      hash: utxo.txid,
+    tx.addInput({
+      txid: utxo.txid,
       index: utxo.vout,
       witnessUtxo: {
-        script: bitcoin.payments.p2tr({
-          internalPubkey,
-          network: bitcoin.networks.bitcoin,
-        }).output!,
-        value: BigInt(utxo.value),
+        script: senderPayment.script,
+        amount: BigInt(utxo.value),
       },
       tapInternalKey: internalPubkey,
     });
@@ -641,13 +706,13 @@ export function buildUnsignedPsbt(
   }
 
   // Add outputs
-  psbt.addOutput({ address: toAddress, value: BigInt(amountSats) });
+  tx.addOutputAddress(toAddress, BigInt(amountSats), NETWORK);
 
   if (hasChange) {
-    psbt.addOutput({ address: changeAddress, value: BigInt(change) });
+    tx.addOutputAddress(changeAddress, BigInt(change), NETWORK);
   }
 
-  return { psbtHex: psbt.toHex(), fee };
+  return { psbtHex: txToPsbtHex(tx), fee };
 }
 
 /**
@@ -681,26 +746,21 @@ export function buildUnsignedMultiOutputPsbt(
     }
   }
 
-  const internalPubkey = Buffer.from(senderPubkeyHex, 'hex');
-  const { address: changeAddress } = bitcoin.payments.p2tr({
-    internalPubkey,
-    network: bitcoin.networks.bitcoin,
-  });
+  const internalPubkey = hex.decode(senderPubkeyHex);
+  const senderPayment = btc.p2tr(internalPubkey, undefined, NETWORK);
+  const changeAddress = senderPayment.address;
   if (!changeAddress) throw new Error('Failed to derive change address');
 
-  const psbt = new bitcoin.Psbt({ network: bitcoin.networks.bitcoin });
+  const tx = new btc.Transaction();
   let totalInput = 0;
 
   for (const utxo of utxos) {
-    psbt.addInput({
-      hash: utxo.txid,
+    tx.addInput({
+      txid: utxo.txid,
       index: utxo.vout,
       witnessUtxo: {
-        script: bitcoin.payments.p2tr({
-          internalPubkey,
-          network: bitcoin.networks.bitcoin,
-        }).output!,
-        value: BigInt(utxo.value),
+        script: senderPayment.script,
+        amount: BigInt(utxo.value),
       },
       tapInternalKey: internalPubkey,
     });
@@ -722,58 +782,62 @@ export function buildUnsignedMultiOutputPsbt(
   }
 
   for (const output of outputs) {
-    psbt.addOutput({ address: output.address, value: BigInt(output.amountSats) });
+    tx.addOutputAddress(output.address, BigInt(output.amountSats), NETWORK);
   }
 
   if (hasChange) {
-    psbt.addOutput({ address: changeAddress, value: BigInt(change) });
+    tx.addOutputAddress(changeAddress, BigInt(change), NETWORK);
   }
 
-  return { psbtHex: psbt.toHex(), fee };
+  return { psbtHex: txToPsbtHex(tx), fee };
+}
+
+/** Compare two `Uint8Array`s for value equality. */
+function bytesEqual(a: Uint8Array, b: Uint8Array): boolean {
+  if (a.length !== b.length) return false;
+  for (let i = 0; i < a.length; i++) if (a[i] !== b[i]) return false;
+  return true;
 }
 
 /**
  * Sign a PSBT locally using a raw private key (nsec).
  *
- * Applies the BIP-341 TapTweak to the private key, signs all inputs whose
- * `tapInternalKey` matches, and returns the signed (but not finalized) PSBT hex.
+ * `@scure/btc-signer.signIdx` accepts the raw 32-byte private scalar and,
+ * when the input carries a `tapInternalKey`, internally applies the BIP-341
+ * TapTweak and produces a Schnorr key-path signature. (For our use case
+ * there is no script tree, so the merkle root is empty.)
  *
  * @param psbtHex       Hex-encoded unsigned PSBT.
  * @param privateKeyHex 32-byte hex private key.
  * @returns Hex-encoded signed PSBT (not finalized).
  */
 export function signPsbtLocal(psbtHex: string, privateKeyHex: string): string {
-  bitcoin.initEccLib(ecc);
-  const psbt = bitcoin.Psbt.fromHex(psbtHex, { network: bitcoin.networks.bitcoin });
+  const tx = psbtFromHex(psbtHex);
 
-  const keyPair = getECPair().fromPrivateKey(Buffer.from(privateKeyHex, 'hex'));
-  const internalPubkey = toXOnly(keyPair.publicKey);
-
-  // Tweak private key for Taproot key-path spending (BIP-341)
-  const tweakedSigner = keyPair.tweak(
-    bitcoin.crypto.taggedHash('TapTweak', internalPubkey),
-  );
+  const privKey = hex.decode(privateKeyHex);
+  const xonly = schnorr.getPublicKey(privKey);
 
   // Per the NIP spec: inputs whose `tapInternalKey` does not match the
   // signer's x-only pubkey MUST be left unchanged. This matters for future
   // multi-signer PSBTs; today `buildUnsignedPsbt` only ever adds the user's
   // own UTXOs, so in practice every input matches.
   let signedAny = false;
-  for (let i = 0; i < psbt.inputCount; i++) {
-    const input = psbt.data.inputs[i];
+  for (let i = 0; i < tx.inputsLength; i++) {
+    const input = tx.getInput(i);
     const inputInternalKey = input.tapInternalKey;
-    if (!inputInternalKey || !Buffer.from(inputInternalKey).equals(Buffer.from(internalPubkey))) {
+    if (!inputInternalKey || !bytesEqual(inputInternalKey, xonly)) {
       continue;
     }
-    psbt.signInput(i, tweakedSigner);
-    signedAny = true;
+    if (tx.signIdx(privKey, i)) {
+      signedAny = true;
+    }
   }
 
   if (!signedAny) {
     throw new Error('No inputs in this PSBT are owned by the signer.');
   }
 
-  return psbt.toHex();
+  return txToPsbtHex(tx);
 }
 
 /**
@@ -783,10 +847,9 @@ export function signPsbtLocal(psbtHex: string, privateKeyHex: string): string {
  * @returns Raw transaction hex ready for broadcast.
  */
 export function finalizePsbt(psbtHex: string): string {
-  bitcoin.initEccLib(ecc);
-  const psbt = bitcoin.Psbt.fromHex(psbtHex, { network: bitcoin.networks.bitcoin });
-  psbt.finalizeAllInputs();
-  return psbt.extractTransaction().toHex();
+  const tx = psbtFromHex(psbtHex);
+  tx.finalize();
+  return hex.encode(tx.extract());
 }
 
 /**
@@ -810,9 +873,8 @@ export function createBitcoinTransaction(
   feeRate: number,
 ): { txHex: string; fee: number } {
   // Derive the x-only pubkey from the private key for buildUnsignedPsbt
-  const keyPair = getECPair().fromPrivateKey(Buffer.from(privateKeyHex, 'hex'));
-  const internalPubkey = toXOnly(keyPair.publicKey);
-  const senderPubkeyHex = Buffer.from(internalPubkey).toString('hex');
+  const privKey = hex.decode(privateKeyHex);
+  const senderPubkeyHex = hex.encode(schnorr.getPublicKey(privKey));
 
   const { psbtHex, fee } = buildUnsignedPsbt(senderPubkeyHex, toAddress, amountSats, utxos, feeRate);
   const signedHex = signPsbtLocal(psbtHex, privateKeyHex);

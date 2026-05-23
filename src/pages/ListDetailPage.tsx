@@ -40,6 +40,7 @@ import { useProfileUrl } from '@/hooks/useProfileUrl';
 import { shareOrCopy } from '@/lib/share';
 import { getRepostKind } from '@/lib/feedUtils';
 import { DITTO_RELAY } from '@/lib/appRelays';
+import { invalidateEventStats } from '@/lib/invalidateEventStats';
 import { toast } from '@/hooks/useToast';
 import { useFeedSettings } from '@/hooks/useFeedSettings';
 import { SubHeaderBar } from '@/components/SubHeaderBar';
@@ -411,7 +412,7 @@ export function ListDetailPage() {
         onSuccess: () => {
           toast({ title: 'Reposted!' });
           setTimeout(() => {
-            queryClient.invalidateQueries({ queryKey: ['event-stats', event.id] });
+            invalidateEventStats(queryClient, event, config.nip85StatsPubkey);
             queryClient.invalidateQueries({ queryKey: ['event-interactions', event.id] });
             queryClient.invalidateQueries({ queryKey: ['user-repost', event.id] });
           }, 3000);
@@ -421,7 +422,7 @@ export function ListDetailPage() {
         },
       },
     );
-  }, [list?.event, user, publishEvent, queryClient]);
+  }, [list?.event, user, publishEvent, queryClient, config.nip85StatsPubkey]);
 
   const handleClone = useCallback(async () => {
     if (!list || !user || cloning) return;

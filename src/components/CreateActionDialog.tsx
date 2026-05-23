@@ -298,6 +298,7 @@ export function CreateActionDialog({ countryCode, communityATag, open, onOpenCha
       if (communityATag) {
         await Promise.all([
           queryClient.invalidateQueries({ queryKey: ['community-actions', communityATag] }),
+          queryClient.invalidateQueries({ queryKey: ['organization-activity', communityATag] }),
           queryClient.invalidateQueries({
             predicate: (q) => {
               const [root, aTagsKey] = q.queryKey;
@@ -308,6 +309,9 @@ export function CreateActionDialog({ countryCode, communityATag, open, onOpenCha
           }),
         ]);
       }
+      // Pledges (kind 36639) surface in the home Agora activity feed.
+      await queryClient.invalidateQueries({ queryKey: ['agora-feed'] });
+      await queryClient.invalidateQueries({ queryKey: ['mixed-feed'] });
 
       setFormData({
         title: '', description: '', tagInput: '', pledgeUsd: '',

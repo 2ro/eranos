@@ -63,6 +63,12 @@ export interface ParsedCommunity {
   relays: string[];
   /** The `a` tag coordinate for the community: `34550:<pubkey>:<d-tag>`. */
   aTag: string;
+  /**
+   * Raw tag array from the underlying kind 34550 event. Carried through so
+   * non-essential, non-indexed markers (e.g. Agora's `["t", "agora"]`
+   * content marker) can be inspected without re-fetching the event.
+   */
+  tags: string[][];
 }
 
 /**
@@ -101,6 +107,7 @@ export function parseCommunityEvent(event: NostrEvent): ParsedCommunity | null {
     moderatorPubkeys,
     relays,
     aTag: `${COMMUNITY_DEFINITION_KIND}:${event.pubkey}:${dTag}`,
+    tags: event.tags,
   };
 }
 
@@ -486,7 +493,7 @@ export function canModerateOrganization(
  *
  * Agora restricts creation of organization-tagged campaigns / pledges /
  * events in the client to this set, but anyone could technically publish
- * a kind 30223 / 36639 / 31922 / 31923 with the organization's uppercase
+ * a kind 33863 / 36639 / 31922 / 31923 with the organization's uppercase
  * `A` root-scope tag outside the client. Queries that surface "official"
  * organization activity MUST pass this list as the `authors` filter so
  * forged events from non-moderators never reach the UI.

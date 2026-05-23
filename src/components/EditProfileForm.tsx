@@ -29,7 +29,6 @@ import {
   CollapsibleTrigger,
 } from '@/components/ui/collapsible';
 import { z } from 'zod';
-import { IntroImage } from '@/components/IntroImage';
 import { ImageCropDialog } from '@/components/ImageCropDialog';
 
 // Extended form schema that includes custom fields
@@ -203,7 +202,7 @@ export const EditProfileForm: React.FC<EditProfileFormProps> = ({ onValuesChange
       // Combine existing metadata with new values
       const data: Record<string, unknown> = { ...metadata, ...standardMetadata };
 
-      // Strip any legacy avatar shape data from old Ditto-style profiles
+      // Strip any legacy avatar-shape field carried over from older clients.
       delete data.shape;
 
       // Clean up empty values in standard metadata
@@ -248,14 +247,11 @@ export const EditProfileForm: React.FC<EditProfileFormProps> = ({ onValuesChange
   return (
     <div>
       {/* Intro */}
-      <div className="flex items-center gap-4 px-3 pt-2 pb-4">
-        <IntroImage src="/profile-intro.png" />
-        <div className="min-w-0">
-          <h2 className="text-sm font-semibold">Your Identity</h2>
-          <p className="text-xs text-muted-foreground mt-1 leading-relaxed">
-            Customize your profile with a name, bio, images, and verification. This is how others will see you on Nostr.
-          </p>
-        </div>
+      <div className="px-3 pt-2 pb-4">
+        <h2 className="text-sm font-semibold">Your Identity</h2>
+        <p className="text-xs text-muted-foreground mt-1 leading-relaxed">
+          Customize your profile with a name, bio, images, and verification. This is how others will see you on Nostr.
+        </p>
       </div>
 
       {/* Crop dialog */}

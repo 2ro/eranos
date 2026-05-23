@@ -1,130 +1,31 @@
 import { useNostr } from '@nostrify/react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import type { NostrEvent } from '@nostrify/nostrify';
 
 import { useNostrPublish } from './useNostrPublish';
 import { useCampaignModerators } from './useCampaignModerators';
 import { CAMPAIGN_KIND } from '@/lib/campaign';
+import {
+  AGORA_MODERATION_NAMESPACE,
+  EMPTY_MODERATION_DATA,
+  LABEL_KIND,
+  type ModerationData,
+  type ModerationLabel,
+  type ModerationState,
+  foldModerationLabels,
+} from '@/lib/agoraModeration';
 
-/** NIP-32 label kind. */
-const LABEL_KIND = 1985;
-/** Label namespace for Agora's moderation labels. */
-export const AGORA_MODERATION_NAMESPACE = 'agora.moderation';
-
-/** The six possible label values in the moderation namespace. */
-export type ModerationLabel =
-  | 'approved'
-  | 'unapproved'
-  | 'hidden'
-  | 'unhidden'
-  | 'featured'
-  | 'unfeatured';
-
-/** A single label event narrowed to its decision axis. */
-interface AxisDecision {
-  /** Latest label observed on this axis. */
-  label: ModerationLabel;
-  /** Author of the latest label. */
-  pubkey: string;
-  /** Created-at of the latest label. */
-  createdAt: number;
-}
+// Re-exports for existing import sites. The namespace constant and the
+// `ModerationLabel` type are imported from this module by the campaign
+// moderation menu and other surfaces; keep those exports stable so the
+// shared-module refactor stays a no-op for callers.
+export { AGORA_MODERATION_NAMESPACE };
+export type { ModerationLabel };
 
 /** Per-campaign rollup of approval + hide + featured state. */
-export interface CampaignModerationState {
-  approval?: AxisDecision; // `approved` or `unapproved`
-  hide?: AxisDecision; // `hidden` or `unhidden`
-  featured?: AxisDecision; // `featured` or `unfeatured`
-}
+export type CampaignModerationState = ModerationState;
 
-export interface CampaignModerationData {
-  /** Map of `30223:<pubkey>:<d>` -> rollup. */
-  byCoord: Map<string, CampaignModerationState>;
-  /** Coordinates where the latest approval label is `approved`. */
-  approvedCoords: Set<string>;
-  /** Coordinates where the latest hide label is `hidden`. */
-  hiddenCoords: Set<string>;
-  /** Coordinates where the latest featured label is `featured`. */
-  featuredCoords: Set<string>;
-  /**
-   * Map of `coord` -> `created_at` of the latest `featured` label.
-   * Used to sort the home-page featured row newest-first.
-   */
-  featuredOrder: Map<string, number>;
-  /** Pubkeys that were considered moderators when the query ran. */
-  moderators: string[];
-}
-
-const EMPTY_DATA: CampaignModerationData = {
-  byCoord: new Map(),
-  approvedCoords: new Set(),
-  hiddenCoords: new Set(),
-  featuredCoords: new Set(),
-  featuredOrder: new Map(),
-  moderators: [],
-};
-
-/** True if a label value belongs to the approval axis. */
-function isApprovalLabel(value: string): value is 'approved' | 'unapproved' {
-  return value === 'approved' || value === 'unapproved';
-}
-
-/** True if a label value belongs to the hide axis. */
-function isHideLabel(value: string): value is 'hidden' | 'unhidden' {
-  return value === 'hidden' || value === 'unhidden';
-}
-
-/** True if a label value belongs to the featured axis. */
-function isFeaturedLabel(value: string): value is 'featured' | 'unfeatured' {
-  return value === 'featured' || value === 'unfeatured';
-}
-
-/**
- * Fold a flat list of label events into per-coordinate rollups by axis.
- * The newest event per `(coord, axis)` wins. Events not addressing a
- * campaign coordinate or carrying a value outside the namespace are dropped.
- */
-function foldLabelEvents(events: NostrEvent[], moderators: string[]): CampaignModerationData {
-  const byCoord = new Map<string, CampaignModerationState>();
-
-  for (const event of events) {
-    const value = event.tags.find(([n, , ns]) => n === 'l' && ns === AGORA_MODERATION_NAMESPACE)?.[1];
-    if (!value) continue;
-    const aTag = event.tags.find(([n, v]) => n === 'a' && typeof v === 'string' && v.startsWith(`${CAMPAIGN_KIND}:`))?.[1];
-    if (!aTag) continue;
-
-    const state = byCoord.get(aTag) ?? {};
-    if (isApprovalLabel(value)) {
-      if (!state.approval || event.created_at > state.approval.createdAt) {
-        state.approval = { label: value, pubkey: event.pubkey, createdAt: event.created_at };
-      }
-    } else if (isHideLabel(value)) {
-      if (!state.hide || event.created_at > state.hide.createdAt) {
-        state.hide = { label: value, pubkey: event.pubkey, createdAt: event.created_at };
-      }
-    } else if (isFeaturedLabel(value)) {
-      if (!state.featured || event.created_at > state.featured.createdAt) {
-        state.featured = { label: value, pubkey: event.pubkey, createdAt: event.created_at };
-      }
-    }
-    byCoord.set(aTag, state);
-  }
-
-  const approvedCoords = new Set<string>();
-  const hiddenCoords = new Set<string>();
-  const featuredCoords = new Set<string>();
-  const featuredOrder = new Map<string, number>();
-  for (const [coord, state] of byCoord) {
-    if (state.approval?.label === 'approved') approvedCoords.add(coord);
-    if (state.hide?.label === 'hidden') hiddenCoords.add(coord);
-    if (state.featured?.label === 'featured') {
-      featuredCoords.add(coord);
-      featuredOrder.set(coord, state.featured.createdAt);
-    }
-  }
-
-  return { byCoord, approvedCoords, hiddenCoords, featuredCoords, featuredOrder, moderators };
-}
+/** Surface-scoped alias so existing callers keep working. */
+export type CampaignModerationData = ModerationData;
 
 /**
  * Fetches and folds campaign-moderation label events authored by Team
@@ -154,7 +55,8 @@ export function useCampaignModeration() {
   // an empty `authors:` filter (which would return everything matching the
   // namespace from any author and break our trust model — see AGENTS.md).
   // Once moderators arrives empty, the query runs and immediately resolves
-  // to EMPTY_DATA — no rendering can promote a campaign without a moderator.
+  // to EMPTY_MODERATION_DATA — no rendering can promote a campaign without
+  // a moderator.
   const moderatorsKey = moderators ? [...moderators].sort().join(',') : '';
 
   const moderationQuery = useQuery({
@@ -162,7 +64,7 @@ export function useCampaignModeration() {
     enabled: moderators !== undefined,
     queryFn: async ({ signal }): Promise<CampaignModerationData> => {
       if (!moderators || moderators.length === 0) {
-        return { ...EMPTY_DATA, moderators: [] };
+        return { ...EMPTY_MODERATION_DATA, moderators: [] };
       }
       const events = await nostr.query(
         [
@@ -179,7 +81,7 @@ export function useCampaignModeration() {
         ],
         { signal: AbortSignal.any([signal, AbortSignal.timeout(8000)]) },
       );
-      return foldLabelEvents(events, moderators);
+      return foldModerationLabels(events, moderators, CAMPAIGN_KIND);
     },
     staleTime: 30_000,
   });
@@ -203,11 +105,18 @@ export function useCampaignModeration() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['campaign-moderation'] });
+      // Moderation decisions (approve / hide / feature) gate which campaigns
+      // surface on the home page, discover shelf, and community grids — so
+      // the list queries need to refetch too, otherwise the moderator's UI
+      // still shows the old approval state until refresh.
+      queryClient.invalidateQueries({ queryKey: ['campaigns'] });
+      queryClient.invalidateQueries({ queryKey: ['campaigns-all'] });
+      queryClient.invalidateQueries({ queryKey: ['campaigns-all-scores'] });
     },
   });
 
   return {
-    data: moderationQuery.data ?? EMPTY_DATA,
+    data: moderationQuery.data ?? EMPTY_MODERATION_DATA,
     isPending: moderationQuery.isPending,
     isLoading: moderationQuery.isLoading,
     isReady: moderationQuery.isSuccess,

@@ -8,6 +8,7 @@ import { useNostrPublish } from '@/hooks/useNostrPublish';
 import { useToast } from '@/hooks/useToast';
 import { useAppContext } from '@/hooks/useAppContext';
 import { notificationSuccess } from '@/lib/haptics';
+import { withAgoraTag } from '@/lib/agoraNoteTags';
 import {
   nostrPubkeyToBitcoinAddress,
   fetchUTXOs,
@@ -74,7 +75,7 @@ export function useOnchainZap(
   const { mutateAsync: publishEvent } = useNostrPublish();
   const { toast } = useToast();
   const { config } = useAppContext();
-  const { esploraBaseUrl } = config;
+  const { esploraApis } = config;
   const queryClient = useQueryClient();
 
   const [isZapping, setIsZapping] = useState(false);
@@ -104,8 +105,8 @@ export function useOnchainZap(
 
       // Fetch UTXOs and fee rates
       const [utxos, rates] = await Promise.all([
-        fetchUTXOs(senderAddress, esploraBaseUrl),
-        getFeeRates(esploraBaseUrl),
+        fetchUTXOs(senderAddress, esploraApis),
+        getFeeRates(esploraApis),
       ]);
 
       if (utxos.length === 0) {
@@ -137,7 +138,7 @@ export function useOnchainZap(
 
       // Broadcast
       setProgress('broadcasting');
-      const txid = await broadcastTransaction(txHex, esploraBaseUrl);
+      const txid = await broadcastTransaction(txHex, esploraApis);
 
       // Publish kind 8333 event
       setProgress('publishing');
@@ -162,7 +163,7 @@ export function useOnchainZap(
       const event = await publishEvent({
         kind: 8333,
         content: comment,
-        tags,
+        tags: withAgoraTag(tags),
       });
 
       return { txid, amountSats, fee, event };

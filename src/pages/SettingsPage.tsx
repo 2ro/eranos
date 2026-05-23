@@ -1,13 +1,11 @@
 import { useSeoMeta } from '@unhead/react';
-import { lazy, Suspense, useState, useEffect, useRef } from 'react';
+import { lazy, Suspense, useState } from 'react';
 import { ChevronRight, Settings } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { PageHeader } from '@/components/PageHeader';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useAppContext } from '@/hooks/useAppContext';
-import { IntroImage } from '@/components/IntroImage';
 import { useLayoutOptions } from '@/contexts/LayoutContext';
-import { toast } from '@/hooks/useToast';
 import { isAdmin } from '@/lib/admins';
 
 const RequestToVanishDialog = lazy(() => import('@/components/RequestToVanishDialog').then(m => ({ default: m.RequestToVanishDialog })));
@@ -16,7 +14,6 @@ interface SettingsSection {
   id: string;
   label: string;
   description: string;
-  illustration?: string;
   path: string;
   requiresAuth?: boolean;
   /** When true, only shown to platform admins (see `isAdmin` in `@/lib/admins`). */
@@ -27,67 +24,46 @@ const settingsSections: SettingsSection[] = [
   {
     id: 'profile',
     label: 'Profile',
-    description: 'Edit your display name, bio, and avatar',
-    illustration: '/profile-intro.png',
+    description: 'Display name, bio, avatar, and verification.',
     path: '/settings/profile',
     requiresAuth: true,
   },
   {
     id: 'appearance',
     label: 'Appearance',
-    description: 'Switch between system, light, and dark mode',
-    illustration: '/theme-intro.png',
+    description: 'System, light, or dark mode.',
     path: '/settings/appearance',
   },
   {
     id: 'feed',
     label: 'Home Feed',
-    description: 'Choose what types of posts appear in your home feed',
-    illustration: '/community-intro.png',
+    description: 'Choose which post types appear in your home feed, and manage muted users, hashtags, and sensitive content.',
     path: '/settings/feed',
-  },
-  {
-    id: 'content',
-    label: 'Content',
-    description: 'Muted users, hashtags, and sensitive content settings',
-    illustration: '/mute-intro.png',
-    path: '/settings/content',
   },
   {
     id: 'network',
     label: 'Network',
-    description: 'Relays and file upload servers',
-    illustration: '/relay-intro.png',
+    description: 'Relays and file upload servers.',
     path: '/settings/network',
     requiresAuth: true,
   },
   {
     id: 'notifications',
     label: 'Notifications',
-    description: 'Configure push notification preferences',
-    illustration: '/notification-intro.png',
+    description: 'Push notification preferences.',
     path: '/settings/notifications',
     requiresAuth: true,
   },
   {
     id: 'advanced',
     label: 'Advanced',
-    description: 'Wallet, system, and power user settings',
-    illustration: '/advanced-intro.png',
+    description: 'Wallet, system, and power-user options.',
     path: '/settings/advanced',
-  },
-  {
-    id: 'magic',
-    label: 'Magic',
-    description: 'Enchanted cursor effects and mystical interface powers',
-    illustration: '/magic-intro.png',
-    path: '/settings/magic',
   },
   {
     id: 'organizers',
     label: 'Organizers',
-    description: 'Appoint country organizers who can pin posts to country feeds',
-    illustration: '/community-intro.png',
+    description: 'Appoint country organizers who can pin posts to country feeds.',
     path: '/organizers',
     requiresAuth: true,
     requiresAdmin: true,
@@ -96,20 +72,10 @@ const settingsSections: SettingsSection[] = [
 
 export function SettingsPage() {
   const { user } = useCurrentUser();
-  const { config, updateConfig } = useAppContext();
+  const { config } = useAppContext();
   const navigate = useNavigate();
-  const [sigilFlash, setSigilFlash] = useState(false);
-  const [sigilVisible, setSigilVisible] = useState(false);
   const [deleteAccountOpen, setDeleteAccountOpen] = useState(false);
-  const inactivityTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  useEffect(() => {
-    if (config.magicMouse) return;
-    inactivityTimer.current = setTimeout(() => setSigilVisible(true), 2 * 60 * 1000);
-    return () => {
-      if (inactivityTimer.current) clearTimeout(inactivityTimer.current);
-    };
-  }, [config.magicMouse]);
   useLayoutOptions({});
 
   useSeoMeta({
@@ -117,86 +83,48 @@ export function SettingsPage() {
     description: `Manage your ${config.appName} settings`,
   });
 
-  // Magic section only appears once unlocked; admin-only sections gate by isAdmin.
   const visibleSections = settingsSections.filter((section) => {
     if (section.requiresAuth && !user) return false;
     if (section.requiresAdmin && !isAdmin(user?.pubkey)) return false;
-    if (section.id === 'magic' && !config.magicMouse) return false;
     return true;
   });
 
-  function unlockMagic() {
-    if (config.magicMouse) {
-      navigate('/settings/magic');
-      return;
-    }
-    setSigilFlash(true);
-    setTimeout(() => setSigilFlash(false), 1000);
-    updateConfig((c) => ({ ...c, magicMouse: true }));
-    toast({
-      title: '✨ Magical potential unlocked',
-      description: 'You have awakened the arcane. Your cursor now burns with enchanted fire.',
-    });
-  }
-
   return (
-    <main className="relative min-h-screen pb-16 sidebar:pb-0">
-      {/* Page header */}
+    <main className="min-h-screen pb-16 sidebar:pb-0">
       <PageHeader title="Settings" icon={<Settings className="size-5" />} backTo="/" />
 
-      {/* Codex heading + exposition */}
-      <div className="px-7 pb-4 pt-4 text-center space-y-2.5">
-        <p className="text-xs text-muted-foreground leading-relaxed select-none">
-          Shape your identity, tune your feed, and manage how you connect to the Nostr network.<br />Everything you need to make this place feel like yours.
-        </p>
-        <p className="text-[10px] tracking-[0.5em] uppercase text-primary/60 select-none pt-6">Codex of Configuration</p>
-      </div>
-
-      {/* Tome ornament */}
-      <div className="flex items-center gap-3 px-6 pb-5">
-        <div className="h-px flex-1 bg-gradient-to-r from-transparent via-primary/40 to-primary/60" />
-        <span className="text-primary/50 text-xs tracking-[0.3em] select-none">✦</span>
-        <div className="h-px flex-1 bg-gradient-to-l from-transparent via-primary/40 to-primary/60" />
-      </div>
-
-      {/* Settings menu */}
-      <div className="px-4">
-        {visibleSections.map((section, i) => {
-          return (
-            <div key={section.id}>
-              <div
-                className="flex items-center gap-4 px-3 py-2 my-1 cursor-pointer rounded-xl transition-colors hover:bg-muted/60 active:bg-muted/80 group"
+      {/* Settings list */}
+      <nav aria-label="Settings" className="px-4 sm:px-6 pt-2">
+        <ul className="divide-y divide-border">
+          {visibleSections.map((section) => (
+            <li key={section.id}>
+              <button
+                type="button"
                 onClick={() => navigate(section.path)}
+                className="flex w-full items-center gap-4 px-2 py-4 text-left transition-colors hover:bg-muted/40 focus-visible:bg-muted/40 focus-visible:outline-none"
               >
-                <div className="flex items-center justify-center size-20 shrink-0">
-                  {section.illustration && (
-                    <IntroImage src={section.illustration} size="w-22" />
-                  )}
-                </div>
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-semibold">{section.label}</p>
                   <p className="text-xs text-muted-foreground mt-0.5">
                     {section.description}
                   </p>
                 </div>
-                <ChevronRight className="size-4 text-primary/40 shrink-0 group-hover:text-primary/70 transition-colors" strokeWidth={4} />
-              </div>
-              {i < visibleSections.length - 1 && (
-                <div className="mx-6 h-px bg-primary/10" />
-              )}
-            </div>
-          );
-        })}
-      </div>
+                <ChevronRight className="size-4 text-muted-foreground shrink-0" aria-hidden="true" />
+              </button>
+            </li>
+          ))}
+        </ul>
+      </nav>
 
-      {/* Delete Account */}
+      {/* Delete account */}
       {user && (
-        <div className="flex justify-center pt-4 pb-1">
+        <div className="flex justify-center pt-8 pb-4">
           <button
+            type="button"
             onClick={() => setDeleteAccountOpen(true)}
-            className="text-xs text-destructive-foreground bg-destructive/80 hover:bg-destructive rounded-full px-4 py-1.5 transition-colors"
+            className="text-xs font-medium text-destructive hover:underline focus-visible:underline focus-visible:outline-none"
           >
-            Delete Account
+            Delete account
           </button>
         </div>
       )}
@@ -207,50 +135,13 @@ export function SettingsPage() {
         </Suspense>
       )}
 
-      {/* Bottom ornament */}
-      <div className="flex items-center gap-3 px-6 pt-4 pb-2">
-        <div className="h-px flex-1 bg-gradient-to-r from-transparent via-primary/20 to-primary/30" />
-        <span className="text-primary/30 text-[10px] tracking-[0.4em] select-none">◆</span>
-        <div className="h-px flex-1 bg-gradient-to-l from-transparent via-primary/20 to-primary/30" />
-      </div>
-
       {/* Version footer */}
-      <Link to="/changelog" className="block text-center text-[11px] text-muted-foreground/50 hover:text-muted-foreground transition-colors select-none pt-1 pb-2">
+      <Link
+        to="/changelog"
+        className="block text-center text-[11px] text-muted-foreground/70 hover:text-muted-foreground transition-colors pt-2 pb-4"
+      >
         v{import.meta.env.VERSION}{import.meta.env.COMMIT_TAG ? '' : '+'} ({new Date(import.meta.env.BUILD_DATE).toLocaleDateString()})
       </Link>
-
-      {/* Magic sigil — appears after 2 min inactivity, only when magic is locked */}
-      {!config.magicMouse && sigilVisible && (<div className="flex justify-center pt-16 pb-12">
-        <button
-          onClick={unlockMagic}
-          className="relative group focus:outline-none"
-          aria-label={config.magicMouse ? 'Open Magic settings' : 'Unlock magical potential'}
-        >
-          {/* Ambient radial glow pool — tight, close to the image */}
-          <div
-            className="absolute inset-0 rounded-full blur-xl animate-pulse-slow"
-            style={{
-              background: 'radial-gradient(circle, hsl(var(--primary) / 0.2), transparent 60%)',
-              opacity: sigilFlash ? 1 : undefined,
-              transform: sigilFlash ? 'scale(1.5)' : undefined,
-              transition: 'opacity 0.8s, transform 0.8s',
-            }}
-          />
-          <div
-            className={!sigilFlash && !config.magicMouse ? 'animate-sigil-glow' : undefined}
-            style={sigilFlash || config.magicMouse ? {
-              opacity: sigilFlash ? 1 : 0.55,
-              filter: sigilFlash
-                ? 'drop-shadow(0 0 20px hsl(var(--primary))) drop-shadow(0 0 40px hsl(var(--primary) / 0.4))'
-                : 'drop-shadow(0 0 8px hsl(var(--primary) / 0.7))',
-              transform: sigilFlash ? 'scale(1.12)' : 'scale(1)',
-              transition: 'opacity 0.8s, filter 0.8s, transform 0.5s',
-            } : undefined}
-          >
-            <IntroImage src="/magic-intro.png" size="w-72" />
-          </div>
-        </button>
-      </div>)}
     </main>
   );
 }

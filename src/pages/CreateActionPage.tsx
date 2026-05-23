@@ -23,7 +23,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
-import { useBitcoinWallet } from '@/hooks/useBitcoinWallet';
+import { useBtcPrice } from '@/hooks/useBtcPrice';
 import { useManageableOrganizations } from '@/hooks/useManageableOrganizations';
 import { useNostrPublish } from '@/hooks/useNostrPublish';
 import { useToast } from '@/hooks/useToast';
@@ -36,6 +36,7 @@ import { createOrganizationAssociationTags, decodeOrganizationParam } from '@/li
 import { sanitizeUrl } from '@/lib/sanitizeUrl';
 import { unixSecondsInTimezone } from '@/lib/timezone';
 import { cn } from '@/lib/utils';
+import { withAgoraTag } from '@/lib/agoraNoteTags';
 
 function normalizePledgeTag(value: string): string {
   return value.trim().replace(/^#+/, '').toLowerCase().replace(/\s+/g, '-');
@@ -62,7 +63,7 @@ export function CreateActionPage() {
   const queryClient = useQueryClient();
   const { mutateAsync: createEvent } = useNostrPublish();
   const { toast } = useToast();
-  const { btcPrice } = useBitcoinWallet();
+  const { data: btcPrice } = useBtcPrice();
 
   const browserTimezone = useMemo(
     () => Intl.DateTimeFormat().resolvedOptions().timeZone,
@@ -197,13 +198,16 @@ export function CreateActionPage() {
         ]);
       }
 
-      await createEvent({ kind: 36639, content: trimmedDescription, tags });
+      await createEvent({ kind: 36639, content: trimmedDescription, tags: withAgoraTag(tags) });
     },
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ['agora-actions'] });
       if (organizationATag) {
         await queryClient.invalidateQueries({ queryKey: ['organization-activity', organizationATag] });
       }
+      // Pledges (kind 36639) surface in the home Agora activity feed.
+      await queryClient.invalidateQueries({ queryKey: ['agora-feed'] });
+      await queryClient.invalidateQueries({ queryKey: ['mixed-feed'] });
       await queryClient.refetchQueries({ queryKey: ['agora-actions'] });
       toast({ title: 'Pledge created' });
       navigate('/pledges');

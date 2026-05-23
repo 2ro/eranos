@@ -15,9 +15,8 @@ import {
 
 import { useAction, type Action } from '@/hooks/useActions';
 import { useAuthor } from '@/hooks/useAuthor';
-import { useBitcoinWallet } from '@/hooks/useBitcoinWallet';
+import { useBtcPrice } from '@/hooks/useBtcPrice';
 import { useComments } from '@/hooks/useComments';
-import { useEventStats } from '@/hooks/useTrending';
 import { useProfileUrl } from '@/hooks/useProfileUrl';
 import { useSubmissionZapTotals } from '@/hooks/useSubmissionZapTotals';
 import { useToast } from '@/hooks/useToast';
@@ -33,14 +32,13 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { Skeleton } from '@/components/ui/skeleton';
+import { DetailCommentComposer } from '@/components/DetailCommentComposer';
 import { PostActionBar } from '@/components/PostActionBar';
+import { PinnedCommentHeader } from '@/components/PinnedCommentHeader';
 import { ReplyComposeModal } from '@/components/ReplyComposeModal';
 import { NoteMoreMenu } from '@/components/NoteMoreMenu';
-import {
-  InteractionsModal,
-  type InteractionTab,
-} from '@/components/InteractionsModal';
 import { ThreadedReplyList, type ReplyNode } from '@/components/ThreadedReplyList';
+import { usePinnedEventComments } from '@/hooks/usePinnedEventComments';
 import NotFound from '@/pages/NotFound';
 
 function formatDeadline(unixSeconds: number): { label: string; isPast: boolean } {
@@ -77,17 +75,21 @@ export function ActionDetailPage({ pubkey, identifier }: ActionDetailPageProps) 
 }
 
 function PledgeDetailContent({ action }: { action: Action }) {
-  const { btcPrice } = useBitcoinWallet();
+  const { data: btcPrice } = useBtcPrice();
   const author = useAuthor(action.pubkey);
   const navigate = useNavigate();
   const { toast } = useToast();
-  const { data: engagementStats } = useEventStats(action.event.id, action.event);
   const { data: commentsData, isLoading: commentsLoading } = useComments(action.event, 500);
+  const rootATag = `36639:${action.pubkey}:${action.id}`;
+  const {
+    pinnedEvents,
+    isPinned,
+    canManagePins,
+    togglePin,
+  } = usePinnedEventComments(rootATag, action.pubkey);
 
   const [replyOpen, setReplyOpen] = useState(false);
   const [moreMenuOpen, setMoreMenuOpen] = useState(false);
-  const [interactionsOpen, setInteractionsOpen] = useState(false);
-  const [interactionsTab, setInteractionsTab] = useState<InteractionTab>('reposts');
 
   const topLevel = useMemo(
     () => commentsData?.topLevelComments ?? [],
@@ -130,17 +132,17 @@ function PledgeDetailContent({ action }: { action: Action }) {
       .map((c) => buildNode(c));
   }, [commentsData, topLevel, zapTotals]);
 
+  const pinnedNodes = useMemo(
+    () => pinnedEvents.map((event): ReplyNode => ({ event, children: [] })),
+    [pinnedEvents],
+  );
+
   const metadata: NostrMetadata | undefined = author.data?.metadata;
   const creatorName = getDisplayName(metadata, action.pubkey);
   const creatorProfileUrl = useProfileUrl(action.pubkey, metadata);
   const deadline = action.deadline ? formatDeadline(action.deadline) : null;
   const cover = sanitizeUrl(action.image);
   const progressValue = action.bounty > 0 ? Math.min(100, Math.round((fundedSats / action.bounty) * 100)) : 0;
-  const hasStats =
-    !!engagementStats?.replies ||
-    !!engagementStats?.reposts ||
-    !!engagementStats?.quotes ||
-    !!engagementStats?.reactions;
 
   const naddr = nip19.naddrEncode({
     kind: 36639,
@@ -155,11 +157,6 @@ function PledgeDetailContent({ action }: { action: Action }) {
     }),
     [action.event],
   );
-
-  const openInteractions = (tab: InteractionTab) => {
-    setInteractionsTab(tab);
-    setInteractionsOpen(true);
-  };
 
   const handleShare = async () => {
     const url = `${window.location.origin}/${naddr}`;
@@ -187,6 +184,35 @@ function PledgeDetailContent({ action }: { action: Action }) {
         onBack={() => navigate(-1)}
       />
 
+      <div className="max-w-6xl mx-auto px-4 sm:px-6">
+        <div className="rounded-b-xl rounded-t-none bg-card border border-t-0 border-border/60 shadow-sm px-4 sm:px-5 py-3">
+          <PostActionBar
+            event={action.event}
+            replyLabel="Submit"
+            onReply={() => setReplyOpen(true)}
+            onMore={() => setMoreMenuOpen(true)}
+          />
+        </div>
+      </div>
+
+      {pinnedNodes.length > 0 && (
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 pt-6">
+          <div className="rounded-2xl bg-card border border-border/60 overflow-hidden">
+            <ThreadedReplyList
+              roots={pinnedNodes}
+              renderItemHeader={(event) => (
+                <PledgePinHeader
+                  isPinned={isPinned(event.id)}
+                  canManagePins={canManagePins}
+                  pinPending={togglePin.isPending}
+                  onTogglePin={() => handleTogglePin(event)}
+                />
+              )}
+            />
+          </div>
+        </div>
+      )}
+
       <div className="max-w-6xl mx-auto px-4 sm:px-6 py-6 lg:py-10">
         <div className="lg:flex lg:gap-8 lg:items-start">
           <div className="lg:hidden mb-6">
@@ -205,39 +231,7 @@ function PledgeDetailContent({ action }: { action: Action }) {
             <PledgeStory storyEvent={storyEvent} hasContent={action.description.trim().length > 0} />
 
             <div id="pledge-activity" className="scroll-mt-20">
-              <div className="rounded-2xl bg-card border border-border/60 shadow-sm px-4 sm:px-5 py-4 sm:py-5">
-                {hasStats && (
-                  <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs sm:text-sm text-muted-foreground">
-                    {engagementStats?.reposts ? (
-                      <button onClick={() => openInteractions('reposts')} className="hover:underline transition-colors">
-                        <span className="font-bold text-foreground">{engagementStats.reposts.toLocaleString()}</span>{' '}
-                        Repost{engagementStats.reposts !== 1 ? 's' : ''}
-                      </button>
-                    ) : null}
-                    {engagementStats?.quotes ? (
-                      <button onClick={() => openInteractions('quotes')} className="hover:underline transition-colors">
-                        <span className="font-bold text-foreground">{engagementStats.quotes.toLocaleString()}</span>{' '}
-                        Quote{engagementStats.quotes !== 1 ? 's' : ''}
-                      </button>
-                    ) : null}
-                    {engagementStats?.reactions ? (
-                      <button onClick={() => openInteractions('reactions')} className="hover:underline transition-colors">
-                        <span className="font-bold text-foreground">{engagementStats.reactions.toLocaleString()}</span>{' '}
-                        Like{engagementStats.reactions !== 1 ? 's' : ''}
-                      </button>
-                    ) : null}
-                  </div>
-                )}
-
-                <PostActionBar
-                  event={action.event}
-                  replyLabel="Submit"
-                  onReply={() => setReplyOpen(true)}
-                  onMore={() => setMoreMenuOpen(true)}
-                />
-              </div>
-
-              <div className="mt-6">
+              <div>
                 <div className="flex items-baseline justify-between gap-3 mb-3 px-1">
                   <h2 className="text-lg font-semibold tracking-tight">Submissions</h2>
                   {topLevel.length > 0 ? (
@@ -247,13 +241,29 @@ function PledgeDetailContent({ action }: { action: Action }) {
                   ) : null}
                 </div>
 
+                <DetailCommentComposer
+                  event={action.event}
+                  placeholder="Share proof, evidence, or completed work..."
+                  className="mb-3"
+                />
+
                 {commentsLoading && replyTree.length === 0 ? (
                   <div className="space-y-3">
                     {Array.from({ length: 3 }).map((_, i) => <PledgeReplySkeleton key={i} />)}
                   </div>
                 ) : replyTree.length > 0 ? (
-                  <div className="-mx-2 sm:-mx-4 rounded-2xl bg-card border border-border/60 overflow-hidden">
-                    <ThreadedReplyList roots={replyTree} />
+                  <div className="rounded-2xl bg-card border border-border/60 overflow-hidden">
+                    <ThreadedReplyList
+                      roots={replyTree}
+                      renderItemHeader={(event) => (
+                        <PledgePinHeader
+                          isPinned={isPinned(event.id)}
+                          canManagePins={canManagePins}
+                          pinPending={togglePin.isPending}
+                          onTogglePin={() => handleTogglePin(event)}
+                        />
+                      )}
+                    />
                   </div>
                 ) : (
                   <button
@@ -289,13 +299,40 @@ function PledgeDetailContent({ action }: { action: Action }) {
 
       <ReplyComposeModal event={action.event} open={replyOpen} onOpenChange={setReplyOpen} />
       <NoteMoreMenu event={action.event} open={moreMenuOpen} onOpenChange={setMoreMenuOpen} />
-      <InteractionsModal
-        eventId={action.event.id}
-        open={interactionsOpen}
-        onOpenChange={setInteractionsOpen}
-        initialTab={interactionsTab}
-      />
     </main>
+  );
+
+  function handleTogglePin(event: NostrEvent) {
+    const wasPinned = isPinned(event.id);
+    togglePin.mutate(event.id, {
+      onSuccess: () => {
+        toast({ title: wasPinned ? 'Unpinned from pledge' : 'Pinned to pledge' });
+      },
+      onError: () => {
+        toast({ title: 'Failed to update pledge pins', variant: 'destructive' });
+      },
+    });
+  }
+}
+
+function PledgePinHeader({
+  isPinned,
+  canManagePins,
+  pinPending,
+  onTogglePin,
+}: {
+  isPinned: boolean;
+  canManagePins: boolean;
+  pinPending: boolean;
+  onTogglePin: () => void;
+}) {
+  return (
+    <PinnedCommentHeader
+      isPinned={isPinned}
+      canManagePins={canManagePins}
+      pinPending={pinPending}
+      onTogglePin={onTogglePin}
+    />
   );
 }
 
@@ -315,7 +352,7 @@ function PledgeHero({ action, cover, creatorName, creatorProfileUrl, deadline, o
 
   return (
     <div className="max-w-6xl mx-auto px-4 sm:px-6 pt-4">
-      <div className="relative aspect-[16/9] sm:aspect-[21/9] rounded-xl overflow-hidden bg-gradient-to-br from-primary/15 via-primary/5 to-secondary">
+      <div className="relative aspect-[16/9] sm:aspect-[21/9] rounded-t-xl rounded-b-none overflow-hidden bg-gradient-to-br from-primary/15 via-primary/5 to-secondary">
         <img
           src={coverImage}
           alt=""

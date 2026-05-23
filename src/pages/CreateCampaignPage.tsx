@@ -1,10 +1,9 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { useSeoMeta } from '@unhead/react';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useNostr } from '@nostrify/react';
-import type { NostrEvent, NostrMetadata } from '@nostrify/nostrify';
-import { Capacitor } from '@capacitor/core';
+import type { NostrEvent } from '@nostrify/nostrify';
 import { nip19 } from 'nostr-tools';
 import {
   AlertTriangle,
@@ -12,37 +11,41 @@ import {
   HandHeart,
   Loader2,
   MapPin,
-  MessageCircle,
-  Share2,
-  UserPlus,
+  Wallet,
   X,
 } from 'lucide-react';
 
-import { PersonSearch } from '@/components/PersonSearch';
 import { CoverImageField } from '@/components/CoverImageField';
 import { FormSection } from '@/components/FormSection';
 import { OrganizationContextChip } from '@/components/OrganizationContextChip';
+import { BitcoinPublicDisclaimer } from '@/components/BitcoinPublicDisclaimer';
+import { BitcoinPrivateDisclaimer } from '@/components/BitcoinPrivateDisclaimer';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
-import { parseAuthorEvent } from '@/hooks/useAuthor';
-import { useBitcoinWallet } from '@/hooks/useBitcoinWallet';
+import { useAuthor } from '@/hooks/useAuthor';
 import { useCampaign } from '@/hooks/useCampaign';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
+import { useHdWallet } from '@/hooks/useHdWallet';
 import { useManageableOrganizations } from '@/hooks/useManageableOrganizations';
 import { useNostrPublish } from '@/hooks/useNostrPublish';
 import { useToast } from '@/hooks/useToast';
-import type { SearchProfile } from '@/hooks/useSearchProfiles';
 import { useLayoutOptions } from '@/contexts/LayoutContext';
-import { formatSats, satsToUSDWhole, usdToSats } from '@/lib/bitcoin';
 import {
   CAMPAIGN_KIND,
   encodeCampaignNaddr,
   parseCampaign,
+  parseCampaignWallet,
   slugifyCampaignIdentifier,
 } from '@/lib/campaign';
 import { getTodayDateInput } from '@/lib/dateInput';
@@ -50,7 +53,8 @@ import { fetchFreshEvent } from '@/lib/fetchFreshEvent';
 import { genUserName } from '@/lib/genUserName';
 import { createOrganizationAssociationTags, decodeOrganizationParam } from '@/lib/organizationContext';
 import { sanitizeUrl } from '@/lib/sanitizeUrl';
-import { COUNTRIES, searchCountries, searchCountry, type CountryEntry } from '@/lib/countries';
+import { withAgoraTag } from '@/lib/agoraNoteTags';
+import { COUNTRIES, searchCountries, type CountryEntry } from '@/lib/countries';
 import { createCountryIdentifier } from '@/lib/countryIdentifiers';
 import { cn } from '@/lib/utils';
 
@@ -58,57 +62,6 @@ interface EditTarget {
   pubkey: string;
   identifier: string;
   relays?: string[];
-}
-
-/** Canonical origin used in shareable invite / notify links. */
-function getShareOrigin(): string {
-  return 'https://agora.spot';
-}
-
-/**
- * Copy text to clipboard with a uniform toast reaction. Returns true on
- * success so the caller can update transient UI state.
- */
-async function copyShareText(
-  text: string,
-  toast: ReturnType<typeof useToast>['toast'],
-  successTitle: string,
-): Promise<boolean> {
-  try {
-    await navigator.clipboard.writeText(text);
-    toast({ title: successTitle, description: 'Paste it into a DM, email, or text message.' });
-    return true;
-  } catch {
-    toast({
-      title: 'Copy failed',
-      description: 'Your browser blocked clipboard access. Select and copy the text manually.',
-      variant: 'destructive',
-    });
-    return false;
-  }
-}
-
-async function shareTextOrCopy(
-  text: string,
-  toast: ReturnType<typeof useToast>['toast'],
-  fallbackSuccessTitle: string,
-): Promise<void> {
-  try {
-    if (Capacitor.isNativePlatform()) {
-      const { Share } = await import('@capacitor/share');
-      await Share.share({ text });
-      return;
-    }
-
-    if (navigator.share) {
-      await navigator.share({ text });
-      return;
-    }
-  } catch (error) {
-    if (error instanceof Error && error.name === 'AbortError') return;
-  }
-
-  await copyShareText(text, toast, fallbackSuccessTitle);
 }
 
 function getEditTarget(value: string | null): EditTarget | null {
@@ -127,116 +80,95 @@ function getEditTarget(value: string | null): EditTarget | null {
   }
 }
 
-function makeRecipientProfile(pubkey: string): SearchProfile {
-  return {
-    pubkey,
-    metadata: {},
-    event: {
-      id: '',
-      pubkey,
-      created_at: 0,
-      kind: 0,
-      tags: [],
-      content: '{}',
-      sig: '',
-    },
-  };
-}
-
-function makeRecipientProfileFromAuthor(
-  pubkey: string,
-  author: { event?: NostrEvent; metadata?: NostrMetadata } | undefined,
-): SearchProfile {
-  if (!author?.event) return makeRecipientProfile(pubkey);
-
-  return {
-    pubkey,
-    metadata: author.metadata ?? {},
-    event: author.event,
-  };
-}
-
-function formatGoalUsd(goalSats: number | undefined, btcPrice: number | undefined): string {
-  if (!goalSats || !btcPrice) return '';
-  const usd = (goalSats / 100_000_000) * btcPrice;
-  if (!Number.isFinite(usd) || usd <= 0) return '';
-  return usd.toFixed(usd >= 100 ? 0 : 2);
-}
-
-function normalizeCampaignTag(value: string): string {
-  return value.trim().replace(/^#+/, '').toLowerCase().replace(/\s+/g, '-');
-}
-
-function parseCampaignTagInput(value: string): string[] {
-  const seen = new Set<string>();
-  const tags: string[] = [];
-  for (const part of value.split(',')) {
-    const tag = normalizeCampaignTag(part);
-    if (!tag || seen.has(tag)) continue;
-    seen.add(tag);
-    tags.push(tag);
-  }
-  return tags;
-}
-
-function getExactCountryCode(query: string): string | undefined {
-  const match = searchCountry(query);
-  return match?.exact ? match.country.code : undefined;
-}
-
 function formatDateInput(unixSeconds: number | undefined): string {
   if (!unixSeconds) return '';
   return new Date(unixSeconds * 1000).toISOString().slice(0, 10);
+}
+
+/**
+ * Build a NIP-92 `imeta` tag from a Blossom upload's NIP-94 tag array.
+ *
+ * NIP-94 returns pairs like `[["url", "<url>"], ["x", "<sha256>"], ["m", "image/jpeg"], ...]`.
+ * NIP-92 packs the same key/value pairs into a single space-separated tag:
+ * `["imeta", "url <url>", "x <sha256>", "m image/jpeg", ...]`.
+ *
+ * The `url` entry MUST come first (NIP-92 convention). Other keys are
+ * emitted in their original order.
+ */
+function buildImetaFromNip94(nip94Tags: string[][]): string[] {
+  const result: string[] = ['imeta'];
+  // url first
+  const urlPair = nip94Tags.find((t) => t[0] === 'url');
+  if (urlPair && urlPair[1]) result.push(`url ${urlPair[1]}`);
+  for (const [key, value] of nip94Tags) {
+    if (key === 'url') continue;
+    if (typeof key !== 'string' || typeof value !== 'string') continue;
+    if (key.includes(' ')) continue;
+    result.push(`${key} ${value}`);
+  }
+  return result;
 }
 
 export function CreateCampaignPage() {
   useLayoutOptions({ noMaxWidth: true, rightSidebar: null });
 
   const { user } = useCurrentUser();
-  const { btcPrice } = useBitcoinWallet();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const queryClient = useQueryClient();
   const { nostr } = useNostr();
   const { mutateAsync: publishEvent } = useNostrPublish();
   const { toast } = useToast();
+  const hdWallet = useHdWallet();
+  const hdWalletAvailable = hdWallet.availability.status === 'available';
+  const silentPaymentSupported = hdWalletAvailable && !!hdWallet.silentPaymentAddress;
+  const userAuthor = useAuthor(user?.pubkey);
+  const userMetadata = userAuthor.data?.metadata;
+  const userDisplayName = user
+    ? (userMetadata?.name ?? userMetadata?.display_name ?? genUserName(user.pubkey))
+    : '';
 
   const [title, setTitle] = useState('');
   const [summary, setSummary] = useState('');
   const [story, setStory] = useState('');
-  const [imageUrl, setImageUrl] = useState('');
+  const [bannerUrl, setBannerUrl] = useState('');
+  /** NIP-94-format tag pairs from the most recent banner upload, used to build the NIP-92 imeta tag on publish. */
+  const [bannerNip94Tags, setBannerNip94Tags] = useState<string[][] | null>(null);
   const [coverUploading, setCoverUploading] = useState(false);
-  const [tagInput, setTagInput] = useState('');
+  const [walletInput, setWalletInput] = useState('');
+  /**
+   * Which "source" supplies the campaign's wallet endpoint:
+   *
+   * - `'public'`  — derive a fresh on-chain (bc1p…) address from the
+   *   user's HD wallet at submit time, advancing the persistent
+   *   receive-index cursor by 1.
+   * - `'private'` — use the user's static silent-payment code (sp1…).
+   * - `'custom'`  — paste any mainnet bech32(m) address (bc1q/bc1p/sp1).
+   *
+   * The two HD-wallet sources are only selectable when the user is
+   * logged in with an nsec (the wallet derives from the raw secret
+   * key). In edit mode we always start in `'custom'` so a re-publish
+   * doesn't silently burn a new index — switching wallets on an
+   * existing campaign is an explicit user choice.
+   */
+  const [walletSource, setWalletSource] = useState<'public' | 'private' | 'custom'>('custom');
   const [goalUsd, setGoalUsd] = useState('');
-  const [goalTouched, setGoalTouched] = useState(false);
   const [deadline, setDeadline] = useState('');
   const [countryQuery, setCountryQuery] = useState('');
   const [countryCode, setCountryCode] = useState('');
-  const [recipients, setRecipients] = useState<SearchProfile[]>([]);
   const [organizationATag, setOrganizationATag] = useState('');
   const [formError, setFormError] = useState('');
   const [prepopulatedEventId, setPrepopulatedEventId] = useState<string | null>(null);
-  const [prepopulatedGoalEventId, setPrepopulatedGoalEventId] = useState<string | null>(null);
 
   const editNaddr = searchParams.get('edit');
   const editTarget = useMemo(() => getEditTarget(editNaddr), [editNaddr]);
   const isEditMode = !!editNaddr;
 
   // ── Organization context (implicit) ────────────────────────────────────
-  // `?org=` carries the org coordinate from the entry point — typically
-  // an org detail page CTA. We accept either an `naddr1...` (preferred,
-  // canonical) or a raw `34550:<pubkey>:<d-tag>` coordinate. The form
-  // never exposes a user-editable selector — the campaign is "under the
-  // user" by default, and "under the org" when the user started from
-  // inside that org's page.
   const orgParam = searchParams.get('org');
   const orgFromParam = useMemo(() => decodeOrganizationParam(orgParam), [orgParam]);
   const { data: manageableOrgs, isLoading: manageableOrgsLoading } = useManageableOrganizations();
 
-  // The org we'll actually attach to the published event. We only honor
-  // the param when the current user is the founder or a moderator of
-  // that org — otherwise drop it silently so a stale link can't forge
-  // an org association.
   const authorizedOrgFromParam = useMemo(() => {
     if (!orgFromParam || !manageableOrgs) return null;
     return manageableOrgs.find((entry) => entry.community.aTag === orgFromParam.aTag) ?? null;
@@ -251,73 +183,33 @@ export function CreateCampaignPage() {
     setOrganizationATag(authorizedOrgFromParam?.community.aTag ?? '');
   }, [isEditMode, authorizedOrgFromParam]);
 
+  // When the HD wallet becomes available on a fresh campaign, default to
+  // the user's on-chain wallet. Skipped in edit mode (we always stay on
+  // 'custom' with the pre-filled value — see the edit-prepopulation
+  // effect below) and once the user has interacted, so re-renders that
+  // re-derive `hdWalletAvailable` don't override an explicit choice.
+  const [walletSourceTouched, setWalletSourceTouched] = useState(false);
+  useEffect(() => {
+    if (isEditMode || walletSourceTouched) return;
+    if (hdWalletAvailable && walletSource === 'custom') {
+      setWalletSource('public');
+    }
+  }, [isEditMode, walletSourceTouched, hdWalletAvailable, walletSource]);
+
   const editCampaignQuery = useCampaign({
     pubkey: editTarget?.pubkey ?? '',
     identifier: editTarget?.identifier ?? '',
     ...(editTarget?.relays ? { relays: editTarget.relays } : {}),
   });
   const editCampaign = isEditMode ? editCampaignQuery.data : null;
-  const editRecipientPubkeys = useMemo(
-    () => editCampaign?.recipients.map((recipient) => recipient.pubkey) ?? [],
-    [editCampaign],
-  );
-  const editRecipientProfiles = useQuery({
-    queryKey: ['campaign-edit-recipients', editRecipientPubkeys],
-    queryFn: async ({ signal }): Promise<SearchProfile[]> => {
-      const cachedProfiles = new Map<string, SearchProfile>();
-      const missingPubkeys: string[] = [];
-
-      for (const pubkey of editRecipientPubkeys) {
-        const cachedAuthor = queryClient.getQueryData<{ event?: NostrEvent; metadata?: NostrMetadata }>([
-          'author',
-          pubkey,
-        ]);
-
-        if (cachedAuthor?.event) {
-          cachedProfiles.set(pubkey, makeRecipientProfileFromAuthor(pubkey, cachedAuthor));
-        } else {
-          missingPubkeys.push(pubkey);
-        }
-      }
-
-      if (missingPubkeys.length > 0) {
-        const events = await nostr.query(
-          [{ kinds: [0], authors: missingPubkeys, limit: missingPubkeys.length }],
-          { signal },
-        );
-
-        const latestByPubkey = new Map<string, NostrEvent>();
-        for (const event of events) {
-          const existing = latestByPubkey.get(event.pubkey);
-          if (!existing || event.created_at > existing.created_at) {
-            latestByPubkey.set(event.pubkey, event);
-          }
-        }
-
-        for (const pubkey of missingPubkeys) {
-          const event = latestByPubkey.get(pubkey);
-          if (!event) continue;
-          const parsed = parseAuthorEvent(event);
-          queryClient.setQueryData(['author', pubkey], parsed);
-          cachedProfiles.set(pubkey, makeRecipientProfileFromAuthor(pubkey, parsed));
-        }
-      }
-
-      return editRecipientPubkeys.map((pubkey) => cachedProfiles.get(pubkey) ?? makeRecipientProfile(pubkey));
-    },
-    enabled: isEditMode && editRecipientPubkeys.length > 0,
-    staleTime: 5 * 60 * 1000,
-  });
 
   // The slug is protocol plumbing: derive it from the title instead of asking
   // fundraisers to understand Nostr d-tags.
   const derivedIdentifier = useMemo(() => slugifyCampaignIdentifier(title), [title]);
   const activeIdentifier = editCampaign?.identifier ?? derivedIdentifier;
-  const goalSatsPreview = useMemo(() => {
-    const n = Number(goalUsd.replace(/[, $]/g, ''));
-    return usdToSats(n, btcPrice);
-  }, [btcPrice, goalUsd]);
   const minDeadline = useMemo(() => getTodayDateInput(), []);
+
+  const parsedWallet = useMemo(() => parseCampaignWallet(walletInput), [walletInput]);
 
   useSeoMeta({
     title: isEditMode ? 'Edit campaign | Agora' : 'Start a campaign | Agora',
@@ -330,64 +222,28 @@ export function CreateCampaignPage() {
     setTitle(editCampaign.title);
     setSummary(editCampaign.summary);
     setStory(editCampaign.story);
-    setImageUrl(editCampaign.image ?? '');
-    setTagInput(editCampaign.tags.join(', '));
+    setBannerUrl(editCampaign.banner ?? '');
+    // We don't have NIP-94 tags for an existing event — the imeta is
+    // already on the event. We'll re-emit it from the original event
+    // tags below if the URL is unchanged.
+    setBannerNip94Tags(null);
+    setWalletInput(editCampaign.wallet.value);
+    // Edit mode always starts in 'custom' with the existing value
+    // pre-filled. We don't try to auto-detect whether the stored `w`
+    // tag came from the user's HD wallet — switching wallets is an
+    // explicit choice the user must make.
+    setWalletSource('custom');
+    setGoalUsd(editCampaign.goalUsd !== undefined ? String(editCampaign.goalUsd) : '');
     setDeadline(formatDateInput(editCampaign.deadline));
-    const editCountryCode = editCampaign.countryCode ?? getExactCountryCode(editCampaign.location ?? '') ?? '';
+    const editCountryCode = editCampaign.countryCode ?? '';
     setCountryCode(editCountryCode);
     setCountryQuery(editCountryCode ? COUNTRIES[editCountryCode]?.name ?? editCountryCode : '');
-    setRecipients(editCampaign.recipients.map((recipient) => makeRecipientProfile(recipient.pubkey)));
-    // Restore the organization root-scope tag (uppercase `A`) so the
-    // selector hydrates with the same org the campaign was originally
-    // attached to. We accept the tag as-is; the publish branch verifies
-    // the current user is still authorized to publish under that org.
     const existingOrgATag = editCampaign.event.tags.find(
       ([n, v]) => n === 'A' && typeof v === 'string' && v.startsWith('34550:'),
     )?.[1] ?? '';
     setOrganizationATag(existingOrgATag);
     setPrepopulatedEventId(editCampaign.event.id);
   }, [editCampaign, prepopulatedEventId]);
-
-  useEffect(() => {
-    const profiles = editRecipientProfiles.data;
-    if (!profiles || profiles.length === 0) return;
-
-    setRecipients((prev) => prev.map((recipient) => {
-      const profile = profiles.find((item) => item.pubkey === recipient.pubkey);
-      return profile ?? recipient;
-    }));
-  }, [editRecipientProfiles.data]);
-
-  useEffect(() => {
-    if (!editCampaign || prepopulatedGoalEventId === editCampaign.event.id || goalUsd.trim()) return;
-
-    const formattedGoal = formatGoalUsd(editCampaign.goalSats, btcPrice);
-    if (!formattedGoal) return;
-
-    setGoalUsd(formattedGoal);
-    setPrepopulatedGoalEventId(editCampaign.event.id);
-  }, [btcPrice, editCampaign, goalUsd, prepopulatedGoalEventId]);
-
-  const addRecipient = (profile: SearchProfile) => {
-    setRecipients((prev) => prev.some((r) => r.pubkey === profile.pubkey) ? prev : [...prev, profile]);
-  };
-
-  const addRecipients = (profiles: SearchProfile[]) => {
-    setRecipients((prev) => {
-      const seen = new Set(prev.map((r) => r.pubkey));
-      const next = [...prev];
-      for (const profile of profiles) {
-        if (seen.has(profile.pubkey)) continue;
-        seen.add(profile.pubkey);
-        next.push(profile);
-      }
-      return next;
-    });
-  };
-
-  const removeRecipient = (pubkey: string) => {
-    setRecipients((prev) => prev.filter((r) => r.pubkey !== pubkey));
-  };
 
   const submitMutation = useMutation({
     mutationFn: async () => {
@@ -405,34 +261,45 @@ export function CreateCampaignPage() {
         throw new Error('Identifier must be lowercase letters, numbers, and hyphens.');
       }
 
-      // Validate recipients.
-      const parsedRecipients: { pubkey: string }[] = [];
-      const seen = new Set<string>();
-      for (const r of recipients) {
-        const pubkey = r.pubkey;
-        if (seen.has(pubkey)) continue;
-        seen.add(pubkey);
-        parsedRecipients.push({ pubkey });
+      // Validate wallet — required. For `walletSource === 'public'` we
+      // defer the actual cursor advance until just before publish so a
+      // late validation failure (banner, deadline, d-tag collision)
+      // doesn't burn an HD wallet index. For 'private' and 'custom'
+      // there's no mutation, so resolve them immediately.
+      let resolvedWalletValue: string;
+      if (walletSource === 'public') {
+        if (!hdWalletAvailable) {
+          throw new Error('Built-in wallet is unavailable for this login. Choose Custom and paste an address.');
+        }
+        // Placeholder — overwritten just before tags are built below.
+        resolvedWalletValue = '';
+      } else if (walletSource === 'private') {
+        if (!silentPaymentSupported || !hdWallet.silentPaymentAddress) {
+          throw new Error('Silent-payment address is unavailable for this login.');
+        }
+        resolvedWalletValue = hdWallet.silentPaymentAddress.address;
+      } else {
+        resolvedWalletValue = walletInput;
       }
 
-      if (parsedRecipients.length === 0) {
-        throw new Error('Add at least one recipient.');
+      // 'public' wallets skip this check (they'll be parsed after the
+      // cursor advances below). 'private' and 'custom' are parsed now.
+      let wallet = walletSource === 'public' ? null : parseCampaignWallet(resolvedWalletValue);
+      if (walletSource !== 'public' && !wallet) {
+        throw new Error(
+          'Wallet endpoint is required. Provide a Bitcoin mainnet address (bc1q… / bc1p…) or a silent-payment code (sp1…).',
+        );
       }
 
-      // Goal / deadline.
-      // In edit mode, preserve the exact stored sats unless the user changed the field.
+      // Goal — integer USD (no unit, no currency conversion).
       let goalNum: number | undefined;
-      if (isEditMode && !goalTouched) {
-        goalNum = editCampaign?.goalSats;
-      } else if (goalUsd.trim()) {
-        const n = Number(goalUsd.replace(/[, $]/g, ''));
-        if (!Number.isFinite(n) || n <= 0) {
-          throw new Error('Goal must be a positive USD amount.');
+      const trimmedGoal = goalUsd.replace(/[, $]/g, '').trim();
+      if (trimmedGoal) {
+        const n = Number(trimmedGoal);
+        if (!Number.isFinite(n) || !Number.isInteger(n) || n <= 0) {
+          throw new Error('Goal must be a positive whole-dollar amount.');
         }
-        goalNum = usdToSats(n, btcPrice);
-        if (goalNum <= 0) {
-          throw new Error('Bitcoin price is unavailable. Try again before setting a USD goal.');
-        }
+        goalNum = n;
       }
 
       let deadlineNum: number | undefined;
@@ -447,8 +314,7 @@ export function CreateCampaignPage() {
         deadlineNum = ts;
       }
 
-      const resolvedCountryCode = countryCode || getExactCountryCode(countryQuery);
-      const campaignTags = parseCampaignTagInput(tagInput);
+      const resolvedCountryCode = countryCode;
 
       let prev: NostrEvent | null = null;
       if (isEditMode) {
@@ -474,46 +340,79 @@ export function CreateCampaignPage() {
         }
       }
 
-      // Validate image URL (must be https).
-      const trimmedImageUrl = imageUrl.trim();
-      const sanitizedImage = trimmedImageUrl ? sanitizeUrl(trimmedImageUrl) : undefined;
-      if (trimmedImageUrl && !sanitizedImage) {
-        throw new Error('Cover image must be a valid https:// URL.');
+      // Validate banner URL (must be https).
+      const trimmedBanner = bannerUrl.trim();
+      const sanitizedBanner = trimmedBanner ? sanitizeUrl(trimmedBanner) : undefined;
+      if (trimmedBanner && !sanitizedBanner) {
+        throw new Error('Banner must be a valid https:// URL.');
       }
 
       const tags: string[][] = [
         ['d', slug],
         ['title', trimmedTitle],
-        ['alt', `Fundraising campaign: ${trimmedTitle}`],
       ];
-      if (summary.trim()) tags.splice(2, 0, ['summary', summary.trim()]);
-      for (const tag of campaignTags) tags.push(['t', tag]);
-      if (sanitizedImage) tags.push(['image', sanitizedImage]);
+      if (summary.trim()) tags.push(['summary', summary.trim()]);
+      if (sanitizedBanner) {
+        tags.push(['banner', sanitizedBanner]);
+        // NIP-92 imeta pairs with the banner. Two sources, in priority order:
+        // 1. A fresh upload during this session — convert the NIP-94 tag
+        //    array from the uploader into the NIP-92 space-separated form.
+        // 2. The existing event's imeta tag — re-emit it verbatim when the
+        //    URL hasn't changed during an edit.
+        const imeta = (() => {
+          if (bannerNip94Tags) {
+            const url = bannerNip94Tags.find((t) => t[0] === 'url')?.[1];
+            if (url === sanitizedBanner) {
+              return buildImetaFromNip94(bannerNip94Tags);
+            }
+          }
+          if (isEditMode && editCampaign?.banner === sanitizedBanner) {
+            const existing = editCampaign.event.tags.find(([n]) => n === 'imeta');
+            if (existing) return existing;
+          }
+          return null;
+        })();
+        if (imeta) tags.push(imeta);
+      }
+      tags.push(['alt', `Fundraising campaign: ${trimmedTitle}`]);
+
+      // Last step before the `w` tag: advance the HD wallet cursor if
+      // the user chose the public wallet source. This is deliberately
+      // the *last* mutation we do before publishing so a validation
+      // failure earlier in this function doesn't burn an index.
+      if (walletSource === 'public') {
+        const next = hdWallet.nextReceiveAddress();
+        if (!next) {
+          throw new Error('Could not derive a fresh on-chain address from your wallet.');
+        }
+        wallet = parseCampaignWallet(next.address);
+        if (!wallet) {
+          throw new Error('Derived wallet address failed validation. Please try Custom instead.');
+        }
+      }
+      // Type narrowing — by this point both branches have set `wallet`.
+      if (!wallet) throw new Error('Wallet endpoint is required.');
+      tags.push(['w', wallet.value]);
       if (goalNum !== undefined) tags.push(['goal', String(goalNum)]);
       if (deadlineNum !== undefined) tags.push(['deadline', String(deadlineNum)]);
       if (resolvedCountryCode) {
         tags.push(['i', createCountryIdentifier(resolvedCountryCode)]);
-        tags.push(['k', 'iso3166']);
+        tags.push(['k', 'iso3166-1']);
       }
       // Organization association (NIP-22 root-scope convention): an
       // uppercase `A` tag points at the NIP-72 community definition so
       // the campaign surfaces as official activity on that org's page.
-      // The `K` companion tag records the referenced kind, and `P` hints
-      // at the org founder for clients that batch-resolve authors.
       const publishOrganizationATag = isEditMode
         ? authorizedOrgForAttachedATag?.community.aTag ?? ''
         : organizationATag;
       if (publishOrganizationATag) {
         tags.push(...createOrganizationAssociationTags(publishOrganizationATag));
       }
-      for (const r of parsedRecipients) {
-        tags.push(['p', r.pubkey]);
-      }
 
       const published = await publishEvent({
         kind: CAMPAIGN_KIND,
         content: story,
-        tags,
+        tags: withAgoraTag(tags),
         prev: prev ?? undefined,
       });
 
@@ -525,12 +424,26 @@ export function CreateCampaignPage() {
     },
     onSuccess: (campaign) => {
       void queryClient.invalidateQueries({ queryKey: ['campaign', campaign.pubkey, campaign.identifier] });
+      // Refresh the campaign list queries used by the home/discover/profile
+      // views so a newly launched (or just-edited) campaign shows up without
+      // a manual reload.
+      void queryClient.invalidateQueries({ queryKey: ['campaigns'] });
+      void queryClient.invalidateQueries({ queryKey: ['campaigns-all'] });
       const publishOrganizationATag = isEditMode
         ? authorizedOrgForAttachedATag?.community.aTag ?? ''
         : organizationATag;
       if (publishOrganizationATag) {
         void queryClient.invalidateQueries({ queryKey: ['organization-activity', publishOrganizationATag] });
       }
+      // Campaigns carrying a country code surface on that country's feed.
+      if (campaign.countryCode) {
+        void queryClient.invalidateQueries({ queryKey: ['agora-feed-paginated', campaign.countryCode] });
+        void queryClient.invalidateQueries({ queryKey: ['agora-feed-new-posts', campaign.countryCode] });
+      }
+      // Campaigns (kind 33863) also surface in the home Agora activity
+      // feed regardless of country code.
+      void queryClient.invalidateQueries({ queryKey: ['agora-feed'] });
+      void queryClient.invalidateQueries({ queryKey: ['mixed-feed'] });
       toast({
         title: isEditMode ? 'Campaign updated' : 'Campaign launched',
         description: isEditMode ? 'Your fundraiser changes are live.' : 'Your fundraiser is live.',
@@ -661,7 +574,7 @@ export function CreateCampaignPage() {
         </div>
 
         <div className="rounded-2xl bg-card/50 p-2">
-          {/* Title & identifier */}
+          {/* Title */}
           <FormSection title="Title" requirement="Required">
             <Input
               value={title}
@@ -670,13 +583,45 @@ export function CreateCampaignPage() {
               maxLength={200}
               required
             />
-            <p className="text-xs text-muted-foreground flex items-baseline gap-1 min-w-0">
-              <span className="shrink-0">URL preview:</span>
-              <span className="font-mono text-foreground truncate min-w-0">
-                /{activeIdentifier || 'your-campaign-title'}{!isEditMode && derivedIdentifier.length >= 64 && '...'}
-              </span>
-              {isEditMode && <span className="shrink-0">(kept from original)</span>}
-            </p>
+          </FormSection>
+
+          {/* Wallet (required) */}
+          <FormSection title="Bitcoin wallet" requirement="Required">
+            <WalletSourceSelect
+              value={walletSource}
+              onChange={(next) => {
+                setWalletSource(next);
+                setWalletSourceTouched(true);
+              }}
+              hdWalletAvailable={hdWalletAvailable}
+              silentPaymentSupported={silentPaymentSupported}
+              displayName={userDisplayName}
+              picture={userMetadata?.picture}
+            />
+
+            {walletSource === 'custom' && (
+              <div className="relative mt-2">
+                <Wallet className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+                <Input
+                  id="campaign-wallet"
+                  value={walletInput}
+                  onChange={(e) => setWalletInput(e.target.value.trim())}
+                  placeholder="bc1p…  or  sp1…"
+                  className="pl-9 font-mono text-xs"
+                  spellCheck={false}
+                  autoComplete="off"
+                  autoCorrect="off"
+                />
+              </div>
+            )}
+
+            <WalletDisclaimer
+              source={walletSource}
+              walletInput={walletInput}
+              parsed={parsedWallet}
+              hdWalletAvailable={hdWalletAvailable}
+              silentPaymentSupported={silentPaymentSupported}
+            />
           </FormSection>
 
           {/* Country */}
@@ -702,76 +647,27 @@ export function CreateCampaignPage() {
             />
           </FormSection>
 
-          {/* Tags */}
-          <FormSection title="Tags" requirement="Recommended">
-            <Input
-              id="campaign-tags"
-              value={tagInput}
-              onChange={(e) => setTagInput(e.target.value)}
-              placeholder="human rights, legal defense, independent media"
-            />
-          </FormSection>
-
-          {/* Recipients */}
-          <FormSection
-            title="Beneficiaries"
-            requirement="Required"
-          >
-            <div className="space-y-3">
-              <PersonSearch
-                onAdd={addRecipient}
-                onAddMany={addRecipients}
-                excludePubkeys={recipients.map((r) => r.pubkey)}
-              />
-
-              {/* "Recipient not here yet?" invite affordance. Always visible
-                  because even campaigns with existing recipients may have one
-                  beneficiary who's still off-Nostr. */}
-              <button
-                type="button"
-                onClick={() => {
-                  const url = `${getShareOrigin()}/receive`;
-                  const message = `I want to create a fundraiser for you on Agora! Sign up to create your account and start receiving donations directly to your Bitcoin wallet: ${url}`;
-                  void shareTextOrCopy(message, toast, 'Invite copied');
-                }}
-                className="w-full flex items-center justify-center gap-2 rounded-lg border border-dashed border-border bg-background px-3 py-2.5 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted/40 motion-safe:transition-colors"
-              >
-                <UserPlus className="size-4" />
-                Recipient not here yet? Invite them
-                <Share2 className="size-3.5 opacity-70" />
-              </button>
-
-              {recipients.length > 0 && (
-                <div className="space-y-2">
-                  <Label className="text-xs text-muted-foreground">
-                    Beneficiaries ({recipients.length})
-                  </Label>
-                  <div className="space-y-1.5">
-                    {recipients.map((recipient) => (
-                      <RecipientRow
-                        key={recipient.pubkey}
-                        profile={recipient}
-                        campaignTitle={title}
-                        onRemove={() => removeRecipient(recipient.pubkey)}
-                      />
-                    ))}
-                  </div>
-                </div>
-              )}
-            </div>
-          </FormSection>
-
-          {/* Cover image */}
-          <FormSection title="Cover image" requirement="Optional">
+          {/* Banner image */}
+          <FormSection title="Banner image" requirement="Recommended">
             <CoverImageField
-              value={imageUrl}
-              onChange={setImageUrl}
+              value={bannerUrl}
+              onChange={(url) => {
+                setBannerUrl(url);
+                // Discard stale NIP-94 tags whenever the URL changes — a manual
+                // paste or template pick won't carry matching metadata.
+                setBannerNip94Tags(null);
+              }}
               onUploadingChange={setCoverUploading}
+              onUploadComplete={(nip94Tags) => {
+                // Capture the NIP-94 tag array so we can convert it into a
+                // NIP-92 imeta tag at publish time.
+                setBannerNip94Tags(nip94Tags);
+              }}
             />
           </FormSection>
 
           {/* Summary */}
-          <FormSection title="Summary" requirement="Optional">
+          <FormSection title="Summary" requirement="Recommended">
             <Textarea
               id="campaign-summary"
               value={summary}
@@ -795,7 +691,7 @@ export function CreateCampaignPage() {
           </FormSection>
 
           <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
-            {/* Goal */}
+            {/* Goal — integer USD */}
             <FormSection title="Goal" requirement="Optional">
               <div className="relative">
                 <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">
@@ -804,35 +700,19 @@ export function CreateCampaignPage() {
                 <Input
                   id="campaign-goal"
                   type="text"
-                  inputMode="decimal"
-                  placeholder="100,000"
+                  inputMode="numeric"
+                  placeholder="25,000"
                   value={goalUsd}
-                  onChange={(e) => {
-                    setGoalUsd(e.target.value);
-                    setGoalTouched(true);
-                  }}
+                  onChange={(e) => setGoalUsd(e.target.value)}
                   className="pl-7 pr-14"
                 />
                 <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-xs font-medium text-muted-foreground">
                   USD
                 </span>
               </div>
-              {isEditMode && editCampaign?.goalSats && !goalTouched && (
-                <p className="text-xs text-muted-foreground">
-                  Current saved goal: {formatSats(editCampaign.goalSats)} sats
-                  {btcPrice
-                    ? <> &mdash; about {satsToUSDWhole(editCampaign.goalSats, btcPrice)} today</>
-                    : null
-                  }. Only edit this field if you want to change the goal.
-                </p>
-              )}
-              {(!isEditMode || goalTouched) && goalSatsPreview > 0 && btcPrice && (
-                <p className="text-xs text-muted-foreground">
-                  Your goal will be saved as {formatSats(goalSatsPreview)} sats &mdash; about{' '}
-                  {satsToUSDWhole(goalSatsPreview, btcPrice)} today.
-                  The dollar estimate may change with Bitcoin's price.
-                </p>
-              )}
+              <p className="text-xs text-muted-foreground">
+                Whole US Dollars. Donors pay in Bitcoin; clients estimate the USD-equivalent at view time.
+              </p>
             </FormSection>
 
             {/* Deadline */}
@@ -866,7 +746,7 @@ export function CreateCampaignPage() {
             ) : coverUploading ? (
               <>
                 <Loader2 className="size-4 mr-2 animate-spin" />
-                Uploading cover…
+                Uploading banner…
               </>
             ) : (
               <>
@@ -882,6 +762,183 @@ export function CreateCampaignPage() {
 }
 
 // ─── Layout helpers ──────────────────────────────────────────────────────────
+
+/**
+ * Dropdown for choosing where the campaign's wallet endpoint comes
+ * from. Renders three options:
+ *
+ *  1. The user's HD wallet (a fresh `bc1p…` per campaign).
+ *  2. The user's silent-payment code (a static `sp1…`).
+ *  3. Custom — pastes any mainnet bech32(m) address.
+ *
+ * The HD-wallet options are disabled when the active login doesn't
+ * support the built-in wallet (extension/bunker logins, since the
+ * derivation needs the raw nsec).
+ */
+function WalletSourceSelect({
+  value,
+  onChange,
+  hdWalletAvailable,
+  silentPaymentSupported,
+  displayName,
+  picture,
+}: {
+  value: 'public' | 'private' | 'custom';
+  onChange: (value: 'public' | 'private' | 'custom') => void;
+  hdWalletAvailable: boolean;
+  silentPaymentSupported: boolean;
+  displayName: string;
+  picture?: string;
+}) {
+  const initial = displayName.charAt(0).toUpperCase() || '?';
+  return (
+    <div className="space-y-1.5">
+      <Select value={value} onValueChange={(v) => onChange(v as 'public' | 'private' | 'custom')}>
+        <SelectTrigger className="h-12">
+          <SelectValue placeholder="Choose a wallet">
+            {value === 'custom' ? (
+              <span className="inline-flex items-center gap-2">
+                <span className="inline-flex size-7 shrink-0 items-center justify-center rounded-full bg-muted text-muted-foreground">
+                  <Wallet className="size-3.5" />
+                </span>
+                <span className="text-sm">Custom</span>
+              </span>
+            ) : (
+              <span className="inline-flex items-center gap-2">
+                <Avatar className="size-7 shrink-0">
+                  <AvatarImage src={picture} alt={displayName} />
+                  <AvatarFallback>{initial}</AvatarFallback>
+                </Avatar>
+                <span className="truncate text-sm">
+                  {displayName ? `${displayName}'s` : 'Your'}{' '}
+                  {value === 'private' ? 'private wallet' : 'wallet'}
+                </span>
+              </span>
+            )}
+          </SelectValue>
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="public" disabled={!hdWalletAvailable}>
+            <span className="inline-flex items-center gap-2">
+              <Avatar className="size-7 shrink-0">
+                <AvatarImage src={picture} alt={displayName} />
+                <AvatarFallback>{initial}</AvatarFallback>
+              </Avatar>
+              <span className="text-sm">
+                {displayName ? `${displayName}'s wallet` : 'Your wallet'}
+              </span>
+            </span>
+          </SelectItem>
+          <SelectItem value="private" disabled={!silentPaymentSupported}>
+            <span className="inline-flex items-center gap-2">
+              <Avatar className="size-7 shrink-0">
+                <AvatarImage src={picture} alt={displayName} />
+                <AvatarFallback>{initial}</AvatarFallback>
+              </Avatar>
+              <span className="text-sm">
+                {displayName ? `${displayName}'s private wallet` : 'Your private wallet'}
+              </span>
+            </span>
+          </SelectItem>
+          <SelectItem value="custom">
+            <span className="inline-flex items-center gap-2">
+              <span className="inline-flex size-7 shrink-0 items-center justify-center rounded-full bg-muted text-muted-foreground">
+                <Wallet className="size-3.5" />
+              </span>
+              <span className="text-sm">Custom</span>
+            </span>
+          </SelectItem>
+        </SelectContent>
+      </Select>
+      {!hdWalletAvailable && (
+        <p className="text-[11px] text-muted-foreground">
+          Log in with a Nostr secret key to use a built-in wallet.
+        </p>
+      )}
+    </div>
+  );
+}
+
+/**
+ * Soft disclaimer rendered below the wallet field. Switches on the
+ * effective wallet mode:
+ *
+ *  - **on-chain** (HD-wallet "public" source, or a `bc1…` custom
+ *    address) → public-ledger privacy notice.
+ *  - **silent payment** (HD-wallet "private" source, or an `sp1…`
+ *    custom address) → "experimental but private" notice.
+ *
+ * For an empty / invalid custom field we fall back to the same inline
+ * help text that lived in `WalletHint` before this dropdown existed,
+ * so users typing an address still see the format hint.
+ */
+function WalletDisclaimer({
+  source,
+  walletInput,
+  parsed,
+  hdWalletAvailable,
+  silentPaymentSupported,
+}: {
+  source: 'public' | 'private' | 'custom';
+  walletInput: string;
+  parsed: ReturnType<typeof parseCampaignWallet>;
+  hdWalletAvailable: boolean;
+  silentPaymentSupported: boolean;
+}) {
+  // Resolve the effective mode. For 'public' / 'private' we trust the
+  // selected source. For 'custom' we look at the parsed input.
+  let mode: 'onchain' | 'sp' | null;
+  if (source === 'public') {
+    mode = hdWalletAvailable ? 'onchain' : null;
+  } else if (source === 'private') {
+    mode = silentPaymentSupported ? 'sp' : null;
+  } else {
+    mode = parsed?.mode ?? null;
+  }
+
+  if (mode === 'onchain') {
+    return (
+      <div className="mt-2">
+        <BitcoinPublicDisclaimer
+          tone="soft"
+          includeCashOutAdvice={false}
+          leadText="Donations are public and can be traced."
+          popoverText={
+            <>
+              Bitcoin is a public ledger. Transactions sent to this
+              wallet will be visible to everyone. Funds you send from
+              it can be traced back to you and your donors, even after
+              being exchanged by multiple people.
+            </>
+          }
+        />
+      </div>
+    );
+  }
+  if (mode === 'sp') {
+    return (
+      <div className="mt-2">
+        <BitcoinPrivateDisclaimer />
+      </div>
+    );
+  }
+
+  // 'custom' with empty input — no hint. The placeholder inside the
+  // input ("bc1p…  or  sp1…") already conveys the expected format.
+  const trimmed = walletInput.trim();
+  if (source === 'custom' && !trimmed) {
+    return null;
+  }
+  if (source === 'custom' && !parsed) {
+    return (
+      <p className="mt-2 text-xs text-destructive">
+        Not a recognized mainnet wallet endpoint. Provide a <span className="font-mono">bc1q…</span>,{' '}
+        <span className="font-mono">bc1p…</span>, or <span className="font-mono">sp1…</span> string.
+      </p>
+    );
+  }
+  return null;
+}
 
 function CountrySelect({
   query,
@@ -989,64 +1046,9 @@ function CountrySelect({
 
       {selectedCountry && (
         <p className="text-xs text-muted-foreground">
-          Publishes <span className="font-mono text-foreground">i: iso3166:{selectedCode}</span> for country sorting.
+          Publishes <span className="font-mono text-foreground">i: iso3166-1:{selectedCode}</span> for country sorting.
         </p>
       )}
-    </div>
-  );
-}
-
-function RecipientRow({
-  profile,
-  campaignTitle,
-  onRemove,
-}: {
-  profile: SearchProfile;
-  campaignTitle: string;
-  onRemove: () => void;
-}) {
-  const { toast } = useToast();
-  const displayName = profile.metadata.display_name || profile.metadata.name || genUserName(profile.pubkey);
-  const picture = sanitizeUrl(profile.metadata.picture);
-
-  const handleNotify = () => {
-    const url = `${getShareOrigin()}/claim`;
-    const titleClause = campaignTitle.trim() ? ` called "${campaignTitle.trim()}"` : '';
-    const message = `I just started a fundraiser for you on Agora${titleClause}! Sign in here for more info and to claim your donations: ${url}`;
-    void shareTextOrCopy(message, toast, `Message for ${displayName} copied`);
-  };
-
-  return (
-    <div className="rounded-lg bg-secondary/30 p-2.5">
-      <div className="flex items-center gap-3">
-        <Avatar className="size-8 shrink-0">
-          {picture && <AvatarImage src={picture} alt="" />}
-          <AvatarFallback className="text-xs">{displayName.slice(0, 2).toUpperCase()}</AvatarFallback>
-        </Avatar>
-        <div className="min-w-0 flex-1">
-          <div className="truncate text-sm font-medium">{displayName}</div>
-        </div>
-        <Button
-          type="button"
-          variant="ghost"
-          size="sm"
-          onClick={handleNotify}
-          className="h-8 shrink-0 gap-1.5 px-2 text-xs text-muted-foreground hover:text-foreground"
-        >
-          <MessageCircle className="size-3.5" />
-          Notify
-        </Button>
-        <Button
-          type="button"
-          variant="ghost"
-          size="icon"
-          onClick={onRemove}
-          aria-label={`Remove ${displayName}`}
-          className="shrink-0"
-        >
-          <X className="size-4" />
-        </Button>
-      </div>
     </div>
   );
 }

@@ -5,6 +5,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { CustomEmojiImg } from '@/components/CustomEmoji';
 import { EmojiPicker, type EmojiSelection } from '@/components/EmojiPicker';
 import { isCustomEmoji } from '@/lib/customEmoji';
+import { useAppContext } from '@/hooks/useAppContext';
 import { useNostrPublish } from '@/hooks/useNostrPublish';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useEmojiUsage } from '@/hooks/useEmojiUsage';
@@ -12,7 +13,8 @@ import { useCustomEmojis } from '@/hooks/useCustomEmojis';
 import { useFeedSettings } from '@/hooks/useFeedSettings';
 import { cn } from '@/lib/utils';
 import { impactLight } from '@/lib/haptics';
-import type { EventStats } from '@/hooks/useTrending';
+import { invalidateEventStats } from '@/lib/invalidateEventStats';
+import type { Nip85EventStats } from '@/hooks/useNip85Stats';
 import type { ResolvedEmoji } from '@/lib/customEmoji';
 
 interface QuickReactMenuProps {
@@ -48,6 +50,12 @@ export function QuickReactMenu({
   const { user } = useCurrentUser();
   const { mutate: publishEvent } = useNostrPublish();
   const queryClient = useQueryClient();
+  const { config } = useAppContext();
+  const statsPubkey = config.nip85StatsPubkey;
+  const statsKey = useMemo(
+    () => ['nip85-event-stats', eventId, statsPubkey] as const,
+    [eventId, statsPubkey],
+  );
   const { trackEmojiUsage, getTopEmojis } = useEmojiUsage();
   const { feedSettings } = useFeedSettings();
   const { emojis: allCustomEmojis } = useCustomEmojis();
@@ -104,14 +112,11 @@ export function QuickReactMenu({
     const resolvedEmoji: ResolvedEmoji = emojiTag
       ? { content: displayEmoji, url: emojiTag[2], name: emojiTag[1] }
       : { content: displayEmoji };
-    const prevStats = queryClient.getQueryData<EventStats>(['event-stats', eventId]);
+    const prevStats = queryClient.getQueryData<Nip85EventStats | null>(statsKey);
     if (prevStats) {
-      queryClient.setQueryData<EventStats>(['event-stats', eventId], {
+      queryClient.setQueryData<Nip85EventStats | null>(statsKey, {
         ...prevStats,
-        reactions: prevStats.reactions + 1,
-        reactionEmojis: prevStats.reactionEmojis.some((e) => e.content === displayEmoji)
-          ? prevStats.reactionEmojis
-          : [...prevStats.reactionEmojis, resolvedEmoji],
+        reactionCount: prevStats.reactionCount + 1,
       });
     }
 
@@ -136,20 +141,20 @@ export function QuickReactMenu({
       {
         onSuccess: () => {
           setTimeout(() => {
-            queryClient.invalidateQueries({ queryKey: ['event-stats', eventId] });
+            invalidateEventStats(queryClient, eventId, statsPubkey);
             queryClient.invalidateQueries({ queryKey: ['event-interactions', eventId] });
           }, 3000);
         },
         onError: () => {
           setSelectedEmoji(null);
           if (prevStats) {
-            queryClient.setQueryData<EventStats>(['event-stats', eventId], prevStats);
+            queryClient.setQueryData<Nip85EventStats | null>(statsKey, prevStats);
           }
           queryClient.removeQueries({ queryKey: ['user-reaction', eventId] });
         },
       },
     );
-  }, [user, eventId, eventPubkey, eventKind, onReact, publishEvent, queryClient, trackEmojiUsage, onClose]);
+  }, [user, eventId, eventPubkey, eventKind, onReact, publishEvent, queryClient, trackEmojiUsage, onClose, statsPubkey, statsKey]);
 
   /** Handle selection from the quick buttons (native or custom emoji). */
   const handleQuickSelect = useCallback((emoji: string) => {

@@ -3,7 +3,6 @@ import { Navigate } from 'react-router-dom';
 import { PageHeader } from '@/components/PageHeader';
 import { RelayListManager } from '@/components/RelayListManager';
 import { BlossomSettings } from '@/components/BlossomSettings';
-import { IntroImage } from '@/components/IntroImage';
 import { HelpTip } from '@/components/HelpTip';
 import { Label } from '@/components/ui/label';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
@@ -41,14 +40,11 @@ export function NetworkSettingsPage() {
 
       <div className="p-4">
         {/* Intro */}
-        <div className="flex items-center gap-4 px-3 pt-2 pb-4">
-          <IntroImage src="/relay-intro.png" />
-          <div className="min-w-0">
-            <h2 className="text-sm font-semibold">Network Connections</h2>
-            <p className="text-xs text-muted-foreground mt-1 leading-relaxed">
-              Manage your relay connections. Relays are servers that store and distribute Nostr events across the network.
-            </p>
-          </div>
+        <div className="px-3 pt-2 pb-4">
+          <h2 className="text-sm font-semibold">Network Connections</h2>
+          <p className="text-xs text-muted-foreground mt-1 leading-relaxed">
+            Manage your relay connections. Relays are servers that store and distribute Nostr events across the network.
+          </p>
         </div>
 
         {/* Relays */}

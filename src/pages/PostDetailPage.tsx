@@ -37,6 +37,7 @@ const CustomNipCard = lazy(() => import("@/components/CustomNipCard").then(m => 
 import { FileMetadataContent } from "@/components/FileMetadataContent";
 import { FollowPackContent } from "@/components/FollowPackContent";
 import { GoalCard } from "@/components/GoalCard";
+import { DetailCommentComposer } from "@/components/DetailCommentComposer";
 import { FollowPackDetailContent } from "@/components/FollowPackDetailContent";
 import { FoundLogContent } from "@/components/FoundLogContent";
 import { GeocacheContent } from "@/components/GeocacheContent";
@@ -51,7 +52,6 @@ import { LiveStreamPage } from "@/components/LiveStreamPage";
 import { MagicDeckContent } from "@/components/MagicDeckContent";
 import { MusicDetailContent } from "@/components/MusicDetailContent";
 import { ActivityCard, EventActionHeader, NoteCard } from "@/components/NoteCard";
-import { FeedCard } from "@/components/FeedCard";
 import { publishedAtAction } from "@/lib/publishedAtAction";
 import { NoteContent } from "@/components/NoteContent";
 import { NsiteCard } from "@/components/NsiteCard";
@@ -437,20 +437,18 @@ function ProfileBadgesDetailView({ event }: { event: NostrEvent }) {
 
   return (
     <div>
-      <FeedCard>
-        <NoteCard event={event} />
-      </FeedCard>
+      <NoteCard event={event} />
       <div className="pb-16 sidebar:pb-0">
         {commentsLoading ? (
-          <FeedCard className="mt-4 divide-y divide-border">
+          <div className="mt-4 divide-y divide-border">
             {Array.from({ length: 3 }).map((_, i) => (
               <ReplyCardSkeleton key={i} />
             ))}
-          </FeedCard>
+          </div>
         ) : orderedReplies.length > 0 ? (
-          <FeedCard className="mt-4">
+          <div className="mt-4">
             <FlatThreadedReplyList replies={orderedReplies} />
-          </FeedCard>
+          </div>
         ) : (
           <div className="py-12 text-center text-muted-foreground text-sm">
             No replies yet. Be the first to reply!
@@ -1398,12 +1396,9 @@ function PostDetailContent({ event }: { event: NostrEvent }) {
   return (
     <CommunityModerationContext.Provider value={communityModContext}>
     <div>
-      {/* Focused post card — ancestor previews, ancestor thread, and the
-          focused event itself share one rounded surface so the page
-          reads as "thread context → this post" instead of an
-          edge-to-edge Twitter timeline. Replies sit in their own
-          FeedCard below. */}
-      <FeedCard>
+      {/* Focused post — ancestor previews, ancestor thread, and the
+          focused event render edge-to-edge to match the Activity feed
+          and the Search results. */}
       {/* Content preview for kind 1111 comments: external content, profile, or community */}
       {externalIdentifier && (
         <ExternalContentPreview identifier={externalIdentifier} />
@@ -2072,25 +2067,53 @@ function PostDetailContent({ event }: { event: NostrEvent }) {
           />
         </article>
       )}
-      </FeedCard>
 
       {/* Replies */}
-      <div className="pb-16 sidebar:pb-0">
+      <div className="mt-6 pb-16 sidebar:pb-0">
+        <div className="flex items-baseline justify-between gap-3 mb-3 px-1">
+          <h2 className="text-lg font-semibold tracking-tight">
+            {isKind1 ? 'Replies' : 'Comments'}
+          </h2>
+          {replyTree.length > 0 ? (
+            <span className="text-sm text-muted-foreground tabular-nums">
+              {formatNumber(replyTree.length)}{' '}
+              {replyTree.length === 1
+                ? isKind1 ? 'reply' : 'comment'
+                : isKind1 ? 'replies' : 'comments'}
+            </span>
+          ) : null}
+        </div>
+
+        <DetailCommentComposer
+          event={event}
+          className="mb-3"
+          placeholder={isKind1 ? 'Write a reply...' : "What's on your mind?"}
+        />
+
         {repliesLoading ? (
-          <FeedCard className="mt-4 divide-y divide-border">
+          <div className="rounded-2xl bg-card border border-border/60 shadow-sm overflow-hidden divide-y divide-border">
             {Array.from({ length: 3 }).map((_, i) => (
               <ReplyCardSkeleton key={i} />
             ))}
-          </FeedCard>
-        ) : replyTree.length > 0 ? (
-          <FeedCard className="mt-4">
-            <ThreadedReplyList roots={replyTree} />
-          </FeedCard>
-         ) : !parentEventId ? (
-          <div className="py-12 text-center text-muted-foreground text-sm">
-            No replies yet. Be the first to reply!
           </div>
-        ) : null}
+        ) : replyTree.length > 0 ? (
+          <div className="rounded-2xl bg-card border border-border/60 shadow-sm overflow-hidden">
+            <ThreadedReplyList roots={replyTree} />
+          </div>
+        ) : (
+          <button
+            type="button"
+            onClick={() => setReplyOpen(true)}
+            className="block w-full rounded-2xl border border-dashed border-border/80 bg-card/50 px-6 py-10 text-center hover:bg-card hover:border-primary/40 transition-colors"
+          >
+            <p className="text-base font-medium text-foreground">
+              No {isKind1 ? 'replies' : 'comments'} yet
+            </p>
+            <p className="mt-1 text-sm text-muted-foreground">
+              Be the first to {isKind1 ? 'reply' : 'start the discussion'}.
+            </p>
+          </button>
+        )}
       </div>
     </div>
     </CommunityModerationContext.Provider>
@@ -2272,11 +2295,11 @@ export function PostDetailSkeleton() {
       </div>
 
       {/* Replies skeleton */}
-      <FeedCard className="mt-4 divide-y divide-border">
+      <div className="mt-4 divide-y divide-border">
         {Array.from({ length: 3 }).map((_, i) => (
           <ReplyCardSkeleton key={i} />
         ))}
-      </FeedCard>
+      </div>
     </div>
   );
 }

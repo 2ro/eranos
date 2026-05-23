@@ -7,7 +7,7 @@ import { nip19 } from 'nostr-tools';
 import { useActions, type Action } from '@/hooks/useActions';
 import { useAuthor } from '@/hooks/useAuthor';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
-import { useBitcoinWallet } from '@/hooks/useBitcoinWallet';
+import { useBtcPrice } from '@/hooks/useBtcPrice';
 import { useNostrPublish } from '@/hooks/useNostrPublish';
 import { useToast } from '@/hooks/useToast';
 import { getAllCountries, getGeoDisplayName, countryCodeToFlag } from '@/lib/countries';
@@ -109,8 +109,27 @@ function ActionShareMenu({ action }: { action: Action }) {
           ['a', `36639:${action.pubkey}:${action.id}`],
         ],
       });
-      await queryClient.invalidateQueries({ queryKey: ['agora-actions'] });
-      await queryClient.invalidateQueries({ queryKey: ['agora-action'] });
+      // Extract any organization `A` tag the pledge was associated with so
+      // the org's activity shelf and community feeds refresh too.
+      const orgATag = action.event.tags.find(([n]) => n === 'A')?.[1];
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ['agora-actions'] }),
+        queryClient.invalidateQueries({ queryKey: ['agora-action'] }),
+        ...(orgATag
+          ? [
+              queryClient.invalidateQueries({ queryKey: ['organization-activity', orgATag] }),
+              queryClient.invalidateQueries({ queryKey: ['community-actions', orgATag] }),
+              queryClient.invalidateQueries({
+                predicate: (q) => {
+                  const [root, aTagsKey] = q.queryKey;
+                  return root === 'community-activity-feed'
+                    && typeof aTagsKey === 'string'
+                    && aTagsKey.split(',').includes(orgATag);
+                },
+              }),
+            ]
+          : []),
+      ]);
       toast({ title: 'Pledge deleted' });
     } catch (error) {
       console.error('Failed to delete pledge:', error);
@@ -184,12 +203,12 @@ function ActionCard({ action, isExpired, btcPrice }: { action: Action; isExpired
       to={`/${naddr}`}
       className="group block rounded-xl overflow-hidden focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background motion-safe:transition-transform motion-safe:duration-200 motion-safe:hover:-translate-y-0.5"
     >
-      <Card className={cn('overflow-hidden border-border/70 shadow-sm motion-safe:transition-shadow motion-safe:duration-200 group-hover:shadow-lg h-full flex flex-col', isExpired && 'opacity-75')}>
+      <Card className="overflow-hidden border-border/70 shadow-sm motion-safe:transition-shadow motion-safe:duration-200 group-hover:shadow-lg h-full flex flex-col">
         <div className="relative w-full aspect-[16/9] bg-gradient-to-br from-primary/15 via-primary/5 to-secondary">
           <img
             src={coverImage}
             alt=""
-            className={cn('absolute inset-0 size-full object-cover', isExpired && 'grayscale')}
+            className="absolute inset-0 size-full object-cover"
             onError={() => setImageLoadFailed(true)}
             loading="lazy"
           />
@@ -256,7 +275,7 @@ type SortOption = 'recent' | 'bounty' | 'deadline';
 
 export default function ActionsPage() {
   const { user } = useCurrentUser();
-  const { btcPrice } = useBitcoinWallet();
+  const { data: btcPrice } = useBtcPrice();
   const navigate = useNavigate();
 
   const [selectedCountry, setSelectedCountry] = useState<string | undefined>(undefined);
