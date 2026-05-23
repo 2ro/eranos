@@ -29,7 +29,6 @@ import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useNostrPublish } from '@/hooks/useNostrPublish';
 import { useToast } from '@/hooks/useToast';
 import type { SearchProfile } from '@/hooks/useSearchProfiles';
-import { useLayoutOptions } from '@/contexts/LayoutContext';
 import {
   COMMUNITY_DEFINITION_KIND,
   parseCommunityEvent,
@@ -119,7 +118,6 @@ function getEditTarget(value: string | null): EditTarget | null {
 }
 
 export function CreateCommunityPage() {
-  useLayoutOptions({ noMaxWidth: true });
 
   const { user } = useCurrentUser();
   const navigate = useNavigate();

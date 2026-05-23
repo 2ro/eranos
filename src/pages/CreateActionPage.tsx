@@ -27,7 +27,6 @@ import { useBtcPrice } from '@/hooks/useBtcPrice';
 import { useManageableOrganizations } from '@/hooks/useManageableOrganizations';
 import { useNostrPublish } from '@/hooks/useNostrPublish';
 import { useToast } from '@/hooks/useToast';
-import { useLayoutOptions } from '@/contexts/LayoutContext';
 import { usdToSats } from '@/lib/bitcoin';
 import { COUNTRIES, searchCountries, type CountryEntry } from '@/lib/countries';
 import { parseContentTagInput } from '@/lib/contentTags';
@@ -40,7 +39,6 @@ import { cn } from '@/lib/utils';
 import { withAgoraTag } from '@/lib/agoraNoteTags';
 
 export function CreateActionPage() {
-  useLayoutOptions({ noMaxWidth: true });
 
   const { user } = useCurrentUser();
   const navigate = useNavigate();

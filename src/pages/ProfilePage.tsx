@@ -15,7 +15,6 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
-import { useLayoutOptions } from '@/contexts/LayoutContext';
 import { ZapDialog } from '@/components/ZapDialog';
 import { ExternalFavicon } from '@/components/ExternalFavicon';
 import { VerifiedNip05Text } from '@/components/Nip05Badge';
@@ -1290,14 +1289,6 @@ function FollowersListModal({ pubkey, open, onOpenChange, displayName }: Followe
       },
     });
   }, [queryClient, pubkey]);
-
-  // ProfilePage opts out of FundraiserLayout's default `max-w-3xl` cap so it
-  // can run a wider canvas (banner full-bleed, contained `max-w-7xl` content
-  // column matching CampaignsPage / AllCampaignsPage). FundraiserLayout has
-  // no right-sidebar slot, so any `rightSidebar` option here would be ignored.
-  useLayoutOptions(pubkey ? {
-    noMaxWidth: true,
-  } : {});
 
   if (!pubkey) {
     // If we're resolving a NIP-05, show loading state

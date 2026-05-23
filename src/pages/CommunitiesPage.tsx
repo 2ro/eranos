@@ -19,7 +19,6 @@ import { CommunityMiniCard, CommunityMiniCardSkeleton } from '@/components/disco
 import { SectionHeader } from '@/components/discovery/SectionHeader';
 import { COOL_PALETTE } from '@/lib/hopePalette';
 import { cn } from '@/lib/utils';
-import { useLayoutOptions } from '@/contexts/LayoutContext';
 import { useAppContext } from '@/hooks/useAppContext';
 import { useCampaignModerators } from '@/hooks/useCampaignModerators';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
@@ -53,10 +52,6 @@ export function CommunitiesPage() {
   // render anything.
   const { data: moderators } = useCampaignModerators();
   const isMod = !!user && !!moderators && moderators.includes(user.pubkey);
-
-  useLayoutOptions({
-    noMaxWidth: true,
-  });
 
   useSeoMeta({
     title: `Groups | ${config.appName}`,

@@ -37,7 +37,6 @@ import { usePublishRSVP } from '@/hooks/usePublishRSVP';
 import { usePinnedEventComments } from '@/hooks/usePinnedEventComments';
 import { useProfileUrl } from '@/hooks/useProfileUrl';
 import { useToast } from '@/hooks/useToast';
-import { useLayoutOptions } from '@/contexts/LayoutContext';
 import { genUserName } from '@/lib/genUserName';
 import { openUrl } from '@/lib/downloadFile';
 import { sanitizeUrl } from '@/lib/sanitizeUrl';
@@ -199,7 +198,6 @@ function EventDetailRow({ icon, children }: { icon: React.ReactNode; children: R
 // --- Main Component ---
 
 export function CalendarEventDetailPage({ event }: { event: NostrEvent }) {
-  useLayoutOptions({ noMaxWidth: true });
 
   const navigate = useNavigate();
   const { user } = useCurrentUser();

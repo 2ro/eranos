@@ -67,7 +67,6 @@ import { useProfileUrl } from '@/hooks/useProfileUrl';
 import { useToast } from '@/hooks/useToast';
 import { useEventRSVPs } from '@/hooks/useEventRSVPs';
 import { CommunityModerationContext } from '@/contexts/CommunityModerationContext';
-import { useLayoutOptions } from '@/contexts/LayoutContext';
 import { applyCommunityModerationToEvents, parseCommunityEvent } from '@/lib/communityUtils';
 import type { ParsedCampaign } from '@/lib/campaign';
 import type { Action } from '@/hooks/useActions';
@@ -865,10 +864,6 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
       },
     );
   }, [community, deleteMutation, event, navigate, queryClient, toast]);
-
-  useLayoutOptions({
-    noMaxWidth: true,
-  });
 
   const moderationCtx = useMemo(
     () => communityATag ? { communityATag, moderation, rankMap } : null,

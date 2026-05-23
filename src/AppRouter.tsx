@@ -1,19 +1,13 @@
-import { lazy, Suspense, useMemo, useRef, useState } from "react";
-import { BrowserRouter, Navigate, Outlet, Route, Routes } from "react-router-dom";
+import { lazy, Suspense, useState } from "react";
+import { BrowserRouter, Link, Navigate, Outlet, Route, Routes } from "react-router-dom";
 import { Toaster } from "./components/ui/toaster";
 import { TopNav } from "./components/TopNav";
 import { ScrollToTop } from "./components/ScrollToTop";
 import { VersionCheck } from "./components/VersionCheck";
 import { useCurrentUser } from "./hooks/useCurrentUser";
 import { useProfileUrl } from "./hooks/useProfileUrl";
-import {
-  CenterColumnContext,
-  LayoutStore,
-  LayoutStoreContext,
-  useLayoutSnapshot,
-} from "@/contexts/LayoutContext";
+import { CenterColumnContext } from "@/contexts/LayoutContext";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Link } from "react-router-dom";
 import { cn } from "@/lib/utils";
 
 // Critical-path pages: eagerly loaded (landing + fallback)
@@ -92,18 +86,14 @@ function SiteFooter() {
 }
 
 /**
- * Persistent app shell. GoFundMe-style top-nav-only chrome wrapping the
- * full-width route outlet.
- *
- * Pages that need to escape the default `max-w-3xl` cap (e.g. campaign /
- * action detail pages with their own immersive layouts) opt out via
- * `useLayoutOptions({ noMaxWidth: true })`. Pages can also pass
- * `wrapperClassName` to append extra classes to the center column.
+ * Persistent app shell. GoFundMe-style top-nav-only chrome wrapping the route
+ * outlet. The width of the center column is decided by the layout variant
+ * picked in the route tree below — narrow (default, `max-w-3xl`) for
+ * form/prose-style pages, wide (full width) for landing / dashboard / detail
+ * pages that render their own internal layout.
  */
-function FundraiserLayoutInner() {
-  const centerColumnRef = useRef<HTMLDivElement>(null);
+function FundraiserLayout({ narrow }: { narrow: boolean }) {
   const [centerColumnEl, setCenterColumnEl] = useState<HTMLElement | null>(null);
-  const { noMaxWidth, wrapperClassName } = useLayoutSnapshot();
 
   return (
     <CenterColumnContext.Provider value={centerColumnEl}>
@@ -111,15 +101,8 @@ function FundraiserLayoutInner() {
         <TopNav />
         <Suspense fallback={<PageSkeleton />}>
           <div
-            ref={(el) => {
-              centerColumnRef.current = el;
-              setCenterColumnEl(el);
-            }}
-            className={cn(
-              "flex-1 min-w-0 w-full mx-auto",
-              !noMaxWidth && "max-w-3xl",
-              wrapperClassName,
-            )}
+            ref={setCenterColumnEl}
+            className={cn("flex-1 min-w-0 w-full mx-auto", narrow && "max-w-3xl")}
           >
             <Outlet />
           </div>
@@ -130,15 +113,6 @@ function FundraiserLayoutInner() {
   );
 }
 
-function FundraiserLayout() {
-  const store = useMemo(() => new LayoutStore(), []);
-  return (
-    <LayoutStoreContext.Provider value={store}>
-      <FundraiserLayoutInner />
-    </LayoutStoreContext.Provider>
-  );
-}
-
 export function AppRouter() {
   return (
     <BrowserRouter>
@@ -146,13 +120,10 @@ export function AppRouter() {
       <VersionCheck />
       <ScrollToTop />
       <Routes>
-        {/* All routes share the persistent FundraiserLayout (top nav + footer) */}
-        <Route element={<FundraiserLayout />}>
-          <Route path="/" element={<CampaignsPage />} />
+        {/* Narrow layout — `max-w-3xl` center column. The default for
+            form/prose-style pages. */}
+        <Route element={<FundraiserLayout narrow />}>
           <Route path="/feed" element={<Index />} />
-          <Route path="/campaigns" element={<Navigate to="/" replace />} />
-          <Route path="/campaigns/new" element={<CreateCampaignPage />} />
-          <Route path="/campaigns/all" element={<AllCampaignsPage />} />
           <Route path="/notifications" element={<NotificationsPage />} />
           <Route path="/search" element={<SearchPage />} />
           <Route path="/profile" element={<ProfileRedirect />} />
@@ -168,23 +139,36 @@ export function AppRouter() {
           <Route path="/wallet" element={<WalletPage />} />
           <Route path="/wallet/recovery" element={<WalletRecoveryPage />} />
           <Route path="/bitcoin" element={<Navigate to="/wallet" replace />} />
-          <Route path="/groups" element={<CommunitiesPage />} />
-          <Route path="/groups/new" element={<CreateCommunityPage />} />
           <Route path="/help" element={<HelpPage />} />
           <Route path="/help/donors" element={<DonorGuidePage />} />
           <Route path="/help/activists" element={<ActivistGuidePage />} />
           <Route path="/privacy" element={<PrivacyPolicyPage />} />
           <Route path="/safety" element={<CSAEPolicyPage />} />
           <Route path="/changelog" element={<ChangelogPage />} />
-          <Route path="/i/*" element={<ExternalContentPage />} />
-          <Route path="/pledges" element={<ActionsPage />} />
-          <Route path="/pledges/new" element={<CreateActionPage />} />
           <Route path="/organizers" element={<OrganizersPage />} />
-          <Route path="/dashboard" element={<EventDashboardPage />} />
-
           {/* Callback target for remote signers (e.g. Amber, Primal) after NIP-46 approval */}
           <Route path="/remoteloginsuccess" element={<RemoteLoginSuccessPage />} />
-          {/* NIP-19 route for npub1, note1, naddr1, nevent1, nprofile1 */}
+        </Route>
+
+        {/* Wide layout — no max-width on the center column. Used by landing /
+            list / detail pages that render their own internal width
+            constraints. */}
+        <Route element={<FundraiserLayout narrow={false} />}>
+          <Route path="/" element={<CampaignsPage />} />
+          <Route path="/campaigns" element={<Navigate to="/" replace />} />
+          <Route path="/campaigns/new" element={<CreateCampaignPage />} />
+          <Route path="/campaigns/all" element={<AllCampaignsPage />} />
+          <Route path="/groups" element={<CommunitiesPage />} />
+          <Route path="/groups/new" element={<CreateCommunityPage />} />
+          <Route path="/pledges" element={<ActionsPage />} />
+          <Route path="/pledges/new" element={<CreateActionPage />} />
+          <Route path="/dashboard" element={<EventDashboardPage />} />
+          <Route path="/i/*" element={<ExternalContentPage />} />
+          {/* NIP-19 route for npub1, note1, naddr1, nevent1, nprofile1.
+              Goes through the wide layout because the dispatch may resolve to
+              a profile, campaign, action, or community page — all of which
+              render their own internal layout. PostDetailPage / ListDetailPage
+              also work edge-to-edge. */}
           <Route path="/:nip19" element={<NIP19Page />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />

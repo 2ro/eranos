@@ -16,7 +16,6 @@ import { getDisplayName } from '@/lib/genUserName';
 import { DEFAULT_ACTION_COVERS, DEFAULT_COVER_IMAGE } from '@/lib/defaultActionCovers';
 import { formatCompactPledgeDeadline, formatPledgeAmount } from '@/lib/pledges';
 import { HOPE_PALETTE } from '@/lib/hopePalette';
-import { useLayoutOptions } from '@/contexts/LayoutContext';
 import { cn } from '@/lib/utils';
 import { HeroAtmosphere } from '@/components/HeroAtmosphere';
 import { HeroBanner } from '@/components/HeroBanner';
@@ -295,13 +294,6 @@ export default function ActionsPage() {
   const createActionHref = selectedCountry
     ? `/pledges/new?country=${encodeURIComponent(selectedCountry)}`
     : '/pledges/new';
-
-  // Drive the global FAB from the canonical layout API so we get the same
-  // circular Plus button every other page has. `noMaxWidth: true` lets
-  // the hero banner span the full content column.
-  useLayoutOptions({
-    noMaxWidth: true,
-  });
 
   const allCountries = useMemo(() => getAllCountries(), []);
 

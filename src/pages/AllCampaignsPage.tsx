@@ -13,7 +13,6 @@ import { useAllCampaigns, type CampaignSort } from '@/hooks/useAllCampaigns';
 import { useCampaignModeration } from '@/hooks/useCampaignModeration';
 import { useDebounce } from '@/hooks/useDebounce';
 import { useAppContext } from '@/hooks/useAppContext';
-import { useLayoutOptions } from '@/contexts/LayoutContext';
 import { cn } from '@/lib/utils';
 import type { ParsedCampaign } from '@/lib/campaign';
 
@@ -49,7 +48,6 @@ export function AllCampaignsPage() {
   // same width budget the Pledge index gets. The inner `max-w-7xl`
   // wrapper still keeps the content from sprawling on ultrawide
   // monitors.
-  useLayoutOptions({ noMaxWidth: true });
   const { config } = useAppContext();
 
   // URL state — sort and query live in the URL so results are shareable.

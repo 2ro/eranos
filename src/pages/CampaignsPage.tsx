@@ -17,7 +17,6 @@ import { useCampaigns } from '@/hooks/useCampaigns';
 import { useCampaignModeration } from '@/hooks/useCampaignModeration';
 import { useCampaignModerators } from '@/hooks/useCampaignModerators';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
-import { useLayoutOptions } from '@/contexts/LayoutContext';
 import { useAppContext } from '@/hooks/useAppContext';
 import { type ParsedCampaign } from '@/lib/campaign';
 
@@ -25,7 +24,6 @@ import { type ParsedCampaign } from '@/lib/campaign';
 const MAX_FEATURED = 4;
 
 export function CampaignsPage() {
-  useLayoutOptions({ noMaxWidth: true });
 
   const { config } = useAppContext();
   const { user } = useCurrentUser();

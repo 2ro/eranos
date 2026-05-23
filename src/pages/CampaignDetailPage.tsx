@@ -52,7 +52,6 @@ import { usePinnedEventComments } from '@/hooks/usePinnedEventComments';
 import { useProfileUrl } from '@/hooks/useProfileUrl';
 import { useShareOrigin } from '@/hooks/useShareOrigin';
 import { useToast } from '@/hooks/useToast';
-import { useLayoutOptions } from '@/contexts/LayoutContext';
 import {
   encodeCampaignNaddr,
   getCampaignCountryLabel,
@@ -110,7 +109,6 @@ export function CampaignDetailPage({ pubkey, identifier, relays }: CampaignDetai
   // with the article on mobile (where the sidebar slot is invisible
   // anyway). Keeping everything in one Outlet lets us inline the donate
   // column below the hero on small screens.
-  useLayoutOptions({ noMaxWidth: true });
 
   const { data: campaign, isLoading, isError } = useCampaign({ pubkey, identifier, relays });
 

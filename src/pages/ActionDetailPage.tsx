@@ -21,7 +21,6 @@ import { useProfileUrl } from '@/hooks/useProfileUrl';
 import { useShareOrigin } from '@/hooks/useShareOrigin';
 import { useSubmissionZapTotals } from '@/hooks/useSubmissionZapTotals';
 import { useToast } from '@/hooks/useToast';
-import { useLayoutOptions } from '@/contexts/LayoutContext';
 import { getDisplayName } from '@/lib/genUserName';
 import { getGeoDisplayName } from '@/lib/countries';
 import { DEFAULT_COVER_IMAGE } from '@/lib/defaultActionCovers';
@@ -61,7 +60,6 @@ interface ActionDetailPageProps {
 }
 
 export function ActionDetailPage({ pubkey, identifier }: ActionDetailPageProps) {
-  useLayoutOptions({ noMaxWidth: true });
 
   const { data: action, isLoading, isError } = useAction(pubkey, identifier);
 

@@ -38,7 +38,6 @@ import { useHdWallet } from '@/hooks/useHdWallet';
 import { useManageableOrganizations } from '@/hooks/useManageableOrganizations';
 import { useNostrPublish } from '@/hooks/useNostrPublish';
 import { useToast } from '@/hooks/useToast';
-import { useLayoutOptions } from '@/contexts/LayoutContext';
 import {
   CAMPAIGN_KIND,
   encodeCampaignNaddr,
@@ -109,7 +108,6 @@ function buildImetaFromNip94(nip94Tags: string[][]): string[] {
 }
 
 export function CreateCampaignPage() {
-  useLayoutOptions({ noMaxWidth: true });
 
   const { user } = useCurrentUser();
   const navigate = useNavigate();
