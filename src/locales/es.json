@@ -650,5 +650,45 @@
       "backupLoadedTitle": "Copia de seguridad cargada",
       "backupLoadedDesc": "Frase de recuperación descifrada desde tus relés."
     }
+  },
+  "walletConnect": {
+    "status": "Estado",
+    "ready": "Listo",
+    "notFound": "No encontrado",
+    "none": "Ninguno",
+    "add": "Añadir",
+    "active": "Activo",
+    "connectionLabel": "Conexión NWC",
+    "defaultWalletName": "Cartera Lightning",
+    "setActiveTitle": "Establecer como activa",
+    "removeTitle": "Eliminar cartera",
+    "helpText": "Instala una extensión de navegador WebLN o conecta una cartera NWC para enviar zaps.",
+    "webln": {
+      "name": "WebLN",
+      "description": "Extensión del navegador"
+    },
+    "nwc": {
+      "name": "Nostr Wallet Connect",
+      "description": "Conexión a cartera remota",
+      "connectedCount_one": "{{count}} cartera conectada",
+      "connectedCount_other": "{{count}} carteras conectadas"
+    },
+    "empty": {
+      "title": "Sin carteras conectadas",
+      "description": "Añade una conexión NWC para activar los zaps instantáneos."
+    },
+    "dialog": {
+      "title": "Conectar cartera NWC",
+      "description": "Pega una cadena de conexión de tu cartera compatible con NWC.",
+      "aliasPlaceholder": "Nombre de la cartera (opcional)",
+      "connect": "Conectar",
+      "connecting": "Conectando..."
+    },
+    "toast": {
+      "uriRequiredTitle": "URI de conexión requerida",
+      "uriRequiredDesc": "Introduce una URI de conexión NWC válida.",
+      "activeChangedTitle": "Cartera activa cambiada",
+      "activeChangedDesc": "La cartera seleccionada ahora está activa para los zaps."
+    }
   }
 }

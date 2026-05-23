@@ -650,5 +650,45 @@
       "backupLoadedTitle": "已加载备份",
       "backupLoadedDesc": "已从你的中继解密恢复短语。"
     }
+  },
+  "walletConnect": {
+    "status": "状态",
+    "ready": "就绪",
+    "notFound": "未找到",
+    "none": "无",
+    "add": "添加",
+    "active": "激活",
+    "connectionLabel": "NWC 连接",
+    "defaultWalletName": "Lightning 钱包",
+    "setActiveTitle": "设为激活",
+    "removeTitle": "移除钱包",
+    "helpText": "安装 WebLN 浏览器扩展或连接 NWC 钱包以发送 zap。",
+    "webln": {
+      "name": "WebLN",
+      "description": "浏览器扩展"
+    },
+    "nwc": {
+      "name": "Nostr Wallet Connect",
+      "description": "远程钱包连接",
+      "connectedCount_one": "已连接 {{count}} 个钱包",
+      "connectedCount_other": "已连接 {{count}} 个钱包"
+    },
+    "empty": {
+      "title": "未连接钱包",
+      "description": "添加一个 NWC 连接以启用即时 zap。"
+    },
+    "dialog": {
+      "title": "连接 NWC 钱包",
+      "description": "从你兼容 NWC 的钱包中粘贴连接字符串。",
+      "aliasPlaceholder": "钱包名称（可选）",
+      "connect": "连接",
+      "connecting": "连接中..."
+    },
+    "toast": {
+      "uriRequiredTitle": "需要连接 URI",
+      "uriRequiredDesc": "请输入有效的 NWC 连接 URI。",
+      "activeChangedTitle": "已切换激活钱包",
+      "activeChangedDesc": "所选钱包现在已激活用于 zap。"
+    }
   }
 }

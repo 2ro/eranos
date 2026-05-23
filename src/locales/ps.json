@@ -650,5 +650,45 @@
       "backupLoadedTitle": "بیک اپ لوډ شو",
       "backupLoadedDesc": "د بیرته راګرځولو عبارت ستاسو له رېلو څخه کوډ مات شو."
     }
+  },
+  "walletConnect": {
+    "status": "حالت",
+    "ready": "چمتو",
+    "notFound": "ونه موندل شو",
+    "none": "هېڅ",
+    "add": "اضافه",
+    "active": "فعاله",
+    "connectionLabel": "د NWC اړیکه",
+    "defaultWalletName": "د Lightning والټ",
+    "setActiveTitle": "د فعالې په توګه وټاکئ",
+    "removeTitle": "والټ لرې کول",
+    "helpText": "د zap لیږلو لپاره د WebLN براوزر توسیع ولګوئ یا د NWC والټ سره ونښلوئ.",
+    "webln": {
+      "name": "WebLN",
+      "description": "د براوزر توسیع"
+    },
+    "nwc": {
+      "name": "Nostr Wallet Connect",
+      "description": "د لیرې والټ اړیکه",
+      "connectedCount_one": "{{count}} والټ ونښلیده",
+      "connectedCount_other": "{{count}} والټونه ونښلیدل"
+    },
+    "empty": {
+      "title": "هېڅ والټ نه دی نښلول شوی",
+      "description": "د سملاسي zapونو فعالولو لپاره د NWC اړیکه اضافه کړئ."
+    },
+    "dialog": {
+      "title": "د NWC والټ سره اړیکه",
+      "description": "د خپل NWC سره مطابق والټ څخه د اړیکې تار دلته الصاق کړئ.",
+      "aliasPlaceholder": "د والټ نوم (اختیاري)",
+      "connect": "وصل کول",
+      "connecting": "په نښلولو کې..."
+    },
+    "toast": {
+      "uriRequiredTitle": "د اړیکې URI ته اړتیا ده",
+      "uriRequiredDesc": "مهرباني وکړئ د NWC اړیکې سم URI دننه کړئ.",
+      "activeChangedTitle": "فعاله والټ بدله شوه",
+      "activeChangedDesc": "ټاکل شوې والټ اوس د zapونو لپاره فعاله ده."
+    }
   }
 }

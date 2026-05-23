@@ -650,5 +650,45 @@
       "backupLoadedTitle": "نسخهٔ پشتیبان بارگذاری شد",
       "backupLoadedDesc": "عبارت بازیابی از رله‌های شما رمزگشایی شد."
     }
+  },
+  "walletConnect": {
+    "status": "وضعیت",
+    "ready": "آماده",
+    "notFound": "یافت نشد",
+    "none": "هیچ",
+    "add": "افزودن",
+    "active": "فعال",
+    "connectionLabel": "اتصال NWC",
+    "defaultWalletName": "کیف پول Lightning",
+    "setActiveTitle": "تنظیم به‌عنوان فعال",
+    "removeTitle": "حذف کیف پول",
+    "helpText": "برای ارسال zap، یک افزونهٔ مرورگر WebLN نصب کنید یا یک کیف پول NWC وصل کنید.",
+    "webln": {
+      "name": "WebLN",
+      "description": "افزونهٔ مرورگر"
+    },
+    "nwc": {
+      "name": "Nostr Wallet Connect",
+      "description": "اتصال کیف پول راه دور",
+      "connectedCount_one": "{{count}} کیف پول متصل",
+      "connectedCount_other": "{{count}} کیف پول متصل"
+    },
+    "empty": {
+      "title": "کیف پولی متصل نیست",
+      "description": "برای فعال‌سازی zapهای فوری، یک اتصال NWC اضافه کنید."
+    },
+    "dialog": {
+      "title": "اتصال کیف پول NWC",
+      "description": "رشتهٔ اتصال را از کیف پول سازگار با NWC خود جای‌گذاری کنید.",
+      "aliasPlaceholder": "نام کیف پول (اختیاری)",
+      "connect": "اتصال",
+      "connecting": "در حال اتصال..."
+    },
+    "toast": {
+      "uriRequiredTitle": "URI اتصال لازم است",
+      "uriRequiredDesc": "لطفاً یک URI اتصال NWC معتبر وارد کنید.",
+      "activeChangedTitle": "کیف پول فعال تغییر کرد",
+      "activeChangedDesc": "کیف پول انتخاب‌شده اکنون برای zapها فعال است."
+    }
   }
 }

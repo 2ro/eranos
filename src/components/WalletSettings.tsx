@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Plus, Trash2, Zap, Globe, WalletMinimal, CheckCircle, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -16,6 +17,7 @@ import { useWallet } from '@/hooks/useWallet';
 import { useToast } from '@/hooks/useToast';
 
 export function WalletSettings() {
+  const { t } = useTranslation();
   const [addDialogOpen, setAddDialogOpen] = useState(false);
   const [connectionUri, setConnectionUri] = useState('');
   const [alias, setAlias] = useState('');
@@ -36,8 +38,8 @@ export function WalletSettings() {
   const handleAddConnection = async () => {
     if (!connectionUri.trim()) {
       toast({
-        title: 'Connection URI required',
-        description: 'Please enter a valid NWC connection URI.',
+        title: t('walletConnect.toast.uriRequiredTitle'),
+        description: t('walletConnect.toast.uriRequiredDesc'),
         variant: 'destructive',
       });
       return;
@@ -63,8 +65,8 @@ export function WalletSettings() {
   const handleSetActive = (connectionString: string) => {
     setActiveConnection(connectionString);
     toast({
-      title: 'Active wallet changed',
-      description: 'The selected wallet is now active for zaps.',
+      title: t('walletConnect.toast.activeChangedTitle'),
+      description: t('walletConnect.toast.activeChangedDesc'),
     });
   };
 
@@ -73,7 +75,7 @@ export function WalletSettings() {
       <div className="space-y-6">
         {/* Connection status cards */}
         <div className="space-y-3">
-          <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide px-1">Status</h2>
+          <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide px-1">{t('walletConnect.status')}</h2>
           <div className="grid gap-3">
             {/* WebLN */}
             <Card className="overflow-hidden">
@@ -83,14 +85,14 @@ export function WalletSettings() {
                     <Globe className="size-4 text-muted-foreground" />
                   </div>
                   <div>
-                    <p className="text-sm font-medium">WebLN</p>
-                    <p className="text-xs text-muted-foreground">Browser extension</p>
+                    <p className="text-sm font-medium">{t('walletConnect.webln.name')}</p>
+                    <p className="text-xs text-muted-foreground">{t('walletConnect.webln.description')}</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
                   {webln && <CheckCircle className="size-4 text-green-500" />}
                   <Badge variant={webln ? 'default' : 'secondary'} className="text-xs">
-                    {webln ? 'Ready' : 'Not Found'}
+                    {webln ? t('walletConnect.ready') : t('walletConnect.notFound')}
                   </Badge>
                 </div>
               </CardContent>
@@ -104,18 +106,18 @@ export function WalletSettings() {
                     <WalletMinimal className="size-4 text-muted-foreground" />
                   </div>
                   <div>
-                    <p className="text-sm font-medium">Nostr Wallet Connect</p>
+                    <p className="text-sm font-medium">{t('walletConnect.nwc.name')}</p>
                     <p className="text-xs text-muted-foreground">
                       {connections.length > 0
-                        ? `${connections.length} wallet${connections.length !== 1 ? 's' : ''} connected`
-                        : 'Remote wallet connection'}
+                        ? t('walletConnect.nwc.connectedCount', { count: connections.length })
+                        : t('walletConnect.nwc.description')}
                     </p>
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
                   {hasNWC && <CheckCircle className="size-4 text-green-500" />}
                   <Badge variant={hasNWC ? 'default' : 'secondary'} className="text-xs">
-                    {hasNWC ? 'Ready' : 'None'}
+                    {hasNWC ? t('walletConnect.ready') : t('walletConnect.none')}
                   </Badge>
                 </div>
               </CardContent>
@@ -128,10 +130,10 @@ export function WalletSettings() {
         {/* NWC Wallets */}
         <div className="space-y-4">
           <div className="flex items-center justify-between px-1">
-            <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">Nostr Wallet Connect</h2>
+            <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">{t('walletConnect.nwc.name')}</h2>
             <Button size="sm" variant="outline" onClick={() => setAddDialogOpen(true)} className="rounded-full">
               <Plus className="size-4 mr-1" />
-              Add
+              {t('walletConnect.add')}
             </Button>
           </div>
 
@@ -139,8 +141,8 @@ export function WalletSettings() {
             <Card className="border-dashed">
               <CardContent className="py-10 text-center">
                 <WalletMinimal className="size-8 mx-auto mb-3 text-muted-foreground/50" />
-                <p className="text-sm text-muted-foreground mb-1">No wallets connected</p>
-                <p className="text-xs text-muted-foreground/70">Add an NWC connection to enable instant zaps.</p>
+                <p className="text-sm text-muted-foreground mb-1">{t('walletConnect.empty.title')}</p>
+                <p className="text-xs text-muted-foreground/70">{t('walletConnect.empty.description')}</p>
               </CardContent>
             </Card>
           ) : (
@@ -157,10 +159,10 @@ export function WalletSettings() {
                         </div>
                         <div className="min-w-0">
                           <p className="text-sm font-medium truncate">
-                            {connection.alias || info?.alias || 'Lightning Wallet'}
+                            {connection.alias || info?.alias || t('walletConnect.defaultWalletName')}
                           </p>
                           <p className="text-xs text-muted-foreground">
-                            {isActive ? 'Active' : 'NWC Connection'}
+                            {isActive ? t('walletConnect.active') : t('walletConnect.connectionLabel')}
                           </p>
                         </div>
                       </div>
@@ -172,7 +174,7 @@ export function WalletSettings() {
                             variant="ghost"
                             onClick={() => handleSetActive(connection.connectionString)}
                             className="rounded-full"
-                            title="Set as active"
+                            title={t('walletConnect.setActiveTitle')}
                           >
                             <Zap className="size-3.5" />
                           </Button>
@@ -182,7 +184,7 @@ export function WalletSettings() {
                           variant="ghost"
                           onClick={() => handleRemoveConnection(connection.connectionString)}
                           className="rounded-full text-muted-foreground hover:text-destructive"
-                          title="Remove wallet"
+                          title={t('walletConnect.removeTitle')}
                         >
                           <Trash2 className="size-3.5" />
                         </Button>
@@ -201,7 +203,7 @@ export function WalletSettings() {
             <Separator />
             <div className="text-center py-4 space-y-2 px-4">
               <p className="text-sm text-muted-foreground">
-                Install a WebLN browser extension or connect a NWC wallet to send zaps.
+                {t('walletConnect.helpText')}
               </p>
             </div>
           </>
@@ -214,7 +216,7 @@ export function WalletSettings() {
           {/* Header */}
           <div className="flex items-center justify-between px-4 h-12">
             <DialogTitle className="text-base font-semibold">
-              Connect NWC Wallet
+              {t('walletConnect.dialog.title')}
             </DialogTitle>
             <button
               onClick={() => setAddDialogOpen(false)}
@@ -226,13 +228,13 @@ export function WalletSettings() {
 
           {/* Description */}
           <p className="px-4 -mt-1 mb-2 text-sm text-muted-foreground">
-            Paste a connection string from your NWC-compatible wallet.
+            {t('walletConnect.dialog.description')}
           </p>
 
           {/* Form fields */}
           <div className="px-4 space-y-4">
             <Input
-              placeholder="Wallet name (optional)"
+              placeholder={t('walletConnect.dialog.aliasPlaceholder')}
               value={alias}
               onChange={(e) => setAlias(e.target.value)}
               className="bg-transparent"
@@ -254,7 +256,7 @@ export function WalletSettings() {
               className="rounded-full px-5 font-bold"
               size="sm"
             >
-              {isConnecting ? 'Connecting...' : 'Connect'}
+              {isConnecting ? t('walletConnect.dialog.connecting') : t('walletConnect.dialog.connect')}
             </Button>
           </div>
         </DialogContent>

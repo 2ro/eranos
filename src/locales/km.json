@@ -650,5 +650,45 @@
       "backupLoadedTitle": "បានផ្ទុកការបម្រុងទុក",
       "backupLoadedDesc": "ឃ្លាសង្គ្រោះត្រូវបានឌិគ្រីបពីម៉ាស៊ីនបញ្ជូនបន្តរបស់អ្នក។"
     }
+  },
+  "walletConnect": {
+    "status": "ស្ថានភាព",
+    "ready": "រួចរាល់",
+    "notFound": "រកមិនឃើញ",
+    "none": "គ្មាន",
+    "add": "បន្ថែម",
+    "active": "សកម្ម",
+    "connectionLabel": "ការតភ្ជាប់ NWC",
+    "defaultWalletName": "កាបូបលុយ Lightning",
+    "setActiveTitle": "កំណត់ឲ្យសកម្ម",
+    "removeTitle": "លុបកាបូបលុយ",
+    "helpText": "ដំឡើងផ្នែកបន្ថែមកម្មវិធីរុករក WebLN ឬភ្ជាប់កាបូបលុយ NWC ដើម្បីផ្ញើ zap។",
+    "webln": {
+      "name": "WebLN",
+      "description": "ផ្នែកបន្ថែមកម្មវិធីរុករក"
+    },
+    "nwc": {
+      "name": "Nostr Wallet Connect",
+      "description": "ការតភ្ជាប់កាបូបលុយពីចម្ងាយ",
+      "connectedCount_one": "បានភ្ជាប់កាបូបលុយ {{count}}",
+      "connectedCount_other": "បានភ្ជាប់កាបូបលុយ {{count}}"
+    },
+    "empty": {
+      "title": "គ្មានកាបូបលុយត្រូវបានភ្ជាប់",
+      "description": "បន្ថែមការតភ្ជាប់ NWC ដើម្បីបើកដំណើរការ zap ភ្លាមៗ។"
+    },
+    "dialog": {
+      "title": "ភ្ជាប់កាបូបលុយ NWC",
+      "description": "បិទភ្ជាប់ខ្សែតភ្ជាប់ពីកាបូបលុយដែលអាចប្រើ NWC របស់អ្នក។",
+      "aliasPlaceholder": "ឈ្មោះកាបូបលុយ (ស្រេចចិត្ត)",
+      "connect": "ភ្ជាប់",
+      "connecting": "កំពុងភ្ជាប់..."
+    },
+    "toast": {
+      "uriRequiredTitle": "ត្រូវការ URI តភ្ជាប់",
+      "uriRequiredDesc": "សូមបញ្ចូល URI តភ្ជាប់ NWC ដែលត្រឹមត្រូវ។",
+      "activeChangedTitle": "បានប្ដូរកាបូបលុយសកម្ម",
+      "activeChangedDesc": "កាបូបលុយដែលបានជ្រើសរើសឥឡូវនេះសកម្មសម្រាប់ zap។"
+    }
   }
 }

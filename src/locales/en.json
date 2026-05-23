@@ -650,5 +650,45 @@
       "backupLoadedTitle": "Backup loaded",
       "backupLoadedDesc": "Recovery phrase decrypted from your relays."
     }
+  },
+  "walletConnect": {
+    "status": "Status",
+    "ready": "Ready",
+    "notFound": "Not Found",
+    "none": "None",
+    "add": "Add",
+    "active": "Active",
+    "connectionLabel": "NWC Connection",
+    "defaultWalletName": "Lightning Wallet",
+    "setActiveTitle": "Set as active",
+    "removeTitle": "Remove wallet",
+    "helpText": "Install a WebLN browser extension or connect a NWC wallet to send zaps.",
+    "webln": {
+      "name": "WebLN",
+      "description": "Browser extension"
+    },
+    "nwc": {
+      "name": "Nostr Wallet Connect",
+      "description": "Remote wallet connection",
+      "connectedCount_one": "{{count}} wallet connected",
+      "connectedCount_other": "{{count}} wallets connected"
+    },
+    "empty": {
+      "title": "No wallets connected",
+      "description": "Add an NWC connection to enable instant zaps."
+    },
+    "dialog": {
+      "title": "Connect NWC Wallet",
+      "description": "Paste a connection string from your NWC-compatible wallet.",
+      "aliasPlaceholder": "Wallet name (optional)",
+      "connect": "Connect",
+      "connecting": "Connecting..."
+    },
+    "toast": {
+      "uriRequiredTitle": "Connection URI required",
+      "uriRequiredDesc": "Please enter a valid NWC connection URI.",
+      "activeChangedTitle": "Active wallet changed",
+      "activeChangedDesc": "The selected wallet is now active for zaps."
+    }
   }
 }

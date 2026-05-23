@@ -650,5 +650,45 @@
       "backupLoadedTitle": "تم تحميل النسخة الاحتياطية",
       "backupLoadedDesc": "تم فك تشفير عبارة الاسترداد من خوادم الترحيل."
     }
+  },
+  "walletConnect": {
+    "status": "الحالة",
+    "ready": "جاهز",
+    "notFound": "غير موجود",
+    "none": "لا شيء",
+    "add": "إضافة",
+    "active": "نشطة",
+    "connectionLabel": "اتصال NWC",
+    "defaultWalletName": "محفظة Lightning",
+    "setActiveTitle": "تعيينها كنشطة",
+    "removeTitle": "إزالة المحفظة",
+    "helpText": "ثبّت امتداد متصفح WebLN أو وصّل محفظة NWC لإرسال الزابات.",
+    "webln": {
+      "name": "WebLN",
+      "description": "امتداد متصفح"
+    },
+    "nwc": {
+      "name": "Nostr Wallet Connect",
+      "description": "اتصال محفظة عن بُعد",
+      "connectedCount_one": "محفظة واحدة متصلة",
+      "connectedCount_other": "{{count}} محافظ متصلة"
+    },
+    "empty": {
+      "title": "لا توجد محافظ متصلة",
+      "description": "أضف اتصال NWC لتفعيل الزابات الفورية."
+    },
+    "dialog": {
+      "title": "وصل محفظة NWC",
+      "description": "الصق سلسلة الاتصال من محفظتك المتوافقة مع NWC.",
+      "aliasPlaceholder": "اسم المحفظة (اختياري)",
+      "connect": "وصل",
+      "connecting": "جارٍ الوصل..."
+    },
+    "toast": {
+      "uriRequiredTitle": "يجب إدخال رابط الاتصال",
+      "uriRequiredDesc": "يرجى إدخال رابط اتصال NWC صالح.",
+      "activeChangedTitle": "تم تغيير المحفظة النشطة",
+      "activeChangedDesc": "المحفظة المختارة الآن نشطة للزابات."
+    }
   }
 }

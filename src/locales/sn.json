@@ -650,5 +650,45 @@
       "backupLoadedTitle": "Backup yaloda",
       "backupLoadedDesc": "Mutsara wekugarisa wakavhurwa kubva pamarelays ako."
     }
+  },
+  "walletConnect": {
+    "status": "Mamiriro",
+    "ready": "Yakagadzirira",
+    "notFound": "Haina kuwanikwa",
+    "none": "Hapana",
+    "add": "Wedzera",
+    "active": "Inoshanda",
+    "connectionLabel": "Mubatanidzwa weNWC",
+    "defaultWalletName": "Chikwama cheLightning",
+    "setActiveTitle": "Isa seinoshanda",
+    "removeTitle": "Bvisa chikwama",
+    "helpText": "Isa yekuwedzera yebrowser yeWebLN kana batanidza chikwama cheNWC kuti utumire mazaps.",
+    "webln": {
+      "name": "WebLN",
+      "description": "Yekuwedzera yebrowser"
+    },
+    "nwc": {
+      "name": "Nostr Wallet Connect",
+      "description": "Mubatanidzwa wechikwama chekure",
+      "connectedCount_one": "Chikwama {{count}} chakabatanidzwa",
+      "connectedCount_other": "Zvikwama {{count}} zvakabatanidzwa"
+    },
+    "empty": {
+      "title": "Hapana zvikwama zvakabatanidzwa",
+      "description": "Wedzera mubatanidzwa weNWC kuti uite kuti mazap akurumidze."
+    },
+    "dialog": {
+      "title": "Batanidza chikwama cheNWC",
+      "description": "Isa connection string kubva pachikwama chako chinoenderana neNWC.",
+      "aliasPlaceholder": "Zita rechikwama (zvinosarudzika)",
+      "connect": "Batanidza",
+      "connecting": "Kubatanidza..."
+    },
+    "toast": {
+      "uriRequiredTitle": "URI yokubatanidza inodiwa",
+      "uriRequiredDesc": "Ndapota isa URI yeNWC inoshanda.",
+      "activeChangedTitle": "Chikwama chinoshanda chashandurwa",
+      "activeChangedDesc": "Chikwama chakasarudzwa zvino chinoshanda pamazap."
+    }
   }
 }
