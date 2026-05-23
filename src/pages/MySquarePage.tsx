@@ -1,7 +1,6 @@
 import { useMemo } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useSeoMeta } from '@unhead/react';
-import type { UseQueryResult } from '@tanstack/react-query';
 import type { NostrEvent } from '@nostrify/nostrify';
 import {
   AtSign,
@@ -34,10 +33,11 @@ import { Skeleton } from '@/components/ui/skeleton';
 
 import { useAppContext } from '@/hooks/useAppContext';
 import { useAuthor } from '@/hooks/useAuthor';
-import { useBitcoinWallet } from '@/hooks/useBitcoinWallet';
+import { useBtcPrice } from '@/hooks/useBtcPrice';
 import { useCampaigns } from '@/hooks/useCampaigns';
 import { useCountryFollows } from '@/hooks/useCountryFollows';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
+import { useHdWallet } from '@/hooks/useHdWallet';
 import { useNotificationPreview } from '@/hooks/useNotificationPreview';
 import { useUserOrganizations, type UserOrganization } from '@/hooks/useUserOrganizations';
 
@@ -54,20 +54,22 @@ import type { ParsedCampaign } from '@/lib/campaign';
  *
  * Three visual zones:
  *
- *  1. **Personal hero** — avatar, greeting, four stat tiles derived from
+ *  1. **Personal hero** — avatar, greeting, three stat tiles derived from
  *     already-loaded section data (zero extra queries).
- *  2. **Utility strip** — wallet balance snapshot (`useBitcoinWallet`, HTTP
- *     only) + notification preview (`useNotificationPreview`, limit 3 one-shot
- *     query, no persistent subscription).
- *  3. **Content sections** — grouped campaigns, countries, communities.
+ *  2. **Utility strip** — wallet balance snapshot (`useHdWallet` + `useBtcPrice`,
+ *     Blockbook-backed, nsec-only; graceful fallback for other login types) +
+ *     notification preview (`useNotificationPreview`, limit 3 one-shot query,
+ *     no persistent subscription).
+ *  3. **Content sections** — user's campaigns, countries, communities.
  *     Each section loads independently with skeleton / empty / error states
  *     and an `ErrorBoundary` so one relay timeout does not break the page.
  *
  * All data hooks are called once in `LoggedInContent` and passed down so
  * TanStack Query subscriptions are shared rather than duplicated.
  *
- * Total cost: 4-7 Nostr relay round-trips + 2-3 HTTP calls to Esplora
- * (balance + price + txs, all cached 30-60s) + 1 notification preview query.
+ * Total cost: 3-5 Nostr relay round-trips + 2 Blockbook HTTP calls
+ * (xpub + utxo, cached 60s) + 1 Esplora price call + 1 notification
+ * preview query.
  */
 export function MySquarePage() {
   const { config } = useAppContext();
@@ -95,11 +97,8 @@ export function MySquarePage() {
  */
 function LoggedInContent({ pubkey }: { pubkey: string }) {
   // ── Data hooks (called once, shared with hero + content sections) ──────
-  const organizedQuery = useCampaigns(
-    { authors: [pubkey], includeArchived: true, limit: 24 },
-  );
-  const beneficiaryQuery = useCampaigns(
-    { recipientPubkeys: [pubkey], includeArchived: true, limit: 24 },
+  const campaignsQuery = useCampaigns(
+    { authors: [pubkey], limit: 24 },
   );
   const countryFollows = useCountryFollows();
   const communitiesQuery = useUserOrganizations();
@@ -111,10 +110,8 @@ function LoggedInContent({ pubkey }: { pubkey: string }) {
         <ErrorBoundary fallback={null}>
           <HeroCard
             pubkey={pubkey}
-            organizedCount={organizedQuery.data?.length}
-            organizedLoading={organizedQuery.isLoading}
-            beneficiaryCount={beneficiaryQuery.data?.length}
-            beneficiaryLoading={beneficiaryQuery.isLoading}
+            campaignsCount={campaignsQuery.data?.length}
+            campaignsLoading={campaignsQuery.isLoading}
             countriesCount={countryFollows.followedCountries.length}
             countriesLoading={countryFollows.isLoading}
             communitiesCount={communitiesQuery.data?.length}
@@ -136,10 +133,7 @@ function LoggedInContent({ pubkey }: { pubkey: string }) {
         <ErrorBoundary
           fallback={<SectionError label="Your campaigns" />}
         >
-          <CampaignsSection
-            organizedQuery={organizedQuery}
-            beneficiaryQuery={beneficiaryQuery}
-          />
+          <CampaignsSection campaignsQuery={campaignsQuery} />
         </ErrorBoundary>
 
         <ErrorBoundary
@@ -184,20 +178,16 @@ function LoggedOutState() {
 
 function HeroCard({
   pubkey,
-  organizedCount,
-  organizedLoading,
-  beneficiaryCount,
-  beneficiaryLoading,
+  campaignsCount,
+  campaignsLoading,
   countriesCount,
   countriesLoading,
   communitiesCount,
   communitiesLoading,
 }: {
   pubkey: string;
-  organizedCount: number | undefined;
-  organizedLoading: boolean;
-  beneficiaryCount: number | undefined;
-  beneficiaryLoading: boolean;
+  campaignsCount: number | undefined;
+  campaignsLoading: boolean;
   countriesCount: number;
   countriesLoading: boolean;
   communitiesCount: number | undefined;
@@ -236,18 +226,12 @@ function HeroCard({
         </div>
 
         {/* Stat tiles */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+        <div className="grid grid-cols-3 gap-2">
           <StatTile
             icon={<HandHeart className="size-3.5" />}
-            count={organizedCount}
-            label="Organized"
-            isLoading={organizedLoading}
-          />
-          <StatTile
-            icon={<HandHeart className="size-3.5" />}
-            count={beneficiaryCount}
-            label="For you"
-            isLoading={beneficiaryLoading}
+            count={campaignsCount}
+            label="Campaigns"
+            isLoading={campaignsLoading}
           />
           <StatTile
             icon={<Globe2 className="size-3.5" />}
@@ -296,16 +280,15 @@ function StatTile({
 // ─── Zone 2: Wallet summary ─────────────────────────────────────────────────
 
 /**
- * Compact wallet balance card.
- *
- * Note: `useBitcoinWallet()` also fetches transaction history (1 extra HTTP
- * call, 30s cache) even though this card only renders balance + price. A
- * lighter `useBitcoinBalance()` hook that skips the transactions query could
- * be a future optimisation, but TanStack Query deduplicates with the Wallet
- * page so the cost is shared when both are visited in the same session.
+ * Compact wallet balance card backed by `useHdWallet` (Blockbook) +
+ * `useBtcPrice` (Esplora). The HD wallet requires an nsec login; for
+ * extension / bunker logins the card shows a simple "View wallet" prompt
+ * instead of a balance. The card always links to `/wallet`.
  */
 function WalletSummaryCard() {
-  const { addressData, btcPrice, isLoading, error } = useBitcoinWallet();
+  const { availability, totalBalance, isLoading, error } = useHdWallet();
+  const { data: btcPrice } = useBtcPrice();
+  const walletAvailable = availability.status === 'available';
 
   return (
     <Link
@@ -324,23 +307,25 @@ function WalletSummaryCard() {
         <ChevronRight className="size-4 text-muted-foreground/50 group-hover:text-muted-foreground motion-safe:transition-colors" />
       </div>
 
-      {isLoading ? (
+      {!walletAvailable ? (
+        <p className="text-sm text-muted-foreground">View wallet</p>
+      ) : isLoading ? (
         <div className="space-y-1.5">
           <Skeleton className="h-7 w-24 rounded" />
           <Skeleton className="h-3.5 w-16 rounded" />
         </div>
       ) : error ? (
         <p className="text-sm text-muted-foreground">Unable to load</p>
-      ) : addressData ? (
+      ) : (
         <div>
           <span className="text-2xl font-bold tracking-tight">
-            {btcPrice ? satsToUSD(addressData.totalBalance, btcPrice) : '---'}
+            {btcPrice ? satsToUSD(totalBalance, btcPrice) : '---'}
           </span>
           <p className="text-xs text-muted-foreground mt-0.5">
-            {formatBTC(addressData.totalBalance)} BTC
+            {formatBTC(totalBalance)} BTC
           </p>
         </div>
-      ) : null}
+      )}
     </Link>
   );
 }
@@ -480,27 +465,19 @@ function NotificationPreviewRow({ event }: { event: NostrEvent }) {
 // ─── Zone 3: Grouped campaigns ───────────────────────────────────────────────
 
 function CampaignsSection({
-  organizedQuery,
-  beneficiaryQuery,
+  campaignsQuery,
 }: {
-  organizedQuery: UseQueryResult<ParsedCampaign[]>;
-  beneficiaryQuery: UseQueryResult<ParsedCampaign[]>;
+  campaignsQuery: { data: ParsedCampaign[] | undefined; isLoading: boolean };
 }) {
-  const organized = organizedQuery.data;
-  const orgLoading = organizedQuery.isLoading;
-  const beneficiary = beneficiaryQuery.data;
-  const benLoading = beneficiaryQuery.isLoading;
-
-  const hasOrganized = !orgLoading && organized && organized.length > 0;
-  const hasBeneficiary = !benLoading && beneficiary && beneficiary.length > 0;
-  const bothEmpty = !orgLoading && !benLoading && !hasOrganized && !hasBeneficiary;
-  const anyLoading = orgLoading || benLoading;
+  const campaigns = campaignsQuery.data;
+  const isLoading = campaignsQuery.isLoading;
+  const hasCampaigns = !isLoading && campaigns && campaigns.length > 0;
 
   return (
     <section>
       <SectionHeader title="Your campaigns" className="px-0 pb-1 sm:px-0" />
 
-      {bothEmpty ? (
+      {!isLoading && !hasCampaigns ? (
         <div className="pt-2">
           <EmptyShelf
             icon={<HandHeart className="size-7 text-primary/70" />}
@@ -511,68 +488,21 @@ function CampaignsSection({
           />
         </div>
       ) : (
-        <div className="space-y-4 pt-1">
-          <CampaignSubShelf
-            label="Organized by you"
-            campaigns={organized}
-            isLoading={orgLoading}
-            emptyNote={anyLoading ? undefined : 'You haven\'t organized any campaigns yet.'}
-          />
-          <CampaignSubShelf
-            label="Started for you"
-            campaigns={beneficiary}
-            isLoading={benLoading}
-            emptyNote={anyLoading ? undefined : 'No one has started a campaign for you yet.'}
-          />
+        <div className="-mx-4 sm:mx-0 pt-1">
+          {isLoading ? (
+            <CampaignShelfSkeleton />
+          ) : (
+            <HorizontalScroll className="sm:px-0">
+              {(campaigns ?? []).map((campaign) => (
+                <div key={campaign.aTag} className="w-72 shrink-0 flex">
+                  <CampaignCard campaign={campaign} className="flex-1" />
+                </div>
+              ))}
+            </HorizontalScroll>
+          )}
         </div>
       )}
     </section>
-  );
-}
-
-function CampaignSubShelf({
-  label,
-  campaigns,
-  isLoading,
-  emptyNote,
-}: {
-  label: string;
-  campaigns: ParsedCampaign[] | undefined;
-  isLoading: boolean;
-  emptyNote?: string;
-}) {
-  const visibleCampaigns = campaigns ?? [];
-
-  if (!isLoading && visibleCampaigns.length === 0) {
-    if (!emptyNote) return null;
-    return (
-      <div className="px-1">
-        <p className="text-xs text-muted-foreground py-2 px-1">{emptyNote}</p>
-      </div>
-    );
-  }
-
-  return (
-    <div>
-      <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider px-1 pb-2">
-        {label}
-      </p>
-      {/* Break out of the page px-4 on mobile so shelves bleed to screen edges.
-          HorizontalScroll has built-in px-4 which restores the item inset. */}
-      <div className="-mx-4 sm:mx-0">
-        {isLoading ? (
-          <CampaignShelfSkeleton />
-        ) : (
-          <HorizontalScroll className="sm:px-0">
-            {visibleCampaigns.map((campaign) => (
-              <div key={campaign.aTag} className="w-72 shrink-0 flex">
-                <CampaignCard campaign={campaign} className="flex-1" />
-              </div>
-            ))}
-          </HorizontalScroll>
-        )}
-      </div>
-    </div>
   );
 }
 
