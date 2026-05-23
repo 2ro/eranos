@@ -775,5 +775,88 @@
       "reconciling": "سمول کیږي…",
       "reconcileNow": "اوس سمول"
     }
+  },
+  "notifications": {
+    "seoTitle": "خبرتیاوې",
+    "seoDescription": "ستاسو د Nostr خبرتیاوې",
+    "title": "خبرتیاوې",
+    "tabs": {
+      "all": "ټول",
+      "mentions": "یادونې"
+    },
+    "loginPrompt": "د خپلو خبرتیاوو لیدلو لپاره ننوځئ.",
+    "empty": "لاهم خبرتیاوې نشته.",
+    "subject": {
+      "twoActors": "<0></0> او <1></1>",
+      "andOthers_one": " او {{count}} نور",
+      "andOthers_other": " او {{count}} نور"
+    },
+    "actorAvatars": {
+      "moreCount": "+{{count}} نور"
+    },
+    "actions": {
+      "reactedToYour": "ستاسو {{noun}} ته یې عکس العمل وښود",
+      "repostedYour": "ستاسو {{noun}} یې بیا خپور کړ",
+      "zappedYou": "تاسو ته یې zap درکړ",
+      "zappedYouWithAmount": "تاسو ته یې {{sats}} ساتوشي zap درکړ",
+      "repliedToYourNote": "ستاسو یادښت ته یې ځواب ورکړ",
+      "mentionedYou": "تاسو یې یاد کړئ",
+      "repliedToYourComment": "ستاسو تبصرې ته یې ځواب ورکړ",
+      "commentedOnYour": "ستاسو {{noun}} باندې یې تبصره وکړه",
+      "sentYouLetter": "تاسو ته یې لیک ولېږه",
+      "highlightedYour": "ستاسو {{noun}} یې روښانه کړ",
+      "awardedBadge": "تاسو ته یې یوه نښان درکړ",
+      "awardedBadges": "تاسو ته یې نښانونه درکړل"
+    },
+    "letter": {
+      "viewAll": "ټول لیکونه وګورئ",
+      "reply": "ځواب"
+    },
+    "kinds": {
+      "profile": "پروفایل",
+      "post": "پوسټ",
+      "encryptedMessage": "کوډ شوی پیغام",
+      "repost": "بیا خپرول",
+      "reaction": "عکس العمل",
+      "badgeAward": "د نښان ورکول",
+      "photo": "انځور",
+      "video": "ویډیو",
+      "requestToVanish": "د ورکېدو غوښتنه",
+      "file": "فایل",
+      "poll": "رایه اخیستنه",
+      "comment": "تبصره",
+      "voiceMessage": "غږیز پیغام",
+      "patch": "پاچ",
+      "pullRequest": "pull request",
+      "highlight": "روښانه‌ول",
+      "birdDetection": "د مرغۍ پېژندنه",
+      "birdex": "Birdex",
+      "colorMoment": "د رنګ شیبه",
+      "foundLog": "موندل شوی لاګ",
+      "nsite": "nsite",
+      "profileBadges": "د پروفایل نښانونه",
+      "badge": "نښان",
+      "article": "مقاله",
+      "emojiPack": "د ایموجي کڅوړه",
+      "podcastEpisode": "د پاډکاسټ څپرکی",
+      "podcastTrailer": "د پاډکاسټ نمونه",
+      "zapstoreAsset": "د Zapstore اثاثه",
+      "zapstoreRelease": "د Zapstore خپرونه",
+      "stream": "سټریم",
+      "status": "حالت",
+      "repository": "ذخیره ګاه",
+      "customNip": "دودیز NIP",
+      "calendarEvent": "د کلیزې پېښه",
+      "zapstoreApp": "د Zapstore اپلیکیشن",
+      "playlist": "د پلې‌لیست",
+      "divine": "پېشبیني",
+      "community": "ټولنه",
+      "goal": "هدف",
+      "track": "تراک",
+      "magicDeck": "د Magic ډېک",
+      "treasure": "خزانه",
+      "constellation": "بُرج",
+      "followPack": "د تعقیب کڅوړه"
+    }
   }
 }

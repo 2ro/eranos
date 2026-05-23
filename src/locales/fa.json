@@ -775,5 +775,88 @@
       "reconciling": "در حال تطبیق…",
       "reconcileNow": "تطبیق اکنون"
     }
+  },
+  "notifications": {
+    "seoTitle": "اعلان‌ها",
+    "seoDescription": "اعلان‌های Nostr شما",
+    "title": "اعلان‌ها",
+    "tabs": {
+      "all": "همه",
+      "mentions": "منشن‌ها"
+    },
+    "loginPrompt": "برای دیدن اعلان‌هایتان وارد شوید.",
+    "empty": "هنوز اعلانی نیست.",
+    "subject": {
+      "twoActors": "<0></0> و <1></1>",
+      "andOthers_one": " و {{count}} نفر دیگر",
+      "andOthers_other": " و {{count}} نفر دیگر"
+    },
+    "actorAvatars": {
+      "moreCount": "+{{count}} بیشتر"
+    },
+    "actions": {
+      "reactedToYour": "به {{noun}} شما واکنش نشان داد",
+      "repostedYour": "{{noun}} شما را بازنشر کرد",
+      "zappedYou": "به شما zap داد",
+      "zappedYouWithAmount": "{{sats}} ساتوشی به شما zap داد",
+      "repliedToYourNote": "به یادداشت شما پاسخ داد",
+      "mentionedYou": "به شما اشاره کرد",
+      "repliedToYourComment": "به نظر شما پاسخ داد",
+      "commentedOnYour": "بر {{noun}} شما نظر گذاشت",
+      "sentYouLetter": "برای شما نامه‌ای فرستاد",
+      "highlightedYour": "{{noun}} شما را هایلایت کرد",
+      "awardedBadge": "به شما یک نشان داد",
+      "awardedBadges": "به شما نشان داد"
+    },
+    "letter": {
+      "viewAll": "مشاهدهٔ همهٔ نامه‌ها",
+      "reply": "پاسخ"
+    },
+    "kinds": {
+      "profile": "پروفایل",
+      "post": "پست",
+      "encryptedMessage": "پیام رمزنگاری‌شده",
+      "repost": "بازنشر",
+      "reaction": "واکنش",
+      "badgeAward": "اعطای نشان",
+      "photo": "عکس",
+      "video": "ویدیو",
+      "requestToVanish": "درخواست محو",
+      "file": "فایل",
+      "poll": "نظرسنجی",
+      "comment": "نظر",
+      "voiceMessage": "پیام صوتی",
+      "patch": "پچ",
+      "pullRequest": "pull request",
+      "highlight": "هایلایت",
+      "birdDetection": "تشخیص پرنده",
+      "birdex": "Birdex",
+      "colorMoment": "لحظهٔ رنگ",
+      "foundLog": "گزارش یافت‌شده",
+      "nsite": "nsite",
+      "profileBadges": "نشان‌های پروفایل",
+      "badge": "نشان",
+      "article": "مقاله",
+      "emojiPack": "بستهٔ ایموجی",
+      "podcastEpisode": "قسمت پادکست",
+      "podcastTrailer": "تریلر پادکست",
+      "zapstoreAsset": "منبع Zapstore",
+      "zapstoreRelease": "انتشار Zapstore",
+      "stream": "پخش",
+      "status": "وضعیت",
+      "repository": "مخزن",
+      "customNip": "NIP سفارشی",
+      "calendarEvent": "رویداد تقویم",
+      "zapstoreApp": "برنامهٔ Zapstore",
+      "playlist": "فهرست پخش",
+      "divine": "پیشگویی",
+      "community": "انجمن",
+      "goal": "هدف",
+      "track": "قطعه",
+      "magicDeck": "دک Magic",
+      "treasure": "گنج",
+      "constellation": "صورت فلکی",
+      "followPack": "بستهٔ دنبال‌کردن"
+    }
   }
 }

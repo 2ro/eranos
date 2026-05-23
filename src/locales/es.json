@@ -775,5 +775,88 @@
       "reconciling": "Reconciliando…",
       "reconcileNow": "Reconciliar ahora"
     }
+  },
+  "notifications": {
+    "seoTitle": "Notificaciones",
+    "seoDescription": "Tus notificaciones de Nostr",
+    "title": "Notificaciones",
+    "tabs": {
+      "all": "Todas",
+      "mentions": "Menciones"
+    },
+    "loginPrompt": "Inicia sesión para ver tus notificaciones.",
+    "empty": "Aún no hay notificaciones.",
+    "subject": {
+      "twoActors": "<0></0> y <1></1>",
+      "andOthers_one": " y {{count}} más",
+      "andOthers_other": " y {{count}} más"
+    },
+    "actorAvatars": {
+      "moreCount": "+{{count}} más"
+    },
+    "actions": {
+      "reactedToYour": "reaccionó a tu {{noun}}",
+      "repostedYour": "reposteó tu {{noun}}",
+      "zappedYou": "te dio un zap",
+      "zappedYouWithAmount": "te dio un zap de {{sats}} sats",
+      "repliedToYourNote": "respondió a tu nota",
+      "mentionedYou": "te mencionó",
+      "repliedToYourComment": "respondió a tu comentario",
+      "commentedOnYour": "comentó tu {{noun}}",
+      "sentYouLetter": "te envió una carta",
+      "highlightedYour": "resaltó tu {{noun}}",
+      "awardedBadge": "te otorgó una insignia",
+      "awardedBadges": "te otorgó insignias"
+    },
+    "letter": {
+      "viewAll": "Ver todas las cartas",
+      "reply": "Responder"
+    },
+    "kinds": {
+      "profile": "perfil",
+      "post": "publicación",
+      "encryptedMessage": "mensaje cifrado",
+      "repost": "reposteo",
+      "reaction": "reacción",
+      "badgeAward": "concesión de insignia",
+      "photo": "foto",
+      "video": "video",
+      "requestToVanish": "solicitud de borrado",
+      "file": "archivo",
+      "poll": "encuesta",
+      "comment": "comentario",
+      "voiceMessage": "mensaje de voz",
+      "patch": "parche",
+      "pullRequest": "pull request",
+      "highlight": "destacado",
+      "birdDetection": "detección de ave",
+      "birdex": "Birdex",
+      "colorMoment": "momento de color",
+      "foundLog": "registro hallado",
+      "nsite": "nsite",
+      "profileBadges": "insignias de perfil",
+      "badge": "insignia",
+      "article": "artículo",
+      "emojiPack": "paquete de emojis",
+      "podcastEpisode": "episodio de podcast",
+      "podcastTrailer": "tráiler de podcast",
+      "zapstoreAsset": "recurso de Zapstore",
+      "zapstoreRelease": "lanzamiento de Zapstore",
+      "stream": "transmisión",
+      "status": "estado",
+      "repository": "repositorio",
+      "customNip": "NIP personalizado",
+      "calendarEvent": "evento de calendario",
+      "zapstoreApp": "aplicación de Zapstore",
+      "playlist": "lista de reproducción",
+      "divine": "divinación",
+      "community": "comunidad",
+      "goal": "objetivo",
+      "track": "pista",
+      "magicDeck": "mazo de Magic",
+      "treasure": "tesoro",
+      "constellation": "constelación",
+      "followPack": "paquete de seguimientos"
+    }
   }
 }

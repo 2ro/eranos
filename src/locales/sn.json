@@ -775,5 +775,88 @@
       "reconciling": "Kureconcile…",
       "reconcileNow": "Reconcile zvino"
     }
+  },
+  "notifications": {
+    "seoTitle": "Zviziviso",
+    "seoDescription": "Zviziviso zvako zveNostr",
+    "title": "Zviziviso",
+    "tabs": {
+      "all": "Zvese",
+      "mentions": "Kudomwa"
+    },
+    "loginPrompt": "Pinda kuti uone zviziviso zvako.",
+    "empty": "Hapasati pava nezviziviso.",
+    "subject": {
+      "twoActors": "<0></0> na<1></1>",
+      "andOthers_one": " nemumwe {{count}}",
+      "andOthers_other": " nevamwe {{count}}"
+    },
+    "actorAvatars": {
+      "moreCount": "+{{count}} zvimwe"
+    },
+    "actions": {
+      "reactedToYour": "akadavira ku{{noun}} yako",
+      "repostedYour": "akadzokorora {{noun}} yako",
+      "zappedYou": "akakuzapa",
+      "zappedYouWithAmount": "akakuzapa ne{{sats}} sats",
+      "repliedToYourNote": "akapindura kunhau yako",
+      "mentionedYou": "akakudoma",
+      "repliedToYourComment": "akapindura kumhinduro yako",
+      "commentedOnYour": "akamhinduro pa{{noun}} yako",
+      "sentYouLetter": "akakutumira tsamba",
+      "highlightedYour": "akasimudzira {{noun}} yako",
+      "awardedBadge": "akakupa badge",
+      "awardedBadges": "akakupa mabadge"
+    },
+    "letter": {
+      "viewAll": "Tarisa tsamba dzese",
+      "reply": "Pindura"
+    },
+    "kinds": {
+      "profile": "profile",
+      "post": "chinyorwa",
+      "encryptedMessage": "meseji yakavharirwa",
+      "repost": "kudzokorora",
+      "reaction": "mhinduro",
+      "badgeAward": "kupiwa kwebadge",
+      "photo": "mufananidzo",
+      "video": "vhidhiyo",
+      "requestToVanish": "chikumbiro chokunyangarika",
+      "file": "faira",
+      "poll": "kuvhotera",
+      "comment": "mhinduro",
+      "voiceMessage": "meseji yenzwi",
+      "patch": "patch",
+      "pullRequest": "pull request",
+      "highlight": "kusimudzira",
+      "birdDetection": "kuziva shiri",
+      "birdex": "Birdex",
+      "colorMoment": "nguva yeruvara",
+      "foundLog": "log yakawanikwa",
+      "nsite": "nsite",
+      "profileBadges": "mabadge eprofile",
+      "badge": "badge",
+      "article": "nyaya",
+      "emojiPack": "paketi yeemojis",
+      "podcastEpisode": "chikamu chepodcast",
+      "podcastTrailer": "trailer yepodcast",
+      "zapstoreAsset": "asset yeZapstore",
+      "zapstoreRelease": "release yeZapstore",
+      "stream": "stream",
+      "status": "mamiriro",
+      "repository": "dura",
+      "customNip": "NIP yakagadzirwa",
+      "calendarEvent": "chiitiko chekarenda",
+      "zapstoreApp": "app yeZapstore",
+      "playlist": "playlist",
+      "divine": "kufemberera",
+      "community": "nharaunda",
+      "goal": "chinangwa",
+      "track": "rwiyo",
+      "magicDeck": "deck yeMagic",
+      "treasure": "pfuma",
+      "constellation": "mwiriri wenyeredzi",
+      "followPack": "paketi yokutevera"
+    }
   }
 }

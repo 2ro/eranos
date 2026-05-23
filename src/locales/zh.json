@@ -775,5 +775,88 @@
       "reconciling": "正在对账…",
       "reconcileNow": "立即对账"
     }
+  },
+  "notifications": {
+    "seoTitle": "通知",
+    "seoDescription": "你的 Nostr 通知",
+    "title": "通知",
+    "tabs": {
+      "all": "全部",
+      "mentions": "提及"
+    },
+    "loginPrompt": "登录以查看你的通知。",
+    "empty": "还没有通知。",
+    "subject": {
+      "twoActors": "<0></0> 和 <1></1>",
+      "andOthers_one": "和另外 {{count}} 人",
+      "andOthers_other": "和另外 {{count}} 人"
+    },
+    "actorAvatars": {
+      "moreCount": "+ 还有 {{count}}"
+    },
+    "actions": {
+      "reactedToYour": "回应了你的{{noun}}",
+      "repostedYour": "转发了你的{{noun}}",
+      "zappedYou": "给你打了 zap",
+      "zappedYouWithAmount": "给你打了 {{sats}} sats",
+      "repliedToYourNote": "回复了你的笔记",
+      "mentionedYou": "提到了你",
+      "repliedToYourComment": "回复了你的评论",
+      "commentedOnYour": "评论了你的{{noun}}",
+      "sentYouLetter": "给你寄了一封信",
+      "highlightedYour": "高亮了你的{{noun}}",
+      "awardedBadge": "给你颁发了一枚徽章",
+      "awardedBadges": "给你颁发了徽章"
+    },
+    "letter": {
+      "viewAll": "查看所有信件",
+      "reply": "回复"
+    },
+    "kinds": {
+      "profile": "资料",
+      "post": "帖子",
+      "encryptedMessage": "加密消息",
+      "repost": "转发",
+      "reaction": "回应",
+      "badgeAward": "徽章授予",
+      "photo": "照片",
+      "video": "视频",
+      "requestToVanish": "消失请求",
+      "file": "文件",
+      "poll": "投票",
+      "comment": "评论",
+      "voiceMessage": "语音消息",
+      "patch": "补丁",
+      "pullRequest": "合并请求",
+      "highlight": "高亮",
+      "birdDetection": "鸟类识别",
+      "birdex": "Birdex",
+      "colorMoment": "色彩瞬间",
+      "foundLog": "发现日志",
+      "nsite": "nsite",
+      "profileBadges": "资料徽章",
+      "badge": "徽章",
+      "article": "文章",
+      "emojiPack": "表情包",
+      "podcastEpisode": "播客单集",
+      "podcastTrailer": "播客预告",
+      "zapstoreAsset": "Zapstore 资源",
+      "zapstoreRelease": "Zapstore 发布",
+      "stream": "直播",
+      "status": "状态",
+      "repository": "仓库",
+      "customNip": "自定义 NIP",
+      "calendarEvent": "日历事件",
+      "zapstoreApp": "Zapstore 应用",
+      "playlist": "播放列表",
+      "divine": "占卜",
+      "community": "社区",
+      "goal": "目标",
+      "track": "曲目",
+      "magicDeck": "Magic 牌组",
+      "treasure": "宝藏",
+      "constellation": "星座",
+      "followPack": "关注包"
+    }
   }
 }

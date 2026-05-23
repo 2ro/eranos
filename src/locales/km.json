@@ -775,5 +775,88 @@
       "reconciling": "កំពុងត្រួតពិនិត្យ…",
       "reconcileNow": "ត្រួតពិនិត្យឥឡូវ"
     }
+  },
+  "notifications": {
+    "seoTitle": "ការជូនដំណឹង",
+    "seoDescription": "ការជូនដំណឹង Nostr របស់អ្នក",
+    "title": "ការជូនដំណឹង",
+    "tabs": {
+      "all": "ទាំងអស់",
+      "mentions": "ការនិយាយដល់"
+    },
+    "loginPrompt": "ចូលដើម្បីមើលការជូនដំណឹងរបស់អ្នក។",
+    "empty": "មិនទាន់មានការជូនដំណឹងទេ។",
+    "subject": {
+      "twoActors": "<0></0> និង <1></1>",
+      "andOthers_one": " និងអ្នកផ្សេងទៀត {{count}} នាក់",
+      "andOthers_other": " និងអ្នកផ្សេងទៀត {{count}} នាក់"
+    },
+    "actorAvatars": {
+      "moreCount": "+{{count}} ផ្សេងទៀត"
+    },
+    "actions": {
+      "reactedToYour": "បានឆ្លើយតបទៅ{{noun}}របស់អ្នក",
+      "repostedYour": "បានបង្ហោះ{{noun}}របស់អ្នកម្ដងទៀត",
+      "zappedYou": "បានផ្ដល់ zap ឲ្យអ្នក",
+      "zappedYouWithAmount": "បានផ្ដល់ zap {{sats}} sats ឲ្យអ្នក",
+      "repliedToYourNote": "បានឆ្លើយតបទៅកំណត់ត្រារបស់អ្នក",
+      "mentionedYou": "បាននិយាយដល់អ្នក",
+      "repliedToYourComment": "បានឆ្លើយតបទៅមតិយោបល់របស់អ្នក",
+      "commentedOnYour": "បានបញ្ចេញមតិលើ{{noun}}របស់អ្នក",
+      "sentYouLetter": "បានផ្ញើសំបុត្រឲ្យអ្នក",
+      "highlightedYour": "បានបន្លិច{{noun}}របស់អ្នក",
+      "awardedBadge": "បានផ្ដល់ផ្លាកសញ្ញាមួយដល់អ្នក",
+      "awardedBadges": "បានផ្ដល់ផ្លាកសញ្ញាដល់អ្នក"
+    },
+    "letter": {
+      "viewAll": "មើលសំបុត្រទាំងអស់",
+      "reply": "ឆ្លើយតប"
+    },
+    "kinds": {
+      "profile": "ប្រវត្តិរូប",
+      "post": "ការបង្ហោះ",
+      "encryptedMessage": "សារដែលអ៊ិនគ្រីប",
+      "repost": "ការបង្ហោះម្ដងទៀត",
+      "reaction": "ការឆ្លើយតប",
+      "badgeAward": "ការផ្ដល់ផ្លាកសញ្ញា",
+      "photo": "រូបថត",
+      "video": "វីដេអូ",
+      "requestToVanish": "សំណើបាត់ខ្លួន",
+      "file": "ឯកសារ",
+      "poll": "ការស្ទង់មតិ",
+      "comment": "មតិយោបល់",
+      "voiceMessage": "សារសំឡេង",
+      "patch": "patch",
+      "pullRequest": "pull request",
+      "highlight": "ការបន្លិច",
+      "birdDetection": "ការរកឃើញសត្វស្លាប",
+      "birdex": "Birdex",
+      "colorMoment": "ពេលវេលាពណ៌",
+      "foundLog": "កំណត់ហេតុរកឃើញ",
+      "nsite": "nsite",
+      "profileBadges": "ផ្លាកសញ្ញាប្រវត្តិរូប",
+      "badge": "ផ្លាកសញ្ញា",
+      "article": "អត្ថបទ",
+      "emojiPack": "កញ្ចប់អេម៉ូជី",
+      "podcastEpisode": "វគ្គ podcast",
+      "podcastTrailer": "ការមើលជាមុន podcast",
+      "zapstoreAsset": "ទ្រព្យ Zapstore",
+      "zapstoreRelease": "ការចេញផ្សាយ Zapstore",
+      "stream": "ការផ្សាយផ្ទាល់",
+      "status": "ស្ថានភាព",
+      "repository": "ឃ្លាំង",
+      "customNip": "NIP កំណត់ផ្ទាល់ខ្លួន",
+      "calendarEvent": "ព្រឹត្តិការណ៍ប្រតិទិន",
+      "zapstoreApp": "កម្មវិធី Zapstore",
+      "playlist": "បញ្ជីចាក់",
+      "divine": "ការទស្សន៍ទាយ",
+      "community": "សហគមន៍",
+      "goal": "គោលដៅ",
+      "track": "បទ",
+      "magicDeck": "ឆ្នុក Magic",
+      "treasure": "កំណប់",
+      "constellation": "រាសីផ្កាយ",
+      "followPack": "កញ្ចប់ការតាមដាន"
+    }
   }
 }

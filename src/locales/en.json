@@ -775,5 +775,88 @@
       "reconciling": "Reconciling…",
       "reconcileNow": "Reconcile now"
     }
+  },
+  "notifications": {
+    "seoTitle": "Notifications",
+    "seoDescription": "Your Nostr notifications",
+    "title": "Notifications",
+    "tabs": {
+      "all": "All",
+      "mentions": "Mentions"
+    },
+    "loginPrompt": "Log in to see your notifications.",
+    "empty": "No notifications yet.",
+    "subject": {
+      "twoActors": "<0></0> and <1></1>",
+      "andOthers_one": " and {{count}} other",
+      "andOthers_other": " and {{count}} others"
+    },
+    "actorAvatars": {
+      "moreCount": "+{{count}} more"
+    },
+    "actions": {
+      "reactedToYour": "reacted to your {{noun}}",
+      "repostedYour": "reposted your {{noun}}",
+      "zappedYou": "zapped you",
+      "zappedYouWithAmount": "zapped you {{sats}} sats",
+      "repliedToYourNote": "replied to your note",
+      "mentionedYou": "mentioned you",
+      "repliedToYourComment": "replied to your comment",
+      "commentedOnYour": "commented on your {{noun}}",
+      "sentYouLetter": "sent you a letter",
+      "highlightedYour": "highlighted your {{noun}}",
+      "awardedBadge": "awarded you a badge",
+      "awardedBadges": "awarded you badges"
+    },
+    "letter": {
+      "viewAll": "View all letters",
+      "reply": "Reply"
+    },
+    "kinds": {
+      "profile": "profile",
+      "post": "post",
+      "encryptedMessage": "encrypted message",
+      "repost": "repost",
+      "reaction": "reaction",
+      "badgeAward": "badge award",
+      "photo": "photo",
+      "video": "video",
+      "requestToVanish": "request to vanish",
+      "file": "file",
+      "poll": "poll",
+      "comment": "comment",
+      "voiceMessage": "voice message",
+      "patch": "patch",
+      "pullRequest": "pull request",
+      "highlight": "highlight",
+      "birdDetection": "bird detection",
+      "birdex": "Birdex",
+      "colorMoment": "color moment",
+      "foundLog": "found log",
+      "nsite": "nsite",
+      "profileBadges": "profile badges",
+      "badge": "badge",
+      "article": "article",
+      "emojiPack": "emoji pack",
+      "podcastEpisode": "podcast episode",
+      "podcastTrailer": "podcast trailer",
+      "zapstoreAsset": "Zapstore asset",
+      "zapstoreRelease": "Zapstore release",
+      "stream": "stream",
+      "status": "status",
+      "repository": "repository",
+      "customNip": "custom NIP",
+      "calendarEvent": "calendar event",
+      "zapstoreApp": "Zapstore app",
+      "playlist": "playlist",
+      "divine": "divine",
+      "community": "community",
+      "goal": "goal",
+      "track": "track",
+      "magicDeck": "Magic deck",
+      "treasure": "treasure",
+      "constellation": "constellation",
+      "followPack": "follow pack"
+    }
   }
 }

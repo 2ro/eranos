@@ -775,5 +775,88 @@
       "reconciling": "جارٍ المطابقة…",
       "reconcileNow": "مطابقة الآن"
     }
+  },
+  "notifications": {
+    "seoTitle": "الإشعارات",
+    "seoDescription": "إشعارات Nostr الخاصة بك",
+    "title": "الإشعارات",
+    "tabs": {
+      "all": "الكل",
+      "mentions": "الإشارات"
+    },
+    "loginPrompt": "سجّل الدخول لرؤية إشعاراتك.",
+    "empty": "لا توجد إشعارات بعد.",
+    "subject": {
+      "twoActors": "<0></0> و<1></1>",
+      "andOthers_one": " وشخص آخر",
+      "andOthers_other": " و{{count}} آخرين"
+    },
+    "actorAvatars": {
+      "moreCount": "+{{count}} المزيد"
+    },
+    "actions": {
+      "reactedToYour": "تفاعل مع {{noun}}ك",
+      "repostedYour": "أعاد نشر {{noun}}ك",
+      "zappedYou": "أرسل لك زاب",
+      "zappedYouWithAmount": "أرسل لك زاب بقيمة {{sats}} ساتوشي",
+      "repliedToYourNote": "ردّ على ملاحظتك",
+      "mentionedYou": "أشار إليك",
+      "repliedToYourComment": "ردّ على تعليقك",
+      "commentedOnYour": "علّق على {{noun}}ك",
+      "sentYouLetter": "أرسل لك رسالة",
+      "highlightedYour": "أبرز {{noun}}ك",
+      "awardedBadge": "منحك شارة",
+      "awardedBadges": "منحك شارات"
+    },
+    "letter": {
+      "viewAll": "عرض جميع الرسائل",
+      "reply": "رد"
+    },
+    "kinds": {
+      "profile": "ملف شخصي",
+      "post": "منشور",
+      "encryptedMessage": "رسالة مشفّرة",
+      "repost": "إعادة نشر",
+      "reaction": "تفاعل",
+      "badgeAward": "منح شارة",
+      "photo": "صورة",
+      "video": "فيديو",
+      "requestToVanish": "طلب اختفاء",
+      "file": "ملف",
+      "poll": "تصويت",
+      "comment": "تعليق",
+      "voiceMessage": "رسالة صوتية",
+      "patch": "باتش",
+      "pullRequest": "طلب دمج",
+      "highlight": "تظليل",
+      "birdDetection": "اكتشاف طيور",
+      "birdex": "Birdex",
+      "colorMoment": "لحظة لونية",
+      "foundLog": "سجل وجد",
+      "nsite": "nsite",
+      "profileBadges": "شارات الملف",
+      "badge": "شارة",
+      "article": "مقال",
+      "emojiPack": "حزمة رموز",
+      "podcastEpisode": "حلقة بودكاست",
+      "podcastTrailer": "مقدمة بودكاست",
+      "zapstoreAsset": "أصل Zapstore",
+      "zapstoreRelease": "إصدار Zapstore",
+      "stream": "بث",
+      "status": "حالة",
+      "repository": "مستودع",
+      "customNip": "NIP مخصص",
+      "calendarEvent": "حدث تقويم",
+      "zapstoreApp": "تطبيق Zapstore",
+      "playlist": "قائمة تشغيل",
+      "divine": "تنبؤ",
+      "community": "مجتمع",
+      "goal": "هدف",
+      "track": "مقطع",
+      "magicDeck": "حزمة Magic",
+      "treasure": "كنز",
+      "constellation": "كوكبة",
+      "followPack": "حزمة متابعة"
+    }
   }
 }
