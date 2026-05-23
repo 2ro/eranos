@@ -40,6 +40,13 @@
     "changelog": "د بدلونونو لاګ",
     "footerTagline": "© {{year}} {{appName}}. د Nostr پر سر د مرستو راټولولو کمپاینونه."
   },
+  "auth": {
+    "join": "ګډون",
+    "login": "ننوتل",
+    "signup": "نوم لیکنه",
+    "logout": "وتل",
+    "addAccount": "بل حساب اضافه کول"
+  },
   "settings": {
     "title": "تنظیمات",
     "description": "د {{appName}} تنظیماتو اداره کول",

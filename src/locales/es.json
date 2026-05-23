@@ -40,6 +40,13 @@
     "changelog": "Novedades",
     "footerTagline": "© {{year}} {{appName}}. Recaudaciones en Nostr."
   },
+  "auth": {
+    "join": "Unirse",
+    "login": "Iniciar sesión",
+    "signup": "Registrarse",
+    "logout": "Cerrar sesión",
+    "addAccount": "Agregar otra cuenta"
+  },
   "settings": {
     "title": "Ajustes",
     "description": "Administra tus ajustes de {{appName}}",

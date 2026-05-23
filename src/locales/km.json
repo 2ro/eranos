@@ -40,6 +40,13 @@
     "changelog": "កំណត់ហេតុការផ្លាស់ប្តូរ",
     "footerTagline": "© {{year}} {{appName}}។ ការប្រមូលមូលនិធិលើ Nostr។"
   },
+  "auth": {
+    "join": "ចូលរួម",
+    "login": "ចូលគណនី",
+    "signup": "ចុះឈ្មោះ",
+    "logout": "ចេញពីគណនី",
+    "addAccount": "បន្ថែមគណនីផ្សេងទៀត"
+  },
   "settings": {
     "title": "ការកំណត់",
     "description": "គ្រប់គ្រងការកំណត់ {{appName}} របស់អ្នក",

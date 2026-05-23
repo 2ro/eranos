@@ -40,6 +40,13 @@
     "changelog": "Rondedzero yeshanduko",
     "footerTagline": "© {{year}} {{appName}}. Mishandirapamwe yekuunganidza mari paNostr."
   },
+  "auth": {
+    "join": "Joinha",
+    "login": "Pinda",
+    "signup": "Nyoresa",
+    "logout": "Buda",
+    "addAccount": "Wedzera imwe akaunti"
+  },
   "settings": {
     "title": "Marongero",
     "description": "Tarisira marongero ako e{{appName}}",

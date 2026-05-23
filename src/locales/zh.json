@@ -40,6 +40,13 @@
     "changelog": "更新日志",
     "footerTagline": "© {{year}} {{appName}}。Nostr 上的众筹活动。"
   },
+  "auth": {
+    "join": "加入",
+    "login": "登录",
+    "signup": "注册",
+    "logout": "退出登录",
+    "addAccount": "添加其他账户"
+  },
   "settings": {
     "title": "设置",
     "description": "管理你的 {{appName}} 设置",

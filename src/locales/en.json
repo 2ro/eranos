@@ -40,6 +40,13 @@
     "changelog": "Changelog",
     "footerTagline": "© {{year}} {{appName}}. Fundraisers on Nostr."
   },
+  "auth": {
+    "join": "Join",
+    "login": "Log in",
+    "signup": "Sign up",
+    "logout": "Log out",
+    "addAccount": "Add another account"
+  },
   "settings": {
     "title": "Settings",
     "description": "Manage your {{appName}} settings",

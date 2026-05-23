@@ -40,6 +40,13 @@
     "changelog": "سجل التغييرات",
     "footerTagline": "© {{year}} {{appName}}. حملات تمويل على Nostr."
   },
+  "auth": {
+    "join": "انضمام",
+    "login": "تسجيل الدخول",
+    "signup": "إنشاء حساب",
+    "logout": "تسجيل الخروج",
+    "addAccount": "إضافة حساب آخر"
+  },
   "settings": {
     "title": "الإعدادات",
     "description": "إدارة إعدادات {{appName}} الخاصة بك",

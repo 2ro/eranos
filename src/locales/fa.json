@@ -40,6 +40,13 @@
     "changelog": "تغییرات",
     "footerTagline": "© {{year}} {{appName}}. کمپین‌های جذب کمک مالی روی Nostr."
   },
+  "auth": {
+    "join": "پیوستن",
+    "login": "ورود",
+    "signup": "ثبت‌نام",
+    "logout": "خروج",
+    "addAccount": "افزودن حساب دیگر"
+  },
   "settings": {
     "title": "تنظیمات",
     "description": "مدیریت تنظیمات {{appName}} شما",
