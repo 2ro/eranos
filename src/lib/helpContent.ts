@@ -71,7 +71,7 @@ const FAQ_TEMPLATE: FAQCategory[] = [
         id: 'who-made-this',
         question: 'Who made {appName}?',
         answer: [
-          '{appName} is built by [Soapbox](https://soapbox.pub), an open-source team building tools for the Nostr ecosystem.',
+          '{appName} is built by [Soapbox](https://soapbox.pub), an open-source team building tools for the Nostr ecosystem, in collaboration with the [World Liberty Congress](https://worldlibertycongress.org/).',
         ],
       },
     ],
