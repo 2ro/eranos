@@ -746,5 +746,34 @@
     "body": "比特币是公开账本。你发送的交易可以永远追溯到你，即使被多人转手后也是如此。只发送给那些你愿意公开支持的人。",
     "bodyWithCashOut": "比特币是公开账本。你发送的交易可以永远追溯到你，即使被多人转手后也是如此。只发送给那些你愿意公开支持的人，或在交易所兑换成法币。",
     "iUnderstand": "我理解此交易是公开的。"
+  },
+  "spScan": {
+    "title": "扫描静默支付",
+    "description": "逐块遍历已配置的 BIP-352 索引器，以检测传入的静默支付。",
+    "fromBlock": "起始区块",
+    "toBlock": "结束区块",
+    "tipPlaceholder": "链尖",
+    "indexerTip": "索引器链尖",
+    "lastFullyScanned": "上次完整扫描",
+    "never": "从未",
+    "includeSpent": "包括已花费",
+    "includeSpentDesc": "同时检测已经被花费的静默支付。在错过扫描或重置后重建收款历史时使用。",
+    "blockProgress": "区块 {{current}} / {{to}}",
+    "matches_one": "{{count}} 项匹配",
+    "matches_other": "{{count}} 项匹配",
+    "scannedRange": "已扫描区块 {{from}} → {{to}}。",
+    "foundOutputs_one": "发现 {{count}} 个新输出。",
+    "foundOutputs_other": "发现 {{count}} 个新输出。",
+    "noNewPayments": "没有新的支付。",
+    "startScan": "开始扫描",
+    "reconcile": {
+      "title": "对账已花费的 UTXO",
+      "description": "将每个存储的静默支付 UTXO 与 Blockbook 进行比对，并移除那些已被花费的。如果发送后余额高于应有数额，请使用此功能。",
+      "checking": "正在检查 {{checked}} / {{total}}…",
+      "checked_one": "已检查 {{count}} 个 UTXO · 已清理 {{pruned}}。",
+      "checked_other": "已检查 {{count}} 个 UTXO · 已清理 {{pruned}}。",
+      "reconciling": "正在对账…",
+      "reconcileNow": "立即对账"
+    }
   }
 }

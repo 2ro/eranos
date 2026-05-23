@@ -746,5 +746,34 @@
     "body": "Bitcoin is a public ledger. Transactions you send can be traced back to you forever, even after being exchanged by multiple people. Send it only to those you wish to support publicly.",
     "bodyWithCashOut": "Bitcoin is a public ledger. Transactions you send can be traced back to you forever, even after being exchanged by multiple people. Send it only to those you wish to support publicly, or cash out at an exchange.",
     "iUnderstand": "I understand this transaction is public."
+  },
+  "spScan": {
+    "title": "Scan for silent payments",
+    "description": "Walks the configured BIP-352 indexer block-by-block to detect incoming silent payments.",
+    "fromBlock": "From block",
+    "toBlock": "To block",
+    "tipPlaceholder": "tip",
+    "indexerTip": "Indexer tip",
+    "lastFullyScanned": "Last fully scanned",
+    "never": "never",
+    "includeSpent": "Include already-spent",
+    "includeSpentDesc": "Also detect silent payments that have since been spent. Use when rebuilding receive history after a missed scan or a reset.",
+    "blockProgress": "Block {{current}} / {{to}}",
+    "matches_one": "{{count}} match",
+    "matches_other": "{{count}} matches",
+    "scannedRange": "Scanned blocks {{from}} → {{to}}.",
+    "foundOutputs_one": "Found {{count}} new output.",
+    "foundOutputs_other": "Found {{count}} new outputs.",
+    "noNewPayments": "No new payments.",
+    "startScan": "Start scan",
+    "reconcile": {
+      "title": "Reconcile spent UTXOs",
+      "description": "Checks each stored silent-payment UTXO against Blockbook and removes any that have been spent. Use this if the balance is higher than it should be after a send.",
+      "checking": "Checking {{checked}} / {{total}}…",
+      "checked_one": "Checked {{count}} UTXO · pruned {{pruned}}.",
+      "checked_other": "Checked {{count}} UTXOs · pruned {{pruned}}.",
+      "reconciling": "Reconciling…",
+      "reconcileNow": "Reconcile now"
+    }
   }
 }

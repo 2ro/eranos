@@ -746,5 +746,34 @@
     "body": "Bitcoin es un libro contable público. Las transacciones que envías pueden rastrearse hasta ti para siempre, incluso después de ser intercambiadas por varias personas. Envíalo solo a quienes quieras apoyar públicamente.",
     "bodyWithCashOut": "Bitcoin es un libro contable público. Las transacciones que envías pueden rastrearse hasta ti para siempre, incluso después de ser intercambiadas por varias personas. Envíalo solo a quienes quieras apoyar públicamente, o convíertelo a moneda fíat en una casa de cambio.",
     "iUnderstand": "Entiendo que esta transacción es pública."
+  },
+  "spScan": {
+    "title": "Buscar pagos silenciosos",
+    "description": "Recorre el indexador BIP-352 configurado bloque por bloque para detectar pagos silenciosos entrantes.",
+    "fromBlock": "Desde el bloque",
+    "toBlock": "Hasta el bloque",
+    "tipPlaceholder": "tope",
+    "indexerTip": "Tope del indexador",
+    "lastFullyScanned": "Último escaneo completo",
+    "never": "nunca",
+    "includeSpent": "Incluir ya gastados",
+    "includeSpentDesc": "También detectar pagos silenciosos que ya se hayan gastado. Úsalo al reconstruir el historial de recepción tras un escaneo perdido o un reinicio.",
+    "blockProgress": "Bloque {{current}} / {{to}}",
+    "matches_one": "{{count}} coincidencia",
+    "matches_other": "{{count}} coincidencias",
+    "scannedRange": "Bloques escaneados {{from}} → {{to}}.",
+    "foundOutputs_one": "Se encontró {{count}} salida nueva.",
+    "foundOutputs_other": "Se encontraron {{count}} salidas nuevas.",
+    "noNewPayments": "Sin pagos nuevos.",
+    "startScan": "Iniciar escaneo",
+    "reconcile": {
+      "title": "Reconciliar UTXOs gastados",
+      "description": "Comprueba cada UTXO de pago silencioso almacenado contra Blockbook y elimina los que ya se hayan gastado. Úsalo si el saldo es mayor de lo que debería ser tras un envío.",
+      "checking": "Comprobando {{checked}} / {{total}}…",
+      "checked_one": "Comprobado {{count}} UTXO · podados {{pruned}}.",
+      "checked_other": "Comprobados {{count}} UTXOs · podados {{pruned}}.",
+      "reconciling": "Reconciliando…",
+      "reconcileNow": "Reconciliar ahora"
+    }
   }
 }

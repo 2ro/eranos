@@ -746,5 +746,34 @@
     "body": "Bitcoin ibhuku reanozivikanwa nemunhu wese. Zvinoitwa zvaunotumira zvinogona kudzokerwa kwauri nekusingaperi, kunyangwe zvachinjwa nevanhu vakawanda. Tumira chete kune avo vaunoda kutsigira pachena.",
     "bodyWithCashOut": "Bitcoin ibhuku reanozivikanwa nemunhu wese. Zvinoitwa zvaunotumira zvinogona kudzokerwa kwauri nekusingaperi, kunyangwe zvachinjwa nevanhu vakawanda. Tumira chete kune avo vaunoda kutsigira pachena, kana ushandure kumari yenyika paexchange.",
     "iUnderstand": "Ndinonzwisisa kuti chinoitwa ichi chinozivikanwa nemunhu wese."
+  },
+  "spScan": {
+    "title": "Tsvaga mibhadharo yakanyararira",
+    "description": "Inotevera muongorori weBIP-352 wakarongwa bhuroka nebhuroka kuti iwane mibhadharo yakanyararira inopinda.",
+    "fromBlock": "Kubva pabhuroka",
+    "toBlock": "Kusvika pabhuroka",
+    "tipPlaceholder": "pamusoro",
+    "indexerTip": "Pamusoro pemuongorori",
+    "lastFullyScanned": "Kupedzisira kuongorora kwakazara",
+    "never": "kana paine",
+    "includeSpent": "Sanganisira zvakatoshandiswa",
+    "includeSpentDesc": "Sanganisira mibhadharo yakanyararira yakazoshandiswa zvakare. Shandisa kana uchivaka history yokugamuchira mushure mekuongorora kwakapotsa kana kudzosera.",
+    "blockProgress": "Bhuroka {{current}} / {{to}}",
+    "matches_one": "kuenderana {{count}}",
+    "matches_other": "kuenderana {{count}}",
+    "scannedRange": "Mabhuroka akaongororwa {{from}} → {{to}}.",
+    "foundOutputs_one": "Yakawana mhedzisiro {{count}} itsva.",
+    "foundOutputs_other": "Yakawana mhedzisiro {{count}} itsva.",
+    "noNewPayments": "Hapana mibhadharo mitsva.",
+    "startScan": "Tanga kuongorora",
+    "reconcile": {
+      "title": "Reconcile UTXOs dzakashandiswa",
+      "description": "Inotarisa UTXO yega yega yakachengetwa yemubhadharo wakanyararira pamberi peBlockbook uye inobvisa idzo dzakashandiswa. Shandisa kana bharanzi yakakwirira pane zvaifanira mushure mokutumira.",
+      "checking": "Kutarisa {{checked}} / {{total}}…",
+      "checked_one": "Yatariswa UTXO {{count}} · yapfupiswa {{pruned}}.",
+      "checked_other": "Dzatariswa UTXOs {{count}} · dzapfupiswa {{pruned}}.",
+      "reconciling": "Kureconcile…",
+      "reconcileNow": "Reconcile zvino"
+    }
   }
 }
