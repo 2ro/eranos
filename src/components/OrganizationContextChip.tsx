@@ -48,7 +48,7 @@ export function OrganizationContextChip({
   if (isEditMode) {
     if (!aTag) return null;
     return (
-      <div className="mt-3 ml-9 flex items-start gap-3 rounded-xl border border-primary/30 bg-primary/10 px-4 py-3 text-primary shadow-sm">
+      <div className="mt-3 flex w-full items-start gap-3 rounded-xl border border-primary/30 bg-primary/10 px-4 py-3 text-primary shadow-sm">
         <div className="mt-0.5 flex size-9 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground">
           <Users className="size-4" />
         </div>
@@ -72,7 +72,7 @@ export function OrganizationContextChip({
   // `?org=` present but malformed.
   if (!paramDecoded) {
     return (
-      <p className="mt-2 ml-9 text-xs text-muted-foreground">
+      <p className="mt-2 w-full text-xs text-muted-foreground">
         Couldn't read the group in the link. Publishing under your account.
       </p>
     );
@@ -82,7 +82,7 @@ export function OrganizationContextChip({
   // authorization yet. Don't claim "publishing under" until we know.
   if (manageableLoading) {
     return (
-      <div className="mt-3 ml-9 rounded-xl border border-border bg-card px-4 py-3 text-sm text-muted-foreground">
+      <div className="mt-3 w-full rounded-xl border border-border bg-card px-4 py-3 text-sm text-muted-foreground">
         Checking group permissions…
       </div>
     );
@@ -93,14 +93,14 @@ export function OrganizationContextChip({
   // an org-tagged event.
   if (!authorizedOrg) {
     return (
-      <p className="mt-2 ml-9 text-xs text-muted-foreground">
+      <p className="mt-2 w-full text-xs text-muted-foreground">
         You aren't a founder or moderator of that group. Publishing under your account.
       </p>
     );
   }
 
   return (
-    <div className="mt-3 ml-9 flex items-start gap-3 rounded-xl border border-primary/30 bg-primary/10 px-4 py-3 text-primary shadow-sm">
+    <div className="mt-3 flex w-full items-start gap-3 rounded-xl border border-primary/30 bg-primary/10 px-4 py-3 text-primary shadow-sm">
       <div className="mt-0.5 flex size-9 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground">
         <Users className="size-4" />
       </div>

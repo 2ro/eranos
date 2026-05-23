@@ -393,12 +393,6 @@ function PledgeHero({
             {action.title}
           </h1>
 
-          {action.description && (
-            <p className="mt-4 text-base sm:text-lg lg:text-xl leading-relaxed text-white/90 max-w-2xl line-clamp-4 sm:line-clamp-none">
-              {action.description}
-            </p>
-          )}
-
           <Link
             to={creatorProfileUrl}
             onClick={(e) => e.stopPropagation()}

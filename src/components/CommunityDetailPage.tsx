@@ -653,6 +653,13 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
   const image = community?.image;
   const cover = sanitizeUrl(image);
   const communityATag = community?.aTag ?? '';
+  const founder = useAuthor(event.pubkey);
+  const founderMetadata: NostrMetadata | undefined = founder.data?.metadata;
+  const founderName = getDisplayName(founderMetadata, event.pubkey);
+  const founderProfileUrl = useProfileUrl(event.pubkey, founderMetadata);
+  const founderPicture = sanitizeUrl(founderMetadata?.picture);
+  const founderInitials = founderName.slice(0, 2).toUpperCase();
+  const countryLabel = community?.countryCode ? getGeoDisplayName(community.countryCode) : undefined;
 
   const descriptionText = description.trim();
 
@@ -973,6 +980,34 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
               <h1 className="max-w-4xl text-3xl sm:text-5xl lg:text-6xl font-bold leading-[1.05] tracking-tight text-white">
                 {name}
               </h1>
+
+              <div className="mt-5 flex flex-wrap items-center gap-x-5 gap-y-3 text-sm sm:text-base text-white/90">
+                <Link
+                  to={founderProfileUrl}
+                  onClick={(e) => e.stopPropagation()}
+                  className="inline-flex items-center gap-2.5 hover:text-white motion-safe:transition-colors group [text-shadow:none]"
+                >
+                  <Avatar className="size-8 sm:size-9 ring-2 ring-white/30">
+                    {founderPicture && <AvatarImage src={founderPicture} alt="" />}
+                    <AvatarFallback className="bg-white/15 text-xs text-white">
+                      {founderInitials}
+                    </AvatarFallback>
+                  </Avatar>
+                  <span className="[text-shadow:0_1px_3px_rgba(0,0,0,0.7)]">
+                    by{' '}
+                    <span className="font-semibold underline-offset-4 group-hover:underline">
+                      {founderName}
+                    </span>
+                  </span>
+                </Link>
+
+                {countryLabel && (
+                  <span className="inline-flex items-center gap-1.5 text-xs sm:text-sm font-medium text-white/85">
+                    <MapPin className="size-4" />
+                    {countryLabel}
+                  </span>
+                )}
+              </div>
 
               <div className="mt-4 border-t border-white/15 pt-3 [text-shadow:none] [&_button]:!text-white/90 [&_button:hover]:!bg-white/15 [&_button:hover]:!text-white [&_button]:transition-colors">
                 <PostActionBar

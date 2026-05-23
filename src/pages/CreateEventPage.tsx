@@ -27,6 +27,7 @@ import { createOrganizationAssociationTags, decodeOrganizationParam } from '@/li
 import { sanitizeUrl } from '@/lib/sanitizeUrl';
 import { unixSecondsInTimezone } from '@/lib/timezone';
 import { withAgoraTag } from '@/lib/agoraNoteTags';
+import { parseContentTagInput } from '@/lib/contentTags';
 
 function slugify(text: string): string {
   return text
@@ -79,6 +80,7 @@ export function CreateEventPage() {
   const [endDate, setEndDate] = useState('');
   const [endTime, setEndTime] = useState('');
   const [location, setLocation] = useState('');
+  const [tagInput, setTagInput] = useState('');
   const [timezone, setTimezone] = useState(browserTimezone);
   const [formError, setFormError] = useState('');
 
@@ -96,6 +98,7 @@ export function CreateEventPage() {
       const trimmedTitle = title.trim();
       const trimmedDescription = description.trim();
       const trimmedLocation = location.trim();
+      const contentTags = parseContentTagInput(tagInput);
 
       if (!trimmedTitle) throw new Error('Title is required.');
       if (!startDate) throw new Error('Start date is required.');
@@ -121,6 +124,8 @@ export function CreateEventPage() {
       if (trimmedLocation) {
         tags.push(['location', trimmedLocation]);
       }
+
+      for (const tag of contentTags) tags.push(['t', tag]);
 
       const trimmedCoverImage = coverImage.trim();
       const sanitizedImage = trimmedCoverImage ? sanitizeUrl(trimmedCoverImage) : undefined;
@@ -403,6 +408,15 @@ export function CreateEventPage() {
               placeholder="Address, venue, or video call link"
               value={location}
               onChange={(e) => setLocation(e.target.value)}
+            />
+          </FormSection>
+
+          <FormSection title="Tags" requirement="Recommended">
+            <Input
+              id="event-tags"
+              value={tagInput}
+              onChange={(e) => setTagInput(e.target.value)}
+              placeholder="mutual-aid, workshop, local-news"
             />
           </FormSection>
         </div>

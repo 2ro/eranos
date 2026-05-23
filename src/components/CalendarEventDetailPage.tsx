@@ -479,12 +479,6 @@ export function CalendarEventDetailPage({ event }: { event: NostrEvent }) {
               {title}
             </h1>
 
-            {summary && (
-              <p className="mt-4 text-base sm:text-lg lg:text-xl leading-relaxed text-white/90 max-w-2xl line-clamp-4 sm:line-clamp-none">
-                {summary}
-              </p>
-            )}
-
             <Link
               to={organizerProfileUrl}
               onClick={(e) => e.stopPropagation()}
