@@ -47,6 +47,36 @@
     "logout": "Cerrar sesión",
     "addAccount": "Agregar otra cuenta"
   },
+  "feed": {
+    "indexTagline": "Tu contenido. Tu estilo. Tus reglas."
+  },
+  "notFound": {
+    "title": "404 - Página no encontrada",
+    "description": "No se pudo encontrar la página que buscas.",
+    "heading": "Esta página no existe.",
+    "goHome": "Ir al inicio"
+  },
+  "campaigns": {
+    "all": {
+      "title": "Todas las campañas",
+      "seoTitle": "Todas las campañas",
+      "description": "Explora todas las campañas publicadas en Agora.",
+      "searchAriaLabel": "Buscar campañas",
+      "searchPlaceholder": "Buscar campañas…",
+      "clearSearch": "Borrar búsqueda",
+      "sortAriaLabel": "Orden",
+      "sortTop": "Destacadas",
+      "sortNew": "Nuevas",
+      "showHidden": "Mostrar ocultas",
+      "startCampaign": "Iniciar una campaña",
+      "noMatch": "Ninguna campaña coincide con «{{query}}»",
+      "noMatchHint": "Prueba con otra búsqueda o bórrala para ver todas las campañas.",
+      "allHidden": "No hay campañas que mostrar",
+      "allHiddenHint": "Todas las campañas de la red han sido ocultadas por moderadores. Activa «Mostrar ocultas» para verlas.",
+      "empty": "Aún no hay campañas",
+      "emptyHint": "Todavía no se ha publicado ninguna campaña. Sé el primero."
+    }
+  },
   "settings": {
     "title": "Ajustes",
     "description": "Administra tus ajustes de {{appName}}",

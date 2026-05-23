@@ -47,6 +47,36 @@
     "logout": "Log out",
     "addAccount": "Add another account"
   },
+  "feed": {
+    "indexTagline": "Your content. Your vibe. Your rules."
+  },
+  "notFound": {
+    "title": "404 - Page Not Found",
+    "description": "The page you are looking for could not be found.",
+    "heading": "This page doesn't exist.",
+    "goHome": "Go home"
+  },
+  "campaigns": {
+    "all": {
+      "title": "All Campaigns",
+      "seoTitle": "All campaigns",
+      "description": "Browse every campaign published on Agora.",
+      "searchAriaLabel": "Search campaigns",
+      "searchPlaceholder": "Search campaigns…",
+      "clearSearch": "Clear search",
+      "sortAriaLabel": "Sort order",
+      "sortTop": "Top",
+      "sortNew": "New",
+      "showHidden": "Show hidden",
+      "startCampaign": "Start a campaign",
+      "noMatch": "No campaigns match \u201c{{query}}\u201d",
+      "noMatchHint": "Try a different search term, or clear the search to see every campaign.",
+      "allHidden": "No campaigns to show",
+      "allHiddenHint": "Every campaign on the network has been hidden by moderators. Toggle \u201cShow hidden\u201d to view them.",
+      "empty": "No campaigns yet",
+      "emptyHint": "No campaigns have been published yet. Be the first."
+    }
+  },
   "settings": {
     "title": "Settings",
     "description": "Manage your {{appName}} settings",

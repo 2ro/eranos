@@ -47,6 +47,36 @@
     "logout": "Buda",
     "addAccount": "Wedzera imwe akaunti"
   },
+  "feed": {
+    "indexTagline": "Zviri zvako. Mafambisirwo ako. Mitemo yako."
+  },
+  "notFound": {
+    "title": "404 - Peji harina kuwanikwa",
+    "description": "Peji yauri kutsvaga haina kuwanikwa.",
+    "heading": "Peji iyi haipo.",
+    "goHome": "Enda kumba"
+  },
+  "campaigns": {
+    "all": {
+      "title": "Mishandirapamwe Yose",
+      "seoTitle": "Mishandirapamwe yose",
+      "description": "Tarisa mishandirapamwe yose yakaiswa paAgora.",
+      "searchAriaLabel": "Tsvaga mishandirapamwe",
+      "searchPlaceholder": "Tsvaga mishandirapamwe…",
+      "clearSearch": "Bvisa kutsvaga",
+      "sortAriaLabel": "Hurongwa",
+      "sortTop": "Yepamusoro",
+      "sortNew": "Itsva",
+      "showHidden": "Ratidza dzakavanzwa",
+      "startCampaign": "Tanga mushandirapamwe",
+      "noMatch": "Hapana mushandirapamwe unoenderana ne«{{query}}»",
+      "noMatchHint": "Edza zvimwe zvinotsvagwa, kana ubvise kutsvaga kuti uone mishandirapamwe yose.",
+      "allHidden": "Hapana mishandirapamwe yekuratidza",
+      "allHiddenHint": "Mishandirapamwe yose pamutambo yakavanzwa nevatariri. Vhura «Ratidza dzakavanzwa» kuti uione.",
+      "empty": "Hapana mishandirapamwe parizvino",
+      "emptyHint": "Hapana mushandirapamwe wakatumirwa parizvino. Iva wokutanga."
+    }
+  },
   "settings": {
     "title": "Marongero",
     "description": "Tarisira marongero ako e{{appName}}",
