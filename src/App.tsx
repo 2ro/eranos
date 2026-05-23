@@ -78,8 +78,6 @@ const hardcodedConfig: AppConfig = {
     feedIncludePeopleLists: true,
     showDecks: false,
     feedIncludeDecks: false,
-    showWebxdc: false,
-    feedIncludeWebxdc: false,
     showPhotos: true,
     feedIncludePhotos: true,
     showVideos: true,
@@ -145,7 +143,6 @@ const hardcodedConfig: AppConfig = {
   autoplayVideos: false,
   imageQuality: 'compressed',
   curatorPubkey: '932614571afcbad4d17a191ee281e39eebbb41b93fac8fd87829622aeb112f4d',
-  sandboxDomain: 'iframe.diy',
   esploraApis: [
     'https://mempool.space/api',
     'https://mempool.emzy.de/api',

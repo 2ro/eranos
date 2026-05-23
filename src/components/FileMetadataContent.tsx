@@ -4,7 +4,6 @@ import type { NostrEvent } from '@nostrify/nostrify';
 import { Button } from '@/components/ui/button';
 import { ImageGallery } from '@/components/ImageGallery';
 import { VideoPlayer } from '@/components/VideoPlayer';
-import { WebxdcEmbed } from '@/components/WebxdcEmbed';
 import { AudioVisualizer } from '@/components/AudioVisualizer';
 import { useAuthor } from '@/hooks/useAuthor';
 import { getDisplayName } from '@/lib/getDisplayName';
@@ -86,11 +85,9 @@ export function FileMetadataContent({ event, compact }: FileMetadataContentProps
   const url = sanitizeUrl(getTag(event.tags, 'url'));
   const mime = getTag(event.tags, 'm') ?? '';
   const alt = getTag(event.tags, 'alt');
-  const webxdcId = getTag(event.tags, 'webxdc');
   const dim = getTag(event.tags, 'dim');
   const blurhash = getTag(event.tags, 'blurhash');
   const thumb = getTag(event.tags, 'thumb') ?? getTag(event.tags, 'image');
-  const summary = getTag(event.tags, 'summary');
   const size = getTag(event.tags, 'size');
 
   if (!url) return null;
@@ -99,22 +96,6 @@ export function FileMetadataContent({ event, compact }: FileMetadataContentProps
   const altText = alt ?? undefined;
   const fileName = url.split('/').pop() ?? 'file';
   const sizeStr = size ? formatBytes(Number(size)) : undefined;
-
-  // ── Webxdc app ──────────────────────────────────────────────────────
-  if (mime === 'application/x-webxdc') {
-    const appName = altText?.replace(/^Webxdc app:\s*/i, '') ?? summary ?? fileName.replace('.xdc', '');
-    return (
-      <div className="mt-3">
-        <WebxdcEmbed
-          url={url}
-          uuid={webxdcId}
-          icon={thumb}
-          showNameCard={false}
-        />
-        <DescriptionCard title={appName} text={description} />
-      </div>
-    );
-  }
 
   // ── Image ───────────────────────────────────────────────────────────
   if (mime.startsWith('image/')) {

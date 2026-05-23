@@ -191,7 +191,7 @@ export function useInfiniteSortedPosts(sort: SortMode, enabled = true) {
  * Uses NIP-50 search extension `sort:hot` against relay.ditto.pub.
  *
  * `extraFilters` allows appending additional filter objects to the REQ,
- * useful when some kinds need tag constraints (e.g. webxdc needs `#m`).
+ * useful when some kinds need tag constraints.
  */
 export function useInfiniteHotFeed(
   kinds: number[],

@@ -92,10 +92,6 @@ export interface FeedSettings {
   showDecks: boolean;
   /** Include Magic Decks in the follows/global feed */
   feedIncludeDecks: boolean;
-  /** Show Webxdc apps (NIP-94 kind 1063 with m=application/x-webxdc) link in sidebar */
-  showWebxdc: boolean;
-  /** Include Webxdc apps in the follows/global feed */
-  feedIncludeWebxdc: boolean;
   /** Include voice messages (kind 1222 + 1244) in the follows/global feed */
   feedIncludeVoiceMessages: boolean;
   /** Show NIP-30 custom emojis in the emoji picker */
@@ -265,8 +261,6 @@ export interface AppConfig {
   imageQuality: 'compressed' | 'original';
   /** Hex pubkey of the curator whose follow list defines the curated feed. */
   curatorPubkey?: string;
-  /** Wildcard domain used for iframe sandboxing (e.g. "iframe.diy"). Default: "iframe.diy". */
-  sandboxDomain: string;
   /**
    * Ordered list of base URLs for Esplora-compatible Bitcoin REST APIs. Used
    * by the wallet, on-chain zap flows, and NIP-73 Bitcoin tx/address pages.

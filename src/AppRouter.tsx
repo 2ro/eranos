@@ -1,4 +1,4 @@
-import { lazy, Suspense, useState } from "react";
+import { lazy, Suspense } from "react";
 import { BrowserRouter, Link, Navigate, Outlet, Route, Routes } from "react-router-dom";
 import { Toaster } from "./components/ui/toaster";
 import { TopNav } from "./components/TopNav";
@@ -6,7 +6,6 @@ import { ScrollToTop } from "./components/ScrollToTop";
 import { VersionCheck } from "./components/VersionCheck";
 import { useCurrentUser } from "./hooks/useCurrentUser";
 import { useProfileUrl } from "./hooks/useProfileUrl";
-import { CenterColumnContext } from "@/contexts/LayoutContext";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 
@@ -93,23 +92,18 @@ function SiteFooter() {
  * pages that render their own internal layout.
  */
 function FundraiserLayout({ narrow }: { narrow: boolean }) {
-  const [centerColumnEl, setCenterColumnEl] = useState<HTMLElement | null>(null);
-
   return (
-    <CenterColumnContext.Provider value={centerColumnEl}>
-      <div className="min-h-dvh flex flex-col bg-background">
-        <TopNav />
-        <Suspense fallback={<PageSkeleton />}>
-          <div
-            ref={setCenterColumnEl}
-            className={cn("flex-1 min-w-0 w-full mx-auto", narrow && "max-w-3xl")}
-          >
-            <Outlet />
-          </div>
-        </Suspense>
-        <SiteFooter />
-      </div>
-    </CenterColumnContext.Provider>
+    <div className="min-h-dvh flex flex-col bg-background">
+      <TopNav />
+      <Suspense fallback={<PageSkeleton />}>
+        <div
+          className={cn("flex-1 min-w-0 w-full mx-auto", narrow && "max-w-3xl")}
+        >
+          <Outlet />
+        </div>
+      </Suspense>
+      <SiteFooter />
+    </div>
   );
 }
 

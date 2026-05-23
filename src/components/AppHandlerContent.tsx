@@ -1,14 +1,13 @@
 import type { NostrEvent, NostrMetadata } from '@nostrify/nostrify';
-import { ExternalLink, GitFork, Package, Play } from 'lucide-react';
-import { useMemo, useState } from 'react';
+import { ExternalLink, GitFork, Package } from 'lucide-react';
+import { useMemo } from 'react';
 import { Link } from 'react-router-dom';
 
 import { Button } from '@/components/ui/button';
 import { ExternalFavicon } from '@/components/ExternalFavicon';
-import { NsitePreviewDialog } from '@/components/NsitePreviewDialog';
 import { Skeleton } from '@/components/ui/skeleton';
-import { useAddrEvent } from '@/hooks/useEvent';
 import { NostrURI } from '@/lib/NostrURI';
+import { hexToBase36 } from '@/lib/nsiteSubdomain';
 import { sanitizeUrl } from '@/lib/sanitizeUrl';
 import { cn } from '@/lib/utils';
 
@@ -93,6 +92,15 @@ function getNsiteRef(tags: string[][]): NsiteRef | undefined {
   return undefined;
 }
 
+/**
+ * Build the canonical nsite URL for a kind 35128 reference. Mirrors the rule
+ * used by NsiteCard / nsiteSubdomain.ts: `<pubkeyB36><dTag>.nsite.lol`.
+ */
+function nsiteUrl(ref: NsiteRef): string {
+  const pubkeyB36 = hexToBase36(ref.pubkey);
+  return `https://${pubkeyB36}${ref.identifier}.nsite.lol`;
+}
+
 interface AppHandlerContentProps {
   event: NostrEvent;
   /** If true, show compact preview (used in NoteCard feed). */
@@ -115,17 +123,13 @@ export function AppHandlerContent({ event, compact }: AppHandlerContentProps) {
   const hashtags = getAllTags(event.tags, 't');
 
   const shakespeareUrl = useMemo(() => getShakespeareUrl(event.tags), [event.tags]);
-  const nsiteRef = useMemo(() => getNsiteRef(event.tags), [event.tags]);
-  const [previewOpen, setPreviewOpen] = useState(false);
-
-  // Fetch the actual nsite event so we can serve files directly from Blossom.
-  const { data: nsiteEvent } = useAddrEvent(
-    nsiteRef ? { kind: 35128, pubkey: nsiteRef.pubkey, identifier: nsiteRef.identifier } : undefined,
-  );
+  const nsiteOpenUrl = useMemo(() => {
+    const ref = getNsiteRef(event.tags);
+    return ref ? nsiteUrl(ref) : undefined;
+  }, [event.tags]);
 
   if (compact) {
     return (
-      <>
       <div className="mt-2">
         <div className="rounded-xl border border-border overflow-hidden transition-all duration-300 hover:shadow-md hover:border-primary/20">
           {/* Banner hero */}
@@ -195,19 +199,16 @@ export function AppHandlerContent({ event, compact }: AppHandlerContentProps) {
 
             {/* Actions */}
             <div className="flex items-center gap-2">
-              {nsiteRef && (
-                <Button
-                  size="sm"
-                  className="h-7 text-xs"
-                  disabled={!nsiteEvent}
-                  onClick={(e) => { e.stopPropagation(); setPreviewOpen(true); }}
-                >
-                  <Play className="size-3 mr-1" />
-                  Run
+              {nsiteOpenUrl && (
+                <Button asChild size="sm" className="h-7 text-xs">
+                  <a href={nsiteOpenUrl} target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()}>
+                    Open Site
+                    <ExternalLink className="size-3 ml-1.5" />
+                  </a>
                 </Button>
               )}
               {websiteUrl && (
-                <Button asChild size="sm" variant={nsiteRef ? 'secondary' : 'default'} className="h-7 text-xs">
+                <Button asChild size="sm" variant={nsiteOpenUrl ? 'secondary' : 'default'} className="h-7 text-xs">
                   <a href={websiteUrl} target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()}>
                     Open App
                     <ExternalLink className="size-3 ml-1.5" />
@@ -226,17 +227,6 @@ export function AppHandlerContent({ event, compact }: AppHandlerContentProps) {
           </div>
         </div>
       </div>
-
-      {nsiteRef && nsiteEvent && (
-         <NsitePreviewDialog
-           event={nsiteEvent}
-           appName={name}
-           appPicture={picture}
-           open={previewOpen}
-           onOpenChange={setPreviewOpen}
-         />
-       )}
-       </>
      );
   }
 
@@ -314,18 +304,16 @@ export function AppHandlerContent({ event, compact }: AppHandlerContentProps) {
 
           {/* Actions */}
           <div className="flex items-center gap-2 pt-1">
-            {nsiteRef && (
-              <Button
-                size="sm"
-                disabled={!nsiteEvent}
-                onClick={(e) => { e.stopPropagation(); setPreviewOpen(true); }}
-              >
-                <Play className="size-3.5 mr-1.5" />
-                Run
+            {nsiteOpenUrl && (
+              <Button asChild size="sm">
+                <a href={nsiteOpenUrl} target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()}>
+                  Open Site
+                  <ExternalLink className="size-3.5 ml-1.5" />
+                </a>
               </Button>
             )}
             {websiteUrl && (
-              <Button asChild size="sm" variant={nsiteRef ? 'secondary' : 'default'}>
+              <Button asChild size="sm" variant={nsiteOpenUrl ? 'secondary' : 'default'}>
                 <a href={websiteUrl} target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()}>
                   Open App
                   <ExternalLink className="size-3 ml-1.5" />
@@ -343,16 +331,6 @@ export function AppHandlerContent({ event, compact }: AppHandlerContentProps) {
           </div>
         </div>
       </div>
-
-      {nsiteRef && nsiteEvent && (
-        <NsitePreviewDialog
-          event={nsiteEvent}
-          appName={name}
-          appPicture={picture}
-          open={previewOpen}
-          onOpenChange={setPreviewOpen}
-        />
-      )}
     </div>
   );
 }
