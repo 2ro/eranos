@@ -54,6 +54,23 @@ const DEFAULT_RECENT_SCAN_BLOCKS = 144; // ~24 hours of mainnet blocks.
  */
 const MAX_RECONCILE_UTXOS = 50;
 
+/**
+ * How many block fetches to keep in flight at once during a scan.
+ *
+ * The BlindBit Oracle exposes only per-block endpoints (`/tweaks/:H`,
+ * `/utxos/:H`), so a 144-block "recent" scan does up to ~288 HTTP round
+ * trips. On the public mainnet indexer each round trip is ~700ms over the
+ * wire, which makes latency — not ECDH compute or bandwidth — the dominant
+ * cost. Sequential fetching takes ~200s wall-clock; the same workload at
+ * concurrency 8 finishes in ~25s while still being polite to the indexer
+ * (anecdotally ~6× speedup at concurrency 10 against the public host).
+ *
+ * Tunable: higher values keep the indexer hotter but risk rate-limiting or
+ * TCP-level head-of-line blocking on slow links. Lower values trend toward
+ * the old sequential behaviour.
+ */
+const SCAN_FETCH_CONCURRENCY = 8;
+
 export interface UseHdWalletSpResult {
   /** Whether the feature is usable. False when not logged in with nsec, or no indexer configured. */
   enabled: boolean;
@@ -469,16 +486,67 @@ export function useHdWalletSp(): UseHdWalletSpResult {
       let matchesFound = 0;
       let highestContiguousScanned = fromHeight - 1;
 
+      // ── Sliding-window pipeline state ────────────────────────
+      //
+      // Declared outside the try block so the `finally` cleanup can drain
+      // any still-pending fetches if we exit via cancel or error.
+      const inflight = new Map<number, Promise<Awaited<ReturnType<typeof fetchBlockEntries>>>>();
+      let nextToSchedule = fromHeight;
+
+      const scheduleUpTo = (limit: number) => {
+        while (
+          nextToSchedule <= resolvedTo &&
+          inflight.size < limit &&
+          !controller.signal.aborted
+        ) {
+          const h = nextToSchedule++;
+          inflight.set(
+            h,
+            fetchBlockEntries(indexerUrl, h, controller.signal, includeSpent),
+          );
+        }
+      };
+
       try {
+        // ── Sliding-window pipeline ─────────────────────────────
+        //
+        // The indexer exposes only per-block endpoints, so a long scan is
+        // dominated by HTTP latency rather than ECDH compute. We keep up
+        // to SCAN_FETCH_CONCURRENCY `fetchBlockEntries` calls in flight at
+        // once, but PROCESS the results strictly in height order — this
+        // keeps `optimisticRef`, `matchesFound`, scan-progress, and the
+        // contiguous `scanHeight` advancement single-writer and monotonic.
+
+        // Prime the pipeline.
+        scheduleUpTo(SCAN_FETCH_CONCURRENCY);
+
         for (let h = fromHeight; h <= resolvedTo; h++) {
           if (controller.signal.aborted) break;
 
-          const entries = await fetchBlockEntries(
-            indexerUrl,
-            h,
-            controller.signal,
-            includeSpent,
-          );
+          const pending = inflight.get(h);
+          if (!pending) {
+            // Shouldn't happen — scheduleUpTo always fills slot h before
+            // we reach it — but guard anyway.
+            throw new Error(`scan pipeline missing height ${h}`);
+          }
+          inflight.delete(h);
+
+          let entries: Awaited<ReturnType<typeof fetchBlockEntries>>;
+          try {
+            entries = await pending;
+          } catch (err) {
+            // First in-order fetch failure aborts the rest of the scan
+            // (matches the previous sequential behaviour). The `finally`
+            // block below drains any still-pending fetches so their
+            // rejections don't surface as unhandled.
+            controller.abort();
+            throw err;
+          }
+
+          // A slot has freed — keep the window topped up before we spend
+          // time on ECDH for this block.
+          scheduleUpTo(SCAN_FETCH_CONCURRENCY);
+
           let blockMatches: SPMatchedUtxo[] = [];
           if (entries.length > 0) {
             blockMatches = await scanBatch(entries, keys.bscan, keys.Bspend, {
@@ -570,6 +638,18 @@ export function useHdWalletSp(): UseHdWalletSpResult {
           setScanError(err instanceof Error ? err : new Error(String(err)));
         }
       } finally {
+        // Drain any still-pending fetches — they'll reject (because we
+        // aborted the controller in the error path, or because the user
+        // called cancelScan) and we don't want unhandled rejection noise.
+        if (inflight.size > 0) {
+          // Ensure the controller is aborted so the fetches actually
+          // settle quickly rather than racing to completion.
+          if (!controller.signal.aborted) controller.abort();
+          for (const p of inflight.values()) {
+            p.catch(() => {});
+          }
+          inflight.clear();
+        }
         setIsScanning(false);
         // Final flush — make sure the last scan progress reaches relays.
         flushRepublish();
