@@ -17,12 +17,15 @@ import { Label } from '@/components/ui/label';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Switch } from '@/components/ui/switch';
 import { Textarea } from '@/components/ui/textarea';
+import { CountrySelect } from '@/components/CountrySelect';
 import { ImageUploadField } from '@/components/ImageUploadField';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useNostrPublish } from '@/hooks/useNostrPublish';
 import { usePublishRSVP } from '@/hooks/usePublishRSVP';
 import { useToast } from '@/hooks/useToast';
 import { fetchFreshEvent } from '@/lib/fetchFreshEvent';
+import { COUNTRIES } from '@/lib/countries';
+import { createCountryIdentifier, parseCountryIdentifier } from '@/lib/countryIdentifiers';
 import { createOrganizationAssociationTags } from '@/lib/organizationContext';
 import { sanitizeUrl } from '@/lib/sanitizeUrl';
 import { withAgoraTag } from '@/lib/agoraNoteTags';
@@ -52,6 +55,11 @@ const MANAGED_EDIT_TAGS = new Set([
   'P',
   't',
 ]);
+
+function isManagedEditTag([name, value]: string[]): boolean {
+  if (MANAGED_EDIT_TAGS.has(name)) return true;
+  return name === 'i' && !!value && !!parseCountryIdentifier(value);
+}
 
 function slugify(text: string): string {
   return text
@@ -101,6 +109,8 @@ export function CreateCommunityEventDialog({ communityATag, open, onOpenChange, 
   const [startTime, setStartTime] = useState('');
   const [endDate, setEndDate] = useState('');
   const [endTime, setEndTime] = useState('');
+  const [countryCode, setCountryCode] = useState('');
+  const [countryQuery, setCountryQuery] = useState('');
   const [location, setLocation] = useState('');
   const [tagInput, setTagInput] = useState('');
   const [isImageUploading, setIsImageUploading] = useState(false);
@@ -124,6 +134,8 @@ export function CreateCommunityEventDialog({ communityATag, open, onOpenChange, 
     setStartTime('');
     setEndDate('');
     setEndTime('');
+    setCountryCode('');
+    setCountryQuery('');
     setLocation('');
     setTagInput('');
     setIsImageUploading(false);
@@ -141,6 +153,9 @@ export function CreateCommunityEventDialog({ communityATag, open, onOpenChange, 
     const summaryTag = event.tags.find(([name]) => name === 'summary')?.[1] ?? '';
     const imageTag = event.tags.find(([name]) => name === 'image')?.[1] ?? '';
     const locationTag = event.tags.find(([name]) => name === 'location')?.[1] ?? '';
+    const editCountryCode = event.tags
+      .map(([name, value]) => name === 'i' && value ? parseCountryIdentifier(value) : undefined)
+      .find((code): code is string => !!code && /^[A-Z]{2}$/.test(code)) ?? '';
     const startTag = event.tags.find(([name]) => name === 'start')?.[1] ?? '';
     const endTag = event.tags.find(([name]) => name === 'end')?.[1] ?? '';
     const isAllDay = event.kind === 31922;
@@ -150,6 +165,8 @@ export function CreateCommunityEventDialog({ communityATag, open, onOpenChange, 
     setDescription(summaryTag || event.content);
     setImageUrl(imageTag);
     setLocation(locationTag);
+    setCountryCode(editCountryCode);
+    setCountryQuery(editCountryCode ? COUNTRIES[editCountryCode]?.name ?? editCountryCode : '');
     setTagInput(getEditableContentTags(event.tags).join(', '));
     setAllDay(isAllDay);
     setIsImageUploading(false);
@@ -241,7 +258,7 @@ export function CreateCommunityEventDialog({ communityATag, open, onOpenChange, 
           })
         : undefined;
       const preservedTags = isEditing
-        ? (prev?.tags ?? event?.tags ?? []).filter(([name]) => !MANAGED_EDIT_TAGS.has(name))
+        ? (prev?.tags ?? event?.tags ?? []).filter((tag) => !isManagedEditTag(tag))
         : [];
       const tags: string[][] = [
         ['d', dTag],
@@ -260,6 +277,10 @@ export function CreateCommunityEventDialog({ communityATag, open, onOpenChange, 
 
       if (location.trim()) {
         tags.push(['location', location.trim()]);
+      }
+
+      if (countryCode) {
+        tags.push(['i', createCountryIdentifier(countryCode)]);
       }
 
       for (const tag of contentTags) tags.push(['t', tag]);
@@ -363,6 +384,7 @@ export function CreateCommunityEventDialog({ communityATag, open, onOpenChange, 
     }
   }, [
     allDay,
+    countryCode,
     description,
     endDate,
     endTime,
@@ -519,7 +541,31 @@ export function CreateCommunityEventDialog({ communityATag, open, onOpenChange, 
                   )}
 
                   <div className="space-y-1.5">
-                    <Label htmlFor="community-event-location">Location (recommended)</Label>
+                    <Label htmlFor="community-event-country">Country (recommended)</Label>
+                    <CountrySelect
+                      id="community-event-country"
+                      query={countryQuery}
+                      selectedCode={countryCode}
+                      onQueryChange={(value) => {
+                        setCountryQuery(value);
+                        const selectedCountry = countryCode ? COUNTRIES[countryCode] : undefined;
+                        if (selectedCountry && value !== selectedCountry.name && value.toUpperCase() !== countryCode) {
+                          setCountryCode('');
+                        }
+                      }}
+                      onSelect={(country) => {
+                        setCountryCode(country.code);
+                        setCountryQuery(country.name);
+                      }}
+                      onClear={() => {
+                        setCountryCode('');
+                        setCountryQuery('');
+                      }}
+                    />
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <Label htmlFor="community-event-location">Location details (recommended)</Label>
                     <Input
                       id="community-event-location"
                       placeholder="Address, venue, or video call link"
