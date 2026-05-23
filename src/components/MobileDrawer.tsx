@@ -83,6 +83,12 @@ export function MobileDrawer({ open, onOpenChange }: MobileDrawerProps) {
       if (def.requiresAdmin && !isAdmin(user?.pubkey)) return false;
       return true;
     });
+    // Phase 1b: when logged out, ensure Help is visible in the main menu.
+    // Logged-in users access Help via the account menu (AccountSwitcher),
+    // but logged-out users have no equivalent affordance — surface it here.
+    if (!user && !filtered.includes('help')) {
+      filtered.push('help');
+    }
     // Phase 2: remove leading, trailing, and consecutive dividers.
     return filtered.filter((id, i, arr) => {
       if (id !== 'divider') return true;
@@ -98,6 +104,9 @@ export function MobileDrawer({ open, onOpenChange }: MobileDrawerProps) {
       const def = getSidebarItem(item.id);
       if (!def) return true;
       if (def.requiresAdmin && !isAdmin(user?.pubkey)) return false;
+      // When logged out, Help is forced into the main list, so hide it
+      // from the "More…" menu to avoid duplication.
+      if (!user && item.id === 'help') return false;
       return true;
     });
   }, [hiddenItems, user]);
