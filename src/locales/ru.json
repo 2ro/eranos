@@ -1009,237 +1009,237 @@
     "adminRequiredDesc": "Только администраторы платформы могут назначать или удалять организаторов."
   },
   "wallet": {
-    "seoTitle": "Wallet",
-    "seoDescription": "Hierarchical-deterministic Bitcoin wallet derived from your Nostr nsec.",
+    "seoTitle": "Кошелёк",
+    "seoDescription": "Иерархический детерминированный Bitcoin-кошелёк, полученный из вашего nsec Nostr.",
     "loggedOut": {
-      "title": "Bitcoin Wallet",
-      "description": "A hierarchical wallet derived from your Nostr identity. Fresh address per receive, full transaction history, no address reuse.",
-      "requiresNsec": "Requires login with an nsec (your Nostr private key)."
+      "title": "Bitcoin-кошелёк",
+      "description": "Иерархический кошелёк, полученный из вашей идентичности Nostr. Свежий адрес при каждом получении, полная история транзакций, без повторного использования адресов.",
+      "requiresNsec": "Требуется вход с nsec (вашим приватным ключом Nostr)."
     },
     "unsupported": {
-      "title": "Wallet unavailable",
-      "extension": "Your browser extension keeps your secret key isolated, so we can't derive child keys for your wallet.",
-      "bunker": "Your remote signer (NIP-46 bunker) keeps your secret key on the bunker side, so we can't derive child keys for your wallet.",
-      "other": "Your login type doesn't expose the secret key needed to derive your wallet.",
-      "instructions": "Log out and sign in again with your nsec to use the wallet."
+      "title": "Кошелёк недоступен",
+      "extension": "Ваше расширение браузера держит ваш секретный ключ изолированно, поэтому мы не можем получить дочерние ключи для вашего кошелька.",
+      "bunker": "Ваш удалённый подписчик (бункер NIP-46) держит ваш секретный ключ на стороне бункера, поэтому мы не можем получить дочерние ключи для вашего кошелька.",
+      "other": "Ваш тип входа не раскрывает секретный ключ, необходимый для получения кошелька.",
+      "instructions": "Выйдите и снова войдите со своим nsec, чтобы использовать кошелёк."
     },
-    "scanFailed": "Failed to scan wallet",
-    "retry": "Retry",
-    "refreshBalance": "Refresh balance",
-    "refreshBalanceTitle": "Click to refresh balance",
-    "amountPending": "{{amount}} pending",
-    "pending": "pending",
-    "send": "Send",
-    "receive": "Receive",
-    "transactions": "Transactions",
+    "scanFailed": "Не удалось просканировать кошелёк",
+    "retry": "Повторить",
+    "refreshBalance": "Обновить баланс",
+    "refreshBalanceTitle": "Нажмите, чтобы обновить баланс",
+    "amountPending": "{{amount}} в ожидании",
+    "pending": "в ожидании",
+    "send": "Отправить",
+    "receive": "Получить",
+    "transactions": "Транзакции",
     "receiveDialog": {
-      "title": "Receive Bitcoin",
-      "description": "Share an address to receive bitcoin.",
-      "onChain": "On-chain",
-      "silentPayment": "Silent payment",
-      "onChainIntro": "Fresh address each time. Bump to a new index after sharing for privacy.",
-      "addressIndex": "Address #{{index}}",
-      "newAddress": "New address",
-      "silentIntro": "Static receive identifier. Share once and reuse forever — senders derive a unique on-chain address per payment.",
-      "noIndexer": "Scanning disabled — no BIP-352 indexer configured. Set <0>bip352IndexerUrl</0> in your app config to detect incoming silent payments.",
-      "silentBalance": "Silent payment balance: <0>{{amount}}</0>",
-      "scanForNew": "Scan for new payments",
-      "scanForPayments": "Scan for payments"
+      "title": "Получить Bitcoin",
+      "description": "Поделитесь адресом для получения bitcoin.",
+      "onChain": "В блокчейне",
+      "silentPayment": "Тихий платёж",
+      "onChainIntro": "Свежий адрес каждый раз. Переходите на новый индекс после публикации для конфиденциальности.",
+      "addressIndex": "Адрес №{{index}}",
+      "newAddress": "Новый адрес",
+      "silentIntro": "Статический идентификатор получения. Поделитесь один раз и используйте навсегда — отправители получают уникальный адрес в блокчейне на каждый платёж.",
+      "noIndexer": "Сканирование отключено — индексер BIP-352 не настроен. Установите <0>bip352IndexerUrl</0> в конфигурации вашего приложения, чтобы обнаруживать входящие тихие платежи.",
+      "silentBalance": "Баланс тихих платежей: <0>{{amount}}</0>",
+      "scanForNew": "Сканировать новые платежи",
+      "scanForPayments": "Сканировать платежи"
     },
     "tx": {
-      "pending": "Pending",
-      "today": "Today",
-      "yesterday": "Yesterday",
-      "daysAgo_one": "{{count}}d ago",
-      "daysAgo_other": "{{count}}d ago",
-      "received": "Received",
-      "sent": "Sent",
-      "silentBadge": "silent",
-      "silentDetectedTitle": "Detected via BIP-352 silent payment scan"
+      "pending": "В ожидании",
+      "today": "Сегодня",
+      "yesterday": "Вчера",
+      "daysAgo_one": "{{count}}д назад",
+      "daysAgo_other": "{{count}}д назад",
+      "received": "Получено",
+      "sent": "Отправлено",
+      "silentBadge": "тихий",
+      "silentDetectedTitle": "Обнаружено через сканирование тихих платежей BIP-352"
     }
   },
   "walletRecovery": {
-    "seoTitle": "Recover Old Wallet",
-    "seoDescription": "Recover funds from a previous Lightning wallet and transfer them to your Nostr-derived Bitcoin address.",
-    "title": "Recover Old Wallet",
-    "heading": "Recover your old wallet",
-    "subheading": "If you previously held funds in the Lightning wallet, you can sweep them to your Nostr-derived Bitcoin address. Your old wallet is not restored — this is a one-time, one-way transfer.",
-    "backToWallet": "Back to wallet",
+    "seoTitle": "Восстановить старый кошелёк",
+    "seoDescription": "Восстановите средства из предыдущего Lightning-кошелька и переведите их на ваш Bitcoin-адрес, полученный из Nostr.",
+    "title": "Восстановить старый кошелёк",
+    "heading": "Восстановите ваш старый кошелёк",
+    "subheading": "Если у вас ранее были средства в Lightning-кошельке, вы можете перевести их на ваш Bitcoin-адрес, полученный из Nostr. Ваш старый кошелёк не восстанавливается — это одноразовый односторонний перевод.",
+    "backToWallet": "Назад к кошельку",
     "loggedOut": {
-      "title": "Log in to recover",
-      "description": "Log in with the Nostr identity that owned the old Lightning wallet so the funds can be swept to its Bitcoin address."
+      "title": "Войдите, чтобы восстановить",
+      "description": "Войдите с идентичностью Nostr, которая владела старым Lightning-кошельком, чтобы средства можно было перевести на её Bitcoin-адрес."
     },
     "destination": {
-      "title": "Funds will be sent to",
-      "description": "Your Nostr-derived Taproot address."
+      "title": "Средства будут отправлены на",
+      "description": "Ваш Taproot-адрес, полученный из Nostr."
     },
     "phrase": {
-      "title": "Recovery phrase",
-      "description": "Paste the 12-word recovery phrase from your old wallet.",
-      "checkingRelays": "Checking your relays for an encrypted backup…",
-      "backupFoundTitle": "Backup found on your relays",
-      "backupFoundDesc": "We found an encrypted backup of your old wallet's recovery phrase published from this account.",
-      "decryptAndUse": "Decrypt and use it",
-      "placeholder": "word1 word2 word3 …",
-      "warning": "Only paste a recovery phrase you trust. Anyone with this phrase can spend the funds. After the sweep completes, delete it from any place you copied it from.",
-      "sweepButton": "Sweep funds to my Bitcoin address"
+      "title": "Фраза восстановления",
+      "description": "Вставьте фразу восстановления из 12 слов из вашего старого кошелька.",
+      "checkingRelays": "Проверка ваших реле на зашифрованную резервную копию…",
+      "backupFoundTitle": "Резервная копия найдена на ваших реле",
+      "backupFoundDesc": "Мы нашли зашифрованную резервную копию фразы восстановления вашего старого кошелька, опубликованную с этого аккаунта.",
+      "decryptAndUse": "Расшифровать и использовать",
+      "placeholder": "слово1 слово2 слово3 …",
+      "warning": "Вставляйте только фразу восстановления, которой вы доверяете. Любой, у кого есть эта фраза, может потратить средства. После завершения перевода удалите её отовсюду, куда вы её скопировали.",
+      "sweepButton": "Перевести средства на мой Bitcoin-адрес"
     },
     "sweeping": {
-      "working": "Working…",
-      "dontClose": "Don't close this tab. This can take up to a minute while the old wallet syncs and the transaction is broadcast."
+      "working": "Работа…",
+      "dontClose": "Не закрывайте эту вкладку. Это может занять до минуты, пока старый кошелёк синхронизируется и транзакция транслируется."
     },
     "success": {
-      "title": "Recovery complete",
-      "sent": "Sent {{sats}} sats to your Bitcoin address.",
-      "viewTransaction": "View transaction"
+      "title": "Восстановление завершено",
+      "sent": "Отправлено {{sats}} сатов на ваш Bitcoin-адрес.",
+      "viewTransaction": "Посмотреть транзакцию"
     },
     "error": {
-      "title": "Recovery failed",
-      "tryAgain": "Try again"
+      "title": "Восстановление не удалось",
+      "tryAgain": "Попробовать снова"
     },
     "errors": {
-      "noNip44": "Your signer does not support NIP-44 decryption, which is required to read the relay backup. Paste your 12-word recovery phrase manually instead.",
-      "decryptFailed": "Could not decrypt the relay backup. Paste your 12-word recovery phrase manually instead.",
-      "decryptGeneric": "Failed to decrypt relay backup.",
-      "invalidWordCount": "Recovery phrase must be 12 or 24 words.",
-      "noBalance": "Your old wallet has no spendable balance. There is nothing to recover.",
-      "sweepGeneric": "Recovery failed. Please try again."
+      "noNip44": "Ваш подписчик не поддерживает дешифрование NIP-44, которое необходимо для чтения резервной копии с реле. Вставьте свою фразу восстановления из 12 слов вручную.",
+      "decryptFailed": "Не удалось расшифровать резервную копию с реле. Вставьте свою фразу восстановления из 12 слов вручную.",
+      "decryptGeneric": "Не удалось расшифровать резервную копию с реле.",
+      "invalidWordCount": "Фраза восстановления должна состоять из 12 или 24 слов.",
+      "noBalance": "У вашего старого кошелька нет тратимого баланса. Восстанавливать нечего.",
+      "sweepGeneric": "Восстановление не удалось. Пожалуйста, попробуйте снова."
     },
     "progress": {
-      "loadingSdk": "Loading wallet SDK…",
-      "connecting": "Connecting to your old wallet…",
-      "checkingBalance": "Checking balance…",
-      "preparingTransfer": "Preparing transfer of {{sats}} sats…",
-      "broadcasting": "Broadcasting transaction…"
+      "loadingSdk": "Загрузка SDK кошелька…",
+      "connecting": "Подключение к вашему старому кошельку…",
+      "checkingBalance": "Проверка баланса…",
+      "preparingTransfer": "Подготовка перевода {{sats}} сатов…",
+      "broadcasting": "Трансляция транзакции…"
     },
     "toast": {
-      "backupLoadedTitle": "Backup loaded",
-      "backupLoadedDesc": "Recovery phrase decrypted from your relays."
+      "backupLoadedTitle": "Резервная копия загружена",
+      "backupLoadedDesc": "Фраза восстановления расшифрована с ваших реле."
     }
   },
   "walletConnect": {
-    "status": "Status",
-    "ready": "Ready",
-    "notFound": "Not Found",
-    "none": "None",
-    "add": "Add",
-    "active": "Active",
-    "connectionLabel": "NWC Connection",
-    "defaultWalletName": "Lightning Wallet",
-    "setActiveTitle": "Set as active",
-    "removeTitle": "Remove wallet",
-    "helpText": "Install a WebLN browser extension or connect a NWC wallet to send zaps.",
+    "status": "Статус",
+    "ready": "Готов",
+    "notFound": "Не найден",
+    "none": "Нет",
+    "add": "Добавить",
+    "active": "Активный",
+    "connectionLabel": "Подключение NWC",
+    "defaultWalletName": "Lightning-кошелёк",
+    "setActiveTitle": "Установить как активный",
+    "removeTitle": "Удалить кошелёк",
+    "helpText": "Установите расширение браузера WebLN или подключите NWC-кошелёк, чтобы отправлять запы.",
     "webln": {
       "name": "WebLN",
-      "description": "Browser extension"
+      "description": "Расширение браузера"
     },
     "nwc": {
       "name": "Nostr Wallet Connect",
-      "description": "Remote wallet connection",
-      "connectedCount_one": "{{count}} wallet connected",
-      "connectedCount_other": "{{count}} wallets connected"
+      "description": "Удалённое подключение кошелька",
+      "connectedCount_one": "{{count}} кошелёк подключён",
+      "connectedCount_other": "{{count}} кошельков подключено"
     },
     "empty": {
-      "title": "No wallets connected",
-      "description": "Add an NWC connection to enable instant zaps."
+      "title": "Кошельки не подключены",
+      "description": "Добавьте подключение NWC, чтобы включить мгновенные запы."
     },
     "dialog": {
-      "title": "Connect NWC Wallet",
-      "description": "Paste a connection string from your NWC-compatible wallet.",
-      "aliasPlaceholder": "Wallet name (optional)",
-      "connect": "Connect",
-      "connecting": "Connecting..."
+      "title": "Подключить NWC-кошелёк",
+      "description": "Вставьте строку подключения из вашего NWC-совместимого кошелька.",
+      "aliasPlaceholder": "Имя кошелька (необязательно)",
+      "connect": "Подключить",
+      "connecting": "Подключение..."
     },
     "toast": {
-      "uriRequiredTitle": "Connection URI required",
-      "uriRequiredDesc": "Please enter a valid NWC connection URI.",
-      "activeChangedTitle": "Active wallet changed",
-      "activeChangedDesc": "The selected wallet is now active for zaps."
+      "uriRequiredTitle": "Требуется URI подключения",
+      "uriRequiredDesc": "Пожалуйста, введите действительный URI подключения NWC.",
+      "activeChangedTitle": "Активный кошелёк изменён",
+      "activeChangedDesc": "Выбранный кошелёк теперь активен для запов."
     }
   },
   "walletSend": {
-    "title": "Send Bitcoin",
-    "send": "Send Bitcoin",
-    "tapAgainToConfirm": "Tap again to confirm",
-    "approxSats": "≈ {{sats}} sats",
-    "satPerVB": "{{rate}} sat/vB",
-    "networkFee": "Network fee",
-    "available": "Available: {{usd}} ({{sats}} sats)",
+    "title": "Отправить Bitcoin",
+    "send": "Отправить Bitcoin",
+    "tapAgainToConfirm": "Нажмите ещё раз для подтверждения",
+    "approxSats": "≈ {{sats}} сатов",
+    "satPerVB": "{{rate}} сат/vB",
+    "networkFee": "Комиссия сети",
+    "available": "Доступно: {{usd}} ({{sats}} сатов)",
     "recipient": {
-      "label": "Recipient",
-      "placeholder": "bc1…, sp1…, or npub…",
-      "sendingSp": "Sending via a silent payment — the recipient gets a fresh, unlinkable on-chain address.",
-      "sendingNostr": "Sending to a Nostr user's on-chain address.",
-      "sendingRaw": "Sending to a raw Bitcoin address."
+      "label": "Получатель",
+      "placeholder": "bc1…, sp1…, или npub…",
+      "sendingSp": "Отправка через тихий платёж — получатель получает свежий, нерасшифровываемый адрес в блокчейне.",
+      "sendingNostr": "Отправка на адрес пользователя Nostr в блокчейне.",
+      "sendingRaw": "Отправка на сырой Bitcoin-адрес."
     },
     "feeSpeed": {
-      "fastest": "~10 min",
-      "halfHour": "~30 min",
-      "hour": "~1 hour",
-      "economy": "~1 day"
+      "fastest": "~10 мин",
+      "halfHour": "~30 мин",
+      "hour": "~1 час",
+      "economy": "~1 день"
     },
     "progress": {
-      "building": "Building transaction…",
-      "signing": "Signing…",
-      "broadcasting": "Broadcasting…",
-      "sending": "Sending…"
+      "building": "Создание транзакции…",
+      "signing": "Подписание…",
+      "broadcasting": "Трансляция…",
+      "sending": "Отправка…"
     },
     "errors": {
-      "unavailable": "HD wallet is not available for this login type.",
-      "enterRecipient": "Enter a Bitcoin address, sp1… address, or npub.",
-      "noSpendable": "No spendable Bitcoin in this wallet.",
-      "feesNotLoaded": "Fee rates not loaded.",
-      "cantSendToSelf": "You can't send to yourself.",
-      "enterAmount": "Enter an amount.",
-      "insufficient": "Not enough Bitcoin for this amount + network fee.",
-      "waitingPrice": "Waiting for BTC price…",
-      "noneYet": "You don't have any Bitcoin yet.",
-      "acknowledgePrivacy": "Acknowledge the privacy warning before sending."
+      "unavailable": "HD-кошелёк недоступен для этого типа входа.",
+      "enterRecipient": "Введите Bitcoin-адрес, адрес sp1… или npub.",
+      "noSpendable": "В этом кошельке нет тратимого Bitcoin.",
+      "feesNotLoaded": "Ставки комиссий не загружены.",
+      "cantSendToSelf": "Вы не можете отправить самому себе.",
+      "enterAmount": "Введите сумму.",
+      "insufficient": "Недостаточно Bitcoin для этой суммы + комиссии сети.",
+      "waitingPrice": "Ожидание цены BTC…",
+      "noneYet": "У вас пока нет Bitcoin.",
+      "acknowledgePrivacy": "Подтвердите предупреждение о конфиденциальности перед отправкой."
     },
     "toast": {
-      "failedTitle": "Transaction failed"
+      "failedTitle": "Транзакция не удалась"
     },
     "success": {
-      "title": "Bitcoin sent",
-      "satsAmount": "{{sats}} sats",
-      "viewTransaction": "View transaction",
-      "done": "Done"
+      "title": "Bitcoin отправлен",
+      "satsAmount": "{{sats}} сатов",
+      "viewTransaction": "Посмотреть транзакцию",
+      "done": "Готово"
     }
   },
   "bitcoinPublic": {
-    "lead": "Money you send is public and can be traced back to you.",
-    "learnMore": "Learn more",
-    "body": "Bitcoin is a public ledger. Transactions you send can be traced back to you forever, even after being exchanged by multiple people. Send it only to those you wish to support publicly.",
-    "bodyWithCashOut": "Bitcoin is a public ledger. Transactions you send can be traced back to you forever, even after being exchanged by multiple people. Send it only to those you wish to support publicly, or cash out at an exchange.",
-    "iUnderstand": "I understand this transaction is public."
+    "lead": "Отправляемые вами деньги публичны и могут быть отслежены до вас.",
+    "learnMore": "Узнать больше",
+    "body": "Bitcoin — это публичный реестр. Транзакции, которые вы отправляете, могут быть отслежены до вас навсегда, даже после обмена несколькими людьми. Отправляйте только тем, кого хотите поддерживать публично.",
+    "bodyWithCashOut": "Bitcoin — это публичный реестр. Транзакции, которые вы отправляете, могут быть отслежены до вас навсегда, даже после обмена несколькими людьми. Отправляйте только тем, кого хотите поддерживать публично, или обналичивайте на бирже.",
+    "iUnderstand": "Я понимаю, что эта транзакция публична."
   },
   "spScan": {
-    "title": "Scan for silent payments",
-    "description": "Walks the configured BIP-352 indexer block-by-block to detect incoming silent payments.",
-    "fromBlock": "From block",
-    "toBlock": "To block",
-    "tipPlaceholder": "tip",
-    "indexerTip": "Indexer tip",
-    "lastFullyScanned": "Last fully scanned",
-    "never": "never",
-    "includeSpent": "Include already-spent",
-    "includeSpentDesc": "Also detect silent payments that have since been spent. Use when rebuilding receive history after a missed scan or a reset.",
-    "blockProgress": "Block {{current}} / {{to}}",
-    "matches_one": "{{count}} match",
-    "matches_other": "{{count}} matches",
-    "scannedRange": "Scanned blocks {{from}} → {{to}}.",
-    "foundOutputs_one": "Found {{count}} new output.",
-    "foundOutputs_other": "Found {{count}} new outputs.",
-    "noNewPayments": "No new payments.",
-    "startScan": "Start scan",
+    "title": "Сканировать тихие платежи",
+    "description": "Проходит по настроенному индексеру BIP-352 блок за блоком, чтобы обнаружить входящие тихие платежи.",
+    "fromBlock": "От блока",
+    "toBlock": "До блока",
+    "tipPlaceholder": "вершина",
+    "indexerTip": "Вершина индексера",
+    "lastFullyScanned": "Последнее полное сканирование",
+    "never": "никогда",
+    "includeSpent": "Включить уже потраченные",
+    "includeSpentDesc": "Также обнаруживать тихие платежи, которые с тех пор были потрачены. Используйте при перестройке истории получения после пропущенного сканирования или сброса.",
+    "blockProgress": "Блок {{current}} / {{to}}",
+    "matches_one": "{{count}} совпадение",
+    "matches_other": "{{count}} совпадений",
+    "scannedRange": "Просканированы блоки {{from}} → {{to}}.",
+    "foundOutputs_one": "Найден {{count}} новый выход.",
+    "foundOutputs_other": "Найдено {{count}} новых выходов.",
+    "noNewPayments": "Нет новых платежей.",
+    "startScan": "Начать сканирование",
     "reconcile": {
-      "title": "Reconcile spent UTXOs",
-      "description": "Checks each stored silent-payment UTXO against Blockbook and removes any that have been spent. Use this if the balance is higher than it should be after a send.",
-      "checking": "Checking {{checked}} / {{total}}…",
-      "checked_one": "Checked {{count}} UTXO · pruned {{pruned}}.",
-      "checked_other": "Checked {{count}} UTXOs · pruned {{pruned}}.",
-      "reconciling": "Reconciling…",
-      "reconcileNow": "Reconcile now"
+      "title": "Сверить потраченные UTXO",
+      "description": "Проверяет каждый сохранённый UTXO тихого платежа в Blockbook и удаляет те, которые были потрачены. Используйте, если баланс выше, чем должен быть после отправки.",
+      "checking": "Проверка {{checked}} / {{total}}…",
+      "checked_one": "Проверен {{count}} UTXO · удалено {{pruned}}.",
+      "checked_other": "Проверено {{count}} UTXO · удалено {{pruned}}.",
+      "reconciling": "Сверка…",
+      "reconcileNow": "Сверить сейчас"
     }
   },
   "notifications": {
