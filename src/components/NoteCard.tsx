@@ -253,9 +253,22 @@ interface NoteCardProps {
   actionEvent?: NostrEvent;
 }
 
+type TranslatableEventField = "title" | "summary" | "content";
+
+interface TranslationField {
+  field: TranslatableEventField;
+  text: string;
+}
+
+type TranslatedEventText = Partial<Record<TranslatableEventField, string>>;
+
 /** Gets a tag value by name. */
 function getTag(tags: string[][], name: string): string | undefined {
   return tags.find(([n]) => n === name)?.[1];
+}
+
+function replaceTagValue(tags: string[][], name: string, value: string): string[][] {
+  return tags.map((tag) => tag[0] === name ? [tag[0], value, ...tag.slice(2)] : tag);
 }
 
 /** Parse single imeta tag into structured object (legacy, for kind 34236 vines). */
@@ -409,7 +422,7 @@ export const NoteCard = memo(function NoteCard({
   const { data: btcPrice } = useBtcPrice();
   const [moreMenuOpen, setMoreMenuOpen] = useState(false);
   const [replyOpen, setReplyOpen] = useState(false);
-  const [translatedContent, setTranslatedContent] = useState<string | null>(null);
+  const [translatedText, setTranslatedText] = useState<TranslatedEventText | null>(null);
 
   // Check if the current user can zap this event's author
   // TODO: Enable zapping split-recipient NIP-75 goals once zap split payments are supported.
@@ -541,11 +554,41 @@ export const NoteCard = memo(function NoteCard({
 
   const isComment = event.kind === 1111;
   const isReply = isTextNote && !isComment && isReplyEvent(event);
-  const canTranslate = isTextNote && event.content.trim().length > 0;
-  const contentEvent = translatedContent ? { ...event, content: translatedContent } : event;
+  const translationFields = useMemo<TranslationField[]>(() => {
+    if (isCampaign) {
+      const fields: TranslationField[] = [
+        { field: "title", text: getTag(event.tags, "title")?.trim() ?? "" },
+        { field: "summary", text: getTag(event.tags, "summary")?.trim() ?? "" },
+        { field: "content", text: event.content.trim() },
+      ];
+      return fields.filter(({ text }) => text.length > 0);
+    }
+
+    if (isTextNote && event.content.trim().length > 0) {
+      return [{ field: "content", text: event.content }];
+    }
+
+    return [];
+  }, [event.content, event.tags, isCampaign, isTextNote]);
+  const canTranslate = translationFields.length > 0;
+  const translationTexts = translationFields.map(({ text }) => text);
+  const translationLabelText = translationTexts.join("\n\n");
+  const contentEvent = useMemo(() => {
+    if (!translatedText) return event;
+
+    let tags = event.tags;
+    if (translatedText.title) tags = replaceTagValue(tags, "title", translatedText.title);
+    if (translatedText.summary) tags = replaceTagValue(tags, "summary", translatedText.summary);
+
+    return {
+      ...event,
+      tags,
+      content: translatedText.content ?? event.content,
+    };
+  }, [event, translatedText]);
 
   useEffect(() => {
-    setTranslatedContent(null);
+    setTranslatedText(null);
   }, [event.id]);
 
   // Find all people being replied to (for "Replying to @user1 and @user2")
@@ -694,7 +737,7 @@ export const NoteCard = memo(function NoteCard({
           <ActionContent event={event} />
 
         ) : isCampaign ? (
-          <CampaignNoteCardContent event={event} />
+          <CampaignNoteCardContent event={contentEvent} />
 
         ) : isVoiceMessage ? (
           <VoiceMessagePlayer event={event} />
@@ -887,10 +930,17 @@ export const NoteCard = memo(function NoteCard({
 
       {canTranslate && (
         <TranslateButton
-          text={event.content}
-          isTranslated={translatedContent !== null}
-          onTranslated={setTranslatedContent}
-          onReset={() => setTranslatedContent(null)}
+          text={translationLabelText}
+          texts={translationTexts}
+          isTranslated={translatedText !== null}
+          onTranslated={(_, translatedTexts) => {
+            const next: TranslatedEventText = {};
+            translationFields.forEach(({ field }, index) => {
+              next[field] = translatedTexts[index];
+            });
+            setTranslatedText(next);
+          }}
+          onReset={() => setTranslatedText(null)}
           responsiveLabel
           className="h-9 px-3 text-sm font-medium"
         />

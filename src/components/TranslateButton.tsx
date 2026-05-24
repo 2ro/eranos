@@ -26,8 +26,10 @@ interface TranslationResponse {
 interface TranslateButtonProps {
   /** Original plaintext content to translate. */
   text: string;
+  /** Optional list of plaintext fields to translate in one request. */
+  texts?: string[];
   /** Called with translated text on success. */
-  onTranslated: (translated: string) => void;
+  onTranslated: (translated: string, translatedTexts: string[]) => void;
   /** Called when the user wants to show the original content again. */
   onReset: () => void;
   /** Whether translated content is currently visible. */
@@ -39,6 +41,7 @@ interface TranslateButtonProps {
 
 export function TranslateButton({
   text,
+  texts,
   onTranslated,
   onReset,
   isTranslated,
@@ -64,14 +67,14 @@ export function TranslateButton({
     try {
       const languagePrefix = i18n.language.split("-")[0].toLowerCase();
       const targetLang = LANG_MAP[languagePrefix] ?? "EN-US";
-      const { textToTranslate, tokens } = prepareForTranslation(text);
+      const prepared = (texts && texts.length > 0 ? texts : [text]).map(prepareForTranslation);
       const translateUrl = import.meta.env.VITE_TRANSLATE_WORKER_URL ?? DEFAULT_TRANSLATE_WORKER_URL;
 
       const response = await fetch(translateUrl, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          text: [textToTranslate],
+          text: prepared.map(({ textToTranslate }) => textToTranslate),
           target_lang: targetLang,
         }),
       });
@@ -79,10 +82,11 @@ export function TranslateButton({
       if (!response.ok) throw new Error(`Translation proxy error ${response.status}`);
 
       const data = await response.json() as TranslationResponse;
-      const translated = data.translations?.[0]?.text;
-      if (!translated) throw new Error(data.error ?? "Empty translation response");
+      const translated = data.translations?.map(({ text }) => text ?? "") ?? [];
+      if (!translated[0]) throw new Error(data.error ?? "Empty translation response");
 
-      onTranslated(restoreTokens(translated, tokens));
+      const restored = translated.map((value, index) => restoreTokens(value, prepared[index]?.tokens ?? []));
+      onTranslated(restored[0], restored);
     } catch (err) {
       console.error("Translation failed:", err);
       setError(true);
