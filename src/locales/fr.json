@@ -1199,12 +1199,52 @@
       "silentBadge": "silencieux",
       "silentDetectedTitle": "Détecté via le scan de paiement silencieux BIP-352"
     },
-    "backupAction": "Sauvegarder le portefeuille",
-    "migration": {
-      "bannerTitle": "Déplacez vos fonds vers votre nouveau portefeuille",
-      "bannerBody": "Nous avons trouvé {{amount}} sur des adresses de votre ancien portefeuille. Le format de la graine Bitcoin a changé, donc ces fonds ne sont pas encore accessibles depuis ce portefeuille. Balayez-les en un seul geste.",
-      "bannerAction": "Migrer maintenant"
+    "openSettings": "Paramètres du portefeuille"
+  },
+  "walletSettings": {
+    "seoTitle": "Paramètres du portefeuille",
+    "seoDescription": "Gérez votre portefeuille Bitcoin — sauvegardez votre phrase de récupération ou récupérez les fonds d'un ancien portefeuille.",
+    "title": "Paramètres du portefeuille",
+    "subtitle": "Sauvegardez votre phrase de récupération ou récupérez les fonds d'un ancien portefeuille.",
+    "backup": {
+      "label": "Sauvegarder le portefeuille",
+      "description": "Révélez votre phrase de récupération de 24 mots."
+    },
+    "legacy": {
+      "label": "Récupération des anciens portefeuilles",
+      "description": "Déplacez les fonds d'un ancien portefeuille Agora."
     }
+  },
+  "walletBackupPage": {
+    "seoTitle": "Sauvegarder le portefeuille",
+    "seoDescription": "Révélez la phrase de récupération de 24 mots de votre portefeuille Bitcoin.",
+    "title": "Sauvegarder le portefeuille",
+    "subtitle": "Votre phrase de récupération de 24 mots. Conservez-la en lieu sûr.",
+    "loggedOut": "Connectez-vous avec votre nsec pour afficher la phrase de récupération de votre portefeuille.",
+    "unsupported": "Votre type de connexion n'expose pas la clé secrète, nous ne pouvons donc pas afficher la phrase de récupération. Déconnectez-vous et reconnectez-vous avec votre nsec pour sauvegarder le portefeuille."
+  },
+  "walletLegacy": {
+    "seoTitle": "Récupération des anciens portefeuilles",
+    "seoDescription": "Récupérez les fonds d'anciennes générations de portefeuilles Agora.",
+    "title": "Récupération des anciens portefeuilles",
+    "subtitle": "Choisissez l'ancien portefeuille que vous utilisiez et balayez son solde vers votre portefeuille actuel.",
+    "loggedOut": "Connectez-vous avec votre identité Nostr pour rechercher des fonds dans vos anciens portefeuilles.",
+    "scanning": "Analyse du portefeuille bêta V2 à la recherche de fonds…",
+    "v2Detected": {
+      "title": "Fonds trouvés dans le portefeuille V2 Prelaunch Beta",
+      "body": "Nous avons trouvé <0>{{amount}}</0> à des adresses de votre ancien portefeuille bêta V2. Ouvrez le balayage V2 ci-dessous pour les déplacer vers votre portefeuille actuel."
+    },
+    "options": {
+      "v2Beta": {
+        "label": "Portefeuille V2 Prelaunch Beta",
+        "description": "Balayez les fonds du portefeuille BIP-86 utilisant la nsec comme graine, distribué avant la dérivation BIP-39."
+      },
+      "v1Breeze": {
+        "label": "Portefeuille V1 Breeze",
+        "description": "Balayez le solde on-chain de l'ancienne custodie Lightning."
+      }
+    },
+    "footnote": "Chaque option est un balayage à sens unique vers votre portefeuille actuel. L'ancien portefeuille lui-même n'est pas restauré — seuls les fonds qu'il détenait sont récupérés."
   },
   "walletRecovery": {
     "seoTitle": "Récupérer l'ancien portefeuille",

@@ -1199,12 +1199,52 @@
       "silentBadge": "silent",
       "silentDetectedTitle": "Detected via BIP-352 silent payment scan"
     },
-    "backupAction": "Back up wallet",
-    "migration": {
-      "bannerTitle": "Move funds to your new wallet",
-      "bannerBody": "We found {{amount}} sitting at addresses from your old wallet. Bitcoin's seed format changed so those funds aren't reachable from this wallet yet. Sweep them in one tap.",
-      "bannerAction": "Migrate now"
+    "openSettings": "Wallet settings"
+  },
+  "walletSettings": {
+    "seoTitle": "Wallet Settings",
+    "seoDescription": "Manage your Bitcoin wallet — back up your seed phrase or recover funds from a previous wallet.",
+    "title": "Wallet Settings",
+    "subtitle": "Back up your seed phrase or recover funds from a previous wallet.",
+    "backup": {
+      "label": "Back up wallet",
+      "description": "Reveal your 24-word recovery phrase."
+    },
+    "legacy": {
+      "label": "Legacy wallet recovery",
+      "description": "Move funds from a previous Agora wallet."
     }
+  },
+  "walletBackupPage": {
+    "seoTitle": "Back Up Wallet",
+    "seoDescription": "Reveal the 24-word recovery phrase for your Bitcoin wallet.",
+    "title": "Back up wallet",
+    "subtitle": "Your 24-word recovery phrase. Store it somewhere safe.",
+    "loggedOut": "Log in with your nsec to view your wallet's recovery phrase.",
+    "unsupported": "Your login type doesn't expose the secret key, so we can't show a recovery phrase. Log out and sign in again with your nsec to back up the wallet."
+  },
+  "walletLegacy": {
+    "seoTitle": "Legacy Wallet Recovery",
+    "seoDescription": "Recover funds from previous Agora wallet generations.",
+    "title": "Legacy wallet recovery",
+    "subtitle": "Pick the previous wallet you used and sweep its balance into your current wallet.",
+    "loggedOut": "Log in with your Nostr identity to look up funds in your old wallets.",
+    "scanning": "Scanning the V2 beta wallet for funds…",
+    "v2Detected": {
+      "title": "Funds found in the V2 Prelaunch Beta Wallet",
+      "body": "We found <0>{{amount}}</0> at addresses from your old V2 beta wallet. Open the V2 sweep below to move them into your current wallet."
+    },
+    "options": {
+      "v2Beta": {
+        "label": "V2 Prelaunch Beta Wallet",
+        "description": "Sweep funds from the nsec-as-seed BIP-86 wallet that shipped before BIP-39 derivation."
+      },
+      "v1Breeze": {
+        "label": "V1 Breeze Wallet",
+        "description": "Sweep the on-chain balance from the legacy Lightning custody."
+      }
+    },
+    "footnote": "Each option is a one-way sweep into your current wallet. The legacy wallet itself is not restored — only the funds it held are recovered."
   },
   "walletRecovery": {
     "seoTitle": "Recover Old Wallet",

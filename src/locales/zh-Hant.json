@@ -775,7 +775,53 @@
       "sent": "已傳送",
       "silentBadge": "靜默",
       "silentDetectedTitle": "通過 BIP-352 靜默支付掃描檢測到"
+    },
+    "openSettings": "錢包設定"
+  },
+  "walletSettings": {
+    "seoTitle": "錢包設定",
+    "seoDescription": "管理你的比特幣錢包——備份助記詞或從先前的錢包恢復資金。",
+    "title": "錢包設定",
+    "subtitle": "備份你的助記詞，或從先前的錢包恢復資金。",
+    "backup": {
+      "label": "備份錢包",
+      "description": "顯示你的 24 詞恢復短語。"
+    },
+    "legacy": {
+      "label": "舊版錢包恢復",
+      "description": "從先前的 Agora 錢包轉移資金。"
     }
+  },
+  "walletBackupPage": {
+    "seoTitle": "備份錢包",
+    "seoDescription": "顯示你的比特幣錢包的 24 詞恢復短語。",
+    "title": "備份錢包",
+    "subtitle": "你的 24 詞恢復短語。請將其妥善保存。",
+    "loggedOut": "請使用你的 nsec 登入以檢視錢包的恢復短語。",
+    "unsupported": "你的登入方式不暴露私鑰，因此我們無法顯示恢復短語。請退出並使用 nsec 重新登入以備份錢包。"
+  },
+  "walletLegacy": {
+    "seoTitle": "舊版錢包恢復",
+    "seoDescription": "從先前世代的 Agora 錢包中恢復資金。",
+    "title": "舊版錢包恢復",
+    "subtitle": "選擇你之前使用過的錢包，並將其餘額一次性轉入你目前的錢包。",
+    "loggedOut": "請使用你的 Nostr 身份登入，以查詢你舊錢包中的資金。",
+    "scanning": "正在掃描 V2 beta 錢包中的資金…",
+    "v2Detected": {
+      "title": "在 V2 預發布 Beta 錢包中找到資金",
+      "body": "我們在你舊的 V2 beta 錢包的地址中找到了 <0>{{amount}}</0>。開啟下方的 V2 轉移功能以將其轉入你目前的錢包。"
+    },
+    "options": {
+      "v2Beta": {
+        "label": "V2 預發布 Beta 錢包",
+        "description": "從採用 nsec 作為種子的 BIP-86 錢包（在 BIP-39 派生之前推出）中轉移資金。"
+      },
+      "v1Breeze": {
+        "label": "V1 Breeze 錢包",
+        "description": "從舊版 Lightning 託管中轉移鏈上餘額。"
+      }
+    },
+    "footnote": "每個選項都是將資金一次性單向轉入你目前的錢包。舊錢包本身不會被恢復——只有其中持有的資金會被取回。"
   },
   "walletRecovery": {
     "seoTitle": "恢復舊錢包",

@@ -1199,12 +1199,52 @@
       "silentBadge": "silencioso",
       "silentDetectedTitle": "Detectado via escaneamento de pagamento silencioso BIP-352"
     },
-    "backupAction": "Fazer backup da carteira",
-    "migration": {
-      "bannerTitle": "Mova seus fundos para a nova carteira",
-      "bannerBody": "Encontramos {{amount}} em endereços da sua carteira antiga. O formato da semente do Bitcoin mudou, então esses fundos ainda não estão acessíveis a partir desta carteira. Transfira tudo com um toque.",
-      "bannerAction": "Migrar agora"
+    "openSettings": "Configurações da carteira"
+  },
+  "walletSettings": {
+    "seoTitle": "Configurações da carteira",
+    "seoDescription": "Gerencie sua carteira Bitcoin — faça backup da sua frase semente ou recupere fundos de uma carteira anterior.",
+    "title": "Configurações da carteira",
+    "subtitle": "Faça backup da sua frase semente ou recupere fundos de uma carteira anterior.",
+    "backup": {
+      "label": "Fazer backup da carteira",
+      "description": "Revele sua frase de recuperação de 24 palavras."
+    },
+    "legacy": {
+      "label": "Recuperação de carteira antiga",
+      "description": "Mova fundos de uma carteira anterior do Agora."
     }
+  },
+  "walletBackupPage": {
+    "seoTitle": "Fazer backup da carteira",
+    "seoDescription": "Revele a frase de recuperação de 24 palavras da sua carteira Bitcoin.",
+    "title": "Fazer backup da carteira",
+    "subtitle": "Sua frase de recuperação de 24 palavras. Guarde-a em um lugar seguro.",
+    "loggedOut": "Entre com seu nsec para ver a frase de recuperação da sua carteira.",
+    "unsupported": "Seu tipo de login não expõe a chave secreta, então não podemos mostrar uma frase de recuperação. Saia e entre novamente com seu nsec para fazer backup da carteira."
+  },
+  "walletLegacy": {
+    "seoTitle": "Recuperação de carteira antiga",
+    "seoDescription": "Recupere fundos de gerações anteriores da carteira do Agora.",
+    "title": "Recuperação de carteira antiga",
+    "subtitle": "Escolha a carteira anterior que você usou e varra o saldo dela para sua carteira atual.",
+    "loggedOut": "Entre com sua identidade Nostr para verificar fundos nas suas carteiras antigas.",
+    "scanning": "Escaneando a carteira beta V2 em busca de fundos…",
+    "v2Detected": {
+      "title": "Fundos encontrados na Carteira Beta V2 de Pré-lançamento",
+      "body": "Encontramos <0>{{amount}}</0> em endereços da sua carteira beta V2 antiga. Abra a varredura V2 abaixo para movê-los para sua carteira atual."
+    },
+    "options": {
+      "v2Beta": {
+        "label": "Carteira Beta V2 de Pré-lançamento",
+        "description": "Varra fundos da carteira BIP-86 com nsec-como-semente que existia antes da derivação BIP-39."
+      },
+      "v1Breeze": {
+        "label": "Carteira V1 Breeze",
+        "description": "Varra o saldo on-chain da custódia Lightning legada."
+      }
+    },
+    "footnote": "Cada opção é uma varredura única e de via única para sua carteira atual. A carteira antiga em si não é restaurada — apenas os fundos que ela continha são recuperados."
   },
   "walletRecovery": {
     "seoTitle": "Recuperar carteira antiga",

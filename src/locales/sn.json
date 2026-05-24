@@ -776,12 +776,52 @@
       "silentBadge": "wakanyararira",
       "silentDetectedTitle": "Zvakaonekwa kuburikidza nokuongorora kwemubhadharo wakanyararira weBIP-352"
     },
-    "backupAction": "Chengetedza backup yechikwama",
-    "migration": {
-      "bannerTitle": "Tamisira mari kuchikwama chako chitsva",
-      "bannerBody": "Takawana {{amount}} pamakero anobva muchikwama chako chekare. Maitirwo eseed eBitcoin akashanduka saka mari iyi haisati ichigona kuwanikwa kubva kuchikwama chino. Itamise nokudzvanya kamwe chete.",
-      "bannerAction": "Tamisira zvino"
+    "openSettings": "Marongerwo echikwama"
+  },
+  "walletSettings": {
+    "seoTitle": "Marongerwo eChikwama",
+    "seoDescription": "Tarisira chikwama chako cheBitcoin — chengetedza mutsara weseed kana kugarisa mari kubva muchikwama chekare.",
+    "title": "Marongerwo eChikwama",
+    "subtitle": "Chengetedza mutsara weseed kana kugarisa mari kubva muchikwama chekare.",
+    "backup": {
+      "label": "Chengetedza chikwama",
+      "description": "Ratidza mutsara wako wekugarisa wemashoko makumi maviri nemana."
+    },
+    "legacy": {
+      "label": "Kugarisa chikwama chekare",
+      "description": "Tamisira mari kubva muchikwama chekare cheAgora."
     }
+  },
+  "walletBackupPage": {
+    "seoTitle": "Chengetedza Chikwama",
+    "seoDescription": "Ratidza mutsara wekugarisa wemashoko makumi maviri nemana wechikwama chako cheBitcoin.",
+    "title": "Chengetedza chikwama",
+    "subtitle": "Mutsara wako wekugarisa wemashoko makumi maviri nemana. Uchengete panzvimbo yakachengetedzeka.",
+    "loggedOut": "Pinda nensec yako kuti uone mutsara wekugarisa wechikwama chako.",
+    "unsupported": "Mhando yako yekupinda haiburitsi kiyi yakavanzika, saka hatigoni kukuratidza mutsara wekugarisa. Buda upinde zvakare nensec yako kuti uchengetedze chikwama."
+  },
+  "walletLegacy": {
+    "seoTitle": "Kugarisa Chikwama Chekare",
+    "seoDescription": "Garisa mari kubva muzvizvarwa zvakapfuura zvechikwama cheAgora.",
+    "title": "Kugarisa chikwama chekare",
+    "subtitle": "Sarudza chikwama chekare chawaishandisa wobvisa bharanzi yacho uchiipinza muchikwama chako chazvino.",
+    "loggedOut": "Pinda nemuviri wako weNostr kuti utsvake mari muzvikwama zvako zvekare.",
+    "scanning": "Kuongorora chikwama chebeta cheV2 kuti tiwane mari…",
+    "v2Detected": {
+      "title": "Mari yawanikwa muChikwama cheV2 Prelaunch Beta",
+      "body": "Takawana <0>{{amount}}</0> pamakero echikwama chako chekare cheV2 beta. Vhura kubvisa kweV2 pazasi kuti uiendese muchikwama chako chazvino."
+    },
+    "options": {
+      "v2Beta": {
+        "label": "V2 Prelaunch Beta Wallet",
+        "description": "Bvisa mari muchikwama cheBIP-86 chaishandisa nsec-se-seed chakatangwa BIP-39 derivation isati yaiswa."
+      },
+      "v1Breeze": {
+        "label": "V1 Breeze Wallet",
+        "description": "Bvisa bharanzi yepa-chain kubva paLightning custody yekare."
+      }
+    },
+    "footnote": "Sarudzo yega yega ndeyokubvisa kekamwe chete uchiisa muchikwama chako chazvino. Chikwama chekare pacho hachidzosererwi — mari yaiva mukati ndiyo chete inogariswa."
   },
   "walletRecovery": {
     "seoTitle": "Garisa chikwama chekare",

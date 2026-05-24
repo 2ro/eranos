@@ -53,6 +53,9 @@ const WalletPage = lazy(() => import("./pages/WalletPage").then(m => ({ default:
 const WalletMigrateV1Page = lazy(() => import("./pages/WalletMigrateV1Page").then(m => ({ default: m.WalletMigrateV1Page })));
 const WalletRecoveryPage = lazy(() => import("./pages/WalletRecoveryPage").then(m => ({ default: m.WalletRecoveryPage })));
 const WalletSettingsPage = lazy(() => import("./pages/WalletSettingsPage").then(m => ({ default: m.WalletSettingsPage })));
+const BitcoinWalletSettingsPage = lazy(() => import("./pages/BitcoinWalletSettingsPage").then(m => ({ default: m.BitcoinWalletSettingsPage })));
+const WalletBackupPage = lazy(() => import("./pages/WalletBackupPage").then(m => ({ default: m.WalletBackupPage })));
+const LegacyWalletRecoveryPage = lazy(() => import("./pages/LegacyWalletRecoveryPage").then(m => ({ default: m.LegacyWalletRecoveryPage })));
 const RemoteLoginSuccessPage = lazy(() => import("./pages/RemoteLoginSuccessPage").then(m => ({ default: m.RemoteLoginSuccessPage })));
 
 /** Redirects /profile to the user's canonical profile URL (nip05 or npub). */
@@ -146,6 +149,9 @@ export function AppRouter() {
           <Route path="/settings/advanced" element={<AdvancedSettingsPage />} />
           <Route path="/settings/network" element={<NetworkSettingsPage />} />
           <Route path="/wallet" element={<WalletPage />} />
+          <Route path="/wallet/settings" element={<BitcoinWalletSettingsPage />} />
+          <Route path="/wallet/settings/backup" element={<WalletBackupPage />} />
+          <Route path="/wallet/settings/legacy" element={<LegacyWalletRecoveryPage />} />
           <Route path="/wallet/recovery" element={<WalletRecoveryPage />} />
           <Route path="/wallet/migrate-v1" element={<WalletMigrateV1Page />} />
           <Route path="/bitcoin" element={<Navigate to="/wallet" replace />} />

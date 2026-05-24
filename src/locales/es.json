@@ -776,12 +776,52 @@
       "silentBadge": "silencioso",
       "silentDetectedTitle": "Detectado mediante el escaneo de pagos silenciosos BIP-352"
     },
-    "backupAction": "Hacer copia de seguridad de la cartera",
-    "migration": {
-      "bannerTitle": "Mueve tus fondos a tu nueva cartera",
-      "bannerBody": "Encontramos {{amount}} en direcciones de tu cartera antigua. El formato de la semilla de Bitcoin ha cambiado, así que esos fondos aún no están disponibles desde esta cartera. Bárrelos con un solo toque.",
-      "bannerAction": "Migrar ahora"
+    "openSettings": "Ajustes de la cartera"
+  },
+  "walletSettings": {
+    "seoTitle": "Ajustes de la cartera",
+    "seoDescription": "Gestiona tu cartera Bitcoin — haz una copia de seguridad de tu frase semilla o recupera fondos de una cartera anterior.",
+    "title": "Ajustes de la cartera",
+    "subtitle": "Haz una copia de seguridad de tu frase semilla o recupera fondos de una cartera anterior.",
+    "backup": {
+      "label": "Copia de seguridad de la cartera",
+      "description": "Muestra tu frase de recuperación de 24 palabras."
+    },
+    "legacy": {
+      "label": "Recuperación de carteras antiguas",
+      "description": "Mueve fondos desde una cartera anterior de Agora."
     }
+  },
+  "walletBackupPage": {
+    "seoTitle": "Copia de seguridad de la cartera",
+    "seoDescription": "Muestra la frase de recuperación de 24 palabras de tu cartera Bitcoin.",
+    "title": "Copia de seguridad de la cartera",
+    "subtitle": "Tu frase de recuperación de 24 palabras. Guárdala en un lugar seguro.",
+    "loggedOut": "Inicia sesión con tu nsec para ver la frase de recuperación de tu cartera.",
+    "unsupported": "Tu tipo de inicio de sesión no expone la clave secreta, así que no podemos mostrar una frase de recuperación. Cierra sesión y vuelve a iniciarla con tu nsec para hacer una copia de seguridad de la cartera."
+  },
+  "walletLegacy": {
+    "seoTitle": "Recuperación de carteras antiguas",
+    "seoDescription": "Recupera los fondos de generaciones anteriores de la cartera de Agora.",
+    "title": "Recuperación de carteras antiguas",
+    "subtitle": "Elige la cartera anterior que utilizaste y barre su saldo a tu cartera actual.",
+    "loggedOut": "Inicia sesión con tu identidad de Nostr para buscar fondos en tus carteras antiguas.",
+    "scanning": "Buscando fondos en la cartera V2 beta…",
+    "v2Detected": {
+      "title": "Fondos encontrados en la cartera V2 beta de prelanzamiento",
+      "body": "Encontramos <0>{{amount}}</0> en direcciones de tu antigua cartera V2 beta. Abre el barrido V2 a continuación para moverlos a tu cartera actual."
+    },
+    "options": {
+      "v2Beta": {
+        "label": "Cartera V2 beta de prelanzamiento",
+        "description": "Barre los fondos de la cartera BIP-86 con nsec como semilla que se lanzó antes de la derivación BIP-39."
+      },
+      "v1Breeze": {
+        "label": "Cartera V1 Breeze",
+        "description": "Barre el saldo on-chain de la antigua custodia Lightning."
+      }
+    },
+    "footnote": "Cada opción es un barrido único hacia tu cartera actual. La cartera antigua en sí no se restaura — solo se recuperan los fondos que contenía."
   },
   "walletRecovery": {
     "seoTitle": "Recuperar cartera antigua",

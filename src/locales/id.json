@@ -1207,7 +1207,53 @@
       "sent": "Terkirim",
       "silentBadge": "silent",
       "silentDetectedTitle": "Terdeteksi melalui pemindaian silent payment BIP-352"
+    },
+    "openSettings": "Pengaturan dompet"
+  },
+  "walletSettings": {
+    "seoTitle": "Pengaturan Dompet",
+    "seoDescription": "Kelola dompet Bitcoin Anda — cadangkan frasa pemulihan atau pulihkan dana dari dompet sebelumnya.",
+    "title": "Pengaturan Dompet",
+    "subtitle": "Cadangkan frasa pemulihan Anda atau pulihkan dana dari dompet sebelumnya.",
+    "backup": {
+      "label": "Cadangkan dompet",
+      "description": "Tampilkan frasa pemulihan 24 kata Anda."
+    },
+    "legacy": {
+      "label": "Pemulihan dompet lawas",
+      "description": "Pindahkan dana dari dompet Agora sebelumnya."
     }
+  },
+  "walletBackupPage": {
+    "seoTitle": "Cadangkan Dompet",
+    "seoDescription": "Tampilkan frasa pemulihan 24 kata untuk dompet Bitcoin Anda.",
+    "title": "Cadangkan dompet",
+    "subtitle": "Frasa pemulihan 24 kata Anda. Simpan di tempat yang aman.",
+    "loggedOut": "Masuk dengan nsec Anda untuk melihat frasa pemulihan dompet Anda.",
+    "unsupported": "Jenis login Anda tidak mengekspos kunci rahasia, sehingga kami tidak bisa menampilkan frasa pemulihan. Keluar dan masuk lagi dengan nsec Anda untuk mencadangkan dompet."
+  },
+  "walletLegacy": {
+    "seoTitle": "Pemulihan Dompet Lawas",
+    "seoDescription": "Pulihkan dana dari generasi dompet Agora sebelumnya.",
+    "title": "Pemulihan dompet lawas",
+    "subtitle": "Pilih dompet sebelumnya yang Anda gunakan dan sapu saldonya ke dompet Anda saat ini.",
+    "loggedOut": "Masuk dengan identitas Nostr Anda untuk mencari dana di dompet lama Anda.",
+    "scanning": "Memindai dompet V2 beta untuk dana…",
+    "v2Detected": {
+      "title": "Dana ditemukan di V2 Prelaunch Beta Wallet",
+      "body": "Kami menemukan <0>{{amount}}</0> di alamat dari dompet V2 beta lama Anda. Buka penyapuan V2 di bawah untuk memindahkannya ke dompet Anda saat ini."
+    },
+    "options": {
+      "v2Beta": {
+        "label": "V2 Prelaunch Beta Wallet",
+        "description": "Sapu dana dari dompet BIP-86 berbasis nsec-sebagai-seed yang dirilis sebelum penurunan BIP-39."
+      },
+      "v1Breeze": {
+        "label": "V1 Breeze Wallet",
+        "description": "Sapu saldo on-chain dari kustodian Lightning lawas."
+      }
+    },
+    "footnote": "Setiap opsi adalah penyapuan satu arah ke dompet Anda saat ini. Dompet lawas itu sendiri tidak dipulihkan — hanya dana yang dimilikinya yang dipulihkan."
   },
   "walletRecovery": {
     "seoTitle": "Pulihkan Dompet Lama",

@@ -1207,7 +1207,53 @@
       "sent": "Gönderildi",
       "silentBadge": "sessiz",
       "silentDetectedTitle": "BIP-352 sessiz ödeme taramasıyla algılandı"
+    },
+    "openSettings": "Cüzdan ayarları"
+  },
+  "walletSettings": {
+    "seoTitle": "Cüzdan Ayarları",
+    "seoDescription": "Bitcoin cüzdanınızı yönetin — kurtarma ifadenizi yedekleyin veya önceki bir cüzdandan fonları kurtarın.",
+    "title": "Cüzdan Ayarları",
+    "subtitle": "Kurtarma ifadenizi yedekleyin veya önceki bir cüzdandan fonları kurtarın.",
+    "backup": {
+      "label": "Cüzdanı yedekle",
+      "description": "24 kelimelik kurtarma ifadenizi görüntüleyin."
+    },
+    "legacy": {
+      "label": "Eski cüzdan kurtarma",
+      "description": "Önceki bir Agora cüzdanından fonları taşıyın."
     }
+  },
+  "walletBackupPage": {
+    "seoTitle": "Cüzdanı Yedekle",
+    "seoDescription": "Bitcoin cüzdanınız için 24 kelimelik kurtarma ifadesini görüntüleyin.",
+    "title": "Cüzdanı yedekle",
+    "subtitle": "24 kelimelik kurtarma ifadeniz. Güvenli bir yerde saklayın.",
+    "loggedOut": "Cüzdanınızın kurtarma ifadesini görüntülemek için nsec'inizle giriş yapın.",
+    "unsupported": "Giriş türünüz gizli anahtarı sunmadığından kurtarma ifadesini gösteremiyoruz. Cüzdanı yedeklemek için çıkış yapın ve nsec'inizle tekrar giriş yapın."
+  },
+  "walletLegacy": {
+    "seoTitle": "Eski Cüzdan Kurtarma",
+    "seoDescription": "Önceki Agora cüzdan kuşaklarından fonları kurtarın.",
+    "title": "Eski cüzdan kurtarma",
+    "subtitle": "Daha önce kullandığınız cüzdanı seçin ve bakiyesini mevcut cüzdanınıza toplayın.",
+    "loggedOut": "Eski cüzdanlarınızdaki fonları aramak için Nostr kimliğinizle giriş yapın.",
+    "scanning": "V2 beta cüzdanında fonlar taranıyor…",
+    "v2Detected": {
+      "title": "V2 Lansman Öncesi Beta Cüzdanında fonlar bulundu",
+      "body": "Eski V2 beta cüzdanınızdaki adreslerde <0>{{amount}}</0> bulduk. Bunları mevcut cüzdanınıza taşımak için aşağıdaki V2 toplama işlemini açın."
+    },
+    "options": {
+      "v2Beta": {
+        "label": "V2 Lansman Öncesi Beta Cüzdanı",
+        "description": "BIP-39 türetilmesinden önce gelen, tohum olarak nsec kullanan BIP-86 cüzdanındaki fonları toplayın."
+      },
+      "v1Breeze": {
+        "label": "V1 Breeze Cüzdanı",
+        "description": "Eski Lightning saklama hizmetinden zincir üstü bakiyeyi toplayın."
+      }
+    },
+    "footnote": "Her seçenek, mevcut cüzdanınıza tek yönlü bir toplamadır. Eski cüzdanın kendisi geri yüklenmez — yalnızca tuttuğu fonlar kurtarılır."
   },
   "walletRecovery": {
     "seoTitle": "Eski Cüzdanı Kurtar",

@@ -776,12 +776,52 @@
       "silentBadge": "静默",
       "silentDetectedTitle": "通过 BIP-352 静默支付扫描检测到"
     },
-    "backupAction": "备份钱包",
-    "migration": {
-      "bannerTitle": "将资金转入你的新钱包",
-      "bannerBody": "我们发现你旧钱包的地址上还有 {{amount}}。由于比特币的种子格式有变更，这些资金目前无法从此钱包访问。点一下即可一次性转移。",
-      "bannerAction": "立即迁移"
+    "openSettings": "钱包设置"
+  },
+  "walletSettings": {
+    "seoTitle": "钱包设置",
+    "seoDescription": "管理你的比特币钱包——备份助记词或从之前的钱包中恢复资金。",
+    "title": "钱包设置",
+    "subtitle": "备份助记词或从之前的钱包中恢复资金。",
+    "backup": {
+      "label": "备份钱包",
+      "description": "显示你的 24 词恢复短语。"
+    },
+    "legacy": {
+      "label": "旧钱包恢复",
+      "description": "从之前的 Agora 钱包中转移资金。"
     }
+  },
+  "walletBackupPage": {
+    "seoTitle": "备份钱包",
+    "seoDescription": "显示你比特币钱包的 24 词恢复短语。",
+    "title": "备份钱包",
+    "subtitle": "你的 24 词恢复短语。请妥善保管在安全的地方。",
+    "loggedOut": "请使用你的 nsec 登录以查看钱包的恢复短语。",
+    "unsupported": "你的登录方式不会暴露私钥，因此我们无法显示恢复短语。请登出后使用 nsec 重新登录以备份钱包。"
+  },
+  "walletLegacy": {
+    "seoTitle": "旧钱包恢复",
+    "seoDescription": "从之前各代 Agora 钱包中恢复资金。",
+    "title": "旧钱包恢复",
+    "subtitle": "选择你之前使用的钱包，将其余额归集到你当前的钱包中。",
+    "loggedOut": "请使用你的 Nostr 身份登录，以查找旧钱包中的资金。",
+    "scanning": "正在扫描 V2 测试版钱包中的资金……",
+    "v2Detected": {
+      "title": "在 V2 预发布测试版钱包中发现资金",
+      "body": "我们在你旧的 V2 测试版钱包的地址上发现了 <0>{{amount}}</0>。请打开下方的 V2 归集，将其转入你当前的钱包。"
+    },
+    "options": {
+      "v2Beta": {
+        "label": "V2 预发布测试版钱包",
+        "description": "归集来自 BIP-39 派生之前以 nsec 作为种子的 BIP-86 钱包中的资金。"
+      },
+      "v1Breeze": {
+        "label": "V1 Breeze 钱包",
+        "description": "归集旧 Lightning 托管钱包中的链上余额。"
+      }
+    },
+    "footnote": "每个选项都是一次性的单向归集到你当前的钱包。旧钱包本身不会被恢复——只有其中保存的资金会被找回。"
   },
   "walletRecovery": {
     "seoTitle": "恢复旧钱包",

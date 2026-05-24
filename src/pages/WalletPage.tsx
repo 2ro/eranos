@@ -13,10 +13,9 @@ import {
   ShieldOff,
   KeyRound,
   Radar,
-  AlertTriangle,
+  Settings,
 } from 'lucide-react';
 
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { LoginArea } from '@/components/auth/LoginArea';
@@ -31,11 +30,9 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { HDSendBitcoinDialog } from '@/components/HDSendBitcoinDialog';
 import { HDSilentPaymentScanDialog } from '@/components/HDSilentPaymentScanDialog';
-import { WalletBackupMnemonicDialog } from '@/components/WalletBackupMnemonic';
 import { useAppContext } from '@/hooks/useAppContext';
 import { useHdWallet } from '@/hooks/useHdWallet';
 import { useHdWalletSp } from '@/hooks/useHdWalletSp';
-import { useHdWalletV1Migration } from '@/hooks/useHdWalletV1Migration';
 import { useHdBtcPrice } from '@/hooks/useHdBtcPrice';
 import { satsToUSD, formatBTC } from '@/lib/bitcoin';
 import type { HdTransaction } from '@/lib/hdwallet/scan';
@@ -57,7 +54,6 @@ export function WalletPage() {
     nextReceiveAddress,
   } = useHdWallet();
   const sp = useHdWalletSp();
-  const migration = useHdWalletV1Migration();
   const { data: btcPrice } = useHdBtcPrice();
 
   const [copiedAddress, setCopiedAddress] = useState(false);
@@ -66,7 +62,6 @@ export function WalletPage() {
   const [sendOpen, setSendOpen] = useState(false);
   const [receiveOpen, setReceiveOpen] = useState(false);
   const [spScanOpen, setSpScanOpen] = useState(false);
-  const [backupOpen, setBackupOpen] = useState(false);
 
   useSeoMeta({
     title: `${t('wallet.seoTitle')} | ${config.appName}`,
@@ -158,32 +153,21 @@ export function WalletPage() {
   // ── Available — full HD wallet UI ────────────────────────────
   return (
     <main>
-      <div className="flex flex-col items-center px-4 pt-8 pb-4 space-y-6 max-w-sm mx-auto">
-        {/* v1 → v2 migration banner. Surfaces only when the user has any
-            balance at addresses derived under the legacy nsec-as-seed
-            scheme. Funds sit untouched at v1 addresses until the user
-            runs the sweep, so we keep the banner persistent rather than
-            dismissable — losing funds to a forgotten migration would be
-            a much worse failure mode than minor annoyance. */}
-        {migration.available && migration.v1TotalBalance > 0 && (
-          <Alert className="border-amber-300/60 bg-amber-50 text-amber-950 dark:border-amber-500/30 dark:bg-amber-950/50 dark:text-amber-100 w-full">
-            <AlertTriangle className="size-4 !text-amber-600 dark:!text-amber-400" />
-            <AlertTitle>{t('wallet.migration.bannerTitle')}</AlertTitle>
-            <AlertDescription className="space-y-2">
-              <p className="text-xs">
-                {t('wallet.migration.bannerBody', {
-                  amount: btcPrice
-                    ? satsToUSD(migration.v1TotalBalance, btcPrice)
-                    : `${formatBTC(migration.v1TotalBalance)} BTC`,
-                })}
-              </p>
-              <Button asChild size="sm" variant="default" className="mt-1">
-                <Link to="/wallet/migrate-v1">{t('wallet.migration.bannerAction')}</Link>
-              </Button>
-            </AlertDescription>
-          </Alert>
-        )}
+      {/* Top bar: settings cog only. We deliberately keep this minimal —
+          the wallet home doubles as a phone-style "home screen" with the
+          balance as the hero, so any chrome here pushes that down. */}
+      <div className="flex items-center justify-end px-4 pt-3">
+        <Link
+          to="/wallet/settings"
+          aria-label={t('wallet.openSettings')}
+          title={t('wallet.openSettings')}
+          className="p-2 -mr-2 rounded-full text-muted-foreground hover:bg-secondary hover:text-foreground motion-safe:transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+        >
+          <Settings className="size-5" />
+        </Link>
+      </div>
 
+      <div className="flex flex-col items-center px-4 pt-4 pb-4 space-y-6 max-w-sm mx-auto">
         {/* Balance */}
         {isLoading ? (
           <div className="flex flex-col items-center space-y-2">
@@ -253,21 +237,11 @@ export function WalletPage() {
           </div>
         )}
 
-        {/* Back up wallet — surfaces the user's BIP-39 seed phrase so they
-            can import the same wallet into any BIP-39-compatible client.
-            Hidden during the initial scan to avoid layout thrash. */}
-        {!isLoading && !error && (
-          <button
-            type="button"
-            onClick={() => setBackupOpen(true)}
-            className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
-          >
-            <KeyRound className="size-3" />
-            {t('wallet.backupAction')}
-          </button>
-        )}
-
-        <WalletBackupMnemonicDialog open={backupOpen} onOpenChange={setBackupOpen} />
+        {/* Back-up affordance and v1 detection have moved into
+            `/wallet/settings` (cog in the top-right). The wallet home no
+            longer auto-detects any legacy balances — that scan only runs
+            when the user explicitly opens the Legacy Wallet Recovery
+            screen. */}
 
         <HDSendBitcoinDialog
           isOpen={sendOpen}

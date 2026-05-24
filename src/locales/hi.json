@@ -1198,7 +1198,53 @@
       "sent": "भेजे",
       "silentBadge": "silent",
       "silentDetectedTitle": "BIP-352 साइलेंट पेमेंट scan से पाया गया"
+    },
+    "openSettings": "वॉलेट सेटिंग्स"
+  },
+  "walletSettings": {
+    "seoTitle": "वॉलेट सेटिंग्स",
+    "seoDescription": "अपना Bitcoin वॉलेट मैनेज करें — अपना seed phrase बैकअप करें या पिछले वॉलेट से फंड रिकवर करें।",
+    "title": "वॉलेट सेटिंग्स",
+    "subtitle": "अपना seed phrase बैकअप करें या पिछले वॉलेट से फंड रिकवर करें।",
+    "backup": {
+      "label": "वॉलेट बैकअप करें",
+      "description": "अपना 24-शब्द रिकवरी फ़्रेज़ देखें।"
+    },
+    "legacy": {
+      "label": "पुराने वॉलेट की रिकवरी",
+      "description": "पिछले Agora वॉलेट से फंड ट्रांसफ़र करें।"
     }
+  },
+  "walletBackupPage": {
+    "seoTitle": "वॉलेट बैकअप करें",
+    "seoDescription": "अपने Bitcoin वॉलेट का 24-शब्द रिकवरी फ़्रेज़ देखें।",
+    "title": "वॉलेट बैकअप करें",
+    "subtitle": "आपका 24-शब्द रिकवरी फ़्रेज़। इसे किसी सुरक्षित जगह स्टोर करें।",
+    "loggedOut": "अपने वॉलेट का रिकवरी फ़्रेज़ देखने के लिए अपनी nsec से लॉग इन करें।",
+    "unsupported": "आपका लॉगिन प्रकार secret key को expose नहीं करता, इसलिए हम रिकवरी फ़्रेज़ नहीं दिखा सकते। वॉलेट बैकअप करने के लिए लॉग आउट करें और अपनी nsec से फिर साइन इन करें।"
+  },
+  "walletLegacy": {
+    "seoTitle": "पुराने वॉलेट की रिकवरी",
+    "seoDescription": "पिछली Agora वॉलेट generations से फंड रिकवर करें।",
+    "title": "पुराने वॉलेट की रिकवरी",
+    "subtitle": "वह पुराना वॉलेट चुनें जो आपने इस्तेमाल किया था और उसका बैलेंस अपने मौजूदा वॉलेट में sweep करें।",
+    "loggedOut": "अपने पुराने वॉलेट में फंड ढूँढने के लिए अपनी Nostr पहचान से लॉग इन करें।",
+    "scanning": "फंड के लिए V2 beta वॉलेट scan किया जा रहा है…",
+    "v2Detected": {
+      "title": "V2 Prelaunch Beta वॉलेट में फंड मिले",
+      "body": "हमें आपके पुराने V2 beta वॉलेट के एड्रेस पर <0>{{amount}}</0> मिले। इन्हें अपने मौजूदा वॉलेट में ले जाने के लिए नीचे V2 sweep खोलें।"
+    },
+    "options": {
+      "v2Beta": {
+        "label": "V2 Prelaunch Beta वॉलेट",
+        "description": "BIP-39 derivation से पहले शिप हुए nsec-as-seed BIP-86 वॉलेट से फंड sweep करें।"
+      },
+      "v1Breeze": {
+        "label": "V1 Breeze वॉलेट",
+        "description": "पुरानी Lightning custody से ऑन-चेन बैलेंस sweep करें।"
+      }
+    },
+    "footnote": "हर विकल्प आपके मौजूदा वॉलेट में एक-तरफ़ा sweep है। पुराना वॉलेट खुद बहाल नहीं होता — सिर्फ़ उसमें रखे फंड रिकवर होते हैं।"
   },
   "walletRecovery": {
     "seoTitle": "पुराना वॉलेट रिकवर करें",
