@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 
 import { EmbeddedNote } from '@/components/EmbeddedNote';
 import { HoverCard, HoverCardContent, HoverCardTrigger } from '@/components/ui/hover-card';
@@ -25,6 +26,7 @@ interface ReplyContextProps {
  * Used consistently across NoteCard and notification views.
  */
 export function ReplyContext({ pubkeys, parentEventId, parentRelayHint, parentAuthorHint, className }: ReplyContextProps) {
+  const { t } = useTranslation();
   // Filter out any undefined/empty pubkeys defensively
   const validPubkeys = pubkeys.filter(Boolean);
   // Show max 2 authors for cleaner UI
@@ -33,7 +35,7 @@ export function ReplyContext({ pubkeys, parentEventId, parentRelayHint, parentAu
   const replyingToLabel = parentEventId ? (
     <HoverCard openDelay={300} closeDelay={150}>
       <HoverCardTrigger asChild>
-        <span className="shrink-0 cursor-pointer hover:underline">Replying to</span>
+        <span className="shrink-0 cursor-pointer hover:underline">{t('feed.replyContext.replyingTo')}</span>
       </HoverCardTrigger>
       <HoverCardContent
         side="bottom"
@@ -52,7 +54,7 @@ export function ReplyContext({ pubkeys, parentEventId, parentRelayHint, parentAu
       </HoverCardContent>
     </HoverCard>
   ) : (
-    <span className="shrink-0">Replying to</span>
+    <span className="shrink-0">{t('feed.replyContext.replyingTo')}</span>
   );
 
   return (
@@ -61,12 +63,12 @@ export function ReplyContext({ pubkeys, parentEventId, parentRelayHint, parentAu
       {displayPubkeys.map((pubkey, index) => (
         <span key={pubkey} className="inline-flex items-center gap-1 min-w-0">
           <ReplyAuthor pubkey={pubkey} />
-          {index < displayPubkeys.length - 1 && <span className="shrink-0">and</span>}
+          {index < displayPubkeys.length - 1 && <span className="shrink-0">{t('feed.replyContext.and')}</span>}
         </span>
       ))}
       {validPubkeys.length > 2 && (
         <span className="text-muted-foreground shrink-0">
-          and {validPubkeys.length - 2} other{validPubkeys.length - 2 !== 1 ? 's' : ''}
+          {t('feed.replyContext.andOthers', { count: validPubkeys.length - 2 })}
         </span>
       )}
     </div>

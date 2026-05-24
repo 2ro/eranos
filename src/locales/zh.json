@@ -48,7 +48,50 @@
     "addAccount": "添加其他账户"
   },
   "feed": {
-    "indexTagline": "你的内容。你的风格。你的规则。"
+    "indexTagline": "你的内容。你的风格。你的规则。",
+    "compose": {
+      "placeholder": "有什么新鲜事？"
+    },
+    "tabs": {
+      "follows": "已关注",
+      "following": "关注中",
+      "global": "全球"
+    },
+    "empty": {
+      "homeAgora": "Agora 暂时安静。新的活动、承诺、捐赠和帖子将在发生时显示在这里。",
+      "homeFollowingLoggedIn": "你的关注 Feed 为空。关注一些人来看看他们在做什么，或切换到 Agora 或 All Nostr。",
+      "homeFollowingLoggedOut": "登录以查看你关注的人的帖子。",
+      "homeOther": "暂无内容。请检查你的中继连接，或稍后再试。",
+      "follows": "你的 Feed 为空。关注一些人，以便在此处看到他们的帖子。",
+      "global": "未找到帖子。请检查你的中继连接，或稍后再来。",
+      "browseAgora": "浏览 Agora Feed",
+      "browseGlobal": "浏览全球 Feed",
+      "discoverPeople": "发现可关注的人",
+      "logIn": "登录"
+    },
+    "modeSwitcher": {
+      "agora": "Agora",
+      "allNostr": "全部 Nostr",
+      "following": "关注中",
+      "ariaLabel": "Feed 模式：{{label}}。点击更改。",
+      "loginRequired": "登录以查看你关注的人的帖子"
+    },
+    "replyContext": {
+      "replyingTo": "回复",
+      "and": "和",
+      "andOthers_one": "及其他 {{count}} 人",
+      "andOthers_other": "及其他 {{count}} 人"
+    },
+    "actions": {
+      "reply": "回复",
+      "repost": "转发",
+      "undoRepost": "撤销转发",
+      "react": "反应",
+      "zap": "Zap",
+      "share": "分享",
+      "more": "更多",
+      "linkCopied": "链接已复制到剪贴板"
+    }
   },
   "forms": {
     "required": "必填",

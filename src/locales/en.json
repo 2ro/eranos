@@ -48,7 +48,50 @@
     "addAccount": "Add another account"
   },
   "feed": {
-    "indexTagline": "Your content. Your vibe. Your rules."
+    "indexTagline": "Your content. Your vibe. Your rules.",
+    "compose": {
+      "placeholder": "What's happening?"
+    },
+    "tabs": {
+      "follows": "Follows",
+      "following": "Following",
+      "global": "Global"
+    },
+    "empty": {
+      "homeAgora": "Quiet moment on Agora. New campaigns, pledges, donations, and posts will appear here as they happen.",
+      "homeFollowingLoggedIn": "Your follow feed is empty. Follow some people to see what they're up to, or switch to Agora or All Nostr.",
+      "homeFollowingLoggedOut": "Log in to see posts from people you follow.",
+      "homeOther": "Nothing to show. Check your relay connections or try again in a moment.",
+      "follows": "Your feed is empty. Follow some people to see their posts here.",
+      "global": "No posts found. Check your relay connections or come back soon.",
+      "browseAgora": "Browse the Agora feed",
+      "browseGlobal": "Browse the Global feed",
+      "discoverPeople": "Discover people to follow",
+      "logIn": "Log in"
+    },
+    "modeSwitcher": {
+      "agora": "Agora",
+      "allNostr": "All Nostr",
+      "following": "Following",
+      "ariaLabel": "Feed mode: {{label}}. Click to change.",
+      "loginRequired": "Log in to see posts from people you follow"
+    },
+    "replyContext": {
+      "replyingTo": "Replying to",
+      "and": "and",
+      "andOthers_one": "and {{count}} other",
+      "andOthers_other": "and {{count}} others"
+    },
+    "actions": {
+      "reply": "Reply",
+      "repost": "Repost",
+      "undoRepost": "Undo repost",
+      "react": "React",
+      "zap": "Zap",
+      "share": "Share",
+      "more": "More",
+      "linkCopied": "Link copied to clipboard"
+    }
   },
   "forms": {
     "required": "Required",

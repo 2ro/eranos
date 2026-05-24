@@ -48,7 +48,50 @@
     "addAccount": "إضافة حساب آخر"
   },
   "feed": {
-    "indexTagline": "محتواك. أسلوبك. قواعدك."
+    "indexTagline": "محتواك. أسلوبك. قواعدك.",
+    "compose": {
+      "placeholder": "ماذا يحدث؟"
+    },
+    "tabs": {
+      "follows": "المتابَعون",
+      "following": "أتابع",
+      "global": "عالمي"
+    },
+    "empty": {
+      "homeAgora": "لحظة هادئة على Agora. ستظهر هنا الحملات والتعهدات والتبرعات والمنشورات الجديدة فور حدوثها.",
+      "homeFollowingLoggedIn": "خلاصة المتابَعين فارغة. تابع بعض الأشخاص لرؤية ما يفعلونه، أو انتقل إلى Agora أو All Nostr.",
+      "homeFollowingLoggedOut": "سجّل الدخول لرؤية منشورات من تتابعهم.",
+      "homeOther": "لا شيء لعرضه. تحقّق من اتصالات الـrelays أو حاول مجددًا بعد قليل.",
+      "follows": "خلاصتك فارغة. تابع بعض الأشخاص لرؤية منشوراتهم هنا.",
+      "global": "لم يتم العثور على منشورات. تحقّق من اتصالات الـrelays أو عُد قريبًا.",
+      "browseAgora": "تصفّح خلاصة Agora",
+      "browseGlobal": "تصفّح الخلاصة العالمية",
+      "discoverPeople": "اكتشف أشخاصًا لمتابعتهم",
+      "logIn": "تسجيل الدخول"
+    },
+    "modeSwitcher": {
+      "agora": "Agora",
+      "allNostr": "كل Nostr",
+      "following": "أتابع",
+      "ariaLabel": "وضع الخلاصة: {{label}}. انقر للتغيير.",
+      "loginRequired": "سجّل الدخول لرؤية منشورات من تتابعهم"
+    },
+    "replyContext": {
+      "replyingTo": "ردًّا على",
+      "and": "و",
+      "andOthers_one": "و{{count}} آخر",
+      "andOthers_other": "و{{count}} آخرين"
+    },
+    "actions": {
+      "reply": "رد",
+      "repost": "إعادة نشر",
+      "undoRepost": "تراجع عن إعادة النشر",
+      "react": "تفاعل",
+      "zap": "Zap",
+      "share": "مشاركة",
+      "more": "المزيد",
+      "linkCopied": "تم نسخ الرابط إلى الحافظة"
+    }
   },
   "forms": {
     "required": "مطلوب",

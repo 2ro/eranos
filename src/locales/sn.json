@@ -48,7 +48,50 @@
     "addAccount": "Wedzera imwe akaunti"
   },
   "feed": {
-    "indexTagline": "Zviri zvako. Mafambisirwo ako. Mitemo yako."
+    "indexTagline": "Zviri zvako. Mafambisirwo ako. Mitemo yako.",
+    "compose": {
+      "placeholder": "Chii chiri kuitika?"
+    },
+    "tabs": {
+      "follows": "Vateveri",
+      "following": "Kutevera",
+      "global": "Pasi rose"
+    },
+    "empty": {
+      "homeAgora": "Nguva yakanyarara paAgora. Mishando mitsva, zvivimbiso, mipo, nezvinyorwa zvichaonekwa pano sezvinozoitika.",
+      "homeFollowingLoggedIn": "Feed yako yokutevera haina chinhu. Tevera vamwe vanhu kuti uone zvavari kuita, kana kuchinjira kuAgora kana All Nostr.",
+      "homeFollowingLoggedOut": "Pinda kuti uone zvinyorwa zvevanhu vauri kutevera.",
+      "homeOther": "Hapana chokuratidza. Tarisa hukama hwerelay yako kana kuedza zvakare munguva pfupi.",
+      "follows": "Feed yako haina chinhu. Tevera vamwe vanhu kuti uone zvinyorwa zvavo pano.",
+      "global": "Hapana zvinyorwa zvakawanikwa. Tarisa hukama hwerelay yako kana kudzoka manje.",
+      "browseAgora": "Tarisa Feed yeAgora",
+      "browseGlobal": "Tarisa Feed yePasi rose",
+      "discoverPeople": "Tsvaga vanhu vokutevera",
+      "logIn": "Pinda"
+    },
+    "modeSwitcher": {
+      "agora": "Agora",
+      "allNostr": "Nostr yose",
+      "following": "Kutevera",
+      "ariaLabel": "Mamiriro eFeed: {{label}}. Dzvanya kushandura.",
+      "loginRequired": "Pinda kuti uone zvinyorwa zvevanhu vauri kutevera"
+    },
+    "replyContext": {
+      "replyingTo": "Kupindura kuna",
+      "and": "uye",
+      "andOthers_one": "uye mumwe {{count}}",
+      "andOthers_other": "uye vamwe {{count}}"
+    },
+    "actions": {
+      "reply": "Pindura",
+      "repost": "Tumira zvakare",
+      "undoRepost": "Dzosera kutumira zvakare",
+      "react": "Pindura nemiitiro",
+      "zap": "Zap",
+      "share": "Govera",
+      "more": "Zvimwe",
+      "linkCopied": "Link yakopwa muclipboard"
+    }
   },
   "forms": {
     "required": "Zvinodikanwa",

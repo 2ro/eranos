@@ -1,5 +1,6 @@
 import { Check, ChevronDown, Globe, Sparkles, Users } from 'lucide-react';
 import type { ComponentType } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import {
   DropdownMenu,
@@ -17,14 +18,15 @@ import { cn } from '@/lib/utils';
 
 interface FeedModeOption {
   mode: FeedMode;
-  label: string;
+  /** Translation key suffix under `feed.modeSwitcher`. */
+  i18nKey: 'agora' | 'allNostr' | 'following';
   icon: ComponentType<{ className?: string }>;
 }
 
 const OPTIONS: FeedModeOption[] = [
-  { mode: 'agora', label: 'Agora', icon: Sparkles },
-  { mode: 'all-nostr', label: 'All Nostr', icon: Globe },
-  { mode: 'following', label: 'Following', icon: Users },
+  { mode: 'agora', i18nKey: 'agora', icon: Sparkles },
+  { mode: 'all-nostr', i18nKey: 'allNostr', icon: Globe },
+  { mode: 'following', i18nKey: 'following', icon: Users },
 ];
 
 interface FeedModeSwitcherProps {
@@ -54,7 +56,9 @@ export function FeedModeSwitcher({
   onLoginRequested,
   className,
 }: FeedModeSwitcherProps) {
+  const { t } = useTranslation();
   const active = OPTIONS.find((opt) => opt.mode === value) ?? OPTIONS[0];
+  const activeLabel = t(`feed.modeSwitcher.${active.i18nKey}`);
 
   return (
     <DropdownMenu>
@@ -65,10 +69,10 @@ export function FeedModeSwitcher({
           'focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background',
           className,
         )}
-        aria-label={`Feed mode: ${active.label}. Click to change.`}
+        aria-label={t('feed.modeSwitcher.ariaLabel', { label: activeLabel })}
       >
         <span className="text-2xl sm:text-3xl font-bold tracking-tight leading-none">
-          {active.label}
+          {activeLabel}
         </span>
         <ChevronDown
           className="size-5 text-muted-foreground motion-safe:transition-transform group-data-[state=open]:rotate-180"
@@ -102,7 +106,7 @@ export function FeedModeSwitcher({
               data-disabled={disabled || undefined}
             >
               <Icon className="size-4 shrink-0 text-muted-foreground" aria-hidden />
-              <span className="flex-1 text-sm font-medium">{opt.label}</span>
+              <span className="flex-1 text-sm font-medium">{t(`feed.modeSwitcher.${opt.i18nKey}`)}</span>
               {isActive && <Check className="size-4 shrink-0 text-primary" aria-hidden />}
             </DropdownMenuItem>
           );
@@ -112,7 +116,7 @@ export function FeedModeSwitcher({
               <Tooltip key={opt.mode}>
                 <TooltipTrigger asChild>{itemContent}</TooltipTrigger>
                 <TooltipContent side="right">
-                  Log in to see posts from people you follow
+                  {t('feed.modeSwitcher.loginRequired')}
                 </TooltipContent>
               </Tooltip>
             );

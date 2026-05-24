@@ -48,7 +48,50 @@
     "addAccount": "Agregar otra cuenta"
   },
   "feed": {
-    "indexTagline": "Tu contenido. Tu estilo. Tus reglas."
+    "indexTagline": "Tu contenido. Tu estilo. Tus reglas.",
+    "compose": {
+      "placeholder": "¿Qué está pasando?"
+    },
+    "tabs": {
+      "follows": "Seguidos",
+      "following": "Siguiendo",
+      "global": "Global"
+    },
+    "empty": {
+      "homeAgora": "Momento tranquilo en Agora. Las nuevas campañas, promesas, donaciones y publicaciones aparecerán aquí cuando ocurran.",
+      "homeFollowingLoggedIn": "Tu feed de seguidos está vacío. Sigue a algunas personas para ver lo que comparten, o cambia a Agora o All Nostr.",
+      "homeFollowingLoggedOut": "Inicia sesión para ver publicaciones de las personas que sigues.",
+      "homeOther": "Nada que mostrar. Comprueba tus conexiones de relays o vuelve a intentarlo en un momento.",
+      "follows": "Tu feed está vacío. Sigue a algunas personas para ver sus publicaciones aquí.",
+      "global": "No se encontraron publicaciones. Comprueba tus conexiones de relays o vuelve pronto.",
+      "browseAgora": "Ver el feed de Agora",
+      "browseGlobal": "Ver el feed Global",
+      "discoverPeople": "Descubre personas a quienes seguir",
+      "logIn": "Iniciar sesión"
+    },
+    "modeSwitcher": {
+      "agora": "Agora",
+      "allNostr": "Todo Nostr",
+      "following": "Siguiendo",
+      "ariaLabel": "Modo del feed: {{label}}. Haz clic para cambiar.",
+      "loginRequired": "Inicia sesión para ver publicaciones de las personas que sigues"
+    },
+    "replyContext": {
+      "replyingTo": "Respondiendo a",
+      "and": "y",
+      "andOthers_one": "y {{count}} más",
+      "andOthers_other": "y {{count}} más"
+    },
+    "actions": {
+      "reply": "Responder",
+      "repost": "Republicar",
+      "undoRepost": "Deshacer republicación",
+      "react": "Reaccionar",
+      "zap": "Zap",
+      "share": "Compartir",
+      "more": "Más",
+      "linkCopied": "Enlace copiado al portapapeles"
+    }
   },
   "forms": {
     "required": "Obligatorio",
