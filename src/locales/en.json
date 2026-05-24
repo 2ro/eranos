@@ -38,7 +38,7 @@
     "privacy": "Privacy",
     "safety": "Safety",
     "changelog": "Changelog",
-    "footerTagline": "© {{year}} {{appName}}. Fundraisers on Nostr."
+    "sourceCode": "Source code"
   },
   "auth": {
     "join": "Join",

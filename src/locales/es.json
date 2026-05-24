@@ -38,7 +38,7 @@
     "privacy": "Privacidad",
     "safety": "Seguridad",
     "changelog": "Novedades",
-    "footerTagline": "© {{year}} {{appName}}. Recaudaciones en Nostr."
+    "sourceCode": "Código fuente"
   },
   "auth": {
     "join": "Unirse",

@@ -5,11 +5,11 @@ import { Toaster } from "./components/ui/toaster";
 import { TopNav } from "./components/TopNav";
 import { ScrollToTop } from "./components/ScrollToTop";
 import { VersionCheck } from "./components/VersionCheck";
-import { useAppContext } from "./hooks/useAppContext";
 import { useCurrentUser } from "./hooks/useCurrentUser";
 import { useProfileUrl } from "./hooks/useProfileUrl";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
+import { openUrl } from "@/lib/downloadFile";
 
 // Critical-path pages: eagerly loaded (landing + fallback)
 import Index from "./pages/Index";
@@ -73,11 +73,16 @@ function PageSkeleton() {
 
 function SiteFooter() {
   const { t } = useTranslation();
-  const { config } = useAppContext();
   return (
     <footer className="bg-background mt-auto pt-12">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 py-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-muted-foreground">
-        <span>{t('nav.footerTagline', { year: new Date().getFullYear(), appName: config.appName })}</span>
+        <button
+          type="button"
+          onClick={() => void openUrl("https://gitlab.com/soapbox-pub/agora")}
+          className="hover:text-foreground motion-safe:transition-colors"
+        >
+          {t('nav.sourceCode')}
+        </button>
         <nav className="flex items-center gap-5">
           <Link to="/about" className="hover:text-foreground motion-safe:transition-colors">{t('nav.about')}</Link>
           <Link to="/privacy" className="hover:text-foreground motion-safe:transition-colors">{t('nav.privacy')}</Link>

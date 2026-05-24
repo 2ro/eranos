@@ -38,7 +38,7 @@
     "privacy": "حریم خصوصی",
     "safety": "ایمنی",
     "changelog": "تغییرات",
-    "footerTagline": "© {{year}} {{appName}}. کمپین‌های جذب کمک مالی روی Nostr."
+    "sourceCode": "کد منبع"
   },
   "auth": {
     "join": "پیوستن",

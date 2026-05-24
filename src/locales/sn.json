@@ -38,7 +38,7 @@
     "privacy": "Akavanzika",
     "safety": "Kuchengetedzeka",
     "changelog": "Rondedzero yeshanduko",
-    "footerTagline": "© {{year}} {{appName}}. Mishandirapamwe yekuunganidza mari paNostr."
+    "sourceCode": "Kodhi yetsime"
   },
   "auth": {
     "join": "Joinha",

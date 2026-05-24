@@ -38,7 +38,7 @@
     "privacy": "الخصوصية",
     "safety": "السلامة",
     "changelog": "سجل التغييرات",
-    "footerTagline": "© {{year}} {{appName}}. حملات تمويل على Nostr."
+    "sourceCode": "الكود المصدري"
   },
   "auth": {
     "join": "انضمام",

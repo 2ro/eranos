@@ -38,7 +38,7 @@
     "privacy": "محرمیت",
     "safety": "خوندیتوب",
     "changelog": "د بدلونونو لاګ",
-    "footerTagline": "© {{year}} {{appName}}. د Nostr پر سر د مرستو راټولولو کمپاینونه."
+    "sourceCode": "د سرچینې کوډ"
   },
   "auth": {
     "join": "ګډون",
