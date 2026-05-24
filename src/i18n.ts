@@ -6,8 +6,11 @@ import ar from './locales/ar.json';
 import en from './locales/en.json';
 import es from './locales/es.json';
 import fa from './locales/fa.json';
+import fr from './locales/fr.json';
 import km from './locales/km.json';
 import ps from './locales/ps.json';
+import pt from './locales/pt.json';
+import ru from './locales/ru.json';
 import sn from './locales/sn.json';
 import zh from './locales/zh.json';
 
@@ -31,6 +34,9 @@ export interface SupportedLanguage {
 export const SUPPORTED_LANGUAGES: SupportedLanguage[] = [
   { code: 'en', nativeName: 'English' },
   { code: 'es', nativeName: 'Español' },
+  { code: 'fr', nativeName: 'Français' },
+  { code: 'pt', nativeName: 'Português' },
+  { code: 'ru', nativeName: 'Русский' },
   { code: 'ar', nativeName: 'العربية' },
   { code: 'fa', nativeName: 'فارسی' },
   { code: 'ps', nativeName: 'پښتو' },
@@ -67,8 +73,11 @@ i18n
       en: { translation: en },
       es: { translation: es },
       fa: { translation: fa },
+      fr: { translation: fr },
       km: { translation: km },
       ps: { translation: ps },
+      pt: { translation: pt },
+      ru: { translation: ru },
       sn: { translation: sn },
       zh: { translation: zh },
     },
