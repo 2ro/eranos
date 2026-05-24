@@ -82,6 +82,31 @@
   }
 }
 
+/* ── Han display-font overrides for Chinese (zh, zh-Hant, zh-TW, zh-HK) ────
+   Bebas Neue (the `.font-display` family) ships only Latin glyphs, so
+   Chinese hero text falls back to system fonts and loses its industrial
+   display character. Swap in Noto Sans TC weight 900 for any element
+   using `.font-display` while the page language is a Chinese variant.
+
+   Tailwind's `italic`, `uppercase`, and `tracking-*` utilities are
+   applied directly to those hero elements; we reverse them here because
+   Han text doesn't have a meaningful italic form, never uppercases, and
+   wants tighter (not wider) letter-spacing. The `:lang()` selector has
+   higher specificity (0,1,1) than a single utility class (0,1,0) so
+   these rules win without `!important`.
+
+   `-webkit-text-stroke` is neutralized because the hero h1 fattens its
+   weight with a 0.022em stroke (Bebas Neue only ships weight 400); at
+   Noto Sans TC weight 900 the stroke trick muddies CJK strokes. */
+:root[lang|="zh"] .font-display {
+  font-family: 'Noto Sans TC', 'PingFang TC', 'PingFang SC', 'Microsoft JhengHei', 'Microsoft YaHei', 'Heiti TC', sans-serif;
+  font-weight: 900;
+  font-style: normal;
+  letter-spacing: 0;
+  text-transform: none;
+  -webkit-text-stroke: 0;
+}
+
 @layer utilities {
   /* ── Safe-area inset utilities ────────────────────────────────────────────
      Use var(--safe-area-inset-*, …) as the outer wrapper so that
