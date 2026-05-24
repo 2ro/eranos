@@ -8,6 +8,7 @@ import es from './locales/es.json';
 import fa from './locales/fa.json';
 import fr from './locales/fr.json';
 import hi from './locales/hi.json';
+import id from './locales/id.json';
 import km from './locales/km.json';
 import ps from './locales/ps.json';
 import pt from './locales/pt.json';
@@ -37,6 +38,7 @@ export const SUPPORTED_LANGUAGES: SupportedLanguage[] = [
   { code: 'es', nativeName: 'Español' },
   { code: 'fr', nativeName: 'Français' },
   { code: 'hi', nativeName: 'हिन्दी' },
+  { code: 'id', nativeName: 'Bahasa Indonesia' },
   { code: 'pt', nativeName: 'Português' },
   { code: 'ru', nativeName: 'Русский' },
   { code: 'ar', nativeName: 'العربية' },
@@ -77,6 +79,7 @@ i18n
       fa: { translation: fa },
       fr: { translation: fr },
       hi: { translation: hi },
+      id: { translation: id },
       km: { translation: km },
       ps: { translation: ps },
       pt: { translation: pt },
