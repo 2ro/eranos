@@ -1607,297 +1607,297 @@
     }
   },
   "profileSettings": {
-    "seoTitle": "Profile | Settings",
-    "seoDescription": "Edit your {{appName}} profile",
+    "seoTitle": "Профиль | Настройки",
+    "seoDescription": "Изменить ваш профиль {{appName}}",
     "header": {
-      "title": "Profile",
-      "subtitle": "Your Nostr identity is portable — it goes wherever you go.",
-      "save": "Save"
+      "title": "Профиль",
+      "subtitle": "Ваша идентичность Nostr портативна — она следует за вами куда угодно.",
+      "save": "Сохранить"
     },
     "intro": {
-      "heading": "Your Identity",
-      "body": "Tap any field on the card to edit. Click your avatar or banner to upload and crop a new image."
+      "heading": "Ваша идентичность",
+      "body": "Нажмите на любое поле карточки, чтобы изменить. Нажмите на аватар или баннер, чтобы загрузить и обрезать новое изображение."
     },
-    "uploading": "Uploading…",
+    "uploading": "Загрузка…",
     "fields": {
-      "heading": "Profile Fields",
-      "website": "Website",
-      "websitePlaceholder": "https://yourwebsite.com",
+      "heading": "Поля профиля",
+      "website": "Веб-сайт",
+      "websitePlaceholder": "https://вашсайт.com",
       "lightning": "Lightning",
-      "lightningPlaceholder": "you@walletofsatoshi.com",
-      "labelPlaceholder": "Label",
-      "tickerPlaceholder": "Ticker",
-      "addressPlaceholder": "Address",
-      "valuePlaceholder": "Value or URL",
-      "mediaPlaceholder": "Upload file or paste direct file link",
-      "chooseFile": "Choose file to upload",
-      "chooseMediaFile": "Choose a media file to upload"
+      "lightningPlaceholder": "вы@walletofsatoshi.com",
+      "labelPlaceholder": "Метка",
+      "tickerPlaceholder": "Тикер",
+      "addressPlaceholder": "Адрес",
+      "valuePlaceholder": "Значение или URL",
+      "mediaPlaceholder": "Загрузить файл или вставить прямую ссылку на файл",
+      "chooseFile": "Выбрать файл для загрузки",
+      "chooseMediaFile": "Выбрать медиафайл для загрузки"
     },
     "presets": {
       "music": {
-        "label": "Music",
-        "description": "Upload a song or audio clip",
-        "valuePlaceholder": "Upload audio or paste direct file link"
+        "label": "Музыка",
+        "description": "Загрузить песню или аудиоклип",
+        "valuePlaceholder": "Загрузить аудио или вставить прямую ссылку"
       },
       "photo": {
-        "label": "Photo",
-        "description": "Upload an image",
-        "valuePlaceholder": "Upload image or paste direct file link"
+        "label": "Фото",
+        "description": "Загрузить изображение",
+        "valuePlaceholder": "Загрузить изображение или вставить прямую ссылку"
       },
       "video": {
-        "label": "Video",
-        "description": "Upload a video clip",
-        "valuePlaceholder": "Upload video or paste direct file link"
+        "label": "Видео",
+        "description": "Загрузить видеоклип",
+        "valuePlaceholder": "Загрузить видео или вставить прямую ссылку"
       },
       "email": {
         "label": "Email",
         "defaultLabel": "Email",
-        "description": "Contact email address",
-        "valuePlaceholder": "you@example.com"
+        "description": "Контактный email-адрес",
+        "valuePlaceholder": "вы@example.com"
       },
       "wallet": {
-        "label": "Wallet",
-        "description": "Cryptocurrency wallet address",
-        "valuePlaceholder": "Address"
+        "label": "Кошелёк",
+        "description": "Адрес криптовалютного кошелька",
+        "valuePlaceholder": "Адрес"
       },
       "link": {
-        "label": "Link",
-        "description": "Link to any website or profile",
+        "label": "Ссылка",
+        "description": "Ссылка на любой сайт или профиль",
         "valuePlaceholder": "https://..."
       },
       "weather": {
-        "label": "Weather",
-        "defaultLabel": "Weather",
-        "description": "Connect a Nostr weather station",
-        "valuePlaceholder": "npub1... or naddr1... (#station-id optional)"
+        "label": "Погода",
+        "defaultLabel": "Погода",
+        "description": "Подключить метеостанцию Nostr",
+        "valuePlaceholder": "npub1... или naddr1... (#station-id необязательно)"
       },
       "custom": {
-        "label": "Custom",
-        "description": "Create any custom field",
-        "valuePlaceholder": "Value or URL"
+        "label": "Пользовательский",
+        "description": "Создать произвольное пользовательское поле",
+        "valuePlaceholder": "Значение или URL"
       }
     },
     "warnings": {
-      "audioWrongType": "This URL doesn’t point to an audio file. Upload an audio file or use a direct link ending in .mp3, .ogg, .wav, etc.",
-      "audioUnknown": "This URL may not work as an audio player. For best results, upload a file using the button or paste a direct link to an audio file.",
-      "imageWrongType": "This URL doesn’t point to an image. Upload an image or use a direct link ending in .jpg, .png, .webp, etc.",
-      "imageUnknown": "This URL may not display as an image. For best results, upload a file using the button or paste a direct link to an image file.",
-      "videoWrongType": "This URL doesn’t point to a video. Upload a video or use a direct link ending in .mp4, .webm, .mov, etc.",
-      "videoUnknown": "This URL may not display as a video. For best results, upload a file using the button or paste a direct link to a video file."
+      "audioWrongType": "Эта URL не указывает на аудиофайл. Загрузите аудиофайл или используйте прямую ссылку, заканчивающуюся на .mp3, .ogg, .wav и т.д.",
+      "audioUnknown": "Эта URL может не работать как аудиоплеер. Для лучших результатов загрузите файл с помощью кнопки или вставьте прямую ссылку на аудиофайл.",
+      "imageWrongType": "Эта URL не указывает на изображение. Загрузите изображение или используйте прямую ссылку, заканчивающуюся на .jpg, .png, .webp и т.д.",
+      "imageUnknown": "Эта URL может не отображаться как изображение. Для лучших результатов загрузите файл с помощью кнопки или вставьте прямую ссылку на файл изображения.",
+      "videoWrongType": "Эта URL не указывает на видео. Загрузите видео или используйте прямую ссылку, заканчивающуюся на .mp4, .webm, .mov и т.д.",
+      "videoUnknown": "Эта URL может не отображаться как видео. Для лучших результатов загрузите файл с помощью кнопки или вставьте прямую ссылку на файл видео."
     },
     "crop": {
-      "profile": "Crop Profile Picture",
-      "banner": "Crop Banner"
+      "profile": "Обрезать фото профиля",
+      "banner": "Обрезать баннер"
     },
-    "mobilePreview": "Profile Fields Preview",
+    "mobilePreview": "Превью полей профиля",
     "advanced": {
-      "heading": "Advanced",
-      "botLabel": "Bot Account",
-      "botDescription": "Mark this account as automated"
+      "heading": "Расширенные",
+      "botLabel": "Бот-аккаунт",
+      "botDescription": "Отметить этот аккаунт как автоматизированный"
     },
     "toast": {
-      "uploaded": "Uploaded",
-      "mediaUploaded": "Media file uploaded",
-      "uploadFailed": "Upload failed",
-      "tryAgain": "Please try again.",
-      "profilePictureUpdated": "Profile picture updated",
-      "bannerUpdated": "Banner updated",
-      "profileSaved": "Profile saved",
-      "saveFailed": "Failed to save profile."
+      "uploaded": "Загружено",
+      "mediaUploaded": "Медиафайл загружен",
+      "uploadFailed": "Загрузка не удалась",
+      "tryAgain": "Пожалуйста, попробуйте снова.",
+      "profilePictureUpdated": "Фото профиля обновлено",
+      "bannerUpdated": "Баннер обновлён",
+      "profileSaved": "Профиль сохранён",
+      "saveFailed": "Не удалось сохранить профиль."
     },
     "key": {
-      "heading": "Your Key",
-      "extensionBody": "You're signed in with a browser extension (NIP-07). Your secret key is stored there — manage or export it from the extension itself.",
-      "bunkerBody": "You're signed in with a remote signer (NIP-46). Your secret key is held by that signer and cannot be exported from {{appName}}.",
-      "explainer": "This secret key controls your account on {{appName}}. Anyone with it can post and impersonate you. Store it in a password manager or somewhere else only you can access.",
-      "warning": "NEVER share your secret key with anyone. Avoid screenshotting it or pasting it anywhere except a password manager. If shared, others will be able to access your account.",
-      "aria": "Your secret key",
-      "copyAria": "Copy secret key",
-      "revealAria": "Reveal secret key",
-      "hideAria": "Hide secret key",
-      "backupButton": "Back Up Key",
-      "saving": "Saving…",
-      "saved": "Secret key saved",
-      "savedToFile": "Your secret key was saved to the Documents folder on your device.",
-      "saveFailed": "Save failed",
-      "saveFailedDescription": "Could not save the key. Please copy it manually.",
-      "copyFailed": "Copy failed",
-      "copyFailedDescription": "Could not access the clipboard. Reveal the key and copy it manually."
+      "heading": "Ваш ключ",
+      "extensionBody": "Вы вошли через расширение браузера (NIP-07). Ваш секретный ключ хранится там — управляйте им или экспортируйте через само расширение.",
+      "bunkerBody": "Вы вошли через удалённый подписчик (NIP-46). Ваш секретный ключ хранится у этого подписчика и не может быть экспортирован из {{appName}}.",
+      "explainer": "Этот секретный ключ контролирует ваш аккаунт на {{appName}}. Любой, у кого он есть, может публиковать и выдавать себя за вас. Храните его в менеджере паролей или где-то ещё, к чему только у вас есть доступ.",
+      "warning": "НИКОГДА не делитесь своим секретным ключом ни с кем. Избегайте делать скриншоты или вставлять его куда-либо, кроме менеджера паролей. Если поделитесь, другие смогут получить доступ к вашему аккаунту.",
+      "aria": "Ваш секретный ключ",
+      "copyAria": "Копировать секретный ключ",
+      "revealAria": "Показать секретный ключ",
+      "hideAria": "Скрыть секретный ключ",
+      "backupButton": "Резервировать ключ",
+      "saving": "Сохранение…",
+      "saved": "Секретный ключ сохранён",
+      "savedToFile": "Ваш секретный ключ был сохранён в папке Документы на вашем устройстве.",
+      "saveFailed": "Сохранение не удалось",
+      "saveFailedDescription": "Не удалось сохранить ключ. Пожалуйста, скопируйте его вручную.",
+      "copyFailed": "Копирование не удалось",
+      "copyFailedDescription": "Не удалось получить доступ к буферу обмена. Покажите ключ и скопируйте его вручную."
     }
   },
   "faq": {
     "categories": {
-      "getting-started": { "label": "About Agora" },
-      "payments": { "label": "Bitcoin Donations on Agora" },
-      "about-nostr": { "label": "About Nostr" },
-      "legacy": { "label": "Legacy" }
+      "getting-started": { "label": "Об Agora" },
+      "payments": { "label": "Bitcoin-пожертвования на Agora" },
+      "about-nostr": { "label": "О Nostr" },
+      "legacy": { "label": "Наследие" }
     },
     "items": {
       "what-is-ditto": {
-        "question": "What is {{appName}}?",
+        "question": "Что такое {{appName}}?",
         "answer": [
-          "{{appName}} is a platform for sending Bitcoin donations — public or private — directly to activists. There's no middleman, no payment processor, and no account that can be frozen.",
-          "{{appName}} is built on Nostr, so your identity isn't locked to this site — you own it."
+          "{{appName}} — это платформа для отправки Bitcoin-пожертвований — публичных или приватных — напрямую активистам. Никаких посредников, никакого платёжного процессора и никакого аккаунта, который можно заморозить.",
+          "{{appName}} построен на Nostr, поэтому ваша идентичность не привязана к этому сайту — она принадлежит вам."
         ]
       },
       "cost-to-use": {
-        "question": "Does {{appName}} cost anything?",
+        "question": "Стоит ли {{appName}} что-нибудь?",
         "answer": [
-          "**No.** {{appName}} takes no platform fee. When you donate, you pay only the Bitcoin network fee that goes to miners — not to us."
+          "**Нет.** {{appName}} не берёт комиссию платформы. Когда вы жертвуете, вы платите только комиссию сети Bitcoin, которая идёт майнерам, а не нам."
         ]
       },
       "who-made-this": {
-        "question": "Who made {{appName}}?",
+        "question": "Кто создал {{appName}}?",
         "answer": [
-          "{{appName}} is built by [Soapbox](https://soapbox.pub), an open-source team building tools for the Nostr ecosystem, in collaboration with the [World Liberty Congress](https://worldlibertycongress.org/)."
+          "{{appName}} создан [Soapbox](https://soapbox.pub), командой с открытым кодом, создающей инструменты для экосистемы Nostr, в сотрудничестве с [World Liberty Congress](https://worldlibertycongress.org/)."
         ]
       },
       "send-bitcoin-onchain": {
-        "question": "How does sending Bitcoin work?",
+        "question": "Как работает отправка Bitcoin?",
         "answer": [
-          "When an activist creates a campaign, they choose what kinds of payments to accept: **public**, **private**, or **both**.",
-          "**Public** donations are real Bitcoin on-chain. They settle on the public blockchain, work in every Bitcoin wallet, and are visible to anyone.",
-          "**Private** donations use **silent payments** (BIP-352). They settle on-chain too, but the transaction can't be linked back to the activist's donation code — so they stay out of public donor lists and totals. The donor needs a wallet that supports silent payments — we recommend [Ditto Wallet](https://ditto.pub) or [Dana](https://github.com/cygnet3/dana/releases/download/v0.7.4/app-live-release.apk).",
-          "When a campaign accepts **both**, {{appName}} shows a single QR code that encodes both endpoints. Silent-payment wallets read it as private; other wallets fall back to the public address. Donors don't have to choose — their wallet picks the right path automatically.",
-          "Either way, the payment goes straight to the activist. {{appName}} never touches the funds."
+          "Когда активист создаёт кампанию, он выбирает, какие виды платежей принимать: **публичные**, **приватные** или **оба**.",
+          "**Публичные** пожертвования — это настоящий Bitcoin в блокчейне. Они зачисляются на публичный блокчейн, работают в любом Bitcoin-кошельке и видны всем.",
+          "**Приватные** пожертвования используют **тихие платежи** (BIP-352). Они также зачисляются в блокчейне, но транзакцию нельзя связать с кодом пожертвования активиста — поэтому они остаются вне публичных списков и итогов жертвователей. Жертвователю нужен кошелёк, поддерживающий тихие платежи — мы рекомендуем [Ditto Wallet](https://ditto.pub) или [Dana](https://github.com/cygnet3/dana/releases/download/v0.7.4/app-live-release.apk).",
+          "Когда кампания принимает **оба**, {{appName}} показывает один QR-код, кодирующий оба эндпойнта. Кошельки тихих платежей читают его как приватный; другие кошельки откатываются к публичному адресу. Жертвователям не нужно выбирать — их кошелёк автоматически выбирает правильный путь.",
+          "В любом случае платёж идёт напрямую активисту. {{appName}} никогда не касается средств."
         ]
       },
       "connect-wallet": {
-        "question": "What is the wallet on {{appName}}?",
+        "question": "Что такое кошелёк на {{appName}}?",
         "answer": [
-          "Your {{appName}} wallet is built from your Nostr key. It can receive Bitcoin both ways — as a public address that any Bitcoin wallet can pay, and as a silent-payments code that capable wallets can pay privately. There's nothing to sign up for; it exists the moment you have an account.",
-          "When you create a campaign, you pick whether to accept public payments, private payments, or both. To spend what you receive, see the **Activist Guide**."
+          "Ваш кошелёк {{appName}} построен из вашего ключа Nostr. Он может получать Bitcoin двумя способами — как публичный адрес, на который может заплатить любой Bitcoin-кошелёк, и как код тихих платежей, на который способные кошельки могут заплатить приватно. Ничего не нужно регистрировать; он существует с момента, когда у вас есть аккаунт.",
+          "Когда вы создаёте кампанию, вы выбираете, принимать ли публичные платежи, приватные платежи или оба. Чтобы потратить то, что вы получаете, см. **Руководство для активиста**."
         ]
       },
       "donations-are-public-general": {
-        "question": "Are donations on {{appName}} public?",
+        "question": "Публичны ли пожертвования на {{appName}}?",
         "answer": [
-          "It depends on which kind of payment the activist accepts.",
-          "**Public donations** are recorded on the Bitcoin blockchain and on Nostr. Anyone can see the amounts, timing, and addresses.",
-          "**Private donations** use silent payments. They're not publicly linkable to the activist's donation code, don't appear in donor lists, and don't count toward public totals.",
-          "When a campaign accepts both, the donor's wallet decides which path to use — silent-payment-capable wallets pay privately, others pay the public address. Read the **Donor Guide** and **Activist Guide** for the full picture."
+          "Это зависит от того, какой вид платежа принимает активист.",
+          "**Публичные пожертвования** записываются в блокчейн Bitcoin и в Nostr. Любой может увидеть суммы, время и адреса.",
+          "**Приватные пожертвования** используют тихие платежи. Они не публично связаны с кодом пожертвования активиста, не появляются в списках жертвователей и не учитываются в публичных итогах.",
+          "Когда кампания принимает оба, кошелёк жертвователя решает, какой путь использовать — кошельки, поддерживающие тихие платежи, платят приватно, другие платят на публичный адрес. Прочитайте **Руководство для жертвователя** и **Руководство для активиста**, чтобы увидеть полную картину."
         ]
       },
       "censorship-resistance": {
-        "question": "What does \"censorship-resistant\" mean here?",
+        "question": "Что здесь означает «устойчивый к цензуре»?",
         "answer": [
-          "No company sits between a donor and an activist. {{appName}} doesn't hold the funds and can't freeze the address.",
-          "As long as the Bitcoin network is running, donations can be sent and received. {{appName}} itself going offline wouldn't stop them."
+          "Никакая компания не находится между жертвователем и активистом. {{appName}} не держит средства и не может заморозить адрес.",
+          "Пока сеть Bitcoin работает, пожертвования можно отправлять и получать. Если бы сам {{appName}} ушёл в офлайн, это бы их не остановило."
         ]
       },
       "why-onchain": {
-        "question": "Why Bitcoin?",
+        "question": "Почему Bitcoin?",
         "answer": [
-          "Bitcoin is the most widely supported and censorship-resistant payment rail in the world. Every Bitcoin wallet can send it.",
-          "On {{appName}}, activists choose how to receive: **public** (a regular Bitcoin address) for maximum reach, **private** (silent payments) for unlinkable donations, or **both** so each donor's wallet picks the right path automatically. Donors who only have a consumer Bitcoin app can still contribute; donors with a silent-payments wallet get privacy by default.",
-          "The tradeoff is that public Bitcoin transactions are visible on the blockchain and pay a miner fee. The Donor and Activist guides explain how to handle both."
+          "Bitcoin — это самый широко поддерживаемый и устойчивый к цензуре платёжный путь в мире. Любой Bitcoin-кошелёк может его отправить.",
+          "На {{appName}} активисты выбирают, как получать: **публично** (обычный Bitcoin-адрес) для максимального охвата, **приватно** (тихие платежи) для нерасшифровываемых пожертвований или **оба**, чтобы кошелёк каждого жертвователя автоматически выбирал правильный путь. Жертвователи, у которых есть только потребительское приложение Bitcoin, всё равно могут участвовать; жертвователи с кошельком тихих платежей получают конфиденциальность по умолчанию.",
+          "Компромисс в том, что публичные транзакции Bitcoin видны в блокчейне и платят комиссию майнерам. Руководства для жертвователя и активиста объясняют, как обращаться с обоими."
         ]
       },
       "why-not-silent-payments": {
-        "question": "Does {{appName}} support silent payments?",
+        "question": "Поддерживает ли {{appName}} тихие платежи?",
         "answer": [
-          "Yes. When an activist creates a campaign they can accept silent payments alongside, or instead of, public Bitcoin payments. Silent-payment donations still settle on-chain, but the transaction can't be linked back to the activist's donation code — so they don't appear in public donor lists or totals.",
-          "Sending a silent payment requires a wallet that supports BIP-352. Most consumer apps don't yet, but [Ditto Wallet](https://ditto.pub) and [Dana](https://github.com/cygnet3/dana/releases/download/v0.7.4/app-live-release.apk) do.",
-          "When a campaign accepts both kinds of payment, {{appName}} encodes them in a single QR code. Silent-payment-capable wallets pay privately; everyone else pays the public address. No donor is shut out, and no activist is forced to choose between reach and privacy."
+          "Да. Когда активист создаёт кампанию, он может принимать тихие платежи вместе с публичными Bitcoin-платежами или вместо них. Пожертвования тихих платежей всё равно зачисляются в блокчейне, но транзакцию нельзя связать с кодом пожертвования активиста — поэтому они не появляются в публичных списках или итогах жертвователей.",
+          "Отправка тихого платежа требует кошелька, поддерживающего BIP-352. Большинство потребительских приложений пока этого не делают, но [Ditto Wallet](https://ditto.pub) и [Dana](https://github.com/cygnet3/dana/releases/download/v0.7.4/app-live-release.apk) делают.",
+          "Когда кампания принимает оба вида платежей, {{appName}} кодирует их в один QR-код. Кошельки, поддерживающие тихие платежи, платят приватно; все остальные платят на публичный адрес. Ни один жертвователь не остаётся в стороне, и ни один активист не вынужден выбирать между охватом и конфиденциальностью."
         ]
       },
       "why-not-lightning": {
-        "question": "Why doesn't {{appName}} use Lightning?",
+        "question": "Почему {{appName}} не использует Lightning?",
         "answer": [
-          "Lightning requires a Lightning wallet. The easiest ones (Wallet of Satoshi, Strike, Breez) are **custodial** — a company holds the funds and can be shut down, geo-blocked, or pressured into freezing accounts. Non-custodial Lightning is technically demanding and unreliable for newcomers.",
-          "We want {{appName}} to work for someone whose only Bitcoin experience is a regular consumer app like Cash App, Coinbase, Strike, Venmo, or PayPal. On-chain Bitcoin works with every wallet on the planet."
+          "Lightning требует Lightning-кошелька. Самые простые (Wallet of Satoshi, Strike, Breez) — **кастодиальные** — компания держит средства и может быть закрыта, гео-заблокирована или вынуждена замораживать аккаунты. Некастодиальный Lightning технически требователен и ненадёжен для новичков.",
+          "Мы хотим, чтобы {{appName}} работал для того, чей единственный опыт с Bitcoin — обычное потребительское приложение типа Cash App, Coinbase, Strike, Venmo или PayPal. Bitcoin в блокчейне работает с любым кошельком на планете."
         ]
       },
       "why-not-rotating-addresses": {
-        "question": "Why doesn't {{appName}} generate a new address for every donation?",
+        "question": "Почему {{appName}} не генерирует новый адрес для каждого пожертвования?",
         "answer": [
-          "Doing this would require {{appName}} to act as a money-exchanging middleman — taking custody of the Bitcoin first and then forwarding it on to the activist.",
-          "That would make us a money transmitter, subject to the regulations that come with that, and a single point of failure: shut down {{appName}}'s server and you've shut down every donation flowing through it.",
-          "Instead, each user's donation address is derived from their Nostr public key. Donors send directly to the activist, {{appName}} never touches the funds, and the platform itself can't be turned off to censor anyone. Activists who want per-donation privacy can accept silent payments, which give the same unlinkability without anyone holding the money in the middle."
+          "Это потребовало бы, чтобы {{appName}} действовал как обменивающий деньги посредник — сначала принимая Bitcoin на хранение, а затем пересылая его активисту.",
+          "Это сделало бы нас денежным передатчиком, подверженным регулированию, которое с этим связано, и единой точкой отказа: закройте сервер {{appName}}, и вы закроете каждое пожертвование, проходящее через него.",
+          "Вместо этого адрес пожертвования каждого пользователя получается из его публичного ключа Nostr. Жертвователи отправляют напрямую активисту, {{appName}} никогда не касается средств, а саму платформу нельзя отключить, чтобы цензурировать кого-либо. Активисты, желающие конфиденциальности на пожертвование, могут принимать тихие платежи, которые дают ту же нерасшифровываемость без того, чтобы кто-то держал деньги посередине."
         ]
       },
       "why-not-other-crypto": {
-        "question": "Why not Monero or another cryptocurrency?",
+        "question": "Почему не Monero или другая криптовалюта?",
         "answer": [
-          "Bitcoin is by far the most widely adopted cryptocurrency. That means it's the easiest for donors to buy and send, and the easiest for activists to receive, hold, and spend.",
-          "Privacy-focused coins like Monero offer different privacy tradeoffs than Bitcoin, but they're unsupported by most consumer apps and harder to convert back to local currency. Asking either side of a donation to first acquire a niche cryptocurrency is a barrier {{appName}} won't put in the way. For Bitcoin donations themselves, silent payments cover the unlinkability use case without leaving the Bitcoin ecosystem."
+          "Bitcoin на сегодняшний день — самая широко принятая криптовалюта. Это означает, что её легче всего покупать и отправлять жертвователям и легче всего получать, держать и тратить активистам.",
+          "Монеты, ориентированные на конфиденциальность, такие как Monero, предлагают другие компромиссы конфиденциальности, чем Bitcoin, но они не поддерживаются большинством потребительских приложений и их труднее конвертировать обратно в местную валюту. Просить любую сторону пожертвования сначала приобрести нишевую криптовалюту — это барьер, который {{appName}} не будет ставить. Для самих Bitcoin-пожертвований тихие платежи покрывают случай использования нерасшифровываемости, не покидая экосистему Bitcoin."
         ]
       },
       "what-is-nostr": {
-        "question": "What is Nostr?",
+        "question": "Что такое Nostr?",
         "answer": [
-          "Nostr is an open network where **you** own your account, not a company. Your identity is a cryptographic key you control, not a username on someone else's server.",
-          "On {{appName}}, that same key is also what your donation address is derived from — which is why you can receive Bitcoin without signing up with anyone."
+          "Nostr — это открытая сеть, где **вы** владеете своим аккаунтом, а не компания. Ваша идентичность — это криптографический ключ, которым вы управляете, а не имя пользователя на чужом сервере.",
+          "На {{appName}} тот же самый ключ — это также то, из чего получен ваш адрес пожертвования, — поэтому вы можете получать Bitcoin без регистрации у кого-либо."
         ]
       },
       "why-login-different": {
-        "question": "Why is my sign-in so different and long?",
+        "question": "Почему мой вход такой другой и длинный?",
         "answer": [
-          "Instead of a username and password controlled by a company, Nostr uses a pair of cryptographic keys.",
-          "Your \"public key\" (starts with **npub**) is your username. Your \"secret key\" (starts with **nsec**) is your password. The long string is what makes it virtually impossible to guess."
+          "Вместо имени пользователя и пароля, контролируемых компанией, Nostr использует пару криптографических ключей.",
+          "Ваш «публичный ключ» (начинается с **npub**) — это ваше имя пользователя. Ваш «секретный ключ» (начинается с **nsec**) — это ваш пароль. Длинная строка — это то, что делает практически невозможным его угадывание."
         ]
       },
       "lose-secret-key": {
-        "question": "What happens if I lose my secret key?",
+        "question": "Что произойдёт, если я потеряю свой секретный ключ?",
         "answer": [
-          "**There is no \"forgot password\" button.** Nobody can reset it for you. If you lose it, your account — and any Bitcoin sitting at your donation address — is gone forever.",
-          "**Save your secret key somewhere safe right now.** For tips, read [Managing Your Nostr Keys](https://soapbox.pub/blog/managing-nostr-keys)."
+          "**Нет кнопки «забыли пароль».** Никто не может сбросить его за вас. Если вы его потеряете, ваш аккаунт — и любой Bitcoin на вашем адресе пожертвования — потерян навсегда.",
+          "**Сохраните свой секретный ключ в безопасном месте прямо сейчас.** За советами читайте [Управление ключами Nostr](https://soapbox.pub/blog/managing-nostr-keys)."
         ]
       },
       "manage-secret-key": {
-        "question": "Can I save my secret key in my phone's password manager?",
+        "question": "Могу ли я сохранить свой секретный ключ в менеджере паролей моего телефона?",
         "answer": [
-          "Yes. You can save it in your device's password manager (iCloud Keychain, 1Password, Bitwarden, etc.). On iPhone, saving it in Passwords lets you use Face ID or Touch ID to log in.",
-          "For a full guide, see [Managing Your Nostr Keys](https://soapbox.pub/blog/managing-nostr-keys)."
+          "Да. Вы можете сохранить его в менеджере паролей вашего устройства (iCloud Keychain, 1Password, Bitwarden и т.д.). На iPhone сохранение его в Паролях позволяет использовать Face ID или Touch ID для входа.",
+          "Полное руководство см. в [Управление ключами Nostr](https://soapbox.pub/blog/managing-nostr-keys)."
         ]
       },
       "send-bitcoin-lightning": {
-        "question": "How does sending Bitcoin over Lightning work?",
+        "question": "Как работает отправка Bitcoin через Lightning?",
         "answer": [
-          "If a recipient has a Lightning address on their profile, you can send to that. Lightning settles in seconds and fees are tiny.",
-          "Lightning sends don't use {{appName}}'s donation address — they go straight to whatever Lightning wallet the recipient set up themselves. {{appName}}'s own donation flow is on-chain only."
+          "Если у получателя есть Lightning-адрес в его профиле, вы можете отправить туда. Lightning зачисляется за секунды, а комиссии крошечные.",
+          "Lightning-отправки не используют адрес пожертвования {{appName}} — они идут прямо в Lightning-кошелёк, который получатель настроил сам. Собственный поток пожертвований {{appName}} — только в блокчейне."
         ]
       },
       "what-are-zaps": {
-        "question": "What are zaps?",
+        "question": "Что такое запы?",
         "answer": [
-          "Zaps are small Lightning tips on Nostr, separate from {{appName}}'s on-chain donation flow."
+          "Запы — это маленькие Lightning-чаевые в Nostr, отдельные от потока пожертвований в блокчейне {{appName}}."
         ]
       },
       "fyp": {
-        "question": "How does the feed work?",
+        "question": "Как работает лента?",
         "answer": [
-          "Your feed shows campaigns and posts from people you follow. There's no algorithm deciding what you see."
+          "Ваша лента показывает кампании и публикации от людей, на которых вы подписаны. Никакой алгоритм не решает, что вы видите."
         ]
       },
       "what-are-relays": {
-        "question": "What are relays?",
+        "question": "Что такое реле?",
         "answer": [
-          "Relays are the servers that store and deliver Nostr events — posts, donation receipts, profile info. The defaults work out of the box; you can add or remove relays in Settings > Network."
+          "Реле — это серверы, которые хранят и доставляют события Nostr — публикации, квитанции о пожертвованиях, информацию профиля. Значения по умолчанию работают из коробки; вы можете добавлять или удалять реле в Настройки > Сеть."
         ]
       },
       "what-are-blossom": {
-        "question": "What are Blossom servers?",
+        "question": "Что такое серверы Blossom?",
         "answer": [
-          "Blossom servers store media files (campaign images, profile pictures) when you upload them. You can manage which servers you use in Settings > Network."
+          "Серверы Blossom хранят медиафайлы (изображения кампаний, фотографии профиля), когда вы их загружаете. Вы можете управлять тем, какие серверы вы используете, в Настройки > Сеть."
         ]
       },
       "report-content": {
-        "question": "How do I report harmful content?",
+        "question": "Как сообщить о вредном контенте?",
         "answer": [
-          "Tap the three-dot menu (**...**) on any post and select \"Report.\" You can mute or block users from the same menu."
+          "Нажмите на меню с тремя точками (**...**) на любой публикации и выберите «Пожаловаться». Вы можете заглушить или заблокировать пользователей в том же меню."
         ]
       },
       "vs-mastodon-bluesky": {
-        "question": "How is Nostr different from Mastodon or Bluesky?",
+        "question": "Чем Nostr отличается от Mastodon или Bluesky?",
         "answer": [
-          "On Mastodon, your account lives on a specific server. On Bluesky, most accounts depend on one company. On Nostr, your identity is a key you control, and your donation address goes with you to any Nostr app."
+          "В Mastodon ваш аккаунт живёт на определённом сервере. В Bluesky большинство аккаунтов зависят от одной компании. В Nostr ваша идентичность — это ключ, которым вы управляете, и ваш адрес пожертвования следует за вами в любое приложение Nostr."
         ]
       },
       "profile-fields": {
-        "question": "What are profile fields?",
+        "question": "Что такое поля профиля?",
         "answer": [
-          "Profile fields let you add extra info to your profile — links, wallet addresses, music, photos, videos."
+          "Поля профиля позволяют добавлять в ваш профиль дополнительную информацию — ссылки, адреса кошельков, музыку, фотографии, видео."
         ]
       }
     }
