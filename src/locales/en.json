@@ -1139,5 +1139,124 @@
     "groupsDialog": {
       "title": "All groups"
     }
+  },
+  "profileSettings": {
+    "seoTitle": "Profile | Settings",
+    "seoDescription": "Edit your {{appName}} profile",
+    "header": {
+      "title": "Profile",
+      "subtitle": "Your Nostr identity is portable — it goes wherever you go.",
+      "save": "Save"
+    },
+    "intro": {
+      "heading": "Your Identity",
+      "body": "Tap any field on the card to edit. Click your avatar or banner to upload and crop a new image."
+    },
+    "uploading": "Uploading…",
+    "fields": {
+      "heading": "Profile Fields",
+      "website": "Website",
+      "websitePlaceholder": "https://yourwebsite.com",
+      "lightning": "Lightning",
+      "lightningPlaceholder": "you@walletofsatoshi.com",
+      "labelPlaceholder": "Label",
+      "tickerPlaceholder": "Ticker",
+      "addressPlaceholder": "Address",
+      "valuePlaceholder": "Value or URL",
+      "mediaPlaceholder": "Upload file or paste direct file link",
+      "chooseFile": "Choose file to upload",
+      "chooseMediaFile": "Choose a media file to upload"
+    },
+    "presets": {
+      "music": {
+        "label": "Music",
+        "description": "Upload a song or audio clip",
+        "valuePlaceholder": "Upload audio or paste direct file link"
+      },
+      "photo": {
+        "label": "Photo",
+        "description": "Upload an image",
+        "valuePlaceholder": "Upload image or paste direct file link"
+      },
+      "video": {
+        "label": "Video",
+        "description": "Upload a video clip",
+        "valuePlaceholder": "Upload video or paste direct file link"
+      },
+      "email": {
+        "label": "Email",
+        "defaultLabel": "Email",
+        "description": "Contact email address",
+        "valuePlaceholder": "you@example.com"
+      },
+      "wallet": {
+        "label": "Wallet",
+        "description": "Cryptocurrency wallet address",
+        "valuePlaceholder": "Address"
+      },
+      "link": {
+        "label": "Link",
+        "description": "Link to any website or profile",
+        "valuePlaceholder": "https://..."
+      },
+      "weather": {
+        "label": "Weather",
+        "defaultLabel": "Weather",
+        "description": "Connect a Nostr weather station",
+        "valuePlaceholder": "npub1... or naddr1... (#station-id optional)"
+      },
+      "custom": {
+        "label": "Custom",
+        "description": "Create any custom field",
+        "valuePlaceholder": "Value or URL"
+      }
+    },
+    "warnings": {
+      "audioWrongType": "This URL doesn’t point to an audio file. Upload an audio file or use a direct link ending in .mp3, .ogg, .wav, etc.",
+      "audioUnknown": "This URL may not work as an audio player. For best results, upload a file using the button or paste a direct link to an audio file.",
+      "imageWrongType": "This URL doesn’t point to an image. Upload an image or use a direct link ending in .jpg, .png, .webp, etc.",
+      "imageUnknown": "This URL may not display as an image. For best results, upload a file using the button or paste a direct link to an image file.",
+      "videoWrongType": "This URL doesn’t point to a video. Upload a video or use a direct link ending in .mp4, .webm, .mov, etc.",
+      "videoUnknown": "This URL may not display as a video. For best results, upload a file using the button or paste a direct link to a video file."
+    },
+    "crop": {
+      "profile": "Crop Profile Picture",
+      "banner": "Crop Banner"
+    },
+    "mobilePreview": "Profile Fields Preview",
+    "advanced": {
+      "heading": "Advanced",
+      "botLabel": "Bot Account",
+      "botDescription": "Mark this account as automated"
+    },
+    "toast": {
+      "uploaded": "Uploaded",
+      "mediaUploaded": "Media file uploaded",
+      "uploadFailed": "Upload failed",
+      "tryAgain": "Please try again.",
+      "profilePictureUpdated": "Profile picture updated",
+      "bannerUpdated": "Banner updated",
+      "profileSaved": "Profile saved",
+      "saveFailed": "Failed to save profile."
+    },
+    "key": {
+      "heading": "Your Key",
+      "extensionBody": "You're signed in with a browser extension (NIP-07). Your secret key is stored there — manage or export it from the extension itself.",
+      "bunkerBody": "You're signed in with a remote signer (NIP-46). Your secret key is held by that signer and cannot be exported from {{appName}}.",
+      "explainer": "This secret key controls your account on {{appName}}. Anyone with it can post and impersonate you. Store it in a password manager or somewhere else only you can access.",
+      "warning": "NEVER share your secret key with anyone. Avoid screenshotting it or pasting it anywhere except a password manager. If shared, others will be able to access your account.",
+      "aria": "Your secret key",
+      "copyAria": "Copy secret key",
+      "revealAria": "Reveal secret key",
+      "hideAria": "Hide secret key",
+      "backupButton": "Back Up Key",
+      "saving": "Saving…",
+      "saved": "Secret key saved",
+      "savedToFile": "Your secret key was saved to the Documents folder on your device.",
+      "saveFailed": "Save failed",
+      "saveFailedDescription": "Could not save the key. Please copy it manually.",
+      "copyFailed": "Copy failed",
+      "copyFailedDescription": "Could not access the clipboard. Reveal the key and copy it manually."
+    }
   }
 }

@@ -1139,5 +1139,124 @@
     "groupsDialog": {
       "title": "Mapoka ose"
     }
+  },
+  "profileSettings": {
+    "seoTitle": "Pfungidziro | Magadzirirwo",
+    "seoDescription": "Gadziridza pfungidziro yako ye{{appName}}",
+    "header": {
+      "title": "Pfungidziro",
+      "subtitle": "Chimiro chako cheNostr chinotakurika — chinoenda newe kwese kwaunoenda.",
+      "save": "Chengeta"
+    },
+    "intro": {
+      "heading": "Chimiro chako",
+      "body": "Tinha chero ndima pakadhi kuti ugadziridze. Dzvanya pamufananidzo wako kana banner kuti uise uye uchekerere mufananidzo mutsva."
+    },
+    "uploading": "Kuisa…",
+    "fields": {
+      "heading": "Ndima dzepfungidziro",
+      "website": "Webhusayiti",
+      "websitePlaceholder": "https://yourwebsite.com",
+      "lightning": "Lightning",
+      "lightningPlaceholder": "you@walletofsatoshi.com",
+      "labelPlaceholder": "Mucherechedzo",
+      "tickerPlaceholder": "Chiratidziri",
+      "addressPlaceholder": "Kero",
+      "valuePlaceholder": "Kukosha kana URL",
+      "mediaPlaceholder": "Isa faira kana namatira link yakananga",
+      "chooseFile": "Sarudza faira rokuisa",
+      "chooseMediaFile": "Sarudza faira remedia rokuisa"
+    },
+    "presets": {
+      "music": {
+        "label": "Mimhanzi",
+        "description": "Isa rwiyo kana chidimbu cheaudhio",
+        "valuePlaceholder": "Isa audhio kana namatira link yakananga"
+      },
+      "photo": {
+        "label": "Mufananidzo",
+        "description": "Isa mufananidzo",
+        "valuePlaceholder": "Isa mufananidzo kana namatira link yakananga"
+      },
+      "video": {
+        "label": "Vhidhiyo",
+        "description": "Isa chidimbu chevhidhiyo",
+        "valuePlaceholder": "Isa vhidhiyo kana namatira link yakananga"
+      },
+      "email": {
+        "label": "Imeyili",
+        "defaultLabel": "Imeyili",
+        "description": "Kero yeimeyili yokutaurirana",
+        "valuePlaceholder": "you@example.com"
+      },
+      "wallet": {
+        "label": "Chikwama",
+        "description": "Kero yechikwama checryptocurrency",
+        "valuePlaceholder": "Kero"
+      },
+      "link": {
+        "label": "Link",
+        "description": "Link kune chero saiti kana pfungidziro",
+        "valuePlaceholder": "https://..."
+      },
+      "weather": {
+        "label": "Mamiriro ekunze",
+        "defaultLabel": "Mamiriro ekunze",
+        "description": "Batanidza chiteshi chemamiriro ekunze cheNostr",
+        "valuePlaceholder": "npub1... kana naddr1... (#station-id zvinosarudzwa)"
+      },
+      "custom": {
+        "label": "Yetsika",
+        "description": "Gadzira chero ndima yetsika",
+        "valuePlaceholder": "Kukosha kana URL"
+      }
+    },
+    "warnings": {
+      "audioWrongType": "URL iyi haina kunongedzera kufaira reaudhio. Isa faira reaudhio kana shandisa link yakananga inopera ne .mp3, .ogg, .wav, nezvimwe.",
+      "audioUnknown": "URL iyi ingangosashanda seaudio player. Kuti uwane mhinduro dzakanaka, isa faira uchishandisa bhatani kana namatira link yakananga kufaira reaudhio.",
+      "imageWrongType": "URL iyi haina kunongedzera kumufananidzo. Isa mufananidzo kana shandisa link yakananga inopera ne .jpg, .png, .webp, nezvimwe.",
+      "imageUnknown": "URL iyi ingangosaratidzwa semufananidzo. Kuti uwane mhinduro dzakanaka, isa faira uchishandisa bhatani kana namatira link yakananga kufaira remufananidzo.",
+      "videoWrongType": "URL iyi haina kunongedzera kuvhidhiyo. Isa vhidhiyo kana shandisa link yakananga inopera ne .mp4, .webm, .mov, nezvimwe.",
+      "videoUnknown": "URL iyi ingangosaratidzwa sevhidhiyo. Kuti uwane mhinduro dzakanaka, isa faira uchishandisa bhatani kana namatira link yakananga kufaira revhidhiyo."
+    },
+    "crop": {
+      "profile": "Chekerera mufananidzo wepfungidziro",
+      "banner": "Chekerera banner"
+    },
+    "mobilePreview": "Onai zvine ndima dzepfungidziro",
+    "advanced": {
+      "heading": "Yakakwirira",
+      "botLabel": "Akaundi yebhoti",
+      "botDescription": "Maka akaundi iyi seyakaautomate"
+    },
+    "toast": {
+      "uploaded": "Yakaiswa",
+      "mediaUploaded": "Faira remedia rakaiswa",
+      "uploadFailed": "Kuisa kwakundikana",
+      "tryAgain": "Edza zvakare.",
+      "profilePictureUpdated": "Mufananidzo wepfungidziro wagadziridzwa",
+      "bannerUpdated": "Banner yagadziridzwa",
+      "profileSaved": "Pfungidziro yachengetwa",
+      "saveFailed": "Hazvina kubudirira kuchengeta pfungidziro."
+    },
+    "key": {
+      "heading": "Kiyi yako",
+      "extensionBody": "Wapinda uchishandisa extension yebrowser (NIP-07). Kiyi yako yakavanzika yakachengetwa ipapo — itarisire kana uitumire kuburikidza neextension iyoyo.",
+      "bunkerBody": "Wapinda uchishandisa remote signer (NIP-46). Kiyi yako yakavanzika yakachengetwa ne signer iyoyo uye haigone kutumirwa kubva mu{{appName}}.",
+      "explainer": "Kiyi yakavanzika iyi inotonga akaundi yako pa{{appName}}. Munhu wose anenge anayo anogona kunyora uye kuita seunge ndiwe. Ichengetedze mumanager wepassword kana kuchimwe chinhambo iwe woga zvauri kugona kuwana.",
+      "warning": "USAMBOpasanise kiyi yako yakavanzika kune chero munhu. Dzivirira kutora screenshot yayo kana kunamatira pamwe pose kunze kwemanager wepassword. Kana yagoverwa, vamwe vachakwanisa kuwana akaundi yako.",
+      "aria": "Kiyi yako yakavanzika",
+      "copyAria": "Kopa kiyi yakavanzika",
+      "revealAria": "Ratidza kiyi yakavanzika",
+      "hideAria": "Vanza kiyi yakavanzika",
+      "backupButton": "Tora bekapu yekiyi",
+      "saving": "Kuchengeta…",
+      "saved": "Kiyi yakavanzika yachengetwa",
+      "savedToFile": "Kiyi yako yakavanzika yachengetwa muDocuments folder pamudziyo wako.",
+      "saveFailed": "Kuchengeta kwakundikana",
+      "saveFailedDescription": "Hazvina kubudirira kuchengeta kiyi. Ikope nemaoko.",
+      "copyFailed": "Kukopa kwakundikana",
+      "copyFailedDescription": "Hazvina kukwanisika kuwana clipboard. Ratidza kiyi wokopa nemaoko."
+    }
   }
 }

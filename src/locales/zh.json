@@ -1139,5 +1139,124 @@
     "groupsDialog": {
       "title": "所有群组"
     }
+  },
+  "profileSettings": {
+    "seoTitle": "资料 | 设置",
+    "seoDescription": "编辑你的 {{appName}} 资料",
+    "header": {
+      "title": "资料",
+      "subtitle": "你的 Nostr 身份是可移植的——它会跟随你到任何地方。",
+      "save": "保存"
+    },
+    "intro": {
+      "heading": "你的身份",
+      "body": "点击卡片上的任意字段进行编辑。点击头像或横幅可上传并裁剪新图片。"
+    },
+    "uploading": "上传中…",
+    "fields": {
+      "heading": "资料字段",
+      "website": "网站",
+      "websitePlaceholder": "https://yourwebsite.com",
+      "lightning": "Lightning",
+      "lightningPlaceholder": "you@walletofsatoshi.com",
+      "labelPlaceholder": "标签",
+      "tickerPlaceholder": "代码",
+      "addressPlaceholder": "地址",
+      "valuePlaceholder": "值或 URL",
+      "mediaPlaceholder": "上传文件或粘贴直接文件链接",
+      "chooseFile": "选择要上传的文件",
+      "chooseMediaFile": "选择要上传的媒体文件"
+    },
+    "presets": {
+      "music": {
+        "label": "音乐",
+        "description": "上传歌曲或音频片段",
+        "valuePlaceholder": "上传音频或粘贴直接文件链接"
+      },
+      "photo": {
+        "label": "照片",
+        "description": "上传图片",
+        "valuePlaceholder": "上传图片或粘贴直接文件链接"
+      },
+      "video": {
+        "label": "视频",
+        "description": "上传视频片段",
+        "valuePlaceholder": "上传视频或粘贴直接文件链接"
+      },
+      "email": {
+        "label": "邮箱",
+        "defaultLabel": "邮箱",
+        "description": "联系电子邮件地址",
+        "valuePlaceholder": "you@example.com"
+      },
+      "wallet": {
+        "label": "钱包",
+        "description": "加密货币钱包地址",
+        "valuePlaceholder": "地址"
+      },
+      "link": {
+        "label": "链接",
+        "description": "链接到任何网站或资料",
+        "valuePlaceholder": "https://..."
+      },
+      "weather": {
+        "label": "天气",
+        "defaultLabel": "天气",
+        "description": "连接 Nostr 天气站",
+        "valuePlaceholder": "npub1... 或 naddr1...（#station-id 可选）"
+      },
+      "custom": {
+        "label": "自定义",
+        "description": "创建任何自定义字段",
+        "valuePlaceholder": "值或 URL"
+      }
+    },
+    "warnings": {
+      "audioWrongType": "此 URL 不是音频文件。请上传音频文件或使用以 .mp3、.ogg、.wav 等结尾的直接链接。",
+      "audioUnknown": "此 URL 可能无法作为音频播放器使用。为获得最佳效果，请使用按钮上传文件或粘贴音频文件的直接链接。",
+      "imageWrongType": "此 URL 不是图片。请上传图片或使用以 .jpg、.png、.webp 等结尾的直接链接。",
+      "imageUnknown": "此 URL 可能无法显示为图片。为获得最佳效果，请使用按钮上传文件或粘贴图片文件的直接链接。",
+      "videoWrongType": "此 URL 不是视频。请上传视频或使用以 .mp4、.webm、.mov 等结尾的直接链接。",
+      "videoUnknown": "此 URL 可能无法显示为视频。为获得最佳效果，请使用按钮上传文件或粘贴视频文件的直接链接。"
+    },
+    "crop": {
+      "profile": "裁剪头像",
+      "banner": "裁剪横幅"
+    },
+    "mobilePreview": "资料字段预览",
+    "advanced": {
+      "heading": "高级",
+      "botLabel": "机器人账号",
+      "botDescription": "将此账号标记为自动化"
+    },
+    "toast": {
+      "uploaded": "已上传",
+      "mediaUploaded": "媒体文件已上传",
+      "uploadFailed": "上传失败",
+      "tryAgain": "请重试。",
+      "profilePictureUpdated": "头像已更新",
+      "bannerUpdated": "横幅已更新",
+      "profileSaved": "资料已保存",
+      "saveFailed": "保存资料失败。"
+    },
+    "key": {
+      "heading": "你的密钥",
+      "extensionBody": "你已使用浏览器扩展（NIP-07）登录。你的私钥保存在那里——请从扩展本身管理或导出。",
+      "bunkerBody": "你已使用远程签名器（NIP-46）登录。你的私钥由该签名器保管，无法从 {{appName}} 导出。",
+      "explainer": "此私钥控制你在 {{appName}} 上的账号。任何拥有它的人都可以发布内容并冒充你。请存储在密码管理器或只有你能访问的地方。",
+      "warning": "切勿与任何人分享你的私钥。避免截图或粘贴到密码管理器之外的任何地方。如果分享，其他人将能够访问你的账号。",
+      "aria": "你的私钥",
+      "copyAria": "复制私钥",
+      "revealAria": "显示私钥",
+      "hideAria": "隐藏私钥",
+      "backupButton": "备份密钥",
+      "saving": "保存中…",
+      "saved": "私钥已保存",
+      "savedToFile": "你的私钥已保存到设备的“文档”文件夹中。",
+      "saveFailed": "保存失败",
+      "saveFailedDescription": "无法保存密钥。请手动复制。",
+      "copyFailed": "复制失败",
+      "copyFailedDescription": "无法访问剪贴板。请显示密钥后手动复制。"
+    }
   }
 }

@@ -1,5 +1,6 @@
 import { useSeoMeta } from '@unhead/react';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   Loader2, Plus, Trash2, ChevronDown,
   Wallet, Upload, Music, ImageIcon, Film, Mail, Link2, Pencil, Eye, EyeOff, Copy, Check, Download, KeyRound, AlertTriangle, CloudSun,
@@ -83,94 +84,69 @@ interface FieldPreset {
   valuePlaceholder?: string;
 }
 
-const FIELD_PRESETS: FieldPreset[] = [
-  {
-    id: 'music',
-    label: 'Music',
-    description: 'Upload a song or audio clip',
-    icon: Music,
-    defaultLabel: '\u{1F3B6}',
-    type: 'media',
-    accept: 'audio/*',
-    formatHint: 'MP3, OGG, WAV, FLAC, AAC, M4A, Opus',
-    valuePlaceholder: 'Upload audio or paste direct file link',
-  },
-  {
-    id: 'photo',
-    label: 'Photo',
-    description: 'Upload an image',
-    icon: ImageIcon,
-    defaultLabel: '\u{1F4F8}',
-    type: 'media',
-    accept: 'image/*',
-    formatHint: 'JPG, PNG, GIF, WebP, SVG, AVIF',
-    valuePlaceholder: 'Upload image or paste direct file link',
-  },
-  {
-    id: 'video',
-    label: 'Video',
-    description: 'Upload a video clip',
-    icon: Film,
-    defaultLabel: '\u{1F3AC}',
-    type: 'media',
-    accept: 'video/*',
-    formatHint: 'MP4, WebM, MOV',
-    valuePlaceholder: 'Upload video or paste direct file link',
-  },
-  {
-    id: 'email',
-    label: 'Email',
-    description: 'Contact email address',
-    icon: Mail,
-    defaultLabel: 'Email',
-    type: 'text',
-    valuePlaceholder: 'you@example.com',
-  },
-  {
-    id: 'wallet',
-    label: 'Wallet',
-    description: 'Cryptocurrency wallet address',
-    icon: Wallet,
-    defaultLabel: '$BTC',
-    type: 'wallet',
-    valuePlaceholder: 'Address',
-  },
-  {
-    id: 'link',
-    label: 'Link',
-    description: 'Link to any website or profile',
-    icon: Link2,
-    defaultLabel: '',
-    type: 'text',
-    valuePlaceholder: 'https://...',
-  },
-  {
-    id: 'weather',
-    label: 'Weather',
-    description: 'Connect a Nostr weather station',
-    icon: CloudSun,
-    defaultLabel: 'Weather',
-    type: 'text',
-    valuePlaceholder: 'npub1... or naddr1... (#station-id optional)',
-  },
+/**
+ * Untranslated preset skeletons — icon, type, accept and the static
+ * (locale-independent) defaults live here. Labels, descriptions, and
+ * placeholders are filled in per-render via `useFieldPresets()` so they
+ * pick up the active language.
+ */
+interface FieldPresetSkeleton {
+  id: string;
+  icon: React.ComponentType<{ className?: string }>;
+  type: 'text' | 'wallet' | 'media';
+  accept?: string;
+  formatHint?: string;
+  /** Locale-independent default label (emoji or wallet ticker). */
+  defaultLabel?: string;
+  /** Translation key suffix in `profileSettings.presets`. */
+  i18nKey: string;
+  /** Whether the default label should come from t('...defaultLabel'). */
+  hasI18nDefaultLabel?: boolean;
+}
+
+const FIELD_PRESET_SKELETONS: FieldPresetSkeleton[] = [
+  { id: 'music', icon: Music, type: 'media', accept: 'audio/*', formatHint: 'MP3, OGG, WAV, FLAC, AAC, M4A, Opus', defaultLabel: '\u{1F3B6}', i18nKey: 'music' },
+  { id: 'photo', icon: ImageIcon, type: 'media', accept: 'image/*', formatHint: 'JPG, PNG, GIF, WebP, SVG, AVIF', defaultLabel: '\u{1F4F8}', i18nKey: 'photo' },
+  { id: 'video', icon: Film, type: 'media', accept: 'video/*', formatHint: 'MP4, WebM, MOV', defaultLabel: '\u{1F3AC}', i18nKey: 'video' },
+  { id: 'email', icon: Mail, type: 'text', i18nKey: 'email', hasI18nDefaultLabel: true },
+  { id: 'wallet', icon: Wallet, type: 'wallet', defaultLabel: '$BTC', i18nKey: 'wallet' },
+  { id: 'link', icon: Link2, type: 'text', defaultLabel: '', i18nKey: 'link' },
+  { id: 'weather', icon: CloudSun, type: 'text', i18nKey: 'weather', hasI18nDefaultLabel: true },
 ];
 
-/** The "Custom" preset — always shown last, separated by a divider. */
-const CUSTOM_PRESET: FieldPreset = {
-  id: 'custom',
-  label: 'Custom',
-  description: 'Create any custom field',
-  icon: Pencil,
-  defaultLabel: '',
-  type: 'text',
-  valuePlaceholder: 'Value or URL',
+const CUSTOM_PRESET_SKELETON: FieldPresetSkeleton = {
+  id: 'custom', icon: Pencil, type: 'text', defaultLabel: '', i18nKey: 'custom',
 };
 
-/** Find a preset's format hint from its accept filter. */
+/** Hook that materializes the field presets in the active locale. */
+function useFieldPresets(): { presets: FieldPreset[]; customPreset: FieldPreset } {
+  const { t } = useTranslation();
+  return useMemo(() => {
+    const materialize = (skel: FieldPresetSkeleton): FieldPreset => ({
+      id: skel.id,
+      icon: skel.icon,
+      type: skel.type,
+      accept: skel.accept,
+      formatHint: skel.formatHint,
+      label: t(`profileSettings.presets.${skel.i18nKey}.label`),
+      description: t(`profileSettings.presets.${skel.i18nKey}.description`),
+      valuePlaceholder: t(`profileSettings.presets.${skel.i18nKey}.valuePlaceholder`),
+      defaultLabel: skel.hasI18nDefaultLabel
+        ? t(`profileSettings.presets.${skel.i18nKey}.defaultLabel`)
+        : (skel.defaultLabel ?? ''),
+    });
+    return {
+      presets: FIELD_PRESET_SKELETONS.map(materialize),
+      customPreset: materialize(CUSTOM_PRESET_SKELETON),
+    };
+  }, [t]);
+}
+
+/** Find a preset skeleton's format hint from its accept filter. */
 function getFormatHintForAccept(accept: string | undefined): string | undefined {
   if (!accept) return undefined;
-  const preset = FIELD_PRESETS.find((p) => p.accept === accept);
-  return preset?.formatHint;
+  const skel = FIELD_PRESET_SKELETONS.find((p) => p.accept === accept);
+  return skel?.formatHint;
 }
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
@@ -193,10 +169,11 @@ const VIDEO_EXT = /\.(mp4|webm|mov|qt)(\?.*)?$/i;
 
 /**
  * Check whether a pasted URL matches the expected file type for a media field.
- * Returns a warning message if the URL looks wrong, or undefined if it's fine.
- * Only warns when the value looks like a URL — empty/non-URL values return undefined.
+ * Returns a translation key (under `profileSettings.warnings`) if the URL looks
+ * wrong, or undefined if it's fine. Only warns when the value looks like a URL —
+ * empty/non-URL values return undefined.
  */
-function getMediaMismatchWarning(value: string, accept: string | undefined): string | undefined {
+function getMediaMismatchWarningKey(value: string, accept: string | undefined): string | undefined {
   const trimmed = value.trim();
   if (!trimmed) return undefined;
   // Only check if it looks like a URL
@@ -212,30 +189,18 @@ function getMediaMismatchWarning(value: string, accept: string | undefined): str
   const hasKnownExt = hasAudioExt || hasImageExt || hasVideoExt;
 
   if (accept === 'audio/*') {
-    if (hasKnownExt && !hasAudioExt) {
-      return 'This URL doesn\u2019t point to an audio file. Upload an audio file or use a direct link ending in .mp3, .ogg, .wav, etc.';
-    }
-    if (!hasKnownExt) {
-      return 'This URL may not work as an audio player. For best results, upload a file using the button or paste a direct link to an audio file.';
-    }
+    if (hasKnownExt && !hasAudioExt) return 'profileSettings.warnings.audioWrongType';
+    if (!hasKnownExt) return 'profileSettings.warnings.audioUnknown';
   }
 
   if (accept === 'image/*') {
-    if (hasKnownExt && !hasImageExt) {
-      return 'This URL doesn\u2019t point to an image. Upload an image or use a direct link ending in .jpg, .png, .webp, etc.';
-    }
-    if (!hasKnownExt) {
-      return 'This URL may not display as an image. For best results, upload a file using the button or paste a direct link to an image file.';
-    }
+    if (hasKnownExt && !hasImageExt) return 'profileSettings.warnings.imageWrongType';
+    if (!hasKnownExt) return 'profileSettings.warnings.imageUnknown';
   }
 
   if (accept === 'video/*') {
-    if (hasKnownExt && !hasVideoExt) {
-      return 'This URL doesn\u2019t point to a video. Upload a video or use a direct link ending in .mp4, .webm, .mov, etc.';
-    }
-    if (!hasKnownExt) {
-      return 'This URL may not display as a video. For best results, upload a file using the button or paste a direct link to a video file.';
-    }
+    if (hasKnownExt && !hasVideoExt) return 'profileSettings.warnings.videoWrongType';
+    if (!hasKnownExt) return 'profileSettings.warnings.videoUnknown';
   }
 
   return undefined;
@@ -289,6 +254,7 @@ interface SortableFieldRowProps {
 }
 
 function SortableFieldRow({ id, index, type, accept, valuePlaceholder, isUploading: fieldUploading, control, onRemove, onMediaPick, onTickerChange }: SortableFieldRowProps) {
+  const { t } = useTranslation();
   const formatHint = type === 'media' ? getFormatHintForAccept(accept) : undefined;
 
   return (
@@ -304,7 +270,7 @@ function SortableFieldRow({ id, index, type, accept, valuePlaceholder, isUploadi
               <Select value={field.value} onValueChange={(v) => { field.onChange(v); onTickerChange(v); }}>
                 <FormControl>
                   <SelectTrigger className="h-9">
-                    <SelectValue placeholder="Ticker" />
+                    <SelectValue placeholder={t('profileSettings.fields.tickerPlaceholder')} />
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
@@ -324,7 +290,7 @@ function SortableFieldRow({ id, index, type, accept, valuePlaceholder, isUploadi
           render={({ field }) => (
             <FormItem>
               <FormControl>
-                <Input placeholder="Label" {...field} className="h-9" />
+                <Input placeholder={t('profileSettings.fields.labelPlaceholder')} {...field} className="h-9" />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -338,12 +304,12 @@ function SortableFieldRow({ id, index, type, accept, valuePlaceholder, isUploadi
           control={control}
           name={`fields.${index}.value`}
           render={({ field }) => {
-            const mismatchWarning = getMediaMismatchWarning(field.value, accept);
+            const warningKey = getMediaMismatchWarningKey(field.value, accept);
             return (
               <FormItem>
                 <div className="flex gap-1.5">
                   <FormControl>
-                    <Input placeholder={valuePlaceholder || 'Upload file or paste direct file link'} {...field} className="h-9 flex-1 min-w-0" readOnly={false} />
+                    <Input placeholder={valuePlaceholder || t('profileSettings.fields.mediaPlaceholder')} {...field} className="h-9 flex-1 min-w-0" readOnly={false} />
                   </FormControl>
                   {fieldUploading ? (
                     <div className="flex items-center justify-center h-9 w-9 shrink-0">
@@ -364,18 +330,18 @@ function SortableFieldRow({ id, index, type, accept, valuePlaceholder, isUploadi
                       </TooltipTrigger>
                       <TooltipContent side="top" className="text-xs max-w-52">
                         {formatHint ? (
-                          <span>Choose file to upload<br /><span className="text-muted-foreground">{formatHint}</span></span>
+                          <span>{t('profileSettings.fields.chooseFile')}<br /><span className="text-muted-foreground">{formatHint}</span></span>
                         ) : (
-                          <span>Choose a media file to upload</span>
+                          <span>{t('profileSettings.fields.chooseMediaFile')}</span>
                         )}
                       </TooltipContent>
                     </Tooltip>
                   )}
                 </div>
-                {mismatchWarning && (
+                {warningKey && (
                   <p className="flex items-start gap-1.5 text-xs text-amber-600 dark:text-amber-500 mt-1 leading-snug">
                     <AlertTriangle className="size-3.5 shrink-0 mt-0.5" />
-                    <span>{mismatchWarning}</span>
+                    <span>{t(warningKey)}</span>
                   </p>
                 )}
                 <FormMessage />
@@ -390,7 +356,7 @@ function SortableFieldRow({ id, index, type, accept, valuePlaceholder, isUploadi
           render={({ field }) => (
             <FormItem>
               <FormControl>
-                <Input placeholder={type === 'wallet' ? 'Address' : 'Value or URL'} {...field} className="h-9" />
+                <Input placeholder={type === 'wallet' ? t('profileSettings.fields.addressPlaceholder') : t('profileSettings.fields.valuePlaceholder')} {...field} className="h-9" />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -416,12 +382,14 @@ function SortableFieldRow({ id, index, type, accept, valuePlaceholder, isUploadi
 // ── Main component ────────────────────────────────────────────────────────────
 
 export function ProfileSettings() {
+  const { t } = useTranslation();
   const { user, metadata, event } = useCurrentUser();
   const { config } = useAppContext();
   const queryClient = useQueryClient();
   const { mutateAsync: publishEvent, isPending } = useNostrPublish();
   const { mutateAsync: uploadFile, isPending: isUploading } = useUploadFile();
   const { toast } = useToast();
+  const { presets, customPreset } = useFieldPresets();
 
   const [cropState, setCropState] = useState<CropState | null>(null);
   const [showAdvanced, setShowAdvanced] = useState(false);
@@ -429,8 +397,8 @@ export function ProfileSettings() {
   const [uploadingFieldIndex, setUploadingFieldIndex] = useState<number>(-1);
 
   useSeoMeta({
-    title: `Profile | Settings | ${config.appName}`,
-    description: `Edit your ${config.appName} profile`,
+    title: `${t('profileSettings.seoTitle')} | ${config.appName}`,
+    description: t('profileSettings.seoDescription', { appName: config.appName }),
   });
 
   // Parse existing custom fields from raw event
@@ -497,9 +465,9 @@ export function ProfileSettings() {
     try {
       const [[, url]] = await uploadFile(file);
       form.setValue(`fields.${index}.value`, url, { shouldDirty: true });
-      toast({ title: 'Uploaded', description: 'Media file uploaded' });
+      toast({ title: t('profileSettings.toast.uploaded'), description: t('profileSettings.toast.mediaUploaded') });
     } catch {
-      toast({ title: 'Upload failed', description: 'Please try again.', variant: 'destructive' });
+      toast({ title: t('profileSettings.toast.uploadFailed'), description: t('profileSettings.toast.tryAgain'), variant: 'destructive' });
     } finally {
       setUploadingFieldIndex(-1);
     }
@@ -540,7 +508,7 @@ export function ProfileSettings() {
     const result: Array<{ label: string; value: string }> = [];
     // Add website if present
     if (watched.website?.trim()) {
-      result.push({ label: 'Website', value: watched.website.trim() });
+      result.push({ label: t('profileSettings.fields.website'), value: watched.website.trim() });
     }
     // Add custom fields that have both label and value
     if (watched.fields) {
@@ -551,7 +519,7 @@ export function ProfileSettings() {
       }
     }
     return result;
-  }, [watched.website, watched.fields]);
+  }, [watched.website, watched.fields, t]);
 
   // Card onChange: patch individual fields
   const handleCardChange = (patch: Partial<NostrMetadata>) => {
@@ -578,7 +546,7 @@ export function ProfileSettings() {
       imageSrc: URL.createObjectURL(file),
       aspect: field === 'picture' ? 1 : 3,
       field,
-      title: field === 'picture' ? 'Crop Profile Picture' : 'Crop Banner',
+      title: field === 'picture' ? t('profileSettings.crop.profile') : t('profileSettings.crop.banner'),
     });
   };
 
@@ -591,9 +559,9 @@ export function ProfileSettings() {
       const file = new File([blob], `${field}.jpg`, { type: 'image/jpeg' });
       const [[, url]] = await uploadFile(file);
       form.setValue(field, url, { shouldDirty: true });
-      toast({ title: 'Uploaded', description: `${field === 'picture' ? 'Profile picture' : 'Banner'} updated` });
+      toast({ title: t('profileSettings.toast.uploaded'), description: field === 'picture' ? t('profileSettings.toast.profilePictureUpdated') : t('profileSettings.toast.bannerUpdated') });
     } catch {
-      toast({ title: 'Upload failed', description: 'Please try again.', variant: 'destructive' });
+      toast({ title: t('profileSettings.toast.uploadFailed'), description: t('profileSettings.toast.tryAgain'), variant: 'destructive' });
     }
   };
 
@@ -632,9 +600,9 @@ export function ProfileSettings() {
       await publishEvent({ kind: 0, content: JSON.stringify(data) });
       queryClient.invalidateQueries({ queryKey: ['logins'] });
       queryClient.invalidateQueries({ queryKey: ['author', user.pubkey] });
-      toast({ title: 'Profile saved' });
+      toast({ title: t('profileSettings.toast.profileSaved') });
     } catch {
-      toast({ title: 'Error', description: 'Failed to save profile.', variant: 'destructive' });
+      toast({ title: t('common.error'), description: t('profileSettings.toast.saveFailed'), variant: 'destructive' });
     }
   };
 
@@ -675,18 +643,18 @@ export function ProfileSettings() {
 
       {/* Header */}
       <PageHeader
-        title="Profile"
+        title={t('profileSettings.header.title')}
         backTo="/settings"
         alwaysShowBack
         titleContent={
           <div className="flex-1 min-w-0">
-            <h1 className="text-xl font-bold leading-tight">Profile</h1>
-            <p className="text-sm text-muted-foreground">Your Nostr identity is portable — it goes wherever you go.</p>
+            <h1 className="text-xl font-bold leading-tight">{t('profileSettings.header.title')}</h1>
+            <p className="text-sm text-muted-foreground">{t('profileSettings.header.subtitle')}</p>
           </div>
         }
       >
         <Button type="submit" form="profile-settings-form" size="sm" className="shrink-0 rounded-full font-bold px-5" disabled={busy}>
-          {busy ? <Loader2 className="size-3.5 animate-spin" /> : 'Save'}
+          {busy ? <Loader2 className="size-3.5 animate-spin" /> : t('profileSettings.header.save')}
         </Button>
       </PageHeader>
 
@@ -695,9 +663,9 @@ export function ProfileSettings() {
 
           {/* Intro */}
           <div className="px-3 pt-2 pb-2">
-            <h2 className="text-sm font-semibold">Your Identity</h2>
+            <h2 className="text-sm font-semibold">{t('profileSettings.intro.heading')}</h2>
             <p className="text-xs text-muted-foreground mt-1 leading-relaxed">
-              Tap any field on the card to edit. Click your avatar or banner to upload and crop a new image.
+              {t('profileSettings.intro.body')}
             </p>
           </div>
 
@@ -714,14 +682,14 @@ export function ProfileSettings() {
           {isUploading && (
             <div className="flex items-center gap-2 text-xs text-muted-foreground">
               <Loader2 className="size-3.5 animate-spin" />
-              Uploading…
+              {t('profileSettings.uploading')}
             </div>
           )}
 
           {/* Profile fields */}
           <div>
             <h2 className="text-sm font-medium py-2 flex items-center gap-1">
-              Profile Fields
+              {t('profileSettings.fields.heading')}
               <HelpTip faqId="profile-fields" iconSize="size-3.5" />
             </h2>
 
@@ -734,9 +702,9 @@ export function ProfileSettings() {
                   <div className="grid grid-cols-[auto,1fr,2fr,auto] gap-2 items-center">
                     <div className="w-6" />
                     <div className="flex items-center h-9 px-3 text-sm text-muted-foreground">
-                      <span>Website</span>
+                      <span>{t('profileSettings.fields.website')}</span>
                     </div>
-                    <Input placeholder="https://yourwebsite.com" {...field} className="h-9" />
+                    <Input placeholder={t('profileSettings.fields.websitePlaceholder')} {...field} className="h-9" />
                     <div className="size-9" />
                   </div>
                 )}
@@ -750,10 +718,10 @@ export function ProfileSettings() {
                   <div className="grid grid-cols-[auto,1fr,2fr,auto] gap-2 items-center">
                     <div className="w-6" />
                     <div className="flex items-center h-9 px-3 text-sm text-muted-foreground gap-1">
-                      <span>Lightning</span>
+                      <span>{t('profileSettings.fields.lightning')}</span>
                       <HelpTip faqId="what-are-zaps" iconSize="size-3.5" />
                     </div>
-                    <Input placeholder="you@walletofsatoshi.com" {...field} className="h-9" />
+                    <Input placeholder={t('profileSettings.fields.lightningPlaceholder')} {...field} className="h-9" />
                     <div className="size-9" />
                   </div>
                 )}
@@ -783,7 +751,7 @@ export function ProfileSettings() {
 
               {/* Add field — visible pill buttons */}
               <div className="flex flex-wrap gap-1.5 pt-1">
-                {[...FIELD_PRESETS, CUSTOM_PRESET].map((preset) => {
+                {[...presets, customPreset].map((preset) => {
                   const Icon = preset.icon;
                   return (
                     <Tooltip key={preset.id}>
@@ -818,7 +786,7 @@ export function ProfileSettings() {
                 <Button type="button" variant="ghost" className="w-full justify-between px-0 h-auto hover:bg-transparent hover:text-foreground">
                   <span className="text-sm font-medium flex items-center gap-1.5">
                     <Eye className="size-3.5" />
-                    Profile Fields Preview
+                    {t('profileSettings.mobilePreview')}
                   </span>
                   <ChevronDown className="size-4 text-muted-foreground transition-transform duration-200 [[data-state=open]_&]:rotate-180" strokeWidth={4} />
                 </Button>
@@ -838,7 +806,7 @@ export function ProfileSettings() {
           <Collapsible open={showAdvanced} onOpenChange={setShowAdvanced}>
             <CollapsibleTrigger asChild>
               <Button type="button" variant="ghost" className="w-full justify-between px-0 h-auto hover:bg-transparent hover:text-foreground">
-                <span className="text-sm font-medium">Advanced</span>
+                <span className="text-sm font-medium">{t('profileSettings.advanced.heading')}</span>
                 <ChevronDown className="size-4 text-muted-foreground transition-transform duration-200 [[data-state=open]_&]:rotate-180" strokeWidth={4} />
               </Button>
             </CollapsibleTrigger>
@@ -849,8 +817,8 @@ export function ProfileSettings() {
                 render={({ field }) => (
                   <FormItem className="flex items-center justify-between rounded-lg border p-3">
                     <div>
-                      <FormLabel className="text-sm">Bot Account</FormLabel>
-                      <FormDescription className="text-xs">Mark this account as automated</FormDescription>
+                      <FormLabel className="text-sm">{t('profileSettings.advanced.botLabel')}</FormLabel>
+                      <FormDescription className="text-xs">{t('profileSettings.advanced.botDescription')}</FormDescription>
                     </div>
                     <FormControl>
                       <Switch checked={field.value} onCheckedChange={field.onChange} />
@@ -875,6 +843,7 @@ export function ProfileSettings() {
 // ── Backup Key section ────────────────────────────────────────────────────────
 
 function BackupKeySection() {
+  const { t } = useTranslation();
   const { logins } = useNostrLogin();
   const { config } = useAppContext();
   const { toast } = useToast();
@@ -887,7 +856,7 @@ function BackupKeySection() {
   const heading = (
     <div className="flex items-center gap-2 pb-1">
       <KeyRound className="size-4 text-primary/70" />
-      <h2 className="text-sm font-semibold">Your Key</h2>
+      <h2 className="text-sm font-semibold">{t('profileSettings.key.heading')}</h2>
     </div>
   );
 
@@ -899,7 +868,7 @@ function BackupKeySection() {
       <div>
         {heading}
         <p className="text-xs text-muted-foreground leading-relaxed">
-          You're signed in with a browser extension (NIP-07). Your secret key is stored there — manage or export it from the extension itself.
+          {t('profileSettings.key.extensionBody')}
         </p>
       </div>
     );
@@ -910,7 +879,7 @@ function BackupKeySection() {
       <div>
         {heading}
         <p className="text-xs text-muted-foreground leading-relaxed">
-          You're signed in with a remote signer (NIP-46). Your secret key is held by that signer and cannot be exported from {config.appName}.
+          {t('profileSettings.key.bunkerBody', { appName: config.appName })}
         </p>
       </div>
     );
@@ -931,8 +900,8 @@ function BackupKeySection() {
       setTimeout(() => setCopied(false), 1500);
     } catch {
       toast({
-        title: 'Copy failed',
-        description: 'Could not access the clipboard. Reveal the key and copy it manually.',
+        title: t('profileSettings.key.copyFailed'),
+        description: t('profileSettings.key.copyFailedDescription'),
         variant: 'destructive',
       });
     }
@@ -945,17 +914,17 @@ function BackupKeySection() {
       const result = await saveNsec(npub, nsec, config.appName);
       if (result === 'saved-to-file') {
         toast({
-          title: 'Secret key saved',
-          description: 'Your secret key was saved to the Documents folder on your device.',
+          title: t('profileSettings.key.saved'),
+          description: t('profileSettings.key.savedToFile'),
         });
       } else if (result === 'saved') {
-        toast({ title: 'Secret key saved' });
+        toast({ title: t('profileSettings.key.saved') });
       }
       // 'dismissed' is a deliberate user choice — no toast.
     } catch {
       toast({
-        title: 'Save failed',
-        description: 'Could not save the key. Please copy it manually.',
+        title: t('profileSettings.key.saveFailed'),
+        description: t('profileSettings.key.saveFailedDescription'),
         variant: 'destructive',
       });
     } finally {
@@ -967,7 +936,7 @@ function BackupKeySection() {
     <div className="space-y-4">
       {heading}
       <p className="text-xs text-muted-foreground leading-relaxed">
-        This secret key controls your account on {config.appName}. Anyone with it can post and impersonate you. Store it in a password manager or somewhere else only you can access.
+        {t('profileSettings.key.explainer', { appName: config.appName })}
       </p>
 
       <div className="relative">
@@ -978,7 +947,7 @@ function BackupKeySection() {
           onFocus={(e) => e.currentTarget.select()}
           onClick={(e) => e.currentTarget.select()}
           className="pr-20 font-mono text-base md:text-sm"
-          aria-label="Your secret key"
+          aria-label={t('profileSettings.key.aria')}
         />
         <div className="absolute right-0 top-0 h-full flex items-center">
           <Button
@@ -987,7 +956,7 @@ function BackupKeySection() {
             size="icon"
             className="h-full px-2 hover:bg-transparent"
             onClick={handleCopy}
-            aria-label="Copy secret key"
+            aria-label={t('profileSettings.key.copyAria')}
           >
             {copied ? (
               <Check className="h-4 w-4 text-emerald-600" />
@@ -1001,7 +970,7 @@ function BackupKeySection() {
             size="icon"
             className="h-full px-2 hover:bg-transparent"
             onClick={() => setShowKey((v) => !v)}
-            aria-label={showKey ? 'Hide secret key' : 'Reveal secret key'}
+            aria-label={showKey ? t('profileSettings.key.hideAria') : t('profileSettings.key.revealAria')}
           >
             {showKey ? (
               <EyeOff className="h-4 w-4 text-muted-foreground" />
@@ -1015,7 +984,7 @@ function BackupKeySection() {
       {showKey && (
         <div className="p-3 bg-amber-50 dark:bg-amber-950/20 rounded-lg border border-amber-200 dark:border-amber-800 animate-in fade-in slide-in-from-top-1 duration-200">
           <p className="text-xs text-amber-900 dark:text-amber-300 leading-relaxed">
-            NEVER share your secret key with anyone. Avoid screenshotting it or pasting it anywhere except a password manager. If shared, others will be able to access your account.
+            {t('profileSettings.key.warning')}
           </p>
         </div>
       )}
@@ -1029,11 +998,11 @@ function BackupKeySection() {
       >
         {isSaving ? (
           <>
-            <Loader2 className="w-4 h-4 animate-spin" /> Saving…
+            <Loader2 className="w-4 h-4 animate-spin" /> {t('profileSettings.key.saving')}
           </>
         ) : (
           <>
-            <Download className="w-4 h-4" /> Back Up Key
+            <Download className="w-4 h-4" /> {t('profileSettings.key.backupButton')}
           </>
         )}
       </Button>

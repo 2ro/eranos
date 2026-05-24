@@ -1139,5 +1139,124 @@
     "groupsDialog": {
       "title": "Todos los grupos"
     }
+  },
+  "profileSettings": {
+    "seoTitle": "Perfil | Configuración",
+    "seoDescription": "Edita tu perfil de {{appName}}",
+    "header": {
+      "title": "Perfil",
+      "subtitle": "Tu identidad en Nostr es portátil — va contigo a donde vayas.",
+      "save": "Guardar"
+    },
+    "intro": {
+      "heading": "Tu identidad",
+      "body": "Toca cualquier campo de la tarjeta para editarlo. Haz clic en tu avatar o portada para subir y recortar una nueva imagen."
+    },
+    "uploading": "Subiendo…",
+    "fields": {
+      "heading": "Campos del perfil",
+      "website": "Sitio web",
+      "websitePlaceholder": "https://tusitio.com",
+      "lightning": "Lightning",
+      "lightningPlaceholder": "tu@walletofsatoshi.com",
+      "labelPlaceholder": "Etiqueta",
+      "tickerPlaceholder": "Ticker",
+      "addressPlaceholder": "Dirección",
+      "valuePlaceholder": "Valor o URL",
+      "mediaPlaceholder": "Sube un archivo o pega un enlace directo",
+      "chooseFile": "Elegir archivo para subir",
+      "chooseMediaFile": "Elegir un archivo multimedia para subir"
+    },
+    "presets": {
+      "music": {
+        "label": "Música",
+        "description": "Sube una canción o clip de audio",
+        "valuePlaceholder": "Sube audio o pega un enlace directo"
+      },
+      "photo": {
+        "label": "Foto",
+        "description": "Sube una imagen",
+        "valuePlaceholder": "Sube imagen o pega un enlace directo"
+      },
+      "video": {
+        "label": "Vídeo",
+        "description": "Sube un clip de vídeo",
+        "valuePlaceholder": "Sube vídeo o pega un enlace directo"
+      },
+      "email": {
+        "label": "Correo",
+        "defaultLabel": "Correo",
+        "description": "Dirección de correo de contacto",
+        "valuePlaceholder": "tu@ejemplo.com"
+      },
+      "wallet": {
+        "label": "Cartera",
+        "description": "Dirección de cartera de criptomonedas",
+        "valuePlaceholder": "Dirección"
+      },
+      "link": {
+        "label": "Enlace",
+        "description": "Enlace a cualquier sitio web o perfil",
+        "valuePlaceholder": "https://..."
+      },
+      "weather": {
+        "label": "Clima",
+        "defaultLabel": "Clima",
+        "description": "Conecta una estación meteorológica de Nostr",
+        "valuePlaceholder": "npub1... o naddr1... (#station-id opcional)"
+      },
+      "custom": {
+        "label": "Personalizado",
+        "description": "Crea cualquier campo personalizado",
+        "valuePlaceholder": "Valor o URL"
+      }
+    },
+    "warnings": {
+      "audioWrongType": "Esta URL no apunta a un archivo de audio. Sube un archivo de audio o usa un enlace directo que termine en .mp3, .ogg, .wav, etc.",
+      "audioUnknown": "Esta URL podría no funcionar como reproductor de audio. Para mejores resultados, sube un archivo o pega un enlace directo a un archivo de audio.",
+      "imageWrongType": "Esta URL no apunta a una imagen. Sube una imagen o usa un enlace directo que termine en .jpg, .png, .webp, etc.",
+      "imageUnknown": "Esta URL podría no mostrarse como imagen. Para mejores resultados, sube un archivo o pega un enlace directo a un archivo de imagen.",
+      "videoWrongType": "Esta URL no apunta a un vídeo. Sube un vídeo o usa un enlace directo que termine en .mp4, .webm, .mov, etc.",
+      "videoUnknown": "Esta URL podría no mostrarse como vídeo. Para mejores resultados, sube un archivo o pega un enlace directo a un archivo de vídeo."
+    },
+    "crop": {
+      "profile": "Recortar foto de perfil",
+      "banner": "Recortar portada"
+    },
+    "mobilePreview": "Vista previa de campos del perfil",
+    "advanced": {
+      "heading": "Avanzado",
+      "botLabel": "Cuenta de bot",
+      "botDescription": "Marca esta cuenta como automatizada"
+    },
+    "toast": {
+      "uploaded": "Subido",
+      "mediaUploaded": "Archivo multimedia subido",
+      "uploadFailed": "Error al subir",
+      "tryAgain": "Inténtalo de nuevo.",
+      "profilePictureUpdated": "Foto de perfil actualizada",
+      "bannerUpdated": "Portada actualizada",
+      "profileSaved": "Perfil guardado",
+      "saveFailed": "No se pudo guardar el perfil."
+    },
+    "key": {
+      "heading": "Tu clave",
+      "extensionBody": "Has iniciado sesión con una extensión del navegador (NIP-07). Tu clave secreta se guarda allí — gestiónala o expórtala desde la extensión.",
+      "bunkerBody": "Has iniciado sesión con un firmante remoto (NIP-46). Tu clave secreta la guarda ese firmante y no se puede exportar desde {{appName}}.",
+      "explainer": "Esta clave secreta controla tu cuenta en {{appName}}. Cualquiera que la tenga puede publicar y suplantarte. Guárdala en un gestor de contraseñas o en un sitio al que solo tú tengas acceso.",
+      "warning": "NUNCA compartas tu clave secreta. Evita capturas de pantalla o pegarla en cualquier sitio que no sea un gestor de contraseñas. Si la compartes, otros podrán acceder a tu cuenta.",
+      "aria": "Tu clave secreta",
+      "copyAria": "Copiar clave secreta",
+      "revealAria": "Mostrar clave secreta",
+      "hideAria": "Ocultar clave secreta",
+      "backupButton": "Respaldar clave",
+      "saving": "Guardando…",
+      "saved": "Clave secreta guardada",
+      "savedToFile": "Tu clave secreta se guardó en la carpeta Documentos de tu dispositivo.",
+      "saveFailed": "Error al guardar",
+      "saveFailedDescription": "No se pudo guardar la clave. Cópiala manualmente.",
+      "copyFailed": "Error al copiar",
+      "copyFailedDescription": "No se pudo acceder al portapapeles. Muestra la clave y cópiala manualmente."
+    }
   }
 }
