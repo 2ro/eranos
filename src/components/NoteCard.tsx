@@ -409,6 +409,7 @@ export const NoteCard = memo(function NoteCard({
   const { data: btcPrice } = useBtcPrice();
   const [moreMenuOpen, setMoreMenuOpen] = useState(false);
   const [replyOpen, setReplyOpen] = useState(false);
+  const [translatedContent, setTranslatedContent] = useState<string | null>(null);
 
   // Check if the current user can zap this event's author
   // TODO: Enable zapping split-recipient NIP-75 goals once zap split payments are supported.
@@ -540,6 +541,12 @@ export const NoteCard = memo(function NoteCard({
 
   const isComment = event.kind === 1111;
   const isReply = isTextNote && !isComment && isReplyEvent(event);
+  const canTranslate = isTextNote && event.content.trim().length > 0;
+  const contentEvent = translatedContent ? { ...event, content: translatedContent } : event;
+
+  useEffect(() => {
+    setTranslatedContent(null);
+  }, [event.id]);
 
   // Find all people being replied to (for "Replying to @user1 and @user2")
   const replyToPubkeys = useMemo(() => {
@@ -743,7 +750,7 @@ export const NoteCard = memo(function NoteCard({
           <ProfileCardContent event={event} />
         ) : (
           <TruncatedNoteContent
-            event={event}
+            event={contentEvent}
           />
         )}
       </ContentWarningGuard>
@@ -877,6 +884,17 @@ export const NoteCard = memo(function NoteCard({
       )}
 
       <div className="flex-1" />
+
+      {canTranslate && (
+        <TranslateButton
+          text={event.content}
+          isTranslated={translatedContent !== null}
+          onTranslated={setTranslatedContent}
+          onReset={() => setTranslatedContent(null)}
+          responsiveLabel
+          className="h-9 px-3 text-sm font-medium"
+        />
+      )}
 
       <button
         className="inline-flex items-center justify-center h-9 w-9 rounded-full text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors sidebar:hidden"
@@ -1249,20 +1267,13 @@ function TruncatedNoteContent({
   const contentRef = useRef<HTMLDivElement>(null);
   const [overflows, setOverflows] = useState(false);
   const [expanded, setExpanded] = useState(false);
-  const [translatedContent, setTranslatedContent] = useState<string | null>(null);
 
   const singleImage = isSingleImagePost(event);
-  const canTranslate = event.content.trim().length > 0 && !singleImage;
-  const displayEvent = translatedContent ? { ...event, content: translatedContent } : event;
 
   const measure = useCallback(() => {
     const el = contentRef.current;
     if (el) setOverflows(!singleImage && el.scrollHeight > MAX_HEIGHT);
   }, [singleImage]);
-
-  useEffect(() => {
-    setTranslatedContent(null);
-  }, [event.id]);
 
   useEffect(() => {
     measure();
@@ -1294,13 +1305,13 @@ function TruncatedNoteContent({
         }
         className="relative"
       >
-        <NoteContent event={displayEvent} className="text-[15px] leading-relaxed" />
+        <NoteContent event={event} className="text-[15px] leading-relaxed" />
         {!expanded && overflows && (
           <div className="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-background to-transparent pointer-events-none" />
         )}
       </div>
-      <div className="mt-1 flex flex-wrap items-center gap-2">
-        {overflows && (
+      {overflows && (
+        <div className="mt-1 flex flex-wrap items-center gap-2">
           <button
             className="text-sm text-primary hover:underline"
             onClick={(e) => {
@@ -1310,16 +1321,8 @@ function TruncatedNoteContent({
           >
             {expanded ? t('noteCard.showLess') : t('noteCard.readMore')}
           </button>
-        )}
-        {canTranslate && (
-          <TranslateButton
-            text={event.content}
-            isTranslated={translatedContent !== null}
-            onTranslated={setTranslatedContent}
-            onReset={() => setTranslatedContent(null)}
-          />
-        )}
-      </div>
+        </div>
+      )}
     </div>
   );
 }

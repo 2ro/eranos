@@ -32,6 +32,8 @@ interface TranslateButtonProps {
   onReset: () => void;
   /** Whether translated content is currently visible. */
   isTranslated: boolean;
+  /** Hide label on narrow screens so the action row can collapse to an icon. */
+  responsiveLabel?: boolean;
   className?: string;
 }
 
@@ -40,6 +42,7 @@ export function TranslateButton({
   onTranslated,
   onReset,
   isTranslated,
+  responsiveLabel,
   className,
 }: TranslateButtonProps) {
   const { t, i18n } = useTranslation();
@@ -98,8 +101,15 @@ export function TranslateButton({
         void handleClick();
       }}
       disabled={loading || !text.trim()}
+      aria-label={
+        error
+          ? t("translate.error")
+          : isTranslated
+            ? t("translate.showOriginal")
+            : t("translate.translate")
+      }
       className={cn(
-        "h-7 gap-1.5 px-2 text-xs transition-colors",
+        "h-7 gap-1.5 rounded-full px-2 text-xs transition-colors",
         isTranslated || error
           ? "text-primary hover:text-primary/80"
           : "text-muted-foreground hover:text-primary",
@@ -114,13 +124,13 @@ export function TranslateButton({
       }
     >
       {loading ? (
-        <Loader2 className="h-3.5 w-3.5 animate-spin" />
+        <Loader2 className="size-[18px] animate-spin" />
       ) : isTranslated ? (
-        <RotateCcw className="h-3.5 w-3.5" />
+        <RotateCcw className="size-[18px]" />
       ) : (
-        <Languages className="h-3.5 w-3.5 shrink-0" />
+        <Languages className="size-[18px] shrink-0" />
       )}
-      <span>
+      <span className={cn(responsiveLabel && "hidden sm:inline")}>
         {loading
           ? t("translate.translating")
           : error
