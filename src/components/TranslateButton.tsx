@@ -13,6 +13,8 @@ const LANG_MAP: Record<string, string> = {
   es: "ES",
   ar: "AR",
   zh: "ZH",
+  fa: "FA",
+  ps: "PS",
 };
 
 interface TranslationResponse {
