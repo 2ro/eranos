@@ -1199,21 +1199,11 @@
       "silentBadge": "silencioso",
       "silentDetectedTitle": "Detectado via escaneamento de pagamento silencioso BIP-352"
     },
-    "openSettings": "Configurações da carteira"
+    "openMenu": "Menu da carteira"
   },
   "walletSettings": {
-    "seoTitle": "Configurações da carteira",
-    "seoDescription": "Gerencie sua carteira Bitcoin — faça backup da sua frase semente ou recupere fundos de uma carteira anterior.",
-    "title": "Configurações da carteira",
-    "subtitle": "Faça backup da sua frase semente ou recupere fundos de uma carteira anterior.",
-    "backup": {
-      "label": "Fazer backup da carteira",
-      "description": "Revele sua frase de recuperação de 24 palavras."
-    },
-    "legacy": {
-      "label": "Recuperação de carteira antiga",
-      "description": "Mova fundos de uma carteira anterior do Agora."
-    }
+    "backup": { "label": "Fazer backup da carteira" },
+    "legacy": { "label": "Recuperação de carteira antiga" }
   },
   "walletBackupPage": {
     "seoTitle": "Fazer backup da carteira",

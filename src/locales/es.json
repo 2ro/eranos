@@ -776,20 +776,14 @@
       "silentBadge": "silencioso",
       "silentDetectedTitle": "Detectado mediante el escaneo de pagos silenciosos BIP-352"
     },
-    "openSettings": "Ajustes de la cartera"
+    "openMenu": "Menú de la cartera"
   },
   "walletSettings": {
-    "seoTitle": "Ajustes de la cartera",
-    "seoDescription": "Gestiona tu cartera Bitcoin — haz una copia de seguridad de tu frase semilla o recupera fondos de una cartera anterior.",
-    "title": "Ajustes de la cartera",
-    "subtitle": "Haz una copia de seguridad de tu frase semilla o recupera fondos de una cartera anterior.",
     "backup": {
-      "label": "Copia de seguridad de la cartera",
-      "description": "Muestra tu frase de recuperación de 24 palabras."
+      "label": "Copia de seguridad de la cartera"
     },
     "legacy": {
-      "label": "Recuperación de carteras antiguas",
-      "description": "Mueve fondos desde una cartera anterior de Agora."
+      "label": "Recuperación de carteras antiguas"
     }
   },
   "walletBackupPage": {
@@ -2001,10 +1995,18 @@
   },
   "faq": {
     "categories": {
-      "getting-started": { "label": "Sobre Agora" },
-      "payments": { "label": "Donaciones de Bitcoin en Agora" },
-      "about-nostr": { "label": "Sobre Nostr" },
-      "legacy": { "label": "Legado" }
+      "getting-started": {
+        "label": "Sobre Agora"
+      },
+      "payments": {
+        "label": "Donaciones de Bitcoin en Agora"
+      },
+      "about-nostr": {
+        "label": "Sobre Nostr"
+      },
+      "legacy": {
+        "label": "Legado"
+      }
     },
     "items": {
       "what-is-ditto": {

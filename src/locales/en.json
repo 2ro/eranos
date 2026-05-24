@@ -1199,20 +1199,14 @@
       "silentBadge": "silent",
       "silentDetectedTitle": "Detected via BIP-352 silent payment scan"
     },
-    "openSettings": "Wallet settings"
+    "openMenu": "Wallet menu"
   },
   "walletSettings": {
-    "seoTitle": "Wallet Settings",
-    "seoDescription": "Manage your Bitcoin wallet — back up your seed phrase or recover funds from a previous wallet.",
-    "title": "Wallet Settings",
-    "subtitle": "Back up your seed phrase or recover funds from a previous wallet.",
     "backup": {
-      "label": "Back up wallet",
-      "description": "Reveal your 24-word recovery phrase."
+      "label": "Back up wallet"
     },
     "legacy": {
-      "label": "Legacy wallet recovery",
-      "description": "Move funds from a previous Agora wallet."
+      "label": "Legacy wallet recovery"
     }
   },
   "walletBackupPage": {

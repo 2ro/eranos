@@ -1208,20 +1208,14 @@
       "silentBadge": "silent",
       "silentDetectedTitle": "Terdeteksi melalui pemindaian silent payment BIP-352"
     },
-    "openSettings": "Pengaturan dompet"
+    "openMenu": "Menu dompet"
   },
   "walletSettings": {
-    "seoTitle": "Pengaturan Dompet",
-    "seoDescription": "Kelola dompet Bitcoin Anda — cadangkan frasa pemulihan atau pulihkan dana dari dompet sebelumnya.",
-    "title": "Pengaturan Dompet",
-    "subtitle": "Cadangkan frasa pemulihan Anda atau pulihkan dana dari dompet sebelumnya.",
     "backup": {
-      "label": "Cadangkan dompet",
-      "description": "Tampilkan frasa pemulihan 24 kata Anda."
+      "label": "Cadangkan dompet"
     },
     "legacy": {
-      "label": "Pemulihan dompet lawas",
-      "description": "Pindahkan dana dari dompet Agora sebelumnya."
+      "label": "Pemulihan dompet lawas"
     }
   },
   "walletBackupPage": {

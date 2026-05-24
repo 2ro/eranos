@@ -12,8 +12,8 @@ import { useHdWalletAccess } from '@/hooks/useHdWalletAccess';
 /**
  * Seed-phrase backup page for `/wallet/backup`.
  *
- * Wraps the existing `WalletBackupMnemonic` component (previously rendered as
- * a dialog from `/wallet`) in a full-page layout. The component itself hides
+ * Wraps the existing `WalletBackupMnemonic` component in a full-page layout.
+ * Reached from the overflow menu on `/wallet`. The component itself hides
  * for extension/bunker logins; we mirror that gating here so the unsupported
  * cases render an explanatory message instead of an empty page.
  */
@@ -33,7 +33,7 @@ export function WalletBackupPage() {
     return (
       <main className="max-w-md mx-auto">
         <PageHeader
-          backTo="/wallet/settings"
+          backTo="/wallet"
           alwaysShowBack
           titleContent={
             <div className="flex-1 min-w-0">
@@ -61,7 +61,7 @@ export function WalletBackupPage() {
     return (
       <main className="max-w-md mx-auto">
         <PageHeader
-          backTo="/wallet/settings"
+          backTo="/wallet"
           alwaysShowBack
           titleContent={
             <div className="flex-1 min-w-0">
@@ -81,7 +81,7 @@ export function WalletBackupPage() {
   return (
     <main className="max-w-md mx-auto">
       <PageHeader
-        backTo="/wallet/settings"
+        backTo="/wallet"
         alwaysShowBack
         titleContent={
           <div className="flex-1 min-w-0">

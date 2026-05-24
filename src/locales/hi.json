@@ -1199,20 +1199,14 @@
       "silentBadge": "silent",
       "silentDetectedTitle": "BIP-352 साइलेंट पेमेंट scan से पाया गया"
     },
-    "openSettings": "वॉलेट सेटिंग्स"
+    "openMenu": "वॉलेट मेन्यू"
   },
   "walletSettings": {
-    "seoTitle": "वॉलेट सेटिंग्स",
-    "seoDescription": "अपना Bitcoin वॉलेट मैनेज करें — अपना seed phrase बैकअप करें या पिछले वॉलेट से फंड रिकवर करें।",
-    "title": "वॉलेट सेटिंग्स",
-    "subtitle": "अपना seed phrase बैकअप करें या पिछले वॉलेट से फंड रिकवर करें।",
     "backup": {
-      "label": "वॉलेट बैकअप करें",
-      "description": "अपना 24-शब्द रिकवरी फ़्रेज़ देखें।"
+      "label": "वॉलेट बैकअप करें"
     },
     "legacy": {
-      "label": "पुराने वॉलेट की रिकवरी",
-      "description": "पिछले Agora वॉलेट से फंड ट्रांसफ़र करें।"
+      "label": "पुराने वॉलेट की रिकवरी"
     }
   },
   "walletBackupPage": {

@@ -13,7 +13,8 @@ import {
   ShieldOff,
   KeyRound,
   Radar,
-  Settings,
+  MoreVertical,
+  History,
 } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
@@ -27,6 +28,12 @@ import {
   DialogTitle,
   DialogDescription,
 } from '@/components/ui/dialog';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { HDSendBitcoinDialog } from '@/components/HDSendBitcoinDialog';
 import { HDSilentPaymentScanDialog } from '@/components/HDSilentPaymentScanDialog';
@@ -153,21 +160,39 @@ export function WalletPage() {
   // ── Available — full HD wallet UI ────────────────────────────
   return (
     <main className="max-w-sm mx-auto">
-      {/* Top bar: settings cog only. We deliberately keep this minimal —
+      {/* Top bar: overflow menu only. We deliberately keep this minimal —
           the wallet home doubles as a phone-style "home screen" with the
-          balance as the hero, so any chrome here pushes that down. The cog
+          balance as the hero, so any chrome here pushes that down. The menu
           shares the `max-w-sm` container with the rest of the wallet UI so
           it sits flush with the balance + send/receive controls instead of
           floating off in the far corner of a wide layout. */}
       <div className="flex items-center justify-end px-4 pt-3">
-        <Link
-          to="/wallet/settings"
-          aria-label={t('wallet.openSettings')}
-          title={t('wallet.openSettings')}
-          className="p-2 -mr-2 rounded-full text-muted-foreground hover:bg-secondary hover:text-foreground motion-safe:transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-        >
-          <Settings className="size-5" />
-        </Link>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <button
+              type="button"
+              aria-label={t('wallet.openMenu')}
+              title={t('wallet.openMenu')}
+              className="p-2 -mr-2 rounded-full text-muted-foreground hover:bg-secondary hover:text-foreground motion-safe:transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            >
+              <MoreVertical className="size-5" />
+            </button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuItem asChild>
+              <Link to="/wallet/backup" className="cursor-pointer">
+                <KeyRound className="size-4 mr-2" />
+                {t('walletSettings.backup.label')}
+              </Link>
+            </DropdownMenuItem>
+            <DropdownMenuItem asChild>
+              <Link to="/wallet/legacy" className="cursor-pointer">
+                <History className="size-4 mr-2" />
+                {t('walletSettings.legacy.label')}
+              </Link>
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
 
       <div className="flex flex-col items-center px-4 pt-4 pb-4 space-y-6">
@@ -240,11 +265,11 @@ export function WalletPage() {
           </div>
         )}
 
-        {/* Back-up affordance and v1 detection have moved into
-            `/wallet/settings` (cog in the top-right). The wallet home no
-            longer auto-detects any legacy balances — that scan only runs
-            when the user explicitly opens the Legacy Wallet Recovery
-            screen. */}
+        {/* Back-up affordance and v1 detection live in the overflow menu
+            in the top-right (Back up wallet / Legacy wallet recovery).
+            The wallet home no longer auto-detects any legacy balances —
+            that scan only runs when the user explicitly opens the Legacy
+            Wallet Recovery screen. */}
 
         <HDSendBitcoinDialog
           isOpen={sendOpen}

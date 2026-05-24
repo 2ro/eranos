@@ -776,20 +776,14 @@
       "silentBadge": "靜默",
       "silentDetectedTitle": "通過 BIP-352 靜默支付掃描檢測到"
     },
-    "openSettings": "錢包設定"
+    "openMenu": "錢包選單"
   },
   "walletSettings": {
-    "seoTitle": "錢包設定",
-    "seoDescription": "管理你的比特幣錢包——備份助記詞或從先前的錢包恢復資金。",
-    "title": "錢包設定",
-    "subtitle": "備份你的助記詞，或從先前的錢包恢復資金。",
     "backup": {
-      "label": "備份錢包",
-      "description": "顯示你的 24 詞恢復短語。"
+      "label": "備份錢包"
     },
     "legacy": {
-      "label": "舊版錢包恢復",
-      "description": "從先前的 Agora 錢包轉移資金。"
+      "label": "舊版錢包恢復"
     }
   },
   "walletBackupPage": {

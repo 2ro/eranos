@@ -1208,20 +1208,14 @@
       "silentBadge": "sessiz",
       "silentDetectedTitle": "BIP-352 sessiz ödeme taramasıyla algılandı"
     },
-    "openSettings": "Cüzdan ayarları"
+    "openMenu": "Cüzdan menüsü"
   },
   "walletSettings": {
-    "seoTitle": "Cüzdan Ayarları",
-    "seoDescription": "Bitcoin cüzdanınızı yönetin — kurtarma ifadenizi yedekleyin veya önceki bir cüzdandan fonları kurtarın.",
-    "title": "Cüzdan Ayarları",
-    "subtitle": "Kurtarma ifadenizi yedekleyin veya önceki bir cüzdandan fonları kurtarın.",
     "backup": {
-      "label": "Cüzdanı yedekle",
-      "description": "24 kelimelik kurtarma ifadenizi görüntüleyin."
+      "label": "Cüzdanı yedekle"
     },
     "legacy": {
-      "label": "Eski cüzdan kurtarma",
-      "description": "Önceki bir Agora cüzdanından fonları taşıyın."
+      "label": "Eski cüzdan kurtarma"
     }
   },
   "walletBackupPage": {

@@ -60,7 +60,7 @@ export function LegacyWalletRecoveryPage() {
     return (
       <main className="max-w-md mx-auto">
         <PageHeader
-          backTo="/wallet/settings"
+          backTo="/wallet"
           alwaysShowBack
           titleContent={
             <div className="flex-1 min-w-0">
@@ -108,7 +108,7 @@ export function LegacyWalletRecoveryPage() {
   return (
     <main className="max-w-md mx-auto">
       <PageHeader
-        backTo="/wallet/settings"
+        backTo="/wallet"
         alwaysShowBack
         titleContent={
           <div className="flex-1 min-w-0">

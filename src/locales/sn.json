@@ -776,20 +776,14 @@
       "silentBadge": "wakanyararira",
       "silentDetectedTitle": "Zvakaonekwa kuburikidza nokuongorora kwemubhadharo wakanyararira weBIP-352"
     },
-    "openSettings": "Marongerwo echikwama"
+    "openMenu": "Menyu yechikwama"
   },
   "walletSettings": {
-    "seoTitle": "Marongerwo eChikwama",
-    "seoDescription": "Tarisira chikwama chako cheBitcoin — chengetedza mutsara weseed kana kugarisa mari kubva muchikwama chekare.",
-    "title": "Marongerwo eChikwama",
-    "subtitle": "Chengetedza mutsara weseed kana kugarisa mari kubva muchikwama chekare.",
     "backup": {
-      "label": "Chengetedza chikwama",
-      "description": "Ratidza mutsara wako wekugarisa wemashoko makumi maviri nemana."
+      "label": "Chengetedza chikwama"
     },
     "legacy": {
-      "label": "Kugarisa chikwama chekare",
-      "description": "Tamisira mari kubva muchikwama chekare cheAgora."
+      "label": "Kugarisa chikwama chekare"
     }
   },
   "walletBackupPage": {

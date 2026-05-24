@@ -1199,20 +1199,14 @@
       "silentBadge": "silencieux",
       "silentDetectedTitle": "Détecté via le scan de paiement silencieux BIP-352"
     },
-    "openSettings": "Paramètres du portefeuille"
+    "openMenu": "Menu du portefeuille"
   },
   "walletSettings": {
-    "seoTitle": "Paramètres du portefeuille",
-    "seoDescription": "Gérez votre portefeuille Bitcoin — sauvegardez votre phrase de récupération ou récupérez les fonds d'un ancien portefeuille.",
-    "title": "Paramètres du portefeuille",
-    "subtitle": "Sauvegardez votre phrase de récupération ou récupérez les fonds d'un ancien portefeuille.",
     "backup": {
-      "label": "Sauvegarder le portefeuille",
-      "description": "Révélez votre phrase de récupération de 24 mots."
+      "label": "Sauvegarder le portefeuille"
     },
     "legacy": {
-      "label": "Récupération des anciens portefeuilles",
-      "description": "Déplacez les fonds d'un ancien portefeuille Agora."
+      "label": "Récupération des anciens portefeuilles"
     }
   },
   "walletBackupPage": {
