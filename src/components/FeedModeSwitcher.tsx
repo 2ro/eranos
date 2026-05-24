@@ -1,5 +1,4 @@
-import { Check, ChevronDown, Globe, Sparkles, Users } from 'lucide-react';
-import type { ComponentType } from 'react';
+import { Check, ChevronDown, Globe, Users } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
 import {
@@ -20,14 +19,30 @@ interface FeedModeOption {
   mode: FeedMode;
   /** Translation key suffix under `feed.modeSwitcher`. */
   i18nKey: 'agora' | 'allNostr' | 'following';
-  icon: ComponentType<{ className?: string }>;
 }
 
 const OPTIONS: FeedModeOption[] = [
-  { mode: 'agora', i18nKey: 'agora', icon: Sparkles },
-  { mode: 'all-nostr', i18nKey: 'allNostr', icon: Globe },
-  { mode: 'following', i18nKey: 'following', icon: Users },
+  { mode: 'agora', i18nKey: 'agora' },
+  { mode: 'all-nostr', i18nKey: 'allNostr' },
+  { mode: 'following', i18nKey: 'following' },
 ];
+
+function FeedModeIcon({ mode, className }: { mode: FeedMode; className?: string }) {
+  if (mode === 'agora') {
+    return (
+      <span
+        className={cn(
+          "inline-block shrink-0 bg-current [mask-image:url('/logo.svg')] [mask-position:center] [mask-repeat:no-repeat] [mask-size:contain]",
+          className,
+        )}
+        aria-hidden
+      />
+    );
+  }
+
+  const Icon = mode === 'following' ? Users : Globe;
+  return <Icon className={cn('shrink-0', className)} aria-hidden />;
+}
 
 interface FeedModeSwitcherProps {
   value: FeedMode;
@@ -71,7 +86,14 @@ export function FeedModeSwitcher({
         )}
         aria-label={t('feed.modeSwitcher.ariaLabel', { label: activeLabel })}
       >
-        <span className="text-2xl sm:text-3xl font-bold tracking-tight leading-none">
+        <FeedModeIcon
+          mode={active.mode}
+          className={cn('size-6 sm:size-7', active.mode === 'agora' ? 'text-primary' : 'text-muted-foreground')}
+        />
+        <span className={cn(
+          'text-2xl sm:text-3xl font-bold tracking-tight leading-none',
+          active.mode === 'agora' && 'text-primary',
+        )}>
           {activeLabel}
         </span>
         <ChevronDown
@@ -81,7 +103,7 @@ export function FeedModeSwitcher({
       </DropdownMenuTrigger>
       <DropdownMenuContent align="start" sideOffset={8} className="w-56 p-1.5">
         {OPTIONS.map((opt) => {
-          const Icon = opt.icon;
+          const label = t(`feed.modeSwitcher.${opt.i18nKey}`);
           const isActive = opt.mode === value;
           const isFollowing = opt.mode === 'following';
           const disabled = isFollowing && !followingAvailable;
@@ -105,8 +127,11 @@ export function FeedModeSwitcher({
               )}
               data-disabled={disabled || undefined}
             >
-              <Icon className="size-4 shrink-0 text-muted-foreground" aria-hidden />
-              <span className="flex-1 text-sm font-medium">{t(`feed.modeSwitcher.${opt.i18nKey}`)}</span>
+              <FeedModeIcon
+                mode={opt.mode}
+                className={cn('size-4', opt.mode === 'agora' ? 'text-primary' : 'text-muted-foreground')}
+              />
+              <span className={cn('flex-1 text-sm font-medium', opt.mode === 'agora' && 'text-primary')}>{label}</span>
               {isActive && <Check className="size-4 shrink-0 text-primary" aria-hidden />}
             </DropdownMenuItem>
           );

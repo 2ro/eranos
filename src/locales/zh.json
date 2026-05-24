@@ -65,7 +65,7 @@
     },
     "empty": {
       "homeAgora": "Agora 暂时安静。新的活动、承诺、捐赠和帖子将在发生时显示在这里。",
-      "homeFollowingLoggedIn": "你的关注 Feed 为空。关注一些人来看看他们在做什么，或切换到 Agora 或 All Nostr。",
+      "homeFollowingLoggedIn": "你的关注 Feed 为空。关注一些人来看看他们在做什么，或切换到 Agora 或全球。",
       "homeFollowingLoggedOut": "登录以查看你关注的人的帖子。",
       "homeOther": "暂无内容。请检查你的中继连接，或稍后再试。",
       "follows": "你的 Feed 为空。关注一些人，以便在此处看到他们的帖子。",
@@ -77,7 +77,7 @@
     },
     "modeSwitcher": {
       "agora": "Agora",
-      "allNostr": "全部 Nostr",
+      "allNostr": "全球",
       "following": "关注中",
       "ariaLabel": "Feed 模式：{{label}}。点击更改。",
       "loginRequired": "登录以查看你关注的人的帖子"

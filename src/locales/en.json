@@ -65,7 +65,7 @@
     },
     "empty": {
       "homeAgora": "Quiet moment on Agora. New campaigns, pledges, donations, and posts will appear here as they happen.",
-      "homeFollowingLoggedIn": "Your follow feed is empty. Follow some people to see what they're up to, or switch to Agora or All Nostr.",
+      "homeFollowingLoggedIn": "Your follow feed is empty. Follow some people to see what they're up to, or switch to Agora or Global.",
       "homeFollowingLoggedOut": "Log in to see posts from people you follow.",
       "homeOther": "Nothing to show. Check your relay connections or try again in a moment.",
       "follows": "Your feed is empty. Follow some people to see their posts here.",
@@ -77,7 +77,7 @@
     },
     "modeSwitcher": {
       "agora": "Agora",
-      "allNostr": "All Nostr",
+      "allNostr": "Global",
       "following": "Following",
       "ariaLabel": "Feed mode: {{label}}. Click to change.",
       "loginRequired": "Log in to see posts from people you follow"

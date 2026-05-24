@@ -65,7 +65,7 @@
     },
     "empty": {
       "homeAgora": "Momento tranquilo en Agora. Las nuevas campañas, promesas, donaciones y publicaciones aparecerán aquí cuando ocurran.",
-      "homeFollowingLoggedIn": "Tu feed de seguidos está vacío. Sigue a algunas personas para ver lo que comparten, o cambia a Agora o All Nostr.",
+      "homeFollowingLoggedIn": "Tu feed de seguidos está vacío. Sigue a algunas personas para ver lo que comparten, o cambia a Agora o Global.",
       "homeFollowingLoggedOut": "Inicia sesión para ver publicaciones de las personas que sigues.",
       "homeOther": "Nada que mostrar. Comprueba tus conexiones de relays o vuelve a intentarlo en un momento.",
       "follows": "Tu feed está vacío. Sigue a algunas personas para ver sus publicaciones aquí.",
@@ -77,7 +77,7 @@
     },
     "modeSwitcher": {
       "agora": "Agora",
-      "allNostr": "Todo Nostr",
+      "allNostr": "Global",
       "following": "Siguiendo",
       "ariaLabel": "Modo del feed: {{label}}. Haz clic para cambiar.",
       "loginRequired": "Inicia sesión para ver publicaciones de las personas que sigues"

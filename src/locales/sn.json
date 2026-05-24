@@ -65,7 +65,7 @@
     },
     "empty": {
       "homeAgora": "Nguva yakanyarara paAgora. Mishando mitsva, zvivimbiso, mipo, nezvinyorwa zvichaonekwa pano sezvinozoitika.",
-      "homeFollowingLoggedIn": "Feed yako yokutevera haina chinhu. Tevera vamwe vanhu kuti uone zvavari kuita, kana kuchinjira kuAgora kana All Nostr.",
+      "homeFollowingLoggedIn": "Feed yako yokutevera haina chinhu. Tevera vamwe vanhu kuti uone zvavari kuita, kana kuchinjira kuAgora kana Pasi rose.",
       "homeFollowingLoggedOut": "Pinda kuti uone zvinyorwa zvevanhu vauri kutevera.",
       "homeOther": "Hapana chokuratidza. Tarisa hukama hwerelay yako kana kuedza zvakare munguva pfupi.",
       "follows": "Feed yako haina chinhu. Tevera vamwe vanhu kuti uone zvinyorwa zvavo pano.",
@@ -77,7 +77,7 @@
     },
     "modeSwitcher": {
       "agora": "Agora",
-      "allNostr": "Nostr yose",
+      "allNostr": "Pasi rose",
       "following": "Kutevera",
       "ariaLabel": "Mamiriro eFeed: {{label}}. Dzvanya kushandura.",
       "loginRequired": "Pinda kuti uone zvinyorwa zvevanhu vauri kutevera"
