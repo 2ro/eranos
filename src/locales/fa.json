@@ -490,6 +490,48 @@
     "openInWallet": "باز کردن در کیف پول",
     "seeAllDonations_other": "نمایش همهٔ {{count}} کمک"
   },
+  "calendarEvents": {
+    "create": {
+      "seoTitle": "ایجاد رویداد | Agora",
+      "seoDescription": "یک رویداد تقویمی در Agora ایجاد کنید.",
+      "loginTitle": "برای ایجاد رویداد وارد شوید",
+      "loginBody": "رویدادها، رویدادهای امضاشدهٔ Nostr هستند. برای انتشار باید وارد Nostr شوید."
+    },
+    "detail": {
+      "untitledEvent": "رویداد بدون عنوان",
+      "dateNotSpecified": "تاریخ مشخص نشده است",
+      "organizer": "برگزارکننده",
+      "rsvpUpdated": "RSVP به‌روزرسانی شد",
+      "rsvpFailed": "به‌روزرسانی RSVP ناموفق بود",
+      "rsvp": "RSVP",
+      "youAreGoing": "شما می‌روید",
+      "youAreInterested": "شما علاقه‌مندید",
+      "youCantGo": "نمی‌توانید بروید",
+      "chooseRsvp": "RSVP خود را انتخاب کنید",
+      "going": "می‌روم",
+      "interested": "علاقه‌مندم",
+      "cantGo": "نمی‌توانم بروم",
+      "attendees": "شرکت‌کنندگان",
+      "links": "پیوندها",
+      "participants": "مشارکت‌کنندگان",
+      "hostedBy": "برگزارشده توسط",
+      "attendingCount_one": "{{count}} نفر شرکت می‌کند",
+      "attendingCount_other": "{{count}} نفر شرکت می‌کنند",
+      "interestedCount_one": "{{count}} نفر علاقه‌مند است",
+      "interestedCount_other": "{{count}} نفر علاقه‌مندند",
+      "comment": "نظر",
+      "description": "توضیح",
+      "emptyDescription": "برگزارکننده هنوز توضیحی برای این رویداد اضافه نکرده است.",
+      "comments": "نظرها",
+      "commentNoun_one": "نظر",
+      "commentNoun_other": "نظر",
+      "noCommentsTitle": "هنوز نظری نیست",
+      "noCommentsHint": "اولین نفری باشید که نظر می‌دهد.",
+      "pinnedToast": "به رویداد سنجاق شد",
+      "unpinnedToast": "از رویداد برداشته شد",
+      "pinFailed": "به‌روزرسانی سنجاق‌های رویداد ناموفق بود"
+    }
+  },
   "follow": {
     "follow": "دنبال کردن",
     "following": "دنبال می‌کنید",

@@ -490,6 +490,48 @@
     "openInWallet": "په بټوه کې پرانیزئ",
     "seeAllDonations_other": "ټولې {{count}} مرستې وګورئ"
   },
+  "calendarEvents": {
+    "create": {
+      "seoTitle": "پېښه جوړول | Agora",
+      "seoDescription": "په Agora کې د تقویم پېښه جوړه کړئ.",
+      "loginTitle": "د پېښې جوړولو لپاره ننوځئ",
+      "loginBody": "پېښې لاسلیک شوي Nostr پېښې دي. د خپرولو لپاره Nostr ننوتل اړین دي."
+    },
+    "detail": {
+      "untitledEvent": "بې سرلیکه پېښه",
+      "dateNotSpecified": "نېټه نه ده ټاکل شوې",
+      "organizer": "جوړوونکی",
+      "rsvpUpdated": "RSVP تازه شو",
+      "rsvpFailed": "RSVP تازه نه شو",
+      "rsvp": "RSVP",
+      "youAreGoing": "تاسو ځئ",
+      "youAreInterested": "تاسو لېوال یاست",
+      "youCantGo": "تاسو نشئ تللی",
+      "chooseRsvp": "خپل RSVP وټاکئ",
+      "going": "ځم",
+      "interested": "لېوال",
+      "cantGo": "نشم تللی",
+      "attendees": "ګډونوال",
+      "links": "لینکونه",
+      "participants": "برخه‌وال",
+      "hostedBy": "کوربه",
+      "attendingCount_one": "{{count}} ګډون کوي",
+      "attendingCount_other": "{{count}} ګډون کوي",
+      "interestedCount_one": "{{count}} لېوال دی",
+      "interestedCount_other": "{{count}} لېوال دي",
+      "comment": "تبصره",
+      "description": "توضیح",
+      "emptyDescription": "جوړوونکي لا د دې پېښې لپاره توضیح نه ده زیاته کړې.",
+      "comments": "تبصرې",
+      "commentNoun_one": "تبصره",
+      "commentNoun_other": "تبصرې",
+      "noCommentsTitle": "تر اوسه تبصرې نشته",
+      "noCommentsHint": "لومړی کس شئ چې تبصره کوي.",
+      "pinnedToast": "پېښې ته وټومبل شو",
+      "unpinnedToast": "له پېښې څخه ټومبل لرې شو",
+      "pinFailed": "د پېښې ټومبلونه تازه نه شول"
+    }
+  },
   "follow": {
     "follow": "تعقیب",
     "following": "تعقیب شوی",

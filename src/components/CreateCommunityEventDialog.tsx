@@ -3,6 +3,7 @@ import { CalendarDays, ChevronLeft } from 'lucide-react';
 import { useNostr } from '@nostrify/react';
 import { useQueryClient } from '@tanstack/react-query';
 import type { NostrEvent } from '@nostrify/nostrify';
+import { nip19 } from 'nostr-tools';
 
 import {
   Dialog,
@@ -36,6 +37,7 @@ interface CreateCommunityEventDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   event?: NostrEvent;
+  onPublished?: (naddr: string) => void;
 }
 
 const MANAGED_EDIT_TAGS = new Set([
@@ -92,7 +94,7 @@ function toLocalTimestamp(date: string, time: string): number {
   return Math.floor(new Date(`${date}T${time}:00`).getTime() / 1000);
 }
 
-export function CreateCommunityEventDialog({ communityATag, open, onOpenChange, event }: CreateCommunityEventDialogProps) {
+export function CreateCommunityEventDialog({ communityATag, open, onOpenChange, event, onPublished }: CreateCommunityEventDialogProps) {
   const { user } = useCurrentUser();
   const { nostr } = useNostr();
   const { toast } = useToast();
@@ -374,6 +376,7 @@ export function CreateCommunityEventDialog({ communityATag, open, onOpenChange, 
       ]);
 
       toast({ title: isEditing ? 'Event updated!' : 'Event created!' });
+      onPublished?.(nip19.naddrEncode({ kind, pubkey: publishedEvent.pubkey, identifier: dTag }));
       handleOpenChange(false);
     } catch (err) {
       toast({
@@ -395,6 +398,7 @@ export function CreateCommunityEventDialog({ communityATag, open, onOpenChange, 
     isEditing,
     location,
     nostr,
+    onPublished,
     publishEvent,
     publishRSVP,
     queryClient,

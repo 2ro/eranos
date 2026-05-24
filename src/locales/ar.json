@@ -490,6 +490,48 @@
     "openInWallet": "فتح في المحفظة",
     "seeAllDonations_other": "عرض جميع {{count}} تبرع"
   },
+  "calendarEvents": {
+    "create": {
+      "seoTitle": "إنشاء حدث | Agora",
+      "seoDescription": "أنشئ حدث تقويم على Agora.",
+      "loginTitle": "سجّل الدخول لإنشاء حدث",
+      "loginBody": "الأحداث هي أحداث Nostr موقّعة. تحتاج إلى تسجيل دخول Nostr لنشر حدث."
+    },
+    "detail": {
+      "untitledEvent": "حدث بلا عنوان",
+      "dateNotSpecified": "لم يتم تحديد التاريخ",
+      "organizer": "المنظم",
+      "rsvpUpdated": "تم تحديث الرد",
+      "rsvpFailed": "فشل تحديث الرد",
+      "rsvp": "الرد على الدعوة",
+      "youAreGoing": "أنت ذاهب",
+      "youAreInterested": "أنت مهتم",
+      "youCantGo": "لا يمكنك الحضور",
+      "chooseRsvp": "اختر ردك",
+      "going": "ذاهب",
+      "interested": "مهتم",
+      "cantGo": "لا أستطيع الحضور",
+      "attendees": "الحاضرون",
+      "links": "الروابط",
+      "participants": "المشاركون",
+      "hostedBy": "يستضيفه",
+      "attendingCount_one": "{{count}} حاضر",
+      "attendingCount_other": "{{count}} حاضرون",
+      "interestedCount_one": "{{count}} مهتم",
+      "interestedCount_other": "{{count}} مهتمون",
+      "comment": "تعليق",
+      "description": "الوصف",
+      "emptyDescription": "لم يضف المنظم وصفاً لهذا الحدث بعد.",
+      "comments": "التعليقات",
+      "commentNoun_one": "تعليق",
+      "commentNoun_other": "تعليقات",
+      "noCommentsTitle": "لا توجد تعليقات بعد",
+      "noCommentsHint": "كن أول من يعلّق.",
+      "pinnedToast": "تم التثبيت على الحدث",
+      "unpinnedToast": "تم إلغاء التثبيت من الحدث",
+      "pinFailed": "فشل تحديث تثبيتات الحدث"
+    }
+  },
   "follow": {
     "follow": "متابعة",
     "following": "متابَع",

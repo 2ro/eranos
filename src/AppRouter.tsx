@@ -29,6 +29,7 @@ const AppearanceSettingsPage = lazy(() => import("./pages/AppearanceSettingsPage
 const ChangelogPage = lazy(() => import("./pages/ChangelogPage").then(m => ({ default: m.ChangelogPage })));
 const CommunitiesPage = lazy(() => import("./pages/CommunitiesPage").then(m => ({ default: m.CommunitiesPage })));
 const CreateCommunityPage = lazy(() => import("./pages/CreateCommunityPage").then(m => ({ default: m.CreateCommunityPage })));
+const CreateEventPage = lazy(() => import("./pages/CreateEventPage").then(m => ({ default: m.CreateEventPage })));
 const CSAEPolicyPage = lazy(() => import("./pages/CSAEPolicyPage").then(m => ({ default: m.CSAEPolicyPage })));
 const ExternalContentPage = lazy(() => import("./pages/ExternalContentPage").then(m => ({ default: m.ExternalContentPage })));
 const GeotagPage = lazy(() => import("./pages/GeotagPage").then(m => ({ default: m.GeotagPage })));
@@ -168,6 +169,7 @@ export function AppRouter() {
           <Route path="/campaigns/all" element={<AllCampaignsPage />} />
           <Route path="/groups" element={<CommunitiesPage />} />
           <Route path="/groups/new" element={<CreateCommunityPage />} />
+          <Route path="/events/new" element={<CreateEventPage />} />
           <Route path="/pledges" element={<ActionsPage />} />
           <Route path="/pledges/new" element={<CreateActionPage />} />
           <Route path="/dashboard" element={<EventDashboardPage />} />

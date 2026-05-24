@@ -490,6 +490,48 @@
     "openInWallet": "Abrir en la cartera",
     "seeAllDonations_other": "Ver las {{count}} donaciones"
   },
+  "calendarEvents": {
+    "create": {
+      "seoTitle": "Crear evento | Agora",
+      "seoDescription": "Crea un evento de calendario en Agora.",
+      "loginTitle": "Inicia sesión para crear un evento",
+      "loginBody": "Los eventos son eventos firmados de Nostr. Necesitas iniciar sesión en Nostr para publicar uno."
+    },
+    "detail": {
+      "untitledEvent": "Evento sin título",
+      "dateNotSpecified": "Fecha no especificada",
+      "organizer": "Organizador",
+      "rsvpUpdated": "RSVP actualizado",
+      "rsvpFailed": "No se pudo actualizar el RSVP",
+      "rsvp": "RSVP",
+      "youAreGoing": "Vas a asistir",
+      "youAreInterested": "Te interesa",
+      "youCantGo": "No puedes ir",
+      "chooseRsvp": "Elige tu RSVP",
+      "going": "Asistiré",
+      "interested": "Me interesa",
+      "cantGo": "No puedo ir",
+      "attendees": "Asistentes",
+      "links": "Enlaces",
+      "participants": "Participantes",
+      "hostedBy": "organizado por",
+      "attendingCount_one": "{{count}} asistente",
+      "attendingCount_other": "{{count}} asistentes",
+      "interestedCount_one": "{{count}} interesado",
+      "interestedCount_other": "{{count}} interesados",
+      "comment": "Comentar",
+      "description": "Descripción",
+      "emptyDescription": "El organizador todavía no ha agregado una descripción para este evento.",
+      "comments": "Comentarios",
+      "commentNoun_one": "comentario",
+      "commentNoun_other": "comentarios",
+      "noCommentsTitle": "Aún no hay comentarios",
+      "noCommentsHint": "Sé la primera persona en comentar.",
+      "pinnedToast": "Fijado al evento",
+      "unpinnedToast": "Quitado del evento",
+      "pinFailed": "No se pudieron actualizar los fijados del evento"
+    }
+  },
   "follow": {
     "follow": "Seguir",
     "following": "Siguiendo",

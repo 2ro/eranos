@@ -913,6 +913,48 @@
     "openInWallet": "Open in wallet",
     "seeAllDonations_other": "See all {{count}} donations"
   },
+  "calendarEvents": {
+    "create": {
+      "seoTitle": "Create event | Agora",
+      "seoDescription": "Create a calendar event on Agora.",
+      "loginTitle": "Log in to create an event",
+      "loginBody": "Events are signed Nostr events. You need a Nostr login to publish one."
+    },
+    "detail": {
+      "untitledEvent": "Untitled event",
+      "dateNotSpecified": "Date not specified",
+      "organizer": "Organizer",
+      "rsvpUpdated": "RSVP updated",
+      "rsvpFailed": "Failed to update RSVP",
+      "rsvp": "RSVP",
+      "youAreGoing": "You are going",
+      "youAreInterested": "You are interested",
+      "youCantGo": "You can't go",
+      "chooseRsvp": "Choose your RSVP",
+      "going": "Going",
+      "interested": "Interested",
+      "cantGo": "Can't Go",
+      "attendees": "Attendees",
+      "links": "Links",
+      "participants": "Participants",
+      "hostedBy": "hosted by",
+      "attendingCount_one": "{{count}} attending",
+      "attendingCount_other": "{{count}} attending",
+      "interestedCount_one": "{{count}} interested",
+      "interestedCount_other": "{{count}} interested",
+      "comment": "Comment",
+      "description": "Description",
+      "emptyDescription": "The organizer hasn't added a description for this event yet.",
+      "comments": "Comments",
+      "commentNoun_one": "comment",
+      "commentNoun_other": "comments",
+      "noCommentsTitle": "No comments yet",
+      "noCommentsHint": "Be the first to comment.",
+      "pinnedToast": "Pinned to event",
+      "unpinnedToast": "Unpinned from event",
+      "pinFailed": "Failed to update event pins"
+    }
+  },
   "follow": {
     "follow": "Follow",
     "following": "Following",

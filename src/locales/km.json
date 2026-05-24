@@ -490,6 +490,48 @@
     "openInWallet": "បើកក្នុងកាបូប",
     "seeAllDonations_other": "មើលការបរិច្ចាគ {{count}} ទាំងអស់"
   },
+  "calendarEvents": {
+    "create": {
+      "seoTitle": "បង្កើតព្រឹត្តិការណ៍ | Agora",
+      "seoDescription": "បង្កើតព្រឹត្តិការណ៍ប្រតិទិនលើ Agora។",
+      "loginTitle": "ចូលគណនីដើម្បីបង្កើតព្រឹត្តិការណ៍",
+      "loginBody": "ព្រឹត្តិការណ៍គឺជាព្រឹត្តិការណ៍ Nostr ដែលបានចុះហត្ថលេខា។ អ្នកត្រូវការចូល Nostr ដើម្បីផ្សព្វផ្សាយ។"
+    },
+    "detail": {
+      "untitledEvent": "ព្រឹត្តិការណ៍គ្មានចំណងជើង",
+      "dateNotSpecified": "មិនបានបញ្ជាក់កាលបរិច្ឆេទ",
+      "organizer": "អ្នករៀបចំ",
+      "rsvpUpdated": "បានធ្វើបច្ចុប្បន្នភាព RSVP",
+      "rsvpFailed": "មិនអាចធ្វើបច្ចុប្បន្នភាព RSVP",
+      "rsvp": "RSVP",
+      "youAreGoing": "អ្នកនឹងទៅ",
+      "youAreInterested": "អ្នកចាប់អារម្មណ៍",
+      "youCantGo": "អ្នកមិនអាចទៅបាន",
+      "chooseRsvp": "ជ្រើស RSVP របស់អ្នក",
+      "going": "ទៅ",
+      "interested": "ចាប់អារម្មណ៍",
+      "cantGo": "មិនអាចទៅបាន",
+      "attendees": "អ្នកចូលរួម",
+      "links": "តំណ",
+      "participants": "អ្នកចូលរួម",
+      "hostedBy": "រៀបចំដោយ",
+      "attendingCount_one": "{{count}} នាក់នឹងចូលរួម",
+      "attendingCount_other": "{{count}} នាក់នឹងចូលរួម",
+      "interestedCount_one": "{{count}} នាក់ចាប់អារម្មណ៍",
+      "interestedCount_other": "{{count}} នាក់ចាប់អារម្មណ៍",
+      "comment": "មតិយោបល់",
+      "description": "ការពិពណ៌នា",
+      "emptyDescription": "អ្នករៀបចំមិនទាន់បានបន្ថែមការពិពណ៌នាសម្រាប់ព្រឹត្តិការណ៍នេះទេ។",
+      "comments": "មតិយោបល់",
+      "commentNoun_one": "មតិយោបល់",
+      "commentNoun_other": "មតិយោបល់",
+      "noCommentsTitle": "មិនទាន់មានមតិយោបល់",
+      "noCommentsHint": "ក្លាយជាមនុស្សដំបូងដែលបញ្ចេញមតិ។",
+      "pinnedToast": "បានខ្ទាស់ទៅព្រឹត្តិការណ៍",
+      "unpinnedToast": "បានដកខ្ទាស់ពីព្រឹត្តិការណ៍",
+      "pinFailed": "មិនអាចធ្វើបច្ចុប្បន្នភាពការខ្ទាស់ព្រឹត្តិការណ៍"
+    }
+  },
   "follow": {
     "follow": "តាមដាន",
     "following": "កំពុងតាមដាន",

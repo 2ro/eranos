@@ -490,6 +490,48 @@
     "openInWallet": "Vhura muchikwama",
     "seeAllDonations_other": "Ona zvipo zvese {{count}}"
   },
+  "calendarEvents": {
+    "create": {
+      "seoTitle": "Gadzira chiitiko | Agora",
+      "seoDescription": "Gadzira chiitiko checalendar paAgora.",
+      "loginTitle": "Pinda kuti ugadzire chiitiko",
+      "loginBody": "Zviitiko maNostr events akasainwa. Unoda kupinda muNostr kuti ubudise chimwe."
+    },
+    "detail": {
+      "untitledEvent": "Chiitiko chisina zita",
+      "dateNotSpecified": "Zuva harina kutsanangurwa",
+      "organizer": "Murongi",
+      "rsvpUpdated": "RSVP yavandudzwa",
+      "rsvpFailed": "Kuvandudza RSVP kwakundikana",
+      "rsvp": "RSVP",
+      "youAreGoing": "Uri kuenda",
+      "youAreInterested": "Uri kufarira",
+      "youCantGo": "Haukwanisi kuenda",
+      "chooseRsvp": "Sarudza RSVP yako",
+      "going": "Kuenda",
+      "interested": "Kufarira",
+      "cantGo": "Handikwanisi kuenda",
+      "attendees": "Vachapinda",
+      "links": "Ma link",
+      "participants": "Vatori vechikamu",
+      "hostedBy": "chirongwa cha",
+      "attendingCount_one": "{{count}} ari kuenda",
+      "attendingCount_other": "{{count}} vari kuenda",
+      "interestedCount_one": "{{count}} ari kufarira",
+      "interestedCount_other": "{{count}} vari kufarira",
+      "comment": "Comment",
+      "description": "Tsananguro",
+      "emptyDescription": "Murongi haasati awedzera tsananguro yechiitiko ichi.",
+      "comments": "Ma comment",
+      "commentNoun_one": "comment",
+      "commentNoun_other": "ma comment",
+      "noCommentsTitle": "Hapana ma comment parizvino",
+      "noCommentsHint": "Iva wekutanga kucomment.",
+      "pinnedToast": "Chapinirwa pachiitiko",
+      "unpinnedToast": "Chabviswa pachiitiko",
+      "pinFailed": "Kuvandudza mapin echiitiko kwakundikana"
+    }
+  },
   "follow": {
     "follow": "Tevera",
     "following": "Uri kutevera",

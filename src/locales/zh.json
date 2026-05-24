@@ -490,6 +490,48 @@
     "openInWallet": "在钱包中打开",
     "seeAllDonations_other": "查看全部 {{count}} 笔捐赠"
   },
+  "calendarEvents": {
+    "create": {
+      "seoTitle": "创建事件 | Agora",
+      "seoDescription": "在 Agora 上创建日历事件。",
+      "loginTitle": "登录以创建事件",
+      "loginBody": "事件是已签名的 Nostr 事件。你需要登录 Nostr 才能发布。"
+    },
+    "detail": {
+      "untitledEvent": "未命名事件",
+      "dateNotSpecified": "未指定日期",
+      "organizer": "组织者",
+      "rsvpUpdated": "RSVP 已更新",
+      "rsvpFailed": "无法更新 RSVP",
+      "rsvp": "RSVP",
+      "youAreGoing": "你将参加",
+      "youAreInterested": "你感兴趣",
+      "youCantGo": "你不能参加",
+      "chooseRsvp": "选择你的 RSVP",
+      "going": "参加",
+      "interested": "感兴趣",
+      "cantGo": "不能参加",
+      "attendees": "参加者",
+      "links": "链接",
+      "participants": "参与者",
+      "hostedBy": "主办者",
+      "attendingCount_one": "{{count}} 人参加",
+      "attendingCount_other": "{{count}} 人参加",
+      "interestedCount_one": "{{count}} 人感兴趣",
+      "interestedCount_other": "{{count}} 人感兴趣",
+      "comment": "评论",
+      "description": "描述",
+      "emptyDescription": "组织者还没有为此事件添加描述。",
+      "comments": "评论",
+      "commentNoun_one": "条评论",
+      "commentNoun_other": "条评论",
+      "noCommentsTitle": "还没有评论",
+      "noCommentsHint": "成为第一个评论的人。",
+      "pinnedToast": "已固定到事件",
+      "unpinnedToast": "已从事件取消固定",
+      "pinFailed": "无法更新事件固定"
+    }
+  },
   "follow": {
     "follow": "关注",
     "following": "已关注",
