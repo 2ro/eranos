@@ -112,7 +112,18 @@
     "description": "ការពិពណ៌នា",
     "timezone": "តំបន់ពេលវេលា",
     "publishing": "កំពុងផ្សព្វផ្សាយ…",
-    "uploadingCover": "កំពុងផ្ទុកគម្រប…"
+    "uploadingCover": "កំពុងផ្ទុកគម្រប…",
+    "countrySearchPlaceholder": "ស្វែងរកប្រទេស",
+    "imageDropzone": "ចុច ឬអូសរូបភាពមកទីនេះ"
+  },
+  "organizationContext": {
+    "attachedToGroup": "បានភ្ជាប់ទៅក្រុម",
+    "groupFallback": "ក្រុម",
+    "editSubtext": "ការធ្វើបច្ចុប្បន្នភាពនឹងនៅតែភ្ជាប់ទៅសកម្មភាពផ្លូវការរបស់ក្រុមនេះ។",
+    "malformedParam": "មិនអាចអានក្រុមនៅក្នុងតំណបានទេ។ នឹងផ្សព្វផ្សាយក្រោមគណនីរបស់អ្នក។",
+    "checkingPermissions": "កំពុងពិនិត្យសិទ្ធិក្រុម…",
+    "unauthorized": "អ្នកមិនមែនជាស្ថាបនិក ឬអ្នកសម្របសម្រួលរបស់ក្រុមនោះទេ។ នឹងផ្សព្វផ្សាយក្រោមគណនីរបស់អ្នក។",
+    "publishingAsGroup": "កំពុងផ្សព្វផ្សាយជាក្រុម"
   },
   "notFound": {
     "title": "404 - រកមិនឃើញទំព័រ",
@@ -179,7 +190,7 @@
       "title": "ចំណងជើង",
       "titlePlaceholder": "កត់ត្រាការសម្អាតឆ្នេរ",
       "country": "ប្រទេស",
-      "countryPlaceholder": "ស្វែងរកប្រទេស ឧ. វេណេស៊ុយអេឡា",
+      "countryPlaceholder": "ស្វែងរកប្រទេស",
       "countryClearAria": "សម្អាតប្រទេស",
       "flagOfAria": "ទង់ជាតិ {{name}}",
       "countryHint": "ផ្សព្វផ្សាយ <0>i: iso3166:{{code}}</0> សម្រាប់តម្រៀបតាមប្រទេស។",
@@ -300,7 +311,7 @@
       "description": "ការពិពណ៌នា",
       "descriptionPlaceholder": "ក្រុមនេះនិយាយអំពីអ្វី?",
       "country": "ប្រទេស",
-      "countryPlaceholder": "ស្វែងរកប្រទេស ឧ. វេណេស៊ុយអេឡា",
+      "countryPlaceholder": "ស្វែងរកប្រទេស",
       "countryClearAria": "សម្អាតប្រទេស",
       "flagOfAria": "ទង់ជាតិ {{name}}",
       "countryHint": "ផ្សព្វផ្សាយ <0>i: iso3166:{{code}}</0> សម្រាប់តម្រៀបតាមប្រទេស។",
@@ -399,7 +410,7 @@
     "onchainInvalid": "មិនមែនជាអាសយដ្ឋានប៊ីតខញ mainnet ដែលត្រូវបានទទួលស្គាល់ទេ (bc1q… / bc1p…)។",
     "spInvalid": "មិនមែនជាលេខកូដបង់ប្រាក់ស្ងាត់ BIP-352 ដែលត្រូវបានទទួលស្គាល់ទេ (sp1…)។",
     "country": "ប្រទេស",
-    "countryPlaceholder": "ស្វែងរកប្រទេស ឧ. វេណេស៊ុយអេឡា",
+    "countryPlaceholder": "ស្វែងរកប្រទេស",
     "countryClearAria": "សម្អាតប្រទេស",
     "flagOfAria": "ទង់ជាតិ {{name}}",
     "countryHint": "ផ្សព្វផ្សាយ <0>i: iso3166:{{code}}</0> សម្រាប់តម្រៀបតាមប្រទេស។",

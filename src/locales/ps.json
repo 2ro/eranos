@@ -112,7 +112,18 @@
     "description": "توضیح",
     "timezone": "وخت زون",
     "publishing": "خپرېږي…",
-    "uploadingCover": "پوښ پورته کېږي…"
+    "uploadingCover": "پوښ پورته کېږي…",
+    "countrySearchPlaceholder": "هېوادونه ولټوئ",
+    "imageDropzone": "دلته انځور کلیک یا راکش کړئ"
+  },
+  "organizationContext": {
+    "attachedToGroup": "له ډلې سره تړلی",
+    "groupFallback": "ډله",
+    "editSubtext": "تازه‌کونې به د دې ډلې له رسمي فعالیت سره تړلې پاتې شي.",
+    "malformedParam": "په لینک کې ډله ونه لوستل شوه. ستاسو د حساب لاندې به خپره شي.",
+    "checkingPermissions": "د ډلې اجازې کتل کېږي…",
+    "unauthorized": "تاسو د هغې ډلې بنسټګر یا مدیر نه یاست. ستاسو د حساب لاندې به خپره شي.",
+    "publishingAsGroup": "د ډلې په توګه خپرول"
   },
   "notFound": {
     "title": "۴۰۴ - پاڼه ونه موندل شوه",
@@ -179,7 +190,7 @@
       "title": "سرلیک",
       "titlePlaceholder": "د ساحل پاکولو مستندول",
       "country": "هیواد",
-      "countryPlaceholder": "د هیوادونو لټون، لکه ونزویلا",
+      "countryPlaceholder": "هېوادونه ولټوئ",
       "countryClearAria": "هیواد پاکول",
       "flagOfAria": "د {{name}} بیرغ",
       "countryHint": "د هیواد د ترتیب لپاره <0>i: iso3166:{{code}}</0> خپریږي.",
@@ -300,7 +311,7 @@
       "description": "تشریح",
       "descriptionPlaceholder": "دا ډله د څه په اړه ده؟",
       "country": "هیواد",
-      "countryPlaceholder": "د هیوادونو لټون، لکه ونزویلا",
+      "countryPlaceholder": "هېوادونه ولټوئ",
       "countryClearAria": "هیواد پاکول",
       "flagOfAria": "د {{name}} بیرغ",
       "countryHint": "د هیواد د ترتیب لپاره <0>i: iso3166:{{code}}</0> خپریږي.",
@@ -399,7 +410,7 @@
     "onchainInvalid": "د mainnet د پېژندل شوي بټ‌کوین پته نه ده (bc1q… / bc1p…).",
     "spInvalid": "د پېژندل شوي BIP-352 د چپ پیسو کوډ نه دی (sp1…).",
     "country": "هیواد",
-    "countryPlaceholder": "د هیوادونو لټون، لکه ونزویلا",
+    "countryPlaceholder": "هېوادونه ولټوئ",
     "countryClearAria": "هیواد پاکول",
     "flagOfAria": "د {{name}} بیرغ",
     "countryHint": "د هیواد د ترتیب لپاره <0>i: iso3166:{{code}}</0> خپریږي.",

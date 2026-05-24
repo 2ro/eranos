@@ -766,7 +766,7 @@ function CountrySelect({
             }
           }}
           className="h-9 rounded-full border-0 bg-secondary pl-10 pr-10 text-sm focus-visible:ring-0 focus-visible:ring-offset-0"
-          placeholder={t('groups.create.countryPlaceholder')}
+          placeholder={t('forms.countrySearchPlaceholder')}
           autoComplete="off"
           role="combobox"
           aria-expanded={showResults}

@@ -112,7 +112,18 @@
     "description": "الوصف",
     "timezone": "المنطقة الزمنية",
     "publishing": "جارٍ النشر…",
-    "uploadingCover": "جارٍ رفع الغلاف…"
+    "uploadingCover": "جارٍ رفع الغلاف…",
+    "countrySearchPlaceholder": "ابحث عن البلدان",
+    "imageDropzone": "انقر أو اسحب صورة هنا"
+  },
+  "organizationContext": {
+    "attachedToGroup": "مرتبط بالمجموعة",
+    "groupFallback": "مجموعة",
+    "editSubtext": "ستبقى التحديثات مرتبطة بالنشاط الرسمي لهذه المجموعة.",
+    "malformedParam": "تعذّر قراءة المجموعة في الرابط. سيتم النشر ضمن حسابك.",
+    "checkingPermissions": "جارٍ التحقق من أذونات المجموعة…",
+    "unauthorized": "لست مؤسساً أو مشرفاً في تلك المجموعة. سيتم النشر ضمن حسابك.",
+    "publishingAsGroup": "النشر كمجموعة"
   },
   "notFound": {
     "title": "404 - الصفحة غير موجودة",
@@ -179,7 +190,7 @@
       "title": "العنوان",
       "titlePlaceholder": "توثيق تنظيف شاطئ",
       "country": "البلد",
-      "countryPlaceholder": "ابحث عن البلدان، مثل فنزويلا",
+      "countryPlaceholder": "ابحث عن البلدان",
       "countryClearAria": "مسح البلد",
       "flagOfAria": "علم {{name}}",
       "countryHint": "يُنشر <0>i: iso3166:{{code}}</0> للترتيب حسب البلد.",
@@ -300,7 +311,7 @@
       "description": "الوصف",
       "descriptionPlaceholder": "عن ماذا تدور هذه المجموعة؟",
       "country": "البلد",
-      "countryPlaceholder": "ابحث عن البلدان، مثل فنزويلا",
+      "countryPlaceholder": "ابحث عن البلدان",
       "countryClearAria": "مسح البلد",
       "flagOfAria": "علم {{name}}",
       "countryHint": "يُنشر <0>i: iso3166:{{code}}</0> للترتيب حسب البلد.",
@@ -399,7 +410,7 @@
     "onchainInvalid": "ليس عنوان بيتكوين شبكة رئيسية معروفًا (bc1q… / bc1p…).",
     "spInvalid": "ليس رمز دفع صامت BIP-352 معروفًا (sp1…).",
     "country": "البلد",
-    "countryPlaceholder": "ابحث عن البلدان، مثل فنزويلا",
+    "countryPlaceholder": "ابحث عن البلدان",
     "countryClearAria": "مسح البلد",
     "flagOfAria": "علم {{name}}",
     "countryHint": "يُنشر <0>i: iso3166:{{code}}</0> للترتيب حسب البلد.",

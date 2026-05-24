@@ -112,7 +112,18 @@
     "description": "توضیح",
     "timezone": "منطقه زمانی",
     "publishing": "در حال انتشار…",
-    "uploadingCover": "در حال بارگذاری کاور…"
+    "uploadingCover": "در حال بارگذاری کاور…",
+    "countrySearchPlaceholder": "جستجوی کشورها",
+    "imageDropzone": "برای انتخاب تصویر کلیک کنید یا آن را اینجا بکشید"
+  },
+  "organizationContext": {
+    "attachedToGroup": "پیوست‌شده به گروه",
+    "groupFallback": "گروه",
+    "editSubtext": "به‌روزرسانی‌ها به فعالیت رسمی این گروه متصل می‌مانند.",
+    "malformedParam": "گروه در پیوند خوانده نشد. زیر حساب شما منتشر می‌شود.",
+    "checkingPermissions": "در حال بررسی مجوزهای گروه…",
+    "unauthorized": "شما بنیان‌گذار یا ناظر آن گروه نیستید. زیر حساب شما منتشر می‌شود.",
+    "publishingAsGroup": "انتشار به‌عنوان گروه"
   },
   "notFound": {
     "title": "۴۰۴ - صفحه پیدا نشد",
@@ -179,7 +190,7 @@
       "title": "عنوان",
       "titlePlaceholder": "مستندسازی پاکسازی ساحل",
       "country": "کشور",
-      "countryPlaceholder": "جستجوی کشور، مثلاً ونزوئلا",
+      "countryPlaceholder": "جستجوی کشورها",
       "countryClearAria": "پاک کردن کشور",
       "flagOfAria": "پرچم {{name}}",
       "countryHint": "<0>i: iso3166:{{code}}</0> برای مرتب‌سازی بر اساس کشور منتشر می‌شود.",
@@ -300,7 +311,7 @@
       "description": "توضیح",
       "descriptionPlaceholder": "این گروه دربارهٔ چیست؟",
       "country": "کشور",
-      "countryPlaceholder": "جستجوی کشور، مثلاً ونزوئلا",
+      "countryPlaceholder": "جستجوی کشورها",
       "countryClearAria": "پاک کردن کشور",
       "flagOfAria": "پرچم {{name}}",
       "countryHint": "<0>i: iso3166:{{code}}</0> برای مرتب‌سازی بر اساس کشور منتشر می‌شود.",
@@ -399,7 +410,7 @@
     "onchainInvalid": "نشانی بیت‌کوین شبکهٔ اصلی شناخته‌شده نیست (bc1q… / bc1p…).",
     "spInvalid": "کد پرداخت بی‌صدای BIP-352 شناخته‌شده نیست (sp1…).",
     "country": "کشور",
-    "countryPlaceholder": "جستجوی کشور، مثلاً ونزوئلا",
+    "countryPlaceholder": "جستجوی کشورها",
     "countryClearAria": "پاک کردن کشور",
     "flagOfAria": "پرچم {{name}}",
     "countryHint": "<0>i: iso3166:{{code}}</0> برای مرتب‌سازی بر اساس کشور منتشر می‌شود.",

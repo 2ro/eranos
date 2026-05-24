@@ -112,7 +112,18 @@
     "description": "描述",
     "timezone": "时区",
     "publishing": "发布中…",
-    "uploadingCover": "正在上传封面…"
+    "uploadingCover": "正在上传封面…",
+    "countrySearchPlaceholder": "搜索国家/地区",
+    "imageDropzone": "点击或拖拽图片到这里"
+  },
+  "organizationContext": {
+    "attachedToGroup": "已关联到群组",
+    "groupFallback": "群组",
+    "editSubtext": "更新将继续关联到此群组的官方活动。",
+    "malformedParam": "无法读取链接中的群组。将以你的账号发布。",
+    "checkingPermissions": "正在检查群组权限…",
+    "unauthorized": "你不是该群组的创始人或版主。将以你的账号发布。",
+    "publishingAsGroup": "以群组身份发布"
   },
   "notFound": {
     "title": "404 - 找不到页面",
@@ -179,7 +190,7 @@
       "title": "标题",
       "titlePlaceholder": "记录一次海滩清理",
       "country": "国家",
-      "countryPlaceholder": "搜索国家，例如委内瑞拉",
+      "countryPlaceholder": "搜索国家/地区",
       "countryClearAria": "清除国家",
       "flagOfAria": "{{name}} 国旗",
       "countryHint": "发布 <0>i: iso3166:{{code}}</0> 用于按国家排序。",
@@ -300,7 +311,7 @@
       "description": "描述",
       "descriptionPlaceholder": "这个群组是关于什么的？",
       "country": "国家",
-      "countryPlaceholder": "搜索国家，例如委内瑞拉",
+      "countryPlaceholder": "搜索国家/地区",
       "countryClearAria": "清除国家",
       "flagOfAria": "{{name}} 国旗",
       "countryHint": "发布 <0>i: iso3166:{{code}}</0> 用于按国家排序。",
@@ -399,7 +410,7 @@
     "onchainInvalid": "不是已识别的主网比特币地址（bc1q… / bc1p…）。",
     "spInvalid": "不是已识别的 BIP-352 静默支付代码（sp1…）。",
     "country": "国家",
-    "countryPlaceholder": "搜索国家，例如委内瑞拉",
+    "countryPlaceholder": "搜索国家/地区",
     "countryClearAria": "清除国家",
     "flagOfAria": "{{name}} 国旗",
     "countryHint": "发布 <0>i: iso3166:{{code}}</0> 用于按国家排序。",

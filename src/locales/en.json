@@ -535,7 +535,18 @@
     "description": "Description",
     "timezone": "Timezone",
     "publishing": "Publishing…",
-    "uploadingCover": "Uploading cover…"
+    "uploadingCover": "Uploading cover…",
+    "countrySearchPlaceholder": "Search countries",
+    "imageDropzone": "Click or drag an image here"
+  },
+  "organizationContext": {
+    "attachedToGroup": "Attached to group",
+    "groupFallback": "Group",
+    "editSubtext": "Updates will stay connected to this group's official activity.",
+    "malformedParam": "Couldn't read the group in the link. Publishing under your account.",
+    "checkingPermissions": "Checking group permissions…",
+    "unauthorized": "You aren't a founder or moderator of that group. Publishing under your account.",
+    "publishingAsGroup": "Publishing as group"
   },
   "notFound": {
     "title": "404 - Page Not Found",
@@ -602,7 +613,7 @@
       "title": "Title",
       "titlePlaceholder": "Document a beach cleanup",
       "country": "Country",
-      "countryPlaceholder": "Search countries, e.g. Venezuela",
+      "countryPlaceholder": "Search countries",
       "countryClearAria": "Clear country",
       "flagOfAria": "Flag of {{name}}",
       "countryHint": "Publishes <0>i: iso3166:{{code}}</0> for country sorting.",
@@ -723,7 +734,7 @@
       "description": "Description",
       "descriptionPlaceholder": "What is this group about?",
       "country": "Country",
-      "countryPlaceholder": "Search countries, e.g. Venezuela",
+      "countryPlaceholder": "Search countries",
       "countryClearAria": "Clear country",
       "flagOfAria": "Flag of {{name}}",
       "countryHint": "Publishes <0>i: iso3166:{{code}}</0> for country sorting.",
@@ -822,7 +833,7 @@
     "onchainInvalid": "Not a recognized mainnet Bitcoin address (bc1q… / bc1p…).",
     "spInvalid": "Not a recognized BIP-352 silent-payment code (sp1…).",
     "country": "Country",
-    "countryPlaceholder": "Search countries, e.g. Venezuela",
+    "countryPlaceholder": "Search countries",
     "countryClearAria": "Clear country",
     "flagOfAria": "Flag of {{name}}",
     "countryHint": "Publishes <0>i: iso3166:{{code}}</0> for country sorting.",

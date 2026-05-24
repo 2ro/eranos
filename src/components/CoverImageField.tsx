@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { ImagePlus, Loader2, X } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/useToast';
@@ -54,6 +55,7 @@ interface CoverImageFieldProps {
  * the same value is what gets published in the Nostr event's `image` tag.
  */
 export function CoverImageField({ value, onChange, onUploadingChange, onUploadComplete, templates }: CoverImageFieldProps) {
+  const { t } = useTranslation();
   const { mutateAsync: uploadFile, isPending: isUploading } = useUploadFile();
   const { toast } = useToast();
   const [isDragging, setIsDragging] = useState(false);
@@ -171,7 +173,7 @@ export function CoverImageField({ value, onChange, onUploadingChange, onUploadCo
             ) : (
               <>
                 <ImagePlus className="size-8" />
-                <span className="text-sm">Click or drag an image here</span>
+                <span className="text-sm">{t('forms.imageDropzone')}</span>
                 <span className="text-xs">PNG, JPG, or WEBP</span>
               </>
             )}
@@ -224,7 +226,7 @@ export function CoverImageField({ value, onChange, onUploadingChange, onUploadCo
       <Input
         type="url"
         inputMode="url"
-        placeholder="Or paste an https:// image URL"
+        placeholder="https://imageurl.com/example"
         value={value}
         onChange={(e) => onChange(e.target.value)}
       />

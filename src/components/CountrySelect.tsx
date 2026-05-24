@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react';
 import { MapPin, X } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 import { Input } from '@/components/ui/input';
 import { COUNTRIES, searchCountries, type CountryEntry } from '@/lib/countries';
@@ -22,8 +23,9 @@ export function CountrySelect({
   onQueryChange,
   onSelect,
   onClear,
-  placeholder = 'Search countries, e.g. Venezuela',
+  placeholder,
 }: CountrySelectProps) {
+  const { t } = useTranslation();
   const [open, setOpen] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(0);
   const selectedCountry = selectedCode ? COUNTRIES[selectedCode] : undefined;
@@ -67,7 +69,7 @@ export function CountrySelect({
             }
           }}
           className="h-9 rounded-full border-0 bg-secondary pl-10 pr-10 text-sm focus-visible:ring-0 focus-visible:ring-offset-0"
-          placeholder={placeholder}
+          placeholder={placeholder ?? t('forms.countrySearchPlaceholder')}
           autoComplete="off"
           role="combobox"
           aria-expanded={showResults}

@@ -112,7 +112,18 @@
     "description": "Tsananguro",
     "timezone": "Nguva yenzvimbo",
     "publishing": "Kuburitsa…",
-    "uploadingCover": "Kuisa mufananidzo wepamusoro…"
+    "uploadingCover": "Kuisa mufananidzo wepamusoro…",
+    "countrySearchPlaceholder": "Tsvaga nyika",
+    "imageDropzone": "Dzvanya kana kukwevera mufananidzo pano"
+  },
+  "organizationContext": {
+    "attachedToGroup": "Chakabatanidzwa kugroup",
+    "groupFallback": "Group",
+    "editSubtext": "Zvauchagadzirisa zvicharamba zvakabatana nebasa repamutemo regroup iyi.",
+    "malformedParam": "Hatina kukwanisa kuverenga group iri mulink. Zvichaburitswa pasi peakaundi yako.",
+    "checkingPermissions": "Kuongorora mvumo dzegroup…",
+    "unauthorized": "Hausi muvambi kana moderator wegroup iyoyo. Zvichaburitswa pasi peakaundi yako.",
+    "publishingAsGroup": "Kuburitsa segroup"
   },
   "notFound": {
     "title": "404 - Peji harina kuwanikwa",
@@ -179,7 +190,7 @@
       "title": "Musoro",
       "titlePlaceholder": "Nyora kuchenesa kwemhenderekedzo",
       "country": "Nyika",
-      "countryPlaceholder": "Tsvaga nyika, semuenzaniso Venezuela",
+      "countryPlaceholder": "Tsvaga nyika",
       "countryClearAria": "Bvisa nyika",
       "flagOfAria": "Mureza we{{name}}",
       "countryHint": "Zvinoburitsa <0>i: iso3166:{{code}}</0> yekuronga nenyika.",
@@ -300,7 +311,7 @@
       "description": "Tsanangudzo",
       "descriptionPlaceholder": "Boka iri rakanangana nei?",
       "country": "Nyika",
-      "countryPlaceholder": "Tsvaga nyika, semuenzaniso Venezuela",
+      "countryPlaceholder": "Tsvaga nyika",
       "countryClearAria": "Bvisa nyika",
       "flagOfAria": "Mureza we{{name}}",
       "countryHint": "Zvinoburitsa <0>i: iso3166:{{code}}</0> yekuronga nenyika.",
@@ -399,7 +410,7 @@
     "onchainInvalid": "Haisi kero yeBitcoin mainnet inozivikanwa (bc1q… / bc1p…).",
     "spInvalid": "Haisi kodhi yeBIP-352 yemubhadharo unyararo inozivikanwa (sp1…).",
     "country": "Nyika",
-    "countryPlaceholder": "Tsvaga nyika, semuenzaniso Venezuela",
+    "countryPlaceholder": "Tsvaga nyika",
     "countryClearAria": "Bvisa nyika",
     "flagOfAria": "Mureza we{{name}}",
     "countryHint": "Zvinoburitsa <0>i: iso3166:{{code}}</0> yekuronga nenyika.",

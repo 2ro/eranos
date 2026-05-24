@@ -112,7 +112,18 @@
     "description": "Descripción",
     "timezone": "Zona horaria",
     "publishing": "Publicando…",
-    "uploadingCover": "Subiendo portada…"
+    "uploadingCover": "Subiendo portada…",
+    "countrySearchPlaceholder": "Buscar países",
+    "imageDropzone": "Haz clic o arrastra una imagen aquí"
+  },
+  "organizationContext": {
+    "attachedToGroup": "Adjunto al grupo",
+    "groupFallback": "Grupo",
+    "editSubtext": "Las actualizaciones seguirán conectadas a la actividad oficial de este grupo.",
+    "malformedParam": "No se pudo leer el grupo en el enlace. Se publicará bajo tu cuenta.",
+    "checkingPermissions": "Comprobando permisos del grupo…",
+    "unauthorized": "No eres fundador ni moderador de ese grupo. Se publicará bajo tu cuenta.",
+    "publishingAsGroup": "Publicando como grupo"
   },
   "notFound": {
     "title": "404 - Página no encontrada",
@@ -179,7 +190,7 @@
       "title": "Título",
       "titlePlaceholder": "Documentar una limpieza de playa",
       "country": "País",
-      "countryPlaceholder": "Buscar países, p. ej. Venezuela",
+      "countryPlaceholder": "Buscar países",
       "countryClearAria": "Borrar país",
       "flagOfAria": "Bandera de {{name}}",
       "countryHint": "Publica <0>i: iso3166:{{code}}</0> para el orden por país.",
@@ -300,7 +311,7 @@
       "description": "Descripción",
       "descriptionPlaceholder": "¿De qué trata este grupo?",
       "country": "País",
-      "countryPlaceholder": "Buscar países, p. ej. Venezuela",
+      "countryPlaceholder": "Buscar países",
       "countryClearAria": "Borrar país",
       "flagOfAria": "Bandera de {{name}}",
       "countryHint": "Publica <0>i: iso3166:{{code}}</0> para el orden por país.",
@@ -399,7 +410,7 @@
     "onchainInvalid": "No es una dirección Bitcoin mainnet reconocida (bc1q… / bc1p…).",
     "spInvalid": "No es un código de pago silencioso BIP-352 reconocido (sp1…).",
     "country": "País",
-    "countryPlaceholder": "Buscar países, p. ej. Venezuela",
+    "countryPlaceholder": "Buscar países",
     "countryClearAria": "Borrar país",
     "flagOfAria": "Bandera de {{name}}",
     "countryHint": "Publica <0>i: iso3166:{{code}}</0> para el orden por país.",

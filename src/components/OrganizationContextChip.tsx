@@ -1,4 +1,5 @@
 import { Users } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 interface OrganizationContextChipProps {
   /** The org `A` tag coordinate currently attached to this draft (or empty). */
@@ -42,6 +43,8 @@ export function OrganizationContextChip({
   manageableLoading,
   isEditMode = false,
 }: OrganizationContextChipProps) {
+  const { t } = useTranslation();
+
   // Edit mode: surface the org the event is already attached to. No
   // permission check here — the underlying publish flow re-resolves the
   // user's authority before emitting the tags.
@@ -53,12 +56,12 @@ export function OrganizationContextChip({
           <Users className="size-4" />
         </div>
         <div className="min-w-0 space-y-0.5">
-          <p className="text-xs font-semibold uppercase tracking-wide">Attached to group</p>
+          <p className="text-xs font-semibold uppercase tracking-wide">{t('organizationContext.attachedToGroup')}</p>
           <p className="truncate text-sm font-semibold text-foreground">
-            {authorizedOrg?.community.name ?? 'Group'}
+            {authorizedOrg?.community.name ?? t('organizationContext.groupFallback')}
           </p>
           <p className="text-xs text-muted-foreground">
-            Updates will stay connected to this group's official activity.
+            {t('organizationContext.editSubtext')}
           </p>
         </div>
       </div>
@@ -73,7 +76,7 @@ export function OrganizationContextChip({
   if (!paramDecoded) {
     return (
       <p className="mt-2 w-full text-xs text-muted-foreground">
-        Couldn't read the group in the link. Publishing under your account.
+        {t('organizationContext.malformedParam')}
       </p>
     );
   }
@@ -83,7 +86,7 @@ export function OrganizationContextChip({
   if (manageableLoading) {
     return (
       <div className="mt-3 w-full rounded-xl border border-border bg-card px-4 py-3 text-sm text-muted-foreground">
-        Checking group permissions…
+        {t('organizationContext.checkingPermissions')}
       </div>
     );
   }
@@ -94,7 +97,7 @@ export function OrganizationContextChip({
   if (!authorizedOrg) {
     return (
       <p className="mt-2 w-full text-xs text-muted-foreground">
-        You aren't a founder or moderator of that group. Publishing under your account.
+        {t('organizationContext.unauthorized')}
       </p>
     );
   }
@@ -105,11 +108,8 @@ export function OrganizationContextChip({
         <Users className="size-4" />
       </div>
       <div className="min-w-0 space-y-0.5">
-        <p className="text-xs font-semibold uppercase tracking-wide">Publishing as group</p>
+        <p className="text-xs font-semibold uppercase tracking-wide">{t('organizationContext.publishingAsGroup')}</p>
         <p className="truncate text-sm font-semibold text-foreground">{authorizedOrg.community.name}</p>
-        <p className="text-xs text-muted-foreground">
-          This will appear as official group activity instead of only under your profile.
-        </p>
       </div>
     </div>
   );
