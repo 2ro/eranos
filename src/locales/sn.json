@@ -754,14 +754,8 @@
     "receiveDialog": {
       "title": "Gamuchira Bitcoin",
       "description": "Govera kero yokugamuchira bitcoin.",
-      "onChain": "PaCheni",
-      "silentPayment": "Mubhadharo wakanyararira",
-      "onChainIntro": "Kero itsva nguva dzese. Chinjira kune index itsva mushure mokugovera kuti uchengetedze privacy.",
       "addressIndex": "Kero #{{index}}",
       "newAddress": "Kero itsva",
-      "silentIntro": "Chiratidzo chokugamuchira chakamira. Govera kamwe woshandisazve nokusingaperi — vatumiri vanobvisa kero yakasiyana pacheni pamubhadharo woga woga.",
-      "noIndexer": "Kuongorora kwadzimwa — hapana muongorori weBIP-352 wakaiswa. Isa <0>bip352IndexerUrl</0> mukurongedzwa kweapp yako kuti uone mibhadharo yakanyararira inopinda.",
-      "silentBalance": "Bharanzi remubhadharo wakanyararira: <0>{{amount}}</0>",
       "scanForNew": "Tsvaga mibhadharo mitsva",
       "scanForPayments": "Tsvaga mibhadharo"
     },

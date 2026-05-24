@@ -754,14 +754,8 @@
     "receiveDialog": {
       "title": "接收比特币",
       "description": "分享一个地址以接收比特币。",
-      "onChain": "链上",
-      "silentPayment": "静默支付",
-      "onChainIntro": "每次都生成新地址。分享后请切换到新索引以保护隐私。",
       "addressIndex": "地址 #{{index}}",
       "newAddress": "新地址",
-      "silentIntro": "静态接收标识符。一次分享，永久复用——发送方为每笔支付派生唯一的链上地址。",
-      "noIndexer": "扫描已禁用——未配置 BIP-352 索引器。在应用配置中设置 <0>bip352IndexerUrl</0> 以检测传入的静默支付。",
-      "silentBalance": "静默支付余额：<0>{{amount}}</0>",
       "scanForNew": "扫描新支付",
       "scanForPayments": "扫描支付"
     },

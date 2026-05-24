@@ -1186,14 +1186,8 @@
     "receiveDialog": {
       "title": "Terima Bitcoin",
       "description": "Bagikan alamat untuk menerima bitcoin.",
-      "onChain": "On-chain",
-      "silentPayment": "Silent payment",
-      "onChainIntro": "Alamat baru setiap saat. Naikkan ke indeks baru setelah berbagi untuk privasi.",
       "addressIndex": "Alamat #{{index}}",
       "newAddress": "Alamat baru",
-      "silentIntro": "Pengenal penerima statis. Bagikan sekali dan gunakan kembali selamanya — pengirim menurunkan alamat on-chain unik per pembayaran.",
-      "noIndexer": "Pemindaian dinonaktifkan — tidak ada indexer BIP-352 yang dikonfigurasi. Setel <0>bip352IndexerUrl</0> di konfigurasi aplikasi Anda untuk mendeteksi silent payment masuk.",
-      "silentBalance": "Saldo silent payment: <0>{{amount}}</0>",
       "scanForNew": "Pindai pembayaran baru",
       "scanForPayments": "Pindai pembayaran"
     },

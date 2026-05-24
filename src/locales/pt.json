@@ -1177,14 +1177,8 @@
     "receiveDialog": {
       "title": "Receber Bitcoin",
       "description": "Compartilhe um endereço para receber bitcoin.",
-      "onChain": "On-chain",
-      "silentPayment": "Pagamento silencioso",
-      "onChainIntro": "Endereço novo a cada vez. Avance para um novo índice após compartilhar para privacidade.",
       "addressIndex": "Endereço n.º {{index}}",
       "newAddress": "Novo endereço",
-      "silentIntro": "Identificador de recebimento estático. Compartilhe uma vez e reutilize para sempre — remetentes derivam um endereço on-chain único por pagamento.",
-      "noIndexer": "Escaneamento desativado — nenhum indexador BIP-352 configurado. Defina <0>bip352IndexerUrl</0> na sua configuração do app para detectar pagamentos silenciosos recebidos.",
-      "silentBalance": "Saldo de pagamentos silenciosos: <0>{{amount}}</0>",
       "scanForNew": "Escanear novos pagamentos",
       "scanForPayments": "Escanear pagamentos"
     },

@@ -1,7 +1,7 @@
 import { useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useSeoMeta } from '@unhead/react';
-import { useTranslation, Trans } from 'react-i18next';
+import { useTranslation } from 'react-i18next';
 import {
   Copy,
   Check,
@@ -34,7 +34,6 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { HDSendBitcoinDialog } from '@/components/HDSendBitcoinDialog';
 import { HDSilentPaymentScanDialog } from '@/components/HDSilentPaymentScanDialog';
 import { WalletBackupMnemonicDialog } from '@/components/WalletBackupMnemonic';
@@ -64,8 +63,7 @@ export function WalletPage() {
   const sp = useHdWalletSp();
   const { data: btcPrice } = useHdBtcPrice();
 
-  const [copiedAddress, setCopiedAddress] = useState(false);
-  const [copiedSp, setCopiedSp] = useState(false);
+  const [copiedPayload, setCopiedPayload] = useState(false);
   const [txOpen, setTxOpen] = useState(false);
   const [sendOpen, setSendOpen] = useState(false);
   const [receiveOpen, setReceiveOpen] = useState(false);
@@ -80,35 +78,29 @@ export function WalletPage() {
   const address = currentReceiveAddress?.address ?? '';
   const spAddress = silentPaymentAddress?.address ?? '';
 
-  const copyAddress = async () => {
-    if (!address) return;
+  // Combined BIP-21 payload: `bitcoin:<bc1>?sp=<sp1>` when both are
+  // available, falling back to the single endpoint that exists.
+  // Mirrors the campaign donate panel's QR payload so BIP-352-aware
+  // wallets pick the `sp=` parameter and legacy wallets fall back to
+  // the on-chain address.
+  const qrPayload = address && spAddress
+    ? `bitcoin:${address}?sp=${spAddress}`
+    : address
+      ? `bitcoin:${address}`
+      : spAddress
+        ? `bitcoin:?sp=${spAddress}`
+        : '';
+
+  const copyPayload = async () => {
+    if (!qrPayload) return;
     try {
-      await navigator.clipboard.writeText(address);
-      setCopiedAddress(true);
-      setTimeout(() => setCopiedAddress(false), 2000);
+      await navigator.clipboard.writeText(qrPayload);
+      setCopiedPayload(true);
+      setTimeout(() => setCopiedPayload(false), 2000);
     } catch {
       // clipboard unavailable
     }
   };
-
-  const copySpAddress = async () => {
-    if (!spAddress) return;
-    try {
-      await navigator.clipboard.writeText(spAddress);
-      setCopiedSp(true);
-      setTimeout(() => setCopiedSp(false), 2000);
-    } catch {
-      // clipboard unavailable
-    }
-  };
-
-  const truncatedAddress = address
-    ? `${address.slice(0, 12)}...${address.slice(-8)}`
-    : '';
-
-  const truncatedSpAddress = spAddress
-    ? `${spAddress.slice(0, 12)}...${spAddress.slice(-8)}`
-    : '';
 
   // ── Logged out ────────────────────────────────────────────────
   if (availability.status === 'logged-out') {
@@ -185,6 +177,14 @@ export function WalletPage() {
               <KeyRound className="size-4 mr-2" />
               {t('walletSettings.backup.label')}
             </DropdownMenuItem>
+            {sp.enabled && spAddress && (
+              <DropdownMenuItem onSelect={() => setSpScanOpen(true)} className="cursor-pointer">
+                <Radar className="size-4 mr-2" />
+                {sp.storage?.scanHeight && sp.storage.scanHeight > 0
+                  ? t('wallet.receiveDialog.scanForNew')
+                  : t('wallet.receiveDialog.scanForPayments')}
+              </DropdownMenuItem>
+            )}
             <DropdownMenuItem asChild>
               <Link to="/wallet/legacy" className="cursor-pointer">
                 <History className="size-4 mr-2" />
@@ -291,115 +291,45 @@ export function WalletPage() {
               </DialogDescription>
             </DialogHeader>
 
-            <Tabs defaultValue="onchain" className="w-full">
-              <TabsList className="grid w-full grid-cols-2">
-                <TabsTrigger value="onchain">{t('wallet.receiveDialog.onChain')}</TabsTrigger>
-                <TabsTrigger value="silent" disabled={!spAddress}>
-                  {t('wallet.receiveDialog.silentPayment')}
-                </TabsTrigger>
-              </TabsList>
+            {qrPayload && (
+              <div className="flex flex-col items-center gap-4">
+                {/* Combined BIP-21 QR. BIP-352-aware wallets pick the
+                    `sp=` parameter; legacy wallets fall back to the
+                    on-chain address. Mirrors CampaignWalletDonatePanel. */}
+                <div className="rounded-2xl bg-white p-4 shadow-sm">
+                  <QRCodeCanvas value={qrPayload} size={220} level="M" />
+                </div>
 
-              {/* ── On-chain (BIP86 single-use) ──────────────── */}
-              <TabsContent value="onchain" className="mt-4">
+                {/* Copyable row showing the full payment URI. */}
+                <button
+                  type="button"
+                  onClick={copyPayload}
+                  className="w-full flex items-center gap-2 rounded-lg border bg-muted/40 px-3 py-2.5 text-left hover:bg-muted/60 motion-safe:transition-colors cursor-pointer"
+                >
+                  <span className="flex-1 min-w-0 truncate font-mono text-xs" title={qrPayload}>
+                    {qrPayload}
+                  </span>
+                  {copiedPayload ? (
+                    <Check className="size-4 text-green-500 shrink-0" />
+                  ) : (
+                    <Copy className="size-4 text-muted-foreground shrink-0" />
+                  )}
+                </button>
+
                 {address && (
-                  <div className="flex flex-col items-center gap-4">
-                    <p className="text-xs text-muted-foreground text-center max-w-xs">
-                      {t('wallet.receiveDialog.onChainIntro')}
-                    </p>
-
-                    <div className="rounded-2xl bg-white p-4 shadow-sm">
-                      <QRCodeCanvas value={address} size={200} level="M" />
-                    </div>
-
+                  <div className="flex items-center gap-3 text-xs text-muted-foreground">
+                    <span>{t('wallet.receiveDialog.addressIndex', { index: currentReceiveAddress?.index ?? 0 })}</span>
+                    <span aria-hidden>·</span>
                     <button
-                      onClick={copyAddress}
-                      className="flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-mono text-muted-foreground hover:bg-muted/50 transition-colors cursor-pointer"
+                      onClick={() => nextReceiveAddress()}
+                      className="hover:text-foreground underline-offset-4 hover:underline transition-colors cursor-pointer"
                     >
-                      {truncatedAddress}
-                      {copiedAddress ? (
-                        <Check className="size-3.5 text-green-500" />
-                      ) : (
-                        <Copy className="size-3.5" />
-                      )}
+                      {t('wallet.receiveDialog.newAddress')}
                     </button>
-
-                    <div className="flex items-center gap-3 text-xs text-muted-foreground">
-                      <span>{t('wallet.receiveDialog.addressIndex', { index: currentReceiveAddress?.index ?? 0 })}</span>
-                      <span aria-hidden>·</span>
-                      <button
-                        onClick={() => nextReceiveAddress()}
-                        className="hover:text-foreground underline-offset-4 hover:underline transition-colors cursor-pointer"
-                      >
-                        {t('wallet.receiveDialog.newAddress')}
-                      </button>
-                    </div>
                   </div>
                 )}
-              </TabsContent>
-
-              {/* ── Silent payment (BIP-352 static) ──────────── */}
-              <TabsContent value="silent" className="mt-4">
-                {spAddress && (
-                  <div className="flex flex-col items-center gap-4">
-                    <p className="text-xs text-muted-foreground text-center max-w-xs">
-                      {t('wallet.receiveDialog.silentIntro')}
-                    </p>
-
-                    <div className="rounded-2xl bg-white p-4 shadow-sm">
-                      <QRCodeCanvas value={spAddress} size={220} level="L" />
-                    </div>
-
-                    <button
-                      onClick={copySpAddress}
-                      className="flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-mono text-muted-foreground hover:bg-muted/50 transition-colors cursor-pointer"
-                    >
-                      {truncatedSpAddress}
-                      {copiedSp ? (
-                        <Check className="size-3.5 text-green-500" />
-                      ) : (
-                        <Copy className="size-3.5" />
-                      )}
-                    </button>
-
-                    {sp.unavailableReason === 'no-indexer' ? (
-                      <p className="text-xs text-orange-500 dark:text-orange-400 text-center max-w-xs">
-                        <Trans
-                          i18nKey="wallet.receiveDialog.noIndexer"
-                          components={{ 0: <span className="font-mono" /> }}
-                        />
-                      </p>
-                    ) : sp.enabled ? (
-                      <div className="flex flex-col items-center gap-2 w-full">
-                        {sp.balance > 0 && (
-                          <p className="text-xs text-muted-foreground text-center">
-                            <Trans
-                              i18nKey="wallet.receiveDialog.silentBalance"
-                              values={{
-                                amount: btcPrice
-                                  ? satsToUSD(sp.balance, btcPrice)
-                                  : `${formatBTC(sp.balance)} BTC`,
-                              }}
-                              components={{ 0: <span className="text-foreground font-medium" /> }}
-                            />
-                          </p>
-                        )}
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => setSpScanOpen(true)}
-                          className="rounded-full"
-                        >
-                          <Radar className="size-3.5 mr-1.5" />
-                          {sp.storage?.scanHeight && sp.storage.scanHeight > 0
-                            ? t('wallet.receiveDialog.scanForNew')
-                            : t('wallet.receiveDialog.scanForPayments')}
-                        </Button>
-                      </div>
-                    ) : null}
-                  </div>
-                )}
-              </TabsContent>
-            </Tabs>
+              </div>
+            )}
           </DialogContent>
         </Dialog>
 

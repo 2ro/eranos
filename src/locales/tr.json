@@ -1186,14 +1186,8 @@
     "receiveDialog": {
       "title": "Bitcoin Al",
       "description": "Bitcoin almak için bir adres paylaşın.",
-      "onChain": "Zincir üstü",
-      "silentPayment": "Sessiz ödeme",
-      "onChainIntro": "Her seferinde yeni adres. Gizlilik için paylaşımdan sonra yeni bir dizine geçin.",
       "addressIndex": "Adres #{{index}}",
       "newAddress": "Yeni adres",
-      "silentIntro": "Sabit alım tanımlayıcısı. Bir kez paylaşın ve sonsuza dek tekrar kullanın — göndericiler her ödeme için benzersiz bir zincir üstü adres türetir.",
-      "noIndexer": "Tarama devre dışı — BIP-352 indeksleyici yapılandırılmamış. Gelen sessiz ödemeleri algılamak için uygulama yapılandırmanızda <0>bip352IndexerUrl</0> ayarını yapın.",
-      "silentBalance": "Sessiz ödeme bakiyesi: <0>{{amount}}</0>",
       "scanForNew": "Yeni ödemeler için tara",
       "scanForPayments": "Ödemeler için tara"
     },

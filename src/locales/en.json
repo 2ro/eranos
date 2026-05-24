@@ -1177,14 +1177,8 @@
     "receiveDialog": {
       "title": "Receive Bitcoin",
       "description": "Share an address to receive bitcoin.",
-      "onChain": "On-chain",
-      "silentPayment": "Silent payment",
-      "onChainIntro": "Fresh address each time. Bump to a new index after sharing for privacy.",
       "addressIndex": "Address #{{index}}",
       "newAddress": "New address",
-      "silentIntro": "Static receive identifier. Share once and reuse forever — senders derive a unique on-chain address per payment.",
-      "noIndexer": "Scanning disabled — no BIP-352 indexer configured. Set <0>bip352IndexerUrl</0> in your app config to detect incoming silent payments.",
-      "silentBalance": "Silent payment balance: <0>{{amount}}</0>",
       "scanForNew": "Scan for new payments",
       "scanForPayments": "Scan for payments"
     },

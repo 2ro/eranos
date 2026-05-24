@@ -1177,14 +1177,8 @@
     "receiveDialog": {
       "title": "Bitcoin पाएँ",
       "description": "Bitcoin पाने के लिए एक एड्रेस शेयर करें।",
-      "onChain": "ऑन-चेन",
-      "silentPayment": "साइलेंट पेमेंट",
-      "onChainIntro": "हर बार नया एड्रेस। प्राइवेसी के लिए शेयर करने के बाद नए index पर बढ़ाएँ।",
       "addressIndex": "एड्रेस #{{index}}",
       "newAddress": "नया एड्रेस",
-      "silentIntro": "स्थिर रिसीव पहचानकर्ता। एक बार शेयर करें और हमेशा के लिए दोहराते रहें — भेजने वाले हर भुगतान के लिए एक अनूठा ऑन-चेन एड्रेस derive करते हैं।",
-      "noIndexer": "Scanning अक्षम है — कोई BIP-352 indexer कॉन्फ़िगर नहीं है। आने वाले साइलेंट पेमेंट का पता लगाने के लिए अपनी ऐप कॉन्फ़िग में <0>bip352IndexerUrl</0> सेट करें।",
-      "silentBalance": "साइलेंट पेमेंट बैलेंस: <0>{{amount}}</0>",
       "scanForNew": "नए भुगतान के लिए scan करें",
       "scanForPayments": "भुगतान के लिए scan करें"
     },
