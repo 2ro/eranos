@@ -6,11 +6,13 @@ import { CommunityModerationOverlay } from '@/components/CommunityModerationMenu
 import { Card } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useAuthor } from '@/hooks/useAuthor';
+import { useEventTranslation } from '@/hooks/useEventTranslation';
 import { genUserName } from '@/lib/genUserName';
 import { sanitizeUrl } from '@/lib/sanitizeUrl';
 import { cn } from '@/lib/utils';
 import {
   COMMUNITY_DEFINITION_KIND,
+  parseCommunityEvent,
   type ParsedCommunity,
 } from '@/lib/communityUtils';
 
@@ -39,8 +41,22 @@ interface CommunityMiniCardProps {
  * a per-card cache subscription on every viewer.
  */
 export function CommunityMiniCard({ community, className }: CommunityMiniCardProps) {
+  const communityEvent = {
+    id: community.aTag,
+    pubkey: community.founderPubkey,
+    kind: COMMUNITY_DEFINITION_KIND,
+    tags: community.tags,
+    content: '',
+    created_at: 0,
+    sig: '',
+  };
+  const { translatedEvent, translateAction } = useEventTranslation(communityEvent, {
+    iconOnly: true,
+    buttonClassName: 'absolute bottom-3 right-3 z-10 size-9 rounded-full bg-background/90 p-0 text-muted-foreground shadow-sm backdrop-blur hover:bg-background hover:text-primary',
+  });
+  const displayCommunity = parseCommunityEvent(translatedEvent) ?? community;
   const founder = useAuthor(community.founderPubkey);
-  const banner = sanitizeUrl(community.image);
+  const banner = sanitizeUrl(displayCommunity.image);
   const founderName =
     founder.data?.metadata?.display_name ||
     founder.data?.metadata?.name ||
@@ -80,14 +96,15 @@ export function CommunityMiniCard({ community, className }: CommunityMiniCardPro
               `useOrganizationModeration` subscription rather than the
               card — keeps non-mod grids free of the heavy label query. */}
           <CommunityModerationOverlay coord={community.aTag} organizationName={community.name} />
+          {translateAction}
         </div>
         <div className="flex flex-col gap-2 p-3.5 flex-1">
           <h3 className="font-semibold leading-tight text-sm tracking-tight line-clamp-1">
-            {community.name}
+            {displayCommunity.name}
           </h3>
-          {community.description && (
+          {displayCommunity.description && (
             <p className="text-xs text-muted-foreground line-clamp-2 leading-snug">
-              {community.description}
+              {displayCommunity.description}
             </p>
           )}
           <div className="flex items-center gap-2 mt-auto pt-1.5">

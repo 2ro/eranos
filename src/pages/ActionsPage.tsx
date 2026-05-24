@@ -5,7 +5,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { useTranslation, Trans } from 'react-i18next';
 import { nip19 } from 'nostr-tools';
 
-import { useActions, type Action } from '@/hooks/useActions';
+import { parseAction, useActions, type Action } from '@/hooks/useActions';
 import { useAppContext } from '@/hooks/useAppContext';
 import { useAuthor } from '@/hooks/useAuthor';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
@@ -13,6 +13,7 @@ import { useBtcPrice } from '@/hooks/useBtcPrice';
 import { useNostrPublish } from '@/hooks/useNostrPublish';
 import { useShareOrigin } from '@/hooks/useShareOrigin';
 import { useToast } from '@/hooks/useToast';
+import { useEventTranslation } from '@/hooks/useEventTranslation';
 import { getAllCountries, getGeoDisplayName, countryCodeToFlag } from '@/lib/countries';
 import { getDisplayName } from '@/lib/genUserName';
 import { DEFAULT_ACTION_COVERS, DEFAULT_COVER_IMAGE } from '@/lib/defaultActionCovers';
@@ -183,6 +184,11 @@ function ActionShareMenu({ action }: { action: Action }) {
 
 function ActionCard({ action, isExpired, btcPrice }: { action: Action; isExpired?: boolean; btcPrice: number | undefined }) {
   const { t } = useTranslation();
+  const { translatedEvent, translateAction } = useEventTranslation(action.event, {
+    iconOnly: true,
+    buttonClassName: 'absolute bottom-3 right-3 z-10 size-9 rounded-full bg-background/90 p-0 text-muted-foreground shadow-sm backdrop-blur hover:bg-background hover:text-primary',
+  });
+  const displayAction = parseAction(translatedEvent) ?? action;
   const author = useAuthor(action.pubkey);
   const metadata = author.data?.metadata;
   const displayName = getDisplayName(metadata, action.pubkey);
@@ -196,12 +202,12 @@ function ActionCard({ action, isExpired, btcPrice }: { action: Action; isExpired
 
   // Always show a cover — fall back to the default if the author didn't set
   // one, or the URL failed to validate / load.
-  const coverImage = (action.image && !imageLoadFailed)
-    ? action.image
+  const coverImage = (displayAction.image && !imageLoadFailed)
+    ? displayAction.image
     : DEFAULT_COVER_IMAGE;
 
-  const deadline = action.deadline ? formatCompactPledgeDeadline(action.deadline) : null;
-  const countryLabel = action.countryCode ? getGeoDisplayName(action.countryCode) : undefined;
+  const deadline = displayAction.deadline ? formatCompactPledgeDeadline(displayAction.deadline) : null;
+  const countryLabel = displayAction.countryCode ? getGeoDisplayName(displayAction.countryCode) : undefined;
 
   return (
     <RouterLink
@@ -225,16 +231,17 @@ function ActionCard({ action, isExpired, btcPrice }: { action: Action; isExpired
             )}
             <ActionShareMenu action={action} />
           </div>
+          {translateAction}
         </div>
 
         <div className="flex flex-col gap-3 p-5 flex-1">
           <div className="space-y-2">
             <h3 className="font-bold leading-tight tracking-tight text-lg line-clamp-2">
-              {action.title}
+              {displayAction.title}
             </h3>
-            {action.description.trim() && (
+            {displayAction.description.trim() && (
               <p className="text-sm text-muted-foreground line-clamp-2">
-                {action.description}
+                {displayAction.description}
               </p>
             )}
           </div>

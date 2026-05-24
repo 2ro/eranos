@@ -12,10 +12,12 @@ import { useAuthor } from '@/hooks/useAuthor';
 import { useBtcPrice } from '@/hooks/useBtcPrice';
 import { useCampaignDonations } from '@/hooks/useCampaignDonations';
 import { useCampaignModeration } from '@/hooks/useCampaignModeration';
+import { useEventTranslation } from '@/hooks/useEventTranslation';
 import {
   type ParsedCampaign,
   encodeCampaignNaddr,
   getCampaignCountryLabel,
+  parseCampaign,
 } from '@/lib/campaign';
 import { formatCampaignAmount, formatUsdGoal, satsToUsd } from '@/lib/formatCampaignAmount';
 import { genUserName } from '@/lib/genUserName';
@@ -114,13 +116,18 @@ interface CampaignCardProps {
  * `<Link>` to the campaign's naddr-based detail route.
  */
 export function CampaignCard({ campaign, variant = 'compact', className, footerBadge }: CampaignCardProps) {
+  const { translatedEvent, translateAction } = useEventTranslation(campaign.event, {
+    iconOnly: true,
+    buttonClassName: 'absolute bottom-3 right-3 z-10 size-9 rounded-full bg-background/90 p-0 text-muted-foreground shadow-sm backdrop-blur hover:bg-background hover:text-primary',
+  });
+  const displayCampaign = parseCampaign(translatedEvent) ?? campaign;
   const author = useAuthor(campaign.pubkey);
   const { data: stats } = useCampaignDonations(campaign);
   const { data: btcPrice } = useBtcPrice();
   const { data: moderation } = useCampaignModeration();
 
   const naddr = useMemo(() => encodeCampaignNaddr(campaign), [campaign]);
-  const cover = sanitizeUrl(campaign.banner);
+  const cover = sanitizeUrl(displayCampaign.banner);
   const creatorName =
     author.data?.metadata?.display_name ||
     author.data?.metadata?.name ||
@@ -188,6 +195,7 @@ export function CampaignCard({ campaign, variant = 'compact', className, footerB
               isFeatured={isFeatured}
             />
           </div>
+          {translateAction}
         </div>
 
         {/* Body */}
@@ -199,16 +207,16 @@ export function CampaignCard({ campaign, variant = 'compact', className, footerB
                 isFeaturedVariant ? 'text-2xl sm:text-3xl' : 'text-lg',
               )}
             >
-              {campaign.title}
+              {displayCampaign.title}
             </h3>
-            {campaign.summary && (
+            {displayCampaign.summary && (
               <p
                 className={cn(
                   'text-muted-foreground',
                   isFeaturedVariant ? 'text-base line-clamp-3' : 'text-sm line-clamp-2',
                 )}
               >
-                {campaign.summary}
+                {displayCampaign.summary}
               </p>
             )}
           </div>

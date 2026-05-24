@@ -70,7 +70,7 @@ import { useEventTranslation } from '@/hooks/useEventTranslation';
 import { CommunityModerationContext } from '@/contexts/CommunityModerationContext';
 import { applyCommunityModerationToEvents, parseCommunityEvent } from '@/lib/communityUtils';
 import type { ParsedCampaign } from '@/lib/campaign';
-import type { Action } from '@/hooks/useActions';
+import { parseAction, type Action } from '@/hooks/useActions';
 import { getGeoDisplayName } from '@/lib/countries';
 import { DEFAULT_COVER_IMAGE } from '@/lib/defaultActionCovers';
 import { formatNumber } from '@/lib/formatNumber';
@@ -225,15 +225,20 @@ function ActivityTypePill({ icon, label }: { icon: React.ReactNode; label: strin
 
 function PledgeShelfCard({ pledge }: { pledge: Action }) {
   const { data: btcPrice } = useBtcPrice();
+  const { translatedEvent, translateAction } = useEventTranslation(pledge.event, {
+    iconOnly: true,
+    buttonClassName: 'absolute bottom-3 right-3 z-10 size-9 rounded-full bg-background/90 p-0 text-muted-foreground shadow-sm backdrop-blur hover:bg-background hover:text-primary',
+  });
+  const displayPledge = parseAction(translatedEvent) ?? pledge;
   const author = useAuthor(pledge.pubkey);
   const metadata = author.data?.metadata;
   const displayName = getDisplayName(metadata, pledge.pubkey);
   const [imageLoadFailed, setImageLoadFailed] = useState(false);
 
-  const sanitizedCover = sanitizeUrl(pledge.image);
+  const sanitizedCover = sanitizeUrl(displayPledge.image);
   const coverImage = sanitizedCover && !imageLoadFailed ? sanitizedCover : DEFAULT_COVER_IMAGE;
-  const deadline = pledge.deadline ? formatCompactPledgeDeadline(pledge.deadline) : null;
-  const countryLabel = pledge.countryCode ? getGeoDisplayName(pledge.countryCode) : undefined;
+  const deadline = displayPledge.deadline ? formatCompactPledgeDeadline(displayPledge.deadline) : null;
+  const countryLabel = displayPledge.countryCode ? getGeoDisplayName(displayPledge.countryCode) : undefined;
   const naddr = nip19.naddrEncode({
     kind: pledge.event.kind,
     pubkey: pledge.pubkey,
@@ -260,16 +265,17 @@ function PledgeShelfCard({ pledge }: { pledge: Action }) {
               </Badge>
             </div>
           )}
+          {translateAction}
         </div>
 
         <div className="flex flex-col gap-3 p-5 flex-1">
           <div className="space-y-2">
             <h3 className="font-bold leading-tight tracking-tight text-lg line-clamp-2">
-              {pledge.title}
+              {displayPledge.title}
             </h3>
-            {pledge.description.trim() && (
+            {displayPledge.description.trim() && (
               <p className="text-sm text-muted-foreground line-clamp-2">
-                {pledge.description}
+                {displayPledge.description}
               </p>
             )}
           </div>
@@ -311,15 +317,19 @@ function PledgeShelfCard({ pledge }: { pledge: Action }) {
 }
 
 function CalendarEventShelfCard({ event }: { event: NostrEvent }) {
+  const { translatedEvent: displayEvent, translateAction } = useEventTranslation(event, {
+    iconOnly: true,
+    buttonClassName: 'absolute bottom-3 right-3 z-10 size-9 rounded-full bg-background/90 p-0 text-muted-foreground shadow-sm backdrop-blur hover:bg-background hover:text-primary',
+  });
   const author = useAuthor(event.pubkey);
   const metadata = author.data?.metadata;
   const displayName = getDisplayName(metadata, event.pubkey);
   const [imageLoadFailed, setImageLoadFailed] = useState(false);
-  const title = getTag(event.tags, 'title') ?? 'Untitled event';
-  const image = sanitizeUrl(getTag(event.tags, 'image'));
+  const title = getTag(displayEvent.tags, 'title') ?? 'Untitled event';
+  const image = sanitizeUrl(getTag(displayEvent.tags, 'image'));
   const coverImage = image && !imageLoadFailed ? image : undefined;
-  const summary = getTag(event.tags, 'summary') || event.content;
-  const locationRaw = getTag(event.tags, 'location');
+  const summary = getTag(displayEvent.tags, 'summary') || displayEvent.content;
+  const locationRaw = getTag(displayEvent.tags, 'location');
   const location = locationRaw ? parseShelfLocation(locationRaw) : undefined;
   const dateLabel = formatShelfEventDate(event);
   const timeLabel = formatShelfEventTime(event);
@@ -357,6 +367,7 @@ function CalendarEventShelfCard({ event }: { event: NostrEvent }) {
               {dateLabel}
             </div>
           )}
+          {translateAction}
         </div>
 
         <div className="flex flex-col gap-3 p-5 flex-1">

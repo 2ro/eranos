@@ -38,6 +38,8 @@ interface TranslateButtonProps {
   isTranslated: boolean;
   /** Hide label on narrow screens so the action row can collapse to an icon. */
   responsiveLabel?: boolean;
+  /** Always hide the visible label. */
+  iconOnly?: boolean;
   className?: string;
 }
 
@@ -48,6 +50,7 @@ export function TranslateButton({
   onReset,
   isTranslated,
   responsiveLabel,
+  iconOnly,
   className,
 }: TranslateButtonProps) {
   const { t, i18n } = useTranslation();
@@ -103,6 +106,7 @@ export function TranslateButton({
       variant="ghost"
       size="sm"
       onClick={(event) => {
+        event.preventDefault();
         event.stopPropagation();
         void handleClick();
       }}
@@ -136,7 +140,7 @@ export function TranslateButton({
       ) : (
         <Languages className="size-[18px] shrink-0" />
       )}
-      <span className={cn(responsiveLabel && "hidden sm:inline")}>
+      <span className={cn(iconOnly && "sr-only", responsiveLabel && !iconOnly && "hidden sm:inline")}>
         {loading
           ? t("translate.translating")
           : error

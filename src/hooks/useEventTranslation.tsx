@@ -16,6 +16,10 @@ type TranslatedEventText = Partial<Record<TranslatableEventField, string>>;
 interface UseEventTranslationOptions {
   /** Treat generic plaintext event.content as translatable for kinds not listed explicitly. */
   includePlainContent?: boolean;
+  /** Always hide the visible label on the translate button. */
+  iconOnly?: boolean;
+  /** Extra classes for the translate button. */
+  buttonClassName?: string;
 }
 
 function getTag(tags: string[][], name: string): string | undefined {
@@ -110,8 +114,9 @@ export function useEventTranslation(event: NostrEvent, options: UseEventTranslat
           setTranslatedText(next);
         }}
         onReset={() => setTranslatedText(null)}
-        responsiveLabel
-        className="h-9 px-3 text-sm font-medium"
+        responsiveLabel={!options.iconOnly}
+        iconOnly={options.iconOnly}
+        className={options.buttonClassName ?? "h-9 px-3 text-sm font-medium"}
       />
     ) : null,
   };
