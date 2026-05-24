@@ -1937,8 +1937,9 @@
       "why-not-silent-payments": {
         "question": "Est-ce que {{appName}} prend en charge les paiements silencieux ?",
         "answer": [
-          "Oui. Quand un activiste crée une campagne, il peut accepter les paiements silencieux à la place ou en plus des paiements Bitcoin publics. Les dons en paiements silencieux sont quand même réglés on-chain, mais la transaction ne peut pas être reliée au code de donation de l'activiste — ils n'apparaissent donc pas dans les listes ou les totaux publics de donateurs.",
-          "Envoyer un paiement silencieux nécessite un portefeuille qui prend en charge BIP-352. La plupart des applications grand public ne le font pas encore, mais [Ditto Wallet](https://ditto.pub) et [Dana](https://github.com/cygnet3/dana/releases/download/v0.7.4/app-live-release.apk) le font.",
+          "Oui — des deux côtés. Le portefeuille Bitcoin intégré de {{appName}} prend en charge BIP-352, donc quand vous envoyez du Bitcoin depuis votre portefeuille {{appName}}, vous pouvez payer n'importe quelle adresse de paiement silencieux (`sp1…`) directement. Et quand un activiste crée une campagne, il peut accepter les paiements silencieux à la place ou en plus des paiements Bitcoin publics.",
+          "Les dons en paiements silencieux sont quand même réglés on-chain, mais la transaction ne peut pas être reliée au code de donation de l'activiste — ils n'apparaissent donc pas dans les listes ou les totaux publics de donateurs.",
+          "Envoyer un paiement silencieux depuis l'extérieur de {{appName}} nécessite un portefeuille qui prend en charge BIP-352. La plupart des applications grand public ne le font pas encore, mais [Ditto Wallet](https://ditto.pub) et [Dana](https://github.com/cygnet3/dana/releases/download/v0.7.4/app-live-release.apk) le font.",
           "Quand une campagne accepte les deux types de paiement, {{appName}} les encode dans un seul QR code. Les portefeuilles compatibles paient en privé ; les autres paient l'adresse publique. Aucun donateur n'est exclu, et aucun activiste n'est forcé de choisir entre portée et confidentialité."
         ]
       },
@@ -1954,7 +1955,7 @@
         "answer": [
           "Faire cela exigerait que {{appName}} agisse comme un intermédiaire d'échange d'argent — prenant d'abord la garde du Bitcoin puis le transférant à l'activiste.",
           "Cela ferait de nous un transmetteur d'argent, soumis aux réglementations qui l'accompagnent, et un point unique de défaillance : fermez le serveur de {{appName}} et vous avez fermé chaque don qui le traverse.",
-          "À la place, l'adresse de donation de chaque utilisateur est dérivée de sa clé publique Nostr. Les donateurs envoient directement à l'activiste, {{appName}} ne touche jamais les fonds, et la plateforme elle-même ne peut pas être éteinte pour censurer qui que ce soit. Les activistes qui veulent de la confidentialité par don peuvent accepter les paiements silencieux, qui offrent la même non-traçabilité sans que personne ne détienne l'argent au milieu."
+          "À la place, l'adresse de donation de chaque utilisateur est dérivée de sa clé secrète Nostr (nsec) — la même clé avec laquelle vous vous connectez. Les donateurs envoient directement à l'activiste, {{appName}} ne touche jamais les fonds, et la plateforme elle-même ne peut pas être éteinte pour censurer qui que ce soit. Les activistes qui veulent de la confidentialité par don peuvent accepter les paiements silencieux, qui offrent la même non-traçabilité sans que personne ne détienne l'argent au milieu."
         ]
       },
       "why-not-other-crypto": {
@@ -1968,7 +1969,7 @@
         "question": "Qu'est-ce que Nostr ?",
         "answer": [
           "Nostr est un réseau ouvert où **vous** possédez votre compte, pas une entreprise. Votre identité est une clé cryptographique que vous contrôlez, et non un nom d'utilisateur sur le serveur de quelqu'un d'autre.",
-          "Sur {{appName}}, cette même clé est aussi ce dont votre adresse de donation est dérivée — c'est pourquoi vous pouvez recevoir du Bitcoin sans vous inscrire auprès de personne."
+          "Sur {{appName}}, cette même clé est aussi ce dont votre adresse de donation est dérivée — votre clé secrète Nostr (nsec) sert de graine à votre portefeuille Bitcoin, c'est pourquoi vous pouvez recevoir du Bitcoin sans vous inscrire auprès de personne."
         ]
       },
       "why-login-different": {
@@ -2136,7 +2137,7 @@
           },
           "arrivesDirectly": {
             "title": "Il arrive directement",
-            "body": "Les fonds sont réglés directement à l'activiste. {{appName}} ne les détient ni ne les achemine, et l'adresse est dérivée de la clé Nostr de l'activiste."
+            "body": "Les fonds sont réglés directement à l'activiste. {{appName}} ne les détient ni ne les achemine, et l'adresse est dérivée de la clé secrète Nostr de l'activiste."
           }
         }
       },
@@ -2193,7 +2194,7 @@
       "howReceiving": {
         "heading": "Comment fonctionne la réception",
         "paragraphs": [
-          "Vos adresses de donation {{appName}} sont dérivées de votre clé publique Nostr. Quand vous créez une campagne, vous choisissez ce que vous acceptez :",
+          "Vos adresses de donation {{appName}} sont dérivées de votre clé secrète Nostr (nsec) — la même clé avec laquelle vous vous connectez sert de graine à votre portefeuille Bitcoin. Quand vous créez une campagne, vous choisissez ce que vous acceptez :",
           "**Paiements publics uniquement.** Une adresse Bitcoin classique. Visible par tous, fonctionne avec tous les portefeuilles.",
           "**Paiements silencieux uniquement.** Paiements silencieux BIP-352. Le côté réception est non-traçable on-chain, donc les dons restent hors des listes et totaux publics de donateurs. Les donateurs ont besoin d'un portefeuille compatible avec les paiements silencieux pour envoyer. S'ils n'en ont pas, leur don ne peut pas passer.",
           "**Les deux.** {{appName}} génère un seul QR code qui encode les deux points de terminaison. Les portefeuilles de paiements silencieux le lisent comme privé ; les portefeuilles ordinaires paient l'adresse publique. Les donateurs n'ont pas à choisir.",

@@ -1937,8 +1937,9 @@
       "why-not-silent-payments": {
         "question": "Does {{appName}} support silent payments?",
         "answer": [
-          "Yes. When an activist creates a campaign they can accept silent payments alongside, or instead of, public Bitcoin payments. Silent-payment donations still settle on-chain, but the transaction can't be linked back to the activist's donation code — so they don't appear in public donor lists or totals.",
-          "Sending a silent payment requires a wallet that supports BIP-352. Most consumer apps don't yet, but [Ditto Wallet](https://ditto.pub) and [Dana](https://github.com/cygnet3/dana/releases/download/v0.7.4/app-live-release.apk) do.",
+          "Yes — on both sides. {{appName}}'s built-in Bitcoin wallet supports BIP-352, so when you send Bitcoin from your {{appName}} wallet you can pay any silent-payment address (`sp1…`) directly. And when an activist creates a campaign, they can accept silent payments alongside, or instead of, public Bitcoin payments.",
+          "Silent-payment donations still settle on-chain, but the transaction can't be linked back to the activist's donation code — so they don't appear in public donor lists or totals.",
+          "Sending a silent payment from outside {{appName}} requires a wallet that supports BIP-352. Most consumer apps don't yet, but [Ditto Wallet](https://ditto.pub) and [Dana](https://github.com/cygnet3/dana/releases/download/v0.7.4/app-live-release.apk) do.",
           "When a campaign accepts both kinds of payment, {{appName}} encodes them in a single QR code. Silent-payment-capable wallets pay privately; everyone else pays the public address. No donor is shut out, and no activist is forced to choose between reach and privacy."
         ]
       },
@@ -1954,7 +1955,7 @@
         "answer": [
           "Doing this would require {{appName}} to act as a money-exchanging middleman — taking custody of the Bitcoin first and then forwarding it on to the activist.",
           "That would make us a money transmitter, subject to the regulations that come with that, and a single point of failure: shut down {{appName}}'s server and you've shut down every donation flowing through it.",
-          "Instead, each user's donation address is derived from their Nostr public key. Donors send directly to the activist, {{appName}} never touches the funds, and the platform itself can't be turned off to censor anyone. Activists who want per-donation privacy can accept silent payments, which give the same unlinkability without anyone holding the money in the middle."
+          "Instead, each user's donation address is derived from their Nostr secret key (nsec) — the same key you sign in with. Donors send directly to the activist, {{appName}} never touches the funds, and the platform itself can't be turned off to censor anyone. Activists who want per-donation privacy can accept silent payments, which give the same unlinkability without anyone holding the money in the middle."
         ]
       },
       "why-not-other-crypto": {
@@ -1968,7 +1969,7 @@
         "question": "What is Nostr?",
         "answer": [
           "Nostr is an open network where **you** own your account, not a company. Your identity is a cryptographic key you control, not a username on someone else's server.",
-          "On {{appName}}, that same key is also what your donation address is derived from — which is why you can receive Bitcoin without signing up with anyone."
+          "On {{appName}}, that same key is also what your donation address is derived from — your Nostr secret key (nsec) seeds your Bitcoin wallet, which is why you can receive Bitcoin without signing up with anyone."
         ]
       },
       "why-login-different": {
@@ -2136,7 +2137,7 @@
           },
           "arrivesDirectly": {
             "title": "It arrives directly",
-            "body": "Funds settle straight to the activist. {{appName}} doesn't hold or route them, and the address is derived from the activist's Nostr key."
+            "body": "Funds settle straight to the activist. {{appName}} doesn't hold or route them, and the address is derived from the activist's Nostr secret key."
           }
         }
       },
@@ -2193,7 +2194,7 @@
       "howReceiving": {
         "heading": "How receiving works",
         "paragraphs": [
-          "Your {{appName}} donation addresses are derived from your Nostr public key. When you create a campaign, you pick what to accept:",
+          "Your {{appName}} donation addresses are derived from your Nostr secret key (nsec) — the same key you sign in with seeds your Bitcoin wallet. When you create a campaign, you pick what to accept:",
           "**Public payments only.** A regular Bitcoin address. Visible to everyone, works with every wallet.",
           "**Silent payments only.** BIP-352 silent payments. The receiving side is unlinkable on-chain, so donations stay out of public donor lists and totals. Donors need a silent-payments-capable wallet to send. If they don't have one, their donation can't go through.",
           "**Both.** {{appName}} generates a single QR code that encodes both endpoints. Silent-payments wallets read it as private; ordinary wallets pay the public address. Donors don't have to choose.",

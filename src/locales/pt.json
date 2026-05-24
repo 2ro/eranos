@@ -1937,8 +1937,9 @@
       "why-not-silent-payments": {
         "question": "O {{appName}} suporta pagamentos silenciosos?",
         "answer": [
-          "Sim. Quando um ativista cria uma campanha, pode aceitar pagamentos silenciosos junto com, ou em vez de, pagamentos Bitcoin públicos. Doações em pagamentos silenciosos ainda são liquidadas on-chain, mas a transação não pode ser conectada ao código de doação do ativista — então não aparecem em listas ou totais públicos de doadores.",
-          "Enviar um pagamento silencioso requer uma carteira que suporte BIP-352. A maioria dos aplicativos de consumo ainda não, mas [Ditto Wallet](https://ditto.pub) e [Dana](https://github.com/cygnet3/dana/releases/download/v0.7.4/app-live-release.apk) suportam.",
+          "Sim — dos dois lados. A carteira Bitcoin embutida do {{appName}} suporta BIP-352, então quando você envia Bitcoin a partir da sua carteira do {{appName}} pode pagar qualquer endereço de pagamento silencioso (`sp1…`) diretamente. E quando um ativista cria uma campanha, pode aceitar pagamentos silenciosos junto com, ou em vez de, pagamentos Bitcoin públicos.",
+          "Doações em pagamentos silenciosos ainda são liquidadas on-chain, mas a transação não pode ser conectada ao código de doação do ativista — então não aparecem em listas ou totais públicos de doadores.",
+          "Enviar um pagamento silencioso de fora do {{appName}} requer uma carteira que suporte BIP-352. A maioria dos aplicativos de consumo ainda não, mas [Ditto Wallet](https://ditto.pub) e [Dana](https://github.com/cygnet3/dana/releases/download/v0.7.4/app-live-release.apk) suportam.",
           "Quando uma campanha aceita ambos os tipos de pagamento, o {{appName}} os codifica em um único QR code. Carteiras capazes de pagamentos silenciosos pagam com privacidade; todos os outros pagam o endereço público. Nenhum doador é excluído, e nenhum ativista é forçado a escolher entre alcance e privacidade."
         ]
       },
@@ -1954,7 +1955,7 @@
         "answer": [
           "Fazer isso exigiria que o {{appName}} atuasse como intermediário de troca de dinheiro — primeiro tomando custódia do Bitcoin e depois encaminhando-o ao ativista.",
           "Isso nos tornaria um transmissor de dinheiro, sujeito às regulamentações que vêm com isso, e um ponto único de falha: desligue o servidor do {{appName}} e você desligou cada doação fluindo por ele.",
-          "Em vez disso, o endereço de doação de cada usuário é derivado de sua chave pública Nostr. Doadores enviam diretamente ao ativista, o {{appName}} nunca toca nos fundos, e a plataforma em si não pode ser desligada para censurar ninguém. Ativistas que querem privacidade por doação podem aceitar pagamentos silenciosos, que dão a mesma inrastreabilidade sem ninguém segurando o dinheiro no meio."
+          "Em vez disso, o endereço de doação de cada usuário é derivado de sua chave secreta Nostr (nsec) — a mesma chave com que você inicia sessão. Doadores enviam diretamente ao ativista, o {{appName}} nunca toca nos fundos, e a plataforma em si não pode ser desligada para censurar ninguém. Ativistas que querem privacidade por doação podem aceitar pagamentos silenciosos, que dão a mesma inrastreabilidade sem ninguém segurando o dinheiro no meio."
         ]
       },
       "why-not-other-crypto": {
@@ -1968,7 +1969,7 @@
         "question": "O que é Nostr?",
         "answer": [
           "Nostr é uma rede aberta onde **você** é dono da sua conta, não uma empresa. Sua identidade é uma chave criptográfica que você controla, não um nome de usuário no servidor de outra pessoa.",
-          "No {{appName}}, essa mesma chave também é da qual seu endereço de doação é derivado — é por isso que você pode receber Bitcoin sem se cadastrar em ninguém."
+          "No {{appName}}, essa mesma chave também é da qual seu endereço de doação é derivado — sua chave secreta Nostr (nsec) semeia sua carteira Bitcoin, e é por isso que você pode receber Bitcoin sem se cadastrar em ninguém."
         ]
       },
       "why-login-different": {
@@ -2136,7 +2137,7 @@
           },
           "arrivesDirectly": {
             "title": "Chega diretamente",
-            "body": "Os fundos são liquidados direto para o ativista. O {{appName}} não os detém ou roteia, e o endereço é derivado da chave Nostr do ativista."
+            "body": "Os fundos são liquidados direto para o ativista. O {{appName}} não os detém ou roteia, e o endereço é derivado da chave secreta Nostr do ativista."
           }
         }
       },
@@ -2193,7 +2194,7 @@
       "howReceiving": {
         "heading": "Como funciona o recebimento",
         "paragraphs": [
-          "Seus endereços de doação {{appName}} são derivados da sua chave pública Nostr. Quando você cria uma campanha, escolhe o que aceitar:",
+          "Seus endereços de doação {{appName}} são derivados da sua chave secreta Nostr (nsec) — a mesma chave com que você inicia sessão semeia sua carteira Bitcoin. Quando você cria uma campanha, escolhe o que aceitar:",
           "**Apenas pagamentos públicos.** Um endereço Bitcoin comum. Visível para todos, funciona com todas as carteiras.",
           "**Apenas pagamentos silenciosos.** Pagamentos silenciosos BIP-352. O lado de recebimento é inrastreável on-chain, então doações ficam fora das listas e totais públicos de doadores. Doadores precisam de uma carteira capaz de pagamentos silenciosos para enviar. Se não têm uma, a doação não pode passar.",
           "**Ambos.** O {{appName}} gera um único QR code que codifica ambos os endpoints. Carteiras de pagamentos silenciosos leem como privado; carteiras comuns pagam o endereço público. Doadores não precisam escolher.",
