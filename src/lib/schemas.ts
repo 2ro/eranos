@@ -148,6 +148,8 @@ export const AppConfigSchema = z.object({
   ).optional().default([]),
   autoplayVideos: z.boolean(),
   imageQuality: z.enum(['compressed', 'original']),
+  imageProxy: z.string(),
+  lowBandwidthMode: z.boolean(),
   curatorPubkey: z.string().regex(/^[0-9a-f]{64}$/i).optional(),
   /**
    * Ordered list of Esplora REST roots tried in failover order. Accepts the
@@ -258,6 +260,7 @@ export const EncryptedSettingsSchema = z.looseObject({
     nip05: z.record(z.string(), z.unknown()),
   }).optional(),
   autoplayVideos: z.boolean().optional(),
+  lowBandwidthMode: z.boolean().optional(),
   corsProxy: z.string().optional(),
   faviconUrl: z.string().optional(),
   linkPreviewUrl: z.string().optional(),

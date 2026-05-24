@@ -1,5 +1,6 @@
 import { useSeoMeta } from '@unhead/react';
 import { useMemo } from 'react';
+import { Trans, useTranslation } from 'react-i18next';
 import {
   AlertTriangle,
   ArrowRight,
@@ -39,13 +40,14 @@ import { cn } from '@/lib/utils';
  * so produces unreadable synthetic-bold smear.
  */
 export function AboutPage() {
+  const { t } = useTranslation();
   const { config } = useAppContext();
   // Routed under the wide FundraiserLayout in AppRouter so sections can
   // span the viewport with their own backgrounds.
 
   useSeoMeta({
-    title: `About | ${config.appName}`,
-    description: `How ${config.appName} works: connecting activists to unstoppable funding through Bitcoin and Nostr.`,
+    title: `${t('about.seoTitle')} | ${config.appName}`,
+    description: t('about.seoDescription', { appName: config.appName }),
   });
 
   const appName = config.appName;
@@ -94,7 +96,7 @@ export function AboutPage() {
             {/* Headline column */}
             <div className="lg:col-span-7">
               <p className="text-xs font-semibold tracking-widest uppercase text-primary mb-4">
-                About {appName}
+                {t('about.hero.eyebrow', { appName })}
               </p>
               {/* Hero H1: verbatim CampaignsPage recipe. Bebas Neue at
                   italic, font-normal, with -webkit-text-stroke painting
@@ -105,7 +107,7 @@ export function AboutPage() {
                   WebkitTextStroke: '0.022em currentColor',
                 }}
               >
-                How{' '}
+                {t('about.hero.headlinePart1')}{' '}
                 {/* Orange highlighter span: same negative-margin trick
                     as CampaignsPage so the inner letter aligns with the
                     column edge despite the box padding. */}
@@ -115,25 +117,24 @@ export function AboutPage() {
                 {/* Line break only on sm+ — on mobile the whole
                     headline fits on one line. */}
                 <br className="hidden sm:inline" />
-                {' '}works.
+                {' '}{t('about.hero.headlinePart2')}
               </h1>
               <p className="text-lg lg:text-xl text-gray-300 max-w-2xl leading-relaxed mb-8">
-                {appName} is a censorship-resistant donation platform built on
-                Nostr and Bitcoin. No frozen bank accounts. No corporate
-                shut-downs. Just direct support from people who believe in your
-                cause.
+                {t('about.hero.body', { appName })}
               </p>
 
               {/* Trust chips */}
               <ul className="mb-10 flex flex-wrap items-center gap-x-6 gap-y-2 text-sm text-gray-400">
-                {['Decentralized', 'Open source', 'Censorship resistant'].map(
-                  (label) => (
-                    <li key={label} className="flex items-center gap-2">
-                      <CircleCheck className="size-4 text-primary" />
-                      {label}
-                    </li>
-                  ),
-                )}
+                {[
+                  t('about.hero.trustChips.decentralized'),
+                  t('about.hero.trustChips.openSource'),
+                  t('about.hero.trustChips.censorshipResistant'),
+                ].map((label) => (
+                  <li key={label} className="flex items-center gap-2">
+                    <CircleCheck className="size-4 text-primary" />
+                    {label}
+                  </li>
+                ))}
               </ul>
 
               {/* CTAs */}
@@ -143,16 +144,16 @@ export function AboutPage() {
                   className="group inline-flex items-center justify-center gap-2 rounded-md bg-primary text-primary-foreground hover:bg-primary/90 font-semibold h-12 px-6 text-base shadow-lg shadow-primary/25 transition-all motion-safe:hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60"
                 >
                   <HandHeart className="size-5" />
-                  Read the Donor Guide
-                  <ArrowRight className="size-4 transition-transform group-hover:translate-x-0.5" />
+                  {t('about.hero.ctaDonor')}
+                  <ArrowRight className="size-4 transition-transform group-hover:translate-x-0.5 rtl:rotate-180" />
                 </Link>
                 <Link
                   to="/about/activists"
                   className="group inline-flex items-center justify-center gap-2 rounded-md border border-white/30 bg-white/5 text-white hover:bg-white/10 font-medium h-12 px-6 text-base transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/50"
                 >
                   <Megaphone className="size-5" />
-                  Read the Activist Guide
-                  <ArrowRight className="size-4 transition-transform group-hover:translate-x-0.5" />
+                  {t('about.hero.ctaActivist')}
+                  <ArrowRight className="size-4 transition-transform group-hover:translate-x-0.5 rtl:rotate-180" />
                 </Link>
               </div>
             </div>
@@ -176,7 +177,7 @@ export function AboutPage() {
                   <div className="relative aspect-[16/9] bg-gradient-to-br from-orange-900 via-red-900 to-orange-800">
                     <img
                       src="/about/venezuela-libertad-presos-politicos.png"
-                      alt="Venezuelan activists at a candlelight vigil holding a sign reading 'Liberen a todos los presos políticos · ¡Cese la represión!'"
+                      alt={t('about.hero.sampleCard.imageAlt')}
                       className="absolute inset-0 size-full object-cover"
                       loading="lazy"
                     />
@@ -186,12 +187,12 @@ export function AboutPage() {
                       <span className="text-sm leading-none" aria-hidden>
                         🇻🇪
                       </span>
-                      <span>Venezuela</span>
+                      <span>{t('about.hero.sampleCard.countryName')}</span>
                     </div>
                     {/* Public pill */}
                     <div className="absolute top-3 right-3 px-2.5 py-1 rounded-full bg-primary/90 backdrop-blur text-primary-foreground text-[11px] font-semibold flex items-center gap-1.5">
                       <Globe className="size-3" />
-                      <span>Public</span>
+                      <span>{t('about.hero.sampleCard.public')}</span>
                     </div>
                   </div>
                   {/* Card body */}
@@ -202,16 +203,15 @@ export function AboutPage() {
                         V
                       </div>
                       <span className="text-xs text-gray-400">
-                        Venezolanos Libres
+                        {t('about.hero.sampleCard.orgName')}
                       </span>
                       <BadgeCheck className="size-3.5 text-primary" />
                     </div>
                     <h3 className="text-lg font-bold tracking-tight text-white leading-snug mb-3">
-                      Free Venezuela's Political Prisoners
+                      {t('about.hero.sampleCard.title')}
                     </h3>
                     <p className="text-xs text-gray-400 leading-snug mb-4 line-clamp-2">
-                      Legal defense and family support for 800+ political
-                      prisoners detained by the Maduro regime.
+                      {t('about.hero.sampleCard.description')}
                     </p>
                     {/* Progress bar */}
                     <div className="h-1.5 w-full rounded-full bg-white/10 overflow-hidden mb-2">
@@ -223,12 +223,12 @@ export function AboutPage() {
                         <span className="font-bold text-white text-base">
                           $8,420
                         </span>
-                        <span className="text-gray-400 text-xs"> raised</span>
+                        <span className="text-gray-400 text-xs"> {t('about.hero.sampleCard.raised')}</span>
                       </div>
-                      <span className="text-gray-500 text-xs">of $10,000</span>
+                      <span className="text-gray-500 text-xs">{t('about.hero.sampleCard.ofGoal')}</span>
                     </div>
                     <p className="text-[11px] text-gray-500 mb-4">
-                      247 donors · 12 countries
+                      {t('about.hero.sampleCard.donorsLine')}
                     </p>
                     {/* Donate button */}
                     <Link
@@ -236,7 +236,7 @@ export function AboutPage() {
                       className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-semibold text-sm h-10 rounded-md flex items-center justify-center gap-2 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/60"
                     >
                       <Bitcoin className="size-4" />
-                      Donate Bitcoin
+                      {t('about.hero.sampleCard.donate')}
                     </Link>
                   </div>
                 </div>
@@ -263,32 +263,32 @@ export function AboutPage() {
         />
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <SectionHeader
-            eyebrow="How it works"
-            title="Three steps. No middleman."
-            lede={`No banks, no borders, no permission.`}
+            eyebrow={t('about.howItWorks.eyebrow')}
+            title={t('about.howItWorks.title')}
+            lede={t('about.howItWorks.lede')}
           />
 
           <div className="grid md:grid-cols-3 gap-6 lg:gap-8">
             <StepCard
               number="01"
               image="/help/step-1-account.jpg"
-              imageAlt="A glowing orange cryptographic key floating in dark space, symbolizing self-sovereign identity"
-              title="Activists sign up in seconds."
-              body={`No bank. No paperwork. No approval. The moment an activist creates an account on ${appName}, they have a Bitcoin address ready to receive support, anywhere in the world.`}
+              imageAlt={t('about.howItWorks.step1.imageAlt')}
+              title={t('about.howItWorks.step1.title')}
+              body={t('about.howItWorks.step1.body', { appName })}
             />
             <StepCard
               number="02"
               image="/help/step-2-send.jpg"
-              imageAlt="A glowing Bitcoin coin flying through the air across a dark world map, symbolizing instant cross-border payment"
-              title="Donors send Bitcoin directly."
-              body={`Donors send Bitcoin from any wallet they already use (Cash App, Coinbase, Strike, a hardware wallet) straight to the activist. ${appName} never touches the money. No server in the middle, no custodian.`}
+              imageAlt={t('about.howItWorks.step2.imageAlt')}
+              title={t('about.howItWorks.step2.title')}
+              body={t('about.howItWorks.step2.body', { appName })}
             />
             <StepCard
               number="03"
               image="/help/step-3-spend.jpg"
-              imageAlt="An open hand with warm orange light radiating from the palm, symbolizing receiving and agency"
-              title="Support lands where it matters."
-              body="Funds arrive at the activist directly. They keep custody, they keep control. Move it, swap it, or spend it; the guides below explain how to do it privately and safely."
+              imageAlt={t('about.howItWorks.step3.imageAlt')}
+              title={t('about.howItWorks.step3.title')}
+              body={t('about.howItWorks.step3.body')}
             />
           </div>
         </div>
@@ -308,77 +308,73 @@ export function AboutPage() {
         />
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <SectionHeader
-            eyebrow="Bitcoin · One QR, two options"
-            title="Two ways to get paid."
-            lede="Both options are Bitcoin. The difference is what you trade off for privacy. When an activist creates a campaign, they choose which options to accept. If both, the donation page shows a single QR code that works for any wallet."
+            eyebrow={t('about.twoWays.eyebrow')}
+            title={t('about.twoWays.title')}
+            lede={t('about.twoWays.lede')}
           />
 
           <div className="grid md:grid-cols-2 gap-6 lg:gap-8 max-w-5xl mx-auto items-start">
             {/* Bitcoin Public Payments */}
             <RailCard
               accent="orange"
-              kicker="Bitcoin Public Payments"
-              tagline="Universal · Fast · Transparent"
+              kicker={t('about.twoWays.public.kicker')}
+              tagline={t('about.twoWays.public.tagline')}
               icon={<Bitcoin className="size-4" />}
-              title="Works with every wallet on earth."
-              description="Donations land at a regular Bitcoin address the activist controls. Anyone with any Bitcoin wallet can send. No new app, no new account, no learning curve."
+              title={t('about.twoWays.public.title')}
+              description={t('about.twoWays.public.description')}
               bullets={[
-                'Works in every Bitcoin wallet: Cash App, Coinbase, Strike, hardware',
-                'Fastest settlement: Bitcoin confirmations only',
-                'Verifiable on-chain: anyone can see what an activist has received',
+                t('about.twoWays.public.bullet1'),
+                t('about.twoWays.public.bullet2'),
+                t('about.twoWays.public.bullet3'),
               ]}
               tradeoffEmphasized
-              tradeoffTitle="Trade-off: Public on-chain."
+              tradeoffTitle={t('about.twoWays.public.tradeoffTitle')}
               tradeoffIntro={
                 <p>
-                  Every donation is public on the Bitcoin blockchain and on
-                  Nostr. {appName} is recommended only for above-ground
-                  activism. If you or your donors require extreme privacy,
-                  including from state actors, read the{' '}
-                  <Link
-                    to="/about/donors"
-                    className="font-semibold text-primary hover:underline"
-                  >
-                    Donor Guide
-                  </Link>{' '}
-                  and{' '}
-                  <Link
-                    to="/about/activists"
-                    className="font-semibold text-primary hover:underline"
-                  >
-                    Activist Guide
-                  </Link>{' '}
-                  before participating.
+                  <Trans
+                    i18nKey="about.twoWays.public.tradeoffIntro"
+                    values={{ appName }}
+                    defaults="Every donation is public on the Bitcoin blockchain and on Nostr. {{appName}} is recommended only for above-ground activism. If you or your donors require extreme privacy, including from state actors, read the <0>Donor Guide</0> and <1>Activist Guide</1> before participating."
+                    components={[
+                      <Link
+                        to="/about/donors"
+                        className="font-semibold text-primary hover:underline"
+                      />,
+                      <Link
+                        to="/about/activists"
+                        className="font-semibold text-primary hover:underline"
+                      />,
+                    ]}
+                  />
                 </p>
               }
             />
             {/* Bitcoin Silent Payments */}
             <RailCard
               accent="indigo"
-              kicker="Bitcoin Silent Payments"
-              tagline="Unlinkable · Direct · BIP-352"
+              kicker={t('about.twoWays.silent.kicker')}
+              tagline={t('about.twoWays.silent.tagline')}
               icon={<ShieldOff className="size-4" />}
-              title="Unlinkable, on-chain, direct."
-              description="Donations are sent as BIP-352 silent payments. Each one lands at a fresh, unlinkable Bitcoin output that an observer staring at the blockchain can't tie back to the campaign."
+              title={t('about.twoWays.silent.title')}
+              description={t('about.twoWays.silent.description')}
               bullets={[
-                "Donation trail can't be reconstructed on-chain",
-                'Protects activists facing serious adversaries',
-                "Lands directly in the activist's wallet, no server in the middle",
+                t('about.twoWays.silent.bullet1'),
+                t('about.twoWays.silent.bullet2'),
+                t('about.twoWays.silent.bullet3'),
               ]}
-              tradeoffTitle="Trade-off: Silent payments are early."
+              tradeoffTitle={t('about.twoWays.silent.tradeoffTitle')}
               tradeoffIntro={
                 <p>
-                  The most private way to receive Bitcoin on-chain, but the
-                  ecosystem is young and rough today:
+                  {t('about.twoWays.silent.tradeoffIntro')}
                 </p>
               }
               tradeoffBullets={[
-                <strong className="text-gray-800 dark:text-gray-100">Few wallets support it.</strong>,
-                <strong className="text-gray-800 dark:text-gray-100">Receiving is slow.</strong>,
-                <strong className="text-gray-800 dark:text-gray-100">No push notifications.</strong>,
-                <strong className="text-gray-800 dark:text-gray-100">Wallets are still buggy.</strong>,
+                <strong className="text-gray-800 dark:text-gray-100">{t('about.twoWays.silent.tradeoffBullet1')}</strong>,
+                <strong className="text-gray-800 dark:text-gray-100">{t('about.twoWays.silent.tradeoffBullet2')}</strong>,
+                <strong className="text-gray-800 dark:text-gray-100">{t('about.twoWays.silent.tradeoffBullet3')}</strong>,
+                <strong className="text-gray-800 dark:text-gray-100">{t('about.twoWays.silent.tradeoffBullet4')}</strong>,
                 <strong className="text-gray-800 dark:text-gray-100">
-                  Donation counts aren't public.
+                  {t('about.twoWays.silent.tradeoffBullet5')}
                 </strong>,
               ]}
             />
@@ -396,13 +392,10 @@ export function AboutPage() {
               </div>
               <div>
                 <h3 className="text-xl sm:text-2xl font-bold tracking-tight text-gray-900 dark:text-white mb-1.5">
-                  No custody. No middleman.
+                  {t('about.twoWays.noCustody.title')}
                 </h3>
                 <p className="text-gray-600 dark:text-gray-300 leading-relaxed text-[15px]">
-                  {appName} never holds funds. Donations move
-                  wallet-to-wallet on Bitcoin. There's no server standing
-                  between donor and activist on either option. If {appName}{' '}
-                  disappeared tomorrow, every campaign would keep working.
+                  {t('about.twoWays.noCustody.body', { appName })}
                 </p>
               </div>
             </div>
@@ -410,16 +403,16 @@ export function AboutPage() {
             {/* Comparison grid */}
             <ul className="grid sm:grid-cols-3 gap-5 sm:gap-6 pt-5 border-t border-primary/10 dark:border-white/10">
               <ComparisonItem
-                heading="Unlike GoFundMe"
-                body="No platform can freeze your donations, demand refunds, or terminate your campaign over policy disagreements."
+                heading={t('about.twoWays.noCustody.gofundme.heading')}
+                body={t('about.twoWays.noCustody.gofundme.body')}
               />
               <ComparisonItem
-                heading="Unlike GiveSendGo"
-                body="No payment processor sits in the middle, so no Stripe, no Visa, no bank can cut you off mid-campaign."
+                heading={t('about.twoWays.noCustody.givesendgo.heading')}
+                body={t('about.twoWays.noCustody.givesendgo.body')}
               />
               <ComparisonItem
-                heading="Unlike other &lsquo;Bitcoin&rsquo; platforms"
-                body="No central Lightning node, custodian, or LSP to fail or go offline. Funds settle directly on-chain to a wallet you control."
+                heading={t('about.twoWays.noCustody.otherBitcoin.heading')}
+                body={t('about.twoWays.noCustody.otherBitcoin.body')}
               />
             </ul>
           </div>
@@ -433,8 +426,8 @@ export function AboutPage() {
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <SectionHeader
-            eyebrow="Questions"
-            title="Frequently asked."
+            eyebrow={t('about.faq.eyebrow')}
+            title={t('about.faq.title')}
           />
 
           {/* Three chapter mini-sections, rendered inline in page flow */}
@@ -443,8 +436,8 @@ export function AboutPage() {
               <FAQChapter
                 key={chapter.id}
                 number={chapter.number}
-                title={chapter.label}
-                description={chapter.description}
+                title={t(chapter.labelKey)}
+                description={t(chapter.descriptionKey)}
                 categoryId={chapter.id}
               />
             ))}
@@ -456,57 +449,57 @@ export function AboutPage() {
       <section className="bg-white dark:bg-[#13181f] py-20 md:py-28">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <SectionHeader
-            eyebrow="Guides"
-            title="Pick the side you're on."
-            lede="Whether you're sending or receiving, learn how to do it safely and privately."
+            eyebrow={t('about.guides.eyebrow')}
+            title={t('about.guides.title')}
+            lede={t('about.guides.lede')}
           />
 
           <div className="grid md:grid-cols-2 gap-6 lg:gap-8 max-w-5xl mx-auto">
             <GuideCard
               to="/about/donors"
               image="/about/donor-guide-freedom-libertad.jpeg"
-              imageAlt="Hooded protesters marching through a European city street at dusk, holding burning red flares and 'FREEDOM' and 'LIBERTAD' banners"
-              role="For Donors"
+              imageAlt={t('about.guides.donor.imageAlt')}
+              role={t('about.guides.donor.role')}
               icon={<HandHeart className="size-5" />}
               accent="blue"
-              title="Support causes the banks won't."
-              description="Send Bitcoin directly to activists and movements anywhere in the world, without asking a payment processor for permission."
+              title={t('about.guides.donor.title')}
+              description={t('about.guides.donor.description')}
               bullets={[
-                'Use any Bitcoin wallet you already have.',
-                'Donations land directly with the activist. No custodian, no middleman.',
-                'For privacy, use a wallet that supports silent payments.',
+                t('about.guides.donor.bullet1'),
+                t('about.guides.donor.bullet2'),
+                t('about.guides.donor.bullet3'),
               ]}
-              cta="Read the Donor Guide"
+              cta={t('about.guides.donor.cta')}
             />
             <GuideCard
               to="/about/activists"
               image="/about/activist-guide-unity.png"
-              imageAlt="Aerial view of thousands of protesters gathered at night in a city square with burning red flares, beneath a 'UNITY IN DARKNESS' banner projected on the surrounding buildings"
-              role="For Activists"
+              imageAlt={t('about.guides.activist.imageAlt')}
+              role={t('about.guides.activist.role')}
               icon={<Megaphone className="size-5" />}
               accent="orange"
-              title="Get funded without permission."
-              description="Receive support directly from people who believe in your cause. No bank account, no application form, no company in the middle."
+              title={t('about.guides.activist.title')}
+              description={t('about.guides.activist.description')}
               bullets={[
-                'Start receiving donations as soon as you sign up.',
-                'Pick which payment types to accept: public, silent payments, or both.',
-                'For private cash-out, send to a silent-payments wallet first, then forward anywhere.',
+                t('about.guides.activist.bullet1'),
+                t('about.guides.activist.bullet2'),
+                t('about.guides.activist.bullet3'),
               ]}
-              cta="Read the Activist Guide"
+              cta={t('about.guides.activist.cta')}
             />
           </div>
 
           {/* Page-closing 'Still stuck?' line: quiet pointer to the
               Team Soapbox follow pack via the in-app /:nip19 route. */}
           <p className="mt-16 text-center text-sm text-muted-foreground">
-            Still stuck?{' '}
+            {t('about.guides.stillStuck')}{' '}
             <Link
               to={`/${teamSoapboxNaddr}`}
               className="font-medium text-primary hover:underline"
             >
-              Follow Team Soapbox on Nostr
+              {t('about.guides.followTeam')}
             </Link>
-            . We triage questions there.
+            {t('about.guides.stillStuckSuffix')}
           </p>
         </div>
       </section>
@@ -526,26 +519,26 @@ export function AboutPage() {
 const FAQ_CHAPTERS: Array<{
   id: string;
   number: string;
-  label: string;
-  description: string;
+  labelKey: string;
+  descriptionKey: string;
 }> = [
   {
     id: 'getting-started',
     number: '01',
-    label: 'Getting started',
-    description: 'What Agora is, who built it, and what it costs.',
+    labelKey: 'about.faq.chapter1.label',
+    descriptionKey: 'about.faq.chapter1.description',
   },
   {
     id: 'payments',
     number: '02',
-    label: 'Bitcoin donations',
-    description: 'How payments work, why on-chain, why public, why these trade-offs.',
+    labelKey: 'about.faq.chapter2.label',
+    descriptionKey: 'about.faq.chapter2.description',
   },
   {
     id: 'about-nostr',
     number: '03',
-    label: 'About Nostr',
-    description: 'The open protocol Agora is built on, and how your account works.',
+    labelKey: 'about.faq.chapter3.label',
+    descriptionKey: 'about.faq.chapter3.description',
   },
 ];
 

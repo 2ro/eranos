@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useSeoMeta } from '@unhead/react';
+import { useTranslation } from 'react-i18next';
 import { Bug, FlaskConical, Minus, Package, Plus, RefreshCw, ScrollText, ShieldAlert } from 'lucide-react';
 
 import { PageHeader } from '@/components/PageHeader';
@@ -34,14 +35,15 @@ const buildDate = import.meta.env.BUILD_DATE;
 const isPreRelease = !commitTag;
 
 export function ChangelogPage() {
+  const { t } = useTranslation();
   const { config } = useAppContext();
   const [content, setContent] = useState<string | null>(null);
   const [error, setError] = useState(false);
 
 
   useSeoMeta({
-    title: `Changelog | ${config.appName}`,
-    description: `What's new in ${config.appName}`,
+    title: `${t('policyPages.changelog.seoTitle')} | ${config.appName}`,
+    description: t('policyPages.changelog.seoDescription', { appName: config.appName }),
   });
 
   useEffect(() => {
@@ -59,15 +61,15 @@ export function ChangelogPage() {
 
   return (
     <main className="min-h-screen pb-16 sidebar:pb-0">
-      <PageHeader title="Changelog" icon={<ScrollText className="size-5" />} backTo="/settings" />
+      <PageHeader title={t('policyPages.changelog.title')} icon={<ScrollText className="size-5" />} backTo="/settings" />
 
       <div className="px-4 pt-3 pb-8 space-y-4">
         {error ? (
-          <p className="text-sm text-muted-foreground pt-4">Failed to load changelog.</p>
+          <p className="text-sm text-muted-foreground pt-4">{t('policyPages.changelog.loadError')}</p>
         ) : content === null ? (
           <ChangelogSkeleton />
         ) : entries.length === 0 ? (
-          <p className="text-sm text-muted-foreground pt-4">No releases yet.</p>
+          <p className="text-sm text-muted-foreground pt-4">{t('policyPages.changelog.empty')}</p>
         ) : (
           <>
             {isPreRelease && latestVersion && <PreReleaseBanner latestVersion={latestVersion} />}
@@ -78,7 +80,7 @@ export function ChangelogPage() {
               <>
                 <div className="flex items-center gap-3 pt-4 pb-1">
                   <div className="h-px flex-1 bg-border" />
-                  <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Past releases</span>
+                  <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">{t('policyPages.changelog.pastReleases')}</span>
                   <div className="h-px flex-1 bg-border" />
                 </div>
 
@@ -96,6 +98,7 @@ export function ChangelogPage() {
 
 /** Hero treatment for the most recent release — no card, centered version + date. */
 function LatestRelease({ entry }: { entry: ChangelogEntry }) {
+  const { t } = useTranslation();
   const contentRef = useRef<HTMLUListElement>(null);
   const [overflows, setOverflows] = useState(false);
   const [expanded, setExpanded] = useState(false);
@@ -153,7 +156,7 @@ function LatestRelease({ entry }: { entry: ChangelogEntry }) {
                   <TooltipTrigger asChild>
                     <Icon className={`size-4 shrink-0 mt-1 cursor-default ${style.colorClass}`} />
                   </TooltipTrigger>
-                  <TooltipContent side="left">{section.category}</TooltipContent>
+                  <TooltipContent side="left">{t(`policyPages.changelog.categories.${section.category}`)}</TooltipContent>
                 </Tooltip>
                 <span>{item}</span>
               </li>
@@ -170,7 +173,7 @@ function LatestRelease({ entry }: { entry: ChangelogEntry }) {
           className="w-full text-sm text-primary hover:underline mt-1"
           onClick={() => setExpanded((v) => !v)}
         >
-          {expanded ? 'Show less' : 'Read more'}
+          {expanded ? t('policyPages.changelog.showLess') : t('policyPages.changelog.readMore')}
         </button>
       )}
 
@@ -182,6 +185,7 @@ const ENTRY_MAX_HEIGHT = 240; // px — entries taller than this get a "Read mor
 
 /** A single changelog release card with truncation for long entries. */
 function ChangelogEntryCard({ entry }: { entry: ChangelogEntry }) {
+  const { t } = useTranslation();
   const contentRef = useRef<HTMLUListElement>(null);
   const [overflows, setOverflows] = useState(false);
   const [expanded, setExpanded] = useState(false);
@@ -241,7 +245,7 @@ function ChangelogEntryCard({ entry }: { entry: ChangelogEntry }) {
                   <TooltipTrigger asChild>
                     <Icon className={`size-3.5 shrink-0 mt-[3px] cursor-default ${style.colorClass}`} />
                   </TooltipTrigger>
-                  <TooltipContent side="left">{section.category}</TooltipContent>
+                  <TooltipContent side="left">{t(`policyPages.changelog.categories.${section.category}`)}</TooltipContent>
                 </Tooltip>
                 <span>{item}</span>
               </li>
@@ -258,7 +262,7 @@ function ChangelogEntryCard({ entry }: { entry: ChangelogEntry }) {
            className="w-full text-sm text-primary hover:underline py-2"
           onClick={() => setExpanded((v) => !v)}
         >
-          {expanded ? 'Show less' : 'Read more'}
+          {expanded ? t('policyPages.changelog.showLess') : t('policyPages.changelog.readMore')}
         </button>
       )}
     </div>
@@ -267,11 +271,12 @@ function ChangelogEntryCard({ entry }: { entry: ChangelogEntry }) {
 
 /** Banner shown at the top of the changelog for untagged (pre-release) builds. */
 function PreReleaseBanner({ latestVersion }: { latestVersion: string }) {
+  const { t } = useTranslation();
   return (
     <div className="rounded-2xl border border-dashed border-amber-500/50 bg-amber-50/50 dark:bg-amber-950/20 px-4 py-3 space-y-1.5">
       <div className="flex items-center gap-2">
         <FlaskConical className="size-4 text-amber-600 dark:text-amber-400 shrink-0" />
-        <span className="text-sm font-medium text-amber-800 dark:text-amber-300">Pre-release build</span>
+        <span className="text-sm font-medium text-amber-800 dark:text-amber-300">{t('policyPages.changelog.preReleaseLabel')}</span>
         {commitSha && buildDate && (
           <a
             href={`${GITLAB_REPO}/-/commit/${commitSha}`}
@@ -284,14 +289,14 @@ function PreReleaseBanner({ latestVersion }: { latestVersion: string }) {
         )}
       </div>
       <p className="text-xs text-amber-700/80 dark:text-amber-400/70">
-        This build contains changes not yet included in a release.{' '}
+        {t('policyPages.changelog.preReleaseBody')}{' '}
         <a
           href={`${GITLAB_REPO}/-/compare/v${latestVersion}...${commitSha || 'main'}`}
           target="_blank"
           rel="noopener noreferrer"
           className="underline underline-offset-2 hover:text-amber-900 dark:hover:text-amber-200 transition-colors"
         >
-          View unreleased changes
+          {t('policyPages.changelog.viewUnreleased')}
         </a>
       </p>
     </div>

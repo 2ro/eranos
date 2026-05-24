@@ -2,9 +2,11 @@ import { useEffect, useState, useMemo } from 'react';
 import { useSeoMeta } from '@unhead/react';
 import { Link as RouterLink, useNavigate } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
+import { useTranslation, Trans } from 'react-i18next';
 import { nip19 } from 'nostr-tools';
 
 import { useActions, type Action } from '@/hooks/useActions';
+import { useAppContext } from '@/hooks/useAppContext';
 import { useAuthor } from '@/hooks/useAuthor';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useBtcPrice } from '@/hooks/useBtcPrice';
@@ -60,6 +62,7 @@ function ActionSkeleton() {
 }
 
 function ActionShareMenu({ action }: { action: Action }) {
+  const { t } = useTranslation();
   const { user } = useCurrentUser();
   const { mutateAsync: createEvent } = useNostrPublish();
   const { toast } = useToast();
@@ -82,11 +85,11 @@ function ActionShareMenu({ action }: { action: Action }) {
     try {
       await navigator.clipboard.writeText(actionUrl);
       setCopied(true);
-      toast({ title: 'Link copied' });
+      toast({ title: t('pledges.card.linkCopied') });
       setTimeout(() => setCopied(false), 2000);
     } catch (error) {
       console.error('Failed to copy link:', error);
-      toast({ title: 'Failed to copy link', variant: 'destructive' });
+      toast({ title: t('pledges.card.linkCopyFailed'), variant: 'destructive' });
     }
   };
 
@@ -95,7 +98,7 @@ function ActionShareMenu({ action }: { action: Action }) {
     e.stopPropagation();
     if (!user || !isOwner) return;
 
-    const confirmed = window.confirm('Delete this pledge? This cannot be undone.');
+    const confirmed = window.confirm(t('pledges.card.confirmDelete'));
     if (!confirmed) return;
 
     setIsDeleting(true);
@@ -104,7 +107,7 @@ function ActionShareMenu({ action }: { action: Action }) {
       // honour a-tag-only deletions for addressable events.
       await createEvent({
         kind: 5,
-        content: 'Deleted pledge',
+        content: t('pledges.card.deletedContent'),
         tags: [
           ['e', action.event.id],
           ['a', `36639:${action.pubkey}:${action.id}`],
@@ -131,10 +134,10 @@ function ActionShareMenu({ action }: { action: Action }) {
             ]
           : []),
       ]);
-      toast({ title: 'Pledge deleted' });
+      toast({ title: t('pledges.card.deleted') });
     } catch (error) {
       console.error('Failed to delete pledge:', error);
-      toast({ title: 'Failed to delete pledge', variant: 'destructive' });
+      toast({ title: t('pledges.card.deleteFailed'), variant: 'destructive' });
     } finally {
       setIsDeleting(false);
     }
@@ -160,7 +163,7 @@ function ActionShareMenu({ action }: { action: Action }) {
               ) : (
                 <Trash2 className="h-4 w-4 mr-2" />
               )}
-              Delete pledge
+              {t('pledges.card.deletePledge')}
             </DropdownMenuItem>
             <DropdownMenuSeparator />
           </>
@@ -171,7 +174,7 @@ function ActionShareMenu({ action }: { action: Action }) {
           ) : (
             <LinkIcon className="h-4 w-4 mr-2" />
           )}
-          Copy link
+          {t('pledges.card.copyLink')}
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
@@ -179,6 +182,7 @@ function ActionShareMenu({ action }: { action: Action }) {
 }
 
 function ActionCard({ action, isExpired, btcPrice }: { action: Action; isExpired?: boolean; btcPrice: number | undefined }) {
+  const { t } = useTranslation();
   const author = useAuthor(action.pubkey);
   const metadata = author.data?.metadata;
   const displayName = getDisplayName(metadata, action.pubkey);
@@ -216,7 +220,7 @@ function ActionCard({ action, isExpired, btcPrice }: { action: Action; isExpired
           <div className="absolute top-3 right-3 flex items-center gap-2" onClick={(e) => e.preventDefault()}>
             {isExpired && (
               <Badge variant="secondary" className="backdrop-blur bg-background/85 border-border/40 text-muted-foreground">
-                Ended
+                {t('pledges.card.ended')}
               </Badge>
             )}
             <ActionShareMenu action={action} />
@@ -238,7 +242,7 @@ function ActionCard({ action, isExpired, btcPrice }: { action: Action; isExpired
           <div className="flex-1" />
 
           <div className="rounded-xl border border-primary/20 bg-primary/10 px-4 py-3">
-            <p className="text-xs font-semibold uppercase tracking-wide text-primary">Pledged</p>
+            <p className="text-xs font-semibold uppercase tracking-wide text-primary">{t('pledges.card.pledged')}</p>
             <p className="mt-1 text-2xl font-bold tracking-tight text-foreground">
               {formatPledgeAmount(action.bounty, btcPrice)}
             </p>
@@ -260,7 +264,11 @@ function ActionCard({ action, isExpired, btcPrice }: { action: Action; isExpired
           </div>
 
           <div className="text-xs text-muted-foreground border-t border-border/60 pt-3 truncate">
-            by <span className="font-medium text-foreground">{displayName}</span>
+            <Trans
+              i18nKey="pledges.card.byAuthor"
+              values={{ name: displayName }}
+              components={{ 0: <span className="font-medium text-foreground" /> }}
+            />
           </div>
         </div>
       </Card>
@@ -275,6 +283,8 @@ function ActionCard({ action, isExpired, btcPrice }: { action: Action; isExpired
 type SortOption = 'recent' | 'bounty' | 'deadline';
 
 export default function ActionsPage() {
+  const { t } = useTranslation();
+  const { config } = useAppContext();
   const { user } = useCurrentUser();
   const { data: btcPrice } = useBtcPrice();
   const navigate = useNavigate();
@@ -299,7 +309,7 @@ export default function ActionsPage() {
 
   const countryOptions = useMemo(() => {
     const options: Array<{ value: string; label: string; flag: string }> = [
-      { value: 'global', label: 'Global', flag: '🌍' },
+      { value: 'global', label: t('pledges.list.global'), flag: '🌍' },
     ];
     allCountries.forEach((country) => {
       options.push({
@@ -309,15 +319,17 @@ export default function ActionsPage() {
       });
     });
     return options;
-  }, [allCountries]);
+  }, [allCountries, t]);
 
   const selectedCountryName = selectedCountry
     ? getGeoDisplayName(selectedCountry)
-    : 'Global';
+    : t('pledges.list.global');
 
   useSeoMeta({
-    title: `Pledges${selectedCountry ? ` — ${selectedCountryName}` : ''} | Agora`,
-    description: 'Pledge funding for concrete actions, evidence, or outcomes you want to inspire.',
+    title: `${selectedCountry
+      ? t('pledges.list.seoTitleWithCountry', { country: selectedCountryName })
+      : t('pledges.list.seoTitle')} | ${config.appName}`,
+    description: t('pledges.list.seoDescription'),
   });
 
   const isLoading = actionsLoading;
@@ -369,30 +381,32 @@ export default function ActionsPage() {
   const hasUpcoming = upcomingActions.length > 0;
   const isOnlyPastView = !hasCurrent && !hasUpcoming && pastActions.length > 0;
   const primarySectionTitle = hasCurrent
-    ? 'Active pledges'
+    ? t('pledges.list.sectionActive')
     : hasUpcoming
-      ? 'Upcoming pledges'
+      ? t('pledges.list.sectionUpcoming')
     : pastActions.length > 0
-        ? 'Past pledges'
-        : 'Pledges';
-  const deadlineSortLabel = isOnlyPastView ? 'Recently ended' : 'Deadline soon';
+        ? t('pledges.list.sectionPast')
+        : t('pledges.list.sectionDefault');
+  const deadlineSortLabel = isOnlyPastView
+    ? t('pledges.list.sortDeadlinePast')
+    : t('pledges.list.sortDeadline');
 
   const headerControls = (
     <div className="flex items-center gap-1">
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button variant="ghost" size="sm" className="h-auto p-2 hover:bg-muted/50 rounded-lg" aria-label="Sort">
+          <Button variant="ghost" size="sm" className="h-auto p-2 hover:bg-muted/50 rounded-lg" aria-label={t('pledges.list.sortAriaLabel')}>
             <ListFilter className="h-5 w-5 text-primary" />
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-48">
-          <div className="px-2 py-1.5 text-xs font-semibold text-muted-foreground">Sort by</div>
+          <div className="px-2 py-1.5 text-xs font-semibold text-muted-foreground">{t('pledges.list.sortBy')}</div>
           <DropdownMenuItem onClick={() => setSortBy('recent')} className={sortBy === 'recent' ? 'bg-primary/10' : ''}>
-            <Clock className="mr-2 h-4 w-4" /><span>Most recent</span>
+            <Clock className="mr-2 h-4 w-4" /><span>{t('pledges.list.sortRecent')}</span>
             {sortBy === 'recent' && <Check className="ml-auto h-4 w-4" />}
           </DropdownMenuItem>
           <DropdownMenuItem onClick={() => setSortBy('bounty')} className={sortBy === 'bounty' ? 'bg-primary/10' : ''}>
-            <DollarSign className="mr-2 h-4 w-4" /><span>Highest pledge</span>
+            <DollarSign className="mr-2 h-4 w-4" /><span>{t('pledges.list.sortBounty')}</span>
             {sortBy === 'bounty' && <Check className="ml-auto h-4 w-4" />}
           </DropdownMenuItem>
           <DropdownMenuItem onClick={() => setSortBy('deadline')} className={sortBy === 'deadline' ? 'bg-primary/10' : ''}>
@@ -404,7 +418,7 @@ export default function ActionsPage() {
 
       <Popover open={headerCountryPickerOpen} onOpenChange={setHeaderCountryPickerOpen}>
         <PopoverTrigger asChild>
-          <Button variant="ghost" size="sm" className="h-auto p-2 hover:bg-muted/50 rounded-lg" aria-label="Filter by country">
+          <Button variant="ghost" size="sm" className="h-auto p-2 hover:bg-muted/50 rounded-lg" aria-label={t('pledges.list.filterAriaLabel')}>
             {selectedCountry ? (
               <span className="text-2xl">{countryCodeToFlag(selectedCountry)}</span>
             ) : (
@@ -414,9 +428,9 @@ export default function ActionsPage() {
         </PopoverTrigger>
         <PopoverContent className="w-[280px] p-0" align="end">
           <Command>
-            <CommandInput placeholder="Search..." />
+            <CommandInput placeholder={t('pledges.list.countrySearchPlaceholder')} />
             <CommandList>
-              <CommandEmpty>No results found.</CommandEmpty>
+              <CommandEmpty>{t('pledges.list.noResults')}</CommandEmpty>
               <CommandGroup>
                 {countryOptions.map((option) => (
                   <CommandItem
@@ -465,7 +479,7 @@ export default function ActionsPage() {
               <div>
                 <h2 className="text-2xl sm:text-3xl font-bold tracking-tight">{primarySectionTitle}</h2>
                 <p className="text-sm text-muted-foreground mt-1">
-                  Help fund the actions worth making.
+                  {t('pledges.list.sectionTagline')}
                 </p>
               </div>
               {headerControls}
@@ -504,7 +518,7 @@ export default function ActionsPage() {
             ) : null}
 
             {hasCurrent && hasUpcoming && (
-              <SectionDivider title="Upcoming">
+              <SectionDivider title={t('pledges.list.dividerUpcoming')}>
                 <ActionSection
                   items={visibleUpcoming}
                   total={upcomingActions.length}
@@ -518,7 +532,7 @@ export default function ActionsPage() {
             )}
 
             {pastActions.length > 0 && (hasCurrent || hasUpcoming) && (
-              <SectionDivider title="Past">
+              <SectionDivider title={t('pledges.list.dividerPast')}>
                 <ActionSection
                   items={visiblePast}
                   total={pastActions.length}
@@ -535,9 +549,9 @@ export default function ActionsPage() {
           <>
             <div className="flex items-end justify-between gap-4 mb-6">
               <div>
-                <h2 className="text-2xl sm:text-3xl font-bold tracking-tight">Active pledges</h2>
+                <h2 className="text-2xl sm:text-3xl font-bold tracking-tight">{t('pledges.list.sectionActive')}</h2>
                 <p className="text-sm text-muted-foreground mt-1">
-                  Help fund the actions worth making.
+                  {t('pledges.list.sectionTagline')}
                 </p>
               </div>
               {headerControls}
@@ -547,15 +561,17 @@ export default function ActionsPage() {
               <div className="py-12 px-8 text-center space-y-4">
                 <HandHeart className="size-10 text-muted-foreground/60 mx-auto" />
                 <div className="space-y-1.5">
-                  <h3 className="text-lg font-semibold">No pledges yet</h3>
+                  <h3 className="text-lg font-semibold">{t('pledges.list.emptyTitle')}</h3>
                   <p className="text-muted-foreground max-w-sm mx-auto">
-                  {selectedCountry ? `Be the first to create a pledge for ${selectedCountryName}.` : 'Be the first to create a pledge.'}
+                  {selectedCountry
+                    ? t('pledges.list.emptyHintCountry', { country: selectedCountryName })
+                    : t('pledges.list.emptyHint')}
                   </p>
                 </div>
                 {user && (
                   <Button onClick={() => navigate(createActionHref)}>
                     <Plus className="size-4 mr-2" />
-                    Create pledge
+                    {t('pledges.list.createPledge')}
                   </Button>
                 )}
               </div>
@@ -601,6 +617,7 @@ interface ActionsHeroProps {
  * with it.
  */
 function ActionsHero({ actionCount, canCreate, onCreateAction }: ActionsHeroProps) {
+  const { t } = useTranslation();
   // Cycle through warm hues on the same cadence as the banner so the
   // whole hero feels like one coordinated moment instead of two
   // unrelated rotations.
@@ -642,15 +659,14 @@ function ActionsHero({ actionCount, canCreate, onCreateAction }: ActionsHeroProp
       <div className="relative max-w-5xl mx-auto px-4 sm:px-6 py-10 sm:py-12 lg:py-14 min-h-[380px] sm:min-h-[420px] lg:min-h-[460px] flex flex-col items-center text-center">
         <div className="relative space-y-3 max-w-3xl">
           <p className="text-xs sm:text-sm font-semibold uppercase tracking-[0.18em] text-white/85 drop-shadow">
-            Pledge
+            {t('pledges.list.heroKicker')}
           </p>
           <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight leading-[1.05] text-white drop-shadow-[0_2px_12px_rgb(0_0_0/0.55)]">
-            Inspire the change
-            <br className="sm:hidden" /> you want to see.
+            {t('pledges.list.heroHeading')}
+            <br className="sm:hidden" /> {t('pledges.list.heroHeadingLine2')}
           </h1>
           <p className="text-base sm:text-lg text-white/85 max-w-2xl mx-auto drop-shadow-[0_1px_6px_rgb(0_0_0/0.5)]">
-            Fund concrete actions, evidence, and outcomes. People reply with submissions,
-            and the community rewards the work that moves the goal forward.
+            {t('pledges.list.heroBody')}
           </p>
         </div>
 
@@ -669,7 +685,7 @@ function ActionsHero({ actionCount, canCreate, onCreateAction }: ActionsHeroProp
               {actionCount.toLocaleString()}
             </span>
             <span className="text-xs sm:text-sm text-muted-foreground line-clamp-1">
-              {actionCount === 1 ? 'pledge open right now' : 'pledges open right now'}
+              {t('pledges.list.openCount', { count: actionCount })}
             </span>
           </div>
         </div>
@@ -690,10 +706,10 @@ function ActionsHero({ actionCount, canCreate, onCreateAction }: ActionsHeroProp
               'motion-safe:transition-colors motion-safe:duration-200',
               'disabled:opacity-60 disabled:cursor-not-allowed',
             )}
-            aria-label={canCreate ? 'Create pledge' : 'Log in to create a pledge'}
+            aria-label={canCreate ? t('pledges.list.createPledge') : t('pledges.list.loginToCreate')}
           >
             <Plus className="mr-2" />
-            Create pledge
+            {t('pledges.list.createPledge')}
           </Button>
         </div>
       </div>
@@ -706,6 +722,7 @@ function ActionSection({
 }: {
   items: Action[]; total: number; visible: number; showAll: boolean; onToggle: () => void; isExpired: boolean; btcPrice: number | undefined;
 }) {
+  const { t } = useTranslation();
   return (
     <div className="space-y-5">
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
@@ -722,9 +739,9 @@ function ActionSection({
         <div className="flex justify-center pt-2">
           <Button variant="outline" onClick={onToggle} className="gap-2">
             {showAll ? (
-              <>Show less <ChevronRight className="h-4 w-4 rotate-90" /></>
+              <>{t('pledges.list.showLess')} <ChevronRight className="h-4 w-4 rotate-90" /></>
             ) : (
-              <>Show more ({total - visible} more) <ChevronRight className="h-4 w-4 -rotate-90" /></>
+              <>{t('pledges.list.showMore', { count: total - visible })} <ChevronRight className="h-4 w-4 -rotate-90" /></>
             )}
           </Button>
         </div>

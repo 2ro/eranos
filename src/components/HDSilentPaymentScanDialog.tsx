@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Loader2, AlertCircle, CheckCircle2 } from 'lucide-react';
 
 import {
@@ -31,6 +32,7 @@ interface HDSilentPaymentScanDialogProps {
 }
 
 export function HDSilentPaymentScanDialog({ open, onOpenChange }: HDSilentPaymentScanDialogProps) {
+  const { t } = useTranslation();
   const sp = useHdWalletSp();
   const [from, setFrom] = useState('');
   const [to, setTo] = useState('');
@@ -82,9 +84,9 @@ export function HDSilentPaymentScanDialog({ open, onOpenChange }: HDSilentPaymen
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-sm">
         <DialogHeader>
-          <DialogTitle>Scan for silent payments</DialogTitle>
+          <DialogTitle>{t('spScan.title')}</DialogTitle>
           <DialogDescription>
-            Walks the configured BIP-352 indexer block-by-block to detect incoming silent payments.
+            {t('spScan.description')}
           </DialogDescription>
         </DialogHeader>
 
@@ -92,7 +94,7 @@ export function HDSilentPaymentScanDialog({ open, onOpenChange }: HDSilentPaymen
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1.5">
               <Label htmlFor="sp-scan-from" className="text-xs">
-                From block
+                {t('spScan.fromBlock')}
               </Label>
               <Input
                 id="sp-scan-from"
@@ -110,14 +112,14 @@ export function HDSilentPaymentScanDialog({ open, onOpenChange }: HDSilentPaymen
             </div>
             <div className="space-y-1.5">
               <Label htmlFor="sp-scan-to" className="text-xs">
-                To block
+                {t('spScan.toBlock')}
               </Label>
               <Input
                 id="sp-scan-to"
                 type="number"
                 inputMode="numeric"
                 min={0}
-                placeholder="tip"
+                placeholder={t('spScan.tipPlaceholder')}
                 value={to}
                 onChange={(e) => {
                   setTouched(true);
@@ -131,13 +133,13 @@ export function HDSilentPaymentScanDialog({ open, onOpenChange }: HDSilentPaymen
 
           {sp.tipHeight !== undefined && (
             <p className="text-xs text-muted-foreground">
-              Indexer tip: <span className="font-mono">{sp.tipHeight.toLocaleString()}</span>
+              {t('spScan.indexerTip')}: <span className="font-mono">{sp.tipHeight.toLocaleString()}</span>
               {sp.storage && (
                 <>
                   {' · '}
-                  Last fully scanned:{' '}
+                  {t('spScan.lastFullyScanned')}:{' '}
                   <span className="font-mono">
-                    {sp.storage.scanHeight > 0 ? sp.storage.scanHeight.toLocaleString() : 'never'}
+                    {sp.storage.scanHeight > 0 ? sp.storage.scanHeight.toLocaleString() : t('spScan.never')}
                   </span>
                 </>
               )}
@@ -164,11 +166,10 @@ export function HDSilentPaymentScanDialog({ open, onOpenChange }: HDSilentPaymen
             />
             <div className="space-y-0.5">
               <Label htmlFor="sp-include-spent" className="text-xs cursor-pointer">
-                Include already-spent
+                {t('spScan.includeSpent')}
               </Label>
               <p className="text-xs text-muted-foreground">
-                Also detect silent payments that have since been spent. Use when
-                rebuilding receive history after a missed scan or a reset.
+                {t('spScan.includeSpentDesc')}
               </p>
             </div>
           </div>
@@ -179,12 +180,13 @@ export function HDSilentPaymentScanDialog({ open, onOpenChange }: HDSilentPaymen
               <div className="flex items-center justify-between text-xs text-muted-foreground">
                 <span className="flex items-center gap-1.5">
                   <Loader2 className="size-3 animate-spin" />
-                  Block {sp.scanProgress.currentHeight.toLocaleString()} /{' '}
-                  {sp.scanProgress.toHeight.toLocaleString()}
+                  {t('spScan.blockProgress', {
+                    current: sp.scanProgress.currentHeight.toLocaleString(),
+                    to: sp.scanProgress.toHeight.toLocaleString(),
+                  })}
                 </span>
                 <span>
-                  {sp.scanProgress.matchesFound} match
-                  {sp.scanProgress.matchesFound === 1 ? '' : 'es'}
+                  {t('spScan.matches', { count: sp.scanProgress.matchesFound })}
                 </span>
               </div>
             </div>
@@ -201,13 +203,13 @@ export function HDSilentPaymentScanDialog({ open, onOpenChange }: HDSilentPaymen
             <div className="flex items-start gap-2 text-xs text-muted-foreground">
               <CheckCircle2 className="size-4 shrink-0 mt-0.5 text-green-500" />
               <p>
-                Scanned blocks {sp.scanProgress.fromHeight.toLocaleString()} →{' '}
-                {sp.scanProgress.currentHeight.toLocaleString()}.{' '}
+                {t('spScan.scannedRange', {
+                  from: sp.scanProgress.fromHeight.toLocaleString(),
+                  to: sp.scanProgress.currentHeight.toLocaleString(),
+                })}{' '}
                 {sp.scanProgress.matchesFound > 0
-                  ? `Found ${sp.scanProgress.matchesFound} new ${
-                      sp.scanProgress.matchesFound === 1 ? 'output' : 'outputs'
-                    }.`
-                  : 'No new payments.'}
+                  ? t('spScan.foundOutputs', { count: sp.scanProgress.matchesFound })
+                  : t('spScan.noNewPayments')}
               </p>
             </div>
           )}
@@ -224,21 +226,23 @@ export function HDSilentPaymentScanDialog({ open, onOpenChange }: HDSilentPaymen
           {sp.storage && sp.storage.utxos.length > 0 && (
             <div className="space-y-2 border-t pt-3">
               <div className="space-y-1">
-                <Label className="text-xs">Reconcile spent UTXOs</Label>
+                <Label className="text-xs">{t('spScan.reconcile.title')}</Label>
                 <p className="text-xs text-muted-foreground">
-                  Checks each stored silent-payment UTXO against Blockbook and removes any
-                  that have been spent. Use this if the balance is higher than it should
-                  be after a send.
+                  {t('spScan.reconcile.description')}
                 </p>
               </div>
 
               {sp.reconcileProgress && !sp.reconcileError && (
                 <p className="text-xs text-muted-foreground">
                   {sp.isReconciling
-                    ? `Checking ${sp.reconcileProgress.checked} / ${sp.reconcileProgress.total}…`
-                    : `Checked ${sp.reconcileProgress.checked} UTXO${
-                        sp.reconcileProgress.checked === 1 ? '' : 's'
-                      } · pruned ${sp.reconcileProgress.prunedSoFar}.`}
+                    ? t('spScan.reconcile.checking', {
+                        checked: sp.reconcileProgress.checked,
+                        total: sp.reconcileProgress.total,
+                      })
+                    : t('spScan.reconcile.checked', {
+                        count: sp.reconcileProgress.checked,
+                        pruned: sp.reconcileProgress.prunedSoFar,
+                      })}
                 </p>
               )}
 
@@ -260,10 +264,10 @@ export function HDSilentPaymentScanDialog({ open, onOpenChange }: HDSilentPaymen
                 {sp.isReconciling ? (
                   <>
                     <Loader2 className="size-3 animate-spin mr-2" />
-                    Reconciling…
+                    {t('spScan.reconcile.reconciling')}
                   </>
                 ) : (
-                  'Reconcile now'
+                  t('spScan.reconcile.reconcileNow')
                 )}
               </Button>
             </div>
@@ -272,15 +276,15 @@ export function HDSilentPaymentScanDialog({ open, onOpenChange }: HDSilentPaymen
           <div className="flex justify-end gap-2 pt-2">
             {sp.isScanning ? (
               <Button variant="outline" onClick={() => sp.cancelScan()}>
-                Cancel
+                {t('common.cancel')}
               </Button>
             ) : (
               <>
                 <Button variant="ghost" onClick={() => onOpenChange(false)}>
-                  Close
+                  {t('common.close')}
                 </Button>
                 <Button onClick={handleScan} disabled={!inputsValid}>
-                  Start scan
+                  {t('spScan.startScan')}
                 </Button>
               </>
             )}

@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useNostr } from '@nostrify/react';
 import { useQuery } from '@tanstack/react-query';
@@ -16,6 +16,7 @@ import { BadgeThumbnail } from '@/components/BadgeThumbnail';
 import { parseProfileBadges } from '@/lib/parseProfileBadges';
 import { useAddrEvent, type AddrCoords } from '@/hooks/useEvent';
 import { useAuthor } from '@/hooks/useAuthor';
+import { useImageProxy } from '@/hooks/useImageProxy';
 import { genUserName } from '@/lib/genUserName';
 import { useProfileUrl } from '@/hooks/useProfileUrl';
 import { isProfileBadgesKind } from '@/lib/badgeUtils';
@@ -100,6 +101,8 @@ export function EmbeddedNaddr({ addr, className, disableHoverCards }: EmbeddedNa
 function EmbeddedBadgeCard({ event, className }: { event: NostrEvent; className?: string }) {
   const navigate = useNavigate();
   const badge = useMemo(() => parseBadgeDefinition(event), [event]);
+  const proxy = useImageProxy();
+  const [proxyFailed, setProxyFailed] = useState(false);
 
   const naddrId = useMemo(() => {
     const dTag = event.tags.find(([n]) => n === 'd')?.[1] ?? '';
@@ -111,6 +114,11 @@ function EmbeddedBadgeCard({ event, className }: { event: NostrEvent; className?
   const heroImage = badge.image
     ?? badge.thumbs.find((t) => t.dimensions === '512x512')?.url
     ?? badge.thumbs[0]?.url;
+
+  // Proxy at 192 — rendered `size-20` is 80px, 2× DPR = 160. Round up.
+  const proxied = heroImage ? proxy(heroImage, 192) : heroImage;
+  const usingProxy = proxied !== heroImage;
+  const displaySrc = proxyFailed || !usingProxy ? heroImage : proxied;
 
   return (
     <div
@@ -162,13 +170,16 @@ function EmbeddedBadgeCard({ event, className }: { event: NostrEvent; className?
 
         {/* Badge image */}
         <div className="relative z-[1]">
-          {heroImage ? (
+          {displaySrc ? (
             <img
-              src={heroImage}
+              src={displaySrc}
               alt={badge.name}
               className="size-20 rounded-xl object-cover drop-shadow-lg"
               loading="lazy"
               decoding="async"
+              onError={() => {
+                if (usingProxy && !proxyFailed) setProxyFailed(true);
+              }}
             />
           ) : (
             <div className="size-20 rounded-xl bg-gradient-to-br from-primary/10 via-primary/5 to-transparent flex items-center justify-center">

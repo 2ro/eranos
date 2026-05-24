@@ -1,8 +1,9 @@
-import { useCallback } from 'react';
+import { useCallback, useState } from 'react';
 import { Award } from 'lucide-react';
 
 import type { BadgeData } from '@/lib/parseBadgeDefinition';
 import { useCardTilt } from '@/hooks/useCardTilt';
+import { useImageProxy } from '@/hooks/useImageProxy';
 import { cn } from '@/lib/utils';
 
 interface BadgeThumbnailProps {
@@ -21,6 +22,8 @@ interface BadgeThumbnailProps {
  */
 export function BadgeThumbnail({ badge, size = 48, className }: BadgeThumbnailProps) {
   const thumbUrl = pickThumb(badge, size);
+  const proxy = useImageProxy();
+  const [proxyFailed, setProxyFailed] = useState(false);
   // Tight perspective relative to the small thumbnail makes the 3D rotation
   // clearly visible even on 28-48px elements.
   const tilt = useCardTilt(35, 1.15, size * 3);
@@ -46,6 +49,14 @@ export function BadgeThumbnail({ badge, size = 48, className }: BadgeThumbnailPr
     touchAction: 'auto',
   };
 
+  // Proxy at 2× the rendered size (retina), with a floor of 128 so the smallest
+  // 28px callouts still get a reasonable image. wsrv.nl won't upscale below
+  // the source's natural size.
+  const proxyWidth = Math.max(size * 2, 128);
+  const proxied = thumbUrl ? proxy(thumbUrl, proxyWidth) : thumbUrl;
+  const usingProxy = proxied !== thumbUrl;
+  const finalSrc = proxyFailed || !usingProxy ? thumbUrl : proxied;
+
   return (
     <div
       ref={tilt.ref}
@@ -53,14 +64,17 @@ export function BadgeThumbnail({ badge, size = 48, className }: BadgeThumbnailPr
       onPointerMove={handlePointerMove}
       onPointerLeave={handlePointerLeave}
     >
-      {thumbUrl ? (
+      {finalSrc ? (
         <img
-          src={thumbUrl}
+          src={finalSrc}
           alt={badge.name}
           className={cn('rounded-lg object-cover', className)}
           style={{ width: size, height: size }}
           loading="lazy"
           decoding="async"
+          onError={() => {
+            if (usingProxy && !proxyFailed) setProxyFailed(true);
+          }}
         />
       ) : (
         <div

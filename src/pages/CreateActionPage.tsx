@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { useSeoMeta } from '@unhead/react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useTranslation, Trans } from 'react-i18next';
 import {
   AlertTriangle,
   ArrowLeft,
@@ -22,6 +23,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
+import { useAppContext } from '@/hooks/useAppContext';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useBtcPrice } from '@/hooks/useBtcPrice';
 import { useManageableOrganizations } from '@/hooks/useManageableOrganizations';
@@ -39,7 +41,8 @@ import { cn } from '@/lib/utils';
 import { withAgoraTag } from '@/lib/agoraNoteTags';
 
 export function CreateActionPage() {
-
+  const { t } = useTranslation();
+  const { config } = useAppContext();
   const { user } = useCurrentUser();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
@@ -98,8 +101,8 @@ export function CreateActionPage() {
   const minDeadline = useMemo(() => getTodayDateInput(), []);
 
   useSeoMeta({
-    title: 'Create pledge | Agora',
-    description: 'Create a donor pledge to inspire concrete action on Agora.',
+    title: `${t('pledges.create.seoTitle')} | ${config.appName}`,
+    description: t('pledges.create.seoDescription', { appName: config.appName }),
   });
 
   const pledgeSatsPreview = useMemo(() => {
@@ -110,22 +113,22 @@ export function CreateActionPage() {
 
   const submitMutation = useMutation({
     mutationFn: async () => {
-      if (!user) throw new Error('You must be logged in to create a pledge.');
+      if (!user) throw new Error(t('pledges.create.errorLoginRequired'));
 
       const trimmedTitle = title.trim();
       const trimmedDescription = description.trim();
 
-      if (!trimmedTitle) throw new Error('Title is required.');
-      if (!trimmedDescription) throw new Error('Description is required.');
-      if (!pledgeUsd.trim()) throw new Error('Pledge amount is required.');
+      if (!trimmedTitle) throw new Error(t('pledges.create.errorTitleRequired'));
+      if (!trimmedDescription) throw new Error(t('pledges.create.errorDescriptionRequired'));
+      if (!pledgeUsd.trim()) throw new Error(t('pledges.create.errorPledgeRequired'));
 
       const pledgeUsdNum = Number(pledgeUsd.replace(/[, $]/g, ''));
       if (!Number.isFinite(pledgeUsdNum) || pledgeUsdNum <= 0) {
-        throw new Error('Pledge amount must be a positive USD amount.');
+        throw new Error(t('pledges.create.errorPledgeInvalid'));
       }
       const pledgeSats = usdToSats(pledgeUsdNum, btcPrice);
       if (pledgeSats <= 0) {
-        throw new Error('Waiting for BTC/USD price to calculate the pledge amount.');
+        throw new Error(t('pledges.create.errorPriceUnavailable'));
       }
 
       const now = Date.now();
@@ -141,7 +144,7 @@ export function CreateActionPage() {
         ['title', trimmedTitle],
         ['bounty', String(pledgeSats)],
         ['t', 'agora-action'],
-        ['alt', `Agora pledge: ${trimmedTitle}`],
+        ['alt', t('pledges.create.altText', { appName: config.appName, title: trimmedTitle })],
       ];
       for (const tag of pledgeTags) tags.push(['t', tag]);
 
@@ -161,7 +164,7 @@ export function CreateActionPage() {
       const trimmedCoverImage = coverImage.trim();
       const sanitizedImage = trimmedCoverImage ? sanitizeUrl(trimmedCoverImage) : undefined;
       if (trimmedCoverImage && !sanitizedImage) {
-        throw new Error('Cover image must be a valid https:// URL.');
+        throw new Error(t('pledges.create.errorCoverInvalid'));
       }
       if (sanitizedImage) {
         tags.push(['image', sanitizedImage]);
@@ -169,7 +172,7 @@ export function CreateActionPage() {
 
       if (deadline) {
         if (deadline < minDeadline) {
-          throw new Error('Deadline cannot be in the past.');
+          throw new Error(t('pledges.create.errorDeadlinePast'));
         }
         const [year, month, day] = deadline.split('-').map(Number);
         const [hours, minutes] = deadlineTime
@@ -192,14 +195,14 @@ export function CreateActionPage() {
       await queryClient.invalidateQueries({ queryKey: ['agora-feed'] });
       await queryClient.invalidateQueries({ queryKey: ['mixed-feed'] });
       await queryClient.refetchQueries({ queryKey: ['agora-actions'] });
-      toast({ title: 'Pledge created' });
+      toast({ title: t('pledges.create.successToast') });
       navigate('/pledges');
     },
     onError: (error: unknown) => {
       const msg = error instanceof Error ? error.message : String(error);
       setFormError(msg);
       toast({
-        title: 'Could not create pledge',
+        title: t('pledges.create.errorToast'),
         description: msg,
         variant: 'destructive',
       });
@@ -213,12 +216,12 @@ export function CreateActionPage() {
           <Card>
             <CardContent className="py-12 px-8 text-center space-y-4">
               <Megaphone className="size-10 text-muted-foreground/60 mx-auto" />
-              <h2 className="text-xl font-semibold">Log in to create a pledge</h2>
+              <h2 className="text-xl font-semibold">{t('pledges.create.loginGateTitle')}</h2>
               <p className="text-muted-foreground">
-                Pledges are signed Nostr events. You need a Nostr login to publish one.
+                {t('pledges.create.loginGateBody')}
               </p>
               <Button asChild>
-                <Link to="/pledges">Back to pledges</Link>
+                <Link to="/pledges">{t('pledges.create.backToPledges')}</Link>
               </Button>
             </CardContent>
           </Card>
@@ -251,12 +254,12 @@ export function CreateActionPage() {
               type="button"
               onClick={() => navigate(-1)}
               className="p-2 rounded-full hover:bg-secondary motion-safe:transition-colors text-muted-foreground hover:text-foreground"
-              aria-label="Go back"
+              aria-label={t('common.goBack')}
             >
-              <ArrowLeft className="size-5" />
+              <ArrowLeft className="size-5 rtl:rotate-180" />
             </button>
             <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">
-              Create pledge
+              {t('pledges.create.heading')}
             </h1>
           </div>
           <OrganizationContextChip
@@ -270,9 +273,9 @@ export function CreateActionPage() {
 
         <div className="rounded-2xl bg-card/50 p-2">
           {/* Title */}
-          <FormSection title="Title" requirement="Required">
+          <FormSection title={t('pledges.create.title')} requirement="Required">
             <Input
-              placeholder="Document a beach cleanup"
+              placeholder={t('pledges.create.titlePlaceholder')}
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               maxLength={200}
@@ -281,7 +284,7 @@ export function CreateActionPage() {
           </FormSection>
 
           {/* Country */}
-          <FormSection title="Country" requirement="Recommended">
+          <FormSection title={t('pledges.create.country')} requirement="Recommended">
             <CountrySelect
               query={countryQuery}
               selectedCode={countryCode}
@@ -304,17 +307,17 @@ export function CreateActionPage() {
           </FormSection>
 
           {/* Tags */}
-          <FormSection title="Tags" requirement="Recommended">
+          <FormSection title={t('pledges.create.tags')} requirement="Recommended">
             <Input
               id="pledge-tags"
               value={tagInput}
               onChange={(e) => setTagInput(e.target.value)}
-              placeholder="beach-cleanup, protest-documentation, internet-blackout"
+              placeholder={t('pledges.create.tagsPlaceholder')}
             />
           </FormSection>
 
           {/* Cover image */}
-          <FormSection title="Cover image" requirement="Optional">
+          <FormSection title={t('pledges.create.coverImage')} requirement="Optional">
             <CoverImageField
               value={coverImage}
               onChange={setCoverImage}
@@ -323,9 +326,9 @@ export function CreateActionPage() {
           </FormSection>
 
           {/* Description */}
-          <FormSection title="Description" requirement="Required">
+          <FormSection title={t('pledges.create.description')} requirement="Required">
             <Textarea
-              placeholder="Explain the action, evidence, or outcome you want to inspire, what submissions should include, and how you plan to evaluate them..."
+              placeholder={t('pledges.create.descriptionPlaceholder')}
               rows={7}
               className="font-mono text-sm"
               value={description}
@@ -335,7 +338,7 @@ export function CreateActionPage() {
 
           <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
             {/* Pledge amount */}
-            <FormSection title="Pledge" requirement="Required">
+            <FormSection title={t('pledges.create.pledge')} requirement="Required">
               <div className="relative">
                 <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">
                   $
@@ -343,7 +346,7 @@ export function CreateActionPage() {
                 <Input
                   type="text"
                   inputMode="decimal"
-                  placeholder="100"
+                  placeholder={t('pledges.create.pledgeAmountPlaceholder')}
                   value={pledgeUsd}
                   onChange={(e) => setPledgeUsd(e.target.value)}
                   className="pl-7 pr-14"
@@ -355,7 +358,7 @@ export function CreateActionPage() {
             </FormSection>
 
             {/* Deadline */}
-            <FormSection title="Deadline" requirement="Optional">
+            <FormSection title={t('pledges.create.deadline')} requirement="Optional">
               <Input
                 type="date"
                 min={minDeadline}
@@ -375,14 +378,14 @@ export function CreateActionPage() {
           </div>
 
           {deadline && (
-            <FormSection title="Timezone" requirement="Required">
+            <FormSection title={t('pledges.create.timezone')} requirement="Required">
               <div className="bg-muted/30 p-3 rounded-lg border border-border/50 space-y-2 animate-in slide-in-from-top-2 duration-200">
                 <div className="flex items-center gap-2 text-sm font-medium">
-                  <Clock className="h-4 w-4" /> Timezone
+                  <Clock className="h-4 w-4" /> {t('pledges.create.timezone')}
                 </div>
                 <TimezoneSwitcher value={timezone} onChange={setTimezone} />
                 <p className="text-xs text-muted-foreground">
-                  Start and deadline times will be interpreted in this timezone.
+                  {t('pledges.create.timezoneNote')}
                 </p>
               </div>
             </FormSection>
@@ -405,17 +408,17 @@ export function CreateActionPage() {
             {submitMutation.isPending ? (
               <>
                 <Loader2 className="size-4 mr-2 animate-spin" />
-                Publishing…
+                {t('pledges.create.publishing')}
               </>
             ) : coverUploading ? (
               <>
                 <Loader2 className="size-4 mr-2 animate-spin" />
-                Uploading cover…
+                {t('pledges.create.uploadingCover')}
               </>
             ) : (
               <>
                 <Plus className="size-4 mr-2" />
-                Create pledge
+                {t('pledges.create.submit')}
               </>
             )}
           </Button>
@@ -438,6 +441,7 @@ function CountrySelect({
   onSelect: (country: CountryEntry) => void;
   onClear: () => void;
 }) {
+  const { t } = useTranslation();
   const [open, setOpen] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(0);
   const selectedCountry = selectedCode ? COUNTRIES[selectedCode] : undefined;
@@ -480,7 +484,7 @@ function CountrySelect({
             }
           }}
           className="h-9 rounded-full border-0 bg-secondary pl-10 pr-10 text-sm focus-visible:ring-0 focus-visible:ring-offset-0"
-          placeholder="Search countries, e.g. Venezuela"
+          placeholder={t('pledges.create.countryPlaceholder')}
           autoComplete="off"
           role="combobox"
           aria-expanded={showResults}
@@ -491,7 +495,7 @@ function CountrySelect({
             type="button"
             onClick={onClear}
             className="absolute right-2 top-1/2 rounded-full p-1 -translate-y-1/2 text-muted-foreground hover:bg-muted hover:text-foreground motion-safe:transition-colors"
-            aria-label="Clear country"
+            aria-label={t('pledges.create.countryClearAria')}
           >
             <X className="size-4" />
           </button>
@@ -516,7 +520,7 @@ function CountrySelect({
                   index === selectedIndex && 'bg-secondary/60',
                 )}
               >
-                <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-secondary text-lg leading-none" role="img" aria-label={`Flag of ${country.name}`}>
+                <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-secondary text-lg leading-none" role="img" aria-label={t('pledges.create.flagOfAria', { name: country.name })}>
                   {country.flag}
                 </span>
                 <span className="min-w-0 flex-1">
@@ -531,7 +535,11 @@ function CountrySelect({
 
       {selectedCountry && (
         <p className="text-xs text-muted-foreground">
-          Publishes <span className="font-mono text-foreground">i: iso3166:{selectedCode}</span> for country sorting.
+          <Trans
+            i18nKey="pledges.create.countryHint"
+            values={{ code: selectedCode }}
+            components={{ 0: <span className="font-mono text-foreground" /> }}
+          />
         </p>
       )}
     </div>

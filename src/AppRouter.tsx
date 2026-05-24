@@ -1,9 +1,11 @@
 import { lazy, Suspense } from "react";
 import { BrowserRouter, Link, Navigate, Outlet, Route, Routes } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { Toaster } from "./components/ui/toaster";
 import { TopNav } from "./components/TopNav";
 import { ScrollToTop } from "./components/ScrollToTop";
 import { VersionCheck } from "./components/VersionCheck";
+import { useAppContext } from "./hooks/useAppContext";
 import { useCurrentUser } from "./hooks/useCurrentUser";
 import { useProfileUrl } from "./hooks/useProfileUrl";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -34,6 +36,7 @@ const HashtagPage = lazy(() => import("./pages/HashtagPage").then(m => ({ defaul
 const AboutPage = lazy(() => import("./pages/AboutPage").then(m => ({ default: m.AboutPage })));
 const DonorGuidePage = lazy(() => import("./pages/DonorGuidePage").then(m => ({ default: m.DonorGuidePage })));
 const ActivistGuidePage = lazy(() => import("./pages/ActivistGuidePage").then(m => ({ default: m.ActivistGuidePage })));
+const LanguageSettingsPage = lazy(() => import("./pages/LanguageSettingsPage").then(m => ({ default: m.LanguageSettingsPage })));
 const NetworkSettingsPage = lazy(() => import("./pages/NetworkSettingsPage").then(m => ({ default: m.NetworkSettingsPage })));
 const NIP19Page = lazy(() => import("./pages/NIP19Page").then(m => ({ default: m.NIP19Page })));
 const NotificationSettings = lazy(() => import("./pages/NotificationSettings").then(m => ({ default: m.NotificationSettings })));
@@ -69,15 +72,17 @@ function PageSkeleton() {
 }
 
 function SiteFooter() {
+  const { t } = useTranslation();
+  const { config } = useAppContext();
   return (
     <footer className="bg-background mt-auto pt-12">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 py-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-muted-foreground">
-        <span>&copy; {new Date().getFullYear()} Agora. Fundraisers on Nostr.</span>
+        <span>{t('nav.footerTagline', { year: new Date().getFullYear(), appName: config.appName })}</span>
         <nav className="flex items-center gap-5">
-          <Link to="/about" className="hover:text-foreground motion-safe:transition-colors">About</Link>
-          <Link to="/privacy" className="hover:text-foreground motion-safe:transition-colors">Privacy</Link>
-          <Link to="/safety" className="hover:text-foreground motion-safe:transition-colors">Safety</Link>
-          <Link to="/changelog" className="hover:text-foreground motion-safe:transition-colors">Changelog</Link>
+          <Link to="/about" className="hover:text-foreground motion-safe:transition-colors">{t('nav.about')}</Link>
+          <Link to="/privacy" className="hover:text-foreground motion-safe:transition-colors">{t('nav.privacy')}</Link>
+          <Link to="/safety" className="hover:text-foreground motion-safe:transition-colors">{t('nav.safety')}</Link>
+          <Link to="/changelog" className="hover:text-foreground motion-safe:transition-colors">{t('nav.changelog')}</Link>
         </nav>
       </div>
     </footer>
@@ -125,6 +130,7 @@ export function AppRouter() {
           <Route path="/g/:geohash" element={<GeotagPage />} />
           <Route path="/settings" element={<SettingsPage />} />
           <Route path="/settings/appearance" element={<AppearanceSettingsPage />} />
+          <Route path="/settings/language" element={<LanguageSettingsPage />} />
           <Route path="/settings/profile" element={<ProfileSettings />} />
           <Route path="/settings/wallet" element={<WalletSettingsPage />} />
           <Route path="/settings/notifications" element={<NotificationSettings />} />

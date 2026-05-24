@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { Capacitor } from '@capacitor/core';
 import { useSeoMeta } from '@unhead/react';
+import { useTranslation } from 'react-i18next';
 import { Bell, BellOff, AlertTriangle, Heart, Highlighter, Repeat2, Zap, AtSign, MessageSquare, Users, Award, Mail, Radio, MonitorSmartphone } from 'lucide-react';
 import { Navigate } from 'react-router-dom';
 import { PageHeader } from '@/components/PageHeader';
@@ -17,67 +18,69 @@ type NotificationPrefKey = 'reactions' | 'reposts' | 'zaps' | 'mentions' | 'comm
 
 interface NotificationTypeRow {
   key: NotificationPrefKey;
-  label: string;
+  /** i18n key under `notifSettings.types.{key}.label` */
+  labelKey: string;
   kinds: number[];
-  description: string;
+  /** i18n key under `notifSettings.types.{key}.description` */
+  descriptionKey: string;
   icon: React.ReactNode;
 }
 
 const NOTIFICATION_TYPES: NotificationTypeRow[] = [
   {
     key: 'reactions',
-    label: 'Reactions',
+    labelKey: 'notifSettings.types.reactions.label',
     kinds: [7],
-    description: 'When someone reacts to your posts',
+    descriptionKey: 'notifSettings.types.reactions.description',
     icon: <Heart className="size-5" />,
   },
   {
     key: 'reposts',
-    label: 'Reposts',
+    labelKey: 'notifSettings.types.reposts.label',
     kinds: [6, 16],
-    description: 'When someone reposts your notes',
+    descriptionKey: 'notifSettings.types.reposts.description',
     icon: <Repeat2 className="size-5" />,
   },
   {
     key: 'zaps',
-    label: 'Zaps',
+    labelKey: 'notifSettings.types.zaps.label',
     kinds: [9735, 8333],
-    description: 'When someone sends you a lightning or on-chain zap',
+    descriptionKey: 'notifSettings.types.zaps.description',
     icon: <Zap className="size-5" />,
   },
   {
     key: 'mentions',
-    label: 'Mentions',
+    labelKey: 'notifSettings.types.mentions.label',
     kinds: [1],
-    description: 'When someone mentions you in a note',
+    descriptionKey: 'notifSettings.types.mentions.description',
     icon: <AtSign className="size-5" />,
   },
   {
     key: 'comments',
-    label: 'Comments & Replies',
+    labelKey: 'notifSettings.types.comments.label',
     kinds: [1111],
-    description: 'When someone comments on or replies to your posts',
+    descriptionKey: 'notifSettings.types.comments.description',
     icon: <MessageSquare className="size-5" />,
   },
   {
     key: 'badges',
-    label: 'Badge Awards',
+    labelKey: 'notifSettings.types.badges.label',
     kinds: [8],
-    description: 'When someone awards you a badge',
+    descriptionKey: 'notifSettings.types.badges.description',
     icon: <Award className="size-5" />,
   },
   {
     key: 'letters',
-    label: 'Letters',
+    labelKey: 'notifSettings.types.letters.label',
     kinds: [8211],
-    description: 'When someone sends you a letter',
+    descriptionKey: 'notifSettings.types.letters.description',
     icon: <Mail className="size-5" />,
   },
   {
     key: 'highlights',
-    label: 'Highlights',
+    labelKey: 'notifSettings.types.highlights.label',
     kinds: [9802],
-    description: 'When someone highlights your content',
+    descriptionKey: 'notifSettings.types.highlights.description',
     icon: <Highlighter className="size-5" />,
   },
 ];
@@ -143,6 +146,7 @@ function NotifRow({
 }
 
 export function NotificationSettings() {
+  const { t } = useTranslation();
   const { user } = useCurrentUser();
   const { config } = useAppContext();
   const { settings, updateSettings } = useEncryptedSettings();
@@ -176,8 +180,8 @@ export function NotificationSettings() {
   const pushEnabled = isNative ? nativePushEnabled : pushHookEnabled;
 
   useSeoMeta({
-    title: `Notifications | Settings | ${config.appName}`,
-    description: 'Configure your notification preferences',
+    title: `${t('notifSettings.seoTitle')} | ${t('settings.title')} | ${config.appName}`,
+    description: t('notifSettings.seoDescription'),
   });
 
   useEffect(() => {
@@ -201,7 +205,7 @@ export function NotificationSettings() {
           await enablePush(user.pubkey, prefs);
         } catch (err) {
           console.error('[push] Registration failed:', err);
-          toast({ title: 'Failed to enable notifications', description: 'Please try again.' });
+          toast({ title: t('notifSettings.toast.enableFailedTitle'), description: t('notifSettings.toast.enableFailedDesc') });
           return; // Don't persist enabled=true if registration failed
         }
       }
@@ -273,9 +277,9 @@ export function NotificationSettings() {
         alwaysShowBack
         titleContent={
           <div className="flex-1 min-w-0">
-            <h1 className="text-xl font-bold">Notifications</h1>
+            <h1 className="text-xl font-bold">{t('notifSettings.title')}</h1>
             <p className="text-sm text-muted-foreground mt-0.5">
-              Customize which notifications you receive.
+              {t('notifSettings.subtitle')}
             </p>
           </div>
         }
@@ -283,12 +287,12 @@ export function NotificationSettings() {
 
       <div className="p-4">
         {/* Push Notifications */}
-        <SectionHeader title="Push Notifications" />
+        <SectionHeader title={t('notifSettings.pushHeading')} />
         <div className="pb-4">
           <NotifRow
             icon={pushEnabled ? <Bell className="size-5" /> : <BellOff className="size-5" />}
-            label="Enable Push Notifications"
-            description="Receive notifications for activity on your posts"
+            label={t('notifSettings.enablePush.label')}
+            description={t('notifSettings.enablePush.description')}
             checked={pushEnabled}
             onCheckedChange={handleTogglePush}
             disabled={!isSupported || isDenied}
@@ -296,13 +300,13 @@ export function NotificationSettings() {
           {!isSupported && (
             <div className="flex items-center gap-2 px-3 pb-3 text-muted-foreground">
               <AlertTriangle className="size-3.5 shrink-0" />
-              <p className="text-xs">Your browser does not support push notifications.</p>
+              <p className="text-xs">{t('notifSettings.unsupported')}</p>
             </div>
           )}
           {isDenied && (
             <div className="flex items-center gap-2 px-3 pb-3 text-destructive">
               <AlertTriangle className="size-3.5 shrink-0" />
-              <p className="text-xs">Notifications are blocked. Update your browser settings to allow notifications from this site.</p>
+              <p className="text-xs">{t('notifSettings.denied')}</p>
             </div>
           )}
         </div>
@@ -311,10 +315,10 @@ export function NotificationSettings() {
             On iOS both modes use BGAppRefreshTask so the choice is meaningless. */}
         {Capacitor.getPlatform() === 'android' && pushEnabled && (
           <>
-            <SectionHeader title="Delivery Method" />
+            <SectionHeader title={t('notifSettings.deliveryMethod.heading')} />
             <div className="pb-4">
               <p className="text-xs text-muted-foreground px-3 pt-3 pb-4">
-                Choose how notifications are delivered to your device.
+                {t('notifSettings.deliveryMethod.intro')}
               </p>
               <RadioGroup
                 value={notificationStyle}
@@ -326,10 +330,10 @@ export function NotificationSettings() {
                   <Label htmlFor="style-push" className="flex-1 cursor-pointer">
                     <div className="flex items-center gap-2">
                       <Radio className="size-4 text-muted-foreground" />
-                      <span className="text-sm font-medium">Push</span>
+                      <span className="text-sm font-medium">{t('notifSettings.deliveryMethod.push.label')}</span>
                     </div>
                     <p className="text-xs text-muted-foreground mt-0.5">
-                      Standard notifications. No persistent status bar icon.
+                      {t('notifSettings.deliveryMethod.push.description')}
                     </p>
                   </Label>
                 </div>
@@ -338,10 +342,10 @@ export function NotificationSettings() {
                   <Label htmlFor="style-persistent" className="flex-1 cursor-pointer">
                     <div className="flex items-center gap-2">
                       <MonitorSmartphone className="size-4 text-muted-foreground" />
-                      <span className="text-sm font-medium">Persistent</span>
+                      <span className="text-sm font-medium">{t('notifSettings.deliveryMethod.persistent.label')}</span>
                     </div>
                     <p className="text-xs text-muted-foreground mt-0.5">
-                      Polls relays directly in the background for new notifications. Use this for reliable delivery on devices without push notification support.
+                      {t('notifSettings.deliveryMethod.persistent.description')}
                     </p>
                   </Label>
                 </div>
@@ -351,18 +355,18 @@ export function NotificationSettings() {
         )}
 
         {/* Filter + Notify Me About — one continuous block */}
-        <SectionHeader title="Notify Me About" />
+        <SectionHeader title={t('notifSettings.notifyAbout.heading')} />
         <div className="pb-4">
           {/* Filter sub-section */}
           <div className="px-3 pt-4 pb-2">
             <span className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
-              Filter
+              {t('notifSettings.notifyAbout.filterHeading')}
             </span>
           </div>
           <NotifRow
             icon={<Users className="size-5" />}
-            label="Only from people I follow"
-            description="Hide notifications from accounts you don't follow"
+            label={t('notifSettings.notifyAbout.onlyFollowing.label')}
+            description={t('notifSettings.notifyAbout.onlyFollowing.description')}
             checked={prefs.onlyFollowing === true}
             onCheckedChange={handleToggleOnlyFollowing}
             noBorder
@@ -371,16 +375,16 @@ export function NotificationSettings() {
           {/* Types sub-section */}
           <div className="px-3 pt-4 pb-2">
             <span className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
-              Types
+              {t('notifSettings.notifyAbout.typesHeading')}
             </span>
           </div>
           {NOTIFICATION_TYPES.map((type) => (
             <NotifRow
               key={type.key}
               icon={type.icon}
-              label={type.label}
+              label={t(type.labelKey)}
               kinds={type.kinds}
-              description={type.description}
+              description={t(type.descriptionKey)}
               checked={prefs[type.key] !== false}
               onCheckedChange={(enabled) => handleToggleType(type.key, enabled)}
             />

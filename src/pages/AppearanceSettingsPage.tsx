@@ -1,5 +1,6 @@
 import { useSeoMeta } from '@unhead/react';
 import { Monitor, Moon, Sun } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { PageHeader } from '@/components/PageHeader';
 import { useAppContext } from '@/hooks/useAppContext';
 import { useTheme } from '@/hooks/useTheme';
@@ -8,39 +9,40 @@ import type { Theme } from '@/contexts/AppContext';
 
 interface ThemeOption {
   value: Theme;
-  label: string;
-  description: string;
+  labelKey: string;
+  descriptionKey: string;
   icon: React.ReactNode;
 }
 
 const themeOptions: ThemeOption[] = [
   {
     value: 'system',
-    label: 'System',
-    description: 'Follows your device setting',
+    labelKey: 'settings.appearance.system',
+    descriptionKey: 'settings.appearance.systemDesc',
     icon: <Monitor className="size-5" />,
   },
   {
     value: 'light',
-    label: 'Light',
-    description: 'Always use light mode',
+    labelKey: 'settings.appearance.light',
+    descriptionKey: 'settings.appearance.lightDesc',
     icon: <Sun className="size-5" />,
   },
   {
     value: 'dark',
-    label: 'Dark',
-    description: 'Always use dark mode',
+    labelKey: 'settings.appearance.dark',
+    descriptionKey: 'settings.appearance.darkDesc',
     icon: <Moon className="size-5" />,
   },
 ];
 
 export function AppearanceSettingsPage() {
+  const { t } = useTranslation();
   const { config } = useAppContext();
   const { theme, setTheme } = useTheme();
 
   useSeoMeta({
-    title: `Appearance | Settings | ${config.appName}`,
-    description: 'Choose between system, light, and dark mode',
+    title: `${t('settings.appearance.title')} | ${t('settings.title')} | ${config.appName}`,
+    description: t('settings.appearance.subtitle'),
   });
 
   return (
@@ -50,9 +52,9 @@ export function AppearanceSettingsPage() {
         alwaysShowBack
         titleContent={
           <div className="flex-1 min-w-0">
-            <h1 className="text-xl font-bold">Appearance</h1>
+            <h1 className="text-xl font-bold">{t('settings.appearance.title')}</h1>
             <p className="text-sm text-muted-foreground mt-0.5">
-              Choose how the app looks.
+              {t('settings.appearance.subtitle')}
             </p>
           </div>
         }
@@ -61,9 +63,9 @@ export function AppearanceSettingsPage() {
       <div className="p-4">
         {/* Intro */}
         <div className="px-3 pt-2 pb-6">
-          <h2 className="text-sm font-semibold">Color Mode</h2>
+          <h2 className="text-sm font-semibold">{t('settings.appearance.colorMode')}</h2>
           <p className="text-xs text-muted-foreground mt-1 leading-relaxed">
-            Pick your preferred color mode. System will automatically match your device's light or dark setting.
+            {t('settings.appearance.intro')}
           </p>
         </div>
 
@@ -96,10 +98,10 @@ export function AppearanceSettingsPage() {
                   'text-sm font-semibold',
                   theme === option.value ? 'text-foreground' : 'text-foreground',
                 )}>
-                  {option.label}
+                  {t(option.labelKey)}
                 </p>
                 <p className="text-xs text-muted-foreground mt-0.5">
-                  {option.description}
+                  {t(option.descriptionKey)}
                 </p>
               </div>
               {theme === option.value && (

@@ -3,6 +3,7 @@ import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { useSeoMeta } from '@unhead/react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useNostr } from '@nostrify/react';
+import { useTranslation, Trans } from 'react-i18next';
 import { nip19 } from 'nostr-tools';
 import type { NostrEvent, NostrMetadata } from '@nostrify/nostrify';
 import {
@@ -24,6 +25,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import { useAppContext } from '@/hooks/useAppContext';
 import { parseAuthorEvent } from '@/hooks/useAuthor';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useNostrPublish } from '@/hooks/useNostrPublish';
@@ -118,7 +120,8 @@ function getEditTarget(value: string | null): EditTarget | null {
 }
 
 export function CreateCommunityPage() {
-
+  const { t } = useTranslation();
+  const { config } = useAppContext();
   const { user } = useCurrentUser();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
@@ -239,10 +242,10 @@ export function CreateCommunityPage() {
   const activeSlug = editCommunity?.community.dTag ?? derivedSlug;
 
   useSeoMeta({
-    title: isEditMode ? 'Edit group | Agora' : 'Create group | Agora',
+    title: `${isEditMode ? t('groups.create.seoTitleEdit') : t('groups.create.seoTitleCreate')} | ${config.appName}`,
     description: isEditMode
-      ? 'Update your group on Agora.'
-      : 'Start a new group on Agora.',
+      ? t('groups.create.seoDescriptionEdit', { appName: config.appName })
+      : t('groups.create.seoDescriptionCreate', { appName: config.appName }),
   });
 
   // Prefill the form when the community loads.
@@ -296,22 +299,20 @@ export function CreateCommunityPage() {
 
   const submitMutation = useMutation({
     mutationFn: async () => {
-      if (!user) throw new Error('You must be logged in to create a group.');
+      if (!user) throw new Error(t('groups.create.errorLoginRequired'));
       if (isEditMode && !editCommunity) {
-        throw new Error('Group could not be loaded for editing.');
+        throw new Error(t('groups.create.errorEditLoadFailed'));
       }
       if (editCommunity && editCommunity.event.pubkey !== user.pubkey) {
-        throw new Error('Only the group founder can edit this group.');
+        throw new Error(t('groups.create.errorEditNotOwner'));
       }
 
       const trimmedName = name.trim();
-      if (!trimmedName) throw new Error('Name is required.');
+      if (!trimmedName) throw new Error(t('groups.create.errorNameRequired'));
 
       const slug = activeSlug;
       if (!slug) {
-        throw new Error(
-          'Name must include letters or numbers so a group URL can be created.',
-        );
+        throw new Error(t('groups.create.errorNameInvalid'));
       }
 
       // Founder is always implicit and shouldn't be in the extra-moderators
@@ -321,7 +322,7 @@ export function CreateCommunityPage() {
       const trimmedImageUrl = imageUrl.trim();
       const sanitizedImage = trimmedImageUrl ? sanitizeUrl(trimmedImageUrl) : undefined;
       if (trimmedImageUrl && !sanitizedImage) {
-        throw new Error('Cover image must be a valid https:// URL.');
+        throw new Error(t('groups.create.errorCoverInvalid'));
       }
       const contentTags = parseContentTagInput(tagInput);
 
@@ -334,7 +335,7 @@ export function CreateCommunityPage() {
           '#d': [slug],
         });
         if (!prev || !parseCommunityEvent(prev)) {
-          throw new Error('Could not find the latest version of this group to update.');
+          throw new Error(t('groups.create.errorEditLatestMissing'));
         }
 
         // Strip the tag names we're going to rewrite; preserve everything
@@ -368,7 +369,7 @@ export function CreateCommunityPage() {
         }
         for (const tag of contentTags) nextTags.push(['t', tag]);
         nextTags.push(...preserved);
-        nextTags.push(['alt', `Group: ${trimmedName}`]);
+        nextTags.push(['alt', t('groups.create.altText', { name: trimmedName })]);
 
         const updated = await publishEvent({
           kind: COMMUNITY_DEFINITION_KIND,
@@ -391,9 +392,7 @@ export function CreateCommunityPage() {
         },
       ]);
       if (existing.length > 0) {
-        throw new Error(
-          `You already have a group with the identifier "${slug}". Choose another name.`,
-        );
+        throw new Error(t('groups.create.errorSlugCollision', { slug }));
       }
 
       // Build the kind 34550 community-definition tag set. Agora's
@@ -418,7 +417,7 @@ export function CreateCommunityPage() {
         tags.push(['k', 'iso3166']);
       }
       for (const tag of contentTags) tags.push(['t', tag]);
-      tags.push(['alt', `Group: ${trimmedName}`]);
+      tags.push(['alt', t('groups.create.altText', { name: trimmedName })]);
 
       const created = await publishEvent({
         kind: COMMUNITY_DEFINITION_KIND,
@@ -449,14 +448,14 @@ export function CreateCommunityPage() {
         queryKey: ['community-activity-feed'],
         exact: false,
       });
-      toast({ title: edited ? 'Group updated!' : 'Group created!' });
+      toast({ title: edited ? t('groups.create.successEdit') : t('groups.create.successCreate') });
       navigate(`/${naddr}`);
     },
     onError: (error: unknown) => {
       const msg = error instanceof Error ? error.message : String(error);
       setFormError(msg);
       toast({
-        title: isEditMode ? 'Could not update group' : 'Could not create group',
+        title: isEditMode ? t('groups.create.errorTitleEdit') : t('groups.create.errorTitleCreate'),
         description: msg,
         variant: 'destructive',
       });
@@ -470,12 +469,12 @@ export function CreateCommunityPage() {
           <Card>
             <CardContent className="py-12 px-8 text-center space-y-4">
               <Users className="size-10 text-muted-foreground/60 mx-auto" />
-              <h2 className="text-xl font-semibold">Log in to start a group</h2>
+              <h2 className="text-xl font-semibold">{t('groups.create.loginGateTitle')}</h2>
               <p className="text-muted-foreground">
-                Groups are signed Nostr events. You need a Nostr login to publish one.
+                {t('groups.create.loginGateBody')}
               </p>
               <Button asChild>
-                <Link to="/groups">Back to groups</Link>
+                <Link to="/groups">{t('groups.create.backToGroups')}</Link>
               </Button>
             </CardContent>
           </Card>
@@ -491,12 +490,12 @@ export function CreateCommunityPage() {
           <Card>
             <CardContent className="py-12 px-8 text-center space-y-4">
               <AlertTriangle className="size-10 text-muted-foreground/60 mx-auto" />
-              <h2 className="text-xl font-semibold">Invalid edit link</h2>
+              <h2 className="text-xl font-semibold">{t('groups.create.invalidEditTitle')}</h2>
               <p className="text-muted-foreground">
-                This group edit link is missing a valid group address.
+                {t('groups.create.invalidEditBody')}
               </p>
               <Button type="button" onClick={() => navigate('/groups/new')}>
-                Start a new group
+                {t('groups.create.startNewGroup')}
               </Button>
             </CardContent>
           </Card>
@@ -512,7 +511,7 @@ export function CreateCommunityPage() {
           <Card>
             <CardContent className="py-12 px-8 text-center space-y-3">
               <Loader2 className="size-8 animate-spin text-muted-foreground mx-auto" />
-              <p className="text-sm text-muted-foreground">Loading group…</p>
+              <p className="text-sm text-muted-foreground">{t('groups.create.loadingGroup')}</p>
             </CardContent>
           </Card>
         </div>
@@ -530,12 +529,12 @@ export function CreateCommunityPage() {
           <Card>
             <CardContent className="py-12 px-8 text-center space-y-4">
               <AlertTriangle className="size-10 text-muted-foreground/60 mx-auto" />
-              <h2 className="text-xl font-semibold">Group cannot be edited</h2>
+              <h2 className="text-xl font-semibold">{t('groups.create.cannotEditTitle')}</h2>
               <p className="text-muted-foreground">
-                Only the founder of this group can update it.
+                {t('groups.create.cannotEditBody')}
               </p>
               <Button type="button" onClick={() => navigate(-1)}>
-                Go back
+                {t('common.goBack')}
               </Button>
             </CardContent>
           </Card>
@@ -560,47 +559,47 @@ export function CreateCommunityPage() {
               type="button"
               onClick={() => navigate(-1)}
               className="p-2 rounded-full hover:bg-secondary motion-safe:transition-colors text-muted-foreground hover:text-foreground"
-              aria-label="Go back"
+              aria-label={t('common.goBack')}
             >
-              <ArrowLeft className="size-5" />
+              <ArrowLeft className="size-5 rtl:rotate-180" />
             </button>
             <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">
-              {isEditMode ? 'Edit group' : 'Create group'}
+              {isEditMode ? t('groups.create.headingEdit') : t('groups.create.headingCreate')}
             </h1>
           </div>
         </div>
 
         <div className="rounded-2xl bg-card/50 p-2">
           {/* Name */}
-          <FormSection title="Name" requirement="Required">
+          <FormSection title={t('groups.create.name')} requirement="Required">
             <Input
               value={name}
               onChange={(e) => setName(e.target.value)}
-              placeholder="e.g. The Arbiter's Guard"
+              placeholder={t('groups.create.namePlaceholder')}
               maxLength={100}
               required
             />
             <p className="text-xs text-muted-foreground">
-              URL preview:{' '}
+              {t('groups.create.urlPreview')}{' '}
               <span className="font-mono text-foreground">
-                /{activeSlug || 'your-group-name'}
+                /{activeSlug || t('groups.create.urlPlaceholder')}
               </span>
-              {isEditMode && ' (kept from original)'}
+              {isEditMode && ` ${t('groups.create.urlKeptOriginal')}`}
             </p>
           </FormSection>
 
           {/* Description */}
-          <FormSection title="Description" requirement="Recommended">
+          <FormSection title={t('groups.create.description')} requirement="Recommended">
             <Textarea
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              placeholder="What is this group about?"
+              placeholder={t('groups.create.descriptionPlaceholder')}
               rows={3}
             />
           </FormSection>
 
           {/* Country */}
-          <FormSection title="Country" requirement="Optional">
+          <FormSection title={t('groups.create.country')} requirement="Optional">
             <CountrySelect
               query={countryQuery}
               selectedCode={countryCode}
@@ -623,17 +622,17 @@ export function CreateCommunityPage() {
           </FormSection>
 
           {/* Tags */}
-          <FormSection title="Tags" requirement="Optional">
+          <FormSection title={t('groups.create.tags')} requirement="Optional">
             <Input
               id="group-tags"
               value={tagInput}
               onChange={(e) => setTagInput(e.target.value)}
-              placeholder="mutual-aid, local-news, digital-rights"
+              placeholder={t('groups.create.tagsPlaceholder')}
             />
           </FormSection>
 
           {/* Cover image */}
-          <FormSection title="Cover image" requirement="Recommended">
+          <FormSection title={t('groups.create.coverImage')} requirement="Recommended">
             <CoverImageField
               value={imageUrl}
               onChange={setImageUrl}
@@ -642,7 +641,7 @@ export function CreateCommunityPage() {
           </FormSection>
 
           {/* Moderators */}
-          <FormSection title="Moderators" requirement="Optional">
+          <FormSection title={t('groups.create.moderators')} requirement="Optional">
             <div className="space-y-3">
               <PersonSearch
                 onAdd={addModerator}
@@ -656,7 +655,7 @@ export function CreateCommunityPage() {
               {moderators.length > 0 && (
                 <>
                   <Label className="text-xs text-muted-foreground">
-                    Moderators ({moderators.length})
+                    {t('groups.create.moderatorsCount', { count: moderators.length })}
                   </Label>
                   <div className="space-y-1.5">
                     {moderators.map((moderator) => (
@@ -689,17 +688,17 @@ export function CreateCommunityPage() {
             {submitMutation.isPending ? (
               <>
                 <Loader2 className="size-4 mr-2 animate-spin" />
-                {isEditMode ? 'Updating…' : 'Creating…'}
+                {isEditMode ? t('groups.create.updating') : t('groups.create.creating')}
               </>
             ) : coverUploading ? (
               <>
                 <Loader2 className="size-4 mr-2 animate-spin" />
-                Uploading cover…
+                {t('groups.create.uploadingCover')}
               </>
             ) : (
               <>
                 <Users className="size-4 mr-2" />
-                {isEditMode ? 'Update group' : 'Create group'}
+                {isEditMode ? t('groups.create.submitEdit') : t('groups.create.submitCreate')}
               </>
             )}
           </Button>
@@ -724,6 +723,7 @@ function CountrySelect({
   onSelect: (country: CountryEntry) => void;
   onClear: () => void;
 }) {
+  const { t } = useTranslation();
   const [open, setOpen] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(0);
   const selectedCountry = selectedCode ? COUNTRIES[selectedCode] : undefined;
@@ -766,7 +766,7 @@ function CountrySelect({
             }
           }}
           className="h-9 rounded-full border-0 bg-secondary pl-10 pr-10 text-sm focus-visible:ring-0 focus-visible:ring-offset-0"
-          placeholder="Search countries, e.g. Venezuela"
+          placeholder={t('groups.create.countryPlaceholder')}
           autoComplete="off"
           role="combobox"
           aria-expanded={showResults}
@@ -777,7 +777,7 @@ function CountrySelect({
             type="button"
             onClick={onClear}
             className="absolute right-2 top-1/2 rounded-full p-1 -translate-y-1/2 text-muted-foreground hover:bg-muted hover:text-foreground motion-safe:transition-colors"
-            aria-label="Clear country"
+            aria-label={t('groups.create.countryClearAria')}
           >
             <X className="size-4" />
           </button>
@@ -802,7 +802,7 @@ function CountrySelect({
                   index === selectedIndex && 'bg-secondary/60',
                 )}
               >
-                <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-secondary text-lg leading-none" role="img" aria-label={`Flag of ${country.name}`}>
+                <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-secondary text-lg leading-none" role="img" aria-label={t('groups.create.flagOfAria', { name: country.name })}>
                   {country.flag}
                 </span>
                 <span className="min-w-0 flex-1">
@@ -817,7 +817,11 @@ function CountrySelect({
 
       {selectedCountry && (
         <p className="text-xs text-muted-foreground">
-          Publishes <span className="font-mono text-foreground">i: iso3166:{selectedCode}</span> for country sorting.
+          <Trans
+            i18nKey="groups.create.countryHint"
+            values={{ code: selectedCode }}
+            components={{ 0: <span className="font-mono text-foreground" /> }}
+          />
         </p>
       )}
     </div>
@@ -831,6 +835,7 @@ function ModeratorRow({
   profile: SearchProfile;
   onRemove: () => void;
 }) {
+  const { t } = useTranslation();
   const displayName =
     profile.metadata.display_name ||
     profile.metadata.name ||
@@ -854,7 +859,7 @@ function ModeratorRow({
           variant="ghost"
           size="icon"
           onClick={onRemove}
-          aria-label={`Remove ${displayName}`}
+          aria-label={t('groups.create.removeModeratorAria', { name: displayName })}
           className="shrink-0"
         >
           <X className="size-4" />

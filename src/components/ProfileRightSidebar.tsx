@@ -19,6 +19,7 @@ import QRCode from 'qrcode';
 import { useNostr } from '@nostrify/react';
 import { useQuery } from '@tanstack/react-query';
 import { useAppContext } from '@/hooks/useAppContext';
+import { useImageProxy } from '@/hooks/useImageProxy';
 import { getContentWarning } from '@/lib/contentWarning';
 import { MiniAudioPlayer } from '@/components/MiniAudioPlayer';
 import { isAudioUrl, isImageUrl, isVideoUrl } from '@/lib/mediaTypeDetection';
@@ -193,6 +194,7 @@ function MediaTile({ item }: { item: MediaItem }) {
   const [loaded, setLoaded] = useState(false);
   const imgRef = useRef<HTMLImageElement>(null);
   const { config } = useAppContext();
+  const proxy = useImageProxy();
   const isVideo = isVideoItem(item);
 
   useEffect(() => {
@@ -233,7 +235,7 @@ function MediaTile({ item }: { item: MediaItem }) {
       ) : (
         <img
           ref={imgRef}
-          src={item.url}
+          src={proxy(item.url, 300)}
           alt=""
           className="absolute inset-0 w-full h-full object-cover"
           loading="lazy"

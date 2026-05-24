@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { useSeoMeta } from '@unhead/react';
+import { useTranslation } from 'react-i18next';
 import { Clock, EyeOff, HandHeart, PlusCircle, Search, TrendingUp, X } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
@@ -16,9 +17,9 @@ import { useAppContext } from '@/hooks/useAppContext';
 import { cn } from '@/lib/utils';
 import type { ParsedCampaign } from '@/lib/campaign';
 
-const SORT_OPTIONS: { value: CampaignSort; label: string; icon: typeof TrendingUp }[] = [
-  { value: 'top', label: 'Top', icon: TrendingUp },
-  { value: 'none', label: 'New', icon: Clock },
+const SORT_OPTIONS: { value: CampaignSort; labelKey: string; icon: typeof TrendingUp }[] = [
+  { value: 'top', labelKey: 'campaigns.all.sortTop', icon: TrendingUp },
+  { value: 'none', labelKey: 'campaigns.all.sortNew', icon: Clock },
 ];
 
 /** Type-guard for the `?sort=` URL param. Default is `top` (most-zapped). */
@@ -43,6 +44,7 @@ function parseSort(value: string | null): CampaignSort {
  * canonical URL stays clean. Useful for sharing search results.
  */
 export function AllCampaignsPage() {
+  const { t } = useTranslation();
   // `noMaxWidth: true` drops MainLayout's default `sidebar:max-w-[600px]`
   // cap so the campaign grid can spread to 3-4 columns on desktop, the
   // same width budget the Pledge index gets. The inner `max-w-7xl`
@@ -99,8 +101,8 @@ export function AllCampaignsPage() {
   const { data: moderation, isReady: moderationReady } = useCampaignModeration();
 
   useSeoMeta({
-    title: `All campaigns | ${config.appName}`,
-    description: 'Browse every campaign published on Agora.',
+    title: `${t('campaigns.all.seoTitle')} | ${config.appName}`,
+    description: t('campaigns.all.description'),
   });
 
   const { visible, hiddenCount } = useMemo(() => {
@@ -128,7 +130,7 @@ export function AllCampaignsPage() {
     <main className="min-h-screen pb-16">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-10 lg:py-14 space-y-8">
         <header className="space-y-3">
-          <h1 className="text-3xl sm:text-4xl font-bold tracking-tight">All Campaigns</h1>
+          <h1 className="text-3xl sm:text-4xl font-bold tracking-tight">{t('campaigns.all.title')}</h1>
         </header>
 
         {/* Toolbar */}
@@ -143,8 +145,8 @@ export function AllCampaignsPage() {
               type="search"
               inputMode="search"
               autoComplete="off"
-              aria-label="Search campaigns"
-              placeholder="Search campaigns…"
+              aria-label={t('campaigns.all.searchAriaLabel')}
+              placeholder={t('campaigns.all.searchPlaceholder')}
               value={searchInput}
               onChange={(e) => setSearchInput(e.target.value)}
               className="pl-9 pr-9"
@@ -152,7 +154,7 @@ export function AllCampaignsPage() {
             {searchInput && (
               <button
                 type="button"
-                aria-label="Clear search"
+                aria-label={t('campaigns.all.clearSearch')}
                 onClick={() => setSearchInput('')}
                 className="absolute right-2 top-1/2 -translate-y-1/2 inline-flex items-center justify-center size-7 rounded-md text-muted-foreground hover:text-foreground hover:bg-secondary motion-safe:transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
               >
@@ -168,9 +170,9 @@ export function AllCampaignsPage() {
               <div
                 className="flex gap-1 p-1 rounded-lg bg-secondary/40"
                 role="radiogroup"
-                aria-label="Sort order"
+                aria-label={t('campaigns.all.sortAriaLabel')}
               >
-                {SORT_OPTIONS.map(({ value, label, icon: Icon }) => (
+                {SORT_OPTIONS.map(({ value, labelKey, icon: Icon }) => (
                   <button
                     key={value}
                     type="button"
@@ -185,7 +187,7 @@ export function AllCampaignsPage() {
                     )}
                   >
                     <Icon className="size-3" />
-                    {label}
+                    {t(labelKey)}
                   </button>
                 ))}
               </div>
@@ -202,7 +204,7 @@ export function AllCampaignsPage() {
                   className="text-sm font-medium cursor-pointer inline-flex items-center gap-1.5"
                 >
                   <EyeOff className="size-4 text-muted-foreground" aria-hidden />
-                  Show hidden
+                  {t('campaigns.all.showHidden')}
                   {hiddenCount > 0 && (
                     <span className="text-muted-foreground font-normal">({hiddenCount})</span>
                   )}
@@ -213,7 +215,7 @@ export function AllCampaignsPage() {
             <Button asChild variant="outline" size="sm">
               <Link to="/campaigns/new">
                 <PlusCircle className="size-4 mr-2" />
-                Start a campaign
+                {t('campaigns.all.startCampaign')}
               </Link>
             </Button>
           </div>
@@ -237,27 +239,24 @@ export function AllCampaignsPage() {
                 {activeQuery ? (
                   <>
                     <h2 className="text-lg font-semibold">
-                      No campaigns match &ldquo;{activeQuery}&rdquo;
+                      {t('campaigns.all.noMatch', { query: activeQuery })}
                     </h2>
                     <p className="text-muted-foreground max-w-sm mx-auto">
-                      Try a different search term, or clear the search to
-                      see every campaign.
+                      {t('campaigns.all.noMatchHint')}
                     </p>
                   </>
                 ) : hiddenCount > 0 && !showHidden ? (
                   <>
-                    <h2 className="text-lg font-semibold">No campaigns to show</h2>
+                    <h2 className="text-lg font-semibold">{t('campaigns.all.allHidden')}</h2>
                     <p className="text-muted-foreground max-w-sm mx-auto">
-                      Every campaign on the network has been hidden by
-                      moderators. Toggle &ldquo;Show hidden&rdquo; to view
-                      them.
+                      {t('campaigns.all.allHiddenHint')}
                     </p>
                   </>
                 ) : (
                   <>
-                    <h2 className="text-lg font-semibold">No campaigns yet</h2>
+                    <h2 className="text-lg font-semibold">{t('campaigns.all.empty')}</h2>
                     <p className="text-muted-foreground max-w-sm mx-auto">
-                      No campaigns have been published yet. Be the first.
+                      {t('campaigns.all.emptyHint')}
                     </p>
                   </>
                 )}
@@ -265,7 +264,7 @@ export function AllCampaignsPage() {
               <Button asChild>
                 <Link to="/campaigns/new">
                   <PlusCircle className="size-4 mr-2" />
-                  Start a campaign
+                  {t('campaigns.all.startCampaign')}
                 </Link>
               </Button>
             </CardContent>

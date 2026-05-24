@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { nip19 } from 'nostr-tools';
 import { useNavigate } from 'react-router-dom';
 
@@ -117,12 +118,13 @@ interface EventJsonDialogProps {
 }
 
 function CopyButton({ text, label }: { text: string; label: string }) {
+  const { t } = useTranslation();
   const [copied, setCopied] = useState(false);
 
   const handleCopy = () => {
     navigator.clipboard.writeText(text);
     setCopied(true);
-    toast({ title: `${label} copied to clipboard` });
+    toast({ title: t('noteMoreMenu.toast.copied', { label }) });
     setTimeout(() => setCopied(false), 2000);
   };
 
@@ -139,6 +141,7 @@ function CopyButton({ text, label }: { text: string; label: string }) {
 }
 
 function EventJsonDialog({ event, nip19Id, open, onOpenChange }: EventJsonDialogProps) {
+  const { t } = useTranslation();
   const { nostr } = useNostr();
   const [broadcasting, setBroadcasting] = useState(false);
 
@@ -148,9 +151,9 @@ function EventJsonDialog({ event, nip19Id, open, onOpenChange }: EventJsonDialog
     setBroadcasting(true);
     try {
       await nostr.event(event, { signal: AbortSignal.timeout(5000) });
-      toast({ title: 'Event broadcast to relays' });
+      toast({ title: t('noteMoreMenu.toast.eventBroadcast') });
     } catch {
-      toast({ title: 'Failed to broadcast event', variant: 'destructive' });
+      toast({ title: t('noteMoreMenu.toast.broadcastFailed'), variant: 'destructive' });
     } finally {
       setBroadcasting(false);
     }
@@ -160,24 +163,24 @@ function EventJsonDialog({ event, nip19Id, open, onOpenChange }: EventJsonDialog
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-2xl max-h-[85dvh] flex flex-col gap-0 p-0 rounded-2xl overflow-hidden">
         <DialogHeader className="px-5 pt-5 pb-3 shrink-0">
-          <DialogTitle className="text-base font-semibold">Event Details</DialogTitle>
+          <DialogTitle className="text-base font-semibold">{t('noteMoreMenu.jsonDialog.title')}</DialogTitle>
         </DialogHeader>
 
         <div className="px-5 pb-3 shrink-0">
-          <p className="text-xs font-medium text-muted-foreground mb-1">Event ID</p>
+          <p className="text-xs font-medium text-muted-foreground mb-1">{t('noteMoreMenu.jsonDialog.eventId')}</p>
           <div className="relative flex items-center bg-muted rounded-lg px-3 py-2">
             <p className="font-mono text-xs break-all text-foreground/80 flex-1 pr-2 select-all">
               {nip19Id}
             </p>
-            <CopyButton text={nip19Id} label="Event ID" />
+            <CopyButton text={nip19Id} label={t('noteMoreMenu.jsonDialog.eventIdLabel')} />
           </div>
         </div>
 
         <div className="px-5 pb-5 flex flex-col flex-1 min-h-0">
-          <p className="text-xs font-medium text-muted-foreground mb-1">Raw JSON</p>
+          <p className="text-xs font-medium text-muted-foreground mb-1">{t('noteMoreMenu.jsonDialog.rawJson')}</p>
           <div className="relative flex-1 min-h-0 overflow-auto rounded-lg bg-muted border border-border">
             <div className="sticky top-2 right-2 float-right mr-2">
-              <CopyButton text={jsonText} label="Event JSON" />
+              <CopyButton text={jsonText} label={t('noteMoreMenu.jsonDialog.eventJsonLabel')} />
             </div>
             <pre className="p-4 text-xs font-mono text-foreground/80 whitespace-pre leading-relaxed">
               {jsonText}
@@ -193,7 +196,7 @@ function EventJsonDialog({ event, nip19Id, open, onOpenChange }: EventJsonDialog
             disabled={broadcasting}
           >
             <Radio className="size-4" />
-            {broadcasting ? 'Broadcasting...' : 'Broadcast Event'}
+            {broadcasting ? t('noteMoreMenu.jsonDialog.broadcasting') : t('noteMoreMenu.jsonDialog.broadcast')}
           </Button>
         </div>
       </DialogContent>
@@ -202,6 +205,7 @@ function EventJsonDialog({ event, nip19Id, open, onOpenChange }: EventJsonDialog
 }
 
 export function NoteMoreMenu({ event, open, onOpenChange }: NoteMoreMenuProps) {
+  const { t } = useTranslation();
   // These states live here (not in NoteMoreMenuContent) so they persist after the menu closes
   const [reportOpen, setReportOpen] = useState(false);
   const [banContentOpen, setBanContentOpen] = useState(false);
@@ -235,10 +239,10 @@ export function NoteMoreMenu({ event, open, onOpenChange }: NoteMoreMenuProps) {
       {
         onSuccess: () => {
           setDeleteConfirmOpen(false);
-          toast({ title: 'Post deleted' });
+          toast({ title: t('noteMoreMenu.toast.postDeleted') });
         },
         onError: () => {
-          toast({ title: 'Failed to delete post', variant: 'destructive' });
+          toast({ title: t('noteMoreMenu.toast.deleteFailed'), variant: 'destructive' });
         },
       },
     );
@@ -312,13 +316,13 @@ export function NoteMoreMenu({ event, open, onOpenChange }: NoteMoreMenuProps) {
       <AlertDialog open={deleteConfirmOpen} onOpenChange={setDeleteConfirmOpen}>
         <AlertDialogContent onClick={(e) => e.stopPropagation()}>
           <AlertDialogHeader>
-            <AlertDialogTitle>Delete post?</AlertDialogTitle>
+            <AlertDialogTitle>{t('noteMoreMenu.deleteDialog.title')}</AlertDialogTitle>
             <AlertDialogDescription>
-              This will request deletion from relays. Some relays may still keep a copy of the original event. This action cannot be undone.
+              {t('noteMoreMenu.deleteDialog.description')}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel disabled={isDeleting}>Cancel</AlertDialogCancel>
+            <AlertDialogCancel disabled={isDeleting}>{t('noteMoreMenu.deleteDialog.cancel')}</AlertDialogCancel>
             <AlertDialogAction
               onClick={(e) => {
                 e.preventDefault();
@@ -327,7 +331,7 @@ export function NoteMoreMenu({ event, open, onOpenChange }: NoteMoreMenuProps) {
               disabled={isDeleting}
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
             >
-              {isDeleting ? 'Deleting...' : 'Delete'}
+              {isDeleting ? t('noteMoreMenu.deleteDialog.deleting') : t('noteMoreMenu.deleteDialog.delete')}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
@@ -347,6 +351,7 @@ interface NoteMoreMenuContentProps extends NoteMoreMenuProps {
 }
 
 function NoteMoreMenuContent({ event, open, onOpenChange, communityContext, onReport, onBanContent, onAddToList, onViewEventJson, onDelete }: NoteMoreMenuContentProps) {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const { user } = useCurrentUser();
   const { isBookmarked, toggleBookmark } = useBookmarks();
@@ -399,10 +404,10 @@ function NoteMoreMenuContent({ event, open, onOpenChange, communityContext, onRe
   const handleToggleSidebar = () => {
     if (isInSidebar) {
       removeFromSidebar(nostrUri);
-      toast({ title: 'Removed from sidebar' });
+      toast({ title: t('noteMoreMenu.toast.removedFromSidebar') });
     } else {
       addToSidebar(nostrUri);
-      toast({ title: 'Added to sidebar' });
+      toast({ title: t('noteMoreMenu.toast.addedToSidebar') });
     }
     close();
   };
@@ -411,10 +416,10 @@ function NoteMoreMenuContent({ event, open, onOpenChange, communityContext, onRe
     impactLight();
     togglePin.mutate(event.id, {
       onSuccess: () => {
-        toast({ title: pinned ? 'Unpinned from profile' : 'Pinned to profile' });
+        toast({ title: pinned ? t('noteMoreMenu.toast.unpinned') : t('noteMoreMenu.toast.pinned') });
       },
       onError: () => {
-        toast({ title: 'Failed to update pinned posts', variant: 'destructive' });
+        toast({ title: t('noteMoreMenu.toast.pinFailed'), variant: 'destructive' });
       },
     });
     close();
@@ -430,15 +435,15 @@ function NoteMoreMenuContent({ event, open, onOpenChange, communityContext, onRe
         onSuccess: () => {
           toast({
             title: postIsPinnedInCountry
-              ? 'Unpinned from country feed'
-              : 'Pinned to country feed',
+              ? t('noteMoreMenu.toast.countryUnpinned')
+              : t('noteMoreMenu.toast.countryPinned'),
           });
         },
         onError: () => {
           toast({
             title: postIsPinnedInCountry
-              ? 'Failed to unpin from country feed'
-              : 'Failed to pin to country feed',
+              ? t('noteMoreMenu.toast.countryUnpinFailed')
+              : t('noteMoreMenu.toast.countryPinFailed'),
             variant: 'destructive',
           });
         },
@@ -455,10 +460,10 @@ function NoteMoreMenuContent({ event, open, onOpenChange, communityContext, onRe
       { type: 'thread', value: threadId },
       {
         onSuccess: () => {
-          toast({ title: 'Conversation muted' });
+          toast({ title: t('noteMoreMenu.toast.convoMuted') });
         },
         onError: () => {
-          toast({ title: 'Failed to mute conversation', variant: 'destructive' });
+          toast({ title: t('noteMoreMenu.toast.convoMuteFailed'), variant: 'destructive' });
         },
       },
     );
@@ -470,10 +475,10 @@ function NoteMoreMenuContent({ event, open, onOpenChange, communityContext, onRe
     const mutation = userMuted ? removeMute : addMute;
     mutation.mutate(muteItem, {
       onSuccess: () => {
-        toast({ title: userMuted ? `Unmuted @${displayName}` : `Muted @${displayName}` });
+        toast({ title: userMuted ? t('noteMoreMenu.toast.unmuted', { name: displayName }) : t('noteMoreMenu.toast.muted', { name: displayName }) });
       },
       onError: () => {
-        toast({ title: userMuted ? 'Failed to unmute user' : 'Failed to mute user', variant: 'destructive' });
+        toast({ title: userMuted ? t('noteMoreMenu.toast.unmuteFailed') : t('noteMoreMenu.toast.muteFailed'), variant: 'destructive' });
       },
     });
     close();
@@ -482,7 +487,7 @@ function NoteMoreMenuContent({ event, open, onOpenChange, communityContext, onRe
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-md max-h-[85dvh] p-0 gap-0 rounded-2xl overflow-y-auto [&>button]:hidden">
-        <DialogTitle className="sr-only">Post options</DialogTitle>
+        <DialogTitle className="sr-only">{t('noteMoreMenu.title')}</DialogTitle>
 
         {/* Post preview */}
         <div className="px-4 pt-4 pb-3">
@@ -505,7 +510,7 @@ function NoteMoreMenuContent({ event, open, onOpenChange, communityContext, onRe
               </div>
               <div className="mt-0.5 text-sm text-muted-foreground line-clamp-3 overflow-wrap-anywhere">
                 {/^[A-Za-z0-9+/=_-]{20,}$/.test(event.content.trim()) ? (
-                  <span className="italic">Encrypted content</span>
+                  <span className="italic">{t('noteMoreMenu.encryptedContent')}</span>
                 ) : (
                   <NoteContent event={event} className="text-sm leading-snug whitespace-normal" disableEmbeds disableNoteEmbeds as="span" />
                 )}
@@ -519,63 +524,63 @@ function NoteMoreMenuContent({ event, open, onOpenChange, communityContext, onRe
         <div className="py-1">
           <MenuItem
             icon={<StickyNote className="size-5" />}
-            label="View post details"
+            label={t('noteMoreMenu.viewPost')}
             onClick={handleViewPostDetails}
           />
           <MenuItem
             icon={<FileJson className="size-5" />}
-            label="View Event JSON"
+            label={t('noteMoreMenu.viewEventJson')}
             onClick={onViewEventJson}
           />
           <MenuItem
             icon={<Bookmark className={cn("size-5", bookmarked && "fill-current")} />}
-            label={bookmarked ? 'Remove Bookmark' : 'Bookmark'}
+            label={bookmarked ? t('noteMoreMenu.removeBookmark') : t('noteMoreMenu.bookmark')}
             onClick={handleBookmark}
           />
           {user && (
             <MenuItem
               icon={<ListPlus className="size-5" />}
-              label="Add to list"
+              label={t('noteMoreMenu.addToList')}
               onClick={() => { onAddToList(); }}
             />
           )}
           <MenuItem
             icon={isInSidebar ? <Trash2 className="size-5" /> : <PanelLeft className="size-5" />}
-            label={isInSidebar ? 'Remove from sidebar' : 'Add to sidebar'}
+            label={isInSidebar ? t('noteMoreMenu.removeFromSidebar') : t('noteMoreMenu.addToSidebar')}
             onClick={handleToggleSidebar}
           />
           {isOwnPost && (
             <MenuItem
               icon={<Pin className={cn("size-5", pinned && "fill-current")} />}
-              label={pinned ? 'Unpin from profile' : 'Pin on profile'}
+              label={pinned ? t('noteMoreMenu.unpinProfile') : t('noteMoreMenu.pinProfile')}
               onClick={handleTogglePin}
             />
           )}
           {canPinHere && (
             <MenuItem
               icon={<Pin className={cn('size-5', postIsPinnedInCountry && 'fill-current')} />}
-              label={postIsPinnedInCountry ? 'Unpin from country feed' : 'Pin to country feed'}
+              label={postIsPinnedInCountry ? t('noteMoreMenu.unpinCountry') : t('noteMoreMenu.pinCountry')}
               onClick={handleToggleCountryPin}
             />
           )}
           {!isOwnPost && (
             <MenuItem
               icon={<BellOff className="size-5" />}
-              label="Mute Conversation"
+              label={t('noteMoreMenu.muteConversation')}
               onClick={handleMuteConversation}
             />
           )}
           {!isOwnPost && (
             <MenuItem
               icon={<VolumeX className="size-5" />}
-              label={userMuted ? `Unmute @${displayName}` : `Mute @${displayName}`}
+              label={userMuted ? t('noteMoreMenu.unmute', { name: displayName }) : t('noteMoreMenu.mute', { name: displayName })}
               onClick={handleMuteUser}
             />
           )}
           {!isOwnPost && (
             <MenuItem
               icon={<Flag className="size-5" />}
-              label={communityContext ? 'Report post to group' : `Report @${displayName}`}
+              label={communityContext ? t('noteMoreMenu.reportToGroup') : t('noteMoreMenu.report', { name: displayName })}
               onClick={onReport}
               destructive
             />
@@ -583,7 +588,7 @@ function NoteMoreMenuContent({ event, open, onOpenChange, communityContext, onRe
           {!isOwnPost && communityContext?.canBan && (
             <MenuItem
               icon={<ShieldBan className="size-5" />}
-              label="Remove from group"
+              label={t('noteMoreMenu.removeFromGroup')}
               onClick={onBanContent}
               destructive
             />
@@ -591,7 +596,7 @@ function NoteMoreMenuContent({ event, open, onOpenChange, communityContext, onRe
           {isOwnPost && (
             <MenuItem
               icon={<Trash2 className="size-5" />}
-              label="Delete post"
+              label={t('noteMoreMenu.delete')}
               onClick={onDelete}
               destructive
             />
@@ -606,7 +611,7 @@ function NoteMoreMenuContent({ event, open, onOpenChange, communityContext, onRe
             className="w-full h-auto py-3 text-[15px] font-medium text-muted-foreground hover:bg-secondary/60 rounded-none"
             onClick={close}
           >
-            Close
+            {t('noteMoreMenu.close')}
           </Button>
         </div>
       </DialogContent>

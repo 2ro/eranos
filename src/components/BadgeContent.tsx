@@ -1,8 +1,9 @@
-import { useCallback, useMemo, useRef } from 'react';
+import { useCallback, useMemo, useRef, useState } from 'react';
 import { Award } from 'lucide-react';
 import type { NostrEvent } from '@nostrify/nostrify';
 
 import { useCardTilt } from '@/hooks/useCardTilt';
+import { useImageProxy } from '@/hooks/useImageProxy';
 import { parseBadgeDefinition } from '@/lib/parseBadgeDefinition';
 
 interface BadgeContentProps {
@@ -76,10 +77,19 @@ const INTERACT_PAD = 48;
 function BadgeImageTilt({ heroImage, badgeName }: { heroImage?: string; badgeName: string }) {
   const tilt = useCardTilt(25, 1.08);
   const glareRef = useRef<HTMLDivElement>(null);
+  const proxy = useImageProxy();
+  const [proxyFailed, setProxyFailed] = useState(false);
 
-  const imageMask: React.CSSProperties | undefined = heroImage ? {
-    maskImage: `url(${heroImage})`,
-    WebkitMaskImage: `url(${heroImage})`,
+  // Proxy the hero at 256 (the rendered `size-28` ≈ 112px, 2× DPR). The
+  // `<img>` and the CSS `mask-image` must use the same URL, otherwise the
+  // glare overlay would mask against a different image than the visible one.
+  const proxied = heroImage ? proxy(heroImage, 256) : heroImage;
+  const usingProxy = proxied !== heroImage;
+  const displaySrc = proxyFailed || !usingProxy ? heroImage : proxied;
+
+  const imageMask: React.CSSProperties | undefined = displaySrc ? {
+    maskImage: `url(${displaySrc})`,
+    WebkitMaskImage: `url(${displaySrc})`,
     maskSize: 'cover',
     WebkitMaskSize: 'cover',
     maskRepeat: 'no-repeat',
@@ -132,13 +142,16 @@ function BadgeImageTilt({ heroImage, badgeName }: { heroImage?: string; badgeNam
       onPointerLeave={handlePointerLeave}
       className="relative z-[1] select-none"
     >
-      {heroImage ? (
+      {displaySrc ? (
         <img
-          src={heroImage}
+          src={displaySrc}
           alt={badgeName}
           className="size-28 rounded-2xl object-cover drop-shadow-lg"
           loading="lazy"
           decoding="async"
+          onError={() => {
+            if (usingProxy && !proxyFailed) setProxyFailed(true);
+          }}
         />
       ) : (
         <div className="size-28 rounded-2xl bg-gradient-to-br from-primary/10 via-primary/5 to-transparent flex items-center justify-center">
@@ -146,7 +159,7 @@ function BadgeImageTilt({ heroImage, badgeName }: { heroImage?: string; badgeNam
         </div>
       )}
       {/* Specular glare overlay */}
-      {heroImage && imageMask && (
+      {displaySrc && imageMask && (
         <div
           ref={glareRef}
           className="absolute pointer-events-none"

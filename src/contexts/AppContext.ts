@@ -256,6 +256,38 @@ export interface AppConfig {
   autoplayVideos: boolean;
   /** Image upload quality: "compressed" resizes/optimizes, "original" uploads as-is. Default: "compressed". */
   imageQuality: 'compressed' | 'original';
+  /**
+   * Base URL of an image-resizing proxy. Empty string = disabled (images load
+   * at full resolution from their origin). When set, image URLs are rewritten
+   * through the proxy at a per-context width, returning WebP at quality 75.
+   *
+   * The proxy must speak the wsrv.nl / weserv API
+   * (https://github.com/weserv/images). The well-known public instance is
+   * `https://wsrv.nl`. Self-hosted `imgproxy` and similar do NOT speak the
+   * same query language.
+   *
+   * **Privacy note**: enabling the proxy collapses every image fetch through
+   * one hostname (good — your ISP no longer sees every Blossom/imgur/etc.
+   * host you load from), but the proxy operator now sees every image URL
+   * you load. Self-hosters and privacy-conscious users can point this at
+   * their own instance, or disable the proxy entirely.
+   *
+   * Default: `'https://wsrv.nl'`.
+   */
+  imageProxy: string;
+  /**
+   * Low-bandwidth mode. When enabled:
+   * - Videos never autoplay (overrides `autoplayVideos`).
+   * - Background video frame-grabbing for posters is skipped.
+   * - Images that would normally load inline (post images, galleries,
+   *   banners, link preview thumbnails, video posters) show a tap-to-load
+   *   placeholder. The image proxy setting is independent — if the proxy
+   *   is on, the tap loads the proxied (smaller) version; if off, the tap
+   *   loads the original.
+   *
+   * Default: false.
+   */
+  lowBandwidthMode: boolean;
   /** Hex pubkey of the curator whose follow list defines the curated feed. */
   curatorPubkey?: string;
   /**

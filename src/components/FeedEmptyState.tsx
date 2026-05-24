@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { Users } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useAppContext } from '@/hooks/useAppContext';
@@ -28,6 +29,7 @@ export function FeedEmptyState({
   showDiscover,
   className,
 }: FeedEmptyStateProps) {
+  const { t } = useTranslation();
   const { config } = useAppContext();
 
   // The /packs page defaults to the Follows tab, which is also empty when the
@@ -51,12 +53,12 @@ export function FeedEmptyState({
         <div className="flex flex-col gap-2 mt-5 w-full max-w-xs">
           {showDiscover && (
             <Button asChild className="rounded-full">
-              <Link to="/packs" onClick={handleDiscoverClick}>Discover people to follow</Link>
+              <Link to="/packs" onClick={handleDiscoverClick}>{t('feed.empty.discoverPeople')}</Link>
             </Button>
           )}
           {onSwitchToGlobal && (
             <Button variant="ghost" className="rounded-full" onClick={onSwitchToGlobal}>
-              Browse the Global feed
+              {t('feed.empty.browseGlobal')}
             </Button>
           )}
         </div>
