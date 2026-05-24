@@ -1301,5 +1301,92 @@
       "copyFailed": "فشل النسخ",
       "copyFailedDescription": "تعذّر الوصول إلى الحافظة. أظهر المفتاح وانسخه يدويًا."
     }
+  },
+  "compose": {
+    "placeholderDefault": "بِمَ تفكر؟",
+    "placeholderPoll": "اطرح سؤالاً…",
+    "placeholderCountry": "ماذا يحدث في {{country}}؟",
+    "placeholderCwReason": "سبب التحذير (اختياري)",
+    "submitDefault": "انشر!",
+    "preview": {
+      "edit": "تحرير",
+      "previewMode": "معاينة"
+    },
+    "poll": {
+      "addOption": "إضافة خيار",
+      "optionLabel": "الخيار {{number}}",
+      "singleChoice": "اختيار واحد",
+      "multipleChoice": "اختيارات متعددة",
+      "backToPost": "العودة إلى المنشور",
+      "publishing": "جارٍ النشر...",
+      "publish": "نشر التصويت",
+      "published": "تم نشر التصويت!",
+      "publishFailed": "فشل نشر التصويت."
+    },
+    "voice": {
+      "cancel": "إلغاء",
+      "send": "إرسال",
+      "sending": "جارٍ الإرسال...",
+      "sentTitle": "تم إرسال الرسالة الصوتية!",
+      "sentBody": "تم نشر رسالتك الصوتية.",
+      "sendFailed": "فشل إرسال الرسالة الصوتية.",
+      "micDeniedTitle": "تم رفض الوصول إلى الميكروفون",
+      "micDeniedBody": "يرجى السماح بالوصول إلى الميكروفون لتسجيل الرسائل الصوتية.",
+      "voiceMessage": "رسالة صوتية"
+    },
+    "toolbar": {
+      "attachFile": "إرفاق ملف",
+      "emojiGif": "إيموجي / GIF",
+      "more": "المزيد",
+      "poll": "تصويت",
+      "spoiler": "حرق أحداث",
+      "emoji": "إيموجي",
+      "stickers": "ملصقات"
+    },
+    "submit": {
+      "posting": "جارٍ النشر...",
+      "uploadFailed": "فشل الرفع",
+      "uploadFailedBody": "تعذّر رفع الملف.",
+      "publishFailed": "فشل نشر الملاحظة.",
+      "posted": "تم النشر!",
+      "replyPublished": "تم نشر ردك.",
+      "quotePublished": "تم نشر اقتباسك.",
+      "notePublished": "تم نشر ملاحظتك."
+    },
+    "destination": {
+      "label": "النشر إلى",
+      "ariaHelp": "ما الفرق بين المنشورات العالمية ومنشورات المجتمع؟",
+      "ariaTrigger": "وجهة النشر",
+      "global": "عالمي",
+      "globalExplainer": "منشور عادي يراه الجميع على Nostr. يمكن لأي شخص في أي مكان رؤيته.",
+      "community": "مجتمع بلدك",
+      "communityExplainer": "يظهر في الخلاصة المحلية لذلك البلد مع منشورات الجيران. الأنسب للتحديثات المرتبطة بالمجتمع.",
+      "chooseAnother": "اختيار بلد آخر…",
+      "searchPlaceholder": "ابحث عن دول...",
+      "noResults": "لم يتم العثور على دول.",
+      "isDefault": "{{name}} هي وجهتك الافتراضية",
+      "globalIsDefault": "عالمي هو وجهتك الافتراضية",
+      "thisIsDefault": "هذه هي وجهتك الافتراضية",
+      "setAsDefault": "تعيين كافتراضي",
+      "defaultUpdated": "تم تحديث الافتراضي",
+      "defaultUpdatedCountry": "ستذهب المنشورات الجديدة إلى {{name}} افتراضيًا.",
+      "defaultUpdatedGlobal": "ستكون المنشورات الجديدة عالمية افتراضيًا."
+    }
+  },
+  "replyModal": {
+    "title": {
+      "newPoll": "تصويت جديد",
+      "newComment": "تعليق جديد",
+      "commentOnProfile": "التعليق على الملف الشخصي",
+      "replyToPost": "الرد على المنشور",
+      "quotePost": "اقتباس المنشور",
+      "newPost": "منشور جديد"
+    },
+    "placeholder": {
+      "writeComment": "اكتب تعليقًا...",
+      "addComment": "أضف تعليقًا...",
+      "whatsHappening": "ماذا يحدث؟"
+    },
+    "blueskyDisclaimer": "الأشخاص على Bluesky لا يمكنهم رؤيتك لأنهم في الواقع غير لامركزيين."
   }
 }

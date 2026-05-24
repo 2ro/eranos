@@ -1301,5 +1301,92 @@
       "copyFailed": "复制失败",
       "copyFailedDescription": "无法访问剪贴板。请显示密钥后手动复制。"
     }
+  },
+  "compose": {
+    "placeholderDefault": "在想什么？",
+    "placeholderPoll": "提个问题…",
+    "placeholderCountry": "{{country}} 发生了什么？",
+    "placeholderCwReason": "内容警告原因（可选）",
+    "submitDefault": "发布！",
+    "preview": {
+      "edit": "编辑",
+      "previewMode": "预览"
+    },
+    "poll": {
+      "addOption": "添加选项",
+      "optionLabel": "选项 {{number}}",
+      "singleChoice": "单选",
+      "multipleChoice": "多选",
+      "backToPost": "返回帖子",
+      "publishing": "发布中...",
+      "publish": "发布投票",
+      "published": "投票已发布！",
+      "publishFailed": "投票发布失败。"
+    },
+    "voice": {
+      "cancel": "取消",
+      "send": "发送",
+      "sending": "发送中...",
+      "sentTitle": "语音消息已发送！",
+      "sentBody": "你的语音消息已发布。",
+      "sendFailed": "发送语音消息失败。",
+      "micDeniedTitle": "麦克风访问被拒绝",
+      "micDeniedBody": "请允许麦克风访问以录制语音消息。",
+      "voiceMessage": "语音消息"
+    },
+    "toolbar": {
+      "attachFile": "附加文件",
+      "emojiGif": "表情 / GIF",
+      "more": "更多",
+      "poll": "投票",
+      "spoiler": "剧透",
+      "emoji": "表情",
+      "stickers": "贴纸"
+    },
+    "submit": {
+      "posting": "发布中...",
+      "uploadFailed": "上传失败",
+      "uploadFailedBody": "无法上传文件。",
+      "publishFailed": "无法发布笔记。",
+      "posted": "已发布！",
+      "replyPublished": "你的回复已发布。",
+      "quotePublished": "你的引用已发布。",
+      "notePublished": "你的笔记已发布。"
+    },
+    "destination": {
+      "label": "发布到",
+      "ariaHelp": "全球帖子和社区帖子有什么区别？",
+      "ariaTrigger": "发布目标",
+      "global": "全球",
+      "globalExplainer": "Nostr 上所有人都能看到的普通帖子。任何人都能看到。",
+      "community": "你的国家社区",
+      "communityExplainer": "在该国家的本地 Feed 中与邻居的帖子一起显示。适合社区相关的更新。",
+      "chooseAnother": "选择其他国家…",
+      "searchPlaceholder": "搜索国家...",
+      "noResults": "未找到国家。",
+      "isDefault": "{{name}} 是你的默认",
+      "globalIsDefault": "全球是你的默认",
+      "thisIsDefault": "这是你的默认",
+      "setAsDefault": "设为默认",
+      "defaultUpdated": "默认已更新",
+      "defaultUpdatedCountry": "新帖子将默认发布到 {{name}}。",
+      "defaultUpdatedGlobal": "新帖子将默认为全球。"
+    }
+  },
+  "replyModal": {
+    "title": {
+      "newPoll": "新投票",
+      "newComment": "新评论",
+      "commentOnProfile": "评论资料",
+      "replyToPost": "回复帖子",
+      "quotePost": "引用帖子",
+      "newPost": "新帖子"
+    },
+    "placeholder": {
+      "writeComment": "写一条评论...",
+      "addComment": "添加评论...",
+      "whatsHappening": "有什么新鲜事？"
+    },
+    "blueskyDisclaimer": "Bluesky 上的人看不到你，因为它们实际上不是去中心化的。"
   }
 }

@@ -1301,5 +1301,92 @@
       "copyFailed": "کپی ناموفق بود",
       "copyFailedDescription": "دسترسی به کلیپ‌بورد ممکن نشد. کلید را نمایش دهید و به‌صورت دستی کپی کنید."
     }
+  },
+  "compose": {
+    "placeholderDefault": "به چه فکر می‌کنی؟",
+    "placeholderPoll": "یک سؤال بپرس…",
+    "placeholderCountry": "در {{country}} چه می‌گذرد؟",
+    "placeholderCwReason": "دلیل هشدار محتوا (اختیاری)",
+    "submitDefault": "ارسال!",
+    "preview": {
+      "edit": "ویرایش",
+      "previewMode": "پیش‌نمایش"
+    },
+    "poll": {
+      "addOption": "افزودن گزینه",
+      "optionLabel": "گزینه {{number}}",
+      "singleChoice": "تک‌گزینه‌ای",
+      "multipleChoice": "چندگزینه‌ای",
+      "backToPost": "بازگشت به پست",
+      "publishing": "در حال انتشار...",
+      "publish": "انتشار نظرسنجی",
+      "published": "نظرسنجی منتشر شد!",
+      "publishFailed": "انتشار نظرسنجی ناموفق بود."
+    },
+    "voice": {
+      "cancel": "لغو",
+      "send": "ارسال",
+      "sending": "در حال ارسال...",
+      "sentTitle": "پیام صوتی ارسال شد!",
+      "sentBody": "پیام صوتی شما منتشر شد.",
+      "sendFailed": "ارسال پیام صوتی ناموفق بود.",
+      "micDeniedTitle": "دسترسی به میکروفون رد شد",
+      "micDeniedBody": "برای ضبط پیام صوتی به میکروفون اجازه دسترسی بدهید.",
+      "voiceMessage": "پیام صوتی"
+    },
+    "toolbar": {
+      "attachFile": "پیوست فایل",
+      "emojiGif": "ایموجی / GIF",
+      "more": "بیشتر",
+      "poll": "نظرسنجی",
+      "spoiler": "اسپویلر",
+      "emoji": "ایموجی",
+      "stickers": "استیکر"
+    },
+    "submit": {
+      "posting": "در حال انتشار...",
+      "uploadFailed": "آپلود ناموفق بود",
+      "uploadFailedBody": "نتوانست فایل را آپلود کند.",
+      "publishFailed": "انتشار یادداشت ناموفق بود.",
+      "posted": "منتشر شد!",
+      "replyPublished": "پاسخ شما منتشر شد.",
+      "quotePublished": "نقل قول شما منتشر شد.",
+      "notePublished": "یادداشت شما منتشر شد."
+    },
+    "destination": {
+      "label": "ارسال به",
+      "ariaHelp": "تفاوت پست‌های جهانی و پست‌های انجمن کشور چیست؟",
+      "ariaTrigger": "مقصد پست",
+      "global": "جهانی",
+      "globalExplainer": "یک پست معمولی که برای همه در Nostr قابل مشاهده است. هرکسی، هرجا، می‌تواند آن را ببیند.",
+      "community": "انجمن کشور شما",
+      "communityExplainer": "در فید محلی آن کشور در کنار پست‌های همسایگان نمایش داده می‌شود. مناسب برای به‌روزرسانی‌های مرتبط با انجمن.",
+      "chooseAnother": "انتخاب کشور دیگر…",
+      "searchPlaceholder": "جست‌وجوی کشورها...",
+      "noResults": "کشوری یافت نشد.",
+      "isDefault": "{{name}} پیش‌فرض شماست",
+      "globalIsDefault": "جهانی پیش‌فرض شماست",
+      "thisIsDefault": "این پیش‌فرض شماست",
+      "setAsDefault": "تنظیم به‌عنوان پیش‌فرض",
+      "defaultUpdated": "پیش‌فرض به‌روزرسانی شد",
+      "defaultUpdatedCountry": "پست‌های جدید به‌طور پیش‌فرض به {{name}} می‌روند.",
+      "defaultUpdatedGlobal": "پست‌های جدید به‌طور پیش‌فرض جهانی خواهند بود."
+    }
+  },
+  "replyModal": {
+    "title": {
+      "newPoll": "نظرسنجی جدید",
+      "newComment": "نظر جدید",
+      "commentOnProfile": "نظر روی نمایه",
+      "replyToPost": "پاسخ به پست",
+      "quotePost": "نقل پست",
+      "newPost": "پست جدید"
+    },
+    "placeholder": {
+      "writeComment": "یک نظر بنویس...",
+      "addComment": "افزودن نظر...",
+      "whatsHappening": "چه خبر؟"
+    },
+    "blueskyDisclaimer": "افراد در Bluesky نمی‌توانند شما را ببینند چون آن‌ها در واقع غیرمتمرکز نیستند."
   }
 }

@@ -1,5 +1,6 @@
 import { lazy, Suspense, useState, useRef, useCallback, useMemo, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { Paperclip, Smile, AlertTriangle, X, Loader2, Mic, Square, Sticker, BarChart3, Plus, ChevronLeft, Check, Globe, HelpCircle } from 'lucide-react';
 import { nip19 } from 'nostr-tools';
 import { encode as blurhashEncode } from 'blurhash';
@@ -228,7 +229,7 @@ function CharRing({ count, max }: { count: number; max: number }) {
 export function ComposeBox({ 
   onSuccess, 
   onPublished,
-  placeholder = "What's on your mind?", 
+  placeholder, 
   compact = false, 
   replyTo, 
   quotedEvent, 
@@ -242,10 +243,13 @@ export function ComposeBox({
   initialMode = 'post',
   customPublish,
   hidePoll = false,
-  submitLabel = 'Post!',
+  submitLabel,
   defaultTags,
   defaultExpanded = false,
 }: ComposeBoxProps) {
+  const { t } = useTranslation();
+  const effectivePlaceholder = placeholder ?? t('compose.placeholderDefault');
+  const effectiveSubmitLabel = submitLabel ?? t('compose.submitDefault');
   const { user, metadata, isLoading: isProfileLoading } = useCurrentUser();
   const userProfileUrl = useProfileUrl(user?.pubkey ?? '', metadata);
   const { mutateAsync: createEvent, isPending, isPending: isPollPending } = useNostrPublish();
@@ -695,9 +699,9 @@ export function ComposeBox({
 
       expand();
     } catch {
-      toast({ title: 'Upload failed', description: 'Could not upload file.', variant: 'destructive' });
+      toast({ title: t('compose.submit.uploadFailed'), description: t('compose.submit.uploadFailedBody'), variant: 'destructive' });
     }
-  }, [uploadFile, expand, toast, imageQuality]);
+  }, [uploadFile, expand, toast, imageQuality, t]);
 
   const handlePaste = useCallback(async (e: React.ClipboardEvent<HTMLTextAreaElement>) => {
     const items = e.clipboardData?.items;
@@ -723,9 +727,9 @@ export function ComposeBox({
       await voiceRecorder.startRecording();
       expand();
     } catch {
-      toast({ title: 'Microphone access denied', description: 'Please allow microphone access to record voice messages.', variant: 'destructive' });
+      toast({ title: t('compose.voice.micDeniedTitle'), description: t('compose.voice.micDeniedBody'), variant: 'destructive' });
     }
-  }, [voiceRecorder, expand, toast]);
+  }, [voiceRecorder, expand, toast, t]);
 
   /** Stop recording, upload, and publish as kind 1222 or 1244. */
   const handleStopAndPublishVoice = useCallback(async () => {
@@ -860,14 +864,14 @@ export function ComposeBox({
         queryClient.invalidateQueries({ queryKey: ['agora-feed-new-posts', selectedCountryCode] });
       }
       notificationSuccess();
-      toast({ title: 'Voice message sent!', description: 'Your voice message has been published.' });
+      toast({ title: t('compose.voice.sentTitle'), description: t('compose.voice.sentBody') });
       onSuccess?.();
     } catch {
-      toast({ title: 'Error', description: 'Failed to send voice message.', variant: 'destructive' });
+      toast({ title: t('common.error'), description: t('compose.voice.sendFailed'), variant: 'destructive' });
     } finally {
       setIsPublishingVoice(false);
     }
-  }, [user, voiceRecorder, uploadFile, buildContentWarningTags, customPublish, createEvent, onPublished, replyTo, queryClient, toast, onSuccess, canChooseDestination, selectedCountryCode, statsPubkey]);
+  }, [user, voiceRecorder, uploadFile, buildContentWarningTags, customPublish, createEvent, onPublished, replyTo, queryClient, toast, onSuccess, canChooseDestination, selectedCountryCode, statsPubkey, t]);
 
   const handleSubmit = async () => {
     if (!content.trim() || !user || charCount > MAX_CHARS) return;
@@ -1135,13 +1139,13 @@ export function ComposeBox({
       notificationSuccess();
       if (!customPublish?.suppressSuccessToast) {
         toast({
-          title: customPublish?.successTitle ?? 'Posted!',
-          description: customPublish?.successDescription ?? (replyTo ? 'Your reply has been published.' : quotedEvent ? 'Your quote has been published.' : 'Your note has been published.'),
+          title: customPublish?.successTitle ?? t('compose.submit.posted'),
+          description: customPublish?.successDescription ?? (replyTo ? t('compose.submit.replyPublished') : quotedEvent ? t('compose.submit.quotePublished') : t('compose.submit.notePublished')),
         });
       }
       onSuccess?.();
     } catch {
-      toast({ title: 'Error', description: 'Failed to publish note.', variant: 'destructive' });
+      toast({ title: t('common.error'), description: t('compose.submit.publishFailed'), variant: 'destructive' });
     }
   };
 
@@ -1205,10 +1209,10 @@ export function ComposeBox({
         queryClient.invalidateQueries({ queryKey: ['agora-feed-new-posts', selectedCountryCode] });
       }
       notificationSuccess();
-      toast({ title: 'Poll published!' });
+      toast({ title: t('compose.poll.published') });
       onSuccess?.();
     } catch {
-      toast({ title: 'Error', description: 'Failed to publish poll.', variant: 'destructive' });
+      toast({ title: t('common.error'), description: t('compose.poll.publishFailed'), variant: 'destructive' });
     }
   };
 
@@ -1241,7 +1245,7 @@ export function ComposeBox({
                   : "text-muted-foreground hover:text-foreground"
               )}
             >
-              Edit
+              {t('compose.preview.edit')}
             </button>
             <button
               onClick={() => setInternalPreviewMode(true)}
@@ -1252,7 +1256,7 @@ export function ComposeBox({
                   : "text-muted-foreground hover:text-foreground"
               )}
             >
-              Preview
+              {t('compose.preview.previewMode')}
             </button>
           </div>
         </div>
@@ -1290,10 +1294,10 @@ export function ComposeBox({
               onPaste={handlePaste}
               placeholder={
                 mode === 'poll'
-                  ? 'Ask a question…'
+                  ? t('compose.placeholderPoll')
                   : selectedCountryInfo
-                    ? `What's happening in ${selectedCountryInfo.name}?`
-                    : placeholder
+                    ? t('compose.placeholderCountry', { country: selectedCountryInfo.name })
+                    : effectivePlaceholder
               }
               className={cn(
                 'w-full bg-transparent text-foreground placeholder:text-muted-foreground resize-none outline-none text-lg pt-2.5 pb-2 opacity-85 break-words overflow-hidden transition-[min-height] duration-200 ease-in-out',
@@ -1343,8 +1347,8 @@ export function ComposeBox({
                 onClick={() => setMode('post')}
                 className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors"
               >
-                <ChevronLeft className="size-3.5" />
-                Back to post
+                <ChevronLeft className="size-3.5 rtl:rotate-180" />
+                {t('compose.poll.backToPost')}
               </button>
             )}
 
@@ -1360,7 +1364,7 @@ export function ComposeBox({
                         prev.map((o) => (o.id === opt.id ? { ...o, label: e.target.value } : o)),
                       )
                     }
-                    placeholder={`Option ${idx + 1}`}
+                    placeholder={t('compose.poll.optionLabel', { number: idx + 1 })}
                     maxLength={100}
                     className="flex-1 bg-secondary/40 rounded-lg px-3 py-1.5 text-sm outline-none focus:ring-1 focus:ring-primary/40 placeholder:text-muted-foreground"
                   />
@@ -1388,26 +1392,26 @@ export function ComposeBox({
                   className="flex items-center gap-1.5 text-xs text-primary hover:text-primary/80 transition-colors pt-0.5"
                 >
                   <Plus className="size-3" />
-                  Add option
+                  {t('compose.poll.addOption')}
                 </button>
               )}
             </div>
 
             {/* Settings row — pill toggles */}
             <div className="flex flex-wrap gap-2 pt-0.5">
-              {(['singlechoice', 'multiplechoice'] as const).map((t) => (
+              {(['singlechoice', 'multiplechoice'] as const).map((pt) => (
                 <button
-                  key={t}
+                  key={pt}
                   type="button"
-                  onClick={() => setPollType(t)}
+                  onClick={() => setPollType(pt)}
                   className={cn(
                     'text-xs px-2.5 py-1 rounded-full border transition-colors',
-                    pollType === t
+                    pollType === pt
                       ? 'border-primary bg-primary/10 text-primary font-medium'
                       : 'border-border text-muted-foreground hover:text-foreground hover:border-foreground/30',
                   )}
                 >
-                  {t === 'singlechoice' ? 'Single choice' : 'Multiple choice'}
+                  {pt === 'singlechoice' ? t('compose.poll.singleChoice') : t('compose.poll.multipleChoice')}
                 </button>
               ))}
               <div className="w-px bg-border self-stretch mx-0.5" />
@@ -1437,7 +1441,7 @@ export function ComposeBox({
             <Input
               value={cwText}
               onChange={(e) => setCwText(e.target.value)}
-              placeholder="Content warning reason (optional)"
+              placeholder={t('compose.placeholderCwReason')}
               className="h-8 text-base md:text-sm bg-secondary/50 border-0 rounded-lg"
             />
             <button
@@ -1478,13 +1482,13 @@ export function ComposeBox({
         {canChooseDestination && isExpanded && (
           <div className="mt-2 flex items-center justify-end gap-2">
             <span className="text-xs font-medium text-muted-foreground">
-              Post to
+              {t('compose.destination.label')}
             </span>
             <Popover>
               <PopoverTrigger asChild>
                 <button
                   type="button"
-                  aria-label="What's the difference between global and community posts?"
+                  aria-label={t('compose.destination.ariaHelp')}
                   className={cn(
                     'inline-flex items-center justify-center size-5 rounded-full shrink-0',
                     'text-muted-foreground/70 hover:text-foreground hover:bg-muted/60',
@@ -1513,9 +1517,9 @@ export function ComposeBox({
                       <div className="flex gap-3">
                         <span className="text-2xl leading-none shrink-0" aria-hidden="true">🌍</span>
                         <div className="flex-1 min-w-0">
-                          <p className="text-sm font-semibold">Global</p>
+                          <p className="text-sm font-semibold">{t('compose.destination.global')}</p>
                           <p className="text-xs text-muted-foreground mt-0.5">
-                            A regular post visible to everyone on Nostr. Anyone, anywhere can see it.
+                            {t('compose.destination.globalExplainer')}
                           </p>
                         </div>
                       </div>
@@ -1524,9 +1528,9 @@ export function ComposeBox({
                           {exampleFlag ?? '🌐'}
                         </span>
                         <div className="flex-1 min-w-0">
-                          <p className="text-sm font-semibold">Your country community</p>
+                          <p className="text-sm font-semibold">{t('compose.destination.community')}</p>
                           <p className="text-xs text-muted-foreground mt-0.5">
-                            Shown in that country's local feed alongside posts from neighbors. Best for community-relevant updates.
+                            {t('compose.destination.communityExplainer')}
                           </p>
                         </div>
                       </div>
@@ -1537,7 +1541,7 @@ export function ComposeBox({
             </Popover>
             <DropdownMenu>
               <DropdownMenuTrigger
-                aria-label="Post destination"
+                aria-label={t('compose.destination.ariaTrigger')}
                 className={cn(
                   'inline-flex items-center justify-center h-8 w-auto gap-1.5 px-2.5 py-1 text-base leading-none',
                   'bg-muted/50 hover:bg-muted shadow-none',
@@ -1559,7 +1563,7 @@ export function ComposeBox({
                 >
                   <span className="inline-flex items-center gap-2 flex-1">
                     <span aria-hidden="true">🌍</span>
-                    <span>Global</span>
+                    <span>{t('compose.destination.global')}</span>
                   </span>
                   {destination === 'world' && (
                     <Check className="size-4 text-primary" aria-hidden />
@@ -1610,15 +1614,15 @@ export function ComposeBox({
                   className="cursor-pointer text-sm"
                 >
                   <Globe className="size-4 mr-2 text-muted-foreground" aria-hidden />
-                  Choose another country…
+                  {t('compose.destination.chooseAnother')}
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 {destination === defaultPostCountry ? (
                   <div className="px-2 py-1.5 text-xs text-muted-foreground">
                     {(() => {
-                      if (defaultPostCountry === 'world') return 'Global is your default';
+                      if (defaultPostCountry === 'world') return t('compose.destination.globalIsDefault');
                       const info = getCountryInfo(defaultPostCountry);
-                      return info ? `${info.name} is your default` : 'This is your default';
+                      return info ? t('compose.destination.isDefault', { name: info.name }) : t('compose.destination.thisIsDefault');
                     })()}
                   </div>
                 ) : (
@@ -1629,15 +1633,15 @@ export function ComposeBox({
                         ? null
                         : getCountryInfo(destination);
                       toast({
-                        title: 'Default updated',
+                        title: t('compose.destination.defaultUpdated'),
                         description: info
-                          ? `New posts will go to ${info.name} by default.`
-                          : 'New posts will be global by default.',
+                          ? t('compose.destination.defaultUpdatedCountry', { name: info.name })
+                          : t('compose.destination.defaultUpdatedGlobal'),
                       });
                     }}
                     className="cursor-pointer text-sm"
                   >
-                    Set as default
+                    {t('compose.destination.setAsDefault')}
                   </DropdownMenuItem>
                 )}
               </DropdownMenuContent>
@@ -1651,9 +1655,9 @@ export function ComposeBox({
               open={countryPickerOpen}
               onOpenChange={setCountryPickerOpen}
             >
-              <CommandInput placeholder="Search countries..." />
+              <CommandInput placeholder={t('compose.destination.searchPlaceholder')} />
               <CommandList>
-                <CommandEmpty>No countries found.</CommandEmpty>
+                <CommandEmpty>{t('compose.destination.noResults')}</CommandEmpty>
                 <CommandGroup>
                   <CommandItem
                     value="Global 🌍"
@@ -1663,7 +1667,7 @@ export function ComposeBox({
                     }}
                   >
                     <span aria-hidden="true" className="mr-2">🌍</span>
-                    <span>Global</span>
+                    <span>{t('compose.destination.global')}</span>
                     {destination === 'world' && (
                       <Check className="ml-auto size-4 text-primary" aria-hidden />
                     )}
@@ -1732,7 +1736,7 @@ export function ComposeBox({
                     <X className="size-[18px]" />
                   </button>
                 </TooltipTrigger>
-                <TooltipContent>Cancel</TooltipContent>
+                <TooltipContent>{t('compose.voice.cancel')}</TooltipContent>
               </Tooltip>
 
               {/* Stop & send button */}
@@ -1747,7 +1751,7 @@ export function ComposeBox({
                 ) : (
                   <Square className="size-3.5 mr-1.5" fill="currentColor" />
                 )}
-                {isPublishingVoice ? 'Sending...' : 'Send'}
+                {isPublishingVoice ? t('compose.voice.sending') : t('compose.voice.send')}
               </Button>
             </div>
           ) : (
@@ -1767,7 +1771,7 @@ export function ComposeBox({
                       {isUploading ? <Loader2 className="size-[18px] animate-spin" /> : <Paperclip className="size-[18px]" />}
                     </button>
                   </TooltipTrigger>
-                  <TooltipContent>Attach file</TooltipContent>
+                  <TooltipContent>{t('compose.toolbar.attachFile')}</TooltipContent>
                 </Tooltip>
 
                 <input
@@ -1798,7 +1802,7 @@ export function ComposeBox({
                         <Mic className="size-[18px]" />
                       </button>
                     </TooltipTrigger>
-                    <TooltipContent>Voice message</TooltipContent>
+                    <TooltipContent>{t('compose.voice.voiceMessage')}</TooltipContent>
                   </Tooltip>
                 )}
 
@@ -1818,7 +1822,7 @@ export function ComposeBox({
                        <Smile className="size-[18px]" />
                      </button>
                    </TooltipTrigger>
-                   {!pickerOpen && <TooltipContent>Emoji / GIF</TooltipContent>}
+                   {!pickerOpen && <TooltipContent>{t('compose.toolbar.emojiGif')}</TooltipContent>}
                  </Tooltip>
 
                 {/* Overflow: Poll + CW */}
@@ -1840,7 +1844,7 @@ export function ComposeBox({
                         </button>
                       </PopoverTrigger>
                     </TooltipTrigger>
-                    {!trayOpen && <TooltipContent>More</TooltipContent>}
+                    {!trayOpen && <TooltipContent>{t('compose.toolbar.more')}</TooltipContent>}
                   </Tooltip>
                   <PopoverContent side="top" align="start" sideOffset={6} className="w-44 p-1.5 rounded-xl border-border shadow-lg">
                     <div className="flex flex-col gap-0.5">
@@ -1853,7 +1857,7 @@ export function ComposeBox({
                           onClick={() => { setMode((m) => m === 'poll' ? 'post' : 'poll'); setTrayOpen(false); expand(); }}
                           className={cn('flex items-center gap-2.5 w-full px-3 py-2 rounded-lg text-sm transition-colors', mode === 'poll' ? 'text-primary bg-primary/10' : 'text-muted-foreground hover:text-foreground hover:bg-secondary/60')}
                         >
-                          <BarChart3 className="size-4" /><span className="font-medium">Poll</span>
+                          <BarChart3 className="size-4" /><span className="font-medium">{t('compose.toolbar.poll')}</span>
                         </button>
                       )}
                       <button
@@ -1861,7 +1865,7 @@ export function ComposeBox({
                         onClick={() => { setCwEnabled((v) => !v); setTrayOpen(false); expand(); }}
                         className={cn('flex items-center gap-2.5 w-full px-3 py-2 rounded-lg text-sm transition-colors', cwEnabled ? 'text-amber-500 bg-amber-500/10' : 'text-muted-foreground hover:text-foreground hover:bg-secondary/60')}
                       >
-                        <AlertTriangle className="size-4" /><span className="font-medium">Spoiler</span>
+                        <AlertTriangle className="size-4" /><span className="font-medium">{t('compose.toolbar.spoiler')}</span>
                       </button>
                     </div>
                   </PopoverContent>
@@ -1893,7 +1897,7 @@ export function ComposeBox({
                     className="rounded-full px-5 font-bold text-white"
                     size="sm"
                   >
-                    {isPollPending ? 'Publishing...' : 'Publish poll'}
+                    {isPollPending ? t('compose.poll.publishing') : t('compose.poll.publish')}
                   </Button>
                 ) : (
                   <Button
@@ -1902,7 +1906,7 @@ export function ComposeBox({
                     className="rounded-full px-5 font-bold text-white"
                     size="sm"
                   >
-                    {isPending || isCommentPending ? 'Posting...' : submitLabel}
+                    {isPending || isCommentPending ? t('compose.submit.posting') : effectiveSubmitLabel}
                   </Button>
                 )}
               </div>
@@ -1927,7 +1931,7 @@ export function ComposeBox({
                 )}
               >
                 <Smile className="size-3.5" />
-                Emoji
+                {t('compose.toolbar.emoji')}
               </button>
               <button
                 type="button"
@@ -1957,7 +1961,7 @@ export function ComposeBox({
                   )}
                 >
                   <Sticker className="size-3.5" />
-                  Stickers
+                  {t('compose.toolbar.stickers')}
                 </button>
               )}
             </div>

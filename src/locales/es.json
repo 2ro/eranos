@@ -1301,5 +1301,92 @@
       "copyFailed": "Error al copiar",
       "copyFailedDescription": "No se pudo acceder al portapapeles. Muestra la clave y cópiala manualmente."
     }
+  },
+  "compose": {
+    "placeholderDefault": "¿En qué piensas?",
+    "placeholderPoll": "Haz una pregunta…",
+    "placeholderCountry": "¿Qué está pasando en {{country}}?",
+    "placeholderCwReason": "Motivo de la advertencia (opcional)",
+    "submitDefault": "¡Publicar!",
+    "preview": {
+      "edit": "Editar",
+      "previewMode": "Vista previa"
+    },
+    "poll": {
+      "addOption": "Añadir opción",
+      "optionLabel": "Opción {{number}}",
+      "singleChoice": "Una opción",
+      "multipleChoice": "Varias opciones",
+      "backToPost": "Volver a la publicación",
+      "publishing": "Publicando...",
+      "publish": "Publicar encuesta",
+      "published": "¡Encuesta publicada!",
+      "publishFailed": "No se pudo publicar la encuesta."
+    },
+    "voice": {
+      "cancel": "Cancelar",
+      "send": "Enviar",
+      "sending": "Enviando...",
+      "sentTitle": "¡Mensaje de voz enviado!",
+      "sentBody": "Tu mensaje de voz se publicó.",
+      "sendFailed": "No se pudo enviar el mensaje de voz.",
+      "micDeniedTitle": "Acceso al micrófono denegado",
+      "micDeniedBody": "Permite el acceso al micrófono para grabar mensajes de voz.",
+      "voiceMessage": "Mensaje de voz"
+    },
+    "toolbar": {
+      "attachFile": "Adjuntar archivo",
+      "emojiGif": "Emoji / GIF",
+      "more": "Más",
+      "poll": "Encuesta",
+      "spoiler": "Spoiler",
+      "emoji": "Emoji",
+      "stickers": "Stickers"
+    },
+    "submit": {
+      "posting": "Publicando...",
+      "uploadFailed": "Error al subir",
+      "uploadFailedBody": "No se pudo subir el archivo.",
+      "publishFailed": "No se pudo publicar la nota.",
+      "posted": "¡Publicado!",
+      "replyPublished": "Tu respuesta se publicó.",
+      "quotePublished": "Tu cita se publicó.",
+      "notePublished": "Tu nota se publicó."
+    },
+    "destination": {
+      "label": "Publicar en",
+      "ariaHelp": "¿Cuál es la diferencia entre publicaciones globales y de comunidad?",
+      "ariaTrigger": "Destino de la publicación",
+      "global": "Global",
+      "globalExplainer": "Una publicación normal visible para todos en Nostr. Cualquiera puede verla.",
+      "community": "Comunidad de tu país",
+      "communityExplainer": "Se muestra en el feed local de ese país junto con publicaciones de vecinos. Ideal para temas comunitarios.",
+      "chooseAnother": "Elegir otro país…",
+      "searchPlaceholder": "Buscar países...",
+      "noResults": "No se encontraron países.",
+      "isDefault": "{{name}} es tu predeterminado",
+      "globalIsDefault": "Global es tu predeterminado",
+      "thisIsDefault": "Este es tu predeterminado",
+      "setAsDefault": "Establecer como predeterminado",
+      "defaultUpdated": "Predeterminado actualizado",
+      "defaultUpdatedCountry": "Las nuevas publicaciones irán a {{name}} por defecto.",
+      "defaultUpdatedGlobal": "Las nuevas publicaciones serán globales por defecto."
+    }
+  },
+  "replyModal": {
+    "title": {
+      "newPoll": "Nueva encuesta",
+      "newComment": "Nuevo comentario",
+      "commentOnProfile": "Comentar en perfil",
+      "replyToPost": "Responder a la publicación",
+      "quotePost": "Citar publicación",
+      "newPost": "Nueva publicación"
+    },
+    "placeholder": {
+      "writeComment": "Escribe un comentario...",
+      "addComment": "Agregar un comentario...",
+      "whatsHappening": "¿Qué está pasando?"
+    },
+    "blueskyDisclaimer": "La gente en Bluesky no puede verte porque en realidad no están descentralizados."
   }
 }

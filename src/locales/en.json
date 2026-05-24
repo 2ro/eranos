@@ -93,6 +93,93 @@
       "linkCopied": "Link copied to clipboard"
     }
   },
+  "compose": {
+    "placeholderDefault": "What's on your mind?",
+    "placeholderPoll": "Ask a question…",
+    "placeholderCountry": "What's happening in {{country}}?",
+    "placeholderCwReason": "Content warning reason (optional)",
+    "submitDefault": "Post!",
+    "preview": {
+      "edit": "Edit",
+      "previewMode": "Preview"
+    },
+    "poll": {
+      "addOption": "Add option",
+      "optionLabel": "Option {{number}}",
+      "singleChoice": "Single choice",
+      "multipleChoice": "Multiple choice",
+      "backToPost": "Back to post",
+      "publishing": "Publishing...",
+      "publish": "Publish poll",
+      "published": "Poll published!",
+      "publishFailed": "Failed to publish poll."
+    },
+    "voice": {
+      "cancel": "Cancel",
+      "send": "Send",
+      "sending": "Sending...",
+      "sentTitle": "Voice message sent!",
+      "sentBody": "Your voice message has been published.",
+      "sendFailed": "Failed to send voice message.",
+      "micDeniedTitle": "Microphone access denied",
+      "micDeniedBody": "Please allow microphone access to record voice messages.",
+      "voiceMessage": "Voice message"
+    },
+    "toolbar": {
+      "attachFile": "Attach file",
+      "emojiGif": "Emoji / GIF",
+      "more": "More",
+      "poll": "Poll",
+      "spoiler": "Spoiler",
+      "emoji": "Emoji",
+      "stickers": "Stickers"
+    },
+    "submit": {
+      "posting": "Posting...",
+      "uploadFailed": "Upload failed",
+      "uploadFailedBody": "Could not upload file.",
+      "publishFailed": "Failed to publish note.",
+      "posted": "Posted!",
+      "replyPublished": "Your reply has been published.",
+      "quotePublished": "Your quote has been published.",
+      "notePublished": "Your note has been published."
+    },
+    "destination": {
+      "label": "Post to",
+      "ariaHelp": "What's the difference between global and community posts?",
+      "ariaTrigger": "Post destination",
+      "global": "Global",
+      "globalExplainer": "A regular post visible to everyone on Nostr. Anyone, anywhere can see it.",
+      "community": "Your country community",
+      "communityExplainer": "Shown in that country's local feed alongside posts from neighbors. Best for community-relevant updates.",
+      "chooseAnother": "Choose another country…",
+      "searchPlaceholder": "Search countries...",
+      "noResults": "No countries found.",
+      "isDefault": "{{name}} is your default",
+      "globalIsDefault": "Global is your default",
+      "thisIsDefault": "This is your default",
+      "setAsDefault": "Set as default",
+      "defaultUpdated": "Default updated",
+      "defaultUpdatedCountry": "New posts will go to {{name}} by default.",
+      "defaultUpdatedGlobal": "New posts will be global by default."
+    }
+  },
+  "replyModal": {
+    "title": {
+      "newPoll": "New poll",
+      "newComment": "New comment",
+      "commentOnProfile": "Comment on profile",
+      "replyToPost": "Reply to post",
+      "quotePost": "Quote post",
+      "newPost": "New post"
+    },
+    "placeholder": {
+      "writeComment": "Write a comment...",
+      "addComment": "Add a comment...",
+      "whatsHappening": "What's happening?"
+    },
+    "blueskyDisclaimer": "People on Bluesky can't see you because they're not actually decentralized."
+  },
   "forms": {
     "required": "Required",
     "recommended": "Recommended",

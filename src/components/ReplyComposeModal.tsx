@@ -1,4 +1,5 @@
 import { useCallback, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { X } from 'lucide-react';
 import type { NostrEvent } from '@nostrify/nostrify';
 
@@ -33,6 +34,7 @@ interface ReplyComposeModalProps {
 }
 
 export function ReplyComposeModal({ event, quotedEvent, open, onOpenChange, onSuccess, initialContent, initialMode, title: titleOverride, placeholder: placeholderOverride }: ReplyComposeModalProps) {
+  const { t } = useTranslation();
   const isUrl = event instanceof URL;
   const isExternalId = typeof event === 'string';
   const isExternal = isUrl || isExternalId;
@@ -43,8 +45,20 @@ export function ReplyComposeModal({ event, quotedEvent, open, onOpenChange, onSu
   const [portalContainer, setPortalContainer] = useState<HTMLElement | undefined>(undefined);
 
   const isProfileRoot = !isExternal && event instanceof Object && 'kind' in event && event.kind === 0;
-  const title = titleOverride ?? (initialMode === 'poll' ? 'New poll' : isExternal ? 'New comment' : isProfileRoot ? 'Comment on profile' : isReply ? 'Reply to post' : isQuote ? 'Quote post' : 'New post');
-  const placeholder = placeholderOverride ?? (isExternal ? 'Write a comment...' : isReply ? "What's on your mind?" : isQuote ? 'Add a comment...' : "What's happening?");
+  const title = titleOverride ?? (
+    initialMode === 'poll' ? t('replyModal.title.newPoll')
+      : isExternal ? t('replyModal.title.newComment')
+      : isProfileRoot ? t('replyModal.title.commentOnProfile')
+      : isReply ? t('replyModal.title.replyToPost')
+      : isQuote ? t('replyModal.title.quotePost')
+      : t('replyModal.title.newPost')
+  );
+  const placeholder = placeholderOverride ?? (
+    isExternal ? t('replyModal.placeholder.writeComment')
+      : isReply ? t('compose.placeholderDefault')
+      : isQuote ? t('replyModal.placeholder.addComment')
+      : t('replyModal.placeholder.whatsHappening')
+  );
 
   const dialogContentRef = useCallback((node: HTMLElement | null) => {
     setPortalContainer(node ?? undefined);
@@ -95,7 +109,7 @@ export function ReplyComposeModal({ event, quotedEvent, open, onOpenChange, onSu
                         : "text-muted-foreground hover:text-foreground"
                     )}
                   >
-                    Edit
+                    {t('compose.preview.edit')}
                   </button>
                   <button
                     onClick={() => setPreviewMode(true)}
@@ -106,7 +120,7 @@ export function ReplyComposeModal({ event, quotedEvent, open, onOpenChange, onSu
                         : "text-muted-foreground hover:text-foreground"
                     )}
                   >
-                    Preview
+                    {t('compose.preview.previewMode')}
                   </button>
                 </div>
               )}
@@ -142,7 +156,7 @@ export function ReplyComposeModal({ event, quotedEvent, open, onOpenChange, onSu
             <div className="mx-4 mb-2 rounded-lg border border-amber-500/30 bg-amber-500/5 px-3 py-2 flex items-start gap-2 shrink-0">
               <span className="text-sm leading-relaxed shrink-0" aria-hidden>&#x26A0;&#xFE0F;</span>
               <p className="text-xs text-amber-700 dark:text-amber-400 leading-relaxed">
-                People on Bluesky can&apos;t see you because they&apos;re not actually decentralized.
+                {t('replyModal.blueskyDisclaimer')}
               </p>
             </div>
           )}

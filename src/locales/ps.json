@@ -1301,5 +1301,92 @@
       "copyFailed": "کاپي کول ناکام شو",
       "copyFailedDescription": "کلپ بورډ ته لاسرسی ونه شو. کیلي وښیئ او په لاسي ډول یې کاپي کړئ."
     }
+  },
+  "compose": {
+    "placeholderDefault": "په څه فکر کوې؟",
+    "placeholderPoll": "یوه پوښتنه وکړئ…",
+    "placeholderCountry": "په {{country}} کې څه روان دي؟",
+    "placeholderCwReason": "د محتوا د خبرتیا دلیل (اختیاري)",
+    "submitDefault": "خپور کړئ!",
+    "preview": {
+      "edit": "سمول",
+      "previewMode": "مخکتنه"
+    },
+    "poll": {
+      "addOption": "اختیار اضافه کړئ",
+      "optionLabel": "اختیار {{number}}",
+      "singleChoice": "یو غوراوی",
+      "multipleChoice": "ډېر غوراوي",
+      "backToPost": "پوسټ ته بیرته",
+      "publishing": "خپریږي...",
+      "publish": "د نظرپوښتنې خپرول",
+      "published": "نظرپوښتنه خپره شوه!",
+      "publishFailed": "د نظرپوښتنې خپرول ناکام شو."
+    },
+    "voice": {
+      "cancel": "لغوه کول",
+      "send": "ولېږئ",
+      "sending": "لېږل کیږي...",
+      "sentTitle": "صوتي پیغام ولېږل شو!",
+      "sentBody": "ستاسو صوتي پیغام خپور شو.",
+      "sendFailed": "د صوتي پیغام لېږل ناکام شو.",
+      "micDeniedTitle": "د مایکروفون لاسرسی ردیږي",
+      "micDeniedBody": "د صوتي پیغامونو د ثبتولو لپاره مهرباني وکړئ مایکروفون ته اجازه ورکړئ.",
+      "voiceMessage": "صوتي پیغام"
+    },
+    "toolbar": {
+      "attachFile": "فایل ضمیمه کړئ",
+      "emojiGif": "اموجي / GIF",
+      "more": "نور",
+      "poll": "نظرپوښتنه",
+      "spoiler": "سپایلر",
+      "emoji": "اموجي",
+      "stickers": "سټیکرونه"
+    },
+    "submit": {
+      "posting": "خپریږي...",
+      "uploadFailed": "اپلوډ ناکام شو",
+      "uploadFailedBody": "د فایل اپلوډ ونه شو.",
+      "publishFailed": "د یادښت خپرول ناکام شو.",
+      "posted": "خپور شو!",
+      "replyPublished": "ستاسو ځواب خپور شو.",
+      "quotePublished": "ستاسو نقل خپور شو.",
+      "notePublished": "ستاسو یادښت خپور شو."
+    },
+    "destination": {
+      "label": "خپرول",
+      "ariaHelp": "د نړیوالو او د هیواد ټولنیزو پوسټونو ترمنځ څه توپیر دی؟",
+      "ariaTrigger": "د خپرولو هدف",
+      "global": "نړیوال",
+      "globalExplainer": "یو معمولي پوسټ چې په Nostr کې هر چا ته لیدلی شي. هر څوک، هر چیرته، یې لیدلی شي.",
+      "community": "ستاسو د هیواد ټولنه",
+      "communityExplainer": "د هغه هیواد په محلي فیډ کې د ګاونډیانو د پوسټونو سره ښودل کیږي. د ټولنیزو اړوندو تازه معلوماتو لپاره غوره.",
+      "chooseAnother": "بل هیواد غوره کړئ…",
+      "searchPlaceholder": "هیوادونه ولټوئ...",
+      "noResults": "هیڅ هیواد ونه موندل شو.",
+      "isDefault": "{{name}} ستاسو ډیفالټ دی",
+      "globalIsDefault": "نړیوال ستاسو ډیفالټ دی",
+      "thisIsDefault": "دا ستاسو ډیفالټ دی",
+      "setAsDefault": "د ډیفالټ په توګه وټاکئ",
+      "defaultUpdated": "ډیفالټ تازه شو",
+      "defaultUpdatedCountry": "نوي پوسټونه به په ډیفالټ ډول {{name}} ته ولاړ شي.",
+      "defaultUpdatedGlobal": "نوي پوسټونه به په ډیفالټ ډول نړیوال وي."
+    }
+  },
+  "replyModal": {
+    "title": {
+      "newPoll": "نوې نظرپوښتنه",
+      "newComment": "نوی تبصره",
+      "commentOnProfile": "په پروفایل تبصره",
+      "replyToPost": "پوسټ ته ځواب",
+      "quotePost": "د پوسټ نقل",
+      "newPost": "نوی پوسټ"
+    },
+    "placeholder": {
+      "writeComment": "تبصره ولیکئ...",
+      "addComment": "تبصره اضافه کړئ...",
+      "whatsHappening": "څه روان دي؟"
+    },
+    "blueskyDisclaimer": "په Bluesky کې خلک تاسو نه شي لیدلی ځکه چې هغوی واقعیا غیرمرکزي نه دي."
   }
 }

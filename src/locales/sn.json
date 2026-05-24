@@ -1301,5 +1301,92 @@
       "copyFailed": "Kukopa kwakundikana",
       "copyFailedDescription": "Hazvina kukwanisika kuwana clipboard. Ratidza kiyi wokopa nemaoko."
     }
+  },
+  "compose": {
+    "placeholderDefault": "Uri kufungei?",
+    "placeholderPoll": "Bvunza mubvunzo…",
+    "placeholderCountry": "Chii chiri kuitika mu{{country}}?",
+    "placeholderCwReason": "Chikonzero cheyambiro yezvirimo (zvinosarudzwa)",
+    "submitDefault": "Tumira!",
+    "preview": {
+      "edit": "Gadzirisa",
+      "previewMode": "Tarisa"
+    },
+    "poll": {
+      "addOption": "Wedzera sarudzo",
+      "optionLabel": "Sarudzo {{number}}",
+      "singleChoice": "Sarudzo imwe",
+      "multipleChoice": "Zvisarudzo zvakawanda",
+      "backToPost": "Dzokera kuchinyorwa",
+      "publishing": "Kunyorwa...",
+      "publish": "Tumira nzvimbo yokuvhota",
+      "published": "Nzvimbo yokuvhota yatumirwa!",
+      "publishFailed": "Hazvina kubudirira kutumira nzvimbo yokuvhota."
+    },
+    "voice": {
+      "cancel": "Kanzura",
+      "send": "Tumira",
+      "sending": "Kutumira...",
+      "sentTitle": "Meseji yezwi yatumirwa!",
+      "sentBody": "Meseji yako yezwi yatumirwa.",
+      "sendFailed": "Hazvina kubudirira kutumira meseji yezwi.",
+      "micDeniedTitle": "Mvumo yemicrophone yarambidzwa",
+      "micDeniedBody": "Bvumira microphone kuti urekode meseji dzezwi.",
+      "voiceMessage": "Meseji yezwi"
+    },
+    "toolbar": {
+      "attachFile": "Batanidza faira",
+      "emojiGif": "Emoji / GIF",
+      "more": "Zvimwe",
+      "poll": "Kuvhota",
+      "spoiler": "Spoiler",
+      "emoji": "Emoji",
+      "stickers": "Stickers"
+    },
+    "submit": {
+      "posting": "Kunyorwa...",
+      "uploadFailed": "Kuisa kwakundikana",
+      "uploadFailedBody": "Hazvina kubudirira kuisa faira.",
+      "publishFailed": "Hazvina kubudirira kutumira chinyorwa.",
+      "posted": "Yatumirwa!",
+      "replyPublished": "Mhinduro yako yatumirwa.",
+      "quotePublished": "Kunokora kwako kwatumirwa.",
+      "notePublished": "Chinyorwa chako chatumirwa."
+    },
+    "destination": {
+      "label": "Tumira ku",
+      "ariaHelp": "Pane musiyano upi pakati pezvinyorwa zvepasi rose nezvenharaunda?",
+      "ariaTrigger": "Kwakutumira",
+      "global": "Pasi rose",
+      "globalExplainer": "Chinyorwa chenguva dzose chinooneka nemunhu wose paNostr. Ani naani, kupi nekupi, anogona kuchiona.",
+      "community": "Nharaunda yenyika yako",
+      "communityExplainer": "Chinoratidzwa muFeed yenyika iyoyo pamwe nezvinyorwa zvevavakidzani. Chakanaka kwazvo kunyaya dzenharaunda.",
+      "chooseAnother": "Sarudza imwe nyika…",
+      "searchPlaceholder": "Tsvaga nyika...",
+      "noResults": "Hapana nyika yakawanikwa.",
+      "isDefault": "{{name}} ndiyo yako default",
+      "globalIsDefault": "Pasi rose ndiyo yako default",
+      "thisIsDefault": "Iyi ndiyo yako default",
+      "setAsDefault": "Sarudza sezvinopiwa",
+      "defaultUpdated": "Default yagadziriswa",
+      "defaultUpdatedCountry": "Zvinyorwa zvitsva zvichaenda ku{{name}} sezvinopiwa.",
+      "defaultUpdatedGlobal": "Zvinyorwa zvitsva zvichange zviri zvepasi rose sezvinopiwa."
+    }
+  },
+  "replyModal": {
+    "title": {
+      "newPoll": "Nzvimbo itsva yokuvhota",
+      "newComment": "Tsinhiro itsva",
+      "commentOnProfile": "Tsinhira papfungidziro",
+      "replyToPost": "Pindura chinyorwa",
+      "quotePost": "Nokora chinyorwa",
+      "newPost": "Chinyorwa chitsva"
+    },
+    "placeholder": {
+      "writeComment": "Nyora tsinhiro...",
+      "addComment": "Wedzera tsinhiro...",
+      "whatsHappening": "Chii chiri kuitika?"
+    },
+    "blueskyDisclaimer": "Vanhu paBluesky havakukuoni nokuti chaizvoizvo havasi vakapararira."
   }
 }
