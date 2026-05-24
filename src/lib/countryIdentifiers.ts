@@ -117,13 +117,3 @@ export function getCountryFilterValues(
   
   return values;
 }
-
-/**
- * DEPRECATED: Legacy function for backward compatibility
- * Use createCountryIdentifier() instead
- * @deprecated Will be removed after migration period
- */
-export function createGeoIdentifier(countryCode: string): string {
-  console.warn('createGeoIdentifier is deprecated. Use createCountryIdentifier instead.');
-  return `geo:${countryCode.toUpperCase()}`;
-}
