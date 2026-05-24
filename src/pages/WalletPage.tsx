@@ -173,10 +173,6 @@ export function WalletPage() {
             </button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
-            <DropdownMenuItem onSelect={() => setBackupOpen(true)} className="cursor-pointer">
-              <KeyRound className="size-4 mr-2" />
-              {t('walletSettings.backup.label')}
-            </DropdownMenuItem>
             {sp.enabled && spAddress && (
               <DropdownMenuItem onSelect={() => setSpScanOpen(true)} className="cursor-pointer">
                 <Radar className="size-4 mr-2" />
@@ -185,6 +181,10 @@ export function WalletPage() {
                   : t('wallet.receiveDialog.scanForPayments')}
               </DropdownMenuItem>
             )}
+            <DropdownMenuItem onSelect={() => setBackupOpen(true)} className="cursor-pointer">
+              <KeyRound className="size-4 mr-2" />
+              {t('walletSettings.backup.label')}
+            </DropdownMenuItem>
             <DropdownMenuItem asChild>
               <Link to="/wallet/legacy" className="cursor-pointer">
                 <History className="size-4 mr-2" />
