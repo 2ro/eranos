@@ -1,5 +1,6 @@
 import { HelpCircle } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { useAppContext } from '@/hooks/useAppContext';
@@ -29,6 +30,9 @@ interface HelpTipProps {
  */
 export function HelpTip({ faqId, iconSize = 'size-4', className }: HelpTipProps) {
   const { config } = useAppContext();
+  // Subscribing to `useTranslation()` makes the component re-render on a
+  // language switch so the popover content reflects the new locale.
+  useTranslation();
   const item = getFAQItem(config.appName, faqId);
   if (!item) return null;
 
