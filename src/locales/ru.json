@@ -1904,220 +1904,220 @@
   },
   "guides": {
     "shared": {
-      "tldrEyebrow": "The short version",
+      "tldrEyebrow": "Короткая версия",
       "paymentBadge": {
-        "public": "Public Payments",
-        "silent": "Silent Payments"
+        "public": "Публичные платежи",
+        "silent": "Тихие платежи"
       },
       "paymentComparison": {
-        "donorHeader": "When you donate",
-        "activistHeader": "When you create",
+        "donorHeader": "Когда вы жертвуете",
+        "activistHeader": "Когда вы создаёте",
         "donorRows": {
           "whatYouSee": {
-            "label": "What you see",
-            "public": "A regular Bitcoin address you can pay from anywhere.",
-            "silent": "The same QR. Your wallet picks the silent-payment endpoint if it supports BIP-352."
+            "label": "Что вы видите",
+            "public": "Обычный Bitcoin-адрес, на который вы можете заплатить откуда угодно.",
+            "silent": "Тот же QR. Ваш кошелёк выбирает эндпойнт тихого платежа, если он поддерживает BIP-352."
           },
           "walletSupport": {
-            "label": "Wallet support",
-            "public": "Every Bitcoin wallet. Cash App, Coinbase, Strike, hardware, anything.",
-            "silent": "Few wallets today. Most fall back to a regular Bitcoin transaction."
+            "label": "Поддержка кошельков",
+            "public": "Любой Bitcoin-кошелёк. Cash App, Coinbase, Strike, аппаратные, что угодно.",
+            "silent": "Мало кошельков сегодня. Большинство откатываются к обычной Bitcoin-транзакции."
           },
           "privacy": {
-            "label": "Privacy of the donation",
-            "public": "Public on-chain. Your sending address is permanently linked to the campaign.",
-            "silent": "Receiving side is unlinkable on-chain. Your sending wallet's trail is still public."
+            "label": "Конфиденциальность пожертвования",
+            "public": "Публично в блокчейне. Ваш отправляющий адрес постоянно связан с кампанией.",
+            "silent": "Принимающая сторона нерасшифровываема в блокчейне. След вашего отправляющего кошелька всё равно публичен."
           },
           "settlement": {
-            "label": "Settlement",
-            "public": "Normal Bitcoin confirmations.",
-            "silent": "Same on-chain confirmations, but the activist has to scan their wallet to find it."
+            "label": "Расчёт",
+            "public": "Обычные подтверждения Bitcoin.",
+            "silent": "Те же подтверждения в блокчейне, но активисту приходится сканировать свой кошелёк, чтобы их найти."
           }
         },
         "activistRows": {
           "whatDonorsSee": {
-            "label": "What donors see",
-            "public": "A regular Bitcoin address. Works with every wallet on earth.",
-            "silent": "A BIP-352 endpoint. Donors' wallets need silent-payments support; otherwise the donation falls back to a regular Bitcoin transaction."
+            "label": "Что видят жертвователи",
+            "public": "Обычный Bitcoin-адрес. Работает с любым кошельком на Земле.",
+            "silent": "Эндпойнт BIP-352. Кошелькам жертвователей нужна поддержка тихих платежей; иначе пожертвование откатывается к обычной Bitcoin-транзакции."
           },
           "receivingSpeed": {
-            "label": "Receiving speed",
-            "public": "Push-style. Donations show up immediately on the campaign page.",
-            "silent": "Manual scanning. Your wallet has to walk the blockchain looking for them. Minutes to hours, depending on the wallet."
+            "label": "Скорость получения",
+            "public": "Стиль push. Пожертвования сразу появляются на странице кампании.",
+            "silent": "Ручное сканирование. Вашему кошельку приходится проходить блокчейн в их поиске. От минут до часов, в зависимости от кошелька."
           },
           "pushNotifications": {
-            "label": "Push notifications",
-            "public": "Yes. You see new donations the moment they arrive.",
-            "silent": "No. Open the wallet and trigger a scan to discover them."
+            "label": "Push-уведомления",
+            "public": "Да. Вы видите новые пожертвования в момент их прибытия.",
+            "silent": "Нет. Откройте кошелёк и запустите сканирование, чтобы их обнаружить."
           },
           "donorList": {
-            "label": "Donor list / campaign totals",
-            "public": "Public forever. Amounts and sending addresses are visible to anyone.",
-            "silent": "Private. The campaign page can't show silent-payments donation counts or totals."
+            "label": "Список жертвователей / итоги кампании",
+            "public": "Публичны навсегда. Суммы и отправляющие адреса видны всем.",
+            "silent": "Приватны. Страница кампании не может показывать количество или итоги пожертвований тихих платежей."
           },
           "ecosystem": {
-            "label": "Ecosystem maturity",
-            "public": "Mature. Settled tooling.",
-            "silent": "Bleeding-edge. Wallets are still buggy; expect missed payments that show up on a later scan."
+            "label": "Зрелость экосистемы",
+            "public": "Зрелая. Устоявшиеся инструменты.",
+            "silent": "На передовой. Кошельки всё ещё с ошибками; ожидайте пропущенных платежей, которые появятся при следующем сканировании."
           },
           "bestFor": {
-            "label": "Best for",
-            "public": "Above-ground fundraisers where social proof and visibility help.",
-            "silent": "Campaigns where donor or activist privacy matters more than the visible total."
+            "label": "Лучше всего для",
+            "public": "Открытых сборов средств, где социальное доказательство и видимость помогают.",
+            "silent": "Кампаний, где конфиденциальность жертвователя или активиста важнее видимого итога."
           },
           "watchOutFor": {
-            "label": "Watch out for",
-            "public": "Permanent public record of every donor.",
-            "silent": "Bumpy UX today. Some donations won't show until the activist scans."
+            "label": "Остерегайтесь",
+            "public": "Постоянной публичной записи каждого жертвователя.",
+            "silent": "Сегодня неровный UX. Некоторые пожертвования не появятся, пока активист не отсканирует."
           }
         }
       }
     },
     "donor": {
       "tldr": {
-        "lede": "Pay the Bitcoin address on the campaign page from any wallet you already have. If the campaign accepts silent payments and your wallet supports them, your donation is private automatically.",
+        "lede": "Заплатите на Bitcoin-адрес на странице кампании из любого кошелька, который у вас уже есть. Если кампания принимает тихие платежи и ваш кошелёк их поддерживает, ваше пожертвование автоматически приватно.",
         "nextActions": [
-          "Pay from any Bitcoin wallet",
-          "No middleman, no holding period",
-          "Want privacy? Read below"
+          "Платите из любого Bitcoin-кошелька",
+          "Никаких посредников, никакого периода удержания",
+          "Хотите конфиденциальности? Читайте ниже"
         ]
       },
       "flow": {
-        "heading": "How a donation flows",
+        "heading": "Как проходит пожертвование",
         "steps": {
           "openCampaign": {
-            "title": "Open the campaign",
-            "body": "You see a single QR code. If the campaign accepts both options, it encodes both endpoints; your wallet picks the right one."
+            "title": "Откройте кампанию",
+            "body": "Вы видите один QR-код. Если кампания принимает оба варианта, он кодирует оба эндпойнта; ваш кошелёк выбирает правильный."
           },
           "payFromAnyWallet": {
-            "title": "Pay it from any wallet",
-            "body": "Cash App, Coinbase, Strike, a hardware wallet, anything. Pay the amount plus the network fee."
+            "title": "Заплатите из любого кошелька",
+            "body": "Cash App, Coinbase, Strike, аппаратный кошелёк, что угодно. Заплатите сумму плюс комиссию сети."
           },
           "arrivesDirectly": {
-            "title": "It arrives directly",
-            "body": "Funds settle straight to the activist. {{appName}} doesn't hold or route them, and the address is derived from the activist's Nostr key."
+            "title": "Он приходит напрямую",
+            "body": "Средства зачисляются прямо активисту. {{appName}} их не держит и не маршрутизирует, а адрес получен из ключа Nostr активиста."
           }
         }
       },
       "comparison": {
-        "footnote": "Campaigns can accept Public only, Silent only, or both. If both, the QR code carries both endpoints. Your wallet picks the one it can use."
+        "footnote": "Кампании могут принимать только Публичные, только Тихие или оба. Если оба, QR-код несёт оба эндпойнта. Ваш кошелёк выбирает тот, который он может использовать."
       },
       "publicVisible": {
-        "title": "Public donations are visible on-chain forever",
-        "body": "A **Public** donation lands at a regular Bitcoin address tied to the campaign. Anyone can look up the address and see the amount, the time, and your sending address. **Silent** donations settle on-chain too, but the receiving side is unlinkable to the campaign so they stay out of public donor lists and totals."
+        "title": "Публичные пожертвования видны в блокчейне навсегда",
+        "body": "**Публичное** пожертвование приходит на обычный Bitcoin-адрес, привязанный к кампании. Любой может посмотреть адрес и увидеть сумму, время и ваш отправляющий адрес. **Тихие** пожертвования также зачисляются в блокчейне, но принимающая сторона нерасшифровываема для кампании, поэтому они остаются вне публичных списков и итогов жертвователей."
       },
       "privacy": {
-        "heading": "Donating privately",
-        "intro": "These steps matter most for **Public** donations, where every transaction is permanently tied to a single address. **Silent** donations already hide the receiving side, so the risk is lower. Targeted analysis of your sending wallet is still possible either way, so if your risk is high these steps are worth taking. Pick one, or stack them.",
+        "heading": "Жертвование с конфиденциальностью",
+        "intro": "Эти шаги важнее всего для **Публичных** пожертвований, где каждая транзакция постоянно связана с одним адресом. **Тихие** пожертвования уже скрывают принимающую сторону, поэтому риск ниже. Целевой анализ вашего отправляющего кошелька всё равно возможен в любом случае, поэтому, если ваш риск высок, эти шаги стоит предпринять. Выберите один или сложите их вместе.",
         "options": {
           "silentWallet": {
-            "name": "Use a silent-payments wallet",
-            "purpose": "Pay with a Bitcoin wallet that supports BIP-352. If the campaign accepts silent payments, your wallet uses that endpoint automatically."
+            "name": "Используйте кошелёк тихих платежей",
+            "purpose": "Платите Bitcoin-кошельком, поддерживающим BIP-352. Если кампания принимает тихие платежи, ваш кошелёк автоматически использует этот эндпойнт."
           },
           "nonKyc": {
-            "name": "Buy non-KYC Bitcoin",
-            "purpose": "Buy Bitcoin peer-to-peer so it isn't linked to your government ID in the first place. Strongest privacy starting point."
+            "name": "Купите Bitcoin без KYC",
+            "purpose": "Купите Bitcoin одноранговым способом, чтобы он не был связан с вашим удостоверением личности с самого начала. Самая сильная отправная точка для конфиденциальности."
           },
           "coinjoin": {
-            "name": "Coinjoin first",
-            "purpose": "Mix your Bitcoin with other people's coins so the output can't be traced to your KYC purchase. Useful when the campaign only accepts public."
+            "name": "Сначала Coinjoin",
+            "purpose": "Смешайте свой Bitcoin с монетами других людей, чтобы выход нельзя было отследить до вашей KYC-покупки. Полезно, когда кампания принимает только публичные."
           },
           "freshWallet": {
-            "name": "Use a fresh wallet",
-            "purpose": "Donate from a wallet that has never touched your main identity or a KYC exchange."
+            "name": "Используйте свежий кошелёк",
+            "purpose": "Жертвуйте из кошелька, который никогда не касался вашей основной идентичности или KYC-биржи."
           }
         }
       },
       "consumerApps": {
-        "title": "Consumer apps can't make you anonymous",
-        "body": "Cash App, Coinbase, Strike, Venmo, Kraken, Binance, and PayPal all verify your ID. No matter how you send the donation, every transaction stays tied to your real identity. Use a non-custodial wallet you control."
+        "title": "Потребительские приложения не могут сделать вас анонимными",
+        "body": "Cash App, Coinbase, Strike, Venmo, Kraken, Binance и PayPal — все они проверяют вашу личность. Неважно, как вы отправляете пожертвование, каждая транзакция остаётся связанной с вашей реальной идентичностью. Используйте некастодиальный кошелёк, которым вы управляете."
       },
       "silentToday": {
-        "heading": "A note on silent payments today",
+        "heading": "Заметка о тихих платежах сегодня",
         "paragraphs": [
-          "Silent payments are the most private way to receive Bitcoin on-chain, but the ecosystem is young. Most popular wallets can't send to a silent-payment endpoint yet, so when a wallet can't, the donation falls back to a regular Bitcoin transaction to the campaign's public address (if the campaign accepts both).",
-          "For activists, silent-payment donations also arrive without push notifications and only appear after the activist scans their wallet, which can take minutes to hours. None of this affects the safety of your funds; it just shapes the experience."
+          "Тихие платежи — самый приватный способ получать Bitcoin в блокчейне, но экосистема молода. Большинство популярных кошельков пока не могут отправлять на эндпойнт тихих платежей, поэтому, когда кошелёк не может, пожертвование откатывается к обычной Bitcoin-транзакции на публичный адрес кампании (если кампания принимает оба).",
+          "Для активистов пожертвования тихих платежей также приходят без push-уведомлений и появляются только после того, как активист отсканирует свой кошелёк, что может занять минуты или часы. Ничего из этого не влияет на безопасность ваших средств; это лишь формирует опыт."
         ]
       }
     },
     "activist": {
       "tldr": {
-        "lede": "Pick what to accept when you create your campaign: Public, Silent, or both. Either option is non-custodial. {{appName}} never holds your funds.",
+        "lede": "Выберите, что принимать при создании кампании: Публичные, Тихие или оба. Любой вариант некастодиальный. {{appName}} никогда не держит ваши средства.",
         "nextActions": [
-          "Compare the two options",
-          "Plan how you will cash out",
-          "Sweep funds promptly"
+          "Сравните два варианта",
+          "Спланируйте, как будете обналичивать",
+          "Своевременно перемещайте средства"
         ]
       },
       "howReceiving": {
-        "heading": "How receiving works",
+        "heading": "Как работает получение",
         "paragraphs": [
-          "Your {{appName}} donation addresses are derived from your Nostr public key. When you create a campaign, you pick what to accept:",
-          "**Public payments only.** A regular Bitcoin address. Visible to everyone, works with every wallet.",
-          "**Silent payments only.** BIP-352 silent payments. The receiving side is unlinkable on-chain, so donations stay out of public donor lists and totals. Donors need a silent-payments-capable wallet to send. If they don't have one, their donation can't go through.",
-          "**Both.** {{appName}} generates a single QR code that encodes both endpoints. Silent-payments wallets read it as private; ordinary wallets pay the public address. Donors don't have to choose.",
-          "Accepting both is usually the right call: you get private donations from supporters who use a silent-payments wallet, and you stay open to donors whose only Bitcoin is in a consumer app."
+          "Ваши адреса пожертвований {{appName}} получены из вашего публичного ключа Nostr. Когда вы создаёте кампанию, вы выбираете, что принимать:",
+          "**Только публичные платежи.** Обычный Bitcoin-адрес. Виден всем, работает с любым кошельком.",
+          "**Только тихие платежи.** Тихие платежи BIP-352. Принимающая сторона нерасшифровываема в блокчейне, поэтому пожертвования остаются вне публичных списков и итогов жертвователей. Жертвователям нужен кошелёк, способный к тихим платежам, чтобы отправлять. Если у них его нет, их пожертвование не пройдёт.",
+          "**Оба.** {{appName}} генерирует один QR-код, кодирующий оба эндпойнта. Кошельки тихих платежей читают его как приватный; обычные кошельки платят на публичный адрес. Жертвователям не нужно выбирать.",
+          "Принимать оба обычно правильный выбор: вы получаете приватные пожертвования от сторонников, использующих кошелёк тихих платежей, и остаётесь открыты для жертвователей, единственный Bitcoin которых находится в потребительском приложении."
         ]
       },
       "whatEveryoneSees": {
-        "heading": "What everyone can see",
+        "heading": "Что видят все",
         "paragraphs": [
-          "If your campaign accepts public payments, anyone considering supporting you can look up the address and see the public donation history.",
-          "Silent-payment donations aren't part of that record. They're invisible to outside observers and don't show in the campaign's public totals; new donors only see whatever you publish about the campaign's progress."
+          "Если ваша кампания принимает публичные платежи, любой, рассматривающий возможность поддержки вас, может посмотреть адрес и увидеть публичную историю пожертвований.",
+          "Пожертвования тихих платежей не являются частью этой записи. Они невидимы для сторонних наблюдателей и не отображаются в публичных итогах кампании; новые жертвователи видят только то, что вы публикуете о прогрессе кампании."
         ]
       },
       "comparison": {
-        "footnote": "You can't switch a campaign's accepted payment options after it's created. If you change your mind, make a new campaign."
+        "footnote": "Вы не можете изменить принимаемые опции платежей кампании после её создания. Если передумаете, создайте новую кампанию."
       },
       "silentToday": {
-        "heading": "A note on silent payments today",
+        "heading": "Заметка о тихих платежах сегодня",
         "paragraphs": [
-          "Silent payments are the most private way to receive Bitcoin on-chain, but the ecosystem is young. Most popular wallets can't send to a silent-payment endpoint yet, so when a donor's wallet can't, the donation falls back to a regular Bitcoin transaction to your public address (if you accept both).",
-          "Silent-payment donations also arrive without push notifications and only appear after you scan your wallet, which can take minutes to hours. None of this affects the safety of your funds; it just shapes the day-to-day experience."
+          "Тихие платежи — самый приватный способ получать Bitcoin в блокчейне, но экосистема молода. Большинство популярных кошельков пока не могут отправлять на эндпойнт тихих платежей, поэтому, когда кошелёк жертвователя не может, пожертвование откатывается к обычной Bitcoin-транзакции на ваш публичный адрес (если вы принимаете оба).",
+          "Пожертвования тихих платежей также приходят без push-уведомлений и появляются только после того, как вы отсканируете свой кошелёк, что может занять минуты или часы. Ничего из этого не влияет на безопасность ваших средств; это лишь формирует ежедневный опыт."
         ]
       },
       "movePromptly": {
-        "heading": "Move donations promptly",
+        "heading": "Своевременно перемещайте пожертвования",
         "steps": {
           "sweep": {
-            "title": "Sweep to a wallet you control",
-            "body": "Good self-custody options: [Sparrow](https://sparrowwallet.com), [BlueWallet](https://bluewallet.io), or [Phoenix](https://phoenix.acinq.co) (Lightning)."
+            "title": "Перемещайте на кошелёк, которым вы управляете",
+            "body": "Хорошие варианты самохранения: [Sparrow](https://sparrowwallet.com), [BlueWallet](https://bluewallet.io) или [Phoenix](https://phoenix.acinq.co) (Lightning)."
           },
           "dontSit": {
-            "title": "Don't sit on funds at the campaign address",
-            "body": "Treat it like a mailbox, not a savings account. This applies to both Public and Silent donations."
+            "title": "Не сидите на средствах по адресу кампании",
+            "body": "Относитесь к нему как к почтовому ящику, а не сберегательному счёту. Это применимо как к Публичным, так и к Тихим пожертвованиям."
           }
         }
       },
       "cashout": {
-        "heading": "Cashing out privately",
-        "intro": "Spending on-chain creates a trail unless you break it first. The simplest privacy exit is to **move funds into a silent-payments wallet first**, then spend onward; the hop breaks the link between your campaign address and what comes next. The other options below also work and have their own trade-offs.",
+        "heading": "Обналичивание с конфиденциальностью",
+        "intro": "Трата в блокчейне создаёт след, если вы сначала его не разорвёте. Самый простой выход для конфиденциальности — это **сначала переместить средства на кошелёк тихих платежей**, затем тратить дальше; прыжок разрывает связь между адресом вашей кампании и тем, что идёт дальше. Другие варианты ниже также работают и имеют свои компромиссы.",
         "options": {
           "silentHop": {
-            "name": "Silent-payments wallet hop",
-            "purpose": "Move your donations to a silent-payments wallet ([Ditto Wallet](https://ditto.pub), [Dana](https://github.com/cygnet3/dana/releases/download/v0.7.4/app-live-release.apk)). From there your downstream spending isn't tied to the campaign."
+            "name": "Прыжок к кошельку тихих платежей",
+            "purpose": "Переместите свои пожертвования на кошелёк тихих платежей ([Ditto Wallet](https://ditto.pub), [Dana](https://github.com/cygnet3/dana/releases/download/v0.7.4/app-live-release.apk)). Оттуда ваши последующие траты не связаны с кампанией."
           },
           "lightningSwap": {
-            "name": "Lightning swap",
-            "purpose": "Atomic-swap on-chain Bitcoin to Lightning. Lightning payments don't hit the public blockchain."
+            "name": "Lightning-обмен",
+            "purpose": "Атомарный обмен Bitcoin в блокчейне на Lightning. Платежи Lightning не попадают в публичный блокчейн."
           },
           "coinjoin": {
             "name": "Coinjoin",
-            "purpose": "Mix your Bitcoin with other users' coins so the output can't be linked back to the input."
+            "purpose": "Смешайте свой Bitcoin с монетами других пользователей, чтобы выход нельзя было связать со входом."
           },
           "peerToPeer": {
-            "name": "Peer-to-peer",
-            "purpose": "Trade Bitcoin for fiat directly with another person or through a broker on Bisq, HodlHodl, or RoboSats."
+            "name": "Одноранговый обмен",
+            "purpose": "Торгуйте Bitcoin на фиат напрямую с другим человеком или через брокера на Bisq, HodlHodl или RoboSats."
           },
           "spendDirectly": {
-            "name": "Spend it directly",
-            "purpose": "Buy gift cards (Amazon, Uber, groceries, travel) straight from Bitcoin without converting to cash first."
+            "name": "Тратьте напрямую",
+            "purpose": "Покупайте подарочные карты (Amazon, Uber, продукты, путешествия) прямо с Bitcoin, не конвертируя сначала в наличные."
           }
         }
       },
       "tumblers": {
-        "title": "Avoid centralized tumblers",
-        "body": "Custodial mixers can steal your coins, log who sent what, or turn out to be law-enforcement honeypots. Use a silent-payments hop or a non-custodial coinjoin instead."
+        "title": "Избегайте централизованных тумблеров",
+        "body": "Кастодиальные миксеры могут украсть ваши монеты, записать, кто что отправил, или оказаться приманками правоохранительных органов. Используйте прыжок к тихим платежам или некастодиальный coinjoin."
       }
     }
   }
