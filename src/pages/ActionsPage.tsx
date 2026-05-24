@@ -186,7 +186,7 @@ function ActionCard({ action, isExpired, btcPrice }: { action: Action; isExpired
   const { t } = useTranslation();
   const { translatedEvent, translateAction } = useEventTranslation(action.event, {
     iconOnly: true,
-    buttonClassName: 'absolute bottom-3 right-3 z-10 size-9 rounded-full bg-background/90 p-0 text-muted-foreground shadow-sm backdrop-blur hover:bg-background hover:text-primary',
+    buttonClassName: 'size-8 rounded-full p-0 text-muted-foreground hover:text-primary hover:bg-primary/10',
   });
   const displayAction = parseAction(translatedEvent) ?? action;
   const author = useAuthor(action.pubkey);
@@ -231,7 +231,6 @@ function ActionCard({ action, isExpired, btcPrice }: { action: Action; isExpired
             )}
             <ActionShareMenu action={action} />
           </div>
-          {translateAction}
         </div>
 
         <div className="flex flex-col gap-3 p-5 flex-1">
@@ -270,12 +269,15 @@ function ActionCard({ action, isExpired, btcPrice }: { action: Action; isExpired
             )}
           </div>
 
-          <div className="text-xs text-muted-foreground border-t border-border/60 pt-3 truncate">
-            <Trans
-              i18nKey="pledges.card.byAuthor"
-              values={{ name: displayName }}
-              components={{ 0: <span className="font-medium text-foreground" /> }}
-            />
+          <div className="flex items-center justify-between gap-3 border-t border-border/60 pt-3 text-xs text-muted-foreground">
+            <div className="truncate">
+              <Trans
+                i18nKey="pledges.card.byAuthor"
+                values={{ name: displayName }}
+                components={{ 0: <span className="font-medium text-foreground" /> }}
+              />
+            </div>
+            {translateAction}
           </div>
         </div>
       </Card>

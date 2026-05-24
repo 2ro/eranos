@@ -118,7 +118,7 @@ interface CampaignCardProps {
 export function CampaignCard({ campaign, variant = 'compact', className, footerBadge }: CampaignCardProps) {
   const { translatedEvent, translateAction } = useEventTranslation(campaign.event, {
     iconOnly: true,
-    buttonClassName: 'absolute bottom-3 right-3 z-10 size-9 rounded-full bg-background/90 p-0 text-muted-foreground shadow-sm backdrop-blur hover:bg-background hover:text-primary',
+    buttonClassName: 'size-8 rounded-full p-0 text-muted-foreground hover:text-primary hover:bg-primary/10',
   });
   const displayCampaign = parseCampaign(translatedEvent) ?? campaign;
   const author = useAuthor(campaign.pubkey);
@@ -195,7 +195,6 @@ export function CampaignCard({ campaign, variant = 'compact', className, footerB
               isFeatured={isFeatured}
             />
           </div>
-          {translateAction}
         </div>
 
         {/* Body */}
@@ -260,7 +259,12 @@ export function CampaignCard({ campaign, variant = 'compact', className, footerB
             <div className="truncate">
               by <span className="font-medium text-foreground">{creatorName}</span>
             </div>
-            {footerBadge && <div className="shrink-0">{footerBadge}</div>}
+            {(footerBadge || translateAction) && (
+              <div className="flex shrink-0 items-center gap-1.5">
+                {footerBadge}
+                {translateAction}
+              </div>
+            )}
           </div>
         </div>
       </Card>

@@ -52,7 +52,7 @@ export function CommunityMiniCard({ community, className }: CommunityMiniCardPro
   };
   const { translatedEvent, translateAction } = useEventTranslation(communityEvent, {
     iconOnly: true,
-    buttonClassName: 'absolute bottom-3 right-3 z-10 size-9 rounded-full bg-background/90 p-0 text-muted-foreground shadow-sm backdrop-blur hover:bg-background hover:text-primary',
+    buttonClassName: 'size-8 rounded-full p-0 text-muted-foreground hover:text-primary hover:bg-primary/10',
   });
   const displayCommunity = parseCommunityEvent(translatedEvent) ?? community;
   const founder = useAuthor(community.founderPubkey);
@@ -96,7 +96,6 @@ export function CommunityMiniCard({ community, className }: CommunityMiniCardPro
               `useOrganizationModeration` subscription rather than the
               card — keeps non-mod grids free of the heavy label query. */}
           <CommunityModerationOverlay coord={community.aTag} organizationName={community.name} />
-          {translateAction}
         </div>
         <div className="flex flex-col gap-2 p-3.5 flex-1">
           <h3 className="font-semibold leading-tight text-sm tracking-tight line-clamp-1">
@@ -107,20 +106,23 @@ export function CommunityMiniCard({ community, className }: CommunityMiniCardPro
               {displayCommunity.description}
             </p>
           )}
-          <div className="flex items-center gap-2 mt-auto pt-1.5">
-            {founderAvatar ? (
-              <img
-                src={founderAvatar}
-                alt=""
-                loading="lazy"
-                className="size-5 rounded-full object-cover"
-              />
-            ) : (
-              <div className="size-5 rounded-full bg-secondary" />
-            )}
-            <span className="text-[11px] text-muted-foreground truncate">
-              by {founderName}
-            </span>
+          <div className="mt-auto flex items-center justify-between gap-2 pt-1.5">
+            <div className="flex min-w-0 items-center gap-2">
+              {founderAvatar ? (
+                <img
+                  src={founderAvatar}
+                  alt=""
+                  loading="lazy"
+                  className="size-5 rounded-full object-cover"
+                />
+              ) : (
+                <div className="size-5 rounded-full bg-secondary" />
+              )}
+              <span className="truncate text-[11px] text-muted-foreground">
+                by {founderName}
+              </span>
+            </div>
+            {translateAction}
           </div>
         </div>
       </Card>

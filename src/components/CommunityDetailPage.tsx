@@ -227,7 +227,7 @@ function PledgeShelfCard({ pledge }: { pledge: Action }) {
   const { data: btcPrice } = useBtcPrice();
   const { translatedEvent, translateAction } = useEventTranslation(pledge.event, {
     iconOnly: true,
-    buttonClassName: 'absolute bottom-3 right-3 z-10 size-9 rounded-full bg-background/90 p-0 text-muted-foreground shadow-sm backdrop-blur hover:bg-background hover:text-primary',
+    buttonClassName: 'size-8 rounded-full p-0 text-muted-foreground hover:text-primary hover:bg-primary/10',
   });
   const displayPledge = parseAction(translatedEvent) ?? pledge;
   const author = useAuthor(pledge.pubkey);
@@ -265,7 +265,6 @@ function PledgeShelfCard({ pledge }: { pledge: Action }) {
               </Badge>
             </div>
           )}
-          {translateAction}
         </div>
 
         <div className="flex flex-col gap-3 p-5 flex-1">
@@ -308,7 +307,10 @@ function PledgeShelfCard({ pledge }: { pledge: Action }) {
             <div className="truncate">
               by <span className="font-medium text-foreground">{displayName}</span>
             </div>
-            <ActivityTypePill icon={<Megaphone className="size-3.5 text-primary" />} label="Pledge" />
+            <div className="flex shrink-0 items-center gap-1.5">
+              <ActivityTypePill icon={<Megaphone className="size-3.5 text-primary" />} label="Pledge" />
+              {translateAction}
+            </div>
           </div>
         </div>
       </Card>
@@ -319,7 +321,7 @@ function PledgeShelfCard({ pledge }: { pledge: Action }) {
 function CalendarEventShelfCard({ event }: { event: NostrEvent }) {
   const { translatedEvent: displayEvent, translateAction } = useEventTranslation(event, {
     iconOnly: true,
-    buttonClassName: 'absolute bottom-3 right-3 z-10 size-9 rounded-full bg-background/90 p-0 text-muted-foreground shadow-sm backdrop-blur hover:bg-background hover:text-primary',
+    buttonClassName: 'size-8 rounded-full p-0 text-muted-foreground hover:text-primary hover:bg-primary/10',
   });
   const author = useAuthor(event.pubkey);
   const metadata = author.data?.metadata;
@@ -367,7 +369,6 @@ function CalendarEventShelfCard({ event }: { event: NostrEvent }) {
               {dateLabel}
             </div>
           )}
-          {translateAction}
         </div>
 
         <div className="flex flex-col gap-3 p-5 flex-1">
@@ -416,7 +417,10 @@ function CalendarEventShelfCard({ event }: { event: NostrEvent }) {
             <div className="truncate">
               by <span className="font-medium text-foreground">{displayName}</span>
             </div>
-            <ActivityTypePill icon={<CalendarDays className="size-3.5 text-primary" />} label="Event" />
+            <div className="flex shrink-0 items-center gap-1.5">
+              <ActivityTypePill icon={<CalendarDays className="size-3.5 text-primary" />} label="Event" />
+              {translateAction}
+            </div>
           </div>
         </div>
       </Card>
