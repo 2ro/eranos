@@ -1209,14 +1209,6 @@
       "label": "Récupération des anciens portefeuilles"
     }
   },
-  "walletBackupPage": {
-    "seoTitle": "Sauvegarder le portefeuille",
-    "seoDescription": "Révélez la phrase de récupération de 24 mots de votre portefeuille Bitcoin.",
-    "title": "Sauvegarder le portefeuille",
-    "subtitle": "Votre phrase de récupération de 24 mots. Conservez-la en lieu sûr.",
-    "loggedOut": "Connectez-vous avec votre nsec pour afficher la phrase de récupération de votre portefeuille.",
-    "unsupported": "Votre type de connexion n'expose pas la clé secrète, nous ne pouvons donc pas afficher la phrase de récupération. Déconnectez-vous et reconnectez-vous avec votre nsec pour sauvegarder le portefeuille."
-  },
   "walletLegacy": {
     "seoTitle": "Récupération des anciens portefeuilles",
     "seoDescription": "Récupérez les fonds d'anciennes générations de portefeuilles Agora.",

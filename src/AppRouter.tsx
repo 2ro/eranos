@@ -53,7 +53,6 @@ const WalletPage = lazy(() => import("./pages/WalletPage").then(m => ({ default:
 const WalletMigrateV1Page = lazy(() => import("./pages/WalletMigrateV1Page").then(m => ({ default: m.WalletMigrateV1Page })));
 const WalletRecoveryPage = lazy(() => import("./pages/WalletRecoveryPage").then(m => ({ default: m.WalletRecoveryPage })));
 const WalletSettingsPage = lazy(() => import("./pages/WalletSettingsPage").then(m => ({ default: m.WalletSettingsPage })));
-const WalletBackupPage = lazy(() => import("./pages/WalletBackupPage").then(m => ({ default: m.WalletBackupPage })));
 const LegacyWalletRecoveryPage = lazy(() => import("./pages/LegacyWalletRecoveryPage").then(m => ({ default: m.LegacyWalletRecoveryPage })));
 const RemoteLoginSuccessPage = lazy(() => import("./pages/RemoteLoginSuccessPage").then(m => ({ default: m.RemoteLoginSuccessPage })));
 
@@ -151,14 +150,16 @@ export function AppRouter() {
           <Route path="/settings/advanced" element={<AdvancedSettingsPage />} />
           <Route path="/settings/network" element={<NetworkSettingsPage />} />
           <Route path="/wallet" element={<WalletPage />} />
-          <Route path="/wallet/backup" element={<WalletBackupPage />} />
           <Route path="/wallet/legacy" element={<LegacyWalletRecoveryPage />} />
           {/* Old nested paths kept as redirects so any existing links / muscle
               memory still land on the right page. `/wallet/settings` was an
               intermediate hub that has been replaced by an overflow menu on
-              `/wallet`, so it redirects to the wallet home. */}
+              `/wallet`, so it redirects to the wallet home. `/wallet/backup`
+              is now an in-page dialog opened from that menu, so it also
+              redirects home. */}
           <Route path="/wallet/settings" element={<Navigate to="/wallet" replace />} />
-          <Route path="/wallet/settings/backup" element={<Navigate to="/wallet/backup" replace />} />
+          <Route path="/wallet/backup" element={<Navigate to="/wallet" replace />} />
+          <Route path="/wallet/settings/backup" element={<Navigate to="/wallet" replace />} />
           <Route path="/wallet/settings/legacy" element={<Navigate to="/wallet/legacy" replace />} />
           <Route path="/wallet/recovery" element={<WalletRecoveryPage />} />
           <Route path="/wallet/migrate-v1" element={<WalletMigrateV1Page />} />

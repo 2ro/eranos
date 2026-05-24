@@ -1209,14 +1209,6 @@
       "label": "Legacy wallet recovery"
     }
   },
-  "walletBackupPage": {
-    "seoTitle": "Back Up Wallet",
-    "seoDescription": "Reveal the 24-word recovery phrase for your Bitcoin wallet.",
-    "title": "Back up wallet",
-    "subtitle": "Your 24-word recovery phrase. Store it somewhere safe.",
-    "loggedOut": "Log in with your nsec to view your wallet's recovery phrase.",
-    "unsupported": "Your login type doesn't expose the secret key, so we can't show a recovery phrase. Log out and sign in again with your nsec to back up the wallet."
-  },
   "walletLegacy": {
     "seoTitle": "Legacy Wallet Recovery",
     "seoDescription": "Recover funds from previous Agora wallet generations.",

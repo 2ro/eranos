@@ -1205,14 +1205,6 @@
     "backup": { "label": "Fazer backup da carteira" },
     "legacy": { "label": "Recuperação de carteira antiga" }
   },
-  "walletBackupPage": {
-    "seoTitle": "Fazer backup da carteira",
-    "seoDescription": "Revele a frase de recuperação de 24 palavras da sua carteira Bitcoin.",
-    "title": "Fazer backup da carteira",
-    "subtitle": "Sua frase de recuperação de 24 palavras. Guarde-a em um lugar seguro.",
-    "loggedOut": "Entre com seu nsec para ver a frase de recuperação da sua carteira.",
-    "unsupported": "Seu tipo de login não expõe a chave secreta, então não podemos mostrar uma frase de recuperação. Saia e entre novamente com seu nsec para fazer backup da carteira."
-  },
   "walletLegacy": {
     "seoTitle": "Recuperação de carteira antiga",
     "seoDescription": "Recupere fundos de gerações anteriores da carteira do Agora.",

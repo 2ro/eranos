@@ -1218,14 +1218,6 @@
       "label": "Pemulihan dompet lawas"
     }
   },
-  "walletBackupPage": {
-    "seoTitle": "Cadangkan Dompet",
-    "seoDescription": "Tampilkan frasa pemulihan 24 kata untuk dompet Bitcoin Anda.",
-    "title": "Cadangkan dompet",
-    "subtitle": "Frasa pemulihan 24 kata Anda. Simpan di tempat yang aman.",
-    "loggedOut": "Masuk dengan nsec Anda untuk melihat frasa pemulihan dompet Anda.",
-    "unsupported": "Jenis login Anda tidak mengekspos kunci rahasia, sehingga kami tidak bisa menampilkan frasa pemulihan. Keluar dan masuk lagi dengan nsec Anda untuk mencadangkan dompet."
-  },
   "walletLegacy": {
     "seoTitle": "Pemulihan Dompet Lawas",
     "seoDescription": "Pulihkan dana dari generasi dompet Agora sebelumnya.",

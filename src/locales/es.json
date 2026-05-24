@@ -786,14 +786,6 @@
       "label": "Recuperación de carteras antiguas"
     }
   },
-  "walletBackupPage": {
-    "seoTitle": "Copia de seguridad de la cartera",
-    "seoDescription": "Muestra la frase de recuperación de 24 palabras de tu cartera Bitcoin.",
-    "title": "Copia de seguridad de la cartera",
-    "subtitle": "Tu frase de recuperación de 24 palabras. Guárdala en un lugar seguro.",
-    "loggedOut": "Inicia sesión con tu nsec para ver la frase de recuperación de tu cartera.",
-    "unsupported": "Tu tipo de inicio de sesión no expone la clave secreta, así que no podemos mostrar una frase de recuperación. Cierra sesión y vuelve a iniciarla con tu nsec para hacer una copia de seguridad de la cartera."
-  },
   "walletLegacy": {
     "seoTitle": "Recuperación de carteras antiguas",
     "seoDescription": "Recupera los fondos de generaciones anteriores de la cartera de Agora.",

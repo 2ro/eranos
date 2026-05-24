@@ -1218,14 +1218,6 @@
       "label": "Eski cüzdan kurtarma"
     }
   },
-  "walletBackupPage": {
-    "seoTitle": "Cüzdanı Yedekle",
-    "seoDescription": "Bitcoin cüzdanınız için 24 kelimelik kurtarma ifadesini görüntüleyin.",
-    "title": "Cüzdanı yedekle",
-    "subtitle": "24 kelimelik kurtarma ifadeniz. Güvenli bir yerde saklayın.",
-    "loggedOut": "Cüzdanınızın kurtarma ifadesini görüntülemek için nsec'inizle giriş yapın.",
-    "unsupported": "Giriş türünüz gizli anahtarı sunmadığından kurtarma ifadesini gösteremiyoruz. Cüzdanı yedeklemek için çıkış yapın ve nsec'inizle tekrar giriş yapın."
-  },
   "walletLegacy": {
     "seoTitle": "Eski Cüzdan Kurtarma",
     "seoDescription": "Önceki Agora cüzdan kuşaklarından fonları kurtarın.",

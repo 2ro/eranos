@@ -786,14 +786,6 @@
       "label": "Kugarisa chikwama chekare"
     }
   },
-  "walletBackupPage": {
-    "seoTitle": "Chengetedza Chikwama",
-    "seoDescription": "Ratidza mutsara wekugarisa wemashoko makumi maviri nemana wechikwama chako cheBitcoin.",
-    "title": "Chengetedza chikwama",
-    "subtitle": "Mutsara wako wekugarisa wemashoko makumi maviri nemana. Uchengete panzvimbo yakachengetedzeka.",
-    "loggedOut": "Pinda nensec yako kuti uone mutsara wekugarisa wechikwama chako.",
-    "unsupported": "Mhando yako yekupinda haiburitsi kiyi yakavanzika, saka hatigoni kukuratidza mutsara wekugarisa. Buda upinde zvakare nensec yako kuti uchengetedze chikwama."
-  },
   "walletLegacy": {
     "seoTitle": "Kugarisa Chikwama Chekare",
     "seoDescription": "Garisa mari kubva muzvizvarwa zvakapfuura zvechikwama cheAgora.",

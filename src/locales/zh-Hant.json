@@ -786,14 +786,6 @@
       "label": "舊版錢包恢復"
     }
   },
-  "walletBackupPage": {
-    "seoTitle": "備份錢包",
-    "seoDescription": "顯示你的比特幣錢包的 24 詞恢復短語。",
-    "title": "備份錢包",
-    "subtitle": "你的 24 詞恢復短語。請將其妥善保存。",
-    "loggedOut": "請使用你的 nsec 登入以檢視錢包的恢復短語。",
-    "unsupported": "你的登入方式不暴露私鑰，因此我們無法顯示恢復短語。請退出並使用 nsec 重新登入以備份錢包。"
-  },
   "walletLegacy": {
     "seoTitle": "舊版錢包恢復",
     "seoDescription": "從先前世代的 Agora 錢包中恢復資金。",

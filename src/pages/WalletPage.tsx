@@ -37,6 +37,7 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { HDSendBitcoinDialog } from '@/components/HDSendBitcoinDialog';
 import { HDSilentPaymentScanDialog } from '@/components/HDSilentPaymentScanDialog';
+import { WalletBackupMnemonicDialog } from '@/components/WalletBackupMnemonic';
 import { useAppContext } from '@/hooks/useAppContext';
 import { useHdWallet } from '@/hooks/useHdWallet';
 import { useHdWalletSp } from '@/hooks/useHdWalletSp';
@@ -69,6 +70,7 @@ export function WalletPage() {
   const [sendOpen, setSendOpen] = useState(false);
   const [receiveOpen, setReceiveOpen] = useState(false);
   const [spScanOpen, setSpScanOpen] = useState(false);
+  const [backupOpen, setBackupOpen] = useState(false);
 
   useSeoMeta({
     title: `${t('wallet.seoTitle')} | ${config.appName}`,
@@ -179,11 +181,9 @@ export function WalletPage() {
             </button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
-            <DropdownMenuItem asChild>
-              <Link to="/wallet/backup" className="cursor-pointer">
-                <KeyRound className="size-4 mr-2" />
-                {t('walletSettings.backup.label')}
-              </Link>
+            <DropdownMenuItem onSelect={() => setBackupOpen(true)} className="cursor-pointer">
+              <KeyRound className="size-4 mr-2" />
+              {t('walletSettings.backup.label')}
             </DropdownMenuItem>
             <DropdownMenuItem asChild>
               <Link to="/wallet/legacy" className="cursor-pointer">
@@ -266,10 +266,10 @@ export function WalletPage() {
         )}
 
         {/* Back-up affordance and v1 detection live in the overflow menu
-            in the top-right (Back up wallet / Legacy wallet recovery).
-            The wallet home no longer auto-detects any legacy balances —
-            that scan only runs when the user explicitly opens the Legacy
-            Wallet Recovery screen. */}
+            in the top-right. Back up opens a dialog inline; Legacy wallet
+            recovery navigates to its own page. The wallet home no longer
+            auto-detects any legacy balances — that scan only runs when
+            the user explicitly opens the Legacy Wallet Recovery screen. */}
 
         <HDSendBitcoinDialog
           isOpen={sendOpen}
@@ -278,6 +278,8 @@ export function WalletPage() {
         />
 
         <HDSilentPaymentScanDialog open={spScanOpen} onOpenChange={setSpScanOpen} />
+
+        <WalletBackupMnemonicDialog open={backupOpen} onOpenChange={setBackupOpen} />
 
         {/* Receive Dialog */}
         <Dialog open={receiveOpen} onOpenChange={setReceiveOpen}>
