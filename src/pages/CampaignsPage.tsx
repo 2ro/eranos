@@ -179,21 +179,32 @@ export function CampaignsPage() {
                   // i18next injects the matched translation segment
                   // (the text between <0>...</0>) as this span's
                   // `children`, so the word renders *inside* the
-                  // orange background. Logical padding (`ps-1 pe-3`,
-                  // start vs end rather than left vs right) so the
-                  // asymmetric flourish extending past the word's
-                  // trailing edge automatically flips for RTL
-                  // languages (ar, fa, ps). The Bebas-Neue-italic
-                  // optical nudge from the pre-i18n version is
-                  // omitted because it assumed the word started with
-                  // a slanted U — not portable across translations.
+                  // orange background.
+                  //
+                  // Padding: `ps-0 pe-3` keeps the first letter flush
+                  // with the box's start edge while the box extends
+                  // past the trailing edge as a deliberate visual
+                  // flourish. Logical properties so RTL languages
+                  // (ar, fa, ps) flip automatically.
+                  //
+                  // `text-indent: -0.06em` compensates for Bebas
+                  // Neue's italic skew, which shifts the visible
+                  // left edge of "U" rightward of its geometric box
+                  // — without the nudge there's a visible gap
+                  // between the orange block's left edge and the
+                  // letter. The shift is small enough that other
+                  // scripts (Arabic, Khmer, Chinese) tolerate it.
                   //
                   // NOTE: `components` MUST be an array, not an
                   // object keyed by `{0: ..., 1: ...}`. The object
                   // form silently drops the indexed tags in this
                   // react-i18next version, rendering the text
                   // without any wrapping element.
-                  <span key="hl" className="inline-block w-fit ps-1 pe-3 bg-primary text-white leading-[0.95] align-baseline" />,
+                  <span
+                    key="hl"
+                    className="inline-block w-fit ps-0 pe-3 bg-primary text-white leading-[0.95] align-baseline"
+                    style={{ textIndent: '-0.06em' }}
+                  />,
                   // Index 1: line break. English wants the
                   // highlighted word on its own line as a standalone
                   // block. Translations that prefer inline flow
