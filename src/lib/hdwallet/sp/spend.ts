@@ -39,24 +39,28 @@ import { SECP_N } from './sender';
 const { Point } = secp256k1;
 
 /**
- * BIP-352 spend-key derivation path per BIP-352 §"Key Derivation" /
- * NIP-SP §2.2.
+ * BIP-352 spend-key derivation path per BIP-352 §"Key Derivation".
  */
 const SP_SPEND_PATH = "m/352'/0'/0'/0'/0";
 
 /**
- * Derive the 32-byte spend private scalar `b_spend` from a raw Nostr secret
- * key. Same path the existing `deriveSilentPaymentAddress` /
- * `deriveSilentPaymentKeys` helpers use; we keep the derivation co-located
- * with the spend-side so the security boundary is explicit.
+ * Derive the 32-byte spend private scalar `b_spend` from a BIP-32 master
+ * seed. Same path the `deriveSilentPaymentAddress` /
+ * `deriveSilentPaymentKeys` helpers use; co-located with the spend-side so
+ * the security boundary is explicit.
+ *
+ * The seed length must be 16-64 bytes (BIP-32 §"Master key generation"
+ * permits 128-512 bits). The v2 wallet always passes a 64-byte BIP-39
+ * PBKDF2 seed; the v1 migration path passes the 32-byte legacy nsec
+ * directly.
  *
  * Callers are responsible for zeroing the returned buffer when done.
  */
-export function deriveSilentPaymentSpendKey(nsecBytes: Uint8Array): Uint8Array {
-  if (nsecBytes.length !== 32) {
-    throw new Error('nsec must be 32 bytes');
+export function deriveSilentPaymentSpendKey(seed: Uint8Array): Uint8Array {
+  if (seed.length < 16 || seed.length > 64) {
+    throw new Error('BIP-32 seed must be 16-64 bytes');
   }
-  const root = HDKey.fromMasterSeed(nsecBytes);
+  const root = HDKey.fromMasterSeed(seed);
   const spendNode = root.derive(SP_SPEND_PATH);
   if (!spendNode.privateKey) {
     throw new Error('Failed to derive silent-payment spend private key');

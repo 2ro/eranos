@@ -80,7 +80,8 @@ function pointAddCompressed(A: Uint8Array, B: Uint8Array): Uint8Array {
 //     already uses)
 //
 // Reference: this is the cryptographic subset of Ditto's `silent-payments.ts`
-// that is needed by the receiver-side scanner — see also NIP-SP §5.
+// that is needed by the receiver-side scanner — see BIP-352 §"Scanning for
+// silent payments" for the underlying math.
 //
 // All scalars are 32-byte big-endian, reduced mod the secp256k1 group order.
 // All points are 33-byte compressed SEC1 except where x-only is explicit.
@@ -148,7 +149,7 @@ export function bytesEqual(a: Uint8Array, b: Uint8Array): boolean {
 }
 
 // ---------------------------------------------------------------------------
-// Receiver-side per-output derivation (BIP-352, NIP-SP §5)
+// Receiver-side per-output derivation (BIP-352)
 // ---------------------------------------------------------------------------
 
 /**

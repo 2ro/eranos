@@ -46,12 +46,33 @@ import type { SPMatchedUtxo } from './scanner';
 /** Current document schema version. Bump on breaking changes. */
 export const SP_STORAGE_VERSION = 1;
 
-/** Stable d-tag suffix appended to `appId` to form the full NIP-78 d-tag. */
-const SP_STORAGE_D_TAG_SUFFIX = 'hdwallet/sp-utxos';
+/**
+ * Stable d-tag suffix appended to `appId` to form the full NIP-78 d-tag.
+ *
+ * The `/v2` suffix segments the v2 (mnemonic-derived) wallet's UTXO set
+ * from the v1 (nsec-as-seed) wallet's. v1 and v2 derive completely
+ * different `(Bscan, Bspend)` keypairs, so their on-chain SP UTXO sets
+ * are disjoint and must not be mixed. v1 docs (`hdwallet/sp-utxos`) are
+ * still legible by the v1 migration sweep flow at `/wallet/migrate-v1`,
+ * which uses the v1-scoped derivation to read them.
+ */
+const SP_STORAGE_D_TAG_SUFFIX = 'hdwallet/sp-utxos/v2';
 
-/** Build the full d-tag for the given appId, e.g. `"agora/hdwallet/sp-utxos"`. */
+/** Build the full d-tag for the given appId, e.g. `"agora/hdwallet/sp-utxos/v2"`. */
 export function spStorageDTag(appId: string): string {
   return `${appId}/${SP_STORAGE_D_TAG_SUFFIX}`;
+}
+
+/** Legacy v1 d-tag suffix — used by the migration sweep to read old SP UTXOs. */
+const SP_STORAGE_V1_D_TAG_SUFFIX = 'hdwallet/sp-utxos';
+
+/**
+ * Build the v1 d-tag for the migration sweep at `/wallet/migrate-v1`. v1
+ * SP UTXOs persisted under this tag are read once during migration and
+ * never written back — new SP scan state always goes to the v2 tag.
+ */
+export function spStorageV1DTag(appId: string): string {
+  return `${appId}/${SP_STORAGE_V1_D_TAG_SUFFIX}`;
 }
 
 /** One persisted silent-payment UTXO entry. */

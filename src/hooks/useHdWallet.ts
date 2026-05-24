@@ -28,8 +28,14 @@ import type { SPStorageDocument } from '@/lib/hdwallet/sp/storage';
 // The chain-scan source of truth is `firstUnusedIndex` (from Blockbook), but
 // if the user explicitly bumps to a fresh address we honour that until the
 // chain catches up.
+//
+// The key is namespaced `:v2:` because v2 addresses do not match v1
+// addresses for the same nsec (different BIP-32 seed). Mixing the two would
+// advertise an address the chain scan doesn't recognise. v1 cursors (the
+// old `hdwallet:cursor:<pubkey>` key) are intentionally left in place but
+// never read — they're harmless leftover localStorage.
 
-const CURSOR_KEY = (pubkey: string) => `hdwallet:cursor:${pubkey}`;
+const CURSOR_KEY = (pubkey: string) => `hdwallet:cursor:v2:${pubkey}`;
 
 interface PersistedCursor {
   /** Currently-displayed receive index. */
@@ -127,11 +133,11 @@ export function useHdWallet(): UseHdWalletResult {
 
   const pubkey = availability.status === 'available' ? availability.pubkey : '';
   const account = availability.status === 'available' ? availability.account : undefined;
-  const nsecBytes = availability.status === 'available' ? availability.nsecBytes : undefined;
+  const seed = availability.status === 'available' ? availability.seed : undefined;
 
   // ── Persisted receive cursor ─────────────────────────────────
   const [cursor, setCursor] = useSecureLocalStorage<PersistedCursor>(
-    pubkey ? CURSOR_KEY(pubkey) : 'hdwallet:cursor:none',
+    pubkey ? CURSOR_KEY(pubkey) : 'hdwallet:cursor:v2:none',
     DEFAULT_CURSOR,
   );
 
@@ -253,11 +259,11 @@ export function useHdWallet(): UseHdWalletResult {
     return deriveReceiveAddress(account, resolved);
   }, [account, scan, cursor.receiveIndex]);
 
-  // ── Silent payment address (static; depends only on nsec) ────
+  // ── Silent payment address (static; depends only on the v2 seed) ────
   const silentPaymentAddress = useMemo<SilentPaymentAddress | undefined>(() => {
-    if (!nsecBytes) return undefined;
-    return deriveSilentPaymentAddress(nsecBytes);
-  }, [nsecBytes]);
+    if (!seed) return undefined;
+    return deriveSilentPaymentAddress(seed);
+  }, [seed]);
 
   // ── Advance to next receive address ──────────────────────────
   const nextReceiveAddress = useCallback((): DerivedAddress | undefined => {

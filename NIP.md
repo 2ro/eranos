@@ -23,6 +23,7 @@
 | Flat Communities | 34550, 30009, 8, 1111, 1984 | One-level badge membership with explicit moderators (NIP-72 ext) |
 | Community Chat | 34550, 1311 | Realtime member chat scoped to a NIP-72 community |
 | Campaign Moderation | 33863, 1985, 39089 | Homepage curation (approved / hidden / featured axes) via moderator-signed labels in the `agora.moderation` namespace, gated by a follow-pack moderator roster |
+| HD Wallet Derivation | — | BIP-39 mnemonic deterministically derived from the user's nsec via HKDF; seeds a BIP-86 Taproot + BIP-352 silent-payment wallet importable into any BIP-39-compatible wallet (see [Agora HD Wallet](#agora-hd-wallet-derivation) below). |
 
 ### Agora Content Marker
 
@@ -1513,3 +1514,85 @@ Albums are represented as kind 34139 playlist events with a `["t", "album"]` tag
 - Albums display release date and label information when available
 - Track ordering follows the order of `a` tags in the event
 - The same detail view, playback, and commenting features apply to both albums and playlists
+
+---
+
+## Agora HD Wallet Derivation
+
+### Summary
+
+Agora's Bitcoin wallet is hierarchical-deterministic and derived from the user's Nostr secret key (`nsec`). The user backs up either the nsec or the 24-word BIP-39 mnemonic — the mnemonic is a deterministic, one-way function of the nsec, so anyone with the nsec can regenerate the mnemonic at will.
+
+This specification covers two derivation generations:
+
+- **v2 (current)** — nsec → HKDF → BIP-39 24-word mnemonic → PBKDF2 → BIP-32 master seed. The resulting mnemonic imports into any BIP-39-compatible wallet (Sparrow, Electrum, Trezor, Ledger, BlueWallet, Phoenix, …) at the standard BIP-86 / BIP-352 paths.
+- **v1 (legacy, migration-only)** — nsec used directly as the BIP-32 master seed (`HDKey.fromMasterSeed(nsec_bytes)`). v1 and v2 produce different addresses for the same nsec.
+
+### v2 Derivation
+
+The v2 pipeline turns a 32-byte nsec into a 64-byte BIP-32 master seed in three steps:
+
+```
+entropy  = HKDF-SHA256(ikm = nsec_bytes,
+                       salt = "" (default per RFC 5869),
+                       info = "agora/v1",
+                       length = 32 bytes)
+mnemonic = BIP-39 encoding of (entropy || SHA256(entropy)[0])      // 24 words
+seed     = PBKDF2-HMAC-SHA512(password = mnemonic,
+                              salt = "mnemonic",
+                              iterations = 2048,
+                              dkLen = 64)
+master   = HDKey.fromMasterSeed(seed)                              // BIP-32 root
+```
+
+The `"agora/v1"` HKDF info string is a versioning hook: changing it would derive a completely independent wallet from the same nsec. The `"mnemonic"` PBKDF2 salt is the literal BIP-39 default (no user passphrase).
+
+#### Properties
+
+- **Deterministic** — the same nsec always produces the same mnemonic, seed, and BIP-32 master.
+- **One-way** — the mnemonic is a hash of the nsec; an attacker who learns the mnemonic learns only the wallet, not the Nostr identity.
+- **Interoperable** — the resulting 24-word phrase is a standard BIP-39 mnemonic. Any BIP-39-compatible wallet can import it at the BIP-86 / BIP-352 paths and recover the same on-chain addresses.
+
+### Address Derivation
+
+Once the BIP-32 master is in hand, addresses derive at the standard paths:
+
+#### BIP-86 (Taproot single-key, key-path-only)
+
+```
+m/86'/0'/0'/<chain>/<index>
+```
+
+- `chain ∈ {0, 1}` — `0` = receive, `1` = change.
+- `index` — advanced per receive (no address reuse).
+
+Output script is P2TR with the derived x-only pubkey as `internalPubkey` (no tapscript tree).
+
+#### BIP-352 (Silent Payments)
+
+```
+m/352'/0'/0'/0'/0    // spend keypair
+m/352'/0'/0'/1'/0    // scan keypair
+```
+
+The silent-payment address (`sp1q…`) is the bech32m encoding of `(scan_pubkey || spend_pubkey)` with version `0` and HRP `sp`. The address is **static** — a user publishes one `sp1q…` and reuses it; each sender derives a fresh, unlinkable Taproot output per payment.
+
+### v1 → v2 Migration
+
+The v1 derivation (`HDKey.fromMasterSeed(nsec_bytes)`) produces a different BIP-32 master than v2 for the same nsec, so a user upgrading from v1 to v2 has funds at addresses that the v2 wallet never scans. Agora ships a one-shot migration page (`/wallet/migrate-v1`) that:
+
+1. Detects v1 funds by scanning the v1 xpub against the configured Blockbook indexer and reading the v1 silent-payment UTXO doc from the user's relays (NIP-78 d-tag `${appId}/hdwallet/sp-utxos`).
+2. If any v1 funds exist, builds a single sweep PSBT consuming every v1 BIP-86 UTXO + every v1 SP UTXO, with one output (`total − fee`) at the v2 wallet's first BIP-86 receive address.
+3. Signs every input using v1-derived keys (`HDKey.fromMasterSeed(nsec_bytes)`) and broadcasts via Blockbook.
+
+The v1 derivation code is retained indefinitely so users can migrate at any time. New scans, sends, and receives always run against v2.
+
+### NIP-78 Storage
+
+Agora stores per-wallet auxiliary state as a NIP-78 encrypted addressable event (kind 30078, NIP-44 to the user's own pubkey). The v2 d-tag suffix is `hdwallet/sp-utxos/v2`; the legacy v1 d-tag is `hdwallet/sp-utxos`. The two are independent: v2 never writes to the v1 tag, and the v1 tag is read only by the migration sweep.
+
+### Security Notes
+
+- The nsec is both the Nostr identity secret and the wallet seed source. Anyone with the nsec controls both. The 24-word mnemonic is the wallet half of that secret and is safer to share with Bitcoin-side tools (it can't impersonate the user on Nostr).
+- The wallet is gated to nsec logins. Browser-extension (NIP-07) and remote-signer (NIP-46) logins do not expose the raw secret key, so the wallet cannot derive child keys and surfaces an "unsupported" state.
+- Spend signing happens locally in the browser using the derived BIP-32 leaves. The nsec never leaves the device.

@@ -387,7 +387,7 @@ export function HDSendBitcoinDialog({ isOpen, onClose, btcPrice }: HDSendBitcoin
         amountSats,
         feeRate: rate,
         nextChangeIndex,
-        nsecBytes: availability.nsecBytes,
+        seed: availability.seed,
       });
 
       setProgress('signing');
@@ -395,7 +395,7 @@ export function HDSendBitcoinDialog({ isOpen, onClose, btcPrice }: HDSendBitcoin
         built.psbtHex,
         built.inputDescriptors,
         availability.account,
-        availability.nsecBytes,
+        availability.seed,
       );
       const txHex = finalizeHdPsbt(signedHex);
 

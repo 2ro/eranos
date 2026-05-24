@@ -764,7 +764,7 @@
       "scanForNew": "扫描新支付",
       "scanForPayments": "扫描支付"
     },
-    "tx": {
+     "tx": {
       "pending": "待确认",
       "today": "今天",
       "yesterday": "昨天",
@@ -774,6 +774,12 @@
       "sent": "已发送",
       "silentBadge": "静默",
       "silentDetectedTitle": "通过 BIP-352 静默支付扫描检测到"
+    },
+    "backupAction": "备份钱包",
+    "migration": {
+      "bannerTitle": "将资金转入你的新钱包",
+      "bannerBody": "我们发现你旧钱包的地址上还有 {{amount}}。由于比特币的种子格式有变更，这些资金目前无法从此钱包访问。点一下即可一次性转移。",
+      "bannerAction": "立即迁移"
     }
   },
   "walletRecovery": {
@@ -833,6 +839,83 @@
     "toast": {
       "backupLoadedTitle": "已加载备份",
       "backupLoadedDesc": "已从你的中继解密恢复短语。"
+    }
+  },
+  "walletBackup": {
+    "heading": "钱包助记词",
+    "dialogDescription": "你比特币钱包的 24 词备份。将这些词导入任何兼容 BIP-39 的钱包（Sparrow、Electrum、Trezor、Ledger、BlueWallet、Phoenix……）即可访问同一笔资金。",
+    "explainer": "这 24 个单词是你比特币钱包的助记词，由你的 Nostr 密钥确定性地派生而来。可以在 BIP-86（Taproot）路径下用它们将此钱包导入其他比特币钱包应用。与你的 nsec 不同，助记词只控制你的比特币——它无法在 Nostr 上冒充你。",
+    "hidden": "点击“显示”以查看你的 24 词助记词。",
+    "warning": "任何拥有这些词的人都可以花掉你的比特币。切勿分享，切勿在任何网站上输入，切勿以明文存储在密码管理器之外的地方。",
+    "reveal": "显示",
+    "hide": "隐藏",
+    "copy": "复制",
+    "copied": "已复制",
+    "copyFailedTitle": "复制失败",
+    "copyFailedDescription": "无法访问剪贴板。请显示助记词后手动复制。"
+  },
+  "walletMigrate": {
+    "seoTitle": "迁移旧钱包",
+    "seoDescription": "将资金从你旧的 Agora 钱包（以 nsec 作为种子）转入新的 BIP-39 钱包。",
+    "title": "迁移旧钱包",
+    "heading": "迁移到你的新钱包",
+    "subheading": "Agora 的比特币钱包现在使用 BIP-39 助记词，因此可以导入任何钱包应用。你旧地址上的资金依然安全——此页面将通过一笔交易把它们转入你的新钱包。",
+    "backToWallet": "返回钱包",
+    "loading": "正在检查你的旧钱包…",
+    "warning": "这将构建一笔归集交易，消耗你旧钱包的全部 UTXO，并把总额（扣除少量网络手续费后）发送到你新钱包的第一个接收地址。一旦广播，此操作不可撤销。",
+    "startButton": "归集到新钱包",
+    "loggedOut": {
+      "title": "登录以进行迁移",
+      "description": "请使用拥有旧钱包的 Nostr 身份登录，以便将资金转入你的新地址。"
+    },
+    "unsupported": {
+      "title": "钱包不可用",
+      "description": "迁移仅适用于 nsec 登录，因为旧钱包的密钥是直接从你的 nsec 派生的。浏览器扩展和远程签名器登录无法执行此迁移。"
+    },
+    "noBlockbook": {
+      "title": "未配置 Blockbook",
+      "description": "迁移需要一个 Blockbook 索引器 URL 来扫描你的旧地址并广播归集交易。"
+    },
+    "noFunds": {
+      "title": "无需迁移",
+      "description": "你的旧钱包没有可花费的余额。所有资金都已在你的新钱包中。"
+    },
+    "detected": {
+      "title": "旧钱包中的资金",
+      "description": "这些资金将通过一笔交易转入你的新钱包。",
+      "bip86": "链上",
+      "sp": "静默支付",
+      "total": "总计"
+    },
+    "destination": {
+      "title": "目标地址",
+      "description": "你新钱包的第一个接收地址。"
+    },
+    "progress": {
+      "building": "正在构建交易…",
+      "signing": "正在签名输入…",
+      "broadcasting": "正在广播交易…",
+      "dontClose": "归集进行中，请勿关闭此标签页。"
+    },
+    "success": {
+      "title": "迁移完成",
+      "sent": "已向你的新钱包发送 {{sats}} sats（手续费 {{fee}} sats）。",
+      "viewTx": "查看交易"
+    },
+    "error": {
+      "title": "迁移失败",
+      "tryAgain": "重试"
+    },
+    "errors": {
+      "noV1Account": "无法访问旧钱包的密钥。",
+      "noDestination": "你的新钱包尚无接收地址。请等待钱包页面加载完成后重试。",
+      "noBlockbook": "未配置 Blockbook 索引器。迁移无法扫描你的旧地址。",
+      "noFunds": "在旧地址中未找到可花费的资金。",
+      "sweepGeneric": "迁移失败。请重试。"
+    },
+    "toast": {
+      "successTitle": "迁移完成",
+      "successDesc": "已将 {{sats}} sats 转入你的新钱包。"
     }
   },
   "walletConnect": {
@@ -1427,7 +1510,7 @@
       "heading": "你的密钥",
       "extensionBody": "你已使用浏览器扩展（NIP-07）登录。你的私钥保存在那里——请从扩展本身管理或导出。",
       "bunkerBody": "你已使用远程签名器（NIP-46）登录。你的私钥由该签名器保管，无法从 {{appName}} 导出。",
-      "explainer": "此私钥控制你在 {{appName}} 上的账号。任何拥有它的人都可以发布内容并冒充你。请存储在密码管理器或只有你能访问的地方。",
+      "explainer": "此私钥控制你在 {{appName}} 上的账号，并作为你比特币钱包的种子。任何拥有它的人都可以代你发帖，也能花掉你的比特币。请存储在密码管理器或只有你能访问的地方。如果你想把比特币钱包导入其他应用，请使用下方的助记词——它分享起来更安全，只控制钱包，无法用来冒充你。",
       "warning": "切勿与任何人分享你的私钥。避免截图或粘贴到密码管理器之外的任何地方。如果分享，其他人将能够访问你的账号。",
       "aria": "你的私钥",
       "copyAria": "复制私钥",

@@ -1197,6 +1197,12 @@
       "sent": "Envoyé",
       "silentBadge": "silencieux",
       "silentDetectedTitle": "Détecté via le scan de paiement silencieux BIP-352"
+    },
+    "backupAction": "Sauvegarder le portefeuille",
+    "migration": {
+      "bannerTitle": "Déplacez vos fonds vers votre nouveau portefeuille",
+      "bannerBody": "Nous avons trouvé {{amount}} sur des adresses de votre ancien portefeuille. Le format de la graine Bitcoin a changé, donc ces fonds ne sont pas encore accessibles depuis ce portefeuille. Balayez-les en un seul geste.",
+      "bannerAction": "Migrer maintenant"
     }
   },
   "walletRecovery": {
@@ -1256,6 +1262,83 @@
     "toast": {
       "backupLoadedTitle": "Sauvegarde chargée",
       "backupLoadedDesc": "Phrase de récupération déchiffrée depuis vos relais."
+    }
+  },
+  "walletBackup": {
+    "heading": "Phrase de récupération du portefeuille",
+    "dialogDescription": "La sauvegarde de 24 mots de votre portefeuille Bitcoin. Importez-les dans n'importe quel portefeuille compatible BIP-39 (Sparrow, Electrum, Trezor, Ledger, BlueWallet, Phoenix, …) pour accéder aux mêmes fonds.",
+    "explainer": "Ces 24 mots constituent la phrase de récupération de votre portefeuille Bitcoin, dérivée de manière déterministe de votre clé Nostr. Utilisez-les pour importer ce portefeuille dans une autre application Bitcoin sur le chemin BIP-86 (Taproot). Contrairement à votre nsec, la phrase de récupération ne contrôle que vos Bitcoins — elle ne peut pas usurper votre identité sur Nostr.",
+    "hidden": "Appuyez sur Révéler pour afficher votre phrase de récupération de 24 mots.",
+    "warning": "Quiconque possède ces mots peut dépenser vos Bitcoins. Ne les partagez jamais, ne les saisissez jamais sur un site web et ne les stockez jamais en clair en dehors d'un gestionnaire de mots de passe.",
+    "reveal": "Révéler",
+    "hide": "Masquer",
+    "copy": "Copier",
+    "copied": "Copié",
+    "copyFailedTitle": "Échec de la copie",
+    "copyFailedDescription": "Impossible d'accéder au presse-papiers. Révélez les mots et copiez-les manuellement."
+  },
+  "walletMigrate": {
+    "seoTitle": "Migrer l'ancien portefeuille",
+    "seoDescription": "Balayez les fonds de votre ancien portefeuille Agora (nsec comme graine) vers le nouveau portefeuille BIP-39.",
+    "title": "Migrer l'ancien portefeuille",
+    "heading": "Migrez vers votre nouveau portefeuille",
+    "subheading": "Le portefeuille Bitcoin d'Agora utilise désormais une phrase de récupération BIP-39 pour pouvoir être importé dans n'importe quelle application de portefeuille. Les fonds sur vos anciennes adresses sont toujours en sécurité — cette page les balaie vers votre nouveau portefeuille en une seule transaction.",
+    "backToWallet": "Retour au portefeuille",
+    "loading": "Vérification de votre ancien portefeuille…",
+    "warning": "Cela construit une seule transaction de balayage qui consomme tous les UTXO de votre ancien portefeuille et envoie le total (moins une petite commission réseau) à la première adresse de réception de votre nouveau portefeuille. Une fois diffusée, l'opération est définitive et ne peut pas être annulée.",
+    "startButton": "Balayer vers le nouveau portefeuille",
+    "loggedOut": {
+      "title": "Connectez-vous pour migrer",
+      "description": "Connectez-vous avec l'identité Nostr qui possède l'ancien portefeuille afin que les fonds puissent être balayés vers votre nouvelle adresse."
+    },
+    "unsupported": {
+      "title": "Portefeuille indisponible",
+      "description": "La migration ne fonctionne que pour les connexions par nsec, car les clés de l'ancien portefeuille étaient dérivées directement de votre nsec. Les connexions par extension de navigateur et par signataire distant ne peuvent pas exécuter cette migration."
+    },
+    "noBlockbook": {
+      "title": "Blockbook non configuré",
+      "description": "La migration a besoin d'une URL d'indexeur Blockbook pour scanner vos anciennes adresses et diffuser la transaction de balayage."
+    },
+    "noFunds": {
+      "title": "Rien à migrer",
+      "description": "Votre ancien portefeuille n'a aucun solde dépensable. Tout est déjà dans votre nouveau portefeuille."
+    },
+    "detected": {
+      "title": "Fonds sur votre ancien portefeuille",
+      "description": "Ces fonds seront déplacés vers votre nouveau portefeuille en une seule transaction.",
+      "bip86": "On-chain",
+      "sp": "Paiements silencieux",
+      "total": "Total"
+    },
+    "destination": {
+      "title": "Destination",
+      "description": "La première adresse de réception de votre nouveau portefeuille."
+    },
+    "progress": {
+      "building": "Construction de la transaction…",
+      "signing": "Signature des entrées…",
+      "broadcasting": "Diffusion de la transaction…",
+      "dontClose": "Ne fermez pas cet onglet pendant que le balayage est en cours."
+    },
+    "success": {
+      "title": "Migration terminée",
+      "sent": "{{sats}} sats envoyés vers votre nouveau portefeuille (frais de {{fee}} sats).",
+      "viewTx": "Voir la transaction"
+    },
+    "error": {
+      "title": "La migration a échoué",
+      "tryAgain": "Réessayer"
+    },
+    "errors": {
+      "noV1Account": "Impossible d'accéder aux clés de l'ancien portefeuille.",
+      "noDestination": "Votre nouveau portefeuille n'a pas encore d'adresse de réception. Attendez que la page du portefeuille se charge et réessayez.",
+      "noBlockbook": "L'indexeur Blockbook n'est pas configuré. La migration ne peut pas scanner vos anciennes adresses.",
+      "noFunds": "Aucun fonds dépensable trouvé aux anciennes adresses.",
+      "sweepGeneric": "La migration a échoué. Veuillez réessayer."
+    },
+    "toast": {
+      "successTitle": "Migration terminée",
+      "successDesc": "{{sats}} sats déplacés vers votre nouveau portefeuille."
     }
   },
   "walletConnect": {
@@ -1850,7 +1933,7 @@
       "heading": "Votre clé",
       "extensionBody": "Vous êtes connecté avec une extension de navigateur (NIP-07). Votre clé secrète y est stockée — gérez-la ou exportez-la depuis l'extension elle-même.",
       "bunkerBody": "Vous êtes connecté avec un signataire à distance (NIP-46). Votre clé secrète est détenue par ce signataire et ne peut pas être exportée depuis {{appName}}.",
-      "explainer": "Cette clé secrète contrôle votre compte sur {{appName}}. Quiconque la possède peut publier et se faire passer pour vous. Conservez-la dans un gestionnaire de mots de passe ou ailleurs où vous seul pouvez y accéder.",
+      "explainer": "Cette clé secrète contrôle votre compte sur {{appName}} et sert de graine à votre portefeuille Bitcoin. Quiconque la possède peut publier en votre nom ET dépenser vos Bitcoins. Conservez-la dans un gestionnaire de mots de passe ou ailleurs où vous seul pouvez y accéder. Si vous souhaitez importer le portefeuille Bitcoin dans une autre application, utilisez la phrase de récupération ci-dessous — elle est plus sûre à partager, ne contrôle que le portefeuille et ne peut pas être utilisée pour vous usurper.",
       "warning": "Ne partagez JAMAIS votre clé secrète avec qui que ce soit. Évitez d'en faire une capture d'écran ou de la coller ailleurs que dans un gestionnaire de mots de passe. Si elle est partagée, d'autres pourront accéder à votre compte.",
       "aria": "Votre clé secrète",
       "copyAria": "Copier la clé secrète",

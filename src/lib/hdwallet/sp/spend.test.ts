@@ -89,12 +89,11 @@ describe('deriveSpUtxoXOnly', () => {
 
 describe('deriveSilentPaymentSpendKey', () => {
   it("matches the receiver-side B_spend = b_spend · G derivation", () => {
-    // Random nsec — value doesn't matter, only that both paths agree.
-    const nsec = hex.decode(
-      'abababababababababababababababababababababababababababababababab',
-    );
-    const bSpend = deriveSilentPaymentSpendKey(nsec);
-    const keys = deriveSilentPaymentKeys(nsec);
+    // Random 64-byte seed — value doesn't matter, only that both paths agree.
+    const seed = new Uint8Array(64);
+    for (let i = 0; i < seed.length; i++) seed[i] = (i * 17 + 1) & 0xff;
+    const bSpend = deriveSilentPaymentSpendKey(seed);
+    const keys = deriveSilentPaymentKeys(seed);
 
     // b_spend · G must equal the published `Bspend` (receive-side).
     const derivedPub = Point.BASE.multiply(bytesToNumberBE(bSpend)).toBytes(true);

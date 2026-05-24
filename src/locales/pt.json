@@ -1197,6 +1197,12 @@
       "sent": "Enviado",
       "silentBadge": "silencioso",
       "silentDetectedTitle": "Detectado via escaneamento de pagamento silencioso BIP-352"
+    },
+    "backupAction": "Fazer backup da carteira",
+    "migration": {
+      "bannerTitle": "Mova seus fundos para a nova carteira",
+      "bannerBody": "Encontramos {{amount}} em endereços da sua carteira antiga. O formato da semente do Bitcoin mudou, então esses fundos ainda não estão acessíveis a partir desta carteira. Transfira tudo com um toque.",
+      "bannerAction": "Migrar agora"
     }
   },
   "walletRecovery": {
@@ -1256,6 +1262,83 @@
     "toast": {
       "backupLoadedTitle": "Backup carregado",
       "backupLoadedDesc": "Frase de recuperação descriptografada dos seus relays."
+    }
+  },
+  "walletBackup": {
+    "heading": "Frase semente da carteira",
+    "dialogDescription": "O backup de 24 palavras da sua carteira Bitcoin. Importe-as em qualquer carteira compatível com BIP-39 (Sparrow, Electrum, Trezor, Ledger, BlueWallet, Phoenix, …) para acessar os mesmos fundos.",
+    "explainer": "Estas 24 palavras são a frase semente da sua carteira Bitcoin, derivadas de forma determinística da sua chave Nostr. Use-as para importar esta carteira em outro aplicativo de Bitcoin no caminho BIP-86 (Taproot). Diferente da sua nsec, a frase semente controla apenas seu Bitcoin — ela não pode se passar por você no Nostr.",
+    "hidden": "Toque em Revelar para exibir sua frase semente de 24 palavras.",
+    "warning": "Qualquer pessoa com estas palavras pode gastar seu Bitcoin. Nunca as compartilhe, nunca as digite em um site e nunca as armazene em texto simples fora de um gerenciador de senhas.",
+    "reveal": "Revelar",
+    "hide": "Ocultar",
+    "copy": "Copiar",
+    "copied": "Copiado",
+    "copyFailedTitle": "Falha ao copiar",
+    "copyFailedDescription": "Não foi possível acessar a área de transferência. Revele as palavras e copie-as manualmente."
+  },
+  "walletMigrate": {
+    "seoTitle": "Migrar carteira antiga",
+    "seoDescription": "Transfira fundos da sua carteira antiga do Agora (nsec como semente) para a nova carteira BIP-39.",
+    "title": "Migrar carteira antiga",
+    "heading": "Migre para sua nova carteira",
+    "subheading": "A carteira Bitcoin do Agora agora usa uma frase semente BIP-39 para poder ser importada em qualquer aplicativo de carteira. Os fundos nos seus endereços antigos continuam seguros — esta página os transfere para sua nova carteira em uma única transação.",
+    "backToWallet": "Voltar para a carteira",
+    "loading": "Verificando sua carteira antiga…",
+    "warning": "Isto constrói uma única transação de transferência que consome todos os UTXOs da sua carteira antiga e envia o total (menos uma pequena taxa de rede) para o primeiro endereço de recebimento da sua nova carteira. Depois de transmitida, a movimentação é definitiva e não pode ser desfeita.",
+    "startButton": "Transferir para a nova carteira",
+    "loggedOut": {
+      "title": "Entre para migrar",
+      "description": "Entre com a identidade Nostr que possui a carteira antiga para que os fundos possam ser transferidos para seu novo endereço."
+    },
+    "unsupported": {
+      "title": "Carteira indisponível",
+      "description": "A migração funciona apenas para logins por nsec, porque as chaves da carteira antiga eram derivadas diretamente da sua nsec. Logins por extensão de navegador e por assinador remoto não conseguem executar esta migração."
+    },
+    "noBlockbook": {
+      "title": "Blockbook não configurado",
+      "description": "A migração precisa de uma URL de indexador Blockbook para escanear seus endereços antigos e transmitir a transação de transferência."
+    },
+    "noFunds": {
+      "title": "Nada para migrar",
+      "description": "Sua carteira antiga não tem saldo disponível. Tudo já está na sua nova carteira."
+    },
+    "detected": {
+      "title": "Fundos na sua carteira antiga",
+      "description": "Esses fundos serão movidos para sua nova carteira em uma única transação.",
+      "bip86": "On-chain",
+      "sp": "Pagamentos silenciosos",
+      "total": "Total"
+    },
+    "destination": {
+      "title": "Destino",
+      "description": "O primeiro endereço de recebimento da sua nova carteira."
+    },
+    "progress": {
+      "building": "Construindo a transação…",
+      "signing": "Assinando as entradas…",
+      "broadcasting": "Transmitindo a transação…",
+      "dontClose": "Não feche esta aba enquanto a transferência estiver em andamento."
+    },
+    "success": {
+      "title": "Migração concluída",
+      "sent": "Enviados {{sats}} sats para sua nova carteira ({{fee}} sats de taxa).",
+      "viewTx": "Ver transação"
+    },
+    "error": {
+      "title": "A migração falhou",
+      "tryAgain": "Tentar novamente"
+    },
+    "errors": {
+      "noV1Account": "Não foi possível acessar as chaves da carteira antiga.",
+      "noDestination": "Sua nova carteira ainda não tem endereço de recebimento. Aguarde a página da carteira carregar e tente novamente.",
+      "noBlockbook": "O indexador Blockbook não está configurado. A migração não pode escanear seus endereços antigos.",
+      "noFunds": "Nenhum fundo disponível encontrado nos endereços antigos.",
+      "sweepGeneric": "A migração falhou. Por favor, tente novamente."
+    },
+    "toast": {
+      "successTitle": "Migração concluída",
+      "successDesc": "{{sats}} sats movidos para sua nova carteira."
     }
   },
   "walletConnect": {
@@ -1850,7 +1933,7 @@
       "heading": "Sua chave",
       "extensionBody": "Você está conectado com uma extensão de navegador (NIP-07). Sua chave secreta está armazenada lá — gerencie ou exporte-a pela própria extensão.",
       "bunkerBody": "Você está conectado com um assinador remoto (NIP-46). Sua chave secreta é mantida por esse assinador e não pode ser exportada do {{appName}}.",
-      "explainer": "Esta chave secreta controla sua conta no {{appName}}. Qualquer pessoa com ela pode publicar e se passar por você. Guarde-a em um gerenciador de senhas ou em outro lugar que só você possa acessar.",
+      "explainer": "Esta chave secreta controla sua conta no {{appName}} e gera a semente da sua carteira Bitcoin. Qualquer pessoa com ela pode publicar como você E gastar seu Bitcoin. Guarde-a em um gerenciador de senhas ou em outro lugar que só você possa acessar. Se quiser importar a carteira Bitcoin em outro aplicativo, use a frase semente abaixo — ela é mais segura para compartilhar, controla apenas a carteira e não pode ser usada para se passar por você.",
       "warning": "NUNCA compartilhe sua chave secreta com ninguém. Evite tirar capturas de tela ou colá-la em qualquer lugar exceto um gerenciador de senhas. Se compartilhada, outros poderão acessar sua conta.",
       "aria": "Sua chave secreta",
       "copyAria": "Copiar chave secreta",

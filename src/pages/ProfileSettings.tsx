@@ -23,6 +23,7 @@ import { PageHeader } from '@/components/PageHeader';
 import { HelpTip } from '@/components/HelpTip';
 import { ImageCropDialog } from '@/components/ImageCropDialog';
 import { SortableList, SortableItem } from '@/components/SortableList';
+import { WalletBackupMnemonic } from '@/components/WalletBackupMnemonic';
 import { useAppContext } from '@/hooks/useAppContext';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useNostrPublish } from '@/hooks/useNostrPublish';
@@ -830,6 +831,14 @@ export function ProfileSettings() {
               {/* Your Key — private-key backup. Rendered inside Advanced but is not part of the form. */}
               <div className="pt-2">
                 <BackupKeySection />
+              </div>
+
+              {/* Wallet seed phrase — same secret material reachable as a
+                  BIP-39 mnemonic for importing the Bitcoin wallet into
+                  other wallet apps. Only shown for nsec logins (the
+                  component renders null otherwise). */}
+              <div className="pt-4 border-t">
+                <WalletBackupMnemonic />
               </div>
             </CollapsibleContent>
           </Collapsible>

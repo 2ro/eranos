@@ -774,6 +774,12 @@
       "sent": "Enviado",
       "silentBadge": "silencioso",
       "silentDetectedTitle": "Detectado mediante el escaneo de pagos silenciosos BIP-352"
+    },
+    "backupAction": "Hacer copia de seguridad de la cartera",
+    "migration": {
+      "bannerTitle": "Mueve tus fondos a tu nueva cartera",
+      "bannerBody": "Encontramos {{amount}} en direcciones de tu cartera antigua. El formato de la semilla de Bitcoin ha cambiado, así que esos fondos aún no están disponibles desde esta cartera. Bárrelos con un solo toque.",
+      "bannerAction": "Migrar ahora"
     }
   },
   "walletRecovery": {
@@ -833,6 +839,83 @@
     "toast": {
       "backupLoadedTitle": "Copia de seguridad cargada",
       "backupLoadedDesc": "Frase de recuperación descifrada desde tus relés."
+    }
+  },
+  "walletBackup": {
+    "heading": "Frase semilla de la cartera",
+    "dialogDescription": "La copia de seguridad de 24 palabras de tu cartera Bitcoin. Impórtalas en cualquier cartera compatible con BIP-39 (Sparrow, Electrum, Trezor, Ledger, BlueWallet, Phoenix, …) para acceder a los mismos fondos.",
+    "explainer": "Estas 24 palabras son la frase semilla de tu cartera Bitcoin, derivadas de forma determinista de tu clave Nostr. Úsalas para importar esta cartera en otra aplicación de Bitcoin en la ruta BIP-86 (Taproot). A diferencia de tu nsec, la frase semilla solo controla tu Bitcoin — no puede suplantarte en Nostr.",
+    "hidden": "Toca Mostrar para ver tu frase semilla de 24 palabras.",
+    "warning": "Cualquiera que tenga estas palabras puede gastar tu Bitcoin. Nunca las compartas, nunca las escribas en un sitio web y nunca las guardes en texto plano fuera de un gestor de contraseñas.",
+    "reveal": "Mostrar",
+    "hide": "Ocultar",
+    "copy": "Copiar",
+    "copied": "Copiado",
+    "copyFailedTitle": "Error al copiar",
+    "copyFailedDescription": "No se pudo acceder al portapapeles. Muestra las palabras y cópialas manualmente."
+  },
+  "walletMigrate": {
+    "seoTitle": "Migrar cartera antigua",
+    "seoDescription": "Barre los fondos de tu cartera antigua de Agora (nsec como semilla) a la nueva cartera BIP-39.",
+    "title": "Migrar cartera antigua",
+    "heading": "Migra a tu nueva cartera",
+    "subheading": "La cartera Bitcoin de Agora ahora usa una frase semilla BIP-39 para que se pueda importar en cualquier aplicación de cartera. Los fondos de tus direcciones antiguas siguen a salvo — esta página los barre a tu nueva cartera en una sola transacción.",
+    "backToWallet": "Volver a la cartera",
+    "loading": "Comprobando tu cartera antigua…",
+    "warning": "Esto construye una única transacción de barrido que consume todos los UTXO de tu cartera antigua y envía el total (menos una pequeña comisión de red) a la primera dirección de recepción de tu nueva cartera. Una vez transmitida, el movimiento es definitivo y no se puede deshacer.",
+    "startButton": "Barrer a la nueva cartera",
+    "loggedOut": {
+      "title": "Inicia sesión para migrar",
+      "description": "Inicia sesión con la identidad de Nostr que posee la cartera antigua para que los fondos puedan barrerse a tu nueva dirección."
+    },
+    "unsupported": {
+      "title": "Cartera no disponible",
+      "description": "La migración solo funciona con inicios de sesión por nsec, porque las claves de la cartera antigua se derivaban directamente de tu nsec. Los inicios de sesión con extensión del navegador o con firmante remoto no pueden ejecutar esta migración."
+    },
+    "noBlockbook": {
+      "title": "Blockbook no configurado",
+      "description": "La migración necesita una URL de indexador Blockbook para escanear tus direcciones antiguas y transmitir la transacción de barrido."
+    },
+    "noFunds": {
+      "title": "Nada que migrar",
+      "description": "Tu cartera antigua no tiene saldo gastable. Todo está ya en tu nueva cartera."
+    },
+    "detected": {
+      "title": "Fondos en tu cartera antigua",
+      "description": "Estos fondos se moverán a tu nueva cartera en una sola transacción.",
+      "bip86": "En cadena",
+      "sp": "Pagos silenciosos",
+      "total": "Total"
+    },
+    "destination": {
+      "title": "Destino",
+      "description": "La primera dirección de recepción de tu nueva cartera."
+    },
+    "progress": {
+      "building": "Construyendo la transacción…",
+      "signing": "Firmando las entradas…",
+      "broadcasting": "Transmitiendo la transacción…",
+      "dontClose": "No cierres esta pestaña mientras el barrido está en curso."
+    },
+    "success": {
+      "title": "Migración completada",
+      "sent": "Se enviaron {{sats}} sats a tu nueva cartera ({{fee}} sats de comisión).",
+      "viewTx": "Ver transacción"
+    },
+    "error": {
+      "title": "La migración falló",
+      "tryAgain": "Intentar de nuevo"
+    },
+    "errors": {
+      "noV1Account": "No se pudo acceder a las claves de la cartera antigua.",
+      "noDestination": "Tu nueva cartera aún no tiene dirección de recepción. Espera a que cargue la página de la cartera e inténtalo de nuevo.",
+      "noBlockbook": "El indexador Blockbook no está configurado. La migración no puede escanear tus direcciones antiguas.",
+      "noFunds": "No se encontraron fondos gastables en las direcciones antiguas.",
+      "sweepGeneric": "La migración falló. Por favor, inténtalo de nuevo."
+    },
+    "toast": {
+      "successTitle": "Migración completada",
+      "successDesc": "{{sats}} sats movidos a tu nueva cartera."
     }
   },
   "walletConnect": {
@@ -1427,7 +1510,7 @@
       "heading": "Tu clave",
       "extensionBody": "Has iniciado sesión con una extensión del navegador (NIP-07). Tu clave secreta se guarda allí — gestiónala o expórtala desde la extensión.",
       "bunkerBody": "Has iniciado sesión con un firmante remoto (NIP-46). Tu clave secreta la guarda ese firmante y no se puede exportar desde {{appName}}.",
-      "explainer": "Esta clave secreta controla tu cuenta en {{appName}}. Cualquiera que la tenga puede publicar y suplantarte. Guárdala en un gestor de contraseñas o en un sitio al que solo tú tengas acceso.",
+      "explainer": "Esta clave secreta controla tu cuenta en {{appName}} y es la semilla de tu cartera Bitcoin. Cualquiera que la tenga puede publicar haciéndose pasar por ti Y gastar tu Bitcoin. Guárdala en un gestor de contraseñas o en un sitio al que solo tú tengas acceso. Si quieres importar la cartera Bitcoin en otra aplicación, usa la frase semilla de abajo — es más segura para compartir, solo controla la cartera y no puede usarse para suplantarte.",
       "warning": "NUNCA compartas tu clave secreta. Evita capturas de pantalla o pegarla en cualquier sitio que no sea un gestor de contraseñas. Si la compartes, otros podrán acceder a tu cuenta.",
       "aria": "Tu clave secreta",
       "copyAria": "Copiar clave secreta",

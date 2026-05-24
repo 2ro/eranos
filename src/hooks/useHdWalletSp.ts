@@ -185,13 +185,13 @@ export function useHdWalletSp(): UseHdWalletSpResult {
   const indexerUrl = (config.bip352IndexerUrl ?? '').trim();
   const blockbookUrl = (config.blockbookBaseUrl ?? '').trim();
   const pubkey = access.status === 'available' ? access.pubkey : '';
-  const nsecBytes = access.status === 'available' ? access.nsecBytes : undefined;
+  const seed = access.status === 'available' ? access.seed : undefined;
 
   // ── SP key derivation (memoised) ─────────────────────────────
   const keys = useMemo<SilentPaymentKeys | undefined>(() => {
-    if (!nsecBytes) return undefined;
-    return deriveSilentPaymentKeys(nsecBytes);
-  }, [nsecBytes]);
+    if (!seed) return undefined;
+    return deriveSilentPaymentKeys(seed);
+  }, [seed]);
 
   // ── Availability gating ──────────────────────────────────────
   // Compute the early-return shape *before* hooks branch so React's

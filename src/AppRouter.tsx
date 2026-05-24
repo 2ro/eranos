@@ -49,6 +49,7 @@ const ProfileSettings = lazy(() => import("./pages/ProfileSettings").then(m => (
 const SearchPage = lazy(() => import("./pages/SearchPage").then(m => ({ default: m.SearchPage })));
 const SettingsPage = lazy(() => import("./pages/SettingsPage").then(m => ({ default: m.SettingsPage })));
 const WalletPage = lazy(() => import("./pages/WalletPage").then(m => ({ default: m.WalletPage })));
+const WalletMigrateV1Page = lazy(() => import("./pages/WalletMigrateV1Page").then(m => ({ default: m.WalletMigrateV1Page })));
 const WalletRecoveryPage = lazy(() => import("./pages/WalletRecoveryPage").then(m => ({ default: m.WalletRecoveryPage })));
 const WalletSettingsPage = lazy(() => import("./pages/WalletSettingsPage").then(m => ({ default: m.WalletSettingsPage })));
 const RemoteLoginSuccessPage = lazy(() => import("./pages/RemoteLoginSuccessPage").then(m => ({ default: m.RemoteLoginSuccessPage })));
@@ -144,6 +145,7 @@ export function AppRouter() {
           <Route path="/settings/network" element={<NetworkSettingsPage />} />
           <Route path="/wallet" element={<WalletPage />} />
           <Route path="/wallet/recovery" element={<WalletRecoveryPage />} />
+          <Route path="/wallet/migrate-v1" element={<WalletMigrateV1Page />} />
           <Route path="/bitcoin" element={<Navigate to="/wallet" replace />} />
           {/* Legacy /help routes redirect to /about so existing links keep
               working. The About page and the two guides themselves live

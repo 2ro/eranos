@@ -335,18 +335,16 @@ interface BuildHdSpendArgs {
   /** Next unused index on the BIP-86 change chain. */
   nextChangeIndex: number;
   /**
-   * For SP recipients ONLY: the 32-byte raw Nostr secret key. Required to
-   * compute the per-recipient `P_k`, because BIP-352 binds the output to
-   * the tweaked Taproot scalar of every input — which is the private key
-   * material.
-   *
-   * `b_spend` (used to spend SP inputs) is also derived from this seed when
-   * any input is `kind: 'sp'`.
+   * For SP-related operations ONLY: the 64-byte BIP-32 seed (the BIP-39
+   * PBKDF2 output the rest of the HD wallet derives from). Required to
+   * compute `b_spend` for spending SP inputs, and to compute the
+   * per-recipient `P_k` for SP recipients (BIP-352 binds the output to
+   * the tweaked Taproot scalar of every input).
    *
    * The buffer is read inside this function and never persisted; callers
    * should zero it after the call.
    */
-  nsecBytes?: Uint8Array;
+  seed?: Uint8Array;
 }
 
 /**
@@ -370,7 +368,7 @@ interface BuildHdSpendArgs {
  * for it anyway.
  */
 export function buildHdSpendPsbt(args: BuildHdSpendArgs): HdUnsignedPsbt {
-  const { account, inputs, recipient, amountSats, feeRate, nextChangeIndex, nsecBytes } = args;
+  const { account, inputs, recipient, amountSats, feeRate, nextChangeIndex, seed } = args;
 
   if (!Number.isInteger(amountSats) || amountSats < BITCOIN_DUST_LIMIT) {
     throw new Error(`Amount must be at least ${BITCOIN_DUST_LIMIT} sats.`);
@@ -428,11 +426,11 @@ export function buildHdSpendPsbt(args: BuildHdSpendArgs): HdUnsignedPsbt {
   const spSenderInputs: SpSenderInput[] = [];
   const wipeAfterBuild: Uint8Array[] = [];
   const needsSpend = selected.some((i) => i.kind === 'sp');
-  if (needsSpend && !nsecBytes) {
-    throw new Error('SP UTXOs selected but nsecBytes was not provided.');
+  if (needsSpend && !seed) {
+    throw new Error('SP UTXOs selected but seed was not provided.');
   }
-  const bSpend = needsSpend && nsecBytes
-    ? deriveSilentPaymentSpendKey(nsecBytes)
+  const bSpend = needsSpend && seed
+    ? deriveSilentPaymentSpendKey(seed)
     : undefined;
   if (bSpend) wipeAfterBuild.push(bSpend);
 
@@ -480,7 +478,7 @@ export function buildHdSpendPsbt(args: BuildHdSpendArgs): HdUnsignedPsbt {
       // SP input
       const utxo = input.utxo;
       if (!bSpend) {
-        throw new Error('SP input requires nsecBytes for spending');
+        throw new Error('SP input requires seed for spending');
       }
       const tweak = hexToBytes(utxo.tweakHex);
       const xonly = deriveSpUtxoXOnly(bSpend, tweak);
@@ -580,7 +578,7 @@ export function signHdPsbt(
   psbtHex: string,
   inputDescriptors: ReadonlyArray<HdInputDescriptor | HdInputDerivation>,
   account: HdAccount,
-  nsecBytes?: Uint8Array,
+  seed?: Uint8Array,
 ): string {
   const tx = psbtFromHex(psbtHex);
 
@@ -597,10 +595,10 @@ export function signHdPsbt(
   });
 
   const hasSp = normalised.some((d) => d.kind === 'sp');
-  if (hasSp && !nsecBytes) {
-    throw new Error('Signing SP inputs requires nsecBytes.');
+  if (hasSp && !seed) {
+    throw new Error('Signing SP inputs requires seed.');
   }
-  const bSpend = hasSp && nsecBytes ? deriveSilentPaymentSpendKey(nsecBytes) : undefined;
+  const bSpend = hasSp && seed ? deriveSilentPaymentSpendKey(seed) : undefined;
 
   // For SP inputs we need every prevout's `script` + `amount` to compute
   // the BIP-341 sighash. Pull them from the PSBT inputs' witnessUtxo.
@@ -657,4 +655,160 @@ export function finalizeHdPsbt(psbtHex: string): string {
 // ---------------------------------------------------------------------------
 // Max-sendable
 // ---------------------------------------------------------------------------
+
+// ---------------------------------------------------------------------------
+// Sweep — drain every input into one output
+// ---------------------------------------------------------------------------
+
+/** Arguments accepted by {@link buildHdSweepPsbt}. */
+export interface BuildHdSweepArgs {
+  /** Account whose keys can sign all `inputs` (used for `bip86` derivation). */
+  account: HdAccount;
+  /**
+   * Every UTXO the wallet should drain. Both BIP-86 and SP inputs are
+   * supported; coin selection is bypassed — *all* inputs are consumed.
+   */
+  inputs: readonly HdInput[];
+  /** Destination address (bech32 / bech32m). Receives `total - fee` sats. */
+  destination: string;
+  /** Fee rate in sat/vB. */
+  feeRate: number;
+  /**
+   * Optional 64-byte BIP-32 seed for the *sweep source*. Required iff any
+   * input is `kind: 'sp'`, because spending v1 SP UTXOs needs `b_spend`
+   * derived from the source wallet's seed.
+   */
+  seed?: Uint8Array;
+}
+
+/** Result of {@link buildHdSweepPsbt}. */
+export interface HdSweepPsbt {
+  /** Hex-encoded unsigned PSBT, ready for `signHdPsbt`. */
+  psbtHex: string;
+  /** Network fee in satoshis. */
+  fee: number;
+  /** Sats actually sent to `destination` after subtracting fee. */
+  amountSats: number;
+  /** Total sats across all consumed inputs (sanity-check field). */
+  totalInput: number;
+  /** Per-input descriptor, aligned 1:1 with PSBT inputs. */
+  inputDescriptors: HdInputDescriptor[];
+  /** SP UTXOs consumed by this sweep, for post-broadcast bookkeeping. */
+  consumedSpUtxos: Array<{ txid: string; vout: number }>;
+}
+
+/**
+ * Build a single-output PSBT that drains every supplied input into one
+ * destination address. There is no coin selection (callers pass exactly
+ * what they want consumed), no change (every input is fully spent), and
+ * no recipient-side silent-payment math (the destination is always a
+ * plain bech32(m) address — typically a v2 BIP-86 receive address fed in
+ * by the migration page).
+ *
+ * Throws if:
+ *   - `inputs` is empty.
+ *   - `destination` doesn't validate as a Bitcoin address.
+ *   - the total input value is less than `fee + BITCOIN_DUST_LIMIT` (the
+ *     sweep wouldn't produce a non-dust output).
+ *   - any `sp` input is present but `seed` was omitted.
+ */
+export function buildHdSweepPsbt(args: BuildHdSweepArgs): HdSweepPsbt {
+  const { account, inputs, destination, feeRate, seed } = args;
+
+  if (!inputs.length) throw new Error('Sweep requires at least one input.');
+  if (!Number.isFinite(feeRate) || feeRate <= 0) {
+    throw new Error('Fee rate must be positive.');
+  }
+  if (!validateBitcoinAddress(destination)) {
+    throw new Error(`Invalid destination address: ${destination}`);
+  }
+
+  // Deduplicate by `(kind, txid, vout)` so an accidentally-duplicated input
+  // list doesn't double-spend.
+  const seen = new Set<string>();
+  const dedup: HdInput[] = [];
+  for (const i of inputs) {
+    const id = inputId(i);
+    if (seen.has(id)) continue;
+    seen.add(id);
+    dedup.push(i);
+  }
+
+  const totalInput = dedup.reduce((s, i) => s + inputValue(i), 0);
+  const fee = estimateFee(dedup.length, 1, feeRate);
+  const amountSats = totalInput - fee;
+  if (amountSats < BITCOIN_DUST_LIMIT) {
+    throw new Error(
+      `Sweep amount (${amountSats}) below dust limit after fee. ` +
+        `Total: ${totalInput}, fee: ${fee}.`,
+    );
+  }
+
+  const hasSp = dedup.some((i) => i.kind === 'sp');
+  if (hasSp && !seed) {
+    throw new Error('Sweep with SP inputs requires the source wallet seed.');
+  }
+  const bSpend = hasSp && seed ? deriveSilentPaymentSpendKey(seed) : undefined;
+
+  try {
+    const tx = new btc.Transaction();
+    const inputDescriptors: HdInputDescriptor[] = [];
+    const consumedSpUtxos: Array<{ txid: string; vout: number }> = [];
+
+    for (const input of dedup) {
+      if (input.kind === 'bip86') {
+        const utxo = input.utxo;
+        const derived = deriveAddress(
+          utxo.chain === CHANGE_CHAIN ? account.changeNode : account.receiveNode,
+          utxo.chain,
+          utxo.index,
+        );
+        if (derived.address !== utxo.address) {
+          throw new Error(
+            `UTXO address mismatch at ${utxo.chain}/${utxo.index}: ` +
+              `expected ${derived.address}, got ${utxo.address}`,
+          );
+        }
+        const internalPubkey = hex.decode(derived.internalPubkeyHex);
+        const payment = btc.p2tr(internalPubkey, undefined, HD_WALLET_NETWORK);
+        tx.addInput({
+          txid: utxo.txid,
+          index: utxo.vout,
+          witnessUtxo: { script: payment.script, amount: BigInt(utxo.value) },
+          tapInternalKey: internalPubkey,
+        });
+        inputDescriptors.push({ kind: 'bip86', chain: utxo.chain, index: utxo.index });
+      } else {
+        // SP input
+        if (!bSpend) {
+          throw new Error('SP input requires b_spend (unreachable).');
+        }
+        const utxo = input.utxo;
+        const tweak = hexToBytes(utxo.tweakHex);
+        const xonly = deriveSpUtxoXOnly(bSpend, tweak);
+        const script = spP2trScriptPubKey(xonly);
+        tx.addInput({
+          txid: utxo.txid,
+          index: utxo.vout,
+          witnessUtxo: { script, amount: BigInt(utxo.value) },
+        });
+        inputDescriptors.push({ kind: 'sp', tweakHex: utxo.tweakHex });
+        consumedSpUtxos.push({ txid: utxo.txid, vout: utxo.vout });
+      }
+    }
+
+    tx.addOutputAddress(destination, BigInt(amountSats), HD_WALLET_NETWORK);
+
+    return {
+      psbtHex: txToPsbtHex(tx),
+      fee,
+      amountSats,
+      totalInput,
+      inputDescriptors,
+      consumedSpUtxos,
+    };
+  } finally {
+    if (bSpend) bSpend.fill(0);
+  }
+}
 

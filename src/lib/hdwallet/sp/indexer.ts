@@ -5,7 +5,7 @@ import type { ScanTweakEntry } from './scanner';
 // BIP-352 tweak-data indexer client — BlindBit Oracle v2 backend
 // ---------------------------------------------------------------------------
 //
-// The HD wallet's silent-payment scan path (BIP-352 §"Scanning", NIP-SP §5.1)
+// The HD wallet's silent-payment scan path (BIP-352 §"Scanning")
 // expects an external indexer that exposes only PUBLIC per-tx tweak data, so
 // the wallet completes the ECDH locally with `bscan` (which MUST NOT leave
 // the device).

@@ -1197,6 +1197,12 @@
       "sent": "Sent",
       "silentBadge": "silent",
       "silentDetectedTitle": "Detected via BIP-352 silent payment scan"
+    },
+    "backupAction": "Back up wallet",
+    "migration": {
+      "bannerTitle": "Move funds to your new wallet",
+      "bannerBody": "We found {{amount}} sitting at addresses from your old wallet. Bitcoin's seed format changed so those funds aren't reachable from this wallet yet. Sweep them in one tap.",
+      "bannerAction": "Migrate now"
     }
   },
   "walletRecovery": {
@@ -1256,6 +1262,83 @@
     "toast": {
       "backupLoadedTitle": "Backup loaded",
       "backupLoadedDesc": "Recovery phrase decrypted from your relays."
+    }
+  },
+  "walletBackup": {
+    "heading": "Wallet seed phrase",
+    "dialogDescription": "The 24-word backup for your Bitcoin wallet. Import these into any BIP-39-compatible wallet (Sparrow, Electrum, Trezor, Ledger, BlueWallet, Phoenix, …) to access the same funds.",
+    "explainer": "These 24 words are your Bitcoin wallet's seed phrase, derived deterministically from your Nostr key. Use them to import this wallet into another Bitcoin wallet app at the BIP-86 (Taproot) path. Unlike your nsec, the seed phrase only controls your Bitcoin — it cannot impersonate you on Nostr.",
+    "hidden": "Tap Reveal to display your 24-word seed phrase.",
+    "warning": "Anyone with these words can spend your Bitcoin. Never share them, never type them into a website, never store them in plaintext outside a password manager.",
+    "reveal": "Reveal",
+    "hide": "Hide",
+    "copy": "Copy",
+    "copied": "Copied",
+    "copyFailedTitle": "Copy failed",
+    "copyFailedDescription": "Could not access the clipboard. Reveal the words and copy them manually."
+  },
+  "walletMigrate": {
+    "seoTitle": "Migrate Old Wallet",
+    "seoDescription": "Sweep funds from your legacy Agora wallet (nsec-as-seed) into the new BIP-39 wallet.",
+    "title": "Migrate Old Wallet",
+    "heading": "Migrate to your new wallet",
+    "subheading": "Agora's Bitcoin wallet now uses a BIP-39 seed phrase so it imports into any wallet app. Funds at your old addresses are still safe — this page sweeps them into your new wallet in one transaction.",
+    "backToWallet": "Back to wallet",
+    "loading": "Checking your old wallet…",
+    "warning": "This builds a single sweep transaction that consumes every UTXO from your old wallet and sends the total (minus a small network fee) to your new wallet's first receive address. Once broadcast, the move is final and cannot be undone.",
+    "startButton": "Sweep to new wallet",
+    "loggedOut": {
+      "title": "Log in to migrate",
+      "description": "Log in with the Nostr identity that owns the old wallet so the funds can be swept to your new address."
+    },
+    "unsupported": {
+      "title": "Wallet not available",
+      "description": "Migration only works for nsec logins, because the old wallet's keys were derived directly from your nsec. Browser-extension and remote-signer logins cannot run this migration."
+    },
+    "noBlockbook": {
+      "title": "Blockbook not configured",
+      "description": "Migration needs a Blockbook indexer URL to scan your old addresses and broadcast the sweep transaction."
+    },
+    "noFunds": {
+      "title": "Nothing to migrate",
+      "description": "Your old wallet has no spendable balance. Everything is already in your new wallet."
+    },
+    "detected": {
+      "title": "Funds in your old wallet",
+      "description": "These funds will be moved to your new wallet in one transaction.",
+      "bip86": "On-chain",
+      "sp": "Silent payments",
+      "total": "Total"
+    },
+    "destination": {
+      "title": "Destination",
+      "description": "Your new wallet's first receive address."
+    },
+    "progress": {
+      "building": "Building transaction…",
+      "signing": "Signing inputs…",
+      "broadcasting": "Broadcasting transaction…",
+      "dontClose": "Don't close this tab while the sweep is in progress."
+    },
+    "success": {
+      "title": "Migration complete",
+      "sent": "Sent {{sats}} sats to your new wallet ({{fee}} sats fee).",
+      "viewTx": "View transaction"
+    },
+    "error": {
+      "title": "Migration failed",
+      "tryAgain": "Try again"
+    },
+    "errors": {
+      "noV1Account": "Could not access the old wallet's keys.",
+      "noDestination": "Your new wallet has no receive address yet. Wait for the wallet page to load and try again.",
+      "noBlockbook": "Blockbook indexer is not configured. Migration cannot scan your old addresses.",
+      "noFunds": "No spendable funds found at the old addresses.",
+      "sweepGeneric": "Migration failed. Please try again."
+    },
+    "toast": {
+      "successTitle": "Migration complete",
+      "successDesc": "{{sats}} sats moved to your new wallet."
     }
   },
   "walletConnect": {
@@ -1850,7 +1933,7 @@
       "heading": "Your Key",
       "extensionBody": "You're signed in with a browser extension (NIP-07). Your secret key is stored there — manage or export it from the extension itself.",
       "bunkerBody": "You're signed in with a remote signer (NIP-46). Your secret key is held by that signer and cannot be exported from {{appName}}.",
-      "explainer": "This secret key controls your account on {{appName}}. Anyone with it can post and impersonate you. Store it in a password manager or somewhere else only you can access.",
+      "explainer": "This secret key controls your account on {{appName}} and seeds your Bitcoin wallet. Anyone with it can post as you AND spend your Bitcoin. Store it in a password manager or somewhere else only you can access. If you want to import the Bitcoin wallet into another app, use the seed phrase below — it's safer to share, only controls the wallet, and can't be used to impersonate you.",
       "warning": "NEVER share your secret key with anyone. Avoid screenshotting it or pasting it anywhere except a password manager. If shared, others will be able to access your account.",
       "aria": "Your secret key",
       "copyAria": "Copy secret key",
