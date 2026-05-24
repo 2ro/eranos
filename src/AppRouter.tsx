@@ -1,13 +1,13 @@
 import { lazy, Suspense } from "react";
 import { BrowserRouter, Link, Navigate, Outlet, Route, Routes } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import { Loader2 } from "lucide-react";
 import { Toaster } from "./components/ui/toaster";
 import { TopNav } from "./components/TopNav";
 import { ScrollToTop } from "./components/ScrollToTop";
 import { VersionCheck } from "./components/VersionCheck";
 import { useCurrentUser } from "./hooks/useCurrentUser";
 import { useProfileUrl } from "./hooks/useProfileUrl";
-import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 import { openUrl } from "@/lib/downloadFile";
 
@@ -67,12 +67,15 @@ function ProfileRedirect() {
 }
 
 function PageSkeleton() {
+  // Shown briefly while a route's lazy chunk is being fetched. A skeleton
+  // tuned to one page's shape (`max-w-6xl` with hero + paragraph blocks)
+  // ends up wrong-shaped on every other page — narrow settings pages,
+  // small wallet screens, etc. A neutral centered spinner is honest about
+  // "loading" without misleading the eye with content-shaped boxes that
+  // never appear.
   return (
-    <div className="mx-auto w-full max-w-6xl px-4 sm:px-6 py-8 space-y-4">
-      <Skeleton className="h-8 w-1/3" />
-      <Skeleton className="h-4 w-full" />
-      <Skeleton className="h-4 w-4/5" />
-      <Skeleton className="h-72 w-full rounded-xl" />
+    <div className="flex items-center justify-center py-24">
+      <Loader2 className="size-6 animate-spin text-muted-foreground" />
     </div>
   );
 }

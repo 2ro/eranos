@@ -17,6 +17,7 @@ import {
 } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
+import { Skeleton } from '@/components/ui/skeleton';
 import { LoginArea } from '@/components/auth/LoginArea';
 import { QRCodeCanvas } from '@/components/ui/qrcode';
 import {
@@ -172,8 +173,9 @@ export function WalletPage() {
       <div className="flex flex-col items-center px-4 pt-4 pb-4 space-y-6">
         {/* Balance */}
         {isLoading ? (
-          <div className="flex flex-col items-center justify-center py-8">
-            <RefreshCw className="size-6 animate-spin text-muted-foreground" />
+          <div className="flex flex-col items-center space-y-2">
+            <Skeleton className="h-10 w-40 rounded-lg" />
+            <Skeleton className="h-4 w-24 rounded" />
           </div>
         ) : error ? (
           <div className="text-center space-y-3">
