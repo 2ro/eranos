@@ -206,19 +206,22 @@ export { TEAM_SOAPBOX as TEAM_SOAPBOX_PACK } from '@/lib/agoraDefaults';
  * dedicated component from `@/components/guide/`. The page just
  * dispatches on `block.kind`.
  *
- * String fields may contain the same inline markup as FAQ answers
- * (`**bold**` and `[link](url)`), and the `{appName}` placeholder. Both
- * are resolved at read-time by the `getDonorGuideBlocks` /
- * `getActivistGuideBlocks` helpers below.
+ * The structure (block order, block kinds, paymentComparison audience,
+ * callout variant, optionGrid hrefs and chips) lives in this file. The
+ * user-visible strings live under the `guides.donor.*` and
+ * `guides.activist.*` namespaces in `src/locales/*.json`, keyed by the
+ * `id` on each structural block below.
  *
- * TODO: not yet translated. The guide blocks are still keyed off the
- * original `{appName}` (single-brace) literal — separate i18n pass.
+ * Strings may contain the inline markup supported by `renderInlineMarkup`
+ * (`**bold**` and `[link](url)`) plus i18next-style `{{appName}}`
+ * interpolation. `chips` and `href`s are not user-visible prose and stay
+ * in code — chips because they're stylistic micro-labels (mostly
+ * technical terms), hrefs because they're external URLs.
+ *
+ * Callers must trigger a re-render when the active i18n language
+ * changes; both `DonorGuidePage` and `ActivistGuidePage` do this via
+ * `useTranslation()` whose `i18n.language` dep feeds a `useMemo`.
  */
-
-/** Replace `{appName}` literals in a guide string with the resolved value. */
-function substitute(str: string, appName: string): string {
-  return str.replaceAll('{appName}', appName);
-}
 
 /**
  * The two payment options a campaign can offer. Used by table headers
@@ -305,262 +308,205 @@ export type GuideBlock =
   | GuideProseBlock
   | GuideOptionGridBlock;
 
-const DONOR_GUIDE_TEMPLATE: GuideBlock[] = [
-  {
-    kind: 'tldr',
-    lede: 'Pay the Bitcoin address on the campaign page from any wallet you already have. If the campaign accepts silent payments and your wallet supports them, your donation is private automatically.',
-    nextActions: [
-      'Pay from any Bitcoin wallet',
-      'No middleman, no holding period',
-      'Want privacy? Read below',
-    ],
-  },
+// ── Guide structure (no user-visible strings; all strings live in locales) ───
+
+/**
+ * A discriminated union of structural block descriptors. Each variant
+ * carries enough state to (a) build the rendered `GuideBlock` after a
+ * string lookup and (b) reference the right i18n keys.
+ *
+ * `id` is the leaf segment under the guide's namespace (e.g. a donor
+ * `{ kind: 'tldr', id: 'tldr' }` block resolves
+ * `guides.donor.tldr.lede` and `guides.donor.tldr.nextActions`).
+ */
+type GuideBlockStructure =
+  | { kind: 'tldr'; id: string }
+  | { kind: 'steps'; id: string; stepIds: string[] }
+  | { kind: 'paymentComparison'; id: string; audience: 'donor' | 'activist'; hasFootnote?: boolean }
+  | { kind: 'callout'; id: string; variant: 'info' | 'warning' | 'danger' | 'success' }
+  | { kind: 'prose'; id: string; paragraphCount: number; hasHeading?: boolean }
+  | {
+      kind: 'optionGrid';
+      id: string;
+      /** Optional intro paragraph above the grid. */
+      hasIntro?: boolean;
+      options: {
+        /** Leaf key under `guides.<guide>.<id>.options.<optionId>`. */
+        id: string;
+        chips: string[];
+        href?: string;
+      }[];
+    };
+
+const DONOR_GUIDE_STRUCTURE: GuideBlockStructure[] = [
+  { kind: 'tldr', id: 'tldr' },
   {
     kind: 'steps',
-    heading: 'How a donation flows',
-    steps: [
-      {
-        title: 'Open the campaign',
-        body: 'You see a single QR code. If the campaign accepts both options, it encodes both endpoints; your wallet picks the right one.',
-      },
-      {
-        title: 'Pay it from any wallet',
-        body: 'Cash App, Coinbase, Strike, a hardware wallet, anything. Pay the amount plus the network fee.',
-      },
-      {
-        title: 'It arrives directly',
-        body: "Funds settle straight to the activist. {appName} doesn't hold or route them, and the address is derived from the activist's Nostr key.",
-      },
-    ],
+    id: 'flow',
+    stepIds: ['openCampaign', 'payFromAnyWallet', 'arrivesDirectly'],
   },
-  {
-    kind: 'paymentComparison',
-    audience: 'donor',
-    footnote:
-      'Campaigns can accept Public only, Silent only, or both. If both, the QR code carries both endpoints. Your wallet picks the one it can use.',
-  },
-  {
-    kind: 'callout',
-    variant: 'warning',
-    title: 'Public donations are visible on-chain forever',
-    body: 'A **Public** donation lands at a regular Bitcoin address tied to the campaign. Anyone can look up the address and see the amount, the time, and your sending address. **Silent** donations settle on-chain too, but the receiving side is unlinkable to the campaign so they stay out of public donor lists and totals.',
-  },
+  { kind: 'paymentComparison', id: 'comparison', audience: 'donor', hasFootnote: true },
+  { kind: 'callout', id: 'publicVisible', variant: 'warning' },
   {
     kind: 'optionGrid',
-    heading: 'Donating privately',
-    intro:
-      "These steps matter most for **Public** donations, where every transaction is permanently tied to a single address. **Silent** donations already hide the receiving side, so the risk is lower. Targeted analysis of your sending wallet is still possible either way, so if your risk is high these steps are worth taking. Pick one, or stack them.",
+    id: 'privacy',
+    hasIntro: true,
     options: [
       {
-        name: 'Use a silent-payments wallet',
-        purpose:
-          'Pay with a Bitcoin wallet that supports BIP-352. If the campaign accepts silent payments, your wallet uses that endpoint automatically.',
+        id: 'silentWallet',
         chips: ['non-custodial', 'easiest', 'BIP-352'],
         href: 'https://ditto.pub',
       },
       {
-        name: 'Buy non-KYC Bitcoin',
-        purpose:
-          "Buy Bitcoin peer-to-peer so it isn't linked to your government ID in the first place. Strongest privacy starting point.",
+        id: 'nonKyc',
         chips: ['peer-to-peer', 'no ID'],
         href: 'https://bisq.network',
       },
       {
-        name: 'Coinjoin first',
-        purpose:
-          "Mix your Bitcoin with other people's coins so the output can't be traced to your KYC purchase. Useful when the campaign only accepts public.",
+        id: 'coinjoin',
         chips: ['non-custodial', 'breaks history'],
         href: 'https://wasabiwallet.io',
       },
       {
-        name: 'Use a fresh wallet',
-        purpose:
-          'Donate from a wallet that has never touched your main identity or a KYC exchange.',
+        id: 'freshWallet',
         chips: ['free', 'non-custodial', 'easiest'],
         href: 'https://sparrowwallet.com',
       },
     ],
   },
-  {
-    kind: 'callout',
-    variant: 'danger',
-    title: "Consumer apps can't make you anonymous",
-    body: 'Cash App, Coinbase, Strike, Venmo, Kraken, Binance, and PayPal all verify your ID. No matter how you send the donation, every transaction stays tied to your real identity. Use a non-custodial wallet you control.',
-  },
-  {
-    kind: 'prose',
-    heading: 'A note on silent payments today',
-    paragraphs: [
-      "Silent payments are the most private way to receive Bitcoin on-chain, but the ecosystem is young. Most popular wallets can't send to a silent-payment endpoint yet, so when a wallet can't, the donation falls back to a regular Bitcoin transaction to the campaign's public address (if the campaign accepts both).",
-      'For activists, silent-payment donations also arrive without push notifications and only appear after the activist scans their wallet, which can take minutes to hours. None of this affects the safety of your funds; it just shapes the experience.',
-    ],
-  },
+  { kind: 'callout', id: 'consumerApps', variant: 'danger' },
+  { kind: 'prose', id: 'silentToday', paragraphCount: 2, hasHeading: true },
 ];
 
-const ACTIVIST_GUIDE_TEMPLATE: GuideBlock[] = [
-  {
-    kind: 'tldr',
-    lede: "Pick what to accept when you create your campaign: Public, Silent, or both. Either option is non-custodial. {appName} never holds your funds.",
-    nextActions: [
-      'Compare the two options',
-      'Plan how you will cash out',
-      'Sweep funds promptly',
-    ],
-  },
-  {
-    kind: 'prose',
-    heading: 'How receiving works',
-    paragraphs: [
-      "Your {appName} donation addresses are derived from your Nostr public key. When you create a campaign, you pick what to accept:",
-      "**Public payments only.** A regular Bitcoin address. Visible to everyone, works with every wallet.",
-      "**Silent payments only.** BIP-352 silent payments. The receiving side is unlinkable on-chain, so donations stay out of public donor lists and totals. Donors need a silent-payments-capable wallet to send. If they don't have one, their donation can't go through.",
-      "**Both.** {appName} generates a single QR code that encodes both endpoints. Silent-payments wallets read it as private; ordinary wallets pay the public address. Donors don't have to choose.",
-      'Accepting both is usually the right call: you get private donations from supporters who use a silent-payments wallet, and you stay open to donors whose only Bitcoin is in a consumer app.',
-    ],
-  },
-  {
-    kind: 'prose',
-    heading: 'What everyone can see',
-    paragraphs: [
-      'If your campaign accepts public payments, anyone considering supporting you can look up the address and see the public donation history.',
-      "Silent-payment donations aren't part of that record. They're invisible to outside observers and don't show in the campaign's public totals; new donors only see whatever you publish about the campaign's progress.",
-    ],
-  },
-  {
-    kind: 'paymentComparison',
-    audience: 'activist',
-    footnote:
-      "You can't switch a campaign's accepted payment options after it's created. If you change your mind, make a new campaign.",
-  },
-  {
-    kind: 'prose',
-    heading: 'A note on silent payments today',
-    paragraphs: [
-      "Silent payments are the most private way to receive Bitcoin on-chain, but the ecosystem is young. Most popular wallets can't send to a silent-payment endpoint yet, so when a donor's wallet can't, the donation falls back to a regular Bitcoin transaction to your public address (if you accept both).",
-      'Silent-payment donations also arrive without push notifications and only appear after you scan your wallet, which can take minutes to hours. None of this affects the safety of your funds; it just shapes the day-to-day experience.',
-    ],
-  },
+const ACTIVIST_GUIDE_STRUCTURE: GuideBlockStructure[] = [
+  { kind: 'tldr', id: 'tldr' },
+  { kind: 'prose', id: 'howReceiving', paragraphCount: 5, hasHeading: true },
+  { kind: 'prose', id: 'whatEveryoneSees', paragraphCount: 2, hasHeading: true },
+  { kind: 'paymentComparison', id: 'comparison', audience: 'activist', hasFootnote: true },
+  { kind: 'prose', id: 'silentToday', paragraphCount: 2, hasHeading: true },
   {
     kind: 'steps',
-    heading: 'Move donations promptly',
-    steps: [
-      {
-        title: 'Sweep to a wallet you control',
-        body: 'Good self-custody options: [Sparrow](https://sparrowwallet.com), [BlueWallet](https://bluewallet.io), or [Phoenix](https://phoenix.acinq.co) (Lightning).',
-      },
-      {
-        title: "Don't sit on funds at the campaign address",
-        body: 'Treat it like a mailbox, not a savings account. This applies to both Public and Silent donations.',
-      },
-    ],
+    id: 'movePromptly',
+    stepIds: ['sweep', 'dontSit'],
   },
   {
     kind: 'optionGrid',
-    heading: 'Cashing out privately',
-    intro:
-      "Spending on-chain creates a trail unless you break it first. The simplest privacy exit is to **move funds into a silent-payments wallet first**, then spend onward; the hop breaks the link between your campaign address and what comes next. The other options below also work and have their own trade-offs.",
+    id: 'cashout',
+    hasIntro: true,
     options: [
       {
-        name: 'Silent-payments wallet hop',
-        purpose:
-          "Move your donations to a silent-payments wallet ([Ditto Wallet](https://ditto.pub), [Dana](https://github.com/cygnet3/dana/releases/download/v0.7.4/app-live-release.apk)). From there your downstream spending isn't tied to the campaign.",
+        id: 'silentHop',
         chips: ['non-custodial', 'easiest', 'low fees'],
         href: 'https://ditto.pub',
       },
       {
-        name: 'Lightning swap',
-        purpose:
-          "Atomic-swap on-chain Bitcoin to Lightning. Lightning payments don't hit the public blockchain.",
+        id: 'lightningSwap',
         chips: ['non-custodial', 'easy', 'low fees'],
         href: 'https://boltz.exchange',
       },
       {
-        name: 'Coinjoin',
-        purpose:
-          "Mix your Bitcoin with other users' coins so the output can't be linked back to the input.",
+        id: 'coinjoin',
         chips: ['non-custodial', 'high privacy'],
         href: 'https://wasabiwallet.io',
       },
       {
-        name: 'Peer-to-peer',
-        purpose:
-          'Trade Bitcoin for fiat directly with another person or through a broker on Bisq, HodlHodl, or RoboSats.',
+        id: 'peerToPeer',
         chips: ['cash', 'no KYC'],
         href: 'https://bisq.network',
       },
       {
-        name: 'Spend it directly',
-        purpose:
-          'Buy gift cards (Amazon, Uber, groceries, travel) straight from Bitcoin without converting to cash first.',
+        id: 'spendDirectly',
         chips: ['skip cash-out', 'instant'],
         href: 'https://www.bitrefill.com/us/en/',
       },
     ],
   },
-  {
-    kind: 'callout',
-    variant: 'danger',
-    title: 'Avoid centralized tumblers',
-    body: 'Custodial mixers can steal your coins, log who sent what, or turn out to be law-enforcement honeypots. Use a silent-payments hop or a non-custodial coinjoin instead.',
-  },
+  { kind: 'callout', id: 'tumblers', variant: 'danger' },
 ];
 
-/** Substitute placeholders in a single guide block. */
-function substituteGuideBlock(block: GuideBlock, appName: string): GuideBlock {
-  switch (block.kind) {
-    case 'tldr':
+/**
+ * Translation parameters passed to every `i18n.t()` call inside the
+ * guide resolver. Shared object keeps the resolver concise and ensures
+ * `{{appName}}` is consistently interpolated everywhere.
+ */
+function tParams(appName: string): Record<string, string> {
+  return { appName };
+}
+
+/** Resolve a single structural guide block to its translated `GuideBlock`. */
+function resolveGuideBlock(
+  structure: GuideBlockStructure,
+  guide: 'donor' | 'activist',
+  appName: string,
+): GuideBlock {
+  const params = tParams(appName);
+  const base = `guides.${guide}.${structure.id}`;
+
+  switch (structure.kind) {
+    case 'tldr': {
+      const lede = i18n.t(`${base}.lede`, params);
+      const raw = i18n.t(`${base}.nextActions`, { ...params, returnObjects: true });
+      const nextActions: string[] = Array.isArray(raw) ? (raw as string[]) : [];
+      return { kind: 'tldr', lede, nextActions };
+    }
+    case 'steps': {
+      const heading = i18n.t(`${base}.heading`, params);
+      const steps = structure.stepIds.map((sid) => ({
+        title: i18n.t(`${base}.steps.${sid}.title`, params),
+        body: i18n.t(`${base}.steps.${sid}.body`, params),
+      }));
+      return { kind: 'steps', heading, steps };
+    }
+    case 'paymentComparison': {
+      const footnote = structure.hasFootnote
+        ? i18n.t(`${base}.footnote`, params)
+        : undefined;
       return {
-        ...block,
-        lede: substitute(block.lede, appName),
-        nextActions: block.nextActions.map((a) => substitute(a, appName)),
+        kind: 'paymentComparison',
+        audience: structure.audience,
+        footnote,
       };
-    case 'steps':
-      return {
-        ...block,
-        heading: substitute(block.heading, appName),
-        steps: block.steps.map((s) => ({
-          title: substitute(s.title, appName),
-          body: substitute(s.body, appName),
-        })),
-      };
-    case 'paymentComparison':
-      return {
-        ...block,
-        footnote: block.footnote ? substitute(block.footnote, appName) : undefined,
-      };
-    case 'callout':
-      return {
-        ...block,
-        title: substitute(block.title, appName),
-        body: substitute(block.body, appName),
-      };
-    case 'prose':
-      return {
-        ...block,
-        heading: block.heading ? substitute(block.heading, appName) : undefined,
-        paragraphs: block.paragraphs.map((p) => substitute(p, appName)),
-      };
-    case 'optionGrid':
-      return {
-        ...block,
-        heading: substitute(block.heading, appName),
-        intro: block.intro ? substitute(block.intro, appName) : undefined,
-        options: block.options.map((o) => ({
-          ...o,
-          name: substitute(o.name, appName),
-          purpose: substitute(o.purpose, appName),
-          chips: o.chips.map((c) => substitute(c, appName)),
-        })),
-      };
+    }
+    case 'callout': {
+      const title = i18n.t(`${base}.title`, params);
+      const body = i18n.t(`${base}.body`, params);
+      return { kind: 'callout', variant: structure.variant, title, body };
+    }
+    case 'prose': {
+      const heading = structure.hasHeading
+        ? i18n.t(`${base}.heading`, params)
+        : undefined;
+      const raw = i18n.t(`${base}.paragraphs`, { ...params, returnObjects: true });
+      const paragraphs: string[] = Array.isArray(raw) ? (raw as string[]) : [];
+      return { kind: 'prose', heading, paragraphs };
+    }
+    case 'optionGrid': {
+      const heading = i18n.t(`${base}.heading`, params);
+      const intro = structure.hasIntro
+        ? i18n.t(`${base}.intro`, params)
+        : undefined;
+      const options: GuideOptionItem[] = structure.options.map((opt) => ({
+        name: i18n.t(`${base}.options.${opt.id}.name`, params),
+        purpose: i18n.t(`${base}.options.${opt.id}.purpose`, params),
+        chips: opt.chips,
+        href: opt.href,
+      }));
+      return { kind: 'optionGrid', heading, intro, options };
+    }
   }
 }
 
-/** Donor guide blocks with `{appName}` resolved. */
+/**
+ * Donor guide blocks, resolved against the active language and with
+ * `{{appName}}` interpolated to `appName`. Re-renders are the caller's
+ * responsibility — `DonorGuidePage` depends on `i18n.language` so a
+ * language switch re-evaluates this.
+ */
 export function getDonorGuideBlocks(appName: string): GuideBlock[] {
-  return DONOR_GUIDE_TEMPLATE.map((b) => substituteGuideBlock(b, appName));
+  return DONOR_GUIDE_STRUCTURE.map((b) => resolveGuideBlock(b, 'donor', appName));
 }
 
-/** Activist guide blocks with `{appName}` resolved. */
+/** Activist guide blocks — same contract as `getDonorGuideBlocks`. */
 export function getActivistGuideBlocks(appName: string): GuideBlock[] {
-  return ACTIVIST_GUIDE_TEMPLATE.map((b) => substituteGuideBlock(b, appName));
+  return ACTIVIST_GUIDE_STRUCTURE.map((b) => resolveGuideBlock(b, 'activist', appName));
 }

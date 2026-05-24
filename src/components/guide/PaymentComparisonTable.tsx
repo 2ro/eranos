@@ -1,5 +1,6 @@
 import { Bell, Bug, Eye, EyeOff, Gauge, ShieldCheck, Sparkles, Wallet } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 import { cn } from '@/lib/utils';
 import { renderInlineMarkup } from '@/lib/helpMarkup';
@@ -13,91 +14,26 @@ interface Row {
   silent: string;
 }
 
-const DONOR_ROWS: Row[] = [
-  {
-    label: 'What you see',
-    Icon: Eye,
-    public: 'A regular Bitcoin address you can pay from anywhere.',
-    silent:
-      'The same QR. Your wallet picks the silent-payment endpoint if it supports BIP-352.',
-  },
-  {
-    label: 'Wallet support',
-    Icon: Wallet,
-    public:
-      'Every Bitcoin wallet. Cash App, Coinbase, Strike, hardware, anything.',
-    silent:
-      'Few wallets today. Most fall back to a regular Bitcoin transaction.',
-  },
-  {
-    label: 'Privacy of the donation',
-    Icon: ShieldCheck,
-    public:
-      'Public on-chain. Your sending address is permanently linked to the campaign.',
-    silent:
-      "Receiving side is unlinkable on-chain. Your sending wallet's trail is still public.",
-  },
-  {
-    label: 'Settlement',
-    Icon: Gauge,
-    public: 'Normal Bitcoin confirmations.',
-    silent:
-      'Same on-chain confirmations, but the activist has to scan their wallet to find it.',
-  },
+/**
+ * Row IDs and icons. Strings live in `guides.shared.paymentComparison.*`
+ * in the locale files, keyed by the `id` below. Keeping icons in code
+ * lets translators ignore the visual layer entirely.
+ */
+const DONOR_ROW_IDS: { id: string; Icon: LucideIcon }[] = [
+  { id: 'whatYouSee', Icon: Eye },
+  { id: 'walletSupport', Icon: Wallet },
+  { id: 'privacy', Icon: ShieldCheck },
+  { id: 'settlement', Icon: Gauge },
 ];
 
-const ACTIVIST_ROWS: Row[] = [
-  {
-    label: 'What donors see',
-    Icon: Sparkles,
-    public:
-      'A regular Bitcoin address. Works with every wallet on earth.',
-    silent:
-      "A BIP-352 endpoint. Donors' wallets need silent-payments support; otherwise the donation falls back to a regular Bitcoin transaction.",
-  },
-  {
-    label: 'Receiving speed',
-    Icon: Gauge,
-    public: 'Push-style. Donations show up immediately on the campaign page.',
-    silent:
-      'Manual scanning. Your wallet has to walk the blockchain looking for them. Minutes to hours, depending on the wallet.',
-  },
-  {
-    label: 'Push notifications',
-    Icon: Bell,
-    public: 'Yes. You see new donations the moment they arrive.',
-    silent: 'No. Open the wallet and trigger a scan to discover them.',
-  },
-  {
-    label: 'Donor list / campaign totals',
-    Icon: Eye,
-    public:
-      'Public forever. Amounts and sending addresses are visible to anyone.',
-    silent:
-      "Private. The campaign page can't show silent-payments donation counts or totals.",
-  },
-  {
-    label: 'Ecosystem maturity',
-    Icon: Bug,
-    public: 'Mature. Settled tooling.',
-    silent:
-      'Bleeding-edge. Wallets are still buggy; expect missed payments that show up on a later scan.',
-  },
-  {
-    label: 'Best for',
-    Icon: ShieldCheck,
-    public:
-      'Above-ground fundraisers where social proof and visibility help.',
-    silent:
-      'Campaigns where donor or activist privacy matters more than the visible total.',
-  },
-  {
-    label: 'Watch out for',
-    Icon: EyeOff,
-    public: 'Permanent public record of every donor.',
-    silent:
-      "Bumpy UX today. Some donations won't show until the activist scans.",
-  },
+const ACTIVIST_ROW_IDS: { id: string; Icon: LucideIcon }[] = [
+  { id: 'whatDonorsSee', Icon: Sparkles },
+  { id: 'receivingSpeed', Icon: Gauge },
+  { id: 'pushNotifications', Icon: Bell },
+  { id: 'donorList', Icon: Eye },
+  { id: 'ecosystem', Icon: Bug },
+  { id: 'bestFor', Icon: ShieldCheck },
+  { id: 'watchOutFor', Icon: EyeOff },
 ];
 
 /**
@@ -109,14 +45,31 @@ const ACTIVIST_ROWS: Row[] = [
  *   the same row labels inside each card. No sideways scrolling.
  *
  * Row content is driven by the `audience` flag so donors and activists
- * get row copy tuned to what they care about.
+ * get row copy tuned to what they care about. All strings are read from
+ * i18n keyed by audience-specific row IDs in `helpContent.ts`'s
+ * structural template.
  */
 export function PaymentComparisonTable({
   block,
 }: {
   block: GuidePaymentComparisonBlock;
 }) {
-  const rows = block.audience === 'donor' ? DONOR_ROWS : ACTIVIST_ROWS;
+  const { t } = useTranslation();
+  const rowIds = block.audience === 'donor' ? DONOR_ROW_IDS : ACTIVIST_ROW_IDS;
+  const audienceKey = block.audience === 'donor' ? 'donorRows' : 'activistRows';
+
+  const rows: Row[] = rowIds.map(({ id, Icon }) => ({
+    label: t(`guides.shared.paymentComparison.${audienceKey}.${id}.label`),
+    Icon,
+    public: t(`guides.shared.paymentComparison.${audienceKey}.${id}.public`),
+    silent: t(`guides.shared.paymentComparison.${audienceKey}.${id}.silent`),
+  }));
+
+  const headerText = t(
+    block.audience === 'donor'
+      ? 'guides.shared.paymentComparison.donorHeader'
+      : 'guides.shared.paymentComparison.activistHeader',
+  );
 
   return (
     <section>
@@ -126,7 +79,7 @@ export function PaymentComparisonTable({
           {/* Header row */}
           <div className="grid grid-cols-[1.1fr_1fr_1fr] bg-secondary/40 border-b">
             <div className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-              {block.audience === 'donor' ? 'When you donate' : 'When you create'}
+              {headerText}
             </div>
             <div className="px-4 py-3 border-l">
               <InlinePaymentBadge mode="public" />

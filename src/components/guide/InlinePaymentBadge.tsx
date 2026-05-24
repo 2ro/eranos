@@ -1,3 +1,5 @@
+import { useTranslation } from 'react-i18next';
+
 import { cn } from '@/lib/utils';
 import type { PaymentMode } from '@/lib/helpContent';
 
@@ -16,7 +18,8 @@ interface InlinePaymentBadgeProps {
  * either looking like a warning state.
  */
 export function InlinePaymentBadge({ mode, className }: InlinePaymentBadgeProps) {
-  const label = mode === 'public' ? 'Public' : 'Silent';
+  const { t } = useTranslation();
+  const label = t(`guides.shared.paymentBadge.${mode}`);
   return (
     <span
       className={cn(
@@ -27,7 +30,7 @@ export function InlinePaymentBadge({ mode, className }: InlinePaymentBadgeProps)
         className,
       )}
     >
-      {label} Payments
+      {label}
     </span>
   );
 }

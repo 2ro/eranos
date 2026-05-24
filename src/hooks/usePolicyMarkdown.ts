@@ -37,7 +37,8 @@ const loaders: LoaderMap = {
     ar: () => import('../content/csae/ar.md?raw'),
     fa: () => import('../content/csae/fa.md?raw'),
     ps: () => import('../content/csae/ps.md?raw'),
-    // km, sn fall back to en via the loader's English fallback path.
+    km: () => import('../content/csae/km.md?raw'),
+    sn: () => import('../content/csae/sn.md?raw'),
   },
 };
 
