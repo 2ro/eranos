@@ -1243,198 +1243,198 @@
     }
   },
   "notifications": {
-    "seoTitle": "Notifications",
-    "seoDescription": "Your Nostr notifications",
-    "title": "Notifications",
+    "seoTitle": "Уведомления",
+    "seoDescription": "Ваши уведомления Nostr",
+    "title": "Уведомления",
     "tabs": {
-      "all": "All",
-      "mentions": "Mentions"
+      "all": "Все",
+      "mentions": "Упоминания"
     },
-    "loginPrompt": "Log in to see your notifications.",
-    "empty": "No notifications yet.",
+    "loginPrompt": "Войдите, чтобы увидеть свои уведомления.",
+    "empty": "Пока нет уведомлений.",
     "subject": {
-      "twoActors": "<0></0> and <1></1>",
-      "andOthers_one": " and {{count}} other",
-      "andOthers_other": " and {{count}} others"
+      "twoActors": "<0></0> и <1></1>",
+      "andOthers_one": " и ещё {{count}}",
+      "andOthers_other": " и ещё {{count}}"
     },
     "actorAvatars": {
-      "moreCount": "+{{count}} more"
+      "moreCount": "+{{count}} ещё"
     },
     "actions": {
-      "reactedToYour": "reacted to your {{noun}}",
-      "repostedYour": "reposted your {{noun}}",
-      "zappedYou": "zapped you",
-      "zappedYouWithAmount": "zapped you {{sats}} sats",
-      "repliedToYourNote": "replied to your note",
-      "mentionedYou": "mentioned you",
-      "repliedToYourComment": "replied to your comment",
-      "commentedOnYour": "commented on your {{noun}}",
-      "sentYouLetter": "sent you a letter",
-      "highlightedYour": "highlighted your {{noun}}",
-      "awardedBadge": "awarded you a badge",
-      "awardedBadges": "awarded you badges"
+      "reactedToYour": "отреагировал(а) на ваш {{noun}}",
+      "repostedYour": "репостнул(а) ваш {{noun}}",
+      "zappedYou": "запил(а) вас",
+      "zappedYouWithAmount": "запил(а) вас на {{sats}} сатов",
+      "repliedToYourNote": "ответил(а) на вашу заметку",
+      "mentionedYou": "упомянул(а) вас",
+      "repliedToYourComment": "ответил(а) на ваш комментарий",
+      "commentedOnYour": "прокомментировал(а) ваш {{noun}}",
+      "sentYouLetter": "отправил(а) вам письмо",
+      "highlightedYour": "выделил(а) ваш {{noun}}",
+      "awardedBadge": "вручил(а) вам значок",
+      "awardedBadges": "вручил(а) вам значки"
     },
     "letter": {
-      "viewAll": "View all letters",
-      "reply": "Reply"
+      "viewAll": "Посмотреть все письма",
+      "reply": "Ответить"
     },
     "kinds": {
-      "profile": "profile",
-      "post": "post",
-      "encryptedMessage": "encrypted message",
-      "repost": "repost",
-      "reaction": "reaction",
-      "badgeAward": "badge award",
-      "photo": "photo",
-      "video": "video",
-      "requestToVanish": "request to vanish",
-      "file": "file",
-      "poll": "poll",
-      "comment": "comment",
-      "voiceMessage": "voice message",
-      "patch": "patch",
+      "profile": "профиль",
+      "post": "публикация",
+      "encryptedMessage": "зашифрованное сообщение",
+      "repost": "репост",
+      "reaction": "реакция",
+      "badgeAward": "вручение значка",
+      "photo": "фото",
+      "video": "видео",
+      "requestToVanish": "запрос на исчезновение",
+      "file": "файл",
+      "poll": "опрос",
+      "comment": "комментарий",
+      "voiceMessage": "голосовое сообщение",
+      "patch": "патч",
       "pullRequest": "pull request",
-      "highlight": "highlight",
-      "birdDetection": "bird detection",
+      "highlight": "выделение",
+      "birdDetection": "обнаружение птицы",
       "birdex": "Birdex",
-      "colorMoment": "color moment",
-      "foundLog": "found log",
+      "colorMoment": "цветовой момент",
+      "foundLog": "журнал находок",
       "nsite": "nsite",
-      "profileBadges": "profile badges",
-      "badge": "badge",
-      "article": "article",
-      "emojiPack": "emoji pack",
-      "podcastEpisode": "podcast episode",
-      "podcastTrailer": "podcast trailer",
-      "zapstoreAsset": "Zapstore asset",
-      "zapstoreRelease": "Zapstore release",
-      "stream": "stream",
-      "status": "status",
-      "repository": "repository",
-      "customNip": "custom NIP",
-      "calendarEvent": "calendar event",
-      "zapstoreApp": "Zapstore app",
-      "playlist": "playlist",
-      "divine": "divine",
-      "community": "community",
-      "goal": "goal",
-      "track": "track",
-      "magicDeck": "Magic deck",
-      "treasure": "treasure",
-      "constellation": "constellation",
-      "followPack": "follow pack"
+      "profileBadges": "значки профиля",
+      "badge": "значок",
+      "article": "статья",
+      "emojiPack": "набор эмодзи",
+      "podcastEpisode": "эпизод подкаста",
+      "podcastTrailer": "трейлер подкаста",
+      "zapstoreAsset": "актив Zapstore",
+      "zapstoreRelease": "релиз Zapstore",
+      "stream": "трансляция",
+      "status": "статус",
+      "repository": "репозиторий",
+      "customNip": "пользовательский NIP",
+      "calendarEvent": "событие календаря",
+      "zapstoreApp": "приложение Zapstore",
+      "playlist": "плейлист",
+      "divine": "божественный",
+      "community": "сообщество",
+      "goal": "цель",
+      "track": "трек",
+      "magicDeck": "Магическая колода",
+      "treasure": "клад",
+      "constellation": "созвездие",
+      "followPack": "набор подписок"
     }
   },
   "notifSettings": {
-    "seoTitle": "Notifications",
-    "seoDescription": "Configure your notification preferences",
-    "title": "Notifications",
-    "subtitle": "Customize which notifications you receive.",
-    "pushHeading": "Push Notifications",
+    "seoTitle": "Уведомления",
+    "seoDescription": "Настройте свои предпочтения уведомлений",
+    "title": "Уведомления",
+    "subtitle": "Настройте, какие уведомления вы получаете.",
+    "pushHeading": "Push-уведомления",
     "enablePush": {
-      "label": "Enable Push Notifications",
-      "description": "Receive notifications for activity on your posts"
+      "label": "Включить push-уведомления",
+      "description": "Получайте уведомления об активности по вашим публикациям"
     },
-    "unsupported": "Your browser does not support push notifications.",
-    "denied": "Notifications are blocked. Update your browser settings to allow notifications from this site.",
+    "unsupported": "Ваш браузер не поддерживает push-уведомления.",
+    "denied": "Уведомления заблокированы. Обновите настройки браузера, чтобы разрешить уведомления с этого сайта.",
     "deliveryMethod": {
-      "heading": "Delivery Method",
-      "intro": "Choose how notifications are delivered to your device.",
+      "heading": "Способ доставки",
+      "intro": "Выберите, как уведомления доставляются на ваше устройство.",
       "push": {
         "label": "Push",
-        "description": "Standard notifications. No persistent status bar icon."
+        "description": "Стандартные уведомления. Без постоянного значка в строке состояния."
       },
       "persistent": {
-        "label": "Persistent",
-        "description": "Polls relays directly in the background for new notifications. Use this for reliable delivery on devices without push notification support."
+        "label": "Постоянные",
+        "description": "Опрашивает реле напрямую в фоне на новые уведомления. Используйте для надёжной доставки на устройствах без поддержки push-уведомлений."
       }
     },
     "notifyAbout": {
-      "heading": "Notify Me About",
-      "filterHeading": "Filter",
-      "typesHeading": "Types",
+      "heading": "Уведомлять меня о",
+      "filterHeading": "Фильтр",
+      "typesHeading": "Типы",
       "onlyFollowing": {
-        "label": "Only from people I follow",
-        "description": "Hide notifications from accounts you don't follow"
+        "label": "Только от людей, на которых я подписан",
+        "description": "Скрывать уведомления от аккаунтов, на которых вы не подписаны"
       }
     },
     "types": {
       "reactions": {
-        "label": "Reactions",
-        "description": "When someone reacts to your posts"
+        "label": "Реакции",
+        "description": "Когда кто-то реагирует на ваши публикации"
       },
       "reposts": {
-        "label": "Reposts",
-        "description": "When someone reposts your notes"
+        "label": "Репосты",
+        "description": "Когда кто-то репостит ваши заметки"
       },
       "zaps": {
-        "label": "Zaps",
-        "description": "When someone sends you a lightning or on-chain zap"
+        "label": "Запы",
+        "description": "Когда кто-то отправляет вам Lightning- или on-chain-зап"
       },
       "mentions": {
-        "label": "Mentions",
-        "description": "When someone mentions you in a note"
+        "label": "Упоминания",
+        "description": "Когда кто-то упоминает вас в заметке"
       },
       "comments": {
-        "label": "Comments & Replies",
-        "description": "When someone comments on or replies to your posts"
+        "label": "Комментарии и ответы",
+        "description": "Когда кто-то комментирует или отвечает на ваши публикации"
       },
       "badges": {
-        "label": "Badge Awards",
-        "description": "When someone awards you a badge"
+        "label": "Вручение значков",
+        "description": "Когда кто-то вручает вам значок"
       },
       "letters": {
-        "label": "Letters",
-        "description": "When someone sends you a letter"
+        "label": "Письма",
+        "description": "Когда кто-то отправляет вам письмо"
       },
       "highlights": {
-        "label": "Highlights",
-        "description": "When someone highlights your content"
+        "label": "Выделения",
+        "description": "Когда кто-то выделяет ваш контент"
       }
     },
     "toast": {
-      "enableFailedTitle": "Failed to enable notifications",
-      "enableFailedDesc": "Please try again."
+      "enableFailedTitle": "Не удалось включить уведомления",
+      "enableFailedDesc": "Пожалуйста, попробуйте снова."
     }
   },
   "search": {
-    "seoTitle": "Search",
-    "seoDescription": "Search Nostr",
-    "title": "Search",
-    "inputPlaceholder": "Search",
-    "filtersAria": "Search filters",
+    "seoTitle": "Поиск",
+    "seoDescription": "Поиск в Nostr",
+    "title": "Поиск",
+    "inputPlaceholder": "Поиск",
+    "filtersAria": "Фильтры поиска",
     "tabs": {
       "agora": "Agora",
       "nostr": "Nostr",
-      "accounts": "Accounts"
+      "accounts": "Аккаунты"
     },
     "filters": {
-      "title": "Filters",
-      "reset": "Reset",
-      "from": "From",
-      "sort": "Sort",
-      "media": "Media",
-      "protocol": "Protocol",
-      "language": "Language",
-      "kind": "Kind",
-      "kindCustomPlaceholder": "e.g. 1, 30023",
-      "includeReplies": "Include replies",
+      "title": "Фильтры",
+      "reset": "Сбросить",
+      "from": "От",
+      "sort": "Сортировка",
+      "media": "Медиа",
+      "protocol": "Протокол",
+      "language": "Язык",
+      "kind": "Тип",
+      "kindCustomPlaceholder": "напр. 1, 30023",
+      "includeReplies": "Включать ответы",
       "authorScope": {
-        "anyone": "Anyone",
-        "follows": "Follows",
-        "people": "People"
+        "anyone": "Любой",
+        "follows": "Подписки",
+        "people": "Люди"
       },
       "sortOptions": {
-        "recent": "Recent",
-        "hot": "Hot",
-        "trending": "Trending"
+        "recent": "Недавнее",
+        "hot": "Горячее",
+        "trending": "В тренде"
       },
       "mediaOptions": {
-        "all": "All",
-        "images": "Images",
-        "videos": "Videos",
+        "all": "Все",
+        "images": "Изображения",
+        "videos": "Видео",
         "shorts": "Shorts",
-        "none": "No media"
+        "none": "Без медиа"
       },
       "protocolOptions": {
         "nostr": "Nostr",
@@ -1442,168 +1442,168 @@
         "bluesky": "Bluesky"
       },
       "langOptions": {
-        "global": "Global",
-        "en": "English",
-        "es": "Spanish",
-        "fr": "French",
-        "de": "German",
-        "ja": "Japanese",
-        "zh": "Chinese"
+        "global": "Глобально",
+        "en": "Английский",
+        "es": "Испанский",
+        "fr": "Французский",
+        "de": "Немецкий",
+        "ja": "Японский",
+        "zh": "Китайский"
       }
     },
     "chips": {
-      "noReplies": "No replies",
-      "images": "Images",
-      "videos": "Videos",
-      "shortsAndDivines": "Shorts & Divines",
-      "noMedia": "No media",
+      "noReplies": "Без ответов",
+      "images": "Изображения",
+      "videos": "Видео",
+      "shortsAndDivines": "Shorts и Divines",
+      "noMedia": "Без медиа",
       "mastodon": "Mastodon",
       "bluesky": "Bluesky",
-      "hot": "Hot",
-      "trending": "Trending",
-      "allKinds": "All kinds",
-      "customKind": "Kind: {{kind}}",
-      "kindNumber": "Kind {{kind}}",
-      "kindsCount_one": "{{count}} kind",
-      "kindsCount_other": "{{count}} kinds",
-      "myFollows": "My follows",
-      "authorsCount_one": "{{count}} author",
-      "authorsCount_other": "{{count}} authors"
+      "hot": "Горячее",
+      "trending": "В тренде",
+      "allKinds": "Все типы",
+      "customKind": "Тип: {{kind}}",
+      "kindNumber": "Тип {{kind}}",
+      "kindsCount_one": "{{count}} тип",
+      "kindsCount_other": "{{count}} типов",
+      "myFollows": "Мои подписки",
+      "authorsCount_one": "{{count}} автор",
+      "authorsCount_other": "{{count}} авторов"
     },
-    "clear": "Clear",
-    "searchLabel": "search:",
-    "newPosts_one": "{{count}} new post",
-    "newPosts_other": "{{count}} new posts",
-    "following": "Following",
-    "botAccount": "Bot account",
+    "clear": "Очистить",
+    "searchLabel": "поиск:",
+    "newPosts_one": "{{count}} новая публикация",
+    "newPosts_other": "{{count}} новых публикаций",
+    "following": "Подписан",
+    "botAccount": "Бот-аккаунт",
     "empty": {
-      "posts": "No results found matching your search.",
-      "postsPrompt": "Enter a search query to find Nostr content.",
-      "accounts": "No accounts found matching your search.",
-      "followsPrompt": "Search for people by name or NIP-05 address.",
-      "agora": "No Agora campaigns, pledges, or groups found matching your search.",
-      "agoraPrompt": "Search Agora campaigns, pledges, and groups, or browse the latest.",
-      "activeFilters": "Active filters:",
-      "clearAll": "Clear all filters"
+      "posts": "Не найдено результатов, соответствующих вашему запросу.",
+      "postsPrompt": "Введите поисковый запрос, чтобы найти контент Nostr.",
+      "accounts": "Не найдено аккаунтов, соответствующих вашему запросу.",
+      "followsPrompt": "Ищите людей по имени или адресу NIP-05.",
+      "agora": "Не найдено кампаний Agora, обещаний или групп, соответствующих вашему запросу.",
+      "agoraPrompt": "Ищите кампании, обещания и группы Agora или просматривайте последние.",
+      "activeFilters": "Активные фильтры:",
+      "clearAll": "Очистить все фильтры"
     }
   },
   "profile": {
-    "seoDescriptionFallback": "Nostr profile",
-    "anonymous": "Anonymous",
-    "userNotFound": "User not found.",
-    "userNotFoundNip05": "User not found: {{handle}}",
-    "couldNotResolveNip05": "Could not resolve this NIP-05 identifier.",
+    "seoDescriptionFallback": "Профиль Nostr",
+    "anonymous": "Аноним",
+    "userNotFound": "Пользователь не найден.",
+    "userNotFoundNip05": "Пользователь не найден: {{handle}}",
+    "couldNotResolveNip05": "Не удалось распознать этот идентификатор NIP-05.",
     "tabs": {
-      "overview": "Overview",
-      "activity": "Activity",
-      "campaigns": "Campaigns",
-      "groups": "Groups",
-      "pledges": "Pledges"
+      "overview": "Обзор",
+      "activity": "Активность",
+      "campaigns": "Кампании",
+      "groups": "Группы",
+      "pledges": "Обещания"
     },
     "header": {
-      "editProfile": "Edit profile",
-      "shareFollowLink": "Share follow link",
-      "moreOptions": "More options",
-      "donate": "Donate",
-      "campaignGoal": "Goal ${{amount}}"
+      "editProfile": "Изменить профиль",
+      "shareFollowLink": "Поделиться ссылкой на подписку",
+      "moreOptions": "Больше опций",
+      "donate": "Пожертвовать",
+      "campaignGoal": "Цель {{amount}} $"
     },
     "stats": {
-      "followers": "Followers",
-      "following": "Following",
-      "raised": "Raised",
-      "followersTitle_one": "{{count}} follower",
-      "followersTitle_other": "{{count}} followers",
-      "followingTitle": "{{count}} following"
+      "followers": "Подписчики",
+      "following": "Подписки",
+      "raised": "Собрано",
+      "followersTitle_one": "{{count}} подписчик",
+      "followersTitle_other": "{{count}} подписчиков",
+      "followingTitle": "{{count}} подписок"
     },
     "sections": {
-      "profile": "Profile",
-      "campaigns": "Campaigns",
-      "latestPledge": "Latest pledge",
-      "groups": "Groups",
-      "seeAllCampaigns_one": "See all {{count}} campaign →",
-      "seeAllCampaigns_other": "See all {{count}} campaigns →",
-      "viewCampaignsTab": "View campaigns tab →",
-      "seeAllPledges_one": "See all {{count}} pledge →",
-      "seeAllPledges_other": "See all {{count}} pledges →",
-      "seeAllGroups": "See all {{count}} →"
+      "profile": "Профиль",
+      "campaigns": "Кампании",
+      "latestPledge": "Последнее обещание",
+      "groups": "Группы",
+      "seeAllCampaigns_one": "Посмотреть все {{count}} кампанию →",
+      "seeAllCampaigns_other": "Посмотреть все {{count}} кампаний →",
+      "viewCampaignsTab": "Посмотреть вкладку кампаний →",
+      "seeAllPledges_one": "Посмотреть все {{count}} обещание →",
+      "seeAllPledges_other": "Посмотреть все {{count}} обещаний →",
+      "seeAllGroups": "Посмотреть все {{count}} →"
     },
     "badges": {
-      "founder": "Founder",
-      "moderator": "Moderator",
-      "mod": "Mod",
-      "ended": "Ended",
-      "pledged": "Pledged"
+      "founder": "Основатель",
+      "moderator": "Модератор",
+      "mod": "Мод",
+      "ended": "Завершено",
+      "pledged": "Обещано"
     },
     "moreMenu": {
-      "title": "Profile options",
-      "copyPubkey": "Copy public key",
-      "copyLink": "Copy profile link",
-      "addToList": "Add to list",
-      "shareFollowLink": "Share follow link",
-      "profileRecovery": "Profile recovery",
+      "title": "Параметры профиля",
+      "copyPubkey": "Копировать публичный ключ",
+      "copyLink": "Копировать ссылку профиля",
+      "addToList": "Добавить в список",
+      "shareFollowLink": "Поделиться ссылкой на подписку",
+      "profileRecovery": "Восстановление профиля",
       "zap": "Zap",
-      "awardBadge": "Award badge",
-      "writeLetter": "Write a letter",
-      "mute": "Mute @{{name}}",
-      "unmute": "Unmute @{{name}}",
-      "report": "Report @{{name}}",
-      "close": "Close"
+      "awardBadge": "Вручить значок",
+      "writeLetter": "Написать письмо",
+      "mute": "Заглушить @{{name}}",
+      "unmute": "Разглушить @{{name}}",
+      "report": "Пожаловаться на @{{name}}",
+      "close": "Закрыть"
     },
     "toast": {
-      "pubkeyCopied": "Public key copied to clipboard",
-      "linkCopied": "Profile link copied to clipboard",
-      "muted": "Muted @{{name}}",
-      "unmuted": "Unmuted @{{name}}",
-      "muteFailed": "Failed to mute user",
-      "unmuteFailed": "Failed to unmute user",
-      "followed": "Followed @{{name}}",
-      "unfollowed": "Unfollowed @{{name}}",
-      "followFailed": "Failed to update follow list",
-      "btcAddressCopied": "Bitcoin address copied to clipboard"
+      "pubkeyCopied": "Публичный ключ скопирован в буфер обмена",
+      "linkCopied": "Ссылка профиля скопирована в буфер обмена",
+      "muted": "@{{name}} заглушен(а)",
+      "unmuted": "@{{name}} разглушен(а)",
+      "muteFailed": "Не удалось заглушить пользователя",
+      "unmuteFailed": "Не удалось разглушить пользователя",
+      "followed": "Подписка на @{{name}}",
+      "unfollowed": "Отписка от @{{name}}",
+      "followFailed": "Не удалось обновить список подписок",
+      "btcAddressCopied": "Bitcoin-адрес скопирован в буфер обмена"
     },
     "followingModal": {
-      "title": "{{name}} follows",
-      "empty": "Not following anyone yet."
+      "title": "{{name}} подписан(а) на",
+      "empty": "Пока ни на кого не подписан(а)."
     },
     "followersModal": {
-      "title": "{{name}}'s followers",
-      "empty": "No followers found."
+      "title": "Подписчики {{name}}",
+      "empty": "Подписчики не найдены."
     },
     "bitcoinModal": {
       "title": "Bitcoin",
-      "qrAlt": "Bitcoin QR",
-      "copyAddress": "Copy address",
-      "showQr": "Show QR code",
-      "viewOnMempool": "View on mempool.space"
+      "qrAlt": "QR Bitcoin",
+      "copyAddress": "Копировать адрес",
+      "showQr": "Показать QR-код",
+      "viewOnMempool": "Посмотреть на mempool.space"
     },
     "lightbox": {
-      "openOriginal": "Open original",
-      "close": "Close (Esc)",
-      "imageAlt": "Profile image"
+      "openOriginal": "Открыть оригинал",
+      "close": "Закрыть (Esc)",
+      "imageAlt": "Изображение профиля"
     },
     "activity": {
-      "empty": "No activity from {{name}} yet. Posts, campaigns, pledges, and donations all show up here."
+      "empty": "Пока нет активности от {{name}}. Публикации, кампании, обещания и пожертвования отображаются здесь."
     },
     "campaigns": {
-      "count_one": "{{count}} campaign",
-      "count_other": "{{count}} campaigns",
-      "sortNew": "New",
-      "sortTop": "Top",
-      "showHidden": "Show hidden",
-      "hideHidden": "Hide hidden",
-      "emptySelf": "You haven't launched a campaign yet.",
-      "emptyOther": "{{name}} hasn't launched a campaign yet.",
-      "startLink": "Start a campaign →"
+      "count_one": "{{count}} кампания",
+      "count_other": "{{count}} кампаний",
+      "sortNew": "Новые",
+      "sortTop": "Топ",
+      "showHidden": "Показать скрытые",
+      "hideHidden": "Скрыть скрытые",
+      "emptySelf": "Вы ещё не запустили кампанию.",
+      "emptyOther": "{{name}} ещё не запустил(а) кампанию.",
+      "startLink": "Запустить кампанию →"
     },
     "pledgesTab": {
-      "active": "Active",
-      "ended": "Ended",
-      "emptySelf": "You haven't created a pledge yet.",
-      "emptyOther": "{{name}} hasn't created a pledge yet.",
-      "createLink": "Create a pledge →"
+      "active": "Активные",
+      "ended": "Завершённые",
+      "emptySelf": "Вы ещё не создали обещание.",
+      "emptyOther": "{{name}} ещё не создал(а) обещание.",
+      "createLink": "Создать обещание →"
     },
     "groupsDialog": {
-      "title": "All groups"
+      "title": "Все группы"
     }
   },
   "profileSettings": {
