@@ -30,6 +30,15 @@ const loaders: LoaderMap = {
     km: () => import('../content/privacy/km.md?raw'),
     sn: () => import('../content/privacy/sn.md?raw'),
   },
+  csae: {
+    en: () => import('../content/csae/en.md?raw'),
+    es: () => import('../content/csae/es.md?raw'),
+    zh: () => import('../content/csae/zh.md?raw'),
+    ar: () => import('../content/csae/ar.md?raw'),
+    fa: () => import('../content/csae/fa.md?raw'),
+    ps: () => import('../content/csae/ps.md?raw'),
+    // km, sn fall back to en via the loader's English fallback path.
+  },
 };
 
 async function tryLoad(slug: string, lng: string): Promise<string | null> {
