@@ -1910,5 +1910,224 @@
         ]
       }
     }
+  },
+  "guides": {
+    "shared": {
+      "tldrEyebrow": "Versión corta",
+      "paymentBadge": {
+        "public": "Pagos públicos",
+        "silent": "Pagos silenciosos"
+      },
+      "paymentComparison": {
+        "donorHeader": "Cuando donas",
+        "activistHeader": "Cuando creas",
+        "donorRows": {
+          "whatYouSee": {
+            "label": "Lo que ves",
+            "public": "Una dirección de Bitcoin normal a la que puedes pagar desde cualquier sitio.",
+            "silent": "El mismo QR. Tu wallet elige el endpoint de silent payments si admite BIP-352."
+          },
+          "walletSupport": {
+            "label": "Compatibilidad de wallets",
+            "public": "Cualquier wallet de Bitcoin. Cash App, Coinbase, Strike, hardware, lo que sea.",
+            "silent": "Pocas wallets hoy. La mayoría recurren a una transacción de Bitcoin normal."
+          },
+          "privacy": {
+            "label": "Privacidad de la donación",
+            "public": "Pública en la cadena. Tu dirección emisora queda vinculada de forma permanente a la campaña.",
+            "silent": "El lado receptor es no vinculable en la cadena. El rastro de tu wallet emisora sigue siendo público."
+          },
+          "settlement": {
+            "label": "Liquidación",
+            "public": "Confirmaciones normales de Bitcoin.",
+            "silent": "Mismas confirmaciones on-chain, pero el activista tiene que escanear su wallet para encontrarla."
+          }
+        },
+        "activistRows": {
+          "whatDonorsSee": {
+            "label": "Lo que ven los donantes",
+            "public": "Una dirección de Bitcoin normal. Funciona con cualquier wallet del planeta.",
+            "silent": "Un endpoint BIP-352. Las wallets de los donantes necesitan compatibilidad con silent payments; si no, la donación recurre a una transacción de Bitcoin normal."
+          },
+          "receivingSpeed": {
+            "label": "Velocidad de recepción",
+            "public": "Estilo push. Las donaciones aparecen al instante en la página de la campaña.",
+            "silent": "Escaneo manual. Tu wallet tiene que recorrer la blockchain buscándolas. Minutos a horas, según la wallet."
+          },
+          "pushNotifications": {
+            "label": "Notificaciones push",
+            "public": "Sí. Ves las nuevas donaciones en el momento en que llegan.",
+            "silent": "No. Abre la wallet y lanza un escaneo para descubrirlas."
+          },
+          "donorList": {
+            "label": "Lista de donantes / totales de la campaña",
+            "public": "Públicos para siempre. Las cantidades y direcciones emisoras son visibles para cualquiera.",
+            "silent": "Privados. La página de la campaña no puede mostrar el número ni los totales de donaciones por silent payments."
+          },
+          "ecosystem": {
+            "label": "Madurez del ecosistema",
+            "public": "Maduro. Herramientas asentadas.",
+            "silent": "Bleeding-edge. Las wallets siguen teniendo bugs; espera pagos que se pierden y aparecen en un escaneo posterior."
+          },
+          "bestFor": {
+            "label": "Ideal para",
+            "public": "Recaudaciones abiertas en las que la prueba social y la visibilidad ayudan.",
+            "silent": "Campañas en las que la privacidad del donante o del activista importa más que el total visible."
+          },
+          "watchOutFor": {
+            "label": "Ten en cuenta",
+            "public": "Registro público permanente de cada donante.",
+            "silent": "UX accidentada hoy. Algunas donaciones no aparecen hasta que el activista escanea."
+          }
+        }
+      }
+    },
+    "donor": {
+      "tldr": {
+        "lede": "Paga la dirección de Bitcoin de la página de la campaña desde cualquier wallet que ya tengas. Si la campaña acepta silent payments y tu wallet los admite, tu donación es privada automáticamente.",
+        "nextActions": [
+          "Paga desde cualquier wallet de Bitcoin",
+          "Sin intermediarios ni periodos de retención",
+          "¿Quieres privacidad? Sigue leyendo"
+        ]
+      },
+      "flow": {
+        "heading": "Cómo fluye una donación",
+        "steps": {
+          "openCampaign": {
+            "title": "Abre la campaña",
+            "body": "Ves un único código QR. Si la campaña acepta las dos opciones, codifica ambos endpoints; tu wallet elige el correcto."
+          },
+          "payFromAnyWallet": {
+            "title": "Págalo desde cualquier wallet",
+            "body": "Cash App, Coinbase, Strike, una wallet hardware, lo que sea. Paga la cantidad más la comisión de red."
+          },
+          "arrivesDirectly": {
+            "title": "Llega directamente",
+            "body": "Los fondos van directos al activista. {{appName}} no los retiene ni los enruta, y la dirección se deriva de la clave de Nostr del activista."
+          }
+        }
+      },
+      "comparison": {
+        "footnote": "Las campañas pueden aceptar solo Públicos, solo Silenciosos o ambos. Si aceptan ambos, el código QR lleva los dos endpoints. Tu wallet elige el que puede usar."
+      },
+      "publicVisible": {
+        "title": "Las donaciones públicas son visibles en la cadena para siempre",
+        "body": "Una donación **Pública** llega a una dirección de Bitcoin normal vinculada a la campaña. Cualquiera puede buscar la dirección y ver la cantidad, el momento y tu dirección emisora. Las donaciones **Silenciosas** también se liquidan en la cadena, pero el lado receptor es no vinculable a la campaña, por lo que se quedan fuera de las listas y los totales públicos de donantes."
+      },
+      "privacy": {
+        "heading": "Donar de forma privada",
+        "intro": "Estos pasos importan más para las donaciones **Públicas**, donde cada transacción queda vinculada de forma permanente a una sola dirección. Las donaciones **Silenciosas** ya ocultan el lado receptor, así que el riesgo es menor. El análisis dirigido de tu wallet emisora sigue siendo posible en cualquier caso, así que si tu riesgo es alto merece la pena dar estos pasos. Elige uno o combínalos.",
+        "options": {
+          "silentWallet": {
+            "name": "Usa una wallet con silent payments",
+            "purpose": "Paga con una wallet de Bitcoin que admita BIP-352. Si la campaña acepta silent payments, tu wallet usa ese endpoint automáticamente."
+          },
+          "nonKyc": {
+            "name": "Compra Bitcoin sin KYC",
+            "purpose": "Compra Bitcoin entre pares para que de entrada no esté vinculado a tu DNI. El punto de partida más fuerte en privacidad."
+          },
+          "coinjoin": {
+            "name": "Coinjoin primero",
+            "purpose": "Mezcla tu Bitcoin con monedas de otras personas para que la salida no se pueda rastrear hasta tu compra con KYC. Útil cuando la campaña solo acepta pagos públicos."
+          },
+          "freshWallet": {
+            "name": "Usa una wallet nueva",
+            "purpose": "Dona desde una wallet que nunca haya tocado tu identidad principal ni un exchange con KYC."
+          }
+        }
+      },
+      "consumerApps": {
+        "title": "Las apps para el público general no pueden hacerte anónimo",
+        "body": "Cash App, Coinbase, Strike, Venmo, Kraken, Binance y PayPal verifican tu identidad. No importa cómo envíes la donación: cada transacción queda atada a tu identidad real. Usa una wallet no custodial que tú controles."
+      },
+      "silentToday": {
+        "heading": "Una nota sobre los silent payments hoy",
+        "paragraphs": [
+          "Los silent payments son la forma más privada de recibir Bitcoin en la cadena, pero el ecosistema es joven. La mayoría de wallets populares todavía no pueden enviar a un endpoint de silent payment, así que cuando una wallet no puede, la donación recurre a una transacción de Bitcoin normal a la dirección pública de la campaña (si la campaña acepta ambos).",
+          "Para los activistas, las donaciones por silent payments también llegan sin notificaciones push y solo aparecen después de que el activista escanee su wallet, lo que puede tardar minutos u horas. Nada de esto afecta a la seguridad de tus fondos; solo modela la experiencia."
+        ]
+      }
+    },
+    "activist": {
+      "tldr": {
+        "lede": "Elige qué aceptar al crear tu campaña: Públicos, Silenciosos o ambos. Cualquiera de las opciones es no custodial. {{appName}} nunca retiene tus fondos.",
+        "nextActions": [
+          "Compara las dos opciones",
+          "Planea cómo vas a cobrar",
+          "Mueve los fondos rápido"
+        ]
+      },
+      "howReceiving": {
+        "heading": "Cómo funciona recibir",
+        "paragraphs": [
+          "Tus direcciones de donación de {{appName}} se derivan de tu clave pública de Nostr. Al crear una campaña, eliges qué aceptar:",
+          "**Solo pagos públicos.** Una dirección de Bitcoin normal. Visible para todo el mundo, funciona con cualquier wallet.",
+          "**Solo silent payments.** Silent payments BIP-352. El lado receptor es no vinculable en la cadena, así que las donaciones quedan fuera de las listas y los totales públicos de donantes. Los donantes necesitan una wallet con soporte de silent payments para enviar. Si no la tienen, su donación no puede pasar.",
+          "**Ambos.** {{appName}} genera un único código QR que codifica los dos endpoints. Las wallets de silent payments lo leen como privado; las wallets normales pagan a la dirección pública. Los donantes no tienen que elegir.",
+          "Aceptar ambos suele ser la opción correcta: recibes donaciones privadas de quienes usen una wallet de silent payments y sigues abierto a donantes cuyo único Bitcoin está en una app para el público general."
+        ]
+      },
+      "whatEveryoneSees": {
+        "heading": "Lo que puede ver cualquiera",
+        "paragraphs": [
+          "Si tu campaña acepta pagos públicos, cualquiera que esté pensando en apoyarte puede buscar la dirección y ver el historial público de donaciones.",
+          "Las donaciones por silent payments no forman parte de ese registro. Son invisibles para observadores externos y no se muestran en los totales públicos de la campaña; los nuevos donantes solo ven lo que publiques sobre el progreso de la campaña."
+        ]
+      },
+      "comparison": {
+        "footnote": "No puedes cambiar las opciones de pago aceptadas por una campaña después de crearla. Si cambias de opinión, crea una nueva campaña."
+      },
+      "silentToday": {
+        "heading": "Una nota sobre los silent payments hoy",
+        "paragraphs": [
+          "Los silent payments son la forma más privada de recibir Bitcoin en la cadena, pero el ecosistema es joven. La mayoría de wallets populares todavía no pueden enviar a un endpoint de silent payment, así que cuando la wallet del donante no puede, la donación recurre a una transacción de Bitcoin normal a tu dirección pública (si aceptas ambos).",
+          "Las donaciones por silent payments también llegan sin notificaciones push y solo aparecen después de que escanees tu wallet, lo que puede tardar minutos u horas. Nada de esto afecta a la seguridad de tus fondos; solo modela la experiencia del día a día."
+        ]
+      },
+      "movePromptly": {
+        "heading": "Mueve las donaciones rápido",
+        "steps": {
+          "sweep": {
+            "title": "Pasa los fondos a una wallet que tú controles",
+            "body": "Buenas opciones de autocustodia: [Sparrow](https://sparrowwallet.com), [BlueWallet](https://bluewallet.io), o [Phoenix](https://phoenix.acinq.co) (Lightning)."
+          },
+          "dontSit": {
+            "title": "No dejes los fondos parados en la dirección de la campaña",
+            "body": "Trátala como un buzón, no como una cuenta de ahorros. Esto se aplica tanto a las donaciones Públicas como a las Silenciosas."
+          }
+        }
+      },
+      "cashout": {
+        "heading": "Cobrar de forma privada",
+        "intro": "Gastar en la cadena crea un rastro a menos que lo rompas antes. La salida de privacidad más simple es **mover primero los fondos a una wallet de silent payments**, y a partir de ahí gastar; el salto rompe el vínculo entre la dirección de tu campaña y lo que venga después. Las otras opciones de abajo también funcionan y tienen sus propias contrapartidas.",
+        "options": {
+          "silentHop": {
+            "name": "Salto a wallet de silent payments",
+            "purpose": "Mueve tus donaciones a una wallet de silent payments ([Ditto Wallet](https://ditto.pub), [Dana](https://github.com/cygnet3/dana/releases/download/v0.7.4/app-live-release.apk)). A partir de ahí tu gasto posterior no está atado a la campaña."
+          },
+          "lightningSwap": {
+            "name": "Swap a Lightning",
+            "purpose": "Intercambio atómico de Bitcoin on-chain a Lightning. Los pagos por Lightning no llegan a la blockchain pública."
+          },
+          "coinjoin": {
+            "name": "Coinjoin",
+            "purpose": "Mezcla tu Bitcoin con las monedas de otros usuarios para que la salida no se pueda vincular con la entrada."
+          },
+          "peerToPeer": {
+            "name": "De persona a persona",
+            "purpose": "Cambia Bitcoin por fiat directamente con otra persona o a través de un broker en Bisq, HodlHodl o RoboSats."
+          },
+          "spendDirectly": {
+            "name": "Gástalo directamente",
+            "purpose": "Compra tarjetas regalo (Amazon, Uber, alimentación, viajes) directamente desde Bitcoin sin convertirlo antes en dinero."
+          }
+        }
+      },
+      "tumblers": {
+        "title": "Evita los mezcladores centralizados",
+        "body": "Los mezcladores custodiales pueden robarte las monedas, registrar quién envió qué o resultar ser cebos de las fuerzas del orden. Usa un salto por silent payments o un coinjoin no custodial en su lugar."
+      }
+    }
   }
 }
