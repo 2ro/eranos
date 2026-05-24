@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react';
+import type { ReactNode } from 'react';
 import { useSeoMeta } from '@unhead/react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useTranslation, Trans } from 'react-i18next';
@@ -12,7 +13,7 @@ import {
   Share2,
 } from 'lucide-react';
 
-import { useAction, type Action } from '@/hooks/useActions';
+import { parseAction, useAction, type Action } from '@/hooks/useActions';
 import { useAppContext } from '@/hooks/useAppContext';
 import { useAuthor } from '@/hooks/useAuthor';
 import { useBtcPrice } from '@/hooks/useBtcPrice';
@@ -40,6 +41,7 @@ import { ReplyComposeModal } from '@/components/ReplyComposeModal';
 import { NoteMoreMenu } from '@/components/NoteMoreMenu';
 import { ThreadedReplyList, type ReplyNode } from '@/components/ThreadedReplyList';
 import { usePinnedEventComments } from '@/hooks/usePinnedEventComments';
+import { useEventTranslation } from '@/hooks/useEventTranslation';
 import NotFound from '@/pages/NotFound';
 
 function formatDeadline(unixSeconds: number, t: TFunction): { label: string; isPast: boolean } {
@@ -95,6 +97,8 @@ function PledgeDetailContent({ action }: { action: Action }) {
 
   const [replyOpen, setReplyOpen] = useState(false);
   const [moreMenuOpen, setMoreMenuOpen] = useState(false);
+  const { translatedEvent, translateAction } = useEventTranslation(action.event);
+  const displayAction = useMemo(() => parseAction(translatedEvent) ?? action, [translatedEvent, action]);
 
   const topLevel = useMemo(
     () => commentsData?.topLevelComments ?? [],
@@ -158,10 +162,10 @@ function PledgeDetailContent({ action }: { action: Action }) {
 
   const storyEvent = useMemo(
     () => ({
-      ...action.event,
-      tags: action.event.tags.filter(([name]) => !['image', 'title', 't'].includes(name)),
+      ...displayAction.event,
+      tags: displayAction.event.tags.filter(([name]) => !['image', 'title', 't'].includes(name)),
     }),
-    [action.event],
+    [displayAction.event],
   );
 
   const handleShare = async () => {
@@ -169,7 +173,7 @@ function PledgeDetailContent({ action }: { action: Action }) {
     try {
       const nav = typeof navigator !== 'undefined' ? navigator : undefined;
       if (nav?.share) {
-        await nav.share({ title: action.title, text: action.description, url });
+        await nav.share({ title: displayAction.title, text: displayAction.description, url });
       } else if (nav?.clipboard) {
         await nav.clipboard.writeText(url);
         toast({ title: t('pledges.detail.linkCopied') });
@@ -182,7 +186,7 @@ function PledgeDetailContent({ action }: { action: Action }) {
   return (
     <main className="min-h-screen pb-16">
       <PledgeHero
-        action={action}
+        action={displayAction}
         cover={cover}
         creatorName={creatorName}
         creatorProfileUrl={creatorProfileUrl}
@@ -191,6 +195,7 @@ function PledgeDetailContent({ action }: { action: Action }) {
         onBack={() => navigate(-1)}
         onReply={() => setReplyOpen(true)}
         onMore={() => setMoreMenuOpen(true)}
+        translateAction={translateAction}
       />
 
       {pinnedNodes.length > 0 && (
@@ -215,7 +220,7 @@ function PledgeDetailContent({ action }: { action: Action }) {
         <div className="lg:flex lg:gap-8 lg:items-start">
           <div className="lg:hidden mb-6">
             <PledgeFundingCard
-              action={action}
+              action={displayAction}
               btcPrice={btcPrice}
               fundedSats={fundedSats}
               progressValue={progressValue}
@@ -226,7 +231,7 @@ function PledgeDetailContent({ action }: { action: Action }) {
           </div>
 
           <div className="flex-1 min-w-0 space-y-8">
-            <PledgeStory storyEvent={storyEvent} hasContent={action.description.trim().length > 0} />
+            <PledgeStory storyEvent={storyEvent} hasContent={displayAction.description.trim().length > 0} />
 
             <div id="pledge-activity" className="scroll-mt-20">
               <div className="mt-6">
@@ -280,7 +285,7 @@ function PledgeDetailContent({ action }: { action: Action }) {
           <aside className="hidden lg:block lg:w-[360px] lg:shrink-0 lg:self-start">
             <div className="lg:sticky lg:top-4">
               <PledgeFundingCard
-                action={action}
+                action={displayAction}
                 btcPrice={btcPrice}
                 fundedSats={fundedSats}
                 progressValue={progressValue}
@@ -342,6 +347,7 @@ interface PledgeHeroProps {
   onBack: () => void;
   onReply: () => void;
   onMore: () => void;
+  translateAction: ReactNode;
 }
 
 function PledgeHero({
@@ -354,6 +360,7 @@ function PledgeHero({
   onBack,
   onReply,
   onMore,
+  translateAction,
 }: PledgeHeroProps) {
   const { t } = useTranslation();
   const countryLabel = action.countryCode ? getGeoDisplayName(action.countryCode) : undefined;
@@ -439,6 +446,7 @@ function PledgeHero({
               showShareInSidebar
               onReply={onReply}
               onMore={onMore}
+              translateAction={translateAction}
             />
           </div>
         </div>

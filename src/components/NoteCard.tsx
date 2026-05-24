@@ -71,7 +71,6 @@ import { ReactionButton } from "@/components/ReactionButton";
 import { ReplyComposeModal } from "@/components/ReplyComposeModal";
 import { ReplyContext } from "@/components/ReplyContext";
 import { RepostMenu } from "@/components/RepostMenu";
-import { TranslateButton } from "@/components/TranslateButton";
 import { EncryptedMessageContent } from "@/components/EncryptedMessageContent";
 import { EncryptedLetterContent } from "@/components/EncryptedLetterContent";
 import { VanishCardCompact } from "@/components/VanishEventContent";
@@ -92,6 +91,7 @@ import { useProfileUrl } from "@/hooks/useProfileUrl";
 import { useShareOrigin } from "@/hooks/useShareOrigin";
 import { toast } from "@/hooks/useToast";
 import { useEventStats } from "@/hooks/useTrending";
+import { useEventTranslation } from "@/hooks/useEventTranslation";
 import { canZap } from "@/lib/canZap";
 import { extractZapSender, extractZapMessage } from "@/hooks/useEventInteractions";
 import { getZapAmountSats } from "@/lib/zapHelpers";
@@ -253,22 +253,9 @@ interface NoteCardProps {
   actionEvent?: NostrEvent;
 }
 
-type TranslatableEventField = "title" | "summary" | "content";
-
-interface TranslationField {
-  field: TranslatableEventField;
-  text: string;
-}
-
-type TranslatedEventText = Partial<Record<TranslatableEventField, string>>;
-
 /** Gets a tag value by name. */
 function getTag(tags: string[][], name: string): string | undefined {
   return tags.find(([n]) => n === name)?.[1];
-}
-
-function replaceTagValue(tags: string[][], name: string, value: string): string[][] {
-  return tags.map((tag) => tag[0] === name ? [tag[0], value, ...tag.slice(2)] : tag);
 }
 
 /** Parse single imeta tag into structured object (legacy, for kind 34236 vines). */
@@ -422,7 +409,6 @@ export const NoteCard = memo(function NoteCard({
   const { data: btcPrice } = useBtcPrice();
   const [moreMenuOpen, setMoreMenuOpen] = useState(false);
   const [replyOpen, setReplyOpen] = useState(false);
-  const [translatedText, setTranslatedText] = useState<TranslatedEventText | null>(null);
 
   // Check if the current user can zap this event's author
   // TODO: Enable zapping split-recipient NIP-75 goals once zap split payments are supported.
@@ -554,42 +540,7 @@ export const NoteCard = memo(function NoteCard({
 
   const isComment = event.kind === 1111;
   const isReply = isTextNote && !isComment && isReplyEvent(event);
-  const translationFields = useMemo<TranslationField[]>(() => {
-    if (isCampaign) {
-      const fields: TranslationField[] = [
-        { field: "title", text: getTag(event.tags, "title")?.trim() ?? "" },
-        { field: "summary", text: getTag(event.tags, "summary")?.trim() ?? "" },
-        { field: "content", text: event.content.trim() },
-      ];
-      return fields.filter(({ text }) => text.length > 0);
-    }
-
-    if (isTextNote && event.content.trim().length > 0) {
-      return [{ field: "content", text: event.content }];
-    }
-
-    return [];
-  }, [event.content, event.tags, isCampaign, isTextNote]);
-  const canTranslate = translationFields.length > 0;
-  const translationTexts = translationFields.map(({ text }) => text);
-  const translationLabelText = translationTexts.join("\n\n");
-  const contentEvent = useMemo(() => {
-    if (!translatedText) return event;
-
-    let tags = event.tags;
-    if (translatedText.title) tags = replaceTagValue(tags, "title", translatedText.title);
-    if (translatedText.summary) tags = replaceTagValue(tags, "summary", translatedText.summary);
-
-    return {
-      ...event,
-      tags,
-      content: translatedText.content ?? event.content,
-    };
-  }, [event, translatedText]);
-
-  useEffect(() => {
-    setTranslatedText(null);
-  }, [event.id]);
+  const { translatedEvent: contentEvent, translateAction } = useEventTranslation(event, { includePlainContent: isTextNote });
 
   // Find all people being replied to (for "Replying to @user1 and @user2")
   const replyToPubkeys = useMemo(() => {
@@ -928,23 +879,7 @@ export const NoteCard = memo(function NoteCard({
 
       <div className="flex-1" />
 
-      {canTranslate && (
-        <TranslateButton
-          text={translationLabelText}
-          texts={translationTexts}
-          isTranslated={translatedText !== null}
-          onTranslated={(_, translatedTexts) => {
-            const next: TranslatedEventText = {};
-            translationFields.forEach(({ field }, index) => {
-              next[field] = translatedTexts[index];
-            });
-            setTranslatedText(next);
-          }}
-          onReset={() => setTranslatedText(null)}
-          responsiveLabel
-          className="h-9 px-3 text-sm font-medium"
-        />
-      )}
+      {translateAction}
 
       <button
         className="inline-flex items-center justify-center h-9 w-9 rounded-full text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors sidebar:hidden"

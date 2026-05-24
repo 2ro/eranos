@@ -1,4 +1,5 @@
 import type { NostrEvent } from '@nostrify/nostrify';
+import type { ReactNode } from 'react';
 import { MessageCircle, MoreHorizontal, Share2, Zap } from 'lucide-react';
 import { nip19 } from 'nostr-tools';
 import { useCallback } from 'react';
@@ -31,6 +32,8 @@ interface PostActionBarProps {
   hideZap?: boolean;
   /** Keep the share button visible at sidebar widths. Defaults to false. */
   showShareInSidebar?: boolean;
+  /** Optional action rendered next to Share, e.g. Translate. */
+  translateAction?: ReactNode;
   /** Extra classes on the outer wrapper div. */
   className?: string;
 }
@@ -42,6 +45,7 @@ export function PostActionBar({
   onMore,
   hideZap = false,
   showShareInSidebar = false,
+  translateAction,
   className,
 }: PostActionBarProps) {
   const { t } = useTranslation();
@@ -147,6 +151,8 @@ export function PostActionBar({
 
       {/* Spacer pushes share/more to the right */}
       <div className="flex-1" />
+
+      {translateAction}
 
       {/* Share */}
       <button

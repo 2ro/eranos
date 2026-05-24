@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react';
+import type { ReactNode } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useSeoMeta } from '@unhead/react';
 import { useQueryClient } from '@tanstack/react-query';
@@ -55,9 +56,11 @@ import { usePinnedEventComments } from '@/hooks/usePinnedEventComments';
 import { useProfileUrl } from '@/hooks/useProfileUrl';
 import { useShareOrigin } from '@/hooks/useShareOrigin';
 import { useToast } from '@/hooks/useToast';
+import { useEventTranslation } from '@/hooks/useEventTranslation';
 import {
   encodeCampaignNaddr,
   getCampaignCountryLabel,
+  parseCampaign,
   type ParsedCampaign,
 } from '@/lib/campaign';
 import { satsToUSDWhole } from '@/lib/bitcoin';
@@ -138,6 +141,8 @@ function CampaignDetailContent({ campaign }: { campaign: ParsedCampaign }) {
   const [interactionsOpen, setInteractionsOpen] = useState(false);
   const [interactionsTab, setInteractionsTab] = useState<InteractionTab>('reposts');
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
+  const { translatedEvent, translateAction } = useEventTranslation(campaign.event);
+  const displayCampaign = useMemo(() => parseCampaign(translatedEvent) ?? campaign, [translatedEvent, campaign]);
 
   const deleteMutation = useDeleteEvent();
 
@@ -254,15 +259,15 @@ function CampaignDetailContent({ campaign }: { campaign: ParsedCampaign }) {
   const naddr = useMemo(() => encodeCampaignNaddr(campaign), [campaign]);
   const storyEvent = useMemo(
     () => ({
-      ...campaign.event,
-      tags: campaign.event.tags.filter(([name]) => !['banner', 'imeta', 'summary', 'title', 'w'].includes(name)),
+      ...displayCampaign.event,
+      tags: displayCampaign.event.tags.filter(([name]) => !['banner', 'imeta', 'summary', 'title', 'w'].includes(name)),
     }),
-    [campaign.event],
+    [displayCampaign.event],
   );
 
   useSeoMeta({
-    title: t('campaignsDetail.seoTitle', { title: campaign.title, appName: config.appName }),
-    description: campaign.summary || t('campaignsDetail.seoDescriptionFallback', { title: campaign.title, appName: config.appName }),
+    title: t('campaignsDetail.seoTitle', { title: displayCampaign.title, appName: config.appName }),
+    description: displayCampaign.summary || t('campaignsDetail.seoDescriptionFallback', { title: displayCampaign.title, appName: config.appName }),
     ogImage: cover,
   });
 
@@ -271,7 +276,7 @@ function CampaignDetailContent({ campaign }: { campaign: ParsedCampaign }) {
     try {
       const nav = typeof navigator !== 'undefined' ? navigator : undefined;
       if (nav?.share) {
-        await nav.share({ title: campaign.title, text: campaign.summary, url });
+        await nav.share({ title: displayCampaign.title, text: displayCampaign.summary, url });
       } else if (nav?.clipboard) {
         await nav.clipboard.writeText(url);
         toast({ title: t('campaignsDetail.linkCopied') });
@@ -357,7 +362,7 @@ function CampaignDetailContent({ campaign }: { campaign: ParsedCampaign }) {
           back/admin buttons all live ON the image — the banner is the
           page's emotional entry point. */}
       <CampaignHero
-        campaign={campaign}
+        campaign={displayCampaign}
         cover={cover}
         creatorName={creatorName}
         creatorProfileUrl={creatorProfileUrl}
@@ -371,6 +376,7 @@ function CampaignDetailContent({ campaign }: { campaign: ParsedCampaign }) {
         onDelete={() => setDeleteConfirmOpen(true)}
         onReply={() => setReplyOpen(true)}
         onMore={() => setMoreMenuOpen(true)}
+        translateAction={translateAction}
       />
 
       {pinnedNodes.length > 0 && (
@@ -405,7 +411,7 @@ function CampaignDetailContent({ campaign }: { campaign: ParsedCampaign }) {
           <div className="flex-1 min-w-0 space-y-8">
             <CampaignStory
               storyEvent={storyEvent}
-              hasContent={campaign.story.trim().length > 0}
+              hasContent={displayCampaign.story.trim().length > 0}
             />
 
             {/* Engagement counters above the comments. The action bar
@@ -638,6 +644,7 @@ interface CampaignHeroProps {
   onDelete: () => void;
   onReply: () => void;
   onMore: () => void;
+  translateAction: ReactNode;
 }
 
 function CampaignHero({
@@ -655,6 +662,7 @@ function CampaignHero({
   onDelete,
   onReply,
   onMore,
+  translateAction,
 }: CampaignHeroProps) {
   const { t } = useTranslation();
   const initials = creatorName.slice(0, 2).toUpperCase();
@@ -804,6 +812,7 @@ function CampaignHero({
               showShareInSidebar
               onReply={onReply}
               onMore={onMore}
+              translateAction={translateAction}
             />
           </div>
         </div>

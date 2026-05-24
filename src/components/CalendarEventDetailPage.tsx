@@ -32,6 +32,7 @@ import { useComments } from '@/hooks/useComments';
 import { useAuthor } from '@/hooks/useAuthor';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useEventRSVPs } from '@/hooks/useEventRSVPs';
+import { useEventTranslation } from '@/hooks/useEventTranslation';
 import { useMyRSVP } from '@/hooks/useMyRSVP';
 import { usePublishRSVP } from '@/hooks/usePublishRSVP';
 import { usePinnedEventComments } from '@/hooks/usePinnedEventComments';
@@ -203,14 +204,15 @@ export function CalendarEventDetailPage({ event }: { event: NostrEvent }) {
   const { user } = useCurrentUser();
   const { toast } = useToast();
   const author = useAuthor(event.pubkey);
+  const { translatedEvent: displayEvent, translateAction } = useEventTranslation(event);
 
-  const title = getTag(event.tags, 'title') ?? 'Untitled Event';
-  const image = sanitizeUrl(getTag(event.tags, 'image'));
-  const locationRaw = getTag(event.tags, 'location');
+  const title = getTag(displayEvent.tags, 'title') ?? 'Untitled Event';
+  const image = sanitizeUrl(getTag(displayEvent.tags, 'image'));
+  const locationRaw = getTag(displayEvent.tags, 'location');
   const location = locationRaw ? parseLocation(locationRaw) : undefined;
-  const summary = getTag(event.tags, 'summary');
-  const hashtags = getAllTags(event.tags, 't').map(([, v]) => v).filter(Boolean);
-  const links = getAllTags(event.tags, 'r').map(([, v]) => sanitizeUrl(v)).filter((v): v is string => !!v);
+  const summary = getTag(displayEvent.tags, 'summary');
+  const hashtags = getAllTags(displayEvent.tags, 't').map(([, v]) => v).filter(Boolean);
+  const links = getAllTags(displayEvent.tags, 'r').map(([, v]) => sanitizeUrl(v)).filter((v): v is string => !!v);
 
   const eventCoord = useMemo(() => getEventCoord(event), [event]);
   const dateStr = useMemo(() => formatDetailDate(event), [event]);
@@ -278,10 +280,10 @@ export function CalendarEventDetailPage({ event }: { event: NostrEvent }) {
   );
 
   const storyEvent = useMemo<NostrEvent>(() => ({
-    ...event,
-    tags: event.tags.filter(([name]) => !['image', 'summary', 'title', 't'].includes(name)),
-    content: event.content || summary || '',
-  }), [event, summary]);
+    ...displayEvent,
+    tags: displayEvent.tags.filter(([name]) => !['image', 'summary', 'title', 't'].includes(name)),
+    content: displayEvent.content || summary || '',
+  }), [displayEvent, summary]);
 
   const handleRSVP = useCallback(async (status: 'accepted' | 'declined' | 'tentative') => {
     if (status === myRsvp.status) return;
@@ -504,6 +506,7 @@ export function CalendarEventDetailPage({ event }: { event: NostrEvent }) {
                 showShareInSidebar
                 onReply={() => setReplyOpen(true)}
                 onMore={() => setMoreMenuOpen(true)}
+                translateAction={translateAction}
               />
             </div>
           </div>

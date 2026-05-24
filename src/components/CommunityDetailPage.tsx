@@ -66,6 +66,7 @@ import { usePinnedEventComments } from '@/hooks/usePinnedEventComments';
 import { useProfileUrl } from '@/hooks/useProfileUrl';
 import { useToast } from '@/hooks/useToast';
 import { useEventRSVPs } from '@/hooks/useEventRSVPs';
+import { useEventTranslation } from '@/hooks/useEventTranslation';
 import { CommunityModerationContext } from '@/contexts/CommunityModerationContext';
 import { applyCommunityModerationToEvents, parseCommunityEvent } from '@/lib/communityUtils';
 import type { ParsedCampaign } from '@/lib/campaign';
@@ -644,9 +645,10 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
   const [moreMenuOpen, setMoreMenuOpen] = useState(false);
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
   const deleteMutation = useDeleteEvent();
+  const { translatedEvent: displayEvent, translateAction } = useEventTranslation(event);
 
   // Parse community definition
-  const community = useMemo(() => parseCommunityEvent(event), [event]);
+  const community = useMemo(() => parseCommunityEvent(displayEvent), [displayEvent]);
   const name = community?.name ?? 'Unnamed Group';
   const description = community?.description ?? '';
   const image = community?.image;
@@ -1010,6 +1012,7 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
                   showShareInSidebar
                   onReply={() => setReplyOpen(true)}
                   onMore={() => setMoreMenuOpen(true)}
+                  translateAction={translateAction}
                 />
               </div>
             </div>

@@ -84,6 +84,7 @@ import { AppHandlerContent } from "@/components/AppHandlerContent";
 import { useAppContext } from "@/hooks/useAppContext";
 import { type AddrCoords, useAddrEvent, useEvent } from "@/hooks/useEvent";
 import { usePollVoteLabel } from "@/hooks/usePollVoteLabel";
+import { useEventTranslation } from "@/hooks/useEventTranslation";
 import { formatNumber } from "@/lib/formatNumber";
 
 /** Kinds that get the full follow-pack detail view. */
@@ -1028,6 +1029,7 @@ function PostDetailContent({ event }: { event: NostrEvent }) {
     !isZapGoal &&
     !isProfile &&
     !isBadgeAward;
+  const { translatedEvent: displayEvent, translateAction } = useEventTranslation(event, { includePlainContent: isTextNote });
 
   const { data: stats } = useEventStats(event.id, event);
   const { data: interactions } = useEventInteractions(event.id);
@@ -1850,7 +1852,7 @@ function PostDetailContent({ event }: { event: NostrEvent }) {
           )}
 
           {/* Post content — kind-based dispatch, guarded by NIP-36 content-warning */}
-          <ContentWarningGuard event={event}>
+          <ContentWarningGuard event={displayEvent}>
             {isPhoto ? (
               <PhotoDetailContent event={event} />
             ) : isVideo ? (
@@ -1866,7 +1868,7 @@ function PostDetailContent({ event }: { event: NostrEvent }) {
             ) : isVoiceMessage ? (
               <VoiceMessagePlayer event={event} />
             ) : isCommunity ? (
-              <CommunityContent event={event} />
+              <CommunityContent event={displayEvent} />
             ) : isGitRepo ? (
               <div className="mt-3">
                 <GitRepoCard event={event} />
@@ -1936,7 +1938,7 @@ function PostDetailContent({ event }: { event: NostrEvent }) {
             ) : (
               <div className="mt-3">
                 <NoteContent
-                  event={event}
+                  event={displayEvent}
                   className="text-[15px] leading-relaxed"
                 />
               </div>
@@ -2051,6 +2053,7 @@ function PostDetailContent({ event }: { event: NostrEvent }) {
             event={event}
             onReply={() => setReplyOpen(true)}
             onMore={() => setMoreMenuOpen(true)}
+            translateAction={translateAction}
             className="-mx-4 px-4"
           />
 
