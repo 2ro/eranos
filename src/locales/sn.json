@@ -1733,5 +1733,182 @@
       "followTeam": "Tevera Team Soapbox paNostr",
       "stillStuckSuffix": ". Tinopindura mibvunzo ipapo."
     }
+  },
+  "faq": {
+    "categories": {
+      "getting-started": { "label": "Nezve Agora" },
+      "payments": { "label": "Zvipo zveBitcoin paAgora" },
+      "about-nostr": { "label": "Nezve Nostr" },
+      "legacy": { "label": "Zvekare" }
+    },
+    "items": {
+      "what-is-ditto": {
+        "question": "Chii chinonzi {{appName}}?",
+        "answer": [
+          "{{appName}} ipuratifomu yekutumira zvipo zveBitcoin — pachena kana zvakavanzika — zvakananga kuvashanduki. Hapana mukuvadzi wepakati, hapana mubati wemari, uye hapana akaundi rinogona kurambidzwa.",
+          "{{appName}} yakavakwa pamusoro peNostr, saka hunhu hwako hahubatani nehurongwa hweno — iwe une humambo hwacho."
+        ]
+      },
+      "cost-to-use": {
+        "question": "Ko {{appName}} ine mutengo here?",
+        "answer": [
+          "**Aiwa.** {{appName}} haitori mari yepuratifomu. Paunopa chipo, unobhadhara chete mari yenetiweki yeBitcoin inoenda kuvachera — kwete kwatiri."
+        ]
+      },
+      "who-made-this": {
+        "question": "Ndiani akagadzira {{appName}}?",
+        "answer": [
+          "{{appName}} yakavakwa ne[Soapbox](https://soapbox.pub), boka rakavhura kodhi rinogadzira maturusi enzvimbo yeNostr, vachishanda pamwe ne[World Liberty Congress](https://worldlibertycongress.org/)."
+        ]
+      },
+      "send-bitcoin-onchain": {
+        "question": "Kutumira Bitcoin kunoshanda sei?",
+        "answer": [
+          "Apo mushanduki anogadzira kambeni, anosarudza mhando dzemubhadharo dzaanozogamuchira: **pachena**, **zvakavanzika**, kana **zvese**.",
+          "Zvipo **zvepachena** chaizvo Bitcoin pa-chain. Zvinopedzwa pabhirochaina yepachena, zvinoshanda mu walleti yose yeBitcoin, uye zvinooneka kunemumwe nemumwe.",
+          "Zvipo **zvakavanzika** zvinoshandisa **mubhadharo wakanyarara** (BIP-352). Zvinopedzwa pa-chain zvakare, asi chibvumirano hachikwanise kubatanidzwa kudzokera kuchidimbu chechipo chemushanduki — saka hazvionekwe muzvinyorwa zvevapi zvepachena uye zvionekwa zvepachena. Mupi anoda walleti inotsigira mibhadharo yakanyarara — tinokurudzira [Ditto Wallet](https://ditto.pub) kana [Dana](https://github.com/cygnet3/dana/releases/download/v0.7.4/app-live-release.apk).",
+          "Apo kambeni inogamuchira **zvese**, {{appName}} inoratidza imwe kodhi yeQR ine zvinyorwa zvese zviri zviviri. MaWalleti emibhadharo yakanyarara anozviverenga sezvakavanzika; mamwe maWalleti anodzokera kukero yepachena. Vapi havatare kusarudza — walleti yavo inotora nzira yakakodzera ichizvichaira.",
+          "Pari pose, mubhadharo unoenda zvakananga kumushanduki. {{appName}} haina kana nguva imwe inobata mari iyi."
+        ]
+      },
+      "connect-wallet": {
+        "question": "Walleti iri pa{{appName}} chii?",
+        "answer": [
+          "Walleti yako ye{{appName}} yakavakwa kubva kukey yako yeNostr. Inogona kugashira Bitcoin nenzira mbiri — sekero yepachena inogona kubhadharwa newalleti yeBitcoin ipi zvayo, uye sekodhi yemibhadharo yakanyarara inogona kubhadharwa newalleti dzinokwanisa muchivande. Hapana chinonyoreswa; inovapo nguva yaunenge wave neakaundi.",
+          "Paunogadzira kambeni, unosarudza kuti unogamuchira mibhadharo yepachena, yakavanzika, kana zvese. Kuti ushandise zvawagamuchira, ona **Bhuku reMushanduki**."
+        ]
+      },
+      "donations-are-public-general": {
+        "question": "Ko zvipo paAgora zvinoonekwa nemunhu wese here?",
+        "answer": [
+          "Zvinoenderana nemhando yemubhadharo yamushanduki anogamuchira.",
+          "**Zvipo zvepachena** zvinonyorwa pabhirochaina yeBitcoin uye paNostr. Munhu wese anogona kuona huwandu, nguva, uye makero.",
+          "**Zvipo zvakavanzika** zvinoshandisa mibhadharo yakanyarara. Hazvigone kubatanidzwa pachena kuchidimbu chechipo chemushanduki, hazvioneki muzvinyorwa zvevapi, uye hazviverengwe muzvionekwa zvepachena.",
+          "Apo kambeni inogamuchira zvese, walleti yemupi inosarudza nzira yekushandisa — maWalleti anokwanisa mibhadharo yakanyarara anobhadhara muchivande, mamwe anobhadhara kero yepachena. Verenga **Bhuku reMupi** ne**Bhuku reMushanduki** kuti uone mufananidzo wakazara."
+        ]
+      },
+      "censorship-resistance": {
+        "question": "\"Kushinga kucensorship\" pano kunorevei?",
+        "answer": [
+          "Hapana kambani inomira pakati pemupi nemushanduki. {{appName}} haichengete mari uye haigone kurambidza kero.",
+          "Kana netiweki yeBitcoin ichishanda, zvipo zvinogona kutumirwa uye kugamuchirwa. Kunyange {{appName}} pachayo kana ikamisikidzwa, hazvigone kuzvimisa."
+        ]
+      },
+      "why-onchain": {
+        "question": "Sei Bitcoin?",
+        "answer": [
+          "Bitcoin ndiyo nzira yemubhadharo inotsigirwa zvakanyanya uye yakashinga kucensorship pasi rose. Walleti yose yeBitcoin inogona kuitumira.",
+          "Pa{{appName}}, vashanduki vanosarudza nzira yokugamuchira: **pachena** (kero yeBitcoin yakajairika) yekusvika kwakanyanya, **zvakavanzika** (mibhadharo yakanyarara) yezvipo zvisingatevedzeke, kana **zvese** kuitira kuti walleti yemupi mumwe nemumwe isarudze nzira yakakodzera zvakazvimirira. Vapi vane chete app yeBitcoin yemumusha vanogona kupawo; vapi vane walleti yemibhadharo yakanyarara vanogashira hukama hwakavanzika sezvakajairika.",
+          "Chiri kunopikiswa ndechokuti zvibvumirano zveBitcoin zvepachena zvinooneka pabhirochaina uye zvinobhadhara mari kuvachera. Bhuku reMupi nereMushanduki zvinotsanangura nzira yokubata zvese."
+        ]
+      },
+      "why-not-silent-payments": {
+        "question": "Ko {{appName}} inotsigira mibhadharo yakanyarara here?",
+        "answer": [
+          "Hongu. Apo mushanduki anogadzira kambeni anogona kugamuchira mibhadharo yakanyarara pamwe chete, kana panzvimbo, yemibhadharo yepachena yeBitcoin. Zvipo zvemibhadharo yakanyarara zvichiri kupedzwa pa-chain, asi chibvumirano hachikwanise kubatanidzwa kudzokera kuchidimbu chechipo chemushanduki — saka hazvioneke muzvinyorwa zvevapi kana zvionekwa zvepachena.",
+          "Kutumira mubhadharo wakanyarara kunoda walleti inotsigira BIP-352. Mamwe app emumusha haasati achitsigira, asi [Ditto Wallet](https://ditto.pub) ne[Dana](https://github.com/cygnet3/dana/releases/download/v0.7.4/app-live-release.apk) zvinotsigira.",
+          "Apo kambeni inogamuchira mhando dzese mbiri dzemubhadharo, {{appName}} inozvinyora mukodhi imwe yeQR. MaWalleti anokwanisa mibhadharo yakanyarara anobhadhara muchivande; mamwe ese anobhadhara kero yepachena. Hapana mupi anosiyiwa, uye hapana mushanduki anomanikidzwa kusarudza pakati pekusvika nekuvanzika."
+        ]
+      },
+      "why-not-lightning": {
+        "question": "Sei {{appName}} isingashandisi Lightning?",
+        "answer": [
+          "Lightning inoda walleti yeLightning. Iri nyore (Wallet of Satoshi, Strike, Breez) **dzinochengetwa (custodial)** — kambani ndiyo inobata mari uye inogona kuvharwa, kuvharwa nenzvimbo, kana kumanikidzwa kurambidza maakaundi. Lightning isingachengetwe yakaoma munyaya yetekinoroji uye haina kuvimbika kuvanhu vatsva.",
+          "Tinoda {{appName}} ishande kune ane chete ruzivo rweBitcoin app yemumusha yakaita seCash App, Coinbase, Strike, Venmo, kana PayPal. Bitcoin on-chain inoshanda nemawalleti ese pasi rose."
+        ]
+      },
+      "why-not-rotating-addresses": {
+        "question": "Sei {{appName}} isina kugadzira kero itsva pachipo chega chega?",
+        "answer": [
+          "Kuita izvi kungada {{appName}} ishande semuchina wepakati wekutsinhanisa mari — yotanga kuchengeta Bitcoin uye kuyitakurira kumushanduki.",
+          "Izvi zvingatiita vakatumira mari, vari pasi pemitemo inouya pamwe chete naizvozvo, uye nzvimbo imwe yokukundikana: vhara seva ye{{appName}} ndokuvhara chipo chega chega chinopfuura nemo.",
+          "Pachinzvimbo chacho, kero yechipo yemumwe nemumwe inotorwa kubva kukey yake yeNostr yepachena. Vapi vanotumira zvakananga kumushanduki, {{appName}} haina kana kubata mari, uye puratifomu pachayo haigone kuvharwa kurambidza chero ani zvake. Vashanduki vanoda kuvanzika kwechipo chega chega vanogona kugamuchira mibhadharo yakanyarara, inopa kusabatanidzika kumwechete pasina munhu anobata mari pakati."
+        ]
+      },
+      "why-not-other-crypto": {
+        "question": "Sei kusiri Monero kana imwe cryptocurrency?",
+        "answer": [
+          "Bitcoin ndiyo cryptocurrency inozivikanwa zvakanyanya. Izvi zvinoreva kuti iri nyore kuvapi kutenga uye kutumira, uye iri nyore kuvashanduki kugashira, kuchengeta, uye kushandisa.",
+          "Macoin akatarisana nekuvanzika kwakaita seMonero anopa kupokana kwakavanzika kwakasiyana neBitcoin, asi haatsigirwe nemamwe app emumusha uye akaoma kushandurira kumari yenyika. Kukumbira kumwe kwemativi maviri echipo kuti chitange chawana cryptocurrency isingazivikanwe imhura iyo {{appName}} haisi kuzoisa panzira. Kuzvipo zveBitcoin pachezvazvo, mibhadharo yakanyarara inovharidzira nyaya yekusabatanidzika pasina kubuda muhupfumi hweBitcoin."
+        ]
+      },
+      "what-is-nostr": {
+        "question": "Nostr chii?",
+        "answer": [
+          "Nostr inetiweki yakavhurika apo **iwe** uri muridzi weakaundi yako, kwete kambani. Hunhu hwako kiyi yekrptiografi yaunodzora, kwete zita remushandisi paseva yemumwe munhu.",
+          "Pa{{appName}}, kiyi yakafanana ndicho chinotorwa kero yako yechipo — ndocho chikonzero unogona kugashira Bitcoin pasina kunyoresa chero kwaani."
+        ]
+      },
+      "why-login-different": {
+        "question": "Sei kupinda kwangu kwakasiyana uye kurefu zvakadai?",
+        "answer": [
+          "Panzvimbo pezita remushandisi nemupasiwedhi yakadzorwa nekambani, Nostr inoshandisa peya yemakiyi ekriptiografi.",
+          "\"Kiyi yako yepachena\" (inotanga ne**npub**) izita rako remushandisi. \"Kiyi yako yakavanzika\" (inotanga ne**nsec**) ipasiwedhi yako. Tambo refu ndiyo inoita kuti iyi isagona kufungidzirwa zvakananga."
+        ]
+      },
+      "lose-secret-key": {
+        "question": "Chii chinoitika kana ndikarasa kiyi yangu yakavanzika?",
+        "answer": [
+          "**Hapana bhatani re\"wakanganwa pasiwedhi\".** Hapana anogona kuyiseta zvekare kwauri. Kana wairasa, akaundi yako — uye chero Bitcoin iri pakero yako yechipo — yaperera nokusingaperi.",
+          "**Chengeta kiyi yako yakavanzika kunzvimbo yakachengeteka iye zvino.** Kuti uone mazano, verenga [Kutarisira Makey ako eNostr](https://soapbox.pub/blog/managing-nostr-keys)."
+        ]
+      },
+      "manage-secret-key": {
+        "question": "Ndinogona here kuchengeta kiyi yangu yakavanzika muchengeti yemapasiwedhi yefoni yangu?",
+        "answer": [
+          "Hongu. Unogona kuyichengeta muchengeti yemapasiwedhi yedhivhaisi yako (iCloud Keychain, 1Password, Bitwarden, n.z.v.). PaiPhone, kuyichengeta muPasswords kunokupa mukana wekushandisa Face ID kana Touch ID kupinda.",
+          "Kuti uwane bhuku rakazara, ona [Kutarisira Makey ako eNostr](https://soapbox.pub/blog/managing-nostr-keys)."
+        ]
+      },
+      "send-bitcoin-lightning": {
+        "question": "Kutumira Bitcoin neLightning kunoshanda sei?",
+        "answer": [
+          "Kana mugashiri aine kero yeLightning papurofiri yake, unogona kutumira kuiyoyo. Lightning inopedza mumaminetiisi mashomanana uye mari yebasa idiki.",
+          "Kutumira kweLightning hakushandisi kero yechipo ye{{appName}} — kunoenda zvakananga kuwalleti yeLightning ipi zvayo yakagadzirwa nemugashiri ega. Mafambisirwo echipo che{{appName}} pachayo zviri on-chain chete."
+        ]
+      },
+      "what-are-zaps": {
+        "question": "MaZaps chii?",
+        "answer": [
+          "MaZaps imari shoma yekutsigira yeLightning paNostr, yakasiyana nemafambisirwo echipo che{{appName}} on-chain."
+        ]
+      },
+      "fyp": {
+        "question": "Feed inoshanda sei?",
+        "answer": [
+          "Feed yako inoratidza makambeni nemaposts kubva kuvanhu vaunotevera. Hapana algorithm inosarudza zvaunoona."
+        ]
+      },
+      "what-are-relays": {
+        "question": "MaRelays chii?",
+        "answer": [
+          "MaRelays ndiwo maseva anochengeta uye anodelivha zviitiko zveNostr — maposts, marisiti echipo, ruzivo rwepurofiri. Zvirongwa zvepiyasi zvinoshanda kubva pakutanga; unogona kuwedzera kana kubvisa relays muSettings > Network."
+        ]
+      },
+      "what-are-blossom": {
+        "question": "MaServers eBlossom chii?",
+        "answer": [
+          "MaServers eBlossom anochengeta mafaira emedia (mafananidzo emakambeni, mafananidzo emapurofiri) paunoaupload. Unogona kutarisira maservers aunoshandisa muSettings > Network."
+        ]
+      },
+      "report-content": {
+        "question": "Ndingareporta sei zvinhu zvinokuvadza?",
+        "answer": [
+          "Vhura menu yemadhoti matatu (**...**) papost ipi zvayo wosarudza \"Report.\" Unogona kuchamira kana kuvharira vashandisi kubva kumenu rimwechetero."
+        ]
+      },
+      "vs-mastodon-bluesky": {
+        "question": "Nostr yakasiyana sei neMastodon kana Bluesky?",
+        "answer": [
+          "PaMastodon, akaundi yako iri paseva yakanyanyowa. PaBluesky, mamwe maakaundi anotsamira pakambani imwechete. PaNostr, hunhu hwako ikey yaunodzora, uye kero yako yechipo inoenda newe kuapp ipi zveNostr."
+        ]
+      },
+      "profile-fields": {
+        "question": "Magedhi epurofiri chii?",
+        "answer": [
+          "Magedhi epurofiri anokupa mukana wekuwedzera ruzivo runonyatso pakupurofiri yako — masaini, makero emawalleti, mhumhutsi, mifananidzo, mavhidhio."
+        ]
+      }
+    }
   }
 }

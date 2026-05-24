@@ -1733,5 +1733,182 @@
       "followTeam": "Sigue a Team Soapbox en Nostr",
       "stillStuckSuffix": ". Allí resolvemos preguntas."
     }
+  },
+  "faq": {
+    "categories": {
+      "getting-started": { "label": "Sobre Agora" },
+      "payments": { "label": "Donaciones de Bitcoin en Agora" },
+      "about-nostr": { "label": "Sobre Nostr" },
+      "legacy": { "label": "Legado" }
+    },
+    "items": {
+      "what-is-ditto": {
+        "question": "¿Qué es {{appName}}?",
+        "answer": [
+          "{{appName}} es una plataforma para enviar donaciones en Bitcoin —públicas o privadas— directamente a activistas. No hay intermediario, ni procesador de pagos, ni cuenta que pueda ser congelada.",
+          "{{appName}} está construido sobre Nostr, por lo que tu identidad no está atada a este sitio: es tuya."
+        ]
+      },
+      "cost-to-use": {
+        "question": "¿{{appName}} tiene algún costo?",
+        "answer": [
+          "**No.** {{appName}} no cobra ninguna comisión de plataforma. Al donar, solo pagas la tarifa de red de Bitcoin que va a los mineros, no a nosotros."
+        ]
+      },
+      "who-made-this": {
+        "question": "¿Quién creó {{appName}}?",
+        "answer": [
+          "{{appName}} está hecho por [Soapbox](https://soapbox.pub), un equipo de código abierto que crea herramientas para el ecosistema Nostr, en colaboración con el [World Liberty Congress](https://worldlibertycongress.org/)."
+        ]
+      },
+      "send-bitcoin-onchain": {
+        "question": "¿Cómo funciona el envío de Bitcoin?",
+        "answer": [
+          "Cuando un activista crea una campaña, elige qué tipos de pago aceptar: **públicos**, **privados** o **ambos**.",
+          "Las donaciones **públicas** son Bitcoin real en la cadena. Se liquidan en la blockchain pública, funcionan en cualquier wallet de Bitcoin y son visibles para cualquiera.",
+          "Las donaciones **privadas** usan **silent payments** (BIP-352). También se liquidan en la cadena, pero la transacción no puede vincularse al código de donación del activista, por lo que quedan fuera de las listas y totales públicos de donantes. El donante necesita una wallet que admita silent payments — recomendamos [Ditto Wallet](https://ditto.pub) o [Dana](https://github.com/cygnet3/dana/releases/download/v0.7.4/app-live-release.apk).",
+          "Cuando una campaña acepta **ambos**, {{appName}} muestra un único código QR que codifica los dos endpoints. Las wallets con silent payments lo leen como privado; las demás recurren a la dirección pública. Los donantes no tienen que elegir: su wallet escoge automáticamente el camino correcto.",
+          "En cualquier caso, el pago llega directamente al activista. {{appName}} nunca toca los fondos."
+        ]
+      },
+      "connect-wallet": {
+        "question": "¿Qué es la wallet en {{appName}}?",
+        "answer": [
+          "Tu wallet de {{appName}} se construye a partir de tu clave de Nostr. Puede recibir Bitcoin de dos maneras: como dirección pública que cualquier wallet de Bitcoin puede pagar, y como código de silent payments al que las wallets compatibles pueden pagar de forma privada. No hay nada que registrar; existe en cuanto tienes una cuenta.",
+          "Al crear una campaña, eliges si aceptar pagos públicos, privados o ambos. Para gastar lo que recibes, consulta la **Guía del activista**."
+        ]
+      },
+      "donations-are-public-general": {
+        "question": "¿Las donaciones en {{appName}} son públicas?",
+        "answer": [
+          "Depende del tipo de pago que acepte el activista.",
+          "Las **donaciones públicas** quedan registradas en la blockchain de Bitcoin y en Nostr. Cualquiera puede ver los importes, las horas y las direcciones.",
+          "Las **donaciones privadas** usan silent payments. No son vinculables públicamente al código de donación del activista, no aparecen en las listas de donantes y no cuentan en los totales públicos.",
+          "Cuando una campaña acepta ambos, la wallet del donante decide qué vía usar — las wallets compatibles con silent payments pagan de forma privada, las demás pagan la dirección pública. Lee la **Guía del donante** y la **Guía del activista** para el panorama completo."
+        ]
+      },
+      "censorship-resistance": {
+        "question": "¿Qué significa aquí \"resistente a la censura\"?",
+        "answer": [
+          "Ninguna empresa se interpone entre un donante y un activista. {{appName}} no retiene los fondos y no puede congelar la dirección.",
+          "Mientras la red Bitcoin funcione, se pueden enviar y recibir donaciones. Que {{appName}} mismo se cayera no las detendría."
+        ]
+      },
+      "why-onchain": {
+        "question": "¿Por qué Bitcoin?",
+        "answer": [
+          "Bitcoin es el método de pago más ampliamente soportado y resistente a la censura del mundo. Cualquier wallet de Bitcoin puede enviarlo.",
+          "En {{appName}}, los activistas eligen cómo recibir: **público** (una dirección de Bitcoin normal) para máximo alcance, **privado** (silent payments) para donaciones no vinculables, o **ambos** para que la wallet de cada donante elija automáticamente el camino correcto. Los donantes que solo tienen una app de Bitcoin para el público general también pueden contribuir; los que usan una wallet con silent payments obtienen privacidad por defecto.",
+          "El contrapeso es que las transacciones de Bitcoin públicas son visibles en la blockchain y pagan una tarifa al minero. Las guías del donante y del activista explican cómo manejar ambas."
+        ]
+      },
+      "why-not-silent-payments": {
+        "question": "¿{{appName}} admite silent payments?",
+        "answer": [
+          "Sí. Cuando un activista crea una campaña puede aceptar silent payments junto a, o en lugar de, los pagos públicos de Bitcoin. Las donaciones por silent payments también se liquidan en la cadena, pero la transacción no se puede vincular al código de donación del activista, por lo que no aparecen en las listas ni en los totales públicos.",
+          "Enviar un silent payment requiere una wallet que admita BIP-352. La mayoría de apps de consumo aún no lo hacen, pero [Ditto Wallet](https://ditto.pub) y [Dana](https://github.com/cygnet3/dana/releases/download/v0.7.4/app-live-release.apk) sí.",
+          "Cuando una campaña acepta ambos tipos de pago, {{appName}} los codifica en un único código QR. Las wallets capaces de silent payments pagan en privado; el resto paga la dirección pública. Ningún donante queda fuera, y ningún activista se ve obligado a elegir entre alcance y privacidad."
+        ]
+      },
+      "why-not-lightning": {
+        "question": "¿Por qué {{appName}} no usa Lightning?",
+        "answer": [
+          "Lightning requiere una wallet de Lightning. Las más fáciles (Wallet of Satoshi, Strike, Breez) son **custodiales** — una empresa retiene los fondos y puede ser cerrada, geobloqueada o presionada para congelar cuentas. La opción no custodial en Lightning es técnicamente exigente y poco fiable para quienes empiezan.",
+          "Queremos que {{appName}} funcione para alguien cuya única experiencia con Bitcoin sea una app para el público general como Cash App, Coinbase, Strike, Venmo o PayPal. Bitcoin on-chain funciona con todas las wallets del planeta."
+        ]
+      },
+      "why-not-rotating-addresses": {
+        "question": "¿Por qué {{appName}} no genera una dirección nueva por cada donación?",
+        "answer": [
+          "Hacerlo obligaría a {{appName}} a actuar como un intermediario de intercambio de dinero, tomando primero custodia de los bitcoins y luego reenviándolos al activista.",
+          "Eso nos convertiría en transmisores de dinero, sujetos a la regulación correspondiente, y en un único punto de fallo: apaga el servidor de {{appName}} y apagas todas las donaciones que pasan por él.",
+          "En cambio, la dirección de donación de cada usuario se deriva de su clave pública de Nostr. Los donantes envían directamente al activista, {{appName}} nunca toca los fondos y la propia plataforma no se puede apagar para censurar a nadie. Los activistas que quieren privacidad por donación pueden aceptar silent payments, que ofrecen la misma no vinculabilidad sin que nadie retenga el dinero por el medio."
+        ]
+      },
+      "why-not-other-crypto": {
+        "question": "¿Por qué no Monero u otra criptomoneda?",
+        "answer": [
+          "Bitcoin es, con diferencia, la criptomoneda más adoptada. Eso significa que es la más fácil para que los donantes la compren y la envíen, y la más fácil para que los activistas la reciban, la guarden y la gasten.",
+          "Las monedas centradas en la privacidad como Monero ofrecen distintas compensaciones de privacidad respecto a Bitcoin, pero no las admiten la mayoría de las apps de consumo y son más difíciles de convertir a moneda local. Pedir a cualquiera de los dos extremos de una donación que primero adquiera una criptomoneda de nicho es una barrera que {{appName}} no va a poner. Para las donaciones de Bitcoin en sí, los silent payments cubren el caso de uso de la no vinculabilidad sin salir del ecosistema Bitcoin."
+        ]
+      },
+      "what-is-nostr": {
+        "question": "¿Qué es Nostr?",
+        "answer": [
+          "Nostr es una red abierta donde **tú** eres dueño de tu cuenta, no una empresa. Tu identidad es una clave criptográfica que tú controlas, no un nombre de usuario en el servidor de otra persona.",
+          "En {{appName}}, esa misma clave también es de donde se deriva tu dirección de donación, por lo que puedes recibir Bitcoin sin registrarte con nadie."
+        ]
+      },
+      "why-login-different": {
+        "question": "¿Por qué mi inicio de sesión es tan distinto y largo?",
+        "answer": [
+          "En lugar de un usuario y una contraseña controlados por una empresa, Nostr usa un par de claves criptográficas.",
+          "Tu \"clave pública\" (empieza por **npub**) es tu nombre de usuario. Tu \"clave secreta\" (empieza por **nsec**) es tu contraseña. La cadena larga es lo que hace que sea prácticamente imposible adivinarla."
+        ]
+      },
+      "lose-secret-key": {
+        "question": "¿Qué pasa si pierdo mi clave secreta?",
+        "answer": [
+          "**No hay botón de \"olvidé mi contraseña\".** Nadie puede restablecerla por ti. Si la pierdes, tu cuenta —y cualquier Bitcoin que haya en tu dirección de donación— desaparece para siempre.",
+          "**Guarda tu clave secreta en un lugar seguro ahora mismo.** Para consejos, lee [Cómo gestionar tus claves de Nostr](https://soapbox.pub/blog/managing-nostr-keys)."
+        ]
+      },
+      "manage-secret-key": {
+        "question": "¿Puedo guardar mi clave secreta en el gestor de contraseñas de mi teléfono?",
+        "answer": [
+          "Sí. Puedes guardarla en el gestor de contraseñas de tu dispositivo (Llavero de iCloud, 1Password, Bitwarden, etc.). En iPhone, guardarla en Contraseñas te permite usar Face ID o Touch ID para iniciar sesión.",
+          "Para una guía completa, consulta [Cómo gestionar tus claves de Nostr](https://soapbox.pub/blog/managing-nostr-keys)."
+        ]
+      },
+      "send-bitcoin-lightning": {
+        "question": "¿Cómo funciona el envío de Bitcoin por Lightning?",
+        "answer": [
+          "Si un destinatario tiene una dirección Lightning en su perfil, puedes enviarle a esa. Lightning se liquida en segundos y las comisiones son mínimas.",
+          "Los envíos por Lightning no usan la dirección de donación de {{appName}}: van directamente a la wallet de Lightning que el destinatario haya configurado por su cuenta. El propio flujo de donaciones de {{appName}} es solo on-chain."
+        ]
+      },
+      "what-are-zaps": {
+        "question": "¿Qué son los zaps?",
+        "answer": [
+          "Los zaps son pequeñas propinas por Lightning en Nostr, separadas del flujo de donaciones on-chain de {{appName}}."
+        ]
+      },
+      "fyp": {
+        "question": "¿Cómo funciona el feed?",
+        "answer": [
+          "Tu feed muestra campañas y publicaciones de las personas a las que sigues. No hay un algoritmo decidiendo qué ves."
+        ]
+      },
+      "what-are-relays": {
+        "question": "¿Qué son los relés?",
+        "answer": [
+          "Los relés son los servidores que almacenan y entregan los eventos de Nostr: publicaciones, recibos de donación, información de perfil. Los valores por defecto funcionan de inmediato; puedes añadir o quitar relés en Ajustes > Red."
+        ]
+      },
+      "what-are-blossom": {
+        "question": "¿Qué son los servidores Blossom?",
+        "answer": [
+          "Los servidores Blossom guardan los archivos multimedia (imágenes de campañas, fotos de perfil) cuando los subes. Puedes gestionar qué servidores utilizas en Ajustes > Red."
+        ]
+      },
+      "report-content": {
+        "question": "¿Cómo denuncio contenido dañino?",
+        "answer": [
+          "Toca el menú de tres puntos (**...**) en cualquier publicación y selecciona \"Denunciar\". Desde el mismo menú puedes silenciar o bloquear usuarios."
+        ]
+      },
+      "vs-mastodon-bluesky": {
+        "question": "¿En qué se diferencia Nostr de Mastodon o Bluesky?",
+        "answer": [
+          "En Mastodon, tu cuenta vive en un servidor concreto. En Bluesky, la mayoría de cuentas dependen de una sola empresa. En Nostr, tu identidad es una clave que tú controlas, y tu dirección de donación te acompaña a cualquier app de Nostr."
+        ]
+      },
+      "profile-fields": {
+        "question": "¿Qué son los campos del perfil?",
+        "answer": [
+          "Los campos del perfil te permiten añadir información extra a tu perfil: enlaces, direcciones de wallet, música, fotos, vídeos."
+        ]
+      }
+    }
   }
 }
