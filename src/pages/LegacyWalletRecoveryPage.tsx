@@ -24,7 +24,7 @@ interface LegacyOption {
 }
 
 /**
- * Legacy wallet recovery hub at `/wallet/settings/legacy`.
+ * Legacy wallet recovery hub at `/wallet/legacy`.
  *
  * Surfaces two opt-in recovery flows for funds that may still be sitting in
  * Agora's previous wallet generations:
@@ -58,7 +58,7 @@ export function LegacyWalletRecoveryPage() {
 
   if (!user) {
     return (
-      <main>
+      <main className="max-w-md mx-auto">
         <PageHeader
           backTo="/wallet/settings"
           alwaysShowBack
@@ -106,7 +106,7 @@ export function LegacyWalletRecoveryPage() {
   const v2HasFunds = v2.v1TotalBalance > 0;
 
   return (
-    <main>
+    <main className="max-w-md mx-auto">
       <PageHeader
         backTo="/wallet/settings"
         alwaysShowBack
@@ -120,7 +120,7 @@ export function LegacyWalletRecoveryPage() {
         }
       />
 
-      <div className="max-w-md mx-auto px-4 pt-2 pb-12 space-y-6">
+      <div className="px-4 pt-2 pb-12 space-y-6">
         {/* V2 beta detection result — only when funds were actually found,
             so the user gets a clear "you have something here" prompt instead
             of a noisy "no funds detected" empty state for the common case. */}

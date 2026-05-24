@@ -17,7 +17,6 @@ import {
 } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
-import { Skeleton } from '@/components/ui/skeleton';
 import { LoginArea } from '@/components/auth/LoginArea';
 import { QRCodeCanvas } from '@/components/ui/qrcode';
 import {
@@ -152,10 +151,13 @@ export function WalletPage() {
 
   // ── Available — full HD wallet UI ────────────────────────────
   return (
-    <main>
+    <main className="max-w-sm mx-auto">
       {/* Top bar: settings cog only. We deliberately keep this minimal —
           the wallet home doubles as a phone-style "home screen" with the
-          balance as the hero, so any chrome here pushes that down. */}
+          balance as the hero, so any chrome here pushes that down. The cog
+          shares the `max-w-sm` container with the rest of the wallet UI so
+          it sits flush with the balance + send/receive controls instead of
+          floating off in the far corner of a wide layout. */}
       <div className="flex items-center justify-end px-4 pt-3">
         <Link
           to="/wallet/settings"
@@ -167,12 +169,11 @@ export function WalletPage() {
         </Link>
       </div>
 
-      <div className="flex flex-col items-center px-4 pt-4 pb-4 space-y-6 max-w-sm mx-auto">
+      <div className="flex flex-col items-center px-4 pt-4 pb-4 space-y-6">
         {/* Balance */}
         {isLoading ? (
-          <div className="flex flex-col items-center space-y-2">
-            <Skeleton className="h-10 w-40 rounded-lg" />
-            <Skeleton className="h-4 w-24 rounded" />
+          <div className="flex flex-col items-center justify-center py-8">
+            <RefreshCw className="size-6 animate-spin text-muted-foreground" />
           </div>
         ) : error ? (
           <div className="text-center space-y-3">

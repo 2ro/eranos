@@ -39,7 +39,7 @@ export function BitcoinWalletSettingsPage() {
   const rows: SettingsRow[] = [
     {
       id: 'backup',
-      to: '/wallet/settings/backup',
+      to: '/wallet/backup',
       icon: <KeyRound className="size-4 text-white" />,
       iconWrapClass: 'bg-blue-500',
       labelKey: 'walletSettings.backup.label',
@@ -47,7 +47,7 @@ export function BitcoinWalletSettingsPage() {
     },
     {
       id: 'legacy',
-      to: '/wallet/settings/legacy',
+      to: '/wallet/legacy',
       icon: <History className="size-4 text-white" />,
       iconWrapClass: 'bg-amber-500',
       labelKey: 'walletSettings.legacy.label',
@@ -56,7 +56,7 @@ export function BitcoinWalletSettingsPage() {
   ];
 
   return (
-    <main>
+    <main className="max-w-md mx-auto">
       <PageHeader
         backTo="/wallet"
         alwaysShowBack
@@ -70,7 +70,7 @@ export function BitcoinWalletSettingsPage() {
         }
       />
 
-      <div className="max-w-md mx-auto px-4 pt-2 pb-12">
+      <div className="px-4 pt-2 pb-12">
         {/* Apple-style grouped list: rounded card, hairline dividers, chevrons. */}
         <ul className="rounded-xl bg-card border divide-y divide-border overflow-hidden shadow-sm">
           {rows.map((row) => (

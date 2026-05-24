@@ -150,8 +150,12 @@ export function AppRouter() {
           <Route path="/settings/network" element={<NetworkSettingsPage />} />
           <Route path="/wallet" element={<WalletPage />} />
           <Route path="/wallet/settings" element={<BitcoinWalletSettingsPage />} />
-          <Route path="/wallet/settings/backup" element={<WalletBackupPage />} />
-          <Route path="/wallet/settings/legacy" element={<LegacyWalletRecoveryPage />} />
+          <Route path="/wallet/backup" element={<WalletBackupPage />} />
+          <Route path="/wallet/legacy" element={<LegacyWalletRecoveryPage />} />
+          {/* Old nested paths kept as redirects so any existing links / muscle
+              memory still land on the right page. */}
+          <Route path="/wallet/settings/backup" element={<Navigate to="/wallet/backup" replace />} />
+          <Route path="/wallet/settings/legacy" element={<Navigate to="/wallet/legacy" replace />} />
           <Route path="/wallet/recovery" element={<WalletRecoveryPage />} />
           <Route path="/wallet/migrate-v1" element={<WalletMigrateV1Page />} />
           <Route path="/bitcoin" element={<Navigate to="/wallet" replace />} />

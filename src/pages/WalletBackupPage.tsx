@@ -10,7 +10,7 @@ import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useHdWalletAccess } from '@/hooks/useHdWalletAccess';
 
 /**
- * Seed-phrase backup page for `/wallet/settings/backup`.
+ * Seed-phrase backup page for `/wallet/backup`.
  *
  * Wraps the existing `WalletBackupMnemonic` component (previously rendered as
  * a dialog from `/wallet`) in a full-page layout. The component itself hides
@@ -31,7 +31,7 @@ export function WalletBackupPage() {
   // Not logged in — show the login prompt rather than redirecting away.
   if (!user) {
     return (
-      <main>
+      <main className="max-w-md mx-auto">
         <PageHeader
           backTo="/wallet/settings"
           alwaysShowBack
@@ -59,7 +59,7 @@ export function WalletBackupPage() {
   // leave a confusing blank page; explain why instead.
   if (access.status !== 'available') {
     return (
-      <main>
+      <main className="max-w-md mx-auto">
         <PageHeader
           backTo="/wallet/settings"
           alwaysShowBack
@@ -69,7 +69,7 @@ export function WalletBackupPage() {
             </div>
           }
         />
-        <div className="py-20 px-8 flex flex-col items-center gap-6 text-center max-w-md mx-auto">
+        <div className="py-20 px-8 flex flex-col items-center gap-6 text-center">
           <p className="text-muted-foreground text-sm">
             {t('walletBackupPage.unsupported')}
           </p>
@@ -79,7 +79,7 @@ export function WalletBackupPage() {
   }
 
   return (
-    <main>
+    <main className="max-w-md mx-auto">
       <PageHeader
         backTo="/wallet/settings"
         alwaysShowBack
@@ -93,7 +93,7 @@ export function WalletBackupPage() {
         }
       />
 
-      <div className="max-w-md mx-auto px-4 pt-2 pb-12">
+      <div className="px-4 pt-2 pb-12">
         <WalletBackupMnemonic />
       </div>
     </main>
