@@ -1,4 +1,5 @@
 import { Check } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 import { Card } from '@/components/ui/card';
 import { renderInlineMarkup } from '@/lib/helpMarkup';
@@ -10,12 +11,13 @@ import type { GuideTldrBlock } from '@/lib/helpContent';
  * page's promise in a single screen.
  */
 export function GuideTLDR({ block }: { block: GuideTldrBlock }) {
+  const { t } = useTranslation();
   return (
     <Card className="overflow-hidden border-primary/20 bg-gradient-to-br from-primary/5 via-card to-card">
       <div className="grid gap-5 p-5 sm:p-6 sm:grid-cols-[1fr_auto] sm:gap-8 sm:items-center">
         <div>
           <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-primary/80 mb-2">
-            The short version
+            {t('guides.shared.tldrEyebrow')}
           </p>
           <p className="text-lg sm:text-xl font-medium leading-snug text-foreground">
             {renderInlineMarkup(block.lede)}

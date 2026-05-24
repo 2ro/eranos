@@ -1901,5 +1901,224 @@
         ]
       }
     }
+  },
+  "guides": {
+    "shared": {
+      "tldrEyebrow": "The short version",
+      "paymentBadge": {
+        "public": "Public Payments",
+        "silent": "Silent Payments"
+      },
+      "paymentComparison": {
+        "donorHeader": "When you donate",
+        "activistHeader": "When you create",
+        "donorRows": {
+          "whatYouSee": {
+            "label": "What you see",
+            "public": "A regular Bitcoin address you can pay from anywhere.",
+            "silent": "The same QR. Your wallet picks the silent-payment endpoint if it supports BIP-352."
+          },
+          "walletSupport": {
+            "label": "Wallet support",
+            "public": "Every Bitcoin wallet. Cash App, Coinbase, Strike, hardware, anything.",
+            "silent": "Few wallets today. Most fall back to a regular Bitcoin transaction."
+          },
+          "privacy": {
+            "label": "Privacy of the donation",
+            "public": "Public on-chain. Your sending address is permanently linked to the campaign.",
+            "silent": "Receiving side is unlinkable on-chain. Your sending wallet's trail is still public."
+          },
+          "settlement": {
+            "label": "Settlement",
+            "public": "Normal Bitcoin confirmations.",
+            "silent": "Same on-chain confirmations, but the activist has to scan their wallet to find it."
+          }
+        },
+        "activistRows": {
+          "whatDonorsSee": {
+            "label": "What donors see",
+            "public": "A regular Bitcoin address. Works with every wallet on earth.",
+            "silent": "A BIP-352 endpoint. Donors' wallets need silent-payments support; otherwise the donation falls back to a regular Bitcoin transaction."
+          },
+          "receivingSpeed": {
+            "label": "Receiving speed",
+            "public": "Push-style. Donations show up immediately on the campaign page.",
+            "silent": "Manual scanning. Your wallet has to walk the blockchain looking for them. Minutes to hours, depending on the wallet."
+          },
+          "pushNotifications": {
+            "label": "Push notifications",
+            "public": "Yes. You see new donations the moment they arrive.",
+            "silent": "No. Open the wallet and trigger a scan to discover them."
+          },
+          "donorList": {
+            "label": "Donor list / campaign totals",
+            "public": "Public forever. Amounts and sending addresses are visible to anyone.",
+            "silent": "Private. The campaign page can't show silent-payments donation counts or totals."
+          },
+          "ecosystem": {
+            "label": "Ecosystem maturity",
+            "public": "Mature. Settled tooling.",
+            "silent": "Bleeding-edge. Wallets are still buggy; expect missed payments that show up on a later scan."
+          },
+          "bestFor": {
+            "label": "Best for",
+            "public": "Above-ground fundraisers where social proof and visibility help.",
+            "silent": "Campaigns where donor or activist privacy matters more than the visible total."
+          },
+          "watchOutFor": {
+            "label": "Watch out for",
+            "public": "Permanent public record of every donor.",
+            "silent": "Bumpy UX today. Some donations won't show until the activist scans."
+          }
+        }
+      }
+    },
+    "donor": {
+      "tldr": {
+        "lede": "Pay the Bitcoin address on the campaign page from any wallet you already have. If the campaign accepts silent payments and your wallet supports them, your donation is private automatically.",
+        "nextActions": [
+          "Pay from any Bitcoin wallet",
+          "No middleman, no holding period",
+          "Want privacy? Read below"
+        ]
+      },
+      "flow": {
+        "heading": "How a donation flows",
+        "steps": {
+          "openCampaign": {
+            "title": "Open the campaign",
+            "body": "You see a single QR code. If the campaign accepts both options, it encodes both endpoints; your wallet picks the right one."
+          },
+          "payFromAnyWallet": {
+            "title": "Pay it from any wallet",
+            "body": "Cash App, Coinbase, Strike, a hardware wallet, anything. Pay the amount plus the network fee."
+          },
+          "arrivesDirectly": {
+            "title": "It arrives directly",
+            "body": "Funds settle straight to the activist. {{appName}} doesn't hold or route them, and the address is derived from the activist's Nostr key."
+          }
+        }
+      },
+      "comparison": {
+        "footnote": "Campaigns can accept Public only, Silent only, or both. If both, the QR code carries both endpoints. Your wallet picks the one it can use."
+      },
+      "publicVisible": {
+        "title": "Public donations are visible on-chain forever",
+        "body": "A **Public** donation lands at a regular Bitcoin address tied to the campaign. Anyone can look up the address and see the amount, the time, and your sending address. **Silent** donations settle on-chain too, but the receiving side is unlinkable to the campaign so they stay out of public donor lists and totals."
+      },
+      "privacy": {
+        "heading": "Donating privately",
+        "intro": "These steps matter most for **Public** donations, where every transaction is permanently tied to a single address. **Silent** donations already hide the receiving side, so the risk is lower. Targeted analysis of your sending wallet is still possible either way, so if your risk is high these steps are worth taking. Pick one, or stack them.",
+        "options": {
+          "silentWallet": {
+            "name": "Use a silent-payments wallet",
+            "purpose": "Pay with a Bitcoin wallet that supports BIP-352. If the campaign accepts silent payments, your wallet uses that endpoint automatically."
+          },
+          "nonKyc": {
+            "name": "Buy non-KYC Bitcoin",
+            "purpose": "Buy Bitcoin peer-to-peer so it isn't linked to your government ID in the first place. Strongest privacy starting point."
+          },
+          "coinjoin": {
+            "name": "Coinjoin first",
+            "purpose": "Mix your Bitcoin with other people's coins so the output can't be traced to your KYC purchase. Useful when the campaign only accepts public."
+          },
+          "freshWallet": {
+            "name": "Use a fresh wallet",
+            "purpose": "Donate from a wallet that has never touched your main identity or a KYC exchange."
+          }
+        }
+      },
+      "consumerApps": {
+        "title": "Consumer apps can't make you anonymous",
+        "body": "Cash App, Coinbase, Strike, Venmo, Kraken, Binance, and PayPal all verify your ID. No matter how you send the donation, every transaction stays tied to your real identity. Use a non-custodial wallet you control."
+      },
+      "silentToday": {
+        "heading": "A note on silent payments today",
+        "paragraphs": [
+          "Silent payments are the most private way to receive Bitcoin on-chain, but the ecosystem is young. Most popular wallets can't send to a silent-payment endpoint yet, so when a wallet can't, the donation falls back to a regular Bitcoin transaction to the campaign's public address (if the campaign accepts both).",
+          "For activists, silent-payment donations also arrive without push notifications and only appear after the activist scans their wallet, which can take minutes to hours. None of this affects the safety of your funds; it just shapes the experience."
+        ]
+      }
+    },
+    "activist": {
+      "tldr": {
+        "lede": "Pick what to accept when you create your campaign: Public, Silent, or both. Either option is non-custodial. {{appName}} never holds your funds.",
+        "nextActions": [
+          "Compare the two options",
+          "Plan how you will cash out",
+          "Sweep funds promptly"
+        ]
+      },
+      "howReceiving": {
+        "heading": "How receiving works",
+        "paragraphs": [
+          "Your {{appName}} donation addresses are derived from your Nostr public key. When you create a campaign, you pick what to accept:",
+          "**Public payments only.** A regular Bitcoin address. Visible to everyone, works with every wallet.",
+          "**Silent payments only.** BIP-352 silent payments. The receiving side is unlinkable on-chain, so donations stay out of public donor lists and totals. Donors need a silent-payments-capable wallet to send. If they don't have one, their donation can't go through.",
+          "**Both.** {{appName}} generates a single QR code that encodes both endpoints. Silent-payments wallets read it as private; ordinary wallets pay the public address. Donors don't have to choose.",
+          "Accepting both is usually the right call: you get private donations from supporters who use a silent-payments wallet, and you stay open to donors whose only Bitcoin is in a consumer app."
+        ]
+      },
+      "whatEveryoneSees": {
+        "heading": "What everyone can see",
+        "paragraphs": [
+          "If your campaign accepts public payments, anyone considering supporting you can look up the address and see the public donation history.",
+          "Silent-payment donations aren't part of that record. They're invisible to outside observers and don't show in the campaign's public totals; new donors only see whatever you publish about the campaign's progress."
+        ]
+      },
+      "comparison": {
+        "footnote": "You can't switch a campaign's accepted payment options after it's created. If you change your mind, make a new campaign."
+      },
+      "silentToday": {
+        "heading": "A note on silent payments today",
+        "paragraphs": [
+          "Silent payments are the most private way to receive Bitcoin on-chain, but the ecosystem is young. Most popular wallets can't send to a silent-payment endpoint yet, so when a donor's wallet can't, the donation falls back to a regular Bitcoin transaction to your public address (if you accept both).",
+          "Silent-payment donations also arrive without push notifications and only appear after you scan your wallet, which can take minutes to hours. None of this affects the safety of your funds; it just shapes the day-to-day experience."
+        ]
+      },
+      "movePromptly": {
+        "heading": "Move donations promptly",
+        "steps": {
+          "sweep": {
+            "title": "Sweep to a wallet you control",
+            "body": "Good self-custody options: [Sparrow](https://sparrowwallet.com), [BlueWallet](https://bluewallet.io), or [Phoenix](https://phoenix.acinq.co) (Lightning)."
+          },
+          "dontSit": {
+            "title": "Don't sit on funds at the campaign address",
+            "body": "Treat it like a mailbox, not a savings account. This applies to both Public and Silent donations."
+          }
+        }
+      },
+      "cashout": {
+        "heading": "Cashing out privately",
+        "intro": "Spending on-chain creates a trail unless you break it first. The simplest privacy exit is to **move funds into a silent-payments wallet first**, then spend onward; the hop breaks the link between your campaign address and what comes next. The other options below also work and have their own trade-offs.",
+        "options": {
+          "silentHop": {
+            "name": "Silent-payments wallet hop",
+            "purpose": "Move your donations to a silent-payments wallet ([Ditto Wallet](https://ditto.pub), [Dana](https://github.com/cygnet3/dana/releases/download/v0.7.4/app-live-release.apk)). From there your downstream spending isn't tied to the campaign."
+          },
+          "lightningSwap": {
+            "name": "Lightning swap",
+            "purpose": "Atomic-swap on-chain Bitcoin to Lightning. Lightning payments don't hit the public blockchain."
+          },
+          "coinjoin": {
+            "name": "Coinjoin",
+            "purpose": "Mix your Bitcoin with other users' coins so the output can't be linked back to the input."
+          },
+          "peerToPeer": {
+            "name": "Peer-to-peer",
+            "purpose": "Trade Bitcoin for fiat directly with another person or through a broker on Bisq, HodlHodl, or RoboSats."
+          },
+          "spendDirectly": {
+            "name": "Spend it directly",
+            "purpose": "Buy gift cards (Amazon, Uber, groceries, travel) straight from Bitcoin without converting to cash first."
+          }
+        }
+      },
+      "tumblers": {
+        "title": "Avoid centralized tumblers",
+        "body": "Custodial mixers can steal your coins, log who sent what, or turn out to be law-enforcement honeypots. Use a silent-payments hop or a non-custodial coinjoin instead."
+      }
+    }
   }
 }
