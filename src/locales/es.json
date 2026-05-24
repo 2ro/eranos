@@ -1591,5 +1591,147 @@
         "Security": "Seguridad"
       }
     }
+  },
+  "about": {
+    "seoTitle": "Acerca de",
+    "seoDescription": "Cómo funciona {{appName}}: conectando a activistas con financiamiento imparable a través de Bitcoin y Nostr.",
+    "hero": {
+      "eyebrow": "Sobre {{appName}}",
+      "headlinePart1": "Cómo",
+      "headlineAppName": "{{appName}}",
+      "headlinePart2": "funciona.",
+      "body": "{{appName}} es una plataforma de donaciones resistente a la censura, construida sobre Nostr y Bitcoin. Sin cuentas bancarias congeladas. Sin cierres corporativos. Solo apoyo directo de personas que creen en tu causa.",
+      "trustChips": {
+        "decentralized": "Descentralizado",
+        "openSource": "Código abierto",
+        "censorshipResistant": "Resistente a la censura"
+      },
+      "ctaDonor": "Lee la guía para donantes",
+      "ctaActivist": "Lee la guía para activistas",
+      "sampleCard": {
+        "countryName": "Venezuela",
+        "public": "Pública",
+        "imageAlt": "Activistas venezolanos en una vigilia con velas sosteniendo un letrero que dice 'Liberen a todos los presos políticos · ¡Cese la represión!'",
+        "orgName": "Venezolanos Libres",
+        "title": "Libera a los presos políticos de Venezuela",
+        "description": "Defensa legal y apoyo familiar para más de 800 presos políticos detenidos por el régimen de Maduro.",
+        "raised": "recaudados",
+        "ofGoal": "de $10,000",
+        "donorsLine": "247 donantes · 12 países",
+        "donate": "Donar Bitcoin"
+      }
+    },
+    "howItWorks": {
+      "eyebrow": "Cómo funciona",
+      "title": "Tres pasos. Sin intermediarios.",
+      "lede": "Sin bancos, sin fronteras, sin permisos.",
+      "step1": {
+        "imageAlt": "Una llave criptográfica naranja brillante flotando en el espacio oscuro, simbolizando la identidad autosoberana",
+        "title": "Los activistas se registran en segundos.",
+        "body": "Sin banco. Sin papeleo. Sin aprobaciones. Tan pronto como un activista crea una cuenta en {{appName}}, tiene una dirección de Bitcoin lista para recibir apoyo, en cualquier parte del mundo."
+      },
+      "step2": {
+        "imageAlt": "Una moneda de Bitcoin brillante volando por el aire sobre un mapa mundial oscuro, simbolizando el pago transfronterizo instantáneo",
+        "title": "Los donantes envían Bitcoin directamente.",
+        "body": "Los donantes envían Bitcoin desde cualquier billetera que ya usen (Cash App, Coinbase, Strike, una billetera de hardware) directamente al activista. {{appName}} nunca toca el dinero. Sin servidor intermedio, sin custodio."
+      },
+      "step3": {
+        "imageAlt": "Una mano abierta con luz naranja cálida irradiando desde la palma, simbolizando recibir y autonomía",
+        "title": "El apoyo llega a donde importa.",
+        "body": "Los fondos llegan directamente al activista. Mantienen la custodia, mantienen el control. Mueven, intercambian o gastan; las guías a continuación explican cómo hacerlo de forma privada y segura."
+      }
+    },
+    "twoWays": {
+      "eyebrow": "Bitcoin · Un QR, dos opciones",
+      "title": "Dos formas de recibir pagos.",
+      "lede": "Ambas opciones son Bitcoin. La diferencia es qué sacrificas por privacidad. Cuando un activista crea una campaña, elige cuáles opciones aceptar. Si son ambas, la página de donación muestra un único QR que funciona con cualquier billetera.",
+      "public": {
+        "kicker": "Pagos públicos de Bitcoin",
+        "tagline": "Universal · Rápido · Transparente",
+        "title": "Funciona con todas las billeteras del planeta.",
+        "description": "Las donaciones llegan a una dirección de Bitcoin normal que el activista controla. Cualquiera con cualquier billetera de Bitcoin puede enviar. Sin nueva app, sin nueva cuenta, sin curva de aprendizaje.",
+        "bullet1": "Funciona en todas las billeteras de Bitcoin: Cash App, Coinbase, Strike, hardware",
+        "bullet2": "La liquidación más rápida: solo confirmaciones de Bitcoin",
+        "bullet3": "Verificable en la blockchain: cualquiera puede ver lo que un activista ha recibido",
+        "tradeoffTitle": "Compromiso: público en la blockchain.",
+        "tradeoffIntro": "Cada donación es pública en la blockchain de Bitcoin y en Nostr. {{appName}} se recomienda solo para activismo de cara visible. Si tú o tus donantes requieren privacidad extrema, incluso frente a actores estatales, lee la <0>Guía para donantes</0> y la <1>Guía para activistas</1> antes de participar."
+      },
+      "silent": {
+        "kicker": "Pagos silenciosos de Bitcoin",
+        "tagline": "No enlazables · Directo · BIP-352",
+        "title": "No enlazable, on-chain, directo.",
+        "description": "Las donaciones se envían como pagos silenciosos BIP-352. Cada una llega a una salida de Bitcoin nueva y no enlazable que un observador mirando la blockchain no puede vincular con la campaña.",
+        "bullet1": "El rastro de donaciones no puede reconstruirse en la blockchain",
+        "bullet2": "Protege a activistas que enfrentan adversarios serios",
+        "bullet3": "Llega directo a la billetera del activista, sin servidor intermedio",
+        "tradeoffTitle": "Compromiso: los pagos silenciosos son una tecnología nueva.",
+        "tradeoffIntro": "La forma más privada de recibir Bitcoin on-chain, pero el ecosistema es joven y áspero hoy:",
+        "tradeoffBullet1": "Pocas billeteras lo soportan.",
+        "tradeoffBullet2": "Recibir es lento.",
+        "tradeoffBullet3": "Sin notificaciones push.",
+        "tradeoffBullet4": "Las billeteras aún tienen errores.",
+        "tradeoffBullet5": "Los contadores de donaciones no son públicos."
+      },
+      "noCustody": {
+        "title": "Sin custodia. Sin intermediarios.",
+        "body": "{{appName}} nunca retiene fondos. Las donaciones se mueven de billetera a billetera sobre Bitcoin. No hay un servidor en medio entre el donante y el activista en ninguna de las opciones. Si {{appName}} desapareciera mañana, cada campaña seguiría funcionando.",
+        "gofundme": {
+          "heading": "A diferencia de GoFundMe",
+          "body": "Ninguna plataforma puede congelar tus donaciones, exigir reembolsos o cerrar tu campaña por desacuerdos sobre políticas."
+        },
+        "givesendgo": {
+          "heading": "A diferencia de GiveSendGo",
+          "body": "Ningún procesador de pagos está en medio, así que ni Stripe, ni Visa, ni un banco pueden cortarte a mitad de campaña."
+        },
+        "otherBitcoin": {
+          "heading": "A diferencia de otras plataformas 'Bitcoin'",
+          "body": "Sin nodo Lightning central, custodio o LSP que pueda fallar o caerse. Los fondos se liquidan directamente on-chain a una billetera que tú controlas."
+        }
+      }
+    },
+    "faq": {
+      "eyebrow": "Preguntas",
+      "title": "Preguntas frecuentes.",
+      "chapter1": {
+        "label": "Primeros pasos",
+        "description": "Qué es Agora, quién lo construyó y cuánto cuesta."
+      },
+      "chapter2": {
+        "label": "Donaciones en Bitcoin",
+        "description": "Cómo funcionan los pagos, por qué on-chain, por qué públicos, por qué estos compromisos."
+      },
+      "chapter3": {
+        "label": "Sobre Nostr",
+        "description": "El protocolo abierto sobre el que se construye Agora y cómo funciona tu cuenta."
+      }
+    },
+    "guides": {
+      "eyebrow": "Guías",
+      "title": "Elige de qué lado estás.",
+      "lede": "Tanto si envías como si recibes, aprende a hacerlo de forma segura y privada.",
+      "donor": {
+        "imageAlt": "Manifestantes con capucha marchando por una calle europea al anochecer, sosteniendo bengalas rojas encendidas y pancartas con 'FREEDOM' y 'LIBERTAD'",
+        "role": "Para donantes",
+        "title": "Apoya causas que los bancos no apoyarán.",
+        "description": "Envía Bitcoin directamente a activistas y movimientos en cualquier parte del mundo, sin pedir permiso a un procesador de pagos.",
+        "bullet1": "Usa cualquier billetera de Bitcoin que ya tengas.",
+        "bullet2": "Las donaciones llegan directamente al activista. Sin custodio, sin intermediario.",
+        "bullet3": "Para mayor privacidad, usa una billetera que soporte pagos silenciosos.",
+        "cta": "Lee la guía para donantes"
+      },
+      "activist": {
+        "imageAlt": "Vista aérea de miles de manifestantes reunidos de noche en una plaza con bengalas rojas encendidas, bajo una pancarta proyectada 'UNITY IN DARKNESS' en los edificios circundantes",
+        "role": "Para activistas",
+        "title": "Recibe fondos sin pedir permiso.",
+        "description": "Recibe apoyo directamente de personas que creen en tu causa. Sin cuenta bancaria, sin formulario de solicitud, sin empresa en medio.",
+        "bullet1": "Empieza a recibir donaciones tan pronto como te registres.",
+        "bullet2": "Elige qué tipos de pago aceptar: público, pagos silenciosos o ambos.",
+        "bullet3": "Para retirar de forma privada, envía primero a una billetera de pagos silenciosos y luego reenvía a donde quieras.",
+        "cta": "Lee la guía para activistas"
+      },
+      "stillStuck": "¿Aún tienes dudas?",
+      "followTeam": "Sigue a Team Soapbox en Nostr",
+      "stillStuckSuffix": ". Allí resolvemos preguntas."
+    }
   }
 }

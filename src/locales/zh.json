@@ -1591,5 +1591,147 @@
         "Security": "安全"
       }
     }
+  },
+  "about": {
+    "seoTitle": "关于",
+    "seoDescription": "{{appName}} 如何运作：通过比特币和 Nostr 将活动人士与无法阻挡的资金连接起来。",
+    "hero": {
+      "eyebrow": "关于 {{appName}}",
+      "headlinePart1": "How",
+      "headlineAppName": "{{appName}}",
+      "headlinePart2": "works.",
+      "body": "{{appName}} 是一个建立在 Nostr 和比特币之上的抗审查捐赠平台。没有冻结的银行账户。没有公司关闭。只有相信你事业的人提供的直接支持。",
+      "trustChips": {
+        "decentralized": "去中心化",
+        "openSource": "开源",
+        "censorshipResistant": "抗审查"
+      },
+      "ctaDonor": "阅读捐赠者指南",
+      "ctaActivist": "阅读活动人士指南",
+      "sampleCard": {
+        "countryName": "委内瑞拉",
+        "public": "公开",
+        "imageAlt": "委内瑞拉活动人士在烛光守夜中举着写有 'Liberen a todos los presos políticos · ¡Cese la represión!' 的标语",
+        "orgName": "Venezolanos Libres",
+        "title": "释放委内瑞拉的政治犯",
+        "description": "为被马杜罗政权拘押的 800 多名政治犯提供法律辩护和家庭支持。",
+        "raised": "已筹集",
+        "ofGoal": "目标 $10,000",
+        "donorsLine": "247 位捐赠者 · 12 个国家",
+        "donate": "捐赠比特币"
+      }
+    },
+    "howItWorks": {
+      "eyebrow": "运作方式",
+      "title": "三步。无中间人。",
+      "lede": "没有银行，没有边界，无需许可。",
+      "step1": {
+        "imageAlt": "一把发光的橙色加密密钥漂浮在黑暗空间中，象征自我主权身份",
+        "title": "活动人士几秒钟内即可注册。",
+        "body": "无银行。无文件。无审批。一旦活动人士在 {{appName}} 上创建账户，他们就有了一个比特币地址，可以在世界任何地方接收支持。"
+      },
+      "step2": {
+        "imageAlt": "一枚发光的比特币硬币飞越黑暗的世界地图，象征即时跨境支付",
+        "title": "捐赠者直接发送比特币。",
+        "body": "捐赠者从他们已经使用的任何钱包（Cash App、Coinbase、Strike、硬件钱包）直接发送比特币给活动人士。{{appName}} 从不接触资金。没有中间服务器，没有托管方。"
+      },
+      "step3": {
+        "imageAlt": "一只张开的手，手掌上散发着温暖的橙色光芒，象征接收和能动性",
+        "title": "支持送达真正需要的地方。",
+        "body": "资金直接到达活动人士。他们保留所有权，保留控制权。转移、兑换或花费；下面的指南解释了如何私密、安全地完成。"
+      }
+    },
+    "twoWays": {
+      "eyebrow": "比特币 · 一个 QR，两种选择",
+      "title": "两种收款方式。",
+      "lede": "两种选择都是比特币。区别在于为隐私付出什么代价。活动人士创建活动时，选择接受哪些方式。如果两者都接受，捐赠页面会显示一个适用于任何钱包的 QR 码。",
+      "public": {
+        "kicker": "比特币公开支付",
+        "tagline": "通用 · 快速 · 透明",
+        "title": "适用于地球上所有钱包。",
+        "description": "捐款直接到达活动人士控制的普通比特币地址。任何拥有比特币钱包的人都可以发送。无需新应用，无需新账户，无需学习曲线。",
+        "bullet1": "适用于所有比特币钱包：Cash App、Coinbase、Strike、硬件",
+        "bullet2": "最快结算：仅需比特币确认",
+        "bullet3": "链上可验证：任何人都可以看到活动人士收到的金额",
+        "tradeoffTitle": "权衡：链上公开。",
+        "tradeoffIntro": "每一笔捐款在比特币区块链和 Nostr 上都是公开的。{{appName}} 仅推荐用于公开活动。如果你或你的捐赠者需要极致的隐私，包括来自国家行为者的隐私，请在参与前阅读<0>捐赠者指南</0>和<1>活动人士指南</1>。"
+      },
+      "silent": {
+        "kicker": "比特币静默支付",
+        "tagline": "不可链接 · 直接 · BIP-352",
+        "title": "不可链接、链上、直接。",
+        "description": "捐款以 BIP-352 静默支付的形式发送。每一笔都到达一个全新的、不可链接的比特币输出，盯着区块链的观察者无法将其与活动联系起来。",
+        "bullet1": "捐赠轨迹无法在链上被重建",
+        "bullet2": "保护面临严重对手的活动人士",
+        "bullet3": "直接到达活动人士的钱包，没有中间服务器",
+        "tradeoffTitle": "权衡：静默支付尚处早期阶段。",
+        "tradeoffIntro": "在链上接收比特币最私密的方式，但生态系统目前还年轻和粗糙：",
+        "tradeoffBullet1": "支持的钱包很少。",
+        "tradeoffBullet2": "接收较慢。",
+        "tradeoffBullet3": "没有推送通知。",
+        "tradeoffBullet4": "钱包仍有错误。",
+        "tradeoffBullet5": "捐赠计数不公开。"
+      },
+      "noCustody": {
+        "title": "无托管。无中间人。",
+        "body": "{{appName}} 从不持有资金。捐款在比特币上以钱包对钱包的方式移动。两种选项中，没有服务器在捐赠者和活动人士之间。如果 {{appName}} 明天消失，每个活动都会继续运作。",
+        "gofundme": {
+          "heading": "不像 GoFundMe",
+          "body": "没有平台可以冻结你的捐款、要求退款或因政策分歧而终止你的活动。"
+        },
+        "givesendgo": {
+          "heading": "不像 GiveSendGo",
+          "body": "没有支付处理商在中间，所以没有 Stripe、没有 Visa、没有银行可以在活动中切断你。"
+        },
+        "otherBitcoin": {
+          "heading": "不像其他'比特币'平台",
+          "body": "没有中央 Lightning 节点、托管方或 LSP 可能出现故障或下线。资金直接在链上结算到你控制的钱包。"
+        }
+      }
+    },
+    "faq": {
+      "eyebrow": "问题",
+      "title": "常见问题。",
+      "chapter1": {
+        "label": "入门",
+        "description": "Agora 是什么、谁建造的、费用如何。"
+      },
+      "chapter2": {
+        "label": "比特币捐赠",
+        "description": "支付如何运作、为什么链上、为什么公开、为什么有这些权衡。"
+      },
+      "chapter3": {
+        "label": "关于 Nostr",
+        "description": "Agora 所基于的开放协议，以及你的账户如何运作。"
+      }
+    },
+    "guides": {
+      "eyebrow": "指南",
+      "title": "选择你站在哪一边。",
+      "lede": "无论你是发送还是接收，了解如何安全、私密地完成。",
+      "donor": {
+        "imageAlt": "戴着兜帽的抗议者在黄昏时分穿过欧洲城市街道游行，手持燃烧的红色信号弹和写有 'FREEDOM' 和 'LIBERTAD' 的横幅",
+        "role": "捐赠者",
+        "title": "支持银行不会支持的事业。",
+        "description": "无需向支付处理商请求许可，直接向世界各地的活动人士和运动发送比特币。",
+        "bullet1": "使用你已有的任何比特币钱包。",
+        "bullet2": "捐款直接到达活动人士。没有托管方，没有中间人。",
+        "bullet3": "为了隐私，请使用支持静默支付的钱包。",
+        "cta": "阅读捐赠者指南"
+      },
+      "activist": {
+        "imageAlt": "数千名抗议者在夜晚聚集在城市广场上的鸟瞰图，手持燃烧的红色信号弹，在周围建筑物上投射出 'UNITY IN DARKNESS' 横幅",
+        "role": "活动人士",
+        "title": "无需许可获得资金。",
+        "description": "直接从相信你事业的人那里接收支持。无需银行账户，无需申请表，中间没有公司。",
+        "bullet1": "注册后即可开始接收捐赠。",
+        "bullet2": "选择接受哪些支付类型：公开、静默支付或两者。",
+        "bullet3": "为了私密提现，先发送到静默支付钱包，然后再转发到任何地方。",
+        "cta": "阅读活动人士指南"
+      },
+      "stillStuck": "还有问题？",
+      "followTeam": "在 Nostr 上关注 Team Soapbox",
+      "stillStuckSuffix": "。我们在那里处理问题。"
+    }
   }
 }

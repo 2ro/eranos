@@ -374,6 +374,148 @@
       }
     }
   },
+  "about": {
+    "seoTitle": "About",
+    "seoDescription": "How {{appName}} works: connecting activists to unstoppable funding through Bitcoin and Nostr.",
+    "hero": {
+      "eyebrow": "About {{appName}}",
+      "headlinePart1": "How",
+      "headlineAppName": "{{appName}}",
+      "headlinePart2": "works.",
+      "body": "{{appName}} is a censorship-resistant donation platform built on Nostr and Bitcoin. No frozen bank accounts. No corporate shut-downs. Just direct support from people who believe in your cause.",
+      "trustChips": {
+        "decentralized": "Decentralized",
+        "openSource": "Open source",
+        "censorshipResistant": "Censorship resistant"
+      },
+      "ctaDonor": "Read the Donor Guide",
+      "ctaActivist": "Read the Activist Guide",
+      "sampleCard": {
+        "countryName": "Venezuela",
+        "public": "Public",
+        "imageAlt": "Venezuelan activists at a candlelight vigil holding a sign reading 'Liberen a todos los presos políticos · ¡Cese la represión!'",
+        "orgName": "Venezolanos Libres",
+        "title": "Free Venezuela's Political Prisoners",
+        "description": "Legal defense and family support for 800+ political prisoners detained by the Maduro regime.",
+        "raised": "raised",
+        "ofGoal": "of $10,000",
+        "donorsLine": "247 donors · 12 countries",
+        "donate": "Donate Bitcoin"
+      }
+    },
+    "howItWorks": {
+      "eyebrow": "How it works",
+      "title": "Three steps. No middleman.",
+      "lede": "No banks, no borders, no permission.",
+      "step1": {
+        "imageAlt": "A glowing orange cryptographic key floating in dark space, symbolizing self-sovereign identity",
+        "title": "Activists sign up in seconds.",
+        "body": "No bank. No paperwork. No approval. The moment an activist creates an account on {{appName}}, they have a Bitcoin address ready to receive support, anywhere in the world."
+      },
+      "step2": {
+        "imageAlt": "A glowing Bitcoin coin flying through the air across a dark world map, symbolizing instant cross-border payment",
+        "title": "Donors send Bitcoin directly.",
+        "body": "Donors send Bitcoin from any wallet they already use (Cash App, Coinbase, Strike, a hardware wallet) straight to the activist. {{appName}} never touches the money. No server in the middle, no custodian."
+      },
+      "step3": {
+        "imageAlt": "An open hand with warm orange light radiating from the palm, symbolizing receiving and agency",
+        "title": "Support lands where it matters.",
+        "body": "Funds arrive at the activist directly. They keep custody, they keep control. Move it, swap it, or spend it; the guides below explain how to do it privately and safely."
+      }
+    },
+    "twoWays": {
+      "eyebrow": "Bitcoin · One QR, two options",
+      "title": "Two ways to get paid.",
+      "lede": "Both options are Bitcoin. The difference is what you trade off for privacy. When an activist creates a campaign, they choose which options to accept. If both, the donation page shows a single QR code that works for any wallet.",
+      "public": {
+        "kicker": "Bitcoin Public Payments",
+        "tagline": "Universal · Fast · Transparent",
+        "title": "Works with every wallet on earth.",
+        "description": "Donations land at a regular Bitcoin address the activist controls. Anyone with any Bitcoin wallet can send. No new app, no new account, no learning curve.",
+        "bullet1": "Works in every Bitcoin wallet: Cash App, Coinbase, Strike, hardware",
+        "bullet2": "Fastest settlement: Bitcoin confirmations only",
+        "bullet3": "Verifiable on-chain: anyone can see what an activist has received",
+        "tradeoffTitle": "Trade-off: Public on-chain.",
+        "tradeoffIntro": "Every donation is public on the Bitcoin blockchain and on Nostr. {{appName}} is recommended only for above-ground activism. If you or your donors require extreme privacy, including from state actors, read the <0>Donor Guide</0> and <1>Activist Guide</1> before participating."
+      },
+      "silent": {
+        "kicker": "Bitcoin Silent Payments",
+        "tagline": "Unlinkable · Direct · BIP-352",
+        "title": "Unlinkable, on-chain, direct.",
+        "description": "Donations are sent as BIP-352 silent payments. Each one lands at a fresh, unlinkable Bitcoin output that an observer staring at the blockchain can't tie back to the campaign.",
+        "bullet1": "Donation trail can't be reconstructed on-chain",
+        "bullet2": "Protects activists facing serious adversaries",
+        "bullet3": "Lands directly in the activist's wallet, no server in the middle",
+        "tradeoffTitle": "Trade-off: Silent payments are early.",
+        "tradeoffIntro": "The most private way to receive Bitcoin on-chain, but the ecosystem is young and rough today:",
+        "tradeoffBullet1": "Few wallets support it.",
+        "tradeoffBullet2": "Receiving is slow.",
+        "tradeoffBullet3": "No push notifications.",
+        "tradeoffBullet4": "Wallets are still buggy.",
+        "tradeoffBullet5": "Donation counts aren't public."
+      },
+      "noCustody": {
+        "title": "No custody. No middleman.",
+        "body": "{{appName}} never holds funds. Donations move wallet-to-wallet on Bitcoin. There's no server standing between donor and activist on either option. If {{appName}} disappeared tomorrow, every campaign would keep working.",
+        "gofundme": {
+          "heading": "Unlike GoFundMe",
+          "body": "No platform can freeze your donations, demand refunds, or terminate your campaign over policy disagreements."
+        },
+        "givesendgo": {
+          "heading": "Unlike GiveSendGo",
+          "body": "No payment processor sits in the middle, so no Stripe, no Visa, no bank can cut you off mid-campaign."
+        },
+        "otherBitcoin": {
+          "heading": "Unlike other \u2018Bitcoin\u2019 platforms",
+          "body": "No central Lightning node, custodian, or LSP to fail or go offline. Funds settle directly on-chain to a wallet you control."
+        }
+      }
+    },
+    "faq": {
+      "eyebrow": "Questions",
+      "title": "Frequently asked.",
+      "chapter1": {
+        "label": "Getting started",
+        "description": "What Agora is, who built it, and what it costs."
+      },
+      "chapter2": {
+        "label": "Bitcoin donations",
+        "description": "How payments work, why on-chain, why public, why these trade-offs."
+      },
+      "chapter3": {
+        "label": "About Nostr",
+        "description": "The open protocol Agora is built on, and how your account works."
+      }
+    },
+    "guides": {
+      "eyebrow": "Guides",
+      "title": "Pick the side you're on.",
+      "lede": "Whether you're sending or receiving, learn how to do it safely and privately.",
+      "donor": {
+        "imageAlt": "Hooded protesters marching through a European city street at dusk, holding burning red flares and 'FREEDOM' and 'LIBERTAD' banners",
+        "role": "For Donors",
+        "title": "Support causes the banks won't.",
+        "description": "Send Bitcoin directly to activists and movements anywhere in the world, without asking a payment processor for permission.",
+        "bullet1": "Use any Bitcoin wallet you already have.",
+        "bullet2": "Donations land directly with the activist. No custodian, no middleman.",
+        "bullet3": "For privacy, use a wallet that supports silent payments.",
+        "cta": "Read the Donor Guide"
+      },
+      "activist": {
+        "imageAlt": "Aerial view of thousands of protesters gathered at night in a city square with burning red flares, beneath a 'UNITY IN DARKNESS' banner projected on the surrounding buildings",
+        "role": "For Activists",
+        "title": "Get funded without permission.",
+        "description": "Receive support directly from people who believe in your cause. No bank account, no application form, no company in the middle.",
+        "bullet1": "Start receiving donations as soon as you sign up.",
+        "bullet2": "Pick which payment types to accept: public, silent payments, or both.",
+        "bullet3": "For private cash-out, send to a silent-payments wallet first, then forward anywhere.",
+        "cta": "Read the Activist Guide"
+      },
+      "stillStuck": "Still stuck?",
+      "followTeam": "Follow Team Soapbox on Nostr",
+      "stillStuckSuffix": ". We triage questions there."
+    }
+  },
   "forms": {
     "required": "Required",
     "recommended": "Recommended",
