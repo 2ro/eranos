@@ -1546,5 +1546,50 @@
       "broadcast": "بث الحدث",
       "broadcasting": "جارٍ البث..."
     }
+  },
+  "policyPages": {
+    "privacy": {
+      "seoTitle": "سياسة الخصوصية",
+      "seoDescription": "سياسة الخصوصية لـ {{appName}} — كيفية التعامل مع بياناتك على شبكة Nostr",
+      "title": "سياسة الخصوصية"
+    },
+    "csae": {
+      "seoTitle": "سياسة سلامة الأطفال",
+      "seoDescription": "سياسة {{appName}} بشأن الاعتداء الجنسي على الأطفال واستغلالهم (CSAE) — التزامنا بسلامة الأطفال على شبكة Nostr",
+      "title": "سياسة سلامة الأطفال"
+    },
+    "donorGuide": {
+      "seoTitle": "دليل المتبرّع",
+      "seoDescription": "كيف يعمل التبرّع على {{appName}} وكيف تحمي خصوصيتك.",
+      "title": "دليل المتبرّع",
+      "subtitle": "بيتكوين حقيقي، يُرسل مباشرة. كل الخطوات في صفحة قصيرة واحدة."
+    },
+    "activistGuide": {
+      "seoTitle": "دليل الناشط",
+      "seoDescription": "كيف تتلقى التبرعات على {{appName}} وتسحبها بسرية.",
+      "title": "دليل الناشط",
+      "subtitle": "اختر ما تقبله، استلم التبرعات، اسحبها. بلغة بسيطة، بلا جدران من النصوص."
+    },
+    "changelog": {
+      "seoTitle": "سجل التغييرات",
+      "seoDescription": "ما الجديد في {{appName}}",
+      "title": "سجل التغييرات",
+      "loadError": "تعذّر تحميل سجل التغييرات.",
+      "empty": "لا توجد إصدارات بعد.",
+      "pastReleases": "إصدارات سابقة",
+      "showLess": "عرض أقل",
+      "readMore": "اقرأ المزيد",
+      "preReleaseLabel": "بناء ما قبل الإصدار",
+      "preReleaseBody": "يحتوي هذا البناء على تغييرات لم تُضمَّن بعد في إصدار رسمي.",
+      "viewUnreleased": "عرض التغييرات غير المُصدَرة",
+      "categories": {
+        "Added": "أُضيف",
+        "Changed": "تم تغييره",
+        "Deprecated": "مهجور",
+        "Removed": "أُزيل",
+        "Fixed": "أُصلح",
+        "Security": "أمان"
+      }
+    }
   }
 }

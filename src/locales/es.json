@@ -1546,5 +1546,50 @@
       "broadcast": "Transmitir evento",
       "broadcasting": "Transmitiendo..."
     }
+  },
+  "policyPages": {
+    "privacy": {
+      "seoTitle": "Política de privacidad",
+      "seoDescription": "Política de privacidad de {{appName}} — cómo se maneja tu información en la red Nostr",
+      "title": "Política de privacidad"
+    },
+    "csae": {
+      "seoTitle": "Política de protección infantil",
+      "seoDescription": "Política de {{appName}} sobre el abuso y la explotación sexual infantil (CSAE) — nuestro compromiso con la seguridad infantil en la red Nostr",
+      "title": "Política de protección infantil"
+    },
+    "donorGuide": {
+      "seoTitle": "Guía para donantes",
+      "seoDescription": "Cómo funciona donar en {{appName}} y cómo proteger tu privacidad.",
+      "title": "Guía para donantes",
+      "subtitle": "Bitcoin real, enviado directamente. Todo el flujo en una página corta."
+    },
+    "activistGuide": {
+      "seoTitle": "Guía para activistas",
+      "seoDescription": "Cómo recibir donaciones en {{appName}} y retirar fondos de forma privada.",
+      "title": "Guía para activistas",
+      "subtitle": "Elige qué aceptar, recibe donaciones, retira. En lenguaje claro, sin texto interminable."
+    },
+    "changelog": {
+      "seoTitle": "Notas de versión",
+      "seoDescription": "Novedades en {{appName}}",
+      "title": "Notas de versión",
+      "loadError": "No se pudo cargar el registro de cambios.",
+      "empty": "Aún no hay versiones.",
+      "pastReleases": "Versiones anteriores",
+      "showLess": "Mostrar menos",
+      "readMore": "Leer más",
+      "preReleaseLabel": "Compilación previa al lanzamiento",
+      "preReleaseBody": "Esta compilación contiene cambios aún no incluidos en una versión.",
+      "viewUnreleased": "Ver cambios sin publicar",
+      "categories": {
+        "Added": "Añadido",
+        "Changed": "Cambiado",
+        "Deprecated": "Obsoleto",
+        "Removed": "Eliminado",
+        "Fixed": "Corregido",
+        "Security": "Seguridad"
+      }
+    }
   }
 }

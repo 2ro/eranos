@@ -1546,5 +1546,50 @@
       "broadcast": "Tumira chiitiko",
       "broadcasting": "Kutumira..."
     }
+  },
+  "policyPages": {
+    "privacy": {
+      "seoTitle": "Mutemo wezvakavanzika",
+      "seoDescription": "Mutemo wezvakavanzika we{{appName}} — kuti data rako rinochengetwa sei pamhepo yeNostr",
+      "title": "Mutemo wezvakavanzika"
+    },
+    "csae": {
+      "seoTitle": "Mutemo wokuchengeteza vana",
+      "seoDescription": "Mutemo we{{appName}} pamusoro pokushungurudza nokushandiswa pabonde kwevana (CSAE) — kuzvipira kwedu pakuchengeteza vana paNostr",
+      "title": "Mutemo wokuchengeteza vana"
+    },
+    "donorGuide": {
+      "seoTitle": "Gwaro romupi",
+      "seoDescription": "Maitiro okupa pa{{appName}} uye maitiro okudzivirira zvakavanzika zvako.",
+      "title": "Gwaro romupi",
+      "subtitle": "Bitcoin chaiyo, yakatumirwa zvakananga. Yose miitiro mupeji pfupi imwe."
+    },
+    "activistGuide": {
+      "seoTitle": "Gwaro romukuru",
+      "seoDescription": "Maitiro okugamuchira zvipo pa{{appName}} uye kuzvibvisa muchivande.",
+      "title": "Gwaro romukuru",
+      "subtitle": "Sarudza chaunoda kugamuchira, gamuchira zvipo, bvisa. Mutauro wakajeka, hapana magwaro marefu."
+    },
+    "changelog": {
+      "seoTitle": "Rondedzero yeshanduko",
+      "seoDescription": "Zvitsva mu{{appName}}",
+      "title": "Rondedzero yeshanduko",
+      "loadError": "Hazvina kubudirira kutakura changelog.",
+      "empty": "Hapana zvakaburitswa zvachose.",
+      "pastReleases": "Zvakaburitswa kare",
+      "showLess": "Ratidza zvishoma",
+      "readMore": "Verenga zvimwe",
+      "preReleaseLabel": "Build yepasati paburitswa",
+      "preReleaseBody": "Build iyi ine shanduko dzisati dzaiswa muburitsa.",
+      "viewUnreleased": "Ona shanduko dzisati dzaburitswa",
+      "categories": {
+        "Added": "Yawedzerwa",
+        "Changed": "Yashandurwa",
+        "Deprecated": "Yarambwa",
+        "Removed": "Yabviswa",
+        "Fixed": "Yagadziriswa",
+        "Security": "Hutsi"
+      }
+    }
   }
 }

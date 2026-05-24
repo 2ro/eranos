@@ -1,21 +1,23 @@
 import { useSeoMeta } from '@unhead/react';
+import { useTranslation } from 'react-i18next';
 import { Shield } from 'lucide-react';
 
 import { PageHeader } from '@/components/PageHeader';
 import { useAppContext } from '@/hooks/useAppContext';
 
 export function PrivacyPolicyPage() {
+  const { t } = useTranslation();
   const { config } = useAppContext();
 
   useSeoMeta({
-    title: `Privacy Policy | ${config.appName}`,
-    description: `Privacy policy for ${config.appName} — how your data is handled on the Nostr network`,
+    title: `${t('policyPages.privacy.seoTitle')} | ${config.appName}`,
+    description: t('policyPages.privacy.seoDescription', { appName: config.appName }),
   });
 
   return (
     <main className="min-h-screen pb-16 sidebar:pb-0">
       {/* Page header */}
-      <PageHeader title="Privacy Policy" icon={<Shield className="size-5" />} backTo="/" />
+      <PageHeader title={t('policyPages.privacy.title')} icon={<Shield className="size-5" />} backTo="/" />
 
       <article className="px-4 pb-8 space-y-6 text-sm text-foreground/90 leading-relaxed">
         <p className="text-xs text-muted-foreground">Last updated: March 18, 2026</p>

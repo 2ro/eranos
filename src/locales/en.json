@@ -329,6 +329,51 @@
       "broadcasting": "Broadcasting..."
     }
   },
+  "policyPages": {
+    "privacy": {
+      "seoTitle": "Privacy Policy",
+      "seoDescription": "Privacy policy for {{appName}} — how your data is handled on the Nostr network",
+      "title": "Privacy Policy"
+    },
+    "csae": {
+      "seoTitle": "Child Safety Policy",
+      "seoDescription": "{{appName}}'s policy on child sexual abuse and exploitation (CSAE) — our commitment to child safety on the Nostr network",
+      "title": "Child Safety Policy"
+    },
+    "donorGuide": {
+      "seoTitle": "Donor Guide",
+      "seoDescription": "How donating works on {{appName}} and how to protect your privacy.",
+      "title": "Donor Guide",
+      "subtitle": "Real Bitcoin, sent directly. The whole flow in one short page."
+    },
+    "activistGuide": {
+      "seoTitle": "Activist Guide",
+      "seoDescription": "How to receive donations on {{appName}} and cash out privately.",
+      "title": "Activist Guide",
+      "subtitle": "Pick what to accept, receive donations, cash out. Plain English, no walls of text."
+    },
+    "changelog": {
+      "seoTitle": "Changelog",
+      "seoDescription": "What's new in {{appName}}",
+      "title": "Changelog",
+      "loadError": "Failed to load changelog.",
+      "empty": "No releases yet.",
+      "pastReleases": "Past releases",
+      "showLess": "Show less",
+      "readMore": "Read more",
+      "preReleaseLabel": "Pre-release build",
+      "preReleaseBody": "This build contains changes not yet included in a release.",
+      "viewUnreleased": "View unreleased changes",
+      "categories": {
+        "Added": "Added",
+        "Changed": "Changed",
+        "Deprecated": "Deprecated",
+        "Removed": "Removed",
+        "Fixed": "Fixed",
+        "Security": "Security"
+      }
+    }
+  },
   "forms": {
     "required": "Required",
     "recommended": "Recommended",

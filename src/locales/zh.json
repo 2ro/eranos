@@ -1546,5 +1546,50 @@
       "broadcast": "广播事件",
       "broadcasting": "广播中..."
     }
+  },
+  "policyPages": {
+    "privacy": {
+      "seoTitle": "隐私政策",
+      "seoDescription": "{{appName}} 的隐私政策——你的数据如何在 Nostr 网络上处理",
+      "title": "隐私政策"
+    },
+    "csae": {
+      "seoTitle": "儿童安全政策",
+      "seoDescription": "{{appName}} 关于儿童性虐待和剥削（CSAE）的政策——我们在 Nostr 网络上对儿童安全的承诺",
+      "title": "儿童安全政策"
+    },
+    "donorGuide": {
+      "seoTitle": "捐赠者指南",
+      "seoDescription": "在 {{appName}} 上捐赠如何运作以及如何保护你的隐私。",
+      "title": "捐赠者指南",
+      "subtitle": "真正的比特币，直接发送。所有流程在一个简短页面中。"
+    },
+    "activistGuide": {
+      "seoTitle": "活动人士指南",
+      "seoDescription": "如何在 {{appName}} 上接收捐款并私下兑现。",
+      "title": "活动人士指南",
+      "subtitle": "选择接受什么、接收捐款、兑现。简明扼要，无冗长文字。"
+    },
+    "changelog": {
+      "seoTitle": "更新日志",
+      "seoDescription": "{{appName}} 的新功能",
+      "title": "更新日志",
+      "loadError": "无法加载更新日志。",
+      "empty": "尚无发布版本。",
+      "pastReleases": "过往版本",
+      "showLess": "显示较少",
+      "readMore": "阅读更多",
+      "preReleaseLabel": "预发布构建",
+      "preReleaseBody": "此构建包含尚未包含在发布版本中的更改。",
+      "viewUnreleased": "查看未发布的更改",
+      "categories": {
+        "Added": "新增",
+        "Changed": "更改",
+        "Deprecated": "弃用",
+        "Removed": "移除",
+        "Fixed": "修复",
+        "Security": "安全"
+      }
+    }
   }
 }

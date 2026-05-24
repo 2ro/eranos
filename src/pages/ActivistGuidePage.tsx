@@ -1,4 +1,5 @@
 import { useSeoMeta } from '@unhead/react';
+import { useTranslation } from 'react-i18next';
 
 import { GuideHero } from '@/components/GuideHero';
 import {
@@ -23,11 +24,12 @@ import { HOPE_PALETTE } from '@/lib/hopePalette';
  * from `/about` as one of the two large guide buttons.
  */
 export function ActivistGuidePage() {
+  const { t } = useTranslation();
   const { config } = useAppContext();
 
   useSeoMeta({
-    title: `Activist Guide | ${config.appName}`,
-    description: `How to receive donations on ${config.appName} and cash out privately.`,
+    title: `${t('policyPages.activistGuide.seoTitle')} | ${config.appName}`,
+    description: t('policyPages.activistGuide.seoDescription', { appName: config.appName }),
   });
 
   const blocks = getActivistGuideBlocks(config.appName);
@@ -35,8 +37,8 @@ export function ActivistGuidePage() {
   return (
     <main className="min-h-screen pb-16 sidebar:pb-0">
       <GuideHero
-        title="Activist Guide"
-        subtitle="Pick what to accept, receive donations, cash out. Plain English, no walls of text."
+        title={t('policyPages.activistGuide.title')}
+        subtitle={t('policyPages.activistGuide.subtitle')}
         images={ACTIVIST_HERO_IMAGES}
         palette={HOPE_PALETTE}
       />
