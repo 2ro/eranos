@@ -20,6 +20,12 @@
     "goBack": "بازگشت",
     "tryAgain": "لطفاً دوباره تلاش کنید."
   },
+  "translate": {
+    "translate": "ترجمه",
+    "translating": "در حال ترجمه…",
+    "showOriginal": "نمایش متن اصلی",
+    "error": "ترجمه ناموفق بود"
+  },
   "nav": {
     "openMenu": "باز کردن منو",
     "closeMenu": "بستن منو",

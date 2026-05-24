@@ -20,6 +20,12 @@
     "goBack": "返回",
     "tryAgain": "请重试。"
   },
+  "translate": {
+    "translate": "翻译",
+    "translating": "正在翻译…",
+    "showOriginal": "显示原文",
+    "error": "翻译失败"
+  },
   "nav": {
     "openMenu": "打开菜单",
     "closeMenu": "关闭菜单",

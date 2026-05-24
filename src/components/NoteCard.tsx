@@ -71,6 +71,7 @@ import { ReactionButton } from "@/components/ReactionButton";
 import { ReplyComposeModal } from "@/components/ReplyComposeModal";
 import { ReplyContext } from "@/components/ReplyContext";
 import { RepostMenu } from "@/components/RepostMenu";
+import { TranslateButton } from "@/components/TranslateButton";
 import { EncryptedMessageContent } from "@/components/EncryptedMessageContent";
 import { EncryptedLetterContent } from "@/components/EncryptedLetterContent";
 import { VanishCardCompact } from "@/components/VanishEventContent";
@@ -1248,13 +1249,20 @@ function TruncatedNoteContent({
   const contentRef = useRef<HTMLDivElement>(null);
   const [overflows, setOverflows] = useState(false);
   const [expanded, setExpanded] = useState(false);
+  const [translatedContent, setTranslatedContent] = useState<string | null>(null);
 
   const singleImage = isSingleImagePost(event);
+  const canTranslate = event.content.trim().length > 0 && !singleImage;
+  const displayEvent = translatedContent ? { ...event, content: translatedContent } : event;
 
   const measure = useCallback(() => {
     const el = contentRef.current;
     if (el) setOverflows(!singleImage && el.scrollHeight > MAX_HEIGHT);
   }, [singleImage]);
+
+  useEffect(() => {
+    setTranslatedContent(null);
+  }, [event.id]);
 
   useEffect(() => {
     measure();
@@ -1286,22 +1294,32 @@ function TruncatedNoteContent({
         }
         className="relative"
       >
-        <NoteContent event={event} className="text-[15px] leading-relaxed" />
+        <NoteContent event={displayEvent} className="text-[15px] leading-relaxed" />
         {!expanded && overflows && (
           <div className="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-background to-transparent pointer-events-none" />
         )}
       </div>
-      {overflows && (
-        <button
-          className="mt-1 text-sm text-primary hover:underline"
-          onClick={(e) => {
-            e.stopPropagation();
-            setExpanded((v) => !v);
-          }}
-        >
-          {expanded ? t('noteCard.showLess') : t('noteCard.readMore')}
-        </button>
-      )}
+      <div className="mt-1 flex flex-wrap items-center gap-2">
+        {overflows && (
+          <button
+            className="text-sm text-primary hover:underline"
+            onClick={(e) => {
+              e.stopPropagation();
+              setExpanded((v) => !v);
+            }}
+          >
+            {expanded ? t('noteCard.showLess') : t('noteCard.readMore')}
+          </button>
+        )}
+        {canTranslate && (
+          <TranslateButton
+            text={event.content}
+            isTranslated={translatedContent !== null}
+            onTranslated={setTranslatedContent}
+            onReset={() => setTranslatedContent(null)}
+          />
+        )}
+      </div>
     </div>
   );
 }

@@ -20,6 +20,12 @@
     "goBack": "Dzokera",
     "tryAgain": "Ndapota edza zvakare."
   },
+  "translate": {
+    "translate": "Dudzira",
+    "translating": "Kududzira…",
+    "showOriginal": "Ratidza chepakutanga",
+    "error": "Dudziro yakundikana"
+  },
   "nav": {
     "openMenu": "Vhura menu",
     "closeMenu": "Vhara menu",

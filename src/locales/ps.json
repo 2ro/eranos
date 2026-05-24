@@ -20,6 +20,12 @@
     "goBack": "بېرته تلل",
     "tryAgain": "مهرباني وکړئ بیا هڅه وکړئ."
   },
+  "translate": {
+    "translate": "ژباړل",
+    "translating": "ژباړل کېږي…",
+    "showOriginal": "اصلي وښایاست",
+    "error": "ژباړه ناکامه شوه"
+  },
   "nav": {
     "openMenu": "د مینو پرانیستل",
     "closeMenu": "د مینو تړل",

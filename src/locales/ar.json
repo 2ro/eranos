@@ -20,6 +20,12 @@
     "goBack": "العودة",
     "tryAgain": "يرجى المحاولة مرة أخرى."
   },
+  "translate": {
+    "translate": "ترجمة",
+    "translating": "جارٍ الترجمة…",
+    "showOriginal": "إظهار الأصل",
+    "error": "فشلت الترجمة"
+  },
   "nav": {
     "openMenu": "فتح القائمة",
     "closeMenu": "إغلاق القائمة",

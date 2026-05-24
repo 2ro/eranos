@@ -20,6 +20,12 @@
     "goBack": "ត្រឡប់ក្រោយ",
     "tryAgain": "សូមព្យាយាមម្តងទៀត។"
   },
+  "translate": {
+    "translate": "បកប្រែ",
+    "translating": "កំពុងបកប្រែ…",
+    "showOriginal": "បង្ហាញអត្ថបទដើម",
+    "error": "ការបកប្រែបានបរាជ័យ"
+  },
   "nav": {
     "openMenu": "បើកម៉ឺនុយ",
     "closeMenu": "បិទម៉ឺនុយ",
