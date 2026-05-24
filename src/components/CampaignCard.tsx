@@ -203,7 +203,7 @@ export function CampaignCard({ campaign, variant = 'compact', className, footerB
             <h3
               className={cn(
                 'font-bold leading-tight tracking-tight',
-                isFeaturedVariant ? 'text-2xl sm:text-3xl' : 'text-lg',
+                isFeaturedVariant ? 'text-2xl sm:text-3xl' : 'text-lg line-clamp-2',
               )}
             >
               {displayCampaign.title}
