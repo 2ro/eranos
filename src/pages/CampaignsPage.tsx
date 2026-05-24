@@ -174,19 +174,32 @@ export function CampaignsPage() {
             >
               <Trans
                 i18nKey="campaigns.home.heroTagline"
-                components={{
-                  // Index 0: orange highlighter block. Wraps the
-                  // emphasized word(s) from the translation; the word
-                  // itself is supplied as the component's children by
-                  // i18next at render time. The English-only optical
-                  // tweak (negative inner-span margin to compensate
-                  // for Bebas Neue italic skew) is dropped because it
-                  // assumed the word started with a wide italic "u" —
-                  // not portable across translations.
-                  0: (
-                    <span className="inline-block w-fit pl-1 pr-3 pt-1 pb-0 -mt-1 -mb-3 bg-primary text-white leading-[0.8] align-baseline" />
-                  ),
-                }}
+                components={[
+                  // Index 0: solid brand-orange highlighter block.
+                  // i18next injects the matched translation segment
+                  // (the text between <0>...</0>) as this span's
+                  // `children`, so the word renders *inside* the
+                  // orange background. Logical padding (`ps-1 pe-3`,
+                  // start vs end rather than left vs right) so the
+                  // asymmetric flourish extending past the word's
+                  // trailing edge automatically flips for RTL
+                  // languages (ar, fa, ps). The Bebas-Neue-italic
+                  // optical nudge from the pre-i18n version is
+                  // omitted because it assumed the word started with
+                  // a slanted U — not portable across translations.
+                  //
+                  // NOTE: `components` MUST be an array, not an
+                  // object keyed by `{0: ..., 1: ...}`. The object
+                  // form silently drops the indexed tags in this
+                  // react-i18next version, rendering the text
+                  // without any wrapping element.
+                  <span key="hl" className="inline-block w-fit ps-1 pe-3 bg-primary text-white leading-[0.95] align-baseline" />,
+                  // Index 1: line break. English wants the
+                  // highlighted word on its own line as a standalone
+                  // block. Translations that prefer inline flow
+                  // simply omit `<1></1>` from their string.
+                  <br key="br" />,
+                ]}
               />
             </h1>
             <p className="text-base sm:text-lg text-white/80 max-w-xl">
