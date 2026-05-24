@@ -14,6 +14,7 @@ import ps from './locales/ps.json';
 import pt from './locales/pt.json';
 import ru from './locales/ru.json';
 import sn from './locales/sn.json';
+import tr from './locales/tr.json';
 import zh from './locales/zh.json';
 
 /**
@@ -41,6 +42,7 @@ export const SUPPORTED_LANGUAGES: SupportedLanguage[] = [
   { code: 'id', nativeName: 'Bahasa Indonesia' },
   { code: 'pt', nativeName: 'Português' },
   { code: 'ru', nativeName: 'Русский' },
+  { code: 'tr', nativeName: 'Türkçe' },
   { code: 'ar', nativeName: 'العربية' },
   { code: 'fa', nativeName: 'فارسی' },
   { code: 'ps', nativeName: 'پښتو' },
@@ -85,6 +87,7 @@ i18n
       pt: { translation: pt },
       ru: { translation: ru },
       sn: { translation: sn },
+      tr: { translation: tr },
       zh: { translation: zh },
     },
     fallbackLng: 'en',
