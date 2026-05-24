@@ -652,7 +652,7 @@ export function CreateCampaignPage() {
 
         <div className="rounded-2xl bg-card/50 p-2">
           {/* Title */}
-          <FormSection title={t('campaignsCreate.title')} requirement="Required">
+          <FormSection title={t('forms.title')} requirement="Required">
             <Input
               value={title}
               onChange={(e) => setTitle(e.target.value)}
@@ -683,7 +683,7 @@ export function CreateCampaignPage() {
           </FormSection>
 
           {/* Country */}
-          <FormSection title={t('campaignsCreate.country')} requirement="Recommended">
+          <FormSection title={t('forms.country')} requirement="Recommended">
             <CountrySelect
               query={countryQuery}
               selectedCode={countryCode}
@@ -706,7 +706,7 @@ export function CreateCampaignPage() {
           </FormSection>
 
           {/* Tags */}
-          <FormSection title={t('campaignsCreate.tags')} requirement="Optional">
+          <FormSection title={t('forms.tags')} requirement="Optional">
             <Input
               id="campaign-tags"
               value={tagInput}
@@ -809,7 +809,7 @@ export function CreateCampaignPage() {
             {submitMutation.isPending ? (
               <>
                 <Loader2 className="size-4 mr-2 animate-spin" />
-                {isEditMode ? t('campaignsCreate.updating') : t('campaignsCreate.publishing')}
+                {isEditMode ? t('campaignsCreate.updating') : t('forms.publishing')}
               </>
             ) : coverUploading ? (
               <>

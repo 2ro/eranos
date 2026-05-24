@@ -527,7 +527,15 @@
   "forms": {
     "required": "Required",
     "recommended": "Recommended",
-    "optional": "Optional"
+    "optional": "Optional",
+    "title": "Title",
+    "country": "Country",
+    "tags": "Tags",
+    "coverImage": "Cover image",
+    "description": "Description",
+    "timezone": "Timezone",
+    "publishing": "Publishing…",
+    "uploadingCover": "Uploading cover…"
   },
   "notFound": {
     "title": "404 - Page Not Found",
@@ -915,10 +923,38 @@
   },
   "calendarEvents": {
     "create": {
-      "seoTitle": "Create event | Agora",
-      "seoDescription": "Create a calendar event on Agora.",
+      "seoTitle": "Create event",
+      "seoDescription": "Create a calendar event on {{appName}}.",
       "loginTitle": "Log in to create an event",
-      "loginBody": "Events are signed Nostr events. You need a Nostr login to publish one."
+      "loginBody": "Events are signed Nostr events. You need a Nostr login to publish one.",
+      "backToEvents": "Back to events",
+      "heading": "Create event",
+      "titlePlaceholder": "Neighborhood cleanup",
+      "descriptionPlaceholder": "Tell people what to expect, what to bring, and who should attend...",
+      "schedule": "Schedule",
+      "allDay": "All-day event",
+      "allDayHint": "Turn off to add start and end times.",
+      "startDate": "Start date",
+      "endDate": "End date",
+      "startTime": "Start time",
+      "endTime": "End time",
+      "locationDetails": "Location details",
+      "locationPlaceholder": "Address, venue, or video call link",
+      "tagsPlaceholder": "mutual-aid, workshop, local-news",
+      "submit": "Create event",
+      "successToast": "Event created",
+      "errorToast": "Could not create event",
+      "altCalendar": "Calendar event: {{title}}",
+      "altGroup": "Group event: {{title}}",
+      "errorLoginRequired": "You must be logged in to create an event.",
+      "errorTitleRequired": "Title is required.",
+      "errorStartDateRequired": "Start date is required.",
+      "errorStartDatePast": "Start date cannot be in the past.",
+      "errorStartTimeRequired": "Start time is required for timed events.",
+      "errorCoverInvalid": "Cover image must be a valid https:// URL.",
+      "errorEndDateBeforeStart": "End date must be on or after the start date.",
+      "errorStartDateTimeInvalid": "Start date or time is invalid.",
+      "errorEndTimeAfterStart": "End time must be after the start time."
     },
     "detail": {
       "untitledEvent": "Untitled event",

@@ -104,7 +104,15 @@
   "forms": {
     "required": "Zvinodikanwa",
     "recommended": "Zvinokurudzirwa",
-    "optional": "Zvichisarudzwa"
+    "optional": "Zvichisarudzwa",
+    "title": "Musoro",
+    "country": "Nyika",
+    "tags": "Matag",
+    "coverImage": "Mufananidzo wepamusoro",
+    "description": "Tsananguro",
+    "timezone": "Nguva yenzvimbo",
+    "publishing": "Kuburitsa…",
+    "uploadingCover": "Kuisa mufananidzo wepamusoro…"
   },
   "notFound": {
     "title": "404 - Peji harina kuwanikwa",
@@ -492,10 +500,38 @@
   },
   "calendarEvents": {
     "create": {
-      "seoTitle": "Gadzira chiitiko | Agora",
-      "seoDescription": "Gadzira chiitiko checalendar paAgora.",
+      "seoTitle": "Gadzira chiitiko",
+      "seoDescription": "Gadzira chiitiko checalendar pa{{appName}}.",
       "loginTitle": "Pinda kuti ugadzire chiitiko",
-      "loginBody": "Zviitiko maNostr events akasainwa. Unoda kupinda muNostr kuti ubudise chimwe."
+      "loginBody": "Zviitiko maNostr events akasainwa. Unoda kupinda muNostr kuti ubudise chimwe.",
+      "backToEvents": "Dzokera kuzviitiko",
+      "heading": "Gadzira chiitiko",
+      "titlePlaceholder": "Kuchenesa nharaunda",
+      "descriptionPlaceholder": "Udza vanhu zvavanotarisira, zvavanofanira kuuya nazvo, uye vanofanira kuuya ndivanaani...",
+      "schedule": "Hurongwa",
+      "allDay": "Chiitiko chezuva rese",
+      "allDayHint": "Dzima kuti uwedzere nguva yekutanga neyekupera.",
+      "startDate": "Zuva rekutanga",
+      "endDate": "Zuva rekupedzisira",
+      "startTime": "Nguva yekutanga",
+      "endTime": "Nguva yekupera",
+      "locationDetails": "Ruzivo rwenzvimbo",
+      "locationPlaceholder": "Kero, nzvimbo, kana link yevideo call",
+      "tagsPlaceholder": "mutual-aid, workshop, local-news",
+      "submit": "Gadzira chiitiko",
+      "successToast": "Chiitiko chagadzirwa",
+      "errorToast": "Hatina kukwanisa kugadzira chiitiko",
+      "altCalendar": "Chiitiko checalendar: {{title}}",
+      "altGroup": "Chiitiko chegroup: {{title}}",
+      "errorLoginRequired": "Unofanira kupinda kuti ugadzire chiitiko.",
+      "errorTitleRequired": "Musoro unodikanwa.",
+      "errorStartDateRequired": "Zuva rekutanga rinodikanwa.",
+      "errorStartDatePast": "Zuva rekutanga harigoni kuva rakapfuura.",
+      "errorStartTimeRequired": "Nguva yekutanga inodikanwa pazviitiko zvine nguva.",
+      "errorCoverInvalid": "Mufananidzo wepamusoro unofanira kuva https:// URL inoshanda.",
+      "errorEndDateBeforeStart": "Zuva rekupedzisira rinofanira kuva pazuva rekutanga kana mushure maro.",
+      "errorStartDateTimeInvalid": "Zuva kana nguva yekutanga haisi kushanda.",
+      "errorEndTimeAfterStart": "Nguva yekupera inofanira kuva mushure menguva yekutanga."
     },
     "detail": {
       "untitledEvent": "Chiitiko chisina zita",

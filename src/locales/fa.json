@@ -104,7 +104,15 @@
   "forms": {
     "required": "الزامی",
     "recommended": "توصیه‌شده",
-    "optional": "اختیاری"
+    "optional": "اختیاری",
+    "title": "عنوان",
+    "country": "کشور",
+    "tags": "برچسب‌ها",
+    "coverImage": "تصویر کاور",
+    "description": "توضیح",
+    "timezone": "منطقه زمانی",
+    "publishing": "در حال انتشار…",
+    "uploadingCover": "در حال بارگذاری کاور…"
   },
   "notFound": {
     "title": "۴۰۴ - صفحه پیدا نشد",
@@ -492,10 +500,38 @@
   },
   "calendarEvents": {
     "create": {
-      "seoTitle": "ایجاد رویداد | Agora",
-      "seoDescription": "یک رویداد تقویمی در Agora ایجاد کنید.",
+      "seoTitle": "ایجاد رویداد",
+      "seoDescription": "یک رویداد تقویمی در {{appName}} ایجاد کنید.",
       "loginTitle": "برای ایجاد رویداد وارد شوید",
-      "loginBody": "رویدادها، رویدادهای امضاشدهٔ Nostr هستند. برای انتشار باید وارد Nostr شوید."
+      "loginBody": "رویدادها، رویدادهای امضاشدهٔ Nostr هستند. برای انتشار باید وارد Nostr شوید.",
+      "backToEvents": "بازگشت به رویدادها",
+      "heading": "ایجاد رویداد",
+      "titlePlaceholder": "پاک‌سازی محله",
+      "descriptionPlaceholder": "به مردم بگویید چه انتظاری داشته باشند، چه چیزی بیاورند، و چه کسانی باید شرکت کنند...",
+      "schedule": "زمان‌بندی",
+      "allDay": "رویداد تمام‌روز",
+      "allDayHint": "برای افزودن زمان شروع و پایان، آن را خاموش کنید.",
+      "startDate": "تاریخ شروع",
+      "endDate": "تاریخ پایان",
+      "startTime": "زمان شروع",
+      "endTime": "زمان پایان",
+      "locationDetails": "جزئیات مکان",
+      "locationPlaceholder": "نشانی، محل برگزاری، یا پیوند تماس ویدیویی",
+      "tagsPlaceholder": "کمک-متقابل، کارگاه، اخبار-محلی",
+      "submit": "ایجاد رویداد",
+      "successToast": "رویداد ایجاد شد",
+      "errorToast": "ایجاد رویداد ممکن نشد",
+      "altCalendar": "رویداد تقویمی: {{title}}",
+      "altGroup": "رویداد گروه: {{title}}",
+      "errorLoginRequired": "برای ایجاد رویداد باید وارد شوید.",
+      "errorTitleRequired": "عنوان الزامی است.",
+      "errorStartDateRequired": "تاریخ شروع الزامی است.",
+      "errorStartDatePast": "تاریخ شروع نمی‌تواند در گذشته باشد.",
+      "errorStartTimeRequired": "زمان شروع برای رویدادهای زمان‌دار الزامی است.",
+      "errorCoverInvalid": "تصویر کاور باید یک URL معتبر https:// باشد.",
+      "errorEndDateBeforeStart": "تاریخ پایان باید برابر یا پس از تاریخ شروع باشد.",
+      "errorStartDateTimeInvalid": "تاریخ یا زمان شروع نامعتبر است.",
+      "errorEndTimeAfterStart": "زمان پایان باید پس از زمان شروع باشد."
     },
     "detail": {
       "untitledEvent": "رویداد بدون عنوان",

@@ -104,7 +104,15 @@
   "forms": {
     "required": "مطلوب",
     "recommended": "موصى به",
-    "optional": "اختياري"
+    "optional": "اختياري",
+    "title": "العنوان",
+    "country": "البلد",
+    "tags": "الوسوم",
+    "coverImage": "صورة الغلاف",
+    "description": "الوصف",
+    "timezone": "المنطقة الزمنية",
+    "publishing": "جارٍ النشر…",
+    "uploadingCover": "جارٍ رفع الغلاف…"
   },
   "notFound": {
     "title": "404 - الصفحة غير موجودة",
@@ -492,10 +500,38 @@
   },
   "calendarEvents": {
     "create": {
-      "seoTitle": "إنشاء حدث | Agora",
-      "seoDescription": "أنشئ حدث تقويم على Agora.",
+      "seoTitle": "إنشاء حدث",
+      "seoDescription": "أنشئ حدث تقويم على {{appName}}.",
       "loginTitle": "سجّل الدخول لإنشاء حدث",
-      "loginBody": "الأحداث هي أحداث Nostr موقّعة. تحتاج إلى تسجيل دخول Nostr لنشر حدث."
+      "loginBody": "الأحداث هي أحداث Nostr موقّعة. تحتاج إلى تسجيل دخول Nostr لنشر حدث.",
+      "backToEvents": "العودة إلى الأحداث",
+      "heading": "إنشاء حدث",
+      "titlePlaceholder": "تنظيف الحي",
+      "descriptionPlaceholder": "أخبر الناس بما يمكن توقعه، وما يجب إحضاره، ومن ينبغي أن يحضر...",
+      "schedule": "الجدول",
+      "allDay": "حدث طوال اليوم",
+      "allDayHint": "أوقف هذا لإضافة أوقات البدء والانتهاء.",
+      "startDate": "تاريخ البدء",
+      "endDate": "تاريخ الانتهاء",
+      "startTime": "وقت البدء",
+      "endTime": "وقت الانتهاء",
+      "locationDetails": "تفاصيل الموقع",
+      "locationPlaceholder": "العنوان أو المكان أو رابط مكالمة الفيديو",
+      "tagsPlaceholder": "مساعدة-متبادلة، ورشة، أخبار-محلية",
+      "submit": "إنشاء حدث",
+      "successToast": "تم إنشاء الحدث",
+      "errorToast": "تعذّر إنشاء الحدث",
+      "altCalendar": "حدث تقويم: {{title}}",
+      "altGroup": "حدث مجموعة: {{title}}",
+      "errorLoginRequired": "يجب تسجيل الدخول لإنشاء حدث.",
+      "errorTitleRequired": "العنوان مطلوب.",
+      "errorStartDateRequired": "تاريخ البدء مطلوب.",
+      "errorStartDatePast": "لا يمكن أن يكون تاريخ البدء في الماضي.",
+      "errorStartTimeRequired": "وقت البدء مطلوب للأحداث المحددة بوقت.",
+      "errorCoverInvalid": "يجب أن تكون صورة الغلاف رابط https:// صالحاً.",
+      "errorEndDateBeforeStart": "يجب أن يكون تاريخ الانتهاء في تاريخ البدء أو بعده.",
+      "errorStartDateTimeInvalid": "تاريخ أو وقت البدء غير صالح.",
+      "errorEndTimeAfterStart": "يجب أن يكون وقت الانتهاء بعد وقت البدء."
     },
     "detail": {
       "untitledEvent": "حدث بلا عنوان",

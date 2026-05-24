@@ -273,7 +273,7 @@ export function CreateActionPage() {
 
         <div className="rounded-2xl bg-card/50 p-2">
           {/* Title */}
-          <FormSection title={t('pledges.create.title')} requirement="Required">
+          <FormSection title={t('forms.title')} requirement="Required">
             <Input
               placeholder={t('pledges.create.titlePlaceholder')}
               value={title}
@@ -284,7 +284,7 @@ export function CreateActionPage() {
           </FormSection>
 
           {/* Country */}
-          <FormSection title={t('pledges.create.country')} requirement="Recommended">
+          <FormSection title={t('forms.country')} requirement="Recommended">
             <CountrySelect
               query={countryQuery}
               selectedCode={countryCode}
@@ -307,7 +307,7 @@ export function CreateActionPage() {
           </FormSection>
 
           {/* Tags */}
-          <FormSection title={t('pledges.create.tags')} requirement="Recommended">
+          <FormSection title={t('forms.tags')} requirement="Recommended">
             <Input
               id="pledge-tags"
               value={tagInput}
@@ -317,7 +317,7 @@ export function CreateActionPage() {
           </FormSection>
 
           {/* Cover image */}
-          <FormSection title={t('pledges.create.coverImage')} requirement="Optional">
+          <FormSection title={t('forms.coverImage')} requirement="Optional">
             <CoverImageField
               value={coverImage}
               onChange={setCoverImage}
@@ -326,7 +326,7 @@ export function CreateActionPage() {
           </FormSection>
 
           {/* Description */}
-          <FormSection title={t('pledges.create.description')} requirement="Required">
+          <FormSection title={t('forms.description')} requirement="Required">
             <Textarea
               placeholder={t('pledges.create.descriptionPlaceholder')}
               rows={7}
@@ -378,10 +378,10 @@ export function CreateActionPage() {
           </div>
 
           {deadline && (
-            <FormSection title={t('pledges.create.timezone')} requirement="Required">
+            <FormSection title={t('forms.timezone')} requirement="Required">
               <div className="bg-muted/30 p-3 rounded-lg border border-border/50 space-y-2 animate-in slide-in-from-top-2 duration-200">
                 <div className="flex items-center gap-2 text-sm font-medium">
-                  <Clock className="h-4 w-4" /> {t('pledges.create.timezone')}
+                  <Clock className="h-4 w-4" /> {t('forms.timezone')}
                 </div>
                 <TimezoneSwitcher value={timezone} onChange={setTimezone} />
                 <p className="text-xs text-muted-foreground">
@@ -408,12 +408,12 @@ export function CreateActionPage() {
             {submitMutation.isPending ? (
               <>
                 <Loader2 className="size-4 mr-2 animate-spin" />
-                {t('pledges.create.publishing')}
+                {t('forms.publishing')}
               </>
             ) : coverUploading ? (
               <>
                 <Loader2 className="size-4 mr-2 animate-spin" />
-                {t('pledges.create.uploadingCover')}
+                {t('forms.uploadingCover')}
               </>
             ) : (
               <>

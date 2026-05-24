@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { useSeoMeta } from '@unhead/react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useTranslation } from 'react-i18next';
 import { nip19 } from 'nostr-tools';
 import { AlertTriangle, ArrowLeft, CalendarDays, Clock, Loader2, Plus } from 'lucide-react';
 
@@ -17,6 +18,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { Textarea } from '@/components/ui/textarea';
+import { useAppContext } from '@/hooks/useAppContext';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useManageableOrganizations } from '@/hooks/useManageableOrganizations';
 import { useNostrPublish } from '@/hooks/useNostrPublish';
@@ -47,6 +49,8 @@ function addDays(date: string, days: number): string {
 }
 
 export function CreateEventPage() {
+  const { t } = useTranslation();
+  const { config } = useAppContext();
   const { user } = useCurrentUser();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
@@ -89,32 +93,32 @@ export function CreateEventPage() {
   const [formError, setFormError] = useState('');
 
   useSeoMeta({
-    title: 'Create event | Agora',
-    description: 'Create a calendar event on Agora.',
+    title: `${t('calendarEvents.create.seoTitle')} | ${config.appName}`,
+    description: t('calendarEvents.create.seoDescription', { appName: config.appName }),
   });
 
   const minEndDate = startDate || minStartDate;
 
   const submitMutation = useMutation({
     mutationFn: async () => {
-      if (!user) throw new Error('You must be logged in to create an event.');
+      if (!user) throw new Error(t('calendarEvents.create.errorLoginRequired'));
 
       const trimmedTitle = title.trim();
       const trimmedDescription = description.trim();
       const trimmedLocation = location.trim();
       const contentTags = parseContentTagInput(tagInput);
 
-      if (!trimmedTitle) throw new Error('Title is required.');
-      if (!startDate) throw new Error('Start date is required.');
-      if (startDate < minStartDate) throw new Error('Start date cannot be in the past.');
-      if (!allDay && !startTime) throw new Error('Start time is required for timed events.');
+      if (!trimmedTitle) throw new Error(t('calendarEvents.create.errorTitleRequired'));
+      if (!startDate) throw new Error(t('calendarEvents.create.errorStartDateRequired'));
+      if (startDate < minStartDate) throw new Error(t('calendarEvents.create.errorStartDatePast'));
+      if (!allDay && !startTime) throw new Error(t('calendarEvents.create.errorStartTimeRequired'));
 
       const dTag = `${slugify(trimmedTitle) || 'event'}-${Date.now()}`;
       let kind = 31922;
       const tags: string[][] = [
         ['d', dTag],
         ['title', trimmedTitle],
-        ['alt', `${organizationATag ? 'Group event' : 'Calendar event'}: ${trimmedTitle}`],
+        ['alt', t(organizationATag ? 'calendarEvents.create.altGroup' : 'calendarEvents.create.altCalendar', { title: trimmedTitle })],
       ];
 
       if (organizationATag) {
@@ -138,7 +142,7 @@ export function CreateEventPage() {
       const trimmedCoverImage = coverImage.trim();
       const sanitizedImage = trimmedCoverImage ? sanitizeUrl(trimmedCoverImage) : undefined;
       if (trimmedCoverImage && !sanitizedImage) {
-        throw new Error('Cover image must be a valid https:// URL.');
+        throw new Error(t('calendarEvents.create.errorCoverInvalid'));
       }
       if (sanitizedImage) {
         tags.push(['image', sanitizedImage]);
@@ -147,16 +151,16 @@ export function CreateEventPage() {
       if (allDay) {
         tags.push(['start', startDate]);
         if (endDate) {
-          if (endDate < startDate) throw new Error('End date must be on or after the start date.');
+          if (endDate < startDate) throw new Error(t('calendarEvents.create.errorEndDateBeforeStart'));
           if (endDate > startDate) tags.push(['end', addDays(endDate, 1)]);
         }
       } else {
-        if (endDate && endDate < startDate) throw new Error('End date must be on or after the start date.');
+        if (endDate && endDate < startDate) throw new Error(t('calendarEvents.create.errorEndDateBeforeStart'));
         kind = 31923;
         const [startYear, startMonth, startDay] = startDate.split('-').map(Number);
         const [startHour, startMinute] = startTime.split(':').map(Number);
         const startTs = unixSecondsInTimezone(startYear, startMonth, startDay, startHour, startMinute, timezone);
-        if (!Number.isFinite(startTs) || startTs <= 0) throw new Error('Start date or time is invalid.');
+        if (!Number.isFinite(startTs) || startTs <= 0) throw new Error(t('calendarEvents.create.errorStartDateTimeInvalid'));
         tags.push(['start', String(startTs)]);
         tags.push(['D', String(Math.floor(startTs / 86400))]);
         tags.push(['start_tzid', timezone]);
@@ -168,7 +172,7 @@ export function CreateEventPage() {
           const [endHour, endMinute] = effectiveEndTime.split(':').map(Number);
           const endTs = unixSecondsInTimezone(endYear, endMonth, endDay, endHour, endMinute, timezone);
           if (!Number.isFinite(endTs) || endTs <= startTs) {
-            throw new Error('End time must be after the start time.');
+            throw new Error(t('calendarEvents.create.errorEndTimeAfterStart'));
           }
           tags.push(['end', String(endTs)]);
           tags.push(['end_tzid', timezone]);
@@ -215,14 +219,14 @@ export function CreateEventPage() {
       });
     },
     onSuccess: (naddr) => {
-      toast({ title: 'Event created' });
+      toast({ title: t('calendarEvents.create.successToast') });
       navigate(`/${naddr}`);
     },
     onError: (error: unknown) => {
       const msg = error instanceof Error ? error.message : String(error);
       setFormError(msg);
       toast({
-        title: 'Could not create event',
+        title: t('calendarEvents.create.errorToast'),
         description: msg,
         variant: 'destructive',
       });
@@ -236,12 +240,12 @@ export function CreateEventPage() {
           <Card>
             <CardContent className="py-12 px-8 text-center space-y-4">
               <CalendarDays className="size-10 text-muted-foreground/60 mx-auto" />
-              <h2 className="text-xl font-semibold">Log in to create an event</h2>
+              <h2 className="text-xl font-semibold">{t('calendarEvents.create.loginTitle')}</h2>
               <p className="text-muted-foreground">
-                Events are signed Nostr events. You need a Nostr login to publish one.
+                {t('calendarEvents.create.loginBody')}
               </p>
               <Button asChild>
-                <Link to="/events">Back to events</Link>
+                <Link to="/events">{t('calendarEvents.create.backToEvents')}</Link>
               </Button>
             </CardContent>
           </Card>
@@ -287,12 +291,12 @@ export function CreateEventPage() {
               type="button"
               onClick={() => navigate(-1)}
               className="p-2 rounded-full hover:bg-secondary motion-safe:transition-colors text-muted-foreground hover:text-foreground"
-              aria-label="Go back"
+              aria-label={t('common.goBack')}
             >
-              <ArrowLeft className="size-5" />
+              <ArrowLeft className="size-5 rtl:rotate-180" />
             </button>
             <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">
-              Create event
+              {t('calendarEvents.create.heading')}
             </h1>
           </div>
           <OrganizationContextChip
@@ -305,9 +309,9 @@ export function CreateEventPage() {
         </div>
 
         <div className="rounded-2xl bg-card/50 p-2">
-          <FormSection title="Title" requirement="Required">
+          <FormSection title={t('forms.title')} requirement="Required">
             <Input
-              placeholder="Neighborhood cleanup"
+              placeholder={t('calendarEvents.create.titlePlaceholder')}
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               maxLength={200}
@@ -315,7 +319,7 @@ export function CreateEventPage() {
             />
           </FormSection>
 
-          <FormSection title="Cover image" requirement="Recommended">
+          <FormSection title={t('forms.coverImage')} requirement="Recommended">
             <CoverImageField
               value={coverImage}
               onChange={setCoverImage}
@@ -323,9 +327,9 @@ export function CreateEventPage() {
             />
           </FormSection>
 
-          <FormSection title="Description" requirement="Recommended">
+          <FormSection title={t('forms.description')} requirement="Recommended">
             <Textarea
-              placeholder="Tell people what to expect, what to bring, and who should attend..."
+              placeholder={t('calendarEvents.create.descriptionPlaceholder')}
               rows={7}
               className="font-mono text-sm"
               value={description}
@@ -333,11 +337,11 @@ export function CreateEventPage() {
             />
           </FormSection>
 
-          <FormSection title="Schedule" requirement="Required">
+          <FormSection title={t('calendarEvents.create.schedule')} requirement="Required">
             <div className="flex items-center justify-between gap-4 rounded-xl border border-border px-3 py-3">
               <div className="space-y-0.5">
-                <Label htmlFor="event-all-day">All-day event</Label>
-                <p className="text-xs text-muted-foreground">Turn off to add start and end times.</p>
+                <Label htmlFor="event-all-day">{t('calendarEvents.create.allDay')}</Label>
+                <p className="text-xs text-muted-foreground">{t('calendarEvents.create.allDayHint')}</p>
               </div>
               <Switch id="event-all-day" checked={allDay} onCheckedChange={handleAllDayChange} />
             </div>
@@ -345,8 +349,8 @@ export function CreateEventPage() {
             <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
               <div className="space-y-1.5">
                 <Label htmlFor="event-start-date" className="flex items-center gap-2">
-                  Start date
-                  <span className="text-xs font-medium text-muted-foreground">Required</span>
+                  {t('calendarEvents.create.startDate')}
+                  <span className="text-xs font-medium text-muted-foreground">{t('forms.required')}</span>
                 </Label>
                 <Input
                   id="event-start-date"
@@ -361,8 +365,8 @@ export function CreateEventPage() {
 
               <div className="space-y-1.5">
                 <Label htmlFor="event-end-date" className="flex items-center gap-2">
-                  End date
-                  <span className="text-xs font-medium text-muted-foreground">Optional</span>
+                  {t('calendarEvents.create.endDate')}
+                  <span className="text-xs font-medium text-muted-foreground">{t('forms.optional')}</span>
                 </Label>
                 <Input
                   id="event-end-date"
@@ -379,7 +383,7 @@ export function CreateEventPage() {
               <div className="space-y-2">
                 <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
                   <div className="space-y-1.5">
-                    <Label htmlFor="event-start-time">Start time *</Label>
+                    <Label htmlFor="event-start-time">{t('calendarEvents.create.startTime')}</Label>
                     <Input
                       id="event-start-time"
                       type="time"
@@ -390,7 +394,7 @@ export function CreateEventPage() {
                     />
                   </div>
                   <div className="space-y-1.5">
-                    <Label htmlFor="event-end-time">End time</Label>
+                    <Label htmlFor="event-end-time">{t('calendarEvents.create.endTime')}</Label>
                     <Input
                       id="event-end-time"
                       type="time"
@@ -403,7 +407,7 @@ export function CreateEventPage() {
 
                 <div className="bg-muted/30 p-3 rounded-lg border border-border/50 space-y-2">
                   <div className="flex items-center gap-2 text-sm font-medium">
-                    <Clock className="h-4 w-4" /> Timezone
+                    <Clock className="h-4 w-4" /> {t('forms.timezone')}
                   </div>
                   <TimezoneSwitcher value={timezone} onChange={setTimezone} />
                 </div>
@@ -411,7 +415,7 @@ export function CreateEventPage() {
             )}
           </FormSection>
 
-          <FormSection title="Country" requirement="Recommended">
+          <FormSection title={t('forms.country')} requirement="Recommended">
             <CountrySelect
               id="event-country"
               query={countryQuery}
@@ -434,20 +438,20 @@ export function CreateEventPage() {
             />
           </FormSection>
 
-          <FormSection title="Location details" requirement="Recommended">
+          <FormSection title={t('calendarEvents.create.locationDetails')} requirement="Recommended">
             <Input
-              placeholder="Address, venue, or video call link"
+              placeholder={t('calendarEvents.create.locationPlaceholder')}
               value={location}
               onChange={(e) => setLocation(e.target.value)}
             />
           </FormSection>
 
-          <FormSection title="Tags" requirement="Recommended">
+          <FormSection title={t('forms.tags')} requirement="Recommended">
             <Input
               id="event-tags"
               value={tagInput}
               onChange={(e) => setTagInput(e.target.value)}
-              placeholder="mutual-aid, workshop, local-news"
+              placeholder={t('calendarEvents.create.tagsPlaceholder')}
             />
           </FormSection>
         </div>
@@ -464,17 +468,17 @@ export function CreateEventPage() {
             {submitMutation.isPending ? (
               <>
                 <Loader2 className="size-4 mr-2 animate-spin" />
-                Publishing…
+                {t('forms.publishing')}
               </>
             ) : coverUploading ? (
               <>
                 <Loader2 className="size-4 mr-2 animate-spin" />
-                Uploading cover…
+                {t('forms.uploadingCover')}
               </>
             ) : (
               <>
                 <Plus className="size-4 mr-2" />
-                Create event
+                {t('calendarEvents.create.submit')}
               </>
             )}
           </Button>

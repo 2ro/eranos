@@ -104,7 +104,15 @@
   "forms": {
     "required": "ត្រូវការ",
     "recommended": "ណែនាំ",
-    "optional": "ស្រេចចិត្ត"
+    "optional": "ស្រេចចិត្ត",
+    "title": "ចំណងជើង",
+    "country": "ប្រទេស",
+    "tags": "ស្លាក",
+    "coverImage": "រូបភាពគម្រប",
+    "description": "ការពិពណ៌នា",
+    "timezone": "តំបន់ពេលវេលា",
+    "publishing": "កំពុងផ្សព្វផ្សាយ…",
+    "uploadingCover": "កំពុងផ្ទុកគម្រប…"
   },
   "notFound": {
     "title": "404 - រកមិនឃើញទំព័រ",
@@ -492,10 +500,38 @@
   },
   "calendarEvents": {
     "create": {
-      "seoTitle": "បង្កើតព្រឹត្តិការណ៍ | Agora",
-      "seoDescription": "បង្កើតព្រឹត្តិការណ៍ប្រតិទិនលើ Agora។",
+      "seoTitle": "បង្កើតព្រឹត្តិការណ៍",
+      "seoDescription": "បង្កើតព្រឹត្តិការណ៍ប្រតិទិនលើ {{appName}}។",
       "loginTitle": "ចូលគណនីដើម្បីបង្កើតព្រឹត្តិការណ៍",
-      "loginBody": "ព្រឹត្តិការណ៍គឺជាព្រឹត្តិការណ៍ Nostr ដែលបានចុះហត្ថលេខា។ អ្នកត្រូវការចូល Nostr ដើម្បីផ្សព្វផ្សាយ។"
+      "loginBody": "ព្រឹត្តិការណ៍គឺជាព្រឹត្តិការណ៍ Nostr ដែលបានចុះហត្ថលេខា។ អ្នកត្រូវការចូល Nostr ដើម្បីផ្សព្វផ្សាយ។",
+      "backToEvents": "ត្រឡប់ទៅព្រឹត្តិការណ៍",
+      "heading": "បង្កើតព្រឹត្តិការណ៍",
+      "titlePlaceholder": "សម្អាតសង្កាត់",
+      "descriptionPlaceholder": "ប្រាប់អ្នកចូលរួមអំពីអ្វីដែលនឹងកើតឡើង អ្វីត្រូវនាំមក និងអ្នកណាគួរចូលរួម...",
+      "schedule": "កាលវិភាគ",
+      "allDay": "ព្រឹត្តិការណ៍ពេញមួយថ្ងៃ",
+      "allDayHint": "បិទដើម្បីបន្ថែមម៉ោងចាប់ផ្តើម និងបញ្ចប់។",
+      "startDate": "កាលបរិច្ឆេទចាប់ផ្តើម",
+      "endDate": "កាលបរិច្ឆេទបញ្ចប់",
+      "startTime": "ម៉ោងចាប់ផ្តើម",
+      "endTime": "ម៉ោងបញ្ចប់",
+      "locationDetails": "ព័ត៌មានទីតាំង",
+      "locationPlaceholder": "អាសយដ្ឋាន ទីកន្លែង ឬតំណវីដេអូខល",
+      "tagsPlaceholder": "mutual-aid, workshop, local-news",
+      "submit": "បង្កើតព្រឹត្តិការណ៍",
+      "successToast": "បានបង្កើតព្រឹត្តិការណ៍",
+      "errorToast": "មិនអាចបង្កើតព្រឹត្តិការណ៍",
+      "altCalendar": "ព្រឹត្តិការណ៍ប្រតិទិន៖ {{title}}",
+      "altGroup": "ព្រឹត្តិការណ៍ក្រុម៖ {{title}}",
+      "errorLoginRequired": "អ្នកត្រូវចូលគណនីដើម្បីបង្កើតព្រឹត្តិការណ៍។",
+      "errorTitleRequired": "ត្រូវការចំណងជើង។",
+      "errorStartDateRequired": "ត្រូវការកាលបរិច្ឆេទចាប់ផ្តើម។",
+      "errorStartDatePast": "កាលបរិច្ឆេទចាប់ផ្តើមមិនអាចនៅអតីតកាល។",
+      "errorStartTimeRequired": "ត្រូវការម៉ោងចាប់ផ្តើមសម្រាប់ព្រឹត្តិការណ៍មានម៉ោង។",
+      "errorCoverInvalid": "រូបភាពគម្របត្រូវតែជា URL https:// ត្រឹមត្រូវ។",
+      "errorEndDateBeforeStart": "កាលបរិច្ឆេទបញ្ចប់ត្រូវតែស្ថិតនៅថ្ងៃចាប់ផ្តើម ឬបន្ទាប់ពីថ្ងៃចាប់ផ្តើម។",
+      "errorStartDateTimeInvalid": "កាលបរិច្ឆេទ ឬម៉ោងចាប់ផ្តើមមិនត្រឹមត្រូវ។",
+      "errorEndTimeAfterStart": "ម៉ោងបញ្ចប់ត្រូវតែបន្ទាប់ពីម៉ោងចាប់ផ្តើម។"
     },
     "detail": {
       "untitledEvent": "ព្រឹត្តិការណ៍គ្មានចំណងជើង",

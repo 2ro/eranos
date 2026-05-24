@@ -104,7 +104,15 @@
   "forms": {
     "required": "必填",
     "recommended": "建议",
-    "optional": "可选"
+    "optional": "可选",
+    "title": "标题",
+    "country": "国家/地区",
+    "tags": "标签",
+    "coverImage": "封面图片",
+    "description": "描述",
+    "timezone": "时区",
+    "publishing": "发布中…",
+    "uploadingCover": "正在上传封面…"
   },
   "notFound": {
     "title": "404 - 找不到页面",
@@ -492,10 +500,38 @@
   },
   "calendarEvents": {
     "create": {
-      "seoTitle": "创建事件 | Agora",
-      "seoDescription": "在 Agora 上创建日历事件。",
+      "seoTitle": "创建事件",
+      "seoDescription": "在 {{appName}} 上创建日历事件。",
       "loginTitle": "登录以创建事件",
-      "loginBody": "事件是已签名的 Nostr 事件。你需要登录 Nostr 才能发布。"
+      "loginBody": "事件是已签名的 Nostr 事件。你需要登录 Nostr 才能发布。",
+      "backToEvents": "返回事件",
+      "heading": "创建事件",
+      "titlePlaceholder": "社区清理",
+      "descriptionPlaceholder": "告诉大家会发生什么、需要带什么，以及谁适合参加...",
+      "schedule": "日程",
+      "allDay": "全天事件",
+      "allDayHint": "关闭后可添加开始和结束时间。",
+      "startDate": "开始日期",
+      "endDate": "结束日期",
+      "startTime": "开始时间",
+      "endTime": "结束时间",
+      "locationDetails": "地点详情",
+      "locationPlaceholder": "地址、场地或视频通话链接",
+      "tagsPlaceholder": "互助, 工作坊, 本地新闻",
+      "submit": "创建事件",
+      "successToast": "事件已创建",
+      "errorToast": "无法创建事件",
+      "altCalendar": "日历事件：{{title}}",
+      "altGroup": "群组事件：{{title}}",
+      "errorLoginRequired": "你必须登录才能创建事件。",
+      "errorTitleRequired": "标题为必填项。",
+      "errorStartDateRequired": "开始日期为必填项。",
+      "errorStartDatePast": "开始日期不能是过去的日期。",
+      "errorStartTimeRequired": "定时事件需要开始时间。",
+      "errorCoverInvalid": "封面图片必须是有效的 https:// URL。",
+      "errorEndDateBeforeStart": "结束日期必须等于或晚于开始日期。",
+      "errorStartDateTimeInvalid": "开始日期或时间无效。",
+      "errorEndTimeAfterStart": "结束时间必须晚于开始时间。"
     },
     "detail": {
       "untitledEvent": "未命名事件",

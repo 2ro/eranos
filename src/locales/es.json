@@ -104,7 +104,15 @@
   "forms": {
     "required": "Obligatorio",
     "recommended": "Recomendado",
-    "optional": "Opcional"
+    "optional": "Opcional",
+    "title": "Título",
+    "country": "País",
+    "tags": "Etiquetas",
+    "coverImage": "Imagen de portada",
+    "description": "Descripción",
+    "timezone": "Zona horaria",
+    "publishing": "Publicando…",
+    "uploadingCover": "Subiendo portada…"
   },
   "notFound": {
     "title": "404 - Página no encontrada",
@@ -492,10 +500,38 @@
   },
   "calendarEvents": {
     "create": {
-      "seoTitle": "Crear evento | Agora",
-      "seoDescription": "Crea un evento de calendario en Agora.",
+      "seoTitle": "Crear evento",
+      "seoDescription": "Crea un evento de calendario en {{appName}}.",
       "loginTitle": "Inicia sesión para crear un evento",
-      "loginBody": "Los eventos son eventos firmados de Nostr. Necesitas iniciar sesión en Nostr para publicar uno."
+      "loginBody": "Los eventos son eventos firmados de Nostr. Necesitas iniciar sesión en Nostr para publicar uno.",
+      "backToEvents": "Volver a eventos",
+      "heading": "Crear evento",
+      "titlePlaceholder": "Limpieza del barrio",
+      "descriptionPlaceholder": "Cuenta qué esperar, qué llevar y quién debería asistir...",
+      "schedule": "Horario",
+      "allDay": "Evento de todo el día",
+      "allDayHint": "Desactívalo para agregar horas de inicio y fin.",
+      "startDate": "Fecha de inicio",
+      "endDate": "Fecha de fin",
+      "startTime": "Hora de inicio",
+      "endTime": "Hora de fin",
+      "locationDetails": "Detalles de ubicación",
+      "locationPlaceholder": "Dirección, lugar o enlace de videollamada",
+      "tagsPlaceholder": "ayuda-mutua, taller, noticias-locales",
+      "submit": "Crear evento",
+      "successToast": "Evento creado",
+      "errorToast": "No se pudo crear el evento",
+      "altCalendar": "Evento de calendario: {{title}}",
+      "altGroup": "Evento de grupo: {{title}}",
+      "errorLoginRequired": "Debes iniciar sesión para crear un evento.",
+      "errorTitleRequired": "El título es obligatorio.",
+      "errorStartDateRequired": "La fecha de inicio es obligatoria.",
+      "errorStartDatePast": "La fecha de inicio no puede estar en el pasado.",
+      "errorStartTimeRequired": "La hora de inicio es obligatoria para eventos con hora.",
+      "errorCoverInvalid": "La imagen de portada debe ser una URL https:// válida.",
+      "errorEndDateBeforeStart": "La fecha de fin debe ser igual o posterior a la fecha de inicio.",
+      "errorStartDateTimeInvalid": "La fecha u hora de inicio no es válida.",
+      "errorEndTimeAfterStart": "La hora de fin debe ser posterior a la hora de inicio."
     },
     "detail": {
       "untitledEvent": "Evento sin título",
