@@ -94,7 +94,7 @@
     }
   },
   "compose": {
-    "placeholderDefault": "À quoi pensez-vous ?",
+    "placeholderDefault": "Quoi de neuf ?",
     "placeholderPoll": "Posez une question…",
     "placeholderCountry": "Que se passe-t-il en {{country}} ?",
     "placeholderCwReason": "Raison de l'avertissement (facultatif)",

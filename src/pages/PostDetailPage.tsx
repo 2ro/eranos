@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 import { nip19 } from "nostr-tools";
 import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Link, useNavigate } from "react-router-dom";
 /** Lazy-loaded markdown-heavy components — keeps react-markdown + unified pipeline out of the detail page bundle. */
 const ArticleContent = lazy(() => import("@/components/ArticleContent").then(m => ({ default: m.ArticleContent })));
@@ -936,6 +937,7 @@ function BookReviewRating({ event }: { event: NostrEvent }) {
 
 
 function PostDetailContent({ event }: { event: NostrEvent }) {
+  const { t } = useTranslation();
   const { muteItems } = useMuteList();
   const queryClient = useQueryClient();
   const author = useAuthor(event.pubkey);
@@ -2095,7 +2097,7 @@ function PostDetailContent({ event }: { event: NostrEvent }) {
         <DetailCommentComposer
           event={event}
           className="mb-3"
-          placeholder={isKind1 ? 'Write a reply...' : "What's on your mind?"}
+          placeholder={isKind1 ? 'Write a reply...' : t('compose.activityPlaceholder')}
         />
 
         {repliesLoading ? (

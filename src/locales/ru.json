@@ -94,7 +94,7 @@
     }
   },
   "compose": {
-    "placeholderDefault": "Что у вас на уме?",
+    "placeholderDefault": "Что происходит?",
     "placeholderPoll": "Задайте вопрос…",
     "placeholderCountry": "Что происходит в {{country}}?",
     "placeholderCwReason": "Причина предупреждения о содержимом (необязательно)",

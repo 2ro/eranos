@@ -94,7 +94,7 @@
     }
   },
   "compose": {
-    "placeholderDefault": "O que está pensando?",
+    "placeholderDefault": "O que está acontecendo?",
     "placeholderPoll": "Faça uma pergunta…",
     "placeholderCountry": "O que está acontecendo em {{country}}?",
     "placeholderCwReason": "Motivo do aviso de conteúdo (opcional)",

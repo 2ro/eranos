@@ -18,7 +18,9 @@
     "confirm": "تأكيد",
     "copied": "تم النسخ",
     "goBack": "العودة",
-    "tryAgain": "يرجى المحاولة مرة أخرى."
+    "tryAgain": "يرجى المحاولة مرة أخرى.",
+    "showLess": "عرض أقل",
+    "readMore": "قراءة المزيد"
   },
   "translate": {
     "translate": "ترجمة",
@@ -318,6 +320,41 @@
       "errorEditLatestMissing": "تعذّر العثور على أحدث نسخة لهذه المجموعة لتحديثها.",
       "errorCoverInvalid": "يجب أن تكون صورة الغلاف رابط https:// صالحًا.",
       "errorSlugCollision": "لديك بالفعل مجموعة بالمعرّف «{{slug}}». اختر اسمًا آخر."
+    },
+    "detail": {
+      "by": "بواسطة",
+      "byAuthor": "بواسطة {{name}}",
+      "members": "الأعضاء",
+      "viewMembers": "عرض الأعضاء",
+      "moreMembers": "+{{count}} آخرين",
+      "about": "حول",
+      "comments": "التعليقات",
+      "comment": "تعليق",
+      "commentNoun_one": "تعليق",
+      "commentNoun_other": "تعليقات",
+      "noCommentsTitle": "لا توجد تعليقات بعد",
+      "noCommentsHint": "كن أول من يبدأ نقاشًا.",
+      "noMembersFound": "لم يتم العثور على أعضاء.",
+      "founder": "المؤسس",
+      "moderator": "مشرف",
+      "moreActions": "المزيد من الإجراءات",
+      "editGroup": "تعديل المجموعة",
+      "deleteGroup": "حذف المجموعة",
+      "officialActivity": "النشاط الرسمي",
+      "officialTools": "الأدوات الرسمية",
+      "startSomething": "ابدأ شيئًا",
+      "officialToolsDescription": "امنح {{name}} خطوة عملية تالية.",
+      "launchCampaign": "إطلاق حملة",
+      "launchCampaignDescription": "اجمع التبرعات بصفحة رسمية للمجموعة.",
+      "campaign": "حملة",
+      "pledge": "تعهد",
+      "pledgeDescription": "قدّم مساعدة يمكن للناس العمل عليها.",
+      "event": "حدث",
+      "eventDescription": "اجمع الداعمين معًا.",
+      "untitledEvent": "حدث بلا عنوان",
+      "interestedCount_one": "{{count}} شخص مهتم",
+      "interestedCount_other": "{{count}} أشخاص مهتمون",
+      "allDay": "طوال اليوم"
     }
   },
   "campaignsCreate": {
@@ -450,7 +487,16 @@
     "donationCount_other": "{{count}} تبرعات",
     "recentDonations": "التبرعات الأخيرة",
     "seeAllDonations_one": "عرض {{count}} تبرع",
+    "openInWallet": "فتح في المحفظة",
     "seeAllDonations_other": "عرض جميع {{count}} تبرع"
+  },
+  "follow": {
+    "follow": "متابعة",
+    "following": "متابَع",
+    "unfollow": "إلغاء المتابعة",
+    "followed": "تمت المتابعة",
+    "unfollowed": "تم إلغاء المتابعة",
+    "updateFailed": "فشل تحديث قائمة المتابعة"
   },
   "campaigns": {
     "home": {
@@ -1309,7 +1355,7 @@
     }
   },
   "compose": {
-    "placeholderDefault": "بِمَ تفكر؟",
+    "placeholderDefault": "ماذا يحدث؟",
     "placeholderPoll": "اطرح سؤالاً…",
     "placeholderCountry": "ماذا يحدث في {{country}}؟",
     "placeholderCwReason": "سبب التحذير (اختياري)",

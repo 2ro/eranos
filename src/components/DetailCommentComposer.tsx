@@ -11,7 +11,7 @@ interface DetailCommentComposerProps {
 
 export function DetailCommentComposer({
   event,
-  placeholder = "What's on your mind?",
+  placeholder,
   onSuccess,
   className,
 }: DetailCommentComposerProps) {

@@ -18,7 +18,9 @@
     "confirm": "Confirmar",
     "copied": "Copiado",
     "goBack": "Volver",
-    "tryAgain": "Por favor, inténtalo de nuevo."
+    "tryAgain": "Por favor, inténtalo de nuevo.",
+    "showLess": "Mostrar menos",
+    "readMore": "Leer más"
   },
   "translate": {
     "translate": "Traducir",
@@ -318,6 +320,41 @@
       "errorEditLatestMissing": "No se pudo encontrar la última versión de este grupo para actualizarlo.",
       "errorCoverInvalid": "La imagen de portada debe ser una URL https:// válida.",
       "errorSlugCollision": "Ya tienes un grupo con el identificador «{{slug}}». Elige otro nombre."
+    },
+    "detail": {
+      "by": "por",
+      "byAuthor": "por {{name}}",
+      "members": "Miembros",
+      "viewMembers": "Ver miembros",
+      "moreMembers": "+{{count}} más",
+      "about": "Acerca de",
+      "comments": "Comentarios",
+      "comment": "Comentar",
+      "commentNoun_one": "comentario",
+      "commentNoun_other": "comentarios",
+      "noCommentsTitle": "Aún no hay comentarios",
+      "noCommentsHint": "Sé la primera persona en iniciar una conversación.",
+      "noMembersFound": "No se encontraron miembros.",
+      "founder": "Fundador",
+      "moderator": "Moderador",
+      "moreActions": "Más acciones",
+      "editGroup": "Editar grupo",
+      "deleteGroup": "Eliminar grupo",
+      "officialActivity": "Actividad oficial",
+      "officialTools": "Herramientas oficiales",
+      "startSomething": "Inicia algo",
+      "officialToolsDescription": "Dale a {{name}} un siguiente paso concreto.",
+      "launchCampaign": "Lanzar una campaña",
+      "launchCampaignDescription": "Recauda fondos con una página oficial del grupo.",
+      "campaign": "Campaña",
+      "pledge": "Promesa",
+      "pledgeDescription": "Ofrece ayuda que otros puedan convertir en acción.",
+      "event": "Evento",
+      "eventDescription": "Reúne a tus simpatizantes.",
+      "untitledEvent": "Evento sin título",
+      "interestedCount_one": "{{count}} persona interesada",
+      "interestedCount_other": "{{count}} personas interesadas",
+      "allDay": "Todo el día"
     }
   },
   "campaignsCreate": {
@@ -450,7 +487,16 @@
     "donationCount_other": "{{count}} donaciones",
     "recentDonations": "Donaciones recientes",
     "seeAllDonations_one": "Ver la {{count}} donación",
+    "openInWallet": "Abrir en la cartera",
     "seeAllDonations_other": "Ver las {{count}} donaciones"
+  },
+  "follow": {
+    "follow": "Seguir",
+    "following": "Siguiendo",
+    "unfollow": "Dejar de seguir",
+    "followed": "Siguiendo",
+    "unfollowed": "Dejaste de seguir",
+    "updateFailed": "No se pudo actualizar la lista de seguidos"
   },
   "campaigns": {
     "home": {
@@ -1309,7 +1355,7 @@
     }
   },
   "compose": {
-    "placeholderDefault": "¿En qué piensas?",
+    "placeholderDefault": "¿Qué está pasando?",
     "placeholderPoll": "Haz una pregunta…",
     "placeholderCountry": "¿Qué está pasando en {{country}}?",
     "placeholderCwReason": "Motivo de la advertencia (opcional)",

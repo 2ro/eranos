@@ -18,7 +18,9 @@
     "confirm": "បញ្ជាក់",
     "copied": "បានចម្លង",
     "goBack": "ត្រឡប់ក្រោយ",
-    "tryAgain": "សូមព្យាយាមម្តងទៀត។"
+    "tryAgain": "សូមព្យាយាមម្តងទៀត។",
+    "showLess": "បង្ហាញតិចជាងមុន",
+    "readMore": "អានបន្ថែម"
   },
   "translate": {
     "translate": "បកប្រែ",
@@ -318,6 +320,41 @@
       "errorEditLatestMissing": "មិនអាចស្វែងរកកំណែចុងក្រោយរបស់ក្រុមនេះដើម្បីធ្វើបច្ចុប្បន្នភាព។",
       "errorCoverInvalid": "រូបភាពគម្របត្រូវតែជា URL https:// ត្រឹមត្រូវ។",
       "errorSlugCollision": "អ្នកមានក្រុមដែលមានកំណត់អត្តសញ្ញាណ «{{slug}}» រួចហើយ។ ជ្រើសរើសឈ្មោះផ្សេង។"
+    },
+    "detail": {
+      "by": "ដោយ",
+      "byAuthor": "ដោយ {{name}}",
+      "members": "សមាជិក",
+      "viewMembers": "មើលសមាជិក",
+      "moreMembers": "+{{count}} បន្ថែម",
+      "about": "អំពី",
+      "comments": "មតិយោបល់",
+      "comment": "មតិយោបល់",
+      "commentNoun_one": "មតិយោបល់",
+      "commentNoun_other": "មតិយោបល់",
+      "noCommentsTitle": "មិនទាន់មានមតិយោបល់",
+      "noCommentsHint": "ក្លាយជាមនុស្សដំបូងដែលចាប់ផ្តើមការពិភាក្សា។",
+      "noMembersFound": "រកមិនឃើញសមាជិក។",
+      "founder": "ស្ថាបនិក",
+      "moderator": "អ្នកសម្របសម្រួល",
+      "moreActions": "សកម្មភាពបន្ថែម",
+      "editGroup": "កែសម្រួលក្រុម",
+      "deleteGroup": "លុបក្រុម",
+      "officialActivity": "សកម្មភាពផ្លូវការ",
+      "officialTools": "ឧបករណ៍ផ្លូវការ",
+      "startSomething": "ចាប់ផ្តើមអ្វីមួយ",
+      "officialToolsDescription": "ផ្តល់ជំហានបន្ទាប់ជាក់ស្តែងដល់ {{name}}។",
+      "launchCampaign": "ចាប់ផ្តើមយុទ្ធនាការ",
+      "launchCampaignDescription": "ប្រមូលមូលនិធិជាមួយទំព័រក្រុមផ្លូវការ។",
+      "campaign": "យុទ្ធនាការ",
+      "pledge": "ការសន្យា",
+      "pledgeDescription": "ផ្តល់ជំនួយដែលមនុស្សអាចអនុវត្តបាន។",
+      "event": "ព្រឹត្តិការណ៍",
+      "eventDescription": "នាំអ្នកគាំទ្រមកជួបគ្នា។",
+      "untitledEvent": "ព្រឹត្តិការណ៍គ្មានចំណងជើង",
+      "interestedCount_one": "មនុស្ស {{count}} នាក់ចាប់អារម្មណ៍",
+      "interestedCount_other": "មនុស្ស {{count}} នាក់ចាប់អារម្មណ៍",
+      "allDay": "ពេញមួយថ្ងៃ"
     }
   },
   "campaignsCreate": {
@@ -450,7 +487,16 @@
     "donationCount_other": "{{count}} ការបរិច្ចាគ",
     "recentDonations": "ការបរិច្ចាគថ្មីៗ",
     "seeAllDonations_one": "មើលការបរិច្ចាគ {{count}} ទាំងអស់",
+    "openInWallet": "បើកក្នុងកាបូប",
     "seeAllDonations_other": "មើលការបរិច្ចាគ {{count}} ទាំងអស់"
+  },
+  "follow": {
+    "follow": "តាមដាន",
+    "following": "កំពុងតាមដាន",
+    "unfollow": "ឈប់តាមដាន",
+    "followed": "បានតាមដាន",
+    "unfollowed": "បានឈប់តាមដាន",
+    "updateFailed": "មិនអាចធ្វើបច្ចុប្បន្នភាពបញ្ជីតាមដាន"
   },
   "campaigns": {
     "home": {
@@ -1309,7 +1355,7 @@
     }
   },
   "compose": {
-    "placeholderDefault": "មានគំនិតអ្វី?",
+    "placeholderDefault": "មានរឿងអ្វី?",
     "placeholderPoll": "សួរសំណួរ…",
     "placeholderCountry": "មានរឿងអ្វីនៅ {{country}}?",
     "placeholderCwReason": "មូលហេតុនៃការព្រមាន (ស្រេចចិត្ត)",

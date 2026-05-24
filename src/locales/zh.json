@@ -18,7 +18,9 @@
     "confirm": "确认",
     "copied": "已复制",
     "goBack": "返回",
-    "tryAgain": "请重试。"
+    "tryAgain": "请重试。",
+    "showLess": "收起",
+    "readMore": "阅读更多"
   },
   "translate": {
     "translate": "翻译",
@@ -318,6 +320,41 @@
       "errorEditLatestMissing": "找不到此群组的最新版本以更新。",
       "errorCoverInvalid": "封面图片必须是有效的 https:// URL。",
       "errorSlugCollision": "你已有一个标识符为「{{slug}}」的群组。请选择其他名称。"
+    },
+    "detail": {
+      "by": "由",
+      "byAuthor": "由 {{name}} 发布",
+      "members": "成员",
+      "viewMembers": "查看成员",
+      "moreMembers": "+{{count}} 更多",
+      "about": "关于",
+      "comments": "评论",
+      "comment": "评论",
+      "commentNoun_one": "条评论",
+      "commentNoun_other": "条评论",
+      "noCommentsTitle": "还没有评论",
+      "noCommentsHint": "成为第一个发起讨论的人。",
+      "noMembersFound": "未找到成员。",
+      "founder": "创建者",
+      "moderator": "管理员",
+      "moreActions": "更多操作",
+      "editGroup": "编辑群组",
+      "deleteGroup": "删除群组",
+      "officialActivity": "官方动态",
+      "officialTools": "官方工具",
+      "startSomething": "开始行动",
+      "officialToolsDescription": "给 {{name}} 一个具体的下一步。",
+      "launchCampaign": "发起活动",
+      "launchCampaignDescription": "用官方群组页面筹集资金。",
+      "campaign": "活动",
+      "pledge": "悬赏",
+      "pledgeDescription": "提供人们可以行动的帮助。",
+      "event": "事件",
+      "eventDescription": "把支持者聚在一起。",
+      "untitledEvent": "未命名事件",
+      "interestedCount_one": "{{count}} 人感兴趣",
+      "interestedCount_other": "{{count}} 人感兴趣",
+      "allDay": "全天"
     }
   },
   "campaignsCreate": {
@@ -450,7 +487,16 @@
     "donationCount_other": "{{count}} 笔捐赠",
     "recentDonations": "最近捐赠",
     "seeAllDonations_one": "查看全部 {{count}} 笔捐赠",
+    "openInWallet": "在钱包中打开",
     "seeAllDonations_other": "查看全部 {{count}} 笔捐赠"
+  },
+  "follow": {
+    "follow": "关注",
+    "following": "已关注",
+    "unfollow": "取消关注",
+    "followed": "已关注",
+    "unfollowed": "已取消关注",
+    "updateFailed": "无法更新关注列表"
   },
   "campaigns": {
     "home": {
@@ -1309,7 +1355,7 @@
     }
   },
   "compose": {
-    "placeholderDefault": "在想什么？",
+    "placeholderDefault": "有什么新鲜事？",
     "placeholderPoll": "提个问题…",
     "placeholderCountry": "{{country}} 发生了什么？",
     "placeholderCwReason": "内容警告原因（可选）",

@@ -18,7 +18,9 @@
     "confirm": "تایید",
     "copied": "کاپي شو",
     "goBack": "بېرته تلل",
-    "tryAgain": "مهرباني وکړئ بیا هڅه وکړئ."
+    "tryAgain": "مهرباني وکړئ بیا هڅه وکړئ.",
+    "showLess": "لږ وښایاست",
+    "readMore": "نور ولولئ"
   },
   "translate": {
     "translate": "ژباړل",
@@ -318,6 +320,41 @@
       "errorEditLatestMissing": "د دې ډلې وروستۍ نسخه د تازه کولو لپاره ونه موندل شوه.",
       "errorCoverInvalid": "د پوښ انځور باید د https:// سمه نښه وي.",
       "errorSlugCollision": "تاسو لا دمخه «{{slug}}» پېژندونکې ډله لرئ. بل نوم وټاکئ."
+    },
+    "detail": {
+      "by": "له خوا",
+      "byAuthor": "د {{name}} له خوا",
+      "members": "غړي",
+      "viewMembers": "غړي وګورئ",
+      "moreMembers": "+{{count}} نور",
+      "about": "په اړه",
+      "comments": "تبصرې",
+      "comment": "تبصره",
+      "commentNoun_one": "تبصره",
+      "commentNoun_other": "تبصرې",
+      "noCommentsTitle": "تر اوسه تبصرې نشته",
+      "noCommentsHint": "لومړی کس شئ چې بحث پیلوي.",
+      "noMembersFound": "غړي ونه موندل شول.",
+      "founder": "بنسټګر",
+      "moderator": "منځګړی",
+      "moreActions": "نورې کړنې",
+      "editGroup": "ډله سمول",
+      "deleteGroup": "ډله ړنګول",
+      "officialActivity": "رسمي فعالیت",
+      "officialTools": "رسمي وسیلې",
+      "startSomething": "یو څه پیل کړئ",
+      "officialToolsDescription": "{{name}} ته یو عملي بل ګام ورکړئ.",
+      "launchCampaign": "کمپاین پیل کړئ",
+      "launchCampaignDescription": "د رسمي ډلې له پاڼې سره پیسې راټولې کړئ.",
+      "campaign": "کمپاین",
+      "pledge": "ژمنه",
+      "pledgeDescription": "هغه مرسته وړاندې کړئ چې خلک پرې عمل کولی شي.",
+      "event": "پېښه",
+      "eventDescription": "ملاتړي سره راټول کړئ.",
+      "untitledEvent": "بې سرلیکه پېښه",
+      "interestedCount_one": "{{count}} کس لېوال دی",
+      "interestedCount_other": "{{count}} کسان لېوال دي",
+      "allDay": "ټوله ورځ"
     }
   },
   "campaignsCreate": {
@@ -450,7 +487,16 @@
     "donationCount_other": "{{count}} مرستې",
     "recentDonations": "وروستۍ مرستې",
     "seeAllDonations_one": "ټولې {{count}} مرستې وګورئ",
+    "openInWallet": "په بټوه کې پرانیزئ",
     "seeAllDonations_other": "ټولې {{count}} مرستې وګورئ"
+  },
+  "follow": {
+    "follow": "تعقیب",
+    "following": "تعقیب شوی",
+    "unfollow": "تعقیب بندول",
+    "followed": "تعقیب شو",
+    "unfollowed": "تعقیب بند شو",
+    "updateFailed": "د تعقیب لست تازه نه شو"
   },
   "campaigns": {
     "home": {
@@ -1309,7 +1355,7 @@
     }
   },
   "compose": {
-    "placeholderDefault": "په څه فکر کوې؟",
+    "placeholderDefault": "څه روان دي؟",
     "placeholderPoll": "یوه پوښتنه وکړئ…",
     "placeholderCountry": "په {{country}} کې څه روان دي؟",
     "placeholderCwReason": "د محتوا د خبرتیا دلیل (اختیاري)",

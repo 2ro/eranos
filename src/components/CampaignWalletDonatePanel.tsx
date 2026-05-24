@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Check, Copy, ExternalLink } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
@@ -54,6 +55,7 @@ function buildQrPayload(wallets: CampaignWallets): string {
 export function CampaignWalletDonatePanel({
   wallets,
 }: CampaignWalletDonatePanelProps) {
+  const { t } = useTranslation();
   const qrPayload = buildQrPayload(wallets);
   const { onchain, sp } = wallets;
 
@@ -103,7 +105,7 @@ export function CampaignWalletDonatePanel({
       <Button asChild className="w-full text-white">
         <a href={qrPayload}>
           <ExternalLink className="size-4 mr-1.5" />
-          Open in wallet
+          {t('campaignsDetail.openInWallet')}
         </a>
       </Button>
     </div>
@@ -153,4 +155,3 @@ function WalletCopyRow({ value, label }: { value: string; label: string }) {
     </button>
   );
 }
-

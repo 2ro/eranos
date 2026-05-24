@@ -18,7 +18,9 @@
     "confirm": "تأیید",
     "copied": "کپی شد",
     "goBack": "بازگشت",
-    "tryAgain": "لطفاً دوباره تلاش کنید."
+    "tryAgain": "لطفاً دوباره تلاش کنید.",
+    "showLess": "نمایش کمتر",
+    "readMore": "بیشتر بخوانید"
   },
   "translate": {
     "translate": "ترجمه",
@@ -318,6 +320,41 @@
       "errorEditLatestMissing": "آخرین نسخهٔ این گروه برای به‌روزرسانی یافت نشد.",
       "errorCoverInvalid": "تصویر جلد باید یک نشانی https:// معتبر باشد.",
       "errorSlugCollision": "از قبل گروهی با شناسهٔ «{{slug}}» داری. نام دیگری انتخاب کن."
+    },
+    "detail": {
+      "by": "توسط",
+      "byAuthor": "توسط {{name}}",
+      "members": "اعضا",
+      "viewMembers": "نمایش اعضا",
+      "moreMembers": "+{{count}} بیشتر",
+      "about": "درباره",
+      "comments": "نظرها",
+      "comment": "نظر",
+      "commentNoun_one": "نظر",
+      "commentNoun_other": "نظر",
+      "noCommentsTitle": "هنوز نظری نیست",
+      "noCommentsHint": "اولین نفری باشید که گفتگو را شروع می‌کند.",
+      "noMembersFound": "عضوی پیدا نشد.",
+      "founder": "بنیان‌گذار",
+      "moderator": "مدیر",
+      "moreActions": "اقدام‌های بیشتر",
+      "editGroup": "ویرایش گروه",
+      "deleteGroup": "حذف گروه",
+      "officialActivity": "فعالیت رسمی",
+      "officialTools": "ابزارهای رسمی",
+      "startSomething": "چیزی شروع کنید",
+      "officialToolsDescription": "برای {{name}} یک گام بعدی مشخص بسازید.",
+      "launchCampaign": "راه‌اندازی کمپین",
+      "launchCampaignDescription": "با صفحه رسمی گروه کمک مالی جمع‌آوری کنید.",
+      "campaign": "کمپین",
+      "pledge": "تعهد",
+      "pledgeDescription": "کمکی پیشنهاد کنید که مردم بتوانند انجام دهند.",
+      "event": "رویداد",
+      "eventDescription": "حامیان را کنار هم بیاورید.",
+      "untitledEvent": "رویداد بدون عنوان",
+      "interestedCount_one": "{{count}} نفر علاقه‌مند است",
+      "interestedCount_other": "{{count}} نفر علاقه‌مندند",
+      "allDay": "تمام‌روز"
     }
   },
   "campaignsCreate": {
@@ -450,7 +487,16 @@
     "donationCount_other": "{{count}} کمک",
     "recentDonations": "کمک‌های اخیر",
     "seeAllDonations_one": "نمایش همهٔ {{count}} کمک",
+    "openInWallet": "باز کردن در کیف پول",
     "seeAllDonations_other": "نمایش همهٔ {{count}} کمک"
+  },
+  "follow": {
+    "follow": "دنبال کردن",
+    "following": "دنبال می‌کنید",
+    "unfollow": "لغو دنبال‌کردن",
+    "followed": "دنبال شد",
+    "unfollowed": "دنبال‌کردن لغو شد",
+    "updateFailed": "به‌روزرسانی فهرست دنبال‌کردن ناموفق بود"
   },
   "campaigns": {
     "home": {
@@ -1309,7 +1355,7 @@
     }
   },
   "compose": {
-    "placeholderDefault": "به چه فکر می‌کنی؟",
+    "placeholderDefault": "چه خبر؟",
     "placeholderPoll": "یک سؤال بپرس…",
     "placeholderCountry": "در {{country}} چه می‌گذرد؟",
     "placeholderCwReason": "دلیل هشدار محتوا (اختیاری)",

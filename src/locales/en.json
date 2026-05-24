@@ -18,7 +18,9 @@
     "confirm": "Confirm",
     "copied": "Copied",
     "goBack": "Go back",
-    "tryAgain": "Please try again."
+    "tryAgain": "Please try again.",
+    "showLess": "Show less",
+    "readMore": "Read more"
   },
   "translate": {
     "translate": "Translate",
@@ -100,7 +102,7 @@
     }
   },
   "compose": {
-    "placeholderDefault": "What's on your mind?",
+    "placeholderDefault": "What's happening?",
     "placeholderPoll": "Ask a question…",
     "placeholderCountry": "What's happening in {{country}}?",
     "placeholderCwReason": "Content warning reason (optional)",
@@ -741,6 +743,41 @@
       "errorEditLatestMissing": "Could not find the latest version of this group to update.",
       "errorCoverInvalid": "Cover image must be a valid https:// URL.",
       "errorSlugCollision": "You already have a group with the identifier \"{{slug}}\". Choose another name."
+    },
+    "detail": {
+      "by": "by",
+      "byAuthor": "by {{name}}",
+      "members": "Members",
+      "viewMembers": "View members",
+      "moreMembers": "+{{count}} more",
+      "about": "About",
+      "comments": "Comments",
+      "comment": "Comment",
+      "commentNoun_one": "comment",
+      "commentNoun_other": "comments",
+      "noCommentsTitle": "No comments yet",
+      "noCommentsHint": "Be the first to start a discussion.",
+      "noMembersFound": "No members found.",
+      "founder": "Founder",
+      "moderator": "Moderator",
+      "moreActions": "More actions",
+      "editGroup": "Edit group",
+      "deleteGroup": "Delete group",
+      "officialActivity": "Official activity",
+      "officialTools": "Official tools",
+      "startSomething": "Start something",
+      "officialToolsDescription": "Give {{name}} a concrete next step.",
+      "launchCampaign": "Launch a campaign",
+      "launchCampaignDescription": "Raise funds with an official group page.",
+      "campaign": "Campaign",
+      "pledge": "Pledge",
+      "pledgeDescription": "Offer help people can act on.",
+      "event": "Event",
+      "eventDescription": "Bring supporters together.",
+      "untitledEvent": "Untitled event",
+      "interestedCount_one": "{{count}} person interested",
+      "interestedCount_other": "{{count}} people interested",
+      "allDay": "All-day"
     }
   },
   "campaignsCreate": {
@@ -873,7 +910,16 @@
     "donationCount_other": "{{count}} donations",
     "recentDonations": "Recent donations",
     "seeAllDonations_one": "See all {{count}} donation",
+    "openInWallet": "Open in wallet",
     "seeAllDonations_other": "See all {{count}} donations"
+  },
+  "follow": {
+    "follow": "Follow",
+    "following": "Following",
+    "unfollow": "Unfollow",
+    "followed": "Followed",
+    "unfollowed": "Unfollowed",
+    "updateFailed": "Failed to update follow list"
   },
   "campaigns": {
     "home": {

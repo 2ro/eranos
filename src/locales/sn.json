@@ -18,7 +18,9 @@
     "confirm": "Simbisa",
     "copied": "Zvakopwa",
     "goBack": "Dzokera",
-    "tryAgain": "Ndapota edza zvakare."
+    "tryAgain": "Ndapota edza zvakare.",
+    "showLess": "Ratidza zvishoma",
+    "readMore": "Verenga zvimwe"
   },
   "translate": {
     "translate": "Dudzira",
@@ -318,6 +320,41 @@
       "errorEditLatestMissing": "Hatina kuwana shanduro yazvino yeboka iri kuti tirivandudze.",
       "errorCoverInvalid": "Mufananidzo wepamusoro unofanira kuva URL ye https:// chaiyo.",
       "errorSlugCollision": "Une kare boka rine kupiwa zita kwe«{{slug}}». Sarudza rimwe zita."
+    },
+    "detail": {
+      "by": "na",
+      "byAuthor": "na {{name}}",
+      "members": "Nhengo",
+      "viewMembers": "Ona nhengo",
+      "moreMembers": "+{{count}} zvimwe",
+      "about": "Nezve",
+      "comments": "Ma comment",
+      "comment": "Comment",
+      "commentNoun_one": "comment",
+      "commentNoun_other": "ma comment",
+      "noCommentsTitle": "Hapana ma comment parizvino",
+      "noCommentsHint": "Iva wekutanga kutanga hurukuro.",
+      "noMembersFound": "Hapana nhengo dzawanikwa.",
+      "founder": "Muvambi",
+      "moderator": "Moderator",
+      "moreActions": "Zvimwe zviito",
+      "editGroup": "Gadzirisa boka",
+      "deleteGroup": "Bvisa boka",
+      "officialActivity": "Zviitiko zviri official",
+      "officialTools": "Zvishandiso zviri official",
+      "startSomething": "Tanga chimwe chinhu",
+      "officialToolsDescription": "Ipa {{name}} danho rinotevera rinooneka.",
+      "launchCampaign": "Tanga campaign",
+      "launchCampaignDescription": "Unganidza mari nepeji reboka riri official.",
+      "campaign": "Campaign",
+      "pledge": "Chitsidziro",
+      "pledgeDescription": "Ipa rubatsiro runogona kuitwa nevanhu.",
+      "event": "Chiitiko",
+      "eventDescription": "Unganidza vatsigiri pamwe chete.",
+      "untitledEvent": "Chiitiko chisina zita",
+      "interestedCount_one": "{{count}} munhu ari kufarira",
+      "interestedCount_other": "{{count}} vanhu vari kufarira",
+      "allDay": "Zuva rese"
     }
   },
   "campaignsCreate": {
@@ -450,7 +487,16 @@
     "donationCount_other": "{{count}} zvipo",
     "recentDonations": "Zvipo zvichangoitika",
     "seeAllDonations_one": "Ona zvipo zvese {{count}}",
+    "openInWallet": "Vhura muchikwama",
     "seeAllDonations_other": "Ona zvipo zvese {{count}}"
+  },
+  "follow": {
+    "follow": "Tevera",
+    "following": "Uri kutevera",
+    "unfollow": "Rega kutevera",
+    "followed": "Watevera",
+    "unfollowed": "Warega kutevera",
+    "updateFailed": "Kuvandudza follow list kwakundikana"
   },
   "campaigns": {
     "home": {
@@ -1309,7 +1355,7 @@
     }
   },
   "compose": {
-    "placeholderDefault": "Uri kufungei?",
+    "placeholderDefault": "Chii chiri kuitika?",
     "placeholderPoll": "Bvunza mubvunzo…",
     "placeholderCountry": "Chii chiri kuitika mu{{country}}?",
     "placeholderCwReason": "Chikonzero cheyambiro yezvirimo (zvinosarudzwa)",

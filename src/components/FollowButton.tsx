@@ -1,4 +1,5 @@
 import { useCallback, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { Button } from '@/components/ui/button';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
@@ -52,6 +53,7 @@ export function FollowToggleButton({
   followingIcon,
   hoverToUnfollow = false,
 }: FollowToggleButtonProps) {
+  const { t } = useTranslation();
   const leadingIcon = isFollowing ? (followingIcon ?? icon) : icon;
   const followedLabel = (
     isPending
@@ -61,12 +63,12 @@ export function FollowToggleButton({
           // Two spans crossfade on hover/focus via group state — keeps button width stable.
           ? (
               <>
-                <span className="group-hover:hidden group-focus-visible:hidden">Following</span>
-                <span className="hidden group-hover:inline group-focus-visible:inline">Unfollow</span>
+                <span className="group-hover:hidden group-focus-visible:hidden">{t('follow.following')}</span>
+                <span className="hidden group-hover:inline group-focus-visible:inline">{t('follow.unfollow')}</span>
               </>
             )
-          : 'Unfollow'
-        : 'Follow'
+          : t('follow.unfollow')
+        : t('follow.follow')
   );
 
   return (
@@ -94,6 +96,7 @@ export function FollowToggleButton({
  * Hides itself when the target is the logged-in user or when no user is logged in.
  */
 export function FollowButton({ pubkey, className, size = 'sm' }: FollowButtonProps) {
+  const { t } = useTranslation();
   const { user } = useCurrentUser();
   const { data: followData } = useFollowList();
   const { isPending, follow, unfollow } = useFollowActions();
@@ -113,17 +116,17 @@ export function FollowButton({ pubkey, className, size = 'sm' }: FollowButtonPro
       if (isFollowing) {
         await unfollow(pubkey);
         impactMedium();
-        toast({ title: 'Unfollowed' });
+        toast({ title: t('follow.unfollowed') });
       } else {
         await follow(pubkey);
         impactMedium();
-        toast({ title: 'Followed' });
+        toast({ title: t('follow.followed') });
       }
     } catch (err) {
       console.error('Follow toggle failed:', err);
-      toast({ title: 'Failed to update follow list', variant: 'destructive' });
+      toast({ title: t('follow.updateFailed'), variant: 'destructive' });
     }
-  }, [user, pubkey, isFollowing, follow, unfollow, toast]);
+  }, [user, pubkey, isFollowing, follow, unfollow, toast, t]);
 
   // Don't render for own profile or when logged out
   if (!user || user.pubkey === pubkey) return null;
