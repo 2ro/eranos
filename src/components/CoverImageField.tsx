@@ -11,7 +11,7 @@ import { cn } from '@/lib/utils';
  * Template thumbnail row: each click sets the cover URL to that template's
  * URL. The thumbnail strip is optional — pass `templates` to enable it.
  */
-export interface CoverImageTemplate {
+interface CoverImageTemplate {
   id: string;
   /** Sanitized https URL the picker will publish if this template is chosen. */
   url: string;

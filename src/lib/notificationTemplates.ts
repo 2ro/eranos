@@ -6,7 +6,7 @@
  * {{author_name}}, {{content}}, {{amount}}.
  */
 
-export interface NotificationTemplate {
+interface NotificationTemplate {
   /** Suffix appended to the base subscription ID to make it unique. */
   id: string;
   /** Nostr event kinds this subscription watches. */

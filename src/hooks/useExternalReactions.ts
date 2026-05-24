@@ -4,7 +4,7 @@ import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { type ExternalContent } from '@/lib/externalContent';
 
 /** The user's reaction emoji string and the event tags (needed for custom emoji rendering). */
-export interface ExternalUserReaction {
+interface ExternalUserReaction {
   emoji: string;
   tags: string[][];
 }
@@ -75,42 +75,3 @@ export function useExternalReactionCount(content: ExternalContent | null | undef
   return data ?? 0;
 }
 
-/**
- * Returns the current user's repost event ID for a given external content identifier, if any.
- * Looks for kind 1 notes with an `#i` tag matching the identifier.
- * Returns undefined while loading, null if not shared, or the event ID string.
- */
-export function useExternalRepostStatus(content: ExternalContent | null | undefined): string | null | undefined {
-  const { nostr } = useNostr();
-  const { user } = useCurrentUser();
-  const queryClient = useQueryClient();
-  const identifier = content?.value ?? '';
-
-  const optimistic = queryClient.getQueryData<string | null>(['external-user-repost', identifier]);
-
-  const { data } = useQuery({
-    queryKey: ['external-user-repost', identifier],
-    queryFn: async ({ signal }): Promise<string | null> => {
-      if (!identifier || !user) return null;
-
-      const events = await nostr.query(
-        [{
-          kinds: [1],
-          authors: [user.pubkey],
-          '#i': [identifier],
-          limit: 1,
-        }],
-        { signal },
-      );
-
-      if (events.length === 0) return null;
-      return events[0].id;
-    },
-    enabled: !!identifier && !!user && optimistic === undefined,
-    staleTime: 5 * 60 * 1000,
-    gcTime: 10 * 60 * 1000,
-  });
-
-  if (optimistic !== undefined) return optimistic;
-  return data;
-}

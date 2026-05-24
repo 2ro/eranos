@@ -71,39 +71,12 @@ export function impactMedium(): void {
   }
 }
 
-/** Heavy tap — game button press, letter seal. */
-export function impactHeavy(): void {
-  if (Capacitor.isNativePlatform()) {
-    nativeImpact('Heavy').catch((e) => warnHapticError('impactHeavy', e));
-  } else {
-    vibrate(30);
-  }
-}
-
 /** Success notification — zap payment success, post published. */
 export function notificationSuccess(): void {
   if (Capacitor.isNativePlatform()) {
     nativeNotification('Success').catch((e) => warnHapticError('notificationSuccess', e));
   } else {
     vibrate(15);
-  }
-}
-
-/** Warning notification. */
-export function notificationWarning(): void {
-  if (Capacitor.isNativePlatform()) {
-    nativeNotification('Warning').catch((e) => warnHapticError('notificationWarning', e));
-  } else {
-    vibrate(20);
-  }
-}
-
-/** Error notification. */
-export function notificationError(): void {
-  if (Capacitor.isNativePlatform()) {
-    nativeNotification('Error').catch((e) => warnHapticError('notificationError', e));
-  } else {
-    vibrate(30);
   }
 }
 

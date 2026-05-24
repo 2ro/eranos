@@ -71,7 +71,7 @@ const MAX_RECONCILE_UTXOS = 50;
  */
 const SCAN_FETCH_CONCURRENCY = 8;
 
-export interface UseHdWalletSpResult {
+interface UseHdWalletSpResult {
   /** Whether the feature is usable. False when not logged in with nsec, or no indexer configured. */
   enabled: boolean;
   /** Concrete reason `enabled` is false, when applicable. */

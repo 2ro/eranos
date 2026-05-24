@@ -15,7 +15,7 @@ const HEX_64_RE = /^[0-9a-f]{64}$/;
  * Checks whether a string looks like a NIP-05 identifier (user@domain.com)
  * or a bare domain (e.g. fiatjaf.com). Strips a leading `@` if present.
  */
-export function looksLikeNip05(value: string): boolean {
+function looksLikeNip05(value: string): boolean {
   const cleaned = value.startsWith('@') ? value.slice(1) : value;
   // user@domain.com — must have text on both sides of @
   if (cleaned.includes('@')) {
@@ -53,7 +53,7 @@ export function isFullUrl(value: string): boolean {
  * Strips the `nostr:` URI prefix if present.
  * Returns the decoded result or `null` if it isn't a valid NIP-19 string.
  */
-export function tryDecodeNip19(input: string): { decoded: DecodedResult; raw: string } | null {
+function tryDecodeNip19(input: string): { decoded: DecodedResult; raw: string } | null {
   const trimmed = input.trim();
   if (!trimmed) return null;
 
@@ -73,7 +73,7 @@ export function tryDecodeNip19(input: string): { decoded: DecodedResult; raw: st
 /**
  * Check if the input is a raw 64-char hex string (event ID or pubkey).
  */
-export function isHex64(input: string): boolean {
+function isHex64(input: string): boolean {
   return HEX_64_RE.test(input.trim());
 }
 
@@ -153,40 +153,3 @@ export function detectIdentifier(query: string): IdentifierMatch | null {
   return null;
 }
 
-/**
- * If `input` is a Nostr identifier (NIP-19 bech32, hex, or NIP-05 address),
- * returns the path the app should navigate to (e.g. `/npub1...` or `/user@domain.com`).
- *
- * Returns `null` if the input is a regular search query.
- */
-export function getNostrIdentifierPath(input: string): string | null {
-  const trimmed = input.trim();
-  if (!trimmed) return null;
-
-  // Strip nostr: URI prefix if present
-  const value = trimmed.startsWith('nostr:') ? trimmed.slice(6) : trimmed;
-
-  // Try NIP-19 decode
-  if (NIP19_PREFIXES.some((p) => value.startsWith(p))) {
-    try {
-      nip19.decode(value); // throws if invalid
-      return `/${value}`;
-    } catch {
-      // Not a valid NIP-19 — fall through
-    }
-  }
-
-  // Try raw 64-char hex (event ID or pubkey) — route handles it directly
-  if (HEX_64_RE.test(value)) {
-    return `/${value}`;
-  }
-
-  // Try NIP-05
-  if (looksLikeNip05(value)) {
-    // Strip leading @ for the URL path
-    const cleaned = value.startsWith('@') ? value.slice(1) : value;
-    return `/${cleaned}`;
-  }
-
-  return null;
-}

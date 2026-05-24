@@ -12,7 +12,7 @@ import { useQuery } from '@tanstack/react-query';
  * difference between "anthem plays everywhere" and "anthem plays only in
  * Chrome/Firefox".
  */
-export interface CommonsAudioDerivative {
+interface CommonsAudioDerivative {
   /** Direct upload.wikimedia.org URL for this derivative. */
   src: string;
   /** MIME type including codec hint where known. */

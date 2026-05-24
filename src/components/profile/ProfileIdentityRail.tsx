@@ -45,7 +45,7 @@ import { DEFAULT_COVER_IMAGE } from '@/lib/defaultActionCovers';
 import { formatCompactPledgeDeadline, formatPledgeAmount } from '@/lib/pledges';
 import { getGeoDisplayName } from '@/lib/countries';
 
-export interface ProfileIdentityRailProps {
+interface ProfileIdentityRailProps {
   pubkey: string;
   /** Whether the logged-in user is viewing their own profile. */
   isOwnProfile: boolean;
@@ -229,7 +229,7 @@ export function ProfileIdentityRail({
 
 // ─── Identity header (name / bio / actions / stats) ─────────────────────────
 
-export interface ProfileIdentityHeaderProps {
+interface ProfileIdentityHeaderProps {
   pubkey: string;
   isOwnProfile: boolean;
   metadata: NostrMetadata | undefined;
@@ -351,7 +351,7 @@ export function ProfileIdentityHeader({
 
 // ─── Overview sections (campaigns / latest pledge / orgs / fields) ──────────
 
-export interface ProfileOverviewSectionsProps {
+interface ProfileOverviewSectionsProps {
   pubkey: string;
   isOwnProfile: boolean;
   campaigns: ParsedCampaign[];
@@ -448,7 +448,7 @@ export function ProfileOrganizationsSection({ pubkey, className }: { pubkey: str
 
 // ─── Avatar block ────────────────────────────────────────────────────────────
 
-export interface ProfileAvatarBlockProps {
+interface ProfileAvatarBlockProps {
   metadata: NostrMetadata | undefined;
   displayName: string;
   status: { text: string | undefined; url: string | undefined } | undefined;

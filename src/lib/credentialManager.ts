@@ -25,7 +25,7 @@ import { AGORA_HOST } from '@/lib/appUrls';
 const CREDENTIAL_DOMAIN = AGORA_HOST;
 
 /** Whether the browser supports PasswordCredential (Chromium-only). */
-export function supportsPasswordCredential(): boolean {
+function supportsPasswordCredential(): boolean {
   return typeof window !== 'undefined' && 'PasswordCredential' in window;
 }
 
@@ -42,7 +42,7 @@ export function supportsPasswordCredential(): boolean {
  * @param name  - Optional display name (Chromium only — shown in the picker)
  * @returns `true` if the credential was stored, `false` if unsupported or rejected
  */
-export async function storeNsecCredential(
+async function storeNsecCredential(
   npub: string,
   nsec: string,
   name?: string,
@@ -79,55 +79,9 @@ export async function storeNsecCredential(
   }
 }
 
-/**
- * Retrieve a previously-stored Nostr credential from the platform's
- * password manager.
- *
- * On Capacitor iOS this shows the iCloud Keychain credential picker.
- * On Chromium browsers this shows the native credential picker.
- *
- * @returns The stored credential, or `undefined` if unavailable / dismissed.
- */
-export async function getNsecCredential(): Promise<
-  { npub: string; nsec: string } | undefined
-> {
-  // Capacitor native path (iOS / Android).
-  if (Capacitor.isNativePlatform()) {
-    try {
-      const result = await SavePassword.readPassword();
-      if (result.username && result.password) {
-        return { npub: result.username, nsec: result.password };
-      }
-      return undefined;
-    } catch {
-      return undefined;
-    }
-  }
-
-  // Chromium PasswordCredential path (web).
-  if (!supportsPasswordCredential()) return undefined;
-
-  try {
-    const credential = await navigator.credentials.get({
-      password: true,
-      mediation: 'optional',
-    } as CredentialRequestOptions);
-
-    if (credential && 'password' in credential) {
-      const pc = credential as PasswordCredential;
-      if (pc.id && pc.password) {
-        return { npub: pc.id, nsec: pc.password };
-      }
-    }
-
-    return undefined;
-  } catch {
-    return undefined;
-  }
-}
 
 /** Result of a `saveNsec` call. */
-export type SaveNsecResult = 'saved' | 'saved-to-file' | 'dismissed';
+type SaveNsecResult = 'saved' | 'saved-to-file' | 'dismissed';
 
 /** Build the filename used for the fallback `.nsec.txt` file. */
 function nsecFilename(npub: string, appName?: string): string {

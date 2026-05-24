@@ -46,14 +46,14 @@ async function getDeviceSecretKey(): Promise<Uint8Array> {
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
-export interface WebPushSubscription {
+interface WebPushSubscription {
   type: 'web';
   endpoint: string;
   p256dh_key: string;
   auth_key: string;
 }
 
-export interface RegisterSubscriptionParams {
+interface RegisterSubscriptionParams {
   subscription_id: string;
   domain: string;
   filter: {
@@ -73,7 +73,7 @@ export interface RegisterSubscriptionParams {
   push_subscription: WebPushSubscription;
 }
 
-export interface UpdateSubscriptionParams {
+interface UpdateSubscriptionParams {
   subscription_id: string;
   domain: string;
   updates: {
@@ -84,7 +84,7 @@ export interface UpdateSubscriptionParams {
   };
 }
 
-export interface DeleteSubscriptionParams {
+interface DeleteSubscriptionParams {
   subscription_id: string;
   domain: string;
 }

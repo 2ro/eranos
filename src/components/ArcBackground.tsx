@@ -1,10 +1,10 @@
 import { cn } from '@/lib/utils';
 
 /** Arc overhang for the downward arc (top bar / sub-header). */
-export const ARC_OVERHANG_PX = 20;
+const ARC_OVERHANG_PX = 20;
 
 /** Larger overhang for the upward arc (bottom nav) so the harsher curve isn't clipped. */
-export const ARC_UP_OVERHANG_PX = 28;
+const ARC_UP_OVERHANG_PX = 28;
 
 /** SVG path for a downward angled bar (used by top bar and sub-header bar).
  *  Bottom edge slopes from each corner down to a center apex, forming an

@@ -35,7 +35,7 @@ export interface QuoteEntry {
   createdAt: number;
 }
 
-export interface EventInteractions {
+interface EventInteractions {
   reposts: RepostEntry[];
   quotes: QuoteEntry[];
   reactions: ReactionEntry[];

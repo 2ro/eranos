@@ -21,10 +21,7 @@ export type Theme = "light" | "dark" | "system";
 export type ContentWarningPolicy = "blur" | "hide" | "show";
 
 /** Whether monetary amounts (zaps, balances, etc.) are displayed in USD or sats. */
-export type CurrencyDisplay = "usd" | "sats";
-/** How to handle events with a NIP-36 content-warning tag. */
-export type NsfwPolicy = "blur" | "hide" | "show";
-
+type CurrencyDisplay = "usd" | "sats";
 export interface RelayMetadata {
   /** List of relays with read/write permissions */
   relays: { url: string; read: boolean; write: boolean }[];
@@ -171,7 +168,7 @@ export interface FeedSettings {
 export type TabFilter = Record<string, unknown>;
 
 /** A variable definition for tab filters (extracted from `var` tags). */
-export interface TabVarDef {
+interface TabVarDef {
   /** Variable name including the `$` prefix, e.g. `"$follows"`. */
   name: string;
   /** Tag name to extract from the referenced event, e.g. `"p"`. */

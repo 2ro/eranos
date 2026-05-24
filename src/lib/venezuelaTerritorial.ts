@@ -9,12 +9,12 @@
 //   Municipality: NN-NNN…     (e.g. "13-1316" = Baruta, Miranda)
 // ---------------------------------------------------------------------------
 
-export interface TerritorialState {
+interface TerritorialState {
   code: string;   // e.g. "13"
   label: string;  // e.g. "Miranda"
 }
 
-export interface Municipality {
+interface Municipality {
   code: string;        // e.g. "13-1316"
   label: string;       // e.g. "Baruta"
   stateCode: string;   // e.g. "13"
@@ -255,9 +255,6 @@ export const VE_MUNICIPALITIES: Municipality[] = MUNICIPALITY_DATA.map(
 // Structural code parsing
 // ---------------------------------------------------------------------------
 
-/** Regex matching a municipality code: NN-NNN… (3–6 digit suffix, purely numeric) */
-const MUNICIPALITY_RE = /^\d{2}-\d{3,6}$/;
-
 /** Regex matching any territorial code (municipality or child). */
 const TERRITORIAL_CODE_RE = /^\d{2}-\d{3,6}(?:-\d{3,6})?[a-z]?$/;
 
@@ -286,24 +283,9 @@ export function getStateByCode(code: string): TerritorialState | undefined {
   return stateByCode.get(code);
 }
 
-/** Format a territorial code for display (uppercase). */
-export function displayCode(code: string): string {
-  return code.toUpperCase();
-}
-
 /** Look up a municipality label by its code. */
 export function getMunicipalityLabel(code: string): string | undefined {
   return municipalityByCode.get(code);
-}
-
-/** Check whether a string is a valid municipality code format. */
-export function isMunicipalityCode(value: string): boolean {
-  return MUNICIPALITY_RE.test(value);
-}
-
-/** Check whether a string is a valid state code format. */
-export function isStateCode(value: string): boolean {
-  return STATE_RE.test(value);
 }
 
 /** Get all municipalities for a given state code. */

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { AlertTriangle, Check, Copy, ExternalLink } from 'lucide-react';
+import { Check, Copy, ExternalLink } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import { QRCodeCanvas } from '@/components/ui/qrcode';
@@ -154,17 +154,3 @@ function WalletCopyRow({ value, label }: { value: string; label: string }) {
   );
 }
 
-/**
- * Fallback rendered when the wallet failed to parse. The detail page
- * should normally never reach this — `parseCampaign` rejects events
- * without a valid `w` tag — but a defensive surface is cheap and helps
- * debugging.
- */
-export function CampaignWalletMissing() {
-  return (
-    <div className="flex items-center gap-2 text-sm">
-      <AlertTriangle className="size-5 text-orange-500 shrink-0" />
-      <span>This campaign is missing a valid wallet endpoint.</span>
-    </div>
-  );
-}

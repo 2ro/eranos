@@ -41,27 +41,11 @@ export function getPaginationCursor(events: NostrEvent[]): number {
 }
 
 /** The set of kind numbers that represent reposts (kind 6 for notes, kind 16 for everything else). */
-export const REPOST_KINDS = new Set([6, 16]);
+const REPOST_KINDS = new Set([6, 16]);
 
 /** Check if a kind number is a repost kind (6 or 16). */
 export function isRepostKind(kind: number): boolean {
   return REPOST_KINDS.has(kind);
-}
-
-/** The set of kind numbers that represent reactions. */
-export const REACTION_KINDS = new Set([7]);
-
-/** Check if a kind number is a reaction kind (7). */
-export function isReactionKind(kind: number): boolean {
-  return REACTION_KINDS.has(kind);
-}
-
-/** The set of kind numbers that represent zap events (Lightning + on-chain). */
-export const ZAP_KINDS = new Set([9735, 8333]);
-
-/** Check if a kind number is a zap kind (9735 Lightning or 8333 on-chain). */
-export function isZapKind(kind: number): boolean {
-  return ZAP_KINDS.has(kind);
 }
 
 /**
@@ -73,7 +57,7 @@ export function getRepostKind(originalEventKind: number): number {
 }
 
 /** Overlay describing a reaction (kind 7) made to a target event. */
-export interface ReactionOverlay {
+interface ReactionOverlay {
   /** The reaction event itself (used for linking to the underlying nevent). */
   event: NostrEvent;
   /** Pubkey of the person who reacted. */
@@ -81,7 +65,7 @@ export interface ReactionOverlay {
 }
 
 /** Overlay describing a zap (kind 9735 Lightning or kind 8333 on-chain). */
-export interface ZapOverlay {
+interface ZapOverlay {
   /** The zap event itself (used for linking to the underlying nevent). */
   event: NostrEvent;
   /** Pubkey of the sender (resolved through P-tag / description / event.pubkey). */
@@ -104,18 +88,6 @@ export interface FeedItem {
   zappedBy?: ZapOverlay;
   /** Sort timestamp — uses the wrapper event's timestamp when present for correct ordering. */
   sortTimestamp: number;
-}
-
-/**
- * Compute a stable React key / dedup key for a feed item. The same target
- * event can appear with multiple wrappers (a repost AND a reaction AND a
- * zap), so the key incorporates the wrapper event id when present.
- */
-export function feedItemKey(item: FeedItem): string {
-  if (item.reactedBy) return `reaction-${item.reactedBy.event.id}-${item.event.id}`;
-  if (item.zappedBy) return `zap-${item.zappedBy.event.id}-${item.event.id}`;
-  if (item.repostedBy) return `repost-${item.repostedBy}-${item.event.id}`;
-  return item.event.id;
 }
 
 /** d-tags reserved by NIP-51 for other purposes — hide these kind 30000 events from feeds. */

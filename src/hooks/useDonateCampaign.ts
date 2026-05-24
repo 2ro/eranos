@@ -19,7 +19,7 @@ import { withAgoraTag } from '@/lib/agoraNoteTags';
 /** Supported on-chain fee speeds (mirrors {@link SendBitcoinDialog}). */
 export type DonationFeeSpeed = 'fastest' | 'halfHour' | 'hour' | 'economy';
 
-export interface DonateCampaignArgs {
+interface DonateCampaignArgs {
   campaign: ParsedCampaign;
   /** Donation amount in satoshis. */
   amountSats: number;

@@ -33,27 +33,6 @@ export function NudgeToastContent({
   );
 }
 
-/**
- * Toast description for the phase-transition toast (encrypt done, now sign).
- * On Android includes the "Approve in signer" link.
- */
-export function PhaseToastContent({
-  message,
-  android,
-}: {
-  message: string;
-  android: boolean;
-}): ReactNode {
-  return (
-    <span>
-      {message}
-      {android && (
-        <AndroidApproveRow onCancel={() => { /* phase toast auto-expires */ }} />
-      )}
-    </span>
-  );
-}
-
 // ---------------------------------------------------------------------------
 // Internal components
 // ---------------------------------------------------------------------------

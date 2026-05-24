@@ -17,20 +17,6 @@ import { EncryptedSettingsSchema } from '@/lib/schemas';
  */
 let lastWriteTs: number = 0;
 
-/**
- * Persist the lastSync timestamp from encrypted settings into localStorage
- * so callers can tell whether the user has ever synced on this browser.
- * If a local timestamp exists, localStorage is trustworthy and the app can
- * render immediately while NostrSync fetches updates in the background.
- */
-export function getLocalSettingsSync(pubkey: string): number {
-  try {
-    return Number(localStorage.getItem(`ditto:settings-lastSync:${pubkey}`)) || 0;
-  } catch {
-    return 0;
-  }
-}
-
 export function setLocalSettingsSync(pubkey: string, lastSync: number): void {
   try {
     localStorage.setItem(`ditto:settings-lastSync:${pubkey}`, String(lastSync));

@@ -31,7 +31,7 @@ function parseImeta(tags: string[][]): { url?: string; thumbnail?: string; durat
   return {};
 }
 
-export interface ParsedMusicTrack {
+interface ParsedMusicTrack {
   title: string;
   artist: string;
   url: string;
@@ -68,7 +68,7 @@ export function parseMusicTrack(event: NostrEvent): ParsedMusicTrack | null {
   };
 }
 
-export interface ParsedMusicPlaylist {
+interface ParsedMusicPlaylist {
   title: string;
   description: string;
   artwork?: string;

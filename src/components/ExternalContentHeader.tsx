@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowLeft, BookOpen, Coins, ExternalLink, FileText, Globe, Landmark, Languages, MapPin, Megaphone, MessageCircle, Package, Pause, Play, Repeat2, Share2, User, UserCheck, UserMinus, UserPlus, Users } from 'lucide-react';
+import { ArrowLeft, BookOpen, Coins, ExternalLink, Globe, Landmark, Languages, MapPin, MessageCircle, Pause, Play, Repeat2, Share2, User, UserCheck, UserMinus, UserPlus, Users } from 'lucide-react';
 import { nip19 } from 'nostr-tools';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Skeleton } from '@/components/ui/skeleton';import { ExternalFavicon } from '@/components/ExternalFavicon';
@@ -31,8 +31,6 @@ import { useWikipediaSummary } from '@/hooks/useWikipediaSummary';
 import { useCountryFacts, type CountryFacts } from '@/hooks/useCountryFacts';
 import { useCommonsAudio } from '@/hooks/useCommonsAudio';
 import { formatNumber } from '@/lib/formatNumber';
-import { EXTRA_KINDS } from '@/lib/extraKinds';
-import { CONTENT_KIND_ICONS } from '@/lib/sidebarItems';
 import { cn } from '@/lib/utils';
 
 // ---------------------------------------------------------------------------
@@ -1393,139 +1391,3 @@ export function ProfilePreview({ pubkey }: { pubkey: string }) {
 // Addressable event preview (vines, music, articles, etc.)
 // ---------------------------------------------------------------------------
 
-/** Extract a thumbnail URL from an addressable event's tags. */
-function extractThumbnail(tags: string[][]): string | undefined {
-  // 1. Explicit icon tag (used by zapstore kind 32267)
-  const iconTag = tags.find(([n]) => n === 'icon')?.[1];
-  if (iconTag) return iconTag;
-
-  // 2. Explicit image/thumb tag
-  const imageTag = tags.find(([n]) => n === 'image' || n === 'thumb')?.[1];
-  if (imageTag) return imageTag;
-
-  // 3. imeta tag (used by vines / kind 34236)
-  const imetaTag = tags.find(([n]) => n === 'imeta');
-  if (imetaTag) {
-    for (let i = 1; i < imetaTag.length; i++) {
-      const part = imetaTag[i];
-      if (part.startsWith('image ')) return part.slice(6);
-    }
-  }
-
-  return undefined;
-}
-
-/** Check if an event has video content (imeta with url containing video indicators). */
-function hasVideo(tags: string[][]): boolean {
-  const imetaTag = tags.find(([n]) => n === 'imeta');
-  if (!imetaTag) return false;
-  for (let i = 1; i < imetaTag.length; i++) {
-    const part = imetaTag[i];
-    if (part.startsWith('url ') || part.startsWith('m video/')) return true;
-  }
-  return false;
-}
-
-/** Fallback labels for well-known kinds not in EXTRA_KINDS. */
-const WELL_KNOWN_KIND_LABELS: Record<number, string> = {
-  9041: 'Goal',
-  31990: 'App',
-  32267: 'Zapstore App',
-  30063: 'Zapstore Release',
-  3063: 'Zapstore Asset',
-  15128: 'Nsite',
-  35128: 'Nsite',
-  36639: 'Pledge',
-};
-
-export function AddressableEventPreview({ addr }: { addr: { kind: number; pubkey: string; identifier: string } }) {
-  const { data: event, isLoading } = useAddrEvent(addr);
-  const author = useAuthor(addr.pubkey);
-  const authorMeta = author.data?.metadata;
-  const authorName = authorMeta?.name ?? genUserName(addr.pubkey);
-
-  const kindDef = useMemo(
-    () => EXTRA_KINDS.find((d) => d.kind === addr.kind || d.subKinds?.some((s) => s.kind === addr.kind)),
-    [addr.kind],
-  );
-  const kindLabel = useMemo(() => {
-    if (kindDef) return kindDef.label;
-    const sub = EXTRA_KINDS.flatMap((d) => d.subKinds ?? []).find((s) => s.kind === addr.kind);
-    if (sub) return sub.label;
-    return WELL_KNOWN_KIND_LABELS[addr.kind] ?? `Kind ${addr.kind}`;
-  }, [kindDef, addr.kind]);
-
-  const KindIcon = useMemo(() => {
-    if (kindDef?.id) return CONTENT_KIND_ICONS[kindDef.id] ?? FileText;
-    // Fallback icons for well-known kinds not in EXTRA_KINDS
-    if (addr.kind === 31990 || addr.kind === 32267 || addr.kind === 30063 || addr.kind === 3063) return Package;
-    if (addr.kind === 15128 || addr.kind === 35128) return Globe;
-    if (addr.kind === 36639) return Megaphone;
-    return FileText;
-  }, [kindDef, addr.kind]);
-
-  const title = event?.tags.find(([n]) => n === 'title')?.[1]
-    || event?.tags.find(([n]) => n === 'name')?.[1]
-    || event?.tags.find(([n]) => n === 'd')?.[1]
-    || kindLabel;
-  const thumbnail = event ? extractThumbnail(event.tags) : undefined;
-  const isVideo = event ? hasVideo(event.tags) : false;
-
-  const link = useMemo(() => {
-    return `/${nip19.naddrEncode({ kind: addr.kind, pubkey: addr.pubkey, identifier: addr.identifier })}`;
-  }, [addr]);
-
-  if (isLoading) {
-    return (
-      <div className="px-4 py-3 border-b border-border">
-        <div className="flex items-center gap-3">
-          <Skeleton className="size-12 rounded-lg shrink-0" />
-          <div className="flex-1 min-w-0 space-y-1.5">
-            <Skeleton className="h-3 w-16" />
-            <Skeleton className="h-4 w-32" />
-            <Skeleton className="h-3 w-24" />
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  return (
-    <Link
-      to={link}
-      className="flex items-center gap-3 px-4 py-3 border-b border-border hover:bg-secondary/30 transition-colors"
-    >
-      {thumbnail ? (
-        <div className="relative size-12 rounded-lg overflow-hidden shrink-0">
-          <img
-            src={thumbnail}
-            alt={title}
-            className="size-full object-cover"
-            loading="lazy"
-          />
-          {isVideo && (
-            <div className="absolute inset-0 flex items-center justify-center bg-black/20">
-              <Play className="size-4 text-white fill-white" />
-            </div>
-          )}
-        </div>
-      ) : (
-        <div className="size-12 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
-          <KindIcon className="size-5 text-primary/50" />
-        </div>
-      )}
-
-      <div className="flex-1 min-w-0">
-        <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-          <KindIcon className="size-3 shrink-0" />
-          <span>{kindLabel}</span>
-          <span className="text-muted-foreground/60">&middot;</span>
-          <span className="truncate">{authorName}</span>
-        </div>
-        <p className="text-sm font-medium truncate mt-0.5">
-          {title}
-        </p>
-      </div>
-    </Link>
-  );
-}

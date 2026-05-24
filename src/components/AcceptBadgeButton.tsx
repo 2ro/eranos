@@ -8,7 +8,7 @@ import { useProfileBadges } from '@/hooks/useProfileBadges';
 import { BADGE_DEFINITION_KIND } from '@/lib/badgeUtils';
 import { cn } from '@/lib/utils';
 
-export interface AcceptBadgeButtonProps {
+interface AcceptBadgeButtonProps {
   /** The kind 8 badge award event. */
   awardEvent: NostrEvent;
   /** Prominent pill style (large, rounded-full, colored). Otherwise compact outline variant. */

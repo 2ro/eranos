@@ -4,11 +4,8 @@ import { Link, useNavigate } from 'react-router-dom';
 import { nip19 } from 'nostr-tools';
 import type { NostrEvent, NostrMetadata } from '@nostrify/nostrify';
 import {
-  ArrowLeft,
   CalendarClock,
   ChevronLeft,
-  DollarSign,
-  Loader2,
   MapPin,
   Share2,
 } from 'lucide-react';
@@ -529,30 +526,3 @@ function PledgeDetailSkeleton() {
   );
 }
 
-/** Loader-state subcomponent used when the addressable coordinate is still
- * being decoded (e.g. by NIP19Page). */
-export function ActionDetailLoading() {
-  return (
-    <main>
-      <div className="flex items-center gap-4 px-4 py-4 bg-background/85">
-        <Link
-          to="/pledges"
-          className="p-2 -ml-2 rounded-full hover:bg-secondary transition-colors sidebar:hidden"
-          aria-label="Back to pledges"
-        >
-          <ArrowLeft className="size-5" />
-        </Link>
-        <div className="flex items-center gap-2 flex-1 min-w-0">
-          <DollarSign className="size-5 text-primary" />
-          <h1 className="text-lg font-semibold truncate">Pledge</h1>
-        </div>
-      </div>
-      <div className="px-4 max-w-3xl mx-auto space-y-4 py-6">
-        <div className="flex items-center gap-3">
-          <Loader2 className="size-5 animate-spin text-primary" />
-          <span className="text-sm text-muted-foreground">Loading pledge…</span>
-        </div>
-      </div>
-    </main>
-  );
-}

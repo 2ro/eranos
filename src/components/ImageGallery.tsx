@@ -283,9 +283,9 @@ function GridImage({
 }
 
 /** Sentinel URL — pass as an image entry to render a loading spinner slot in the lightbox. */
-export const LOADING_SENTINEL = '__lightbox_loading__';
+const LOADING_SENTINEL = '__lightbox_loading__';
 
-export interface LightboxMediaMeta {
+interface LightboxMediaMeta {
   mime?: string;
   dim?: string;
   blurhash?: string;
@@ -295,7 +295,7 @@ export interface LightboxMediaMeta {
   pubkey?: string;
 }
 
-export interface LightboxProps {
+interface LightboxProps {
   images: string[];
   currentIndex: number;
   onClose: () => void;

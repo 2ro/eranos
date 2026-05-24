@@ -42,7 +42,7 @@ function formatDeadline(unixSeconds: number): { label: string; isPast: boolean }
  * time using the live BTC price. While the price is loading the raised
  * amount falls back to sats.
  */
-export function CampaignProgress({
+function CampaignProgress({
   raisedSats,
   goalUsd,
   btcPrice,
@@ -80,7 +80,7 @@ export function CampaignProgress({
  * on-chain totals are unobservable by design. Shows the goal as a target
  * (if set) but no progress bar or raised amount.
  */
-export function CampaignPrivateNotice({
+function CampaignPrivateNotice({
   goalUsd,
   className,
 }: {

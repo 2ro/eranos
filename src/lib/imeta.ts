@@ -1,5 +1,5 @@
 /** Parsed imeta entry from NIP-94 tags. */
-export interface ImetaEntry {
+interface ImetaEntry {
   url: string;
   thumbnail?: string;
   mime?: string;

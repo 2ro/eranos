@@ -6,7 +6,7 @@ import { sanitizeUrl } from '@/lib/sanitizeUrl';
 // ── Kind constant ─────────────────────────────────────────────────────────────
 
 /** NIP-75 Zap Goal (regular event). */
-export const ZAP_GOAL_KIND = 9041;
+const ZAP_GOAL_KIND = 9041;
 
 function normalizeRelayUrl(value: string | undefined): string | undefined {
   if (!value) return undefined;

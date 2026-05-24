@@ -25,7 +25,7 @@ import { useHdWalletSp } from '@/hooks/useHdWalletSp';
 // targeted backfill.
 // ---------------------------------------------------------------------------
 
-export interface HDSilentPaymentScanDialogProps {
+interface HDSilentPaymentScanDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }

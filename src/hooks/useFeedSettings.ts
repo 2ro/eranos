@@ -63,7 +63,7 @@ function computeOrderedItems(sidebarOrder: string[]): string[] {
  * Compute the list of items available to add to the sidebar.
  * Returns sidebar items not currently in the ordered list.
  */
-export interface HiddenSidebarItem {
+interface HiddenSidebarItem {
   /** Identifier to pass to addToSidebar. */
   id: string;
   /** Display label. */

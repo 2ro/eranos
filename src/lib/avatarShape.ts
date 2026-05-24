@@ -1,5 +1,3 @@
-import type React from 'react';
-
 /**
  * An avatar shape is stored in kind-0 metadata as the `shape` property.
  * Supported formats:
@@ -54,23 +52,6 @@ export function getAvatarShape(metadata: { [key: string]: unknown } | undefined)
 
 // ── Shaped avatar border style ───────────────────────────────────────────
 
-/**
- * CSS filter that creates a crisp, solid outline around a shaped avatar
- * (emoji), mimicking the appearance of `border-4 border-background`
- * without clipping the mask shape. Apply this to a **wrapper** around the
- * masked `<Avatar>`.
- */
-export const shapedAvatarBorderStyle: React.CSSProperties = {
-  filter:
-    'drop-shadow(3px 0 0 hsl(var(--background)))' +
-    ' drop-shadow(-3px 0 0 hsl(var(--background)))' +
-    ' drop-shadow(0 3px 0 hsl(var(--background)))' +
-    ' drop-shadow(0 -3px 0 hsl(var(--background)))',
-};
-
-/** @deprecated Use shapedAvatarBorderStyle instead */
-export const emojiAvatarBorderStyle = shapedAvatarBorderStyle;
-
 // ── Emoji mask generation ──────────────────────────────────────────────────
 
 /** In-memory cache: emoji string → data-URL. */
@@ -83,18 +64,6 @@ const emojiMaskCache = new Map<string, string>();
  * Returns empty string if shape is invalid or mask generation fails.
  */
 export function getAvatarMaskUrl(shape: string): string {
-  if (isEmoji(shape)) {
-    return getEmojiMaskUrl(shape);
-  }
-
-  return '';
-}
-
-/**
- * Async version of getAvatarMaskUrl.
- * For emoji, this is equivalent to the sync version.
- */
-export async function getAvatarMaskUrlAsync(shape: string): Promise<string> {
   if (isEmoji(shape)) {
     return getEmojiMaskUrl(shape);
   }
@@ -128,7 +97,7 @@ export async function getAvatarMaskUrlAsync(shape: string): Promise<string> {
  * If `mask-image` is unsupported the avatar renders as a plain square
  * (the emoji mask is simply ignored by the browser).
  */
-export function getEmojiMaskUrl(emoji: string): string {
+function getEmojiMaskUrl(emoji: string): string {
   const cached = emojiMaskCache.get(emoji);
   if (cached) return cached;
 

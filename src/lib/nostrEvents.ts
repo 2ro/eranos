@@ -15,7 +15,7 @@ export function isReplyEvent(event: NostrEvent): boolean {
 }
 
 /** Hints extracted from an `e` tag for relay resolution. */
-export interface ParentEventHints {
+interface ParentEventHints {
   id: string;
   relayHint?: string;
   authorHint?: string;

@@ -1,6 +1,5 @@
 import { EXTRA_KINDS } from '@/lib/extraKinds';
 import { CONTENT_KIND_ICONS } from '@/lib/sidebarItems';
-import type { TabFilter } from '@/contexts/AppContext';
 
 type KindOption = {
   value: string;
@@ -87,9 +86,3 @@ export function buildKindOptions(): KindOption[] {
   });
 }
 
-/** Parse a TabFilter's kinds array into an array of string kind values. */
-export function parseSelectedKinds(filter: TabFilter): string[] {
-  const kinds = filter.kinds;
-  if (!Array.isArray(kinds) || kinds.length === 0) return [];
-  return kinds.map(String);
-}

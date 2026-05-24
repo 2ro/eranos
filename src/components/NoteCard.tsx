@@ -183,7 +183,7 @@ export function ActivityCard({
 }
 
 /** Reusable actor row: small avatar + display name + action label + timestamp. */
-export interface ActorRowProps {
+interface ActorRowProps {
   pubkey: string;
   profileUrl: string;
   picture?: string;
@@ -197,7 +197,7 @@ export interface ActorRowProps {
   timestampLabel: string;
 }
 
-export function ActorRow({ pubkey, profileUrl, picture, displayName, authorEvent, isLoading, label, extra, timestampLabel }: ActorRowProps) {
+function ActorRow({ pubkey, profileUrl, picture, displayName, authorEvent, isLoading, label, extra, timestampLabel }: ActorRowProps) {
   if (isLoading) {
     return (
       <div className="flex items-center gap-2">
@@ -1727,7 +1727,7 @@ function StreamContent({ event }: { event: NostrEvent }) {
   );
 }
 
-export interface EventActionHeaderProps {
+interface EventActionHeaderProps {
   /** Pubkey of the person performing the action. */
   pubkey: string;
   /** Lucide icon component shown to the left of the author name. */

@@ -3,7 +3,7 @@ import { nip19 } from 'nostr-tools';
 /**
  * Represents a parsed Nostr URI with its components
  */
-export interface NostrURIParts {
+interface NostrURIParts {
   /** The public key (hex format) */
   pubkey: string;
   /** The identifier (d-tag value) */

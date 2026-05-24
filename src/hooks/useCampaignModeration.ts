@@ -10,7 +10,6 @@ import {
   LABEL_KIND,
   type ModerationData,
   type ModerationLabel,
-  type ModerationState,
   foldModerationLabels,
 } from '@/lib/agoraModeration';
 
@@ -18,14 +17,10 @@ import {
 // `ModerationLabel` type are imported from this module by the campaign
 // moderation menu and other surfaces; keep those exports stable so the
 // shared-module refactor stays a no-op for callers.
-export { AGORA_MODERATION_NAMESPACE };
 export type { ModerationLabel };
 
-/** Per-campaign rollup of approval + hide + featured state. */
-export type CampaignModerationState = ModerationState;
-
 /** Surface-scoped alias so existing callers keep working. */
-export type CampaignModerationData = ModerationData;
+type CampaignModerationData = ModerationData;
 
 /**
  * Fetches and folds campaign-moderation label events authored by Team

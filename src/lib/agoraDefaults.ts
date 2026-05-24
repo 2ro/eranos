@@ -20,21 +20,13 @@ import { nip19 } from 'nostr-tools';
  *   identifier: gllbeu7itctq
  *   relays:     wss://relay.primal.net
  */
-export const VERIFIED_FOLLOW_PACK_NADDR =
+const VERIFIED_FOLLOW_PACK_NADDR =
   'naddr1qqxxwmrvvfjh2dmfw33hgugpzemhxue69uhhyetvv9ujuurjd9kkzmpwdejhgq3qjvnpg4c6ljadf5t6ry0w9q0rnm4mksde87kglkrc993z46c39axsxpqqqzvtzxrjurt';
 
 const decoded = nip19.decode(VERIFIED_FOLLOW_PACK_NADDR);
 if (decoded.type !== 'naddr') {
   throw new Error('VERIFIED_FOLLOW_PACK_NADDR must be an naddr');
 }
-
-/** Decoded coordinates for the canonical verified-users follow pack. */
-export const VERIFIED_FOLLOW_PACK = {
-  kind: decoded.data.kind,
-  pubkey: decoded.data.pubkey,
-  identifier: decoded.data.identifier,
-  relays: decoded.data.relays,
-} as const;
 
 /** Sidebar path for the in-app Verified page. */
 export const VERIFIED_PAGE_PATH = '/verified';

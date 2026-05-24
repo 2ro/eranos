@@ -56,34 +56,4 @@ export function isEventMuted(event: NostrEvent, muteItems: MuteListItem[]): bool
   return false;
 }
 
-/**
- * Filter an array of events to exclude muted content
- */
-export function filterMutedEvents(events: NostrEvent[], muteItems: MuteListItem[]): NostrEvent[] {
-  if (muteItems.length === 0) {
-    return events;
-  }
-
-  return events.filter((event) => !isEventMuted(event, muteItems));
-}
-
-/**
- * Get a summary of what's being muted
- */
-export function getMuteSummary(muteItems: MuteListItem[]): {
-  pubkeys: number;
-  hashtags: number;
-  words: number;
-  threads: number;
-  total: number;
-} {
-  return {
-    pubkeys: muteItems.filter((item) => item.type === 'pubkey').length,
-    hashtags: muteItems.filter((item) => item.type === 'hashtag').length,
-    words: muteItems.filter((item) => item.type === 'word').length,
-    threads: muteItems.filter((item) => item.type === 'thread').length,
-    total: muteItems.length,
-  };
-}
-
 

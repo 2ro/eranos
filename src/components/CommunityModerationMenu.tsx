@@ -25,46 +25,6 @@ interface CommunityModerationMenuProps {
   className?: string;
 }
 
-/**
- * Per-card kebab menu exposing the moderator actions for an organization:
- *
- *   Hide / Unhide         (axis = hide)
- *   Feature / Unfeature   (axis = featured)
- *
- * Organizations intentionally do **not** have an `approved` axis — unlike
- * campaigns, which gate homepage placement on moderator approval, every
- * Agora-tagged organization is publicly visible by default. Moderators
- * curate via two narrower controls: lifting an org into the Featured
- * shelf, or suppressing it with a Hidden label.
- *
- * Renders `null` for users who are not Team Soapbox pack members. Sits
- * inside the clickable `CommunityMiniCard` `<Link>`, so the trigger
- * swallows its own click and the dropdown content stops propagation —
- * otherwise every menu interaction would navigate to the organization
- * detail page.
- *
- * The moderation rollup is read inside this component (after the
- * moderator gate) instead of at the parent so non-moderator viewers
- * never subscribe to the heavy `useOrganizationModeration` query — every
- * `CommunityMiniCard` in a grid would otherwise wake the same cache
- * subscription up to 18+ times per page.
- */
-export function CommunityModerationMenu({
-  coord,
-  organizationName,
-  className,
-}: CommunityModerationMenuProps) {
-  const { user } = useCurrentUser();
-  const { data: moderators } = useCampaignModerators();
-  const isMod = !!user && !!moderators && moderators.includes(user.pubkey);
-
-  // Bail before the heavy moderation query subscribes. Non-moderators
-  // (the overwhelming majority) never pay the network or render cost.
-  if (!isMod) return null;
-
-  return <CommunityModerationMenuInner coord={coord} organizationName={organizationName} className={className} />;
-}
-
 function CommunityModerationMenuInner({
   coord,
   organizationName,

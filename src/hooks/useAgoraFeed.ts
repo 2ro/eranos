@@ -171,7 +171,7 @@ function extractDonationTargets(events: NostrEvent[]): { coordinates: string[]; 
   };
 }
 
-export interface UseAgoraFeedOptions {
+interface UseAgoraFeedOptions {
   /**
    * Restrict the feed to events authored by these pubkeys. Applied as an
    * `authors:` filter on every relay query (server-side filtering). Empty

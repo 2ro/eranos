@@ -3,7 +3,7 @@ import { sanitizeUrl } from '@/lib/sanitizeUrl';
 import { sanitizeCssString } from '@/lib/cssSanitize';
 
 export const LETTER_KIND = 8211;
-export const COLOR_MOMENT_KIND = 3367;
+const COLOR_MOMENT_KIND = 3367;
 
 /** Default stationery background color (parchment). */
 export const DEFAULT_STATIONERY_COLOR = '#F5E6D3';
@@ -154,7 +154,7 @@ export type FrameStyle =
   | 'fruit'
   | 'sparkle';
 
-export interface FramePreset {
+interface FramePreset {
   id: FrameStyle;
   name: string;
   /** Emoji set for the border scatter */
@@ -184,34 +184,6 @@ export interface Letter {
   timestamp: number;
 }
 
-/**
- * Built-in stationery presets — flat single color + optional emoji backsplash.
- * No gradients.
- */
-export const STATIONERY_PRESETS: Record<string, { name: string; color: string; emoji?: string }> = {
-  parchment: { name: 'Parchment', color: DEFAULT_STATIONERY_COLOR, emoji: undefined },
-  meadow:    { name: 'Meadow',    color: '#C8E6C9', emoji: '🌿' },
-  twilight:  { name: 'Twilight',  color: '#E1BEE7', emoji: '🌙' },
-  ocean:     { name: 'Ocean',     color: '#B3E5FC', emoji: '🌊' },
-  blossom:   { name: 'Blossom',   color: '#FCE4EC', emoji: '🌸' },
-  forest:    { name: 'Forest',    color: '#DCEDC8', emoji: '🌲' },
-  butter:    { name: 'Butter',    color: '#FFF9C4', emoji: '🌻' },
-  peach:     { name: 'Peach',     color: '#FFE0CC', emoji: '🍑' },
-  mint:      { name: 'Mint',      color: '#E0F2E9', emoji: '🍃' },
-  lavender:  { name: 'Lavender',  color: '#EDE7F6', emoji: '💜' },
-};
-
-export const CLOSING_PRESETS = [
-  'With Love,',
-  'Warmly,',
-  'Yours Truly,',
-  'XO,',
-  'Until Next Time,',
-  'Thinking of You,',
-  'Forever Yours,',
-  'With Gratitude,',
-];
-
 export const FONT_OPTIONS = [
   { value: 'fredoka',     label: 'Fredoka',     family: 'Fredoka Variable, Fredoka, sans-serif' },
   { value: 'nunito',      label: 'Nunito',      family: 'Nunito Variable, Nunito, sans-serif' },
@@ -230,7 +202,7 @@ export const FONT_OPTIONS = [
  * Serializable stationery for localStorage persistence.
  * NostrEvent is a plain JSON object, so it serializes fine.
  */
-export type SerializableStationery = Stationery;
+type SerializableStationery = Stationery;
 
 /**
  * User's default letter preferences — persisted per-pubkey in settings.
@@ -252,18 +224,5 @@ export interface LetterPreferences {
   friendsOnlyInbox?: boolean;
   /** Only show friends in search suggestions */
   friendsOnlySearch?: boolean;
-}
-
-/** Build a Stationery from a preset key */
-export function presetToStationery(key: string): Stationery | undefined {
-  const preset = STATIONERY_PRESETS[key];
-  if (!preset) return undefined;
-  return { color: preset.color, emoji: preset.emoji };
-}
-
-/** Build a Stationery from a kind 3367 color moment event. */
-export function colorMomentToStationery(event: NostrEvent): Stationery {
-  const color = event.tags.find(([n]) => n === 'c')?.[1] ?? DEFAULT_STATIONERY_COLOR;
-  return { color, event };
 }
 

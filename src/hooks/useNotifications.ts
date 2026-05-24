@@ -59,7 +59,7 @@ interface NotificationPage {
   oldestTimestamp: number;
 }
 
-export interface NotificationData {
+interface NotificationData {
   /** All notification items (paginated, flattened). */
   items: NotificationItem[];
   /** Grouped / condensed notification items for rendering. */

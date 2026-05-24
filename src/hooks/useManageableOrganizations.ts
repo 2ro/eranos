@@ -11,7 +11,7 @@ import {
 } from '@/lib/communityUtils';
 import { dedupeAddressableLatest } from '@/lib/addressableEvents';
 
-export interface ManageableOrganization {
+interface ManageableOrganization {
   /** The parsed community definition. */
   community: ParsedCommunity;
   /** The raw kind 34550 event. */

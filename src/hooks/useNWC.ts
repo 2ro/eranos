@@ -10,7 +10,7 @@ export interface NWCConnection {
   client?: LN;
 }
 
-export interface NWCInfo {
+interface NWCInfo {
   alias?: string;
   color?: string;
   pubkey?: string;

@@ -13,7 +13,7 @@
 export const HASHTAG_PATTERN = '#[\\p{L}\\p{N}_](?:[\\p{L}\\p{N}_-]*[\\p{L}\\p{N}_])?';
 
 /** Return a fresh global+unicode RegExp that matches hashtags. */
-export function hashtagRegex(): RegExp {
+function hashtagRegex(): RegExp {
   return new RegExp(HASHTAG_PATTERN, 'gu');
 }
 

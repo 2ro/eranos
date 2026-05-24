@@ -5,14 +5,14 @@ import type { Theme, ContentWarningPolicy } from '@/contexts/AppContext';
 // ─── Theme Schemas ───────────────────────────────────────────────────
 
 /** Zod schema for Theme validation */
-export const ThemeSchema = z.enum(['dark', 'light', 'system']) satisfies z.ZodType<Theme>;
+const ThemeSchema = z.enum(['dark', 'light', 'system']) satisfies z.ZodType<Theme>;
 
 /** Zod schema for ContentWarningPolicy validation */
-export const ContentWarningPolicySchema = z.enum(['blur', 'hide', 'show']) satisfies z.ZodType<ContentWarningPolicy>;
+const ContentWarningPolicySchema = z.enum(['blur', 'hide', 'show']) satisfies z.ZodType<ContentWarningPolicy>;
 
 // ─── Feed & Relay Schemas ────────────────────────────────────────────
 
-export const RelayMetadataSchema = z.object({
+const RelayMetadataSchema = z.object({
   relays: z.array(z.object({
     url: z.string().url(),
     read: z.boolean(),
@@ -22,7 +22,7 @@ export const RelayMetadataSchema = z.object({
 });
 
 /** Zod schema for BlossomServerMetadata (BUD-03 kind 10063 server list). */
-export const BlossomServerMetadataSchema = z.object({
+const BlossomServerMetadataSchema = z.object({
   servers: z.array(z.string().url()),
   updatedAt: z.number(),
 });
@@ -34,7 +34,7 @@ export const BlossomServerMetadataSchema = z.object({
  * Uses looseObject to preserve extra keys from newer encrypted settings.
  * Missing fields get filled in by the defaultConfig merge downstream.
  */
-export const FeedSettingsSchema = z.looseObject({
+const FeedSettingsSchema = z.looseObject({
   feedIncludePosts: z.boolean().optional(),
   feedIncludeComments: z.boolean().optional(),
   feedIncludeReposts: z.boolean().optional(),
@@ -88,16 +88,16 @@ export const FeedSettingsSchema = z.looseObject({
 });
 
 /** Schema for a NIP-01 filter object (lenient — allows variable placeholder strings). */
-export const TabFilterSchema = z.record(z.string(), z.unknown());
+const TabFilterSchema = z.record(z.string(), z.unknown());
 
 /** Schema for a variable definition. */
-export const TabVarDefSchema = z.object({
+const TabVarDefSchema = z.object({
   name: z.string(),
   tagName: z.string(),
   pointer: z.string(),
 });
 
-export const SavedFeedSchema = z.object({
+const SavedFeedSchema = z.object({
   id: z.string(),
   label: z.string(),
   filter: TabFilterSchema,
@@ -192,15 +192,10 @@ export const BuildConfigSchema = AppConfigSchema
 /** Inferred type for the build-time configuration. */
 export type BuildConfig = z.infer<typeof BuildConfigSchema>;
 
-/** @deprecated Use BuildConfigSchema instead. Kept for backwards compatibility. */
-export const DittoConfigSchema = BuildConfigSchema;
-/** @deprecated Use BuildConfig instead. Kept for backwards compatibility. */
-export type DittoConfig = BuildConfig;
-
 // ─── Content Filter Schemas ──────────────────────────────────────────
 
 /** Zod schema for FilterRule validation */
-export const FilterRuleSchema = z.object({
+const FilterRuleSchema = z.object({
   type: z.enum(['kind', 'content-regex', 'tag', 'author-metadata']),
   field: z.string().optional(),
   operator: z.enum(['equals', 'contains', 'regex', 'not-equals', 'not-contains']),
@@ -209,7 +204,7 @@ export const FilterRuleSchema = z.object({
 });
 
 /** Zod schema for ContentFilter validation */
-export const ContentFilterSchema = z.object({
+const ContentFilterSchema = z.object({
   id: z.string(),
   name: z.string(),
   enabled: z.boolean(),

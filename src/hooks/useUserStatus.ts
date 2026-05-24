@@ -3,7 +3,7 @@ import { useNostr } from '@nostrify/react';
 
 import { sanitizeUrl } from '@/lib/sanitizeUrl';
 
-export interface UserStatus {
+interface UserStatus {
   /** The status text, or null if no status / expired / cleared. */
   status: string | null;
   /** Optional URL linked from the status (from `r` tag). */

@@ -8,7 +8,7 @@ import { getStorageKey } from '@/lib/storageKey';
  * with no country root). Matches the value used by ComposeBox's `destination`
  * state.
  */
-export type PostCountryDestination = 'world' | string;
+type PostCountryDestination = 'world' | string;
 
 const WORLD = 'world' as const;
 const STORAGE_SUFFIX = 'compose-default-country';

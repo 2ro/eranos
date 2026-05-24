@@ -18,27 +18,6 @@ export interface BookReview {
   contentWarning?: string;
 }
 
-/** Check if a Nostr event is book-related. */
-export function isBookEvent(event: NostrEvent): boolean {
-  // Check for bookstr hashtag
-  if (event.tags.some(([name, value]) => name === 't' && value === 'bookstr')) {
-    return true;
-  }
-
-  // Check for ISBN references (lowercase i tag — kind 1 posts)
-  if (event.tags.some(([name, value]) => name === 'i' && value?.startsWith('isbn:'))) {
-    return true;
-  }
-
-  // Check for ISBN references (uppercase I tag — kind 1111 NIP-22 comments on books)
-  if (event.tags.some(([name, value]) => name === 'I' && value?.startsWith('isbn:'))) {
-    return true;
-  }
-
-  // Check for book-specific kinds
-  return (Object.values(BOOKSTR_KINDS) as number[]).includes(event.kind);
-}
-
 /** Extract an ISBN from a book event, or null if none found. */
 export function extractISBNFromEvent(event: NostrEvent): string | null {
   // For reviews (kind 31985), check the d tag

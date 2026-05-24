@@ -7,7 +7,7 @@ import type { NostrEvent, NostrFilter } from '@nostrify/nostrify';
  * Per NIP-65: tags with no marker are both read+write; tags with "read"
  * are read-only; tags with "write" are write-only (excluded here).
  */
-export function extractReadRelays(event: NostrEvent): string[] {
+function extractReadRelays(event: NostrEvent): string[] {
   const relays = new Set<string>();
   for (const [name, url, marker] of event.tags) {
     if (name !== 'r' || marker === 'write' || !url) continue;

@@ -5,7 +5,7 @@ import { useLoggedInAccounts } from '@/hooks/useLoggedInAccounts';
 import { AccountSwitcher } from './AccountSwitcher';
 import { cn } from '@/lib/utils';
 
-export interface LoginAreaProps {
+interface LoginAreaProps {
   className?: string;
 }
 

@@ -104,21 +104,3 @@ export function usePublishReview() {
   });
 }
 
-/** Compute the average rating for a set of reviews. */
-export function useBookRating(isbn: string) {
-  const { data: reviews } = useBookReviews(isbn);
-
-  const ratings = reviews
-    ?.map(({ review }) => review.rating)
-    .filter((rating): rating is number => rating !== undefined) ?? [];
-
-  if (ratings.length === 0) {
-    return { averageRating: null, totalRatings: 0 };
-  }
-
-  const sum = ratings.reduce((acc, r) => acc + r, 0);
-  return {
-    averageRating: sum / ratings.length,
-    totalRatings: ratings.length,
-  };
-}

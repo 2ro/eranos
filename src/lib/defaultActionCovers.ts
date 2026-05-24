@@ -19,8 +19,3 @@ export const DEFAULT_ACTION_COVERS = [
 /** Default cover image when an action has none set. */
 export const DEFAULT_COVER_IMAGE = 'https://blossom.dreamith.to/798305829a160757bcf7ad5c28f5e7382bcf7f087beb9fad83648950910e15f5.png';
 
-/** Pick a random default cover image (used for variety in fallbacks). */
-export function getRandomDefaultCover() {
-  const index = Math.floor(Math.random() * DEFAULT_ACTION_COVERS.length);
-  return DEFAULT_ACTION_COVERS[index];
-}

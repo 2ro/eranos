@@ -15,7 +15,7 @@ export interface MuteListItem {
 }
 
 /** Build the localStorage key for cached mute list items. */
-export function getMuteCacheKey(appId: string): string {
+function getMuteCacheKey(appId: string): string {
   return getStorageKey(appId, 'muteListCache');
 }
 

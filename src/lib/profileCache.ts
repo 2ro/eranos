@@ -14,7 +14,7 @@ import { openDatabase, STORE } from '@/lib/db';
 // on every render when used as TanStack Query `initialData`.
 // ============================================================================
 
-export interface ProfileCacheEntry {
+interface ProfileCacheEntry {
   /** Hex pubkey of the profile author */
   pubkey: string;
   /** The raw kind 0 NostrEvent */
@@ -94,26 +94,3 @@ export async function setProfileCached(event: NostrEvent, metadata?: NostrMetada
   }
 }
 
-/** Remove a single profile entry. */
-export async function deleteProfileCached(pubkey: string): Promise<void> {
-  memoryCache.delete(pubkey);
-
-  try {
-    const db = await openDatabase();
-    if (db) await db.delete(STORE.PROFILES, pubkey);
-  } catch {
-    // Non-critical.
-  }
-}
-
-/** Clear the entire profile cache. */
-export async function clearProfileCache(): Promise<void> {
-  memoryCache.clear();
-
-  try {
-    const db = await openDatabase();
-    if (db) await db.clear(STORE.PROFILES);
-  } catch {
-    // Non-critical.
-  }
-}

@@ -3,7 +3,7 @@ import type { NostrEvent } from '@nostrify/nostrify';
 import { isProfileBadgesKind } from '@/lib/badgeUtils';
 
 /** A parsed badge reference from a profile badges event. */
-export interface BadgeRef {
+interface BadgeRef {
   /** The `a` tag value referencing a kind 30009 badge definition. */
   aTag: string;
   /** The `e` tag value referencing a kind 8 badge award event. */

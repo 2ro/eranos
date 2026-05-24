@@ -1,14 +1,14 @@
 /** Image extensions rendered inline. */
-export const IMAGE_EXTS = 'jpg|jpeg|png|gif|webp|svg|avif';
+const IMAGE_EXTS = 'jpg|jpeg|png|gif|webp|svg|avif';
 
 /** Video extensions rendered as players. */
-export const VIDEO_EXTS = 'mp4|webm|mov|qt|avi|mkv|flv';
+const VIDEO_EXTS = 'mp4|webm|mov|qt|avi|mkv|flv';
 
 /** Audio extensions rendered as players. */
-export const AUDIO_EXTS = 'mp3|wav|ogg|flac|m4a|aac|opus';
+const AUDIO_EXTS = 'mp3|wav|ogg|flac|m4a|aac|opus';
 
 /** All media extensions (image + video + audio). */
-export const ALL_MEDIA_EXTS = `${IMAGE_EXTS}|${VIDEO_EXTS}|${AUDIO_EXTS}`;
+const ALL_MEDIA_EXTS = `${IMAGE_EXTS}|${VIDEO_EXTS}|${AUDIO_EXTS}`;
 
 /** Matches image URLs. */
 export const IMAGE_URL_REGEX = new RegExp(
@@ -17,13 +17,13 @@ export const IMAGE_URL_REGEX = new RegExp(
 );
 
 /** Matches video URLs. */
-export const VIDEO_URL_REGEX = new RegExp(
+const VIDEO_URL_REGEX = new RegExp(
   `https?:\\/\\/[^\\s]+\\.(${VIDEO_EXTS})(\\?[^\\s]*)?`,
   'gi',
 );
 
 /** Matches audio URLs. */
-export const AUDIO_URL_REGEX = new RegExp(
+const AUDIO_URL_REGEX = new RegExp(
   `https?:\\/\\/[^\\s]+\\.(${AUDIO_EXTS})(\\?[^\\s]*)?`,
   'gi',
 );

@@ -96,7 +96,7 @@ function normalize(url: string): string {
 /**
  * Options that control failover behaviour for a single `esploraFetch` call.
  */
-export interface EsploraFetchOptions extends Omit<RequestInit, 'signal'> {
+interface EsploraFetchOptions extends Omit<RequestInit, 'signal'> {
   /**
    * Caller-supplied abort signal. When this signal aborts (e.g. a TanStack
    * Query unmount), the inflight request is cancelled and an `AbortError`
@@ -126,7 +126,7 @@ export interface EsploraFetchOptions extends Omit<RequestInit, 'signal'> {
 }
 
 /** Error thrown when every endpoint in the list is unreachable or cooled down. */
-export class EsploraAllEndpointsFailedError extends Error {
+class EsploraAllEndpointsFailedError extends Error {
   constructor(
     /** Original URLs that were attempted. */
     public readonly urls: string[],
@@ -310,13 +310,5 @@ export async function esploraFetch(
   }
 
   throw new EsploraAllEndpointsFailedError(baseUrls, causes);
-}
-
-/**
- * Test-only: reset the in-memory cool-down map. Not exported from the public
- * surface for production code — consumers should never need this.
- */
-export function _resetEsploraStateForTests(): void {
-  state.clear();
 }
 

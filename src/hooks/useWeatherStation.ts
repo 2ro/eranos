@@ -7,14 +7,14 @@ import {
   WEATHER_STATION_READING_KIND,
 } from '@/lib/weatherStation';
 
-export interface WeatherSensorReading {
+interface WeatherSensorReading {
   key: string;
   label: string;
   value: string;
   model?: string;
 }
 
-export interface WeatherStationData {
+interface WeatherStationData {
   stationName?: string;
   stationDescription?: string;
   observedAt: number;

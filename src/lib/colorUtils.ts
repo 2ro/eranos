@@ -6,11 +6,6 @@ export function parseHsl(hsl: string): { h: number; s: number; l: number } {
   return { h: parts[0], s: parts[1], l: parts[2] };
 }
 
-/** Format { h, s, l } back to "228 20% 10%" */
-export function formatHsl(h: number, s: number, l: number): string {
-  return `${Math.round(h * 10) / 10} ${Math.round(s * 10) / 10}% ${Math.round(l * 10) / 10}%`;
-}
-
 /** Convert HSL to RGB. h in [0,360], s,l in [0,100]. Returns [r,g,b] each [0,255]. */
 export function hslToRgb(h: number, s: number, l: number): [number, number, number] {
   s /= 100;
@@ -21,28 +16,8 @@ export function hslToRgb(h: number, s: number, l: number): [number, number, numb
   return [Math.round(f(0) * 255), Math.round(f(8) * 255), Math.round(f(4) * 255)];
 }
 
-/** Convert RGB [0,255] to HSL { h, s, l } (h in degrees, s/l in percent). */
-export function rgbToHsl(r: number, g: number, b: number): { h: number; s: number; l: number } {
-  r /= 255; g /= 255; b /= 255;
-  const max = Math.max(r, g, b), min = Math.min(r, g, b);
-  const l = (max + min) / 2;
-  if (max === min) return { h: 0, s: 0, l: l * 100 };
-  const d = max - min;
-  const s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
-  let h = 0;
-  if (max === r) h = ((g - b) / d + (g < b ? 6 : 0)) / 6;
-  else if (max === g) h = ((b - r) / d + 2) / 6;
-  else h = ((r - g) / d + 4) / 6;
-  return { h: h * 360, s: s * 100, l: l * 100 };
-}
-
-/** Check whether a string looks like a valid hex color (#RGB, #RRGGBB, or without #). */
-export function isValidHex(hex: string): boolean {
-  return /^#?([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/.test(hex);
-}
-
 /** Convert hex color (#RRGGBB or #RGB) to RGB. */
-export function hexToRgb(hex: string): [number, number, number] {
+function hexToRgb(hex: string): [number, number, number] {
   hex = hex.replace('#', '');
   if (hex.length === 3) hex = hex[0] + hex[0] + hex[1] + hex[1] + hex[2] + hex[2];
   return [
@@ -57,24 +32,10 @@ export function rgbToHex(r: number, g: number, b: number): string {
   return '#' + [r, g, b].map(v => v.toString(16).padStart(2, '0')).join('');
 }
 
-/** Convert hex to HSL string like "228 20% 10%". */
-export function hexToHslString(hex: string): string {
-  const [r, g, b] = hexToRgb(hex);
-  const { h, s, l } = rgbToHsl(r, g, b);
-  return formatHsl(h, s, l);
-}
-
-/** Convert HSL string like "228 20% 10%" to hex. */
-export function hslStringToHex(hsl: string): string {
-  const { h, s, l } = parseHsl(hsl);
-  const [r, g, b] = hslToRgb(h, s, l);
-  return rgbToHex(r, g, b);
-}
-
 // ─── Luminance & Contrast ─────────────────────────────────────────────
 
 /** Relative luminance per WCAG 2.1 (0 = black, 1 = white). */
-export function getLuminance(r: number, g: number, b: number): number {
+function getLuminance(r: number, g: number, b: number): number {
   const sRGB = [r, g, b].map(v => {
     v /= 255;
     return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4);
@@ -94,13 +55,6 @@ export function getContrastRatio(
   return (lighter + 0.05) / (darker + 0.05);
 }
 
-/** Get contrast ratio between two HSL strings. */
-export function getContrastRatioHsl(hsl1: string, hsl2: string): number {
-  const c1 = parseHsl(hsl1);
-  const c2 = parseHsl(hsl2);
-  return getContrastRatio(hslToRgb(c1.h, c1.s, c1.l), hslToRgb(c2.h, c2.s, c2.l));
-}
-
 // ─── Dark/Light Detection ─────────────────────────────────────────────
 
 /** Determine if an HSL background string represents a "dark" theme. */
@@ -118,19 +72,6 @@ export function getBackgroundThemeMode(): 'dark' | 'light' {
     .trim();
   if (!bg) return 'light';
   return isDarkTheme(bg) ? 'dark' : 'light';
-}
-
-/** Resolve the live --background CSS variable to a hex color, or `null`. */
-export function getBackgroundHex(): string | null {
-  if (typeof document === 'undefined') return null;
-  const bg = getComputedStyle(document.documentElement)
-    .getPropertyValue('--background')
-    .trim();
-  if (!bg) return null;
-  const { h, s, l } = parseHsl(bg);
-  if ([h, s, l].some(isNaN)) return null;
-  const [r, g, b] = hslToRgb(h, s, l);
-  return rgbToHex(r, g, b);
 }
 
 // ─── Adjust HSL helpers ───────────────────────────────────────────────

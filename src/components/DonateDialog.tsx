@@ -731,6 +731,3 @@ function SignerUnsupportedView({
 // Loading skeleton (for callers that need a placeholder button)
 // ─────────────────────────────────────────────────────────────────────
 
-export function DonateButtonSkeleton() {
-  return <Skeleton className="h-11 w-full rounded-md" />;
-}

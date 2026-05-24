@@ -16,24 +16,3 @@ export function isAddressableKind(kind: number): boolean {
   return kind >= 30000 && kind < 40000;
 }
 
-/** Returns true for replaceable kinds 10000–19999 (excludes legacy 0 and 3). */
-export function isReplaceableKind(kind: number): boolean {
-  return kind >= 10000 && kind < 20000;
-}
-
-/** Returns true for ephemeral kinds 20000–29999. */
-export function isEphemeralKind(kind: number): boolean {
-  return kind >= 20000 && kind < 30000;
-}
-
-/**
- * Returns true if the kind has replaceable semantics — i.e. relays only keep
- * the latest version per author (and per `d` tag, for addressable kinds).
- *
- * Includes the legacy replaceable kinds 0 (profile metadata) and 3 (follow list)
- * along with the 10000–19999 and 30000–39999 ranges.
- */
-export function isReplaceableLikeKind(kind: number): boolean {
-  if (kind === 0 || kind === 3) return true;
-  return isReplaceableKind(kind) || isAddressableKind(kind);
-}

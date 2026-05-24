@@ -12,7 +12,7 @@ import { cn } from '@/lib/utils';
 
 // ── Generic sortable list container ──────────────────────────────────────────
 
-export interface SortableListProps<T> {
+interface SortableListProps<T> {
   /** Items in current order. */
   items: T[];
   /** Extract a unique stable string id from each item. */
@@ -62,7 +62,7 @@ export function SortableList<T>({ items, getItemId, onReorder, renderItem, class
 
 // ── Generic sortable item wrapper ────────────────────────────────────────────
 
-export interface SortableItemProps {
+interface SortableItemProps {
   /** Must match the id returned by `getItemId` for this item. */
   id: string;
   /** When false the grip handle is hidden and dragging is disabled. */

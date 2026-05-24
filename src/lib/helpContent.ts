@@ -317,14 +317,6 @@ export function getFAQCategories(appName: string): FAQCategory[] {
   return FAQ_TEMPLATE.map((c) => substituteCategory(c, appName));
 }
 
-/** Flat list of every FAQ item, optionally filtered by category ID. */
-export function getFAQItems(appName: string, categoryId?: string): FAQItem[] {
-  const cats = categoryId
-    ? FAQ_TEMPLATE.filter((c) => c.id === categoryId)
-    : FAQ_TEMPLATE;
-  return cats.flatMap((c) => c.items).map((i) => substituteItem(i, appName));
-}
-
 /** Look up a single FAQ item by its ID across all categories. */
 export function getFAQItem(appName: string, itemId: string): FAQItem | undefined {
   for (const cat of FAQ_TEMPLATE) {

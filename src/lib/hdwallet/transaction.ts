@@ -120,12 +120,12 @@ function inputId(input: HdInput): string {
 }
 
 /** Recipient parsing result. */
-export type HdRecipient =
+type HdRecipient =
   | { kind: 'address'; address: string }
   | { kind: 'sp'; spAddress: string };
 
 /** Result of building an unsigned PSBT for the HD wallet. */
-export interface HdUnsignedPsbt {
+interface HdUnsignedPsbt {
   /** Hex-encoded unsigned PSBT. */
   psbtHex: string;
   /** Network fee in satoshis. */
@@ -157,7 +157,7 @@ export interface HdUnsignedPsbt {
 }
 
 /** Per-input descriptor stored alongside the PSBT for signing dispatch. */
-export type HdInputDescriptor =
+type HdInputDescriptor =
   | { kind: 'bip86'; chain: 0 | 1; index: number }
   | { kind: 'sp'; tweakHex: string };
 
@@ -170,7 +170,7 @@ export type HdInputDescriptor =
 // list as the canonical field.
 
 /** @deprecated Use {@link HdInputDescriptor} via `inputDescriptors`. */
-export type HdInputDerivation = { chain: 0 | 1; index: number };
+type HdInputDerivation = { chain: 0 | 1; index: number };
 
 // ---------------------------------------------------------------------------
 // PSBT hex helpers (private)
@@ -313,63 +313,12 @@ export function parseHdRecipient(input: string): HdRecipient | null {
 // PSBT build (legacy BIP-86 path — backwards compatible)
 // ---------------------------------------------------------------------------
 
-/**
- * Legacy result shape kept for callers that haven't migrated to the new
- * `inputDescriptors` field.
- */
-export interface HdUnsignedPsbtLegacy {
-  psbtHex: string;
-  fee: number;
-  hasChange: boolean;
-  changeAddress?: string;
-  inputDerivations: HdInputDerivation[];
-}
-
-/**
- * Build an unsigned P2TR PSBT for the HD wallet (BIP-86-only inputs +
- * bare-address recipient).
- *
- * Preserved for callers that haven't switched to the SP-aware
- * {@link buildHdSpendPsbt}. Inputs are chosen by the unified selector;
- * change (if any) goes to a fresh address on the internal chain.
- */
-export function buildHdUnsignedPsbt(
-  account: HdAccount,
-  ownedUtxos: readonly HdSpendableUtxo[],
-  toAddress: string,
-  amountSats: number,
-  feeRate: number,
-  nextChangeIndex: number,
-): HdUnsignedPsbtLegacy {
-  const built = buildHdSpendPsbt({
-    account,
-    inputs: liftBip86(ownedUtxos),
-    recipient: { kind: 'address', address: toAddress },
-    amountSats,
-    feeRate,
-    nextChangeIndex,
-  });
-  return {
-    psbtHex: built.psbtHex,
-    fee: built.fee,
-    hasChange: built.hasChange,
-    changeAddress: built.changeAddress,
-    inputDerivations: built.inputDescriptors.map((d) => {
-      if (d.kind !== 'bip86') {
-        // Should never happen given the input filter above.
-        throw new Error('Legacy buildHdUnsignedPsbt produced a non-BIP86 input descriptor.');
-      }
-      return { chain: d.chain, index: d.index };
-    }),
-  };
-}
-
 // ---------------------------------------------------------------------------
 // PSBT build (SP-aware)
 // ---------------------------------------------------------------------------
 
 /** Arguments accepted by {@link buildHdSpendPsbt}. */
-export interface BuildHdSpendArgs {
+interface BuildHdSpendArgs {
   /** HD account — used for change derivation and (for BIP-86 inputs) re-derivation of internal pubkeys. */
   account: HdAccount;
   /**
@@ -705,40 +654,7 @@ export function finalizeHdPsbt(psbtHex: string): string {
   return hex.encode(tx.extract());
 }
 
-/**
- * Convenience: build → sign → finalise in one call.
- *
- * @deprecated Prefer the explicit {@link buildHdSpendPsbt} +
- *             {@link signHdPsbt} pair for SP-aware flows.
- */
-export function createHdTransaction(
-  account: HdAccount,
-  ownedUtxos: readonly HdSpendableUtxo[],
-  toAddress: string,
-  amountSats: number,
-  feeRate: number,
-  nextChangeIndex: number,
-): { txHex: string; fee: number; hasChange: boolean; changeAddress?: string } {
-  const built = buildHdUnsignedPsbt(account, ownedUtxos, toAddress, amountSats, feeRate, nextChangeIndex);
-  const signed = signHdPsbt(built.psbtHex, built.inputDerivations, account);
-  const txHex = finalizeHdPsbt(signed);
-  return { txHex, fee: built.fee, hasChange: built.hasChange, changeAddress: built.changeAddress };
-}
-
 // ---------------------------------------------------------------------------
 // Max-sendable
 // ---------------------------------------------------------------------------
 
-/**
- * Compute the maximum amount sendable to a single recipient if every owned
- * UTXO is consumed and no change is produced.
- */
-export function maxHdSendable(
-  utxos: readonly HdSpendableUtxo[] | readonly HdInput[],
-  feeRate: number,
-): number {
-  const lifted = isHdInputArray(utxos) ? (utxos as readonly HdInput[]) : liftBip86(utxos as readonly HdSpendableUtxo[]);
-  const total = lifted.reduce((s, i) => s + inputValue(i), 0);
-  const fee = estimateFee(lifted.length, 1, feeRate);
-  return Math.max(0, total - fee);
-}

@@ -8,7 +8,7 @@ import { NSchema as n } from '@nostrify/nostrify';
  * to assert that a `string` is already a `HexId`. Functions consuming a `HexId`
  * (e.g. `nip19.npubEncode` via wrappers) can trust it without re-validating.
  */
-export type HexId = string & { readonly __brand: 'HexId' };
+type HexId = string & { readonly __brand: 'HexId' };
 
 /**
  * Canonical validator for 32-byte Nostr identifiers — pubkeys and event ids.

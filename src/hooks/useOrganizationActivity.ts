@@ -34,7 +34,7 @@ function isValidCalendarEvent(event: NostrEvent): boolean {
   return Number.isFinite(startTs) && startTs > 0;
 }
 
-export interface OrganizationActivity {
+interface OrganizationActivity {
   campaigns: ParsedCampaign[];
   pledges: Action[];
   events: NostrEvent[];

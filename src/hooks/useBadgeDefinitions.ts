@@ -13,7 +13,7 @@ interface BadgeRef {
 }
 
 /** A BadgeData with its source event attached. */
-export interface BadgeDefinition extends BadgeData {
+interface BadgeDefinition extends BadgeData {
   event: NostrEvent;
   aTag: string;
 }

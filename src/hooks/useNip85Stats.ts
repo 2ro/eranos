@@ -10,7 +10,7 @@ export interface Nip85EventStats {
   zapAmount: number;
 }
 
-export interface Nip85UserStats {
+interface Nip85UserStats {
   followers: number;
   postCount: number;
 }

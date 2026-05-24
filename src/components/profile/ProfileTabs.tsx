@@ -1,7 +1,7 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { cn } from '@/lib/utils';
 
-export interface ProfileTabsProps {
+interface ProfileTabsProps {
   tabs: Array<{ id: string; label: string }>;
   activeTab: string;
   onChange: (id: string) => void;

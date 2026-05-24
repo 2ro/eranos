@@ -44,19 +44,6 @@ export interface ResolvedEmoji {
 }
 
 /**
- * Checks whether a kind 7 reaction event is valid.
- * Custom emoji reactions (`:shortcode:` content) are invalid without a matching `emoji` tag.
- */
-export function isValidReaction(event: NostrEvent): boolean {
-  const content = event.content.trim();
-  const emoji = (content === '+' || content === '') ? '+' : content;
-  if (isCustomEmoji(emoji)) {
-    return getCustomEmojiUrl(emoji, event.tags) !== undefined;
-  }
-  return true;
-}
-
-/**
  * Resolves a reaction emoji from a kind 7 event into a ResolvedEmoji.
  * Returns `undefined` for malformed custom emoji reactions (missing emoji tag).
  */

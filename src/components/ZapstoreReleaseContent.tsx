@@ -21,7 +21,6 @@ import { Link } from 'react-router-dom';
 
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Separator } from '@/components/ui/separator';
 import { Skeleton } from '@/components/ui/skeleton';
 import { ZAPSTORE_RELAY } from '@/lib/appRelays';
 import { openUrl } from '@/lib/downloadFile';
@@ -747,6 +746,3 @@ export function ZapstoreAssetSkeleton() {
     </div>
   );
 }
-
-// Re-export Separator so it's available if needed
-export { Separator };

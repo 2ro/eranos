@@ -58,7 +58,7 @@ const TEMPLATE_ID_TO_PREF_KEY: Record<string, keyof NonNullable<EncryptedSetting
   letters: 'letters',
 };
 
-export interface UsePushNotificationsReturn {
+interface UsePushNotificationsReturn {
   /** Current browser permission state. */
   permission: NotificationPermission;
   /** Whether Web Push is currently active and registered. */
