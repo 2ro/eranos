@@ -227,7 +227,7 @@ function CharRing({ count, max }: { count: number; max: number }) {
 
 
 export function ComposeBox({ 
-  onSuccess, 
+  onSuccess,
   onPublished,
   placeholder, 
   compact = false, 
@@ -1660,7 +1660,7 @@ export function ComposeBox({
                 <CommandEmpty>{t('compose.destination.noResults')}</CommandEmpty>
                 <CommandGroup>
                   <CommandItem
-                    value="Global 🌍"
+                    value={`${t('compose.destination.global')} 🌍`}
                     onSelect={() => {
                       setDestination('world');
                       setCountryPickerOpen(false);
