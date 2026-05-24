@@ -23,6 +23,9 @@ const loaders: LoaderMap = {
   privacy: {
     en: () => import('../content/privacy/en.md?raw'),
     es: () => import('../content/privacy/es.md?raw'),
+    fr: () => import('../content/privacy/fr.md?raw'),
+    pt: () => import('../content/privacy/pt.md?raw'),
+    ru: () => import('../content/privacy/ru.md?raw'),
     zh: () => import('../content/privacy/zh.md?raw'),
     ar: () => import('../content/privacy/ar.md?raw'),
     fa: () => import('../content/privacy/fa.md?raw'),
@@ -33,6 +36,9 @@ const loaders: LoaderMap = {
   csae: {
     en: () => import('../content/csae/en.md?raw'),
     es: () => import('../content/csae/es.md?raw'),
+    fr: () => import('../content/csae/fr.md?raw'),
+    pt: () => import('../content/csae/pt.md?raw'),
+    ru: () => import('../content/csae/ru.md?raw'),
     zh: () => import('../content/csae/zh.md?raw'),
     ar: () => import('../content/csae/ar.md?raw'),
     fa: () => import('../content/csae/fa.md?raw'),
