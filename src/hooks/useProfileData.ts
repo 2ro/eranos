@@ -2,7 +2,7 @@ import { useNostr } from '@nostrify/react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import type { NostrEvent } from '@nostrify/nostrify';
 
-export interface ProfileSupplementary {
+interface ProfileSupplementary {
   /** Pubkeys the profile follows (from kind 3). */
   following: string[];
   /** Raw kind 3 event. */

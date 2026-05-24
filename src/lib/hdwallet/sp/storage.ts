@@ -47,7 +47,7 @@ import type { SPMatchedUtxo } from './scanner';
 export const SP_STORAGE_VERSION = 1;
 
 /** Stable d-tag suffix appended to `appId` to form the full NIP-78 d-tag. */
-export const SP_STORAGE_D_TAG_SUFFIX = 'hdwallet/sp-utxos';
+const SP_STORAGE_D_TAG_SUFFIX = 'hdwallet/sp-utxos';
 
 /** Build the full d-tag for the given appId, e.g. `"agora/hdwallet/sp-utxos"`. */
 export function spStorageDTag(appId: string): string {

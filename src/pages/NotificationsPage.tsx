@@ -1,6 +1,7 @@
 import { useState, useMemo, useEffect, useCallback } from 'react';
 import { useInView } from 'react-intersection-observer';
 import { useSeoMeta } from '@unhead/react';
+import { useTranslation, Trans } from 'react-i18next';
 import { useQueryClient } from '@tanstack/react-query';
 import { Zap, AtSign, MessageSquare, MessageCircle, Highlighter, Loader2, Award, Mail, Bell } from 'lucide-react';
 import { RepostIcon } from '@/components/icons/RepostIcon';
@@ -46,66 +47,78 @@ import { PageHeader } from '@/components/PageHeader';
 type NotificationTab = 'all' | 'mentions';
 
 /**
- * Maps event kind numbers to bare noun labels for notification action text.
- * e.g. "reacted to your **badge**", "reposted your **theme**".
- * Falls back to "post" for unknown kinds.
+ * Maps event kind numbers to i18n key suffixes for notification action text.
+ * The English value lives in en.json under `notifications.kinds.{key}`.
+ * Add a new kind here when introducing a new event kind that surfaces in
+ * notifications.
+ *
+ * The previous mapping (kind → bare English noun) has moved into the locale
+ * files. Keep this map small and well-named — the English noun is in en.json.
  */
-const NOTIFICATION_KIND_NOUNS: Record<number, string> = {
+const NOTIFICATION_KIND_NOUN_KEYS: Record<number, string> = {
   0: 'profile',
   1: 'post',
-  4: 'encrypted message',
+  4: 'encryptedMessage',
   6: 'repost',
   7: 'reaction',
-  8: 'badge award',
+  8: 'badgeAward',
   16: 'repost',
   20: 'photo',
   21: 'video',
   22: 'video',
-  62: 'request to vanish',
+  62: 'requestToVanish',
   1063: 'file',
   1068: 'poll',
   1111: 'comment',
-  1222: 'voice message',
+  1222: 'voiceMessage',
   1617: 'patch',
-  1618: 'pull request',
+  1618: 'pullRequest',
   9802: 'highlight',
-  2473: 'bird detection',
-  12473: 'Birdex',
-  3367: 'color moment',
-  7516: 'found log',
+  2473: 'birdDetection',
+  12473: 'birdex',
+  3367: 'colorMoment',
+  7516: 'foundLog',
   15128: 'nsite',
-  10008: 'profile badges',
-  30008: 'profile badges',
+  10008: 'profileBadges',
+  30008: 'profileBadges',
   30009: 'badge',
   30023: 'article',
-  30030: 'emoji pack',
-  30054: 'podcast episode',
-  30055: 'podcast trailer',
-  3063: 'Zapstore asset',
-  30063: 'Zapstore release',
+  30030: 'emojiPack',
+  30054: 'podcastEpisode',
+  30055: 'podcastTrailer',
+  3063: 'zapstoreAsset',
+  30063: 'zapstoreRelease',
   30311: 'stream',
   30315: 'status',
   30617: 'repository',
-  30817: 'custom NIP',
-  31922: 'calendar event',
-  31923: 'calendar event',
-  32267: 'Zapstore app',
+  30817: 'customNip',
+  31922: 'calendarEvent',
+  31923: 'calendarEvent',
+  32267: 'zapstoreApp',
   34139: 'playlist',
   34236: 'divine',
   34550: 'community',
   9041: 'goal',
   35128: 'nsite',
   36787: 'track',
-  37381: 'Magic deck',
+  37381: 'magicDeck',
   37516: 'treasure',
   30621: 'constellation',
-  39089: 'follow pack',
+  39089: 'followPack',
 };
 
-/** Get a bare noun label for a kind number, defaulting to "post". */
-function getNotificationKindNoun(kind: number | undefined): string {
-  if (kind === undefined) return 'post';
-  return NOTIFICATION_KIND_NOUNS[kind] ?? 'post';
+/** Get a translated noun label for a kind number, defaulting to "post". */
+function useNotificationKindNoun(): (kind: number | undefined) => string {
+  const { t } = useTranslation();
+  return useCallback(
+    (kind: number | undefined): string => {
+      if (kind === undefined) return t('notifications.kinds.post');
+      const key = NOTIFICATION_KIND_NOUN_KEYS[kind];
+      if (!key) return t('notifications.kinds.post');
+      return t(`notifications.kinds.${key}`);
+    },
+    [t],
+  );
 }
 
 /**
@@ -135,11 +148,12 @@ function contentMentionsPubkey(event: NostrEvent, pubkey: string): boolean {
 }
 
 export function NotificationsPage() {
+  const { t } = useTranslation();
   const { config } = useAppContext();
 
   useSeoMeta({
-    title: `Notifications | ${config.appName}`,
-    description: 'Your Nostr notifications',
+    title: `${t('notifications.seoTitle')} | ${config.appName}`,
+    description: t('notifications.seoDescription'),
   });
 
 
@@ -212,13 +226,13 @@ export function NotificationsPage() {
   }, [groupedItems, activeTab, muteItems, user]);
 
   const tabs: { key: NotificationTab; label: string }[] = [
-    { key: 'all', label: 'All' },
-    { key: 'mentions', label: 'Mentions' },
+    { key: 'all', label: t('notifications.tabs.all') },
+    { key: 'mentions', label: t('notifications.tabs.mentions') },
   ];
 
   return (
     <main className="flex-1 min-w-0">
-      <PageHeader title="Notifications" icon={<Bell className="size-5 text-primary" />} />
+      <PageHeader title={t('notifications.title')} icon={<Bell className="size-5 text-primary" />} />
       {/* Tab bar */}
       <SubHeaderBar>
         {tabs.map(({ key, label }) => (
@@ -236,7 +250,7 @@ export function NotificationsPage() {
       <PullToRefresh onRefresh={handleRefresh}>
         {!user ? (
           <div className="py-16 text-center text-muted-foreground">
-            Log in to see your notifications.
+            {t('notifications.loginPrompt')}
           </div>
         ) : isLoading || !hasFetched ? (
           <div className="divide-y divide-border">
@@ -266,7 +280,7 @@ export function NotificationsPage() {
           </>
         ) : (
           <div className="py-16 text-center text-muted-foreground">
-            No notifications yet.
+            {t('notifications.empty')}
           </div>
         )}
       </PullToRefresh>
@@ -355,6 +369,7 @@ function ReferencedNoteCard({ item }: { item: NotificationItem }) {
 const MAX_SHOWN = 5;
 
 function ActorAvatars({ actors }: { actors: NotificationItem[] }) {
+  const { t } = useTranslation();
   const shown = actors.slice(0, MAX_SHOWN);
   const overflow = actors.length - MAX_SHOWN;
 
@@ -365,7 +380,7 @@ function ActorAvatars({ actors }: { actors: NotificationItem[] }) {
       ))}
       {overflow > 0 && (
         <span className="text-xs text-muted-foreground font-medium pl-0.5">
-          +{overflow} more
+          {t('notifications.actorAvatars.moreCount', { count: overflow })}
         </span>
       )}
     </div>
@@ -403,6 +418,7 @@ function GroupHeader({
   icon: React.ReactNode;
   action: React.ReactNode;
 }) {
+  const { t } = useTranslation();
   // Build a human-readable subject line from the first 2 actor names
   const firstActor = actors[0];
   const secondActor = actors[1];
@@ -417,17 +433,19 @@ function GroupHeader({
     subject = <ActorLink pubkey={firstActor.event.pubkey} name={firstName} />;
   } else if (totalCount === 2) {
     subject = (
-      <>
-        <ActorLink pubkey={firstActor.event.pubkey} name={firstName} />
-        {' and '}
-        <ActorLink pubkey={secondActor.event.pubkey} name={secondName} />
-      </>
+      <Trans
+        i18nKey="notifications.subject.twoActors"
+        components={{
+          0: <ActorLink pubkey={firstActor.event.pubkey} name={firstName} />,
+          1: <ActorLink pubkey={secondActor.event.pubkey} name={secondName} />,
+        }}
+      />
     );
   } else {
     subject = (
       <>
         <ActorLink pubkey={firstActor.event.pubkey} name={firstName} />
-        {` and ${totalCount - 1} others`}
+        {t('notifications.subject.andOthers', { count: totalCount - 1 })}
       </>
     );
   }
@@ -470,9 +488,11 @@ function ActorLink({ pubkey, name }: { pubkey: string; name: string }) {
 // Like Notification (single actor)
 // ──────────────────────────────────────
 function LikeNotification({ item, isNew }: { item: NotificationItem; isNew: boolean }) {
+  const { t } = useTranslation();
+  const getNoun = useNotificationKindNoun();
   const isProfileReaction = item.referencedEvent?.kind === 0
     || item.event.tags.some(([name, value]) => name === 'a' && value?.startsWith('0:'));
-  const noun = isProfileReaction ? 'profile' : getNotificationKindNoun(item.referencedEvent?.kind);
+  const noun = isProfileReaction ? t('notifications.kinds.profile') : getNoun(item.referencedEvent?.kind);
   return (
     <NotificationWrapper isNew={isNew}>
       <div className={cn('px-4 pt-3', isProfileReaction && 'pb-3')}>
@@ -483,7 +503,7 @@ function LikeNotification({ item, isNew }: { item: NotificationItem; isNew: bool
               <ReactionEmoji content={item.event.content.trim()} tags={item.event.tags} className="inline-block h-4 w-4 object-contain" />
             </span>
           }
-          action={<ActionLink event={item.event}>{`reacted to your ${noun}`}</ActionLink>}
+          action={<ActionLink event={item.event}>{t('notifications.actions.reactedToYour', { noun })}</ActionLink>}
         />
       </div>
       {!isProfileReaction && <ReferencedNoteCard item={item} />}
@@ -495,14 +515,16 @@ function LikeNotification({ item, isNew }: { item: NotificationItem; isNew: bool
 // Repost Notification (single actor)
 // ──────────────────────────────────────
 function RepostNotification({ item, isNew }: { item: NotificationItem; isNew: boolean }) {
-  const noun = getNotificationKindNoun(item.referencedEvent?.kind);
+  const { t } = useTranslation();
+  const getNoun = useNotificationKindNoun();
+  const noun = getNoun(item.referencedEvent?.kind);
   return (
     <NotificationWrapper isNew={isNew}>
       <div className="px-4 pt-3">
         <NotificationHeader
           actorPubkey={item.event.pubkey}
           icon={<RepostIcon className="size-4 text-accent" />}
-          action={<ActionLink event={item.event}>{`reposted your ${noun}`}</ActionLink>}
+          action={<ActionLink event={item.event}>{t('notifications.actions.repostedYour', { noun })}</ActionLink>}
         />
       </div>
       <ReferencedNoteCard item={item} />
@@ -530,6 +552,7 @@ function ActionLink({ event, children }: { event: NostrEvent | undefined; childr
 }
 
 function ZapNotification({ item, isNew }: { item: NotificationItem; isNew: boolean }) {
+  const { t } = useTranslation();
   const { event } = item;
   const { user } = useCurrentUser();
 
@@ -543,7 +566,9 @@ function ZapNotification({ item, isNew }: { item: NotificationItem; isNew: boole
   );
   const senderPubkey = useMemo(() => getZapSenderPubkey(event), [event]);
 
-  const amountLabel = zapAmount > 0 ? ` ${formatNumber(zapAmount)} sats` : '';
+  const actionText = zapAmount > 0
+    ? t('notifications.actions.zappedYouWithAmount', { sats: formatNumber(zapAmount) })
+    : t('notifications.actions.zappedYou');
 
   return (
     <NotificationWrapper isNew={isNew}>
@@ -551,7 +576,7 @@ function ZapNotification({ item, isNew }: { item: NotificationItem; isNew: boole
         <NotificationHeader
           actorPubkey={senderPubkey}
           icon={<Zap className="size-4 text-amber-500 fill-amber-500" />}
-          action={<ActionLink event={event}>{`zapped you${amountLabel}`}</ActionLink>}
+          action={<ActionLink event={event}>{actionText}</ActionLink>}
         />
       </div>
       <ReferencedNoteCard item={item} />
@@ -563,11 +588,13 @@ function ZapNotification({ item, isNew }: { item: NotificationItem; isNew: boole
 // Like Notification (grouped)
 // ──────────────────────────────────────
 function LikeNotificationGroup({ group }: { group: GroupedNotificationItem }) {
+  const { t } = useTranslation();
+  const getNoun = useNotificationKindNoun();
   // Use the first actor's reaction emoji as the icon
   const firstEvent = group.actors[0].event;
   const isProfileReaction = group.referencedEvent?.kind === 0
     || firstEvent.tags.some(([name, value]) => name === 'a' && value?.startsWith('0:'));
-  const noun = isProfileReaction ? 'profile' : getNotificationKindNoun(group.referencedEvent?.kind);
+  const noun = isProfileReaction ? t('notifications.kinds.profile') : getNoun(group.referencedEvent?.kind);
   return (
     <NotificationWrapper isNew={group.isNew}>
       <GroupHeader
@@ -577,7 +604,7 @@ function LikeNotificationGroup({ group }: { group: GroupedNotificationItem }) {
             <ReactionEmoji content={firstEvent.content.trim()} tags={firstEvent.tags} className="inline-block h-4 w-4 object-contain" />
           </span>
         }
-        action={<ActionLink event={firstEvent}>{`reacted to your ${noun}`}</ActionLink>}
+        action={<ActionLink event={firstEvent}>{t('notifications.actions.reactedToYour', { noun })}</ActionLink>}
       />
       {!isProfileReaction && <ReferencedNoteCard item={group.actors[0]} />}
     </NotificationWrapper>
@@ -588,13 +615,15 @@ function LikeNotificationGroup({ group }: { group: GroupedNotificationItem }) {
 // Repost Notification (grouped)
 // ──────────────────────────────────────
 function RepostNotificationGroup({ group }: { group: GroupedNotificationItem }) {
-  const noun = getNotificationKindNoun(group.referencedEvent?.kind);
+  const { t } = useTranslation();
+  const getNoun = useNotificationKindNoun();
+  const noun = getNoun(group.referencedEvent?.kind);
   return (
     <NotificationWrapper isNew={group.isNew}>
       <GroupHeader
         actors={group.actors}
         icon={<RepostIcon className="size-4 text-accent" />}
-        action={<ActionLink event={group.actors[0].event}>{`reposted your ${noun}`}</ActionLink>}
+        action={<ActionLink event={group.actors[0].event}>{t('notifications.actions.repostedYour', { noun })}</ActionLink>}
       />
       <ReferencedNoteCard item={group.actors[0]} />
     </NotificationWrapper>
@@ -605,6 +634,7 @@ function RepostNotificationGroup({ group }: { group: GroupedNotificationItem }) 
 // Zap Notification (grouped)
 // ──────────────────────────────────────
 function ZapNotificationGroup({ group }: { group: GroupedNotificationItem }) {
+  const { t } = useTranslation();
   const { user } = useCurrentUser();
   // Sum zap amounts across all actors in the group. Mixes lightning (9735)
   // and on-chain (8333) zaps — both contribute their sat value to the total.
@@ -631,14 +661,16 @@ function ZapNotificationGroup({ group }: { group: GroupedNotificationItem }) {
     });
   }, [group.actors]);
 
-  const amountLabel = totalSats > 0 ? ` ${formatNumber(totalSats)} sats` : '';
+  const actionText = totalSats > 0
+    ? t('notifications.actions.zappedYouWithAmount', { sats: formatNumber(totalSats) })
+    : t('notifications.actions.zappedYou');
 
   return (
     <NotificationWrapper isNew={group.isNew}>
       <GroupHeader
         actors={zapActors}
         icon={<Zap className="size-4 text-amber-500 fill-amber-500" />}
-        action={<ActionLink event={group.actors[0].event}>{`zapped you${amountLabel}`}</ActionLink>}
+        action={<ActionLink event={group.actors[0].event}>{actionText}</ActionLink>}
       />
       <ReferencedNoteCard item={group.actors[0]} />
     </NotificationWrapper>
@@ -649,6 +681,7 @@ function ZapNotificationGroup({ group }: { group: GroupedNotificationItem }) {
 // Kind 1 Notification (reply or mention, always standalone)
 // ──────────────────────────────────────
 function MentionNotification({ item, isNew }: { item: NotificationItem; isNew: boolean }) {
+  const { t } = useTranslation();
   const isReply = isReplyEvent(item.event);
 
   return (
@@ -660,7 +693,7 @@ function MentionNotification({ item, isNew }: { item: NotificationItem; isNew: b
             ? <MessageCircle className="size-4 text-primary" />
             : <AtSign className="size-4 text-primary" />
           }
-          action={isReply ? 'replied to your note' : 'mentioned you'}
+          action={isReply ? t('notifications.actions.repliedToYourNote') : t('notifications.actions.mentionedYou')}
         />
       </div>
       <NoteCard event={item.event} className="border-0" />
@@ -672,12 +705,16 @@ function MentionNotification({ item, isNew }: { item: NotificationItem; isNew: b
 // Comment Notification (kind 1111, always standalone)
 // ──────────────────────────────────────
 function CommentNotification({ item, isNew }: { item: NotificationItem; isNew: boolean }) {
+  const { t } = useTranslation();
+  const getNoun = useNotificationKindNoun();
   // If the parent kind tag is "1111", this is a reply to a comment; otherwise it's a
   // top-level comment on a piece of content the user authored.
   const parentKind = item.event.tags.find(([name]) => name === 'k')?.[1];
   const parentKindNum = parentKind ? parseInt(parentKind, 10) : undefined;
-  const noun = getNotificationKindNoun(isNaN(parentKindNum as number) ? undefined : parentKindNum);
-  const action = parentKind === '1111' ? 'replied to your comment' : `commented on your ${noun}`;
+  const noun = getNoun(isNaN(parentKindNum as number) ? undefined : parentKindNum);
+  const action = parentKind === '1111'
+    ? t('notifications.actions.repliedToYourComment')
+    : t('notifications.actions.commentedOnYour', { noun });
 
   return (
     <NotificationWrapper isNew={isNew}>
@@ -697,6 +734,7 @@ function CommentNotification({ item, isNew }: { item: NotificationItem; isNew: b
 // Letter Notification (kind 8211, always standalone)
 // ──────────────────────────────────────
 function LetterNotification({ item, isNew }: { item: NotificationItem; isNew: boolean }) {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [showDetail, setShowDetail] = useState(false);
 
@@ -715,7 +753,7 @@ function LetterNotification({ item, isNew }: { item: NotificationItem; isNew: bo
           <NotificationHeader
             actorPubkey={item.event.pubkey}
             icon={<Mail className="size-4 text-primary" />}
-            action="sent you a letter"
+            action={t('notifications.actions.sentYouLetter')}
           />
         </div>
         <div className="flex flex-col items-center gap-3 px-4 pb-4 pt-2">
@@ -735,7 +773,7 @@ function LetterNotification({ item, isNew }: { item: NotificationItem; isNew: bo
               onClick={() => navigate('/letters')}
             >
               <Mail className="size-3.5" />
-              View all letters
+              {t('notifications.letter.viewAll')}
             </Button>
             <Button
               variant="default"
@@ -743,7 +781,7 @@ function LetterNotification({ item, isNew }: { item: NotificationItem; isNew: bo
               onClick={() => navigate(`/letters/compose?to=${nip19.npubEncode(item.event.pubkey)}`)}
             >
               <InkPenIcon className="size-3.5" strokeWidth={2} />
-              Reply
+              {t('notifications.letter.reply')}
             </Button>
           </div>
         </div>
@@ -798,14 +836,16 @@ function HighlightExcerpt({ event }: { event: NostrEvent }) {
 }
 
 function HighlightNotification({ item, isNew }: { item: NotificationItem; isNew: boolean }) {
-  const noun = getNotificationKindNoun(item.referencedEvent?.kind);
+  const { t } = useTranslation();
+  const getNoun = useNotificationKindNoun();
+  const noun = getNoun(item.referencedEvent?.kind);
   return (
     <NotificationWrapper isNew={isNew}>
       <div className="px-4 pt-3">
         <NotificationHeader
           actorPubkey={item.event.pubkey}
           icon={<Highlighter className="size-4 text-primary" />}
-          action={`highlighted your ${noun}`}
+          action={t('notifications.actions.highlightedYour', { noun })}
         />
       </div>
       <HighlightExcerpt event={item.event} />
@@ -815,17 +855,19 @@ function HighlightNotification({ item, isNew }: { item: NotificationItem; isNew:
 }
 
 function HighlightNotificationGroup({ group }: { group: GroupedNotificationItem }) {
+  const { t } = useTranslation();
+  const getNoun = useNotificationKindNoun();
   // Grouping is keyed by (highlight event id), so in practice every group
   // here contains one actor — keep the group fallback just in case the
   // grouping policy changes.
-  const noun = getNotificationKindNoun(group.referencedEvent?.kind);
+  const noun = getNoun(group.referencedEvent?.kind);
   const first = group.actors[0];
   return (
     <NotificationWrapper isNew={group.isNew}>
       <GroupHeader
         actors={group.actors}
         icon={<Highlighter className="size-4 text-primary" />}
-        action={`highlighted your ${noun}`}
+        action={t('notifications.actions.highlightedYour', { noun })}
       />
       {first && <HighlightExcerpt event={first.event} />}
       {first && <ReferencedNoteCard item={first} />}
@@ -857,6 +899,7 @@ function useBadgeAward(awardEvent: NostrEvent): { name: string | undefined; badg
 // Badge Award Notification (single actor)
 // ──────────────────────────────────────
 function BadgeAwardNotification({ item, isNew }: { item: NotificationItem; isNew: boolean }) {
+  const { t } = useTranslation();
   const { definitionEvent } = useBadgeAward(item.event);
   const parsed = useMemo(() => parseBadgeATag(item.event), [item.event]);
   const badgeNaddr = useMemo(
@@ -870,7 +913,7 @@ function BadgeAwardNotification({ item, isNew }: { item: NotificationItem; isNew
         <NotificationHeader
           actorPubkey={item.event.pubkey}
           icon={<Award className="size-4 text-primary" />}
-          action="awarded you a badge"
+          action={t('notifications.actions.awardedBadge')}
         />
       </div>
       {definitionEvent && (
@@ -889,6 +932,7 @@ function BadgeAwardNotification({ item, isNew }: { item: NotificationItem; isNew
 // Badge Award Notification (grouped)
 // ──────────────────────────────────────
 function BadgeAwardNotificationGroup({ group }: { group: GroupedNotificationItem }) {
+  const { t } = useTranslation();
   const badgeRefs = useMemo(() => {
     const refs: Array<{ pubkey: string; identifier: string }> = [];
     for (const actor of group.actors) {
@@ -905,7 +949,7 @@ function BadgeAwardNotificationGroup({ group }: { group: GroupedNotificationItem
       <GroupHeader
         actors={group.actors}
         icon={<Award className="size-4 text-primary" />}
-        action="awarded you badges"
+        action={t('notifications.actions.awardedBadges')}
       />
       <div className="px-4 pb-3 space-y-2">
         {group.actors.map((actor) => {

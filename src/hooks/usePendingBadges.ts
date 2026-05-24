@@ -7,7 +7,7 @@ import { useProfileBadges } from '@/hooks/useProfileBadges';
 import { BADGE_AWARD_KIND } from '@/lib/badgeUtils';
 
 /** A pending (unaccepted) badge award. */
-export interface PendingBadge {
+interface PendingBadge {
   /** The `a` tag from the award event referencing the badge definition. */
   aTag: string;
   /** The kind 8 award event. */

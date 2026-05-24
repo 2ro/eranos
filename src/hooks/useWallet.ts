@@ -2,7 +2,7 @@ import { useMemo } from 'react';
 import { useNWC } from '@/hooks/useNWCContext';
 import type { WebLNProvider } from '@webbtc/webln-types';
 
-export interface WalletStatus {
+interface WalletStatus {
   hasNWC: boolean;
   webln: WebLNProvider | null;
   activeNWC: ReturnType<typeof useNWC>['getActiveConnection'] extends () => infer T ? T : null;

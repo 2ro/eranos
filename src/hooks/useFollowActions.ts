@@ -12,7 +12,7 @@ import type { NostrEvent } from '@nostrify/nostrify';
 // useFollowList — cached view of the user's follow list for UI reads
 // ---------------------------------------------------------------------------
 
-export interface FollowListData {
+interface FollowListData {
   /** The raw kind 3 event (null if none found). */
   event: NostrEvent | null;
   /** All pubkeys from `p` tags. */
@@ -81,7 +81,7 @@ export function useFollowList() {
 // useFollowActions — safe follow / unfollow mutation
 // ---------------------------------------------------------------------------
 
-export interface UseFollowActionsReturn {
+interface UseFollowActionsReturn {
   /** Whether a follow/unfollow mutation is in progress. */
   isPending: boolean;
   /** Follow a pubkey. Fetches the freshest kind 3 first, then publishes. */

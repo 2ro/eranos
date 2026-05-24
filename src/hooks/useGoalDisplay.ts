@@ -10,7 +10,7 @@ import { useGoalProgress } from '@/hooks/useGoalProgress';
 import { useNow } from '@/hooks/useNow';
 import { useProfileUrl } from '@/hooks/useProfileUrl';
 
-export interface GoalDisplayData {
+interface GoalDisplayData {
   expired: boolean;
   funded: boolean;
   currentSats: number;

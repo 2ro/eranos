@@ -10,7 +10,7 @@ import {
 } from '@/lib/communityUtils';
 import { dedupeAddressableLatest } from '@/lib/addressableEvents';
 
-export interface FeaturedOrganization {
+interface FeaturedOrganization {
   community: ParsedCommunity;
   event: NostrEvent;
 }

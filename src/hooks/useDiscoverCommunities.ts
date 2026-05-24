@@ -1,6 +1,5 @@
 import { useNostr } from '@nostrify/react';
 import { useQuery } from '@tanstack/react-query';
-import { useMemo } from 'react';
 import type { NostrEvent } from '@nostrify/nostrify';
 
 import {
@@ -67,19 +66,3 @@ export function useDiscoverCommunities(options: UseDiscoverCommunitiesOptions = 
   });
 }
 
-/**
- * Pulls a stable list of communities with banner art, used to seed the
- * Discover page hero gallery. Returns the first `n` parsed communities
- * that have a non-empty `image`.
- */
-export function useDiscoverCommunityImages(communities: ParsedCommunity[] | undefined, n: number) {
-  return useMemo(() => {
-    if (!communities) return [];
-    const urls: string[] = [];
-    for (const c of communities) {
-      if (c.image) urls.push(c.image);
-      if (urls.length >= n) break;
-    }
-    return urls;
-  }, [communities, n]);
-}

@@ -1,12 +1,11 @@
 import type { FeedSettings } from '@/contexts/AppContext';
-import type { NostrEvent } from '@nostrify/nostrify';
 import type { ComponentType } from 'react';
 import { Bird, CircleAlert, GitPullRequestArrow, Globe, Megaphone, MessageSquareMore, Stars, UserCheck, Users } from 'lucide-react';
 import { RepostIcon } from '@/components/icons/RepostIcon';
 import { CONTENT_KIND_ICONS } from '@/lib/sidebarItems';
 
 /** A sub-kind that lives under a parent ExtraKindDef. */
-export interface SubKindDef {
+interface SubKindDef {
   kind: number;
   /** Key in FeedSettings that controls visibility within the parent page. */
   showKey: keyof FeedSettings;
@@ -23,7 +22,7 @@ export interface SubKindDef {
 }
 
 /** An external site where users can create or participate in a specific kind. */
-export interface ExtraKindSite {
+interface ExtraKindSite {
   /** Full URL to the site. */
   url: string;
   /** Display name override. Defaults to the first segment of the hostname, capitalized. */
@@ -31,22 +30,10 @@ export interface ExtraKindSite {
 }
 
 /** Section labels for grouping extra kinds in settings UI. */
-export type ExtraKindSection = 'feed' | 'media' | 'social' | 'development' | 'whimsy';
-
-/** Display labels for each section. */
-export const SECTION_LABELS: Record<ExtraKindSection, string> = {
-  feed: 'Feed',
-  media: 'Media',
-  social: 'Social',
-  development: 'Development',
-  whimsy: 'Whimsy',
-};
-
-/** Ordered list of sections for the "Other Stuff" settings UI. */
-export const SECTION_ORDER: ExtraKindSection[] = ['media', 'social', 'development', 'whimsy'];
+type ExtraKindSection = 'feed' | 'media' | 'social' | 'development' | 'whimsy';
 
 /** Metadata for an extra (non-kind-1) content type. */
-export interface ExtraKindDef {
+interface ExtraKindDef {
   kind: number;
   /** Unique identifier for this content type. Used in sidebar ordering and icon maps. */
   id: string;
@@ -539,14 +526,6 @@ export const EXTRA_KINDS: ExtraKindDef[] = [
   },
 ];
 
-/** Lookup an ExtraKindDef by its `id` field. */
-export function getExtraKindDef(id: string): ExtraKindDef | undefined {
-  return EXTRA_KINDS.find((d) => d.id === id);
-}
-
-/** Entries rendered in the "Notes" section (Posts, Reposts, Articles). */
-export const FEED_KINDS: ExtraKindDef[] = EXTRA_KINDS.filter((def) => def.section === 'feed');
-
 /** Return the kind numbers the user has opted to include in mixed feeds. */
 export function getEnabledFeedKinds(feedSettings: FeedSettings): number[] {
   const kinds: number[] = [];
@@ -570,15 +549,6 @@ export function getEnabledFeedKinds(feedSettings: FeedSettings): number[] {
   }
 
   return kinds;
-}
-
-/** Return the kinds enabled for a specific extra-kind page (respecting sub-kind toggles). */
-export function getPageKinds(def: ExtraKindDef, feedSettings: FeedSettings): number[] {
-  if (!def.subKinds) return [def.kind];
-
-  return def.subKinds
-    .filter((sub) => feedSettings[sub.showKey])
-    .flatMap((sub) => sub.extraFeedKinds ? [sub.kind, ...sub.extraFeedKinds] : [sub.kind]);
 }
 
 /**
@@ -670,11 +640,6 @@ for (const def of EXTRA_KINDS) {
   }
 }
 
-/** Get the sidebar/content-type ID for a given kind number, if any. */
-export function getKindId(kind: number): string | undefined {
-  return KIND_TO_ID.get(kind);
-}
-
 /**
  * Get the icon component for a given kind number.
  * Checks KIND_SPECIFIC_ICONS first, then falls back to the parent def's icon via CONTENT_KIND_ICONS.
@@ -687,40 +652,3 @@ export function getKindIcon(kind: number): ComponentType<{ className?: string }>
   return CONTENT_KIND_ICONS[id];
 }
 
-/** Return all extra kind numbers (regardless of settings). */
-export function getAllExtraKindNumbers(): number[] {
-  const kinds: number[] = [];
-
-  for (const def of EXTRA_KINDS) {
-    if (def.subKinds) {
-      for (const sub of def.subKinds) {
-        if (!kinds.includes(sub.kind)) kinds.push(sub.kind);
-        if (sub.extraFeedKinds) {
-          for (const k of sub.extraFeedKinds) {
-            if (!kinds.includes(k)) kinds.push(k);
-          }
-        }
-      }
-    } else {
-      kinds.push(def.kind);
-    }
-  }
-
-  return kinds;
-}
-
-/**
- * Extract the NIP-31 `alt` tag — the author's own human-readable fallback
- * text for clients that don't know how to render the event's kind.
- *
- * Only `alt` is consulted. Other tags (`title`, `name`, `summary`,
- * `description`, `d`) are intentionally excluded: they have kind-specific
- * semantics and are not guaranteed to be safe user-facing text. When `alt`
- * is missing, callers should render a neutral "unsupported kind" tombstone.
- *
- * Returns `undefined` if the event has no `alt` tag (or it's blank).
- */
-export function getEventFallbackText(event: NostrEvent): string | undefined {
-  const alt = event.tags.find(([n]) => n === 'alt')?.[1];
-  return alt && alt.trim().length > 0 ? alt.trim() : undefined;
-}

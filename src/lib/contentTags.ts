@@ -1,6 +1,6 @@
 const EXCLUDED_CONTENT_TAGS = new Set(['agora']);
 
-export function normalizeContentTag(value: string): string {
+function normalizeContentTag(value: string): string {
   return value.trim().replace(/^#+/, '').toLowerCase().replace(/\s+/g, '-');
 }
 

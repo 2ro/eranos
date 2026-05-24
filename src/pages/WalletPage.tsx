@@ -1,6 +1,7 @@
 import { useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useSeoMeta } from '@unhead/react';
+import { useTranslation, Trans } from 'react-i18next';
 import {
   Copy,
   Check,
@@ -36,6 +37,7 @@ import { satsToUSD, formatBTC } from '@/lib/bitcoin';
 import type { HdTransaction } from '@/lib/hdwallet/scan';
 
 export function WalletPage() {
+  const { t } = useTranslation();
   const { config } = useAppContext();
   const {
     availability,
@@ -61,8 +63,8 @@ export function WalletPage() {
   const [spScanOpen, setSpScanOpen] = useState(false);
 
   useSeoMeta({
-    title: `Wallet | ${config.appName}`,
-    description: 'Hierarchical-deterministic Bitcoin wallet derived from your Nostr nsec.',
+    title: `${t('wallet.seoTitle')} | ${config.appName}`,
+    description: t('wallet.seoDescription'),
   });
 
   const address = currentReceiveAddress?.address ?? '';
@@ -107,13 +109,12 @@ export function WalletPage() {
             <KeyRound className="size-8 text-primary" />
           </div>
           <div className="space-y-2 max-w-xs">
-            <h2 className="text-xl font-bold">Bitcoin Wallet</h2>
+            <h2 className="text-xl font-bold">{t('wallet.loggedOut.title')}</h2>
             <p className="text-muted-foreground text-sm">
-              A hierarchical wallet derived from your Nostr identity. Fresh address per receive,
-              full transaction history, no address reuse.
+              {t('wallet.loggedOut.description')}
             </p>
             <p className="text-muted-foreground text-xs pt-2">
-              Requires login with an nsec (your Nostr private key).
+              {t('wallet.loggedOut.requiresNsec')}
             </p>
           </div>
           <LoginArea className="max-w-60" />
@@ -131,16 +132,16 @@ export function WalletPage() {
             <ShieldOff className="size-8 text-muted-foreground" />
           </div>
           <div className="space-y-2">
-            <h2 className="text-xl font-bold">Wallet unavailable</h2>
+            <h2 className="text-xl font-bold">{t('wallet.unsupported.title')}</h2>
             <p className="text-muted-foreground text-sm">
               {availability.loginType === 'extension'
-                ? 'Your browser extension keeps your secret key isolated, so we can\'t derive child keys for your wallet.'
+                ? t('wallet.unsupported.extension')
                 : availability.loginType === 'bunker'
-                  ? 'Your remote signer (NIP-46 bunker) keeps your secret key on the bunker side, so we can\'t derive child keys for your wallet.'
-                  : "Your login type doesn't expose the secret key needed to derive your wallet."}
+                  ? t('wallet.unsupported.bunker')
+                  : t('wallet.unsupported.other')}
             </p>
             <p className="text-muted-foreground text-sm pt-2">
-              Log out and sign in again with your nsec to use the wallet.
+              {t('wallet.unsupported.instructions')}
             </p>
           </div>
         </div>
@@ -160,10 +161,10 @@ export function WalletPage() {
           </div>
         ) : error ? (
           <div className="text-center space-y-3">
-            <p className="text-sm text-destructive">Failed to scan wallet</p>
+            <p className="text-sm text-destructive">{t('wallet.scanFailed')}</p>
             <Button variant="outline" size="sm" onClick={() => refetch()}>
               <RefreshCw className="size-3.5 mr-1.5" />
-              Retry
+              {t('wallet.retry')}
             </Button>
           </div>
         ) : (
@@ -172,8 +173,8 @@ export function WalletPage() {
             onClick={() => refetch()}
             disabled={isFetching}
             className="flex flex-col items-center space-y-1 group cursor-pointer disabled:cursor-default rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring px-4 py-2"
-            aria-label="Refresh balance"
-            title="Click to refresh balance"
+            aria-label={t('wallet.refreshBalance')}
+            title={t('wallet.refreshBalanceTitle')}
           >
             <span className="text-4xl font-bold tracking-tight group-hover:opacity-80 transition-opacity flex items-center gap-2">
               {btcPrice ? satsToUSD(totalBalance, btcPrice) : '---'}
@@ -189,8 +190,8 @@ export function WalletPage() {
               <span className="flex items-center gap-1 text-xs text-orange-500 dark:text-orange-400 pt-1">
                 <RefreshCw className="size-3 animate-spin" />
                 {btcPrice
-                  ? `${satsToUSD(Math.abs(pendingBalance), btcPrice)} pending`
-                  : 'pending'}
+                  ? t('wallet.amountPending', { amount: satsToUSD(Math.abs(pendingBalance), btcPrice) })
+                  : t('wallet.pending')}
               </span>
             )}
           </button>
@@ -206,7 +207,7 @@ export function WalletPage() {
               className="rounded-full"
             >
               <Send className="size-3.5 mr-1.5" />
-              Send
+              {t('wallet.send')}
             </Button>
             <Button
               variant="outline"
@@ -216,7 +217,7 @@ export function WalletPage() {
               disabled={!address}
             >
               <ArrowDownLeft className="size-3.5 mr-1.5" />
-              Receive
+              {t('wallet.receive')}
             </Button>
           </div>
         )}
@@ -233,17 +234,17 @@ export function WalletPage() {
         <Dialog open={receiveOpen} onOpenChange={setReceiveOpen}>
           <DialogContent className="sm:max-w-sm">
             <DialogHeader>
-              <DialogTitle>Receive Bitcoin</DialogTitle>
+              <DialogTitle>{t('wallet.receiveDialog.title')}</DialogTitle>
               <DialogDescription>
-                Share an address to receive bitcoin.
+                {t('wallet.receiveDialog.description')}
               </DialogDescription>
             </DialogHeader>
 
             <Tabs defaultValue="onchain" className="w-full">
               <TabsList className="grid w-full grid-cols-2">
-                <TabsTrigger value="onchain">On-chain</TabsTrigger>
+                <TabsTrigger value="onchain">{t('wallet.receiveDialog.onChain')}</TabsTrigger>
                 <TabsTrigger value="silent" disabled={!spAddress}>
-                  Silent payment
+                  {t('wallet.receiveDialog.silentPayment')}
                 </TabsTrigger>
               </TabsList>
 
@@ -252,8 +253,7 @@ export function WalletPage() {
                 {address && (
                   <div className="flex flex-col items-center gap-4">
                     <p className="text-xs text-muted-foreground text-center max-w-xs">
-                      Fresh address each time. Bump to a new index after sharing
-                      for privacy.
+                      {t('wallet.receiveDialog.onChainIntro')}
                     </p>
 
                     <div className="rounded-2xl bg-white p-4 shadow-sm">
@@ -273,13 +273,13 @@ export function WalletPage() {
                     </button>
 
                     <div className="flex items-center gap-3 text-xs text-muted-foreground">
-                      <span>Address #{currentReceiveAddress?.index ?? 0}</span>
+                      <span>{t('wallet.receiveDialog.addressIndex', { index: currentReceiveAddress?.index ?? 0 })}</span>
                       <span aria-hidden>·</span>
                       <button
                         onClick={() => nextReceiveAddress()}
                         className="hover:text-foreground underline-offset-4 hover:underline transition-colors cursor-pointer"
                       >
-                        New address
+                        {t('wallet.receiveDialog.newAddress')}
                       </button>
                     </div>
                   </div>
@@ -291,8 +291,7 @@ export function WalletPage() {
                 {spAddress && (
                   <div className="flex flex-col items-center gap-4">
                     <p className="text-xs text-muted-foreground text-center max-w-xs">
-                      Static receive identifier. Share once and reuse forever —
-                      senders derive a unique on-chain address per payment.
+                      {t('wallet.receiveDialog.silentIntro')}
                     </p>
 
                     <div className="rounded-2xl bg-white p-4 shadow-sm">
@@ -313,20 +312,24 @@ export function WalletPage() {
 
                     {sp.unavailableReason === 'no-indexer' ? (
                       <p className="text-xs text-orange-500 dark:text-orange-400 text-center max-w-xs">
-                        Scanning disabled — no BIP-352 indexer configured. Set{' '}
-                        <span className="font-mono">bip352IndexerUrl</span> in your app config to
-                        detect incoming silent payments.
+                        <Trans
+                          i18nKey="wallet.receiveDialog.noIndexer"
+                          components={{ 0: <span className="font-mono" /> }}
+                        />
                       </p>
                     ) : sp.enabled ? (
                       <div className="flex flex-col items-center gap-2 w-full">
                         {sp.balance > 0 && (
                           <p className="text-xs text-muted-foreground text-center">
-                            Silent payment balance:{' '}
-                            <span className="text-foreground font-medium">
-                              {btcPrice
-                                ? satsToUSD(sp.balance, btcPrice)
-                                : `${formatBTC(sp.balance)} BTC`}
-                            </span>
+                            <Trans
+                              i18nKey="wallet.receiveDialog.silentBalance"
+                              values={{
+                                amount: btcPrice
+                                  ? satsToUSD(sp.balance, btcPrice)
+                                  : `${formatBTC(sp.balance)} BTC`,
+                              }}
+                              components={{ 0: <span className="text-foreground font-medium" /> }}
+                            />
                           </p>
                         )}
                         <Button
@@ -337,8 +340,8 @@ export function WalletPage() {
                         >
                           <Radar className="size-3.5 mr-1.5" />
                           {sp.storage?.scanHeight && sp.storage.scanHeight > 0
-                            ? 'Scan for new payments'
-                            : 'Scan for payments'}
+                            ? t('wallet.receiveDialog.scanForNew')
+                            : t('wallet.receiveDialog.scanForPayments')}
                         </Button>
                       </div>
                     ) : null}
@@ -356,7 +359,7 @@ export function WalletPage() {
               onClick={() => setTxOpen((o) => !o)}
               className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
             >
-              Transactions
+              {t('wallet.transactions')}
               <ChevronDown className={`size-3 transition-transform duration-200 ${txOpen ? 'rotate-180' : ''}`} />
             </button>
 
@@ -392,8 +395,8 @@ function TxAccordion({ open, children }: { open: boolean; children: React.ReactN
   );
 }
 
-function formatTxDate(timestamp?: number): string {
-  if (!timestamp) return 'Pending';
+function formatTxDate(timestamp: number | undefined, t: (key: string, options?: Record<string, unknown>) => string, locale: string): string {
+  if (!timestamp) return t('wallet.tx.pending');
   const date = new Date(timestamp * 1000);
   const now = new Date();
   // Clamp negative diffs (timestamp slightly in the future) to "Today" rather
@@ -403,13 +406,18 @@ function formatTxDate(timestamp?: number): string {
     0,
     Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60 * 24)),
   );
-  if (diffDays === 0) return 'Today';
-  if (diffDays === 1) return 'Yesterday';
-  if (diffDays < 7) return `${diffDays}d ago`;
-  return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+  if (diffDays === 0) return t('wallet.tx.today');
+  if (diffDays === 1) return t('wallet.tx.yesterday');
+  if (diffDays < 7) return t('wallet.tx.daysAgo', { count: diffDays });
+  try {
+    return date.toLocaleDateString(locale, { month: 'short', day: 'numeric' });
+  } catch {
+    return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+  }
 }
 
 function TxRow({ tx, btcPrice }: { tx: HdTransaction; btcPrice?: number }) {
+  const { t, i18n } = useTranslation();
   const isReceive = tx.type === 'receive';
   const isSilent = tx.source === 'silent-payment';
   return (
@@ -429,18 +437,18 @@ function TxRow({ tx, btcPrice }: { tx: HdTransaction; btcPrice?: number }) {
         </div>
         <div>
           <p className="text-sm font-medium flex items-center gap-1.5">
-            {isReceive ? 'Received' : 'Sent'}
+            {isReceive ? t('wallet.tx.received') : t('wallet.tx.sent')}
             {isSilent && (
               <span
                 className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-1.5 py-0.5 text-[10px] font-medium text-primary"
-                title="Detected via BIP-352 silent payment scan"
+                title={t('wallet.tx.silentDetectedTitle')}
               >
                 <Radar className="size-2.5" />
-                silent
+                {t('wallet.tx.silentBadge')}
               </span>
             )}
           </p>
-          <p className="text-xs text-muted-foreground">{formatTxDate(tx.timestamp)}</p>
+          <p className="text-xs text-muted-foreground">{formatTxDate(tx.timestamp, t, i18n.language)}</p>
         </div>
       </div>
       <div className="text-right">

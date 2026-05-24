@@ -1,5 +1,5 @@
-import { Check, ChevronDown, Globe, Sparkles, Users } from 'lucide-react';
-import type { ComponentType } from 'react';
+import { Check, ChevronDown, Globe, Users } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 import {
   DropdownMenu,
@@ -17,15 +17,32 @@ import { cn } from '@/lib/utils';
 
 interface FeedModeOption {
   mode: FeedMode;
-  label: string;
-  icon: ComponentType<{ className?: string }>;
+  /** Translation key suffix under `feed.modeSwitcher`. */
+  i18nKey: 'agora' | 'allNostr' | 'following';
 }
 
 const OPTIONS: FeedModeOption[] = [
-  { mode: 'agora', label: 'Agora', icon: Sparkles },
-  { mode: 'all-nostr', label: 'All Nostr', icon: Globe },
-  { mode: 'following', label: 'Following', icon: Users },
+  { mode: 'agora', i18nKey: 'agora' },
+  { mode: 'all-nostr', i18nKey: 'allNostr' },
+  { mode: 'following', i18nKey: 'following' },
 ];
+
+function FeedModeIcon({ mode, className }: { mode: FeedMode; className?: string }) {
+  if (mode === 'agora') {
+    return (
+      <span
+        className={cn(
+          "inline-block shrink-0 bg-current [mask-image:url('/logo.svg')] [mask-position:center] [mask-repeat:no-repeat] [mask-size:contain]",
+          className,
+        )}
+        aria-hidden
+      />
+    );
+  }
+
+  const Icon = mode === 'following' ? Users : Globe;
+  return <Icon className={cn('shrink-0', className)} aria-hidden />;
+}
 
 interface FeedModeSwitcherProps {
   value: FeedMode;
@@ -54,7 +71,9 @@ export function FeedModeSwitcher({
   onLoginRequested,
   className,
 }: FeedModeSwitcherProps) {
+  const { t } = useTranslation();
   const active = OPTIONS.find((opt) => opt.mode === value) ?? OPTIONS[0];
+  const activeLabel = t(`feed.modeSwitcher.${active.i18nKey}`);
 
   return (
     <DropdownMenu>
@@ -65,10 +84,17 @@ export function FeedModeSwitcher({
           'focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background',
           className,
         )}
-        aria-label={`Feed mode: ${active.label}. Click to change.`}
+        aria-label={t('feed.modeSwitcher.ariaLabel', { label: activeLabel })}
       >
-        <span className="text-2xl sm:text-3xl font-bold tracking-tight leading-none">
-          {active.label}
+        <FeedModeIcon
+          mode={active.mode}
+          className={cn('size-6 sm:size-7', active.mode === 'agora' ? 'text-primary' : 'text-muted-foreground')}
+        />
+        <span className={cn(
+          'text-2xl sm:text-3xl font-bold tracking-tight leading-none',
+          active.mode === 'agora' && 'text-primary',
+        )}>
+          {activeLabel}
         </span>
         <ChevronDown
           className="size-5 text-muted-foreground motion-safe:transition-transform group-data-[state=open]:rotate-180"
@@ -77,7 +103,7 @@ export function FeedModeSwitcher({
       </DropdownMenuTrigger>
       <DropdownMenuContent align="start" sideOffset={8} className="w-56 p-1.5">
         {OPTIONS.map((opt) => {
-          const Icon = opt.icon;
+          const label = t(`feed.modeSwitcher.${opt.i18nKey}`);
           const isActive = opt.mode === value;
           const isFollowing = opt.mode === 'following';
           const disabled = isFollowing && !followingAvailable;
@@ -101,8 +127,11 @@ export function FeedModeSwitcher({
               )}
               data-disabled={disabled || undefined}
             >
-              <Icon className="size-4 shrink-0 text-muted-foreground" aria-hidden />
-              <span className="flex-1 text-sm font-medium">{opt.label}</span>
+              <FeedModeIcon
+                mode={opt.mode}
+                className={cn('size-4', opt.mode === 'agora' ? 'text-primary' : 'text-muted-foreground')}
+              />
+              <span className={cn('flex-1 text-sm font-medium', opt.mode === 'agora' && 'text-primary')}>{label}</span>
               {isActive && <Check className="size-4 shrink-0 text-primary" aria-hidden />}
             </DropdownMenuItem>
           );
@@ -112,7 +141,7 @@ export function FeedModeSwitcher({
               <Tooltip key={opt.mode}>
                 <TooltipTrigger asChild>{itemContent}</TooltipTrigger>
                 <TooltipContent side="right">
-                  Log in to see posts from people you follow
+                  {t('feed.modeSwitcher.loginRequired')}
                 </TooltipContent>
               </Tooltip>
             );

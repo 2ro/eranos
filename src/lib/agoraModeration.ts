@@ -29,7 +29,7 @@ export type ModerationLabel =
   | 'unfeatured';
 
 /** A single label event narrowed to its decision axis. */
-export interface AxisDecision {
+interface AxisDecision {
   /** Latest label observed on this axis. */
   label: ModerationLabel;
   /** Author of the latest label. */

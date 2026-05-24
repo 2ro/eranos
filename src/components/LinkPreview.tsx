@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { Skeleton } from '@/components/ui/skeleton';
 import { ExternalFavicon } from '@/components/ExternalFavicon';
 import { useLinkPreview } from '@/hooks/useLinkPreview';
+import { useImageProxy } from '@/hooks/useImageProxy';
+import { useAppContext } from '@/hooks/useAppContext';
 import { cn } from '@/lib/utils';
 
 interface LinkPreviewProps {
@@ -30,6 +32,12 @@ function displayDomain(url: string): string {
 export function LinkPreview({ url, className, hideImage, navigateToComments, showActions = true }: LinkPreviewProps) {
   const { data, isLoading } = useLinkPreview(url);
   const navigate = useNavigate();
+  const proxy = useImageProxy();
+  const { config } = useAppContext();
+
+  // In low-bandwidth mode, suppress the preview thumbnail — the card still
+  // renders the title/description/domain, just no image.
+  const suppressImage = hideImage || config.lowBandwidthMode;
 
   if (isLoading) {
     return <LinkPreviewSkeleton className={className} />;
@@ -58,10 +66,10 @@ export function LinkPreview({ url, className, hideImage, navigateToComments, sho
       onClick={handleClick}
     >
       {/* Thumbnail image */}
-      {image && !hideImage && (
+      {image && !suppressImage && (
         <div className="w-full overflow-hidden">
           <img
-            src={image}
+            src={proxy(image, 400)}
             alt=""
             className="w-full h-[180px] object-cover"
             loading="lazy"

@@ -1,12 +1,16 @@
 import { createContext } from "react";
-import type { ThemeConfig, ThemesConfig } from "@/themes";
 
 /**
- * A builtin theme whose colors are defined at build time.
+ * The app theme preference.
+ *
  * "system" resolves to "light" or "dark" based on OS preference.
- * "custom" uses user-defined token values stored in `customTheme`.
+ *
+ * Agora's colors are hardcoded in `src/index.css` and cannot be customized
+ * at runtime. This used to support a `"custom"` value that loaded
+ * user-defined colors, fonts, and backgrounds from localStorage / Nostr
+ * events; that capability has been removed entirely for security reasons.
  */
-export type Theme = "light" | "dark" | "system" | "custom";
+export type Theme = "light" | "dark" | "system";
 
 /**
  * How to handle events with a NIP-36 content-warning tag.
@@ -17,10 +21,7 @@ export type Theme = "light" | "dark" | "system" | "custom";
 export type ContentWarningPolicy = "blur" | "hide" | "show";
 
 /** Whether monetary amounts (zaps, balances, etc.) are displayed in USD or sats. */
-export type CurrencyDisplay = "usd" | "sats";
-/** How to handle events with a NIP-36 content-warning tag. */
-export type NsfwPolicy = "blur" | "hide" | "show";
-
+type CurrencyDisplay = "usd" | "sats";
 export interface RelayMetadata {
   /** List of relays with read/write permissions */
   relays: { url: string; read: boolean; write: boolean }[];
@@ -167,7 +168,7 @@ export interface FeedSettings {
 export type TabFilter = Record<string, unknown>;
 
 /** A variable definition for tab filters (extracted from `var` tags). */
-export interface TabVarDef {
+interface TabVarDef {
   /** Variable name including the `$` prefix, e.g. `"$follows"`. */
   name: string;
   /** Tag name to extract from the referenced event, e.g. `"p"`. */
@@ -205,10 +206,6 @@ export interface AppConfig {
   client?: string;
   /** Current theme */
   theme: Theme;
-  /** Custom theme config (colors, fonts, background). Only used when theme === "custom". */
-  customTheme?: ThemeConfig;
-  /** Configured light and dark themes. Overrides the builtin themes when set. */
-  themes?: ThemesConfig;
   /** NIP-65 relay list metadata */
   relayMetadata: RelayMetadata;
   /** Whether to use app default relays in addition to user relays */
@@ -259,6 +256,38 @@ export interface AppConfig {
   autoplayVideos: boolean;
   /** Image upload quality: "compressed" resizes/optimizes, "original" uploads as-is. Default: "compressed". */
   imageQuality: 'compressed' | 'original';
+  /**
+   * Base URL of an image-resizing proxy. Empty string = disabled (images load
+   * at full resolution from their origin). When set, image URLs are rewritten
+   * through the proxy at a per-context width, returning WebP at quality 75.
+   *
+   * The proxy must speak the wsrv.nl / weserv API
+   * (https://github.com/weserv/images). The well-known public instance is
+   * `https://wsrv.nl`. Self-hosted `imgproxy` and similar do NOT speak the
+   * same query language.
+   *
+   * **Privacy note**: enabling the proxy collapses every image fetch through
+   * one hostname (good — your ISP no longer sees every Blossom/imgur/etc.
+   * host you load from), but the proxy operator now sees every image URL
+   * you load. Self-hosters and privacy-conscious users can point this at
+   * their own instance, or disable the proxy entirely.
+   *
+   * Default: `'https://wsrv.nl'`.
+   */
+  imageProxy: string;
+  /**
+   * Low-bandwidth mode. When enabled:
+   * - Videos never autoplay (overrides `autoplayVideos`).
+   * - Background video frame-grabbing for posters is skipped.
+   * - Images that would normally load inline (post images, galleries,
+   *   banners, link preview thumbnails, video posters) show a tap-to-load
+   *   placeholder. The image proxy setting is independent — if the proxy
+   *   is on, the tap loads the proxied (smaller) version; if off, the tap
+   *   loads the original.
+   *
+   * Default: false.
+   */
+  lowBandwidthMode: boolean;
   /** Hex pubkey of the curator whose follow list defines the curated feed. */
   curatorPubkey?: string;
   /**

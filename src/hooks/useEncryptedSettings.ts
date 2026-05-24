@@ -7,7 +7,6 @@ import { useAppContext } from '@/hooks/useAppContext';
 import { useCurrentUser } from './useCurrentUser';
 import { fetchFreshEvent } from '@/lib/fetchFreshEvent';
 import type { Theme, FeedSettings, ContentWarningPolicy, SavedFeed, WidgetConfig } from '@/contexts/AppContext';
-import type { ThemeConfig } from '@/themes';
 import type { ContentFilter } from './useContentFilters';
 import type { LetterPreferences } from '@/lib/letterTypes';
 import { EncryptedSettingsSchema } from '@/lib/schemas';
@@ -17,20 +16,6 @@ import { EncryptedSettingsSchema } from '@/lib/schemas';
  * NostrSync uses this to avoid overwriting a local edit with a stale relay event.
  */
 let lastWriteTs: number = 0;
-
-/**
- * Persist the lastSync timestamp from encrypted settings into localStorage
- * so callers can tell whether the user has ever synced on this browser.
- * If a local timestamp exists, localStorage is trustworthy and the app can
- * render immediately while NostrSync fetches updates in the background.
- */
-export function getLocalSettingsSync(pubkey: string): number {
-  try {
-    return Number(localStorage.getItem(`ditto:settings-lastSync:${pubkey}`)) || 0;
-  } catch {
-    return 0;
-  }
-}
 
 export function setLocalSettingsSync(pubkey: string, lastSync: number): void {
   try {
@@ -46,8 +31,6 @@ export function setLocalSettingsSync(pubkey: string, lastSync: number): void {
 export interface EncryptedSettings {
   /** App theme preference */
   theme?: Theme;
-  /** Custom theme config (colors, fonts, background) */
-  customTheme?: ThemeConfig;
   /** Whether to use app default relays in addition to user relays */
   useAppRelays?: boolean;
   /** Whether to include the user's personal NIP-65 relay list in the effective relay set. */
@@ -103,6 +86,8 @@ export interface EncryptedSettings {
   linkPreviewUrl?: string;
   /** Autoplay videos in feeds and previews (muted) */
   autoplayVideos?: boolean;
+  /** Low-bandwidth mode (overrides autoplay, defers media, etc.) */
+  lowBandwidthMode?: boolean;
   /** Sentry DSN for error reporting (empty string = disabled) */
   sentryDsn?: string;
   /** Saved feed tabs created from the search page. */

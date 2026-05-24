@@ -9,7 +9,7 @@ import { openDatabase, STORE } from '@/lib/db';
 // to re-check.
 // ============================================================================
 
-export interface Nip05CacheEntry {
+interface Nip05CacheEntry {
   /** The NIP-05 identifier (e.g. "user@domain.com") */
   identifier: string;
   /** The resolved hex pubkey */
@@ -91,14 +91,3 @@ export async function deleteNip05Cached(identifier: string): Promise<void> {
   }
 }
 
-/** Clear the entire NIP-05 cache. */
-export async function clearNip05Cache(): Promise<void> {
-  memoryCache.clear();
-
-  try {
-    const db = await openDatabase();
-    if (db) await db.clear(STORE.NIP05);
-  } catch {
-    // Non-critical.
-  }
-}

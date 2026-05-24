@@ -2,7 +2,7 @@ import { nip19 } from 'nostr-tools';
 
 import { COMMUNITY_DEFINITION_KIND } from '@/lib/communityUtils';
 
-export interface DecodedOrganizationParam {
+interface DecodedOrganizationParam {
   aTag: string;
 }
 

@@ -917,11 +917,6 @@ function useCountryRootContext(event: NostrEvent): { iTag: string; code: string 
  * flag pill) in the current context. Useful for sibling components that
  * want to coordinate styling.
  */
-// eslint-disable-next-line react-refresh/only-export-components
-export function useIsCountryRooted(event: NostrEvent): boolean {
-  return useCountryRootContext(event) !== null;
-}
-
 /**
  * Standalone country flag pill for kind-1111 events whose root is an ISO 3166
  * identifier. Intended to be rendered in the upper-right of `NoteCard`'s

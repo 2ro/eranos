@@ -3,7 +3,7 @@ import { nip19 } from 'nostr-tools';
 export const WEATHER_STATION_METADATA_KIND = 16158;
 export const WEATHER_STATION_READING_KIND = 4223;
 
-export interface WeatherStationRef {
+interface WeatherStationRef {
   pubkey: string;
   stationId?: string;
   raw: string;

@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 import { nip19 } from "nostr-tools";
 import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Link, useNavigate } from "react-router-dom";
 /** Lazy-loaded markdown-heavy components — keeps react-markdown + unified pipeline out of the detail page bundle. */
 const ArticleContent = lazy(() => import("@/components/ArticleContent").then(m => ({ default: m.ArticleContent })));
@@ -25,10 +26,7 @@ import { BadgeAwardCard } from "@/components/BadgeAwardCard";
 import { CalendarEventDetailPage } from "@/components/CalendarEventDetailPage";
 import { CommunityDetailPage } from "@/components/CommunityDetailPage";
 
-import {
-  ColorMomentContent,
-  ColorMomentEyeButton,
-} from "@/components/ColorMomentContent";
+import { ColorMomentContent } from "@/components/ColorMomentContent";
 import {
   EmojifiedText,
   ReactionEmoji,
@@ -87,6 +85,7 @@ import { AppHandlerContent } from "@/components/AppHandlerContent";
 import { useAppContext } from "@/hooks/useAppContext";
 import { type AddrCoords, useAddrEvent, useEvent } from "@/hooks/useEvent";
 import { usePollVoteLabel } from "@/hooks/usePollVoteLabel";
+import { useEventTranslation } from "@/hooks/useEventTranslation";
 import { formatNumber } from "@/lib/formatNumber";
 
 /** Kinds that get the full follow-pack detail view. */
@@ -938,6 +937,7 @@ function BookReviewRating({ event }: { event: NostrEvent }) {
 
 
 function PostDetailContent({ event }: { event: NostrEvent }) {
+  const { t } = useTranslation();
   const { muteItems } = useMuteList();
   const queryClient = useQueryClient();
   const author = useAuthor(event.pubkey);
@@ -1031,6 +1031,7 @@ function PostDetailContent({ event }: { event: NostrEvent }) {
     !isZapGoal &&
     !isProfile &&
     !isBadgeAward;
+  const { translatedEvent: displayEvent, translateAction } = useEventTranslation(event, { includePlainContent: isTextNote });
 
   const { data: stats } = useEventStats(event.id, event);
   const { data: interactions } = useEventInteractions(event.id);
@@ -1840,7 +1841,6 @@ function PostDetailContent({ event }: { event: NostrEvent }) {
                     🤖
                   </span>
                 )}
-                {isColor && <ColorMomentEyeButton event={event} />}
               </>
             )}
           </div>
@@ -1854,7 +1854,7 @@ function PostDetailContent({ event }: { event: NostrEvent }) {
           )}
 
           {/* Post content — kind-based dispatch, guarded by NIP-36 content-warning */}
-          <ContentWarningGuard event={event}>
+          <ContentWarningGuard event={displayEvent}>
             {isPhoto ? (
               <PhotoDetailContent event={event} />
             ) : isVideo ? (
@@ -1870,7 +1870,7 @@ function PostDetailContent({ event }: { event: NostrEvent }) {
             ) : isVoiceMessage ? (
               <VoiceMessagePlayer event={event} />
             ) : isCommunity ? (
-              <CommunityContent event={event} />
+              <CommunityContent event={displayEvent} />
             ) : isGitRepo ? (
               <div className="mt-3">
                 <GitRepoCard event={event} />
@@ -1940,7 +1940,7 @@ function PostDetailContent({ event }: { event: NostrEvent }) {
             ) : (
               <div className="mt-3">
                 <NoteContent
-                  event={event}
+                  event={displayEvent}
                   className="text-[15px] leading-relaxed"
                 />
               </div>
@@ -2055,6 +2055,7 @@ function PostDetailContent({ event }: { event: NostrEvent }) {
             event={event}
             onReply={() => setReplyOpen(true)}
             onMore={() => setMoreMenuOpen(true)}
+            translateAction={translateAction}
             className="-mx-4 px-4"
           />
 
@@ -2096,7 +2097,7 @@ function PostDetailContent({ event }: { event: NostrEvent }) {
         <DetailCommentComposer
           event={event}
           className="mb-3"
-          placeholder={isKind1 ? 'Write a reply...' : "What's on your mind?"}
+          placeholder={isKind1 ? 'Write a reply...' : t('compose.activityPlaceholder')}
         />
 
         {repliesLoading ? (

@@ -12,10 +12,12 @@ import { useAuthor } from '@/hooks/useAuthor';
 import { useBtcPrice } from '@/hooks/useBtcPrice';
 import { useCampaignDonations } from '@/hooks/useCampaignDonations';
 import { useCampaignModeration } from '@/hooks/useCampaignModeration';
+import { useEventTranslation } from '@/hooks/useEventTranslation';
 import {
   type ParsedCampaign,
   encodeCampaignNaddr,
   getCampaignCountryLabel,
+  parseCampaign,
 } from '@/lib/campaign';
 import { formatCampaignAmount, formatUsdGoal, satsToUsd } from '@/lib/formatCampaignAmount';
 import { genUserName } from '@/lib/genUserName';
@@ -42,7 +44,7 @@ function formatDeadline(unixSeconds: number): { label: string; isPast: boolean }
  * time using the live BTC price. While the price is loading the raised
  * amount falls back to sats.
  */
-export function CampaignProgress({
+function CampaignProgress({
   raisedSats,
   goalUsd,
   btcPrice,
@@ -80,7 +82,7 @@ export function CampaignProgress({
  * on-chain totals are unobservable by design. Shows the goal as a target
  * (if set) but no progress bar or raised amount.
  */
-export function CampaignPrivateNotice({
+function CampaignPrivateNotice({
   goalUsd,
   className,
 }: {
@@ -114,13 +116,18 @@ interface CampaignCardProps {
  * `<Link>` to the campaign's naddr-based detail route.
  */
 export function CampaignCard({ campaign, variant = 'compact', className, footerBadge }: CampaignCardProps) {
+  const { translatedEvent, translateAction } = useEventTranslation(campaign.event, {
+    iconOnly: true,
+    buttonClassName: 'size-8 rounded-full p-0 text-muted-foreground hover:text-primary hover:bg-primary/10',
+  });
+  const displayCampaign = parseCampaign(translatedEvent) ?? campaign;
   const author = useAuthor(campaign.pubkey);
   const { data: stats } = useCampaignDonations(campaign);
   const { data: btcPrice } = useBtcPrice();
   const { data: moderation } = useCampaignModeration();
 
   const naddr = useMemo(() => encodeCampaignNaddr(campaign), [campaign]);
-  const cover = sanitizeUrl(campaign.banner);
+  const cover = sanitizeUrl(displayCampaign.banner);
   const creatorName =
     author.data?.metadata?.display_name ||
     author.data?.metadata?.name ||
@@ -199,16 +206,16 @@ export function CampaignCard({ campaign, variant = 'compact', className, footerB
                 isFeaturedVariant ? 'text-2xl sm:text-3xl' : 'text-lg line-clamp-2',
               )}
             >
-              {campaign.title}
+              {displayCampaign.title}
             </h3>
-            {campaign.summary && (
+            {displayCampaign.summary && (
               <p
                 className={cn(
                   'text-muted-foreground',
                   isFeaturedVariant ? 'text-base line-clamp-3' : 'text-sm line-clamp-2',
                 )}
               >
-                {campaign.summary}
+                {displayCampaign.summary}
               </p>
             )}
           </div>
@@ -252,7 +259,12 @@ export function CampaignCard({ campaign, variant = 'compact', className, footerB
             <div className="truncate">
               by <span className="font-medium text-foreground">{creatorName}</span>
             </div>
-            {footerBadge && <div className="shrink-0">{footerBadge}</div>}
+            {(footerBadge || translateAction) && (
+              <div className="flex shrink-0 items-center gap-1.5">
+                {footerBadge}
+                {translateAction}
+              </div>
+            )}
           </div>
         </div>
       </Card>

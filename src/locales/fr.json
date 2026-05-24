@@ -1,0 +1,2267 @@
+{
+  "common": {
+    "loading": "Chargement…",
+    "error": "Erreur",
+    "success": "Succès",
+    "cancel": "Annuler",
+    "save": "Enregistrer",
+    "delete": "Supprimer",
+    "edit": "Modifier",
+    "close": "Fermer",
+    "back": "Retour",
+    "next": "Suivant",
+    "refresh": "Actualiser",
+    "search": "Rechercher",
+    "filter": "Filtrer",
+    "clear": "Effacer",
+    "submit": "Envoyer",
+    "confirm": "Confirmer",
+    "copied": "Copié",
+    "goBack": "Retour",
+    "tryAgain": "Veuillez réessayer.",
+    "showLess": "Réduire",
+    "readMore": "Lire plus"
+  },
+  "translate": {
+    "translate": "Traduire",
+    "translating": "Traduction…",
+    "showOriginal": "Afficher l'original",
+    "error": "Échec de la traduction"
+  },
+  "nav": {
+    "openMenu": "Ouvrir le menu",
+    "closeMenu": "Fermer le menu",
+    "brandHome": "Accueil de {{appName}}",
+    "activity": "Activité",
+    "campaigns": "Campagnes",
+    "groups": "Groupes",
+    "pledge": "Promesse",
+    "search": "Rechercher",
+    "dashboard": "Tableau de bord",
+    "myDashboard": "Mon tableau de bord",
+    "wallet": "Portefeuille",
+    "notifications": "Notifications",
+    "profile": "Profil",
+    "settings": "Paramètres",
+    "about": "À propos",
+    "privacy": "Confidentialité",
+    "safety": "Sécurité",
+    "changelog": "Journal des modifications",
+    "sourceCode": "Code source"
+  },
+  "auth": {
+    "join": "Rejoindre",
+    "login": "Se connecter",
+    "signup": "S'inscrire",
+    "logout": "Se déconnecter",
+    "addAccount": "Ajouter un autre compte"
+  },
+  "feed": {
+    "indexTagline": "Votre contenu. Votre ambiance. Vos règles.",
+    "compose": {
+      "placeholder": "Que se passe-t-il ?"
+    },
+    "tabs": {
+      "follows": "Abonnements",
+      "following": "Abonné",
+      "global": "Global"
+    },
+    "empty": {
+      "homeAgora": "Moment calme sur Agora. Les nouvelles campagnes, promesses, dons et publications apparaîtront ici au fur et à mesure.",
+      "homeFollowingLoggedIn": "Votre fil d'abonnements est vide. Suivez quelques personnes pour voir ce qu'elles font, ou passez sur Agora ou Global.",
+      "homeFollowingLoggedOut": "Connectez-vous pour voir les publications des personnes que vous suivez.",
+      "homeOther": "Rien à afficher. Vérifiez vos connexions aux relais ou réessayez dans un instant.",
+      "follows": "Votre fil est vide. Suivez quelques personnes pour voir leurs publications ici.",
+      "global": "Aucune publication trouvée. Vérifiez vos connexions aux relais ou revenez bientôt.",
+      "browseAgora": "Parcourir le fil Agora",
+      "browseGlobal": "Parcourir le fil Global",
+      "discoverPeople": "Découvrir des personnes à suivre",
+      "logIn": "Se connecter"
+    },
+    "modeSwitcher": {
+      "agora": "Agora",
+      "allNostr": "Global",
+      "following": "Abonnements",
+      "ariaLabel": "Mode du fil : {{label}}. Cliquez pour changer.",
+      "loginRequired": "Connectez-vous pour voir les publications des personnes que vous suivez"
+    },
+    "replyContext": {
+      "replyingTo": "En réponse à",
+      "and": "et",
+      "andOthers_one": "et {{count}} autre",
+      "andOthers_other": "et {{count}} autres"
+    },
+    "actions": {
+      "reply": "Répondre",
+      "repost": "Republier",
+      "undoRepost": "Annuler la republication",
+      "react": "Réagir",
+      "zap": "Zap",
+      "share": "Partager",
+      "more": "Plus",
+      "linkCopied": "Lien copié dans le presse-papiers"
+    }
+  },
+  "compose": {
+    "placeholderDefault": "Quoi de neuf ?",
+    "placeholderPoll": "Posez une question…",
+    "placeholderCountry": "Que se passe-t-il en {{country}} ?",
+    "placeholderCwReason": "Raison de l'avertissement (facultatif)",
+    "submitDefault": "Publier !",
+    "preview": {
+      "edit": "Modifier",
+      "previewMode": "Aperçu"
+    },
+    "poll": {
+      "addOption": "Ajouter une option",
+      "optionLabel": "Option {{number}}",
+      "singleChoice": "Choix unique",
+      "multipleChoice": "Choix multiple",
+      "backToPost": "Retour à la publication",
+      "publishing": "Publication...",
+      "publish": "Publier le sondage",
+      "published": "Sondage publié !",
+      "publishFailed": "Échec de la publication du sondage."
+    },
+    "voice": {
+      "cancel": "Annuler",
+      "send": "Envoyer",
+      "sending": "Envoi...",
+      "sentTitle": "Message vocal envoyé !",
+      "sentBody": "Votre message vocal a été publié.",
+      "sendFailed": "Échec de l'envoi du message vocal.",
+      "micDeniedTitle": "Accès au microphone refusé",
+      "micDeniedBody": "Veuillez autoriser l'accès au microphone pour enregistrer des messages vocaux.",
+      "voiceMessage": "Message vocal"
+    },
+    "toolbar": {
+      "attachFile": "Joindre un fichier",
+      "emojiGif": "Emoji / GIF",
+      "more": "Plus",
+      "poll": "Sondage",
+      "spoiler": "Spoiler",
+      "emoji": "Emoji",
+      "stickers": "Autocollants"
+    },
+    "submit": {
+      "posting": "Publication...",
+      "uploadFailed": "Échec du téléversement",
+      "uploadFailedBody": "Impossible de téléverser le fichier.",
+      "publishFailed": "Échec de la publication.",
+      "posted": "Publié !",
+      "replyPublished": "Votre réponse a été publiée.",
+      "quotePublished": "Votre citation a été publiée.",
+      "notePublished": "Votre note a été publiée."
+    },
+    "destination": {
+      "label": "Publier vers",
+      "ariaHelp": "Quelle est la différence entre une publication globale et communautaire ?",
+      "ariaTrigger": "Destination de la publication",
+      "global": "Global",
+      "globalExplainer": "Une publication normale visible par tous sur Nostr. N'importe qui, n'importe où peut la voir.",
+      "community": "Votre communauté nationale",
+      "communityExplainer": "Affichée dans le fil local du pays aux côtés des publications des voisins. Idéal pour les actualités communautaires.",
+      "chooseAnother": "Choisir un autre pays…",
+      "searchPlaceholder": "Rechercher des pays...",
+      "noResults": "Aucun pays trouvé.",
+      "isDefault": "{{name}} est votre destination par défaut",
+      "globalIsDefault": "Global est votre destination par défaut",
+      "thisIsDefault": "C'est votre destination par défaut",
+      "setAsDefault": "Définir par défaut",
+      "defaultUpdated": "Destination par défaut mise à jour",
+      "defaultUpdatedCountry": "Les nouvelles publications iront vers {{name}} par défaut.",
+      "defaultUpdatedGlobal": "Les nouvelles publications seront globales par défaut."
+    }
+  },
+  "replyModal": {
+    "title": {
+      "newPoll": "Nouveau sondage",
+      "newComment": "Nouveau commentaire",
+      "commentOnProfile": "Commenter le profil",
+      "replyToPost": "Répondre à la publication",
+      "quotePost": "Citer la publication",
+      "newPost": "Nouvelle publication"
+    },
+    "placeholder": {
+      "writeComment": "Écrire un commentaire...",
+      "addComment": "Ajouter un commentaire...",
+      "whatsHappening": "Que se passe-t-il ?"
+    },
+    "blueskyDisclaimer": "Les utilisateurs de Bluesky ne peuvent pas vous voir car ils ne sont pas vraiment décentralisés."
+  },
+  "noteCard": {
+    "botAccount": "Compte bot",
+    "showLess": "Réduire",
+    "readMore": "Lire plus",
+    "reacted": "a réagi",
+    "reposted": "a republié",
+    "voted": "a voté",
+    "zap": {
+      "donatedTo": "A fait un don à",
+      "donatedAmountTo": "A fait un don de {{amount}} à",
+      "sat_one": "{{formattedCount}} sat",
+      "sat_other": "{{formattedCount}} sats"
+    },
+    "stream": {
+      "untitled": "Diffusion sans titre",
+      "live": "EN DIRECT",
+      "ended": "TERMINÉ",
+      "planned": "PRÉVU",
+      "unknown": "INCONNU"
+    },
+    "kindHeader": {
+      "photo": { "action": "a partagé une", "noun": "photo" },
+      "encryptedMessage": { "action": "a envoyé un", "noun": "message chiffré" },
+      "letter": { "action": "a envoyé une", "noun": "lettre" },
+      "treasureHidCreated": "a caché un",
+      "treasureHidUpdated": "a mis à jour un",
+      "treasureNoun": "trésor",
+      "treasureFound": "a trouvé un",
+      "deckCreated": "a créé un",
+      "deckUpdated": "a mis à jour un",
+      "deckFallback": "a partagé un",
+      "deckNoun": "jeu",
+      "emojiPackCreated": "a créé un",
+      "emojiPackUpdated": "a mis à jour un",
+      "emojiPackFallback": "a partagé un",
+      "emojiPackNoun": "pack d'emojis",
+      "groupCreated": "a créé un",
+      "groupUpdated": "a mis à jour un",
+      "groupFallback": "a partagé un",
+      "groupNoun": "groupe",
+      "campaignLaunched": "a lancé une",
+      "campaignUpdated": "a mis à jour une",
+      "campaignFallback": "a partagé une",
+      "campaignNoun": "campagne",
+      "badgeAwarded": "a décerné un",
+      "badgeNoun": "badge",
+      "badgeCreated": "a créé un",
+      "badgeDefUpdated": "a mis à jour un",
+      "badgesNoun": "badges",
+      "badgesCreatedTheir": "a créé ses",
+      "badgesUpdatedTheir": "a mis à jour ses",
+      "streamingLive": "est en direct",
+      "streamed": "a diffusé",
+      "zapstoreAppPublished": "a publié une application Zapstore",
+      "zapstoreAppUpdated": "a mis à jour une application Zapstore",
+      "zapstoreReleasePublished": "a publié une sortie Zapstore",
+      "zapstoreReleaseUpdated": "a mis à jour une sortie Zapstore",
+      "zapstoreAssetPublished": "a publié un actif Zapstore",
+      "appPublished": "a publié une application",
+      "appUpdated": "a mis à jour une application",
+      "repoCreated": "a créé un",
+      "repoUpdated": "a mis à jour un",
+      "repoFallback": "a partagé un",
+      "repoNoun": "dépôt",
+      "patchSubmitted": "a soumis un",
+      "patchNoun": "correctif",
+      "prOpened": "a ouvert une",
+      "prNoun": "pull request",
+      "nipProposed": "a proposé un",
+      "nipUpdated": "a mis à jour un",
+      "nipNoun": "NIP",
+      "nsiteDeployed": "a déployé un",
+      "nsiteRedeployed": "a redéployé un",
+      "nsiteNoun": "nsite",
+      "zapped": "a zappé",
+      "pledgeCreated": "a créé une",
+      "pledgeUpdated": "a mis à jour une",
+      "pledgeNoun": "promesse",
+      "followPackCreated": "a créé un",
+      "followPackUpdated": "a mis à jour un",
+      "followPackFallback": "a partagé un",
+      "followPackNoun": "pack de suivis",
+      "followSetCreated": "a créé un",
+      "followSetUpdated": "a mis à jour un",
+      "followSetFallback": "a partagé un",
+      "followSetNoun": "ensemble de suivis"
+    }
+  },
+  "noteMoreMenu": {
+    "title": "Options de la publication",
+    "viewPost": "Voir les détails",
+    "viewEventJson": "Voir le JSON de l'événement",
+    "bookmark": "Mettre en favori",
+    "removeBookmark": "Retirer des favoris",
+    "addToList": "Ajouter à une liste",
+    "addToSidebar": "Ajouter à la barre latérale",
+    "removeFromSidebar": "Retirer de la barre latérale",
+    "pinProfile": "Épingler au profil",
+    "unpinProfile": "Désépingler du profil",
+    "pinCountry": "Épingler au fil du pays",
+    "unpinCountry": "Désépingler du fil du pays",
+    "muteConversation": "Mettre la conversation en sourdine",
+    "mute": "Mettre @{{name}} en sourdine",
+    "unmute": "Réactiver @{{name}}",
+    "report": "Signaler @{{name}}",
+    "reportToGroup": "Signaler la publication au groupe",
+    "removeFromGroup": "Retirer du groupe",
+    "delete": "Supprimer la publication",
+    "close": "Fermer",
+    "encryptedContent": "Contenu chiffré",
+    "toast": {
+      "removedFromSidebar": "Retiré de la barre latérale",
+      "addedToSidebar": "Ajouté à la barre latérale",
+      "pinned": "Épinglé au profil",
+      "unpinned": "Désépinglé du profil",
+      "pinFailed": "Échec de la mise à jour des publications épinglées",
+      "countryPinned": "Épinglé au fil du pays",
+      "countryUnpinned": "Désépinglé du fil du pays",
+      "countryPinFailed": "Échec de l'épinglage au fil du pays",
+      "countryUnpinFailed": "Échec du désépinglage du fil du pays",
+      "convoMuted": "Conversation en sourdine",
+      "convoMuteFailed": "Échec de la mise en sourdine de la conversation",
+      "muted": "@{{name}} en sourdine",
+      "unmuted": "@{{name}} réactivé",
+      "muteFailed": "Échec de la mise en sourdine de l'utilisateur",
+      "unmuteFailed": "Échec de la réactivation de l'utilisateur",
+      "postDeleted": "Publication supprimée",
+      "deleteFailed": "Échec de la suppression de la publication",
+      "eventBroadcast": "Événement diffusé aux relais",
+      "broadcastFailed": "Échec de la diffusion de l'événement",
+      "copied": "{{label}} copié dans le presse-papiers"
+    },
+    "deleteDialog": {
+      "title": "Supprimer la publication ?",
+      "description": "Cela demandera la suppression aux relais. Certains relais peuvent encore conserver une copie de l'événement original. Cette action est irréversible.",
+      "cancel": "Annuler",
+      "delete": "Supprimer",
+      "deleting": "Suppression..."
+    },
+    "jsonDialog": {
+      "title": "Détails de l'événement",
+      "eventId": "ID de l'événement",
+      "eventIdLabel": "ID de l'événement",
+      "rawJson": "JSON brut",
+      "eventJsonLabel": "JSON de l'événement",
+      "broadcast": "Diffuser l'événement",
+      "broadcasting": "Diffusion..."
+    }
+  },
+  "policyPages": {
+    "privacy": {
+      "seoTitle": "Politique de confidentialité",
+      "seoDescription": "Politique de confidentialité de {{appName}} — comment vos données sont gérées sur le réseau Nostr",
+      "title": "Politique de confidentialité"
+    },
+    "csae": {
+      "seoTitle": "Politique de protection de l'enfance",
+      "seoDescription": "Politique de {{appName}} sur l'exploitation et les abus sexuels d'enfants (CSAE) — notre engagement pour la sécurité des enfants sur le réseau Nostr",
+      "title": "Politique de protection de l'enfance"
+    },
+    "donorGuide": {
+      "seoTitle": "Guide du donateur",
+      "seoDescription": "Comment fonctionnent les dons sur {{appName}} et comment protéger votre vie privée.",
+      "title": "Guide du donateur",
+      "subtitle": "Du vrai Bitcoin, envoyé directement. Tout le processus en une courte page."
+    },
+    "activistGuide": {
+      "seoTitle": "Guide de l'activiste",
+      "seoDescription": "Comment recevoir des dons sur {{appName}} et retirer des fonds en privé.",
+      "title": "Guide de l'activiste",
+      "subtitle": "Choisissez ce que vous acceptez, recevez des dons, retirez. En français clair, sans murs de texte."
+    },
+    "changelog": {
+      "seoTitle": "Journal des modifications",
+      "seoDescription": "Quoi de neuf dans {{appName}}",
+      "title": "Journal des modifications",
+      "loadError": "Échec du chargement du journal.",
+      "empty": "Aucune version pour l'instant.",
+      "pastReleases": "Versions précédentes",
+      "showLess": "Réduire",
+      "readMore": "Lire plus",
+      "preReleaseLabel": "Version préliminaire",
+      "preReleaseBody": "Cette version contient des modifications non incluses dans une publication officielle.",
+      "viewUnreleased": "Voir les modifications non publiées",
+      "categories": {
+        "Added": "Ajouté",
+        "Changed": "Modifié",
+        "Deprecated": "Déprécié",
+        "Removed": "Supprimé",
+        "Fixed": "Corrigé",
+        "Security": "Sécurité"
+      }
+    }
+  },
+  "about": {
+    "seoTitle": "À propos",
+    "seoDescription": "Comment fonctionne {{appName}} : connecter les activistes à un financement inarrêtable grâce au Bitcoin et à Nostr.",
+    "hero": {
+      "eyebrow": "À propos de {{appName}}",
+      "headlinePart1": "Comment",
+      "headlineAppName": "{{appName}}",
+      "headlinePart2": "fonctionne.",
+      "body": "{{appName}} est une plateforme de dons résistante à la censure, bâtie sur Nostr et Bitcoin. Pas de comptes bancaires gelés. Pas de fermetures par des entreprises. Juste un soutien direct de personnes qui croient en votre cause.",
+      "trustChips": {
+        "decentralized": "Décentralisée",
+        "openSource": "Code ouvert",
+        "censorshipResistant": "Résistante à la censure"
+      },
+      "ctaDonor": "Lire le Guide du donateur",
+      "ctaActivist": "Lire le Guide de l'activiste",
+      "sampleCard": {
+        "countryName": "Venezuela",
+        "public": "Public",
+        "imageAlt": "Activistes vénézuéliens lors d'une veillée aux chandelles tenant une pancarte « Liberen a todos los presos políticos · ¡Cese la represión! »",
+        "orgName": "Venezolanos Libres",
+        "title": "Libérer les prisonniers politiques du Venezuela",
+        "description": "Défense juridique et soutien familial pour plus de 800 prisonniers politiques détenus par le régime Maduro.",
+        "raised": "récoltés",
+        "ofGoal": "sur 10 000 $",
+        "donorsLine": "247 donateurs · 12 pays",
+        "donate": "Faire un don en Bitcoin"
+      }
+    },
+    "howItWorks": {
+      "eyebrow": "Comment ça marche",
+      "title": "Trois étapes. Aucun intermédiaire.",
+      "lede": "Pas de banques, pas de frontières, pas d'autorisation.",
+      "step1": {
+        "imageAlt": "Une clé cryptographique orange lumineuse flottant dans l'espace sombre, symbolisant l'identité auto-souveraine",
+        "title": "Les activistes s'inscrivent en quelques secondes.",
+        "body": "Pas de banque. Pas de paperasse. Pas d'approbation. Dès qu'un activiste crée un compte sur {{appName}}, il dispose d'une adresse Bitcoin prête à recevoir du soutien, n'importe où dans le monde."
+      },
+      "step2": {
+        "imageAlt": "Une pièce Bitcoin lumineuse traversant l'air à travers une carte du monde sombre, symbolisant un paiement transfrontalier instantané",
+        "title": "Les donateurs envoient du Bitcoin directement.",
+        "body": "Les donateurs envoient du Bitcoin depuis n'importe quel portefeuille qu'ils utilisent déjà (Cash App, Coinbase, Strike, un portefeuille matériel) directement à l'activiste. {{appName}} ne touche jamais l'argent. Aucun serveur intermédiaire, aucun dépositaire."
+      },
+      "step3": {
+        "imageAlt": "Une main ouverte avec une lumière orange chaleureuse rayonnant de la paume, symbolisant la réception et l'autonomie",
+        "title": "Le soutien arrive là où il compte.",
+        "body": "Les fonds arrivent directement à l'activiste. Il garde la garde, il garde le contrôle. Déplacez-les, échangez-les ou dépensez-les ; les guides ci-dessous expliquent comment le faire en privé et en toute sécurité."
+      }
+    },
+    "twoWays": {
+      "eyebrow": "Bitcoin · Un QR code, deux options",
+      "title": "Deux façons d'être payé.",
+      "lede": "Les deux options sont du Bitcoin. La différence réside dans ce que vous échangez contre la confidentialité. Quand un activiste crée une campagne, il choisit les options à accepter. Si les deux, la page de don affiche un seul QR code qui fonctionne pour n'importe quel portefeuille.",
+      "public": {
+        "kicker": "Paiements Bitcoin publics",
+        "tagline": "Universels · Rapides · Transparents",
+        "title": "Fonctionne avec tous les portefeuilles du monde.",
+        "description": "Les dons arrivent à une adresse Bitcoin classique contrôlée par l'activiste. N'importe qui avec n'importe quel portefeuille Bitcoin peut envoyer. Aucune nouvelle application, aucun nouveau compte, aucune courbe d'apprentissage.",
+        "bullet1": "Fonctionne dans tous les portefeuilles Bitcoin : Cash App, Coinbase, Strike, matériel",
+        "bullet2": "Règlement le plus rapide : uniquement les confirmations Bitcoin",
+        "bullet3": "Vérifiable sur la chaîne : tout le monde peut voir ce qu'un activiste a reçu",
+        "tradeoffTitle": "Compromis : public sur la blockchain.",
+        "tradeoffIntro": "Chaque don est public sur la blockchain Bitcoin et sur Nostr. {{appName}} est recommandé uniquement pour l'activisme ouvert. Si vous ou vos donateurs avez besoin d'une confidentialité extrême, y compris vis-à-vis des acteurs étatiques, lisez le <0>Guide du donateur</0> et le <1>Guide de l'activiste</1> avant de participer."
+      },
+      "silent": {
+        "kicker": "Paiements Bitcoin silencieux",
+        "tagline": "Non-traçables · Directs · BIP-352",
+        "title": "Non-traçables, sur la chaîne, directs.",
+        "description": "Les dons sont envoyés sous forme de paiements silencieux BIP-352. Chacun arrive à une nouvelle sortie Bitcoin non-traçable qu'un observateur regardant la blockchain ne peut pas relier à la campagne.",
+        "bullet1": "La trace des dons ne peut pas être reconstituée sur la chaîne",
+        "bullet2": "Protège les activistes face à des adversaires sérieux",
+        "bullet3": "Arrive directement dans le portefeuille de l'activiste, sans serveur intermédiaire",
+        "tradeoffTitle": "Compromis : les paiements silencieux sont récents.",
+        "tradeoffIntro": "La façon la plus privée de recevoir du Bitcoin sur la chaîne, mais l'écosystème est jeune et imparfait aujourd'hui :",
+        "tradeoffBullet1": "Peu de portefeuilles le prennent en charge.",
+        "tradeoffBullet2": "La réception est lente.",
+        "tradeoffBullet3": "Pas de notifications push.",
+        "tradeoffBullet4": "Les portefeuilles ont encore des bugs.",
+        "tradeoffBullet5": "Les comptes de dons ne sont pas publics."
+      },
+      "noCustody": {
+        "title": "Pas de garde. Pas d'intermédiaire.",
+        "body": "{{appName}} ne détient jamais les fonds. Les dons passent de portefeuille à portefeuille sur Bitcoin. Aucun serveur ne se trouve entre le donateur et l'activiste sur l'une ou l'autre option. Si {{appName}} disparaissait demain, toutes les campagnes continueraient de fonctionner.",
+        "gofundme": {
+          "heading": "Contrairement à GoFundMe",
+          "body": "Aucune plateforme ne peut geler vos dons, exiger des remboursements ou mettre fin à votre campagne pour des désaccords politiques."
+        },
+        "givesendgo": {
+          "heading": "Contrairement à GiveSendGo",
+          "body": "Aucun processeur de paiement n'est au milieu, donc ni Stripe, ni Visa, ni banque ne peuvent vous couper en pleine campagne."
+        },
+        "otherBitcoin": {
+          "heading": "Contrairement aux autres plateformes « Bitcoin »",
+          "body": "Pas de nœud Lightning central, de dépositaire ou de LSP qui peut tomber en panne ou se déconnecter. Les fonds sont réglés directement sur la chaîne vers un portefeuille que vous contrôlez."
+        }
+      }
+    },
+    "faq": {
+      "eyebrow": "Questions",
+      "title": "Foire aux questions.",
+      "chapter1": {
+        "label": "Pour commencer",
+        "description": "Ce qu'est Agora, qui l'a construit et ce qu'il coûte."
+      },
+      "chapter2": {
+        "label": "Dons en Bitcoin",
+        "description": "Comment fonctionnent les paiements, pourquoi sur la chaîne, pourquoi publics, pourquoi ces compromis."
+      },
+      "chapter3": {
+        "label": "À propos de Nostr",
+        "description": "Le protocole ouvert sur lequel Agora est bâti, et comment fonctionne votre compte."
+      }
+    },
+    "guides": {
+      "eyebrow": "Guides",
+      "title": "Choisissez votre camp.",
+      "lede": "Que vous envoyiez ou receviez, apprenez à le faire en sécurité et en privé.",
+      "donor": {
+        "imageAlt": "Manifestants encapuchonnés marchant dans une rue de ville européenne au crépuscule, tenant des fusées rouges allumées et des banderoles « FREEDOM » et « LIBERTAD »",
+        "role": "Pour les donateurs",
+        "title": "Soutenez les causes que les banques ne soutiennent pas.",
+        "description": "Envoyez du Bitcoin directement aux activistes et aux mouvements partout dans le monde, sans demander la permission à un processeur de paiement.",
+        "bullet1": "Utilisez n'importe quel portefeuille Bitcoin que vous avez déjà.",
+        "bullet2": "Les dons arrivent directement à l'activiste. Pas de dépositaire, pas d'intermédiaire.",
+        "bullet3": "Pour la confidentialité, utilisez un portefeuille qui prend en charge les paiements silencieux.",
+        "cta": "Lire le Guide du donateur"
+      },
+      "activist": {
+        "imageAlt": "Vue aérienne de milliers de manifestants rassemblés la nuit sur une place de ville avec des fusées rouges allumées, sous une banderole « UNITY IN DARKNESS » projetée sur les bâtiments environnants",
+        "role": "Pour les activistes",
+        "title": "Obtenez un financement sans autorisation.",
+        "description": "Recevez un soutien direct de personnes qui croient en votre cause. Pas de compte bancaire, pas de formulaire de demande, pas d'entreprise au milieu.",
+        "bullet1": "Commencez à recevoir des dons dès votre inscription.",
+        "bullet2": "Choisissez les types de paiement à accepter : public, paiements silencieux, ou les deux.",
+        "bullet3": "Pour un retrait privé, envoyez d'abord vers un portefeuille de paiements silencieux, puis transférez n'importe où.",
+        "cta": "Lire le Guide de l'activiste"
+      },
+      "stillStuck": "Toujours bloqué ?",
+      "followTeam": "Suivez Team Soapbox sur Nostr",
+      "stillStuckSuffix": ". Nous y traitons les questions."
+    }
+  },
+  "forms": {
+    "required": "Obligatoire",
+    "recommended": "Recommandé",
+    "optional": "Facultatif",
+    "title": "Titre",
+    "country": "Pays",
+    "tags": "Étiquettes",
+    "coverImage": "Image de couverture",
+    "description": "Description",
+    "timezone": "Fuseau horaire",
+    "publishing": "Publication…",
+    "uploadingCover": "Téléversement de la couverture…",
+    "countrySearchPlaceholder": "Rechercher des pays",
+    "imageDropzone": "Cliquez ou faites glisser une image ici"
+  },
+  "organizationContext": {
+    "attachedToGroup": "Attaché au groupe",
+    "groupFallback": "Groupe",
+    "editSubtext": "Les modifications resteront liées à l'activité officielle de ce groupe.",
+    "malformedParam": "Impossible de lire le groupe dans le lien. Publication sous votre compte.",
+    "checkingPermissions": "Vérification des autorisations du groupe…",
+    "unauthorized": "Vous n'êtes ni fondateur ni modérateur de ce groupe. Publication sous votre compte.",
+    "publishingAsGroup": "Publication en tant que groupe"
+  },
+  "notFound": {
+    "title": "404 - Page introuvable",
+    "description": "La page que vous cherchez est introuvable.",
+    "heading": "Cette page n'existe pas.",
+    "goHome": "Accueil"
+  },
+  "pledges": {
+    "list": {
+      "seoTitle": "Promesses",
+      "seoTitleWithCountry": "Promesses — {{country}}",
+      "seoDescription": "Financez des actions, des preuves ou des résultats que vous voulez inspirer.",
+      "heroKicker": "Promesse",
+      "heroHeading": "Inspirez le changement",
+      "heroHeadingLine2": "que vous voulez voir.",
+      "heroBody": "Financez des actions concrètes, des preuves et des résultats. Les gens répondent par des soumissions, et la communauté récompense le travail qui fait avancer l'objectif.",
+      "openCount_one": "promesse ouverte maintenant",
+      "openCount_other": "promesses ouvertes maintenant",
+      "createPledge": "Créer une promesse",
+      "loginToCreate": "Connectez-vous pour créer une promesse",
+      "sectionActive": "Promesses actives",
+      "sectionUpcoming": "Promesses à venir",
+      "sectionPast": "Promesses passées",
+      "sectionDefault": "Promesses",
+      "sectionTagline": "Aidez à financer les actions qui valent la peine d'être menées.",
+      "sortAriaLabel": "Trier",
+      "sortBy": "Trier par",
+      "sortRecent": "Plus récent",
+      "sortBounty": "Plus grosse promesse",
+      "sortDeadline": "Échéance proche",
+      "sortDeadlinePast": "Récemment terminée",
+      "filterAriaLabel": "Filtrer par pays",
+      "countrySearchPlaceholder": "Rechercher…",
+      "noResults": "Aucun résultat trouvé.",
+      "global": "Global",
+      "dividerUpcoming": "À venir",
+      "dividerPast": "Passées",
+      "showLess": "Réduire",
+      "showMore": "Afficher plus ({{count}} de plus)",
+      "emptyTitle": "Aucune promesse pour l'instant",
+      "emptyHint": "Soyez le premier à créer une promesse.",
+      "emptyHintCountry": "Soyez le premier à créer une promesse pour {{country}}."
+    },
+    "card": {
+      "ended": "Terminée",
+      "pledged": "Promis",
+      "byAuthor": "par <0>{{name}}</0>",
+      "deletePledge": "Supprimer la promesse",
+      "copyLink": "Copier le lien",
+      "linkCopied": "Lien copié",
+      "linkCopyFailed": "Échec de la copie du lien",
+      "confirmDelete": "Supprimer cette promesse ? Cette action est irréversible.",
+      "deleted": "Promesse supprimée",
+      "deletedContent": "Promesse supprimée",
+      "deleteFailed": "Échec de la suppression de la promesse"
+    },
+    "create": {
+      "seoTitle": "Créer une promesse",
+      "seoDescription": "Créez une promesse de donateur pour inspirer des actions concrètes sur {{appName}}.",
+      "loginGateTitle": "Connectez-vous pour créer une promesse",
+      "loginGateBody": "Les promesses sont des événements Nostr signés. Vous avez besoin d'une connexion Nostr pour en publier une.",
+      "backToPledges": "Retour aux promesses",
+      "heading": "Créer une promesse",
+      "title": "Titre",
+      "titlePlaceholder": "Documenter un nettoyage de plage",
+      "country": "Pays",
+      "countryPlaceholder": "Rechercher des pays",
+      "countryClearAria": "Effacer le pays",
+      "flagOfAria": "Drapeau de {{name}}",
+      "countryHint": "Publie <0>i: iso3166:{{code}}</0> pour le tri par pays.",
+      "tags": "Étiquettes",
+      "tagsPlaceholder": "nettoyage-plage, documentation-manifestation, coupure-internet",
+      "coverImage": "Image de couverture",
+      "description": "Description",
+      "descriptionPlaceholder": "Expliquez l'action, la preuve ou le résultat que vous souhaitez inspirer, ce que les soumissions devraient inclure, et comment vous prévoyez de les évaluer...",
+      "pledge": "Promesse",
+      "pledgeAmountPlaceholder": "100",
+      "deadline": "Échéance",
+      "timezone": "Fuseau horaire",
+      "timezoneNote": "Les heures de début et d'échéance seront interprétées dans ce fuseau horaire.",
+      "submit": "Créer la promesse",
+      "publishing": "Publication…",
+      "uploadingCover": "Téléversement de la couverture…",
+      "altText": "Promesse {{appName}} : {{title}}",
+      "successToast": "Promesse créée",
+      "errorToast": "Impossible de créer la promesse",
+      "errorLoginRequired": "Vous devez être connecté pour créer une promesse.",
+      "errorTitleRequired": "Le titre est obligatoire.",
+      "errorDescriptionRequired": "La description est obligatoire.",
+      "errorPledgeRequired": "Le montant de la promesse est obligatoire.",
+      "errorPledgeInvalid": "Le montant de la promesse doit être un montant positif en USD.",
+      "errorPriceUnavailable": "En attente du prix BTC/USD pour calculer le montant de la promesse.",
+      "errorCoverInvalid": "L'image de couverture doit être une URL https:// valide.",
+      "errorDeadlinePast": "L'échéance ne peut pas être dans le passé."
+    },
+    "detail": {
+      "seoTitle": "{{title}} | Promesse {{appName}}",
+      "seoFallbackTitle": "Promesse | {{appName}}",
+      "deadlineEndedOn": "Terminée le {{date}}",
+      "deadlineEndsToday": "Se termine aujourd'hui",
+      "deadlineDaysLeft_one": "{{count}} jour restant",
+      "deadlineDaysLeft_other": "{{count}} jours restants",
+      "deadlineEndsOn": "Se termine le {{date}}",
+      "openEnded": "Ouverte sans limite",
+      "back": "Retour",
+      "backToPledges": "Retour aux promesses",
+      "loadingPledge": "Chargement de la promesse…",
+      "pledge": "Promesse",
+      "byAuthor": "par <0>{{name}}</0>",
+      "submitLabel": "Soumettre",
+      "linkCopied": "Lien copié dans le presse-papiers",
+      "pinnedToast": "Épinglé à la promesse",
+      "unpinnedToast": "Désépinglé de la promesse",
+      "pinFailed": "Échec de la mise à jour des épingles de la promesse",
+      "submissions": "Soumissions",
+      "submissionCount_one": "{{count}} soumission",
+      "submissionCount_other": "{{count}} soumissions",
+      "submissionPlaceholder": "Partagez des preuves, des justificatifs ou un travail terminé...",
+      "noSubmissionsTitle": "Aucune soumission pour l'instant",
+      "noSubmissionsHint": "Soyez le premier à répondre avec des preuves, des justificatifs ou un travail terminé.",
+      "funded": "financé",
+      "ofPledged": "sur {{amount}} promis",
+      "trustNote": "Cette promesse est basée sur la confiance. La progression du financement additionne les zaps et les reçus de dons sur les soumissions de premier niveau.",
+      "share": "Partager",
+      "storyHeading": "La promesse",
+      "storyEmpty": "Le promettant n'a pas encore écrit de détails pour cette promesse."
+    }
+  },
+  "groups": {
+    "list": {
+      "seoTitle": "Groupes",
+      "seoDescription": "Découvrez et rejoignez des groupes sur Nostr",
+      "heroKicker": "Groupes",
+      "heroHeading": "La force",
+      "heroHeadingLine2": "du nombre.",
+      "heroBody": "Créez des groupes, rassemblez des membres et suivez ce que font vos espaces.",
+      "createGroup": "Créer un groupe",
+      "createGroupLoginTitle": "Connectez-vous pour créer un groupe",
+      "createGroupLoginBody": "Créer un groupe publie un événement Nostr depuis votre compte.",
+      "myGroups": "Mes groupes",
+      "featuredGroups": "Groupes mis en avant",
+      "loginToSeeTitle": "Connectez-vous pour voir vos groupes",
+      "loginToSeeBody": "Les groupes que vous avez fondés ou modérés apparaîtront ici.",
+      "noGroupsTitle": "Aucun groupe pour l'instant",
+      "noGroupsBody": "Créez votre propre groupe pour commencer à coordonner des campagnes, des promesses et des événements avec vos proches.",
+      "noFeaturedTitle": "Aucun groupe mis en avant pour l'instant",
+      "noFeaturedBody": "Les modérateurs de {{appName}} mettent en avant les groupes remarquables ici. Revenez bientôt.",
+      "connectingRelays": "Connexion aux relais…",
+      "showLess": "Réduire",
+      "showMore": "Afficher {{count}} de plus",
+      "needsReview": "À examiner",
+      "needsReviewDesc": "Groupes {{appName}} qui n'ont pas encore été mis en avant ou masqués. Élevez-en un dans la sélection Mis en avant ou masquez-le.",
+      "needsReviewEmpty": "Rien en attente d'examen.",
+      "hidden": "Masqués",
+      "hiddenDesc": "Groupes supprimés de la découverte publique. Utilisez le menu en kebab d'une carte pour les démasquer.",
+      "hiddenEmpty": "Aucun groupe n'est actuellement masqué.",
+      "tickerCampaignsRaised_one": "récolté sur la chaîne dans {{count}} campagne",
+      "tickerCampaignsRaised_other": "récolté sur la chaîne dans {{count}} campagnes",
+      "tickerFeaturedGroups_one": "groupe mis en avant sur Nostr",
+      "tickerFeaturedGroups_other": "groupes mis en avant sur Nostr",
+      "tickerCountries_one": "pays publiant aujourd'hui",
+      "tickerCountries_other": "pays publiant aujourd'hui"
+    },
+    "create": {
+      "seoTitleCreate": "Créer un groupe",
+      "seoTitleEdit": "Modifier le groupe",
+      "seoDescriptionCreate": "Démarrez un nouveau groupe sur {{appName}}.",
+      "seoDescriptionEdit": "Mettez à jour votre groupe sur {{appName}}.",
+      "loginGateTitle": "Connectez-vous pour démarrer un groupe",
+      "loginGateBody": "Les groupes sont des événements Nostr signés. Vous avez besoin d'une connexion Nostr pour en publier un.",
+      "backToGroups": "Retour aux groupes",
+      "invalidEditTitle": "Lien d'édition invalide",
+      "invalidEditBody": "Ce lien d'édition de groupe ne contient pas d'adresse de groupe valide.",
+      "startNewGroup": "Démarrer un nouveau groupe",
+      "loadingGroup": "Chargement du groupe…",
+      "cannotEditTitle": "Le groupe ne peut pas être modifié",
+      "cannotEditBody": "Seul le fondateur de ce groupe peut le mettre à jour.",
+      "headingCreate": "Créer un groupe",
+      "headingEdit": "Modifier le groupe",
+      "name": "Nom",
+      "namePlaceholder": "ex. La Garde de l'Arbitre",
+      "urlPreview": "Aperçu de l'URL :",
+      "urlPlaceholder": "nom-de-votre-groupe",
+      "urlKeptOriginal": "(conservé de l'original)",
+      "description": "Description",
+      "descriptionPlaceholder": "De quoi parle ce groupe ?",
+      "country": "Pays",
+      "countryPlaceholder": "Rechercher des pays",
+      "countryClearAria": "Effacer le pays",
+      "flagOfAria": "Drapeau de {{name}}",
+      "countryHint": "Publie <0>i: iso3166:{{code}}</0> pour le tri par pays.",
+      "tags": "Étiquettes",
+      "tagsPlaceholder": "entraide, actus-locales, droits-numériques",
+      "coverImage": "Image de couverture",
+      "moderators": "Modérateurs",
+      "moderatorsCount": "Modérateurs ({{count}})",
+      "removeModeratorAria": "Retirer {{name}}",
+      "submitCreate": "Créer le groupe",
+      "submitEdit": "Mettre à jour le groupe",
+      "creating": "Création…",
+      "updating": "Mise à jour…",
+      "uploadingCover": "Téléversement de la couverture…",
+      "altText": "Groupe : {{name}}",
+      "successCreate": "Groupe créé !",
+      "successEdit": "Groupe mis à jour !",
+      "errorTitleCreate": "Impossible de créer le groupe",
+      "errorTitleEdit": "Impossible de mettre à jour le groupe",
+      "errorLoginRequired": "Vous devez être connecté pour créer un groupe.",
+      "errorEditLoadFailed": "Impossible de charger le groupe pour modification.",
+      "errorEditNotOwner": "Seul le fondateur du groupe peut le modifier.",
+      "errorNameRequired": "Le nom est obligatoire.",
+      "errorNameInvalid": "Le nom doit contenir des lettres ou des chiffres pour qu'une URL de groupe puisse être créée.",
+      "errorEditLatestMissing": "Impossible de trouver la dernière version de ce groupe à mettre à jour.",
+      "errorCoverInvalid": "L'image de couverture doit être une URL https:// valide.",
+      "errorSlugCollision": "Vous avez déjà un groupe avec l'identifiant « {{slug}} ». Choisissez un autre nom."
+    },
+    "detail": {
+      "by": "par",
+      "byAuthor": "par {{name}}",
+      "members": "Membres",
+      "viewMembers": "Voir les membres",
+      "moreMembers": "+{{count}} de plus",
+      "about": "À propos",
+      "comments": "Commentaires",
+      "comment": "Commentaire",
+      "commentNoun_one": "commentaire",
+      "commentNoun_other": "commentaires",
+      "noCommentsTitle": "Aucun commentaire pour l'instant",
+      "noCommentsHint": "Soyez le premier à lancer une discussion.",
+      "noMembersFound": "Aucun membre trouvé.",
+      "founder": "Fondateur",
+      "moderator": "Modérateur",
+      "moreActions": "Plus d'actions",
+      "editGroup": "Modifier le groupe",
+      "deleteGroup": "Supprimer le groupe",
+      "officialActivity": "Activité officielle",
+      "officialTools": "Outils officiels",
+      "startSomething": "Lancer quelque chose",
+      "officialToolsDescription": "Donnez à {{name}} une prochaine étape concrète.",
+      "launchCampaign": "Lancer une campagne",
+      "launchCampaignDescription": "Récolter des fonds avec une page de groupe officielle.",
+      "campaign": "Campagne",
+      "pledge": "Promesse",
+      "pledgeDescription": "Offrir de l'aide sur laquelle on peut agir.",
+      "event": "Événement",
+      "eventDescription": "Rassembler des soutiens.",
+      "untitledEvent": "Événement sans titre",
+      "interestedCount_one": "{{count}} personne intéressée",
+      "interestedCount_other": "{{count}} personnes intéressées",
+      "allDay": "Toute la journée"
+    }
+  },
+  "campaignsCreate": {
+    "seoTitleCreate": "Démarrer une campagne",
+    "seoTitleEdit": "Modifier la campagne",
+    "seoDescriptionCreate": "Lancez une campagne de collecte de fonds sur {{appName}}.",
+    "seoDescriptionEdit": "Mettez à jour votre campagne de collecte de fonds sur {{appName}}.",
+    "loginGateTitle": "Connectez-vous pour démarrer une campagne",
+    "loginGateBody": "Les campagnes sont des événements Nostr signés. Vous avez besoin d'une connexion Nostr pour en publier une.",
+    "goHome": "Accueil",
+    "invalidEditTitle": "Lien d'édition invalide",
+    "invalidEditBody": "Ce lien d'édition de campagne ne contient pas d'adresse de campagne valide.",
+    "startNewCampaign": "Démarrer une nouvelle campagne",
+    "loadingCampaign": "Chargement de la campagne…",
+    "cannotEditTitle": "La campagne ne peut pas être modifiée",
+    "cannotEditBody": "Seul l'auteur de cette campagne peut la mettre à jour.",
+    "headingCreate": "Démarrer une campagne",
+    "headingEdit": "Modifier la campagne",
+    "title": "Titre",
+    "titlePlaceholder": "Sauver la dernière librairie",
+    "wallet": "Portefeuille Bitcoin",
+    "myWalletLabel": "Portefeuille de {{name}}",
+    "myWalletDefault": "Mon portefeuille",
+    "walletChoose": "Choisir un portefeuille",
+    "walletCustom": "Personnalisé",
+    "acceptAll": "Accepter tous les types de paiement",
+    "acceptPublic": "Accepter uniquement les paiements publics",
+    "acceptPrivate": "Accepter uniquement les paiements privés",
+    "customWalletIntro": "Saisissez une adresse Bitcoin, un code de paiement silencieux, ou les deux. Au moins un est obligatoire.",
+    "bitcoinAddress": "Adresse Bitcoin",
+    "bitcoinAddressPlaceholder": "bc1q… ou bc1p…",
+    "silentPaymentCode": "Code de paiement silencieux",
+    "silentPaymentCodePlaceholder": "sp1…",
+    "onchainInvalid": "Adresse Bitcoin mainnet non reconnue (bc1q… / bc1p…).",
+    "spInvalid": "Code de paiement silencieux BIP-352 non reconnu (sp1…).",
+    "country": "Pays",
+      "countryPlaceholder": "Rechercher des pays",
+    "countryClearAria": "Effacer le pays",
+    "flagOfAria": "Drapeau de {{name}}",
+    "countryHint": "Publie <0>i: iso3166:{{code}}</0> pour le tri par pays.",
+    "tags": "Étiquettes",
+    "tagsPlaceholder": "défense-juridique, entraide, actus-locales",
+    "banner": "Image de bannière",
+    "summary": "Résumé",
+    "summaryPlaceholder": "Aidez notre clinique juridique de quartier à défendre les manifestants pacifiques.",
+    "story": "Histoire",
+    "storyPlaceholder": "Partagez le contexte, qui en bénéficie et comment les fonds seront utilisés.",
+    "goal": "Objectif",
+    "goalPlaceholder": "25 000",
+    "goalNote": "Dollars américains entiers. Les donateurs paient en Bitcoin ; les clients estiment l'équivalent en USD au moment de la consultation.",
+    "deadline": "Échéance",
+    "submitCreate": "Lancer la campagne",
+    "submitEdit": "Mettre à jour la campagne",
+    "publishing": "Publication…",
+    "updating": "Mise à jour…",
+    "uploadingBanner": "Téléversement de la bannière…",
+    "altText": "Campagne de collecte de fonds : {{title}}",
+    "successCreate": "Campagne lancée",
+    "successCreateDesc": "Votre collecte de fonds est en ligne.",
+    "successEdit": "Campagne mise à jour",
+    "successEditDesc": "Vos modifications de campagne sont en ligne.",
+    "errorTitleCreate": "Impossible de publier la campagne",
+    "errorTitleEdit": "Impossible de mettre à jour la campagne",
+    "errorLoginRequired": "Vous devez être connecté pour créer une campagne.",
+    "errorEditLoadFailed": "Impossible de charger la campagne pour modification.",
+    "errorEditNotOwner": "Seul l'auteur de la campagne peut la modifier.",
+    "errorTitleRequired": "Le titre est obligatoire.",
+    "errorTitleInvalid": "Le titre doit contenir des lettres ou des chiffres pour qu'une URL de campagne puisse être créée.",
+    "errorSlugInvalid": "L'identifiant doit être composé de lettres minuscules, de chiffres et de traits d'union.",
+    "errorHdUnavailable": "Le portefeuille intégré n'est pas disponible pour ce mode de connexion.",
+    "errorSpUnavailable": "L'adresse de paiement silencieux n'est pas disponible pour ce mode de connexion.",
+    "errorOnchainInvalid": "L'adresse on-chain n'est pas une adresse bech32(m) mainnet reconnue (bc1q… / bc1p…).",
+    "errorSpInvalid": "Le code de paiement silencieux n'est pas un code BIP-352 reconnu (sp1…).",
+    "errorWalletRequired": "Fournissez au moins un point de terminaison de portefeuille — une adresse mainnet Bitcoin (bc1q… / bc1p…) ou un code de paiement silencieux (sp1…).",
+    "errorGoalInvalid": "L'objectif doit être un montant entier positif en dollars.",
+    "errorDeadlinePast": "L'échéance ne peut pas être dans le passé.",
+    "errorDeadlineInvalid": "L'échéance n'est pas une date valide.",
+    "errorEditLatestMissing": "Impossible de trouver la dernière version de cette campagne à mettre à jour.",
+    "errorSlugCollision": "Vous avez déjà une campagne avec l'identifiant « {{slug}} ». Choisissez-en une autre.",
+    "errorBannerInvalid": "La bannière doit être une URL https:// valide.",
+    "errorHdDeriveFailed": "Impossible de dériver une nouvelle adresse on-chain depuis votre portefeuille.",
+    "errorHdDeriveInvalid": "L'adresse de portefeuille dérivée a échoué à la validation. Veuillez ajouter une adresse personnalisée à la place.",
+    "errorWalletRequiredFallback": "Le point de terminaison du portefeuille est obligatoire.",
+    "errorPublishedInvalid": "L'événement publié a échoué à la validation. Veuillez actualiser et réessayer."
+  },
+  "campaignsDetail": {
+    "seoTitle": "{{title}} | Collectes de fonds {{appName}}",
+    "seoDescriptionFallback": "Soutenez {{title}} sur {{appName}}.",
+    "deadlineEndedOn": "Terminée le {{date}}",
+    "deadlineEndsToday": "Se termine aujourd'hui",
+    "deadlineDaysLeft_one": "{{count}} jour restant",
+    "deadlineDaysLeft_other": "{{count}} jours restants",
+    "deadlineEndsOn": "Se termine le {{date}}",
+    "back": "Retour",
+    "edit": "Modifier",
+    "delete": "Supprimer",
+    "deleting": "Suppression…",
+    "byAuthor": "par <0>{{name}}</0>",
+    "commentLabel": "Commentaire",
+    "linkCopied": "Lien copié dans le presse-papiers",
+    "pinnedToast": "Épinglé à la campagne",
+    "unpinnedToast": "Désépinglé de la campagne",
+    "pinFailed": "Échec de la mise à jour des épingles de la campagne",
+    "deletedToast": "Campagne supprimée",
+    "deletedToastDesc": "Une demande de suppression a été publiée. Les relais bien intentionnés retireront la campagne des fils.",
+    "deleteErrorTitle": "Impossible de supprimer la campagne",
+    "campaigner": "Organisateur",
+    "repost_one": "<0>{{count}}</0> Republication",
+    "repost_other": "<0>{{count}}</0> Republications",
+    "quote_one": "<0>{{count}}</0> Citation",
+    "quote_other": "<0>{{count}}</0> Citations",
+    "like_one": "<0>{{count}}</0> J'aime",
+    "like_other": "<0>{{count}}</0> J'aime",
+    "commentsAndDonations": "Commentaires et dons",
+    "commentCount_one": "{{count}} commentaire",
+    "commentCount_other": "{{count}} commentaires",
+    "noCommentsTitle": "Aucun commentaire pour l'instant",
+    "noCommentsHint": "Soyez le premier à laisser un message de soutien.",
+    "deleteDialogTitle": "Supprimer cette campagne ?",
+    "deleteDialogBody": "Cela publie une demande de suppression NIP-09. Les relais bien intentionnés retireront la campagne des fils et des liens directs. Les reçus de dons passés restent sur la chaîne quoi qu'il arrive. Cette action est irréversible — pour continuer à accepter les dons, modifiez la campagne à la place.",
+    "storyHeading": "L'histoire",
+    "storyEmpty": "L'organisateur n'a pas encore écrit d'histoire pour cette campagne.",
+    "campaignEnded": "Campagne terminée",
+    "donate": "Faire un don",
+    "share": "Partager",
+    "target": "Objectif : {{amount}}",
+    "raised": "récoltés",
+    "ofGoal": "sur un objectif de {{amount}}",
+    "donationCount_one": "{{count}} don",
+    "donationCount_other": "{{count}} dons",
+    "recentDonations": "Dons récents",
+    "seeAllDonations_one": "Voir tous les {{count}} don",
+    "openInWallet": "Ouvrir dans le portefeuille",
+    "seeAllDonations_other": "Voir tous les {{count}} dons"
+  },
+  "calendarEvents": {
+    "create": {
+      "seoTitle": "Créer un événement",
+      "seoDescription": "Créer un événement de calendrier sur {{appName}}.",
+      "loginTitle": "Connectez-vous pour créer un événement",
+      "loginBody": "Les événements sont des événements Nostr signés. Vous avez besoin d'une connexion Nostr pour en publier un.",
+      "backToEvents": "Retour aux événements",
+      "heading": "Créer un événement",
+      "titlePlaceholder": "Nettoyage du quartier",
+      "descriptionPlaceholder": "Dites aux gens à quoi s'attendre, ce qu'il faut apporter et qui devrait venir...",
+      "schedule": "Calendrier",
+      "allDay": "Événement toute la journée",
+      "allDayHint": "Désactivez pour ajouter des heures de début et de fin.",
+      "startDate": "Date de début",
+      "endDate": "Date de fin",
+      "startTime": "Heure de début",
+      "endTime": "Heure de fin",
+      "locationDetails": "Détails du lieu",
+      "locationPlaceholder": "Adresse, lieu ou lien d'appel vidéo",
+      "tagsPlaceholder": "entraide, atelier, actus-locales",
+      "submit": "Créer l'événement",
+      "successToast": "Événement créé",
+      "errorToast": "Impossible de créer l'événement",
+      "altCalendar": "Événement de calendrier : {{title}}",
+      "altGroup": "Événement de groupe : {{title}}",
+      "errorLoginRequired": "Vous devez être connecté pour créer un événement.",
+      "errorTitleRequired": "Le titre est obligatoire.",
+      "errorStartDateRequired": "La date de début est obligatoire.",
+      "errorStartDatePast": "La date de début ne peut pas être dans le passé.",
+      "errorStartTimeRequired": "L'heure de début est obligatoire pour les événements minutés.",
+      "errorCoverInvalid": "L'image de couverture doit être une URL https:// valide.",
+      "errorEndDateBeforeStart": "La date de fin doit être à ou après la date de début.",
+      "errorStartDateTimeInvalid": "La date ou l'heure de début n'est pas valide.",
+      "errorEndTimeAfterStart": "L'heure de fin doit être après l'heure de début."
+    },
+    "detail": {
+      "untitledEvent": "Événement sans titre",
+      "dateNotSpecified": "Date non précisée",
+      "organizer": "Organisateur",
+      "rsvpUpdated": "RSVP mis à jour",
+      "rsvpFailed": "Échec de la mise à jour du RSVP",
+      "rsvp": "RSVP",
+      "youAreGoing": "Vous y allez",
+      "youAreInterested": "Vous êtes intéressé(e)",
+      "youCantGo": "Vous ne pouvez pas y aller",
+      "chooseRsvp": "Choisissez votre RSVP",
+      "going": "J'y vais",
+      "interested": "Intéressé(e)",
+      "cantGo": "Je ne peux pas",
+      "attendees": "Participants",
+      "links": "Liens",
+      "participants": "Participants",
+      "hostedBy": "organisé par",
+      "attendingCount_one": "{{count}} participant",
+      "attendingCount_other": "{{count}} participants",
+      "interestedCount_one": "{{count}} intéressé",
+      "interestedCount_other": "{{count}} intéressés",
+      "comment": "Commentaire",
+      "description": "Description",
+      "emptyDescription": "L'organisateur n'a pas encore ajouté de description pour cet événement.",
+      "comments": "Commentaires",
+      "commentNoun_one": "commentaire",
+      "commentNoun_other": "commentaires",
+      "noCommentsTitle": "Aucun commentaire pour l'instant",
+      "noCommentsHint": "Soyez le premier à commenter.",
+      "pinnedToast": "Épinglé à l'événement",
+      "unpinnedToast": "Désépinglé de l'événement",
+      "pinFailed": "Échec de la mise à jour des épingles de l'événement"
+    }
+  },
+  "follow": {
+    "follow": "Suivre",
+    "following": "Abonné",
+    "unfollow": "Se désabonner",
+    "followed": "Suivi",
+    "unfollowed": "Désabonné",
+    "updateFailed": "Échec de la mise à jour de la liste d'abonnements"
+  },
+  "campaigns": {
+    "home": {
+      "seoTitle": "Collectes de fonds",
+      "seoDescription": "Connecter les activistes à un financement inarrêtable.",
+      "heroTagline": "Connecter les activistes à un financement<1></1><0>inarrêtable</0>.",
+      "heroBody": "Récoltez du Bitcoin directement auprès de soutiens partout dans le monde. Chaque don est réglé directement vers votre portefeuille, sans intermédiaire, sans rétrofacturation, et sans plateforme qui détient vos fonds.",
+      "startCampaign": "Démarrer une campagne",
+      "howItWorks": "Comment ça marche",
+      "exploreCampaigns": "Explorer les campagnes",
+      "featured": "Mis en avant",
+      "featuredDesc": "Campagnes sélectionnées par l'équipe de {{appName}}.",
+      "community": "Campagnes communautaires",
+      "communityDesc": "Aidez à financer les changements qui valent la peine d'être menés.",
+      "browseAll": "Parcourir toutes les campagnes →",
+      "pending": "En attente d'approbation",
+      "pendingDesc": "Campagnes sur le réseau qu'aucun modérateur de Team Soapbox n'a encore approuvées ou masquées.",
+      "pendingEmpty": "Rien en attente d'examen.",
+      "hidden": "Masquées",
+      "hiddenDesc": "Campagnes supprimées de la page d'accueil publique. Utilisez le menu en kebab d'une carte pour les démasquer.",
+      "hiddenEmpty": "Aucune campagne n'est actuellement masquée.",
+      "yourCampaigns": "Vos campagnes",
+      "yourCampaignsDesc": "Vos campagnes sont en ligne sur Nostr et les dons fonctionnent via le lien de la campagne. Elles apparaissent sur la page d'accueil dès qu'un modérateur de Team Soapbox les approuve.",
+      "empty": "Aucune campagne pour l'instant",
+      "emptyHint": "Soyez le premier à démarrer une collecte de fonds sur {{appName}}. Racontez votre histoire, choisissez vos bénéficiaires et partagez le lien."
+    },
+    "all": {
+      "title": "Toutes les campagnes",
+      "seoTitle": "Toutes les campagnes",
+      "description": "Parcourez toutes les campagnes publiées sur Agora.",
+      "searchAriaLabel": "Rechercher des campagnes",
+      "searchPlaceholder": "Rechercher des campagnes…",
+      "clearSearch": "Effacer la recherche",
+      "sortAriaLabel": "Ordre de tri",
+      "sortTop": "Top",
+      "sortNew": "Nouvelles",
+      "showHidden": "Afficher les masquées",
+      "startCampaign": "Démarrer une campagne",
+      "noMatch": "Aucune campagne ne correspond à « {{query}} »",
+      "noMatchHint": "Essayez un autre terme de recherche, ou effacez la recherche pour voir toutes les campagnes.",
+      "allHidden": "Aucune campagne à afficher",
+      "allHiddenHint": "Toutes les campagnes du réseau ont été masquées par les modérateurs. Activez « Afficher les masquées » pour les voir.",
+      "empty": "Aucune campagne pour l'instant",
+      "emptyHint": "Aucune campagne n'a encore été publiée. Soyez le premier."
+    }
+  },
+  "settings": {
+    "title": "Paramètres",
+    "description": "Gérez vos paramètres {{appName}}",
+    "deleteAccount": "Supprimer le compte",
+    "sections": {
+      "profile": "Profil",
+      "profileDesc": "Nom d'affichage, biographie, avatar et vérification.",
+      "appearance": "Apparence",
+      "appearanceDesc": "Mode système, clair ou sombre.",
+      "language": "Langue",
+      "languageDesc": "Choisissez la langue utilisée dans toute l'application.",
+      "network": "Réseau",
+      "networkDesc": "Utilisation des données, relais et serveurs de téléversement.",
+      "notifications": "Notifications",
+      "notificationsDesc": "Préférences de notifications push.",
+      "advanced": "Avancé",
+      "advancedDesc": "Portefeuille, système et options utilisateur avancé.",
+      "organizers": "Organisateurs",
+      "organizersDesc": "Désignez des organisateurs nationaux qui peuvent épingler des publications aux fils nationaux."
+    },
+    "organizers": "Organisateurs",
+    "signInToManage": "Connectez-vous pour gérer",
+    "loginRequired": "Vous devez être connecté pour gérer les organisateurs.",
+    "appearance": {
+      "title": "Apparence",
+      "subtitle": "Choisissez l'apparence de l'application.",
+      "intro": "Choisissez votre mode de couleur préféré. Système correspondra automatiquement au réglage clair ou sombre de votre appareil.",
+      "colorMode": "Mode de couleur",
+      "system": "Système",
+      "systemDesc": "Suit le réglage de votre appareil",
+      "light": "Clair",
+      "lightDesc": "Utiliser toujours le mode clair",
+      "dark": "Sombre",
+      "darkDesc": "Utiliser toujours le mode sombre"
+    },
+    "network": {
+      "title": "Réseau",
+      "subtitle": "Gérez l'utilisation des données, les relais et les serveurs de téléversement.",
+      "connectionsHeading": "Connexions réseau",
+      "connectionsIntro": "Gérez vos connexions aux relais. Les relais sont des serveurs qui stockent et distribuent les événements Nostr sur le réseau.",
+      "lowBandwidthHeading": "Mode faible bande passante",
+      "reduceDataUsage": "Réduire l'utilisation des données",
+      "reduceDataUsageDesc": "Pour les connexions mesurées ou lentes. Les vidéos ne se lisent pas automatiquement, les aperçus vidéo en arrière-plan sont ignorés, et les images attendent une pression avant de charger.",
+      "useImageProxy": "Utiliser un proxy d'images",
+      "useImageProxyDesc": "Récupère des versions WebP plus petites des images au lieu des originaux pleine résolution.",
+      "proxyUrl": "URL du proxy",
+      "proxyApiDesc": "Doit utiliser l'API <0>wsrv.nl / weserv</0>. Les auto-hébergeurs peuvent pointer ceci vers leur propre instance.",
+      "reset": "Réinitialiser",
+      "relays": "Relais",
+      "blossomServers": "Serveurs Blossom",
+      "imageUploads": "Téléversement d'images",
+      "uploadQuality": "Qualité de téléversement",
+      "uploadQualityDesc": "Compressé redimensionne les grandes images et choisit le format le plus petit. Original téléverse les images telles quelles.",
+      "compressed": "Compressé",
+      "original": "Original"
+    },
+    "advanced": {
+      "title": "Avancé",
+      "subtitle": "Connexions de portefeuille, configuration système et autres options avancées pour les utilisateurs expérimentés.",
+      "intro": "Connexions de portefeuille, configuration système et autres options avancées.",
+      "powerUserHeading": "Paramètres utilisateur avancé",
+      "wallet": "Portefeuille"
+    },
+    "wallet": {
+      "title": "Portefeuille",
+      "subtitle": "Gérez les connexions de portefeuille et les paiements"
+    }
+  },
+  "language": {
+    "title": "Langue",
+    "subtitle": "Choisissez la langue utilisée dans toute l'application.",
+    "intro": "Sélectionnez votre langue préférée. L'application changera immédiatement et se souviendra de votre choix sur cet appareil.",
+    "translationNote": "Les traductions sont en cours. Le texte non traduit revient à l'anglais."
+  },
+  "organizers": {
+    "appoint": "Désigner un organisateur",
+    "appointDesc": "Accordez à un utilisateur la permission d'épingler des publications sur un fil de pays spécifique.",
+    "appointing": "Désignation…",
+    "appointed": "Organisateur désigné",
+    "appointedSuccess": "Organisateur désigné pour {{country}}",
+    "userNpub": "npub de l'utilisateur",
+    "country": "Pays",
+    "selectCountry": "Sélectionner un pays",
+    "invalidNpub": "Format npub invalide",
+    "alreadyOrganizer": "Cet utilisateur est déjà organisateur pour ce pays",
+    "current": "Organisateurs actuels",
+    "noOrganizers": "Aucun organisateur désigné pour l'instant.",
+    "removed": "Organisateur retiré",
+    "removedSuccess": "{{name}} retiré de {{country}}",
+    "refreshed": "Actualisé",
+    "refreshedDesc": "Liste des organisateurs actualisée depuis les relais.",
+    "adminRequired": "Accès administrateur requis",
+    "adminRequiredDesc": "Seuls les administrateurs de la plateforme peuvent désigner ou retirer des organisateurs."
+  },
+  "wallet": {
+    "seoTitle": "Portefeuille",
+    "seoDescription": "Portefeuille Bitcoin hiérarchique déterministe dérivé de votre nsec Nostr.",
+    "loggedOut": {
+      "title": "Portefeuille Bitcoin",
+      "description": "Un portefeuille hiérarchique dérivé de votre identité Nostr. Adresse fraîche à chaque réception, historique complet des transactions, pas de réutilisation d'adresse.",
+      "requiresNsec": "Nécessite une connexion avec un nsec (votre clé privée Nostr)."
+    },
+    "unsupported": {
+      "title": "Portefeuille indisponible",
+      "extension": "Votre extension de navigateur garde votre clé secrète isolée, nous ne pouvons donc pas dériver de clés enfants pour votre portefeuille.",
+      "bunker": "Votre signataire à distance (NIP-46 bunker) garde votre clé secrète côté bunker, nous ne pouvons donc pas dériver de clés enfants pour votre portefeuille.",
+      "other": "Votre type de connexion n'expose pas la clé secrète nécessaire pour dériver votre portefeuille.",
+      "instructions": "Déconnectez-vous et reconnectez-vous avec votre nsec pour utiliser le portefeuille."
+    },
+    "scanFailed": "Échec du scan du portefeuille",
+    "retry": "Réessayer",
+    "refreshBalance": "Actualiser le solde",
+    "refreshBalanceTitle": "Cliquez pour actualiser le solde",
+    "amountPending": "{{amount}} en attente",
+    "pending": "en attente",
+    "send": "Envoyer",
+    "receive": "Recevoir",
+    "transactions": "Transactions",
+    "receiveDialog": {
+      "title": "Recevoir du Bitcoin",
+      "description": "Partagez une adresse pour recevoir du bitcoin.",
+      "onChain": "Sur la chaîne",
+      "silentPayment": "Paiement silencieux",
+      "onChainIntro": "Nouvelle adresse à chaque fois. Passez à un nouvel index après partage pour la confidentialité.",
+      "addressIndex": "Adresse n°{{index}}",
+      "newAddress": "Nouvelle adresse",
+      "silentIntro": "Identifiant de réception statique. Partagez une fois et réutilisez à vie — les expéditeurs dérivent une adresse on-chain unique par paiement.",
+      "noIndexer": "Scan désactivé — aucun indexeur BIP-352 configuré. Définissez <0>bip352IndexerUrl</0> dans votre configuration d'application pour détecter les paiements silencieux entrants.",
+      "silentBalance": "Solde des paiements silencieux : <0>{{amount}}</0>",
+      "scanForNew": "Scanner les nouveaux paiements",
+      "scanForPayments": "Scanner les paiements"
+    },
+    "tx": {
+      "pending": "En attente",
+      "today": "Aujourd'hui",
+      "yesterday": "Hier",
+      "daysAgo_one": "il y a {{count}}j",
+      "daysAgo_other": "il y a {{count}}j",
+      "received": "Reçu",
+      "sent": "Envoyé",
+      "silentBadge": "silencieux",
+      "silentDetectedTitle": "Détecté via le scan de paiement silencieux BIP-352"
+    }
+  },
+  "walletRecovery": {
+    "seoTitle": "Récupérer l'ancien portefeuille",
+    "seoDescription": "Récupérez les fonds d'un ancien portefeuille Lightning et transférez-les vers votre adresse Bitcoin dérivée de Nostr.",
+    "title": "Récupérer l'ancien portefeuille",
+    "heading": "Récupérez votre ancien portefeuille",
+    "subheading": "Si vous déteniez auparavant des fonds dans le portefeuille Lightning, vous pouvez les balayer vers votre adresse Bitcoin dérivée de Nostr. Votre ancien portefeuille n'est pas restauré — il s'agit d'un transfert unique et à sens unique.",
+    "backToWallet": "Retour au portefeuille",
+    "loggedOut": {
+      "title": "Connectez-vous pour récupérer",
+      "description": "Connectez-vous avec l'identité Nostr qui possédait l'ancien portefeuille Lightning afin que les fonds puissent être balayés vers son adresse Bitcoin."
+    },
+    "destination": {
+      "title": "Les fonds seront envoyés à",
+      "description": "Votre adresse Taproot dérivée de Nostr."
+    },
+    "phrase": {
+      "title": "Phrase de récupération",
+      "description": "Collez la phrase de récupération de 12 mots de votre ancien portefeuille.",
+      "checkingRelays": "Vérification de vos relais à la recherche d'une sauvegarde chiffrée…",
+      "backupFoundTitle": "Sauvegarde trouvée sur vos relais",
+      "backupFoundDesc": "Nous avons trouvé une sauvegarde chiffrée de la phrase de récupération de votre ancien portefeuille publiée depuis ce compte.",
+      "decryptAndUse": "Déchiffrer et utiliser",
+      "placeholder": "mot1 mot2 mot3 …",
+      "warning": "Ne collez qu'une phrase de récupération en laquelle vous avez confiance. Quiconque possède cette phrase peut dépenser les fonds. Une fois le balayage terminé, supprimez-la de tout endroit où vous l'avez copiée.",
+      "sweepButton": "Balayer les fonds vers mon adresse Bitcoin"
+    },
+    "sweeping": {
+      "working": "Traitement…",
+      "dontClose": "Ne fermez pas cet onglet. Cela peut prendre jusqu'à une minute pendant que l'ancien portefeuille se synchronise et que la transaction est diffusée."
+    },
+    "success": {
+      "title": "Récupération terminée",
+      "sent": "{{sats}} sats envoyés à votre adresse Bitcoin.",
+      "viewTransaction": "Voir la transaction"
+    },
+    "error": {
+      "title": "Échec de la récupération",
+      "tryAgain": "Réessayer"
+    },
+    "errors": {
+      "noNip44": "Votre signataire ne prend pas en charge le déchiffrement NIP-44, requis pour lire la sauvegarde du relais. Collez votre phrase de récupération de 12 mots manuellement à la place.",
+      "decryptFailed": "Impossible de déchiffrer la sauvegarde du relais. Collez votre phrase de récupération de 12 mots manuellement à la place.",
+      "decryptGeneric": "Échec du déchiffrement de la sauvegarde du relais.",
+      "invalidWordCount": "La phrase de récupération doit comporter 12 ou 24 mots.",
+      "noBalance": "Votre ancien portefeuille n'a pas de solde dépensable. Il n'y a rien à récupérer.",
+      "sweepGeneric": "Échec de la récupération. Veuillez réessayer."
+    },
+    "progress": {
+      "loadingSdk": "Chargement du SDK du portefeuille…",
+      "connecting": "Connexion à votre ancien portefeuille…",
+      "checkingBalance": "Vérification du solde…",
+      "preparingTransfer": "Préparation du transfert de {{sats}} sats…",
+      "broadcasting": "Diffusion de la transaction…"
+    },
+    "toast": {
+      "backupLoadedTitle": "Sauvegarde chargée",
+      "backupLoadedDesc": "Phrase de récupération déchiffrée depuis vos relais."
+    }
+  },
+  "walletConnect": {
+    "status": "Statut",
+    "ready": "Prêt",
+    "notFound": "Introuvable",
+    "none": "Aucun",
+    "add": "Ajouter",
+    "active": "Actif",
+    "connectionLabel": "Connexion NWC",
+    "defaultWalletName": "Portefeuille Lightning",
+    "setActiveTitle": "Définir comme actif",
+    "removeTitle": "Retirer le portefeuille",
+    "helpText": "Installez une extension de navigateur WebLN ou connectez un portefeuille NWC pour envoyer des zaps.",
+    "webln": {
+      "name": "WebLN",
+      "description": "Extension de navigateur"
+    },
+    "nwc": {
+      "name": "Nostr Wallet Connect",
+      "description": "Connexion à un portefeuille à distance",
+      "connectedCount_one": "{{count}} portefeuille connecté",
+      "connectedCount_other": "{{count}} portefeuilles connectés"
+    },
+    "empty": {
+      "title": "Aucun portefeuille connecté",
+      "description": "Ajoutez une connexion NWC pour activer les zaps instantanés."
+    },
+    "dialog": {
+      "title": "Connecter un portefeuille NWC",
+      "description": "Collez une chaîne de connexion depuis votre portefeuille compatible NWC.",
+      "aliasPlaceholder": "Nom du portefeuille (facultatif)",
+      "connect": "Connecter",
+      "connecting": "Connexion..."
+    },
+    "toast": {
+      "uriRequiredTitle": "URI de connexion requise",
+      "uriRequiredDesc": "Veuillez saisir une URI de connexion NWC valide.",
+      "activeChangedTitle": "Portefeuille actif modifié",
+      "activeChangedDesc": "Le portefeuille sélectionné est maintenant actif pour les zaps."
+    }
+  },
+  "walletSend": {
+    "title": "Envoyer du Bitcoin",
+    "send": "Envoyer du Bitcoin",
+    "tapAgainToConfirm": "Appuyez à nouveau pour confirmer",
+    "approxSats": "≈ {{sats}} sats",
+    "satPerVB": "{{rate}} sat/vB",
+    "networkFee": "Frais réseau",
+    "available": "Disponible : {{usd}} ({{sats}} sats)",
+    "recipient": {
+      "label": "Destinataire",
+      "placeholder": "bc1…, sp1…, ou npub…",
+      "sendingSp": "Envoi via un paiement silencieux — le destinataire reçoit une nouvelle adresse on-chain non-traçable.",
+      "sendingNostr": "Envoi vers l'adresse on-chain d'un utilisateur Nostr.",
+      "sendingRaw": "Envoi vers une adresse Bitcoin brute."
+    },
+    "feeSpeed": {
+      "fastest": "~10 min",
+      "halfHour": "~30 min",
+      "hour": "~1 heure",
+      "economy": "~1 jour"
+    },
+    "progress": {
+      "building": "Construction de la transaction…",
+      "signing": "Signature…",
+      "broadcasting": "Diffusion…",
+      "sending": "Envoi…"
+    },
+    "errors": {
+      "unavailable": "Le portefeuille HD n'est pas disponible pour ce type de connexion.",
+      "enterRecipient": "Saisissez une adresse Bitcoin, une adresse sp1…, ou un npub.",
+      "noSpendable": "Pas de Bitcoin dépensable dans ce portefeuille.",
+      "feesNotLoaded": "Taux de frais non chargés.",
+      "cantSendToSelf": "Vous ne pouvez pas vous envoyer à vous-même.",
+      "enterAmount": "Saisissez un montant.",
+      "insufficient": "Pas assez de Bitcoin pour ce montant + frais réseau.",
+      "waitingPrice": "En attente du prix BTC…",
+      "noneYet": "Vous n'avez pas encore de Bitcoin.",
+      "acknowledgePrivacy": "Reconnaissez l'avertissement de confidentialité avant l'envoi."
+    },
+    "toast": {
+      "failedTitle": "Échec de la transaction"
+    },
+    "success": {
+      "title": "Bitcoin envoyé",
+      "satsAmount": "{{sats}} sats",
+      "viewTransaction": "Voir la transaction",
+      "done": "Terminé"
+    }
+  },
+  "bitcoinPublic": {
+    "lead": "L'argent que vous envoyez est public et peut être retracé jusqu'à vous.",
+    "learnMore": "En savoir plus",
+    "body": "Bitcoin est un registre public. Les transactions que vous envoyez peuvent être retracées jusqu'à vous pour toujours, même après avoir été échangées entre plusieurs personnes. N'envoyez qu'à ceux que vous souhaitez soutenir publiquement.",
+    "bodyWithCashOut": "Bitcoin est un registre public. Les transactions que vous envoyez peuvent être retracées jusqu'à vous pour toujours, même après avoir été échangées entre plusieurs personnes. N'envoyez qu'à ceux que vous souhaitez soutenir publiquement, ou retirez via une plateforme d'échange.",
+    "iUnderstand": "Je comprends que cette transaction est publique."
+  },
+  "spScan": {
+    "title": "Scanner les paiements silencieux",
+    "description": "Parcourt l'indexeur BIP-352 configuré bloc par bloc pour détecter les paiements silencieux entrants.",
+    "fromBlock": "Du bloc",
+    "toBlock": "Au bloc",
+    "tipPlaceholder": "sommet",
+    "indexerTip": "Sommet de l'indexeur",
+    "lastFullyScanned": "Dernier scan complet",
+    "never": "jamais",
+    "includeSpent": "Inclure les déjà dépensés",
+    "includeSpentDesc": "Détecte également les paiements silencieux qui ont depuis été dépensés. À utiliser pour reconstruire l'historique de réception après un scan manqué ou une réinitialisation.",
+    "blockProgress": "Bloc {{current}} / {{to}}",
+    "matches_one": "{{count}} correspondance",
+    "matches_other": "{{count}} correspondances",
+    "scannedRange": "Blocs scannés {{from}} → {{to}}.",
+    "foundOutputs_one": "Trouvé {{count}} nouvelle sortie.",
+    "foundOutputs_other": "Trouvé {{count}} nouvelles sorties.",
+    "noNewPayments": "Aucun nouveau paiement.",
+    "startScan": "Démarrer le scan",
+    "reconcile": {
+      "title": "Réconcilier les UTXO dépensés",
+      "description": "Vérifie chaque UTXO de paiement silencieux stocké via Blockbook et supprime ceux qui ont été dépensés. À utiliser si le solde est plus élevé qu'il ne devrait l'être après un envoi.",
+      "checking": "Vérification {{checked}} / {{total}}…",
+      "checked_one": "{{count}} UTXO vérifié · {{pruned}} élagués.",
+      "checked_other": "{{count}} UTXO vérifiés · {{pruned}} élagués.",
+      "reconciling": "Réconciliation…",
+      "reconcileNow": "Réconcilier maintenant"
+    }
+  },
+  "notifications": {
+    "seoTitle": "Notifications",
+    "seoDescription": "Vos notifications Nostr",
+    "title": "Notifications",
+    "tabs": {
+      "all": "Toutes",
+      "mentions": "Mentions"
+    },
+    "loginPrompt": "Connectez-vous pour voir vos notifications.",
+    "empty": "Aucune notification pour l'instant.",
+    "subject": {
+      "twoActors": "<0></0> et <1></1>",
+      "andOthers_one": " et {{count}} autre",
+      "andOthers_other": " et {{count}} autres"
+    },
+    "actorAvatars": {
+      "moreCount": "+{{count}} de plus"
+    },
+    "actions": {
+      "reactedToYour": "a réagi à votre {{noun}}",
+      "repostedYour": "a republié votre {{noun}}",
+      "zappedYou": "vous a zappé",
+      "zappedYouWithAmount": "vous a zappé {{sats}} sats",
+      "repliedToYourNote": "a répondu à votre note",
+      "mentionedYou": "vous a mentionné",
+      "repliedToYourComment": "a répondu à votre commentaire",
+      "commentedOnYour": "a commenté votre {{noun}}",
+      "sentYouLetter": "vous a envoyé une lettre",
+      "highlightedYour": "a mis en évidence votre {{noun}}",
+      "awardedBadge": "vous a décerné un badge",
+      "awardedBadges": "vous a décerné des badges"
+    },
+    "letter": {
+      "viewAll": "Voir toutes les lettres",
+      "reply": "Répondre"
+    },
+    "kinds": {
+      "profile": "profil",
+      "post": "publication",
+      "encryptedMessage": "message chiffré",
+      "repost": "republication",
+      "reaction": "réaction",
+      "badgeAward": "remise de badge",
+      "photo": "photo",
+      "video": "vidéo",
+      "requestToVanish": "demande de disparition",
+      "file": "fichier",
+      "poll": "sondage",
+      "comment": "commentaire",
+      "voiceMessage": "message vocal",
+      "patch": "correctif",
+      "pullRequest": "pull request",
+      "highlight": "mise en évidence",
+      "birdDetection": "détection d'oiseau",
+      "birdex": "Birdex",
+      "colorMoment": "moment de couleur",
+      "foundLog": "journal trouvé",
+      "nsite": "nsite",
+      "profileBadges": "badges de profil",
+      "badge": "badge",
+      "article": "article",
+      "emojiPack": "pack d'emojis",
+      "podcastEpisode": "épisode de podcast",
+      "podcastTrailer": "bande-annonce de podcast",
+      "zapstoreAsset": "actif Zapstore",
+      "zapstoreRelease": "sortie Zapstore",
+      "stream": "diffusion",
+      "status": "statut",
+      "repository": "dépôt",
+      "customNip": "NIP personnalisé",
+      "calendarEvent": "événement de calendrier",
+      "zapstoreApp": "application Zapstore",
+      "playlist": "liste de lecture",
+      "divine": "divin",
+      "community": "communauté",
+      "goal": "objectif",
+      "track": "piste",
+      "magicDeck": "jeu magique",
+      "treasure": "trésor",
+      "constellation": "constellation",
+      "followPack": "pack de suivis"
+    }
+  },
+  "notifSettings": {
+    "seoTitle": "Notifications",
+    "seoDescription": "Configurez vos préférences de notification",
+    "title": "Notifications",
+    "subtitle": "Personnalisez les notifications que vous recevez.",
+    "pushHeading": "Notifications push",
+    "enablePush": {
+      "label": "Activer les notifications push",
+      "description": "Recevez des notifications pour l'activité sur vos publications"
+    },
+    "unsupported": "Votre navigateur ne prend pas en charge les notifications push.",
+    "denied": "Les notifications sont bloquées. Modifiez les paramètres de votre navigateur pour autoriser les notifications de ce site.",
+    "deliveryMethod": {
+      "heading": "Méthode de livraison",
+      "intro": "Choisissez comment les notifications sont livrées sur votre appareil.",
+      "push": {
+        "label": "Push",
+        "description": "Notifications standard. Pas d'icône persistante dans la barre d'état."
+      },
+      "persistent": {
+        "label": "Persistante",
+        "description": "Interroge directement les relais en arrière-plan pour les nouvelles notifications. À utiliser pour une livraison fiable sur les appareils sans prise en charge des notifications push."
+      }
+    },
+    "notifyAbout": {
+      "heading": "Me notifier des",
+      "filterHeading": "Filtre",
+      "typesHeading": "Types",
+      "onlyFollowing": {
+        "label": "Uniquement des personnes que je suis",
+        "description": "Masquer les notifications des comptes que vous ne suivez pas"
+      }
+    },
+    "types": {
+      "reactions": {
+        "label": "Réactions",
+        "description": "Quand quelqu'un réagit à vos publications"
+      },
+      "reposts": {
+        "label": "Republications",
+        "description": "Quand quelqu'un republie vos notes"
+      },
+      "zaps": {
+        "label": "Zaps",
+        "description": "Quand quelqu'un vous envoie un zap Lightning ou on-chain"
+      },
+      "mentions": {
+        "label": "Mentions",
+        "description": "Quand quelqu'un vous mentionne dans une note"
+      },
+      "comments": {
+        "label": "Commentaires et réponses",
+        "description": "Quand quelqu'un commente ou répond à vos publications"
+      },
+      "badges": {
+        "label": "Remises de badges",
+        "description": "Quand quelqu'un vous décerne un badge"
+      },
+      "letters": {
+        "label": "Lettres",
+        "description": "Quand quelqu'un vous envoie une lettre"
+      },
+      "highlights": {
+        "label": "Mises en évidence",
+        "description": "Quand quelqu'un met en évidence votre contenu"
+      }
+    },
+    "toast": {
+      "enableFailedTitle": "Échec de l'activation des notifications",
+      "enableFailedDesc": "Veuillez réessayer."
+    }
+  },
+  "search": {
+    "seoTitle": "Recherche",
+    "seoDescription": "Rechercher sur Nostr",
+    "title": "Recherche",
+    "inputPlaceholder": "Rechercher",
+    "filtersAria": "Filtres de recherche",
+    "tabs": {
+      "agora": "Agora",
+      "nostr": "Nostr",
+      "accounts": "Comptes"
+    },
+    "filters": {
+      "title": "Filtres",
+      "reset": "Réinitialiser",
+      "from": "De",
+      "sort": "Tri",
+      "media": "Média",
+      "protocol": "Protocole",
+      "language": "Langue",
+      "kind": "Type",
+      "kindCustomPlaceholder": "ex. 1, 30023",
+      "includeReplies": "Inclure les réponses",
+      "authorScope": {
+        "anyone": "N'importe qui",
+        "follows": "Abonnements",
+        "people": "Personnes"
+      },
+      "sortOptions": {
+        "recent": "Récent",
+        "hot": "Populaire",
+        "trending": "Tendance"
+      },
+      "mediaOptions": {
+        "all": "Tous",
+        "images": "Images",
+        "videos": "Vidéos",
+        "shorts": "Shorts",
+        "none": "Sans média"
+      },
+      "protocolOptions": {
+        "nostr": "Nostr",
+        "mastodon": "Mastodon",
+        "bluesky": "Bluesky"
+      },
+      "langOptions": {
+        "global": "Global",
+        "en": "Anglais",
+        "es": "Espagnol",
+        "fr": "Français",
+        "de": "Allemand",
+        "ja": "Japonais",
+        "zh": "Chinois"
+      }
+    },
+    "chips": {
+      "noReplies": "Sans réponses",
+      "images": "Images",
+      "videos": "Vidéos",
+      "shortsAndDivines": "Shorts et Divines",
+      "noMedia": "Sans média",
+      "mastodon": "Mastodon",
+      "bluesky": "Bluesky",
+      "hot": "Populaire",
+      "trending": "Tendance",
+      "allKinds": "Tous les types",
+      "customKind": "Type : {{kind}}",
+      "kindNumber": "Type {{kind}}",
+      "kindsCount_one": "{{count}} type",
+      "kindsCount_other": "{{count}} types",
+      "myFollows": "Mes abonnements",
+      "authorsCount_one": "{{count}} auteur",
+      "authorsCount_other": "{{count}} auteurs"
+    },
+    "clear": "Effacer",
+    "searchLabel": "recherche :",
+    "newPosts_one": "{{count}} nouvelle publication",
+    "newPosts_other": "{{count}} nouvelles publications",
+    "following": "Abonné",
+    "botAccount": "Compte bot",
+    "empty": {
+      "posts": "Aucun résultat correspondant à votre recherche.",
+      "postsPrompt": "Saisissez une requête pour trouver du contenu Nostr.",
+      "accounts": "Aucun compte correspondant à votre recherche.",
+      "followsPrompt": "Recherchez des personnes par nom ou adresse NIP-05.",
+      "agora": "Aucune campagne, promesse ou groupe Agora correspondant à votre recherche.",
+      "agoraPrompt": "Recherchez des campagnes, promesses et groupes Agora, ou parcourez les dernières.",
+      "activeFilters": "Filtres actifs :",
+      "clearAll": "Tout effacer"
+    }
+  },
+  "profile": {
+    "seoDescriptionFallback": "Profil Nostr",
+    "anonymous": "Anonyme",
+    "userNotFound": "Utilisateur introuvable.",
+    "userNotFoundNip05": "Utilisateur introuvable : {{handle}}",
+    "couldNotResolveNip05": "Impossible de résoudre cet identifiant NIP-05.",
+    "tabs": {
+      "overview": "Aperçu",
+      "activity": "Activité",
+      "campaigns": "Campagnes",
+      "groups": "Groupes",
+      "pledges": "Promesses"
+    },
+    "header": {
+      "editProfile": "Modifier le profil",
+      "shareFollowLink": "Partager le lien de suivi",
+      "moreOptions": "Plus d'options",
+      "donate": "Faire un don",
+      "campaignGoal": "Objectif {{amount}} $"
+    },
+    "stats": {
+      "followers": "Abonnés",
+      "following": "Abonnements",
+      "raised": "Récoltés",
+      "followersTitle_one": "{{count}} abonné",
+      "followersTitle_other": "{{count}} abonnés",
+      "followingTitle": "{{count}} abonnements"
+    },
+    "sections": {
+      "profile": "Profil",
+      "campaigns": "Campagnes",
+      "latestPledge": "Dernière promesse",
+      "groups": "Groupes",
+      "seeAllCampaigns_one": "Voir toutes les {{count}} campagne →",
+      "seeAllCampaigns_other": "Voir toutes les {{count}} campagnes →",
+      "viewCampaignsTab": "Voir l'onglet campagnes →",
+      "seeAllPledges_one": "Voir toutes les {{count}} promesse →",
+      "seeAllPledges_other": "Voir toutes les {{count}} promesses →",
+      "seeAllGroups": "Voir tous les {{count}} →"
+    },
+    "badges": {
+      "founder": "Fondateur",
+      "moderator": "Modérateur",
+      "mod": "Mod",
+      "ended": "Terminée",
+      "pledged": "Promis"
+    },
+    "moreMenu": {
+      "title": "Options du profil",
+      "copyPubkey": "Copier la clé publique",
+      "copyLink": "Copier le lien du profil",
+      "addToList": "Ajouter à une liste",
+      "shareFollowLink": "Partager le lien de suivi",
+      "profileRecovery": "Récupération du profil",
+      "zap": "Zap",
+      "awardBadge": "Décerner un badge",
+      "writeLetter": "Écrire une lettre",
+      "mute": "Mettre @{{name}} en sourdine",
+      "unmute": "Réactiver @{{name}}",
+      "report": "Signaler @{{name}}",
+      "close": "Fermer"
+    },
+    "toast": {
+      "pubkeyCopied": "Clé publique copiée dans le presse-papiers",
+      "linkCopied": "Lien du profil copié dans le presse-papiers",
+      "muted": "@{{name}} en sourdine",
+      "unmuted": "@{{name}} réactivé",
+      "muteFailed": "Échec de la mise en sourdine de l'utilisateur",
+      "unmuteFailed": "Échec de la réactivation de l'utilisateur",
+      "followed": "Suivi de @{{name}}",
+      "unfollowed": "Désabonné de @{{name}}",
+      "followFailed": "Échec de la mise à jour de la liste d'abonnements",
+      "btcAddressCopied": "Adresse Bitcoin copiée dans le presse-papiers"
+    },
+    "followingModal": {
+      "title": "{{name}} suit",
+      "empty": "Ne suit personne pour l'instant."
+    },
+    "followersModal": {
+      "title": "Abonnés de {{name}}",
+      "empty": "Aucun abonné trouvé."
+    },
+    "bitcoinModal": {
+      "title": "Bitcoin",
+      "qrAlt": "QR Bitcoin",
+      "copyAddress": "Copier l'adresse",
+      "showQr": "Afficher le QR code",
+      "viewOnMempool": "Voir sur mempool.space"
+    },
+    "lightbox": {
+      "openOriginal": "Ouvrir l'original",
+      "close": "Fermer (Échap)",
+      "imageAlt": "Image de profil"
+    },
+    "activity": {
+      "empty": "Aucune activité de {{name}} pour l'instant. Publications, campagnes, promesses et dons apparaissent ici."
+    },
+    "campaigns": {
+      "count_one": "{{count}} campagne",
+      "count_other": "{{count}} campagnes",
+      "sortNew": "Nouvelles",
+      "sortTop": "Top",
+      "showHidden": "Afficher les masquées",
+      "hideHidden": "Masquer les masquées",
+      "emptySelf": "Vous n'avez pas encore lancé de campagne.",
+      "emptyOther": "{{name}} n'a pas encore lancé de campagne.",
+      "startLink": "Démarrer une campagne →"
+    },
+    "pledgesTab": {
+      "active": "Active",
+      "ended": "Terminée",
+      "emptySelf": "Vous n'avez pas encore créé de promesse.",
+      "emptyOther": "{{name}} n'a pas encore créé de promesse.",
+      "createLink": "Créer une promesse →"
+    },
+    "groupsDialog": {
+      "title": "Tous les groupes"
+    }
+  },
+  "profileSettings": {
+    "seoTitle": "Profil | Paramètres",
+    "seoDescription": "Modifiez votre profil {{appName}}",
+    "header": {
+      "title": "Profil",
+      "subtitle": "Votre identité Nostr est portable — elle vous suit partout.",
+      "save": "Enregistrer"
+    },
+    "intro": {
+      "heading": "Votre identité",
+      "body": "Appuyez sur n'importe quel champ de la carte pour le modifier. Cliquez sur votre avatar ou votre bannière pour téléverser et recadrer une nouvelle image."
+    },
+    "uploading": "Téléversement…",
+    "fields": {
+      "heading": "Champs du profil",
+      "website": "Site web",
+      "websitePlaceholder": "https://votresite.com",
+      "lightning": "Lightning",
+      "lightningPlaceholder": "vous@walletofsatoshi.com",
+      "labelPlaceholder": "Étiquette",
+      "tickerPlaceholder": "Ticker",
+      "addressPlaceholder": "Adresse",
+      "valuePlaceholder": "Valeur ou URL",
+      "mediaPlaceholder": "Téléverser un fichier ou coller un lien direct",
+      "chooseFile": "Choisir un fichier à téléverser",
+      "chooseMediaFile": "Choisir un fichier multimédia à téléverser"
+    },
+    "presets": {
+      "music": {
+        "label": "Musique",
+        "description": "Téléverser une chanson ou un clip audio",
+        "valuePlaceholder": "Téléverser un audio ou coller un lien direct"
+      },
+      "photo": {
+        "label": "Photo",
+        "description": "Téléverser une image",
+        "valuePlaceholder": "Téléverser une image ou coller un lien direct"
+      },
+      "video": {
+        "label": "Vidéo",
+        "description": "Téléverser un clip vidéo",
+        "valuePlaceholder": "Téléverser une vidéo ou coller un lien direct"
+      },
+      "email": {
+        "label": "Email",
+        "defaultLabel": "Email",
+        "description": "Adresse e-mail de contact",
+        "valuePlaceholder": "vous@example.com"
+      },
+      "wallet": {
+        "label": "Portefeuille",
+        "description": "Adresse de portefeuille cryptographique",
+        "valuePlaceholder": "Adresse"
+      },
+      "link": {
+        "label": "Lien",
+        "description": "Lien vers n'importe quel site ou profil",
+        "valuePlaceholder": "https://..."
+      },
+      "weather": {
+        "label": "Météo",
+        "defaultLabel": "Météo",
+        "description": "Connecter une station météo Nostr",
+        "valuePlaceholder": "npub1... ou naddr1... (#station-id facultatif)"
+      },
+      "custom": {
+        "label": "Personnalisé",
+        "description": "Créer un champ personnalisé",
+        "valuePlaceholder": "Valeur ou URL"
+      }
+    },
+    "warnings": {
+      "audioWrongType": "Cette URL ne pointe pas vers un fichier audio. Téléversez un fichier audio ou utilisez un lien direct se terminant par .mp3, .ogg, .wav, etc.",
+      "audioUnknown": "Cette URL peut ne pas fonctionner comme lecteur audio. Pour de meilleurs résultats, téléversez un fichier avec le bouton ou collez un lien direct vers un fichier audio.",
+      "imageWrongType": "Cette URL ne pointe pas vers une image. Téléversez une image ou utilisez un lien direct se terminant par .jpg, .png, .webp, etc.",
+      "imageUnknown": "Cette URL peut ne pas s'afficher comme une image. Pour de meilleurs résultats, téléversez un fichier avec le bouton ou collez un lien direct vers un fichier image.",
+      "videoWrongType": "Cette URL ne pointe pas vers une vidéo. Téléversez une vidéo ou utilisez un lien direct se terminant par .mp4, .webm, .mov, etc.",
+      "videoUnknown": "Cette URL peut ne pas s'afficher comme une vidéo. Pour de meilleurs résultats, téléversez un fichier avec le bouton ou collez un lien direct vers un fichier vidéo."
+    },
+    "crop": {
+      "profile": "Recadrer la photo de profil",
+      "banner": "Recadrer la bannière"
+    },
+    "mobilePreview": "Aperçu des champs du profil",
+    "advanced": {
+      "heading": "Avancé",
+      "botLabel": "Compte bot",
+      "botDescription": "Marquer ce compte comme automatisé"
+    },
+    "toast": {
+      "uploaded": "Téléversé",
+      "mediaUploaded": "Fichier multimédia téléversé",
+      "uploadFailed": "Échec du téléversement",
+      "tryAgain": "Veuillez réessayer.",
+      "profilePictureUpdated": "Photo de profil mise à jour",
+      "bannerUpdated": "Bannière mise à jour",
+      "profileSaved": "Profil enregistré",
+      "saveFailed": "Échec de l'enregistrement du profil."
+    },
+    "key": {
+      "heading": "Votre clé",
+      "extensionBody": "Vous êtes connecté avec une extension de navigateur (NIP-07). Votre clé secrète y est stockée — gérez-la ou exportez-la depuis l'extension elle-même.",
+      "bunkerBody": "Vous êtes connecté avec un signataire à distance (NIP-46). Votre clé secrète est détenue par ce signataire et ne peut pas être exportée depuis {{appName}}.",
+      "explainer": "Cette clé secrète contrôle votre compte sur {{appName}}. Quiconque la possède peut publier et se faire passer pour vous. Conservez-la dans un gestionnaire de mots de passe ou ailleurs où vous seul pouvez y accéder.",
+      "warning": "Ne partagez JAMAIS votre clé secrète avec qui que ce soit. Évitez d'en faire une capture d'écran ou de la coller ailleurs que dans un gestionnaire de mots de passe. Si elle est partagée, d'autres pourront accéder à votre compte.",
+      "aria": "Votre clé secrète",
+      "copyAria": "Copier la clé secrète",
+      "revealAria": "Révéler la clé secrète",
+      "hideAria": "Masquer la clé secrète",
+      "backupButton": "Sauvegarder la clé",
+      "saving": "Enregistrement…",
+      "saved": "Clé secrète enregistrée",
+      "savedToFile": "Votre clé secrète a été enregistrée dans le dossier Documents de votre appareil.",
+      "saveFailed": "Échec de l'enregistrement",
+      "saveFailedDescription": "Impossible d'enregistrer la clé. Veuillez la copier manuellement.",
+      "copyFailed": "Échec de la copie",
+      "copyFailedDescription": "Impossible d'accéder au presse-papiers. Révélez la clé et copiez-la manuellement."
+    }
+  },
+  "faq": {
+    "categories": {
+      "getting-started": { "label": "À propos d'Agora" },
+      "payments": { "label": "Dons Bitcoin sur Agora" },
+      "about-nostr": { "label": "À propos de Nostr" },
+      "legacy": { "label": "Héritage" }
+    },
+    "items": {
+      "what-is-ditto": {
+        "question": "Qu'est-ce que {{appName}} ?",
+        "answer": [
+          "{{appName}} est une plateforme pour envoyer des dons en Bitcoin — publics ou privés — directement aux activistes. Il n'y a pas d'intermédiaire, pas de processeur de paiement, et pas de compte qui peut être gelé.",
+          "{{appName}} est bâtie sur Nostr, donc votre identité n'est pas verrouillée à ce site — elle vous appartient."
+        ]
+      },
+      "cost-to-use": {
+        "question": "Est-ce que {{appName}} coûte quelque chose ?",
+        "answer": [
+          "**Non.** {{appName}} ne prend aucun frais de plateforme. Quand vous faites un don, vous ne payez que les frais du réseau Bitcoin qui vont aux mineurs — pas à nous."
+        ]
+      },
+      "who-made-this": {
+        "question": "Qui a créé {{appName}} ?",
+        "answer": [
+          "{{appName}} est construite par [Soapbox](https://soapbox.pub), une équipe open-source qui développe des outils pour l'écosystème Nostr, en collaboration avec le [World Liberty Congress](https://worldlibertycongress.org/)."
+        ]
+      },
+      "send-bitcoin-onchain": {
+        "question": "Comment fonctionne l'envoi de Bitcoin ?",
+        "answer": [
+          "Quand un activiste crée une campagne, il choisit quels types de paiements accepter : **publics**, **privés**, ou **les deux**.",
+          "Les dons **publics** sont du vrai Bitcoin on-chain. Ils sont réglés sur la blockchain publique, fonctionnent dans tous les portefeuilles Bitcoin, et sont visibles par n'importe qui.",
+          "Les dons **privés** utilisent des **paiements silencieux** (BIP-352). Ils sont aussi réglés on-chain, mais la transaction ne peut pas être reliée au code de donation de l'activiste — ils restent donc hors des listes et totaux publics de donateurs. Le donateur a besoin d'un portefeuille qui prend en charge les paiements silencieux — nous recommandons [Ditto Wallet](https://ditto.pub) ou [Dana](https://github.com/cygnet3/dana/releases/download/v0.7.4/app-live-release.apk).",
+          "Quand une campagne accepte **les deux**, {{appName}} affiche un seul QR code qui encode les deux points de terminaison. Les portefeuilles de paiements silencieux le lisent comme privé ; les autres portefeuilles se rabattent sur l'adresse publique. Les donateurs n'ont pas à choisir — leur portefeuille sélectionne automatiquement le bon chemin.",
+          "Dans tous les cas, le paiement va directement à l'activiste. {{appName}} ne touche jamais les fonds."
+        ]
+      },
+      "connect-wallet": {
+        "question": "Qu'est-ce que le portefeuille sur {{appName}} ?",
+        "answer": [
+          "Votre portefeuille {{appName}} est construit à partir de votre clé Nostr. Il peut recevoir du Bitcoin de deux façons — comme une adresse publique que n'importe quel portefeuille Bitcoin peut payer, et comme un code de paiements silencieux que les portefeuilles compatibles peuvent payer en privé. Il n'y a rien à créer ; il existe dès l'instant où vous avez un compte.",
+          "Quand vous créez une campagne, vous choisissez si vous acceptez les paiements publics, les paiements privés, ou les deux. Pour dépenser ce que vous recevez, consultez le **Guide de l'activiste**."
+        ]
+      },
+      "donations-are-public-general": {
+        "question": "Les dons sur {{appName}} sont-ils publics ?",
+        "answer": [
+          "Cela dépend du type de paiement que l'activiste accepte.",
+          "**Les dons publics** sont enregistrés sur la blockchain Bitcoin et sur Nostr. N'importe qui peut voir les montants, les horaires et les adresses.",
+          "**Les dons privés** utilisent les paiements silencieux. Ils ne sont pas publiquement liables au code de donation de l'activiste, n'apparaissent pas dans les listes de donateurs, et ne comptent pas dans les totaux publics.",
+          "Quand une campagne accepte les deux, le portefeuille du donateur décide quel chemin utiliser — les portefeuilles compatibles paient en privé, les autres paient l'adresse publique. Lisez le **Guide du donateur** et le **Guide de l'activiste** pour le tableau complet."
+        ]
+      },
+      "censorship-resistance": {
+        "question": "Que signifie « résistant à la censure » ici ?",
+        "answer": [
+          "Aucune entreprise ne se place entre un donateur et un activiste. {{appName}} ne détient pas les fonds et ne peut pas geler l'adresse.",
+          "Tant que le réseau Bitcoin fonctionne, les dons peuvent être envoyés et reçus. Le fait que {{appName}} elle-même soit hors ligne ne les arrêterait pas."
+        ]
+      },
+      "why-onchain": {
+        "question": "Pourquoi Bitcoin ?",
+        "answer": [
+          "Bitcoin est le rail de paiement le plus largement pris en charge et le plus résistant à la censure au monde. Tous les portefeuilles Bitcoin peuvent l'envoyer.",
+          "Sur {{appName}}, les activistes choisissent comment recevoir : **public** (une adresse Bitcoin classique) pour une portée maximale, **privé** (paiements silencieux) pour des dons non-traçables, ou **les deux** afin que le portefeuille de chaque donateur sélectionne automatiquement le bon chemin. Les donateurs qui n'ont qu'une application Bitcoin grand public peuvent quand même contribuer ; les donateurs avec un portefeuille de paiements silencieux obtiennent la confidentialité par défaut.",
+          "Le compromis est que les transactions Bitcoin publiques sont visibles sur la blockchain et paient des frais de mineur. Les guides Donateur et Activiste expliquent comment gérer les deux."
+        ]
+      },
+      "why-not-silent-payments": {
+        "question": "Est-ce que {{appName}} prend en charge les paiements silencieux ?",
+        "answer": [
+          "Oui — des deux côtés. Le portefeuille Bitcoin intégré de {{appName}} prend en charge BIP-352, donc quand vous envoyez du Bitcoin depuis votre portefeuille {{appName}}, vous pouvez payer n'importe quelle adresse de paiement silencieux (`sp1…`) directement. Et quand un activiste crée une campagne, il peut accepter les paiements silencieux à la place ou en plus des paiements Bitcoin publics.",
+          "Les dons en paiements silencieux sont quand même réglés on-chain, mais la transaction ne peut pas être reliée au code de donation de l'activiste — ils n'apparaissent donc pas dans les listes ou les totaux publics de donateurs.",
+          "Envoyer un paiement silencieux depuis l'extérieur de {{appName}} nécessite un portefeuille qui prend en charge BIP-352. La plupart des applications grand public ne le font pas encore, mais [Ditto Wallet](https://ditto.pub) et [Dana](https://github.com/cygnet3/dana/releases/download/v0.7.4/app-live-release.apk) le font.",
+          "Quand une campagne accepte les deux types de paiement, {{appName}} les encode dans un seul QR code. Les portefeuilles compatibles paient en privé ; les autres paient l'adresse publique. Aucun donateur n'est exclu, et aucun activiste n'est forcé de choisir entre portée et confidentialité."
+        ]
+      },
+      "why-not-lightning": {
+        "question": "Pourquoi {{appName}} n'utilise-t-il pas Lightning ?",
+        "answer": [
+          "Lightning nécessite un portefeuille Lightning. Les plus faciles (Wallet of Satoshi, Strike, Breez) sont **dépositaires** — une entreprise détient les fonds et peut être fermée, géo-bloquée, ou pressée de geler les comptes. Lightning non-dépositaire est techniquement exigeant et peu fiable pour les débutants.",
+          "Nous voulons que {{appName}} fonctionne pour quelqu'un dont la seule expérience Bitcoin est une application grand public comme Cash App, Coinbase, Strike, Venmo ou PayPal. Le Bitcoin on-chain fonctionne avec tous les portefeuilles de la planète."
+        ]
+      },
+      "why-not-rotating-addresses": {
+        "question": "Pourquoi {{appName}} ne génère-t-il pas une nouvelle adresse pour chaque don ?",
+        "answer": [
+          "Faire cela exigerait que {{appName}} agisse comme un intermédiaire d'échange d'argent — prenant d'abord la garde du Bitcoin puis le transférant à l'activiste.",
+          "Cela ferait de nous un transmetteur d'argent, soumis aux réglementations qui l'accompagnent, et un point unique de défaillance : fermez le serveur de {{appName}} et vous avez fermé chaque don qui le traverse.",
+          "À la place, l'adresse de donation de chaque utilisateur est dérivée de sa clé secrète Nostr (nsec) — la même clé avec laquelle vous vous connectez. Les donateurs envoient directement à l'activiste, {{appName}} ne touche jamais les fonds, et la plateforme elle-même ne peut pas être éteinte pour censurer qui que ce soit. Les activistes qui veulent de la confidentialité par don peuvent accepter les paiements silencieux, qui offrent la même non-traçabilité sans que personne ne détienne l'argent au milieu."
+        ]
+      },
+      "why-not-other-crypto": {
+        "question": "Pourquoi pas Monero ou une autre crypto-monnaie ?",
+        "answer": [
+          "Bitcoin est de loin la crypto-monnaie la plus largement adoptée. Cela signifie qu'elle est la plus facile à acheter et à envoyer pour les donateurs, et la plus facile à recevoir, détenir et dépenser pour les activistes.",
+          "Les pièces axées sur la confidentialité comme Monero offrent des compromis de confidentialité différents de Bitcoin, mais elles ne sont pas prises en charge par la plupart des applications grand public et sont plus difficiles à reconvertir en monnaie locale. Demander à l'une ou l'autre des parties d'un don d'acquérir d'abord une crypto-monnaie de niche est une barrière que {{appName}} n'imposera pas. Pour les dons Bitcoin eux-mêmes, les paiements silencieux couvrent le cas d'usage de la non-traçabilité sans quitter l'écosystème Bitcoin."
+        ]
+      },
+      "what-is-nostr": {
+        "question": "Qu'est-ce que Nostr ?",
+        "answer": [
+          "Nostr est un réseau ouvert où **vous** possédez votre compte, pas une entreprise. Votre identité est une clé cryptographique que vous contrôlez, et non un nom d'utilisateur sur le serveur de quelqu'un d'autre.",
+          "Sur {{appName}}, cette même clé est aussi ce dont votre adresse de donation est dérivée — votre clé secrète Nostr (nsec) sert de graine à votre portefeuille Bitcoin, c'est pourquoi vous pouvez recevoir du Bitcoin sans vous inscrire auprès de personne."
+        ]
+      },
+      "why-login-different": {
+        "question": "Pourquoi ma connexion est-elle si différente et longue ?",
+        "answer": [
+          "Au lieu d'un nom d'utilisateur et d'un mot de passe contrôlés par une entreprise, Nostr utilise une paire de clés cryptographiques.",
+          "Votre « clé publique » (commence par **npub**) est votre nom d'utilisateur. Votre « clé secrète » (commence par **nsec**) est votre mot de passe. La longue chaîne est ce qui rend virtuellement impossible de la deviner."
+        ]
+      },
+      "lose-secret-key": {
+        "question": "Que se passe-t-il si je perds ma clé secrète ?",
+        "answer": [
+          "**Il n'y a pas de bouton « mot de passe oublié ».** Personne ne peut la réinitialiser pour vous. Si vous la perdez, votre compte — et tout Bitcoin présent à votre adresse de donation — est perdu pour toujours.",
+          "**Enregistrez votre clé secrète en lieu sûr dès maintenant.** Pour des conseils, lisez [Gérer vos clés Nostr](https://soapbox.pub/blog/managing-nostr-keys)."
+        ]
+      },
+      "manage-secret-key": {
+        "question": "Puis-je enregistrer ma clé secrète dans le gestionnaire de mots de passe de mon téléphone ?",
+        "answer": [
+          "Oui. Vous pouvez l'enregistrer dans le gestionnaire de mots de passe de votre appareil (iCloud Keychain, 1Password, Bitwarden, etc.). Sur iPhone, l'enregistrer dans Mots de passe vous permet d'utiliser Face ID ou Touch ID pour vous connecter.",
+          "Pour un guide complet, voir [Gérer vos clés Nostr](https://soapbox.pub/blog/managing-nostr-keys)."
+        ]
+      },
+      "send-bitcoin-lightning": {
+        "question": "Comment fonctionne l'envoi de Bitcoin via Lightning ?",
+        "answer": [
+          "Si un destinataire a une adresse Lightning sur son profil, vous pouvez y envoyer. Lightning est réglé en quelques secondes et les frais sont minuscules.",
+          "Les envois Lightning n'utilisent pas l'adresse de donation de {{appName}} — ils vont directement vers le portefeuille Lightning que le destinataire a configuré lui-même. Le propre flux de dons de {{appName}} est uniquement on-chain."
+        ]
+      },
+      "what-are-zaps": {
+        "question": "Que sont les zaps ?",
+        "answer": [
+          "Les zaps sont de petits pourboires Lightning sur Nostr, distincts du flux de dons on-chain de {{appName}}."
+        ]
+      },
+      "fyp": {
+        "question": "Comment fonctionne le fil ?",
+        "answer": [
+          "Votre fil affiche les campagnes et les publications des personnes que vous suivez. Aucun algorithme ne décide de ce que vous voyez."
+        ]
+      },
+      "what-are-relays": {
+        "question": "Qu'est-ce que les relais ?",
+        "answer": [
+          "Les relais sont les serveurs qui stockent et livrent les événements Nostr — publications, reçus de dons, infos de profil. Les valeurs par défaut fonctionnent immédiatement ; vous pouvez ajouter ou retirer des relais dans Paramètres > Réseau."
+        ]
+      },
+      "what-are-blossom": {
+        "question": "Qu'est-ce que les serveurs Blossom ?",
+        "answer": [
+          "Les serveurs Blossom stockent les fichiers multimédias (images de campagnes, photos de profil) quand vous les téléversez. Vous pouvez gérer quels serveurs vous utilisez dans Paramètres > Réseau."
+        ]
+      },
+      "report-content": {
+        "question": "Comment signaler du contenu nuisible ?",
+        "answer": [
+          "Appuyez sur le menu à trois points (**...**) sur n'importe quelle publication et sélectionnez « Signaler ». Vous pouvez mettre en sourdine ou bloquer des utilisateurs depuis le même menu."
+        ]
+      },
+      "vs-mastodon-bluesky": {
+        "question": "En quoi Nostr est-il différent de Mastodon ou Bluesky ?",
+        "answer": [
+          "Sur Mastodon, votre compte vit sur un serveur spécifique. Sur Bluesky, la plupart des comptes dépendent d'une seule entreprise. Sur Nostr, votre identité est une clé que vous contrôlez, et votre adresse de donation vous suit dans n'importe quelle application Nostr."
+        ]
+      },
+      "profile-fields": {
+        "question": "Que sont les champs de profil ?",
+        "answer": [
+          "Les champs de profil vous permettent d'ajouter des infos supplémentaires à votre profil — liens, adresses de portefeuille, musique, photos, vidéos."
+        ]
+      }
+    }
+  },
+  "guides": {
+    "shared": {
+      "tldrEyebrow": "La version courte",
+      "paymentBadge": {
+        "public": "Paiements publics",
+        "silent": "Paiements silencieux"
+      },
+      "paymentComparison": {
+        "donorHeader": "Quand vous donnez",
+        "activistHeader": "Quand vous créez",
+        "donorRows": {
+          "whatYouSee": {
+            "label": "Ce que vous voyez",
+            "public": "Une adresse Bitcoin classique que vous pouvez payer depuis n'importe où.",
+            "silent": "Le même QR. Votre portefeuille choisit le point de terminaison de paiement silencieux s'il prend en charge BIP-352."
+          },
+          "walletSupport": {
+            "label": "Prise en charge des portefeuilles",
+            "public": "Tous les portefeuilles Bitcoin. Cash App, Coinbase, Strike, matériel, tout.",
+            "silent": "Peu de portefeuilles aujourd'hui. La plupart se rabattent sur une transaction Bitcoin classique."
+          },
+          "privacy": {
+            "label": "Confidentialité du don",
+            "public": "Public on-chain. Votre adresse d'envoi est liée en permanence à la campagne.",
+            "silent": "Le côté réception est non-traçable on-chain. La trace de votre portefeuille d'envoi reste publique."
+          },
+          "settlement": {
+            "label": "Règlement",
+            "public": "Confirmations Bitcoin normales.",
+            "silent": "Mêmes confirmations on-chain, mais l'activiste doit scanner son portefeuille pour le trouver."
+          }
+        },
+        "activistRows": {
+          "whatDonorsSee": {
+            "label": "Ce que voient les donateurs",
+            "public": "Une adresse Bitcoin classique. Fonctionne avec tous les portefeuilles de la planète.",
+            "silent": "Un point de terminaison BIP-352. Les portefeuilles des donateurs doivent prendre en charge les paiements silencieux ; sinon le don se rabat sur une transaction Bitcoin classique."
+          },
+          "receivingSpeed": {
+            "label": "Vitesse de réception",
+            "public": "Type push. Les dons apparaissent immédiatement sur la page de la campagne.",
+            "silent": "Scan manuel. Votre portefeuille doit parcourir la blockchain à leur recherche. Minutes à heures, selon le portefeuille."
+          },
+          "pushNotifications": {
+            "label": "Notifications push",
+            "public": "Oui. Vous voyez les nouveaux dons dès leur arrivée.",
+            "silent": "Non. Ouvrez le portefeuille et déclenchez un scan pour les découvrir."
+          },
+          "donorList": {
+            "label": "Liste des donateurs / totaux de campagne",
+            "public": "Publics à vie. Les montants et les adresses d'envoi sont visibles par n'importe qui.",
+            "silent": "Privés. La page de la campagne ne peut pas afficher les comptes ou totaux de dons silencieux."
+          },
+          "ecosystem": {
+            "label": "Maturité de l'écosystème",
+            "public": "Mature. Outillage établi.",
+            "silent": "À la pointe. Les portefeuilles ont encore des bugs ; attendez-vous à des paiements manqués qui apparaissent lors d'un scan ultérieur."
+          },
+          "bestFor": {
+            "label": "Idéal pour",
+            "public": "Collectes ouvertes où la preuve sociale et la visibilité aident.",
+            "silent": "Campagnes où la confidentialité du donateur ou de l'activiste compte plus que le total visible."
+          },
+          "watchOutFor": {
+            "label": "À surveiller",
+            "public": "Trace publique permanente de chaque donateur.",
+            "silent": "Expérience utilisateur cahoteuse aujourd'hui. Certains dons n'apparaîtront qu'au moment du scan par l'activiste."
+          }
+        }
+      }
+    },
+    "donor": {
+      "tldr": {
+        "lede": "Payez l'adresse Bitcoin de la page de campagne depuis n'importe quel portefeuille que vous avez déjà. Si la campagne accepte les paiements silencieux et que votre portefeuille les prend en charge, votre don est privé automatiquement.",
+        "nextActions": [
+          "Payez depuis n'importe quel portefeuille Bitcoin",
+          "Pas d'intermédiaire, pas de période de détention",
+          "Vous voulez de la confidentialité ? Lisez ci-dessous"
+        ]
+      },
+      "flow": {
+        "heading": "Comment un don circule",
+        "steps": {
+          "openCampaign": {
+            "title": "Ouvrez la campagne",
+            "body": "Vous voyez un seul QR code. Si la campagne accepte les deux options, il encode les deux points de terminaison ; votre portefeuille choisit le bon."
+          },
+          "payFromAnyWallet": {
+            "title": "Payez-le depuis n'importe quel portefeuille",
+            "body": "Cash App, Coinbase, Strike, un portefeuille matériel, n'importe quoi. Payez le montant plus les frais de réseau."
+          },
+          "arrivesDirectly": {
+            "title": "Il arrive directement",
+            "body": "Les fonds sont réglés directement à l'activiste. {{appName}} ne les détient ni ne les achemine, et l'adresse est dérivée de la clé secrète Nostr de l'activiste."
+          }
+        }
+      },
+      "comparison": {
+        "footnote": "Les campagnes peuvent accepter uniquement Public, uniquement Silencieux, ou les deux. Si les deux, le QR code porte les deux points de terminaison. Votre portefeuille choisit celui qu'il peut utiliser."
+      },
+      "publicVisible": {
+        "title": "Les dons publics sont visibles on-chain à jamais",
+        "body": "Un don **Public** arrive à une adresse Bitcoin classique liée à la campagne. N'importe qui peut consulter l'adresse et voir le montant, l'heure et votre adresse d'envoi. Les dons **Silencieux** sont également réglés on-chain, mais le côté réception est non-traçable à la campagne donc ils restent hors des listes et totaux publics de donateurs."
+      },
+      "privacy": {
+        "heading": "Faire un don en privé",
+        "intro": "Ces étapes comptent surtout pour les dons **Publics**, où chaque transaction est liée en permanence à une seule adresse. Les dons **Silencieux** cachent déjà le côté réception, donc le risque est moindre. L'analyse ciblée de votre portefeuille d'envoi reste possible dans les deux cas, donc si votre risque est élevé, ces étapes valent la peine d'être suivies. Choisissez-en une, ou empilez-les.",
+        "options": {
+          "silentWallet": {
+            "name": "Utiliser un portefeuille de paiements silencieux",
+            "purpose": "Payez avec un portefeuille Bitcoin qui prend en charge BIP-352. Si la campagne accepte les paiements silencieux, votre portefeuille utilise ce point de terminaison automatiquement."
+          },
+          "nonKyc": {
+            "name": "Acheter du Bitcoin non-KYC",
+            "purpose": "Achetez du Bitcoin en pair-à-pair pour qu'il ne soit pas lié à votre pièce d'identité dès le départ. Point de départ de confidentialité le plus solide."
+          },
+          "coinjoin": {
+            "name": "Coinjoin d'abord",
+            "purpose": "Mélangez votre Bitcoin avec les pièces d'autres personnes pour que la sortie ne puisse pas être retracée à votre achat KYC. Utile quand la campagne n'accepte que le public."
+          },
+          "freshWallet": {
+            "name": "Utiliser un portefeuille neuf",
+            "purpose": "Faites un don depuis un portefeuille qui n'a jamais touché à votre identité principale ou à une plateforme d'échange KYC."
+          }
+        }
+      },
+      "consumerApps": {
+        "title": "Les applications grand public ne peuvent pas vous rendre anonyme",
+        "body": "Cash App, Coinbase, Strike, Venmo, Kraken, Binance et PayPal vérifient tous votre identité. Peu importe comment vous envoyez le don, chaque transaction reste liée à votre identité réelle. Utilisez un portefeuille non-dépositaire que vous contrôlez."
+      },
+      "silentToday": {
+        "heading": "Une note sur les paiements silencieux aujourd'hui",
+        "paragraphs": [
+          "Les paiements silencieux sont la façon la plus privée de recevoir du Bitcoin on-chain, mais l'écosystème est jeune. La plupart des portefeuilles populaires ne peuvent pas encore envoyer vers un point de terminaison de paiement silencieux, donc quand un portefeuille ne le peut pas, le don se rabat sur une transaction Bitcoin classique vers l'adresse publique de la campagne (si la campagne accepte les deux).",
+          "Pour les activistes, les dons silencieux arrivent également sans notifications push et n'apparaissent qu'après que l'activiste a scanné son portefeuille, ce qui peut prendre minutes à heures. Rien de tout cela n'affecte la sécurité de vos fonds ; cela façonne seulement l'expérience."
+        ]
+      }
+    },
+    "activist": {
+      "tldr": {
+        "lede": "Choisissez ce que vous acceptez en créant votre campagne : Public, Silencieux, ou les deux. Chaque option est non-dépositaire. {{appName}} ne détient jamais vos fonds.",
+        "nextActions": [
+          "Comparez les deux options",
+          "Planifiez comment vous allez retirer",
+          "Balayez les fonds rapidement"
+        ]
+      },
+      "howReceiving": {
+        "heading": "Comment fonctionne la réception",
+        "paragraphs": [
+          "Vos adresses de donation {{appName}} sont dérivées de votre clé secrète Nostr (nsec) — la même clé avec laquelle vous vous connectez sert de graine à votre portefeuille Bitcoin. Quand vous créez une campagne, vous choisissez ce que vous acceptez :",
+          "**Paiements publics uniquement.** Une adresse Bitcoin classique. Visible par tous, fonctionne avec tous les portefeuilles.",
+          "**Paiements silencieux uniquement.** Paiements silencieux BIP-352. Le côté réception est non-traçable on-chain, donc les dons restent hors des listes et totaux publics de donateurs. Les donateurs ont besoin d'un portefeuille compatible avec les paiements silencieux pour envoyer. S'ils n'en ont pas, leur don ne peut pas passer.",
+          "**Les deux.** {{appName}} génère un seul QR code qui encode les deux points de terminaison. Les portefeuilles de paiements silencieux le lisent comme privé ; les portefeuilles ordinaires paient l'adresse publique. Les donateurs n'ont pas à choisir.",
+          "Accepter les deux est généralement le bon choix : vous obtenez des dons privés de soutiens qui utilisent un portefeuille de paiements silencieux, et vous restez ouvert aux donateurs dont le seul Bitcoin est dans une application grand public."
+        ]
+      },
+      "whatEveryoneSees": {
+        "heading": "Ce que tout le monde peut voir",
+        "paragraphs": [
+          "Si votre campagne accepte les paiements publics, n'importe qui envisageant de vous soutenir peut consulter l'adresse et voir l'historique public des dons.",
+          "Les dons silencieux ne font pas partie de cet historique. Ils sont invisibles aux observateurs externes et n'apparaissent pas dans les totaux publics de la campagne ; les nouveaux donateurs ne voient que ce que vous publiez sur les progrès de la campagne."
+        ]
+      },
+      "comparison": {
+        "footnote": "Vous ne pouvez pas changer les options de paiement acceptées par une campagne après sa création. Si vous changez d'avis, créez une nouvelle campagne."
+      },
+      "silentToday": {
+        "heading": "Une note sur les paiements silencieux aujourd'hui",
+        "paragraphs": [
+          "Les paiements silencieux sont la façon la plus privée de recevoir du Bitcoin on-chain, mais l'écosystème est jeune. La plupart des portefeuilles populaires ne peuvent pas encore envoyer vers un point de terminaison de paiement silencieux, donc quand le portefeuille d'un donateur ne le peut pas, le don se rabat sur une transaction Bitcoin classique vers votre adresse publique (si vous acceptez les deux).",
+          "Les dons silencieux arrivent également sans notifications push et n'apparaissent qu'après que vous avez scanné votre portefeuille, ce qui peut prendre minutes à heures. Rien de tout cela n'affecte la sécurité de vos fonds ; cela façonne seulement l'expérience quotidienne."
+        ]
+      },
+      "movePromptly": {
+        "heading": "Déplacez les dons rapidement",
+        "steps": {
+          "sweep": {
+            "title": "Balayez vers un portefeuille que vous contrôlez",
+            "body": "Bonnes options d'auto-garde : [Sparrow](https://sparrowwallet.com), [BlueWallet](https://bluewallet.io), ou [Phoenix](https://phoenix.acinq.co) (Lightning)."
+          },
+          "dontSit": {
+            "title": "Ne laissez pas les fonds dormir à l'adresse de la campagne",
+            "body": "Traitez-la comme une boîte aux lettres, pas un compte d'épargne. Cela s'applique aux dons Publics et Silencieux."
+          }
+        }
+      },
+      "cashout": {
+        "heading": "Retirer en privé",
+        "intro": "Dépenser on-chain crée une trace à moins que vous ne la brisiez d'abord. La sortie de confidentialité la plus simple est de **déplacer d'abord les fonds vers un portefeuille de paiements silencieux**, puis de dépenser ensuite ; le saut brise le lien entre votre adresse de campagne et ce qui vient après. Les autres options ci-dessous fonctionnent également et ont leurs propres compromis.",
+        "options": {
+          "silentHop": {
+            "name": "Saut vers un portefeuille de paiements silencieux",
+            "purpose": "Déplacez vos dons vers un portefeuille de paiements silencieux ([Ditto Wallet](https://ditto.pub), [Dana](https://github.com/cygnet3/dana/releases/download/v0.7.4/app-live-release.apk)). À partir de là, vos dépenses en aval ne sont pas liées à la campagne."
+          },
+          "lightningSwap": {
+            "name": "Échange Lightning",
+            "purpose": "Échange atomique de Bitcoin on-chain vers Lightning. Les paiements Lightning ne touchent pas la blockchain publique."
+          },
+          "coinjoin": {
+            "name": "Coinjoin",
+            "purpose": "Mélangez votre Bitcoin avec les pièces d'autres utilisateurs pour que la sortie ne puisse pas être reliée à l'entrée."
+          },
+          "peerToPeer": {
+            "name": "Pair-à-pair",
+            "purpose": "Échangez du Bitcoin contre du fiat directement avec une autre personne ou via un courtier sur Bisq, HodlHodl, ou RoboSats."
+          },
+          "spendDirectly": {
+            "name": "Dépensez directement",
+            "purpose": "Achetez des cartes-cadeaux (Amazon, Uber, courses, voyages) directement avec du Bitcoin sans le convertir d'abord en espèces."
+          }
+        }
+      },
+      "tumblers": {
+        "title": "Évitez les tumblers centralisés",
+        "body": "Les mélangeurs dépositaires peuvent voler vos pièces, enregistrer qui a envoyé quoi, ou s'avérer être des pots de miel pour les forces de l'ordre. Utilisez un saut vers les paiements silencieux ou un coinjoin non-dépositaire à la place."
+      }
+    }
+  }
+}

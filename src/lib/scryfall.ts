@@ -13,7 +13,7 @@
  */
 
 /** A single face of a card (for double-faced, modal DFC, split cards, etc.). */
-export interface ScryfallCardFace {
+interface ScryfallCardFace {
   name: string;
   mana_cost?: string;
   type_line?: string;
@@ -27,7 +27,7 @@ export interface ScryfallCardFace {
 }
 
 /** Image URIs for various display sizes. */
-export interface ScryfallImageUris {
+interface ScryfallImageUris {
   small: string;
   normal: string;
   large: string;
@@ -69,10 +69,10 @@ export interface ScryfallCard {
 }
 
 /** Version of image to request from the `format=image` Scryfall endpoint. */
-export type ScryfallImageVersion = 'small' | 'normal' | 'large' | 'png' | 'art_crop' | 'border_crop';
+type ScryfallImageVersion = 'small' | 'normal' | 'large' | 'png' | 'art_crop' | 'border_crop';
 
 /** Reference to a card by its Scryfall-native identifiers. */
-export interface CardRef {
+interface CardRef {
   /** Set code, e.g. "neo". Case-insensitive. */
   setId?: string;
   /** Collector number, e.g. "42". */
@@ -97,17 +97,6 @@ export function scryfallImageUrl(
     return `https://api.scryfall.com/cards/${encodeURIComponent(card.setId.toLowerCase())}/${encodeURIComponent(card.artId)}?format=image&version=${version}`;
   }
   return `https://api.scryfall.com/cards/named?exact=${encodeURIComponent(card.name ?? '')}&format=image&version=${version}`;
-}
-
-/**
- * Build a Scryfall image URL from a Gatherer multiverse ID.
- * See https://scryfall.com/docs/api/cards/multiverse
- */
-export function scryfallMultiverseImageUrl(
-  multiverseId: string,
-  version: ScryfallImageVersion = 'normal',
-): string {
-  return `https://api.scryfall.com/cards/multiverse/${encodeURIComponent(multiverseId)}?format=image&version=${version}`;
 }
 
 /** A Scryfall lookup key. Exactly one form is used per request. */

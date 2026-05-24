@@ -11,7 +11,7 @@ export interface RegionFeed {
   count: number;
 }
 
-export interface UseMultiHashtagFeedOptions {
+interface UseMultiHashtagFeedOptions {
   /** Must be true for relay queries to fire. */
   enabled?: boolean;
 }
@@ -27,14 +27,14 @@ const POLL_TIMEOUT_MS = 8000;
 /**
  * Normalize content for duplicate comparison: trim and collapse internal whitespace.
  */
-export function normalizeContent(content: string): string {
+function normalizeContent(content: string): string {
   return content.trim().replace(/\s+/g, ' ');
 }
 
 /**
  * Build a fingerprint string for duplicate detection.
  */
-export function eventFingerprint(event: NostrEvent): string {
+function eventFingerprint(event: NostrEvent): string {
   const tTags = event.tags
     .filter(([name]) => name === 't')
     .map(([, value]) => value)
@@ -47,7 +47,7 @@ export function eventFingerprint(event: NostrEvent): string {
 /**
  * Remove near-duplicate posts within a 10-minute window.
  */
-export function deduplicatePosts(posts: NostrEvent[]): NostrEvent[] {
+function deduplicatePosts(posts: NostrEvent[]): NostrEvent[] {
   if (posts.length === 0) return posts;
 
   const groups = new Map<string, NostrEvent[]>();

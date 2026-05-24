@@ -10,6 +10,7 @@ import { RepostIcon } from '@/components/icons/RepostIcon';
 import type { NostrEvent } from '@nostrify/nostrify';
 import { nip19 } from 'nostr-tools';
 import { useAuthor } from '@/hooks/useAuthor';
+import { useImageProxy } from '@/hooks/useImageProxy';
 import { useProfileUrl } from '@/hooks/useProfileUrl';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useEventStats } from '@/hooks/useTrending';
@@ -53,6 +54,7 @@ function TrackDetail({ event }: { event: NostrEvent }) {
   const navigate = useNavigate();
   const player = useAudioPlayer();
   const parsed = useMemo(() => parseMusicTrack(event), [event]);
+  const proxy = useImageProxy();
 
   const author = useAuthor(event.pubkey);
   const metadata = author.data?.metadata;
@@ -109,7 +111,7 @@ function TrackDetail({ event }: { event: NostrEvent }) {
         {/* Artwork */}
         <div className="shrink-0 w-32 sm:w-40 aspect-square rounded-2xl overflow-hidden bg-muted shadow-lg">
           {parsed?.artwork && !imgError ? (
-            <img src={parsed.artwork} alt={parsed.title} className="w-full h-full object-cover" onError={() => setImgError(true)} />
+            <img src={proxy(parsed.artwork, 320)} alt={parsed.title} className="w-full h-full object-cover" onError={() => setImgError(true)} />
           ) : (
             <div className="w-full h-full flex items-center justify-center bg-primary/10">
               <Music className="size-12 text-primary/30" />
@@ -326,6 +328,7 @@ function PlaylistDetail({ event }: { event: NostrEvent }) {
   const parsed = useMemo(() => parseMusicPlaylist(event), [event]);
   const [imgError, setImgError] = useState(false);
   const author = useAuthor(event.pubkey);
+  const proxy = useImageProxy();
   const metadata = author.data?.metadata;
   const displayName = getDisplayName(metadata, event.pubkey);
   const profileUrl = useProfileUrl(event.pubkey, metadata);
@@ -393,7 +396,7 @@ function PlaylistDetail({ event }: { event: NostrEvent }) {
       <div className="px-4 flex gap-5 items-start">
         <div className="shrink-0 w-32 sm:w-40 aspect-square rounded-2xl overflow-hidden bg-muted shadow-lg">
           {coverArt ? (
-            <img src={coverArt} alt={parsed?.title ?? ''} className="w-full h-full object-cover" onError={() => setImgError(true)} />
+            <img src={proxy(coverArt, 320)} alt={parsed?.title ?? ''} className="w-full h-full object-cover" onError={() => setImgError(true)} />
           ) : (
             <div className="w-full h-full flex items-center justify-center bg-primary/10">
               <FallbackIcon className="size-12 text-primary/30" />
@@ -515,6 +518,7 @@ function PlaylistTrackRow({
 }) {
   const player = useAudioPlayer();
   const parsed = useMemo(() => parseMusicTrack(event), [event]);
+  const proxy = useImageProxy();
   const [imgError, setImgError] = useState(false);
 
   const naddrPath = useMemo(() => {
@@ -568,7 +572,7 @@ function PlaylistTrackRow({
       {/* Artwork */}
       <div className="size-12 rounded-lg overflow-hidden shrink-0 bg-muted">
         {parsed.artwork && !imgError ? (
-          <img src={parsed.artwork} alt={parsed.title} className="size-full object-cover" loading="lazy" onError={() => setImgError(true)} />
+          <img src={proxy(parsed.artwork, 96)} alt={parsed.title} className="size-full object-cover" loading="lazy" onError={() => setImgError(true)} />
         ) : (
           <div className="size-full flex items-center justify-center bg-primary/10">
             <Music className="size-5 text-primary/30" />

@@ -81,12 +81,12 @@ function EditableTextarea({
   );
 }
 
-export interface ProfileField {
+interface ProfileField {
   label: string;
   value: string;
 }
 
-export interface ProfileCardProps {
+interface ProfileCardProps {
   pubkey?: string;
   metadata: Partial<NostrMetadata>;
   onChange?: (patch: Partial<NostrMetadata>) => void;

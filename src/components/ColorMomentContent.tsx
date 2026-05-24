@@ -1,8 +1,7 @@
-import { useMemo, useState, useEffect, useId } from 'react';
+import { useMemo } from 'react';
 
 import { cn } from '@/lib/utils';
-import { useTheme } from '@/hooks/useTheme';
-import { getColors, paletteToTheme } from '@/lib/colorMomentUtils';
+import { getColors } from '@/lib/colorMomentUtils';
 import type { NostrEvent } from '@nostrify/nostrify';
 
 type Layout = 'horizontal' | 'vertical' | 'grid' | 'star' | 'checkerboard' | 'diagonalStripes';
@@ -198,61 +197,14 @@ const LAYOUT_MAP: Record<Layout, React.FC<{ colors: string[] }>> = {
   diagonalStripes: DiagonalStripesLayout,
 };
 
-/** Standalone blinking eye button for setting a color moment as the active theme. */
-export function ColorMomentEyeButton({ event }: { event: NostrEvent }) {
-  const colors = useMemo(() => getColors(event.tags), [event.tags]);
-  const { applyCustomTheme } = useTheme();
-  const [isBlinking, setIsBlinking] = useState(false);
-  const uid = useId();
-
-  useEffect(() => {
-    if (isBlinking) {
-      const timer = setTimeout(() => setIsBlinking(false), 500);
-      return () => clearTimeout(timer);
-    }
-  }, [isBlinking]);
-
-  const handleSetTheme = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    setIsBlinking(true);
-    applyCustomTheme(paletteToTheme(colors));
-  };
-
-  if (colors.length === 0) return null;
-
-  const outer = colors[0] ?? '#888';
-  const iris = colors[colors.length - 1] ?? '#888';
-
-  // Build the eye as a data-URI SVG so the browser renders it as an image
-  // (smooth anti-aliasing, no compositing layer on siblings)
-  const eyeSvg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
-    <circle cx="50" cy="50" r="45" fill="${outer}"/>
-    <circle cx="50" cy="50" r="32" fill="white" opacity="0.9"/>
-    <circle cx="50" cy="50" r="20" fill="${iris}"/>
-    <circle cx="50" cy="50" r="10" fill="#1c1917"/>
-    <circle cx="43" cy="43" r="4" fill="white" opacity="0.8"/>
-  </svg>`;
-  const eyeUrl = `data:image/svg+xml,${encodeURIComponent(eyeSvg)}`;
-
-  return (
-    <button
-      onClick={handleSetTheme}
-      className="flex items-center gap-1.5 hover:opacity-80 active:scale-95 transition-all shrink-0"
-      title="Set as theme"
-    >
-      <span className="text-[11px] font-medium text-muted-foreground">Set as theme</span>
-      {/* Eye container — overflow-hidden clips the eyelid, doesn't touch siblings */}
-      <div className="relative size-9 rounded-full overflow-hidden" id={uid}>
-        <img src={eyeUrl} alt="" className="w-9 h-9" />
-        {isBlinking && (
-          <div className="absolute inset-0 animate-eyelid-blink">
-            <div className="absolute rounded-full bg-background w-full h-full bottom-0 left-0" />
-          </div>
-        )}
-      </div>
-    </button>
-  );
-}
+/** Standalone blinking eye button — REMOVED.
+ *
+ * This component used to let any user apply an arbitrary kind-3367 event's
+ * palette as their active theme via `applyCustomTheme(paletteToTheme(...))`.
+ * Agora no longer supports user-customizable themes, so the apply path has
+ * been removed entirely. Color Moments still render as palette art via
+ * `ColorMomentContent` below.
+ */
 
 export function ColorMomentContent({ event }: { event: NostrEvent }) {
   const colors = useMemo(() => getColors(event.tags), [event.tags]);

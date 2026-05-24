@@ -13,7 +13,7 @@ import type { NostrEvent } from '@nostrify/nostrify';
 const ORGANIZERS_D_TAG = 'agora-organizers';
 const LEGACY_ORGANIZERS_D_TAG = 'pathos-organizers';
 
-export interface Organizer {
+interface Organizer {
   pubkey: string;
   countryCode: string;
 }

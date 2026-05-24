@@ -18,7 +18,7 @@ export interface AudioTrack {
   path?: string;
 }
 
-export interface AudioPlayerState {
+interface AudioPlayerState {
   /** Currently loaded track. */
   currentTrack: AudioTrack | null;
   /** Playlist tracks (when playing a playlist). */
@@ -37,7 +37,7 @@ export interface AudioPlayerState {
   volume: number;
 }
 
-export interface AudioPlayerActions {
+interface AudioPlayerActions {
   /** Play a single track. */
   playTrack: (track: AudioTrack) => void;
   /** Play a playlist starting at a given index. */
@@ -62,9 +62,9 @@ export interface AudioPlayerActions {
   stop: () => void;
 }
 
-export type AudioPlayerContextType = AudioPlayerState & AudioPlayerActions;
+type AudioPlayerContextType = AudioPlayerState & AudioPlayerActions;
 
-export const AudioPlayerContext = createContext<AudioPlayerContextType | undefined>(undefined);
+const AudioPlayerContext = createContext<AudioPlayerContextType | undefined>(undefined);
 
 export function useAudioPlayer(): AudioPlayerContextType {
   const ctx = useContext(AudioPlayerContext);

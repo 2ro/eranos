@@ -9,7 +9,7 @@ const WAVEFORM_SAMPLES = 100;
 /** Sampling interval in ms for waveform amplitude capture. */
 const SAMPLE_INTERVAL_MS = 100;
 
-export interface VoiceRecording {
+interface VoiceRecording {
   /** The recorded audio blob. */
   blob: Blob;
   /** MIME type of the recording. */
@@ -20,7 +20,7 @@ export interface VoiceRecording {
   waveform: number[];
 }
 
-export interface UseVoiceRecorderReturn {
+interface UseVoiceRecorderReturn {
   /** Whether the browser supports audio recording. */
   isSupported: boolean;
   /** Whether a recording is currently in progress. */

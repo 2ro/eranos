@@ -28,7 +28,7 @@ type Tab = 'feed' | 'members';
 
 // ─── Feed Tab ─────────────────────────────────────────────────────────────────
 
-export function PackFeedTab({ pubkeys }: { pubkeys: string[] }) {
+function PackFeedTab({ pubkeys }: { pubkeys: string[] }) {
   const { muteItems } = useMuteList();
 
   const { posts, isLoading } = useStreamPosts('', {
@@ -89,7 +89,7 @@ export function PackFeedTab({ pubkeys }: { pubkeys: string[] }) {
 
 // ─── Members Tab ──────────────────────────────────────────────────────────────
 
-export function PackMembersTab({
+function PackMembersTab({
   pubkeys,
   membersMap,
   membersLoading,
@@ -322,7 +322,7 @@ export function FollowPackDetailContent({ event }: { event: NostrEvent }) {
 }
 
 /** Individual member card in the follow pack. */
-export function MemberCard({
+function MemberCard({
   pubkey,
   metadata,
   isFollowed,
@@ -401,7 +401,7 @@ export function MemberCard({
   );
 }
 
-export function MemberCardSkeleton() {
+function MemberCardSkeleton() {
   return (
     <div className="flex items-center gap-3 px-4 py-3">
       <Skeleton className="size-11 rounded-full shrink-0" />

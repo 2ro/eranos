@@ -17,7 +17,7 @@ const EmojiPackDialog = lazy(() => import('@/components/EmojiPackDialog').then(m
 const PREVIEW_LIMIT = 24;
 
 /** Parsed emoji pack data. */
-export interface EmojiPackData {
+interface EmojiPackData {
   identifier: string;
   name: string;
   picture?: string;

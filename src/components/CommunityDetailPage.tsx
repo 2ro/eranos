@@ -1,4 +1,5 @@
 import { useMemo, useCallback, useEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Link, useNavigate } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
 import { nip19 } from 'nostr-tools';
@@ -66,10 +67,11 @@ import { usePinnedEventComments } from '@/hooks/usePinnedEventComments';
 import { useProfileUrl } from '@/hooks/useProfileUrl';
 import { useToast } from '@/hooks/useToast';
 import { useEventRSVPs } from '@/hooks/useEventRSVPs';
+import { useEventTranslation } from '@/hooks/useEventTranslation';
 import { CommunityModerationContext } from '@/contexts/CommunityModerationContext';
 import { applyCommunityModerationToEvents, parseCommunityEvent } from '@/lib/communityUtils';
 import type { ParsedCampaign } from '@/lib/campaign';
-import type { Action } from '@/hooks/useActions';
+import { parseAction, type Action } from '@/hooks/useActions';
 import { getGeoDisplayName } from '@/lib/countries';
 import { DEFAULT_COVER_IMAGE } from '@/lib/defaultActionCovers';
 import { formatNumber } from '@/lib/formatNumber';
@@ -223,16 +225,22 @@ function ActivityTypePill({ icon, label }: { icon: React.ReactNode; label: strin
 }
 
 function PledgeShelfCard({ pledge }: { pledge: Action }) {
+  const { t } = useTranslation();
   const { data: btcPrice } = useBtcPrice();
+  const { translatedEvent, translateAction } = useEventTranslation(pledge.event, {
+    iconOnly: true,
+    buttonClassName: 'size-8 rounded-full p-0 text-muted-foreground hover:text-primary hover:bg-primary/10',
+  });
+  const displayPledge = parseAction(translatedEvent) ?? pledge;
   const author = useAuthor(pledge.pubkey);
   const metadata = author.data?.metadata;
   const displayName = getDisplayName(metadata, pledge.pubkey);
   const [imageLoadFailed, setImageLoadFailed] = useState(false);
 
-  const sanitizedCover = sanitizeUrl(pledge.image);
+  const sanitizedCover = sanitizeUrl(displayPledge.image);
   const coverImage = sanitizedCover && !imageLoadFailed ? sanitizedCover : DEFAULT_COVER_IMAGE;
-  const deadline = pledge.deadline ? formatCompactPledgeDeadline(pledge.deadline) : null;
-  const countryLabel = pledge.countryCode ? getGeoDisplayName(pledge.countryCode) : undefined;
+  const deadline = displayPledge.deadline ? formatCompactPledgeDeadline(displayPledge.deadline) : null;
+  const countryLabel = displayPledge.countryCode ? getGeoDisplayName(displayPledge.countryCode) : undefined;
   const naddr = nip19.naddrEncode({
     kind: pledge.event.kind,
     pubkey: pledge.pubkey,
@@ -255,7 +263,7 @@ function PledgeShelfCard({ pledge }: { pledge: Action }) {
           {deadline?.isPast && (
             <div className="absolute right-3 top-3">
               <Badge variant="secondary" className="backdrop-blur bg-background/85 border-border/40 text-muted-foreground">
-                Ended
+                {t('pledges.card.ended')}
               </Badge>
             </div>
           )}
@@ -264,11 +272,11 @@ function PledgeShelfCard({ pledge }: { pledge: Action }) {
         <div className="flex flex-col gap-3 p-5 flex-1">
           <div className="space-y-2">
             <h3 className="font-bold leading-tight tracking-tight text-lg line-clamp-2">
-              {pledge.title}
+              {displayPledge.title}
             </h3>
-            {pledge.description.trim() && (
+            {displayPledge.description.trim() && (
               <p className="text-sm text-muted-foreground line-clamp-2">
-                {pledge.description}
+                {displayPledge.description}
               </p>
             )}
           </div>
@@ -276,7 +284,7 @@ function PledgeShelfCard({ pledge }: { pledge: Action }) {
           <div className="flex-1" />
 
           <div className="rounded-xl border border-primary/20 bg-primary/10 px-4 py-3">
-            <p className="text-xs font-semibold uppercase tracking-wide text-primary">Pledged</p>
+            <p className="text-xs font-semibold uppercase tracking-wide text-primary">{t('pledges.card.pledged')}</p>
             <p className="mt-1 text-2xl font-bold tracking-tight text-foreground">
               {formatPledgeAmount(pledge.bounty, btcPrice)}
             </p>
@@ -299,9 +307,12 @@ function PledgeShelfCard({ pledge }: { pledge: Action }) {
 
           <div className="flex items-center justify-between gap-3 border-t border-border/60 pt-3 text-xs text-muted-foreground">
             <div className="truncate">
-              by <span className="font-medium text-foreground">{displayName}</span>
+              {t('groups.detail.byAuthor', { name: displayName })}
             </div>
-            <ActivityTypePill icon={<Megaphone className="size-3.5 text-primary" />} label="Pledge" />
+            <div className="flex shrink-0 items-center gap-1.5">
+              <ActivityTypePill icon={<Megaphone className="size-3.5 text-primary" />} label={t('groups.detail.pledge')} />
+              {translateAction}
+            </div>
           </div>
         </div>
       </Card>
@@ -310,15 +321,20 @@ function PledgeShelfCard({ pledge }: { pledge: Action }) {
 }
 
 function CalendarEventShelfCard({ event }: { event: NostrEvent }) {
+  const { t } = useTranslation();
+  const { translatedEvent: displayEvent, translateAction } = useEventTranslation(event, {
+    iconOnly: true,
+    buttonClassName: 'size-8 rounded-full p-0 text-muted-foreground hover:text-primary hover:bg-primary/10',
+  });
   const author = useAuthor(event.pubkey);
   const metadata = author.data?.metadata;
   const displayName = getDisplayName(metadata, event.pubkey);
   const [imageLoadFailed, setImageLoadFailed] = useState(false);
-  const title = getTag(event.tags, 'title') ?? 'Untitled event';
-  const image = sanitizeUrl(getTag(event.tags, 'image'));
+  const title = getTag(displayEvent.tags, 'title') ?? t('groups.detail.untitledEvent');
+  const image = sanitizeUrl(getTag(displayEvent.tags, 'image'));
   const coverImage = image && !imageLoadFailed ? image : undefined;
-  const summary = getTag(event.tags, 'summary') || event.content;
-  const locationRaw = getTag(event.tags, 'location');
+  const summary = getTag(displayEvent.tags, 'summary') || displayEvent.content;
+  const locationRaw = getTag(displayEvent.tags, 'location');
   const location = locationRaw ? parseShelfLocation(locationRaw) : undefined;
   const dateLabel = formatShelfEventDate(event);
   const timeLabel = formatShelfEventTime(event);
@@ -390,21 +406,24 @@ function CalendarEventShelfCard({ event }: { event: NostrEvent }) {
           <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 text-xs text-muted-foreground pt-1">
             <span className="inline-flex items-center gap-1.5">
               <Users className="size-3.5" />
-              {interestedCount} {interestedCount === 1 ? 'person' : 'people'} interested
+              {t('groups.detail.interestedCount', { count: interestedCount })}
             </span>
             {event.kind === 31922 ? (
               <span className="inline-flex items-center gap-1.5">
                 <CalendarDays className="size-3.5" />
-                All-day
+                {t('groups.detail.allDay')}
               </span>
             ) : null}
           </div>
 
           <div className="flex items-center justify-between gap-3 border-t border-border/60 pt-3 text-xs text-muted-foreground">
             <div className="truncate">
-              by <span className="font-medium text-foreground">{displayName}</span>
+              {t('groups.detail.byAuthor', { name: displayName })}
             </div>
-            <ActivityTypePill icon={<CalendarDays className="size-3.5 text-primary" />} label="Event" />
+            <div className="flex shrink-0 items-center gap-1.5">
+              <ActivityTypePill icon={<CalendarDays className="size-3.5 text-primary" />} label={t('groups.detail.event')} />
+              {translateAction}
+            </div>
           </div>
         </div>
       </Card>
@@ -460,6 +479,7 @@ function OfficialActivityShelves({
   eventsLoading: boolean;
   now: number;
 }) {
+  const { t } = useTranslation();
   // All loaded campaigns. Closure is via NIP-09 deletion (relay-level),
   // so anything that reached us is current.
   const liveCampaigns = campaigns;
@@ -517,7 +537,7 @@ function OfficialActivityShelves({
   return (
     <div className="space-y-1">
       <OfficialShelf
-        title="Official activity"
+        title={t('groups.detail.officialActivity')}
         count={mixedActivity.length}
         isLoading={campaignsLoading || pledgesLoading || eventsLoading}
         isEmpty={mixedActivity.length === 0}
@@ -529,7 +549,7 @@ function OfficialActivityShelves({
                 <CampaignCard
                   campaign={item.campaign}
                   className="h-full"
-                  footerBadge={<ActivityTypePill icon={<HandHeart className="size-3.5 text-primary" />} label="Campaign" />}
+                  footerBadge={<ActivityTypePill icon={<HandHeart className="size-3.5 text-primary" />} label={t('groups.detail.campaign')} />}
                 />
               </div>
             );
@@ -553,6 +573,7 @@ function GroupActionColumn({
   orgNaddr: string;
   organizationName: string;
 }) {
+  const { t } = useTranslation();
   const createQuery = orgNaddr ? `?org=${orgNaddr}` : '';
 
   return (
@@ -563,10 +584,10 @@ function GroupActionColumn({
 
         <div className="relative flex items-start justify-between gap-3">
           <div className="space-y-1.5">
-            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary">Official tools</p>
-            <h2 className="text-xl font-semibold tracking-tight">Start something</h2>
+            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary">{t('groups.detail.officialTools')}</p>
+            <h2 className="text-xl font-semibold tracking-tight">{t('groups.detail.startSomething')}</h2>
             <p className="text-sm leading-5 text-muted-foreground">
-              Give {organizationName} a concrete next step.
+              {t('groups.detail.officialToolsDescription', { name: organizationName })}
             </p>
           </div>
           <div className="hidden rounded-full border border-primary/15 bg-primary/10 p-2 text-primary sm:block lg:hidden xl:block">
@@ -589,8 +610,8 @@ function GroupActionColumn({
                   <ChevronRight className="size-5 transition-transform group-hover:translate-x-0.5" />
                 </div>
                 <span>
-                  <span className="block text-lg font-semibold">Launch a campaign</span>
-                  <span className="mt-1 block text-sm text-primary-foreground/80">Raise funds with an official group page.</span>
+                  <span className="block text-lg font-semibold">{t('groups.detail.launchCampaign')}</span>
+                  <span className="mt-1 block text-sm text-primary-foreground/80">{t('groups.detail.launchCampaignDescription')}</span>
                 </span>
               </div>
             </div>
@@ -606,8 +627,8 @@ function GroupActionColumn({
               </span>
               <ChevronRight className="size-4 text-muted-foreground transition-transform group-hover:translate-x-0.5 group-hover:text-primary" />
             </span>
-            <span className="block font-semibold">Pledge</span>
-            <span className="mt-1 block text-xs leading-4 text-muted-foreground">Offer help people can act on.</span>
+            <span className="block font-semibold">{t('groups.detail.pledge')}</span>
+            <span className="mt-1 block text-xs leading-4 text-muted-foreground">{t('groups.detail.pledgeDescription')}</span>
           </Link>
 
           <Link
@@ -620,8 +641,8 @@ function GroupActionColumn({
               </span>
               <ChevronRight className="size-4 text-muted-foreground transition-transform group-hover:translate-x-0.5 group-hover:text-primary" />
             </span>
-            <span className="block font-semibold">Event</span>
-            <span className="mt-1 block text-xs leading-4 text-muted-foreground">Bring supporters together.</span>
+            <span className="block font-semibold">{t('groups.detail.event')}</span>
+            <span className="mt-1 block text-xs leading-4 text-muted-foreground">{t('groups.detail.eventDescription')}</span>
           </Link>
         </div>
       </CardContent>
@@ -632,6 +653,7 @@ function GroupActionColumn({
 // ── Main component ────────────────────────────────────────────────────────────
 
 export function CommunityDetailPage({ event }: { event: NostrEvent }) {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { toast } = useToast();
@@ -644,9 +666,10 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
   const [moreMenuOpen, setMoreMenuOpen] = useState(false);
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
   const deleteMutation = useDeleteEvent();
+  const { translatedEvent: displayEvent, translateAction } = useEventTranslation(event);
 
   // Parse community definition
-  const community = useMemo(() => parseCommunityEvent(event), [event]);
+  const community = useMemo(() => parseCommunityEvent(displayEvent), [displayEvent]);
   const name = community?.name ?? 'Unnamed Group';
   const description = community?.description ?? '';
   const image = community?.image;
@@ -902,10 +925,10 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
               <button
                 onClick={() => window.history.length > 1 ? navigate(-1) : navigate('/')}
                 className="inline-flex h-10 items-center gap-1.5 rounded-full bg-black/30 pl-2 pr-3.5 text-white backdrop-blur-md hover:bg-black/45 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80 motion-safe:transition-colors"
-                aria-label="Go back"
+                aria-label={t('common.goBack')}
               >
                 <ChevronLeft className="size-5" />
-                <span className="hidden text-sm font-medium sm:inline">Back</span>
+                <span className="hidden text-sm font-medium sm:inline">{t('common.back')}</span>
               </button>
 
               <div className="flex items-center gap-1.5">
@@ -933,7 +956,7 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
                 {isFounder && community && (
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <button type="button" className={bannerActionClassName} aria-label="More actions">
+                      <button type="button" className={bannerActionClassName} aria-label={t('groups.detail.moreActions')}>
                         <MoreVertical className="size-5" />
                       </button>
                     </DropdownMenuTrigger>
@@ -949,7 +972,7 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
                         }}
                       >
                         <Pencil className="size-4 mr-2" />
-                        Edit group
+                        {t('groups.detail.editGroup')}
                       </DropdownMenuItem>
                       <DropdownMenuItem
                         onSelect={(e) => {
@@ -959,7 +982,7 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
                         className="text-destructive focus:text-destructive focus:bg-destructive/10"
                       >
                         <Trash2 className="size-4 mr-2" />
-                        Delete group
+                        {t('groups.detail.deleteGroup')}
                       </DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
@@ -987,7 +1010,7 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
                     </AvatarFallback>
                   </Avatar>
                   <span className="[text-shadow:0_1px_3px_rgba(0,0,0,0.7)]">
-                    by{' '}
+                    {t('groups.detail.by')}{' '}
                     <span className="font-semibold underline-offset-4 group-hover:underline">
                       {founderName}
                     </span>
@@ -1005,11 +1028,12 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
               <div className="mt-4 border-t border-white/15 pt-3 [text-shadow:none] [&_button]:!text-white/90 [&_button:hover]:!bg-white/15 [&_button:hover]:!text-white [&_button]:transition-colors">
                 <PostActionBar
                   event={event}
-                  replyLabel="Comment"
+                  replyLabel={t('groups.detail.comment')}
                   hideZap
                   showShareInSidebar
                   onReply={() => setReplyOpen(true)}
                   onMore={() => setMoreMenuOpen(true)}
+                  translateAction={translateAction}
                 />
               </div>
             </div>
@@ -1023,7 +1047,7 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
                   <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
                     <div className="space-y-3">
                       <div className="text-xs font-semibold uppercase tracking-[0.12em] text-muted-foreground">
-                        Members
+                        {t('groups.detail.members')}
                       </div>
                       <PeopleAvatarStack
                         pubkeys={leadershipPubkeys}
@@ -1041,10 +1065,10 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
                     >
                       {hiddenMemberCount > 0 && (
                         <span className="mr-2 text-muted-foreground">
-                          +{hiddenMemberCount.toLocaleString()} more
+                          {t('groups.detail.moreMembers', { count: hiddenMemberCount })}
                         </span>
                       )}
-                      View members
+                      {t('groups.detail.viewMembers')}
                       <ChevronRight className="ml-1 size-4" />
                     </Button>
                   </div>
@@ -1053,7 +1077,7 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
                 {descriptionText && (
                   <div className="space-y-2">
                     <div className="text-xs font-semibold uppercase tracking-[0.12em] text-muted-foreground">
-                      About
+                      {t('groups.detail.about')}
                     </div>
                     <div className="relative">
                       <div
@@ -1076,7 +1100,7 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
                         className="h-auto p-0 text-sm"
                         onClick={() => setDescriptionExpanded((expanded) => !expanded)}
                       >
-                        {descriptionExpanded ? 'Show less' : 'Read more'}
+                        {descriptionExpanded ? t('common.showLess') : t('common.readMore')}
                       </Button>
                     )}
                   </div>
@@ -1124,11 +1148,11 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
                 <div id="org-activity" className="scroll-mt-20">
                   <div className="mt-6">
                     <div className="flex items-baseline justify-between gap-3 mb-3 px-1">
-                      <h2 className="text-lg font-semibold tracking-tight">Comments</h2>
+                      <h2 className="text-lg font-semibold tracking-tight">{t('groups.detail.comments')}</h2>
                       {engagementStats?.replies ? (
                         <span className="text-sm text-muted-foreground tabular-nums">
                           {formatNumber(engagementStats.replies)}{' '}
-                          {engagementStats.replies === 1 ? 'comment' : 'comments'}
+                          {t('groups.detail.commentNoun', { count: engagementStats.replies })}
                         </span>
                       ) : null}
                     </div>
@@ -1160,10 +1184,10 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
                         className="block w-full rounded-2xl border border-dashed border-border/80 bg-card/50 px-6 py-10 text-center hover:bg-card hover:border-primary/40 transition-colors"
                       >
                         <p className="text-base font-medium text-foreground">
-                          No comments yet
+                          {t('groups.detail.noCommentsTitle')}
                         </p>
                         <p className="mt-1 text-sm text-muted-foreground">
-                          Be the first to start a discussion.
+                          {t('groups.detail.noCommentsHint')}
                         </p>
                       </button>
                     )}
@@ -1186,7 +1210,7 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
           <DialogHeader className="px-5 pt-5 pb-3 border-b border-border shrink-0">
             <DialogTitle className="flex items-center gap-2">
               <Users className="size-5" />
-              Members
+              {t('groups.detail.members')}
               {leadershipPubkeys.length > 0 && (
                 <span className="text-muted-foreground font-normal text-sm">({leadershipPubkeys.length})</span>
               )}
@@ -1198,7 +1222,7 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
               <MembersSkeleton />
             ) : memberSections.length === 0 ? (
               <div className="py-12 text-center text-muted-foreground text-sm px-5">
-                No members found.
+                {t('groups.detail.noMembersFound')}
               </div>
             ) : (
               <div className="divide-y divide-border">
@@ -1214,7 +1238,7 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
                         <PersonRow
                           key={m.pubkey}
                           pubkey={m.pubkey}
-                          label={m.isFounder ? 'Founder' : 'Moderator'}
+                          label={m.isFounder ? t('groups.detail.founder') : t('groups.detail.moderator')}
                           size="sm"
                         />
                       ))}

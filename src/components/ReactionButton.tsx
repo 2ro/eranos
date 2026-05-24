@@ -2,6 +2,7 @@ import { useState, useRef, useCallback, useMemo } from 'react';
 import { Heart } from 'lucide-react';
 import { useQueryClient } from '@tanstack/react-query';
 import { useNostr } from '@nostrify/react';
+import { useTranslation } from 'react-i18next';
 
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { QuickReactMenu } from '@/components/QuickReactMenu';
@@ -48,6 +49,7 @@ export function ReactionButton({
   filledHeart = false,
   variant = 'pill',
 }: ReactionButtonProps) {
+  const { t } = useTranslation();
   const { user } = useCurrentUser();
   const { nostr } = useNostr();
   const { mutate: publishEvent } = useNostrPublish();
@@ -153,7 +155,7 @@ export function ReactionButton({
             className,
             hasReacted && 'text-pink-500',
           )}
-          title="React"
+          title={t('feed.actions.react')}
           onClick={(e) => {
             e.stopPropagation();
             if (!user) return;

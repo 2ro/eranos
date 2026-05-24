@@ -1,7 +1,10 @@
 import { useMemo, useState } from 'react';
+import type { ReactNode } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useSeoMeta } from '@unhead/react';
 import { useQueryClient } from '@tanstack/react-query';
+import { useTranslation, Trans } from 'react-i18next';
+import type { TFunction } from 'i18next';
 import type { NostrEvent } from '@nostrify/nostrify';
 import {
   CalendarClock,
@@ -41,6 +44,7 @@ import { NoteMoreMenu } from '@/components/NoteMoreMenu';
 import { Progress } from '@/components/ui/progress';
 import { ThreadedReplyList, type ReplyNode } from '@/components/ThreadedReplyList';
 import { useAuthor } from '@/hooks/useAuthor';
+import { useAppContext } from '@/hooks/useAppContext';
 import { useBtcPrice } from '@/hooks/useBtcPrice';
 import { useCampaign } from '@/hooks/useCampaign';
 import { useCampaignDonations } from '@/hooks/useCampaignDonations';
@@ -52,9 +56,11 @@ import { usePinnedEventComments } from '@/hooks/usePinnedEventComments';
 import { useProfileUrl } from '@/hooks/useProfileUrl';
 import { useShareOrigin } from '@/hooks/useShareOrigin';
 import { useToast } from '@/hooks/useToast';
+import { useEventTranslation } from '@/hooks/useEventTranslation';
 import {
   encodeCampaignNaddr,
   getCampaignCountryLabel,
+  parseCampaign,
   type ParsedCampaign,
 } from '@/lib/campaign';
 import { satsToUSDWhole } from '@/lib/bitcoin';
@@ -80,16 +86,16 @@ function formatSatsFull(sats: number, btcPrice: number | undefined): string {
   return `${sats.toLocaleString()} sats`;
 }
 
-function formatDeadline(unixSeconds: number): { label: string; isPast: boolean } {
+function formatDeadline(unixSeconds: number, t: TFunction): { label: string; isPast: boolean } {
   const now = Math.floor(Date.now() / 1000);
   const diff = unixSeconds - now;
   if (diff <= 0) {
-    return { label: `Ended ${new Date(unixSeconds * 1000).toLocaleDateString()}`, isPast: true };
+    return { label: t('campaignsDetail.deadlineEndedOn', { date: new Date(unixSeconds * 1000).toLocaleDateString() }), isPast: true };
   }
   const days = Math.ceil(diff / 86_400);
-  if (days <= 1) return { label: 'Ends today', isPast: false };
-  if (days < 60) return { label: `${days} days left`, isPast: false };
-  return { label: `Ends ${new Date(unixSeconds * 1000).toLocaleDateString()}`, isPast: false };
+  if (days <= 1) return { label: t('campaignsDetail.deadlineEndsToday'), isPast: false };
+  if (days < 60) return { label: t('campaignsDetail.deadlineDaysLeft', { count: days }), isPast: false };
+  return { label: t('campaignsDetail.deadlineEndsOn', { date: new Date(unixSeconds * 1000).toLocaleDateString() }), isPast: false };
 }
 
 function collectReplyEvents(nodes: ReplyNode[], out = new Map<string, NostrEvent>()): Map<string, NostrEvent> {
@@ -119,6 +125,8 @@ export function CampaignDetailPage({ pubkey, identifier, relays }: CampaignDetai
 }
 
 function CampaignDetailContent({ campaign }: { campaign: ParsedCampaign }) {
+  const { t } = useTranslation();
+  const { config } = useAppContext();
   const { user } = useCurrentUser();
   const { data: btcPrice } = useBtcPrice();
   const author = useAuthor(campaign.pubkey);
@@ -133,6 +141,8 @@ function CampaignDetailContent({ campaign }: { campaign: ParsedCampaign }) {
   const [interactionsOpen, setInteractionsOpen] = useState(false);
   const [interactionsTab, setInteractionsTab] = useState<InteractionTab>('reposts');
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
+  const { translatedEvent, translateAction } = useEventTranslation(campaign.event);
+  const displayCampaign = useMemo(() => parseCampaign(translatedEvent) ?? campaign, [translatedEvent, campaign]);
 
   const deleteMutation = useDeleteEvent();
 
@@ -241,7 +251,7 @@ function CampaignDetailContent({ campaign }: { campaign: ParsedCampaign }) {
     creatorMetadata?.display_name || creatorMetadata?.name || genUserName(campaign.pubkey);
   const creatorProfileUrl = useProfileUrl(campaign.pubkey, creatorMetadata);
 
-  const deadline = campaign.deadline ? formatDeadline(campaign.deadline) : null;
+  const deadline = campaign.deadline ? formatDeadline(campaign.deadline, t) : null;
   const countryLabel = getCampaignCountryLabel(campaign);
   const raisedSats = stats?.totalSats ?? 0;
 
@@ -249,15 +259,15 @@ function CampaignDetailContent({ campaign }: { campaign: ParsedCampaign }) {
   const naddr = useMemo(() => encodeCampaignNaddr(campaign), [campaign]);
   const storyEvent = useMemo(
     () => ({
-      ...campaign.event,
-      tags: campaign.event.tags.filter(([name]) => !['banner', 'imeta', 'summary', 'title', 'w'].includes(name)),
+      ...displayCampaign.event,
+      tags: displayCampaign.event.tags.filter(([name]) => !['banner', 'imeta', 'summary', 'title', 'w'].includes(name)),
     }),
-    [campaign.event],
+    [displayCampaign.event],
   );
 
   useSeoMeta({
-    title: `${campaign.title} | Agora Fundraisers`,
-    description: campaign.summary || `Support ${campaign.title} on Agora.`,
+    title: t('campaignsDetail.seoTitle', { title: displayCampaign.title, appName: config.appName }),
+    description: displayCampaign.summary || t('campaignsDetail.seoDescriptionFallback', { title: displayCampaign.title, appName: config.appName }),
     ogImage: cover,
   });
 
@@ -266,10 +276,10 @@ function CampaignDetailContent({ campaign }: { campaign: ParsedCampaign }) {
     try {
       const nav = typeof navigator !== 'undefined' ? navigator : undefined;
       if (nav?.share) {
-        await nav.share({ title: campaign.title, text: campaign.summary, url });
+        await nav.share({ title: displayCampaign.title, text: displayCampaign.summary, url });
       } else if (nav?.clipboard) {
         await nav.clipboard.writeText(url);
-        toast({ title: 'Link copied to clipboard' });
+        toast({ title: t('campaignsDetail.linkCopied') });
       }
     } catch {
       // User likely cancelled the share sheet; nothing to do.
@@ -287,9 +297,8 @@ function CampaignDetailContent({ campaign }: { campaign: ParsedCampaign }) {
       {
         onSuccess: () => {
           toast({
-            title: 'Campaign deleted',
-            description:
-              'A deletion request was published. Well-behaved relays will drop the campaign from feeds.',
+            title: t('campaignsDetail.deletedToast'),
+            description: t('campaignsDetail.deletedToastDesc'),
           });
           setDeleteConfirmOpen(false);
           void queryClient.invalidateQueries({ queryKey: ['campaign', campaign.pubkey, campaign.identifier] });
@@ -312,7 +321,7 @@ function CampaignDetailContent({ campaign }: { campaign: ParsedCampaign }) {
         onError: (error: unknown) => {
           const msg = error instanceof Error ? error.message : String(error);
           toast({
-            title: 'Could not delete campaign',
+            title: t('campaignsDetail.deleteErrorTitle'),
             description: msg,
             variant: 'destructive',
           });
@@ -353,7 +362,7 @@ function CampaignDetailContent({ campaign }: { campaign: ParsedCampaign }) {
           back/admin buttons all live ON the image — the banner is the
           page's emotional entry point. */}
       <CampaignHero
-        campaign={campaign}
+        campaign={displayCampaign}
         cover={cover}
         creatorName={creatorName}
         creatorProfileUrl={creatorProfileUrl}
@@ -367,6 +376,7 @@ function CampaignDetailContent({ campaign }: { campaign: ParsedCampaign }) {
         onDelete={() => setDeleteConfirmOpen(true)}
         onReply={() => setReplyOpen(true)}
         onMore={() => setMoreMenuOpen(true)}
+        translateAction={translateAction}
       />
 
       {pinnedNodes.length > 0 && (
@@ -401,7 +411,7 @@ function CampaignDetailContent({ campaign }: { campaign: ParsedCampaign }) {
           <div className="flex-1 min-w-0 space-y-8">
             <CampaignStory
               storyEvent={storyEvent}
-              hasContent={campaign.story.trim().length > 0}
+              hasContent={displayCampaign.story.trim().length > 0}
             />
 
             {/* Engagement counters above the comments. The action bar
@@ -416,10 +426,12 @@ function CampaignDetailContent({ campaign }: { campaign: ParsedCampaign }) {
                       onClick={() => openInteractions('reposts')}
                       className="hover:underline transition-colors"
                     >
-                      <span className="font-bold text-foreground">
-                        {formatNumber(engagementStats.reposts)}
-                      </span>{' '}
-                      Repost{engagementStats.reposts !== 1 ? 's' : ''}
+                      <Trans
+                        i18nKey="campaignsDetail.repost"
+                        count={engagementStats.reposts}
+                        values={{ count: formatNumber(engagementStats.reposts) }}
+                        components={{ 0: <span className="font-bold text-foreground" /> }}
+                      />
                     </button>
                   ) : null}
                   {engagementStats?.quotes ? (
@@ -427,10 +439,12 @@ function CampaignDetailContent({ campaign }: { campaign: ParsedCampaign }) {
                       onClick={() => openInteractions('quotes')}
                       className="hover:underline transition-colors"
                     >
-                      <span className="font-bold text-foreground">
-                        {formatNumber(engagementStats.quotes)}
-                      </span>{' '}
-                      Quote{engagementStats.quotes !== 1 ? 's' : ''}
+                      <Trans
+                        i18nKey="campaignsDetail.quote"
+                        count={engagementStats.quotes}
+                        values={{ count: formatNumber(engagementStats.quotes) }}
+                        components={{ 0: <span className="font-bold text-foreground" /> }}
+                      />
                     </button>
                   ) : null}
                   {engagementStats?.reactions ? (
@@ -438,10 +452,12 @@ function CampaignDetailContent({ campaign }: { campaign: ParsedCampaign }) {
                       onClick={() => openInteractions('reactions')}
                       className="hover:underline transition-colors"
                     >
-                      <span className="font-bold text-foreground">
-                        {formatNumber(engagementStats.reactions)}
-                      </span>{' '}
-                      Like{engagementStats.reactions !== 1 ? 's' : ''}
+                      <Trans
+                        i18nKey="campaignsDetail.like"
+                        count={engagementStats.reactions}
+                        values={{ count: formatNumber(engagementStats.reactions) }}
+                        components={{ 0: <span className="font-bold text-foreground" /> }}
+                      />
                     </button>
                   ) : null}
                 </div>
@@ -450,12 +466,11 @@ function CampaignDetailContent({ campaign }: { campaign: ParsedCampaign }) {
               <div className="mt-6">
                 <div className="flex items-baseline justify-between gap-3 mb-3 px-1">
                   <h2 className="text-lg font-semibold tracking-tight">
-                    Comments &amp; donations
+                    {t('campaignsDetail.commentsAndDonations')}
                   </h2>
                   {engagementStats?.replies ? (
                     <span className="text-sm text-muted-foreground tabular-nums">
-                      {formatNumber(engagementStats.replies)}{' '}
-                      {engagementStats.replies === 1 ? 'comment' : 'comments'}
+                      {t('campaignsDetail.commentCount', { count: engagementStats.replies })}
                     </span>
                   ) : null}
                 </div>
@@ -492,10 +507,10 @@ function CampaignDetailContent({ campaign }: { campaign: ParsedCampaign }) {
                     className="block w-full rounded-2xl border border-dashed border-border/80 bg-card/50 px-6 py-10 text-center hover:bg-card hover:border-primary/40 transition-colors"
                   >
                     <p className="text-base font-medium text-foreground">
-                      No comments yet
+                      {t('campaignsDetail.noCommentsTitle')}
                     </p>
                     <p className="mt-1 text-sm text-muted-foreground">
-                      Be the first to leave a message of support.
+                      {t('campaignsDetail.noCommentsHint')}
                     </p>
                   </button>
                 )}
@@ -539,17 +554,13 @@ function CampaignDetailContent({ campaign }: { campaign: ParsedCampaign }) {
       <AlertDialog open={deleteConfirmOpen} onOpenChange={setDeleteConfirmOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Delete this campaign?</AlertDialogTitle>
+            <AlertDialogTitle>{t('campaignsDetail.deleteDialogTitle')}</AlertDialogTitle>
             <AlertDialogDescription>
-              This publishes a NIP-09 deletion request. Well-behaved relays
-              will drop the campaign from feeds and direct links. Past
-              donation receipts stay on-chain regardless. This action cannot
-              be undone — to keep accepting donations, edit the campaign
-              instead.
+              {t('campaignsDetail.deleteDialogBody')}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel disabled={deleteMutation.isPending}>Cancel</AlertDialogCancel>
+            <AlertDialogCancel disabled={deleteMutation.isPending}>{t('common.cancel')}</AlertDialogCancel>
             <AlertDialogAction
               onClick={(e) => {
                 e.preventDefault();
@@ -558,7 +569,7 @@ function CampaignDetailContent({ campaign }: { campaign: ParsedCampaign }) {
               disabled={deleteMutation.isPending}
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
             >
-              {deleteMutation.isPending ? 'Deleting…' : 'Delete'}
+              {deleteMutation.isPending ? t('campaignsDetail.deleting') : t('campaignsDetail.delete')}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
@@ -570,10 +581,10 @@ function CampaignDetailContent({ campaign }: { campaign: ParsedCampaign }) {
     const wasPinned = isPinned(event.id);
     togglePin.mutate(event.id, {
       onSuccess: () => {
-        toast({ title: wasPinned ? 'Unpinned from campaign' : 'Pinned to campaign' });
+        toast({ title: wasPinned ? t('campaignsDetail.unpinnedToast') : t('campaignsDetail.pinnedToast') });
       },
       onError: () => {
-        toast({ title: 'Failed to update campaign pins', variant: 'destructive' });
+        toast({ title: t('campaignsDetail.pinFailed'), variant: 'destructive' });
       },
     });
   }
@@ -592,6 +603,7 @@ function CampaignPinHeader({
   pinPending: boolean;
   onTogglePin: () => void;
 }) {
+  const { t } = useTranslation();
   return (
     <PinnedCommentHeader
       isPinned={isPinned}
@@ -602,7 +614,7 @@ function CampaignPinHeader({
       {isCampaignAuthor && (
         <span className="inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-2 py-0.5 font-medium text-primary">
           <ShieldCheck className="size-3" />
-          Campaigner
+          {t('campaignsDetail.campaigner')}
         </span>
       )}
     </PinnedCommentHeader>
@@ -632,6 +644,7 @@ interface CampaignHeroProps {
   onDelete: () => void;
   onReply: () => void;
   onMore: () => void;
+  translateAction: ReactNode;
 }
 
 function CampaignHero({
@@ -649,7 +662,9 @@ function CampaignHero({
   onDelete,
   onReply,
   onMore,
+  translateAction,
 }: CampaignHeroProps) {
+  const { t } = useTranslation();
   const initials = creatorName.slice(0, 2).toUpperCase();
 
   return (
@@ -696,10 +711,10 @@ function CampaignHero({
           <button
             onClick={onBack}
             className="inline-flex items-center gap-1.5 h-10 pl-2 pr-3.5 rounded-full bg-black/30 text-white backdrop-blur-md hover:bg-black/45 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80 motion-safe:transition-colors"
-            aria-label="Go back"
+            aria-label={t('common.goBack')}
           >
-            <ChevronLeft className="size-5" />
-            <span className="text-sm font-medium hidden sm:inline">Back</span>
+            <ChevronLeft className="size-5 rtl:rotate-180" />
+            <span className="text-sm font-medium hidden sm:inline">{t('campaignsDetail.back')}</span>
           </button>
 
           {isCreator && (
@@ -711,7 +726,7 @@ function CampaignHero({
               >
                 <Link to={`/campaigns/new?edit=${encodeURIComponent(naddr)}`}>
                   <Pencil className="size-4 sm:mr-2" />
-                  <span className="hidden sm:inline">Edit</span>
+                  <span className="hidden sm:inline">{t('campaignsDetail.edit')}</span>
                 </Link>
               </Button>
               <Button
@@ -722,7 +737,7 @@ function CampaignHero({
                 className="h-10 rounded-full bg-black/30 text-white backdrop-blur-md shadow-none hover:bg-destructive/70 focus-visible:ring-white/80"
               >
                 <Trash2 className="size-4 sm:mr-2" />
-                <span className="hidden sm:inline">Delete</span>
+                <span className="hidden sm:inline">{t('campaignsDetail.delete')}</span>
               </Button>
             </div>
           )}
@@ -759,10 +774,11 @@ function CampaignHero({
               </AvatarFallback>
             </Avatar>
             <span className="[text-shadow:0_1px_3px_rgba(0,0,0,0.7)]">
-              by{' '}
-              <span className="font-semibold underline-offset-4 group-hover:underline">
-                {creatorName}
-              </span>
+              <Trans
+                i18nKey="campaignsDetail.byAuthor"
+                values={{ name: creatorName }}
+                components={{ 0: <span className="font-semibold underline-offset-4 group-hover:underline" /> }}
+              />
             </span>
           </Link>
 
@@ -791,11 +807,12 @@ function CampaignHero({
           <div className="mt-4 pt-3 border-t border-white/15 [&_button]:!text-white/90 [&_button:hover]:!text-white [&_button:hover]:!bg-white/15 [&_button]:transition-colors [text-shadow:none]">
             <PostActionBar
               event={campaign.event}
-              replyLabel="Comment"
+              replyLabel={t('campaignsDetail.commentLabel')}
               hideZap
               showShareInSidebar
               onReply={onReply}
               onMore={onMore}
+              translateAction={translateAction}
             />
           </div>
         </div>
@@ -815,13 +832,14 @@ function CampaignStory({
   storyEvent: NostrEvent;
   hasContent: boolean;
 }) {
+  const { t } = useTranslation();
   return (
     <DetailStory
       event={storyEvent}
       hasContent={hasContent}
-      heading="The story"
+      heading={t('campaignsDetail.storyHeading')}
       headingId="campaign-story-heading"
-      emptyText="The organizer hasn't written a story for this campaign yet."
+      emptyText={t('campaignsDetail.storyEmpty')}
     />
   );
 }
@@ -853,8 +871,9 @@ function DonateColumn({
   onShare,
   onSeeAll,
 }: DonateColumnProps) {
+  const { t } = useTranslation();
   const ended = !!deadline?.isPast;
-  const endedLabel = ended ? 'Campaign ended' : null;
+  const endedLabel = ended ? t('campaignsDetail.campaignEnded') : null;
   const isSilentPayment = !campaign.wallets.onchain;
 
   return (
@@ -871,7 +890,7 @@ function DonateColumn({
         {isSilentPayment ? (
           campaign.goalUsd && campaign.goalUsd > 0 ? (
             <div className="text-xs text-muted-foreground">
-              Target: {formatUsdGoal(campaign.goalUsd)}
+              {t('campaignsDetail.target', { amount: formatUsdGoal(campaign.goalUsd) })}
             </div>
           ) : null
         ) : statsLoading ? (
@@ -882,24 +901,22 @@ function DonateColumn({
               <div className="text-2xl font-bold tracking-tight">
                 {formatSatsFull(raisedSats, btcPrice)}
                 <span className="ml-1.5 text-sm font-normal text-muted-foreground">
-                  raised
+                  {t('campaignsDetail.raised')}
                 </span>
               </div>
               {campaign.goalUsd ? (
                 <div className="text-xs text-muted-foreground">
-                  of {formatUsdGoal(campaign.goalUsd)} goal
+                  {t('campaignsDetail.ofGoal', { amount: formatUsdGoal(campaign.goalUsd) })}
                   {donations.length > 0 && (
                     <>
                       {' · '}
-                      {formatNumber(donations.length)}{' '}
-                      {donations.length === 1 ? 'donation' : 'donations'}
+                      {t('campaignsDetail.donationCount', { count: donations.length })}
                     </>
                   )}
                 </div>
               ) : donations.length > 0 ? (
                 <div className="text-xs text-muted-foreground">
-                  {formatNumber(donations.length)}{' '}
-                  {donations.length === 1 ? 'donation' : 'donations'}
+                  {t('campaignsDetail.donationCount', { count: donations.length })}
                 </div>
               ) : null}
             </div>
@@ -920,11 +937,11 @@ function DonateColumn({
           <div className="space-y-2">
             <Button size="lg" className="w-full" disabled>
               <HandHeart className="size-5 mr-2" />
-              {endedLabel ?? 'Donate'}
+              {endedLabel ?? t('campaignsDetail.donate')}
             </Button>
             <Button variant="outline" size="lg" className="w-full" onClick={onShare}>
               <Share2 className="size-4 mr-2" />
-              Share
+              {t('campaignsDetail.share')}
             </Button>
           </div>
         ) : (
@@ -935,7 +952,7 @@ function DonateColumn({
             <CampaignWalletDonatePanel wallets={campaign.wallets} />
             <Button variant="outline" size="lg" className="w-full" onClick={onShare}>
               <Share2 className="size-4 mr-2" />
-              Share
+              {t('campaignsDetail.share')}
             </Button>
           </div>
         )}
@@ -945,7 +962,7 @@ function DonateColumn({
         {!isSilentPayment && donations.length > 0 && (
           <div className="space-y-2 border-t border-border/60 pt-4">
             <div className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-              Recent donations
+              {t('campaignsDetail.recentDonations')}
             </div>
             <DonorPreviewList donations={donations} btcPrice={btcPrice} />
             <button
@@ -953,8 +970,7 @@ function DonateColumn({
               onClick={onSeeAll}
               className="w-full text-sm font-medium text-primary hover:underline motion-safe:transition-colors text-center pt-1"
             >
-              See all {donations.length}{' '}
-              {donations.length === 1 ? 'donation' : 'donations'}
+              {t('campaignsDetail.seeAllDonations', { count: donations.length })}
             </button>
           </div>
         )}

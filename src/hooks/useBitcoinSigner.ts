@@ -17,7 +17,7 @@ import { type BtcSigner, hasBtcSigning } from '@/lib/bitcoin-signers';
  *                   the unsupported state when a `sign_psbt` call rejects with
  *                   a capability error (see `reportSignerUnsupported`).
  */
-export type BitcoinSignerCapability = 'supported' | 'unsupported' | 'unknown';
+type BitcoinSignerCapability = 'supported' | 'unsupported' | 'unknown';
 
 /**
  * Module-level registry of bunker pubkeys that have been observed to reject
@@ -36,20 +36,6 @@ export function reportSignerUnsupported(pubkey: string): void {
   // Dispatch a DOM event so hook consumers can re-render without plumbing a
   // shared store through the app. Listened to by `useBitcoinSigner`.
   window.dispatchEvent(new CustomEvent('bitcoin-signer-unsupported', { detail: pubkey }));
-}
-
-/**
- * Clear the unsupported-bunker memo for a pubkey (or all pubkeys). Called
- * when the user logs out or switches accounts, so that a re-login with a
- * potentially-upgraded bunker doesn't inherit the previous rejection.
- */
-export function clearSignerUnsupported(pubkey?: string): void {
-  if (pubkey === undefined) {
-    knownUnsupportedBunkers.clear();
-  } else {
-    knownUnsupportedBunkers.delete(pubkey);
-  }
-  window.dispatchEvent(new CustomEvent('bitcoin-signer-cleared', { detail: pubkey ?? '*' }));
 }
 
 /**

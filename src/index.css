@@ -3,16 +3,65 @@
 @tailwind utilities;
 
 @layer base {
+  /*
+   * Agora's built-in color tokens. These are hardcoded and ship with the
+   * bundle — there is no runtime injection path, no remote theme loader,
+   * no localStorage-driven CSS-variable mutation. The only thing that
+   * changes at runtime is the `.dark` class on <html>, set by
+   * AppProvider based on the resolved theme preference.
+   *
+   * If you want to recolor the app, edit these values directly.
+   */
   :root {
     --radius: 0.75rem;
-    --success: 142 72% 29%;
-    --success-foreground: 138 60% 94%;
     /* Mobile chrome dimensions — referenced by layout utility classes below */
     --top-bar-height: 2.5rem;   /* MobileTopBar h-10 = 40px */
     --bottom-nav-height: 2.75rem; /* MobileBottomNav h-11 = 44px */
+
+    /* ── Light theme tokens ───────────────────────────────────────────── */
+    --background: 0 0% 100%;
+    --foreground: 222 47% 11%;
+    --card: 0 0% 100%;
+    --card-foreground: 222 47% 11%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222 47% 11%;
+    --primary: 24 100% 50%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 0 0% 96%;
+    --secondary-foreground: 222 47% 11%;
+    --muted: 0 0% 96%;
+    --muted-foreground: 222 17% 46%;
+    --accent: 0 0% 92%;
+    --accent-foreground: 222 47% 11%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 24 50% 82%;
+    --input: 24 50% 82%;
+    --ring: 24 100% 50%;
+    --success: 142 72% 29%;
+    --success-foreground: 138 60% 94%;
   }
 
   .dark {
+    --background: 0 0% 10%;
+    --foreground: 0 0% 95%;
+    --card: 0 0% 12%;
+    --card-foreground: 0 0% 95%;
+    --popover: 0 0% 12%;
+    --popover-foreground: 0 0% 95%;
+    --primary: 24 100% 50%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 0 0% 18%;
+    --secondary-foreground: 0 0% 95%;
+    --muted: 0 0% 18%;
+    --muted-foreground: 0 0% 65%;
+    --accent: 0 0% 24%;
+    --accent-foreground: 0 0% 95%;
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 95%;
+    --border: 24 40% 30%;
+    --input: 24 40% 30%;
+    --ring: 24 100% 50%;
     --success: 142 60% 22%;
     --success-foreground: 138 60% 94%;
   }
@@ -31,6 +80,31 @@
   body {
     @apply bg-background text-foreground;
   }
+}
+
+/* ── Han display-font overrides for Chinese (zh, zh-Hant, zh-TW, zh-HK) ────
+   Bebas Neue (the `.font-display` family) ships only Latin glyphs, so
+   Chinese hero text falls back to system fonts and loses its industrial
+   display character. Swap in Noto Sans TC weight 900 for any element
+   using `.font-display` while the page language is a Chinese variant.
+
+   Tailwind's `italic`, `uppercase`, and `tracking-*` utilities are
+   applied directly to those hero elements; we reverse them here because
+   Han text doesn't have a meaningful italic form, never uppercases, and
+   wants tighter (not wider) letter-spacing. The `:lang()` selector has
+   higher specificity (0,1,1) than a single utility class (0,1,0) so
+   these rules win without `!important`.
+
+   `-webkit-text-stroke` is neutralized because the hero h1 fattens its
+   weight with a 0.022em stroke (Bebas Neue only ships weight 400); at
+   Noto Sans TC weight 900 the stroke trick muddies CJK strokes. */
+:root[lang|="zh"] .font-display {
+  font-family: 'Noto Sans TC', 'PingFang TC', 'PingFang SC', 'Microsoft JhengHei', 'Microsoft YaHei', 'Heiti TC', sans-serif;
+  font-weight: 900;
+  font-style: normal;
+  letter-spacing: 0;
+  text-transform: none;
+  -webkit-text-stroke: 0;
 }
 
 @layer utilities {
@@ -165,59 +239,6 @@
       bottom: calc(var(--bottom-nav-height) + var(--safe-area-inset-bottom, env(safe-area-inset-bottom, 0px)));
     }
   }
-}
-
-/* Leaflet control theming — override the default white/gray controls to
-   match the app's themed palette. The default `leaflet/dist/leaflet.css`
-   ships with hardcoded `background: white` / dark border colors that
-   clash with our themed surfaces (especially in dark mode and on the
-   `/world` map where controls sit on top of the dark Positron tiles).
-
-   We re-style only the controls; tile rendering and marker popovers are
-   untouched. Hover state uses the primary color so the controls match
-   the same orange accent as buttons elsewhere. */
-.leaflet-bar {
-  border: 1px solid hsl(var(--border)) !important;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.18) !important;
-  border-radius: calc(var(--radius) - 0.25rem) !important;
-  overflow: hidden;
-}
-
-.leaflet-bar a,
-.leaflet-bar a:hover,
-.leaflet-bar a:focus {
-  background-color: hsl(var(--background) / 0.95) !important;
-  color: hsl(var(--foreground)) !important;
-  border-bottom: 1px solid hsl(var(--border)) !important;
-  backdrop-filter: blur(4px);
-  transition: background-color 120ms, color 120ms;
-}
-
-.leaflet-bar a:last-child {
-  border-bottom: none !important;
-}
-
-.leaflet-bar a:hover,
-.leaflet-bar a:focus {
-  background-color: hsl(var(--primary)) !important;
-  color: hsl(var(--primary-foreground)) !important;
-}
-
-.leaflet-bar a.leaflet-disabled {
-  background-color: hsl(var(--muted)) !important;
-  color: hsl(var(--muted-foreground) / 0.5) !important;
-  cursor: not-allowed;
-}
-
-/* Attribution control (hidden on /world via `attributionControl={false}`,
-   but kept consistent for any other map usage). */
-.leaflet-control-attribution {
-  background-color: hsl(var(--background) / 0.85) !important;
-  color: hsl(var(--muted-foreground)) !important;
-  backdrop-filter: blur(4px);
-}
-.leaflet-control-attribution a {
-  color: hsl(var(--primary)) !important;
 }
 
 @keyframes spin {

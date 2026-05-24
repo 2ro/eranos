@@ -1,17 +1,9 @@
 import type { NostrEvent, NostrMetadata } from '@nostrify/nostrify';
 
-/** Kinds rendered as "people lists" — kind 3 follow lists, NIP-51 follow sets, and follow packs. */
-export const PEOPLE_LIST_KINDS = new Set<number>([3, 30000, 39089]);
-
-/** Returns true if an event should be rendered with the shared people-list components. */
-export function isPeopleListKind(kind: number): boolean {
-  return PEOPLE_LIST_KINDS.has(kind);
-}
-
 /** Classify the variant of a people-list event. */
-export type PeopleListVariant = 'follow-list' | 'follow-set' | 'follow-pack';
+type PeopleListVariant = 'follow-list' | 'follow-set' | 'follow-pack';
 
-export function getPeopleListVariant(kind: number): PeopleListVariant | null {
+function getPeopleListVariant(kind: number): PeopleListVariant | null {
   if (kind === 3) return 'follow-list';
   if (kind === 30000) return 'follow-set';
   if (kind === 39089) return 'follow-pack';
@@ -23,7 +15,7 @@ export function getPeopleListVariant(kind: number): PeopleListVariant | null {
  * title/description/image of its own, so callers pass the author's metadata
  * and we fall back to display name + about + banner.
  */
-export interface ParsedPeopleList {
+interface ParsedPeopleList {
   /** Human-readable title (never empty — falls back to a sensible default). */
   title: string;
   /** Optional description. */

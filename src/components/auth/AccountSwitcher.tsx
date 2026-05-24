@@ -1,8 +1,12 @@
 // NOTE: This file is stable and usually should not be modified.
 // It is important that all functionality in this file is preserved, and should only be modified if explicitly requested.
 
+// NOTE: This file is stable and usually should not be modified.
+// It is important that all functionality in this file is preserved, and should only be modified if explicitly requested.
+
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { Activity, Bell, ChevronDown, CircleHelp, LayoutDashboard, LogOut, Search, Settings, User, UserIcon, UserPlus, Wallet } from 'lucide-react';
 import { nip19 } from 'nostr-tools';
 import {
@@ -23,6 +27,7 @@ interface AccountSwitcherProps {
 }
 
 export function AccountSwitcher({ onAddAccountClick }: AccountSwitcherProps) {
+  const { t } = useTranslation();
   const { currentUser, otherUsers, isLoading, setLogin, removeLogin } = useLoggedInAccounts();
   const { orderedItems } = useFeedSettings();
   const [isOpen, setIsOpen] = useState(false);
@@ -78,50 +83,50 @@ export function AccountSwitcher({ onAddAccountClick }: AccountSwitcherProps) {
           <DropdownMenuItem asChild className='flex items-center gap-2 cursor-pointer p-2 rounded-md'>
             <Link to="/dashboard">
               <Activity className='w-4 h-4' />
-              <span>Dashboard</span>
+              <span>{t('nav.dashboard')}</span>
             </Link>
           </DropdownMenuItem>
         )}
         <DropdownMenuItem asChild className='flex items-center gap-2 cursor-pointer p-2 rounded-md'>
           <Link to="/my-dashboard">
             <LayoutDashboard className='w-4 h-4' />
-            <span>My Dashboard</span>
+            <span>{t('nav.myDashboard')}</span>
           </Link>
         </DropdownMenuItem>
         <DropdownMenuItem asChild className='flex items-center gap-2 cursor-pointer p-2 rounded-md'>
           <Link to="/wallet">
             <Wallet className='w-4 h-4' />
-            <span>Wallet</span>
+            <span>{t('nav.wallet')}</span>
           </Link>
         </DropdownMenuItem>
         <DropdownMenuItem asChild className='flex items-center gap-2 cursor-pointer p-2 rounded-md'>
           <Link to="/notifications">
             <Bell className='w-4 h-4' />
-            <span>Notifications</span>
+            <span>{t('nav.notifications')}</span>
           </Link>
         </DropdownMenuItem>
         <DropdownMenuItem asChild className='flex items-center gap-2 cursor-pointer p-2 rounded-md'>
           <Link to={`/${nip19.npubEncode(currentUser.pubkey)}`}>
             <User className='w-4 h-4' />
-            <span>Profile</span>
+            <span>{t('nav.profile')}</span>
           </Link>
         </DropdownMenuItem>
         <DropdownMenuItem asChild className='flex items-center gap-2 cursor-pointer p-2 rounded-md'>
           <Link to="/search">
             <Search className='w-4 h-4' />
-            <span>Search</span>
+            <span>{t('nav.search')}</span>
           </Link>
         </DropdownMenuItem>
         <DropdownMenuItem asChild className='flex items-center gap-2 cursor-pointer p-2 rounded-md'>
           <Link to="/settings">
             <Settings className='w-4 h-4' />
-            <span>Settings</span>
+            <span>{t('nav.settings')}</span>
           </Link>
         </DropdownMenuItem>
         <DropdownMenuItem asChild className='flex items-center gap-2 cursor-pointer p-2 rounded-md'>
           <Link to="/about">
             <CircleHelp className='w-4 h-4' />
-            <span>About</span>
+            <span>{t('nav.about')}</span>
           </Link>
         </DropdownMenuItem>
         <DropdownMenuSeparator />
@@ -130,14 +135,14 @@ export function AccountSwitcher({ onAddAccountClick }: AccountSwitcherProps) {
           className='flex items-center gap-2 cursor-pointer p-2 rounded-md'
         >
           <UserPlus className='w-4 h-4' />
-          <span>Add another account</span>
+          <span>{t('auth.addAccount')}</span>
         </DropdownMenuItem>
         <DropdownMenuItem
           onClick={handleLogout}
           className='flex items-center gap-2 cursor-pointer p-2 rounded-md text-red-500'
         >
           <LogOut className='w-4 h-4' />
-          <span>Log out</span>
+          <span>{t('auth.logout')}</span>
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

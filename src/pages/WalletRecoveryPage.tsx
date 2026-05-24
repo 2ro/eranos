@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { useSeoMeta } from '@unhead/react';
+import { useTranslation } from 'react-i18next';
 import { useNostr } from '@nostrify/react';
 import {
   AlertTriangle,
@@ -45,6 +46,7 @@ type Step = 'input' | 'sweeping' | 'success' | 'error';
  * address.
  */
 export function WalletRecoveryPage() {
+  const { t } = useTranslation();
   const { config } = useAppContext();
   const { user } = useCurrentUser();
   const { nostr } = useNostr();
@@ -59,8 +61,8 @@ export function WalletRecoveryPage() {
   const [progress, setProgress] = useState<string | null>(null);
 
   useSeoMeta({
-    title: `Recover Old Wallet | ${config.appName}`,
-    description: 'Recover funds from a previous Lightning wallet and transfer them to your Nostr-derived Bitcoin address.',
+    title: `${t('walletRecovery.seoTitle')} | ${config.appName}`,
+    description: t('walletRecovery.seoDescription'),
   });
 
   const destinationAddress = useMemo(
@@ -90,15 +92,15 @@ export function WalletRecoveryPage() {
   if (!user) {
     return (
       <main>
-        <PageHeader title="Recover Old Wallet" icon={<WalletIcon className="size-5" />} />
+        <PageHeader title={t('walletRecovery.title')} icon={<WalletIcon className="size-5" />} />
         <div className="py-20 px-8 flex flex-col items-center gap-6 text-center">
           <div className="p-4 rounded-full bg-primary/10">
             <WalletIcon className="size-8 text-primary" />
           </div>
           <div className="space-y-2 max-w-sm">
-            <h2 className="text-xl font-bold">Log in to recover</h2>
+            <h2 className="text-xl font-bold">{t('walletRecovery.loggedOut.title')}</h2>
             <p className="text-muted-foreground text-sm">
-              Log in with the Nostr identity that owned the old Lightning wallet so the funds can be swept to its Bitcoin address.
+              {t('walletRecovery.loggedOut.description')}
             </p>
           </div>
           <LoginArea className="max-w-60" />
@@ -111,24 +113,24 @@ export function WalletRecoveryPage() {
     const backup = backupQuery.data;
     if (!backup || !user) return;
     if (!user.signer.nip44?.decrypt) {
-      setError('Your signer does not support NIP-44 decryption, which is required to read the relay backup. Paste your 12-word recovery phrase manually instead.');
+      setError(t('walletRecovery.errors.noNip44'));
       return;
     }
     try {
       const { decryptBackupEvent } = await import('@/lib/spark/backup');
       const decrypted = await decryptBackupEvent(backup, user.signer);
       if (!decrypted) {
-        setError('Could not decrypt the relay backup. Paste your 12-word recovery phrase manually instead.');
+        setError(t('walletRecovery.errors.decryptFailed'));
         return;
       }
       setMnemonic(decrypted.trim());
       toast({
-        title: 'Backup loaded',
-        description: 'Recovery phrase decrypted from your relays.',
+        title: t('walletRecovery.toast.backupLoadedTitle'),
+        description: t('walletRecovery.toast.backupLoadedDesc'),
       });
     } catch (err) {
       logger.error('[WalletRecovery] decryptRelayBackup failed', err);
-      setError(err instanceof Error ? err.message : 'Failed to decrypt relay backup.');
+      setError(err instanceof Error ? err.message : t('walletRecovery.errors.decryptGeneric'));
     }
   }
 
@@ -137,7 +139,7 @@ export function WalletRecoveryPage() {
     const trimmed = mnemonic.trim().toLowerCase().replace(/\s+/g, ' ');
     const wordCount = trimmed.split(' ').filter(Boolean).length;
     if (wordCount !== 12 && wordCount !== 24) {
-      setError('Recovery phrase must be 12 or 24 words.');
+      setError(t('walletRecovery.errors.invalidWordCount'));
       return;
     }
 
@@ -148,27 +150,27 @@ export function WalletRecoveryPage() {
     // recovering. Everything below stays scoped to this function so the SDK
     // instance is discarded as soon as we're done.
     try {
-      setProgress('Loading wallet SDK…');
+      setProgress(t('walletRecovery.progress.loadingSdk'));
       const { breezService } = await import('@/lib/spark/breezService');
 
-      setProgress('Connecting to your old wallet…');
+      setProgress(t('walletRecovery.progress.connecting'));
       await breezService.connect(trimmed);
 
-      setProgress('Checking balance…');
+      setProgress(t('walletRecovery.progress.checkingBalance'));
       const balance = await breezService.getBalance();
       if (balance <= 0) {
         await breezService.disconnect();
-        setError('Your old wallet has no spendable balance. There is nothing to recover.');
+        setError(t('walletRecovery.errors.noBalance'));
         return;
       }
 
-      setProgress(`Preparing transfer of ${balance.toLocaleString()} sats…`);
+      setProgress(t('walletRecovery.progress.preparingTransfer', { sats: balance.toLocaleString() }));
       // Pass the whole balance as the amount; Breez will deduct the network
       // fee from the prepared response and we let it use its default "medium"
       // confirmation speed.
       const prep = await breezService.prepareBitcoinPayment(destinationAddress, balance);
 
-      setProgress('Broadcasting transaction…');
+      setProgress(t('walletRecovery.progress.broadcasting'));
       const payment = await breezService.sendBitcoinPayment(prep, 'medium');
 
       setProgress(null);
@@ -184,34 +186,34 @@ export function WalletRecoveryPage() {
       }
     } catch (err) {
       logger.error('[WalletRecovery] sweep failed', err);
-      setError(err instanceof Error ? err.message : 'Recovery failed. Please try again.');
+      setError(err instanceof Error ? err.message : t('walletRecovery.errors.sweepGeneric'));
     }
   }
 
   return (
     <main>
-      <PageHeader title="Recover Old Wallet" icon={<WalletIcon className="size-5" />} />
+      <PageHeader title={t('walletRecovery.title')} icon={<WalletIcon className="size-5" />} />
 
       <div className="max-w-md mx-auto px-4 py-6 space-y-6">
         <Button variant="ghost" size="sm" asChild className="-ml-2">
           <Link to="/wallet">
-            <ArrowLeft className="size-4 mr-1.5" />
-            Back to wallet
+            <ArrowLeft className="size-4 mr-1.5 rtl:rotate-180" />
+            {t('walletRecovery.backToWallet')}
           </Link>
         </Button>
 
         <div className="space-y-2">
-          <h2 className="text-2xl font-bold tracking-tight">Recover your old wallet</h2>
+          <h2 className="text-2xl font-bold tracking-tight">{t('walletRecovery.heading')}</h2>
           <p className="text-sm text-muted-foreground">
-            If you previously held funds in the Lightning wallet, you can sweep them to your Nostr-derived Bitcoin address. Your old wallet is not restored — this is a one-time, one-way transfer.
+            {t('walletRecovery.subheading')}
           </p>
         </div>
 
         {destinationAddress && (
           <Card>
             <CardHeader>
-              <CardTitle className="text-base">Funds will be sent to</CardTitle>
-              <CardDescription>Your Nostr-derived Taproot address.</CardDescription>
+              <CardTitle className="text-base">{t('walletRecovery.destination.title')}</CardTitle>
+              <CardDescription>{t('walletRecovery.destination.description')}</CardDescription>
             </CardHeader>
             <CardContent>
               <code className="block break-all rounded-md bg-muted px-3 py-2 text-xs font-mono">
@@ -224,28 +226,28 @@ export function WalletRecoveryPage() {
         {step === 'input' && (
           <Card>
             <CardHeader>
-              <CardTitle className="text-base">Recovery phrase</CardTitle>
+              <CardTitle className="text-base">{t('walletRecovery.phrase.title')}</CardTitle>
               <CardDescription>
-                Paste the 12-word recovery phrase from your old wallet.
+                {t('walletRecovery.phrase.description')}
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               {backupQuery.isLoading && (
                 <p className="flex items-center gap-2 text-xs text-muted-foreground">
                   <Loader2 className="size-3.5 animate-spin" />
-                  Checking your relays for an encrypted backup…
+                  {t('walletRecovery.phrase.checkingRelays')}
                 </p>
               )}
               {backupQuery.data && (
                 <Alert>
                   <ShieldAlert className="size-4" />
-                  <AlertTitle>Backup found on your relays</AlertTitle>
+                  <AlertTitle>{t('walletRecovery.phrase.backupFoundTitle')}</AlertTitle>
                   <AlertDescription className="space-y-3">
                     <p>
-                      We found an encrypted backup of your old wallet's recovery phrase published from this account.
+                      {t('walletRecovery.phrase.backupFoundDesc')}
                     </p>
                     <Button size="sm" variant="secondary" onClick={decryptRelayBackup}>
-                      Decrypt and use it
+                      {t('walletRecovery.phrase.decryptAndUse')}
                     </Button>
                   </AlertDescription>
                 </Alert>
@@ -254,7 +256,7 @@ export function WalletRecoveryPage() {
               <Textarea
                 value={mnemonic}
                 onChange={(e) => setMnemonic(e.target.value)}
-                placeholder="word1 word2 word3 …"
+                placeholder={t('walletRecovery.phrase.placeholder')}
                 rows={4}
                 autoComplete="off"
                 spellCheck={false}
@@ -264,12 +266,12 @@ export function WalletRecoveryPage() {
               <Alert variant="default" className="border-amber-300/60 bg-amber-50 text-amber-950 dark:border-amber-500/30 dark:bg-amber-950/50 dark:text-amber-100">
                 <AlertTriangle className="size-4 !text-amber-600 dark:!text-amber-400" />
                 <AlertDescription className="text-xs">
-                  Only paste a recovery phrase you trust. Anyone with this phrase can spend the funds. After the sweep completes, delete it from any place you copied it from.
+                  {t('walletRecovery.phrase.warning')}
                 </AlertDescription>
               </Alert>
 
               <Button onClick={startSweep} disabled={!mnemonic.trim()} className="w-full">
-                Sweep funds to my Bitcoin address
+                {t('walletRecovery.phrase.sweepButton')}
               </Button>
             </CardContent>
           </Card>
@@ -279,9 +281,9 @@ export function WalletRecoveryPage() {
           <Card>
             <CardContent className="py-10 flex flex-col items-center gap-4 text-center">
               <Loader2 className="size-8 animate-spin text-primary" />
-              <p className="text-sm font-medium">{progress ?? 'Working…'}</p>
+              <p className="text-sm font-medium">{progress ?? t('walletRecovery.sweeping.working')}</p>
               <p className="text-xs text-muted-foreground max-w-xs">
-                Don't close this tab. This can take up to a minute while the old wallet syncs and the transaction is broadcast.
+                {t('walletRecovery.sweeping.dontClose')}
               </p>
             </CardContent>
           </Card>
@@ -294,20 +296,20 @@ export function WalletRecoveryPage() {
                 <CheckCircle2 className="size-8 text-green-600 dark:text-green-400" />
               </div>
               <div className="space-y-1">
-                <p className="text-lg font-bold">Recovery complete</p>
+                <p className="text-lg font-bold">{t('walletRecovery.success.title')}</p>
                 {sweptSats !== null && (
                   <p className="text-sm text-muted-foreground">
-                    Sent {sweptSats.toLocaleString()} sats to your Bitcoin address.
+                    {t('walletRecovery.success.sent', { sats: sweptSats.toLocaleString() })}
                   </p>
                 )}
               </div>
               {txid && (
                 <Button variant="outline" asChild>
-                  <Link to={`/i/bitcoin:tx:${txid}`}>View transaction</Link>
+                  <Link to={`/i/bitcoin:tx:${txid}`}>{t('walletRecovery.success.viewTransaction')}</Link>
                 </Button>
               )}
               <Button variant="ghost" onClick={() => navigate('/wallet')}>
-                Back to wallet
+                {t('walletRecovery.backToWallet')}
               </Button>
             </CardContent>
           </Card>
@@ -318,7 +320,7 @@ export function WalletRecoveryPage() {
             <CardContent className="py-6 space-y-4">
               <Alert variant="destructive">
                 <AlertTriangle className="size-4" />
-                <AlertTitle>Recovery failed</AlertTitle>
+                <AlertTitle>{t('walletRecovery.error.title')}</AlertTitle>
                 <AlertDescription>{error}</AlertDescription>
               </Alert>
               <Button
@@ -329,7 +331,7 @@ export function WalletRecoveryPage() {
                   setStep('input');
                 }}
               >
-                Try again
+                {t('walletRecovery.error.tryAgain')}
               </Button>
             </CardContent>
           </Card>

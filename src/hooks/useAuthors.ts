@@ -4,7 +4,7 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { parseAuthorEvent } from '@/hooks/useAuthor';
 import { setProfileCached } from '@/lib/profileCache';
 
-export interface AuthorData {
+interface AuthorData {
   pubkey: string;
   event?: NostrEvent;
   metadata?: NostrMetadata;

@@ -23,7 +23,7 @@ export function extractYouTubeId(url: string): string | null {
 }
 
 /** Bluesky post info extracted from a bsky.app URL. */
-export interface BlueskyPostInfo {
+interface BlueskyPostInfo {
   /** Handle or DID of the author. */
   author: string;
   /** Record key of the post. */
@@ -168,13 +168,6 @@ export function extractGathererCard(url: string): GathererCard | null {
   } catch {
     return null;
   }
-}
-
-/** Returns true if the URL should be rendered as a rich embed rather than a plain link. */
-export function isEmbeddableUrl(url: string): boolean {
-  return !!extractYouTubeId(url) || !!extractBlueskyPost(url)
-    || !!extractMastodonPost(url)
-    || !!extractArchiveOrgId(url) || !!extractGathererCard(url);
 }
 
 /** Get a short label for the embed type. */

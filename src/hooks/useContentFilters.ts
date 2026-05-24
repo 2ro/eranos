@@ -12,7 +12,7 @@ export interface ContentFilter {
   updatedAt: number;
 }
 
-export interface FilterRule {
+interface FilterRule {
   type: 'kind' | 'content-regex' | 'tag' | 'author-metadata';
   field?: string;
   operator: 'equals' | 'contains' | 'regex' | 'not-equals' | 'not-contains';

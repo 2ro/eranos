@@ -1,0 +1,2267 @@
+{
+  "common": {
+    "loading": "लोड हो रहा है…",
+    "error": "त्रुटि",
+    "success": "सफल",
+    "cancel": "रद्द करें",
+    "save": "सेव करें",
+    "delete": "डिलीट करें",
+    "edit": "एडिट करें",
+    "close": "बंद करें",
+    "back": "वापस",
+    "next": "आगे",
+    "refresh": "रिफ्रेश करें",
+    "search": "खोजें",
+    "filter": "फ़िल्टर",
+    "clear": "साफ़ करें",
+    "submit": "सबमिट करें",
+    "confirm": "पुष्टि करें",
+    "copied": "कॉपी हो गया",
+    "goBack": "वापस जाएँ",
+    "tryAgain": "कृपया दोबारा कोशिश करें।",
+    "showLess": "कम दिखाएँ",
+    "readMore": "और पढ़ें"
+  },
+  "translate": {
+    "translate": "अनुवाद करें",
+    "translating": "अनुवाद हो रहा है…",
+    "showOriginal": "मूल दिखाएँ",
+    "error": "अनुवाद विफल"
+  },
+  "nav": {
+    "openMenu": "मेन्यू खोलें",
+    "closeMenu": "मेन्यू बंद करें",
+    "brandHome": "{{appName}} होम",
+    "activity": "गतिविधि",
+    "campaigns": "कैंपेन",
+    "groups": "ग्रुप",
+    "pledge": "प्लेज",
+    "search": "खोजें",
+    "dashboard": "डैशबोर्ड",
+    "myDashboard": "मेरा डैशबोर्ड",
+    "wallet": "वॉलेट",
+    "notifications": "नोटिफिकेशन",
+    "profile": "प्रोफ़ाइल",
+    "settings": "सेटिंग्स",
+    "about": "बारे में",
+    "privacy": "प्राइवेसी",
+    "safety": "सुरक्षा",
+    "changelog": "बदलाव",
+    "sourceCode": "सोर्स कोड"
+  },
+  "auth": {
+    "join": "जुड़ें",
+    "login": "लॉग इन करें",
+    "signup": "साइन अप करें",
+    "logout": "लॉग आउट करें",
+    "addAccount": "एक और अकाउंट जोड़ें"
+  },
+  "feed": {
+    "indexTagline": "आपका कंटेंट। आपका अंदाज़। आपके नियम।",
+    "compose": {
+      "placeholder": "क्या चल रहा है?"
+    },
+    "tabs": {
+      "follows": "फ़ॉलो",
+      "following": "फ़ॉलो कर रहे हैं",
+      "global": "Global"
+    },
+    "empty": {
+      "homeAgora": "Agora पर शांत पल। नए कैंपेन, प्लेज, डोनेशन और पोस्ट यहाँ आते ही दिखेंगे।",
+      "homeFollowingLoggedIn": "आपका फ़ॉलो फ़ीड खाली है। कुछ लोगों को फ़ॉलो करें और देखें वे क्या कर रहे हैं, या Agora या Global पर जाएँ।",
+      "homeFollowingLoggedOut": "जिन लोगों को आप फ़ॉलो करते हैं उनकी पोस्ट देखने के लिए लॉग इन करें।",
+      "homeOther": "दिखाने के लिए कुछ नहीं। अपने relay कनेक्शन जाँचें या थोड़ी देर में दोबारा कोशिश करें।",
+      "follows": "आपका फ़ीड खाली है। कुछ लोगों को फ़ॉलो करें ताकि उनकी पोस्ट यहाँ दिखें।",
+      "global": "कोई पोस्ट नहीं मिली। अपने relay कनेक्शन जाँचें या जल्द वापस आएँ।",
+      "browseAgora": "Agora फ़ीड देखें",
+      "browseGlobal": "Global फ़ीड देखें",
+      "discoverPeople": "फ़ॉलो करने के लिए लोगों की खोज करें",
+      "logIn": "लॉग इन करें"
+    },
+    "modeSwitcher": {
+      "agora": "Agora",
+      "allNostr": "Global",
+      "following": "फ़ॉलो कर रहे हैं",
+      "ariaLabel": "फ़ीड मोड: {{label}}. बदलने के लिए क्लिक करें।",
+      "loginRequired": "जिन लोगों को आप फ़ॉलो करते हैं उनकी पोस्ट देखने के लिए लॉग इन करें"
+    },
+    "replyContext": {
+      "replyingTo": "जवाब दे रहे हैं",
+      "and": "और",
+      "andOthers_one": "और {{count}} अन्य",
+      "andOthers_other": "और {{count}} अन्य"
+    },
+    "actions": {
+      "reply": "जवाब दें",
+      "repost": "रीपोस्ट",
+      "undoRepost": "रीपोस्ट हटाएँ",
+      "react": "रिएक्ट करें",
+      "zap": "Zap",
+      "share": "शेयर करें",
+      "more": "और",
+      "linkCopied": "लिंक क्लिपबोर्ड पर कॉपी हो गया"
+    }
+  },
+  "compose": {
+    "placeholderDefault": "क्या चल रहा है?",
+    "placeholderPoll": "एक सवाल पूछें…",
+    "placeholderCountry": "{{country}} में क्या चल रहा है?",
+    "placeholderCwReason": "कंटेंट वार्निंग की वजह (वैकल्पिक)",
+    "submitDefault": "पोस्ट!",
+    "preview": {
+      "edit": "एडिट करें",
+      "previewMode": "प्रीव्यू"
+    },
+    "poll": {
+      "addOption": "विकल्प जोड़ें",
+      "optionLabel": "विकल्प {{number}}",
+      "singleChoice": "एक विकल्प",
+      "multipleChoice": "कई विकल्प",
+      "backToPost": "पोस्ट पर वापस",
+      "publishing": "पब्लिश हो रहा है...",
+      "publish": "पोल पब्लिश करें",
+      "published": "पोल पब्लिश हो गया!",
+      "publishFailed": "पोल पब्लिश नहीं हो सका।"
+    },
+    "voice": {
+      "cancel": "रद्द करें",
+      "send": "भेजें",
+      "sending": "भेजा जा रहा है...",
+      "sentTitle": "वॉइस मैसेज भेज दिया!",
+      "sentBody": "आपका वॉइस मैसेज पब्लिश हो गया है।",
+      "sendFailed": "वॉइस मैसेज नहीं भेज सके।",
+      "micDeniedTitle": "माइक्रोफ़ोन की अनुमति नहीं मिली",
+      "micDeniedBody": "वॉइस मैसेज रिकॉर्ड करने के लिए माइक्रोफ़ोन की अनुमति दें।",
+      "voiceMessage": "वॉइस मैसेज"
+    },
+    "toolbar": {
+      "attachFile": "फ़ाइल अटैच करें",
+      "emojiGif": "इमोजी / GIF",
+      "more": "और",
+      "poll": "पोल",
+      "spoiler": "स्पॉइलर",
+      "emoji": "इमोजी",
+      "stickers": "स्टिकर"
+    },
+    "submit": {
+      "posting": "पोस्ट हो रहा है...",
+      "uploadFailed": "अपलोड विफल",
+      "uploadFailedBody": "फ़ाइल अपलोड नहीं हो सकी।",
+      "publishFailed": "नोट पब्लिश नहीं हो सका।",
+      "posted": "पोस्ट हो गया!",
+      "replyPublished": "आपका जवाब पब्लिश हो गया है।",
+      "quotePublished": "आपका कोट पब्लिश हो गया है।",
+      "notePublished": "आपका नोट पब्लिश हो गया है।"
+    },
+    "destination": {
+      "label": "कहाँ पोस्ट करें",
+      "ariaHelp": "ग्लोबल और कम्युनिटी पोस्ट में क्या फ़र्क है?",
+      "ariaTrigger": "पोस्ट की मंज़िल",
+      "global": "Global",
+      "globalExplainer": "एक नियमित पोस्ट जो Nostr पर सबको दिखती है। कहीं भी, कोई भी देख सकता है।",
+      "community": "आपका देश कम्युनिटी",
+      "communityExplainer": "उस देश के लोकल फ़ीड में पड़ोसियों की पोस्ट के साथ दिखेगी। कम्युनिटी से जुड़ी अपडेट के लिए सबसे अच्छा।",
+      "chooseAnother": "दूसरा देश चुनें…",
+      "searchPlaceholder": "देश खोजें...",
+      "noResults": "कोई देश नहीं मिला।",
+      "isDefault": "{{name}} आपका डिफ़ॉल्ट है",
+      "globalIsDefault": "Global आपका डिफ़ॉल्ट है",
+      "thisIsDefault": "यह आपका डिफ़ॉल्ट है",
+      "setAsDefault": "डिफ़ॉल्ट के तौर पर सेट करें",
+      "defaultUpdated": "डिफ़ॉल्ट अपडेट हो गया",
+      "defaultUpdatedCountry": "नई पोस्ट डिफ़ॉल्ट रूप से {{name}} में जाएँगी।",
+      "defaultUpdatedGlobal": "नई पोस्ट डिफ़ॉल्ट रूप से ग्लोबल होंगी।"
+    }
+  },
+  "replyModal": {
+    "title": {
+      "newPoll": "नया पोल",
+      "newComment": "नया कमेंट",
+      "commentOnProfile": "प्रोफ़ाइल पर कमेंट",
+      "replyToPost": "पोस्ट का जवाब दें",
+      "quotePost": "पोस्ट कोट करें",
+      "newPost": "नई पोस्ट"
+    },
+    "placeholder": {
+      "writeComment": "कमेंट लिखें...",
+      "addComment": "कमेंट जोड़ें...",
+      "whatsHappening": "क्या चल रहा है?"
+    },
+    "blueskyDisclaimer": "Bluesky पर लोग आपको नहीं देख सकते क्योंकि वे असल में डिसेंट्रलाइज़्ड नहीं हैं।"
+  },
+  "noteCard": {
+    "botAccount": "बॉट अकाउंट",
+    "showLess": "कम दिखाएँ",
+    "readMore": "और पढ़ें",
+    "reacted": "ने रिएक्ट किया",
+    "reposted": "ने रीपोस्ट किया",
+    "voted": "ने वोट किया",
+    "zap": {
+      "donatedTo": "को डोनेट किया",
+      "donatedAmountTo": "{{amount}} डोनेट किया को",
+      "sat_one": "{{formattedCount}} sat",
+      "sat_other": "{{formattedCount}} sats"
+    },
+    "stream": {
+      "untitled": "बिना शीर्षक स्ट्रीम",
+      "live": "LIVE",
+      "ended": "समाप्त",
+      "planned": "योजना में",
+      "unknown": "अज्ञात"
+    },
+    "kindHeader": {
+      "photo": { "action": "ने शेयर की एक", "noun": "फ़ोटो" },
+      "encryptedMessage": { "action": "ने भेजा एक", "noun": "एन्क्रिप्टेड मैसेज" },
+      "letter": { "action": "ने भेजी एक", "noun": "चिट्ठी" },
+      "treasureHidCreated": "ने छुपाया एक",
+      "treasureHidUpdated": "ने अपडेट किया एक",
+      "treasureNoun": "ख़ज़ाना",
+      "treasureFound": "ने पाया एक",
+      "deckCreated": "ने बनाया एक",
+      "deckUpdated": "ने अपडेट किया एक",
+      "deckFallback": "ने शेयर किया एक",
+      "deckNoun": "डेक",
+      "emojiPackCreated": "ने बनाया एक",
+      "emojiPackUpdated": "ने अपडेट किया एक",
+      "emojiPackFallback": "ने शेयर किया एक",
+      "emojiPackNoun": "इमोजी पैक",
+      "groupCreated": "ने बनाया एक",
+      "groupUpdated": "ने अपडेट किया एक",
+      "groupFallback": "ने शेयर किया एक",
+      "groupNoun": "ग्रुप",
+      "campaignLaunched": "ने लॉन्च किया एक",
+      "campaignUpdated": "ने अपडेट किया एक",
+      "campaignFallback": "ने शेयर किया एक",
+      "campaignNoun": "कैंपेन",
+      "badgeAwarded": "ने दिया एक",
+      "badgeNoun": "बैज",
+      "badgeCreated": "ने बनाया एक",
+      "badgeDefUpdated": "ने अपडेट किया एक",
+      "badgesNoun": "बैज",
+      "badgesCreatedTheir": "ने बनाए अपने",
+      "badgesUpdatedTheir": "ने अपडेट किए अपने",
+      "streamingLive": "स्ट्रीम कर रहे हैं",
+      "streamed": "ने स्ट्रीम किया",
+      "zapstoreAppPublished": "ने Zapstore ऐप पब्लिश किया",
+      "zapstoreAppUpdated": "ने Zapstore ऐप अपडेट किया",
+      "zapstoreReleasePublished": "ने Zapstore रिलीज़ पब्लिश की",
+      "zapstoreReleaseUpdated": "ने Zapstore रिलीज़ अपडेट की",
+      "zapstoreAssetPublished": "ने Zapstore एसेट पब्लिश की",
+      "appPublished": "ने एक ऐप पब्लिश किया",
+      "appUpdated": "ने एक ऐप अपडेट किया",
+      "repoCreated": "ने बनाई एक",
+      "repoUpdated": "ने अपडेट की एक",
+      "repoFallback": "ने शेयर की एक",
+      "repoNoun": "रिपॉज़िटरी",
+      "patchSubmitted": "ने सबमिट किया एक",
+      "patchNoun": "पैच",
+      "prOpened": "ने खोला एक",
+      "prNoun": "pull request",
+      "nipProposed": "ने प्रस्तावित किया एक",
+      "nipUpdated": "ने अपडेट किया एक",
+      "nipNoun": "NIP",
+      "nsiteDeployed": "ने डिप्लॉय की एक",
+      "nsiteRedeployed": "ने फिर से डिप्लॉय की एक",
+      "nsiteNoun": "nsite",
+      "zapped": "ने ज़ैप किया",
+      "pledgeCreated": "ने बनाया एक",
+      "pledgeUpdated": "ने अपडेट किया एक",
+      "pledgeNoun": "प्लेज",
+      "followPackCreated": "ने बनाया एक",
+      "followPackUpdated": "ने अपडेट किया एक",
+      "followPackFallback": "ने शेयर किया एक",
+      "followPackNoun": "follow pack",
+      "followSetCreated": "ने बनाया एक",
+      "followSetUpdated": "ने अपडेट किया एक",
+      "followSetFallback": "ने शेयर किया एक",
+      "followSetNoun": "follow set"
+    }
+  },
+  "noteMoreMenu": {
+    "title": "पोस्ट विकल्प",
+    "viewPost": "पोस्ट विवरण देखें",
+    "viewEventJson": "Event JSON देखें",
+    "bookmark": "बुकमार्क",
+    "removeBookmark": "बुकमार्क हटाएँ",
+    "addToList": "लिस्ट में जोड़ें",
+    "addToSidebar": "साइडबार में जोड़ें",
+    "removeFromSidebar": "साइडबार से हटाएँ",
+    "pinProfile": "प्रोफ़ाइल पर पिन करें",
+    "unpinProfile": "प्रोफ़ाइल से अनपिन करें",
+    "pinCountry": "देश फ़ीड पर पिन करें",
+    "unpinCountry": "देश फ़ीड से अनपिन करें",
+    "muteConversation": "बातचीत म्यूट करें",
+    "mute": "@{{name}} को म्यूट करें",
+    "unmute": "@{{name}} को अनम्यूट करें",
+    "report": "@{{name}} की रिपोर्ट करें",
+    "reportToGroup": "ग्रुप को पोस्ट की रिपोर्ट करें",
+    "removeFromGroup": "ग्रुप से हटाएँ",
+    "delete": "पोस्ट डिलीट करें",
+    "close": "बंद करें",
+    "encryptedContent": "एन्क्रिप्टेड कंटेंट",
+    "toast": {
+      "removedFromSidebar": "साइडबार से हटा दिया",
+      "addedToSidebar": "साइडबार में जोड़ दिया",
+      "pinned": "प्रोफ़ाइल पर पिन कर दिया",
+      "unpinned": "प्रोफ़ाइल से अनपिन कर दिया",
+      "pinFailed": "पिन की गई पोस्ट अपडेट नहीं हो सकीं",
+      "countryPinned": "देश फ़ीड पर पिन कर दिया",
+      "countryUnpinned": "देश फ़ीड से अनपिन कर दिया",
+      "countryPinFailed": "देश फ़ीड पर पिन नहीं कर सके",
+      "countryUnpinFailed": "देश फ़ीड से अनपिन नहीं कर सके",
+      "convoMuted": "बातचीत म्यूट कर दी",
+      "convoMuteFailed": "बातचीत म्यूट नहीं कर सके",
+      "muted": "@{{name}} म्यूट कर दिया",
+      "unmuted": "@{{name}} अनम्यूट कर दिया",
+      "muteFailed": "यूज़र म्यूट नहीं कर सके",
+      "unmuteFailed": "यूज़र अनम्यूट नहीं कर सके",
+      "postDeleted": "पोस्ट डिलीट कर दी",
+      "deleteFailed": "पोस्ट डिलीट नहीं कर सके",
+      "eventBroadcast": "Event को रिले पर ब्रॉडकास्ट किया",
+      "broadcastFailed": "Event ब्रॉडकास्ट नहीं कर सके",
+      "copied": "{{label}} क्लिपबोर्ड पर कॉपी हो गया"
+    },
+    "deleteDialog": {
+      "title": "पोस्ट डिलीट करें?",
+      "description": "इससे रिले को डिलीशन रिक्वेस्ट भेजी जाएगी। कुछ रिले मूल event की कॉपी रख सकते हैं। यह क्रिया वापस नहीं ली जा सकती।",
+      "cancel": "रद्द करें",
+      "delete": "डिलीट करें",
+      "deleting": "डिलीट हो रहा है..."
+    },
+    "jsonDialog": {
+      "title": "Event विवरण",
+      "eventId": "Event ID",
+      "eventIdLabel": "Event ID",
+      "rawJson": "Raw JSON",
+      "eventJsonLabel": "Event JSON",
+      "broadcast": "Event ब्रॉडकास्ट करें",
+      "broadcasting": "ब्रॉडकास्ट हो रहा है..."
+    }
+  },
+  "policyPages": {
+    "privacy": {
+      "seoTitle": "प्राइवेसी नीति",
+      "seoDescription": "{{appName}} की प्राइवेसी नीति — Nostr नेटवर्क पर आपके डेटा को कैसे संभाला जाता है",
+      "title": "प्राइवेसी नीति"
+    },
+    "csae": {
+      "seoTitle": "बाल सुरक्षा नीति",
+      "seoDescription": "बाल यौन शोषण और दुर्व्यवहार (CSAE) पर {{appName}} की नीति — Nostr नेटवर्क पर बाल सुरक्षा के प्रति हमारी प्रतिबद्धता",
+      "title": "बाल सुरक्षा नीति"
+    },
+    "donorGuide": {
+      "seoTitle": "डोनर गाइड",
+      "seoDescription": "{{appName}} पर डोनेशन कैसे काम करता है और अपनी प्राइवेसी कैसे बचाएँ।",
+      "title": "डोनर गाइड",
+      "subtitle": "असली Bitcoin, सीधे भेजा। पूरी प्रक्रिया एक छोटे पन्ने में।"
+    },
+    "activistGuide": {
+      "seoTitle": "एक्टिविस्ट गाइड",
+      "seoDescription": "{{appName}} पर डोनेशन कैसे लें और निजी तौर पर कैश आउट कैसे करें।",
+      "title": "एक्टिविस्ट गाइड",
+      "subtitle": "तय करें क्या स्वीकार करें, डोनेशन लें, कैश आउट करें। साफ़ भाषा, बिना लंबे-चौड़े पाठ के।"
+    },
+    "changelog": {
+      "seoTitle": "बदलाव",
+      "seoDescription": "{{appName}} में क्या नया है",
+      "title": "बदलाव",
+      "loadError": "बदलावों की सूची लोड नहीं हो सकी।",
+      "empty": "अभी कोई रिलीज़ नहीं।",
+      "pastReleases": "पिछली रिलीज़",
+      "showLess": "कम दिखाएँ",
+      "readMore": "और पढ़ें",
+      "preReleaseLabel": "प्री-रिलीज़ बिल्ड",
+      "preReleaseBody": "इस बिल्ड में ऐसे बदलाव हैं जो अभी किसी रिलीज़ में शामिल नहीं हैं।",
+      "viewUnreleased": "अनरिलीज़्ड बदलाव देखें",
+      "categories": {
+        "Added": "जोड़ा गया",
+        "Changed": "बदला गया",
+        "Deprecated": "अप्रचलित",
+        "Removed": "हटाया गया",
+        "Fixed": "ठीक किया",
+        "Security": "सुरक्षा"
+      }
+    }
+  },
+  "about": {
+    "seoTitle": "बारे में",
+    "seoDescription": "{{appName}} कैसे काम करता है: Bitcoin और Nostr के ज़रिए सक्रियकर्ताओं को अजेय फंडिंग से जोड़ना।",
+    "hero": {
+      "eyebrow": "{{appName}} के बारे में",
+      "headlinePart1": "कैसे",
+      "headlineAppName": "{{appName}}",
+      "headlinePart2": "काम करता है।",
+      "body": "{{appName}} एक सेंसरशिप-प्रतिरोधी डोनेशन प्लेटफ़ॉर्म है जो Nostr और Bitcoin पर बना है। न जमे बैंक खाते, न कॉर्पोरेट पाबंदी। बस उन लोगों से सीधा समर्थन जो आपकी वजह पर भरोसा करते हैं।",
+      "trustChips": {
+        "decentralized": "डिसेंट्रलाइज़्ड",
+        "openSource": "ओपन सोर्स",
+        "censorshipResistant": "सेंसरशिप-प्रतिरोधी"
+      },
+      "ctaDonor": "डोनर गाइड पढ़ें",
+      "ctaActivist": "एक्टिविस्ट गाइड पढ़ें",
+      "sampleCard": {
+        "countryName": "वेनेज़ुएला",
+        "public": "सार्वजनिक",
+        "imageAlt": "वेनेज़ुएला के सक्रियकर्ता मोमबत्ती की रोशनी में एक vigil पर 'Liberen a todos los presos políticos · ¡Cese la represión!' लिखा एक तख्ती थामे हुए",
+        "orgName": "Venezolanos Libres",
+        "title": "वेनेज़ुएला के राजनीतिक कैदियों को रिहा कराओ",
+        "description": "Maduro शासन द्वारा हिरासत में लिए गए 800+ राजनीतिक कैदियों के लिए कानूनी बचाव और परिवार का सहारा।",
+        "raised": "जुटाए",
+        "ofGoal": "$10,000 में से",
+        "donorsLine": "247 डोनर · 12 देश",
+        "donate": "Bitcoin डोनेट करें"
+      }
+    },
+    "howItWorks": {
+      "eyebrow": "यह कैसे काम करता है",
+      "title": "तीन कदम। कोई बिचौलिया नहीं।",
+      "lede": "न बैंक, न सरहदें, न इजाज़त।",
+      "step1": {
+        "imageAlt": "अँधेरे अंतरिक्ष में तैरती एक चमकती नारंगी क्रिप्टोग्राफ़िक चाबी, स्व-संप्रभु पहचान का प्रतीक",
+        "title": "सक्रियकर्ता सेकंडों में साइन अप करते हैं।",
+        "body": "कोई बैंक नहीं। कोई कागज़ी कार्रवाई नहीं। कोई मंज़ूरी नहीं। जिस पल एक सक्रियकर्ता {{appName}} पर अकाउंट बनाता है, उसी पल उसके पास दुनिया में कहीं से भी समर्थन पाने के लिए एक Bitcoin एड्रेस तैयार है।"
+      },
+      "step2": {
+        "imageAlt": "एक अँधेरे विश्व मानचित्र पर हवा में उड़ता हुआ एक चमकता Bitcoin सिक्का, तुरंत सीमा-पार भुगतान का प्रतीक",
+        "title": "डोनर सीधे Bitcoin भेजते हैं।",
+        "body": "डोनर किसी भी वॉलेट से जो वे पहले से इस्तेमाल करते हैं (Cash App, Coinbase, Strike, हार्डवेयर वॉलेट) सीधे सक्रियकर्ता को Bitcoin भेजते हैं। {{appName}} पैसे को कभी नहीं छूता। बीच में कोई सर्वर नहीं, कोई कस्टोडियन नहीं।"
+      },
+      "step3": {
+        "imageAlt": "एक खुला हाथ जिसकी हथेली से गर्म नारंगी रोशनी निकल रही है, पाने और अधिकार का प्रतीक",
+        "title": "समर्थन वहीं पहुँचता है जहाँ इसकी ज़रूरत है।",
+        "body": "फंड सीधे सक्रियकर्ता तक पहुँचते हैं। उनके पास कस्टडी रहती है, उनके पास नियंत्रण रहता है। उन्हें कहीं भेजें, स्वैप करें, या खर्च करें; नीचे की गाइड बताती हैं कि इसे निजी तौर पर और सुरक्षित रूप से कैसे करें।"
+      }
+    },
+    "twoWays": {
+      "eyebrow": "Bitcoin · एक QR, दो विकल्प",
+      "title": "पेमेंट लेने के दो तरीके।",
+      "lede": "दोनों विकल्प Bitcoin हैं। फ़र्क बस यह है कि प्राइवेसी के लिए आप क्या समझौता करते हैं। जब सक्रियकर्ता कैंपेन बनाते हैं, तो वे चुनते हैं कि कौन-से विकल्प स्वीकार करने हैं। अगर दोनों, तो डोनेशन पेज एक ही QR कोड दिखाता है जो किसी भी वॉलेट के साथ काम करता है।",
+      "public": {
+        "kicker": "Bitcoin पब्लिक पेमेंट",
+        "tagline": "सर्व-उपयोगी · तेज़ · पारदर्शी",
+        "title": "धरती के हर वॉलेट के साथ काम करता है।",
+        "description": "डोनेशन एक नियमित Bitcoin एड्रेस पर पहुँचते हैं जिसे सक्रियकर्ता नियंत्रित करते हैं। कोई भी किसी भी Bitcoin वॉलेट से भेज सकता है। न नया ऐप, न नया अकाउंट, न सीखने की मेहनत।",
+        "bullet1": "हर Bitcoin वॉलेट में काम करता है: Cash App, Coinbase, Strike, हार्डवेयर",
+        "bullet2": "सबसे तेज़ सेटलमेंट: सिर्फ़ Bitcoin confirmations",
+        "bullet3": "ऑन-चेन सत्यापन योग्य: कोई भी देख सकता है कि सक्रियकर्ता को क्या मिला",
+        "tradeoffTitle": "समझौता: ऑन-चेन पर सार्वजनिक।",
+        "tradeoffIntro": "हर डोनेशन Bitcoin ब्लॉकचेन और Nostr पर सार्वजनिक होता है। {{appName}} केवल खुले-तौर पर की जा रही सक्रियता के लिए सुझाया जाता है। अगर आपको या आपके डोनर को सरकारी निगाहों से भी अत्यधिक प्राइवेसी चाहिए, तो भाग लेने से पहले <0>डोनर गाइड</0> और <1>एक्टिविस्ट गाइड</1> पढ़ें।"
+      },
+      "silent": {
+        "kicker": "Bitcoin साइलेंट पेमेंट",
+        "tagline": "अनलिंक करने योग्य नहीं · सीधा · BIP-352",
+        "title": "अनलिंक करने योग्य नहीं, ऑन-चेन, सीधा।",
+        "description": "डोनेशन BIP-352 साइलेंट पेमेंट के रूप में भेजे जाते हैं। हर एक एक नए, अनलिंक न होने वाले Bitcoin आउटपुट पर पहुँचता है जिसे ब्लॉकचेन देख रहा कोई भी पर्यवेक्षक कैंपेन से नहीं जोड़ सकता।",
+        "bullet1": "ऑन-चेन पर डोनेशन का सिलसिला फिर से नहीं बनाया जा सकता",
+        "bullet2": "गंभीर दुश्मनों का सामना कर रहे सक्रियकर्ताओं की रक्षा करता है",
+        "bullet3": "सीधे सक्रियकर्ता के वॉलेट में पहुँचता है, बीच में कोई सर्वर नहीं",
+        "tradeoffTitle": "समझौता: साइलेंट पेमेंट अभी शुरुआती हैं।",
+        "tradeoffIntro": "ऑन-चेन पर Bitcoin पाने का सबसे निजी तरीका, लेकिन इकोसिस्टम आज भी नया और कच्चा है:",
+        "tradeoffBullet1": "कुछ ही वॉलेट सपोर्ट करते हैं।",
+        "tradeoffBullet2": "रिसीव करना धीमा है।",
+        "tradeoffBullet3": "Push नोटिफिकेशन नहीं हैं।",
+        "tradeoffBullet4": "वॉलेट में अभी भी bug हैं।",
+        "tradeoffBullet5": "डोनेशन की संख्या सार्वजनिक नहीं होती।"
+      },
+      "noCustody": {
+        "title": "कोई कस्टडी नहीं। कोई बिचौलिया नहीं।",
+        "body": "{{appName}} कभी फंड नहीं रखता। डोनेशन Bitcoin पर वॉलेट-से-वॉलेट चलते हैं। किसी भी विकल्प में डोनर और सक्रियकर्ता के बीच कोई सर्वर खड़ा नहीं है। अगर {{appName}} कल ग़ायब हो जाए, तो हर कैंपेन काम करता रहेगा।",
+        "gofundme": {
+          "heading": "GoFundMe के विपरीत",
+          "body": "कोई प्लेटफ़ॉर्म आपके डोनेशन फ़्रीज़ नहीं कर सकता, रिफंड की माँग नहीं कर सकता, या नीति के विवाद पर आपका कैंपेन बंद नहीं कर सकता।"
+        },
+        "givesendgo": {
+          "heading": "GiveSendGo के विपरीत",
+          "body": "बीच में कोई पेमेंट प्रोसेसर नहीं बैठा है, इसलिए न Stripe, न Visa, न कोई बैंक आपको कैंपेन के बीच में रोक सकता है।"
+        },
+        "otherBitcoin": {
+          "heading": "अन्य ‘Bitcoin’ प्लेटफ़ॉर्म के विपरीत",
+          "body": "कोई केंद्रीय Lightning node, कस्टोडियन, या LSP नहीं जो विफल हो जाए या ऑफ़लाइन हो जाए। फंड सीधे ऑन-चेन उस वॉलेट में सेटल होते हैं जिसे आप नियंत्रित करते हैं।"
+        }
+      }
+    },
+    "faq": {
+      "eyebrow": "सवाल",
+      "title": "अक्सर पूछे जाने वाले।",
+      "chapter1": {
+        "label": "शुरुआत करना",
+        "description": "Agora क्या है, इसे किसने बनाया, और इसकी क़ीमत क्या है।"
+      },
+      "chapter2": {
+        "label": "Bitcoin डोनेशन",
+        "description": "भुगतान कैसे काम करते हैं, ऑन-चेन क्यों, सार्वजनिक क्यों, ये समझौते क्यों।"
+      },
+      "chapter3": {
+        "label": "Nostr के बारे में",
+        "description": "वह खुला प्रोटोकॉल जिस पर Agora बना है, और आपका अकाउंट कैसे काम करता है।"
+      }
+    },
+    "guides": {
+      "eyebrow": "गाइड",
+      "title": "अपनी तरफ़ चुनें।",
+      "lede": "चाहे आप भेज रहे हों या ले रहे हों, सीखें कि इसे सुरक्षित और निजी तौर पर कैसे करें।",
+      "donor": {
+        "imageAlt": "शाम के समय एक यूरोपीय शहर की सड़क पर हुड पहने प्रदर्शनकारी मार्च करते हुए, जलते लाल फ़्लेयर और 'FREEDOM' तथा 'LIBERTAD' बैनर थामे हुए",
+        "role": "डोनर के लिए",
+        "title": "उन कारणों का समर्थन करें जिनका बैंक नहीं करेंगे।",
+        "description": "किसी पेमेंट प्रोसेसर से इजाज़त माँगे बिना, दुनिया में कहीं भी सक्रियकर्ताओं और आंदोलनों को सीधे Bitcoin भेजें।",
+        "bullet1": "किसी भी Bitcoin वॉलेट का इस्तेमाल करें जो आपके पास पहले से है।",
+        "bullet2": "डोनेशन सीधे सक्रियकर्ता तक पहुँचते हैं। कोई कस्टोडियन नहीं, कोई बिचौलिया नहीं।",
+        "bullet3": "प्राइवेसी के लिए, ऐसा वॉलेट इस्तेमाल करें जो साइलेंट पेमेंट सपोर्ट करता हो।",
+        "cta": "डोनर गाइड पढ़ें"
+      },
+      "activist": {
+        "imageAlt": "एक शहर के चौक पर रात में हज़ारों प्रदर्शनकारियों का हवाई दृश्य जो जलते लाल फ़्लेयर के साथ इकट्ठा हैं, और आसपास की इमारतों पर 'UNITY IN DARKNESS' बैनर प्रोजेक्ट किया गया है",
+        "role": "सक्रियकर्ताओं के लिए",
+        "title": "बिना इजाज़त के फंडिंग पाएँ।",
+        "description": "उन लोगों से सीधा समर्थन पाएँ जो आपकी वजह पर भरोसा करते हैं। न कोई बैंक खाता, न आवेदन फ़ॉर्म, न बीच में कोई कंपनी।",
+        "bullet1": "साइन अप करते ही डोनेशन लेना शुरू करें।",
+        "bullet2": "चुनें कि किस प्रकार के भुगतान स्वीकार करें: सार्वजनिक, साइलेंट पेमेंट, या दोनों।",
+        "bullet3": "निजी कैश-आउट के लिए, पहले साइलेंट-पेमेंट वॉलेट में भेजें, फिर कहीं भी फ़ॉरवर्ड करें।",
+        "cta": "एक्टिविस्ट गाइड पढ़ें"
+      },
+      "stillStuck": "अब भी अटके हैं?",
+      "followTeam": "Nostr पर Team Soapbox को फ़ॉलो करें",
+      "stillStuckSuffix": "। हम वहाँ सवालों पर ध्यान देते हैं।"
+    }
+  },
+  "forms": {
+    "required": "ज़रूरी",
+    "recommended": "अनुशंसित",
+    "optional": "वैकल्पिक",
+    "title": "शीर्षक",
+    "country": "देश",
+    "tags": "टैग",
+    "coverImage": "कवर इमेज",
+    "description": "विवरण",
+    "timezone": "टाइमज़ोन",
+    "publishing": "पब्लिश हो रहा है…",
+    "uploadingCover": "कवर अपलोड हो रहा है…",
+    "countrySearchPlaceholder": "देश खोजें",
+    "imageDropzone": "यहाँ क्लिक करें या इमेज खींचकर डालें"
+  },
+  "organizationContext": {
+    "attachedToGroup": "ग्रुप से जुड़ी",
+    "groupFallback": "ग्रुप",
+    "editSubtext": "अपडेट इस ग्रुप की आधिकारिक गतिविधि से जुड़े रहेंगे।",
+    "malformedParam": "लिंक में ग्रुप पढ़ नहीं सके। आपके अकाउंट के तहत पब्लिश हो रहा है।",
+    "checkingPermissions": "ग्रुप की अनुमतियाँ जाँची जा रही हैं…",
+    "unauthorized": "आप उस ग्रुप के संस्थापक या मॉडरेटर नहीं हैं। आपके अकाउंट के तहत पब्लिश हो रहा है।",
+    "publishingAsGroup": "ग्रुप के तौर पर पब्लिश हो रहा है"
+  },
+  "notFound": {
+    "title": "404 - पेज नहीं मिला",
+    "description": "आप जिस पेज को ढूँढ रहे हैं वह नहीं मिल सका।",
+    "heading": "यह पेज मौजूद नहीं है।",
+    "goHome": "होम जाएँ"
+  },
+  "pledges": {
+    "list": {
+      "seoTitle": "प्लेज",
+      "seoTitleWithCountry": "प्लेज — {{country}}",
+      "seoDescription": "उन ठोस कामों, सबूत, या नतीजों के लिए फंडिंग का प्लेज करें जिनसे आप प्रेरणा देना चाहते हैं।",
+      "heroKicker": "प्लेज",
+      "heroHeading": "वह बदलाव",
+      "heroHeadingLine2": "जो आप देखना चाहते हैं।",
+      "heroBody": "ठोस कामों, सबूत, और नतीजों के लिए फंड दें। लोग सबमिशन से जवाब देते हैं, और कम्युनिटी उस काम को इनाम देती है जो लक्ष्य को आगे बढ़ाता है।",
+      "openCount_one": "प्लेज अभी खुला है",
+      "openCount_other": "प्लेज अभी खुले हैं",
+      "createPledge": "प्लेज बनाएँ",
+      "loginToCreate": "प्लेज बनाने के लिए लॉग इन करें",
+      "sectionActive": "सक्रिय प्लेज",
+      "sectionUpcoming": "आने वाले प्लेज",
+      "sectionPast": "पिछले प्लेज",
+      "sectionDefault": "प्लेज",
+      "sectionTagline": "उन कामों को फंड करने में मदद करें जिनके होने लायक़ हैं।",
+      "sortAriaLabel": "क्रम लगाएँ",
+      "sortBy": "क्रम",
+      "sortRecent": "सबसे हाल का",
+      "sortBounty": "सबसे ऊँचा प्लेज",
+      "sortDeadline": "जल्द ख़त्म होने वाले",
+      "sortDeadlinePast": "हाल ही में समाप्त",
+      "filterAriaLabel": "देश से फ़िल्टर करें",
+      "countrySearchPlaceholder": "खोजें…",
+      "noResults": "कोई परिणाम नहीं मिला।",
+      "global": "Global",
+      "dividerUpcoming": "आने वाले",
+      "dividerPast": "पिछले",
+      "showLess": "कम दिखाएँ",
+      "showMore": "और दिखाएँ ({{count}} और)",
+      "emptyTitle": "अभी कोई प्लेज नहीं",
+      "emptyHint": "प्लेज बनाने वाले पहले व्यक्ति बनें।",
+      "emptyHintCountry": "{{country}} के लिए प्लेज बनाने वाले पहले व्यक्ति बनें।"
+    },
+    "card": {
+      "ended": "समाप्त",
+      "pledged": "प्लेज किया गया",
+      "byAuthor": "<0>{{name}}</0> द्वारा",
+      "deletePledge": "प्लेज डिलीट करें",
+      "copyLink": "लिंक कॉपी करें",
+      "linkCopied": "लिंक कॉपी हो गया",
+      "linkCopyFailed": "लिंक कॉपी नहीं हो सका",
+      "confirmDelete": "इस प्लेज को डिलीट करें? यह वापस नहीं किया जा सकता।",
+      "deleted": "प्लेज डिलीट हो गया",
+      "deletedContent": "डिलीट किया गया प्लेज",
+      "deleteFailed": "प्लेज डिलीट नहीं हो सका"
+    },
+    "create": {
+      "seoTitle": "प्लेज बनाएँ",
+      "seoDescription": "{{appName}} पर ठोस कार्रवाई के लिए प्रेरित करने हेतु डोनर प्लेज बनाएँ।",
+      "loginGateTitle": "प्लेज बनाने के लिए लॉग इन करें",
+      "loginGateBody": "प्लेज साइन किए गए Nostr events हैं। एक पब्लिश करने के लिए आपको Nostr लॉगिन चाहिए।",
+      "backToPledges": "प्लेज पर वापस",
+      "heading": "प्लेज बनाएँ",
+      "title": "शीर्षक",
+      "titlePlaceholder": "एक beach cleanup का दस्तावेज़",
+      "country": "देश",
+      "countryPlaceholder": "देश खोजें",
+      "countryClearAria": "देश साफ़ करें",
+      "flagOfAria": "{{name}} का झंडा",
+      "countryHint": "देश के क्रम के लिए <0>i: iso3166:{{code}}</0> पब्लिश करता है।",
+      "tags": "टैग",
+      "tagsPlaceholder": "beach-cleanup, protest-documentation, internet-blackout",
+      "coverImage": "कवर इमेज",
+      "description": "विवरण",
+      "descriptionPlaceholder": "उस कार्रवाई, सबूत, या नतीजे को समझाएँ जिसके लिए आप प्रेरणा देना चाहते हैं, सबमिशन में क्या होना चाहिए, और आप उनका मूल्यांकन कैसे करेंगे...",
+      "pledge": "प्लेज",
+      "pledgeAmountPlaceholder": "100",
+      "deadline": "अंतिम तारीख़",
+      "timezone": "टाइमज़ोन",
+      "timezoneNote": "शुरू और अंतिम समय इसी टाइमज़ोन में समझे जाएँगे।",
+      "submit": "प्लेज बनाएँ",
+      "publishing": "पब्लिश हो रहा है…",
+      "uploadingCover": "कवर अपलोड हो रहा है…",
+      "altText": "{{appName}} प्लेज: {{title}}",
+      "successToast": "प्लेज बन गया",
+      "errorToast": "प्लेज नहीं बना सके",
+      "errorLoginRequired": "प्लेज बनाने के लिए लॉग इन होना ज़रूरी है।",
+      "errorTitleRequired": "शीर्षक ज़रूरी है।",
+      "errorDescriptionRequired": "विवरण ज़रूरी है।",
+      "errorPledgeRequired": "प्लेज राशि ज़रूरी है।",
+      "errorPledgeInvalid": "प्लेज राशि एक धनात्मक USD राशि होनी चाहिए।",
+      "errorPriceUnavailable": "प्लेज राशि की गणना के लिए BTC/USD दाम का इंतज़ार है।",
+      "errorCoverInvalid": "कवर इमेज एक मान्य https:// URL होनी चाहिए।",
+      "errorDeadlinePast": "अंतिम तारीख़ बीते समय की नहीं हो सकती।"
+    },
+    "detail": {
+      "seoTitle": "{{title}} | {{appName}} प्लेज",
+      "seoFallbackTitle": "प्लेज | {{appName}}",
+      "deadlineEndedOn": "{{date}} को समाप्त",
+      "deadlineEndsToday": "आज समाप्त",
+      "deadlineDaysLeft_one": "{{count}} दिन बाक़ी",
+      "deadlineDaysLeft_other": "{{count}} दिन बाक़ी",
+      "deadlineEndsOn": "{{date}} को समाप्त",
+      "openEnded": "खुला-अंत",
+      "back": "वापस",
+      "backToPledges": "प्लेज पर वापस",
+      "loadingPledge": "प्लेज लोड हो रहा है…",
+      "pledge": "प्लेज",
+      "byAuthor": "<0>{{name}}</0> द्वारा",
+      "submitLabel": "सबमिट करें",
+      "linkCopied": "लिंक क्लिपबोर्ड पर कॉपी हो गया",
+      "pinnedToast": "प्लेज पर पिन कर दिया",
+      "unpinnedToast": "प्लेज से अनपिन कर दिया",
+      "pinFailed": "प्लेज के पिन अपडेट नहीं कर सके",
+      "submissions": "सबमिशन",
+      "submissionCount_one": "{{count}} सबमिशन",
+      "submissionCount_other": "{{count}} सबमिशन",
+      "submissionPlaceholder": "प्रमाण, सबूत, या पूरा किया गया काम शेयर करें...",
+      "noSubmissionsTitle": "अभी कोई सबमिशन नहीं",
+      "noSubmissionsHint": "प्रमाण, सबूत, या पूरा किया गया काम के साथ जवाब देने वाले पहले व्यक्ति बनें।",
+      "funded": "फंडेड",
+      "ofPledged": "{{amount}} में से प्लेज किया गया",
+      "trustNote": "यह प्लेज भरोसे पर आधारित है। फंडिंग की प्रगति शीर्ष-स्तर के सबमिशन पर zaps और डोनेशन रसीद जोड़कर बनती है।",
+      "share": "शेयर करें",
+      "storyHeading": "प्लेज",
+      "storyEmpty": "प्लेज बनाने वाले ने अभी इस प्लेज के लिए विवरण नहीं लिखा है।"
+    }
+  },
+  "groups": {
+    "list": {
+      "seoTitle": "ग्रुप",
+      "seoDescription": "Nostr पर ग्रुप खोजें और उनमें शामिल हों",
+      "heroKicker": "ग्रुप",
+      "heroHeading": "एकता",
+      "heroHeadingLine2": "ताक़त है।",
+      "heroBody": "ग्रुप बनाएँ, सदस्य जुटाएँ, और अपनी जगहों में हो रही गतिविधियों से जुड़े रहें।",
+      "createGroup": "ग्रुप बनाएँ",
+      "createGroupLoginTitle": "ग्रुप बनाने के लिए लॉग इन करें",
+      "createGroupLoginBody": "ग्रुप बनाने से आपके अकाउंट से एक Nostr event पब्लिश होता है।",
+      "myGroups": "मेरे ग्रुप",
+      "featuredGroups": "फ़ीचर्ड ग्रुप",
+      "loginToSeeTitle": "अपने ग्रुप देखने के लिए लॉग इन करें",
+      "loginToSeeBody": "आपने जो ग्रुप बनाए या मॉडरेट किए हैं वे यहाँ दिखेंगे।",
+      "noGroupsTitle": "अभी कोई ग्रुप नहीं",
+      "noGroupsBody": "अपने लोगों के साथ कैंपेन, प्लेज, और इवेंट तालमेल बनाने के लिए अपना ग्रुप बनाएँ।",
+      "noFeaturedTitle": "अभी कोई फ़ीचर्ड ग्रुप नहीं",
+      "noFeaturedBody": "{{appName}} मॉडरेटर यहाँ अलग दिखने वाले ग्रुप फ़ीचर करते हैं। जल्द फिर आएँ।",
+      "connectingRelays": "रिले से जुड़ रहे हैं…",
+      "showLess": "कम दिखाएँ",
+      "showMore": "{{count}} और दिखाएँ",
+      "needsReview": "समीक्षा की ज़रूरत",
+      "needsReviewDesc": "{{appName}} ग्रुप जिन्हें अभी फ़ीचर या छुपाया नहीं गया है। किसी एक को Featured shelf में लाएँ या Hide से दबा दें।",
+      "needsReviewEmpty": "समीक्षा का इंतज़ार में कुछ नहीं।",
+      "hidden": "छुपा हुआ",
+      "hiddenDesc": "सार्वजनिक खोज से दबाए गए ग्रुप। कार्ड के kebab मेन्यू से अनहाइड करें।",
+      "hiddenEmpty": "अभी कोई ग्रुप छुपा हुआ नहीं है।",
+      "tickerCampaignsRaised_one": "{{count}} कैंपेन में ऑन-चेन जुटाए",
+      "tickerCampaignsRaised_other": "{{count}} कैंपेन में ऑन-चेन जुटाए",
+      "tickerFeaturedGroups_one": "Nostr पर फ़ीचर्ड ग्रुप",
+      "tickerFeaturedGroups_other": "Nostr पर फ़ीचर्ड ग्रुप",
+      "tickerCountries_one": "देश आज पोस्ट कर रहा है",
+      "tickerCountries_other": "देश आज पोस्ट कर रहे हैं"
+    },
+    "create": {
+      "seoTitleCreate": "ग्रुप बनाएँ",
+      "seoTitleEdit": "ग्रुप एडिट करें",
+      "seoDescriptionCreate": "{{appName}} पर नया ग्रुप शुरू करें।",
+      "seoDescriptionEdit": "{{appName}} पर अपना ग्रुप अपडेट करें।",
+      "loginGateTitle": "ग्रुप शुरू करने के लिए लॉग इन करें",
+      "loginGateBody": "ग्रुप साइन किए गए Nostr events हैं। एक पब्लिश करने के लिए Nostr लॉगिन चाहिए।",
+      "backToGroups": "ग्रुप पर वापस",
+      "invalidEditTitle": "अमान्य एडिट लिंक",
+      "invalidEditBody": "इस ग्रुप एडिट लिंक में मान्य ग्रुप एड्रेस नहीं है।",
+      "startNewGroup": "नया ग्रुप शुरू करें",
+      "loadingGroup": "ग्रुप लोड हो रहा है…",
+      "cannotEditTitle": "ग्रुप एडिट नहीं हो सकता",
+      "cannotEditBody": "केवल इस ग्रुप के संस्थापक ही इसे अपडेट कर सकते हैं।",
+      "headingCreate": "ग्रुप बनाएँ",
+      "headingEdit": "ग्रुप एडिट करें",
+      "name": "नाम",
+      "namePlaceholder": "जैसे The Arbiter's Guard",
+      "urlPreview": "URL प्रीव्यू:",
+      "urlPlaceholder": "your-group-name",
+      "urlKeptOriginal": "(मूल से रखा गया)",
+      "description": "विवरण",
+      "descriptionPlaceholder": "यह ग्रुप किस बारे में है?",
+      "country": "देश",
+      "countryPlaceholder": "देश खोजें",
+      "countryClearAria": "देश साफ़ करें",
+      "flagOfAria": "{{name}} का झंडा",
+      "countryHint": "देश के क्रम के लिए <0>i: iso3166:{{code}}</0> पब्लिश करता है।",
+      "tags": "टैग",
+      "tagsPlaceholder": "mutual-aid, local-news, digital-rights",
+      "coverImage": "कवर इमेज",
+      "moderators": "मॉडरेटर",
+      "moderatorsCount": "मॉडरेटर ({{count}})",
+      "removeModeratorAria": "{{name}} को हटाएँ",
+      "submitCreate": "ग्रुप बनाएँ",
+      "submitEdit": "ग्रुप अपडेट करें",
+      "creating": "बन रहा है…",
+      "updating": "अपडेट हो रहा है…",
+      "uploadingCover": "कवर अपलोड हो रहा है…",
+      "altText": "ग्रुप: {{name}}",
+      "successCreate": "ग्रुप बन गया!",
+      "successEdit": "ग्रुप अपडेट हो गया!",
+      "errorTitleCreate": "ग्रुप नहीं बना सके",
+      "errorTitleEdit": "ग्रुप अपडेट नहीं कर सके",
+      "errorLoginRequired": "ग्रुप बनाने के लिए लॉग इन होना ज़रूरी है।",
+      "errorEditLoadFailed": "एडिट के लिए ग्रुप लोड नहीं हो सका।",
+      "errorEditNotOwner": "केवल ग्रुप का संस्थापक इस ग्रुप को एडिट कर सकता है।",
+      "errorNameRequired": "नाम ज़रूरी है।",
+      "errorNameInvalid": "नाम में अक्षर या अंक होने चाहिए ताकि ग्रुप URL बन सके।",
+      "errorEditLatestMissing": "इस ग्रुप का सबसे नया संस्करण अपडेट करने के लिए नहीं मिला।",
+      "errorCoverInvalid": "कवर इमेज एक मान्य https:// URL होनी चाहिए।",
+      "errorSlugCollision": "आपके पास पहले से \"{{slug}}\" पहचानकर्ता वाला ग्रुप है। दूसरा नाम चुनें।"
+    },
+    "detail": {
+      "by": "द्वारा",
+      "byAuthor": "{{name}} द्वारा",
+      "members": "सदस्य",
+      "viewMembers": "सदस्य देखें",
+      "moreMembers": "+{{count}} और",
+      "about": "बारे में",
+      "comments": "कमेंट",
+      "comment": "कमेंट करें",
+      "commentNoun_one": "कमेंट",
+      "commentNoun_other": "कमेंट",
+      "noCommentsTitle": "अभी कोई कमेंट नहीं",
+      "noCommentsHint": "चर्चा शुरू करने वाले पहले व्यक्ति बनें।",
+      "noMembersFound": "कोई सदस्य नहीं मिला।",
+      "founder": "संस्थापक",
+      "moderator": "मॉडरेटर",
+      "moreActions": "और क्रियाएँ",
+      "editGroup": "ग्रुप एडिट करें",
+      "deleteGroup": "ग्रुप डिलीट करें",
+      "officialActivity": "आधिकारिक गतिविधि",
+      "officialTools": "आधिकारिक टूल",
+      "startSomething": "कुछ शुरू करें",
+      "officialToolsDescription": "{{name}} को एक ठोस अगला कदम दें।",
+      "launchCampaign": "कैंपेन लॉन्च करें",
+      "launchCampaignDescription": "आधिकारिक ग्रुप पेज से फंड जुटाएँ।",
+      "campaign": "कैंपेन",
+      "pledge": "प्लेज",
+      "pledgeDescription": "ऐसी मदद की पेशकश करें जिस पर लोग कार्रवाई कर सकें।",
+      "event": "इवेंट",
+      "eventDescription": "समर्थकों को एक साथ लाएँ।",
+      "untitledEvent": "बिना शीर्षक इवेंट",
+      "interestedCount_one": "{{count}} व्यक्ति की रुचि है",
+      "interestedCount_other": "{{count}} लोगों की रुचि है",
+      "allDay": "पूरे दिन"
+    }
+  },
+  "campaignsCreate": {
+    "seoTitleCreate": "कैंपेन शुरू करें",
+    "seoTitleEdit": "कैंपेन एडिट करें",
+    "seoDescriptionCreate": "{{appName}} पर फंडरेज़िंग कैंपेन लॉन्च करें।",
+    "seoDescriptionEdit": "{{appName}} पर अपना फंडरेज़िंग कैंपेन अपडेट करें।",
+    "loginGateTitle": "कैंपेन शुरू करने के लिए लॉग इन करें",
+    "loginGateBody": "कैंपेन साइन किए गए Nostr events हैं। एक पब्लिश करने के लिए Nostr लॉगिन चाहिए।",
+    "goHome": "होम जाएँ",
+    "invalidEditTitle": "अमान्य एडिट लिंक",
+    "invalidEditBody": "इस कैंपेन एडिट लिंक में मान्य कैंपेन एड्रेस नहीं है।",
+    "startNewCampaign": "नया कैंपेन शुरू करें",
+    "loadingCampaign": "कैंपेन लोड हो रहा है…",
+    "cannotEditTitle": "कैंपेन एडिट नहीं हो सकता",
+    "cannotEditBody": "केवल इस कैंपेन का लेखक इसे अपडेट कर सकता है।",
+    "headingCreate": "कैंपेन शुरू करें",
+    "headingEdit": "कैंपेन एडिट करें",
+    "title": "शीर्षक",
+    "titlePlaceholder": "Save the Last Bookstore",
+    "wallet": "Bitcoin वॉलेट",
+    "myWalletLabel": "{{name}} का वॉलेट",
+    "myWalletDefault": "मेरा वॉलेट",
+    "walletChoose": "वॉलेट चुनें",
+    "walletCustom": "कस्टम",
+    "acceptAll": "सभी भुगतान प्रकार स्वीकार करें",
+    "acceptPublic": "केवल सार्वजनिक भुगतान स्वीकार करें",
+    "acceptPrivate": "केवल निजी भुगतान स्वीकार करें",
+    "customWalletIntro": "एक Bitcoin एड्रेस, एक साइलेंट-पेमेंट कोड, या दोनों दर्ज करें। कम से कम एक ज़रूरी है।",
+    "bitcoinAddress": "Bitcoin एड्रेस",
+    "bitcoinAddressPlaceholder": "bc1q… या bc1p…",
+    "silentPaymentCode": "साइलेंट-पेमेंट कोड",
+    "silentPaymentCodePlaceholder": "sp1…",
+    "onchainInvalid": "यह कोई पहचाना mainnet Bitcoin एड्रेस नहीं है (bc1q… / bc1p…)।",
+    "spInvalid": "यह कोई पहचाना BIP-352 साइलेंट-पेमेंट कोड नहीं है (sp1…)।",
+    "country": "देश",
+    "countryPlaceholder": "देश खोजें",
+    "countryClearAria": "देश साफ़ करें",
+    "flagOfAria": "{{name}} का झंडा",
+    "countryHint": "देश के क्रम के लिए <0>i: iso3166:{{code}}</0> पब्लिश करता है।",
+    "tags": "टैग",
+    "tagsPlaceholder": "legal-defense, mutual-aid, local-news",
+    "banner": "बैनर इमेज",
+    "summary": "सारांश",
+    "summaryPlaceholder": "हमारे मोहल्ले के क़ानूनी क्लीनिक की मदद करें ताकि वे शांतिपूर्ण प्रदर्शनकारियों का बचाव कर सकें।",
+    "story": "कहानी",
+    "storyPlaceholder": "पृष्ठभूमि, किसे लाभ होगा, और फंड का उपयोग कैसे होगा, यह शेयर करें।",
+    "goal": "लक्ष्य",
+    "goalPlaceholder": "25,000",
+    "goalNote": "पूरे US डॉलर। डोनर Bitcoin में भुगतान करते हैं; क्लाइंट देखने के समय USD-समकक्ष का अनुमान लगाते हैं।",
+    "deadline": "अंतिम तारीख़",
+    "submitCreate": "कैंपेन लॉन्च करें",
+    "submitEdit": "कैंपेन अपडेट करें",
+    "publishing": "पब्लिश हो रहा है…",
+    "updating": "अपडेट हो रहा है…",
+    "uploadingBanner": "बैनर अपलोड हो रहा है…",
+    "altText": "फंडरेज़िंग कैंपेन: {{title}}",
+    "successCreate": "कैंपेन लॉन्च हो गया",
+    "successCreateDesc": "आपका फंडरेज़र लाइव है।",
+    "successEdit": "कैंपेन अपडेट हो गया",
+    "successEditDesc": "आपके फंडरेज़र के बदलाव लाइव हैं।",
+    "errorTitleCreate": "कैंपेन पब्लिश नहीं कर सके",
+    "errorTitleEdit": "कैंपेन अपडेट नहीं कर सके",
+    "errorLoginRequired": "कैंपेन बनाने के लिए लॉग इन होना ज़रूरी है।",
+    "errorEditLoadFailed": "एडिट के लिए कैंपेन लोड नहीं हो सका।",
+    "errorEditNotOwner": "केवल कैंपेन का लेखक इस कैंपेन को एडिट कर सकता है।",
+    "errorTitleRequired": "शीर्षक ज़रूरी है।",
+    "errorTitleInvalid": "शीर्षक में अक्षर या अंक होने चाहिए ताकि कैंपेन URL बन सके।",
+    "errorSlugInvalid": "पहचानकर्ता में छोटे अक्षर, अंक, और हाइफ़न ही होने चाहिए।",
+    "errorHdUnavailable": "इस लॉगिन के लिए बिल्ट-इन वॉलेट उपलब्ध नहीं है।",
+    "errorSpUnavailable": "इस लॉगिन के लिए साइलेंट-पेमेंट एड्रेस उपलब्ध नहीं है।",
+    "errorOnchainInvalid": "ऑन-चेन एड्रेस कोई पहचाना mainnet bech32(m) एड्रेस नहीं है (bc1q… / bc1p…)।",
+    "errorSpInvalid": "साइलेंट-पेमेंट कोड कोई पहचाना BIP-352 कोड नहीं है (sp1…)।",
+    "errorWalletRequired": "कम से कम एक वॉलेट endpoint दें — एक Bitcoin mainnet एड्रेस (bc1q… / bc1p…) या एक साइलेंट-पेमेंट कोड (sp1…)।",
+    "errorGoalInvalid": "लक्ष्य एक धनात्मक पूर्ण-डॉलर राशि होनी चाहिए।",
+    "errorDeadlinePast": "अंतिम तारीख़ बीते समय की नहीं हो सकती।",
+    "errorDeadlineInvalid": "अंतिम तारीख़ मान्य तारीख़ नहीं है।",
+    "errorEditLatestMissing": "इस कैंपेन का सबसे नया संस्करण अपडेट करने के लिए नहीं मिला।",
+    "errorSlugCollision": "आपके पास पहले से \"{{slug}}\" पहचानकर्ता वाला कैंपेन है। दूसरा चुनें।",
+    "errorBannerInvalid": "बैनर एक मान्य https:// URL होना चाहिए।",
+    "errorHdDeriveFailed": "आपके वॉलेट से नया ऑन-चेन एड्रेस derive नहीं कर सके।",
+    "errorHdDeriveInvalid": "Derive किया गया वॉलेट एड्रेस सत्यापन में विफल। कृपया एक कस्टम एड्रेस जोड़ें।",
+    "errorWalletRequiredFallback": "वॉलेट endpoint ज़रूरी है।",
+    "errorPublishedInvalid": "पब्लिश किया गया event सत्यापन में विफल। कृपया रिफ्रेश करके दोबारा कोशिश करें।"
+  },
+  "campaignsDetail": {
+    "seoTitle": "{{title}} | {{appName}} फंडरेज़र",
+    "seoDescriptionFallback": "{{appName}} पर {{title}} का समर्थन करें।",
+    "deadlineEndedOn": "{{date}} को समाप्त",
+    "deadlineEndsToday": "आज समाप्त",
+    "deadlineDaysLeft_one": "{{count}} दिन बाक़ी",
+    "deadlineDaysLeft_other": "{{count}} दिन बाक़ी",
+    "deadlineEndsOn": "{{date}} को समाप्त",
+    "back": "वापस",
+    "edit": "एडिट करें",
+    "delete": "डिलीट करें",
+    "deleting": "डिलीट हो रहा है…",
+    "byAuthor": "<0>{{name}}</0> द्वारा",
+    "commentLabel": "कमेंट",
+    "linkCopied": "लिंक क्लिपबोर्ड पर कॉपी हो गया",
+    "pinnedToast": "कैंपेन पर पिन कर दिया",
+    "unpinnedToast": "कैंपेन से अनपिन कर दिया",
+    "pinFailed": "कैंपेन के पिन अपडेट नहीं कर सके",
+    "deletedToast": "कैंपेन डिलीट हो गया",
+    "deletedToastDesc": "डिलीशन रिक्वेस्ट पब्लिश की गई। सही तरीक़े से चलने वाले रिले कैंपेन को फ़ीड से हटा देंगे।",
+    "deleteErrorTitle": "कैंपेन डिलीट नहीं कर सके",
+    "campaigner": "कैंपेनर",
+    "repost_one": "<0>{{count}}</0> रीपोस्ट",
+    "repost_other": "<0>{{count}}</0> रीपोस्ट",
+    "quote_one": "<0>{{count}}</0> कोट",
+    "quote_other": "<0>{{count}}</0> कोट",
+    "like_one": "<0>{{count}}</0> लाइक",
+    "like_other": "<0>{{count}}</0> लाइक",
+    "commentsAndDonations": "कमेंट और डोनेशन",
+    "commentCount_one": "{{count}} कमेंट",
+    "commentCount_other": "{{count}} कमेंट",
+    "noCommentsTitle": "अभी कोई कमेंट नहीं",
+    "noCommentsHint": "समर्थन का संदेश छोड़ने वाले पहले व्यक्ति बनें।",
+    "deleteDialogTitle": "इस कैंपेन को डिलीट करें?",
+    "deleteDialogBody": "इससे एक NIP-09 डिलीशन रिक्वेस्ट पब्लिश होती है। सही तरीक़े से चलने वाले रिले कैंपेन को फ़ीड और सीधे लिंक से हटा देंगे। पिछली डोनेशन रसीदें ऑन-चेन वैसे भी रहेंगी। यह क्रिया वापस नहीं ली जा सकती — डोनेशन लेना जारी रखने के लिए इसके बजाय कैंपेन एडिट करें।",
+    "storyHeading": "कहानी",
+    "storyEmpty": "आयोजक ने अभी इस कैंपेन के लिए कहानी नहीं लिखी है।",
+    "campaignEnded": "कैंपेन समाप्त",
+    "donate": "डोनेट करें",
+    "share": "शेयर करें",
+    "target": "लक्ष्य: {{amount}}",
+    "raised": "जुटाए",
+    "ofGoal": "{{amount}} के लक्ष्य में से",
+    "donationCount_one": "{{count}} डोनेशन",
+    "donationCount_other": "{{count}} डोनेशन",
+    "recentDonations": "हाल के डोनेशन",
+    "seeAllDonations_one": "सभी {{count}} डोनेशन देखें",
+    "openInWallet": "वॉलेट में खोलें",
+    "seeAllDonations_other": "सभी {{count}} डोनेशन देखें"
+  },
+  "calendarEvents": {
+    "create": {
+      "seoTitle": "इवेंट बनाएँ",
+      "seoDescription": "{{appName}} पर एक कैलेंडर इवेंट बनाएँ।",
+      "loginTitle": "इवेंट बनाने के लिए लॉग इन करें",
+      "loginBody": "इवेंट साइन किए गए Nostr events हैं। एक पब्लिश करने के लिए Nostr लॉगिन चाहिए।",
+      "backToEvents": "इवेंट पर वापस",
+      "heading": "इवेंट बनाएँ",
+      "titlePlaceholder": "मोहल्ले की सफ़ाई",
+      "descriptionPlaceholder": "लोगों को बताएँ क्या उम्मीद करें, क्या लाएँ, और किसे आना चाहिए...",
+      "schedule": "शेड्यूल",
+      "allDay": "पूरे दिन का इवेंट",
+      "allDayHint": "शुरू और अंत के समय जोड़ने के लिए बंद करें।",
+      "startDate": "शुरू तारीख़",
+      "endDate": "अंत तारीख़",
+      "startTime": "शुरू समय",
+      "endTime": "अंत समय",
+      "locationDetails": "स्थान का विवरण",
+      "locationPlaceholder": "पता, स्थल, या वीडियो कॉल लिंक",
+      "tagsPlaceholder": "mutual-aid, workshop, local-news",
+      "submit": "इवेंट बनाएँ",
+      "successToast": "इवेंट बन गया",
+      "errorToast": "इवेंट नहीं बना सके",
+      "altCalendar": "कैलेंडर इवेंट: {{title}}",
+      "altGroup": "ग्रुप इवेंट: {{title}}",
+      "errorLoginRequired": "इवेंट बनाने के लिए लॉग इन होना ज़रूरी है।",
+      "errorTitleRequired": "शीर्षक ज़रूरी है।",
+      "errorStartDateRequired": "शुरू तारीख़ ज़रूरी है।",
+      "errorStartDatePast": "शुरू तारीख़ बीते समय की नहीं हो सकती।",
+      "errorStartTimeRequired": "समय वाले इवेंट के लिए शुरू समय ज़रूरी है।",
+      "errorCoverInvalid": "कवर इमेज एक मान्य https:// URL होनी चाहिए।",
+      "errorEndDateBeforeStart": "अंत तारीख़ शुरू तारीख़ से बाद की या उसी की होनी चाहिए।",
+      "errorStartDateTimeInvalid": "शुरू तारीख़ या समय अमान्य है।",
+      "errorEndTimeAfterStart": "अंत समय शुरू समय के बाद होना चाहिए।"
+    },
+    "detail": {
+      "untitledEvent": "बिना शीर्षक इवेंट",
+      "dateNotSpecified": "तारीख़ नहीं बताई गई",
+      "organizer": "आयोजक",
+      "rsvpUpdated": "RSVP अपडेट हो गया",
+      "rsvpFailed": "RSVP अपडेट नहीं हो सका",
+      "rsvp": "RSVP",
+      "youAreGoing": "आप जा रहे हैं",
+      "youAreInterested": "आपकी रुचि है",
+      "youCantGo": "आप नहीं जा सकते",
+      "chooseRsvp": "अपना RSVP चुनें",
+      "going": "जा रहे हैं",
+      "interested": "रुचि है",
+      "cantGo": "नहीं जा सकते",
+      "attendees": "हिस्सा लेने वाले",
+      "links": "लिंक",
+      "participants": "प्रतिभागी",
+      "hostedBy": "द्वारा होस्ट किया गया",
+      "attendingCount_one": "{{count}} शामिल हो रहे हैं",
+      "attendingCount_other": "{{count}} शामिल हो रहे हैं",
+      "interestedCount_one": "{{count}} रुचि रखते हैं",
+      "interestedCount_other": "{{count}} रुचि रखते हैं",
+      "comment": "कमेंट",
+      "description": "विवरण",
+      "emptyDescription": "आयोजक ने अभी इस इवेंट के लिए विवरण नहीं जोड़ा है।",
+      "comments": "कमेंट",
+      "commentNoun_one": "कमेंट",
+      "commentNoun_other": "कमेंट",
+      "noCommentsTitle": "अभी कोई कमेंट नहीं",
+      "noCommentsHint": "कमेंट करने वाले पहले व्यक्ति बनें।",
+      "pinnedToast": "इवेंट पर पिन कर दिया",
+      "unpinnedToast": "इवेंट से अनपिन कर दिया",
+      "pinFailed": "इवेंट के पिन अपडेट नहीं कर सके"
+    }
+  },
+  "follow": {
+    "follow": "फ़ॉलो करें",
+    "following": "फ़ॉलो कर रहे हैं",
+    "unfollow": "अनफ़ॉलो करें",
+    "followed": "फ़ॉलो किया",
+    "unfollowed": "अनफ़ॉलो किया",
+    "updateFailed": "फ़ॉलो लिस्ट अपडेट नहीं हो सकी"
+  },
+  "campaigns": {
+    "home": {
+      "seoTitle": "फंडरेज़र",
+      "seoDescription": "सक्रियकर्ताओं को अजेय फंडिंग से जोड़ना।",
+      "heroTagline": "सक्रियकर्ताओं को<1></1><0>अजेय</0> फंडिंग से जोड़ना।",
+      "heroBody": "दुनिया भर के समर्थकों से सीधे Bitcoin जुटाएँ। हर डोनेशन सीधे आपके वॉलेट में पहुँचता है, बीच में कोई बिचौलिया नहीं, कोई chargeback नहीं, और कोई प्लेटफ़ॉर्म आपके फंड को रोकता नहीं।",
+      "startCampaign": "कैंपेन शुरू करें",
+      "howItWorks": "यह कैसे काम करता है",
+      "exploreCampaigns": "कैंपेन देखें",
+      "featured": "फ़ीचर्ड",
+      "featuredDesc": "{{appName}} टीम द्वारा चुने गए कैंपेन।",
+      "community": "कम्युनिटी कैंपेन",
+      "communityDesc": "उन बदलावों को फंड करने में मदद करें जिनके होने लायक़ हैं।",
+      "browseAll": "सभी कैंपेन देखें →",
+      "pending": "मंज़ूरी का इंतज़ार",
+      "pendingDesc": "नेटवर्क पर ऐसे कैंपेन जिन्हें Team Soapbox के किसी मॉडरेटर ने अभी मंज़ूरी या छुपाया नहीं है।",
+      "pendingEmpty": "समीक्षा का इंतज़ार में कुछ नहीं।",
+      "hidden": "छुपा हुआ",
+      "hiddenDesc": "सार्वजनिक होमपेज से दबाए गए कैंपेन। कार्ड के kebab मेन्यू से अनहाइड करें।",
+      "hiddenEmpty": "अभी कोई कैंपेन छुपा हुआ नहीं है।",
+      "yourCampaigns": "आपके कैंपेन",
+      "yourCampaignsDesc": "आपके कैंपेन Nostr पर लाइव हैं और डोनेशन कैंपेन लिंक से काम करते हैं। ये होमपेज पर तब दिखेंगे जब Team Soapbox का कोई मॉडरेटर इन्हें मंज़ूरी देगा।",
+      "empty": "अभी कोई कैंपेन नहीं",
+      "emptyHint": "{{appName}} पर फंडरेज़र शुरू करने वाले पहले बनें। अपनी कहानी बताएँ, लाभार्थी चुनें, और लिंक शेयर करें।"
+    },
+    "all": {
+      "title": "सभी कैंपेन",
+      "seoTitle": "सभी कैंपेन",
+      "description": "Agora पर पब्लिश हुए हर कैंपेन को देखें।",
+      "searchAriaLabel": "कैंपेन खोजें",
+      "searchPlaceholder": "कैंपेन खोजें…",
+      "clearSearch": "खोज साफ़ करें",
+      "sortAriaLabel": "क्रम",
+      "sortTop": "टॉप",
+      "sortNew": "नए",
+      "showHidden": "छुपे हुए दिखाएँ",
+      "startCampaign": "कैंपेन शुरू करें",
+      "noMatch": "“{{query}}” से मेल खाने वाला कोई कैंपेन नहीं",
+      "noMatchHint": "अलग खोज शब्द आज़माएँ, या हर कैंपेन देखने के लिए खोज साफ़ करें।",
+      "allHidden": "दिखाने के लिए कोई कैंपेन नहीं",
+      "allHiddenHint": "नेटवर्क पर हर कैंपेन मॉडरेटरों ने छुपा रखा है। उन्हें देखने के लिए “छुपे हुए दिखाएँ” टॉगल करें।",
+      "empty": "अभी कोई कैंपेन नहीं",
+      "emptyHint": "अभी कोई कैंपेन पब्लिश नहीं हुआ है। पहले बनें।"
+    }
+  },
+  "settings": {
+    "title": "सेटिंग्स",
+    "description": "अपनी {{appName}} सेटिंग्स प्रबंधित करें",
+    "deleteAccount": "अकाउंट डिलीट करें",
+    "sections": {
+      "profile": "प्रोफ़ाइल",
+      "profileDesc": "डिस्प्ले नाम, बायो, अवतार, और सत्यापन।",
+      "appearance": "दिखावट",
+      "appearanceDesc": "सिस्टम, लाइट, या डार्क मोड।",
+      "language": "भाषा",
+      "languageDesc": "ऐप में इस्तेमाल होने वाली भाषा चुनें।",
+      "network": "नेटवर्क",
+      "networkDesc": "डेटा उपयोग, रिले, और फ़ाइल अपलोड सर्वर।",
+      "notifications": "नोटिफिकेशन",
+      "notificationsDesc": "पुश नोटिफिकेशन की प्राथमिकताएँ।",
+      "advanced": "उन्नत",
+      "advancedDesc": "वॉलेट, सिस्टम, और पावर-यूज़र विकल्प।",
+      "organizers": "ऑर्गनाइज़र",
+      "organizersDesc": "देश के ऑर्गनाइज़र नियुक्त करें जो देश फ़ीड पर पोस्ट पिन कर सकें।"
+    },
+    "organizers": "ऑर्गनाइज़र",
+    "signInToManage": "प्रबंधित करने के लिए साइन इन करें",
+    "loginRequired": "ऑर्गनाइज़र प्रबंधित करने के लिए साइन इन होना ज़रूरी है।",
+    "appearance": {
+      "title": "दिखावट",
+      "subtitle": "चुनें ऐप कैसा दिखे।",
+      "intro": "अपनी पसंदीदा कलर मोड चुनें। सिस्टम आपकी डिवाइस की लाइट या डार्क सेटिंग से अपने आप मेल खाएगा।",
+      "colorMode": "कलर मोड",
+      "system": "सिस्टम",
+      "systemDesc": "आपकी डिवाइस सेटिंग के अनुसार",
+      "light": "लाइट",
+      "lightDesc": "हमेशा लाइट मोड",
+      "dark": "डार्क",
+      "darkDesc": "हमेशा डार्क मोड"
+    },
+    "network": {
+      "title": "नेटवर्क",
+      "subtitle": "डेटा उपयोग, रिले, और फ़ाइल अपलोड सर्वर प्रबंधित करें।",
+      "connectionsHeading": "नेटवर्क कनेक्शन",
+      "connectionsIntro": "अपने रिले कनेक्शन प्रबंधित करें। रिले वे सर्वर हैं जो Nostr events को नेटवर्क पर स्टोर और वितरित करते हैं।",
+      "lowBandwidthHeading": "लो-बैंडविड्थ मोड",
+      "reduceDataUsage": "डेटा उपयोग कम करें",
+      "reduceDataUsageDesc": "metered या धीमे कनेक्शन के लिए। वीडियो ख़ुद से नहीं चलेंगे, बैकग्राउंड वीडियो प्रीव्यू नहीं होंगे, और इमेज लोड होने के लिए टैप का इंतज़ार करेंगी।",
+      "useImageProxy": "इमेज प्रॉक्सी इस्तेमाल करें",
+      "useImageProxyDesc": "पूरे-रिज़ॉल्यूशन की मूल इमेज की जगह छोटी WebP कॉपी लाता है।",
+      "proxyUrl": "प्रॉक्सी URL",
+      "proxyApiDesc": "<0>wsrv.nl / weserv</0> API से मेल खाना चाहिए। ख़ुद होस्ट करने वाले इसे अपनी instance पर इंगित कर सकते हैं।",
+      "reset": "रीसेट",
+      "relays": "रिले",
+      "blossomServers": "Blossom सर्वर",
+      "imageUploads": "इमेज अपलोड",
+      "uploadQuality": "अपलोड क्वालिटी",
+      "uploadQualityDesc": "Compressed बड़ी इमेज को रीसाइज़ करता है और सबसे छोटा फ़ॉर्मैट चुनता है। Original इमेज को बिल्कुल वैसे ही अपलोड करता है।",
+      "compressed": "Compressed",
+      "original": "Original"
+    },
+    "advanced": {
+      "title": "उन्नत",
+      "subtitle": "वॉलेट कनेक्शन, सिस्टम कॉन्फ़िगरेशन, और पावर यूज़र के लिए अन्य उन्नत विकल्प।",
+      "intro": "वॉलेट कनेक्शन, सिस्टम कॉन्फ़िगरेशन, और अन्य उन्नत विकल्प।",
+      "powerUserHeading": "पावर यूज़र सेटिंग्स",
+      "wallet": "वॉलेट"
+    },
+    "wallet": {
+      "title": "वॉलेट",
+      "subtitle": "वॉलेट कनेक्शन और भुगतान प्रबंधित करें"
+    }
+  },
+  "language": {
+    "title": "भाषा",
+    "subtitle": "ऐप में इस्तेमाल होने वाली भाषा चुनें।",
+    "intro": "अपनी पसंदीदा भाषा चुनें। ऐप तुरंत बदल जाएगा और इस डिवाइस पर आपकी पसंद याद रखेगा।",
+    "translationNote": "अनुवाद प्रगति पर है। अनुवाद न हुआ टेक्स्ट अंग्रेज़ी में दिखेगा।"
+  },
+  "organizers": {
+    "appoint": "ऑर्गनाइज़र नियुक्त करें",
+    "appointDesc": "किसी यूज़र को किसी देश फ़ीड पर पोस्ट पिन करने की अनुमति दें।",
+    "appointing": "नियुक्त किया जा रहा है…",
+    "appointed": "ऑर्गनाइज़र नियुक्त",
+    "appointedSuccess": "{{country}} के लिए ऑर्गनाइज़र नियुक्त",
+    "userNpub": "यूज़र का npub",
+    "country": "देश",
+    "selectCountry": "देश चुनें",
+    "invalidNpub": "अमान्य npub फ़ॉर्मैट",
+    "alreadyOrganizer": "यह यूज़र पहले से उस देश के लिए ऑर्गनाइज़र है",
+    "current": "मौजूदा ऑर्गनाइज़र",
+    "noOrganizers": "अभी कोई ऑर्गनाइज़र नियुक्त नहीं हुआ।",
+    "removed": "ऑर्गनाइज़र हटाया गया",
+    "removedSuccess": "{{country}} से {{name}} को हटाया",
+    "refreshed": "रिफ्रेश हो गया",
+    "refreshedDesc": "ऑर्गनाइज़र सूची रिले से रिफ्रेश हो गई।",
+    "adminRequired": "एडमिन एक्सेस ज़रूरी है",
+    "adminRequiredDesc": "केवल प्लेटफ़ॉर्म एडमिन ही ऑर्गनाइज़र नियुक्त या हटा सकते हैं।"
+  },
+  "wallet": {
+    "seoTitle": "वॉलेट",
+    "seoDescription": "आपके Nostr nsec से derive किया गया hierarchical-deterministic Bitcoin वॉलेट।",
+    "loggedOut": {
+      "title": "Bitcoin वॉलेट",
+      "description": "आपकी Nostr पहचान से derive किया गया एक hierarchical वॉलेट। हर रिसीव पर नया एड्रेस, पूरा transaction इतिहास, कोई एड्रेस दोहराव नहीं।",
+      "requiresNsec": "nsec (आपकी Nostr secret key) के साथ लॉगिन ज़रूरी है।"
+    },
+    "unsupported": {
+      "title": "वॉलेट उपलब्ध नहीं",
+      "extension": "आपका ब्राउज़र एक्सटेंशन आपकी secret key को अलग रखता है, इसलिए हम आपके वॉलेट के लिए child keys derive नहीं कर सकते।",
+      "bunker": "आपका रिमोट signer (NIP-46 bunker) आपकी secret key को bunker की तरफ़ रखता है, इसलिए हम आपके वॉलेट के लिए child keys derive नहीं कर सकते।",
+      "other": "आपका लॉगिन प्रकार उस secret key को expose नहीं करता जो आपके वॉलेट को derive करने के लिए चाहिए।",
+      "instructions": "वॉलेट इस्तेमाल करने के लिए लॉग आउट करें और अपनी nsec से फिर साइन इन करें।"
+    },
+    "scanFailed": "वॉलेट scan नहीं हो सका",
+    "retry": "दोबारा कोशिश करें",
+    "refreshBalance": "बैलेंस रिफ्रेश करें",
+    "refreshBalanceTitle": "बैलेंस रिफ्रेश करने के लिए क्लिक करें",
+    "amountPending": "{{amount}} पेंडिंग",
+    "pending": "पेंडिंग",
+    "send": "भेजें",
+    "receive": "पाएँ",
+    "transactions": "Transactions",
+    "receiveDialog": {
+      "title": "Bitcoin पाएँ",
+      "description": "Bitcoin पाने के लिए एक एड्रेस शेयर करें।",
+      "onChain": "ऑन-चेन",
+      "silentPayment": "साइलेंट पेमेंट",
+      "onChainIntro": "हर बार नया एड्रेस। प्राइवेसी के लिए शेयर करने के बाद नए index पर बढ़ाएँ।",
+      "addressIndex": "एड्रेस #{{index}}",
+      "newAddress": "नया एड्रेस",
+      "silentIntro": "स्थिर रिसीव पहचानकर्ता। एक बार शेयर करें और हमेशा के लिए दोहराते रहें — भेजने वाले हर भुगतान के लिए एक अनूठा ऑन-चेन एड्रेस derive करते हैं।",
+      "noIndexer": "Scanning अक्षम है — कोई BIP-352 indexer कॉन्फ़िगर नहीं है। आने वाले साइलेंट पेमेंट का पता लगाने के लिए अपनी ऐप कॉन्फ़िग में <0>bip352IndexerUrl</0> सेट करें।",
+      "silentBalance": "साइलेंट पेमेंट बैलेंस: <0>{{amount}}</0>",
+      "scanForNew": "नए भुगतान के लिए scan करें",
+      "scanForPayments": "भुगतान के लिए scan करें"
+    },
+    "tx": {
+      "pending": "पेंडिंग",
+      "today": "आज",
+      "yesterday": "कल",
+      "daysAgo_one": "{{count}}d पहले",
+      "daysAgo_other": "{{count}}d पहले",
+      "received": "मिले",
+      "sent": "भेजे",
+      "silentBadge": "silent",
+      "silentDetectedTitle": "BIP-352 साइलेंट पेमेंट scan से पाया गया"
+    }
+  },
+  "walletRecovery": {
+    "seoTitle": "पुराना वॉलेट रिकवर करें",
+    "seoDescription": "पिछले Lightning वॉलेट से फंड रिकवर करें और उन्हें अपने Nostr-derived Bitcoin एड्रेस पर भेजें।",
+    "title": "पुराना वॉलेट रिकवर करें",
+    "heading": "अपना पुराना वॉलेट रिकवर करें",
+    "subheading": "अगर आपने पहले Lightning वॉलेट में फंड रखे थे, तो आप उन्हें अपने Nostr-derived Bitcoin एड्रेस में sweep कर सकते हैं। आपका पुराना वॉलेट बहाल नहीं होता — यह एक बार का, एक-तरफ़ा ट्रांसफ़र है।",
+    "backToWallet": "वॉलेट पर वापस",
+    "loggedOut": {
+      "title": "रिकवर करने के लिए लॉग इन करें",
+      "description": "उस Nostr पहचान से लॉग इन करें जिसके पास पुराना Lightning वॉलेट था ताकि फंड उसके Bitcoin एड्रेस पर sweep हो सकें।"
+    },
+    "destination": {
+      "title": "फंड यहाँ भेजे जाएँगे",
+      "description": "आपका Nostr-derived Taproot एड्रेस।"
+    },
+    "phrase": {
+      "title": "रिकवरी फ़्रेज़",
+      "description": "अपने पुराने वॉलेट का 12-शब्द रिकवरी फ़्रेज़ paste करें।",
+      "checkingRelays": "एन्क्रिप्टेड बैकअप के लिए आपके रिले जाँचे जा रहे हैं…",
+      "backupFoundTitle": "आपके रिले पर बैकअप मिला",
+      "backupFoundDesc": "हमें इस अकाउंट से पब्लिश किया गया आपके पुराने वॉलेट के रिकवरी फ़्रेज़ का एन्क्रिप्टेड बैकअप मिला।",
+      "decryptAndUse": "Decrypt करें और इस्तेमाल करें",
+      "placeholder": "word1 word2 word3 …",
+      "warning": "केवल वही रिकवरी फ़्रेज़ paste करें जिस पर आप भरोसा करते हैं। इस फ़्रेज़ वाला कोई भी फंड ख़र्च कर सकता है। sweep पूरा होने के बाद, इसे हर उस जगह से डिलीट कर दें जहाँ आपने कॉपी किया था।",
+      "sweepButton": "मेरे Bitcoin एड्रेस पर फंड sweep करें"
+    },
+    "sweeping": {
+      "working": "काम चल रहा है…",
+      "dontClose": "यह टैब बंद न करें। पुराने वॉलेट के sync होने और transaction के broadcast होने में एक मिनट तक लग सकता है।"
+    },
+    "success": {
+      "title": "रिकवरी पूरी हुई",
+      "sent": "आपके Bitcoin एड्रेस पर {{sats}} sats भेजे।",
+      "viewTransaction": "Transaction देखें"
+    },
+    "error": {
+      "title": "रिकवरी विफल",
+      "tryAgain": "दोबारा कोशिश करें"
+    },
+    "errors": {
+      "noNip44": "आपका signer NIP-44 decryption सपोर्ट नहीं करता, जो रिले बैकअप पढ़ने के लिए ज़रूरी है। इसकी जगह 12-शब्द रिकवरी फ़्रेज़ ख़ुद paste करें।",
+      "decryptFailed": "रिले बैकअप decrypt नहीं हो सका। इसकी जगह 12-शब्द रिकवरी फ़्रेज़ ख़ुद paste करें।",
+      "decryptGeneric": "रिले बैकअप decrypt नहीं हो सका।",
+      "invalidWordCount": "रिकवरी फ़्रेज़ 12 या 24 शब्दों का होना चाहिए।",
+      "noBalance": "आपके पुराने वॉलेट में कोई ख़र्च-योग्य बैलेंस नहीं है। रिकवर करने के लिए कुछ नहीं है।",
+      "sweepGeneric": "रिकवरी विफल। कृपया दोबारा कोशिश करें।"
+    },
+    "progress": {
+      "loadingSdk": "वॉलेट SDK लोड हो रही है…",
+      "connecting": "आपके पुराने वॉलेट से जुड़ रहे हैं…",
+      "checkingBalance": "बैलेंस जाँचा जा रहा है…",
+      "preparingTransfer": "{{sats}} sats का ट्रांसफ़र तैयार किया जा रहा है…",
+      "broadcasting": "Transaction broadcast किया जा रहा है…"
+    },
+    "toast": {
+      "backupLoadedTitle": "बैकअप लोड हो गया",
+      "backupLoadedDesc": "रिकवरी फ़्रेज़ आपके रिले से decrypt हो गया।"
+    }
+  },
+  "walletConnect": {
+    "status": "स्थिति",
+    "ready": "तैयार",
+    "notFound": "नहीं मिला",
+    "none": "कोई नहीं",
+    "add": "जोड़ें",
+    "active": "सक्रिय",
+    "connectionLabel": "NWC कनेक्शन",
+    "defaultWalletName": "Lightning वॉलेट",
+    "setActiveTitle": "सक्रिय के तौर पर सेट करें",
+    "removeTitle": "वॉलेट हटाएँ",
+    "helpText": "Zap भेजने के लिए WebLN ब्राउज़र एक्सटेंशन इंस्टॉल करें या एक NWC वॉलेट कनेक्ट करें।",
+    "webln": {
+      "name": "WebLN",
+      "description": "ब्राउज़र एक्सटेंशन"
+    },
+    "nwc": {
+      "name": "Nostr Wallet Connect",
+      "description": "रिमोट वॉलेट कनेक्शन",
+      "connectedCount_one": "{{count}} वॉलेट कनेक्टेड",
+      "connectedCount_other": "{{count}} वॉलेट कनेक्टेड"
+    },
+    "empty": {
+      "title": "कोई वॉलेट कनेक्ट नहीं",
+      "description": "तुरंत zaps के लिए एक NWC कनेक्शन जोड़ें।"
+    },
+    "dialog": {
+      "title": "NWC वॉलेट कनेक्ट करें",
+      "description": "अपने NWC-संगत वॉलेट से connection string paste करें।",
+      "aliasPlaceholder": "वॉलेट का नाम (वैकल्पिक)",
+      "connect": "कनेक्ट करें",
+      "connecting": "कनेक्ट हो रहा है..."
+    },
+    "toast": {
+      "uriRequiredTitle": "Connection URI ज़रूरी",
+      "uriRequiredDesc": "कृपया एक मान्य NWC connection URI दर्ज करें।",
+      "activeChangedTitle": "सक्रिय वॉलेट बदला",
+      "activeChangedDesc": "चुना गया वॉलेट अब zaps के लिए सक्रिय है।"
+    }
+  },
+  "walletSend": {
+    "title": "Bitcoin भेजें",
+    "send": "Bitcoin भेजें",
+    "tapAgainToConfirm": "पुष्टि के लिए फिर टैप करें",
+    "approxSats": "≈ {{sats}} sats",
+    "satPerVB": "{{rate}} sat/vB",
+    "networkFee": "नेटवर्क फ़ीस",
+    "available": "उपलब्ध: {{usd}} ({{sats}} sats)",
+    "recipient": {
+      "label": "प्राप्तकर्ता",
+      "placeholder": "bc1…, sp1…, या npub…",
+      "sendingSp": "साइलेंट पेमेंट से भेजा जा रहा है — प्राप्तकर्ता को एक नया, अनलिंक न होने वाला ऑन-चेन एड्रेस मिलता है।",
+      "sendingNostr": "एक Nostr यूज़र के ऑन-चेन एड्रेस पर भेजा जा रहा है।",
+      "sendingRaw": "एक raw Bitcoin एड्रेस पर भेजा जा रहा है।"
+    },
+    "feeSpeed": {
+      "fastest": "~10 मिनट",
+      "halfHour": "~30 मिनट",
+      "hour": "~1 घंटा",
+      "economy": "~1 दिन"
+    },
+    "progress": {
+      "building": "Transaction बन रहा है…",
+      "signing": "Sign हो रहा है…",
+      "broadcasting": "Broadcast हो रहा है…",
+      "sending": "भेजा जा रहा है…"
+    },
+    "errors": {
+      "unavailable": "इस लॉगिन प्रकार के लिए HD वॉलेट उपलब्ध नहीं है।",
+      "enterRecipient": "एक Bitcoin एड्रेस, sp1… एड्रेस, या npub दर्ज करें।",
+      "noSpendable": "इस वॉलेट में कोई ख़र्च-योग्य Bitcoin नहीं।",
+      "feesNotLoaded": "Fee rates लोड नहीं हुईं।",
+      "cantSendToSelf": "आप ख़ुद को नहीं भेज सकते।",
+      "enterAmount": "एक राशि दर्ज करें।",
+      "insufficient": "इस राशि + नेटवर्क फ़ीस के लिए Bitcoin पर्याप्त नहीं।",
+      "waitingPrice": "BTC दाम का इंतज़ार है…",
+      "noneYet": "आपके पास अभी कोई Bitcoin नहीं है।",
+      "acknowledgePrivacy": "भेजने से पहले प्राइवेसी चेतावनी स्वीकार करें।"
+    },
+    "toast": {
+      "failedTitle": "Transaction विफल"
+    },
+    "success": {
+      "title": "Bitcoin भेज दिया",
+      "satsAmount": "{{sats}} sats",
+      "viewTransaction": "Transaction देखें",
+      "done": "हो गया"
+    }
+  },
+  "bitcoinPublic": {
+    "lead": "आप जो पैसा भेजते हैं वह सार्वजनिक है और आप तक trace किया जा सकता है।",
+    "learnMore": "और जानें",
+    "body": "Bitcoin एक सार्वजनिक ledger है। आप जो transaction भेजते हैं उसे हमेशा के लिए आप तक trace किया जा सकता है, चाहे वह कई लोगों के बीच हाथ बदल चुका हो। इसे केवल उन्हीं को भेजें जिनका आप सार्वजनिक रूप से समर्थन करना चाहते हैं।",
+    "bodyWithCashOut": "Bitcoin एक सार्वजनिक ledger है। आप जो transaction भेजते हैं उसे हमेशा के लिए आप तक trace किया जा सकता है, चाहे वह कई लोगों के बीच हाथ बदल चुका हो। इसे केवल उन्हीं को भेजें जिनका आप सार्वजनिक रूप से समर्थन करना चाहते हैं, या किसी एक्सचेंज पर कैश आउट करें।",
+    "iUnderstand": "मैं समझता/समझती हूँ कि यह transaction सार्वजनिक है।"
+  },
+  "spScan": {
+    "title": "साइलेंट पेमेंट के लिए scan करें",
+    "description": "आने वाले साइलेंट पेमेंट का पता लगाने के लिए कॉन्फ़िगर किए गए BIP-352 indexer को block-by-block चलाता है।",
+    "fromBlock": "किस block से",
+    "toBlock": "किस block तक",
+    "tipPlaceholder": "tip",
+    "indexerTip": "Indexer tip",
+    "lastFullyScanned": "आख़िरी पूरी तरह scan किया गया",
+    "never": "कभी नहीं",
+    "includeSpent": "पहले से ख़र्च हो चुके भी शामिल करें",
+    "includeSpentDesc": "उन साइलेंट पेमेंट का भी पता लगाएँ जो तब से ख़र्च हो चुके हैं। चूके scan या रीसेट के बाद रिसीव इतिहास फिर से बनाते समय इस्तेमाल करें।",
+    "blockProgress": "Block {{current}} / {{to}}",
+    "matches_one": "{{count}} match",
+    "matches_other": "{{count}} matches",
+    "scannedRange": "Block {{from}} → {{to}} scan हुए।",
+    "foundOutputs_one": "{{count}} नया output मिला।",
+    "foundOutputs_other": "{{count}} नए outputs मिले।",
+    "noNewPayments": "कोई नया भुगतान नहीं।",
+    "startScan": "Scan शुरू करें",
+    "reconcile": {
+      "title": "ख़र्च किए गए UTXO का मिलान करें",
+      "description": "हर स्टोर किए गए साइलेंट-पेमेंट UTXO को Blockbook से जाँचता है और ख़र्च हो चुके किसी भी UTXO को हटाता है। अगर भेजने के बाद बैलेंस उससे ज़्यादा दिखे जितना होना चाहिए, तो इसका इस्तेमाल करें।",
+      "checking": "{{checked}} / {{total}} जाँचे जा रहे हैं…",
+      "checked_one": "{{count}} UTXO जाँचा · {{pruned}} हटाया।",
+      "checked_other": "{{count}} UTXO जाँचे · {{pruned}} हटाए।",
+      "reconciling": "मिलान हो रहा है…",
+      "reconcileNow": "अभी मिलान करें"
+    }
+  },
+  "notifications": {
+    "seoTitle": "नोटिफिकेशन",
+    "seoDescription": "आपके Nostr नोटिफिकेशन",
+    "title": "नोटिफिकेशन",
+    "tabs": {
+      "all": "सभी",
+      "mentions": "मेंशन"
+    },
+    "loginPrompt": "अपने नोटिफिकेशन देखने के लिए लॉग इन करें।",
+    "empty": "अभी कोई नोटिफिकेशन नहीं।",
+    "subject": {
+      "twoActors": "<0></0> और <1></1>",
+      "andOthers_one": " और {{count}} अन्य",
+      "andOthers_other": " और {{count}} अन्य"
+    },
+    "actorAvatars": {
+      "moreCount": "+{{count}} और"
+    },
+    "actions": {
+      "reactedToYour": "ने आपकी {{noun}} पर रिएक्ट किया",
+      "repostedYour": "ने आपकी {{noun}} रीपोस्ट की",
+      "zappedYou": "ने आपको ज़ैप किया",
+      "zappedYouWithAmount": "ने आपको {{sats}} sats ज़ैप किए",
+      "repliedToYourNote": "ने आपके नोट का जवाब दिया",
+      "mentionedYou": "ने आपको मेंशन किया",
+      "repliedToYourComment": "ने आपके कमेंट का जवाब दिया",
+      "commentedOnYour": "ने आपकी {{noun}} पर कमेंट किया",
+      "sentYouLetter": "ने आपको एक चिट्ठी भेजी",
+      "highlightedYour": "ने आपके {{noun}} को हाइलाइट किया",
+      "awardedBadge": "ने आपको एक बैज दिया",
+      "awardedBadges": "ने आपको बैज दिए"
+    },
+    "letter": {
+      "viewAll": "सभी चिट्ठियाँ देखें",
+      "reply": "जवाब दें"
+    },
+    "kinds": {
+      "profile": "प्रोफ़ाइल",
+      "post": "पोस्ट",
+      "encryptedMessage": "एन्क्रिप्टेड मैसेज",
+      "repost": "रीपोस्ट",
+      "reaction": "रिएक्शन",
+      "badgeAward": "बैज अवॉर्ड",
+      "photo": "फ़ोटो",
+      "video": "वीडियो",
+      "requestToVanish": "ग़ायब होने का अनुरोध",
+      "file": "फ़ाइल",
+      "poll": "पोल",
+      "comment": "कमेंट",
+      "voiceMessage": "वॉइस मैसेज",
+      "patch": "पैच",
+      "pullRequest": "pull request",
+      "highlight": "हाइलाइट",
+      "birdDetection": "पक्षी detection",
+      "birdex": "Birdex",
+      "colorMoment": "color moment",
+      "foundLog": "found log",
+      "nsite": "nsite",
+      "profileBadges": "प्रोफ़ाइल बैज",
+      "badge": "बैज",
+      "article": "लेख",
+      "emojiPack": "इमोजी पैक",
+      "podcastEpisode": "पॉडकास्ट एपिसोड",
+      "podcastTrailer": "पॉडकास्ट ट्रेलर",
+      "zapstoreAsset": "Zapstore एसेट",
+      "zapstoreRelease": "Zapstore रिलीज़",
+      "stream": "स्ट्रीम",
+      "status": "स्टेटस",
+      "repository": "रिपॉज़िटरी",
+      "customNip": "कस्टम NIP",
+      "calendarEvent": "कैलेंडर इवेंट",
+      "zapstoreApp": "Zapstore ऐप",
+      "playlist": "प्लेलिस्ट",
+      "divine": "divine",
+      "community": "कम्युनिटी",
+      "goal": "लक्ष्य",
+      "track": "ट्रैक",
+      "magicDeck": "Magic deck",
+      "treasure": "ख़ज़ाना",
+      "constellation": "constellation",
+      "followPack": "follow pack"
+    }
+  },
+  "notifSettings": {
+    "seoTitle": "नोटिफिकेशन",
+    "seoDescription": "अपनी नोटिफिकेशन प्राथमिकताएँ कॉन्फ़िगर करें",
+    "title": "नोटिफिकेशन",
+    "subtitle": "अनुकूलित करें कि कौन-से नोटिफिकेशन मिलें।",
+    "pushHeading": "Push नोटिफिकेशन",
+    "enablePush": {
+      "label": "Push नोटिफिकेशन चालू करें",
+      "description": "अपनी पोस्ट पर गतिविधि के लिए नोटिफिकेशन पाएँ"
+    },
+    "unsupported": "आपका ब्राउज़र push नोटिफिकेशन सपोर्ट नहीं करता।",
+    "denied": "नोटिफिकेशन ब्लॉक हैं। इस साइट से नोटिफिकेशन की अनुमति देने के लिए अपनी ब्राउज़र सेटिंग्स अपडेट करें।",
+    "deliveryMethod": {
+      "heading": "डिलीवरी का तरीक़ा",
+      "intro": "चुनें कि नोटिफिकेशन आपके डिवाइस पर कैसे डिलीवर हों।",
+      "push": {
+        "label": "Push",
+        "description": "मानक नोटिफिकेशन। कोई स्थायी स्टेटस-बार आइकन नहीं।"
+      },
+      "persistent": {
+        "label": "Persistent",
+        "description": "नए नोटिफिकेशन के लिए सीधे बैकग्राउंड में रिले पर poll करता है। push नोटिफिकेशन सपोर्ट न करने वाले डिवाइस पर भरोसेमंद डिलीवरी के लिए इसका इस्तेमाल करें।"
+      }
+    },
+    "notifyAbout": {
+      "heading": "मुझे किस बारे में सूचित करें",
+      "filterHeading": "फ़िल्टर",
+      "typesHeading": "प्रकार",
+      "onlyFollowing": {
+        "label": "केवल उन लोगों से जिन्हें मैं फ़ॉलो करता/करती हूँ",
+        "description": "उन अकाउंट से नोटिफिकेशन छुपाएँ जिन्हें आप फ़ॉलो नहीं करते"
+      }
+    },
+    "types": {
+      "reactions": {
+        "label": "रिएक्शन",
+        "description": "जब कोई आपकी पोस्ट पर रिएक्ट करे"
+      },
+      "reposts": {
+        "label": "रीपोस्ट",
+        "description": "जब कोई आपके नोट को रीपोस्ट करे"
+      },
+      "zaps": {
+        "label": "Zaps",
+        "description": "जब कोई आपको lightning या ऑन-चेन zap भेजे"
+      },
+      "mentions": {
+        "label": "मेंशन",
+        "description": "जब कोई आपको नोट में मेंशन करे"
+      },
+      "comments": {
+        "label": "कमेंट और जवाब",
+        "description": "जब कोई आपकी पोस्ट पर कमेंट या जवाब दे"
+      },
+      "badges": {
+        "label": "बैज अवॉर्ड",
+        "description": "जब कोई आपको बैज दे"
+      },
+      "letters": {
+        "label": "चिट्ठियाँ",
+        "description": "जब कोई आपको चिट्ठी भेजे"
+      },
+      "highlights": {
+        "label": "हाइलाइट",
+        "description": "जब कोई आपके कंटेंट को हाइलाइट करे"
+      }
+    },
+    "toast": {
+      "enableFailedTitle": "नोटिफिकेशन चालू नहीं कर सके",
+      "enableFailedDesc": "कृपया दोबारा कोशिश करें।"
+    }
+  },
+  "search": {
+    "seoTitle": "खोजें",
+    "seoDescription": "Nostr पर खोजें",
+    "title": "खोजें",
+    "inputPlaceholder": "खोजें",
+    "filtersAria": "खोज फ़िल्टर",
+    "tabs": {
+      "agora": "Agora",
+      "nostr": "Nostr",
+      "accounts": "अकाउंट"
+    },
+    "filters": {
+      "title": "फ़िल्टर",
+      "reset": "रीसेट",
+      "from": "से",
+      "sort": "क्रम",
+      "media": "मीडिया",
+      "protocol": "प्रोटोकॉल",
+      "language": "भाषा",
+      "kind": "Kind",
+      "kindCustomPlaceholder": "जैसे 1, 30023",
+      "includeReplies": "जवाब शामिल करें",
+      "authorScope": {
+        "anyone": "कोई भी",
+        "follows": "फ़ॉलो",
+        "people": "लोग"
+      },
+      "sortOptions": {
+        "recent": "हाल का",
+        "hot": "Hot",
+        "trending": "Trending"
+      },
+      "mediaOptions": {
+        "all": "सभी",
+        "images": "इमेज",
+        "videos": "वीडियो",
+        "shorts": "Shorts",
+        "none": "कोई मीडिया नहीं"
+      },
+      "protocolOptions": {
+        "nostr": "Nostr",
+        "mastodon": "Mastodon",
+        "bluesky": "Bluesky"
+      },
+      "langOptions": {
+        "global": "Global",
+        "en": "अंग्रेज़ी",
+        "es": "स्पैनिश",
+        "fr": "फ़्रेंच",
+        "de": "जर्मन",
+        "ja": "जापानी",
+        "zh": "चीनी"
+      }
+    },
+    "chips": {
+      "noReplies": "कोई जवाब नहीं",
+      "images": "इमेज",
+      "videos": "वीडियो",
+      "shortsAndDivines": "Shorts और Divines",
+      "noMedia": "कोई मीडिया नहीं",
+      "mastodon": "Mastodon",
+      "bluesky": "Bluesky",
+      "hot": "Hot",
+      "trending": "Trending",
+      "allKinds": "सभी kinds",
+      "customKind": "Kind: {{kind}}",
+      "kindNumber": "Kind {{kind}}",
+      "kindsCount_one": "{{count}} kind",
+      "kindsCount_other": "{{count}} kinds",
+      "myFollows": "मेरे फ़ॉलो",
+      "authorsCount_one": "{{count}} लेखक",
+      "authorsCount_other": "{{count}} लेखक"
+    },
+    "clear": "साफ़ करें",
+    "searchLabel": "खोज:",
+    "newPosts_one": "{{count}} नई पोस्ट",
+    "newPosts_other": "{{count}} नई पोस्ट",
+    "following": "फ़ॉलो कर रहे हैं",
+    "botAccount": "बॉट अकाउंट",
+    "empty": {
+      "posts": "आपकी खोज से मेल खाता कोई परिणाम नहीं मिला।",
+      "postsPrompt": "Nostr कंटेंट ढूँढने के लिए खोज दर्ज करें।",
+      "accounts": "आपकी खोज से मेल खाता कोई अकाउंट नहीं मिला।",
+      "followsPrompt": "नाम या NIP-05 एड्रेस से लोगों को खोजें।",
+      "agora": "आपकी खोज से मेल खाते कोई Agora कैंपेन, प्लेज, या ग्रुप नहीं मिले।",
+      "agoraPrompt": "Agora कैंपेन, प्लेज, और ग्रुप खोजें, या नवीनतम देखें।",
+      "activeFilters": "सक्रिय फ़िल्टर:",
+      "clearAll": "सभी फ़िल्टर साफ़ करें"
+    }
+  },
+  "profile": {
+    "seoDescriptionFallback": "Nostr प्रोफ़ाइल",
+    "anonymous": "अज्ञात",
+    "userNotFound": "यूज़र नहीं मिला।",
+    "userNotFoundNip05": "यूज़र नहीं मिला: {{handle}}",
+    "couldNotResolveNip05": "इस NIP-05 पहचानकर्ता को resolve नहीं कर सके।",
+    "tabs": {
+      "overview": "ओवरव्यू",
+      "activity": "गतिविधि",
+      "campaigns": "कैंपेन",
+      "groups": "ग्रुप",
+      "pledges": "प्लेज"
+    },
+    "header": {
+      "editProfile": "प्रोफ़ाइल एडिट करें",
+      "shareFollowLink": "फ़ॉलो लिंक शेयर करें",
+      "moreOptions": "और विकल्प",
+      "donate": "डोनेट करें",
+      "campaignGoal": "लक्ष्य ${{amount}}"
+    },
+    "stats": {
+      "followers": "फ़ॉलोअर",
+      "following": "फ़ॉलो कर रहे हैं",
+      "raised": "जुटाए",
+      "followersTitle_one": "{{count}} फ़ॉलोअर",
+      "followersTitle_other": "{{count}} फ़ॉलोअर",
+      "followingTitle": "{{count}} फ़ॉलो कर रहे हैं"
+    },
+    "sections": {
+      "profile": "प्रोफ़ाइल",
+      "campaigns": "कैंपेन",
+      "latestPledge": "नवीनतम प्लेज",
+      "groups": "ग्रुप",
+      "seeAllCampaigns_one": "सभी {{count}} कैंपेन देखें →",
+      "seeAllCampaigns_other": "सभी {{count}} कैंपेन देखें →",
+      "viewCampaignsTab": "कैंपेन टैब देखें →",
+      "seeAllPledges_one": "सभी {{count}} प्लेज देखें →",
+      "seeAllPledges_other": "सभी {{count}} प्लेज देखें →",
+      "seeAllGroups": "सभी {{count}} देखें →"
+    },
+    "badges": {
+      "founder": "संस्थापक",
+      "moderator": "मॉडरेटर",
+      "mod": "Mod",
+      "ended": "समाप्त",
+      "pledged": "प्लेज किया गया"
+    },
+    "moreMenu": {
+      "title": "प्रोफ़ाइल विकल्प",
+      "copyPubkey": "पब्लिक key कॉपी करें",
+      "copyLink": "प्रोफ़ाइल लिंक कॉपी करें",
+      "addToList": "लिस्ट में जोड़ें",
+      "shareFollowLink": "फ़ॉलो लिंक शेयर करें",
+      "profileRecovery": "प्रोफ़ाइल रिकवरी",
+      "zap": "Zap",
+      "awardBadge": "बैज दें",
+      "writeLetter": "चिट्ठी लिखें",
+      "mute": "@{{name}} को म्यूट करें",
+      "unmute": "@{{name}} को अनम्यूट करें",
+      "report": "@{{name}} की रिपोर्ट करें",
+      "close": "बंद करें"
+    },
+    "toast": {
+      "pubkeyCopied": "पब्लिक key क्लिपबोर्ड पर कॉपी हो गई",
+      "linkCopied": "प्रोफ़ाइल लिंक क्लिपबोर्ड पर कॉपी हो गया",
+      "muted": "@{{name}} म्यूट कर दिया",
+      "unmuted": "@{{name}} अनम्यूट कर दिया",
+      "muteFailed": "यूज़र म्यूट नहीं कर सके",
+      "unmuteFailed": "यूज़र अनम्यूट नहीं कर सके",
+      "followed": "@{{name}} को फ़ॉलो किया",
+      "unfollowed": "@{{name}} को अनफ़ॉलो किया",
+      "followFailed": "फ़ॉलो लिस्ट अपडेट नहीं हो सकी",
+      "btcAddressCopied": "Bitcoin एड्रेस क्लिपबोर्ड पर कॉपी हो गया"
+    },
+    "followingModal": {
+      "title": "{{name}} फ़ॉलो कर रहे हैं",
+      "empty": "अभी किसी को फ़ॉलो नहीं कर रहे।"
+    },
+    "followersModal": {
+      "title": "{{name}} के फ़ॉलोअर",
+      "empty": "कोई फ़ॉलोअर नहीं मिला।"
+    },
+    "bitcoinModal": {
+      "title": "Bitcoin",
+      "qrAlt": "Bitcoin QR",
+      "copyAddress": "एड्रेस कॉपी करें",
+      "showQr": "QR कोड दिखाएँ",
+      "viewOnMempool": "mempool.space पर देखें"
+    },
+    "lightbox": {
+      "openOriginal": "मूल खोलें",
+      "close": "बंद करें (Esc)",
+      "imageAlt": "प्रोफ़ाइल इमेज"
+    },
+    "activity": {
+      "empty": "{{name}} की अभी कोई गतिविधि नहीं। पोस्ट, कैंपेन, प्लेज, और डोनेशन सब यहाँ दिखेंगे।"
+    },
+    "campaigns": {
+      "count_one": "{{count}} कैंपेन",
+      "count_other": "{{count}} कैंपेन",
+      "sortNew": "नए",
+      "sortTop": "टॉप",
+      "showHidden": "छुपे हुए दिखाएँ",
+      "hideHidden": "छुपे हुए छुपाएँ",
+      "emptySelf": "आपने अभी कोई कैंपेन लॉन्च नहीं किया है।",
+      "emptyOther": "{{name}} ने अभी कोई कैंपेन लॉन्च नहीं किया है।",
+      "startLink": "कैंपेन शुरू करें →"
+    },
+    "pledgesTab": {
+      "active": "सक्रिय",
+      "ended": "समाप्त",
+      "emptySelf": "आपने अभी कोई प्लेज नहीं बनाया है।",
+      "emptyOther": "{{name}} ने अभी कोई प्लेज नहीं बनाया है।",
+      "createLink": "प्लेज बनाएँ →"
+    },
+    "groupsDialog": {
+      "title": "सभी ग्रुप"
+    }
+  },
+  "profileSettings": {
+    "seoTitle": "प्रोफ़ाइल | सेटिंग्स",
+    "seoDescription": "अपनी {{appName}} प्रोफ़ाइल एडिट करें",
+    "header": {
+      "title": "प्रोफ़ाइल",
+      "subtitle": "आपकी Nostr पहचान पोर्टेबल है — जहाँ आप जाएँ, यह साथ जाती है।",
+      "save": "सेव करें"
+    },
+    "intro": {
+      "heading": "आपकी पहचान",
+      "body": "एडिट करने के लिए कार्ड के किसी फ़ील्ड पर टैप करें। नई इमेज अपलोड और crop करने के लिए अपने अवतार या बैनर पर क्लिक करें।"
+    },
+    "uploading": "अपलोड हो रहा है…",
+    "fields": {
+      "heading": "प्रोफ़ाइल फ़ील्ड",
+      "website": "वेबसाइट",
+      "websitePlaceholder": "https://yourwebsite.com",
+      "lightning": "Lightning",
+      "lightningPlaceholder": "you@walletofsatoshi.com",
+      "labelPlaceholder": "लेबल",
+      "tickerPlaceholder": "Ticker",
+      "addressPlaceholder": "एड्रेस",
+      "valuePlaceholder": "मान या URL",
+      "mediaPlaceholder": "फ़ाइल अपलोड करें या सीधी फ़ाइल लिंक paste करें",
+      "chooseFile": "अपलोड करने के लिए फ़ाइल चुनें",
+      "chooseMediaFile": "अपलोड करने के लिए मीडिया फ़ाइल चुनें"
+    },
+    "presets": {
+      "music": {
+        "label": "संगीत",
+        "description": "एक गाना या ऑडियो clip अपलोड करें",
+        "valuePlaceholder": "ऑडियो अपलोड करें या सीधी फ़ाइल लिंक paste करें"
+      },
+      "photo": {
+        "label": "फ़ोटो",
+        "description": "एक इमेज अपलोड करें",
+        "valuePlaceholder": "इमेज अपलोड करें या सीधी फ़ाइल लिंक paste करें"
+      },
+      "video": {
+        "label": "वीडियो",
+        "description": "एक वीडियो clip अपलोड करें",
+        "valuePlaceholder": "वीडियो अपलोड करें या सीधी फ़ाइल लिंक paste करें"
+      },
+      "email": {
+        "label": "ईमेल",
+        "defaultLabel": "ईमेल",
+        "description": "संपर्क ईमेल एड्रेस",
+        "valuePlaceholder": "you@example.com"
+      },
+      "wallet": {
+        "label": "वॉलेट",
+        "description": "क्रिप्टोकरेंसी वॉलेट एड्रेस",
+        "valuePlaceholder": "एड्रेस"
+      },
+      "link": {
+        "label": "लिंक",
+        "description": "किसी भी वेबसाइट या प्रोफ़ाइल का लिंक",
+        "valuePlaceholder": "https://..."
+      },
+      "weather": {
+        "label": "मौसम",
+        "defaultLabel": "मौसम",
+        "description": "एक Nostr मौसम station कनेक्ट करें",
+        "valuePlaceholder": "npub1... या naddr1... (#station-id वैकल्पिक)"
+      },
+      "custom": {
+        "label": "कस्टम",
+        "description": "कोई भी कस्टम फ़ील्ड बनाएँ",
+        "valuePlaceholder": "मान या URL"
+      }
+    },
+    "warnings": {
+      "audioWrongType": "यह URL किसी ऑडियो फ़ाइल पर इंगित नहीं करता। ऑडियो फ़ाइल अपलोड करें या .mp3, .ogg, .wav आदि से ख़त्म होने वाला सीधा लिंक इस्तेमाल करें।",
+      "audioUnknown": "यह URL ऑडियो प्लेयर के तौर पर काम नहीं कर सकता। सबसे अच्छे नतीजे के लिए, बटन से फ़ाइल अपलोड करें या किसी ऑडियो फ़ाइल का सीधा लिंक paste करें।",
+      "imageWrongType": "यह URL किसी इमेज पर इंगित नहीं करता। इमेज अपलोड करें या .jpg, .png, .webp आदि से ख़त्म होने वाला सीधा लिंक इस्तेमाल करें।",
+      "imageUnknown": "यह URL इमेज के तौर पर नहीं दिख सकता। सबसे अच्छे नतीजे के लिए, बटन से फ़ाइल अपलोड करें या किसी इमेज फ़ाइल का सीधा लिंक paste करें।",
+      "videoWrongType": "यह URL किसी वीडियो पर इंगित नहीं करता। वीडियो अपलोड करें या .mp4, .webm, .mov आदि से ख़त्म होने वाला सीधा लिंक इस्तेमाल करें।",
+      "videoUnknown": "यह URL वीडियो के तौर पर नहीं दिख सकता। सबसे अच्छे नतीजे के लिए, बटन से फ़ाइल अपलोड करें या किसी वीडियो फ़ाइल का सीधा लिंक paste करें।"
+    },
+    "crop": {
+      "profile": "प्रोफ़ाइल पिक्चर crop करें",
+      "banner": "बैनर crop करें"
+    },
+    "mobilePreview": "प्रोफ़ाइल फ़ील्ड प्रीव्यू",
+    "advanced": {
+      "heading": "उन्नत",
+      "botLabel": "बॉट अकाउंट",
+      "botDescription": "इस अकाउंट को automated के तौर पर चिह्नित करें"
+    },
+    "toast": {
+      "uploaded": "अपलोड हो गया",
+      "mediaUploaded": "मीडिया फ़ाइल अपलोड हो गई",
+      "uploadFailed": "अपलोड विफल",
+      "tryAgain": "कृपया दोबारा कोशिश करें।",
+      "profilePictureUpdated": "प्रोफ़ाइल पिक्चर अपडेट हो गई",
+      "bannerUpdated": "बैनर अपडेट हो गया",
+      "profileSaved": "प्रोफ़ाइल सेव हो गई",
+      "saveFailed": "प्रोफ़ाइल सेव नहीं हो सकी।"
+    },
+    "key": {
+      "heading": "आपकी key",
+      "extensionBody": "आप ब्राउज़र एक्सटेंशन (NIP-07) से साइन इन हैं। आपकी secret key वहाँ रखी है — एक्सटेंशन से ही उसे प्रबंधित या export करें।",
+      "bunkerBody": "आप एक रिमोट signer (NIP-46) से साइन इन हैं। आपकी secret key उस signer के पास है और उसे {{appName}} से export नहीं किया जा सकता।",
+      "explainer": "यह secret key {{appName}} पर आपके अकाउंट को नियंत्रित करती है। इसे रखने वाला कोई भी पोस्ट कर सकता है और आपकी जगह बन सकता है। इसे password manager में या कहीं ऐसी जगह रखें जहाँ केवल आप पहुँच सकते हैं।",
+      "warning": "अपनी secret key कभी किसी के साथ शेयर न करें। इसका स्क्रीनशॉट लेने या password manager के अलावा कहीं भी paste करने से बचें। अगर शेयर हुई, तो दूसरे आपके अकाउंट तक पहुँच सकेंगे।",
+      "aria": "आपकी secret key",
+      "copyAria": "Secret key कॉपी करें",
+      "revealAria": "Secret key दिखाएँ",
+      "hideAria": "Secret key छुपाएँ",
+      "backupButton": "Key का बैकअप लें",
+      "saving": "सेव हो रहा है…",
+      "saved": "Secret key सेव हो गई",
+      "savedToFile": "आपकी secret key आपके डिवाइस के Documents फ़ोल्डर में सेव हो गई।",
+      "saveFailed": "सेव विफल",
+      "saveFailedDescription": "Key सेव नहीं कर सके। कृपया इसे ख़ुद कॉपी करें।",
+      "copyFailed": "कॉपी विफल",
+      "copyFailedDescription": "क्लिपबोर्ड तक नहीं पहुँच सके। Key दिखाएँ और इसे ख़ुद कॉपी करें।"
+    }
+  },
+  "faq": {
+    "categories": {
+      "getting-started": { "label": "Agora के बारे में" },
+      "payments": { "label": "Agora पर Bitcoin डोनेशन" },
+      "about-nostr": { "label": "Nostr के बारे में" },
+      "legacy": { "label": "Legacy" }
+    },
+    "items": {
+      "what-is-ditto": {
+        "question": "{{appName}} क्या है?",
+        "answer": [
+          "{{appName}} सक्रियकर्ताओं को सीधे Bitcoin डोनेशन — सार्वजनिक या निजी — भेजने का एक प्लेटफ़ॉर्म है। बीच में कोई बिचौलिया नहीं, कोई पेमेंट प्रोसेसर नहीं, और कोई ऐसा अकाउंट नहीं जो फ़्रीज़ हो सके।",
+          "{{appName}} Nostr पर बना है, इसलिए आपकी पहचान इस साइट से बंधी नहीं है — यह आपकी है।"
+        ]
+      },
+      "cost-to-use": {
+        "question": "क्या {{appName}} की कोई क़ीमत है?",
+        "answer": [
+          "**नहीं।** {{appName}} कोई प्लेटफ़ॉर्म फ़ीस नहीं लेता। जब आप डोनेट करते हैं, तो आप केवल Bitcoin नेटवर्क फ़ीस देते हैं जो miners को जाती है — हमें नहीं।"
+        ]
+      },
+      "who-made-this": {
+        "question": "{{appName}} किसने बनाया?",
+        "answer": [
+          "{{appName}} को [Soapbox](https://soapbox.pub) ने बनाया है, जो Nostr ecosystem के लिए टूल बनाने वाली एक ओपन-सोर्स टीम है, [World Liberty Congress](https://worldlibertycongress.org/) के साथ मिलकर।"
+        ]
+      },
+      "send-bitcoin-onchain": {
+        "question": "Bitcoin भेजना कैसे काम करता है?",
+        "answer": [
+          "जब कोई सक्रियकर्ता कैंपेन बनाता है, तो वह चुनता है कि किस प्रकार के भुगतान स्वीकार करना है: **सार्वजनिक**, **निजी**, या **दोनों**।",
+          "**सार्वजनिक** डोनेशन असली Bitcoin ऑन-चेन होते हैं। ये सार्वजनिक ब्लॉकचेन पर सेटल होते हैं, हर Bitcoin वॉलेट में काम करते हैं, और किसी को भी दिखते हैं।",
+          "**निजी** डोनेशन **साइलेंट पेमेंट** (BIP-352) का इस्तेमाल करते हैं। ये भी ऑन-चेन सेटल होते हैं, लेकिन transaction को सक्रियकर्ता के डोनेशन कोड से नहीं जोड़ा जा सकता — इसलिए ये सार्वजनिक डोनर लिस्ट और कुल आँकड़ों से बाहर रहते हैं। डोनर को ऐसा वॉलेट चाहिए जो साइलेंट पेमेंट सपोर्ट करता हो — हम [Ditto Wallet](https://ditto.pub) या [Dana](https://github.com/cygnet3/dana/releases/download/v0.7.4/app-live-release.apk) की सलाह देते हैं।",
+          "जब कैंपेन **दोनों** स्वीकार करता है, तो {{appName}} एक ही QR कोड दिखाता है जो दोनों endpoints encode करता है। साइलेंट-पेमेंट वॉलेट इसे निजी के तौर पर पढ़ते हैं; अन्य वॉलेट सार्वजनिक एड्रेस पर वापस आ जाते हैं। डोनर को चुनना नहीं पड़ता — उनका वॉलेट सही रास्ता ख़ुद चुन लेता है।",
+          "किसी भी तरीक़े से, भुगतान सीधे सक्रियकर्ता को जाता है। {{appName}} फंड को कभी नहीं छूता।"
+        ]
+      },
+      "connect-wallet": {
+        "question": "{{appName}} पर वॉलेट क्या है?",
+        "answer": [
+          "आपका {{appName}} वॉलेट आपकी Nostr key से बनता है। यह Bitcoin दोनों तरह से पा सकता है — एक सार्वजनिक एड्रेस के तौर पर जिस पर कोई भी Bitcoin वॉलेट भुगतान कर सकता है, और एक साइलेंट-पेमेंट कोड के तौर पर जिस पर सक्षम वॉलेट निजी तौर पर भुगतान कर सकते हैं। साइन अप करने के लिए कुछ नहीं; जिस पल आपके पास अकाउंट है, यह मौजूद है।",
+          "जब आप कैंपेन बनाते हैं, तो आप चुनते हैं कि सार्वजनिक भुगतान, निजी भुगतान, या दोनों स्वीकार करें। जो आपको मिले उसे ख़र्च करने के लिए, **एक्टिविस्ट गाइड** देखें।"
+        ]
+      },
+      "donations-are-public-general": {
+        "question": "क्या {{appName}} पर डोनेशन सार्वजनिक हैं?",
+        "answer": [
+          "यह इस पर निर्भर करता है कि सक्रियकर्ता किस तरह के भुगतान स्वीकार करता है।",
+          "**सार्वजनिक डोनेशन** Bitcoin ब्लॉकचेन और Nostr पर दर्ज होते हैं। कोई भी राशि, समय, और एड्रेस देख सकता है।",
+          "**निजी डोनेशन** साइलेंट पेमेंट का इस्तेमाल करते हैं। ये सार्वजनिक रूप से सक्रियकर्ता के डोनेशन कोड से नहीं जोड़े जा सकते, डोनर लिस्ट में नहीं दिखते, और सार्वजनिक कुल आँकड़ों में नहीं गिने जाते।",
+          "जब कैंपेन दोनों स्वीकार करता है, तो डोनर का वॉलेट तय करता है कि किस रास्ते का इस्तेमाल हो — साइलेंट-पेमेंट-सक्षम वॉलेट निजी तौर पर भुगतान करते हैं, अन्य सार्वजनिक एड्रेस पर भुगतान करते हैं। पूरी तस्वीर के लिए **डोनर गाइड** और **एक्टिविस्ट गाइड** पढ़ें।"
+        ]
+      },
+      "censorship-resistance": {
+        "question": "यहाँ \"सेंसरशिप-प्रतिरोधी\" का क्या मतलब है?",
+        "answer": [
+          "डोनर और सक्रियकर्ता के बीच कोई कंपनी नहीं बैठती। {{appName}} फंड को नहीं रखता और एड्रेस को फ़्रीज़ नहीं कर सकता।",
+          "जब तक Bitcoin नेटवर्क चल रहा है, डोनेशन भेजे और प्राप्त किए जा सकते हैं। {{appName}} ख़ुद ऑफ़लाइन होने से उन्हें नहीं रोका जा सकेगा।"
+        ]
+      },
+      "why-onchain": {
+        "question": "Bitcoin क्यों?",
+        "answer": [
+          "Bitcoin दुनिया में सबसे व्यापक रूप से सपोर्टेड और सेंसरशिप-प्रतिरोधी पेमेंट रेल है। हर Bitcoin वॉलेट इसे भेज सकता है।",
+          "{{appName}} पर, सक्रियकर्ता चुनते हैं कि कैसे पाएँ: **सार्वजनिक** (एक नियमित Bitcoin एड्रेस) अधिकतम पहुँच के लिए, **निजी** (साइलेंट पेमेंट) न जोड़े जा सकने वाले डोनेशन के लिए, या **दोनों** ताकि हर डोनर का वॉलेट सही रास्ता ख़ुद चुन ले। ऐसे डोनर जिनके पास सिर्फ़ एक उपभोक्ता Bitcoin ऐप है, फिर भी योगदान दे सकते हैं; साइलेंट-पेमेंट वॉलेट वाले डोनर को डिफ़ॉल्ट रूप से प्राइवेसी मिलती है।",
+          "समझौता यह है कि सार्वजनिक Bitcoin transactions ब्लॉकचेन पर दिखते हैं और miner फ़ीस देते हैं। डोनर और एक्टिविस्ट गाइड समझाती हैं कि दोनों को कैसे संभालें।"
+        ]
+      },
+      "why-not-silent-payments": {
+        "question": "क्या {{appName}} साइलेंट पेमेंट सपोर्ट करता है?",
+        "answer": [
+          "हाँ — दोनों तरफ़ से। {{appName}} का बिल्ट-इन Bitcoin वॉलेट BIP-352 सपोर्ट करता है, इसलिए जब आप अपने {{appName}} वॉलेट से Bitcoin भेजते हैं, तो आप किसी भी साइलेंट-पेमेंट एड्रेस (`sp1…`) पर सीधे भुगतान कर सकते हैं। और जब एक सक्रियकर्ता कैंपेन बनाता है, तो वह सार्वजनिक Bitcoin भुगतान के साथ, या उसकी जगह, साइलेंट पेमेंट स्वीकार कर सकता है।",
+          "साइलेंट-पेमेंट डोनेशन भी ऑन-चेन सेटल होते हैं, लेकिन transaction को सक्रियकर्ता के डोनेशन कोड से नहीं जोड़ा जा सकता — इसलिए ये सार्वजनिक डोनर लिस्ट या कुल आँकड़ों में नहीं दिखते।",
+          "{{appName}} के बाहर से साइलेंट पेमेंट भेजने के लिए ऐसा वॉलेट चाहिए जो BIP-352 सपोर्ट करता हो। अधिकांश उपभोक्ता ऐप अभी नहीं करते, लेकिन [Ditto Wallet](https://ditto.pub) और [Dana](https://github.com/cygnet3/dana/releases/download/v0.7.4/app-live-release.apk) करते हैं।",
+          "जब कैंपेन दोनों तरह के भुगतान स्वीकार करता है, तो {{appName}} उन्हें एक ही QR कोड में encode कर देता है। साइलेंट-पेमेंट-सक्षम वॉलेट निजी तौर पर भुगतान करते हैं; बाक़ी सब सार्वजनिक एड्रेस पर भुगतान करते हैं। कोई डोनर बाहर नहीं किया जाता, और किसी सक्रियकर्ता को पहुँच और प्राइवेसी में से चुनने पर मजबूर नहीं किया जाता।"
+        ]
+      },
+      "why-not-lightning": {
+        "question": "{{appName}} Lightning का इस्तेमाल क्यों नहीं करता?",
+        "answer": [
+          "Lightning के लिए Lightning वॉलेट चाहिए। सबसे आसान वाले (Wallet of Satoshi, Strike, Breez) **custodial** हैं — एक कंपनी फंड रखती है और उसे बंद किया जा सकता है, geo-block किया जा सकता है, या अकाउंट फ़्रीज़ करने के लिए दबाव डाला जा सकता है। Non-custodial Lightning तकनीकी रूप से माँगपूर्ण है और नए लोगों के लिए भरोसेमंद नहीं।",
+          "हम चाहते हैं कि {{appName}} ऐसे व्यक्ति के लिए काम करे जिसका Bitcoin का एकमात्र अनुभव Cash App, Coinbase, Strike, Venmo, या PayPal जैसा कोई नियमित उपभोक्ता ऐप है। ऑन-चेन Bitcoin धरती के हर वॉलेट के साथ काम करता है।"
+        ]
+      },
+      "why-not-rotating-addresses": {
+        "question": "{{appName}} हर डोनेशन के लिए नया एड्रेस क्यों नहीं बनाता?",
+        "answer": [
+          "ऐसा करने के लिए {{appName}} को पैसा बदलने वाला बिचौलिया बनना पड़ेगा — पहले Bitcoin की कस्टडी लेकर फिर उसे सक्रियकर्ता को आगे भेजना।",
+          "इससे हम money transmitter बन जाएँगे, जिसके साथ नियामक बंधन आते हैं, और एक single point of failure: {{appName}} का सर्वर बंद करो और इसके ज़रिए चलने वाली हर डोनेशन भी बंद हो जाएगी।",
+          "इसके बजाय, हर यूज़र का डोनेशन एड्रेस उसकी Nostr secret key (nsec) से derive होता है — वही key जिससे आप साइन इन करते हैं। डोनर सीधे सक्रियकर्ता को भेजते हैं, {{appName}} फंड को कभी नहीं छूता, और प्लेटफ़ॉर्म को बंद करके किसी को सेंसर नहीं किया जा सकता। जो सक्रियकर्ता हर डोनेशन में प्राइवेसी चाहते हैं वे साइलेंट पेमेंट स्वीकार कर सकते हैं, जो बीच में किसी के पैसा रखे बिना वही न जोड़े जा सकने योग्यता देते हैं।"
+        ]
+      },
+      "why-not-other-crypto": {
+        "question": "Monero या कोई और cryptocurrency क्यों नहीं?",
+        "answer": [
+          "Bitcoin अब तक सबसे व्यापक रूप से अपनाई गई cryptocurrency है। इसका मतलब है कि डोनर के लिए इसे ख़रीदना और भेजना सबसे आसान है, और सक्रियकर्ताओं के लिए इसे पाना, रखना, और ख़र्च करना सबसे आसान है।",
+          "Monero जैसी प्राइवेसी-केंद्रित coins Bitcoin से अलग प्राइवेसी समझौते देती हैं, लेकिन वे अधिकांश उपभोक्ता ऐप द्वारा सपोर्टेड नहीं हैं और स्थानीय मुद्रा में बदलना मुश्किल है। डोनेशन के किसी भी पक्ष को पहले एक niche cryptocurrency हासिल करने के लिए कहना एक बाधा है जिसे {{appName}} रास्ते में नहीं रखेगा। Bitcoin डोनेशन के लिए ख़ुद ही, साइलेंट पेमेंट Bitcoin ecosystem से बाहर निकले बिना न जोड़े जा सकने योग्यता का इस्तेमाल कवर कर देते हैं।"
+        ]
+      },
+      "what-is-nostr": {
+        "question": "Nostr क्या है?",
+        "answer": [
+          "Nostr एक खुला नेटवर्क है जहाँ **आप** अपने अकाउंट के मालिक हैं, कोई कंपनी नहीं। आपकी पहचान एक cryptographic key है जिसे आप नियंत्रित करते हैं, किसी और के सर्वर पर username नहीं।",
+          "{{appName}} पर, वही key आपके डोनेशन एड्रेस के derive होने का आधार भी है — आपकी Nostr secret key (nsec) आपके Bitcoin वॉलेट को seed करती है, इसी वजह से आप किसी के पास साइन अप किए बिना Bitcoin पा सकते हैं।"
+        ]
+      },
+      "why-login-different": {
+        "question": "मेरा साइन-इन इतना अलग और लंबा क्यों है?",
+        "answer": [
+          "कंपनी द्वारा नियंत्रित username और पासवर्ड की जगह, Nostr cryptographic keys का एक जोड़ा इस्तेमाल करता है।",
+          "आपकी \"public key\" (**npub** से शुरू) आपका username है। आपकी \"secret key\" (**nsec** से शुरू) आपका पासवर्ड है। लंबी string ही इसे क़रीब-क़रीब अनुमान-असंभव बनाती है।"
+        ]
+      },
+      "lose-secret-key": {
+        "question": "अगर मेरी secret key खो जाए तो क्या होगा?",
+        "answer": [
+          "**कोई \"forgot password\" बटन नहीं है।** कोई भी इसे आपके लिए रीसेट नहीं कर सकता। अगर आप इसे खो देते हैं, तो आपका अकाउंट — और आपके डोनेशन एड्रेस पर मौजूद कोई भी Bitcoin — हमेशा के लिए चला जाता है।",
+          "**अभी अपनी secret key को कहीं सुरक्षित जगह सेव करें।** सुझावों के लिए, [Managing Your Nostr Keys](https://soapbox.pub/blog/managing-nostr-keys) पढ़ें।"
+        ]
+      },
+      "manage-secret-key": {
+        "question": "क्या मैं अपनी secret key अपने फ़ोन के password manager में सेव कर सकता/सकती हूँ?",
+        "answer": [
+          "हाँ। आप इसे अपने डिवाइस के password manager में सेव कर सकते हैं (iCloud Keychain, 1Password, Bitwarden, आदि)। iPhone पर, इसे Passwords में सेव करके आप Face ID या Touch ID से लॉग इन कर सकते हैं।",
+          "पूरी गाइड के लिए, [Managing Your Nostr Keys](https://soapbox.pub/blog/managing-nostr-keys) देखें।"
+        ]
+      },
+      "send-bitcoin-lightning": {
+        "question": "Lightning के ज़रिए Bitcoin भेजना कैसे काम करता है?",
+        "answer": [
+          "अगर किसी प्राप्तकर्ता की प्रोफ़ाइल पर Lightning एड्रेस है, तो आप उस पर भेज सकते हैं। Lightning सेकंडों में सेटल होता है और फ़ीस बहुत कम होती हैं।",
+          "Lightning भेजे {{appName}} के डोनेशन एड्रेस का इस्तेमाल नहीं करते — वे सीधे उस Lightning वॉलेट पर जाते हैं जो प्राप्तकर्ता ने ख़ुद सेट किया है। {{appName}} का अपना डोनेशन फ़्लो केवल ऑन-चेन है।"
+        ]
+      },
+      "what-are-zaps": {
+        "question": "Zaps क्या हैं?",
+        "answer": [
+          "Zaps Nostr पर छोटी Lightning टिप्स हैं, जो {{appName}} के ऑन-चेन डोनेशन फ़्लो से अलग हैं।"
+        ]
+      },
+      "fyp": {
+        "question": "फ़ीड कैसे काम करता है?",
+        "answer": [
+          "आपका फ़ीड उन लोगों के कैंपेन और पोस्ट दिखाता है जिन्हें आप फ़ॉलो करते हैं। आप क्या देखेंगे यह तय करने वाला कोई algorithm नहीं है।"
+        ]
+      },
+      "what-are-relays": {
+        "question": "रिले क्या हैं?",
+        "answer": [
+          "रिले वे सर्वर हैं जो Nostr events — पोस्ट, डोनेशन रसीद, प्रोफ़ाइल जानकारी — स्टोर और डिलीवर करते हैं। डिफ़ॉल्ट सीधे काम करते हैं; आप Settings > Network में रिले जोड़ या हटा सकते हैं।"
+        ]
+      },
+      "what-are-blossom": {
+        "question": "Blossom सर्वर क्या हैं?",
+        "answer": [
+          "Blossom सर्वर मीडिया फ़ाइल (कैंपेन इमेज, प्रोफ़ाइल पिक्चर) स्टोर करते हैं जब आप उन्हें अपलोड करते हैं। आप Settings > Network में प्रबंधित कर सकते हैं कि कौन-से सर्वर इस्तेमाल हों।"
+        ]
+      },
+      "report-content": {
+        "question": "हानिकारक कंटेंट की रिपोर्ट कैसे करूँ?",
+        "answer": [
+          "किसी भी पोस्ट पर तीन-डॉट मेन्यू (**...**) पर टैप करें और \"Report\" चुनें। आप उसी मेन्यू से यूज़र को म्यूट या ब्लॉक कर सकते हैं।"
+        ]
+      },
+      "vs-mastodon-bluesky": {
+        "question": "Nostr Mastodon या Bluesky से कैसे अलग है?",
+        "answer": [
+          "Mastodon पर, आपका अकाउंट किसी एक सर्वर पर रहता है। Bluesky पर, ज़्यादातर अकाउंट एक कंपनी पर निर्भर हैं। Nostr पर, आपकी पहचान एक key है जिसे आप नियंत्रित करते हैं, और आपका डोनेशन एड्रेस आपके साथ किसी भी Nostr ऐप में जाता है।"
+        ]
+      },
+      "profile-fields": {
+        "question": "प्रोफ़ाइल फ़ील्ड क्या हैं?",
+        "answer": [
+          "प्रोफ़ाइल फ़ील्ड आपको अपनी प्रोफ़ाइल में अतिरिक्त जानकारी जोड़ने देते हैं — लिंक, वॉलेट एड्रेस, संगीत, फ़ोटो, वीडियो।"
+        ]
+      }
+    }
+  },
+  "guides": {
+    "shared": {
+      "tldrEyebrow": "छोटा संस्करण",
+      "paymentBadge": {
+        "public": "सार्वजनिक भुगतान",
+        "silent": "साइलेंट पेमेंट"
+      },
+      "paymentComparison": {
+        "donorHeader": "जब आप डोनेट करते हैं",
+        "activistHeader": "जब आप बनाते हैं",
+        "donorRows": {
+          "whatYouSee": {
+            "label": "आप क्या देखते हैं",
+            "public": "एक नियमित Bitcoin एड्रेस जिसे आप कहीं से भी भुगतान कर सकते हैं।",
+            "silent": "वही QR। आपका वॉलेट साइलेंट-पेमेंट endpoint चुन लेता है अगर वह BIP-352 सपोर्ट करता है।"
+          },
+          "walletSupport": {
+            "label": "वॉलेट सपोर्ट",
+            "public": "हर Bitcoin वॉलेट। Cash App, Coinbase, Strike, हार्डवेयर, कुछ भी।",
+            "silent": "आज कुछ ही वॉलेट। ज़्यादातर एक नियमित Bitcoin transaction पर वापस आ जाते हैं।"
+          },
+          "privacy": {
+            "label": "डोनेशन की प्राइवेसी",
+            "public": "ऑन-चेन सार्वजनिक। आपका भेजने वाला एड्रेस कैंपेन से हमेशा के लिए जुड़ा रहता है।",
+            "silent": "पाने वाला पक्ष ऑन-चेन पर न जोड़े जा सकने वाला है। आपके भेजने वाले वॉलेट का सिलसिला अभी भी सार्वजनिक है।"
+          },
+          "settlement": {
+            "label": "सेटलमेंट",
+            "public": "सामान्य Bitcoin confirmations.",
+            "silent": "वही ऑन-चेन confirmations, लेकिन सक्रियकर्ता को इसे ढूँढने के लिए अपना वॉलेट scan करना पड़ता है।"
+          }
+        },
+        "activistRows": {
+          "whatDonorsSee": {
+            "label": "डोनर क्या देखते हैं",
+            "public": "एक नियमित Bitcoin एड्रेस। धरती के हर वॉलेट के साथ काम करता है।",
+            "silent": "एक BIP-352 endpoint. डोनर के वॉलेट को साइलेंट-पेमेंट सपोर्ट चाहिए; नहीं तो डोनेशन एक नियमित Bitcoin transaction पर वापस आ जाता है।"
+          },
+          "receivingSpeed": {
+            "label": "पाने की गति",
+            "public": "Push-शैली। डोनेशन तुरंत कैंपेन पेज पर दिखते हैं।",
+            "silent": "मैनुअल scanning. आपके वॉलेट को इन्हें ढूँढने के लिए ब्लॉकचेन पर चलना पड़ता है। वॉलेट के अनुसार मिनटों से घंटों तक।"
+          },
+          "pushNotifications": {
+            "label": "Push नोटिफिकेशन",
+            "public": "हाँ। नए डोनेशन आते ही आप देख लेते हैं।",
+            "silent": "नहीं। वॉलेट खोलें और इन्हें खोजने के लिए scan trigger करें।"
+          },
+          "donorList": {
+            "label": "डोनर लिस्ट / कैंपेन कुल",
+            "public": "हमेशा के लिए सार्वजनिक। राशि और भेजने वाले एड्रेस किसी को भी दिखते हैं।",
+            "silent": "निजी। कैंपेन पेज साइलेंट-पेमेंट डोनेशन संख्या या कुल नहीं दिखा सकता।"
+          },
+          "ecosystem": {
+            "label": "Ecosystem की परिपक्वता",
+            "public": "परिपक्व। जमे हुए टूल।",
+            "silent": "Bleeding-edge. वॉलेट में अभी भी bug हैं; उम्मीद करें कि कुछ भुगतान चूकेंगे और बाद के scan में दिखेंगे।"
+          },
+          "bestFor": {
+            "label": "किसके लिए सबसे अच्छा",
+            "public": "खुले-तौर पर चलने वाले फंडरेज़र जहाँ सामाजिक प्रमाण और दृश्यता मदद करती है।",
+            "silent": "ऐसे कैंपेन जहाँ डोनर या सक्रियकर्ता की प्राइवेसी दिखने वाले कुल से ज़्यादा मायने रखती है।"
+          },
+          "watchOutFor": {
+            "label": "किस बात का ध्यान रखें",
+            "public": "हर डोनर का स्थायी सार्वजनिक रिकॉर्ड।",
+            "silent": "आज UX में अड़चनें। कुछ डोनेशन तब तक नहीं दिखेंगे जब तक सक्रियकर्ता scan न करे।"
+          }
+        }
+      }
+    },
+    "donor": {
+      "tldr": {
+        "lede": "कैंपेन पेज पर मौजूद Bitcoin एड्रेस को अपने पास के किसी भी वॉलेट से भुगतान करें। अगर कैंपेन साइलेंट पेमेंट स्वीकार करता है और आपका वॉलेट उन्हें सपोर्ट करता है, तो आपका डोनेशन अपने आप निजी हो जाता है।",
+        "nextActions": [
+          "किसी भी Bitcoin वॉलेट से भुगतान करें",
+          "कोई बिचौलिया नहीं, कोई holding period नहीं",
+          "प्राइवेसी चाहिए? नीचे पढ़ें"
+        ]
+      },
+      "flow": {
+        "heading": "एक डोनेशन कैसे बहता है",
+        "steps": {
+          "openCampaign": {
+            "title": "कैंपेन खोलें",
+            "body": "आपको एक ही QR कोड दिखता है। अगर कैंपेन दोनों विकल्प स्वीकार करता है, तो यह दोनों endpoints encode करता है; आपका वॉलेट सही चुन लेता है।"
+          },
+          "payFromAnyWallet": {
+            "title": "किसी भी वॉलेट से भुगतान करें",
+            "body": "Cash App, Coinbase, Strike, एक हार्डवेयर वॉलेट, कुछ भी। राशि और नेटवर्क फ़ीस का भुगतान करें।"
+          },
+          "arrivesDirectly": {
+            "title": "यह सीधे पहुँचता है",
+            "body": "फंड सीधे सक्रियकर्ता तक सेटल होते हैं। {{appName}} इन्हें रखता या route नहीं करता, और एड्रेस सक्रियकर्ता की Nostr secret key से derive होता है।"
+          }
+        }
+      },
+      "comparison": {
+        "footnote": "कैंपेन केवल सार्वजनिक, केवल साइलेंट, या दोनों स्वीकार कर सकते हैं। अगर दोनों, तो QR कोड दोनों endpoints रखता है। आपका वॉलेट वह चुनता है जिसका वह उपयोग कर सकता है।"
+      },
+      "publicVisible": {
+        "title": "सार्वजनिक डोनेशन हमेशा के लिए ऑन-चेन पर दिखते हैं",
+        "body": "एक **सार्वजनिक** डोनेशन कैंपेन से बंधे एक नियमित Bitcoin एड्रेस पर पहुँचता है। कोई भी एड्रेस देख सकता है और राशि, समय, और आपका भेजने वाला एड्रेस देख सकता है। **साइलेंट** डोनेशन भी ऑन-चेन सेटल होते हैं, लेकिन पाने वाला पक्ष कैंपेन से जुड़ने योग्य नहीं है इसलिए ये सार्वजनिक डोनर लिस्ट और कुल आँकड़ों से बाहर रहते हैं।"
+      },
+      "privacy": {
+        "heading": "निजी तौर पर डोनेट करना",
+        "intro": "ये कदम **सार्वजनिक** डोनेशन के लिए सबसे ज़्यादा मायने रखते हैं, जहाँ हर transaction स्थायी रूप से एक ही एड्रेस से बंधा होता है। **साइलेंट** डोनेशन पाने वाले पक्ष को पहले ही छुपा लेते हैं, इसलिए जोखिम कम है। आपके भेजने वाले वॉलेट का targeted विश्लेषण फिर भी दोनों तरीक़ों से संभव है, इसलिए अगर आपका जोखिम ऊँचा है तो ये कदम उठाने लायक़ हैं। एक चुनें, या उन्हें मिलाएँ।",
+        "options": {
+          "silentWallet": {
+            "name": "एक साइलेंट-पेमेंट वॉलेट इस्तेमाल करें",
+            "purpose": "एक Bitcoin वॉलेट से भुगतान करें जो BIP-352 सपोर्ट करता है। अगर कैंपेन साइलेंट पेमेंट स्वीकार करता है, तो आपका वॉलेट उस endpoint को अपने आप इस्तेमाल करता है।"
+          },
+          "nonKyc": {
+            "name": "Non-KYC Bitcoin ख़रीदें",
+            "purpose": "Bitcoin को peer-to-peer ख़रीदें ताकि यह पहले से आपके सरकारी ID से बंधा न हो। सबसे मज़बूत प्राइवेसी की शुरुआत।"
+          },
+          "coinjoin": {
+            "name": "पहले coinjoin करें",
+            "purpose": "अपने Bitcoin को दूसरों के coins के साथ मिलाएँ ताकि output को आपकी KYC ख़रीद से trace न किया जा सके। तब उपयोगी जब कैंपेन केवल सार्वजनिक स्वीकार करता है।"
+          },
+          "freshWallet": {
+            "name": "एक नया वॉलेट इस्तेमाल करें",
+            "purpose": "एक ऐसे वॉलेट से डोनेट करें जिसने कभी आपकी मुख्य पहचान या एक KYC एक्सचेंज को न छुआ हो।"
+          }
+        }
+      },
+      "consumerApps": {
+        "title": "उपभोक्ता ऐप आपको गुमनाम नहीं बना सकते",
+        "body": "Cash App, Coinbase, Strike, Venmo, Kraken, Binance, और PayPal सब आपकी ID सत्यापित करते हैं। आप डोनेशन कैसे भी भेजें, हर transaction आपकी असली पहचान से बँधा रहता है। एक ऐसा non-custodial वॉलेट इस्तेमाल करें जिसे आप नियंत्रित करते हैं।"
+      },
+      "silentToday": {
+        "heading": "आज साइलेंट पेमेंट पर एक टिप्पणी",
+        "paragraphs": [
+          "साइलेंट पेमेंट Bitcoin को ऑन-चेन पर पाने का सबसे निजी तरीक़ा है, लेकिन ecosystem नया है। सबसे लोकप्रिय वॉलेट अभी साइलेंट-पेमेंट endpoint पर नहीं भेज सकते, इसलिए जब वॉलेट नहीं कर सकता, तो डोनेशन एक नियमित Bitcoin transaction के तौर पर कैंपेन के सार्वजनिक एड्रेस पर वापस चला जाता है (अगर कैंपेन दोनों स्वीकार करता है)।",
+          "सक्रियकर्ताओं के लिए, साइलेंट-पेमेंट डोनेशन push नोटिफिकेशन के बिना भी पहुँचते हैं और तभी दिखते हैं जब सक्रियकर्ता अपना वॉलेट scan करता है, जिसमें मिनटों से घंटों तक लग सकते हैं। इनमें से कुछ भी आपके फंड की सुरक्षा को प्रभावित नहीं करता; बस अनुभव को आकार देता है।"
+        ]
+      }
+    },
+    "activist": {
+      "tldr": {
+        "lede": "कैंपेन बनाते समय चुनें क्या स्वीकार करें: सार्वजनिक, साइलेंट, या दोनों। दोनों विकल्प non-custodial हैं। {{appName}} आपके फंड को कभी नहीं रखता।",
+        "nextActions": [
+          "दोनों विकल्पों की तुलना करें",
+          "तय करें कैश आउट कैसे करेंगे",
+          "फंड को तुरंत sweep करें"
+        ]
+      },
+      "howReceiving": {
+        "heading": "पाना कैसे काम करता है",
+        "paragraphs": [
+          "आपके {{appName}} डोनेशन एड्रेस आपकी Nostr secret key (nsec) से derive होते हैं — वही key जिससे आप साइन इन करते हैं आपके Bitcoin वॉलेट को seed करती है। जब आप कैंपेन बनाते हैं, तो आप चुनते हैं क्या स्वीकार करना है:",
+          "**केवल सार्वजनिक भुगतान।** एक नियमित Bitcoin एड्रेस। सबको दिखता है, हर वॉलेट के साथ काम करता है।",
+          "**केवल साइलेंट पेमेंट।** BIP-352 साइलेंट पेमेंट। पाने वाला पक्ष ऑन-चेन पर न जोड़े जा सकने वाला है, इसलिए डोनेशन सार्वजनिक डोनर लिस्ट और कुल आँकड़ों से बाहर रहते हैं। डोनर को भेजने के लिए साइलेंट-पेमेंट-सक्षम वॉलेट चाहिए। अगर उनके पास नहीं है, तो उनका डोनेशन नहीं हो सकता।",
+          "**दोनों।** {{appName}} एक ही QR कोड बनाता है जो दोनों endpoints encode करता है। साइलेंट-पेमेंट वॉलेट इसे निजी के तौर पर पढ़ते हैं; सामान्य वॉलेट सार्वजनिक एड्रेस पर भुगतान करते हैं। डोनर को चुनना नहीं पड़ता।",
+          "दोनों को स्वीकार करना आमतौर पर सही फ़ैसला है: आपको उन समर्थकों से निजी डोनेशन मिलते हैं जो साइलेंट-पेमेंट वॉलेट इस्तेमाल करते हैं, और आप उन डोनरों के लिए खुले रहते हैं जिनका Bitcoin केवल किसी उपभोक्ता ऐप में है।"
+        ]
+      },
+      "whatEveryoneSees": {
+        "heading": "हर कोई क्या देख सकता है",
+        "paragraphs": [
+          "अगर आपका कैंपेन सार्वजनिक भुगतान स्वीकार करता है, तो आपका समर्थन करने पर विचार करने वाला कोई भी एड्रेस देख सकता है और सार्वजनिक डोनेशन इतिहास देख सकता है।",
+          "साइलेंट-पेमेंट डोनेशन उस रिकॉर्ड का हिस्सा नहीं हैं। ये बाहर के observers को नहीं दिखते और कैंपेन के सार्वजनिक कुल में नहीं दिखते; नए डोनर केवल वही देखते हैं जो आप कैंपेन की प्रगति के बारे में पब्लिश करते हैं।"
+        ]
+      },
+      "comparison": {
+        "footnote": "एक कैंपेन के स्वीकृत भुगतान विकल्प बनने के बाद बदले नहीं जा सकते। अगर आपका मन बदले, तो एक नया कैंपेन बनाएँ।"
+      },
+      "silentToday": {
+        "heading": "आज साइलेंट पेमेंट पर एक टिप्पणी",
+        "paragraphs": [
+          "साइलेंट पेमेंट Bitcoin को ऑन-चेन पर पाने का सबसे निजी तरीक़ा है, लेकिन ecosystem नया है। सबसे लोकप्रिय वॉलेट अभी साइलेंट-पेमेंट endpoint पर नहीं भेज सकते, इसलिए जब किसी डोनर का वॉलेट नहीं कर सकता, तो डोनेशन एक नियमित Bitcoin transaction के तौर पर आपके सार्वजनिक एड्रेस पर वापस चला जाता है (अगर आप दोनों स्वीकार करते हैं)।",
+          "साइलेंट-पेमेंट डोनेशन push नोटिफिकेशन के बिना पहुँचते हैं और तभी दिखते हैं जब आप अपना वॉलेट scan करते हैं, जिसमें मिनटों से घंटों तक लग सकते हैं। इनमें से कुछ भी आपके फंड की सुरक्षा को प्रभावित नहीं करता; बस रोज़मर्रा के अनुभव को आकार देता है।"
+        ]
+      },
+      "movePromptly": {
+        "heading": "डोनेशन को तुरंत आगे बढ़ाएँ",
+        "steps": {
+          "sweep": {
+            "title": "एक ऐसे वॉलेट पर sweep करें जिसे आप नियंत्रित करते हैं",
+            "body": "अच्छे self-custody विकल्प: [Sparrow](https://sparrowwallet.com), [BlueWallet](https://bluewallet.io), या [Phoenix](https://phoenix.acinq.co) (Lightning)।"
+          },
+          "dontSit": {
+            "title": "कैंपेन एड्रेस पर फंड न बैठने दें",
+            "body": "इसे एक mailbox की तरह समझें, बचत खाता नहीं। यह सार्वजनिक और साइलेंट दोनों डोनेशन पर लागू होता है।"
+          }
+        }
+      },
+      "cashout": {
+        "heading": "निजी तौर पर कैश आउट करना",
+        "intro": "ऑन-चेन ख़र्च करने से एक सिलसिला बनता है जब तक आप उसे पहले न तोड़ें। सबसे सरल प्राइवेसी निकास है **पहले फंड को साइलेंट-पेमेंट वॉलेट में ले जाना**, फिर आगे ख़र्च करना; यह छलाँग आपके कैंपेन एड्रेस और उसके बाद आने वाले के बीच का संबंध तोड़ देती है। नीचे के अन्य विकल्प भी काम करते हैं और उनके अपने समझौते हैं।",
+        "options": {
+          "silentHop": {
+            "name": "साइलेंट-पेमेंट वॉलेट छलाँग",
+            "purpose": "अपने डोनेशन को एक साइलेंट-पेमेंट वॉलेट ([Ditto Wallet](https://ditto.pub), [Dana](https://github.com/cygnet3/dana/releases/download/v0.7.4/app-live-release.apk)) पर ले जाएँ। वहाँ से आपका आगे का ख़र्च कैंपेन से नहीं बँधा होता।"
+          },
+          "lightningSwap": {
+            "name": "Lightning swap",
+            "purpose": "ऑन-चेन Bitcoin को Lightning में atomic-swap करें। Lightning भुगतान सार्वजनिक ब्लॉकचेन पर नहीं दिखते।"
+          },
+          "coinjoin": {
+            "name": "Coinjoin",
+            "purpose": "अपने Bitcoin को दूसरे यूज़र के coins के साथ मिलाएँ ताकि output को input से वापस न जोड़ा जा सके।"
+          },
+          "peerToPeer": {
+            "name": "Peer-to-peer",
+            "purpose": "Bisq, HodlHodl, या RoboSats पर किसी और व्यक्ति या broker के साथ सीधे Bitcoin को fiat में बदलें।"
+          },
+          "spendDirectly": {
+            "name": "इसे सीधे ख़र्च करें",
+            "purpose": "Bitcoin से सीधे gift cards (Amazon, Uber, ग्रोसरी, यात्रा) ख़रीदें बिना पहले cash में बदले।"
+          }
+        }
+      },
+      "tumblers": {
+        "title": "केंद्रीकृत tumblers से बचें",
+        "body": "Custodial mixers आपके coins चुरा सकते हैं, log कर सकते हैं कि किसने क्या भेजा, या क़ानून-प्रवर्तन के honeypots निकल सकते हैं। इसके बजाय एक साइलेंट-पेमेंट छलाँग या एक non-custodial coinjoin इस्तेमाल करें।"
+      }
+    }
+  }
+}

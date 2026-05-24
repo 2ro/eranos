@@ -9,7 +9,7 @@ import { parseATagCoordinate } from '@/lib/nostrEvents';
 import { toast } from '@/hooks/useToast';
 
 /** NIP-51 Communities list — kind 10004. */
-export const COMMUNITIES_LIST_KIND = 10004;
+const COMMUNITIES_LIST_KIND = 10004;
 
 const HEX_PUBKEY_RE = /^[0-9a-f]{64}$/i;
 

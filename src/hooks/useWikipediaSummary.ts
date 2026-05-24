@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 
-export interface WikipediaSummary {
+interface WikipediaSummary {
   /** Page title. */
   title: string;
   /** Short plain-text extract (first paragraph). */

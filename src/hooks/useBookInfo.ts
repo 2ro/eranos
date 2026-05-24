@@ -24,7 +24,7 @@ const _OpenLibraryBookSchema = z.object({
   })).optional(),
 });
 
-export type BookInfo = z.infer<typeof _OpenLibraryBookSchema>;
+type BookInfo = z.infer<typeof _OpenLibraryBookSchema>;
 
 async function fetchBookInfo(isbn: string, signal?: AbortSignal): Promise<BookInfo | null> {
   try {

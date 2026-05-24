@@ -114,10 +114,10 @@ function isValidCompressedPoint(bytes: Uint8Array): boolean {
 // ---------------------------------------------------------------------------
 
 /** Network of a silent payment address. */
-export type SilentPaymentNetwork = 'mainnet' | 'testnet';
+type SilentPaymentNetwork = 'mainnet' | 'testnet';
 
 /** A decoded silent payment address. */
-export interface DecodedSilentPaymentAddress {
+interface DecodedSilentPaymentAddress {
   /** Bech32m HRP. `"sp"` for mainnet, `"tsp"` for testnet/signet/regtest. */
   hrp: string;
   network: SilentPaymentNetwork;
@@ -281,7 +281,7 @@ export interface SilentPaymentInput {
 }
 
 /** A single resolved silent payment recipient. */
-export interface SilentPaymentRecipient {
+interface SilentPaymentRecipient {
   /** Decoded silent payment address. */
   address: DecodedSilentPaymentAddress;
   /** Original raw address string (for diagnostics / receipts). */
@@ -472,4 +472,5 @@ export function bip86TweakedPrivateKey(child: Uint8Array): Uint8Array {
 // The `scalarBytes` helper is exported for the SP spend path, which needs
 // to combine `b_spend` and `t_k` into a single signing scalar.
 export { scalarBytes as encodeScalar };
+
 export { SECP_N };

@@ -1,5 +1,6 @@
 import { useSeoMeta } from '@unhead/react';
 import { Monitor, Moon, Sun } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { PageHeader } from '@/components/PageHeader';
 import { useAppContext } from '@/hooks/useAppContext';
 import { useTheme } from '@/hooks/useTheme';
@@ -8,42 +9,40 @@ import type { Theme } from '@/contexts/AppContext';
 
 interface ThemeOption {
   value: Theme;
-  label: string;
-  description: string;
+  labelKey: string;
+  descriptionKey: string;
   icon: React.ReactNode;
 }
 
 const themeOptions: ThemeOption[] = [
   {
     value: 'system',
-    label: 'System',
-    description: 'Follows your device setting',
+    labelKey: 'settings.appearance.system',
+    descriptionKey: 'settings.appearance.systemDesc',
     icon: <Monitor className="size-5" />,
   },
   {
     value: 'light',
-    label: 'Light',
-    description: 'Always use light mode',
+    labelKey: 'settings.appearance.light',
+    descriptionKey: 'settings.appearance.lightDesc',
     icon: <Sun className="size-5" />,
   },
   {
     value: 'dark',
-    label: 'Dark',
-    description: 'Always use dark mode',
+    labelKey: 'settings.appearance.dark',
+    descriptionKey: 'settings.appearance.darkDesc',
     icon: <Moon className="size-5" />,
   },
 ];
 
 export function AppearanceSettingsPage() {
+  const { t } = useTranslation();
   const { config } = useAppContext();
   const { theme, setTheme } = useTheme();
 
-  // Treat "custom" as "system" for display since we're simplifying to 3 options
-  const activeTheme = theme === 'custom' ? 'system' : theme;
-
   useSeoMeta({
-    title: `Appearance | Settings | ${config.appName}`,
-    description: 'Choose between system, light, and dark mode',
+    title: `${t('settings.appearance.title')} | ${t('settings.title')} | ${config.appName}`,
+    description: t('settings.appearance.subtitle'),
   });
 
   return (
@@ -53,9 +52,9 @@ export function AppearanceSettingsPage() {
         alwaysShowBack
         titleContent={
           <div className="flex-1 min-w-0">
-            <h1 className="text-xl font-bold">Appearance</h1>
+            <h1 className="text-xl font-bold">{t('settings.appearance.title')}</h1>
             <p className="text-sm text-muted-foreground mt-0.5">
-              Choose how the app looks.
+              {t('settings.appearance.subtitle')}
             </p>
           </div>
         }
@@ -64,9 +63,9 @@ export function AppearanceSettingsPage() {
       <div className="p-4">
         {/* Intro */}
         <div className="px-3 pt-2 pb-6">
-          <h2 className="text-sm font-semibold">Color Mode</h2>
+          <h2 className="text-sm font-semibold">{t('settings.appearance.colorMode')}</h2>
           <p className="text-xs text-muted-foreground mt-1 leading-relaxed">
-            Pick your preferred color mode. System will automatically match your device's light or dark setting.
+            {t('settings.appearance.intro')}
           </p>
         </div>
 
@@ -79,7 +78,7 @@ export function AppearanceSettingsPage() {
               className={cn(
                 'w-full flex items-center gap-4 px-4 py-3.5 rounded-xl border-2 transition-all duration-200',
                 'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
-                activeTheme === option.value
+                theme === option.value
                   ? 'border-primary bg-primary/5 shadow-sm'
                   : 'border-border/50 hover:border-primary/40 hover:bg-muted/30',
               )}
@@ -87,7 +86,7 @@ export function AppearanceSettingsPage() {
               <div
                 className={cn(
                   'flex items-center justify-center size-10 rounded-lg transition-colors',
-                  activeTheme === option.value
+                  theme === option.value
                     ? 'bg-primary text-primary-foreground'
                     : 'bg-muted text-muted-foreground',
                 )}
@@ -97,15 +96,15 @@ export function AppearanceSettingsPage() {
               <div className="flex-1 text-left min-w-0">
                 <p className={cn(
                   'text-sm font-semibold',
-                  activeTheme === option.value ? 'text-foreground' : 'text-foreground',
+                  theme === option.value ? 'text-foreground' : 'text-foreground',
                 )}>
-                  {option.label}
+                  {t(option.labelKey)}
                 </p>
                 <p className="text-xs text-muted-foreground mt-0.5">
-                  {option.description}
+                  {t(option.descriptionKey)}
                 </p>
               </div>
-              {activeTheme === option.value && (
+              {theme === option.value && (
                 <div className="size-2.5 rounded-full bg-primary shrink-0 animate-in fade-in zoom-in duration-200" />
               )}
             </button>

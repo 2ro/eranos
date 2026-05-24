@@ -1,58 +1,33 @@
 // Reads the saved theme from localStorage and applies it to <html> and the
 // preloader background before first paint. Runs as a blocking <script> so
 // there's no flash of the wrong theme.
+//
+// Agora's colors are hardcoded in src/index.css via :root {} and .dark {}
+// blocks. There is no custom-theme branch; the only thing this script
+// does is set the right class on <html> and paint the preloader with the
+// matching background + primary color so the page doesn't flash white
+// in dark mode (or vice versa) before the React bundle boots.
+//
+// The colors below MUST stay in sync with the values in src/index.css.
 (function () {
-  // Builtin themes — must match builtinThemes in src/themes.ts
   var builtins = {
-    dark:  { bg: 'hsl(0 0% 10%)', primary: 'hsl(15 90% 52%)' },
-    light: { bg: 'hsl(0 0% 100%)', primary: 'hsl(15 90% 48%)' }
+    dark:  { bg: 'hsl(0 0% 10%)',  primary: 'hsl(24 100% 50%)' },
+    light: { bg: 'hsl(0 0% 100%)', primary: 'hsl(24 100% 50%)' }
   };
 
-  var theme = 'dark';
-  var colors = builtins.dark;
-  var cfg;
+  var theme = 'system';
   try {
-    cfg = JSON.parse(localStorage.getItem('nostr:app-config') || '{}');
-    if (cfg.theme) theme = cfg.theme;
+    var cfg = JSON.parse(localStorage.getItem('nostr:app-config') || '{}');
+    if (cfg.theme === 'dark' || cfg.theme === 'light' || cfg.theme === 'system') {
+      theme = cfg.theme;
+    }
   } catch (e) {}
 
-  // Resolve "system" to light or dark based on OS preference
   if (theme === 'system') {
     theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
   }
 
-  if (theme === 'custom') {
-    // Custom theme: read colors from customTheme.colors (ThemeConfig format)
-    try {
-      var ct = cfg && cfg.customTheme;
-      if (ct && ct.colors) {
-        var bg = ct.colors.background;
-        var pr = ct.colors.primary;
-        if (bg && pr) {
-          colors = { bg: 'hsl(' + bg + ')', primary: 'hsl(' + pr + ')' };
-        }
-      }
-    } catch (e) {}
-  } else if (theme === 'light' || theme === 'dark') {
-    // Check for configured theme overrides (ThemesConfig in cfg.themes)
-    try {
-      var themes = cfg && cfg.themes;
-      if (themes && themes[theme] && themes[theme].colors) {
-        var tc = themes[theme].colors;
-        if (tc.background && tc.primary) {
-          colors = { bg: 'hsl(' + tc.background + ')', primary: 'hsl(' + tc.primary + ')' };
-        } else {
-          colors = builtins[theme];
-        }
-      } else {
-        colors = builtins[theme];
-      }
-    } catch (e) {
-      colors = builtins[theme];
-    }
-  } else {
-    colors = builtins.dark;
-  }
+  var colors = builtins[theme] || builtins.dark;
 
   document.documentElement.className = theme;
   document.body.style.background = colors.bg;

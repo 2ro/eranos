@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 
-export interface RelayInfoDocument {
+interface RelayInfoDocument {
   name?: string;
   description?: string;
   icon?: string;

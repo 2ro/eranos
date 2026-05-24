@@ -28,6 +28,7 @@ import { genUserName } from '@/lib/genUserName';
 import { VerifiedNip05Text } from '@/components/Nip05Badge';
 import { parseBadgeDefinition } from '@/lib/parseBadgeDefinition';
 import { useCardTilt } from '@/hooks/useCardTilt';
+import { useImageProxy } from '@/hooks/useImageProxy';
 import { useProfileUrl } from '@/hooks/useProfileUrl';
 import { AwardBadgeDialog } from '@/components/AwardBadgeDialog';
 import { NoteMoreMenu } from '@/components/NoteMoreMenu';
@@ -497,12 +498,21 @@ function BadgeHero({ heroImage, badgeName }: { heroImage: string; badgeName: str
   const tilt = useCardTilt(30, 1.06);
   const glareRef = useRef<HTMLDivElement>(null);
   const glareFadeTimerRef = useRef<ReturnType<typeof setTimeout>>(undefined);
+  const proxy = useImageProxy();
+  const [proxyFailed, setProxyFailed] = useState(false);
+
+  // Proxy at 320 — rendered `size-36` is 144px, 2× DPR = 288. Round up.
+  // Mask URL and <img> src must match; both follow the same fallback path
+  // so the glare overlay always clips to the visible image.
+  const proxied = proxy(heroImage, 320);
+  const usingProxy = proxied !== heroImage;
+  const displaySrc = proxyFailed || !usingProxy ? heroImage : proxied;
 
   // Mask string that clips overlays to the badge image's visible pixels.
   // This ensures glare and edge effects don't paint over transparent areas.
   const imageMask: React.CSSProperties = {
-    maskImage: `url(${heroImage})`,
-    WebkitMaskImage: `url(${heroImage})`,
+    maskImage: `url(${displaySrc})`,
+    WebkitMaskImage: `url(${displaySrc})`,
     maskSize: 'cover',
     WebkitMaskSize: 'cover',
     maskRepeat: 'no-repeat',
@@ -614,11 +624,14 @@ function BadgeHero({ heroImage, badgeName }: { heroImage: string; badgeName: str
         className="relative select-none"
       >
         <img
-          src={heroImage}
+          src={displaySrc}
           alt={badgeName}
           className="size-36 object-cover drop-shadow-lg"
           loading="lazy"
           draggable={false}
+          onError={() => {
+            if (usingProxy && !proxyFailed) setProxyFailed(true);
+          }}
         />
         {/* Specular glare overlay — masked to the image's alpha channel */}
         <div

@@ -9,7 +9,7 @@ import { sendToInboxRelays } from "@/lib/inboxRelays";
 import type { NostrEvent } from "@nostrify/nostrify";
 
 /** Event template accepted by `useNostrPublish`. */
-export type EventTemplate = Omit<NostrEvent, 'id' | 'pubkey' | 'sig'> & {
+type EventTemplate = Omit<NostrEvent, 'id' | 'pubkey' | 'sig'> & {
   /**
    * The previous version of the event being replaced (for replaceable/addressable kinds).
    * When provided, `published_at` from the old event is preserved on the new one.

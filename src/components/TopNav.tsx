@@ -1,5 +1,6 @@
 import { useState, type ComponentType } from 'react';
 import { Link, NavLink, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import {
   Activity,
   Bell,
@@ -26,7 +27,8 @@ import { useFeedSettings } from '@/hooks/useFeedSettings';
 import { cn } from '@/lib/utils';
 
 interface NavItem {
-  label: string;
+  /** i18n key under `nav.*` for the label. */
+  labelKey: string;
   to: string;
   icon: ComponentType<{ className?: string }>;
   /** If true, this link is treated as active only on an exact match. */
@@ -34,10 +36,10 @@ interface NavItem {
 }
 
 const NAV_ITEMS: NavItem[] = [
-  { label: 'Activity', to: '/feed', icon: Activity },
-  { label: 'Campaigns', to: '/campaigns/all', icon: HandHeart },
-  { label: 'Groups', to: '/groups', icon: Users },
-  { label: 'Pledge', to: '/pledges', icon: Megaphone },
+  { labelKey: 'nav.activity', to: '/feed', icon: Activity },
+  { labelKey: 'nav.campaigns', to: '/campaigns/all', icon: HandHeart },
+  { labelKey: 'nav.groups', to: '/groups', icon: Users },
+  { labelKey: 'nav.pledge', to: '/pledges', icon: Megaphone },
 ];
 
 interface MobileLinkItem extends NavItem {
@@ -51,6 +53,7 @@ interface MobileLinkItem extends NavItem {
  * menu below the `md` breakpoint.
  */
 export function TopNav() {
+  const { t } = useTranslation();
   const { config } = useAppContext();
   const { user } = useCurrentUser();
   const { orderedItems } = useFeedSettings();
@@ -67,7 +70,7 @@ export function TopNav() {
           type="button"
           onClick={() => setMobileOpen(true)}
           className="md:hidden -ml-2 p-2 rounded-full hover:bg-secondary motion-safe:transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
-          aria-label="Open menu"
+          aria-label={t('nav.openMenu')}
         >
           <Menu className="size-5" />
         </button>
@@ -76,7 +79,7 @@ export function TopNav() {
         <Link
           to="/"
           className="flex items-center gap-2 font-bold text-lg tracking-tight text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded-md px-1"
-          aria-label={`${config.appName} home`}
+          aria-label={t('nav.brandHome', { appName: config.appName })}
         >
           <LogoIcon className="size-6" />
           <span>{config.appName}</span>
@@ -99,8 +102,8 @@ export function TopNav() {
             type="button"
             onClick={goToSearch}
             className="shrink-0 size-9 rounded-full flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-secondary motion-safe:transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
-            aria-label="Search"
-            title="Search"
+            aria-label={t('nav.search')}
+            title={t('nav.search')}
           >
             <Search className="size-5" />
           </button>
@@ -127,7 +130,7 @@ export function TopNav() {
             <button
               onClick={() => setMobileOpen(false)}
               className="p-1.5 -mr-1.5 rounded-full hover:bg-secondary"
-              aria-label="Close menu"
+              aria-label={t('nav.closeMenu')}
             >
               <X className="size-5" />
             </button>
@@ -152,6 +155,7 @@ export function TopNav() {
 }
 
 function NavLinkButton({ item }: { item: NavItem }) {
+  const { t } = useTranslation();
   return (
     <NavLink
       to={item.to}
@@ -165,16 +169,17 @@ function NavLinkButton({ item }: { item: NavItem }) {
         )
       }
     >
-      {item.label}
+      {t(item.labelKey)}
     </NavLink>
   );
 }
 
 function MobileFooterLinks({ onClose }: { onClose: () => void }) {
+  const { t } = useTranslation();
   const items = [
-    { label: 'Privacy', to: '/privacy' },
-    { label: 'Safety', to: '/safety' },
-    { label: 'Changelog', to: '/changelog' },
+    { labelKey: 'nav.privacy', to: '/privacy' },
+    { labelKey: 'nav.safety', to: '/safety' },
+    { labelKey: 'nav.changelog', to: '/changelog' },
   ];
 
   return (
@@ -186,7 +191,7 @@ function MobileFooterLinks({ onClose }: { onClose: () => void }) {
           onClick={onClose}
           className="hover:text-foreground motion-safe:transition-colors"
         >
-          {item.label}
+          {t(item.labelKey)}
         </Link>
       ))}
     </nav>
@@ -203,18 +208,19 @@ function getProfileMenuItems({
   if (!userPubkey) return [];
 
   return [
-    ...(showDashboard ? [{ label: 'Dashboard', to: '/dashboard', icon: Activity }] : []),
-    { label: 'My Dashboard', to: '/my-dashboard', icon: LayoutDashboard },
-    { label: 'Wallet', to: '/wallet', icon: Wallet },
-    { label: 'Notifications', to: '/notifications', icon: Bell },
-    { label: 'Profile', to: `/${nip19.npubEncode(userPubkey)}`, icon: User },
-    { label: 'Search', to: '/search', icon: Search },
-    { label: 'Settings', to: '/settings', icon: Settings },
-    { label: 'About', to: '/about', icon: Info },
+    ...(showDashboard ? [{ labelKey: 'nav.dashboard', to: '/dashboard', icon: Activity }] : []),
+    { labelKey: 'nav.myDashboard', to: '/my-dashboard', icon: LayoutDashboard },
+    { labelKey: 'nav.wallet', to: '/wallet', icon: Wallet },
+    { labelKey: 'nav.notifications', to: '/notifications', icon: Bell },
+    { labelKey: 'nav.profile', to: `/${nip19.npubEncode(userPubkey)}`, icon: User },
+    { labelKey: 'nav.search', to: '/search', icon: Search },
+    { labelKey: 'nav.settings', to: '/settings', icon: Settings },
+    { labelKey: 'nav.about', to: '/about', icon: Info },
   ];
 }
 
 function MobileLinkList({ items, onClose }: { items: MobileLinkItem[]; onClose: () => void }) {
+  const { t } = useTranslation();
   if (items.length === 0) return null;
 
   return (
@@ -235,7 +241,7 @@ function MobileLinkList({ items, onClose }: { items: MobileLinkItem[]; onClose: 
             }
           >
             <item.icon className="size-4 shrink-0" />
-            {item.label}
+            {t(item.labelKey)}
           </NavLink>
         </li>
       ))}

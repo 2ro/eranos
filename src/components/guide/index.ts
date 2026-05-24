@@ -8,6 +8,5 @@ export { CalloutCard } from './CalloutCard';
 export { GuideProse } from './GuideProse';
 export { GuideSteps } from './GuideSteps';
 export { GuideTLDR } from './GuideTLDR';
-export { InlinePaymentBadge } from './InlinePaymentBadge';
 export { OptionGrid } from './OptionGrid';
 export { PaymentComparisonTable } from './PaymentComparisonTable';

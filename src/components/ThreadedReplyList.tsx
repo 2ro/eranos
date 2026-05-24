@@ -115,7 +115,7 @@ function ExpandThreadButton({ count, onClick, isLast }: { count: number; onClick
 
 // ── Flat interface (for pages that don't need full threading) ──
 
-export interface ThreadedReply {
+interface ThreadedReply {
   reply: NostrEvent;
   firstSubReply?: NostrEvent;
 }

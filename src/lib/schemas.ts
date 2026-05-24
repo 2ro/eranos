@@ -1,116 +1,18 @@
 import { z } from 'zod';
 
 import type { Theme, ContentWarningPolicy } from '@/contexts/AppContext';
-import type { CoreThemeColors, ThemeConfig, ThemesConfig } from '@/themes';
 
 // ─── Theme Schemas ───────────────────────────────────────────────────
 
 /** Zod schema for Theme validation */
-export const ThemeSchema = z.enum(['dark', 'light', 'system', 'custom']) satisfies z.ZodType<Theme>;
-
-
-/** HSL value string like "258 70% 55%" */
-const HslValue = z.string().regex(/^\d/);
-
-/** Zod schema for CoreThemeColors (the 3 core colors) */
-export const CoreThemeColorsSchema = z.object({
-  background: HslValue,
-  text: HslValue,
-  primary: HslValue,
-}) satisfies z.ZodType<CoreThemeColors>;
-
-/**
- * Legacy schema that accepts the old 19-token ThemeTokens format.
- * Used for backward compatibility when reading old configs/events.
- * Extracts core colors from legacy format.
- */
-export const LegacyThemeTokensSchema = z.object({
-  background: HslValue,
-  foreground: HslValue,
-  primary: HslValue,
-}).passthrough();
-
-/**
- * Legacy schema that accepts the old 4-color format (with secondary).
- * Strips the secondary field and normalizes to CoreThemeColors.
- */
-export const LegacyFourColorSchema = z.object({
-  background: HslValue,
-  text: HslValue,
-  primary: HslValue,
-  secondary: HslValue,
-}).transform(({ background, text, primary }): CoreThemeColors => ({
-  background,
-  text,
-  primary,
-}));
-
-/**
- * Schema that accepts CoreThemeColors, legacy 4-color, or legacy ThemeTokens,
- * always normalizing to CoreThemeColors.
- */
-export const ThemeColorsCompatSchema = z.union([
-  CoreThemeColorsSchema,
-  LegacyFourColorSchema,
-  LegacyThemeTokensSchema.transform((legacy): CoreThemeColors => ({
-    background: legacy.background,
-    text: legacy.foreground,
-    primary: legacy.primary,
-  })),
-]);
-
-// ─── ThemeConfig Schemas ──────────────────────────────────────────────
-
-/** Zod schema for ThemeFont */
-export const ThemeFontSchema = z.object({
-  family: z.string(),
-  // Reject non-URL strings at the schema layer. Downstream consumers still
-  // run the value through \`sanitizeUrl()\` to enforce \`https:\` and strip
-  // \`javascript:\`/\`data:\` URIs before use — this is defense-in-depth.
-  url: z.url().optional(),
-});
-
-/** Zod schema for ThemeBackground */
-export const ThemeBackgroundSchema = z.object({
-  url: z.url(),
-  mode: z.enum(['cover', 'tile']).optional(),
-  dimensions: z.string().optional(),
-  mimeType: z.string().optional(),
-  blurhash: z.string().optional(),
-});
-
-/** Zod schema for the full ThemeConfig */
-export const ThemeConfigSchema = z.object({
-  title: z.string().optional(),
-  colors: CoreThemeColorsSchema,
-  font: ThemeFontSchema.optional(),
-  titleFont: ThemeFontSchema.optional(),
-  background: ThemeBackgroundSchema.optional(),
-});
-
-/** Zod schema for ThemesConfig (light + dark theme configs) */
-export const ThemesConfigSchema = z.object({
-  light: z.lazy(() => ThemeConfigSchema),
-  dark: z.lazy(() => ThemeConfigSchema),
-}) satisfies z.ZodType<ThemesConfig>;
-
-/**
- * Compat schema that accepts either the new ThemeConfig format or the old
- * bare CoreThemeColors format (and all legacy color variants), normalizing
- * to ThemeConfig.
- */
-export const ThemeConfigCompatSchema = z.union([
-  ThemeConfigSchema,
-  // Bare CoreThemeColors (old format) → wrap in ThemeConfig
-  ThemeColorsCompatSchema.transform((colors): ThemeConfig => ({ colors })),
-]);
+const ThemeSchema = z.enum(['dark', 'light', 'system']) satisfies z.ZodType<Theme>;
 
 /** Zod schema for ContentWarningPolicy validation */
-export const ContentWarningPolicySchema = z.enum(['blur', 'hide', 'show']) satisfies z.ZodType<ContentWarningPolicy>;
+const ContentWarningPolicySchema = z.enum(['blur', 'hide', 'show']) satisfies z.ZodType<ContentWarningPolicy>;
 
 // ─── Feed & Relay Schemas ────────────────────────────────────────────
 
-export const RelayMetadataSchema = z.object({
+const RelayMetadataSchema = z.object({
   relays: z.array(z.object({
     url: z.string().url(),
     read: z.boolean(),
@@ -120,7 +22,7 @@ export const RelayMetadataSchema = z.object({
 });
 
 /** Zod schema for BlossomServerMetadata (BUD-03 kind 10063 server list). */
-export const BlossomServerMetadataSchema = z.object({
+const BlossomServerMetadataSchema = z.object({
   servers: z.array(z.string().url()),
   updatedAt: z.number(),
 });
@@ -132,7 +34,7 @@ export const BlossomServerMetadataSchema = z.object({
  * Uses looseObject to preserve extra keys from newer encrypted settings.
  * Missing fields get filled in by the defaultConfig merge downstream.
  */
-export const FeedSettingsSchema = z.looseObject({
+const FeedSettingsSchema = z.looseObject({
   feedIncludePosts: z.boolean().optional(),
   feedIncludeComments: z.boolean().optional(),
   feedIncludeReposts: z.boolean().optional(),
@@ -186,16 +88,16 @@ export const FeedSettingsSchema = z.looseObject({
 });
 
 /** Schema for a NIP-01 filter object (lenient — allows variable placeholder strings). */
-export const TabFilterSchema = z.record(z.string(), z.unknown());
+const TabFilterSchema = z.record(z.string(), z.unknown());
 
 /** Schema for a variable definition. */
-export const TabVarDefSchema = z.object({
+const TabVarDefSchema = z.object({
   name: z.string(),
   tagName: z.string(),
   pointer: z.string(),
 });
 
-export const SavedFeedSchema = z.object({
+const SavedFeedSchema = z.object({
   id: z.string(),
   label: z.string(),
   filter: TabFilterSchema,
@@ -207,9 +109,6 @@ export const SavedFeedSchema = z.object({
 
 /**
  * Zod schema for the full AppConfig stored in localStorage.
- *
- * Uses ThemeConfigCompatSchema for the customTheme field so legacy
- * 19-token color objects still parse successfully.
  */
 export const AppConfigSchema = z.object({
   appName: z.string().optional(),
@@ -220,8 +119,6 @@ export const AppConfigSchema = z.object({
   /** NIP-19 naddr1 string for the kind 31990 handler event. */
   client: z.string().startsWith('naddr1').optional(),
   theme: ThemeSchema,
-  customTheme: ThemeConfigCompatSchema.optional(),
-  themes: ThemesConfigSchema.optional(),
   relayMetadata: RelayMetadataSchema,
   useAppRelays: z.boolean(),
   useUserRelays: z.boolean(),
@@ -251,6 +148,8 @@ export const AppConfigSchema = z.object({
   ).optional().default([]),
   autoplayVideos: z.boolean(),
   imageQuality: z.enum(['compressed', 'original']),
+  imageProxy: z.string(),
+  lowBandwidthMode: z.boolean(),
   curatorPubkey: z.string().regex(/^[0-9a-f]{64}$/i).optional(),
   /**
    * Ordered list of Esplora REST roots tried in failover order. Accepts the
@@ -295,15 +194,10 @@ export const BuildConfigSchema = AppConfigSchema
 /** Inferred type for the build-time configuration. */
 export type BuildConfig = z.infer<typeof BuildConfigSchema>;
 
-/** @deprecated Use BuildConfigSchema instead. Kept for backwards compatibility. */
-export const DittoConfigSchema = BuildConfigSchema;
-/** @deprecated Use BuildConfig instead. Kept for backwards compatibility. */
-export type DittoConfig = BuildConfig;
-
 // ─── Content Filter Schemas ──────────────────────────────────────────
 
 /** Zod schema for FilterRule validation */
-export const FilterRuleSchema = z.object({
+const FilterRuleSchema = z.object({
   type: z.enum(['kind', 'content-regex', 'tag', 'author-metadata']),
   field: z.string().optional(),
   operator: z.enum(['equals', 'contains', 'regex', 'not-equals', 'not-contains']),
@@ -312,7 +206,7 @@ export const FilterRuleSchema = z.object({
 });
 
 /** Zod schema for ContentFilter validation */
-export const ContentFilterSchema = z.object({
+const ContentFilterSchema = z.object({
   id: z.string(),
   name: z.string(),
   enabled: z.boolean(),
@@ -332,7 +226,6 @@ export const ContentFilterSchema = z.object({
  */
 export const EncryptedSettingsSchema = z.looseObject({
   theme: ThemeSchema.optional(),
-  customTheme: ThemeConfigCompatSchema.optional(),
   useAppRelays: z.boolean().optional(),
   useUserRelays: z.boolean().optional(),
   feedSettings: FeedSettingsSchema.optional(),
@@ -367,6 +260,7 @@ export const EncryptedSettingsSchema = z.looseObject({
     nip05: z.record(z.string(), z.unknown()),
   }).optional(),
   autoplayVideos: z.boolean().optional(),
+  lowBandwidthMode: z.boolean().optional(),
   corsProxy: z.string().optional(),
   faviconUrl: z.string().optional(),
   linkPreviewUrl: z.string().optional(),

@@ -177,11 +177,6 @@ export function deriveReceiveAddress(account: HdAccount, index: number): Derived
   return deriveAddress(account.receiveNode, RECEIVE_CHAIN, index);
 }
 
-/** Convenience: derive a single change address at the given index. */
-export function deriveChangeAddress(account: HdAccount, index: number): DerivedAddress {
-  return deriveAddress(account.changeNode, CHANGE_CHAIN, index);
-}
-
 // ---------------------------------------------------------------------------
 // Signing keys
 // ---------------------------------------------------------------------------

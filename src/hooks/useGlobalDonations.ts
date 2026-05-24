@@ -1,7 +1,7 @@
 import { useNostr } from '@nostrify/react';
 import { useQuery } from '@tanstack/react-query';
 
-export interface GlobalDonationStats {
+interface GlobalDonationStats {
   /** Self-reported total satoshis across all kind 8333 receipts. */
   totalSats: number;
   /** Number of unique on-chain transactions counted. */

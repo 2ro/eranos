@@ -14,7 +14,7 @@ import {
 } from '@/lib/agoraModeration';
 
 /** Surface-scoped alias so call sites read naturally. */
-export type OrganizationModerationData = ModerationData;
+type OrganizationModerationData = ModerationData;
 
 /**
  * Fetches and folds organization-moderation label events authored by Team

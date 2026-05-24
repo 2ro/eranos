@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { ReactNode } from 'react';
 import { createPortal } from 'react-dom';
+import { useTranslation } from 'react-i18next';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useInView } from 'react-intersection-observer';
 import { useNostr } from '@nostrify/react';
@@ -19,6 +20,7 @@ import { ZapDialog } from '@/components/ZapDialog';
 import { ExternalFavicon } from '@/components/ExternalFavicon';
 import { VerifiedNip05Text } from '@/components/Nip05Badge';
 import { useAppContext } from '@/hooks/useAppContext';
+import { useImageProxy } from '@/hooks/useImageProxy';
 import { useAuthor } from '@/hooks/useAuthor';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useToast } from '@/hooks/useToast';
@@ -107,6 +109,7 @@ interface ProfileMoreMenuProps {
 }
 
 function ProfileMoreMenu({ pubkey, displayName, open, onOpenChange, isOwnProfile, authorEvent }: ProfileMoreMenuProps) {
+  const { t } = useTranslation();
   const { toast } = useToast();
   const { user } = useCurrentUser();
   const shareOrigin = useShareOrigin();
@@ -132,14 +135,14 @@ function ProfileMoreMenu({ pubkey, displayName, open, onOpenChange, isOwnProfile
 
   const handleCopyPubkey = () => {
     navigator.clipboard.writeText(npubEncoded);
-    toast({ title: 'Public key copied to clipboard' });
+    toast({ title: t('profile.toast.pubkeyCopied') });
     close();
   };
 
   const handleCopyLink = () => {
     const url = `${shareOrigin}/${npubEncoded}`;
     navigator.clipboard.writeText(url);
-    toast({ title: 'Profile link copied to clipboard' });
+    toast({ title: t('profile.toast.linkCopied') });
     close();
   };
 
@@ -148,10 +151,10 @@ function ProfileMoreMenu({ pubkey, displayName, open, onOpenChange, isOwnProfile
     const mutation = userMuted ? removeMute : addMute;
     mutation.mutate(muteItem, {
       onSuccess: () => {
-        toast({ title: userMuted ? `Unmuted @${displayName}` : `Muted @${displayName}` });
+        toast({ title: userMuted ? t('profile.toast.unmuted', { name: displayName }) : t('profile.toast.muted', { name: displayName }) });
       },
       onError: () => {
-        toast({ title: userMuted ? 'Failed to unmute user' : 'Failed to mute user', variant: 'destructive' });
+        toast({ title: userMuted ? t('profile.toast.unmuteFailed') : t('profile.toast.muteFailed'), variant: 'destructive' });
       },
     });
     close();
@@ -175,22 +178,22 @@ function ProfileMoreMenu({ pubkey, displayName, open, onOpenChange, isOwnProfile
   <>
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-md p-0 gap-0 rounded-2xl overflow-hidden [&>button]:hidden">
-        <DialogTitle className="sr-only">Profile options</DialogTitle>
+        <DialogTitle className="sr-only">{t('profile.moreMenu.title')}</DialogTitle>
 
         <div className="py-1">
           <MenuRow
             icon={<ClipboardCopy className="size-5" />}
-            label="Copy public key"
+            label={t('profile.moreMenu.copyPubkey')}
             onClick={handleCopyPubkey}
           />
           <MenuRow
             icon={<ClipboardCopy className="size-5" />}
-            label="Copy profile link"
+            label={t('profile.moreMenu.copyLink')}
             onClick={handleCopyLink}
           />
           <MenuRow
             icon={<ListPlus className="size-5" />}
-            label="Add to list"
+            label={t('profile.moreMenu.addToList')}
             onClick={handleAddToList}
           />
         </div>
@@ -202,12 +205,12 @@ function ProfileMoreMenu({ pubkey, displayName, open, onOpenChange, isOwnProfile
             <div className="py-1">
               <MenuRow
                 icon={<QrCode className="size-5" />}
-                label="Share follow link"
+                label={t('profile.moreMenu.shareFollowLink')}
                 onClick={handleFollowQR}
               />
               <MenuRow
                 icon={<RotateCcw className="size-5" />}
-                label="Profile recovery"
+                label={t('profile.moreMenu.profileRecovery')}
                 onClick={handleRecovery}
               />
             </div>
@@ -222,32 +225,32 @@ function ProfileMoreMenu({ pubkey, displayName, open, onOpenChange, isOwnProfile
               {showZap && (
                 <MenuRow
                   icon={<Zap className="size-5" />}
-                  label="Zap"
+                  label={t('profile.moreMenu.zap')}
                   onClick={handleZap}
                 />
               )}
               {user && (
                 <MenuRow
                   icon={<Award className="size-5" />}
-                  label="Award badge"
+                  label={t('profile.moreMenu.awardBadge')}
                   onClick={handleGiveBadge}
                 />
               )}
               {user && (
                 <MenuRow
                   icon={<Mail className="size-5" />}
-                  label="Write a letter"
+                  label={t('profile.moreMenu.writeLetter')}
                   onClick={handleWriteLetter}
                 />
               )}
               <MenuRow
                 icon={<VolumeX className="size-5" />}
-                label={userMuted ? `Unmute @${displayName}` : `Mute @${displayName}`}
+                label={userMuted ? t('profile.moreMenu.unmute', { name: displayName }) : t('profile.moreMenu.mute', { name: displayName })}
                 onClick={handleMuteUser}
               />
               <MenuRow
                 icon={<Flag className="size-5" />}
-                label={`Report @${displayName}`}
+                label={t('profile.moreMenu.report', { name: displayName })}
                 onClick={handleReport}
                 destructive
               />
@@ -263,7 +266,7 @@ function ProfileMoreMenu({ pubkey, displayName, open, onOpenChange, isOwnProfile
             className="w-full h-auto py-3 text-[15px] font-medium text-muted-foreground hover:bg-secondary/60 rounded-none"
             onClick={close}
           >
-            Close
+            {t('profile.moreMenu.close')}
           </Button>
         </div>
       </DialogContent>
@@ -383,13 +386,14 @@ interface FollowingListModalProps {
 }
 
 function FollowingListModal({ pubkeys, open, onOpenChange, displayName }: FollowingListModalProps) {
+  const { t } = useTranslation();
   const handleNavigate = useCallback(() => onOpenChange(false), [onOpenChange]);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-md p-0 gap-0 rounded-2xl overflow-hidden [&>button]:hidden">
         <div className="flex items-center justify-between px-4 py-3 border-b border-border">
-          <DialogTitle className="text-base font-bold">{displayName} follows</DialogTitle>
+          <DialogTitle className="text-base font-bold">{t('profile.followingModal.title', { name: displayName })}</DialogTitle>
           <Button
             variant="ghost"
             size="icon"
@@ -402,7 +406,7 @@ function FollowingListModal({ pubkeys, open, onOpenChange, displayName }: Follow
         <ScrollArea className="max-h-[60vh]">
           {pubkeys.length === 0 ? (
             <div className="py-12 text-center text-muted-foreground text-sm">
-              Not following anyone yet.
+              {t('profile.followingModal.empty')}
             </div>
           ) : (
             pubkeys.map((pk) => <FollowingUserRow key={pk} pubkey={pk} onNavigate={handleNavigate} />)
@@ -420,6 +424,7 @@ function FollowingListModal({ pubkeys, open, onOpenChange, displayName }: Follow
 // ----- Bitcoin QR Modal (mobile) -----
 
 function BitcoinQRModal({ address }: { address: string }) {
+  const { t } = useTranslation();
   const [qrUrl, setQrUrl] = useState('');
   const [copied, setCopied] = useState(false);
   const { toast } = useToast();
@@ -435,7 +440,7 @@ function BitcoinQRModal({ address }: { address: string }) {
   const handleCopy = async () => {
     await navigator.clipboard.writeText(address);
     setCopied(true);
-    toast({ title: 'Copied', description: 'Bitcoin address copied to clipboard' });
+    toast({ title: t('common.copied'), description: t('profile.toast.btcAddressCopied') });
     setTimeout(() => setCopied(false), 2000);
   };
 
@@ -447,14 +452,14 @@ function BitcoinQRModal({ address }: { address: string }) {
             <div className="size-7 rounded-full bg-orange-500 flex items-center justify-center shrink-0">
               <Bitcoin className="size-4 text-white" />
             </div>
-            <span>Bitcoin</span>
+            <span>{t('profile.bitcoinModal.title')}</span>
           </DialogTitle>
         </DialogHeader>
 
         <div className="flex justify-center my-5">
           <div className="bg-white p-3 rounded-xl">
             {qrUrl ? (
-              <img src={qrUrl} alt="Bitcoin QR" className="size-[220px]" />
+              <img src={qrUrl} alt={t('profile.bitcoinModal.qrAlt')} className="size-[220px]" />
             ) : (
               <div className="size-[220px] bg-muted animate-pulse rounded" />
             )}
@@ -515,6 +520,7 @@ function parseNostrUri(value: string): { type: 'note'; eventId: string } | { typ
 // ----- Inline Profile Field (mobile) -----
 
 function ProfileFieldInline({ field }: { field: { label: string; value: string } }) {
+  const { t } = useTranslation();
   const [copied, setCopied] = useState(false);
   const { toast } = useToast();
   const isBtc = field.label === '$BTC';
@@ -524,7 +530,7 @@ function ProfileFieldInline({ field }: { field: { label: string; value: string }
   const handleCopy = async () => {
     await navigator.clipboard.writeText(field.value);
     setCopied(true);
-    toast({ title: 'Copied', description: 'Bitcoin address copied to clipboard' });
+    toast({ title: t('common.copied'), description: t('profile.toast.btcAddressCopied') });
     setTimeout(() => setCopied(false), 2000);
   };
 
@@ -534,19 +540,19 @@ function ProfileFieldInline({ field }: { field: { label: string; value: string }
         <div className="size-5 rounded-full bg-orange-500 flex items-center justify-center shrink-0">
           <Bitcoin className="size-3 text-white" />
         </div>
-        <span className="text-sm font-semibold shrink-0">Bitcoin</span>
+        <span className="text-sm font-semibold shrink-0">{t('profile.bitcoinModal.title')}</span>
         <span className="text-sm text-muted-foreground font-mono truncate">{field.value.slice(0, 12)}…{field.value.slice(-6)}</span>
         <div className="flex items-center gap-1 shrink-0">
           <button
             onClick={handleCopy}
             className="p-1 rounded hover:bg-secondary transition-colors text-muted-foreground hover:text-primary"
-            title="Copy address"
+            title={t('profile.bitcoinModal.copyAddress')}
           >
             {copied ? <Check className="size-4 text-green-500" /> : <Copy className="size-4" />}
           </button>
           <Dialog>
             <DialogTrigger asChild>
-              <button className="p-1 rounded hover:bg-secondary transition-colors text-muted-foreground hover:text-primary" title="Show QR code">
+              <button className="p-1 rounded hover:bg-secondary transition-colors text-muted-foreground hover:text-primary" title={t('profile.bitcoinModal.showQr')}>
                 <QrCode className="size-4" />
               </button>
             </DialogTrigger>
@@ -557,7 +563,7 @@ function ProfileFieldInline({ field }: { field: { label: string; value: string }
             target="_blank"
             rel="noopener noreferrer"
             className="p-1 rounded hover:bg-secondary transition-colors text-muted-foreground hover:text-primary"
-            title="View on mempool.space"
+            title={t('profile.bitcoinModal.viewOnMempool')}
           >
             <ExternalLink className="size-4" />
           </a>
@@ -619,7 +625,7 @@ function ProfileFieldInline({ field }: { field: { label: string; value: string }
         <a href={safeUrl} target="_blank" rel="noopener noreferrer" className="block">
           <img
             src={safeUrl}
-            alt={field.label || 'Profile image'}
+            alt={field.label || t('profile.lightbox.imageAlt')}
             className="w-full max-w-sm rounded-lg object-cover"
             loading="lazy"
           />
@@ -671,6 +677,7 @@ function WeatherFieldInline({ value }: { value: string }) {
 // ----- Profile Image Lightbox -----
 
 function ProfileImageLightbox({ imageUrl, onClose }: { imageUrl: string; onClose: () => void }) {
+  const { t } = useTranslation();
   const [isLoaded, setIsLoaded] = useState(false);
 
   // Keyboard navigation
@@ -717,14 +724,14 @@ function ProfileImageLightbox({ imageUrl, onClose }: { imageUrl: string; onClose
           <button
             onClick={handleDownload}
             className="p-2.5 rounded-full text-white/70 hover:text-white hover:bg-white/10 transition-colors"
-            title="Open original"
+            title={t('profile.lightbox.openOriginal')}
           >
             <Download className="size-5" />
           </button>
           <button
             onClick={(e) => { e.stopPropagation(); e.preventDefault(); onClose(); }}
             className="p-2.5 rounded-full text-white/70 hover:text-white hover:bg-white/10 transition-colors"
-            title="Close (Esc)"
+            title={t('profile.lightbox.close')}
           >
             <X className="size-5" />
           </button>
@@ -758,11 +765,14 @@ function ProfileBannerImage({ src, onClick }: { src: string; onClick: () => void
   const [useBlobFallback, setUseBlobFallback] = useState(false);
   const [blobUrl, setBlobUrl] = useState<string>();
   const [failed, setFailed] = useState(false);
+  const [proxyFailed, setProxyFailed] = useState(false);
+  const proxy = useImageProxy();
 
   useEffect(() => {
     setUseBlobFallback(false);
     setBlobUrl(undefined);
     setFailed(false);
+    setProxyFailed(false);
   }, [src]);
 
   useEffect(() => {
@@ -791,7 +801,15 @@ function ProfileBannerImage({ src, onClick }: { src: string; onClick: () => void
     return () => controller.abort();
   }, [src, useBlobFallback]);
 
-  const imageSrc = blobUrl ?? (useBlobFallback ? undefined : src);
+  // Route the displayed src through the image proxy at banner width. The
+  // proxy serves permissive CORS so the CORP/blob fallback usually isn't
+  // needed when the proxy is on. If the proxy itself errors, swap to the
+  // original src (which may then trigger the blob fallback).
+  const proxied = proxy(src, 1200);
+  const usingProxy = proxied !== src;
+  const displaySrc = proxyFailed || !usingProxy ? src : proxied;
+
+  const imageSrc = blobUrl ?? (useBlobFallback ? undefined : displaySrc);
 
   if (failed) {
     return <div className="absolute inset-0 bg-gradient-to-br from-accent/10 via-transparent to-primary/5" />;
@@ -811,6 +829,11 @@ function ProfileBannerImage({ src, onClick }: { src: string; onClick: () => void
           decoding="async"
           onClick={onClick}
           onError={() => {
+            // First failure with the proxy → drop back to the original URL.
+            if (usingProxy && !proxyFailed && !blobUrl && !useBlobFallback) {
+              setProxyFailed(true);
+              return;
+            }
             if (blobUrl) {
               setFailed(true);
             } else {
@@ -922,20 +945,20 @@ function ProfileTabContent({
 // Desktop (lg+) keeps the focused 3-tab content set; the rail to the
 // left already shows the profile's Overview information (campaigns,
 // orgs, fields), so duplicating it as a tab would be redundant.
-const DESKTOP_TAB_LABELS = ['Activity', 'Campaigns', 'Pledges'];
+const DESKTOP_TAB_LABEL_KEYS = ['activity', 'campaigns', 'pledges'] as const;
 
 // Below lg the left rail is unavailable, so its content becomes the
 // default "Overview" tab and organizations get their own "Groups"
 // tab. Order matters — "Overview" is the default on first mount.
-const MOBILE_TAB_LABELS = ['Overview', 'Activity', 'Campaigns', 'Groups', 'Pledges'];
+const MOBILE_TAB_LABEL_KEYS = ['overview', 'activity', 'campaigns', 'groups', 'pledges'] as const;
 
-// Map from display label → internal tab id.
+// Map from label key → internal tab id.
 const CORE_TAB_IDS: Record<string, string> = {
-  'Overview': 'overview',
-  'Activity': 'activity',
-  'Campaigns': 'campaigns',
-  'Groups': 'community',
-  'Pledges': 'pledges',
+  'overview': 'overview',
+  'activity': 'activity',
+  'campaigns': 'campaigns',
+  'groups': 'community',
+  'pledges': 'pledges',
 };
 
 const KNOWN_TAB_IDS = new Set(['overview', 'activity', 'campaigns', 'community', 'pledges']);
@@ -954,6 +977,7 @@ function getInitialActiveTab(): string {
 }
 
 export function ProfilePage() {
+  const { t } = useTranslation();
   const { config } = useAppContext();
   const params = useParams();
   const npub = params.npub ?? params.nip19;
@@ -1030,6 +1054,7 @@ interface FollowersListModalProps {
 }
 
 function FollowersListModal({ pubkey, open, onOpenChange, displayName }: FollowersListModalProps) {
+  const { t } = useTranslation();
   const handleNavigate = useCallback(() => onOpenChange(false), [onOpenChange]);
   const { nostr } = useNostr();
 
@@ -1112,7 +1137,7 @@ function FollowersListModal({ pubkey, open, onOpenChange, displayName }: Followe
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-md p-0 gap-0 rounded-2xl overflow-hidden [&>button]:hidden">
         <div className="flex items-center justify-between px-4 py-3 border-b border-border">
-          <DialogTitle className="text-base font-bold">{displayName}'s followers</DialogTitle>
+          <DialogTitle className="text-base font-bold">{t('profile.followersModal.title', { name: displayName })}</DialogTitle>
           <Button
             variant="ghost"
             size="icon"
@@ -1129,7 +1154,7 @@ function FollowersListModal({ pubkey, open, onOpenChange, displayName }: Followe
             </div>
           ) : allFollowers.length === 0 ? (
             <div className="py-12 text-center text-muted-foreground text-sm">
-              No followers found.
+              {t('profile.followersModal.empty')}
             </div>
           ) : (
             <>
@@ -1153,12 +1178,12 @@ function FollowersListModal({ pubkey, open, onOpenChange, displayName }: Followe
   // so cross-breakpoint navigation (e.g. clicking "See all" in the
   // mobile Overview tab) Just Works.
   const desktopTabs = useMemo(
-    () => DESKTOP_TAB_LABELS.map((label) => ({ id: CORE_TAB_IDS[label], label })),
-    [],
+    () => DESKTOP_TAB_LABEL_KEYS.map((key) => ({ id: CORE_TAB_IDS[key], label: t(`profile.tabs.${key}`) })),
+    [t],
   );
   const mobileTabs = useMemo(
-    () => MOBILE_TAB_LABELS.map((label) => ({ id: CORE_TAB_IDS[label], label })),
-    [],
+    () => MOBILE_TAB_LABEL_KEYS.map((key) => ({ id: CORE_TAB_IDS[key], label: t(`profile.tabs.${key}`) })),
+    [t],
   );
 
   // Keep the active tab in sync if it ever falls out of the recognized
@@ -1198,7 +1223,7 @@ function FollowersListModal({ pubkey, open, onOpenChange, displayName }: Followe
     }
   }, [pubkey, queryClient]);
   const metadataEvent = author.data?.event;
-  const displayName = metadata?.name || (pubkey ? genUserName(pubkey) : 'Anonymous');
+  const displayName = metadata?.name || (pubkey ? genUserName(pubkey) : t('profile.anonymous'));
 
   // Kind 3 + 10001 — fetched separately so the large contact list
   // doesn't block the profile header or feed from rendering.
@@ -1211,7 +1236,7 @@ function FollowersListModal({ pubkey, open, onOpenChange, displayName }: Followe
 
   useSeoMeta({
     title: `${displayName} | ${config.appName}`,
-    description: metadata?.about || 'Nostr profile',
+    description: metadata?.about || t('profile.seoDescriptionFallback'),
   });
 
   // Follow list (cached, for display checks only)
@@ -1265,10 +1290,10 @@ function FollowersListModal({ pubkey, open, onOpenChange, displayName }: Followe
         await follow(pubkey);
       }
       impactMedium();
-      toast({ title: isFollowing ? `Unfollowed @${displayName}` : `Followed @${displayName}` });
+      toast({ title: isFollowing ? t('profile.toast.unfollowed', { name: displayName }) : t('profile.toast.followed', { name: displayName }) });
     } catch (err) {
       console.error('Follow toggle failed:', err);
-      toast({ title: 'Failed to update follow list', variant: 'destructive' });
+      toast({ title: t('profile.toast.followFailed'), variant: 'destructive' });
     }
   };
 
@@ -1311,8 +1336,8 @@ function FollowersListModal({ pubkey, open, onOpenChange, displayName }: Followe
       return (
         <main className="min-h-screen pb-16">
           <div className="max-w-7xl mx-auto p-8 text-center text-muted-foreground">
-            <p>User not found: {npub}</p>
-            <p className="text-xs mt-2">Could not resolve this NIP-05 identifier.</p>
+            <p>{t('profile.userNotFoundNip05', { handle: npub })}</p>
+            <p className="text-xs mt-2">{t('profile.couldNotResolveNip05')}</p>
           </div>
         </main>
       );
@@ -1320,7 +1345,7 @@ function FollowersListModal({ pubkey, open, onOpenChange, displayName }: Followe
     return (
       <main className="min-h-screen pb-16">
         <div className="max-w-7xl mx-auto p-8 text-center text-muted-foreground">
-          <p>User not found.</p>
+          <p>{t('profile.userNotFound')}</p>
         </div>
       </main>
     );

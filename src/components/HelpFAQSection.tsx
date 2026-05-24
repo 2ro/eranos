@@ -1,4 +1,5 @@
 import { useMemo, useState, Fragment } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import {
   Accordion,
@@ -77,6 +78,11 @@ export function HelpFAQSection({
   listTone = 'default',
 }: HelpFAQSectionProps) {
   const { config } = useAppContext();
+  const { i18n } = useTranslation();
+  // `getFAQCategories` resolves strings against `i18n.language` at call
+  // time. Capturing the language in a local lets us include it as a memo
+  // dep so a language switch re-runs the resolver.
+  const lng = i18n.language;
 
   const filteredCategories = useMemo(() => {
     let cats: FAQCategory[] = getFAQCategories(config.appName);
@@ -104,7 +110,9 @@ export function HelpFAQSection({
     }
 
     return cats;
-  }, [categories, items, config.appName]);
+    // `lng` is in the dep list to force re-resolution on a language switch.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [categories, items, config.appName, lng]);
 
   // Tab state: first category is selected by default.
   const [activeTab, setActiveTab] = useState<string | null>(

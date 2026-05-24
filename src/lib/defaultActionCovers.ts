@@ -5,8 +5,7 @@
  * Hosted on Blossom rather than served from /public so that when an action
  * author picks one of these as their cover, the URL we publish in the
  * kind-36639 `image` tag resolves on any Nostr client — not just on Agora's
- * own origin. (The same files still live in /public/challenge-covers/ for
- * the Actions hero banner; that page reads from these URLs directly.)
+ * own origin.
  */
 export const DEFAULT_ACTION_COVERS = [
   { id: 'cover2', url: 'https://blossom.dreamith.to/a5d3927951b9daae21f9709490f290497fb9fa4221649c72ba9762f28503a7ef.png', name: 'Raised Fists' },
@@ -20,8 +19,3 @@ export const DEFAULT_ACTION_COVERS = [
 /** Default cover image when an action has none set. */
 export const DEFAULT_COVER_IMAGE = 'https://blossom.dreamith.to/798305829a160757bcf7ad5c28f5e7382bcf7f087beb9fad83648950910e15f5.png';
 
-/** Pick a random default cover image (used for variety in fallbacks). */
-export function getRandomDefaultCover() {
-  const index = Math.floor(Math.random() * DEFAULT_ACTION_COVERS.length);
-  return DEFAULT_ACTION_COVERS[index];
-}

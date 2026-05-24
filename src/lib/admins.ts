@@ -7,7 +7,7 @@
  * default while Agora is forked from Pathos. To rotate admins, edit
  * `ADMIN_NPUBS` below — the hex pubkey set is derived at module load time.
  */
-export const ADMIN_NPUBS = [
+const ADMIN_NPUBS = [
   'npub1hee433872q2gen90cqh2ypwcq9z7y5ugn23etrd2l2rrwpruss8qwmrsv6',
   'npub1zz2wwgst3mcdqj34wzha4xrn66mlcra0jyunwn2dzkq0nu5kd4qqx4e594',
   'npub1yxd53jkacz02yxfskkcmuwpscnfgzxx4mfpem6fs96a0jze8dfasgx3ylt',

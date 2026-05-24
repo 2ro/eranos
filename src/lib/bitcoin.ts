@@ -14,12 +14,6 @@ const DUST_LIMIT = 546;
 /** Minimum non-dust output value in satoshis (BIP-141 / P2TR relay policy). */
 export const BITCOIN_DUST_LIMIT = DUST_LIMIT;
 
-/** A single output (recipient address + amount) for building a multi-output PSBT. */
-export interface BitcoinPaymentOutput {
-  address: string;
-  amountSats: number;
-}
-
 /** Estimated vBytes per P2TR input. */
 const VBYTES_PER_INPUT = 57.5;
 
@@ -159,7 +153,7 @@ export async function fetchAddressData(
 // ---------------------------------------------------------------------------
 
 /** Convert satoshis to a BTC string with up to 8 decimal places. */
-export function satsToBTC(sats: number): string {
+function satsToBTC(sats: number): string {
   return (sats / 100_000_000).toFixed(8);
 }
 
@@ -202,11 +196,6 @@ export async function fetchBtcPrice(baseUrls: string[], signal?: AbortSignal): P
 
   const data = await response.json();
   return data.USD;
-}
-
-/** Convert a BTC amount to satoshis (rounded to nearest integer). */
-export function btcToSats(btc: number): number {
-  return Math.round(btc * 100_000_000);
 }
 
 /**
@@ -275,66 +264,12 @@ export interface Transaction {
   timestamp?: number;
 }
 
-/**
- * Fetch transactions for a Bitcoin address from an Esplora-compatible API.
- * Returns simplified transactions with net amount relative to the address.
- *
- * @param address    The Bitcoin address to look up.
- * @param baseUrls   Ordered list of Esplora REST roots tried with failover.
- * @param signal     Optional abort signal (e.g. from TanStack Query).
- */
-export async function fetchTransactions(
-  address: string,
-  baseUrls: string[],
-  signal?: AbortSignal,
-): Promise<Transaction[]> {
-  const response = await esploraFetch(baseUrls, `/address/${address}/txs`, { signal });
-
-  if (!response.ok) {
-    throw new Error('Failed to fetch transactions');
-  }
-
-  const txs = await response.json();
-
-  return txs.map((tx: Record<string, unknown>) => {
-    const vin = tx.vin as Array<{ prevout: { scriptpubkey_address?: string; value: number } | null }>;
-    const vout = tx.vout as Array<{ scriptpubkey_address?: string; value: number }>;
-    const status = tx.status as { confirmed: boolean; block_time?: number };
-
-    // Sum sats flowing out of this address (inputs we owned)
-    const totalIn = vin.reduce((sum, input) => {
-      if (input.prevout?.scriptpubkey_address === address) {
-        return sum + input.prevout.value;
-      }
-      return sum;
-    }, 0);
-
-    // Sum sats flowing into this address (outputs we own)
-    const totalOut = vout.reduce((sum, output) => {
-      if (output.scriptpubkey_address === address) {
-        return sum + output.value;
-      }
-      return sum;
-    }, 0);
-
-    const net = totalOut - totalIn;
-
-    return {
-      txid: tx.txid as string,
-      amount: Math.abs(net),
-      type: net >= 0 ? 'receive' : 'send',
-      confirmed: status.confirmed,
-      timestamp: status.block_time,
-    } satisfies Transaction;
-  });
-}
-
 // ---------------------------------------------------------------------------
 // Full transaction detail (NIP-73 /i/bitcoin:tx:... page)
 // ---------------------------------------------------------------------------
 
 /** A single input in a full transaction. */
-export interface TxInput {
+interface TxInput {
   txid: string;
   vout: number;
   address?: string;
@@ -343,7 +278,7 @@ export interface TxInput {
 }
 
 /** A single output in a full transaction. */
-export interface TxOutput {
+interface TxOutput {
   address?: string;
   value: number;
   scriptpubkeyType: string;
@@ -352,7 +287,7 @@ export interface TxOutput {
 }
 
 /** Full transaction detail returned by the Esplora API. */
-export interface TxDetail {
+interface TxDetail {
   txid: string;
   version: number;
   locktime: number;
@@ -440,44 +375,6 @@ export async function fetchTxDetail(
 // ---------------------------------------------------------------------------
 // Full address detail (NIP-73 /i/bitcoin:address:... page)
 // ---------------------------------------------------------------------------
-
-/** Full address detail combining balance stats + recent transactions. */
-export interface AddressDetail {
-  address: string;
-  balance: number;
-  pendingBalance: number;
-  totalBalance: number;
-  totalReceived: number;
-  totalSent: number;
-  txCount: number;
-  pendingTxCount: number;
-  /** Most recent transactions (up to 25). */
-  recentTxs: Transaction[];
-}
-
-/**
- * Fetch full address details (balance + recent txs) from an Esplora-compatible API.
- *
- * @param address    The Bitcoin address to look up.
- * @param baseUrls   Ordered list of Esplora REST roots tried with failover.
- * @param signal     Optional abort signal (e.g. from TanStack Query).
- */
-export async function fetchAddressDetail(
-  address: string,
-  baseUrls: string[],
-  signal?: AbortSignal,
-): Promise<AddressDetail> {
-  const [addrData, txs] = await Promise.all([
-    fetchAddressData(address, baseUrls, signal),
-    fetchTransactions(address, baseUrls, signal),
-  ]);
-
-  return {
-    address,
-    ...addrData,
-    recentTxs: txs.slice(0, 25),
-  };
-}
 
 // ---------------------------------------------------------------------------
 // Sending: UTXOs, fee estimation, transaction construction, broadcast
@@ -606,22 +503,8 @@ export async function broadcastTransaction(
   return response.text();
 }
 
-/**
- * Compute the maximum sendable amount (in sats) after fees.
- *
- * @param totalBalance Total spendable sats across all UTXOs.
- * @param numInputs    Number of UTXOs that will be consumed.
- * @param feeRate      Fee rate in sat/vB.
- * @returns The max amount in sats, or 0 if the balance cannot cover fees.
- */
-export function maxSendable(totalBalance: number, numInputs: number, feeRate: number): number {
-  // When sending max there is no change output, so only 1 output.
-  const fee = estimateFee(numInputs, 1, feeRate);
-  return Math.max(0, totalBalance - fee);
-}
-
 /** Result of building an unsigned PSBT. */
-export interface UnsignedPsbt {
+interface UnsignedPsbt {
   /** Hex-encoded unsigned PSBT. */
   psbtHex: string;
   /** Fee in satoshis. */
@@ -707,83 +590,6 @@ export function buildUnsignedPsbt(
 
   // Add outputs
   tx.addOutputAddress(toAddress, BigInt(amountSats), NETWORK);
-
-  if (hasChange) {
-    tx.addOutputAddress(changeAddress, BigInt(change), NETWORK);
-  }
-
-  return { psbtHex: txToPsbtHex(tx), fee };
-}
-
-/**
- * Build an unsigned Taproot PSBT with multiple recipient outputs.
- *
- * Used by community batch zaps and campaign donations to fan out a single
- * signed transaction to many recipients. All UTXOs are consumed; change (if
- * above the dust limit) returns to the sender's Taproot address.
- *
- * @param senderPubkeyHex 32-byte hex x-only public key of the sender.
- * @param outputs         Recipient outputs. Each amount must be >= the dust limit.
- * @param utxos           Available UTXOs (all will be consumed).
- * @param feeRate         Fee rate in sat/vB.
- */
-export function buildUnsignedMultiOutputPsbt(
-  senderPubkeyHex: string,
-  outputs: BitcoinPaymentOutput[],
-  utxos: UTXO[],
-  feeRate: number,
-): UnsignedPsbt {
-  if (outputs.length === 0) {
-    throw new Error('At least one recipient output is required.');
-  }
-
-  for (const output of outputs) {
-    if (!validateBitcoinAddress(output.address)) {
-      throw new Error(`Invalid Bitcoin address: ${output.address}`);
-    }
-    if (!Number.isInteger(output.amountSats) || output.amountSats < DUST_LIMIT) {
-      throw new Error(`Bitcoin outputs must be at least ${DUST_LIMIT} sats.`);
-    }
-  }
-
-  const internalPubkey = hex.decode(senderPubkeyHex);
-  const senderPayment = btc.p2tr(internalPubkey, undefined, NETWORK);
-  const changeAddress = senderPayment.address;
-  if (!changeAddress) throw new Error('Failed to derive change address');
-
-  const tx = new btc.Transaction();
-  let totalInput = 0;
-
-  for (const utxo of utxos) {
-    tx.addInput({
-      txid: utxo.txid,
-      index: utxo.vout,
-      witnessUtxo: {
-        script: senderPayment.script,
-        amount: BigInt(utxo.value),
-      },
-      tapInternalKey: internalPubkey,
-    });
-    totalInput += utxo.value;
-  }
-
-  const totalOutput = outputs.reduce((sum, output) => sum + output.amountSats, 0);
-  const feeWithChange = estimateFee(utxos.length, outputs.length + 1, feeRate);
-  const changeWithChange = totalInput - totalOutput - feeWithChange;
-  const hasChange = changeWithChange >= DUST_LIMIT;
-  const numOutputs = outputs.length + (hasChange ? 1 : 0);
-  const fee = estimateFee(utxos.length, numOutputs, feeRate);
-  const change = totalInput - totalOutput - fee;
-
-  if (change < 0) {
-    throw new Error(
-      `Insufficient funds. Need ${(totalOutput + fee).toLocaleString()} sats, have ${totalInput.toLocaleString()} sats.`,
-    );
-  }
-
-  for (const output of outputs) {
-    tx.addOutputAddress(output.address, BigInt(output.amountSats), NETWORK);
-  }
 
   if (hasChange) {
     tx.addOutputAddress(changeAddress, BigInt(change), NETWORK);

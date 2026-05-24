@@ -1,7 +1,9 @@
 import type { NostrEvent } from '@nostrify/nostrify';
+import type { ReactNode } from 'react';
 import { MessageCircle, MoreHorizontal, Share2, Zap } from 'lucide-react';
 import { nip19 } from 'nostr-tools';
 import { useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { RepostIcon } from '@/components/icons/RepostIcon';
 import { ReactionButton } from '@/components/ReactionButton';
@@ -30,24 +32,29 @@ interface PostActionBarProps {
   hideZap?: boolean;
   /** Keep the share button visible at sidebar widths. Defaults to false. */
   showShareInSidebar?: boolean;
+  /** Optional action rendered next to Share, e.g. Translate. */
+  translateAction?: ReactNode;
   /** Extra classes on the outer wrapper div. */
   className?: string;
 }
 
 export function PostActionBar({
   event,
-  replyLabel = 'Reply',
+  replyLabel,
   onReply,
   onMore,
   hideZap = false,
   showShareInSidebar = false,
+  translateAction,
   className,
 }: PostActionBarProps) {
+  const { t } = useTranslation();
   const { toast } = useToast();
   const { user } = useCurrentUser();
   const shareOrigin = useShareOrigin();
   const author = useAuthor(event.pubkey);
   const metadata = author.data?.metadata;
+  const effectiveReplyLabel = replyLabel ?? t('feed.actions.reply');
   // TODO: Enable zapping split-recipient NIP-75 goals once zap split payments are supported.
   const canZapAuthor = !hideZap && user && canZap(metadata) && !hasGoalZapSplits(event);
 
@@ -66,8 +73,8 @@ export function PostActionBar({
     }
     const url = `${shareOrigin}/${encoded}`;
     const result = await shareOrCopy(url);
-    if (result === 'copied') toast({ title: 'Link copied to clipboard' });
-  }, [event, shareOrigin, toast]);
+    if (result === 'copied') toast({ title: t('feed.actions.linkCopied') });
+  }, [event, shareOrigin, toast, t]);
 
   return (
     <div
@@ -83,14 +90,14 @@ export function PostActionBar({
       {/* Reply / Comments */}
       <button
         className="inline-flex items-center gap-2 h-9 px-3 rounded-full text-sm font-medium text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors"
-        title={replyLabel}
+        title={effectiveReplyLabel}
         onClick={onReply}
       >
         <MessageCircle className="size-[18px]" />
         {stats?.replies ? (
           <span className="tabular-nums">{formatNumber(stats.replies)}</span>
         ) : (
-          <span className="hidden sm:inline">{replyLabel}</span>
+          <span className="hidden sm:inline">{effectiveReplyLabel}</span>
         )}
       </button>
 
@@ -104,13 +111,13 @@ export function PostActionBar({
                 ? 'text-accent hover:text-accent/80 hover:bg-accent/10'
                 : 'text-muted-foreground hover:text-accent hover:bg-accent/10',
             )}
-            title={isReposted ? 'Undo repost' : 'Repost'}
+            title={isReposted ? t('feed.actions.undoRepost') : t('feed.actions.repost')}
           >
             <RepostIcon className="size-[18px]" />
             {repostTotal > 0 ? (
               <span className="tabular-nums">{formatNumber(repostTotal)}</span>
             ) : (
-              <span className="hidden sm:inline">Repost</span>
+              <span className="hidden sm:inline">{t('feed.actions.repost')}</span>
             )}
           </button>
         )}
@@ -130,13 +137,13 @@ export function PostActionBar({
         <ZapDialog target={event}>
           <button
             className="inline-flex items-center gap-2 h-9 px-3 rounded-full text-sm font-medium text-muted-foreground hover:text-amber-500 hover:bg-amber-500/10 transition-colors"
-            title="Zap"
+            title={t('feed.actions.zap')}
           >
             <Zap className="size-[18px]" />
             {stats?.zapAmount ? (
               <span className="tabular-nums">{formatNumber(stats.zapAmount)}</span>
             ) : (
-              <span className="hidden sm:inline">Zap</span>
+              <span className="hidden sm:inline">{t('feed.actions.zap')}</span>
             )}
           </button>
         </ZapDialog>
@@ -145,13 +152,15 @@ export function PostActionBar({
       {/* Spacer pushes share/more to the right */}
       <div className="flex-1" />
 
+      {translateAction}
+
       {/* Share */}
       <button
         className={cn(
           'inline-flex items-center justify-center h-9 w-9 rounded-full text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors',
           !showShareInSidebar && 'sidebar:hidden',
         )}
-        title="Share"
+        title={t('feed.actions.share')}
         onClick={handleShare}
       >
         <Share2 className="size-[18px]" />
@@ -160,7 +169,7 @@ export function PostActionBar({
       {/* More */}
       <button
         className="inline-flex items-center justify-center h-9 w-9 rounded-full text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors"
-        title="More"
+        title={t('feed.actions.more')}
         onClick={onMore}
       >
         <MoreHorizontal className="size-[18px]" />

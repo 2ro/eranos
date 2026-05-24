@@ -1,4 +1,5 @@
 import { useSeoMeta } from '@unhead/react';
+import { useTranslation } from 'react-i18next';
 
 import { GuideHero } from '@/components/GuideHero';
 import {
@@ -22,11 +23,12 @@ import { COOL_PALETTE } from '@/lib/hopePalette';
  * from `/about` as one of the two large guide buttons.
  */
 export function DonorGuidePage() {
+  const { t } = useTranslation();
   const { config } = useAppContext();
 
   useSeoMeta({
-    title: `Donor Guide | ${config.appName}`,
-    description: `How donating works on ${config.appName} and how to protect your privacy.`,
+    title: `${t('policyPages.donorGuide.seoTitle')} | ${config.appName}`,
+    description: t('policyPages.donorGuide.seoDescription', { appName: config.appName }),
   });
 
   const blocks = getDonorGuideBlocks(config.appName);
@@ -34,8 +36,8 @@ export function DonorGuidePage() {
   return (
     <main className="min-h-screen pb-16 sidebar:pb-0">
       <GuideHero
-        title="Donor Guide"
-        subtitle="Real Bitcoin, sent directly. The whole flow in one short page."
+        title={t('policyPages.donorGuide.title')}
+        subtitle={t('policyPages.donorGuide.subtitle')}
         images={DONOR_HERO_IMAGES}
         palette={COOL_PALETTE}
       />

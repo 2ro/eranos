@@ -25,10 +25,10 @@ export const CAMPAIGN_KIND = 33863;
  *   Donations are unlinkable by design; clients MUST hide all aggregate
  *   UI and MUST NOT publish donation receipts.
  */
-export type CampaignWalletMode = 'onchain' | 'sp';
+type CampaignWalletMode = 'onchain' | 'sp';
 
 /** Parsed wallet endpoint declared by a campaign's `w` tag. */
-export interface CampaignWallet {
+interface CampaignWallet {
   /** Raw bech32(m) string as it appears in the `w` tag. */
   value: string;
   /** Mode derived from the prefix. */
@@ -52,7 +52,7 @@ export interface CampaignWallets {
  * `banner` tag (`url` MUST match the banner URL — clients ignore an
  * imeta whose URL does not match).
  */
-export interface CampaignBannerImeta {
+interface CampaignBannerImeta {
   url: string;
   /** MIME type, e.g. `image/jpeg`. */
   m?: string;
@@ -173,7 +173,7 @@ export function parseCampaignWallet(value: string | undefined): CampaignWallet |
  * one `w` value is present for the same mode (the spec permits at most
  * one endpoint per mode).
  */
-export function parseCampaignWallets(values: string[]): CampaignWallets | null {
+function parseCampaignWallets(values: string[]): CampaignWallets | null {
   if (values.length === 0) return null;
   const wallets: CampaignWallets = {};
   for (const raw of values) {

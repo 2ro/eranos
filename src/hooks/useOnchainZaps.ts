@@ -1,10 +1,7 @@
-import { useQueries, useQuery } from '@tanstack/react-query';
-import { useNostr } from '@nostrify/react';
 import type { NostrEvent } from '@nostrify/nostrify';
 
 import { fetchTxDetail, nostrPubkeyToBitcoinAddress } from '@/lib/bitcoin';
-import { useAppContext } from '@/hooks/useAppContext';
-import { CAMPAIGN_KIND, parseCampaign } from '@/lib/campaign';
+import { CAMPAIGN_KIND } from '@/lib/campaign';
 /** A single verified on-chain zap, with the amount that actually paid the recipient(s) on-chain. */
 export interface OnchainZapEntry {
   /** The kind 8333 event. */
@@ -48,7 +45,7 @@ export function extractOnchainZapTxid(event: NostrEvent): string | null {
 }
 
 /** Parse the claimed amount (sats) from a kind 8333 event. */
-export function extractOnchainZapClaimedAmount(event: NostrEvent): number {
+function extractOnchainZapClaimedAmount(event: NostrEvent): number {
   const tag = event.tags.find(([n]) => n === 'amount');
   if (!tag?.[1]) return 0;
   const n = parseInt(tag[1], 10);
@@ -62,7 +59,7 @@ export function extractOnchainZapClaimedAmount(event: NostrEvent): number {
  * events carry none (a campaign is not a Nostr identity). Returns the
  * pubkeys in `p`-tag order, deduplicated.
  */
-export function extractOnchainZapRecipients(event: NostrEvent): string[] {
+function extractOnchainZapRecipients(event: NostrEvent): string[] {
   const seen = new Set<string>();
   const recipients: string[] = [];
   for (const tag of event.tags) {
@@ -75,15 +72,6 @@ export function extractOnchainZapRecipients(event: NostrEvent): string[] {
     recipients.push(normalized);
   }
   return recipients;
-}
-
-/**
- * Convenience: returns the first recipient pubkey, or '' if none. Useful for
- * single-recipient callsites (profile zaps, etc.) that don't yet care about
- * multi-output events.
- */
-export function extractOnchainZapRecipient(event: NostrEvent): string {
-  return extractOnchainZapRecipients(event)[0] ?? '';
 }
 
 /**
@@ -195,143 +183,3 @@ export async function verifyOnchainZap(
   };
 }
 
-/**
- * Query all kind 8333 on-chain zaps targeting a specific event, then verify
- * each one on-chain. Returns only verified entries (deduped by txid).
- *
- * When the target is a kind 33863 campaign, verification matches against
- * the campaign's `w` wallet address rather than derived recipient
- * addresses. Silent-payment campaigns (`w` starts with `sp1…`) return an
- * empty list — donations to those campaigns are unlinkable by design.
- */
-export function useOnchainZaps(target: NostrEvent | undefined) {
-  const { nostr } = useNostr();
-  const { config } = useAppContext();
-  const { esploraApis } = config;
-  const isAddressable = target && target.kind >= 30000 && target.kind < 40000;
-  const dTag = isAddressable
-    ? target.tags.find(([n]) => n === 'd')?.[1] ?? ''
-    : '';
-  const aCoord = isAddressable && target ? `${target.kind}:${target.pubkey}:${dTag}` : '';
-
-  // If the target is a campaign, parse its on-chain `w` endpoint for
-  // campaign-wallet mode verification. A campaign without an on-chain
-  // endpoint (silent-payment-only) short-circuits to "no verifiable
-  // donations" — we don't issue any verifier queries.
-  const campaignOnchain = target && target.kind === CAMPAIGN_KIND
-    ? parseCampaign(target)?.wallets.onchain
-    : undefined;
-  const isCampaign = target?.kind === CAMPAIGN_KIND;
-  const skipCampaignVerification = isCampaign && !campaignOnchain;
-
-  // Step 1: fetch the raw kind 8333 events for this target
-  const eventsQuery = useQuery({
-    queryKey: ['onchain-zaps', 'events', target?.id ?? '', aCoord],
-    queryFn: async ({ signal }) => {
-      if (!target) return [] as NostrEvent[];
-      const timeout = AbortSignal.timeout(5000);
-      const combined = AbortSignal.any([signal, timeout]);
-
-      const filters: Parameters<typeof nostr.query>[0] = [
-        { kinds: [8333], '#e': [target.id], limit: 100 },
-      ];
-      if (aCoord) {
-        filters.push({ kinds: [8333], '#a': [aCoord], limit: 100 });
-      }
-
-      const events = await nostr.query(filters, { signal: combined });
-
-      // Dedupe by event id, then by txid (one canonical zap per tx per target).
-      const byId = new Map<string, NostrEvent>();
-      for (const e of events) byId.set(e.id, e);
-
-      const byTxid = new Map<string, NostrEvent>();
-      for (const e of byId.values()) {
-        const txid = extractOnchainZapTxid(e);
-        if (!txid) continue;
-        const existing = byTxid.get(txid);
-        // Prefer the earliest event for each txid (first to claim this tx).
-        if (!existing || e.created_at < existing.created_at) {
-          byTxid.set(txid, e);
-        }
-      }
-
-      return Array.from(byTxid.values());
-    },
-    enabled: !!target && !skipCampaignVerification,
-    staleTime: 30_000,
-  });
-
-  // Step 2: verify each event on-chain (parallel, cached per event)
-  const events = eventsQuery.data ?? [];
-  const walletValue = campaignOnchain?.value;
-  const verifications = useQueries({
-    queries: events.map((event) => ({
-      queryKey: ['onchain-zaps', 'verify', esploraApis, event.id, walletValue ?? ''],
-      queryFn: ({ signal }: { signal: AbortSignal }) =>
-        verifyOnchainZap(event, esploraApis, walletValue, signal),
-      staleTime: 60_000,
-    })),
-  });
-
-  const verified: OnchainZapEntry[] = verifications
-    .map((v) => v.data)
-    .filter((v): v is OnchainZapEntry => !!v);
-
-  // Sort by verified amount (largest first)
-  verified.sort((a, b) => b.amountSats - a.amountSats);
-
-  const totalSats = verified.reduce((s, v) => s + v.amountSats, 0);
-  const isLoading = !skipCampaignVerification && (eventsQuery.isLoading || verifications.some((v) => v.isLoading));
-
-  return {
-    zaps: verified,
-    totalSats,
-    count: verified.length,
-    isLoading,
-  };
-}
-
-/**
- * Verify a single kind 8333 event against the Bitcoin blockchain and return
- * the resulting `OnchainZapEntry`. Used by standalone surfaces (embedded
- * cards, detail page) that need to display a verified amount without doing
- * a full `#e`/`#a` fan-out.
- *
- * Returns `undefined` while loading, `null` if the event fails verification
- * (invalid tx, wrong recipient, self-zap, etc.), or the entry.
- *
- * If the receipt targets a kind 33863 campaign, pass the campaign's `w`
- * value as `campaignWallet` so the verifier can match outputs against the
- * campaign address. Without it, campaign-targeted receipts always fail
- * verification (no `p` tags, no fallback).
- */
-export function useVerifiedOnchainZap(
-  event: NostrEvent | undefined,
-  campaignWallet?: string,
-): OnchainZapEntry | null | undefined {
-  const { config } = useAppContext();
-  const { esploraApis } = config;
-  const txid = event ? extractOnchainZapTxid(event) : null;
-  const targetsCampaign = event ? !!extractCampaignTarget(event) : false;
-  const hasIdentityRecipient = event ? extractOnchainZapRecipients(event).length > 0 : false;
-
-  // Enable verification when:
-  // - we have a txid AND
-  // - either the receipt targets a campaign AND we know the wallet, OR
-  // - the receipt has an identity recipient (`p` tag).
-  const enabled = !!event && !!txid && (
-    (targetsCampaign && !!campaignWallet)
-    || (!targetsCampaign && hasIdentityRecipient)
-  );
-
-  const { data } = useQuery({
-    queryKey: ['onchain-zaps', 'verify', esploraApis, event?.id ?? '', campaignWallet ?? ''],
-    queryFn: ({ signal }) => verifyOnchainZap(event!, esploraApis, campaignWallet, signal),
-    enabled,
-    staleTime: 60_000,
-  });
-
-  if (!event) return null;
-  return data;
-}

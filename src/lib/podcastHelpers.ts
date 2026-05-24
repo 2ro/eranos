@@ -29,7 +29,7 @@ function parseImeta(tags: string[][]): { url?: string; thumbnail?: string; durat
   return {};
 }
 
-export interface ParsedPodcastEpisode {
+interface ParsedPodcastEpisode {
   title: string;
   audioUrl: string;
   audioMime?: string;
@@ -80,7 +80,7 @@ export function parsePodcastEpisode(event: NostrEvent): ParsedPodcastEpisode | n
   };
 }
 
-export interface ParsedPodcastTrailer {
+interface ParsedPodcastTrailer {
   title: string;
   url: string;
   pubdate?: number;

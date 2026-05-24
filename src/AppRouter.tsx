@@ -1,5 +1,6 @@
 import { lazy, Suspense } from "react";
 import { BrowserRouter, Link, Navigate, Outlet, Route, Routes } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { Toaster } from "./components/ui/toaster";
 import { TopNav } from "./components/TopNav";
 import { ScrollToTop } from "./components/ScrollToTop";
@@ -8,6 +9,7 @@ import { useCurrentUser } from "./hooks/useCurrentUser";
 import { useProfileUrl } from "./hooks/useProfileUrl";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
+import { openUrl } from "@/lib/downloadFile";
 
 // Critical-path pages: eagerly loaded (landing + fallback)
 import Index from "./pages/Index";
@@ -27,6 +29,7 @@ const AppearanceSettingsPage = lazy(() => import("./pages/AppearanceSettingsPage
 const ChangelogPage = lazy(() => import("./pages/ChangelogPage").then(m => ({ default: m.ChangelogPage })));
 const CommunitiesPage = lazy(() => import("./pages/CommunitiesPage").then(m => ({ default: m.CommunitiesPage })));
 const CreateCommunityPage = lazy(() => import("./pages/CreateCommunityPage").then(m => ({ default: m.CreateCommunityPage })));
+const CreateEventPage = lazy(() => import("./pages/CreateEventPage").then(m => ({ default: m.CreateEventPage })));
 const CSAEPolicyPage = lazy(() => import("./pages/CSAEPolicyPage").then(m => ({ default: m.CSAEPolicyPage })));
 const ExternalContentPage = lazy(() => import("./pages/ExternalContentPage").then(m => ({ default: m.ExternalContentPage })));
 const GeotagPage = lazy(() => import("./pages/GeotagPage").then(m => ({ default: m.GeotagPage })));
@@ -35,6 +38,7 @@ const MyDashboardPage = lazy(() => import("./pages/MyDashboardPage").then(m => (
 const AboutPage = lazy(() => import("./pages/AboutPage").then(m => ({ default: m.AboutPage })));
 const DonorGuidePage = lazy(() => import("./pages/DonorGuidePage").then(m => ({ default: m.DonorGuidePage })));
 const ActivistGuidePage = lazy(() => import("./pages/ActivistGuidePage").then(m => ({ default: m.ActivistGuidePage })));
+const LanguageSettingsPage = lazy(() => import("./pages/LanguageSettingsPage").then(m => ({ default: m.LanguageSettingsPage })));
 const NetworkSettingsPage = lazy(() => import("./pages/NetworkSettingsPage").then(m => ({ default: m.NetworkSettingsPage })));
 const NIP19Page = lazy(() => import("./pages/NIP19Page").then(m => ({ default: m.NIP19Page })));
 const NotificationSettings = lazy(() => import("./pages/NotificationSettings").then(m => ({ default: m.NotificationSettings })));
@@ -70,15 +74,22 @@ function PageSkeleton() {
 }
 
 function SiteFooter() {
+  const { t } = useTranslation();
   return (
     <footer className="bg-background mt-auto pt-12">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 py-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-muted-foreground">
-        <span>&copy; {new Date().getFullYear()} Agora. Fundraisers on Nostr.</span>
+        <button
+          type="button"
+          onClick={() => void openUrl("https://gitlab.com/soapbox-pub/agora")}
+          className="hover:text-foreground motion-safe:transition-colors"
+        >
+          {t('nav.sourceCode')}
+        </button>
         <nav className="flex items-center gap-5">
-          <Link to="/about" className="hover:text-foreground motion-safe:transition-colors">About</Link>
-          <Link to="/privacy" className="hover:text-foreground motion-safe:transition-colors">Privacy</Link>
-          <Link to="/safety" className="hover:text-foreground motion-safe:transition-colors">Safety</Link>
-          <Link to="/changelog" className="hover:text-foreground motion-safe:transition-colors">Changelog</Link>
+          <Link to="/about" className="hover:text-foreground motion-safe:transition-colors">{t('nav.about')}</Link>
+          <Link to="/privacy" className="hover:text-foreground motion-safe:transition-colors">{t('nav.privacy')}</Link>
+          <Link to="/safety" className="hover:text-foreground motion-safe:transition-colors">{t('nav.safety')}</Link>
+          <Link to="/changelog" className="hover:text-foreground motion-safe:transition-colors">{t('nav.changelog')}</Link>
         </nav>
       </div>
     </footer>
@@ -127,6 +138,7 @@ export function AppRouter() {
           <Route path="/g/:geohash" element={<GeotagPage />} />
           <Route path="/settings" element={<SettingsPage />} />
           <Route path="/settings/appearance" element={<AppearanceSettingsPage />} />
+          <Route path="/settings/language" element={<LanguageSettingsPage />} />
           <Route path="/settings/profile" element={<ProfileSettings />} />
           <Route path="/settings/wallet" element={<WalletSettingsPage />} />
           <Route path="/settings/notifications" element={<NotificationSettings />} />
@@ -159,6 +171,7 @@ export function AppRouter() {
           <Route path="/campaigns/all" element={<AllCampaignsPage />} />
           <Route path="/groups" element={<CommunitiesPage />} />
           <Route path="/groups/new" element={<CreateCommunityPage />} />
+          <Route path="/events/new" element={<CreateEventPage />} />
           <Route path="/pledges" element={<ActionsPage />} />
           <Route path="/pledges/new" element={<CreateActionPage />} />
           <Route path="/dashboard" element={<EventDashboardPage />} />

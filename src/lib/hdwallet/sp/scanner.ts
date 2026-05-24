@@ -90,7 +90,7 @@ export interface SPMatchedUtxo {
  * upstream is responsible for that. The only inputs validated here are the
  * key/tweak lengths (anything else is a programmer error).
  */
-export function scanTransaction(
+function scanTransaction(
   entry: ScanTweakEntry,
   bscan: Uint8Array,
   Bspend: Uint8Array,
@@ -148,7 +148,7 @@ export function scanTransaction(
 // Batch orchestration
 // ---------------------------------------------------------------------------
 
-export interface ScanBatchOptions {
+interface ScanBatchOptions {
   /** Yield to the event loop every N processed entries. Default: 64. */
   yieldEvery?: number;
   /** Called after each yield with the highest height fully processed. */

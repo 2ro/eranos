@@ -25,7 +25,7 @@ export function getActiveTrackedCodes(config: DashboardConfig): Set<string> {
 /**
  * Check if a state is fully covered (all its municipalities are tracked).
  */
-export function isStateCovered(
+function isStateCovered(
   stateCode: string,
   activeTrackedCodes: Set<string>,
 ): boolean {

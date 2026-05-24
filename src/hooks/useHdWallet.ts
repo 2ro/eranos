@@ -54,7 +54,7 @@ const REFRESH_INTERVAL_MS = 60_000;
 // Return shape
 // ---------------------------------------------------------------------------
 
-export interface UseHdWalletResult {
+interface UseHdWalletResult {
   /** Availability status — mirrors `useHdWalletAccess`. */
   availability: HdWalletAvailability;
   /** Currently-advertised receive address (the one the UI shows). */

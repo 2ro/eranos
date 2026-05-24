@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { AlertTriangle, Check, Copy, ExternalLink } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
+import { Check, Copy, ExternalLink } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import { QRCodeCanvas } from '@/components/ui/qrcode';
@@ -54,6 +55,7 @@ function buildQrPayload(wallets: CampaignWallets): string {
 export function CampaignWalletDonatePanel({
   wallets,
 }: CampaignWalletDonatePanelProps) {
+  const { t } = useTranslation();
   const qrPayload = buildQrPayload(wallets);
   const { onchain, sp } = wallets;
 
@@ -103,7 +105,7 @@ export function CampaignWalletDonatePanel({
       <Button asChild className="w-full text-white">
         <a href={qrPayload}>
           <ExternalLink className="size-4 mr-1.5" />
-          Open in wallet
+          {t('campaignsDetail.openInWallet')}
         </a>
       </Button>
     </div>
@@ -151,20 +153,5 @@ function WalletCopyRow({ value, label }: { value: string; label: string }) {
         <Copy className="size-4 text-muted-foreground shrink-0" />
       )}
     </button>
-  );
-}
-
-/**
- * Fallback rendered when the wallet failed to parse. The detail page
- * should normally never reach this — `parseCampaign` rejects events
- * without a valid `w` tag — but a defensive surface is cheap and helps
- * debugging.
- */
-export function CampaignWalletMissing() {
-  return (
-    <div className="flex items-center gap-2 text-sm">
-      <AlertTriangle className="size-5 text-orange-500 shrink-0" />
-      <span>This campaign is missing a valid wallet endpoint.</span>
-    </div>
   );
 }

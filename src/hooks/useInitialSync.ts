@@ -13,7 +13,7 @@ import {
   setCachedMuteItems,
 } from "./useMuteList";
 
-export type SyncPhase =
+type SyncPhase =
   | "idle" // No user logged in
   | "syncing" // Actively fetching settings from relays
   | "found" // Settings were found and applied, ready to proceed
@@ -206,9 +206,6 @@ export function useInitialSync() {
 
               if (parsed.theme) {
                 updates.theme = parsed.theme;
-              }
-              if (parsed.customTheme) {
-                updates.customTheme = parsed.customTheme;
               }
               if (parsed.useAppRelays !== undefined) {
                 updates.useAppRelays = parsed.useAppRelays;

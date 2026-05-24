@@ -260,6 +260,21 @@ Routes live in `AppRouter.tsx`. To add one:
 
 The router provides automatic scroll-to-top on navigation and a 404 `NotFound` page.
 
+## Internationalization
+
+All user-facing strings live in `src/locales/<lang>.json`. `en.json` is the source of truth; ten other locales ship alongside it: `ar`, `es`, `fa`, `fr`, `km`, `ps`, `pt`, `ru`, `sn`, `zh`.
+
+**When you edit, add, or remove a translated string, update every locale in the same change — not just `en.json`.** Leaving the other locales stale ships an inconsistent app: users in other languages either see outdated copy or get an English fallback in the middle of a localized screen. This applies to FAQ entries, guide bodies, button labels, error messages — every value reachable through `t()`.
+
+Concrete rules:
+
+- **Edits to an existing key** — change the value in `en.json` first, then update the corresponding key in all ten other locales. Translate the new content into each language; don't paste English. Preserve `{{interpolation}}` placeholders, markdown links, and technical tokens (`sp1…`, `BIP-352`, kind numbers, etc.) verbatim.
+- **New keys** — add to `en.json` first, then add the same key with a translated value in every other locale. `src/test/locales.test.ts` fails the build if any locale ships a key that doesn't exist in `en.json`, but the inverse (a key missing from a non-English locale) is allowed and falls back to English at runtime — which is exactly the user-visible mess you're trying to avoid.
+- **Removed keys** — delete from `en.json` and every other locale together. Leftover keys are dead translations and clutter future diffs.
+- **Parallelize the translation work** — when updating one English string across all ten locales, dispatch the per-language edits to subagents in parallel rather than translating ten files sequentially. Provide each subagent the new English source, the existing translation snippet (so it matches established voice), and explicit instructions to preserve placeholders and technical tokens.
+
+Always run `npm run test` after locale changes — `locales.test.ts` catches structural drift, and the wider suite catches any `t()` calls that referenced a key you renamed.
+
 ## Development Practices
 
 - React Query for data fetching and caching

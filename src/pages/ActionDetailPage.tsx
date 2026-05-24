@@ -1,19 +1,20 @@
 import { useMemo, useState } from 'react';
+import type { ReactNode } from 'react';
 import { useSeoMeta } from '@unhead/react';
 import { Link, useNavigate } from 'react-router-dom';
+import { useTranslation, Trans } from 'react-i18next';
+import type { TFunction } from 'i18next';
 import { nip19 } from 'nostr-tools';
 import type { NostrEvent, NostrMetadata } from '@nostrify/nostrify';
 import {
-  ArrowLeft,
   CalendarClock,
   ChevronLeft,
-  DollarSign,
-  Loader2,
   MapPin,
   Share2,
 } from 'lucide-react';
 
-import { useAction, type Action } from '@/hooks/useActions';
+import { parseAction, useAction, type Action } from '@/hooks/useActions';
+import { useAppContext } from '@/hooks/useAppContext';
 import { useAuthor } from '@/hooks/useAuthor';
 import { useBtcPrice } from '@/hooks/useBtcPrice';
 import { useComments } from '@/hooks/useComments';
@@ -40,18 +41,19 @@ import { ReplyComposeModal } from '@/components/ReplyComposeModal';
 import { NoteMoreMenu } from '@/components/NoteMoreMenu';
 import { ThreadedReplyList, type ReplyNode } from '@/components/ThreadedReplyList';
 import { usePinnedEventComments } from '@/hooks/usePinnedEventComments';
+import { useEventTranslation } from '@/hooks/useEventTranslation';
 import NotFound from '@/pages/NotFound';
 
-function formatDeadline(unixSeconds: number): { label: string; isPast: boolean } {
+function formatDeadline(unixSeconds: number, t: TFunction): { label: string; isPast: boolean } {
   const now = Math.floor(Date.now() / 1000);
   const diff = unixSeconds - now;
   if (diff <= 0) {
-    return { label: `Ended ${new Date(unixSeconds * 1000).toLocaleDateString()}`, isPast: true };
+    return { label: t('pledges.detail.deadlineEndedOn', { date: new Date(unixSeconds * 1000).toLocaleDateString() }), isPast: true };
   }
   const days = Math.ceil(diff / 86_400);
-  if (days <= 1) return { label: 'Ends today', isPast: false };
-  if (days < 60) return { label: `${days} days left`, isPast: false };
-  return { label: `Ends ${new Date(unixSeconds * 1000).toLocaleDateString()}`, isPast: false };
+  if (days <= 1) return { label: t('pledges.detail.deadlineEndsToday'), isPast: false };
+  if (days < 60) return { label: t('pledges.detail.deadlineDaysLeft', { count: days }), isPast: false };
+  return { label: t('pledges.detail.deadlineEndsOn', { date: new Date(unixSeconds * 1000).toLocaleDateString() }), isPast: false };
 }
 
 interface ActionDetailPageProps {
@@ -60,11 +62,14 @@ interface ActionDetailPageProps {
 }
 
 export function ActionDetailPage({ pubkey, identifier }: ActionDetailPageProps) {
-
+  const { t } = useTranslation();
+  const { config } = useAppContext();
   const { data: action, isLoading, isError } = useAction(pubkey, identifier);
 
   useSeoMeta({
-    title: action ? `${action.title} | Agora Pledge` : 'Pledge | Agora',
+    title: action
+      ? t('pledges.detail.seoTitle', { title: action.title, appName: config.appName })
+      : t('pledges.detail.seoFallbackTitle', { appName: config.appName }),
     description: action?.description?.slice(0, 200),
   });
 
@@ -75,6 +80,7 @@ export function ActionDetailPage({ pubkey, identifier }: ActionDetailPageProps) 
 }
 
 function PledgeDetailContent({ action }: { action: Action }) {
+  const { t } = useTranslation();
   const { data: btcPrice } = useBtcPrice();
   const author = useAuthor(action.pubkey);
   const navigate = useNavigate();
@@ -91,6 +97,8 @@ function PledgeDetailContent({ action }: { action: Action }) {
 
   const [replyOpen, setReplyOpen] = useState(false);
   const [moreMenuOpen, setMoreMenuOpen] = useState(false);
+  const { translatedEvent, translateAction } = useEventTranslation(action.event);
+  const displayAction = useMemo(() => parseAction(translatedEvent) ?? action, [translatedEvent, action]);
 
   const topLevel = useMemo(
     () => commentsData?.topLevelComments ?? [],
@@ -142,7 +150,7 @@ function PledgeDetailContent({ action }: { action: Action }) {
   const creatorName = getDisplayName(metadata, action.pubkey);
   const creatorProfileUrl = useProfileUrl(action.pubkey, metadata);
   const creatorPicture = sanitizeUrl(metadata?.picture);
-  const deadline = action.deadline ? formatDeadline(action.deadline) : null;
+  const deadline = action.deadline ? formatDeadline(action.deadline, t) : null;
   const cover = sanitizeUrl(action.image);
   const progressValue = action.bounty > 0 ? Math.min(100, Math.round((fundedSats / action.bounty) * 100)) : 0;
 
@@ -154,10 +162,10 @@ function PledgeDetailContent({ action }: { action: Action }) {
 
   const storyEvent = useMemo(
     () => ({
-      ...action.event,
-      tags: action.event.tags.filter(([name]) => !['image', 'title', 't'].includes(name)),
+      ...displayAction.event,
+      tags: displayAction.event.tags.filter(([name]) => !['image', 'title', 't'].includes(name)),
     }),
-    [action.event],
+    [displayAction.event],
   );
 
   const handleShare = async () => {
@@ -165,10 +173,10 @@ function PledgeDetailContent({ action }: { action: Action }) {
     try {
       const nav = typeof navigator !== 'undefined' ? navigator : undefined;
       if (nav?.share) {
-        await nav.share({ title: action.title, text: action.description, url });
+        await nav.share({ title: displayAction.title, text: displayAction.description, url });
       } else if (nav?.clipboard) {
         await nav.clipboard.writeText(url);
-        toast({ title: 'Link copied to clipboard' });
+        toast({ title: t('pledges.detail.linkCopied') });
       }
     } catch {
       // User likely cancelled the share sheet; nothing to do.
@@ -178,7 +186,7 @@ function PledgeDetailContent({ action }: { action: Action }) {
   return (
     <main className="min-h-screen pb-16">
       <PledgeHero
-        action={action}
+        action={displayAction}
         cover={cover}
         creatorName={creatorName}
         creatorProfileUrl={creatorProfileUrl}
@@ -187,6 +195,7 @@ function PledgeDetailContent({ action }: { action: Action }) {
         onBack={() => navigate(-1)}
         onReply={() => setReplyOpen(true)}
         onMore={() => setMoreMenuOpen(true)}
+        translateAction={translateAction}
       />
 
       {pinnedNodes.length > 0 && (
@@ -211,7 +220,7 @@ function PledgeDetailContent({ action }: { action: Action }) {
         <div className="lg:flex lg:gap-8 lg:items-start">
           <div className="lg:hidden mb-6">
             <PledgeFundingCard
-              action={action}
+              action={displayAction}
               btcPrice={btcPrice}
               fundedSats={fundedSats}
               progressValue={progressValue}
@@ -222,22 +231,22 @@ function PledgeDetailContent({ action }: { action: Action }) {
           </div>
 
           <div className="flex-1 min-w-0 space-y-8">
-            <PledgeStory storyEvent={storyEvent} hasContent={action.description.trim().length > 0} />
+            <PledgeStory storyEvent={storyEvent} hasContent={displayAction.description.trim().length > 0} />
 
             <div id="pledge-activity" className="scroll-mt-20">
               <div className="mt-6">
                 <div className="flex items-baseline justify-between gap-3 mb-3 px-1">
-                  <h2 className="text-lg font-semibold tracking-tight">Submissions</h2>
+                  <h2 className="text-lg font-semibold tracking-tight">{t('pledges.detail.submissions')}</h2>
                   {topLevel.length > 0 ? (
                     <span className="text-sm text-muted-foreground tabular-nums">
-                      {topLevel.length.toLocaleString()} {topLevel.length === 1 ? 'submission' : 'submissions'}
+                      {t('pledges.detail.submissionCount', { count: topLevel.length })}
                     </span>
                   ) : null}
                 </div>
 
                 <DetailCommentComposer
                   event={action.event}
-                  placeholder="Share proof, evidence, or completed work..."
+                  placeholder={t('pledges.detail.submissionPlaceholder')}
                   className="mb-3"
                 />
 
@@ -263,9 +272,9 @@ function PledgeDetailContent({ action }: { action: Action }) {
                     onClick={() => setReplyOpen(true)}
                     className="block w-full rounded-2xl border border-dashed border-border/80 bg-card/50 px-6 py-10 text-center hover:bg-card hover:border-primary/40 transition-colors"
                   >
-                    <p className="text-base font-medium text-foreground">No submissions yet</p>
+                    <p className="text-base font-medium text-foreground">{t('pledges.detail.noSubmissionsTitle')}</p>
                     <p className="mt-1 text-sm text-muted-foreground">
-                      Be the first to reply with proof, evidence, or completed work.
+                      {t('pledges.detail.noSubmissionsHint')}
                     </p>
                   </button>
                 )}
@@ -276,7 +285,7 @@ function PledgeDetailContent({ action }: { action: Action }) {
           <aside className="hidden lg:block lg:w-[360px] lg:shrink-0 lg:self-start">
             <div className="lg:sticky lg:top-4">
               <PledgeFundingCard
-                action={action}
+                action={displayAction}
                 btcPrice={btcPrice}
                 fundedSats={fundedSats}
                 progressValue={progressValue}
@@ -298,10 +307,10 @@ function PledgeDetailContent({ action }: { action: Action }) {
     const wasPinned = isPinned(event.id);
     togglePin.mutate(event.id, {
       onSuccess: () => {
-        toast({ title: wasPinned ? 'Unpinned from pledge' : 'Pinned to pledge' });
+        toast({ title: wasPinned ? t('pledges.detail.unpinnedToast') : t('pledges.detail.pinnedToast') });
       },
       onError: () => {
-        toast({ title: 'Failed to update pledge pins', variant: 'destructive' });
+        toast({ title: t('pledges.detail.pinFailed'), variant: 'destructive' });
       },
     });
   }
@@ -338,6 +347,7 @@ interface PledgeHeroProps {
   onBack: () => void;
   onReply: () => void;
   onMore: () => void;
+  translateAction: ReactNode;
 }
 
 function PledgeHero({
@@ -350,7 +360,9 @@ function PledgeHero({
   onBack,
   onReply,
   onMore,
+  translateAction,
 }: PledgeHeroProps) {
+  const { t } = useTranslation();
   const countryLabel = action.countryCode ? getGeoDisplayName(action.countryCode) : undefined;
   const [imageLoadFailed, setImageLoadFailed] = useState(false);
   const coverImage = cover && !imageLoadFailed ? cover : DEFAULT_COVER_IMAGE;
@@ -379,10 +391,10 @@ function PledgeHero({
           <button
             onClick={onBack}
             className="inline-flex items-center gap-1.5 h-10 pl-2 pr-3.5 rounded-full bg-black/30 text-white backdrop-blur-md hover:bg-black/45 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80 motion-safe:transition-colors"
-            aria-label="Go back"
+            aria-label={t('common.goBack')}
           >
-            <ChevronLeft className="size-5" />
-            <span className="text-sm font-medium hidden sm:inline">Back</span>
+            <ChevronLeft className="size-5 rtl:rotate-180" />
+            <span className="text-sm font-medium hidden sm:inline">{t('pledges.detail.back')}</span>
           </button>
         </div>
       </div>
@@ -405,10 +417,11 @@ function PledgeHero({
               </AvatarFallback>
             </Avatar>
             <span className="[text-shadow:0_1px_3px_rgba(0,0,0,0.7)]">
-              by{' '}
-              <span className="font-semibold underline-offset-4 group-hover:underline">
-                {creatorName}
-              </span>
+              <Trans
+                i18nKey="pledges.detail.byAuthor"
+                values={{ name: creatorName }}
+                components={{ 0: <span className="font-semibold underline-offset-4 group-hover:underline" /> }}
+              />
             </span>
           </Link>
 
@@ -421,18 +434,19 @@ function PledgeHero({
             )}
             <span className="inline-flex items-center gap-1.5">
               <CalendarClock className="size-4" />
-              {deadline ? deadline.label : 'Open-ended'}
+              {deadline ? deadline.label : t('pledges.detail.openEnded')}
             </span>
           </div>
 
           <div className="mt-4 pt-3 border-t border-white/15 [&_button]:!text-white/90 [&_button:hover]:!text-white [&_button:hover]:!bg-white/15 [&_button]:transition-colors [text-shadow:none]">
             <PostActionBar
               event={action.event}
-              replyLabel="Submit"
+              replyLabel={t('pledges.detail.submitLabel')}
               hideZap
               showShareInSidebar
               onReply={onReply}
               onMore={onMore}
+              translateAction={translateAction}
             />
           </div>
         </div>
@@ -458,6 +472,7 @@ function PledgeFundingCard({
   isLoading: boolean;
   onShare: () => void;
 }) {
+  const { t } = useTranslation();
   return (
     <Card className="overflow-hidden border-0 shadow-none bg-transparent lg:border lg:shadow-sm lg:bg-card">
       <CardContent className="p-0 lg:p-5 space-y-5">
@@ -468,28 +483,28 @@ function PledgeFundingCard({
             <div className="space-y-1">
               <div className="text-2xl font-bold tracking-tight">
                 {formatPledgeAmount(fundedSats, btcPrice)}
-                <span className="ml-1.5 text-sm font-normal text-muted-foreground">funded</span>
+                <span className="ml-1.5 text-sm font-normal text-muted-foreground">{t('pledges.detail.funded')}</span>
               </div>
               <div className="text-xs text-muted-foreground">
-                of {formatPledgeAmount(action.bounty, btcPrice)} pledged
+                {t('pledges.detail.ofPledged', { amount: formatPledgeAmount(action.bounty, btcPrice) })}
                 {submissionsCount > 0 && (
                   <>
                     {' · '}
-                    {submissionsCount.toLocaleString()} {submissionsCount === 1 ? 'submission' : 'submissions'}
+                    {t('pledges.detail.submissionCount', { count: submissionsCount })}
                   </>
                 )}
               </div>
             </div>
             <Progress value={progressValue} className="h-2" />
             <p className="text-xs text-muted-foreground leading-relaxed">
-              This pledge is trust-based. Funding progress sums zaps and donation receipts on top-level submissions.
+              {t('pledges.detail.trustNote')}
             </p>
           </div>
         )}
 
         <Button variant="outline" size="lg" className="w-full" onClick={onShare}>
           <Share2 className="size-4 mr-2" />
-          Share
+          {t('pledges.detail.share')}
         </Button>
       </CardContent>
     </Card>
@@ -497,13 +512,14 @@ function PledgeFundingCard({
 }
 
 function PledgeStory({ storyEvent, hasContent }: { storyEvent: NostrEvent; hasContent: boolean }) {
+  const { t } = useTranslation();
   return (
     <DetailStory
       event={storyEvent}
       hasContent={hasContent}
-      heading="The pledge"
+      heading={t('pledges.detail.storyHeading')}
       headingId="pledge-story-heading"
-      emptyText="The pledger hasn't written details for this pledge yet."
+      emptyText={t('pledges.detail.storyEmpty')}
     />
   );
 }
@@ -523,34 +539,6 @@ function PledgeDetailSkeleton() {
           <div className="hidden lg:block lg:w-[360px] lg:shrink-0 space-y-3">
             <Skeleton className="h-48 w-full rounded-xl" />
           </div>
-        </div>
-      </div>
-    </main>
-  );
-}
-
-/** Loader-state subcomponent used when the addressable coordinate is still
- * being decoded (e.g. by NIP19Page). */
-export function ActionDetailLoading() {
-  return (
-    <main>
-      <div className="flex items-center gap-4 px-4 py-4 bg-background/85">
-        <Link
-          to="/pledges"
-          className="p-2 -ml-2 rounded-full hover:bg-secondary transition-colors sidebar:hidden"
-          aria-label="Back to pledges"
-        >
-          <ArrowLeft className="size-5" />
-        </Link>
-        <div className="flex items-center gap-2 flex-1 min-w-0">
-          <DollarSign className="size-5 text-primary" />
-          <h1 className="text-lg font-semibold truncate">Pledge</h1>
-        </div>
-      </div>
-      <div className="px-4 max-w-3xl mx-auto space-y-4 py-6">
-        <div className="flex items-center gap-3">
-          <Loader2 className="size-5 animate-spin text-primary" />
-          <span className="text-sm text-muted-foreground">Loading pledge…</span>
         </div>
       </div>
     </main>

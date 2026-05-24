@@ -43,7 +43,7 @@ import type { HdSpendableUtxo } from './transaction';
 // ---------------------------------------------------------------------------
 
 /** A scanned address with everything the UI / coin selector needs. */
-export interface ScannedAddress {
+interface ScannedAddress {
   derived: DerivedAddress;
   data: AddressData;
   utxos: UTXO[];
@@ -52,7 +52,7 @@ export interface ScannedAddress {
 }
 
 /** Per-chain scan result. */
-export interface ChainScanResult {
+interface ChainScanResult {
   /** Used addresses on this chain (path index ascending). */
   used: ScannedAddress[];
   /** Subset of `used` with non-zero balance or active UTXOs. */

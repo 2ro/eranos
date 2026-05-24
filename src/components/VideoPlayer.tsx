@@ -82,7 +82,9 @@ export function VideoPlayer({ src: originalSrc, poster, className, dim, blurhash
   const { src, onError: onBlossomError } = useBlossomFallback(originalSrc);
   const { isHls } = useHls(videoRef, src);
   const { config } = useAppContext();
-  const shouldAutoPlay = autoPlay ?? config.autoplayVideos;
+  // Low-bandwidth mode forces autoplay off, regardless of the per-call or
+  // per-config preference.
+  const shouldAutoPlay = config.lowBandwidthMode ? false : (autoPlay ?? config.autoplayVideos);
 
   const generatedPoster = useVideoThumbnail(src, poster);
 

@@ -1,0 +1,2276 @@
+{
+  "common": {
+    "loading": "در حال بارگذاری…",
+    "error": "خطا",
+    "success": "موفق",
+    "cancel": "لغو",
+    "save": "ذخیره",
+    "delete": "حذف",
+    "edit": "ویرایش",
+    "close": "بستن",
+    "back": "بازگشت",
+    "next": "بعدی",
+    "refresh": "به‌روزرسانی",
+    "search": "جستجو",
+    "filter": "فیلتر",
+    "clear": "پاک کردن",
+    "submit": "ارسال",
+    "confirm": "تأیید",
+    "copied": "کپی شد",
+    "goBack": "بازگشت",
+    "tryAgain": "لطفاً دوباره تلاش کنید.",
+    "showLess": "نمایش کمتر",
+    "readMore": "بیشتر بخوانید"
+  },
+  "translate": {
+    "translate": "ترجمه",
+    "translating": "در حال ترجمه…",
+    "showOriginal": "نمایش متن اصلی",
+    "error": "ترجمه ناموفق بود"
+  },
+  "nav": {
+    "openMenu": "باز کردن منو",
+    "closeMenu": "بستن منو",
+    "brandHome": "صفحه اصلی {{appName}}",
+    "activity": "فعالیت",
+    "campaigns": "کمپین‌ها",
+    "groups": "گروه‌ها",
+    "pledge": "تعهدها",
+    "search": "جستجو",
+    "dashboard": "داشبورد",
+    "myDashboard": "داشبورد من",
+    "wallet": "کیف پول",
+    "notifications": "اعلان‌ها",
+    "profile": "نمایه",
+    "settings": "تنظیمات",
+    "about": "درباره",
+    "privacy": "حریم خصوصی",
+    "safety": "ایمنی",
+    "changelog": "تغییرات",
+    "sourceCode": "کد منبع"
+  },
+  "auth": {
+    "join": "پیوستن",
+    "login": "ورود",
+    "signup": "ثبت‌نام",
+    "logout": "خروج",
+    "addAccount": "افزودن حساب دیگر"
+  },
+  "feed": {
+    "indexTagline": "محتوای شما. سبک شما. قوانین شما.",
+    "compose": {
+      "placeholder": "چه خبر؟"
+    },
+    "tabs": {
+      "follows": "دنبال‌شوندگان",
+      "following": "دنبال می‌کنم",
+      "global": "جهانی"
+    },
+    "empty": {
+      "homeAgora": "لحظه‌ای آرام در Agora. کارزارها، تعهدها، اهداها و پست‌های جدید همین که رخ دهند اینجا ظاهر می‌شوند.",
+      "homeFollowingLoggedIn": "فید دنبال‌شوندگان شما خالی است. چند نفر را دنبال کنید تا ببینید چه می‌کنند، یا به Agora یا جهانی بروید.",
+      "homeFollowingLoggedOut": "برای دیدن پست‌های افرادی که دنبال می‌کنید وارد شوید.",
+      "homeOther": "چیزی برای نمایش نیست. اتصال‌های ریلی خود را بررسی کنید یا کمی بعد دوباره امتحان کنید.",
+      "follows": "فید شما خالی است. چند نفر را دنبال کنید تا پست‌هایشان اینجا دیده شود.",
+      "global": "هیچ پستی پیدا نشد. اتصال‌های ریلی خود را بررسی کنید یا به‌زودی بازگردید.",
+      "browseAgora": "مرور فید Agora",
+      "browseGlobal": "مرور فید جهانی",
+      "discoverPeople": "افرادی برای دنبال کردن کشف کنید",
+      "logIn": "ورود"
+    },
+    "modeSwitcher": {
+      "agora": "Agora",
+      "allNostr": "جهانی",
+      "following": "دنبال می‌کنم",
+      "ariaLabel": "حالت فید: {{label}}. برای تغییر کلیک کنید.",
+      "loginRequired": "برای دیدن پست‌های افرادی که دنبال می‌کنید وارد شوید"
+    },
+    "replyContext": {
+      "replyingTo": "در پاسخ به",
+      "and": "و",
+      "andOthers_one": "و {{count}} نفر دیگر",
+      "andOthers_other": "و {{count}} نفر دیگر"
+    },
+    "actions": {
+      "reply": "پاسخ",
+      "repost": "بازنشر",
+      "undoRepost": "لغو بازنشر",
+      "react": "واکنش",
+      "zap": "Zap",
+      "share": "اشتراک‌گذاری",
+      "more": "بیشتر",
+      "linkCopied": "لینک در کلیپ‌بورد کپی شد"
+    }
+  },
+  "forms": {
+    "required": "الزامی",
+    "recommended": "توصیه‌شده",
+    "optional": "اختیاری",
+    "title": "عنوان",
+    "country": "کشور",
+    "tags": "برچسب‌ها",
+    "coverImage": "تصویر کاور",
+    "description": "توضیح",
+    "timezone": "منطقه زمانی",
+    "publishing": "در حال انتشار…",
+    "uploadingCover": "در حال بارگذاری کاور…",
+    "countrySearchPlaceholder": "جستجوی کشورها",
+    "imageDropzone": "برای انتخاب تصویر کلیک کنید یا آن را اینجا بکشید"
+  },
+  "organizationContext": {
+    "attachedToGroup": "پیوست‌شده به گروه",
+    "groupFallback": "گروه",
+    "editSubtext": "به‌روزرسانی‌ها به فعالیت رسمی این گروه متصل می‌مانند.",
+    "malformedParam": "گروه در پیوند خوانده نشد. زیر حساب شما منتشر می‌شود.",
+    "checkingPermissions": "در حال بررسی مجوزهای گروه…",
+    "unauthorized": "شما بنیان‌گذار یا ناظر آن گروه نیستید. زیر حساب شما منتشر می‌شود.",
+    "publishingAsGroup": "انتشار به‌عنوان گروه"
+  },
+  "notFound": {
+    "title": "۴۰۴ - صفحه پیدا نشد",
+    "description": "صفحه‌ای که به دنبال آن هستید پیدا نشد.",
+    "heading": "این صفحه وجود ندارد.",
+    "goHome": "رفتن به خانه"
+  },
+  "pledges": {
+    "list": {
+      "seoTitle": "تعهدها",
+      "seoTitleWithCountry": "تعهدها — {{country}}",
+      "seoDescription": "برای کنش‌ها، شواهد یا پیامدهای مشخصی که می‌خواهید الهام‌بخش باشید، تأمین مالی متعهد شوید.",
+      "heroKicker": "تعهد",
+      "heroHeading": "تغییری را الهام بخش",
+      "heroHeadingLine2": "که می‌خواهی ببینی.",
+      "heroBody": "کنش‌ها، شواهد و پیامدهای مشخص را تأمین مالی کنید. مردم با ارسال پاسخ می‌دهند و جامعه به کارهایی پاداش می‌دهد که هدف را به جلو می‌برند.",
+      "openCount_one": "تعهد باز در همین حالا",
+      "openCount_other": "تعهد باز در همین حالا",
+      "createPledge": "ایجاد تعهد",
+      "loginToCreate": "برای ایجاد تعهد وارد شوید",
+      "sectionActive": "تعهدهای فعال",
+      "sectionUpcoming": "تعهدهای پیش‌رو",
+      "sectionPast": "تعهدهای گذشته",
+      "sectionDefault": "تعهدها",
+      "sectionTagline": "به تأمین مالی کنش‌هایی که ارزش انجام دارند کمک کنید.",
+      "sortAriaLabel": "مرتب‌سازی",
+      "sortBy": "مرتب‌سازی بر اساس",
+      "sortRecent": "تازه‌ترین",
+      "sortBounty": "بیشترین تعهد",
+      "sortDeadline": "مهلت نزدیک",
+      "sortDeadlinePast": "اخیراً پایان‌یافته",
+      "filterAriaLabel": "فیلتر بر اساس کشور",
+      "countrySearchPlaceholder": "جستجو…",
+      "noResults": "نتیجه‌ای یافت نشد.",
+      "global": "جهانی",
+      "dividerUpcoming": "پیش‌رو",
+      "dividerPast": "گذشته",
+      "showLess": "نمایش کمتر",
+      "showMore": "نمایش بیشتر ({{count}} مورد دیگر)",
+      "emptyTitle": "هنوز تعهدی نیست",
+      "emptyHint": "اولین کسی باش که تعهد می‌سازد.",
+      "emptyHintCountry": "اولین کسی باش که برای {{country}} تعهدی می‌سازد."
+    },
+    "card": {
+      "ended": "پایان‌یافته",
+      "pledged": "متعهد شده",
+      "byAuthor": "توسط <0>{{name}}</0>",
+      "deletePledge": "حذف تعهد",
+      "copyLink": "کپی کردن پیوند",
+      "linkCopied": "پیوند کپی شد",
+      "linkCopyFailed": "کپی پیوند ناموفق بود",
+      "confirmDelete": "این تعهد حذف شود؟ این کار قابل بازگشت نیست.",
+      "deleted": "تعهد حذف شد",
+      "deletedContent": "تعهد حذف‌شده",
+      "deleteFailed": "حذف تعهد ناموفق بود"
+    },
+    "create": {
+      "seoTitle": "ایجاد تعهد",
+      "seoDescription": "برای الهام‌بخشی به کنشی مشخص در {{appName}}، یک تعهد اهداکننده بسازید.",
+      "loginGateTitle": "برای ایجاد تعهد وارد شوید",
+      "loginGateBody": "تعهدها رویدادهای امضاشدهٔ Nostr هستند. برای انتشار یک تعهد به ورود Nostr نیاز دارید.",
+      "backToPledges": "بازگشت به تعهدها",
+      "heading": "ایجاد تعهد",
+      "title": "عنوان",
+      "titlePlaceholder": "مستندسازی پاکسازی ساحل",
+      "country": "کشور",
+      "countryPlaceholder": "جستجوی کشورها",
+      "countryClearAria": "پاک کردن کشور",
+      "flagOfAria": "پرچم {{name}}",
+      "countryHint": "<0>i: iso3166:{{code}}</0> برای مرتب‌سازی بر اساس کشور منتشر می‌شود.",
+      "tags": "برچسب‌ها",
+      "tagsPlaceholder": "پاکسازی-ساحل، مستندسازی-اعتراض، قطعی-اینترنت",
+      "coverImage": "تصویر جلد",
+      "description": "توضیح",
+      "descriptionPlaceholder": "کنش، شواهد یا پیامدی که می‌خواهید الهام‌بخش شوید، آنچه پاسخ‌ها باید شامل باشد و نحوهٔ ارزیابی آن‌ها را شرح دهید...",
+      "pledge": "تعهد",
+      "pledgeAmountPlaceholder": "100",
+      "deadline": "مهلت",
+      "timezone": "منطقهٔ زمانی",
+      "timezoneNote": "زمان شروع و مهلت در این منطقهٔ زمانی تفسیر می‌شوند.",
+      "submit": "ایجاد تعهد",
+      "publishing": "در حال انتشار…",
+      "uploadingCover": "در حال بارگذاری جلد…",
+      "altText": "تعهد {{appName}}: {{title}}",
+      "successToast": "تعهد ایجاد شد",
+      "errorToast": "ایجاد تعهد ممکن نشد",
+      "errorLoginRequired": "برای ایجاد تعهد باید وارد شوید.",
+      "errorTitleRequired": "عنوان الزامی است.",
+      "errorDescriptionRequired": "توضیح الزامی است.",
+      "errorPledgeRequired": "مبلغ تعهد الزامی است.",
+      "errorPledgeInvalid": "مبلغ تعهد باید یک مقدار مثبت به دلار باشد.",
+      "errorPriceUnavailable": "در انتظار قیمت BTC/USD برای محاسبهٔ مبلغ تعهد.",
+      "errorCoverInvalid": "تصویر جلد باید یک نشانی https:// معتبر باشد.",
+      "errorDeadlinePast": "مهلت نمی‌تواند در گذشته باشد."
+    },
+    "detail": {
+      "seoTitle": "{{title}} | تعهد {{appName}}",
+      "seoFallbackTitle": "تعهد | {{appName}}",
+      "deadlineEndedOn": "در {{date}} پایان یافت",
+      "deadlineEndsToday": "امروز پایان می‌یابد",
+      "deadlineDaysLeft_one": "{{count}} روز باقی",
+      "deadlineDaysLeft_other": "{{count}} روز باقی",
+      "deadlineEndsOn": "در {{date}} پایان می‌یابد",
+      "openEnded": "بدون مهلت",
+      "back": "بازگشت",
+      "backToPledges": "بازگشت به تعهدها",
+      "loadingPledge": "بارگذاری تعهد…",
+      "pledge": "تعهد",
+      "byAuthor": "توسط <0>{{name}}</0>",
+      "submitLabel": "ارسال",
+      "linkCopied": "پیوند در کلیپ‌بورد کپی شد",
+      "pinnedToast": "به تعهد سنجاق شد",
+      "unpinnedToast": "از تعهد جدا شد",
+      "pinFailed": "به‌روزرسانی سنجاق‌ها ناموفق بود",
+      "submissions": "ارسال‌ها",
+      "submissionCount_one": "{{count}} ارسال",
+      "submissionCount_other": "{{count}} ارسال",
+      "submissionPlaceholder": "گواه، شواهد، یا کار تکمیل‌شده را به اشتراک بگذارید...",
+      "noSubmissionsTitle": "هنوز ارسالی نیست",
+      "noSubmissionsHint": "اولین کسی باش که با گواه، شواهد یا کار تکمیل‌شده پاسخ می‌دهد.",
+      "funded": "تأمین‌شده",
+      "ofPledged": "از {{amount}} متعهد شده",
+      "trustNote": "این تعهد بر پایهٔ اعتماد است. پیشرفت تأمین مالی مجموع زپ‌ها و رسیدهای کمک روی ارسال‌های سطح بالا را جمع می‌زند.",
+      "share": "هم‌رسانی",
+      "storyHeading": "تعهد",
+      "storyEmpty": "متعهد هنوز جزئیاتی برای این تعهد ننوشته است."
+    }
+  },
+  "groups": {
+    "list": {
+      "seoTitle": "گروه‌ها",
+      "seoDescription": "گروه‌ها را در Nostr کشف و به آن‌ها بپیوندید",
+      "heroKicker": "گروه‌ها",
+      "heroHeading": "قدرت",
+      "heroHeadingLine2": "در شمار است.",
+      "heroBody": "گروه بسازید، اعضا را گرد هم آورید و از اتفاقات فضاهای خود باخبر بمانید.",
+      "createGroup": "ساخت گروه",
+      "createGroupLoginTitle": "برای ساخت گروه وارد شوید",
+      "createGroupLoginBody": "ساخت گروه یک رویداد Nostr از حساب شما منتشر می‌کند.",
+      "myGroups": "گروه‌های من",
+      "featuredGroups": "گروه‌های ویژه",
+      "loginToSeeTitle": "برای دیدن گروه‌هایت وارد شو",
+      "loginToSeeBody": "گروه‌هایی که ساخته‌ای یا مدیریت می‌کنی اینجا ظاهر می‌شوند.",
+      "noGroupsTitle": "هنوز گروهی نیست",
+      "noGroupsBody": "گروه خودت را بساز تا کمپین‌ها، تعهدها و رویدادها را با مردمت هماهنگ کنی.",
+      "noFeaturedTitle": "هنوز گروه ویژه‌ای نیست",
+      "noFeaturedBody": "مدیران {{appName}} گروه‌های برجسته را اینجا معرفی می‌کنند. به‌زودی سر بزن.",
+      "connectingRelays": "در حال اتصال به رله‌ها…",
+      "showLess": "نمایش کمتر",
+      "showMore": "نمایش {{count}} مورد دیگر",
+      "needsReview": "نیازمند بررسی",
+      "needsReviewDesc": "گروه‌های {{appName}} که هنوز ویژه یا پنهان نشده‌اند. آن‌ها را به قفسهٔ ویژه ببر یا با پنهان‌سازی سرکوب کن.",
+      "needsReviewEmpty": "چیزی منتظر بررسی نیست.",
+      "hidden": "پنهان",
+      "hiddenDesc": "گروه‌های پنهان‌شده از کشف عمومی. از منوی کبابی روی کارت برای آشکارسازی استفاده کن.",
+      "hiddenEmpty": "در حال حاضر گروه پنهانی وجود ندارد.",
+      "tickerCampaignsRaised_one": "روی زنجیره در {{count}} کمپین جمع‌آوری‌شده",
+      "tickerCampaignsRaised_other": "روی زنجیره در {{count}} کمپین جمع‌آوری‌شده",
+      "tickerFeaturedGroups_one": "گروه ویژه در Nostr",
+      "tickerFeaturedGroups_other": "گروه ویژه در Nostr",
+      "tickerCountries_one": "کشور امروز در حال انتشار",
+      "tickerCountries_other": "کشور امروز در حال انتشار"
+    },
+    "create": {
+      "seoTitleCreate": "ساخت گروه",
+      "seoTitleEdit": "ویرایش گروه",
+      "seoDescriptionCreate": "گروهی تازه روی {{appName}} راه بینداز.",
+      "seoDescriptionEdit": "گروهت را در {{appName}} به‌روز کن.",
+      "loginGateTitle": "برای ساخت گروه وارد شو",
+      "loginGateBody": "گروه‌ها رویدادهای امضاشدهٔ Nostr هستند. برای انتشار به ورود Nostr نیاز داری.",
+      "backToGroups": "بازگشت به گروه‌ها",
+      "invalidEditTitle": "پیوند ویرایش نامعتبر",
+      "invalidEditBody": "این پیوند ویرایش گروه نشانی معتبر گروه را ندارد.",
+      "startNewGroup": "ساخت گروه تازه",
+      "loadingGroup": "بارگذاری گروه…",
+      "cannotEditTitle": "این گروه قابل ویرایش نیست",
+      "cannotEditBody": "تنها بنیان‌گذار این گروه می‌تواند آن را به‌روز کند.",
+      "headingCreate": "ساخت گروه",
+      "headingEdit": "ویرایش گروه",
+      "name": "نام",
+      "namePlaceholder": "مثلاً نگهبانان داور",
+      "urlPreview": "پیش‌نمایش نشانی:",
+      "urlPlaceholder": "نام-گروه-تو",
+      "urlKeptOriginal": "(از اصل حفظ شده)",
+      "description": "توضیح",
+      "descriptionPlaceholder": "این گروه دربارهٔ چیست؟",
+      "country": "کشور",
+      "countryPlaceholder": "جستجوی کشورها",
+      "countryClearAria": "پاک کردن کشور",
+      "flagOfAria": "پرچم {{name}}",
+      "countryHint": "<0>i: iso3166:{{code}}</0> برای مرتب‌سازی بر اساس کشور منتشر می‌شود.",
+      "tags": "برچسب‌ها",
+      "tagsPlaceholder": "کمک-متقابل، اخبار-محلی، حقوق-دیجیتال",
+      "coverImage": "تصویر جلد",
+      "moderators": "مدیران",
+      "moderatorsCount": "مدیران ({{count}})",
+      "removeModeratorAria": "حذف {{name}}",
+      "submitCreate": "ساخت گروه",
+      "submitEdit": "به‌روزرسانی گروه",
+      "creating": "در حال ساخت…",
+      "updating": "در حال به‌روزرسانی…",
+      "uploadingCover": "در حال بارگذاری جلد…",
+      "altText": "گروه: {{name}}",
+      "successCreate": "گروه ساخته شد!",
+      "successEdit": "گروه به‌روز شد!",
+      "errorTitleCreate": "ساخت گروه ممکن نشد",
+      "errorTitleEdit": "به‌روزرسانی گروه ممکن نشد",
+      "errorLoginRequired": "برای ساخت گروه باید وارد شوید.",
+      "errorEditLoadFailed": "گروه برای ویرایش بارگذاری نشد.",
+      "errorEditNotOwner": "تنها بنیان‌گذار گروه می‌تواند آن را ویرایش کند.",
+      "errorNameRequired": "نام الزامی است.",
+      "errorNameInvalid": "نام باید شامل حروف یا اعداد باشد تا یک نشانی برای گروه ساخته شود.",
+      "errorEditLatestMissing": "آخرین نسخهٔ این گروه برای به‌روزرسانی یافت نشد.",
+      "errorCoverInvalid": "تصویر جلد باید یک نشانی https:// معتبر باشد.",
+      "errorSlugCollision": "از قبل گروهی با شناسهٔ «{{slug}}» داری. نام دیگری انتخاب کن."
+    },
+    "detail": {
+      "by": "توسط",
+      "byAuthor": "توسط {{name}}",
+      "members": "اعضا",
+      "viewMembers": "نمایش اعضا",
+      "moreMembers": "+{{count}} بیشتر",
+      "about": "درباره",
+      "comments": "نظرها",
+      "comment": "نظر",
+      "commentNoun_one": "نظر",
+      "commentNoun_other": "نظر",
+      "noCommentsTitle": "هنوز نظری نیست",
+      "noCommentsHint": "اولین نفری باشید که گفتگو را شروع می‌کند.",
+      "noMembersFound": "عضوی پیدا نشد.",
+      "founder": "بنیان‌گذار",
+      "moderator": "مدیر",
+      "moreActions": "اقدام‌های بیشتر",
+      "editGroup": "ویرایش گروه",
+      "deleteGroup": "حذف گروه",
+      "officialActivity": "فعالیت رسمی",
+      "officialTools": "ابزارهای رسمی",
+      "startSomething": "چیزی شروع کنید",
+      "officialToolsDescription": "برای {{name}} یک گام بعدی مشخص بسازید.",
+      "launchCampaign": "راه‌اندازی کمپین",
+      "launchCampaignDescription": "با صفحه رسمی گروه کمک مالی جمع‌آوری کنید.",
+      "campaign": "کمپین",
+      "pledge": "تعهد",
+      "pledgeDescription": "کمکی پیشنهاد کنید که مردم بتوانند انجام دهند.",
+      "event": "رویداد",
+      "eventDescription": "حامیان را کنار هم بیاورید.",
+      "untitledEvent": "رویداد بدون عنوان",
+      "interestedCount_one": "{{count}} نفر علاقه‌مند است",
+      "interestedCount_other": "{{count}} نفر علاقه‌مندند",
+      "allDay": "تمام‌روز"
+    }
+  },
+  "campaignsCreate": {
+    "seoTitleCreate": "شروع کمپین",
+    "seoTitleEdit": "ویرایش کمپین",
+    "seoDescriptionCreate": "یک کمپین جمع‌آوری مالی روی {{appName}} راه بینداز.",
+    "seoDescriptionEdit": "کمپین جمع‌آوری مالی‌ات را روی {{appName}} به‌روز کن.",
+    "loginGateTitle": "برای شروع کمپین وارد شو",
+    "loginGateBody": "کمپین‌ها رویدادهای امضاشدهٔ Nostr هستند. برای انتشار به ورود Nostr نیاز داری.",
+    "goHome": "رفتن به خانه",
+    "invalidEditTitle": "پیوند ویرایش نامعتبر",
+    "invalidEditBody": "این پیوند ویرایش کمپین نشانی معتبر کمپین را ندارد.",
+    "startNewCampaign": "شروع کمپین تازه",
+    "loadingCampaign": "بارگذاری کمپین…",
+    "cannotEditTitle": "این کمپین قابل ویرایش نیست",
+    "cannotEditBody": "تنها نویسندهٔ این کمپین می‌تواند آن را به‌روز کند.",
+    "headingCreate": "شروع کمپین",
+    "headingEdit": "ویرایش کمپین",
+    "title": "عنوان",
+    "titlePlaceholder": "آخرین کتاب‌فروشی را نجات بدهیم",
+    "wallet": "کیف پول بیت‌کوین",
+    "myWalletLabel": "کیف پول {{name}}",
+    "myWalletDefault": "کیف پول من",
+    "walletChoose": "یک کیف پول انتخاب کن",
+    "walletCustom": "سفارشی",
+    "acceptAll": "پذیرش همهٔ نوع‌های پرداخت",
+    "acceptPublic": "پذیرش فقط پرداخت‌های عمومی",
+    "acceptPrivate": "پذیرش فقط پرداخت‌های خصوصی",
+    "customWalletIntro": "یک نشانی بیت‌کوین، یک کد پرداخت بی‌صدا یا هر دو را وارد کن. حداقل یکی الزامی است.",
+    "bitcoinAddress": "نشانی بیت‌کوین",
+    "bitcoinAddressPlaceholder": "bc1q… یا bc1p…",
+    "silentPaymentCode": "کد پرداخت بی‌صدا",
+    "silentPaymentCodePlaceholder": "sp1…",
+    "onchainInvalid": "نشانی بیت‌کوین شبکهٔ اصلی شناخته‌شده نیست (bc1q… / bc1p…).",
+    "spInvalid": "کد پرداخت بی‌صدای BIP-352 شناخته‌شده نیست (sp1…).",
+    "country": "کشور",
+    "countryPlaceholder": "جستجوی کشورها",
+    "countryClearAria": "پاک کردن کشور",
+    "flagOfAria": "پرچم {{name}}",
+    "countryHint": "<0>i: iso3166:{{code}}</0> برای مرتب‌سازی بر اساس کشور منتشر می‌شود.",
+    "tags": "برچسب‌ها",
+    "tagsPlaceholder": "دفاع-حقوقی، کمک-متقابل، اخبار-محلی",
+    "banner": "تصویر بنر",
+    "summary": "خلاصه",
+    "summaryPlaceholder": "به کلینیک حقوقی محله‌مان برای دفاع از معترضان مسالمت‌جو کمک کنید.",
+    "story": "داستان",
+    "storyPlaceholder": "پیشینه، ذی‌نفعان و نحوهٔ استفاده از منابع را بیان کن.",
+    "goal": "هدف",
+    "goalPlaceholder": "۲۵٬۰۰۰",
+    "goalNote": "دلار آمریکای صحیح. اهداکنندگان با بیت‌کوین می‌پردازند؛ کلاینت‌ها معادل دلاری را در زمان نمایش تخمین می‌زنند.",
+    "deadline": "مهلت",
+    "submitCreate": "راه‌اندازی کمپین",
+    "submitEdit": "به‌روزرسانی کمپین",
+    "publishing": "در حال انتشار…",
+    "updating": "در حال به‌روزرسانی…",
+    "uploadingBanner": "در حال بارگذاری بنر…",
+    "altText": "کمپین جمع‌آوری مالی: {{title}}",
+    "successCreate": "کمپین راه‌اندازی شد",
+    "successCreateDesc": "کمپین تو فعال است.",
+    "successEdit": "کمپین به‌روز شد",
+    "successEditDesc": "تغییرات کمپین تو فعال‌اند.",
+    "errorTitleCreate": "انتشار کمپین ممکن نشد",
+    "errorTitleEdit": "به‌روزرسانی کمپین ممکن نشد",
+    "errorLoginRequired": "برای ساخت کمپین باید وارد شوید.",
+    "errorEditLoadFailed": "کمپین برای ویرایش بارگذاری نشد.",
+    "errorEditNotOwner": "تنها نویسندهٔ کمپین می‌تواند آن را ویرایش کند.",
+    "errorTitleRequired": "عنوان الزامی است.",
+    "errorTitleInvalid": "عنوان باید شامل حروف یا اعداد باشد تا یک نشانی برای کمپین ساخته شود.",
+    "errorSlugInvalid": "شناسه باید با حروف کوچک، اعداد و خط تیره باشد.",
+    "errorHdUnavailable": "کیف پول داخلی برای این ورود در دسترس نیست.",
+    "errorSpUnavailable": "نشانی پرداخت بی‌صدا برای این ورود در دسترس نیست.",
+    "errorOnchainInvalid": "نشانی روی زنجیره، یک نشانی bech32(m) شبکهٔ اصلی شناخته‌شده نیست (bc1q… / bc1p…).",
+    "errorSpInvalid": "کد پرداخت بی‌صدا یک کد BIP-352 شناخته‌شده نیست (sp1…).",
+    "errorWalletRequired": "حداقل یک نقطهٔ کیف پول وارد کن — یک نشانی بیت‌کوین شبکهٔ اصلی (bc1q… / bc1p…) یا یک کد پرداخت بی‌صدا (sp1…).",
+    "errorGoalInvalid": "هدف باید یک مقدار مثبت به دلار صحیح باشد.",
+    "errorDeadlinePast": "مهلت نمی‌تواند در گذشته باشد.",
+    "errorDeadlineInvalid": "مهلت یک تاریخ معتبر نیست.",
+    "errorEditLatestMissing": "آخرین نسخهٔ این کمپین برای به‌روزرسانی یافت نشد.",
+    "errorSlugCollision": "از قبل کمپینی با شناسهٔ «{{slug}}» داری. شناسهٔ دیگری انتخاب کن.",
+    "errorBannerInvalid": "بنر باید یک نشانی https:// معتبر باشد.",
+    "errorHdDeriveFailed": "نشانی روی زنجیرهٔ تازه از کیف پولت استخراج نشد.",
+    "errorHdDeriveInvalid": "نشانی استخراج‌شده اعتبارسنجی نشد. لطفاً یک نشانی سفارشی اضافه کن.",
+    "errorWalletRequiredFallback": "نقطهٔ کیف پول الزامی است.",
+    "errorPublishedInvalid": "رویداد منتشرشده اعتبارسنجی نشد. لطفاً صفحه را به‌روز کن و دوباره تلاش کن."
+  },
+  "campaignsDetail": {
+    "seoTitle": "{{title}} | کمپین‌های {{appName}}",
+    "seoDescriptionFallback": "از {{title}} در {{appName}} حمایت کن.",
+    "deadlineEndedOn": "در {{date}} پایان یافت",
+    "deadlineEndsToday": "امروز پایان می‌یابد",
+    "deadlineDaysLeft_one": "{{count}} روز باقی",
+    "deadlineDaysLeft_other": "{{count}} روز باقی",
+    "deadlineEndsOn": "در {{date}} پایان می‌یابد",
+    "back": "بازگشت",
+    "edit": "ویرایش",
+    "delete": "حذف",
+    "deleting": "در حال حذف…",
+    "byAuthor": "توسط <0>{{name}}</0>",
+    "commentLabel": "نظر",
+    "linkCopied": "پیوند در کلیپ‌بورد کپی شد",
+    "pinnedToast": "به کمپین سنجاق شد",
+    "unpinnedToast": "از کمپین جدا شد",
+    "pinFailed": "به‌روزرسانی سنجاق‌ها ناموفق بود",
+    "deletedToast": "کمپین حذف شد",
+    "deletedToastDesc": "درخواست حذف منتشر شد. رله‌های همکار کمپین را از فیدها حذف خواهند کرد.",
+    "deleteErrorTitle": "حذف کمپین ممکن نشد",
+    "campaigner": "میزبان کمپین",
+    "repost_one": "<0>{{count}}</0> بازنشر",
+    "repost_other": "<0>{{count}}</0> بازنشر",
+    "quote_one": "<0>{{count}}</0> نقل‌قول",
+    "quote_other": "<0>{{count}}</0> نقل‌قول",
+    "like_one": "<0>{{count}}</0> پسند",
+    "like_other": "<0>{{count}}</0> پسند",
+    "commentsAndDonations": "نظرها و کمک‌ها",
+    "commentCount_one": "{{count}} نظر",
+    "commentCount_other": "{{count}} نظر",
+    "noCommentsTitle": "هنوز نظری نیست",
+    "noCommentsHint": "اولین کسی باش که پیام حمایت می‌گذارد.",
+    "deleteDialogTitle": "این کمپین حذف شود؟",
+    "deleteDialogBody": "این یک درخواست حذف NIP-09 منتشر می‌کند. رله‌های همکار کمپین را از فیدها و پیوندهای مستقیم حذف خواهند کرد. رسیدهای کمک‌های گذشته در زنجیره باقی می‌مانند. این کار قابل بازگشت نیست — برای ادامهٔ دریافت کمک، به‌جای حذف کمپین را ویرایش کن.",
+    "storyHeading": "داستان",
+    "storyEmpty": "سازمان‌دهنده هنوز داستانی برای این کمپین ننوشته است.",
+    "campaignEnded": "کمپین پایان یافت",
+    "donate": "کمک کنید",
+    "share": "هم‌رسانی",
+    "target": "هدف: {{amount}}",
+    "raised": "جمع‌آوری‌شده",
+    "ofGoal": "از هدف {{amount}}",
+    "donationCount_one": "{{count}} کمک",
+    "donationCount_other": "{{count}} کمک",
+    "recentDonations": "کمک‌های اخیر",
+    "seeAllDonations_one": "نمایش همهٔ {{count}} کمک",
+    "openInWallet": "باز کردن در کیف پول",
+    "seeAllDonations_other": "نمایش همهٔ {{count}} کمک"
+  },
+  "calendarEvents": {
+    "create": {
+      "seoTitle": "ایجاد رویداد",
+      "seoDescription": "یک رویداد تقویمی در {{appName}} ایجاد کنید.",
+      "loginTitle": "برای ایجاد رویداد وارد شوید",
+      "loginBody": "رویدادها، رویدادهای امضاشدهٔ Nostr هستند. برای انتشار باید وارد Nostr شوید.",
+      "backToEvents": "بازگشت به رویدادها",
+      "heading": "ایجاد رویداد",
+      "titlePlaceholder": "پاک‌سازی محله",
+      "descriptionPlaceholder": "به مردم بگویید چه انتظاری داشته باشند، چه چیزی بیاورند، و چه کسانی باید شرکت کنند...",
+      "schedule": "زمان‌بندی",
+      "allDay": "رویداد تمام‌روز",
+      "allDayHint": "برای افزودن زمان شروع و پایان، آن را خاموش کنید.",
+      "startDate": "تاریخ شروع",
+      "endDate": "تاریخ پایان",
+      "startTime": "زمان شروع",
+      "endTime": "زمان پایان",
+      "locationDetails": "جزئیات مکان",
+      "locationPlaceholder": "نشانی، محل برگزاری، یا پیوند تماس ویدیویی",
+      "tagsPlaceholder": "کمک-متقابل، کارگاه، اخبار-محلی",
+      "submit": "ایجاد رویداد",
+      "successToast": "رویداد ایجاد شد",
+      "errorToast": "ایجاد رویداد ممکن نشد",
+      "altCalendar": "رویداد تقویمی: {{title}}",
+      "altGroup": "رویداد گروه: {{title}}",
+      "errorLoginRequired": "برای ایجاد رویداد باید وارد شوید.",
+      "errorTitleRequired": "عنوان الزامی است.",
+      "errorStartDateRequired": "تاریخ شروع الزامی است.",
+      "errorStartDatePast": "تاریخ شروع نمی‌تواند در گذشته باشد.",
+      "errorStartTimeRequired": "زمان شروع برای رویدادهای زمان‌دار الزامی است.",
+      "errorCoverInvalid": "تصویر کاور باید یک URL معتبر https:// باشد.",
+      "errorEndDateBeforeStart": "تاریخ پایان باید برابر یا پس از تاریخ شروع باشد.",
+      "errorStartDateTimeInvalid": "تاریخ یا زمان شروع نامعتبر است.",
+      "errorEndTimeAfterStart": "زمان پایان باید پس از زمان شروع باشد."
+    },
+    "detail": {
+      "untitledEvent": "رویداد بدون عنوان",
+      "dateNotSpecified": "تاریخ مشخص نشده است",
+      "organizer": "برگزارکننده",
+      "rsvpUpdated": "RSVP به‌روزرسانی شد",
+      "rsvpFailed": "به‌روزرسانی RSVP ناموفق بود",
+      "rsvp": "RSVP",
+      "youAreGoing": "شما می‌روید",
+      "youAreInterested": "شما علاقه‌مندید",
+      "youCantGo": "نمی‌توانید بروید",
+      "chooseRsvp": "RSVP خود را انتخاب کنید",
+      "going": "می‌روم",
+      "interested": "علاقه‌مندم",
+      "cantGo": "نمی‌توانم بروم",
+      "attendees": "شرکت‌کنندگان",
+      "links": "پیوندها",
+      "participants": "مشارکت‌کنندگان",
+      "hostedBy": "برگزارشده توسط",
+      "attendingCount_one": "{{count}} نفر شرکت می‌کند",
+      "attendingCount_other": "{{count}} نفر شرکت می‌کنند",
+      "interestedCount_one": "{{count}} نفر علاقه‌مند است",
+      "interestedCount_other": "{{count}} نفر علاقه‌مندند",
+      "comment": "نظر",
+      "description": "توضیح",
+      "emptyDescription": "برگزارکننده هنوز توضیحی برای این رویداد اضافه نکرده است.",
+      "comments": "نظرها",
+      "commentNoun_one": "نظر",
+      "commentNoun_other": "نظر",
+      "noCommentsTitle": "هنوز نظری نیست",
+      "noCommentsHint": "اولین نفری باشید که نظر می‌دهد.",
+      "pinnedToast": "به رویداد سنجاق شد",
+      "unpinnedToast": "از رویداد برداشته شد",
+      "pinFailed": "به‌روزرسانی سنجاق‌های رویداد ناموفق بود"
+    }
+  },
+  "follow": {
+    "follow": "دنبال کردن",
+    "following": "دنبال می‌کنید",
+    "unfollow": "لغو دنبال‌کردن",
+    "followed": "دنبال شد",
+    "unfollowed": "دنبال‌کردن لغو شد",
+    "updateFailed": "به‌روزرسانی فهرست دنبال‌کردن ناموفق بود"
+  },
+  "campaigns": {
+    "home": {
+      "seoTitle": "کمپین‌های جذب کمک مالی",
+      "seoDescription": "اتصال فعالان به تأمین مالی غیرقابل توقف.",
+      "heroTagline": "تأمین مالی <0>غیرقابل توقف</0> برای فعالان.",
+      "heroBody": "بیت‌کوین را مستقیماً از حامیان سراسر جهان دریافت کنید. هر کمک مالی بدون واسطه، بدون استرداد، و بدون اینکه هیچ پلتفرمی پول شما را نگه دارد، مستقیماً به کیف پول شما می‌رسد.",
+      "startCampaign": "شروع یک کمپین",
+      "howItWorks": "چگونه کار می‌کند",
+      "exploreCampaigns": "مرور کمپین‌ها",
+      "featured": "ویژه",
+      "featuredDesc": "کمپین‌های منتخب تیم {{appName}}.",
+      "community": "کمپین‌های جامعه",
+      "communityDesc": "به تأمین مالی تغییراتی که ارزش انجام دادن دارند کمک کنید.",
+      "browseAll": "← مرور همه کمپین‌ها",
+      "pending": "در انتظار تأیید",
+      "pendingDesc": "کمپین‌هایی که در شبکه هستند و هیچ ناظر تیم Soapbox هنوز آن‌ها را تأیید یا پنهان نکرده است.",
+      "pendingEmpty": "چیزی برای بررسی نیست.",
+      "hidden": "پنهان‌شده",
+      "hiddenDesc": "کمپین‌هایی که از صفحه اصلی عمومی حذف شده‌اند. برای آشکار کردن دوباره از منوی کارت استفاده کنید.",
+      "hiddenEmpty": "در حال حاضر هیچ کمپینی پنهان نشده است.",
+      "yourCampaigns": "کمپین‌های شما",
+      "yourCampaignsDesc": "کمپین‌های شما در Nostr فعال هستند و کمک‌های مالی از طریق لینک کار می‌کنند. به محض تأیید توسط یک ناظر تیم Soapbox، در صفحه اصلی ظاهر می‌شوند.",
+      "empty": "هنوز کمپینی وجود ندارد",
+      "emptyHint": "اولین نفری باشید که در {{appName}} کمپین راه‌اندازی می‌کند. داستان خود را بگویید، ذی‌نفعان را انتخاب کنید، و لینک را به اشتراک بگذارید."
+    },
+    "all": {
+      "title": "همه کمپین‌ها",
+      "seoTitle": "همه کمپین‌ها",
+      "description": "همه کمپین‌های منتشرشده در Agora را مرور کنید.",
+      "searchAriaLabel": "جستجوی کمپین‌ها",
+      "searchPlaceholder": "جستجوی کمپین‌ها…",
+      "clearSearch": "پاک کردن جستجو",
+      "sortAriaLabel": "ترتیب",
+      "sortTop": "برتر",
+      "sortNew": "جدید",
+      "showHidden": "نمایش پنهان‌شده‌ها",
+      "startCampaign": "شروع یک کمپین",
+      "noMatch": "هیچ کمپینی با «{{query}}» مطابقت ندارد",
+      "noMatchHint": "عبارت جستجوی دیگری را امتحان کنید، یا جستجو را پاک کنید تا همه کمپین‌ها را ببینید.",
+      "allHidden": "کمپینی برای نمایش وجود ندارد",
+      "allHiddenHint": "تمام کمپین‌های روی شبکه توسط ناظران پنهان شده‌اند. «نمایش پنهان‌شده‌ها» را فعال کنید تا آن‌ها را ببینید.",
+      "empty": "هنوز کمپینی وجود ندارد",
+      "emptyHint": "هنوز هیچ کمپینی منتشر نشده است. اولین نفر باشید."
+    }
+  },
+  "settings": {
+    "title": "تنظیمات",
+    "description": "مدیریت تنظیمات {{appName}} شما",
+    "deleteAccount": "حذف حساب",
+    "sections": {
+      "profile": "نمایه",
+      "profileDesc": "نام نمایشی، بیوگرافی، آواتار و تأیید هویت.",
+      "appearance": "ظاهر",
+      "appearanceDesc": "حالت سیستم، روشن یا تاریک.",
+      "language": "زبان",
+      "languageDesc": "زبان مورد استفاده در سراسر برنامه را انتخاب کنید.",
+      "network": "شبکه",
+      "networkDesc": "مصرف داده، رله‌ها و سرورهای بارگذاری فایل.",
+      "notifications": "اعلان‌ها",
+      "notificationsDesc": "ترجیحات اعلان‌های فوری.",
+      "advanced": "پیشرفته",
+      "advancedDesc": "کیف پول، سیستم و گزینه‌های کاربران حرفه‌ای.",
+      "organizers": "سازماندهندگان",
+      "organizersDesc": "تعیین سازماندهندگان کشوری که می‌توانند پست‌ها را به فید کشور سنجاق کنند."
+    },
+    "organizers": "سازماندهندگان",
+    "signInToManage": "برای مدیریت وارد شوید",
+    "loginRequired": "برای مدیریت سازماندهندگان باید وارد شوید.",
+    "appearance": {
+      "title": "ظاهر",
+      "subtitle": "نحوه نمایش برنامه را انتخاب کنید.",
+      "intro": "حالت رنگ مورد علاقه خود را انتخاب کنید. حالت «سیستم» به طور خودکار با تنظیمات روشن یا تاریک دستگاه شما هماهنگ می‌شود.",
+      "colorMode": "حالت رنگ",
+      "system": "سیستم",
+      "systemDesc": "از تنظیمات دستگاه پیروی می‌کند",
+      "light": "روشن",
+      "lightDesc": "همیشه از حالت روشن استفاده کن",
+      "dark": "تاریک",
+      "darkDesc": "همیشه از حالت تاریک استفاده کن"
+    },
+    "network": {
+      "title": "شبکه",
+      "subtitle": "مدیریت مصرف داده، رله‌ها و سرورهای بارگذاری فایل.",
+      "connectionsHeading": "اتصالات شبکه",
+      "connectionsIntro": "اتصالات رله خود را مدیریت کنید. رله‌ها سرورهایی هستند که رویدادهای Nostr را در شبکه ذخیره و توزیع می‌کنند.",
+      "lowBandwidthHeading": "حالت پهنای باند کم",
+      "reduceDataUsage": "کاهش مصرف داده",
+      "reduceDataUsageDesc": "برای اتصالات اندازه‌گیری‌شده یا کند. ویدیوها به‌صورت خودکار پخش نمی‌شوند، پیش‌نمایش‌های ویدیویی پس‌زمینه نادیده گرفته می‌شوند و تصاویر پیش از بارگذاری منتظر ضربه می‌مانند.",
+      "useImageProxy": "استفاده از پراکسی تصویر",
+      "useImageProxyDesc": "نسخه‌های کوچک‌تر WebP تصاویر را به‌جای اصل با وضوح کامل دریافت می‌کند.",
+      "proxyUrl": "نشانی پراکسی",
+      "proxyApiDesc": "باید با API <0>wsrv.nl / weserv</0> سازگار باشد. کاربرانی که خودشان میزبانی می‌کنند می‌توانند آن را به نمونه خود اشاره دهند.",
+      "reset": "بازنشانی",
+      "relays": "رله‌ها",
+      "blossomServers": "سرورهای Blossom",
+      "imageUploads": "بارگذاری تصاویر",
+      "uploadQuality": "کیفیت بارگذاری",
+      "uploadQualityDesc": "«فشرده» اندازه تصاویر بزرگ را تغییر می‌دهد و کوچک‌ترین فرمت را انتخاب می‌کند. «اصلی» تصاویر را دقیقاً همان‌طور که هستند بارگذاری می‌کند.",
+      "compressed": "فشرده",
+      "original": "اصلی"
+    },
+    "advanced": {
+      "title": "پیشرفته",
+      "subtitle": "اتصالات کیف پول، پیکربندی سیستم و سایر گزینه‌های پیشرفته برای کاربران حرفه‌ای.",
+      "intro": "اتصالات کیف پول، پیکربندی سیستم و سایر گزینه‌های پیشرفته.",
+      "powerUserHeading": "تنظیمات کاربران حرفه‌ای",
+      "wallet": "کیف پول"
+    },
+    "wallet": {
+      "title": "کیف پول",
+      "subtitle": "مدیریت اتصالات کیف پول و پرداخت‌ها"
+    }
+  },
+  "language": {
+    "title": "زبان",
+    "subtitle": "زبان مورد استفاده در سراسر برنامه را انتخاب کنید.",
+    "intro": "زبان مورد علاقه خود را انتخاب کنید. برنامه فوراً تغییر می‌کند و انتخاب شما را در این دستگاه به یاد می‌سپارد.",
+    "translationNote": "ترجمه‌ها در حال انجام هستند. متن ترجمه‌نشده به انگلیسی نمایش داده می‌شود."
+  },
+  "organizers": {
+    "appoint": "تعیین سازمان‌دهنده",
+    "appointDesc": "به کاربر اجازه دهید پست‌ها را در فید یک کشور خاص سنجاق کند.",
+    "appointing": "در حال تعیین…",
+    "appointed": "سازمان‌دهنده تعیین شد",
+    "appointedSuccess": "سازمان‌دهنده برای {{country}} تعیین شد",
+    "userNpub": "npub کاربر",
+    "country": "کشور",
+    "selectCountry": "یک کشور انتخاب کنید",
+    "invalidNpub": "قالب npub نامعتبر است",
+    "alreadyOrganizer": "این کاربر در حال حاضر سازمان‌دهنده آن کشور است",
+    "current": "سازمان‌دهندگان فعلی",
+    "noOrganizers": "هنوز هیچ سازمان‌دهنده‌ای تعیین نشده است.",
+    "removed": "سازمان‌دهنده حذف شد",
+    "removedSuccess": "{{name}} از {{country}} حذف شد",
+    "refreshed": "به‌روزرسانی شد",
+    "refreshedDesc": "فهرست سازمان‌دهندگان از رله‌ها به‌روزرسانی شد.",
+    "adminRequired": "دسترسی مدیر لازم است",
+    "adminRequiredDesc": "فقط مدیران پلتفرم می‌توانند سازمان‌دهندگان را تعیین یا حذف کنند."
+  },
+  "wallet": {
+    "seoTitle": "کیف پول",
+    "seoDescription": "کیف پول بیت‌کوین قطعی سلسله‌مراتبی مشتق‌شده از nsec شما در Nostr.",
+    "loggedOut": {
+      "title": "کیف پول بیت‌کوین",
+      "description": "یک کیف پول سلسله‌مراتبی که از هویت Nostr شما مشتق می‌شود. نشانی تازه برای هر دریافت، تاریخچهٔ کامل تراکنش‌ها، بدون استفادهٔ مجدد از نشانی.",
+      "requiresNsec": "برای ورود نیازمند nsec (کلید خصوصی Nostr شما) است."
+    },
+    "unsupported": {
+      "title": "کیف پول در دسترس نیست",
+      "extension": "افزونهٔ مرورگر شما کلید مخفی را جدا نگه می‌دارد، بنابراین نمی‌توانیم کلیدهای فرزند را برای کیف پول شما مشتق کنیم.",
+      "bunker": "امضاکنندهٔ راه دور شما (bunker مطابق NIP-46) کلید مخفی را در سمت bunker نگه می‌دارد، بنابراین نمی‌توانیم کلیدهای فرزند را برای کیف پول شما مشتق کنیم.",
+      "other": "روش ورود شما کلید مخفی لازم برای مشتق‌سازی کیف پول را در دسترس قرار نمی‌دهد.",
+      "instructions": "برای استفاده از کیف پول، خارج شوید و دوباره با nsec وارد شوید."
+    },
+    "scanFailed": "پویش کیف پول ناموفق بود",
+    "retry": "تلاش دوباره",
+    "refreshBalance": "بازخوانی موجودی",
+    "refreshBalanceTitle": "برای بازخوانی موجودی کلیک کنید",
+    "amountPending": "{{amount}} در انتظار",
+    "pending": "در انتظار",
+    "send": "ارسال",
+    "receive": "دریافت",
+    "transactions": "تراکنش‌ها",
+    "receiveDialog": {
+      "title": "دریافت بیت‌کوین",
+      "description": "برای دریافت بیت‌کوین، یک نشانی به اشتراک بگذارید.",
+      "onChain": "روی زنجیره",
+      "silentPayment": "پرداخت خاموش",
+      "onChainIntro": "هر بار نشانی تازه. پس از اشتراک‌گذاری، برای حفظ حریم خصوصی به یک نمایه جدید بروید.",
+      "addressIndex": "نشانی شمارهٔ {{index}}",
+      "newAddress": "نشانی جدید",
+      "silentIntro": "شناسهٔ دریافت ایستا. یک‌بار به اشتراک بگذارید و برای همیشه استفاده کنید — فرستندگان برای هر پرداخت یک نشانی منحصربه‌فرد روی زنجیره مشتق می‌کنند.",
+      "noIndexer": "پویش غیرفعال است — هیچ ایندکس‌کنندهٔ BIP-352 پیکربندی نشده است. برای شناسایی پرداخت‌های خاموش ورودی، <0>bip352IndexerUrl</0> را در پیکربندی برنامه تنظیم کنید.",
+      "silentBalance": "موجودی پرداخت خاموش: <0>{{amount}}</0>",
+      "scanForNew": "پویش پرداخت‌های جدید",
+      "scanForPayments": "پویش پرداخت‌ها"
+    },
+    "tx": {
+      "pending": "در انتظار",
+      "today": "امروز",
+      "yesterday": "دیروز",
+      "daysAgo_one": "{{count}} روز پیش",
+      "daysAgo_other": "{{count}} روز پیش",
+      "received": "دریافت‌شده",
+      "sent": "ارسال‌شده",
+      "silentBadge": "خاموش",
+      "silentDetectedTitle": "از طریق پویش پرداخت خاموش BIP-352 شناسایی شد"
+    }
+  },
+  "walletRecovery": {
+    "seoTitle": "بازیابی کیف پول قدیمی",
+    "seoDescription": "وجوه را از کیف پول Lightning قبلی بازیابی کنید و آن‌ها را به نشانی بیت‌کوین مشتق‌شده از Nostr خود منتقل کنید.",
+    "title": "بازیابی کیف پول قدیمی",
+    "heading": "کیف پول قدیمی خود را بازیابی کنید",
+    "subheading": "اگر قبلاً وجوهی در کیف پول Lightning نگه می‌داشتید، می‌توانید آن‌ها را به نشانی بیت‌کوین مشتق‌شده از Nostr خود منتقل کنید. کیف پول قبلی شما بازنشانی نمی‌شود — این انتقالی یک‌بارمصرف و یک‌طرفه است.",
+    "backToWallet": "بازگشت به کیف پول",
+    "loggedOut": {
+      "title": "برای بازیابی وارد شوید",
+      "description": "با هویت Nostr که مالک کیف پول قدیمی Lightning بود وارد شوید تا وجوه به نشانی بیت‌کوین آن منتقل شوند."
+    },
+    "destination": {
+      "title": "وجوه به این نشانی ارسال می‌شوند",
+      "description": "نشانی Taproot مشتق‌شده از Nostr شما."
+    },
+    "phrase": {
+      "title": "عبارت بازیابی",
+      "description": "عبارت بازیابی ۱۲ کلمه‌ای کیف پول قدیمی خود را الصاق کنید.",
+      "checkingRelays": "در حال بررسی رله‌های شما برای یافتن نسخهٔ پشتیبان رمزنگاری‌شده…",
+      "backupFoundTitle": "نسخهٔ پشتیبان روی رله‌های شما پیدا شد",
+      "backupFoundDesc": "نسخهٔ پشتیبان رمزنگاری‌شده‌ای از عبارت بازیابی کیف پول قدیمی شما را که از این حساب منتشر شده پیدا کردیم.",
+      "decryptAndUse": "رمزگشایی و استفاده",
+      "placeholder": "کلمه۱ کلمه۲ کلمه۳ …",
+      "warning": "فقط عبارت بازیابی‌ای را الصاق کنید که به آن اعتماد دارید. هر کسی که این عبارت را داشته باشد می‌تواند وجوه را خرج کند. پس از تکمیل انتقال، آن را از هر جایی که کپی کرده‌اید پاک کنید.",
+      "sweepButton": "انتقال وجوه به نشانی بیت‌کوین من"
+    },
+    "sweeping": {
+      "working": "در حال انجام…",
+      "dontClose": "این برگه را نبندید. ممکن است تا یک دقیقه طول بکشد تا کیف پول قدیمی همگام‌سازی شود و تراکنش پخش گردد."
+    },
+    "success": {
+      "title": "بازیابی کامل شد",
+      "sent": "{{sats}} ساتوشی به نشانی بیت‌کوین شما ارسال شد.",
+      "viewTransaction": "مشاهدهٔ تراکنش"
+    },
+    "error": {
+      "title": "بازیابی ناموفق بود",
+      "tryAgain": "تلاش دوباره"
+    },
+    "errors": {
+      "noNip44": "امضاکنندهٔ شما رمزگشایی NIP-44 را که برای خواندن نسخهٔ پشتیبان از رله مورد نیاز است پشتیبانی نمی‌کند. به‌جای آن عبارت بازیابی ۱۲ کلمه‌ای خود را به‌صورت دستی الصاق کنید.",
+      "decryptFailed": "نتوانستیم نسخهٔ پشتیبان رله را رمزگشایی کنیم. به‌جای آن عبارت بازیابی ۱۲ کلمه‌ای خود را به‌صورت دستی الصاق کنید.",
+      "decryptGeneric": "رمزگشایی نسخهٔ پشتیبان رله ناموفق بود.",
+      "invalidWordCount": "عبارت بازیابی باید ۱۲ یا ۲۴ کلمه باشد.",
+      "noBalance": "کیف پول قدیمی شما موجودی قابل خرج ندارد. چیزی برای بازیابی نیست.",
+      "sweepGeneric": "بازیابی ناموفق بود. لطفاً دوباره تلاش کنید."
+    },
+    "progress": {
+      "loadingSdk": "در حال بارگذاری SDK کیف پول…",
+      "connecting": "در حال اتصال به کیف پول قدیمی شما…",
+      "checkingBalance": "در حال بررسی موجودی…",
+      "preparingTransfer": "در حال آماده‌سازی انتقال {{sats}} ساتوشی…",
+      "broadcasting": "در حال پخش تراکنش…"
+    },
+    "toast": {
+      "backupLoadedTitle": "نسخهٔ پشتیبان بارگذاری شد",
+      "backupLoadedDesc": "عبارت بازیابی از رله‌های شما رمزگشایی شد."
+    }
+  },
+  "walletConnect": {
+    "status": "وضعیت",
+    "ready": "آماده",
+    "notFound": "یافت نشد",
+    "none": "هیچ",
+    "add": "افزودن",
+    "active": "فعال",
+    "connectionLabel": "اتصال NWC",
+    "defaultWalletName": "کیف پول Lightning",
+    "setActiveTitle": "تنظیم به‌عنوان فعال",
+    "removeTitle": "حذف کیف پول",
+    "helpText": "برای ارسال zap، یک افزونهٔ مرورگر WebLN نصب کنید یا یک کیف پول NWC وصل کنید.",
+    "webln": {
+      "name": "WebLN",
+      "description": "افزونهٔ مرورگر"
+    },
+    "nwc": {
+      "name": "Nostr Wallet Connect",
+      "description": "اتصال کیف پول راه دور",
+      "connectedCount_one": "{{count}} کیف پول متصل",
+      "connectedCount_other": "{{count}} کیف پول متصل"
+    },
+    "empty": {
+      "title": "کیف پولی متصل نیست",
+      "description": "برای فعال‌سازی zapهای فوری، یک اتصال NWC اضافه کنید."
+    },
+    "dialog": {
+      "title": "اتصال کیف پول NWC",
+      "description": "رشتهٔ اتصال را از کیف پول سازگار با NWC خود جای‌گذاری کنید.",
+      "aliasPlaceholder": "نام کیف پول (اختیاری)",
+      "connect": "اتصال",
+      "connecting": "در حال اتصال..."
+    },
+    "toast": {
+      "uriRequiredTitle": "URI اتصال لازم است",
+      "uriRequiredDesc": "لطفاً یک URI اتصال NWC معتبر وارد کنید.",
+      "activeChangedTitle": "کیف پول فعال تغییر کرد",
+      "activeChangedDesc": "کیف پول انتخاب‌شده اکنون برای zapها فعال است."
+    }
+  },
+  "walletSend": {
+    "title": "ارسال بیت‌کوین",
+    "send": "ارسال بیت‌کوین",
+    "tapAgainToConfirm": "برای تأیید دوباره ضربه بزنید",
+    "approxSats": "≈ {{sats}} ساتوشی",
+    "satPerVB": "{{rate}} ساتوشی/vB",
+    "networkFee": "کارمزد شبکه",
+    "available": "موجود: {{usd}} ({{sats}} ساتوشی)",
+    "recipient": {
+      "label": "گیرنده",
+      "placeholder": "bc1…، sp1… یا npub…",
+      "sendingSp": "ارسال از طریق پرداخت خاموش — گیرنده یک نشانی تازه و غیرقابل‌پیوندیابی روی زنجیره دریافت می‌کند.",
+      "sendingNostr": "ارسال به نشانی روی‌زنجیرهٔ یک کاربر Nostr.",
+      "sendingRaw": "ارسال به یک نشانی خام بیت‌کوین."
+    },
+    "feeSpeed": {
+      "fastest": "~۱۰ دقیقه",
+      "halfHour": "~۳۰ دقیقه",
+      "hour": "~۱ ساعت",
+      "economy": "~۱ روز"
+    },
+    "progress": {
+      "building": "در حال ساخت تراکنش…",
+      "signing": "در حال امضا…",
+      "broadcasting": "در حال پخش…",
+      "sending": "در حال ارسال…"
+    },
+    "errors": {
+      "unavailable": "کیف پول HD برای این روش ورود در دسترس نیست.",
+      "enterRecipient": "یک نشانی بیت‌کوین، نشانی sp1… یا npub وارد کنید.",
+      "noSpendable": "هیچ بیت‌کوین قابل خرجی در این کیف پول وجود ندارد.",
+      "feesNotLoaded": "نرخ کارمزد بارگذاری نشده است.",
+      "cantSendToSelf": "نمی‌توانید به خودتان ارسال کنید.",
+      "enterAmount": "یک مبلغ وارد کنید.",
+      "insufficient": "بیت‌کوین کافی برای این مبلغ + کارمزد شبکه ندارید.",
+      "waitingPrice": "در انتظار قیمت BTC…",
+      "noneYet": "هنوز بیت‌کوینی ندارید.",
+      "acknowledgePrivacy": "پیش از ارسال هشدار حریم خصوصی را تأیید کنید."
+    },
+    "toast": {
+      "failedTitle": "تراکنش ناموفق بود"
+    },
+    "success": {
+      "title": "بیت‌کوین ارسال شد",
+      "satsAmount": "{{sats}} ساتوشی",
+      "viewTransaction": "مشاهدهٔ تراکنش",
+      "done": "انجام شد"
+    }
+  },
+  "bitcoinPublic": {
+    "lead": "پولی که ارسال می‌کنید عمومی است و می‌تواند به شما بازیابی شود.",
+    "learnMore": "بیشتر بدانید",
+    "body": "بیت‌کوین یک دفتر کل عمومی است. تراکنش‌هایی که ارسال می‌کنید می‌توانند برای همیشه به شما ردیابی شوند، حتی پس از مبادله توسط چند نفر. تنها به کسانی ارسال کنید که می‌خواهید آشکارا حمایتشان کنید.",
+    "bodyWithCashOut": "بیت‌کوین یک دفتر کل عمومی است. تراکنش‌هایی که ارسال می‌کنید می‌توانند برای همیشه به شما ردیابی شوند، حتی پس از مبادله توسط چند نفر. تنها به کسانی ارسال کنید که می‌خواهید آشکارا حمایتشان کنید، یا در یک صرافی نقد کنید.",
+    "iUnderstand": "می‌دانم که این تراکنش عمومی است."
+  },
+  "spScan": {
+    "title": "پویش پرداخت‌های خاموش",
+    "description": "ایندکس‌کنندهٔ BIP-352 پیکربندی‌شده را بلوک‌به‌بلوک پیمایش می‌کند تا پرداخت‌های خاموش ورودی را شناسایی کند.",
+    "fromBlock": "از بلوک",
+    "toBlock": "تا بلوک",
+    "tipPlaceholder": "نوک",
+    "indexerTip": "نوک ایندکس‌کننده",
+    "lastFullyScanned": "آخرین پویش کامل",
+    "never": "هرگز",
+    "includeSpent": "شامل خرج‌شده‌ها",
+    "includeSpentDesc": "پرداخت‌های خاموشی که از آن پس خرج شده‌اند را نیز شناسایی کن. هنگام بازسازی تاریخچهٔ دریافت پس از پویش از دست‌رفته یا بازنشانی استفاده شود.",
+    "blockProgress": "بلوک {{current}} / {{to}}",
+    "matches_one": "{{count}} تطبیق",
+    "matches_other": "{{count}} تطبیق",
+    "scannedRange": "بلوک‌های پویش‌شده {{from}} → {{to}}.",
+    "foundOutputs_one": "{{count}} خروجی جدید یافت شد.",
+    "foundOutputs_other": "{{count}} خروجی جدید یافت شد.",
+    "noNewPayments": "پرداخت جدیدی نیست.",
+    "startScan": "شروع پویش",
+    "reconcile": {
+      "title": "تطبیق UTXOهای خرج‌شده",
+      "description": "هر UTXOِ پرداخت خاموش ذخیره‌شده را در برابر Blockbook بررسی می‌کند و آن‌هایی را که خرج شده‌اند حذف می‌کند. اگر پس از ارسال، موجودی بیش از حد است از این استفاده کن.",
+      "checking": "در حال بررسی {{checked}} / {{total}}…",
+      "checked_one": "{{count}} UTXO بررسی شد · {{pruned}} هرس شد.",
+      "checked_other": "{{count}} UTXO بررسی شد · {{pruned}} هرس شد.",
+      "reconciling": "در حال تطبیق…",
+      "reconcileNow": "تطبیق اکنون"
+    }
+  },
+  "notifications": {
+    "seoTitle": "اعلان‌ها",
+    "seoDescription": "اعلان‌های Nostr شما",
+    "title": "اعلان‌ها",
+    "tabs": {
+      "all": "همه",
+      "mentions": "منشن‌ها"
+    },
+    "loginPrompt": "برای دیدن اعلان‌هایتان وارد شوید.",
+    "empty": "هنوز اعلانی نیست.",
+    "subject": {
+      "twoActors": "<0></0> و <1></1>",
+      "andOthers_one": " و {{count}} نفر دیگر",
+      "andOthers_other": " و {{count}} نفر دیگر"
+    },
+    "actorAvatars": {
+      "moreCount": "+{{count}} بیشتر"
+    },
+    "actions": {
+      "reactedToYour": "به {{noun}} شما واکنش نشان داد",
+      "repostedYour": "{{noun}} شما را بازنشر کرد",
+      "zappedYou": "به شما zap داد",
+      "zappedYouWithAmount": "{{sats}} ساتوشی به شما zap داد",
+      "repliedToYourNote": "به یادداشت شما پاسخ داد",
+      "mentionedYou": "به شما اشاره کرد",
+      "repliedToYourComment": "به نظر شما پاسخ داد",
+      "commentedOnYour": "بر {{noun}} شما نظر گذاشت",
+      "sentYouLetter": "برای شما نامه‌ای فرستاد",
+      "highlightedYour": "{{noun}} شما را هایلایت کرد",
+      "awardedBadge": "به شما یک نشان داد",
+      "awardedBadges": "به شما نشان داد"
+    },
+    "letter": {
+      "viewAll": "مشاهدهٔ همهٔ نامه‌ها",
+      "reply": "پاسخ"
+    },
+    "kinds": {
+      "profile": "پروفایل",
+      "post": "پست",
+      "encryptedMessage": "پیام رمزنگاری‌شده",
+      "repost": "بازنشر",
+      "reaction": "واکنش",
+      "badgeAward": "اعطای نشان",
+      "photo": "عکس",
+      "video": "ویدیو",
+      "requestToVanish": "درخواست محو",
+      "file": "فایل",
+      "poll": "نظرسنجی",
+      "comment": "نظر",
+      "voiceMessage": "پیام صوتی",
+      "patch": "پچ",
+      "pullRequest": "pull request",
+      "highlight": "هایلایت",
+      "birdDetection": "تشخیص پرنده",
+      "birdex": "Birdex",
+      "colorMoment": "لحظهٔ رنگ",
+      "foundLog": "گزارش یافت‌شده",
+      "nsite": "nsite",
+      "profileBadges": "نشان‌های پروفایل",
+      "badge": "نشان",
+      "article": "مقاله",
+      "emojiPack": "بستهٔ ایموجی",
+      "podcastEpisode": "قسمت پادکست",
+      "podcastTrailer": "تریلر پادکست",
+      "zapstoreAsset": "منبع Zapstore",
+      "zapstoreRelease": "انتشار Zapstore",
+      "stream": "پخش",
+      "status": "وضعیت",
+      "repository": "مخزن",
+      "customNip": "NIP سفارشی",
+      "calendarEvent": "رویداد تقویم",
+      "zapstoreApp": "برنامهٔ Zapstore",
+      "playlist": "فهرست پخش",
+      "divine": "پیشگویی",
+      "community": "انجمن",
+      "goal": "هدف",
+      "track": "قطعه",
+      "magicDeck": "دک Magic",
+      "treasure": "گنج",
+      "constellation": "صورت فلکی",
+      "followPack": "بستهٔ دنبال‌کردن"
+    }
+  },
+  "notifSettings": {
+    "seoTitle": "اعلان‌ها",
+    "seoDescription": "ترجیحات اعلان‌های خود را تنظیم کنید",
+    "title": "اعلان‌ها",
+    "subtitle": "مشخص کنید چه اعلان‌هایی دریافت کنید.",
+    "pushHeading": "اعلان‌های پوش",
+    "enablePush": {
+      "label": "فعال‌سازی اعلان‌های پوش",
+      "description": "برای فعالیت روی پست‌های شما اعلان دریافت کنید"
+    },
+    "unsupported": "مرورگر شما از اعلان‌های پوش پشتیبانی نمی‌کند.",
+    "denied": "اعلان‌ها مسدود شده‌اند. تنظیمات مرورگر خود را برای اجازهٔ اعلان‌های این سایت به‌روزرسانی کنید.",
+    "deliveryMethod": {
+      "heading": "روش تحویل",
+      "intro": "انتخاب کنید چگونه اعلان‌ها به دستگاه شما تحویل داده شوند.",
+      "push": {
+        "label": "پوش",
+        "description": "اعلان‌های استاندارد. بدون آیکون دائمی نوار وضعیت."
+      },
+      "persistent": {
+        "label": "پایدار",
+        "description": "به‌طور مستقیم در پس‌زمینه از رله‌ها برای اعلان‌های جدید پرس‌وجو می‌کند. برای تحویل قابل اتکا روی دستگاه‌هایی که از اعلان پوش پشتیبانی نمی‌کنند استفاده کنید."
+      }
+    },
+    "notifyAbout": {
+      "heading": "به من اطلاع بده دربارهٔ",
+      "filterHeading": "فیلتر",
+      "typesHeading": "انواع",
+      "onlyFollowing": {
+        "label": "فقط از کسانی که دنبال می‌کنم",
+        "description": "اعلان‌ها از حساب‌هایی که دنبال نمی‌کنید را پنهان کن"
+      }
+    },
+    "types": {
+      "reactions": {
+        "label": "واکنش‌ها",
+        "description": "وقتی کسی به پست‌های شما واکنش می‌دهد"
+      },
+      "reposts": {
+        "label": "بازنشرها",
+        "description": "وقتی کسی یادداشت‌های شما را بازنشر می‌کند"
+      },
+      "zaps": {
+        "label": "Zapها",
+        "description": "وقتی کسی برای شما zap از طریق Lightning یا روی زنجیره می‌فرستد"
+      },
+      "mentions": {
+        "label": "منشن‌ها",
+        "description": "وقتی کسی شما را در یادداشت منشن می‌کند"
+      },
+      "comments": {
+        "label": "نظرها و پاسخ‌ها",
+        "description": "وقتی کسی روی پست‌های شما نظر می‌گذارد یا پاسخ می‌دهد"
+      },
+      "badges": {
+        "label": "اعطای نشان‌ها",
+        "description": "وقتی کسی به شما نشانی اعطا می‌کند"
+      },
+      "letters": {
+        "label": "نامه‌ها",
+        "description": "وقتی کسی برای شما نامه‌ای می‌فرستد"
+      },
+      "highlights": {
+        "label": "هایلایت‌ها",
+        "description": "وقتی کسی محتوای شما را هایلایت می‌کند"
+      }
+    },
+    "toast": {
+      "enableFailedTitle": "فعال‌سازی اعلان‌ها ناموفق بود",
+      "enableFailedDesc": "لطفاً دوباره تلاش کنید."
+    }
+  },
+  "search": {
+    "seoTitle": "جستجو",
+    "seoDescription": "جستجو در Nostr",
+    "title": "جستجو",
+    "inputPlaceholder": "جستجو",
+    "filtersAria": "فیلترهای جستجو",
+    "tabs": {
+      "agora": "آگورا",
+      "nostr": "Nostr",
+      "accounts": "حساب‌ها"
+    },
+    "filters": {
+      "title": "فیلترها",
+      "reset": "بازنشانی",
+      "from": "از",
+      "sort": "مرتب‌سازی",
+      "media": "رسانه",
+      "protocol": "پروتکل",
+      "language": "زبان",
+      "kind": "نوع",
+      "kindCustomPlaceholder": "مثال: ۱، ۳۰۰۲۳",
+      "includeReplies": "شامل پاسخ‌ها",
+      "authorScope": {
+        "anyone": "هرکس",
+        "follows": "دنبال‌شده‌ها",
+        "people": "افراد"
+      },
+      "sortOptions": {
+        "recent": "اخیر",
+        "hot": "داغ",
+        "trending": "پرطرفدار"
+      },
+      "mediaOptions": {
+        "all": "همه",
+        "images": "تصاویر",
+        "videos": "ویدیوها",
+        "shorts": "کوتاه",
+        "none": "بدون رسانه"
+      },
+      "protocolOptions": {
+        "nostr": "Nostr",
+        "mastodon": "Mastodon",
+        "bluesky": "Bluesky"
+      },
+      "langOptions": {
+        "global": "سراسری",
+        "en": "انگلیسی",
+        "es": "اسپانیایی",
+        "fr": "فرانسوی",
+        "de": "آلمانی",
+        "ja": "ژاپنی",
+        "zh": "چینی"
+      }
+    },
+    "chips": {
+      "noReplies": "بدون پاسخ",
+      "images": "تصاویر",
+      "videos": "ویدیوها",
+      "shortsAndDivines": "کوتاه‌ها و Divines",
+      "noMedia": "بدون رسانه",
+      "mastodon": "Mastodon",
+      "bluesky": "Bluesky",
+      "hot": "داغ",
+      "trending": "پرطرفدار",
+      "allKinds": "همهٔ انواع",
+      "customKind": "نوع: {{kind}}",
+      "kindNumber": "نوع {{kind}}",
+      "kindsCount_one": "{{count}} نوع",
+      "kindsCount_other": "{{count}} نوع",
+      "myFollows": "دنبال‌شدگانم",
+      "authorsCount_one": "{{count}} نویسنده",
+      "authorsCount_other": "{{count}} نویسنده"
+    },
+    "clear": "پاک‌سازی",
+    "searchLabel": "جستجو:",
+    "newPosts_one": "{{count}} پست جدید",
+    "newPosts_other": "{{count}} پست جدید",
+    "following": "دنبال‌شده",
+    "botAccount": "حساب بات",
+    "empty": {
+      "posts": "هیچ نتیجه‌ای مطابق جستجوی شما پیدا نشد.",
+      "postsPrompt": "برای یافتن محتوای Nostr یک عبارت جستجو وارد کنید.",
+      "accounts": "هیچ حسابی مطابق جستجوی شما پیدا نشد.",
+      "followsPrompt": "افراد را با نام یا نشانی NIP-05 جستجو کنید.",
+      "agora": "هیچ کمپین، pledge یا گروهی از آگورا مطابق جستجوی شما پیدا نشد.",
+      "agoraPrompt": "کمپین‌ها، pledgeها و گروه‌های آگورا را جستجو کنید یا جدیدترین‌ها را مرور کنید.",
+      "activeFilters": "فیلترهای فعال:",
+      "clearAll": "پاک کردن همهٔ فیلترها"
+    }
+  },
+  "profile": {
+    "seoDescriptionFallback": "نمایه Nostr",
+    "anonymous": "ناشناس",
+    "userNotFound": "کاربر پیدا نشد.",
+    "userNotFoundNip05": "کاربر پیدا نشد: {{handle}}",
+    "couldNotResolveNip05": "این شناسه NIP-05 قابل حل نیست.",
+    "tabs": {
+      "overview": "مرور",
+      "activity": "فعالیت",
+      "campaigns": "کارزارها",
+      "groups": "گروه‌ها",
+      "pledges": "تعهدها"
+    },
+    "header": {
+      "editProfile": "ویرایش نمایه",
+      "shareFollowLink": "اشتراک‌گذاری لینک دنبال‌کردن",
+      "moreOptions": "گزینه‌های بیشتر",
+      "donate": "اهدا کنید",
+      "campaignGoal": "هدف ${{amount}}"
+    },
+    "stats": {
+      "followers": "دنبال‌کنندگان",
+      "following": "دنبال‌شوندگان",
+      "raised": "جمع‌آوری‌شده",
+      "followersTitle_one": "{{count}} دنبال‌کننده",
+      "followersTitle_other": "{{count}} دنبال‌کننده",
+      "followingTitle": "{{count}} دنبال‌شونده"
+    },
+    "sections": {
+      "profile": "نمایه",
+      "campaigns": "کارزارها",
+      "latestPledge": "تازه‌ترین تعهد",
+      "groups": "گروه‌ها",
+      "seeAllCampaigns_one": "مشاهده {{count}} کارزار ←",
+      "seeAllCampaigns_other": "مشاهده همه {{count}} کارزار ←",
+      "viewCampaignsTab": "نمایش تب کارزارها ←",
+      "seeAllPledges_one": "مشاهده {{count}} تعهد ←",
+      "seeAllPledges_other": "مشاهده همه {{count}} تعهد ←",
+      "seeAllGroups": "مشاهده همه {{count}} ←"
+    },
+    "badges": {
+      "founder": "بنیان‌گذار",
+      "moderator": "ناظر",
+      "mod": "ناظر",
+      "ended": "پایان‌یافته",
+      "pledged": "تعهد شد"
+    },
+    "moreMenu": {
+      "title": "گزینه‌های نمایه",
+      "copyPubkey": "کپی کلید عمومی",
+      "copyLink": "کپی لینک نمایه",
+      "addToList": "افزودن به فهرست",
+      "shareFollowLink": "اشتراک‌گذاری لینک دنبال‌کردن",
+      "profileRecovery": "بازیابی نمایه",
+      "zap": "Zap",
+      "awardBadge": "اعطای نشان",
+      "writeLetter": "نوشتن نامه",
+      "mute": "بی‌صدا کردن @{{name}}",
+      "unmute": "خارج‌کردن از بی‌صدا @{{name}}",
+      "report": "گزارش @{{name}}",
+      "close": "بستن"
+    },
+    "toast": {
+      "pubkeyCopied": "کلید عمومی در کلیپ‌بورد کپی شد",
+      "linkCopied": "لینک نمایه در کلیپ‌بورد کپی شد",
+      "muted": "@{{name}} بی‌صدا شد",
+      "unmuted": "@{{name}} از بی‌صدا خارج شد",
+      "muteFailed": "بی‌صدا کردن کاربر ناموفق بود",
+      "unmuteFailed": "خارج‌کردن از بی‌صدا ناموفق بود",
+      "followed": "اکنون @{{name}} را دنبال می‌کنید",
+      "unfollowed": "دنبال‌کردن @{{name}} لغو شد",
+      "followFailed": "به‌روزرسانی فهرست دنبال‌شوندگان ناموفق بود",
+      "btcAddressCopied": "نشانی بیت‌کوین در کلیپ‌بورد کپی شد"
+    },
+    "followingModal": {
+      "title": "{{name}} دنبال می‌کند",
+      "empty": "هنوز کسی را دنبال نمی‌کند."
+    },
+    "followersModal": {
+      "title": "دنبال‌کنندگان {{name}}",
+      "empty": "هیچ دنبال‌کننده‌ای یافت نشد."
+    },
+    "bitcoinModal": {
+      "title": "بیت‌کوین",
+      "qrAlt": "کد QR بیت‌کوین",
+      "copyAddress": "کپی نشانی",
+      "showQr": "نمایش کد QR",
+      "viewOnMempool": "مشاهده در mempool.space"
+    },
+    "lightbox": {
+      "openOriginal": "باز کردن نسخه اصلی",
+      "close": "بستن (Esc)",
+      "imageAlt": "تصویر نمایه"
+    },
+    "activity": {
+      "empty": "{{name}} هنوز فعالیتی ندارد. پست‌ها، کارزارها، تعهدها و اهداها در این‌جا نمایش داده می‌شوند."
+    },
+    "campaigns": {
+      "count_one": "{{count}} کارزار",
+      "count_other": "{{count}} کارزار",
+      "sortNew": "جدید",
+      "sortTop": "برتر",
+      "showHidden": "نمایش پنهان‌ها",
+      "hideHidden": "پنهان‌سازی پنهان‌ها",
+      "emptySelf": "هنوز کارزاری راه‌اندازی نکرده‌اید.",
+      "emptyOther": "{{name}} هنوز کارزاری راه‌اندازی نکرده است.",
+      "startLink": "راه‌اندازی کارزار ←"
+    },
+    "pledgesTab": {
+      "active": "فعال",
+      "ended": "پایان‌یافته",
+      "emptySelf": "هنوز تعهدی ایجاد نکرده‌اید.",
+      "emptyOther": "{{name}} هنوز تعهدی ایجاد نکرده است.",
+      "createLink": "ایجاد تعهد ←"
+    },
+    "groupsDialog": {
+      "title": "همه گروه‌ها"
+    }
+  },
+  "profileSettings": {
+    "seoTitle": "نمایه | تنظیمات",
+    "seoDescription": "نمایه {{appName}} خود را ویرایش کنید",
+    "header": {
+      "title": "نمایه",
+      "subtitle": "هویت Nostr شما قابل حمل است — هرجا بروید با شما می‌آید.",
+      "save": "ذخیره"
+    },
+    "intro": {
+      "heading": "هویت شما",
+      "body": "روی هر فیلد در کارت ضربه بزنید تا ویرایش کنید. روی آواتار یا بنر کلیک کنید تا تصویر جدید آپلود و برش بزنید."
+    },
+    "uploading": "در حال آپلود…",
+    "fields": {
+      "heading": "فیلدهای نمایه",
+      "website": "وب‌سایت",
+      "websitePlaceholder": "https://yourwebsite.com",
+      "lightning": "Lightning",
+      "lightningPlaceholder": "you@walletofsatoshi.com",
+      "labelPlaceholder": "برچسب",
+      "tickerPlaceholder": "نماد",
+      "addressPlaceholder": "نشانی",
+      "valuePlaceholder": "مقدار یا URL",
+      "mediaPlaceholder": "فایلی را آپلود کنید یا لینک مستقیم را بچسبانید",
+      "chooseFile": "فایلی برای آپلود انتخاب کنید",
+      "chooseMediaFile": "فایل رسانه‌ای را برای آپلود انتخاب کنید"
+    },
+    "presets": {
+      "music": {
+        "label": "موسیقی",
+        "description": "آهنگ یا کلیپ صوتی آپلود کنید",
+        "valuePlaceholder": "صدا آپلود کنید یا لینک مستقیم بچسبانید"
+      },
+      "photo": {
+        "label": "عکس",
+        "description": "تصویر آپلود کنید",
+        "valuePlaceholder": "تصویر آپلود کنید یا لینک مستقیم بچسبانید"
+      },
+      "video": {
+        "label": "ویدئو",
+        "description": "کلیپ ویدئویی آپلود کنید",
+        "valuePlaceholder": "ویدئو آپلود کنید یا لینک مستقیم بچسبانید"
+      },
+      "email": {
+        "label": "ایمیل",
+        "defaultLabel": "ایمیل",
+        "description": "آدرس ایمیل تماس",
+        "valuePlaceholder": "you@example.com"
+      },
+      "wallet": {
+        "label": "کیف پول",
+        "description": "نشانی کیف پول رمزارز",
+        "valuePlaceholder": "نشانی"
+      },
+      "link": {
+        "label": "پیوند",
+        "description": "پیوند به هر وب‌سایت یا نمایه",
+        "valuePlaceholder": "https://..."
+      },
+      "weather": {
+        "label": "هواشناسی",
+        "defaultLabel": "هواشناسی",
+        "description": "ایستگاه هواشناسی Nostr را متصل کنید",
+        "valuePlaceholder": "npub1... یا naddr1... (#station-id اختیاری)"
+      },
+      "custom": {
+        "label": "سفارشی",
+        "description": "هر فیلد سفارشی بسازید",
+        "valuePlaceholder": "مقدار یا URL"
+      }
+    },
+    "warnings": {
+      "audioWrongType": "این URL به فایل صوتی اشاره نمی‌کند. فایل صوتی آپلود کنید یا از لینک مستقیمی که به .mp3, .ogg, .wav و... ختم شود استفاده کنید.",
+      "audioUnknown": "این URL ممکن است به‌عنوان پخش‌کننده صدا کار نکند. برای بهترین نتیجه، فایل را با دکمه آپلود کنید یا لینک مستقیم به یک فایل صوتی بچسبانید.",
+      "imageWrongType": "این URL به تصویر اشاره نمی‌کند. تصویر آپلود کنید یا از لینک مستقیمی که به .jpg, .png, .webp و... ختم شود استفاده کنید.",
+      "imageUnknown": "این URL ممکن است به‌عنوان تصویر نمایش داده نشود. برای بهترین نتیجه، فایل را با دکمه آپلود کنید یا لینک مستقیم به فایل تصویر بچسبانید.",
+      "videoWrongType": "این URL به ویدئو اشاره نمی‌کند. ویدئو آپلود کنید یا از لینک مستقیمی که به .mp4, .webm, .mov و... ختم شود استفاده کنید.",
+      "videoUnknown": "این URL ممکن است به‌عنوان ویدئو نمایش داده نشود. برای بهترین نتیجه، فایل را با دکمه آپلود کنید یا لینک مستقیم به فایل ویدئو بچسبانید."
+    },
+    "crop": {
+      "profile": "برش تصویر نمایه",
+      "banner": "برش بنر"
+    },
+    "mobilePreview": "پیش‌نمایش فیلدهای نمایه",
+    "advanced": {
+      "heading": "پیشرفته",
+      "botLabel": "حساب ربات",
+      "botDescription": "این حساب را به‌عنوان خودکار علامت بزنید"
+    },
+    "toast": {
+      "uploaded": "آپلود شد",
+      "mediaUploaded": "فایل رسانه‌ای آپلود شد",
+      "uploadFailed": "آپلود ناموفق بود",
+      "tryAgain": "لطفاً دوباره تلاش کنید.",
+      "profilePictureUpdated": "تصویر نمایه به‌روزرسانی شد",
+      "bannerUpdated": "بنر به‌روزرسانی شد",
+      "profileSaved": "نمایه ذخیره شد",
+      "saveFailed": "ذخیره نمایه ناموفق بود."
+    },
+    "key": {
+      "heading": "کلید شما",
+      "extensionBody": "با افزونه مرورگر (NIP-07) وارد شده‌اید. کلید مخفی شما در آن‌جا ذخیره می‌شود — آن را از طریق خود افزونه مدیریت یا صادر کنید.",
+      "bunkerBody": "با امضاکننده راه‌دور (NIP-46) وارد شده‌اید. کلید مخفی شما توسط آن امضاکننده نگهداری می‌شود و امکان صدور آن از {{appName}} وجود ندارد.",
+      "explainer": "این کلید مخفی حساب شما در {{appName}} را کنترل می‌کند. هر کسی که آن را داشته باشد می‌تواند مطلب منتشر کند و خود را به‌جای شما جا بزند. آن را در یک مدیر گذرواژه یا جایی که فقط خودتان دسترسی دارید نگهداری کنید.",
+      "warning": "هرگز کلید مخفی خود را با کسی به اشتراک نگذارید. از گرفتن اسکرین‌شات از آن یا چسباندنش در هر جایی به‌جز یک مدیر گذرواژه خودداری کنید. اگر به اشتراک گذاشته شود، دیگران به حساب شما دسترسی خواهند داشت.",
+      "aria": "کلید مخفی شما",
+      "copyAria": "کپی کلید مخفی",
+      "revealAria": "نمایش کلید مخفی",
+      "hideAria": "پنهان کردن کلید مخفی",
+      "backupButton": "تهیه نسخه پشتیبان از کلید",
+      "saving": "در حال ذخیره…",
+      "saved": "کلید مخفی ذخیره شد",
+      "savedToFile": "کلید مخفی شما در پوشه Documents دستگاه شما ذخیره شد.",
+      "saveFailed": "ذخیره ناموفق بود",
+      "saveFailedDescription": "ذخیره کلید ممکن نشد. لطفاً آن را به‌صورت دستی کپی کنید.",
+      "copyFailed": "کپی ناموفق بود",
+      "copyFailedDescription": "دسترسی به کلیپ‌بورد ممکن نشد. کلید را نمایش دهید و به‌صورت دستی کپی کنید."
+    }
+  },
+  "compose": {
+    "placeholderDefault": "چه خبر؟",
+    "placeholderPoll": "یک سؤال بپرس…",
+    "placeholderCountry": "در {{country}} چه می‌گذرد؟",
+    "placeholderCwReason": "دلیل هشدار محتوا (اختیاری)",
+    "submitDefault": "ارسال!",
+    "preview": {
+      "edit": "ویرایش",
+      "previewMode": "پیش‌نمایش"
+    },
+    "poll": {
+      "addOption": "افزودن گزینه",
+      "optionLabel": "گزینه {{number}}",
+      "singleChoice": "تک‌گزینه‌ای",
+      "multipleChoice": "چندگزینه‌ای",
+      "backToPost": "بازگشت به پست",
+      "publishing": "در حال انتشار...",
+      "publish": "انتشار نظرسنجی",
+      "published": "نظرسنجی منتشر شد!",
+      "publishFailed": "انتشار نظرسنجی ناموفق بود."
+    },
+    "voice": {
+      "cancel": "لغو",
+      "send": "ارسال",
+      "sending": "در حال ارسال...",
+      "sentTitle": "پیام صوتی ارسال شد!",
+      "sentBody": "پیام صوتی شما منتشر شد.",
+      "sendFailed": "ارسال پیام صوتی ناموفق بود.",
+      "micDeniedTitle": "دسترسی به میکروفون رد شد",
+      "micDeniedBody": "برای ضبط پیام صوتی به میکروفون اجازه دسترسی بدهید.",
+      "voiceMessage": "پیام صوتی"
+    },
+    "toolbar": {
+      "attachFile": "پیوست فایل",
+      "emojiGif": "ایموجی / GIF",
+      "more": "بیشتر",
+      "poll": "نظرسنجی",
+      "spoiler": "اسپویلر",
+      "emoji": "ایموجی",
+      "stickers": "استیکر"
+    },
+    "submit": {
+      "posting": "در حال انتشار...",
+      "uploadFailed": "آپلود ناموفق بود",
+      "uploadFailedBody": "نتوانست فایل را آپلود کند.",
+      "publishFailed": "انتشار یادداشت ناموفق بود.",
+      "posted": "منتشر شد!",
+      "replyPublished": "پاسخ شما منتشر شد.",
+      "quotePublished": "نقل قول شما منتشر شد.",
+      "notePublished": "یادداشت شما منتشر شد."
+    },
+    "destination": {
+      "label": "ارسال به",
+      "ariaHelp": "تفاوت پست‌های جهانی و پست‌های انجمن کشور چیست؟",
+      "ariaTrigger": "مقصد پست",
+      "global": "جهانی",
+      "globalExplainer": "یک پست معمولی که برای همه در Nostr قابل مشاهده است. هرکسی، هرجا، می‌تواند آن را ببیند.",
+      "community": "انجمن کشور شما",
+      "communityExplainer": "در فید محلی آن کشور در کنار پست‌های همسایگان نمایش داده می‌شود. مناسب برای به‌روزرسانی‌های مرتبط با انجمن.",
+      "chooseAnother": "انتخاب کشور دیگر…",
+      "searchPlaceholder": "جست‌وجوی کشورها...",
+      "noResults": "کشوری یافت نشد.",
+      "isDefault": "{{name}} پیش‌فرض شماست",
+      "globalIsDefault": "جهانی پیش‌فرض شماست",
+      "thisIsDefault": "این پیش‌فرض شماست",
+      "setAsDefault": "تنظیم به‌عنوان پیش‌فرض",
+      "defaultUpdated": "پیش‌فرض به‌روزرسانی شد",
+      "defaultUpdatedCountry": "پست‌های جدید به‌طور پیش‌فرض به {{name}} می‌روند.",
+      "defaultUpdatedGlobal": "پست‌های جدید به‌طور پیش‌فرض جهانی خواهند بود."
+    }
+  },
+  "replyModal": {
+    "title": {
+      "newPoll": "نظرسنجی جدید",
+      "newComment": "نظر جدید",
+      "commentOnProfile": "نظر روی نمایه",
+      "replyToPost": "پاسخ به پست",
+      "quotePost": "نقل پست",
+      "newPost": "پست جدید"
+    },
+    "placeholder": {
+      "writeComment": "یک نظر بنویس...",
+      "addComment": "افزودن نظر...",
+      "whatsHappening": "چه خبر؟"
+    },
+    "blueskyDisclaimer": "افراد در Bluesky نمی‌توانند شما را ببینند چون آن‌ها در واقع غیرمتمرکز نیستند."
+  },
+  "noteCard": {
+    "botAccount": "حساب ربات",
+    "showLess": "نمایش کمتر",
+    "readMore": "بیشتر بخوانید",
+    "reacted": "واکنش نشان داد",
+    "reposted": "بازنشر کرد",
+    "voted": "رأی داد",
+    "zap": {
+      "donatedTo": "اهدا کرد به",
+      "donatedAmountTo": "{{amount}} اهدا کرد به",
+      "sat_one": "{{formattedCount}} ساتوشی",
+      "sat_other": "{{formattedCount}} ساتوشی"
+    },
+    "stream": {
+      "untitled": "پخش بدون عنوان",
+      "live": "زنده",
+      "ended": "پایان‌یافته",
+      "planned": "برنامه‌ریزی‌شده",
+      "unknown": "نامشخص"
+    },
+    "kindHeader": {
+      "photo": {
+        "action": "به اشتراک گذاشت",
+        "noun": "عکس"
+      },
+      "encryptedMessage": {
+        "action": "فرستاد",
+        "noun": "پیام رمز‌نگاشته"
+      },
+      "letter": {
+        "action": "فرستاد",
+        "noun": "نامه"
+      },
+      "treasureHidCreated": "پنهان کرد",
+      "treasureHidUpdated": "به‌روزرسانی کرد",
+      "treasureNoun": "گنج",
+      "treasureFound": "یافت",
+      "deckCreated": "ساخت",
+      "deckUpdated": "به‌روزرسانی کرد",
+      "deckFallback": "به اشتراک گذاشت",
+      "deckNoun": "دسته",
+      "emojiPackCreated": "ساخت",
+      "emojiPackUpdated": "به‌روزرسانی کرد",
+      "emojiPackFallback": "به اشتراک گذاشت",
+      "emojiPackNoun": "بسته ایموجی",
+      "groupCreated": "ساخت",
+      "groupUpdated": "به‌روزرسانی کرد",
+      "groupFallback": "به اشتراک گذاشت",
+      "groupNoun": "گروه",
+      "campaignLaunched": "راه‌اندازی کرد",
+      "campaignUpdated": "به‌روزرسانی کرد",
+      "campaignFallback": "به اشتراک گذاشت",
+      "campaignNoun": "کارزار",
+      "badgeAwarded": "اعطا کرد",
+      "badgeNoun": "نشان",
+      "badgeCreated": "ساخت",
+      "badgeDefUpdated": "به‌روزرسانی کرد",
+      "badgesNoun": "نشان‌ها",
+      "badgesCreatedTheir": "ساخت",
+      "badgesUpdatedTheir": "به‌روزرسانی کرد",
+      "streamingLive": "در حال پخش زنده",
+      "streamed": "پخش کرد",
+      "zapstoreAppPublished": "اپ Zapstore منتشر کرد",
+      "zapstoreAppUpdated": "اپ Zapstore به‌روزرسانی کرد",
+      "zapstoreReleasePublished": "نسخه Zapstore منتشر کرد",
+      "zapstoreReleaseUpdated": "نسخه Zapstore به‌روزرسانی کرد",
+      "zapstoreAssetPublished": "دارایی Zapstore منتشر کرد",
+      "appPublished": "اپ منتشر کرد",
+      "appUpdated": "اپ به‌روزرسانی کرد",
+      "repoCreated": "ساخت",
+      "repoUpdated": "به‌روزرسانی کرد",
+      "repoFallback": "به اشتراک گذاشت",
+      "repoNoun": "مخزن",
+      "patchSubmitted": "ارسال کرد",
+      "patchNoun": "وصله",
+      "prOpened": "باز کرد",
+      "prNoun": "Pull Request",
+      "nipProposed": "پیشنهاد داد",
+      "nipUpdated": "به‌روزرسانی کرد",
+      "nipNoun": "NIP",
+      "nsiteDeployed": "مستقر کرد",
+      "nsiteRedeployed": "بازمستقر کرد",
+      "nsiteNoun": "nsite",
+      "zapped": "Zap فرستاد",
+      "pledgeCreated": "ساخت",
+      "pledgeUpdated": "به‌روزرسانی کرد",
+      "pledgeNoun": "تعهد",
+      "followPackCreated": "ساخت",
+      "followPackUpdated": "به‌روزرسانی کرد",
+      "followPackFallback": "به اشتراک گذاشت",
+      "followPackNoun": "بسته دنبال‌شوندگان",
+      "followSetCreated": "ساخت",
+      "followSetUpdated": "به‌روزرسانی کرد",
+      "followSetFallback": "به اشتراک گذاشت",
+      "followSetNoun": "مجموعه دنبال‌شوندگان"
+    }
+  },
+  "noteMoreMenu": {
+    "title": "گزینه‌های پست",
+    "viewPost": "مشاهده جزئیات پست",
+    "viewEventJson": "مشاهده JSON رویداد",
+    "bookmark": "نشانه‌گذاری",
+    "removeBookmark": "حذف نشانه",
+    "addToList": "افزودن به فهرست",
+    "addToSidebar": "افزودن به نوار کناری",
+    "removeFromSidebar": "حذف از نوار کناری",
+    "pinProfile": "سنجاق به نمایه",
+    "unpinProfile": "حذف سنجاق از نمایه",
+    "pinCountry": "سنجاق به فید کشور",
+    "unpinCountry": "حذف سنجاق از فید کشور",
+    "muteConversation": "بی‌صدا کردن گفتگو",
+    "mute": "بی‌صدا کردن @{{name}}",
+    "unmute": "خارج‌کردن از بی‌صدا @{{name}}",
+    "report": "گزارش @{{name}}",
+    "reportToGroup": "گزارش پست به گروه",
+    "removeFromGroup": "حذف از گروه",
+    "delete": "حذف پست",
+    "close": "بستن",
+    "encryptedContent": "محتوای رمز‌نگاشته",
+    "toast": {
+      "removedFromSidebar": "از نوار کناری حذف شد",
+      "addedToSidebar": "به نوار کناری اضافه شد",
+      "pinned": "به نمایه سنجاق شد",
+      "unpinned": "سنجاق از نمایه حذف شد",
+      "pinFailed": "به‌روزرسانی پست‌های سنجاق‌شده ناموفق بود",
+      "countryPinned": "به فید کشور سنجاق شد",
+      "countryUnpinned": "سنجاق از فید کشور حذف شد",
+      "countryPinFailed": "سنجاق به فید کشور ناموفق بود",
+      "countryUnpinFailed": "حذف سنجاق از فید کشور ناموفق بود",
+      "convoMuted": "گفتگو بی‌صدا شد",
+      "convoMuteFailed": "بی‌صدا کردن گفتگو ناموفق بود",
+      "muted": "@{{name}} بی‌صدا شد",
+      "unmuted": "@{{name}} از بی‌صدا خارج شد",
+      "muteFailed": "بی‌صدا کردن کاربر ناموفق بود",
+      "unmuteFailed": "خارج‌کردن از بی‌صدا ناموفق بود",
+      "postDeleted": "پست حذف شد",
+      "deleteFailed": "حذف پست ناموفق بود",
+      "eventBroadcast": "رویداد به ریلی‌ها پخش شد",
+      "broadcastFailed": "پخش رویداد ناموفق بود",
+      "copied": "{{label}} در کلیپ‌بورد کپی شد"
+    },
+    "deleteDialog": {
+      "title": "حذف پست؟",
+      "description": "این کار درخواست حذف از ریلی‌ها را ارسال می‌کند. برخی ریلی‌ها ممکن است هنوز یک نسخه از رویداد اصلی را نگه دارند. این عمل قابل بازگشت نیست.",
+      "cancel": "لغو",
+      "delete": "حذف",
+      "deleting": "در حال حذف..."
+    },
+    "jsonDialog": {
+      "title": "جزئیات رویداد",
+      "eventId": "شناسه رویداد",
+      "eventIdLabel": "شناسه رویداد",
+      "rawJson": "JSON خام",
+      "eventJsonLabel": "JSON رویداد",
+      "broadcast": "پخش رویداد",
+      "broadcasting": "در حال پخش..."
+    }
+  },
+  "policyPages": {
+    "privacy": {
+      "seoTitle": "سیاست حریم خصوصی",
+      "seoDescription": "سیاست حریم خصوصی {{appName}} — نحوه مدیریت داده‌های شما در شبکه Nostr",
+      "title": "سیاست حریم خصوصی"
+    },
+    "csae": {
+      "seoTitle": "سیاست ایمنی کودکان",
+      "seoDescription": "سیاست {{appName}} درباره سوءاستفاده و بهره‌کشی جنسی از کودکان (CSAE) — تعهد ما به ایمنی کودکان در شبکه Nostr",
+      "title": "سیاست ایمنی کودکان"
+    },
+    "donorGuide": {
+      "seoTitle": "راهنمای اهداکننده",
+      "seoDescription": "نحوه کارکرد اهدا در {{appName}} و چگونگی محافظت از حریم خصوصی شما.",
+      "title": "راهنمای اهداکننده",
+      "subtitle": "بیت‌کوین واقعی، مستقیم ارسال‌شده. کل فرایند در یک صفحه کوتاه."
+    },
+    "activistGuide": {
+      "seoTitle": "راهنمای کنش‌گر",
+      "seoDescription": "نحوه دریافت کمک مالی در {{appName}} و برداشت آن به صورت خصوصی.",
+      "title": "راهنمای کنش‌گر",
+      "subtitle": "انتخاب کنید چه دریافت کنید، اهدا را بپذیرید، برداشت کنید. به زبان ساده، بدون متن طولانی."
+    },
+    "changelog": {
+      "seoTitle": "تغییرات نسخه‌ها",
+      "seoDescription": "تازه‌ها در {{appName}}",
+      "title": "تغییرات نسخه‌ها",
+      "loadError": "بارگذاری گزارش تغییرات ناموفق بود.",
+      "empty": "هنوز نسخه‌ای وجود ندارد.",
+      "pastReleases": "نسخه‌های گذشته",
+      "showLess": "نمایش کمتر",
+      "readMore": "بیشتر بخوانید",
+      "preReleaseLabel": "ساخت پیش‌انتشار",
+      "preReleaseBody": "این ساخت شامل تغییراتی است که هنوز در یک نسخه منتشر نشده‌اند.",
+      "viewUnreleased": "مشاهده تغییرات منتشرنشده",
+      "categories": {
+        "Added": "افزوده‌شده",
+        "Changed": "تغییرکرده",
+        "Deprecated": "منسوخ",
+        "Removed": "حذف‌شده",
+        "Fixed": "اصلاح‌شده",
+        "Security": "امنیتی"
+      }
+    }
+  },
+  "about": {
+    "seoTitle": "درباره",
+    "seoDescription": "نحوه کارکرد {{appName}}: اتصال کنش‌گران به تأمین مالی غیرقابل‌توقف از طریق بیت‌کوین و Nostr.",
+    "hero": {
+      "eyebrow": "درباره {{appName}}",
+      "headlinePart1": "چگونه",
+      "headlineAppName": "{{appName}}",
+      "headlinePart2": "کار می‌کند.",
+      "body": "{{appName}} یک پلتفرم اهدای مقاوم در برابر سانسور است که بر روی Nostr و بیت‌کوین ساخته شده. بدون حساب‌های بانکی مسدودشده. بدون تعطیلی شرکتی. فقط حمایت مستقیم از سوی افرادی که به آرمان شما باور دارند.",
+      "trustChips": {
+        "decentralized": "غیرمتمرکز",
+        "openSource": "کد باز",
+        "censorshipResistant": "مقاوم در برابر سانسور"
+      },
+      "ctaDonor": "راهنمای اهداکننده را بخوانید",
+      "ctaActivist": "راهنمای کنش‌گر را بخوانید",
+      "sampleCard": {
+        "countryName": "ونزوئلا",
+        "public": "عمومی",
+        "imageAlt": "کنش‌گران ونزوئلایی در مراسم شمع‌افروزی با تابلویی که نوشته 'Liberen a todos los presos políticos · ¡Cese la represión!'",
+        "orgName": "Venezolanos Libres",
+        "title": "زندانیان سیاسی ونزوئلا را آزاد کنید",
+        "description": "دفاع حقوقی و حمایت خانوادگی برای بیش از ۸۰۰ زندانی سیاسی که توسط رژیم مادورو بازداشت شده‌اند.",
+        "raised": "جمع‌آوری‌شده",
+        "ofGoal": "از $10,000",
+        "donorsLine": "۲۴۷ اهداکننده · ۱۲ کشور",
+        "donate": "اهدای بیت‌کوین"
+      }
+    },
+    "howItWorks": {
+      "eyebrow": "نحوه کارکرد",
+      "title": "سه گام. بدون واسطه.",
+      "lede": "بدون بانک، بدون مرز، بدون مجوز.",
+      "step1": {
+        "imageAlt": "یک کلید رمزنگاری نارنجی درخشان که در فضای تاریک شناور است و نماد هویت خودحاکمیتی است",
+        "title": "کنش‌گران در چند ثانیه ثبت‌نام می‌کنند.",
+        "body": "بدون بانک. بدون کاغذبازی. بدون تأیید. لحظه‌ای که یک کنش‌گر در {{appName}} حساب می‌سازد، آدرس بیت‌کوینی آماده برای دریافت حمایت در هر کجای جهان دارد."
+      },
+      "step2": {
+        "imageAlt": "یک سکه بیت‌کوین درخشان در هوا بر فراز نقشه جهانی تاریک پرواز می‌کند و نماد پرداخت فوری فرامرزی است",
+        "title": "اهداکنندگان مستقیماً بیت‌کوین می‌فرستند.",
+        "body": "اهداکنندگان از هر کیف‌پولی که از قبل استفاده می‌کنند (Cash App، Coinbase، Strike، کیف‌پول سخت‌افزاری) مستقیماً به کنش‌گر بیت‌کوین می‌فرستند. {{appName}} هرگز به پول دست نمی‌زند. بدون سرور میانی، بدون امانت‌دار."
+      },
+      "step3": {
+        "imageAlt": "یک دست باز که از کف آن نور نارنجی گرم می‌تابد و نماد دریافت و اختیار است",
+        "title": "حمایت به جایی می‌رسد که اهمیت دارد.",
+        "body": "وجوه مستقیماً به کنش‌گر می‌رسد. آن‌ها مالکیت را حفظ می‌کنند، کنترل را حفظ می‌کنند. جابجا، تبدیل یا خرج کنید؛ راهنماهای زیر توضیح می‌دهند چگونه این کار را به‌صورت خصوصی و امن انجام دهید."
+      }
+    },
+    "twoWays": {
+      "eyebrow": "بیت‌کوین · یک QR، دو گزینه",
+      "title": "دو راه برای دریافت.",
+      "lede": "هر دو گزینه بیت‌کوین هستند. تفاوت در آن چیزی است که برای حریم خصوصی فدا می‌کنید. وقتی یک کنش‌گر کارزار می‌سازد، انتخاب می‌کند کدام گزینه‌ها را بپذیرد. اگر هر دو، صفحه اهدا یک QR واحد نمایش می‌دهد که با هر کیف‌پولی کار می‌کند.",
+      "public": {
+        "kicker": "پرداخت‌های عمومی بیت‌کوین",
+        "tagline": "جهانی · سریع · شفاف",
+        "title": "با هر کیف‌پولی روی زمین کار می‌کند.",
+        "description": "اهداها به یک آدرس بیت‌کوین معمولی که کنش‌گر کنترل می‌کند می‌رسند. هرکسی با هر کیف‌پول بیت‌کوین می‌تواند ارسال کند. بدون اپ جدید، بدون حساب جدید، بدون منحنی یادگیری.",
+        "bullet1": "در هر کیف‌پول بیت‌کوین کار می‌کند: Cash App، Coinbase، Strike، سخت‌افزاری",
+        "bullet2": "سریع‌ترین تسویه: فقط تأییدیه‌های بیت‌کوین",
+        "bullet3": "قابل تأیید روی زنجیره: هرکسی می‌تواند ببیند یک کنش‌گر چه دریافت کرده",
+        "tradeoffTitle": "تبادل: عمومی روی زنجیره.",
+        "tradeoffIntro": "هر اهدا روی زنجیره بیت‌کوین و Nostr عمومی است. {{appName}} تنها برای کنش‌گری روبسته توصیه می‌شود. اگر شما یا اهداکنندگانتان به حریم خصوصی شدید نیاز دارید، از جمله در برابر بازیگران دولتی، پیش از شرکت <0>راهنمای اهداکننده</0> و <1>راهنمای کنش‌گر</1> را بخوانید."
+      },
+      "silent": {
+        "kicker": "پرداخت‌های خاموش بیت‌کوین",
+        "tagline": "غیرقابل‌پیوند · مستقیم · BIP-352",
+        "title": "غیرقابل‌پیوند، روی زنجیره، مستقیم.",
+        "description": "اهداها به‌صورت پرداخت‌های خاموش BIP-352 ارسال می‌شوند. هر یک به یک خروجی بیت‌کوین تازه و غیرقابل‌پیوند می‌رسد که ناظر بر زنجیره نمی‌تواند آن را به کارزار مرتبط کند.",
+        "bullet1": "ردِّ اهداها روی زنجیره قابل بازسازی نیست",
+        "bullet2": "از کنش‌گرانی که با دشمنان جدی روبه‌رو هستند محافظت می‌کند",
+        "bullet3": "مستقیماً به کیف‌پول کنش‌گر می‌رسد، بدون سرور میانی",
+        "tradeoffTitle": "تبادل: پرداخت‌های خاموش هنوز در آغاز راه‌اند.",
+        "tradeoffIntro": "خصوصی‌ترین راه دریافت بیت‌کوین روی زنجیره، اما اکوسیستم امروز جوان و خام است:",
+        "tradeoffBullet1": "کیف‌پول‌های کمی از آن پشتیبانی می‌کنند.",
+        "tradeoffBullet2": "دریافت کند است.",
+        "tradeoffBullet3": "اطلاع‌رسانی push وجود ندارد.",
+        "tradeoffBullet4": "کیف‌پول‌ها هنوز باگ دارند.",
+        "tradeoffBullet5": "تعداد اهداها عمومی نیست."
+      },
+      "noCustody": {
+        "title": "بدون امانت. بدون واسطه.",
+        "body": "{{appName}} هرگز وجوه را نگه نمی‌دارد. اهداها روی بیت‌کوین از کیف‌پول به کیف‌پول جابجا می‌شوند. در هیچ‌کدام از گزینه‌ها سروری بین اهداکننده و کنش‌گر نیست. اگر {{appName}} فردا ناپدید شود، هر کارزار به کار خود ادامه می‌دهد.",
+        "gofundme": {
+          "heading": "برخلاف GoFundMe",
+          "body": "هیچ پلتفرمی نمی‌تواند اهداهای شما را مسدود کند، تقاضای استرداد کند، یا کارزار شما را به‌خاطر اختلاف سیاستی پایان دهد."
+        },
+        "givesendgo": {
+          "heading": "برخلاف GiveSendGo",
+          "body": "هیچ پردازنده پرداختی در میانه نیست، پس نه Stripe، نه Visa، نه یک بانک می‌تواند شما را در میانه کارزار قطع کند."
+        },
+        "otherBitcoin": {
+          "heading": "برخلاف دیگر پلتفرم‌های «بیت‌کوین»",
+          "body": "هیچ گره Lightning مرکزی، امانت‌دار یا LSP که خراب شود یا آفلاین شود وجود ندارد. وجوه مستقیماً روی زنجیره به کیف‌پولی که خودتان کنترل می‌کنید تسویه می‌شوند."
+        }
+      }
+    },
+    "faq": {
+      "eyebrow": "سؤالات",
+      "title": "پرسش‌های متداول.",
+      "chapter1": {
+        "label": "شروع کار",
+        "description": "Agora چیست، چه کسی آن را ساخته، و هزینه‌اش چقدر است."
+      },
+      "chapter2": {
+        "label": "اهداهای بیت‌کوین",
+        "description": "نحوه کارکرد پرداخت‌ها، چرا روی زنجیره، چرا عمومی، چرا این تبادل‌ها."
+      },
+      "chapter3": {
+        "label": "درباره Nostr",
+        "description": "پروتکل بازی که Agora روی آن ساخته شده، و حساب شما چگونه کار می‌کند."
+      }
+    },
+    "guides": {
+      "eyebrow": "راهنماها",
+      "title": "طرفی که در آن ایستاده‌اید را انتخاب کنید.",
+      "lede": "چه می‌فرستید چه دریافت می‌کنید، یاد بگیرید چگونه این کار را امن و خصوصی انجام دهید.",
+      "donor": {
+        "imageAlt": "معترضان کلاه‌دار در حال راهپیمایی در یک خیابان شهری اروپایی هنگام غروب، با شمع‌های قرمز سوزان و پلاکاردهای 'FREEDOM' و 'LIBERTAD'",
+        "role": "برای اهداکنندگان",
+        "title": "از آرمان‌هایی حمایت کنید که بانک‌ها حمایت نمی‌کنند.",
+        "description": "بدون اجازه گرفتن از یک پردازنده پرداخت، مستقیماً به کنش‌گران و جنبش‌ها در هر کجای جهان بیت‌کوین بفرستید.",
+        "bullet1": "از هر کیف‌پول بیت‌کوینی که از قبل دارید استفاده کنید.",
+        "bullet2": "اهداها مستقیماً به کنش‌گر می‌رسند. بدون امانت‌دار، بدون واسطه.",
+        "bullet3": "برای حریم خصوصی، از کیف‌پولی استفاده کنید که از پرداخت‌های خاموش پشتیبانی کند.",
+        "cta": "راهنمای اهداکننده را بخوانید"
+      },
+      "activist": {
+        "imageAlt": "نمایی هوایی از هزاران معترض که شب‌هنگام در میدان شهری با شمع‌های قرمز سوزان جمع شده‌اند، در زیر پلاکارد 'UNITY IN DARKNESS' که بر ساختمان‌های اطراف افتاده",
+        "role": "برای کنش‌گران",
+        "title": "بدون اجازه گرفتن، تأمین مالی شوید.",
+        "description": "از کسانی که به آرمان شما باور دارند مستقیماً حمایت دریافت کنید. بدون حساب بانکی، بدون فرم درخواست، بدون شرکتی در میانه.",
+        "bullet1": "به‌محض ثبت‌نام شروع به دریافت اهدا کنید.",
+        "bullet2": "انتخاب کنید چه نوع پرداختی را بپذیرید: عمومی، پرداخت‌های خاموش، یا هر دو.",
+        "bullet3": "برای برداشت خصوصی، ابتدا به یک کیف‌پول پرداخت‌های خاموش بفرستید سپس به هر کجا می‌خواهید منتقل کنید.",
+        "cta": "راهنمای کنش‌گر را بخوانید"
+      },
+      "stillStuck": "هنوز گیر کرده‌اید؟",
+      "followTeam": "Team Soapbox را در Nostr دنبال کنید",
+      "stillStuckSuffix": ". آنجا به پرسش‌ها رسیدگی می‌کنیم."
+    }
+  },
+  "faq": {
+    "categories": {
+      "getting-started": { "label": "دربارهٔ Agora" },
+      "payments": { "label": "اهدای بیت‌کوین در Agora" },
+      "about-nostr": { "label": "دربارهٔ Nostr" },
+      "legacy": { "label": "محتوای پیشین" }
+    },
+    "items": {
+      "what-is-ditto": {
+        "question": "{{appName}} چیست؟",
+        "answer": [
+          "{{appName}} پلتفرمی برای ارسال کمک‌های بیت‌کوینی — عمومی یا خصوصی — به‌صورت مستقیم به فعالان است. هیچ واسطه‌ای، هیچ پردازشگر پرداختی و هیچ حسابی که قابل مسدودسازی باشد وجود ندارد.",
+          "{{appName}} روی Nostr ساخته شده است، بنابراین هویت شما به این سایت گره نمی‌خورد — متعلق به خودتان است."
+        ]
+      },
+      "cost-to-use": {
+        "question": "آیا استفاده از {{appName}} هزینه‌ای دارد؟",
+        "answer": [
+          "**خیر.** {{appName}} هیچ کارمزد پلتفرمی نمی‌گیرد. وقتی اهدا می‌کنید، فقط کارمزد شبکهٔ بیت‌کوین را می‌پردازید که به ماینرها می‌رسد — نه به ما."
+        ]
+      },
+      "who-made-this": {
+        "question": "{{appName}} را چه کسانی ساخته‌اند؟",
+        "answer": [
+          "{{appName}} توسط [Soapbox](https://soapbox.pub) — یک تیم متن‌باز که ابزارهایی برای اکوسیستم Nostr می‌سازد — با همکاری [کنگرهٔ آزادی جهانی (World Liberty Congress)](https://worldlibertycongress.org/) ساخته شده است."
+        ]
+      },
+      "send-bitcoin-onchain": {
+        "question": "ارسال بیت‌کوین چگونه کار می‌کند؟",
+        "answer": [
+          "وقتی یک فعال کارزاری ایجاد می‌کند، انتخاب می‌کند که چه نوع پرداختی را بپذیرد: **عمومی**، **خصوصی** یا **هر دو**.",
+          "اهدای **عمومی** بیت‌کوین واقعی روی زنجیره است. روی بلاکچین عمومی تسویه می‌شود، در هر کیف پول بیت‌کوین کار می‌کند و برای همه قابل مشاهده است.",
+          "اهدای **خصوصی** از **پرداخت‌های خاموش** (BIP-352) استفاده می‌کند. این پرداخت‌ها نیز روی زنجیره تسویه می‌شوند، اما تراکنش قابل اتصال به کد اهدای فعال نیست — بنابراین در فهرست‌ها و جمع‌های عمومی اهداکنندگان نمی‌آیند. اهداکننده به کیف پولی نیاز دارد که از پرداخت‌های خاموش پشتیبانی کند — ما [Ditto Wallet](https://ditto.pub) یا [Dana](https://github.com/cygnet3/dana/releases/download/v0.7.4/app-live-release.apk) را توصیه می‌کنیم.",
+          "وقتی یک کارزار **هر دو** نوع را بپذیرد، {{appName}} یک کد QR واحد نشان می‌دهد که هر دو نقطهٔ پایان را در خود کدگذاری می‌کند. کیف پول‌های پرداخت خاموش آن را به‌صورت خصوصی می‌خوانند؛ سایر کیف پول‌ها به آدرس عمومی بازمی‌گردند. اهداکنندگان مجبور به انتخاب نیستند — کیف پولشان مسیر درست را به‌صورت خودکار انتخاب می‌کند.",
+          "در هر دو حالت، پرداخت مستقیماً به فعال می‌رسد. {{appName}} هرگز به وجوه دست نمی‌زند."
+        ]
+      },
+      "connect-wallet": {
+        "question": "کیف پول در {{appName}} چیست؟",
+        "answer": [
+          "کیف پول {{appName}} شما از کلید Nostr شما ساخته شده است. می‌تواند بیت‌کوین را به دو شکل دریافت کند — به‌صورت آدرس عمومی که هر کیف پول بیت‌کوین می‌تواند به آن پرداخت کند، و به‌صورت کد پرداخت خاموش که کیف پول‌های توانمند می‌توانند به‌صورت خصوصی به آن پرداخت کنند. هیچ ثبت‌نامی لازم نیست؛ به محض اینکه حسابی داشته باشید، این کیف پول وجود دارد.",
+          "هنگام ایجاد کارزار، انتخاب می‌کنید که پرداخت‌های عمومی، خصوصی یا هر دو را بپذیرید. برای خرج کردن آنچه دریافت می‌کنید، **راهنمای فعال** را ببینید."
+        ]
+      },
+      "donations-are-public-general": {
+        "question": "آیا اهداها در {{appName}} عمومی هستند؟",
+        "answer": [
+          "بستگی به نوع پرداختی دارد که فعال می‌پذیرد.",
+          "**اهداهای عمومی** روی بلاکچین بیت‌کوین و در Nostr ثبت می‌شوند. هر کسی می‌تواند مبالغ، زمان‌بندی و آدرس‌ها را ببیند.",
+          "**اهداهای خصوصی** از پرداخت‌های خاموش استفاده می‌کنند. به‌صورت عمومی به کد اهدای فعال قابل اتصال نیستند، در فهرست اهداکنندگان ظاهر نمی‌شوند و در جمع‌های عمومی حساب نمی‌شوند.",
+          "وقتی یک کارزار هر دو را می‌پذیرد، کیف پول اهداکننده تصمیم می‌گیرد از کدام مسیر استفاده شود — کیف پول‌های توانمند به پرداخت خاموش به‌صورت خصوصی پرداخت می‌کنند، بقیه به آدرس عمومی. برای تصویر کامل، **راهنمای اهداکننده** و **راهنمای فعال** را بخوانید."
+        ]
+      },
+      "censorship-resistance": {
+        "question": "«مقاومت در برابر سانسور» اینجا یعنی چه؟",
+        "answer": [
+          "هیچ شرکتی بین اهداکننده و فعال قرار نمی‌گیرد. {{appName}} وجوه را نگه نمی‌دارد و نمی‌تواند آدرس را مسدود کند.",
+          "تا زمانی که شبکهٔ بیت‌کوین فعال است، اهداها قابل ارسال و دریافت‌اند. حتی اگر خود {{appName}} از دسترس خارج شود، آنها را متوقف نمی‌کند."
+        ]
+      },
+      "why-onchain": {
+        "question": "چرا بیت‌کوین؟",
+        "answer": [
+          "بیت‌کوین گسترده‌ترین و مقاوم‌ترین زیرساخت پرداخت در برابر سانسور در جهان است. هر کیف پول بیت‌کوین می‌تواند آن را ارسال کند.",
+          "در {{appName}}، فعالان انتخاب می‌کنند چگونه دریافت کنند: **عمومی** (یک آدرس بیت‌کوین معمولی) برای بیشترین دسترسی، **خصوصی** (پرداخت‌های خاموش) برای اهداهای غیرقابل‌ربط، یا **هر دو** تا کیف پول هر اهداکننده مسیر صحیح را به‌صورت خودکار انتخاب کند. اهداکنندگانی که فقط یک برنامهٔ مصرفی بیت‌کوین دارند می‌توانند مشارکت کنند؛ اهداکنندگان با کیف پول پرداخت خاموش به‌صورت پیش‌فرض حریم خصوصی می‌گیرند.",
+          "بده‌بستان این است که تراکنش‌های بیت‌کوین عمومی روی بلاکچین قابل مشاهده‌اند و کارمزد ماینر می‌پردازند. راهنمای اهداکننده و راهنمای فعال نحوهٔ مدیریت هر دو را توضیح می‌دهند."
+        ]
+      },
+      "why-not-silent-payments": {
+        "question": "آیا {{appName}} از پرداخت‌های خاموش پشتیبانی می‌کند؟",
+        "answer": [
+          "بله — از هر دو سو. کیف پول بیت‌کوین داخلی {{appName}} از BIP-352 پشتیبانی می‌کند، بنابراین وقتی از کیف پول {{appName}} خود بیت‌کوین ارسال می‌کنید می‌توانید مستقیماً به هر آدرس پرداخت خاموش (`sp1…`) بپردازید. و وقتی یک فعال کارزاری ایجاد می‌کند، می‌تواند پرداخت‌های خاموش را در کنار پرداخت‌های عمومی بیت‌کوین یا به جای آن‌ها بپذیرد.",
+          "اهداهای پرداخت خاموش همچنان روی زنجیره تسویه می‌شوند، اما تراکنش قابل اتصال به کد اهدای فعال نیست — بنابراین در فهرست‌ها یا جمع‌های عمومی اهداکنندگان ظاهر نمی‌شوند.",
+          "ارسال یک پرداخت خاموش از خارج از {{appName}} به کیف پولی نیاز دارد که از BIP-352 پشتیبانی کند. اکثر برنامه‌های مصرفی هنوز چنین قابلیتی ندارند، اما [Ditto Wallet](https://ditto.pub) و [Dana](https://github.com/cygnet3/dana/releases/download/v0.7.4/app-live-release.apk) دارند.",
+          "وقتی یک کارزار هر دو نوع پرداخت را بپذیرد، {{appName}} هر دو را در یک کد QR کدگذاری می‌کند. کیف پول‌های توانمند به پرداخت خاموش به‌صورت خصوصی پرداخت می‌کنند؛ بقیه به آدرس عمومی پرداخت می‌کنند. هیچ اهداکننده‌ای کنار گذاشته نمی‌شود و هیچ فعالی مجبور به انتخاب بین دسترسی و حریم خصوصی نیست."
+        ]
+      },
+      "why-not-lightning": {
+        "question": "چرا {{appName}} از Lightning استفاده نمی‌کند؟",
+        "answer": [
+          "Lightning به یک کیف پول Lightning نیاز دارد. ساده‌ترین‌ها (Wallet of Satoshi، Strike، Breez) **سرپرستی‌شده (custodial)** هستند — شرکتی وجوه را نگه می‌دارد و می‌تواند بسته شود، مسدودیت جغرافیایی بخورد یا برای مسدود کردن حساب‌ها تحت فشار قرار گیرد. Lightning غیرسرپرستی‌شده از نظر فنی دشوار و برای تازه‌واردان غیرقابل‌اتکا است.",
+          "ما می‌خواهیم {{appName}} برای کسی کار کند که تنها تجربه‌اش با بیت‌کوین یک برنامهٔ مصرفی معمولی مانند Cash App، Coinbase، Strike، Venmo یا PayPal است. بیت‌کوین روی زنجیره با هر کیف پولی روی این کرهٔ خاکی کار می‌کند."
+        ]
+      },
+      "why-not-rotating-addresses": {
+        "question": "چرا {{appName}} برای هر اهدا یک آدرس جدید نمی‌سازد؟",
+        "answer": [
+          "این کار {{appName}} را وادار می‌کرد به‌عنوان یک واسط مبادلهٔ پول عمل کند — ابتدا بیت‌کوین را در امانت بگیرد و سپس آن را به فعال بفرستد.",
+          "این ما را به یک نقل‌دهندهٔ پول تبدیل می‌کرد، تابع مقررات مربوطه، و یک نقطهٔ شکست واحد: سرور {{appName}} را خاموش کنید تا هر اهدای جاری از آن نیز خاموش شود.",
+          "در عوض، آدرس اهدای هر کاربر از کلید مخفی Nostr (nsec) او — همان کلیدی که با آن وارد می‌شوید — مشتق می‌شود. اهداکنندگان مستقیماً به فعال می‌فرستند، {{appName}} هرگز به وجوه دست نمی‌زند و خود پلتفرم را نمی‌توان برای سانسور کسی خاموش کرد. فعالانی که به حریم خصوصی به ازای هر اهدا می‌اندیشند، می‌توانند پرداخت‌های خاموش را بپذیرند — همان عدم قابلیت ربط را بدون اینکه کسی پول را در میانه نگه دارد فراهم می‌کند."
+        ]
+      },
+      "why-not-other-crypto": {
+        "question": "چرا نه Monero یا ارز رمزنگاری‌شدهٔ دیگری؟",
+        "answer": [
+          "بیت‌کوین تا حد زیادی پذیرفته‌شده‌ترین ارز رمزنگاری‌شده است. این یعنی برای اهداکنندگان آسان‌ترین گزینه برای خرید و ارسال است، و برای فعالان آسان‌ترین گزینه برای دریافت، نگهداری و خرج کردن.",
+          "ارزهای متمرکز بر حریم خصوصی مانند Monero موازنه‌های حریم خصوصی متفاوتی نسبت به بیت‌کوین ارائه می‌دهند، اما در اکثر برنامه‌های مصرفی پشتیبانی نمی‌شوند و تبدیل آن‌ها به ارز محلی دشوارتر است. درخواست از هر یک از طرفین اهدا برای تهیهٔ یک ارز کم‌مخاطب در ابتدا، مانعی است که {{appName}} ایجاد نمی‌کند. برای خود اهدای بیت‌کوین، پرداخت‌های خاموش بدون خروج از اکوسیستم بیت‌کوین، نیاز عدم قابلیت ربط را پوشش می‌دهند."
+        ]
+      },
+      "what-is-nostr": {
+        "question": "Nostr چیست؟",
+        "answer": [
+          "Nostr شبکه‌ای باز است که در آن **شما** صاحب حساب خود هستید، نه یک شرکت. هویت شما کلیدی رمزنگاری‌شده است که خودتان آن را کنترل می‌کنید، نه نام کاربری روی سرور شخص دیگری.",
+          "در {{appName}}، آدرس اهدای شما نیز از همان کلید مشتق می‌شود — کلید مخفی Nostr (nsec) شما کیف پول بیت‌کوین شما را seed می‌کند، برای همین می‌توانید بدون ثبت‌نام نزد هیچ‌کس، بیت‌کوین دریافت کنید."
+        ]
+      },
+      "why-login-different": {
+        "question": "چرا ورود من اینقدر متفاوت و طولانی است؟",
+        "answer": [
+          "به جای نام کاربری و رمز عبور که توسط یک شرکت کنترل شود، Nostr از یک جفت کلید رمزنگاری‌شده استفاده می‌کند.",
+          "«کلید عمومی» شما (با **npub** شروع می‌شود) نام کاربری شماست. «کلید خصوصی» شما (با **nsec** شروع می‌شود) رمز عبور شماست. رشتهٔ بلند همان چیزی است که حدس زدن آن را تقریباً غیرممکن می‌کند."
+        ]
+      },
+      "lose-secret-key": {
+        "question": "اگر کلید خصوصی‌ام را گم کنم چه می‌شود؟",
+        "answer": [
+          "**دکمهٔ «رمز عبور را فراموش کرده‌ام» وجود ندارد.** هیچ‌کس نمی‌تواند آن را برای شما بازنشانی کند. اگر آن را گم کنید، حساب شما — و هر بیت‌کوینی که در آدرس اهدای شما وجود دارد — برای همیشه از بین می‌رود.",
+          "**همین حالا کلید خصوصی‌تان را در جای امنی ذخیره کنید.** برای نکات، [مدیریت کلیدهای Nostr](https://soapbox.pub/blog/managing-nostr-keys) را بخوانید."
+        ]
+      },
+      "manage-secret-key": {
+        "question": "آیا می‌توانم کلید خصوصی‌ام را در مدیر رمز عبور تلفنم ذخیره کنم؟",
+        "answer": [
+          "بله. می‌توانید آن را در مدیر رمز عبور دستگاهتان (iCloud Keychain، 1Password، Bitwarden و غیره) ذخیره کنید. در iPhone، ذخیره در Passwords به شما اجازه می‌دهد با Face ID یا Touch ID وارد شوید.",
+          "برای راهنمای کامل، [مدیریت کلیدهای Nostr](https://soapbox.pub/blog/managing-nostr-keys) را ببینید."
+        ]
+      },
+      "send-bitcoin-lightning": {
+        "question": "ارسال بیت‌کوین از طریق Lightning چگونه کار می‌کند؟",
+        "answer": [
+          "اگر گیرنده در نمایه‌اش یک آدرس Lightning داشته باشد، می‌توانید به آن ارسال کنید. Lightning در چند ثانیه تسویه می‌شود و کارمزد آن بسیار اندک است.",
+          "ارسال‌های Lightning از آدرس اهدای {{appName}} استفاده نمی‌کنند — مستقیماً به هر کیف پول Lightningی که گیرنده خودش راه‌اندازی کرده برود. جریان اهدای خود {{appName}} فقط روی زنجیره است."
+        ]
+      },
+      "what-are-zaps": {
+        "question": "Zap‌ها چه هستند؟",
+        "answer": [
+          "Zap‌ها انعام‌های کوچک Lightning روی Nostr هستند، جدا از جریان اهدای روی‌زنجیره‌ی {{appName}}."
+        ]
+      },
+      "fyp": {
+        "question": "فید چگونه کار می‌کند؟",
+        "answer": [
+          "فید شما کارزارها و پست‌های افرادی را که دنبال می‌کنید نشان می‌دهد. هیچ الگوریتمی تصمیم نمی‌گیرد چه چیزی می‌بینید."
+        ]
+      },
+      "what-are-relays": {
+        "question": "رله‌ها چه هستند؟",
+        "answer": [
+          "رله‌ها سرورهایی هستند که رویدادهای Nostr را — پست‌ها، رسیدهای اهدا، اطلاعات نمایه — ذخیره و تحویل می‌دهند. تنظیمات پیش‌فرض از همان ابتدا کار می‌کنند؛ می‌توانید رله‌ها را در تنظیمات > شبکه اضافه یا حذف کنید."
+        ]
+      },
+      "what-are-blossom": {
+        "question": "سرورهای Blossom چه هستند؟",
+        "answer": [
+          "سرورهای Blossom فایل‌های رسانه‌ای (تصاویر کارزار، عکس‌های نمایه) را هنگام آپلود ذخیره می‌کنند. می‌توانید سرورهای مورد استفاده را در تنظیمات > شبکه مدیریت کنید."
+        ]
+      },
+      "report-content": {
+        "question": "چگونه محتوای آسیب‌رسان را گزارش کنم؟",
+        "answer": [
+          "روی منوی سه‌نقطه (**...**) هر پست بزنید و «گزارش» را انتخاب کنید. از همین منو می‌توانید کاربران را بی‌صدا کنید یا مسدود نمایید."
+        ]
+      },
+      "vs-mastodon-bluesky": {
+        "question": "Nostr با Mastodon یا Bluesky چه فرقی دارد؟",
+        "answer": [
+          "در Mastodon، حساب شما روی یک سرور خاص قرار دارد. در Bluesky، بیشتر حساب‌ها به یک شرکت وابسته‌اند. در Nostr، هویت شما کلیدی است که خودتان کنترل می‌کنید و آدرس اهدای شما به همراهتان به هر برنامهٔ Nostr می‌رود."
+        ]
+      },
+      "profile-fields": {
+        "question": "فیلدهای نمایه چه هستند؟",
+        "answer": [
+          "فیلدهای نمایه به شما اجازه می‌دهند اطلاعات اضافی به نمایهٔ خود اضافه کنید — پیوندها، آدرس کیف پول‌ها، موسیقی، عکس‌ها، ویدیوها."
+        ]
+      }
+    }
+  },
+  "guides": {
+    "shared": {
+      "tldrEyebrow": "نسخهٔ کوتاه",
+      "paymentBadge": {
+        "public": "پرداخت‌های عمومی",
+        "silent": "پرداخت‌های خاموش"
+      },
+      "paymentComparison": {
+        "donorHeader": "وقتی اهدا می‌کنید",
+        "activistHeader": "وقتی کارزار ایجاد می‌کنید",
+        "donorRows": {
+          "whatYouSee": {
+            "label": "آنچه می‌بینید",
+            "public": "یک آدرس بیت‌کوین معمولی که می‌توانید از هر جایی به آن بپردازید.",
+            "silent": "همان QR. اگر کیف پول شما از BIP-352 پشتیبانی کند، نقطهٔ پایان پرداخت خاموش را انتخاب می‌کند."
+          },
+          "walletSupport": {
+            "label": "پشتیبانی کیف پول",
+            "public": "هر کیف پول بیت‌کوینی. Cash App، Coinbase، Strike، سخت‌افزاری، هر چیزی.",
+            "silent": "امروز کیف پول‌های کمی پشتیبانی می‌کنند. بیشترشان به یک تراکنش بیت‌کوین معمولی بازمی‌گردند."
+          },
+          "privacy": {
+            "label": "حریم خصوصی اهدا",
+            "public": "روی زنجیره عمومی است. آدرس فرستندهٔ شما به‌طور دائمی به کارزار متصل می‌شود.",
+            "silent": "طرف گیرنده روی زنجیره غیرقابل‌ربط است. ردپای کیف پول فرستندهٔ شما همچنان عمومی است."
+          },
+          "settlement": {
+            "label": "تسویه",
+            "public": "تأییدهای معمولی بیت‌کوین.",
+            "silent": "همان تأییدهای روی زنجیره، اما فعال باید کیف پولش را اسکن کند تا آن را پیدا کند."
+          }
+        },
+        "activistRows": {
+          "whatDonorsSee": {
+            "label": "آنچه اهداکنندگان می‌بینند",
+            "public": "یک آدرس بیت‌کوین معمولی. با هر کیف پولی روی این کرهٔ خاکی کار می‌کند.",
+            "silent": "یک نقطهٔ پایان BIP-352. کیف پول اهداکنندگان به پشتیبانی از پرداخت خاموش نیاز دارد؛ در غیر این صورت، اهدا به یک تراکنش بیت‌کوین معمولی بازمی‌گردد."
+          },
+          "receivingSpeed": {
+            "label": "سرعت دریافت",
+            "public": "سبک Push. اهداها در همان لحظه روی صفحهٔ کارزار ظاهر می‌شوند.",
+            "silent": "اسکن دستی. کیف پول شما باید بلاکچین را جستجو کند. بسته به کیف پول، چند دقیقه تا چند ساعت."
+          },
+          "pushNotifications": {
+            "label": "اعلان‌های Push",
+            "public": "بله. اهداهای جدید را در لحظهٔ رسیدن می‌بینید.",
+            "silent": "خیر. کیف پول را باز کنید و یک اسکن را فعال کنید تا کشف شوند."
+          },
+          "donorList": {
+            "label": "فهرست اهداکنندگان / مجموع کارزار",
+            "public": "برای همیشه عمومی است. مبالغ و آدرس‌های ارسال برای همه قابل مشاهده است.",
+            "silent": "خصوصی است. صفحهٔ کارزار نمی‌تواند تعداد یا مجموع اهداهای پرداخت خاموش را نشان دهد."
+          },
+          "ecosystem": {
+            "label": "بلوغ اکوسیستم",
+            "public": "بالغ. ابزارهای جا افتاده.",
+            "silent": "خط مقدم. کیف پول‌ها هنوز باگ دارند؛ منتظر اهداهای از قلم افتاده باشید که در اسکن بعدی ظاهر می‌شوند."
+          },
+          "bestFor": {
+            "label": "بهترین برای",
+            "public": "کارزارهای کمک‌خواهی آشکار که اثبات اجتماعی و دیده شدن کمک می‌کند.",
+            "silent": "کارزارهایی که حریم خصوصی اهداکننده یا فعال مهم‌تر از مجموع قابل مشاهده است."
+          },
+          "watchOutFor": {
+            "label": "مراقب باشید",
+            "public": "سابقهٔ عمومی دائمی از هر اهداکننده.",
+            "silent": "تجربهٔ کاربری امروز ناهموار است. برخی اهداها تا زمانی که فعال اسکن نکند، ظاهر نمی‌شوند."
+          }
+        }
+      }
+    },
+    "donor": {
+      "tldr": {
+        "lede": "از هر کیف پولی که از قبل دارید، آدرس بیت‌کوین روی صفحهٔ کارزار را پرداخت کنید. اگر کارزار پرداخت‌های خاموش را می‌پذیرد و کیف پول شما از آن پشتیبانی می‌کند، اهدای شما به‌طور خودکار خصوصی است.",
+        "nextActions": [
+          "از هر کیف پول بیت‌کوینی پرداخت کنید",
+          "بدون واسطه، بدون دورهٔ نگهداری",
+          "حریم خصوصی می‌خواهید؟ ادامه را بخوانید"
+        ]
+      },
+      "flow": {
+        "heading": "چگونه یک اهدا جریان می‌یابد",
+        "steps": {
+          "openCampaign": {
+            "title": "کارزار را باز کنید",
+            "body": "یک کد QR می‌بینید. اگر کارزار هر دو گزینه را بپذیرد، هر دو نقطهٔ پایان را در خود کدگذاری می‌کند؛ کیف پول شما درست را انتخاب می‌کند."
+          },
+          "payFromAnyWallet": {
+            "title": "از هر کیف پولی پرداخت کنید",
+            "body": "Cash App، Coinbase، Strike، یک کیف پول سخت‌افزاری، هر چیزی. مبلغ به‌اضافهٔ کارمزد شبکه را بپردازید."
+          },
+          "arrivesDirectly": {
+            "title": "مستقیماً می‌رسد",
+            "body": "وجوه مستقیماً به فعال تسویه می‌شود. {{appName}} آن را نگه نمی‌دارد یا مسیریابی نمی‌کند، و آدرس از کلید مخفی Nostr فعال مشتق می‌شود."
+          }
+        }
+      },
+      "comparison": {
+        "footnote": "کارزارها می‌توانند فقط عمومی، فقط خاموش یا هر دو را بپذیرند. اگر هر دو، کد QR هر دو نقطهٔ پایان را در خود حمل می‌کند. کیف پول شما آن یکی را که می‌تواند استفاده کند انتخاب می‌کند."
+      },
+      "publicVisible": {
+        "title": "اهداهای عمومی برای همیشه روی زنجیره قابل مشاهده‌اند",
+        "body": "یک اهدای **عمومی** به یک آدرس بیت‌کوین معمولی متصل به کارزار می‌رسد. هرکسی می‌تواند آدرس را جستجو کند و مبلغ، زمان و آدرس فرستندهٔ شما را ببیند. اهداهای **خاموش** هم روی زنجیره تسویه می‌شوند، اما طرف گیرنده به کارزار غیرقابل‌ربط است، بنابراین از فهرست‌ها و مجموع‌های عمومی اهداکنندگان خارج می‌مانند."
+      },
+      "privacy": {
+        "heading": "اهدای خصوصی",
+        "intro": "این مراحل بیشتر برای اهداهای **عمومی** اهمیت دارند، جایی که هر تراکنش به‌طور دائمی به یک آدرس واحد گره می‌خورد. اهداهای **خاموش** پیش‌تر طرف گیرنده را پنهان می‌کنند، پس خطر کمتر است. تحلیل هدفمند روی کیف پول فرستندهٔ شما در هر دو حالت همچنان ممکن است، بنابراین اگر سطح خطر شما بالاست این مراحل ارزش انجام دادن دارند. یکی را انتخاب کنید یا روی هم بگذارید.",
+        "options": {
+          "silentWallet": {
+            "name": "از یک کیف پول پرداخت خاموش استفاده کنید",
+            "purpose": "با یک کیف پول بیت‌کوین که از BIP-352 پشتیبانی می‌کند پرداخت کنید. اگر کارزار پرداخت‌های خاموش را بپذیرد، کیف پول شما به‌طور خودکار از آن نقطهٔ پایان استفاده می‌کند."
+          },
+          "nonKyc": {
+            "name": "بیت‌کوین غیر KYC بخرید",
+            "purpose": "بیت‌کوین را به‌صورت همتا به همتا بخرید تا از همان ابتدا به شناسهٔ دولتی شما گره نخورد. قوی‌ترین نقطهٔ شروع برای حریم خصوصی."
+          },
+          "coinjoin": {
+            "name": "ابتدا Coinjoin",
+            "purpose": "بیت‌کوین خود را با سکهٔ دیگران ترکیب کنید تا خروجی قابل ردیابی به خرید KYC شما نباشد. در مواقعی که کارزار فقط عمومی را می‌پذیرد مفید است."
+          },
+          "freshWallet": {
+            "name": "از یک کیف پول تازه استفاده کنید",
+            "purpose": "از کیف پولی اهدا کنید که هرگز با هویت اصلی شما یا یک صرافی KYC تماس نداشته است."
+          }
+        }
+      },
+      "consumerApps": {
+        "title": "برنامه‌های مصرفی نمی‌توانند شما را ناشناس کنند",
+        "body": "Cash App، Coinbase، Strike، Venmo، Kraken، Binance و PayPal همگی هویت شما را تأیید می‌کنند. مهم نیست چگونه اهدا را ارسال می‌کنید، هر تراکنش به هویت واقعی شما گره می‌ماند. از یک کیف پول غیرسرپرستی‌شده استفاده کنید که خودتان آن را کنترل می‌کنید."
+      },
+      "silentToday": {
+        "heading": "یک یادداشت دربارهٔ پرداخت‌های خاموش امروز",
+        "paragraphs": [
+          "پرداخت‌های خاموش خصوصی‌ترین راه دریافت بیت‌کوین روی زنجیره هستند، اما اکوسیستم جوان است. بیشتر کیف پول‌های محبوب هنوز نمی‌توانند به یک نقطهٔ پایان پرداخت خاموش بفرستند، بنابراین هنگامی که کیف پول نمی‌تواند، اهدا به یک تراکنش بیت‌کوین معمولی به آدرس عمومی کارزار بازمی‌گردد (اگر کارزار هر دو را بپذیرد).",
+          "برای فعالان، اهداهای پرداخت خاموش بدون اعلان Push نیز می‌رسند و فقط پس از اسکن کردن کیف پول توسط فعال ظاهر می‌شوند، که می‌تواند چند دقیقه تا چند ساعت طول بکشد. هیچ‌یک از این موارد بر امنیت وجوه شما اثر نمی‌گذارد؛ فقط شکل تجربه را تعیین می‌کند."
+        ]
+      }
+    },
+    "activist": {
+      "tldr": {
+        "lede": "هنگام ایجاد کارزار، آنچه را که می‌پذیرید انتخاب کنید: عمومی، خاموش یا هر دو. هر گزینه‌ای غیرسرپرستی‌شده است. {{appName}} هرگز وجوه شما را نگه نمی‌دارد.",
+        "nextActions": [
+          "دو گزینه را مقایسه کنید",
+          "برای نحوهٔ نقد کردن برنامه‌ریزی کنید",
+          "وجوه را به‌سرعت جمع کنید"
+        ]
+      },
+      "howReceiving": {
+        "heading": "نحوهٔ کار دریافت",
+        "paragraphs": [
+          "آدرس‌های اهدای {{appName}} شما از کلید مخفی Nostr (nsec) شما مشتق می‌شوند — کلید مخفی Nostr شما کیف پول بیت‌کوین شما را seed می‌کند. هنگام ایجاد کارزار، انتخاب می‌کنید چه چیزی را بپذیرید:",
+          "**فقط پرداخت‌های عمومی.** یک آدرس بیت‌کوین معمولی. برای همه قابل مشاهده است، با هر کیف پولی کار می‌کند.",
+          "**فقط پرداخت‌های خاموش.** پرداخت‌های خاموش BIP-352. طرف گیرنده روی زنجیره غیرقابل‌ربط است، بنابراین اهداها از فهرست‌ها و مجموع‌های عمومی اهداکنندگان خارج می‌مانند. اهداکنندگان به یک کیف پول دارای قابلیت پرداخت خاموش برای ارسال نیاز دارند. اگر نداشته باشند، اهدای آن‌ها انجام نمی‌شود.",
+          "**هر دو.** {{appName}} یک کد QR منفرد تولید می‌کند که هر دو نقطهٔ پایان را در خود کدگذاری می‌کند. کیف پول‌های پرداخت خاموش آن را به‌صورت خصوصی می‌خوانند؛ کیف پول‌های عادی به آدرس عمومی می‌پردازند. اهداکنندگان مجبور به انتخاب نیستند.",
+          "پذیرش هر دو معمولاً انتخاب درست است: از حامیانی که از کیف پول پرداخت خاموش استفاده می‌کنند اهدای خصوصی می‌گیرید، و برای اهداکنندگانی که تنها بیت‌کوینشان در یک برنامهٔ مصرفی است نیز باز می‌مانید."
+        ]
+      },
+      "whatEveryoneSees": {
+        "heading": "آنچه همه می‌توانند ببینند",
+        "paragraphs": [
+          "اگر کارزار شما پرداخت‌های عمومی را بپذیرد، هرکسی که در حال فکر کردن دربارهٔ حمایت از شماست می‌تواند آدرس را جستجو کند و سابقهٔ عمومی اهداها را ببیند.",
+          "اهداهای پرداخت خاموش بخشی از آن سابقه نیستند. برای ناظران بیرونی نامرئی‌اند و در مجموع‌های عمومی کارزار نشان داده نمی‌شوند؛ اهداکنندگان جدید تنها چیزی را می‌بینند که شما دربارهٔ پیشرفت کارزار منتشر می‌کنید."
+        ]
+      },
+      "comparison": {
+        "footnote": "نمی‌توانید گزینه‌های پرداخت پذیرفته‌شدهٔ یک کارزار را پس از ایجاد آن تغییر دهید. اگر نظرتان تغییر کرد، یک کارزار جدید بسازید."
+      },
+      "silentToday": {
+        "heading": "یک یادداشت دربارهٔ پرداخت‌های خاموش امروز",
+        "paragraphs": [
+          "پرداخت‌های خاموش خصوصی‌ترین راه دریافت بیت‌کوین روی زنجیره هستند، اما اکوسیستم جوان است. بیشتر کیف پول‌های محبوب هنوز نمی‌توانند به یک نقطهٔ پایان پرداخت خاموش بفرستند، بنابراین هنگامی که کیف پول اهداکننده نمی‌تواند، اهدا به یک تراکنش بیت‌کوین معمولی به آدرس عمومی شما بازمی‌گردد (اگر هر دو را بپذیرید).",
+          "اهداهای پرداخت خاموش نیز بدون اعلان Push می‌رسند و فقط پس از اسکن کردن کیف پول شما ظاهر می‌شوند، که می‌تواند چند دقیقه تا چند ساعت طول بکشد. هیچ‌یک از این موارد بر امنیت وجوه شما اثر نمی‌گذارد؛ فقط شکل تجربهٔ روزمره را تعیین می‌کند."
+        ]
+      },
+      "movePromptly": {
+        "heading": "اهداها را به‌سرعت جابه‌جا کنید",
+        "steps": {
+          "sweep": {
+            "title": "به یک کیف پول که خودتان کنترل می‌کنید جمع کنید",
+            "body": "گزینه‌های خوب خودنگهداری: [Sparrow](https://sparrowwallet.com)، [BlueWallet](https://bluewallet.io)، یا [Phoenix](https://phoenix.acinq.co) (Lightning)."
+          },
+          "dontSit": {
+            "title": "وجوه را روی آدرس کارزار نگذارید",
+            "body": "با آن مانند یک صندوق پستی رفتار کنید، نه یک حساب پس‌انداز. این برای هر دو نوع اهدای عمومی و خاموش صدق می‌کند."
+          }
+        }
+      },
+      "cashout": {
+        "heading": "نقد کردن به‌صورت خصوصی",
+        "intro": "هزینه کردن روی زنجیره یک ردپا ایجاد می‌کند، مگر اینکه ابتدا آن را قطع کنید. ساده‌ترین خروج برای حریم خصوصی این است که **ابتدا وجوه را به یک کیف پول پرداخت خاموش منتقل کنید**، سپس از آنجا هزینه کنید؛ این جهش، ارتباط بین آدرس کارزار شما و آنچه بعد می‌آید را قطع می‌کند. گزینه‌های دیگر زیر نیز کار می‌کنند و مفاوضات خود را دارند.",
+        "options": {
+          "silentHop": {
+            "name": "جهش به کیف پول پرداخت خاموش",
+            "purpose": "اهداهای خود را به یک کیف پول پرداخت خاموش ([Ditto Wallet](https://ditto.pub)، [Dana](https://github.com/cygnet3/dana/releases/download/v0.7.4/app-live-release.apk)) منتقل کنید. از آنجا، هزینه‌کرد بعدی شما به کارزار گره نمی‌خورد."
+          },
+          "lightningSwap": {
+            "name": "تبادل با Lightning",
+            "purpose": "تبادل اتمی بیت‌کوین روی زنجیره به Lightning. پرداخت‌های Lightning به بلاکچین عمومی نمی‌رسند."
+          },
+          "coinjoin": {
+            "name": "Coinjoin",
+            "purpose": "بیت‌کوین خود را با سکهٔ کاربران دیگر ترکیب کنید تا خروجی نتواند به ورودی متصل شود."
+          },
+          "peerToPeer": {
+            "name": "همتا به همتا",
+            "purpose": "بیت‌کوین را به‌صورت مستقیم با شخصی دیگر یا از طریق یک کارگزار در Bisq، HodlHodl یا RoboSats با ارز فیات معامله کنید."
+          },
+          "spendDirectly": {
+            "name": "مستقیماً خرج کنید",
+            "purpose": "کارت‌های هدیه (Amazon، Uber، خواربار، سفر) را مستقیماً با بیت‌کوین بخرید، بدون اینکه ابتدا آن را به پول نقد تبدیل کنید."
+          }
+        }
+      },
+      "tumblers": {
+        "title": "از مخلوط‌کنندگان متمرکز اجتناب کنید",
+        "body": "مخلوط‌کنندگان سرپرستی‌شده ممکن است سکه‌های شما را بدزدند، ثبت کنند که چه کسی چه چیزی فرستاده، یا به‌نوبه‌ٔ خود تله‌های اجرای قانون باشند. به جای آن از جهش پرداخت خاموش یا یک coinjoin غیرسرپرستی‌شده استفاده کنید."
+      }
+    }
+  }
+}

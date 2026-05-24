@@ -3,6 +3,7 @@ import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { useSeoMeta } from '@unhead/react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useNostr } from '@nostrify/react';
+import { useTranslation, Trans } from 'react-i18next';
 import type { NostrEvent } from '@nostrify/nostrify';
 import { nip19 } from 'nostr-tools';
 import {
@@ -31,6 +32,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
+import { useAppContext } from '@/hooks/useAppContext';
 import { useAuthor } from '@/hooks/useAuthor';
 import { useCampaign } from '@/hooks/useCampaign';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
@@ -108,7 +110,8 @@ function buildImetaFromNip94(nip94Tags: string[][]): string[] {
 }
 
 export function CreateCampaignPage() {
-
+  const { t } = useTranslation();
+  const { config } = useAppContext();
   const { user } = useCurrentUser();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
@@ -247,8 +250,10 @@ export function CreateCampaignPage() {
   );
 
   useSeoMeta({
-    title: isEditMode ? 'Edit campaign | Agora' : 'Start a campaign | Agora',
-    description: isEditMode ? 'Update your fundraising campaign on Agora.' : 'Launch a fundraising campaign on Agora.',
+    title: `${isEditMode ? t('campaignsCreate.seoTitleEdit') : t('campaignsCreate.seoTitleCreate')} | ${config.appName}`,
+    description: isEditMode
+      ? t('campaignsCreate.seoDescriptionEdit', { appName: config.appName })
+      : t('campaignsCreate.seoDescriptionCreate', { appName: config.appName }),
   });
 
   useEffect(() => {
@@ -286,18 +291,18 @@ export function CreateCampaignPage() {
 
   const submitMutation = useMutation({
     mutationFn: async () => {
-      if (!user) throw new Error('You must be logged in to create a campaign.');
-      if (isEditMode && !editCampaign) throw new Error('Campaign could not be loaded for editing.');
+      if (!user) throw new Error(t('campaignsCreate.errorLoginRequired'));
+      if (isEditMode && !editCampaign) throw new Error(t('campaignsCreate.errorEditLoadFailed'));
       if (editCampaign && editCampaign.pubkey !== user.pubkey) {
-        throw new Error('Only the campaign author can edit this campaign.');
+        throw new Error(t('campaignsCreate.errorEditNotOwner'));
       }
       const trimmedTitle = title.trim();
       const slug = activeIdentifier;
 
-      if (!trimmedTitle) throw new Error('Title is required.');
-      if (!slug) throw new Error('Title must include letters or numbers so a campaign URL can be created.');
+      if (!trimmedTitle) throw new Error(t('campaignsCreate.errorTitleRequired'));
+      if (!slug) throw new Error(t('campaignsCreate.errorTitleInvalid'));
       if (!/^[a-z0-9][a-z0-9-]{0,63}$/.test(slug)) {
-        throw new Error('Identifier must be lowercase letters, numbers, and hyphens.');
+        throw new Error(t('campaignsCreate.errorSlugInvalid'));
       }
 
       // Resolve the campaign's `w` endpoints.
@@ -320,12 +325,12 @@ export function CreateCampaignPage() {
 
       if (walletSource === 'mine') {
         if (!hdWalletAvailable) {
-          throw new Error('Built-in wallet is unavailable for this login.');
+          throw new Error(t('campaignsCreate.errorHdUnavailable'));
         }
         const wantsOnchain = mineAccept === 'all' || mineAccept === 'public';
         const wantsSp = mineAccept === 'all' || mineAccept === 'private';
         if (wantsSp && !silentPaymentSupported) {
-          throw new Error('Silent-payment address is unavailable for this login.');
+          throw new Error(t('campaignsCreate.errorSpUnavailable'));
         }
         willUseHdOnchain = wantsOnchain;
         if (wantsSp && hdWallet.silentPaymentAddress) {
@@ -338,17 +343,13 @@ export function CreateCampaignPage() {
         if (customOnchainTrimmed) {
           customOnchainWallet = parseCampaignWallet(customOnchainTrimmed);
           if (!customOnchainWallet || customOnchainWallet.mode !== 'onchain') {
-            throw new Error(
-              'The on-chain address is not a recognized mainnet bech32(m) address (bc1q… / bc1p…).',
-            );
+            throw new Error(t('campaignsCreate.errorOnchainInvalid'));
           }
         }
         if (customSpTrimmed) {
           customSpWallet = parseCampaignWallet(customSpTrimmed);
           if (!customSpWallet || customSpWallet.mode !== 'sp') {
-            throw new Error(
-              'The silent-payment code is not a recognized BIP-352 code (sp1…).',
-            );
+            throw new Error(t('campaignsCreate.errorSpInvalid'));
           }
         }
         spWallet = customSpWallet;
@@ -356,9 +357,7 @@ export function CreateCampaignPage() {
 
       // At least one endpoint must resolve.
       if (!willUseHdOnchain && !customOnchainWallet && !spWallet) {
-        throw new Error(
-          'Provide at least one wallet endpoint — a Bitcoin mainnet address (bc1q… / bc1p…) or a silent-payment code (sp1…).',
-        );
+        throw new Error(t('campaignsCreate.errorWalletRequired'));
       }
 
       // Goal — integer USD (no unit, no currency conversion).
@@ -367,7 +366,7 @@ export function CreateCampaignPage() {
       if (trimmedGoal) {
         const n = Number(trimmedGoal);
         if (!Number.isFinite(n) || !Number.isInteger(n) || n <= 0) {
-          throw new Error('Goal must be a positive whole-dollar amount.');
+          throw new Error(t('campaignsCreate.errorGoalInvalid'));
         }
         goalNum = n;
       }
@@ -375,11 +374,11 @@ export function CreateCampaignPage() {
       let deadlineNum: number | undefined;
       if (deadline.trim()) {
         if (deadline < minDeadline) {
-          throw new Error('Deadline cannot be in the past.');
+          throw new Error(t('campaignsCreate.errorDeadlinePast'));
         }
         const ts = Math.floor(new Date(deadline).getTime() / 1000);
         if (!Number.isFinite(ts) || ts <= 0) {
-          throw new Error('Deadline is not a valid date.');
+          throw new Error(t('campaignsCreate.errorDeadlineInvalid'));
         }
         deadlineNum = ts;
       }
@@ -395,7 +394,7 @@ export function CreateCampaignPage() {
           '#d': [slug],
         });
         if (!prev || !parseCampaign(prev)) {
-          throw new Error('Could not find the latest version of this campaign to update.');
+          throw new Error(t('campaignsCreate.errorEditLatestMissing'));
         }
       } else {
         // d-tag collision guard. Block silent overwrite of an existing campaign
@@ -405,9 +404,7 @@ export function CreateCampaignPage() {
           { kinds: [CAMPAIGN_KIND], authors: [user.pubkey], '#d': [slug], limit: 1 },
         ]);
         if (existing.length > 0) {
-          throw new Error(
-            `You already have a campaign with the identifier "${slug}". Choose another.`,
-          );
+          throw new Error(t('campaignsCreate.errorSlugCollision', { slug }));
         }
       }
 
@@ -415,7 +412,7 @@ export function CreateCampaignPage() {
       const trimmedBanner = bannerUrl.trim();
       const sanitizedBanner = trimmedBanner ? sanitizeUrl(trimmedBanner) : undefined;
       if (trimmedBanner && !sanitizedBanner) {
-        throw new Error('Banner must be a valid https:// URL.');
+        throw new Error(t('campaignsCreate.errorBannerInvalid'));
       }
 
       const tags: string[][] = [
@@ -445,7 +442,7 @@ export function CreateCampaignPage() {
         })();
         if (imeta) tags.push(imeta);
       }
-      tags.push(['alt', `Fundraising campaign: ${trimmedTitle}`]);
+      tags.push(['alt', t('campaignsCreate.altText', { title: trimmedTitle })]);
 
       // Last step before the `w` tags: advance the HD wallet cursor
       // if the user chose 'mine' and the selected accept mode includes
@@ -456,11 +453,11 @@ export function CreateCampaignPage() {
       if (!onchainWallet && willUseHdOnchain) {
         const next = hdWallet.nextReceiveAddress();
         if (!next) {
-          throw new Error('Could not derive a fresh on-chain address from your wallet.');
+          throw new Error(t('campaignsCreate.errorHdDeriveFailed'));
         }
         const parsed = parseCampaignWallet(next.address);
         if (!parsed || parsed.mode !== 'onchain') {
-          throw new Error('Derived wallet address failed validation. Please add a custom address instead.');
+          throw new Error(t('campaignsCreate.errorHdDeriveInvalid'));
         }
         onchainWallet = parsed;
       }
@@ -468,7 +465,7 @@ export function CreateCampaignPage() {
       if (!onchainWallet && !spWallet) {
         // Defense in depth — the earlier guard already covers this,
         // but the type narrower can't see across the cursor advance.
-        throw new Error('Wallet endpoint is required.');
+        throw new Error(t('campaignsCreate.errorWalletRequiredFallback'));
       }
       if (onchainWallet) tags.push(['w', onchainWallet.value]);
       if (spWallet) tags.push(['w', spWallet.value]);
@@ -498,7 +495,7 @@ export function CreateCampaignPage() {
 
       const parsed = parseCampaign(published);
       if (!parsed) {
-        throw new Error('Published event failed validation. Please refresh and try again.');
+        throw new Error(t('campaignsCreate.errorPublishedInvalid'));
       }
       return parsed;
     },
@@ -525,8 +522,8 @@ export function CreateCampaignPage() {
       void queryClient.invalidateQueries({ queryKey: ['agora-feed'] });
       void queryClient.invalidateQueries({ queryKey: ['mixed-feed'] });
       toast({
-        title: isEditMode ? 'Campaign updated' : 'Campaign launched',
-        description: isEditMode ? 'Your fundraiser changes are live.' : 'Your fundraiser is live.',
+        title: isEditMode ? t('campaignsCreate.successEdit') : t('campaignsCreate.successCreate'),
+        description: isEditMode ? t('campaignsCreate.successEditDesc') : t('campaignsCreate.successCreateDesc'),
       });
       navigate(`/${encodeCampaignNaddr(campaign)}`);
     },
@@ -534,7 +531,7 @@ export function CreateCampaignPage() {
       const msg = error instanceof Error ? error.message : String(error);
       setFormError(msg);
       toast({
-        title: isEditMode ? 'Could not update campaign' : 'Could not publish campaign',
+        title: isEditMode ? t('campaignsCreate.errorTitleEdit') : t('campaignsCreate.errorTitleCreate'),
         description: msg,
         variant: 'destructive',
       });
@@ -548,12 +545,12 @@ export function CreateCampaignPage() {
           <Card>
             <CardContent className="py-12 px-8 text-center space-y-4">
               <HandHeart className="size-10 text-muted-foreground/60 mx-auto" />
-              <h2 className="text-xl font-semibold">Log in to start a campaign</h2>
+              <h2 className="text-xl font-semibold">{t('campaignsCreate.loginGateTitle')}</h2>
               <p className="text-muted-foreground">
-                Campaigns are signed Nostr events. You need a Nostr login to publish one.
+                {t('campaignsCreate.loginGateBody')}
               </p>
               <Button asChild>
-                <Link to="/">Go home</Link>
+                <Link to="/">{t('campaignsCreate.goHome')}</Link>
               </Button>
             </CardContent>
           </Card>
@@ -569,12 +566,12 @@ export function CreateCampaignPage() {
           <Card>
             <CardContent className="py-12 px-8 text-center space-y-4">
               <AlertTriangle className="size-10 text-muted-foreground/60 mx-auto" />
-              <h2 className="text-xl font-semibold">Invalid edit link</h2>
+              <h2 className="text-xl font-semibold">{t('campaignsCreate.invalidEditTitle')}</h2>
               <p className="text-muted-foreground">
-                This campaign edit link is missing a valid campaign address.
+                {t('campaignsCreate.invalidEditBody')}
               </p>
               <Button type="button" onClick={() => navigate('/campaigns/new')}>
-                Start a new campaign
+                {t('campaignsCreate.startNewCampaign')}
               </Button>
             </CardContent>
           </Card>
@@ -590,7 +587,7 @@ export function CreateCampaignPage() {
           <Card>
             <CardContent className="py-12 px-8 text-center space-y-3">
               <Loader2 className="size-8 animate-spin text-muted-foreground mx-auto" />
-              <p className="text-sm text-muted-foreground">Loading campaign…</p>
+              <p className="text-sm text-muted-foreground">{t('campaignsCreate.loadingCampaign')}</p>
             </CardContent>
           </Card>
         </div>
@@ -605,12 +602,12 @@ export function CreateCampaignPage() {
           <Card>
             <CardContent className="py-12 px-8 text-center space-y-4">
               <AlertTriangle className="size-10 text-muted-foreground/60 mx-auto" />
-              <h2 className="text-xl font-semibold">Campaign cannot be edited</h2>
+              <h2 className="text-xl font-semibold">{t('campaignsCreate.cannotEditTitle')}</h2>
               <p className="text-muted-foreground">
-                Only the author of this campaign can update it.
+                {t('campaignsCreate.cannotEditBody')}
               </p>
               <Button type="button" onClick={() => navigate(-1)}>
-                Go back
+                {t('common.goBack')}
               </Button>
             </CardContent>
           </Card>
@@ -635,12 +632,12 @@ export function CreateCampaignPage() {
               type="button"
               onClick={() => navigate(-1)}
               className="p-2 rounded-full hover:bg-secondary motion-safe:transition-colors text-muted-foreground hover:text-foreground"
-              aria-label="Go back"
+              aria-label={t('common.goBack')}
             >
-              <ArrowLeft className="size-5" />
+              <ArrowLeft className="size-5 rtl:rotate-180" />
             </button>
             <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">
-              {isEditMode ? 'Edit campaign' : 'Start a campaign'}
+              {isEditMode ? t('campaignsCreate.headingEdit') : t('campaignsCreate.headingCreate')}
             </h1>
           </div>
           <OrganizationContextChip
@@ -655,18 +652,18 @@ export function CreateCampaignPage() {
 
         <div className="rounded-2xl bg-card/50 p-2">
           {/* Title */}
-          <FormSection title="Title" requirement="Required">
+          <FormSection title={t('forms.title')} requirement="Required">
             <Input
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              placeholder="Save the Last Bookstore"
+              placeholder={t('campaignsCreate.titlePlaceholder')}
               maxLength={200}
               required
             />
           </FormSection>
 
           {/* Wallet (required) */}
-          <FormSection title="Bitcoin wallet" requirement="Required">
+          <FormSection title={t('campaignsCreate.wallet')} requirement="Required">
             <WalletPicker
               hdWalletAvailable={hdWalletAvailable}
               silentPaymentSupported={silentPaymentSupported}
@@ -686,7 +683,7 @@ export function CreateCampaignPage() {
           </FormSection>
 
           {/* Country */}
-          <FormSection title="Country" requirement="Recommended">
+          <FormSection title={t('forms.country')} requirement="Recommended">
             <CountrySelect
               query={countryQuery}
               selectedCode={countryCode}
@@ -709,17 +706,17 @@ export function CreateCampaignPage() {
           </FormSection>
 
           {/* Tags */}
-          <FormSection title="Tags" requirement="Optional">
+          <FormSection title={t('forms.tags')} requirement="Optional">
             <Input
               id="campaign-tags"
               value={tagInput}
               onChange={(e) => setTagInput(e.target.value)}
-              placeholder="legal-defense, mutual-aid, local-news"
+              placeholder={t('campaignsCreate.tagsPlaceholder')}
             />
           </FormSection>
 
           {/* Banner image */}
-          <FormSection title="Banner image" requirement="Recommended">
+          <FormSection title={t('campaignsCreate.banner')} requirement="Recommended">
             <CoverImageField
               value={bannerUrl}
               onChange={(url) => {
@@ -738,24 +735,24 @@ export function CreateCampaignPage() {
           </FormSection>
 
           {/* Summary */}
-          <FormSection title="Summary" requirement="Recommended">
+          <FormSection title={t('campaignsCreate.summary')} requirement="Recommended">
             <Textarea
               id="campaign-summary"
               value={summary}
               onChange={(e) => setSummary(e.target.value)}
-              placeholder="Help our neighborhood legal clinic defend peaceful protesters."
+              placeholder={t('campaignsCreate.summaryPlaceholder')}
               rows={2}
               maxLength={300}
             />
           </FormSection>
 
           {/* Story */}
-          <FormSection title="Story" requirement="Optional">
+          <FormSection title={t('campaignsCreate.story')} requirement="Optional">
             <Textarea
               id="campaign-story"
               value={story}
               onChange={(e) => setStory(e.target.value)}
-              placeholder="Share the background, who benefits, and how funds will be used."
+              placeholder={t('campaignsCreate.storyPlaceholder')}
               rows={7}
               className="font-mono text-sm"
             />
@@ -763,7 +760,7 @@ export function CreateCampaignPage() {
 
           <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
             {/* Goal — integer USD */}
-            <FormSection title="Goal" requirement="Optional">
+            <FormSection title={t('campaignsCreate.goal')} requirement="Optional">
               <div className="relative">
                 <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">
                   $
@@ -772,7 +769,7 @@ export function CreateCampaignPage() {
                   id="campaign-goal"
                   type="text"
                   inputMode="numeric"
-                  placeholder="25,000"
+                  placeholder={t('campaignsCreate.goalPlaceholder')}
                   value={goalUsd}
                   onChange={(e) => setGoalUsd(e.target.value)}
                   className="pl-7 pr-14"
@@ -782,12 +779,12 @@ export function CreateCampaignPage() {
                 </span>
               </div>
               <p className="text-xs text-muted-foreground">
-                Whole US Dollars. Donors pay in Bitcoin; clients estimate the USD-equivalent at view time.
+                {t('campaignsCreate.goalNote')}
               </p>
             </FormSection>
 
             {/* Deadline */}
-            <FormSection title="Deadline" requirement="Optional">
+            <FormSection title={t('campaignsCreate.deadline')} requirement="Optional">
               <Input
                 id="campaign-deadline"
                 type="date"
@@ -812,17 +809,17 @@ export function CreateCampaignPage() {
             {submitMutation.isPending ? (
               <>
                 <Loader2 className="size-4 mr-2 animate-spin" />
-                {isEditMode ? 'Updating…' : 'Publishing…'}
+                {isEditMode ? t('campaignsCreate.updating') : t('forms.publishing')}
               </>
             ) : coverUploading ? (
               <>
                 <Loader2 className="size-4 mr-2 animate-spin" />
-                Uploading banner…
+                {t('campaignsCreate.uploadingBanner')}
               </>
             ) : (
               <>
                 <HandHeart className="size-4 mr-2" />
-                {isEditMode ? 'Update campaign' : 'Launch campaign'}
+                {isEditMode ? t('campaignsCreate.submitEdit') : t('campaignsCreate.submitCreate')}
               </>
             )}
           </Button>
@@ -884,8 +881,11 @@ function WalletPicker({
   onCustomSpChange: (value: string) => void;
   parsedCustomSp: ReturnType<typeof parseCampaignWallet>;
 }) {
+  const { t } = useTranslation();
   const initial = displayName.charAt(0).toUpperCase() || '?';
-  const myWalletLabel = displayName ? `${displayName}'s wallet` : 'My wallet';
+  const myWalletLabel = displayName
+    ? t('campaignsCreate.myWalletLabel', { name: displayName })
+    : t('campaignsCreate.myWalletDefault');
 
   return (
     <div className="space-y-3">
@@ -893,13 +893,13 @@ function WalletPicker({
         <>
           <Select value={walletSource} onValueChange={(v) => onWalletSourceChange(v as 'mine' | 'custom')}>
             <SelectTrigger className="h-12">
-              <SelectValue placeholder="Choose a wallet">
+              <SelectValue placeholder={t('campaignsCreate.walletChoose')}>
                 {walletSource === 'custom' ? (
                   <span className="inline-flex items-center gap-2">
                     <span className="inline-flex size-7 shrink-0 items-center justify-center rounded-full bg-muted text-muted-foreground">
                       <Wallet className="size-3.5" />
                     </span>
-                    <span className="text-sm">Custom</span>
+                    <span className="text-sm">{t('campaignsCreate.walletCustom')}</span>
                   </span>
                 ) : (
                   <span className="inline-flex items-center gap-2">
@@ -927,7 +927,7 @@ function WalletPicker({
                   <span className="inline-flex size-7 shrink-0 items-center justify-center rounded-full bg-muted text-muted-foreground">
                     <Wallet className="size-3.5" />
                   </span>
-                  <span className="text-sm">Custom</span>
+                  <span className="text-sm">{t('campaignsCreate.walletCustom')}</span>
                 </span>
               </SelectItem>
             </SelectContent>
@@ -943,11 +943,11 @@ function WalletPicker({
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all" disabled={!silentPaymentSupported}>
-                  Accept all payment types
+                  {t('campaignsCreate.acceptAll')}
                 </SelectItem>
-                <SelectItem value="public">Accept public payments only</SelectItem>
+                <SelectItem value="public">{t('campaignsCreate.acceptPublic')}</SelectItem>
                 <SelectItem value="private" disabled={!silentPaymentSupported}>
-                  Accept private payments only
+                  {t('campaignsCreate.acceptPrivate')}
                 </SelectItem>
               </SelectContent>
             </Select>
@@ -955,7 +955,7 @@ function WalletPicker({
         </>
       ) : (
         <p className="text-xs text-muted-foreground">
-          Enter a Bitcoin address, a silent-payment code, or both. At least one is required.
+          {t('campaignsCreate.customWalletIntro')}
         </p>
       )}
 
@@ -963,8 +963,8 @@ function WalletPicker({
         <div className="space-y-3 pt-1">
           <CustomWalletInput
             id="campaign-wallet-onchain"
-            label="Bitcoin address"
-            placeholder="bc1q… or bc1p…"
+            label={t('campaignsCreate.bitcoinAddress')}
+            placeholder={t('campaignsCreate.bitcoinAddressPlaceholder')}
             value={customOnchain}
             onChange={onCustomOnchainChange}
             parsed={parsedCustomOnchain}
@@ -972,8 +972,8 @@ function WalletPicker({
           />
           <CustomWalletInput
             id="campaign-wallet-sp"
-            label="Silent-payment code"
-            placeholder="sp1…"
+            label={t('campaignsCreate.silentPaymentCode')}
+            placeholder={t('campaignsCreate.silentPaymentCodePlaceholder')}
             value={customSp}
             onChange={onCustomSpChange}
             parsed={parsedCustomSp}
@@ -1008,12 +1008,13 @@ function CustomWalletInput({
   parsed: ReturnType<typeof parseCampaignWallet>;
   expectedMode: 'onchain' | 'sp';
 }) {
+  const { t } = useTranslation();
   const trimmed = value.trim();
   const hasError = trimmed.length > 0 && (!parsed || parsed.mode !== expectedMode);
   const errorMessage =
     expectedMode === 'onchain'
-      ? 'Not a recognized mainnet Bitcoin address (bc1q… / bc1p…).'
-      : 'Not a recognized BIP-352 silent-payment code (sp1…).';
+      ? t('campaignsCreate.onchainInvalid')
+      : t('campaignsCreate.spInvalid');
   return (
     <div className="space-y-1">
       <label htmlFor={id} className="text-xs font-medium text-muted-foreground">
@@ -1051,6 +1052,7 @@ function CountrySelect({
   onSelect: (country: CountryEntry) => void;
   onClear: () => void;
 }) {
+  const { t } = useTranslation();
   const [open, setOpen] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(0);
   const selectedCountry = selectedCode ? COUNTRIES[selectedCode] : undefined;
@@ -1093,7 +1095,7 @@ function CountrySelect({
             }
           }}
           className="h-9 rounded-full border-0 bg-secondary pl-10 pr-10 text-sm focus-visible:ring-0 focus-visible:ring-offset-0"
-          placeholder="Search countries, e.g. Venezuela"
+          placeholder={t('forms.countrySearchPlaceholder')}
           autoComplete="off"
           role="combobox"
           aria-expanded={showResults}
@@ -1104,7 +1106,7 @@ function CountrySelect({
             type="button"
             onClick={onClear}
             className="absolute right-2 top-1/2 rounded-full p-1 -translate-y-1/2 text-muted-foreground hover:bg-muted hover:text-foreground motion-safe:transition-colors"
-            aria-label="Clear country"
+            aria-label={t('campaignsCreate.countryClearAria')}
           >
             <X className="size-4" />
           </button>
@@ -1129,7 +1131,7 @@ function CountrySelect({
                   index === selectedIndex && 'bg-secondary/60',
                 )}
               >
-                <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-secondary text-lg leading-none" role="img" aria-label={`Flag of ${country.name}`}>
+                <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-secondary text-lg leading-none" role="img" aria-label={t('campaignsCreate.flagOfAria', { name: country.name })}>
                   {country.flag}
                 </span>
                 <span className="min-w-0 flex-1">
@@ -1144,7 +1146,11 @@ function CountrySelect({
 
       {selectedCountry && (
         <p className="text-xs text-muted-foreground">
-          Publishes <span className="font-mono text-foreground">i: iso3166:{selectedCode}</span> for country sorting.
+          <Trans
+            i18nKey="campaignsCreate.countryHint"
+            values={{ code: selectedCode }}
+            components={{ 0: <span className="font-mono text-foreground" /> }}
+          />
         </p>
       )}
     </div>

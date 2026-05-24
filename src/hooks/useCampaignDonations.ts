@@ -7,7 +7,7 @@ import { verifyOnchainZap, extractOnchainZapTxid, type OnchainZapEntry } from '@
 import { fetchAddressData } from '@/lib/bitcoin';
 import type { ParsedCampaign } from '@/lib/campaign';
 
-export interface CampaignDonationStats {
+interface CampaignDonationStats {
   /**
    * Total satoshis raised, sourced from the cumulative on-chain amount
    * ever received by the campaign's `w` address (`chain_stats.funded_txo_sum`

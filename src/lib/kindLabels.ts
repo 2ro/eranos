@@ -22,7 +22,7 @@
 // ---------------------------------------------------------------------------
 
 /** Map of every known Nostr event kind to a short human-readable label. */
-export const KIND_LABELS: Record<number, string> = {
+const KIND_LABELS: Record<number, string> = {
   // NIP-01 core
   0: 'Profile',
   1: 'Short text note',

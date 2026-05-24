@@ -23,6 +23,7 @@ import {
 } from "lucide-react";
 import { nip19 } from "nostr-tools";
 import { type ReactNode, lazy, memo, Suspense, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 /** Lazy-loaded markdown-heavy components — keeps react-markdown + unified pipeline out of the main feed bundle. */
 const ArticleContent = lazy(() => import("@/components/ArticleContent").then(m => ({ default: m.ArticleContent })));
@@ -38,10 +39,7 @@ import { BadgeContent } from "@/components/BadgeContent";
 import { CampaignNoteCardContent } from "@/components/CampaignNoteCardContent";
 import { CommunityContent } from "@/components/CommunityContent";
 import { CalendarEventContent } from "@/components/CalendarEventContent";
-import {
-  ColorMomentContent,
-  ColorMomentEyeButton,
-} from "@/components/ColorMomentContent";
+import { ColorMomentContent } from "@/components/ColorMomentContent";
 import { CommentContext, CountryCommentPill } from "@/components/CommentContext";
 import { CommunityContentWarning } from "@/components/CommunityContentWarning";
 import { ContentWarningGuard } from "@/components/ContentWarningGuard";
@@ -93,6 +91,7 @@ import { useProfileUrl } from "@/hooks/useProfileUrl";
 import { useShareOrigin } from "@/hooks/useShareOrigin";
 import { toast } from "@/hooks/useToast";
 import { useEventStats } from "@/hooks/useTrending";
+import { useEventTranslation } from "@/hooks/useEventTranslation";
 import { canZap } from "@/lib/canZap";
 import { extractZapSender, extractZapMessage } from "@/hooks/useEventInteractions";
 import { getZapAmountSats } from "@/lib/zapHelpers";
@@ -186,7 +185,7 @@ export function ActivityCard({
 }
 
 /** Reusable actor row: small avatar + display name + action label + timestamp. */
-export interface ActorRowProps {
+interface ActorRowProps {
   pubkey: string;
   profileUrl: string;
   picture?: string;
@@ -200,7 +199,7 @@ export interface ActorRowProps {
   timestampLabel: string;
 }
 
-export function ActorRow({ pubkey, profileUrl, picture, displayName, authorEvent, isLoading, label, extra, timestampLabel }: ActorRowProps) {
+function ActorRow({ pubkey, profileUrl, picture, displayName, authorEvent, isLoading, label, extra, timestampLabel }: ActorRowProps) {
   if (isLoading) {
     return (
       <div className="flex items-center gap-2">
@@ -380,6 +379,7 @@ export const NoteCard = memo(function NoteCard({
   commentContextPrefix,
   actionEvent,
 }: NoteCardProps) {
+  const { t } = useTranslation();
   const actionTarget = actionEvent ?? event;
   const { config } = useAppContext();
   const { user } = useCurrentUser();
@@ -540,6 +540,7 @@ export const NoteCard = memo(function NoteCard({
 
   const isComment = event.kind === 1111;
   const isReply = isTextNote && !isComment && isReplyEvent(event);
+  const { translatedEvent: contentEvent, translateAction } = useEventTranslation(event, { includePlainContent: isTextNote });
 
   // Find all people being replied to (for "Replying to @user1 and @user2")
   const replyToPubkeys = useMemo(() => {
@@ -687,7 +688,7 @@ export const NoteCard = memo(function NoteCard({
           <ActionContent event={event} />
 
         ) : isCampaign ? (
-          <CampaignNoteCardContent event={event} />
+          <CampaignNoteCardContent event={contentEvent} />
 
         ) : isVoiceMessage ? (
           <VoiceMessagePlayer event={event} />
@@ -743,7 +744,7 @@ export const NoteCard = memo(function NoteCard({
           <ProfileCardContent event={event} />
         ) : (
           <TruncatedNoteContent
-            event={event}
+            event={contentEvent}
           />
         )}
       </ContentWarningGuard>
@@ -776,7 +777,7 @@ export const NoteCard = memo(function NoteCard({
           </Link>
         </ProfileHoverCard>
         {metadata?.bot && (
-          <span className="text-xs text-primary shrink-0" title="Bot account">
+          <span className="text-xs text-primary shrink-0" title={t('noteCard.botAccount')}>
             🤖
           </span>
         )}
@@ -819,7 +820,7 @@ export const NoteCard = memo(function NoteCard({
     <div className="flex flex-wrap items-center gap-1 sm:gap-2 mt-3">
       <button
         className="inline-flex items-center gap-2 h-9 px-3 rounded-full text-sm font-medium text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors"
-        title="Reply"
+        title={t('feed.actions.reply')}
         onClick={(e) => {
           e.stopPropagation();
           setReplyOpen(true);
@@ -840,7 +841,7 @@ export const NoteCard = memo(function NoteCard({
                 ? "text-accent hover:text-accent/80 hover:bg-accent/10"
                 : "text-muted-foreground hover:text-accent hover:bg-accent/10",
             )}
-            title={isReposted ? "Undo repost" : "Repost"}
+            title={isReposted ? t('feed.actions.undoRepost') : t('feed.actions.repost')}
           >
             <RepostIcon className="size-[18px]" />
             {stats?.reposts || stats?.quotes ? (
@@ -864,7 +865,7 @@ export const NoteCard = memo(function NoteCard({
         <ZapDialog target={actionTarget}>
           <button
             className="inline-flex items-center gap-2 h-9 px-3 rounded-full text-sm font-medium text-muted-foreground hover:text-amber-500 hover:bg-amber-500/10 transition-colors"
-            title="Zap"
+            title={t('feed.actions.zap')}
           >
             <Zap className="size-[18px]" />
             {stats?.zapAmount ? (
@@ -878,15 +879,17 @@ export const NoteCard = memo(function NoteCard({
 
       <div className="flex-1" />
 
+      {translateAction}
+
       <button
         className="inline-flex items-center justify-center h-9 w-9 rounded-full text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors sidebar:hidden"
-        title="Share"
+        title={t('feed.actions.share')}
         onClick={async (e) => {
           e.stopPropagation();
           impactLight();
           const url = `${shareOrigin}/${encodedId}`;
           const result = await shareOrCopy(url);
-          if (result === "copied") toast({ title: "Link copied to clipboard" });
+          if (result === "copied") toast({ title: t('feed.actions.linkCopied') });
         }}
       >
         <Share2 className="size-[18px]" />
@@ -894,7 +897,7 @@ export const NoteCard = memo(function NoteCard({
 
       <button
         className="inline-flex items-center justify-center h-9 w-9 rounded-full text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors"
-        title="More"
+        title={t('feed.actions.more')}
         onClick={(e) => {
           e.stopPropagation();
           setMoreMenuOpen(true);
@@ -982,7 +985,7 @@ export const NoteCard = memo(function NoteCard({
         }
         actorRow={
           <ActorRow pubkey={event.pubkey} profileUrl={profileUrl} picture={metadata?.picture}
-            displayName={displayName} authorEvent={author.data?.event} isLoading={author.isLoading} label="reacted" timestampLabel={timeAgo(event.created_at)} />
+            displayName={displayName} authorEvent={author.data?.event} isLoading={author.isLoading} label={t('noteCard.reacted')} timestampLabel={timeAgo(event.created_at)} />
         }
         threaded={threaded} threadedLast={threadedLast} threadedLineClassName={threadedLineClassName}
         className={className} onClick={handleCardClick} onAuxClick={handleAuxClick}
@@ -1002,7 +1005,7 @@ export const NoteCard = memo(function NoteCard({
         }
         actorRow={
           <ActorRow pubkey={event.pubkey} profileUrl={profileUrl} picture={metadata?.picture}
-            displayName={displayName} authorEvent={author.data?.event} isLoading={author.isLoading} label="reposted" timestampLabel={timeAgo(event.created_at)} />
+            displayName={displayName} authorEvent={author.data?.event} isLoading={author.isLoading} label={t('noteCard.reposted')} timestampLabel={timeAgo(event.created_at)} />
         }
         threaded={threaded} threadedLast={threadedLast} threadedLineClassName={threadedLineClassName}
         className={className} onClick={handleCardClick} onAuxClick={handleAuxClick}
@@ -1017,9 +1020,9 @@ export const NoteCard = memo(function NoteCard({
     const zapAmountSats = getZapAmountSats(event);
     const zapMessage = (event.kind === 8333 ? event.content : extractZapMessage(event)).trim();
     const usdLabel = btcPrice ? satsToUSD(zapAmountSats, btcPrice) : undefined;
-    const satsLabel = `${formatNumber(zapAmountSats)} ${zapAmountSats === 1 ? 'sat' : 'sats'}`;
+    const satsLabel = t('noteCard.zap.sat', { count: zapAmountSats, formattedCount: formatNumber(zapAmountSats) });
     const amountText = usdLabel ?? satsLabel;
-    const donationPrefix = zapAmountSats > 0 ? `Donated ${amountText} to` : "Donated to";
+    const donationPrefix = zapAmountSats > 0 ? t('noteCard.zap.donatedAmountTo', { amount: amountText }) : t('noteCard.zap.donatedTo');
     const zapCommentEvent = buildZapCommentEvent(
       event,
       zapRequestTags,
@@ -1065,7 +1068,7 @@ export const NoteCard = memo(function NoteCard({
                 {author.data?.event ? <EmojifiedText tags={author.data.event.tags}>{displayName}</EmojifiedText> : displayName}
               </Link>
             </ProfileHoverCard>
-            <span className="text-sm text-muted-foreground shrink-0">voted</span>
+            <span className="text-sm text-muted-foreground shrink-0">{t('noteCard.voted')}</span>
             <span className="text-xs text-muted-foreground ml-auto shrink-0">{timeAgo(event.created_at)}</span>
           </div>
         }
@@ -1169,7 +1172,7 @@ export const NoteCard = memo(function NoteCard({
               pubkey={repostedBy}
               icon={RepostIcon}
               iconClassName="text-accent"
-              action="reposted"
+              action="noteCard.reposted"
             />
           ) : (
             !hideKindHeader && KIND_HEADER_MAP[event.kind] &&
@@ -1206,7 +1209,6 @@ export const NoteCard = memo(function NoteCard({
           <div className="flex items-center gap-3">
             {avatarElement}
             {authorInfo}
-            {isColor && <ColorMomentEyeButton event={event} />}
             <CountryCommentPill
               event={event}
               className="shrink-0 [text-shadow:none]"
@@ -1246,6 +1248,7 @@ function TruncatedNoteContent({
 }: {
   event: NostrEvent;
 }) {
+  const { t } = useTranslation();
   const contentRef = useRef<HTMLDivElement>(null);
   const [overflows, setOverflows] = useState(false);
   const [expanded, setExpanded] = useState(false);
@@ -1293,15 +1296,17 @@ function TruncatedNoteContent({
         )}
       </div>
       {overflows && (
-        <button
-          className="mt-1 text-sm text-primary hover:underline"
-          onClick={(e) => {
-            e.stopPropagation();
-            setExpanded((v) => !v);
-          }}
-        >
-          {expanded ? "Show less" : "Read more"}
-        </button>
+        <div className="mt-1 flex flex-wrap items-center gap-2">
+          <button
+            className="text-sm text-primary hover:underline"
+            onClick={(e) => {
+              e.stopPropagation();
+              setExpanded((v) => !v);
+            }}
+          >
+            {expanded ? t('noteCard.showLess') : t('noteCard.readMore')}
+          </button>
+        </div>
       )}
     </div>
   );
@@ -1577,28 +1582,28 @@ function VineMedia({
   );
 }
 
-/** Stream status badge config. */
+/** Stream status badge config. The `label` is an i18n key under `noteCard.stream.*`. */
 function getStreamStatusConfig(status: string | undefined) {
   switch (status) {
     case "live":
       return {
-        label: "LIVE",
+        labelKey: "noteCard.stream.live",
         className: "bg-red-600 hover:bg-red-600 text-white border-red-600",
       };
     case "ended":
       return {
-        label: "ENDED",
+        labelKey: "noteCard.stream.ended",
         className: "bg-muted text-muted-foreground border-border",
       };
     case "planned":
       return {
-        label: "PLANNED",
+        labelKey: "noteCard.stream.planned",
         className:
           "bg-blue-600/90 hover:bg-blue-600/90 text-white border-blue-600",
       };
     default:
       return {
-        label: status?.toUpperCase() || "UNKNOWN",
+        labelKey: "noteCard.stream.unknown",
         className: "bg-muted text-muted-foreground border-border",
       };
   }
@@ -1606,7 +1611,8 @@ function getStreamStatusConfig(status: string | undefined) {
 
 /** Inline content for kind 30311 live stream events. */
 function StreamContent({ event }: { event: NostrEvent }) {
-  const title = getTag(event.tags, "title") || "Untitled Stream";
+  const { t } = useTranslation();
+  const title = getTag(event.tags, "title") || t('noteCard.stream.untitled');
   const summary = getTag(event.tags, "summary");
   const imageUrl = getTag(event.tags, "image");
   const streamingUrl = getTag(event.tags, "streaming");
@@ -1646,7 +1652,7 @@ function StreamContent({ event }: { event: NostrEvent }) {
                 className={cn("text-[10px]", statusConfig.className)}
               >
                 <div className="size-1.5 bg-white rounded-full animate-pulse mr-1" />
-                {statusConfig.label}
+                {t(statusConfig.labelKey)}
               </Badge>
               {currentParticipants && (
                 <span className="flex items-center gap-1 bg-black/60 text-white text-xs px-2 py-0.5 rounded">
@@ -1673,7 +1679,7 @@ function StreamContent({ event }: { event: NostrEvent }) {
                 variant="outline"
                 className={cn("text-[10px]", statusConfig.className)}
               >
-                {statusConfig.label}
+                {t(statusConfig.labelKey)}
               </Badge>
             </div>
             {currentParticipants && (
@@ -1694,7 +1700,7 @@ function StreamContent({ event }: { event: NostrEvent }) {
               {status === "live" && (
                 <div className="size-1.5 bg-white rounded-full animate-pulse mr-1" />
               )}
-              {statusConfig.label}
+              {t(statusConfig.labelKey)}
             </Badge>
             {currentParticipants && (
               <span className="flex items-center gap-1 text-xs text-muted-foreground">
@@ -1731,16 +1737,20 @@ function StreamContent({ event }: { event: NostrEvent }) {
   );
 }
 
-export interface EventActionHeaderProps {
+interface EventActionHeaderProps {
   /** Pubkey of the person performing the action. */
   pubkey: string;
   /** Lucide icon component shown to the left of the author name. */
   icon: React.ComponentType<{ className?: string }>;
   /** Optional className for the icon (defaults to text-primary). */
   iconClassName?: string;
-  /** Verb phrase shown after the author name, e.g. "hid a" or "is streaming". */
+  /**
+   * Translation key for the verb phrase shown after the author name,
+   * e.g. "noteCard.kindHeader.treasureHidCreated". Translated at render
+   * time via i18next.
+   */
   action: string;
-  /** Optional noun shown after the verb, linked to a page route, e.g. "treasure" → /treasures. */
+  /** Translation key for an optional noun shown after the verb. */
   noun?: string;
   /** Route to link the noun to, e.g. "/treasures". */
   nounRoute?: string;
@@ -1750,88 +1760,98 @@ export interface EventActionHeaderProps {
 interface KindHeaderConfig {
   icon: React.ComponentType<{ className?: string }>;
   iconClassName?: string;
-  /** Static action string, or a function that computes it from the event. */
+  /**
+   * Either a static i18n key under `noteCard.kindHeader`, or a function
+   * that computes the action key from the event. The materialized verb
+   * phrase is filled in by `useKindHeader()` at render time.
+   */
   action: string | ((event: NostrEvent) => string);
+  /** Optional i18n key for the linked noun under `noteCard.kindHeader`. */
   noun?: string;
   nounRoute?: string;
+}
+
+/** Resolves a `publishedAtAction` outcome to a noteCard.kindHeader.* key. */
+function publishedAtKey(event: NostrEvent, keys: { created: string; updated: string; fallback: string }): string {
+  return publishedAtAction(event, keys);
 }
 
 const KIND_HEADER_MAP: Record<number, KindHeaderConfig> = {
   20: {
     icon: Camera,
-    action: "shared a",
-    noun: "photo",
+    action: "noteCard.kindHeader.photo.action",
+    noun: "noteCard.kindHeader.photo.noun",
     nounRoute: "/photos",
   },
   4: {
     icon: Mail,
-    action: "sent an",
-    noun: "encrypted message",
+    action: "noteCard.kindHeader.encryptedMessage.action",
+    noun: "noteCard.kindHeader.encryptedMessage.noun",
   },
   8211: {
     icon: Mail,
-    action: "sent a",
-    noun: "letter",
+    action: "noteCard.kindHeader.letter.action",
+    noun: "noteCard.kindHeader.letter.noun",
     nounRoute: "/letters",
   },
   37516: {
     icon: ChestIcon,
-    action: (event) => publishedAtAction(event, { created: "hid a", updated: "updated a", fallback: "hid a" }),
-    noun: "treasure",
+    action: (event) => publishedAtKey(event, { created: "noteCard.kindHeader.treasureHidCreated", updated: "noteCard.kindHeader.treasureHidUpdated", fallback: "noteCard.kindHeader.treasureHidCreated" }),
+    noun: "noteCard.kindHeader.treasureNoun",
     nounRoute: "/treasures",
   },
   7516: {
     icon: ChestIcon,
-    action: "found a",
-    noun: "treasure",
+    action: "noteCard.kindHeader.treasureFound",
+    noun: "noteCard.kindHeader.treasureNoun",
     nounRoute: "/treasures",
   },
   37381: {
     icon: CardsIcon,
-    action: (event) => publishedAtAction(event, { created: "created a", updated: "updated a", fallback: "shared a" }),
-    noun: "deck",
+    action: (event) => publishedAtKey(event, { created: "noteCard.kindHeader.deckCreated", updated: "noteCard.kindHeader.deckUpdated", fallback: "noteCard.kindHeader.deckFallback" }),
+    noun: "noteCard.kindHeader.deckNoun",
     nounRoute: "/decks",
   },
   30030: {
     icon: SmilePlus,
-    action: (event) => publishedAtAction(event, { created: "created an", updated: "updated an", fallback: "shared an" }),
-    noun: "emoji pack",
+    action: (event) => publishedAtKey(event, { created: "noteCard.kindHeader.emojiPackCreated", updated: "noteCard.kindHeader.emojiPackUpdated", fallback: "noteCard.kindHeader.emojiPackFallback" }),
+    noun: "noteCard.kindHeader.emojiPackNoun",
     nounRoute: "/emojis",
   },
   34550: {
     icon: Users,
-    action: (event) => publishedAtAction(event, { created: "created a", updated: "updated a", fallback: "shared a" }),
-    noun: "group",
+    action: (event) => publishedAtKey(event, { created: "noteCard.kindHeader.groupCreated", updated: "noteCard.kindHeader.groupUpdated", fallback: "noteCard.kindHeader.groupFallback" }),
+    noun: "noteCard.kindHeader.groupNoun",
     nounRoute: "/groups",
   },
   33863: {
     icon: HandHeart,
-    action: (event) => publishedAtAction(event, { created: "launched a", updated: "updated a", fallback: "shared a" }),
-    noun: "campaign",
+    action: (event) => publishedAtKey(event, { created: "noteCard.kindHeader.campaignLaunched", updated: "noteCard.kindHeader.campaignUpdated", fallback: "noteCard.kindHeader.campaignFallback" }),
+    noun: "noteCard.kindHeader.campaignNoun",
     nounRoute: "/campaigns/all",
   },
   8: {
     icon: Award,
-    action: "awarded a",
-    noun: "badge",
+    action: "noteCard.kindHeader.badgeAwarded",
+    noun: "noteCard.kindHeader.badgeNoun",
     nounRoute: "/badges",
   },
   30009: {
     icon: Award,
-    action: (event) => publishedAtAction(event, { created: "created a", updated: "updated a", fallback: "created a" }),
-    noun: "badge",
+    action: (event) => publishedAtKey(event, { created: "noteCard.kindHeader.badgeCreated", updated: "noteCard.kindHeader.badgeDefUpdated", fallback: "noteCard.kindHeader.badgeCreated" }),
+    noun: "noteCard.kindHeader.badgeNoun",
     nounRoute: "/badges",
   },
   10008: {
     icon: Award,
-    action: (event) => publishedAtAction(event, { created: "created their", updated: "updated their", fallback: "updated their" }),
-    noun: "badges",
+    action: (event) => publishedAtKey(event, { created: "noteCard.kindHeader.badgesCreatedTheir", updated: "noteCard.kindHeader.badgesUpdatedTheir", fallback: "noteCard.kindHeader.badgesUpdatedTheir" }),
+    noun: "noteCard.kindHeader.badgesNoun",
     nounRoute: "/badges",
   },
   30008: {
     icon: Award,
-    action: (event) => publishedAtAction(event, { created: "created their", updated: "updated their", fallback: "updated their" }),
-    noun: "badges",
+    action: (event) => publishedAtKey(event, { created: "noteCard.kindHeader.badgesCreatedTheir", updated: "noteCard.kindHeader.badgesUpdatedTheir", fallback: "noteCard.kindHeader.badgesUpdatedTheir" }),
+    noun: "noteCard.kindHeader.badgesNoun",
     nounRoute: "/badges",
   },
   30311: {
@@ -1839,81 +1859,81 @@ const KIND_HEADER_MAP: Record<number, KindHeaderConfig> = {
     iconClassName: undefined, // computed dynamically below
     action: (event) =>
       getEffectiveStreamStatus(event) === "live"
-        ? "is streaming"
-        : "streamed",
+        ? "noteCard.kindHeader.streamingLive"
+        : "noteCard.kindHeader.streamed",
   },
   32267: {
     icon: Package,
-    action: (event) => publishedAtAction(event, { created: "published a Zapstore app", updated: "updated a Zapstore app", fallback: "published a Zapstore app" }),
+    action: (event) => publishedAtKey(event, { created: "noteCard.kindHeader.zapstoreAppPublished", updated: "noteCard.kindHeader.zapstoreAppUpdated", fallback: "noteCard.kindHeader.zapstoreAppPublished" }),
   },
   30063: {
     icon: Package,
-    action: (event) => publishedAtAction(event, { created: "published a Zapstore release", updated: "updated a Zapstore release", fallback: "published a Zapstore release" }),
+    action: (event) => publishedAtKey(event, { created: "noteCard.kindHeader.zapstoreReleasePublished", updated: "noteCard.kindHeader.zapstoreReleaseUpdated", fallback: "noteCard.kindHeader.zapstoreReleasePublished" }),
   },
   3063: {
     icon: Package,
-    action: "published a Zapstore asset",
+    action: "noteCard.kindHeader.zapstoreAssetPublished",
   },
   31990: {
     icon: Package,
-    action: (event) => publishedAtAction(event, { created: "published an app", updated: "updated an app", fallback: "published an app" }),
+    action: (event) => publishedAtKey(event, { created: "noteCard.kindHeader.appPublished", updated: "noteCard.kindHeader.appUpdated", fallback: "noteCard.kindHeader.appPublished" }),
   },
   30617: {
     icon: GitBranch,
-    action: (event) => publishedAtAction(event, { created: "created a", updated: "updated a", fallback: "shared a" }),
-    noun: "repository",
+    action: (event) => publishedAtKey(event, { created: "noteCard.kindHeader.repoCreated", updated: "noteCard.kindHeader.repoUpdated", fallback: "noteCard.kindHeader.repoFallback" }),
+    noun: "noteCard.kindHeader.repoNoun",
     nounRoute: "/development",
   },
   1617: {
     icon: FileText,
-    action: "submitted a",
-    noun: "patch",
+    action: "noteCard.kindHeader.patchSubmitted",
+    noun: "noteCard.kindHeader.patchNoun",
     nounRoute: "/development",
   },
   1618: {
     icon: GitPullRequest,
-    action: "opened a",
-    noun: "pull request",
+    action: "noteCard.kindHeader.prOpened",
+    noun: "noteCard.kindHeader.prNoun",
     nounRoute: "/development",
   },
   30817: {
     icon: FileCode,
-    action: (event) => publishedAtAction(event, { created: "proposed a", updated: "updated a", fallback: "proposed a" }),
-    noun: "NIP",
+    action: (event) => publishedAtKey(event, { created: "noteCard.kindHeader.nipProposed", updated: "noteCard.kindHeader.nipUpdated", fallback: "noteCard.kindHeader.nipProposed" }),
+    noun: "noteCard.kindHeader.nipNoun",
     nounRoute: "/development",
   },
   15128: {
     icon: Rocket,
-    action: (event) => publishedAtAction(event, { created: "deployed an", updated: "redeployed an", fallback: "deployed an" }),
-    noun: "nsite",
+    action: (event) => publishedAtKey(event, { created: "noteCard.kindHeader.nsiteDeployed", updated: "noteCard.kindHeader.nsiteRedeployed", fallback: "noteCard.kindHeader.nsiteDeployed" }),
+    noun: "noteCard.kindHeader.nsiteNoun",
     nounRoute: "/development",
   },
   35128: {
     icon: Rocket,
-    action: (event) => publishedAtAction(event, { created: "deployed an", updated: "redeployed an", fallback: "deployed an" }),
-    noun: "nsite",
+    action: (event) => publishedAtKey(event, { created: "noteCard.kindHeader.nsiteDeployed", updated: "noteCard.kindHeader.nsiteRedeployed", fallback: "noteCard.kindHeader.nsiteDeployed" }),
+    noun: "noteCard.kindHeader.nsiteNoun",
     nounRoute: "/development",
   },
   9735: {
     icon: Zap,
-    action: "zapped",
+    action: "noteCard.kindHeader.zapped",
   },
   36639: {
     icon: Megaphone,
-    action: (event) => publishedAtAction(event, { created: "created a", updated: "updated a", fallback: "created a" }),
-    noun: "pledge",
+    action: (event) => publishedAtKey(event, { created: "noteCard.kindHeader.pledgeCreated", updated: "noteCard.kindHeader.pledgeUpdated", fallback: "noteCard.kindHeader.pledgeCreated" }),
+    noun: "noteCard.kindHeader.pledgeNoun",
     nounRoute: "/pledges",
   },
   39089: {
     icon: PartyPopper,
-    action: (event) => publishedAtAction(event, { created: "created a", updated: "updated a", fallback: "shared a" }),
-    noun: "follow pack",
+    action: (event) => publishedAtKey(event, { created: "noteCard.kindHeader.followPackCreated", updated: "noteCard.kindHeader.followPackUpdated", fallback: "noteCard.kindHeader.followPackFallback" }),
+    noun: "noteCard.kindHeader.followPackNoun",
     nounRoute: "/packs",
   },
   30000: {
     icon: PartyPopper,
-    action: (event) => publishedAtAction(event, { created: "created a", updated: "updated a", fallback: "shared a" }),
-    noun: "follow set",
+    action: (event) => publishedAtKey(event, { created: "noteCard.kindHeader.followSetCreated", updated: "noteCard.kindHeader.followSetUpdated", fallback: "noteCard.kindHeader.followSetFallback" }),
+    noun: "noteCard.kindHeader.followSetNoun",
     nounRoute: "/packs",
   },
 };
@@ -1927,9 +1947,12 @@ export function EventActionHeader({
   noun,
   nounRoute,
 }: EventActionHeaderProps) {
+  const { t } = useTranslation();
   const author = useAuthor(pubkey);
   const name = author.data?.metadata?.name || genUserName(pubkey);
   const url = useProfileUrl(pubkey, author.data?.metadata);
+  const actionText = t(action);
+  const nounText = noun ? t(noun) : undefined;
 
   return (
     <div className="flex items-center gap-3 text-xs text-muted-foreground mb-3 min-w-0">
@@ -1962,8 +1985,8 @@ export function EventActionHeader({
           </ProfileHoverCard>
         )}
         <span className={cn("shrink-0", author.isLoading && "ml-1")}>
-          {action}
-          {noun && nounRoute && (
+          {actionText}
+          {nounText && nounRoute && (
             <>
               {" "}
               <Link
@@ -1971,11 +1994,11 @@ export function EventActionHeader({
                 className="hover:underline"
                 onClick={(e) => e.stopPropagation()}
               >
-                {noun}
+                {nounText}
               </Link>
             </>
           )}
-          {noun && !nounRoute && <> {noun}</>}
+          {nounText && !nounRoute && <> {nounText}</>}
         </span>
       </div>
     </div>

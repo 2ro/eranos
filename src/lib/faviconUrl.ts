@@ -1,6 +1,6 @@
 import UriTemplate from 'uri-templates';
 
-export interface TemplateUrlOpts {
+interface TemplateUrlOpts {
   template: string;
   url: string | URL;
 }
@@ -29,7 +29,7 @@ export function templateUrl(opts: TemplateUrlOpts): string {
 }
 
 /** @deprecated Use `templateUrl` instead. */
-export type FaviconUrlOpts = TemplateUrlOpts;
+type FaviconUrlOpts = TemplateUrlOpts;
 
 /**
  * Generate a favicon URL from a template and input URL.

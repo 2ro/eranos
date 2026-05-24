@@ -47,18 +47,6 @@ export function encodeEventAddress(event: NostrEvent): string {
   return nip19.neventEncode({ id: event.id, author: event.pubkey });
 }
 
-/**
- * Encodes a NIP-19 `nevent` identifier pinned to the exact event id.
- *
- * Use this when the UI specifically needs to reference a historical or
- * point-in-time version of an event — e.g. profile-recovery dialogs that
- * list past versions of a replaceable event. For "go to the current
- * thing" navigation in feeds, use `encodeEventAddress` instead.
- */
-export function encodeEventNevent(event: NostrEvent): string {
-  return nip19.neventEncode({ id: event.id, author: event.pubkey });
-}
-
 /** Returns true for the legacy NIP-01 replaceable kinds below 1000. */
 function isLegacyReplaceableKind(kind: number): boolean {
   return kind === 0 || kind === 3 || kind === 41;

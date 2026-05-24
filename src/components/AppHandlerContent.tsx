@@ -5,7 +5,6 @@ import { Link } from 'react-router-dom';
 
 import { Button } from '@/components/ui/button';
 import { ExternalFavicon } from '@/components/ExternalFavicon';
-import { Skeleton } from '@/components/ui/skeleton';
 import { NostrURI } from '@/lib/NostrURI';
 import { hexToBase36 } from '@/lib/nsiteSubdomain';
 import { sanitizeUrl } from '@/lib/sanitizeUrl';
@@ -335,26 +334,3 @@ export function AppHandlerContent({ event, compact }: AppHandlerContentProps) {
   );
 }
 
-/** Skeleton loading state for AppHandlerContent. */
-export function AppHandlerSkeleton() {
-  return (
-    <div className="mt-3">
-      <div className="rounded-xl border border-border overflow-hidden">
-        <Skeleton className="aspect-[2/1] w-full" />
-        <div className="px-4 pb-4 space-y-3">
-          <div className="-mt-10">
-            <Skeleton className="size-20 rounded-2xl border-4 border-background" />
-          </div>
-          <div className="space-y-1.5">
-            <Skeleton className="h-5 w-32" />
-            <Skeleton className="h-3 w-24" />
-          </div>
-          <div className="space-y-1.5">
-            <Skeleton className="h-4 w-full" />
-            <Skeleton className="h-4 w-4/5" />
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}

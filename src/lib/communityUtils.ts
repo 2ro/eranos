@@ -186,9 +186,9 @@ export function getViewerAuthority(
  * here. Hide a user by banning each of their posts individually, or by
  * dropping them from the moderator list.
  */
-export type CommunityReportAction = 'content-ban' | 'report';
+type CommunityReportAction = 'content-ban' | 'report';
 
-export interface CommunityReport {
+interface CommunityReport {
   /** The original kind 1984 event. */
   event: NostrEvent;
   /** Classified action type. */
@@ -203,7 +203,7 @@ export interface CommunityReport {
   reporterPubkey: string;
 }
 
-export interface CommunityContentBan {
+interface CommunityContentBan {
   /** Target event ID claimed by the ban event's `e` tag. */
   eventId: string;
   /** Target pubkey claimed by the ban event's `p` tag. */
@@ -253,7 +253,7 @@ export const EMPTY_RANK_MAP: ReadonlyMap<string, CommunityMember> = new Map();
  * actual author. Without this check, a malicious report could pair a real
  * event ID with a lower-ranked or non-member pubkey to bypass authority checks.
  */
-export function hasApplicableContentBan(
+function hasApplicableContentBan(
   event: NostrEvent,
   moderation: CommunityModeration,
 ): boolean {
@@ -286,7 +286,7 @@ export function getApplicableReports(
  * (not banned by author or content ban). Use for single-event checks;
  * use `applyCommunityModerationToEvents` for batch filtering.
  */
-export function isEventAllowedByModeration(
+function isEventAllowedByModeration(
   event: NostrEvent,
   moderation: CommunityModeration,
 ): boolean {
@@ -334,7 +334,7 @@ function hasBanLabel(event: NostrEvent): boolean {
  *
  * Returns `null` if the event's structure is not a valid NIP-56 report.
  */
-export function parseCommunityReport(event: NostrEvent): CommunityReport | null {
+function parseCommunityReport(event: NostrEvent): CommunityReport | null {
   if (event.kind !== REPORT_KIND) return null;
 
   // Extract target pubkey (required on all reports)
@@ -427,14 +427,6 @@ export function resolveCommunityModeration(
   return { contentBansByEventId, bannedPubkeys: new Set(), reportsByEventId, allReports };
 }
 
-/**
- * Build the `a` tag coordinate string for a community event.
- */
-export function getCommunityATag(event: NostrEvent): string {
-  const dTag = event.tags.find(([n]) => n === 'd')?.[1] ?? '';
-  return `${COMMUNITY_DEFINITION_KIND}:${event.pubkey}:${dTag}`;
-}
-
 // ─── Organization role helpers (founder + moderator model) ───────────────────
 //
 // Agora treats NIP-72 communities as "Organizations" with only two trust
@@ -443,59 +435,6 @@ export function getCommunityATag(event: NostrEvent): string {
 // layer is no longer part of Agora's product model. These helpers centralize
 // the role checks so callers don't reach into ParsedCommunity tag arrays
 // directly.
-
-/**
- * Return whether the given pubkey is the organization's founder. The founder
- * is always the publisher of the kind 34550 event.
- */
-export function isOrganizationFounder(
-  community: ParsedCommunity,
-  pubkey: string | undefined,
-): boolean {
-  return !!pubkey && community.founderPubkey === pubkey;
-}
-
-/**
- * Return whether the given pubkey is one of the organization's moderators.
- * Moderators are pubkeys listed in the kind 34550 event's `p` tags with
- * role "moderator". The founder is intentionally NOT included here — use
- * {@link canModerateOrganization} for the broader "founder OR moderator"
- * check that gates moderation actions.
- */
-export function isOrganizationModerator(
-  community: ParsedCommunity,
-  pubkey: string | undefined,
-): boolean {
-  return !!pubkey && community.moderatorPubkeys.includes(pubkey);
-}
-
-/**
- * Only the founder can edit organization metadata (name, description,
- * cover image, moderator roster). This mirrors NIP-72's implicit rule that
- * a community definition is a replaceable event keyed on its author —
- * only the author can publish a new version.
- */
-export function canEditOrganization(
-  community: ParsedCommunity,
-  pubkey: string | undefined,
-): boolean {
-  return isOrganizationFounder(community, pubkey);
-}
-
-/**
- * Both founder and moderators can moderate the organization feed — hide
- * comments, ban users from appearing, dismiss content. Editing the
- * organization itself is founder-only (see {@link canEditOrganization}).
- */
-export function canModerateOrganization(
-  community: ParsedCommunity,
-  pubkey: string | undefined,
-): boolean {
-  return (
-    isOrganizationFounder(community, pubkey) ||
-    isOrganizationModerator(community, pubkey)
-  );
-}
 
 /**
  * Return the list of pubkeys whose campaigns, pledges, and calendar events

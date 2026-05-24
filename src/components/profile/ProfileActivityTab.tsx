@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useInView } from 'react-intersection-observer';
 import { Loader2, Sparkles } from 'lucide-react';
 
@@ -31,6 +32,7 @@ interface ProfileActivityTabProps {
  * and benefits from full-width cards.
  */
 export function ProfileActivityTab({ pubkey, displayName }: ProfileActivityTabProps) {
+  const { t } = useTranslation();
   const {
     events,
     items,
@@ -72,8 +74,7 @@ export function ProfileActivityTab({ pubkey, displayName }: ProfileActivityTabPr
           <div className="py-12 px-8 text-center">
             <Sparkles className="size-10 mx-auto mb-3 text-muted-foreground/40" />
             <p className="text-muted-foreground max-w-sm mx-auto">
-              No activity from {displayName} yet. Posts, campaigns, pledges,
-              and donations all show up here.
+              {t('profile.activity.empty', { name: displayName })}
             </p>
           </div>
         </Card>

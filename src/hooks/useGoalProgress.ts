@@ -10,7 +10,7 @@ import type { ParsedGoal } from '@/lib/goalUtils';
 const ZAP_RECEIPT_PAGE_SIZE = 500;
 const MAX_ZAP_RECEIPT_PAGES = 20;
 
-export interface GoalProgress {
+interface GoalProgress {
   /** Total zapped in millisatoshis. */
   currentMsat: number;
   /** Total zapped in satoshis. */

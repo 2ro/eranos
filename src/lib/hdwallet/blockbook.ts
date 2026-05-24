@@ -530,7 +530,7 @@ interface BlockbookTxVout {
 }
 
 /** Subset of the `getTransaction` response we consume. */
-export interface BlockbookTransaction {
+interface BlockbookTransaction {
   txid: string;
   vout: BlockbookTxVout[];
 }
@@ -540,7 +540,7 @@ export interface BlockbookTransaction {
  * including per-vout `spent` flags — the field the wallet uses to learn
  * whether a stored SP UTXO is still unspent.
  */
-export async function fetchBlockbookTransaction(
+async function fetchBlockbookTransaction(
   baseUrl: string,
   txid: string,
   signal?: AbortSignal,
@@ -601,25 +601,6 @@ export async function fetchUtxoSpentStatus(
 // ---------------------------------------------------------------------------
 // getInfo — health check
 // ---------------------------------------------------------------------------
-
-/** Subset of the `getInfo` response we care about. */
-export interface BlockbookStatus {
-  name?: string;
-  shortcut?: string;
-  decimals?: number;
-  version?: string;
-  bestHeight?: number;
-  bestHash?: string;
-  block0Hash?: string;
-  testnet?: boolean;
-}
-
-export async function fetchBlockbookStatus(
-  baseUrl: string,
-  signal?: AbortSignal,
-): Promise<BlockbookStatus> {
-  return getSocket(baseUrl).send<BlockbookStatus>('getInfo', {}, signal);
-}
 
 // ---------------------------------------------------------------------------
 // getBlock — block-header timestamp lookup

@@ -12,9 +12,6 @@ export const BADGE_PROFILE_KIND = 10008;
  */
 export const BADGE_PROFILE_KIND_LEGACY = 30008;
 
-/** Both profile badge kinds, used when querying. */
-export const BADGE_PROFILE_KINDS = [BADGE_PROFILE_KIND, BADGE_PROFILE_KIND_LEGACY] as const;
-
 /**
  * Build the canonical `a` tag value for a kind 30009 badge definition.
  * Format: `30009:<pubkey>:<d-tag>`

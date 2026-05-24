@@ -10,7 +10,6 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogOverlay, DialogPortal } from '@/components/ui/dialog';
 import * as DialogPrimitive from '@radix-ui/react-dialog';
-import { Skeleton } from '@/components/ui/skeleton';
 
 /** Get a tag value by name. */
 function getTag(tags: string[][], name: string): string | undefined {
@@ -451,30 +450,3 @@ export function ZapstoreAppContent({ event, compact }: ZapstoreAppContentProps) 
   );
 }
 
-/** Skeleton loading state for ZapstoreAppContent. */
-export function ZapstoreAppSkeleton() {
-  return (
-    <div className="mt-3 space-y-4">
-      <div className="flex items-start gap-4">
-        <Skeleton className="size-16 rounded-2xl shrink-0" />
-        <div className="flex-1 space-y-2">
-          <Skeleton className="h-5 w-32" />
-          <Skeleton className="h-4 w-48" />
-          <div className="flex gap-2">
-            <Skeleton className="h-5 w-16 rounded-full" />
-            <Skeleton className="h-5 w-14 rounded-full" />
-          </div>
-        </div>
-      </div>
-      <div className="flex gap-2">
-        <Skeleton className="h-8 w-24 rounded-md" />
-        <Skeleton className="h-8 w-20 rounded-md" />
-      </div>
-      <div className="space-y-1.5">
-        <Skeleton className="h-4 w-full" />
-        <Skeleton className="h-4 w-4/5" />
-        <Skeleton className="h-4 w-3/5" />
-      </div>
-    </div>
-  );
-}

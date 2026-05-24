@@ -4,19 +4,6 @@ import { useOrganizers } from '@/hooks/useOrganizers';
 import { ADMIN_PUBKEYS } from '@/lib/admins';
 import { parseStatsEvent } from '@/lib/statsParser';
 
-// Re-export types for ergonomic single-import call sites.
-export type {
-  TopAction,
-  TopPoster,
-  TrendingHashtag,
-  TopContributor,
-  TopDonor,
-  StatName,
-  StatsTimeframe,
-  TimeframedStats,
-  TrustedCountryStats,
-} from '@/lib/statsParser';
-
 /**
  * Fetch the latest pre-computed community stats snapshot (kind 30385) for a
  * country. Trusted authors are platform admins plus the country's appointed

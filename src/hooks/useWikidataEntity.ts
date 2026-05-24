@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 
-export interface WikidataEntity {
+interface WikidataEntity {
   /** The Wikidata entity ID (e.g. "Q42"). */
   id: string;
   /**

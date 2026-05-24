@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useInView } from 'react-intersection-observer';
 import { usePageRefresh } from '@/hooks/usePageRefresh';
 import { ComposeBox } from '@/components/ComposeBox';
@@ -49,6 +50,7 @@ function isFeedMode(value: string): value is FeedMode {
 }
 
 export function Feed({ kinds, tagFilters, header, hideCompose, emptyMessage, feedId = 'home' }: FeedProps = {}) {
+  const { t } = useTranslation();
   const { user } = useCurrentUser();
   const { muteItems } = useMuteList();
 
@@ -192,14 +194,14 @@ export function Feed({ kinds, tagFilters, header, hideCompose, emptyMessage, fee
   // Per-mode empty-state copy for the home feed.
   const homeEmptyMessage = (() => {
     if (homeFeedMode === 'agora') {
-      return "Quiet moment on Agora. New campaigns, pledges, donations, and posts will appear here as they happen.";
+      return t('feed.empty.homeAgora');
     }
     if (homeFeedMode === 'following') {
       return user
-        ? "Your follow feed is empty. Follow some people to see what they're up to, or switch to Agora or All Nostr."
-        : "Log in to see posts from people you follow.";
+        ? t('feed.empty.homeFollowingLoggedIn')
+        : t('feed.empty.homeFollowingLoggedOut');
     }
-    return 'Nothing to show. Check your relay connections or try again in a moment.';
+    return t('feed.empty.homeOther');
   })();
 
   return (
@@ -229,7 +231,7 @@ export function Feed({ kinds, tagFilters, header, hideCompose, emptyMessage, fee
             compact
             hideBorder={isHomeAgoraFeed}
             defaultExpanded
-            placeholder="What's happening?"
+            placeholder={t('feed.compose.placeholder')}
           />
         )}
 
@@ -237,8 +239,8 @@ export function Feed({ kinds, tagFilters, header, hideCompose, emptyMessage, fee
             the FeedModeSwitcher above. */}
         {user && (isKindSpecificPage || tagFilters) && (
           <SubHeaderBar>
-            <TabButton label={isKindSpecificPage || tagFilters ? 'Follows' : 'Following'} active={activeTab === 'follows'} onClick={() => handleSetActiveTab('follows')} />
-            <TabButton label="Global" active={activeTab === 'global'} onClick={() => handleSetActiveTab('global')} />
+            <TabButton label={isKindSpecificPage || tagFilters ? t('feed.tabs.follows') : t('feed.tabs.following')} active={activeTab === 'follows'} onClick={() => handleSetActiveTab('follows')} />
+            <TabButton label={t('feed.tabs.global')} active={activeTab === 'global'} onClick={() => handleSetActiveTab('global')} />
           </SubHeaderBar>
         )}
 
@@ -280,8 +282,8 @@ export function Feed({ kinds, tagFilters, header, hideCompose, emptyMessage, fee
               message={
                 emptyMessage ?? (
                   activeTab === 'follows'
-                    ? 'Your feed is empty. Follow some people to see their posts here.'
-                    : 'No posts found. Check your relay connections or come back soon.'
+                    ? t('feed.empty.follows')
+                    : t('feed.empty.global')
                 )
               }
               showDiscover={!emptyMessage && activeTab === 'follows'}
@@ -314,13 +316,14 @@ interface HomeFeedEmptyStateProps {
 }
 
 function HomeFeedEmptyState({ mode, message, onSwitchToAgora, onLoginClick }: HomeFeedEmptyStateProps) {
+  const { t } = useTranslation();
   return (
     <div className="py-20 px-8 flex flex-col items-center text-center">
       <p className="text-muted-foreground max-w-sm leading-relaxed">{message}</p>
       <div className="flex flex-col gap-2 mt-6 w-full max-w-xs">
         {onLoginClick && (
           <Button className="rounded-full" onClick={onLoginClick}>
-            Log in
+            {t('feed.empty.logIn')}
           </Button>
         )}
         {onSwitchToAgora && (
@@ -329,7 +332,7 @@ function HomeFeedEmptyState({ mode, message, onSwitchToAgora, onLoginClick }: Ho
             className="rounded-full"
             onClick={onSwitchToAgora}
           >
-            Browse the Agora feed
+            {t('feed.empty.browseAgora')}
           </Button>
         )}
       </div>

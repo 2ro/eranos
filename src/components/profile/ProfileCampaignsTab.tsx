@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import { Megaphone } from 'lucide-react';
 import { useQueries } from '@tanstack/react-query';
@@ -40,6 +41,7 @@ export function ProfileCampaignsTab({
   campaigns,
   isLoading,
 }: ProfileCampaignsTabProps) {
+  const { t } = useTranslation();
   const { user } = useCurrentUser();
   const { data: moderation } = useCampaignModeration();
   const { data: moderators } = useCampaignModerators();
@@ -75,15 +77,15 @@ export function ProfileCampaignsTab({
             <Megaphone className="size-10 mx-auto mb-3 text-muted-foreground/40" />
             <p className="text-muted-foreground max-w-sm mx-auto">
               {isOwnProfile
-                ? "You haven't launched a campaign yet."
-                : `${displayName} hasn't launched a campaign yet.`}
+                ? t('profile.campaigns.emptySelf')
+                : t('profile.campaigns.emptyOther', { name: displayName })}
             </p>
             {isOwnProfile && (
               <Link
                 to="/campaigns/new"
                 className="inline-block mt-4 text-sm font-medium text-primary hover:underline"
               >
-                Start a campaign →
+                {t('profile.campaigns.startLink')}
               </Link>
             )}
           </div>
@@ -96,7 +98,7 @@ export function ProfileCampaignsTab({
     <div className="px-4 sm:px-6 py-6 space-y-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <p className="text-sm text-muted-foreground">
-          {filtered.length} {filtered.length === 1 ? 'campaign' : 'campaigns'}
+          {t('profile.campaigns.count', { count: filtered.length })}
         </p>
         <div className="flex items-center gap-2">
           <Button
@@ -104,14 +106,14 @@ export function ProfileCampaignsTab({
             size="sm"
             onClick={() => setSortMode('new')}
           >
-            New
+            {t('profile.campaigns.sortNew')}
           </Button>
           <Button
             variant={sortMode === 'top' ? 'secondary' : 'ghost'}
             size="sm"
             onClick={() => setSortMode('top')}
           >
-            Top
+            {t('profile.campaigns.sortTop')}
           </Button>
           {canShowHidden && (
             <Button
@@ -119,7 +121,7 @@ export function ProfileCampaignsTab({
               size="sm"
               onClick={() => setShowHidden((v) => !v)}
             >
-              {showHidden ? 'Hide hidden' : 'Show hidden'}
+              {showHidden ? t('profile.campaigns.hideHidden') : t('profile.campaigns.showHidden')}
             </Button>
           )}
         </div>

@@ -1,10 +1,16 @@
 import { type ReactNode, useCallback, useState } from 'react';
 
+import { useImageProxy } from '@/hooks/useImageProxy';
 import { isCustomEmoji, getCustomEmojiUrl, buildEmojiMap, type ResolvedEmoji } from '@/lib/customEmoji';
 import { cn } from '@/lib/utils';
 
 /** Threshold at or below which we apply nearest-neighbor scaling. */
 const PIXEL_ART_MAX = 16;
+
+/** Proxy width for custom emojis. wsrv.nl doesn't upscale by default, so
+ * tiny pixel-art emojis stay at their natural size; only oversized PNGs/GIFs
+ * get downscaled. */
+const EMOJI_PROXY_WIDTH = 48;
 
 interface CustomEmojiImgProps {
   /** The shortcode name (without colons). */
@@ -23,6 +29,8 @@ interface CustomEmojiImgProps {
  */
 export function CustomEmojiImg({ name, url, className = 'inline h-[1.2em] w-[1.2em] object-contain align-text-bottom' }: CustomEmojiImgProps) {
   const [pixelated, setPixelated] = useState(false);
+  const [proxyFailed, setProxyFailed] = useState(false);
+  const proxy = useImageProxy();
 
   const handleLoad = useCallback((e: React.SyntheticEvent<HTMLImageElement>) => {
     const img = e.currentTarget;
@@ -31,9 +39,13 @@ export function CustomEmojiImg({ name, url, className = 'inline h-[1.2em] w-[1.2
     }
   }, []);
 
+  const proxied = proxy(url, EMOJI_PROXY_WIDTH);
+  const usingProxy = proxied !== url;
+  const finalSrc = proxyFailed || !usingProxy ? url : proxied;
+
   return (
     <img
-      src={url}
+      src={finalSrc}
       alt={`:${name}:`}
       title={`:${name}:`}
       className={className}
@@ -41,6 +53,9 @@ export function CustomEmojiImg({ name, url, className = 'inline h-[1.2em] w-[1.2
       loading="lazy"
       decoding="async"
       onLoad={handleLoad}
+      onError={() => {
+        if (usingProxy && !proxyFailed) setProxyFailed(true);
+      }}
     />
   );
 }

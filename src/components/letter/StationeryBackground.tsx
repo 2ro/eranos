@@ -20,9 +20,8 @@ import {
   resolveStationery,
 } from '@/lib/letterTypes';
 import { ColorPaletteDisplay, type PaletteLayout } from './ColorPaletteDisplay';
-import { hexLuminance, darkenHex } from '@/lib/colorUtils';
+import { darkenHex } from '@/lib/colorUtils';
 
-export type { PaletteLayout } from './ColorPaletteDisplay';
 
 const DEFAULT_STATIONERY: Stationery = { color: DEFAULT_STATIONERY_COLOR };
 
@@ -223,106 +222,3 @@ export function StationeryBackground({
 // StationeryPreview — picker grid swatch
 // ---------------------------------------------------------------------------
 
-interface StationeryPreviewProps {
-  stationery: Stationery;
-  selected?: boolean;
-  className?: string;
-}
-
-function ThemeMockup({ stationery }: { stationery: Stationery }) {
-  const s = resolveStationery(stationery);
-  const bg      = s.color;
-  const text    = s.textColor    ?? '#333333';
-  const primary = s.primaryColor ?? '#4CAF50';
-  const isDark  = hexLuminance(bg) < 0.3;
-  const cardBg  = isDark ? `${bg}dd` : '#ffffffcc';
-
-  return (
-    <div className="absolute inset-0 p-1.5 flex flex-col gap-1" style={{ backgroundColor: bg }}>
-      {s.imageUrl && (
-        <div
-          className="absolute inset-0"
-          style={{
-            backgroundImage: `url("${s.imageUrl}")`,
-            backgroundSize: 'cover',
-            backgroundPosition: 'center',
-            opacity: 0.35,
-          }}
-        />
-      )}
-      <div className="relative z-10 h-2 rounded-sm" style={{ backgroundColor: cardBg }} />
-      <div
-        className="relative z-10 flex-1 rounded-sm p-1 flex flex-col justify-between overflow-hidden"
-        style={{ backgroundColor: cardBg }}
-      >
-        <div className="space-y-0.5">
-          <div className="h-1 w-3/4 rounded-full opacity-60" style={{ backgroundColor: text }} />
-          <div className="h-1 w-1/2 rounded-full opacity-40" style={{ backgroundColor: text }} />
-        </div>
-        <div className="h-2 w-8 rounded-sm" style={{ backgroundColor: primary }} />
-      </div>
-      <div
-        className="absolute right-0 top-0 bottom-0 w-3 z-10"
-        style={{ backgroundColor: primary, opacity: 0.6 }}
-      />
-    </div>
-  );
-}
-
-export function StationeryPreview({
-  stationery,
-  selected,
-  className = '',
-}: StationeryPreviewProps) {
-  const s = resolveStationery(stationery);
-  const ringClass = selected
-    ? 'ring-2 ring-primary ring-offset-2 ring-offset-background'
-    : '';
-
-  if (s.colors && s.colors.length >= 2) {
-    return (
-      <div className={`relative overflow-hidden rounded-2xl ${ringClass} ${className}`}>
-        <ColorPaletteDisplay
-          colors={s.colors}
-          layout={(s.layout as PaletteLayout) ?? 'horizontal'}
-          className="w-full h-full"
-        >
-          {s.emoji && (
-            <span className="text-xl drop-shadow select-none">{s.emoji}</span>
-          )}
-        </ColorPaletteDisplay>
-      </div>
-    );
-  }
-
-  if (s.textColor || s.primaryColor) {
-    return (
-      <div className={`relative overflow-hidden rounded-2xl ${ringClass} ${className}`}>
-        <ThemeMockup stationery={stationery} />
-      </div>
-    );
-  }
-
-  return (
-    <div
-      className={`relative overflow-hidden rounded-2xl ${ringClass} ${className}`}
-      style={{ backgroundColor: s.color }}
-    >
-      {s.imageUrl && (
-        <div
-          className="absolute inset-0"
-          style={{
-            backgroundImage: `url("${s.imageUrl}")`,
-            backgroundSize: 'cover',
-            backgroundPosition: 'center',
-          }}
-        />
-      )}
-      {s.emoji && !s.imageUrl && (
-        <div className="absolute inset-0 flex items-center justify-center pointer-events-none select-none">
-          <span className="text-3xl opacity-70">{s.emoji}</span>
-        </div>
-      )}
-    </div>
-  );
-}

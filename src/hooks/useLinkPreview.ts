@@ -22,7 +22,7 @@ const OEmbedSchema = z.object({
 });
 
 /** OEmbed response from the link preview endpoint. */
-export type OEmbedData = z.infer<typeof OEmbedSchema>;
+type OEmbedData = z.infer<typeof OEmbedSchema>;
 
 /**
  * Try to fetch OEmbed data directly from a known provider's native endpoint.

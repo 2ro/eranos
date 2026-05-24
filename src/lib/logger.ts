@@ -15,7 +15,7 @@ const isDev = import.meta.env.DEV;
  * Debug-level logging (development only)
  * Use for detailed operational information
  */
-export function debug(message: string, ...args: unknown[]): void {
+function debug(message: string, ...args: unknown[]): void {
   if (isDev) {
     console.log(message, ...args);
   }
@@ -25,7 +25,7 @@ export function debug(message: string, ...args: unknown[]): void {
  * Info-level logging (development only)
  * Use for general operational information
  */
-export function info(message: string, ...args: unknown[]): void {
+function info(message: string, ...args: unknown[]): void {
   if (isDev) {
     console.info(message, ...args);
   }
@@ -35,7 +35,7 @@ export function info(message: string, ...args: unknown[]): void {
  * Warning-level logging (development only)
  * Use for potentially problematic situations
  */
-export function warn(message: string, ...args: unknown[]): void {
+function warn(message: string, ...args: unknown[]): void {
   if (isDev) {
     console.warn(message, ...args);
   }
@@ -46,7 +46,7 @@ export function warn(message: string, ...args: unknown[]): void {
  * Use for error conditions - these are always logged
  * but should never contain sensitive data
  */
-export function error(message: string, ...args: unknown[]): void {
+function error(message: string, ...args: unknown[]): void {
   // Errors are always logged, but sanitize sensitive data
   console.error(message, ...args);
 }
@@ -61,4 +61,3 @@ export const logger = {
   error,
 };
 
-export default logger;
