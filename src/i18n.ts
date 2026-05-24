@@ -7,12 +7,16 @@ import en from './locales/en.json';
 import es from './locales/es.json';
 import fa from './locales/fa.json';
 import fr from './locales/fr.json';
+import hi from './locales/hi.json';
+import id from './locales/id.json';
 import km from './locales/km.json';
 import ps from './locales/ps.json';
 import pt from './locales/pt.json';
 import ru from './locales/ru.json';
 import sn from './locales/sn.json';
+import tr from './locales/tr.json';
 import zh from './locales/zh.json';
+import zhHant from './locales/zh-Hant.json';
 
 /**
  * i18next initialization for Agora.
@@ -35,14 +39,18 @@ export const SUPPORTED_LANGUAGES: SupportedLanguage[] = [
   { code: 'en', nativeName: 'English' },
   { code: 'es', nativeName: 'Español' },
   { code: 'fr', nativeName: 'Français' },
+  { code: 'hi', nativeName: 'हिन्दी' },
+  { code: 'id', nativeName: 'Bahasa Indonesia' },
   { code: 'pt', nativeName: 'Português' },
   { code: 'ru', nativeName: 'Русский' },
+  { code: 'tr', nativeName: 'Türkçe' },
   { code: 'ar', nativeName: 'العربية' },
   { code: 'fa', nativeName: 'فارسی' },
   { code: 'ps', nativeName: 'پښتو' },
   { code: 'km', nativeName: 'ភាសាខ្មែរ' },
   { code: 'sn', nativeName: 'ChiShona' },
-  { code: 'zh', nativeName: '中文' },
+  { code: 'zh', nativeName: '简体中文' },
+  { code: 'zh-Hant', nativeName: '繁體中文' },
 ];
 
 export const RTL_LANGUAGES = new Set(['ar', 'fa', 'ps', 'ur', 'he', 'yi', 'ku', 'ug']);
@@ -74,15 +82,28 @@ i18n
       es: { translation: es },
       fa: { translation: fa },
       fr: { translation: fr },
+      hi: { translation: hi },
+      id: { translation: id },
       km: { translation: km },
       ps: { translation: ps },
       pt: { translation: pt },
       ru: { translation: ru },
       sn: { translation: sn },
+      tr: { translation: tr },
       zh: { translation: zh },
+      // Traditional Chinese is registered under three codes pointing at the
+      // same resource object so device-language detection works whether the
+      // browser reports `zh-Hant`, `zh-TW`, or `zh-HK`. Mainland `zh-CN`
+      // continues to resolve to `zh` (Simplified) via `nonExplicitSupportedLngs`.
+      'zh-Hant': { translation: zhHant },
+      'zh-TW': { translation: zhHant },
+      'zh-HK': { translation: zhHant },
     },
     fallbackLng: 'en',
-    supportedLngs: SUPPORTED_LANGUAGES.map((l) => l.code),
+    // SUPPORTED_LANGUAGES drives the switcher UI; `zh-TW` and `zh-HK` are
+    // also accepted by the detector so Taiwan/HK device locales route to
+    // the Traditional resource directly instead of falling back to Simplified.
+    supportedLngs: [...SUPPORTED_LANGUAGES.map((l) => l.code), 'zh-TW', 'zh-HK'],
     nonExplicitSupportedLngs: true,
     debug: false,
     interpolation: {

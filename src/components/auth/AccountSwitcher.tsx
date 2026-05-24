@@ -7,7 +7,7 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Activity, Bell, ChevronDown, CircleHelp, LogOut, Search, Settings, User, UserIcon, UserPlus, Wallet } from 'lucide-react';
+import { Activity, Bell, ChevronDown, CircleHelp, LayoutDashboard, LogOut, Search, Settings, User, UserIcon, UserPlus, Wallet } from 'lucide-react';
 import { nip19 } from 'nostr-tools';
 import {
   DropdownMenu,
@@ -87,6 +87,12 @@ export function AccountSwitcher({ onAddAccountClick }: AccountSwitcherProps) {
             </Link>
           </DropdownMenuItem>
         )}
+        <DropdownMenuItem asChild className='flex items-center gap-2 cursor-pointer p-2 rounded-md'>
+          <Link to="/my-dashboard">
+            <LayoutDashboard className='w-4 h-4' />
+            <span>{t('nav.myDashboard')}</span>
+          </Link>
+        </DropdownMenuItem>
         <DropdownMenuItem asChild className='flex items-center gap-2 cursor-pointer p-2 rounded-md'>
           <Link to="/wallet">
             <Wallet className='w-4 h-4' />

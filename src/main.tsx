@@ -18,6 +18,13 @@ import './i18n';
 
 import '@fontsource-variable/inter';
 import '@fontsource/bebas-neue/400.css';
+// Han display font for Chinese (zh, zh-Hant, zh-TW, zh-HK). Bebas Neue
+// only ships Latin glyphs, so Chinese hero text would otherwise fall back
+// to system fonts and lose its display-weight character. The fontsource
+// CSS uses unicode-range descriptors so non-Chinese users only download
+// the slices for glyphs actually rendered on their page (effectively
+// zero for Latin-only locales).
+import '@fontsource/noto-sans-tc/900.css';
 
 // ─── Native status bar theming (Android APK / iOS) ───────────────────────────
 // Keeps the OS top chrome in sync with the active app theme.

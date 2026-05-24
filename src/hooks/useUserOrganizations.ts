@@ -9,7 +9,7 @@ import { useManageableOrganizations } from '@/hooks/useManageableOrganizations';
 import { COMMUNITY_DEFINITION_KIND, parseCommunityEvent, type ParsedCommunity } from '@/lib/communityUtils';
 import { dedupeAddressableLatest } from '@/lib/addressableEvents';
 
-interface UserOrganization {
+export interface UserOrganization {
   community: ParsedCommunity;
   event: NostrEvent;
   isFounder: boolean;
