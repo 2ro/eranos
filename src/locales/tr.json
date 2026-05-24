@@ -1300,6 +1300,14 @@
       "backupLoadedDesc": "Kurtarma ifadesinin rölelerinizden şifresi çözüldü."
     }
   },
+  "walletBackup": {
+    "heading": "Cüzdan kurtarma ifadesi",
+    "dialogDescription": "Bu 24 kelimelik yedeği içe aktararak Agora cüzdanınıza herhangi bir Bitcoin cüzdanından erişebilirsiniz.",
+    "hidden": "24 kelimelik kurtarma ifadenizi görüntülemek için dokunun.",
+    "revealAria": "Kurtarma ifadesini göster",
+    "hideAria": "Kurtarma ifadesini gizle",
+    "warning": "Bu kelimelere sahip olan herkes Bitcoin'lerinizi harcayabilir. Onları asla paylaşmayın, asla bir web sitesine yazmayın, bir parola yöneticisi dışında asla düz metin olarak saklamayın."
+  },
   "walletConnect": {
     "status": "Durum",
     "ready": "Hazır",

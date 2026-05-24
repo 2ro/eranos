@@ -870,16 +870,11 @@
   },
   "walletBackup": {
     "heading": "钱包助记词",
-    "dialogDescription": "你比特币钱包的 24 词备份。将这些词导入任何兼容 BIP-39 的钱包（Sparrow、Electrum、Trezor、Ledger、BlueWallet、Phoenix……）即可访问同一笔资金。",
-    "explainer": "这 24 个单词是你比特币钱包的助记词，由你的 Nostr 密钥确定性地派生而来。可以在 BIP-86（Taproot）路径下用它们将此钱包导入其他比特币钱包应用。与你的 nsec 不同，助记词只控制你的比特币——它无法在 Nostr 上冒充你。",
-    "hidden": "点击“显示”以查看你的 24 词助记词。",
-    "warning": "任何拥有这些词的人都可以花掉你的比特币。切勿分享，切勿在任何网站上输入，切勿以明文存储在密码管理器之外的地方。",
-    "reveal": "显示",
-    "hide": "隐藏",
-    "copy": "复制",
-    "copied": "已复制",
-    "copyFailedTitle": "复制失败",
-    "copyFailedDescription": "无法访问剪贴板。请显示助记词后手动复制。"
+    "dialogDescription": "你可以将这 24 词备份导入任何比特币钱包，以访问你的 Agora 钱包。",
+    "hidden": "点击以显示你的 24 词助记词。",
+    "revealAria": "显示助记词",
+    "hideAria": "隐藏助记词",
+    "warning": "任何拥有这些词的人都可以花掉你的比特币。切勿分享，切勿在任何网站上输入，切勿以明文存储在密码管理器之外的地方。"
   },
   "walletMigrate": {
     "seoTitle": "迁移旧钱包",

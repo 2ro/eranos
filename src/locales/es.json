@@ -870,16 +870,11 @@
   },
   "walletBackup": {
     "heading": "Frase semilla de la cartera",
-    "dialogDescription": "La copia de seguridad de 24 palabras de tu cartera Bitcoin. Impórtalas en cualquier cartera compatible con BIP-39 (Sparrow, Electrum, Trezor, Ledger, BlueWallet, Phoenix, …) para acceder a los mismos fondos.",
-    "explainer": "Estas 24 palabras son la frase semilla de tu cartera Bitcoin, derivadas de forma determinista de tu clave Nostr. Úsalas para importar esta cartera en otra aplicación de Bitcoin en la ruta BIP-86 (Taproot). A diferencia de tu nsec, la frase semilla solo controla tu Bitcoin — no puede suplantarte en Nostr.",
-    "hidden": "Toca Mostrar para ver tu frase semilla de 24 palabras.",
-    "warning": "Cualquiera que tenga estas palabras puede gastar tu Bitcoin. Nunca las compartas, nunca las escribas en un sitio web y nunca las guardes en texto plano fuera de un gestor de contraseñas.",
-    "reveal": "Mostrar",
-    "hide": "Ocultar",
-    "copy": "Copiar",
-    "copied": "Copiado",
-    "copyFailedTitle": "Error al copiar",
-    "copyFailedDescription": "No se pudo acceder al portapapeles. Muestra las palabras y cópialas manualmente."
+    "dialogDescription": "Puedes acceder a tu cartera de Agora desde cualquier cartera Bitcoin importando esta copia de seguridad de 24 palabras.",
+    "hidden": "Toca para mostrar tu frase semilla de 24 palabras.",
+    "revealAria": "Mostrar frase semilla",
+    "hideAria": "Ocultar frase semilla",
+    "warning": "Cualquiera que tenga estas palabras puede gastar tu Bitcoin. Nunca las compartas, nunca las escribas en un sitio web y nunca las guardes en texto plano fuera de un gestor de contraseñas."
   },
   "walletMigrate": {
     "seoTitle": "Migrar cartera antigua",

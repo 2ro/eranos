@@ -1293,16 +1293,11 @@
   },
   "walletBackup": {
     "heading": "Phrase de récupération du portefeuille",
-    "dialogDescription": "La sauvegarde de 24 mots de votre portefeuille Bitcoin. Importez-les dans n'importe quel portefeuille compatible BIP-39 (Sparrow, Electrum, Trezor, Ledger, BlueWallet, Phoenix, …) pour accéder aux mêmes fonds.",
-    "explainer": "Ces 24 mots constituent la phrase de récupération de votre portefeuille Bitcoin, dérivée de manière déterministe de votre clé Nostr. Utilisez-les pour importer ce portefeuille dans une autre application Bitcoin sur le chemin BIP-86 (Taproot). Contrairement à votre nsec, la phrase de récupération ne contrôle que vos Bitcoins — elle ne peut pas usurper votre identité sur Nostr.",
-    "hidden": "Appuyez sur Révéler pour afficher votre phrase de récupération de 24 mots.",
-    "warning": "Quiconque possède ces mots peut dépenser vos Bitcoins. Ne les partagez jamais, ne les saisissez jamais sur un site web et ne les stockez jamais en clair en dehors d'un gestionnaire de mots de passe.",
-    "reveal": "Révéler",
-    "hide": "Masquer",
-    "copy": "Copier",
-    "copied": "Copié",
-    "copyFailedTitle": "Échec de la copie",
-    "copyFailedDescription": "Impossible d'accéder au presse-papiers. Révélez les mots et copiez-les manuellement."
+    "dialogDescription": "Vous pouvez accéder à votre portefeuille Agora dans n'importe quel portefeuille Bitcoin en important cette sauvegarde de 24 mots.",
+    "hidden": "Appuyez pour afficher votre phrase de récupération de 24 mots.",
+    "revealAria": "Afficher la phrase de récupération",
+    "hideAria": "Masquer la phrase de récupération",
+    "warning": "Quiconque possède ces mots peut dépenser vos Bitcoins. Ne les partagez jamais, ne les saisissez jamais sur un site web et ne les stockez jamais en clair en dehors d'un gestionnaire de mots de passe."
   },
   "walletMigrate": {
     "seoTitle": "Migrer l'ancien portefeuille",

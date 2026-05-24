@@ -1293,16 +1293,11 @@
   },
   "walletBackup": {
     "heading": "Wallet seed phrase",
-    "dialogDescription": "The 24-word backup for your Bitcoin wallet. Import these into any BIP-39-compatible wallet (Sparrow, Electrum, Trezor, Ledger, BlueWallet, Phoenix, …) to access the same funds.",
-    "explainer": "These 24 words are your Bitcoin wallet's seed phrase, derived deterministically from your Nostr key. Use them to import this wallet into another Bitcoin wallet app at the BIP-86 (Taproot) path. Unlike your nsec, the seed phrase only controls your Bitcoin — it cannot impersonate you on Nostr.",
-    "hidden": "Tap Reveal to display your 24-word seed phrase.",
-    "warning": "Anyone with these words can spend your Bitcoin. Never share them, never type them into a website, never store them in plaintext outside a password manager.",
-    "reveal": "Reveal",
-    "hide": "Hide",
-    "copy": "Copy",
-    "copied": "Copied",
-    "copyFailedTitle": "Copy failed",
-    "copyFailedDescription": "Could not access the clipboard. Reveal the words and copy them manually."
+    "dialogDescription": "You can access your Agora wallet in any Bitcoin wallet by importing this 24-word backup.",
+    "hidden": "Tap to display your 24-word seed phrase.",
+    "revealAria": "Reveal seed phrase",
+    "hideAria": "Hide seed phrase",
+    "warning": "Anyone with these words can spend your Bitcoin. Never share them, never type them into a website, never store them in plaintext outside a password manager."
   },
   "walletMigrate": {
     "seoTitle": "Migrate Old Wallet",

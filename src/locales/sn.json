@@ -870,16 +870,11 @@
   },
   "walletBackup": {
     "heading": "Mutsara weseed wechikwama",
-    "dialogDescription": "Backup yemashoko makumi maviri nemana yechikwama chako cheBitcoin. Pinza idzi kuchikwama chipi nechipi chinotsigira BIP-39 (Sparrow, Electrum, Trezor, Ledger, BlueWallet, Phoenix, …) kuti uwane mari imwe chete.",
-    "explainer": "Mashoko makumi maviri nemana aya mutsara weseed wechikwama chako cheBitcoin, wakatorwa nenzira yakatemwa kubva pakiyi yako yeNostr. Ishandise kuti upinze chikwama chino mune chimwe chikwama cheBitcoin pamugwagwa weBIP-86 (Taproot). Kusiyana nensec yako, mutsara weseed unotonga chete Bitcoin yako — haugoni kuita seunge ndiwe paNostr.",
-    "hidden": "Dzvanya Ratidza kuti uone mutsara weseed wemashoko makumi maviri nemana wako.",
-    "warning": "Munhu wose anenge ane mashoko aya anogona kushandisa Bitcoin yako. Usaagovere kana wani, usaanyore pawebhusaiti, usaachengete sezvinyorwa zvakajeka kunze kwemanager wepassword.",
-    "reveal": "Ratidza",
-    "hide": "Vanza",
-    "copy": "Kopa",
-    "copied": "Zvakopwa",
-    "copyFailedTitle": "Kukopa kwakundikana",
-    "copyFailedDescription": "Hatina kukwanisa kuwana clipboard. Ratidza mashoko uchiakopa nemaoko."
+    "dialogDescription": "Unogona kupinda muchikwama chako cheAgora muchikwama chipi nechipi cheBitcoin nokupinza backup iyi yemashoko makumi maviri nemana.",
+    "hidden": "Dzvanya kuti uone mutsara weseed wemashoko makumi maviri nemana wako.",
+    "revealAria": "Ratidza mutsara weseed",
+    "hideAria": "Vanza mutsara weseed",
+    "warning": "Munhu wose anenge ane mashoko aya anogona kushandisa Bitcoin yako. Usaagovere kana wani, usaanyore pawebhusaiti, usaachengete sezvinyorwa zvakajeka kunze kwemanager wepassword."
   },
   "walletMigrate": {
     "seoTitle": "Tamisira chikwama chekare",

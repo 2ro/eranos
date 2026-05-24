@@ -1289,16 +1289,11 @@
   },
   "walletBackup": {
     "heading": "Frase semente da carteira",
-    "dialogDescription": "O backup de 24 palavras da sua carteira Bitcoin. Importe-as em qualquer carteira compatível com BIP-39 (Sparrow, Electrum, Trezor, Ledger, BlueWallet, Phoenix, …) para acessar os mesmos fundos.",
-    "explainer": "Estas 24 palavras são a frase semente da sua carteira Bitcoin, derivadas de forma determinística da sua chave Nostr. Use-as para importar esta carteira em outro aplicativo de Bitcoin no caminho BIP-86 (Taproot). Diferente da sua nsec, a frase semente controla apenas seu Bitcoin — ela não pode se passar por você no Nostr.",
-    "hidden": "Toque em Revelar para exibir sua frase semente de 24 palavras.",
-    "warning": "Qualquer pessoa com estas palavras pode gastar seu Bitcoin. Nunca as compartilhe, nunca as digite em um site e nunca as armazene em texto simples fora de um gerenciador de senhas.",
-    "reveal": "Revelar",
-    "hide": "Ocultar",
-    "copy": "Copiar",
-    "copied": "Copiado",
-    "copyFailedTitle": "Falha ao copiar",
-    "copyFailedDescription": "Não foi possível acessar a área de transferência. Revele as palavras e copie-as manualmente."
+    "dialogDescription": "Você pode acessar sua carteira Agora em qualquer carteira Bitcoin importando este backup de 24 palavras.",
+    "hidden": "Toque para exibir sua frase semente de 24 palavras.",
+    "revealAria": "Revelar frase semente",
+    "hideAria": "Ocultar frase semente",
+    "warning": "Qualquer pessoa com estas palavras pode gastar seu Bitcoin. Nunca as compartilhe, nunca as digite em um site e nunca as armazene em texto simples fora de um gerenciador de senhas."
   },
   "walletMigrate": {
     "seoTitle": "Migrar carteira antiga",

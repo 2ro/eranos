@@ -868,6 +868,14 @@
       "backupLoadedDesc": "已從你的中繼解密恢復短語。"
     }
   },
+  "walletBackup": {
+    "heading": "錢包助記詞",
+    "dialogDescription": "您可以將這 24 個單字的備份匯入任何比特幣錢包，以存取您的 Agora 錢包。",
+    "hidden": "點按以顯示您的 24 個單字助記詞。",
+    "revealAria": "顯示助記詞",
+    "hideAria": "隱藏助記詞",
+    "warning": "任何擁有這些單字的人都能花用您的比特幣。請絕對不要分享、不要輸入到任何網站，也不要在密碼管理員以外的地方以明文儲存。"
+  },
   "walletConnect": {
     "status": "狀態",
     "ready": "就緒",

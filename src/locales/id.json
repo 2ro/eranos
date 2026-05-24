@@ -1300,6 +1300,14 @@
       "backupLoadedDesc": "Frasa pemulihan didekripsi dari relay Anda."
     }
   },
+  "walletBackup": {
+    "heading": "Frasa pemulihan dompet",
+    "dialogDescription": "Anda dapat mengakses dompet Agora Anda di dompet Bitcoin mana pun dengan mengimpor cadangan 24 kata ini.",
+    "hidden": "Ketuk untuk menampilkan frasa pemulihan 24 kata Anda.",
+    "revealAria": "Tampilkan frasa pemulihan",
+    "hideAria": "Sembunyikan frasa pemulihan",
+    "warning": "Siapa pun yang memiliki kata-kata ini dapat membelanjakan Bitcoin Anda. Jangan pernah membagikannya, jangan pernah mengetikkannya ke situs web, jangan pernah menyimpannya dalam teks biasa di luar pengelola kata sandi."
+  },
   "walletConnect": {
     "status": "Status",
     "ready": "Siap",
