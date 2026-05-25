@@ -33,6 +33,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { Skeleton } from '@/components/ui/skeleton';
+import { CommentsSection } from '@/components/CommentsSection';
 import { DetailCommentComposer } from '@/components/DetailCommentComposer';
 import { DetailReplySkeleton, DetailStory } from '@/components/DetailStory';
 import { PostActionBar } from '@/components/PostActionBar';
@@ -234,24 +235,17 @@ function PledgeDetailContent({ action }: { action: Action }) {
             <PledgeStory storyEvent={storyEvent} hasContent={displayAction.description.trim().length > 0} />
 
             <div id="pledge-activity" className="scroll-mt-20">
-              <div className="mt-6">
-                <div className="flex items-baseline justify-between gap-3 mb-3 px-1">
-                  <h2 className="text-lg font-semibold tracking-tight">{t('pledges.detail.submissions')}</h2>
-                  {topLevel.length > 0 ? (
-                    <span className="text-sm text-muted-foreground tabular-nums">
-                      {t('pledges.detail.submissionCount', { count: topLevel.length })}
-                    </span>
-                  ) : null}
-                </div>
-
+              <CommentsSection
+                title={t('pledges.detail.submissions')}
+                countLabel={topLevel.length > 0 ? t('pledges.detail.submissionCount', { count: topLevel.length }) : undefined}
+              >
                 <DetailCommentComposer
                   event={action.event}
                   placeholder={t('pledges.detail.submissionPlaceholder')}
-                  className="mb-3"
                 />
 
                 {commentsLoading && replyTree.length === 0 ? (
-                  <div className="space-y-3">
+                  <div>
                     {Array.from({ length: 3 }).map((_, i) => <DetailReplySkeleton key={i} />)}
                   </div>
                 ) : replyTree.length > 0 ? (
@@ -270,7 +264,7 @@ function PledgeDetailContent({ action }: { action: Action }) {
                   <button
                     type="button"
                     onClick={() => setReplyOpen(true)}
-                    className="block w-full rounded-2xl border border-dashed border-border/80 bg-card/50 px-6 py-10 text-center hover:bg-card hover:border-primary/40 transition-colors"
+                    className="block w-full px-6 py-10 text-center hover:bg-foreground/5 transition-colors"
                   >
                     <p className="text-base font-medium text-foreground">{t('pledges.detail.noSubmissionsTitle')}</p>
                     <p className="mt-1 text-sm text-muted-foreground">
@@ -278,7 +272,7 @@ function PledgeDetailContent({ action }: { action: Action }) {
                     </p>
                   </button>
                 )}
-              </div>
+              </CommentsSection>
             </div>
           </div>
 

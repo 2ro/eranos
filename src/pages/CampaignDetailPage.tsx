@@ -17,7 +17,8 @@ import {
   Trash2,
 } from 'lucide-react';
 
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { AuthorByline } from '@/components/AuthorByline';
+import { CommentsSection } from '@/components/CommentsSection';
 import {
   CampaignWalletDonatePanel,
 } from '@/components/CampaignWalletDonatePanel';
@@ -43,7 +44,6 @@ import { ReplyComposeModal } from '@/components/ReplyComposeModal';
 import { NoteMoreMenu } from '@/components/NoteMoreMenu';
 import { Progress } from '@/components/ui/progress';
 import { ThreadedReplyList, type ReplyNode } from '@/components/ThreadedReplyList';
-import { useAuthor } from '@/hooks/useAuthor';
 import { useAppContext } from '@/hooks/useAppContext';
 import { useBtcPrice } from '@/hooks/useBtcPrice';
 import { useCampaign } from '@/hooks/useCampaign';
@@ -53,7 +53,6 @@ import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useDeleteEvent } from '@/hooks/useDeleteEvent';
 import { useEventStats } from '@/hooks/useTrending';
 import { usePinnedEventComments } from '@/hooks/usePinnedEventComments';
-import { useProfileUrl } from '@/hooks/useProfileUrl';
 import { useShareOrigin } from '@/hooks/useShareOrigin';
 import { useToast } from '@/hooks/useToast';
 import { useEventTranslation } from '@/hooks/useEventTranslation';
@@ -66,7 +65,6 @@ import {
 import { satsToUSDWhole } from '@/lib/bitcoin';
 import { formatUsdGoal } from '@/lib/formatCampaignAmount';
 import { formatNumber } from '@/lib/formatNumber';
-import { genUserName } from '@/lib/genUserName';
 import { sanitizeUrl } from '@/lib/sanitizeUrl';
 import { timeAgo } from '@/lib/timeAgo';
 import NotFound from './NotFound';
@@ -129,7 +127,6 @@ function CampaignDetailContent({ campaign }: { campaign: ParsedCampaign }) {
   const { config } = useAppContext();
   const { user } = useCurrentUser();
   const { data: btcPrice } = useBtcPrice();
-  const author = useAuthor(campaign.pubkey);
   const { data: stats, isLoading: statsLoading } = useCampaignDonations(campaign);
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -246,10 +243,6 @@ function CampaignDetailContent({ campaign }: { campaign: ParsedCampaign }) {
   }, [feedEventsById, pinnedEvents, pinnedIds]);
 
   const cover = sanitizeUrl(campaign.banner);
-  const creatorMetadata = author.data?.metadata;
-  const creatorName =
-    creatorMetadata?.display_name || creatorMetadata?.name || genUserName(campaign.pubkey);
-  const creatorProfileUrl = useProfileUrl(campaign.pubkey, creatorMetadata);
 
   const deadline = campaign.deadline ? formatDeadline(campaign.deadline, t) : null;
   const countryLabel = getCampaignCountryLabel(campaign);
@@ -364,9 +357,7 @@ function CampaignDetailContent({ campaign }: { campaign: ParsedCampaign }) {
       <CampaignHero
         campaign={displayCampaign}
         cover={cover}
-        creatorName={creatorName}
-        creatorProfileUrl={creatorProfileUrl}
-        creatorPicture={sanitizeUrl(creatorMetadata?.picture)}
+        creatorPubkey={campaign.pubkey}
         deadline={deadline}
         countryLabel={countryLabel}
         isCreator={isCreator}
@@ -473,75 +464,52 @@ function CampaignDetailContent({ campaign }: { campaign: ParsedCampaign }) {
                 </div>
               )}
 
-              <div className="mt-4">
-                <div className="mb-3 px-1">
-                  <h2 className="text-lg font-semibold tracking-tight">
-                    {t('campaignsDetail.commentsAndDonations')}
-                  </h2>
-                </div>
+              <CommentsSection title={t('campaignsDetail.commentsAndDonations')}>
+                <DetailCommentComposer
+                  event={campaign.event}
+                  onSuccess={() => queryClient.invalidateQueries({ queryKey: ['nostr', 'comments'] })}
+                />
 
-                {/* Muted surface wraps the composer and comment list.
-                    The composer inside uses `bg-card` (one shade
-                    lighter) so the input area reads as the focused
-                    surface against this muted backdrop. `bg-muted/60`
-                    softens the wrap so contained cards feel less
-                    boxed-in. All internal dividers (top separator
-                    plus the per-note `border-b`) are retinted to
-                    `border-primary/20` so they read as a single
-                    consistent edge color matching the composer's
-                    bottom border. */}
-                {/* Muted surface wraps the composer and comment list.
-                    The wrap carries the outer L/R/B border so the
-                    rounded corners curve naturally without any 1px
-                    gaps at the join. Per-article `border-b` divides
-                    items. The composer's own border closes the top. */}
-                <div className="rounded-2xl bg-muted/60 overflow-hidden border-l border-r border-primary/20 [&_article]:border-b-primary/20 [&_article]:bg-background/40">
-                  <DetailCommentComposer
-                    event={campaign.event}
-                    onSuccess={() => queryClient.invalidateQueries({ queryKey: ['nostr', 'comments'] })}
-                  />
-
-                  {commentsLoading && statsLoading && replyTree.length === 0 ? (
-                    <div>
-                      {Array.from({ length: 3 }).map((_, i) => (
-                        <DetailReplySkeleton key={i} />
-                      ))}
-                    </div>
-                  ) : replyTree.length > 0 ? (
-                    <div>
-                      <ThreadedReplyList
-                        roots={replyTree}
-                        hideCommentContext
-                        leafCardClassName="py-4"
-                        renderAuthorBadge={(event) =>
-                          event.pubkey === campaign.pubkey ? <CampaignerBadge /> : null
-                        }
-                        renderItemHeader={(event) => (
-                          <CampaignPinHeader
-                            canManagePins={canManagePins}
-                            isPinned={isPinned(event.id)}
-                            pinPending={togglePin.isPending}
-                            onTogglePin={() => handleTogglePin(event)}
-                          />
-                        )}
-                      />
-                    </div>
-                  ) : (
-                    <button
-                      type="button"
-                      onClick={() => setReplyOpen(true)}
-                      className="block w-full px-6 py-10 text-center hover:bg-foreground/5 transition-colors"
-                    >
-                      <p className="text-base font-medium text-foreground">
-                        {t('campaignsDetail.noCommentsTitle')}
-                      </p>
-                      <p className="mt-1 text-sm text-muted-foreground">
-                        {t('campaignsDetail.noCommentsHint')}
-                      </p>
-                    </button>
-                  )}
-                </div>
-              </div>
+                {commentsLoading && statsLoading && replyTree.length === 0 ? (
+                  <div>
+                    {Array.from({ length: 3 }).map((_, i) => (
+                      <DetailReplySkeleton key={i} />
+                    ))}
+                  </div>
+                ) : replyTree.length > 0 ? (
+                  <div>
+                    <ThreadedReplyList
+                      roots={replyTree}
+                      hideCommentContext
+                      leafCardClassName="py-4"
+                      renderAuthorBadge={(event) =>
+                        event.pubkey === campaign.pubkey ? <CampaignerBadge /> : null
+                      }
+                      renderItemHeader={(event) => (
+                        <CampaignPinHeader
+                          canManagePins={canManagePins}
+                          isPinned={isPinned(event.id)}
+                          pinPending={togglePin.isPending}
+                          onTogglePin={() => handleTogglePin(event)}
+                        />
+                      )}
+                    />
+                  </div>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => setReplyOpen(true)}
+                    className="block w-full px-6 py-10 text-center hover:bg-foreground/5 transition-colors"
+                  >
+                    <p className="text-base font-medium text-foreground">
+                      {t('campaignsDetail.noCommentsTitle')}
+                    </p>
+                    <p className="mt-1 text-sm text-muted-foreground">
+                      {t('campaignsDetail.noCommentsHint')}
+                    </p>
+                  </button>
+                )}
+              </CommentsSection>
             </div>
           </div>
 
@@ -666,9 +634,7 @@ function CampaignerBadge() {
 interface CampaignHeroProps {
   campaign: ParsedCampaign;
   cover: string | undefined;
-  creatorName: string;
-  creatorProfileUrl: string;
-  creatorPicture: string | undefined;
+  creatorPubkey: string;
   deadline: { label: string; isPast: boolean } | null;
   countryLabel: string | undefined;
   isCreator: boolean;
@@ -684,9 +650,7 @@ interface CampaignHeroProps {
 function CampaignHero({
   campaign,
   cover,
-  creatorName,
-  creatorProfileUrl,
-  creatorPicture,
+  creatorPubkey,
   deadline,
   countryLabel,
   isCreator,
@@ -699,7 +663,6 @@ function CampaignHero({
   translateAction,
 }: CampaignHeroProps) {
   const { t } = useTranslation();
-  const initials = creatorName.slice(0, 2).toUpperCase();
 
   return (
     // True full-bleed: no max-width wrapper, no horizontal padding, no
@@ -796,25 +759,9 @@ function CampaignHero({
             </p>
           )}
 
-          <Link
-            to={creatorProfileUrl}
-            onClick={(e) => e.stopPropagation()}
-            className="mt-5 inline-flex items-center gap-2.5 text-sm sm:text-base text-white/90 hover:text-white motion-safe:transition-colors group [text-shadow:none]"
-          >
-            <Avatar className="size-8 sm:size-9 ring-2 ring-white/30">
-              {creatorPicture && <AvatarImage src={creatorPicture} alt="" />}
-              <AvatarFallback className="text-xs bg-white/15 text-white">
-                {initials}
-              </AvatarFallback>
-            </Avatar>
-            <span className="[text-shadow:0_1px_3px_rgba(0,0,0,0.7)]">
-              <Trans
-                i18nKey="campaignsDetail.byAuthor"
-                values={{ name: creatorName }}
-                components={{ 0: <span className="font-semibold underline-offset-4 group-hover:underline" /> }}
-              />
-            </span>
-          </Link>
+          <div className="mt-5">
+            <AuthorByline pubkey={creatorPubkey} variant="hero" />
+          </div>
 
           {(countryLabel || deadline) && (
             <div className="mt-3 flex flex-wrap items-center gap-x-5 gap-y-1.5 text-xs sm:text-sm font-medium text-white/85">

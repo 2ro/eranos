@@ -28,6 +28,7 @@ import { DetailReplySkeleton } from '@/components/DetailStory';
 import { PeopleAvatarStack } from '@/components/PeopleAvatarStack';
 import { PledgeCard } from '@/components/PledgeCard';
 import { PostActionBar } from '@/components/PostActionBar';
+import { CommentsSection } from '@/components/CommentsSection';
 import { DetailCommentComposer } from '@/components/DetailCommentComposer';
 import { PinnedCommentHeader } from '@/components/PinnedCommentHeader';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
@@ -1064,21 +1065,19 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
 
                 {/* Comments — NIP-22 thread on the community event itself. */}
                 <div id="org-activity" className="scroll-mt-20">
-                  <div className="mt-6">
-                    <div className="flex items-baseline justify-between gap-3 mb-3 px-1">
-                      <h2 className="text-lg font-semibold tracking-tight">{t('groups.detail.comments')}</h2>
-                      {engagementStats?.replies ? (
-                        <span className="text-sm text-muted-foreground tabular-nums">
-                          {formatNumber(engagementStats.replies)}{' '}
-                          {t('groups.detail.commentNoun', { count: engagementStats.replies })}
-                        </span>
-                      ) : null}
-                    </div>
-
-                    <DetailCommentComposer event={event} className="mb-3" />
+                  <CommentsSection
+                    title={t('groups.detail.comments')}
+                    countLabel={engagementStats?.replies ? (
+                      <>
+                        {formatNumber(engagementStats.replies)}{' '}
+                        {t('groups.detail.commentNoun', { count: engagementStats.replies })}
+                      </>
+                    ) : undefined}
+                  >
+                    <DetailCommentComposer event={event} />
 
                     {commentsLoading && statsLoading && replyTree.length === 0 ? (
-                      <div className="space-y-3">
+                      <div>
                         {Array.from({ length: 3 }).map((_, i) => (
                           <DetailReplySkeleton key={i} />
                         ))}
@@ -1099,7 +1098,7 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
                       <button
                         type="button"
                         onClick={() => setReplyOpen(true)}
-                        className="block w-full rounded-2xl border border-dashed border-border/80 bg-card/50 px-6 py-10 text-center hover:bg-card hover:border-primary/40 transition-colors"
+                        className="block w-full px-6 py-10 text-center hover:bg-foreground/5 transition-colors"
                       >
                         <p className="text-base font-medium text-foreground">
                           {t('groups.detail.noCommentsTitle')}
@@ -1109,7 +1108,7 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
                         </p>
                       </button>
                     )}
-                  </div>
+                  </CommentsSection>
                 </div>
               </div>
 
