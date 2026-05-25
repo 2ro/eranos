@@ -1,14 +1,15 @@
 import { useMemo } from 'react';
 import type { ReactNode } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import { CalendarClock, EyeOff, HandHeart, MapPin, ShieldCheck } from 'lucide-react';
 
+import { AuthorByline } from '@/components/AuthorByline';
 import { Badge } from '@/components/ui/badge';
 import { Card } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { Skeleton } from '@/components/ui/skeleton';
 import { CampaignModerationMenu } from '@/components/CampaignModerationMenu';
-import { useAuthor } from '@/hooks/useAuthor';
 import { useBtcPrice } from '@/hooks/useBtcPrice';
 import { useCampaignDonations } from '@/hooks/useCampaignDonations';
 import { useCampaignModeration } from '@/hooks/useCampaignModeration';
@@ -20,7 +21,6 @@ import {
   parseCampaign,
 } from '@/lib/campaign';
 import { formatCampaignAmount, formatUsdGoal, satsToUsd } from '@/lib/formatCampaignAmount';
-import { genUserName } from '@/lib/genUserName';
 import { sanitizeUrl } from '@/lib/sanitizeUrl';
 import { cn } from '@/lib/utils';
 
@@ -142,22 +142,18 @@ interface CampaignCardProps {
  * `<Link>` to the campaign's naddr-based detail route.
  */
 export function CampaignCard({ campaign, variant = 'compact', className, footerBadge }: CampaignCardProps) {
+  const { t } = useTranslation();
   const { translatedEvent, translateAction } = useEventTranslation(campaign.event, {
     iconOnly: true,
     buttonClassName: 'size-8 rounded-full p-0 text-muted-foreground hover:text-primary hover:bg-primary/10',
   });
   const displayCampaign = parseCampaign(translatedEvent) ?? campaign;
-  const author = useAuthor(campaign.pubkey);
   const { data: stats } = useCampaignDonations(campaign);
   const { data: btcPrice } = useBtcPrice();
   const { data: moderation } = useCampaignModeration();
 
   const naddr = useMemo(() => encodeCampaignNaddr(campaign), [campaign]);
   const cover = sanitizeUrl(displayCampaign.banner);
-  const creatorName =
-    author.data?.metadata?.display_name ||
-    author.data?.metadata?.name ||
-    genUserName(campaign.pubkey);
   const deadline = campaign.deadline ? formatDeadline(campaign.deadline) : null;
   const raisedSats = stats?.totalSats ?? 0;
   const countryLabel = getCampaignCountryLabel(campaign);
@@ -303,11 +299,11 @@ export function CampaignCard({ campaign, variant = 'compact', className, footerB
           )}
 
           <div className="flex items-center justify-between gap-3 border-t border-border/60 pt-3 text-xs text-muted-foreground">
-            <div className="truncate">
-              by <span className="font-medium text-foreground">{creatorName}</span>
+            <div className="flex min-w-0 items-center gap-2">
+              <AuthorByline pubkey={campaign.pubkey} insideLink />
               {!isSilentPayment && stats && stats.donorCount > 0 && (
-                <span className="ml-2 text-muted-foreground/80">
-                  · {stats.donorCount} {stats.donorCount === 1 ? 'donor' : 'donors'}
+                <span className="shrink-0 text-muted-foreground/80">
+                  · {t('common.donors', { count: stats.donorCount })}
                 </span>
               )}
             </div>
