@@ -146,7 +146,7 @@ export function WalletPage() {
   // ── Available — full HD wallet UI ────────────────────────────
   return (
     <main className="max-w-sm mx-auto">
-      <div className="flex flex-col items-center px-4 pt-4 pb-4 space-y-6">
+      <div className="flex flex-col items-center px-4 pt-4 pb-4 space-y-4">
         {/* Balance */}
         {isLoading ? (
           <div className="flex flex-col items-center space-y-2">
@@ -193,7 +193,7 @@ export function WalletPage() {
           <button
             type="button"
             onClick={() => setSpScanOpen(true)}
-            className="text-xs text-muted-foreground hover:text-foreground motion-safe:transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-sm"
+            className="text-xs text-muted-foreground hover:text-foreground underline underline-offset-4 motion-safe:transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-sm cursor-pointer"
           >
             {t('wallet.receiveDialog.scanForNew')}
           </button>
@@ -219,7 +219,7 @@ export function WalletPage() {
             of behind a modal so the QR is always visible. The copy row uses
             the same explicit width as the white QR tile (280 + p-4 + p-4). */}
         {!isLoading && !error && qrPayload && (
-          <div className="flex flex-col items-center gap-4 pt-2">
+          <div className="flex flex-col items-center gap-4">
             {/* Combined BIP-21 QR with centered Agora logo. BIP-352-aware
                 wallets pick the `sp=` parameter; legacy wallets fall back
                 to the on-chain address. Mirrors CampaignWalletDonatePanel:
