@@ -12,7 +12,6 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { CommunityGrid } from '@/components/discovery/CommunityGrid';
 import { CommunityMiniCard, CommunityMiniCardSkeleton } from '@/components/discovery/CommunityMiniCard';
-import { SectionHeader } from '@/components/discovery/SectionHeader';
 import { DiscoverySearchToolbar } from '@/components/DiscoverySearchToolbar';
 import { ModeratorCollapsibleSection } from '@/components/moderation';
 import { COOL_PALETTE } from '@/lib/hopePalette';
@@ -207,20 +206,35 @@ export function CommunitiesPage() {
           </section>
         </div>
       ) : (
-        <div className="max-w-7xl mx-auto space-y-2 sm:space-y-4 pb-8 pt-2">
-          <section className="pt-6">
-            <SectionHeader title={t('groups.list.myGroups')} className="pb-3 sm:px-6" />
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 space-y-10 sm:space-y-12 pb-8 pt-10 lg:pt-14">
+          <section className="space-y-5">
+            <div className="flex items-end justify-between gap-4">
+              <div>
+                <h2 className="text-2xl sm:text-3xl font-bold tracking-tight">
+                  {t('groups.list.myGroups')}
+                </h2>
+                <p className="text-sm text-muted-foreground mt-1">
+                  {t('groups.list.myGroupsTagline')}
+                </p>
+              </div>
+            </div>
             <MyCommunitiesShelf
               userOrganizations={userOrganizations}
               onCreateCommunity={handleCreateCommunity}
             />
           </section>
 
-          <section className="pt-4 pb-8">
-            <SectionHeader
-              title={t('groups.list.featuredGroups')}
-              className="pb-3 sm:px-6"
-            />
+          <section className="space-y-5">
+            <div className="flex items-end justify-between gap-4">
+              <div>
+                <h2 className="text-2xl sm:text-3xl font-bold tracking-tight">
+                  {t('groups.list.featuredGroups')}
+                </h2>
+                <p className="text-sm text-muted-foreground mt-1">
+                  {t('groups.list.featuredGroupsTagline')}
+                </p>
+              </div>
+            </div>
             <FeaturedOrganizationsShelf />
           </section>
 
@@ -299,16 +313,16 @@ function ModeratorReviewSections() {
         isLoading={sectionsLoading}
         emptyText={t('groups.list.needsReviewEmpty')}
         size="compact"
-        triggerPaddingClassName="px-4 sm:px-6 pb-3"
+        triggerPaddingClassName="pb-3"
         skeleton={
-          <CommunityGrid>
+          <CommunityGrid className="px-0">
             {Array.from({ length: 4 }).map((_, i) => (
               <CommunityMiniCardSkeleton key={i} className="w-full" />
             ))}
           </CommunityGrid>
         }
       >
-        <CommunityGrid>
+        <CommunityGrid className="px-0">
           {needsReviewOrgs.map((org) => (
             <CommunityMiniCard key={org.aTag} community={org} className="w-full" />
           ))}
@@ -322,16 +336,16 @@ function ModeratorReviewSections() {
         isLoading={sectionsLoading}
         emptyText={t('groups.list.hiddenEmpty')}
         size="compact"
-        triggerPaddingClassName="px-4 sm:px-6 pb-3"
+        triggerPaddingClassName="pb-3"
         skeleton={
-          <CommunityGrid>
+          <CommunityGrid className="px-0">
             {Array.from({ length: 4 }).map((_, i) => (
               <CommunityMiniCardSkeleton key={i} className="w-full" />
             ))}
           </CommunityGrid>
         }
       >
-        <CommunityGrid>
+        <CommunityGrid className="px-0">
           {hiddenOrgs.map((org) => (
             <CommunityMiniCard key={org.aTag} community={org} className="w-full" />
           ))}
@@ -564,7 +578,7 @@ function MyCommunitiesShelfContent({
 
   if (isLoading) {
     return (
-      <CommunityGrid>
+      <CommunityGrid className="px-0">
         {Array.from({ length: 4 }).map((_, i) => (
           <CommunityMiniCardSkeleton key={i} className="w-full" />
         ))}
@@ -594,7 +608,7 @@ function MyCommunitiesShelfContent({
 
   return (
     <div className="space-y-4">
-      <CommunityGrid>
+      <CommunityGrid className="px-0">
         {visible.map((entry) => (
           <CommunityMiniCard
             key={entry.community.aTag}
@@ -604,7 +618,7 @@ function MyCommunitiesShelfContent({
         ))}
       </CommunityGrid>
       {canExpand && (
-        <div className="flex justify-center px-4 sm:px-6">
+        <div className="flex justify-center">
           <Button
             type="button"
             variant="ghost"
@@ -638,7 +652,7 @@ function FeaturedOrganizationsShelf() {
 
   if (isLoading && !hasFeatured) {
     return (
-      <CommunityGrid>
+      <CommunityGrid className="px-0">
         {Array.from({ length: 8 }).map((_, i) => (
           <CommunityMiniCardSkeleton key={i} className="w-full" />
         ))}
@@ -658,7 +672,7 @@ function FeaturedOrganizationsShelf() {
   }
 
   return (
-    <CommunityGrid>
+    <CommunityGrid className="px-0">
       {featured.map((entry) => (
         <CommunityMiniCard
           key={entry.community.aTag}
@@ -682,17 +696,15 @@ function EmptyShelf({
   action: React.ReactNode;
 }) {
   return (
-    <div className="px-4 sm:px-6">
-      <Card className="border-dashed">
-        <CardContent className="py-10 px-6 text-center space-y-3 flex flex-col items-center">
-          <div className="p-3 rounded-full bg-primary/10">{icon}</div>
-          <div className="space-y-1">
-            <h3 className="text-base font-semibold">{title}</h3>
-            <p className="text-sm text-muted-foreground max-w-md mx-auto">{body}</p>
-          </div>
-          {action}
-        </CardContent>
-      </Card>
-    </div>
+    <Card className="border-dashed">
+      <CardContent className="py-10 px-6 text-center space-y-3 flex flex-col items-center">
+        <div className="p-3 rounded-full bg-primary/10">{icon}</div>
+        <div className="space-y-1">
+          <h3 className="text-base font-semibold">{title}</h3>
+          <p className="text-sm text-muted-foreground max-w-md mx-auto">{body}</p>
+        </div>
+        {action}
+      </CardContent>
+    </Card>
   );
 }

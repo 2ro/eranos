@@ -25,8 +25,12 @@ function parseSort(value: string | null): CampaignSort {
 }
 
 /**
- * Map between the shared toolbar's sort vocabulary (`top` / `new`) and
- * the `useAllCampaigns` hook's vocabulary (`top` / `none`). The legacy
+ * Map between the shared toolbar's sort vocabulary (`default` / `top` /
+ * `new`) and the `useAllCampaigns` hook's vocabulary (`top` / `none`).
+ *
+ * AllCampaignsPage doesn't have a curated/default layout — it's the
+ * "show me everything" page — so the toolbar's 'default' option falls
+ * through to 'top' here, the page's canonical ranked view. The legacy
  * `none` value is preserved on the URL so existing share links keep
  * working.
  */
@@ -152,6 +156,27 @@ export function AllCampaignsPage() {
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-10 lg:py-14 space-y-8">
+        {/* Section heading — matches the `/pledges` and `/groups` pages
+            so the discovery surfaces all share the same large-bold
+            section header pattern. Title switches between Search / Top /
+            New based on toolbar state; tagline stays constant. */}
+        <div className="flex items-end justify-between gap-4">
+          <div>
+            <h2 className="text-2xl sm:text-3xl font-bold tracking-tight">
+              {activeQuery
+                ? t('common.search')
+                : sort === 'top'
+                  ? t('common.sortTop')
+                  : t('common.sortNew')}
+            </h2>
+            <p className="text-sm text-muted-foreground mt-1">
+              {activeQuery
+                ? t('common.searchResultsCount', { count: visible.length })
+                : t('campaigns.all.sectionTagline')}
+            </p>
+          </div>
+        </div>
+
         {/* Grid — widens to 3 columns at lg and 4 at xl so desktop users
             can scan more campaigns at once, matching the Pledge index's
             card density. Mobile and small tablets stay single / double
