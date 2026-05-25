@@ -23,7 +23,16 @@
     "readMore": "Ler mais",
     "byAuthor": "por <0>{{name}}</0>",
     "donors_one": "{{count}} doador",
-    "donors_other": "{{count}} doadores"
+    "donors_other": "{{count}} doadores",
+    "clearSearch": "Limpar pesquisa",
+    "searching": "Pesquisando\u2026",
+    "searchResultsCount_one": "{{count}} resultado",
+    "searchResultsCount_other": "{{count}} resultados",
+    "sortAriaLabel": "Ordem de classifica\u00e7\u00e3o",
+    "sortTop": "Top",
+    "sortNew": "Novo",
+    "showHidden": "Mostrar ocultos",
+    "filtersAriaLabel": "Filtros de pesquisa"
   },
   "translate": {
     "translate": "Traduzir",
@@ -592,7 +601,11 @@
       "showMore": "Mostrar mais ({{count}} mais)",
       "emptyTitle": "Nenhuma promessa ainda",
       "emptyHint": "Seja o primeiro a criar uma promessa.",
-      "emptyHintCountry": "Seja o primeiro a criar uma promessa para {{country}}."
+      "emptyHintCountry": "Seja o primeiro a criar uma promessa para {{country}}.",
+      "searchPlaceholder": "Pesquisar promessas\u2026",
+      "searchAriaLabel": "Pesquisar promessas",
+      "noMatch": "Nenhuma promessa corresponde a \u201c{{query}}\u201d",
+      "noMatchHint": "Tente um termo de pesquisa diferente, ou limpe a pesquisa."
     },
     "card": {
       "ended": "Encerrada",
@@ -712,7 +725,11 @@
       "tickerFeaturedGroups_one": "grupo em destaque no Nostr",
       "tickerFeaturedGroups_other": "grupos em destaque no Nostr",
       "tickerCountries_one": "país publicando hoje",
-      "tickerCountries_other": "países publicando hoje"
+      "tickerCountries_other": "países publicando hoje",
+      "searchPlaceholder": "Pesquisar grupos\u2026",
+      "searchAriaLabel": "Pesquisar grupos",
+      "noMatch": "Nenhum grupo corresponde a \u201c{{query}}\u201d",
+      "noMatchHint": "Tente um termo de pesquisa diferente, ou limpe a pesquisa."
     },
     "create": {
       "seoTitleCreate": "Criar grupo",
@@ -1035,12 +1052,22 @@
       "yourCampaigns": "Suas campanhas",
       "yourCampaignsDesc": "Suas campanhas estão no ar no Nostr e as doações funcionam através do link da campanha. Elas aparecem na página inicial quando um moderador da Team Soapbox as aprova.",
       "empty": "Nenhuma campanha ainda",
-      "emptyHint": "Seja o primeiro a iniciar uma arrecadação no {{appName}}. Conte sua história, escolha seus beneficiários e compartilhe o link."
+      "emptyHint": "Seja o primeiro a iniciar uma arrecadação no {{appName}}. Conte sua história, escolha seus beneficiários e compartilhe o link.",
+      "searchPlaceholder": "Pesquisar campanhas\u2026",
+      "searchAriaLabel": "Pesquisar campanhas",
+      "noMatch": "Nenhuma campanha corresponde a \u201c{{query}}\u201d",
+      "noMatchHint": "Tente um termo de pesquisa diferente, ou limpe a pesquisa."
     },
     "all": {
       "title": "Todas as campanhas",
       "seoTitle": "Todas as campanhas",
       "description": "Navegue por todas as campanhas publicadas no Agora.",
+      "heroKicker": "Campanhas",
+      "heroHeading": "Cada causa,",
+      "heroHeadingLine2": "em um s\u00f3 lugar.",
+      "heroBody": "Cada arrecada\u00e7\u00e3o publicada no Nostr, reunida em um s\u00f3 lugar. Navegue pela rede inteira, encontre uma causa que importa para voc\u00ea e apoie diretamente com Bitcoin.",
+      "campaignsCount_one": "campanha na rede",
+      "campaignsCount_other": "campanhas na rede",
       "searchAriaLabel": "Pesquisar campanhas",
       "searchPlaceholder": "Pesquisar campanhas…",
       "clearSearch": "Limpar pesquisa",

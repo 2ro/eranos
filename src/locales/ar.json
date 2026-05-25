@@ -23,7 +23,12 @@
     "readMore": "قراءة المزيد",
     "byAuthor": "بواسطة <0>{{name}}</0>",
     "donors_one": "{{count}} متبرع",
-    "donors_other": "{{count}} متبرعون"
+    "donors_other": "{{count}} متبرعون",
+    "sortAriaLabel": "ترتيب الفرز",
+    "sortTop": "الأبرز",
+    "sortNew": "الأحدث",
+    "showHidden": "إظهار المخفية",
+    "filtersAriaLabel": "مرشّحات البحث"
   },
   "translate": {
     "translate": "ترجمة",
@@ -618,6 +623,12 @@
       "title": "كل الحملات",
       "seoTitle": "كل الحملات",
       "description": "تصفّح كل الحملات المنشورة على Agora.",
+      "heroKicker": "الحملات",
+      "heroHeading": "كل قضيّة،",
+      "heroHeadingLine2": "في مكان واحد.",
+      "heroBody": "كل حملة تمويل منشورة على Nostr، مجموعةً في مكان واحد. تصفّح الشبكة بأكملها، اعثر على قضيّة تهمّك، وادعمها مباشرةً بالبتكوين.",
+      "campaignsCount_one": "حملة على الشبكة",
+      "campaignsCount_other": "حملات على الشبكة",
       "searchAriaLabel": "البحث في الحملات",
       "searchPlaceholder": "ابحث في الحملات…",
       "clearSearch": "مسح البحث",

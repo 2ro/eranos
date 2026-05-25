@@ -23,7 +23,16 @@
     "readMore": "Leer más",
     "byAuthor": "por <0>{{name}}</0>",
     "donors_one": "{{count}} donante",
-    "donors_other": "{{count}} donantes"
+    "donors_other": "{{count}} donantes",
+    "clearSearch": "Borrar búsqueda",
+    "searching": "Buscando…",
+    "searchResultsCount_one": "{{count}} resultado",
+    "searchResultsCount_other": "{{count}} resultados",
+    "sortAriaLabel": "Orden",
+    "sortTop": "Destacadas",
+    "sortNew": "Nuevas",
+    "showHidden": "Mostrar ocultas",
+    "filtersAriaLabel": "Filtros de búsqueda"
   },
   "translate": {
     "translate": "Traducir",
@@ -169,7 +178,11 @@
       "showMore": "Mostrar más ({{count}} más)",
       "emptyTitle": "Aún no hay promesas",
       "emptyHint": "Sé el primero en crear una promesa.",
-      "emptyHintCountry": "Sé el primero en crear una promesa para {{country}}."
+      "emptyHintCountry": "Sé el primero en crear una promesa para {{country}}.",
+      "searchPlaceholder": "Buscar promesas…",
+      "searchAriaLabel": "Buscar promesas",
+      "noMatch": "Ninguna promesa coincide con «{{query}}»",
+      "noMatchHint": "Prueba con otro término de búsqueda o bórrala."
     },
     "card": {
       "ended": "Finalizada",
@@ -289,7 +302,11 @@
       "tickerFeaturedGroups_one": "grupo destacado en Nostr",
       "tickerFeaturedGroups_other": "grupos destacados en Nostr",
       "tickerCountries_one": "país publicando hoy",
-      "tickerCountries_other": "países publicando hoy"
+      "tickerCountries_other": "países publicando hoy",
+      "searchPlaceholder": "Buscar grupos…",
+      "searchAriaLabel": "Buscar grupos",
+      "noMatch": "Ningún grupo coincide con «{{query}}»",
+      "noMatchHint": "Prueba con otro término de búsqueda o bórrala."
     },
     "create": {
       "seoTitleCreate": "Crear grupo",
@@ -612,12 +629,22 @@
       "yourCampaigns": "Tus campañas",
       "yourCampaignsDesc": "Tus campañas están activas en Nostr y las donaciones funcionan mediante el enlace. Aparecerán en la página de inicio cuando un moderador del equipo Soapbox las apruebe.",
       "empty": "Aún no hay campañas",
-      "emptyHint": "Sé el primero en iniciar una recaudación en {{appName}}. Cuenta tu historia, elige a los beneficiarios y comparte el enlace."
+      "emptyHint": "Sé el primero en iniciar una recaudación en {{appName}}. Cuenta tu historia, elige a los beneficiarios y comparte el enlace.",
+      "searchPlaceholder": "Buscar campañas…",
+      "searchAriaLabel": "Buscar campañas",
+      "noMatch": "Ninguna campaña coincide con «{{query}}»",
+      "noMatchHint": "Prueba con otro término de búsqueda o bórrala."
     },
     "all": {
       "title": "Todas las campañas",
       "seoTitle": "Todas las campañas",
       "description": "Explora todas las campañas publicadas en Agora.",
+      "heroKicker": "Campañas",
+      "heroHeading": "Cada causa,",
+      "heroHeadingLine2": "en un solo lugar.",
+      "heroBody": "Cada recaudación publicada en Nostr, reunida en un solo lugar. Explora toda la red, encuentra una causa que te importe y apóyala directamente con Bitcoin.",
+      "campaignsCount_one": "campaña en la red",
+      "campaignsCount_other": "campañas en la red",
       "searchAriaLabel": "Buscar campañas",
       "searchPlaceholder": "Buscar campañas…",
       "clearSearch": "Borrar búsqueda",

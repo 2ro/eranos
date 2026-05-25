@@ -23,7 +23,16 @@
     "readMore": "阅读更多",
     "byAuthor": "由 <0>{{name}}</0>",
     "donors_one": "{{count}} 位捐赠者",
-    "donors_other": "{{count}} 位捐赠者"
+    "donors_other": "{{count}} 位捐赠者",
+    "clearSearch": "清除搜索",
+    "searching": "搜索中…",
+    "searchResultsCount_one": "{{count}} 个结果",
+    "searchResultsCount_other": "{{count}} 个结果",
+    "sortAriaLabel": "排序",
+    "sortTop": "热门",
+    "sortNew": "最新",
+    "showHidden": "显示已隐藏",
+    "filtersAriaLabel": "搜索筛选"
   },
   "translate": {
     "translate": "翻译",
@@ -169,7 +178,11 @@
       "showMore": "展开更多（还有 {{count}} 个）",
       "emptyTitle": "还没有悬赏",
       "emptyHint": "成为第一个创建悬赏的人。",
-      "emptyHintCountry": "成为第一个为 {{country}} 创建悬赏的人。"
+      "emptyHintCountry": "成为第一个为 {{country}} 创建悬赏的人。",
+      "searchPlaceholder": "搜索悬赏…",
+      "searchAriaLabel": "搜索悬赏",
+      "noMatch": "没有悬赏匹配「{{query}}」",
+      "noMatchHint": "尝试其他搜索词，或清除搜索。"
     },
     "card": {
       "ended": "已结束",
@@ -289,7 +302,11 @@
       "tickerFeaturedGroups_one": "个 Nostr 精选群组",
       "tickerFeaturedGroups_other": "个 Nostr 精选群组",
       "tickerCountries_one": "个国家今天发帖",
-      "tickerCountries_other": "个国家今天发帖"
+      "tickerCountries_other": "个国家今天发帖",
+      "searchPlaceholder": "搜索群组…",
+      "searchAriaLabel": "搜索群组",
+      "noMatch": "没有群组匹配「{{query}}」",
+      "noMatchHint": "尝试其他搜索词，或清除搜索。"
     },
     "create": {
       "seoTitleCreate": "创建群组",
@@ -612,12 +629,22 @@
       "yourCampaigns": "你的活动",
       "yourCampaignsDesc": "你的活动已在 Nostr 上线,通过活动链接可以接收捐款。一旦 Soapbox 团队版主批准,它们将出现在首页。",
       "empty": "暂无活动",
-      "emptyHint": "成为在 {{appName}} 发起众筹的第一人。讲述你的故事、选择受益人、并分享链接。"
+      "emptyHint": "成为在 {{appName}} 发起众筹的第一人。讲述你的故事、选择受益人、并分享链接。",
+      "searchPlaceholder": "搜索活动…",
+      "searchAriaLabel": "搜索活动",
+      "noMatch": "没有活动匹配「{{query}}」",
+      "noMatchHint": "尝试其他搜索词，或清除搜索。"
     },
     "all": {
       "title": "所有活动",
       "seoTitle": "所有活动",
       "description": "浏览 Agora 上发布的所有活动。",
+      "heroKicker": "活动",
+      "heroHeading": "每一个理念，",
+      "heroHeadingLine2": "汇聚于此。",
+      "heroBody": "Nostr 上发布的每一个筹款活动，汇聚于一处。浏览整个网络，找到你关心的事业，直接用比特币支持它。",
+      "campaignsCount_one": "个网络上的活动",
+      "campaignsCount_other": "个网络上的活动",
       "searchAriaLabel": "搜索活动",
       "searchPlaceholder": "搜索活动…",
       "clearSearch": "清除搜索",

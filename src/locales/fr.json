@@ -23,7 +23,16 @@
     "readMore": "Lire plus",
     "byAuthor": "par <0>{{name}}</0>",
     "donors_one": "{{count}} donateur",
-    "donors_other": "{{count}} donateurs"
+    "donors_other": "{{count}} donateurs",
+    "clearSearch": "Effacer la recherche",
+    "searching": "Recherche…",
+    "searchResultsCount_one": "{{count}} résultat",
+    "searchResultsCount_other": "{{count}} résultats",
+    "sortAriaLabel": "Ordre de tri",
+    "sortTop": "Populaires",
+    "sortNew": "Récentes",
+    "showHidden": "Afficher les masquées",
+    "filtersAriaLabel": "Filtres de recherche"
   },
   "translate": {
     "translate": "Traduire",
@@ -592,7 +601,11 @@
       "showMore": "Afficher plus ({{count}} de plus)",
       "emptyTitle": "Aucune promesse pour l'instant",
       "emptyHint": "Soyez le premier à créer une promesse.",
-      "emptyHintCountry": "Soyez le premier à créer une promesse pour {{country}}."
+      "emptyHintCountry": "Soyez le premier à créer une promesse pour {{country}}.",
+      "searchPlaceholder": "Rechercher des promesses…",
+      "searchAriaLabel": "Rechercher des promesses",
+      "noMatch": "Aucune promesse ne correspond à « {{query}} »",
+      "noMatchHint": "Essayez un autre terme de recherche, ou effacez la recherche."
     },
     "card": {
       "ended": "Terminée",
@@ -712,7 +725,11 @@
       "tickerFeaturedGroups_one": "groupe mis en avant sur Nostr",
       "tickerFeaturedGroups_other": "groupes mis en avant sur Nostr",
       "tickerCountries_one": "pays publiant aujourd'hui",
-      "tickerCountries_other": "pays publiant aujourd'hui"
+      "tickerCountries_other": "pays publiant aujourd'hui",
+      "searchPlaceholder": "Rechercher des groupes…",
+      "searchAriaLabel": "Rechercher des groupes",
+      "noMatch": "Aucun groupe ne correspond à « {{query}} »",
+      "noMatchHint": "Essayez un autre terme de recherche, ou effacez la recherche."
     },
     "create": {
       "seoTitleCreate": "Créer un groupe",
@@ -1035,12 +1052,22 @@
       "yourCampaigns": "Vos campagnes",
       "yourCampaignsDesc": "Vos campagnes sont en ligne sur Nostr et les dons fonctionnent via le lien de la campagne. Elles apparaissent sur la page d'accueil dès qu'un modérateur de Team Soapbox les approuve.",
       "empty": "Aucune campagne pour l'instant",
-      "emptyHint": "Soyez le premier à démarrer une collecte de fonds sur {{appName}}. Racontez votre histoire, choisissez vos bénéficiaires et partagez le lien."
+      "emptyHint": "Soyez le premier à démarrer une collecte de fonds sur {{appName}}. Racontez votre histoire, choisissez vos bénéficiaires et partagez le lien.",
+      "searchPlaceholder": "Rechercher des campagnes…",
+      "searchAriaLabel": "Rechercher des campagnes",
+      "noMatch": "Aucune campagne ne correspond à « {{query}} »",
+      "noMatchHint": "Essayez un autre terme de recherche, ou effacez la recherche."
     },
     "all": {
       "title": "Toutes les campagnes",
       "seoTitle": "Toutes les campagnes",
       "description": "Parcourez toutes les campagnes publiées sur Agora.",
+      "heroKicker": "Campagnes",
+      "heroHeading": "Chaque cause,",
+      "heroHeadingLine2": "au même endroit.",
+      "heroBody": "Toutes les collectes de fonds publiées sur Nostr, rassemblées en un seul endroit. Parcourez l'ensemble du réseau, trouvez une cause qui vous tient à cœur et soutenez-la directement en Bitcoin.",
+      "campaignsCount_one": "campagne sur le réseau",
+      "campaignsCount_other": "campagnes sur le réseau",
       "searchAriaLabel": "Rechercher des campagnes",
       "searchPlaceholder": "Rechercher des campagnes…",
       "clearSearch": "Effacer la recherche",

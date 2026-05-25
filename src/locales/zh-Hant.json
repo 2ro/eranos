@@ -23,7 +23,16 @@
     "readMore": "閱讀更多",
     "byAuthor": "由 <0>{{name}}</0>",
     "donors_one": "{{count}} 位捐贈者",
-    "donors_other": "{{count}} 位捐贈者"
+    "donors_other": "{{count}} 位捐贈者",
+    "clearSearch": "清除搜尋",
+    "searching": "搜尋中…",
+    "searchResultsCount_one": "{{count}} 個結果",
+    "searchResultsCount_other": "{{count}} 個結果",
+    "sortAriaLabel": "排序方式",
+    "sortTop": "熱門",
+    "sortNew": "最新",
+    "showHidden": "顯示已隱藏",
+    "filtersAriaLabel": "搜尋篩選"
   },
   "translate": {
     "translate": "翻譯",
@@ -169,7 +178,11 @@
       "showMore": "展開更多（還有 {{count}} 個）",
       "emptyTitle": "還沒有懸賞",
       "emptyHint": "成為第一個建立懸賞的人。",
-      "emptyHintCountry": "成為第一個為 {{country}} 建立懸賞的人。"
+      "emptyHintCountry": "成為第一個為 {{country}} 建立懸賞的人。",
+      "searchPlaceholder": "搜尋懸賞…",
+      "searchAriaLabel": "搜尋懸賞",
+      "noMatch": "沒有懸賞符合「{{query}}」",
+      "noMatchHint": "請嘗試不同的搜尋字詞,或清除搜尋。"
     },
     "card": {
       "ended": "已結束",
@@ -289,7 +302,11 @@
       "tickerFeaturedGroups_one": "個 Nostr 精選群組",
       "tickerFeaturedGroups_other": "個 Nostr 精選群組",
       "tickerCountries_one": "個國家今天發帖",
-      "tickerCountries_other": "個國家今天發帖"
+      "tickerCountries_other": "個國家今天發帖",
+      "searchPlaceholder": "搜尋群組…",
+      "searchAriaLabel": "搜尋群組",
+      "noMatch": "沒有群組符合「{{query}}」",
+      "noMatchHint": "請嘗試不同的搜尋字詞,或清除搜尋。"
     },
     "create": {
       "seoTitleCreate": "建立群組",
@@ -612,12 +629,22 @@
       "yourCampaigns": "你的活動",
       "yourCampaignsDesc": "你的活動已在 Nostr 上線,通過活動連結可以接收捐款。一旦 Soapbox 團隊版主批准,它們將出現在首頁。",
       "empty": "暫無活動",
-      "emptyHint": "成為在 {{appName}} 發起眾籌的第一人。講述你的故事、選擇受益人、並分享連結。"
+      "emptyHint": "成為在 {{appName}} 發起眾籌的第一人。講述你的故事、選擇受益人、並分享連結。",
+      "searchPlaceholder": "搜尋活動…",
+      "searchAriaLabel": "搜尋活動",
+      "noMatch": "沒有活動符合「{{query}}」",
+      "noMatchHint": "請嘗試不同的搜尋字詞,或清除搜尋。"
     },
     "all": {
       "title": "所有活動",
       "seoTitle": "所有活動",
       "description": "瀏覽 Agora 上釋出的所有活動。",
+      "heroKicker": "活動",
+      "heroHeading": "每一份心意，",
+      "heroHeadingLine2": "匯聚於此。",
+      "heroBody": "Nostr 上釋出的每一個募款活動，全部匯聚於此。瀏覽整個網路、找到你關心的議題，並直接以比特幣支持它。",
+      "campaignsCount_one": "個活動正在網路上進行",
+      "campaignsCount_other": "個活動正在網路上進行",
       "searchAriaLabel": "搜尋活動",
       "searchPlaceholder": "搜尋活動…",
       "clearSearch": "清除搜尋",

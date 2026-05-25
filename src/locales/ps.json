@@ -23,7 +23,16 @@
     "readMore": "نور ولولئ",
     "byAuthor": "د <0>{{name}}</0> لخوا",
     "donors_one": "{{count}} بسپنه ورکوونکی",
-    "donors_other": "{{count}} بسپنه ورکوونکي"
+    "donors_other": "{{count}} بسپنه ورکوونکي",
+    "clearSearch": "لټون پاکول",
+    "searching": "لټون کېږي…",
+    "searchResultsCount_one": "{{count}} پایله",
+    "searchResultsCount_other": "{{count}} پایلې",
+    "sortAriaLabel": "د ترتیب اساس",
+    "sortTop": "غوره",
+    "sortNew": "نوي",
+    "showHidden": "پټ ښودل",
+    "filtersAriaLabel": "د لټون فلټرونه"
   },
   "translate": {
     "translate": "ژباړل",
@@ -169,7 +178,11 @@
       "showMore": "نور ښودل ({{count}} نور)",
       "emptyTitle": "تر اوسه هیڅ ژمنه نشته",
       "emptyHint": "د ژمنې جوړولو لومړنی شه.",
-      "emptyHintCountry": "د {{country}} لپاره د ژمنې جوړولو لومړنی شه."
+      "emptyHintCountry": "د {{country}} لپاره د ژمنې جوړولو لومړنی شه.",
+      "searchPlaceholder": "د ژمنو لټون…",
+      "searchAriaLabel": "د ژمنو لټون",
+      "noMatch": "هیڅ ژمنه له «{{query}}» سره سمون نه لري",
+      "noMatchHint": "بل لټون وکارئ، یا لټون پاک کړئ."
     },
     "card": {
       "ended": "پای ته رسیدلې",
@@ -289,7 +302,11 @@
       "tickerFeaturedGroups_one": "په Nostr کې ځانګړې ډله",
       "tickerFeaturedGroups_other": "په Nostr کې ځانګړې ډلې",
       "tickerCountries_one": "نن ورځ خپروونکی هیواد",
-      "tickerCountries_other": "نن ورځ خپروونکي هیوادونه"
+      "tickerCountries_other": "نن ورځ خپروونکي هیوادونه",
+      "searchPlaceholder": "د ډلو لټون…",
+      "searchAriaLabel": "د ډلو لټون",
+      "noMatch": "هیڅ ډله له «{{query}}» سره سمون نه لري",
+      "noMatchHint": "بل لټون وکارئ، یا لټون پاک کړئ."
     },
     "create": {
       "seoTitleCreate": "د ډلې جوړول",
@@ -612,9 +629,19 @@
       "yourCampaigns": "ستاسو کمپاینونه",
       "yourCampaignsDesc": "ستاسو کمپاینونه په Nostr کې ژوندي دي او مرستې د کمپاین له لینک څخه کار کوي. کله چې د Soapbox ټیم یو مدیر یې ومني، په کور پاڼه کې به څرګند شي.",
       "empty": "تر اوسه کوم کمپاین نشته",
-      "emptyHint": "په {{appName}} کې د مرستو راټولولو کمپاین پیل کوونکی لومړی شئ. خپله کیسه ووایاست، ګټه اخیستونکي وټاکئ، او لینک شریک کړئ."
+      "emptyHint": "په {{appName}} کې د مرستو راټولولو کمپاین پیل کوونکی لومړی شئ. خپله کیسه ووایاست، ګټه اخیستونکي وټاکئ، او لینک شریک کړئ.",
+      "searchPlaceholder": "د کمپاینونو لټون…",
+      "searchAriaLabel": "د کمپاینونو لټون",
+      "noMatch": "هیڅ کمپاین له «{{query}}» سره سمون نه لري",
+      "noMatchHint": "بل لټون وکارئ، یا لټون پاک کړئ."
     },
     "all": {
+      "heroKicker": "کمپاینونه",
+      "heroHeading": "هر هدف،",
+      "heroHeadingLine2": "په یوه ځای کې.",
+      "heroBody": "په Nostr کې خپور شوی هر د مرستو راټولولو کمپاین په یوه ځای کې راټول شوی. د بشپړې شبکې لټون وکړئ، هغه هدف ومومئ چې درته اهمیت لري، او په مستقیم ډول یې د بټکوین له لارې ملاتړ وکړئ.",
+      "campaignsCount_one": "په شبکه کې کمپاین",
+      "campaignsCount_other": "په شبکه کې کمپاینونه",
       "title": "ټول کمپاینونه",
       "seoTitle": "ټول کمپاینونه",
       "description": "په Agora کې خپور شوي ټول کمپاینونه وګورئ.",

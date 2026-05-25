@@ -23,7 +23,16 @@
     "readMore": "Читать дальше",
     "byAuthor": "от <0>{{name}}</0>",
     "donors_one": "{{count}} донор",
-    "donors_other": "{{count}} доноров"
+    "donors_other": "{{count}} доноров",
+    "clearSearch": "Очистить поиск",
+    "searching": "Поиск…",
+    "searchResultsCount_one": "{{count}} результат",
+    "searchResultsCount_other": "{{count}} результатов",
+    "sortAriaLabel": "Порядок сортировки",
+    "sortTop": "Топ",
+    "sortNew": "Новые",
+    "showHidden": "Показать скрытые",
+    "filtersAriaLabel": "Фильтры поиска"
   },
   "translate": {
     "translate": "Перевести",
@@ -592,7 +601,11 @@
       "showMore": "Показать ещё ({{count}})",
       "emptyTitle": "Пока нет обещаний",
       "emptyHint": "Будьте первым, кто создаст обещание.",
-      "emptyHintCountry": "Будьте первым, кто создаст обещание для {{country}}."
+      "emptyHintCountry": "Будьте первым, кто создаст обещание для {{country}}.",
+      "searchPlaceholder": "Поиск обещаний…",
+      "searchAriaLabel": "Поиск обещаний",
+      "noMatch": "Ни одно обещание не соответствует «{{query}}»",
+      "noMatchHint": "Попробуйте другой поисковый запрос или очистите поиск."
     },
     "card": {
       "ended": "Завершено",
@@ -712,7 +725,11 @@
       "tickerFeaturedGroups_one": "избранная группа в Nostr",
       "tickerFeaturedGroups_other": "избранных групп в Nostr",
       "tickerCountries_one": "страна публикует сегодня",
-      "tickerCountries_other": "стран публикуют сегодня"
+      "tickerCountries_other": "стран публикуют сегодня",
+      "searchPlaceholder": "Поиск групп…",
+      "searchAriaLabel": "Поиск групп",
+      "noMatch": "Ни одна группа не соответствует «{{query}}»",
+      "noMatchHint": "Попробуйте другой поисковый запрос или очистите поиск."
     },
     "create": {
       "seoTitleCreate": "Создать группу",
@@ -1035,12 +1052,22 @@
       "yourCampaigns": "Ваши кампании",
       "yourCampaignsDesc": "Ваши кампании в эфире в Nostr, и пожертвования работают через ссылку кампании. Они появляются на главной странице, когда модератор Team Soapbox их одобряет.",
       "empty": "Пока нет кампаний",
-      "emptyHint": "Будьте первым, кто запустит сбор средств на {{appName}}. Расскажите свою историю, выберите бенефициаров и поделитесь ссылкой."
+      "emptyHint": "Будьте первым, кто запустит сбор средств на {{appName}}. Расскажите свою историю, выберите бенефициаров и поделитесь ссылкой.",
+      "searchPlaceholder": "Поиск кампаний…",
+      "searchAriaLabel": "Поиск кампаний",
+      "noMatch": "Ни одна кампания не соответствует «{{query}}»",
+      "noMatchHint": "Попробуйте другой поисковый запрос или очистите поиск."
     },
     "all": {
       "title": "Все кампании",
       "seoTitle": "Все кампании",
       "description": "Просмотрите все кампании, опубликованные на Agora.",
+      "heroKicker": "Кампании",
+      "heroHeading": "Каждое дело —",
+      "heroHeadingLine2": "в одном месте.",
+      "heroBody": "Каждый сбор средств, опубликованный в Nostr, собран в одном месте. Просматривайте всю сеть, найдите дело, которое важно для вас, и поддержите его напрямую биткоином.",
+      "campaignsCount_one": "кампания в сети",
+      "campaignsCount_other": "кампаний в сети",
       "searchAriaLabel": "Поиск кампаний",
       "searchPlaceholder": "Поиск кампаний…",
       "clearSearch": "Очистить поиск",

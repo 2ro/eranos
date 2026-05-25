@@ -23,7 +23,16 @@
     "readMore": "Selengkapnya",
     "byAuthor": "oleh <0>{{name}}</0>",
     "donors_one": "{{count}} donatur",
-    "donors_other": "{{count}} donatur"
+    "donors_other": "{{count}} donatur",
+    "clearSearch": "Bersihkan pencarian",
+    "searching": "Mencari…",
+    "searchResultsCount_one": "{{count}} hasil",
+    "searchResultsCount_other": "{{count}} hasil",
+    "sortAriaLabel": "Urutan",
+    "sortTop": "Teratas",
+    "sortNew": "Baru",
+    "showHidden": "Tampilkan yang tersembunyi",
+    "filtersAriaLabel": "Filter pencarian"
   },
   "translate": {
     "translate": "Terjemahkan",
@@ -601,7 +610,11 @@
       "showMore": "Tampilkan lebih banyak ({{count}} lagi)",
       "emptyTitle": "Belum ada ikrar",
       "emptyHint": "Jadilah yang pertama membuat ikrar.",
-      "emptyHintCountry": "Jadilah yang pertama membuat ikrar untuk {{country}}."
+      "emptyHintCountry": "Jadilah yang pertama membuat ikrar untuk {{country}}.",
+      "searchPlaceholder": "Cari ikrar…",
+      "searchAriaLabel": "Cari ikrar",
+      "noMatch": "Tidak ada ikrar yang cocok dengan “{{query}}”",
+      "noMatchHint": "Coba kata pencarian lain, atau bersihkan pencarian."
     },
     "card": {
       "ended": "Berakhir",
@@ -721,7 +734,11 @@
       "tickerFeaturedGroups_one": "grup unggulan di Nostr",
       "tickerFeaturedGroups_other": "grup unggulan di Nostr",
       "tickerCountries_one": "negara memposting hari ini",
-      "tickerCountries_other": "negara memposting hari ini"
+      "tickerCountries_other": "negara memposting hari ini",
+      "searchPlaceholder": "Cari grup…",
+      "searchAriaLabel": "Cari grup",
+      "noMatch": "Tidak ada grup yang cocok dengan “{{query}}”",
+      "noMatchHint": "Coba kata pencarian lain, atau bersihkan pencarian."
     },
     "create": {
       "seoTitleCreate": "Buat grup",
@@ -1044,12 +1061,22 @@
       "yourCampaigns": "Kampanye Anda",
       "yourCampaignsDesc": "Kampanye Anda aktif di Nostr dan donasi berfungsi melalui tautan kampanye. Mereka akan muncul di beranda setelah moderator Team Soapbox menyetujuinya.",
       "empty": "Belum ada kampanye",
-      "emptyHint": "Jadilah yang pertama memulai penggalangan dana di {{appName}}. Ceritakan kisah Anda, pilih penerima manfaat, dan bagikan tautannya."
+      "emptyHint": "Jadilah yang pertama memulai penggalangan dana di {{appName}}. Ceritakan kisah Anda, pilih penerima manfaat, dan bagikan tautannya.",
+      "searchPlaceholder": "Cari kampanye…",
+      "searchAriaLabel": "Cari kampanye",
+      "noMatch": "Tidak ada kampanye yang cocok dengan “{{query}}”",
+      "noMatchHint": "Coba kata pencarian lain, atau bersihkan pencarian."
     },
     "all": {
       "title": "Semua Kampanye",
       "seoTitle": "Semua kampanye",
       "description": "Telusuri setiap kampanye yang dipublikasikan di Agora.",
+      "heroKicker": "Kampanye",
+      "heroHeading": "Setiap aksi,",
+      "heroHeadingLine2": "dalam satu tempat.",
+      "heroBody": "Setiap penggalangan dana yang dipublikasikan di Nostr, dikumpulkan dalam satu tempat. Telusuri seluruh jaringan, temukan aksi yang penting bagi Anda, dan dukung langsung dengan Bitcoin.",
+      "campaignsCount_one": "kampanye di jaringan",
+      "campaignsCount_other": "kampanye di jaringan",
       "searchAriaLabel": "Cari kampanye",
       "searchPlaceholder": "Cari kampanye…",
       "clearSearch": "Bersihkan pencarian",

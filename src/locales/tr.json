@@ -23,7 +23,16 @@
     "readMore": "Daha fazla oku",
     "byAuthor": "<0>{{name}}</0> tarafından",
     "donors_one": "{{count}} bağışçı",
-    "donors_other": "{{count}} bağışçı"
+    "donors_other": "{{count}} bağışçı",
+    "clearSearch": "Aramayı temizle",
+    "searching": "Aranıyor\u2026",
+    "searchResultsCount_one": "{{count}} sonuç",
+    "searchResultsCount_other": "{{count}} sonuç",
+    "sortAriaLabel": "Sıralama düzeni",
+    "sortTop": "Üst",
+    "sortNew": "Yeni",
+    "showHidden": "Gizlileri göster",
+    "filtersAriaLabel": "Arama filtreleri"
   },
   "translate": {
     "translate": "Çevir",
@@ -601,7 +610,11 @@
       "showMore": "Daha fazla göster ({{count}} daha)",
       "emptyTitle": "Henüz taahhüt yok",
       "emptyHint": "Taahhüt oluşturan ilk kişi olun.",
-      "emptyHintCountry": "{{country}} için taahhüt oluşturan ilk kişi olun."
+      "emptyHintCountry": "{{country}} için taahhüt oluşturan ilk kişi olun.",
+      "searchPlaceholder": "Taahhüt ara\u2026",
+      "searchAriaLabel": "Taahhütleri ara",
+      "noMatch": "\u201c{{query}}\u201d ile eşleşen taahhüt yok",
+      "noMatchHint": "Farklı bir arama terimi deneyin ya da aramayı temizleyin."
     },
     "card": {
       "ended": "Bitti",
@@ -721,7 +734,11 @@
       "tickerFeaturedGroups_one": "Nostr'da öne çıkan grup",
       "tickerFeaturedGroups_other": "Nostr'da öne çıkan grup",
       "tickerCountries_one": "ülke bugün paylaşım yapıyor",
-      "tickerCountries_other": "ülke bugün paylaşım yapıyor"
+      "tickerCountries_other": "ülke bugün paylaşım yapıyor",
+      "searchPlaceholder": "Grup ara\u2026",
+      "searchAriaLabel": "Grupları ara",
+      "noMatch": "\u201c{{query}}\u201d ile eşleşen grup yok",
+      "noMatchHint": "Farklı bir arama terimi deneyin ya da aramayı temizleyin."
     },
     "create": {
       "seoTitleCreate": "Grup oluştur",
@@ -1044,7 +1061,11 @@
       "yourCampaigns": "Kampanyalarınız",
       "yourCampaignsDesc": "Kampanyalarınız Nostr'da yayında ve bağışlar kampanya bağlantısıyla çalışır. Bir Team Soapbox moderatörü onayladığında ana sayfada görünürler.",
       "empty": "Henüz kampanya yok",
-      "emptyHint": "{{appName}}'da fon toplama kampanyası başlatan ilk kişi olun. Hikayenizi anlatın, yararlanıcılarınızı seçin ve bağlantıyı paylaşın."
+      "emptyHint": "{{appName}}'da fon toplama kampanyası başlatan ilk kişi olun. Hikayenizi anlatın, yararlanıcılarınızı seçin ve bağlantıyı paylaşın.",
+      "searchPlaceholder": "Kampanya ara\u2026",
+      "searchAriaLabel": "Kampanyaları ara",
+      "noMatch": "\u201c{{query}}\u201d ile eşleşen kampanya yok",
+      "noMatchHint": "Farklı bir arama terimi deneyin ya da aramayı temizleyin."
     },
     "all": {
       "title": "Tüm Kampanyalar",
@@ -1063,7 +1084,13 @@
       "allHidden": "Gösterilecek kampanya yok",
       "allHiddenHint": "Ağdaki her kampanya moderatörler tarafından gizlenmiş. Görmek için “Gizlileri göster” seçeneğini açın.",
       "empty": "Henüz kampanya yok",
-      "emptyHint": "Henüz hiçbir kampanya yayımlanmamış. İlk olun."
+      "emptyHint": "Henüz hiçbir kampanya yayımlanmamış. İlk olun.",
+      "heroKicker": "Kampanyalar",
+      "heroHeading": "Her dava,",
+      "heroHeadingLine2": "tek bir yerde.",
+      "heroBody": "Nostr'da yayımlanan her bağış kampanyası tek bir yerde toplandı. Ağın tamamına göz atın, sizin için önemli bir dava bulun ve doğrudan Bitcoin ile destekleyin.",
+      "campaignsCount_one": "ağdaki kampanya",
+      "campaignsCount_other": "ağdaki kampanya"
     }
   },
   "settings": {

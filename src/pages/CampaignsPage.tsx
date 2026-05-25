@@ -12,6 +12,7 @@ import {
   CollapsibleTrigger,
 } from '@/components/ui/collapsible';
 import { CampaignCard, CampaignCardSkeleton } from '@/components/CampaignCard';
+import { DiscoverySearchToolbar } from '@/components/DiscoverySearchToolbar';
 import { HeroLightningMap } from '@/components/HeroLightningMap';
 import { cn } from '@/lib/utils';
 import { useCampaigns } from '@/hooks/useCampaigns';
@@ -19,7 +20,9 @@ import { useCampaignModeration } from '@/hooks/useCampaignModeration';
 import { useCampaignModerators } from '@/hooks/useCampaignModerators';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useAppContext } from '@/hooks/useAppContext';
-import { type ParsedCampaign } from '@/lib/campaign';
+import { useDebounce } from '@/hooks/useDebounce';
+import { useNip50Search, type Nip50Sort } from '@/hooks/useNip50Search';
+import { CAMPAIGN_KIND, parseCampaign, type ParsedCampaign } from '@/lib/campaign';
 
 /** Cap on how many featured campaigns we render in the home-page row. */
 const MAX_FEATURED = 4;
@@ -143,6 +146,50 @@ export function CampaignsPage() {
     );
   }, [isMod, user, moderation, ownCampaigns]);
 
+  // On-page NIP-50 search + sort + show-hidden toolbar state. Empty
+  // input + `new` sort falls back to the curated home layout below;
+  // anything else (typed query, or "Top" sort with an empty input)
+  // swaps the body for a flat results grid restricted to kind 33863.
+  // The search itself is pinned to the Ditto relay group via
+  // `useNip50Search` so non-NIP-50 relays in the user's pool can't
+  // drown out the result set.
+  const [searchInput, setSearchInput] = useState('');
+  const [sortMode, setSortMode] = useState<Nip50Sort>('new');
+  const [showHidden, setShowHidden] = useState(false);
+  const debouncedSearch = useDebounce(searchInput, 300);
+  const trimmedSearch = debouncedSearch.trim();
+  const {
+    data: searchHitsRaw,
+    isFetching: isSearchFetching,
+    isActive: isSearching,
+  } = useNip50Search<ParsedCampaign>({
+    kind: CAMPAIGN_KIND,
+    query: debouncedSearch,
+    sort: sortMode,
+    parse: parseCampaign,
+  });
+
+  // Filter hidden campaigns out of the search results unless the user
+  // explicitly opts in via the Show-hidden switch. Mirrors the
+  // AllCampaignsPage behavior so moderation is consistent across the
+  // two campaign listings. Computed here (not in the hook) so the hook
+  // stays generic for non-campaign kinds.
+  const { searchHits, searchHiddenCount } = useMemo(() => {
+    if (!searchHitsRaw) return { searchHits: undefined, searchHiddenCount: 0 };
+    const hiddenCoords = moderation?.hiddenCoords ?? new Set<string>();
+    let hidden = 0;
+    const visible: ParsedCampaign[] = [];
+    for (const c of searchHitsRaw) {
+      if (hiddenCoords.has(c.aTag)) {
+        hidden += 1;
+        if (showHidden) visible.push(c);
+      } else {
+        visible.push(c);
+      }
+    }
+    return { searchHits: visible, searchHiddenCount: hidden };
+  }, [searchHitsRaw, moderation, showHidden]);
+
   return (
     <main className="min-h-screen pb-16">
       {/* Hero.
@@ -255,6 +302,78 @@ export function CampaignsPage() {
         </div>
       </section>
 
+      {/* Toolbar — search + sort + show-hidden. Sits just below the hero
+          on every discovery page so the affordance is consistent. The
+          query is NIP-50, restricted to this page's kind, and routed at
+          the Ditto relay group. */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 pt-6">
+        <DiscoverySearchToolbar
+          query={searchInput}
+          onQueryChange={setSearchInput}
+          sort={sortMode}
+          onSortChange={setSortMode}
+          searchPlaceholderKey="campaigns.home.searchPlaceholder"
+          searchAriaLabelKey="campaigns.home.searchAriaLabel"
+          showHidden={{
+            value: showHidden,
+            onChange: setShowHidden,
+            count: searchHiddenCount,
+          }}
+        />
+      </div>
+
+      {/* Search results branch — replaces the curated home layout while
+          the toolbar is active (typed query, or Top sort with empty
+          input). Empty + New sort falls through to the existing featured
+          / community / moderator sections below. */}
+      {isSearching ? (
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-10 lg:py-14">
+          <section className="space-y-5">
+            <div className="flex items-end justify-between gap-4">
+              <div>
+                <h2 className="text-2xl sm:text-3xl font-bold tracking-tight">
+                  {trimmedSearch ? t('common.search') : t('common.sortTop')}
+                </h2>
+                {searchHits && (
+                  <p className="text-sm text-muted-foreground mt-1">
+                    {t('common.searchResultsCount', { count: searchHits.length })}
+                  </p>
+                )}
+              </div>
+            </div>
+
+            {isSearchFetching && !searchHits ? (
+              <CampaignGridSkeleton />
+            ) : searchHits && searchHits.length > 0 ? (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+                {searchHits.map((campaign) => (
+                  <CampaignCard key={campaign.aTag} campaign={campaign} />
+                ))}
+              </div>
+            ) : (
+              <Card className="border-dashed">
+                <CardContent className="py-12 px-8 text-center space-y-2">
+                  {trimmedSearch ? (
+                    <>
+                      <p className="text-base font-medium">
+                        {t('campaigns.home.noMatch', { query: trimmedSearch })}
+                      </p>
+                      <p className="text-sm text-muted-foreground">
+                        {t('campaigns.home.noMatchHint')}
+                      </p>
+                    </>
+                  ) : (
+                    <p className="text-sm text-muted-foreground">
+                      {t('campaigns.home.empty')}
+                    </p>
+                  )}
+                </CardContent>
+              </Card>
+            )}
+          </section>
+        </div>
+      ) : (
+
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-10 lg:py-14 space-y-12" id="campaigns">
         {/* Featured — only rendered when at least one campaign is featured
             (or the featured query is still loading on first paint). */}
@@ -365,6 +484,7 @@ export function CampaignsPage() {
           </section>
         )}
       </div>
+      )}
     </main>
   );
 }

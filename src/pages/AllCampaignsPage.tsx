@@ -2,30 +2,36 @@ import { useEffect, useMemo, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { useSeoMeta } from '@unhead/react';
 import { useTranslation } from 'react-i18next';
-import { Clock, EyeOff, HandHeart, PlusCircle, Search, TrendingUp, X } from 'lucide-react';
+import { HandHeart, PlusCircle } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Switch } from '@/components/ui/switch';
-import { Label } from '@/components/ui/label';
 import { CampaignCard, CampaignCardSkeleton } from '@/components/CampaignCard';
+import { DiscoverySearchToolbar } from '@/components/DiscoverySearchToolbar';
+import { HeroAtmosphere } from '@/components/HeroAtmosphere';
+import { HeroBanner } from '@/components/HeroBanner';
 import { useAllCampaigns, type CampaignSort } from '@/hooks/useAllCampaigns';
 import { useCampaignModeration } from '@/hooks/useCampaignModeration';
-import { useDebounce } from '@/hooks/useDebounce';
 import { useAppContext } from '@/hooks/useAppContext';
+import { useDebounce } from '@/hooks/useDebounce';
+import { HOPE_PALETTE } from '@/lib/hopePalette';
 import { cn } from '@/lib/utils';
+import type { Nip50Sort } from '@/hooks/useNip50Search';
 import type { ParsedCampaign } from '@/lib/campaign';
-
-const SORT_OPTIONS: { value: CampaignSort; labelKey: string; icon: typeof TrendingUp }[] = [
-  { value: 'top', labelKey: 'campaigns.all.sortTop', icon: TrendingUp },
-  { value: 'none', labelKey: 'campaigns.all.sortNew', icon: Clock },
-];
 
 /** Type-guard for the `?sort=` URL param. Default is `top` (most-zapped). */
 function parseSort(value: string | null): CampaignSort {
   return value === 'none' ? 'none' : 'top';
 }
+
+/**
+ * Map between the shared toolbar's sort vocabulary (`top` / `new`) and
+ * the `useAllCampaigns` hook's vocabulary (`top` / `none`). The legacy
+ * `none` value is preserved on the URL so existing share links keep
+ * working.
+ */
+const toToolbarSort = (s: CampaignSort): Nip50Sort => (s === 'none' ? 'new' : 'top');
+const toQuerySort = (s: Nip50Sort): CampaignSort => (s === 'new' ? 'none' : 'top');
 
 /**
  * Lists every campaign found on relays. Two sort modes:
@@ -37,19 +43,13 @@ function parseSort(value: string | null): CampaignSort {
  * summary, story, location, and category tags client-side.
  *
  * Hidden campaigns are excluded by default — flip the "Show hidden"
- * toggle to include them. The toggle filters client-side after the
- * campaign list resolves.
+ * toggle (inside the toolbar's filter popover) to include them.
  *
  * URL state: `?sort=none&q=<search>`. Default values are stripped so the
  * canonical URL stays clean. Useful for sharing search results.
  */
 export function AllCampaignsPage() {
   const { t } = useTranslation();
-  // `noMaxWidth: true` drops MainLayout's default `sidebar:max-w-[600px]`
-  // cap so the campaign grid can spread to 3-4 columns on desktop, the
-  // same width budget the Pledge index gets. The inner `max-w-7xl`
-  // wrapper still keeps the content from sprawling on ultrawide
-  // monitors.
   const { config } = useAppContext();
 
   // URL state — sort and query live in the URL so results are shareable.
@@ -86,9 +86,10 @@ export function AllCampaignsPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [urlQuery]);
 
-  const setSort = (value: CampaignSort) => {
+  const setSortFromToolbar = (value: Nip50Sort) => {
     const next = new URLSearchParams(searchParams);
-    if (value === 'none') next.set('sort', 'none');
+    const queryValue = toQuerySort(value);
+    if (queryValue === 'none') next.set('sort', 'none');
     else next.delete('sort');
     setSearchParams(next, { replace: true });
   };
@@ -125,102 +126,32 @@ export function AllCampaignsPage() {
 
   const showSkeleton = isLoading || !moderationReady;
   const activeQuery = debouncedSearch.trim();
+  const totalCampaigns = campaigns?.length ?? 0;
 
   return (
     <main className="min-h-screen pb-16">
+      <AllCampaignsHero campaignCount={totalCampaigns} />
+
+      {/* Toolbar — search + sort + show-hidden. Inline against the page
+          background, narrow shell, with modifiers tucked behind a single
+          filter button on the right (matches the global SearchPage). */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 pt-6">
+        <DiscoverySearchToolbar
+          query={searchInput}
+          onQueryChange={setSearchInput}
+          sort={toToolbarSort(sort)}
+          onSortChange={setSortFromToolbar}
+          searchPlaceholderKey="campaigns.all.searchPlaceholder"
+          searchAriaLabelKey="campaigns.all.searchAriaLabel"
+          showHidden={{
+            value: showHidden,
+            onChange: setShowHidden,
+            count: hiddenCount,
+          }}
+        />
+      </div>
+
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-10 lg:py-14 space-y-8">
-        <header className="space-y-3">
-          <h1 className="text-3xl sm:text-4xl font-bold tracking-tight">{t('campaigns.all.title')}</h1>
-        </header>
-
-        {/* Toolbar */}
-        <div className="space-y-4 rounded-lg border border-border/70 bg-card px-4 py-4">
-          {/* Search input */}
-          <div className="relative">
-            <Search
-              className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground"
-              aria-hidden
-            />
-            <Input
-              type="search"
-              inputMode="search"
-              autoComplete="off"
-              aria-label={t('campaigns.all.searchAriaLabel')}
-              placeholder={t('campaigns.all.searchPlaceholder')}
-              value={searchInput}
-              onChange={(e) => setSearchInput(e.target.value)}
-              className="pl-9 pr-9"
-            />
-            {searchInput && (
-              <button
-                type="button"
-                aria-label={t('campaigns.all.clearSearch')}
-                onClick={() => setSearchInput('')}
-                className="absolute right-2 top-1/2 -translate-y-1/2 inline-flex items-center justify-center size-7 rounded-md text-muted-foreground hover:text-foreground hover:bg-secondary motion-safe:transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
-              >
-                <X className="size-4" />
-              </button>
-            )}
-          </div>
-
-          {/* Controls row */}
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-            <div className="flex flex-wrap items-center gap-3">
-              {/* Sort pills */}
-              <div
-                className="flex gap-1 p-1 rounded-lg bg-secondary/40"
-                role="radiogroup"
-                aria-label={t('campaigns.all.sortAriaLabel')}
-              >
-                {SORT_OPTIONS.map(({ value, labelKey, icon: Icon }) => (
-                  <button
-                    key={value}
-                    type="button"
-                    role="radio"
-                    aria-checked={sort === value}
-                    onClick={() => setSort(value)}
-                    className={cn(
-                      'inline-flex items-center gap-1 px-2.5 py-1 text-xs font-medium rounded-md motion-safe:transition-colors',
-                      sort === value
-                        ? 'bg-background text-foreground shadow-sm'
-                        : 'text-muted-foreground hover:text-foreground',
-                    )}
-                  >
-                    <Icon className="size-3" />
-                    {t(labelKey)}
-                  </button>
-                ))}
-              </div>
-
-              {/* Show-hidden switch */}
-              <div className="flex items-center gap-2">
-                <Switch
-                  id="show-hidden"
-                  checked={showHidden}
-                  onCheckedChange={setShowHidden}
-                />
-                <Label
-                  htmlFor="show-hidden"
-                  className="text-sm font-medium cursor-pointer inline-flex items-center gap-1.5"
-                >
-                  <EyeOff className="size-4 text-muted-foreground" aria-hidden />
-                  {t('campaigns.all.showHidden')}
-                  {hiddenCount > 0 && (
-                    <span className="text-muted-foreground font-normal">({hiddenCount})</span>
-                  )}
-                </Label>
-              </div>
-            </div>
-
-            <Button asChild variant="outline" size="sm">
-              <Link to="/campaigns/new">
-                <PlusCircle className="size-4 mr-2" />
-                {t('campaigns.all.startCampaign')}
-              </Link>
-            </Button>
-          </div>
-        </div>
-
         {/* Grid — widens to 3 columns at lg and 4 at xl so desktop users
             can scan more campaigns at once, matching the Pledge index's
             card density. Mobile and small tablets stay single / double
@@ -282,3 +213,112 @@ export function AllCampaignsPage() {
 }
 
 export default AllCampaignsPage;
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// Hero
+// ═══════════════════════════════════════════════════════════════════════════════
+
+interface AllCampaignsHeroProps {
+  /** Total campaigns currently loaded — fuels the live stat pill. */
+  campaignCount: number;
+}
+
+/**
+ * Photo-led hero for the All-Campaigns page. Mirrors the Pledges /
+ * Communities hero recipe (rotating banner + atmospheric tint + scrims
+ * + overlay copy + glassy CTA) so the three discovery pages share the
+ * same visual shape. The campaign home (`/campaigns`) keeps its bespoke
+ * lightning-map hero as the brand-leading entry point; this surface
+ * gets the photo-led treatment because it's the actual browseable index.
+ */
+function AllCampaignsHero({ campaignCount }: AllCampaignsHeroProps) {
+  const { t } = useTranslation();
+  // Cycle through warm hues on the same cadence as the banner so the
+  // whole hero feels like one coordinated moment instead of two
+  // unrelated rotations.
+  const [hueIndex, setHueIndex] = useState(0);
+  useEffect(() => {
+    const id = window.setInterval(() => {
+      setHueIndex((i) => (i + 1) % HOPE_PALETTE.length);
+    }, 9_000);
+    return () => window.clearInterval(id);
+  }, []);
+  const activeHue = HOPE_PALETTE[hueIndex];
+
+  return (
+    <section className="relative overflow-hidden border-b border-border bg-secondary/30">
+      {/* Rotating photo banner — uses the default WLC photo set so this
+          page matches the Communities hero's photographic vocabulary. */}
+      <HeroBanner />
+
+      {/* Warm atmosphere — campaigns-side hue, same as the Pledges hero. */}
+      <HeroAtmosphere hue={activeHue} />
+
+      {/* Top scrim so the headline stays legible across every photo. */}
+      <div
+        className="absolute inset-x-0 top-0 h-64 sm:h-80 pointer-events-none bg-gradient-to-b from-black/70 via-black/40 to-transparent"
+        aria-hidden="true"
+      />
+
+      {/* Bottom scrim so the stat pill + CTA stay legible. */}
+      <div
+        className="absolute inset-x-0 bottom-0 h-56 sm:h-72 pointer-events-none bg-gradient-to-t from-black/70 via-black/35 to-transparent"
+        aria-hidden="true"
+      />
+
+      <div className="relative max-w-5xl mx-auto px-4 sm:px-6 py-10 sm:py-12 lg:py-14 min-h-[380px] sm:min-h-[420px] lg:min-h-[460px] flex flex-col items-center text-center">
+        <div className="relative space-y-3 max-w-3xl">
+          <p className="text-xs sm:text-sm font-semibold uppercase tracking-[0.18em] text-white/85 drop-shadow">
+            {t('campaigns.all.heroKicker')}
+          </p>
+          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight leading-[1.05] text-white drop-shadow-[0_2px_12px_rgb(0_0_0/0.55)]">
+            {t('campaigns.all.heroHeading')}
+            <br className="sm:hidden" /> {t('campaigns.all.heroHeadingLine2')}
+          </h1>
+          <p className="text-base sm:text-lg text-white/85 max-w-2xl mx-auto drop-shadow-[0_1px_6px_rgb(0_0_0/0.5)]">
+            {t('campaigns.all.heroBody')}
+          </p>
+        </div>
+
+        <div className="flex-1 min-h-[100px] sm:min-h-[120px]" aria-hidden="true" />
+
+        {/* Live stat pill — campaigns-on-network count. */}
+        <div
+          className="relative w-full max-w-md mx-auto rounded-full bg-black/30 backdrop-blur-xl backdrop-saturate-150 border border-white/20 px-5 py-3 shadow-lg shadow-amber-500/10"
+          aria-live="polite"
+        >
+          <div className="flex items-center justify-center gap-3">
+            <HandHeart className="size-5 text-amber-200 shrink-0 drop-shadow" aria-hidden />
+            <span className="text-sm sm:text-base font-semibold tracking-tight text-white drop-shadow-[0_1px_4px_rgb(0_0_0/0.5)]">
+              {campaignCount.toLocaleString()}
+            </span>
+            <span className="text-xs sm:text-sm text-white/85 line-clamp-1 drop-shadow-[0_1px_4px_rgb(0_0_0/0.5)]">
+              {t('campaigns.all.campaignsCount', { count: campaignCount })}
+            </span>
+          </div>
+        </div>
+
+        <div className="mt-5 flex flex-wrap items-center justify-center gap-3">
+          <Button
+            asChild
+            size="lg"
+            className={cn(
+              'relative rounded-full text-white font-semibold text-base h-12 px-7 [&_svg]:size-[18px]',
+              'bg-gradient-to-br from-white/14 via-amber-100/10 to-rose-100/10 hover:from-white/20 hover:via-amber-100/14 hover:to-rose-100/14',
+              'backdrop-blur-xl backdrop-saturate-150',
+              'border border-white/25 hover:border-white/35',
+              'shadow-[inset_0_0_0_1px_rgb(255_255_255/0.08),0_10px_28px_-12px_hsl(24_85%_45%/0.4)]',
+              'hover:shadow-[inset_0_0_0_1px_rgb(255_255_255/0.12),0_12px_32px_-10px_hsl(24_85%_45%/0.5)]',
+              'motion-safe:transition-colors motion-safe:duration-200',
+            )}
+          >
+            <Link to="/campaigns/new">
+              <PlusCircle className="mr-2" />
+              {t('campaigns.all.startCampaign')}
+            </Link>
+          </Button>
+        </div>
+      </div>
+    </section>
+  );
+}

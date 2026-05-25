@@ -18,21 +18,24 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { CommunityGrid } from '@/components/discovery/CommunityGrid';
 import { CommunityMiniCard, CommunityMiniCardSkeleton } from '@/components/discovery/CommunityMiniCard';
 import { SectionHeader } from '@/components/discovery/SectionHeader';
+import { DiscoverySearchToolbar } from '@/components/DiscoverySearchToolbar';
 import { COOL_PALETTE } from '@/lib/hopePalette';
 import { cn } from '@/lib/utils';
 import { useAppContext } from '@/hooks/useAppContext';
 import { useCampaignModerators } from '@/hooks/useCampaignModerators';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
+import { useDebounce } from '@/hooks/useDebounce';
 import { useDiscoverCommunities } from '@/hooks/useDiscoverCommunities';
 import { useFeaturedOrganizations } from '@/hooks/useFeaturedOrganizations';
 import { useGlobalActivity } from '@/hooks/useGlobalActivity';
 import { useGlobalDonations } from '@/hooks/useGlobalDonations';
+import { useNip50Search, type Nip50Sort } from '@/hooks/useNip50Search';
 import { useOrganizationModeration } from '@/hooks/useOrganizationModeration';
 import { useToast } from '@/hooks/useToast';
 import { useUserOrganizations } from '@/hooks/useUserOrganizations';
 import { hasAgoraTag } from '@/lib/agoraNoteTags';
 import { formatSatsShort } from '@/lib/formatCampaignAmount';
-import type { ParsedCommunity } from '@/lib/communityUtils';
+import { COMMUNITY_DEFINITION_KIND, parseCommunityEvent, type ParsedCommunity } from '@/lib/communityUtils';
 
 // ─── Page ──────────────────────────────────────────────────────────────────────
 
@@ -71,35 +74,153 @@ export function CommunitiesPage() {
     navigate('/groups/new');
   };
 
+  // On-page NIP-50 search + sort + show-hidden toolbar state.
+  // (kind 34550 community definitions.) Empty input + `new` sort
+  // falls back to the curated "My groups" / "Featured groups" /
+  // moderator shelves below; anything else swaps the body for a flat
+  // results grid pinned to the Ditto relay group.
+  const [searchInput, setSearchInput] = useState('');
+  const [sortMode, setSortMode] = useState<Nip50Sort>('new');
+  const [showHidden, setShowHidden] = useState(false);
+  const debouncedSearch = useDebounce(searchInput, 300);
+  const trimmedSearch = debouncedSearch.trim();
+  const {
+    data: searchHitsRaw,
+    isFetching: isSearchFetching,
+    isActive: isSearching,
+  } = useNip50Search<ParsedCommunity>({
+    kind: COMMUNITY_DEFINITION_KIND,
+    query: debouncedSearch,
+    sort: sortMode,
+    parse: parseCommunityEvent,
+  });
+
+  // Lift org moderation to the page so search results can drop hidden
+  // groups (or include them when the Show-hidden switch is on). The
+  // ModeratorReviewSections subtree below still calls its own copy of
+  // the hook — query results are cached, so the second call is free.
+  const { data: orgModeration } = useOrganizationModeration();
+  const { searchHits, searchHiddenCount } = useMemo(() => {
+    if (!searchHitsRaw) return { searchHits: undefined, searchHiddenCount: 0 };
+    const hiddenCoords = orgModeration?.hiddenCoords ?? new Set<string>();
+    let hidden = 0;
+    const visible: ParsedCommunity[] = [];
+    for (const c of searchHitsRaw) {
+      if (hiddenCoords.has(c.aTag)) {
+        hidden += 1;
+        if (showHidden) visible.push(c);
+      } else {
+        visible.push(c);
+      }
+    }
+    return { searchHits: visible, searchHiddenCount: hidden };
+  }, [searchHitsRaw, orgModeration, showHidden]);
+
   return (
     <main className="min-h-screen pb-16 sidebar:pb-0">
       <CommunitiesHero onCreateCommunity={handleCreateCommunity} />
 
-      <div className="max-w-7xl mx-auto space-y-2 sm:space-y-4 pb-8">
-        <section className="pt-6">
-          <SectionHeader title={t('groups.list.myGroups')} className="pb-3 sm:px-6" />
-          <MyCommunitiesShelf
-            userOrganizations={userOrganizations}
-            onCreateCommunity={handleCreateCommunity}
-          />
-        </section>
-
-        <section className="pt-4 pb-8">
-          <SectionHeader
-            title={t('groups.list.featuredGroups')}
-            className="pb-3 sm:px-6"
-          />
-          <FeaturedOrganizationsShelf />
-        </section>
-
-        {/* Moderator-only review sections: "Needs review" and "Hidden".
-            Organizations have a two-axis moderation model (featured /
-            hidden — no approval gate), so anything not yet labelled
-            simply lives in the public Featured-or-not space. The Needs
-            review queue surfaces unlabelled Agora-tagged orgs so
-            moderators can pick what to feature or hide. */}
-        {isMod && <ModeratorReviewSections />}
+      {/* Toolbar — search + sort + show-hidden. Sits just below the hero
+          on every discovery page so the affordance is consistent. The
+          query is NIP-50, restricted to kind 34550, and routed at the
+          Ditto relay group. */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 pt-6">
+        <DiscoverySearchToolbar
+          query={searchInput}
+          onQueryChange={setSearchInput}
+          sort={sortMode}
+          onSortChange={setSortMode}
+          searchPlaceholderKey="groups.list.searchPlaceholder"
+          searchAriaLabelKey="groups.list.searchAriaLabel"
+          showHidden={{
+            value: showHidden,
+            onChange: setShowHidden,
+            count: searchHiddenCount,
+          }}
+        />
       </div>
+
+      {isSearching ? (
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-10">
+          <section className="space-y-5">
+            <div className="flex items-end justify-between gap-4">
+              <div>
+                <h2 className="text-2xl sm:text-3xl font-bold tracking-tight">
+                  {trimmedSearch ? t('common.search') : t('common.sortTop')}
+                </h2>
+                {searchHits && (
+                  <p className="text-sm text-muted-foreground mt-1">
+                    {t('common.searchResultsCount', { count: searchHits.length })}
+                  </p>
+                )}
+              </div>
+            </div>
+
+            {isSearchFetching && !searchHits ? (
+              <CommunityGrid className="px-0">
+                {Array.from({ length: 8 }).map((_, i) => (
+                  <CommunityMiniCardSkeleton key={i} className="w-full" />
+                ))}
+              </CommunityGrid>
+            ) : searchHits && searchHits.length > 0 ? (
+              <CommunityGrid className="px-0">
+                {searchHits.map((community) => (
+                  <CommunityMiniCard
+                    key={community.aTag}
+                    community={community}
+                    className="w-full"
+                  />
+                ))}
+              </CommunityGrid>
+            ) : (
+              <Card className="border-dashed">
+                <CardContent className="py-12 px-8 text-center space-y-2">
+                  {trimmedSearch ? (
+                    <>
+                      <p className="text-base font-medium">
+                        {t('groups.list.noMatch', { query: trimmedSearch })}
+                      </p>
+                      <p className="text-sm text-muted-foreground">
+                        {t('groups.list.noMatchHint')}
+                      </p>
+                    </>
+                  ) : (
+                    <p className="text-sm text-muted-foreground">
+                      {t('groups.list.noFeaturedBody', { appName: config.appName })}
+                    </p>
+                  )}
+                </CardContent>
+              </Card>
+            )}
+          </section>
+        </div>
+      ) : (
+        <div className="max-w-7xl mx-auto space-y-2 sm:space-y-4 pb-8 pt-2">
+          <section className="pt-6">
+            <SectionHeader title={t('groups.list.myGroups')} className="pb-3 sm:px-6" />
+            <MyCommunitiesShelf
+              userOrganizations={userOrganizations}
+              onCreateCommunity={handleCreateCommunity}
+            />
+          </section>
+
+          <section className="pt-4 pb-8">
+            <SectionHeader
+              title={t('groups.list.featuredGroups')}
+              className="pb-3 sm:px-6"
+            />
+            <FeaturedOrganizationsShelf />
+          </section>
+
+          {/* Moderator-only review sections: "Needs review" and "Hidden".
+              Organizations have a two-axis moderation model (featured /
+              hidden — no approval gate), so anything not yet labelled
+              simply lives in the public Featured-or-not space. The Needs
+              review queue surfaces unlabelled Agora-tagged orgs so
+              moderators can pick what to feature or hide. */}
+          {isMod && <ModeratorReviewSections />}
+        </div>
+      )}
     </main>
   );
 }

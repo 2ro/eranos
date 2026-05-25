@@ -23,7 +23,16 @@
     "readMore": "और पढ़ें",
     "byAuthor": "<0>{{name}}</0> द्वारा",
     "donors_one": "{{count}} दानदाता",
-    "donors_other": "{{count}} दानदाता"
+    "donors_other": "{{count}} दानदाता",
+    "clearSearch": "खोज साफ़ करें",
+    "searching": "खोज हो रही है…",
+    "searchResultsCount_one": "{{count}} परिणाम",
+    "searchResultsCount_other": "{{count}} परिणाम",
+    "sortAriaLabel": "क्रम",
+    "sortTop": "टॉप",
+    "sortNew": "नए",
+    "showHidden": "छुपे हुए दिखाएँ",
+    "filtersAriaLabel": "खोज फ़िल्टर"
   },
   "translate": {
     "translate": "अनुवाद करें",
@@ -592,7 +601,11 @@
       "showMore": "और दिखाएँ ({{count}} और)",
       "emptyTitle": "अभी कोई प्लेज नहीं",
       "emptyHint": "प्लेज बनाने वाले पहले व्यक्ति बनें।",
-      "emptyHintCountry": "{{country}} के लिए प्लेज बनाने वाले पहले व्यक्ति बनें।"
+      "emptyHintCountry": "{{country}} के लिए प्लेज बनाने वाले पहले व्यक्ति बनें।",
+      "searchPlaceholder": "प्लेज खोजें…",
+      "searchAriaLabel": "प्लेज खोजें",
+      "noMatch": "“{{query}}” से मेल खाने वाला कोई प्लेज नहीं",
+      "noMatchHint": "अलग खोज शब्द आज़माएँ, या खोज साफ़ करें।"
     },
     "card": {
       "ended": "समाप्त",
@@ -712,7 +725,11 @@
       "tickerFeaturedGroups_one": "Nostr पर फ़ीचर्ड ग्रुप",
       "tickerFeaturedGroups_other": "Nostr पर फ़ीचर्ड ग्रुप",
       "tickerCountries_one": "देश आज पोस्ट कर रहा है",
-      "tickerCountries_other": "देश आज पोस्ट कर रहे हैं"
+      "tickerCountries_other": "देश आज पोस्ट कर रहे हैं",
+      "searchPlaceholder": "ग्रुप खोजें…",
+      "searchAriaLabel": "ग्रुप खोजें",
+      "noMatch": "“{{query}}” से मेल खाने वाला कोई ग्रुप नहीं",
+      "noMatchHint": "अलग खोज शब्द आज़माएँ, या खोज साफ़ करें।"
     },
     "create": {
       "seoTitleCreate": "ग्रुप बनाएँ",
@@ -1035,12 +1052,22 @@
       "yourCampaigns": "आपके कैंपेन",
       "yourCampaignsDesc": "आपके कैंपेन Nostr पर लाइव हैं और डोनेशन कैंपेन लिंक से काम करते हैं। ये होमपेज पर तब दिखेंगे जब Team Soapbox का कोई मॉडरेटर इन्हें मंज़ूरी देगा।",
       "empty": "अभी कोई कैंपेन नहीं",
-      "emptyHint": "{{appName}} पर फंडरेज़र शुरू करने वाले पहले बनें। अपनी कहानी बताएँ, लाभार्थी चुनें, और लिंक शेयर करें।"
+      "emptyHint": "{{appName}} पर फंडरेज़र शुरू करने वाले पहले बनें। अपनी कहानी बताएँ, लाभार्थी चुनें, और लिंक शेयर करें।",
+      "searchPlaceholder": "कैंपेन खोजें…",
+      "searchAriaLabel": "कैंपेन खोजें",
+      "noMatch": "“{{query}}” से मेल खाने वाला कोई कैंपेन नहीं",
+      "noMatchHint": "अलग खोज शब्द आज़माएँ, या खोज साफ़ करें।"
     },
     "all": {
       "title": "सभी कैंपेन",
       "seoTitle": "सभी कैंपेन",
       "description": "Agora पर पब्लिश हुए हर कैंपेन को देखें।",
+      "heroKicker": "कैंपेन",
+      "heroHeading": "हर मक़सद,",
+      "heroHeadingLine2": "एक ही जगह।",
+      "heroBody": "Nostr पर पब्लिश हुआ हर फंडरेज़र, एक ही जगह जुटा हुआ। पूरे नेटवर्क को देखें, अपने लिए ज़रूरी मक़सद ढूँढें, और सीधे Bitcoin से उसका साथ दें।",
+      "campaignsCount_one": "कैंपेन नेटवर्क पर",
+      "campaignsCount_other": "कैंपेन नेटवर्क पर",
       "searchAriaLabel": "कैंपेन खोजें",
       "searchPlaceholder": "कैंपेन खोजें…",
       "clearSearch": "खोज साफ़ करें",

@@ -23,7 +23,16 @@
     "readMore": "بیشتر بخوانید",
     "byAuthor": "توسط <0>{{name}}</0>",
     "donors_one": "{{count}} اهداکننده",
-    "donors_other": "{{count}} اهداکننده"
+    "donors_other": "{{count}} اهداکننده",
+    "clearSearch": "پاک کردن جستجو",
+    "searching": "در حال جستجو…",
+    "searchResultsCount_one": "{{count}} نتیجه",
+    "searchResultsCount_other": "{{count}} نتیجه",
+    "sortAriaLabel": "ترتیب",
+    "sortTop": "برتر",
+    "sortNew": "جدید",
+    "showHidden": "نمایش پنهان‌شده‌ها",
+    "filtersAriaLabel": "فیلترهای جستجو"
   },
   "translate": {
     "translate": "ترجمه",
@@ -169,7 +178,11 @@
       "showMore": "نمایش بیشتر ({{count}} مورد دیگر)",
       "emptyTitle": "هنوز تعهدی نیست",
       "emptyHint": "اولین کسی باش که تعهد می‌سازد.",
-      "emptyHintCountry": "اولین کسی باش که برای {{country}} تعهدی می‌سازد."
+      "emptyHintCountry": "اولین کسی باش که برای {{country}} تعهدی می‌سازد.",
+      "searchPlaceholder": "جستجوی تعهدها…",
+      "searchAriaLabel": "جستجوی تعهدها",
+      "noMatch": "هیچ تعهدی با «{{query}}» مطابقت ندارد",
+      "noMatchHint": "عبارت جستجوی دیگری را امتحان کنید، یا جستجو را پاک کنید."
     },
     "card": {
       "ended": "پایان‌یافته",
@@ -289,7 +302,11 @@
       "tickerFeaturedGroups_one": "گروه ویژه در Nostr",
       "tickerFeaturedGroups_other": "گروه ویژه در Nostr",
       "tickerCountries_one": "کشور امروز در حال انتشار",
-      "tickerCountries_other": "کشور امروز در حال انتشار"
+      "tickerCountries_other": "کشور امروز در حال انتشار",
+      "searchPlaceholder": "جستجوی گروه‌ها…",
+      "searchAriaLabel": "جستجوی گروه‌ها",
+      "noMatch": "هیچ گروهی با «{{query}}» مطابقت ندارد",
+      "noMatchHint": "عبارت جستجوی دیگری را امتحان کنید، یا جستجو را پاک کنید."
     },
     "create": {
       "seoTitleCreate": "ساخت گروه",
@@ -612,12 +629,22 @@
       "yourCampaigns": "کمپین‌های شما",
       "yourCampaignsDesc": "کمپین‌های شما در Nostr فعال هستند و کمک‌های مالی از طریق لینک کار می‌کنند. به محض تأیید توسط یک ناظر تیم Soapbox، در صفحه اصلی ظاهر می‌شوند.",
       "empty": "هنوز کمپینی وجود ندارد",
-      "emptyHint": "اولین نفری باشید که در {{appName}} کمپین راه‌اندازی می‌کند. داستان خود را بگویید، ذی‌نفعان را انتخاب کنید، و لینک را به اشتراک بگذارید."
+      "emptyHint": "اولین نفری باشید که در {{appName}} کمپین راه‌اندازی می‌کند. داستان خود را بگویید، ذی‌نفعان را انتخاب کنید، و لینک را به اشتراک بگذارید.",
+      "searchPlaceholder": "جستجوی کمپین‌ها…",
+      "searchAriaLabel": "جستجوی کمپین‌ها",
+      "noMatch": "هیچ کمپینی با «{{query}}» مطابقت ندارد",
+      "noMatchHint": "عبارت جستجوی دیگری را امتحان کنید، یا جستجو را پاک کنید."
     },
     "all": {
       "title": "همه کمپین‌ها",
       "seoTitle": "همه کمپین‌ها",
       "description": "همه کمپین‌های منتشرشده در Agora را مرور کنید.",
+      "heroKicker": "کمپین‌ها",
+      "heroHeading": "هر هدف،",
+      "heroHeadingLine2": "در یک جا.",
+      "heroBody": "هر کمپین جذب کمک مالی که روی Nostr منتشر شده، گرد هم در یک جا. کل شبکه را مرور کنید، هدفی را که برایتان مهم است پیدا کنید و مستقیماً با بیت‌کوین از آن حمایت کنید.",
+      "campaignsCount_one": "کمپین در شبکه",
+      "campaignsCount_other": "کمپین در شبکه",
       "searchAriaLabel": "جستجوی کمپین‌ها",
       "searchPlaceholder": "جستجوی کمپین‌ها…",
       "clearSearch": "پاک کردن جستجو",

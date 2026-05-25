@@ -5,10 +5,12 @@ import { useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { nip19 } from 'nostr-tools';
 
-import { useActions, type Action } from '@/hooks/useActions';
+import { parseAction, useActions, type Action } from '@/hooks/useActions';
 import { useAppContext } from '@/hooks/useAppContext';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useBtcPrice } from '@/hooks/useBtcPrice';
+import { useDebounce } from '@/hooks/useDebounce';
+import { useNip50Search, type Nip50Sort } from '@/hooks/useNip50Search';
 import { useNostrPublish } from '@/hooks/useNostrPublish';
 import { useShareOrigin } from '@/hooks/useShareOrigin';
 import { useToast } from '@/hooks/useToast';
@@ -16,6 +18,7 @@ import { getAllCountries, getGeoDisplayName, countryCodeToFlag } from '@/lib/cou
 import { DEFAULT_ACTION_COVERS } from '@/lib/defaultActionCovers';
 import { HOPE_PALETTE } from '@/lib/hopePalette';
 import { cn } from '@/lib/utils';
+import { DiscoverySearchToolbar } from '@/components/DiscoverySearchToolbar';
 import { HeroAtmosphere } from '@/components/HeroAtmosphere';
 import { HeroBanner } from '@/components/HeroBanner';
 import { PledgeCard } from '@/components/PledgeCard';
@@ -195,6 +198,32 @@ export default function ActionsPage() {
   const [sortBy, setSortBy] = useState<SortOption>('recent');
   const [headerCountryPickerOpen, setHeaderCountryPickerOpen] = useState(false);
 
+  // On-page NIP-50 search + sort toolbar state (kind 36639 pledges).
+  // Empty input + `new` sort falls back to the curated active /
+  // upcoming / past sections below; anything else (typed query, or
+  // Top sort with empty input) swaps the body for a flat results grid
+  // pinned to the Ditto relay group. Search ignores the active country
+  // filter so users can find pledges anywhere by name even after
+  // picking a country.
+  //
+  // No Show-hidden switch here yet — pledges don't have a hidden-axis
+  // moderation layer like campaigns and groups do. Adding one is
+  // tracked as a follow-up.
+  const [searchInput, setSearchInput] = useState('');
+  const [sortMode, setSortMode] = useState<Nip50Sort>('new');
+  const debouncedSearch = useDebounce(searchInput, 300);
+  const trimmedSearch = debouncedSearch.trim();
+  const {
+    data: searchHits,
+    isFetching: isSearchFetching,
+    isActive: isSearching,
+  } = useNip50Search<Action>({
+    kind: 36639,
+    query: debouncedSearch,
+    sort: sortMode,
+    parse: parseAction,
+  });
+
   const { data: actions, isLoading: actionsLoading } = useActions({
     countryCode: selectedCountry,
     limit: 300,
@@ -370,6 +399,82 @@ export default function ActionsPage() {
         onCreateAction={() => navigate(createActionHref)}
       />
 
+      {/* Toolbar — search + sort. Sits just below the hero on every
+          discovery page so the affordance is consistent. The query is
+          NIP-50, restricted to kind 36639, and routed at the Ditto
+          relay group. No Show-hidden switch yet (pledges lack a hidden
+          moderation axis). */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 pt-6">
+        <DiscoverySearchToolbar
+          query={searchInput}
+          onQueryChange={setSearchInput}
+          sort={sortMode}
+          onSortChange={setSortMode}
+          searchPlaceholderKey="pledges.list.searchPlaceholder"
+          searchAriaLabelKey="pledges.list.searchAriaLabel"
+        />
+      </div>
+
+      {isSearching ? (
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-10 lg:py-14">
+          <section className="space-y-5">
+            <div className="flex items-end justify-between gap-4">
+              <div>
+                <h2 className="text-2xl sm:text-3xl font-bold tracking-tight">
+                  {trimmedSearch ? t('common.search') : t('common.sortTop')}
+                </h2>
+                {searchHits && (
+                  <p className="text-sm text-muted-foreground mt-1">
+                    {t('common.searchResultsCount', { count: searchHits.length })}
+                  </p>
+                )}
+              </div>
+            </div>
+
+            {isSearchFetching && !searchHits ? (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+                {Array.from({ length: 8 }).map((_, i) => <ActionSkeleton key={i} />)}
+              </div>
+            ) : searchHits && searchHits.length > 0 ? (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+                {searchHits.map((action) => (
+                  <PledgeCard
+                    key={`${action.pubkey}:${action.id}`}
+                    action={action}
+                    isExpired={
+                      action.deadline ? action.deadline <= Date.now() / 1000 : false
+                    }
+                    btcPrice={btcPrice}
+                    showAuthor
+                    showTranslate
+                    topRight={<ActionShareMenu action={action} />}
+                  />
+                ))}
+              </div>
+            ) : (
+              <Card className="border-dashed">
+                <div className="py-12 px-8 text-center space-y-2">
+                  {trimmedSearch ? (
+                    <>
+                      <p className="text-base font-medium">
+                        {t('pledges.list.noMatch', { query: trimmedSearch })}
+                      </p>
+                      <p className="text-sm text-muted-foreground">
+                        {t('pledges.list.noMatchHint')}
+                      </p>
+                    </>
+                  ) : (
+                    <p className="text-sm text-muted-foreground">
+                      {t('pledges.list.emptyTitle')}
+                    </p>
+                  )}
+                </div>
+              </Card>
+            )}
+          </section>
+        </div>
+      ) : (
+
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-10 lg:py-14 space-y-12">
         {isLoading ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
@@ -481,6 +586,7 @@ export default function ActionsPage() {
           </>
         )}
       </div>
+      )}
     </main>
   );
 }

@@ -23,7 +23,16 @@
     "readMore": "Verenga zvimwe",
     "byAuthor": "na <0>{{name}}</0>",
     "donors_one": "mupi {{count}}",
-    "donors_other": "vapi {{count}}"
+    "donors_other": "vapi {{count}}",
+    "clearSearch": "Bvisa kutsvaga",
+    "searching": "Kutsvaga…",
+    "searchResultsCount_one": "{{count}} chakawanikwa",
+    "searchResultsCount_other": "{{count}} zvakawanikwa",
+    "sortAriaLabel": "Hurongwa hwekuronga",
+    "sortTop": "Yepamusoro",
+    "sortNew": "Itsva",
+    "showHidden": "Ratidza zvakavanzwa",
+    "filtersAriaLabel": "Masefa ekutsvaga"
   },
   "translate": {
     "translate": "Dudzira",
@@ -169,7 +178,11 @@
       "showMore": "Ratidza zvimwe ({{count}} zvimwe)",
       "emptyTitle": "Hapana zvitsidziro parizvino",
       "emptyHint": "Iva wekutanga kugadzira chitsidziro.",
-      "emptyHintCountry": "Iva wekutanga kugadzira chitsidziro che{{country}}."
+      "emptyHintCountry": "Iva wekutanga kugadzira chitsidziro che{{country}}.",
+      "searchPlaceholder": "Tsvaga zvitsidziro…",
+      "searchAriaLabel": "Tsvaga zvitsidziro",
+      "noMatch": "Hapana chitsidziro chinoenderana ne«{{query}}»",
+      "noMatchHint": "Edza chimwe chinotsvagwa, kana ubvise kutsvaga."
     },
     "card": {
       "ended": "Zvapera",
@@ -289,7 +302,11 @@
       "tickerFeaturedGroups_one": "boka rinokurumbira paNostr",
       "tickerFeaturedGroups_other": "mapoka anokurumbira paNostr",
       "tickerCountries_one": "nyika iri kuburitsa nhasi",
-      "tickerCountries_other": "nyika dziri kuburitsa nhasi"
+      "tickerCountries_other": "nyika dziri kuburitsa nhasi",
+      "searchPlaceholder": "Tsvaga mapoka…",
+      "searchAriaLabel": "Tsvaga mapoka",
+      "noMatch": "Hapana boka rinoenderana ne«{{query}}»",
+      "noMatchHint": "Edza chimwe chinotsvagwa, kana ubvise kutsvaga."
     },
     "create": {
       "seoTitleCreate": "Gadzira boka",
@@ -612,12 +629,22 @@
       "yourCampaigns": "Mishandirapamwe yako",
       "yourCampaignsDesc": "Mishandirapamwe yako iri panetwork yeNostr uye mipiro inoshanda kuburikidza nemurawu wemushandirapamwe. Inoonekwa papeji rekutanga kana muoni weTeam Soapbox aitenderera.",
       "empty": "Hapana mishandirapamwe parizvino",
-      "emptyHint": "Iva wekutanga kutanga kuunganidza mari pa{{appName}}. Taura nyaya yako, sarudza vanobatsirwa, uchipa rwumwe rwekugovera."
+      "emptyHint": "Iva wekutanga kutanga kuunganidza mari pa{{appName}}. Taura nyaya yako, sarudza vanobatsirwa, uchipa rwumwe rwekugovera.",
+      "searchPlaceholder": "Tsvaga mishandirapamwe…",
+      "searchAriaLabel": "Tsvaga mishandirapamwe",
+      "noMatch": "Hapana mushandirapamwe unoenderana ne«{{query}}»",
+      "noMatchHint": "Edza chimwe chinotsvagwa, kana ubvise kutsvaga."
     },
     "all": {
       "title": "Mishandirapamwe Yose",
       "seoTitle": "Mishandirapamwe yose",
       "description": "Tarisa mishandirapamwe yose yakaiswa paAgora.",
+      "heroKicker": "Mishandirapamwe",
+      "heroHeading": "Chinangwa chimwe nechimwe,",
+      "heroHeadingLine2": "panzvimbo imwe chete.",
+      "heroBody": "Mishandirapamwe yose yakaburitswa paNostr, yakaunganidzwa panzvimbo imwe chete. Tarisa network yose, wana chinangwa chinokukosha, uye uchitsigire wakananga neBitcoin.",
+      "campaignsCount_one": "mushandirapamwe panetwork",
+      "campaignsCount_other": "mishandirapamwe panetwork",
       "searchAriaLabel": "Tsvaga mishandirapamwe",
       "searchPlaceholder": "Tsvaga mishandirapamwe…",
       "clearSearch": "Bvisa kutsvaga",

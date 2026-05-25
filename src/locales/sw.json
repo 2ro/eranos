@@ -23,7 +23,16 @@
     "readMore": "Soma zaidi",
     "byAuthor": "na <0>{{name}}</0>",
     "donors_one": "mfadhili {{count}}",
-    "donors_other": "wafadhili {{count}}"
+    "donors_other": "wafadhili {{count}}",
+    "clearSearch": "Futa utafutaji",
+    "searching": "Inatafuta\u2026",
+    "searchResultsCount_one": "tokeo {{count}}",
+    "searchResultsCount_other": "matokeo {{count}}",
+    "sortAriaLabel": "Mpangilio wa kupanga",
+    "sortTop": "Juu",
+    "sortNew": "Mpya",
+    "showHidden": "Onyesha zilizofichwa",
+    "filtersAriaLabel": "Vichujio vya utafutaji"
   },
   "translate": {
     "translate": "Tafsiri",
@@ -600,7 +609,11 @@
       "showMore": "Onyesha zaidi ({{count}} zaidi)",
       "emptyTitle": "Hakuna ahadi bado",
       "emptyHint": "Kuwa wa kwanza kuunda ahadi.",
-      "emptyHintCountry": "Kuwa wa kwanza kuunda ahadi kwa {{country}}."
+      "emptyHintCountry": "Kuwa wa kwanza kuunda ahadi kwa {{country}}.",
+      "searchPlaceholder": "Tafuta ahadi\u2026",
+      "searchAriaLabel": "Tafuta ahadi",
+      "noMatch": "Hakuna ahadi zinazolingana na \u201c{{query}}\u201d",
+      "noMatchHint": "Jaribu neno tofauti la utafutaji, au futa utafutaji."
     },
     "card": {
       "ended": "Imeisha",
@@ -720,7 +733,11 @@
       "tickerFeaturedGroups_one": "kikundi maarufu kwenye Nostr",
       "tickerFeaturedGroups_other": "vikundi maarufu kwenye Nostr",
       "tickerCountries_one": "nchi inayochapisha leo",
-      "tickerCountries_other": "nchi zinazochapisha leo"
+      "tickerCountries_other": "nchi zinazochapisha leo",
+      "searchPlaceholder": "Tafuta vikundi\u2026",
+      "searchAriaLabel": "Tafuta vikundi",
+      "noMatch": "Hakuna vikundi vinavyolingana na \u201c{{query}}\u201d",
+      "noMatchHint": "Jaribu neno tofauti la utafutaji, au futa utafutaji."
     },
     "create": {
       "seoTitleCreate": "Unda kikundi",
@@ -1043,7 +1060,11 @@
       "yourCampaigns": "Kampeni zako",
       "yourCampaignsDesc": "Kampeni zako ziko mtandaoni kwenye Nostr na michango hufanya kazi kupitia kiungo cha kampeni. Zinaonekana kwenye ukurasa wa mwanzo mara tu msimamizi wa Team Soapbox anapozithibitisha.",
       "empty": "Hakuna kampeni bado",
-      "emptyHint": "Kuwa wa kwanza kuanza kampeni ya kukusanya fedha kwenye {{appName}}. Eleza hadithi yako, chagua walengwa wako, na shiriki kiungo."
+      "emptyHint": "Kuwa wa kwanza kuanza kampeni ya kukusanya fedha kwenye {{appName}}. Eleza hadithi yako, chagua walengwa wako, na shiriki kiungo.",
+      "searchPlaceholder": "Tafuta kampeni\u2026",
+      "searchAriaLabel": "Tafuta kampeni",
+      "noMatch": "Hakuna kampeni zinazolingana na \u201c{{query}}\u201d",
+      "noMatchHint": "Jaribu neno tofauti la utafutaji, au futa utafutaji."
     },
     "all": {
       "title": "Kampeni Zote",
@@ -1062,7 +1083,13 @@
       "allHidden": "Hakuna kampeni za kuonyesha",
       "allHiddenHint": "Kila kampeni kwenye mtandao imefichwa na wasimamizi. Geuza “Onyesha zilizofichwa” ili kuziona.",
       "empty": "Hakuna kampeni bado",
-      "emptyHint": "Hakuna kampeni zilizochapishwa bado. Kuwa wa kwanza."
+      "emptyHint": "Hakuna kampeni zilizochapishwa bado. Kuwa wa kwanza.",
+      "heroKicker": "Kampeni",
+      "heroHeading": "Kila lengo,",
+      "heroHeadingLine2": "mahali pamoja.",
+      "heroBody": "Kila kampeni iliyochapishwa kwenye Nostr, imekusanywa mahali pamoja. Vinjari mtandao mzima, pata lengo linalokuhusu, na liunge mkono moja kwa moja kwa Bitcoin.",
+      "campaignsCount_one": "kampeni kwenye mtandao",
+      "campaignsCount_other": "kampeni kwenye mtandao"
     }
   },
   "settings": {
