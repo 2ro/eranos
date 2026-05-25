@@ -1185,14 +1185,8 @@
     "receiveDialog": {
       "title": "Pokea Bitcoin",
       "description": "Shiriki anwani kupokea bitcoin.",
-      "onChain": "Katika mnyororo",
-      "silentPayment": "Malipo ya kimya",
-      "onChainIntro": "Anwani mpya kila wakati. Pandisha kwenye fahirisi mpya baada ya kushiriki kwa faragha.",
       "addressIndex": "Anwani #{{index}}",
       "newAddress": "Anwani mpya",
-      "silentIntro": "Kitambulisho cha kupokea kisichobadilika. Shiriki mara moja na utumie tena milele — watumaji hupata anwani ya kipekee ya katika-mnyororo kwa kila malipo.",
-      "noIndexer": "Uchanganuzi umelemazwa — hakuna kifaa cha kuorodhesha cha BIP-352 kilichosanidiwa. Weka <0>bip352IndexerUrl</0> katika usanidi wa programu yako ili kugundua malipo ya kimya yanayoingia.",
-      "silentBalance": "Salio la malipo ya kimya: <0>{{amount}}</0>",
       "scanForNew": "Changanua kwa malipo mapya",
       "scanForPayments": "Changanua kwa malipo"
     },
