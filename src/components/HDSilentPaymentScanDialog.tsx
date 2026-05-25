@@ -400,13 +400,13 @@ export function HDSilentPaymentScanDialog({ open, onOpenChange }: HDSilentPaymen
             </div>
           )}
 
-          <div className="flex justify-end gap-2 pt-2">
+          <div className="pt-2">
             {sp.isScanning ? (
-              <Button variant="outline" onClick={() => sp.cancelScan()}>
+              <Button variant="outline" className="w-full" onClick={() => sp.cancelScan()}>
                 {t('common.cancel')}
               </Button>
             ) : (
-              <Button onClick={handleScan} disabled={!canStart}>
+              <Button className="w-full" onClick={handleScan} disabled={!canStart}>
                 {t('spScan.startScan')}
               </Button>
             )}
