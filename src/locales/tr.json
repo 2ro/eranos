@@ -20,7 +20,10 @@
     "goBack": "Geri dön",
     "tryAgain": "Lütfen tekrar deneyin.",
     "showLess": "Daha az göster",
-    "readMore": "Daha fazla oku"
+    "readMore": "Daha fazla oku",
+    "byAuthor": "<0>{{name}}</0> tarafından",
+    "donors_one": "{{count}} bağışçı",
+    "donors_other": "{{count}} bağışçı"
   },
   "translate": {
     "translate": "Çevir",

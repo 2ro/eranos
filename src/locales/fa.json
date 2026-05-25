@@ -20,7 +20,10 @@
     "goBack": "بازگشت",
     "tryAgain": "لطفاً دوباره تلاش کنید.",
     "showLess": "نمایش کمتر",
-    "readMore": "بیشتر بخوانید"
+    "readMore": "بیشتر بخوانید",
+    "byAuthor": "توسط <0>{{name}}</0>",
+    "donors_one": "{{count}} اهداکننده",
+    "donors_other": "{{count}} اهداکننده"
   },
   "translate": {
     "translate": "ترجمه",

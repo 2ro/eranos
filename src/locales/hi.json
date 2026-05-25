@@ -20,7 +20,10 @@
     "goBack": "वापस जाएँ",
     "tryAgain": "कृपया दोबारा कोशिश करें।",
     "showLess": "कम दिखाएँ",
-    "readMore": "और पढ़ें"
+    "readMore": "और पढ़ें",
+    "byAuthor": "<0>{{name}}</0> द्वारा",
+    "donors_one": "{{count}} दानदाता",
+    "donors_other": "{{count}} दानदाता"
   },
   "translate": {
     "translate": "अनुवाद करें",

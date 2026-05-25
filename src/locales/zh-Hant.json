@@ -20,7 +20,10 @@
     "goBack": "返回",
     "tryAgain": "請重試。",
     "showLess": "收起",
-    "readMore": "閱讀更多"
+    "readMore": "閱讀更多",
+    "byAuthor": "由 <0>{{name}}</0>",
+    "donors_one": "{{count}} 位捐贈者",
+    "donors_other": "{{count}} 位捐贈者"
   },
   "translate": {
     "translate": "翻譯",

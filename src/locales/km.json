@@ -20,7 +20,10 @@
     "goBack": "ត្រឡប់ក្រោយ",
     "tryAgain": "សូមព្យាយាមម្តងទៀត។",
     "showLess": "បង្ហាញតិចជាងមុន",
-    "readMore": "អានបន្ថែម"
+    "readMore": "អានបន្ថែម",
+    "byAuthor": "ដោយ <0>{{name}}</0>",
+    "donors_one": "អ្នកបរិច្ចាគ {{count}} នាក់",
+    "donors_other": "អ្នកបរិច្ចាគ {{count}} នាក់"
   },
   "translate": {
     "translate": "បកប្រែ",

@@ -20,7 +20,10 @@
     "goBack": "العودة",
     "tryAgain": "يرجى المحاولة مرة أخرى.",
     "showLess": "عرض أقل",
-    "readMore": "قراءة المزيد"
+    "readMore": "قراءة المزيد",
+    "byAuthor": "بواسطة <0>{{name}}</0>",
+    "donors_one": "{{count}} متبرع",
+    "donors_other": "{{count}} متبرعون"
   },
   "translate": {
     "translate": "ترجمة",

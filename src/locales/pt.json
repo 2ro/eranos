@@ -20,7 +20,10 @@
     "goBack": "Voltar",
     "tryAgain": "Por favor, tente novamente.",
     "showLess": "Mostrar menos",
-    "readMore": "Ler mais"
+    "readMore": "Ler mais",
+    "byAuthor": "por <0>{{name}}</0>",
+    "donors_one": "{{count}} doador",
+    "donors_other": "{{count}} doadores"
   },
   "translate": {
     "translate": "Traduzir",

@@ -20,7 +20,10 @@
     "goBack": "Kembali",
     "tryAgain": "Silakan coba lagi.",
     "showLess": "Tampilkan lebih sedikit",
-    "readMore": "Selengkapnya"
+    "readMore": "Selengkapnya",
+    "byAuthor": "oleh <0>{{name}}</0>",
+    "donors_one": "{{count}} donatur",
+    "donors_other": "{{count}} donatur"
   },
   "translate": {
     "translate": "Terjemahkan",

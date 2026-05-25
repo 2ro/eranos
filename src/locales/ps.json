@@ -20,7 +20,10 @@
     "goBack": "بېرته تلل",
     "tryAgain": "مهرباني وکړئ بیا هڅه وکړئ.",
     "showLess": "لږ وښایاست",
-    "readMore": "نور ولولئ"
+    "readMore": "نور ولولئ",
+    "byAuthor": "د <0>{{name}}</0> لخوا",
+    "donors_one": "{{count}} بسپنه ورکوونکی",
+    "donors_other": "{{count}} بسپنه ورکوونکي"
   },
   "translate": {
     "translate": "ژباړل",
