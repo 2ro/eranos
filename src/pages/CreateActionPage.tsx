@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Link, useNavigate, useSearchParams } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useSeoMeta } from '@unhead/react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useTranslation, Trans } from 'react-i18next';
@@ -18,6 +18,7 @@ import { CoverImageField } from '@/components/CoverImageField';
 import { FormSection } from '@/components/FormSection';
 import { OrganizationContextChip } from '@/components/OrganizationContextChip';
 import { TimezoneSwitcher } from '@/components/TimezoneSwitcher';
+import { LoginArea } from '@/components/auth/LoginArea';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -214,15 +215,17 @@ export function CreateActionPage() {
       <main className="min-h-screen pb-16">
         <div className="max-w-2xl mx-auto px-4 sm:px-6 py-12">
           <Card>
-            <CardContent className="py-12 px-8 text-center space-y-4">
-              <Megaphone className="size-10 text-muted-foreground/60 mx-auto" />
-              <h2 className="text-xl font-semibold">{t('pledges.create.loginGateTitle')}</h2>
-              <p className="text-muted-foreground">
-                {t('pledges.create.loginGateBody')}
-              </p>
-              <Button asChild>
-                <Link to="/pledges">{t('pledges.create.backToPledges')}</Link>
-              </Button>
+            <CardContent className="py-12 px-8 flex flex-col items-center gap-6 text-center">
+              <div className="p-4 rounded-full bg-primary/10">
+                <Megaphone className="size-8 text-primary" />
+              </div>
+              <div className="space-y-2 max-w-sm">
+                <h2 className="text-xl font-semibold">{t('pledges.create.loginGateTitle')}</h2>
+                <p className="text-muted-foreground text-sm">
+                  {t('pledges.create.loginGateBody')}
+                </p>
+              </div>
+              <LoginArea className="max-w-60" />
             </CardContent>
           </Card>
         </div>

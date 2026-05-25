@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { Link, useNavigate, useSearchParams } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useSeoMeta } from '@unhead/react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useNostr } from '@nostrify/react';
@@ -18,6 +18,7 @@ import {
 import { PersonSearch } from '@/components/PersonSearch';
 import { CoverImageField } from '@/components/CoverImageField';
 import { FormSection } from '@/components/FormSection';
+import { LoginArea } from '@/components/auth/LoginArea';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
@@ -467,15 +468,17 @@ export function CreateCommunityPage() {
       <main className="min-h-screen pb-16">
         <div className="max-w-2xl mx-auto px-4 sm:px-6 py-12">
           <Card>
-            <CardContent className="py-12 px-8 text-center space-y-4">
-              <Users className="size-10 text-muted-foreground/60 mx-auto" />
-              <h2 className="text-xl font-semibold">{t('groups.create.loginGateTitle')}</h2>
-              <p className="text-muted-foreground">
-                {t('groups.create.loginGateBody')}
-              </p>
-              <Button asChild>
-                <Link to="/groups">{t('groups.create.backToGroups')}</Link>
-              </Button>
+            <CardContent className="py-12 px-8 flex flex-col items-center gap-6 text-center">
+              <div className="p-4 rounded-full bg-primary/10">
+                <Users className="size-8 text-primary" />
+              </div>
+              <div className="space-y-2 max-w-sm">
+                <h2 className="text-xl font-semibold">{t('groups.create.loginGateTitle')}</h2>
+                <p className="text-muted-foreground text-sm">
+                  {t('groups.create.loginGateBody')}
+                </p>
+              </div>
+              <LoginArea className="max-w-60" />
             </CardContent>
           </Card>
         </div>
