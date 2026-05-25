@@ -373,7 +373,7 @@ function CommunitiesHero({ onCreateCommunity }: CommunitiesHeroProps) {
         <div className="flex-1 min-h-[100px] sm:min-h-[120px]" aria-hidden="true" />
 
         <div
-          className="relative w-full max-w-md mx-auto rounded-full bg-background/55 backdrop-blur-xl backdrop-saturate-150 border border-white/20 dark:border-white/10 px-5 py-3 shadow-lg shadow-teal-500/10"
+          className="relative w-full max-w-md mx-auto rounded-full bg-black/30 backdrop-blur-xl backdrop-saturate-150 border border-white/20 px-5 py-3 shadow-lg shadow-teal-500/10"
           aria-live="polite"
         >
           {currentStat ? (
@@ -381,11 +381,11 @@ function CommunitiesHero({ onCreateCommunity }: CommunitiesHeroProps) {
               key={currentStat.id}
               className="flex items-center justify-center gap-3 motion-safe:animate-in motion-safe:fade-in motion-safe:duration-500"
             >
-              <span className="text-primary shrink-0">{currentStat.icon}</span>
-              <span className="text-sm sm:text-base font-semibold tracking-tight">
+              <span className="text-cyan-200 shrink-0 drop-shadow">{currentStat.icon}</span>
+              <span className="text-sm sm:text-base font-semibold tracking-tight text-white drop-shadow-[0_1px_4px_rgb(0_0_0/0.5)]">
                 {currentStat.value}
               </span>
-              <span className="text-xs sm:text-sm text-muted-foreground line-clamp-1">
+              <span className="text-xs sm:text-sm text-white/85 line-clamp-1 drop-shadow-[0_1px_4px_rgb(0_0_0/0.5)]">
                 {currentStat.label}
               </span>
             </div>
@@ -398,7 +398,7 @@ function CommunitiesHero({ onCreateCommunity }: CommunitiesHeroProps) {
                   <Skeleton className="h-3 w-32" />
                 </>
               ) : (
-                <span className="text-xs text-muted-foreground">
+                <span className="text-xs text-white/85 drop-shadow-[0_1px_4px_rgb(0_0_0/0.5)]">
                   {t('groups.list.connectingRelays')}
                 </span>
               )}

@@ -578,15 +578,15 @@ function ActionsHero({ actionCount, canCreate, onCreateAction }: ActionsHeroProp
             only carries a single fact — the current pledge count —
             so it stays calm and the headline does the heavy lifting. */}
         <div
-          className="relative w-full max-w-md mx-auto rounded-full bg-background/55 backdrop-blur-xl backdrop-saturate-150 border border-white/20 dark:border-white/10 px-5 py-3 shadow-lg shadow-amber-500/10"
+          className="relative w-full max-w-md mx-auto rounded-full bg-black/30 backdrop-blur-xl backdrop-saturate-150 border border-white/20 px-5 py-3 shadow-lg shadow-amber-500/10"
           aria-live="polite"
         >
           <div className="flex items-center justify-center gap-3">
-            <Megaphone className="size-5 text-primary shrink-0" aria-hidden />
-            <span className="text-sm sm:text-base font-semibold tracking-tight">
+            <Megaphone className="size-5 text-amber-200 shrink-0 drop-shadow" aria-hidden />
+            <span className="text-sm sm:text-base font-semibold tracking-tight text-white drop-shadow-[0_1px_4px_rgb(0_0_0/0.5)]">
               {actionCount.toLocaleString()}
             </span>
-            <span className="text-xs sm:text-sm text-muted-foreground line-clamp-1">
+            <span className="text-xs sm:text-sm text-white/85 line-clamp-1 drop-shadow-[0_1px_4px_rgb(0_0_0/0.5)]">
               {t('pledges.list.openCount', { count: actionCount })}
             </span>
           </div>
