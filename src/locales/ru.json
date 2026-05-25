@@ -627,6 +627,7 @@
       "ended": "Завершено",
       "pledged": "Обещано",
       "byAuthor": "от <0>{{name}}</0>",
+      "actionsAriaLabel": "Действия с обещанием",
       "deletePledge": "Удалить обещание",
       "copyLink": "Копировать ссылку",
       "linkCopied": "Ссылка скопирована",

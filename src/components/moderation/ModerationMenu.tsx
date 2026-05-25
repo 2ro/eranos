@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
-  Check, EyeOff, Eye, Loader2, MoreHorizontal,
+  Check, EyeOff, Eye, MoreHorizontal,
   ShieldCheck, ShieldOff, Sparkles, SparklesIcon,
 } from 'lucide-react';
 
@@ -38,25 +38,20 @@ export type ModerationSurface = 'campaign' | 'pledge' | 'group';
  */
 export type ModerationAxis = 'approval' | 'hide' | 'featured';
 
-interface ModerationMenuProps {
+interface ModerationItemsProps {
   /** Addressable coordinate of the entity (`<kind>:<pubkey>:<d>`). */
   coord: string;
   /** Visible title for the entity, used in toast feedback. */
   entityTitle: string;
-  /** Which surface this kebab acts on. */
+  /** Which surface this acts on. */
   surface: ModerationSurface;
   /** Which axes to render. */
   axes: readonly ModerationAxis[];
-  /** Optional override className applied to the trigger button. */
-  className?: string;
 }
 
-/** Bag of state + mutation that the menu shell needs. Shape-unified
- *  across the three per-surface hooks (they all return `data` and
- *  `moderate`). */
-interface SurfaceModeration {
-  data: ReturnType<typeof useCampaignModeration>['data'];
-  moderate: ReturnType<typeof useCampaignModeration>['moderate'];
+interface ModerationMenuProps extends ModerationItemsProps {
+  /** Optional override className applied to the trigger button. */
+  className?: string;
 }
 
 /** Translated label for the trigger's aria-label. */
@@ -68,30 +63,41 @@ function ariaLabelKey(surface: ModerationSurface): string {
   }
 }
 
-/**
- * Shared dropdown shell. Pure UI — receives the moderation state and
- * the `moderate` mutation from the per-surface wrapper above, so it
- * never has to know which surface it's for. Renders the configured
- * axes in a consistent order:
- *
- *   Approve / Unapprove   (axis = 'approval')
- *   Hide / Unhide         (axis = 'hide')
- *   ───────
- *   Feature / Unfeature   (axis = 'featured')
- *
- * The split keeps the destructive Hide action adjacent to the
- * trust-decision Approve action, and pushes the Feature elevation into
- * its own visual group below the separator.
- */
-function ModerationMenuShell({
+// ─────────────────────────────────────────────────────────────────────
+// ModerationMenuItems — the dropdown rows themselves (label + items)
+// without the outer DropdownMenu / DropdownMenuTrigger wrapper. Used by
+// the standalone ModerationMenu below and by callers (like ActionCard's
+// share/delete kebab) that need to embed moderator actions inside
+// their own dropdown so the card carries a single kebab.
+//
+// Returns `null` for non-moderators; callers compose conditionally:
+//
+//   <DropdownMenuContent>
+//     <DropdownMenuItem onClick={…}>Copy link</DropdownMenuItem>
+//     <DropdownMenuSeparator />
+//     <ModerationMenuItems coord={…} surface="pledge" axes={…} entityTitle={…} />
+//   </DropdownMenuContent>
+//
+// Callers are responsible for inserting a leading separator when there
+// are share/owner items above. The component starts with a
+// `DropdownMenuLabel` ("Moderator actions") so the section reads as a
+// distinct group either way.
+// ─────────────────────────────────────────────────────────────────────
+
+/** Inner rows once moderation state has been resolved. Pure UI. */
+function ModerationItemsShell({
   coord,
   entityTitle,
-  surface,
   axes,
-  className,
-  data: moderation,
+  moderation,
   moderate,
-}: ModerationMenuProps & SurfaceModeration) {
+}: {
+  coord: string;
+  entityTitle: string;
+  axes: readonly ModerationAxis[];
+  moderation: ReturnType<typeof useCampaignModeration>['data'];
+  moderate: ReturnType<typeof useCampaignModeration>['moderate'];
+}) {
   const { t } = useTranslation();
   const { toast } = useToast();
   const [busy, setBusy] = useState<ModerationLabel | null>(null);
@@ -123,104 +129,136 @@ function ModerationMenuShell({
   };
 
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild onClick={(e) => e.preventDefault()}>
-        <Button
-          variant="ghost"
-          size="icon"
-          aria-label={t(ariaLabelKey(surface))}
-          className={className ?? 'h-8 w-8 bg-background/80 backdrop-blur text-muted-foreground hover:text-foreground'}
-        >
-          {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : <MoreHorizontal className="h-4 w-4" />}
-        </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" onClick={(e) => e.stopPropagation()}>
-        <DropdownMenuLabel className="text-xs text-muted-foreground">
-          {t('moderation.menu.label')}
-        </DropdownMenuLabel>
-        <DropdownMenuSeparator />
+    <>
+      <DropdownMenuLabel className="text-xs text-muted-foreground">
+        {t('moderation.menu.label')}
+      </DropdownMenuLabel>
+      <DropdownMenuSeparator />
 
-        {hasApproval && (
-          isApproved ? (
-            <DropdownMenuItem onClick={() => runAction('unapproved', t('moderation.menu.toastUnapproved'))}>
-              <ShieldOff className="h-4 w-4 mr-2" />
-              {t('moderation.menu.unapprove')}
-              <span className="ml-auto text-xs text-muted-foreground inline-flex items-center gap-1">
-                <Check className="h-3 w-3" /> {t('moderation.menu.approvedState')}
-              </span>
-            </DropdownMenuItem>
-          ) : (
-            <DropdownMenuItem onClick={() => runAction('approved', t('moderation.menu.toastApproved'))}>
-              <ShieldCheck className="h-4 w-4 mr-2" />
-              {t('moderation.menu.approve')}
-            </DropdownMenuItem>
-          )
-        )}
+      {hasApproval && (
+        isApproved ? (
+          <DropdownMenuItem onClick={() => runAction('unapproved', t('moderation.menu.toastUnapproved'))} disabled={!!busy}>
+            <ShieldOff className="h-4 w-4 mr-2" />
+            {t('moderation.menu.unapprove')}
+            <span className="ml-auto text-xs text-muted-foreground inline-flex items-center gap-1">
+              <Check className="h-3 w-3" /> {t('moderation.menu.approvedState')}
+            </span>
+          </DropdownMenuItem>
+        ) : (
+          <DropdownMenuItem onClick={() => runAction('approved', t('moderation.menu.toastApproved'))} disabled={!!busy}>
+            <ShieldCheck className="h-4 w-4 mr-2" />
+            {t('moderation.menu.approve')}
+          </DropdownMenuItem>
+        )
+      )}
 
-        {hasHide && (
-          isHidden ? (
-            <DropdownMenuItem onClick={() => runAction('unhidden', t('moderation.menu.toastUnhidden'))}>
-              <Eye className="h-4 w-4 mr-2" />
-              {t('moderation.menu.unhide')}
-              <span className="ml-auto text-xs text-muted-foreground inline-flex items-center gap-1">
-                <Check className="h-3 w-3" /> {t('moderation.menu.hiddenState')}
-              </span>
-            </DropdownMenuItem>
-          ) : (
-            <DropdownMenuItem
-              onClick={() => runAction('hidden', t('moderation.menu.toastHidden'))}
-              className="text-destructive focus:text-destructive"
-            >
-              <EyeOff className="h-4 w-4 mr-2" />
-              {t('moderation.menu.hide')}
-            </DropdownMenuItem>
-          )
-        )}
+      {hasHide && (
+        isHidden ? (
+          <DropdownMenuItem onClick={() => runAction('unhidden', t('moderation.menu.toastUnhidden'))} disabled={!!busy}>
+            <Eye className="h-4 w-4 mr-2" />
+            {t('moderation.menu.unhide')}
+            <span className="ml-auto text-xs text-muted-foreground inline-flex items-center gap-1">
+              <Check className="h-3 w-3" /> {t('moderation.menu.hiddenState')}
+            </span>
+          </DropdownMenuItem>
+        ) : (
+          <DropdownMenuItem
+            onClick={() => runAction('hidden', t('moderation.menu.toastHidden'))}
+            disabled={!!busy}
+            className="text-destructive focus:text-destructive"
+          >
+            <EyeOff className="h-4 w-4 mr-2" />
+            {t('moderation.menu.hide')}
+          </DropdownMenuItem>
+        )
+      )}
 
-        {hasFeatured && (hasApproval || hasHide) && <DropdownMenuSeparator />}
+      {hasFeatured && (hasApproval || hasHide) && <DropdownMenuSeparator />}
 
-        {hasFeatured && (
-          isFeatured ? (
-            <DropdownMenuItem onClick={() => runAction('unfeatured', t('moderation.menu.toastUnfeatured'))}>
-              <SparklesIcon className="h-4 w-4 mr-2" />
-              {t('moderation.menu.unfeature')}
-              <span className="ml-auto text-xs text-muted-foreground inline-flex items-center gap-1">
-                <Check className="h-3 w-3" /> {t('moderation.menu.featuredState')}
-              </span>
-            </DropdownMenuItem>
-          ) : (
-            <DropdownMenuItem onClick={() => runAction('featured', t('moderation.menu.toastFeatured'))}>
-              <Sparkles className="h-4 w-4 mr-2" />
-              {t('moderation.menu.feature')}
-            </DropdownMenuItem>
-          )
-        )}
-      </DropdownMenuContent>
-    </DropdownMenu>
+      {hasFeatured && (
+        isFeatured ? (
+          <DropdownMenuItem onClick={() => runAction('unfeatured', t('moderation.menu.toastUnfeatured'))} disabled={!!busy}>
+            <SparklesIcon className="h-4 w-4 mr-2" />
+            {t('moderation.menu.unfeature')}
+            <span className="ml-auto text-xs text-muted-foreground inline-flex items-center gap-1">
+              <Check className="h-3 w-3" /> {t('moderation.menu.featuredState')}
+            </span>
+          </DropdownMenuItem>
+        ) : (
+          <DropdownMenuItem onClick={() => runAction('featured', t('moderation.menu.toastFeatured'))} disabled={!!busy}>
+            <Sparkles className="h-4 w-4 mr-2" />
+            {t('moderation.menu.feature')}
+          </DropdownMenuItem>
+        )
+      )}
+    </>
   );
 }
 
-// ─────────────────────────────────────────────────────────────────────
-// Per-surface inner components. Each one is the only place its
-// moderation hook is mounted, so we never subscribe a pledge card to
-// the campaign label query (or vice versa). They all share the same
-// dropdown shell above.
-// ─────────────────────────────────────────────────────────────────────
+// Per-surface inner components. Each mounts only its own moderation
+// hook so a pledge card never subscribes to the campaign label query
+// (and vice versa).
 
-function CampaignMenuInner(props: ModerationMenuProps) {
+function CampaignItemsInner(props: { coord: string; entityTitle: string; axes: readonly ModerationAxis[] }) {
   const { data, moderate } = useCampaignModeration();
-  return <ModerationMenuShell {...props} data={data} moderate={moderate} />;
+  return <ModerationItemsShell {...props} moderation={data} moderate={moderate} />;
 }
 
-function PledgeMenuInner(props: ModerationMenuProps) {
+function PledgeItemsInner(props: { coord: string; entityTitle: string; axes: readonly ModerationAxis[] }) {
   const { data, moderate } = usePledgeModeration();
-  return <ModerationMenuShell {...props} data={data} moderate={moderate} />;
+  return <ModerationItemsShell {...props} moderation={data} moderate={moderate} />;
 }
 
-function GroupMenuInner(props: ModerationMenuProps) {
+function GroupItemsInner(props: { coord: string; entityTitle: string; axes: readonly ModerationAxis[] }) {
   const { data, moderate } = useOrganizationModeration();
-  return <ModerationMenuShell {...props} data={data} moderate={moderate} />;
+  return <ModerationItemsShell {...props} moderation={data} moderate={moderate} />;
 }
+
+/**
+ * Renders the moderator-only dropdown rows (label + action items) for
+ * embedding inside a host `DropdownMenuContent`. Returns `null` for
+ * non-moderators so the moderation cache is never subscribed on non-mod
+ * views.
+ *
+ * Compose with other items in a single host dropdown when a card needs
+ * to expose both share/owner actions AND moderator actions in one kebab
+ * (e.g. `ActionShareMenu` on pledge cards). Insert a
+ * `<DropdownMenuSeparator />` immediately before this component when
+ * any preceding items exist, so the moderator section reads as a
+ * distinct group:
+ *
+ *   <DropdownMenuContent>
+ *     <DropdownMenuItem onClick={copy}>Copy link</DropdownMenuItem>
+ *     {isOwner && <DropdownMenuItem onClick={del}>Delete</DropdownMenuItem>}
+ *     <DropdownMenuSeparator />
+ *     <ModerationMenuItems coord={…} surface="pledge" axes={…} entityTitle={…} />
+ *   </DropdownMenuContent>
+ *
+ * For surfaces that only need the moderator kebab in isolation (no
+ * share/owner items), use {@link ModerationMenu} or
+ * {@link ModerationOverlay} — both wrap this component in their own
+ * trigger.
+ */
+export function ModerationMenuItems(props: ModerationItemsProps) {
+  const { user } = useCurrentUser();
+  const { data: moderators } = useCampaignModerators();
+  const isMod = !!user && !!moderators && moderators.includes(user.pubkey);
+
+  if (!isMod) return null;
+
+  const inner = { coord: props.coord, entityTitle: props.entityTitle, axes: props.axes };
+  switch (props.surface) {
+    case 'campaign': return <CampaignItemsInner {...inner} />;
+    case 'pledge': return <PledgeItemsInner {...inner} />;
+    case 'group': return <GroupItemsInner {...inner} />;
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────
+// Standalone moderator kebab. Wraps ModerationMenuItems in its own
+// DropdownMenu + trigger. Returns null for non-moderators so the
+// trigger and the moderation query are both skipped.
+// ─────────────────────────────────────────────────────────────────────
 
 /**
  * Per-card / per-surface kebab menu for moderator actions. Returns
@@ -231,16 +269,29 @@ function GroupMenuInner(props: ModerationMenuProps) {
  * prefer {@link ModerationOverlay}, which bundles this kebab with a
  * "Hidden" badge in an absolutely-positioned corner.
  */
-export function ModerationMenu(props: ModerationMenuProps) {
+export function ModerationMenu({ className, ...rest }: ModerationMenuProps) {
+  const { t } = useTranslation();
   const { user } = useCurrentUser();
   const { data: moderators } = useCampaignModerators();
   const isMod = !!user && !!moderators && moderators.includes(user.pubkey);
 
   if (!isMod) return null;
 
-  switch (props.surface) {
-    case 'campaign': return <CampaignMenuInner {...props} />;
-    case 'pledge': return <PledgeMenuInner {...props} />;
-    case 'group': return <GroupMenuInner {...props} />;
-  }
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild onClick={(e) => e.preventDefault()}>
+        <Button
+          variant="ghost"
+          size="icon"
+          aria-label={t(ariaLabelKey(rest.surface))}
+          className={className ?? 'h-8 w-8 bg-background/80 backdrop-blur text-muted-foreground hover:text-foreground'}
+        >
+          <MoreHorizontal className="h-4 w-4" />
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end" onClick={(e) => e.stopPropagation()}>
+        <ModerationMenuItems {...rest} />
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
 }

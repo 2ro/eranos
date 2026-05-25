@@ -187,6 +187,7 @@
       "ended": "منتهية",
       "pledged": "متعهَّد به",
       "byAuthor": "بواسطة <0>{{name}}</0>",
+      "actionsAriaLabel": "إجراءات التعهد",
       "deletePledge": "حذف التعهد",
       "copyLink": "نسخ الرابط",
       "linkCopied": "تم نسخ الرابط",

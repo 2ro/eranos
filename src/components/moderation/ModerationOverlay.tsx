@@ -23,6 +23,14 @@ interface ModerationOverlayProps {
    */
   badgeSize?: 'default' | 'compact';
   /**
+   * When false, the moderator kebab is suppressed and only the
+   * "Hidden" badge renders. Useful when a card already exposes a
+   * combined kebab elsewhere (e.g. `ActionShareMenu` on pledge cards
+   * embeds `ModerationMenuItems` directly into its share/delete
+   * dropdown so the card carries a single kebab). Defaults to true.
+   */
+  showMenu?: boolean;
+  /**
    * Extra classes overriding the absolutely-positioned wrapper. Most
    * callers can omit; campaigns historically used `top-3 right-3` while
    * pledges/groups use `top-2 right-2`.
@@ -38,19 +46,27 @@ function OverlayBody({
   surface,
   axes,
   badgeSize,
+  showMenu = true,
   className,
 }: Omit<ModerationOverlayProps, never> & { isHidden: boolean }) {
   const wrapperClass = className ?? 'absolute top-2 right-2 z-10 flex items-center gap-1.5';
 
+  // When the menu is suppressed AND nothing is hidden, the overlay
+  // would render an empty positioned div. Skip render entirely so the
+  // banner stays clean.
+  if (!showMenu && !isHidden) return null;
+
   return (
     <div className={wrapperClass}>
       {isHidden && <HiddenBadge size={badgeSize ?? 'compact'} />}
-      <ModerationMenu
-        coord={coord}
-        entityTitle={entityTitle}
-        surface={surface}
-        axes={axes}
-      />
+      {showMenu && (
+        <ModerationMenu
+          coord={coord}
+          entityTitle={entityTitle}
+          surface={surface}
+          axes={axes}
+        />
+      )}
     </div>
   );
 }

@@ -195,6 +195,7 @@
       "ended": "پای ته رسیدلې",
       "pledged": "ژمنه شوې",
       "byAuthor": "د <0>{{name}}</0> له لوري",
+      "actionsAriaLabel": "د ژمنې کړنې",
       "deletePledge": "ژمنه ړنګول",
       "copyLink": "د لینک کاپي",
       "linkCopied": "لینک کاپي شو",

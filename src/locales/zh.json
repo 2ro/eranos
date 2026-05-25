@@ -195,6 +195,7 @@
       "ended": "已结束",
       "pledged": "已悬赏",
       "byAuthor": "由 <0>{{name}}</0>",
+      "actionsAriaLabel": "悬赏操作",
       "deletePledge": "删除悬赏",
       "copyLink": "复制链接",
       "linkCopied": "已复制链接",

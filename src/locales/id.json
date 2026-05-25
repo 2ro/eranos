@@ -627,6 +627,7 @@
       "ended": "Berakhir",
       "pledged": "Diikrarkan",
       "byAuthor": "oleh <0>{{name}}</0>",
+      "actionsAriaLabel": "Tindakan ikrar",
       "deletePledge": "Hapus ikrar",
       "copyLink": "Salin tautan",
       "linkCopied": "Tautan disalin",

@@ -617,6 +617,7 @@
       "ended": "Terminée",
       "pledged": "Promis",
       "byAuthor": "par <0>{{name}}</0>",
+      "actionsAriaLabel": "Actions de la promesse",
       "deletePledge": "Supprimer la promesse",
       "copyLink": "Copier le lien",
       "linkCopied": "Lien copié",

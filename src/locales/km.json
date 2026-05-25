@@ -195,6 +195,7 @@
       "ended": "បានបញ្ចប់",
       "pledged": "បានសន្យា",
       "byAuthor": "ដោយ <0>{{name}}</0>",
+      "actionsAriaLabel": "សកម្មភាពកិច្ចសន្យា",
       "deletePledge": "លុបការសន្យា",
       "copyLink": "ចម្លងតំណ",
       "linkCopied": "បានចម្លងតំណ",

@@ -195,6 +195,7 @@
       "ended": "پایان‌یافته",
       "pledged": "متعهد شده",
       "byAuthor": "توسط <0>{{name}}</0>",
+      "actionsAriaLabel": "کنش‌های تعهد",
       "deletePledge": "حذف تعهد",
       "copyLink": "کپی کردن پیوند",
       "linkCopied": "پیوند کپی شد",

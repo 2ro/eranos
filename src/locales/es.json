@@ -195,6 +195,7 @@
       "ended": "Finalizada",
       "pledged": "Prometido",
       "byAuthor": "por <0>{{name}}</0>",
+      "actionsAriaLabel": "Acciones de la promesa",
       "deletePledge": "Eliminar promesa",
       "copyLink": "Copiar enlace",
       "linkCopied": "Enlace copiado",

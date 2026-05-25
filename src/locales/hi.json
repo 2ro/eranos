@@ -627,6 +627,7 @@
       "ended": "समाप्त",
       "pledged": "प्लेज किया गया",
       "byAuthor": "<0>{{name}}</0> द्वारा",
+      "actionsAriaLabel": "प्लेज क्रियाएँ",
       "deletePledge": "प्लेज डिलीट करें",
       "copyLink": "लिंक कॉपी करें",
       "linkCopied": "लिंक कॉपी हो गया",

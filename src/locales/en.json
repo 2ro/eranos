@@ -618,6 +618,7 @@
       "ended": "Ended",
       "pledged": "Pledged",
       "byAuthor": "by <0>{{name}}</0>",
+      "actionsAriaLabel": "Pledge actions",
       "deletePledge": "Delete pledge",
       "copyLink": "Copy link",
       "linkCopied": "Link copied",

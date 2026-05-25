@@ -626,6 +626,7 @@
       "ended": "Bitti",
       "pledged": "Taahhüt edildi",
       "byAuthor": "<0>{{name}}</0> tarafından",
+      "actionsAriaLabel": "Taahhüt işlemleri",
       "deletePledge": "Taahhüdü sil",
       "copyLink": "Bağlantıyı kopyala",
       "linkCopied": "Bağlantı kopyalandı",

@@ -23,7 +23,11 @@ import { cn } from '@/lib/utils';
 import { DiscoverySearchToolbar } from '@/components/DiscoverySearchToolbar';
 import { HeroAtmosphere } from '@/components/HeroAtmosphere';
 import { HeroBanner } from '@/components/HeroBanner';
-import { ModerationOverlay, ModeratorCollapsibleSection } from '@/components/moderation';
+import {
+  ModerationMenuItems,
+  ModerationOverlay,
+  ModeratorCollapsibleSection,
+} from '@/components/moderation';
 import { PledgeCard } from '@/components/PledgeCard';
 
 import { Card } from '@/components/ui/card';
@@ -64,9 +68,10 @@ function ActionSkeleton() {
   );
 }
 
-function ActionShareMenu({ action }: { action: Action }) {
+function ActionShareMenu({ action, displayTitle }: { action: Action; displayTitle: string }) {
   const { t } = useTranslation();
   const { user } = useCurrentUser();
+  const { data: moderators } = useCampaignModerators();
   const { mutateAsync: createEvent } = useNostrPublish();
   const { toast } = useToast();
   const shareOrigin = useShareOrigin();
@@ -75,6 +80,12 @@ function ActionShareMenu({ action }: { action: Action }) {
   const [isDeleting, setIsDeleting] = useState(false);
 
   const isOwner = user?.pubkey === action.pubkey;
+  // Moderator gate is identical to the one in `ModerationMenuItems`,
+  // duplicated here so we can decide whether to render the trailing
+  // separator that introduces the moderator section. `ModerationMenuItems`
+  // returns `null` for non-mods, so without this check we'd render an
+  // orphaned separator at the bottom of the dropdown.
+  const isMod = !!user && !!moderators && moderators.includes(user.pubkey);
 
   const naddr = nip19.naddrEncode({
     kind: 36639,
@@ -152,7 +163,8 @@ function ActionShareMenu({ action }: { action: Action }) {
         <Button
           variant="ghost"
           size="icon"
-          className="h-8 w-8 text-muted-foreground hover:text-foreground"
+          aria-label={t('pledges.card.actionsAriaLabel')}
+          className="h-8 w-8 bg-background/80 backdrop-blur text-muted-foreground hover:text-foreground"
         >
           <MoreHorizontal className="h-4 w-4" />
         </Button>
@@ -179,6 +191,18 @@ function ActionShareMenu({ action }: { action: Action }) {
           )}
           {t('pledges.card.copyLink')}
         </DropdownMenuItem>
+        {/* Moderator actions appear under a separator when the viewer
+            is a Team Soapbox moderator. `ModerationMenuItems` returns
+            null for non-mods, so we gate the trailing separator on the
+            same `isMod` check to avoid an orphan separator at the
+            bottom of non-mod dropdowns. */}
+        {isMod && <DropdownMenuSeparator />}
+        <ModerationMenuItems
+          coord={`36639:${action.pubkey}:${action.id}`}
+          entityTitle={displayTitle}
+          surface="pledge"
+          axes={['hide', 'featured']}
+        />
       </DropdownMenuContent>
     </DropdownMenu>
   );
@@ -530,14 +554,15 @@ export default function ActionsPage() {
                     showTranslate
                     topRight={
                       <>
-                        <ActionShareMenu action={action} />
                         <ModerationOverlay
                           coord={`36639:${action.pubkey}:${action.id}`}
                           entityTitle={action.title}
                           surface="pledge"
                           axes={['hide', 'featured']}
-                          className="flex items-center gap-1.5"
+                          showMenu={false}
+                          className="flex items-center"
                         />
+                        <ActionShareMenu action={action} displayTitle={action.title} />
                       </>
                     }
                   />
@@ -711,14 +736,15 @@ export default function ActionsPage() {
                   showTranslate
                   topRight={
                     <>
-                      <ActionShareMenu action={action} />
                       <ModerationOverlay
                         coord={`36639:${action.pubkey}:${action.id}`}
                         entityTitle={action.title}
                         surface="pledge"
                         axes={['hide', 'featured']}
-                        className="flex items-center gap-1.5"
+                        showMenu={false}
+                        className="flex items-center"
                       />
+                      <ActionShareMenu action={action} displayTitle={action.title} />
                     </>
                   }
                 />
@@ -749,14 +775,15 @@ export default function ActionsPage() {
                   showTranslate
                   topRight={
                     <>
-                      <ActionShareMenu action={action} />
                       <ModerationOverlay
                         coord={`36639:${action.pubkey}:${action.id}`}
                         entityTitle={action.title}
                         surface="pledge"
                         axes={['hide', 'featured']}
-                        className="flex items-center gap-1.5"
+                        showMenu={false}
+                        className="flex items-center"
                       />
+                      <ActionShareMenu action={action} displayTitle={action.title} />
                     </>
                   }
                 />
@@ -922,14 +949,15 @@ function ActionSection({
             showTranslate
             topRight={
               <>
-                <ActionShareMenu action={action} />
                 <ModerationOverlay
                   coord={`36639:${action.pubkey}:${action.id}`}
                   entityTitle={action.title}
                   surface="pledge"
                   axes={['hide', 'featured']}
-                  className="flex items-center gap-1.5"
+                  showMenu={false}
+                  className="flex items-center"
                 />
+                <ActionShareMenu action={action} displayTitle={action.title} />
               </>
             }
           />
