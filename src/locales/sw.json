@@ -1263,8 +1263,7 @@
       "description": "Shiriki anwani kupokea bitcoin.",
       "addressIndex": "Anwani #{{index}}",
       "newAddress": "Anwani mpya",
-      "scanForNew": "Angalia malipo mapya",
-      "scanForPayments": "Changanua kwa malipo"
+      "scanForNew": "Angalia malipo mapya"
     },
     "tx": {
       "pending": "Inasubiri",
@@ -1436,6 +1435,17 @@
   "spScan": {
     "title": "Changanua malipo ya kimya",
     "description": "Inatembea kifaa cha kuorodhesha cha BIP-352 kilichosanidiwa block-kwa-block kugundua malipo ya kimya yanayoingia.",
+    "since": "Tangu",
+    "preset": {
+      "lastHour": "Saa iliyopita",
+      "last3h": "Saa 3 zilizopita",
+      "last24h": "Saa 24 zilizopita",
+      "lastWeek": "Wiki iliyopita",
+      "lastMonth": "Mwezi uliopita"
+    },
+    "advanced": "Kina",
+    "connectingIndexer": "Inaunganisha na kifaa cha kuorodhesha…",
+    "upToDate": "Tayari uko hadi sasa.",
     "fromBlock": "Kutoka block",
     "indexerTip": "Kilele cha kifaa cha kuorodhesha",
     "lastFullyScanned": "Iliyochanganuliwa kikamilifu mwisho",

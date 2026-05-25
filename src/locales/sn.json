@@ -832,8 +832,7 @@
       "description": "Govera kero yokugamuchira bitcoin.",
       "addressIndex": "Kero #{{index}}",
       "newAddress": "Kero itsva",
-      "scanForNew": "Tarisa mibhadharo mitsva",
-      "scanForPayments": "Tsvaga mibhadharo"
+      "scanForNew": "Tarisa mibhadharo mitsva"
     },
     "tx": {
       "pending": "Zvichakamirira",
@@ -1109,6 +1108,17 @@
   "spScan": {
     "title": "Tsvaga mibhadharo yakanyararira",
     "description": "Inotevera muongorori weBIP-352 wakarongwa bhuroka nebhuroka kuti iwane mibhadharo yakanyararira inopinda.",
+    "since": "Kubvira",
+    "preset": {
+      "lastHour": "Awa rapfuura",
+      "last3h": "Maawa 3 apfuura",
+      "last24h": "Maawa 24 apfuura",
+      "lastWeek": "Vhiki rapfuura",
+      "lastMonth": "Mwedzi wapfuura"
+    },
+    "advanced": "Zvepamusoro",
+    "connectingIndexer": "Kubatanidza nemuongorori…",
+    "upToDate": "Watova pamberi pose.",
     "fromBlock": "Kubva pabhuroka",
     "indexerTip": "Pamusoro pemuongorori",
     "lastFullyScanned": "Kupedzisira kuongorora kwakazara",

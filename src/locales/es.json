@@ -832,8 +832,7 @@
       "description": "Comparte una dirección para recibir bitcoin.",
       "addressIndex": "Dirección n.º {{index}}",
       "newAddress": "Nueva dirección",
-      "scanForNew": "Comprobar nuevos pagos",
-      "scanForPayments": "Buscar pagos"
+      "scanForNew": "Comprobar nuevos pagos"
     },
     "tx": {
       "pending": "Pendiente",
@@ -1109,6 +1108,17 @@
   "spScan": {
     "title": "Buscar pagos silenciosos",
     "description": "Recorre el indexador BIP-352 configurado bloque por bloque para detectar pagos silenciosos entrantes.",
+    "since": "Desde",
+    "preset": {
+      "lastHour": "Última hora",
+      "last3h": "Últimas 3 horas",
+      "last24h": "Últimas 24 horas",
+      "lastWeek": "Última semana",
+      "lastMonth": "Último mes"
+    },
+    "advanced": "Avanzado",
+    "connectingIndexer": "Conectando con el indexador…",
+    "upToDate": "Ya estás al día.",
     "fromBlock": "Desde el bloque",
     "indexerTip": "Tope del indexador",
     "lastFullyScanned": "Último escaneo completo",

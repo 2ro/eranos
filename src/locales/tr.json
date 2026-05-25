@@ -1263,8 +1263,7 @@
       "description": "Bitcoin almak için bir adres paylaşın.",
       "addressIndex": "Adres #{{index}}",
       "newAddress": "Yeni adres",
-      "scanForNew": "Yeni ödemeleri kontrol et",
-      "scanForPayments": "Ödemeler için tara"
+      "scanForNew": "Yeni ödemeleri kontrol et"
     },
     "tx": {
       "pending": "Beklemede",
@@ -1476,6 +1475,17 @@
   "spScan": {
     "title": "Sessiz ödemeler için tara",
     "description": "Gelen sessiz ödemeleri algılamak için yapılandırılmış BIP-352 indeksleyiciyi blok blok dolaşır.",
+    "since": "Şu tarihten itibaren",
+    "preset": {
+      "lastHour": "Son bir saat",
+      "last3h": "Son 3 saat",
+      "last24h": "Son 24 saat",
+      "lastWeek": "Geçen hafta",
+      "lastMonth": "Geçen ay"
+    },
+    "advanced": "Gelişmiş",
+    "connectingIndexer": "İndeksleyiciye bağlanılıyor…",
+    "upToDate": "Zaten güncelsiniz.",
     "fromBlock": "Başlangıç bloğu",
     "indexerTip": "İndeksleyici ucu",
     "lastFullyScanned": "En son tam tarama",

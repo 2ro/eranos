@@ -1264,8 +1264,7 @@
       "description": "Bitcoin पाने के लिए एक एड्रेस शेयर करें।",
       "addressIndex": "एड्रेस #{{index}}",
       "newAddress": "नया एड्रेस",
-      "scanForNew": "नए भुगतानों की जाँच करें",
-      "scanForPayments": "भुगतान के लिए scan करें"
+      "scanForNew": "नए भुगतानों की जाँच करें"
     },
     "tx": {
       "pending": "पेंडिंग",
@@ -1477,6 +1476,17 @@
   "spScan": {
     "title": "साइलेंट पेमेंट के लिए scan करें",
     "description": "आने वाले साइलेंट पेमेंट का पता लगाने के लिए कॉन्फ़िगर किए गए BIP-352 indexer को block-by-block चलाता है।",
+    "since": "के बाद से",
+    "preset": {
+      "lastHour": "पिछला एक घंटा",
+      "last3h": "पिछले 3 घंटे",
+      "last24h": "पिछले 24 घंटे",
+      "lastWeek": "पिछला हफ़्ता",
+      "lastMonth": "पिछला महीना"
+    },
+    "advanced": "उन्नत",
+    "connectingIndexer": "Indexer से जुड़ रहे हैं…",
+    "upToDate": "आप पहले से ही अप टू डेट हैं।",
     "fromBlock": "किस block से",
     "indexerTip": "Indexer tip",
     "lastFullyScanned": "आख़िरी पूरी तरह scan किया गया",

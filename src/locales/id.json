@@ -1264,8 +1264,7 @@
       "description": "Bagikan alamat untuk menerima bitcoin.",
       "addressIndex": "Alamat #{{index}}",
       "newAddress": "Alamat baru",
-      "scanForNew": "Periksa pembayaran baru",
-      "scanForPayments": "Pindai pembayaran"
+      "scanForNew": "Periksa pembayaran baru"
     },
     "tx": {
       "pending": "Tertunda",
@@ -1477,6 +1476,17 @@
   "spScan": {
     "title": "Pindai silent payment",
     "description": "Menelusuri indexer BIP-352 yang dikonfigurasi blok per blok untuk mendeteksi silent payment masuk.",
+    "since": "Sejak",
+    "preset": {
+      "lastHour": "Satu jam terakhir",
+      "last3h": "3 jam terakhir",
+      "last24h": "24 jam terakhir",
+      "lastWeek": "Pekan lalu",
+      "lastMonth": "Bulan lalu"
+    },
+    "advanced": "Lanjutan",
+    "connectingIndexer": "Menghubungkan ke indexer…",
+    "upToDate": "Anda sudah mutakhir.",
     "fromBlock": "Dari blok",
     "indexerTip": "Tip indexer",
     "lastFullyScanned": "Terakhir dipindai penuh",
