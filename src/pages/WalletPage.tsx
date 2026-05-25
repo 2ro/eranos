@@ -22,13 +22,6 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { LoginArea } from '@/components/auth/LoginArea';
 import { QRCodeCanvas } from '@/components/ui/qrcode';
 import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-} from '@/components/ui/dialog';
-import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -67,7 +60,6 @@ export function WalletPage() {
   const [copiedPayload, setCopiedPayload] = useState(false);
   const [txOpen, setTxOpen] = useState(false);
   const [sendOpen, setSendOpen] = useState(false);
-  const [receiveOpen, setReceiveOpen] = useState(false);
   const [spScanOpen, setSpScanOpen] = useState(false);
   const [backupOpen, setBackupOpen] = useState(false);
 
@@ -239,7 +231,7 @@ export function WalletPage() {
           </button>
         )}
 
-        {/* Send + Receive */}
+        {/* Send */}
         {!isLoading && !error && (
           <div className="flex items-center gap-2">
             <Button
@@ -250,16 +242,6 @@ export function WalletPage() {
             >
               <Send className="size-3.5 mr-1.5" />
               {t('wallet.send')}
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setReceiveOpen(true)}
-              className="rounded-full"
-              disabled={!address}
-            >
-              <ArrowDownLeft className="size-3.5 mr-1.5" />
-              {t('wallet.receive')}
             </Button>
           </div>
         )}
@@ -280,57 +262,70 @@ export function WalletPage() {
 
         <WalletBackupMnemonicDialog open={backupOpen} onOpenChange={setBackupOpen} />
 
-        {/* Receive Dialog */}
-        <Dialog open={receiveOpen} onOpenChange={setReceiveOpen}>
-          <DialogContent className="sm:max-w-sm">
-            <DialogHeader>
-              <DialogTitle>{t('wallet.receiveDialog.title')}</DialogTitle>
-              <DialogDescription>
+        {/* Inline receive panel — lives directly under the balance instead
+            of behind a modal so the QR is always visible. */}
+        {!isLoading && !error && qrPayload && (
+          <div className="w-full max-w-sm flex flex-col items-center gap-4 pt-2">
+            <div className="text-center space-y-1">
+              <h2 className="text-lg font-semibold tracking-tight">
+                {t('wallet.receiveDialog.title')}
+              </h2>
+              <p className="text-sm text-muted-foreground">
                 {t('wallet.receiveDialog.description')}
-              </DialogDescription>
-            </DialogHeader>
+              </p>
+            </div>
 
-            {qrPayload && (
-              <div className="flex flex-col items-center gap-4">
-                {/* Combined BIP-21 QR. BIP-352-aware wallets pick the
-                    `sp=` parameter; legacy wallets fall back to the
-                    on-chain address. Mirrors CampaignWalletDonatePanel. */}
-                <div className="rounded-2xl bg-white p-4 shadow-sm">
-                  <QRCodeCanvas value={qrPayload} size={220} level="M" />
+            {/* Combined BIP-21 QR with centered Agora logo. BIP-352-aware
+                wallets pick the `sp=` parameter; legacy wallets fall back
+                to the on-chain address. Mirrors CampaignWalletDonatePanel:
+                level="H" tolerates the logo occlusion. */}
+            <div className="relative rounded-2xl bg-white p-4 shadow-sm">
+              <QRCodeCanvas value={qrPayload} size={280} level="H" />
+              <div
+                aria-hidden
+                className="absolute inset-0 flex items-center justify-center pointer-events-none"
+              >
+                <div className="rounded-full bg-primary p-2 ring-[6px] ring-white">
+                  <img
+                    src="/logo.svg"
+                    alt=""
+                    className="size-16 object-contain brightness-0 invert"
+                    draggable={false}
+                  />
                 </div>
+              </div>
+            </div>
 
-                {/* Copyable row showing the full payment URI. */}
+            {/* Copyable row showing the full payment URI. */}
+            <button
+              type="button"
+              onClick={copyPayload}
+              className="w-full flex items-center gap-2 rounded-lg border bg-muted/40 px-3 py-2.5 text-left hover:bg-muted/60 motion-safe:transition-colors cursor-pointer"
+            >
+              <span className="flex-1 min-w-0 truncate font-mono text-xs" title={qrPayload}>
+                {qrPayload}
+              </span>
+              {copiedPayload ? (
+                <Check className="size-4 text-green-500 shrink-0" />
+              ) : (
+                <Copy className="size-4 text-muted-foreground shrink-0" />
+              )}
+            </button>
+
+            {address && (
+              <div className="flex items-center gap-3 text-xs text-muted-foreground">
+                <span>{t('wallet.receiveDialog.addressIndex', { index: currentReceiveAddress?.index ?? 0 })}</span>
+                <span aria-hidden>·</span>
                 <button
-                  type="button"
-                  onClick={copyPayload}
-                  className="w-full flex items-center gap-2 rounded-lg border bg-muted/40 px-3 py-2.5 text-left hover:bg-muted/60 motion-safe:transition-colors cursor-pointer"
+                  onClick={() => nextReceiveAddress()}
+                  className="hover:text-foreground underline-offset-4 hover:underline transition-colors cursor-pointer"
                 >
-                  <span className="flex-1 min-w-0 truncate font-mono text-xs" title={qrPayload}>
-                    {qrPayload}
-                  </span>
-                  {copiedPayload ? (
-                    <Check className="size-4 text-green-500 shrink-0" />
-                  ) : (
-                    <Copy className="size-4 text-muted-foreground shrink-0" />
-                  )}
+                  {t('wallet.receiveDialog.newAddress')}
                 </button>
-
-                {address && (
-                  <div className="flex items-center gap-3 text-xs text-muted-foreground">
-                    <span>{t('wallet.receiveDialog.addressIndex', { index: currentReceiveAddress?.index ?? 0 })}</span>
-                    <span aria-hidden>·</span>
-                    <button
-                      onClick={() => nextReceiveAddress()}
-                      className="hover:text-foreground underline-offset-4 hover:underline transition-colors cursor-pointer"
-                    >
-                      {t('wallet.receiveDialog.newAddress')}
-                    </button>
-                  </div>
-                )}
               </div>
             )}
-          </DialogContent>
-        </Dialog>
+          </div>
+        )}
 
         {/* Transactions */}
         {transactions && transactions.length > 0 && (
