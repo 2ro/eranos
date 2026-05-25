@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next';
-import { Clock, EyeOff, SlidersHorizontal, TrendingUp } from 'lucide-react';
+import { Clock, EyeOff, LayoutGrid, SlidersHorizontal, TrendingUp } from 'lucide-react';
 
 import { DebouncedSearchInput } from '@/components/DebouncedSearchInput';
 import { Label } from '@/components/ui/label';
@@ -9,6 +9,7 @@ import { cn } from '@/lib/utils';
 import type { Nip50Sort } from '@/hooks/useNip50Search';
 
 const SORT_OPTIONS: { value: Nip50Sort; labelKey: string; icon: typeof TrendingUp }[] = [
+  { value: 'default', labelKey: 'common.sortDefault', icon: LayoutGrid },
   { value: 'top', labelKey: 'common.sortTop', icon: TrendingUp },
   { value: 'new', labelKey: 'common.sortNew', icon: Clock },
 ];
@@ -77,10 +78,10 @@ export function DiscoverySearchToolbar({
   const { t } = useTranslation();
   const switchId = showHidden?.id ?? 'discovery-show-hidden';
 
-  // Any modifier that differs from the default ("New" sort, hidden off)
-  // tints the Filter button so the active state is visible without
+  // Any modifier that differs from the defaults (Default sort, hidden
+  // off) tints the Filter button so the active state is visible without
   // opening the popover.
-  const hasActiveFilters = sort !== 'new' || showHidden?.value === true;
+  const hasActiveFilters = sort !== 'default' || showHidden?.value === true;
 
   return (
     <div className={cn('max-w-3xl mx-auto flex items-center gap-2', className)}>
@@ -127,7 +128,7 @@ export function DiscoverySearchToolbar({
                   aria-checked={sort === value}
                   onClick={() => onSortChange(value)}
                   className={cn(
-                    'flex-1 inline-flex items-center justify-center gap-1.5 px-2.5 py-1.5 text-xs font-medium rounded-md motion-safe:transition-colors',
+                    'flex-1 inline-flex items-center justify-center gap-1 px-1.5 py-1.5 text-xs font-medium rounded-md motion-safe:transition-colors',
                     sort === value
                       ? 'bg-background text-foreground shadow-sm'
                       : 'text-muted-foreground hover:text-foreground',
