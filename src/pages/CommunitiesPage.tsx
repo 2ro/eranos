@@ -75,7 +75,7 @@ export function CommunitiesPage() {
     <main className="min-h-screen pb-16 sidebar:pb-0">
       <CommunitiesHero onCreateCommunity={handleCreateCommunity} />
 
-      <div className="max-w-5xl mx-auto space-y-2 sm:space-y-4 pb-8">
+      <div className="max-w-7xl mx-auto space-y-2 sm:space-y-4 pb-8">
         <section className="pt-6">
           <SectionHeader title={t('groups.list.myGroups')} className="pb-3 sm:px-6" />
           <MyCommunitiesShelf
