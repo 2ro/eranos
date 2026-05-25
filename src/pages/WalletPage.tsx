@@ -266,15 +266,6 @@ export function WalletPage() {
             of behind a modal so the QR is always visible. */}
         {!isLoading && !error && qrPayload && (
           <div className="w-full max-w-sm flex flex-col items-center gap-4 pt-2">
-            <div className="text-center space-y-1">
-              <h2 className="text-lg font-semibold tracking-tight">
-                {t('wallet.receiveDialog.title')}
-              </h2>
-              <p className="text-sm text-muted-foreground">
-                {t('wallet.receiveDialog.description')}
-              </p>
-            </div>
-
             {/* Combined BIP-21 QR with centered Agora logo. BIP-352-aware
                 wallets pick the `sp=` parameter; legacy wallets fall back
                 to the on-chain address. Mirrors CampaignWalletDonatePanel:
@@ -296,34 +287,50 @@ export function WalletPage() {
               </div>
             </div>
 
-            {/* Copyable row showing the full payment URI. */}
-            <button
-              type="button"
-              onClick={copyPayload}
-              className="w-full flex items-center gap-2 rounded-lg border bg-muted/40 px-3 py-2.5 text-left hover:bg-muted/60 motion-safe:transition-colors cursor-pointer"
-            >
-              <span className="flex-1 min-w-0 truncate font-mono text-xs" title={qrPayload}>
-                {qrPayload}
-              </span>
-              {copiedPayload ? (
-                <Check className="size-4 text-green-500 shrink-0" />
-              ) : (
-                <Copy className="size-4 text-muted-foreground shrink-0" />
-              )}
-            </button>
-
-            {address && (
-              <div className="flex items-center gap-3 text-xs text-muted-foreground">
-                <span>{t('wallet.receiveDialog.addressIndex', { index: currentReceiveAddress?.index ?? 0 })}</span>
-                <span aria-hidden>·</span>
-                <button
-                  onClick={() => nextReceiveAddress()}
-                  className="hover:text-foreground underline-offset-4 hover:underline transition-colors cursor-pointer"
-                >
-                  {t('wallet.receiveDialog.newAddress')}
-                </button>
-              </div>
-            )}
+            {/* Copyable row showing the full payment URI. A refresh icon on
+                the left rotates to the next unused on-chain address; clicks
+                stop propagation so they don't trigger the row's copy. */}
+            <div className="w-full space-y-1.5">
+              <button
+                type="button"
+                onClick={copyPayload}
+                className="w-full flex items-center gap-2 rounded-lg border bg-muted/40 px-3 py-2.5 text-left hover:bg-muted/60 motion-safe:transition-colors cursor-pointer"
+              >
+                {address && (
+                  <span
+                    role="button"
+                    tabIndex={0}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      nextReceiveAddress();
+                    }}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        nextReceiveAddress();
+                      }
+                    }}
+                    className="shrink-0 -ml-1 inline-flex items-center justify-center size-7 rounded-full text-muted-foreground hover:text-foreground hover:bg-muted motion-safe:transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary cursor-pointer"
+                    aria-label={t('wallet.receiveDialog.newAddress')}
+                    title={t('wallet.receiveDialog.newAddress')}
+                  >
+                    <RefreshCw className="size-3.5" />
+                  </span>
+                )}
+                <span className="flex-1 min-w-0 truncate font-mono text-xs" title={qrPayload}>
+                  {qrPayload}
+                </span>
+                {copiedPayload ? (
+                  <Check className="size-4 text-green-500 shrink-0" />
+                ) : (
+                  <Copy className="size-4 text-muted-foreground shrink-0" />
+                )}
+              </button>
+              <p className="text-xs text-muted-foreground text-center">
+                {t('wallet.receiveDialog.description')}
+              </p>
+            </div>
           </div>
         )}
 
