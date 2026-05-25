@@ -373,8 +373,121 @@ export async function fetchTxDetail(
 }
 
 // ---------------------------------------------------------------------------
-// Full address detail (NIP-73 /i/bitcoin:address:... page)
+// Address transaction history (campaign ledger, /i/bitcoin:address:... page)
 // ---------------------------------------------------------------------------
+
+/**
+ * A transaction in an address's history, summarised for ledger-style display.
+ *
+ * `netSats` is the address-relative net flow: the sum of outputs paying to
+ * the address minus the sum of inputs spending from it. Positive means the
+ * address received funds in this tx, negative means it sent.
+ */
+export interface AddressTransaction {
+  /** Transaction ID (hex). */
+  txid: string;
+  /** Net satoshi change for the address (positive = received, negative = sent). */
+  netSats: number;
+  /** Total satoshis received by the address in this tx (sum of outputs to it). */
+  receivedSats: number;
+  /** Total satoshis sent from the address in this tx (sum of inputs from it). */
+  sentSats: number;
+  /** Network fee paid by this tx (sats). */
+  fee: number;
+  /** Block height (undefined if unconfirmed). */
+  blockHeight?: number;
+  /** Block time (unix seconds, undefined if unconfirmed). */
+  blockTime?: number;
+  /** True if confirmed in a block. */
+  confirmed: boolean;
+}
+
+/** Shape of a single `vin` / `vout` entry returned by Esplora's `/address/:addr/txs` endpoint. */
+interface EsploraTxIO {
+  prevout?: { scriptpubkey_address?: string; value: number } | null;
+  scriptpubkey_address?: string;
+  value: number;
+}
+
+/** Shape of a single transaction returned by Esplora's `/address/:addr/txs` endpoint. */
+interface EsploraAddressTx {
+  txid: string;
+  fee: number;
+  vin: EsploraTxIO[];
+  vout: EsploraTxIO[];
+  status: {
+    confirmed: boolean;
+    block_height?: number;
+    block_time?: number;
+  };
+}
+
+/**
+ * Summarise a raw Esplora tx (from `/address/:addr/txs[/chain/...]`) into an
+ * address-relative ledger row.
+ */
+function summariseAddressTx(tx: EsploraAddressTx, address: string): AddressTransaction {
+  let sentSats = 0;
+  for (const input of tx.vin) {
+    if (input.prevout?.scriptpubkey_address === address) {
+      sentSats += input.prevout.value ?? 0;
+    }
+  }
+
+  let receivedSats = 0;
+  for (const output of tx.vout) {
+    if (output.scriptpubkey_address === address) {
+      receivedSats += output.value ?? 0;
+    }
+  }
+
+  return {
+    txid: tx.txid,
+    netSats: receivedSats - sentSats,
+    receivedSats,
+    sentSats,
+    fee: tx.fee ?? 0,
+    blockHeight: tx.status.block_height,
+    blockTime: tx.status.block_time,
+    confirmed: tx.status.confirmed,
+  };
+}
+
+/**
+ * Fetch transaction history for a Bitcoin address from an Esplora-compatible
+ * REST API.
+ *
+ * Returns confirmed transactions newest first, optionally prefixed by any
+ * unconfirmed (mempool) transactions touching the address. Esplora's
+ * `/address/:addr/txs` endpoint returns at most 50 confirmed transactions
+ * per page (plus all mempool entries on the first call). Pass `lastSeenTxid`
+ * to fetch the next page via `/address/:addr/txs/chain/:last_seen_txid`.
+ *
+ * @param address       The Bitcoin address to look up.
+ * @param baseUrls      Ordered list of Esplora REST roots tried with failover.
+ * @param lastSeenTxid  When supplied, fetch the page of confirmed txs older
+ *                      than this txid. When omitted, returns mempool + the
+ *                      newest confirmed page.
+ * @param signal        Optional abort signal (e.g. from TanStack Query).
+ */
+export async function fetchAddressTxs(
+  address: string,
+  baseUrls: string[],
+  lastSeenTxid: string | undefined,
+  signal?: AbortSignal,
+): Promise<AddressTransaction[]> {
+  const path = lastSeenTxid
+    ? `/address/${address}/txs/chain/${lastSeenTxid}`
+    : `/address/${address}/txs`;
+  const response = await esploraFetch(baseUrls, path, { signal });
+
+  if (!response.ok) {
+    throw new Error('Failed to fetch address transactions');
+  }
+
+  const data: EsploraAddressTx[] = await response.json();
+  return data.map((tx) => summariseAddressTx(tx, address));
+}
 
 // ---------------------------------------------------------------------------
 // Sending: UTXOs, fee estimation, transaction construction, broadcast

@@ -18,6 +18,7 @@ import {
 } from 'lucide-react';
 
 import { AuthorByline } from '@/components/AuthorByline';
+import { CampaignLedger } from '@/components/CampaignLedger';
 import { CommentsSection } from '@/components/CommentsSection';
 import {
   CampaignWalletDonatePanel,
@@ -25,6 +26,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -469,52 +471,57 @@ function CampaignDetailContent({ campaign }: { campaign: ParsedCampaign }) {
                 </div>
               )}
 
-              <CommentsSection title={t('campaignsDetail.commentsAndDonations')}>
-                <DetailCommentComposer
-                  event={campaign.event}
-                  onSuccess={() => queryClient.invalidateQueries({ queryKey: ['nostr', 'comments'] })}
-                />
-
-                {commentsLoading && statsLoading && replyTree.length === 0 ? (
-                  <div>
-                    {Array.from({ length: 3 }).map((_, i) => (
-                      <DetailReplySkeleton key={i} />
-                    ))}
-                  </div>
-                ) : replyTree.length > 0 ? (
-                  <div>
-                    <ThreadedReplyList
-                      roots={replyTree}
-                      hideCommentContext
-                      leafCardClassName="py-4"
-                      renderAuthorBadge={(event) =>
-                        event.pubkey === campaign.pubkey ? <CampaignerBadge /> : null
-                      }
-                      renderItemHeader={(event) => (
-                        <CampaignPinHeader
-                          canManagePins={canManagePins}
-                          isPinned={isPinned(event.id)}
-                          pinPending={togglePin.isPending}
-                          onTogglePin={() => handleTogglePin(event)}
-                        />
-                      )}
+              <CampaignActivityTabs
+                campaign={campaign}
+                commentsTab={
+                  <CommentsSection title={t('campaignsDetail.commentsAndDonations')}>
+                    <DetailCommentComposer
+                      event={campaign.event}
+                      onSuccess={() => queryClient.invalidateQueries({ queryKey: ['nostr', 'comments'] })}
                     />
-                  </div>
-                ) : (
-                  <button
-                    type="button"
-                    onClick={() => setReplyOpen(true)}
-                    className="block w-full px-6 py-10 text-center hover:bg-foreground/5 transition-colors"
-                  >
-                    <p className="text-base font-medium text-foreground">
-                      {t('campaignsDetail.noCommentsTitle')}
-                    </p>
-                    <p className="mt-1 text-sm text-muted-foreground">
-                      {t('campaignsDetail.noCommentsHint')}
-                    </p>
-                  </button>
-                )}
-              </CommentsSection>
+
+                    {commentsLoading && statsLoading && replyTree.length === 0 ? (
+                      <div>
+                        {Array.from({ length: 3 }).map((_, i) => (
+                          <DetailReplySkeleton key={i} />
+                        ))}
+                      </div>
+                    ) : replyTree.length > 0 ? (
+                      <div>
+                        <ThreadedReplyList
+                          roots={replyTree}
+                          hideCommentContext
+                          leafCardClassName="py-4"
+                          renderAuthorBadge={(event) =>
+                            event.pubkey === campaign.pubkey ? <CampaignerBadge /> : null
+                          }
+                          renderItemHeader={(event) => (
+                            <CampaignPinHeader
+                              canManagePins={canManagePins}
+                              isPinned={isPinned(event.id)}
+                              pinPending={togglePin.isPending}
+                              onTogglePin={() => handleTogglePin(event)}
+                            />
+                          )}
+                        />
+                      </div>
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={() => setReplyOpen(true)}
+                        className="block w-full px-6 py-10 text-center hover:bg-foreground/5 transition-colors"
+                      >
+                        <p className="text-base font-medium text-foreground">
+                          {t('campaignsDetail.noCommentsTitle')}
+                        </p>
+                        <p className="mt-1 text-sm text-muted-foreground">
+                          {t('campaignsDetail.noCommentsHint')}
+                        </p>
+                      </button>
+                    )}
+                  </CommentsSection>
+                }
+              />
             </div>
           </div>
 
@@ -609,6 +616,56 @@ function CampaignPinHeader({
       pinPending={pinPending}
       onTogglePin={onTogglePin}
     />
+  );
+}
+
+/**
+ * Tabbed wrapper around the campaign's social + on-chain activity. The
+ * "Comments & donations" tab is always present; "Ledger" only renders when
+ * the campaign declares a public on-chain endpoint (`bc1q…` / `bc1p…`).
+ *
+ * Silent-payment-only campaigns intentionally have no ledger — the receive
+ * address is unlinkable by design — so the component degrades to a single
+ * un-tabbed surface in that case to avoid showing a lone disabled tab.
+ */
+function CampaignActivityTabs({
+  campaign,
+  commentsTab,
+}: {
+  campaign: ParsedCampaign;
+  commentsTab: ReactNode;
+}) {
+  const { t } = useTranslation();
+  const onchainAddress = campaign.wallets.onchain?.value;
+
+  // No on-chain endpoint → no Ledger tab. Render the comments surface
+  // directly so we don't show a single lonely tab control.
+  if (!onchainAddress) {
+    return <>{commentsTab}</>;
+  }
+
+  return (
+    <Tabs defaultValue="comments" className="mt-4">
+      <TabsList className="w-full sm:w-auto">
+        <TabsTrigger value="comments" className="flex-1 sm:flex-none">
+          {t('campaignsDetail.tabComments')}
+        </TabsTrigger>
+        <TabsTrigger value="ledger" className="flex-1 sm:flex-none">
+          {t('campaignsDetail.tabLedger')}
+        </TabsTrigger>
+      </TabsList>
+
+      <TabsContent value="comments" className="mt-3">
+        {/* The wrapped CommentsSection already provides its own heading +
+            margin; nest it here without an extra `mt-*` so the tab list
+            and the panel stay visually tight. */}
+        <div className="-mt-4">{commentsTab}</div>
+      </TabsContent>
+
+      <TabsContent value="ledger" className="mt-3">
+        <CampaignLedger address={onchainAddress} />
+      </TabsContent>
+    </Tabs>
   );
 }
 
