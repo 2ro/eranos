@@ -1393,8 +1393,6 @@
     "title": "साइलेंट पेमेंट के लिए scan करें",
     "description": "आने वाले साइलेंट पेमेंट का पता लगाने के लिए कॉन्फ़िगर किए गए BIP-352 indexer को block-by-block चलाता है।",
     "fromBlock": "किस block से",
-    "toBlock": "किस block तक",
-    "tipPlaceholder": "tip",
     "indexerTip": "Indexer tip",
     "lastFullyScanned": "आख़िरी पूरी तरह scan किया गया",
     "never": "कभी नहीं",

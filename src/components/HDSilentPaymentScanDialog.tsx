@@ -20,10 +20,11 @@ import { useHdWalletSp } from '@/hooks/useHdWalletSp';
 // HD wallet — silent-payment "Scan history" dialog
 // ---------------------------------------------------------------------------
 //
-// Walks the user through running a BIP-352 chain scan over a configurable
-// block range. Defaults to "from last scanned height → tip", which is the
-// common forward-catch-up case; advanced users can edit the bounds for a
-// targeted backfill.
+// Walks the user through running a BIP-352 chain scan from a configurable
+// starting height up to the current indexer tip. Defaults to
+// "last scanned height + 1", which is the common forward-catch-up case;
+// advanced users can edit the starting bound for a targeted backfill.
+// The scan always runs to the tip — to stop early, hit Cancel.
 // ---------------------------------------------------------------------------
 
 interface HDSilentPaymentScanDialogProps {
@@ -35,7 +36,6 @@ export function HDSilentPaymentScanDialog({ open, onOpenChange }: HDSilentPaymen
   const { t } = useTranslation();
   const sp = useHdWalletSp();
   const [from, setFrom] = useState('');
-  const [to, setTo] = useState('');
   const [touched, setTouched] = useState(false);
   const [includeSpent, setIncludeSpent] = useState(false);
 
@@ -51,20 +51,16 @@ export function HDSilentPaymentScanDialog({ open, onOpenChange }: HDSilentPaymen
     const lastScanned = sp.storage?.scanHeight ?? 0;
     const defaultFrom = lastScanned > 0 ? lastScanned + 1 : tip ? Math.max(0, tip - 144) : 0;
     setFrom(String(defaultFrom));
-    setTo(tip ? String(tip) : '');
   }, [open, sp.tipHeight, sp.storage?.scanHeight, touched]);
 
   const fromNum = Number(from);
-  const toNum = Number(to);
   const fromValid = Number.isInteger(fromNum) && fromNum >= 0;
-  const toValid = to === '' || (Number.isInteger(toNum) && toNum >= fromNum);
-  const inputsValid = fromValid && toValid;
+  const inputsValid = fromValid;
 
   const handleScan = async () => {
     if (!inputsValid) return;
     await sp.scanRange({
       fromHeight: fromNum,
-      toHeight: to === '' ? undefined : toNum,
       includeSpent,
     });
   };
@@ -91,44 +87,23 @@ export function HDSilentPaymentScanDialog({ open, onOpenChange }: HDSilentPaymen
         </DialogHeader>
 
         <div className="space-y-4">
-          <div className="grid grid-cols-2 gap-3">
-            <div className="space-y-1.5">
-              <Label htmlFor="sp-scan-from" className="text-xs">
-                {t('spScan.fromBlock')}
-              </Label>
-              <Input
-                id="sp-scan-from"
-                type="number"
-                inputMode="numeric"
-                min={0}
-                value={from}
-                onChange={(e) => {
-                  setTouched(true);
-                  setFrom(e.target.value);
-                }}
-                disabled={sp.isScanning}
-                aria-invalid={!fromValid}
-              />
-            </div>
-            <div className="space-y-1.5">
-              <Label htmlFor="sp-scan-to" className="text-xs">
-                {t('spScan.toBlock')}
-              </Label>
-              <Input
-                id="sp-scan-to"
-                type="number"
-                inputMode="numeric"
-                min={0}
-                placeholder={t('spScan.tipPlaceholder')}
-                value={to}
-                onChange={(e) => {
-                  setTouched(true);
-                  setTo(e.target.value);
-                }}
-                disabled={sp.isScanning}
-                aria-invalid={!toValid}
-              />
-            </div>
+          <div className="space-y-1.5">
+            <Label htmlFor="sp-scan-from" className="text-xs">
+              {t('spScan.fromBlock')}
+            </Label>
+            <Input
+              id="sp-scan-from"
+              type="number"
+              inputMode="numeric"
+              min={0}
+              value={from}
+              onChange={(e) => {
+                setTouched(true);
+                setFrom(e.target.value);
+              }}
+              disabled={sp.isScanning}
+              aria-invalid={!fromValid}
+            />
           </div>
 
           {sp.tipHeight !== undefined && (

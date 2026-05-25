@@ -1457,8 +1457,6 @@
     "title": "Scan for silent payments",
     "description": "Walks the configured BIP-352 indexer block-by-block to detect incoming silent payments.",
     "fromBlock": "From block",
-    "toBlock": "To block",
-    "tipPlaceholder": "tip",
     "indexerTip": "Indexer tip",
     "lastFullyScanned": "Last fully scanned",
     "never": "never",

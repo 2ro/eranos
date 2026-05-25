@@ -1453,8 +1453,6 @@
     "title": "Escanear pagamentos silenciosos",
     "description": "Percorre o indexador BIP-352 configurado bloco a bloco para detectar pagamentos silenciosos recebidos.",
     "fromBlock": "Do bloco",
-    "toBlock": "Ao bloco",
-    "tipPlaceholder": "topo",
     "indexerTip": "Topo do indexador",
     "lastFullyScanned": "Último escaneamento completo",
     "never": "nunca",

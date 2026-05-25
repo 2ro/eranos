@@ -1034,8 +1034,6 @@
     "title": "Tsvaga mibhadharo yakanyararira",
     "description": "Inotevera muongorori weBIP-352 wakarongwa bhuroka nebhuroka kuti iwane mibhadharo yakanyararira inopinda.",
     "fromBlock": "Kubva pabhuroka",
-    "toBlock": "Kusvika pabhuroka",
-    "tipPlaceholder": "pamusoro",
     "indexerTip": "Pamusoro pemuongorori",
     "lastFullyScanned": "Kupedzisira kuongorora kwakazara",
     "never": "kana paine",

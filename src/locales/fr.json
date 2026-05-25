@@ -1457,8 +1457,6 @@
     "title": "Scanner les paiements silencieux",
     "description": "Parcourt l'indexeur BIP-352 configuré bloc par bloc pour détecter les paiements silencieux entrants.",
     "fromBlock": "Du bloc",
-    "toBlock": "Au bloc",
-    "tipPlaceholder": "sommet",
     "indexerTip": "Sommet de l'indexeur",
     "lastFullyScanned": "Dernier scan complet",
     "never": "jamais",

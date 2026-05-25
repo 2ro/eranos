@@ -1402,8 +1402,6 @@
     "title": "Pindai silent payment",
     "description": "Menelusuri indexer BIP-352 yang dikonfigurasi blok per blok untuk mendeteksi silent payment masuk.",
     "fromBlock": "Dari blok",
-    "toBlock": "Ke blok",
-    "tipPlaceholder": "tip",
     "indexerTip": "Tip indexer",
     "lastFullyScanned": "Terakhir dipindai penuh",
     "never": "tidak pernah",

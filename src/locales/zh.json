@@ -1034,8 +1034,6 @@
     "title": "扫描静默支付",
     "description": "逐块遍历已配置的 BIP-352 索引器，以检测传入的静默支付。",
     "fromBlock": "起始区块",
-    "toBlock": "结束区块",
-    "tipPlaceholder": "链尖",
     "indexerTip": "索引器链尖",
     "lastFullyScanned": "上次完整扫描",
     "never": "从未",

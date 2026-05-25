@@ -1402,8 +1402,6 @@
     "title": "Sessiz ödemeler için tara",
     "description": "Gelen sessiz ödemeleri algılamak için yapılandırılmış BIP-352 indeksleyiciyi blok blok dolaşır.",
     "fromBlock": "Başlangıç bloğu",
-    "toBlock": "Bitiş bloğu",
-    "tipPlaceholder": "uç",
     "indexerTip": "İndeksleyici ucu",
     "lastFullyScanned": "En son tam tarama",
     "never": "hiç",
