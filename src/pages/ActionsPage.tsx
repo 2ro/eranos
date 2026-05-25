@@ -417,7 +417,7 @@ export default function ActionsPage() {
       {isSearching ? (
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-10 lg:py-14">
           <section className="space-y-5">
-            <div className="flex items-end justify-between gap-4">
+            <div className="flex flex-col items-stretch gap-4 sm:flex-row sm:items-end sm:justify-between">
               <div>
                 <h2 className="text-2xl sm:text-3xl font-bold tracking-tight">
                   {trimmedSearch
@@ -498,7 +498,7 @@ export default function ActionsPage() {
           </div>
         ) : (actions && actions.length > 0) ? (
           <div className="space-y-8">
-            <div className="flex items-end justify-between gap-4">
+            <div className="flex flex-col items-stretch gap-4 sm:flex-row sm:items-end sm:justify-between">
               <div>
                 <h2 className="text-2xl sm:text-3xl font-bold tracking-tight">{primarySectionTitle}</h2>
                 <p className="text-sm text-muted-foreground mt-1">
@@ -570,7 +570,7 @@ export default function ActionsPage() {
           </div>
         ) : (
           <>
-            <div className="flex items-end justify-between gap-4 mb-6">
+            <div className="flex flex-col items-stretch gap-4 sm:flex-row sm:items-end sm:justify-between mb-6">
               <div>
                 <h2 className="text-2xl sm:text-3xl font-bold tracking-tight">{t('pledges.list.sectionActive')}</h2>
                 <p className="text-sm text-muted-foreground mt-1">

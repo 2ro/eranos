@@ -154,7 +154,7 @@ export function CommunitiesPage() {
       {isSearching ? (
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-10">
           <section className="space-y-5">
-            <div className="flex items-end justify-between gap-4">
+            <div className="flex flex-col items-stretch gap-4 sm:flex-row sm:items-end sm:justify-between">
               <div>
                 <h2 className="text-2xl sm:text-3xl font-bold tracking-tight">
                   {trimmedSearch
@@ -213,7 +213,7 @@ export function CommunitiesPage() {
       ) : (
         <div className="max-w-7xl mx-auto px-4 sm:px-6 space-y-10 sm:space-y-12 pb-8 pt-10 lg:pt-14">
           <section className="space-y-5">
-            <div className="flex items-end justify-between gap-4">
+            <div className="flex flex-col items-stretch gap-4 sm:flex-row sm:items-end sm:justify-between">
               <div>
                 <h2 className="text-2xl sm:text-3xl font-bold tracking-tight">
                   {t('groups.list.myGroups')}
@@ -231,7 +231,7 @@ export function CommunitiesPage() {
           </section>
 
           <section className="space-y-5">
-            <div className="flex items-end justify-between gap-4">
+            <div className="flex flex-col items-stretch gap-4 sm:flex-row sm:items-end sm:justify-between">
               <div>
                 <h2 className="text-2xl sm:text-3xl font-bold tracking-tight">
                   {t('groups.list.featuredGroups')}

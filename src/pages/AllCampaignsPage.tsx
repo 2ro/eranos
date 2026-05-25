@@ -155,7 +155,7 @@ export function AllCampaignsPage() {
             New based on toolbar state; tagline stays constant.
             Search input + filter button cluster on the right, paired
             with the heading on the left in a single row. */}
-        <div className="flex items-end justify-between gap-4">
+        <div className="flex flex-col items-stretch gap-4 sm:flex-row sm:items-end sm:justify-between">
           <div>
             <h2 className="text-2xl sm:text-3xl font-bold tracking-tight">
               {activeQuery

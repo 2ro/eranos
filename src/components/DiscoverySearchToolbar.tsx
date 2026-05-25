@@ -103,14 +103,14 @@ export function DiscoverySearchToolbar({
     : SORT_OPTIONS;
 
   return (
-    <div className={cn('flex items-center gap-1 shrink-0', className)}>
+    <div className={cn('flex items-center gap-1 sm:shrink-0', className)}>
       <DebouncedSearchInput
         value={query}
         onChange={onQueryChange}
         placeholder={t(searchPlaceholderKey)}
         ariaLabel={t(searchAriaLabelKey)}
         clearLabel={t('common.clearSearch')}
-        className="w-48 sm:w-64 mr-1"
+        className="flex-1 sm:flex-none sm:w-64 mr-1"
       />
 
       <DropdownMenu>
