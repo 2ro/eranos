@@ -2014,8 +2014,19 @@
       "connect-wallet": {
         "question": "Walleti iri pa{{appName}} chii?",
         "answer": [
-          "Walleti yako ye{{appName}} yakavakwa kubva kukey yako yeNostr. Inogona kugashira Bitcoin nenzira mbiri — sekero yepachena inogona kubhadharwa newalleti yeBitcoin ipi zvayo, uye sekodhi yemibhadharo yakanyarara inogona kubhadharwa newalleti dzinokwanisa muchivande. Hapana chinonyoreswa; inovapo nguva yaunenge wave neakaundi.",
-          "Paunogadzira kambeni, unosarudza kuti unogamuchira mibhadharo yepachena, yakavanzika, kana zvese. Kuti ushandise zvawagamuchira, ona **Bhuku reMushanduki**."
+          "Walleti yako ye{{appName}} iwalleti yeBitcoin **inozvichengeta** (self-custodial), yakavakwa kubva kukiyi yako yeNostr. {{appName}} haina kana nguva imwe inobata mari yako — walleti inomhanya mubrowser mako uye inosaina mishando ipapo nekiyi yaunozvidzora wega. Inogona kugashira Bitcoin nenzira mbiri — sekero yepachena inogona kubhadharwa newalleti yeBitcoin ipi zvayo, uye sekodhi yemibhadharo yakanyarara inogona kubhadharwa newalleti dzinokwanisa muchivande. Hapana chinonyoreswa; inovapo nguva yaunenge wave neakaundi.",
+          "Paunogadzira kambeni, unosarudza kuti unogamuchira mibhadharo yepachena, yakavanzika, kana zvese. Kuti ushandise zvawagamuchira, ona **Bhuku reMushanduki**.",
+          "Unogonawo kubudisa mutsara weseed wemazwi makumi maviri nemana wewalleti yako wougopinza muwalleti yeBitcoin ipi zvayo yakajairika — ona \"Ndinogona kubudisa walleti yangu ye{{appName}} ndichiipinza mune imwe walleti yeBitcoin here?\" pazasi."
+        ]
+      },
+      "export-wallet": {
+        "question": "Ndinogona kubudisa walleti yangu ye{{appName}} ndichiipinza mune imwe walleti yeBitcoin here?",
+        "answer": [
+          "Hongu. Walleti yako ye{{appName}} inozvichengeta zvizere. {{appName}} haina kana nguva imwe inobata Bitcoin yako uye haione makiyi ako — walleti inomhanya zvachose mubrowser mako, ichisaina mishando ipapo nekiyi inotorwa kubva kukiyi yako yakavanzika yeNostr (nsec).",
+          "Vhura walleti uchibva mumenyu, baya menyu yematombo matatu kumusoro kurudyi, wosarudza **Chengetedza chikwama**. Uchaona mutsara weseed weBIP-39 wemazwi makumi maviri nemana. Anyora pane imwe nzvimbo yakachengetedzeka (kana kuanochengeta mu password manager) — **chero ani anenge aine mazwi aya anogona kushandisa Bitcoin yako.**",
+          "Unogona kupinza mazwi makumi maviri nemana iwayo muwalleti yeBitcoin ipi zvayo yakajairika: **Sparrow**, **Electrum**, **BlueWallet**, **Phoenix**, **Trezor**, kana **Ledger**. {{appName}} inoshandisa nzira dzakajairika dzekutora — BIP-86 (Taproot) neBIP-352 (mibhadharo yakanyarara) — saka hapana kumisikidza kwakasarudzika kunodikanwa.",
+          "Mushure mekupinza, walleti iyo imwe inoratidza bharanzi nenhoroondo zvakafanana newalleti yako ye{{appName}} — iwalleti imwechete, kungoti maonero maviri ayo.",
+          "Kubudisa mutsara weseed kunowanikwa chete kana wakapinda uchishandisa nsec. Kupinda kwekuwedzera kwebrowser nokwemusainiri wekure (bunker) kunochengeta kiyi yako yakavanzika yakaparadzaniswa, saka {{appName}} haigone kutora seed munzira idzodzo."
         ]
       },
       "donations-are-public-general": {
@@ -2331,11 +2342,11 @@
         "steps": {
           "sweep": {
             "title": "Tora kuwalleti yaunozvidzora",
-            "body": "Sarudzo dzakanaka dzekuzvichengeta: [Sparrow](https://sparrowwallet.com), [BlueWallet](https://bluewallet.io), kana [Phoenix](https://phoenix.acinq.co) (Lightning)."
+            "body": "Walleti yako ye{{appName}} yatova inozvichengeta — iwe, uye iwe chete, ndiwe unodzora makiyi. Kuti uone bharanzi imwechete uchishandisa walleti yedesktop kana yehardware, vhura menyu yewalleti, sarudza **Chengetedza chikwama**, wogopinza mutsara weseed wemazwi makumi maviri nemana muna [Sparrow](https://sparrowwallet.com), [BlueWallet](https://bluewallet.io), kana muwalleti yehardware (Trezor, Ledger). Kana uchida kufambisa mari kukiyi yakasiyana zvachose — semuenzaniso, kuwalleti yeLightning se [Phoenix](https://phoenix.acinq.co) — tumira mushando weBitcoin wakajairika kubva muwalleti yako ye{{appName}}."
           },
           "dontSit": {
-            "title": "Usagara nemari kukero yekambeni",
-            "body": "Itai sebhokisi remepositi, kwete account yekuchengeta. Izvi zvinoshanda kuzvipo zvepachena nezvakanyarara zvese."
+            "title": "Usagara nemari mubrowser",
+            "body": "Zvikuru kumakambeni ane mari yakawanda, chengeta mutsara weseed wewalleti panze (papepa, pasimbi, kana mu password manager pamuchina wakatsaurirwa) uye funga nezve walleti yehardware. Seed yaunochengetedza kubva pa{{appName}} ndeyewalleti imwecheteyo — chengetedza mazwi uye watova nechechengeto yakatonhora (cold storage)."
           }
         }
       },
