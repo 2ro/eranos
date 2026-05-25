@@ -38,7 +38,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 
 import {
-  HandHeart, PlusCircle, ChevronRight, Loader2,
+  HandHeart, PlusCircle, ChevronDown, ChevronUp, Loader2,
   Link as LinkIcon, Check, MoreHorizontal, Trash2,
   Megaphone, Hourglass, EyeOff,
 } from 'lucide-react';
@@ -863,12 +863,24 @@ function ActionSection({
         ))}
       </div>
       {total > visible && (
-        <div className="flex justify-center pt-2">
-          <Button variant="outline" onClick={onToggle} className="gap-2">
+        <div className="flex justify-center">
+          <Button
+            type="button"
+            variant="ghost"
+            onClick={onToggle}
+            className="rounded-full text-sm"
+            aria-expanded={showAll}
+          >
             {showAll ? (
-              <>{t('pledges.list.showLess')} <ChevronRight className="h-4 w-4 rotate-90" /></>
+              <>
+                <ChevronUp className="size-4 mr-1.5" />
+                {t('pledges.list.showLess')}
+              </>
             ) : (
-              <>{t('pledges.list.showMore', { count: total - visible })} <ChevronRight className="h-4 w-4 -rotate-90" /></>
+              <>
+                <ChevronDown className="size-4 mr-1.5" />
+                {t('pledges.list.showMore', { count: total - visible })}
+              </>
             )}
           </Button>
         </div>
