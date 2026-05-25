@@ -29,6 +29,7 @@ export function RepostMenu({ event, children }: RepostMenuProps) {
   const [open, setOpen] = useState(false);
   const [quoteOpen, setQuoteOpen] = useState(false);
   const [quoteInitialContent, setQuoteInitialContent] = useState<string | undefined>(undefined);
+  const [attachQuotedEvent, setAttachQuotedEvent] = useState(true);
   const { user } = useCurrentUser();
   const { mutate: publishEvent } = useNostrPublish();
   const { mutate: deleteEvent } = useDeleteEvent();
@@ -149,12 +150,14 @@ export function RepostMenu({ event, children }: RepostMenuProps) {
 
   const handleQuote = () => {
     setQuoteInitialContent(undefined);
+    setAttachQuotedEvent(true);
     setOpen(false);
     setQuoteOpen(true);
   };
 
   const handleBoost = () => {
     setQuoteInitialContent(`\n\n${buildAgoraUrl(encodeEventAddress(event))}`);
+    setAttachQuotedEvent(false);
     setOpen(false);
     setQuoteOpen(true);
   };
@@ -225,7 +228,7 @@ export function RepostMenu({ event, children }: RepostMenuProps) {
         </PopoverContent>
       </Popover>
       <ReplyComposeModal 
-        quotedEvent={event}
+        quotedEvent={attachQuotedEvent ? event : undefined}
         open={quoteOpen}
         onOpenChange={setQuoteOpen}
         initialContent={quoteInitialContent}
