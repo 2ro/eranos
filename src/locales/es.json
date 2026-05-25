@@ -1106,7 +1106,9 @@
     "iUnderstand": "Entiendo que esta transacción es pública."
   },
   "spScan": {
-    "title": "Buscar pagos silenciosos",
+    "title": "Comprobar nuevos pagos",
+    "subtitle": "Escanea la cadena de bloques en busca de pagos privados",
+    "descriptionHelp": "Más información",
     "description": "Recorre el indexador BIP-352 configurado bloque por bloque para detectar pagos silenciosos entrantes.",
     "since": "Desde",
     "preset": {

@@ -1538,7 +1538,9 @@
     "iUnderstand": "Entendo que esta transação é pública."
   },
   "spScan": {
-    "title": "Escanear pagamentos silenciosos",
+    "title": "Verificar novos pagamentos",
+    "subtitle": "Escaneie a blockchain em busca de pagamentos privados",
+    "descriptionHelp": "Mais informações",
     "description": "Percorre o indexador BIP-352 configurado bloco a bloco para detectar pagamentos silenciosos recebidos.",
     "since": "Desde",
     "preset": {

@@ -1474,7 +1474,9 @@
     "iUnderstand": "Saya memahami transaksi ini bersifat publik."
   },
   "spScan": {
-    "title": "Pindai silent payment",
+    "title": "Periksa pembayaran baru",
+    "subtitle": "Pindai blockchain untuk pembayaran privat",
+    "descriptionHelp": "Info selengkapnya",
     "description": "Menelusuri indexer BIP-352 yang dikonfigurasi blok per blok untuk mendeteksi silent payment masuk.",
     "since": "Sejak",
     "preset": {

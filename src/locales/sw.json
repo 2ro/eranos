@@ -1433,7 +1433,9 @@
     "iUnderstand": "Naelewa muamala huu ni wa umma."
   },
   "spScan": {
-    "title": "Changanua malipo ya kimya",
+    "title": "Angalia malipo mapya",
+    "subtitle": "Changanua blockchain kupata malipo ya faragha",
+    "descriptionHelp": "Maelezo zaidi",
     "description": "Inatembea kifaa cha kuorodhesha cha BIP-352 kilichosanidiwa block-kwa-block kugundua malipo ya kimya yanayoingia.",
     "since": "Tangu",
     "preset": {

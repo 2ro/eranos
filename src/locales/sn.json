@@ -1106,7 +1106,9 @@
     "iUnderstand": "Ndinonzwisisa kuti chinoitwa ichi chinozivikanwa nemunhu wese."
   },
   "spScan": {
-    "title": "Tsvaga mibhadharo yakanyararira",
+    "title": "Tarisa mibhadharo mitsva",
+    "subtitle": "Tsvaga muchitirakitiri chemibhadharo yakavanzika",
+    "descriptionHelp": "Ruzivo rwakawanda",
     "description": "Inotevera muongorori weBIP-352 wakarongwa bhuroka nebhuroka kuti iwane mibhadharo yakanyararira inopinda.",
     "since": "Kubvira",
     "preset": {

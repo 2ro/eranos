@@ -1042,7 +1042,9 @@
     "iUnderstand": "我理解此交易是公開的。"
   },
   "spScan": {
-    "title": "掃描靜默支付",
+    "title": "檢查新付款",
+    "subtitle": "掃描區塊鏈以尋找私密支付",
+    "descriptionHelp": "了解更多",
     "description": "逐塊遍歷已配置的 BIP-352 索引器，以檢測傳入的靜默支付。",
     "since": "起始時間",
     "preset": {

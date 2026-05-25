@@ -1474,7 +1474,9 @@
     "iUnderstand": "मैं समझता/समझती हूँ कि यह transaction सार्वजनिक है।"
   },
   "spScan": {
-    "title": "साइलेंट पेमेंट के लिए scan करें",
+    "title": "नए भुगतानों की जाँच करें",
+    "subtitle": "निजी भुगतानों के लिए blockchain स्कैन करें",
+    "descriptionHelp": "अधिक जानकारी",
     "description": "आने वाले साइलेंट पेमेंट का पता लगाने के लिए कॉन्फ़िगर किए गए BIP-352 indexer को block-by-block चलाता है।",
     "since": "के बाद से",
     "preset": {

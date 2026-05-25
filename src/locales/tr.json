@@ -1473,7 +1473,9 @@
     "iUnderstand": "Bu işlemin herkese açık olduğunu anlıyorum."
   },
   "spScan": {
-    "title": "Sessiz ödemeler için tara",
+    "title": "Yeni ödemeleri kontrol et",
+    "subtitle": "Özel ödemeler için blok zincirini tara",
+    "descriptionHelp": "Daha fazla bilgi",
     "description": "Gelen sessiz ödemeleri algılamak için yapılandırılmış BIP-352 indeksleyiciyi blok blok dolaşır.",
     "since": "Şu tarihten itibaren",
     "preset": {
