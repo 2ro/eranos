@@ -920,8 +920,6 @@
     "like_one": "<0>{{count}}</0> Kupenda",
     "like_other": "<0>{{count}}</0> Kupenda",
     "commentsAndDonations": "Maoni na michango",
-    "commentCount_one": "maoni {{count}}",
-    "commentCount_other": "maoni {{count}}",
     "noCommentsTitle": "Hakuna maoni bado",
     "noCommentsHint": "Kuwa wa kwanza kuacha ujumbe wa msaada.",
     "deleteDialogTitle": "Futa kampeni hii?",

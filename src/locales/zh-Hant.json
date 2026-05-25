@@ -489,8 +489,6 @@
     "like_one": "<0>{{count}}</0> 點贊",
     "like_other": "<0>{{count}}</0> 點贊",
     "commentsAndDonations": "評論與捐贈",
-    "commentCount_one": "{{count}} 條評論",
-    "commentCount_other": "{{count}} 條評論",
     "noCommentsTitle": "暫無評論",
     "noCommentsHint": "成為第一個留下支持留言的人。",
     "deleteDialogTitle": "刪除此活動？",

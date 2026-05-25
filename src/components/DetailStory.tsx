@@ -37,7 +37,7 @@ export function DetailStory({ event, hasContent, heading, headingId, emptyText }
 
 export function DetailReplySkeleton() {
   return (
-    <div className="py-3 border-b border-border last:border-b-0">
+    <div className="px-4 py-3 border-b border-primary/20 last:border-b-0">
       <div className="flex gap-3">
         <Skeleton className="size-10 rounded-full shrink-0" />
         <div className="flex-1 space-y-2">

@@ -489,8 +489,6 @@
     "like_one": "<0>{{count}}</0> خوښ",
     "like_other": "<0>{{count}}</0> خوښونه",
     "commentsAndDonations": "تبصرې او مرستې",
-    "commentCount_one": "{{count}} تبصره",
-    "commentCount_other": "{{count}} تبصرې",
     "noCommentsTitle": "تر اوسه تبصرې نشته",
     "noCommentsHint": "د ملاتړ د پیغام لومړنی شه.",
     "deleteDialogTitle": "دا کمپاین ړنګ کړئ؟",

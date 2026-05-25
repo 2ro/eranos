@@ -489,8 +489,6 @@
     "like_one": "<0>{{count}}</0> پسند",
     "like_other": "<0>{{count}}</0> پسند",
     "commentsAndDonations": "نظرها و کمک‌ها",
-    "commentCount_one": "{{count}} نظر",
-    "commentCount_other": "{{count}} نظر",
     "noCommentsTitle": "هنوز نظری نیست",
     "noCommentsHint": "اولین کسی باش که پیام حمایت می‌گذارد.",
     "deleteDialogTitle": "این کمپین حذف شود؟",

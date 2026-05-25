@@ -912,8 +912,6 @@
     "like_one": "<0>{{count}}</0> Curtida",
     "like_other": "<0>{{count}}</0> Curtidas",
     "commentsAndDonations": "Comentários e doações",
-    "commentCount_one": "{{count}} comentário",
-    "commentCount_other": "{{count}} comentários",
     "noCommentsTitle": "Nenhum comentário ainda",
     "noCommentsHint": "Seja o primeiro a deixar uma mensagem de apoio.",
     "deleteDialogTitle": "Excluir esta campanha?",

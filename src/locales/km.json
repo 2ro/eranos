@@ -489,8 +489,6 @@
     "like_one": "<0>{{count}}</0> ចូលចិត្ត",
     "like_other": "<0>{{count}}</0> ចូលចិត្ត",
     "commentsAndDonations": "មតិយោបល់ និងការបរិច្ចាគ",
-    "commentCount_one": "{{count}} មតិយោបល់",
-    "commentCount_other": "{{count}} មតិយោបល់",
     "noCommentsTitle": "មិនទាន់មានមតិយោបល់",
     "noCommentsHint": "ក្លាយជាមនុស្សដំបូងផ្ញើសារគាំទ្រ។",
     "deleteDialogTitle": "លុបយុទ្ធនាការនេះមែនទេ?",

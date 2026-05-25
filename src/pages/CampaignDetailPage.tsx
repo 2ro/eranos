@@ -379,30 +379,40 @@ function CampaignDetailContent({ campaign }: { campaign: ParsedCampaign }) {
         translateAction={translateAction}
       />
 
-      {pinnedNodes.length > 0 && (
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 pt-6">
-          <div className="rounded-2xl bg-card border border-border/60 overflow-hidden">
-            <ThreadedReplyList
-              roots={pinnedNodes}
-              renderItemHeader={(event) => (
-                <CampaignPinHeader
-                  isCampaignAuthor={event.pubkey === campaign.pubkey}
-                  canManagePins={canManagePins}
-                  isPinned={isPinned(event.id)}
-                  pinPending={togglePin.isPending}
-                  onTogglePin={() => handleTogglePin(event)}
-                />
-              )}
-            />
-          </div>
-        </div>
-      )}
+      {/* Body region. Background stays flat — the warmth lives on the
+          sidebar and comments surfaces, not in the page itself. The
+          hero's `from-black/95` cap is the only transition into the
+          body. */}
+      <div className="relative">
 
-      {/* Two-column body. On mobile the right column collapses inline
-          immediately below the hero so the donate CTA stays above the
-          fold. On lg+ the right column sticks to the viewport edge of
-          the main content while the article scrolls. */}
-      <div className="max-w-6xl mx-auto px-5 sm:px-6 lg:px-0 py-6 lg:py-10">
+        {pinnedNodes.length > 0 && (
+          <div className="relative max-w-6xl mx-auto px-4 sm:px-6 pt-6">
+            <div className="rounded-2xl bg-card border border-border/60 overflow-hidden">
+              <ThreadedReplyList
+                roots={pinnedNodes}
+                hideCommentContext
+                leafCardClassName="py-4"
+                renderAuthorBadge={(event) =>
+                  event.pubkey === campaign.pubkey ? <CampaignerBadge /> : null
+                }
+                renderItemHeader={(event) => (
+                  <CampaignPinHeader
+                    canManagePins={canManagePins}
+                    isPinned={isPinned(event.id)}
+                    pinPending={togglePin.isPending}
+                    onTogglePin={() => handleTogglePin(event)}
+                  />
+                )}
+              />
+            </div>
+          </div>
+        )}
+
+        {/* Two-column body. On mobile the right column collapses inline
+            immediately below the hero so the donate CTA stays above the
+            fold. On lg+ the right column sticks to the viewport edge of
+            the main content while the article scrolls. */}
+        <div className="relative max-w-6xl mx-auto px-5 sm:px-6 lg:px-0 py-6 lg:py-10">
         <div className="lg:flex lg:gap-8 lg:items-start">
           {/* Mobile-only inline donate card */}
           <div className="lg:hidden mb-6">{donateColumn}</div>
@@ -420,7 +430,7 @@ function CampaignDetailContent({ campaign }: { campaign: ParsedCampaign }) {
                 quoted / liked the campaign via InteractionsModal. */}
             <div id="campaign-activity" className="scroll-mt-20">
               {hasStats && (
-                <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs sm:text-sm text-muted-foreground pb-2 border-t border-border/60 pt-4">
+                <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs sm:text-sm text-muted-foreground px-1">
                   {engagementStats?.reposts ? (
                     <button
                       onClick={() => openInteractions('reposts')}
@@ -463,57 +473,74 @@ function CampaignDetailContent({ campaign }: { campaign: ParsedCampaign }) {
                 </div>
               )}
 
-              <div className="mt-6">
-                <div className="flex items-baseline justify-between gap-3 mb-3 px-1">
+              <div className="mt-4">
+                <div className="mb-3 px-1">
                   <h2 className="text-lg font-semibold tracking-tight">
                     {t('campaignsDetail.commentsAndDonations')}
                   </h2>
-                  {engagementStats?.replies ? (
-                    <span className="text-sm text-muted-foreground tabular-nums">
-                      {t('campaignsDetail.commentCount', { count: engagementStats.replies })}
-                    </span>
-                  ) : null}
                 </div>
 
-                <DetailCommentComposer
-                  event={campaign.event}
-                  className="mb-3"
-                  onSuccess={() => queryClient.invalidateQueries({ queryKey: ['nostr', 'comments'] })}
-                />
-
-                {commentsLoading && statsLoading && replyTree.length === 0 ? (
-                  <div className="space-y-3">
-                    {Array.from({ length: 3 }).map((_, i) => (
-                      <DetailReplySkeleton key={i} />
-                    ))}
-                  </div>
-                ) : replyTree.length > 0 ? (
-                  <ThreadedReplyList
-                    roots={replyTree}
-                    renderItemHeader={(event) => (
-                      <CampaignPinHeader
-                        isCampaignAuthor={event.pubkey === campaign.pubkey}
-                        canManagePins={canManagePins}
-                        isPinned={isPinned(event.id)}
-                        pinPending={togglePin.isPending}
-                        onTogglePin={() => handleTogglePin(event)}
-                      />
-                    )}
+                {/* Muted surface wraps the composer and comment list.
+                    The composer inside uses `bg-card` (one shade
+                    lighter) so the input area reads as the focused
+                    surface against this muted backdrop. `bg-muted/60`
+                    softens the wrap so contained cards feel less
+                    boxed-in. All internal dividers (top separator
+                    plus the per-note `border-b`) are retinted to
+                    `border-primary/20` so they read as a single
+                    consistent edge color matching the composer's
+                    bottom border. */}
+                {/* Muted surface wraps the composer and comment list.
+                    The wrap carries the outer L/R/B border so the
+                    rounded corners curve naturally without any 1px
+                    gaps at the join. Per-article `border-b` divides
+                    items. The composer's own border closes the top. */}
+                <div className="rounded-2xl bg-muted/60 overflow-hidden border-l border-r border-primary/20 [&_article]:border-b-primary/20 [&_article]:bg-background/40">
+                  <DetailCommentComposer
+                    event={campaign.event}
+                    onSuccess={() => queryClient.invalidateQueries({ queryKey: ['nostr', 'comments'] })}
                   />
-                ) : (
-                  <button
-                    type="button"
-                    onClick={() => setReplyOpen(true)}
-                    className="block w-full rounded-2xl border border-dashed border-border/80 bg-card/50 px-6 py-10 text-center hover:bg-card hover:border-primary/40 transition-colors"
-                  >
-                    <p className="text-base font-medium text-foreground">
-                      {t('campaignsDetail.noCommentsTitle')}
-                    </p>
-                    <p className="mt-1 text-sm text-muted-foreground">
-                      {t('campaignsDetail.noCommentsHint')}
-                    </p>
-                  </button>
-                )}
+
+                  {commentsLoading && statsLoading && replyTree.length === 0 ? (
+                    <div>
+                      {Array.from({ length: 3 }).map((_, i) => (
+                        <DetailReplySkeleton key={i} />
+                      ))}
+                    </div>
+                  ) : replyTree.length > 0 ? (
+                    <div>
+                      <ThreadedReplyList
+                        roots={replyTree}
+                        hideCommentContext
+                        leafCardClassName="py-4"
+                        renderAuthorBadge={(event) =>
+                          event.pubkey === campaign.pubkey ? <CampaignerBadge /> : null
+                        }
+                        renderItemHeader={(event) => (
+                          <CampaignPinHeader
+                            canManagePins={canManagePins}
+                            isPinned={isPinned(event.id)}
+                            pinPending={togglePin.isPending}
+                            onTogglePin={() => handleTogglePin(event)}
+                          />
+                        )}
+                      />
+                    </div>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={() => setReplyOpen(true)}
+                      className="block w-full px-6 py-10 text-center hover:bg-foreground/5 transition-colors"
+                    >
+                      <p className="text-base font-medium text-foreground">
+                        {t('campaignsDetail.noCommentsTitle')}
+                      </p>
+                      <p className="mt-1 text-sm text-muted-foreground">
+                        {t('campaignsDetail.noCommentsHint')}
+                      </p>
+                    </button>
+                  )}
+                </div>
               </div>
             </div>
           </div>
@@ -532,6 +559,7 @@ function CampaignDetailContent({ campaign }: { campaign: ParsedCampaign }) {
             <div className="lg:sticky lg:top-4">{donateColumn}</div>
           </aside>
         </div>
+      </div>
       </div>
 
       <ReplyComposeModal
@@ -591,33 +619,39 @@ function CampaignDetailContent({ campaign }: { campaign: ParsedCampaign }) {
 }
 
 function CampaignPinHeader({
-  isCampaignAuthor,
   canManagePins,
   isPinned,
   pinPending,
   onTogglePin,
 }: {
-  isCampaignAuthor: boolean;
   canManagePins: boolean;
   isPinned: boolean;
   pinPending: boolean;
   onTogglePin: () => void;
 }) {
-  const { t } = useTranslation();
   return (
     <PinnedCommentHeader
       isPinned={isPinned}
       canManagePins={canManagePins}
       pinPending={pinPending}
       onTogglePin={onTogglePin}
-    >
-      {isCampaignAuthor && (
-        <span className="inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-2 py-0.5 font-medium text-primary">
-          <ShieldCheck className="size-3" />
-          {t('campaignsDetail.campaigner')}
-        </span>
-      )}
-    </PinnedCommentHeader>
+    />
+  );
+}
+
+/**
+ * Pill badge marking a comment authored by the campaign's creator.
+ * Rendered inside `NoteCard`'s author row via `renderAuthorBadge`, so
+ * the marker appears next to the campaigner's display name on every
+ * comment they post — not just pinned ones.
+ */
+function CampaignerBadge() {
+  const { t } = useTranslation();
+  return (
+    <span className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary shrink-0">
+      <ShieldCheck className="size-3" />
+      {t('campaignsDetail.campaigner')}
+    </span>
   );
 }
 
@@ -877,12 +911,14 @@ function DonateColumn({
   const isSilentPayment = !campaign.wallets.onchain;
 
   return (
-    // On mobile we drop the Card chrome (no border, no shadow, no
-    // rounded background) so the donate content flows inline with the
-    // page instead of being a floating box stacked between the hero
-    // and the story. On lg+ the sticky right sidebar reinstates the
-    // card framing so the column reads as a proper aside.
-    <Card className="overflow-hidden border-0 shadow-none bg-transparent lg:border lg:shadow-sm lg:bg-card">
+    // On mobile we drop the surface chrome (no rounded background) so
+    // the donate content flows inline with the page instead of being a
+    // floating box stacked between the hero and the story. On lg+ the
+    // sticky right sidebar uses `bg-card` with a brand-orange border
+    // on all four sides — same color family as the composer's
+    // top-and-sides border in the comments region, so both columns of
+    // the body read as siblings sharing one focal treatment.
+    <Card className="overflow-hidden border-0 shadow-none bg-transparent lg:bg-[hsl(24_100%_99%)] dark:lg:bg-[hsl(24_30%_12%)] lg:border lg:border-primary/40">
       <CardContent className="p-0 lg:p-5 space-y-5">
         {/* Raised stats + progress. Silent-payment campaigns hide all
             aggregate numbers by design (per NIP.md Kind 33863) — only

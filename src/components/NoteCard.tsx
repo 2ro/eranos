@@ -249,6 +249,20 @@ interface NoteCardProps {
   hideKindHeader?: boolean;
   /** Override the NIP-22 context row prefix. Used by synthetic zap cards. */
   commentContextPrefix?: string;
+  /**
+   * Suppress the NIP-22 "Commenting on …" context row. Used by pages
+   * that already establish the comment's subject from page chrome
+   * (e.g. the campaign detail page renders comments below the
+   * campaign hero — the "Commenting on …" line is redundant there).
+   */
+  hideCommentContext?: boolean;
+  /**
+   * Custom badge rendered inside the author row, next to the display
+   * name. Used for page-specific role markers (e.g. a "Campaigner"
+   * badge on the campaign detail page). Keep it short — a single
+   * pill-style span is the expected shape.
+   */
+  authorBadge?: ReactNode;
   /** Event used for actions/navigation when the displayed card is synthetic. */
   actionEvent?: NostrEvent;
 }
@@ -377,6 +391,8 @@ export const NoteCard = memo(function NoteCard({
   highlight,
   hideKindHeader,
   commentContextPrefix,
+  hideCommentContext,
+  authorBadge,
   actionEvent,
 }: NoteCardProps) {
   const { t } = useTranslation();
@@ -626,7 +642,7 @@ export const NoteCard = memo(function NoteCard({
   const contentBlock = (
     <CommunityContentWarning event={event}>
       {/* Reply context (kind 1) or comment context (kind 1111) — shown above content */}
-      {isComment && <CommentContext event={event} prefix={commentContextPrefix} />}
+      {isComment && !hideCommentContext && <CommentContext event={event} prefix={commentContextPrefix} />}
       {isReply && (
         <ReplyContext
           pubkeys={replyToPubkeys}
@@ -781,6 +797,7 @@ export const NoteCard = memo(function NoteCard({
             🤖
           </span>
         )}
+        {authorBadge}
       </div>
       <div className="flex items-center gap-1 text-sm text-muted-foreground min-w-0 pr-2">
         <span className="shrink-0 hover:underline whitespace-nowrap">

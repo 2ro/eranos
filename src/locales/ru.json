@@ -912,8 +912,6 @@
     "like_one": "<0>{{count}}</0> Лайк",
     "like_other": "<0>{{count}}</0> Лайков",
     "commentsAndDonations": "Комментарии и пожертвования",
-    "commentCount_one": "{{count}} комментарий",
-    "commentCount_other": "{{count}} комментариев",
     "noCommentsTitle": "Пока нет комментариев",
     "noCommentsHint": "Будьте первым, кто оставит сообщение поддержки.",
     "deleteDialogTitle": "Удалить эту кампанию?",

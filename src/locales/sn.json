@@ -489,8 +489,6 @@
     "like_one": "<0>{{count}}</0> Like",
     "like_other": "<0>{{count}}</0> maLike",
     "commentsAndDonations": "Mhinduro nezvipo",
-    "commentCount_one": "{{count}} mhinduro",
-    "commentCount_other": "{{count}} mhinduro",
     "noCommentsTitle": "Hapana mhinduro parizvino",
     "noCommentsHint": "Iva wekutanga kusiya shoko rerutsigiro.",
     "deleteDialogTitle": "Bvisa campaign iyi?",

@@ -21,7 +21,11 @@
     /* ── Light theme tokens ───────────────────────────────────────────── */
     --background: 0 0% 100%;
     --foreground: 222 47% 11%;
-    --card: 0 0% 100%;
+    /* Card surfaces sit one subtle step above the page. The 2%
+       luminance drop is barely perceptible in isolation but gives
+       every card real elevation against the pure-white background
+       without needing borders or shadows. */
+    --card: 0 0% 98%;
     --card-foreground: 222 47% 11%;
     --popover: 0 0% 100%;
     --popover-foreground: 222 47% 11%;
@@ -29,7 +33,11 @@
     --primary-foreground: 0 0% 100%;
     --secondary: 0 0% 96%;
     --secondary-foreground: 222 47% 11%;
-    --muted: 0 0% 96%;
+    /* Muted surfaces (input fields, skeleton fills, comment-region
+       wraps, etc.) are a genuine luminance step away from background
+       so they read as a distinct surface in light mode. A very faint
+       warm hue ties them to the brand without coloring the page. */
+    --muted: 30 12% 94%;
     --muted-foreground: 222 17% 46%;
     --accent: 0 0% 92%;
     --accent-foreground: 222 47% 11%;

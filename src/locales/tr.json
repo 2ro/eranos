@@ -921,8 +921,6 @@
     "like_one": "<0>{{count}}</0> Beğeni",
     "like_other": "<0>{{count}}</0> Beğeni",
     "commentsAndDonations": "Yorumlar ve bağışlar",
-    "commentCount_one": "{{count}} yorum",
-    "commentCount_other": "{{count}} yorum",
     "noCommentsTitle": "Henüz yorum yok",
     "noCommentsHint": "Destek mesajı bırakan ilk kişi olun.",
     "deleteDialogTitle": "Bu kampanya silinsin mi?",

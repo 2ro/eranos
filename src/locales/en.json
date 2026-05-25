@@ -912,8 +912,6 @@
     "like_one": "<0>{{count}}</0> Like",
     "like_other": "<0>{{count}}</0> Likes",
     "commentsAndDonations": "Comments & donations",
-    "commentCount_one": "{{count}} comment",
-    "commentCount_other": "{{count}} comments",
     "noCommentsTitle": "No comments yet",
     "noCommentsHint": "Be the first to leave a message of support.",
     "deleteDialogTitle": "Delete this campaign?",

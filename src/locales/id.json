@@ -921,8 +921,6 @@
     "like_one": "<0>{{count}}</0> Suka",
     "like_other": "<0>{{count}}</0> Suka",
     "commentsAndDonations": "Komentar & donasi",
-    "commentCount_one": "{{count}} komentar",
-    "commentCount_other": "{{count}} komentar",
     "noCommentsTitle": "Belum ada komentar",
     "noCommentsHint": "Jadilah yang pertama meninggalkan pesan dukungan.",
     "deleteDialogTitle": "Hapus kampanye ini?",

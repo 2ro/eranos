@@ -489,8 +489,6 @@
     "like_one": "<0>{{count}}</0> إعجاب",
     "like_other": "<0>{{count}}</0> إعجابات",
     "commentsAndDonations": "التعليقات والتبرعات",
-    "commentCount_one": "{{count}} تعليق",
-    "commentCount_other": "{{count}} تعليقات",
     "noCommentsTitle": "لا توجد تعليقات بعد",
     "noCommentsHint": "كن أول من يترك رسالة دعم.",
     "deleteDialogTitle": "حذف هذه الحملة؟",

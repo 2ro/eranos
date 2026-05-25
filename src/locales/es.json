@@ -489,8 +489,6 @@
     "like_one": "<0>{{count}}</0> Me gusta",
     "like_other": "<0>{{count}}</0> Me gusta",
     "commentsAndDonations": "Comentarios y donaciones",
-    "commentCount_one": "{{count}} comentario",
-    "commentCount_other": "{{count}} comentarios",
     "noCommentsTitle": "Aún no hay comentarios",
     "noCommentsHint": "Sé la primera persona en dejar un mensaje de apoyo.",
     "deleteDialogTitle": "¿Eliminar esta campaña?",

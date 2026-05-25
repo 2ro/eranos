@@ -489,8 +489,6 @@
     "like_one": "<0>{{count}}</0> 点赞",
     "like_other": "<0>{{count}}</0> 点赞",
     "commentsAndDonations": "评论与捐赠",
-    "commentCount_one": "{{count}} 条评论",
-    "commentCount_other": "{{count}} 条评论",
     "noCommentsTitle": "暂无评论",
     "noCommentsHint": "成为第一个留下支持留言的人。",
     "deleteDialogTitle": "删除此活动？",

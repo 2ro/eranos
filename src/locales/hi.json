@@ -912,8 +912,6 @@
     "like_one": "<0>{{count}}</0> लाइक",
     "like_other": "<0>{{count}}</0> लाइक",
     "commentsAndDonations": "कमेंट और डोनेशन",
-    "commentCount_one": "{{count}} कमेंट",
-    "commentCount_other": "{{count}} कमेंट",
     "noCommentsTitle": "अभी कोई कमेंट नहीं",
     "noCommentsHint": "समर्थन का संदेश छोड़ने वाले पहले व्यक्ति बनें।",
     "deleteDialogTitle": "इस कैंपेन को डिलीट करें?",
