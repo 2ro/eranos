@@ -28,11 +28,18 @@ function HeroLightningMapImpl({ className }: { className?: string }) {
   const uid = useId();
   const arcId = (key: string) => `${uid}-${key}`;
 
-  // viewBox is the equirectangular world: 360 wide × 180 tall, recentered
-  // so (0,0) is the geographic origin. We project [lng, lat] -> [lng, -lat]
-  // (SVG y grows downward).
+  // viewBox: equirectangular world projected as [lng, -lat] (SVG y grows
+  // downward). We keep the full 360° of longitude but trim the polar
+  // bands slightly. The full lat range (-90..+90) leaves a noticeable
+  // empty gutter at the bottom of the hero on wide viewports — Antarctica's
+  // coastline only reaches ~lat -75 around its perimeter and below that
+  // the projection is just empty ocean. Pulling the viewBox in to roughly
+  // the populated band (lat -LAT_RANGE..+LAT_RANGE) lets `slice` fill the
+  // hero with land texture instead of empty space, without distorting any
+  // geography — `preserveAspectRatio` still scales uniformly.
   const W = 360;
-  const H = 180;
+  const LAT_RANGE = 85; // viewBox covers latitudes -85..+85
+  const H = LAT_RANGE * 2;
 
   const landPaths = useMemo(() => {
     return LAND_RINGS.map((ring, idx) => {
