@@ -1,9 +1,8 @@
 import type { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Link, Link as RouterLink } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import {
   Bitcoin,
-  CalendarClock,
   Globe,
   HandHeart,
   Megaphone,
@@ -11,13 +10,11 @@ import {
   QrCode,
   Users,
 } from 'lucide-react';
-import { nip19 } from 'nostr-tools';
 import type { NostrEvent, NostrMetadata } from '@nostrify/nostrify';
 
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -31,6 +28,7 @@ import { CommunityMiniCard, CommunityMiniCardSkeleton } from '@/components/disco
 import { EmojifiedText } from '@/components/CustomEmoji';
 import { FollowToggleButton } from '@/components/FollowButton';
 import { Nip05Badge } from '@/components/Nip05Badge';
+import { PledgeCard } from '@/components/PledgeCard';
 import { ProfileReactionButton } from '@/components/ProfileReactionButton';
 import { OrganizationsAllDialog } from '@/components/profile/OrganizationsAllDialog';
 import { useCampaignModeration } from '@/hooks/useCampaignModeration';
@@ -42,9 +40,6 @@ import { formatNumber } from '@/lib/formatNumber';
 import { sanitizeUrl } from '@/lib/sanitizeUrl';
 import { cn } from '@/lib/utils';
 import type { Action } from '@/hooks/useActions';
-import { DEFAULT_COVER_IMAGE } from '@/lib/defaultActionCovers';
-import { formatCompactPledgeDeadline, formatPledgeAmount } from '@/lib/pledges';
-import { getGeoDisplayName } from '@/lib/countries';
 
 interface ProfileIdentityRailProps {
   pubkey: string;
@@ -806,7 +801,7 @@ function RailLatestPledgeSection({
         icon={<HandHeart className="size-4 text-primary" />}
         title={t('profile.sections.latestPledge')}
       />
-      <RailPledgeCard action={latest} btcPrice={btcPrice} />
+      <PledgeCard action={latest} btcPrice={btcPrice} variant="rail" />
       {showSeeAll && (
         <button
           type="button"
@@ -817,79 +812,6 @@ function RailLatestPledgeSection({
         </button>
       )}
     </section>
-  );
-}
-
-/**
- * Compact pledge card sized for the rail's narrow column. Smaller cover
- * aspect, tighter padding, and a single-line pledged amount that doesn't
- * dominate the rail.
- */
-function RailPledgeCard({
-  action,
-  btcPrice,
-}: {
-  action: Action;
-  btcPrice: number | undefined;
-}) {
-  const { t } = useTranslation();
-  const naddr = nip19.naddrEncode({
-    kind: 36639,
-    pubkey: action.pubkey,
-    identifier: action.id,
-  });
-  const cover = sanitizeUrl(action.image) ?? DEFAULT_COVER_IMAGE;
-  const deadline = action.deadline ? formatCompactPledgeDeadline(action.deadline) : null;
-  const isExpired = !!deadline?.isPast;
-  const countryLabel = action.countryCode ? getGeoDisplayName(action.countryCode) : undefined;
-
-  return (
-    <RouterLink
-      to={`/${naddr}`}
-      className="group block rounded-xl overflow-hidden focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
-    >
-      <Card className="overflow-hidden border-border/70 shadow-sm motion-safe:transition-shadow group-hover:shadow-md">
-        <div className="relative aspect-[16/9] bg-gradient-to-br from-primary/15 via-primary/5 to-secondary">
-          <img
-            src={cover}
-            alt=""
-            loading="lazy"
-            className="absolute inset-0 size-full object-cover"
-          />
-          {isExpired && (
-            <Badge
-              variant="secondary"
-              className="absolute top-2 right-2 backdrop-blur bg-background/85 border-border/40 text-[10px] uppercase tracking-wide text-muted-foreground"
-            >
-              {t('profile.badges.ended')}
-            </Badge>
-          )}
-        </div>
-        <div className="p-3 space-y-1.5">
-          <h3 className="font-semibold text-sm leading-snug line-clamp-2">{action.title}</h3>
-          <div className="flex items-baseline justify-between gap-2 text-xs">
-            <span className="text-muted-foreground uppercase tracking-wide font-semibold">{t('profile.badges.pledged')}</span>
-            <span className="text-foreground font-bold tabular-nums">
-              {formatPledgeAmount(action.bounty, btcPrice)}
-            </span>
-          </div>
-          {(countryLabel || deadline) && (
-            <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] text-muted-foreground pt-0.5">
-              {deadline && (
-                <span className={cn(
-                  'inline-flex items-center gap-1',
-                  deadline.isPast && 'text-destructive',
-                )}>
-                  <CalendarClock className="size-3" />
-                  {deadline.label}
-                </span>
-              )}
-              {countryLabel && <span className="truncate">{countryLabel}</span>}
-            </div>
-          )}
-        </div>
-      </Card>
-    </RouterLink>
   );
 }
 

@@ -1,29 +1,25 @@
 import { useEffect, useState, useMemo } from 'react';
 import { useSeoMeta } from '@unhead/react';
-import { Link as RouterLink, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
-import { useTranslation, Trans } from 'react-i18next';
+import { useTranslation } from 'react-i18next';
 import { nip19 } from 'nostr-tools';
 
-import { parseAction, useActions, type Action } from '@/hooks/useActions';
+import { useActions, type Action } from '@/hooks/useActions';
 import { useAppContext } from '@/hooks/useAppContext';
-import { useAuthor } from '@/hooks/useAuthor';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useBtcPrice } from '@/hooks/useBtcPrice';
 import { useNostrPublish } from '@/hooks/useNostrPublish';
 import { useShareOrigin } from '@/hooks/useShareOrigin';
 import { useToast } from '@/hooks/useToast';
-import { useEventTranslation } from '@/hooks/useEventTranslation';
 import { getAllCountries, getGeoDisplayName, countryCodeToFlag } from '@/lib/countries';
-import { getDisplayName } from '@/lib/genUserName';
-import { DEFAULT_ACTION_COVERS, DEFAULT_COVER_IMAGE } from '@/lib/defaultActionCovers';
-import { formatCompactPledgeDeadline, formatPledgeAmount } from '@/lib/pledges';
+import { DEFAULT_ACTION_COVERS } from '@/lib/defaultActionCovers';
 import { HOPE_PALETTE } from '@/lib/hopePalette';
 import { cn } from '@/lib/utils';
 import { HeroAtmosphere } from '@/components/HeroAtmosphere';
 import { HeroBanner } from '@/components/HeroBanner';
+import { PledgeCard } from '@/components/PledgeCard';
 
-import { Badge } from '@/components/ui/badge';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -38,7 +34,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 
 import {
-  CalendarClock, Clock, HandHeart, MapPin, Plus, ChevronRight, Loader2,
+  Clock, HandHeart, Plus, ChevronRight, Loader2,
   Link as LinkIcon, Check, MoreHorizontal, Trash2, ListFilter,
   Calendar, DollarSign, Globe, Megaphone,
 } from 'lucide-react';
@@ -179,109 +175,6 @@ function ActionShareMenu({ action }: { action: Action }) {
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
-  );
-}
-
-function ActionCard({ action, isExpired, btcPrice }: { action: Action; isExpired?: boolean; btcPrice: number | undefined }) {
-  const { t } = useTranslation();
-  const { translatedEvent, translateAction } = useEventTranslation(action.event, {
-    iconOnly: true,
-    buttonClassName: 'size-8 rounded-full p-0 text-muted-foreground hover:text-primary hover:bg-primary/10',
-  });
-  const displayAction = parseAction(translatedEvent) ?? action;
-  const author = useAuthor(action.pubkey);
-  const metadata = author.data?.metadata;
-  const displayName = getDisplayName(metadata, action.pubkey);
-  const [imageLoadFailed, setImageLoadFailed] = useState(false);
-
-  const naddr = nip19.naddrEncode({
-    kind: 36639,
-    pubkey: action.pubkey,
-    identifier: action.id,
-  });
-
-  // Always show a cover — fall back to the default if the author didn't set
-  // one, or the URL failed to validate / load.
-  const coverImage = (displayAction.image && !imageLoadFailed)
-    ? displayAction.image
-    : DEFAULT_COVER_IMAGE;
-
-  const deadline = displayAction.deadline ? formatCompactPledgeDeadline(displayAction.deadline) : null;
-  const countryLabel = displayAction.countryCode ? getGeoDisplayName(displayAction.countryCode) : undefined;
-
-  return (
-    <RouterLink
-      to={`/${naddr}`}
-      className="group block rounded-xl overflow-hidden focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background motion-safe:transition-transform motion-safe:duration-200 motion-safe:hover:-translate-y-0.5"
-    >
-      <Card className="overflow-hidden border-border/70 shadow-sm motion-safe:transition-shadow motion-safe:duration-200 group-hover:shadow-lg h-full flex flex-col">
-        <div className="relative w-full aspect-[16/9] bg-gradient-to-br from-primary/15 via-primary/5 to-secondary">
-          <img
-            src={coverImage}
-            alt=""
-            className="absolute inset-0 size-full object-cover"
-            onError={() => setImageLoadFailed(true)}
-            loading="lazy"
-          />
-          <div className="absolute top-3 right-3 flex items-center gap-2" onClick={(e) => e.preventDefault()}>
-            {isExpired && (
-              <Badge variant="secondary" className="backdrop-blur bg-background/85 border-border/40 text-muted-foreground">
-                {t('pledges.card.ended')}
-              </Badge>
-            )}
-            <ActionShareMenu action={action} />
-          </div>
-        </div>
-
-        <div className="flex flex-col gap-3 p-5 flex-1">
-          <div className="space-y-2">
-            <h3 className="font-bold leading-tight tracking-tight text-lg line-clamp-2">
-              {displayAction.title}
-            </h3>
-            {displayAction.description.trim() && (
-              <p className="text-sm text-muted-foreground line-clamp-2">
-                {displayAction.description}
-              </p>
-            )}
-          </div>
-
-          <div className="flex-1" />
-
-          <div className="rounded-xl border border-primary/20 bg-primary/10 px-4 py-3">
-            <p className="text-xs font-semibold uppercase tracking-wide text-primary">{t('pledges.card.pledged')}</p>
-            <p className="mt-1 text-2xl font-bold tracking-tight text-foreground">
-              {formatPledgeAmount(action.bounty, btcPrice)}
-            </p>
-          </div>
-
-          <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 text-xs text-muted-foreground pt-1">
-            {countryLabel && (
-              <span className="inline-flex items-center gap-1.5">
-                <MapPin className="size-3.5" />
-                {countryLabel}
-              </span>
-            )}
-            {deadline && (
-              <span className={cn('inline-flex items-center gap-1.5', deadline.isPast && 'text-destructive')}>
-                <CalendarClock className="size-3.5" />
-                {deadline.label}
-              </span>
-            )}
-          </div>
-
-          <div className="flex items-center justify-between gap-3 border-t border-border/60 pt-3 text-xs text-muted-foreground">
-            <div className="truncate">
-              <Trans
-                i18nKey="pledges.card.byAuthor"
-                values={{ name: displayName }}
-                components={{ 0: <span className="font-medium text-foreground" /> }}
-              />
-            </div>
-            {translateAction}
-          </div>
-        </div>
-      </Card>
-    </RouterLink>
   );
 }
 
@@ -736,11 +629,14 @@ function ActionSection({
     <div className="space-y-5">
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
         {items.map((action) => (
-          <ActionCard
+          <PledgeCard
             key={`${action.pubkey}:${action.id}`}
             action={action}
             isExpired={isExpired}
             btcPrice={btcPrice}
+            showAuthor
+            showTranslate
+            topRight={<ActionShareMenu action={action} />}
           />
         ))}
       </div>

@@ -4,7 +4,6 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
 import { nip19 } from 'nostr-tools';
 import {
-  CalendarClock,
   CalendarDays,
   ChevronLeft,
   ChevronRight,
@@ -27,6 +26,7 @@ import type { NostrEvent, NostrMetadata } from '@nostrify/nostrify';
 import { CampaignCard } from '@/components/CampaignCard';
 import { DetailReplySkeleton } from '@/components/DetailStory';
 import { PeopleAvatarStack } from '@/components/PeopleAvatarStack';
+import { PledgeCard } from '@/components/PledgeCard';
 import { PostActionBar } from '@/components/PostActionBar';
 import { DetailCommentComposer } from '@/components/DetailCommentComposer';
 import { PinnedCommentHeader } from '@/components/PinnedCommentHeader';
@@ -71,12 +71,10 @@ import { useEventTranslation } from '@/hooks/useEventTranslation';
 import { CommunityModerationContext } from '@/contexts/CommunityModerationContext';
 import { applyCommunityModerationToEvents, parseCommunityEvent } from '@/lib/communityUtils';
 import type { ParsedCampaign } from '@/lib/campaign';
-import { parseAction, type Action } from '@/hooks/useActions';
+import { type Action } from '@/hooks/useActions';
 import { getGeoDisplayName } from '@/lib/countries';
-import { DEFAULT_COVER_IMAGE } from '@/lib/defaultActionCovers';
 import { formatNumber } from '@/lib/formatNumber';
 import { genUserName, getDisplayName } from '@/lib/genUserName';
-import { formatCompactPledgeDeadline, formatPledgeAmount } from '@/lib/pledges';
 import { sanitizeUrl } from '@/lib/sanitizeUrl';
 import { cn } from '@/lib/utils';
 
@@ -227,96 +225,18 @@ function ActivityTypePill({ icon, label }: { icon: React.ReactNode; label: strin
 function PledgeShelfCard({ pledge }: { pledge: Action }) {
   const { t } = useTranslation();
   const { data: btcPrice } = useBtcPrice();
-  const { translatedEvent, translateAction } = useEventTranslation(pledge.event, {
-    iconOnly: true,
-    buttonClassName: 'size-8 rounded-full p-0 text-muted-foreground hover:text-primary hover:bg-primary/10',
-  });
-  const displayPledge = parseAction(translatedEvent) ?? pledge;
-  const author = useAuthor(pledge.pubkey);
-  const metadata = author.data?.metadata;
-  const displayName = getDisplayName(metadata, pledge.pubkey);
-  const [imageLoadFailed, setImageLoadFailed] = useState(false);
-
-  const sanitizedCover = sanitizeUrl(displayPledge.image);
-  const coverImage = sanitizedCover && !imageLoadFailed ? sanitizedCover : DEFAULT_COVER_IMAGE;
-  const deadline = displayPledge.deadline ? formatCompactPledgeDeadline(displayPledge.deadline) : null;
-  const countryLabel = displayPledge.countryCode ? getGeoDisplayName(displayPledge.countryCode) : undefined;
-  const naddr = nip19.naddrEncode({
-    kind: pledge.event.kind,
-    pubkey: pledge.pubkey,
-    identifier: pledge.id,
-  });
   return (
-    <Link
-      to={`/${naddr}`}
-      className="group block h-[430px] w-[280px] shrink-0 rounded-xl overflow-hidden focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background motion-safe:transition-transform motion-safe:duration-200 motion-safe:hover:-translate-y-0.5"
-    >
-      <Card className="overflow-hidden border-border/70 shadow-sm motion-safe:transition-shadow motion-safe:duration-200 group-hover:shadow-lg h-full flex flex-col">
-        <div className="relative w-full aspect-[16/9] bg-gradient-to-br from-primary/15 via-primary/5 to-secondary">
-          <img
-            src={coverImage}
-            alt=""
-            className="absolute inset-0 size-full object-cover"
-            onError={() => setImageLoadFailed(true)}
-            loading="lazy"
-          />
-          {deadline?.isPast && (
-            <div className="absolute right-3 top-3">
-              <Badge variant="secondary" className="backdrop-blur bg-background/85 border-border/40 text-muted-foreground">
-                {t('pledges.card.ended')}
-              </Badge>
-            </div>
-          )}
-        </div>
-
-        <div className="flex flex-col gap-3 p-5 flex-1">
-          <div className="space-y-2">
-            <h3 className="font-bold leading-tight tracking-tight text-lg line-clamp-2">
-              {displayPledge.title}
-            </h3>
-            {displayPledge.description.trim() && (
-              <p className="text-sm text-muted-foreground line-clamp-2">
-                {displayPledge.description}
-              </p>
-            )}
-          </div>
-
-          <div className="flex-1" />
-
-          <div className="rounded-xl border border-primary/20 bg-primary/10 px-4 py-3">
-            <p className="text-xs font-semibold uppercase tracking-wide text-primary">{t('pledges.card.pledged')}</p>
-            <p className="mt-1 text-2xl font-bold tracking-tight text-foreground">
-              {formatPledgeAmount(pledge.bounty, btcPrice)}
-            </p>
-          </div>
-
-          <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 text-xs text-muted-foreground pt-1">
-            {countryLabel && (
-              <span className="inline-flex items-center gap-1.5">
-                <MapPin className="size-3.5" />
-                {countryLabel}
-              </span>
-            )}
-            {deadline && (
-              <span className={cn('inline-flex items-center gap-1.5', deadline.isPast && 'text-destructive')}>
-                <CalendarClock className="size-3.5" />
-                {deadline.label}
-              </span>
-            )}
-          </div>
-
-          <div className="flex items-center justify-between gap-3 border-t border-border/60 pt-3 text-xs text-muted-foreground">
-            <div className="truncate">
-              {t('groups.detail.byAuthor', { name: displayName })}
-            </div>
-            <div className="flex shrink-0 items-center gap-1.5">
-              <ActivityTypePill icon={<Megaphone className="size-3.5 text-primary" />} label={t('groups.detail.pledge')} />
-              {translateAction}
-            </div>
-          </div>
-        </div>
-      </Card>
-    </Link>
+    <PledgeCard
+      action={pledge}
+      btcPrice={btcPrice}
+      variant="shelf"
+      showAuthor
+      showTranslate
+      authorLabel={(name) => t('groups.detail.byAuthor', { name })}
+      footerAddon={
+        <ActivityTypePill icon={<Megaphone className="size-3.5 text-primary" />} label={t('groups.detail.pledge')} />
+      }
+    />
   );
 }
 
