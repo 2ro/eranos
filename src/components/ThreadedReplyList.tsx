@@ -66,7 +66,7 @@ function ReplyThread({
 
   if (shouldCollapse) {
     return (
-      <div>
+      <div className="relative group/note">
         {renderItemHeader?.(node.event)}
         <NoteCard
           event={node.event}
@@ -81,7 +81,7 @@ function ReplyThread({
 
   if (!hasChildren) {
     return (
-      <div>
+      <div className="relative group/note">
         {renderItemHeader?.(node.event)}
         <NoteCard
           event={node.event}
@@ -97,7 +97,7 @@ function ReplyThread({
   const childDepthless = depthless || expanded;
 
   return (
-    <div>
+    <div className="relative group/note">
       {renderItemHeader?.(node.event)}
       <NoteCard
         event={node.event}
@@ -111,7 +111,7 @@ function ReplyThread({
       )}
       {/* Revealed hidden siblings render as threaded items before the inline child */}
       {showHidden && node.hiddenChildren!.map((child) => (
-        <div key={child.event.id}>
+        <div key={child.event.id} className="relative group/note">
           {renderItemHeader?.(child.event)}
           <NoteCard
             event={child.event}
