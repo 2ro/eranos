@@ -2100,6 +2100,14 @@
           "Apo kambeni inogamuchira zvese, walleti yemupi inosarudza nzira yekushandisa — maWalleti anokwanisa mibhadharo yakanyarara anobhadhara muchivande, mamwe anobhadhara kero yepachena. Verenga **Bhuku reMupi** ne**Bhuku reMushanduki** kuti uone mufananidzo wakazara."
         ]
       },
+      "why-donations-pending": {
+        "question": "Sei zvimwe zvipo zvichiti \"pending\"?",
+        "answer": [
+          "Chipo che**pending** iBitcoin chaiyo yatotumirwa — chiri kungomirira kusimbiswa nenetiweki. Walleti yemupi yakaparadzira chibvumirano, asi hachisati chabatanidzwa mubhirochaina.",
+          "Bitcoin inoburitsa bhirochaina itsva pamwe chete maminitsi gumi oga oga, uye vacheri vanosarudza zvibvumirano zvichienderana nemubhadharo wakabhadharwa nemupi. Zvipo zvakawanda zvinosimbiswa muawa imwe; zvine fee diki zvinogona kutora nguva refu apo netiweki yakabatikana. {{appName}} inocheka zvakare mamiriro ekusimbiswa ichizvichaira, saka chiratidzo che**pending** chinonyangarika choga kana bhirochaina yauya.",
+          "Mari iri munzira — mushanduki achaona chipo chichiverengwa muhuwandu hwekambeni kanongochisimbiswa. Hapana chimwe chinogona kuitwa nemushanduki kana {{appName}} kuti vamhanyise zvinhu; walleti yemupi chete ndiyo inogona kuwedzera fee."
+        ]
+      },
       "censorship-resistance": {
         "question": "\"Kushinga kucensorship\" pano kunorevei?",
         "answer": [

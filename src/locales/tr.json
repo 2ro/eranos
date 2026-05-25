@@ -2043,6 +2043,14 @@
           "Bir kampanya her ikisini de kabul ettiğinde, hangi yolun kullanılacağına bağışçının cüzdanı karar verir — sessiz ödemeleri destekleyen cüzdanlar gizli olarak öder, diğerleri açık adrese öder. Tam görüntü için **Bağışçı Rehberi**'ni ve **Aktivist Rehberi**'ni okuyun."
         ]
       },
+      "why-donations-pending": {
+        "question": "Bazı bağışlar neden \"beklemede\" görünüyor?",
+        "answer": [
+          "**Beklemede** olan bir bağış, zaten gönderilmiş gerçek Bitcoin'dir — yalnızca ağ tarafından onaylanmayı beklemektedir. Bağışçının cüzdanı işlemi yayımlamıştır, ancak işlem henüz bir bloğa dahil edilmemiştir.",
+          "Bitcoin yaklaşık her 10 dakikada bir yeni bir blok üretir ve madenciler işlemleri bağışçının ödediği ücrete göre seçer. Bağışların çoğu bir saat içinde onaylanır; düşük ücretli olanlar ağ yoğun olduğunda daha uzun sürebilir. {{appName}} onay durumunu otomatik olarak yeniden kontrol eder, bu yüzden bir blok geldiğinde **beklemede** etiketi kendiliğinden kaybolur.",
+          "Fonlar yoldadır — bağış onaylandığı anda aktivist, bağışın kampanya toplamına eklendiğini görecektir. Aktivistin veya {{appName}}'in işlemi hızlandırmak için yapabileceği hiçbir şey yoktur; yalnızca bağışçının cüzdanı ücreti artırabilir."
+        ]
+      },
       "censorship-resistance": {
         "question": "Buradaki \"sansüre dayanıklı\" ne anlama geliyor?",
         "answer": [

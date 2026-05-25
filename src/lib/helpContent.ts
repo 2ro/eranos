@@ -87,6 +87,7 @@ const FAQ_STRUCTURE: FAQCategoryStructure[] = [
       { id: 'connect-wallet' },
       { id: 'export-wallet' },
       { id: 'donations-are-public-general' },
+      { id: 'why-donations-pending' },
       { id: 'censorship-resistance' },
       { id: 'why-onchain' },
       { id: 'why-not-silent-payments' },

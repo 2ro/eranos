@@ -2044,6 +2044,14 @@
           "Saat kampanye menerima keduanya, dompet donatur memutuskan jalur mana yang digunakan — dompet yang mendukung silent payments membayar secara privat, yang lain membayar alamat publik. Baca **Panduan Donatur** dan **Panduan Aktivis** untuk gambaran lengkap."
         ]
       },
+      "why-donations-pending": {
+        "question": "Mengapa beberapa donasi tertulis \"pending\"?",
+        "answer": [
+          "Donasi **pending** adalah Bitcoin asli yang sudah dikirim — ia hanya menunggu untuk dikonfirmasi oleh jaringan. Dompet donatur telah menyiarkan transaksinya, tetapi belum dimasukkan ke dalam blok.",
+          "Bitcoin menghasilkan blok baru kira-kira setiap 10 menit, dan penambang memilih transaksi berdasarkan biaya yang dibayar donatur. Sebagian besar donasi terkonfirmasi dalam satu jam; donasi dengan biaya lebih rendah bisa memakan waktu lebih lama saat jaringan sedang sibuk. {{appName}} memeriksa ulang status konfirmasi secara otomatis, sehingga label **pending** hilang dengan sendirinya begitu blok masuk.",
+          "Dananya sedang dalam perjalanan — aktivis akan melihat donasi tersebut dihitung ke dalam total kampanye segera setelah terkonfirmasi. Tidak ada yang bisa dilakukan aktivis atau {{appName}} untuk mempercepatnya; hanya dompet donatur yang bisa menaikkan fee."
+        ]
+      },
       "censorship-resistance": {
         "question": "Apa yang dimaksud dengan \"anti-sensor\" di sini?",
         "answer": [

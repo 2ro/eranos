@@ -2091,6 +2091,14 @@
           "When a campaign accepts both, the donor's wallet decides which path to use — silent-payment-capable wallets pay privately, others pay the public address. Read the **Donor Guide** and **Activist Guide** for the full picture."
         ]
       },
+      "why-donations-pending": {
+        "question": "Why do some donations say \"pending\"?",
+        "answer": [
+          "A **pending** donation is real Bitcoin that's already been sent — it's just waiting to be confirmed by the network. The donor's wallet has broadcast the transaction, but it hasn't been included in a block yet.",
+          "Bitcoin produces a new block roughly every 10 minutes, and miners pick transactions based on the fee the donor paid. Most donations confirm within an hour; lower-fee ones can take longer when the network is busy. {{appName}} re-checks confirmation status automatically, so the **pending** label disappears on its own once a block lands.",
+          "The funds are on the way — the activist will see the donation count toward the campaign total as soon as it confirms. There's nothing the activist or {{appName}} can do to speed it up; only the donor's wallet can bump the fee."
+        ]
+      },
       "censorship-resistance": {
         "question": "What does \"censorship-resistant\" mean here?",
         "answer": [

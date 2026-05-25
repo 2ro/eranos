@@ -2108,6 +2108,14 @@
           "Cuando una campaña acepta ambos, la wallet del donante decide qué vía usar — las wallets compatibles con silent payments pagan de forma privada, las demás pagan la dirección pública. Lee la **Guía del donante** y la **Guía del activista** para el panorama completo."
         ]
       },
+      "why-donations-pending": {
+        "question": "¿Por qué algunas donaciones aparecen como «pendientes»?",
+        "answer": [
+          "Una donación **pendiente** es Bitcoin real que ya se ha enviado — solo está esperando a que la red lo confirme. La wallet del donante ya ha transmitido la transacción, pero todavía no se ha incluido en un bloque.",
+          "Bitcoin produce un bloque nuevo aproximadamente cada 10 minutos, y los mineros eligen las transacciones según la comisión que pagó el donante. La mayoría de las donaciones se confirman en menos de una hora; las que tienen una comisión más baja pueden tardar más cuando la red está congestionada. {{appName}} vuelve a comprobar el estado de la confirmación automáticamente, por lo que la etiqueta de **pendiente** desaparece sola en cuanto entra un bloque.",
+          "Los fondos están en camino — el activista verá la donación contabilizada en el total de la campaña en cuanto se confirme. No hay nada que el activista ni {{appName}} puedan hacer para acelerarlo; solo la wallet del donante puede subir la comisión."
+        ]
+      },
       "censorship-resistance": {
         "question": "¿Qué significa aquí \"resistente a la censura\"?",
         "answer": [

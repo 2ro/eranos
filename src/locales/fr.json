@@ -2090,6 +2090,14 @@
           "Quand une campagne accepte les deux, le portefeuille du donateur décide quel chemin utiliser — les portefeuilles compatibles paient en privé, les autres paient l'adresse publique. Lisez le **Guide du donateur** et le **Guide de l'activiste** pour le tableau complet."
         ]
       },
+      "why-donations-pending": {
+        "question": "Pourquoi certains dons indiquent-ils « en attente » ?",
+        "answer": [
+          "Un don **en attente** est du vrai Bitcoin qui a déjà été envoyé — il attend simplement d'être confirmé par le réseau. Le portefeuille du donateur a diffusé la transaction, mais elle n'a pas encore été incluse dans un bloc.",
+          "Bitcoin produit un nouveau bloc environ toutes les 10 minutes, et les mineurs sélectionnent les transactions en fonction des frais payés par le donateur. La plupart des dons sont confirmés en moins d'une heure ; ceux avec des frais plus bas peuvent prendre plus de temps lorsque le réseau est saturé. {{appName}} revérifie automatiquement l'état de confirmation, donc l'étiquette **en attente** disparaît d'elle-même dès qu'un bloc arrive.",
+          "Les fonds sont en route — l'activiste verra le don compter dans le total de la campagne dès qu'il sera confirmé. Ni l'activiste ni {{appName}} ne peuvent accélérer le processus ; seul le portefeuille du donateur peut augmenter les frais."
+        ]
+      },
       "censorship-resistance": {
         "question": "Que signifie « résistant à la censure » ici ?",
         "answer": [

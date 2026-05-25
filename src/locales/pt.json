@@ -2108,6 +2108,14 @@
           "Quando uma campanha aceita ambos, a carteira do doador decide qual caminho usar — carteiras capazes de pagamentos silenciosos pagam com privacidade, outras pagam o endereço público. Leia o **Guia do Doador** e o **Guia do Ativista** para o quadro completo."
         ]
       },
+      "why-donations-pending": {
+        "question": "Por que algumas doações aparecem como \"pendentes\"?",
+        "answer": [
+          "Uma doação **pendente** é Bitcoin real que já foi enviado — está apenas aguardando confirmação pela rede. A carteira do doador transmitiu a transação, mas ela ainda não foi incluída em um bloco.",
+          "O Bitcoin produz um novo bloco a cada 10 minutos, aproximadamente, e os mineradores escolhem as transações com base na taxa que o doador pagou. A maioria das doações confirma em até uma hora; as com taxa mais baixa podem demorar mais quando a rede está congestionada. O {{appName}} verifica o status de confirmação automaticamente, então o rótulo **pendente** desaparece sozinho assim que um bloco é minerado.",
+          "Os fundos estão a caminho — o ativista verá a doação ser contabilizada no total da campanha assim que ela for confirmada. Não há nada que o ativista ou o {{appName}} possam fazer para acelerar; apenas a carteira do doador pode aumentar a taxa."
+        ]
+      },
       "censorship-resistance": {
         "question": "O que significa \"resistente à censura\" aqui?",
         "answer": [

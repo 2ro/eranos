@@ -2003,6 +2003,14 @@
           "Kampeni inapokubali zote mbili, pochi ya mfadhili huamua njia ya kutumia — pochi zenye uwezo wa malipo ya kimya hulipa kwa faragha, nyingine hulipa anwani ya umma. Soma **Mwongozo wa Mfadhili** na **Mwongozo wa Mwanaharakati** kwa picha kamili."
         ]
       },
+      "why-donations-pending": {
+        "question": "Kwa nini baadhi ya michango inasema \"inasubiri\"?",
+        "answer": [
+          "Mchango **unaosubiri** ni Bitcoin halisi ambayo tayari imetumwa — inangoja tu kuthibitishwa na mtandao. Pochi ya mfadhili imeshatangaza muamala, lakini bado haujajumuishwa katika kizuizi.",
+          "Bitcoin huzalisha kizuizi kipya takriban kila dakika 10, na wachimbaji huchagua miamala kulingana na ada aliyolipa mfadhili. Michango mingi huthibitishwa ndani ya saa moja; ile yenye ada ya chini inaweza kuchukua muda mrefu wakati mtandao una shughuli nyingi. {{appName}} hukagua tena hali ya uthibitisho kiotomatiki, hivyo lebo ya **inasubiri** hutoweka yenyewe mara kizuizi kinapotua.",
+          "Fedha ziko njiani — mwanaharakati ataona mchango ukihesabiwa katika jumla ya kampeni mara tu unapothibitishwa. Hakuna jambo mwanaharakati au {{appName}} wanaloweza kufanya kuharakisha; pochi ya mfadhili pekee ndiyo inayoweza kuongeza ada."
+        ]
+      },
       "censorship-resistance": {
         "question": "\"Inastahimili udhibiti\" inamaanisha nini hapa?",
         "answer": [
