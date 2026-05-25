@@ -556,7 +556,11 @@ export const NoteCard = memo(function NoteCard({
 
   const isComment = event.kind === 1111;
   const isReply = isTextNote && !isComment && isReplyEvent(event);
-  const { translatedEvent: contentEvent, translateAction } = useEventTranslation(event, { includePlainContent: isTextNote });
+  const { translatedEvent: contentEvent, translateAction } = useEventTranslation(event, {
+    includePlainContent: isTextNote,
+    iconOnly: true,
+    buttonClassName: "h-9 w-9 p-0",
+  });
 
   // Find all people being replied to (for "Replying to @user1 and @user2")
   const replyToPubkeys = useMemo(() => {
@@ -896,8 +900,6 @@ export const NoteCard = memo(function NoteCard({
 
       <div className="flex-1" />
 
-      {translateAction}
-
       <button
         className="inline-flex items-center justify-center h-9 w-9 rounded-full text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors sidebar:hidden"
         title={t('feed.actions.share')}
@@ -911,7 +913,12 @@ export const NoteCard = memo(function NoteCard({
       >
         <Share2 className="size-[18px]" />
       </button>
+    </div>
+  );
 
+  const headerControls = !compact ? (
+    <div className="ml-auto flex shrink-0 items-center gap-1">
+      {translateAction}
       <button
         className="inline-flex items-center justify-center h-9 w-9 rounded-full text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors"
         title={t('feed.actions.more')}
@@ -923,7 +930,7 @@ export const NoteCard = memo(function NoteCard({
         <MoreHorizontal className="size-[18px]" />
       </button>
     </div>
-  );
+  ) : null;
 
   // ── Vanish layout (kind 62) — dramatic card, no author row ──
   if (isVanish) {
@@ -932,13 +939,14 @@ export const NoteCard = memo(function NoteCard({
       return (
         <article
           className={cn(
-            "px-4 pt-3 hover:bg-secondary/30 transition-colors cursor-pointer overflow-hidden",
+            "relative px-4 pt-3 hover:bg-secondary/30 transition-colors cursor-pointer overflow-hidden",
             threaded ? "pb-0" : "pb-3 border-b border-border",
             className,
           )}
           onClick={handleCardClick}
           onAuxClick={handleAuxClick}
         >
+          {headerControls && <div className="absolute right-3 top-2 z-10">{headerControls}</div>}
           <div className="flex gap-3">
             <div className="flex flex-col items-center">
               {avatarElement}
@@ -964,12 +972,13 @@ export const NoteCard = memo(function NoteCard({
     return (
       <article
         className={cn(
-          "px-4 py-3 border-b border-border hover:bg-secondary/30 transition-colors cursor-pointer overflow-hidden",
+          "relative px-4 py-3 border-b border-border hover:bg-secondary/30 transition-colors cursor-pointer overflow-hidden",
           className,
         )}
         onClick={handleCardClick}
         onAuxClick={handleAuxClick}
       >
+        {headerControls && <div className="absolute right-3 top-2 z-10">{headerControls}</div>}
         <VanishCardCompact event={event} />
         {!compact && (
           <>
@@ -1150,6 +1159,7 @@ export const NoteCard = memo(function NoteCard({
                   {authorInfo}
                 </div>
                 <CountryCommentPill event={event} className="shrink-0 [text-shadow:none]" />
+                {headerControls}
               </div>
               {contentBlock}
               {actionButtons}
@@ -1230,6 +1240,7 @@ export const NoteCard = memo(function NoteCard({
               event={event}
               className="shrink-0 [text-shadow:none]"
             />
+            {headerControls}
           </div>
         </div>
 

@@ -1359,8 +1359,6 @@
     "title": "Changanua malipo ya kimya",
     "description": "Inatembea kifaa cha kuorodhesha cha BIP-352 kilichosanidiwa block-kwa-block kugundua malipo ya kimya yanayoingia.",
     "fromBlock": "Kutoka block",
-    "toBlock": "Hadi block",
-    "tipPlaceholder": "kilele",
     "indexerTip": "Kilele cha kifaa cha kuorodhesha",
     "lastFullyScanned": "Iliyochanganuliwa kikamilifu mwisho",
     "never": "kamwe",

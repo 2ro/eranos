@@ -384,7 +384,7 @@ export function SearchPage() {
       <PageHeader title={t('search.title')} icon={<SearchIcon className="size-5" />} />
       <SubHeaderBar>
         <TabButton label={t('search.tabs.agora')} active={activeTab === 'agora'} onClick={() => setActiveTab('agora')} />
-        <TabButton label={t('search.tabs.nostr')} active={activeTab === 'posts'} onClick={() => setActiveTab('posts')} />
+        <TabButton label={t('search.filters.langOptions.global')} active={activeTab === 'posts'} onClick={() => setActiveTab('posts')} />
         <TabButton label={t('search.tabs.accounts')} active={activeTab === 'accounts'} onClick={() => setActiveTab('accounts')} />
       </SubHeaderBar>
 
@@ -1079,4 +1079,3 @@ function AgoraSearchTab({
 
   return <EmptyState message={t('search.empty.agoraPrompt')} />;
 }
-
