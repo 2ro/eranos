@@ -9,7 +9,6 @@ import {
   ChevronDown,
   ArrowDownLeft,
   ArrowUpRight,
-  Send,
   ShieldOff,
   KeyRound,
   Radar,
@@ -147,47 +146,6 @@ export function WalletPage() {
   // ── Available — full HD wallet UI ────────────────────────────
   return (
     <main className="max-w-sm mx-auto">
-      {/* Top bar: overflow menu only. We deliberately keep this minimal —
-          the wallet home doubles as a phone-style "home screen" with the
-          balance as the hero, so any chrome here pushes that down. The menu
-          shares the `max-w-sm` container with the rest of the wallet UI so
-          it sits flush with the balance + send/receive controls instead of
-          floating off in the far corner of a wide layout. */}
-      <div className="flex items-center justify-end px-4 pt-3">
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <button
-              type="button"
-              aria-label={t('wallet.openMenu')}
-              title={t('wallet.openMenu')}
-              className="p-2 -mr-2 rounded-full text-muted-foreground hover:bg-secondary hover:text-foreground motion-safe:transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-            >
-              <MoreVertical className="size-5" />
-            </button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            {sp.enabled && spAddress && (
-              <DropdownMenuItem onSelect={() => setSpScanOpen(true)} className="cursor-pointer">
-                <Radar className="size-4 mr-2" />
-                {sp.storage?.scanHeight && sp.storage.scanHeight > 0
-                  ? t('wallet.receiveDialog.scanForNew')
-                  : t('wallet.receiveDialog.scanForPayments')}
-              </DropdownMenuItem>
-            )}
-            <DropdownMenuItem onSelect={() => setBackupOpen(true)} className="cursor-pointer">
-              <KeyRound className="size-4 mr-2" />
-              {t('walletSettings.backup.label')}
-            </DropdownMenuItem>
-            <DropdownMenuItem asChild>
-              <Link to="/wallet/legacy" className="cursor-pointer">
-                <History className="size-4 mr-2" />
-                {t('walletSettings.legacy.label')}
-              </Link>
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      </div>
-
       <div className="flex flex-col items-center px-4 pt-4 pb-4 space-y-6">
         {/* Balance */}
         {isLoading ? (
@@ -231,21 +189,6 @@ export function WalletPage() {
           </button>
         )}
 
-        {/* Send */}
-        {!isLoading && !error && (
-          <div className="flex items-center gap-2">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setSendOpen(true)}
-              className="rounded-full"
-            >
-              <Send className="size-3.5 mr-1.5" />
-              {t('wallet.send')}
-            </Button>
-          </div>
-        )}
-
         {/* Back-up affordance and v1 detection live in the overflow menu
             in the top-right. Back up opens a dialog inline; Legacy wallet
             recovery navigates to its own page. The wallet home no longer
@@ -263,9 +206,10 @@ export function WalletPage() {
         <WalletBackupMnemonicDialog open={backupOpen} onOpenChange={setBackupOpen} />
 
         {/* Inline receive panel — lives directly under the balance instead
-            of behind a modal so the QR is always visible. */}
+            of behind a modal so the QR is always visible. The copy row uses
+            the same explicit width as the white QR tile (280 + p-4 + p-4). */}
         {!isLoading && !error && qrPayload && (
-          <div className="w-full max-w-sm flex flex-col items-center gap-4 pt-2">
+          <div className="flex flex-col items-center gap-4 pt-2">
             {/* Combined BIP-21 QR with centered Agora logo. BIP-352-aware
                 wallets pick the `sp=` parameter; legacy wallets fall back
                 to the on-chain address. Mirrors CampaignWalletDonatePanel:
@@ -290,47 +234,91 @@ export function WalletPage() {
             {/* Copyable row showing the full payment URI. A refresh icon on
                 the left rotates to the next unused on-chain address; clicks
                 stop propagation so they don't trigger the row's copy. */}
-            <div className="w-full space-y-1.5">
-              <button
-                type="button"
-                onClick={copyPayload}
-                className="w-full flex items-center gap-2 rounded-lg border bg-muted/40 px-3 py-2.5 text-left hover:bg-muted/60 motion-safe:transition-colors cursor-pointer"
-              >
-                {address && (
-                  <span
-                    role="button"
-                    tabIndex={0}
-                    onClick={(e) => {
+            <button
+              type="button"
+              onClick={copyPayload}
+              className="w-[312px] flex items-center gap-2 rounded-lg border bg-muted/40 px-3 py-2.5 text-left hover:bg-muted/60 motion-safe:transition-colors cursor-pointer"
+            >
+              {address && (
+                <span
+                  role="button"
+                  tabIndex={0}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    nextReceiveAddress();
+                  }}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
                       e.stopPropagation();
                       nextReceiveAddress();
-                    }}
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter' || e.key === ' ') {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        nextReceiveAddress();
-                      }
-                    }}
-                    className="shrink-0 -ml-1 inline-flex items-center justify-center size-7 rounded-full text-muted-foreground hover:text-foreground hover:bg-muted motion-safe:transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary cursor-pointer"
-                    aria-label={t('wallet.receiveDialog.newAddress')}
-                    title={t('wallet.receiveDialog.newAddress')}
-                  >
-                    <RefreshCw className="size-3.5" />
-                  </span>
-                )}
-                <span className="flex-1 min-w-0 truncate font-mono text-xs" title={qrPayload}>
-                  {qrPayload}
+                    }
+                  }}
+                  className="shrink-0 -ml-1 inline-flex items-center justify-center size-7 rounded-full text-muted-foreground hover:text-foreground hover:bg-muted motion-safe:transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary cursor-pointer"
+                  aria-label={t('wallet.receiveDialog.newAddress')}
+                  title={t('wallet.receiveDialog.newAddress')}
+                >
+                  <RefreshCw className="size-3.5" />
                 </span>
-                {copiedPayload ? (
-                  <Check className="size-4 text-green-500 shrink-0" />
-                ) : (
-                  <Copy className="size-4 text-muted-foreground shrink-0" />
+              )}
+              <span className="flex-1 min-w-0 truncate font-mono text-xs" title={qrPayload}>
+                {qrPayload}
+              </span>
+              {copiedPayload ? (
+                <Check className="size-4 text-green-500 shrink-0" />
+              ) : (
+                <Copy className="size-4 text-muted-foreground shrink-0" />
+              )}
+            </button>
+          </div>
+        )}
+
+        {/* Send button — placed at the bottom of the wallet column so the
+            receive QR is the first thing users see; sending is a less
+            frequent action. Styled to mirror the `Start a campaign` hero
+            CTA on the home page. */}
+        {!isLoading && !error && (
+          <div className="w-[312px] flex items-center gap-2">
+            <Button
+              size="lg"
+              onClick={() => setSendOpen(true)}
+              className="flex-1 rounded-full text-white font-semibold text-base h-12 px-7 [&_svg]:size-[18px] motion-safe:transition-colors"
+            >
+              <ArrowUpRight className="mr-2" />
+              {t('wallet.send')}
+            </Button>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <button
+                  type="button"
+                  aria-label={t('wallet.openMenu')}
+                  title={t('wallet.openMenu')}
+                  className="shrink-0 p-2 rounded-full text-muted-foreground hover:bg-secondary hover:text-foreground motion-safe:transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                >
+                  <MoreVertical className="size-5" />
+                </button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                {sp.enabled && spAddress && (
+                  <DropdownMenuItem onSelect={() => setSpScanOpen(true)} className="cursor-pointer">
+                    <Radar className="size-4 mr-2" />
+                    {sp.storage?.scanHeight && sp.storage.scanHeight > 0
+                      ? t('wallet.receiveDialog.scanForNew')
+                      : t('wallet.receiveDialog.scanForPayments')}
+                  </DropdownMenuItem>
                 )}
-              </button>
-              <p className="text-xs text-muted-foreground text-center">
-                {t('wallet.receiveDialog.description')}
-              </p>
-            </div>
+                <DropdownMenuItem onSelect={() => setBackupOpen(true)} className="cursor-pointer">
+                  <KeyRound className="size-4 mr-2" />
+                  {t('walletSettings.backup.label')}
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link to="/wallet/legacy" className="cursor-pointer">
+                    <History className="size-4 mr-2" />
+                    {t('walletSettings.legacy.label')}
+                  </Link>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         )}
 
