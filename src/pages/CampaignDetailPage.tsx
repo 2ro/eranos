@@ -962,7 +962,10 @@ function DonateColumn({
                   100,
                   Math.round((raisedUsd(raisedSats, btcPrice)! / campaign.goalUsd) * 100),
                 )}
-                className="h-2"
+                // `bg-foreground/15` overrides the primitive's default
+                // `bg-secondary` track for legibility against the card
+                // surface — matches the treatment in CampaignCard.
+                className="h-2 bg-foreground/15"
               />
             )}
           </div>
