@@ -173,13 +173,13 @@ export function CommunitiesPage() {
             </div>
 
             {isSearchFetching && !searchHits ? (
-              <CommunityGrid className="px-0">
+              <CommunityGrid>
                 {Array.from({ length: 8 }).map((_, i) => (
                   <CommunityMiniCardSkeleton key={i} className="w-full" />
                 ))}
               </CommunityGrid>
             ) : searchHits && searchHits.length > 0 ? (
-              <CommunityGrid className="px-0">
+              <CommunityGrid>
                 {searchHits.map((community) => (
                   <CommunityMiniCard
                     key={community.aTag}
@@ -321,14 +321,14 @@ function ModeratorReviewSections() {
         size="compact"
         triggerPaddingClassName="pb-3"
         skeleton={
-          <CommunityGrid className="px-0">
+          <CommunityGrid>
             {Array.from({ length: 4 }).map((_, i) => (
               <CommunityMiniCardSkeleton key={i} className="w-full" />
             ))}
           </CommunityGrid>
         }
       >
-        <CommunityGrid className="px-0">
+        <CommunityGrid>
           {needsReviewOrgs.map((org) => (
             <CommunityMiniCard key={org.aTag} community={org} className="w-full" />
           ))}
@@ -344,14 +344,14 @@ function ModeratorReviewSections() {
         size="compact"
         triggerPaddingClassName="pb-3"
         skeleton={
-          <CommunityGrid className="px-0">
+          <CommunityGrid>
             {Array.from({ length: 4 }).map((_, i) => (
               <CommunityMiniCardSkeleton key={i} className="w-full" />
             ))}
           </CommunityGrid>
         }
       >
-        <CommunityGrid className="px-0">
+        <CommunityGrid>
           {hiddenOrgs.map((org) => (
             <CommunityMiniCard key={org.aTag} community={org} className="w-full" />
           ))}
@@ -584,7 +584,7 @@ function MyCommunitiesShelfContent({
 
   if (isLoading) {
     return (
-      <CommunityGrid className="px-0">
+      <CommunityGrid>
         {Array.from({ length: 4 }).map((_, i) => (
           <CommunityMiniCardSkeleton key={i} className="w-full" />
         ))}
@@ -614,7 +614,7 @@ function MyCommunitiesShelfContent({
 
   return (
     <div className="space-y-4">
-      <CommunityGrid className="px-0">
+      <CommunityGrid>
         {visible.map((entry) => (
           <CommunityMiniCard
             key={entry.community.aTag}
@@ -658,7 +658,7 @@ function FeaturedOrganizationsShelf() {
 
   if (isLoading && !hasFeatured) {
     return (
-      <CommunityGrid className="px-0">
+      <CommunityGrid>
         {Array.from({ length: 8 }).map((_, i) => (
           <CommunityMiniCardSkeleton key={i} className="w-full" />
         ))}
@@ -678,7 +678,7 @@ function FeaturedOrganizationsShelf() {
   }
 
   return (
-    <CommunityGrid className="px-0">
+    <CommunityGrid>
       {featured.map((entry) => (
         <CommunityMiniCard
           key={entry.community.aTag}
