@@ -2005,8 +2005,19 @@
       "connect-wallet": {
         "question": "What is the wallet on {{appName}}?",
         "answer": [
-          "Your {{appName}} wallet is built from your Nostr key. It can receive Bitcoin both ways — as a public address that any Bitcoin wallet can pay, and as a silent-payments code that capable wallets can pay privately. There's nothing to sign up for; it exists the moment you have an account.",
-          "When you create a campaign, you pick whether to accept public payments, private payments, or both. To spend what you receive, see the **Activist Guide**."
+          "Your {{appName}} wallet is a **self-custodial** Bitcoin wallet, built from your Nostr key. {{appName}} never holds your funds — the wallet runs in your browser and signs transactions locally with a key only you control. It can receive Bitcoin both ways — as a public address that any Bitcoin wallet can pay, and as a silent-payments code that capable wallets can pay privately. There's nothing to sign up for; it exists the moment you have an account.",
+          "When you create a campaign, you pick whether to accept public payments, private payments, or both. To spend what you receive, see the **Activist Guide**.",
+          "You can also export your wallet's 24-word seed phrase and import it into any standard Bitcoin wallet — see \"Can I export my {{appName}} wallet to another Bitcoin wallet?\" below."
+        ]
+      },
+      "export-wallet": {
+        "question": "Can I export my {{appName}} wallet to another Bitcoin wallet?",
+        "answer": [
+          "Yes. Your {{appName}} wallet is fully self-custodial. {{appName}} never holds your Bitcoin and never sees your keys — the wallet runs entirely in your browser, signing transactions locally with a key derived from your Nostr secret key (nsec).",
+          "Open the wallet from the menu, tap the three-dot menu in the top right, and choose **Back up wallet**. You'll see a 24-word BIP-39 seed phrase. Write it down somewhere safe (or save it in a password manager) — **anyone with these words can spend your Bitcoin.**",
+          "You can import those 24 words into any standard Bitcoin wallet: **Sparrow**, **Electrum**, **BlueWallet**, **Phoenix**, a **Trezor**, or a **Ledger**. {{appName}} uses standard BIP-86 (Taproot) and BIP-352 (silent payments) derivation paths, so no special configuration is needed.",
+          "After importing, the other wallet shows the same balance and history as your {{appName}} wallet — they're the same wallet, just two views of it.",
+          "Seed-phrase export is only available when you sign in with an nsec. Browser-extension and remote-signer (bunker) logins keep your secret key isolated, so {{appName}} can't derive the seed in those modes."
         ]
       },
       "donations-are-public-general": {
@@ -2322,11 +2333,11 @@
         "steps": {
           "sweep": {
             "title": "Sweep to a wallet you control",
-            "body": "Good self-custody options: [Sparrow](https://sparrowwallet.com), [BlueWallet](https://bluewallet.io), or [Phoenix](https://phoenix.acinq.co) (Lightning)."
+            "body": "Your {{appName}} wallet is already self-custodial — you, and only you, control the keys. For a desktop or hardware-wallet view of the same balance, open the wallet menu, choose **Back up wallet**, and import the 24-word seed into [Sparrow](https://sparrowwallet.com), [BlueWallet](https://bluewallet.io), or a hardware wallet (Trezor, Ledger). If you'd rather move the funds to a different key entirely — for example, to a Lightning wallet like [Phoenix](https://phoenix.acinq.co) — send a regular Bitcoin transaction from your {{appName}} wallet."
           },
           "dontSit": {
-            "title": "Don't sit on funds at the campaign address",
-            "body": "Treat it like a mailbox, not a savings account. This applies to both Public and Silent donations."
+            "title": "Don't sit on funds in the browser",
+            "body": "Especially for high-value campaigns, store the wallet's seed phrase offline (paper, metal backup, or a password manager on a dedicated device) and consider a hardware wallet. The seed you back up from {{appName}} is the same wallet — secure the words and you've got cold storage."
           }
         }
       },

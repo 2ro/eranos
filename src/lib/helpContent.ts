@@ -85,6 +85,7 @@ const FAQ_STRUCTURE: FAQCategoryStructure[] = [
     items: [
       { id: 'send-bitcoin-onchain' },
       { id: 'connect-wallet' },
+      { id: 'export-wallet' },
       { id: 'donations-are-public-general' },
       { id: 'censorship-resistance' },
       { id: 'why-onchain' },

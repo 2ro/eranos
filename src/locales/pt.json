@@ -2001,8 +2001,19 @@
       "connect-wallet": {
         "question": "O que é a carteira no {{appName}}?",
         "answer": [
-          "Sua carteira {{appName}} é construída a partir da sua chave Nostr. Ela pode receber Bitcoin de duas maneiras — como um endereço público que qualquer carteira Bitcoin pode pagar, e como um código de pagamentos silenciosos que carteiras capazes podem pagar com privacidade. Não há nada para se cadastrar; ela existe no momento em que você tem uma conta.",
-          "Quando você cria uma campanha, escolhe se aceita pagamentos públicos, privados ou ambos. Para gastar o que recebe, veja o **Guia do Ativista**."
+          "Sua carteira {{appName}} é uma carteira Bitcoin de **auto-custódia**, construída a partir da sua chave Nostr. O {{appName}} nunca detém seus fundos — a carteira roda no seu navegador e assina transações localmente com uma chave que somente você controla. Ela pode receber Bitcoin de duas maneiras — como um endereço público que qualquer carteira Bitcoin pode pagar, e como um código de pagamentos silenciosos que carteiras capazes podem pagar com privacidade. Não há nada para se cadastrar; ela existe no momento em que você tem uma conta.",
+          "Quando você cria uma campanha, escolhe se aceita pagamentos públicos, privados ou ambos. Para gastar o que recebe, veja o **Guia do Ativista**.",
+          "Você também pode exportar a frase semente de 24 palavras da sua carteira e importá-la em qualquer carteira Bitcoin padrão — veja \"Posso exportar minha carteira {{appName}} para outra carteira Bitcoin?\" abaixo."
+        ]
+      },
+      "export-wallet": {
+        "question": "Posso exportar minha carteira {{appName}} para outra carteira Bitcoin?",
+        "answer": [
+          "Sim. Sua carteira {{appName}} é totalmente de auto-custódia. O {{appName}} nunca detém seu Bitcoin e nunca vê suas chaves — a carteira roda inteiramente no seu navegador, assinando transações localmente com uma chave derivada da sua chave secreta Nostr (nsec).",
+          "Abra a carteira pelo menu, toque no menu de três pontos no canto superior direito e escolha **Fazer backup da carteira**. Você verá uma frase semente BIP-39 de 24 palavras. Anote em um lugar seguro (ou salve em um gerenciador de senhas) — **qualquer pessoa com essas palavras pode gastar seu Bitcoin.**",
+          "Você pode importar essas 24 palavras em qualquer carteira Bitcoin padrão: **Sparrow**, **Electrum**, **BlueWallet**, **Phoenix**, um **Trezor** ou um **Ledger**. O {{appName}} usa os caminhos de derivação padrão BIP-86 (Taproot) e BIP-352 (pagamentos silenciosos), então nenhuma configuração especial é necessária.",
+          "Após importar, a outra carteira mostra o mesmo saldo e histórico que sua carteira {{appName}} — é a mesma carteira, apenas duas visões dela.",
+          "A exportação da frase semente só está disponível quando você entra com uma nsec. Logins via extensão de navegador e via assinador remoto (bunker) mantêm sua chave secreta isolada, então o {{appName}} não consegue derivar a semente nesses modos."
         ]
       },
       "donations-are-public-general": {
@@ -2318,11 +2329,11 @@
         "steps": {
           "sweep": {
             "title": "Mova para uma carteira que você controla",
-            "body": "Boas opções de auto-custódia: [Sparrow](https://sparrowwallet.com), [BlueWallet](https://bluewallet.io) ou [Phoenix](https://phoenix.acinq.co) (Lightning)."
+            "body": "Sua carteira {{appName}} já é de auto-custódia — você, e somente você, controla as chaves. Para uma visão em desktop ou carteira de hardware do mesmo saldo, abra o menu da carteira, escolha **Fazer backup da carteira** e importe a semente de 24 palavras no [Sparrow](https://sparrowwallet.com), [BlueWallet](https://bluewallet.io), ou em uma carteira de hardware (Trezor, Ledger). Se preferir mover os fundos para uma chave totalmente diferente — por exemplo, para uma carteira Lightning como a [Phoenix](https://phoenix.acinq.co) — envie uma transação Bitcoin comum a partir da sua carteira {{appName}}."
           },
           "dontSit": {
-            "title": "Não deixe fundos parados no endereço da campanha",
-            "body": "Trate-o como uma caixa de correio, não uma conta poupança. Isso se aplica a doações Públicas e Silenciosas."
+            "title": "Não deixe fundos parados no navegador",
+            "body": "Especialmente para campanhas de alto valor, guarde a frase semente da carteira offline (papel, backup em metal, ou um gerenciador de senhas em um dispositivo dedicado) e considere uma carteira de hardware. A semente que você faz backup no {{appName}} é a mesma carteira — proteja as palavras e você terá armazenamento a frio."
           }
         }
       },

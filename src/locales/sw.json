@@ -1917,8 +1917,19 @@
       "connect-wallet": {
         "question": "Pochi ya {{appName}} ni nini?",
         "answer": [
-          "Pochi yako ya {{appName}} imejengwa kutoka kwa funguo yako ya Nostr. Inaweza kupokea Bitcoin njia zote mbili — kama anwani ya umma ambayo pochi yoyote ya Bitcoin inaweza kulipa, na kama msimbo wa malipo ya kimya ambao pochi zenye uwezo zinaweza kulipa kwa faragha. Hakuna cha kujisajilia; ipo wakati una akaunti.",
-          "Unapounda kampeni, unachagua kukubali malipo ya umma, malipo ya faragha, au zote mbili. Kutumia unachopokea, ona **Mwongozo wa Mwanaharakati**."
+          "Pochi yako ya {{appName}} ni pochi ya Bitcoin ya **kujihifadhi**, iliyojengwa kutoka kwa funguo yako ya Nostr. {{appName}} kamwe haishiki fedha zako — pochi inaendesha katika kivinjari chako na kusaini miamala ndani ya nchi kwa funguo unayoidhibiti wewe tu. Inaweza kupokea Bitcoin njia zote mbili — kama anwani ya umma ambayo pochi yoyote ya Bitcoin inaweza kulipa, na kama msimbo wa malipo ya kimya ambao pochi zenye uwezo zinaweza kulipa kwa faragha. Hakuna cha kujisajilia; ipo wakati una akaunti.",
+          "Unapounda kampeni, unachagua kukubali malipo ya umma, malipo ya faragha, au zote mbili. Kutumia unachopokea, ona **Mwongozo wa Mwanaharakati**.",
+          "Unaweza pia kuhamisha kifungu cha maneno 24 cha mbegu ya pochi yako na kukileta katika pochi yoyote ya kawaida ya Bitcoin — ona \"Je, naweza kuhamisha pochi yangu ya {{appName}} kwa pochi nyingine ya Bitcoin?\" hapa chini."
+        ]
+      },
+      "export-wallet": {
+        "question": "Je, naweza kuhamisha pochi yangu ya {{appName}} kwa pochi nyingine ya Bitcoin?",
+        "answer": [
+          "Ndiyo. Pochi yako ya {{appName}} ni ya kujihifadhi kabisa. {{appName}} kamwe haishiki Bitcoin yako na kamwe haioni funguo zako — pochi inaendesha kabisa katika kivinjari chako, ikisaini miamala ndani ya nchi kwa funguo iliyotokana na funguo yako ya siri ya Nostr (nsec).",
+          "Fungua pochi kutoka kwa menyu, gusa menyu ya vitone vitatu juu kulia, na chagua **Back up wallet**. Utaona kifungu cha maneno 24 cha mbegu cha BIP-39. Kiandike mahali salama (au kihifadhi katika msimamizi wa nywila) — **yeyote mwenye maneno haya anaweza kutumia Bitcoin yako.**",
+          "Unaweza kuleta maneno hayo 24 katika pochi yoyote ya kawaida ya Bitcoin: **Sparrow**, **Electrum**, **BlueWallet**, **Phoenix**, **Trezor**, au **Ledger**. {{appName}} hutumia njia za kawaida za utokeaji za BIP-86 (Taproot) na BIP-352 (malipo ya kimya), kwa hivyo hakuna usanidi maalum unaohitajika.",
+          "Baada ya kuleta, pochi nyingine inaonyesha salio sawa na historia kama pochi yako ya {{appName}} — ni pochi ileile, ni mitazamo miwili tu ya hiyo.",
+          "Kuhamisha kifungu cha mbegu kunapatikana tu unapoingia kwa nsec. Kuingia kwa kiendelezi cha kivinjari na kisainishi cha mbali (bunker) huweka funguo yako ya siri kando, kwa hivyo {{appName}} haiwezi kupata mbegu katika hali hizo."
         ]
       },
       "donations-are-public-general": {
@@ -2233,12 +2244,12 @@
         "heading": "Hamisha michango haraka",
         "steps": {
           "sweep": {
-            "title": "Ondoa kwenye pochi unayoidhibiti",
-            "body": "Chaguzi nzuri za kujihifadhi: [Sparrow](https://sparrowwallet.com), [BlueWallet](https://bluewallet.io), au [Phoenix](https://phoenix.acinq.co) (Lightning)."
+            "title": "Hamisha kwenye pochi unayoidhibiti",
+            "body": "Pochi yako ya {{appName}} tayari ni ya kujihifadhi — wewe, na wewe tu, unadhibiti funguo. Kwa mtazamo wa kompyuta ya mezani au pochi ya kifaa wa salio lilelile, fungua menyu ya pochi, chagua **Back up wallet**, na ulete kifungu cha maneno 24 cha mbegu katika [Sparrow](https://sparrowwallet.com), [BlueWallet](https://bluewallet.io), au pochi ya kifaa (Trezor, Ledger). Ikiwa ungependelea kuhamisha fedha kwa funguo tofauti kabisa — kwa mfano, kwa pochi ya Lightning kama [Phoenix](https://phoenix.acinq.co) — tuma muamala wa kawaida wa Bitcoin kutoka kwa pochi yako ya {{appName}}."
           },
           "dontSit": {
-            "title": "Usikae na fedha kwenye anwani ya kampeni",
-            "body": "Itendee kama sanduku la barua, si akaunti ya akiba. Hii inatumika kwa michango ya Umma na Kimya zote mbili."
+            "title": "Usikae na fedha katika kivinjari",
+            "body": "Hasa kwa kampeni za thamani kubwa, hifadhi kifungu cha mbegu ya pochi nje ya mtandao (karatasi, hifadhi ya chuma, au msimamizi wa nywila kwenye kifaa maalum) na fikiria pochi ya kifaa. Mbegu unayoihifadhi kutoka kwa {{appName}} ni pochi ileile — linda maneno na utakuwa na hifadhi baridi."
           }
         }
       },

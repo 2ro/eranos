@@ -1958,8 +1958,19 @@
       "connect-wallet": {
         "question": "Apa itu dompet di {{appName}}?",
         "answer": [
-          "Dompet {{appName}} Anda dibangun dari kunci Nostr Anda. Ia dapat menerima Bitcoin dengan kedua cara — sebagai alamat publik yang bisa dibayar dompet Bitcoin apa pun, dan sebagai kode silent-payments yang bisa dibayar oleh dompet yang mendukung secara privat. Tidak ada yang perlu didaftarkan; dompet ada sejak Anda memiliki akun.",
-          "Saat Anda membuat kampanye, Anda memilih apakah menerima pembayaran publik, pembayaran privat, atau keduanya. Untuk membelanjakan apa yang Anda terima, lihat **Panduan Aktivis**."
+          "Dompet {{appName}} Anda adalah dompet Bitcoin **self-custodial**, dibangun dari kunci Nostr Anda. {{appName}} tidak pernah menahan dana Anda — dompet berjalan di peramban Anda dan menandatangani transaksi secara lokal dengan kunci yang hanya Anda kendalikan. Ia dapat menerima Bitcoin dengan kedua cara — sebagai alamat publik yang bisa dibayar dompet Bitcoin apa pun, dan sebagai kode silent-payments yang bisa dibayar oleh dompet yang mendukung secara privat. Tidak ada yang perlu didaftarkan; dompet ada sejak Anda memiliki akun.",
+          "Saat Anda membuat kampanye, Anda memilih apakah menerima pembayaran publik, pembayaran privat, atau keduanya. Untuk membelanjakan apa yang Anda terima, lihat **Panduan Aktivis**.",
+          "Anda juga bisa mengekspor frasa seed 24 kata dari dompet Anda dan mengimpornya ke dompet Bitcoin standar apa pun — lihat \"Bisakah saya mengekspor dompet {{appName}} saya ke dompet Bitcoin lain?\" di bawah."
+        ]
+      },
+      "export-wallet": {
+        "question": "Bisakah saya mengekspor dompet {{appName}} saya ke dompet Bitcoin lain?",
+        "answer": [
+          "Ya. Dompet {{appName}} Anda sepenuhnya self-custodial. {{appName}} tidak pernah menahan Bitcoin Anda dan tidak pernah melihat kunci Anda — dompet berjalan sepenuhnya di peramban Anda, menandatangani transaksi secara lokal dengan kunci yang diturunkan dari kunci rahasia Nostr Anda (nsec).",
+          "Buka dompet dari menu, ketuk menu tiga titik di kanan atas, dan pilih **Cadangkan dompet**. Anda akan melihat frasa seed BIP-39 24 kata. Tuliskan di tempat yang aman (atau simpan di pengelola kata sandi) — **siapa pun yang memiliki kata-kata ini bisa membelanjakan Bitcoin Anda.**",
+          "Anda bisa mengimpor 24 kata tersebut ke dompet Bitcoin standar apa pun: **Sparrow**, **Electrum**, **BlueWallet**, **Phoenix**, **Trezor**, atau **Ledger**. {{appName}} menggunakan jalur derivasi standar BIP-86 (Taproot) dan BIP-352 (silent payments), jadi tidak diperlukan konfigurasi khusus.",
+          "Setelah diimpor, dompet lain menampilkan saldo dan riwayat yang sama dengan dompet {{appName}} Anda — keduanya adalah dompet yang sama, hanya dua tampilan darinya.",
+          "Ekspor frasa seed hanya tersedia saat Anda masuk dengan nsec. Login melalui ekstensi peramban dan remote-signer (bunker) menjaga kunci rahasia Anda tetap terisolasi, sehingga {{appName}} tidak bisa menurunkan seed dalam mode tersebut."
         ]
       },
       "donations-are-public-general": {
@@ -2275,11 +2286,11 @@
         "steps": {
           "sweep": {
             "title": "Sapu ke dompet yang Anda kendalikan",
-            "body": "Opsi self-custody yang baik: [Sparrow](https://sparrowwallet.com), [BlueWallet](https://bluewallet.io), atau [Phoenix](https://phoenix.acinq.co) (Lightning)."
+            "body": "Dompet {{appName}} Anda sudah self-custodial — Anda, dan hanya Anda, yang mengendalikan kuncinya. Untuk tampilan saldo yang sama di desktop atau dompet perangkat keras, buka menu dompet, pilih **Cadangkan dompet**, dan impor seed 24 kata ke [Sparrow](https://sparrowwallet.com), [BlueWallet](https://bluewallet.io), atau dompet perangkat keras (Trezor, Ledger). Jika Anda lebih ingin memindahkan dana ke kunci yang sepenuhnya berbeda — misalnya, ke dompet Lightning seperti [Phoenix](https://phoenix.acinq.co) — kirim transaksi Bitcoin biasa dari dompet {{appName}} Anda."
           },
           "dontSit": {
-            "title": "Jangan diamkan dana di alamat kampanye",
-            "body": "Perlakukan seperti kotak surat, bukan rekening tabungan. Ini berlaku untuk donasi Publik maupun Silent."
+            "title": "Jangan diamkan dana di peramban",
+            "body": "Khususnya untuk kampanye bernilai tinggi, simpan frasa seed dompet secara offline (kertas, cadangan logam, atau pengelola kata sandi di perangkat khusus) dan pertimbangkan dompet perangkat keras. Seed yang Anda cadangkan dari {{appName}} adalah dompet yang sama — amankan kata-katanya dan Anda sudah memiliki cold storage."
           }
         }
       },
