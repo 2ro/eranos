@@ -530,7 +530,7 @@
       "sent": "发送",
       "unconfirmed": "未确认",
       "block": "区块 {{height}}",
-      "satsUnit": "聪",
+      "btcUnit": "BTC",
       "empty": "此地址暂无链上活动。",
       "error": "无法加载链上活动。请稍后再试。",
       "loadMore": "加载更多",

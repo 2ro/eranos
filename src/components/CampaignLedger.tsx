@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useAddressLedger } from '@/hooks/useAddressLedger';
 import { useBtcPrice } from '@/hooks/useBtcPrice';
-import { type AddressTransaction, formatSats, satsToUSD } from '@/lib/bitcoin';
+import { type AddressTransaction, formatBTC, satsToUSD } from '@/lib/bitcoin';
 import { openUrl } from '@/lib/downloadFile';
 import { timeAgo } from '@/lib/timeAgo';
 
@@ -162,16 +162,20 @@ function LedgerRow({
         </div>
 
         <div className="text-right shrink-0">
-          <div className={`text-sm font-semibold tabular-nums ${tone}`}>
-            {isInflow ? '+' : '−'}
-            {formatSats(absSats)} {t('campaignsDetail.ledger.satsUnit')}
-          </div>
           {btcPrice ? (
-            <div className="text-xs text-muted-foreground tabular-nums">
+            <div className={`text-sm font-semibold tabular-nums ${tone}`}>
               {isInflow ? '+' : '−'}
               {satsToUSD(absSats, btcPrice)}
             </div>
           ) : null}
+          <div
+            className={`tabular-nums ${
+              btcPrice ? 'text-xs text-muted-foreground' : `text-sm font-semibold ${tone}`
+            }`}
+          >
+            {isInflow ? '+' : '−'}
+            {formatBTC(absSats)} {t('campaignsDetail.ledger.btcUnit')}
+          </div>
         </div>
       </button>
     </li>

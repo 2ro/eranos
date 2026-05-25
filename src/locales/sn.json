@@ -530,7 +530,7 @@
       "sent": "Zvatumirwa",
       "unconfirmed": "Hazvisati zvasimbiswa",
       "block": "Block {{height}}",
-      "satsUnit": "sats",
+      "btcUnit": "BTC",
       "empty": "Hapana zvichakaitika pachain pakero iyi.",
       "error": "Hatina kukwanisa kurodha zvakaitika pachain. Edza zvakare munguva pfupi.",
       "loadMore": "Rodha zvimwe",

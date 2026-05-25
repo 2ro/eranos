@@ -953,7 +953,7 @@
       "sent": "Sent",
       "unconfirmed": "Unconfirmed",
       "block": "Block {{height}}",
-      "satsUnit": "sats",
+      "btcUnit": "BTC",
       "empty": "No on-chain activity yet for this address.",
       "error": "Couldn't load on-chain activity. Try again in a moment.",
       "loadMore": "Load more",

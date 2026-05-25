@@ -962,7 +962,7 @@
       "sent": "Terkirim",
       "unconfirmed": "Belum dikonfirmasi",
       "block": "Blok {{height}}",
-      "satsUnit": "sats",
+      "btcUnit": "BTC",
       "empty": "Belum ada aktivitas on-chain untuk alamat ini.",
       "error": "Tidak dapat memuat aktivitas on-chain. Coba lagi sebentar.",
       "loadMore": "Muat lebih banyak",

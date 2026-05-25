@@ -961,7 +961,7 @@
       "sent": "Imetumwa",
       "unconfirmed": "Haijathibitishwa",
       "block": "Bloku {{height}}",
-      "satsUnit": "sats",
+      "btcUnit": "BTC",
       "empty": "Bado hakuna shughuli ya mnyororoni kwa anwani hii.",
       "error": "Haikuweza kupakia shughuli ya mnyororoni. Jaribu tena baada ya muda mfupi.",
       "loadMore": "Pakia zaidi",

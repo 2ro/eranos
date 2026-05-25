@@ -530,7 +530,7 @@
       "sent": "送出",
       "unconfirmed": "未確認",
       "block": "區塊 {{height}}",
-      "satsUnit": "聰",
+      "btcUnit": "BTC",
       "empty": "此地址尚無鏈上活動。",
       "error": "無法載入鏈上活動。請稍後再試。",
       "loadMore": "載入更多",

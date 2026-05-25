@@ -952,7 +952,7 @@
       "sent": "Envoyé",
       "unconfirmed": "Non confirmé",
       "block": "Bloc {{height}}",
-      "satsUnit": "sats",
+      "btcUnit": "BTC",
       "empty": "Aucune activité on-chain pour cette adresse pour l'instant.",
       "error": "Impossible de charger l'activité on-chain. Réessayez dans un instant.",
       "loadMore": "Charger plus",

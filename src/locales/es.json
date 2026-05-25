@@ -530,7 +530,7 @@
       "sent": "Enviado",
       "unconfirmed": "Sin confirmar",
       "block": "Bloque {{height}}",
-      "satsUnit": "sats",
+      "btcUnit": "BTC",
       "empty": "Todavía no hay actividad en cadena para esta dirección.",
       "error": "No se pudo cargar la actividad en cadena. Inténtalo de nuevo en un momento.",
       "loadMore": "Cargar más",
