@@ -13,7 +13,27 @@ export function LanguageSettingsPage() {
   // Use the live i18n language so the selected indicator updates immediately
   // after the user picks a new option (the component re-renders via
   // `useTranslation` when the language changes).
-  const currentLng = (i18nInstance.language ?? 'en').split('-')[0].toLowerCase();
+  //
+  // Match the active language against `SUPPORTED_LANGUAGES` codes in two
+  // passes so script-tagged variants like `zh-Hant` keep their checkmark
+  // instead of collapsing to the base `zh` row:
+  //   1. Exact match (case-insensitive) — `zh-Hant` matches the `zh-Hant`
+  //      switcher entry, `en` matches `en`.
+  //   2. Alias map — `zh-TW` and `zh-HK` both resolve to `zh-Hant` because
+  //      i18n.ts registers them as resource aliases.
+  //   3. Base-code match — `en-US` matches `en`, `pt-BR` matches `pt`, etc.
+  //      Only consulted when no script-tagged variant matched first.
+  const rawLng = i18nInstance.language ?? 'en';
+  const ZH_HANT_ALIASES = new Set(['zh-tw', 'zh-hk']);
+  const supportedCodesLower = new Set(SUPPORTED_LANGUAGES.map((l) => l.code.toLowerCase()));
+  const rawLngLower = rawLng.toLowerCase();
+  const currentLng = (() => {
+    if (supportedCodesLower.has(rawLngLower)) {
+      return SUPPORTED_LANGUAGES.find((l) => l.code.toLowerCase() === rawLngLower)!.code;
+    }
+    if (ZH_HANT_ALIASES.has(rawLngLower)) return 'zh-Hant';
+    return rawLng.split('-')[0].toLowerCase();
+  })();
 
   useSeoMeta({
     title: `${t('language.title')} | ${t('settings.title')} | ${config.appName}`,
