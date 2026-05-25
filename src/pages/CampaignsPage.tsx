@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { useSeoMeta } from '@unhead/react';
 import { Trans, useTranslation } from 'react-i18next';
@@ -7,7 +7,6 @@ import { ArrowRight, EyeOff, HandHeart, Hourglass, PlusCircle, ShieldCheck } fro
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { CampaignCard, CampaignCardSkeleton } from '@/components/CampaignCard';
-import { DiscoverySearchToolbar } from '@/components/DiscoverySearchToolbar';
 import { HeroLightningMap } from '@/components/HeroLightningMap';
 import { ModeratorCollapsibleSection } from '@/components/moderation';
 import { useCampaigns } from '@/hooks/useCampaigns';
@@ -15,9 +14,7 @@ import { useCampaignModeration } from '@/hooks/useCampaignModeration';
 import { useCampaignModerators } from '@/hooks/useCampaignModerators';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useAppContext } from '@/hooks/useAppContext';
-import { useDebounce } from '@/hooks/useDebounce';
-import { useNip50Search, type Nip50Sort } from '@/hooks/useNip50Search';
-import { CAMPAIGN_KIND, parseCampaign, type ParsedCampaign } from '@/lib/campaign';
+import type { ParsedCampaign } from '@/lib/campaign';
 
 /** Cap on how many featured campaigns we render in the home-page row. */
 const MAX_FEATURED = 4;
@@ -141,64 +138,6 @@ export function CampaignsPage() {
     );
   }, [isMod, user, moderation, ownCampaigns]);
 
-  // On-page NIP-50 search + sort + show-hidden toolbar state.
-  //
-  //   Default sort, empty query → curated home layout (featured / my /
-  //     community sections below).
-  //   Default sort, with query  → relay searches kind 33863, results are
-  //     post-filtered client-side against title/summary/content.
-  //   Top / New sort             → always active. Top sends `sort:top`;
-  //     New sends a raw chronological feed of the kind.
-  //
-  // The search is pinned to the Ditto relay group via `useNip50Search`
-  // so non-NIP-50 relays in the user's pool can't drown out the result
-  // set.
-  const [searchInput, setSearchInput] = useState('');
-  const [sortMode, setSortMode] = useState<Nip50Sort>('default');
-  const [showHidden, setShowHidden] = useState(false);
-  const debouncedSearch = useDebounce(searchInput, 300);
-  const trimmedSearch = debouncedSearch.trim();
-  const {
-    data: searchHitsRaw,
-    isFetching: isSearchFetching,
-    isActive: isSearching,
-  } = useNip50Search<ParsedCampaign>({
-    kind: CAMPAIGN_KIND,
-    query: debouncedSearch,
-    sort: sortMode,
-    parse: parseCampaign,
-    // Most relay NIP-50 indexers only match against `content`, so titles
-    // and summaries (which live in tags) get dropped. Widen the net
-    // client-side by also matching against the `title` and `summary`
-    // tag values.
-    getKeywordHaystack: (event) => {
-      const title = event.tags.find(([n]) => n === 'title')?.[1] ?? '';
-      const summary = event.tags.find(([n]) => n === 'summary')?.[1] ?? '';
-      return [title, summary, event.content];
-    },
-  });
-
-  // Filter hidden campaigns out of the search results unless the user
-  // explicitly opts in via the Show-hidden switch. Mirrors the
-  // AllCampaignsPage behavior so moderation is consistent across the
-  // two campaign listings. Computed here (not in the hook) so the hook
-  // stays generic for non-campaign kinds.
-  const { searchHits, searchHiddenCount } = useMemo(() => {
-    if (!searchHitsRaw) return { searchHits: undefined, searchHiddenCount: 0 };
-    const hiddenCoords = moderation?.hiddenCoords ?? new Set<string>();
-    let hidden = 0;
-    const visible: ParsedCampaign[] = [];
-    for (const c of searchHitsRaw) {
-      if (hiddenCoords.has(c.aTag)) {
-        hidden += 1;
-        if (showHidden) visible.push(c);
-      } else {
-        visible.push(c);
-      }
-    }
-    return { searchHits: visible, searchHiddenCount: hidden };
-  }, [searchHitsRaw, moderation, showHidden]);
-
   return (
     <main className="min-h-screen pb-16">
       {/* Hero.
@@ -310,82 +249,6 @@ export function CampaignsPage() {
           </div>
         </div>
       </section>
-
-      {/* Toolbar — search + sort + show-hidden. Sits just below the hero
-          on every discovery page so the affordance is consistent. The
-          query is NIP-50, restricted to this page's kind, and routed at
-          the Ditto relay group. */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 pt-6">
-        <DiscoverySearchToolbar
-          query={searchInput}
-          onQueryChange={setSearchInput}
-          sort={sortMode}
-          onSortChange={setSortMode}
-          searchPlaceholderKey="campaigns.home.searchPlaceholder"
-          searchAriaLabelKey="campaigns.home.searchAriaLabel"
-          showHidden={{
-            value: showHidden,
-            onChange: setShowHidden,
-            count: searchHiddenCount,
-          }}
-        />
-      </div>
-
-      {/* Search results branch — replaces the curated home layout while
-          the toolbar is active (typed query, or Top sort with empty
-          input). Empty + New sort falls through to the existing featured
-          / community / moderator sections below. */}
-      {isSearching ? (
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-10 lg:py-14">
-          <section className="space-y-5">
-            <div className="flex items-end justify-between gap-4">
-              <div>
-                <h2 className="text-2xl sm:text-3xl font-bold tracking-tight">
-                  {trimmedSearch
-                    ? t('common.search')
-                    : sortMode === 'top'
-                      ? t('common.sortTop')
-                      : t('common.sortNew')}
-                </h2>
-                {searchHits && (
-                  <p className="text-sm text-muted-foreground mt-1">
-                    {t('common.searchResultsCount', { count: searchHits.length })}
-                  </p>
-                )}
-              </div>
-            </div>
-
-            {isSearchFetching && !searchHits ? (
-              <CampaignGridSkeleton />
-            ) : searchHits && searchHits.length > 0 ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
-                {searchHits.map((campaign) => (
-                  <CampaignCard key={campaign.aTag} campaign={campaign} />
-                ))}
-              </div>
-            ) : (
-              <Card className="border-dashed">
-                <CardContent className="py-12 px-8 text-center space-y-2">
-                  {trimmedSearch ? (
-                    <>
-                      <p className="text-base font-medium">
-                        {t('campaigns.home.noMatch', { query: trimmedSearch })}
-                      </p>
-                      <p className="text-sm text-muted-foreground">
-                        {t('campaigns.home.noMatchHint')}
-                      </p>
-                    </>
-                  ) : (
-                    <p className="text-sm text-muted-foreground">
-                      {t('campaigns.home.empty')}
-                    </p>
-                  )}
-                </CardContent>
-              </Card>
-            )}
-          </section>
-        </div>
-      ) : (
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-10 lg:py-14 space-y-12" id="campaigns">
         {/* Featured — only rendered when at least one campaign is featured
@@ -509,7 +372,6 @@ export function CampaignsPage() {
           </section>
         )}
       </div>
-      )}
     </main>
   );
 }
