@@ -1,18 +1,17 @@
 import type { ReactNode } from 'react';
 import { useState } from 'react';
-import { Trans, useTranslation } from 'react-i18next';
+import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import { CalendarClock, MapPin } from 'lucide-react';
 import { nip19 } from 'nostr-tools';
 
+import { AuthorByline } from '@/components/AuthorByline';
 import { Badge } from '@/components/ui/badge';
 import { Card } from '@/components/ui/card';
-import { useAuthor } from '@/hooks/useAuthor';
 import { useEventTranslation } from '@/hooks/useEventTranslation';
 import { parseAction, type Action } from '@/hooks/useActions';
 import { getGeoDisplayName } from '@/lib/countries';
 import { DEFAULT_COVER_IMAGE } from '@/lib/defaultActionCovers';
-import { getDisplayName } from '@/lib/genUserName';
 import { formatCompactPledgeDeadline, formatPledgeAmount } from '@/lib/pledges';
 import { cn } from '@/lib/utils';
 
@@ -31,8 +30,6 @@ interface PledgeCardProps {
   topRight?: ReactNode;
   /** Extra footer affordance, e.g. group official-activity type pill. */
   footerAddon?: ReactNode;
-  /** Custom author label for contexts that need different grammar. */
-  authorLabel?: (name: string) => ReactNode;
   className?: string;
 }
 
@@ -45,7 +42,6 @@ export function PledgeCard({
   showTranslate = false,
   topRight,
   footerAddon,
-  authorLabel,
   className,
 }: PledgeCardProps) {
   const { t } = useTranslation();
@@ -54,9 +50,6 @@ export function PledgeCard({
     buttonClassName: 'size-8 rounded-full p-0 text-muted-foreground hover:text-primary hover:bg-primary/10',
   });
   const displayAction = showTranslate ? (parseAction(translatedEvent) ?? action) : action;
-  const author = useAuthor(showAuthor ? action.pubkey : undefined);
-  const metadata = author.data?.metadata;
-  const displayName = showAuthor ? getDisplayName(metadata, action.pubkey) : undefined;
   const [imageLoadFailed, setImageLoadFailed] = useState(false);
 
   const naddr = nip19.naddrEncode({
@@ -71,7 +64,7 @@ export function PledgeCard({
   const countryLabel = displayAction.countryCode ? getGeoDisplayName(displayAction.countryCode) : undefined;
   const isRail = variant === 'rail';
 
-  const footer = (showAuthor && displayName) || showTranslate || footerAddon;
+  const footer = showAuthor || showTranslate || footerAddon;
 
   return (
     <Link
@@ -163,18 +156,8 @@ export function PledgeCard({
 
           {footer && !isRail && (
             <div className="flex items-center justify-between gap-3 border-t border-border/60 pt-3 text-xs text-muted-foreground">
-              <div className="truncate">
-                {showAuthor && displayName
-                  ? authorLabel
-                    ? authorLabel(displayName)
-                    : (
-                        <Trans
-                          i18nKey="pledges.card.byAuthor"
-                          values={{ name: displayName }}
-                          components={{ 0: <span className="font-medium text-foreground" /> }}
-                        />
-                      )
-                  : null}
+              <div className="min-w-0 flex-1 truncate">
+                {showAuthor ? <AuthorByline pubkey={action.pubkey} insideLink /> : null}
               </div>
               {(footerAddon || (showTranslate && translateAction)) && (
                 <div className="flex shrink-0 items-center gap-1.5">

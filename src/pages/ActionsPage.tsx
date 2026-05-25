@@ -34,7 +34,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 
 import {
-  Clock, HandHeart, Plus, ChevronRight, Loader2,
+  Clock, HandHeart, PlusCircle, ChevronRight, Loader2,
   Link as LinkIcon, Check, MoreHorizontal, Trash2, ListFilter,
   Calendar, DollarSign, Globe, Megaphone,
 } from 'lucide-react';
@@ -472,7 +472,7 @@ export default function ActionsPage() {
                 </div>
                 {user && (
                   <Button onClick={() => navigate(createActionHref)}>
-                    <Plus className="size-4 mr-2" />
+                    <PlusCircle className="size-4 mr-2" />
                     {t('pledges.list.createPledge')}
                   </Button>
                 )}
@@ -610,7 +610,7 @@ function ActionsHero({ actionCount, canCreate, onCreateAction }: ActionsHeroProp
             )}
             aria-label={canCreate ? t('pledges.list.createPledge') : t('pledges.list.loginToCreate')}
           >
-            <Plus className="mr-2" />
+            <PlusCircle className="mr-2" />
             {t('pledges.list.createPledge')}
           </Button>
         </div>

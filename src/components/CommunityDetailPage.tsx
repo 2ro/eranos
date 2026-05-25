@@ -232,7 +232,6 @@ function PledgeShelfCard({ pledge }: { pledge: Action }) {
       variant="shelf"
       showAuthor
       showTranslate
-      authorLabel={(name) => t('groups.detail.byAuthor', { name })}
       footerAddon={
         <ActivityTypePill icon={<Megaphone className="size-3.5 text-primary" />} label={t('groups.detail.pledge')} />
       }
