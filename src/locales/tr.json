@@ -921,8 +921,6 @@
     "like_one": "<0>{{count}}</0> Beğeni",
     "like_other": "<0>{{count}}</0> Beğeni",
     "commentsAndDonations": "Yorumlar ve bağışlar",
-    "commentCount_one": "{{count}} yorum",
-    "commentCount_other": "{{count}} yorum",
     "noCommentsTitle": "Henüz yorum yok",
     "noCommentsHint": "Destek mesajı bırakan ilk kişi olun.",
     "deleteDialogTitle": "Bu kampanya silinsin mi?",
@@ -1956,8 +1954,19 @@
       "connect-wallet": {
         "question": "{{appName}}'daki cüzdan nedir?",
         "answer": [
-          "{{appName}} cüzdanınız Nostr anahtarınızdan oluşturulur. Bitcoin'i iki şekilde alabilir — herhangi bir Bitcoin cüzdanının ödeme yapabileceği bir açık adres olarak ve uygun cüzdanların gizli olarak ödeme yapabileceği bir sessiz ödeme kodu olarak. Kaydolacak bir şey yoktur; hesabınız olduğu anda var olur.",
-          "Bir kampanya oluşturduğunuzda açık ödemeleri mi, gizli ödemeleri mi yoksa her ikisini mi kabul edeceğinizi seçersiniz. Aldıklarınızı harcamak için **Aktivist Rehberi**'ne bakın."
+          "{{appName}} cüzdanınız, Nostr anahtarınızdan oluşturulan **öz-saklamalı** bir Bitcoin cüzdanıdır. {{appName}} fonlarınızı asla tutmaz — cüzdan tarayıcınızda çalışır ve işlemleri yalnızca sizin kontrol ettiğiniz bir anahtarla yerel olarak imzalar. Bitcoin'i iki şekilde alabilir — herhangi bir Bitcoin cüzdanının ödeme yapabileceği bir açık adres olarak ve uygun cüzdanların gizli olarak ödeme yapabileceği bir sessiz ödeme kodu olarak. Kaydolacak bir şey yoktur; hesabınız olduğu anda var olur.",
+          "Bir kampanya oluşturduğunuzda açık ödemeleri mi, gizli ödemeleri mi yoksa her ikisini mi kabul edeceğinizi seçersiniz. Aldıklarınızı harcamak için **Aktivist Rehberi**'ne bakın.",
+          "Cüzdanınızın 24 kelimelik tohum cümlesini dışa aktarıp herhangi bir standart Bitcoin cüzdanına aktarabilirsiniz — aşağıdaki \"{{appName}} cüzdanımı başka bir Bitcoin cüzdanına aktarabilir miyim?\" bölümüne bakın."
+        ]
+      },
+      "export-wallet": {
+        "question": "{{appName}} cüzdanımı başka bir Bitcoin cüzdanına aktarabilir miyim?",
+        "answer": [
+          "Evet. {{appName}} cüzdanınız tamamen öz-saklamalıdır. {{appName}} Bitcoin'inizi asla tutmaz ve anahtarlarınızı asla görmez — cüzdan tamamen tarayıcınızda çalışır ve işlemleri Nostr gizli anahtarınızdan (nsec) türetilen bir anahtarla yerel olarak imzalar.",
+          "Menüden cüzdanı açın, sağ üstteki üç noktalı menüye dokunun ve **Cüzdanı yedekle** seçeneğini seçin. 24 kelimelik bir BIP-39 tohum cümlesi göreceksiniz. Onu güvenli bir yere yazın (veya bir parola yöneticisine kaydedin) — **bu kelimelere sahip olan herkes Bitcoin'inizi harcayabilir.**",
+          "Bu 24 kelimeyi herhangi bir standart Bitcoin cüzdanına aktarabilirsiniz: **Sparrow**, **Electrum**, **BlueWallet**, **Phoenix**, bir **Trezor** veya bir **Ledger**. {{appName}} standart BIP-86 (Taproot) ve BIP-352 (sessiz ödemeler) türetme yollarını kullanır, bu nedenle özel bir yapılandırma gerekmez.",
+          "Aktarımdan sonra diğer cüzdan, {{appName}} cüzdanınızla aynı bakiyeyi ve geçmişi gösterir — aynı cüzdandır, sadece onun iki görünümüdür.",
+          "Tohum cümlesi dışa aktarımı yalnızca bir nsec ile giriş yaptığınızda kullanılabilir. Tarayıcı uzantısı ve uzak imzalayıcı (bunker) girişleri gizli anahtarınızı yalıtık tutar, bu nedenle {{appName}} bu modlarda tohumu türetemez."
         ]
       },
       "donations-are-public-general": {
@@ -2273,11 +2282,11 @@
         "steps": {
           "sweep": {
             "title": "Kontrol ettiğiniz bir cüzdana toplayın",
-            "body": "İyi öz-saklama seçenekleri: [Sparrow](https://sparrowwallet.com), [BlueWallet](https://bluewallet.io) ya da [Phoenix](https://phoenix.acinq.co) (Lightning)."
+            "body": "{{appName}} cüzdanınız zaten öz-saklamalıdır — anahtarları yalnızca siz kontrol edersiniz. Aynı bakiyenin masaüstü veya donanım cüzdanı görünümü için cüzdan menüsünü açın, **Cüzdanı yedekle** seçeneğini seçin ve 24 kelimelik tohumu [Sparrow](https://sparrowwallet.com)'a, [BlueWallet](https://bluewallet.io)'a veya bir donanım cüzdanına (Trezor, Ledger) aktarın. Bunun yerine fonları tamamen farklı bir anahtara taşımak isterseniz — örneğin [Phoenix](https://phoenix.acinq.co) gibi bir Lightning cüzdanına — {{appName}} cüzdanınızdan normal bir Bitcoin işlemi gönderin."
           },
           "dontSit": {
-            "title": "Fonları kampanya adresinde bekletmeyin",
-            "body": "Onu tasarruf hesabı gibi değil, posta kutusu gibi düşünün. Bu hem Açık hem Sessiz bağışlar için geçerlidir."
+            "title": "Fonları tarayıcıda bekletmeyin",
+            "body": "Özellikle yüksek değerli kampanyalar için cüzdanın tohum cümlesini çevrimdışı saklayın (kâğıt, metal yedekleme veya özel bir cihazdaki parola yöneticisi) ve bir donanım cüzdanını değerlendirin. {{appName}}'dan yedeklediğiniz tohum aynı cüzdandır — kelimeleri güvene alın ve soğuk depolamaya kavuşmuş olun."
           }
         }
       },

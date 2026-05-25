@@ -489,8 +489,6 @@
     "like_one": "<0>{{count}}</0> Me gusta",
     "like_other": "<0>{{count}}</0> Me gusta",
     "commentsAndDonations": "Comentarios y donaciones",
-    "commentCount_one": "{{count}} comentario",
-    "commentCount_other": "{{count}} comentarios",
     "noCommentsTitle": "Aún no hay comentarios",
     "noCommentsHint": "Sé la primera persona en dejar un mensaje de apoyo.",
     "deleteDialogTitle": "¿Eliminar esta campaña?",
@@ -2020,8 +2018,19 @@
       "connect-wallet": {
         "question": "¿Qué es la wallet en {{appName}}?",
         "answer": [
-          "Tu wallet de {{appName}} se construye a partir de tu clave de Nostr. Puede recibir Bitcoin de dos maneras: como dirección pública que cualquier wallet de Bitcoin puede pagar, y como código de silent payments al que las wallets compatibles pueden pagar de forma privada. No hay nada que registrar; existe en cuanto tienes una cuenta.",
-          "Al crear una campaña, eliges si aceptar pagos públicos, privados o ambos. Para gastar lo que recibes, consulta la **Guía del activista**."
+          "Tu wallet de {{appName}} es una wallet de Bitcoin **autocustodial**, construida a partir de tu clave de Nostr. {{appName}} nunca retiene tus fondos — la wallet se ejecuta en tu navegador y firma las transacciones localmente con una clave que solo tú controlas. Puede recibir Bitcoin de dos maneras: como dirección pública que cualquier wallet de Bitcoin puede pagar, y como código de silent payments al que las wallets compatibles pueden pagar de forma privada. No hay nada que registrar; existe en cuanto tienes una cuenta.",
+          "Al crear una campaña, eliges si aceptar pagos públicos, privados o ambos. Para gastar lo que recibes, consulta la **Guía del activista**.",
+          "También puedes exportar la frase semilla de 24 palabras de tu wallet e importarla en cualquier wallet de Bitcoin estándar — consulta \"¿Puedo exportar mi wallet de {{appName}} a otra wallet de Bitcoin?\" más abajo."
+        ]
+      },
+      "export-wallet": {
+        "question": "¿Puedo exportar mi wallet de {{appName}} a otra wallet de Bitcoin?",
+        "answer": [
+          "Sí. Tu wallet de {{appName}} es totalmente autocustodial. {{appName}} nunca retiene tu Bitcoin y nunca ve tus claves — la wallet se ejecuta enteramente en tu navegador y firma las transacciones localmente con una clave derivada de tu clave secreta de Nostr (nsec).",
+          "Abre la wallet desde el menú, toca el menú de tres puntos en la esquina superior derecha y elige **Copia de seguridad de la cartera**. Verás una frase semilla BIP-39 de 24 palabras. Anótala en un lugar seguro (o guárdala en un gestor de contraseñas) — **cualquiera que tenga estas palabras puede gastar tu Bitcoin.**",
+          "Puedes importar esas 24 palabras en cualquier wallet de Bitcoin estándar: **Sparrow**, **Electrum**, **BlueWallet**, **Phoenix**, una **Trezor** o una **Ledger**. {{appName}} utiliza las rutas de derivación estándar BIP-86 (Taproot) y BIP-352 (silent payments), por lo que no hace falta ninguna configuración especial.",
+          "Tras la importación, la otra wallet muestra el mismo saldo e historial que tu wallet de {{appName}} — son la misma wallet, solo dos vistas de ella.",
+          "La exportación de la frase semilla solo está disponible cuando inicias sesión con un nsec. Los inicios de sesión con extensión de navegador y con firmante remoto (bunker) mantienen tu clave secreta aislada, por lo que {{appName}} no puede derivar la semilla en esos modos."
         ]
       },
       "donations-are-public-general": {
@@ -2337,11 +2346,11 @@
         "steps": {
           "sweep": {
             "title": "Pasa los fondos a una wallet que tú controles",
-            "body": "Buenas opciones de autocustodia: [Sparrow](https://sparrowwallet.com), [BlueWallet](https://bluewallet.io), o [Phoenix](https://phoenix.acinq.co) (Lightning)."
+            "body": "Tu wallet de {{appName}} ya es autocustodial — tú, y solo tú, controlas las claves. Para una vista del mismo saldo desde escritorio o desde una wallet hardware, abre el menú de la wallet, elige **Copia de seguridad de la cartera** e importa la semilla de 24 palabras en [Sparrow](https://sparrowwallet.com), [BlueWallet](https://bluewallet.io) o una wallet hardware (Trezor, Ledger). Si prefieres mover los fondos a otra clave totalmente distinta — por ejemplo, a una wallet de Lightning como [Phoenix](https://phoenix.acinq.co) — envía una transacción de Bitcoin normal desde tu wallet de {{appName}}."
           },
           "dontSit": {
-            "title": "No dejes los fondos parados en la dirección de la campaña",
-            "body": "Trátala como un buzón, no como una cuenta de ahorros. Esto se aplica tanto a las donaciones Públicas como a las Silenciosas."
+            "title": "No dejes los fondos parados en el navegador",
+            "body": "Especialmente en campañas de alto valor, guarda la frase semilla de la wallet sin conexión (en papel, en un soporte metálico de respaldo o en un gestor de contraseñas en un dispositivo dedicado) y considera usar una wallet hardware. La semilla que respaldas desde {{appName}} es la misma wallet — asegura las palabras y ya tienes almacenamiento en frío."
           }
         }
       },

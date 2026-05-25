@@ -489,8 +489,6 @@
     "like_one": "<0>{{count}}</0> 點贊",
     "like_other": "<0>{{count}}</0> 點贊",
     "commentsAndDonations": "評論與捐贈",
-    "commentCount_one": "{{count}} 條評論",
-    "commentCount_other": "{{count}} 條評論",
     "noCommentsTitle": "暫無評論",
     "noCommentsHint": "成為第一個留下支持留言的人。",
     "deleteDialogTitle": "刪除此活動？",
@@ -1956,8 +1954,19 @@
       "connect-wallet": {
         "question": "{{appName}} 上的錢包是什麼？",
         "answer": [
-          "你的 {{appName}} 錢包是基於你的 Nostr 金鑰構建的。它可以以兩種方式接收比特幣——作為任何比特幣錢包都能支付的公開地址，以及作為受支援錢包可以私密支付的靜默支付代碼。無需註冊任何東西；只要你擁有賬戶，它就存在了。",
-          "建立活動時，你可以選擇接受公開支付、私密支付，或兩者皆可。要使用你收到的資金，請參閱**行動者指南**。"
+          "你的 {{appName}} 錢包是一個**自我託管**的 Bitcoin 錢包，由你的 Nostr 金鑰構建而成。{{appName}} 從不持有你的資金——錢包在你的瀏覽器中執行，並使用只有你能掌控的金鑰於本機簽署交易。它可以以兩種方式接收 Bitcoin——作為任何 Bitcoin 錢包都能支付的公開地址，以及作為受支援錢包可以私密支付的靜默支付代碼。無需註冊任何東西；只要你擁有帳戶，它就存在了。",
+          "建立活動時，你可以選擇接受公開支付、私密支付，或兩者皆可。要使用你收到的資金，請參閱**行動者指南**。",
+          "你也可以匯出錢包的 24 字種子片語，並將其匯入任何標準的 Bitcoin 錢包——請參閱下方的「我可以把 {{appName}} 錢包匯出到其他 Bitcoin 錢包嗎？」。"
+        ]
+      },
+      "export-wallet": {
+        "question": "我可以把 {{appName}} 錢包匯出到其他 Bitcoin 錢包嗎？",
+        "answer": [
+          "可以。你的 {{appName}} 錢包是完全自我託管的。{{appName}} 從不持有你的 Bitcoin，也從不會看到你的金鑰——錢包完全在你的瀏覽器中執行，並使用一把由你的 Nostr 私鑰（nsec）衍生而來的金鑰於本機簽署交易。",
+          "從選單開啟錢包，點選右上角的三點選單，並選擇**備份錢包**。你將看到一組 24 字的 BIP-39 種子片語。請將其抄寫在安全的地方（或儲存在密碼管理員中）——**任何持有這些字詞的人都能花用你的 Bitcoin。**",
+          "你可以把這 24 個字匯入任何標準的 Bitcoin 錢包：**Sparrow**、**Electrum**、**BlueWallet**、**Phoenix**、**Trezor** 或 **Ledger**。{{appName}} 使用標準的 BIP-86（Taproot）與 BIP-352（靜默支付）衍生路徑，因此無需特殊設定。",
+          "匯入之後，另一個錢包會顯示與你的 {{appName}} 錢包相同的餘額與歷史記錄——它們是同一個錢包，只是兩個不同的檢視。",
+          "種子片語匯出僅在你以 nsec 登入時可用。瀏覽器擴充功能與遠端簽署器（bunker）登入會將你的私鑰隔離，因此 {{appName}} 在這些模式下無法衍生種子。"
         ]
       },
       "donations-are-public-general": {
@@ -2273,11 +2282,11 @@
         "steps": {
           "sweep": {
             "title": "把資金清掃到你掌控的錢包",
-            "body": "良好的自託管選項：[Sparrow](https://sparrowwallet.com)、[BlueWallet](https://bluewallet.io) 或 [Phoenix](https://phoenix.acinq.co)（閃電網路）。"
+            "body": "你的 {{appName}} 錢包已經是自我託管的——你，且只有你，掌控金鑰。若想在桌面或硬體錢包上檢視相同的餘額，請開啟錢包選單，選擇**備份錢包**，並把 24 字種子匯入 [Sparrow](https://sparrowwallet.com)、[BlueWallet](https://bluewallet.io) 或硬體錢包（Trezor、Ledger）。若你想把資金完全轉到另一把金鑰——例如轉入像 [Phoenix](https://phoenix.acinq.co) 這樣的 Lightning 錢包——只需從你的 {{appName}} 錢包送出一筆普通的 Bitcoin 交易即可。"
           },
           "dontSit": {
-            "title": "不要讓資金停留在活動地址",
-            "body": "把它當作郵箱來使用，而不是儲蓄賬戶。這一點對公開和靜默捐款都適用。"
+            "title": "不要把資金停留在瀏覽器中",
+            "body": "尤其對於高金額的活動，請把錢包的種子片語離線儲存（紙本、金屬備份，或專用裝置上的密碼管理員），並考慮使用硬體錢包。你從 {{appName}} 備份出來的種子就是同一個錢包——把這些字詞保管好，你就擁有了冷儲存。"
           }
         }
       },

@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 import type { ReactNode } from 'react';
 import { Link } from 'react-router-dom';
-import { CalendarClock, EyeOff, HandHeart, MapPin, ShieldCheck, Target } from 'lucide-react';
+import { CalendarClock, EyeOff, HandHeart, MapPin, ShieldCheck } from 'lucide-react';
 
 import { Badge } from '@/components/ui/badge';
 import { Card } from '@/components/ui/card';
@@ -61,9 +61,22 @@ function CampaignProgress({
     ? Math.min(100, Math.round((raisedUsd / goalUsd!) * 100))
     : 0;
 
+  // Always reserve a bar row so cards with and without a goal occupy
+  // the same vertical space. The bar is rendered invisibly when
+  // there's no goal — same height, no visual weight.
+  //
+  // The primitive's default `bg-secondary` track is too close to the
+  // card surface in both light and dark modes (in dark mode they're
+  // both `0 0% 18%`, making the empty portion of the bar invisible).
+  // `bg-foreground/15` overrides it with a foreground-tinted track
+  // that has real contrast against the card in either theme.
   return (
     <div className={cn('space-y-1.5', className)}>
-      {hasGoal && <Progress value={pct} className="h-2" />}
+      <Progress
+        value={pct}
+        className={cn('h-2 bg-foreground/15', !hasGoal && 'invisible')}
+        aria-hidden={!hasGoal}
+      />
       <div className="flex items-baseline justify-between gap-2 text-sm">
         <span className="font-semibold">
           {formatCampaignAmount(raisedSats, btcPrice)}
@@ -89,15 +102,21 @@ function CampaignPrivateNotice({
   goalUsd?: number;
   className?: string;
 }) {
+  // Mirrors CampaignProgress's vertical footprint (invisible bar + one
+  // text row) so a silent-payment card lines up visually with a
+  // public-progress card alongside it.
   return (
-    <div className={cn('space-y-1.5 text-sm', className)}>
-      <div className="flex items-center gap-1.5 text-muted-foreground">
-        <ShieldCheck className="size-3.5" />
-        <span>Private campaign — totals are not public</span>
+    <div className={cn('space-y-1.5', className)}>
+      <Progress value={0} className="h-2 invisible" aria-hidden />
+      <div className="flex items-baseline justify-between gap-2 text-sm">
+        <span className="inline-flex items-center gap-1.5 text-muted-foreground">
+          <ShieldCheck className="size-3.5" />
+          Private campaign
+        </span>
+        {goalUsd && goalUsd > 0 && (
+          <span className="text-muted-foreground">Target: {formatUsdGoal(goalUsd)}</span>
+        )}
       </div>
-      {goalUsd && goalUsd > 0 && (
-        <div className="text-xs text-muted-foreground">Target: {formatUsdGoal(goalUsd)}</div>
-      )}
     </div>
   );
 }
@@ -158,7 +177,11 @@ export function CampaignCard({ campaign, variant = 'compact', className, footerB
           isFeaturedVariant && 'sm:flex-row sm:items-stretch',
         )}
       >
-        {/* Cover image */}
+        {/* Cover image. Optional metadata (country, deadline) is
+            overlaid on the banner as glass chips so the body below can
+            stay structurally deterministic. A bottom gradient keeps
+            the chips legible against any photo; a top scrim does the
+            same for the moderation chip + hidden badge. */}
         <div
           className={cn(
             'relative w-full bg-gradient-to-br from-primary/15 via-primary/5 to-secondary',
@@ -177,7 +200,46 @@ export function CampaignCard({ campaign, variant = 'compact', className, footerB
               <HandHeart className="size-12 text-primary/40" />
             </div>
           )}
-          <div className="absolute top-3 right-3 flex items-center gap-2">
+
+          {/* Bottom gradient — only present when there are bottom chips
+              to display, so a banner with no overlays stays visually
+              clean. */}
+          {(countryLabel || deadline) && (
+            <div
+              aria-hidden
+              className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-black/70 via-black/30 to-transparent"
+            />
+          )}
+          {/* Top scrim for moderation chip + hidden badge legibility. */}
+          <div
+            aria-hidden
+            className="absolute inset-x-0 top-0 h-16 bg-gradient-to-b from-black/30 to-transparent"
+          />
+
+          {/* Bottom-left meta chips — country + deadline. */}
+          {(countryLabel || deadline) && (
+            <div className="absolute bottom-3 left-3 z-10 flex flex-wrap items-center gap-1.5 [text-shadow:0_1px_2px_rgba(0,0,0,0.6)]">
+              {countryLabel && (
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-black/35 backdrop-blur-md px-2.5 py-1 text-[11px] font-medium text-white">
+                  <MapPin className="size-3.5" />
+                  {countryLabel}
+                </span>
+              )}
+              {deadline && (
+                <span
+                  className={cn(
+                    'inline-flex items-center gap-1.5 rounded-full bg-black/35 backdrop-blur-md px-2.5 py-1 text-[11px] font-medium text-white',
+                    deadline.isPast && 'bg-destructive/60',
+                  )}
+                >
+                  <CalendarClock className="size-3.5" />
+                  {deadline.label}
+                </span>
+              )}
+            </div>
+          )}
+
+          <div className="absolute top-3 right-3 z-10 flex items-center gap-2">
             {isHidden && (
               <Badge
                 variant="secondary"
@@ -197,30 +259,33 @@ export function CampaignCard({ campaign, variant = 'compact', className, footerB
           </div>
         </div>
 
-        {/* Body */}
+        {/* Body — deterministic structure: title (1 line, truncates) →
+            summary (1 line, truncates; non-breaking space placeholder
+            when absent) → progress (invisible-bar placeholder absorbs
+            the no-goal case) → creator footer. Country, deadline,
+            hidden badge, and moderation menu all live on the banner
+            overlay, so this region's height is genuinely fixed: every
+            card has the same body footprint, no dead space, no
+            raggedness. */}
         <div className={cn('flex flex-col gap-3 p-5', isFeaturedVariant && 'sm:w-1/2 sm:p-6')}>
-          <div className="space-y-2">
+          <div className="space-y-1">
             <h3
               className={cn(
-                'font-bold leading-tight tracking-tight',
-                isFeaturedVariant ? 'text-2xl sm:text-3xl' : 'text-lg line-clamp-2',
+                'font-bold leading-tight tracking-tight truncate',
+                isFeaturedVariant ? 'text-2xl sm:text-3xl' : 'text-lg',
               )}
             >
               {displayCampaign.title}
             </h3>
-            {displayCampaign.summary && (
-              <p
-                className={cn(
-                  'text-muted-foreground',
-                  isFeaturedVariant ? 'text-base line-clamp-3' : 'text-sm line-clamp-2',
-                )}
-              >
-                {displayCampaign.summary}
-              </p>
-            )}
+            <p
+              className={cn(
+                'text-muted-foreground truncate',
+                isFeaturedVariant ? 'text-base' : 'text-sm',
+              )}
+            >
+              {displayCampaign.summary || '\u00A0'}
+            </p>
           </div>
-
-          <div className="flex-1" />
 
           {isSilentPayment ? (
             <CampaignPrivateNotice goalUsd={campaign.goalUsd} />
@@ -228,36 +293,14 @@ export function CampaignCard({ campaign, variant = 'compact', className, footerB
             <CampaignProgress raisedSats={raisedSats} goalUsd={campaign.goalUsd} btcPrice={btcPrice} />
           )}
 
-          {/* Meta row */}
-          <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 text-xs text-muted-foreground pt-1">
-            {!isSilentPayment && stats && stats.donorCount > 0 && (
-              <span className="inline-flex items-center gap-1.5">
-                <Target className="size-3.5" />
-                {stats.donorCount} {stats.donorCount === 1 ? 'donor' : 'donors'}
-              </span>
-            )}
-            {countryLabel && (
-              <span className="inline-flex items-center gap-1.5">
-                <MapPin className="size-3.5" />
-                {countryLabel}
-              </span>
-            )}
-            {deadline && (
-              <span
-                className={cn(
-                  'inline-flex items-center gap-1.5',
-                  deadline.isPast && 'text-destructive',
-                )}
-              >
-                <CalendarClock className="size-3.5" />
-                {deadline.label}
-              </span>
-            )}
-          </div>
-
           <div className="flex items-center justify-between gap-3 border-t border-border/60 pt-3 text-xs text-muted-foreground">
             <div className="truncate">
               by <span className="font-medium text-foreground">{creatorName}</span>
+              {!isSilentPayment && stats && stats.donorCount > 0 && (
+                <span className="ml-2 text-muted-foreground/80">
+                  · {stats.donorCount} {stats.donorCount === 1 ? 'donor' : 'donors'}
+                </span>
+              )}
             </div>
             {(footerBadge || translateAction) && (
               <div className="flex shrink-0 items-center gap-1.5">

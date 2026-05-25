@@ -226,17 +226,9 @@ export function Feed({ kinds, tagFilters, header, hideCompose, emptyMessage, fee
           </div>
         )}
 
-        {!hideCompose && (
-          <ComposeBox
-            compact
-            hideBorder={isHomeAgoraFeed}
-            defaultExpanded
-            placeholder={t('feed.compose.placeholder')}
-          />
-        )}
-
-        {/* Tabs are only kept for specialized feed pages. The home feed uses
-            the FeedModeSwitcher above. */}
+        {/* Tabs are only kept for specialized feed pages. The home feed
+            uses the FeedModeSwitcher above. Sits OUTSIDE the muted wrap
+            so the tab strip reads as page chrome, not panel chrome. */}
         {user && (isKindSpecificPage || tagFilters) && (
           <SubHeaderBar>
             <TabButton label={isKindSpecificPage || tagFilters ? t('feed.tabs.follows') : t('feed.tabs.following')} active={activeTab === 'follows'} onClick={() => handleSetActiveTab('follows')} />
@@ -244,57 +236,76 @@ export function Feed({ kinds, tagFilters, header, hideCompose, emptyMessage, fee
           </SubHeaderBar>
         )}
 
-        <PullToRefresh onRefresh={handleRefresh}>
-          {showSkeleton ? (
-            <div className="divide-y divide-border">
-              {Array.from({ length: 5 }).map((_, i) => (
-                <NoteCardSkeleton key={i} />
-              ))}
-            </div>
-          ) : feedItems.length > 0 ? (
-            <div>
-              {feedItems.map((item: FeedItem) => (
-                <NoteCard
-                  key={item.repostedBy ? `repost-${item.repostedBy}-${item.event.id}` : item.event.id}
-                  event={item.event}
-                  repostedBy={item.repostedBy}
-                />
-              ))}
-              {hasNextPage && (
-                <div ref={scrollRef} className="py-4">
-                  {isFetchingNextPage && (
-                    <div className="flex justify-center">
-                      <Loader2 className="size-5 animate-spin text-muted-foreground" />
-                    </div>
-                  )}
-                </div>
-              )}
-            </div>
-          ) : isHomeAgoraFeed ? (
-            <HomeFeedEmptyState
-              mode={homeFeedMode}
-              message={homeEmptyMessage}
-              onSwitchToAgora={homeFeedMode !== 'agora' ? () => handleModeChange('agora') : undefined}
-              onLoginClick={!user && homeFeedMode === 'following' ? () => setAuthDialogOpen(true) : undefined}
-            />
-          ) : (
-            <FeedEmptyState
-              message={
-                emptyMessage ?? (
-                  activeTab === 'follows'
-                    ? t('feed.empty.follows')
-                    : t('feed.empty.global')
-                )
-              }
-              showDiscover={!emptyMessage && activeTab === 'follows'}
-              onSwitchToGlobal={
-                activeTab === 'follows'
-                  ? () => handleSetActiveTab('global')
-                  : undefined
-              }
+        {/* Composer + feed list share a single muted rounded panel so
+            the reading area reads as one focused surface, matching the
+            comments region on the campaign detail page. The composer
+            inside gets a brand-orange border that frames it against
+            the muted wrap below. Per-note `border-b` dividers are
+            retinted to match the composer's bottom border. */}
+        <div className="rounded-2xl bg-muted/60 overflow-hidden border-l border-r border-primary/20 [&_article]:border-b-primary/20 [&_article]:bg-background/40">
+          {!hideCompose && (
+            <ComposeBox
+              compact
+              hideBorder
+              defaultExpanded
+              placeholder={t('feed.compose.placeholder')}
+              className="!bg-[hsl(24_100%_99%)] dark:!bg-[hsl(24_30%_12%)] border-t border-b border-t-primary/40 border-b-primary/20 rounded-t-2xl"
             />
           )}
-        </PullToRefresh>
+
+          <PullToRefresh onRefresh={handleRefresh}>
+            {showSkeleton ? (
+              <div className="divide-y divide-primary/20 [&>div]:border-b-primary/20">
+                {Array.from({ length: 5 }).map((_, i) => (
+                  <NoteCardSkeleton key={i} />
+                ))}
+              </div>
+            ) : feedItems.length > 0 ? (
+              <div>
+                {feedItems.map((item: FeedItem) => (
+                  <NoteCard
+                    key={item.repostedBy ? `repost-${item.repostedBy}-${item.event.id}` : item.event.id}
+                    event={item.event}
+                    repostedBy={item.repostedBy}
+                    className="py-4"
+                  />
+                ))}
+                {hasNextPage && (
+                  <div ref={scrollRef} className="py-4">
+                    {isFetchingNextPage && (
+                      <div className="flex justify-center">
+                        <Loader2 className="size-5 animate-spin text-muted-foreground" />
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+            ) : isHomeAgoraFeed ? (
+              <HomeFeedEmptyState
+                mode={homeFeedMode}
+                message={homeEmptyMessage}
+                onSwitchToAgora={homeFeedMode !== 'agora' ? () => handleModeChange('agora') : undefined}
+                onLoginClick={!user && homeFeedMode === 'following' ? () => setAuthDialogOpen(true) : undefined}
+              />
+            ) : (
+              <FeedEmptyState
+                message={
+                  emptyMessage ?? (
+                    activeTab === 'follows'
+                      ? t('feed.empty.follows')
+                      : t('feed.empty.global')
+                  )
+                }
+                showDiscover={!emptyMessage && activeTab === 'follows'}
+                onSwitchToGlobal={
+                  activeTab === 'follows'
+                    ? () => handleSetActiveTab('global')
+                    : undefined
+                }
+              />
+            )}
+          </PullToRefresh>
+        </div>
 
         {/* Auth dialog (only needed on main feed) */}
         {!kinds && (
@@ -342,7 +353,7 @@ function HomeFeedEmptyState({ mode, message, onSwitchToAgora, onLoginClick }: Ho
 
 function NoteCardSkeleton({ className }: { className?: string }) {
   return (
-    <div className={cn('px-4 py-3 border-b border-border', className)}>
+    <div className={cn('px-4 py-4 border-b border-border', className)}>
       <div className="flex items-center gap-3">
         <Skeleton className="size-11 rounded-full shrink-0" />
         <div className="min-w-0 space-y-1.5">

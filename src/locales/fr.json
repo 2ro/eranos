@@ -912,8 +912,6 @@
     "like_one": "<0>{{count}}</0> J'aime",
     "like_other": "<0>{{count}}</0> J'aime",
     "commentsAndDonations": "Commentaires et dons",
-    "commentCount_one": "{{count}} commentaire",
-    "commentCount_other": "{{count}} commentaires",
     "noCommentsTitle": "Aucun commentaire pour l'instant",
     "noCommentsHint": "Soyez le premier à laisser un message de soutien.",
     "deleteDialogTitle": "Supprimer cette campagne ?",
@@ -2003,8 +2001,19 @@
       "connect-wallet": {
         "question": "Qu'est-ce que le portefeuille sur {{appName}} ?",
         "answer": [
-          "Votre portefeuille {{appName}} est construit à partir de votre clé Nostr. Il peut recevoir du Bitcoin de deux façons — comme une adresse publique que n'importe quel portefeuille Bitcoin peut payer, et comme un code de paiements silencieux que les portefeuilles compatibles peuvent payer en privé. Il n'y a rien à créer ; il existe dès l'instant où vous avez un compte.",
-          "Quand vous créez une campagne, vous choisissez si vous acceptez les paiements publics, les paiements privés, ou les deux. Pour dépenser ce que vous recevez, consultez le **Guide de l'activiste**."
+          "Votre portefeuille {{appName}} est un portefeuille Bitcoin **auto-hébergé**, construit à partir de votre clé Nostr. {{appName}} ne détient jamais vos fonds — le portefeuille fonctionne dans votre navigateur et signe les transactions localement avec une clé que vous seul contrôlez. Il peut recevoir du Bitcoin de deux façons — comme une adresse publique que n'importe quel portefeuille Bitcoin peut payer, et comme un code de paiements silencieux que les portefeuilles compatibles peuvent payer en privé. Il n'y a rien à créer ; il existe dès l'instant où vous avez un compte.",
+          "Quand vous créez une campagne, vous choisissez si vous acceptez les paiements publics, les paiements privés, ou les deux. Pour dépenser ce que vous recevez, consultez le **Guide de l'activiste**.",
+          "Vous pouvez également exporter la phrase de récupération de 24 mots de votre portefeuille et l'importer dans n'importe quel portefeuille Bitcoin standard — voir « Puis-je exporter mon portefeuille {{appName}} vers un autre portefeuille Bitcoin ? » ci-dessous."
+        ]
+      },
+      "export-wallet": {
+        "question": "Puis-je exporter mon portefeuille {{appName}} vers un autre portefeuille Bitcoin ?",
+        "answer": [
+          "Oui. Votre portefeuille {{appName}} est entièrement auto-hébergé. {{appName}} ne détient jamais vos bitcoins et ne voit jamais vos clés — le portefeuille fonctionne entièrement dans votre navigateur, signant les transactions localement avec une clé dérivée de votre clé secrète Nostr (nsec).",
+          "Ouvrez le portefeuille depuis le menu, appuyez sur le menu à trois points en haut à droite, et choisissez **Sauvegarder le portefeuille**. Vous verrez une phrase de récupération BIP-39 de 24 mots. Notez-la dans un endroit sûr (ou enregistrez-la dans un gestionnaire de mots de passe) — **quiconque possède ces mots peut dépenser vos bitcoins.**",
+          "Vous pouvez importer ces 24 mots dans n'importe quel portefeuille Bitcoin standard : **Sparrow**, **Electrum**, **BlueWallet**, **Phoenix**, un **Trezor** ou un **Ledger**. {{appName}} utilise les chemins de dérivation standards BIP-86 (Taproot) et BIP-352 (paiements silencieux), donc aucune configuration spéciale n'est nécessaire.",
+          "Après l'importation, l'autre portefeuille affiche le même solde et le même historique que votre portefeuille {{appName}} — il s'agit du même portefeuille, juste avec deux vues différentes.",
+          "L'exportation de la phrase de récupération n'est disponible que lorsque vous vous connectez avec une nsec. Les connexions par extension de navigateur et par signataire distant (bunker) gardent votre clé secrète isolée, donc {{appName}} ne peut pas dériver la phrase dans ces modes."
         ]
       },
       "donations-are-public-general": {
@@ -2320,11 +2329,11 @@
         "steps": {
           "sweep": {
             "title": "Balayez vers un portefeuille que vous contrôlez",
-            "body": "Bonnes options d'auto-garde : [Sparrow](https://sparrowwallet.com), [BlueWallet](https://bluewallet.io), ou [Phoenix](https://phoenix.acinq.co) (Lightning)."
+            "body": "Votre portefeuille {{appName}} est déjà auto-hébergé — vous, et vous seul, contrôlez les clés. Pour avoir une vue du même solde depuis un ordinateur ou un portefeuille matériel, ouvrez le menu du portefeuille, choisissez **Sauvegarder le portefeuille**, et importez la phrase de récupération de 24 mots dans [Sparrow](https://sparrowwallet.com), [BlueWallet](https://bluewallet.io), ou un portefeuille matériel (Trezor, Ledger). Si vous préférez déplacer les fonds vers une clé entièrement différente — par exemple, vers un portefeuille Lightning comme [Phoenix](https://phoenix.acinq.co) — envoyez une transaction Bitcoin classique depuis votre portefeuille {{appName}}."
           },
           "dontSit": {
-            "title": "Ne laissez pas les fonds dormir à l'adresse de la campagne",
-            "body": "Traitez-la comme une boîte aux lettres, pas un compte d'épargne. Cela s'applique aux dons Publics et Silencieux."
+            "title": "Ne laissez pas les fonds dormir dans le navigateur",
+            "body": "Surtout pour les campagnes à forte valeur, conservez la phrase de récupération du portefeuille hors ligne (papier, sauvegarde sur métal, ou gestionnaire de mots de passe sur un appareil dédié) et envisagez un portefeuille matériel. La phrase que vous sauvegardez depuis {{appName}} correspond au même portefeuille — sécurisez les mots et vous obtenez un stockage à froid."
           }
         }
       },

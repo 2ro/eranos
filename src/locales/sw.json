@@ -1,0 +1,2286 @@
+{
+  "common": {
+    "loading": "Inapakia…",
+    "error": "Hitilafu",
+    "success": "Imefanikiwa",
+    "cancel": "Ghairi",
+    "save": "Hifadhi",
+    "delete": "Futa",
+    "edit": "Hariri",
+    "close": "Funga",
+    "back": "Rudi",
+    "next": "Inayofuata",
+    "refresh": "Onyesha upya",
+    "search": "Tafuta",
+    "filter": "Chuja",
+    "clear": "Futa",
+    "submit": "Wasilisha",
+    "confirm": "Thibitisha",
+    "copied": "Imenakiliwa",
+    "goBack": "Rudi nyuma",
+    "tryAgain": "Tafadhali jaribu tena.",
+    "showLess": "Onyesha kidogo",
+    "readMore": "Soma zaidi"
+  },
+  "translate": {
+    "translate": "Tafsiri",
+    "translating": "Inatafsiri…",
+    "showOriginal": "Onyesha asili",
+    "error": "Tafsiri imeshindikana"
+  },
+  "nav": {
+    "openMenu": "Fungua menyu",
+    "closeMenu": "Funga menyu",
+    "brandHome": "Nyumbani kwa {{appName}}",
+    "activity": "Shughuli",
+    "campaigns": "Kampeni",
+    "groups": "Vikundi",
+    "pledge": "Ahadi",
+    "search": "Tafuta",
+    "dashboard": "Dashibodi",
+    "wallet": "Pochi",
+    "notifications": "Arifa",
+    "profile": "Wasifu",
+    "settings": "Mipangilio",
+    "about": "Kuhusu",
+    "privacy": "Faragha",
+    "safety": "Usalama",
+    "changelog": "Kumbukumbu ya mabadiliko",
+    "sourceCode": "Msimbo wa chanzo"
+  },
+  "auth": {
+    "join": "Jiunge",
+    "login": "Ingia",
+    "signup": "Jisajili",
+    "logout": "Toka",
+    "addAccount": "Ongeza akaunti nyingine"
+  },
+  "feed": {
+    "indexTagline": "Maudhui yako. Mtindo wako. Sheria zako.",
+    "compose": {
+      "placeholder": "Kuna nini?"
+    },
+    "tabs": {
+      "follows": "Unawafuata",
+      "following": "Unafuata",
+      "global": "Kimataifa"
+    },
+    "empty": {
+      "homeAgora": "Wakati wa utulivu kwenye Agora. Kampeni mpya, ahadi, michango, na machapisho yataonekana hapa yanapotokea.",
+      "homeFollowingLoggedIn": "Mlisho wako wa unaofuata ni tupu. Fuata watu kuona wanachofanya, au badilisha kuwa Agora au Kimataifa.",
+      "homeFollowingLoggedOut": "Ingia ili kuona machapisho kutoka kwa watu unaowafuata.",
+      "homeOther": "Hakuna cha kuonyesha. Angalia muunganisho wako wa relei au jaribu tena baadaye.",
+      "follows": "Mlisho wako ni tupu. Fuata watu kuona machapisho yao hapa.",
+      "global": "Hakuna machapisho yaliyopatikana. Angalia muunganisho wako wa relei au rudi tena baadaye.",
+      "browseAgora": "Vinjari mlisho wa Agora",
+      "browseGlobal": "Vinjari mlisho wa Kimataifa",
+      "discoverPeople": "Gundua watu wa kufuata",
+      "logIn": "Ingia"
+    },
+    "modeSwitcher": {
+      "agora": "Agora",
+      "allNostr": "Kimataifa",
+      "following": "Unafuata",
+      "ariaLabel": "Hali ya mlisho: {{label}}. Bonyeza kubadilisha.",
+      "loginRequired": "Ingia ili kuona machapisho kutoka kwa watu unaowafuata"
+    },
+    "replyContext": {
+      "replyingTo": "Anamjibu",
+      "and": "na",
+      "andOthers_one": "na mtu mwingine {{count}}",
+      "andOthers_other": "na wengine {{count}}"
+    },
+    "actions": {
+      "reply": "Jibu",
+      "repost": "Chapisha tena",
+      "undoRepost": "Tengua kuchapisha tena",
+      "react": "Itikia",
+      "zap": "Zap",
+      "share": "Shiriki",
+      "more": "Zaidi",
+      "linkCopied": "Kiungo kimenakiliwa kwenye ubao wa kunakili"
+    }
+  },
+  "compose": {
+    "placeholderDefault": "Kuna nini?",
+    "placeholderPoll": "Uliza swali…",
+    "placeholderCountry": "Kuna nini {{country}}?",
+    "placeholderCwReason": "Sababu ya onyo la maudhui (si lazima)",
+    "submitDefault": "Chapisha!",
+    "preview": {
+      "edit": "Hariri",
+      "previewMode": "Hakiki"
+    },
+    "poll": {
+      "addOption": "Ongeza chaguo",
+      "optionLabel": "Chaguo {{number}}",
+      "singleChoice": "Chaguo moja",
+      "multipleChoice": "Chaguo nyingi",
+      "backToPost": "Rudi kwenye chapisho",
+      "publishing": "Inachapisha...",
+      "publish": "Chapisha kura",
+      "published": "Kura imechapishwa!",
+      "publishFailed": "Imeshindikana kuchapisha kura."
+    },
+    "voice": {
+      "cancel": "Ghairi",
+      "send": "Tuma",
+      "sending": "Inatuma...",
+      "sentTitle": "Ujumbe wa sauti umetumwa!",
+      "sentBody": "Ujumbe wako wa sauti umechapishwa.",
+      "sendFailed": "Imeshindikana kutuma ujumbe wa sauti.",
+      "micDeniedTitle": "Ufikiaji wa kipaza sauti umekataliwa",
+      "micDeniedBody": "Tafadhali ruhusu ufikiaji wa kipaza sauti ili kurekodi ujumbe wa sauti.",
+      "voiceMessage": "Ujumbe wa sauti"
+    },
+    "toolbar": {
+      "attachFile": "Ambatisha faili",
+      "emojiGif": "Emoji / GIF",
+      "more": "Zaidi",
+      "poll": "Kura",
+      "spoiler": "Onyo",
+      "emoji": "Emoji",
+      "stickers": "Stika"
+    },
+    "submit": {
+      "posting": "Inachapisha...",
+      "uploadFailed": "Upakiaji umeshindikana",
+      "uploadFailedBody": "Haikuweza kupakia faili.",
+      "publishFailed": "Imeshindikana kuchapisha noti.",
+      "posted": "Imechapishwa!",
+      "replyPublished": "Jibu lako limechapishwa.",
+      "quotePublished": "Nukuu yako imechapishwa.",
+      "notePublished": "Noti yako imechapishwa."
+    },
+    "destination": {
+      "label": "Chapisha kwa",
+      "ariaHelp": "Kuna tofauti gani kati ya machapisho ya kimataifa na ya jumuiya?",
+      "ariaTrigger": "Mahali pa kuchapisha",
+      "global": "Kimataifa",
+      "globalExplainer": "Chapisho la kawaida linaloonekana kwa kila mtu kwenye Nostr. Yeyote, popote anaweza kuliona.",
+      "community": "Jumuiya ya nchi yako",
+      "communityExplainer": "Linaonyeshwa kwenye mlisho wa ndani wa nchi hiyo pamoja na machapisho ya majirani. Bora kwa habari muhimu kwa jumuiya.",
+      "chooseAnother": "Chagua nchi nyingine…",
+      "searchPlaceholder": "Tafuta nchi...",
+      "noResults": "Hakuna nchi zilizopatikana.",
+      "isDefault": "{{name}} ni chaguo lako la msingi",
+      "globalIsDefault": "Kimataifa ni chaguo lako la msingi",
+      "thisIsDefault": "Hili ni chaguo lako la msingi",
+      "setAsDefault": "Weka kama chaguo-msingi",
+      "defaultUpdated": "Chaguo-msingi limesasishwa",
+      "defaultUpdatedCountry": "Machapisho mapya yataenda {{name}} kwa chaguo-msingi.",
+      "defaultUpdatedGlobal": "Machapisho mapya yatakuwa ya kimataifa kwa chaguo-msingi."
+    }
+  },
+  "replyModal": {
+    "title": {
+      "newPoll": "Kura mpya",
+      "newComment": "Maoni mapya",
+      "commentOnProfile": "Toa maoni kwenye wasifu",
+      "replyToPost": "Jibu chapisho",
+      "quotePost": "Nukuu chapisho",
+      "newPost": "Chapisho jipya"
+    },
+    "placeholder": {
+      "writeComment": "Andika maoni...",
+      "addComment": "Ongeza maoni...",
+      "whatsHappening": "Kuna nini?"
+    },
+    "blueskyDisclaimer": "Watu wa Bluesky hawawezi kukuona kwa sababu si wa kweli waliogawanywa."
+  },
+  "noteCard": {
+    "botAccount": "Akaunti ya bot",
+    "showLess": "Onyesha kidogo",
+    "readMore": "Soma zaidi",
+    "reacted": "ameitikia",
+    "reposted": "amechapisha tena",
+    "voted": "amepiga kura",
+    "zap": {
+      "donatedTo": "Amechangia kwa",
+      "donatedAmountTo": "Amechangia {{amount}} kwa",
+      "sat_one": "sat {{formattedCount}}",
+      "sat_other": "sats {{formattedCount}}"
+    },
+    "stream": {
+      "untitled": "Mkondo Usio na Jina",
+      "live": "MOJA KWA MOJA",
+      "ended": "UMEISHA",
+      "planned": "UMEPANGWA",
+      "unknown": "HAUJULIKANI"
+    },
+    "kindHeader": {
+      "photo": {
+        "action": "ameshiriki",
+        "noun": "picha"
+      },
+      "encryptedMessage": {
+        "action": "ametuma",
+        "noun": "ujumbe uliosimbwa"
+      },
+      "letter": {
+        "action": "ametuma",
+        "noun": "barua"
+      },
+      "treasureHidCreated": "amefichi",
+      "treasureHidUpdated": "amesasisha",
+      "treasureNoun": "hazina",
+      "treasureFound": "amepata",
+      "deckCreated": "ameunda",
+      "deckUpdated": "amesasisha",
+      "deckFallback": "ameshiriki",
+      "deckNoun": "rundo",
+      "emojiPackCreated": "ameunda",
+      "emojiPackUpdated": "amesasisha",
+      "emojiPackFallback": "ameshiriki",
+      "emojiPackNoun": "paketi ya emoji",
+      "groupCreated": "ameunda",
+      "groupUpdated": "amesasisha",
+      "groupFallback": "ameshiriki",
+      "groupNoun": "kikundi",
+      "campaignLaunched": "amezindua",
+      "campaignUpdated": "amesasisha",
+      "campaignFallback": "ameshiriki",
+      "campaignNoun": "kampeni",
+      "badgeAwarded": "ametunuku",
+      "badgeNoun": "beji",
+      "badgeCreated": "ameunda",
+      "badgeDefUpdated": "amesasisha",
+      "badgesNoun": "beji",
+      "badgesCreatedTheir": "ameunda zake",
+      "badgesUpdatedTheir": "amesasisha zake",
+      "streamingLive": "anamulika moja kwa moja",
+      "streamed": "amemulika",
+      "zapstoreAppPublished": "amechapisha programu ya Zapstore",
+      "zapstoreAppUpdated": "amesasisha programu ya Zapstore",
+      "zapstoreReleasePublished": "amechapisha toleo la Zapstore",
+      "zapstoreReleaseUpdated": "amesasisha toleo la Zapstore",
+      "zapstoreAssetPublished": "amechapisha rasilimali ya Zapstore",
+      "appPublished": "amechapisha programu",
+      "appUpdated": "amesasisha programu",
+      "repoCreated": "ameunda",
+      "repoUpdated": "amesasisha",
+      "repoFallback": "ameshiriki",
+      "repoNoun": "hifadhi",
+      "patchSubmitted": "amewasilisha",
+      "patchNoun": "kiraka",
+      "prOpened": "amefungua",
+      "prNoun": "ombi la kuvuta",
+      "nipProposed": "amependekeza",
+      "nipUpdated": "amesasisha",
+      "nipNoun": "NIP",
+      "nsiteDeployed": "amesambaza",
+      "nsiteRedeployed": "amesambaza tena",
+      "nsiteNoun": "nsite",
+      "zapped": "amezapped",
+      "pledgeCreated": "ameunda",
+      "pledgeUpdated": "amesasisha",
+      "pledgeNoun": "ahadi",
+      "followPackCreated": "ameunda",
+      "followPackUpdated": "amesasisha",
+      "followPackFallback": "ameshiriki",
+      "followPackNoun": "paketi ya kufuata",
+      "followSetCreated": "ameunda",
+      "followSetUpdated": "amesasisha",
+      "followSetFallback": "ameshiriki",
+      "followSetNoun": "seti ya kufuata"
+    }
+  },
+  "noteMoreMenu": {
+    "title": "Chaguzi za chapisho",
+    "viewPost": "Tazama maelezo ya chapisho",
+    "viewEventJson": "Tazama JSON ya tukio",
+    "bookmark": "Alamisha",
+    "removeBookmark": "Ondoa alamisho",
+    "addToList": "Ongeza kwenye orodha",
+    "addToSidebar": "Ongeza kwenye upau wa kando",
+    "removeFromSidebar": "Ondoa kwenye upau wa kando",
+    "pinProfile": "Bandika kwenye wasifu",
+    "unpinProfile": "Ondoa bandiko kwenye wasifu",
+    "pinCountry": "Bandika kwenye mlisho wa nchi",
+    "unpinCountry": "Ondoa bandiko kwenye mlisho wa nchi",
+    "muteConversation": "Nyamazisha mazungumzo",
+    "mute": "Nyamazisha @{{name}}",
+    "unmute": "Ondoa unyamavu wa @{{name}}",
+    "report": "Ripoti @{{name}}",
+    "reportToGroup": "Ripoti chapisho kwa kikundi",
+    "removeFromGroup": "Ondoa kwenye kikundi",
+    "delete": "Futa chapisho",
+    "close": "Funga",
+    "encryptedContent": "Maudhui yaliyosimbwa",
+    "toast": {
+      "removedFromSidebar": "Imeondolewa kwenye upau wa kando",
+      "addedToSidebar": "Imeongezwa kwenye upau wa kando",
+      "pinned": "Imebandikwa kwenye wasifu",
+      "unpinned": "Imeondolewa kwenye wasifu",
+      "pinFailed": "Imeshindikana kusasisha machapisho yaliyobandikwa",
+      "countryPinned": "Imebandikwa kwenye mlisho wa nchi",
+      "countryUnpinned": "Imeondolewa kwenye mlisho wa nchi",
+      "countryPinFailed": "Imeshindikana kubandika kwenye mlisho wa nchi",
+      "countryUnpinFailed": "Imeshindikana kuondoa bandiko kwenye mlisho wa nchi",
+      "convoMuted": "Mazungumzo yamenyamazishwa",
+      "convoMuteFailed": "Imeshindikana kunyamazisha mazungumzo",
+      "muted": "@{{name}} amenyamazishwa",
+      "unmuted": "@{{name}} ameondolewa unyamavu",
+      "muteFailed": "Imeshindikana kunyamazisha mtumiaji",
+      "unmuteFailed": "Imeshindikana kuondoa unyamavu wa mtumiaji",
+      "postDeleted": "Chapisho limefutwa",
+      "deleteFailed": "Imeshindikana kufuta chapisho",
+      "eventBroadcast": "Tukio limetangazwa kwa relei",
+      "broadcastFailed": "Imeshindikana kutangaza tukio",
+      "copied": "{{label}} imenakiliwa kwenye ubao wa kunakili"
+    },
+    "deleteDialog": {
+      "title": "Futa chapisho?",
+      "description": "Hili litaomba kufutwa kutoka kwa relei. Baadhi ya relei zinaweza kuendelea kuhifadhi nakala ya tukio asili. Kitendo hiki hakiwezi kutenduliwa.",
+      "cancel": "Ghairi",
+      "delete": "Futa",
+      "deleting": "Inafuta..."
+    },
+    "jsonDialog": {
+      "title": "Maelezo ya tukio",
+      "eventId": "Kitambulisho cha tukio",
+      "eventIdLabel": "Kitambulisho cha tukio",
+      "rawJson": "JSON ghafi",
+      "eventJsonLabel": "JSON ya tukio",
+      "broadcast": "Tangaza tukio",
+      "broadcasting": "Inatangaza..."
+    }
+  },
+  "policyPages": {
+    "privacy": {
+      "seoTitle": "Sera ya Faragha",
+      "seoDescription": "Sera ya faragha kwa {{appName}} — jinsi data yako inavyoshughulikiwa kwenye mtandao wa Nostr",
+      "title": "Sera ya Faragha"
+    },
+    "csae": {
+      "seoTitle": "Sera ya Usalama wa Watoto",
+      "seoDescription": "Sera ya {{appName}} kuhusu unyanyasaji wa kingono wa watoto (CSAE) — kujitolea kwetu kwa usalama wa watoto kwenye mtandao wa Nostr",
+      "title": "Sera ya Usalama wa Watoto"
+    },
+    "donorGuide": {
+      "seoTitle": "Mwongozo wa Mfadhili",
+      "seoDescription": "Jinsi kuchangia kunavyofanya kazi kwenye {{appName}} na jinsi ya kulinda faragha yako.",
+      "title": "Mwongozo wa Mfadhili",
+      "subtitle": "Bitcoin halisi, inayotumwa moja kwa moja. Mtiririko mzima katika ukurasa mmoja mfupi."
+    },
+    "activistGuide": {
+      "seoTitle": "Mwongozo wa Mwanaharakati",
+      "seoDescription": "Jinsi ya kupokea michango kwenye {{appName}} na kutoa pesa kwa faragha.",
+      "title": "Mwongozo wa Mwanaharakati",
+      "subtitle": "Chagua cha kukubali, pokea michango, toa pesa. Lugha rahisi, bila maandiko mengi."
+    },
+    "changelog": {
+      "seoTitle": "Kumbukumbu ya Mabadiliko",
+      "seoDescription": "Kipya katika {{appName}}",
+      "title": "Kumbukumbu ya Mabadiliko",
+      "loadError": "Imeshindikana kupakia kumbukumbu ya mabadiliko.",
+      "empty": "Hakuna matoleo bado.",
+      "pastReleases": "Matoleo ya zamani",
+      "showLess": "Onyesha kidogo",
+      "readMore": "Soma zaidi",
+      "preReleaseLabel": "Ujenzi wa kabla ya toleo",
+      "preReleaseBody": "Ujenzi huu una mabadiliko ambayo bado hayajajumuishwa katika toleo.",
+      "viewUnreleased": "Tazama mabadiliko ambayo hayajatolewa",
+      "categories": {
+        "Added": "Vilivyoongezwa",
+        "Changed": "Vilivyobadilishwa",
+        "Deprecated": "Vilivyopitwa na wakati",
+        "Removed": "Vilivyoondolewa",
+        "Fixed": "Vilivyorekebishwa",
+        "Security": "Usalama"
+      }
+    }
+  },
+  "about": {
+    "seoTitle": "Kuhusu",
+    "seoDescription": "Jinsi {{appName}} inavyofanya kazi: kuwaunganisha wanaharakati na ufadhili usiozuilika kupitia Bitcoin na Nostr.",
+    "hero": {
+      "eyebrow": "Kuhusu {{appName}}",
+      "headlinePart1": "Jinsi",
+      "headlineAppName": "{{appName}}",
+      "headlinePart2": "inavyofanya kazi.",
+      "body": "{{appName}} ni jukwaa la michango linalostahimili udhibiti lililojengwa kwenye Nostr na Bitcoin. Hakuna akaunti za benki zilizofungwa. Hakuna kufungwa kwa mashirika. Ni msaada wa moja kwa moja tu kutoka kwa watu wanaoamini lengo lako.",
+      "trustChips": {
+        "decentralized": "Iliyogawanywa",
+        "openSource": "Chanzo wazi",
+        "censorshipResistant": "Inastahimili udhibiti"
+      },
+      "ctaDonor": "Soma Mwongozo wa Mfadhili",
+      "ctaActivist": "Soma Mwongozo wa Mwanaharakati",
+      "sampleCard": {
+        "countryName": "Venezuela",
+        "public": "Hadharani",
+        "imageAlt": "Wanaharakati wa Venezuela katika mkesha wa mishumaa wakishikilia bango lisemalo 'Liberen a todos los presos políticos · ¡Cese la represión!'",
+        "orgName": "Venezolanos Libres",
+        "title": "Kuwakomboa Wafungwa wa Kisiasa wa Venezuela",
+        "description": "Utetezi wa kisheria na msaada wa familia kwa zaidi ya wafungwa 800 wa kisiasa waliokamatwa na utawala wa Maduro.",
+        "raised": "imechangwa",
+        "ofGoal": "kati ya $10,000",
+        "donorsLine": "wafadhili 247 · nchi 12",
+        "donate": "Changia Bitcoin"
+      }
+    },
+    "howItWorks": {
+      "eyebrow": "Jinsi inavyofanya kazi",
+      "title": "Hatua tatu. Hakuna mpatanishi.",
+      "lede": "Hakuna benki, hakuna mipaka, hakuna ruhusa.",
+      "step1": {
+        "imageAlt": "Funguo ya kriptografia ya rangi ya machungwa inayong'aa ikielea kwenye nafasi ya giza, ikiashiria utambulisho wa kujitegemea",
+        "title": "Wanaharakati hujisajili kwa sekunde.",
+        "body": "Hakuna benki. Hakuna karatasi. Hakuna idhini. Wakati mwanaharakati anaunda akaunti kwenye {{appName}}, anakuwa na anwani ya Bitcoin tayari kupokea msaada, popote duniani."
+      },
+      "step2": {
+        "imageAlt": "Sarafu ya Bitcoin inayong'aa ikiruka angani juu ya ramani ya dunia yenye giza, ikiashiria malipo ya papo hapo ya mipaka",
+        "title": "Wafadhili hutuma Bitcoin moja kwa moja.",
+        "body": "Wafadhili hutuma Bitcoin kutoka kwa pochi yoyote wanayotumia tayari (Cash App, Coinbase, Strike, pochi ya kifaa) moja kwa moja kwa mwanaharakati. {{appName}} kamwe haigusi pesa. Hakuna seva katikati, hakuna mhifadhi."
+      },
+      "step3": {
+        "imageAlt": "Mkono wazi wenye mwanga wa rangi ya machungwa unaong'aa kutoka kiganjani, ukiashiria kupokea na uwezo",
+        "title": "Msaada hufika pale unapohitajika.",
+        "body": "Fedha hufika kwa mwanaharakati moja kwa moja. Wanabaki na umiliki, wanabaki na udhibiti. Hamisha, badilisha, au tumia; miongozo iliyo hapa chini inaeleza jinsi ya kufanya hivyo kwa faragha na usalama."
+      }
+    },
+    "twoWays": {
+      "eyebrow": "Bitcoin · QR moja, chaguzi mbili",
+      "title": "Njia mbili za kulipwa.",
+      "lede": "Chaguzi zote mbili ni Bitcoin. Tofauti ni unachokitoa kwa ajili ya faragha. Wakati mwanaharakati anaunda kampeni, anachagua chaguzi za kukubali. Ikiwa zote mbili, ukurasa wa mchango unaonyesha msimbo mmoja wa QR unaofanya kazi kwa pochi yoyote.",
+      "public": {
+        "kicker": "Malipo ya Umma ya Bitcoin",
+        "tagline": "Ya ulimwengu wote · Haraka · Wazi",
+        "title": "Inafanya kazi na kila pochi duniani.",
+        "description": "Michango huingia kwenye anwani ya kawaida ya Bitcoin ambayo mwanaharakati anaimiliki. Yeyote mwenye pochi yoyote ya Bitcoin anaweza kutuma. Hakuna programu mpya, hakuna akaunti mpya, hakuna mafunzo mapya.",
+        "bullet1": "Inafanya kazi katika kila pochi ya Bitcoin: Cash App, Coinbase, Strike, vifaa",
+        "bullet2": "Utuaji wa haraka zaidi: uthibitisho wa Bitcoin pekee",
+        "bullet3": "Inayoweza kuthibitishwa katika mnyororo: yeyote anaweza kuona mwanaharakati amepokea nini",
+        "tradeoffTitle": "Athari: Umma katika mnyororo.",
+        "tradeoffIntro": "Kila mchango ni wa umma kwenye mnyororo wa Bitcoin na kwenye Nostr. {{appName}} inapendekezwa tu kwa harakati za wazi. Ikiwa wewe au wafadhili wako mnahitaji faragha kali, ikiwa ni pamoja na kutoka kwa watendaji wa serikali, soma <0>Mwongozo wa Mfadhili</0> na <1>Mwongozo wa Mwanaharakati</1> kabla ya kushiriki."
+      },
+      "silent": {
+        "kicker": "Malipo ya Kimya ya Bitcoin",
+        "tagline": "Hayaunganiki · Moja kwa moja · BIP-352",
+        "title": "Yasiyounganika, katika mnyororo, moja kwa moja.",
+        "description": "Michango hutumwa kama malipo ya kimya ya BIP-352. Kila moja huingia kwenye matokeo mapya ya Bitcoin yasiyounganika ambayo mtazamaji anayechunguza mnyororo hawezi kuyaunganisha tena na kampeni.",
+        "bullet1": "Njia ya mchango haiwezi kujengwa upya katika mnyororo",
+        "bullet2": "Inalinda wanaharakati wanaokabili maadui makubwa",
+        "bullet3": "Inaingia moja kwa moja kwenye pochi ya mwanaharakati, hakuna seva katikati",
+        "tradeoffTitle": "Athari: Malipo ya kimya bado ni mapya.",
+        "tradeoffIntro": "Njia ya faragha zaidi ya kupokea Bitcoin katika mnyororo, lakini mfumo bado ni mchanga na mbaya leo:",
+        "tradeoffBullet1": "Pochi chache zinaiunga mkono.",
+        "tradeoffBullet2": "Kupokea ni polepole.",
+        "tradeoffBullet3": "Hakuna arifa za kusukuma.",
+        "tradeoffBullet4": "Pochi bado zina hitilafu.",
+        "tradeoffBullet5": "Idadi ya michango si ya umma."
+      },
+      "noCustody": {
+        "title": "Hakuna ulinzi. Hakuna mpatanishi.",
+        "body": "{{appName}} kamwe haishiki fedha. Michango huhama kati ya pochi kwenye Bitcoin. Hakuna seva inayosimama kati ya mfadhili na mwanaharakati katika chaguo lolote. Ikiwa {{appName}} ingetoweka kesho, kila kampeni ingeendelea kufanya kazi.",
+        "gofundme": {
+          "heading": "Tofauti na GoFundMe",
+          "body": "Hakuna jukwaa linaloweza kufunga michango yako, kudai marejesho, au kumaliza kampeni yako kwa sababu ya kutokubaliana kwa sera."
+        },
+        "givesendgo": {
+          "heading": "Tofauti na GiveSendGo",
+          "body": "Hakuna mchakataji wa malipo aliye katikati, kwa hivyo hakuna Stripe, hakuna Visa, hakuna benki inayoweza kukukatia katikati ya kampeni."
+        },
+        "otherBitcoin": {
+          "heading": "Tofauti na majukwaa mengine ya 'Bitcoin'",
+          "body": "Hakuna nodi kuu ya Lightning, mhifadhi, au LSP ya kushindwa au kuondoka mtandaoni. Fedha hutua moja kwa moja katika mnyororo kwenye pochi unayoidhibiti."
+        }
+      }
+    },
+    "faq": {
+      "eyebrow": "Maswali",
+      "title": "Yanayoulizwa mara kwa mara.",
+      "chapter1": {
+        "label": "Kuanza",
+        "description": "Agora ni nini, nani aliyeijenga, na inagharimu nini."
+      },
+      "chapter2": {
+        "label": "Michango ya Bitcoin",
+        "description": "Jinsi malipo yanavyofanya kazi, kwa nini katika mnyororo, kwa nini hadharani, kwa nini athari hizi."
+      },
+      "chapter3": {
+        "label": "Kuhusu Nostr",
+        "description": "Protokoli wazi ambayo Agora imejengwa juu yake, na jinsi akaunti yako inavyofanya kazi."
+      }
+    },
+    "guides": {
+      "eyebrow": "Miongozo",
+      "title": "Chagua upande ulio kwako.",
+      "lede": "Iwe unatuma au unapokea, jifunze jinsi ya kufanya hivyo kwa usalama na faragha.",
+      "donor": {
+        "imageAlt": "Waandamanaji waliovaa kofia wakipita barabarani katika mji wa Ulaya jioni, wakishikilia tochi nyekundu zinazowaka na mabango ya 'FREEDOM' na 'LIBERTAD'",
+        "role": "Kwa Wafadhili",
+        "title": "Unga mkono malengo ambayo benki hawawezi.",
+        "description": "Tuma Bitcoin moja kwa moja kwa wanaharakati na harakati popote duniani, bila kuomba ruhusa kwa mchakataji wa malipo.",
+        "bullet1": "Tumia pochi yoyote ya Bitcoin ulionayo tayari.",
+        "bullet2": "Michango huingia moja kwa moja kwa mwanaharakati. Hakuna mhifadhi, hakuna mpatanishi.",
+        "bullet3": "Kwa faragha, tumia pochi inayoauni malipo ya kimya.",
+        "cta": "Soma Mwongozo wa Mfadhili"
+      },
+      "activist": {
+        "imageAlt": "Mtazamo wa angani wa maelfu ya waandamanaji waliokusanyika usiku kwenye uwanja wa jiji na tochi nyekundu zinazowaka, chini ya bango la 'UNITY IN DARKNESS' lililoonyeshwa kwenye majengo ya jirani",
+        "role": "Kwa Wanaharakati",
+        "title": "Pata ufadhili bila ruhusa.",
+        "description": "Pokea msaada moja kwa moja kutoka kwa watu wanaoamini lengo lako. Hakuna akaunti ya benki, hakuna fomu ya maombi, hakuna kampuni katikati.",
+        "bullet1": "Anza kupokea michango mara tu unapojisajili.",
+        "bullet2": "Chagua aina za malipo za kukubali: za umma, malipo ya kimya, au zote mbili.",
+        "bullet3": "Kwa utoaji wa pesa kwa faragha, tuma kwanza kwa pochi ya malipo ya kimya, kisha tuma popote.",
+        "cta": "Soma Mwongozo wa Mwanaharakati"
+      },
+      "stillStuck": "Bado umekwama?",
+      "followTeam": "Fuata Team Soapbox kwenye Nostr",
+      "stillStuckSuffix": ". Tunashughulikia maswali huko."
+    }
+  },
+  "forms": {
+    "required": "Lazima",
+    "recommended": "Inapendekezwa",
+    "optional": "Si lazima",
+    "title": "Kichwa",
+    "country": "Nchi",
+    "tags": "Lebo",
+    "coverImage": "Picha ya jalada",
+    "description": "Maelezo",
+    "timezone": "Saa za eneo",
+    "publishing": "Inachapisha…",
+    "uploadingCover": "Inapakia jalada…",
+    "countrySearchPlaceholder": "Tafuta nchi",
+    "imageDropzone": "Bonyeza au buruta picha hapa"
+  },
+  "organizationContext": {
+    "attachedToGroup": "Imeunganishwa na kikundi",
+    "groupFallback": "Kikundi",
+    "editSubtext": "Masasisho yatabaki yakiunganishwa na shughuli rasmi ya kikundi hiki.",
+    "malformedParam": "Haikuweza kusoma kikundi katika kiungo. Inachapisha chini ya akaunti yako.",
+    "checkingPermissions": "Inakagua ruhusa za kikundi…",
+    "unauthorized": "Wewe si mwanzilishi au msimamizi wa kikundi hicho. Inachapisha chini ya akaunti yako.",
+    "publishingAsGroup": "Inachapisha kama kikundi"
+  },
+  "notFound": {
+    "title": "404 - Ukurasa Haujapatikana",
+    "description": "Ukurasa unaoutafuta haukuweza kupatikana.",
+    "heading": "Ukurasa huu haupo.",
+    "goHome": "Nenda nyumbani"
+  },
+  "pledges": {
+    "list": {
+      "seoTitle": "Ahadi",
+      "seoTitleWithCountry": "Ahadi — {{country}}",
+      "seoDescription": "Toa ahadi ya ufadhili kwa hatua, ushahidi, au matokeo unayotaka kuhamasisha.",
+      "heroKicker": "Ahadi",
+      "heroHeading": "Hamasisha mabadiliko",
+      "heroHeadingLine2": "unayotaka kuyaona.",
+      "heroBody": "Fadhili hatua halisi, ushahidi, na matokeo. Watu hujibu kwa mawasilisho, na jumuiya huzawadia kazi inayosukuma lengo mbele.",
+      "openCount_one": "ahadi imefunguliwa sasa hivi",
+      "openCount_other": "ahadi zimefunguliwa sasa hivi",
+      "createPledge": "Unda ahadi",
+      "loginToCreate": "Ingia ili kuunda ahadi",
+      "sectionActive": "Ahadi zinazoendelea",
+      "sectionUpcoming": "Ahadi zijazo",
+      "sectionPast": "Ahadi zilizopita",
+      "sectionDefault": "Ahadi",
+      "sectionTagline": "Saidia kufadhili hatua zinazostahili kufanywa.",
+      "sortAriaLabel": "Panga",
+      "sortBy": "Panga kwa",
+      "sortRecent": "Mpya zaidi",
+      "sortBounty": "Ahadi kubwa zaidi",
+      "sortDeadline": "Tarehe ya mwisho hivi karibuni",
+      "sortDeadlinePast": "Zilizoisha hivi karibuni",
+      "filterAriaLabel": "Chuja kwa nchi",
+      "countrySearchPlaceholder": "Tafuta…",
+      "noResults": "Hakuna matokeo yaliyopatikana.",
+      "global": "Kimataifa",
+      "dividerUpcoming": "Zijazo",
+      "dividerPast": "Zilizopita",
+      "showLess": "Onyesha kidogo",
+      "showMore": "Onyesha zaidi ({{count}} zaidi)",
+      "emptyTitle": "Hakuna ahadi bado",
+      "emptyHint": "Kuwa wa kwanza kuunda ahadi.",
+      "emptyHintCountry": "Kuwa wa kwanza kuunda ahadi kwa {{country}}."
+    },
+    "card": {
+      "ended": "Imeisha",
+      "pledged": "Imeahidiwa",
+      "byAuthor": "na <0>{{name}}</0>",
+      "deletePledge": "Futa ahadi",
+      "copyLink": "Nakili kiungo",
+      "linkCopied": "Kiungo kimenakiliwa",
+      "linkCopyFailed": "Imeshindikana kunakili kiungo",
+      "confirmDelete": "Futa ahadi hii? Hii haiwezi kutenduliwa.",
+      "deleted": "Ahadi imefutwa",
+      "deletedContent": "Ahadi iliyofutwa",
+      "deleteFailed": "Imeshindikana kufuta ahadi"
+    },
+    "create": {
+      "seoTitle": "Unda ahadi",
+      "seoDescription": "Unda ahadi ya mfadhili ili kuhamasisha hatua halisi kwenye {{appName}}.",
+      "loginGateTitle": "Ingia ili kuunda ahadi",
+      "loginGateBody": "Ahadi ni matukio ya Nostr yaliyotiwa saini. Unahitaji kuingia kwa Nostr ili kuchapisha moja.",
+      "backToPledges": "Rudi kwenye ahadi",
+      "heading": "Unda ahadi",
+      "title": "Kichwa",
+      "titlePlaceholder": "Hifadhi kumbukumbu ya kusafisha pwani",
+      "country": "Nchi",
+      "countryPlaceholder": "Tafuta nchi",
+      "countryClearAria": "Futa nchi",
+      "flagOfAria": "Bendera ya {{name}}",
+      "countryHint": "Inachapisha <0>i: iso3166:{{code}}</0> kwa upangaji wa nchi.",
+      "tags": "Lebo",
+      "tagsPlaceholder": "kusafisha-pwani, kumbukumbu-maandamano, kuzima-intaneti",
+      "coverImage": "Picha ya jalada",
+      "description": "Maelezo",
+      "descriptionPlaceholder": "Eleza hatua, ushahidi, au matokeo unayotaka kuhamasisha, mawasilisho yanapaswa kujumuisha nini, na jinsi unavyopanga kuyatathmini...",
+      "pledge": "Ahadi",
+      "pledgeAmountPlaceholder": "100",
+      "deadline": "Tarehe ya mwisho",
+      "timezone": "Saa za eneo",
+      "timezoneNote": "Nyakati za kuanza na za mwisho zitafasiriwa katika eneo hili la saa.",
+      "submit": "Unda ahadi",
+      "publishing": "Inachapisha…",
+      "uploadingCover": "Inapakia jalada…",
+      "altText": "Ahadi ya {{appName}}: {{title}}",
+      "successToast": "Ahadi imeundwa",
+      "errorToast": "Haikuweza kuunda ahadi",
+      "errorLoginRequired": "Lazima uwe umeingia ili kuunda ahadi.",
+      "errorTitleRequired": "Kichwa kinahitajika.",
+      "errorDescriptionRequired": "Maelezo yanahitajika.",
+      "errorPledgeRequired": "Kiasi cha ahadi kinahitajika.",
+      "errorPledgeInvalid": "Kiasi cha ahadi kinapaswa kuwa kiasi chanya cha USD.",
+      "errorPriceUnavailable": "Inasubiri bei ya BTC/USD ili kuhesabu kiasi cha ahadi.",
+      "errorCoverInvalid": "Picha ya jalada lazima iwe URL halali ya https://.",
+      "errorDeadlinePast": "Tarehe ya mwisho haiwezi kuwa iliyopita."
+    },
+    "detail": {
+      "seoTitle": "{{title}} | Ahadi ya {{appName}}",
+      "seoFallbackTitle": "Ahadi | {{appName}}",
+      "deadlineEndedOn": "Imeisha {{date}}",
+      "deadlineEndsToday": "Inaisha leo",
+      "deadlineDaysLeft_one": "siku {{count}} imebaki",
+      "deadlineDaysLeft_other": "siku {{count}} zimebaki",
+      "deadlineEndsOn": "Inaisha {{date}}",
+      "openEnded": "Bila mwisho",
+      "back": "Rudi",
+      "backToPledges": "Rudi kwenye ahadi",
+      "loadingPledge": "Inapakia ahadi…",
+      "pledge": "Ahadi",
+      "byAuthor": "na <0>{{name}}</0>",
+      "submitLabel": "Wasilisha",
+      "linkCopied": "Kiungo kimenakiliwa kwenye ubao wa kunakili",
+      "pinnedToast": "Imebandikwa kwenye ahadi",
+      "unpinnedToast": "Imeondolewa kwenye ahadi",
+      "pinFailed": "Imeshindikana kusasisha mabandiko ya ahadi",
+      "submissions": "Mawasilisho",
+      "submissionCount_one": "wasilisho {{count}}",
+      "submissionCount_other": "mawasilisho {{count}}",
+      "submissionPlaceholder": "Shiriki uthibitisho, ushahidi, au kazi iliyokamilika...",
+      "noSubmissionsTitle": "Hakuna mawasilisho bado",
+      "noSubmissionsHint": "Kuwa wa kwanza kujibu na uthibitisho, ushahidi, au kazi iliyokamilika.",
+      "funded": "imefadhiliwa",
+      "ofPledged": "kati ya {{amount}} iliyoahidiwa",
+      "trustNote": "Ahadi hii inategemea uaminifu. Maendeleo ya ufadhili hujumlisha zaps na risiti za michango kwenye mawasilisho ya kiwango cha juu.",
+      "share": "Shiriki",
+      "storyHeading": "Ahadi",
+      "storyEmpty": "Mtoa ahadi hajaandika maelezo ya ahadi hii bado."
+    }
+  },
+  "groups": {
+    "list": {
+      "seoTitle": "Vikundi",
+      "seoDescription": "Gundua na ujiunge na vikundi kwenye Nostr",
+      "heroKicker": "Vikundi",
+      "heroHeading": "Nguvu",
+      "heroHeadingLine2": "katika idadi.",
+      "heroBody": "Unda vikundi, kusanya wanachama, na ufuatilie kile maeneo yako yanachofanya.",
+      "createGroup": "Unda kikundi",
+      "createGroupLoginTitle": "Ingia ili kuunda kikundi",
+      "createGroupLoginBody": "Kuunda kikundi huchapisha tukio la Nostr kutoka kwa akaunti yako.",
+      "myGroups": "Vikundi vyangu",
+      "featuredGroups": "Vikundi maarufu",
+      "loginToSeeTitle": "Ingia ili kuona vikundi vyako",
+      "loginToSeeBody": "Vikundi ulivyounda au unavyosimamia vitaonekana hapa.",
+      "noGroupsTitle": "Hakuna vikundi bado",
+      "noGroupsBody": "Unda kikundi chako mwenyewe ili kuanza kuratibu kampeni, ahadi, na matukio na watu wako.",
+      "noFeaturedTitle": "Hakuna vikundi maarufu bado",
+      "noFeaturedBody": "Wasimamizi wa {{appName}} huangazia vikundi vya kipekee hapa. Rudi tena baadaye.",
+      "connectingRelays": "Inaunganisha na relei…",
+      "showLess": "Onyesha kidogo",
+      "showMore": "Onyesha {{count}} zaidi",
+      "needsReview": "Inahitaji ukaguzi",
+      "needsReviewDesc": "Vikundi vya {{appName}} ambavyo bado havijaangaziwa au kufichwa. Nyanyua moja kwenye rafu ya Maarufu au lifiche kwa Ficha.",
+      "needsReviewEmpty": "Hakuna kinachosubiri ukaguzi.",
+      "hidden": "Vilivyofichwa",
+      "hiddenDesc": "Vikundi vilivyofichwa kutoka kwa ugunduzi wa umma. Tumia menyu ya nukta tatu kwenye kadi ili kuonyesha.",
+      "hiddenEmpty": "Hakuna vikundi vilivyofichwa kwa sasa.",
+      "tickerCampaignsRaised_one": "imechangwa katika mnyororo katika kampeni {{count}}",
+      "tickerCampaignsRaised_other": "imechangwa katika mnyororo katika kampeni {{count}}",
+      "tickerFeaturedGroups_one": "kikundi maarufu kwenye Nostr",
+      "tickerFeaturedGroups_other": "vikundi maarufu kwenye Nostr",
+      "tickerCountries_one": "nchi inayochapisha leo",
+      "tickerCountries_other": "nchi zinazochapisha leo"
+    },
+    "create": {
+      "seoTitleCreate": "Unda kikundi",
+      "seoTitleEdit": "Hariri kikundi",
+      "seoDescriptionCreate": "Anza kikundi kipya kwenye {{appName}}.",
+      "seoDescriptionEdit": "Sasisha kikundi chako kwenye {{appName}}.",
+      "loginGateTitle": "Ingia ili kuanza kikundi",
+      "loginGateBody": "Vikundi ni matukio ya Nostr yaliyotiwa saini. Unahitaji kuingia kwa Nostr ili kuchapisha kimoja.",
+      "backToGroups": "Rudi kwenye vikundi",
+      "invalidEditTitle": "Kiungo cha kuhariri si halali",
+      "invalidEditBody": "Kiungo hiki cha kuhariri kikundi hakina anwani halali ya kikundi.",
+      "startNewGroup": "Anza kikundi kipya",
+      "loadingGroup": "Inapakia kikundi…",
+      "cannotEditTitle": "Kikundi hakiwezi kuharirwa",
+      "cannotEditBody": "Mwanzilishi wa kikundi hiki pekee ndiye anayeweza kukisasisha.",
+      "headingCreate": "Unda kikundi",
+      "headingEdit": "Hariri kikundi",
+      "name": "Jina",
+      "namePlaceholder": "k.m. Walinzi wa Mwamuzi",
+      "urlPreview": "Hakikisho la URL:",
+      "urlPlaceholder": "jina-la-kikundi-chako",
+      "urlKeptOriginal": "(imehifadhiwa kutoka asili)",
+      "description": "Maelezo",
+      "descriptionPlaceholder": "Kikundi hiki kinahusu nini?",
+      "country": "Nchi",
+      "countryPlaceholder": "Tafuta nchi",
+      "countryClearAria": "Futa nchi",
+      "flagOfAria": "Bendera ya {{name}}",
+      "countryHint": "Inachapisha <0>i: iso3166:{{code}}</0> kwa upangaji wa nchi.",
+      "tags": "Lebo",
+      "tagsPlaceholder": "msaada-wa-pamoja, habari-za-ndani, haki-za-kidijitali",
+      "coverImage": "Picha ya jalada",
+      "moderators": "Wasimamizi",
+      "moderatorsCount": "Wasimamizi ({{count}})",
+      "removeModeratorAria": "Ondoa {{name}}",
+      "submitCreate": "Unda kikundi",
+      "submitEdit": "Sasisha kikundi",
+      "creating": "Inaunda…",
+      "updating": "Inasasisha…",
+      "uploadingCover": "Inapakia jalada…",
+      "altText": "Kikundi: {{name}}",
+      "successCreate": "Kikundi kimeundwa!",
+      "successEdit": "Kikundi kimesasishwa!",
+      "errorTitleCreate": "Haikuweza kuunda kikundi",
+      "errorTitleEdit": "Haikuweza kusasisha kikundi",
+      "errorLoginRequired": "Lazima uwe umeingia ili kuunda kikundi.",
+      "errorEditLoadFailed": "Kikundi hakikuweza kupakiwa kwa ajili ya kuhariri.",
+      "errorEditNotOwner": "Mwanzilishi wa kikundi pekee ndiye anayeweza kuhariri kikundi hiki.",
+      "errorNameRequired": "Jina linahitajika.",
+      "errorNameInvalid": "Jina lazima lijumuishe herufi au nambari ili URL ya kikundi iweze kuundwa.",
+      "errorEditLatestMissing": "Haikuweza kupata toleo la hivi karibuni la kikundi hiki kusasisha.",
+      "errorCoverInvalid": "Picha ya jalada lazima iwe URL halali ya https://.",
+      "errorSlugCollision": "Tayari una kikundi chenye kitambulisho \"{{slug}}\". Chagua jina lingine."
+    },
+    "detail": {
+      "by": "na",
+      "byAuthor": "na {{name}}",
+      "members": "Wanachama",
+      "viewMembers": "Tazama wanachama",
+      "moreMembers": "+{{count}} zaidi",
+      "about": "Kuhusu",
+      "comments": "Maoni",
+      "comment": "Maoni",
+      "commentNoun_one": "maoni",
+      "commentNoun_other": "maoni",
+      "noCommentsTitle": "Hakuna maoni bado",
+      "noCommentsHint": "Kuwa wa kwanza kuanzisha mjadala.",
+      "noMembersFound": "Hakuna wanachama waliopatikana.",
+      "founder": "Mwanzilishi",
+      "moderator": "Msimamizi",
+      "moreActions": "Vitendo zaidi",
+      "editGroup": "Hariri kikundi",
+      "deleteGroup": "Futa kikundi",
+      "officialActivity": "Shughuli rasmi",
+      "officialTools": "Zana rasmi",
+      "startSomething": "Anza jambo",
+      "officialToolsDescription": "Mpe {{name}} hatua halisi inayofuata.",
+      "launchCampaign": "Zindua kampeni",
+      "launchCampaignDescription": "Kusanya fedha kwa ukurasa rasmi wa kikundi.",
+      "campaign": "Kampeni",
+      "pledge": "Ahadi",
+      "pledgeDescription": "Toa msaada watu wanaoweza kuchukua hatua juu yake.",
+      "event": "Tukio",
+      "eventDescription": "Walete pamoja wafuasi.",
+      "untitledEvent": "Tukio lisilo na jina",
+      "interestedCount_one": "mtu {{count}} amependezwa",
+      "interestedCount_other": "watu {{count}} wamependezwa",
+      "allDay": "Siku nzima"
+    }
+  },
+  "campaignsCreate": {
+    "seoTitleCreate": "Anza kampeni",
+    "seoTitleEdit": "Hariri kampeni",
+    "seoDescriptionCreate": "Zindua kampeni ya kukusanya fedha kwenye {{appName}}.",
+    "seoDescriptionEdit": "Sasisha kampeni yako ya kukusanya fedha kwenye {{appName}}.",
+    "loginGateTitle": "Ingia ili kuanza kampeni",
+    "loginGateBody": "Kampeni ni matukio ya Nostr yaliyotiwa saini. Unahitaji kuingia kwa Nostr ili kuchapisha moja.",
+    "goHome": "Nenda nyumbani",
+    "invalidEditTitle": "Kiungo cha kuhariri si halali",
+    "invalidEditBody": "Kiungo hiki cha kuhariri kampeni hakina anwani halali ya kampeni.",
+    "startNewCampaign": "Anza kampeni mpya",
+    "loadingCampaign": "Inapakia kampeni…",
+    "cannotEditTitle": "Kampeni haiwezi kuharirwa",
+    "cannotEditBody": "Mwandishi wa kampeni hii pekee ndiye anayeweza kuisasisha.",
+    "headingCreate": "Anza kampeni",
+    "headingEdit": "Hariri kampeni",
+    "title": "Kichwa",
+    "titlePlaceholder": "Okoa Duka la Vitabu la Mwisho",
+    "wallet": "Pochi ya Bitcoin",
+    "myWalletLabel": "Pochi ya {{name}}",
+    "myWalletDefault": "Pochi yangu",
+    "walletChoose": "Chagua pochi",
+    "walletCustom": "Maalum",
+    "acceptAll": "Kubali aina zote za malipo",
+    "acceptPublic": "Kubali malipo ya umma pekee",
+    "acceptPrivate": "Kubali malipo ya faragha pekee",
+    "customWalletIntro": "Weka anwani ya Bitcoin, msimbo wa malipo ya kimya, au zote mbili. Angalau moja inahitajika.",
+    "bitcoinAddress": "Anwani ya Bitcoin",
+    "bitcoinAddressPlaceholder": "bc1q… au bc1p…",
+    "silentPaymentCode": "Msimbo wa malipo ya kimya",
+    "silentPaymentCodePlaceholder": "sp1…",
+    "onchainInvalid": "Si anwani ya Bitcoin ya mtandao mkuu inayotambulika (bc1q… / bc1p…).",
+    "spInvalid": "Si msimbo wa malipo ya kimya wa BIP-352 unaotambulika (sp1…).",
+    "country": "Nchi",
+    "countryPlaceholder": "Tafuta nchi",
+    "countryClearAria": "Futa nchi",
+    "flagOfAria": "Bendera ya {{name}}",
+    "countryHint": "Inachapisha <0>i: iso3166:{{code}}</0> kwa upangaji wa nchi.",
+    "tags": "Lebo",
+    "tagsPlaceholder": "utetezi-wa-kisheria, msaada-wa-pamoja, habari-za-ndani",
+    "banner": "Picha ya bango",
+    "summary": "Muhtasari",
+    "summaryPlaceholder": "Saidia kliniki ya kisheria ya jirani yetu kutetea waandamanaji wa amani.",
+    "story": "Hadithi",
+    "storyPlaceholder": "Shiriki historia, ni nani anayenufaika, na jinsi fedha zitakavyotumika.",
+    "goal": "Lengo",
+    "goalPlaceholder": "25,000",
+    "goalNote": "Dola za Marekani kamili. Wafadhili hulipa kwa Bitcoin; wateja hukadiria kiwango sawa cha USD wakati wa kutazama.",
+    "deadline": "Tarehe ya mwisho",
+    "submitCreate": "Zindua kampeni",
+    "submitEdit": "Sasisha kampeni",
+    "publishing": "Inachapisha…",
+    "updating": "Inasasisha…",
+    "uploadingBanner": "Inapakia bango…",
+    "altText": "Kampeni ya kukusanya fedha: {{title}}",
+    "successCreate": "Kampeni imezinduliwa",
+    "successCreateDesc": "Kampeni yako ya kukusanya fedha iko mtandaoni.",
+    "successEdit": "Kampeni imesasishwa",
+    "successEditDesc": "Mabadiliko ya kampeni yako yako mtandaoni.",
+    "errorTitleCreate": "Haikuweza kuchapisha kampeni",
+    "errorTitleEdit": "Haikuweza kusasisha kampeni",
+    "errorLoginRequired": "Lazima uwe umeingia ili kuunda kampeni.",
+    "errorEditLoadFailed": "Kampeni haikuweza kupakiwa kwa ajili ya kuhariri.",
+    "errorEditNotOwner": "Mwandishi wa kampeni pekee ndiye anayeweza kuhariri kampeni hii.",
+    "errorTitleRequired": "Kichwa kinahitajika.",
+    "errorTitleInvalid": "Kichwa lazima kijumuishe herufi au nambari ili URL ya kampeni iweze kuundwa.",
+    "errorSlugInvalid": "Kitambulisho lazima kiwe herufi ndogo, nambari, na vistari.",
+    "errorHdUnavailable": "Pochi iliyojengwa ndani haipatikani kwa kuingia hii.",
+    "errorSpUnavailable": "Anwani ya malipo ya kimya haipatikani kwa kuingia hii.",
+    "errorOnchainInvalid": "Anwani ya katika-mnyororo si anwani ya mtandao mkuu ya bech32(m) inayotambulika (bc1q… / bc1p…).",
+    "errorSpInvalid": "Msimbo wa malipo ya kimya si msimbo wa BIP-352 unaotambulika (sp1…).",
+    "errorWalletRequired": "Toa angalau ncha moja ya pochi — anwani ya mtandao mkuu wa Bitcoin (bc1q… / bc1p…) au msimbo wa malipo ya kimya (sp1…).",
+    "errorGoalInvalid": "Lengo lazima liwe kiasi chanya cha dola kamili.",
+    "errorDeadlinePast": "Tarehe ya mwisho haiwezi kuwa iliyopita.",
+    "errorDeadlineInvalid": "Tarehe ya mwisho si tarehe halali.",
+    "errorEditLatestMissing": "Haikuweza kupata toleo la hivi karibuni la kampeni hii kusasisha.",
+    "errorSlugCollision": "Tayari una kampeni yenye kitambulisho \"{{slug}}\". Chagua nyingine.",
+    "errorBannerInvalid": "Bango lazima liwe URL halali ya https://.",
+    "errorHdDeriveFailed": "Haikuweza kupata anwani mpya ya katika-mnyororo kutoka kwa pochi yako.",
+    "errorHdDeriveInvalid": "Anwani ya pochi iliyotolewa imeshindwa uthibitishaji. Tafadhali ongeza anwani maalum badala yake.",
+    "errorWalletRequiredFallback": "Ncha ya pochi inahitajika.",
+    "errorPublishedInvalid": "Tukio lililochapishwa limeshindwa uthibitishaji. Tafadhali onyesha upya na ujaribu tena."
+  },
+  "campaignsDetail": {
+    "seoTitle": "{{title}} | Kampeni za {{appName}}",
+    "seoDescriptionFallback": "Unga mkono {{title}} kwenye {{appName}}.",
+    "deadlineEndedOn": "Imeisha {{date}}",
+    "deadlineEndsToday": "Inaisha leo",
+    "deadlineDaysLeft_one": "siku {{count}} imebaki",
+    "deadlineDaysLeft_other": "siku {{count}} zimebaki",
+    "deadlineEndsOn": "Inaisha {{date}}",
+    "back": "Rudi",
+    "edit": "Hariri",
+    "delete": "Futa",
+    "deleting": "Inafuta…",
+    "byAuthor": "na <0>{{name}}</0>",
+    "commentLabel": "Maoni",
+    "linkCopied": "Kiungo kimenakiliwa kwenye ubao wa kunakili",
+    "pinnedToast": "Imebandikwa kwenye kampeni",
+    "unpinnedToast": "Imeondolewa kwenye kampeni",
+    "pinFailed": "Imeshindikana kusasisha mabandiko ya kampeni",
+    "deletedToast": "Kampeni imefutwa",
+    "deletedToastDesc": "Ombi la kufutwa limechapishwa. Relei zinazoendesha vyema zitaiondoa kampeni kutoka kwa milisho.",
+    "deleteErrorTitle": "Haikuweza kufuta kampeni",
+    "campaigner": "Mwendeshaji wa kampeni",
+    "repost_one": "<0>{{count}}</0> Chapisho upya",
+    "repost_other": "<0>{{count}}</0> Machapisho upya",
+    "quote_one": "<0>{{count}}</0> Nukuu",
+    "quote_other": "<0>{{count}}</0> Nukuu",
+    "like_one": "<0>{{count}}</0> Kupenda",
+    "like_other": "<0>{{count}}</0> Kupenda",
+    "commentsAndDonations": "Maoni na michango",
+    "noCommentsTitle": "Hakuna maoni bado",
+    "noCommentsHint": "Kuwa wa kwanza kuacha ujumbe wa msaada.",
+    "deleteDialogTitle": "Futa kampeni hii?",
+    "deleteDialogBody": "Hii inachapisha ombi la kufutwa la NIP-09. Relei zinazoendesha vyema zitaiondoa kampeni kutoka kwa milisho na viungo vya moja kwa moja. Risiti za michango zilizopita zinabaki katika mnyororo bila kujali. Kitendo hiki hakiwezi kutenduliwa — ili kuendelea kupokea michango, hariri kampeni badala yake.",
+    "storyHeading": "Hadithi",
+    "storyEmpty": "Mratibu hajaandika hadithi ya kampeni hii bado.",
+    "campaignEnded": "Kampeni imeisha",
+    "donate": "Changia",
+    "share": "Shiriki",
+    "target": "Lengo: {{amount}}",
+    "raised": "imechangwa",
+    "ofGoal": "kati ya lengo la {{amount}}",
+    "donationCount_one": "mchango {{count}}",
+    "donationCount_other": "michango {{count}}",
+    "recentDonations": "Michango ya hivi karibuni",
+    "seeAllDonations_one": "Tazama mchango wote {{count}}",
+    "openInWallet": "Fungua katika pochi",
+    "seeAllDonations_other": "Tazama michango yote {{count}}"
+  },
+  "calendarEvents": {
+    "create": {
+      "seoTitle": "Unda tukio",
+      "seoDescription": "Unda tukio la kalenda kwenye {{appName}}.",
+      "loginTitle": "Ingia ili kuunda tukio",
+      "loginBody": "Matukio ni matukio ya Nostr yaliyotiwa saini. Unahitaji kuingia kwa Nostr ili kuchapisha moja.",
+      "backToEvents": "Rudi kwenye matukio",
+      "heading": "Unda tukio",
+      "titlePlaceholder": "Usafi wa mtaa",
+      "descriptionPlaceholder": "Waambie watu wa kutarajia nini, wachukue nini, na nani anayepaswa kuhudhuria...",
+      "schedule": "Ratiba",
+      "allDay": "Tukio la siku nzima",
+      "allDayHint": "Zima ili kuongeza nyakati za kuanza na za mwisho.",
+      "startDate": "Tarehe ya kuanza",
+      "endDate": "Tarehe ya mwisho",
+      "startTime": "Wakati wa kuanza",
+      "endTime": "Wakati wa mwisho",
+      "locationDetails": "Maelezo ya mahali",
+      "locationPlaceholder": "Anwani, ukumbi, au kiungo cha simu ya video",
+      "tagsPlaceholder": "msaada-wa-pamoja, warsha, habari-za-ndani",
+      "submit": "Unda tukio",
+      "successToast": "Tukio limeundwa",
+      "errorToast": "Haikuweza kuunda tukio",
+      "altCalendar": "Tukio la kalenda: {{title}}",
+      "altGroup": "Tukio la kikundi: {{title}}",
+      "errorLoginRequired": "Lazima uwe umeingia ili kuunda tukio.",
+      "errorTitleRequired": "Kichwa kinahitajika.",
+      "errorStartDateRequired": "Tarehe ya kuanza inahitajika.",
+      "errorStartDatePast": "Tarehe ya kuanza haiwezi kuwa iliyopita.",
+      "errorStartTimeRequired": "Wakati wa kuanza unahitajika kwa matukio ya wakati maalum.",
+      "errorCoverInvalid": "Picha ya jalada lazima iwe URL halali ya https://.",
+      "errorEndDateBeforeStart": "Tarehe ya mwisho lazima iwe siku ya au baada ya tarehe ya kuanza.",
+      "errorStartDateTimeInvalid": "Tarehe au wakati wa kuanza si halali.",
+      "errorEndTimeAfterStart": "Wakati wa mwisho lazima uwe baada ya wakati wa kuanza."
+    },
+    "detail": {
+      "untitledEvent": "Tukio lisilo na jina",
+      "dateNotSpecified": "Tarehe haijabainishwa",
+      "organizer": "Mratibu",
+      "rsvpUpdated": "Jibu la mahudhurio limesasishwa",
+      "rsvpFailed": "Imeshindikana kusasisha jibu la mahudhurio",
+      "rsvp": "Jibu mahudhurio",
+      "youAreGoing": "Unaenda",
+      "youAreInterested": "Umependezwa",
+      "youCantGo": "Huwezi kwenda",
+      "chooseRsvp": "Chagua jibu lako la mahudhurio",
+      "going": "Naenda",
+      "interested": "Nimependezwa",
+      "cantGo": "Siwezi kwenda",
+      "attendees": "Wahudhuriaji",
+      "links": "Viungo",
+      "participants": "Washiriki",
+      "hostedBy": "imeandaliwa na",
+      "attendingCount_one": "{{count}} anahudhuria",
+      "attendingCount_other": "{{count}} wanahudhuria",
+      "interestedCount_one": "{{count}} amependezwa",
+      "interestedCount_other": "{{count}} wamependezwa",
+      "comment": "Maoni",
+      "description": "Maelezo",
+      "emptyDescription": "Mratibu hajaongeza maelezo ya tukio hili bado.",
+      "comments": "Maoni",
+      "commentNoun_one": "maoni",
+      "commentNoun_other": "maoni",
+      "noCommentsTitle": "Hakuna maoni bado",
+      "noCommentsHint": "Kuwa wa kwanza kutoa maoni.",
+      "pinnedToast": "Imebandikwa kwenye tukio",
+      "unpinnedToast": "Imeondolewa kwenye tukio",
+      "pinFailed": "Imeshindikana kusasisha mabandiko ya tukio"
+    }
+  },
+  "follow": {
+    "follow": "Fuata",
+    "following": "Unafuata",
+    "unfollow": "Acha kufuata",
+    "followed": "Umefuata",
+    "unfollowed": "Umeacha kufuata",
+    "updateFailed": "Imeshindikana kusasisha orodha ya kufuata"
+  },
+  "campaigns": {
+    "home": {
+      "seoTitle": "Wakusanyaji wa fedha",
+      "seoDescription": "Kuwaunganisha wanaharakati na ufadhili usiozuilika.",
+      "heroTagline": "Kuwaunganisha wanaharakati na<1></1><0>ufadhili usiozuilika.</0>",
+      "heroBody": "Kusanya Bitcoin moja kwa moja kutoka kwa wafuasi kote duniani. Kila mchango huingia moja kwa moja kwenye pochi yako, bila wapatanishi, bila marejesho, na bila jukwaa kushikilia fedha zako.",
+      "startCampaign": "Anza kampeni",
+      "howItWorks": "Jinsi inavyofanya kazi",
+      "exploreCampaigns": "Chunguza kampeni",
+      "featured": "Maarufu",
+      "featuredDesc": "Kampeni zilizochaguliwa kwa mkono kutoka kwa timu ya {{appName}}.",
+      "community": "Kampeni za Jumuiya",
+      "communityDesc": "Saidia kufadhili mabadiliko yanayostahili kufanywa.",
+      "browseAll": "Vinjari kampeni zote →",
+      "pending": "Inasubiri idhini",
+      "pendingDesc": "Kampeni kwenye mtandao ambazo hakuna msimamizi wa Team Soapbox aliyezithibitisha au kuzificha bado.",
+      "pendingEmpty": "Hakuna kinachosubiri ukaguzi.",
+      "hidden": "Vilivyofichwa",
+      "hiddenDesc": "Kampeni zilizofichwa kutoka kwenye ukurasa wa mwanzo wa umma. Tumia menyu ya nukta tatu kwenye kadi ili kuonyesha.",
+      "hiddenEmpty": "Hakuna kampeni zilizofichwa kwa sasa.",
+      "yourCampaigns": "Kampeni zako",
+      "yourCampaignsDesc": "Kampeni zako ziko mtandaoni kwenye Nostr na michango hufanya kazi kupitia kiungo cha kampeni. Zinaonekana kwenye ukurasa wa mwanzo mara tu msimamizi wa Team Soapbox anapozithibitisha.",
+      "empty": "Hakuna kampeni bado",
+      "emptyHint": "Kuwa wa kwanza kuanza kampeni ya kukusanya fedha kwenye {{appName}}. Eleza hadithi yako, chagua walengwa wako, na shiriki kiungo."
+    },
+    "all": {
+      "title": "Kampeni Zote",
+      "seoTitle": "Kampeni zote",
+      "description": "Vinjari kila kampeni iliyochapishwa kwenye Agora.",
+      "searchAriaLabel": "Tafuta kampeni",
+      "searchPlaceholder": "Tafuta kampeni…",
+      "clearSearch": "Futa utafutaji",
+      "sortAriaLabel": "Mpangilio wa kupanga",
+      "sortTop": "Juu",
+      "sortNew": "Mpya",
+      "showHidden": "Onyesha zilizofichwa",
+      "startCampaign": "Anza kampeni",
+      "noMatch": "Hakuna kampeni zinazolingana na “{{query}}”",
+      "noMatchHint": "Jaribu neno tofauti la utafutaji, au futa utafutaji ili kuona kila kampeni.",
+      "allHidden": "Hakuna kampeni za kuonyesha",
+      "allHiddenHint": "Kila kampeni kwenye mtandao imefichwa na wasimamizi. Geuza “Onyesha zilizofichwa” ili kuziona.",
+      "empty": "Hakuna kampeni bado",
+      "emptyHint": "Hakuna kampeni zilizochapishwa bado. Kuwa wa kwanza."
+    }
+  },
+  "settings": {
+    "title": "Mipangilio",
+    "description": "Simamia mipangilio yako ya {{appName}}",
+    "deleteAccount": "Futa akaunti",
+    "sections": {
+      "profile": "Wasifu",
+      "profileDesc": "Jina la kuonyesha, wasifu, picha, na uthibitisho.",
+      "appearance": "Mwonekano",
+      "appearanceDesc": "Hali ya mfumo, mwanga, au giza.",
+      "language": "Lugha",
+      "languageDesc": "Chagua lugha inayotumiwa katika programu yote.",
+      "network": "Mtandao",
+      "networkDesc": "Matumizi ya data, relei, na seva za upakiaji faili.",
+      "notifications": "Arifa",
+      "notificationsDesc": "Mapendeleo ya arifa za kusukuma.",
+      "advanced": "Ya kina",
+      "advancedDesc": "Pochi, mfumo, na chaguzi za mtumiaji mwenye uwezo.",
+      "organizers": "Waratibu",
+      "organizersDesc": "Teua waratibu wa nchi ambao wanaweza kubandika machapisho kwenye milisho ya nchi."
+    },
+    "organizers": "Waratibu",
+    "signInToManage": "Ingia ili kusimamia",
+    "loginRequired": "Unahitaji kuingia ili kusimamia waratibu.",
+    "appearance": {
+      "title": "Mwonekano",
+      "subtitle": "Chagua jinsi programu inavyoonekana.",
+      "intro": "Chagua hali yako ya rangi unayopendelea. Mfumo utalingana kiotomatiki na mpangilio wa mwanga au giza wa kifaa chako.",
+      "colorMode": "Hali ya Rangi",
+      "system": "Mfumo",
+      "systemDesc": "Inafuata mpangilio wa kifaa chako",
+      "light": "Mwanga",
+      "lightDesc": "Tumia hali ya mwanga kila wakati",
+      "dark": "Giza",
+      "darkDesc": "Tumia hali ya giza kila wakati"
+    },
+    "network": {
+      "title": "Mtandao",
+      "subtitle": "Simamia matumizi ya data, relei, na seva za upakiaji faili.",
+      "connectionsHeading": "Muunganisho wa Mtandao",
+      "connectionsIntro": "Simamia muunganisho wako wa relei. Relei ni seva zinazohifadhi na kusambaza matukio ya Nostr katika mtandao.",
+      "lowBandwidthHeading": "Hali ya Mtandao wa Chini",
+      "reduceDataUsage": "Punguza matumizi ya data",
+      "reduceDataUsageDesc": "Kwa muunganisho wenye kupimwa au polepole. Video hazitachezwa kiotomatiki, hakikisho la video nyuma hupitwa, na picha husubiri bonyezo kabla ya kupakiwa.",
+      "useImageProxy": "Tumia proxy ya picha",
+      "useImageProxyDesc": "Hupata matoleo madogo ya WebP ya picha badala ya asili kamili.",
+      "proxyUrl": "URL ya proxy",
+      "proxyApiDesc": "Lazima izungumze API ya <0>wsrv.nl / weserv</0>. Wenye kuhifadhi wenyewe wanaweza kuielekeza kwenye mfano wao.",
+      "reset": "Weka upya",
+      "relays": "Relei",
+      "blossomServers": "Seva za Blossom",
+      "imageUploads": "Upakiaji wa Picha",
+      "uploadQuality": "Ubora wa upakiaji",
+      "uploadQualityDesc": "Iliyobanwa hubadilisha ukubwa wa picha kubwa na huchagua umbo dogo zaidi. Ya asili hupakia picha kama zilivyo.",
+      "compressed": "Iliyobanwa",
+      "original": "Ya asili"
+    },
+    "advanced": {
+      "title": "Ya kina",
+      "subtitle": "Muunganisho wa pochi, usanidi wa mfumo, na chaguzi zingine za kina kwa watumiaji wenye uwezo.",
+      "intro": "Muunganisho wa pochi, usanidi wa mfumo, na chaguzi zingine za kina.",
+      "powerUserHeading": "Mipangilio ya Mtumiaji Mwenye Uwezo",
+      "wallet": "Pochi"
+    },
+    "wallet": {
+      "title": "Pochi",
+      "subtitle": "Simamia muunganisho wa pochi na malipo"
+    }
+  },
+  "language": {
+    "title": "Lugha",
+    "subtitle": "Chagua lugha inayotumiwa katika programu yote.",
+    "intro": "Chagua lugha unayopendelea. Programu itabadilika mara moja na itakumbuka chaguo lako kwenye kifaa hiki.",
+    "translationNote": "Tafsiri ziko katika hatua ya kazi. Maandishi yasiyotafsiriwa hurudi kwa Kiingereza."
+  },
+  "organizers": {
+    "appoint": "Teua Mratibu",
+    "appointDesc": "Mpe mtumiaji ruhusa ya kubandika machapisho kwenye mlisho wa nchi maalum.",
+    "appointing": "Inateua…",
+    "appointed": "Mratibu ameteuliwa",
+    "appointedSuccess": "Mratibu ameteuliwa kwa {{country}}",
+    "userNpub": "npub ya mtumiaji",
+    "country": "Nchi",
+    "selectCountry": "Chagua nchi",
+    "invalidNpub": "Muundo wa npub si halali",
+    "alreadyOrganizer": "Mtumiaji huyu tayari ni mratibu wa nchi hiyo",
+    "current": "Waratibu wa Sasa",
+    "noOrganizers": "Hakuna waratibu walioteuliwa bado.",
+    "removed": "Mratibu ameondolewa",
+    "removedSuccess": "{{name}} ameondolewa kutoka {{country}}",
+    "refreshed": "Imeonyeshwa upya",
+    "refreshedDesc": "Orodha ya waratibu imeonyeshwa upya kutoka kwa relei.",
+    "adminRequired": "Ufikiaji wa msimamizi unahitajika",
+    "adminRequiredDesc": "Wasimamizi wa jukwaa pekee ndio wanaweza kuteua au kuondoa waratibu."
+  },
+  "wallet": {
+    "seoTitle": "Pochi",
+    "seoDescription": "Pochi ya Bitcoin ya kihierarkia-kiamuzi inayotokana na nsec yako ya Nostr.",
+    "loggedOut": {
+      "title": "Pochi ya Bitcoin",
+      "description": "Pochi ya kihierarkia inayotokana na utambulisho wako wa Nostr. Anwani mpya kwa kila upokeaji, historia kamili ya muamala, hakuna kutumia anwani tena.",
+      "requiresNsec": "Inahitaji kuingia na nsec (funguo yako ya siri ya Nostr)."
+    },
+    "unsupported": {
+      "title": "Pochi haipatikani",
+      "extension": "Kiendelezi chako cha kivinjari huweka funguo yako ya siri kando, kwa hivyo hatuwezi kupata funguo za watoto kwa pochi yako.",
+      "bunker": "Mtia saini wako wa mbali (banker wa NIP-46) huweka funguo yako ya siri upande wa banker, kwa hivyo hatuwezi kupata funguo za watoto kwa pochi yako.",
+      "other": "Aina yako ya kuingia haifichui funguo ya siri inayohitajika kupata pochi yako.",
+      "instructions": "Toka na uingie tena na nsec yako ili kutumia pochi."
+    },
+    "scanFailed": "Imeshindikana kuchanganua pochi",
+    "retry": "Jaribu tena",
+    "refreshBalance": "Onyesha upya salio",
+    "refreshBalanceTitle": "Bonyeza kuonyesha salio upya",
+    "amountPending": "{{amount}} inasubiri",
+    "pending": "inasubiri",
+    "send": "Tuma",
+    "receive": "Pokea",
+    "transactions": "Miamala",
+    "receiveDialog": {
+      "title": "Pokea Bitcoin",
+      "description": "Shiriki anwani kupokea bitcoin.",
+      "addressIndex": "Anwani #{{index}}",
+      "newAddress": "Anwani mpya",
+      "scanForNew": "Changanua kwa malipo mapya",
+      "scanForPayments": "Changanua kwa malipo"
+    },
+    "tx": {
+      "pending": "Inasubiri",
+      "today": "Leo",
+      "yesterday": "Jana",
+      "daysAgo_one": "siku {{count}} iliyopita",
+      "daysAgo_other": "siku {{count}} zilizopita",
+      "received": "Imepokelewa",
+      "sent": "Imetumwa",
+      "silentBadge": "kimya",
+      "silentDetectedTitle": "Imegunduliwa kupitia uchanganuzi wa malipo ya kimya wa BIP-352"
+    }
+  },
+  "walletRecovery": {
+    "seoTitle": "Rejesha Pochi ya Zamani",
+    "seoDescription": "Rejesha fedha kutoka kwa pochi ya zamani ya Lightning na uhamishe kwa anwani yako ya Bitcoin inayotokana na Nostr.",
+    "title": "Rejesha Pochi ya Zamani",
+    "heading": "Rejesha pochi yako ya zamani",
+    "subheading": "Ikiwa hapo awali ulikuwa na fedha kwenye pochi ya Lightning, unaweza kuziondoa kwenye anwani yako ya Bitcoin inayotokana na Nostr. Pochi yako ya zamani hairejeshwi — hii ni uhamishaji wa mara moja, wa upande mmoja.",
+    "backToWallet": "Rudi kwenye pochi",
+    "loggedOut": {
+      "title": "Ingia ili kurejesha",
+      "description": "Ingia na utambulisho wa Nostr ulioikuwa wa pochi ya zamani ya Lightning ili fedha ziweze kuondolewa kwa anwani yake ya Bitcoin."
+    },
+    "destination": {
+      "title": "Fedha zitatumwa kwa",
+      "description": "Anwani yako ya Taproot inayotokana na Nostr."
+    },
+    "phrase": {
+      "title": "Maneno ya kurejesha",
+      "description": "Bandika maneno 12 ya kurejesha kutoka kwa pochi yako ya zamani.",
+      "checkingRelays": "Inakagua relei zako kwa nakala iliyosimbwa…",
+      "backupFoundTitle": "Nakala imepatikana kwenye relei zako",
+      "backupFoundDesc": "Tulipata nakala iliyosimbwa ya maneno ya kurejesha ya pochi yako ya zamani iliyochapishwa kutoka kwa akaunti hii.",
+      "decryptAndUse": "Simbua na uitumie",
+      "placeholder": "neno1 neno2 neno3 …",
+      "warning": "Bandika tu maneno ya kurejesha unayoyaamini. Yeyote mwenye maneno haya anaweza kutumia fedha. Baada ya kuondolewa kukamilika, futa kutoka mahali popote ulipoyanakili.",
+      "sweepButton": "Ondoa fedha kwenye anwani yangu ya Bitcoin"
+    },
+    "sweeping": {
+      "working": "Inafanya kazi…",
+      "dontClose": "Usifunge kichupo hiki. Hili linaweza kuchukua hadi dakika moja huku pochi ya zamani ikisawazishwa na muamala unatangazwa."
+    },
+    "success": {
+      "title": "Urejeshaji umekamilika",
+      "sent": "Sats {{sats}} zimetumwa kwa anwani yako ya Bitcoin.",
+      "viewTransaction": "Tazama muamala"
+    },
+    "error": {
+      "title": "Urejeshaji umeshindikana",
+      "tryAgain": "Jaribu tena"
+    },
+    "errors": {
+      "noNip44": "Mtia saini wako hauauni usimbuaji wa NIP-44, ambao unahitajika kusoma nakala ya relei. Bandika maneno yako 12 ya kurejesha kwa mkono badala yake.",
+      "decryptFailed": "Haikuweza kusimbua nakala ya relei. Bandika maneno yako 12 ya kurejesha kwa mkono badala yake.",
+      "decryptGeneric": "Imeshindikana kusimbua nakala ya relei.",
+      "invalidWordCount": "Maneno ya kurejesha lazima yawe 12 au 24.",
+      "noBalance": "Pochi yako ya zamani haina salio linaloweza kutumika. Hakuna cha kurejesha.",
+      "sweepGeneric": "Urejeshaji umeshindikana. Tafadhali jaribu tena."
+    },
+    "progress": {
+      "loadingSdk": "Inapakia SDK ya pochi…",
+      "connecting": "Inaunganisha na pochi yako ya zamani…",
+      "checkingBalance": "Inakagua salio…",
+      "preparingTransfer": "Inaandaa uhamishaji wa sats {{sats}}…",
+      "broadcasting": "Inatangaza muamala…"
+    },
+    "toast": {
+      "backupLoadedTitle": "Nakala imepakiwa",
+      "backupLoadedDesc": "Maneno ya kurejesha yamesimbuliwa kutoka kwa relei zako."
+    }
+  },
+  "walletConnect": {
+    "status": "Hali",
+    "ready": "Tayari",
+    "notFound": "Haijapatikana",
+    "none": "Hakuna",
+    "add": "Ongeza",
+    "active": "Inafanya kazi",
+    "connectionLabel": "Muunganisho wa NWC",
+    "defaultWalletName": "Pochi ya Lightning",
+    "setActiveTitle": "Weka kama inayofanya kazi",
+    "removeTitle": "Ondoa pochi",
+    "helpText": "Sakinisha kiendelezi cha kivinjari cha WebLN au unganisha pochi ya NWC kutuma zaps.",
+    "webln": {
+      "name": "WebLN",
+      "description": "Kiendelezi cha kivinjari"
+    },
+    "nwc": {
+      "name": "Nostr Wallet Connect",
+      "description": "Muunganisho wa pochi ya mbali",
+      "connectedCount_one": "pochi {{count}} imeunganishwa",
+      "connectedCount_other": "pochi {{count}} zimeunganishwa"
+    },
+    "empty": {
+      "title": "Hakuna pochi zilizounganishwa",
+      "description": "Ongeza muunganisho wa NWC ili kuwezesha zaps za papo hapo."
+    },
+    "dialog": {
+      "title": "Unganisha Pochi ya NWC",
+      "description": "Bandika mfuatano wa muunganisho kutoka kwa pochi yako inayooana na NWC.",
+      "aliasPlaceholder": "Jina la pochi (si lazima)",
+      "connect": "Unganisha",
+      "connecting": "Inaunganisha..."
+    },
+    "toast": {
+      "uriRequiredTitle": "URI ya muunganisho inahitajika",
+      "uriRequiredDesc": "Tafadhali weka URI halali ya muunganisho wa NWC.",
+      "activeChangedTitle": "Pochi inayofanya kazi imebadilika",
+      "activeChangedDesc": "Pochi iliyochaguliwa sasa inafanya kazi kwa zaps."
+    }
+  },
+  "walletSend": {
+    "title": "Tuma Bitcoin",
+    "send": "Tuma Bitcoin",
+    "tapAgainToConfirm": "Bonyeza tena kuthibitisha",
+    "approxSats": "≈ sats {{sats}}",
+    "satPerVB": "sat/vB {{rate}}",
+    "networkFee": "Ada ya mtandao",
+    "available": "Inapatikana: {{usd}} (sats {{sats}})",
+    "recipient": {
+      "label": "Mpokeaji",
+      "placeholder": "bc1…, sp1…, au npub…",
+      "sendingSp": "Inatuma kupitia malipo ya kimya — mpokeaji anapata anwani mpya ya katika-mnyororo isiyounganika.",
+      "sendingNostr": "Inatuma kwa anwani ya katika-mnyororo ya mtumiaji wa Nostr.",
+      "sendingRaw": "Inatuma kwa anwani ghafi ya Bitcoin."
+    },
+    "feeSpeed": {
+      "fastest": "~dakika 10",
+      "halfHour": "~dakika 30",
+      "hour": "~saa 1",
+      "economy": "~siku 1"
+    },
+    "progress": {
+      "building": "Inajenga muamala…",
+      "signing": "Inatia saini…",
+      "broadcasting": "Inatangaza…",
+      "sending": "Inatuma…"
+    },
+    "errors": {
+      "unavailable": "Pochi ya HD haipatikani kwa aina hii ya kuingia.",
+      "enterRecipient": "Weka anwani ya Bitcoin, anwani ya sp1…, au npub.",
+      "noSpendable": "Hakuna Bitcoin inayoweza kutumika katika pochi hii.",
+      "feesNotLoaded": "Viwango vya ada havijapakiwa.",
+      "cantSendToSelf": "Huwezi kujitumia mwenyewe.",
+      "enterAmount": "Weka kiasi.",
+      "insufficient": "Hakuna Bitcoin ya kutosha kwa kiasi hiki + ada ya mtandao.",
+      "waitingPrice": "Inasubiri bei ya BTC…",
+      "noneYet": "Bado huna Bitcoin yoyote.",
+      "acknowledgePrivacy": "Tambua onyo la faragha kabla ya kutuma."
+    },
+    "toast": {
+      "failedTitle": "Muamala umeshindikana"
+    },
+    "success": {
+      "title": "Bitcoin imetumwa",
+      "satsAmount": "sats {{sats}}",
+      "viewTransaction": "Tazama muamala",
+      "done": "Imekamilika"
+    }
+  },
+  "bitcoinPublic": {
+    "lead": "Pesa unazotuma ni za umma na zinaweza kufuatiliwa hadi kwako.",
+    "learnMore": "Jifunze zaidi",
+    "body": "Bitcoin ni leja ya umma. Miamala unayotuma inaweza kufuatiliwa hadi kwako milele, hata baada ya kubadilishana na watu wengi. Tuma tu kwa wale unaowataka kuwaunga mkono hadharani.",
+    "bodyWithCashOut": "Bitcoin ni leja ya umma. Miamala unayotuma inaweza kufuatiliwa hadi kwako milele, hata baada ya kubadilishana na watu wengi. Tuma tu kwa wale unaowataka kuwaunga mkono hadharani, au toa pesa katika ubadilishaji.",
+    "iUnderstand": "Naelewa muamala huu ni wa umma."
+  },
+  "spScan": {
+    "title": "Changanua malipo ya kimya",
+    "description": "Inatembea kifaa cha kuorodhesha cha BIP-352 kilichosanidiwa block-kwa-block kugundua malipo ya kimya yanayoingia.",
+    "fromBlock": "Kutoka block",
+    "toBlock": "Hadi block",
+    "tipPlaceholder": "kilele",
+    "indexerTip": "Kilele cha kifaa cha kuorodhesha",
+    "lastFullyScanned": "Iliyochanganuliwa kikamilifu mwisho",
+    "never": "kamwe",
+    "includeSpent": "Jumuisha zilizokwisha tumika",
+    "includeSpentDesc": "Pia gundua malipo ya kimya ambayo yamekwisha tumika tangu. Tumia unapojenga upya historia ya kupokea baada ya uchanganuzi uliokosa au kuweka upya.",
+    "blockProgress": "Block {{current}} / {{to}}",
+    "matches_one": "ulinganifu {{count}}",
+    "matches_other": "ulinganifu {{count}}",
+    "scannedRange": "Block zilizochanganuliwa {{from}} → {{to}}.",
+    "foundOutputs_one": "Imepatikana matokeo mapya {{count}}.",
+    "foundOutputs_other": "Imepatikana matokeo mapya {{count}}.",
+    "noNewPayments": "Hakuna malipo mapya.",
+    "startScan": "Anza uchanganuzi",
+    "reconcile": {
+      "title": "Patanisha UTXO zilizotumika",
+      "description": "Hukagua kila UTXO ya malipo ya kimya iliyohifadhiwa dhidi ya Blockbook na huondoa zile zilizokwisha tumika. Tumia ikiwa salio ni juu zaidi kuliko inavyopaswa kuwa baada ya kutuma.",
+      "checking": "Inakagua {{checked}} / {{total}}…",
+      "checked_one": "Imekaguliwa UTXO {{count}} · imeondolewa {{pruned}}.",
+      "checked_other": "Imekaguliwa UTXO {{count}} · imeondolewa {{pruned}}.",
+      "reconciling": "Inapatanisha…",
+      "reconcileNow": "Patanisha sasa"
+    }
+  },
+  "notifications": {
+    "seoTitle": "Arifa",
+    "seoDescription": "Arifa zako za Nostr",
+    "title": "Arifa",
+    "tabs": {
+      "all": "Zote",
+      "mentions": "Kutajwa"
+    },
+    "loginPrompt": "Ingia ili kuona arifa zako.",
+    "empty": "Hakuna arifa bado.",
+    "subject": {
+      "twoActors": "<0></0> na <1></1>",
+      "andOthers_one": " na mwingine {{count}}",
+      "andOthers_other": " na wengine {{count}}"
+    },
+    "actorAvatars": {
+      "moreCount": "+{{count}} zaidi"
+    },
+    "actions": {
+      "reactedToYour": "ameitikia {{noun}} yako",
+      "repostedYour": "amechapisha tena {{noun}} yako",
+      "zappedYou": "amekupa zap",
+      "zappedYouWithAmount": "amekupa zap ya sats {{sats}}",
+      "repliedToYourNote": "amejibu noti yako",
+      "mentionedYou": "amekutaja",
+      "repliedToYourComment": "amejibu maoni yako",
+      "commentedOnYour": "ametoa maoni kwenye {{noun}} yako",
+      "sentYouLetter": "amekutumia barua",
+      "highlightedYour": "ameangazia {{noun}} yako",
+      "awardedBadge": "amekutunuku beji",
+      "awardedBadges": "amekutunuku beji"
+    },
+    "letter": {
+      "viewAll": "Tazama barua zote",
+      "reply": "Jibu"
+    },
+    "kinds": {
+      "profile": "wasifu",
+      "post": "chapisho",
+      "encryptedMessage": "ujumbe uliosimbwa",
+      "repost": "chapisho upya",
+      "reaction": "itikio",
+      "badgeAward": "tunzo ya beji",
+      "photo": "picha",
+      "video": "video",
+      "requestToVanish": "ombi la kutoweka",
+      "file": "faili",
+      "poll": "kura",
+      "comment": "maoni",
+      "voiceMessage": "ujumbe wa sauti",
+      "patch": "kiraka",
+      "pullRequest": "ombi la kuvuta",
+      "highlight": "muhtasari",
+      "birdDetection": "ugunduzi wa ndege",
+      "birdex": "Birdex",
+      "colorMoment": "wakati wa rangi",
+      "foundLog": "kumbukumbu ya kupatikana",
+      "nsite": "nsite",
+      "profileBadges": "beji za wasifu",
+      "badge": "beji",
+      "article": "makala",
+      "emojiPack": "paketi ya emoji",
+      "podcastEpisode": "kipindi cha podikasti",
+      "podcastTrailer": "trela ya podikasti",
+      "zapstoreAsset": "rasilimali ya Zapstore",
+      "zapstoreRelease": "toleo la Zapstore",
+      "stream": "mkondo",
+      "status": "hali",
+      "repository": "hifadhi",
+      "customNip": "NIP maalum",
+      "calendarEvent": "tukio la kalenda",
+      "zapstoreApp": "programu ya Zapstore",
+      "playlist": "orodha ya kucheza",
+      "divine": "takatifu",
+      "community": "jumuiya",
+      "goal": "lengo",
+      "track": "wimbo",
+      "magicDeck": "rundo la uchawi",
+      "treasure": "hazina",
+      "constellation": "kundinyota",
+      "followPack": "paketi ya kufuata"
+    }
+  },
+  "notifSettings": {
+    "seoTitle": "Arifa",
+    "seoDescription": "Sanidi mapendeleo yako ya arifa",
+    "title": "Arifa",
+    "subtitle": "Badilisha arifa unazopokea.",
+    "pushHeading": "Arifa za Kusukuma",
+    "enablePush": {
+      "label": "Wezesha Arifa za Kusukuma",
+      "description": "Pokea arifa kuhusu shughuli kwenye machapisho yako"
+    },
+    "unsupported": "Kivinjari chako hakiauni arifa za kusukuma.",
+    "denied": "Arifa zimezuiliwa. Sasisha mipangilio ya kivinjari chako kuruhusu arifa kutoka kwa tovuti hii.",
+    "deliveryMethod": {
+      "heading": "Njia ya Utoaji",
+      "intro": "Chagua jinsi arifa zinavyotolewa kwa kifaa chako.",
+      "push": {
+        "label": "Kusukuma",
+        "description": "Arifa za kawaida. Hakuna ikoni ya kudumu kwenye upau wa hali."
+      },
+      "persistent": {
+        "label": "Endelevu",
+        "description": "Hupiga simu relei moja kwa moja nyuma kwa arifa mpya. Tumia hii kwa utoaji wa kuaminika kwenye vifaa visivyoauni arifa za kusukuma."
+      }
+    },
+    "notifyAbout": {
+      "heading": "Niarifu Kuhusu",
+      "filterHeading": "Chuja",
+      "typesHeading": "Aina",
+      "onlyFollowing": {
+        "label": "Tu kutoka kwa watu ninaowafuata",
+        "description": "Ficha arifa kutoka kwa akaunti usizofuata"
+      }
+    },
+    "types": {
+      "reactions": {
+        "label": "Itikio",
+        "description": "Wakati mtu anaitikia machapisho yako"
+      },
+      "reposts": {
+        "label": "Machapisho upya",
+        "description": "Wakati mtu anachapisha noti zako tena"
+      },
+      "zaps": {
+        "label": "Zaps",
+        "description": "Wakati mtu anakutumia zap ya lightning au ya katika-mnyororo"
+      },
+      "mentions": {
+        "label": "Kutajwa",
+        "description": "Wakati mtu anakutaja kwenye noti"
+      },
+      "comments": {
+        "label": "Maoni na Majibu",
+        "description": "Wakati mtu anatoa maoni au kujibu machapisho yako"
+      },
+      "badges": {
+        "label": "Tunzo za Beji",
+        "description": "Wakati mtu anakutunuku beji"
+      },
+      "letters": {
+        "label": "Barua",
+        "description": "Wakati mtu anakutumia barua"
+      },
+      "highlights": {
+        "label": "Muhtasari",
+        "description": "Wakati mtu anaangazia maudhui yako"
+      }
+    },
+    "toast": {
+      "enableFailedTitle": "Imeshindikana kuwezesha arifa",
+      "enableFailedDesc": "Tafadhali jaribu tena."
+    }
+  },
+  "search": {
+    "seoTitle": "Tafuta",
+    "seoDescription": "Tafuta Nostr",
+    "title": "Tafuta",
+    "inputPlaceholder": "Tafuta",
+    "filtersAria": "Vichujio vya utafutaji",
+    "tabs": {
+      "agora": "Agora",
+      "nostr": "Nostr",
+      "accounts": "Akaunti"
+    },
+    "filters": {
+      "title": "Vichujio",
+      "reset": "Weka upya",
+      "from": "Kutoka",
+      "sort": "Panga",
+      "media": "Media",
+      "protocol": "Protokoli",
+      "language": "Lugha",
+      "kind": "Aina",
+      "kindCustomPlaceholder": "k.m. 1, 30023",
+      "includeReplies": "Jumuisha majibu",
+      "authorScope": {
+        "anyone": "Yeyote",
+        "follows": "Unaofuata",
+        "people": "Watu"
+      },
+      "sortOptions": {
+        "recent": "Hivi karibuni",
+        "hot": "Moto",
+        "trending": "Maarufu"
+      },
+      "mediaOptions": {
+        "all": "Yote",
+        "images": "Picha",
+        "videos": "Video",
+        "shorts": "Shorts",
+        "none": "Hakuna media"
+      },
+      "protocolOptions": {
+        "nostr": "Nostr",
+        "mastodon": "Mastodon",
+        "bluesky": "Bluesky"
+      },
+      "langOptions": {
+        "global": "Kimataifa",
+        "en": "Kiingereza",
+        "es": "Kihispania",
+        "fr": "Kifaransa",
+        "de": "Kijerumani",
+        "ja": "Kijapani",
+        "zh": "Kichina"
+      }
+    },
+    "chips": {
+      "noReplies": "Hakuna majibu",
+      "images": "Picha",
+      "videos": "Video",
+      "shortsAndDivines": "Shorts na Divines",
+      "noMedia": "Hakuna media",
+      "mastodon": "Mastodon",
+      "bluesky": "Bluesky",
+      "hot": "Moto",
+      "trending": "Maarufu",
+      "allKinds": "Aina zote",
+      "customKind": "Aina: {{kind}}",
+      "kindNumber": "Aina {{kind}}",
+      "kindsCount_one": "aina {{count}}",
+      "kindsCount_other": "aina {{count}}",
+      "myFollows": "Watu ninaowafuata",
+      "authorsCount_one": "mwandishi {{count}}",
+      "authorsCount_other": "waandishi {{count}}"
+    },
+    "clear": "Futa",
+    "searchLabel": "tafuta:",
+    "newPosts_one": "chapisho jipya {{count}}",
+    "newPosts_other": "machapisho mapya {{count}}",
+    "following": "Unafuata",
+    "botAccount": "Akaunti ya bot",
+    "empty": {
+      "posts": "Hakuna matokeo yaliyolingana na utafutaji wako.",
+      "postsPrompt": "Weka swali la utafutaji ili kupata maudhui ya Nostr.",
+      "accounts": "Hakuna akaunti zilizolingana na utafutaji wako.",
+      "followsPrompt": "Tafuta watu kwa jina au anwani ya NIP-05.",
+      "agora": "Hakuna kampeni, ahadi, au vikundi vya Agora vilivyolingana na utafutaji wako.",
+      "agoraPrompt": "Tafuta kampeni, ahadi, na vikundi vya Agora, au vinjari vya hivi karibuni.",
+      "activeFilters": "Vichujio vinavyofanya kazi:",
+      "clearAll": "Futa vichujio vyote"
+    }
+  },
+  "profile": {
+    "seoDescriptionFallback": "Wasifu wa Nostr",
+    "anonymous": "Asiyejulikana",
+    "userNotFound": "Mtumiaji hajapatikana.",
+    "userNotFoundNip05": "Mtumiaji hajapatikana: {{handle}}",
+    "couldNotResolveNip05": "Haikuweza kutatua kitambulisho hiki cha NIP-05.",
+    "tabs": {
+      "overview": "Muhtasari",
+      "activity": "Shughuli",
+      "campaigns": "Kampeni",
+      "groups": "Vikundi",
+      "pledges": "Ahadi"
+    },
+    "header": {
+      "editProfile": "Hariri wasifu",
+      "shareFollowLink": "Shiriki kiungo cha kufuata",
+      "moreOptions": "Chaguzi zaidi",
+      "donate": "Changia",
+      "campaignGoal": "Lengo ${{amount}}"
+    },
+    "stats": {
+      "followers": "Wafuasi",
+      "following": "Unafuata",
+      "raised": "Imechangwa",
+      "followersTitle_one": "mfuasi {{count}}",
+      "followersTitle_other": "wafuasi {{count}}",
+      "followingTitle": "{{count}} anaofuata"
+    },
+    "sections": {
+      "profile": "Wasifu",
+      "campaigns": "Kampeni",
+      "latestPledge": "Ahadi ya hivi karibuni",
+      "groups": "Vikundi",
+      "seeAllCampaigns_one": "Tazama kampeni yote {{count}} →",
+      "seeAllCampaigns_other": "Tazama kampeni zote {{count}} →",
+      "viewCampaignsTab": "Tazama kichupo cha kampeni →",
+      "seeAllPledges_one": "Tazama ahadi yote {{count}} →",
+      "seeAllPledges_other": "Tazama ahadi zote {{count}} →",
+      "seeAllGroups": "Tazama vyote {{count}} →"
+    },
+    "badges": {
+      "founder": "Mwanzilishi",
+      "moderator": "Msimamizi",
+      "mod": "Msmz",
+      "ended": "Imeisha",
+      "pledged": "Imeahidiwa"
+    },
+    "moreMenu": {
+      "title": "Chaguzi za wasifu",
+      "copyPubkey": "Nakili funguo ya umma",
+      "copyLink": "Nakili kiungo cha wasifu",
+      "addToList": "Ongeza kwenye orodha",
+      "shareFollowLink": "Shiriki kiungo cha kufuata",
+      "profileRecovery": "Urejeshaji wa wasifu",
+      "zap": "Zap",
+      "awardBadge": "Tunuku beji",
+      "writeLetter": "Andika barua",
+      "mute": "Nyamazisha @{{name}}",
+      "unmute": "Ondoa unyamavu wa @{{name}}",
+      "report": "Ripoti @{{name}}",
+      "close": "Funga"
+    },
+    "toast": {
+      "pubkeyCopied": "Funguo ya umma imenakiliwa kwenye ubao wa kunakili",
+      "linkCopied": "Kiungo cha wasifu kimenakiliwa kwenye ubao wa kunakili",
+      "muted": "@{{name}} amenyamazishwa",
+      "unmuted": "@{{name}} ameondolewa unyamavu",
+      "muteFailed": "Imeshindikana kunyamazisha mtumiaji",
+      "unmuteFailed": "Imeshindikana kuondoa unyamavu wa mtumiaji",
+      "followed": "Umemfuata @{{name}}",
+      "unfollowed": "Umeacha kumfuata @{{name}}",
+      "followFailed": "Imeshindikana kusasisha orodha ya kufuata",
+      "btcAddressCopied": "Anwani ya Bitcoin imenakiliwa kwenye ubao wa kunakili"
+    },
+    "followingModal": {
+      "title": "{{name}} anafuata",
+      "empty": "Bado hafuati mtu yeyote."
+    },
+    "followersModal": {
+      "title": "Wafuasi wa {{name}}",
+      "empty": "Hakuna wafuasi waliopatikana."
+    },
+    "bitcoinModal": {
+      "title": "Bitcoin",
+      "qrAlt": "QR ya Bitcoin",
+      "copyAddress": "Nakili anwani",
+      "showQr": "Onyesha msimbo wa QR",
+      "viewOnMempool": "Tazama kwenye mempool.space"
+    },
+    "lightbox": {
+      "openOriginal": "Fungua asili",
+      "close": "Funga (Esc)",
+      "imageAlt": "Picha ya wasifu"
+    },
+    "activity": {
+      "empty": "Hakuna shughuli kutoka kwa {{name}} bado. Machapisho, kampeni, ahadi, na michango yote inaonekana hapa."
+    },
+    "campaigns": {
+      "count_one": "kampeni {{count}}",
+      "count_other": "kampeni {{count}}",
+      "sortNew": "Mpya",
+      "sortTop": "Juu",
+      "showHidden": "Onyesha zilizofichwa",
+      "hideHidden": "Ficha zilizofichwa",
+      "emptySelf": "Bado hujazindua kampeni yoyote.",
+      "emptyOther": "{{name}} bado hajazindua kampeni yoyote.",
+      "startLink": "Anza kampeni →"
+    },
+    "pledgesTab": {
+      "active": "Zinazoendelea",
+      "ended": "Zilizoisha",
+      "emptySelf": "Bado hujaunda ahadi yoyote.",
+      "emptyOther": "{{name}} bado hajaunda ahadi yoyote.",
+      "createLink": "Unda ahadi →"
+    },
+    "groupsDialog": {
+      "title": "Vikundi vyote"
+    }
+  },
+  "profileSettings": {
+    "seoTitle": "Wasifu | Mipangilio",
+    "seoDescription": "Hariri wasifu wako wa {{appName}}",
+    "header": {
+      "title": "Wasifu",
+      "subtitle": "Utambulisho wako wa Nostr unabebeka — unaenda popote unapokwenda.",
+      "save": "Hifadhi"
+    },
+    "intro": {
+      "heading": "Utambulisho Wako",
+      "body": "Gusa uwanja wowote kwenye kadi kuhariri. Bonyeza picha yako au bango kupakia na kukata picha mpya."
+    },
+    "uploading": "Inapakia…",
+    "fields": {
+      "heading": "Sehemu za Wasifu",
+      "website": "Tovuti",
+      "websitePlaceholder": "https://tovuti-yako.com",
+      "lightning": "Lightning",
+      "lightningPlaceholder": "wewe@walletofsatoshi.com",
+      "labelPlaceholder": "Lebo",
+      "tickerPlaceholder": "Alama",
+      "addressPlaceholder": "Anwani",
+      "valuePlaceholder": "Thamani au URL",
+      "mediaPlaceholder": "Pakia faili au bandika kiungo cha faili moja kwa moja",
+      "chooseFile": "Chagua faili la kupakia",
+      "chooseMediaFile": "Chagua faili la media la kupakia"
+    },
+    "presets": {
+      "music": {
+        "label": "Muziki",
+        "description": "Pakia wimbo au klipu ya sauti",
+        "valuePlaceholder": "Pakia sauti au bandika kiungo cha faili moja kwa moja"
+      },
+      "photo": {
+        "label": "Picha",
+        "description": "Pakia picha",
+        "valuePlaceholder": "Pakia picha au bandika kiungo cha faili moja kwa moja"
+      },
+      "video": {
+        "label": "Video",
+        "description": "Pakia klipu ya video",
+        "valuePlaceholder": "Pakia video au bandika kiungo cha faili moja kwa moja"
+      },
+      "email": {
+        "label": "Barua pepe",
+        "defaultLabel": "Barua pepe",
+        "description": "Anwani ya barua pepe ya mawasiliano",
+        "valuePlaceholder": "wewe@mfano.com"
+      },
+      "wallet": {
+        "label": "Pochi",
+        "description": "Anwani ya pochi ya cryptocurrency",
+        "valuePlaceholder": "Anwani"
+      },
+      "link": {
+        "label": "Kiungo",
+        "description": "Kiungo cha tovuti yoyote au wasifu",
+        "valuePlaceholder": "https://..."
+      },
+      "weather": {
+        "label": "Hali ya hewa",
+        "defaultLabel": "Hali ya hewa",
+        "description": "Unganisha kituo cha hali ya hewa cha Nostr",
+        "valuePlaceholder": "npub1... au naddr1... (#station-id si lazima)"
+      },
+      "custom": {
+        "label": "Maalum",
+        "description": "Unda uwanja wowote maalum",
+        "valuePlaceholder": "Thamani au URL"
+      }
+    },
+    "warnings": {
+      "audioWrongType": "URL hii haielekezi kwenye faili la sauti. Pakia faili la sauti au tumia kiungo cha moja kwa moja kinachoishia .mp3, .ogg, .wav, n.k.",
+      "audioUnknown": "URL hii inaweza isifanye kazi kama kichezaji cha sauti. Kwa matokeo bora, pakia faili kwa kutumia kitufe au bandika kiungo cha moja kwa moja kwa faili la sauti.",
+      "imageWrongType": "URL hii haielekezi kwenye picha. Pakia picha au tumia kiungo cha moja kwa moja kinachoishia .jpg, .png, .webp, n.k.",
+      "imageUnknown": "URL hii inaweza isionyeshwe kama picha. Kwa matokeo bora, pakia faili kwa kutumia kitufe au bandika kiungo cha moja kwa moja kwa faili la picha.",
+      "videoWrongType": "URL hii haielekezi kwenye video. Pakia video au tumia kiungo cha moja kwa moja kinachoishia .mp4, .webm, .mov, n.k.",
+      "videoUnknown": "URL hii inaweza isionyeshwe kama video. Kwa matokeo bora, pakia faili kwa kutumia kitufe au bandika kiungo cha moja kwa moja kwa faili la video."
+    },
+    "crop": {
+      "profile": "Kata Picha ya Wasifu",
+      "banner": "Kata Bango"
+    },
+    "mobilePreview": "Hakikisho la Sehemu za Wasifu",
+    "advanced": {
+      "heading": "Ya kina",
+      "botLabel": "Akaunti ya Bot",
+      "botDescription": "Tia alama akaunti hii kama ya kiotomatiki"
+    },
+    "toast": {
+      "uploaded": "Imepakiwa",
+      "mediaUploaded": "Faili la media limepakiwa",
+      "uploadFailed": "Upakiaji umeshindikana",
+      "tryAgain": "Tafadhali jaribu tena.",
+      "profilePictureUpdated": "Picha ya wasifu imesasishwa",
+      "bannerUpdated": "Bango limesasishwa",
+      "profileSaved": "Wasifu umehifadhiwa",
+      "saveFailed": "Imeshindikana kuhifadhi wasifu."
+    },
+    "key": {
+      "heading": "Funguo Yako",
+      "extensionBody": "Umeingia kwa kiendelezi cha kivinjari (NIP-07). Funguo yako ya siri imehifadhiwa hapo — simamia au itoe kutoka kwa kiendelezi chenyewe.",
+      "bunkerBody": "Umeingia kwa mtia saini wa mbali (NIP-46). Funguo yako ya siri inashikiliwa na mtia saini huyo na haiwezi kutolewa kutoka {{appName}}.",
+      "explainer": "Funguo hii ya siri inadhibiti akaunti yako kwenye {{appName}}. Yeyote mwenye nayo anaweza kuchapisha na kukuiga. Hifadhi katika kidhibiti cha nenosiri au mahali pengine ambapo wewe pekee unaweza kufikia.",
+      "warning": "USIWAHI kushiriki funguo yako ya siri na yeyote. Epuka kuipiga picha au kuibandika popote isipokuwa kidhibiti cha nenosiri. Ikishirikiwa, wengine wataweza kufikia akaunti yako.",
+      "aria": "Funguo yako ya siri",
+      "copyAria": "Nakili funguo ya siri",
+      "revealAria": "Fichua funguo ya siri",
+      "hideAria": "Ficha funguo ya siri",
+      "backupButton": "Hifadhi Funguo",
+      "saving": "Inahifadhi…",
+      "saved": "Funguo ya siri imehifadhiwa",
+      "savedToFile": "Funguo yako ya siri ilihifadhiwa kwenye folda ya Hati kwenye kifaa chako.",
+      "saveFailed": "Hifadhi imeshindikana",
+      "saveFailedDescription": "Haikuweza kuhifadhi funguo. Tafadhali inakili kwa mkono.",
+      "copyFailed": "Kunakili kumeshindikana",
+      "copyFailedDescription": "Haikuweza kufikia ubao wa kunakili. Fichua funguo na inakili kwa mkono."
+    }
+  },
+  "faq": {
+    "categories": {
+      "getting-started": {
+        "label": "Kuhusu Agora"
+      },
+      "payments": {
+        "label": "Michango ya Bitcoin kwenye Agora"
+      },
+      "about-nostr": {
+        "label": "Kuhusu Nostr"
+      },
+      "legacy": {
+        "label": "Urithi"
+      }
+    },
+    "items": {
+      "what-is-ditto": {
+        "question": "{{appName}} ni nini?",
+        "answer": [
+          "{{appName}} ni jukwaa la kutuma michango ya Bitcoin — ya umma au ya faragha — moja kwa moja kwa wanaharakati. Hakuna mpatanishi, hakuna mchakataji wa malipo, na hakuna akaunti inayoweza kufungwa.",
+          "{{appName}} imejengwa kwenye Nostr, kwa hivyo utambulisho wako haujafungwa kwenye tovuti hii — wewe ndiye unayemiliki."
+        ]
+      },
+      "cost-to-use": {
+        "question": "Je, {{appName}} inagharimu chochote?",
+        "answer": [
+          "**Hapana.** {{appName}} haichukui ada ya jukwaa. Unapochangia, unalipa tu ada ya mtandao wa Bitcoin inayoenda kwa wachimba madini — si kwetu sisi."
+        ]
+      },
+      "who-made-this": {
+        "question": "Nani aliyetengeneza {{appName}}?",
+        "answer": [
+          "{{appName}} imejengwa na [Soapbox](https://soapbox.pub), timu ya chanzo wazi inayotengeneza zana kwa mfumo wa Nostr, kwa ushirikiano na [World Liberty Congress](https://worldlibertycongress.org/)."
+        ]
+      },
+      "send-bitcoin-onchain": {
+        "question": "Je, kutuma Bitcoin kunafanyaje kazi?",
+        "answer": [
+          "Mwanaharakati anapounda kampeni, anachagua aina za malipo za kukubali: **ya umma**, **ya faragha**, au **zote mbili**.",
+          "Michango ya **umma** ni Bitcoin halisi katika mnyororo. Inaingia kwenye blockchain ya umma, inafanya kazi katika kila pochi ya Bitcoin, na inaonekana kwa yeyote.",
+          "Michango ya **faragha** hutumia **malipo ya kimya** (BIP-352). Inaingia pia katika mnyororo, lakini muamala hauwezi kuunganishwa na msimbo wa mchango wa mwanaharakati — kwa hivyo wanabaki nje ya orodha za wafadhili za umma na jumla. Mfadhili anahitaji pochi inayoauni malipo ya kimya — tunapendekeza [Ditto Wallet](https://ditto.pub) au [Dana](https://github.com/cygnet3/dana/releases/download/v0.7.4/app-live-release.apk).",
+          "Kampeni inapokubali **zote mbili**, {{appName}} inaonyesha msimbo mmoja wa QR unaosimba ncha zote mbili. Pochi za malipo ya kimya huusoma kama wa faragha; pochi nyingine zinarudi kwa anwani ya umma. Wafadhili hawana haja ya kuchagua — pochi yao huchagua njia sahihi kiotomatiki.",
+          "Vyovyote, malipo yanaenda moja kwa moja kwa mwanaharakati. {{appName}} kamwe haigusi fedha."
+        ]
+      },
+      "connect-wallet": {
+        "question": "Pochi ya {{appName}} ni nini?",
+        "answer": [
+          "Pochi yako ya {{appName}} ni pochi ya Bitcoin ya **kujihifadhi**, iliyojengwa kutoka kwa funguo yako ya Nostr. {{appName}} kamwe haishiki fedha zako — pochi inaendesha katika kivinjari chako na kusaini miamala ndani ya nchi kwa funguo unayoidhibiti wewe tu. Inaweza kupokea Bitcoin njia zote mbili — kama anwani ya umma ambayo pochi yoyote ya Bitcoin inaweza kulipa, na kama msimbo wa malipo ya kimya ambao pochi zenye uwezo zinaweza kulipa kwa faragha. Hakuna cha kujisajilia; ipo wakati una akaunti.",
+          "Unapounda kampeni, unachagua kukubali malipo ya umma, malipo ya faragha, au zote mbili. Kutumia unachopokea, ona **Mwongozo wa Mwanaharakati**.",
+          "Unaweza pia kuhamisha kifungu cha maneno 24 cha mbegu ya pochi yako na kukileta katika pochi yoyote ya kawaida ya Bitcoin — ona \"Je, naweza kuhamisha pochi yangu ya {{appName}} kwa pochi nyingine ya Bitcoin?\" hapa chini."
+        ]
+      },
+      "export-wallet": {
+        "question": "Je, naweza kuhamisha pochi yangu ya {{appName}} kwa pochi nyingine ya Bitcoin?",
+        "answer": [
+          "Ndiyo. Pochi yako ya {{appName}} ni ya kujihifadhi kabisa. {{appName}} kamwe haishiki Bitcoin yako na kamwe haioni funguo zako — pochi inaendesha kabisa katika kivinjari chako, ikisaini miamala ndani ya nchi kwa funguo iliyotokana na funguo yako ya siri ya Nostr (nsec).",
+          "Fungua pochi kutoka kwa menyu, gusa menyu ya vitone vitatu juu kulia, na chagua **Back up wallet**. Utaona kifungu cha maneno 24 cha mbegu cha BIP-39. Kiandike mahali salama (au kihifadhi katika msimamizi wa nywila) — **yeyote mwenye maneno haya anaweza kutumia Bitcoin yako.**",
+          "Unaweza kuleta maneno hayo 24 katika pochi yoyote ya kawaida ya Bitcoin: **Sparrow**, **Electrum**, **BlueWallet**, **Phoenix**, **Trezor**, au **Ledger**. {{appName}} hutumia njia za kawaida za utokeaji za BIP-86 (Taproot) na BIP-352 (malipo ya kimya), kwa hivyo hakuna usanidi maalum unaohitajika.",
+          "Baada ya kuleta, pochi nyingine inaonyesha salio sawa na historia kama pochi yako ya {{appName}} — ni pochi ileile, ni mitazamo miwili tu ya hiyo.",
+          "Kuhamisha kifungu cha mbegu kunapatikana tu unapoingia kwa nsec. Kuingia kwa kiendelezi cha kivinjari na kisainishi cha mbali (bunker) huweka funguo yako ya siri kando, kwa hivyo {{appName}} haiwezi kupata mbegu katika hali hizo."
+        ]
+      },
+      "donations-are-public-general": {
+        "question": "Je, michango kwenye {{appName}} ni ya umma?",
+        "answer": [
+          "Inategemea aina gani ya malipo mwanaharakati anakubali.",
+          "**Michango ya umma** imerekodiwa kwenye blockchain ya Bitcoin na kwenye Nostr. Yeyote anaweza kuona kiasi, wakati, na anwani.",
+          "**Michango ya faragha** hutumia malipo ya kimya. Hayaunganiki hadharani na msimbo wa mchango wa mwanaharakati, hayaonekani kwenye orodha za wafadhili, na hayahesabiwi katika jumla ya umma.",
+          "Kampeni inapokubali zote mbili, pochi ya mfadhili huamua njia ya kutumia — pochi zenye uwezo wa malipo ya kimya hulipa kwa faragha, nyingine hulipa anwani ya umma. Soma **Mwongozo wa Mfadhili** na **Mwongozo wa Mwanaharakati** kwa picha kamili."
+        ]
+      },
+      "censorship-resistance": {
+        "question": "\"Inastahimili udhibiti\" inamaanisha nini hapa?",
+        "answer": [
+          "Hakuna kampuni inayoketi kati ya mfadhili na mwanaharakati. {{appName}} haishiki fedha na haiwezi kufunga anwani.",
+          "Mradi mtandao wa Bitcoin unaendesha, michango inaweza kutumwa na kupokelewa. {{appName}} yenyewe kutokuwepo mtandaoni hakutaizuia."
+        ]
+      },
+      "why-onchain": {
+        "question": "Kwa nini Bitcoin?",
+        "answer": [
+          "Bitcoin ni reli ya malipo iliyo na uungwaji mkono mkubwa zaidi na inayostahimili udhibiti zaidi duniani. Kila pochi ya Bitcoin inaweza kuituma.",
+          "Kwenye {{appName}}, wanaharakati huchagua jinsi ya kupokea: **ya umma** (anwani ya kawaida ya Bitcoin) kwa ufikiaji wa juu, **ya faragha** (malipo ya kimya) kwa michango isiyounganika, au **zote mbili** ili pochi ya kila mfadhili ichague njia sahihi kiotomatiki. Wafadhili ambao wana programu tu ya watumiaji wa Bitcoin bado wanaweza kuchangia; wafadhili wenye pochi ya malipo ya kimya wanapata faragha kwa chaguo-msingi.",
+          "Athari ni kwamba miamala ya umma ya Bitcoin inaonekana kwenye blockchain na hulipa ada ya mchimba. Miongozo ya Mfadhili na Mwanaharakati inaeleza jinsi ya kushughulikia zote mbili."
+        ]
+      },
+      "why-not-silent-payments": {
+        "question": "Je, {{appName}} inaauni malipo ya kimya?",
+        "answer": [
+          "Ndiyo — pande zote mbili. Pochi ya Bitcoin iliyojengwa ndani ya {{appName}} inaauni BIP-352, kwa hivyo unapotuma Bitcoin kutoka kwa pochi yako ya {{appName}} unaweza kulipa anwani yoyote ya malipo ya kimya (`sp1…`) moja kwa moja. Na mwanaharakati anapounda kampeni, anaweza kukubali malipo ya kimya pamoja na, au badala ya, malipo ya umma ya Bitcoin.",
+          "Michango ya malipo ya kimya bado inaingia katika mnyororo, lakini muamala hauwezi kuunganishwa na msimbo wa mchango wa mwanaharakati — kwa hivyo haionekani katika orodha za wafadhili au jumla za umma.",
+          "Kutuma malipo ya kimya kutoka nje ya {{appName}} kunahitaji pochi inayoauni BIP-352. Programu nyingi za watumiaji bado hazifanyi hivyo, lakini [Ditto Wallet](https://ditto.pub) na [Dana](https://github.com/cygnet3/dana/releases/download/v0.7.4/app-live-release.apk) zinaweza.",
+          "Kampeni inapokubali aina zote mbili za malipo, {{appName}} inaisimba kwenye msimbo mmoja wa QR. Pochi zenye uwezo wa malipo ya kimya hulipa kwa faragha; wengine wote hulipa anwani ya umma. Hakuna mfadhili anayefungiwa nje, na hakuna mwanaharakati analazimishwa kuchagua kati ya ufikiaji na faragha."
+        ]
+      },
+      "why-not-lightning": {
+        "question": "Kwa nini {{appName}} haitumii Lightning?",
+        "answer": [
+          "Lightning inahitaji pochi ya Lightning. Rahisi zaidi (Wallet of Satoshi, Strike, Breez) ni **za uhifadhi** — kampuni inashikilia fedha na inaweza kufungwa, kuzuiwa kijiografia, au kushinikizwa kufunga akaunti. Lightning isiyo ya uhifadhi ni ngumu kiteknolojia na isiyoaminika kwa wapya.",
+          "Tunataka {{appName}} ifanye kazi kwa mtu ambaye uzoefu wake pekee wa Bitcoin ni programu ya kawaida ya watumiaji kama Cash App, Coinbase, Strike, Venmo, au PayPal. Bitcoin ya katika-mnyororo inafanya kazi na kila pochi kwenye sayari."
+        ]
+      },
+      "why-not-rotating-addresses": {
+        "question": "Kwa nini {{appName}} haizalishi anwani mpya kwa kila mchango?",
+        "answer": [
+          "Kufanya hivi kungehitaji {{appName}} kufanya kama mpatanishi wa kubadilisha pesa — kuchukua ulinzi wa Bitcoin kwanza na kisha kuipeleka kwa mwanaharakati.",
+          "Hilo lingetufanya kuwa mtumaji wa pesa, chini ya kanuni zinazokuja na hilo, na hatua moja ya kushindwa: funga seva ya {{appName}} na umefunga kila mchango unaopita kupitia.",
+          "Badala yake, anwani ya mchango ya kila mtumiaji inatokana na funguo yake ya siri ya Nostr (nsec) — funguo ile ile unayoingia nayo. Wafadhili hutuma moja kwa moja kwa mwanaharakati, {{appName}} kamwe haigusi fedha, na jukwaa lenyewe haliwezi kuzimwa kudhibiti yeyote. Wanaharakati wanaotaka faragha kwa kila mchango wanaweza kukubali malipo ya kimya, ambayo hutoa kutounganika kuleile bila yeyote kushikilia pesa katikati."
+        ]
+      },
+      "why-not-other-crypto": {
+        "question": "Kwa nini si Monero au cryptocurrency nyingine?",
+        "answer": [
+          "Bitcoin ni cryptocurrency iliyo na matumizi makubwa zaidi. Hiyo inamaanisha ni rahisi zaidi kwa wafadhili kununua na kutuma, na rahisi zaidi kwa wanaharakati kupokea, kuhifadhi, na kutumia.",
+          "Sarafu zinazojikita kwenye faragha kama Monero zinatoa athari tofauti za faragha kuliko Bitcoin, lakini hazitumiwi na programu nyingi za watumiaji na ni ngumu zaidi kubadilisha kurudi kwa sarafu ya ndani. Kuomba pande zote mbili za mchango kwanza kupata cryptocurrency ya kiwango kidogo ni kizuizi ambacho {{appName}} haitaweka njiani. Kwa michango ya Bitcoin yenyewe, malipo ya kimya yanafunika kesi ya matumizi ya kutounganika bila kuondoka kwenye mfumo wa Bitcoin."
+        ]
+      },
+      "what-is-nostr": {
+        "question": "Nostr ni nini?",
+        "answer": [
+          "Nostr ni mtandao wazi ambapo **wewe** ndiye unayemiliki akaunti yako, si kampuni. Utambulisho wako ni funguo ya kriptografia unayoidhibiti, si jina la mtumiaji kwenye seva ya mtu mwingine.",
+          "Kwenye {{appName}}, funguo hiyo hiyo ndiyo pia anwani yako ya mchango inatokana nayo — funguo yako ya siri ya Nostr (nsec) inapanda pochi yako ya Bitcoin, ndiyo sababu unaweza kupokea Bitcoin bila kujisajilia na yeyote."
+        ]
+      },
+      "why-login-different": {
+        "question": "Kwa nini kuingia kwangu ni tofauti na refu sana?",
+        "answer": [
+          "Badala ya jina la mtumiaji na nenosiri vinavyodhibitiwa na kampuni, Nostr hutumia jozi ya funguo za kriptografia.",
+          "\"Funguo ya umma\" yako (huanza na **npub**) ni jina lako la mtumiaji. \"Funguo ya siri\" yako (huanza na **nsec**) ni nenosiri lako. Mfuatano mrefu ndio unaofanya iwe haiwezekani kabisa kukisia."
+        ]
+      },
+      "lose-secret-key": {
+        "question": "Itakuwaje ikiwa nitapoteza funguo yangu ya siri?",
+        "answer": [
+          "**Hakuna kitufe cha \"umesahau nenosiri\".** Hakuna anayeweza kuiweka upya kwako. Ukipoteza, akaunti yako — na Bitcoin yoyote iliyo kwenye anwani yako ya mchango — imepotea milele.",
+          "**Hifadhi funguo yako ya siri mahali salama sasa hivi.** Kwa vidokezo, soma [Managing Your Nostr Keys](https://soapbox.pub/blog/managing-nostr-keys)."
+        ]
+      },
+      "manage-secret-key": {
+        "question": "Je, naweza kuhifadhi funguo yangu ya siri katika kidhibiti cha nenosiri cha simu yangu?",
+        "answer": [
+          "Ndiyo. Unaweza kuhifadhi katika kidhibiti cha nenosiri cha kifaa chako (iCloud Keychain, 1Password, Bitwarden, n.k.). Kwenye iPhone, kuihifadhi katika Passwords hukuruhusu kutumia Face ID au Touch ID kuingia.",
+          "Kwa mwongozo kamili, ona [Managing Your Nostr Keys](https://soapbox.pub/blog/managing-nostr-keys)."
+        ]
+      },
+      "send-bitcoin-lightning": {
+        "question": "Je, kutuma Bitcoin kupitia Lightning kunafanyaje kazi?",
+        "answer": [
+          "Ikiwa mpokeaji ana anwani ya Lightning kwenye wasifu wake, unaweza kutuma kwa hiyo. Lightning inaingia ndani ya sekunde na ada ni ndogo sana.",
+          "Utumaji wa Lightning hautumii anwani ya mchango ya {{appName}} — huenda moja kwa moja kwa pochi yoyote ya Lightning ambayo mpokeaji aliisanidi yeye mwenyewe. Mtiririko wa mchango wa {{appName}} mwenyewe ni katika-mnyororo pekee."
+        ]
+      },
+      "what-are-zaps": {
+        "question": "Zaps ni nini?",
+        "answer": [
+          "Zaps ni vidokezo vidogo vya Lightning kwenye Nostr, vilivyotenganishwa na mtiririko wa michango wa katika-mnyororo wa {{appName}}."
+        ]
+      },
+      "fyp": {
+        "question": "Je, mlisho unafanyaje kazi?",
+        "answer": [
+          "Mlisho wako unaonyesha kampeni na machapisho kutoka kwa watu unaowafuata. Hakuna kanuni inayoamua unachoona."
+        ]
+      },
+      "what-are-relays": {
+        "question": "Relei ni nini?",
+        "answer": [
+          "Relei ni seva zinazohifadhi na kutoa matukio ya Nostr — machapisho, risiti za michango, taarifa za wasifu. Chaguo-msingi zinafanya kazi nje ya boksi; unaweza kuongeza au kuondoa relei katika Mipangilio > Mtandao."
+        ]
+      },
+      "what-are-blossom": {
+        "question": "Seva za Blossom ni nini?",
+        "answer": [
+          "Seva za Blossom huhifadhi faili za media (picha za kampeni, picha za wasifu) unapozipakia. Unaweza kusimamia ni seva zipi unazotumia katika Mipangilio > Mtandao."
+        ]
+      },
+      "report-content": {
+        "question": "Je, ninaripotije maudhui yenye madhara?",
+        "answer": [
+          "Gusa menyu ya nukta tatu (**...**) kwenye chapisho lolote na uchague \"Ripoti.\" Unaweza kunyamazisha au kuzuia watumiaji kutoka kwa menyu hiyo hiyo."
+        ]
+      },
+      "vs-mastodon-bluesky": {
+        "question": "Nostr inatofautianaje na Mastodon au Bluesky?",
+        "answer": [
+          "Kwenye Mastodon, akaunti yako iko kwenye seva maalum. Kwenye Bluesky, akaunti nyingi zinategemea kampuni moja. Kwenye Nostr, utambulisho wako ni funguo unayoidhibiti, na anwani yako ya mchango huenda nawe kwa programu yoyote ya Nostr."
+        ]
+      },
+      "profile-fields": {
+        "question": "Sehemu za wasifu ni nini?",
+        "answer": [
+          "Sehemu za wasifu hukuruhusu kuongeza taarifa za ziada kwenye wasifu wako — viungo, anwani za pochi, muziki, picha, video."
+        ]
+      }
+    }
+  },
+  "guides": {
+    "shared": {
+      "tldrEyebrow": "Toleo fupi",
+      "paymentBadge": {
+        "public": "Malipo ya Umma",
+        "silent": "Malipo ya Kimya"
+      },
+      "paymentComparison": {
+        "donorHeader": "Unapochangia",
+        "activistHeader": "Unapounda",
+        "donorRows": {
+          "whatYouSee": {
+            "label": "Unachokiona",
+            "public": "Anwani ya kawaida ya Bitcoin unayoweza kulipa kutoka popote.",
+            "silent": "QR ile ile. Pochi yako huchagua ncha ya malipo ya kimya ikiwa inaauni BIP-352."
+          },
+          "walletSupport": {
+            "label": "Uauni wa pochi",
+            "public": "Kila pochi ya Bitcoin. Cash App, Coinbase, Strike, vifaa, chochote.",
+            "silent": "Pochi chache leo. Nyingi hurudi kwa muamala wa kawaida wa Bitcoin."
+          },
+          "privacy": {
+            "label": "Faragha ya mchango",
+            "public": "Umma katika mnyororo. Anwani yako ya kutuma imeunganishwa milele na kampeni.",
+            "silent": "Upande wa kupokea hauunganiki katika mnyororo. Njia ya pochi yako ya kutuma bado ni ya umma."
+          },
+          "settlement": {
+            "label": "Utuaji",
+            "public": "Uthibitisho wa kawaida wa Bitcoin.",
+            "silent": "Uthibitisho ule ule wa katika-mnyororo, lakini mwanaharakati lazima achanganue pochi yake kuipata."
+          }
+        },
+        "activistRows": {
+          "whatDonorsSee": {
+            "label": "Wafadhili wanaona nini",
+            "public": "Anwani ya kawaida ya Bitcoin. Inafanya kazi na kila pochi duniani.",
+            "silent": "Ncha ya BIP-352. Pochi za wafadhili zinahitaji uauni wa malipo ya kimya; vinginevyo mchango hurudi kwa muamala wa kawaida wa Bitcoin."
+          },
+          "receivingSpeed": {
+            "label": "Kasi ya kupokea",
+            "public": "Mtindo wa kusukuma. Michango inaonekana mara moja kwenye ukurasa wa kampeni.",
+            "silent": "Uchanganuzi wa mkono. Pochi yako lazima itembee blockchain ikitafuta. Dakika hadi saa, kulingana na pochi."
+          },
+          "pushNotifications": {
+            "label": "Arifa za kusukuma",
+            "public": "Ndiyo. Unaona michango mipya wakati inafika.",
+            "silent": "Hapana. Fungua pochi na uanzishe uchanganuzi kuipata."
+          },
+          "donorList": {
+            "label": "Orodha ya wafadhili / jumla za kampeni",
+            "public": "Umma milele. Kiasi na anwani za kutuma zinaonekana kwa yeyote.",
+            "silent": "Faragha. Ukurasa wa kampeni hauwezi kuonyesha idadi au jumla za michango ya malipo ya kimya."
+          },
+          "ecosystem": {
+            "label": "Ukomavu wa mfumo",
+            "public": "Iliyokomaa. Zana zilizotulia.",
+            "silent": "Inavuja damu. Pochi bado zina hitilafu; tarajia malipo yaliyokoswa yanayoonekana kwenye uchanganuzi wa baadaye."
+          },
+          "bestFor": {
+            "label": "Bora kwa",
+            "public": "Kampeni za wazi ambapo uthibitisho wa kijamii na uonekano husaidia.",
+            "silent": "Kampeni ambapo faragha ya mfadhili au mwanaharakati ni muhimu zaidi kuliko jumla inayoonekana."
+          },
+          "watchOutFor": {
+            "label": "Jiangalie",
+            "public": "Rekodi ya umma ya kudumu ya kila mfadhili.",
+            "silent": "UX yenye matuta leo. Michango mingine haitaonekana hadi mwanaharakati achanganue."
+          }
+        }
+      }
+    },
+    "donor": {
+      "tldr": {
+        "lede": "Lipa anwani ya Bitcoin kwenye ukurasa wa kampeni kutoka kwa pochi yoyote uliyo nayo. Ikiwa kampeni inakubali malipo ya kimya na pochi yako inayaauni, mchango wako ni wa faragha kiotomatiki.",
+        "nextActions": [
+          "Lipa kutoka kwa pochi yoyote ya Bitcoin",
+          "Hakuna mpatanishi, hakuna kipindi cha kushikilia",
+          "Unataka faragha? Soma hapa chini"
+        ]
+      },
+      "flow": {
+        "heading": "Jinsi mchango unavyotiririka",
+        "steps": {
+          "openCampaign": {
+            "title": "Fungua kampeni",
+            "body": "Unaona msimbo mmoja wa QR. Ikiwa kampeni inakubali chaguo zote mbili, inasimba ncha zote mbili; pochi yako huchagua sahihi."
+          },
+          "payFromAnyWallet": {
+            "title": "Ilipie kutoka kwa pochi yoyote",
+            "body": "Cash App, Coinbase, Strike, pochi ya kifaa, chochote. Lipa kiasi pamoja na ada ya mtandao."
+          },
+          "arrivesDirectly": {
+            "title": "Inafika moja kwa moja",
+            "body": "Fedha huingia moja kwa moja kwa mwanaharakati. {{appName}} haishiki au kuelekeza, na anwani inatokana na funguo ya siri ya Nostr ya mwanaharakati."
+          }
+        }
+      },
+      "comparison": {
+        "footnote": "Kampeni zinaweza kukubali Umma pekee, Kimya pekee, au zote mbili. Ikiwa zote mbili, msimbo wa QR unabeba ncha zote mbili. Pochi yako huchagua ile inayoweza kuitumia."
+      },
+      "publicVisible": {
+        "title": "Michango ya umma inaonekana katika mnyororo milele",
+        "body": "Mchango wa **Umma** huingia kwenye anwani ya kawaida ya Bitcoin iliyounganishwa na kampeni. Yeyote anaweza kuangalia anwani na kuona kiasi, wakati, na anwani yako ya kutuma. Michango ya **Kimya** pia hutua katika mnyororo, lakini upande wa kupokea hauunganiki na kampeni kwa hivyo wanabaki nje ya orodha za wafadhili za umma na jumla."
+      },
+      "privacy": {
+        "heading": "Kuchangia kwa faragha",
+        "intro": "Hatua hizi ni muhimu zaidi kwa michango ya **Umma**, ambapo kila muamala umeunganishwa milele na anwani moja. Michango ya **Kimya** tayari inaficha upande wa kupokea, kwa hivyo hatari ni ndogo. Uchanganuzi ulioelekezwa wa pochi yako ya kutuma bado unawezekana vyovyote, kwa hivyo ikiwa hatari yako iko juu hatua hizi zinastahili kuchukuliwa. Chagua moja, au zungushe.",
+        "options": {
+          "silentWallet": {
+            "name": "Tumia pochi ya malipo ya kimya",
+            "purpose": "Lipa kwa pochi ya Bitcoin inayoauni BIP-352. Ikiwa kampeni inakubali malipo ya kimya, pochi yako hutumia ncha hiyo kiotomatiki."
+          },
+          "nonKyc": {
+            "name": "Nunua Bitcoin isiyo ya KYC",
+            "purpose": "Nunua Bitcoin moja kwa moja kati ya watu ili isiunganishwe na kitambulisho chako cha serikali kwanza. Hatua imara zaidi ya kuanzia faragha."
+          },
+          "coinjoin": {
+            "name": "Coinjoin kwanza",
+            "purpose": "Changanya Bitcoin yako na sarafu za watu wengine ili matokeo yasiweze kufuatiliwa kwenye ununuzi wako wa KYC. Inafaa wakati kampeni inakubali umma tu."
+          },
+          "freshWallet": {
+            "name": "Tumia pochi mpya",
+            "purpose": "Changia kutoka kwa pochi ambayo haijawahi kugusa utambulisho wako wa msingi au ubadilishaji wa KYC."
+          }
+        }
+      },
+      "consumerApps": {
+        "title": "Programu za watumiaji haziwezi kukufanya usiojulikana",
+        "body": "Cash App, Coinbase, Strike, Venmo, Kraken, Binance, na PayPal zote huthibitisha kitambulisho chako. Hata ukitumaje mchango, kila muamala unabaki umeunganishwa na utambulisho wako halisi. Tumia pochi isiyo ya uhifadhi unayoidhibiti."
+      },
+      "silentToday": {
+        "heading": "Maelezo kuhusu malipo ya kimya leo",
+        "paragraphs": [
+          "Malipo ya kimya ni njia ya faragha zaidi ya kupokea Bitcoin katika mnyororo, lakini mfumo bado ni mchanga. Pochi nyingi maarufu haziwezi kutuma kwa ncha ya malipo ya kimya bado, kwa hivyo pochi inaposhindwa, mchango hurudi kwa muamala wa kawaida wa Bitcoin kwa anwani ya umma ya kampeni (ikiwa kampeni inakubali zote mbili).",
+          "Kwa wanaharakati, michango ya malipo ya kimya pia hufika bila arifa za kusukuma na huonekana tu baada ya mwanaharakati kuchanganua pochi yake, ambayo inaweza kuchukua dakika hadi saa. Hakuna kati ya hii inayoathiri usalama wa fedha zako; inaunda tu uzoefu."
+        ]
+      }
+    },
+    "activist": {
+      "tldr": {
+        "lede": "Chagua cha kukubali unapounda kampeni: Umma, Kimya, au zote mbili. Chaguo lolote si la uhifadhi. {{appName}} kamwe haishiki fedha zako.",
+        "nextActions": [
+          "Linganisha chaguzi mbili",
+          "Panga jinsi utakavyotoa pesa",
+          "Ondoa fedha haraka"
+        ]
+      },
+      "howReceiving": {
+        "heading": "Jinsi kupokea kunavyofanya kazi",
+        "paragraphs": [
+          "Anwani zako za michango za {{appName}} zinatokana na funguo yako ya siri ya Nostr (nsec) — funguo ile ile unayoingia nayo inapanda pochi yako ya Bitcoin. Unapounda kampeni, unachagua cha kukubali:",
+          "**Malipo ya umma pekee.** Anwani ya kawaida ya Bitcoin. Inaonekana kwa kila mtu, inafanya kazi na kila pochi.",
+          "**Malipo ya kimya pekee.** Malipo ya kimya ya BIP-352. Upande wa kupokea hauunganiki katika mnyororo, kwa hivyo michango inabaki nje ya orodha za wafadhili za umma na jumla. Wafadhili wanahitaji pochi yenye uwezo wa malipo ya kimya kutuma. Ikiwa hawana, mchango wao hauwezi kupita.",
+          "**Zote mbili.** {{appName}} hutoa msimbo mmoja wa QR unaosimba ncha zote mbili. Pochi za malipo ya kimya huusoma kama wa faragha; pochi za kawaida hulipa anwani ya umma. Wafadhili hawana haja ya kuchagua.",
+          "Kukubali zote mbili kawaida ndio uamuzi sahihi: unapata michango ya faragha kutoka kwa wafuasi wanaotumia pochi ya malipo ya kimya, na unabaki wazi kwa wafadhili ambao Bitcoin yao pekee iko kwenye programu ya watumiaji."
+        ]
+      },
+      "whatEveryoneSees": {
+        "heading": "Kila mtu anaweza kuona nini",
+        "paragraphs": [
+          "Ikiwa kampeni yako inakubali malipo ya umma, yeyote anayefikiria kukuunga mkono anaweza kuangalia anwani na kuona historia ya umma ya michango.",
+          "Michango ya malipo ya kimya si sehemu ya rekodi hiyo. Haionekani kwa watazamaji wa nje na haionekani katika jumla za umma za kampeni; wafadhili wapya wanaona tu kile unachochapisha kuhusu maendeleo ya kampeni."
+        ]
+      },
+      "comparison": {
+        "footnote": "Huwezi kubadilisha chaguzi za malipo zilizokubaliwa za kampeni baada ya kuundwa. Ikiwa unabadilisha mawazo, fanya kampeni mpya."
+      },
+      "silentToday": {
+        "heading": "Maelezo kuhusu malipo ya kimya leo",
+        "paragraphs": [
+          "Malipo ya kimya ni njia ya faragha zaidi ya kupokea Bitcoin katika mnyororo, lakini mfumo bado ni mchanga. Pochi nyingi maarufu haziwezi kutuma kwa ncha ya malipo ya kimya bado, kwa hivyo pochi ya mfadhili inaposhindwa, mchango hurudi kwa muamala wa kawaida wa Bitcoin kwa anwani yako ya umma (ikiwa unakubali zote mbili).",
+          "Michango ya malipo ya kimya pia hufika bila arifa za kusukuma na huonekana tu baada ya kuchanganua pochi yako, ambayo inaweza kuchukua dakika hadi saa. Hakuna kati ya hii inayoathiri usalama wa fedha zako; inaunda tu uzoefu wa kila siku."
+        ]
+      },
+      "movePromptly": {
+        "heading": "Hamisha michango haraka",
+        "steps": {
+          "sweep": {
+            "title": "Hamisha kwenye pochi unayoidhibiti",
+            "body": "Pochi yako ya {{appName}} tayari ni ya kujihifadhi — wewe, na wewe tu, unadhibiti funguo. Kwa mtazamo wa kompyuta ya mezani au pochi ya kifaa wa salio lilelile, fungua menyu ya pochi, chagua **Back up wallet**, na ulete kifungu cha maneno 24 cha mbegu katika [Sparrow](https://sparrowwallet.com), [BlueWallet](https://bluewallet.io), au pochi ya kifaa (Trezor, Ledger). Ikiwa ungependelea kuhamisha fedha kwa funguo tofauti kabisa — kwa mfano, kwa pochi ya Lightning kama [Phoenix](https://phoenix.acinq.co) — tuma muamala wa kawaida wa Bitcoin kutoka kwa pochi yako ya {{appName}}."
+          },
+          "dontSit": {
+            "title": "Usikae na fedha katika kivinjari",
+            "body": "Hasa kwa kampeni za thamani kubwa, hifadhi kifungu cha mbegu ya pochi nje ya mtandao (karatasi, hifadhi ya chuma, au msimamizi wa nywila kwenye kifaa maalum) na fikiria pochi ya kifaa. Mbegu unayoihifadhi kutoka kwa {{appName}} ni pochi ileile — linda maneno na utakuwa na hifadhi baridi."
+          }
+        }
+      },
+      "cashout": {
+        "heading": "Kutoa pesa kwa faragha",
+        "intro": "Kutumia katika mnyororo huunda njia isipokuwa uvunje kwanza. Njia rahisi ya faragha ya kutoka ni **kuhamisha fedha kwenye pochi ya malipo ya kimya kwanza**, kisha kutumia mbele; mruko huvunja kiungo kati ya anwani yako ya kampeni na kile kinachofuata. Chaguzi zingine hapa chini pia hufanya kazi na zina athari zao.",
+        "options": {
+          "silentHop": {
+            "name": "Mruko wa pochi ya malipo ya kimya",
+            "purpose": "Hamisha michango yako kwa pochi ya malipo ya kimya ([Ditto Wallet](https://ditto.pub), [Dana](https://github.com/cygnet3/dana/releases/download/v0.7.4/app-live-release.apk)). Kutoka hapo matumizi yako ya chini hayajaunganishwa na kampeni."
+          },
+          "lightningSwap": {
+            "name": "Ubadilishaji wa Lightning",
+            "purpose": "Badilisha Bitcoin ya katika-mnyororo kwa Lightning kwa njia ya atomiki. Malipo ya Lightning hayagusi blockchain ya umma."
+          },
+          "coinjoin": {
+            "name": "Coinjoin",
+            "purpose": "Changanya Bitcoin yako na sarafu za watumiaji wengine ili matokeo yasiweze kuunganishwa nyuma na kuingia."
+          },
+          "peerToPeer": {
+            "name": "Kati ya watu",
+            "purpose": "Badilishana Bitcoin kwa fiat moja kwa moja na mtu mwingine au kupitia broka kwenye Bisq, HodlHodl, au RoboSats."
+          },
+          "spendDirectly": {
+            "name": "Itumie moja kwa moja",
+            "purpose": "Nunua kadi za zawadi (Amazon, Uber, vyakula, safari) moja kwa moja kutoka kwa Bitcoin bila kubadilisha kuwa pesa taslimu kwanza."
+          }
+        }
+      },
+      "tumblers": {
+        "title": "Epuka vichanganyaji vya kati",
+        "body": "Vichanganyaji vya uhifadhi vinaweza kuiba sarafu zako, kuandika ni nani aliyetuma nini, au kuwa mitego ya watekelezaji wa sheria. Tumia mruko wa malipo ya kimya au coinjoin isiyo ya uhifadhi badala yake."
+      }
+    }
+  }
+}

@@ -14,24 +14,50 @@ export interface ReplyNode {
   hiddenChildren?: ReplyNode[];
 }
 
+/** Per-event customization hooks forwarded to each rendered `NoteCard`. */
+interface ReplyListOptions {
+  /** Renders a header row above each comment (e.g. pin controls). */
+  renderItemHeader?: (event: NostrEvent) => ReactNode;
+  /** Renders a badge inside each comment's author name row (e.g. role marker). */
+  renderAuthorBadge?: (event: NostrEvent) => ReactNode;
+  /**
+   * Suppress the per-comment "Commenting on …" context line. The page
+   * already establishes what's being commented on, so the row is just
+   * noise.
+   */
+  hideCommentContext?: boolean;
+  /**
+   * Extra className applied to non-threaded leaf comments. Use this to
+   * loosen vertical padding (e.g. `py-4`) on pages that want more
+   * breathing room between items. Skipped for threaded mid-items so
+   * the in-thread "butt up against next" layout is preserved.
+   */
+  leafCardClassName?: string;
+}
+
 /** Renders a fully threaded reply tree with collapsible deep branches. */
-export function ThreadedReplyList({ roots, renderItemHeader }: { roots: ReplyNode[]; renderItemHeader?: (event: NostrEvent) => ReactNode }) {
+export function ThreadedReplyList({
+  roots,
+  ...options
+}: { roots: ReplyNode[] } & ReplyListOptions) {
   return (
-    // Drop the trailing border on the last comment in the list — when
-    // the surrounding page doesn't wrap us in a card, that border
-    // floats orphaned below the final note. Two selectors are needed
-    // because the last root may be either a bare <article> (no
-    // children) or a <div> wrapping an <article> chain. `!important`
-    // overrides NoteCard's own `border-b border-border` utility.
-    <div className="[&>article:last-child]:!border-b-transparent [&>div:last-child_article]:!border-b-transparent">
+    <div>
       {roots.map((node) => (
-        <ReplyThread key={node.event.id} node={node} depth={0} renderItemHeader={renderItemHeader} />
+        <ReplyThread key={node.event.id} node={node} depth={0} {...options} />
       ))}
     </div>
   );
 }
 
-function ReplyThread({ node, depth, depthless, renderItemHeader }: { node: ReplyNode; depth: number; depthless?: boolean; renderItemHeader?: (event: NostrEvent) => ReactNode }) {
+function ReplyThread({
+  node,
+  depth,
+  depthless,
+  renderItemHeader,
+  renderAuthorBadge,
+  hideCommentContext,
+  leafCardClassName,
+}: { node: ReplyNode; depth: number; depthless?: boolean } & ReplyListOptions) {
   const [expanded, setExpanded] = useState(false);
   const [showHidden, setShowHidden] = useState(false);
   const hasChildren = node.children.length > 0;
@@ -42,7 +68,12 @@ function ReplyThread({ node, depth, depthless, renderItemHeader }: { node: Reply
     return (
       <div>
         {renderItemHeader?.(node.event)}
-        <NoteCard event={node.event} threaded />
+        <NoteCard
+          event={node.event}
+          threaded
+          authorBadge={renderAuthorBadge?.(node.event)}
+          hideCommentContext={hideCommentContext}
+        />
         <ExpandThreadButton count={countDescendants(node)} onClick={() => setExpanded(true)} isLast />
       </div>
     );
@@ -52,7 +83,12 @@ function ReplyThread({ node, depth, depthless, renderItemHeader }: { node: Reply
     return (
       <div>
         {renderItemHeader?.(node.event)}
-        <NoteCard event={node.event} />
+        <NoteCard
+          event={node.event}
+          className={leafCardClassName}
+          authorBadge={renderAuthorBadge?.(node.event)}
+          hideCommentContext={hideCommentContext}
+        />
       </div>
     );
   }
@@ -63,7 +99,12 @@ function ReplyThread({ node, depth, depthless, renderItemHeader }: { node: Reply
   return (
     <div>
       {renderItemHeader?.(node.event)}
-      <NoteCard event={node.event} threaded />
+      <NoteCard
+        event={node.event}
+        threaded
+        authorBadge={renderAuthorBadge?.(node.event)}
+        hideCommentContext={hideCommentContext}
+      />
       {/* Show hidden sibling count between parent and first child */}
       {hiddenCount > 0 && !showHidden && (
         <ExpandThreadButton count={hiddenCount} onClick={() => setShowHidden(true)} />
@@ -72,11 +113,26 @@ function ReplyThread({ node, depth, depthless, renderItemHeader }: { node: Reply
       {showHidden && node.hiddenChildren!.map((child) => (
         <div key={child.event.id}>
           {renderItemHeader?.(child.event)}
-          <NoteCard event={child.event} threaded threadedLineClassName="bg-primary/30" />
+          <NoteCard
+            event={child.event}
+            threaded
+            threadedLineClassName="bg-primary/30"
+            authorBadge={renderAuthorBadge?.(child.event)}
+            hideCommentContext={hideCommentContext}
+          />
         </div>
       ))}
       {node.children.map((child) => (
-        <ReplyThread key={child.event.id} node={child} depth={depth + 1} depthless={childDepthless} renderItemHeader={renderItemHeader} />
+        <ReplyThread
+          key={child.event.id}
+          node={child}
+          depth={depth + 1}
+          depthless={childDepthless}
+          renderItemHeader={renderItemHeader}
+          renderAuthorBadge={renderAuthorBadge}
+          hideCommentContext={hideCommentContext}
+          leafCardClassName={leafCardClassName}
+        />
       ))}
     </div>
   );
