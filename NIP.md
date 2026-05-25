@@ -22,7 +22,7 @@
 |--------------------------|-----------------------------------------|-----------------------------------------------------------------|
 | Flat Communities | 34550, 30009, 8, 1111, 1984 | One-level badge membership with explicit moderators (NIP-72 ext) |
 | Community Chat | 34550, 1311 | Realtime member chat scoped to a NIP-72 community |
-| Campaign Moderation | 33863, 1985, 39089 | Homepage curation (approved / hidden / featured axes) via moderator-signed labels in the `agora.moderation` namespace, gated by a follow-pack moderator roster |
+| Campaign Moderation | 33863, 34550, 36639, 1985, 39089 | Discovery curation (approved / hidden / featured axes) via moderator-signed labels in the `agora.moderation` namespace, gated by a follow-pack moderator roster. Covers campaigns (all three axes), organizations (hidden + featured), and pledges (hidden + featured). |
 | HD Wallet Derivation | — | BIP-39 mnemonic deterministically derived from the user's nsec via HKDF; seeds a BIP-86 Taproot + BIP-352 silent-payment wallet importable into any BIP-39-compatible wallet (see [Agora HD Wallet](#agora-hd-wallet-derivation) below). |
 
 ### Agora Content Marker
@@ -488,14 +488,15 @@ The `pinnedEvents` array is ordered newest pin first. Pinning an already-pinned 
 
 ### Agora Moderation Labels
 
-Agora curates which kind 33863 campaigns appear on the homepage (`/`) and on the Support directory (`/campaigns/all`), and which kind 34550 organizations appear in the Featured shelf on `/communities`, via moderator-signed NIP-32 label events (kind 1985) in a dedicated label namespace. The labeled event itself is never modified — surfacing is purely a client-side rollup of label events.
+Agora curates which kind 33863 campaigns appear on the homepage (`/`) and on the Support directory (`/campaigns/all`), which kind 34550 organizations appear in the Featured shelf on `/communities`, and which kind 36639 pledges appear in the discovery surfaces on `/pledges`, via moderator-signed NIP-32 label events (kind 1985) in a dedicated label namespace. The labeled event itself is never modified — surfacing is purely a client-side rollup of label events.
 
-Campaigns and organizations share a single label namespace and a single moderator pack (Team Soapbox); the only thing distinguishing the two streams is the kind prefix on the `a` tag of each label:
+Campaigns, organizations, and pledges share a single label namespace and a single moderator pack (Team Soapbox); the only thing distinguishing the three streams is the kind prefix on the `a` tag of each label:
 
 - `33863:<author-pubkey>:<d>` — campaign (kind 33863, see "Open Campaigns" above).
 - `34550:<author-pubkey>:<d>` — organization (kind 34550, NIP-72 community definition).
+- `36639:<author-pubkey>:<d>` — pledge (kind 36639, see "Pledge" below).
 
-A client surfacing campaigns MUST filter folded labels to those whose `a` tag starts with `33863:`. A client surfacing organizations MUST filter to `34550:`. Mixing the two streams would let a moderator's `featured` label on a campaign appear to feature an unrelated organization with the same `d` tag, or vice versa.
+A client surfacing campaigns MUST filter folded labels to those whose `a` tag starts with `33863:`. A client surfacing organizations MUST filter to `34550:`. A client surfacing pledges MUST filter to `36639:`. Mixing the streams would let a moderator's `featured` label on a campaign appear to feature an unrelated pledge with the same `d` tag, or any other cross-surface bleed.
 
 #### Namespace
 
@@ -510,13 +511,13 @@ Each label event carries the namespace twice, per NIP-32:
 
 #### Label values
 
-Three independent axes are defined; the newest moderator-signed label per axis per coordinate wins. **Campaigns** use all three axes (`approval`, `hide`, `featured`). **Organizations** use only two — `hide` and `featured` — because every Agora-tagged organization is publicly visible by default; there is no approval gate for orgs. Moderators MUST NOT publish `approved` or `unapproved` labels against kind 34550 coordinates, and clients MUST ignore any such labels they receive.
+Three independent axes are defined; the newest moderator-signed label per axis per coordinate wins. **Campaigns** use all three axes (`approval`, `hide`, `featured`). **Organizations** and **pledges** use only two — `hide` and `featured` — because every Agora-tagged organization or pledge is publicly visible by default; there is no approval gate. Moderators MUST NOT publish `approved` or `unapproved` labels against kind 34550 or kind 36639 coordinates, and clients MUST ignore any such labels they receive.
 
-| Axis     | Values                    | Surfaces       | Meaning                                                                 |
-|----------|---------------------------|----------------|-------------------------------------------------------------------------|
-| approval | `approved`, `unapproved`  | campaigns only | `approved` allows the campaign on its discovery surfaces. `unapproved` retracts a previous approval. |
-| hide     | `hidden`, `unhidden`      | both           | `hidden` suppresses the campaign/organization everywhere it would otherwise appear. `unhidden` retracts a previous hide. |
-| featured | `featured`, `unfeatured`  | both           | `featured` places the campaign in the hand-picked Featured row on `/`, or the organization in the Featured shelf on `/communities`. `unfeatured` retracts. |
+| Axis     | Values                    | Surfaces                           | Meaning                                                                 |
+|----------|---------------------------|------------------------------------|-------------------------------------------------------------------------|
+| approval | `approved`, `unapproved`  | campaigns only                     | `approved` allows the campaign on its discovery surfaces. `unapproved` retracts a previous approval. |
+| hide     | `hidden`, `unhidden`      | campaigns, organizations, pledges  | `hidden` suppresses the target everywhere it would otherwise appear. `unhidden` retracts a previous hide. |
+| featured | `featured`, `unfeatured`  | campaigns, organizations, pledges  | `featured` places the target in a hand-picked Featured row. `unfeatured` retracts. |
 
 Surfacing rules (hide always wins):
 
@@ -535,6 +536,13 @@ Surfacing rules (hide always wins):
 - **Moderator-only "Needs review"** — iff `t:agora` AND not featured AND not hidden. Surfaces orgs minted through Agora's create flow that haven't been triaged into Featured or Hidden yet.
 - **Moderator-only "Hidden"** — iff hidden.
 - **Hide enforcement on other organization discovery surfaces** — clients SHOULD suppress `hidden` organizations from any future "All organizations" / browse surface for non-moderators. Moderators MAY see hidden organizations with a "Hidden" treatment so they can unhide.
+
+**Pledges**
+
+- **Discovery surfaces on `/pledges`** — non-moderators MUST NOT see `hidden` pledges in the active / upcoming / past sections, the search results grid, or any future browse surface. Moderators MAY opt-in to seeing hidden pledges via a Show-hidden toggle so they can unhide.
+- **Author-own surfaces** — a pledge author's own pledges in their profile always render regardless of moderation state. Moderation governs public discovery, not authorship.
+- **Direct-URL access** — a pledge's detail page (`/<naddr>`) renders regardless of moderation state. Hidden pledges remain reachable by anyone who has the link; moderation only governs which surfaces enumerate them.
+- **Featured** — reserved for a future curated pledge shelf. The `featured` axis is defined for symmetry with campaigns/organizations, and clients MAY use it when implementing such a shelf.
 
 #### Event Structure
 
@@ -566,12 +574,27 @@ An organization label has the same shape with a kind 34550 `a` tag:
 }
 ```
 
+A pledge label has the same shape with a kind 36639 `a` tag:
+
+```json
+{
+  "kind": 1985,
+  "content": "",
+  "tags": [
+    ["L", "agora.moderation"],
+    ["l", "hidden", "agora.moderation"],
+    ["a", "36639:<author-pubkey>:<pledge-d-tag>"],
+    ["alt", "Pledge moderation: hidden"]
+  ]
+}
+```
+
 Required tags:
 
 - `L` set to `agora.moderation`.
 - `l` with the label value as the 2nd element and `agora.moderation` as the 3rd.
-- `a` referencing the target coordinate (`33863:<pubkey>:<d>` for a campaign, `34550:<pubkey>:<d>` for an organization).
-- `alt` (NIP-31) — clients without label support will display this string. The `alt` value SHOULD identify the surface (e.g. `Campaign moderation: featured` or `Organization moderation: featured`) so non-Agora clients can read it.
+- `a` referencing the target coordinate (`33863:<pubkey>:<d>` for a campaign, `34550:<pubkey>:<d>` for an organization, `36639:<pubkey>:<d>` for a pledge).
+- `alt` (NIP-31) — clients without label support will display this string. The `alt` value SHOULD identify the surface (e.g. `Campaign moderation: featured`, `Organization moderation: featured`, or `Pledge moderation: hidden`) so non-Agora clients can read it.
 
 #### Trust Model
 
