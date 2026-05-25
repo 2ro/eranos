@@ -841,7 +841,6 @@
     "seoDescriptionEdit": "Update your fundraising campaign on {{appName}}.",
     "loginGateTitle": "Log in to start a campaign",
     "loginGateBody": "Campaigns are signed Nostr events. You need a Nostr login to publish one.",
-    "goHome": "Go home",
     "invalidEditTitle": "Invalid edit link",
     "invalidEditBody": "This campaign edit link is missing a valid campaign address.",
     "startNewCampaign": "Start a new campaign",

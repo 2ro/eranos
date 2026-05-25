@@ -418,7 +418,6 @@
     "seoDescriptionEdit": "在 {{appName}} 上更新你的募款活动。",
     "loginGateTitle": "登录以发起活动",
     "loginGateBody": "活动是签名的 Nostr 事件。你需要 Nostr 登录才能发布。",
-    "goHome": "返回首页",
     "invalidEditTitle": "编辑链接无效",
     "invalidEditBody": "此活动编辑链接缺少有效的活动地址。",
     "startNewCampaign": "发起一个新活动",

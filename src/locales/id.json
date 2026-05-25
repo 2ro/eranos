@@ -850,7 +850,6 @@
     "seoDescriptionEdit": "Perbarui kampanye penggalangan dana Anda di {{appName}}.",
     "loginGateTitle": "Masuk untuk memulai kampanye",
     "loginGateBody": "Kampanye adalah event Nostr yang ditandatangani. Anda perlu masuk Nostr untuk memublikasikannya.",
-    "goHome": "Ke beranda",
     "invalidEditTitle": "Tautan edit tidak valid",
     "invalidEditBody": "Tautan edit kampanye ini kehilangan alamat kampanye yang valid.",
     "startNewCampaign": "Mulai kampanye baru",

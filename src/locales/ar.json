@@ -406,7 +406,6 @@
     "seoDescriptionEdit": "حدّث حملتك التمويلية على {{appName}}.",
     "loginGateTitle": "سجّل الدخول لبدء حملة",
     "loginGateBody": "الحملات أحداث Nostr موقّعة. تحتاج إلى تسجيل دخول Nostr لنشر حملة.",
-    "goHome": "العودة للصفحة الرئيسية",
     "invalidEditTitle": "رابط تعديل غير صالح",
     "invalidEditBody": "رابط تعديل الحملة هذا لا يحمل عنوان حملة صالحًا.",
     "startNewCampaign": "بدء حملة جديدة",

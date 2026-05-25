@@ -840,7 +840,6 @@
     "seoDescriptionEdit": "Mettez à jour votre campagne de collecte de fonds sur {{appName}}.",
     "loginGateTitle": "Connectez-vous pour démarrer une campagne",
     "loginGateBody": "Les campagnes sont des événements Nostr signés. Vous avez besoin d'une connexion Nostr pour en publier une.",
-    "goHome": "Accueil",
     "invalidEditTitle": "Lien d'édition invalide",
     "invalidEditBody": "Ce lien d'édition de campagne ne contient pas d'adresse de campagne valide.",
     "startNewCampaign": "Démarrer une nouvelle campagne",

@@ -418,7 +418,6 @@
     "seoDescriptionEdit": "Actualiza tu campaña de recaudación en {{appName}}.",
     "loginGateTitle": "Inicia sesión para iniciar una campaña",
     "loginGateBody": "Las campañas son eventos firmados de Nostr. Necesitas una sesión de Nostr para publicar una.",
-    "goHome": "Ir al inicio",
     "invalidEditTitle": "Enlace de edición inválido",
     "invalidEditBody": "Este enlace de edición de campaña no incluye una dirección válida.",
     "startNewCampaign": "Iniciar una campaña nueva",

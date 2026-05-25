@@ -850,7 +850,6 @@
     "seoDescriptionEdit": "{{appName}} पर अपना फंडरेज़िंग कैंपेन अपडेट करें।",
     "loginGateTitle": "कैंपेन शुरू करने के लिए लॉग इन करें",
     "loginGateBody": "कैंपेन साइन किए गए Nostr events हैं। एक पब्लिश करने के लिए Nostr लॉगिन चाहिए।",
-    "goHome": "होम जाएँ",
     "invalidEditTitle": "अमान्य एडिट लिंक",
     "invalidEditBody": "इस कैंपेन एडिट लिंक में मान्य कैंपेन एड्रेस नहीं है।",
     "startNewCampaign": "नया कैंपेन शुरू करें",

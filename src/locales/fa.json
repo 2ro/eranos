@@ -418,7 +418,6 @@
     "seoDescriptionEdit": "کمپین جمع‌آوری مالی‌ات را روی {{appName}} به‌روز کن.",
     "loginGateTitle": "برای شروع کمپین وارد شو",
     "loginGateBody": "کمپین‌ها رویدادهای امضاشدهٔ Nostr هستند. برای انتشار به ورود Nostr نیاز داری.",
-    "goHome": "رفتن به خانه",
     "invalidEditTitle": "پیوند ویرایش نامعتبر",
     "invalidEditBody": "این پیوند ویرایش کمپین نشانی معتبر کمپین را ندارد.",
     "startNewCampaign": "شروع کمپین تازه",

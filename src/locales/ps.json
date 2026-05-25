@@ -418,7 +418,6 @@
     "seoDescriptionEdit": "په {{appName}} کې خپل تمویل کمپاین تازه کړئ.",
     "loginGateTitle": "د کمپاین پیلولو لپاره ننوځئ",
     "loginGateBody": "کمپاینونه د لاسلیک‌شویو Nostr پیښو په توګه دي. د خپرولو لپاره د Nostr ننوتلو ته اړتیا لرئ.",
-    "goHome": "کور ته لاړ شه",
     "invalidEditTitle": "د سمولو ناسم لینک",
     "invalidEditBody": "د دې کمپاین د سمولو لینک د سمې پتې نه لري.",
     "startNewCampaign": "نوی کمپاین پیل کړئ",

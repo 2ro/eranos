@@ -849,7 +849,6 @@
     "seoDescriptionEdit": "{{appName}}'daki fon toplama kampanyanızı güncelleyin.",
     "loginGateTitle": "Kampanya başlatmak için giriş yapın",
     "loginGateBody": "Kampanyalar imzalı Nostr event'leridir. Yayımlamak için bir Nostr girişi gerekir.",
-    "goHome": "Ana sayfaya dön",
     "invalidEditTitle": "Geçersiz düzenleme bağlantısı",
     "invalidEditBody": "Bu kampanya düzenleme bağlantısında geçerli bir kampanya adresi yok.",
     "startNewCampaign": "Yeni bir kampanya başlat",
