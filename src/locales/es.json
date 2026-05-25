@@ -29,6 +29,7 @@
     "searchResultsCount_one": "{{count}} resultado",
     "searchResultsCount_other": "{{count}} resultados",
     "sortAriaLabel": "Orden",
+    "sortDefault": "Predeterminado",
     "sortTop": "Destacadas",
     "sortNew": "Nuevas",
     "showHidden": "Mostrar ocultas",
@@ -182,7 +183,13 @@
       "searchPlaceholder": "Buscar promesas…",
       "searchAriaLabel": "Buscar promesas",
       "noMatch": "Ninguna promesa coincide con «{{query}}»",
-      "noMatchHint": "Prueba con otro término de búsqueda o bórrala."
+      "noMatchHint": "Prueba con otro término de búsqueda o bórrala.",
+      "needsReview": "Pendiente de revisión",
+      "needsReviewDesc": "Promesas de {{appName}} que aún no han sido destacadas ni ocultadas. Súbelas a la sección destacada o suprímelas con Ocultar.",
+      "needsReviewEmpty": "Nada pendiente de revisión.",
+      "hidden": "Ocultas",
+      "hiddenDesc": "Promesas suprimidas del descubrimiento público. Usa el menú de la tarjeta para mostrarlas de nuevo.",
+      "hiddenEmpty": "No hay promesas ocultas actualmente."
     },
     "card": {
       "ended": "Finalizada",
@@ -659,6 +666,31 @@
       "allHiddenHint": "Todas las campañas de la red han sido ocultadas por moderadores. Activa «Mostrar ocultas» para verlas.",
       "empty": "Aún no hay campañas",
       "emptyHint": "Todavía no se ha publicado ninguna campaña. Sé el primero."
+    }
+  },
+  "moderation": {
+    "hiddenBadge": "Oculto",
+    "menu": {
+      "label": "Acciones de moderador",
+      "ariaCampaign": "Moderar campaña",
+      "ariaPledge": "Moderar promesa",
+      "ariaGroup": "Moderar grupo",
+      "failedAction": "No se pudo {{action}}",
+      "approve": "Aprobar",
+      "unapprove": "Desaprobar",
+      "approvedState": "Aprobado",
+      "hide": "Ocultar",
+      "unhide": "Mostrar",
+      "hiddenState": "Oculto",
+      "feature": "Destacar",
+      "unfeature": "Quitar de destacados",
+      "featuredState": "Destacado",
+      "toastApproved": "Aprobado para la página de inicio",
+      "toastUnapproved": "Eliminado de la página de inicio",
+      "toastHidden": "Ocultado",
+      "toastUnhidden": "Restaurado",
+      "toastFeatured": "Destacado",
+      "toastUnfeatured": "Eliminado de destacados"
     }
   },
   "settings": {

@@ -25,6 +25,7 @@
     "donors_one": "{{count}} متبرع",
     "donors_other": "{{count}} متبرعون",
     "sortAriaLabel": "ترتيب الفرز",
+    "sortDefault": "افتراضي",
     "sortTop": "الأبرز",
     "sortNew": "الأحدث",
     "showHidden": "إظهار المخفية",
@@ -174,7 +175,13 @@
       "showMore": "عرض المزيد ({{count}} إضافية)",
       "emptyTitle": "لا توجد تعهدات بعد",
       "emptyHint": "كن أول من ينشئ تعهدًا.",
-      "emptyHintCountry": "كن أول من ينشئ تعهدًا لـ {{country}}."
+      "emptyHintCountry": "كن أول من ينشئ تعهدًا لـ {{country}}.",
+      "needsReview": "بحاجة إلى مراجعة",
+      "needsReviewDesc": "تعهدات {{appName}} التي لم تُميَّز ولم تُخفَ بعد. ارفعها إلى رف المميزة أو أخفِها بزر الإخفاء.",
+      "needsReviewEmpty": "لا شيء بانتظار المراجعة.",
+      "hidden": "مخفية",
+      "hiddenDesc": "تعهدات مُخفاة عن الاكتشاف العام. استخدم قائمة الكباب على البطاقة لإلغاء الإخفاء.",
+      "hiddenEmpty": "لا توجد تعهدات مخفية حاليًا."
     },
     "card": {
       "ended": "منتهية",
@@ -645,6 +652,31 @@
       "emptyHint": "لم تُنشَر أي حملة بعد. كن الأول."
     }
   },
+  "moderation": {
+    "hiddenBadge": "مخفية",
+    "menu": {
+      "label": "إجراءات المشرف",
+      "ariaCampaign": "إدارة الحملة",
+      "ariaPledge": "إدارة التعهد",
+      "ariaGroup": "إدارة المجموعة",
+      "failedAction": "فشل {{action}}",
+      "approve": "اعتماد",
+      "unapprove": "إلغاء الاعتماد",
+      "approvedState": "معتمدة",
+      "hide": "إخفاء",
+      "unhide": "إلغاء الإخفاء",
+      "hiddenState": "مخفية",
+      "feature": "تمييز",
+      "unfeature": "إلغاء التمييز",
+      "featuredState": "مميّزة",
+      "toastApproved": "تم الاعتماد للصفحة الرئيسية",
+      "toastUnapproved": "أُزيلت من الصفحة الرئيسية",
+      "toastHidden": "تم الإخفاء",
+      "toastUnhidden": "تم إلغاء الإخفاء",
+      "toastFeatured": "تم التمييز",
+      "toastUnfeatured": "أُزيلت من المميزة"
+    }
+  },
   "settings": {
     "title": "الإعدادات",
     "description": "إدارة إعدادات {{appName}} الخاصة بك",
@@ -771,7 +803,7 @@
       "scanForNew": "فحص المدفوعات الجديدة",
       "scanForPayments": "فحص المدفوعات"
     },
-     "tx": {
+    "tx": {
       "pending": "قيد المعالجة",
       "today": "اليوم",
       "yesterday": "الأمس",
@@ -1986,10 +2018,18 @@
   },
   "faq": {
     "categories": {
-      "getting-started": { "label": "عن Agora" },
-      "payments": { "label": "تبرعات البيتكوين على Agora" },
-      "about-nostr": { "label": "عن Nostr" },
-      "legacy": { "label": "محتوى قديم" }
+      "getting-started": {
+        "label": "عن Agora"
+      },
+      "payments": {
+        "label": "تبرعات البيتكوين على Agora"
+      },
+      "about-nostr": {
+        "label": "عن Nostr"
+      },
+      "legacy": {
+        "label": "محتوى قديم"
+      }
     },
     "items": {
       "what-is-ditto": {

@@ -29,6 +29,7 @@
     "searchResultsCount_one": "{{count}} परिणाम",
     "searchResultsCount_other": "{{count}} परिणाम",
     "sortAriaLabel": "क्रम",
+    "sortDefault": "डिफ़ॉल्ट",
     "sortTop": "टॉप",
     "sortNew": "नए",
     "showHidden": "छुपे हुए दिखाएँ",
@@ -222,9 +223,18 @@
       "unknown": "अज्ञात"
     },
     "kindHeader": {
-      "photo": { "action": "ने शेयर की एक", "noun": "फ़ोटो" },
-      "encryptedMessage": { "action": "ने भेजा एक", "noun": "एन्क्रिप्टेड मैसेज" },
-      "letter": { "action": "ने भेजी एक", "noun": "चिट्ठी" },
+      "photo": {
+        "action": "ने शेयर की एक",
+        "noun": "फ़ोटो"
+      },
+      "encryptedMessage": {
+        "action": "ने भेजा एक",
+        "noun": "एन्क्रिप्टेड मैसेज"
+      },
+      "letter": {
+        "action": "ने भेजी एक",
+        "noun": "चिट्ठी"
+      },
       "treasureHidCreated": "ने छुपाया एक",
       "treasureHidUpdated": "ने अपडेट किया एक",
       "treasureNoun": "ख़ज़ाना",
@@ -605,7 +615,13 @@
       "searchPlaceholder": "प्लेज खोजें…",
       "searchAriaLabel": "प्लेज खोजें",
       "noMatch": "“{{query}}” से मेल खाने वाला कोई प्लेज नहीं",
-      "noMatchHint": "अलग खोज शब्द आज़माएँ, या खोज साफ़ करें।"
+      "noMatchHint": "अलग खोज शब्द आज़माएँ, या खोज साफ़ करें।",
+      "needsReview": "समीक्षा की ज़रूरत",
+      "needsReviewDesc": "{{appName}} प्लेज जिन्हें अभी फ़ीचर या छुपाया नहीं गया है। किसी एक को Featured shelf में लाएँ या Hide से दबा दें।",
+      "needsReviewEmpty": "समीक्षा का इंतज़ार में कुछ नहीं।",
+      "hidden": "छुपा हुआ",
+      "hiddenDesc": "सार्वजनिक खोज से दबाए गए प्लेज। कार्ड के kebab मेन्यू से अनहाइड करें।",
+      "hiddenEmpty": "अभी कोई प्लेज छुपा हुआ नहीं है।"
     },
     "card": {
       "ended": "समाप्त",
@@ -1082,6 +1098,31 @@
       "allHiddenHint": "नेटवर्क पर हर कैंपेन मॉडरेटरों ने छुपा रखा है। उन्हें देखने के लिए “छुपे हुए दिखाएँ” टॉगल करें।",
       "empty": "अभी कोई कैंपेन नहीं",
       "emptyHint": "अभी कोई कैंपेन पब्लिश नहीं हुआ है। पहले बनें।"
+    }
+  },
+  "moderation": {
+    "hiddenBadge": "छुपा हुआ",
+    "menu": {
+      "label": "मॉडरेटर कार्रवाइयाँ",
+      "ariaCampaign": "कैंपेन मॉडरेट करें",
+      "ariaPledge": "प्लेज मॉडरेट करें",
+      "ariaGroup": "ग्रुप मॉडरेट करें",
+      "failedAction": "{{action}} नहीं हो सका",
+      "approve": "मंज़ूरी दें",
+      "unapprove": "मंज़ूरी हटाएँ",
+      "approvedState": "मंज़ूर",
+      "hide": "छुपाएँ",
+      "unhide": "अनहाइड करें",
+      "hiddenState": "छुपा हुआ",
+      "feature": "फ़ीचर करें",
+      "unfeature": "फ़ीचर से हटाएँ",
+      "featuredState": "फ़ीचर्ड",
+      "toastApproved": "होमपेज के लिए मंज़ूरी दी गई",
+      "toastUnapproved": "होमपेज से हटाया गया",
+      "toastHidden": "छुपा दिया गया",
+      "toastUnhidden": "अनहाइड कर दिया गया",
+      "toastFeatured": "फ़ीचर कर दिया गया",
+      "toastUnfeatured": "फ़ीचर से हटाया गया"
     }
   },
   "settings": {
@@ -1929,10 +1970,18 @@
   },
   "faq": {
     "categories": {
-      "getting-started": { "label": "Agora के बारे में" },
-      "payments": { "label": "Agora पर Bitcoin डोनेशन" },
-      "about-nostr": { "label": "Nostr के बारे में" },
-      "legacy": { "label": "Legacy" }
+      "getting-started": {
+        "label": "Agora के बारे में"
+      },
+      "payments": {
+        "label": "Agora पर Bitcoin डोनेशन"
+      },
+      "about-nostr": {
+        "label": "Nostr के बारे में"
+      },
+      "legacy": {
+        "label": "Legacy"
+      }
     },
     "items": {
       "what-is-ditto": {

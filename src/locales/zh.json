@@ -29,6 +29,7 @@
     "searchResultsCount_one": "{{count}} 个结果",
     "searchResultsCount_other": "{{count}} 个结果",
     "sortAriaLabel": "排序",
+    "sortDefault": "默认",
     "sortTop": "热门",
     "sortNew": "最新",
     "showHidden": "显示已隐藏",
@@ -182,7 +183,13 @@
       "searchPlaceholder": "搜索悬赏…",
       "searchAriaLabel": "搜索悬赏",
       "noMatch": "没有悬赏匹配「{{query}}」",
-      "noMatchHint": "尝试其他搜索词，或清除搜索。"
+      "noMatchHint": "尝试其他搜索词，或清除搜索。",
+      "needsReview": "待审核",
+      "needsReviewDesc": "尚未被推荐或隐藏的 {{appName}} 悬赏。把它们提升到精选栏，或用「隐藏」抑制。",
+      "needsReviewEmpty": "没有待审核的内容。",
+      "hidden": "已隐藏",
+      "hiddenDesc": "从公开发现中抑制的悬赏。使用卡片上的菜单取消隐藏。",
+      "hiddenEmpty": "目前没有隐藏的悬赏。"
     },
     "card": {
       "ended": "已结束",
@@ -661,6 +668,31 @@
       "emptyHint": "尚未发布任何活动。来当第一个吧。"
     }
   },
+  "moderation": {
+    "hiddenBadge": "已隐藏",
+    "menu": {
+      "label": "版主操作",
+      "ariaCampaign": "管理活动",
+      "ariaPledge": "管理悬赏",
+      "ariaGroup": "管理群组",
+      "failedAction": "操作失败：{{action}}",
+      "approve": "批准",
+      "unapprove": "取消批准",
+      "approvedState": "已批准",
+      "hide": "隐藏",
+      "unhide": "取消隐藏",
+      "hiddenState": "已隐藏",
+      "feature": "精选",
+      "unfeature": "取消精选",
+      "featuredState": "已精选",
+      "toastApproved": "已批准至首页",
+      "toastUnapproved": "已从首页移除",
+      "toastHidden": "已隐藏",
+      "toastUnhidden": "已取消隐藏",
+      "toastFeatured": "已精选",
+      "toastUnfeatured": "已从精选移除"
+    }
+  },
   "settings": {
     "title": "设置",
     "description": "管理你的 {{appName}} 设置",
@@ -787,7 +819,7 @@
       "scanForNew": "扫描新支付",
       "scanForPayments": "扫描支付"
     },
-     "tx": {
+    "tx": {
       "pending": "待确认",
       "today": "今天",
       "yesterday": "昨天",
@@ -2002,10 +2034,18 @@
   },
   "faq": {
     "categories": {
-      "getting-started": { "label": "关于 Agora" },
-      "payments": { "label": "在 Agora 上的比特币捐款" },
-      "about-nostr": { "label": "关于 Nostr" },
-      "legacy": { "label": "遗留内容" }
+      "getting-started": {
+        "label": "关于 Agora"
+      },
+      "payments": {
+        "label": "在 Agora 上的比特币捐款"
+      },
+      "about-nostr": {
+        "label": "关于 Nostr"
+      },
+      "legacy": {
+        "label": "遗留内容"
+      }
     },
     "items": {
       "what-is-ditto": {

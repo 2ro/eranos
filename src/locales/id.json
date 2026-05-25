@@ -29,6 +29,7 @@
     "searchResultsCount_one": "{{count}} hasil",
     "searchResultsCount_other": "{{count}} hasil",
     "sortAriaLabel": "Urutan",
+    "sortDefault": "Bawaan",
     "sortTop": "Teratas",
     "sortNew": "Baru",
     "showHidden": "Tampilkan yang tersembunyi",
@@ -614,7 +615,13 @@
       "searchPlaceholder": "Cari ikrar…",
       "searchAriaLabel": "Cari ikrar",
       "noMatch": "Tidak ada ikrar yang cocok dengan “{{query}}”",
-      "noMatchHint": "Coba kata pencarian lain, atau bersihkan pencarian."
+      "noMatchHint": "Coba kata pencarian lain, atau bersihkan pencarian.",
+      "needsReview": "Perlu ditinjau",
+      "needsReviewDesc": "Ikrar {{appName}} yang belum diunggulkan atau disembunyikan. Naikkan ke rak Unggulan atau sembunyikan dengan Hide.",
+      "needsReviewEmpty": "Tidak ada yang menunggu peninjauan.",
+      "hidden": "Tersembunyi",
+      "hiddenDesc": "Ikrar yang disembunyikan dari penemuan publik. Gunakan menu kebab pada kartu untuk menampilkannya kembali.",
+      "hiddenEmpty": "Tidak ada ikrar yang sedang disembunyikan."
     },
     "card": {
       "ended": "Berakhir",
@@ -1091,6 +1098,31 @@
       "allHiddenHint": "Setiap kampanye di jaringan telah disembunyikan oleh moderator. Aktifkan “Tampilkan yang tersembunyi” untuk melihatnya.",
       "empty": "Belum ada kampanye",
       "emptyHint": "Belum ada kampanye yang dipublikasikan. Jadilah yang pertama."
+    }
+  },
+  "moderation": {
+    "hiddenBadge": "Tersembunyi",
+    "menu": {
+      "label": "Tindakan moderator",
+      "ariaCampaign": "Moderasi kampanye",
+      "ariaPledge": "Moderasi ikrar",
+      "ariaGroup": "Moderasi grup",
+      "failedAction": "Gagal {{action}}",
+      "approve": "Setujui",
+      "unapprove": "Batalkan persetujuan",
+      "approvedState": "Disetujui",
+      "hide": "Sembunyikan",
+      "unhide": "Tampilkan kembali",
+      "hiddenState": "Tersembunyi",
+      "feature": "Unggulkan",
+      "unfeature": "Batalkan unggulan",
+      "featuredState": "Diunggulkan",
+      "toastApproved": "Disetujui untuk beranda",
+      "toastUnapproved": "Dihapus dari beranda",
+      "toastHidden": "Disembunyikan",
+      "toastUnhidden": "Ditampilkan kembali",
+      "toastFeatured": "Diunggulkan",
+      "toastUnfeatured": "Dihapus dari unggulan"
     }
   },
   "settings": {

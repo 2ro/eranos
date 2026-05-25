@@ -29,6 +29,7 @@
     "searchResultsCount_one": "{{count}} نتیجه",
     "searchResultsCount_other": "{{count}} نتیجه",
     "sortAriaLabel": "ترتیب",
+    "sortDefault": "پیش‌فرض",
     "sortTop": "برتر",
     "sortNew": "جدید",
     "showHidden": "نمایش پنهان‌شده‌ها",
@@ -182,7 +183,13 @@
       "searchPlaceholder": "جستجوی تعهدها…",
       "searchAriaLabel": "جستجوی تعهدها",
       "noMatch": "هیچ تعهدی با «{{query}}» مطابقت ندارد",
-      "noMatchHint": "عبارت جستجوی دیگری را امتحان کنید، یا جستجو را پاک کنید."
+      "noMatchHint": "عبارت جستجوی دیگری را امتحان کنید، یا جستجو را پاک کنید.",
+      "needsReview": "نیازمند بررسی",
+      "needsReviewDesc": "تعهدهای {{appName}} که هنوز ویژه یا پنهان نشده‌اند. آن‌ها را به قفسهٔ ویژه ببر یا با پنهان‌سازی سرکوب کن.",
+      "needsReviewEmpty": "چیزی منتظر بررسی نیست.",
+      "hidden": "پنهان",
+      "hiddenDesc": "تعهدهای پنهان‌شده از کشف عمومی. از منوی کبابی روی کارت برای آشکارسازی استفاده کن.",
+      "hiddenEmpty": "در حال حاضر تعهد پنهانی وجود ندارد."
     },
     "card": {
       "ended": "پایان‌یافته",
@@ -661,6 +668,31 @@
       "emptyHint": "هنوز هیچ کمپینی منتشر نشده است. اولین نفر باشید."
     }
   },
+  "moderation": {
+    "hiddenBadge": "پنهان",
+    "menu": {
+      "label": "اقدامات ناظر",
+      "ariaCampaign": "نظارت بر کمپین",
+      "ariaPledge": "نظارت بر تعهد",
+      "ariaGroup": "نظارت بر گروه",
+      "failedAction": "{{action}} ناموفق بود",
+      "approve": "تأیید",
+      "unapprove": "لغو تأیید",
+      "approvedState": "تأییدشده",
+      "hide": "پنهان کردن",
+      "unhide": "آشکار کردن",
+      "hiddenState": "پنهان",
+      "feature": "ویژه کردن",
+      "unfeature": "لغو ویژه‌سازی",
+      "featuredState": "ویژه",
+      "toastApproved": "برای صفحه اصلی تأیید شد",
+      "toastUnapproved": "از صفحه اصلی حذف شد",
+      "toastHidden": "پنهان شد",
+      "toastUnhidden": "آشکار شد",
+      "toastFeatured": "ویژه شد",
+      "toastUnfeatured": "از فهرست ویژه‌ها حذف شد"
+    }
+  },
   "settings": {
     "title": "تنظیمات",
     "description": "مدیریت تنظیمات {{appName}} شما",
@@ -787,7 +819,7 @@
       "scanForNew": "پویش پرداخت‌های جدید",
       "scanForPayments": "پویش پرداخت‌ها"
     },
-     "tx": {
+    "tx": {
       "pending": "در انتظار",
       "today": "امروز",
       "yesterday": "دیروز",
@@ -2002,10 +2034,18 @@
   },
   "faq": {
     "categories": {
-      "getting-started": { "label": "دربارهٔ Agora" },
-      "payments": { "label": "اهدای بیت‌کوین در Agora" },
-      "about-nostr": { "label": "دربارهٔ Nostr" },
-      "legacy": { "label": "محتوای پیشین" }
+      "getting-started": {
+        "label": "دربارهٔ Agora"
+      },
+      "payments": {
+        "label": "اهدای بیت‌کوین در Agora"
+      },
+      "about-nostr": {
+        "label": "دربارهٔ Nostr"
+      },
+      "legacy": {
+        "label": "محتوای پیشین"
+      }
     },
     "items": {
       "what-is-ditto": {

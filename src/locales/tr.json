@@ -614,7 +614,13 @@
       "searchPlaceholder": "Taahhüt ara\u2026",
       "searchAriaLabel": "Taahhütleri ara",
       "noMatch": "\u201c{{query}}\u201d ile eşleşen taahhüt yok",
-      "noMatchHint": "Farklı bir arama terimi deneyin ya da aramayı temizleyin."
+      "noMatchHint": "Farklı bir arama terimi deneyin ya da aramayı temizleyin.",
+      "needsReview": "İncelemeyi bekliyor",
+      "needsReviewDesc": "Henüz öne çıkarılmamış veya gizlenmemiş {{appName}} taahhütleri. Birini Öne Çıkan rafına yükseltin ya da Gizle ile gizleyin.",
+      "needsReviewEmpty": "İncelemeyi bekleyen bir şey yok.",
+      "hidden": "Gizli",
+      "hiddenDesc": "Herkese açık keşiften gizlenmiş taahhütler. Gizliliği kaldırmak için karttaki kebap menüsünü kullanın.",
+      "hiddenEmpty": "Şu anda gizlenmiş taahhüt yok."
     },
     "card": {
       "ended": "Bitti",
@@ -1091,6 +1097,31 @@
       "heroBody": "Nostr'da yayımlanan her bağış kampanyası tek bir yerde toplandı. Ağın tamamına göz atın, sizin için önemli bir dava bulun ve doğrudan Bitcoin ile destekleyin.",
       "campaignsCount_one": "ağdaki kampanya",
       "campaignsCount_other": "ağdaki kampanya"
+    }
+  },
+  "moderation": {
+    "hiddenBadge": "Gizli",
+    "menu": {
+      "label": "Moderatör işlemleri",
+      "ariaCampaign": "Kampanyayı modere et",
+      "ariaPledge": "Taahhüdü modere et",
+      "ariaGroup": "Grubu modere et",
+      "failedAction": "{{action}} başarısız oldu",
+      "approve": "Onayla",
+      "unapprove": "Onayı kaldır",
+      "approvedState": "Onaylandı",
+      "hide": "Gizle",
+      "unhide": "Gizlemeyi kaldır",
+      "hiddenState": "Gizli",
+      "feature": "Öne çıkar",
+      "unfeature": "Öne çıkarmayı kaldır",
+      "featuredState": "Öne çıkarıldı",
+      "toastApproved": "Ana sayfa için onaylandı",
+      "toastUnapproved": "Ana sayfadan kaldırıldı",
+      "toastHidden": "Gizlendi",
+      "toastUnhidden": "Gizleme kaldırıldı",
+      "toastFeatured": "Öne çıkarıldı",
+      "toastUnfeatured": "Öne çıkanlardan kaldırıldı"
     }
   },
   "settings": {

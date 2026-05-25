@@ -2,19 +2,14 @@ import { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useSeoMeta } from '@unhead/react';
 import { Trans, useTranslation } from 'react-i18next';
-import { ArrowRight, ChevronDown, EyeOff, HandHeart, Hourglass, PlusCircle, ShieldCheck } from 'lucide-react';
+import { ArrowRight, EyeOff, HandHeart, Hourglass, PlusCircle, ShieldCheck } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from '@/components/ui/collapsible';
 import { CampaignCard, CampaignCardSkeleton } from '@/components/CampaignCard';
 import { DiscoverySearchToolbar } from '@/components/DiscoverySearchToolbar';
 import { HeroLightningMap } from '@/components/HeroLightningMap';
-import { cn } from '@/lib/utils';
+import { ModeratorCollapsibleSection } from '@/components/moderation';
 import { useCampaigns } from '@/hooks/useCampaigns';
 import { useCampaignModeration } from '@/hooks/useCampaignModeration';
 import { useCampaignModerators } from '@/hooks/useCampaignModerators';
@@ -146,15 +141,20 @@ export function CampaignsPage() {
     );
   }, [isMod, user, moderation, ownCampaigns]);
 
-  // On-page NIP-50 search + sort + show-hidden toolbar state. Empty
-  // input + `new` sort falls back to the curated home layout below;
-  // anything else (typed query, or "Top" sort with an empty input)
-  // swaps the body for a flat results grid restricted to kind 33863.
-  // The search itself is pinned to the Ditto relay group via
-  // `useNip50Search` so non-NIP-50 relays in the user's pool can't
-  // drown out the result set.
+  // On-page NIP-50 search + sort + show-hidden toolbar state.
+  //
+  //   Default sort, empty query → curated home layout (featured / my /
+  //     community sections below).
+  //   Default sort, with query  → relay searches kind 33863, results are
+  //     post-filtered client-side against title/summary/content.
+  //   Top / New sort             → always active. Top sends `sort:top`;
+  //     New sends a raw chronological feed of the kind.
+  //
+  // The search is pinned to the Ditto relay group via `useNip50Search`
+  // so non-NIP-50 relays in the user's pool can't drown out the result
+  // set.
   const [searchInput, setSearchInput] = useState('');
-  const [sortMode, setSortMode] = useState<Nip50Sort>('new');
+  const [sortMode, setSortMode] = useState<Nip50Sort>('default');
   const [showHidden, setShowHidden] = useState(false);
   const debouncedSearch = useDebounce(searchInput, 300);
   const trimmedSearch = debouncedSearch.trim();
@@ -167,6 +167,15 @@ export function CampaignsPage() {
     query: debouncedSearch,
     sort: sortMode,
     parse: parseCampaign,
+    // Most relay NIP-50 indexers only match against `content`, so titles
+    // and summaries (which live in tags) get dropped. Widen the net
+    // client-side by also matching against the `title` and `summary`
+    // tag values.
+    getKeywordHaystack: (event) => {
+      const title = event.tags.find(([n]) => n === 'title')?.[1] ?? '';
+      const summary = event.tags.find(([n]) => n === 'summary')?.[1] ?? '';
+      return [title, summary, event.content];
+    },
   });
 
   // Filter hidden campaigns out of the search results unless the user
@@ -332,7 +341,11 @@ export function CampaignsPage() {
             <div className="flex items-end justify-between gap-4">
               <div>
                 <h2 className="text-2xl sm:text-3xl font-bold tracking-tight">
-                  {trimmedSearch ? t('common.search') : t('common.sortTop')}
+                  {trimmedSearch
+                    ? t('common.search')
+                    : sortMode === 'top'
+                      ? t('common.sortTop')
+                      : t('common.sortNew')}
                 </h2>
                 {searchHits && (
                   <p className="text-sm text-muted-foreground mt-1">
@@ -438,28 +451,40 @@ export function CampaignsPage() {
 
         {/* Moderator-only: campaigns awaiting an approval decision. */}
         {isMod && (
-          <ModeratorSection
+          <ModeratorCollapsibleSection
             icon={<Hourglass className="size-4" />}
             title={t('campaigns.home.pending')}
             description={t('campaigns.home.pendingDesc')}
             count={pendingCampaigns.length}
-            campaigns={pendingCampaigns}
             isLoading={allLoading}
             emptyText={t('campaigns.home.pendingEmpty')}
-          />
+            skeleton={<CampaignGridSkeleton />}
+          >
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+              {pendingCampaigns.map((campaign) => (
+                <CampaignCard key={campaign.aTag} campaign={campaign} />
+              ))}
+            </div>
+          </ModeratorCollapsibleSection>
         )}
 
         {/* Moderator-only: campaigns currently hidden. */}
         {isMod && (
-          <ModeratorSection
+          <ModeratorCollapsibleSection
             icon={<EyeOff className="size-4" />}
             title={t('campaigns.home.hidden')}
             description={t('campaigns.home.hiddenDesc')}
             count={hiddenCampaigns.length}
-            campaigns={hiddenCampaigns}
             isLoading={allLoading}
             emptyText={t('campaigns.home.hiddenEmpty')}
-          />
+            skeleton={<CampaignGridSkeleton />}
+          >
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+              {hiddenCampaigns.map((campaign) => (
+                <CampaignCard key={campaign.aTag} campaign={campaign} />
+              ))}
+            </div>
+          </ModeratorCollapsibleSection>
         )}
 
         {/* Non-mod creator: surface their own not-yet-approved campaigns
@@ -486,77 +511,6 @@ export function CampaignsPage() {
       </div>
       )}
     </main>
-  );
-}
-
-/**
- * Collapsible moderator-only section listing campaigns in a particular
- * moderation state (pending / hidden). Defaults to expanded when the list
- * is short, collapsed otherwise.
- */
-function ModeratorSection({
-  icon,
-  title,
-  description,
-  count,
-  campaigns,
-  isLoading,
-  emptyText,
-}: {
-  icon: React.ReactNode;
-  title: string;
-  description: string;
-  count: number;
-  campaigns: ParsedCampaign[];
-  isLoading: boolean;
-  emptyText: string;
-}) {
-  const [open, setOpen] = useState(count <= 6);
-
-  return (
-    <Collapsible open={open} onOpenChange={setOpen} asChild>
-      <section className="space-y-5">
-        <CollapsibleTrigger asChild>
-          <button
-            type="button"
-            className="flex w-full items-end justify-between gap-4 rounded-lg text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
-          >
-            <div>
-              <h2 className="text-2xl sm:text-3xl font-bold tracking-tight inline-flex items-center gap-2">
-                <span className="text-muted-foreground">{icon}</span>
-                {title}
-                <span className="text-base font-medium text-muted-foreground">({count})</span>
-              </h2>
-              <p className="text-sm text-muted-foreground mt-1 max-w-2xl">{description}</p>
-            </div>
-            <ChevronDown
-              className={cn(
-                'size-5 text-muted-foreground motion-safe:transition-transform shrink-0',
-                open && 'rotate-180',
-              )}
-              aria-hidden
-            />
-          </button>
-        </CollapsibleTrigger>
-        <CollapsibleContent>
-          {isLoading && campaigns.length === 0 ? (
-            <CampaignGridSkeleton />
-          ) : campaigns.length === 0 ? (
-            <Card className="border-dashed">
-              <CardContent className="py-8 text-center text-sm text-muted-foreground">
-                {emptyText}
-              </CardContent>
-            </Card>
-          ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
-              {campaigns.map((campaign) => (
-                <CampaignCard key={campaign.aTag} campaign={campaign} />
-              ))}
-            </div>
-          )}
-        </CollapsibleContent>
-      </section>
-    </Collapsible>
   );
 }
 

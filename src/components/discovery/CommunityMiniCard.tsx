@@ -3,7 +3,7 @@ import { Users } from 'lucide-react';
 import { nip19 } from 'nostr-tools';
 
 import { AuthorByline } from '@/components/AuthorByline';
-import { CommunityModerationOverlay } from '@/components/CommunityModerationMenu';
+import { ModerationOverlay } from '@/components/moderation';
 import { Card } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useEventTranslation } from '@/hooks/useEventTranslation';
@@ -88,7 +88,12 @@ export function CommunityMiniCard({ community, className }: CommunityMiniCardPro
               non-moderators, which is why this component owns the
               `useOrganizationModeration` subscription rather than the
               card — keeps non-mod grids free of the heavy label query. */}
-          <CommunityModerationOverlay coord={community.aTag} organizationName={community.name} />
+          <ModerationOverlay
+            coord={community.aTag}
+            entityTitle={community.name}
+            surface="group"
+            axes={['hide', 'featured']}
+          />
         </div>
         <div className="flex flex-col gap-2 p-3.5 flex-1">
           <h3 className="font-semibold leading-tight text-sm tracking-tight line-clamp-1">

@@ -2,17 +2,15 @@ import { useMemo } from 'react';
 import type { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
-import { CalendarClock, EyeOff, HandHeart, MapPin, ShieldCheck } from 'lucide-react';
+import { CalendarClock, HandHeart, MapPin, ShieldCheck } from 'lucide-react';
 
 import { AuthorByline } from '@/components/AuthorByline';
-import { Badge } from '@/components/ui/badge';
 import { Card } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { Skeleton } from '@/components/ui/skeleton';
-import { CampaignModerationMenu } from '@/components/CampaignModerationMenu';
+import { ModerationOverlay } from '@/components/moderation';
 import { useBtcPrice } from '@/hooks/useBtcPrice';
 import { useCampaignDonations } from '@/hooks/useCampaignDonations';
-import { useCampaignModeration } from '@/hooks/useCampaignModeration';
 import { useEventTranslation } from '@/hooks/useEventTranslation';
 import {
   type ParsedCampaign,
@@ -150,7 +148,6 @@ export function CampaignCard({ campaign, variant = 'compact', className, footerB
   const displayCampaign = parseCampaign(translatedEvent) ?? campaign;
   const { data: stats } = useCampaignDonations(campaign);
   const { data: btcPrice } = useBtcPrice();
-  const { data: moderation } = useCampaignModeration();
 
   const naddr = useMemo(() => encodeCampaignNaddr(campaign), [campaign]);
   const cover = sanitizeUrl(displayCampaign.banner);
@@ -163,9 +160,6 @@ export function CampaignCard({ campaign, variant = 'compact', className, footerB
 
   const isFeaturedVariant = variant === 'featured';
   const isShelfVariant = variant === 'shelf';
-  const isApproved = moderation.approvedCoords.has(campaign.aTag);
-  const isHidden = moderation.hiddenCoords.has(campaign.aTag);
-  const isFeatured = moderation.featuredCoords.has(campaign.aTag);
 
   return (
     <Link
@@ -244,24 +238,14 @@ export function CampaignCard({ campaign, variant = 'compact', className, footerB
             </div>
           )}
 
-          <div className="absolute top-3 right-3 z-10 flex items-center gap-2">
-            {isHidden && (
-              <Badge
-                variant="secondary"
-                className="backdrop-blur bg-destructive/15 text-destructive border-destructive/30"
-              >
-                <EyeOff className="size-3.5 mr-1" />
-                Hidden
-              </Badge>
-            )}
-            <CampaignModerationMenu
-              coord={campaign.aTag}
-              campaignTitle={campaign.title}
-              isApproved={isApproved}
-              isHidden={isHidden}
-              isFeatured={isFeatured}
-            />
-          </div>
+          <ModerationOverlay
+            coord={campaign.aTag}
+            entityTitle={campaign.title}
+            surface="campaign"
+            axes={['approval', 'hide', 'featured']}
+            badgeSize="default"
+            className="absolute top-3 right-3 z-10 flex items-center gap-2"
+          />
         </div>
 
         {/* Body — deterministic structure: title (1 line, truncates) →

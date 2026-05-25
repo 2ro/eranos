@@ -29,6 +29,7 @@
     "searchResultsCount_one": "{{count}} 個結果",
     "searchResultsCount_other": "{{count}} 個結果",
     "sortAriaLabel": "排序方式",
+    "sortDefault": "預設",
     "sortTop": "熱門",
     "sortNew": "最新",
     "showHidden": "顯示已隱藏",
@@ -182,7 +183,13 @@
       "searchPlaceholder": "搜尋懸賞…",
       "searchAriaLabel": "搜尋懸賞",
       "noMatch": "沒有懸賞符合「{{query}}」",
-      "noMatchHint": "請嘗試不同的搜尋字詞,或清除搜尋。"
+      "noMatchHint": "請嘗試不同的搜尋字詞,或清除搜尋。",
+      "needsReview": "待稽核",
+      "needsReviewDesc": "尚未被推薦或隱藏的 {{appName}} 懸賞。把它們提升到精選欄，或用「隱藏」抑制。",
+      "needsReviewEmpty": "沒有待稽核的內容。",
+      "hidden": "已隱藏",
+      "hiddenDesc": "從公開發現中抑制的懸賞。使用卡片上的選單取消隱藏。",
+      "hiddenEmpty": "目前沒有隱藏的懸賞。"
     },
     "card": {
       "ended": "已結束",
@@ -659,6 +666,31 @@
       "allHiddenHint": "網路上的所有活動都已被版主隱藏。開啟「顯示已隱藏」即可檢視。",
       "empty": "暫無活動",
       "emptyHint": "尚未釋出任何活動。來當第一個吧。"
+    }
+  },
+  "moderation": {
+    "hiddenBadge": "已隱藏",
+    "menu": {
+      "label": "版主動作",
+      "ariaCampaign": "管理活動",
+      "ariaPledge": "管理懸賞",
+      "ariaGroup": "管理群組",
+      "failedAction": "無法{{action}}",
+      "approve": "批准",
+      "unapprove": "取消批准",
+      "approvedState": "已批准",
+      "hide": "隱藏",
+      "unhide": "取消隱藏",
+      "hiddenState": "已隱藏",
+      "feature": "推薦精選",
+      "unfeature": "取消精選",
+      "featuredState": "已精選",
+      "toastApproved": "已批准顯示於首頁",
+      "toastUnapproved": "已自首頁移除",
+      "toastHidden": "已隱藏",
+      "toastUnhidden": "已取消隱藏",
+      "toastFeatured": "已加入精選",
+      "toastUnfeatured": "已自精選移除"
     }
   },
   "settings": {

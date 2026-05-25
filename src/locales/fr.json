@@ -605,7 +605,13 @@
       "searchPlaceholder": "Rechercher des promesses…",
       "searchAriaLabel": "Rechercher des promesses",
       "noMatch": "Aucune promesse ne correspond à « {{query}} »",
-      "noMatchHint": "Essayez un autre terme de recherche, ou effacez la recherche."
+      "noMatchHint": "Essayez un autre terme de recherche, ou effacez la recherche.",
+      "needsReview": "À examiner",
+      "needsReviewDesc": "Promesses {{appName}} qui n'ont pas encore été mises en avant ou masquées. Élevez-en une dans la sélection Mises en avant ou masquez-la.",
+      "needsReviewEmpty": "Rien en attente d'examen.",
+      "hidden": "Masquées",
+      "hiddenDesc": "Promesses supprimées de la découverte publique. Utilisez le menu en kebab d'une carte pour les démasquer.",
+      "hiddenEmpty": "Aucune promesse n'est actuellement masquée."
     },
     "card": {
       "ended": "Terminée",
@@ -1082,6 +1088,31 @@
       "allHiddenHint": "Toutes les campagnes du réseau ont été masquées par les modérateurs. Activez « Afficher les masquées » pour les voir.",
       "empty": "Aucune campagne pour l'instant",
       "emptyHint": "Aucune campagne n'a encore été publiée. Soyez le premier."
+    }
+  },
+  "moderation": {
+    "hiddenBadge": "Masquée",
+    "menu": {
+      "label": "Actions de modération",
+      "ariaCampaign": "Modérer la campagne",
+      "ariaPledge": "Modérer la promesse",
+      "ariaGroup": "Modérer le groupe",
+      "failedAction": "Échec de l'action {{action}}",
+      "approve": "Approuver",
+      "unapprove": "Désapprouver",
+      "approvedState": "Approuvée",
+      "hide": "Masquer",
+      "unhide": "Démasquer",
+      "hiddenState": "Masquée",
+      "feature": "Mettre en avant",
+      "unfeature": "Retirer de la sélection",
+      "featuredState": "Mise en avant",
+      "toastApproved": "Approuvée pour la page d'accueil",
+      "toastUnapproved": "Retirée de la page d'accueil",
+      "toastHidden": "Masquée",
+      "toastUnhidden": "Démasquée",
+      "toastFeatured": "Mise en avant",
+      "toastUnfeatured": "Retirée de la sélection"
     }
   },
   "settings": {

@@ -29,6 +29,7 @@
     "searchResultsCount_one": "{{count}} результат",
     "searchResultsCount_other": "{{count}} результатов",
     "sortAriaLabel": "Порядок сортировки",
+    "sortDefault": "По умолчанию",
     "sortTop": "Топ",
     "sortNew": "Новые",
     "showHidden": "Показать скрытые",
@@ -222,9 +223,18 @@
       "unknown": "НЕИЗВЕСТНО"
     },
     "kindHeader": {
-      "photo": { "action": "поделился(ась)", "noun": "фото" },
-      "encryptedMessage": { "action": "отправил(а)", "noun": "зашифрованное сообщение" },
-      "letter": { "action": "отправил(а)", "noun": "письмо" },
+      "photo": {
+        "action": "поделился(ась)",
+        "noun": "фото"
+      },
+      "encryptedMessage": {
+        "action": "отправил(а)",
+        "noun": "зашифрованное сообщение"
+      },
+      "letter": {
+        "action": "отправил(а)",
+        "noun": "письмо"
+      },
       "treasureHidCreated": "спрятал(а)",
       "treasureHidUpdated": "обновил(а)",
       "treasureNoun": "клад",
@@ -605,7 +615,13 @@
       "searchPlaceholder": "Поиск обещаний…",
       "searchAriaLabel": "Поиск обещаний",
       "noMatch": "Ни одно обещание не соответствует «{{query}}»",
-      "noMatchHint": "Попробуйте другой поисковый запрос или очистите поиск."
+      "noMatchHint": "Попробуйте другой поисковый запрос или очистите поиск.",
+      "needsReview": "Требуется проверка",
+      "needsReviewDesc": "Обещания {{appName}}, которые ещё не были выделены или скрыты. Поднимите одно на полку Избранное или подавите его, скрыв.",
+      "needsReviewEmpty": "Ничего не ждёт проверки.",
+      "hidden": "Скрытые",
+      "hiddenDesc": "Обещания, скрытые от публичного обнаружения. Используйте меню с тремя точками на карточке, чтобы вернуть.",
+      "hiddenEmpty": "В настоящее время нет скрытых обещаний."
     },
     "card": {
       "ended": "Завершено",
@@ -1082,6 +1098,31 @@
       "allHiddenHint": "Все кампании в сети скрыты модераторами. Включите «Показать скрытые», чтобы их увидеть.",
       "empty": "Пока нет кампаний",
       "emptyHint": "Кампаний пока не было опубликовано. Будьте первым."
+    }
+  },
+  "moderation": {
+    "hiddenBadge": "Скрыто",
+    "menu": {
+      "label": "Действия модератора",
+      "ariaCampaign": "Модерировать кампанию",
+      "ariaPledge": "Модерировать обещание",
+      "ariaGroup": "Модерировать группу",
+      "failedAction": "Не удалось выполнить действие: {{action}}",
+      "approve": "Одобрить",
+      "unapprove": "Отозвать одобрение",
+      "approvedState": "Одобрено",
+      "hide": "Скрыть",
+      "unhide": "Показать",
+      "hiddenState": "Скрыто",
+      "feature": "Выделить",
+      "unfeature": "Убрать из избранного",
+      "featuredState": "Избранное",
+      "toastApproved": "Одобрено для главной страницы",
+      "toastUnapproved": "Удалено с главной страницы",
+      "toastHidden": "Скрыто",
+      "toastUnhidden": "Показано",
+      "toastFeatured": "Добавлено в избранное",
+      "toastUnfeatured": "Удалено из избранного"
     }
   },
   "settings": {
@@ -1993,10 +2034,18 @@
   },
   "faq": {
     "categories": {
-      "getting-started": { "label": "Об Agora" },
-      "payments": { "label": "Bitcoin-пожертвования на Agora" },
-      "about-nostr": { "label": "О Nostr" },
-      "legacy": { "label": "Наследие" }
+      "getting-started": {
+        "label": "Об Agora"
+      },
+      "payments": {
+        "label": "Bitcoin-пожертвования на Agora"
+      },
+      "about-nostr": {
+        "label": "О Nostr"
+      },
+      "legacy": {
+        "label": "Наследие"
+      }
     },
     "items": {
       "what-is-ditto": {

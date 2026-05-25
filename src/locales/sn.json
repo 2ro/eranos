@@ -29,6 +29,7 @@
     "searchResultsCount_one": "{{count}} chakawanikwa",
     "searchResultsCount_other": "{{count}} zvakawanikwa",
     "sortAriaLabel": "Hurongwa hwekuronga",
+    "sortDefault": "Yakajairwa",
     "sortTop": "Yepamusoro",
     "sortNew": "Itsva",
     "showHidden": "Ratidza zvakavanzwa",
@@ -182,7 +183,13 @@
       "searchPlaceholder": "Tsvaga zvitsidziro…",
       "searchAriaLabel": "Tsvaga zvitsidziro",
       "noMatch": "Hapana chitsidziro chinoenderana ne«{{query}}»",
-      "noMatchHint": "Edza chimwe chinotsvagwa, kana ubvise kutsvaga."
+      "noMatchHint": "Edza chimwe chinotsvagwa, kana ubvise kutsvaga.",
+      "needsReview": "Inoda kuongororwa",
+      "needsReviewDesc": "Zvitsidziro zve{{appName}} zvisati zvanyorwa kana kuvanzwa. Simudza chimwe kushelf yanokurumbira kana kuchiderera nokuvigwa.",
+      "needsReviewEmpty": "Hapana chiri kumirira kuongororwa.",
+      "hidden": "Zvakavanzwa",
+      "hiddenDesc": "Zvitsidziro zvakadzvinyirirwa kubva mukuwanikwa pachena. Shandisa menu yekebab pakadhi kuti ubvise kuvanzwa.",
+      "hiddenEmpty": "Hapana zvitsidziro zvakavanzwa parizvino."
     },
     "card": {
       "ended": "Zvapera",
@@ -659,6 +666,31 @@
       "allHiddenHint": "Mishandirapamwe yose pamutambo yakavanzwa nevatariri. Vhura «Ratidza dzakavanzwa» kuti uione.",
       "empty": "Hapana mishandirapamwe parizvino",
       "emptyHint": "Hapana mushandirapamwe wakatumirwa parizvino. Iva wokutanga."
+    }
+  },
+  "moderation": {
+    "hiddenBadge": "Zvakavanzwa",
+    "menu": {
+      "label": "Zviito zvomutariri",
+      "ariaCampaign": "Tarisa mushandirapamwe",
+      "ariaPledge": "Tarisa chitsidziro",
+      "ariaGroup": "Tarisa boka",
+      "failedAction": "Hazvina kubudirira ku{{action}}",
+      "approve": "Tendera",
+      "unapprove": "Bvisa kutenderwa",
+      "approvedState": "Zvakatenderwa",
+      "hide": "Vanza",
+      "unhide": "Bvisa kuvanzwa",
+      "hiddenState": "Zvakavanzwa",
+      "feature": "Sarudza",
+      "unfeature": "Bvisa kusarudzwa",
+      "featuredState": "Zvakasarudzwa",
+      "toastApproved": "Zvatenderwa kupeji rekutanga",
+      "toastUnapproved": "Zvabviswa papeji rekutanga",
+      "toastHidden": "Zvavanzwa",
+      "toastUnhidden": "Zvabviswa pakuvanzwa",
+      "toastFeatured": "Zvasarudzwa",
+      "toastUnfeatured": "Zvabviswa pakusarudzwa"
     }
   },
   "settings": {

@@ -29,6 +29,7 @@
     "searchResultsCount_one": "{{count}} result",
     "searchResultsCount_other": "{{count}} results",
     "sortAriaLabel": "Sort order",
+    "sortDefault": "Default",
     "sortTop": "Top",
     "sortNew": "New",
     "showHidden": "Show hidden",
@@ -605,7 +606,13 @@
       "showMore": "Show more ({{count}} more)",
       "emptyTitle": "No pledges yet",
       "emptyHint": "Be the first to create a pledge.",
-      "emptyHintCountry": "Be the first to create a pledge for {{country}}."
+      "emptyHintCountry": "Be the first to create a pledge for {{country}}.",
+      "needsReview": "Needs review",
+      "needsReviewDesc": "{{appName}} pledges that haven't been featured or hidden yet. Lift one into the Featured shelf or suppress it with Hide.",
+      "needsReviewEmpty": "Nothing awaiting review.",
+      "hidden": "Hidden",
+      "hiddenDesc": "Pledges suppressed from public discovery. Use the kebab menu on a card to unhide.",
+      "hiddenEmpty": "No pledges are currently hidden."
     },
     "card": {
       "ended": "Ended",
@@ -1082,6 +1089,31 @@
       "allHiddenHint": "Every campaign on the network has been hidden by moderators. Toggle \u201cShow hidden\u201d to view them.",
       "empty": "No campaigns yet",
       "emptyHint": "No campaigns have been published yet. Be the first."
+    }
+  },
+  "moderation": {
+    "hiddenBadge": "Hidden",
+    "menu": {
+      "label": "Moderator actions",
+      "ariaCampaign": "Moderate campaign",
+      "ariaPledge": "Moderate pledge",
+      "ariaGroup": "Moderate group",
+      "failedAction": "Failed to {{action}}",
+      "approve": "Approve",
+      "unapprove": "Unapprove",
+      "approvedState": "Approved",
+      "hide": "Hide",
+      "unhide": "Unhide",
+      "hiddenState": "Hidden",
+      "feature": "Feature",
+      "unfeature": "Unfeature",
+      "featuredState": "Featured",
+      "toastApproved": "Approved for homepage",
+      "toastUnapproved": "Removed from homepage",
+      "toastHidden": "Hidden",
+      "toastUnhidden": "Unhidden",
+      "toastFeatured": "Featured",
+      "toastUnfeatured": "Removed from featured"
     }
   },
   "settings": {

@@ -7,11 +7,13 @@ import { nip19 } from 'nostr-tools';
 
 import { parseAction, useActions, type Action } from '@/hooks/useActions';
 import { useAppContext } from '@/hooks/useAppContext';
+import { useCampaignModerators } from '@/hooks/useCampaignModerators';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useBtcPrice } from '@/hooks/useBtcPrice';
 import { useDebounce } from '@/hooks/useDebounce';
 import { useNip50Search, type Nip50Sort } from '@/hooks/useNip50Search';
 import { useNostrPublish } from '@/hooks/useNostrPublish';
+import { usePledgeModeration } from '@/hooks/usePledgeModeration';
 import { useShareOrigin } from '@/hooks/useShareOrigin';
 import { useToast } from '@/hooks/useToast';
 import { getAllCountries, getGeoDisplayName, countryCodeToFlag } from '@/lib/countries';
@@ -21,6 +23,7 @@ import { cn } from '@/lib/utils';
 import { DiscoverySearchToolbar } from '@/components/DiscoverySearchToolbar';
 import { HeroAtmosphere } from '@/components/HeroAtmosphere';
 import { HeroBanner } from '@/components/HeroBanner';
+import { ModerationOverlay, ModeratorCollapsibleSection } from '@/components/moderation';
 import { PledgeCard } from '@/components/PledgeCard';
 
 import { Card } from '@/components/ui/card';
@@ -39,7 +42,7 @@ import {
 import {
   Clock, HandHeart, PlusCircle, ChevronRight, Loader2,
   Link as LinkIcon, Check, MoreHorizontal, Trash2, ListFilter,
-  Calendar, DollarSign, Globe, Megaphone,
+  Calendar, DollarSign, Globe, Megaphone, Hourglass, EyeOff,
 } from 'lucide-react';
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -198,23 +201,24 @@ export default function ActionsPage() {
   const [sortBy, setSortBy] = useState<SortOption>('recent');
   const [headerCountryPickerOpen, setHeaderCountryPickerOpen] = useState(false);
 
-  // On-page NIP-50 search + sort toolbar state (kind 36639 pledges).
-  // Empty input + `new` sort falls back to the curated active /
-  // upcoming / past sections below; anything else (typed query, or
-  // Top sort with empty input) swaps the body for a flat results grid
-  // pinned to the Ditto relay group. Search ignores the active country
-  // filter so users can find pledges anywhere by name even after
-  // picking a country.
+  // On-page NIP-50 search + sort + show-hidden toolbar state.
   //
-  // No Show-hidden switch here yet — pledges don't have a hidden-axis
-  // moderation layer like campaigns and groups do. Adding one is
-  // tracked as a follow-up.
+  //   Default sort, empty query → curated active / upcoming / past
+  //     sections below.
+  //   Default sort, with query  → relay search for kind 36639, results
+  //     post-filtered against title/content client-side.
+  //   Top / New                  → always active. Top sends `sort:top`;
+  //     New sends a raw chronological feed of the kind.
+  //
+  // Search ignores the active country filter so users can find pledges
+  // anywhere by name even after picking a country.
   const [searchInput, setSearchInput] = useState('');
-  const [sortMode, setSortMode] = useState<Nip50Sort>('new');
+  const [sortMode, setSortMode] = useState<Nip50Sort>('default');
+  const [showHidden, setShowHidden] = useState(false);
   const debouncedSearch = useDebounce(searchInput, 300);
   const trimmedSearch = debouncedSearch.trim();
   const {
-    data: searchHits,
+    data: searchHitsRaw,
     isFetching: isSearchFetching,
     isActive: isSearching,
   } = useNip50Search<Action>({
@@ -222,12 +226,81 @@ export default function ActionsPage() {
     query: debouncedSearch,
     sort: sortMode,
     parse: parseAction,
+    // Pledge titles live in a `title` tag, not `content`. Most NIP-50
+    // implementations only match content; widen the net client-side.
+    getKeywordHaystack: (event) => {
+      const title = event.tags.find(([n]) => n === 'title')?.[1] ?? '';
+      return [title, event.content];
+    },
   });
+
+  // Pledges now ride the same `agora.moderation` namespace as campaigns
+  // and organizations (two-axis: hide + featured). Filter hidden pledges
+  // out of search results unless the moderator opts in via the
+  // Show-hidden switch. Computed here so the search hook stays
+  // kind-agnostic.
+  const { data: pledgeModeration, isReady: pledgeModerationReady } = usePledgeModeration();
+  const { searchHits, searchHiddenCount } = useMemo(() => {
+    if (!searchHitsRaw) return { searchHits: undefined, searchHiddenCount: 0 };
+    const hiddenCoords = pledgeModeration?.hiddenCoords ?? new Set<string>();
+    let hidden = 0;
+    const visible: Action[] = [];
+    for (const a of searchHitsRaw) {
+      const coord = `36639:${a.pubkey}:${a.id}`;
+      if (hiddenCoords.has(coord)) {
+        hidden += 1;
+        if (showHidden) visible.push(a);
+      } else {
+        visible.push(a);
+      }
+    }
+    return { searchHits: visible, searchHiddenCount: hidden };
+  }, [searchHitsRaw, pledgeModeration, showHidden]);
 
   const { data: actions, isLoading: actionsLoading } = useActions({
     countryCode: selectedCountry,
     limit: 300,
   });
+
+  // Moderator gate. Reuses the campaign moderator pack (Team Soapbox) —
+  // the pledge moderation namespace rides the same signer set as the
+  // campaign and group surfaces. Drives the Pending and Hidden review
+  // sections at the bottom of the page.
+  const { data: moderators } = useCampaignModerators();
+  const isMod = !!user && !!moderators && moderators.includes(user.pubkey);
+
+  // For moderators we pull the full (unfiltered-by-country) pledge
+  // stream so the review queue isn't blinkered to whatever country the
+  // viewer happens to have selected. Same `agora-action` t-tag filter
+  // as the public list, just wider. Skipped entirely for non-mods so we
+  // don't pay the round-trip cost for everyone.
+  const { data: allPledgesForMods, isLoading: allPledgesLoading } = useActions({
+    limit: 300,
+    enabled: isMod,
+  });
+
+  // Pending (mod-only): pledges that haven't been featured or hidden.
+  // Mirrors the campaign/group "needs review" semantics — pledges have
+  // a two-axis model, so "pending" means "no curation decision yet".
+  // Gated on `pledgeModerationReady` so a cold load doesn't briefly
+  // dump every pledge into "Pending" before label folding completes.
+  const pendingPledges = useMemo<Action[]>(() => {
+    if (!isMod || !pledgeModerationReady) return [];
+    return (allPledgesForMods ?? []).filter((p) => {
+      const coord = `36639:${p.pubkey}:${p.id}`;
+      return !pledgeModeration.featuredCoords.has(coord)
+        && !pledgeModeration.hiddenCoords.has(coord);
+    });
+  }, [isMod, pledgeModerationReady, pledgeModeration, allPledgesForMods]);
+
+  // Hidden (mod-only): pledges where the latest hide-axis label is `hidden`.
+  const hiddenPledges = useMemo<Action[]>(() => {
+    if (!isMod || !pledgeModerationReady) return [];
+    return (allPledgesForMods ?? []).filter((p) => {
+      const coord = `36639:${p.pubkey}:${p.id}`;
+      return pledgeModeration.hiddenCoords.has(coord);
+    });
+  }, [isMod, pledgeModerationReady, pledgeModeration, allPledgesForMods]);
 
   // Route entry points for "Create pledge" all pass the currently-selected
   // country via ?country= so the dedicated page can pre-fill it, matching
@@ -399,11 +472,10 @@ export default function ActionsPage() {
         onCreateAction={() => navigate(createActionHref)}
       />
 
-      {/* Toolbar — search + sort. Sits just below the hero on every
-          discovery page so the affordance is consistent. The query is
-          NIP-50, restricted to kind 36639, and routed at the Ditto
-          relay group. No Show-hidden switch yet (pledges lack a hidden
-          moderation axis). */}
+      {/* Toolbar — search + sort + show-hidden. Sits just below the hero
+          on every discovery page so the affordance is consistent. The
+          query is NIP-50, restricted to kind 36639, and routed at the
+          Ditto relay group. */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 pt-6">
         <DiscoverySearchToolbar
           query={searchInput}
@@ -412,6 +484,11 @@ export default function ActionsPage() {
           onSortChange={setSortMode}
           searchPlaceholderKey="pledges.list.searchPlaceholder"
           searchAriaLabelKey="pledges.list.searchAriaLabel"
+          showHidden={{
+            value: showHidden,
+            onChange: setShowHidden,
+            count: searchHiddenCount,
+          }}
         />
       </div>
 
@@ -421,7 +498,11 @@ export default function ActionsPage() {
             <div className="flex items-end justify-between gap-4">
               <div>
                 <h2 className="text-2xl sm:text-3xl font-bold tracking-tight">
-                  {trimmedSearch ? t('common.search') : t('common.sortTop')}
+                  {trimmedSearch
+                    ? t('common.search')
+                    : sortMode === 'top'
+                      ? t('common.sortTop')
+                      : t('common.sortNew')}
                 </h2>
                 {searchHits && (
                   <p className="text-sm text-muted-foreground mt-1">
@@ -447,7 +528,18 @@ export default function ActionsPage() {
                     btcPrice={btcPrice}
                     showAuthor
                     showTranslate
-                    topRight={<ActionShareMenu action={action} />}
+                    topRight={
+                      <>
+                        <ActionShareMenu action={action} />
+                        <ModerationOverlay
+                          coord={`36639:${action.pubkey}:${action.id}`}
+                          entityTitle={action.title}
+                          surface="pledge"
+                          axes={['hide', 'featured']}
+                          className="flex items-center gap-1.5"
+                        />
+                      </>
+                    }
                   />
                 ))}
               </div>
@@ -586,6 +678,92 @@ export default function ActionsPage() {
           </>
         )}
       </div>
+      )}
+
+      {/* Moderator-only review queues at the bottom of the page —
+          consistent with the campaigns and groups index pages so
+          reviewers see the same "Pending / Hidden" affordance
+          everywhere. Pulls the unfiltered-by-country pledge stream so
+          the queue isn't blinkered by the viewer's country filter. */}
+      {isMod && (
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 pb-10 lg:pb-14 space-y-12">
+          <ModeratorCollapsibleSection
+            icon={<Hourglass className="size-4" />}
+            title={t('pledges.list.needsReview')}
+            description={t('pledges.list.needsReviewDesc', { appName: config.appName })}
+            count={pendingPledges.length}
+            isLoading={allPledgesLoading || !pledgeModerationReady}
+            emptyText={t('pledges.list.needsReviewEmpty')}
+            skeleton={
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+                {Array.from({ length: 4 }).map((_, i) => <ActionSkeleton key={i} />)}
+              </div>
+            }
+          >
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+              {pendingPledges.map((action) => (
+                <PledgeCard
+                  key={`${action.pubkey}:${action.id}`}
+                  action={action}
+                  isExpired={action.deadline ? action.deadline <= Date.now() / 1000 : false}
+                  btcPrice={btcPrice}
+                  showAuthor
+                  showTranslate
+                  topRight={
+                    <>
+                      <ActionShareMenu action={action} />
+                      <ModerationOverlay
+                        coord={`36639:${action.pubkey}:${action.id}`}
+                        entityTitle={action.title}
+                        surface="pledge"
+                        axes={['hide', 'featured']}
+                        className="flex items-center gap-1.5"
+                      />
+                    </>
+                  }
+                />
+              ))}
+            </div>
+          </ModeratorCollapsibleSection>
+          <ModeratorCollapsibleSection
+            icon={<EyeOff className="size-4" />}
+            title={t('pledges.list.hidden')}
+            description={t('pledges.list.hiddenDesc')}
+            count={hiddenPledges.length}
+            isLoading={allPledgesLoading || !pledgeModerationReady}
+            emptyText={t('pledges.list.hiddenEmpty')}
+            skeleton={
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+                {Array.from({ length: 4 }).map((_, i) => <ActionSkeleton key={i} />)}
+              </div>
+            }
+          >
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+              {hiddenPledges.map((action) => (
+                <PledgeCard
+                  key={`${action.pubkey}:${action.id}`}
+                  action={action}
+                  isExpired={action.deadline ? action.deadline <= Date.now() / 1000 : false}
+                  btcPrice={btcPrice}
+                  showAuthor
+                  showTranslate
+                  topRight={
+                    <>
+                      <ActionShareMenu action={action} />
+                      <ModerationOverlay
+                        coord={`36639:${action.pubkey}:${action.id}`}
+                        entityTitle={action.title}
+                        surface="pledge"
+                        axes={['hide', 'featured']}
+                        className="flex items-center gap-1.5"
+                      />
+                    </>
+                  }
+                />
+              ))}
+            </div>
+          </ModeratorCollapsibleSection>
+        </div>
       )}
     </main>
   );
@@ -742,7 +920,18 @@ function ActionSection({
             btcPrice={btcPrice}
             showAuthor
             showTranslate
-            topRight={<ActionShareMenu action={action} />}
+            topRight={
+              <>
+                <ActionShareMenu action={action} />
+                <ModerationOverlay
+                  coord={`36639:${action.pubkey}:${action.id}`}
+                  entityTitle={action.title}
+                  surface="pledge"
+                  axes={['hide', 'featured']}
+                  className="flex items-center gap-1.5"
+                />
+              </>
+            }
           />
         ))}
       </div>

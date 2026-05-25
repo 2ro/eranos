@@ -29,6 +29,7 @@
     "searchResultsCount_one": "លទ្ធផល {{count}}",
     "searchResultsCount_other": "លទ្ធផល {{count}}",
     "sortAriaLabel": "លំដាប់តម្រៀប",
+    "sortDefault": "លំនាំដើម",
     "sortTop": "ល្បីបំផុត",
     "sortNew": "ថ្មី",
     "showHidden": "បង្ហាញដែលលាក់",
@@ -179,6 +180,12 @@
       "emptyTitle": "មិនទាន់មានការសន្យាទេ",
       "emptyHint": "ក្លាយជាមនុស្សដំបូងបង្កើតការសន្យា។",
       "emptyHintCountry": "ក្លាយជាមនុស្សដំបូងបង្កើតការសន្យាសម្រាប់ {{country}}។",
+      "needsReview": "ត្រូវការត្រួតពិនិត្យ",
+      "needsReviewDesc": "ការសន្យា {{appName}} ដែលមិនទាន់ត្រូវបានលេចធ្លោ ឬលាក់នៅឡើយ។ លើកទៅធ្នើរលេចធ្លោ ឬបង្ក្រាបវាដោយលាក់។",
+      "needsReviewEmpty": "មិនមានអ្វីរង់ចាំការត្រួតពិនិត្យទេ។",
+      "hidden": "បានលាក់",
+      "hiddenDesc": "ការសន្យាដែលបានបង្ក្រាបពីការស្វែងរកសាធារណៈ។ ប្រើម៉ឺនុយ kebab លើកាតដើម្បីបង្ហាញឡើងវិញ។",
+      "hiddenEmpty": "បច្ចុប្បន្នមិនមានការសន្យាត្រូវបានលាក់ទេ។",
       "searchPlaceholder": "ស្វែងរកការសន្យា…",
       "searchAriaLabel": "ស្វែងរកការសន្យា",
       "noMatch": "គ្មានការសន្យាណាដែលត្រូវនឹង «{{query}}»",
@@ -659,6 +666,31 @@
       "allHiddenHint": "យុទ្ធនាការទាំងអស់នៅលើបណ្ដាញត្រូវបានលាក់ដោយអ្នកសម្របសម្រួល។ បើក «បង្ហាញដែលលាក់» ដើម្បីមើល។",
       "empty": "មិនទាន់មានយុទ្ធនាការនៅឡើយ",
       "emptyHint": "មិនទាន់មានយុទ្ធនាការផ្សព្វផ្សាយនៅឡើយទេ។ ធ្វើជាមនុស្សដំបូង។"
+    }
+  },
+  "moderation": {
+    "hiddenBadge": "បានលាក់",
+    "menu": {
+      "label": "សកម្មភាពអ្នកសម្របសម្រួល",
+      "ariaCampaign": "សម្របសម្រួលយុទ្ធនាការ",
+      "ariaPledge": "សម្របសម្រួលការសន្យា",
+      "ariaGroup": "សម្របសម្រួលក្រុម",
+      "failedAction": "បរាជ័យក្នុងការ {{action}}",
+      "approve": "អនុម័ត",
+      "unapprove": "ដកការអនុម័ត",
+      "approvedState": "បានអនុម័ត",
+      "hide": "លាក់",
+      "unhide": "ឈប់លាក់",
+      "hiddenState": "បានលាក់",
+      "feature": "លេចធ្លោ",
+      "unfeature": "ដកការលេចធ្លោ",
+      "featuredState": "បានលេចធ្លោ",
+      "toastApproved": "បានអនុម័តសម្រាប់ទំព័រដើម",
+      "toastUnapproved": "បានដកចេញពីទំព័រដើម",
+      "toastHidden": "បានលាក់",
+      "toastUnhidden": "បានឈប់លាក់",
+      "toastFeatured": "បានលេចធ្លោ",
+      "toastUnfeatured": "បានដកចេញពីការលេចធ្លោ"
     }
   },
   "settings": {
@@ -2002,10 +2034,18 @@
   },
   "faq": {
     "categories": {
-      "getting-started": { "label": "អំពី Agora" },
-      "payments": { "label": "ការបរិច្ចាគ Bitcoin នៅលើ Agora" },
-      "about-nostr": { "label": "អំពី Nostr" },
-      "legacy": { "label": "មាតិកាចាស់" }
+      "getting-started": {
+        "label": "អំពី Agora"
+      },
+      "payments": {
+        "label": "ការបរិច្ចាគ Bitcoin នៅលើ Agora"
+      },
+      "about-nostr": {
+        "label": "អំពី Nostr"
+      },
+      "legacy": {
+        "label": "មាតិកាចាស់"
+      }
     },
     "items": {
       "what-is-ditto": {

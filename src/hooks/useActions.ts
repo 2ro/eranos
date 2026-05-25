@@ -125,6 +125,11 @@ interface UseActionsOptions {
   countryCode?: string;
   /** Maximum number of events to request from relays. */
   limit?: number;
+  /** When false, the underlying query never fires. Callers that gate
+   *  the list on moderator status (or any other prerequisite) can pass
+   *  `enabled: false` to skip the round-trip until the prerequisite
+   *  resolves. Defaults to true. */
+  enabled?: boolean;
 }
 
 /**
@@ -136,11 +141,12 @@ interface UseActionsOptions {
  * Pledges are user-generated. Country filtering only applies when a country
  * code is provided.
  */
-export function useActions({ countryCode, limit = 50 }: UseActionsOptions = {}) {
+export function useActions({ countryCode, limit = 50, enabled = true }: UseActionsOptions = {}) {
   const { nostr } = useNostr();
 
   return useQuery({
     queryKey: ['agora-actions', countryCode, limit],
+    enabled,
     queryFn: async (c) => {
       const signal = AbortSignal.any([c.signal, AbortSignal.timeout(5000)]);
 

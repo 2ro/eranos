@@ -9,16 +9,12 @@ import { HeroBanner } from '@/components/HeroBanner';
 import { LoginArea } from '@/components/auth/LoginArea';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from '@/components/ui/collapsible';
 import { Skeleton } from '@/components/ui/skeleton';
 import { CommunityGrid } from '@/components/discovery/CommunityGrid';
 import { CommunityMiniCard, CommunityMiniCardSkeleton } from '@/components/discovery/CommunityMiniCard';
 import { SectionHeader } from '@/components/discovery/SectionHeader';
 import { DiscoverySearchToolbar } from '@/components/DiscoverySearchToolbar';
+import { ModeratorCollapsibleSection } from '@/components/moderation';
 import { COOL_PALETTE } from '@/lib/hopePalette';
 import { cn } from '@/lib/utils';
 import { useAppContext } from '@/hooks/useAppContext';
@@ -75,12 +71,15 @@ export function CommunitiesPage() {
   };
 
   // On-page NIP-50 search + sort + show-hidden toolbar state.
-  // (kind 34550 community definitions.) Empty input + `new` sort
-  // falls back to the curated "My groups" / "Featured groups" /
-  // moderator shelves below; anything else swaps the body for a flat
-  // results grid pinned to the Ditto relay group.
+  //
+  //   Default sort, empty query → curated "My groups" / "Featured" /
+  //     moderator shelves below.
+  //   Default sort, with query  → relay search for kind 34550, results
+  //     post-filtered against name/description/content client-side.
+  //   Top / New                  → always active. Top sends `sort:top`;
+  //     New sends a raw chronological feed of the kind.
   const [searchInput, setSearchInput] = useState('');
-  const [sortMode, setSortMode] = useState<Nip50Sort>('new');
+  const [sortMode, setSortMode] = useState<Nip50Sort>('default');
   const [showHidden, setShowHidden] = useState(false);
   const debouncedSearch = useDebounce(searchInput, 300);
   const trimmedSearch = debouncedSearch.trim();
@@ -93,6 +92,15 @@ export function CommunitiesPage() {
     query: debouncedSearch,
     sort: sortMode,
     parse: parseCommunityEvent,
+    // Group names and descriptions live in tags, not `content`. Relay
+    // NIP-50 implementations that only match content silently miss
+    // obvious title hits — widen client-side by also checking these
+    // tag values.
+    getKeywordHaystack: (event) => {
+      const name = event.tags.find(([n]) => n === 'name')?.[1] ?? '';
+      const description = event.tags.find(([n]) => n === 'description')?.[1] ?? '';
+      return [name, description, event.content];
+    },
   });
 
   // Lift org moderation to the page so search results can drop hidden
@@ -146,7 +154,11 @@ export function CommunitiesPage() {
             <div className="flex items-end justify-between gap-4">
               <div>
                 <h2 className="text-2xl sm:text-3xl font-bold tracking-tight">
-                  {trimmedSearch ? t('common.search') : t('common.sortTop')}
+                  {trimmedSearch
+                    ? t('common.search')
+                    : sortMode === 'top'
+                      ? t('common.sortTop')
+                      : t('common.sortNew')}
                 </h2>
                 {searchHits && (
                   <p className="text-sm text-muted-foreground mt-1">
@@ -279,103 +291,53 @@ function ModeratorReviewSections() {
 
   return (
     <>
-      <ModeratorOrgSection
+      <ModeratorCollapsibleSection
         icon={<Hourglass className="size-4" />}
         title={t('groups.list.needsReview')}
         description={t('groups.list.needsReviewDesc', { appName: config.appName })}
         count={needsReviewOrgs.length}
-        orgs={needsReviewOrgs}
         isLoading={sectionsLoading}
         emptyText={t('groups.list.needsReviewEmpty')}
-      />
-      <ModeratorOrgSection
+        size="compact"
+        triggerPaddingClassName="px-4 sm:px-6 pb-3"
+        skeleton={
+          <CommunityGrid>
+            {Array.from({ length: 4 }).map((_, i) => (
+              <CommunityMiniCardSkeleton key={i} className="w-full" />
+            ))}
+          </CommunityGrid>
+        }
+      >
+        <CommunityGrid>
+          {needsReviewOrgs.map((org) => (
+            <CommunityMiniCard key={org.aTag} community={org} className="w-full" />
+          ))}
+        </CommunityGrid>
+      </ModeratorCollapsibleSection>
+      <ModeratorCollapsibleSection
         icon={<EyeOff className="size-4" />}
         title={t('groups.list.hidden')}
         description={t('groups.list.hiddenDesc')}
         count={hiddenOrgs.length}
-        orgs={hiddenOrgs}
         isLoading={sectionsLoading}
         emptyText={t('groups.list.hiddenEmpty')}
-      />
+        size="compact"
+        triggerPaddingClassName="px-4 sm:px-6 pb-3"
+        skeleton={
+          <CommunityGrid>
+            {Array.from({ length: 4 }).map((_, i) => (
+              <CommunityMiniCardSkeleton key={i} className="w-full" />
+            ))}
+          </CommunityGrid>
+        }
+      >
+        <CommunityGrid>
+          {hiddenOrgs.map((org) => (
+            <CommunityMiniCard key={org.aTag} community={org} className="w-full" />
+          ))}
+        </CommunityGrid>
+      </ModeratorCollapsibleSection>
     </>
-  );
-}
-
-/**
- * Collapsible moderator-only section listing organizations in a particular
- * moderation state (pending / hidden). Defaults to expanded when the list
- * is short (≤ 6 items), collapsed otherwise — same heuristic as the
- * campaign version.
- */
-function ModeratorOrgSection({
-  icon,
-  title,
-  description,
-  count,
-  orgs,
-  isLoading,
-  emptyText,
-}: {
-  icon: React.ReactNode;
-  title: string;
-  description: string;
-  count: number;
-  orgs: ParsedCommunity[];
-  isLoading: boolean;
-  emptyText: string;
-}) {
-  const [open, setOpen] = useState(count <= 6);
-
-  return (
-    <Collapsible open={open} onOpenChange={setOpen} asChild>
-      <section className="pt-4 pb-2">
-        <CollapsibleTrigger asChild>
-          <button
-            type="button"
-            className="flex w-full items-end justify-between gap-4 rounded-lg text-left px-4 sm:px-6 pb-3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
-          >
-            <div>
-              <h2 className="text-xl sm:text-2xl font-bold tracking-tight inline-flex items-center gap-2">
-                <span className="text-muted-foreground">{icon}</span>
-                {title}
-                <span className="text-sm font-medium text-muted-foreground">({count})</span>
-              </h2>
-              <p className="text-sm text-muted-foreground mt-1 max-w-2xl">{description}</p>
-            </div>
-            <ChevronDown
-              className={cn(
-                'size-5 text-muted-foreground motion-safe:transition-transform shrink-0',
-                open && 'rotate-180',
-              )}
-              aria-hidden
-            />
-          </button>
-        </CollapsibleTrigger>
-        <CollapsibleContent>
-          {isLoading && orgs.length === 0 ? (
-            <CommunityGrid>
-              {Array.from({ length: 4 }).map((_, i) => (
-                <CommunityMiniCardSkeleton key={i} className="w-full" />
-              ))}
-            </CommunityGrid>
-          ) : orgs.length === 0 ? (
-            <div className="px-4 sm:px-6">
-              <Card className="border-dashed">
-                <CardContent className="py-8 text-center text-sm text-muted-foreground">
-                  {emptyText}
-                </CardContent>
-              </Card>
-            </div>
-          ) : (
-            <CommunityGrid>
-              {orgs.map((org) => (
-                <CommunityMiniCard key={org.aTag} community={org} className="w-full" />
-              ))}
-            </CommunityGrid>
-          )}
-        </CollapsibleContent>
-      </section>
-    </Collapsible>
   );
 }
 

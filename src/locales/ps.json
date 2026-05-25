@@ -29,6 +29,7 @@
     "searchResultsCount_one": "{{count}} پایله",
     "searchResultsCount_other": "{{count}} پایلې",
     "sortAriaLabel": "د ترتیب اساس",
+    "sortDefault": "اصلي",
     "sortTop": "غوره",
     "sortNew": "نوي",
     "showHidden": "پټ ښودل",
@@ -182,7 +183,13 @@
       "searchPlaceholder": "د ژمنو لټون…",
       "searchAriaLabel": "د ژمنو لټون",
       "noMatch": "هیڅ ژمنه له «{{query}}» سره سمون نه لري",
-      "noMatchHint": "بل لټون وکارئ، یا لټون پاک کړئ."
+      "noMatchHint": "بل لټون وکارئ، یا لټون پاک کړئ.",
+      "needsReview": "بیاکتنه ته اړتیا لري",
+      "needsReviewDesc": "د {{appName}} ژمنې چې تر اوسه نه ځانګړې شوې او نه پټې شوې. یوه یې ځانګړو ته پورته کړئ یا یې په پټولو سره ضعیفه کړئ.",
+      "needsReviewEmpty": "د بیاکتنې په تمه څه نشته.",
+      "hidden": "پټې",
+      "hiddenDesc": "د عامه موندنې څخه پټې ژمنې. د کارت په کباب مینو کې د پټولو لرې کولو لپاره وکاروئ.",
+      "hiddenEmpty": "اوس مهال هیڅ ژمنه پټه نه ده."
     },
     "card": {
       "ended": "پای ته رسیدلې",
@@ -659,6 +666,31 @@
       "allHiddenHint": "د شبکې ټول کمپاینونه د څارونکو لخوا پټ شوي. د هغوی لیدلو لپاره «پټ ښودل» فعاله کړئ.",
       "empty": "تر اوسه کوم کمپاین نشته",
       "emptyHint": "تر اوسه کوم کمپاین نه دی خپور شوی. لومړی شئ."
+    }
+  },
+  "moderation": {
+    "hiddenBadge": "پټ شوی",
+    "menu": {
+      "label": "د څارونکي کړنې",
+      "ariaCampaign": "د کمپاین څارنه",
+      "ariaPledge": "د ژمنې څارنه",
+      "ariaGroup": "د ډلې څارنه",
+      "failedAction": "په {{action}} کې پاتې راغی",
+      "approve": "منل",
+      "unapprove": "د منلو لرې کول",
+      "approvedState": "منل شوی",
+      "hide": "پټول",
+      "unhide": "بېرته ښودل",
+      "hiddenState": "پټ شوی",
+      "feature": "ځانګړي کول",
+      "unfeature": "د ځانګړي حالت لرې کول",
+      "featuredState": "ځانګړی",
+      "toastApproved": "د کور پاڼې لپاره منل شوی",
+      "toastUnapproved": "د کور پاڼې څخه لرې شوی",
+      "toastHidden": "پټ شوی",
+      "toastUnhidden": "بېرته ښودل شوی",
+      "toastFeatured": "ځانګړی شوی",
+      "toastUnfeatured": "د ځانګړو څخه لرې شوی"
     }
   },
   "settings": {
@@ -2002,10 +2034,18 @@
   },
   "faq": {
     "categories": {
-      "getting-started": { "label": "د Agora په اړه" },
-      "payments": { "label": "په Agora کې د بیټکوین مرستې" },
-      "about-nostr": { "label": "د Nostr په اړه" },
-      "legacy": { "label": "زاړه محتوا" }
+      "getting-started": {
+        "label": "د Agora په اړه"
+      },
+      "payments": {
+        "label": "په Agora کې د بیټکوین مرستې"
+      },
+      "about-nostr": {
+        "label": "د Nostr په اړه"
+      },
+      "legacy": {
+        "label": "زاړه محتوا"
+      }
     },
     "items": {
       "what-is-ditto": {

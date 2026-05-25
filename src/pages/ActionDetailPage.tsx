@@ -40,6 +40,7 @@ import { PostActionBar } from '@/components/PostActionBar';
 import { PinnedCommentHeader } from '@/components/PinnedCommentHeader';
 import { ReplyComposeModal } from '@/components/ReplyComposeModal';
 import { NoteMoreMenu } from '@/components/NoteMoreMenu';
+import { ModerationMenu } from '@/components/moderation';
 import { ThreadedReplyList, type ReplyNode } from '@/components/ThreadedReplyList';
 import { usePinnedEventComments } from '@/hooks/usePinnedEventComments';
 import { useEventTranslation } from '@/hooks/useEventTranslation';
@@ -390,6 +391,18 @@ function PledgeHero({
             <ChevronLeft className="size-5 rtl:rotate-180" />
             <span className="text-sm font-medium hidden sm:inline">{t('pledges.detail.back')}</span>
           </button>
+          {/* Moderator-only kebab. Returns null for non-moderators so
+              non-mod viewers don't subscribe to the moderation query.
+              Matches the dark hero styling — translucent black pill so
+              it reads against the photo at the same weight as the back
+              button on the left. */}
+          <ModerationMenu
+            coord={`36639:${action.pubkey}:${action.id}`}
+            entityTitle={action.title}
+            surface="pledge"
+            axes={['hide', 'featured']}
+            className="size-10 rounded-full bg-black/30 text-white backdrop-blur-md hover:bg-black/45 hover:text-white focus-visible:ring-2 focus-visible:ring-white/80"
+          />
         </div>
       </div>
 
