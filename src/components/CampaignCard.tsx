@@ -123,8 +123,15 @@ function CampaignPrivateNotice({
 
 interface CampaignCardProps {
   campaign: ParsedCampaign;
-  /** Visual variant: `compact` for grid items, `featured` for hero placement. */
-  variant?: 'compact' | 'featured';
+  /**
+   * Visual variant.
+   *
+   * - `compact` — default grid item.
+   * - `featured` — hero placement (wider, side-by-side on `sm+`).
+   * - `shelf` — fixed-width card for horizontal scroll rails (e.g. group
+   *   official-activity). Caller no longer hand-rolls the size wrapper.
+   */
+  variant?: 'compact' | 'featured' | 'shelf';
   className?: string;
   /** Optional footer affordance rendered opposite the author line. */
   footerBadge?: ReactNode;
@@ -159,6 +166,7 @@ export function CampaignCard({ campaign, variant = 'compact', className, footerB
   const isSilentPayment = !campaign.wallets.onchain;
 
   const isFeaturedVariant = variant === 'featured';
+  const isShelfVariant = variant === 'shelf';
   const isApproved = moderation.approvedCoords.has(campaign.aTag);
   const isHidden = moderation.hiddenCoords.has(campaign.aTag);
   const isFeatured = moderation.featuredCoords.has(campaign.aTag);
@@ -168,6 +176,7 @@ export function CampaignCard({ campaign, variant = 'compact', className, footerB
       to={`/${naddr}`}
       className={cn(
         'group block rounded-xl overflow-hidden focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background motion-safe:transition-transform motion-safe:duration-200 motion-safe:hover:-translate-y-0.5',
+        isShelfVariant && 'h-[430px] w-[280px] shrink-0',
         className,
       )}
     >

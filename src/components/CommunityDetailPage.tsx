@@ -465,13 +465,12 @@ function OfficialActivityShelves({
         {mixedActivity.map((item) => {
           if (item.type === 'campaign') {
             return (
-              <div key={`campaign:${item.id}`} className="h-[430px] w-[280px] shrink-0">
-                <CampaignCard
-                  campaign={item.campaign}
-                  className="h-full"
-                  footerBadge={<ActivityTypePill icon={<HandHeart className="size-3.5 text-primary" />} label={t('groups.detail.campaign')} />}
-                />
-              </div>
+              <CampaignCard
+                key={`campaign:${item.id}`}
+                campaign={item.campaign}
+                variant="shelf"
+                footerBadge={<ActivityTypePill icon={<HandHeart className="size-3.5 text-primary" />} label={t('groups.detail.campaign')} />}
+              />
             );
           }
 
