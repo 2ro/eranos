@@ -1263,7 +1263,7 @@
       "description": "Shiriki anwani kupokea bitcoin.",
       "addressIndex": "Anwani #{{index}}",
       "newAddress": "Anwani mpya",
-      "scanForNew": "Changanua kwa malipo mapya",
+      "scanForNew": "Angalia malipo mapya",
       "scanForPayments": "Changanua kwa malipo"
     },
     "tx": {

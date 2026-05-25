@@ -832,7 +832,7 @@
       "description": "د بټکوین د ترلاسه کولو لپاره یوه پته شریکه کړئ.",
       "addressIndex": "پته #{{index}}",
       "newAddress": "نوې پته",
-      "scanForNew": "د نوو ورکړو لپاره سکن",
+      "scanForNew": "نوې ورکړې وګورئ",
       "scanForPayments": "د ورکړو لپاره سکن"
     },
     "tx": {

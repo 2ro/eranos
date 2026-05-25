@@ -1264,7 +1264,7 @@
       "description": "Поделитесь адресом для получения bitcoin.",
       "addressIndex": "Адрес №{{index}}",
       "newAddress": "Новый адрес",
-      "scanForNew": "Сканировать новые платежи",
+      "scanForNew": "Проверить новые платежи",
       "scanForPayments": "Сканировать платежи"
     },
     "tx": {

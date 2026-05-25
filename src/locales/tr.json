@@ -1263,7 +1263,7 @@
       "description": "Bitcoin almak için bir adres paylaşın.",
       "addressIndex": "Adres #{{index}}",
       "newAddress": "Yeni adres",
-      "scanForNew": "Yeni ödemeler için tara",
+      "scanForNew": "Yeni ödemeleri kontrol et",
       "scanForPayments": "Ödemeler için tara"
     },
     "tx": {

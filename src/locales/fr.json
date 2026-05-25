@@ -1254,7 +1254,7 @@
       "description": "Partagez une adresse pour recevoir du bitcoin.",
       "addressIndex": "Adresse n°{{index}}",
       "newAddress": "Nouvelle adresse",
-      "scanForNew": "Scanner les nouveaux paiements",
+      "scanForNew": "Vérifier les nouveaux paiements",
       "scanForPayments": "Scanner les paiements"
     },
     "tx": {

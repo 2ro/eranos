@@ -832,7 +832,7 @@
       "description": "ចែករំលែកអាសយដ្ឋានដើម្បីទទួល Bitcoin។",
       "addressIndex": "អាសយដ្ឋាន #{{index}}",
       "newAddress": "អាសយដ្ឋានថ្មី",
-      "scanForNew": "ស្កេនការទូទាត់ថ្មី",
+      "scanForNew": "ពិនិត្យមើលការទូទាត់ថ្មី",
       "scanForPayments": "ស្កេនការទូទាត់"
     },
     "tx": {

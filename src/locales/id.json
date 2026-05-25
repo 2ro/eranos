@@ -1264,7 +1264,7 @@
       "description": "Bagikan alamat untuk menerima bitcoin.",
       "addressIndex": "Alamat #{{index}}",
       "newAddress": "Alamat baru",
-      "scanForNew": "Pindai pembayaran baru",
+      "scanForNew": "Periksa pembayaran baru",
       "scanForPayments": "Pindai pembayaran"
     },
     "tx": {

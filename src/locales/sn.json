@@ -832,7 +832,7 @@
       "description": "Govera kero yokugamuchira bitcoin.",
       "addressIndex": "Kero #{{index}}",
       "newAddress": "Kero itsva",
-      "scanForNew": "Tsvaga mibhadharo mitsva",
+      "scanForNew": "Tarisa mibhadharo mitsva",
       "scanForPayments": "Tsvaga mibhadharo"
     },
     "tx": {

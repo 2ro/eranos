@@ -832,7 +832,7 @@
       "description": "分享一個地址以接收比特幣。",
       "addressIndex": "地址 #{{index}}",
       "newAddress": "新地址",
-      "scanForNew": "掃描新支付",
+      "scanForNew": "檢查新付款",
       "scanForPayments": "掃描支付"
     },
     "tx": {

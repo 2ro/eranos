@@ -189,6 +189,16 @@ export function WalletPage() {
           </button>
         )}
 
+        {sp.enabled && spAddress && (
+          <button
+            type="button"
+            onClick={() => setSpScanOpen(true)}
+            className="text-xs text-muted-foreground hover:text-foreground motion-safe:transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-sm"
+          >
+            {t('wallet.receiveDialog.scanForNew')}
+          </button>
+        )}
+
         {/* Back-up affordance and v1 detection live in the overflow menu
             in the top-right. Back up opens a dialog inline; Legacy wallet
             recovery navigates to its own page. The wallet home no longer
@@ -299,14 +309,6 @@ export function WalletPage() {
                 </button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
-                {sp.enabled && spAddress && (
-                  <DropdownMenuItem onSelect={() => setSpScanOpen(true)} className="cursor-pointer">
-                    <Radar className="size-4 mr-2" />
-                    {sp.storage?.scanHeight && sp.storage.scanHeight > 0
-                      ? t('wallet.receiveDialog.scanForNew')
-                      : t('wallet.receiveDialog.scanForPayments')}
-                  </DropdownMenuItem>
-                )}
                 <DropdownMenuItem onSelect={() => setBackupOpen(true)} className="cursor-pointer">
                   <KeyRound className="size-4 mr-2" />
                   {t('walletSettings.backup.label')}

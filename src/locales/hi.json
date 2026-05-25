@@ -1264,7 +1264,7 @@
       "description": "Bitcoin पाने के लिए एक एड्रेस शेयर करें।",
       "addressIndex": "एड्रेस #{{index}}",
       "newAddress": "नया एड्रेस",
-      "scanForNew": "नए भुगतान के लिए scan करें",
+      "scanForNew": "नए भुगतानों की जाँच करें",
       "scanForPayments": "भुगतान के लिए scan करें"
     },
     "tx": {

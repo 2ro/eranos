@@ -816,7 +816,7 @@
       "description": "شارك عنواناً لاستقبال البيتكوين.",
       "addressIndex": "العنوان رقم {{index}}",
       "newAddress": "عنوان جديد",
-      "scanForNew": "فحص المدفوعات الجديدة",
+      "scanForNew": "تحقق من المدفوعات الجديدة",
       "scanForPayments": "فحص المدفوعات"
     },
     "tx": {

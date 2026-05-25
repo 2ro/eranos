@@ -832,7 +832,7 @@
       "description": "Comparte una dirección para recibir bitcoin.",
       "addressIndex": "Dirección n.º {{index}}",
       "newAddress": "Nueva dirección",
-      "scanForNew": "Buscar nuevos pagos",
+      "scanForNew": "Comprobar nuevos pagos",
       "scanForPayments": "Buscar pagos"
     },
     "tx": {
