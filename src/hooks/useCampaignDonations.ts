@@ -16,6 +16,15 @@ interface CampaignDonationStats {
    * reduce the number.
    */
   totalSats: number;
+  /**
+   * Mempool delta in sats — the net unconfirmed amount currently sitting
+   * in the mempool for the campaign's `w` address. Sourced from Esplora's
+   * `mempool_stats.funded_txo_sum - mempool_stats.spent_txo_sum`. Counts
+   * every inbound mempool tx, whether or not a kind 8333 receipt has
+   * been published for it. Negative when the beneficiary has unconfirmed
+   * outgoing spends.
+   */
+  pendingSats: number;
   /** Number of unique on-chain transactions counted (from verified receipts). */
   txCount: number;
   /** Number of unique donor pubkeys (from verified receipts). */
@@ -24,6 +33,12 @@ interface CampaignDonationStats {
   receipts: NostrEvent[];
   /** Verified entries (one per unique txid). */
   verified: OnchainZapEntry[];
+  /**
+   * Map of `txid → confirmed` for every verified receipt. Lets the donor
+   * preview / activity list mark individual rows as pending when the
+   * underlying Bitcoin tx is still in the mempool.
+   */
+  confirmedByTxid: Map<string, boolean>;
   /**
    * True while underlying queries (address balance + receipt verification)
    * are still in flight. Callers may use this to defer rendering
@@ -136,12 +151,15 @@ export function useCampaignDonations(campaign: ParsedCampaign | undefined): {
     .filter((v): v is OnchainZapEntry => !!v);
 
   const totalSats = hasOnchain ? (addressQuery.data?.totalReceived ?? 0) : 0;
+  const pendingSats = hasOnchain ? (addressQuery.data?.pendingBalance ?? 0) : 0;
 
   const txids = new Set<string>();
   const donors = new Set<string>();
+  const confirmedByTxid = new Map<string, boolean>();
   for (const v of verified) {
     txids.add(v.txid);
     donors.add(v.senderPubkey);
+    confirmedByTxid.set(v.txid, v.confirmed);
   }
 
   const sortedReceipts = [...receipts].sort((a, b) => b.created_at - a.created_at);
@@ -155,10 +173,12 @@ export function useCampaignDonations(campaign: ParsedCampaign | undefined): {
   return {
     data: {
       totalSats,
+      pendingSats,
       txCount: txids.size,
       donorCount: donors.size,
       receipts: sortedReceipts,
       verified,
+      confirmedByTxid,
       isVerifying,
     },
     isLoading: isVerifying,

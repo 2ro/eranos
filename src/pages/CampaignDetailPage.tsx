@@ -40,6 +40,7 @@ import { DetailReplySkeleton, DetailStory } from '@/components/DetailStory';
 import { InteractionsModal, type InteractionTab } from '@/components/InteractionsModal';
 import { PostActionBar } from '@/components/PostActionBar';
 import { PinnedCommentHeader } from '@/components/PinnedCommentHeader';
+import { PendingBadge } from '@/components/PendingBadge';
 import { ReplyComposeModal } from '@/components/ReplyComposeModal';
 import { NoteMoreMenu } from '@/components/NoteMoreMenu';
 import { Progress } from '@/components/ui/progress';
@@ -247,6 +248,8 @@ function CampaignDetailContent({ campaign }: { campaign: ParsedCampaign }) {
   const deadline = campaign.deadline ? formatDeadline(campaign.deadline, t) : null;
   const countryLabel = getCampaignCountryLabel(campaign);
   const raisedSats = stats?.totalSats ?? 0;
+  const pendingSats = stats?.pendingSats ?? 0;
+  const confirmedByTxid = stats?.confirmedByTxid;
 
   const isCreator = user?.pubkey === campaign.pubkey;
   const naddr = useMemo(() => encodeCampaignNaddr(campaign), [campaign]);
@@ -340,9 +343,11 @@ function CampaignDetailContent({ campaign }: { campaign: ParsedCampaign }) {
     <DonateColumn
       campaign={campaign}
       raisedSats={raisedSats}
+      pendingSats={pendingSats}
       statsLoading={statsLoading}
       btcPrice={btcPrice}
       donations={donationReceipts}
+      confirmedByTxid={confirmedByTxid}
       deadline={deadline}
       onShare={handleShare}
       onSeeAll={scrollToActivity}
@@ -832,10 +837,22 @@ function CampaignStory({
 interface DonateColumnProps {
   campaign: ParsedCampaign;
   raisedSats: number;
+  /**
+   * Unconfirmed mempool delta in sats. Positive = inbound pending, negative
+   * = beneficiary spending. Displayed as a pending badge under the raised
+   * total when non-zero.
+   */
+  pendingSats: number;
   statsLoading: boolean;
   btcPrice: number | undefined;
   /** Aggregated kind 8333 donation events, newest first. */
   donations: NostrEvent[];
+  /**
+   * `txid → confirmed` lookup from the verified receipts. Undefined while
+   * verification is still in flight. Donor rows whose txid maps to `false`
+   * render a pending badge in place of the relative timestamp.
+   */
+  confirmedByTxid: Map<string, boolean> | undefined;
   deadline: { label: string; isPast: boolean } | null;
   onShare: () => void;
   /** Scroll the inline activity list into view (donations + comments). */
@@ -845,9 +862,11 @@ interface DonateColumnProps {
 function DonateColumn({
   campaign,
   raisedSats,
+  pendingSats,
   statsLoading,
   btcPrice,
   donations,
+  confirmedByTxid,
   deadline,
   onShare,
   onSeeAll,
@@ -902,6 +921,12 @@ function DonateColumn({
                   {t('campaignsDetail.donationCount', { count: donations.length })}
                 </div>
               ) : null}
+              {pendingSats !== 0 && (
+                <PendingBadge
+                  amountLabel={formatSatsFull(Math.abs(pendingSats), btcPrice)}
+                  className="flex"
+                />
+              )}
             </div>
             {campaign.goalUsd && raisedUsd(raisedSats, btcPrice) !== undefined && (
               <Progress
@@ -950,7 +975,11 @@ function DonateColumn({
             <div className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
               {t('campaignsDetail.recentDonations')}
             </div>
-            <DonorPreviewList donations={donations} btcPrice={btcPrice} />
+            <DonorPreviewList
+              donations={donations}
+              btcPrice={btcPrice}
+              confirmedByTxid={confirmedByTxid}
+            />
             <button
               type="button"
               onClick={onSeeAll}
@@ -972,13 +1001,17 @@ function raisedUsd(sats: number, btcPrice: number | undefined): number | undefin
 }
 
 /** Compact donor list: monogram, amount, relative time. Shows up to the
- *  first 5 entries; the parent surfaces the rest via "See all". */
+ *  first 5 entries; the parent surfaces the rest via "See all". Rows whose
+ *  underlying Bitcoin tx is still in the mempool render a pending badge in
+ *  place of the relative timestamp — mirrors the wallet's tx list. */
 function DonorPreviewList({
   donations,
   btcPrice,
+  confirmedByTxid,
 }: {
   donations: NostrEvent[];
   btcPrice: number | undefined;
+  confirmedByTxid: Map<string, boolean> | undefined;
 }) {
   const preview = donations.slice(0, 5);
   return (
@@ -986,6 +1019,14 @@ function DonorPreviewList({
       {preview.map((ev) => {
         const amountTag = ev.tags.find(([n]) => n === 'amount')?.[1];
         const sats = amountTag ? Number(amountTag) : 0;
+        const txid = ev.tags
+          .find(([n]) => n === 'i')?.[1]
+          ?.replace(/^bitcoin:tx:/, '');
+        const confirmed = txid ? confirmedByTxid?.get(txid) : undefined;
+        // `false` means the verifier confirmed the tx is unconfirmed.
+        // `undefined` means we haven't verified yet (or txid is missing) —
+        // don't show pending in that case to avoid flashing on load.
+        const isPending = confirmed === false;
         return (
           <li key={ev.id} className="flex items-center gap-3 text-sm">
             <div className="size-8 shrink-0 rounded-full bg-primary/15 text-primary flex items-center justify-center">
@@ -996,7 +1037,7 @@ function DonorPreviewList({
                 {formatSatsFull(sats, btcPrice)}
               </div>
               <div className="text-xs text-muted-foreground">
-                {timeAgo(ev.created_at)}
+                {isPending ? <PendingBadge /> : timeAgo(ev.created_at)}
               </div>
             </div>
           </li>
