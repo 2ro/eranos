@@ -1529,7 +1529,9 @@
     "iUnderstand": "I understand this transaction is public."
   },
   "spScan": {
-    "title": "Scan for silent payments",
+    "title": "Check for new payments",
+    "subtitle": "Scan the blockchain for private payments",
+    "descriptionHelp": "More info",
     "description": "Walks the configured BIP-352 indexer block-by-block to detect incoming silent payments.",
     "since": "Since",
     "preset": {

@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Loader2, AlertCircle, CheckCircle2, ChevronDown, ChevronUp } from 'lucide-react';
+import { Loader2, AlertCircle, CheckCircle2, ChevronDown, ChevronUp, HelpCircle } from 'lucide-react';
 
 import {
   Dialog,
@@ -14,6 +14,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Progress } from '@/components/ui/progress';
 import {
   Select,
@@ -70,7 +71,7 @@ const PRESETS = {
 type PresetId = keyof typeof PRESETS;
 
 const PRESET_ORDER: PresetId[] = ['lastHour', 'last3h', 'last24h', 'lastWeek', 'lastMonth'];
-const DEFAULT_PRESET: PresetId = 'last24h';
+const DEFAULT_PRESET: PresetId = 'lastHour';
 
 /**
  * Resolves the starting block height that a scan would actually use given
@@ -166,8 +167,22 @@ export function HDSilentPaymentScanDialog({ open, onOpenChange }: HDSilentPaymen
       <DialogContent className="sm:max-w-sm">
         <DialogHeader>
           <DialogTitle>{t('spScan.title')}</DialogTitle>
-          <DialogDescription>
-            {t('spScan.description')}
+          <DialogDescription className="flex items-center gap-1.5">
+            <span>{t('spScan.subtitle')}</span>
+            <Popover>
+              <PopoverTrigger asChild>
+                <button
+                  type="button"
+                  className="inline-flex items-center justify-center text-muted-foreground hover:text-foreground motion-safe:transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-full cursor-pointer"
+                  aria-label={t('spScan.descriptionHelp')}
+                >
+                  <HelpCircle className="size-3.5" />
+                </button>
+              </PopoverTrigger>
+              <PopoverContent side="top" className="text-xs w-72">
+                {t('spScan.description')}
+              </PopoverContent>
+            </Popover>
           </DialogDescription>
         </DialogHeader>
 
@@ -391,14 +406,9 @@ export function HDSilentPaymentScanDialog({ open, onOpenChange }: HDSilentPaymen
                 {t('common.cancel')}
               </Button>
             ) : (
-              <>
-                <Button variant="ghost" onClick={() => onOpenChange(false)}>
-                  {t('common.close')}
-                </Button>
-                <Button onClick={handleScan} disabled={!canStart}>
-                  {t('spScan.startScan')}
-                </Button>
-              </>
+              <Button onClick={handleScan} disabled={!canStart}>
+                {t('spScan.startScan')}
+              </Button>
             )}
           </div>
         </div>
