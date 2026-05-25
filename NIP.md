@@ -388,8 +388,8 @@ Each endpoint type drives its own UI elements independently. A dual-endpoint cam
 | UI element                  | On-chain (`bc1`) present                                        | Silent payment (`sp1`) present                        |
 |-----------------------------|-----------------------------------------------------------------|-------------------------------------------------------|
 | QR code                     | bech32(m) address in BIP-21 `bitcoin:` URI                      | SP code in BIP-21 `?sp=` extension (combined with on-chain address when both are present) |
-| "Raised X" / progress bar   | Shown, computed from verified kind 8333 receipts against the on-chain address | **Not contributed.** When the on-chain endpoint is absent, aggregate UI is hidden entirely. |
-| Donor / recent-donation list| Shown                                                           | **Not contributed.**                                   |
+| "Raised X" / progress bar   | Shown, computed from cumulative `chain_stats.funded_txo_sum` on the on-chain `w` address via an Esplora endpoint (default mempool.space). Kind 8333 receipts are **not** the source of this total — donors paying the BIP-21 QR with a native wallet would otherwise be missed. | **Not contributed.** When the on-chain endpoint is absent, aggregate UI is hidden entirely. |
+| Donor / recent-donation list| Shown, populated from verified kind 8333 receipts against the on-chain address (attribution only — these do not feed the headline total). | **Not contributed.**                                   |
 | Goal display                | Shown as USD target with optional sat-equivalent estimate       | Shown as USD target; no progress computation when on-chain endpoint is absent |
 | Donation receipt published  | Donor's client publishes a kind 8333 receipt against the on-chain endpoint (see below) | **No receipt published.** Publishing one would defeat SP unlinkability and is forbidden. |
 
@@ -438,13 +438,23 @@ Silent-payment unlinkability is the entire point of this mode. Clients MUST NOT 
 { "kinds": [33863], "authors": ["<creator-pubkey>"], "#d": ["<slug>"], "limit": 1 }
 ```
 
-**Aggregate donations for an on-chain campaign:**
+**Compute the "raised" total:**
+
+The headline "raised" amount for an on-chain campaign MUST be sourced **directly from the campaign's on-chain `w` address**, not by aggregating kind 8333 receipts. Specifically, clients SHOULD query a mempool.space-compatible Esplora endpoint for the address and use the cumulative `chain_stats.funded_txo_sum` (plus `mempool_stats.funded_txo_sum` if surfacing pending donations) as the total raised.
+
+This is the source of truth for three reasons:
+
+1. **Completeness.** Donors who pay the BIP-21 QR with a native wallet do not publish a kind 8333 receipt. Aggregating receipts would undercount the campaign.
+2. **Forgery resistance.** A single Esplora `GET /address/<addr>` call cannot be spoofed by Nostr publishers, whereas verifying 500+ receipts against the chain is slower and more brittle (relay availability, pagination, replay attempts).
+3. **Stability.** `funded_txo_sum` is cumulative — it does not regress when the beneficiary spends from the address.
+
+**List individual donations (for the recent-donations sidebar):**
 
 ```json
 { "kinds": [8333], "#a": ["33863:<creator-pubkey>:<slug>"], "limit": 500 }
 ```
 
-Clients MUST verify each kind 8333 event on-chain before counting it toward the campaign total, per the *Campaign-wallet mode* verification rules in the kind 8333 section.
+Kind 8333 receipts are used **only** to attribute individual donations to Nostr identities (donor pubkey, comment, timestamp) — not to compute the campaign total. Clients MUST still verify each receipt on-chain per the *Campaign-wallet mode* verification rules in the kind 8333 section before displaying it.
 
 **Filter by country:**
 
