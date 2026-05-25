@@ -20,7 +20,24 @@
     "goBack": "Voltar",
     "tryAgain": "Por favor, tente novamente.",
     "showLess": "Mostrar menos",
-    "readMore": "Ler mais"
+    "readMore": "Ler mais",
+    "byAuthor": "por <0>{{name}}</0>",
+    "donors_one": "{{count}} doador",
+    "donors_other": "{{count}} doadores",
+    "clearSearch": "Limpar pesquisa",
+    "searching": "Pesquisando…",
+    "searchResultsCount_one": "{{count}} resultado",
+    "searchResultsCount_other": "{{count}} resultados",
+    "sortAriaLabel": "Ordem de classificação",
+    "sortDefault": "Padrão",
+    "sortTop": "Top",
+    "sortNew": "Novo",
+    "showHidden": "Mostrar ocultos",
+    "filtersAriaLabel": "Filtros de pesquisa",
+    "countryFilterAriaLabel": "Filtrar por país",
+    "countrySearchPlaceholder": "Pesquisar países…",
+    "countryNoResults": "Nenhum país encontrado.",
+    "countryGlobal": "Global"
   },
   "translate": {
     "translate": "Traduzir",
@@ -210,9 +227,18 @@
       "unknown": "DESCONHECIDO"
     },
     "kindHeader": {
-      "photo": { "action": "compartilhou uma", "noun": "foto" },
-      "encryptedMessage": { "action": "enviou uma", "noun": "mensagem criptografada" },
-      "letter": { "action": "enviou uma", "noun": "carta" },
+      "photo": {
+        "action": "compartilhou uma",
+        "noun": "foto"
+      },
+      "encryptedMessage": {
+        "action": "enviou uma",
+        "noun": "mensagem criptografada"
+      },
+      "letter": {
+        "action": "enviou uma",
+        "noun": "carta"
+      },
       "treasureHidCreated": "escondeu um",
       "treasureHidUpdated": "atualizou um",
       "treasureNoun": "tesouro",
@@ -589,12 +615,23 @@
       "showMore": "Mostrar mais ({{count}} mais)",
       "emptyTitle": "Nenhuma promessa ainda",
       "emptyHint": "Seja o primeiro a criar uma promessa.",
-      "emptyHintCountry": "Seja o primeiro a criar uma promessa para {{country}}."
+      "emptyHintCountry": "Seja o primeiro a criar uma promessa para {{country}}.",
+      "searchPlaceholder": "Pesquisar promessas…",
+      "searchAriaLabel": "Pesquisar promessas",
+      "noMatch": "Nenhuma promessa corresponde a “{{query}}”",
+      "noMatchHint": "Tente um termo de pesquisa diferente, ou limpe a pesquisa.",
+      "needsReview": "Precisa de revisão",
+      "needsReviewDesc": "Promessas do {{appName}} que ainda não foram destacadas ou ocultadas. Eleve uma para a prateleira em Destaque ou suprima com Ocultar.",
+      "needsReviewEmpty": "Nada aguardando revisão.",
+      "hidden": "Ocultas",
+      "hiddenDesc": "Promessas suprimidas da descoberta pública. Use o menu de três pontos em um cartão para reexibir.",
+      "hiddenEmpty": "Nenhuma promessa está oculta atualmente."
     },
     "card": {
       "ended": "Encerrada",
       "pledged": "Prometido",
       "byAuthor": "por <0>{{name}}</0>",
+      "actionsAriaLabel": "Ações da promessa",
       "deletePledge": "Excluir promessa",
       "copyLink": "Copiar link",
       "linkCopied": "Link copiado",
@@ -609,7 +646,6 @@
       "seoDescription": "Crie uma promessa de doador para inspirar ações concretas no {{appName}}.",
       "loginGateTitle": "Entre para criar uma promessa",
       "loginGateBody": "Promessas são eventos Nostr assinados. Você precisa de um login Nostr para publicar uma.",
-      "backToPledges": "Voltar para promessas",
       "heading": "Criar promessa",
       "title": "Título",
       "titlePlaceholder": "Documentar uma limpeza de praia",
@@ -688,7 +724,9 @@
       "createGroupLoginTitle": "Entre para criar um grupo",
       "createGroupLoginBody": "Criar um grupo publica um evento Nostr da sua conta.",
       "myGroups": "Meus grupos",
+      "myGroupsTagline": "Grupos que você fundou, modera ou segue.",
       "featuredGroups": "Grupos em destaque",
+      "featuredGroupsTagline": "Grupos que se destacam e merecem sua atenção.",
       "loginToSeeTitle": "Entre para ver seus grupos",
       "loginToSeeBody": "Grupos que você fundou ou modera aparecerão aqui.",
       "noGroupsTitle": "Nenhum grupo ainda",
@@ -709,7 +747,11 @@
       "tickerFeaturedGroups_one": "grupo em destaque no Nostr",
       "tickerFeaturedGroups_other": "grupos em destaque no Nostr",
       "tickerCountries_one": "país publicando hoje",
-      "tickerCountries_other": "países publicando hoje"
+      "tickerCountries_other": "países publicando hoje",
+      "searchPlaceholder": "Pesquisar grupos…",
+      "searchAriaLabel": "Pesquisar grupos",
+      "noMatch": "Nenhum grupo corresponde a “{{query}}”",
+      "noMatchHint": "Tente um termo de pesquisa diferente, ou limpe a pesquisa."
     },
     "create": {
       "seoTitleCreate": "Criar grupo",
@@ -718,7 +760,6 @@
       "seoDescriptionEdit": "Atualize seu grupo no {{appName}}.",
       "loginGateTitle": "Entre para iniciar um grupo",
       "loginGateBody": "Grupos são eventos Nostr assinados. Você precisa de um login Nostr para publicar um.",
-      "backToGroups": "Voltar para grupos",
       "invalidEditTitle": "Link de edição inválido",
       "invalidEditBody": "Este link de edição de grupo não contém um endereço de grupo válido.",
       "startNewGroup": "Iniciar um novo grupo",
@@ -807,7 +848,6 @@
     "seoDescriptionEdit": "Atualize sua campanha de arrecadação no {{appName}}.",
     "loginGateTitle": "Entre para iniciar uma campanha",
     "loginGateBody": "Campanhas são eventos Nostr assinados. Você precisa de um login Nostr para publicar uma.",
-    "goHome": "Ir para o início",
     "invalidEditTitle": "Link de edição inválido",
     "invalidEditBody": "Este link de edição de campanha não contém um endereço de campanha válido.",
     "startNewCampaign": "Iniciar uma nova campanha",
@@ -937,7 +977,6 @@
       "seoDescription": "Crie um evento de calendário no {{appName}}.",
       "loginTitle": "Entre para criar um evento",
       "loginBody": "Eventos são eventos Nostr assinados. Você precisa de um login Nostr para publicar um.",
-      "backToEvents": "Voltar para eventos",
       "heading": "Criar evento",
       "titlePlaceholder": "Limpeza do bairro",
       "descriptionPlaceholder": "Diga às pessoas o que esperar, o que trazer e quem deve comparecer...",
@@ -1032,12 +1071,23 @@
       "yourCampaigns": "Suas campanhas",
       "yourCampaignsDesc": "Suas campanhas estão no ar no Nostr e as doações funcionam através do link da campanha. Elas aparecem na página inicial quando um moderador da Team Soapbox as aprova.",
       "empty": "Nenhuma campanha ainda",
-      "emptyHint": "Seja o primeiro a iniciar uma arrecadação no {{appName}}. Conte sua história, escolha seus beneficiários e compartilhe o link."
+      "emptyHint": "Seja o primeiro a iniciar uma arrecadação no {{appName}}. Conte sua história, escolha seus beneficiários e compartilhe o link.",
+      "searchPlaceholder": "Pesquisar campanhas…",
+      "searchAriaLabel": "Pesquisar campanhas",
+      "noMatch": "Nenhuma campanha corresponde a “{{query}}”",
+      "noMatchHint": "Tente um termo de pesquisa diferente, ou limpe a pesquisa."
     },
     "all": {
       "title": "Todas as campanhas",
       "seoTitle": "Todas as campanhas",
       "description": "Navegue por todas as campanhas publicadas no Agora.",
+      "sectionTagline": "Conheça todas as causas da rede.",
+      "heroKicker": "Campanhas",
+      "heroHeading": "Cada causa,",
+      "heroHeadingLine2": "em um só lugar.",
+      "heroBody": "Cada arrecadação publicada no Nostr, reunida em um só lugar. Navegue pela rede inteira, encontre uma causa que importa para você e apoie diretamente com Bitcoin.",
+      "campaignsCount_one": "campanha na rede",
+      "campaignsCount_other": "campanhas na rede",
       "searchAriaLabel": "Pesquisar campanhas",
       "searchPlaceholder": "Pesquisar campanhas…",
       "clearSearch": "Limpar pesquisa",
@@ -1046,12 +1096,37 @@
       "sortNew": "Novas",
       "showHidden": "Mostrar ocultas",
       "startCampaign": "Iniciar uma campanha",
-      "noMatch": "Nenhuma campanha corresponde a \u201c{{query}}\u201d",
+      "noMatch": "Nenhuma campanha corresponde a “{{query}}”",
       "noMatchHint": "Tente um termo de pesquisa diferente, ou limpe a pesquisa para ver todas as campanhas.",
       "allHidden": "Nenhuma campanha para mostrar",
-      "allHiddenHint": "Todas as campanhas na rede foram ocultadas pelos moderadores. Ative \u201cMostrar ocultas\u201d para visualizá-las.",
+      "allHiddenHint": "Todas as campanhas na rede foram ocultadas pelos moderadores. Ative “Mostrar ocultas” para visualizá-las.",
       "empty": "Nenhuma campanha ainda",
       "emptyHint": "Nenhuma campanha foi publicada ainda. Seja o primeiro."
+    }
+  },
+  "moderation": {
+    "hiddenBadge": "Oculto",
+    "menu": {
+      "label": "Ações de moderador",
+      "ariaCampaign": "Moderar campanha",
+      "ariaPledge": "Moderar promessa",
+      "ariaGroup": "Moderar grupo",
+      "failedAction": "Falha ao {{action}}",
+      "approve": "Aprovar",
+      "unapprove": "Desaprovar",
+      "approvedState": "Aprovado",
+      "hide": "Ocultar",
+      "unhide": "Reexibir",
+      "hiddenState": "Oculto",
+      "feature": "Destacar",
+      "unfeature": "Remover destaque",
+      "featuredState": "Em destaque",
+      "toastApproved": "Aprovado para a página inicial",
+      "toastUnapproved": "Removido da página inicial",
+      "toastHidden": "Ocultado",
+      "toastUnhidden": "Reexibido",
+      "toastFeatured": "Destacado",
+      "toastUnfeatured": "Removido dos destaques"
     }
   },
   "settings": {
@@ -1194,8 +1269,12 @@
     "openMenu": "Menu da carteira"
   },
   "walletSettings": {
-    "backup": { "label": "Fazer backup da carteira" },
-    "legacy": { "label": "Recuperação de carteira antiga" }
+    "backup": {
+      "label": "Fazer backup da carteira"
+    },
+    "legacy": {
+      "label": "Recuperação de carteira antiga"
+    }
   },
   "walletLegacy": {
     "seoTitle": "Recuperação de carteira antiga",
@@ -1638,7 +1717,7 @@
     "tabs": {
       "agora": "Agora",
       "nostr": "Nostr",
-      "accounts": "Contas"
+      "accounts": "Usuários"
     },
     "filters": {
       "title": "Filtros",
@@ -1711,7 +1790,7 @@
     "empty": {
       "posts": "Nenhum resultado encontrado correspondendo à sua pesquisa.",
       "postsPrompt": "Digite uma consulta de pesquisa para encontrar conteúdo Nostr.",
-      "accounts": "Nenhuma conta encontrada correspondendo à sua pesquisa.",
+      "accounts": "Nenhum usuário encontrado correspondendo à sua pesquisa.",
       "followsPrompt": "Pesquise pessoas por nome ou endereço NIP-05.",
       "agora": "Nenhuma campanha, promessa ou grupo Agora correspondendo à sua pesquisa.",
       "agoraPrompt": "Pesquise campanhas, promessas e grupos Agora, ou navegue pelos mais recentes.",
@@ -1959,10 +2038,18 @@
   },
   "faq": {
     "categories": {
-      "getting-started": { "label": "Sobre o Agora" },
-      "payments": { "label": "Doações em Bitcoin no Agora" },
-      "about-nostr": { "label": "Sobre o Nostr" },
-      "legacy": { "label": "Legado" }
+      "getting-started": {
+        "label": "Sobre o Agora"
+      },
+      "payments": {
+        "label": "Doações em Bitcoin no Agora"
+      },
+      "about-nostr": {
+        "label": "Sobre o Nostr"
+      },
+      "legacy": {
+        "label": "Legado"
+      }
     },
     "items": {
       "what-is-ditto": {
@@ -2019,6 +2106,14 @@
           "**Doações públicas** são registradas na blockchain do Bitcoin e no Nostr. Qualquer um pode ver os valores, horários e endereços.",
           "**Doações privadas** usam pagamentos silenciosos. Não são publicamente conectáveis ao código de doação do ativista, não aparecem nas listas de doadores e não contam para os totais públicos.",
           "Quando uma campanha aceita ambos, a carteira do doador decide qual caminho usar — carteiras capazes de pagamentos silenciosos pagam com privacidade, outras pagam o endereço público. Leia o **Guia do Doador** e o **Guia do Ativista** para o quadro completo."
+        ]
+      },
+      "why-donations-pending": {
+        "question": "Por que algumas doações aparecem como \"pendentes\"?",
+        "answer": [
+          "Uma doação **pendente** é Bitcoin real que já foi enviado — está apenas aguardando confirmação pela rede. A carteira do doador transmitiu a transação, mas ela ainda não foi incluída em um bloco.",
+          "O Bitcoin produz um novo bloco a cada 10 minutos, aproximadamente, e os mineradores escolhem as transações com base na taxa que o doador pagou. A maioria das doações confirma em até uma hora; as com taxa mais baixa podem demorar mais quando a rede está congestionada. O {{appName}} verifica o status de confirmação automaticamente, então o rótulo **pendente** desaparece sozinho assim que um bloco é minerado.",
+          "Os fundos estão a caminho — o ativista verá a doação ser contabilizada no total da campanha assim que ela for confirmada. Não há nada que o ativista ou o {{appName}} possam fazer para acelerar; apenas a carteira do doador pode aumentar a taxa."
         ]
       },
       "censorship-resistance": {

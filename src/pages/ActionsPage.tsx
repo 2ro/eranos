@@ -1,46 +1,46 @@
 import { useEffect, useState, useMemo } from 'react';
 import { useSeoMeta } from '@unhead/react';
-import { Link as RouterLink, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
-import { useTranslation, Trans } from 'react-i18next';
+import { useTranslation } from 'react-i18next';
 import { nip19 } from 'nostr-tools';
 
 import { parseAction, useActions, type Action } from '@/hooks/useActions';
 import { useAppContext } from '@/hooks/useAppContext';
-import { useAuthor } from '@/hooks/useAuthor';
+import { useCampaignModerators } from '@/hooks/useCampaignModerators';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useBtcPrice } from '@/hooks/useBtcPrice';
+import { useDebounce } from '@/hooks/useDebounce';
+import { useNip50Search, type Nip50Sort } from '@/hooks/useNip50Search';
 import { useNostrPublish } from '@/hooks/useNostrPublish';
+import { usePledgeModeration } from '@/hooks/usePledgeModeration';
 import { useShareOrigin } from '@/hooks/useShareOrigin';
 import { useToast } from '@/hooks/useToast';
-import { useEventTranslation } from '@/hooks/useEventTranslation';
-import { getAllCountries, getGeoDisplayName, countryCodeToFlag } from '@/lib/countries';
-import { getDisplayName } from '@/lib/genUserName';
-import { DEFAULT_ACTION_COVERS, DEFAULT_COVER_IMAGE } from '@/lib/defaultActionCovers';
-import { formatCompactPledgeDeadline, formatPledgeAmount } from '@/lib/pledges';
+import { getGeoDisplayName } from '@/lib/countries';
+import { DEFAULT_ACTION_COVERS } from '@/lib/defaultActionCovers';
 import { HOPE_PALETTE } from '@/lib/hopePalette';
 import { cn } from '@/lib/utils';
+import { DiscoverySearchToolbar } from '@/components/DiscoverySearchToolbar';
 import { HeroAtmosphere } from '@/components/HeroAtmosphere';
 import { HeroBanner } from '@/components/HeroBanner';
+import {
+  ModerationMenuItems,
+  ModerationOverlay,
+  ModeratorCollapsibleSection,
+} from '@/components/moderation';
+import { PledgeCard } from '@/components/PledgeCard';
 
-import { Badge } from '@/components/ui/badge';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
-import {
-  Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList,
-} from '@/components/ui/command';
-import {
-  Popover, PopoverContent, PopoverTrigger,
-} from '@/components/ui/popover';
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 
 import {
-  CalendarClock, Clock, HandHeart, MapPin, Plus, ChevronRight, Loader2,
-  Link as LinkIcon, Check, MoreHorizontal, Trash2, ListFilter,
-  Calendar, DollarSign, Globe, Megaphone,
+  HandHeart, PlusCircle, ChevronDown, ChevronUp, Loader2,
+  Link as LinkIcon, Check, MoreHorizontal, Trash2,
+  Megaphone, Hourglass, EyeOff,
 } from 'lucide-react';
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -62,9 +62,10 @@ function ActionSkeleton() {
   );
 }
 
-function ActionShareMenu({ action }: { action: Action }) {
+function ActionShareMenu({ action, displayTitle }: { action: Action; displayTitle: string }) {
   const { t } = useTranslation();
   const { user } = useCurrentUser();
+  const { data: moderators } = useCampaignModerators();
   const { mutateAsync: createEvent } = useNostrPublish();
   const { toast } = useToast();
   const shareOrigin = useShareOrigin();
@@ -73,6 +74,12 @@ function ActionShareMenu({ action }: { action: Action }) {
   const [isDeleting, setIsDeleting] = useState(false);
 
   const isOwner = user?.pubkey === action.pubkey;
+  // Moderator gate is identical to the one in `ModerationMenuItems`,
+  // duplicated here so we can decide whether to render the trailing
+  // separator that introduces the moderator section. `ModerationMenuItems`
+  // returns `null` for non-mods, so without this check we'd render an
+  // orphaned separator at the bottom of the dropdown.
+  const isMod = !!user && !!moderators && moderators.includes(user.pubkey);
 
   const naddr = nip19.naddrEncode({
     kind: 36639,
@@ -150,7 +157,8 @@ function ActionShareMenu({ action }: { action: Action }) {
         <Button
           variant="ghost"
           size="icon"
-          className="h-8 w-8 text-muted-foreground hover:text-foreground"
+          aria-label={t('pledges.card.actionsAriaLabel')}
+          className="h-8 w-8 bg-background/80 backdrop-blur text-muted-foreground hover:text-foreground"
         >
           <MoreHorizontal className="h-4 w-4" />
         </Button>
@@ -177,119 +185,26 @@ function ActionShareMenu({ action }: { action: Action }) {
           )}
           {t('pledges.card.copyLink')}
         </DropdownMenuItem>
+        {/* Moderator actions appear under a separator when the viewer
+            is a Team Soapbox moderator. `ModerationMenuItems` returns
+            null for non-mods, so we gate the trailing separator on the
+            same `isMod` check to avoid an orphan separator at the
+            bottom of non-mod dropdowns. */}
+        {isMod && <DropdownMenuSeparator />}
+        <ModerationMenuItems
+          coord={`36639:${action.pubkey}:${action.id}`}
+          entityTitle={displayTitle}
+          surface="pledge"
+          axes={['hide', 'featured']}
+        />
       </DropdownMenuContent>
     </DropdownMenu>
-  );
-}
-
-function ActionCard({ action, isExpired, btcPrice }: { action: Action; isExpired?: boolean; btcPrice: number | undefined }) {
-  const { t } = useTranslation();
-  const { translatedEvent, translateAction } = useEventTranslation(action.event, {
-    iconOnly: true,
-    buttonClassName: 'size-8 rounded-full p-0 text-muted-foreground hover:text-primary hover:bg-primary/10',
-  });
-  const displayAction = parseAction(translatedEvent) ?? action;
-  const author = useAuthor(action.pubkey);
-  const metadata = author.data?.metadata;
-  const displayName = getDisplayName(metadata, action.pubkey);
-  const [imageLoadFailed, setImageLoadFailed] = useState(false);
-
-  const naddr = nip19.naddrEncode({
-    kind: 36639,
-    pubkey: action.pubkey,
-    identifier: action.id,
-  });
-
-  // Always show a cover — fall back to the default if the author didn't set
-  // one, or the URL failed to validate / load.
-  const coverImage = (displayAction.image && !imageLoadFailed)
-    ? displayAction.image
-    : DEFAULT_COVER_IMAGE;
-
-  const deadline = displayAction.deadline ? formatCompactPledgeDeadline(displayAction.deadline) : null;
-  const countryLabel = displayAction.countryCode ? getGeoDisplayName(displayAction.countryCode) : undefined;
-
-  return (
-    <RouterLink
-      to={`/${naddr}`}
-      className="group block rounded-xl overflow-hidden focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background motion-safe:transition-transform motion-safe:duration-200 motion-safe:hover:-translate-y-0.5"
-    >
-      <Card className="overflow-hidden border-border/70 shadow-sm motion-safe:transition-shadow motion-safe:duration-200 group-hover:shadow-lg h-full flex flex-col">
-        <div className="relative w-full aspect-[16/9] bg-gradient-to-br from-primary/15 via-primary/5 to-secondary">
-          <img
-            src={coverImage}
-            alt=""
-            className="absolute inset-0 size-full object-cover"
-            onError={() => setImageLoadFailed(true)}
-            loading="lazy"
-          />
-          <div className="absolute top-3 right-3 flex items-center gap-2" onClick={(e) => e.preventDefault()}>
-            {isExpired && (
-              <Badge variant="secondary" className="backdrop-blur bg-background/85 border-border/40 text-muted-foreground">
-                {t('pledges.card.ended')}
-              </Badge>
-            )}
-            <ActionShareMenu action={action} />
-          </div>
-        </div>
-
-        <div className="flex flex-col gap-3 p-5 flex-1">
-          <div className="space-y-2">
-            <h3 className="font-bold leading-tight tracking-tight text-lg line-clamp-2">
-              {displayAction.title}
-            </h3>
-            {displayAction.description.trim() && (
-              <p className="text-sm text-muted-foreground line-clamp-2">
-                {displayAction.description}
-              </p>
-            )}
-          </div>
-
-          <div className="flex-1" />
-
-          <div className="rounded-xl border border-primary/20 bg-primary/10 px-4 py-3">
-            <p className="text-xs font-semibold uppercase tracking-wide text-primary">{t('pledges.card.pledged')}</p>
-            <p className="mt-1 text-2xl font-bold tracking-tight text-foreground">
-              {formatPledgeAmount(action.bounty, btcPrice)}
-            </p>
-          </div>
-
-          <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 text-xs text-muted-foreground pt-1">
-            {countryLabel && (
-              <span className="inline-flex items-center gap-1.5">
-                <MapPin className="size-3.5" />
-                {countryLabel}
-              </span>
-            )}
-            {deadline && (
-              <span className={cn('inline-flex items-center gap-1.5', deadline.isPast && 'text-destructive')}>
-                <CalendarClock className="size-3.5" />
-                {deadline.label}
-              </span>
-            )}
-          </div>
-
-          <div className="flex items-center justify-between gap-3 border-t border-border/60 pt-3 text-xs text-muted-foreground">
-            <div className="truncate">
-              <Trans
-                i18nKey="pledges.card.byAuthor"
-                values={{ name: displayName }}
-                components={{ 0: <span className="font-medium text-foreground" /> }}
-              />
-            </div>
-            {translateAction}
-          </div>
-        </div>
-      </Card>
-    </RouterLink>
   );
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Page
 // ─────────────────────────────────────────────────────────────────────────────
-
-type SortOption = 'recent' | 'bounty' | 'deadline';
 
 export default function ActionsPage() {
   const { t } = useTranslation();
@@ -299,13 +214,116 @@ export default function ActionsPage() {
   const navigate = useNavigate();
 
   const [selectedCountry, setSelectedCountry] = useState<string | undefined>(undefined);
-  const [sortBy, setSortBy] = useState<SortOption>('recent');
-  const [headerCountryPickerOpen, setHeaderCountryPickerOpen] = useState(false);
+
+  // On-page NIP-50 search + sort + show-hidden toolbar state.
+  //
+  //   Default sort, empty query → curated active / upcoming / past
+  //     sections below.
+  //   Default sort, with query  → relay search for kind 36639, results
+  //     post-filtered against title/content client-side.
+  //   Top / New                  → always active. Top sends `sort:top`;
+  //     New sends a raw chronological feed of the kind.
+  //
+  // The country filter is threaded through to the search as a NIP-73
+  // `#i` tag filter (`iso3166:XX` + legacy `geo:XX`). Picking a country
+  // with an empty query still activates the search view — narrowing a
+  // kind by external identifier produces a useful filtered grid even
+  // without a typed term.
+  const [searchInput, setSearchInput] = useState('');
+  const [sortMode, setSortMode] = useState<Nip50Sort>('default');
+  const [showHidden, setShowHidden] = useState(false);
+  const debouncedSearch = useDebounce(searchInput, 300);
+  const trimmedSearch = debouncedSearch.trim();
+  const iTags = useMemo<string[] | undefined>(() => {
+    if (!selectedCountry) return undefined;
+    const code = selectedCountry.toUpperCase();
+    return [`iso3166:${code}`, `geo:${code}`];
+  }, [selectedCountry]);
+  const {
+    data: searchHitsRaw,
+    isFetching: isSearchFetching,
+    isActive: isSearching,
+  } = useNip50Search<Action>({
+    kind: 36639,
+    query: debouncedSearch,
+    sort: sortMode,
+    parse: parseAction,
+    iTags,
+    // Pledge titles live in a `title` tag, not `content`. Most NIP-50
+    // implementations only match content; widen the net client-side.
+    getKeywordHaystack: (event) => {
+      const title = event.tags.find(([n]) => n === 'title')?.[1] ?? '';
+      return [title, event.content];
+    },
+  });
+
+  // Pledges now ride the same `agora.moderation` namespace as campaigns
+  // and organizations (two-axis: hide + featured). Filter hidden pledges
+  // out of search results unless the moderator opts in via the
+  // Show-hidden switch. Computed here so the search hook stays
+  // kind-agnostic.
+  const { data: pledgeModeration, isReady: pledgeModerationReady } = usePledgeModeration();
+  const { searchHits, searchHiddenCount } = useMemo(() => {
+    if (!searchHitsRaw) return { searchHits: undefined, searchHiddenCount: 0 };
+    const hiddenCoords = pledgeModeration?.hiddenCoords ?? new Set<string>();
+    let hidden = 0;
+    const visible: Action[] = [];
+    for (const a of searchHitsRaw) {
+      const coord = `36639:${a.pubkey}:${a.id}`;
+      if (hiddenCoords.has(coord)) {
+        hidden += 1;
+        if (showHidden) visible.push(a);
+      } else {
+        visible.push(a);
+      }
+    }
+    return { searchHits: visible, searchHiddenCount: hidden };
+  }, [searchHitsRaw, pledgeModeration, showHidden]);
 
   const { data: actions, isLoading: actionsLoading } = useActions({
     countryCode: selectedCountry,
     limit: 300,
   });
+
+  // Moderator gate. Reuses the campaign moderator pack (Team Soapbox) —
+  // the pledge moderation namespace rides the same signer set as the
+  // campaign and group surfaces. Drives the Pending and Hidden review
+  // sections at the bottom of the page.
+  const { data: moderators } = useCampaignModerators();
+  const isMod = !!user && !!moderators && moderators.includes(user.pubkey);
+
+  // For moderators we pull the full (unfiltered-by-country) pledge
+  // stream so the review queue isn't blinkered to whatever country the
+  // viewer happens to have selected. Same `agora-action` t-tag filter
+  // as the public list, just wider. Skipped entirely for non-mods so we
+  // don't pay the round-trip cost for everyone.
+  const { data: allPledgesForMods, isLoading: allPledgesLoading } = useActions({
+    limit: 300,
+    enabled: isMod,
+  });
+
+  // Pending (mod-only): pledges that haven't been featured or hidden.
+  // Mirrors the campaign/group "needs review" semantics — pledges have
+  // a two-axis model, so "pending" means "no curation decision yet".
+  // Gated on `pledgeModerationReady` so a cold load doesn't briefly
+  // dump every pledge into "Pending" before label folding completes.
+  const pendingPledges = useMemo<Action[]>(() => {
+    if (!isMod || !pledgeModerationReady) return [];
+    return (allPledgesForMods ?? []).filter((p) => {
+      const coord = `36639:${p.pubkey}:${p.id}`;
+      return !pledgeModeration.featuredCoords.has(coord)
+        && !pledgeModeration.hiddenCoords.has(coord);
+    });
+  }, [isMod, pledgeModerationReady, pledgeModeration, allPledgesForMods]);
+
+  // Hidden (mod-only): pledges where the latest hide-axis label is `hidden`.
+  const hiddenPledges = useMemo<Action[]>(() => {
+    if (!isMod || !pledgeModerationReady) return [];
+    return (allPledgesForMods ?? []).filter((p) => {
+      const coord = `36639:${p.pubkey}:${p.id}`;
+      return pledgeModeration.hiddenCoords.has(coord);
+    });
+  }, [isMod, pledgeModerationReady, pledgeModeration, allPledgesForMods]);
 
   // Route entry points for "Create pledge" all pass the currently-selected
   // country via ?country= so the dedicated page can pre-fill it, matching
@@ -313,22 +331,6 @@ export default function ActionsPage() {
   const createActionHref = selectedCountry
     ? `/pledges/new?country=${encodeURIComponent(selectedCountry)}`
     : '/pledges/new';
-
-  const allCountries = useMemo(() => getAllCountries(), []);
-
-  const countryOptions = useMemo(() => {
-    const options: Array<{ value: string; label: string; flag: string }> = [
-      { value: 'global', label: t('pledges.list.global'), flag: '🌍' },
-    ];
-    allCountries.forEach((country) => {
-      options.push({
-        value: country.code,
-        label: country.name,
-        flag: countryCodeToFlag(country.code),
-      });
-    });
-    return options;
-  }, [allCountries, t]);
 
   const selectedCountryName = selectedCountry
     ? getGeoDisplayName(selectedCountry)
@@ -356,23 +358,13 @@ export default function ActionsPage() {
   }) ?? [];
   const pastUnsorted = actions?.filter((c) => c.deadline && c.deadline <= now) ?? [];
 
-  const sortActions = (cs: Action[]) => {
-    const sorted = [...cs];
-    const isPastOnlyList = sorted.length > 0 && sorted.every((c) => !!c.deadline && c.deadline <= now);
-    switch (sortBy) {
-      case 'recent':
-        return sorted.sort((a, b) => b.createdAt - a.createdAt);
-      case 'bounty':
-        return sorted.sort((a, b) => b.bounty - a.bounty);
-      case 'deadline':
-        return sorted.sort((a, b) => {
-          if (!a.deadline) return 1;
-          if (!b.deadline) return -1;
-          // Upcoming/current: soonest deadline first. Past: most recently ended first.
-          return isPastOnlyList ? b.deadline - a.deadline : a.deadline - b.deadline;
-        });
-    }
-  };
+  // Within each lifecycle section we sort newest-first by `createdAt`.
+  // The page used to expose Recent / Bounty / Deadline as a dropdown,
+  // but those modes were superseded by the shared DiscoverySearchToolbar
+  // (Default / Top / New) which drives a relay-ranked search view —
+  // keeping a parallel client-side sort on top of the curated layout
+  // duplicated the affordance for no real gain.
+  const sortActions = (cs: Action[]) => [...cs].sort((a, b) => b.createdAt - a.createdAt);
 
   const currentActions = sortActions(currentUnsorted);
   const upcomingActions = sortActions(upcomingUnsorted);
@@ -388,7 +380,6 @@ export default function ActionsPage() {
   const visiblePast = showAllPast ? pastActions : pastActions.slice(0, DEFAULT_VISIBLE);
   const hasCurrent = currentActions.length > 0;
   const hasUpcoming = upcomingActions.length > 0;
-  const isOnlyPastView = !hasCurrent && !hasUpcoming && pastActions.length > 0;
   const primarySectionTitle = hasCurrent
     ? t('pledges.list.sectionActive')
     : hasUpcoming
@@ -396,77 +387,23 @@ export default function ActionsPage() {
     : pastActions.length > 0
         ? t('pledges.list.sectionPast')
         : t('pledges.list.sectionDefault');
-  const deadlineSortLabel = isOnlyPastView
-    ? t('pledges.list.sortDeadlinePast')
-    : t('pledges.list.sortDeadline');
 
   const headerControls = (
-    <div className="flex items-center gap-1">
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button variant="ghost" size="sm" className="h-auto p-2 hover:bg-muted/50 rounded-lg" aria-label={t('pledges.list.sortAriaLabel')}>
-            <ListFilter className="h-5 w-5 text-primary" />
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="end" className="w-48">
-          <div className="px-2 py-1.5 text-xs font-semibold text-muted-foreground">{t('pledges.list.sortBy')}</div>
-          <DropdownMenuItem onClick={() => setSortBy('recent')} className={sortBy === 'recent' ? 'bg-primary/10' : ''}>
-            <Clock className="mr-2 h-4 w-4" /><span>{t('pledges.list.sortRecent')}</span>
-            {sortBy === 'recent' && <Check className="ml-auto h-4 w-4" />}
-          </DropdownMenuItem>
-          <DropdownMenuItem onClick={() => setSortBy('bounty')} className={sortBy === 'bounty' ? 'bg-primary/10' : ''}>
-            <DollarSign className="mr-2 h-4 w-4" /><span>{t('pledges.list.sortBounty')}</span>
-            {sortBy === 'bounty' && <Check className="ml-auto h-4 w-4" />}
-          </DropdownMenuItem>
-          <DropdownMenuItem onClick={() => setSortBy('deadline')} className={sortBy === 'deadline' ? 'bg-primary/10' : ''}>
-            <Calendar className="mr-2 h-4 w-4" /><span>{deadlineSortLabel}</span>
-            {sortBy === 'deadline' && <Check className="ml-auto h-4 w-4" />}
-          </DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
-
-      <Popover open={headerCountryPickerOpen} onOpenChange={setHeaderCountryPickerOpen}>
-        <PopoverTrigger asChild>
-          <Button variant="ghost" size="sm" className="h-auto p-2 hover:bg-muted/50 rounded-lg" aria-label={t('pledges.list.filterAriaLabel')}>
-            {selectedCountry ? (
-              <span className="text-2xl">{countryCodeToFlag(selectedCountry)}</span>
-            ) : (
-              <Globe className="h-5 w-5 text-primary" />
-            )}
-          </Button>
-        </PopoverTrigger>
-        <PopoverContent className="w-[280px] p-0" align="end">
-          <Command>
-            <CommandInput placeholder={t('pledges.list.countrySearchPlaceholder')} />
-            <CommandList>
-              <CommandEmpty>{t('pledges.list.noResults')}</CommandEmpty>
-              <CommandGroup>
-                {countryOptions.map((option) => (
-                  <CommandItem
-                    key={option.value}
-                    value={`${option.label} ${option.value}`}
-                    onSelect={() => {
-                      setSelectedCountry(option.value === 'global' ? undefined : option.value);
-                      setHeaderCountryPickerOpen(false);
-                    }}
-                    className="gap-2"
-                  >
-                    <span>{option.flag}</span>
-                    <span className="flex-1">{option.label}</span>
-                    <Check
-                      className={cn(
-                        'h-4 w-4',
-                        (selectedCountry || 'global') === option.value ? 'opacity-100' : 'opacity-0',
-                      )}
-                    />
-                  </CommandItem>
-                ))}
-              </CommandGroup>
-            </CommandList>
-          </Command>
-        </PopoverContent>
-      </Popover>
-    </div>
+    <DiscoverySearchToolbar
+      query={searchInput}
+      onQueryChange={setSearchInput}
+      sort={sortMode}
+      onSortChange={setSortMode}
+      searchPlaceholderKey="pledges.list.searchPlaceholder"
+      searchAriaLabelKey="pledges.list.searchAriaLabel"
+      showHidden={{
+        value: showHidden,
+        onChange: setShowHidden,
+        count: searchHiddenCount,
+      }}
+      country={selectedCountry}
+      onCountryChange={setSelectedCountry}
+    />
   );
 
   return (
@@ -477,6 +414,83 @@ export default function ActionsPage() {
         onCreateAction={() => navigate(createActionHref)}
       />
 
+      {isSearching ? (
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-10 lg:py-14">
+          <section className="space-y-5">
+            <div className="flex flex-col items-stretch gap-4 sm:flex-row sm:items-end sm:justify-between">
+              <div>
+                <h2 className="text-2xl sm:text-3xl font-bold tracking-tight">
+                  {trimmedSearch
+                    ? t('common.search')
+                    : sortMode === 'top'
+                      ? t('common.sortTop')
+                      : t('common.sortNew')}
+                </h2>
+                {searchHits && (
+                  <p className="text-sm text-muted-foreground mt-1">
+                    {t('common.searchResultsCount', { count: searchHits.length })}
+                  </p>
+                )}
+              </div>
+              {headerControls}
+            </div>
+
+            {isSearchFetching && !searchHits ? (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+                {Array.from({ length: 8 }).map((_, i) => <ActionSkeleton key={i} />)}
+              </div>
+            ) : searchHits && searchHits.length > 0 ? (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+                {searchHits.map((action) => (
+                  <PledgeCard
+                    key={`${action.pubkey}:${action.id}`}
+                    action={action}
+                    isExpired={
+                      action.deadline ? action.deadline <= Date.now() / 1000 : false
+                    }
+                    btcPrice={btcPrice}
+                    showAuthor
+                    showTranslate
+                    topRight={
+                      <>
+                        <ModerationOverlay
+                          coord={`36639:${action.pubkey}:${action.id}`}
+                          entityTitle={action.title}
+                          surface="pledge"
+                          axes={['hide', 'featured']}
+                          showMenu={false}
+                          className="flex items-center"
+                        />
+                        <ActionShareMenu action={action} displayTitle={action.title} />
+                      </>
+                    }
+                  />
+                ))}
+              </div>
+            ) : (
+              <Card className="border-dashed">
+                <div className="py-12 px-8 text-center space-y-2">
+                  {trimmedSearch ? (
+                    <>
+                      <p className="text-base font-medium">
+                        {t('pledges.list.noMatch', { query: trimmedSearch })}
+                      </p>
+                      <p className="text-sm text-muted-foreground">
+                        {t('pledges.list.noMatchHint')}
+                      </p>
+                    </>
+                  ) : (
+                    <p className="text-sm text-muted-foreground">
+                      {t('pledges.list.emptyTitle')}
+                    </p>
+                  )}
+                </div>
+              </Card>
+            )}
+          </section>
+        </div>
+      ) : (
+
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-10 lg:py-14 space-y-12">
         {isLoading ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
@@ -484,7 +498,7 @@ export default function ActionsPage() {
           </div>
         ) : (actions && actions.length > 0) ? (
           <div className="space-y-8">
-            <div className="flex items-end justify-between gap-4">
+            <div className="flex flex-col items-stretch gap-4 sm:flex-row sm:items-end sm:justify-between">
               <div>
                 <h2 className="text-2xl sm:text-3xl font-bold tracking-tight">{primarySectionTitle}</h2>
                 <p className="text-sm text-muted-foreground mt-1">
@@ -556,7 +570,7 @@ export default function ActionsPage() {
           </div>
         ) : (
           <>
-            <div className="flex items-end justify-between gap-4 mb-6">
+            <div className="flex flex-col items-stretch gap-4 sm:flex-row sm:items-end sm:justify-between mb-6">
               <div>
                 <h2 className="text-2xl sm:text-3xl font-bold tracking-tight">{t('pledges.list.sectionActive')}</h2>
                 <p className="text-sm text-muted-foreground mt-1">
@@ -579,7 +593,7 @@ export default function ActionsPage() {
                 </div>
                 {user && (
                   <Button onClick={() => navigate(createActionHref)}>
-                    <Plus className="size-4 mr-2" />
+                    <PlusCircle className="size-4 mr-2" />
                     {t('pledges.list.createPledge')}
                   </Button>
                 )}
@@ -588,6 +602,95 @@ export default function ActionsPage() {
           </>
         )}
       </div>
+      )}
+
+      {/* Moderator-only review queues at the bottom of the page —
+          consistent with the campaigns and groups index pages so
+          reviewers see the same "Pending / Hidden" affordance
+          everywhere. Pulls the unfiltered-by-country pledge stream so
+          the queue isn't blinkered by the viewer's country filter. */}
+      {isMod && (
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 pb-10 lg:pb-14 space-y-12">
+          <ModeratorCollapsibleSection
+            icon={<Hourglass className="size-4" />}
+            title={t('pledges.list.needsReview')}
+            description={t('pledges.list.needsReviewDesc', { appName: config.appName })}
+            count={pendingPledges.length}
+            isLoading={allPledgesLoading || !pledgeModerationReady}
+            emptyText={t('pledges.list.needsReviewEmpty')}
+            skeleton={
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+                {Array.from({ length: 4 }).map((_, i) => <ActionSkeleton key={i} />)}
+              </div>
+            }
+          >
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+              {pendingPledges.map((action) => (
+                <PledgeCard
+                  key={`${action.pubkey}:${action.id}`}
+                  action={action}
+                  isExpired={action.deadline ? action.deadline <= Date.now() / 1000 : false}
+                  btcPrice={btcPrice}
+                  showAuthor
+                  showTranslate
+                  topRight={
+                    <>
+                      <ModerationOverlay
+                        coord={`36639:${action.pubkey}:${action.id}`}
+                        entityTitle={action.title}
+                        surface="pledge"
+                        axes={['hide', 'featured']}
+                        showMenu={false}
+                        className="flex items-center"
+                      />
+                      <ActionShareMenu action={action} displayTitle={action.title} />
+                    </>
+                  }
+                />
+              ))}
+            </div>
+          </ModeratorCollapsibleSection>
+          <ModeratorCollapsibleSection
+            icon={<EyeOff className="size-4" />}
+            title={t('pledges.list.hidden')}
+            description={t('pledges.list.hiddenDesc')}
+            count={hiddenPledges.length}
+            isLoading={allPledgesLoading || !pledgeModerationReady}
+            emptyText={t('pledges.list.hiddenEmpty')}
+            skeleton={
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+                {Array.from({ length: 4 }).map((_, i) => <ActionSkeleton key={i} />)}
+              </div>
+            }
+          >
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+              {hiddenPledges.map((action) => (
+                <PledgeCard
+                  key={`${action.pubkey}:${action.id}`}
+                  action={action}
+                  isExpired={action.deadline ? action.deadline <= Date.now() / 1000 : false}
+                  btcPrice={btcPrice}
+                  showAuthor
+                  showTranslate
+                  topRight={
+                    <>
+                      <ModerationOverlay
+                        coord={`36639:${action.pubkey}:${action.id}`}
+                        entityTitle={action.title}
+                        surface="pledge"
+                        axes={['hide', 'featured']}
+                        showMenu={false}
+                        className="flex items-center"
+                      />
+                      <ActionShareMenu action={action} displayTitle={action.title} />
+                    </>
+                  }
+                />
+              ))}
+            </div>
+          </ModeratorCollapsibleSection>
+        </div>
+      )}
     </main>
   );
 }
@@ -685,15 +788,15 @@ function ActionsHero({ actionCount, canCreate, onCreateAction }: ActionsHeroProp
             only carries a single fact — the current pledge count —
             so it stays calm and the headline does the heavy lifting. */}
         <div
-          className="relative w-full max-w-md mx-auto rounded-full bg-background/55 backdrop-blur-xl backdrop-saturate-150 border border-white/20 dark:border-white/10 px-5 py-3 shadow-lg shadow-amber-500/10"
+          className="relative w-full max-w-md mx-auto rounded-full bg-black/30 backdrop-blur-xl backdrop-saturate-150 border border-white/20 px-5 py-3 shadow-lg shadow-amber-500/10"
           aria-live="polite"
         >
           <div className="flex items-center justify-center gap-3">
-            <Megaphone className="size-5 text-primary shrink-0" aria-hidden />
-            <span className="text-sm sm:text-base font-semibold tracking-tight">
+            <Megaphone className="size-5 text-amber-200 shrink-0 drop-shadow" aria-hidden />
+            <span className="text-sm sm:text-base font-semibold tracking-tight text-white drop-shadow-[0_1px_4px_rgb(0_0_0/0.5)]">
               {actionCount.toLocaleString()}
             </span>
-            <span className="text-xs sm:text-sm text-muted-foreground line-clamp-1">
+            <span className="text-xs sm:text-sm text-white/85 line-clamp-1 drop-shadow-[0_1px_4px_rgb(0_0_0/0.5)]">
               {t('pledges.list.openCount', { count: actionCount })}
             </span>
           </div>
@@ -717,7 +820,7 @@ function ActionsHero({ actionCount, canCreate, onCreateAction }: ActionsHeroProp
             )}
             aria-label={canCreate ? t('pledges.list.createPledge') : t('pledges.list.loginToCreate')}
           >
-            <Plus className="mr-2" />
+            <PlusCircle className="mr-2" />
             {t('pledges.list.createPledge')}
           </Button>
         </div>
@@ -736,21 +839,48 @@ function ActionSection({
     <div className="space-y-5">
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
         {items.map((action) => (
-          <ActionCard
+          <PledgeCard
             key={`${action.pubkey}:${action.id}`}
             action={action}
             isExpired={isExpired}
             btcPrice={btcPrice}
+            showAuthor
+            showTranslate
+            topRight={
+              <>
+                <ModerationOverlay
+                  coord={`36639:${action.pubkey}:${action.id}`}
+                  entityTitle={action.title}
+                  surface="pledge"
+                  axes={['hide', 'featured']}
+                  showMenu={false}
+                  className="flex items-center"
+                />
+                <ActionShareMenu action={action} displayTitle={action.title} />
+              </>
+            }
           />
         ))}
       </div>
       {total > visible && (
-        <div className="flex justify-center pt-2">
-          <Button variant="outline" onClick={onToggle} className="gap-2">
+        <div className="flex justify-center">
+          <Button
+            type="button"
+            variant="ghost"
+            onClick={onToggle}
+            className="rounded-full text-sm"
+            aria-expanded={showAll}
+          >
             {showAll ? (
-              <>{t('pledges.list.showLess')} <ChevronRight className="h-4 w-4 rotate-90" /></>
+              <>
+                <ChevronUp className="size-4 mr-1.5" />
+                {t('pledges.list.showLess')}
+              </>
             ) : (
-              <>{t('pledges.list.showMore', { count: total - visible })} <ChevronRight className="h-4 w-4 -rotate-90" /></>
+              <>
+                <ChevronDown className="size-4 mr-1.5" />
+                {t('pledges.list.showMore', { count: total - visible })}
+              </>
             )}
           </Button>
         </div>

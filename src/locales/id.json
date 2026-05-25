@@ -20,7 +20,24 @@
     "goBack": "Kembali",
     "tryAgain": "Silakan coba lagi.",
     "showLess": "Tampilkan lebih sedikit",
-    "readMore": "Selengkapnya"
+    "readMore": "Selengkapnya",
+    "byAuthor": "oleh <0>{{name}}</0>",
+    "donors_one": "{{count}} donatur",
+    "donors_other": "{{count}} donatur",
+    "clearSearch": "Bersihkan pencarian",
+    "searching": "Mencari…",
+    "searchResultsCount_one": "{{count}} hasil",
+    "searchResultsCount_other": "{{count}} hasil",
+    "sortAriaLabel": "Urutan",
+    "sortDefault": "Bawaan",
+    "sortTop": "Teratas",
+    "sortNew": "Baru",
+    "showHidden": "Tampilkan yang tersembunyi",
+    "filtersAriaLabel": "Filter pencarian",
+    "countryFilterAriaLabel": "Saring berdasarkan negara",
+    "countrySearchPlaceholder": "Cari negara…",
+    "countryNoResults": "Tidak ada negara yang ditemukan.",
+    "countryGlobal": "Global"
   },
   "translate": {
     "translate": "Terjemahkan",
@@ -598,12 +615,23 @@
       "showMore": "Tampilkan lebih banyak ({{count}} lagi)",
       "emptyTitle": "Belum ada ikrar",
       "emptyHint": "Jadilah yang pertama membuat ikrar.",
-      "emptyHintCountry": "Jadilah yang pertama membuat ikrar untuk {{country}}."
+      "emptyHintCountry": "Jadilah yang pertama membuat ikrar untuk {{country}}.",
+      "searchPlaceholder": "Cari ikrar…",
+      "searchAriaLabel": "Cari ikrar",
+      "noMatch": "Tidak ada ikrar yang cocok dengan “{{query}}”",
+      "noMatchHint": "Coba kata pencarian lain, atau bersihkan pencarian.",
+      "needsReview": "Perlu ditinjau",
+      "needsReviewDesc": "Ikrar {{appName}} yang belum diunggulkan atau disembunyikan. Naikkan ke rak Unggulan atau sembunyikan dengan Hide.",
+      "needsReviewEmpty": "Tidak ada yang menunggu peninjauan.",
+      "hidden": "Tersembunyi",
+      "hiddenDesc": "Ikrar yang disembunyikan dari penemuan publik. Gunakan menu kebab pada kartu untuk menampilkannya kembali.",
+      "hiddenEmpty": "Tidak ada ikrar yang sedang disembunyikan."
     },
     "card": {
       "ended": "Berakhir",
       "pledged": "Diikrarkan",
       "byAuthor": "oleh <0>{{name}}</0>",
+      "actionsAriaLabel": "Tindakan ikrar",
       "deletePledge": "Hapus ikrar",
       "copyLink": "Salin tautan",
       "linkCopied": "Tautan disalin",
@@ -618,7 +646,6 @@
       "seoDescription": "Buat ikrar donatur untuk menginspirasi aksi konkret di {{appName}}.",
       "loginGateTitle": "Masuk untuk membuat ikrar",
       "loginGateBody": "Ikrar adalah event Nostr yang ditandatangani. Anda perlu masuk Nostr untuk memublikasikannya.",
-      "backToPledges": "Kembali ke ikrar",
       "heading": "Buat ikrar",
       "title": "Judul",
       "titlePlaceholder": "Mendokumentasikan pembersihan pantai",
@@ -697,7 +724,9 @@
       "createGroupLoginTitle": "Masuk untuk membuat grup",
       "createGroupLoginBody": "Membuat grup memublikasikan event Nostr dari akun Anda.",
       "myGroups": "Grup saya",
+      "myGroupsTagline": "Grup yang Anda dirikan, moderasi, atau ikuti.",
       "featuredGroups": "Grup unggulan",
+      "featuredGroupsTagline": "Grup menonjol yang layak Anda perhatikan.",
       "loginToSeeTitle": "Masuk untuk melihat grup Anda",
       "loginToSeeBody": "Grup yang Anda dirikan atau moderasi akan muncul di sini.",
       "noGroupsTitle": "Belum ada grup",
@@ -718,7 +747,11 @@
       "tickerFeaturedGroups_one": "grup unggulan di Nostr",
       "tickerFeaturedGroups_other": "grup unggulan di Nostr",
       "tickerCountries_one": "negara memposting hari ini",
-      "tickerCountries_other": "negara memposting hari ini"
+      "tickerCountries_other": "negara memposting hari ini",
+      "searchPlaceholder": "Cari grup…",
+      "searchAriaLabel": "Cari grup",
+      "noMatch": "Tidak ada grup yang cocok dengan “{{query}}”",
+      "noMatchHint": "Coba kata pencarian lain, atau bersihkan pencarian."
     },
     "create": {
       "seoTitleCreate": "Buat grup",
@@ -727,7 +760,6 @@
       "seoDescriptionEdit": "Perbarui grup Anda di {{appName}}.",
       "loginGateTitle": "Masuk untuk memulai grup",
       "loginGateBody": "Grup adalah event Nostr yang ditandatangani. Anda perlu masuk Nostr untuk memublikasikannya.",
-      "backToGroups": "Kembali ke grup",
       "invalidEditTitle": "Tautan edit tidak valid",
       "invalidEditBody": "Tautan edit grup ini kehilangan alamat grup yang valid.",
       "startNewGroup": "Mulai grup baru",
@@ -816,7 +848,6 @@
     "seoDescriptionEdit": "Perbarui kampanye penggalangan dana Anda di {{appName}}.",
     "loginGateTitle": "Masuk untuk memulai kampanye",
     "loginGateBody": "Kampanye adalah event Nostr yang ditandatangani. Anda perlu masuk Nostr untuk memublikasikannya.",
-    "goHome": "Ke beranda",
     "invalidEditTitle": "Tautan edit tidak valid",
     "invalidEditBody": "Tautan edit kampanye ini kehilangan alamat kampanye yang valid.",
     "startNewCampaign": "Mulai kampanye baru",
@@ -946,7 +977,6 @@
       "seoDescription": "Buat acara kalender di {{appName}}.",
       "loginTitle": "Masuk untuk membuat acara",
       "loginBody": "Acara adalah event Nostr yang ditandatangani. Anda perlu masuk Nostr untuk memublikasikannya.",
-      "backToEvents": "Kembali ke acara",
       "heading": "Buat acara",
       "titlePlaceholder": "Bersih-bersih lingkungan",
       "descriptionPlaceholder": "Beri tahu orang apa yang diharapkan, apa yang harus dibawa, dan siapa yang sebaiknya hadir...",
@@ -1041,12 +1071,23 @@
       "yourCampaigns": "Kampanye Anda",
       "yourCampaignsDesc": "Kampanye Anda aktif di Nostr dan donasi berfungsi melalui tautan kampanye. Mereka akan muncul di beranda setelah moderator Team Soapbox menyetujuinya.",
       "empty": "Belum ada kampanye",
-      "emptyHint": "Jadilah yang pertama memulai penggalangan dana di {{appName}}. Ceritakan kisah Anda, pilih penerima manfaat, dan bagikan tautannya."
+      "emptyHint": "Jadilah yang pertama memulai penggalangan dana di {{appName}}. Ceritakan kisah Anda, pilih penerima manfaat, dan bagikan tautannya.",
+      "searchPlaceholder": "Cari kampanye…",
+      "searchAriaLabel": "Cari kampanye",
+      "noMatch": "Tidak ada kampanye yang cocok dengan “{{query}}”",
+      "noMatchHint": "Coba kata pencarian lain, atau bersihkan pencarian."
     },
     "all": {
       "title": "Semua Kampanye",
       "seoTitle": "Semua kampanye",
       "description": "Telusuri setiap kampanye yang dipublikasikan di Agora.",
+      "sectionTagline": "Jelajahi setiap aksi di jaringan.",
+      "heroKicker": "Kampanye",
+      "heroHeading": "Setiap aksi,",
+      "heroHeadingLine2": "dalam satu tempat.",
+      "heroBody": "Setiap penggalangan dana yang dipublikasikan di Nostr, dikumpulkan dalam satu tempat. Telusuri seluruh jaringan, temukan aksi yang penting bagi Anda, dan dukung langsung dengan Bitcoin.",
+      "campaignsCount_one": "kampanye di jaringan",
+      "campaignsCount_other": "kampanye di jaringan",
       "searchAriaLabel": "Cari kampanye",
       "searchPlaceholder": "Cari kampanye…",
       "clearSearch": "Bersihkan pencarian",
@@ -1061,6 +1102,31 @@
       "allHiddenHint": "Setiap kampanye di jaringan telah disembunyikan oleh moderator. Aktifkan “Tampilkan yang tersembunyi” untuk melihatnya.",
       "empty": "Belum ada kampanye",
       "emptyHint": "Belum ada kampanye yang dipublikasikan. Jadilah yang pertama."
+    }
+  },
+  "moderation": {
+    "hiddenBadge": "Tersembunyi",
+    "menu": {
+      "label": "Tindakan moderator",
+      "ariaCampaign": "Moderasi kampanye",
+      "ariaPledge": "Moderasi ikrar",
+      "ariaGroup": "Moderasi grup",
+      "failedAction": "Gagal {{action}}",
+      "approve": "Setujui",
+      "unapprove": "Batalkan persetujuan",
+      "approvedState": "Disetujui",
+      "hide": "Sembunyikan",
+      "unhide": "Tampilkan kembali",
+      "hiddenState": "Tersembunyi",
+      "feature": "Unggulkan",
+      "unfeature": "Batalkan unggulan",
+      "featuredState": "Diunggulkan",
+      "toastApproved": "Disetujui untuk beranda",
+      "toastUnapproved": "Dihapus dari beranda",
+      "toastHidden": "Disembunyikan",
+      "toastUnhidden": "Ditampilkan kembali",
+      "toastFeatured": "Diunggulkan",
+      "toastUnfeatured": "Dihapus dari unggulan"
     }
   },
   "settings": {
@@ -1587,7 +1653,7 @@
     "tabs": {
       "agora": "Agora",
       "nostr": "Nostr",
-      "accounts": "Akun"
+      "accounts": "Pengguna"
     },
     "filters": {
       "title": "Filter",
@@ -1660,7 +1726,7 @@
     "empty": {
       "posts": "Tidak ada hasil yang cocok dengan pencarian Anda.",
       "postsPrompt": "Masukkan kueri pencarian untuk menemukan konten Nostr.",
-      "accounts": "Tidak ada akun yang cocok dengan pencarian Anda.",
+      "accounts": "Tidak ada pengguna yang cocok dengan pencarian Anda.",
       "followsPrompt": "Cari orang berdasarkan nama atau alamat NIP-05.",
       "agora": "Tidak ada kampanye, ikrar, atau grup Agora yang cocok dengan pencarian Anda.",
       "agoraPrompt": "Cari kampanye, ikrar, dan grup Agora, atau telusuri yang terbaru.",
@@ -1976,6 +2042,14 @@
           "**Donasi publik** dicatat di blockchain Bitcoin dan di Nostr. Siapa pun bisa melihat jumlah, waktu, dan alamatnya.",
           "**Donasi privat** menggunakan silent payments. Mereka tidak bisa dihubungkan secara publik ke kode donasi aktivis, tidak muncul dalam daftar donatur, dan tidak dihitung dalam jumlah total publik.",
           "Saat kampanye menerima keduanya, dompet donatur memutuskan jalur mana yang digunakan — dompet yang mendukung silent payments membayar secara privat, yang lain membayar alamat publik. Baca **Panduan Donatur** dan **Panduan Aktivis** untuk gambaran lengkap."
+        ]
+      },
+      "why-donations-pending": {
+        "question": "Mengapa beberapa donasi tertulis \"pending\"?",
+        "answer": [
+          "Donasi **pending** adalah Bitcoin asli yang sudah dikirim — ia hanya menunggu untuk dikonfirmasi oleh jaringan. Dompet donatur telah menyiarkan transaksinya, tetapi belum dimasukkan ke dalam blok.",
+          "Bitcoin menghasilkan blok baru kira-kira setiap 10 menit, dan penambang memilih transaksi berdasarkan biaya yang dibayar donatur. Sebagian besar donasi terkonfirmasi dalam satu jam; donasi dengan biaya lebih rendah bisa memakan waktu lebih lama saat jaringan sedang sibuk. {{appName}} memeriksa ulang status konfirmasi secara otomatis, sehingga label **pending** hilang dengan sendirinya begitu blok masuk.",
+          "Dananya sedang dalam perjalanan — aktivis akan melihat donasi tersebut dihitung ke dalam total kampanye segera setelah terkonfirmasi. Tidak ada yang bisa dilakukan aktivis atau {{appName}} untuk mempercepatnya; hanya dompet donatur yang bisa menaikkan fee."
         ]
       },
       "censorship-resistance": {

@@ -260,7 +260,7 @@ export function WalletRecoveryPage() {
                 rows={4}
                 autoComplete="off"
                 spellCheck={false}
-                className="font-mono text-sm"
+                className="font-mono text-base md:text-sm"
               />
 
               <Alert variant="default" className="border-amber-300/60 bg-amber-50 text-amber-950 dark:border-amber-500/30 dark:bg-amber-950/50 dark:text-amber-100">

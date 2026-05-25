@@ -1,17 +1,16 @@
 import { useMemo } from 'react';
 import type { ReactNode } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
-import { CalendarClock, EyeOff, HandHeart, MapPin, ShieldCheck } from 'lucide-react';
+import { CalendarClock, HandHeart, MapPin, ShieldCheck } from 'lucide-react';
 
-import { Badge } from '@/components/ui/badge';
+import { AuthorByline } from '@/components/AuthorByline';
 import { Card } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { Skeleton } from '@/components/ui/skeleton';
-import { CampaignModerationMenu } from '@/components/CampaignModerationMenu';
-import { useAuthor } from '@/hooks/useAuthor';
+import { ModerationOverlay } from '@/components/moderation';
 import { useBtcPrice } from '@/hooks/useBtcPrice';
 import { useCampaignDonations } from '@/hooks/useCampaignDonations';
-import { useCampaignModeration } from '@/hooks/useCampaignModeration';
 import { useEventTranslation } from '@/hooks/useEventTranslation';
 import {
   type ParsedCampaign,
@@ -20,7 +19,6 @@ import {
   parseCampaign,
 } from '@/lib/campaign';
 import { formatCampaignAmount, formatUsdGoal, satsToUsd } from '@/lib/formatCampaignAmount';
-import { genUserName } from '@/lib/genUserName';
 import { sanitizeUrl } from '@/lib/sanitizeUrl';
 import { cn } from '@/lib/utils';
 
@@ -123,8 +121,15 @@ function CampaignPrivateNotice({
 
 interface CampaignCardProps {
   campaign: ParsedCampaign;
-  /** Visual variant: `compact` for grid items, `featured` for hero placement. */
-  variant?: 'compact' | 'featured';
+  /**
+   * Visual variant.
+   *
+   * - `compact` — default grid item.
+   * - `featured` — hero placement (wider, side-by-side on `sm+`).
+   * - `shelf` — fixed-width card for horizontal scroll rails (e.g. group
+   *   official-activity). Caller no longer hand-rolls the size wrapper.
+   */
+  variant?: 'compact' | 'featured' | 'shelf';
   className?: string;
   /** Optional footer affordance rendered opposite the author line. */
   footerBadge?: ReactNode;
@@ -135,22 +140,17 @@ interface CampaignCardProps {
  * `<Link>` to the campaign's naddr-based detail route.
  */
 export function CampaignCard({ campaign, variant = 'compact', className, footerBadge }: CampaignCardProps) {
+  const { t } = useTranslation();
   const { translatedEvent, translateAction } = useEventTranslation(campaign.event, {
     iconOnly: true,
     buttonClassName: 'size-8 rounded-full p-0 text-muted-foreground hover:text-primary hover:bg-primary/10',
   });
   const displayCampaign = parseCampaign(translatedEvent) ?? campaign;
-  const author = useAuthor(campaign.pubkey);
   const { data: stats } = useCampaignDonations(campaign);
   const { data: btcPrice } = useBtcPrice();
-  const { data: moderation } = useCampaignModeration();
 
   const naddr = useMemo(() => encodeCampaignNaddr(campaign), [campaign]);
   const cover = sanitizeUrl(displayCampaign.banner);
-  const creatorName =
-    author.data?.metadata?.display_name ||
-    author.data?.metadata?.name ||
-    genUserName(campaign.pubkey);
   const deadline = campaign.deadline ? formatDeadline(campaign.deadline) : null;
   const raisedSats = stats?.totalSats ?? 0;
   const countryLabel = getCampaignCountryLabel(campaign);
@@ -159,15 +159,14 @@ export function CampaignCard({ campaign, variant = 'compact', className, footerB
   const isSilentPayment = !campaign.wallets.onchain;
 
   const isFeaturedVariant = variant === 'featured';
-  const isApproved = moderation.approvedCoords.has(campaign.aTag);
-  const isHidden = moderation.hiddenCoords.has(campaign.aTag);
-  const isFeatured = moderation.featuredCoords.has(campaign.aTag);
+  const isShelfVariant = variant === 'shelf';
 
   return (
     <Link
       to={`/${naddr}`}
       className={cn(
         'group block rounded-xl overflow-hidden focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background motion-safe:transition-transform motion-safe:duration-200 motion-safe:hover:-translate-y-0.5',
+        isShelfVariant && 'h-[430px] w-[280px] shrink-0',
         className,
       )}
     >
@@ -239,24 +238,14 @@ export function CampaignCard({ campaign, variant = 'compact', className, footerB
             </div>
           )}
 
-          <div className="absolute top-3 right-3 z-10 flex items-center gap-2">
-            {isHidden && (
-              <Badge
-                variant="secondary"
-                className="backdrop-blur bg-destructive/15 text-destructive border-destructive/30"
-              >
-                <EyeOff className="size-3.5 mr-1" />
-                Hidden
-              </Badge>
-            )}
-            <CampaignModerationMenu
-              coord={campaign.aTag}
-              campaignTitle={campaign.title}
-              isApproved={isApproved}
-              isHidden={isHidden}
-              isFeatured={isFeatured}
-            />
-          </div>
+          <ModerationOverlay
+            coord={campaign.aTag}
+            entityTitle={campaign.title}
+            surface="campaign"
+            axes={['approval', 'hide', 'featured']}
+            badgeSize="default"
+            className="absolute top-3 right-3 z-10 flex items-center gap-2"
+          />
         </div>
 
         {/* Body — deterministic structure: title (1 line, truncates) →
@@ -294,11 +283,11 @@ export function CampaignCard({ campaign, variant = 'compact', className, footerB
           )}
 
           <div className="flex items-center justify-between gap-3 border-t border-border/60 pt-3 text-xs text-muted-foreground">
-            <div className="truncate">
-              by <span className="font-medium text-foreground">{creatorName}</span>
+            <div className="flex min-w-0 items-center gap-2">
+              <AuthorByline pubkey={campaign.pubkey} insideLink />
               {!isSilentPayment && stats && stats.donorCount > 0 && (
-                <span className="ml-2 text-muted-foreground/80">
-                  · {stats.donorCount} {stats.donorCount === 1 ? 'donor' : 'donors'}
+                <span className="shrink-0 text-muted-foreground/80">
+                  · {t('common.donors', { count: stats.donorCount })}
                 </span>
               )}
             </div>

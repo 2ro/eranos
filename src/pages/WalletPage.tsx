@@ -37,6 +37,7 @@ import {
 import { HDSendBitcoinDialog } from '@/components/HDSendBitcoinDialog';
 import { HDSilentPaymentScanDialog } from '@/components/HDSilentPaymentScanDialog';
 import { WalletBackupMnemonicDialog } from '@/components/WalletBackupMnemonic';
+import { PendingBadge } from '@/components/PendingBadge';
 import { useAppContext } from '@/hooks/useAppContext';
 import { useHdWallet } from '@/hooks/useHdWallet';
 import { useHdWalletSp } from '@/hooks/useHdWalletSp';
@@ -230,12 +231,10 @@ export function WalletPage() {
             </span>
 
             {pendingBalance !== 0 && (
-              <span className="flex items-center gap-1 text-xs text-orange-500 dark:text-orange-400 pt-1">
-                <RefreshCw className="size-3 animate-spin" />
-                {btcPrice
-                  ? t('wallet.amountPending', { amount: satsToUSD(Math.abs(pendingBalance), btcPrice) })
-                  : t('wallet.pending')}
-              </span>
+              <PendingBadge
+                amountLabel={btcPrice ? satsToUSD(Math.abs(pendingBalance), btcPrice) : undefined}
+                className="pt-1 flex"
+              />
             )}
           </button>
         )}

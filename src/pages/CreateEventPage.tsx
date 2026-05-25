@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { Link, useNavigate, useSearchParams } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useSeoMeta } from '@unhead/react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
@@ -11,6 +11,7 @@ import { CountrySelect } from '@/components/CountrySelect';
 import { FormSection } from '@/components/FormSection';
 import { OrganizationContextChip } from '@/components/OrganizationContextChip';
 import { TimezoneSwitcher } from '@/components/TimezoneSwitcher';
+import { LoginArea } from '@/components/auth/LoginArea';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -238,15 +239,17 @@ export function CreateEventPage() {
       <main className="min-h-screen pb-16">
         <div className="max-w-2xl mx-auto px-4 sm:px-6 py-12">
           <Card>
-            <CardContent className="py-12 px-8 text-center space-y-4">
-              <CalendarDays className="size-10 text-muted-foreground/60 mx-auto" />
-              <h2 className="text-xl font-semibold">{t('calendarEvents.create.loginTitle')}</h2>
-              <p className="text-muted-foreground">
-                {t('calendarEvents.create.loginBody')}
-              </p>
-              <Button asChild>
-                <Link to="/events">{t('calendarEvents.create.backToEvents')}</Link>
-              </Button>
+            <CardContent className="py-12 px-8 flex flex-col items-center gap-6 text-center">
+              <div className="p-4 rounded-full bg-primary/10">
+                <CalendarDays className="size-8 text-primary" />
+              </div>
+              <div className="space-y-2 max-w-sm">
+                <h2 className="text-xl font-semibold">{t('calendarEvents.create.loginTitle')}</h2>
+                <p className="text-muted-foreground text-sm">
+                  {t('calendarEvents.create.loginBody')}
+                </p>
+              </div>
+              <LoginArea className="max-w-60" />
             </CardContent>
           </Card>
         </div>
@@ -331,7 +334,7 @@ export function CreateEventPage() {
             <Textarea
               placeholder={t('calendarEvents.create.descriptionPlaceholder')}
               rows={7}
-              className="font-mono text-sm"
+              className="font-mono text-base md:text-sm"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
             />

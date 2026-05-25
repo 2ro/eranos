@@ -1,16 +1,10 @@
-import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link as RouterLink } from 'react-router-dom';
-import { CalendarClock, HandHeart, MapPin } from 'lucide-react';
-import { nip19 } from 'nostr-tools';
+import { HandHeart } from 'lucide-react';
 
-import { Badge } from '@/components/ui/badge';
 import { Card } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
-import { DEFAULT_COVER_IMAGE } from '@/lib/defaultActionCovers';
-import { formatCompactPledgeDeadline, formatPledgeAmount } from '@/lib/pledges';
-import { getGeoDisplayName } from '@/lib/countries';
-import { cn } from '@/lib/utils';
+import { PledgeCard } from '@/components/PledgeCard';
 import type { Action } from '@/hooks/useActions';
 
 interface ProfilePledgesTabProps {
@@ -96,7 +90,7 @@ export function ProfilePledgesTab({
           )}
           <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-5">
             {active.map((pledge) => (
-              <ProfilePledgeCard key={pledge.event.id} action={pledge} btcPrice={btcPrice} />
+              <PledgeCard key={pledge.event.id} action={pledge} btcPrice={btcPrice} />
             ))}
           </div>
         </section>
@@ -109,98 +103,12 @@ export function ProfilePledgesTab({
           </h3>
           <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-5">
             {ended.map((pledge) => (
-              <ProfilePledgeCard key={pledge.event.id} action={pledge} btcPrice={btcPrice} isExpired />
+              <PledgeCard key={pledge.event.id} action={pledge} btcPrice={btcPrice} isExpired />
             ))}
           </div>
         </section>
       )}
     </div>
-  );
-}
-
-function ProfilePledgeCard({
-  action,
-  isExpired,
-  btcPrice,
-}: {
-  action: Action;
-  isExpired?: boolean;
-  btcPrice: number | undefined;
-}) {
-  const { t } = useTranslation();
-  const [imageLoadFailed, setImageLoadFailed] = useState(false);
-
-  const naddr = nip19.naddrEncode({
-    kind: 36639,
-    pubkey: action.pubkey,
-    identifier: action.id,
-  });
-
-  const coverImage = (action.image && !imageLoadFailed) ? action.image : DEFAULT_COVER_IMAGE;
-  const deadline = action.deadline ? formatCompactPledgeDeadline(action.deadline) : null;
-  const countryLabel = action.countryCode ? getGeoDisplayName(action.countryCode) : undefined;
-
-  return (
-    <RouterLink
-      to={`/${naddr}`}
-      className="group block rounded-xl overflow-hidden focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background motion-safe:transition-transform motion-safe:duration-200 motion-safe:hover:-translate-y-0.5"
-    >
-      <Card className="overflow-hidden border-border/70 shadow-sm motion-safe:transition-shadow motion-safe:duration-200 group-hover:shadow-lg h-full flex flex-col">
-        <div className="relative w-full aspect-[16/9] bg-gradient-to-br from-primary/15 via-primary/5 to-secondary">
-          <img
-            src={coverImage}
-            alt=""
-            className="absolute inset-0 size-full object-cover"
-            onError={() => setImageLoadFailed(true)}
-            loading="lazy"
-          />
-          {isExpired && (
-            <Badge
-              variant="secondary"
-              className="absolute top-3 right-3 backdrop-blur bg-background/85 border-border/40 text-muted-foreground"
-            >
-              {t('profile.badges.ended')}
-            </Badge>
-          )}
-        </div>
-
-        <div className="flex flex-col gap-3 p-5 flex-1">
-          <h3 className="font-bold leading-tight tracking-tight text-lg line-clamp-2">
-            {action.title}
-          </h3>
-          {action.description.trim() && (
-            <p className="text-sm text-muted-foreground line-clamp-2">{action.description}</p>
-          )}
-
-          <div className="flex-1" />
-
-          <div className="rounded-xl border border-primary/20 bg-primary/10 px-4 py-3">
-            <p className="text-xs font-semibold uppercase tracking-wide text-primary">{t('profile.badges.pledged')}</p>
-            <p className="mt-1 text-2xl font-bold tracking-tight text-foreground">
-              {formatPledgeAmount(action.bounty, btcPrice)}
-            </p>
-          </div>
-
-          <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 text-xs text-muted-foreground pt-1">
-            {countryLabel && (
-              <span className="inline-flex items-center gap-1.5">
-                <MapPin className="size-3.5" />
-                {countryLabel}
-              </span>
-            )}
-            {deadline && (
-              <span className={cn(
-                'inline-flex items-center gap-1.5',
-                deadline.isPast && 'text-destructive',
-              )}>
-                <CalendarClock className="size-3.5" />
-                {deadline.label}
-              </span>
-            )}
-          </div>
-        </div>
-      </Card>
-    </RouterLink>
   );
 }
 

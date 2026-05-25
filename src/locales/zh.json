@@ -20,7 +20,24 @@
     "goBack": "返回",
     "tryAgain": "请重试。",
     "showLess": "收起",
-    "readMore": "阅读更多"
+    "readMore": "阅读更多",
+    "byAuthor": "由 <0>{{name}}</0>",
+    "donors_one": "{{count}} 位捐赠者",
+    "donors_other": "{{count}} 位捐赠者",
+    "clearSearch": "清除搜索",
+    "searching": "搜索中…",
+    "searchResultsCount_one": "{{count}} 个结果",
+    "searchResultsCount_other": "{{count}} 个结果",
+    "sortAriaLabel": "排序",
+    "sortDefault": "默认",
+    "sortTop": "热门",
+    "sortNew": "最新",
+    "showHidden": "显示已隐藏",
+    "filtersAriaLabel": "搜索筛选",
+    "countryFilterAriaLabel": "按国家筛选",
+    "countrySearchPlaceholder": "搜索国家…",
+    "countryNoResults": "未找到国家。",
+    "countryGlobal": "全球"
   },
   "translate": {
     "translate": "翻译",
@@ -166,12 +183,23 @@
       "showMore": "展开更多（还有 {{count}} 个）",
       "emptyTitle": "还没有悬赏",
       "emptyHint": "成为第一个创建悬赏的人。",
-      "emptyHintCountry": "成为第一个为 {{country}} 创建悬赏的人。"
+      "emptyHintCountry": "成为第一个为 {{country}} 创建悬赏的人。",
+      "searchPlaceholder": "搜索悬赏…",
+      "searchAriaLabel": "搜索悬赏",
+      "noMatch": "没有悬赏匹配「{{query}}」",
+      "noMatchHint": "尝试其他搜索词，或清除搜索。",
+      "needsReview": "待审核",
+      "needsReviewDesc": "尚未被推荐或隐藏的 {{appName}} 悬赏。把它们提升到精选栏，或用「隐藏」抑制。",
+      "needsReviewEmpty": "没有待审核的内容。",
+      "hidden": "已隐藏",
+      "hiddenDesc": "从公开发现中抑制的悬赏。使用卡片上的菜单取消隐藏。",
+      "hiddenEmpty": "目前没有隐藏的悬赏。"
     },
     "card": {
       "ended": "已结束",
       "pledged": "已悬赏",
       "byAuthor": "由 <0>{{name}}</0>",
+      "actionsAriaLabel": "悬赏操作",
       "deletePledge": "删除悬赏",
       "copyLink": "复制链接",
       "linkCopied": "已复制链接",
@@ -186,7 +214,6 @@
       "seoDescription": "创建一个捐赠者悬赏，在 {{appName}} 上激发具体的行动。",
       "loginGateTitle": "登录以创建悬赏",
       "loginGateBody": "悬赏是签名的 Nostr 事件。你需要 Nostr 登录才能发布。",
-      "backToPledges": "返回悬赏",
       "heading": "创建悬赏",
       "title": "标题",
       "titlePlaceholder": "记录一次海滩清理",
@@ -265,7 +292,9 @@
       "createGroupLoginTitle": "登录以创建群组",
       "createGroupLoginBody": "创建群组会从你的账号发布一个 Nostr 事件。",
       "myGroups": "我的群组",
+      "myGroupsTagline": "你创建、管理或关注的群组。",
       "featuredGroups": "精选群组",
+      "featuredGroupsTagline": "值得你关注的出色群组。",
       "loginToSeeTitle": "登录以查看你的群组",
       "loginToSeeBody": "你创建或管理的群组会显示在这里。",
       "noGroupsTitle": "还没有群组",
@@ -286,7 +315,11 @@
       "tickerFeaturedGroups_one": "个 Nostr 精选群组",
       "tickerFeaturedGroups_other": "个 Nostr 精选群组",
       "tickerCountries_one": "个国家今天发帖",
-      "tickerCountries_other": "个国家今天发帖"
+      "tickerCountries_other": "个国家今天发帖",
+      "searchPlaceholder": "搜索群组…",
+      "searchAriaLabel": "搜索群组",
+      "noMatch": "没有群组匹配「{{query}}」",
+      "noMatchHint": "尝试其他搜索词，或清除搜索。"
     },
     "create": {
       "seoTitleCreate": "创建群组",
@@ -295,7 +328,6 @@
       "seoDescriptionEdit": "在 {{appName}} 上更新你的群组。",
       "loginGateTitle": "登录以发起群组",
       "loginGateBody": "群组是签名的 Nostr 事件。你需要 Nostr 登录才能发布。",
-      "backToGroups": "返回群组",
       "invalidEditTitle": "编辑链接无效",
       "invalidEditBody": "此群组编辑链接缺少有效的群组地址。",
       "startNewGroup": "发起一个新群组",
@@ -384,7 +416,6 @@
     "seoDescriptionEdit": "在 {{appName}} 上更新你的募款活动。",
     "loginGateTitle": "登录以发起活动",
     "loginGateBody": "活动是签名的 Nostr 事件。你需要 Nostr 登录才能发布。",
-    "goHome": "返回首页",
     "invalidEditTitle": "编辑链接无效",
     "invalidEditBody": "此活动编辑链接缺少有效的活动地址。",
     "startNewCampaign": "发起一个新活动",
@@ -514,7 +545,6 @@
       "seoDescription": "在 {{appName}} 上创建日历事件。",
       "loginTitle": "登录以创建事件",
       "loginBody": "事件是已签名的 Nostr 事件。你需要登录 Nostr 才能发布。",
-      "backToEvents": "返回事件",
       "heading": "创建事件",
       "titlePlaceholder": "社区清理",
       "descriptionPlaceholder": "告诉大家会发生什么、需要带什么，以及谁适合参加...",
@@ -609,12 +639,23 @@
       "yourCampaigns": "你的活动",
       "yourCampaignsDesc": "你的活动已在 Nostr 上线,通过活动链接可以接收捐款。一旦 Soapbox 团队版主批准,它们将出现在首页。",
       "empty": "暂无活动",
-      "emptyHint": "成为在 {{appName}} 发起众筹的第一人。讲述你的故事、选择受益人、并分享链接。"
+      "emptyHint": "成为在 {{appName}} 发起众筹的第一人。讲述你的故事、选择受益人、并分享链接。",
+      "searchPlaceholder": "搜索活动…",
+      "searchAriaLabel": "搜索活动",
+      "noMatch": "没有活动匹配「{{query}}」",
+      "noMatchHint": "尝试其他搜索词，或清除搜索。"
     },
     "all": {
       "title": "所有活动",
       "seoTitle": "所有活动",
       "description": "浏览 Agora 上发布的所有活动。",
+      "sectionTagline": "浏览网络上的每一项事业。",
+      "heroKicker": "活动",
+      "heroHeading": "每一个理念，",
+      "heroHeadingLine2": "汇聚于此。",
+      "heroBody": "Nostr 上发布的每一个筹款活动，汇聚于一处。浏览整个网络，找到你关心的事业，直接用比特币支持它。",
+      "campaignsCount_one": "个网络上的活动",
+      "campaignsCount_other": "个网络上的活动",
       "searchAriaLabel": "搜索活动",
       "searchPlaceholder": "搜索活动…",
       "clearSearch": "清除搜索",
@@ -629,6 +670,31 @@
       "allHiddenHint": "网络上的所有活动都已被版主隐藏。打开「显示已隐藏」即可查看。",
       "empty": "暂无活动",
       "emptyHint": "尚未发布任何活动。来当第一个吧。"
+    }
+  },
+  "moderation": {
+    "hiddenBadge": "已隐藏",
+    "menu": {
+      "label": "版主操作",
+      "ariaCampaign": "管理活动",
+      "ariaPledge": "管理悬赏",
+      "ariaGroup": "管理群组",
+      "failedAction": "操作失败：{{action}}",
+      "approve": "批准",
+      "unapprove": "取消批准",
+      "approvedState": "已批准",
+      "hide": "隐藏",
+      "unhide": "取消隐藏",
+      "hiddenState": "已隐藏",
+      "feature": "精选",
+      "unfeature": "取消精选",
+      "featuredState": "已精选",
+      "toastApproved": "已批准至首页",
+      "toastUnapproved": "已从首页移除",
+      "toastHidden": "已隐藏",
+      "toastUnhidden": "已取消隐藏",
+      "toastFeatured": "已精选",
+      "toastUnfeatured": "已从精选移除"
     }
   },
   "settings": {
@@ -757,7 +823,7 @@
       "scanForNew": "扫描新支付",
       "scanForPayments": "扫描支付"
     },
-     "tx": {
+    "tx": {
       "pending": "待确认",
       "today": "今天",
       "yesterday": "昨天",
@@ -1219,7 +1285,7 @@
     "tabs": {
       "agora": "Agora",
       "nostr": "Nostr",
-      "accounts": "账号"
+      "accounts": "用户"
     },
     "filters": {
       "title": "过滤器",
@@ -1292,7 +1358,7 @@
     "empty": {
       "posts": "没有找到匹配你搜索的结果。",
       "postsPrompt": "输入搜索关键词以查找 Nostr 内容。",
-      "accounts": "没有找到匹配你搜索的账号。",
+      "accounts": "没有找到匹配你搜索的用户。",
       "followsPrompt": "通过名字或 NIP-05 地址搜索用户。",
       "agora": "没有找到匹配你搜索的 Agora 竞选、pledge 或群组。",
       "agoraPrompt": "搜索 Agora 的竞选、pledge 和群组，或浏览最新内容。",
@@ -1972,10 +2038,18 @@
   },
   "faq": {
     "categories": {
-      "getting-started": { "label": "关于 Agora" },
-      "payments": { "label": "在 Agora 上的比特币捐款" },
-      "about-nostr": { "label": "关于 Nostr" },
-      "legacy": { "label": "遗留内容" }
+      "getting-started": {
+        "label": "关于 Agora"
+      },
+      "payments": {
+        "label": "在 Agora 上的比特币捐款"
+      },
+      "about-nostr": {
+        "label": "关于 Nostr"
+      },
+      "legacy": {
+        "label": "遗留内容"
+      }
     },
     "items": {
       "what-is-ditto": {
@@ -2032,6 +2106,14 @@
           "**公开捐款**会被记录在比特币区块链和 Nostr 上。任何人都可以看到金额、时间和地址。",
           "**私密捐款**使用静默支付。它们无法被公开关联到行动者的捐款代码，不会出现在捐款人列表中，也不计入公开总额。",
           "当一项活动同时接受两者时，由捐款人的钱包决定使用哪条路径——支持静默支付的钱包私密支付，其他钱包则支付公开地址。完整图景请阅读**捐款人指南**和**行动者指南**。"
+        ]
+      },
+      "why-donations-pending": {
+        "question": "为什么有些捐款显示为“**待确认**”？",
+        "answer": [
+          "**待确认**的捐款是真实的、已经发送出去的比特币——只是还在等待网络确认。捐款人的钱包已经广播了这笔交易，但它尚未被打包进区块。",
+          "比特币大约每 10 分钟产生一个新区块，矿工会根据捐款人支付的手续费来挑选交易。大多数捐款会在一小时内确认；当网络拥堵时，手续费较低的交易可能需要更长时间。{{appName}} 会自动重新检查确认状态，所以一旦有区块打包，**待确认**标签就会自行消失。",
+          "款项已经在路上——一旦确认，行动者就会看到这笔捐款计入活动总额。无论是行动者还是 {{appName}} 都无法加快它的速度；只有捐款人的钱包可以通过追加手续费来提速。"
         ]
       },
       "censorship-resistance": {

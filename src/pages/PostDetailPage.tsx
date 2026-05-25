@@ -155,7 +155,6 @@ function shellTitleForKind(kind?: number): string {
 }
 
 import { CommentContext } from "@/components/CommentContext";
-import { CommunityContent } from "@/components/CommunityContent";
 import { ContentWarningGuard } from "@/components/ContentWarningGuard";
 import { EmojiPackContent } from "@/components/EmojiPackContent";
 import {
@@ -1869,8 +1868,6 @@ function PostDetailContent({ event }: { event: NostrEvent }) {
               <FileMetadataContent event={event} />
             ) : isVoiceMessage ? (
               <VoiceMessagePlayer event={event} />
-            ) : isCommunity ? (
-              <CommunityContent event={displayEvent} />
             ) : isGitRepo ? (
               <div className="mt-3">
                 <GitRepoCard event={event} />

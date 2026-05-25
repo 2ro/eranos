@@ -20,7 +20,24 @@
     "goBack": "返回",
     "tryAgain": "請重試。",
     "showLess": "收起",
-    "readMore": "閱讀更多"
+    "readMore": "閱讀更多",
+    "byAuthor": "由 <0>{{name}}</0>",
+    "donors_one": "{{count}} 位捐贈者",
+    "donors_other": "{{count}} 位捐贈者",
+    "clearSearch": "清除搜尋",
+    "searching": "搜尋中…",
+    "searchResultsCount_one": "{{count}} 個結果",
+    "searchResultsCount_other": "{{count}} 個結果",
+    "sortAriaLabel": "排序方式",
+    "sortDefault": "預設",
+    "sortTop": "熱門",
+    "sortNew": "最新",
+    "showHidden": "顯示已隱藏",
+    "filtersAriaLabel": "搜尋篩選",
+    "countryFilterAriaLabel": "依國家篩選",
+    "countrySearchPlaceholder": "搜尋國家…",
+    "countryNoResults": "找不到國家。",
+    "countryGlobal": "全球"
   },
   "translate": {
     "translate": "翻譯",
@@ -166,12 +183,23 @@
       "showMore": "展開更多（還有 {{count}} 個）",
       "emptyTitle": "還沒有懸賞",
       "emptyHint": "成為第一個建立懸賞的人。",
-      "emptyHintCountry": "成為第一個為 {{country}} 建立懸賞的人。"
+      "emptyHintCountry": "成為第一個為 {{country}} 建立懸賞的人。",
+      "searchPlaceholder": "搜尋懸賞…",
+      "searchAriaLabel": "搜尋懸賞",
+      "noMatch": "沒有懸賞符合「{{query}}」",
+      "noMatchHint": "請嘗試不同的搜尋字詞,或清除搜尋。",
+      "needsReview": "待稽核",
+      "needsReviewDesc": "尚未被推薦或隱藏的 {{appName}} 懸賞。把它們提升到精選欄，或用「隱藏」抑制。",
+      "needsReviewEmpty": "沒有待稽核的內容。",
+      "hidden": "已隱藏",
+      "hiddenDesc": "從公開發現中抑制的懸賞。使用卡片上的選單取消隱藏。",
+      "hiddenEmpty": "目前沒有隱藏的懸賞。"
     },
     "card": {
       "ended": "已結束",
       "pledged": "已懸賞",
       "byAuthor": "由 <0>{{name}}</0>",
+      "actionsAriaLabel": "懸賞操作",
       "deletePledge": "刪除懸賞",
       "copyLink": "複製連結",
       "linkCopied": "已複製連結",
@@ -186,7 +214,6 @@
       "seoDescription": "建立一個捐贈者懸賞，在 {{appName}} 上激發具體的行動。",
       "loginGateTitle": "登入以建立懸賞",
       "loginGateBody": "懸賞是簽名的 Nostr 事件。你需要 Nostr 登入才能釋出。",
-      "backToPledges": "返回懸賞",
       "heading": "建立懸賞",
       "title": "標題",
       "titlePlaceholder": "記錄一次海灘清理",
@@ -265,7 +292,9 @@
       "createGroupLoginTitle": "登入以建立群組",
       "createGroupLoginBody": "建立群組會從你的賬號釋出一個 Nostr 事件。",
       "myGroups": "我的群組",
+      "myGroupsTagline": "你建立、管理或追蹤的群組。",
       "featuredGroups": "精選群組",
+      "featuredGroupsTagline": "值得你關注的出色群組。",
       "loginToSeeTitle": "登入以檢視你的群組",
       "loginToSeeBody": "你建立或管理的群組會顯示在這裡。",
       "noGroupsTitle": "還沒有群組",
@@ -286,7 +315,11 @@
       "tickerFeaturedGroups_one": "個 Nostr 精選群組",
       "tickerFeaturedGroups_other": "個 Nostr 精選群組",
       "tickerCountries_one": "個國家今天發帖",
-      "tickerCountries_other": "個國家今天發帖"
+      "tickerCountries_other": "個國家今天發帖",
+      "searchPlaceholder": "搜尋群組…",
+      "searchAriaLabel": "搜尋群組",
+      "noMatch": "沒有群組符合「{{query}}」",
+      "noMatchHint": "請嘗試不同的搜尋字詞,或清除搜尋。"
     },
     "create": {
       "seoTitleCreate": "建立群組",
@@ -295,7 +328,6 @@
       "seoDescriptionEdit": "在 {{appName}} 上更新你的群組。",
       "loginGateTitle": "登入以發起群組",
       "loginGateBody": "群組是簽名的 Nostr 事件。你需要 Nostr 登入才能釋出。",
-      "backToGroups": "返回群組",
       "invalidEditTitle": "編輯連結無效",
       "invalidEditBody": "此群組編輯連結缺少有效的群組地址。",
       "startNewGroup": "發起一個新群組",
@@ -384,7 +416,6 @@
     "seoDescriptionEdit": "在 {{appName}} 上更新你的募款活動。",
     "loginGateTitle": "登入以發起活動",
     "loginGateBody": "活動是簽名的 Nostr 事件。你需要 Nostr 登入才能釋出。",
-    "goHome": "返回首頁",
     "invalidEditTitle": "編輯連結無效",
     "invalidEditBody": "此活動編輯連結缺少有效的活動地址。",
     "startNewCampaign": "發起一個新活動",
@@ -514,7 +545,6 @@
       "seoDescription": "在 {{appName}} 上建立日曆事件。",
       "loginTitle": "登入以建立事件",
       "loginBody": "事件是已簽名的 Nostr 事件。你需要登入 Nostr 才能釋出。",
-      "backToEvents": "返回事件",
       "heading": "建立事件",
       "titlePlaceholder": "社群清理",
       "descriptionPlaceholder": "告訴大家會發生什麼、需要帶什麼，以及誰適合參加...",
@@ -609,12 +639,23 @@
       "yourCampaigns": "你的活動",
       "yourCampaignsDesc": "你的活動已在 Nostr 上線,通過活動連結可以接收捐款。一旦 Soapbox 團隊版主批准,它們將出現在首頁。",
       "empty": "暫無活動",
-      "emptyHint": "成為在 {{appName}} 發起眾籌的第一人。講述你的故事、選擇受益人、並分享連結。"
+      "emptyHint": "成為在 {{appName}} 發起眾籌的第一人。講述你的故事、選擇受益人、並分享連結。",
+      "searchPlaceholder": "搜尋活動…",
+      "searchAriaLabel": "搜尋活動",
+      "noMatch": "沒有活動符合「{{query}}」",
+      "noMatchHint": "請嘗試不同的搜尋字詞,或清除搜尋。"
     },
     "all": {
       "title": "所有活動",
       "seoTitle": "所有活動",
       "description": "瀏覽 Agora 上釋出的所有活動。",
+      "sectionTagline": "瀏覽網路上的每一項事業。",
+      "heroKicker": "活動",
+      "heroHeading": "每一份心意，",
+      "heroHeadingLine2": "匯聚於此。",
+      "heroBody": "Nostr 上釋出的每一個募款活動，全部匯聚於此。瀏覽整個網路、找到你關心的議題，並直接以比特幣支持它。",
+      "campaignsCount_one": "個活動正在網路上進行",
+      "campaignsCount_other": "個活動正在網路上進行",
       "searchAriaLabel": "搜尋活動",
       "searchPlaceholder": "搜尋活動…",
       "clearSearch": "清除搜尋",
@@ -629,6 +670,31 @@
       "allHiddenHint": "網路上的所有活動都已被版主隱藏。開啟「顯示已隱藏」即可檢視。",
       "empty": "暫無活動",
       "emptyHint": "尚未釋出任何活動。來當第一個吧。"
+    }
+  },
+  "moderation": {
+    "hiddenBadge": "已隱藏",
+    "menu": {
+      "label": "版主動作",
+      "ariaCampaign": "管理活動",
+      "ariaPledge": "管理懸賞",
+      "ariaGroup": "管理群組",
+      "failedAction": "無法{{action}}",
+      "approve": "批准",
+      "unapprove": "取消批准",
+      "approvedState": "已批准",
+      "hide": "隱藏",
+      "unhide": "取消隱藏",
+      "hiddenState": "已隱藏",
+      "feature": "推薦精選",
+      "unfeature": "取消精選",
+      "featuredState": "已精選",
+      "toastApproved": "已批准顯示於首頁",
+      "toastUnapproved": "已自首頁移除",
+      "toastHidden": "已隱藏",
+      "toastUnhidden": "已取消隱藏",
+      "toastFeatured": "已加入精選",
+      "toastUnfeatured": "已自精選移除"
     }
   },
   "settings": {
@@ -1155,7 +1221,7 @@
     "tabs": {
       "agora": "Agora",
       "nostr": "Nostr",
-      "accounts": "賬號"
+      "accounts": "使用者"
     },
     "filters": {
       "title": "過濾器",
@@ -1228,7 +1294,7 @@
     "empty": {
       "posts": "沒有找到匹配你搜索的結果。",
       "postsPrompt": "輸入搜尋關鍵詞以查詢 Nostr 內容。",
-      "accounts": "沒有找到匹配你搜索的賬號。",
+      "accounts": "沒有找到匹配你搜尋的使用者。",
       "followsPrompt": "通過名字或 NIP-05 地址搜尋使用者。",
       "agora": "沒有找到匹配你搜索的 Agora 競選、pledge 或群組。",
       "agoraPrompt": "搜尋 Agora 的競選、pledge 和群組，或瀏覽最新內容。",
@@ -1976,6 +2042,14 @@
           "**公開捐款**會被記錄在比特幣區塊鏈和 Nostr 上。任何人都可以看到金額、時間和地址。",
           "**私密捐款**使用靜默支付。它們無法被公開關聯到行動者的捐款代碼，不會出現在捐款人列表中，也不計入公開總額。",
           "當一項活動同時接受兩者時，由捐款人的錢包決定使用哪條路徑——支援靜默支付的錢包私密支付，其他錢包則支付公開地址。完整圖景請閱讀**捐款人指南**和**行動者指南**。"
+        ]
+      },
+      "why-donations-pending": {
+        "question": "為什麼有些捐款顯示為「**待確認**」？",
+        "answer": [
+          "**待確認**的捐款是真實的比特幣，已經被送出——只是還在等待網路確認。捐款人的錢包已經廣播了交易，但它尚未被納入區塊。",
+          "比特幣大約每 10 分鐘產生一個新區塊，礦工會根據捐款人支付的手續費來挑選交易。大多數捐款會在一小時內確認；當網路繁忙時，手續費較低的交易可能需要更久。{{appName}} 會自動重新檢查確認狀態，因此一旦交易進入區塊，**待確認**標籤就會自行消失。",
+          "款項已經在路上——交易一旦確認，行動者就會看到該捐款計入活動總額。行動者與 {{appName}} 都無法加速這個過程；只有捐款人的錢包能夠提高手續費。"
         ]
       },
       "censorship-resistance": {

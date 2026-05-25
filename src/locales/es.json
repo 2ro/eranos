@@ -20,7 +20,24 @@
     "goBack": "Volver",
     "tryAgain": "Por favor, inténtalo de nuevo.",
     "showLess": "Mostrar menos",
-    "readMore": "Leer más"
+    "readMore": "Leer más",
+    "byAuthor": "por <0>{{name}}</0>",
+    "donors_one": "{{count}} donante",
+    "donors_other": "{{count}} donantes",
+    "clearSearch": "Borrar búsqueda",
+    "searching": "Buscando…",
+    "searchResultsCount_one": "{{count}} resultado",
+    "searchResultsCount_other": "{{count}} resultados",
+    "sortAriaLabel": "Orden",
+    "sortDefault": "Predeterminado",
+    "sortTop": "Destacadas",
+    "sortNew": "Nuevas",
+    "showHidden": "Mostrar ocultas",
+    "filtersAriaLabel": "Filtros de búsqueda",
+    "countryFilterAriaLabel": "Filtrar por país",
+    "countrySearchPlaceholder": "Buscar países…",
+    "countryNoResults": "No se encontraron países.",
+    "countryGlobal": "Global"
   },
   "translate": {
     "translate": "Traducir",
@@ -166,12 +183,23 @@
       "showMore": "Mostrar más ({{count}} más)",
       "emptyTitle": "Aún no hay promesas",
       "emptyHint": "Sé el primero en crear una promesa.",
-      "emptyHintCountry": "Sé el primero en crear una promesa para {{country}}."
+      "emptyHintCountry": "Sé el primero en crear una promesa para {{country}}.",
+      "searchPlaceholder": "Buscar promesas…",
+      "searchAriaLabel": "Buscar promesas",
+      "noMatch": "Ninguna promesa coincide con «{{query}}»",
+      "noMatchHint": "Prueba con otro término de búsqueda o bórrala.",
+      "needsReview": "Pendiente de revisión",
+      "needsReviewDesc": "Promesas de {{appName}} que aún no han sido destacadas ni ocultadas. Súbelas a la sección destacada o suprímelas con Ocultar.",
+      "needsReviewEmpty": "Nada pendiente de revisión.",
+      "hidden": "Ocultas",
+      "hiddenDesc": "Promesas suprimidas del descubrimiento público. Usa el menú de la tarjeta para mostrarlas de nuevo.",
+      "hiddenEmpty": "No hay promesas ocultas actualmente."
     },
     "card": {
       "ended": "Finalizada",
       "pledged": "Prometido",
       "byAuthor": "por <0>{{name}}</0>",
+      "actionsAriaLabel": "Acciones de la promesa",
       "deletePledge": "Eliminar promesa",
       "copyLink": "Copiar enlace",
       "linkCopied": "Enlace copiado",
@@ -186,7 +214,6 @@
       "seoDescription": "Crea una promesa de donante para inspirar acciones concretas en {{appName}}.",
       "loginGateTitle": "Inicia sesión para crear una promesa",
       "loginGateBody": "Las promesas son eventos firmados de Nostr. Necesitas una sesión de Nostr para publicar una.",
-      "backToPledges": "Volver a promesas",
       "heading": "Crear promesa",
       "title": "Título",
       "titlePlaceholder": "Documentar una limpieza de playa",
@@ -265,7 +292,9 @@
       "createGroupLoginTitle": "Inicia sesión para crear un grupo",
       "createGroupLoginBody": "Crear un grupo publica un evento de Nostr desde tu cuenta.",
       "myGroups": "Mis grupos",
+      "myGroupsTagline": "Grupos que fundaste, moderas o sigues.",
       "featuredGroups": "Grupos destacados",
+      "featuredGroupsTagline": "Grupos destacados que merecen tu atención.",
       "loginToSeeTitle": "Inicia sesión para ver tus grupos",
       "loginToSeeBody": "Los grupos que fundaste o moderas aparecerán aquí.",
       "noGroupsTitle": "Aún no hay grupos",
@@ -286,7 +315,11 @@
       "tickerFeaturedGroups_one": "grupo destacado en Nostr",
       "tickerFeaturedGroups_other": "grupos destacados en Nostr",
       "tickerCountries_one": "país publicando hoy",
-      "tickerCountries_other": "países publicando hoy"
+      "tickerCountries_other": "países publicando hoy",
+      "searchPlaceholder": "Buscar grupos…",
+      "searchAriaLabel": "Buscar grupos",
+      "noMatch": "Ningún grupo coincide con «{{query}}»",
+      "noMatchHint": "Prueba con otro término de búsqueda o bórrala."
     },
     "create": {
       "seoTitleCreate": "Crear grupo",
@@ -295,7 +328,6 @@
       "seoDescriptionEdit": "Actualiza tu grupo en {{appName}}.",
       "loginGateTitle": "Inicia sesión para crear un grupo",
       "loginGateBody": "Los grupos son eventos firmados de Nostr. Necesitas una sesión de Nostr para publicar uno.",
-      "backToGroups": "Volver a grupos",
       "invalidEditTitle": "Enlace de edición inválido",
       "invalidEditBody": "Este enlace de edición de grupo no incluye una dirección válida.",
       "startNewGroup": "Crear un grupo nuevo",
@@ -384,7 +416,6 @@
     "seoDescriptionEdit": "Actualiza tu campaña de recaudación en {{appName}}.",
     "loginGateTitle": "Inicia sesión para iniciar una campaña",
     "loginGateBody": "Las campañas son eventos firmados de Nostr. Necesitas una sesión de Nostr para publicar una.",
-    "goHome": "Ir al inicio",
     "invalidEditTitle": "Enlace de edición inválido",
     "invalidEditBody": "Este enlace de edición de campaña no incluye una dirección válida.",
     "startNewCampaign": "Iniciar una campaña nueva",
@@ -514,7 +545,6 @@
       "seoDescription": "Crea un evento de calendario en {{appName}}.",
       "loginTitle": "Inicia sesión para crear un evento",
       "loginBody": "Los eventos son eventos firmados de Nostr. Necesitas iniciar sesión en Nostr para publicar uno.",
-      "backToEvents": "Volver a eventos",
       "heading": "Crear evento",
       "titlePlaceholder": "Limpieza del barrio",
       "descriptionPlaceholder": "Cuenta qué esperar, qué llevar y quién debería asistir...",
@@ -609,12 +639,23 @@
       "yourCampaigns": "Tus campañas",
       "yourCampaignsDesc": "Tus campañas están activas en Nostr y las donaciones funcionan mediante el enlace. Aparecerán en la página de inicio cuando un moderador del equipo Soapbox las apruebe.",
       "empty": "Aún no hay campañas",
-      "emptyHint": "Sé el primero en iniciar una recaudación en {{appName}}. Cuenta tu historia, elige a los beneficiarios y comparte el enlace."
+      "emptyHint": "Sé el primero en iniciar una recaudación en {{appName}}. Cuenta tu historia, elige a los beneficiarios y comparte el enlace.",
+      "searchPlaceholder": "Buscar campañas…",
+      "searchAriaLabel": "Buscar campañas",
+      "noMatch": "Ninguna campaña coincide con «{{query}}»",
+      "noMatchHint": "Prueba con otro término de búsqueda o bórrala."
     },
     "all": {
       "title": "Todas las campañas",
       "seoTitle": "Todas las campañas",
       "description": "Explora todas las campañas publicadas en Agora.",
+      "sectionTagline": "Explora cada causa en la red.",
+      "heroKicker": "Campañas",
+      "heroHeading": "Cada causa,",
+      "heroHeadingLine2": "en un solo lugar.",
+      "heroBody": "Cada recaudación publicada en Nostr, reunida en un solo lugar. Explora toda la red, encuentra una causa que te importe y apóyala directamente con Bitcoin.",
+      "campaignsCount_one": "campaña en la red",
+      "campaignsCount_other": "campañas en la red",
       "searchAriaLabel": "Buscar campañas",
       "searchPlaceholder": "Buscar campañas…",
       "clearSearch": "Borrar búsqueda",
@@ -629,6 +670,31 @@
       "allHiddenHint": "Todas las campañas de la red han sido ocultadas por moderadores. Activa «Mostrar ocultas» para verlas.",
       "empty": "Aún no hay campañas",
       "emptyHint": "Todavía no se ha publicado ninguna campaña. Sé el primero."
+    }
+  },
+  "moderation": {
+    "hiddenBadge": "Oculto",
+    "menu": {
+      "label": "Acciones de moderador",
+      "ariaCampaign": "Moderar campaña",
+      "ariaPledge": "Moderar promesa",
+      "ariaGroup": "Moderar grupo",
+      "failedAction": "No se pudo {{action}}",
+      "approve": "Aprobar",
+      "unapprove": "Desaprobar",
+      "approvedState": "Aprobado",
+      "hide": "Ocultar",
+      "unhide": "Mostrar",
+      "hiddenState": "Oculto",
+      "feature": "Destacar",
+      "unfeature": "Quitar de destacados",
+      "featuredState": "Destacado",
+      "toastApproved": "Aprobado para la página de inicio",
+      "toastUnapproved": "Eliminado de la página de inicio",
+      "toastHidden": "Ocultado",
+      "toastUnhidden": "Restaurado",
+      "toastFeatured": "Destacado",
+      "toastUnfeatured": "Eliminado de destacados"
     }
   },
   "settings": {
@@ -1219,7 +1285,7 @@
     "tabs": {
       "agora": "Ágora",
       "nostr": "Nostr",
-      "accounts": "Cuentas"
+      "accounts": "Usuarios"
     },
     "filters": {
       "title": "Filtros",
@@ -1292,7 +1358,7 @@
     "empty": {
       "posts": "No se encontraron resultados para tu búsqueda.",
       "postsPrompt": "Introduce una consulta para buscar contenido de Nostr.",
-      "accounts": "No se encontraron cuentas para tu búsqueda.",
+      "accounts": "No se encontraron usuarios para tu búsqueda.",
       "followsPrompt": "Busca personas por nombre o dirección NIP-05.",
       "agora": "No se encontraron campañas, pledges ni grupos de Ágora para tu búsqueda.",
       "agoraPrompt": "Busca campañas, pledges y grupos de Ágora, o explora lo más reciente.",
@@ -2040,6 +2106,14 @@
           "Las **donaciones públicas** quedan registradas en la blockchain de Bitcoin y en Nostr. Cualquiera puede ver los importes, las horas y las direcciones.",
           "Las **donaciones privadas** usan silent payments. No son vinculables públicamente al código de donación del activista, no aparecen en las listas de donantes y no cuentan en los totales públicos.",
           "Cuando una campaña acepta ambos, la wallet del donante decide qué vía usar — las wallets compatibles con silent payments pagan de forma privada, las demás pagan la dirección pública. Lee la **Guía del donante** y la **Guía del activista** para el panorama completo."
+        ]
+      },
+      "why-donations-pending": {
+        "question": "¿Por qué algunas donaciones aparecen como «pendientes»?",
+        "answer": [
+          "Una donación **pendiente** es Bitcoin real que ya se ha enviado — solo está esperando a que la red lo confirme. La wallet del donante ya ha transmitido la transacción, pero todavía no se ha incluido en un bloque.",
+          "Bitcoin produce un bloque nuevo aproximadamente cada 10 minutos, y los mineros eligen las transacciones según la comisión que pagó el donante. La mayoría de las donaciones se confirman en menos de una hora; las que tienen una comisión más baja pueden tardar más cuando la red está congestionada. {{appName}} vuelve a comprobar el estado de la confirmación automáticamente, por lo que la etiqueta de **pendiente** desaparece sola en cuanto entra un bloque.",
+          "Los fondos están en camino — el activista verá la donación contabilizada en el total de la campaña en cuanto se confirme. No hay nada que el activista ni {{appName}} puedan hacer para acelerarlo; solo la wallet del donante puede subir la comisión."
         ]
       },
       "censorship-resistance": {

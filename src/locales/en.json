@@ -20,7 +20,24 @@
     "goBack": "Go back",
     "tryAgain": "Please try again.",
     "showLess": "Show less",
-    "readMore": "Read more"
+    "readMore": "Read more",
+    "byAuthor": "by <0>{{name}}</0>",
+    "donors_one": "{{count}} donor",
+    "donors_other": "{{count}} donors",
+    "clearSearch": "Clear search",
+    "searching": "Searching\u2026",
+    "searchResultsCount_one": "{{count}} result",
+    "searchResultsCount_other": "{{count}} results",
+    "sortAriaLabel": "Sort order",
+    "sortDefault": "Default",
+    "sortTop": "Top",
+    "sortNew": "New",
+    "showHidden": "Show hidden",
+    "filtersAriaLabel": "Search filters",
+    "countryFilterAriaLabel": "Filter by country",
+    "countrySearchPlaceholder": "Search countries\u2026",
+    "countryNoResults": "No countries found.",
+    "countryGlobal": "Global"
   },
   "translate": {
     "translate": "Translate",
@@ -573,6 +590,10 @@
       "sectionPast": "Past pledges",
       "sectionDefault": "Pledges",
       "sectionTagline": "Help fund the actions worth making.",
+      "searchPlaceholder": "Search pledges\u2026",
+      "searchAriaLabel": "Search pledges",
+      "noMatch": "No pledges match \u201c{{query}}\u201d",
+      "noMatchHint": "Try a different search term, or clear the search.",
       "sortAriaLabel": "Sort",
       "sortBy": "Sort by",
       "sortRecent": "Most recent",
@@ -589,12 +610,19 @@
       "showMore": "Show more ({{count}} more)",
       "emptyTitle": "No pledges yet",
       "emptyHint": "Be the first to create a pledge.",
-      "emptyHintCountry": "Be the first to create a pledge for {{country}}."
+      "emptyHintCountry": "Be the first to create a pledge for {{country}}.",
+      "needsReview": "Needs review",
+      "needsReviewDesc": "{{appName}} pledges that haven't been featured or hidden yet. Lift one into the Featured shelf or suppress it with Hide.",
+      "needsReviewEmpty": "Nothing awaiting review.",
+      "hidden": "Hidden",
+      "hiddenDesc": "Pledges suppressed from public discovery. Use the kebab menu on a card to unhide.",
+      "hiddenEmpty": "No pledges are currently hidden."
     },
     "card": {
       "ended": "Ended",
       "pledged": "Pledged",
       "byAuthor": "by <0>{{name}}</0>",
+      "actionsAriaLabel": "Pledge actions",
       "deletePledge": "Delete pledge",
       "copyLink": "Copy link",
       "linkCopied": "Link copied",
@@ -609,7 +637,6 @@
       "seoDescription": "Create a donor pledge to inspire concrete action on {{appName}}.",
       "loginGateTitle": "Log in to create a pledge",
       "loginGateBody": "Pledges are signed Nostr events. You need a Nostr login to publish one.",
-      "backToPledges": "Back to pledges",
       "heading": "Create pledge",
       "title": "Title",
       "titlePlaceholder": "Document a beach cleanup",
@@ -688,7 +715,13 @@
       "createGroupLoginTitle": "Log in to create a group",
       "createGroupLoginBody": "Creating a group publishes a Nostr event from your account.",
       "myGroups": "My groups",
+      "myGroupsTagline": "Groups you've founded, moderate, or follow.",
       "featuredGroups": "Featured groups",
+      "featuredGroupsTagline": "Standout groups worth your attention.",
+      "searchPlaceholder": "Search groups\u2026",
+      "searchAriaLabel": "Search groups",
+      "noMatch": "No groups match \u201c{{query}}\u201d",
+      "noMatchHint": "Try a different search term, or clear the search.",
       "loginToSeeTitle": "Log in to see your groups",
       "loginToSeeBody": "Groups you've founded or moderate will appear here.",
       "noGroupsTitle": "No groups yet",
@@ -718,7 +751,6 @@
       "seoDescriptionEdit": "Update your group on {{appName}}.",
       "loginGateTitle": "Log in to start a group",
       "loginGateBody": "Groups are signed Nostr events. You need a Nostr login to publish one.",
-      "backToGroups": "Back to groups",
       "invalidEditTitle": "Invalid edit link",
       "invalidEditBody": "This group edit link is missing a valid group address.",
       "startNewGroup": "Start a new group",
@@ -807,7 +839,6 @@
     "seoDescriptionEdit": "Update your fundraising campaign on {{appName}}.",
     "loginGateTitle": "Log in to start a campaign",
     "loginGateBody": "Campaigns are signed Nostr events. You need a Nostr login to publish one.",
-    "goHome": "Go home",
     "invalidEditTitle": "Invalid edit link",
     "invalidEditBody": "This campaign edit link is missing a valid campaign address.",
     "startNewCampaign": "Start a new campaign",
@@ -937,7 +968,6 @@
       "seoDescription": "Create a calendar event on {{appName}}.",
       "loginTitle": "Log in to create an event",
       "loginBody": "Events are signed Nostr events. You need a Nostr login to publish one.",
-      "backToEvents": "Back to events",
       "heading": "Create event",
       "titlePlaceholder": "Neighborhood cleanup",
       "descriptionPlaceholder": "Tell people what to expect, what to bring, and who should attend...",
@@ -1023,6 +1053,10 @@
       "community": "Community Campaigns",
       "communityDesc": "Help fund the changes worth making.",
       "browseAll": "Browse all campaigns →",
+      "searchPlaceholder": "Search campaigns\u2026",
+      "searchAriaLabel": "Search campaigns",
+      "noMatch": "No campaigns match \u201c{{query}}\u201d",
+      "noMatchHint": "Try a different search term, or clear the search.",
       "pending": "Pending approval",
       "pendingDesc": "Campaigns on the network that no Team Soapbox moderator has approved or hidden yet.",
       "pendingEmpty": "Nothing awaiting review.",
@@ -1038,6 +1072,13 @@
       "title": "All Campaigns",
       "seoTitle": "All campaigns",
       "description": "Browse every campaign published on Agora.",
+      "sectionTagline": "Browse every cause on the network.",
+      "heroKicker": "Campaigns",
+      "heroHeading": "Every cause,",
+      "heroHeadingLine2": "in one place.",
+      "heroBody": "Every fundraiser published on Nostr, gathered into one place. Browse the full network, find a cause that matters to you, and back it directly with Bitcoin.",
+      "campaignsCount_one": "campaign on the network",
+      "campaignsCount_other": "campaigns on the network",
       "searchAriaLabel": "Search campaigns",
       "searchPlaceholder": "Search campaigns…",
       "clearSearch": "Clear search",
@@ -1052,6 +1093,31 @@
       "allHiddenHint": "Every campaign on the network has been hidden by moderators. Toggle \u201cShow hidden\u201d to view them.",
       "empty": "No campaigns yet",
       "emptyHint": "No campaigns have been published yet. Be the first."
+    }
+  },
+  "moderation": {
+    "hiddenBadge": "Hidden",
+    "menu": {
+      "label": "Moderator actions",
+      "ariaCampaign": "Moderate campaign",
+      "ariaPledge": "Moderate pledge",
+      "ariaGroup": "Moderate group",
+      "failedAction": "Failed to {{action}}",
+      "approve": "Approve",
+      "unapprove": "Unapprove",
+      "approvedState": "Approved",
+      "hide": "Hide",
+      "unhide": "Unhide",
+      "hiddenState": "Hidden",
+      "feature": "Feature",
+      "unfeature": "Unfeature",
+      "featuredState": "Featured",
+      "toastApproved": "Approved for homepage",
+      "toastUnapproved": "Removed from homepage",
+      "toastHidden": "Hidden",
+      "toastUnhidden": "Unhidden",
+      "toastFeatured": "Featured",
+      "toastUnfeatured": "Removed from featured"
     }
   },
   "settings": {
@@ -1642,7 +1708,7 @@
     "tabs": {
       "agora": "Agora",
       "nostr": "Nostr",
-      "accounts": "Accounts"
+      "accounts": "Users"
     },
     "filters": {
       "title": "Filters",
@@ -1715,7 +1781,7 @@
     "empty": {
       "posts": "No results found matching your search.",
       "postsPrompt": "Enter a search query to find Nostr content.",
-      "accounts": "No accounts found matching your search.",
+      "accounts": "No users found matching your search.",
       "followsPrompt": "Search for people by name or NIP-05 address.",
       "agora": "No Agora campaigns, pledges, or groups found matching your search.",
       "agoraPrompt": "Search Agora campaigns, pledges, and groups, or browse the latest.",
@@ -2023,6 +2089,14 @@
           "**Public donations** are recorded on the Bitcoin blockchain and on Nostr. Anyone can see the amounts, timing, and addresses.",
           "**Private donations** use silent payments. They're not publicly linkable to the activist's donation code, don't appear in donor lists, and don't count toward public totals.",
           "When a campaign accepts both, the donor's wallet decides which path to use — silent-payment-capable wallets pay privately, others pay the public address. Read the **Donor Guide** and **Activist Guide** for the full picture."
+        ]
+      },
+      "why-donations-pending": {
+        "question": "Why do some donations say \"pending\"?",
+        "answer": [
+          "A **pending** donation is real Bitcoin that's already been sent — it's just waiting to be confirmed by the network. The donor's wallet has broadcast the transaction, but it hasn't been included in a block yet.",
+          "Bitcoin produces a new block roughly every 10 minutes, and miners pick transactions based on the fee the donor paid. Most donations confirm within an hour; lower-fee ones can take longer when the network is busy. {{appName}} re-checks confirmation status automatically, so the **pending** label disappears on its own once a block lands.",
+          "The funds are on the way — the activist will see the donation count toward the campaign total as soon as it confirms. There's nothing the activist or {{appName}} can do to speed it up; only the donor's wallet can bump the fee."
         ]
       },
       "censorship-resistance": {

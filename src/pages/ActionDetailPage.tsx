@@ -33,12 +33,14 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { Skeleton } from '@/components/ui/skeleton';
+import { CommentsSection } from '@/components/CommentsSection';
 import { DetailCommentComposer } from '@/components/DetailCommentComposer';
 import { DetailReplySkeleton, DetailStory } from '@/components/DetailStory';
 import { PostActionBar } from '@/components/PostActionBar';
 import { PinnedCommentHeader } from '@/components/PinnedCommentHeader';
 import { ReplyComposeModal } from '@/components/ReplyComposeModal';
 import { NoteMoreMenu } from '@/components/NoteMoreMenu';
+import { ModerationMenu } from '@/components/moderation';
 import { ThreadedReplyList, type ReplyNode } from '@/components/ThreadedReplyList';
 import { usePinnedEventComments } from '@/hooks/usePinnedEventComments';
 import { useEventTranslation } from '@/hooks/useEventTranslation';
@@ -234,24 +236,17 @@ function PledgeDetailContent({ action }: { action: Action }) {
             <PledgeStory storyEvent={storyEvent} hasContent={displayAction.description.trim().length > 0} />
 
             <div id="pledge-activity" className="scroll-mt-20">
-              <div className="mt-6">
-                <div className="flex items-baseline justify-between gap-3 mb-3 px-1">
-                  <h2 className="text-lg font-semibold tracking-tight">{t('pledges.detail.submissions')}</h2>
-                  {topLevel.length > 0 ? (
-                    <span className="text-sm text-muted-foreground tabular-nums">
-                      {t('pledges.detail.submissionCount', { count: topLevel.length })}
-                    </span>
-                  ) : null}
-                </div>
-
+              <CommentsSection
+                title={t('pledges.detail.submissions')}
+                countLabel={topLevel.length > 0 ? t('pledges.detail.submissionCount', { count: topLevel.length }) : undefined}
+              >
                 <DetailCommentComposer
                   event={action.event}
                   placeholder={t('pledges.detail.submissionPlaceholder')}
-                  className="mb-3"
                 />
 
                 {commentsLoading && replyTree.length === 0 ? (
-                  <div className="space-y-3">
+                  <div>
                     {Array.from({ length: 3 }).map((_, i) => <DetailReplySkeleton key={i} />)}
                   </div>
                 ) : replyTree.length > 0 ? (
@@ -270,7 +265,7 @@ function PledgeDetailContent({ action }: { action: Action }) {
                   <button
                     type="button"
                     onClick={() => setReplyOpen(true)}
-                    className="block w-full rounded-2xl border border-dashed border-border/80 bg-card/50 px-6 py-10 text-center hover:bg-card hover:border-primary/40 transition-colors"
+                    className="block w-full px-6 py-10 text-center hover:bg-foreground/5 transition-colors"
                   >
                     <p className="text-base font-medium text-foreground">{t('pledges.detail.noSubmissionsTitle')}</p>
                     <p className="mt-1 text-sm text-muted-foreground">
@@ -278,7 +273,7 @@ function PledgeDetailContent({ action }: { action: Action }) {
                     </p>
                   </button>
                 )}
-              </div>
+              </CommentsSection>
             </div>
           </div>
 
@@ -396,6 +391,18 @@ function PledgeHero({
             <ChevronLeft className="size-5 rtl:rotate-180" />
             <span className="text-sm font-medium hidden sm:inline">{t('pledges.detail.back')}</span>
           </button>
+          {/* Moderator-only kebab. Returns null for non-moderators so
+              non-mod viewers don't subscribe to the moderation query.
+              Matches the dark hero styling — translucent black pill so
+              it reads against the photo at the same weight as the back
+              button on the left. */}
+          <ModerationMenu
+            coord={`36639:${action.pubkey}:${action.id}`}
+            entityTitle={action.title}
+            surface="pledge"
+            axes={['hide', 'featured']}
+            className="size-10 rounded-full bg-black/30 text-white backdrop-blur-md hover:bg-black/45 hover:text-white focus-visible:ring-2 focus-visible:ring-white/80"
+          />
         </div>
       </div>
 

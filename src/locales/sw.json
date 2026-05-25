@@ -20,7 +20,24 @@
     "goBack": "Rudi nyuma",
     "tryAgain": "Tafadhali jaribu tena.",
     "showLess": "Onyesha kidogo",
-    "readMore": "Soma zaidi"
+    "readMore": "Soma zaidi",
+    "byAuthor": "na <0>{{name}}</0>",
+    "donors_one": "mfadhili {{count}}",
+    "donors_other": "wafadhili {{count}}",
+    "clearSearch": "Futa utafutaji",
+    "searching": "Inatafuta…",
+    "searchResultsCount_one": "tokeo {{count}}",
+    "searchResultsCount_other": "matokeo {{count}}",
+    "sortAriaLabel": "Mpangilio wa kupanga",
+    "sortDefault": "Chaguomsingi",
+    "sortTop": "Juu",
+    "sortNew": "Mpya",
+    "showHidden": "Onyesha zilizofichwa",
+    "filtersAriaLabel": "Vichujio vya utafutaji",
+    "countryFilterAriaLabel": "Chuja kwa nchi",
+    "countrySearchPlaceholder": "Tafuta nchi…",
+    "countryNoResults": "Hakuna nchi zilizopatikana.",
+    "countryGlobal": "Kimataifa"
   },
   "translate": {
     "translate": "Tafsiri",
@@ -597,12 +614,23 @@
       "showMore": "Onyesha zaidi ({{count}} zaidi)",
       "emptyTitle": "Hakuna ahadi bado",
       "emptyHint": "Kuwa wa kwanza kuunda ahadi.",
-      "emptyHintCountry": "Kuwa wa kwanza kuunda ahadi kwa {{country}}."
+      "emptyHintCountry": "Kuwa wa kwanza kuunda ahadi kwa {{country}}.",
+      "searchPlaceholder": "Tafuta ahadi…",
+      "searchAriaLabel": "Tafuta ahadi",
+      "noMatch": "Hakuna ahadi zinazolingana na “{{query}}”",
+      "noMatchHint": "Jaribu neno tofauti la utafutaji, au futa utafutaji.",
+      "needsReview": "Inahitaji ukaguzi",
+      "needsReviewDesc": "Ahadi za {{appName}} ambazo bado hazijaangaziwa au kufichwa. Nyanyua moja kwenye rafu ya Maarufu au lifiche kwa Ficha.",
+      "needsReviewEmpty": "Hakuna kinachosubiri ukaguzi.",
+      "hidden": "Vilivyofichwa",
+      "hiddenDesc": "Ahadi zilizofichwa kutoka kwa ugunduzi wa umma. Tumia menyu ya nukta tatu kwenye kadi ili kuonyesha.",
+      "hiddenEmpty": "Hakuna ahadi zilizofichwa kwa sasa."
     },
     "card": {
       "ended": "Imeisha",
       "pledged": "Imeahidiwa",
       "byAuthor": "na <0>{{name}}</0>",
+      "actionsAriaLabel": "Vitendo vya ahadi",
       "deletePledge": "Futa ahadi",
       "copyLink": "Nakili kiungo",
       "linkCopied": "Kiungo kimenakiliwa",
@@ -617,7 +645,6 @@
       "seoDescription": "Unda ahadi ya mfadhili ili kuhamasisha hatua halisi kwenye {{appName}}.",
       "loginGateTitle": "Ingia ili kuunda ahadi",
       "loginGateBody": "Ahadi ni matukio ya Nostr yaliyotiwa saini. Unahitaji kuingia kwa Nostr ili kuchapisha moja.",
-      "backToPledges": "Rudi kwenye ahadi",
       "heading": "Unda ahadi",
       "title": "Kichwa",
       "titlePlaceholder": "Hifadhi kumbukumbu ya kusafisha pwani",
@@ -696,7 +723,9 @@
       "createGroupLoginTitle": "Ingia ili kuunda kikundi",
       "createGroupLoginBody": "Kuunda kikundi huchapisha tukio la Nostr kutoka kwa akaunti yako.",
       "myGroups": "Vikundi vyangu",
+      "myGroupsTagline": "Vikundi ulivyounda, unavyosimamia, au unavyofuata.",
       "featuredGroups": "Vikundi maarufu",
+      "featuredGroupsTagline": "Vikundi vinavyojitokeza vinavyostahili usikivu wako.",
       "loginToSeeTitle": "Ingia ili kuona vikundi vyako",
       "loginToSeeBody": "Vikundi ulivyounda au unavyosimamia vitaonekana hapa.",
       "noGroupsTitle": "Hakuna vikundi bado",
@@ -717,7 +746,11 @@
       "tickerFeaturedGroups_one": "kikundi maarufu kwenye Nostr",
       "tickerFeaturedGroups_other": "vikundi maarufu kwenye Nostr",
       "tickerCountries_one": "nchi inayochapisha leo",
-      "tickerCountries_other": "nchi zinazochapisha leo"
+      "tickerCountries_other": "nchi zinazochapisha leo",
+      "searchPlaceholder": "Tafuta vikundi…",
+      "searchAriaLabel": "Tafuta vikundi",
+      "noMatch": "Hakuna vikundi vinavyolingana na “{{query}}”",
+      "noMatchHint": "Jaribu neno tofauti la utafutaji, au futa utafutaji."
     },
     "create": {
       "seoTitleCreate": "Unda kikundi",
@@ -726,7 +759,6 @@
       "seoDescriptionEdit": "Sasisha kikundi chako kwenye {{appName}}.",
       "loginGateTitle": "Ingia ili kuanza kikundi",
       "loginGateBody": "Vikundi ni matukio ya Nostr yaliyotiwa saini. Unahitaji kuingia kwa Nostr ili kuchapisha kimoja.",
-      "backToGroups": "Rudi kwenye vikundi",
       "invalidEditTitle": "Kiungo cha kuhariri si halali",
       "invalidEditBody": "Kiungo hiki cha kuhariri kikundi hakina anwani halali ya kikundi.",
       "startNewGroup": "Anza kikundi kipya",
@@ -815,7 +847,6 @@
     "seoDescriptionEdit": "Sasisha kampeni yako ya kukusanya fedha kwenye {{appName}}.",
     "loginGateTitle": "Ingia ili kuanza kampeni",
     "loginGateBody": "Kampeni ni matukio ya Nostr yaliyotiwa saini. Unahitaji kuingia kwa Nostr ili kuchapisha moja.",
-    "goHome": "Nenda nyumbani",
     "invalidEditTitle": "Kiungo cha kuhariri si halali",
     "invalidEditBody": "Kiungo hiki cha kuhariri kampeni hakina anwani halali ya kampeni.",
     "startNewCampaign": "Anza kampeni mpya",
@@ -945,7 +976,6 @@
       "seoDescription": "Unda tukio la kalenda kwenye {{appName}}.",
       "loginTitle": "Ingia ili kuunda tukio",
       "loginBody": "Matukio ni matukio ya Nostr yaliyotiwa saini. Unahitaji kuingia kwa Nostr ili kuchapisha moja.",
-      "backToEvents": "Rudi kwenye matukio",
       "heading": "Unda tukio",
       "titlePlaceholder": "Usafi wa mtaa",
       "descriptionPlaceholder": "Waambie watu wa kutarajia nini, wachukue nini, na nani anayepaswa kuhudhuria...",
@@ -1040,12 +1070,17 @@
       "yourCampaigns": "Kampeni zako",
       "yourCampaignsDesc": "Kampeni zako ziko mtandaoni kwenye Nostr na michango hufanya kazi kupitia kiungo cha kampeni. Zinaonekana kwenye ukurasa wa mwanzo mara tu msimamizi wa Team Soapbox anapozithibitisha.",
       "empty": "Hakuna kampeni bado",
-      "emptyHint": "Kuwa wa kwanza kuanza kampeni ya kukusanya fedha kwenye {{appName}}. Eleza hadithi yako, chagua walengwa wako, na shiriki kiungo."
+      "emptyHint": "Kuwa wa kwanza kuanza kampeni ya kukusanya fedha kwenye {{appName}}. Eleza hadithi yako, chagua walengwa wako, na shiriki kiungo.",
+      "searchPlaceholder": "Tafuta kampeni…",
+      "searchAriaLabel": "Tafuta kampeni",
+      "noMatch": "Hakuna kampeni zinazolingana na “{{query}}”",
+      "noMatchHint": "Jaribu neno tofauti la utafutaji, au futa utafutaji."
     },
     "all": {
       "title": "Kampeni Zote",
       "seoTitle": "Kampeni zote",
       "description": "Vinjari kila kampeni iliyochapishwa kwenye Agora.",
+      "sectionTagline": "Vinjari kila lengo kwenye mtandao.",
       "searchAriaLabel": "Tafuta kampeni",
       "searchPlaceholder": "Tafuta kampeni…",
       "clearSearch": "Futa utafutaji",
@@ -1059,7 +1094,38 @@
       "allHidden": "Hakuna kampeni za kuonyesha",
       "allHiddenHint": "Kila kampeni kwenye mtandao imefichwa na wasimamizi. Geuza “Onyesha zilizofichwa” ili kuziona.",
       "empty": "Hakuna kampeni bado",
-      "emptyHint": "Hakuna kampeni zilizochapishwa bado. Kuwa wa kwanza."
+      "emptyHint": "Hakuna kampeni zilizochapishwa bado. Kuwa wa kwanza.",
+      "heroKicker": "Kampeni",
+      "heroHeading": "Kila lengo,",
+      "heroHeadingLine2": "mahali pamoja.",
+      "heroBody": "Kila kampeni iliyochapishwa kwenye Nostr, imekusanywa mahali pamoja. Vinjari mtandao mzima, pata lengo linalokuhusu, na liunge mkono moja kwa moja kwa Bitcoin.",
+      "campaignsCount_one": "kampeni kwenye mtandao",
+      "campaignsCount_other": "kampeni kwenye mtandao"
+    }
+  },
+  "moderation": {
+    "hiddenBadge": "Vilivyofichwa",
+    "menu": {
+      "label": "Vitendo vya msimamizi",
+      "ariaCampaign": "Simamia kampeni",
+      "ariaPledge": "Simamia ahadi",
+      "ariaGroup": "Simamia kikundi",
+      "failedAction": "Imeshindikana ku-{{action}}",
+      "approve": "Idhinisha",
+      "unapprove": "Ondoa idhini",
+      "approvedState": "Imeidhinishwa",
+      "hide": "Ficha",
+      "unhide": "Onyesha",
+      "hiddenState": "Imefichwa",
+      "feature": "Angazia",
+      "unfeature": "Ondoa kwenye maarufu",
+      "featuredState": "Imeangaziwa",
+      "toastApproved": "Imeidhinishwa kwa ukurasa wa mwanzo",
+      "toastUnapproved": "Imeondolewa kwenye ukurasa wa mwanzo",
+      "toastHidden": "Imefichwa",
+      "toastUnhidden": "Imeonyeshwa",
+      "toastFeatured": "Imeangaziwa",
+      "toastUnfeatured": "Imeondolewa kwenye maarufu"
     }
   },
   "settings": {
@@ -1359,8 +1425,6 @@
     "title": "Changanua malipo ya kimya",
     "description": "Inatembea kifaa cha kuorodhesha cha BIP-352 kilichosanidiwa block-kwa-block kugundua malipo ya kimya yanayoingia.",
     "fromBlock": "Kutoka block",
-    "toBlock": "Hadi block",
-    "tipPlaceholder": "kilele",
     "indexerTip": "Kilele cha kifaa cha kuorodhesha",
     "lastFullyScanned": "Iliyochanganuliwa kikamilifu mwisho",
     "never": "kamwe",
@@ -1548,7 +1612,7 @@
     "tabs": {
       "agora": "Agora",
       "nostr": "Nostr",
-      "accounts": "Akaunti"
+      "accounts": "Watumiaji"
     },
     "filters": {
       "title": "Vichujio",
@@ -1621,7 +1685,7 @@
     "empty": {
       "posts": "Hakuna matokeo yaliyolingana na utafutaji wako.",
       "postsPrompt": "Weka swali la utafutaji ili kupata maudhui ya Nostr.",
-      "accounts": "Hakuna akaunti zilizolingana na utafutaji wako.",
+      "accounts": "Hakuna watumiaji waliolingana na utafutaji wako.",
       "followsPrompt": "Tafuta watu kwa jina au anwani ya NIP-05.",
       "agora": "Hakuna kampeni, ahadi, au vikundi vya Agora vilivyolingana na utafutaji wako.",
       "agoraPrompt": "Tafuta kampeni, ahadi, na vikundi vya Agora, au vinjari vya hivi karibuni.",
@@ -1937,6 +2001,14 @@
           "**Michango ya umma** imerekodiwa kwenye blockchain ya Bitcoin na kwenye Nostr. Yeyote anaweza kuona kiasi, wakati, na anwani.",
           "**Michango ya faragha** hutumia malipo ya kimya. Hayaunganiki hadharani na msimbo wa mchango wa mwanaharakati, hayaonekani kwenye orodha za wafadhili, na hayahesabiwi katika jumla ya umma.",
           "Kampeni inapokubali zote mbili, pochi ya mfadhili huamua njia ya kutumia — pochi zenye uwezo wa malipo ya kimya hulipa kwa faragha, nyingine hulipa anwani ya umma. Soma **Mwongozo wa Mfadhili** na **Mwongozo wa Mwanaharakati** kwa picha kamili."
+        ]
+      },
+      "why-donations-pending": {
+        "question": "Kwa nini baadhi ya michango inasema \"inasubiri\"?",
+        "answer": [
+          "Mchango **unaosubiri** ni Bitcoin halisi ambayo tayari imetumwa — inangoja tu kuthibitishwa na mtandao. Pochi ya mfadhili imeshatangaza muamala, lakini bado haujajumuishwa katika kizuizi.",
+          "Bitcoin huzalisha kizuizi kipya takriban kila dakika 10, na wachimbaji huchagua miamala kulingana na ada aliyolipa mfadhili. Michango mingi huthibitishwa ndani ya saa moja; ile yenye ada ya chini inaweza kuchukua muda mrefu wakati mtandao una shughuli nyingi. {{appName}} hukagua tena hali ya uthibitisho kiotomatiki, hivyo lebo ya **inasubiri** hutoweka yenyewe mara kizuizi kinapotua.",
+          "Fedha ziko njiani — mwanaharakati ataona mchango ukihesabiwa katika jumla ya kampeni mara tu unapothibitishwa. Hakuna jambo mwanaharakati au {{appName}} wanaloweza kufanya kuharakisha; pochi ya mfadhili pekee ndiyo inayoweza kuongeza ada."
         ]
       },
       "censorship-resistance": {

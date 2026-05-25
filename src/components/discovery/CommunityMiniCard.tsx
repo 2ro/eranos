@@ -2,12 +2,11 @@ import { Link } from 'react-router-dom';
 import { Users } from 'lucide-react';
 import { nip19 } from 'nostr-tools';
 
-import { CommunityModerationOverlay } from '@/components/CommunityModerationMenu';
+import { AuthorByline } from '@/components/AuthorByline';
+import { ModerationOverlay } from '@/components/moderation';
 import { Card } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
-import { useAuthor } from '@/hooks/useAuthor';
 import { useEventTranslation } from '@/hooks/useEventTranslation';
-import { genUserName } from '@/lib/genUserName';
 import { sanitizeUrl } from '@/lib/sanitizeUrl';
 import { cn } from '@/lib/utils';
 import {
@@ -55,13 +54,7 @@ export function CommunityMiniCard({ community, className }: CommunityMiniCardPro
     buttonClassName: 'size-8 rounded-full p-0 text-muted-foreground hover:text-primary hover:bg-primary/10',
   });
   const displayCommunity = parseCommunityEvent(translatedEvent) ?? community;
-  const founder = useAuthor(community.founderPubkey);
   const banner = sanitizeUrl(displayCommunity.image);
-  const founderName =
-    founder.data?.metadata?.display_name ||
-    founder.data?.metadata?.name ||
-    genUserName(community.founderPubkey);
-  const founderAvatar = sanitizeUrl(founder.data?.metadata?.picture);
 
   const naddr = nip19.naddrEncode({
     kind: COMMUNITY_DEFINITION_KIND,
@@ -95,7 +88,12 @@ export function CommunityMiniCard({ community, className }: CommunityMiniCardPro
               non-moderators, which is why this component owns the
               `useOrganizationModeration` subscription rather than the
               card — keeps non-mod grids free of the heavy label query. */}
-          <CommunityModerationOverlay coord={community.aTag} organizationName={community.name} />
+          <ModerationOverlay
+            coord={community.aTag}
+            entityTitle={community.name}
+            surface="group"
+            axes={['hide', 'featured']}
+          />
         </div>
         <div className="flex flex-col gap-2 p-3.5 flex-1">
           <h3 className="font-semibold leading-tight text-sm tracking-tight line-clamp-1">
@@ -107,21 +105,7 @@ export function CommunityMiniCard({ community, className }: CommunityMiniCardPro
             </p>
           )}
           <div className="mt-auto flex items-center justify-between gap-2 pt-1.5">
-            <div className="flex min-w-0 items-center gap-2">
-              {founderAvatar ? (
-                <img
-                  src={founderAvatar}
-                  alt=""
-                  loading="lazy"
-                  className="size-5 rounded-full object-cover"
-                />
-              ) : (
-                <div className="size-5 rounded-full bg-secondary" />
-              )}
-              <span className="truncate text-[11px] text-muted-foreground">
-                by {founderName}
-              </span>
-            </div>
+            <AuthorByline pubkey={community.founderPubkey} insideLink />
             {translateAction}
           </div>
         </div>

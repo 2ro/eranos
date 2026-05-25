@@ -1,25 +1,20 @@
-import { useMemo, useState } from 'react';
+import { useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { useSeoMeta } from '@unhead/react';
 import { Trans, useTranslation } from 'react-i18next';
-import { ArrowRight, ChevronDown, EyeOff, HandHeart, Hourglass, PlusCircle, ShieldCheck } from 'lucide-react';
+import { ArrowRight, EyeOff, HandHeart, Hourglass, PlusCircle, ShieldCheck } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from '@/components/ui/collapsible';
 import { CampaignCard, CampaignCardSkeleton } from '@/components/CampaignCard';
 import { HeroLightningMap } from '@/components/HeroLightningMap';
-import { cn } from '@/lib/utils';
+import { ModeratorCollapsibleSection } from '@/components/moderation';
 import { useCampaigns } from '@/hooks/useCampaigns';
 import { useCampaignModeration } from '@/hooks/useCampaignModeration';
 import { useCampaignModerators } from '@/hooks/useCampaignModerators';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useAppContext } from '@/hooks/useAppContext';
-import { type ParsedCampaign } from '@/lib/campaign';
+import type { ParsedCampaign } from '@/lib/campaign';
 
 /** Cap on how many featured campaigns we render in the home-page row. */
 const MAX_FEATURED = 4;
@@ -319,28 +314,40 @@ export function CampaignsPage() {
 
         {/* Moderator-only: campaigns awaiting an approval decision. */}
         {isMod && (
-          <ModeratorSection
+          <ModeratorCollapsibleSection
             icon={<Hourglass className="size-4" />}
             title={t('campaigns.home.pending')}
             description={t('campaigns.home.pendingDesc')}
             count={pendingCampaigns.length}
-            campaigns={pendingCampaigns}
             isLoading={allLoading}
             emptyText={t('campaigns.home.pendingEmpty')}
-          />
+            skeleton={<CampaignGridSkeleton />}
+          >
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+              {pendingCampaigns.map((campaign) => (
+                <CampaignCard key={campaign.aTag} campaign={campaign} />
+              ))}
+            </div>
+          </ModeratorCollapsibleSection>
         )}
 
         {/* Moderator-only: campaigns currently hidden. */}
         {isMod && (
-          <ModeratorSection
+          <ModeratorCollapsibleSection
             icon={<EyeOff className="size-4" />}
             title={t('campaigns.home.hidden')}
             description={t('campaigns.home.hiddenDesc')}
             count={hiddenCampaigns.length}
-            campaigns={hiddenCampaigns}
             isLoading={allLoading}
             emptyText={t('campaigns.home.hiddenEmpty')}
-          />
+            skeleton={<CampaignGridSkeleton />}
+          >
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+              {hiddenCampaigns.map((campaign) => (
+                <CampaignCard key={campaign.aTag} campaign={campaign} />
+              ))}
+            </div>
+          </ModeratorCollapsibleSection>
         )}
 
         {/* Non-mod creator: surface their own not-yet-approved campaigns
@@ -366,77 +373,6 @@ export function CampaignsPage() {
         )}
       </div>
     </main>
-  );
-}
-
-/**
- * Collapsible moderator-only section listing campaigns in a particular
- * moderation state (pending / hidden). Defaults to expanded when the list
- * is short, collapsed otherwise.
- */
-function ModeratorSection({
-  icon,
-  title,
-  description,
-  count,
-  campaigns,
-  isLoading,
-  emptyText,
-}: {
-  icon: React.ReactNode;
-  title: string;
-  description: string;
-  count: number;
-  campaigns: ParsedCampaign[];
-  isLoading: boolean;
-  emptyText: string;
-}) {
-  const [open, setOpen] = useState(count <= 6);
-
-  return (
-    <Collapsible open={open} onOpenChange={setOpen} asChild>
-      <section className="space-y-5">
-        <CollapsibleTrigger asChild>
-          <button
-            type="button"
-            className="flex w-full items-end justify-between gap-4 rounded-lg text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
-          >
-            <div>
-              <h2 className="text-2xl sm:text-3xl font-bold tracking-tight inline-flex items-center gap-2">
-                <span className="text-muted-foreground">{icon}</span>
-                {title}
-                <span className="text-base font-medium text-muted-foreground">({count})</span>
-              </h2>
-              <p className="text-sm text-muted-foreground mt-1 max-w-2xl">{description}</p>
-            </div>
-            <ChevronDown
-              className={cn(
-                'size-5 text-muted-foreground motion-safe:transition-transform shrink-0',
-                open && 'rotate-180',
-              )}
-              aria-hidden
-            />
-          </button>
-        </CollapsibleTrigger>
-        <CollapsibleContent>
-          {isLoading && campaigns.length === 0 ? (
-            <CampaignGridSkeleton />
-          ) : campaigns.length === 0 ? (
-            <Card className="border-dashed">
-              <CardContent className="py-8 text-center text-sm text-muted-foreground">
-                {emptyText}
-              </CardContent>
-            </Card>
-          ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
-              {campaigns.map((campaign) => (
-                <CampaignCard key={campaign.aTag} campaign={campaign} />
-              ))}
-            </div>
-          )}
-        </CollapsibleContent>
-      </section>
-    </Collapsible>
   );
 }
 

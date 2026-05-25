@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Link, useNavigate, useSearchParams } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useSeoMeta } from '@unhead/react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useNostr } from '@nostrify/react';
@@ -19,6 +19,7 @@ import {
 import { CoverImageField } from '@/components/CoverImageField';
 import { FormSection } from '@/components/FormSection';
 import { OrganizationContextChip } from '@/components/OrganizationContextChip';
+import { LoginArea } from '@/components/auth/LoginArea';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
@@ -543,15 +544,17 @@ export function CreateCampaignPage() {
       <main className="min-h-screen pb-16">
         <div className="max-w-2xl mx-auto px-4 sm:px-6 py-12">
           <Card>
-            <CardContent className="py-12 px-8 text-center space-y-4">
-              <HandHeart className="size-10 text-muted-foreground/60 mx-auto" />
-              <h2 className="text-xl font-semibold">{t('campaignsCreate.loginGateTitle')}</h2>
-              <p className="text-muted-foreground">
-                {t('campaignsCreate.loginGateBody')}
-              </p>
-              <Button asChild>
-                <Link to="/">{t('campaignsCreate.goHome')}</Link>
-              </Button>
+            <CardContent className="py-12 px-8 flex flex-col items-center gap-6 text-center">
+              <div className="p-4 rounded-full bg-primary/10">
+                <HandHeart className="size-8 text-primary" />
+              </div>
+              <div className="space-y-2 max-w-sm">
+                <h2 className="text-xl font-semibold">{t('campaignsCreate.loginGateTitle')}</h2>
+                <p className="text-muted-foreground text-sm">
+                  {t('campaignsCreate.loginGateBody')}
+                </p>
+              </div>
+              <LoginArea className="max-w-60" />
             </CardContent>
           </Card>
         </div>
@@ -754,7 +757,7 @@ export function CreateCampaignPage() {
               onChange={(e) => setStory(e.target.value)}
               placeholder={t('campaignsCreate.storyPlaceholder')}
               rows={7}
-              className="font-mono text-sm"
+              className="font-mono text-base md:text-sm"
             />
           </FormSection>
 
@@ -1094,7 +1097,7 @@ function CountrySelect({
               setOpen(false);
             }
           }}
-          className="h-9 rounded-full border-0 bg-secondary pl-10 pr-10 text-sm focus-visible:ring-0 focus-visible:ring-offset-0"
+          className="h-9 rounded-full border-0 bg-secondary pl-10 pr-10 text-base md:text-sm focus-visible:ring-0 focus-visible:ring-offset-0"
           placeholder={t('forms.countrySearchPlaceholder')}
           autoComplete="off"
           role="combobox"

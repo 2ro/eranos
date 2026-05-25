@@ -9,30 +9,28 @@ import { HeroBanner } from '@/components/HeroBanner';
 import { LoginArea } from '@/components/auth/LoginArea';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from '@/components/ui/collapsible';
 import { Skeleton } from '@/components/ui/skeleton';
 import { CommunityGrid } from '@/components/discovery/CommunityGrid';
 import { CommunityMiniCard, CommunityMiniCardSkeleton } from '@/components/discovery/CommunityMiniCard';
-import { SectionHeader } from '@/components/discovery/SectionHeader';
+import { DiscoverySearchToolbar } from '@/components/DiscoverySearchToolbar';
+import { ModeratorCollapsibleSection } from '@/components/moderation';
 import { COOL_PALETTE } from '@/lib/hopePalette';
 import { cn } from '@/lib/utils';
 import { useAppContext } from '@/hooks/useAppContext';
 import { useCampaignModerators } from '@/hooks/useCampaignModerators';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
+import { useDebounce } from '@/hooks/useDebounce';
 import { useDiscoverCommunities } from '@/hooks/useDiscoverCommunities';
 import { useFeaturedOrganizations } from '@/hooks/useFeaturedOrganizations';
 import { useGlobalActivity } from '@/hooks/useGlobalActivity';
 import { useGlobalDonations } from '@/hooks/useGlobalDonations';
+import { useNip50Search, type Nip50Sort } from '@/hooks/useNip50Search';
 import { useOrganizationModeration } from '@/hooks/useOrganizationModeration';
 import { useToast } from '@/hooks/useToast';
 import { useUserOrganizations } from '@/hooks/useUserOrganizations';
 import { hasAgoraTag } from '@/lib/agoraNoteTags';
 import { formatSatsShort } from '@/lib/formatCampaignAmount';
-import type { ParsedCommunity } from '@/lib/communityUtils';
+import { COMMUNITY_DEFINITION_KIND, parseCommunityEvent, type ParsedCommunity } from '@/lib/communityUtils';
 
 // ─── Page ──────────────────────────────────────────────────────────────────────
 
@@ -71,35 +69,190 @@ export function CommunitiesPage() {
     navigate('/groups/new');
   };
 
+  // On-page NIP-50 search + sort + show-hidden toolbar state.
+  //
+  //   Default sort, empty query → curated "My groups" / "Featured" /
+  //     moderator shelves below.
+  //   Default sort, with query  → relay search for kind 34550, results
+  //     post-filtered against name/description/content client-side.
+  //   Top / New                  → always active. Top sends `sort:top`;
+  //     New sends a raw chronological feed of the kind.
+  //
+  // Groups aren't country-scoped on the discovery surface (a community
+  // is its own scope), so the country picker is intentionally omitted
+  // from the toolbar here even though Campaigns and Pledges expose it.
+  const [searchInput, setSearchInput] = useState('');
+  const [sortMode, setSortMode] = useState<Nip50Sort>('default');
+  const [showHidden, setShowHidden] = useState(false);
+  const debouncedSearch = useDebounce(searchInput, 300);
+  const trimmedSearch = debouncedSearch.trim();
+  const {
+    data: searchHitsRaw,
+    isFetching: isSearchFetching,
+    isActive: isSearching,
+  } = useNip50Search<ParsedCommunity>({
+    kind: COMMUNITY_DEFINITION_KIND,
+    query: debouncedSearch,
+    sort: sortMode,
+    parse: parseCommunityEvent,
+    // Group names and descriptions live in tags, not `content`. Relay
+    // NIP-50 implementations that only match content silently miss
+    // obvious title hits — widen client-side by also checking these
+    // tag values.
+    getKeywordHaystack: (event) => {
+      const name = event.tags.find(([n]) => n === 'name')?.[1] ?? '';
+      const description = event.tags.find(([n]) => n === 'description')?.[1] ?? '';
+      return [name, description, event.content];
+    },
+  });
+
+  // Lift org moderation to the page so search results can drop hidden
+  // groups (or include them when the Show-hidden switch is on). The
+  // ModeratorReviewSections subtree below still calls its own copy of
+  // the hook — query results are cached, so the second call is free.
+  const { data: orgModeration } = useOrganizationModeration();
+  const { searchHits, searchHiddenCount } = useMemo(() => {
+    if (!searchHitsRaw) return { searchHits: undefined, searchHiddenCount: 0 };
+    const hiddenCoords = orgModeration?.hiddenCoords ?? new Set<string>();
+    let hidden = 0;
+    const visible: ParsedCommunity[] = [];
+    for (const c of searchHitsRaw) {
+      if (hiddenCoords.has(c.aTag)) {
+        hidden += 1;
+        if (showHidden) visible.push(c);
+      } else {
+        visible.push(c);
+      }
+    }
+    return { searchHits: visible, searchHiddenCount: hidden };
+  }, [searchHitsRaw, orgModeration, showHidden]);
+
+  // Search + sort + show-hidden cluster reused on both branches' top
+  // section row. Factored out so the "My groups" heading (curated
+  // layout) and the "Search / Top / New" heading (search-active layout)
+  // both render the same affordance without duplicating the prop list.
+  const searchToolbar = (
+    <DiscoverySearchToolbar
+      query={searchInput}
+      onQueryChange={setSearchInput}
+      sort={sortMode}
+      onSortChange={setSortMode}
+      searchPlaceholderKey="groups.list.searchPlaceholder"
+      searchAriaLabelKey="groups.list.searchAriaLabel"
+      showHidden={{
+        value: showHidden,
+        onChange: setShowHidden,
+        count: searchHiddenCount,
+      }}
+    />
+  );
+
   return (
     <main className="min-h-screen pb-16 sidebar:pb-0">
       <CommunitiesHero onCreateCommunity={handleCreateCommunity} />
 
-      <div className="max-w-5xl mx-auto space-y-2 sm:space-y-4 pb-8">
-        <section className="pt-6">
-          <SectionHeader title={t('groups.list.myGroups')} className="pb-3 sm:px-6" />
-          <MyCommunitiesShelf
-            userOrganizations={userOrganizations}
-            onCreateCommunity={handleCreateCommunity}
-          />
-        </section>
+      {isSearching ? (
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-10">
+          <section className="space-y-5">
+            <div className="flex flex-col items-stretch gap-4 sm:flex-row sm:items-end sm:justify-between">
+              <div>
+                <h2 className="text-2xl sm:text-3xl font-bold tracking-tight">
+                  {trimmedSearch
+                    ? t('common.search')
+                    : sortMode === 'top'
+                      ? t('common.sortTop')
+                      : t('common.sortNew')}
+                </h2>
+                {searchHits && (
+                  <p className="text-sm text-muted-foreground mt-1">
+                    {t('common.searchResultsCount', { count: searchHits.length })}
+                  </p>
+                )}
+              </div>
+              {searchToolbar}
+            </div>
 
-        <section className="pt-4 pb-8">
-          <SectionHeader
-            title={t('groups.list.featuredGroups')}
-            className="pb-3 sm:px-6"
-          />
-          <FeaturedOrganizationsShelf />
-        </section>
+            {isSearchFetching && !searchHits ? (
+              <CommunityGrid>
+                {Array.from({ length: 8 }).map((_, i) => (
+                  <CommunityMiniCardSkeleton key={i} className="w-full" />
+                ))}
+              </CommunityGrid>
+            ) : searchHits && searchHits.length > 0 ? (
+              <CommunityGrid>
+                {searchHits.map((community) => (
+                  <CommunityMiniCard
+                    key={community.aTag}
+                    community={community}
+                    className="w-full"
+                  />
+                ))}
+              </CommunityGrid>
+            ) : (
+              <Card className="border-dashed">
+                <CardContent className="py-12 px-8 text-center space-y-2">
+                  {trimmedSearch ? (
+                    <>
+                      <p className="text-base font-medium">
+                        {t('groups.list.noMatch', { query: trimmedSearch })}
+                      </p>
+                      <p className="text-sm text-muted-foreground">
+                        {t('groups.list.noMatchHint')}
+                      </p>
+                    </>
+                  ) : (
+                    <p className="text-sm text-muted-foreground">
+                      {t('groups.list.noFeaturedBody', { appName: config.appName })}
+                    </p>
+                  )}
+                </CardContent>
+              </Card>
+            )}
+          </section>
+        </div>
+      ) : (
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 space-y-10 sm:space-y-12 pb-8 pt-10 lg:pt-14">
+          <section className="space-y-5">
+            <div className="flex flex-col items-stretch gap-4 sm:flex-row sm:items-end sm:justify-between">
+              <div>
+                <h2 className="text-2xl sm:text-3xl font-bold tracking-tight">
+                  {t('groups.list.myGroups')}
+                </h2>
+                <p className="text-sm text-muted-foreground mt-1">
+                  {t('groups.list.myGroupsTagline')}
+                </p>
+              </div>
+              {searchToolbar}
+            </div>
+            <MyCommunitiesShelf
+              userOrganizations={userOrganizations}
+              onCreateCommunity={handleCreateCommunity}
+            />
+          </section>
 
-        {/* Moderator-only review sections: "Needs review" and "Hidden".
-            Organizations have a two-axis moderation model (featured /
-            hidden — no approval gate), so anything not yet labelled
-            simply lives in the public Featured-or-not space. The Needs
-            review queue surfaces unlabelled Agora-tagged orgs so
-            moderators can pick what to feature or hide. */}
-        {isMod && <ModeratorReviewSections />}
-      </div>
+          <section className="space-y-5">
+            <div className="flex flex-col items-stretch gap-4 sm:flex-row sm:items-end sm:justify-between">
+              <div>
+                <h2 className="text-2xl sm:text-3xl font-bold tracking-tight">
+                  {t('groups.list.featuredGroups')}
+                </h2>
+                <p className="text-sm text-muted-foreground mt-1">
+                  {t('groups.list.featuredGroupsTagline')}
+                </p>
+              </div>
+            </div>
+            <FeaturedOrganizationsShelf />
+          </section>
+
+          {/* Moderator-only review sections: "Needs review" and "Hidden".
+              Organizations have a two-axis moderation model (featured /
+              hidden — no approval gate), so anything not yet labelled
+              simply lives in the public Featured-or-not space. The Needs
+              review queue surfaces unlabelled Agora-tagged orgs so
+              moderators can pick what to feature or hide. */}
+          {isMod && <ModeratorReviewSections />}
+        </div>
+      )}
     </main>
   );
 }
@@ -158,103 +311,53 @@ function ModeratorReviewSections() {
 
   return (
     <>
-      <ModeratorOrgSection
+      <ModeratorCollapsibleSection
         icon={<Hourglass className="size-4" />}
         title={t('groups.list.needsReview')}
         description={t('groups.list.needsReviewDesc', { appName: config.appName })}
         count={needsReviewOrgs.length}
-        orgs={needsReviewOrgs}
         isLoading={sectionsLoading}
         emptyText={t('groups.list.needsReviewEmpty')}
-      />
-      <ModeratorOrgSection
+        size="compact"
+        triggerPaddingClassName="pb-3"
+        skeleton={
+          <CommunityGrid>
+            {Array.from({ length: 4 }).map((_, i) => (
+              <CommunityMiniCardSkeleton key={i} className="w-full" />
+            ))}
+          </CommunityGrid>
+        }
+      >
+        <CommunityGrid>
+          {needsReviewOrgs.map((org) => (
+            <CommunityMiniCard key={org.aTag} community={org} className="w-full" />
+          ))}
+        </CommunityGrid>
+      </ModeratorCollapsibleSection>
+      <ModeratorCollapsibleSection
         icon={<EyeOff className="size-4" />}
         title={t('groups.list.hidden')}
         description={t('groups.list.hiddenDesc')}
         count={hiddenOrgs.length}
-        orgs={hiddenOrgs}
         isLoading={sectionsLoading}
         emptyText={t('groups.list.hiddenEmpty')}
-      />
+        size="compact"
+        triggerPaddingClassName="pb-3"
+        skeleton={
+          <CommunityGrid>
+            {Array.from({ length: 4 }).map((_, i) => (
+              <CommunityMiniCardSkeleton key={i} className="w-full" />
+            ))}
+          </CommunityGrid>
+        }
+      >
+        <CommunityGrid>
+          {hiddenOrgs.map((org) => (
+            <CommunityMiniCard key={org.aTag} community={org} className="w-full" />
+          ))}
+        </CommunityGrid>
+      </ModeratorCollapsibleSection>
     </>
-  );
-}
-
-/**
- * Collapsible moderator-only section listing organizations in a particular
- * moderation state (pending / hidden). Defaults to expanded when the list
- * is short (≤ 6 items), collapsed otherwise — same heuristic as the
- * campaign version.
- */
-function ModeratorOrgSection({
-  icon,
-  title,
-  description,
-  count,
-  orgs,
-  isLoading,
-  emptyText,
-}: {
-  icon: React.ReactNode;
-  title: string;
-  description: string;
-  count: number;
-  orgs: ParsedCommunity[];
-  isLoading: boolean;
-  emptyText: string;
-}) {
-  const [open, setOpen] = useState(count <= 6);
-
-  return (
-    <Collapsible open={open} onOpenChange={setOpen} asChild>
-      <section className="pt-4 pb-2">
-        <CollapsibleTrigger asChild>
-          <button
-            type="button"
-            className="flex w-full items-end justify-between gap-4 rounded-lg text-left px-4 sm:px-6 pb-3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
-          >
-            <div>
-              <h2 className="text-xl sm:text-2xl font-bold tracking-tight inline-flex items-center gap-2">
-                <span className="text-muted-foreground">{icon}</span>
-                {title}
-                <span className="text-sm font-medium text-muted-foreground">({count})</span>
-              </h2>
-              <p className="text-sm text-muted-foreground mt-1 max-w-2xl">{description}</p>
-            </div>
-            <ChevronDown
-              className={cn(
-                'size-5 text-muted-foreground motion-safe:transition-transform shrink-0',
-                open && 'rotate-180',
-              )}
-              aria-hidden
-            />
-          </button>
-        </CollapsibleTrigger>
-        <CollapsibleContent>
-          {isLoading && orgs.length === 0 ? (
-            <CommunityGrid>
-              {Array.from({ length: 4 }).map((_, i) => (
-                <CommunityMiniCardSkeleton key={i} className="w-full" />
-              ))}
-            </CommunityGrid>
-          ) : orgs.length === 0 ? (
-            <div className="px-4 sm:px-6">
-              <Card className="border-dashed">
-                <CardContent className="py-8 text-center text-sm text-muted-foreground">
-                  {emptyText}
-                </CardContent>
-              </Card>
-            </div>
-          ) : (
-            <CommunityGrid>
-              {orgs.map((org) => (
-                <CommunityMiniCard key={org.aTag} community={org} className="w-full" />
-              ))}
-            </CommunityGrid>
-          )}
-        </CollapsibleContent>
-      </section>
-    </Collapsible>
   );
 }
 
@@ -373,7 +476,7 @@ function CommunitiesHero({ onCreateCommunity }: CommunitiesHeroProps) {
         <div className="flex-1 min-h-[100px] sm:min-h-[120px]" aria-hidden="true" />
 
         <div
-          className="relative w-full max-w-md mx-auto rounded-full bg-background/55 backdrop-blur-xl backdrop-saturate-150 border border-white/20 dark:border-white/10 px-5 py-3 shadow-lg shadow-teal-500/10"
+          className="relative w-full max-w-md mx-auto rounded-full bg-black/30 backdrop-blur-xl backdrop-saturate-150 border border-white/20 px-5 py-3 shadow-lg shadow-teal-500/10"
           aria-live="polite"
         >
           {currentStat ? (
@@ -381,11 +484,11 @@ function CommunitiesHero({ onCreateCommunity }: CommunitiesHeroProps) {
               key={currentStat.id}
               className="flex items-center justify-center gap-3 motion-safe:animate-in motion-safe:fade-in motion-safe:duration-500"
             >
-              <span className="text-primary shrink-0">{currentStat.icon}</span>
-              <span className="text-sm sm:text-base font-semibold tracking-tight">
+              <span className="text-cyan-200 shrink-0 drop-shadow">{currentStat.icon}</span>
+              <span className="text-sm sm:text-base font-semibold tracking-tight text-white drop-shadow-[0_1px_4px_rgb(0_0_0/0.5)]">
                 {currentStat.value}
               </span>
-              <span className="text-xs sm:text-sm text-muted-foreground line-clamp-1">
+              <span className="text-xs sm:text-sm text-white/85 line-clamp-1 drop-shadow-[0_1px_4px_rgb(0_0_0/0.5)]">
                 {currentStat.label}
               </span>
             </div>
@@ -398,7 +501,7 @@ function CommunitiesHero({ onCreateCommunity }: CommunitiesHeroProps) {
                   <Skeleton className="h-3 w-32" />
                 </>
               ) : (
-                <span className="text-xs text-muted-foreground">
+                <span className="text-xs text-white/85 drop-shadow-[0_1px_4px_rgb(0_0_0/0.5)]">
                   {t('groups.list.connectingRelays')}
                 </span>
               )}
@@ -521,7 +624,7 @@ function MyCommunitiesShelfContent({
         ))}
       </CommunityGrid>
       {canExpand && (
-        <div className="flex justify-center px-4 sm:px-6">
+        <div className="flex justify-center">
           <Button
             type="button"
             variant="ghost"
@@ -599,17 +702,15 @@ function EmptyShelf({
   action: React.ReactNode;
 }) {
   return (
-    <div className="px-4 sm:px-6">
-      <Card className="border-dashed">
-        <CardContent className="py-10 px-6 text-center space-y-3 flex flex-col items-center">
-          <div className="p-3 rounded-full bg-primary/10">{icon}</div>
-          <div className="space-y-1">
-            <h3 className="text-base font-semibold">{title}</h3>
-            <p className="text-sm text-muted-foreground max-w-md mx-auto">{body}</p>
-          </div>
-          {action}
-        </CardContent>
-      </Card>
-    </div>
+    <Card className="border-dashed">
+      <CardContent className="py-10 px-6 text-center space-y-3 flex flex-col items-center">
+        <div className="p-3 rounded-full bg-primary/10">{icon}</div>
+        <div className="space-y-1">
+          <h3 className="text-base font-semibold">{title}</h3>
+          <p className="text-sm text-muted-foreground max-w-md mx-auto">{body}</p>
+        </div>
+        {action}
+      </CardContent>
+    </Card>
   );
 }

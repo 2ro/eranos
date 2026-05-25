@@ -20,7 +20,24 @@
     "goBack": "वापस जाएँ",
     "tryAgain": "कृपया दोबारा कोशिश करें।",
     "showLess": "कम दिखाएँ",
-    "readMore": "और पढ़ें"
+    "readMore": "और पढ़ें",
+    "byAuthor": "<0>{{name}}</0> द्वारा",
+    "donors_one": "{{count}} दानदाता",
+    "donors_other": "{{count}} दानदाता",
+    "clearSearch": "खोज साफ़ करें",
+    "searching": "खोज हो रही है…",
+    "searchResultsCount_one": "{{count}} परिणाम",
+    "searchResultsCount_other": "{{count}} परिणाम",
+    "sortAriaLabel": "क्रम",
+    "sortDefault": "डिफ़ॉल्ट",
+    "sortTop": "टॉप",
+    "sortNew": "नए",
+    "showHidden": "छुपे हुए दिखाएँ",
+    "filtersAriaLabel": "खोज फ़िल्टर",
+    "countryFilterAriaLabel": "देश के अनुसार फ़िल्टर करें",
+    "countrySearchPlaceholder": "देश खोजें…",
+    "countryNoResults": "कोई देश नहीं मिला.",
+    "countryGlobal": "वैश्विक"
   },
   "translate": {
     "translate": "अनुवाद करें",
@@ -210,9 +227,18 @@
       "unknown": "अज्ञात"
     },
     "kindHeader": {
-      "photo": { "action": "ने शेयर की एक", "noun": "फ़ोटो" },
-      "encryptedMessage": { "action": "ने भेजा एक", "noun": "एन्क्रिप्टेड मैसेज" },
-      "letter": { "action": "ने भेजी एक", "noun": "चिट्ठी" },
+      "photo": {
+        "action": "ने शेयर की एक",
+        "noun": "फ़ोटो"
+      },
+      "encryptedMessage": {
+        "action": "ने भेजा एक",
+        "noun": "एन्क्रिप्टेड मैसेज"
+      },
+      "letter": {
+        "action": "ने भेजी एक",
+        "noun": "चिट्ठी"
+      },
       "treasureHidCreated": "ने छुपाया एक",
       "treasureHidUpdated": "ने अपडेट किया एक",
       "treasureNoun": "ख़ज़ाना",
@@ -589,12 +615,23 @@
       "showMore": "और दिखाएँ ({{count}} और)",
       "emptyTitle": "अभी कोई प्लेज नहीं",
       "emptyHint": "प्लेज बनाने वाले पहले व्यक्ति बनें।",
-      "emptyHintCountry": "{{country}} के लिए प्लेज बनाने वाले पहले व्यक्ति बनें।"
+      "emptyHintCountry": "{{country}} के लिए प्लेज बनाने वाले पहले व्यक्ति बनें।",
+      "searchPlaceholder": "प्लेज खोजें…",
+      "searchAriaLabel": "प्लेज खोजें",
+      "noMatch": "“{{query}}” से मेल खाने वाला कोई प्लेज नहीं",
+      "noMatchHint": "अलग खोज शब्द आज़माएँ, या खोज साफ़ करें।",
+      "needsReview": "समीक्षा की ज़रूरत",
+      "needsReviewDesc": "{{appName}} प्लेज जिन्हें अभी फ़ीचर या छुपाया नहीं गया है। किसी एक को Featured shelf में लाएँ या Hide से दबा दें।",
+      "needsReviewEmpty": "समीक्षा का इंतज़ार में कुछ नहीं।",
+      "hidden": "छुपा हुआ",
+      "hiddenDesc": "सार्वजनिक खोज से दबाए गए प्लेज। कार्ड के kebab मेन्यू से अनहाइड करें।",
+      "hiddenEmpty": "अभी कोई प्लेज छुपा हुआ नहीं है।"
     },
     "card": {
       "ended": "समाप्त",
       "pledged": "प्लेज किया गया",
       "byAuthor": "<0>{{name}}</0> द्वारा",
+      "actionsAriaLabel": "प्लेज क्रियाएँ",
       "deletePledge": "प्लेज डिलीट करें",
       "copyLink": "लिंक कॉपी करें",
       "linkCopied": "लिंक कॉपी हो गया",
@@ -609,7 +646,6 @@
       "seoDescription": "{{appName}} पर ठोस कार्रवाई के लिए प्रेरित करने हेतु डोनर प्लेज बनाएँ।",
       "loginGateTitle": "प्लेज बनाने के लिए लॉग इन करें",
       "loginGateBody": "प्लेज साइन किए गए Nostr events हैं। एक पब्लिश करने के लिए आपको Nostr लॉगिन चाहिए।",
-      "backToPledges": "प्लेज पर वापस",
       "heading": "प्लेज बनाएँ",
       "title": "शीर्षक",
       "titlePlaceholder": "एक beach cleanup का दस्तावेज़",
@@ -688,7 +724,9 @@
       "createGroupLoginTitle": "ग्रुप बनाने के लिए लॉग इन करें",
       "createGroupLoginBody": "ग्रुप बनाने से आपके अकाउंट से एक Nostr event पब्लिश होता है।",
       "myGroups": "मेरे ग्रुप",
+      "myGroupsTagline": "जिन ग्रुप को आपने बनाया, मॉडरेट किया, या फ़ॉलो किया है।",
       "featuredGroups": "फ़ीचर्ड ग्रुप",
+      "featuredGroupsTagline": "आपके ध्यान के लायक ख़ास ग्रुप।",
       "loginToSeeTitle": "अपने ग्रुप देखने के लिए लॉग इन करें",
       "loginToSeeBody": "आपने जो ग्रुप बनाए या मॉडरेट किए हैं वे यहाँ दिखेंगे।",
       "noGroupsTitle": "अभी कोई ग्रुप नहीं",
@@ -709,7 +747,11 @@
       "tickerFeaturedGroups_one": "Nostr पर फ़ीचर्ड ग्रुप",
       "tickerFeaturedGroups_other": "Nostr पर फ़ीचर्ड ग्रुप",
       "tickerCountries_one": "देश आज पोस्ट कर रहा है",
-      "tickerCountries_other": "देश आज पोस्ट कर रहे हैं"
+      "tickerCountries_other": "देश आज पोस्ट कर रहे हैं",
+      "searchPlaceholder": "ग्रुप खोजें…",
+      "searchAriaLabel": "ग्रुप खोजें",
+      "noMatch": "“{{query}}” से मेल खाने वाला कोई ग्रुप नहीं",
+      "noMatchHint": "अलग खोज शब्द आज़माएँ, या खोज साफ़ करें।"
     },
     "create": {
       "seoTitleCreate": "ग्रुप बनाएँ",
@@ -718,7 +760,6 @@
       "seoDescriptionEdit": "{{appName}} पर अपना ग्रुप अपडेट करें।",
       "loginGateTitle": "ग्रुप शुरू करने के लिए लॉग इन करें",
       "loginGateBody": "ग्रुप साइन किए गए Nostr events हैं। एक पब्लिश करने के लिए Nostr लॉगिन चाहिए।",
-      "backToGroups": "ग्रुप पर वापस",
       "invalidEditTitle": "अमान्य एडिट लिंक",
       "invalidEditBody": "इस ग्रुप एडिट लिंक में मान्य ग्रुप एड्रेस नहीं है।",
       "startNewGroup": "नया ग्रुप शुरू करें",
@@ -807,7 +848,6 @@
     "seoDescriptionEdit": "{{appName}} पर अपना फंडरेज़िंग कैंपेन अपडेट करें।",
     "loginGateTitle": "कैंपेन शुरू करने के लिए लॉग इन करें",
     "loginGateBody": "कैंपेन साइन किए गए Nostr events हैं। एक पब्लिश करने के लिए Nostr लॉगिन चाहिए।",
-    "goHome": "होम जाएँ",
     "invalidEditTitle": "अमान्य एडिट लिंक",
     "invalidEditBody": "इस कैंपेन एडिट लिंक में मान्य कैंपेन एड्रेस नहीं है।",
     "startNewCampaign": "नया कैंपेन शुरू करें",
@@ -937,7 +977,6 @@
       "seoDescription": "{{appName}} पर एक कैलेंडर इवेंट बनाएँ।",
       "loginTitle": "इवेंट बनाने के लिए लॉग इन करें",
       "loginBody": "इवेंट साइन किए गए Nostr events हैं। एक पब्लिश करने के लिए Nostr लॉगिन चाहिए।",
-      "backToEvents": "इवेंट पर वापस",
       "heading": "इवेंट बनाएँ",
       "titlePlaceholder": "मोहल्ले की सफ़ाई",
       "descriptionPlaceholder": "लोगों को बताएँ क्या उम्मीद करें, क्या लाएँ, और किसे आना चाहिए...",
@@ -1032,12 +1071,23 @@
       "yourCampaigns": "आपके कैंपेन",
       "yourCampaignsDesc": "आपके कैंपेन Nostr पर लाइव हैं और डोनेशन कैंपेन लिंक से काम करते हैं। ये होमपेज पर तब दिखेंगे जब Team Soapbox का कोई मॉडरेटर इन्हें मंज़ूरी देगा।",
       "empty": "अभी कोई कैंपेन नहीं",
-      "emptyHint": "{{appName}} पर फंडरेज़र शुरू करने वाले पहले बनें। अपनी कहानी बताएँ, लाभार्थी चुनें, और लिंक शेयर करें।"
+      "emptyHint": "{{appName}} पर फंडरेज़र शुरू करने वाले पहले बनें। अपनी कहानी बताएँ, लाभार्थी चुनें, और लिंक शेयर करें।",
+      "searchPlaceholder": "कैंपेन खोजें…",
+      "searchAriaLabel": "कैंपेन खोजें",
+      "noMatch": "“{{query}}” से मेल खाने वाला कोई कैंपेन नहीं",
+      "noMatchHint": "अलग खोज शब्द आज़माएँ, या खोज साफ़ करें।"
     },
     "all": {
       "title": "सभी कैंपेन",
       "seoTitle": "सभी कैंपेन",
       "description": "Agora पर पब्लिश हुए हर कैंपेन को देखें।",
+      "sectionTagline": "नेटवर्क पर हर मक़सद को देखें।",
+      "heroKicker": "कैंपेन",
+      "heroHeading": "हर मक़सद,",
+      "heroHeadingLine2": "एक ही जगह।",
+      "heroBody": "Nostr पर पब्लिश हुआ हर फंडरेज़र, एक ही जगह जुटा हुआ। पूरे नेटवर्क को देखें, अपने लिए ज़रूरी मक़सद ढूँढें, और सीधे Bitcoin से उसका साथ दें।",
+      "campaignsCount_one": "कैंपेन नेटवर्क पर",
+      "campaignsCount_other": "कैंपेन नेटवर्क पर",
       "searchAriaLabel": "कैंपेन खोजें",
       "searchPlaceholder": "कैंपेन खोजें…",
       "clearSearch": "खोज साफ़ करें",
@@ -1052,6 +1102,31 @@
       "allHiddenHint": "नेटवर्क पर हर कैंपेन मॉडरेटरों ने छुपा रखा है। उन्हें देखने के लिए “छुपे हुए दिखाएँ” टॉगल करें।",
       "empty": "अभी कोई कैंपेन नहीं",
       "emptyHint": "अभी कोई कैंपेन पब्लिश नहीं हुआ है। पहले बनें।"
+    }
+  },
+  "moderation": {
+    "hiddenBadge": "छुपा हुआ",
+    "menu": {
+      "label": "मॉडरेटर कार्रवाइयाँ",
+      "ariaCampaign": "कैंपेन मॉडरेट करें",
+      "ariaPledge": "प्लेज मॉडरेट करें",
+      "ariaGroup": "ग्रुप मॉडरेट करें",
+      "failedAction": "{{action}} नहीं हो सका",
+      "approve": "मंज़ूरी दें",
+      "unapprove": "मंज़ूरी हटाएँ",
+      "approvedState": "मंज़ूर",
+      "hide": "छुपाएँ",
+      "unhide": "अनहाइड करें",
+      "hiddenState": "छुपा हुआ",
+      "feature": "फ़ीचर करें",
+      "unfeature": "फ़ीचर से हटाएँ",
+      "featuredState": "फ़ीचर्ड",
+      "toastApproved": "होमपेज के लिए मंज़ूरी दी गई",
+      "toastUnapproved": "होमपेज से हटाया गया",
+      "toastHidden": "छुपा दिया गया",
+      "toastUnhidden": "अनहाइड कर दिया गया",
+      "toastFeatured": "फ़ीचर कर दिया गया",
+      "toastUnfeatured": "फ़ीचर से हटाया गया"
     }
   },
   "settings": {
@@ -1578,7 +1653,7 @@
     "tabs": {
       "agora": "Agora",
       "nostr": "Nostr",
-      "accounts": "अकाउंट"
+      "accounts": "उपयोगकर्ता"
     },
     "filters": {
       "title": "फ़िल्टर",
@@ -1651,7 +1726,7 @@
     "empty": {
       "posts": "आपकी खोज से मेल खाता कोई परिणाम नहीं मिला।",
       "postsPrompt": "Nostr कंटेंट ढूँढने के लिए खोज दर्ज करें।",
-      "accounts": "आपकी खोज से मेल खाता कोई अकाउंट नहीं मिला।",
+      "accounts": "आपकी खोज से मेल खाता कोई उपयोगकर्ता नहीं मिला।",
       "followsPrompt": "नाम या NIP-05 एड्रेस से लोगों को खोजें।",
       "agora": "आपकी खोज से मेल खाते कोई Agora कैंपेन, प्लेज, या ग्रुप नहीं मिले।",
       "agoraPrompt": "Agora कैंपेन, प्लेज, और ग्रुप खोजें, या नवीनतम देखें।",
@@ -1899,10 +1974,18 @@
   },
   "faq": {
     "categories": {
-      "getting-started": { "label": "Agora के बारे में" },
-      "payments": { "label": "Agora पर Bitcoin डोनेशन" },
-      "about-nostr": { "label": "Nostr के बारे में" },
-      "legacy": { "label": "Legacy" }
+      "getting-started": {
+        "label": "Agora के बारे में"
+      },
+      "payments": {
+        "label": "Agora पर Bitcoin डोनेशन"
+      },
+      "about-nostr": {
+        "label": "Nostr के बारे में"
+      },
+      "legacy": {
+        "label": "Legacy"
+      }
     },
     "items": {
       "what-is-ditto": {
@@ -1959,6 +2042,14 @@
           "**सार्वजनिक डोनेशन** Bitcoin ब्लॉकचेन और Nostr पर दर्ज होते हैं। कोई भी राशि, समय, और एड्रेस देख सकता है।",
           "**निजी डोनेशन** साइलेंट पेमेंट का इस्तेमाल करते हैं। ये सार्वजनिक रूप से सक्रियकर्ता के डोनेशन कोड से नहीं जोड़े जा सकते, डोनर लिस्ट में नहीं दिखते, और सार्वजनिक कुल आँकड़ों में नहीं गिने जाते।",
           "जब कैंपेन दोनों स्वीकार करता है, तो डोनर का वॉलेट तय करता है कि किस रास्ते का इस्तेमाल हो — साइलेंट-पेमेंट-सक्षम वॉलेट निजी तौर पर भुगतान करते हैं, अन्य सार्वजनिक एड्रेस पर भुगतान करते हैं। पूरी तस्वीर के लिए **डोनर गाइड** और **एक्टिविस्ट गाइड** पढ़ें।"
+        ]
+      },
+      "why-donations-pending": {
+        "question": "कुछ डोनेशन \"**pending**\" क्यों दिखाते हैं?",
+        "answer": [
+          "**pending** डोनेशन असली Bitcoin है जो पहले ही भेजा जा चुका है — बस नेटवर्क द्वारा कन्फ़र्म होने का इंतज़ार कर रहा है। डोनर के वॉलेट ने transaction ब्रॉडकास्ट कर दिया है, लेकिन यह अभी तक किसी ब्लॉक में शामिल नहीं हुआ है।",
+          "Bitcoin हर लगभग 10 मिनट में एक नया ब्लॉक बनाता है, और माइनर डोनर द्वारा दी गई fee के आधार पर transactions चुनते हैं। ज़्यादातर डोनेशन एक घंटे के अंदर कन्फ़र्म हो जाते हैं; जब नेटवर्क व्यस्त हो तो कम fee वाले डोनेशन को ज़्यादा समय लग सकता है। {{appName}} कन्फ़र्मेशन स्टेटस को अपने आप दोबारा जाँचता है, इसलिए जैसे ही एक ब्लॉक आता है, **pending** लेबल अपने आप ग़ायब हो जाता है।",
+          "फंड रास्ते में है — कन्फ़र्म होते ही सक्रियकर्ता को डोनेशन कैंपेन के कुल में जुड़ता दिखेगा। इसे तेज़ करने के लिए सक्रियकर्ता या {{appName}} कुछ नहीं कर सकता; केवल डोनर का वॉलेट ही fee बढ़ा सकता है।"
         ]
       },
       "censorship-resistance": {
