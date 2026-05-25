@@ -71,27 +71,21 @@ export function CommunitiesPage() {
 
   // On-page NIP-50 search + sort + show-hidden toolbar state.
   //
-  //   Default sort, empty query, no country → curated "My groups" /
-  //     "Featured" / moderator shelves below.
-  //   Default sort, with query              → relay search for kind
-  //     34550, results post-filtered against name/description/content
-  //     client-side.
-  //   Country picked (any sort/query)       → search view activates;
-  //     relay query carries a NIP-73 `#i` tag filter narrowing to that
-  //     country (iso3166 + legacy geo forms).
-  //   Top / New                             → always active. Top sends
-  //     `sort:top`; New sends a raw chronological feed of the kind.
+  //   Default sort, empty query → curated "My groups" / "Featured" /
+  //     moderator shelves below.
+  //   Default sort, with query  → relay search for kind 34550, results
+  //     post-filtered against name/description/content client-side.
+  //   Top / New                  → always active. Top sends `sort:top`;
+  //     New sends a raw chronological feed of the kind.
+  //
+  // Groups aren't country-scoped on the discovery surface (a community
+  // is its own scope), so the country picker is intentionally omitted
+  // from the toolbar here even though Campaigns and Pledges expose it.
   const [searchInput, setSearchInput] = useState('');
   const [sortMode, setSortMode] = useState<Nip50Sort>('default');
   const [showHidden, setShowHidden] = useState(false);
-  const [selectedCountry, setSelectedCountry] = useState<string | undefined>(undefined);
   const debouncedSearch = useDebounce(searchInput, 300);
   const trimmedSearch = debouncedSearch.trim();
-  const iTags = useMemo<string[] | undefined>(() => {
-    if (!selectedCountry) return undefined;
-    const code = selectedCountry.toUpperCase();
-    return [`iso3166:${code}`, `geo:${code}`];
-  }, [selectedCountry]);
   const {
     data: searchHitsRaw,
     isFetching: isSearchFetching,
@@ -101,7 +95,6 @@ export function CommunitiesPage() {
     query: debouncedSearch,
     sort: sortMode,
     parse: parseCommunityEvent,
-    iTags,
     // Group names and descriptions live in tags, not `content`. Relay
     // NIP-50 implementations that only match content silently miss
     // obvious title hits — widen client-side by also checking these
@@ -151,8 +144,6 @@ export function CommunitiesPage() {
         onChange: setShowHidden,
         count: searchHiddenCount,
       }}
-      country={selectedCountry}
-      onCountryChange={setSelectedCountry}
     />
   );
 
