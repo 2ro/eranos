@@ -33,11 +33,9 @@ import {
   PodcastEpisodeContent,
   PodcastTrailerContent,
 } from "@/components/AudioKindContent";
-import { ActionContent } from "@/components/ActionContent";
+import { CampaignInlinePreview, GroupInlinePreview, PledgeInlinePreview } from "@/components/AgoraInlinePreview";
 import { BadgeAwardCard } from "@/components/BadgeAwardCard";
 import { BadgeContent } from "@/components/BadgeContent";
-import { CampaignNoteCardContent } from "@/components/CampaignNoteCardContent";
-import { CommunityContent } from "@/components/CommunityContent";
 import { CalendarEventContent } from "@/components/CalendarEventContent";
 import { ColorMomentContent } from "@/components/ColorMomentContent";
 import { CommentContext, CountryCommentPill } from "@/components/CommentContext";
@@ -700,15 +698,15 @@ export const NoteCard = memo(function NoteCard({
         ) : isBadgeAward ? (
           <BadgeAwardCard event={event} />
         ) : isCommunity ? (
-          <CommunityContent event={event} />
+          <GroupInlinePreview event={contentEvent} />
         ) : isZapGoal ? (
           <GoalCard event={event} />
 
         ) : isAction ? (
-          <ActionContent event={event} />
+          <PledgeInlinePreview event={contentEvent} />
 
         ) : isCampaign ? (
-          <CampaignNoteCardContent event={contentEvent} />
+          <CampaignInlinePreview event={contentEvent} />
 
         ) : isVoiceMessage ? (
           <VoiceMessagePlayer event={event} />
