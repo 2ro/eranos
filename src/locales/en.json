@@ -1642,7 +1642,7 @@
     "tabs": {
       "agora": "Agora",
       "nostr": "Nostr",
-      "accounts": "Accounts"
+      "accounts": "Users"
     },
     "filters": {
       "title": "Filters",
@@ -1715,7 +1715,7 @@
     "empty": {
       "posts": "No results found matching your search.",
       "postsPrompt": "Enter a search query to find Nostr content.",
-      "accounts": "No accounts found matching your search.",
+      "accounts": "No users found matching your search.",
       "followsPrompt": "Search for people by name or NIP-05 address.",
       "agora": "No Agora campaigns, pledges, or groups found matching your search.",
       "agoraPrompt": "Search Agora campaigns, pledges, and groups, or browse the latest.",

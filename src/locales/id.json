@@ -1587,7 +1587,7 @@
     "tabs": {
       "agora": "Agora",
       "nostr": "Nostr",
-      "accounts": "Akun"
+      "accounts": "Pengguna"
     },
     "filters": {
       "title": "Filter",
@@ -1660,7 +1660,7 @@
     "empty": {
       "posts": "Tidak ada hasil yang cocok dengan pencarian Anda.",
       "postsPrompt": "Masukkan kueri pencarian untuk menemukan konten Nostr.",
-      "accounts": "Tidak ada akun yang cocok dengan pencarian Anda.",
+      "accounts": "Tidak ada pengguna yang cocok dengan pencarian Anda.",
       "followsPrompt": "Cari orang berdasarkan nama atau alamat NIP-05.",
       "agora": "Tidak ada kampanye, ikrar, atau grup Agora yang cocok dengan pencarian Anda.",
       "agoraPrompt": "Cari kampanye, ikrar, dan grup Agora, atau telusuri yang terbaru.",

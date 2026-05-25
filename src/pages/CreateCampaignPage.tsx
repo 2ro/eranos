@@ -754,7 +754,7 @@ export function CreateCampaignPage() {
               onChange={(e) => setStory(e.target.value)}
               placeholder={t('campaignsCreate.storyPlaceholder')}
               rows={7}
-              className="font-mono text-sm"
+              className="font-mono text-base md:text-sm"
             />
           </FormSection>
 
@@ -1094,7 +1094,7 @@ function CountrySelect({
               setOpen(false);
             }
           }}
-          className="h-9 rounded-full border-0 bg-secondary pl-10 pr-10 text-sm focus-visible:ring-0 focus-visible:ring-offset-0"
+          className="h-9 rounded-full border-0 bg-secondary pl-10 pr-10 text-base md:text-sm focus-visible:ring-0 focus-visible:ring-offset-0"
           placeholder={t('forms.countrySearchPlaceholder')}
           autoComplete="off"
           role="combobox"

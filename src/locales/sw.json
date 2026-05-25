@@ -1546,7 +1546,7 @@
     "tabs": {
       "agora": "Agora",
       "nostr": "Nostr",
-      "accounts": "Akaunti"
+      "accounts": "Watumiaji"
     },
     "filters": {
       "title": "Vichujio",
@@ -1619,7 +1619,7 @@
     "empty": {
       "posts": "Hakuna matokeo yaliyolingana na utafutaji wako.",
       "postsPrompt": "Weka swali la utafutaji ili kupata maudhui ya Nostr.",
-      "accounts": "Hakuna akaunti zilizolingana na utafutaji wako.",
+      "accounts": "Hakuna watumiaji waliolingana na utafutaji wako.",
       "followsPrompt": "Tafuta watu kwa jina au anwani ya NIP-05.",
       "agora": "Hakuna kampeni, ahadi, au vikundi vya Agora vilivyolingana na utafutaji wako.",
       "agoraPrompt": "Tafuta kampeni, ahadi, na vikundi vya Agora, au vinjari vya hivi karibuni.",

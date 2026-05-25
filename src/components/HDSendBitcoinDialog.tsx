@@ -587,7 +587,7 @@ export function HDSendBitcoinDialog({ isOpen, onClose, btcPrice }: HDSendBitcoin
                 placeholder={t('walletSend.recipient.placeholder')}
                 autoComplete="off"
                 spellCheck={false}
-                className="font-mono text-sm"
+                className="font-mono text-base md:text-sm"
               />
               {recipient && (
                 <p className="text-xs text-muted-foreground">

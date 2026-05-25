@@ -1155,7 +1155,7 @@
     "tabs": {
       "agora": "Agora",
       "nostr": "Nostr",
-      "accounts": "賬號"
+      "accounts": "使用者"
     },
     "filters": {
       "title": "過濾器",
@@ -1228,7 +1228,7 @@
     "empty": {
       "posts": "沒有找到匹配你搜索的結果。",
       "postsPrompt": "輸入搜尋關鍵詞以查詢 Nostr 內容。",
-      "accounts": "沒有找到匹配你搜索的賬號。",
+      "accounts": "沒有找到匹配你搜尋的使用者。",
       "followsPrompt": "通過名字或 NIP-05 地址搜尋使用者。",
       "agora": "沒有找到匹配你搜索的 Agora 競選、pledge 或群組。",
       "agoraPrompt": "搜尋 Agora 的競選、pledge 和群組，或瀏覽最新內容。",

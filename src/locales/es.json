@@ -1219,7 +1219,7 @@
     "tabs": {
       "agora": "Ágora",
       "nostr": "Nostr",
-      "accounts": "Cuentas"
+      "accounts": "Usuarios"
     },
     "filters": {
       "title": "Filtros",
@@ -1292,7 +1292,7 @@
     "empty": {
       "posts": "No se encontraron resultados para tu búsqueda.",
       "postsPrompt": "Introduce una consulta para buscar contenido de Nostr.",
-      "accounts": "No se encontraron cuentas para tu búsqueda.",
+      "accounts": "No se encontraron usuarios para tu búsqueda.",
       "followsPrompt": "Busca personas por nombre o dirección NIP-05.",
       "agora": "No se encontraron campañas, pledges ni grupos de Ágora para tu búsqueda.",
       "agoraPrompt": "Busca campañas, pledges y grupos de Ágora, o explora lo más reciente.",

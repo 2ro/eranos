@@ -1219,7 +1219,7 @@
     "tabs": {
       "agora": "Agora",
       "nostr": "Nostr",
-      "accounts": "Maakaundi"
+      "accounts": "Vashandisi"
     },
     "filters": {
       "title": "Mafilter",
@@ -1292,7 +1292,7 @@
     "empty": {
       "posts": "Hapana mhinduro dzakawanikwa dzinoenderana nokutsvaga kwako.",
       "postsPrompt": "Isa mubvunzo wokutsvaga kuti uwane zviri muNostr.",
-      "accounts": "Hapana maakaundi akawanikwa anoenderana nokutsvaga kwako.",
+      "accounts": "Hapana vashandisi vakawanikwa vanoenderana nokutsvaga kwako.",
       "followsPrompt": "Tsvaga vanhu nezita kana kero yeNIP-05.",
       "agora": "Hapana macampaign, pledges, kana mapoka eAgora akawanikwa anoenderana nokutsvaga kwako.",
       "agoraPrompt": "Tsvaga macampaign, pledges, nemapoka eAgora, kana kutarisa zvitsva.",

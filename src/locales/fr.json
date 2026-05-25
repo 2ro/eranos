@@ -1642,7 +1642,7 @@
     "tabs": {
       "agora": "Agora",
       "nostr": "Nostr",
-      "accounts": "Comptes"
+      "accounts": "Utilisateurs"
     },
     "filters": {
       "title": "Filtres",
@@ -1715,7 +1715,7 @@
     "empty": {
       "posts": "Aucun résultat correspondant à votre recherche.",
       "postsPrompt": "Saisissez une requête pour trouver du contenu Nostr.",
-      "accounts": "Aucun compte correspondant à votre recherche.",
+      "accounts": "Aucun utilisateur correspondant à votre recherche.",
       "followsPrompt": "Recherchez des personnes par nom ou adresse NIP-05.",
       "agora": "Aucune campagne, promesse ou groupe Agora correspondant à votre recherche.",
       "agoraPrompt": "Recherchez des campagnes, promesses et groupes Agora, ou parcourez les dernières.",

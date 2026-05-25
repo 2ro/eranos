@@ -153,7 +153,7 @@ export function PersonSearch({
               }
             }}
             placeholder="Search people..."
-            className="pl-10 pr-10 rounded-full bg-secondary border-0 focus-visible:ring-0 focus-visible:ring-offset-0 h-9 text-sm"
+            className="pl-10 pr-10 rounded-full bg-secondary border-0 focus-visible:ring-0 focus-visible:ring-offset-0 h-9 text-base md:text-sm"
             autoComplete="off"
           />
         </div>

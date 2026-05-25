@@ -1638,7 +1638,7 @@
     "tabs": {
       "agora": "Agora",
       "nostr": "Nostr",
-      "accounts": "Contas"
+      "accounts": "Usuários"
     },
     "filters": {
       "title": "Filtros",
@@ -1711,7 +1711,7 @@
     "empty": {
       "posts": "Nenhum resultado encontrado correspondendo à sua pesquisa.",
       "postsPrompt": "Digite uma consulta de pesquisa para encontrar conteúdo Nostr.",
-      "accounts": "Nenhuma conta encontrada correspondendo à sua pesquisa.",
+      "accounts": "Nenhum usuário encontrado correspondendo à sua pesquisa.",
       "followsPrompt": "Pesquise pessoas por nome ou endereço NIP-05.",
       "agora": "Nenhuma campanha, promessa ou grupo Agora correspondendo à sua pesquisa.",
       "agoraPrompt": "Pesquise campanhas, promessas e grupos Agora, ou navegue pelos mais recentes.",

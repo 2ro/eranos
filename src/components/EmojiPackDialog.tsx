@@ -431,7 +431,7 @@ export function EmojiPackDialog({ open, onOpenChange, editEvent }: EmojiPackDial
                   value={idTouched ? identifier : effectiveIdentifier}
                   onChange={(e) => handleIdChange(e.target.value)}
                   disabled={isEditMode || isSubmitting}
-                  className={`font-mono text-sm ${isEditMode ? 'text-muted-foreground' : ''}`}
+                  className={`font-mono text-base md:text-sm ${isEditMode ? 'text-muted-foreground' : ''}`}
                 />
                 {isEditMode && (
                   <p className="text-xs text-muted-foreground">Cannot be changed.</p>

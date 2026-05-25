@@ -331,7 +331,7 @@ export function CreateEventPage() {
             <Textarea
               placeholder={t('calendarEvents.create.descriptionPlaceholder')}
               rows={7}
-              className="font-mono text-sm"
+              className="font-mono text-base md:text-sm"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
             />

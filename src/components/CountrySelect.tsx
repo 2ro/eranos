@@ -68,7 +68,7 @@ export function CountrySelect({
               setOpen(false);
             }
           }}
-          className="h-9 rounded-full border-0 bg-secondary pl-10 pr-10 text-sm focus-visible:ring-0 focus-visible:ring-offset-0"
+          className="h-9 rounded-full border-0 bg-secondary pl-10 pr-10 text-base md:text-sm focus-visible:ring-0 focus-visible:ring-offset-0"
           placeholder={placeholder ?? t('forms.countrySearchPlaceholder')}
           autoComplete="off"
           role="combobox"

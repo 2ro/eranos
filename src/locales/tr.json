@@ -1587,7 +1587,7 @@
     "tabs": {
       "agora": "Agora",
       "nostr": "Nostr",
-      "accounts": "Hesaplar"
+      "accounts": "Kullanıcılar"
     },
     "filters": {
       "title": "Filtreler",
@@ -1660,7 +1660,7 @@
     "empty": {
       "posts": "Aramanızla eşleşen sonuç bulunamadı.",
       "postsPrompt": "Nostr içeriği bulmak için bir arama sorgusu girin.",
-      "accounts": "Aramanızla eşleşen hesap bulunamadı.",
+      "accounts": "Aramanızla eşleşen kullanıcı bulunamadı.",
       "followsPrompt": "İnsanları ada veya NIP-05 adresine göre arayın.",
       "agora": "Aramanızla eşleşen Agora kampanyası, taahhüdü veya grubu bulunamadı.",
       "agoraPrompt": "Agora kampanyalarını, taahhütlerini ve gruplarını arayın ya da en yenilere göz atın.",
