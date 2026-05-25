@@ -14,6 +14,7 @@ import ps from './locales/ps.json';
 import pt from './locales/pt.json';
 import ru from './locales/ru.json';
 import sn from './locales/sn.json';
+import sw from './locales/sw.json';
 import tr from './locales/tr.json';
 import zh from './locales/zh.json';
 import zhHant from './locales/zh-Hant.json';
@@ -49,6 +50,7 @@ export const SUPPORTED_LANGUAGES: SupportedLanguage[] = [
   { code: 'ps', nativeName: 'پښتو' },
   { code: 'km', nativeName: 'ភាសាខ្មែរ' },
   { code: 'sn', nativeName: 'ChiShona' },
+  { code: 'sw', nativeName: 'Kiswahili' },
   { code: 'zh', nativeName: '简体中文' },
   { code: 'zh-Hant', nativeName: '繁體中文' },
 ];
@@ -89,6 +91,7 @@ i18n
       pt: { translation: pt },
       ru: { translation: ru },
       sn: { translation: sn },
+      sw: { translation: sw },
       tr: { translation: tr },
       zh: { translation: zh },
       // Traditional Chinese is registered under three codes pointing at the
