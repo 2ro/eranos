@@ -1,4 +1,4 @@
-import { useState, type ComponentType } from 'react';
+import { startTransition, useEffect, useState, type ComponentType } from 'react';
 import { Link, NavLink } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import {
@@ -117,7 +117,7 @@ export function TopNav() {
               entry point in the chrome; mobile users still reach search via
               the hamburger menu. Hidden until the HD wallet is available and
               the BTC price has loaded. */}
-          <WalletBalancePill />
+          <DeferredWalletBalancePill />
 
           {/* LoginArea handles both logged-in (account avatar dropdown) and
               logged-out (Log in / Sign up) states. We render it inline-flex
@@ -181,6 +181,16 @@ export function TopNav() {
  * isn't available (logged out, extension/bunker login, still loading, or no
  * price yet) so the chrome stays quiet rather than flashing placeholder text.
  */
+function DeferredWalletBalancePill() {
+  const [ready, setReady] = useState(false);
+
+  useEffect(() => {
+    startTransition(() => setReady(true));
+  }, []);
+
+  return ready ? <WalletBalancePill /> : null;
+}
+
 function WalletBalancePill() {
   const { t } = useTranslation();
   const { availability, totalBalance, isLoading, error } = useHdWallet();
