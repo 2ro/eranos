@@ -75,14 +75,31 @@ export function TopNav() {
           <Menu className="size-5" />
         </button>
 
-        {/* Brand */}
+        {/* Brand — bolt + wordmark. The bolt SVG leans ~10° to the left
+            (the dominant slash runs from top-right (13.4,1) to bottom-left
+            (9.5,23) within the 24-unit viewBox, ≈ arctan(3.9/22) ≈ 10°).
+            The wordmark splits the first letter (which mirrors the bolt
+            silhouette — a steeply leaned capital) from the remaining
+            letters (a gentler oblique that's easier to read at nav-bar
+            size). The 0.022em currentColor stroke matches the hero recipe
+            (Bebas only ships weight 400, so this fattens letterforms
+            without the fuzz of a synthetic bold). */}
         <Link
           to="/"
-          className="flex items-center gap-2 font-bold text-lg tracking-tight text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded-md px-1"
+          className="flex items-center text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded-md px-1"
           aria-label={t('nav.brandHome', { appName: config.appName })}
         >
-          <LogoIcon className="size-6" />
-          <span>{config.appName}</span>
+          <LogoIcon className="size-9" />
+          <span
+            className="font-display font-normal tracking-wide leading-none uppercase text-3xl inline-block -ml-0.5"
+            style={{
+              WebkitTextStroke: '0.022em currentColor',
+              transform: 'skewX(-6deg) scaleX(1.1)',
+              transformOrigin: '0 100%',
+            }}
+          >
+            {config.appName}
+          </span>
         </Link>
 
         {/* Desktop nav */}
@@ -122,10 +139,19 @@ export function TopNav() {
             <Link
               to="/"
               onClick={() => setMobileOpen(false)}
-              className="flex items-center gap-2 font-bold text-lg text-primary"
+              className="flex items-center text-primary"
             >
-              <LogoIcon className="size-6" />
-              <span>{config.appName}</span>
+              <LogoIcon className="size-9" />
+              <span
+                className="font-display font-normal tracking-wide leading-none uppercase text-3xl inline-block -ml-0.5"
+                style={{
+                  WebkitTextStroke: '0.022em currentColor',
+                  transform: 'skewX(-6deg) scaleX(1.1)',
+                  transformOrigin: '0 100%',
+                }}
+              >
+                {config.appName}
+              </span>
             </Link>
             <button
               onClick={() => setMobileOpen(false)}
@@ -164,7 +190,7 @@ function NavLinkButton({ item }: { item: NavItem }) {
         cn(
           'px-3 py-2 rounded-md text-sm font-medium motion-safe:transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary',
           isActive
-            ? 'text-foreground'
+            ? 'text-primary'
             : 'text-muted-foreground hover:text-foreground hover:bg-secondary',
         )
       }
@@ -235,7 +261,7 @@ function MobileLinkList({ items, onClose }: { items: MobileLinkItem[]; onClose: 
               cn(
                 'flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium motion-safe:transition-colors',
                 isActive
-                  ? 'bg-primary/10 text-foreground'
+                  ? 'bg-primary/10 text-primary'
                   : 'text-muted-foreground hover:text-foreground hover:bg-secondary',
               )
             }
