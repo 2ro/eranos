@@ -29,7 +29,11 @@
     "sortTop": "الأبرز",
     "sortNew": "الأحدث",
     "showHidden": "إظهار المخفية",
-    "filtersAriaLabel": "مرشّحات البحث"
+    "filtersAriaLabel": "مرشّحات البحث",
+    "countryFilterAriaLabel": "تصفية حسب البلد",
+    "countrySearchPlaceholder": "ابحث عن البلدان…",
+    "countryNoResults": "لم يتم العثور على بلدان.",
+    "countryGlobal": "عالمي"
   },
   "translate": {
     "translate": "ترجمة",

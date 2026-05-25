@@ -33,7 +33,11 @@
     "sortTop": "Yepamusoro",
     "sortNew": "Itsva",
     "showHidden": "Ratidza zvakavanzwa",
-    "filtersAriaLabel": "Masefa ekutsvaga"
+    "filtersAriaLabel": "Masefa ekutsvaga",
+    "countryFilterAriaLabel": "Sefa nenyika",
+    "countrySearchPlaceholder": "Tsvaga nyika…",
+    "countryNoResults": "Hapana nyika dzakawanikwa.",
+    "countryGlobal": "Pasi rose"
   },
   "translate": {
     "translate": "Dudzira",

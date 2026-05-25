@@ -33,7 +33,11 @@
     "sortTop": "برتر",
     "sortNew": "جدید",
     "showHidden": "نمایش پنهان‌شده‌ها",
-    "filtersAriaLabel": "فیلترهای جستجو"
+    "filtersAriaLabel": "فیلترهای جستجو",
+    "countryFilterAriaLabel": "فیلتر بر اساس کشور",
+    "countrySearchPlaceholder": "جستجوی کشورها…",
+    "countryNoResults": "هیچ کشوری پیدا نشد.",
+    "countryGlobal": "جهانی"
   },
   "translate": {
     "translate": "ترجمه",

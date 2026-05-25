@@ -56,10 +56,12 @@ export function AllCampaignsPage() {
   const { t } = useTranslation();
   const { config } = useAppContext();
 
-  // URL state — sort and query live in the URL so results are shareable.
+  // URL state — sort, query, and country live in the URL so results are
+  // shareable.
   const [searchParams, setSearchParams] = useSearchParams();
   const sort = parseSort(searchParams.get('sort'));
   const urlQuery = searchParams.get('q') ?? '';
+  const urlCountry = searchParams.get('country') ?? undefined;
 
   // Search input is local-state so typing is responsive; we debounce to
   // the URL + the query.
@@ -98,9 +100,19 @@ export function AllCampaignsPage() {
     setSearchParams(next, { replace: true });
   };
 
+  // The country picker also rides the URL so country-scoped views are
+  // shareable / linkable.
+  const setCountry = (next: string | undefined) => {
+    const params = new URLSearchParams(searchParams);
+    if (next) params.set('country', next);
+    else params.delete('country');
+    setSearchParams(params, { replace: true });
+  };
+
   const { data: campaigns, isLoading } = useAllCampaigns({
     sort,
     search: debouncedSearch.trim(),
+    countryCode: urlCountry,
     limit: 200,
   });
   const { data: moderation, isReady: moderationReady } = useCampaignModeration();
@@ -136,30 +148,13 @@ export function AllCampaignsPage() {
     <main className="min-h-screen pb-16">
       <AllCampaignsHero campaignCount={totalCampaigns} />
 
-      {/* Toolbar — search + sort + show-hidden. Inline against the page
-          background, narrow shell, with modifiers tucked behind a single
-          filter button on the right (matches the global SearchPage). */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 pt-6">
-        <DiscoverySearchToolbar
-          query={searchInput}
-          onQueryChange={setSearchInput}
-          sort={toToolbarSort(sort)}
-          onSortChange={setSortFromToolbar}
-          searchPlaceholderKey="campaigns.all.searchPlaceholder"
-          searchAriaLabelKey="campaigns.all.searchAriaLabel"
-          showHidden={{
-            value: showHidden,
-            onChange: setShowHidden,
-            count: hiddenCount,
-          }}
-        />
-      </div>
-
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-10 lg:py-14 space-y-8">
         {/* Section heading — matches the `/pledges` and `/groups` pages
             so the discovery surfaces all share the same large-bold
             section header pattern. Title switches between Search / Top /
-            New based on toolbar state; tagline stays constant. */}
+            New based on toolbar state; tagline stays constant.
+            Search input + filter button cluster on the right, paired
+            with the heading on the left in a single row. */}
         <div className="flex items-end justify-between gap-4">
           <div>
             <h2 className="text-2xl sm:text-3xl font-bold tracking-tight">
@@ -175,6 +170,22 @@ export function AllCampaignsPage() {
                 : t('campaigns.all.sectionTagline')}
             </p>
           </div>
+          <DiscoverySearchToolbar
+            query={searchInput}
+            onQueryChange={setSearchInput}
+            sort={toToolbarSort(sort)}
+            onSortChange={setSortFromToolbar}
+            sortOptions={['top', 'new']}
+            searchPlaceholderKey="campaigns.all.searchPlaceholder"
+            searchAriaLabelKey="campaigns.all.searchAriaLabel"
+            showHidden={{
+              value: showHidden,
+              onChange: setShowHidden,
+              count: hiddenCount,
+            }}
+            country={urlCountry}
+            onCountryChange={setCountry}
+          />
         </div>
 
         {/* Grid — widens to 3 columns at lg and 4 at xl so desktop users

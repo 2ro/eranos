@@ -33,7 +33,11 @@
     "sortTop": "熱門",
     "sortNew": "最新",
     "showHidden": "顯示已隱藏",
-    "filtersAriaLabel": "搜尋篩選"
+    "filtersAriaLabel": "搜尋篩選",
+    "countryFilterAriaLabel": "依國家篩選",
+    "countrySearchPlaceholder": "搜尋國家…",
+    "countryNoResults": "找不到國家。",
+    "countryGlobal": "全球"
   },
   "translate": {
     "translate": "翻譯",

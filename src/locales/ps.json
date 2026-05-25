@@ -33,7 +33,11 @@
     "sortTop": "غوره",
     "sortNew": "نوي",
     "showHidden": "پټ ښودل",
-    "filtersAriaLabel": "د لټون فلټرونه"
+    "filtersAriaLabel": "د لټون فلټرونه",
+    "countryFilterAriaLabel": "د هیواد له مخې فلټر",
+    "countrySearchPlaceholder": "هیوادونه ولټوئ…",
+    "countryNoResults": "هیڅ هیواد ونه موندل شو.",
+    "countryGlobal": "نړیوال"
   },
   "translate": {
     "translate": "ژباړل",

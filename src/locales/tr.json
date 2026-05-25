@@ -32,7 +32,11 @@
     "sortTop": "Üst",
     "sortNew": "Yeni",
     "showHidden": "Gizlileri göster",
-    "filtersAriaLabel": "Arama filtreleri"
+    "filtersAriaLabel": "Arama filtreleri",
+    "countryFilterAriaLabel": "Ülkeye göre filtrele",
+    "countrySearchPlaceholder": "Ülke ara…",
+    "countryNoResults": "Ülke bulunamadı.",
+    "countryGlobal": "Küresel"
   },
   "translate": {
     "translate": "Çevir",

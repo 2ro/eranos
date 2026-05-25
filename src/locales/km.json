@@ -33,7 +33,11 @@
     "sortTop": "ល្បីបំផុត",
     "sortNew": "ថ្មី",
     "showHidden": "បង្ហាញដែលលាក់",
-    "filtersAriaLabel": "តម្រងស្វែងរក"
+    "filtersAriaLabel": "តម្រងស្វែងរក",
+    "countryFilterAriaLabel": "ច្រោះតាមប្រទេស",
+    "countrySearchPlaceholder": "ស្វែងរកប្រទេស…",
+    "countryNoResults": "រកមិនឃើញប្រទេសទេ។",
+    "countryGlobal": "សកល"
   },
   "translate": {
     "translate": "បកប្រែ",

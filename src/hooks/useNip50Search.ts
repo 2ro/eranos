@@ -42,6 +42,19 @@ interface UseNip50SearchOptions<T> {
    */
   addressable?: boolean;
   /**
+   * Optional NIP-73 `i`-tag values to filter on (e.g.
+   * `['iso3166:US', 'geo:US']` for a country-scoped search). Forwarded
+   * as a standard `#i` filter alongside the `search` field, so the
+   * relay returns the intersection. Any single value matches (relay
+   * `#i` is OR-of-values).
+   *
+   * Supplying a non-empty array also **activates** the hook even when
+   * the query is empty and the sort is `'default'`, so picking a
+   * country (with no typed query) drives the page into the search/
+   * filtered view the same way typing a query does.
+   */
+  iTags?: string[];
+  /**
    * Per-event keyword sources used for client-side keyword matching when
    * `query` is non-empty. Many structured kinds (34550 organizations,
    * 36639 pledges, 33863 campaigns) carry the title in tags rather than
@@ -105,18 +118,23 @@ export function useNip50Search<T>({
   sort = 'default',
   limit = 60,
   addressable = true,
+  iTags,
   getKeywordHaystack,
 }: UseNip50SearchOptions<T>): UseNip50SearchResult<T> {
   const { nostr } = useNostr();
   const trimmed = query.trim();
   const hasQuery = trimmed.length >= 1;
+  const hasITags = !!iTags && iTags.length > 0;
 
   // The hook is "active" — drives the page body — whenever:
   //   - The user typed something (any sort), OR
   //   - They picked Top or New as the sort (which both produce a flat
-  //     feed even with an empty box).
-  // Empty + Default is the curated fall-through case.
-  const enabled = hasQuery || sort === 'top' || sort === 'new';
+  //     feed even with an empty box), OR
+  //   - They picked an `i`-tag filter (e.g. a country) with no other
+  //     input — narrowing the kind by external identifier still
+  //     deserves the filtered grid view.
+  // Empty + Default + no iTags is the curated fall-through case.
+  const enabled = hasQuery || sort === 'top' || sort === 'new' || hasITags;
 
   // Build the NIP-50 search payload for the active cases. `undefined`
   // means "don't send a `search` field at all" which is the chronological
@@ -129,7 +147,8 @@ export function useNip50Search<T>({
     // 'new' or 'default' — both send the raw query when present, and
     // for empty-query Top is handled above.
     if (hasQuery) return trimmed;
-    // empty + 'new' falls here — no search field, just the kind filter.
+    // empty + 'new', or empty + 'default' with iTags only — no search
+    // field, just the kind filter (+ #i if supplied).
     return undefined;
   })();
 
@@ -137,17 +156,25 @@ export function useNip50Search<T>({
   // keystrokes by reading from the trimmed query directly.
   const keyword = hasQuery ? trimmed.toLowerCase() : '';
 
+  // Stable key for the `#i` filter — sorted so reordering doesn't bust
+  // the cache. `null` rather than `undefined`/`[]` so the cache key
+  // serializes consistently.
+  const iTagsKey = hasITags ? [...iTags!].sort().join(',') : null;
+
   const result = useQuery<T[]>({
-    queryKey: ['nip50-search', kind, searchPayload ?? null, limit, addressable, keyword],
+    queryKey: ['nip50-search', kind, searchPayload ?? null, limit, addressable, keyword, iTagsKey],
     enabled,
     queryFn: async ({ signal }) => {
       const group = nostr.group(DITTO_RELAYS);
-      const filter: { kinds: number[]; limit: number; search?: string } = {
+      const filter: { kinds: number[]; limit: number; search?: string; '#i'?: string[] } = {
         kinds: [kind],
         limit,
       };
       if (searchPayload !== undefined) {
         filter.search = searchPayload;
+      }
+      if (hasITags) {
+        filter['#i'] = iTags!;
       }
       const events = await group.query(
         [filter],

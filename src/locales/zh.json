@@ -33,7 +33,11 @@
     "sortTop": "热门",
     "sortNew": "最新",
     "showHidden": "显示已隐藏",
-    "filtersAriaLabel": "搜索筛选"
+    "filtersAriaLabel": "搜索筛选",
+    "countryFilterAriaLabel": "按国家筛选",
+    "countrySearchPlaceholder": "搜索国家…",
+    "countryNoResults": "未找到国家。",
+    "countryGlobal": "全球"
   },
   "translate": {
     "translate": "翻译",

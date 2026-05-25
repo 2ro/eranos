@@ -33,7 +33,11 @@
     "sortTop": "Top",
     "sortNew": "Novo",
     "showHidden": "Mostrar ocultos",
-    "filtersAriaLabel": "Filtros de pesquisa"
+    "filtersAriaLabel": "Filtros de pesquisa",
+    "countryFilterAriaLabel": "Filtrar por país",
+    "countrySearchPlaceholder": "Pesquisar países…",
+    "countryNoResults": "Nenhum país encontrado.",
+    "countryGlobal": "Global"
   },
   "translate": {
     "translate": "Traduzir",

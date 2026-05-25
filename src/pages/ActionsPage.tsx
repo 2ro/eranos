@@ -16,7 +16,7 @@ import { useNostrPublish } from '@/hooks/useNostrPublish';
 import { usePledgeModeration } from '@/hooks/usePledgeModeration';
 import { useShareOrigin } from '@/hooks/useShareOrigin';
 import { useToast } from '@/hooks/useToast';
-import { getAllCountries, getGeoDisplayName, countryCodeToFlag } from '@/lib/countries';
+import { getGeoDisplayName } from '@/lib/countries';
 import { DEFAULT_ACTION_COVERS } from '@/lib/defaultActionCovers';
 import { HOPE_PALETTE } from '@/lib/hopePalette';
 import { cn } from '@/lib/utils';
@@ -34,19 +34,13 @@ import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import {
-  Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList,
-} from '@/components/ui/command';
-import {
-  Popover, PopoverContent, PopoverTrigger,
-} from '@/components/ui/popover';
-import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 
 import {
-  Clock, HandHeart, PlusCircle, ChevronRight, Loader2,
-  Link as LinkIcon, Check, MoreHorizontal, Trash2, ListFilter,
-  Calendar, DollarSign, Globe, Megaphone, Hourglass, EyeOff,
+  HandHeart, PlusCircle, ChevronRight, Loader2,
+  Link as LinkIcon, Check, MoreHorizontal, Trash2,
+  Megaphone, Hourglass, EyeOff,
 } from 'lucide-react';
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -212,8 +206,6 @@ function ActionShareMenu({ action, displayTitle }: { action: Action; displayTitl
 // Page
 // ─────────────────────────────────────────────────────────────────────────────
 
-type SortOption = 'recent' | 'bounty' | 'deadline';
-
 export default function ActionsPage() {
   const { t } = useTranslation();
   const { config } = useAppContext();
@@ -222,8 +214,6 @@ export default function ActionsPage() {
   const navigate = useNavigate();
 
   const [selectedCountry, setSelectedCountry] = useState<string | undefined>(undefined);
-  const [sortBy, setSortBy] = useState<SortOption>('recent');
-  const [headerCountryPickerOpen, setHeaderCountryPickerOpen] = useState(false);
 
   // On-page NIP-50 search + sort + show-hidden toolbar state.
   //
@@ -234,13 +224,21 @@ export default function ActionsPage() {
   //   Top / New                  → always active. Top sends `sort:top`;
   //     New sends a raw chronological feed of the kind.
   //
-  // Search ignores the active country filter so users can find pledges
-  // anywhere by name even after picking a country.
+  // The country filter is threaded through to the search as a NIP-73
+  // `#i` tag filter (`iso3166:XX` + legacy `geo:XX`). Picking a country
+  // with an empty query still activates the search view — narrowing a
+  // kind by external identifier produces a useful filtered grid even
+  // without a typed term.
   const [searchInput, setSearchInput] = useState('');
   const [sortMode, setSortMode] = useState<Nip50Sort>('default');
   const [showHidden, setShowHidden] = useState(false);
   const debouncedSearch = useDebounce(searchInput, 300);
   const trimmedSearch = debouncedSearch.trim();
+  const iTags = useMemo<string[] | undefined>(() => {
+    if (!selectedCountry) return undefined;
+    const code = selectedCountry.toUpperCase();
+    return [`iso3166:${code}`, `geo:${code}`];
+  }, [selectedCountry]);
   const {
     data: searchHitsRaw,
     isFetching: isSearchFetching,
@@ -250,6 +248,7 @@ export default function ActionsPage() {
     query: debouncedSearch,
     sort: sortMode,
     parse: parseAction,
+    iTags,
     // Pledge titles live in a `title` tag, not `content`. Most NIP-50
     // implementations only match content; widen the net client-side.
     getKeywordHaystack: (event) => {
@@ -333,22 +332,6 @@ export default function ActionsPage() {
     ? `/pledges/new?country=${encodeURIComponent(selectedCountry)}`
     : '/pledges/new';
 
-  const allCountries = useMemo(() => getAllCountries(), []);
-
-  const countryOptions = useMemo(() => {
-    const options: Array<{ value: string; label: string; flag: string }> = [
-      { value: 'global', label: t('pledges.list.global'), flag: '🌍' },
-    ];
-    allCountries.forEach((country) => {
-      options.push({
-        value: country.code,
-        label: country.name,
-        flag: countryCodeToFlag(country.code),
-      });
-    });
-    return options;
-  }, [allCountries, t]);
-
   const selectedCountryName = selectedCountry
     ? getGeoDisplayName(selectedCountry)
     : t('pledges.list.global');
@@ -375,23 +358,13 @@ export default function ActionsPage() {
   }) ?? [];
   const pastUnsorted = actions?.filter((c) => c.deadline && c.deadline <= now) ?? [];
 
-  const sortActions = (cs: Action[]) => {
-    const sorted = [...cs];
-    const isPastOnlyList = sorted.length > 0 && sorted.every((c) => !!c.deadline && c.deadline <= now);
-    switch (sortBy) {
-      case 'recent':
-        return sorted.sort((a, b) => b.createdAt - a.createdAt);
-      case 'bounty':
-        return sorted.sort((a, b) => b.bounty - a.bounty);
-      case 'deadline':
-        return sorted.sort((a, b) => {
-          if (!a.deadline) return 1;
-          if (!b.deadline) return -1;
-          // Upcoming/current: soonest deadline first. Past: most recently ended first.
-          return isPastOnlyList ? b.deadline - a.deadline : a.deadline - b.deadline;
-        });
-    }
-  };
+  // Within each lifecycle section we sort newest-first by `createdAt`.
+  // The page used to expose Recent / Bounty / Deadline as a dropdown,
+  // but those modes were superseded by the shared DiscoverySearchToolbar
+  // (Default / Top / New) which drives a relay-ranked search view —
+  // keeping a parallel client-side sort on top of the curated layout
+  // duplicated the affordance for no real gain.
+  const sortActions = (cs: Action[]) => [...cs].sort((a, b) => b.createdAt - a.createdAt);
 
   const currentActions = sortActions(currentUnsorted);
   const upcomingActions = sortActions(upcomingUnsorted);
@@ -407,7 +380,6 @@ export default function ActionsPage() {
   const visiblePast = showAllPast ? pastActions : pastActions.slice(0, DEFAULT_VISIBLE);
   const hasCurrent = currentActions.length > 0;
   const hasUpcoming = upcomingActions.length > 0;
-  const isOnlyPastView = !hasCurrent && !hasUpcoming && pastActions.length > 0;
   const primarySectionTitle = hasCurrent
     ? t('pledges.list.sectionActive')
     : hasUpcoming
@@ -415,77 +387,23 @@ export default function ActionsPage() {
     : pastActions.length > 0
         ? t('pledges.list.sectionPast')
         : t('pledges.list.sectionDefault');
-  const deadlineSortLabel = isOnlyPastView
-    ? t('pledges.list.sortDeadlinePast')
-    : t('pledges.list.sortDeadline');
 
   const headerControls = (
-    <div className="flex items-center gap-1">
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button variant="ghost" size="sm" className="h-auto p-2 hover:bg-muted/50 rounded-lg" aria-label={t('pledges.list.sortAriaLabel')}>
-            <ListFilter className="h-5 w-5 text-primary" />
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="end" className="w-48">
-          <div className="px-2 py-1.5 text-xs font-semibold text-muted-foreground">{t('pledges.list.sortBy')}</div>
-          <DropdownMenuItem onClick={() => setSortBy('recent')} className={sortBy === 'recent' ? 'bg-primary/10' : ''}>
-            <Clock className="mr-2 h-4 w-4" /><span>{t('pledges.list.sortRecent')}</span>
-            {sortBy === 'recent' && <Check className="ml-auto h-4 w-4" />}
-          </DropdownMenuItem>
-          <DropdownMenuItem onClick={() => setSortBy('bounty')} className={sortBy === 'bounty' ? 'bg-primary/10' : ''}>
-            <DollarSign className="mr-2 h-4 w-4" /><span>{t('pledges.list.sortBounty')}</span>
-            {sortBy === 'bounty' && <Check className="ml-auto h-4 w-4" />}
-          </DropdownMenuItem>
-          <DropdownMenuItem onClick={() => setSortBy('deadline')} className={sortBy === 'deadline' ? 'bg-primary/10' : ''}>
-            <Calendar className="mr-2 h-4 w-4" /><span>{deadlineSortLabel}</span>
-            {sortBy === 'deadline' && <Check className="ml-auto h-4 w-4" />}
-          </DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
-
-      <Popover open={headerCountryPickerOpen} onOpenChange={setHeaderCountryPickerOpen}>
-        <PopoverTrigger asChild>
-          <Button variant="ghost" size="sm" className="h-auto p-2 hover:bg-muted/50 rounded-lg" aria-label={t('pledges.list.filterAriaLabel')}>
-            {selectedCountry ? (
-              <span className="text-2xl">{countryCodeToFlag(selectedCountry)}</span>
-            ) : (
-              <Globe className="h-5 w-5 text-primary" />
-            )}
-          </Button>
-        </PopoverTrigger>
-        <PopoverContent className="w-[280px] p-0" align="end">
-          <Command>
-            <CommandInput placeholder={t('pledges.list.countrySearchPlaceholder')} />
-            <CommandList>
-              <CommandEmpty>{t('pledges.list.noResults')}</CommandEmpty>
-              <CommandGroup>
-                {countryOptions.map((option) => (
-                  <CommandItem
-                    key={option.value}
-                    value={`${option.label} ${option.value}`}
-                    onSelect={() => {
-                      setSelectedCountry(option.value === 'global' ? undefined : option.value);
-                      setHeaderCountryPickerOpen(false);
-                    }}
-                    className="gap-2"
-                  >
-                    <span>{option.flag}</span>
-                    <span className="flex-1">{option.label}</span>
-                    <Check
-                      className={cn(
-                        'h-4 w-4',
-                        (selectedCountry || 'global') === option.value ? 'opacity-100' : 'opacity-0',
-                      )}
-                    />
-                  </CommandItem>
-                ))}
-              </CommandGroup>
-            </CommandList>
-          </Command>
-        </PopoverContent>
-      </Popover>
-    </div>
+    <DiscoverySearchToolbar
+      query={searchInput}
+      onQueryChange={setSearchInput}
+      sort={sortMode}
+      onSortChange={setSortMode}
+      searchPlaceholderKey="pledges.list.searchPlaceholder"
+      searchAriaLabelKey="pledges.list.searchAriaLabel"
+      showHidden={{
+        value: showHidden,
+        onChange: setShowHidden,
+        count: searchHiddenCount,
+      }}
+      country={selectedCountry}
+      onCountryChange={setSelectedCountry}
+    />
   );
 
   return (
@@ -495,26 +413,6 @@ export default function ActionsPage() {
         canCreate={!!user}
         onCreateAction={() => navigate(createActionHref)}
       />
-
-      {/* Toolbar — search + sort + show-hidden. Sits just below the hero
-          on every discovery page so the affordance is consistent. The
-          query is NIP-50, restricted to kind 36639, and routed at the
-          Ditto relay group. */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 pt-6">
-        <DiscoverySearchToolbar
-          query={searchInput}
-          onQueryChange={setSearchInput}
-          sort={sortMode}
-          onSortChange={setSortMode}
-          searchPlaceholderKey="pledges.list.searchPlaceholder"
-          searchAriaLabelKey="pledges.list.searchAriaLabel"
-          showHidden={{
-            value: showHidden,
-            onChange: setShowHidden,
-            count: searchHiddenCount,
-          }}
-        />
-      </div>
 
       {isSearching ? (
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-10 lg:py-14">
@@ -534,6 +432,7 @@ export default function ActionsPage() {
                   </p>
                 )}
               </div>
+              {headerControls}
             </div>
 
             {isSearchFetching && !searchHits ? (

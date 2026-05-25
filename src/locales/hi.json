@@ -33,7 +33,11 @@
     "sortTop": "टॉप",
     "sortNew": "नए",
     "showHidden": "छुपे हुए दिखाएँ",
-    "filtersAriaLabel": "खोज फ़िल्टर"
+    "filtersAriaLabel": "खोज फ़िल्टर",
+    "countryFilterAriaLabel": "देश के अनुसार फ़िल्टर करें",
+    "countrySearchPlaceholder": "देश खोजें…",
+    "countryNoResults": "कोई देश नहीं मिला.",
+    "countryGlobal": "वैश्विक"
   },
   "translate": {
     "translate": "अनुवाद करें",

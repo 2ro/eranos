@@ -1,10 +1,17 @@
 import { useTranslation } from 'react-i18next';
-import { Clock, EyeOff, LayoutGrid, SlidersHorizontal, TrendingUp } from 'lucide-react';
+import { Check, Clock, EyeOff, LayoutGrid, ListFilter, TrendingUp } from 'lucide-react';
 
+import { CountryPickerButton } from '@/components/CountryPickerButton';
 import { DebouncedSearchInput } from '@/components/DebouncedSearchInput';
-import { Label } from '@/components/ui/label';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { Switch } from '@/components/ui/switch';
+import { Button } from '@/components/ui/button';
+import {
+  DropdownMenu,
+  DropdownMenuCheckboxItem,
+  DropdownMenuContent,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import { cn } from '@/lib/utils';
 import type { Nip50Sort } from '@/hooks/useNip50Search';
 
@@ -23,14 +30,15 @@ interface DiscoverySearchToolbarProps {
   sort: Nip50Sort;
   /** Called when the user picks a different sort. */
   onSortChange: (next: Nip50Sort) => void;
+  /** Subset of sort options to expose. Defaults to all three. */
+  sortOptions?: Nip50Sort[];
   /** i18n placeholder key for the input, e.g. `pledges.list.searchPlaceholder`. */
   searchPlaceholderKey: string;
   /** i18n aria-label key for the input, e.g. `pledges.list.searchAriaLabel`. */
   searchAriaLabelKey: string;
   /**
-   * Show-hidden switch state + handler. When `undefined`, the switch is
-   * not rendered (use this on surfaces that have no hidden-moderation
-   * concept, like Pledges today).
+   * Show-hidden switch state + handler. When `undefined`, the show-hidden
+   * row is omitted from the menu.
    */
   showHidden?: {
     /** Switch value. */
@@ -39,27 +47,37 @@ interface DiscoverySearchToolbarProps {
     onChange: (next: boolean) => void;
     /** Optional count to render next to the label, e.g. (3). */
     count?: number;
-    /**
-     * Stable HTML id for the switch ⇄ label pairing. Default is
-     * `discovery-show-hidden`; supply your own when multiple toolbars
-     * could mount in the same tree.
-     */
-    id?: string;
   };
+  /**
+   * Selected ISO 3166-1 alpha-2 country code (e.g. `"US"`), or
+   * `undefined` for the global / no-filter state. Drives the country
+   * picker button rendered to the right of the filter dropdown.
+   */
+  country?: string;
+  /** Called when the user picks a country, or `undefined` for Global. */
+  onCountryChange?: (next: string | undefined) => void;
   /** Extra classes on the outer container. */
   className?: string;
 }
 
 /**
- * Toolbar shared by every discovery page (Campaigns home, All-Campaigns,
- * Communities, Pledges). Renders inline against the page background — no
- * card framing — so the discovery hero still anchors visual hierarchy.
+ * Filter cluster shared by every discovery page (Campaigns home, All-Campaigns,
+ * Communities, Pledges). Designed to sit on the **right** of a section
+ * heading row, paired with an `h2 + tagline` block on the left:
  *
- * Layout: a single row with the search input flexing to fill, and a
- * compact Filter button on the right that opens a popover containing
- * the Top / New sort pills and (optionally) the Show-hidden switch.
- * Matches the affordance used on the global SearchPage so the
- * filter idiom feels the same across the app.
+ *     <div className="flex items-end justify-between gap-4">
+ *       <div>
+ *         <h2>…</h2>
+ *         <p>…</p>
+ *       </div>
+ *       <DiscoverySearchToolbar … />
+ *     </div>
+ *
+ * Layout: a horizontal cluster with a compact debounced search input
+ * (left) and a single Filter button (right) whose `DropdownMenu`
+ * contains the sort options and the optional Show-hidden switch — same
+ * `ListFilter` icon-button pattern the pledges page already uses for
+ * its sort dropdown, so the affordance is consistent.
  *
  * Fully controlled — parent owns search / sort / show-hidden state.
  * Keeps URL sync, debounce, and storage decisions where they belong
@@ -70,101 +88,93 @@ export function DiscoverySearchToolbar({
   onQueryChange,
   sort,
   onSortChange,
+  sortOptions,
   searchPlaceholderKey,
   searchAriaLabelKey,
   showHidden,
+  country,
+  onCountryChange,
   className,
 }: DiscoverySearchToolbarProps) {
   const { t } = useTranslation();
-  const switchId = showHidden?.id ?? 'discovery-show-hidden';
 
-  // Any modifier that differs from the defaults (Default sort, hidden
-  // off) tints the Filter button so the active state is visible without
-  // opening the popover.
-  const hasActiveFilters = sort !== 'default' || showHidden?.value === true;
+  const sorts = sortOptions
+    ? SORT_OPTIONS.filter((o) => sortOptions.includes(o.value))
+    : SORT_OPTIONS;
 
   return (
-    <div className={cn('max-w-3xl mx-auto flex items-center gap-2', className)}>
+    <div className={cn('flex items-center gap-1 shrink-0', className)}>
       <DebouncedSearchInput
         value={query}
         onChange={onQueryChange}
         placeholder={t(searchPlaceholderKey)}
         ariaLabel={t(searchAriaLabelKey)}
         clearLabel={t('common.clearSearch')}
-        className="flex-1"
+        className="w-48 sm:w-64 mr-1"
       />
 
-      <Popover>
-        <PopoverTrigger asChild>
-          <button
-            type="button"
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button
+            variant="ghost"
+            size="sm"
             aria-label={t('common.filtersAriaLabel')}
-            className={cn(
-              'shrink-0 h-11 w-11 rounded-lg border bg-secondary/50 hover:bg-secondary flex items-center justify-center motion-safe:transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary',
-              hasActiveFilters
-                ? 'border-primary text-primary'
-                : 'border-border text-muted-foreground hover:text-foreground',
-            )}
+            className="h-auto p-2 rounded-lg hover:bg-muted/50"
           >
-            <SlidersHorizontal className="size-4" />
-          </button>
-        </PopoverTrigger>
-        <PopoverContent align="end" className="w-72 p-3 space-y-4">
-          {/* Sort pills */}
-          <div className="space-y-1.5">
-            <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
-              {t('common.sortAriaLabel')}
-            </span>
-            <div
-              className="flex gap-1 p-1 rounded-lg bg-secondary/40"
-              role="radiogroup"
-              aria-label={t('common.sortAriaLabel')}
+            <ListFilter className="h-5 w-5 text-primary" />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end" className="w-56">
+          <DropdownMenuLabel className="text-xs font-semibold text-muted-foreground">
+            {t('common.sortAriaLabel')}
+          </DropdownMenuLabel>
+          {sorts.map(({ value, labelKey, icon: Icon }) => (
+            <DropdownMenuCheckboxItem
+              key={value}
+              checked={sort === value}
+              onCheckedChange={(checked) => {
+                if (checked) onSortChange(value);
+              }}
+              // The checkbox slot on the left is hidden in favour of an
+              // explicit `Check` on the right (matches the
+              // pledges-page sort dropdown). We keep the variant
+              // because it gives us the radio-like "one checked at a
+              // time" semantics for free.
+              className={cn(
+                '[&>span:first-child]:hidden pl-2',
+                sort === value && 'bg-primary/10',
+              )}
             >
-              {SORT_OPTIONS.map(({ value, labelKey, icon: Icon }) => (
-                <button
-                  key={value}
-                  type="button"
-                  role="radio"
-                  aria-checked={sort === value}
-                  onClick={() => onSortChange(value)}
-                  className={cn(
-                    'flex-1 inline-flex items-center justify-center gap-1 px-1.5 py-1.5 text-xs font-medium rounded-md motion-safe:transition-colors',
-                    sort === value
-                      ? 'bg-background text-foreground shadow-sm'
-                      : 'text-muted-foreground hover:text-foreground',
-                  )}
-                >
-                  <Icon className="size-3.5" />
-                  {t(labelKey)}
-                </button>
-              ))}
-            </div>
-          </div>
+              <Icon className="mr-2 h-4 w-4" />
+              <span className="flex-1">{t(labelKey)}</span>
+              {sort === value && <Check className="ml-2 h-4 w-4" />}
+            </DropdownMenuCheckboxItem>
+          ))}
 
-          {/* Show-hidden switch (optional) */}
           {showHidden && (
-            <div className="flex items-center justify-between gap-3">
-              <Label
-                htmlFor={switchId}
-                className="text-sm font-medium cursor-pointer inline-flex items-center gap-1.5"
+            <>
+              <DropdownMenuSeparator />
+              <DropdownMenuCheckboxItem
+                checked={showHidden.value}
+                onCheckedChange={showHidden.onChange}
+                className="pl-2"
               >
-                <EyeOff className="size-4 text-muted-foreground" aria-hidden />
-                {t('common.showHidden')}
+                <EyeOff className="mr-2 h-4 w-4" />
+                <span className="flex-1">{t('common.showHidden')}</span>
                 {showHidden.count !== undefined && showHidden.count > 0 && (
-                  <span className="text-muted-foreground font-normal">
+                  <span className="ml-2 text-xs text-muted-foreground">
                     ({showHidden.count})
                   </span>
                 )}
-              </Label>
-              <Switch
-                id={switchId}
-                checked={showHidden.value}
-                onCheckedChange={showHidden.onChange}
-              />
-            </div>
+              </DropdownMenuCheckboxItem>
+            </>
           )}
-        </PopoverContent>
-      </Popover>
+        </DropdownMenuContent>
+      </DropdownMenu>
+
+      {onCountryChange && (
+        <CountryPickerButton value={country} onChange={onCountryChange} />
+      )}
     </div>
   );
 }

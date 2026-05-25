@@ -33,7 +33,11 @@
     "sortTop": "Juu",
     "sortNew": "Mpya",
     "showHidden": "Onyesha zilizofichwa",
-    "filtersAriaLabel": "Vichujio vya utafutaji"
+    "filtersAriaLabel": "Vichujio vya utafutaji",
+    "countryFilterAriaLabel": "Chuja kwa nchi",
+    "countrySearchPlaceholder": "Tafuta nchi…",
+    "countryNoResults": "Hakuna nchi zilizopatikana.",
+    "countryGlobal": "Kimataifa"
   },
   "translate": {
     "translate": "Tafsiri",

@@ -33,7 +33,11 @@
     "sortTop": "Teratas",
     "sortNew": "Baru",
     "showHidden": "Tampilkan yang tersembunyi",
-    "filtersAriaLabel": "Filter pencarian"
+    "filtersAriaLabel": "Filter pencarian",
+    "countryFilterAriaLabel": "Saring berdasarkan negara",
+    "countrySearchPlaceholder": "Cari negara…",
+    "countryNoResults": "Tidak ada negara yang ditemukan.",
+    "countryGlobal": "Global"
   },
   "translate": {
     "translate": "Terjemahkan",

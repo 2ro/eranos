@@ -33,7 +33,11 @@
     "sortTop": "Топ",
     "sortNew": "Новые",
     "showHidden": "Показать скрытые",
-    "filtersAriaLabel": "Фильтры поиска"
+    "filtersAriaLabel": "Фильтры поиска",
+    "countryFilterAriaLabel": "Фильтр по стране",
+    "countrySearchPlaceholder": "Поиск стран…",
+    "countryNoResults": "Страны не найдены.",
+    "countryGlobal": "Глобально"
   },
   "translate": {
     "translate": "Перевести",
