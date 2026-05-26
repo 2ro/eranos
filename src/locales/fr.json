@@ -941,7 +941,6 @@
     "quote_other": "<0>{{count}}</0> Citations",
     "like_one": "<0>{{count}}</0> J'aime",
     "like_other": "<0>{{count}}</0> J'aime",
-    "commentsAndDonations": "Commentaires et dons",
     "tabComments": "Commentaires et dons",
     "tabLedger": "Registre",
     "ledger": {

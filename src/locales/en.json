@@ -942,7 +942,6 @@
     "quote_other": "<0>{{count}}</0> Quotes",
     "like_one": "<0>{{count}}</0> Like",
     "like_other": "<0>{{count}}</0> Likes",
-    "commentsAndDonations": "Comments & donations",
     "tabComments": "Comments & donations",
     "tabLedger": "Ledger",
     "ledger": {

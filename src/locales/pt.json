@@ -951,7 +951,6 @@
     "quote_other": "<0>{{count}}</0> Citações",
     "like_one": "<0>{{count}}</0> Curtida",
     "like_other": "<0>{{count}}</0> Curtidas",
-    "commentsAndDonations": "Comentários e doações",
     "tabComments": "Comentários e doações",
     "tabLedger": "Livro-razão",
     "ledger": {

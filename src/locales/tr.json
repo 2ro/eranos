@@ -950,7 +950,6 @@
     "quote_other": "<0>{{count}}</0> Alıntı",
     "like_one": "<0>{{count}}</0> Beğeni",
     "like_other": "<0>{{count}}</0> Beğeni",
-    "commentsAndDonations": "Yorumlar ve bağışlar",
     "tabComments": "Yorumlar ve bağışlar",
     "tabLedger": "Defter",
     "ledger": {

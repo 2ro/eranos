@@ -951,7 +951,6 @@
     "quote_other": "<0>{{count}}</0> Цитат",
     "like_one": "<0>{{count}}</0> Лайк",
     "like_other": "<0>{{count}}</0> Лайков",
-    "commentsAndDonations": "Комментарии и пожертвования",
     "tabComments": "Комментарии и пожертвования",
     "tabLedger": "Реестр",
     "ledger": {

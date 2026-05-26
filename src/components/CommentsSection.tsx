@@ -3,9 +3,14 @@ import type { ReactNode } from 'react';
 import { cn } from '@/lib/utils';
 
 interface CommentsSectionProps {
-  /** Section heading rendered above the muted panel. */
-  title: string;
-  /** Optional count chip rendered opposite the heading. */
+  /**
+   * Section heading rendered above the muted panel. Omit when the section
+   * already lives under a higher-level header (e.g. a tab label that
+   * doubles as the section title) — the panel then renders without its
+   * own heading row.
+   */
+  title?: string;
+  /** Optional count chip rendered opposite the heading. Ignored when `title` is omitted. */
   countLabel?: ReactNode;
   /**
    * Panel contents. Composer + threaded list + empty state are owned
@@ -31,12 +36,14 @@ interface CommentsSectionProps {
 export function CommentsSection({ title, countLabel, children, className }: CommentsSectionProps) {
   return (
     <div className={cn('mt-4', className)}>
-      <div className="mb-3 px-1 flex items-baseline justify-between gap-3">
-        <h2 className="text-lg font-semibold tracking-tight">{title}</h2>
-        {countLabel ? (
-          <span className="text-sm text-muted-foreground tabular-nums">{countLabel}</span>
-        ) : null}
-      </div>
+      {title ? (
+        <div className="mb-3 px-1 flex items-baseline justify-between gap-3">
+          <h2 className="text-lg font-semibold tracking-tight">{title}</h2>
+          {countLabel ? (
+            <span className="text-sm text-muted-foreground tabular-nums">{countLabel}</span>
+          ) : null}
+        </div>
+      ) : null}
 
       {/* Muted surface wraps the composer and comment list. The wrap
           carries the outer L/R/B border so the rounded corners curve

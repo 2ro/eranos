@@ -519,7 +519,6 @@
     "quote_other": "<0>{{count}}</0> 引用",
     "like_one": "<0>{{count}}</0> 點贊",
     "like_other": "<0>{{count}}</0> 點贊",
-    "commentsAndDonations": "評論與捐贈",
     "tabComments": "評論與捐贈",
     "tabLedger": "賬本",
     "ledger": {

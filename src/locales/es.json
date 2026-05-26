@@ -519,7 +519,6 @@
     "quote_other": "<0>{{count}}</0> Citas",
     "like_one": "<0>{{count}}</0> Me gusta",
     "like_other": "<0>{{count}}</0> Me gusta",
-    "commentsAndDonations": "Comentarios y donaciones",
     "tabComments": "Comentarios y donaciones",
     "tabLedger": "Libro contable",
     "ledger": {

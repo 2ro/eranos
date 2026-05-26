@@ -474,7 +474,7 @@ function CampaignDetailContent({ campaign }: { campaign: ParsedCampaign }) {
               <CampaignActivityTabs
                 campaign={campaign}
                 commentsTab={
-                  <CommentsSection title={t('campaignsDetail.commentsAndDonations')}>
+                  <CommentsSection>
                     <DetailCommentComposer
                       event={campaign.event}
                       onSuccess={() => queryClient.invalidateQueries({ queryKey: ['nostr', 'comments'] })}
@@ -627,6 +627,14 @@ function CampaignPinHeader({
  * Silent-payment-only campaigns intentionally have no ledger — the receive
  * address is unlinkable by design — so the component degrades to a single
  * un-tabbed surface in that case to avoid showing a lone disabled tab.
+ *
+ * Visual treatment: the tab strip reads as a *section header*, not a
+ * control widget. The active tab label is the same size and weight as the
+ * `<h2>` headings used elsewhere on the page; the inactive tabs sit beside
+ * it as muted siblings. A 1px baseline border runs the full width of the
+ * panel, and the active tab "lifts" off that baseline with a thicker
+ * primary-tinted under-rule that visually flows into the content surface
+ * below. The list overrides the default shadcn pill style entirely.
  */
 function CampaignActivityTabs({
   campaign,
@@ -639,33 +647,86 @@ function CampaignActivityTabs({
   const onchainAddress = campaign.wallets.onchain?.value;
 
   // No on-chain endpoint → no Ledger tab. Render the comments surface
-  // directly so we don't show a single lonely tab control.
+  // directly so we don't show a single lonely tab control. The caller
+  // already omits the inline title, so add a heading here that mirrors
+  // the section headers used elsewhere on the page.
   if (!onchainAddress) {
-    return <>{commentsTab}</>;
+    return (
+      <div className="mt-4">
+        <h2 className="mb-3 px-1 text-lg font-semibold tracking-tight">
+          {t('campaignsDetail.tabComments')}
+        </h2>
+        {commentsTab}
+      </div>
+    );
   }
 
   return (
     <Tabs defaultValue="comments" className="mt-4">
-      <TabsList className="w-full sm:w-auto">
-        <TabsTrigger value="comments" className="flex-1 sm:flex-none">
+      {/* Underline-style tab strip that reads as a section header.
+          Overrides every default class on shadcn's TabsList (which is a
+          muted pill control) — `h-auto`, no `bg-*`, no padding, no
+          rounding. The baseline `border-b border-primary/20` runs the
+          full width of the panel below, and each trigger draws a
+          thicker primary under-rule when active so the active tab
+          "owns" the panel surface below it. */}
+      <TabsList className="h-auto w-full justify-start gap-1 rounded-none border-b border-primary/20 bg-transparent p-0">
+        <CampaignActivityTabTrigger value="comments">
           {t('campaignsDetail.tabComments')}
-        </TabsTrigger>
-        <TabsTrigger value="ledger" className="flex-1 sm:flex-none">
+        </CampaignActivityTabTrigger>
+        <CampaignActivityTabTrigger value="ledger">
           {t('campaignsDetail.tabLedger')}
-        </TabsTrigger>
+        </CampaignActivityTabTrigger>
       </TabsList>
 
-      <TabsContent value="comments" className="mt-3">
-        {/* The wrapped CommentsSection already provides its own heading +
-            margin; nest it here without an extra `mt-*` so the tab list
-            and the panel stay visually tight. */}
+      <TabsContent value="comments" className="mt-0">
+        {/* The wrapped CommentsSection's outer `mt-4` would re-introduce a
+            gap between the tab strip and the panel surface — undo it so
+            the panel sits flush under the active tab's under-rule. */}
         <div className="-mt-4">{commentsTab}</div>
       </TabsContent>
 
-      <TabsContent value="ledger" className="mt-3">
+      <TabsContent value="ledger" className="mt-0">
         <CampaignLedger address={onchainAddress} />
       </TabsContent>
     </Tabs>
+  );
+}
+
+/**
+ * Section-header-styled tab trigger. Overrides shadcn's default pill /
+ * shadow active state (`data-[state=active]:bg-background data-[state=active]:shadow-sm`)
+ * with an underline + colour shift, so the strip reads as a header instead
+ * of a control. Sizing matches the page's other `<h2>` headings (`text-lg
+ * font-semibold tracking-tight`) so the active tab label feels like the
+ * canonical section title.
+ */
+function CampaignActivityTabTrigger({
+  value,
+  children,
+}: {
+  value: string;
+  children: ReactNode;
+}) {
+  return (
+    <TabsTrigger
+      value={value}
+      className="
+        relative h-auto rounded-none border-0 bg-transparent px-1 py-2
+        text-lg font-semibold tracking-tight text-muted-foreground
+        shadow-none transition-colors
+        hover:text-foreground/90
+        focus-visible:ring-0 focus-visible:ring-offset-0
+        data-[state=active]:bg-transparent data-[state=active]:text-foreground
+        data-[state=active]:shadow-none
+        after:absolute after:-bottom-px after:left-0 after:right-0 after:h-0.5
+        after:rounded-full after:bg-transparent
+        data-[state=active]:after:bg-primary
+        motion-safe:after:transition-colors
+      "
+    >
+      {children}
+    </TabsTrigger>
   );
 }
 

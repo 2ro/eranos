@@ -519,7 +519,6 @@
     "quote_other": "<0>{{count}}</0> 引用",
     "like_one": "<0>{{count}}</0> 点赞",
     "like_other": "<0>{{count}}</0> 点赞",
-    "commentsAndDonations": "评论与捐赠",
     "tabComments": "评论与捐赠",
     "tabLedger": "账本",
     "ledger": {
