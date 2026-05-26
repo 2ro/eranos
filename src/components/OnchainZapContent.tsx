@@ -285,7 +285,9 @@ export function OnchainZapContent({ target, onSuccess, onClose }: OnchainZapCont
                   Fee{' '}
                   {estimatedFeeSats > 0 && btcPrice
                     ? `≈ ${satsToUSD(estimatedFeeSats, btcPrice)}`
-                    : '…'}
+                    : currentFeeRate
+                      ? `${currentFeeRate} sat/vB`
+                      : 'loading'}
                   <span className="opacity-60"> · {FEE_SPEED_LABELS[feeSpeed]}</span>
                 </span>
               </button>
