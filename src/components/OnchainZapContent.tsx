@@ -12,6 +12,7 @@ import {
 } from '@/components/ui/popover';
 import { QRCodeCanvas } from '@/components/ui/qrcode';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import { BitcoinAmountPicker } from '@/components/BitcoinAmountPicker';
 
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useBitcoinSigner } from '@/hooks/useBitcoinSigner';
@@ -103,8 +104,6 @@ export function OnchainZapContent({ target, onSuccess, onClose }: OnchainZapCont
   const [feeSpeed, setFeeSpeed] = useState<OnchainFeeSpeed>('halfHour');
   const [error, setError] = useState('');
   const [feePopoverOpen, setFeePopoverOpen] = useState(false);
-  const [editingAmount, setEditingAmount] = useState(false);
-  const amountInputRef = useRef<HTMLInputElement>(null);
 
   // Tracks whether the user has manually picked a fee speed. Once true, we
   // stop auto-adjusting the fee in response to amount changes.
@@ -256,23 +255,6 @@ export function OnchainZapContent({ target, onSuccess, onClose }: OnchainZapCont
   const totalUsdString = btcPrice ? satsToUSD(totalSats, btcPrice) : '';
   const uniqueFeeSpeeds = useMemo(() => getUniqueFeeSpeeds(feeRates), [feeRates]);
 
-  // Clicking the big amount flips it into edit mode. Auto-focus and
-  // select-all so typing overwrites the current value.
-  useEffect(() => {
-    if (editingAmount) {
-      amountInputRef.current?.focus();
-      amountInputRef.current?.select();
-    }
-  }, [editingAmount]);
-
-  const commitAmountEdit = useCallback(() => {
-    setEditingAmount(false);
-    // Normalize empty string to 0 so the display doesn't show "$" alone.
-    if (typeof usdAmount === 'string' && usdAmount.trim() === '') {
-      setUsdAmount(0);
-    }
-  }, [usdAmount]);
-
   if (user && capability === 'unsupported') {
     return (
       <UnsupportedSignerQR
@@ -290,63 +272,13 @@ export function OnchainZapContent({ target, onSuccess, onClose }: OnchainZapCont
 
   return (
     <div className="grid gap-4 px-4 py-4 w-full overflow-hidden">
-      {/* Amount — big number on top, editable by clicking. */}
-      <div className="flex flex-col items-center pt-2">
-        {editingAmount ? (
-          <div className="flex items-baseline justify-center">
-            <span className={`text-4xl font-semibold ${insufficient ? 'text-destructive' : 'text-muted-foreground'}`}>$</span>
-            <input
-              ref={amountInputRef}
-              type="number"
-              inputMode="decimal"
-              min={0}
-              step="0.01"
-              value={usdAmount}
-              onChange={(e) => { setUsdAmount(e.target.value); setError(''); }}
-              onBlur={commitAmountEdit}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter') {
-                  e.preventDefault();
-                  commitAmountEdit();
-                }
-              }}
-              aria-label="Amount in USD"
-              className={`bg-transparent border-0 outline-none text-4xl font-semibold text-center [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none ${insufficient ? 'text-destructive' : ''}`}
-              style={{ width: `${Math.max(2, String(usdAmount).length + 1)}ch` }}
-            />
-          </div>
-        ) : (
-          <button
-            type="button"
-            onClick={() => setEditingAmount(true)}
-            aria-label="Edit amount"
-            className="flex items-baseline justify-center rounded-md px-2 -mx-2 hover:bg-muted/50 focus:outline-none focus-visible:ring-2 focus-visible:ring-ring transition-colors"
-          >
-            <span className={`text-4xl font-semibold ${insufficient ? 'text-destructive' : 'text-muted-foreground'}`}>$</span>
-            <span className={`text-4xl font-semibold tabular-nums ${insufficient ? 'text-destructive' : ''}`}>
-              {hasValidAmount ? currentUsd : 0}
-            </span>
-          </button>
-        )}
-      </div>
-
-      {/* Preset buttons sit under the big number. */}
-      <ToggleGroup
-        type="single"
-        value={USD_PRESETS.includes(Number(usdAmount)) ? String(usdAmount) : ''}
-        onValueChange={(v) => { if (v) { setUsdAmount(Number(v)); setError(''); setEditingAmount(false); } }}
-        className="grid grid-cols-5 gap-1 w-full"
-      >
-        {USD_PRESETS.map((v) => (
-          <ToggleGroupItem
-            key={v}
-            value={String(v)}
-            className="h-8 min-w-0 text-xs font-semibold px-1"
-          >
-            ${v}
-          </ToggleGroupItem>
-        ))}
-      </ToggleGroup>
+      <BitcoinAmountPicker
+        usdAmount={usdAmount}
+        onUsdAmountChange={setUsdAmount}
+        presets={USD_PRESETS}
+        insufficient={insufficient}
+        onAmountChangeStart={() => setError('')}
+      />
 
       {/* Error */}
       {error && (
