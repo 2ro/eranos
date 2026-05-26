@@ -1119,7 +1119,7 @@
       "lastMonth": "Último mes",
       "custom": "Personalizado…"
     },
-    "customHours": "Horas a escanear hacia atrás",
+    "customHours": "Horas",
     "customHoursPlaceholder": "p. ej. 12",
     "advanced": "Avanzado",
     "connectingIndexer": "Conectando con el indexador…",

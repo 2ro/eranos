@@ -1541,7 +1541,7 @@
       "lastMonth": "Dernier mois",
       "custom": "Personnalisé…"
     },
-    "customHours": "Heures à scanner en arrière",
+    "customHours": "Heures",
     "customHoursPlaceholder": "p. ex. 12",
     "advanced": "Avancé",
     "connectingIndexer": "Connexion à l'indexeur…",

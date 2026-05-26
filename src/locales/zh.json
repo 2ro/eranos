@@ -1119,7 +1119,7 @@
       "lastMonth": "最近一个月",
       "custom": "自定义…"
     },
-    "customHours": "向前扫描的小时数",
+    "customHours": "小时",
     "customHoursPlaceholder": "例如 12",
     "advanced": "高级选项",
     "connectingIndexer": "正在连接索引器…",

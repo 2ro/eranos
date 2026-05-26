@@ -1551,7 +1551,7 @@
       "lastMonth": "За последний месяц",
       "custom": "Другое…"
     },
-    "customHours": "На сколько часов назад сканировать",
+    "customHours": "Часы",
     "customHoursPlaceholder": "напр. 12",
     "advanced": "Дополнительно",
     "connectingIndexer": "Подключение к индексеру…",

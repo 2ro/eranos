@@ -1486,7 +1486,7 @@
       "lastMonth": "Geçen ay",
       "custom": "Özel…"
     },
-    "customHours": "Geriye doğru taranacak saat",
+    "customHours": "Saat",
     "customHoursPlaceholder": "örn. 12",
     "advanced": "Gelişmiş",
     "connectingIndexer": "İndeksleyiciye bağlanılıyor…",

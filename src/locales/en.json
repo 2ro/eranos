@@ -1542,7 +1542,7 @@
       "lastMonth": "Last month",
       "custom": "Custom…"
     },
-    "customHours": "Hours to scan back",
+    "customHours": "Hours",
     "customHoursPlaceholder": "e.g. 12",
     "advanced": "Advanced",
     "connectingIndexer": "Connecting to indexer…",
