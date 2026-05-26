@@ -48,7 +48,7 @@ interface HDSilentPaymentScanDialogProps {
 
 /**
  * "Since" presets — relative time windows expressed in wall-clock seconds.
- * Block height is resolved from Blockbook timestamps at scan time, not by
+ * Block height is resolved from real block timestamps at scan time, not by
  * assuming an average block interval.
  */
 const PRESETS = {
@@ -63,7 +63,26 @@ type PresetId = keyof typeof PRESETS;
 
 const PRESET_ORDER: PresetId[] = ['lastHour', 'last3h', 'last24h', 'lastWeek', 'lastMonth'];
 const DEFAULT_PRESET: PresetId = 'lastHour';
-const TIME_RESOLUTION_SAFETY_BLOCKS = 12;
+const TIME_RESOLUTION_SAFETY_BLOCKS = 3;
+const MEMPOOL_TIMESTAMP_BLOCK_URL = 'https://mempool.space/api/v1/mining/blocks/timestamp';
+
+interface MempoolTimestampBlockResponse {
+  height?: unknown;
+}
+
+async function fetchMempoolTimestampBlockHeight(cutoffTime: number): Promise<number> {
+  const response = await fetch(`${MEMPOOL_TIMESTAMP_BLOCK_URL}/${cutoffTime}`);
+  if (!response.ok) {
+    throw new Error(`mempool.space timestamp lookup returned ${response.status}`);
+  }
+
+  const data = (await response.json()) as MempoolTimestampBlockResponse;
+  if (typeof data.height !== 'number' || !Number.isInteger(data.height) || data.height < 0) {
+    throw new Error('mempool.space timestamp lookup missing valid block height');
+  }
+
+  return data.height;
+}
 
 /**
  * Finds the highest block whose header time is at-or-before the cutoff.
@@ -96,8 +115,10 @@ async function findBoundaryBlockByTime(
 
 /**
  * Resolves the selected wall-clock preset to the conservative scan start.
- * The binary search gives a timestamp-derived boundary; the small rewind
- * covers Bitcoin's non-strictly-monotonic block timestamps.
+ * mempool.space usually gives the boundary block in one request; the
+ * Blockbook binary search fallback keeps the flow usable if that public API
+ * is unreachable. The small rewind covers timestamp edge cases without
+ * adding a large scan delay.
  */
 async function resolvePresetFromHeight(
   preset: PresetId,
@@ -106,7 +127,13 @@ async function resolvePresetFromHeight(
   blockbookBaseUrl: string,
 ): Promise<number> {
   const cutoffTime = Math.floor(Date.now() / 1000) - PRESETS[preset].seconds;
-  const boundary = await findBoundaryBlockByTime(blockbookBaseUrl, tipHeight, cutoffTime);
+  let boundary: number;
+  try {
+    boundary = await fetchMempoolTimestampBlockHeight(cutoffTime);
+  } catch {
+    boundary = await findBoundaryBlockByTime(blockbookBaseUrl, tipHeight, cutoffTime);
+  }
+  boundary = Math.min(boundary, tipHeight);
   const target = Math.max(0, boundary - TIME_RESOLUTION_SAFETY_BLOCKS);
   const resume = (scanHeight ?? 0) + 1;
   return Math.max(resume, target);
