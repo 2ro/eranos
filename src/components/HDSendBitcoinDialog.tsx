@@ -12,7 +12,6 @@ import {
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import {
   Dialog,
   DialogContent,
@@ -26,6 +25,7 @@ import {
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { BitcoinAmountPicker } from '@/components/BitcoinAmountPicker';
 import { BitcoinPublicDisclaimer } from '@/components/BitcoinPublicDisclaimer';
+import { BitcoinRecipientInput } from '@/components/BitcoinRecipientInput';
 import { HelpTip } from '@/components/HelpTip';
 import { cn } from '@/lib/utils';
 
@@ -531,14 +531,10 @@ export function HDSendBitcoinDialog({ isOpen, onClose, btcPrice }: HDSendBitcoin
                 <label className="text-xs text-muted-foreground" htmlFor="hd-recipient-input">
                   {t('walletSend.recipient.label')}
                 </label>
-                <Input
-                  id="hd-recipient-input"
+                <BitcoinRecipientInput
                   value={recipientInput}
-                  onChange={(e) => setRecipientInput(e.target.value)}
+                  onChange={setRecipientInput}
                   placeholder={t('walletSend.recipient.placeholder')}
-                  autoComplete="off"
-                  spellCheck={false}
-                  className="font-mono text-base md:text-sm"
                 />
                 {recipient && (
                   <p className="text-xs text-muted-foreground">
