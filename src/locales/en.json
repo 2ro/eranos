@@ -1558,6 +1558,10 @@
     "foundOutputs_other": "Found {{count}} new outputs.",
     "noNewPayments": "No new payments.",
     "startScan": "Start scan",
+    "resolveFailed": {
+      "title": "Couldn't look up the start block",
+      "description": "mempool.space is unreachable right now. Enter a starting block under Advanced → From block to scan anyway."
+    },
     "reconcile": {
       "title": "Reconcile spent UTXOs",
       "description": "Checks each stored silent-payment UTXO against Blockbook and removes any that have been spent. Use this if the balance is higher than it should be after a send.",

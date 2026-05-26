@@ -1462,6 +1462,10 @@
     "foundOutputs_other": "Imepatikana matokeo mapya {{count}}.",
     "noNewPayments": "Hakuna malipo mapya.",
     "startScan": "Anza uchanganuzi",
+    "resolveFailed": {
+      "title": "Imeshindwa kupata block ya kuanzia",
+      "description": "mempool.space haipatikani kwa sasa. Weka block ya kuanzia chini ya Kina → Kutoka block ili kuchanganua hata hivyo."
+    },
     "reconcile": {
       "title": "Patanisha UTXO zilizotumika",
       "description": "Hukagua kila UTXO ya malipo ya kimya iliyohifadhiwa dhidi ya Blockbook na huondoa zile zilizokwisha tumika. Tumia ikiwa salio ni juu zaidi kuliko inavyopaswa kuwa baada ya kutuma.",

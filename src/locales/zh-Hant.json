@@ -1071,6 +1071,10 @@
     "foundOutputs_other": "發現 {{count}} 個新輸出。",
     "noNewPayments": "沒有新的支付。",
     "startScan": "開始掃描",
+    "resolveFailed": {
+      "title": "無法查詢起始區塊",
+      "description": "目前無法連線至 mempool.space。請在「進階 → 起始區塊」下方輸入一個起始區塊以繼續掃描。"
+    },
     "reconcile": {
       "title": "對賬已花費的 UTXO",
       "description": "將每個儲存的靜默支付 UTXO 與 Blockbook 進行比對，並移除那些已被花費的。如果傳送後餘額高於應有數額，請使用此功能。",

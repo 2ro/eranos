@@ -1503,6 +1503,10 @@
     "foundOutputs_other": "{{count}} नए outputs मिले।",
     "noNewPayments": "कोई नया भुगतान नहीं।",
     "startScan": "Scan शुरू करें",
+    "resolveFailed": {
+      "title": "शुरुआती block का पता नहीं चल सका",
+      "description": "mempool.space अभी पहुँच से बाहर है। फिर भी scan करने के लिए उन्नत → किस block से के तहत एक शुरुआती block डालें।"
+    },
     "reconcile": {
       "title": "ख़र्च किए गए UTXO का मिलान करें",
       "description": "हर स्टोर किए गए साइलेंट-पेमेंट UTXO को Blockbook से जाँचता है और ख़र्च हो चुके किसी भी UTXO को हटाता है। अगर भेजने के बाद बैलेंस उससे ज़्यादा दिखे जितना होना चाहिए, तो इसका इस्तेमाल करें।",

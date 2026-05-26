@@ -1135,6 +1135,10 @@
     "foundOutputs_other": "Se encontraron {{count}} salidas nuevas.",
     "noNewPayments": "Sin pagos nuevos.",
     "startScan": "Iniciar escaneo",
+    "resolveFailed": {
+      "title": "No se pudo consultar el bloque inicial",
+      "description": "mempool.space no está disponible en este momento. Introduce un bloque inicial en Avanzado → Desde el bloque para escanear de todos modos."
+    },
     "reconcile": {
       "title": "Reconciliar UTXOs gastados",
       "description": "Comprueba cada UTXO de pago silencioso almacenado contra Blockbook y elimina los que ya se hayan gastado. Úsalo si el saldo es mayor de lo que debería ser tras un envío.",

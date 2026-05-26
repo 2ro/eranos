@@ -1135,6 +1135,10 @@
     "foundOutputs_other": "Yakawana mhedzisiro {{count}} itsva.",
     "noNewPayments": "Hapana mibhadharo mitsva.",
     "startScan": "Tanga kuongorora",
+    "resolveFailed": {
+      "title": "Hatina kukwanisa kutsvaga bhuroka rokutangira",
+      "description": "mempool.space haisi kuwanikwa pari zvino. Pinda bhuroka rokutangira pasi peZvepamusoro → Kubva pabhuroka kuti uongorore zvakadaro."
+    },
     "reconcile": {
       "title": "Reconcile UTXOs dzakashandiswa",
       "description": "Inotarisa UTXO yega yega yakachengetwa yemubhadharo wakanyararira pamberi peBlockbook uye inobvisa idzo dzakashandiswa. Shandisa kana bharanzi yakakwirira pane zvaifanira mushure mokutumira.",

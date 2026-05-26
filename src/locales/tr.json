@@ -1502,6 +1502,10 @@
     "foundOutputs_other": "{{count}} yeni çıkış bulundu.",
     "noNewPayments": "Yeni ödeme yok.",
     "startScan": "Taramayı başlat",
+    "resolveFailed": {
+      "title": "Başlangıç bloğu sorgulanamadı",
+      "description": "mempool.space şu anda erişilemez durumda. Yine de taramak için Gelişmiş → Başlangıç bloğu altında bir başlangıç bloğu girin."
+    },
     "reconcile": {
       "title": "Harcanan UTXO'ları uzlaştır",
       "description": "Saklanan her sessiz ödeme UTXO'sunu Blockbook'a karşı kontrol eder ve harcanmış olanları kaldırır. Bir gönderimden sonra bakiye olması gerekenden yüksekse bunu kullanın.",

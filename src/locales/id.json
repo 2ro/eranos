@@ -1503,6 +1503,10 @@
     "foundOutputs_other": "Menemukan {{count}} output baru.",
     "noNewPayments": "Tidak ada pembayaran baru.",
     "startScan": "Mulai pindai",
+    "resolveFailed": {
+      "title": "Tidak bisa mencari blok awal",
+      "description": "mempool.space tidak dapat dijangkau saat ini. Masukkan blok awal di Lanjutan → Dari blok untuk tetap memindai."
+    },
     "reconcile": {
       "title": "Rekonsiliasi UTXO yang dibelanjakan",
       "description": "Memeriksa setiap UTXO silent-payment yang tersimpan terhadap Blockbook dan menghapus yang sudah dibelanjakan. Gunakan ini jika saldo lebih tinggi dari seharusnya setelah pengiriman.",

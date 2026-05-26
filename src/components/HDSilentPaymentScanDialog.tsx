@@ -23,9 +23,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { useAppContext } from '@/hooks/useAppContext';
 import { useHdWalletSp } from '@/hooks/useHdWalletSp';
-import { fetchBlockTime } from '@/lib/hdwallet/blockbook';
+import { useToast } from '@/hooks/useToast';
 
 // ---------------------------------------------------------------------------
 // HD wallet — silent-payment "Scan history" dialog
@@ -35,7 +34,10 @@ import { fetchBlockTime } from '@/lib/hdwallet/blockbook';
 // indexer tip. The primary control is a relative time window ("Since")
 // because most users know when they expect a payment, not which block it
 // landed in. The selected time window is resolved to a block height on start
-// with Blockbook header timestamps, then passed to the existing scanRange API.
+// via mempool.space's timestamp-to-block endpoint, then passed to the
+// existing scanRange API. If mempool.space is unreachable, the dialog
+// surfaces a toast pointing the user at the Advanced → From block escape
+// hatch instead of stalling on a slow indexer fallback.
 //
 // Power users can override the resolved starting height (or toggle
 // rebuild-from-spent rescans) under the "Advanced" disclosure.
@@ -85,54 +87,19 @@ async function fetchMempoolTimestampBlockHeight(cutoffTime: number): Promise<num
 }
 
 /**
- * Finds the highest block whose header time is at-or-before the cutoff.
- * Kept local to this dialog so the time-based "Since" behavior is easy to
- * remove if the UI returns to explicit block-height-only scanning later.
- */
-async function findBoundaryBlockByTime(
-  blockbookBaseUrl: string,
-  tipHeight: number,
-  cutoffTime: number,
-): Promise<number> {
-  let low = 0;
-  let high = tipHeight;
-  let best = 0;
-
-  while (low <= high) {
-    const mid = Math.floor((low + high) / 2);
-    const blockTime = await fetchBlockTime(blockbookBaseUrl, mid);
-
-    if (blockTime <= cutoffTime) {
-      best = mid;
-      low = mid + 1;
-    } else {
-      high = mid - 1;
-    }
-  }
-
-  return best;
-}
-
-/**
  * Resolves the selected wall-clock preset to the conservative scan start.
- * mempool.space usually gives the boundary block in one request; the
- * Blockbook binary search fallback keeps the flow usable if that public API
- * is unreachable. The small rewind covers timestamp edge cases without
- * adding a large scan delay.
+ * mempool.space's timestamp-to-block endpoint is the only source of truth;
+ * if it's unreachable the caller surfaces a toast pointing the user at
+ * Advanced → From block. The small rewind covers timestamp edge cases
+ * without adding a large scan delay.
  */
 async function resolvePresetFromHeight(
   preset: PresetId,
   tipHeight: number,
   scanHeight: number | undefined,
-  blockbookBaseUrl: string,
 ): Promise<number> {
   const cutoffTime = Math.floor(Date.now() / 1000) - PRESETS[preset].seconds;
-  let boundary: number;
-  try {
-    boundary = await fetchMempoolTimestampBlockHeight(cutoffTime);
-  } catch {
-    boundary = await findBoundaryBlockByTime(blockbookBaseUrl, tipHeight, cutoffTime);
-  }
+  let boundary = await fetchMempoolTimestampBlockHeight(cutoffTime);
   boundary = Math.min(boundary, tipHeight);
   const target = Math.max(0, boundary - TIME_RESOLUTION_SAFETY_BLOCKS);
   const resume = (scanHeight ?? 0) + 1;
@@ -141,14 +108,13 @@ async function resolvePresetFromHeight(
 
 export function HDSilentPaymentScanDialog({ open, onOpenChange }: HDSilentPaymentScanDialogProps) {
   const { t } = useTranslation();
-  const { config } = useAppContext();
+  const { toast } = useToast();
   const sp = useHdWalletSp();
   const [since, setSince] = useState<PresetId>(DEFAULT_PRESET);
   const [fromOverride, setFromOverride] = useState('');
   const [includeSpent, setIncludeSpent] = useState(false);
   const [advancedOpen, setAdvancedOpen] = useState(false);
   const [isResolvingSince, setIsResolvingSince] = useState(false);
-  const [resolveError, setResolveError] = useState<Error | undefined>();
 
   // Reset all local state when the dialog closes so reopening always
   // starts from a clean, conservative default.
@@ -159,7 +125,6 @@ export function HDSilentPaymentScanDialog({ open, onOpenChange }: HDSilentPaymen
       setIncludeSpent(false);
       setAdvancedOpen(false);
       setIsResolvingSince(false);
-      setResolveError(undefined);
     }
   }, [open]);
 
@@ -194,7 +159,6 @@ export function HDSilentPaymentScanDialog({ open, onOpenChange }: HDSilentPaymen
 
   const handleScan = async () => {
     if (!canStart) return;
-    setResolveError(undefined);
 
     if (overrideTrimmed !== '') {
       if (effectiveFrom === undefined) return;
@@ -212,14 +176,20 @@ export function HDSilentPaymentScanDialog({ open, onOpenChange }: HDSilentPaymen
         since,
         tipHeight,
         sp.storage?.scanHeight,
-        config.blockbookBaseUrl,
       );
       await sp.scanRange({
         fromHeight,
         includeSpent,
       });
-    } catch (err) {
-      setResolveError(err instanceof Error ? err : new Error(String(err)));
+    } catch {
+      // mempool.space is the only path now — when it's down, point the
+      // user at the Advanced → From block escape hatch and auto-open it.
+      toast({
+        title: t('spScan.resolveFailed.title'),
+        description: t('spScan.resolveFailed.description'),
+        variant: 'destructive',
+      });
+      setAdvancedOpen(true);
     } finally {
       setIsResolvingSince(false);
     }
@@ -390,14 +360,14 @@ export function HDSilentPaymentScanDialog({ open, onOpenChange }: HDSilentPaymen
             </div>
           )}
 
-          {!sp.isScanning && (sp.scanError || resolveError) && (
+          {!sp.isScanning && sp.scanError && (
             <div className="flex items-start gap-2 text-xs text-destructive">
               <AlertCircle className="size-4 shrink-0 mt-0.5" />
-              <p>{(sp.scanError ?? resolveError)?.message}</p>
+              <p>{sp.scanError.message}</p>
             </div>
           )}
 
-          {!sp.isScanning && !sp.scanError && !resolveError && sp.scanProgress && (
+          {!sp.isScanning && !sp.scanError && sp.scanProgress && (
             <div className="flex items-start gap-2 text-xs text-muted-foreground">
               <CheckCircle2 className="size-4 shrink-0 mt-0.5 text-green-500" />
               <p>
