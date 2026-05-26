@@ -1548,8 +1548,11 @@
       "last3h": "Últimas 3 horas",
       "last24h": "Últimas 24 horas",
       "lastWeek": "Última semana",
-      "lastMonth": "Último mês"
+      "lastMonth": "Último mês",
+      "custom": "Personalizado…"
     },
+    "customHours": "Horas para escanear",
+    "customHoursPlaceholder": "ex. 12",
     "advanced": "Avançado",
     "connectingIndexer": "Conectando ao indexador…",
     "upToDate": "Você já está atualizado.",

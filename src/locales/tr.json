@@ -1483,8 +1483,11 @@
       "last3h": "Son 3 saat",
       "last24h": "Son 24 saat",
       "lastWeek": "Geçen hafta",
-      "lastMonth": "Geçen ay"
+      "lastMonth": "Geçen ay",
+      "custom": "Özel…"
     },
+    "customHours": "Geriye doğru taranacak saat",
+    "customHoursPlaceholder": "örn. 12",
     "advanced": "Gelişmiş",
     "connectingIndexer": "İndeksleyiciye bağlanılıyor…",
     "upToDate": "Zaten güncelsiniz.",

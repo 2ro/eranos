@@ -1116,8 +1116,11 @@
       "last3h": "最近 3 小时",
       "last24h": "最近 24 小时",
       "lastWeek": "最近一周",
-      "lastMonth": "最近一个月"
+      "lastMonth": "最近一个月",
+      "custom": "自定义…"
     },
+    "customHours": "向前扫描的小时数",
+    "customHoursPlaceholder": "例如 12",
     "advanced": "高级选项",
     "connectingIndexer": "正在连接索引器…",
     "upToDate": "已是最新状态。",

@@ -1052,8 +1052,11 @@
       "last3h": "過去 3 小時",
       "last24h": "過去 24 小時",
       "lastWeek": "過去一週",
-      "lastMonth": "過去一個月"
+      "lastMonth": "過去一個月",
+      "custom": "自訂…"
     },
+    "customHours": "回溯掃描小時數",
+    "customHoursPlaceholder": "例如 12",
     "advanced": "進階",
     "connectingIndexer": "正在連接索引器…",
     "upToDate": "您已是最新狀態。",

@@ -63,8 +63,17 @@ const PRESETS = {
 
 type PresetId = keyof typeof PRESETS;
 
+/**
+ * Sentinel for the "Custom" Since option — selects a user-supplied window
+ * in hours instead of a fixed preset. The hours value lives in its own
+ * input rendered conditionally under the Select.
+ */
+const CUSTOM_SINCE = 'custom' as const;
+type SinceId = PresetId | typeof CUSTOM_SINCE;
+
 const PRESET_ORDER: PresetId[] = ['lastHour', 'last3h', 'last24h', 'lastWeek', 'lastMonth'];
-const DEFAULT_PRESET: PresetId = 'lastHour';
+const SINCE_ORDER: SinceId[] = [...PRESET_ORDER, CUSTOM_SINCE];
+const DEFAULT_SINCE: SinceId = 'lastHour';
 // Bitcoin block timestamps aren't strictly monotonic — the consensus rule is
 // only that a block's timestamp must exceed the median of the previous 11
 // (the "median-time-past" rule, BIP-113). So a block at height H can carry a
@@ -95,18 +104,18 @@ async function fetchMempoolTimestampBlockHeight(cutoffTime: number): Promise<num
 }
 
 /**
- * Resolves the selected wall-clock preset to the conservative scan start.
- * mempool.space's timestamp-to-block endpoint is the only source of truth;
- * if it's unreachable the caller surfaces a toast pointing the user at
- * Advanced → From block. The 11-block rewind (see
+ * Resolves a wall-clock time window (in seconds) to the conservative scan
+ * start block. mempool.space's timestamp-to-block endpoint is the only
+ * source of truth; if it's unreachable the caller surfaces a toast pointing
+ * the user at Advanced → From block. The 11-block rewind (see
  * TIME_RESOLUTION_SAFETY_BLOCKS) covers BIP-113 timestamp inversions.
  */
-async function resolvePresetFromHeight(
-  preset: PresetId,
+async function resolveWindowFromHeight(
+  windowSeconds: number,
   tipHeight: number,
   scanHeight: number | undefined,
 ): Promise<number> {
-  const cutoffTime = Math.floor(Date.now() / 1000) - PRESETS[preset].seconds;
+  const cutoffTime = Math.floor(Date.now() / 1000) - windowSeconds;
   let boundary = await fetchMempoolTimestampBlockHeight(cutoffTime);
   boundary = Math.min(boundary, tipHeight);
   const target = Math.max(0, boundary - TIME_RESOLUTION_SAFETY_BLOCKS);
@@ -118,7 +127,8 @@ export function HDSilentPaymentScanDialog({ open, onOpenChange }: HDSilentPaymen
   const { t } = useTranslation();
   const { toast } = useToast();
   const sp = useHdWalletSp();
-  const [since, setSince] = useState<PresetId>(DEFAULT_PRESET);
+  const [since, setSince] = useState<SinceId>(DEFAULT_SINCE);
+  const [customHours, setCustomHours] = useState('');
   const [fromOverride, setFromOverride] = useState('');
   const [includeSpent, setIncludeSpent] = useState(false);
   const [advancedOpen, setAdvancedOpen] = useState(false);
@@ -128,7 +138,8 @@ export function HDSilentPaymentScanDialog({ open, onOpenChange }: HDSilentPaymen
   // starts from a clean, conservative default.
   useEffect(() => {
     if (!open) {
-      setSince(DEFAULT_PRESET);
+      setSince(DEFAULT_SINCE);
+      setCustomHours('');
       setFromOverride('');
       setIncludeSpent(false);
       setAdvancedOpen(false);
@@ -147,6 +158,22 @@ export function HDSilentPaymentScanDialog({ open, onOpenChange }: HDSilentPaymen
   // resolved asynchronously on submit from real block timestamps.
   const effectiveFrom = overrideTrimmed !== '' ? overrideParsed : undefined;
 
+  // Parse the Custom hours input. Allow fractional hours (e.g. 0.5 for 30
+  // minutes) but reject zero / negative / non-finite values. Empty string
+  // means "not yet entered" — the Start button stays disabled until the
+  // user actually types a number.
+  const customTrimmed = customHours.trim();
+  const customParsed = customTrimmed === '' ? undefined : Number(customTrimmed);
+  const customValid =
+    customTrimmed === '' ||
+    (typeof customParsed === 'number' &&
+      Number.isFinite(customParsed) &&
+      (customParsed as number) > 0);
+  const customSeconds =
+    typeof customParsed === 'number' && customValid && customParsed > 0
+      ? Math.round(customParsed * 60 * 60)
+      : undefined;
+
   const tipHeight = sp.tipHeight;
   const isManualUpToDate =
     tipHeight !== undefined && effectiveFrom !== undefined && effectiveFrom > tipHeight;
@@ -158,9 +185,13 @@ export function HDSilentPaymentScanDialog({ open, onOpenChange }: HDSilentPaymen
   //  - the override field has garbage in it (input is invalid)
   //  - we still don't know the tip and the user hasn't overridden
   //  - the resolved range is empty (already up to date)
+  //  - the user picked Custom but hasn't entered a valid hour value yet
+  const sinceReady = since === CUSTOM_SINCE ? customSeconds !== undefined : true;
   const canStart =
     overrideValid &&
+    customValid &&
     (overrideTrimmed !== '' ? effectiveFrom !== undefined : tipHeight !== undefined) &&
+    sinceReady &&
     !isUpToDate &&
     !sp.isScanning &&
     !isResolvingSince;
@@ -178,10 +209,17 @@ export function HDSilentPaymentScanDialog({ open, onOpenChange }: HDSilentPaymen
     }
 
     if (tipHeight === undefined) return;
+
+    // Resolve the selected "Since" option to a window in seconds. Custom
+    // pulls from the hours input; everything else is a fixed preset.
+    const windowSeconds =
+      since === CUSTOM_SINCE ? customSeconds : PRESETS[since].seconds;
+    if (windowSeconds === undefined) return;
+
     setIsResolvingSince(true);
     try {
-      const fromHeight = await resolvePresetFromHeight(
-        since,
+      const fromHeight = await resolveWindowFromHeight(
+        windowSeconds,
         tipHeight,
         sp.storage?.scanHeight,
       );
@@ -246,20 +284,44 @@ export function HDSilentPaymentScanDialog({ open, onOpenChange }: HDSilentPaymen
             </Label>
             <Select
               value={since}
-              onValueChange={(v) => setSince(v as PresetId)}
+              onValueChange={(v) => setSince(v as SinceId)}
               disabled={sp.isScanning}
             >
               <SelectTrigger id="sp-scan-since">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                {PRESET_ORDER.map((id) => (
+                {SINCE_ORDER.map((id) => (
                   <SelectItem key={id} value={id}>
                     {t(`spScan.preset.${id}`)}
                   </SelectItem>
                 ))}
               </SelectContent>
             </Select>
+
+            {/* Custom hours input — only renders when Custom is selected.
+                Accepts fractional values (e.g. 0.5 = 30 minutes) and the
+                Start button stays disabled until a positive number is
+                entered, so there's no ambiguous "empty == zero" submit. */}
+            {since === CUSTOM_SINCE && (
+              <div className="pt-1.5 space-y-1.5">
+                <Label htmlFor="sp-scan-custom-hours" className="text-xs">
+                  {t('spScan.customHours')}
+                </Label>
+                <Input
+                  id="sp-scan-custom-hours"
+                  type="number"
+                  inputMode="decimal"
+                  min={0}
+                  step="any"
+                  placeholder={t('spScan.customHoursPlaceholder')}
+                  value={customHours}
+                  onChange={(e) => setCustomHours(e.target.value)}
+                  disabled={sp.isScanning}
+                  aria-invalid={!customValid}
+                />
+              </div>
+            )}
           </div>
 
           {/* Advanced disclosure — collapsed by default, resets on close. */}

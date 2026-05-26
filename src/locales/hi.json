@@ -1484,8 +1484,11 @@
       "last3h": "पिछले 3 घंटे",
       "last24h": "पिछले 24 घंटे",
       "lastWeek": "पिछला हफ़्ता",
-      "lastMonth": "पिछला महीना"
+      "lastMonth": "पिछला महीना",
+      "custom": "कस्टम…"
     },
+    "customHours": "कितने घंटे पीछे तक scan करें",
+    "customHoursPlaceholder": "उदा. 12",
     "advanced": "उन्नत",
     "connectingIndexer": "Indexer से जुड़ रहे हैं…",
     "upToDate": "आप पहले से ही अप टू डेट हैं।",

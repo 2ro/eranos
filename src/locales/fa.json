@@ -1116,8 +1116,11 @@
       "last3h": "۳ ساعت گذشته",
       "last24h": "۲۴ ساعت گذشته",
       "lastWeek": "هفتهٔ گذشته",
-      "lastMonth": "ماه گذشته"
+      "lastMonth": "ماه گذشته",
+      "custom": "سفارشی…"
     },
+    "customHours": "ساعت‌های پویش به عقب",
+    "customHoursPlaceholder": "مثلاً ۱۲",
     "advanced": "پیشرفته",
     "connectingIndexer": "در حال اتصال به ایندکس‌کننده…",
     "upToDate": "از پیش به‌روز هستید.",

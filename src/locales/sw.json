@@ -1443,8 +1443,11 @@
       "last3h": "Saa 3 zilizopita",
       "last24h": "Saa 24 zilizopita",
       "lastWeek": "Wiki iliyopita",
-      "lastMonth": "Mwezi uliopita"
+      "lastMonth": "Mwezi uliopita",
+      "custom": "Maalum…"
     },
+    "customHours": "Saa za kuchanganua nyuma",
+    "customHoursPlaceholder": "mf. 12",
     "advanced": "Kina",
     "connectingIndexer": "Inaunganisha na kifaa cha kuorodhesha…",
     "upToDate": "Tayari uko hadi sasa.",

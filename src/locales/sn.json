@@ -1116,8 +1116,11 @@
       "last3h": "Maawa 3 apfuura",
       "last24h": "Maawa 24 apfuura",
       "lastWeek": "Vhiki rapfuura",
-      "lastMonth": "Mwedzi wapfuura"
+      "lastMonth": "Mwedzi wapfuura",
+      "custom": "Zvakasarudzwa…"
     },
+    "customHours": "Maawa okuongorora kumashure",
+    "customHoursPlaceholder": "semuenzaniso 12",
     "advanced": "Zvepamusoro",
     "connectingIndexer": "Kubatanidza nemuongorori…",
     "upToDate": "Watova pamberi pose.",

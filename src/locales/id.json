@@ -1484,8 +1484,11 @@
       "last3h": "3 jam terakhir",
       "last24h": "24 jam terakhir",
       "lastWeek": "Pekan lalu",
-      "lastMonth": "Bulan lalu"
+      "lastMonth": "Bulan lalu",
+      "custom": "Khusus…"
     },
+    "customHours": "Jam untuk dipindai ke belakang",
+    "customHoursPlaceholder": "misal 12",
     "advanced": "Lanjutan",
     "connectingIndexer": "Menghubungkan ke indexer…",
     "upToDate": "Anda sudah mutakhir.",

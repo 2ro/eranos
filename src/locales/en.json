@@ -1539,8 +1539,11 @@
       "last3h": "Last 3 hours",
       "last24h": "Last 24 hours",
       "lastWeek": "Last week",
-      "lastMonth": "Last month"
+      "lastMonth": "Last month",
+      "custom": "Custom…"
     },
+    "customHours": "Hours to scan back",
+    "customHoursPlaceholder": "e.g. 12",
     "advanced": "Advanced",
     "connectingIndexer": "Connecting to indexer…",
     "upToDate": "You're already up to date.",

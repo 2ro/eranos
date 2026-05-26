@@ -1100,8 +1100,11 @@
       "last3h": "آخر 3 ساعات",
       "last24h": "آخر 24 ساعة",
       "lastWeek": "الأسبوع الماضي",
-      "lastMonth": "الشهر الماضي"
+      "lastMonth": "الشهر الماضي",
+      "custom": "مخصّص…"
     },
+    "customHours": "عدد الساعات للفحص الرجعي",
+    "customHoursPlaceholder": "مثال: 12",
     "advanced": "متقدّم",
     "connectingIndexer": "جارٍ الاتصال بالمفهرس…",
     "upToDate": "أنت محدَّث بالفعل.",
