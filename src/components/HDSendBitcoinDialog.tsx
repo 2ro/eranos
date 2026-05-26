@@ -535,6 +535,7 @@ export function HDSendBitcoinDialog({ isOpen, onClose, btcPrice }: HDSendBitcoin
                   value={recipientInput}
                   onChange={setRecipientInput}
                   placeholder={t('walletSend.recipient.placeholder')}
+                  resolvedPubkey={recipient?.pubkey}
                 />
                 {recipient && (
                   <p className="text-xs text-muted-foreground">
