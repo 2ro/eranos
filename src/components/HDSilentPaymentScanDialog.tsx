@@ -104,23 +104,28 @@ async function fetchMempoolTimestampBlockHeight(cutoffTime: number): Promise<num
 }
 
 /**
- * Resolves a wall-clock time window (in seconds) to the conservative scan
- * start block. mempool.space's timestamp-to-block endpoint is the only
- * source of truth; if it's unreachable the caller surfaces a toast pointing
- * the user at Advanced → From block. The 11-block rewind (see
+ * Resolves a wall-clock time window (in seconds) to the scan start block.
+ * mempool.space's timestamp-to-block endpoint is the only source of truth;
+ * if it's unreachable the caller surfaces a toast pointing the user at
+ * Advanced → From block. The 11-block rewind (see
  * TIME_RESOLUTION_SAFETY_BLOCKS) covers BIP-113 timestamp inversions.
+ *
+ * The start block is the literal window boundary — we deliberately don't
+ * clamp it forward to the wallet's last scanned height. Re-scanning blocks
+ * we've already scanned is cheap (the indexer is just iterating tweak data)
+ * and is exactly what the user asked for. The previous "forward only" clamp
+ * silently degraded "Last week" into a no-op when the wallet had been
+ * scanned more recently, which made the dialog useless for the case it was
+ * designed to fix.
  */
 async function resolveWindowFromHeight(
   windowSeconds: number,
   tipHeight: number,
-  scanHeight: number | undefined,
 ): Promise<number> {
   const cutoffTime = Math.floor(Date.now() / 1000) - windowSeconds;
   let boundary = await fetchMempoolTimestampBlockHeight(cutoffTime);
   boundary = Math.min(boundary, tipHeight);
-  const target = Math.max(0, boundary - TIME_RESOLUTION_SAFETY_BLOCKS);
-  const resume = (scanHeight ?? 0) + 1;
-  return Math.max(resume, target);
+  return Math.max(0, boundary - TIME_RESOLUTION_SAFETY_BLOCKS);
 }
 
 export function HDSilentPaymentScanDialog({ open, onOpenChange }: HDSilentPaymentScanDialogProps) {
@@ -175,16 +180,18 @@ export function HDSilentPaymentScanDialog({ open, onOpenChange }: HDSilentPaymen
       : undefined;
 
   const tipHeight = sp.tipHeight;
+  // Only the manual From-block override has a real "nothing to scan" state —
+  // typing a height past the tip would produce an empty range. The Since
+  // presets don't have an equivalent: re-scanning blocks we've already
+  // scanned is cheap and is what the user asked for, so we never block the
+  // Start button just because scanHeight has caught up to the tip.
   const isManualUpToDate =
     tipHeight !== undefined && effectiveFrom !== undefined && effectiveFrom > tipHeight;
-  const isPresetUpToDate =
-    overrideTrimmed === '' && tipHeight !== undefined && (sp.storage?.scanHeight ?? 0) >= tipHeight;
-  const isUpToDate = isManualUpToDate || isPresetUpToDate;
 
   // Disable Start when:
   //  - the override field has garbage in it (input is invalid)
   //  - we still don't know the tip and the user hasn't overridden
-  //  - the resolved range is empty (already up to date)
+  //  - the manual override is past the tip (nothing to scan)
   //  - the user picked Custom but hasn't entered a valid hour value yet
   const sinceReady = since === CUSTOM_SINCE ? customSeconds !== undefined : true;
   const canStart =
@@ -192,7 +199,7 @@ export function HDSilentPaymentScanDialog({ open, onOpenChange }: HDSilentPaymen
     customValid &&
     (overrideTrimmed !== '' ? effectiveFrom !== undefined : tipHeight !== undefined) &&
     sinceReady &&
-    !isUpToDate &&
+    !isManualUpToDate &&
     !sp.isScanning &&
     !isResolvingSince;
 
@@ -221,7 +228,6 @@ export function HDSilentPaymentScanDialog({ open, onOpenChange }: HDSilentPaymen
       const fromHeight = await resolveWindowFromHeight(
         windowSeconds,
         tipHeight,
-        sp.storage?.scanHeight,
       );
       await sp.scanRange({
         fromHeight,
@@ -406,7 +412,7 @@ export function HDSilentPaymentScanDialog({ open, onOpenChange }: HDSilentPaymen
               {t('spScan.connectingIndexer')}
             </p>
           )}
-          {!sp.isScanning && isUpToDate && (
+          {!sp.isScanning && isManualUpToDate && (
             <p className="text-xs text-muted-foreground">
               {t('spScan.upToDate')}
             </p>
