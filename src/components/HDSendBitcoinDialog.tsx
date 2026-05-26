@@ -35,13 +35,17 @@ import { useHdWalletAccess } from '@/hooks/useHdWalletAccess';
 import { useHdWallet } from '@/hooks/useHdWallet';
 import { notificationSuccess } from '@/lib/haptics';
 import {
+  getBitcoinFeeRate,
+  getUniqueBitcoinFeeSpeeds,
+  type BitcoinFeeSpeed,
+} from '@/lib/bitcoinFeeSpeed';
+import {
   isLargeAmount,
   nostrPubkeyToBitcoinAddress,
   satsToUSD,
 } from '@/lib/bitcoin';
 import {
   broadcastBlockbookTx,
-  type BlockbookFeeRates,
   fetchFeeRates,
 } from '@/lib/hdwallet/blockbook';
 import {
@@ -62,29 +66,7 @@ import { useQuery } from '@tanstack/react-query';
 
 const USD_PRESETS = [1, 5, 10, 25, 100];
 
-type FeeSpeed = 'fastest' | 'halfHour' | 'hour' | 'economy';
-
-const FEE_SPEED_ORDER: FeeSpeed[] = ['fastest', 'halfHour', 'hour', 'economy'];
-
-function getRateForSpeed(rates: BlockbookFeeRates, speed: FeeSpeed): number {
-  switch (speed) {
-    case 'fastest': return rates.fastestFee;
-    case 'halfHour': return rates.halfHourFee;
-    case 'hour': return rates.hourFee;
-    case 'economy': return rates.economyFee;
-  }
-}
-
-function getUniqueFeeSpeeds(rates: BlockbookFeeRates | undefined): FeeSpeed[] {
-  if (!rates) return FEE_SPEED_ORDER;
-  const seen = new Set<number>();
-  const result: FeeSpeed[] = [];
-  for (const speed of FEE_SPEED_ORDER) {
-    const rate = getRateForSpeed(rates, speed);
-    if (!seen.has(rate)) { seen.add(rate); result.push(speed); }
-  }
-  return result;
-}
+type FeeSpeed = BitcoinFeeSpeed;
 
 // ---------------------------------------------------------------------------
 // Recipient resolution
@@ -236,7 +218,7 @@ export function HDSendBitcoinDialog({ isOpen, onClose, btcPrice }: HDSendBitcoin
 
   const currentFeeRate = useMemo(() => {
     if (!feeRates) return undefined;
-    return getRateForSpeed(feeRates, feeSpeed);
+    return getBitcoinFeeRate(feeRates, feeSpeed);
   }, [feeRates, feeSpeed]);
 
   // ── Owned UTXO set ───────────────────────────────────────────
@@ -303,12 +285,12 @@ export function HDSendBitcoinDialog({ isOpen, onClose, btcPrice }: HDSendBitcoin
     if (feeSpeedUserChanged.current) return;
     if (!ownedInputs.length || !feeRates || amountSats <= 0) return;
 
-    const uniqueSpeeds = getUniqueFeeSpeeds(feeRates);
+    const uniqueSpeeds = getUniqueBitcoinFeeSpeeds(feeRates);
     const threshold = amountSats * 0.4;
 
     let target: FeeSpeed = uniqueSpeeds[uniqueSpeeds.length - 1];
     for (const speed of uniqueSpeeds) {
-      const rate = getRateForSpeed(feeRates, speed);
+      const rate = getBitcoinFeeRate(feeRates, speed);
       const fee = previewHdFee(ownedInputs, amountSats, rate);
       if (fee > 0 && fee <= threshold) { target = speed; break; }
     }
@@ -360,7 +342,7 @@ export function HDSendBitcoinDialog({ isOpen, onClose, btcPrice }: HDSendBitcoin
       if (amountSats <= 0) throw new Error(t('walletSend.errors.enterAmount'));
       if (insufficient) throw new Error(t('walletSend.errors.insufficient'));
 
-      const rate = getRateForSpeed(feeRates, feeSpeed);
+      const rate = getBitcoinFeeRate(feeRates, feeSpeed);
       const nextChangeIndex = scan?.change.firstUnusedIndex ?? 0;
 
       setProgress('building');
@@ -578,7 +560,7 @@ export function HDSendBitcoinDialog({ isOpen, onClose, btcPrice }: HDSendBitcoin
                   </PopoverTrigger>
                   <PopoverContent className="w-44 p-1" align="end">
                     <div className="grid gap-0.5">
-                      {getUniqueFeeSpeeds(feeRates).map((speed) => (
+                      {getUniqueBitcoinFeeSpeeds(feeRates).map((speed) => (
                         <button
                           key={speed}
                           type="button"
@@ -591,7 +573,7 @@ export function HDSendBitcoinDialog({ isOpen, onClose, btcPrice }: HDSendBitcoin
                           <span>{feeSpeedLabels[speed]}</span>
                           {feeRates && (
                             <span className="text-muted-foreground tabular-nums">
-                              {t('walletSend.satPerVB', { rate: getRateForSpeed(feeRates, speed) })}
+                              {t('walletSend.satPerVB', { rate: getBitcoinFeeRate(feeRates, speed) })}
                             </span>
                           )}
                         </button>

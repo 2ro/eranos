@@ -13,6 +13,7 @@ import {
 import { QRCodeCanvas } from '@/components/ui/qrcode';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { BitcoinAmountPicker } from '@/components/BitcoinAmountPicker';
+import { getBitcoinFeeRate, getUniqueBitcoinFeeSpeeds } from '@/lib/bitcoinFeeSpeed';
 
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useBitcoinSigner } from '@/hooks/useBitcoinSigner';
@@ -40,40 +41,6 @@ const FEE_SPEED_LABELS: Record<OnchainFeeSpeed, string> = {
   hour: '~1 hour',
   economy: '~1 day',
 };
-
-const FEE_SPEED_ORDER: OnchainFeeSpeed[] = ['fastest', 'halfHour', 'hour', 'economy'];
-
-/**
- * Given the raw mempool fee rates (sat/vB), return a deduplicated list of
- * speed tiers. When multiple tiers share the same rate (common when the
- * mempool is empty and everything collapses to 1 sat/vB), we keep only the
- * fastest-labeled tier for that rate. This prevents rows like "~10 min 2
- * sat/vB / ~30 min 2 sat/vB / ~1 hour 2 sat/vB" in the UI.
- */
-function getRateForSpeed(rates: { fastestFee: number; halfHourFee: number; hourFee: number; economyFee: number }, speed: OnchainFeeSpeed): number {
-  switch (speed) {
-    case 'fastest': return rates.fastestFee;
-    case 'halfHour': return rates.halfHourFee;
-    case 'hour': return rates.hourFee;
-    case 'economy': return rates.economyFee;
-  }
-}
-
-function getUniqueFeeSpeeds(
-  rates: { fastestFee: number; halfHourFee: number; hourFee: number; economyFee: number } | undefined,
-): OnchainFeeSpeed[] {
-  if (!rates) return FEE_SPEED_ORDER;
-  const seen = new Set<number>();
-  const result: OnchainFeeSpeed[] = [];
-  for (const speed of FEE_SPEED_ORDER) {
-    const rate = getRateForSpeed(rates, speed);
-    if (!seen.has(rate)) {
-      seen.add(rate);
-      result.push(speed);
-    }
-  }
-  return result;
-}
 
 interface OnchainZapContentProps {
   target: NostrEvent;
@@ -139,7 +106,7 @@ export function OnchainZapContent({ target, onSuccess, onClose }: OnchainZapCont
 
   const currentFeeRate = useMemo(() => {
     if (!feeRates) return 0;
-    return getRateForSpeed(feeRates, feeSpeed);
+    return getBitcoinFeeRate(feeRates, feeSpeed);
   }, [feeRates, feeSpeed]);
 
   // Convert the USD amount to sats
@@ -172,12 +139,12 @@ export function OnchainZapContent({ target, onSuccess, onClose }: OnchainZapCont
     if (feeSpeedUserChanged.current) return;
     if (!utxos?.length || !feeRates || amountSats <= 0) return;
 
-    const uniqueSpeeds = getUniqueFeeSpeeds(feeRates);
+    const uniqueSpeeds = getUniqueBitcoinFeeSpeeds(feeRates);
     const threshold = amountSats * 0.4;
 
     let target: OnchainFeeSpeed = uniqueSpeeds[uniqueSpeeds.length - 1];
     for (const speed of uniqueSpeeds) {
-      const rate = getRateForSpeed(feeRates, speed);
+      const rate = getBitcoinFeeRate(feeRates, speed);
       const fee2 = estimateFee(utxos.length, 2, rate);
       const change = totalBalance - amountSats - fee2;
       const outputs = change > 546 ? 2 : 1;
@@ -253,7 +220,7 @@ export function OnchainZapContent({ target, onSuccess, onClose }: OnchainZapCont
   const currentUsd = typeof usdAmount === 'string' ? parseFloat(usdAmount) : usdAmount;
   const hasValidAmount = Number.isFinite(currentUsd) && currentUsd > 0;
   const totalUsdString = btcPrice ? satsToUSD(totalSats, btcPrice) : '';
-  const uniqueFeeSpeeds = useMemo(() => getUniqueFeeSpeeds(feeRates), [feeRates]);
+  const uniqueFeeSpeeds = useMemo(() => getUniqueBitcoinFeeSpeeds(feeRates), [feeRates]);
 
   if (user && capability === 'unsupported') {
     return (
@@ -326,7 +293,7 @@ export function OnchainZapContent({ target, onSuccess, onClose }: OnchainZapCont
             <PopoverContent align="center" sideOffset={6} className="w-56 p-1">
               <div className="flex flex-col">
                 {uniqueFeeSpeeds.map((speed) => {
-                  const rate = feeRates ? getRateForSpeed(feeRates, speed) : 0;
+                  const rate = feeRates ? getBitcoinFeeRate(feeRates, speed) : 0;
                   const selected = speed === feeSpeed;
                   return (
                     <button

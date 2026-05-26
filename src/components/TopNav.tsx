@@ -113,11 +113,18 @@ export function TopNav() {
 
         {/* Right cluster */}
         <div className="flex items-center gap-2 sm:gap-3">
-          {/* Wallet balance in USD — links to /wallet. Replaces the search
-              entry point in the chrome; mobile users still reach search via
-              the hamburger menu. Hidden until the HD wallet is available and
-              the BTC price has loaded. */}
-          <DeferredWalletBalancePill />
+          {user ? (
+            <DeferredWalletBalancePill />
+          ) : (
+            <Link
+              to="/search"
+              className="shrink-0 size-9 rounded-full flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-secondary motion-safe:transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+              aria-label={t('nav.search')}
+              title={t('nav.search')}
+            >
+              <Search className="size-5" />
+            </Link>
+          )}
 
           {/* LoginArea handles both logged-in (account avatar dropdown) and
               logged-out (Log in / Sign up) states. We render it inline-flex
