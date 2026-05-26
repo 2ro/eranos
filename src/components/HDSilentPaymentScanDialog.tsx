@@ -65,7 +65,15 @@ type PresetId = keyof typeof PRESETS;
 
 const PRESET_ORDER: PresetId[] = ['lastHour', 'last3h', 'last24h', 'lastWeek', 'lastMonth'];
 const DEFAULT_PRESET: PresetId = 'lastHour';
-const TIME_RESOLUTION_SAFETY_BLOCKS = 3;
+// Bitcoin block timestamps aren't strictly monotonic — the consensus rule is
+// only that a block's timestamp must exceed the median of the previous 11
+// (the "median-time-past" rule, BIP-113). So a block at height H can carry a
+// timestamp earlier than its predecessor's, but no inversion can drag a block
+// more than 11 positions out of timestamp order. Rewinding by 11 blocks from
+// mempool.space's "highest block with ts <= cutoff" guarantees we don't skip
+// past a payment whose containing block has an out-of-order timestamp near
+// the boundary. The cost is ~11 extra block fetches on the SP scanner.
+const TIME_RESOLUTION_SAFETY_BLOCKS = 11;
 const MEMPOOL_TIMESTAMP_BLOCK_URL = 'https://mempool.space/api/v1/mining/blocks/timestamp';
 
 interface MempoolTimestampBlockResponse {
@@ -90,8 +98,8 @@ async function fetchMempoolTimestampBlockHeight(cutoffTime: number): Promise<num
  * Resolves the selected wall-clock preset to the conservative scan start.
  * mempool.space's timestamp-to-block endpoint is the only source of truth;
  * if it's unreachable the caller surfaces a toast pointing the user at
- * Advanced → From block. The small rewind covers timestamp edge cases
- * without adding a large scan delay.
+ * Advanced → From block. The 11-block rewind (see
+ * TIME_RESOLUTION_SAFETY_BLOCKS) covers BIP-113 timestamp inversions.
  */
 async function resolvePresetFromHeight(
   preset: PresetId,
