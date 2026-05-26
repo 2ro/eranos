@@ -549,10 +549,7 @@
     "ofGoal": "ye{{amount}} chinangwa",
     "donationCount_one": "{{count}} chipo",
     "donationCount_other": "{{count}} zvipo",
-    "recentDonations": "Zvipo zvichangoitika",
-    "seeAllDonations_one": "Ona zvipo zvese {{count}}",
-    "openInWallet": "Vhura muchikwama",
-    "seeAllDonations_other": "Ona zvipo zvese {{count}}"
+    "openInWallet": "Vhura muchikwama"
   },
   "calendarEvents": {
     "create": {

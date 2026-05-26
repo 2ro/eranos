@@ -980,10 +980,7 @@
     "ofGoal": "/ {{amount}} hedef",
     "donationCount_one": "{{count}} bağış",
     "donationCount_other": "{{count}} bağış",
-    "recentDonations": "Son bağışlar",
-    "seeAllDonations_one": "Tüm {{count}} bağışı gör",
-    "openInWallet": "Cüzdanda aç",
-    "seeAllDonations_other": "Tüm {{count}} bağışı gör"
+    "openInWallet": "Cüzdanda aç"
   },
   "calendarEvents": {
     "create": {

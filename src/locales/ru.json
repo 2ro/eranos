@@ -981,10 +981,7 @@
     "ofGoal": "из цели {{amount}}",
     "donationCount_one": "{{count}} пожертвование",
     "donationCount_other": "{{count}} пожертвований",
-    "recentDonations": "Недавние пожертвования",
-    "seeAllDonations_one": "Увидеть все {{count}} пожертвование",
-    "openInWallet": "Открыть в кошельке",
-    "seeAllDonations_other": "Увидеть все {{count}} пожертвований"
+    "openInWallet": "Открыть в кошельке"
   },
   "calendarEvents": {
     "create": {

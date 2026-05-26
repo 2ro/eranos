@@ -971,10 +971,7 @@
     "ofGoal": "sur un objectif de {{amount}}",
     "donationCount_one": "{{count}} don",
     "donationCount_other": "{{count}} dons",
-    "recentDonations": "Dons récents",
-    "seeAllDonations_one": "Voir tous les {{count}} don",
-    "openInWallet": "Ouvrir dans le portefeuille",
-    "seeAllDonations_other": "Voir tous les {{count}} dons"
+    "openInWallet": "Ouvrir dans le portefeuille"
   },
   "calendarEvents": {
     "create": {

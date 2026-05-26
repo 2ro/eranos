@@ -549,10 +549,7 @@
     "ofGoal": "de la meta de {{amount}}",
     "donationCount_one": "{{count}} donación",
     "donationCount_other": "{{count}} donaciones",
-    "recentDonations": "Donaciones recientes",
-    "seeAllDonations_one": "Ver la {{count}} donación",
-    "openInWallet": "Abrir en la cartera",
-    "seeAllDonations_other": "Ver las {{count}} donaciones"
+    "openInWallet": "Abrir en la cartera"
   },
   "calendarEvents": {
     "create": {

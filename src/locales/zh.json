@@ -549,10 +549,7 @@
     "ofGoal": "目标 {{amount}}",
     "donationCount_one": "{{count}} 笔捐赠",
     "donationCount_other": "{{count}} 笔捐赠",
-    "recentDonations": "最近捐赠",
-    "seeAllDonations_one": "查看全部 {{count}} 笔捐赠",
-    "openInWallet": "在钱包中打开",
-    "seeAllDonations_other": "查看全部 {{count}} 笔捐赠"
+    "openInWallet": "在钱包中打开"
   },
   "calendarEvents": {
     "create": {

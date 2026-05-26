@@ -972,10 +972,7 @@
     "ofGoal": "of {{amount}} goal",
     "donationCount_one": "{{count}} donation",
     "donationCount_other": "{{count}} donations",
-    "recentDonations": "Recent donations",
-    "seeAllDonations_one": "See all {{count}} donation",
-    "openInWallet": "Open in wallet",
-    "seeAllDonations_other": "See all {{count}} donations"
+    "openInWallet": "Open in wallet"
   },
   "calendarEvents": {
     "create": {

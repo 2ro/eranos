@@ -981,10 +981,7 @@
     "ofGoal": "{{amount}} के लक्ष्य में से",
     "donationCount_one": "{{count}} डोनेशन",
     "donationCount_other": "{{count}} डोनेशन",
-    "recentDonations": "हाल के डोनेशन",
-    "seeAllDonations_one": "सभी {{count}} डोनेशन देखें",
-    "openInWallet": "वॉलेट में खोलें",
-    "seeAllDonations_other": "सभी {{count}} डोनेशन देखें"
+    "openInWallet": "वॉलेट में खोलें"
   },
   "calendarEvents": {
     "create": {

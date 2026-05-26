@@ -549,10 +549,7 @@
     "ofGoal": "目標 {{amount}}",
     "donationCount_one": "{{count}} 筆捐贈",
     "donationCount_other": "{{count}} 筆捐贈",
-    "recentDonations": "最近捐贈",
-    "seeAllDonations_one": "檢視全部 {{count}} 筆捐贈",
-    "openInWallet": "在錢包中開啟",
-    "seeAllDonations_other": "檢視全部 {{count}} 筆捐贈"
+    "openInWallet": "在錢包中開啟"
   },
   "calendarEvents": {
     "create": {

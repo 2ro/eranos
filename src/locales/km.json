@@ -549,10 +549,7 @@
     "ofGoal": "នៃគោលដៅ {{amount}}",
     "donationCount_one": "{{count}} ការបរិច្ចាគ",
     "donationCount_other": "{{count}} ការបរិច្ចាគ",
-    "recentDonations": "ការបរិច្ចាគថ្មីៗ",
-    "seeAllDonations_one": "មើលការបរិច្ចាគ {{count}} ទាំងអស់",
-    "openInWallet": "បើកក្នុងកាបូប",
-    "seeAllDonations_other": "មើលការបរិច្ចាគ {{count}} ទាំងអស់"
+    "openInWallet": "បើកក្នុងកាបូប"
   },
   "calendarEvents": {
     "create": {

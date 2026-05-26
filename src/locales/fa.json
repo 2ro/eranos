@@ -549,10 +549,7 @@
     "ofGoal": "از هدف {{amount}}",
     "donationCount_one": "{{count}} کمک",
     "donationCount_other": "{{count}} کمک",
-    "recentDonations": "کمک‌های اخیر",
-    "seeAllDonations_one": "نمایش همهٔ {{count}} کمک",
-    "openInWallet": "باز کردن در کیف پول",
-    "seeAllDonations_other": "نمایش همهٔ {{count}} کمک"
+    "openInWallet": "باز کردن در کیف پول"
   },
   "calendarEvents": {
     "create": {

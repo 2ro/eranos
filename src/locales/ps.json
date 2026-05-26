@@ -549,10 +549,7 @@
     "ofGoal": "د {{amount}} هدف څخه",
     "donationCount_one": "{{count}} مرسته",
     "donationCount_other": "{{count}} مرستې",
-    "recentDonations": "وروستۍ مرستې",
-    "seeAllDonations_one": "ټولې {{count}} مرستې وګورئ",
-    "openInWallet": "په بټوه کې پرانیزئ",
-    "seeAllDonations_other": "ټولې {{count}} مرستې وګورئ"
+    "openInWallet": "په بټوه کې پرانیزئ"
   },
   "calendarEvents": {
     "create": {

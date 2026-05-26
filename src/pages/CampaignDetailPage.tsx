@@ -69,7 +69,6 @@ import { satsToUSDWhole } from '@/lib/bitcoin';
 import { formatUsdGoal } from '@/lib/formatCampaignAmount';
 import { formatNumber } from '@/lib/formatNumber';
 import { sanitizeUrl } from '@/lib/sanitizeUrl';
-import { timeAgo } from '@/lib/timeAgo';
 import NotFound from './NotFound';
 
 interface CampaignDetailPageProps {
@@ -251,7 +250,6 @@ function CampaignDetailContent({ campaign }: { campaign: ParsedCampaign }) {
   const countryLabel = getCampaignCountryLabel(campaign);
   const raisedSats = stats?.totalSats ?? 0;
   const pendingSats = stats?.pendingSats ?? 0;
-  const confirmedByTxid = stats?.confirmedByTxid;
 
   const isCreator = user?.pubkey === campaign.pubkey;
   const naddr = useMemo(() => encodeCampaignNaddr(campaign), [campaign]);
@@ -328,14 +326,6 @@ function CampaignDetailContent({ campaign }: { campaign: ParsedCampaign }) {
     );
   };
 
-  /** Smooth-scroll the comments+donations list (which already includes
-   *  every donation receipt as a top-level node) into view. Used by the
-   *  donate column's "See all" affordance. */
-  const scrollToActivity = () => {
-    const el = document.getElementById('campaign-activity');
-    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  };
-
   // ── Donate column ──
   // Rendered twice in the JSX tree below: once inline under the hero on
   // mobile (`lg:hidden`), once as the sticky right column on desktop
@@ -349,10 +339,8 @@ function CampaignDetailContent({ campaign }: { campaign: ParsedCampaign }) {
       statsLoading={statsLoading}
       btcPrice={btcPrice}
       donations={donationReceipts}
-      confirmedByTxid={confirmedByTxid}
       deadline={deadline}
       onShare={handleShare}
-      onSeeAll={scrollToActivity}
     />
   );
 
@@ -967,16 +955,8 @@ interface DonateColumnProps {
   btcPrice: number | undefined;
   /** Aggregated kind 8333 donation events, newest first. */
   donations: NostrEvent[];
-  /**
-   * `txid → confirmed` lookup from the verified receipts. Undefined while
-   * verification is still in flight. Donor rows whose txid maps to `false`
-   * render a pending badge in place of the relative timestamp.
-   */
-  confirmedByTxid: Map<string, boolean> | undefined;
   deadline: { label: string; isPast: boolean } | null;
   onShare: () => void;
-  /** Scroll the inline activity list into view (donations + comments). */
-  onSeeAll: () => void;
 }
 
 function DonateColumn({
@@ -986,10 +966,8 @@ function DonateColumn({
   statsLoading,
   btcPrice,
   donations,
-  confirmedByTxid,
   deadline,
   onShare,
-  onSeeAll,
 }: DonateColumnProps) {
   const { t } = useTranslation();
   const ended = !!deadline?.isPast;
@@ -1087,28 +1065,6 @@ function DonateColumn({
             </Button>
           </div>
         )}
-
-        {/* Latest donors preview (on-chain only; SP campaigns hide all
-            donor signals by design). */}
-        {!isSilentPayment && donations.length > 0 && (
-          <div className="space-y-2 border-t border-border/60 pt-4">
-            <div className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-              {t('campaignsDetail.recentDonations')}
-            </div>
-            <DonorPreviewList
-              donations={donations}
-              btcPrice={btcPrice}
-              confirmedByTxid={confirmedByTxid}
-            />
-            <button
-              type="button"
-              onClick={onSeeAll}
-              className="w-full text-sm font-medium text-primary hover:underline motion-safe:transition-colors text-center pt-1"
-            >
-              {t('campaignsDetail.seeAllDonations', { count: donations.length })}
-            </button>
-          </div>
-        )}
       </CardContent>
     </Card>
   );
@@ -1118,53 +1074,6 @@ function DonateColumn({
 function raisedUsd(sats: number, btcPrice: number | undefined): number | undefined {
   if (!btcPrice || !Number.isFinite(btcPrice) || btcPrice <= 0) return undefined;
   return (sats / 100_000_000) * btcPrice;
-}
-
-/** Compact donor list: monogram, amount, relative time. Shows up to the
- *  first 5 entries; the parent surfaces the rest via "See all". Rows whose
- *  underlying Bitcoin tx is still in the mempool render a pending badge in
- *  place of the relative timestamp — mirrors the wallet's tx list. */
-function DonorPreviewList({
-  donations,
-  btcPrice,
-  confirmedByTxid,
-}: {
-  donations: NostrEvent[];
-  btcPrice: number | undefined;
-  confirmedByTxid: Map<string, boolean> | undefined;
-}) {
-  const preview = donations.slice(0, 5);
-  return (
-    <ul className="space-y-2">
-      {preview.map((ev) => {
-        const amountTag = ev.tags.find(([n]) => n === 'amount')?.[1];
-        const sats = amountTag ? Number(amountTag) : 0;
-        const txid = ev.tags
-          .find(([n]) => n === 'i')?.[1]
-          ?.replace(/^bitcoin:tx:/, '');
-        const confirmed = txid ? confirmedByTxid?.get(txid) : undefined;
-        // `false` means the verifier confirmed the tx is unconfirmed.
-        // `undefined` means we haven't verified yet (or txid is missing) —
-        // don't show pending in that case to avoid flashing on load.
-        const isPending = confirmed === false;
-        return (
-          <li key={ev.id} className="flex items-center gap-3 text-sm">
-            <div className="size-8 shrink-0 rounded-full bg-primary/15 text-primary flex items-center justify-center">
-              <HandHeart className="size-4" />
-            </div>
-            <div className="min-w-0 flex-1">
-              <div className="font-semibold truncate">
-                {formatSatsFull(sats, btcPrice)}
-              </div>
-              <div className="text-xs text-muted-foreground">
-                {isPending ? <PendingBadge /> : timeAgo(ev.created_at)}
-              </div>
-            </div>
-          </li>
-        );
-      })}
-    </ul>
-  );
 }
 
 // ─────────────────────────────────────────────────────────────────────

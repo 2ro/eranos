@@ -537,10 +537,7 @@
     "ofGoal": "من هدف {{amount}}",
     "donationCount_one": "{{count}} تبرع",
     "donationCount_other": "{{count}} تبرعات",
-    "recentDonations": "التبرعات الأخيرة",
-    "seeAllDonations_one": "عرض {{count}} تبرع",
-    "openInWallet": "فتح في المحفظة",
-    "seeAllDonations_other": "عرض جميع {{count}} تبرع"
+    "openInWallet": "فتح في المحفظة"
   },
   "calendarEvents": {
     "create": {

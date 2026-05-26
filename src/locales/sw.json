@@ -980,10 +980,7 @@
     "ofGoal": "kati ya lengo la {{amount}}",
     "donationCount_one": "mchango {{count}}",
     "donationCount_other": "michango {{count}}",
-    "recentDonations": "Michango ya hivi karibuni",
-    "seeAllDonations_one": "Tazama mchango wote {{count}}",
-    "openInWallet": "Fungua katika pochi",
-    "seeAllDonations_other": "Tazama michango yote {{count}}"
+    "openInWallet": "Fungua katika pochi"
   },
   "calendarEvents": {
     "create": {
