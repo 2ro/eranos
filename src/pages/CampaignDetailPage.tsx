@@ -474,7 +474,7 @@ function CampaignDetailContent({ campaign }: { campaign: ParsedCampaign }) {
               <CampaignActivityTabs
                 campaign={campaign}
                 commentsTab={
-                  <CommentsSection>
+                  <CommentsSection className="mt-0">
                     <DetailCommentComposer
                       event={campaign.event}
                       onSuccess={() => queryClient.invalidateQueries({ queryKey: ['nostr', 'comments'] })}
@@ -669,8 +669,10 @@ function CampaignActivityTabs({
           rounding. The baseline `border-b border-primary/20` runs the
           full width of the panel below, and each trigger draws a
           thicker primary under-rule when active so the active tab
-          "owns" the panel surface below it. */}
-      <TabsList className="h-auto w-full justify-start gap-1 rounded-none border-b border-primary/20 bg-transparent p-0">
+          "owns" the panel surface below it. `gap-8` gives each label
+          room to breathe so they read as separate section headers
+          rather than a packed control. */}
+      <TabsList className="h-auto w-full justify-start gap-8 rounded-none border-b border-primary/20 bg-transparent p-0">
         <CampaignActivityTabTrigger value="comments">
           {t('campaignsDetail.tabComments')}
         </CampaignActivityTabTrigger>
@@ -679,14 +681,14 @@ function CampaignActivityTabs({
         </CampaignActivityTabTrigger>
       </TabsList>
 
-      <TabsContent value="comments" className="mt-0">
-        {/* The wrapped CommentsSection's outer `mt-4` would re-introduce a
-            gap between the tab strip and the panel surface — undo it so
-            the panel sits flush under the active tab's under-rule. */}
-        <div className="-mt-4">{commentsTab}</div>
+      {/* TabsContent's own `mt-4` puts a comfortable 16px gap between the
+          tab strip's baseline and the rounded panel below — without it,
+          the panel's rounded top corners visually overlap the under-rule. */}
+      <TabsContent value="comments" className="mt-4">
+        {commentsTab}
       </TabsContent>
 
-      <TabsContent value="ledger" className="mt-0">
+      <TabsContent value="ledger" className="mt-4">
         <CampaignLedger address={onchainAddress} />
       </TabsContent>
     </Tabs>
