@@ -202,11 +202,20 @@ function WalletBalancePill() {
   return (
     <Link
       to="/wallet"
-      className="shrink-0 inline-flex items-center font-bold text-lg tracking-tight text-primary rounded-md px-1 hover:bg-primary/10 motion-safe:transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+      className="shrink-0 inline-flex items-center text-primary rounded-md px-1 hover:bg-primary/10 motion-safe:transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
       aria-label={t('nav.wallet')}
       title={t('nav.wallet')}
     >
-      <span className="tabular-nums">{satsToUSD(totalBalance, btcPrice)}</span>
+      <span
+        className="font-display font-normal tracking-wide leading-none uppercase text-xl inline-block tabular-nums"
+        style={{
+          WebkitTextStroke: '0.022em currentColor',
+          transform: 'skewX(-6deg) scaleX(1.1)',
+          transformOrigin: '0 100%',
+        }}
+      >
+        {satsToUSD(totalBalance, btcPrice)}
+      </span>
     </Link>
   );
 }

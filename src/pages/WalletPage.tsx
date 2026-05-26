@@ -170,8 +170,17 @@ export function WalletPage() {
             aria-label={t('wallet.refreshBalance')}
             title={t('wallet.refreshBalanceTitle')}
           >
-            <span className="text-4xl font-bold tracking-tight group-hover:opacity-80 transition-opacity flex items-center gap-2">
-              {btcPrice ? satsToUSD(totalBalance, btcPrice) : '---'}
+            <span className="flex items-center gap-2 text-primary group-hover:opacity-80 transition-opacity">
+              <span
+                className="font-display font-normal tracking-wide leading-none uppercase text-5xl inline-block tabular-nums"
+                style={{
+                  WebkitTextStroke: '0.022em currentColor',
+                  transform: 'skewX(-6deg) scaleX(1.1)',
+                  transformOrigin: '0 100%',
+                }}
+              >
+                {btcPrice ? satsToUSD(totalBalance, btcPrice) : '---'}
+              </span>
               {isFetching && (
                 <RefreshCw className="size-5 animate-spin text-muted-foreground" />
               )}
