@@ -155,9 +155,21 @@ export function CreateCampaignPage() {
    *
    * Without nsec access the dropdown is hidden entirely; the user
    * sees only the two custom inputs.
+   *
+   * Both fields are seeded from the synchronously-available HD-wallet
+   * availability on first render so the dropdown opens already showing
+   * the user's Agora wallet (and the matching `mineAccept` choice)
+   * instead of the empty "Choose a wallet" placeholder. The effect
+   * below still re-runs on availability changes for the edge case
+   * where the hook resolves a tick later, but the common nsec-login
+   * path no longer flickers through `'custom'` on mount.
    */
-  const [walletSource, setWalletSource] = useState<'mine' | 'custom'>('custom');
-  const [mineAccept, setMineAccept] = useState<'all' | 'public' | 'private'>('all');
+  const [walletSource, setWalletSource] = useState<'mine' | 'custom'>(
+    () => (hdWalletAvailable ? 'mine' : 'custom'),
+  );
+  const [mineAccept, setMineAccept] = useState<'all' | 'public' | 'private'>(
+    () => (hdWalletAvailable && !silentPaymentSupported ? 'public' : 'all'),
+  );
   const [customOnchain, setCustomOnchain] = useState('');
   const [customSp, setCustomSp] = useState('');
   const [goalUsd, setGoalUsd] = useState('');
