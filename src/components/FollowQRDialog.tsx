@@ -27,7 +27,10 @@ export function FollowQRDialog({ open, onOpenChange }: FollowQRDialogProps) {
   const npub = user ? nip19.npubEncode(user.pubkey) : '';
   const nip05 = metadata?.nip05?.trim();
   const followIdentifier = nip05 || npub;
-  const followUrl = followIdentifier ? `${shareOrigin}/follow/${followIdentifier}` : '';
+  // Route to the bare /:nip19 path — Agora's universal NIP-19 / NIP-05 dispatcher
+  // (src/pages/NIP19Page.tsx) resolves both npub and `user@domain.com` to ProfilePage.
+  // There is no `/follow/...` route, so anything nested under it 404s.
+  const followUrl = followIdentifier ? `${shareOrigin}/${followIdentifier}` : '';
 
   const handleCopy = async () => {
     try {
