@@ -23,6 +23,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { CountryFlag } from '@/components/CountryFlag';
 import { useToast } from '@/hooks/useToast';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
@@ -254,7 +255,14 @@ export function OrganizersManager() {
                 <SelectContent>
                   {countries.map((country) => (
                     <SelectItem key={country.code} value={country.code}>
-                      {country.flag} {country.name}
+                      <span className="inline-flex items-center gap-2">
+                        <CountryFlag
+                          code={country.code}
+                          emoji={country.flag}
+                          label={`Flag of ${country.name}`}
+                        />
+                        {country.name}
+                      </span>
                     </SelectItem>
                   ))}
                 </SelectContent>

@@ -15,6 +15,7 @@ import {
 } from 'lucide-react';
 
 import { CoverImageField } from '@/components/CoverImageField';
+import { CountryFlag } from '@/components/CountryFlag';
 import { FormSection } from '@/components/FormSection';
 import { OrganizationContextChip } from '@/components/OrganizationContextChip';
 import { TimezoneSwitcher } from '@/components/TimezoneSwitcher';
@@ -31,7 +32,7 @@ import { useManageableOrganizations } from '@/hooks/useManageableOrganizations';
 import { useNostrPublish } from '@/hooks/useNostrPublish';
 import { useToast } from '@/hooks/useToast';
 import { usdToSats } from '@/lib/bitcoin';
-import { COUNTRIES, searchCountries, type CountryEntry } from '@/lib/countries';
+import { getCountryInfo, searchCountries, type CountryEntry } from '@/lib/countries';
 import { parseContentTagInput } from '@/lib/contentTags';
 import { createCountryIdentifier } from '@/lib/countryIdentifiers';
 import { getTodayDateInput } from '@/lib/dateInput';
@@ -87,7 +88,7 @@ export function CreateActionPage() {
   const [coverImage, setCoverImage] = useState<string>('');
   const [coverUploading, setCoverUploading] = useState(false);
   const [countryCode, setCountryCode] = useState(pageCountryCode);
-  const [countryQuery, setCountryQuery] = useState(pageCountryCode ? (COUNTRIES[pageCountryCode]?.name ?? pageCountryCode) : '');
+  const [countryQuery, setCountryQuery] = useState(pageCountryCode ? (getCountryInfo(pageCountryCode)?.subdivisionName ?? getCountryInfo(pageCountryCode)?.name ?? pageCountryCode) : '');
   // Effective org coordinate to attach on publish. Sourced only from the
   // URL — never editable inside the form. Drops to '' when the user
   // isn't authorized for the param's org.
@@ -293,8 +294,9 @@ export function CreateActionPage() {
               selectedCode={countryCode}
               onQueryChange={(value) => {
                 setCountryQuery(value);
-                const selectedCountry = countryCode ? COUNTRIES[countryCode] : undefined;
-                if (selectedCountry && value !== selectedCountry.name && value.toUpperCase() !== countryCode) {
+                const selectedCountry = countryCode ? getCountryInfo(countryCode) : undefined;
+                const selectedName = selectedCountry?.subdivisionName ?? selectedCountry?.name;
+                if (selectedCountry && value !== selectedName && value.toUpperCase() !== countryCode) {
                   setCountryCode('');
                 }
               }}
@@ -447,7 +449,7 @@ function CountrySelect({
   const { t } = useTranslation();
   const [open, setOpen] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(0);
-  const selectedCountry = selectedCode ? COUNTRIES[selectedCode] : undefined;
+  const selectedCountry = selectedCode ? getCountryInfo(selectedCode) : undefined;
   const results = useMemo(() => searchCountries(query), [query]);
   const showResults = open && results.length > 0;
 
@@ -523,8 +525,13 @@ function CountrySelect({
                   index === selectedIndex && 'bg-secondary/60',
                 )}
               >
-                <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-secondary text-lg leading-none" role="img" aria-label={t('pledges.create.flagOfAria', { name: country.name })}>
-                  {country.flag}
+                <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-secondary leading-none">
+                  <CountryFlag
+                    code={country.code}
+                    emoji={country.flag}
+                    label={t('pledges.create.flagOfAria', { name: country.name })}
+                    className="text-lg"
+                  />
                 </span>
                 <span className="min-w-0 flex-1">
                   <span className="block truncate text-sm font-semibold">{country.name}</span>

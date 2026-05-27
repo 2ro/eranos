@@ -3,7 +3,8 @@ import { MapPin, X } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
 import { Input } from '@/components/ui/input';
-import { COUNTRIES, searchCountries, type CountryEntry } from '@/lib/countries';
+import { CountryFlag } from '@/components/CountryFlag';
+import { getCountryInfo, searchCountries, type CountryEntry } from '@/lib/countries';
 import { cn } from '@/lib/utils';
 
 interface CountrySelectProps {
@@ -28,7 +29,7 @@ export function CountrySelect({
   const { t } = useTranslation();
   const [open, setOpen] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(0);
-  const selectedCountry = selectedCode ? COUNTRIES[selectedCode] : undefined;
+  const selectedCountry = selectedCode ? getCountryInfo(selectedCode) : undefined;
   const results = useMemo(() => searchCountries(query), [query]);
   const showResults = open && results.length > 0;
   const resultsId = `${id}-results`;
@@ -105,8 +106,13 @@ export function CountrySelect({
                   index === selectedIndex && 'bg-secondary/60',
                 )}
               >
-                <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-secondary text-lg leading-none" role="img" aria-label={`Flag of ${country.name}`}>
-                  {country.flag}
+                <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-secondary leading-none">
+                  <CountryFlag
+                    code={country.code}
+                    emoji={country.flag}
+                    label={`Flag of ${country.name}`}
+                    className="text-lg"
+                  />
                 </span>
                 <span className="min-w-0 flex-1">
                   <span className="block truncate text-sm font-semibold">{country.name}</span>

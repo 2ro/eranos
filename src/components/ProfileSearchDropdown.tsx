@@ -5,6 +5,7 @@ import { nip19 } from 'nostr-tools';
 import { Input } from '@/components/ui/input';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { EmojifiedText } from '@/components/CustomEmoji';
+import { CountryFlag } from '@/components/CountryFlag';
 import { useSearchProfiles, type SearchProfile } from '@/hooks/useSearchProfiles';
 import { genUserName } from '@/lib/genUserName';
 import { useNip05Verify } from '@/hooks/useNip05Verify';
@@ -818,9 +819,12 @@ function CountryItem({
       onMouseDown={(e) => e.preventDefault()}
     >
       <div className="size-10 shrink-0 rounded-full bg-secondary flex items-center justify-center">
-        <span className="text-lg leading-none" role="img" aria-label={`Flag of ${country.name}`}>
-          {country.flag}
-        </span>
+        <CountryFlag
+          code={country.code}
+          emoji={country.flag}
+          label={`Flag of ${country.name}`}
+          className="text-lg"
+        />
       </div>
       <div className="flex-1 min-w-0">
         <span className="font-semibold text-sm truncate">{country.name}</span>

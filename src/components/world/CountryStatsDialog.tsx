@@ -7,7 +7,8 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { CommunityStatsPanel } from '@/components/CommunityStatsPanel';
-import { COUNTRIES } from '@/lib/countries';
+import { CountryFlag } from '@/components/CountryFlag';
+import { getCountryInfo } from '@/lib/countries';
 
 interface CountryStatsDialogProps {
   /** ISO 3166-1 alpha-2 country code (e.g. `VE`). */
@@ -31,8 +32,8 @@ interface CountryStatsDialogProps {
  * trigger inside a dropdown menu without rendering two visible affordances.
  */
 export function CountryStatsDialog({ countryCode, open, onOpenChange }: CountryStatsDialogProps) {
-  const country = COUNTRIES[countryCode.toUpperCase()];
-  const countryName = country?.name ?? countryCode;
+  const country = getCountryInfo(countryCode);
+  const countryName = country?.subdivisionName ?? country?.name ?? countryCode;
   const flag = country?.flag ?? '';
 
   return (
@@ -43,13 +44,12 @@ export function CountryStatsDialog({ countryCode, open, onOpenChange }: CountryS
         <DialogHeader className="px-4 pt-5 pb-3 border-b border-border/40">
           <DialogTitle className="flex items-center gap-2 text-base">
             {flag ? (
-              <span
-                className="text-lg leading-none"
-                role="img"
-                aria-label={`Flag of ${countryName}`}
-              >
-                {flag}
-              </span>
+              <CountryFlag
+                code={countryCode}
+                emoji={flag}
+                label={`Flag of ${countryName}`}
+                className="text-lg"
+              />
             ) : (
               <Trophy className="size-4 text-primary shrink-0" />
             )}

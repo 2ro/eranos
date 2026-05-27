@@ -38,6 +38,7 @@ import { EmojiShortcodeAutocomplete } from '@/components/EmojiShortcodeAutocompl
 import { StickerPicker } from '@/components/StickerPicker';
 
 import { NoteContent } from '@/components/NoteContent';
+import { CountryFlag } from '@/components/CountryFlag';
 
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useNostrPublish } from '@/hooks/useNostrPublish';
@@ -1552,9 +1553,15 @@ export function ComposeBox({
                 {/* Show just the flag in the trigger to keep the row
                     compact on mobile. The list items below carry the
                     country name so users can still tell them apart. */}
-                <span aria-hidden="true">
-                  {selectedCountryInfo?.flag ?? '🌍'}
-                </span>
+                {selectedCountryCode && selectedCountryInfo ? (
+                  <CountryFlag
+                    code={selectedCountryCode}
+                    emoji={selectedCountryInfo.flag}
+                    label={`Flag of ${selectedCountryInfo.subdivisionName ?? selectedCountryInfo.name}`}
+                  />
+                ) : (
+                  <span aria-hidden="true">🌍</span>
+                )}
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="min-w-[240px]">
                 <DropdownMenuItem
@@ -1595,8 +1602,12 @@ export function ComposeBox({
                         className="cursor-pointer"
                       >
                         <span className="inline-flex items-center gap-2 flex-1">
-                          <span aria-hidden="true">{info.flag}</span>
-                          <span>{info.name}</span>
+                          <CountryFlag
+                            code={code}
+                            emoji={info.flag}
+                            label={`Flag of ${info.subdivisionName ?? info.name}`}
+                          />
+                          <span>{info.subdivisionName ?? info.name}</span>
                         </span>
                         {destination === code && (
                           <Check className="size-4 text-primary" aria-hidden />
@@ -1683,7 +1694,12 @@ export function ComposeBox({
                         setCountryPickerOpen(false);
                       }}
                     >
-                      <span aria-hidden="true" className="mr-2">{country.flag}</span>
+                      <CountryFlag
+                        code={country.code}
+                        emoji={country.flag}
+                        label={`Flag of ${country.name}`}
+                        className="mr-2"
+                      />
                       <span>{country.name}</span>
                       <span className="ml-2 text-xs text-muted-foreground">{country.code}</span>
                       {destination === country.code && (

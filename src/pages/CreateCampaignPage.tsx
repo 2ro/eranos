@@ -17,6 +17,7 @@ import {
 } from 'lucide-react';
 
 import { CoverImageField } from '@/components/CoverImageField';
+import { CountryFlag } from '@/components/CountryFlag';
 import { FormSection } from '@/components/FormSection';
 import { OrganizationContextChip } from '@/components/OrganizationContextChip';
 import { LoginArea } from '@/components/auth/LoginArea';
@@ -54,7 +55,7 @@ import { genUserName } from '@/lib/genUserName';
 import { createOrganizationAssociationTags, decodeOrganizationParam } from '@/lib/organizationContext';
 import { sanitizeUrl } from '@/lib/sanitizeUrl';
 import { withAgoraTag } from '@/lib/agoraNoteTags';
-import { COUNTRIES, searchCountries, type CountryEntry } from '@/lib/countries';
+import { getCountryInfo, searchCountries, type CountryEntry } from '@/lib/countries';
 import { getEditableContentTags, parseContentTagInput } from '@/lib/contentTags';
 import { createCountryIdentifier } from '@/lib/countryIdentifiers';
 import { cn } from '@/lib/utils';
@@ -281,7 +282,7 @@ export function CreateCampaignPage() {
     setDeadline(formatDateInput(editCampaign.deadline));
     const editCountryCode = editCampaign.countryCode ?? '';
     setCountryCode(editCountryCode);
-    setCountryQuery(editCountryCode ? COUNTRIES[editCountryCode]?.name ?? editCountryCode : '');
+    setCountryQuery(editCountryCode ? (getCountryInfo(editCountryCode)?.subdivisionName ?? getCountryInfo(editCountryCode)?.name ?? editCountryCode) : '');
     setTagInput(getEditableContentTags(editCampaign.event.tags).join(', '));
     const existingOrgATag = editCampaign.event.tags.find(
       ([n, v]) => n === 'A' && typeof v === 'string' && v.startsWith('34550:'),
@@ -692,8 +693,9 @@ export function CreateCampaignPage() {
               selectedCode={countryCode}
               onQueryChange={(value) => {
                 setCountryQuery(value);
-                const selectedCountry = countryCode ? COUNTRIES[countryCode] : undefined;
-                if (selectedCountry && value !== selectedCountry.name && value.toUpperCase() !== countryCode) {
+                const selectedCountry = countryCode ? getCountryInfo(countryCode) : undefined;
+                const selectedName = selectedCountry?.subdivisionName ?? selectedCountry?.name;
+                if (selectedCountry && value !== selectedName && value.toUpperCase() !== countryCode) {
                   setCountryCode('');
                 }
               }}
@@ -1058,7 +1060,7 @@ function CountrySelect({
   const { t } = useTranslation();
   const [open, setOpen] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(0);
-  const selectedCountry = selectedCode ? COUNTRIES[selectedCode] : undefined;
+  const selectedCountry = selectedCode ? getCountryInfo(selectedCode) : undefined;
   const results = useMemo(() => searchCountries(query), [query]);
   const showResults = open && results.length > 0;
 
@@ -1134,8 +1136,13 @@ function CountrySelect({
                   index === selectedIndex && 'bg-secondary/60',
                 )}
               >
-                <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-secondary text-lg leading-none" role="img" aria-label={t('campaignsCreate.flagOfAria', { name: country.name })}>
-                  {country.flag}
+                <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-secondary leading-none">
+                  <CountryFlag
+                    code={country.code}
+                    emoji={country.flag}
+                    label={t('campaignsCreate.flagOfAria', { name: country.name })}
+                    className="text-lg"
+                  />
                 </span>
                 <span className="min-w-0 flex-1">
                   <span className="block truncate text-sm font-semibold">{country.name}</span>

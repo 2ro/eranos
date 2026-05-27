@@ -41,7 +41,7 @@ import { useNotificationPreview } from '@/hooks/useNotificationPreview';
 import { useUserOrganizations, type UserOrganization } from '@/hooks/useUserOrganizations';
 
 import { satsToUSD, formatBTC } from '@/lib/bitcoin';
-import { COUNTRIES } from '@/lib/countries';
+import { getCountryInfo } from '@/lib/countries';
 import { getDisplayName } from '@/lib/genUserName';
 import { sanitizeUrl } from '@/lib/sanitizeUrl';
 import { cn } from '@/lib/utils';
@@ -533,8 +533,8 @@ function CountriesSection({
       ) : followedCountries.length > 0 ? (
         <div className="flex gap-2 flex-wrap pb-1">
           {followedCountries.map((code) => {
-            const info = COUNTRIES[code];
-            const name = info?.name ?? code;
+            const info = getCountryInfo(code);
+            const name = info?.subdivisionName ?? info?.name ?? code;
             const flag = info?.flag ?? '';
 
             return (

@@ -12,6 +12,7 @@ import {
   CommandList,
 } from '@/components/ui/command';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { CountryFlag } from '@/components/CountryFlag';
 import { countryCodeToFlag, getAllCountries } from '@/lib/countries';
 import { cn } from '@/lib/utils';
 
@@ -71,7 +72,12 @@ export function CountryPickerButton({ value, onChange, className }: CountryPicke
           aria-label={t('common.countryFilterAriaLabel')}
         >
           {value ? (
-            <span className="text-2xl leading-none">{countryCodeToFlag(value)}</span>
+            <CountryFlag
+              code={value}
+              emoji={countryCodeToFlag(value)}
+              label={t('common.countryFilterAriaLabel')}
+              className="text-2xl"
+            />
           ) : (
             <Globe className="h-5 w-5 text-primary" />
           )}
@@ -93,7 +99,16 @@ export function CountryPickerButton({ value, onChange, className }: CountryPicke
                   }}
                   className="gap-2"
                 >
-                  <span>{option.flag}</span>
+                  {option.value === 'global' ? (
+                    <span className="text-base leading-none">{option.flag}</span>
+                  ) : (
+                    <CountryFlag
+                      code={option.value}
+                      emoji={option.flag}
+                      label={`Flag of ${option.label}`}
+                      className="text-base"
+                    />
+                  )}
                   <span className="flex-1">{option.label}</span>
                   <Check
                     className={cn(

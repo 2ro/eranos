@@ -95,6 +95,7 @@ export const COUNTRIES: Record<string, { name: string; flag: string }> = {
   KZ: { name: 'Kazakhstan', flag: '🇰🇿' },
   KE: { name: 'Kenya', flag: '🇰🇪' },
   KI: { name: 'Kiribati', flag: '🇰🇮' },
+  XK: { name: 'Kosovo', flag: '🌍' },
   KP: { name: 'North Korea', flag: '🇰🇵' },
   KR: { name: 'South Korea', flag: '🇰🇷' },
   KW: { name: 'Kuwait', flag: '🇰🇼' },
@@ -199,15 +200,30 @@ export const COUNTRIES: Record<string, { name: string; flag: string }> = {
   VA: { name: 'Vatican City', flag: '🇻🇦' },
   VE: { name: 'Venezuela', flag: '🇻🇪' },
   VN: { name: 'Vietnam', flag: '🇻🇳' },
+  EH: { name: 'Western Sahara', flag: '🇪🇭' },
   YE: { name: 'Yemen', flag: '🇾🇪' },
   ZM: { name: 'Zambia', flag: '🇿🇲' },
   ZW: { name: 'Zimbabwe', flag: '🇿🇼' },
 };
 
 /** Pre-sorted array of country entries for searching. */
-export const COUNTRY_LIST = Object.entries(COUNTRIES)
-  .map(([code, { name, flag }]) => ({ code, name, flag }))
-  .sort((a, b) => a.name.localeCompare(b.name));
+export const COUNTRY_LIST = (() => {
+  const base = Object.entries(COUNTRIES).map(([code, { name, flag }]) => ({ code, name, flag }));
+
+  // Promote a handful of ISO 3166-2 subdivisions to country-level entries
+  // in the search list. These are editorial choices to surface places that
+  // are commonly thought of as countries but lack their own ISO 3166-1
+  // code. The on-wire identifier stays `iso3166:CC-XX` so we don't fork
+  // a parallel addressing scheme — only the picker pretends.
+  const promoted: { code: string; name: string; flag: string }[] = [
+    // Tibet (CN-XZ) — bundled Snow Lion SVG renders via CountryFlag; the
+    // `flag` field here is the text fallback for raw-text consumers, so
+    // we use the parent-country emoji rather than nothing.
+    { code: 'CN-XZ', name: 'Tibet', flag: '🇨🇳' },
+  ];
+
+  return [...base, ...promoted].sort((a, b) => a.name.localeCompare(b.name));
+})();
 
 export type CountryEntry = typeof COUNTRY_LIST[number];
 
@@ -390,15 +406,15 @@ export function isValidGeoCode(code: string): boolean {
 // ---------------------------------------------------------------------------
 
 /**
- * Return the list of ISO 3166-1 countries Agora knows about, sorted
- * alphabetically by English name. Pathos exposes a localized variant — Agora
- * is currently English-only so the `lang` argument is ignored. Kept for
- * call-site compatibility with ports.
+ * Return the list of countries Agora surfaces for picker UIs, sorted
+ * alphabetically by English name. Mirrors {@link COUNTRY_LIST} (which
+ * also includes editorially promoted ISO 3166-2 entries like Tibet).
+ * Pathos exposes a localized variant — Agora is currently English-only
+ * so the `lang` argument is ignored. Kept for call-site compatibility
+ * with ports.
  */
 export function getAllCountries(_lang?: string): { code: string; name: string; flag: string }[] {
-  return Object.entries(COUNTRIES)
-    .map(([code, info]) => ({ code, name: info.name, flag: info.flag }))
-    .sort((a, b) => a.name.localeCompare(b.name));
+  return COUNTRY_LIST.map(({ code, name, flag }) => ({ code, name, flag }));
 }
 
 /**
@@ -428,6 +444,11 @@ export function countryCodeToFlag(code: string): string {
   const upper = code.toUpperCase();
   const parentCode = upper.includes('-') ? upper.split('-')[0] : upper;
   if (!/^[A-Z]{2}$/.test(parentCode)) return '';
+  // Honour explicit overrides first — covers user-assigned codes like
+  // Kosovo (`XK`) whose regional-indicator sequence has no associated
+  // Unicode flag glyph and would otherwise render as raw letters.
+  const explicit = COUNTRIES[parentCode]?.flag;
+  if (explicit) return explicit;
   // Regional indicator symbols start at U+1F1E6 (🇦); A=0x41.
   return parentCode
     .split('')
