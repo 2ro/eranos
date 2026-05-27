@@ -430,7 +430,7 @@ function CampaignDetailContent({ campaign }: { campaign: ParsedCampaign }) {
                       <Trans
                         i18nKey="campaignsDetail.repost"
                         count={engagementStats.reposts}
-                        values={{ count: formatNumber(engagementStats.reposts) }}
+                        values={{ formattedCount: formatNumber(engagementStats.reposts) }}
                         components={{ 0: <span className="font-bold text-foreground" /> }}
                       />
                     </button>
@@ -443,7 +443,7 @@ function CampaignDetailContent({ campaign }: { campaign: ParsedCampaign }) {
                       <Trans
                         i18nKey="campaignsDetail.quote"
                         count={engagementStats.quotes}
-                        values={{ count: formatNumber(engagementStats.quotes) }}
+                        values={{ formattedCount: formatNumber(engagementStats.quotes) }}
                         components={{ 0: <span className="font-bold text-foreground" /> }}
                       />
                     </button>
@@ -456,7 +456,7 @@ function CampaignDetailContent({ campaign }: { campaign: ParsedCampaign }) {
                       <Trans
                         i18nKey="campaignsDetail.like"
                         count={engagementStats.reactions}
-                        values={{ count: formatNumber(engagementStats.reactions) }}
+                        values={{ formattedCount: formatNumber(engagementStats.reactions) }}
                         components={{ 0: <span className="font-bold text-foreground" /> }}
                       />
                     </button>
