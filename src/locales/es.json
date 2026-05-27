@@ -832,8 +832,7 @@
       "description": "Comparte una dirección para recibir bitcoin.",
       "addressIndex": "Dirección n.º {{index}}",
       "newAddress": "Nueva dirección",
-      "scanForNew": "Buscar nuevos pagos",
-      "scanForPayments": "Buscar pagos"
+      "scanForNew": "Comprobar nuevos pagos"
     },
     "tx": {
       "pending": "Pendiente",
@@ -1107,8 +1106,24 @@
     "iUnderstand": "Entiendo que esta transacción es pública."
   },
   "spScan": {
-    "title": "Buscar pagos silenciosos",
+    "title": "Comprobar nuevos pagos",
+    "subtitle": "Escanea la cadena de bloques en busca de pagos privados",
+    "descriptionHelp": "Más información",
     "description": "Recorre el indexador BIP-352 configurado bloque por bloque para detectar pagos silenciosos entrantes.",
+    "since": "Desde",
+    "preset": {
+      "lastHour": "Última hora",
+      "last3h": "Últimas 3 horas",
+      "last24h": "Últimas 24 horas",
+      "lastWeek": "Última semana",
+      "lastMonth": "Último mes",
+      "custom": "Personalizado…"
+    },
+    "customHours": "Horas",
+    "customHoursPlaceholder": "p. ej. 12",
+    "advanced": "Avanzado",
+    "connectingIndexer": "Conectando con el indexador…",
+    "upToDate": "Ya estás al día.",
     "fromBlock": "Desde el bloque",
     "indexerTip": "Tope del indexador",
     "lastFullyScanned": "Último escaneo completo",
@@ -1123,6 +1138,10 @@
     "foundOutputs_other": "Se encontraron {{count}} salidas nuevas.",
     "noNewPayments": "Sin pagos nuevos.",
     "startScan": "Iniciar escaneo",
+    "resolveFailed": {
+      "title": "No se pudo consultar el bloque inicial",
+      "description": "mempool.space no está disponible en este momento. Introduce un bloque inicial en Avanzado → Desde el bloque para escanear de todos modos."
+    },
     "reconcile": {
       "title": "Reconciliar UTXOs gastados",
       "description": "Comprueba cada UTXO de pago silencioso almacenado contra Blockbook y elimina los que ya se hayan gastado. Úsalo si el saldo es mayor de lo que debería ser tras un envío.",

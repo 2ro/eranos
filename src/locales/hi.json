@@ -1264,8 +1264,7 @@
       "description": "Bitcoin पाने के लिए एक एड्रेस शेयर करें।",
       "addressIndex": "एड्रेस #{{index}}",
       "newAddress": "नया एड्रेस",
-      "scanForNew": "नए भुगतान के लिए scan करें",
-      "scanForPayments": "भुगतान के लिए scan करें"
+      "scanForNew": "नए भुगतानों की जाँच करें"
     },
     "tx": {
       "pending": "पेंडिंग",
@@ -1475,8 +1474,24 @@
     "iUnderstand": "मैं समझता/समझती हूँ कि यह transaction सार्वजनिक है।"
   },
   "spScan": {
-    "title": "साइलेंट पेमेंट के लिए scan करें",
+    "title": "नए भुगतानों की जाँच करें",
+    "subtitle": "निजी भुगतानों के लिए blockchain स्कैन करें",
+    "descriptionHelp": "अधिक जानकारी",
     "description": "आने वाले साइलेंट पेमेंट का पता लगाने के लिए कॉन्फ़िगर किए गए BIP-352 indexer को block-by-block चलाता है।",
+    "since": "के बाद से",
+    "preset": {
+      "lastHour": "पिछला एक घंटा",
+      "last3h": "पिछले 3 घंटे",
+      "last24h": "पिछले 24 घंटे",
+      "lastWeek": "पिछला हफ़्ता",
+      "lastMonth": "पिछला महीना",
+      "custom": "कस्टम…"
+    },
+    "customHours": "घंटे",
+    "customHoursPlaceholder": "उदा. 12",
+    "advanced": "उन्नत",
+    "connectingIndexer": "Indexer से जुड़ रहे हैं…",
+    "upToDate": "आप पहले से ही अप टू डेट हैं।",
     "fromBlock": "किस block से",
     "indexerTip": "Indexer tip",
     "lastFullyScanned": "आख़िरी पूरी तरह scan किया गया",
@@ -1491,6 +1506,10 @@
     "foundOutputs_other": "{{count}} नए outputs मिले।",
     "noNewPayments": "कोई नया भुगतान नहीं।",
     "startScan": "Scan शुरू करें",
+    "resolveFailed": {
+      "title": "शुरुआती block का पता नहीं चल सका",
+      "description": "mempool.space अभी पहुँच से बाहर है। फिर भी scan करने के लिए उन्नत → किस block से के तहत एक शुरुआती block डालें।"
+    },
     "reconcile": {
       "title": "ख़र्च किए गए UTXO का मिलान करें",
       "description": "हर स्टोर किए गए साइलेंट-पेमेंट UTXO को Blockbook से जाँचता है और ख़र्च हो चुके किसी भी UTXO को हटाता है। अगर भेजने के बाद बैलेंस उससे ज़्यादा दिखे जितना होना चाहिए, तो इसका इस्तेमाल करें।",

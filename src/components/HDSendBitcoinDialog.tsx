@@ -12,7 +12,6 @@ import {
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import {
   Dialog,
   DialogContent,
@@ -24,7 +23,10 @@ import {
   PopoverTrigger,
 } from '@/components/ui/popover';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import { BitcoinAmountPicker } from '@/components/BitcoinAmountPicker';
 import { BitcoinPublicDisclaimer } from '@/components/BitcoinPublicDisclaimer';
+import { BitcoinRecipientInput } from '@/components/BitcoinRecipientInput';
+import { HelpTip } from '@/components/HelpTip';
 import { cn } from '@/lib/utils';
 
 import { useToast } from '@/hooks/useToast';
@@ -33,13 +35,17 @@ import { useHdWalletAccess } from '@/hooks/useHdWalletAccess';
 import { useHdWallet } from '@/hooks/useHdWallet';
 import { notificationSuccess } from '@/lib/haptics';
 import {
+  getBitcoinFeeRate,
+  getUniqueBitcoinFeeSpeeds,
+  type BitcoinFeeSpeed,
+} from '@/lib/bitcoinFeeSpeed';
+import {
   isLargeAmount,
   nostrPubkeyToBitcoinAddress,
   satsToUSD,
 } from '@/lib/bitcoin';
 import {
   broadcastBlockbookTx,
-  type BlockbookFeeRates,
   fetchFeeRates,
 } from '@/lib/hdwallet/blockbook';
 import {
@@ -60,29 +66,7 @@ import { useQuery } from '@tanstack/react-query';
 
 const USD_PRESETS = [1, 5, 10, 25, 100];
 
-type FeeSpeed = 'fastest' | 'halfHour' | 'hour' | 'economy';
-
-const FEE_SPEED_ORDER: FeeSpeed[] = ['fastest', 'halfHour', 'hour', 'economy'];
-
-function getRateForSpeed(rates: BlockbookFeeRates, speed: FeeSpeed): number {
-  switch (speed) {
-    case 'fastest': return rates.fastestFee;
-    case 'halfHour': return rates.halfHourFee;
-    case 'hour': return rates.hourFee;
-    case 'economy': return rates.economyFee;
-  }
-}
-
-function getUniqueFeeSpeeds(rates: BlockbookFeeRates | undefined): FeeSpeed[] {
-  if (!rates) return FEE_SPEED_ORDER;
-  const seen = new Set<number>();
-  const result: FeeSpeed[] = [];
-  for (const speed of FEE_SPEED_ORDER) {
-    const rate = getRateForSpeed(rates, speed);
-    if (!seen.has(rate)) { seen.add(rate); result.push(speed); }
-  }
-  return result;
-}
+type FeeSpeed = BitcoinFeeSpeed;
 
 // ---------------------------------------------------------------------------
 // Recipient resolution
@@ -217,11 +201,9 @@ export function HDSendBitcoinDialog({ isOpen, onClose, btcPrice }: HDSendBitcoin
   const [usdAmount, setUsdAmount] = useState<number | string>(5);
   const [feeSpeed, setFeeSpeed] = useState<FeeSpeed>('halfHour');
   const [error, setError] = useState('');
-  const [editingAmount, setEditingAmount] = useState(false);
   const [feePopoverOpen, setFeePopoverOpen] = useState(false);
   const [success, setSuccess] = useState<SendResult | null>(null);
 
-  const amountInputRef = useRef<HTMLInputElement>(null);
   const feeSpeedUserChanged = useRef(false);
 
   const recipient = useMemo(() => resolveRecipient(recipientInput), [recipientInput]);
@@ -236,7 +218,7 @@ export function HDSendBitcoinDialog({ isOpen, onClose, btcPrice }: HDSendBitcoin
 
   const currentFeeRate = useMemo(() => {
     if (!feeRates) return undefined;
-    return getRateForSpeed(feeRates, feeSpeed);
+    return getBitcoinFeeRate(feeRates, feeSpeed);
   }, [feeRates, feeSpeed]);
 
   // ── Owned UTXO set ───────────────────────────────────────────
@@ -303,12 +285,12 @@ export function HDSendBitcoinDialog({ isOpen, onClose, btcPrice }: HDSendBitcoin
     if (feeSpeedUserChanged.current) return;
     if (!ownedInputs.length || !feeRates || amountSats <= 0) return;
 
-    const uniqueSpeeds = getUniqueFeeSpeeds(feeRates);
+    const uniqueSpeeds = getUniqueBitcoinFeeSpeeds(feeRates);
     const threshold = amountSats * 0.4;
 
     let target: FeeSpeed = uniqueSpeeds[uniqueSpeeds.length - 1];
     for (const speed of uniqueSpeeds) {
-      const rate = getRateForSpeed(feeRates, speed);
+      const rate = getBitcoinFeeRate(feeRates, speed);
       const fee = previewHdFee(ownedInputs, amountSats, rate);
       if (fee > 0 && fee <= threshold) { target = speed; break; }
     }
@@ -345,19 +327,6 @@ export function HDSendBitcoinDialog({ isOpen, onClose, btcPrice }: HDSendBitcoin
 
   const requiresArm = isLarge || isRawAddress;
 
-  // ── Amount focus management ──────────────────────────────────
-  useEffect(() => {
-    if (editingAmount) {
-      amountInputRef.current?.focus();
-      amountInputRef.current?.select();
-    }
-  }, [editingAmount]);
-
-  const commitAmountEdit = useCallback(() => {
-    setEditingAmount(false);
-    if (typeof usdAmount === 'string' && usdAmount.trim() === '') setUsdAmount(0);
-  }, [usdAmount]);
-
   // ── Send mutation ────────────────────────────────────────────
   const [progress, setProgress] = useState<'idle' | 'building' | 'signing' | 'broadcasting'>('idle');
 
@@ -373,7 +342,7 @@ export function HDSendBitcoinDialog({ isOpen, onClose, btcPrice }: HDSendBitcoin
       if (amountSats <= 0) throw new Error(t('walletSend.errors.enterAmount'));
       if (insufficient) throw new Error(t('walletSend.errors.insufficient'));
 
-      const rate = getRateForSpeed(feeRates, feeSpeed);
+      const rate = getBitcoinFeeRate(feeRates, feeSpeed);
       const nextChangeIndex = scan?.change.firstUnusedIndex ?? 0;
 
       setProgress('building');
@@ -500,7 +469,7 @@ export function HDSendBitcoinDialog({ isOpen, onClose, btcPrice }: HDSendBitcoin
   // ── Render ───────────────────────────────────────────────────
   return (
     <Dialog open={isOpen} onOpenChange={(v) => { if (!v) handleClose(); }}>
-      <DialogContent className="sm:max-w-md p-0 gap-0 overflow-hidden [&>button]:hidden">
+      <DialogContent className="max-w-[425px] rounded-2xl p-0 gap-0 border-border overflow-hidden max-h-[95vh] [&>button]:hidden">
         <DialogTitle className="sr-only">{t('walletSend.title')}</DialogTitle>
 
         {success ? (
@@ -511,179 +480,141 @@ export function HDSendBitcoinDialog({ isOpen, onClose, btcPrice }: HDSendBitcoin
             onClose={handleClose}
           />
         ) : (
-          <div className="grid gap-5 px-6 py-6">
+          <>
             {/* Header */}
-            <div className="flex items-center justify-between">
-              <h2 className="text-base font-semibold">{t('walletSend.title')}</h2>
+            <div className="flex items-center justify-between px-4 h-12">
+              <h2 className="text-base font-semibold flex items-center gap-1.5">
+                {t('walletSend.title')}
+                <HelpTip faqId="send-bitcoin-onchain" />
+              </h2>
               <button
                 onClick={handleClose}
-                className="text-muted-foreground hover:text-foreground transition-colors"
+                className="p-1.5 -mr-1.5 rounded-full text-muted-foreground hover:text-foreground hover:bg-secondary/60 transition-colors"
                 aria-label={t('common.close')}
               >
-                <X className="size-4" />
+                <X className="size-5" />
               </button>
             </div>
 
-            {/* Amount */}
-            <div className="flex flex-col items-center py-2">
-              {editingAmount ? (
-                <div className="flex items-center text-4xl font-bold tracking-tight">
-                  <span className="text-muted-foreground">$</span>
-                  <Input
-                    ref={amountInputRef}
-                    type="number"
-                    inputMode="decimal"
-                    value={usdAmount}
-                    onChange={(e) => setUsdAmount(e.target.value)}
-                    onBlur={commitAmountEdit}
-                    onKeyDown={(e) => { if (e.key === 'Enter') commitAmountEdit(); }}
-                    className="bg-transparent border-none focus-visible:ring-0 text-4xl font-bold tracking-tight w-32 text-center px-0 h-auto"
-                  />
-                </div>
-              ) : (
-                <button
-                  type="button"
-                  onClick={() => setEditingAmount(true)}
-                  className="text-4xl font-bold tracking-tight hover:text-primary transition-colors cursor-text"
-                >
-                  ${typeof usdAmount === 'number' ? usdAmount : (parseFloat(usdAmount) || 0)}
-                </button>
-              )}
-              {amountSats > 0 && btcPrice && (
-                <span className="text-xs text-muted-foreground mt-1 tabular-nums">
-                  {t('walletSend.approxSats', { sats: amountSats.toLocaleString() })}
-                </span>
-              )}
-            </div>
-
-            {/* USD presets */}
-            <div className="flex flex-wrap justify-center gap-1.5">
-              {USD_PRESETS.map((preset) => (
-                <button
-                  key={preset}
-                  type="button"
-                  onClick={() => { setUsdAmount(preset); setEditingAmount(false); }}
-                  className={cn(
-                    'px-3 py-1 rounded-full text-xs border transition-colors',
-                    Number(usdAmount) === preset
-                      ? 'bg-primary text-primary-foreground border-primary'
-                      : 'border-border hover:bg-muted/50',
-                  )}
-                >
-                  ${preset}
-                </button>
-              ))}
-            </div>
-
-            {/* Recipient */}
-            <div className="grid gap-1">
-              <label className="text-xs text-muted-foreground" htmlFor="hd-recipient-input">
-                {t('walletSend.recipient.label')}
-              </label>
-              <Input
-                id="hd-recipient-input"
-                value={recipientInput}
-                onChange={(e) => setRecipientInput(e.target.value)}
-                placeholder={t('walletSend.recipient.placeholder')}
-                autoComplete="off"
-                spellCheck={false}
-                className="font-mono text-base md:text-sm"
+            <div className="grid gap-4 px-4 py-4 w-full overflow-y-auto">
+              <BitcoinAmountPicker
+                usdAmount={usdAmount}
+                onUsdAmountChange={setUsdAmount}
+                presets={USD_PRESETS}
+                insufficient={insufficient}
+                satsLabel={amountSats > 0 && btcPrice
+                  ? t('walletSend.approxSats', { sats: amountSats.toLocaleString() })
+                  : undefined}
+                onAmountChangeStart={() => setError('')}
               />
-              {recipient && (
-                <p className="text-xs text-muted-foreground">
-                  {recipient.kind === 'sp'
-                    ? t('walletSend.recipient.sendingSp')
-                    : recipient.pubkey
-                      ? t('walletSend.recipient.sendingNostr')
-                      : t('walletSend.recipient.sendingRaw')}
+
+              {/* Recipient */}
+              <div className="grid gap-1">
+                <label className="text-xs text-muted-foreground" htmlFor="hd-recipient-input">
+                  {t('walletSend.recipient.label')}
+                </label>
+                <BitcoinRecipientInput
+                  value={recipientInput}
+                  onChange={setRecipientInput}
+                  placeholder={t('walletSend.recipient.placeholder')}
+                  resolvedPubkey={recipient?.pubkey}
+                />
+                {recipient && (
+                  <p className="text-xs text-muted-foreground">
+                    {recipient.kind === 'sp'
+                      ? t('walletSend.recipient.sendingSp')
+                      : recipient.pubkey
+                        ? t('walletSend.recipient.sendingNostr')
+                        : t('walletSend.recipient.sendingRaw')}
+                  </p>
+                )}
+              </div>
+
+              {/* Privacy disclaimer for raw addresses */}
+              {isRawAddress && (
+                <BitcoinPublicDisclaimer
+                  acknowledged={acknowledgedPublic}
+                  onAcknowledgedChange={setAcknowledgedPublic}
+                />
+              )}
+
+              {/* Fee speed */}
+              <div className="flex items-center justify-between text-xs">
+                <span className="text-muted-foreground">{t('walletSend.networkFee')}</span>
+                <Popover open={feePopoverOpen} onOpenChange={setFeePopoverOpen}>
+                  <PopoverTrigger asChild>
+                    <button
+                      type="button"
+                      className="flex items-center gap-1.5 hover:text-foreground transition-colors text-muted-foreground tabular-nums"
+                    >
+                      {estimatedFeeSats > 0 && btcPrice ? (
+                        <>≈ {satsToUSD(estimatedFeeSats, btcPrice)}</>
+                      ) : currentFeeRate ? (
+                        <>{t('walletSend.satPerVB', { rate: currentFeeRate })}</>
+                      ) : (
+                        <>—</>
+                      )}
+                      <span className="opacity-60">·</span>
+                      {feeSpeedLabels[feeSpeed]}
+                    </button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-44 p-1" align="end">
+                    <div className="grid gap-0.5">
+                      {getUniqueBitcoinFeeSpeeds(feeRates).map((speed) => (
+                        <button
+                          key={speed}
+                          type="button"
+                          onClick={() => handleFeeSpeedChange(speed)}
+                          className={cn(
+                            'flex justify-between items-center px-3 py-1.5 rounded-md text-xs hover:bg-muted/50 transition-colors',
+                            feeSpeed === speed && 'bg-muted',
+                          )}
+                        >
+                          <span>{feeSpeedLabels[speed]}</span>
+                          {feeRates && (
+                            <span className="text-muted-foreground tabular-nums">
+                              {t('walletSend.satPerVB', { rate: getBitcoinFeeRate(feeRates, speed) })}
+                            </span>
+                          )}
+                        </button>
+                      ))}
+                    </div>
+                  </PopoverContent>
+                </Popover>
+              </div>
+
+              {showBalance && totalBalance > 0 && btcPrice && (
+                <p className="text-xs text-muted-foreground text-center">
+                  {t('walletSend.available', {
+                    usd: satsToUSD(totalBalance, btcPrice),
+                    sats: totalBalance.toLocaleString(),
+                  })}
                 </p>
               )}
-            </div>
 
-            {/* Privacy disclaimer for raw addresses */}
-            {isRawAddress && (
-              <BitcoinPublicDisclaimer
-                acknowledged={acknowledgedPublic}
-                onAcknowledgedChange={setAcknowledgedPublic}
-              />
-            )}
-
-            {/* Fee speed */}
-            <div className="flex items-center justify-between text-xs">
-              <span className="text-muted-foreground">{t('walletSend.networkFee')}</span>
-              <Popover open={feePopoverOpen} onOpenChange={setFeePopoverOpen}>
-                <PopoverTrigger asChild>
-                  <button
-                    type="button"
-                    className="flex items-center gap-1.5 hover:text-foreground transition-colors text-muted-foreground tabular-nums"
-                  >
-                    {estimatedFeeSats > 0 && btcPrice ? (
-                      <>≈ {satsToUSD(estimatedFeeSats, btcPrice)}</>
-                    ) : currentFeeRate ? (
-                      <>{t('walletSend.satPerVB', { rate: currentFeeRate })}</>
-                    ) : (
-                      <>—</>
-                    )}
-                    <span className="opacity-60">·</span>
-                    {feeSpeedLabels[feeSpeed]}
-                  </button>
-                </PopoverTrigger>
-                <PopoverContent className="w-44 p-1" align="end">
-                  <div className="grid gap-0.5">
-                    {getUniqueFeeSpeeds(feeRates).map((speed) => (
-                      <button
-                        key={speed}
-                        type="button"
-                        onClick={() => handleFeeSpeedChange(speed)}
-                        className={cn(
-                          'flex justify-between items-center px-3 py-1.5 rounded-md text-xs hover:bg-muted/50 transition-colors',
-                          feeSpeed === speed && 'bg-muted',
-                        )}
-                      >
-                        <span>{feeSpeedLabels[speed]}</span>
-                        {feeRates && (
-                          <span className="text-muted-foreground tabular-nums">
-                            {t('walletSend.satPerVB', { rate: getRateForSpeed(feeRates, speed) })}
-                          </span>
-                        )}
-                      </button>
-                    ))}
-                  </div>
-                </PopoverContent>
-              </Popover>
-            </div>
-
-            {showBalance && totalBalance > 0 && btcPrice && (
-              <p className="text-xs text-muted-foreground text-center">
-                {t('walletSend.available', {
-                  usd: satsToUSD(totalBalance, btcPrice),
-                  sats: totalBalance.toLocaleString(),
-                })}
-              </p>
-            )}
-
-            {/* Error */}
-            {error && (
-              <Alert variant="destructive" className="py-2">
-                <AlertTriangle className="size-3.5" />
-                <AlertDescription className="text-xs">{error}</AlertDescription>
-              </Alert>
-            )}
-
-            {/* Send button */}
-            <Button
-              type="button"
-              onClick={handleSend}
-              disabled={sendDisabled}
-              className={cn(
-                'w-full',
-                confirmArmed && !sendMutation.isPending && 'bg-amber-500 hover:bg-amber-600 text-white',
+              {/* Error */}
+              {error && (
+                <Alert variant="destructive" className="py-2">
+                  <AlertTriangle className="size-3.5" />
+                  <AlertDescription className="text-xs">{error}</AlertDescription>
+                </Alert>
               )}
-            >
-              {sendMutation.isPending && <Loader2 className="size-4 mr-2 animate-spin" />}
-              {sendButtonLabel}
-            </Button>
-          </div>
+
+              {/* Send button */}
+              <Button
+                type="button"
+                onClick={handleSend}
+                disabled={sendDisabled}
+                className={cn(
+                  'w-full',
+                  confirmArmed && !sendMutation.isPending && 'bg-amber-500 hover:bg-amber-600 text-white',
+                )}
+              >
+                {sendMutation.isPending && <Loader2 className="size-4 mr-2 animate-spin" />}
+                {sendButtonLabel}
+              </Button>
+            </div>
+          </>
         )}
       </DialogContent>
     </Dialog>

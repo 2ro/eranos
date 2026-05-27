@@ -1263,8 +1263,7 @@
       "description": "Shiriki anwani kupokea bitcoin.",
       "addressIndex": "Anwani #{{index}}",
       "newAddress": "Anwani mpya",
-      "scanForNew": "Changanua kwa malipo mapya",
-      "scanForPayments": "Changanua kwa malipo"
+      "scanForNew": "Angalia malipo mapya"
     },
     "tx": {
       "pending": "Inasubiri",
@@ -1434,8 +1433,24 @@
     "iUnderstand": "Naelewa muamala huu ni wa umma."
   },
   "spScan": {
-    "title": "Changanua malipo ya kimya",
+    "title": "Angalia malipo mapya",
+    "subtitle": "Changanua blockchain kupata malipo ya faragha",
+    "descriptionHelp": "Maelezo zaidi",
     "description": "Inatembea kifaa cha kuorodhesha cha BIP-352 kilichosanidiwa block-kwa-block kugundua malipo ya kimya yanayoingia.",
+    "since": "Tangu",
+    "preset": {
+      "lastHour": "Saa iliyopita",
+      "last3h": "Saa 3 zilizopita",
+      "last24h": "Saa 24 zilizopita",
+      "lastWeek": "Wiki iliyopita",
+      "lastMonth": "Mwezi uliopita",
+      "custom": "Maalum…"
+    },
+    "customHours": "Saa",
+    "customHoursPlaceholder": "mf. 12",
+    "advanced": "Kina",
+    "connectingIndexer": "Inaunganisha na kifaa cha kuorodhesha…",
+    "upToDate": "Tayari uko hadi sasa.",
     "fromBlock": "Kutoka block",
     "indexerTip": "Kilele cha kifaa cha kuorodhesha",
     "lastFullyScanned": "Iliyochanganuliwa kikamilifu mwisho",
@@ -1450,6 +1465,10 @@
     "foundOutputs_other": "Imepatikana matokeo mapya {{count}}.",
     "noNewPayments": "Hakuna malipo mapya.",
     "startScan": "Anza uchanganuzi",
+    "resolveFailed": {
+      "title": "Imeshindwa kupata block ya kuanzia",
+      "description": "mempool.space haipatikani kwa sasa. Weka block ya kuanzia chini ya Kina → Kutoka block ili kuchanganua hata hivyo."
+    },
     "reconcile": {
       "title": "Patanisha UTXO zilizotumika",
       "description": "Hukagua kila UTXO ya malipo ya kimya iliyohifadhiwa dhidi ya Blockbook na huondoa zile zilizokwisha tumika. Tumia ikiwa salio ni juu zaidi kuliko inavyopaswa kuwa baada ya kutuma.",

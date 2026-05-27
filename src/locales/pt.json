@@ -1264,8 +1264,7 @@
       "description": "Compartilhe um endereço para receber bitcoin.",
       "addressIndex": "Endereço n.º {{index}}",
       "newAddress": "Novo endereço",
-      "scanForNew": "Escanear novos pagamentos",
-      "scanForPayments": "Escanear pagamentos"
+      "scanForNew": "Verificar novos pagamentos"
     },
     "tx": {
       "pending": "Pendente",
@@ -1539,8 +1538,24 @@
     "iUnderstand": "Entendo que esta transação é pública."
   },
   "spScan": {
-    "title": "Escanear pagamentos silenciosos",
+    "title": "Verificar novos pagamentos",
+    "subtitle": "Escaneie a blockchain em busca de pagamentos privados",
+    "descriptionHelp": "Mais informações",
     "description": "Percorre o indexador BIP-352 configurado bloco a bloco para detectar pagamentos silenciosos recebidos.",
+    "since": "Desde",
+    "preset": {
+      "lastHour": "Última hora",
+      "last3h": "Últimas 3 horas",
+      "last24h": "Últimas 24 horas",
+      "lastWeek": "Última semana",
+      "lastMonth": "Último mês",
+      "custom": "Personalizado…"
+    },
+    "customHours": "Horas",
+    "customHoursPlaceholder": "ex. 12",
+    "advanced": "Avançado",
+    "connectingIndexer": "Conectando ao indexador…",
+    "upToDate": "Você já está atualizado.",
     "fromBlock": "Do bloco",
     "indexerTip": "Topo do indexador",
     "lastFullyScanned": "Último escaneamento completo",
@@ -1555,6 +1570,10 @@
     "foundOutputs_other": "Encontradas {{count}} novas saídas.",
     "noNewPayments": "Nenhum pagamento novo.",
     "startScan": "Iniciar escaneamento",
+    "resolveFailed": {
+      "title": "Não foi possível consultar o bloco inicial",
+      "description": "mempool.space está inacessível no momento. Informe um bloco inicial em Avançado → Do bloco para escanear mesmo assim."
+    },
     "reconcile": {
       "title": "Reconciliar UTXOs gastos",
       "description": "Verifica cada UTXO de pagamento silencioso armazenado contra o Blockbook e remove os que foram gastos. Use se o saldo estiver maior do que deveria após um envio.",

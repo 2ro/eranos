@@ -1255,8 +1255,7 @@
       "description": "Share an address to receive bitcoin.",
       "addressIndex": "Address #{{index}}",
       "newAddress": "New address",
-      "scanForNew": "Scan for new payments",
-      "scanForPayments": "Scan for payments"
+      "scanForNew": "Check for new payments"
     },
     "tx": {
       "pending": "Pending",
@@ -1530,8 +1529,24 @@
     "iUnderstand": "I understand this transaction is public."
   },
   "spScan": {
-    "title": "Scan for silent payments",
+    "title": "Check for new payments",
+    "subtitle": "Scan the blockchain for private payments",
+    "descriptionHelp": "More info",
     "description": "Walks the configured BIP-352 indexer block-by-block to detect incoming silent payments.",
+    "since": "Since",
+    "preset": {
+      "lastHour": "Last hour",
+      "last3h": "Last 3 hours",
+      "last24h": "Last 24 hours",
+      "lastWeek": "Last week",
+      "lastMonth": "Last month",
+      "custom": "Custom…"
+    },
+    "customHours": "Hours",
+    "customHoursPlaceholder": "e.g. 12",
+    "advanced": "Advanced",
+    "connectingIndexer": "Connecting to indexer…",
+    "upToDate": "You're already up to date.",
     "fromBlock": "From block",
     "indexerTip": "Indexer tip",
     "lastFullyScanned": "Last fully scanned",
@@ -1546,6 +1561,10 @@
     "foundOutputs_other": "Found {{count}} new outputs.",
     "noNewPayments": "No new payments.",
     "startScan": "Start scan",
+    "resolveFailed": {
+      "title": "Couldn't look up the start block",
+      "description": "mempool.space is unreachable right now. Enter a starting block under Advanced → From block to scan anyway."
+    },
     "reconcile": {
       "title": "Reconcile spent UTXOs",
       "description": "Checks each stored silent-payment UTXO against Blockbook and removes any that have been spent. Use this if the balance is higher than it should be after a send.",

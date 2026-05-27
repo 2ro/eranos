@@ -832,8 +832,7 @@
       "description": "Govera kero yokugamuchira bitcoin.",
       "addressIndex": "Kero #{{index}}",
       "newAddress": "Kero itsva",
-      "scanForNew": "Tsvaga mibhadharo mitsva",
-      "scanForPayments": "Tsvaga mibhadharo"
+      "scanForNew": "Tarisa mibhadharo mitsva"
     },
     "tx": {
       "pending": "Zvichakamirira",
@@ -1107,8 +1106,24 @@
     "iUnderstand": "Ndinonzwisisa kuti chinoitwa ichi chinozivikanwa nemunhu wese."
   },
   "spScan": {
-    "title": "Tsvaga mibhadharo yakanyararira",
+    "title": "Tarisa mibhadharo mitsva",
+    "subtitle": "Tsvaga muchitirakitiri chemibhadharo yakavanzika",
+    "descriptionHelp": "Ruzivo rwakawanda",
     "description": "Inotevera muongorori weBIP-352 wakarongwa bhuroka nebhuroka kuti iwane mibhadharo yakanyararira inopinda.",
+    "since": "Kubvira",
+    "preset": {
+      "lastHour": "Awa rapfuura",
+      "last3h": "Maawa 3 apfuura",
+      "last24h": "Maawa 24 apfuura",
+      "lastWeek": "Vhiki rapfuura",
+      "lastMonth": "Mwedzi wapfuura",
+      "custom": "Zvakasarudzwa…"
+    },
+    "customHours": "Maawa",
+    "customHoursPlaceholder": "semuenzaniso 12",
+    "advanced": "Zvepamusoro",
+    "connectingIndexer": "Kubatanidza nemuongorori…",
+    "upToDate": "Watova pamberi pose.",
     "fromBlock": "Kubva pabhuroka",
     "indexerTip": "Pamusoro pemuongorori",
     "lastFullyScanned": "Kupedzisira kuongorora kwakazara",
@@ -1123,6 +1138,10 @@
     "foundOutputs_other": "Yakawana mhedzisiro {{count}} itsva.",
     "noNewPayments": "Hapana mibhadharo mitsva.",
     "startScan": "Tanga kuongorora",
+    "resolveFailed": {
+      "title": "Hatina kukwanisa kutsvaga bhuroka rokutangira",
+      "description": "mempool.space haisi kuwanikwa pari zvino. Pinda bhuroka rokutangira pasi peZvepamusoro → Kubva pabhuroka kuti uongorore zvakadaro."
+    },
     "reconcile": {
       "title": "Reconcile UTXOs dzakashandiswa",
       "description": "Inotarisa UTXO yega yega yakachengetwa yemubhadharo wakanyararira pamberi peBlockbook uye inobvisa idzo dzakashandiswa. Shandisa kana bharanzi yakakwirira pane zvaifanira mushure mokutumira.",

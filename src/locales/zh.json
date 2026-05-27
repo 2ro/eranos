@@ -832,8 +832,7 @@
       "description": "分享一个地址以接收比特币。",
       "addressIndex": "地址 #{{index}}",
       "newAddress": "新地址",
-      "scanForNew": "扫描新支付",
-      "scanForPayments": "扫描支付"
+      "scanForNew": "检查新付款"
     },
     "tx": {
       "pending": "待确认",
@@ -1107,8 +1106,24 @@
     "iUnderstand": "我理解此交易是公开的。"
   },
   "spScan": {
-    "title": "扫描静默支付",
+    "title": "检查新付款",
+    "subtitle": "扫描区块链以查找私密支付",
+    "descriptionHelp": "了解更多",
     "description": "逐块遍历已配置的 BIP-352 索引器，以检测传入的静默支付。",
+    "since": "起始时间",
+    "preset": {
+      "lastHour": "最近一小时",
+      "last3h": "最近 3 小时",
+      "last24h": "最近 24 小时",
+      "lastWeek": "最近一周",
+      "lastMonth": "最近一个月",
+      "custom": "自定义…"
+    },
+    "customHours": "小时",
+    "customHoursPlaceholder": "例如 12",
+    "advanced": "高级选项",
+    "connectingIndexer": "正在连接索引器…",
+    "upToDate": "已是最新状态。",
     "fromBlock": "起始区块",
     "indexerTip": "索引器链尖",
     "lastFullyScanned": "上次完整扫描",
@@ -1123,6 +1138,10 @@
     "foundOutputs_other": "发现 {{count}} 个新输出。",
     "noNewPayments": "没有新的支付。",
     "startScan": "开始扫描",
+    "resolveFailed": {
+      "title": "无法获取起始区块",
+      "description": "目前无法访问 mempool.space。请在“高级选项 → 起始区块”中手动输入起始区块以继续扫描。"
+    },
     "reconcile": {
       "title": "对账已花费的 UTXO",
       "description": "将每个存储的静默支付 UTXO 与 Blockbook 进行比对，并移除那些已被花费的。如果发送后余额高于应有数额，请使用此功能。",

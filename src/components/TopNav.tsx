@@ -1,5 +1,5 @@
-import { useState, type ComponentType } from 'react';
-import { Link, NavLink, useNavigate } from 'react-router-dom';
+import { startTransition, useEffect, useState, type ComponentType } from 'react';
+import { Link, NavLink } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import {
   Activity,
@@ -22,8 +22,11 @@ import { LoginArea } from '@/components/auth/LoginArea';
 import { LogoIcon } from '@/components/icons/LogoIcon';
 import { Sheet, SheetContent } from '@/components/ui/sheet';
 import { useAppContext } from '@/hooks/useAppContext';
+import { useBtcPrice } from '@/hooks/useBtcPrice';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useFeedSettings } from '@/hooks/useFeedSettings';
+import { useHdWallet } from '@/hooks/useHdWallet';
+import { satsToUSD } from '@/lib/bitcoin';
 import { cn } from '@/lib/utils';
 
 interface NavItem {
@@ -58,9 +61,6 @@ export function TopNav() {
   const { user } = useCurrentUser();
   const { orderedItems } = useFeedSettings();
   const [mobileOpen, setMobileOpen] = useState(false);
-  const navigate = useNavigate();
-
-  const goToSearch = () => navigate('/search');
 
   return (
     <header className="sticky top-0 z-40 w-full border-b border-border bg-background/85 backdrop-blur supports-[backdrop-filter]:bg-background/70">
@@ -113,17 +113,18 @@ export function TopNav() {
 
         {/* Right cluster */}
         <div className="flex items-center gap-2 sm:gap-3">
-          {/* Search — navigates to the /search page. Visible on all
-              breakpoints so users can always reach search from the chrome. */}
-          <button
-            type="button"
-            onClick={goToSearch}
-            className="shrink-0 size-9 rounded-full flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-secondary motion-safe:transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
-            aria-label={t('nav.search')}
-            title={t('nav.search')}
-          >
-            <Search className="size-5" />
-          </button>
+          {user ? (
+            <DeferredWalletBalancePill />
+          ) : (
+            <Link
+              to="/search"
+              className="shrink-0 size-9 rounded-full flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-secondary motion-safe:transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+              aria-label={t('nav.search')}
+              title={t('nav.search')}
+            >
+              <Search className="size-5" />
+            </Link>
+          )}
 
           {/* LoginArea handles both logged-in (account avatar dropdown) and
               logged-out (Log in / Sign up) states. We render it inline-flex
@@ -177,6 +178,52 @@ export function TopNav() {
         </SheetContent>
       </Sheet>
     </header>
+  );
+}
+
+/**
+ * Compact USD balance pill in the top-nav right cluster, replacing the
+ * previous search icon. Reads the HD-wallet sats balance via {@link useHdWallet}
+ * and converts to USD via {@link useBtcPrice}. Renders nothing when the wallet
+ * isn't available (logged out, extension/bunker login, still loading, or no
+ * price yet) so the chrome stays quiet rather than flashing placeholder text.
+ */
+function DeferredWalletBalancePill() {
+  const [ready, setReady] = useState(false);
+
+  useEffect(() => {
+    startTransition(() => setReady(true));
+  }, []);
+
+  return ready ? <WalletBalancePill /> : null;
+}
+
+function WalletBalancePill() {
+  const { t } = useTranslation();
+  const { availability, totalBalance, isLoading, error } = useHdWallet();
+  const { data: btcPrice } = useBtcPrice();
+
+  if (availability.status !== 'available') return null;
+  if (isLoading || error || !btcPrice) return null;
+
+  return (
+    <Link
+      to="/wallet"
+      className="shrink-0 inline-flex items-center text-primary rounded-md px-1 hover:bg-primary/10 motion-safe:transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+      aria-label={t('nav.wallet')}
+      title={t('nav.wallet')}
+    >
+      <span
+        className="font-display font-normal tracking-wide leading-none uppercase text-xl inline-block tabular-nums"
+        style={{
+          WebkitTextStroke: '0.022em currentColor',
+          transform: 'skewX(-6deg) scaleX(1.1)',
+          transformOrigin: '0 100%',
+        }}
+      >
+        {satsToUSD(totalBalance, btcPrice)}
+      </span>
+    </Link>
   );
 }
 

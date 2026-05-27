@@ -12,6 +12,8 @@ import {
 } from '@/components/ui/popover';
 import { QRCodeCanvas } from '@/components/ui/qrcode';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import { BitcoinAmountPicker } from '@/components/BitcoinAmountPicker';
+import { getBitcoinFeeRate, getUniqueBitcoinFeeSpeeds } from '@/lib/bitcoinFeeSpeed';
 
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useBitcoinSigner } from '@/hooks/useBitcoinSigner';
@@ -39,40 +41,6 @@ const FEE_SPEED_LABELS: Record<OnchainFeeSpeed, string> = {
   hour: '~1 hour',
   economy: '~1 day',
 };
-
-const FEE_SPEED_ORDER: OnchainFeeSpeed[] = ['fastest', 'halfHour', 'hour', 'economy'];
-
-/**
- * Given the raw mempool fee rates (sat/vB), return a deduplicated list of
- * speed tiers. When multiple tiers share the same rate (common when the
- * mempool is empty and everything collapses to 1 sat/vB), we keep only the
- * fastest-labeled tier for that rate. This prevents rows like "~10 min 2
- * sat/vB / ~30 min 2 sat/vB / ~1 hour 2 sat/vB" in the UI.
- */
-function getRateForSpeed(rates: { fastestFee: number; halfHourFee: number; hourFee: number; economyFee: number }, speed: OnchainFeeSpeed): number {
-  switch (speed) {
-    case 'fastest': return rates.fastestFee;
-    case 'halfHour': return rates.halfHourFee;
-    case 'hour': return rates.hourFee;
-    case 'economy': return rates.economyFee;
-  }
-}
-
-function getUniqueFeeSpeeds(
-  rates: { fastestFee: number; halfHourFee: number; hourFee: number; economyFee: number } | undefined,
-): OnchainFeeSpeed[] {
-  if (!rates) return FEE_SPEED_ORDER;
-  const seen = new Set<number>();
-  const result: OnchainFeeSpeed[] = [];
-  for (const speed of FEE_SPEED_ORDER) {
-    const rate = getRateForSpeed(rates, speed);
-    if (!seen.has(rate)) {
-      seen.add(rate);
-      result.push(speed);
-    }
-  }
-  return result;
-}
 
 interface OnchainZapContentProps {
   target: NostrEvent;
@@ -103,8 +71,6 @@ export function OnchainZapContent({ target, onSuccess, onClose }: OnchainZapCont
   const [feeSpeed, setFeeSpeed] = useState<OnchainFeeSpeed>('halfHour');
   const [error, setError] = useState('');
   const [feePopoverOpen, setFeePopoverOpen] = useState(false);
-  const [editingAmount, setEditingAmount] = useState(false);
-  const amountInputRef = useRef<HTMLInputElement>(null);
 
   // Tracks whether the user has manually picked a fee speed. Once true, we
   // stop auto-adjusting the fee in response to amount changes.
@@ -140,7 +106,7 @@ export function OnchainZapContent({ target, onSuccess, onClose }: OnchainZapCont
 
   const currentFeeRate = useMemo(() => {
     if (!feeRates) return 0;
-    return getRateForSpeed(feeRates, feeSpeed);
+    return getBitcoinFeeRate(feeRates, feeSpeed);
   }, [feeRates, feeSpeed]);
 
   // Convert the USD amount to sats
@@ -173,12 +139,12 @@ export function OnchainZapContent({ target, onSuccess, onClose }: OnchainZapCont
     if (feeSpeedUserChanged.current) return;
     if (!utxos?.length || !feeRates || amountSats <= 0) return;
 
-    const uniqueSpeeds = getUniqueFeeSpeeds(feeRates);
+    const uniqueSpeeds = getUniqueBitcoinFeeSpeeds(feeRates);
     const threshold = amountSats * 0.4;
 
     let target: OnchainFeeSpeed = uniqueSpeeds[uniqueSpeeds.length - 1];
     for (const speed of uniqueSpeeds) {
-      const rate = getRateForSpeed(feeRates, speed);
+      const rate = getBitcoinFeeRate(feeRates, speed);
       const fee2 = estimateFee(utxos.length, 2, rate);
       const change = totalBalance - amountSats - fee2;
       const outputs = change > 546 ? 2 : 1;
@@ -254,24 +220,7 @@ export function OnchainZapContent({ target, onSuccess, onClose }: OnchainZapCont
   const currentUsd = typeof usdAmount === 'string' ? parseFloat(usdAmount) : usdAmount;
   const hasValidAmount = Number.isFinite(currentUsd) && currentUsd > 0;
   const totalUsdString = btcPrice ? satsToUSD(totalSats, btcPrice) : '';
-  const uniqueFeeSpeeds = useMemo(() => getUniqueFeeSpeeds(feeRates), [feeRates]);
-
-  // Clicking the big amount flips it into edit mode. Auto-focus and
-  // select-all so typing overwrites the current value.
-  useEffect(() => {
-    if (editingAmount) {
-      amountInputRef.current?.focus();
-      amountInputRef.current?.select();
-    }
-  }, [editingAmount]);
-
-  const commitAmountEdit = useCallback(() => {
-    setEditingAmount(false);
-    // Normalize empty string to 0 so the display doesn't show "$" alone.
-    if (typeof usdAmount === 'string' && usdAmount.trim() === '') {
-      setUsdAmount(0);
-    }
-  }, [usdAmount]);
+  const uniqueFeeSpeeds = useMemo(() => getUniqueBitcoinFeeSpeeds(feeRates), [feeRates]);
 
   if (user && capability === 'unsupported') {
     return (
@@ -290,63 +239,13 @@ export function OnchainZapContent({ target, onSuccess, onClose }: OnchainZapCont
 
   return (
     <div className="grid gap-4 px-4 py-4 w-full overflow-hidden">
-      {/* Amount — big number on top, editable by clicking. */}
-      <div className="flex flex-col items-center pt-2">
-        {editingAmount ? (
-          <div className="flex items-baseline justify-center">
-            <span className={`text-4xl font-semibold ${insufficient ? 'text-destructive' : 'text-muted-foreground'}`}>$</span>
-            <input
-              ref={amountInputRef}
-              type="number"
-              inputMode="decimal"
-              min={0}
-              step="0.01"
-              value={usdAmount}
-              onChange={(e) => { setUsdAmount(e.target.value); setError(''); }}
-              onBlur={commitAmountEdit}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter') {
-                  e.preventDefault();
-                  commitAmountEdit();
-                }
-              }}
-              aria-label="Amount in USD"
-              className={`bg-transparent border-0 outline-none text-4xl font-semibold text-center [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none ${insufficient ? 'text-destructive' : ''}`}
-              style={{ width: `${Math.max(2, String(usdAmount).length + 1)}ch` }}
-            />
-          </div>
-        ) : (
-          <button
-            type="button"
-            onClick={() => setEditingAmount(true)}
-            aria-label="Edit amount"
-            className="flex items-baseline justify-center rounded-md px-2 -mx-2 hover:bg-muted/50 focus:outline-none focus-visible:ring-2 focus-visible:ring-ring transition-colors"
-          >
-            <span className={`text-4xl font-semibold ${insufficient ? 'text-destructive' : 'text-muted-foreground'}`}>$</span>
-            <span className={`text-4xl font-semibold tabular-nums ${insufficient ? 'text-destructive' : ''}`}>
-              {hasValidAmount ? currentUsd : 0}
-            </span>
-          </button>
-        )}
-      </div>
-
-      {/* Preset buttons sit under the big number. */}
-      <ToggleGroup
-        type="single"
-        value={USD_PRESETS.includes(Number(usdAmount)) ? String(usdAmount) : ''}
-        onValueChange={(v) => { if (v) { setUsdAmount(Number(v)); setError(''); setEditingAmount(false); } }}
-        className="grid grid-cols-5 gap-1 w-full"
-      >
-        {USD_PRESETS.map((v) => (
-          <ToggleGroupItem
-            key={v}
-            value={String(v)}
-            className="h-8 min-w-0 text-xs font-semibold px-1"
-          >
-            ${v}
-          </ToggleGroupItem>
-        ))}
-      </ToggleGroup>
+      <BitcoinAmountPicker
+        usdAmount={usdAmount}
+        onUsdAmountChange={setUsdAmount}
+        presets={USD_PRESETS}
+        insufficient={insufficient}
+        onAmountChangeStart={() => setError('')}
+      />
 
       {/* Error */}
       {error && (
@@ -386,7 +285,9 @@ export function OnchainZapContent({ target, onSuccess, onClose }: OnchainZapCont
                   Fee{' '}
                   {estimatedFeeSats > 0 && btcPrice
                     ? `≈ ${satsToUSD(estimatedFeeSats, btcPrice)}`
-                    : '…'}
+                    : currentFeeRate
+                      ? `${currentFeeRate} sat/vB`
+                      : 'loading'}
                   <span className="opacity-60"> · {FEE_SPEED_LABELS[feeSpeed]}</span>
                 </span>
               </button>
@@ -394,7 +295,7 @@ export function OnchainZapContent({ target, onSuccess, onClose }: OnchainZapCont
             <PopoverContent align="center" sideOffset={6} className="w-56 p-1">
               <div className="flex flex-col">
                 {uniqueFeeSpeeds.map((speed) => {
-                  const rate = feeRates ? getRateForSpeed(feeRates, speed) : 0;
+                  const rate = feeRates ? getBitcoinFeeRate(feeRates, speed) : 0;
                   const selected = speed === feeSpeed;
                   return (
                     <button

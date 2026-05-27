@@ -1254,8 +1254,7 @@
       "description": "Partagez une adresse pour recevoir du bitcoin.",
       "addressIndex": "Adresse n°{{index}}",
       "newAddress": "Nouvelle adresse",
-      "scanForNew": "Scanner les nouveaux paiements",
-      "scanForPayments": "Scanner les paiements"
+      "scanForNew": "Vérifier les nouveaux paiements"
     },
     "tx": {
       "pending": "En attente",
@@ -1529,8 +1528,24 @@
     "iUnderstand": "Je comprends que cette transaction est publique."
   },
   "spScan": {
-    "title": "Scanner les paiements silencieux",
+    "title": "Vérifier les nouveaux paiements",
+    "subtitle": "Scanner la blockchain pour les paiements privés",
+    "descriptionHelp": "Plus d'infos",
     "description": "Parcourt l'indexeur BIP-352 configuré bloc par bloc pour détecter les paiements silencieux entrants.",
+    "since": "Depuis",
+    "preset": {
+      "lastHour": "Dernière heure",
+      "last3h": "3 dernières heures",
+      "last24h": "Dernières 24 heures",
+      "lastWeek": "Dernière semaine",
+      "lastMonth": "Dernier mois",
+      "custom": "Personnalisé…"
+    },
+    "customHours": "Heures",
+    "customHoursPlaceholder": "p. ex. 12",
+    "advanced": "Avancé",
+    "connectingIndexer": "Connexion à l'indexeur…",
+    "upToDate": "Vous êtes déjà à jour.",
     "fromBlock": "Du bloc",
     "indexerTip": "Sommet de l'indexeur",
     "lastFullyScanned": "Dernier scan complet",
@@ -1545,6 +1560,10 @@
     "foundOutputs_other": "Trouvé {{count}} nouvelles sorties.",
     "noNewPayments": "Aucun nouveau paiement.",
     "startScan": "Démarrer le scan",
+    "resolveFailed": {
+      "title": "Impossible de récupérer le bloc de départ",
+      "description": "mempool.space est injoignable pour le moment. Saisissez un bloc de départ sous Avancé → Du bloc pour scanner quand même."
+    },
     "reconcile": {
       "title": "Réconcilier les UTXO dépensés",
       "description": "Vérifie chaque UTXO de paiement silencieux stocké via Blockbook et supprime ceux qui ont été dépensés. À utiliser si le solde est plus élevé qu'il ne devrait l'être après un envoi.",

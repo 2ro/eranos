@@ -1263,8 +1263,7 @@
       "description": "Bitcoin almak için bir adres paylaşın.",
       "addressIndex": "Adres #{{index}}",
       "newAddress": "Yeni adres",
-      "scanForNew": "Yeni ödemeler için tara",
-      "scanForPayments": "Ödemeler için tara"
+      "scanForNew": "Yeni ödemeleri kontrol et"
     },
     "tx": {
       "pending": "Beklemede",
@@ -1474,8 +1473,24 @@
     "iUnderstand": "Bu işlemin herkese açık olduğunu anlıyorum."
   },
   "spScan": {
-    "title": "Sessiz ödemeler için tara",
+    "title": "Yeni ödemeleri kontrol et",
+    "subtitle": "Özel ödemeler için blok zincirini tara",
+    "descriptionHelp": "Daha fazla bilgi",
     "description": "Gelen sessiz ödemeleri algılamak için yapılandırılmış BIP-352 indeksleyiciyi blok blok dolaşır.",
+    "since": "Şu tarihten itibaren",
+    "preset": {
+      "lastHour": "Son bir saat",
+      "last3h": "Son 3 saat",
+      "last24h": "Son 24 saat",
+      "lastWeek": "Geçen hafta",
+      "lastMonth": "Geçen ay",
+      "custom": "Özel…"
+    },
+    "customHours": "Saat",
+    "customHoursPlaceholder": "örn. 12",
+    "advanced": "Gelişmiş",
+    "connectingIndexer": "İndeksleyiciye bağlanılıyor…",
+    "upToDate": "Zaten güncelsiniz.",
     "fromBlock": "Başlangıç bloğu",
     "indexerTip": "İndeksleyici ucu",
     "lastFullyScanned": "En son tam tarama",
@@ -1490,6 +1505,10 @@
     "foundOutputs_other": "{{count}} yeni çıkış bulundu.",
     "noNewPayments": "Yeni ödeme yok.",
     "startScan": "Taramayı başlat",
+    "resolveFailed": {
+      "title": "Başlangıç bloğu sorgulanamadı",
+      "description": "mempool.space şu anda erişilemez durumda. Yine de taramak için Gelişmiş → Başlangıç bloğu altında bir başlangıç bloğu girin."
+    },
     "reconcile": {
       "title": "Harcanan UTXO'ları uzlaştır",
       "description": "Saklanan her sessiz ödeme UTXO'sunu Blockbook'a karşı kontrol eder ve harcanmış olanları kaldırır. Bir gönderimden sonra bakiye olması gerekenden yüksekse bunu kullanın.",
