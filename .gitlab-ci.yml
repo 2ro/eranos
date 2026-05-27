@@ -38,9 +38,11 @@ deploy-web:
       when: never
     - if: $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH && $DEPLOY_SSH_KEY && $DEPLOY_TARGET
   variables:
-    # Vite inlines VITE_* env vars at build time. Sourced from a GitLab CI/CD
-    # variable so the URL can be rotated without a code change.
+    # Vite inlines VITE_* env vars at build time. Sourced from GitLab CI/CD
+    # variables so values can be rotated without a code change.
     VITE_TRANSLATE_WORKER_URL: $VITE_TRANSLATE_WORKER_URL
+    VITE_PLAUSIBLE_DOMAIN: $VITE_PLAUSIBLE_DOMAIN
+    VITE_PLAUSIBLE_ENDPOINT: $VITE_PLAUSIBLE_ENDPOINT
   script:
     # Build the web app
     - npm ci
