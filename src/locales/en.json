@@ -972,7 +972,9 @@
     "ofGoal": "of {{amount}} goal",
     "donationCount_one": "{{count}} donation",
     "donationCount_other": "{{count}} donations",
-    "openInWallet": "Open in wallet"
+    "openExternalWallet": "Open external wallet",
+    "openInWallet": "Open in wallet",
+    "payWithAgoraWallet": "Pay with Agora"
   },
   "calendarEvents": {
     "create": {
@@ -1485,7 +1487,9 @@
       "placeholder": "bc1…, sp1…, or npub…",
       "sendingSp": "Sending via a silent payment — the recipient gets a fresh, unlinkable on-chain address.",
       "sendingNostr": "Sending to a Nostr user's on-chain address.",
-      "sendingRaw": "Sending to a raw Bitcoin address."
+      "sendingRaw": "Sending to a raw Bitcoin address.",
+      "useSilentPayment": "Use silent payment instead",
+      "useOnchain": "Use on-chain address instead"
     },
     "feeSpeed": {
       "fastest": "~10 min",

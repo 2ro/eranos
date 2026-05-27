@@ -981,7 +981,9 @@
     "ofGoal": "da meta de {{amount}}",
     "donationCount_one": "{{count}} doação",
     "donationCount_other": "{{count}} doações",
-    "openInWallet": "Abrir na carteira"
+    "openInWallet": "Abrir na carteira",
+    "payWithAgoraWallet": "Pagar com Agora",
+    "openExternalWallet": "Abrir carteira externa"
   },
   "calendarEvents": {
     "create": {
@@ -1494,7 +1496,9 @@
       "placeholder": "bc1…, sp1…, ou npub…",
       "sendingSp": "Enviando via pagamento silencioso — o destinatário recebe um endereço on-chain novo e inrastreável.",
       "sendingNostr": "Enviando para o endereço on-chain de um usuário Nostr.",
-      "sendingRaw": "Enviando para um endereço Bitcoin bruto."
+      "sendingRaw": "Enviando para um endereço Bitcoin bruto.",
+      "useSilentPayment": "Usar pagamento silencioso",
+      "useOnchain": "Usar endereço on-chain"
     },
     "feeSpeed": {
       "fastest": "~10 min",

@@ -549,7 +549,9 @@
     "ofGoal": "د {{amount}} هدف څخه",
     "donationCount_one": "{{count}} مرسته",
     "donationCount_other": "{{count}} مرستې",
-    "openInWallet": "په بټوه کې پرانیزئ"
+    "openInWallet": "په بټوه کې پرانیزئ",
+    "payWithAgoraWallet": "د Agora له لارې تادیه وکړئ",
+    "openExternalWallet": "بهرنۍ بټوه پرانیزئ"
   },
   "calendarEvents": {
     "create": {
@@ -1062,7 +1064,9 @@
       "placeholder": "bc1…، sp1…، یا npub…",
       "sendingSp": "د چوپې ورکړې له لارې لیږل — ترلاسه کوونکی په زنځیر کې یوه نوې، نه نښلیدونکې پته ترلاسه کوي.",
       "sendingNostr": "د Nostr کارن د زنځیر په پته لیږل.",
-      "sendingRaw": "یوې خامه بټکوین پتې ته لیږل."
+      "sendingRaw": "یوې خامه بټکوین پتې ته لیږل.",
+      "useSilentPayment": "پر ځای يې د چوپې ورکړې وکاروئ",
+      "useOnchain": "پر ځای يې د زنځیر په پته وکاروئ"
     },
     "feeSpeed": {
       "fastest": "~۱۰ دقیقې",

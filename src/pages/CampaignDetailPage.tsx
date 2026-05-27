@@ -15,6 +15,7 @@ import {
   Share2,
   ShieldCheck,
   Trash2,
+  Wallet,
 } from 'lucide-react';
 
 import { AuthorByline } from '@/components/AuthorByline';
@@ -23,6 +24,7 @@ import { CommentsSection } from '@/components/CommentsSection';
 import {
   CampaignWalletDonatePanel,
 } from '@/components/CampaignWalletDonatePanel';
+import { HDSendBitcoinDialog } from '@/components/HDSendBitcoinDialog';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -55,6 +57,7 @@ import { useComments } from '@/hooks/useComments';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useDeleteEvent } from '@/hooks/useDeleteEvent';
 import { useEventStats } from '@/hooks/useTrending';
+import { useHdWalletAccess } from '@/hooks/useHdWalletAccess';
 import { usePinnedEventComments } from '@/hooks/usePinnedEventComments';
 import { useShareOrigin } from '@/hooks/useShareOrigin';
 import { useToast } from '@/hooks/useToast';
@@ -970,9 +973,34 @@ function DonateColumn({
   onShare,
 }: DonateColumnProps) {
   const { t } = useTranslation();
+  const { user } = useCurrentUser();
+  const hdAccess = useHdWalletAccess();
+  const [sendOpen, setSendOpen] = useState(false);
   const ended = !!deadline?.isPast;
   const endedLabel = ended ? t('campaignsDetail.campaignEnded') : null;
   const isSilentPayment = !campaign.wallets.onchain;
+
+  // The in-app "Pay with Agora" button opens HDSendBitcoinDialog
+  // pre-filled with the campaign's on-chain address. The donor enters a
+  // USD amount and signs with their nsec-derived HD wallet — same flow
+  // they'd use from /wallet to send Bitcoin to anywhere else.
+  //
+  // Hide the button when:
+  //   - the campaign has ended.
+  //   - the donor is the campaign owner (paying yourself is a foot-gun).
+  //   - the campaign is silent-payment-only (no on-chain address to
+  //     prefill; SP donations require a BIP-352-aware wallet that derives
+  //     a fresh one-time output, which the in-app Taproot signer doesn't
+  //     do).
+  //   - the HD wallet isn't available for this login (extension/bunker
+  //     logins don't expose the secret key, so we can't derive child
+  //     keys — see useHdWalletAccess).
+  const canPayInApp =
+    !ended &&
+    !!user &&
+    !isSilentPayment &&
+    user.pubkey !== campaign.pubkey &&
+    hdAccess.status === 'available';
 
   return (
     // On mobile we drop the surface chrome (no rounded background) so
@@ -1054,11 +1082,28 @@ function DonateColumn({
             </Button>
           </div>
         ) : (
-          // Donors pay from an external wallet via the QR/address panel.
-          // Both on-chain and silent-payment campaigns route through the
-          // same UX — Agora no longer runs an in-app PSBT signer.
+          // Donors can either pay from their in-app Agora wallet (HD
+          // send dialog prefilled with the campaign address) or scan the
+          // QR from any external wallet. Both routes terminate at the
+          // same `w`-tag address on-chain. The in-app pay button is
+          // injected into the donate panel so it sits directly above
+          // "Open external wallet" — only one primary CTA stacked.
           <div className="space-y-3">
-            <CampaignWalletDonatePanel wallets={campaign.wallets} />
+            <CampaignWalletDonatePanel
+              wallets={campaign.wallets}
+              primaryAction={
+                canPayInApp ? (
+                  <Button
+                    size="lg"
+                    className="w-full"
+                    onClick={() => setSendOpen(true)}
+                  >
+                    <Wallet className="size-5 mr-2" />
+                    {t('campaignsDetail.payWithAgoraWallet')}
+                  </Button>
+                ) : null
+              }
+            />
             <Button variant="outline" size="lg" className="w-full" onClick={onShare}>
               <Share2 className="size-4 mr-2" />
               {t('campaignsDetail.share')}
@@ -1066,6 +1111,15 @@ function DonateColumn({
           </div>
         )}
       </CardContent>
+      {canPayInApp && campaign.wallets.onchain && (
+        <HDSendBitcoinDialog
+          isOpen={sendOpen}
+          onClose={() => setSendOpen(false)}
+          btcPrice={btcPrice}
+          initialRecipient={campaign.wallets.onchain.value}
+          initialRecipientAlt={campaign.wallets.sp?.value}
+        />
+      )}
     </Card>
   );
 }

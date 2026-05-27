@@ -537,7 +537,9 @@
     "ofGoal": "من هدف {{amount}}",
     "donationCount_one": "{{count}} تبرع",
     "donationCount_other": "{{count}} تبرعات",
-    "openInWallet": "فتح في المحفظة"
+    "openInWallet": "فتح في المحفظة",
+    "payWithAgoraWallet": "الدفع عبر Agora",
+    "openExternalWallet": "فتح محفظة خارجية"
   },
   "calendarEvents": {
     "create": {
@@ -1046,7 +1048,9 @@
       "placeholder": "bc1…, sp1…, أو npub…",
       "sendingSp": "الإرسال عبر دفع صامت — يحصل المستلم على عنوان جديد على السلسلة لا يمكن ربطه.",
       "sendingNostr": "الإرسال إلى عنوان مستخدم Nostr على السلسلة.",
-      "sendingRaw": "الإرسال إلى عنوان بيتكوين خام."
+      "sendingRaw": "الإرسال إلى عنوان بيتكوين خام.",
+      "useSilentPayment": "استخدام الدفع الصامت بدلاً من ذلك",
+      "useOnchain": "استخدام عنوان على السلسلة بدلاً من ذلك"
     },
     "feeSpeed": {
       "fastest": "~10 دقائق",

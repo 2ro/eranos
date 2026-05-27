@@ -981,7 +981,9 @@
     "ofGoal": "{{amount}} के लक्ष्य में से",
     "donationCount_one": "{{count}} डोनेशन",
     "donationCount_other": "{{count}} डोनेशन",
-    "openInWallet": "वॉलेट में खोलें"
+    "openInWallet": "वॉलेट में खोलें",
+    "payWithAgoraWallet": "Agora से भुगतान करें",
+    "openExternalWallet": "बाहरी वॉलेट खोलें"
   },
   "calendarEvents": {
     "create": {
@@ -1430,7 +1432,9 @@
       "placeholder": "bc1…, sp1…, या npub…",
       "sendingSp": "साइलेंट पेमेंट से भेजा जा रहा है — प्राप्तकर्ता को एक नया, अनलिंक न होने वाला ऑन-चेन एड्रेस मिलता है।",
       "sendingNostr": "एक Nostr यूज़र के ऑन-चेन एड्रेस पर भेजा जा रहा है।",
-      "sendingRaw": "एक raw Bitcoin एड्रेस पर भेजा जा रहा है।"
+      "sendingRaw": "एक raw Bitcoin एड्रेस पर भेजा जा रहा है।",
+      "useSilentPayment": "इसके बजाय साइलेंट पेमेंट का उपयोग करें",
+      "useOnchain": "इसके बजाय ऑन-चेन एड्रेस का उपयोग करें"
     },
     "feeSpeed": {
       "fastest": "~10 मिनट",

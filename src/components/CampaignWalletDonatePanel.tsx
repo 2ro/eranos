@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import type { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Check, Copy, ExternalLink } from 'lucide-react';
 
@@ -10,6 +11,19 @@ import type { CampaignWallets } from '@/lib/campaign';
 interface CampaignWalletDonatePanelProps {
   /** Parsed wallet endpoints declared by the campaign's `w` tags. At least one must be present. */
   wallets: CampaignWallets;
+  /**
+   * Optional primary action rendered immediately above the
+   * "Open external wallet" button — typically a "Pay with Agora"
+   * button injected by the campaign detail page when the logged-in donor
+   * has an HD wallet available.
+   *
+   * When supplied, the "Open external wallet" button switches to the
+   * `outline` variant so the in-app pay action visually leads. When
+   * absent, the external-wallet button keeps its default (primary)
+   * styling — the panel still works on its own for logged-out donors
+   * and SP-only campaigns.
+   */
+  primaryAction?: ReactNode;
 }
 
 /**
@@ -54,6 +68,7 @@ function buildQrPayload(wallets: CampaignWallets): string {
  */
 export function CampaignWalletDonatePanel({
   wallets,
+  primaryAction,
 }: CampaignWalletDonatePanelProps) {
   const { t } = useTranslation();
   const qrPayload = buildQrPayload(wallets);
@@ -97,15 +112,35 @@ export function CampaignWalletDonatePanel({
       {/* Copyable value — single row mirroring the QR payload. */}
       <WalletCopyRow value={copyValue} label={copyLabel} />
 
-      {/* Open in wallet — relies on the `bitcoin:` URI handler. SP codes
-          inside `bitcoin:?sp=` are still understood by BIP-352-aware
-          wallets. Older wallets that don't know about SP will ignore
-          the parameter and either refuse the link or show an error — at
-          which point the donor falls back to copy/paste anyway. */}
-      <Button asChild className="w-full text-white">
+      {/* Optional in-app pay action rendered immediately above the
+          external-wallet button. When present it becomes the primary
+          CTA; the external button below downgrades to `outline` so
+          there's only ever one orange button stacked here. */}
+      {primaryAction}
+
+      {/* "Open in wallet" — relies on the `bitcoin:` URI handler. SP
+          codes inside `bitcoin:?sp=` are still understood by BIP-352-
+          aware wallets. Older wallets that don't know about SP will
+          ignore the parameter and either refuse the link or show an
+          error — at which point the donor falls back to copy/paste
+          anyway.
+
+          The label switches to "Open external wallet" only when a
+          `primaryAction` slot is filled (i.e. the in-app "Pay with
+          Agora" button is right above it) — that's the one situation
+          where we need to disambiguate between "external" and "Agora's
+          own wallet". When the slot is empty the qualifier is just
+          noise. */}
+      <Button
+        asChild
+        variant={primaryAction ? 'outline' : 'default'}
+        className={primaryAction ? 'w-full' : 'w-full text-white'}
+      >
         <a href={qrPayload}>
           <ExternalLink className="size-4 mr-1.5" />
-          {t('campaignsDetail.openInWallet')}
+          {primaryAction
+            ? t('campaignsDetail.openExternalWallet')
+            : t('campaignsDetail.openInWallet')}
         </a>
       </Button>
     </div>

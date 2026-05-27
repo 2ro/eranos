@@ -549,7 +549,9 @@
     "ofGoal": "از هدف {{amount}}",
     "donationCount_one": "{{count}} کمک",
     "donationCount_other": "{{count}} کمک",
-    "openInWallet": "باز کردن در کیف پول"
+    "openInWallet": "باز کردن در کیف پول",
+    "payWithAgoraWallet": "پرداخت با Agora",
+    "openExternalWallet": "باز کردن کیف پول خارجی"
   },
   "calendarEvents": {
     "create": {
@@ -1062,7 +1064,9 @@
       "placeholder": "bc1…، sp1… یا npub…",
       "sendingSp": "ارسال از طریق پرداخت خاموش — گیرنده یک نشانی تازه و غیرقابل‌پیوندیابی روی زنجیره دریافت می‌کند.",
       "sendingNostr": "ارسال به نشانی روی‌زنجیرهٔ یک کاربر Nostr.",
-      "sendingRaw": "ارسال به یک نشانی خام بیت‌کوین."
+      "sendingRaw": "ارسال به یک نشانی خام بیت‌کوین.",
+      "useSilentPayment": "استفاده از پرداخت خاموش به جای آن",
+      "useOnchain": "استفاده از نشانی روی‌زنجیره به جای آن"
     },
     "feeSpeed": {
       "fastest": "~۱۰ دقیقه",

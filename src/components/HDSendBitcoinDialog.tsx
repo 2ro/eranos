@@ -145,6 +145,31 @@ interface HDSendBitcoinDialogProps {
   onClose: () => void;
   /** BTC/USD price — passed in to avoid duplicate fetches. */
   btcPrice?: number;
+  /**
+   * Optional recipient (bare address, `sp1…` code, npub, or `bitcoin:` URI)
+   * to prefill the recipient field with when the dialog opens. Used by
+   * callers like the campaign detail page that already know the
+   * destination, so the donor only needs to enter an amount.
+   *
+   * The field stays editable — donors can clear and retype if they want
+   * to send somewhere else. The prefill applies on each open transition
+   * (false → true) so reopening after a successful send loads the same
+   * destination again.
+   */
+  initialRecipient?: string;
+  /**
+   * Optional *alternate* recipient. When supplied alongside
+   * {@link initialRecipient}, the dialog shows a small "Use silent
+   * payment instead" / "Use on-chain address instead" toggle under the
+   * recipient field. Clicking it swaps the input between the two values
+   * so donors can pick whichever the campaign provides without leaving
+   * the modal.
+   *
+   * Campaign detail page wires the on-chain `bc1…` address as
+   * {@link initialRecipient} (default) and the silent-payment `sp1…`
+   * code as `initialRecipientAlt`.
+   */
+  initialRecipientAlt?: string;
 }
 
 interface SendResult {
@@ -169,7 +194,7 @@ interface SendResult {
  * the HD wallet's UTXO set across many addresses, signs with per-input HD-derived
  * keys, and emits change to a fresh internal address.
  */
-export function HDSendBitcoinDialog({ isOpen, onClose, btcPrice }: HDSendBitcoinDialogProps) {
+export function HDSendBitcoinDialog({ isOpen, onClose, btcPrice, initialRecipient, initialRecipientAlt }: HDSendBitcoinDialogProps) {
   const { t } = useTranslation();
   const availability = useHdWalletAccess();
   const {
@@ -314,6 +339,31 @@ export function HDSendBitcoinDialog({ isOpen, onClose, btcPrice }: HDSendBitcoin
   const [confirmArmed, setConfirmArmed] = useState(false);
   const [acknowledgedPublic, setAcknowledgedPublic] = useState(false);
 
+  // Recipient swap target. When the caller supplied two alternate
+  // destinations (e.g. campaign detail page passing both `bc1…` and
+  // `sp1…` from the campaign's wallet endpoints) and the current input
+  // still matches one of them, expose a one-tap toggle to swap. If the
+  // donor manually edited the field to something else, the toggle hides
+  // itself so we don't trash their typed input.
+  //
+  // Lives next to `isRawAddress` so the render block can place the
+  // toggle adjacent to the privacy disclaimer (its natural home — both
+  // are about whether to expose a reusable on-chain address).
+  const recipientSwap = useMemo<{ swapTo: string; labelKey: string } | null>(() => {
+    if (!initialRecipient || !initialRecipientAlt) return null;
+    const trimmed = recipientInput.trim();
+    let swapTo: string | null = null;
+    if (trimmed === initialRecipient) swapTo = initialRecipientAlt;
+    else if (trimmed === initialRecipientAlt) swapTo = initialRecipient;
+    if (!swapTo) return null;
+    // The label tells the user *what they're switching to* — detect by
+    // prefix so an `sp1…` swap target advertises silent payment.
+    const labelKey = swapTo.toLowerCase().startsWith('sp1')
+      ? 'walletSend.recipient.useSilentPayment'
+      : 'walletSend.recipient.useOnchain';
+    return { swapTo, labelKey };
+  }, [initialRecipient, initialRecipientAlt, recipientInput]);
+
   useEffect(() => {
     setConfirmArmed(false);
   }, [amountSats, currentFeeRate, btcPrice, recipient?.address]);
@@ -324,6 +374,21 @@ export function HDSendBitcoinDialog({ isOpen, onClose, btcPrice }: HDSendBitcoin
   useEffect(() => {
     setAcknowledgedPublic(false);
   }, [recipient?.address]);
+
+  // Prefill the recipient field on every dialog open transition (closed →
+  // open). Callers like the campaign donate column already know the
+  // destination, so the donor only needs to type an amount. The field
+  // stays editable; reopening after a send re-applies the prefill instead
+  // of remembering the cleared value. Tracked via a ref so reopens with a
+  // stable string still re-apply (the value alone can't tell us whether
+  // the dialog has reopened).
+  const wasOpenRef = useRef(false);
+  useEffect(() => {
+    if (isOpen && !wasOpenRef.current && initialRecipient) {
+      setRecipientInput(initialRecipient);
+    }
+    wasOpenRef.current = isOpen;
+  }, [isOpen, initialRecipient]);
 
   const requiresArm = isLarge || isRawAddress;
 
@@ -530,12 +595,32 @@ export function HDSendBitcoinDialog({ isOpen, onClose, btcPrice }: HDSendBitcoin
                 )}
               </div>
 
-              {/* Privacy disclaimer for raw addresses */}
-              {isRawAddress && (
-                <BitcoinPublicDisclaimer
-                  acknowledged={acknowledgedPublic}
-                  onAcknowledgedChange={setAcknowledgedPublic}
-                />
+              {/* Privacy disclaimer for raw addresses + companion
+                  swap-to-silent-payment toggle. Both are about whether
+                  the donation will land on a reusable, publicly-tied
+                  address; grouping them lets a donor who reads the
+                  warning flip straight to SP without hunting for the
+                  control. When the disclaimer is absent (recipient is
+                  already SP or a Nostr identity), the toggle still
+                  renders so the donor can swap back to on-chain. */}
+              {(isRawAddress || recipientSwap) && (
+                <div className="grid gap-2">
+                  {isRawAddress && (
+                    <BitcoinPublicDisclaimer
+                      acknowledged={acknowledgedPublic}
+                      onAcknowledgedChange={setAcknowledgedPublic}
+                    />
+                  )}
+                  {recipientSwap && (
+                    <button
+                      type="button"
+                      onClick={() => setRecipientInput(recipientSwap.swapTo)}
+                      className="self-start text-xs text-primary hover:underline motion-safe:transition-colors"
+                    >
+                      {t(recipientSwap.labelKey)}
+                    </button>
+                  )}
+                </div>
               )}
 
               {/* Fee speed */}

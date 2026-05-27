@@ -549,7 +549,9 @@
     "ofGoal": "ye{{amount}} chinangwa",
     "donationCount_one": "{{count}} chipo",
     "donationCount_other": "{{count}} zvipo",
-    "openInWallet": "Vhura muchikwama"
+    "openInWallet": "Vhura muchikwama",
+    "payWithAgoraWallet": "Bhadhara neAgora",
+    "openExternalWallet": "Vhura chikwama chekunze"
   },
   "calendarEvents": {
     "create": {
@@ -1062,7 +1064,9 @@
       "placeholder": "bc1…, sp1…, kana npub…",
       "sendingSp": "Kutumira nemubhadharo wakanyararira — mugamuchiri anowana kero itsva, isingakwanise kubatanidzwa pacheni.",
       "sendingNostr": "Kutumira kukero yepacheni yemushandisi weNostr.",
-      "sendingRaw": "Kutumira kukero yeBitcoin yakangosaina."
+      "sendingRaw": "Kutumira kukero yeBitcoin yakangosaina.",
+      "useSilentPayment": "Shandisa mubhadharo wakanyararira pachinzvimbo",
+      "useOnchain": "Shandisa kero yepacheni pachinzvimbo"
     },
     "feeSpeed": {
       "fastest": "~10 maminitsi",

@@ -981,7 +981,9 @@
     "ofGoal": "из цели {{amount}}",
     "donationCount_one": "{{count}} пожертвование",
     "donationCount_other": "{{count}} пожертвований",
-    "openInWallet": "Открыть в кошельке"
+    "openInWallet": "Открыть в кошельке",
+    "payWithAgoraWallet": "Оплатить через Agora",
+    "openExternalWallet": "Открыть внешний кошелёк"
   },
   "calendarEvents": {
     "create": {
@@ -1494,7 +1496,9 @@
       "placeholder": "bc1…, sp1…, или npub…",
       "sendingSp": "Отправка через тихий платёж — получатель получает свежий, нерасшифровываемый адрес в блокчейне.",
       "sendingNostr": "Отправка на адрес пользователя Nostr в блокчейне.",
-      "sendingRaw": "Отправка на сырой Bitcoin-адрес."
+      "sendingRaw": "Отправка на сырой Bitcoin-адрес.",
+      "useSilentPayment": "Использовать тихий платёж",
+      "useOnchain": "Использовать адрес в блокчейне"
     },
     "feeSpeed": {
       "fastest": "~10 мин",

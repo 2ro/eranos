@@ -981,7 +981,9 @@
     "ofGoal": "dari target {{amount}}",
     "donationCount_one": "{{count}} donasi",
     "donationCount_other": "{{count}} donasi",
-    "openInWallet": "Buka di dompet"
+    "openInWallet": "Buka di dompet",
+    "payWithAgoraWallet": "Bayar dengan Agora",
+    "openExternalWallet": "Buka dompet eksternal"
   },
   "calendarEvents": {
     "create": {
@@ -1430,7 +1432,9 @@
       "placeholder": "bc1…, sp1…, atau npub…",
       "sendingSp": "Mengirim melalui silent payment — penerima mendapat alamat on-chain baru yang tak terhubungkan.",
       "sendingNostr": "Mengirim ke alamat on-chain pengguna Nostr.",
-      "sendingRaw": "Mengirim ke alamat Bitcoin mentah."
+      "sendingRaw": "Mengirim ke alamat Bitcoin mentah.",
+      "useSilentPayment": "Gunakan silent payment saja",
+      "useOnchain": "Gunakan alamat on-chain saja"
     },
     "feeSpeed": {
       "fastest": "~10 menit",
