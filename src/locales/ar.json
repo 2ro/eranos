@@ -489,6 +489,7 @@
     "edit": "تعديل",
     "delete": "حذف",
     "deleting": "جارٍ الحذف…",
+    "openCover": "افتح صورة الغلاف",
     "byAuthor": "بواسطة <0>{{name}}</0>",
     "commentLabel": "تعليق",
     "linkCopied": "تم نسخ الرابط إلى الحافظة",

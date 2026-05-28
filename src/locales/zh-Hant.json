@@ -501,6 +501,7 @@
     "edit": "編輯",
     "delete": "刪除",
     "deleting": "刪除中……",
+    "openCover": "開啟封面圖片",
     "byAuthor": "由 <0>{{name}}</0>",
     "commentLabel": "評論",
     "linkCopied": "已複製連結到剪貼簿",

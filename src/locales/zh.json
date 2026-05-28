@@ -501,6 +501,7 @@
     "edit": "编辑",
     "delete": "删除",
     "deleting": "删除中……",
+    "openCover": "打开封面图片",
     "byAuthor": "由 <0>{{name}}</0>",
     "commentLabel": "评论",
     "linkCopied": "已复制链接到剪贴板",

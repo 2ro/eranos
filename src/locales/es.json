@@ -501,6 +501,7 @@
     "edit": "Editar",
     "delete": "Eliminar",
     "deleting": "Eliminando…",
+    "openCover": "Abrir imagen de portada",
     "byAuthor": "por <0>{{name}}</0>",
     "commentLabel": "Comentar",
     "linkCopied": "Enlace copiado al portapapeles",

@@ -924,6 +924,7 @@
     "edit": "Edit",
     "delete": "Delete",
     "deleting": "Deleting…",
+    "openCover": "Open cover image",
     "byAuthor": "by <0>{{name}}</0>",
     "commentLabel": "Comment",
     "linkCopied": "Link copied to clipboard",

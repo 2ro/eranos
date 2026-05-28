@@ -501,6 +501,7 @@
     "edit": "سمول",
     "delete": "ړنګول",
     "deleting": "ړنګېږي…",
+    "openCover": "د سرپاڼې انځور پرانیستل",
     "byAuthor": "د <0>{{name}}</0> له لوري",
     "commentLabel": "تبصره",
     "linkCopied": "لینک کلپ‌بورډ ته کاپي شو",

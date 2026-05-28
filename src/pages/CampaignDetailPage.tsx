@@ -25,6 +25,7 @@ import {
   CampaignWalletDonatePanel,
 } from '@/components/CampaignWalletDonatePanel';
 import { HDSendBitcoinDialog } from '@/components/HDSendBitcoinDialog';
+import { Lightbox } from '@/components/ImageGallery';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -145,6 +146,7 @@ function CampaignDetailContent({ campaign }: { campaign: ParsedCampaign }) {
   const [interactionsOpen, setInteractionsOpen] = useState(false);
   const [interactionsTab, setInteractionsTab] = useState<InteractionTab>('reposts');
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
+  const [coverLightboxOpen, setCoverLightboxOpen] = useState(false);
   const { translatedEvent, translateAction } = useEventTranslation(campaign.event);
   const displayCampaign = useMemo(() => parseCampaign(translatedEvent) ?? campaign, [translatedEvent, campaign]);
 
@@ -363,6 +365,7 @@ function CampaignDetailContent({ campaign }: { campaign: ParsedCampaign }) {
         deleteDisabled={deleteMutation.isPending}
         onBack={() => navigate(-1)}
         onDelete={() => setDeleteConfirmOpen(true)}
+        onCoverClick={cover ? () => setCoverLightboxOpen(true) : undefined}
       />
 
       <CampaignHeading
@@ -555,6 +558,16 @@ function CampaignDetailContent({ campaign }: { campaign: ParsedCampaign }) {
         onOpenChange={setInteractionsOpen}
         initialTab={interactionsTab}
       />
+
+      {cover && coverLightboxOpen && (
+        <Lightbox
+          images={[cover]}
+          currentIndex={0}
+          onClose={() => setCoverLightboxOpen(false)}
+          onNext={() => {}}
+          onPrev={() => {}}
+        />
+      )}
 
       <AlertDialog open={deleteConfirmOpen} onOpenChange={setDeleteConfirmOpen}>
         <AlertDialogContent>
@@ -760,6 +773,9 @@ interface CampaignHeroProps {
   deleteDisabled: boolean;
   onBack: () => void;
   onDelete: () => void;
+  /** Click the cover image to open it in the fullscreen Lightbox. Pass
+      `undefined` to disable (e.g. when there is no cover image). */
+  onCoverClick: (() => void) | undefined;
 }
 
 function CampaignHero({
@@ -769,74 +785,159 @@ function CampaignHero({
   deleteDisabled,
   onBack,
   onDelete,
+  onCoverClick,
 }: CampaignHeroProps) {
   const { t } = useTranslation();
 
   return (
-    // Pure image hero: full-bleed banner with floating back / admin
-    // controls only. Title, summary, byline, meta, and action bar all
-    // live in `CampaignHeading` below the banner so they get their own
-    // room and never collide with text baked into the image. Aspect
-    // ratios stay landscape at every breakpoint (4:3 → 21:9 → 3:1) so
-    // `object-cover` trims a thin strip top/bottom instead of slicing
-    // horizontal content off the sides.
-    <header className="relative isolate w-full overflow-hidden bg-gradient-to-br from-primary/40 via-primary/20 to-secondary aspect-[4/3] sm:aspect-[21/9] lg:aspect-[3/1]">
-      {cover ? (
-        <img
-          src={cover}
-          alt=""
-          className="absolute inset-0 size-full object-cover"
-        />
-      ) : (
-        <div className="absolute inset-0 flex items-center justify-center">
-          <HandHeart className="size-20 text-primary/40" />
-        </div>
-      )}
-
-      {/* Top controls — back left, admin right. No scrim above; the
-          buttons rely on their own `bg-black/30 backdrop-blur-md` chip
-          backgrounds for legibility, which works on any image without
-          darkening the top of the banner. Contained to the same
-          max-w-6xl column as the heading block below so the back
-          button aligns with the title's left edge. */}
-      <div className="absolute inset-x-0 top-0 z-10 px-5 sm:px-6 lg:px-0 pt-[max(env(safe-area-inset-top),1rem)]">
-        <div className="max-w-6xl mx-auto flex items-center justify-between gap-3">
+    <>
+      {/* Black band ABOVE the banner. On mobile it hosts the back /
+          admin toolbar so the chips sit on a plain dark surface
+          instead of overlaying the banner image (and any baked-in
+          text). On `sm:` upward the toolbar moves inside the header
+          (chip overlay), but this band stays as a thin strip of
+          black above the banner so the banner reads as a framed
+          window into the image rather than a floating block on the
+          page background. */}
+      <div className="bg-black text-white">
+        <div className="sm:hidden flex items-center justify-between gap-3 px-3 pt-[max(env(safe-area-inset-top),0.5rem)] pb-2">
           <button
             onClick={onBack}
-            className="inline-flex items-center gap-1.5 h-10 pl-2 pr-3.5 rounded-full bg-black/30 text-white backdrop-blur-md hover:bg-black/45 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80 motion-safe:transition-colors"
+            className="inline-flex items-center gap-1.5 h-10 -ml-2 pl-2 pr-3.5 rounded-full text-white hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80 motion-safe:transition-colors"
             aria-label={t('common.goBack')}
           >
             <ChevronLeft className="size-5 rtl:rotate-180" />
-            <span className="text-sm font-medium hidden sm:inline">{t('campaignsDetail.back')}</span>
           </button>
 
           {isCreator && (
             <div className="flex items-center gap-1.5">
-              <Button
-                asChild
-                size="sm"
-                className="h-10 rounded-full bg-black/30 text-white backdrop-blur-md shadow-none hover:bg-black/45 focus-visible:ring-white/80"
-              >
-                <Link to={`/campaigns/new?edit=${encodeURIComponent(naddr)}`}>
-                  <Pencil className="size-4 sm:mr-2" />
-                  <span className="hidden sm:inline">{t('campaignsDetail.edit')}</span>
+              <Button asChild size="sm" variant="ghost" className="h-10 rounded-full text-white hover:bg-white/10 hover:text-white">
+                <Link to={`/campaigns/new?edit=${encodeURIComponent(naddr)}`} aria-label={t('campaignsDetail.edit')}>
+                  <Pencil className="size-4" />
                 </Link>
               </Button>
               <Button
                 type="button"
                 size="sm"
+                variant="ghost"
                 onClick={onDelete}
                 disabled={deleteDisabled}
-                className="h-10 rounded-full bg-black/30 text-white backdrop-blur-md shadow-none hover:bg-destructive/70 focus-visible:ring-white/80"
+                aria-label={t('campaignsDetail.delete')}
+                className="h-10 rounded-full text-white hover:bg-destructive/30 hover:text-white"
               >
-                <Trash2 className="size-4 sm:mr-2" />
-                <span className="hidden sm:inline">{t('campaignsDetail.delete')}</span>
+                <Trash2 className="size-4" />
               </Button>
             </div>
           )}
         </div>
       </div>
-    </header>
+
+      {/* Full-bleed banner that respects the source image. The section
+          stretches edge to edge of the viewport and takes its height
+          from the contained image (capped at 70vh so an extreme
+          portrait banner can't eat the whole screen). The blurred,
+          scaled backdrop fills that full width so the banner never
+          reads as a floating box. The sharp `object-contain`
+          foreground image is capped to the same `max-w-6xl` reading
+          column and centered, so the actual banner pixels are never
+          cropped — anything outside the image's natural frame is the
+          soft blurred bleed. */}
+      <header className="relative isolate w-full overflow-hidden bg-black shadow-lg shadow-black/25">
+        {cover ? (
+          <>
+            {/* Blurred bleed: a scaled-up, soft copy of the same image
+                fills the full-bleed gutters around the contained
+                foreground. `scale-110` hides the soft edges left by
+                `blur-2xl`. `brightness-75` keeps the bleed shadowy so
+                the centered sharp image visually dominates.
+                `aria-hidden` because the foreground image already
+                conveys the content. */}
+            <img
+              src={cover}
+              alt=""
+              aria-hidden
+              className="absolute inset-0 size-full object-cover scale-110 blur-2xl brightness-75"
+            />
+            {/* Side vignette — soft horizontal shadow that darkens the
+                left and right gutters specifically, so the bleed
+                recedes and the contained image reads as the subject. */}
+            <div
+              aria-hidden
+              className="absolute inset-0 bg-gradient-to-r from-black/55 via-transparent to-black/55"
+            />
+            {/* Sharp foreground capped to the reading column and to
+                70vh so it dictates the banner's height. `mx-auto`
+                centers it horizontally; `object-contain` guarantees
+                the source image is shown in its entirety, never
+                cropped. Wrapped in a button so clicking the banner
+                opens it fullscreen via the shared Lightbox.
+                `cursor-zoom-in` signals the affordance. */}
+            <button
+              type="button"
+              onClick={onCoverClick}
+              aria-label={t('campaignsDetail.openCover')}
+              className="relative block w-full max-w-6xl max-h-[70vh] mx-auto cursor-zoom-in focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80"
+            >
+              <img
+                src={cover}
+                alt=""
+                className="block w-full max-h-[70vh] mx-auto object-contain"
+              />
+            </button>
+          </>
+        ) : (
+          <div className="flex items-center justify-center aspect-[16/9] bg-gradient-to-br from-primary/30 via-primary/10 to-secondary">
+            <HandHeart className="size-20 text-primary/40" />
+          </div>
+        )}
+
+        {/* Desktop top controls (sm+) — back left, admin right.
+            Absolutely positioned over the banner inside the same
+            max-w-6xl column as the heading block below so the back
+            button aligns with the title's left edge. Chip-style
+            backdrops so they read on top of an arbitrary blurred
+            bleed without an opaque pill. On mobile we use the plain
+            toolbar above the banner instead so chips can't cover
+            baked-in image text. */}
+        <div className="hidden sm:block absolute inset-x-0 top-0 z-10 px-5 sm:px-6 lg:px-0 pt-[max(env(safe-area-inset-top),1rem)]">
+          <div className="max-w-6xl mx-auto flex items-center justify-between gap-3">
+            <button
+              onClick={onBack}
+              className="inline-flex items-center gap-1.5 h-10 pl-2 pr-3.5 rounded-full bg-black/30 text-white backdrop-blur-md hover:bg-black/45 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80 motion-safe:transition-colors"
+              aria-label={t('common.goBack')}
+            >
+              <ChevronLeft className="size-5 rtl:rotate-180" />
+              <span className="text-sm font-medium">{t('campaignsDetail.back')}</span>
+            </button>
+
+            {isCreator && (
+              <div className="flex items-center gap-1.5">
+                <Button
+                  asChild
+                  size="sm"
+                  className="h-10 rounded-full bg-black/30 text-white backdrop-blur-md shadow-none hover:bg-black/45 focus-visible:ring-white/80"
+                >
+                  <Link to={`/campaigns/new?edit=${encodeURIComponent(naddr)}`}>
+                    <Pencil className="size-4 mr-2" />
+                    <span>{t('campaignsDetail.edit')}</span>
+                  </Link>
+                </Button>
+                <Button
+                  type="button"
+                  size="sm"
+                  onClick={onDelete}
+                  disabled={deleteDisabled}
+                  className="h-10 rounded-full bg-black/30 text-white backdrop-blur-md shadow-none hover:bg-destructive/70 focus-visible:ring-white/80"
+                >
+                  <Trash2 className="size-4 mr-2" />
+                  <span>{t('campaignsDetail.delete')}</span>
+                </Button>
+              </div>
+            )}
+          </div>
+        </div>
+      </header>
+    </>
   );
 }
 
@@ -879,7 +980,7 @@ function CampaignHeading({
       )}
 
       <div className="mt-5">
-        <AuthorByline pubkey={creatorPubkey} variant="hero" />
+        <AuthorByline pubkey={creatorPubkey} />
       </div>
 
       {(countryLabel || deadline) && (
@@ -900,9 +1001,8 @@ function CampaignHeading({
       )}
 
       {/* Action bar (comment / repost / react / share / more) sits
-          directly under the heading on the page surface. No glass
-          treatment — it inherits PostActionBar's default styling
-          against `bg-background`. */}
+          directly under the heading on the page surface — default
+          PostActionBar styling against `bg-background`. */}
       <div className="mt-4 pt-3 border-t border-border/60">
         <PostActionBar
           event={campaign.event}
