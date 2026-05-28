@@ -912,7 +912,7 @@ export const NoteCard = memo(function NoteCard({
       <div className="flex-1" />
 
       <button
-        className="inline-flex items-center justify-center h-9 w-9 rounded-full text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors sidebar:hidden"
+        className="inline-flex items-center justify-center h-9 w-9 rounded-full text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors"
         title={t('feed.actions.share')}
         onClick={async (e) => {
           e.stopPropagation();
