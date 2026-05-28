@@ -261,13 +261,6 @@ export default function ActionsPage() {
     },
   });
 
-  // Pledges now ride the same `agora.moderation` namespace as campaigns
-  // and organizations (two-axis: hide + featured). Filter hidden pledges
-  // out of search results unless the moderator opts in via the
-  // Show-hidden switch. Computed here so the search hook stays
-  // kind-agnostic.
-  const { data: pledgeModeration, isReady: pledgeModerationReady } = usePledgeModeration();
-
   // Moderator gate. Reuses the campaign moderator pack (Team Soapbox) —
   // the pledge moderation namespace rides the same signer set as the
   // campaign and group surfaces. Drives the Pending and Hidden review
@@ -275,6 +268,41 @@ export default function ActionsPage() {
   const { data: moderators } = useCampaignModerators();
   const isMod = !!user && !!moderators && moderators.includes(user.pubkey);
   const canShowHidden = isMod && showHidden;
+
+  const { data: rawActions, isLoading: actionsLoading } = useActions({
+    countryCode: selectedCountry,
+    limit: 300,
+  });
+
+  // For moderators we pull the full (unfiltered-by-country) pledge
+  // stream so the review queue isn't blinkered to whatever country the
+  // viewer happens to have selected. Same `agora-action` t-tag filter
+  // as the public list, just wider. Skipped entirely for non-mods so we
+  // don't pay the round-trip cost for everyone.
+  const { data: allPledgesForMods, isLoading: allPledgesLoading } = useActions({
+    limit: 300,
+    enabled: isMod,
+  });
+
+  const moderationCoordSourcesLoaded = isSearching ? !!searchHitsRaw : !!rawActions;
+  const pledgeModerationCoords = useMemo(() => {
+    const coords = new Set<string>();
+    for (const action of rawActions ?? []) coords.add(getPledgeCoord(action));
+    for (const action of searchHitsRaw ?? []) coords.add(getPledgeCoord(action));
+    for (const action of allPledgesForMods ?? []) coords.add(getPledgeCoord(action));
+    return Array.from(coords);
+  }, [rawActions, searchHitsRaw, allPledgesForMods]);
+
+  // Pledges now ride the same `agora.moderation` namespace as campaigns
+  // and organizations (two-axis: hide + featured). Unlike campaigns,
+  // pledges are public by default, so the page fetches the pledge stream
+  // first and then asks for moderation labels targeted to those pledge
+  // coordinates. Targeting `#a` avoids missing older hide labels when the
+  // global moderation stream grows beyond the broad query limit.
+  const { data: pledgeModeration, isReady: pledgeModerationReady } = usePledgeModeration({
+    coordinates: pledgeModerationCoords,
+    enabled: moderationCoordSourcesLoaded,
+  });
 
   const { searchHits, searchHiddenCount } = useMemo(() => {
     if (!searchHitsRaw) return { searchHits: undefined, searchHiddenCount: 0 };
@@ -292,11 +320,6 @@ export default function ActionsPage() {
     }
     return { searchHits: visible, searchHiddenCount: hidden };
   }, [searchHitsRaw, pledgeModeration, canShowHidden]);
-
-  const { data: rawActions, isLoading: actionsLoading } = useActions({
-    countryCode: selectedCountry,
-    limit: 300,
-  });
 
   const { actions, listHiddenCount } = useMemo(() => {
     if (!rawActions) return { actions: undefined, listHiddenCount: 0 };
@@ -316,16 +339,6 @@ export default function ActionsPage() {
 
     return { actions: visible, listHiddenCount: hidden };
   }, [rawActions, pledgeModeration, canShowHidden]);
-
-  // For moderators we pull the full (unfiltered-by-country) pledge
-  // stream so the review queue isn't blinkered to whatever country the
-  // viewer happens to have selected. Same `agora-action` t-tag filter
-  // as the public list, just wider. Skipped entirely for non-mods so we
-  // don't pay the round-trip cost for everyone.
-  const { data: allPledgesForMods, isLoading: allPledgesLoading } = useActions({
-    limit: 300,
-    enabled: isMod,
-  });
 
   // Pending (mod-only): pledges that haven't been featured or hidden.
   // Mirrors the campaign/group "needs review" semantics — pledges have

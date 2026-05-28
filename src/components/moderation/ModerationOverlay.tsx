@@ -84,7 +84,7 @@ function CampaignOverlay(props: ModerationOverlayProps) {
 }
 
 function PledgeOverlay(props: ModerationOverlayProps) {
-  const { data } = usePledgeModeration();
+  const { data } = usePledgeModeration({ coordinates: [props.coord] });
   return <OverlayBody {...props} isHidden={data.hiddenCoords.has(props.coord)} />;
 }
 

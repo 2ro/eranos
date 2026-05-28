@@ -205,7 +205,7 @@ function CampaignItemsInner(props: { coord: string; entityTitle: string; axes: r
 }
 
 function PledgeItemsInner(props: { coord: string; entityTitle: string; axes: readonly ModerationAxis[] }) {
-  const { data, moderate } = usePledgeModeration();
+  const { data, moderate } = usePledgeModeration({ coordinates: [props.coord] });
   return <ModerationItemsShell {...props} moderation={data} moderate={moderate} />;
 }
 
