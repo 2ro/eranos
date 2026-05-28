@@ -131,7 +131,6 @@ export function CreateCampaignPage() {
     : '';
 
   const [title, setTitle] = useState('');
-  const [summary, setSummary] = useState('');
   const [story, setStory] = useState('');
   const [bannerUrl, setBannerUrl] = useState('');
   /** NIP-94-format tag pairs from the most recent banner upload, used to build the NIP-92 imeta tag on publish. */
@@ -274,7 +273,6 @@ export function CreateCampaignPage() {
     if (!editCampaign || prepopulatedEventId === editCampaign.event.id) return;
 
     setTitle(editCampaign.title);
-    setSummary(editCampaign.summary);
     setStory(editCampaign.story);
     setBannerUrl(editCampaign.banner ?? '');
     // We don't have NIP-94 tags for an existing event — the imeta is
@@ -433,7 +431,6 @@ export function CreateCampaignPage() {
         ['d', slug],
         ['title', trimmedTitle],
       ];
-      if (summary.trim()) tags.push(['summary', summary.trim()]);
       if (sanitizedBanner) {
         tags.push(['banner', sanitizedBanner]);
         // NIP-92 imeta pairs with the banner. Two sources, in priority order:
@@ -751,20 +748,8 @@ export function CreateCampaignPage() {
             />
           </FormSection>
 
-          {/* Summary */}
-          <FormSection title={t('campaignsCreate.summary')} requirement="Recommended">
-            <Textarea
-              id="campaign-summary"
-              value={summary}
-              onChange={(e) => setSummary(e.target.value)}
-              placeholder={t('campaignsCreate.summaryPlaceholder')}
-              rows={2}
-              maxLength={300}
-            />
-          </FormSection>
-
           {/* Story */}
-          <FormSection title={t('campaignsCreate.story')} requirement="Optional">
+          <FormSection title={t('campaignsCreate.story')} requirement="Recommended">
             <Textarea
               id="campaign-story"
               value={story}
