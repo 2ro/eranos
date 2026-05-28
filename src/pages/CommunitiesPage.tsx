@@ -475,17 +475,18 @@ function MyCommunitiesShelf({
   // "My organizations" = orgs the user founded, moderates, or follows.
   // Sorting is founder first, moderator second, followed-only last, with
   // newest community definition revisions first inside each bucket.
-  const { data: organizations, isLoading } = userOrganizations;
+  const { data: organizations } = userOrganizations;
   const [expanded, setExpanded] = useState(false);
 
   if (!user) return null;
-  // Suppress the entire section (header + tagline included) when the user has
-  // no groups to show. The header should only appear alongside actual content.
-  if (!isLoading && (!organizations || organizations.length === 0)) return null;
+  // Suppress the entire section (header + tagline included) until at least
+  // one group is known. Rendering the header while the query is still
+  // pending causes a flash when the result resolves to an empty list.
+  if (!organizations || organizations.length === 0) return null;
 
   const COLLAPSED_COUNT = 4;
-  const visible = expanded ? organizations ?? [] : (organizations ?? []).slice(0, COLLAPSED_COUNT);
-  const canExpand = (organizations?.length ?? 0) > COLLAPSED_COUNT;
+  const visible = expanded ? organizations : organizations.slice(0, COLLAPSED_COUNT);
+  const canExpand = organizations.length > COLLAPSED_COUNT;
 
   return (
     <section className="space-y-5">
@@ -497,70 +498,47 @@ function MyCommunitiesShelf({
           {t('groups.list.myGroupsTagline')}
         </p>
       </div>
-      {isLoading ? (
+      <div className="space-y-4">
         <CommunityGrid>
-          {Array.from({ length: 4 }).map((_, i) => (
-            <CommunityMiniCardSkeleton key={i} className="w-full" />
+          {visible.map((entry) => (
+            <CommunityMiniCard
+              key={entry.community.aTag}
+              community={entry.community}
+              className="w-full"
+            />
           ))}
         </CommunityGrid>
-      ) : (
-        <div className="space-y-4">
-          <CommunityGrid>
-            {visible.map((entry) => (
-              <CommunityMiniCard
-                key={entry.community.aTag}
-                community={entry.community}
-                className="w-full"
-              />
-            ))}
-          </CommunityGrid>
-          {canExpand && (
-            <div className="flex justify-center">
-              <Button
-                type="button"
-                variant="ghost"
-                onClick={() => setExpanded((v) => !v)}
-                className="rounded-full text-sm"
-                aria-expanded={expanded}
-              >
-                {expanded ? (
-                  <>
-                    <ChevronUp className="size-4 mr-1.5" />
-                    {t('groups.list.showLess')}
-                  </>
-                ) : (
-                  <>
-                    <ChevronDown className="size-4 mr-1.5" />
-                    {t('groups.list.showMore', { count: (organizations?.length ?? 0) - COLLAPSED_COUNT })}
-                  </>
-                )}
-              </Button>
-            </div>
-          )}
-        </div>
-      )}
+        {canExpand && (
+          <div className="flex justify-center">
+            <Button
+              type="button"
+              variant="ghost"
+              onClick={() => setExpanded((v) => !v)}
+              className="rounded-full text-sm"
+              aria-expanded={expanded}
+            >
+              {expanded ? (
+                <>
+                  <ChevronUp className="size-4 mr-1.5" />
+                  {t('groups.list.showLess')}
+                </>
+              ) : (
+                <>
+                  <ChevronDown className="size-4 mr-1.5" />
+                  {t('groups.list.showMore', { count: organizations.length - COLLAPSED_COUNT })}
+                </>
+              )}
+            </Button>
+          </div>
+        )}
+      </div>
     </section>
   );
 }
 
 function FeaturedOrganizationsShelf() {
-  const { data: featured, isLoading, isPending } = useFeaturedOrganizations();
-  const hasFeatured = !!featured && featured.length > 0;
-
-  if ((isPending || isLoading) && !hasFeatured) {
-    return (
-      <section className="space-y-5">
-        <FeaturedOrganizationsHeading />
-        <CommunityGrid>
-          {Array.from({ length: 8 }).map((_, i) => (
-            <CommunityMiniCardSkeleton key={i} className="w-full" />
-          ))}
-        </CommunityGrid>
-      </section>
-    );
-  }
-
-  if (!hasFeatured) return null;
+  const { data: featured } = useFeaturedOrganizations();
+  if (!featured || featured.length === 0) return null;
 
   return (
     <section className="space-y-5">
