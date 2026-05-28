@@ -3,6 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import type { NostrEvent, NostrFilter } from '@nostrify/nostrify';
 
 import { useOrganizationModeration } from '@/hooks/useOrganizationModeration';
+import { DITTO_RELAY } from '@/lib/appRelays';
 import {
   COMMUNITY_DEFINITION_KIND,
   parseCommunityEvent,
@@ -49,6 +50,7 @@ function parseCoord(coord: string): { pubkey: string; dTag: string } | null {
  */
 export function useFeaturedOrganizations() {
   const { nostr } = useNostr();
+  const relay = nostr.relay(DITTO_RELAY);
   const { data: moderation, isReady: moderationReady } = useOrganizationModeration();
 
   // Derive the curated coord set: featured minus hidden, sorted by the
@@ -101,7 +103,7 @@ export function useFeaturedOrganizations() {
       );
 
       const combinedSignal = AbortSignal.any([signal, AbortSignal.timeout(8000)]);
-      const events = await nostr.query(filters, { signal: combinedSignal });
+      const events = await relay.query(filters, { signal: combinedSignal });
 
       // Latest-wins dedupe of addressable revisions, then index by coord so
       // we can return them in the moderator-controlled `featuredOrder`.

@@ -2,6 +2,7 @@ import { useNostr } from '@nostrify/react';
 import { useQuery } from '@tanstack/react-query';
 import type { NostrEvent } from '@nostrify/nostrify';
 
+import { DITTO_RELAY } from '@/lib/appRelays';
 import {
   COMMUNITY_DEFINITION_KIND,
   parseCommunityEvent,
@@ -29,11 +30,12 @@ interface UseDiscoverCommunitiesOptions {
 export function useDiscoverCommunities(options: UseDiscoverCommunitiesOptions = {}) {
   const { limit = 24 } = options;
   const { nostr } = useNostr();
+  const relay = nostr.relay(DITTO_RELAY);
 
   return useQuery<ParsedCommunity[]>({
     queryKey: ['discover-communities', limit],
     queryFn: async ({ signal }) => {
-      const events = await nostr.query(
+      const events = await relay.query(
         [{ kinds: [COMMUNITY_DEFINITION_KIND], limit }],
         { signal },
       );
@@ -65,4 +67,3 @@ export function useDiscoverCommunities(options: UseDiscoverCommunitiesOptions = 
     staleTime: 60_000,
   });
 }
-
