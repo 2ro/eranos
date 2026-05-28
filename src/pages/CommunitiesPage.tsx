@@ -653,10 +653,10 @@ function MyCommunitiesShelfContent({
 function FeaturedOrganizationsShelf() {
   const { t } = useTranslation();
   const { config } = useAppContext();
-  const { data: featured, isLoading } = useFeaturedOrganizations();
+  const { data: featured, isLoading, isPending } = useFeaturedOrganizations();
   const hasFeatured = !!featured && featured.length > 0;
 
-  if (isLoading && !hasFeatured) {
+  if ((isPending || isLoading) && !hasFeatured) {
     return (
       <CommunityGrid>
         {Array.from({ length: 8 }).map((_, i) => (
