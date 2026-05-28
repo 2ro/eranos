@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useSeoMeta } from '@unhead/react';
 import { useTranslation } from 'react-i18next';
@@ -58,7 +58,7 @@ export function WalletDoubleTweakFixPage() {
   const blockbookUrl = (config.blockbookBaseUrl ?? '').trim();
   const destinationAddress = wallet.currentReceiveAddress?.address;
 
-  const [fromHeight, setFromHeight] = useState('');
+  const [fromHeight, setFromHeight] = useState(String(recovery.defaultFromHeight));
   const [step, setStep] = useState<Step>('idle');
   const [error, setError] = useState<string | null>(null);
   const [txid, setTxid] = useState<string | null>(null);
@@ -68,13 +68,6 @@ export function WalletDoubleTweakFixPage() {
     title: `${t('walletDoubleTweak.seoTitle')} | ${config.appName}`,
     description: t('walletDoubleTweak.seoDescription'),
   });
-
-  // Pre-fill the start height once the indexer tip resolves.
-  useEffect(() => {
-    if (fromHeight === '' && recovery.defaultFromHeight !== undefined) {
-      setFromHeight(String(recovery.defaultFromHeight));
-    }
-  }, [recovery.defaultFromHeight, fromHeight]);
 
   const fromHeightNum = useMemo(() => {
     const n = parseInt(fromHeight, 10);

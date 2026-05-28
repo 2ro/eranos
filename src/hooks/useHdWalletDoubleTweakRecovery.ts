@@ -30,11 +30,13 @@ import {
 const SCAN_FETCH_CONCURRENCY = 8;
 
 /**
- * Default lookback window (in blocks) when the user doesn't specify a start
- * height. ~30 days of mainnet blocks — comfortably covers the period the
- * buggy build was live without scanning the whole chain.
+ * Default scan start height: one block before the earliest known
+ * double-tweak-affected transaction (the original $500 send,
+ * `9fb78657…`, mined in block 951431). No affected output can exist
+ * before this point, so starting here covers every stranded payment
+ * without scanning the whole chain.
  */
-const DEFAULT_LOOKBACK_BLOCKS = 4320;
+const DEFAULT_FROM_HEIGHT = 951430;
 
 export type DoubleTweakRecoveryUnavailable =
   | 'logged-out'
@@ -58,8 +60,9 @@ export interface UseHdWalletDoubleTweakRecoveryResult {
   seed?: Uint8Array;
   /** Indexer tip height, once resolved. */
   tipHeight?: number;
-  /** Suggested default start height for a scan. */
-  defaultFromHeight?: number;
+  /** Suggested default start height for a scan (one block before the
+   * earliest affected transaction). Always defined. */
+  defaultFromHeight: number;
   /** True while a scan is running. */
   isScanning: boolean;
   /** Live scan progress, or undefined when idle. */
@@ -108,8 +111,10 @@ export function useHdWalletDoubleTweakRecovery(): UseHdWalletDoubleTweakRecovery
     staleTime: 60_000,
   });
 
+  // Fixed floor — one block before the earliest affected tx. Clamp to the
+  // tip when known so we never suggest scanning past the chain end.
   const defaultFromHeight =
-    tipHeight !== undefined ? Math.max(0, tipHeight - DEFAULT_LOOKBACK_BLOCKS) : undefined;
+    tipHeight !== undefined ? Math.min(DEFAULT_FROM_HEIGHT, tipHeight) : DEFAULT_FROM_HEIGHT;
 
   const [isScanning, setIsScanning] = useState(false);
   const [scanProgress, setScanProgress] = useState<DoubleTweakScanProgress>();
