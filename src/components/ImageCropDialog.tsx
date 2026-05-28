@@ -11,17 +11,41 @@ interface ImageCropDialogProps {
   imageSrc: string;
   aspect: number;
   title?: string;
+  /**
+   * Cap on the output JPEG's long edge, in pixels. When the selected crop
+   * region in source-pixel space exceeds this, the canvas downscales with
+   * `drawImage`'s built-in bilinear filter. Omit (or pass `0`) to preserve
+   * the source-pixel crop size 1:1 — historical behavior, kept as the
+   * default so existing callers (avatar/banner in ProfileSettings) aren't
+   * silently down-rezzed without opting in.
+   */
+  maxOutputSize?: number;
   onCancel: () => void;
   onCrop: (croppedBlob: Blob) => void;
 }
 
-async function getCroppedBlob(imageSrc: string, pixelCrop: Area): Promise<Blob> {
+async function getCroppedBlob(
+  imageSrc: string,
+  pixelCrop: Area,
+  maxOutputSize?: number,
+): Promise<Blob> {
   const image = await createImageBitmap(await (await fetch(imageSrc)).blob());
+  // Compute the downscale factor. `drawImage` handles non-integer scaling
+  // fine; we round the final canvas size so the output dimensions are
+  // sensible integers.
+  const longest = Math.max(pixelCrop.width, pixelCrop.height);
+  const scale = maxOutputSize && longest > maxOutputSize ? maxOutputSize / longest : 1;
+  const outW = Math.max(1, Math.round(pixelCrop.width * scale));
+  const outH = Math.max(1, Math.round(pixelCrop.height * scale));
   const canvas = document.createElement('canvas');
-  canvas.width = pixelCrop.width;
-  canvas.height = pixelCrop.height;
+  canvas.width = outW;
+  canvas.height = outH;
   const ctx = canvas.getContext('2d');
   if (!ctx) throw new Error('Canvas context unavailable');
+  // Hint the browser toward higher-quality resampling when downscaling.
+  // Safari/Chrome both honor this for the 9-arg `drawImage` form.
+  ctx.imageSmoothingEnabled = true;
+  ctx.imageSmoothingQuality = 'high';
   ctx.drawImage(
     image,
     pixelCrop.x,
@@ -30,8 +54,8 @@ async function getCroppedBlob(imageSrc: string, pixelCrop: Area): Promise<Blob> 
     pixelCrop.height,
     0,
     0,
-    pixelCrop.width,
-    pixelCrop.height,
+    outW,
+    outH,
   );
   return new Promise<Blob>((resolve, reject) => {
     canvas.toBlob((blob) => {
@@ -41,7 +65,7 @@ async function getCroppedBlob(imageSrc: string, pixelCrop: Area): Promise<Blob> 
   });
 }
 
-export function ImageCropDialog({ open, imageSrc, aspect, title = 'Crop Image', onCancel, onCrop }: ImageCropDialogProps) {
+export function ImageCropDialog({ open, imageSrc, aspect, title = 'Crop Image', maxOutputSize, onCancel, onCrop }: ImageCropDialogProps) {
   const [crop, setCrop] = useState<Point>({ x: 0, y: 0 });
   const [zoom, setZoom] = useState(1);
   const [croppedAreaPixels, setCroppedAreaPixels] = useState<Area | null>(null);
@@ -60,7 +84,7 @@ export function ImageCropDialog({ open, imageSrc, aspect, title = 'Crop Image', 
     if (!croppedAreaPixels) return;
     setIsProcessing(true);
     try {
-      const blob = await getCroppedBlob(imageSrc, croppedAreaPixels);
+      const blob = await getCroppedBlob(imageSrc, croppedAreaPixels, maxOutputSize);
       onCrop(blob);
     } finally {
       setIsProcessing(false);
