@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useSeoMeta } from '@unhead/react';
 import { useTranslation } from 'react-i18next';
-import { ChevronDown, ChevronUp, Globe2, HandHeart, PlusCircle, Users } from 'lucide-react';
+import { ChevronDown, ChevronUp, EyeOff, Globe2, HandHeart, PlusCircle, Users } from 'lucide-react';
 
 import { HeroAtmosphere } from '@/components/HeroAtmosphere';
 import { HeroBanner } from '@/components/HeroBanner';
@@ -12,6 +12,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { CommunityGrid } from '@/components/discovery/CommunityGrid';
 import { CommunityMiniCard, CommunityMiniCardSkeleton } from '@/components/discovery/CommunityMiniCard';
 import { DiscoverySearchToolbar } from '@/components/DiscoverySearchToolbar';
+import { ModeratorCollapsibleSection } from '@/components/moderation';
 import { COOL_PALETTE } from '@/lib/hopePalette';
 import { cn } from '@/lib/utils';
 import { useAppContext } from '@/hooks/useAppContext';
@@ -101,8 +102,8 @@ export function CommunitiesPage() {
 
   // Lift org moderation to the page so search results can drop hidden
   // groups (or include them when the Show-hidden switch is on). The
-  // ModeratorReviewSections subtree below still calls its own copy of
-  // the hook — query results are cached, so the second call is free.
+  // Hidden ModeratorCollapsibleSection below derives its data from the
+  // same `allOrgs` fetch, so no additional query round-trip is needed.
   const { data: orgModeration } = useOrganizationModeration();
   const { searchHits, searchHiddenCount } = useMemo(() => {
     if (!searchHitsRaw) return { searchHits: undefined, searchHiddenCount: 0 };
@@ -121,20 +122,22 @@ export function CommunitiesPage() {
   }, [searchHitsRaw, orgModeration, showHidden]);
 
   const { data: allOrgs, isLoading: allOrgsLoading } = useDiscoverCommunities({ limit: 200 });
-  const { allGroups, allHiddenCount } = useMemo(() => {
+  const { allGroups, allHiddenCount, hiddenGroups } = useMemo(() => {
     const hiddenCoords = orgModeration?.hiddenCoords ?? new Set<string>();
     const featuredCoords = orgModeration?.featuredCoords ?? new Set<string>();
     let hidden = 0;
     const visible: ParsedCommunity[] = [];
+    const hiddenList: ParsedCommunity[] = [];
     for (const org of allOrgs ?? []) {
       if (hiddenCoords.has(org.aTag)) {
         hidden += 1;
+        hiddenList.push(org);
         if (isMod && showHidden) visible.push(org);
       } else if (hasAgoraTag(org.tags) && !featuredCoords.has(org.aTag)) {
         visible.push(org);
       }
     }
-    return { allGroups: visible, allHiddenCount: hidden };
+    return { allGroups: visible, allHiddenCount: hidden, hiddenGroups: hiddenList };
   }, [allOrgs, isMod, orgModeration, showHidden]);
 
   // Search + sort + show-hidden cluster for the All section.
@@ -251,6 +254,34 @@ export function CommunitiesPage() {
             </Card>
           )}
         </section>
+
+        {isMod && (
+          <ModeratorCollapsibleSection
+            icon={<EyeOff className="size-4" />}
+            title={t('groups.list.hidden')}
+            description={t('groups.list.hiddenDesc')}
+            count={hiddenGroups.length}
+            isLoading={allOrgsLoading}
+            emptyText={t('groups.list.hiddenEmpty')}
+            skeleton={
+              <CommunityGrid>
+                {Array.from({ length: 4 }).map((_, i) => (
+                  <CommunityMiniCardSkeleton key={i} className="w-full" />
+                ))}
+              </CommunityGrid>
+            }
+          >
+            <CommunityGrid>
+              {hiddenGroups.map((community) => (
+                <CommunityMiniCard
+                  key={community.aTag}
+                  community={community}
+                  className="w-full"
+                />
+              ))}
+            </CommunityGrid>
+          </ModeratorCollapsibleSection>
+        )}
       </div>
     </main>
   );

@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { useSeoMeta } from '@unhead/react';
 import { useTranslation } from 'react-i18next';
-import { ChevronDown, ChevronUp, HandHeart, PlusCircle } from 'lucide-react';
+import { ChevronDown, ChevronUp, EyeOff, HandHeart, PlusCircle } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -10,6 +10,7 @@ import { CampaignCard, CampaignCardSkeleton } from '@/components/CampaignCard';
 import { DiscoverySearchToolbar } from '@/components/DiscoverySearchToolbar';
 import { HeroAtmosphere } from '@/components/HeroAtmosphere';
 import { HeroBanner } from '@/components/HeroBanner';
+import { ModeratorCollapsibleSection } from '@/components/moderation';
 import { useCampaigns } from '@/hooks/useCampaigns';
 import { useAllCampaigns, type CampaignSort } from '@/hooks/useAllCampaigns';
 import { useCampaignModeration } from '@/hooks/useCampaignModeration';
@@ -147,23 +148,25 @@ export function AllCampaignsPage() {
     description: t('campaigns.all.description'),
   });
 
-  const { visible, hiddenCount } = useMemo(() => {
+  const { visible, hiddenCount, hiddenCampaigns } = useMemo(() => {
     const all = campaigns ?? [];
     const hiddenCoords = moderation?.hiddenCoords ?? new Set<string>();
     const featuredCoordSet = new Set(featuredCoords);
     let hiddenCount = 0;
     const visible: ParsedCampaign[] = [];
+    const hiddenCampaigns: ParsedCampaign[] = [];
 
     for (const c of all) {
       if (hiddenCoords.has(c.aTag)) {
         hiddenCount += 1;
+        hiddenCampaigns.push(c);
         if (isMod && showHidden) visible.push(c);
       } else if (!featuredCoordSet.has(c.aTag)) {
         visible.push(c);
       }
     }
 
-    return { visible, hiddenCount };
+    return { visible, hiddenCount, hiddenCampaigns };
   }, [campaigns, featuredCoords, isMod, moderation, showHidden]);
 
   const orderedFeaturedCampaigns = useMemo(() => {
@@ -331,6 +334,32 @@ export function AllCampaignsPage() {
               <CampaignCard key={campaign.aTag} campaign={campaign} />
             ))}
           </div>
+        )}
+
+        {/* Moderator-only: every hidden campaign on the network. Mirrors
+            the section on `/campaigns` so moderators see the same
+            "Hidden" affordance whether they're browsing the curated
+            home or the full index. */}
+        {isMod && (
+          <ModeratorCollapsibleSection
+            icon={<EyeOff className="size-4" />}
+            title={t('campaigns.home.hidden')}
+            description={t('campaigns.home.hiddenDesc')}
+            count={hiddenCampaigns.length}
+            isLoading={showSkeleton}
+            emptyText={t('campaigns.home.hiddenEmpty')}
+            skeleton={
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+                {Array.from({ length: 4 }).map((_, i) => <CampaignCardSkeleton key={i} />)}
+              </div>
+            }
+          >
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+              {hiddenCampaigns.map((campaign) => (
+                <CampaignCard key={campaign.aTag} campaign={campaign} />
+              ))}
+            </div>
+          </ModeratorCollapsibleSection>
         )}
 
       </div>
