@@ -73,6 +73,60 @@
     "logout": "Buda",
     "addAccount": "Wedzera imwe akaunti"
   },
+  "onboarding": {
+    "ariaLabel": "Kugadzira akaunti",
+    "close": "Vhara",
+    "back": "Dzokera",
+    "role": {
+      "title": "Chii chakuunza pano?",
+      "subtitle": "Unogona kuita zvose zviri zviviri gare gare. Izvi zvinongotibatsira kurongedza matanho anotevera.",
+      "creator": {
+        "title": "Tanga mushandirapamwe",
+        "description": "Unganidza Bitcoin yechikonzero chaunoona chichikosha.",
+        "finderNote": "Vapi vanotumira sats zvakananga kuchikwama chako."
+      },
+      "donor": {
+        "title": "Ipa kumishandirapamwe",
+        "description": "Tsigira zvikonzero neBitcoin.",
+        "finderNote": "Mupiro wako unoenda zvakananga kuchikwama chemurongi."
+      }
+    },
+    "keygen": {
+      "title": "Kiyi yako ndiwo muviri wako",
+      "description": "Tichagadzira kiyi yakavanzika yako iwe wega. Ndiyo nzira yega yokupinda — pasina email, pasina password.",
+      "generatingTitle": "Kugadzira kiyi yako…",
+      "generatingDescription": "Izvi zvinotora kanguva kadiki chete.",
+      "button": "Gadzira kiyi yangu"
+    },
+    "secure": {
+      "title": "Chengetedza kiyi yako",
+      "subtitle": "Daunirodha faira ugorichengeta panzvimbo yakachengetedzeka. Password manager inoshanda zvakanaka.",
+      "couplingNote": "Akaunti yako nechikwama chako zvinoshandisa kiyi imwe chete. Inosaina maposvo ako eNostr uye inovhura chikwama chako cheBitcoin paAgora.",
+      "permanenceHeadline": "Hapana nzira yekudzosa kiyi iyi kana ukairasa.",
+      "permanenceBody": "Hapana kuireseta, hapana nhare yerubatsiro, hapana kudzoswa neemail. Ichengete usati waenderera mberi.",
+      "button": "Daunirodha & enderera mberi",
+      "downloadFailedTitle": "Kudaunirodha kwakundikana",
+      "downloadFailedDescription": "Hatina kukwanisa kudaunirodha faira rekiyi. Ndapota ikope nemaoko."
+    },
+    "profile": {
+      "title": "Ita seyako",
+      "subtitle": "Udza vamwe zvishoma pamusoro pako. Zvose zvichisarudzwa, chinja chero nguva.",
+      "nameLabel": "Zita rinoratidzwa",
+      "namePlaceholder": "Zita rako",
+      "aboutLabel": "Nhoroondo",
+      "aboutPlaceholder": "Zvishoma pamusoro pako…",
+      "avatarLabel": "Avatar",
+      "uploadAvatar": "Isa avatar",
+      "finish": "Pedzisa",
+      "saving": "Kuchengeta…",
+      "skip": "Pfuura zvinosvika",
+      "imageOnly": "Ndapota sarudza mufananidzo.",
+      "imageTooLarge": "Mufananidzo wakakura kwazvo (kupera 5MB).",
+      "uploadFailed": "Kuisa kwakundikana.",
+      "publishFailedTitle": "Kugadzira profile kwakundikana",
+      "publishFailedDescription": "Akaunti yako yagadzirwa asi profile haina kukwanisa kuchengetwa. Unogona kuivandudza gare gare."
+    }
+  },
   "feed": {
     "indexTagline": "Zviri zvako. Mafambisirwo ako. Mitemo yako.",
     "compose": {

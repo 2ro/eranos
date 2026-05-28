@@ -1,9 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import {
-  Download,
   Upload,
-  Eye,
-  EyeOff,
   ChevronDown,
   ChevronUp,
   Loader2,
@@ -11,7 +8,6 @@ import {
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import {
   Collapsible,
@@ -21,7 +17,6 @@ import {
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { QRCodeCanvas } from '@/components/ui/qrcode';
 import { AgoraBoltIcon } from '@/components/icons/AgoraBoltIcon';
-import { toast } from '@/hooks/useToast';
 import { useAppContext } from '@/hooks/useAppContext';
 import {
   useLoginActions,
@@ -30,18 +25,21 @@ import {
   type NostrConnectParams,
   type NostrConnectStatus,
 } from '@/hooks/useLoginActions';
-import { useNostrPublish } from '@/hooks/useNostrPublish';
-import { useUploadFile } from '@/hooks/useUploadFile';
 import { useIsMobile } from '@/hooks/useIsMobile';
-import { downloadTextFile } from '@/lib/downloadFile';
-import { generateSecretKey, getPublicKey, nip19 } from 'nostr-tools';
+import { useOnboarding } from '@/contexts/onboardingContextDef';
 
 interface AuthDialogProps {
   isOpen: boolean;
   onClose: () => void;
 }
 
-type Step = 'welcome' | 'generate' | 'secure' | 'profile' | 'login' | 'connect';
+/**
+ * The dialog covers the three login paths only — nsec, NIP-07 extension, and
+ * NIP-46 (nostrconnect QR + bunker URI). New-account signup is handled by
+ * the captive `<OnboardingGate>` flow; the welcome step's "Create" button
+ * closes this dialog and hands off to that flow.
+ */
+type Step = 'welcome' | 'login' | 'connect';
 
 const validateNsec = (nsec: string) => /^nsec1[a-zA-Z0-9]{58}$/.test(nsec);
 const validateBunkerUri = (uri: string) => uri.startsWith('bunker://');
@@ -63,24 +61,8 @@ function isMobileDevice(): boolean {
   return /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
 }
 
-/** Download an nsec to a text file. Uses Capacitor-aware helper so it works in native WebView. */
-function downloadNsecFile(nsec: string): Promise<void> {
-  const decoded = nip19.decode(nsec);
-  if (decoded.type !== 'nsec') throw new Error('Invalid nsec key');
-  const pubkey = getPublicKey(decoded.data);
-  const npub = nip19.npubEncode(pubkey);
-  const filename = `nostr-${location.hostname.replaceAll(/\./g, '-')}-${npub.slice(5, 9)}.nsec.txt`;
-  return downloadTextFile(filename, nsec);
-}
-
 const AuthDialog: React.FC<AuthDialogProps> = ({ isOpen, onClose }) => {
   const [step, setStep] = useState<Step>('welcome');
-
-  // Signup state
-  const [nsec, setNsec] = useState('');
-  const [showKey, setShowKey] = useState(false);
-  const [isGenerating, setIsGenerating] = useState(false);
-  const [profileData, setProfileData] = useState({ name: '', about: '', picture: '' });
 
   // Login state
   const [loginNsec, setLoginNsec] = useState('');
@@ -109,6 +91,7 @@ const AuthDialog: React.FC<AuthDialogProps> = ({ isOpen, onClose }) => {
 
   const login = useLoginActions();
   const { config } = useAppContext();
+  const { startSignup } = useOnboarding();
   // Stable refs so the nostrconnect listening effect below doesn't restart on
   // every parent render. Parents typically pass inline arrow functions for
   // onClose, and useLoginActions returns a fresh object each render — without
@@ -123,9 +106,6 @@ const AuthDialog: React.FC<AuthDialogProps> = ({ isOpen, onClose }) => {
     onCloseRef.current = onClose;
   }, [onClose]);
 
-  const { mutateAsync: publishEvent, isPending: isPublishing } = useNostrPublish();
-  const { mutateAsync: uploadFile, isPending: isUploading } = useUploadFile();
-  const avatarFileInputRef = useRef<HTMLInputElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const abortControllerRef = useRef<AbortController | null>(null);
   const isMobile = useIsMobile();
@@ -140,14 +120,10 @@ const AuthDialog: React.FC<AuthDialogProps> = ({ isOpen, onClose }) => {
   useEffect(() => {
     if (!isOpen) {
       setStep('welcome');
-      setNsec('');
       setLoginNsec('');
-      setShowKey(false);
-      setIsGenerating(false);
       setIsLoggingIn(false);
       setLoginError('');
       setShowMoreOptions(false);
-      setProfileData({ name: '', about: '', picture: '' });
       setNostrConnectParams(null);
       setNostrConnectUri('');
       setConnectError(null);
@@ -262,31 +238,17 @@ const AuthDialog: React.FC<AuthDialogProps> = ({ isOpen, onClose }) => {
     }
   };
 
-  // Signup: generate a key with a brief spinner for feedback.
-  const generateKey = () => {
-    setIsGenerating(true);
-    setTimeout(() => {
-      const sk = generateSecretKey();
-      setNsec(nip19.nsecEncode(sk));
-      setStep('secure');
-      setIsGenerating(false);
-    }, 750);
-  };
-
-  // Signup: download the nsec to a file and move on to the profile step.
-  const downloadAndProceed = async () => {
-    try {
-      await downloadNsecFile(nsec);
-      login.nsec(nsec);
-      setStep('profile');
-    } catch {
-      toast({
-        title: 'Download failed',
-        description: 'Could not download the key file. Please copy it manually.',
-        variant: 'destructive',
-      });
-    }
-  };
+  /**
+   * Hand off from this login-focused dialog to the captive signup flow.
+   * Closes the dialog first so the captive overlay isn't competing with a
+   * still-open dialog (the captive overlay's z-50 would visually win, but
+   * leaving the dialog mounted means a stale "welcome" step would flash
+   * when the captive flow finishes and the dialog re-opens for any reason).
+   */
+  const goToSignup = useCallback(() => {
+    onClose();
+    startSignup();
+  }, [onClose, startSignup]);
 
   // Login: submit the entered nsec.
   const handleLogin = () => {
@@ -342,59 +304,10 @@ const AuthDialog: React.FC<AuthDialogProps> = ({ isOpen, onClose }) => {
     }
   };
 
-  const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    e.target.value = '';
-
-    if (!file.type.startsWith('image/')) {
-      toast({ title: 'Please select an image.', variant: 'destructive' });
-      return;
-    }
-    if (file.size > 5 * 1024 * 1024) {
-      toast({ title: 'Image too large (max 5MB).', variant: 'destructive' });
-      return;
-    }
-
-    try {
-      const tags = await uploadFile(file);
-      const url = tags[0]?.[1];
-      if (url) setProfileData((prev) => ({ ...prev, picture: url }));
-    } catch {
-      toast({ title: 'Upload failed.', variant: 'destructive' });
-    }
-  };
-
-  const finishSignup = async (skipProfile = false) => {
-    try {
-      if (!skipProfile && (profileData.name || profileData.about || profileData.picture)) {
-        const metadata: Record<string, string> = {};
-        if (profileData.name) metadata.name = profileData.name;
-        if (profileData.about) metadata.about = profileData.about;
-        if (profileData.picture) metadata.picture = profileData.picture;
-        await publishEvent({ kind: 0, content: JSON.stringify(metadata) });
-      }
-    } catch {
-      toast({
-        title: 'Profile setup failed',
-        description: 'Your account was created but the profile could not be saved. You can update it later.',
-        variant: 'destructive',
-      });
-    } finally {
-      onClose();
-    }
-  };
-
   const getTitle = () => {
     switch (step) {
       case 'welcome':
         return `Welcome to ${config.appName}`;
-      case 'generate':
-        return 'Create account';
-      case 'secure':
-        return 'Save your key';
-      case 'profile':
-        return 'Your profile';
       case 'login':
         return 'Log in';
       case 'connect':
@@ -436,7 +349,7 @@ const AuthDialog: React.FC<AuthDialogProps> = ({ isOpen, onClose }) => {
               </p>
 
               <div className="space-y-2">
-                <Button onClick={() => setStep('generate')} className="w-full h-12">
+                <Button onClick={goToSignup} className="w-full h-12">
                   Create a new Nostr account
                 </Button>
                 <Button
@@ -445,190 +358,6 @@ const AuthDialog: React.FC<AuthDialogProps> = ({ isOpen, onClose }) => {
                   className="w-full h-12"
                 >
                   Log in to an existing account
-                </Button>
-              </div>
-            </div>
-          )}
-
-          {/* Generate step. */}
-          {step === 'generate' && (
-            <div className="space-y-5 text-center">
-              <div className="relative w-20 h-20 mx-auto">
-                {isGenerating ? (
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <Loader2 className="w-12 h-12 text-primary animate-spin" />
-                  </div>
-                ) : (
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <AgoraBoltIcon className="size-16 drop-shadow-md" />
-                  </div>
-                )}
-              </div>
-
-              <div className="space-y-1">
-                <p className="font-medium">
-                  {isGenerating ? 'Creating your key…' : 'Your key is your identity'}
-                </p>
-                <p className="text-sm text-muted-foreground">
-                  {isGenerating
-                    ? 'This only takes a moment.'
-                    : "We'll generate a secret key just for you. Keep it safe — it's the only way to log in."}
-                </p>
-              </div>
-
-              {!isGenerating && (
-                <Button onClick={generateKey} className="w-full h-12">
-                  Generate key
-                </Button>
-              )}
-
-              <button
-                onClick={() => setStep('welcome')}
-                className="text-sm text-muted-foreground hover:text-foreground"
-              >
-                Back
-              </button>
-            </div>
-          )}
-
-          {/* Secure step — show + download nsec. */}
-          {step === 'secure' && (
-            <div className="space-y-4">
-              <div className="flex justify-center pt-1">
-                <AgoraBoltIcon className="size-14 drop-shadow-md" />
-              </div>
-
-              <p className="text-sm text-muted-foreground text-center">
-                Store your key somewhere safe. You'll need it to log in again.
-              </p>
-
-              <div className="relative">
-                <Input
-                  type={showKey ? 'text' : 'password'}
-                  value={nsec}
-                  readOnly
-                  className="pr-10 font-mono"
-                />
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="icon"
-                  className="absolute right-0 top-0 h-full px-3 hover:bg-transparent"
-                  onClick={() => setShowKey(!showKey)}
-                >
-                  {showKey ? (
-                    <EyeOff className="h-4 w-4 text-muted-foreground" />
-                  ) : (
-                    <Eye className="h-4 w-4 text-muted-foreground" />
-                  )}
-                </Button>
-              </div>
-
-              <div className="p-3 rounded-lg bg-primary/10 border border-primary/25">
-                <p className="text-xs text-foreground">
-                  This key is your only way to access your account. If you lose it, you lose the account.
-                </p>
-              </div>
-
-              <Button onClick={downloadAndProceed} className="w-full h-12">
-                <Download className="w-4 h-4 mr-2" />
-                Download &amp; continue
-              </Button>
-            </div>
-          )}
-
-          {/* Profile step — optional metadata. */}
-          {step === 'profile' && (
-            <div className="space-y-4">
-              <p className="text-sm text-muted-foreground text-center">
-                Tell others a bit about yourself (optional).
-              </p>
-
-              <div className={`space-y-4 ${isPublishing ? 'opacity-50 pointer-events-none' : ''}`}>
-                <div className="space-y-1.5">
-                  <label htmlFor="profile-name" className="text-sm font-medium">
-                    Display name
-                  </label>
-                  <Input
-                    id="profile-name"
-                    value={profileData.name}
-                    onChange={(e) =>
-                      setProfileData((prev) => ({ ...prev, name: e.target.value }))
-                    }
-                    placeholder="Your name"
-                  />
-                </div>
-
-                <div className="space-y-1.5">
-                  <label htmlFor="profile-about" className="text-sm font-medium">
-                    Bio
-                  </label>
-                  <Textarea
-                    id="profile-about"
-                    value={profileData.about}
-                    onChange={(e) =>
-                      setProfileData((prev) => ({ ...prev, about: e.target.value }))
-                    }
-                    placeholder="A little about you…"
-                    className="resize-none"
-                    rows={3}
-                  />
-                </div>
-
-                <div className="space-y-1.5">
-                  <label htmlFor="profile-picture" className="text-sm font-medium">
-                    Avatar
-                  </label>
-                  <div className="flex gap-2">
-                    <Input
-                      id="profile-picture"
-                      value={profileData.picture}
-                      onChange={(e) =>
-                        setProfileData((prev) => ({ ...prev, picture: e.target.value }))
-                      }
-                      placeholder="https://…"
-                      className="flex-1"
-                    />
-                    <input
-                      type="file"
-                      accept="image/*"
-                      className="hidden"
-                      ref={avatarFileInputRef}
-                      onChange={handleAvatarUpload}
-                    />
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="icon"
-                      onClick={() => avatarFileInputRef.current?.click()}
-                      disabled={isUploading}
-                      title="Upload avatar"
-                    >
-                      {isUploading ? (
-                        <Loader2 className="w-4 h-4 animate-spin" />
-                      ) : (
-                        <Upload className="w-4 h-4" />
-                      )}
-                    </Button>
-                  </div>
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <Button
-                  onClick={() => finishSignup(false)}
-                  disabled={isPublishing}
-                  className="w-full h-12"
-                >
-                  {isPublishing ? 'Saving…' : 'Finish'}
-                </Button>
-                <Button
-                  variant="ghost"
-                  onClick={() => finishSignup(true)}
-                  disabled={isPublishing}
-                  className="w-full"
-                >
-                  Skip for now
                 </Button>
               </div>
             </div>
