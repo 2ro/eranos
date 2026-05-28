@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { Loader2, Search } from 'lucide-react';
+import { Loader2, QrCode, Search } from 'lucide-react';
 import { nip19 } from 'nostr-tools';
 
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -10,12 +10,21 @@ import { useAuthor } from '@/hooks/useAuthor';
 import { useSearchProfiles, type SearchProfile } from '@/hooks/useSearchProfiles';
 import { genUserName } from '@/lib/genUserName';
 import { sanitizeUrl } from '@/lib/sanitizeUrl';
+import { cn } from '@/lib/utils';
 
 interface BitcoinRecipientInputProps {
   value: string;
   onChange: (value: string) => void;
   placeholder: string;
   resolvedPubkey?: string;
+  /**
+   * When provided, a camera button is rendered inside the input that opens
+   * a QR scanner. The parent owns the scanner lifecycle and interprets the
+   * scan result (BIP-21 parsing, silent-payment priority, etc.).
+   */
+  onScanClick?: () => void;
+  /** Localized aria-label for the scan button (only used when `onScanClick` is set). */
+  scanLabel?: string;
 }
 
 function shouldSkipProfileSearch(value: string): boolean {
@@ -33,7 +42,7 @@ function shouldSkipProfileSearch(value: string): boolean {
   );
 }
 
-export function BitcoinRecipientInput({ value, onChange, placeholder, resolvedPubkey }: BitcoinRecipientInputProps) {
+export function BitcoinRecipientInput({ value, onChange, placeholder, resolvedPubkey, onScanClick, scanLabel }: BitcoinRecipientInputProps) {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const searchQuery = shouldSkipProfileSearch(value) ? '' : value;
@@ -67,7 +76,12 @@ export function BitcoinRecipientInput({ value, onChange, placeholder, resolvedPu
           <div className="relative flex items-center">
             <Search className="absolute left-3 size-4 text-muted-foreground pointer-events-none" />
             {isFetching && shouldShowSearch && (
-              <Loader2 className="absolute right-3 size-4 text-muted-foreground animate-spin" />
+              <Loader2
+                className={cn(
+                  'absolute size-4 text-muted-foreground animate-spin',
+                  onScanClick ? 'right-11' : 'right-3',
+                )}
+              />
             )}
             <Input
               ref={inputRef}
@@ -80,8 +94,21 @@ export function BitcoinRecipientInput({ value, onChange, placeholder, resolvedPu
               placeholder={placeholder}
               autoComplete="off"
               spellCheck={false}
-              className="pl-10 pr-10 font-mono text-base md:text-sm"
+              className={cn(
+                'pl-10 font-mono text-base md:text-sm',
+                onScanClick ? 'pr-11' : 'pr-10',
+              )}
             />
+            {onScanClick && (
+              <button
+                type="button"
+                onClick={onScanClick}
+                aria-label={scanLabel ?? 'Scan QR code'}
+                className="absolute right-1 top-1/2 -translate-y-1/2 size-8 rounded-full text-muted-foreground hover:text-foreground hover:bg-secondary/60 flex items-center justify-center motion-safe:transition-colors"
+              >
+                <QrCode className="size-4" />
+              </button>
+            )}
           </div>
         </PopoverTrigger>
 

@@ -1399,7 +1399,8 @@
       "sendingNostr": "Inatuma kwa anwani ya katika-mnyororo ya mtumiaji wa Nostr.",
       "sendingRaw": "Inatuma kwa anwani ghafi ya Bitcoin.",
       "useSilentPayment": "Tumia malipo ya kimya badala yake",
-      "useOnchain": "Tumia anwani ya katika-mnyororo badala yake"
+      "useOnchain": "Tumia anwani ya katika-mnyororo badala yake",
+      "scan": "Changanua msimbo wa QR"
     },
     "feeSpeed": {
       "fastest": "~dakika 10",
@@ -1433,6 +1434,24 @@
       "satsAmount": "sats {{sats}}",
       "viewTransaction": "Tazama muamala",
       "done": "Imekamilika"
+    }
+  },
+  "qrScanner": {
+    "title": "Changanua msimbo wa QR",
+    "close": "Funga",
+    "starting": "Inawasha kamera…",
+    "aim": "Elekeza kamera yako kwa msimbo wa QR.",
+    "flashOn": "Washa mweko",
+    "flashOff": "Zima mweko",
+    "errors": {
+      "generic": "Haikuweza kufikia kamera.",
+      "insecure": "Ufikiaji wa kamera unahitaji muunganisho salama (HTTPS).",
+      "unsupported": "Kivinjari hiki hakitumii ufikiaji wa kamera.",
+      "notFound": "Hakuna kamera iliyopatikana kwenye kifaa hiki.",
+      "denied": "Idhini ya kamera imekataliwa. Iwashe katika mipangilio yako ili kuchanganua misimbo ya QR.",
+      "busy": "Programu nyingine inatumia kamera. Ifunge na ujaribu tena.",
+      "overconstrained": "Kamera ya kifaa hiki haitumii mipangilio iliyoombwa.",
+      "didntStart": "Kamera haikuanza. Programu nyingine inaweza kuwa inaitumia, au kivinjari chako kinaweza kuwa kimezuia kichanganuzi."
     }
   },
   "bitcoinPublic": {

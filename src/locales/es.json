@@ -1072,7 +1072,8 @@
       "sendingNostr": "Enviando a la dirección en cadena de un usuario de Nostr.",
       "sendingRaw": "Enviando a una dirección de Bitcoin sin asociar.",
       "useSilentPayment": "Usar pago silencioso en su lugar",
-      "useOnchain": "Usar dirección en cadena en su lugar"
+      "useOnchain": "Usar dirección en cadena en su lugar",
+      "scan": "Escanear código QR"
     },
     "feeSpeed": {
       "fastest": "~10 min",
@@ -1106,6 +1107,24 @@
       "satsAmount": "{{sats}} sats",
       "viewTransaction": "Ver transacción",
       "done": "Hecho"
+    }
+  },
+  "qrScanner": {
+    "title": "Escanear código QR",
+    "close": "Cerrar",
+    "starting": "Iniciando la cámara…",
+    "aim": "Apunta la cámara al código QR.",
+    "flashOn": "Encender el flash",
+    "flashOff": "Apagar el flash",
+    "errors": {
+      "generic": "No se pudo acceder a la cámara.",
+      "insecure": "El acceso a la cámara requiere una conexión segura (HTTPS).",
+      "unsupported": "Este navegador no admite el acceso a la cámara.",
+      "notFound": "No se encontró ninguna cámara en este dispositivo.",
+      "denied": "Se denegó el permiso de la cámara. Actívalo en los ajustes para escanear códigos QR.",
+      "busy": "Otra aplicación está usando la cámara. Ciérrala e inténtalo de nuevo.",
+      "overconstrained": "La cámara de este dispositivo no admite la configuración solicitada.",
+      "didntStart": "La cámara no se inició. Es posible que otra aplicación la esté usando o que el navegador haya bloqueado el escáner."
     }
   },
   "bitcoinPublic": {

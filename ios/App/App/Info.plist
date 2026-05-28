@@ -50,7 +50,7 @@
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>Agora needs access to your photo library to upload images to your posts and profile.</string>
 	<key>NSCameraUsageDescription</key>
-	<string>Agora needs camera access to take photos and videos for your posts.</string>
+	<string>Agora needs camera access to take photos and videos for your posts, and to scan QR codes when sending Bitcoin.</string>
 	<key>NSMicrophoneUsageDescription</key>
 	<string>Agora needs access to your microphone to record voice messages.</string>
 	<key>ITSAppUsesNonExemptEncryption</key>

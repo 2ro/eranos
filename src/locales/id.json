@@ -1440,7 +1440,8 @@
       "sendingNostr": "Mengirim ke alamat on-chain pengguna Nostr.",
       "sendingRaw": "Mengirim ke alamat Bitcoin mentah.",
       "useSilentPayment": "Gunakan silent payment saja",
-      "useOnchain": "Gunakan alamat on-chain saja"
+      "useOnchain": "Gunakan alamat on-chain saja",
+      "scan": "Pindai kode QR"
     },
     "feeSpeed": {
       "fastest": "~10 menit",
@@ -1474,6 +1475,24 @@
       "satsAmount": "{{sats}} sats",
       "viewTransaction": "Lihat transaksi",
       "done": "Selesai"
+    }
+  },
+  "qrScanner": {
+    "title": "Pindai kode QR",
+    "close": "Tutup",
+    "starting": "Menyalakan kamera…",
+    "aim": "Arahkan kamera Anda ke kode QR.",
+    "flashOn": "Nyalakan lampu kilat",
+    "flashOff": "Matikan lampu kilat",
+    "errors": {
+      "generic": "Tidak bisa mengakses kamera.",
+      "insecure": "Akses kamera memerlukan koneksi yang aman (HTTPS).",
+      "unsupported": "Peramban ini tidak mendukung akses kamera.",
+      "notFound": "Tidak ada kamera yang ditemukan di perangkat ini.",
+      "denied": "Izin kamera ditolak. Aktifkan di pengaturan untuk memindai kode QR.",
+      "busy": "Aplikasi lain sedang menggunakan kamera. Tutup dan coba lagi.",
+      "overconstrained": "Kamera perangkat ini tidak mendukung pengaturan yang diminta.",
+      "didntStart": "Kamera tidak menyala. Mungkin aplikasi lain sedang menggunakannya, atau peramban Anda memblokir pemindai."
     }
   },
   "bitcoinPublic": {

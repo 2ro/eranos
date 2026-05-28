@@ -1008,7 +1008,8 @@
       "sendingNostr": "傳送到某個 Nostr 使用者的鏈上地址。",
       "sendingRaw": "傳送到一個原始比特幣地址。",
       "useSilentPayment": "改用靜默支付",
-      "useOnchain": "改用鏈上地址"
+      "useOnchain": "改用鏈上地址",
+      "scan": "掃描 QR 碼"
     },
     "feeSpeed": {
       "fastest": "~10 分鐘",
@@ -1042,6 +1043,24 @@
       "satsAmount": "{{sats}} sats",
       "viewTransaction": "檢視交易",
       "done": "完成"
+    }
+  },
+  "qrScanner": {
+    "title": "掃描 QR 碼",
+    "close": "關閉",
+    "starting": "正在啟動相機…",
+    "aim": "將相機對準 QR 碼。",
+    "flashOn": "開啟閃光燈",
+    "flashOff": "關閉閃光燈",
+    "errors": {
+      "generic": "無法存取相機。",
+      "insecure": "存取相機需要安全（HTTPS）連線。",
+      "unsupported": "此瀏覽器不支援存取相機。",
+      "notFound": "此裝置上未找到相機。",
+      "denied": "相機權限被拒絕。請在設定中啟用以掃描 QR 碼。",
+      "busy": "另一個應用程式正在使用相機。請關閉它後再試。",
+      "overconstrained": "此裝置的相機不支援所請求的設定。",
+      "didntStart": "相機未啟動。可能有其他應用程式正在使用它，或者你的瀏覽器阻止了掃描器。"
     }
   },
   "bitcoinPublic": {

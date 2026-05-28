@@ -26,6 +26,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { BitcoinAmountPicker } from '@/components/BitcoinAmountPicker';
 import { BitcoinPublicDisclaimer } from '@/components/BitcoinPublicDisclaimer';
 import { BitcoinRecipientInput } from '@/components/BitcoinRecipientInput';
+import { QrScannerDialog } from '@/components/QrScannerDialog';
 import { HelpTip } from '@/components/HelpTip';
 import { cn } from '@/lib/utils';
 
@@ -42,6 +43,7 @@ import {
 import {
   isLargeAmount,
   nostrPubkeyToBitcoinAddress,
+  parseBitcoinUri,
   satsToUSD,
 } from '@/lib/bitcoin';
 import {
@@ -228,10 +230,38 @@ export function HDSendBitcoinDialog({ isOpen, onClose, btcPrice, initialRecipien
   const [error, setError] = useState('');
   const [feePopoverOpen, setFeePopoverOpen] = useState(false);
   const [success, setSuccess] = useState<SendResult | null>(null);
+  const [scannerOpen, setScannerOpen] = useState(false);
 
   const feeSpeedUserChanged = useRef(false);
 
   const recipient = useMemo(() => resolveRecipient(recipientInput), [recipientInput]);
+
+  /**
+   * Interpret a freshly-scanned QR code and stuff it into the recipient
+   * input. A `bitcoin:bc1q…?sp=sp1q…` BIP-21 URI means "send via silent
+   * payment if you can; otherwise fall back to the on-chain address" — we
+   * prefer the `sp` parameter when it parses, and the swap toggle under the
+   * input lets the user fall back to the on-chain address if they want to.
+   * Anything else (bare address, `sp1…`, npub, nprofile) is dropped in
+   * verbatim and `resolveRecipient` does the rest.
+   */
+  const handleScan = useCallback((scanned: string) => {
+    setScannerOpen(false);
+    setError('');
+    const trimmed = scanned.trim();
+    const bip21 = parseBitcoinUri(trimmed);
+    if (bip21) {
+      if (bip21.sp && resolveRecipient(bip21.sp)) {
+        setRecipientInput(bip21.sp);
+        return;
+      }
+      if (bip21.address) {
+        setRecipientInput(bip21.address);
+        return;
+      }
+    }
+    setRecipientInput(trimmed);
+  }, []);
 
   // ── Fee rates ────────────────────────────────────────────────
   const { data: feeRates } = useQuery({
@@ -533,6 +563,7 @@ export function HDSendBitcoinDialog({ isOpen, onClose, btcPrice, initialRecipien
 
   // ── Render ───────────────────────────────────────────────────
   return (
+    <>
     <Dialog open={isOpen} onOpenChange={(v) => { if (!v) handleClose(); }}>
       <DialogContent className="max-w-[425px] rounded-2xl p-0 gap-0 border-border overflow-hidden max-h-[95vh] [&>button]:hidden">
         <DialogTitle className="sr-only">{t('walletSend.title')}</DialogTitle>
@@ -583,6 +614,8 @@ export function HDSendBitcoinDialog({ isOpen, onClose, btcPrice, initialRecipien
                   onChange={setRecipientInput}
                   placeholder={t('walletSend.recipient.placeholder')}
                   resolvedPubkey={recipient?.pubkey}
+                  onScanClick={() => setScannerOpen(true)}
+                  scanLabel={t('walletSend.recipient.scan')}
                 />
                 {recipient && (
                   <p className="text-xs text-muted-foreground">
@@ -703,6 +736,13 @@ export function HDSendBitcoinDialog({ isOpen, onClose, btcPrice, initialRecipien
         )}
       </DialogContent>
     </Dialog>
+    <QrScannerDialog
+      isOpen={scannerOpen}
+      onClose={() => setScannerOpen(false)}
+      onScan={handleScan}
+      title={t('walletSend.recipient.scan')}
+    />
+    </>
   );
 }
 

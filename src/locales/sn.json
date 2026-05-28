@@ -1072,7 +1072,8 @@
       "sendingNostr": "Kutumira kukero yepacheni yemushandisi weNostr.",
       "sendingRaw": "Kutumira kukero yeBitcoin yakangosaina.",
       "useSilentPayment": "Shandisa mubhadharo wakanyararira pachinzvimbo",
-      "useOnchain": "Shandisa kero yepacheni pachinzvimbo"
+      "useOnchain": "Shandisa kero yepacheni pachinzvimbo",
+      "scan": "Skena kodhi yeQR"
     },
     "feeSpeed": {
       "fastest": "~10 maminitsi",
@@ -1106,6 +1107,24 @@
       "satsAmount": "{{sats}} sats",
       "viewTransaction": "Tarisa chinoitwa",
       "done": "Zvapera"
+    }
+  },
+  "qrScanner": {
+    "title": "Skena kodhi yeQR",
+    "close": "Vhara",
+    "starting": "Kutanga kamera…",
+    "aim": "Nongedza kamera yako kukodhi yeQR.",
+    "flashOn": "Batidza mwenje",
+    "flashOff": "Dzima mwenje",
+    "errors": {
+      "generic": "Hazvina kukwanisika kushandisa kamera.",
+      "insecure": "Kushandisa kamera kunoda kubatana kwakachengeteka (HTTPS).",
+      "unsupported": "Browser iyi haitsigire kushandisa kamera.",
+      "notFound": "Hapana kamera yakawanikwa pamudziyo uyu.",
+      "denied": "Mvumo yekamera yakarambwa. Ibvumire mukurongedza kwako kuti uskene makodhi eQR.",
+      "busy": "Imwe app iri kushandisa kamera. Ivhare wozoedza zvakare.",
+      "overconstrained": "Kamera yemudziyo uyu haitsigire zvakumbirwa.",
+      "didntStart": "Kamera haina kutanga. Imwe app inogona kunge iri kuishandisa, kana browser yako yakanga yavhara skena."
     }
   },
   "bitcoinPublic": {

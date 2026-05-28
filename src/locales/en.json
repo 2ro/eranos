@@ -1495,7 +1495,8 @@
       "sendingNostr": "Sending to a Nostr user's on-chain address.",
       "sendingRaw": "Sending to a raw Bitcoin address.",
       "useSilentPayment": "Use silent payment instead",
-      "useOnchain": "Use on-chain address instead"
+      "useOnchain": "Use on-chain address instead",
+      "scan": "Scan QR code"
     },
     "feeSpeed": {
       "fastest": "~10 min",
@@ -1529,6 +1530,24 @@
       "satsAmount": "{{sats}} sats",
       "viewTransaction": "View transaction",
       "done": "Done"
+    }
+  },
+  "qrScanner": {
+    "title": "Scan QR code",
+    "close": "Close",
+    "starting": "Starting camera…",
+    "aim": "Point your camera at a QR code.",
+    "flashOn": "Turn flash on",
+    "flashOff": "Turn flash off",
+    "errors": {
+      "generic": "Could not access the camera.",
+      "insecure": "Camera access requires a secure (HTTPS) connection.",
+      "unsupported": "This browser doesn't support camera access.",
+      "notFound": "No camera was found on this device.",
+      "denied": "Camera permission was denied. Enable it in your settings to scan QR codes.",
+      "busy": "Another app is using the camera. Close it and try again.",
+      "overconstrained": "This device's camera doesn't support the requested settings.",
+      "didntStart": "Camera didn't start. Another app may be using it, or your browser may have blocked the scanner."
     }
   },
   "bitcoinPublic": {

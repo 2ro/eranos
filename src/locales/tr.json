@@ -1439,7 +1439,8 @@
       "sendingNostr": "Bir Nostr kullanıcısının zincir üstü adresine gönderiliyor.",
       "sendingRaw": "Ham bir Bitcoin adresine gönderiliyor.",
       "useSilentPayment": "Bunun yerine sessiz ödeme kullan",
-      "useOnchain": "Bunun yerine zincir üstü adres kullan"
+      "useOnchain": "Bunun yerine zincir üstü adres kullan",
+      "scan": "QR kodu tara"
     },
     "feeSpeed": {
       "fastest": "~10 dk",
@@ -1473,6 +1474,24 @@
       "satsAmount": "{{sats}} sat",
       "viewTransaction": "İşlemi görüntüle",
       "done": "Tamam"
+    }
+  },
+  "qrScanner": {
+    "title": "QR kodu tara",
+    "close": "Kapat",
+    "starting": "Kamera başlatılıyor…",
+    "aim": "Kameranızı bir QR koduna doğrultun.",
+    "flashOn": "Flaşı aç",
+    "flashOff": "Flaşı kapat",
+    "errors": {
+      "generic": "Kameraya erişilemedi.",
+      "insecure": "Kamera erişimi için güvenli (HTTPS) bir bağlantı gerekiyor.",
+      "unsupported": "Bu tarayıcı kamera erişimini desteklemiyor.",
+      "notFound": "Bu cihazda kamera bulunamadı.",
+      "denied": "Kamera izni reddedildi. QR kodlarını taramak için ayarlarınızdan etkinleştirin.",
+      "busy": "Başka bir uygulama kamerayı kullanıyor. Onu kapatıp tekrar deneyin.",
+      "overconstrained": "Bu cihazın kamerası istenen ayarları desteklemiyor.",
+      "didntStart": "Kamera başlamadı. Başka bir uygulama kullanıyor olabilir ya da tarayıcınız tarayıcıyı engellemiş olabilir."
     }
   },
   "bitcoinPublic": {
