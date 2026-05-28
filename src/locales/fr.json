@@ -1518,8 +1518,7 @@
       "enterAmount": "Saisissez un montant.",
       "insufficient": "Pas assez de Bitcoin pour ce montant + frais réseau.",
       "waitingPrice": "En attente du prix BTC…",
-      "noneYet": "Vous n'avez pas encore de Bitcoin.",
-      "acknowledgePrivacy": "Reconnaissez l'avertissement de confidentialité avant l'envoi."
+      "noneYet": "Vous n'avez pas encore de Bitcoin."
     },
     "toast": {
       "failedTitle": "Échec de la transaction"

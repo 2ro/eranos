@@ -1528,8 +1528,7 @@
       "enterAmount": "Digite um valor.",
       "insufficient": "Bitcoin insuficiente para este valor + taxa de rede.",
       "waitingPrice": "Aguardando preço do BTC…",
-      "noneYet": "Você ainda não tem nenhum Bitcoin.",
-      "acknowledgePrivacy": "Reconheça o aviso de privacidade antes de enviar."
+      "noneYet": "Você ainda não tem nenhum Bitcoin."
     },
     "toast": {
       "failedTitle": "Transação falhou"

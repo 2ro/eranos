@@ -1096,8 +1096,7 @@
       "enterAmount": "请输入金额。",
       "insufficient": "比特币不足以支付该金额和网络费用。",
       "waitingPrice": "正在等待 BTC 价格…",
-      "noneYet": "你还没有任何比特币。",
-      "acknowledgePrivacy": "发送前请确认隐私警告。"
+      "noneYet": "你还没有任何比特币。"
     },
     "toast": {
       "failedTitle": "交易失败"

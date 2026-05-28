@@ -1096,8 +1096,7 @@
       "enterAmount": "Isa huwandu.",
       "insufficient": "Bitcoin haina kukwana pahuwandu uhwu + muripo wenetwork.",
       "waitingPrice": "Kumirira mutengo weBTC…",
-      "noneYet": "Hauna kana Bitcoin parizvino.",
-      "acknowledgePrivacy": "Bvuma yambiro yokuvanzika usati watumira."
+      "noneYet": "Hauna kana Bitcoin parizvino."
     },
     "toast": {
       "failedTitle": "Chinoitwa chakundikana"

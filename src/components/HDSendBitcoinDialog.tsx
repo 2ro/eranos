@@ -367,7 +367,6 @@ export function HDSendBitcoinDialog({ isOpen, onClose, btcPrice, initialRecipien
   const isRawAddress =
     !!recipient && recipient.kind === 'address' && !recipient.pubkey;
   const [confirmArmed, setConfirmArmed] = useState(false);
-  const [acknowledgedPublic, setAcknowledgedPublic] = useState(false);
 
   // Recipient swap target. When the caller supplied two alternate
   // destinations (e.g. campaign detail page passing both `bc1…` and
@@ -397,13 +396,6 @@ export function HDSendBitcoinDialog({ isOpen, onClose, btcPrice, initialRecipien
   useEffect(() => {
     setConfirmArmed(false);
   }, [amountSats, currentFeeRate, btcPrice, recipient?.address]);
-
-  // Reset the privacy acknowledgement only when the recipient changes —
-  // not when the user adjusts the amount or fee tier. Toggling between
-  // fee speeds should not silently uncheck the warning.
-  useEffect(() => {
-    setAcknowledgedPublic(false);
-  }, [recipient?.address]);
 
   // Prefill the recipient field on every dialog open transition (closed →
   // open). Callers like the campaign donate column already know the
@@ -502,9 +494,6 @@ export function HDSendBitcoinDialog({ isOpen, onClose, btcPrice, initialRecipien
     if (amountSats <= 0) { setError(t('walletSend.errors.enterAmount')); return; }
     if (!ownedInputs.length) { setError(t('walletSend.errors.noneYet')); return; }
     if (insufficient) { setError(t('walletSend.errors.insufficient')); return; }
-    if (isRawAddress && !acknowledgedPublic) {
-      setError(t('walletSend.errors.acknowledgePrivacy')); return;
-    }
     if (requiresArm && !confirmArmed) { setConfirmArmed(true); return; }
     sendMutation.mutate();
   }, [
@@ -515,8 +504,6 @@ export function HDSendBitcoinDialog({ isOpen, onClose, btcPrice, initialRecipien
     amountSats,
     ownedInputs.length,
     insufficient,
-    isRawAddress,
-    acknowledgedPublic,
     requiresArm,
     confirmArmed,
     sendMutation,
@@ -532,7 +519,6 @@ export function HDSendBitcoinDialog({ isOpen, onClose, btcPrice, initialRecipien
       setUsdAmount(5);
       setError('');
       setConfirmArmed(false);
-      setAcknowledgedPublic(false);
       setSuccess(null);
       feeSpeedUserChanged.current = false;
     }, 200);
@@ -558,8 +544,7 @@ export function HDSendBitcoinDialog({ isOpen, onClose, btcPrice, initialRecipien
     !btcPrice ||
     amountSats <= 0 ||
     insufficient ||
-    !ownedInputs.length ||
-    (isRawAddress && !acknowledgedPublic);
+    !ownedInputs.length;
 
   // ── Render ───────────────────────────────────────────────────
   return (
@@ -639,10 +624,7 @@ export function HDSendBitcoinDialog({ isOpen, onClose, btcPrice, initialRecipien
               {(isRawAddress || recipientSwap) && (
                 <div className="grid gap-2">
                   {isRawAddress && (
-                    <BitcoinPublicDisclaimer
-                      acknowledged={acknowledgedPublic}
-                      onAcknowledgedChange={setAcknowledgedPublic}
-                    />
+                    <BitcoinPublicDisclaimer tone="soft" />
                   )}
                   {recipientSwap && (
                     <button

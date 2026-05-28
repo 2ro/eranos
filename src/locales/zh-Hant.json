@@ -1032,8 +1032,7 @@
       "enterAmount": "請輸入金額。",
       "insufficient": "比特幣不足以支付該金額和網路費用。",
       "waitingPrice": "正在等待 BTC 價格…",
-      "noneYet": "你還沒有任何比特幣。",
-      "acknowledgePrivacy": "傳送前請確認隱私警告。"
+      "noneYet": "你還沒有任何比特幣。"
     },
     "toast": {
       "failedTitle": "交易失敗"

@@ -1519,8 +1519,7 @@
       "enterAmount": "Enter an amount.",
       "insufficient": "Not enough Bitcoin for this amount + network fee.",
       "waitingPrice": "Waiting for BTC price…",
-      "noneYet": "You don't have any Bitcoin yet.",
-      "acknowledgePrivacy": "Acknowledge the privacy warning before sending."
+      "noneYet": "You don't have any Bitcoin yet."
     },
     "toast": {
       "failedTitle": "Transaction failed"

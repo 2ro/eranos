@@ -1528,8 +1528,7 @@
       "enterAmount": "Введите сумму.",
       "insufficient": "Недостаточно Bitcoin для этой суммы + комиссии сети.",
       "waitingPrice": "Ожидание цены BTC…",
-      "noneYet": "У вас пока нет Bitcoin.",
-      "acknowledgePrivacy": "Подтвердите предупреждение о конфиденциальности перед отправкой."
+      "noneYet": "У вас пока нет Bitcoin."
     },
     "toast": {
       "failedTitle": "Транзакция не удалась"

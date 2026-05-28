@@ -1096,8 +1096,7 @@
       "enterAmount": "Introduce una cantidad.",
       "insufficient": "No hay Bitcoin suficiente para esta cantidad + la comisión de red.",
       "waitingPrice": "Esperando el precio del BTC…",
-      "noneYet": "Aún no tienes Bitcoin.",
-      "acknowledgePrivacy": "Acepta la advertencia de privacidad antes de enviar."
+      "noneYet": "Aún no tienes Bitcoin."
     },
     "toast": {
       "failedTitle": "La transacción falló"

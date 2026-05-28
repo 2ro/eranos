@@ -1463,8 +1463,7 @@
       "enterAmount": "Bir tutar girin.",
       "insufficient": "Bu tutar + ağ ücreti için yeterli Bitcoin yok.",
       "waitingPrice": "BTC fiyatı bekleniyor…",
-      "noneYet": "Henüz Bitcoin'iniz yok.",
-      "acknowledgePrivacy": "Göndermeden önce gizlilik uyarısını onaylayın."
+      "noneYet": "Henüz Bitcoin'iniz yok."
     },
     "toast": {
       "failedTitle": "İşlem başarısız"

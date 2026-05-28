@@ -1464,8 +1464,7 @@
       "enterAmount": "एक राशि दर्ज करें।",
       "insufficient": "इस राशि + नेटवर्क फ़ीस के लिए Bitcoin पर्याप्त नहीं।",
       "waitingPrice": "BTC दाम का इंतज़ार है…",
-      "noneYet": "आपके पास अभी कोई Bitcoin नहीं है।",
-      "acknowledgePrivacy": "भेजने से पहले प्राइवेसी चेतावनी स्वीकार करें।"
+      "noneYet": "आपके पास अभी कोई Bitcoin नहीं है।"
     },
     "toast": {
       "failedTitle": "Transaction विफल"

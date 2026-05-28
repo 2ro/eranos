@@ -1423,8 +1423,7 @@
       "enterAmount": "Weka kiasi.",
       "insufficient": "Hakuna Bitcoin ya kutosha kwa kiasi hiki + ada ya mtandao.",
       "waitingPrice": "Inasubiri bei ya BTC…",
-      "noneYet": "Bado huna Bitcoin yoyote.",
-      "acknowledgePrivacy": "Tambua onyo la faragha kabla ya kutuma."
+      "noneYet": "Bado huna Bitcoin yoyote."
     },
     "toast": {
       "failedTitle": "Muamala umeshindikana"

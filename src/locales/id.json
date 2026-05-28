@@ -1464,8 +1464,7 @@
       "enterAmount": "Masukkan jumlah.",
       "insufficient": "Bitcoin tidak cukup untuk jumlah ini + biaya jaringan.",
       "waitingPrice": "Menunggu harga BTC…",
-      "noneYet": "Anda belum punya Bitcoin.",
-      "acknowledgePrivacy": "Konfirmasi peringatan privasi sebelum mengirim."
+      "noneYet": "Anda belum punya Bitcoin."
     },
     "toast": {
       "failedTitle": "Transaksi gagal"
