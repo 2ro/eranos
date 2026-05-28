@@ -102,7 +102,7 @@ export function CommunitiesPage() {
 
   // Lift org moderation to the page so search results can drop hidden
   // groups (or include them when the Show-hidden switch is on).
-  const { data: orgModeration } = useOrganizationModeration();
+  const { data: orgModeration, isReady: orgModerationReady } = useOrganizationModeration();
   const { searchHits, searchHiddenCount } = useMemo(() => {
     if (!searchHitsRaw) return { searchHits: undefined, searchHiddenCount: 0 };
     const hiddenCoords = orgModeration?.hiddenCoords ?? new Set<string>();
@@ -160,6 +160,15 @@ export function CommunitiesPage() {
       .map((entry) => entry.community)
       .filter((c) => (isMod && showHidden) || !hiddenCoords.has(c.aTag));
   }, [featuredOrgs, orgModeration, isMod, showHidden]);
+
+  // Idle-render skeleton gate. `useFeaturedOrganizations` is internally
+  // gated on `moderationReady`, so while the moderation labels are
+  // still loading, the hook is *disabled* and reports `isLoading: false`
+  // / `data: undefined`. Treating that as "not loading" would render
+  // the empty state for a moment before the curated grid pops in;
+  // tracking moderation-readiness here keeps the skeleton on screen
+  // until we know what's featured.
+  const idleLoading = !orgModerationReady || featuredOrgsLoading || featuredOrgs === undefined;
 
   // Search + sort + show-hidden cluster for the unified section.
   const searchToolbar = (
@@ -254,7 +263,7 @@ export function CommunitiesPage() {
                 </Card>
               )}
             </>
-          ) : featuredOrgsLoading ? (
+          ) : idleLoading ? (
             <CommunityGrid>
               {Array.from({ length: 8 }).map((_, i) => (
                 <CommunityMiniCardSkeleton key={i} className="w-full" />
