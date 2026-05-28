@@ -124,7 +124,7 @@ export function AllCampaignsPage() {
     limit: 200,
   });
   const { data: moderation, isReady: moderationReady } = useCampaignModeration();
-  const { data: myCampaigns, isLoading: myCampaignsLoading } = useCampaigns({
+  const { data: myCampaigns } = useCampaigns({
     authors: user ? [user.pubkey] : undefined,
     limit: 100,
     enabled: !!user,
@@ -191,7 +191,7 @@ export function AllCampaignsPage() {
       <AllCampaignsHero campaignCount={totalCampaigns} />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-10 lg:py-14 space-y-8">
-        {user && (myCampaignsLoading || (myCampaigns && myCampaigns.length > 0)) && (
+        {user && myCampaigns && myCampaigns.length > 0 && (
           <section className="space-y-5">
             <div>
               <h2 className="text-2xl sm:text-3xl font-bold tracking-tight">
@@ -201,19 +201,13 @@ export function AllCampaignsPage() {
                 {t('campaigns.home.yourCampaignsDesc')}
               </p>
             </div>
-            {myCampaignsLoading && !myCampaigns ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
-                {Array.from({ length: 4 }).map((_, i) => <CampaignCardSkeleton key={i} />)}
-              </div>
-            ) : (
-              <CampaignSection
-                campaigns={visibleMine}
-                total={myCampaigns?.length ?? 0}
-                visible={DEFAULT_VISIBLE}
-                showAll={showAllMine}
-                onToggle={() => setShowAllMine(!showAllMine)}
-              />
-            )}
+            <CampaignSection
+              campaigns={visibleMine}
+              total={myCampaigns.length}
+              visible={DEFAULT_VISIBLE}
+              showAll={showAllMine}
+              onToggle={() => setShowAllMine(!showAllMine)}
+            />
           </section>
         )}
 
