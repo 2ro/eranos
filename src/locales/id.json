@@ -316,6 +316,7 @@
     "pinCountry": "Sematkan ke feed negara",
     "unpinCountry": "Lepas sematan dari feed negara",
     "muteConversation": "Bisukan Percakapan",
+    "muteCampaign": "Bisukan Kampanye",
     "mute": "Bisukan @{{name}}",
     "unmute": "Aktifkan @{{name}}",
     "report": "Laporkan @{{name}}",

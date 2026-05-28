@@ -1844,6 +1844,7 @@
     "pinCountry": "تثبيت في خلاصة البلد",
     "unpinCountry": "إلغاء تثبيت من خلاصة البلد",
     "muteConversation": "كتم المحادثة",
+    "muteCampaign": "كتم الحملة",
     "mute": "كتم @{{name}}",
     "unmute": "إلغاء كتم @{{name}}",
     "report": "الإبلاغ عن @{{name}}",

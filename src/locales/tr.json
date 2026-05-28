@@ -315,6 +315,7 @@
     "pinCountry": "Ülke akışına sabitle",
     "unpinCountry": "Ülke akışından sabitlemeyi kaldır",
     "muteConversation": "Sohbeti sessize al",
+    "muteCampaign": "Kampanyayı sessize al",
     "mute": "@{{name}} kullanıcısını sessize al",
     "unmute": "@{{name}} kullanıcısının sesini aç",
     "report": "@{{name}} kullanıcısını şikayet et",

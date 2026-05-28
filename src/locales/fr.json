@@ -306,6 +306,7 @@
     "pinCountry": "Épingler au fil du pays",
     "unpinCountry": "Désépingler du fil du pays",
     "muteConversation": "Mettre la conversation en sourdine",
+    "muteCampaign": "Mettre la campagne en sourdine",
     "mute": "Mettre @{{name}} en sourdine",
     "unmute": "Réactiver @{{name}}",
     "report": "Signaler @{{name}}",

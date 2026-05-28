@@ -1860,6 +1860,7 @@
     "pinCountry": "置顶到国家 Feed",
     "unpinCountry": "取消置顶国家 Feed",
     "muteConversation": "静音对话",
+    "muteCampaign": "静音活动",
     "mute": "静音 @{{name}}",
     "unmute": "取消静音 @{{name}}",
     "report": "举报 @{{name}}",

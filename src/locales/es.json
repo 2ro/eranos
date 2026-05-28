@@ -1860,6 +1860,7 @@
     "pinCountry": "Fijar en feed del país",
     "unpinCountry": "Quitar de fijados del país",
     "muteConversation": "Silenciar conversación",
+    "muteCampaign": "Silenciar campaña",
     "mute": "Silenciar a @{{name}}",
     "unmute": "Dejar de silenciar a @{{name}}",
     "report": "Reportar a @{{name}}",

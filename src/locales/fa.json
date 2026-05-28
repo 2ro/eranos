@@ -1860,6 +1860,7 @@
     "pinCountry": "سنجاق به فید کشور",
     "unpinCountry": "حذف سنجاق از فید کشور",
     "muteConversation": "بی‌صدا کردن گفتگو",
+    "muteCampaign": "بی‌صدا کردن کمپین",
     "mute": "بی‌صدا کردن @{{name}}",
     "unmute": "خارج‌کردن از بی‌صدا @{{name}}",
     "report": "گزارش @{{name}}",

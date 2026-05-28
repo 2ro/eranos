@@ -61,6 +61,7 @@ import { type CommunityMenuContext, canBanTarget, getViewerAuthority } from '@/l
 // `useCommunityModerationContext()`. Parents install a
 // `CommunityModerationContext.Provider` to enable community-aware menu items.
 import { isAdmin } from '@/lib/admins';
+import { CAMPAIGN_KIND } from '@/lib/campaign';
 import { genUserName } from '@/lib/genUserName';
 import { timeAgo } from '@/lib/timeAgo';
 import { toast } from '@/hooks/useToast';
@@ -360,6 +361,10 @@ function NoteMoreMenuContent({ event, open, onOpenChange, communityContext, onRe
   const pinned = isPinned(event.id);
   const isOwnPost = user?.pubkey === event.pubkey;
 
+  // Bookmark / Add to list / Add to sidebar don't map cleanly to campaigns
+  // (kind 33863 — addressable, with their own dedicated UI). Hide them there.
+  const isCampaign = event.kind === CAMPAIGN_KIND;
+
   // Country-feed pin/unpin context (organizer/admin action). `useCountryFeed`
   // returns null outside of a country page; we only enable usePinnedPosts when
   // the viewer is actually authorized to pin so we avoid extra relay traffic
@@ -532,23 +537,27 @@ function NoteMoreMenuContent({ event, open, onOpenChange, communityContext, onRe
             label={t('noteMoreMenu.viewEventJson')}
             onClick={onViewEventJson}
           />
-          <MenuItem
-            icon={<Bookmark className={cn("size-5", bookmarked && "fill-current")} />}
-            label={bookmarked ? t('noteMoreMenu.removeBookmark') : t('noteMoreMenu.bookmark')}
-            onClick={handleBookmark}
-          />
-          {user && (
+          {!isCampaign && (
+            <MenuItem
+              icon={<Bookmark className={cn("size-5", bookmarked && "fill-current")} />}
+              label={bookmarked ? t('noteMoreMenu.removeBookmark') : t('noteMoreMenu.bookmark')}
+              onClick={handleBookmark}
+            />
+          )}
+          {user && !isCampaign && (
             <MenuItem
               icon={<ListPlus className="size-5" />}
               label={t('noteMoreMenu.addToList')}
               onClick={() => { onAddToList(); }}
             />
           )}
-          <MenuItem
-            icon={isInSidebar ? <Trash2 className="size-5" /> : <PanelLeft className="size-5" />}
-            label={isInSidebar ? t('noteMoreMenu.removeFromSidebar') : t('noteMoreMenu.addToSidebar')}
-            onClick={handleToggleSidebar}
-          />
+          {!isCampaign && (
+            <MenuItem
+              icon={isInSidebar ? <Trash2 className="size-5" /> : <PanelLeft className="size-5" />}
+              label={isInSidebar ? t('noteMoreMenu.removeFromSidebar') : t('noteMoreMenu.addToSidebar')}
+              onClick={handleToggleSidebar}
+            />
+          )}
           {isOwnPost && (
             <MenuItem
               icon={<Pin className={cn("size-5", pinned && "fill-current")} />}
@@ -566,7 +575,7 @@ function NoteMoreMenuContent({ event, open, onOpenChange, communityContext, onRe
           {!isOwnPost && (
             <MenuItem
               icon={<BellOff className="size-5" />}
-              label={t('noteMoreMenu.muteConversation')}
+              label={isCampaign ? t('noteMoreMenu.muteCampaign') : t('noteMoreMenu.muteConversation')}
               onClick={handleMuteConversation}
             />
           )}

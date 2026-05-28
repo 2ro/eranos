@@ -308,6 +308,7 @@
     "pinCountry": "Pin to country feed",
     "unpinCountry": "Unpin from country feed",
     "muteConversation": "Mute Conversation",
+    "muteCampaign": "Mute Campaign",
     "mute": "Mute @{{name}}",
     "unmute": "Unmute @{{name}}",
     "report": "Report @{{name}}",
