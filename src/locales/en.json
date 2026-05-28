@@ -973,7 +973,22 @@
     "errorHdDeriveFailed": "Could not derive a fresh on-chain address from your wallet.",
     "errorHdDeriveInvalid": "Derived wallet address failed validation. Please add a custom address instead.",
     "errorWalletRequiredFallback": "Wallet endpoint is required.",
-    "errorPublishedInvalid": "Published event failed validation. Please refresh and try again."
+    "errorPublishedInvalid": "Published event failed validation. Please refresh and try again.",
+    "wizard": {
+      "stepProgress": "Step {{current}} of {{total}}",
+      "step1Title": "The basics",
+      "step1Subtitle": "Give your campaign a name and tell us where donations should go. You can launch as soon as these are filled in.",
+      "step2Title": "Tell your story",
+      "step2Subtitle": "Help donors understand who benefits and how funds will be used. Add a banner image to make it stand out.",
+      "step3Title": "Goal and deadline",
+      "step3Subtitle": "Set a fundraising target and an end date. Both are optional — leave them blank for an open-ended campaign.",
+      "step4Title": "Where and what",
+      "step4Subtitle": "Tag your campaign with a country and topics so the right people can find it.",
+      "next": "Next",
+      "back": "Back",
+      "skip": "Skip",
+      "launchNow": "Launch campaign"
+    }
   },
   "campaignsDetail": {
     "seoTitle": "{{title}} | {{appName}} Fundraisers",

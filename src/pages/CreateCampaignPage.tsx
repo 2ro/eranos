@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState, type FormEvent, type ReactNode } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useSeoMeta } from '@unhead/react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
@@ -631,220 +631,437 @@ export function CreateCampaignPage() {
     );
   }
 
+  // ── Form section nodes ─────────────────────────────────────────────────
+  // Built once and rendered either all together (edit mode) or one step
+  // at a time (create mode wizard). Keeping them as locals — instead of
+  // extracting into sub-components — avoids dragging the dozen+ state
+  // setters into a new prop surface.
+  const titleSection = (
+    <FormSection title={t('forms.title')} requirement="Required">
+      <Input
+        value={title}
+        onChange={(e) => setTitle(e.target.value)}
+        placeholder={t('campaignsCreate.titlePlaceholder')}
+        maxLength={200}
+        required
+      />
+    </FormSection>
+  );
+
+  const walletSection = (
+    <FormSection title={t('campaignsCreate.wallet')} requirement="Required">
+      <WalletPicker
+        hdWalletAvailable={hdWalletAvailable}
+        silentPaymentSupported={silentPaymentSupported}
+        displayName={userDisplayName}
+        picture={userMetadata?.picture}
+        walletSource={walletSource}
+        onWalletSourceChange={setWalletSource}
+        mineAccept={mineAccept}
+        onMineAcceptChange={setMineAccept}
+        customOnchain={customOnchain}
+        onCustomOnchainChange={setCustomOnchain}
+        parsedCustomOnchain={parsedCustomOnchain}
+        customSp={customSp}
+        onCustomSpChange={setCustomSp}
+        parsedCustomSp={parsedCustomSp}
+      />
+    </FormSection>
+  );
+
+  const countrySection = (
+    <FormSection title={t('forms.country')} requirement="Recommended">
+      <CountrySelect
+        query={countryQuery}
+        selectedCode={countryCode}
+        onQueryChange={(value) => {
+          setCountryQuery(value);
+          const selectedCountry = countryCode ? getCountryInfo(countryCode) : undefined;
+          const selectedName = selectedCountry?.subdivisionName ?? selectedCountry?.name;
+          if (selectedCountry && value !== selectedName && value.toUpperCase() !== countryCode) {
+            setCountryCode('');
+          }
+        }}
+        onSelect={(country) => {
+          setCountryCode(country.code);
+          setCountryQuery(country.name);
+        }}
+        onClear={() => {
+          setCountryCode('');
+          setCountryQuery('');
+        }}
+      />
+    </FormSection>
+  );
+
+  const tagsSection = (
+    <FormSection title={t('forms.tags')} requirement="Optional">
+      <Input
+        id="campaign-tags"
+        value={tagInput}
+        onChange={(e) => setTagInput(e.target.value)}
+        placeholder={t('campaignsCreate.tagsPlaceholder')}
+      />
+    </FormSection>
+  );
+
+  const bannerSection = (
+    <FormSection title={t('campaignsCreate.banner')} requirement="Recommended">
+      <CoverImageField
+        value={bannerUrl}
+        onChange={(url) => {
+          setBannerUrl(url);
+          // Discard stale NIP-94 tags whenever the URL changes — a manual
+          // paste or template pick won't carry matching metadata.
+          setBannerNip94Tags(null);
+        }}
+        onUploadingChange={setCoverUploading}
+        onUploadComplete={(nip94Tags) => {
+          // Capture the NIP-94 tag array so we can convert it into a
+          // NIP-92 imeta tag at publish time.
+          setBannerNip94Tags(nip94Tags);
+        }}
+      />
+    </FormSection>
+  );
+
+  const storySection = (
+    <FormSection title={t('campaignsCreate.story')} requirement="Recommended">
+      <Textarea
+        id="campaign-story"
+        value={story}
+        onChange={(e) => setStory(e.target.value)}
+        placeholder={t('campaignsCreate.storyPlaceholder')}
+        rows={7}
+        className="font-mono text-base md:text-sm"
+      />
+    </FormSection>
+  );
+
+  const goalDeadlineSection = (
+    <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+      {/* Goal — integer USD */}
+      <FormSection
+        title={(
+          <span className="inline-flex items-center gap-1.5">
+            {t('campaignsCreate.goal')}
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <button
+                  type="button"
+                  className="inline-flex text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                  aria-label={t('campaignsCreate.goalNote')}
+                >
+                  <HelpCircle className="size-4" />
+                </button>
+              </TooltipTrigger>
+              <TooltipContent side="top" className="max-w-64 text-xs leading-relaxed">
+                {t('campaignsCreate.goalNote')}
+              </TooltipContent>
+            </Tooltip>
+          </span>
+        )}
+        requirement="Optional"
+      >
+        <div className="relative">
+          <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">
+            $
+          </span>
+          <Input
+            id="campaign-goal"
+            type="text"
+            inputMode="numeric"
+            placeholder={t('campaignsCreate.goalPlaceholder')}
+            value={goalUsd}
+            onChange={(e) => setGoalUsd(e.target.value)}
+            className="pl-7 pr-14"
+          />
+          <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-xs font-medium text-muted-foreground">
+            USD
+          </span>
+        </div>
+      </FormSection>
+
+      {/* Deadline */}
+      <FormSection title={t('campaignsCreate.deadline')} requirement="Optional">
+        <Input
+          id="campaign-deadline"
+          type="date"
+          min={minDeadline}
+          value={deadline}
+          onChange={(e) => setDeadline(e.target.value)}
+          className="[color-scheme:light] dark:[color-scheme:dark] dark:[&::-webkit-calendar-picker-indicator]:invert dark:[&::-webkit-calendar-picker-indicator]:opacity-80"
+        />
+      </FormSection>
+    </div>
+  );
+
+  const header = (
+    <div>
+      <div className="flex items-center gap-2 -ml-2">
+        <button
+          type="button"
+          onClick={() => navigate(-1)}
+          className="p-2 rounded-full hover:bg-secondary motion-safe:transition-colors text-muted-foreground hover:text-foreground"
+          aria-label={t('common.goBack')}
+        >
+          <ArrowLeft className="size-5 rtl:rotate-180" />
+        </button>
+        <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">
+          {isEditMode ? t('campaignsCreate.headingEdit') : t('campaignsCreate.headingCreate')}
+        </h1>
+      </div>
+      <OrganizationContextChip
+        aTag={isEditMode && organizationATag && !authorizedOrgForAttachedATag && !manageableOrgsLoading ? '' : organizationATag}
+        authorizedOrg={isEditMode ? authorizedOrgForAttachedATag : authorizedOrgFromParam}
+        param={orgParam}
+        paramDecoded={orgFromParam}
+        manageableLoading={manageableOrgsLoading}
+        isEditMode={isEditMode}
+      />
+    </div>
+  );
+
+  const errorAlert = formError ? (
+    <Alert variant="destructive">
+      <AlertTriangle className="size-4" />
+      <AlertDescription>{formError}</AlertDescription>
+    </Alert>
+  ) : null;
+
+  const submitButtonContent = submitMutation.isPending ? (
+    <>
+      <Loader2 className="size-4 mr-2 animate-spin" />
+      {isEditMode ? t('campaignsCreate.updating') : t('forms.publishing')}
+    </>
+  ) : coverUploading ? (
+    <>
+      <Loader2 className="size-4 mr-2 animate-spin" />
+      {t('campaignsCreate.uploadingBanner')}
+    </>
+  ) : (
+    <>
+      <HandHeart className="size-4 mr-2" />
+      {isEditMode ? t('campaignsCreate.submitEdit') : t('campaignsCreate.submitCreate')}
+    </>
+  );
+
+  const handleSubmit = (e: FormEvent) => {
+    e.preventDefault();
+    setFormError('');
+    submitMutation.mutate();
+  };
+
+  // Edit mode keeps the original single-page form — pre-populated fields
+  // need to be visible and editable in one place, and the multi-step
+  // wizard is optimized for a linear first-time flow.
+  if (isEditMode) {
+    return (
+      <main className="min-h-screen pb-16">
+        <form className="max-w-3xl mx-auto px-4 sm:px-6 py-8 lg:py-10 space-y-5" onSubmit={handleSubmit}>
+          {header}
+
+          <div className="rounded-2xl bg-card/50 p-2">
+            {titleSection}
+            {walletSection}
+            {countrySection}
+            {tagsSection}
+            {bannerSection}
+            {storySection}
+            {goalDeadlineSection}
+          </div>
+
+          {errorAlert}
+
+          <div className="pt-1">
+            <Button type="submit" disabled={submitMutation.isPending || coverUploading} className="w-full">
+              {submitButtonContent}
+            </Button>
+          </div>
+        </form>
+      </main>
+    );
+  }
+
+  // ── Create-mode wizard ────────────────────────────────────────────────
+  // Step 1's "Next" is gated on a non-empty title so a user can't reach
+  // later steps with the required field still blank. The wallet field
+  // can't be cleanly gated client-side (it's a multi-mode picker with
+  // live parsing), so we let the submit-time validator catch it via
+  // `formError`.
+  const step1CanAdvance = title.trim().length > 0;
+
+  return (
+    <CampaignWizard
+      header={header}
+      step1={<>{titleSection}{walletSection}</>}
+      step2={<>{storySection}{bannerSection}</>}
+      step3={goalDeadlineSection}
+      step4={<>{countrySection}{tagsSection}</>}
+      errorAlert={errorAlert}
+      submitButtonContent={submitButtonContent}
+      submitting={submitMutation.isPending || coverUploading}
+      step1CanAdvance={step1CanAdvance}
+      onSubmit={handleSubmit}
+    />
+  );
+}
+
+// ─── Wizard wrapper ──────────────────────────────────────────────────────────
+
+/**
+ * Multi-step layout for creating a new campaign.
+ *
+ * Modelled on the {@link AuthDialog} signup flow: a single piece of
+ * `useState<Step>` swaps the section that's currently rendered, with a
+ * progress label at the top and a sticky-feeling footer at the bottom.
+ *
+ * Step 1 holds the **required** fields (title + wallet). Once those are
+ * filled in, the user can either continue through the remaining steps or
+ * tap "Launch campaign" right from step 1 and skip the rest — the parent
+ * form's `handleSubmit` handles the rest. Steps 2 and 3 surface a
+ * "Skip" button alongside Back/Next; step 4 is terminal and shows
+ * "Launch campaign" as its primary action.
+ *
+ * The form lives in this wrapper (not the parent) so the publish button
+ * — wherever it ends up in the wizard — submits the same form and reuses
+ * the parent's `handleSubmit`.
+ */
+function CampaignWizard({
+  header,
+  step1,
+  step2,
+  step3,
+  step4,
+  errorAlert,
+  submitButtonContent,
+  submitting,
+  step1CanAdvance,
+  onSubmit,
+}: {
+  header: ReactNode;
+  step1: ReactNode;
+  step2: ReactNode;
+  step3: ReactNode;
+  step4: ReactNode;
+  errorAlert: ReactNode;
+  submitButtonContent: ReactNode;
+  submitting: boolean;
+  step1CanAdvance: boolean;
+  onSubmit: (e: FormEvent) => void;
+}) {
+  const { t } = useTranslation();
+  const [step, setStep] = useState<1 | 2 | 3 | 4>(1);
+
+  const stepTitles: Record<1 | 2 | 3 | 4, string> = {
+    1: t('campaignsCreate.wizard.step1Title'),
+    2: t('campaignsCreate.wizard.step2Title'),
+    3: t('campaignsCreate.wizard.step3Title'),
+    4: t('campaignsCreate.wizard.step4Title'),
+  };
+  const stepSubtitles: Record<1 | 2 | 3 | 4, string> = {
+    1: t('campaignsCreate.wizard.step1Subtitle'),
+    2: t('campaignsCreate.wizard.step2Subtitle'),
+    3: t('campaignsCreate.wizard.step3Subtitle'),
+    4: t('campaignsCreate.wizard.step4Subtitle'),
+  };
+
   return (
     <main className="min-h-screen pb-16">
-      <form
-        className="max-w-3xl mx-auto px-4 sm:px-6 py-8 lg:py-10 space-y-5"
-        onSubmit={(e) => {
-          e.preventDefault();
-          setFormError('');
-          submitMutation.mutate();
-        }}
-      >
-        <div>
-          <div className="flex items-center gap-2 -ml-2">
-            <button
-              type="button"
-              onClick={() => navigate(-1)}
-              className="p-2 rounded-full hover:bg-secondary motion-safe:transition-colors text-muted-foreground hover:text-foreground"
-              aria-label={t('common.goBack')}
-            >
-              <ArrowLeft className="size-5 rtl:rotate-180" />
-            </button>
-            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">
-              {isEditMode ? t('campaignsCreate.headingEdit') : t('campaignsCreate.headingCreate')}
-            </h1>
+      <form className="max-w-3xl mx-auto px-4 sm:px-6 py-8 lg:py-10 space-y-5" onSubmit={onSubmit}>
+        {header}
+
+        {/* Progress indicator — text-only, mirrors CreateCommunityEventDialog. */}
+        <div className="space-y-3">
+          <div className="space-y-1">
+            <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+              {t('campaignsCreate.wizard.stepProgress', { current: step, total: 4 })}
+            </p>
+            <h2 className="text-lg font-semibold tracking-tight">{stepTitles[step]}</h2>
+            <p className="text-sm text-muted-foreground">{stepSubtitles[step]}</p>
           </div>
-          <OrganizationContextChip
-            aTag={isEditMode && organizationATag && !authorizedOrgForAttachedATag && !manageableOrgsLoading ? '' : organizationATag}
-            authorizedOrg={isEditMode ? authorizedOrgForAttachedATag : authorizedOrgFromParam}
-            param={orgParam}
-            paramDecoded={orgFromParam}
-            manageableLoading={manageableOrgsLoading}
-            isEditMode={isEditMode}
-          />
+          {/* Progress bar */}
+          <div className="flex gap-1.5" aria-hidden>
+            {[1, 2, 3, 4].map((n) => (
+              <div
+                key={n}
+                className={cn(
+                  'h-1 flex-1 rounded-full motion-safe:transition-colors',
+                  n <= step ? 'bg-primary' : 'bg-muted',
+                )}
+              />
+            ))}
+          </div>
         </div>
 
         <div className="rounded-2xl bg-card/50 p-2">
-          {/* Title */}
-          <FormSection title={t('forms.title')} requirement="Required">
-            <Input
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              placeholder={t('campaignsCreate.titlePlaceholder')}
-              maxLength={200}
-              required
-            />
-          </FormSection>
-
-          {/* Wallet (required) */}
-          <FormSection title={t('campaignsCreate.wallet')} requirement="Required">
-            <WalletPicker
-              hdWalletAvailable={hdWalletAvailable}
-              silentPaymentSupported={silentPaymentSupported}
-              displayName={userDisplayName}
-              picture={userMetadata?.picture}
-              walletSource={walletSource}
-              onWalletSourceChange={setWalletSource}
-              mineAccept={mineAccept}
-              onMineAcceptChange={setMineAccept}
-              customOnchain={customOnchain}
-              onCustomOnchainChange={setCustomOnchain}
-              parsedCustomOnchain={parsedCustomOnchain}
-              customSp={customSp}
-              onCustomSpChange={setCustomSp}
-              parsedCustomSp={parsedCustomSp}
-            />
-          </FormSection>
-
-          {/* Country */}
-          <FormSection title={t('forms.country')} requirement="Recommended">
-            <CountrySelect
-              query={countryQuery}
-              selectedCode={countryCode}
-              onQueryChange={(value) => {
-                setCountryQuery(value);
-                const selectedCountry = countryCode ? getCountryInfo(countryCode) : undefined;
-                const selectedName = selectedCountry?.subdivisionName ?? selectedCountry?.name;
-                if (selectedCountry && value !== selectedName && value.toUpperCase() !== countryCode) {
-                  setCountryCode('');
-                }
-              }}
-              onSelect={(country) => {
-                setCountryCode(country.code);
-                setCountryQuery(country.name);
-              }}
-              onClear={() => {
-                setCountryCode('');
-                setCountryQuery('');
-              }}
-            />
-          </FormSection>
-
-          {/* Tags */}
-          <FormSection title={t('forms.tags')} requirement="Optional">
-            <Input
-              id="campaign-tags"
-              value={tagInput}
-              onChange={(e) => setTagInput(e.target.value)}
-              placeholder={t('campaignsCreate.tagsPlaceholder')}
-            />
-          </FormSection>
-
-          {/* Banner image */}
-          <FormSection title={t('campaignsCreate.banner')} requirement="Recommended">
-            <CoverImageField
-              value={bannerUrl}
-              onChange={(url) => {
-                setBannerUrl(url);
-                // Discard stale NIP-94 tags whenever the URL changes — a manual
-                // paste or template pick won't carry matching metadata.
-                setBannerNip94Tags(null);
-              }}
-              onUploadingChange={setCoverUploading}
-              onUploadComplete={(nip94Tags) => {
-                // Capture the NIP-94 tag array so we can convert it into a
-                // NIP-92 imeta tag at publish time.
-                setBannerNip94Tags(nip94Tags);
-              }}
-            />
-          </FormSection>
-
-          {/* Story */}
-          <FormSection title={t('campaignsCreate.story')} requirement="Recommended">
-            <Textarea
-              id="campaign-story"
-              value={story}
-              onChange={(e) => setStory(e.target.value)}
-              placeholder={t('campaignsCreate.storyPlaceholder')}
-              rows={7}
-              className="font-mono text-base md:text-sm"
-            />
-          </FormSection>
-
-          <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
-            {/* Goal — integer USD */}
-            <FormSection
-              title={(
-                <span className="inline-flex items-center gap-1.5">
-                  {t('campaignsCreate.goal')}
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <button
-                        type="button"
-                        className="inline-flex text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-                        aria-label={t('campaignsCreate.goalNote')}
-                      >
-                        <HelpCircle className="size-4" />
-                      </button>
-                    </TooltipTrigger>
-                    <TooltipContent side="top" className="max-w-64 text-xs leading-relaxed">
-                      {t('campaignsCreate.goalNote')}
-                    </TooltipContent>
-                  </Tooltip>
-                </span>
-              )}
-              requirement="Optional"
-            >
-              <div className="relative">
-                <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">
-                  $
-                </span>
-                <Input
-                  id="campaign-goal"
-                  type="text"
-                  inputMode="numeric"
-                  placeholder={t('campaignsCreate.goalPlaceholder')}
-                  value={goalUsd}
-                  onChange={(e) => setGoalUsd(e.target.value)}
-                  className="pl-7 pr-14"
-                />
-                <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-xs font-medium text-muted-foreground">
-                  USD
-                </span>
-              </div>
-            </FormSection>
-
-            {/* Deadline */}
-            <FormSection title={t('campaignsCreate.deadline')} requirement="Optional">
-              <Input
-                id="campaign-deadline"
-                type="date"
-                min={minDeadline}
-                value={deadline}
-                onChange={(e) => setDeadline(e.target.value)}
-                className="[color-scheme:light] dark:[color-scheme:dark] dark:[&::-webkit-calendar-picker-indicator]:invert dark:[&::-webkit-calendar-picker-indicator]:opacity-80"
-              />
-            </FormSection>
-          </div>
+          {step === 1 && step1}
+          {step === 2 && step2}
+          {step === 3 && step3}
+          {step === 4 && step4}
         </div>
 
-        {formError && (
-          <Alert variant="destructive">
-            <AlertTriangle className="size-4" />
-            <AlertDescription>{formError}</AlertDescription>
-          </Alert>
-        )}
+        {errorAlert}
 
-        <div className="pt-1">
-          <Button type="submit" disabled={submitMutation.isPending || coverUploading} className="w-full">
-            {submitMutation.isPending ? (
-              <>
-                <Loader2 className="size-4 mr-2 animate-spin" />
-                {isEditMode ? t('campaignsCreate.updating') : t('forms.publishing')}
-              </>
-            ) : coverUploading ? (
-              <>
-                <Loader2 className="size-4 mr-2 animate-spin" />
-                {t('campaignsCreate.uploadingBanner')}
-              </>
-            ) : (
-              <>
-                <HandHeart className="size-4 mr-2" />
-                {isEditMode ? t('campaignsCreate.submitEdit') : t('campaignsCreate.submitCreate')}
-              </>
-            )}
-          </Button>
+        {/* Footer — buttons vary per step. */}
+        <div className="space-y-2 pt-1">
+          {step === 1 ? (
+            <>
+              <Button type="submit" disabled={submitting} className="w-full">
+                {submitButtonContent}
+              </Button>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setStep(2)}
+                disabled={submitting || !step1CanAdvance}
+                className="w-full"
+              >
+                {t('campaignsCreate.wizard.next')}
+              </Button>
+            </>
+          ) : step === 4 ? (
+            <>
+              <Button type="submit" disabled={submitting} className="w-full">
+                {submitButtonContent}
+              </Button>
+              <Button
+                type="button"
+                variant="ghost"
+                onClick={() => setStep(3)}
+                disabled={submitting}
+                className="w-full"
+              >
+                {t('campaignsCreate.wizard.back')}
+              </Button>
+            </>
+          ) : (
+            // Steps 2 and 3 — three buttons: Back / Skip (publish now) / Next.
+            <>
+              <Button
+                type="button"
+                onClick={() => setStep((s) => (s === 2 ? 3 : 4) as 1 | 2 | 3 | 4)}
+                disabled={submitting}
+                className="w-full"
+              >
+                {t('campaignsCreate.wizard.next')}
+              </Button>
+              <div className="flex gap-2">
+                <Button
+                  type="button"
+                  variant="ghost"
+                  onClick={() => setStep((s) => (s === 3 ? 2 : 1) as 1 | 2 | 3 | 4)}
+                  disabled={submitting}
+                  className="flex-1"
+                >
+                  {t('campaignsCreate.wizard.back')}
+                </Button>
+                <Button type="submit" variant="outline" disabled={submitting} className="flex-1">
+                  {submitting ? submitButtonContent : t('campaignsCreate.wizard.launchNow')}
+                </Button>
+              </div>
+            </>
+          )}
         </div>
       </form>
     </main>
