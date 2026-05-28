@@ -352,20 +352,24 @@ function CampaignDetailContent({ campaign }: { campaign: ParsedCampaign }) {
 
   return (
     <main className="min-h-screen pb-16">
-      {/* Full-bleed cover hero. Title, creator, meta, and the
-          back/admin buttons all live ON the image — the banner is the
-          page's emotional entry point. */}
+      {/* Full-bleed cover image. Title, summary, byline, meta, and the
+          action bar live in `CampaignHeading` below the banner — the
+          image stays unobstructed so banners with baked-in text are
+          fully visible. */}
       <CampaignHero
-        campaign={displayCampaign}
         cover={cover}
-        creatorPubkey={campaign.pubkey}
-        deadline={deadline}
-        countryLabel={countryLabel}
         isCreator={isCreator}
         naddr={naddr}
         deleteDisabled={deleteMutation.isPending}
         onBack={() => navigate(-1)}
         onDelete={() => setDeleteConfirmOpen(true)}
+      />
+
+      <CampaignHeading
+        campaign={displayCampaign}
+        creatorPubkey={campaign.pubkey}
+        deadline={deadline}
+        countryLabel={countryLabel}
         onReply={() => setReplyOpen(true)}
         onMore={() => setMoreMenuOpen(true)}
         translateAction={translateAction}
@@ -750,46 +754,33 @@ function CampaignerBadge() {
 // ─────────────────────────────────────────────────────────────────────
 
 interface CampaignHeroProps {
-  campaign: ParsedCampaign;
   cover: string | undefined;
-  creatorPubkey: string;
-  deadline: { label: string; isPast: boolean } | null;
-  countryLabel: string | undefined;
   isCreator: boolean;
   naddr: string;
   deleteDisabled: boolean;
   onBack: () => void;
   onDelete: () => void;
-  onReply: () => void;
-  onMore: () => void;
-  translateAction: ReactNode;
 }
 
 function CampaignHero({
-  campaign,
   cover,
-  creatorPubkey,
-  deadline,
-  countryLabel,
   isCreator,
   naddr,
   deleteDisabled,
   onBack,
   onDelete,
-  onReply,
-  onMore,
-  translateAction,
 }: CampaignHeroProps) {
   const { t } = useTranslation();
 
   return (
-    // True full-bleed: no max-width wrapper, no horizontal padding, no
-    // rounded corners — the image touches every edge on every
-    // breakpoint. Height is generous on mobile so the banner fills the
-    // viewport for an immersive first impression instead of being a
-    // strip; on larger screens we cap it so the page content below
-    // stays visible.
-    <header className="relative isolate w-full overflow-hidden bg-gradient-to-br from-primary/40 via-primary/20 to-secondary min-h-[92svh] sm:min-h-0 sm:aspect-[21/9] lg:aspect-[3/1]">
+    // Pure image hero: full-bleed banner with floating back / admin
+    // controls only. Title, summary, byline, meta, and action bar all
+    // live in `CampaignHeading` below the banner so they get their own
+    // room and never collide with text baked into the image. Aspect
+    // ratios stay landscape at every breakpoint (4:3 → 21:9 → 3:1) so
+    // `object-cover` trims a thin strip top/bottom instead of slicing
+    // horizontal content off the sides.
+    <header className="relative isolate w-full overflow-hidden bg-gradient-to-br from-primary/40 via-primary/20 to-secondary aspect-[4/3] sm:aspect-[21/9] lg:aspect-[3/1]">
       {cover ? (
         <img
           src={cover}
@@ -802,25 +793,12 @@ function CampaignHero({
         </div>
       )}
 
-      {/* Tall, deep bottom gradient covering ~80% of the hero so the
-          overlay text sits on a near-opaque base no matter how busy
-          the photo is. Image stays vibrant only in the very top of
-          the banner. */}
-      <div
-        aria-hidden
-        className="absolute inset-x-0 bottom-0 top-[20%] bg-gradient-to-t from-black/95 via-black/80 to-transparent"
-      />
-      {/* Subtle top scrim purely to keep the back/admin buttons
-          legible against bright skies, beaches, etc. */}
-      <div
-        aria-hidden
-        className="absolute inset-x-0 top-0 h-24 bg-gradient-to-b from-black/45 to-transparent"
-      />
-
-      {/* Top controls — back left, admin right. Contained to the
-          same max-w-6xl column as the overlay text below so the back
-          button aligns with the title's left edge. Chip-style
-          backdrops so they read on any image without an opaque pill. */}
+      {/* Top controls — back left, admin right. No scrim above; the
+          buttons rely on their own `bg-black/30 backdrop-blur-md` chip
+          backgrounds for legibility, which works on any image without
+          darkening the top of the banner. Contained to the same
+          max-w-6xl column as the heading block below so the back
+          button aligns with the title's left edge. */}
       <div className="absolute inset-x-0 top-0 z-10 px-5 sm:px-6 lg:px-0 pt-[max(env(safe-area-inset-top),1rem)]">
         <div className="max-w-6xl mx-auto flex items-center justify-between gap-3">
           <button
@@ -858,59 +836,85 @@ function CampaignHero({
           )}
         </div>
       </div>
-
-      {/* Overlay content — sits at the bottom of the image, contained
-          to the 6xl column on desktop so it lines up with the body
-          content below. Generous bottom padding (incl. safe-area)
-          keeps the title comfortably above the home-indicator on
-          notched phones. Drop-shadow on text gives extra contrast on
-          busy photos without darkening the gradient further. */}
-      <div className="absolute inset-x-0 bottom-0 z-10 px-5 sm:px-6 lg:px-0 pb-[max(env(safe-area-inset-bottom),1.75rem)] pt-16 sm:pt-20">
-        <div className="max-w-6xl mx-auto [text-shadow:0_1px_3px_rgba(0,0,0,0.7)]">
-          <h1 className="text-3xl sm:text-5xl lg:text-6xl font-bold leading-[1.05] tracking-tight text-white max-w-4xl">
-            {campaign.title}
-          </h1>
-
-          <div className="mt-5">
-            <AuthorByline pubkey={creatorPubkey} variant="hero" />
-          </div>
-
-          {(countryLabel || deadline) && (
-            <div className="mt-3 flex flex-wrap items-center gap-x-5 gap-y-1.5 text-xs sm:text-sm font-medium text-white/85">
-              {countryLabel && (
-                <span className="inline-flex items-center gap-1.5">
-                  <MapPin className="size-4" />
-                  {countryLabel}
-                </span>
-              )}
-              {deadline && (
-                <span className="inline-flex items-center gap-1.5">
-                  <CalendarClock className="size-4" />
-                  {deadline.label}
-                </span>
-              )}
-            </div>
-          )}
-
-          {/* Action bar (comment / repost / react / share / more) sits
-              flush with the hero text — donations + comments + sharing
-              are all reachable from the banner without a separate bar
-              floating below. Styled as glass chips so the buttons read
-              on the dark gradient. */}
-          <div className="mt-4 pt-3 border-t border-white/15 [&_button]:!text-white/90 [&_button:hover]:!text-white [&_button:hover]:!bg-white/15 [&_button]:transition-colors [text-shadow:none]">
-            <PostActionBar
-              event={campaign.event}
-              replyLabel={t('campaignsDetail.commentLabel')}
-              hideZap
-              showShareInSidebar
-              onReply={onReply}
-              onMore={onMore}
-              translateAction={translateAction}
-            />
-          </div>
-        </div>
-      </div>
     </header>
+  );
+}
+
+interface CampaignHeadingProps {
+  campaign: ParsedCampaign;
+  creatorPubkey: string;
+  deadline: { label: string; isPast: boolean } | null;
+  countryLabel: string | undefined;
+  onReply: () => void;
+  onMore: () => void;
+  translateAction: ReactNode;
+}
+
+function CampaignHeading({
+  campaign,
+  creatorPubkey,
+  deadline,
+  countryLabel,
+  onReply,
+  onMore,
+  translateAction,
+}: CampaignHeadingProps) {
+  const { t } = useTranslation();
+
+  return (
+    // Title / summary / byline / meta / action bar sit in normal page
+    // flow on `bg-background`, so they can grow to whatever length the
+    // campaign needs without overflowing or being clipped. Same
+    // max-w-6xl column the rest of the page uses, so the left edge of
+    // the title aligns with the body content.
+    <section className="max-w-6xl mx-auto px-5 sm:px-6 lg:px-0 pt-6 sm:pt-8">
+      <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold leading-[1.1] tracking-tight max-w-4xl">
+        {campaign.title}
+      </h1>
+
+      {campaign.summary && (
+        <p className="mt-3 text-base sm:text-lg leading-relaxed text-muted-foreground max-w-2xl">
+          {campaign.summary}
+        </p>
+      )}
+
+      <div className="mt-5">
+        <AuthorByline pubkey={creatorPubkey} variant="hero" />
+      </div>
+
+      {(countryLabel || deadline) && (
+        <div className="mt-3 flex flex-wrap items-center gap-x-5 gap-y-1.5 text-xs sm:text-sm font-medium text-muted-foreground">
+          {countryLabel && (
+            <span className="inline-flex items-center gap-1.5">
+              <MapPin className="size-4" />
+              {countryLabel}
+            </span>
+          )}
+          {deadline && (
+            <span className="inline-flex items-center gap-1.5">
+              <CalendarClock className="size-4" />
+              {deadline.label}
+            </span>
+          )}
+        </div>
+      )}
+
+      {/* Action bar (comment / repost / react / share / more) sits
+          directly under the heading on the page surface. No glass
+          treatment — it inherits PostActionBar's default styling
+          against `bg-background`. */}
+      <div className="mt-4 pt-3 border-t border-border/60">
+        <PostActionBar
+          event={campaign.event}
+          replyLabel={t('campaignsDetail.commentLabel')}
+          hideZap
+          showShareInSidebar
+          onReply={onReply}
+          onMore={onMore}
+          translateAction={translateAction}
+        />
+      </div>
+    </section>
   );
 }
 
