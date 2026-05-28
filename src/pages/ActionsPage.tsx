@@ -269,7 +269,7 @@ export default function ActionsPage() {
     limit: 300,
   });
 
-  const { data: myPledges, isLoading: myPledgesLoading } = useActions({
+  const { data: myPledges } = useActions({
     authors: user ? [user.pubkey] : undefined,
     limit: 100,
     enabled: !!user,
@@ -407,26 +407,20 @@ export default function ActionsPage() {
       />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-10 lg:py-14 space-y-12">
-        {user && (myPledgesLoading || (myPledges && myPledges.length > 0)) && (
+        {user && myPledges && myPledges.length > 0 && (
           <section className="space-y-5">
             <div>
               <h2 className="text-2xl sm:text-3xl font-bold tracking-tight">{t('pledges.list.myPledges')}</h2>
               <p className="text-sm text-muted-foreground mt-1">{t('pledges.list.myPledgesTagline')}</p>
             </div>
-            {myPledgesLoading && !myPledges ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
-                {Array.from({ length: 4 }).map((_, i) => <ActionSkeleton key={i} />)}
-              </div>
-            ) : (
-              <ActionSection
-                items={visibleMine}
-                total={myPledges?.length ?? 0}
-                visible={DEFAULT_VISIBLE}
-                showAll={showAllMine}
-                onToggle={() => setShowAllMine(!showAllMine)}
-                btcPrice={btcPrice}
-              />
-            )}
+            <ActionSection
+              items={visibleMine}
+              total={myPledges.length}
+              visible={DEFAULT_VISIBLE}
+              showAll={showAllMine}
+              onToggle={() => setShowAllMine(!showAllMine)}
+              btcPrice={btcPrice}
+            />
           </section>
         )}
 
