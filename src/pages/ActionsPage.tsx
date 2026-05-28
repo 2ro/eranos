@@ -36,7 +36,7 @@ import {
 import {
   HandHeart, PlusCircle, ChevronDown, ChevronUp, Loader2,
   Link as LinkIcon, Check, MoreHorizontal, Trash2,
-  Megaphone, Sparkles, EyeOff,
+  Megaphone, EyeOff,
 } from 'lucide-react';
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -323,6 +323,10 @@ export default function ActionsPage() {
     return { searchHits: visible, searchHiddenCount: hidden };
   }, [searchHitsRaw, pledgeModeration, canShowHidden]);
 
+  // `actions` is the chronological pledge list filtered by country, with
+  // moderator-hidden items dropped (unless `showHidden` is on). Featured
+  // pledges are NOT excluded here — the idle render path pulls them
+  // separately, and the active render path shows the full list.
   const { actions, listHiddenCount } = useMemo(() => {
     if (!rawActions) return { actions: undefined, listHiddenCount: 0 };
     const hiddenCoords = pledgeModeration?.hiddenCoords ?? new Set<string>();
@@ -365,16 +369,18 @@ export default function ActionsPage() {
 
   const DEFAULT_VISIBLE = 4;
   const [showAllMine, setShowAllMine] = useState(false);
-  const [showAllFeatured, setShowAllFeatured] = useState(false);
-  const [showAllPledges, setShowAllPledges] = useState(false);
 
-  const allPledges = useMemo(
-    () => (actions ?? []).filter((action) => !featuredPledgeCoordSet.has(getPledgeCoord(action))),
-    [actions, featuredPledgeCoordSet],
-  );
   const visibleMine = showAllMine ? (myPledges ?? []) : (myPledges ?? []).slice(0, DEFAULT_VISIBLE);
-  const visibleFeatured = showAllFeatured ? orderedFeaturedPledges : orderedFeaturedPledges.slice(0, DEFAULT_VISIBLE);
-  const visibleAllPledges = showAllPledges ? allPledges : allPledges.slice(0, DEFAULT_VISIBLE);
+
+  // Idle list: featured first; if none are featured, fall back to the
+  // chronological all-pledges grid so the page is never blank.
+  const idlePledges = useMemo<Action[]>(() => {
+    if (orderedFeaturedPledges.length > 0) return orderedFeaturedPledges;
+    return (actions ?? []).filter(
+      (action) => !featuredPledgeCoordSet.has(getPledgeCoord(action)),
+    );
+  }, [orderedFeaturedPledges, actions, featuredPledgeCoordSet]);
+
   const hiddenPledges = useMemo<Action[]>(() => {
     if (!isMod || !pledgeModerationReady) return [];
     return (allPledgesForMods ?? []).filter((pledge) => pledgeModeration.hiddenCoords.has(getPledgeCoord(pledge)));
@@ -386,6 +392,7 @@ export default function ActionsPage() {
       onQueryChange={setSearchInput}
       sort={sortMode}
       onSortChange={setSortMode}
+      sortOptions={['top', 'new']}
       searchPlaceholderKey="pledges.list.searchPlaceholder"
       searchAriaLabelKey="pledges.list.searchAriaLabel"
       showHidden={isMod ? {
@@ -424,37 +431,18 @@ export default function ActionsPage() {
           </section>
         )}
 
-        {orderedFeaturedPledges.length > 0 && (
-          <section className="space-y-5">
-            <div>
-              <h2 className="text-2xl sm:text-3xl font-bold tracking-tight inline-flex items-center gap-2">
-                <Sparkles className="size-6 text-primary" />
-                {t('pledges.list.featuredPledges')}
-              </h2>
-              <p className="text-sm text-muted-foreground mt-1">{t('pledges.list.featuredPledgesTagline')}</p>
-            </div>
-            <ActionSection
-              items={visibleFeatured}
-              total={orderedFeaturedPledges.length}
-              visible={DEFAULT_VISIBLE}
-              showAll={showAllFeatured}
-              onToggle={() => setShowAllFeatured(!showAllFeatured)}
-              btcPrice={btcPrice}
-            />
-          </section>
-        )}
-
+        {/* Unified Pledges section.
+            - Idle (no search / no sort / no country): renders the
+              moderator-featured grid, or a chronological fallback when
+              no pledges are featured yet.
+            - Active: renders the full search/sort/country result set. */}
         <section className="space-y-5">
           <div className="flex flex-col items-stretch gap-4 sm:flex-row sm:items-end sm:justify-between">
             <div>
               <h2 className="text-2xl sm:text-3xl font-bold tracking-tight">
                 {trimmedSearch
                   ? t('common.search')
-                  : isSearching && sortMode === 'top'
-                    ? t('common.sortTop')
-                    : isSearching && sortMode === 'new'
-                      ? t('common.sortNew')
-                      : t('pledges.list.allPledges')}
+                  : t('pledges.list.allPledges')}
               </h2>
               <p className="text-sm text-muted-foreground mt-1">
                 {isSearching && searchHits
@@ -521,15 +509,31 @@ export default function ActionsPage() {
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
               {Array.from({ length: 8 }).map((_, i) => <ActionSkeleton key={i} />)}
             </div>
-          ) : allPledges.length > 0 ? (
-            <ActionSection
-              items={visibleAllPledges}
-              total={allPledges.length}
-              visible={DEFAULT_VISIBLE}
-              showAll={showAllPledges}
-              onToggle={() => setShowAllPledges(!showAllPledges)}
-              btcPrice={btcPrice}
-            />
+          ) : idlePledges.length > 0 ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+              {idlePledges.map((action) => (
+                <PledgeCard
+                  key={`${action.pubkey}:${action.id}`}
+                  action={action}
+                  btcPrice={btcPrice}
+                  showAuthor
+                  showTranslate
+                  topRight={
+                    <>
+                      <ModerationOverlay
+                        coord={getPledgeCoord(action)}
+                        entityTitle={action.title}
+                        surface="pledge"
+                        axes={['hide', 'featured']}
+                        showMenu={false}
+                        className="flex items-center"
+                      />
+                      <ActionShareMenu action={action} displayTitle={action.title} />
+                    </>
+                  }
+                />
+              ))}
+            </div>
           ) : (
             <Card className="border-dashed">
               <div className="py-12 px-8 text-center space-y-4">

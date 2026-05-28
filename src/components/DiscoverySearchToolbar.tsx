@@ -133,7 +133,14 @@ export function DiscoverySearchToolbar({
               key={value}
               checked={sort === value}
               onCheckedChange={(checked) => {
+                // `checked === false` means the user clicked the
+                // currently-active item — return to the curated
+                // `default` view (featured-first) rather than leaving
+                // them stuck on Top/New with no exit affordance now
+                // that `default` is no longer an exposed option in the
+                // dropdown.
                 if (checked) onSortChange(value);
+                else onSortChange('default');
               }}
               // The checkbox slot on the left is hidden in favour of an
               // explicit `Check` on the right (matches the

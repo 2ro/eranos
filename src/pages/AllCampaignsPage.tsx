@@ -23,38 +23,47 @@ import { cn } from '@/lib/utils';
 import type { Nip50Sort } from '@/hooks/useNip50Search';
 import type { ParsedCampaign } from '@/lib/campaign';
 
-/** Type-guard for the `?sort=` URL param. Default is `top` (most-zapped). */
-function parseSort(value: string | null): CampaignSort {
-  return value === 'none' ? 'none' : 'top';
+/**
+ * Type-guard for the `?sort=` URL param.
+ *
+ * - `top` and `new` map to the toolbar's active sort modes.
+ * - Anything else (missing, empty, legacy values) collapses to
+ *   `'default'`, the curated featured-first idle state.
+ */
+function parseSort(value: string | null): Nip50Sort {
+  if (value === 'top') return 'top';
+  if (value === 'new') return 'new';
+  return 'default';
 }
 
 /**
- * Map between the shared toolbar's sort vocabulary (`default` / `top` /
- * `new`) and the `useAllCampaigns` hook's vocabulary (`top` / `none`).
- *
- * AllCampaignsPage doesn't have a curated/default layout — it's the
- * "show me everything" page — so the toolbar's 'default' option falls
- * through to 'top' here, the page's canonical ranked view. The legacy
- * `none` value is preserved on the URL so existing share links keep
- * working.
+ * Map the toolbar's sort vocabulary (`default` / `top` / `new`) to the
+ * `useAllCampaigns` hook's vocabulary (`top` / `none`). `'new'` and
+ * `'default'` both map to `'none'` (chronological) — the page handles
+ * the "show featured only" framing on top of that.
  */
-const toToolbarSort = (s: CampaignSort): Nip50Sort => (s === 'none' ? 'new' : 'top');
-const toQuerySort = (s: Nip50Sort): CampaignSort => (s === 'new' ? 'none' : 'top');
+const toQuerySort = (s: Nip50Sort): CampaignSort => (s === 'top' ? 'top' : 'none');
 
 /**
- * Lists every campaign found on relays. Two sort modes:
+ * Lists every campaign found on relays. The page has two display modes:
  *
- * - **Top** (default): ranked by total sats raised (kind 8333 donation receipts).
- * - **New**: chronological by `created_at`.
+ * 1. **Idle** (no search, no sort, no country picked) — shows
+ *    moderator-featured campaigns only. If there are no featured
+ *    campaigns, falls back to the latest chronological grid so the page
+ *    is never blank.
+ * 2. **Active** (user typed a query, picked Top/New, or chose a
+ *    country) — shows the full set, ranked by sats raised (Top) or
+ *    chronological (New / search default).
  *
- * Both modes share a free-text search bar that filters across title,
- * summary, story, location, and category tags client-side.
+ * Search filters across title, summary, story, location, and category
+ * tags client-side.
  *
  * Hidden campaigns are excluded by default — flip the "Show hidden"
  * toggle (inside the toolbar's filter popover) to include them.
  *
- * URL state: `?sort=none&q=<search>`. Default values are stripped so the
- * canonical URL stays clean. Useful for sharing search results.
+ * URL state: `?sort=top|new&q=<search>&country=<iso>`. Default values
+ * are stripped so the canonical URL stays clean. Useful for sharing
+ * search results.
  */
 export function AllCampaignsPage() {
   const { t } = useTranslation();
@@ -79,7 +88,7 @@ export function AllCampaignsPage() {
 
   // Sync the debounced search → URL. Empty / default values are stripped
   // so the canonical URL is `/campaigns/all` (not
-  // `/campaigns/all?sort=none&q=`).
+  // `/campaigns/all?sort=&q=`).
   useEffect(() => {
     const next = new URLSearchParams(searchParams);
     const trimmed = debouncedSearch.trim();
@@ -102,8 +111,8 @@ export function AllCampaignsPage() {
 
   const setSortFromToolbar = (value: Nip50Sort) => {
     const next = new URLSearchParams(searchParams);
-    const queryValue = toQuerySort(value);
-    if (queryValue === 'none') next.set('sort', 'none');
+    if (value === 'top') next.set('sort', 'top');
+    else if (value === 'new') next.set('sort', 'new');
     else next.delete('sort');
     setSearchParams(next, { replace: true });
   };
@@ -118,7 +127,7 @@ export function AllCampaignsPage() {
   };
 
   const { data: campaigns, isLoading } = useAllCampaigns({
-    sort,
+    sort: toQuerySort(sort),
     search: debouncedSearch.trim(),
     countryCode: urlCountry,
     limit: 200,
@@ -148,10 +157,21 @@ export function AllCampaignsPage() {
     description: t('campaigns.all.description'),
   });
 
+  const activeQuery = debouncedSearch.trim();
+
+  // The unified section is in "active" mode when the user has expressed
+  // intent to browse the full set: typed a query, picked Top/New, or
+  // chosen a country. Otherwise it's the curated featured-first view.
+  const isActive = activeQuery !== '' || sort !== 'default' || !!urlCountry;
+
+  // Visible campaigns in the **active** branch: every campaign matching
+  // the search/sort/country, minus hidden (unless the moderator opted
+  // in to seeing hidden). Featured items are intentionally NOT pulled
+  // out of this list — when the user is actively browsing, they want a
+  // ranked or chronological grid, not the curated shelf.
   const { visible, hiddenCount, hiddenCampaigns } = useMemo(() => {
     const all = campaigns ?? [];
     const hiddenCoords = moderation?.hiddenCoords ?? new Set<string>();
-    const featuredCoordSet = new Set(featuredCoords);
     let hiddenCount = 0;
     const visible: ParsedCampaign[] = [];
     const hiddenCampaigns: ParsedCampaign[] = [];
@@ -161,13 +181,13 @@ export function AllCampaignsPage() {
         hiddenCount += 1;
         hiddenCampaigns.push(c);
         if (isMod && showHidden) visible.push(c);
-      } else if (!featuredCoordSet.has(c.aTag)) {
+      } else {
         visible.push(c);
       }
     }
 
     return { visible, hiddenCount, hiddenCampaigns };
-  }, [campaigns, featuredCoords, isMod, moderation, showHidden]);
+  }, [campaigns, isMod, moderation, showHidden]);
 
   const orderedFeaturedCampaigns = useMemo(() => {
     if (!featuredCampaigns) return [] as ParsedCampaign[];
@@ -176,19 +196,23 @@ export function AllCampaignsPage() {
     );
   }, [featuredCampaigns, moderation]);
 
+  // Idle-mode list: featured first; if none are featured, fall back to
+  // the latest chronological grid so the page never lands on an empty
+  // state when there's content to show.
+  const idleCampaigns = useMemo<ParsedCampaign[]>(() => {
+    if (orderedFeaturedCampaigns.length > 0) return orderedFeaturedCampaigns;
+    return visible;
+  }, [orderedFeaturedCampaigns, visible]);
+
   const DEFAULT_VISIBLE = 4;
   const [showAllMine, setShowAllMine] = useState(false);
-  const [showAllFeatured, setShowAllFeatured] = useState(false);
   const visibleMine = showAllMine ? (myCampaigns ?? []) : (myCampaigns ?? []).slice(0, DEFAULT_VISIBLE);
-  const visibleFeatured = showAllFeatured ? orderedFeaturedCampaigns : orderedFeaturedCampaigns.slice(0, DEFAULT_VISIBLE);
 
   const showSkeleton = isLoading || !moderationReady;
-  const activeQuery = debouncedSearch.trim();
-  const totalCampaigns = campaigns?.length ?? 0;
 
   return (
     <main className="min-h-screen pb-16">
-      <AllCampaignsHero campaignCount={totalCampaigns} />
+      <AllCampaignsHero campaignCount={visible.length} />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-10 lg:py-14 space-y-8">
         {user && myCampaigns && myCampaigns.length > 0 && (
@@ -211,118 +235,100 @@ export function AllCampaignsPage() {
           </section>
         )}
 
-        {orderedFeaturedCampaigns.length > 0 && (
-          <section className="space-y-5">
+        {/* Unified Campaigns section.
+            - Idle (no search / no sort / no country): renders the
+              moderator-curated featured grid, or a chronological
+              fallback if nothing is featured yet.
+            - Active: renders the full search/sort/country result set. */}
+        <section className="space-y-5">
+          <div className="flex flex-col items-stretch gap-4 sm:flex-row sm:items-end sm:justify-between">
             <div>
               <h2 className="text-2xl sm:text-3xl font-bold tracking-tight">
-                {t('campaigns.home.featured')}
+                {activeQuery
+                  ? t('common.search')
+                  : t('campaigns.all.title')}
               </h2>
               <p className="text-sm text-muted-foreground mt-1">
-                {t('campaigns.home.featuredDesc', { appName: config.appName })}
+                {activeQuery
+                  ? t('common.searchResultsCount', { count: visible.length })
+                  : t('campaigns.all.sectionTagline')}
               </p>
             </div>
-            <CampaignSection
-              campaigns={visibleFeatured}
-              total={orderedFeaturedCampaigns.length}
-              visible={DEFAULT_VISIBLE}
-              showAll={showAllFeatured}
-              onToggle={() => setShowAllFeatured(!showAllFeatured)}
+            <DiscoverySearchToolbar
+              query={searchInput}
+              onQueryChange={setSearchInput}
+              sort={sort}
+              onSortChange={setSortFromToolbar}
+              sortOptions={['top', 'new']}
+              searchPlaceholderKey="campaigns.all.searchPlaceholder"
+              searchAriaLabelKey="campaigns.all.searchAriaLabel"
+              showHidden={isMod ? {
+                value: showHidden,
+                onChange: setShowHidden,
+                count: hiddenCount,
+              } : undefined}
+              country={urlCountry}
+              onCountryChange={setCountry}
             />
-          </section>
-        )}
+          </div>
 
-        {/* Section heading — matches the `/pledges` and `/groups` pages
-            so the discovery surfaces all share the same large-bold
-            section header pattern. Title switches between Search / Top /
-            New based on toolbar state; tagline stays constant.
-            Search input + filter button cluster on the right, paired
-            with the heading on the left in a single row. */}
-        <div className="flex flex-col items-stretch gap-4 sm:flex-row sm:items-end sm:justify-between">
-          <div>
-            <h2 className="text-2xl sm:text-3xl font-bold tracking-tight">
-              {activeQuery
-                ? t('common.search')
-                : t('campaigns.all.title')}
-            </h2>
-            <p className="text-sm text-muted-foreground mt-1">
-              {activeQuery
-                ? t('common.searchResultsCount', { count: visible.length })
-                : t('campaigns.all.sectionTagline')}
-            </p>
-          </div>
-          <DiscoverySearchToolbar
-            query={searchInput}
-            onQueryChange={setSearchInput}
-            sort={toToolbarSort(sort)}
-            onSortChange={setSortFromToolbar}
-            sortOptions={['top', 'new']}
-            searchPlaceholderKey="campaigns.all.searchPlaceholder"
-            searchAriaLabelKey="campaigns.all.searchAriaLabel"
-            showHidden={isMod ? {
-              value: showHidden,
-              onChange: setShowHidden,
-              count: hiddenCount,
-            } : undefined}
-            country={urlCountry}
-            onCountryChange={setCountry}
-          />
-        </div>
-
-        {/* Grid — widens to 3 columns at lg and 4 at xl so desktop users
-            can scan more campaigns at once, matching the Pledge index's
-            card density. Mobile and small tablets stay single / double
-            column so the cards keep their tappable size. */}
-        {showSkeleton ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
-            {Array.from({ length: 8 }).map((_, i) => (
-              <CampaignCardSkeleton key={i} />
-            ))}
-          </div>
-        ) : visible.length === 0 ? (
-          <Card className="border-dashed">
-            <CardContent className="py-12 px-8 text-center space-y-4">
-              <HandHeart className="size-10 text-muted-foreground mx-auto" />
-              <div className="space-y-1.5">
-                {activeQuery ? (
-                  <>
-                    <h2 className="text-lg font-semibold">
-                      {t('campaigns.all.noMatch', { query: activeQuery })}
-                    </h2>
-                    <p className="text-muted-foreground max-w-sm mx-auto">
-                      {t('campaigns.all.noMatchHint')}
-                    </p>
-                  </>
-                ) : hiddenCount > 0 && !showHidden ? (
-                  <>
-                    <h2 className="text-lg font-semibold">{t('campaigns.all.allHidden')}</h2>
-                    <p className="text-muted-foreground max-w-sm mx-auto">
-                      {t('campaigns.all.allHiddenHint')}
-                    </p>
-                  </>
-                ) : (
-                  <>
-                    <h2 className="text-lg font-semibold">{t('campaigns.all.empty')}</h2>
-                    <p className="text-muted-foreground max-w-sm mx-auto">
-                      {t('campaigns.all.emptyHint')}
-                    </p>
-                  </>
-                )}
-              </div>
-              <Button asChild>
-                <Link to="/campaigns/new">
-                  <PlusCircle className="size-4 mr-2" />
-                  {t('campaigns.all.startCampaign')}
-                </Link>
-              </Button>
-            </CardContent>
-          </Card>
-        ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
-            {visible.map((campaign) => (
-              <CampaignCard key={campaign.aTag} campaign={campaign} />
-            ))}
-          </div>
-        )}
+          {/* Grid — widens to 3 columns at lg and 4 at xl so desktop
+              users can scan more campaigns at once, matching the Pledge
+              index's card density. Mobile and small tablets stay
+              single / double column so the cards keep their tappable
+              size. */}
+          {showSkeleton ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+              {Array.from({ length: 8 }).map((_, i) => (
+                <CampaignCardSkeleton key={i} />
+              ))}
+            </div>
+          ) : (isActive ? visible : idleCampaigns).length === 0 ? (
+            <Card className="border-dashed">
+              <CardContent className="py-12 px-8 text-center space-y-4">
+                <HandHeart className="size-10 text-muted-foreground mx-auto" />
+                <div className="space-y-1.5">
+                  {activeQuery ? (
+                    <>
+                      <h2 className="text-lg font-semibold">
+                        {t('campaigns.all.noMatch', { query: activeQuery })}
+                      </h2>
+                      <p className="text-muted-foreground max-w-sm mx-auto">
+                        {t('campaigns.all.noMatchHint')}
+                      </p>
+                    </>
+                  ) : hiddenCount > 0 && !showHidden ? (
+                    <>
+                      <h2 className="text-lg font-semibold">{t('campaigns.all.allHidden')}</h2>
+                      <p className="text-muted-foreground max-w-sm mx-auto">
+                        {t('campaigns.all.allHiddenHint')}
+                      </p>
+                    </>
+                  ) : (
+                    <>
+                      <h2 className="text-lg font-semibold">{t('campaigns.all.empty')}</h2>
+                      <p className="text-muted-foreground max-w-sm mx-auto">
+                        {t('campaigns.all.emptyHint')}
+                      </p>
+                    </>
+                  )}
+                </div>
+                <Button asChild>
+                  <Link to="/campaigns/new">
+                    <PlusCircle className="size-4 mr-2" />
+                    {t('campaigns.all.startCampaign')}
+                  </Link>
+                </Button>
+              </CardContent>
+            </Card>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+              {(isActive ? visible : idleCampaigns).map((campaign) => (
+                <CampaignCard key={campaign.aTag} campaign={campaign} />
+              ))}
+            </div>
+          )}
+        </section>
 
         {/* Moderator-only: every hidden campaign on the network. Mirrors
             the section on `/campaigns` so moderators see the same

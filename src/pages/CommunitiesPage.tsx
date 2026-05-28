@@ -65,8 +65,9 @@ export function CommunitiesPage() {
 
   // On-page NIP-50 search + sort + show-hidden toolbar state.
   //
-  //   Default sort, empty query → curated "My groups" / "Featured" /
-  //     moderator shelves below.
+  //   Default sort, empty query → curated featured-first idle view.
+  //     If no groups are featured yet, falls back to the chronological
+  //     "all groups" grid so the page is never blank.
   //   Default sort, with query  → relay search for kind 34550, results
   //     post-filtered against name/description/content client-side.
   //   Top / New                  → always active. Top sends `sort:top`;
@@ -122,9 +123,14 @@ export function CommunitiesPage() {
   }, [searchHitsRaw, orgModeration, showHidden]);
 
   const { data: allOrgs, isLoading: allOrgsLoading } = useDiscoverCommunities({ limit: 200 });
+  // `allGroups` is the chronological "every Agora-tagged group" list,
+  // used both as the fallback for the idle view (when nothing is
+  // featured yet) and as the result list when the user switches to
+  // Top/New sort with no typed query. Featured groups are NOT removed
+  // here — when the user is actively browsing they want the full set;
+  // the idle-mode rendering path handles the featured-first framing.
   const { allGroups, allHiddenCount, hiddenGroups } = useMemo(() => {
     const hiddenCoords = orgModeration?.hiddenCoords ?? new Set<string>();
-    const featuredCoords = orgModeration?.featuredCoords ?? new Set<string>();
     let hidden = 0;
     const visible: ParsedCommunity[] = [];
     const hiddenList: ParsedCommunity[] = [];
@@ -133,20 +139,34 @@ export function CommunitiesPage() {
         hidden += 1;
         hiddenList.push(org);
         if (isMod && showHidden) visible.push(org);
-      } else if (hasAgoraTag(org.tags) && !featuredCoords.has(org.aTag)) {
+      } else if (hasAgoraTag(org.tags)) {
         visible.push(org);
       }
     }
     return { allGroups: visible, allHiddenCount: hidden, hiddenGroups: hiddenList };
   }, [allOrgs, isMod, orgModeration, showHidden]);
 
-  // Search + sort + show-hidden cluster for the All section.
+  // Featured groups for the idle view. When there are none, the idle
+  // view falls back to `allGroups` so users always see something.
+  const { data: featuredOrgs } = useFeaturedOrganizations();
+  const featuredGroups = useMemo<ParsedCommunity[]>(() => {
+    if (!featuredOrgs) return [];
+    const hiddenCoords = orgModeration?.hiddenCoords ?? new Set<string>();
+    return featuredOrgs
+      .map((entry) => entry.community)
+      .filter((c) => !hiddenCoords.has(c.aTag));
+  }, [featuredOrgs, orgModeration]);
+
+  const idleGroups = featuredGroups.length > 0 ? featuredGroups : allGroups;
+
+  // Search + sort + show-hidden cluster for the unified section.
   const searchToolbar = (
     <DiscoverySearchToolbar
       query={searchInput}
       onQueryChange={setSearchInput}
       sort={sortMode}
       onSortChange={setSortMode}
+      sortOptions={['top', 'new']}
       searchPlaceholderKey="groups.list.searchPlaceholder"
       searchAriaLabelKey="groups.list.searchAriaLabel"
       showHidden={isMod ? {
@@ -166,19 +186,18 @@ export function CommunitiesPage() {
           userOrganizations={userOrganizations}
         />
 
-        <FeaturedOrganizationsShelf />
-
+        {/* Unified Groups section.
+            - Idle (no search / no sort): renders moderator-featured
+              groups, or the chronological "all groups" fallback when
+              nothing is featured yet.
+            - Active: renders the full search/sort result set. */}
         <section className="space-y-5">
           <div className="flex flex-col items-stretch gap-4 sm:flex-row sm:items-end sm:justify-between">
             <div>
               <h2 className="text-2xl sm:text-3xl font-bold tracking-tight">
                 {trimmedSearch
                   ? t('common.search')
-                  : isSearching && sortMode === 'top'
-                    ? t('common.sortTop')
-                    : isSearching && sortMode === 'new'
-                      ? t('common.sortNew')
-                      : t('groups.list.allGroups')}
+                  : t('groups.list.allGroups')}
               </h2>
               <p className="text-sm text-muted-foreground mt-1">
                 {isSearching && searchHits
@@ -234,9 +253,9 @@ export function CommunitiesPage() {
                 <CommunityMiniCardSkeleton key={i} className="w-full" />
               ))}
             </CommunityGrid>
-          ) : allGroups.length > 0 ? (
+          ) : idleGroups.length > 0 ? (
             <CommunityGrid>
-              {allGroups.map((community) => (
+              {idleGroups.map((community) => (
                 <CommunityMiniCard
                   key={community.aTag}
                   community={community}
@@ -536,36 +555,6 @@ function MyCommunitiesShelf({
   );
 }
 
-function FeaturedOrganizationsShelf() {
-  const { data: featured } = useFeaturedOrganizations();
-  if (!featured || featured.length === 0) return null;
 
-  return (
-    <section className="space-y-5">
-      <FeaturedOrganizationsHeading />
-      <CommunityGrid>
-        {featured.map((entry) => (
-          <CommunityMiniCard
-            key={entry.community.aTag}
-            community={entry.community}
-            className="w-full"
-          />
-        ))}
-      </CommunityGrid>
-    </section>
-  );
-}
 
-function FeaturedOrganizationsHeading() {
-  const { t } = useTranslation();
-  return (
-    <div>
-      <h2 className="text-2xl sm:text-3xl font-bold tracking-tight">
-        {t('groups.list.featuredGroups')}
-      </h2>
-      <p className="text-sm text-muted-foreground mt-1">
-        {t('groups.list.featuredGroupsTagline')}
-      </p>
-    </div>
-  );
-}
+
