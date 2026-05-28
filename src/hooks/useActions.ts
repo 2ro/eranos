@@ -1,6 +1,7 @@
 import { useNostr } from '@nostrify/react';
 import { useQuery } from '@tanstack/react-query';
 import type { NostrEvent, NostrFilter } from '@nostrify/nostrify';
+import { DITTO_RELAY } from '@/lib/appRelays';
 import { sanitizeUrl } from '@/lib/sanitizeUrl';
 
 /**
@@ -143,6 +144,7 @@ interface UseActionsOptions {
  */
 export function useActions({ countryCode, limit = 50, enabled = true }: UseActionsOptions = {}) {
   const { nostr } = useNostr();
+  const relay = nostr.relay(DITTO_RELAY);
 
   return useQuery({
     queryKey: ['agora-actions', countryCode, limit],
@@ -166,7 +168,7 @@ export function useActions({ countryCode, limit = 50, enabled = true }: UseActio
             limit,
           }];
 
-      const allEvents = await nostr.query(queries, { signal });
+      const allEvents = await relay.query(queries, { signal });
 
       const parsed = allEvents
         .map(parseAction)
@@ -225,6 +227,7 @@ export function useActions({ countryCode, limit = 50, enabled = true }: UseActio
  */
 export function useAction(pubkey: string | undefined, identifier: string | undefined) {
   const { nostr } = useNostr();
+  const relay = nostr.relay(DITTO_RELAY);
 
   return useQuery({
     queryKey: ['agora-action', pubkey, identifier],
@@ -232,7 +235,7 @@ export function useAction(pubkey: string | undefined, identifier: string | undef
       if (!pubkey || !identifier) return null;
       const signal = AbortSignal.any([c.signal, AbortSignal.timeout(3000)]);
 
-      const events = await nostr.query(
+      const events = await relay.query(
         [{
           kinds: [36639],
           authors: [pubkey],
