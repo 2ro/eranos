@@ -18,7 +18,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { useNsecPasteGuard } from "@/hooks/useNsecPasteGuard";
 import type { AppConfig } from "@/contexts/AppContext";
 import { NWCProvider } from "@/contexts/NWCContext";
-import { OnboardingProvider } from "@/contexts/OnboardingContext";
+import { OnboardingProvider } from "@/contexts/OnboardingProvider";
 import { BuildConfigSchema, type BuildConfig } from "@/lib/schemas";
 import { secureStorage } from "@/lib/secureStorage";
 import AppRouter from "./AppRouter";

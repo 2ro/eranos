@@ -26,7 +26,7 @@ import {
   type NostrConnectStatus,
 } from '@/hooks/useLoginActions';
 import { useIsMobile } from '@/hooks/useIsMobile';
-import { useOnboarding } from '@/contexts/OnboardingContext';
+import { useOnboarding } from '@/contexts/onboardingContextDef';
 
 interface AuthDialogProps {
   isOpen: boolean;

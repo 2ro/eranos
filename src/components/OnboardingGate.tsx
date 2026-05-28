@@ -32,7 +32,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useLoginActions } from '@/hooks/useLoginActions';
 import { useNostrPublish } from '@/hooks/useNostrPublish';
-import { useOnboarding, type OnboardingRole } from '@/contexts/OnboardingContext';
+import { useOnboarding, type OnboardingRole } from '@/contexts/onboardingContextDef';
 import { useToast } from '@/hooks/useToast';
 import { useUploadFile } from '@/hooks/useUploadFile';
 import { downloadTextFile } from '@/lib/downloadFile';

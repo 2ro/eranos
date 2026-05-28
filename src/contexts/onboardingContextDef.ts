@@ -1,9 +1,9 @@
-import { createContext, useCallback, useContext, useState, type ReactNode } from 'react';
+import { createContext, useContext } from 'react';
 
 /**
  * The two top-level roles a new user can pick during onboarding. Drives
- * downstream copy (creator gets stronger nsec-wallet warnings; donor sees
- * lighter copy) and the outro CTA target (creator → /campaigns/new, donor → /).
+ * downstream copy (creator vs. donor framing) and the role-pick CTA target
+ * (creator → /campaigns/new, donor → /campaigns/all).
  *
  * `null` before the user has answered the role-picker step.
  */
@@ -13,8 +13,7 @@ export type OnboardingRole = 'creator' | 'donor' | null;
 export interface StartSignupOptions {
   /**
    * Pre-fill the role picker. CTAs that semantically already imply a role
-   * (e.g. "Start a campaign" in the home hero) can skip the role step by
-   * passing this. Without a role the flow asks on the second step.
+   * (e.g. "Start a campaign") can skip the role step by passing this.
    */
   role?: 'creator' | 'donor';
 }
@@ -34,39 +33,6 @@ export interface OnboardingContextValue {
 }
 
 export const OnboardingContext = createContext<OnboardingContextValue | undefined>(undefined);
-
-/**
- * Provides captive-onboarding state to the whole tree.
- *
- * Designed for Ditto-style "fullscreen overlay wraps the router" usage: any
- * CTA in the app calls `useOnboarding().startSignup()` and a sibling
- * `<OnboardingGate>` renders the overlay on top of `<AppRouter />`.
- */
-export function OnboardingProvider({ children }: { children: ReactNode }) {
-  const [active, setActive] = useState(false);
-  const [role, setRoleState] = useState<OnboardingRole>(null);
-
-  const startSignup = useCallback((options?: StartSignupOptions) => {
-    setRoleState(options?.role ?? null);
-    setActive(true);
-  }, []);
-
-  const cancel = useCallback(() => {
-    setActive(false);
-    // Don't reset role here — let the consumer keep it through the close
-    // animation. We re-seed on the next startSignup().
-  }, []);
-
-  const setRole = useCallback((next: 'creator' | 'donor') => {
-    setRoleState(next);
-  }, []);
-
-  return (
-    <OnboardingContext.Provider value={{ active, role, startSignup, cancel, setRole }}>
-      {children}
-    </OnboardingContext.Provider>
-  );
-}
 
 /**
  * Access the captive onboarding controller. Used by both consumers (CTAs
