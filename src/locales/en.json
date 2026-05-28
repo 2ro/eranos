@@ -1484,9 +1484,7 @@
     "title": "Send Bitcoin",
     "send": "Send Bitcoin",
     "tapAgainToConfirm": "Tap again to confirm",
-    "approxSats": "≈ {{sats}} sats",
     "satPerVB": "{{rate}} sat/vB",
-    "networkFee": "Network fee",
     "available": "Available: {{usd}} ({{sats}} sats)",
     "recipient": {
       "label": "Recipient",

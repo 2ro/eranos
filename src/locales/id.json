@@ -1429,9 +1429,7 @@
     "title": "Kirim Bitcoin",
     "send": "Kirim Bitcoin",
     "tapAgainToConfirm": "Ketuk lagi untuk konfirmasi",
-    "approxSats": "≈ {{sats}} sats",
     "satPerVB": "{{rate}} sat/vB",
-    "networkFee": "Biaya jaringan",
     "available": "Tersedia: {{usd}} ({{sats}} sats)",
     "recipient": {
       "label": "Penerima",

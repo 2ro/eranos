@@ -1061,9 +1061,7 @@
     "title": "发送比特币",
     "send": "发送比特币",
     "tapAgainToConfirm": "再次点击确认",
-    "approxSats": "≈ {{sats}} sats",
     "satPerVB": "{{rate}} sat/vB",
-    "networkFee": "网络费用",
     "available": "可用：{{usd}}（{{sats}} sats）",
     "recipient": {
       "label": "收款方",

@@ -1061,9 +1061,7 @@
     "title": "ارسال بیت‌کوین",
     "send": "ارسال بیت‌کوین",
     "tapAgainToConfirm": "برای تأیید دوباره ضربه بزنید",
-    "approxSats": "≈ {{sats}} ساتوشی",
     "satPerVB": "{{rate}} ساتوشی/vB",
-    "networkFee": "کارمزد شبکه",
     "available": "موجود: {{usd}} ({{sats}} ساتوشی)",
     "recipient": {
       "label": "گیرنده",

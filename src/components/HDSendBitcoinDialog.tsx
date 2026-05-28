@@ -583,9 +583,6 @@ export function HDSendBitcoinDialog({ isOpen, onClose, btcPrice, initialRecipien
                 onUsdAmountChange={setUsdAmount}
                 presets={USD_PRESETS}
                 insufficient={insufficient}
-                satsLabel={amountSats > 0 && btcPrice
-                  ? t('walletSend.approxSats', { sats: amountSats.toLocaleString() })
-                  : undefined}
                 onAmountChangeStart={() => setError('')}
               />
 
@@ -629,51 +626,6 @@ export function HDSendBitcoinDialog({ isOpen, onClose, btcPrice, initialRecipien
                 </div>
               )}
 
-              {/* Fee speed */}
-              <div className="flex items-center justify-between text-xs">
-                <span className="text-muted-foreground">{t('walletSend.networkFee')}</span>
-                <Popover open={feePopoverOpen} onOpenChange={setFeePopoverOpen}>
-                  <PopoverTrigger asChild>
-                    <button
-                      type="button"
-                      className="flex items-center gap-1.5 hover:text-foreground transition-colors text-muted-foreground tabular-nums"
-                    >
-                      {estimatedFeeSats > 0 && btcPrice ? (
-                        <>≈ {satsToUSD(estimatedFeeSats, btcPrice)}</>
-                      ) : currentFeeRate ? (
-                        <>{t('walletSend.satPerVB', { rate: currentFeeRate })}</>
-                      ) : (
-                        <>—</>
-                      )}
-                      <span className="opacity-60">·</span>
-                      {feeSpeedLabels[feeSpeed]}
-                    </button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-44 p-1" align="end">
-                    <div className="grid gap-0.5">
-                      {getUniqueBitcoinFeeSpeeds(feeRates).map((speed) => (
-                        <button
-                          key={speed}
-                          type="button"
-                          onClick={() => handleFeeSpeedChange(speed)}
-                          className={cn(
-                            'flex justify-between items-center px-3 py-1.5 rounded-md text-xs hover:bg-muted/50 transition-colors',
-                            feeSpeed === speed && 'bg-muted',
-                          )}
-                        >
-                          <span>{feeSpeedLabels[speed]}</span>
-                          {feeRates && (
-                            <span className="text-muted-foreground tabular-nums">
-                              {t('walletSend.satPerVB', { rate: getBitcoinFeeRate(feeRates, speed) })}
-                            </span>
-                          )}
-                        </button>
-                      ))}
-                    </div>
-                  </PopoverContent>
-                </Popover>
-              </div>
-
               {showBalance && totalBalance > 0 && btcPrice && (
                 <p className="text-xs text-muted-foreground text-center">
                   {t('walletSend.available', {
@@ -704,6 +656,52 @@ export function HDSendBitcoinDialog({ isOpen, onClose, btcPrice, initialRecipien
                 {sendMutation.isPending && <Loader2 className="size-4 mr-2 animate-spin" />}
                 {sendButtonLabel}
               </Button>
+
+              {/* Fee speed — under the Send button, centered. The label is
+                  implicit: the only thing in the dialog you'd open a popover
+                  for here is the network-fee tier. */}
+              <div className="flex justify-center text-xs">
+                <Popover open={feePopoverOpen} onOpenChange={setFeePopoverOpen}>
+                  <PopoverTrigger asChild>
+                    <button
+                      type="button"
+                      className="flex items-center gap-1.5 hover:text-foreground transition-colors text-muted-foreground tabular-nums"
+                    >
+                      {estimatedFeeSats > 0 && btcPrice ? (
+                        <>≈ {satsToUSD(estimatedFeeSats, btcPrice)}</>
+                      ) : currentFeeRate ? (
+                        <>{t('walletSend.satPerVB', { rate: currentFeeRate })}</>
+                      ) : (
+                        <>—</>
+                      )}
+                      <span className="opacity-60">·</span>
+                      {feeSpeedLabels[feeSpeed]}
+                    </button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-44 p-1" align="center">
+                    <div className="grid gap-0.5">
+                      {getUniqueBitcoinFeeSpeeds(feeRates).map((speed) => (
+                        <button
+                          key={speed}
+                          type="button"
+                          onClick={() => handleFeeSpeedChange(speed)}
+                          className={cn(
+                            'flex justify-between items-center px-3 py-1.5 rounded-md text-xs hover:bg-muted/50 transition-colors',
+                            feeSpeed === speed && 'bg-muted',
+                          )}
+                        >
+                          <span>{feeSpeedLabels[speed]}</span>
+                          {feeRates && (
+                            <span className="text-muted-foreground tabular-nums">
+                              {t('walletSend.satPerVB', { rate: getBitcoinFeeRate(feeRates, speed) })}
+                            </span>
+                          )}
+                        </button>
+                      ))}
+                    </div>
+                  </PopoverContent>
+                </Popover>
+              </div>
             </div>
           </>
         )}

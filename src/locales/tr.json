@@ -1428,9 +1428,7 @@
     "title": "Bitcoin Gönder",
     "send": "Bitcoin Gönder",
     "tapAgainToConfirm": "Onaylamak için tekrar dokunun",
-    "approxSats": "≈ {{sats}} sat",
     "satPerVB": "{{rate}} sat/vB",
-    "networkFee": "Ağ ücreti",
     "available": "Kullanılabilir: {{usd}} ({{sats}} sat)",
     "recipient": {
       "label": "Alıcı",

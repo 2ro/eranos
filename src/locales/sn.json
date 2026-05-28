@@ -1061,9 +1061,7 @@
     "title": "Tumira Bitcoin",
     "send": "Tumira Bitcoin",
     "tapAgainToConfirm": "Dzvanya zvakare kuti usimbise",
-    "approxSats": "≈ {{sats}} sats",
     "satPerVB": "{{rate}} sat/vB",
-    "networkFee": "Muripo wenetwork",
     "available": "Inowanikwa: {{usd}} ({{sats}} sats)",
     "recipient": {
       "label": "Mugamuchiri",

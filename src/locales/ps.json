@@ -1061,9 +1061,7 @@
     "title": "بټکوین لیږل",
     "send": "بټکوین لیږل",
     "tapAgainToConfirm": "د تایید لپاره بیا ټک ووهئ",
-    "approxSats": "≈ {{sats}} ساتوشي",
     "satPerVB": "{{rate}} ساتوشي/vB",
-    "networkFee": "د شبکې فیس",
     "available": "شته: {{usd}} ({{sats}} ساتوشي)",
     "recipient": {
       "label": "ترلاسه کوونکی",

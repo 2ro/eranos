@@ -1061,9 +1061,7 @@
     "title": "ផ្ញើ Bitcoin",
     "send": "ផ្ញើ Bitcoin",
     "tapAgainToConfirm": "ប៉ះម្ដងទៀតដើម្បីបញ្ជាក់",
-    "approxSats": "≈ {{sats}} sats",
     "satPerVB": "{{rate}} sat/vB",
-    "networkFee": "ថ្លៃបណ្តាញ",
     "available": "អាចប្រើ: {{usd}} ({{sats}} sats)",
     "recipient": {
       "label": "អ្នកទទួល",

@@ -1483,9 +1483,7 @@
     "title": "Envoyer du Bitcoin",
     "send": "Envoyer du Bitcoin",
     "tapAgainToConfirm": "Appuyez à nouveau pour confirmer",
-    "approxSats": "≈ {{sats}} sats",
     "satPerVB": "{{rate}} sat/vB",
-    "networkFee": "Frais réseau",
     "available": "Disponible : {{usd}} ({{sats}} sats)",
     "recipient": {
       "label": "Destinataire",

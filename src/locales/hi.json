@@ -1429,9 +1429,7 @@
     "title": "Bitcoin भेजें",
     "send": "Bitcoin भेजें",
     "tapAgainToConfirm": "पुष्टि के लिए फिर टैप करें",
-    "approxSats": "≈ {{sats}} sats",
     "satPerVB": "{{rate}} sat/vB",
-    "networkFee": "नेटवर्क फ़ीस",
     "available": "उपलब्ध: {{usd}} ({{sats}} sats)",
     "recipient": {
       "label": "प्राप्तकर्ता",

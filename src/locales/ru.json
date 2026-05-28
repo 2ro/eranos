@@ -1493,9 +1493,7 @@
     "title": "Отправить Bitcoin",
     "send": "Отправить Bitcoin",
     "tapAgainToConfirm": "Нажмите ещё раз для подтверждения",
-    "approxSats": "≈ {{sats}} сатов",
     "satPerVB": "{{rate}} сат/vB",
-    "networkFee": "Комиссия сети",
     "available": "Доступно: {{usd}} ({{sats}} сатов)",
     "recipient": {
       "label": "Получатель",

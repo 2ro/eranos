@@ -997,9 +997,7 @@
     "title": "傳送比特幣",
     "send": "傳送比特幣",
     "tapAgainToConfirm": "再次點選確認",
-    "approxSats": "≈ {{sats}} sats",
     "satPerVB": "{{rate}} sat/vB",
-    "networkFee": "網路費用",
     "available": "可用：{{usd}}（{{sats}} sats）",
     "recipient": {
       "label": "收款方",

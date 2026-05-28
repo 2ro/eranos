@@ -1388,9 +1388,7 @@
     "title": "Tuma Bitcoin",
     "send": "Tuma Bitcoin",
     "tapAgainToConfirm": "Bonyeza tena kuthibitisha",
-    "approxSats": "≈ sats {{sats}}",
     "satPerVB": "sat/vB {{rate}}",
-    "networkFee": "Ada ya mtandao",
     "available": "Inapatikana: {{usd}} (sats {{sats}})",
     "recipient": {
       "label": "Mpokeaji",
