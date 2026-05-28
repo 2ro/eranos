@@ -909,7 +909,7 @@ export function CreateCampaignPage() {
     <CampaignWizard
       orgChip={orgChip}
       step1={<>{titleSection}{walletSection}</>}
-      step2={<>{storySection}{bannerSection}</>}
+      step2={<>{bannerSection}{storySection}</>}
       step3={goalDeadlineSection}
       step4={<>{countrySection}{tagsSection}</>}
       errorAlert={errorAlert}
@@ -1036,6 +1036,21 @@ function CampaignWizard({
         <X className="h-5 w-5" />
       </button>
 
+      {/* Top-left back. Mirrors the close button so the user can step
+          back through the wizard without scrolling to the footer. Only
+          rendered from step 2 onward — step 1's escape route is the X. */}
+      {step > 1 && (
+        <button
+          type="button"
+          onClick={() => setStep((s) => Math.max(s - 1, 1) as 1 | 2 | 3 | 4)}
+          disabled={submitting}
+          aria-label={t('campaignsCreate.wizard.back')}
+          className="absolute left-4 top-4 sm:left-6 sm:top-6 inline-flex h-9 w-9 items-center justify-center rounded-full text-muted-foreground hover:bg-muted hover:text-foreground transition-colors disabled:opacity-50"
+        >
+          <ArrowLeft className="h-5 w-5 rtl:rotate-180" />
+        </button>
+      )}
+
       <form
         className="flex-1 flex items-start sm:items-center justify-center px-6 pt-16 pb-12"
         onSubmit={onSubmit}
@@ -1044,12 +1059,10 @@ function CampaignWizard({
           key={step}
           className="w-full max-w-md mx-auto space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-300"
         >
-          {/* Centered title block — captive-onboarding cadence: small
-              "Step N of 4" eyebrow, large heading, muted subtitle. */}
+          {/* Centered title block — captive-onboarding cadence: large
+              heading + muted subtitle, no progress eyebrow (the
+              top-of-page bar carries that signal). */}
           <div className="space-y-2 text-center">
-            <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-              {t('campaignsCreate.wizard.stepProgress', { current: step, total: 4 })}
-            </p>
             <h2 className="text-2xl font-bold tracking-tight">{stepTitles[step]}</h2>
             <p className="text-sm text-muted-foreground">{stepSubtitles[step]}</p>
           </div>
@@ -1062,14 +1075,13 @@ function CampaignWizard({
 
           {/* Footer.
             - Steps 1–3: primary "Next" (rounded-full h-12) advances the
-              wizard; a ghost "Launch campaign" shortcut sits beneath
+              wizard; a ghost "Skip Next & Launch" shortcut sits beneath
               once the required fields validate, so the rest of the
               wizard is opt-in.
             - Step 4: primary "Launch campaign" is the only forward
               action.
-            - A subtle text "Back" link sits at the very bottom on every
-              step but the first; step 1's escape route is the top-right
-              X. */}
+            - Back navigation lives in the top-left header chrome, not
+              here. */}
           <div className="space-y-3 pt-1">
             {step === 4 ? (
               <Button
@@ -1098,18 +1110,6 @@ function CampaignWizard({
                   {submitting ? submitButtonContent : t('campaignsCreate.wizard.launchNow')}
                 </Button>
               </>
-            )}
-
-            {step > 1 && (
-              <button
-                type="button"
-                onClick={() => setStep((s) => Math.max(s - 1, 1) as 1 | 2 | 3 | 4)}
-                disabled={submitting}
-                className="w-full text-sm text-muted-foreground hover:text-foreground inline-flex items-center justify-center gap-1.5 py-2 disabled:opacity-50"
-              >
-                <ArrowLeft className="h-3.5 w-3.5 rtl:rotate-180" />
-                {t('campaignsCreate.wizard.back')}
-              </button>
             )}
           </div>
         </div>
