@@ -608,7 +608,7 @@ export default function ActionsPage() {
 
             <Card className="border-dashed">
               <div className="py-12 px-8 text-center space-y-4">
-                <HandHeart className="size-10 text-muted-foreground/60 mx-auto" />
+                <HandHeart className="size-10 text-muted-foreground mx-auto" />
                 <div className="space-y-1.5">
                   <h3 className="text-lg font-semibold">{t('pledges.list.emptyTitle')}</h3>
                   <p className="text-muted-foreground max-w-sm mx-auto">
