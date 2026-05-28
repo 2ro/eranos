@@ -1135,6 +1135,8 @@
       "community": "Kampeni za Jumuiya",
       "communityDesc": "Saidia kufadhili mabadiliko yanayostahili kufanywa.",
       "browseAll": "Vinjari kampeni zote →",
+      "browseAllGroups": "Vinjari vikundi vyote →",
+      "browseAllPledges": "Vinjari ahadi zote →",
       "pending": "Inasubiri idhini",
       "pendingDesc": "Kampeni kwenye mtandao ambazo hakuna msimamizi wa Team Soapbox aliyezithibitisha au kuzificha bado.",
       "pendingEmpty": "Hakuna kinachosubiri ukaguzi.",

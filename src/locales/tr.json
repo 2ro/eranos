@@ -1135,6 +1135,8 @@
       "community": "Topluluk Kampanyaları",
       "communityDesc": "Yapmaya değer değişiklikleri finanse etmeye yardım edin.",
       "browseAll": "Tüm kampanyalara göz at →",
+      "browseAllGroups": "Tüm gruplara göz at →",
+      "browseAllPledges": "Tüm taahhütlere göz at →",
       "pending": "Onay bekliyor",
       "pendingDesc": "Ağdaki, henüz hiçbir Team Soapbox moderatörünün onaylamadığı veya gizlemediği kampanyalar.",
       "pendingEmpty": "İncelemeyi bekleyen bir şey yok.",

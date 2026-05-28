@@ -704,6 +704,8 @@
       "community": "Mishandirapamwe yeNharaunda",
       "communityDesc": "Batsira kupa mari kushanduko dzakakodzera.",
       "browseAll": "Tarisa mishandirapamwe yose →",
+      "browseAllGroups": "Tarisa mapoka ose →",
+      "browseAllPledges": "Tarisa zvitsidziro zvose →",
       "pending": "Yakamirira kutenderwa",
       "pendingDesc": "Mishandirapamwe iri panetwork isati yatenderwa kana kuvanzwa naani zvake muTeam Soapbox.",
       "pendingEmpty": "Hapana chinomirira kutariswa.",

@@ -1136,6 +1136,8 @@
       "community": "Campanhas da comunidade",
       "communityDesc": "Ajude a financiar as mudanças que valem a pena.",
       "browseAll": "Navegar por todas as campanhas →",
+      "browseAllGroups": "Navegar por todos os grupos →",
+      "browseAllPledges": "Navegar por todas as promessas →",
       "pending": "Aguardando aprovação",
       "pendingDesc": "Campanhas na rede que nenhum moderador da Team Soapbox aprovou ou ocultou ainda.",
       "pendingEmpty": "Nada aguardando revisão.",

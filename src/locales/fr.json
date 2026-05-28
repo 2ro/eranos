@@ -1126,6 +1126,8 @@
       "community": "Campagnes communautaires",
       "communityDesc": "Aidez à financer les changements qui valent la peine d'être menés.",
       "browseAll": "Parcourir toutes les campagnes →",
+      "browseAllGroups": "Parcourir tous les groupes →",
+      "browseAllPledges": "Parcourir toutes les promesses →",
       "pending": "En attente d'approbation",
       "pendingDesc": "Campagnes sur le réseau qu'aucun modérateur de Team Soapbox n'a encore approuvées ou masquées.",
       "pendingEmpty": "Rien en attente d'examen.",
