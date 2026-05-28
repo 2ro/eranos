@@ -1427,7 +1427,7 @@
     "send": "Bitcoin Gönder",
     "tapAgainToConfirm": "Onaylamak için tekrar dokunun",
     "satPerVB": "{{rate}} sat/vB",
-    "available": "Kullanılabilir: {{usd}} ({{sats}} sat)",
+    "notEnoughBitcoin": "Yetersiz Bitcoin",
     "recipient": {
       "placeholder": "bc1…, sp1…",
       "useSilentPayment": "Bunun yerine sessiz ödeme kullan",

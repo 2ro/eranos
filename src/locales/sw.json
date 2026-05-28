@@ -1387,7 +1387,7 @@
     "send": "Tuma Bitcoin",
     "tapAgainToConfirm": "Bonyeza tena kuthibitisha",
     "satPerVB": "sat/vB {{rate}}",
-    "available": "Inapatikana: {{usd}} (sats {{sats}})",
+    "notEnoughBitcoin": "Bitcoin haitoshi",
     "recipient": {
       "placeholder": "bc1…, sp1…",
       "useSilentPayment": "Tumia malipo ya kimya badala yake",

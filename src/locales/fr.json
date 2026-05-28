@@ -1482,7 +1482,7 @@
     "send": "Envoyer du Bitcoin",
     "tapAgainToConfirm": "Appuyez à nouveau pour confirmer",
     "satPerVB": "{{rate}} sat/vB",
-    "available": "Disponible : {{usd}} ({{sats}} sats)",
+    "notEnoughBitcoin": "Bitcoin insuffisant",
     "recipient": {
       "placeholder": "bc1…, sp1…",
       "useSilentPayment": "Utiliser un paiement silencieux à la place",

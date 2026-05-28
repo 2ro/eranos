@@ -1060,7 +1060,7 @@
     "send": "ارسال بیت‌کوین",
     "tapAgainToConfirm": "برای تأیید دوباره ضربه بزنید",
     "satPerVB": "{{rate}} ساتوشی/vB",
-    "available": "موجود: {{usd}} ({{sats}} ساتوشی)",
+    "notEnoughBitcoin": "بیت‌کوین کافی نیست",
     "recipient": {
       "placeholder": "bc1…، sp1…",
       "useSilentPayment": "استفاده از پرداخت خاموش به جای آن",

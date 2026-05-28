@@ -996,7 +996,7 @@
     "send": "傳送比特幣",
     "tapAgainToConfirm": "再次點選確認",
     "satPerVB": "{{rate}} sat/vB",
-    "available": "可用：{{usd}}（{{sats}} sats）",
+    "notEnoughBitcoin": "比特幣不足",
     "recipient": {
       "placeholder": "bc1…、sp1…",
       "useSilentPayment": "改用靜默支付",

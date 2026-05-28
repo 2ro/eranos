@@ -1044,7 +1044,7 @@
     "send": "إرسال البيتكوين",
     "tapAgainToConfirm": "انقر مرة أخرى للتأكيد",
     "satPerVB": "{{rate}} ساتوشي/vB",
-    "available": "المتاح: {{usd}} ({{sats}} ساتوشي)",
+    "notEnoughBitcoin": "لا يوجد بيتكوين كافٍ",
     "recipient": {
       "placeholder": "bc1…, sp1…",
       "useSilentPayment": "استخدام الدفع الصامت بدلاً من ذلك",

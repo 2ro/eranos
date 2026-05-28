@@ -1428,7 +1428,7 @@
     "send": "Bitcoin भेजें",
     "tapAgainToConfirm": "पुष्टि के लिए फिर टैप करें",
     "satPerVB": "{{rate}} sat/vB",
-    "available": "उपलब्ध: {{usd}} ({{sats}} sats)",
+    "notEnoughBitcoin": "पर्याप्त बिटकॉइन नहीं",
     "recipient": {
       "placeholder": "bc1…, sp1…",
       "useSilentPayment": "इसके बजाय साइलेंट पेमेंट का उपयोग करें",

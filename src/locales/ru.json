@@ -1492,7 +1492,7 @@
     "send": "Отправить Bitcoin",
     "tapAgainToConfirm": "Нажмите ещё раз для подтверждения",
     "satPerVB": "{{rate}} сат/vB",
-    "available": "Доступно: {{usd}} ({{sats}} сатов)",
+    "notEnoughBitcoin": "Недостаточно биткоинов",
     "recipient": {
       "placeholder": "bc1…, sp1…",
       "useSilentPayment": "Использовать тихий платёж",

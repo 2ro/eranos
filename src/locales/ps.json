@@ -1060,7 +1060,7 @@
     "send": "بټکوین لیږل",
     "tapAgainToConfirm": "د تایید لپاره بیا ټک ووهئ",
     "satPerVB": "{{rate}} ساتوشي/vB",
-    "available": "شته: {{usd}} ({{sats}} ساتوشي)",
+    "notEnoughBitcoin": "کافی بټکوین نشته",
     "recipient": {
       "placeholder": "bc1…، sp1…",
       "useSilentPayment": "پر ځای يې د چوپې ورکړې وکاروئ",

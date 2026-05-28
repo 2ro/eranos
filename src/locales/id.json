@@ -1428,7 +1428,7 @@
     "send": "Kirim Bitcoin",
     "tapAgainToConfirm": "Ketuk lagi untuk konfirmasi",
     "satPerVB": "{{rate}} sat/vB",
-    "available": "Tersedia: {{usd}} ({{sats}} sats)",
+    "notEnoughBitcoin": "Bitcoin tidak mencukupi",
     "recipient": {
       "placeholder": "bc1…, sp1…",
       "useSilentPayment": "Gunakan silent payment saja",

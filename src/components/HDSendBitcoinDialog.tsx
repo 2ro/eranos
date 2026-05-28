@@ -332,7 +332,6 @@ export function HDSendBitcoinDialog({ isOpen, onClose, btcPrice, initialRecipien
   const selectionFailed =
     amountSats > 0 && !!currentFeeRate && ownedInputs.length > 0 && estimatedFeeSats === 0;
   const insufficient = selectionFailed || (totalBalance > 0 && totalSats > totalBalance);
-  const showBalance = insufficient || (amountSats > 0 && totalBalance === 0);
 
   // Auto-tune fee speed to keep fees < 40% of the send amount, unless the
   // user has manually overridden.
@@ -535,6 +534,7 @@ export function HDSendBitcoinDialog({ isOpen, onClose, btcPrice, initialRecipien
       }
     }
     if (confirmArmed) return t('walletSend.tapAgainToConfirm');
+    if (insufficient) return t('walletSend.notEnoughBitcoin');
     return t('walletSend.send');
   })();
 
@@ -619,15 +619,6 @@ export function HDSendBitcoinDialog({ isOpen, onClose, btcPrice, initialRecipien
                     </button>
                   )}
                 </div>
-              )}
-
-              {showBalance && totalBalance > 0 && btcPrice && (
-                <p className="text-xs text-muted-foreground text-center">
-                  {t('walletSend.available', {
-                    usd: satsToUSD(totalBalance, btcPrice),
-                    sats: totalBalance.toLocaleString(),
-                  })}
-                </p>
               )}
 
               {/* Error */}

@@ -1060,7 +1060,7 @@
     "send": "Tumira Bitcoin",
     "tapAgainToConfirm": "Dzvanya zvakare kuti usimbise",
     "satPerVB": "{{rate}} sat/vB",
-    "available": "Inowanikwa: {{usd}} ({{sats}} sats)",
+    "notEnoughBitcoin": "Bitcoin haina kukwana",
     "recipient": {
       "placeholder": "bc1…, sp1…",
       "useSilentPayment": "Shandisa mubhadharo wakanyararira pachinzvimbo",

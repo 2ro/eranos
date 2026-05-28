@@ -1060,7 +1060,7 @@
     "send": "发送比特币",
     "tapAgainToConfirm": "再次点击确认",
     "satPerVB": "{{rate}} sat/vB",
-    "available": "可用：{{usd}}（{{sats}} sats）",
+    "notEnoughBitcoin": "比特币不足",
     "recipient": {
       "placeholder": "bc1…、sp1…",
       "useSilentPayment": "改用静默支付",
