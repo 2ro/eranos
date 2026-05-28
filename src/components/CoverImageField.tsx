@@ -113,12 +113,12 @@ export function CoverImageField({ value, onChange, onUploadingChange, onUploadCo
     setCropImageSrc(URL.createObjectURL(file));
   };
 
-  const handleCropConfirm = async (blob: Blob) => {
+  const handleCropConfirm = async (file: File) => {
     const src = cropImageSrc;
     setCropImageSrc(null);
     if (src) URL.revokeObjectURL(src);
-    // The crop dialog always emits JPEG (see ImageCropDialog).
-    const file = new File([blob], 'cover.jpg', { type: 'image/jpeg' });
+    // The crop dialog hands back a fully-formed File (JPEG or PNG,
+    // whichever encoded smaller — see encodeImage in @/lib/resizeImage).
     try {
       const tags = await uploadFile(file);
       const [[, url]] = tags;

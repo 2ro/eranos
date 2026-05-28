@@ -5,6 +5,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '
 import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
 import { ZoomIn, ZoomOut, RotateCcw } from 'lucide-react';
+import { encodeImage } from '@/lib/resizeImage';
 
 interface ImageCropDialogProps {
   open: boolean;
@@ -12,7 +13,7 @@ interface ImageCropDialogProps {
   aspect: number;
   title?: string;
   /**
-   * Cap on the output JPEG's long edge, in pixels. When the selected crop
+   * Cap on the output's long edge, in pixels. When the selected crop
    * region in source-pixel space exceeds this, the canvas downscales with
    * `drawImage`'s built-in bilinear filter. Omit (or pass `0`) to preserve
    * the source-pixel crop size 1:1 — historical behavior, kept as the
@@ -21,48 +22,12 @@ interface ImageCropDialogProps {
    */
   maxOutputSize?: number;
   onCancel: () => void;
-  onCrop: (croppedBlob: Blob) => void;
-}
-
-async function getCroppedBlob(
-  imageSrc: string,
-  pixelCrop: Area,
-  maxOutputSize?: number,
-): Promise<Blob> {
-  const image = await createImageBitmap(await (await fetch(imageSrc)).blob());
-  // Compute the downscale factor. `drawImage` handles non-integer scaling
-  // fine; we round the final canvas size so the output dimensions are
-  // sensible integers.
-  const longest = Math.max(pixelCrop.width, pixelCrop.height);
-  const scale = maxOutputSize && longest > maxOutputSize ? maxOutputSize / longest : 1;
-  const outW = Math.max(1, Math.round(pixelCrop.width * scale));
-  const outH = Math.max(1, Math.round(pixelCrop.height * scale));
-  const canvas = document.createElement('canvas');
-  canvas.width = outW;
-  canvas.height = outH;
-  const ctx = canvas.getContext('2d');
-  if (!ctx) throw new Error('Canvas context unavailable');
-  // Hint the browser toward higher-quality resampling when downscaling.
-  // Safari/Chrome both honor this for the 9-arg `drawImage` form.
-  ctx.imageSmoothingEnabled = true;
-  ctx.imageSmoothingQuality = 'high';
-  ctx.drawImage(
-    image,
-    pixelCrop.x,
-    pixelCrop.y,
-    pixelCrop.width,
-    pixelCrop.height,
-    0,
-    0,
-    outW,
-    outH,
-  );
-  return new Promise<Blob>((resolve, reject) => {
-    canvas.toBlob((blob) => {
-      if (blob) resolve(blob);
-      else reject(new Error('Failed to create blob'));
-    }, 'image/jpeg', 0.92);
-  });
+  /**
+   * Receives the cropped result as a `File` (JPEG or PNG, whichever
+   * encoded smaller — see `encodeImage` in `@/lib/resizeImage`). The
+   * mime/extension on the file reflects the winning format.
+   */
+  onCrop: (croppedFile: File) => void;
 }
 
 export function ImageCropDialog({ open, imageSrc, aspect, title = 'Crop Image', maxOutputSize, onCancel, onCrop }: ImageCropDialogProps) {
@@ -84,8 +49,18 @@ export function ImageCropDialog({ open, imageSrc, aspect, title = 'Crop Image', 
     if (!croppedAreaPixels) return;
     setIsProcessing(true);
     try {
-      const blob = await getCroppedBlob(imageSrc, croppedAreaPixels, maxOutputSize);
-      onCrop(blob);
+      // Delegate to the shared encoder so cover-image crops pick up the
+      // same JPEG-vs-PNG comparison and quality defaults used by the
+      // upload paths in ComposeBox / ImageUploadField. JPEG quality stays
+      // at the lib default (0.85) — the previous 0.92 was set when this
+      // dialog was JPEG-only and not coordinating with the rest of the
+      // app's resize pipeline.
+      const { file } = await encodeImage(imageSrc, {
+        crop: croppedAreaPixels,
+        maxOutputSize,
+        filename: 'cropped',
+      });
+      onCrop(file);
     } finally {
       setIsProcessing(false);
     }
