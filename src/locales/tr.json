@@ -170,7 +170,6 @@
       "notePublished": "Notunuz yayımlandı."
     },
     "destination": {
-      "label": "Şuraya gönder",
       "ariaHelp": "Küresel ve topluluk gönderileri arasındaki fark nedir?",
       "ariaTrigger": "Gönderi hedefi",
       "global": "Küresel",
@@ -1431,8 +1430,7 @@
     "satPerVB": "{{rate}} sat/vB",
     "available": "Kullanılabilir: {{usd}} ({{sats}} sat)",
     "recipient": {
-      "label": "Alıcı",
-      "placeholder": "bc1…, sp1… ya da npub…",
+      "placeholder": "bc1…, sp1…",
       "useSilentPayment": "Bunun yerine sessiz ödeme kullan",
       "useOnchain": "Bunun yerine zincir üstü adres kullan",
       "scan": "QR kodu tara"

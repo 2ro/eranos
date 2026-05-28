@@ -695,7 +695,6 @@
   "moderation": {
     "hiddenBadge": "Oculto",
     "menu": {
-      "label": "Acciones de moderador",
       "ariaCampaign": "Moderar campaña",
       "ariaPledge": "Moderar promesa",
       "ariaGroup": "Moderar grupo",
@@ -1064,8 +1063,7 @@
     "satPerVB": "{{rate}} sat/vB",
     "available": "Disponible: {{usd}} ({{sats}} sats)",
     "recipient": {
-      "label": "Destinatario",
-      "placeholder": "bc1…, sp1… o npub…",
+      "placeholder": "bc1…, sp1…",
       "useSilentPayment": "Usar pago silencioso en su lugar",
       "useOnchain": "Usar dirección en cadena en su lugar",
       "scan": "Escanear código QR"

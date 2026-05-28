@@ -170,7 +170,6 @@
       "notePublished": "Noti yako imechapishwa."
     },
     "destination": {
-      "label": "Chapisha kwa",
       "ariaHelp": "Kuna tofauti gani kati ya machapisho ya kimataifa na ya jumuiya?",
       "ariaTrigger": "Mahali pa kuchapisha",
       "global": "Kimataifa",
@@ -1391,8 +1390,7 @@
     "satPerVB": "sat/vB {{rate}}",
     "available": "Inapatikana: {{usd}} (sats {{sats}})",
     "recipient": {
-      "label": "Mpokeaji",
-      "placeholder": "bc1…, sp1…, au npub…",
+      "placeholder": "bc1…, sp1…",
       "useSilentPayment": "Tumia malipo ya kimya badala yake",
       "useOnchain": "Tumia anwani ya katika-mnyororo badala yake",
       "scan": "Changanua msimbo wa QR"

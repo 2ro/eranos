@@ -171,7 +171,6 @@
       "notePublished": "Catatan Anda telah dipublikasikan."
     },
     "destination": {
-      "label": "Posting ke",
       "ariaHelp": "Apa perbedaan antara unggahan global dan komunitas?",
       "ariaTrigger": "Tujuan unggahan",
       "global": "Global",
@@ -1432,8 +1431,7 @@
     "satPerVB": "{{rate}} sat/vB",
     "available": "Tersedia: {{usd}} ({{sats}} sats)",
     "recipient": {
-      "label": "Penerima",
-      "placeholder": "bc1…, sp1…, atau npub…",
+      "placeholder": "bc1…, sp1…",
       "useSilentPayment": "Gunakan silent payment saja",
       "useOnchain": "Gunakan alamat on-chain saja",
       "scan": "Pindai kode QR"

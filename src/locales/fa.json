@@ -695,7 +695,6 @@
   "moderation": {
     "hiddenBadge": "پنهان",
     "menu": {
-      "label": "اقدامات ناظر",
       "ariaCampaign": "نظارت بر کمپین",
       "ariaPledge": "نظارت بر تعهد",
       "ariaGroup": "نظارت بر گروه",
@@ -1064,8 +1063,7 @@
     "satPerVB": "{{rate}} ساتوشی/vB",
     "available": "موجود: {{usd}} ({{sats}} ساتوشی)",
     "recipient": {
-      "label": "گیرنده",
-      "placeholder": "bc1…، sp1… یا npub…",
+      "placeholder": "bc1…، sp1…",
       "useSilentPayment": "استفاده از پرداخت خاموش به جای آن",
       "useOnchain": "استفاده از نشانی روی‌زنجیره به جای آن",
       "scan": "اسکن کد QR"

@@ -1487,8 +1487,7 @@
     "satPerVB": "{{rate}} sat/vB",
     "available": "Available: {{usd}} ({{sats}} sats)",
     "recipient": {
-      "label": "Recipient",
-      "placeholder": "bc1…, sp1…, or npub…",
+      "placeholder": "bc1…, sp1…",
       "useSilentPayment": "Use silent payment instead",
       "useOnchain": "Use on-chain address instead",
       "scan": "Scan QR code"

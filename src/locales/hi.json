@@ -171,7 +171,6 @@
       "notePublished": "आपका नोट पब्लिश हो गया है।"
     },
     "destination": {
-      "label": "कहाँ पोस्ट करें",
       "ariaHelp": "ग्लोबल और कम्युनिटी पोस्ट में क्या फ़र्क है?",
       "ariaTrigger": "पोस्ट की मंज़िल",
       "global": "Global",
@@ -1432,8 +1431,7 @@
     "satPerVB": "{{rate}} sat/vB",
     "available": "उपलब्ध: {{usd}} ({{sats}} sats)",
     "recipient": {
-      "label": "प्राप्तकर्ता",
-      "placeholder": "bc1…, sp1…, या npub…",
+      "placeholder": "bc1…, sp1…",
       "useSilentPayment": "इसके बजाय साइलेंट पेमेंट का उपयोग करें",
       "useOnchain": "इसके बजाय ऑन-चेन एड्रेस का उपयोग करें",
       "scan": "QR कोड स्कैन करें"

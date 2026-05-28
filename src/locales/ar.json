@@ -679,7 +679,6 @@
   "moderation": {
     "hiddenBadge": "مخفية",
     "menu": {
-      "label": "إجراءات المشرف",
       "ariaCampaign": "إدارة الحملة",
       "ariaPledge": "إدارة التعهد",
       "ariaGroup": "إدارة المجموعة",
@@ -1048,8 +1047,7 @@
     "satPerVB": "{{rate}} ساتوشي/vB",
     "available": "المتاح: {{usd}} ({{sats}} ساتوشي)",
     "recipient": {
-      "label": "المستلم",
-      "placeholder": "bc1…, sp1…, أو npub…",
+      "placeholder": "bc1…, sp1…",
       "useSilentPayment": "استخدام الدفع الصامت بدلاً من ذلك",
       "useOnchain": "استخدام عنوان على السلسلة بدلاً من ذلك",
       "scan": "مسح رمز QR"

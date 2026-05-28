@@ -170,7 +170,6 @@
       "notePublished": "Votre note a été publiée."
     },
     "destination": {
-      "label": "Publier vers",
       "ariaHelp": "Quelle est la différence entre une publication globale et communautaire ?",
       "ariaTrigger": "Destination de la publication",
       "global": "Global",
@@ -1486,8 +1485,7 @@
     "satPerVB": "{{rate}} sat/vB",
     "available": "Disponible : {{usd}} ({{sats}} sats)",
     "recipient": {
-      "label": "Destinataire",
-      "placeholder": "bc1…, sp1…, ou npub…",
+      "placeholder": "bc1…, sp1…",
       "useSilentPayment": "Utiliser un paiement silencieux à la place",
       "useOnchain": "Utiliser une adresse on-chain à la place",
       "scan": "Scanner le QR code"

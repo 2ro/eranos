@@ -695,7 +695,6 @@
   "moderation": {
     "hiddenBadge": "Zvakavanzwa",
     "menu": {
-      "label": "Zviito zvomutariri",
       "ariaCampaign": "Tarisa mushandirapamwe",
       "ariaPledge": "Tarisa chitsidziro",
       "ariaGroup": "Tarisa boka",
@@ -1064,8 +1063,7 @@
     "satPerVB": "{{rate}} sat/vB",
     "available": "Inowanikwa: {{usd}} ({{sats}} sats)",
     "recipient": {
-      "label": "Mugamuchiri",
-      "placeholder": "bc1…, sp1…, kana npub…",
+      "placeholder": "bc1…, sp1…",
       "useSilentPayment": "Shandisa mubhadharo wakanyararira pachinzvimbo",
       "useOnchain": "Shandisa kero yepacheni pachinzvimbo",
       "scan": "Skena kodhi yeQR"

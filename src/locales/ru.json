@@ -171,7 +171,6 @@
       "notePublished": "Ваша заметка опубликована."
     },
     "destination": {
-      "label": "Опубликовать в",
       "ariaHelp": "В чём разница между глобальными и сообщественными публикациями?",
       "ariaTrigger": "Назначение публикации",
       "global": "Глобально",
@@ -1496,8 +1495,7 @@
     "satPerVB": "{{rate}} сат/vB",
     "available": "Доступно: {{usd}} ({{sats}} сатов)",
     "recipient": {
-      "label": "Получатель",
-      "placeholder": "bc1…, sp1…, или npub…",
+      "placeholder": "bc1…, sp1…",
       "useSilentPayment": "Использовать тихий платёж",
       "useOnchain": "Использовать адрес в блокчейне",
       "scan": "Сканировать QR-код"

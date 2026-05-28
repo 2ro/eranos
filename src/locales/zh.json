@@ -695,7 +695,6 @@
   "moderation": {
     "hiddenBadge": "已隐藏",
     "menu": {
-      "label": "版主操作",
       "ariaCampaign": "管理活动",
       "ariaPledge": "管理悬赏",
       "ariaGroup": "管理群组",
@@ -1064,8 +1063,7 @@
     "satPerVB": "{{rate}} sat/vB",
     "available": "可用：{{usd}}（{{sats}} sats）",
     "recipient": {
-      "label": "收款方",
-      "placeholder": "bc1…、sp1…或 npub…",
+      "placeholder": "bc1…、sp1…",
       "useSilentPayment": "改用静默支付",
       "useOnchain": "改用链上地址",
       "scan": "扫描二维码"

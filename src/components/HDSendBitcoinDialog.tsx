@@ -587,19 +587,14 @@ export function HDSendBitcoinDialog({ isOpen, onClose, btcPrice, initialRecipien
               />
 
               {/* Recipient */}
-              <div className="grid gap-1">
-                <label className="text-xs text-muted-foreground" htmlFor="hd-recipient-input">
-                  {t('walletSend.recipient.label')}
-                </label>
-                <BitcoinRecipientInput
-                  value={recipientInput}
-                  onChange={setRecipientInput}
-                  placeholder={t('walletSend.recipient.placeholder')}
-                  resolvedPubkey={recipient?.pubkey}
-                  onScanClick={() => setScannerOpen(true)}
-                  scanLabel={t('walletSend.recipient.scan')}
-                />
-              </div>
+              <BitcoinRecipientInput
+                value={recipientInput}
+                onChange={setRecipientInput}
+                placeholder={t('walletSend.recipient.placeholder')}
+                resolvedPubkey={recipient?.pubkey}
+                onScanClick={() => setScannerOpen(true)}
+                scanLabel={t('walletSend.recipient.scan')}
+              />
 
               {/* Privacy disclaimer for raw addresses + companion
                   swap-to-silent-payment toggle. Both are about whether

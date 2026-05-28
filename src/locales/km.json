@@ -695,7 +695,6 @@
   "moderation": {
     "hiddenBadge": "បានលាក់",
     "menu": {
-      "label": "សកម្មភាពអ្នកសម្របសម្រួល",
       "ariaCampaign": "សម្របសម្រួលយុទ្ធនាការ",
       "ariaPledge": "សម្របសម្រួលការសន្យា",
       "ariaGroup": "សម្របសម្រួលក្រុម",
@@ -1064,8 +1063,7 @@
     "satPerVB": "{{rate}} sat/vB",
     "available": "អាចប្រើ: {{usd}} ({{sats}} sats)",
     "recipient": {
-      "label": "អ្នកទទួល",
-      "placeholder": "bc1…, sp1… ឬ npub…",
+      "placeholder": "bc1…, sp1…",
       "useSilentPayment": "ប្រើការទូទាត់ស្ងាត់ជំនួសវិញ",
       "useOnchain": "ប្រើអាសយដ្ឋានលើខ្សែសង្វាក់ជំនួសវិញ",
       "scan": "ស្កេនកូដ QR"

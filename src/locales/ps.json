@@ -695,7 +695,6 @@
   "moderation": {
     "hiddenBadge": "پټ شوی",
     "menu": {
-      "label": "د څارونکي کړنې",
       "ariaCampaign": "د کمپاین څارنه",
       "ariaPledge": "د ژمنې څارنه",
       "ariaGroup": "د ډلې څارنه",
@@ -1064,8 +1063,7 @@
     "satPerVB": "{{rate}} ساتوشي/vB",
     "available": "شته: {{usd}} ({{sats}} ساتوشي)",
     "recipient": {
-      "label": "ترلاسه کوونکی",
-      "placeholder": "bc1…، sp1…، یا npub…",
+      "placeholder": "bc1…، sp1…",
       "useSilentPayment": "پر ځای يې د چوپې ورکړې وکاروئ",
       "useOnchain": "پر ځای يې د زنځیر په پته وکاروئ",
       "scan": "د QR کوډ سکن کړئ"
