@@ -27,7 +27,6 @@ import { useNip50Search, type Nip50Sort } from '@/hooks/useNip50Search';
 import { useOrganizationModeration } from '@/hooks/useOrganizationModeration';
 import { useToast } from '@/hooks/useToast';
 import { useUserOrganizations } from '@/hooks/useUserOrganizations';
-import { hasAgoraTag } from '@/lib/agoraNoteTags';
 import { formatSatsShort } from '@/lib/formatCampaignAmount';
 import { COMMUNITY_DEFINITION_KIND, parseCommunityEvent, type ParsedCommunity } from '@/lib/communityUtils';
 
@@ -102,9 +101,7 @@ export function CommunitiesPage() {
   });
 
   // Lift org moderation to the page so search results can drop hidden
-  // groups (or include them when the Show-hidden switch is on). The
-  // Hidden ModeratorCollapsibleSection below derives its data from the
-  // same `allOrgs` fetch, so no additional query round-trip is needed.
+  // groups (or include them when the Show-hidden switch is on).
   const { data: orgModeration } = useOrganizationModeration();
   const { searchHits, searchHiddenCount } = useMemo(() => {
     if (!searchHitsRaw) return { searchHits: undefined, searchHiddenCount: 0 };
@@ -122,42 +119,47 @@ export function CommunitiesPage() {
     return { searchHits: visible, searchHiddenCount: hidden };
   }, [searchHitsRaw, orgModeration, showHidden]);
 
-  const { data: allOrgs, isLoading: allOrgsLoading } = useDiscoverCommunities({ limit: 200 });
-  // `allGroups` is the chronological "every Agora-tagged group" list,
-  // used both as the fallback for the idle view (when nothing is
-  // featured yet) and as the result list when the user switches to
-  // Top/New sort with no typed query. Featured groups are NOT removed
-  // here — when the user is actively browsing they want the full set;
-  // the idle-mode rendering path handles the featured-first framing.
-  const { allGroups, allHiddenCount, hiddenGroups } = useMemo(() => {
+  // The full kind-34550 fetch is only used by moderators — it feeds the
+  // "Hidden" collapsible section and the hidden-count badge inside the
+  // toolbar's filter menu. Non-moderators don't need it: the unified
+  // section renders moderator-featured groups directly (or relay
+  // search results when the user is actively browsing), so there's no
+  // "render everything, then filter for the Agora tag" round-trip and
+  // therefore no flash of unrelated groups before the curated set
+  // appears.
+  const { data: allOrgs, isLoading: allOrgsLoading } = useDiscoverCommunities({
+    limit: 200,
+    enabled: isMod,
+  });
+  const { allHiddenCount, hiddenGroups } = useMemo(() => {
     const hiddenCoords = orgModeration?.hiddenCoords ?? new Set<string>();
     let hidden = 0;
-    const visible: ParsedCommunity[] = [];
     const hiddenList: ParsedCommunity[] = [];
     for (const org of allOrgs ?? []) {
       if (hiddenCoords.has(org.aTag)) {
         hidden += 1;
         hiddenList.push(org);
-        if (isMod && showHidden) visible.push(org);
-      } else if (hasAgoraTag(org.tags)) {
-        visible.push(org);
       }
     }
-    return { allGroups: visible, allHiddenCount: hidden, hiddenGroups: hiddenList };
-  }, [allOrgs, isMod, orgModeration, showHidden]);
+    return { allHiddenCount: hidden, hiddenGroups: hiddenList };
+  }, [allOrgs, orgModeration]);
 
-  // Featured groups for the idle view. When there are none, the idle
-  // view falls back to `allGroups` so users always see something.
-  const { data: featuredOrgs } = useFeaturedOrganizations();
+  // Featured groups — the curated list moderators publish. This is the
+  // entire idle-mode payload: no chronological fallback, no client-side
+  // tag filter, no "fetch everything and pick the Agora ones out of it"
+  // dance. Hidden coords are dropped (unless a moderator has flipped
+  // Show hidden on).
+  const {
+    data: featuredOrgs,
+    isLoading: featuredOrgsLoading,
+  } = useFeaturedOrganizations();
   const featuredGroups = useMemo<ParsedCommunity[]>(() => {
     if (!featuredOrgs) return [];
     const hiddenCoords = orgModeration?.hiddenCoords ?? new Set<string>();
     return featuredOrgs
       .map((entry) => entry.community)
-      .filter((c) => !hiddenCoords.has(c.aTag));
-  }, [featuredOrgs, orgModeration]);
-
-  const idleGroups = featuredGroups.length > 0 ? featuredGroups : allGroups;
+      .filter((c) => (isMod && showHidden) || !hiddenCoords.has(c.aTag));
+  }, [featuredOrgs, orgModeration, isMod, showHidden]);
 
   // Search + sort + show-hidden cluster for the unified section.
   const searchToolbar = (
@@ -187,10 +189,15 @@ export function CommunitiesPage() {
         />
 
         {/* Unified Groups section.
-            - Idle (no search / no sort): renders moderator-featured
-              groups, or the chronological "all groups" fallback when
-              nothing is featured yet.
-            - Active: renders the full search/sort result set. */}
+            - Idle (no search / no sort): renders ONLY moderator-featured
+              groups. No fallback to a chronological "all groups" grid —
+              that produced a brief flash of unrelated communities while
+              the relay returned every kind-34550 event before the
+              client-side Agora-tag filter ran. The skeleton is gated on
+              the featured query itself, so the idle view goes
+              skeleton → curated grid without any intermediate state.
+            - Active (search / Top / New): renders the full relay
+              search result set. */}
         <section className="space-y-5">
           <div className="flex flex-col items-stretch gap-4 sm:flex-row sm:items-end sm:justify-between">
             <div>
@@ -247,15 +254,15 @@ export function CommunitiesPage() {
                 </Card>
               )}
             </>
-          ) : allOrgsLoading ? (
+          ) : featuredOrgsLoading ? (
             <CommunityGrid>
               {Array.from({ length: 8 }).map((_, i) => (
                 <CommunityMiniCardSkeleton key={i} className="w-full" />
               ))}
             </CommunityGrid>
-          ) : idleGroups.length > 0 ? (
+          ) : featuredGroups.length > 0 ? (
             <CommunityGrid>
-              {idleGroups.map((community) => (
+              {featuredGroups.map((community) => (
                 <CommunityMiniCard
                   key={community.aTag}
                   community={community}

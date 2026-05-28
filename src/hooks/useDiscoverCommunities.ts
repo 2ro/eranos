@@ -12,6 +12,14 @@ import {
 interface UseDiscoverCommunitiesOptions {
   /** Maximum number of communities to fetch. Default: 24. */
   limit?: number;
+  /**
+   * Gate the underlying query. Useful for callers that only need the
+   * full kind-34550 universe under a moderator role (e.g. the Hidden
+   * section on `/groups`); skipping the fetch for everyone else avoids
+   * a global relay round-trip whose results would only feed
+   * moderator-only UI. Defaults to `true`.
+   */
+  enabled?: boolean;
 }
 
 /**
@@ -28,12 +36,13 @@ interface UseDiscoverCommunitiesOptions {
  * the card just shows a gradient fallback.
  */
 export function useDiscoverCommunities(options: UseDiscoverCommunitiesOptions = {}) {
-  const { limit = 24 } = options;
+  const { limit = 24, enabled = true } = options;
   const { nostr } = useNostr();
   const relay = nostr.relay(DITTO_RELAY);
 
   return useQuery<ParsedCommunity[]>({
     queryKey: ['discover-communities', limit],
+    enabled,
     queryFn: async ({ signal }) => {
       const events = await relay.query(
         [{ kinds: [COMMUNITY_DEFINITION_KIND], limit }],
