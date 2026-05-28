@@ -7,31 +7,41 @@ import { ChevronDown, ChevronUp, EyeOff, Globe2, HandHeart, PlusCircle, Users } 
 import { HeroAtmosphere } from '@/components/HeroAtmosphere';
 import { HeroBanner } from '@/components/HeroBanner';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { CommunityGrid } from '@/components/discovery/CommunityGrid';
-import { CommunityMiniCard, CommunityMiniCardSkeleton } from '@/components/discovery/CommunityMiniCard';
-import { DiscoverySearchToolbar } from '@/components/DiscoverySearchToolbar';
+import {
+  CommunityMiniCard,
+  CommunityMiniCardSkeleton,
+} from '@/components/discovery/CommunityMiniCard';
+import { GroupsDiscoverySection } from '@/components/discovery/GroupsDiscoverySection';
 import { ModeratorCollapsibleSection } from '@/components/moderation';
 import { COOL_PALETTE } from '@/lib/hopePalette';
 import { cn } from '@/lib/utils';
 import { useAppContext } from '@/hooks/useAppContext';
 import { useCampaignModerators } from '@/hooks/useCampaignModerators';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
-import { useDebounce } from '@/hooks/useDebounce';
 import { useDiscoverCommunities } from '@/hooks/useDiscoverCommunities';
 import { useFeaturedOrganizations } from '@/hooks/useFeaturedOrganizations';
 import { useGlobalActivity } from '@/hooks/useGlobalActivity';
 import { useGlobalDonations } from '@/hooks/useGlobalDonations';
-import { useNip50Search, type Nip50Sort } from '@/hooks/useNip50Search';
 import { useOrganizationModeration } from '@/hooks/useOrganizationModeration';
 import { useToast } from '@/hooks/useToast';
 import { useUserOrganizations } from '@/hooks/useUserOrganizations';
 import { formatSatsShort } from '@/lib/formatCampaignAmount';
-import { COMMUNITY_DEFINITION_KIND, parseCommunityEvent, type ParsedCommunity } from '@/lib/communityUtils';
+import type { ParsedCommunity } from '@/lib/communityUtils';
 
-// ─── Page ──────────────────────────────────────────────────────────────────────
-
+/**
+ * Dedicated `/groups` page.
+ *
+ * Thin shell around the shared {@link GroupsDiscoverySection}: hero,
+ * optional "My groups" shelf, the unified search-and-discover
+ * section, and a moderator-only Hidden collapsible.
+ *
+ * URL state (`?q=&sort=`) lives inside the section's
+ * `useDiscoveryFilters` hook so search results stay shareable. The
+ * page only owns the Show-hidden flag and the moderator-only data
+ * needed for the Hidden collapsible.
+ */
 export function CommunitiesPage() {
   const { t } = useTranslation();
   const { config } = useAppContext();
@@ -62,233 +72,45 @@ export function CommunitiesPage() {
     navigate('/groups/new');
   };
 
-  // On-page NIP-50 search + sort + show-hidden toolbar state.
-  //
-  //   Default sort, empty query → curated featured-first idle view.
-  //     If no groups are featured yet, falls back to the chronological
-  //     "all groups" grid so the page is never blank.
-  //   Default sort, with query  → relay search for kind 34550, results
-  //     post-filtered against name/description/content client-side.
-  //   Top / New                  → always active. Top sends `sort:top`;
-  //     New sends a raw chronological feed of the kind.
-  //
-  // Groups aren't country-scoped on the discovery surface (a community
-  // is its own scope), so the country picker is intentionally omitted
-  // from the toolbar here even though Campaigns and Pledges expose it.
-  const [searchInput, setSearchInput] = useState('');
-  const [sortMode, setSortMode] = useState<Nip50Sort>('default');
   const [showHidden, setShowHidden] = useState(false);
-  const debouncedSearch = useDebounce(searchInput, 300);
-  const trimmedSearch = debouncedSearch.trim();
-  const {
-    data: searchHitsRaw,
-    isFetching: isSearchFetching,
-    isActive: isSearching,
-  } = useNip50Search<ParsedCommunity>({
-    kind: COMMUNITY_DEFINITION_KIND,
-    query: debouncedSearch,
-    sort: sortMode,
-    parse: parseCommunityEvent,
-    // Group names and descriptions live in tags, not `content`. Relay
-    // NIP-50 implementations that only match content silently miss
-    // obvious title hits — widen client-side by also checking these
-    // tag values.
-    getKeywordHaystack: (event) => {
-      const name = event.tags.find(([n]) => n === 'name')?.[1] ?? '';
-      const description = event.tags.find(([n]) => n === 'description')?.[1] ?? '';
-      return [name, description, event.content];
-    },
-  });
 
-  // Lift org moderation to the page so search results can drop hidden
-  // groups (or include them when the Show-hidden switch is on).
-  const { data: orgModeration, isReady: orgModerationReady } = useOrganizationModeration();
-  const { searchHits, searchHiddenCount } = useMemo(() => {
-    if (!searchHitsRaw) return { searchHits: undefined, searchHiddenCount: 0 };
-    const hiddenCoords = orgModeration?.hiddenCoords ?? new Set<string>();
-    let hidden = 0;
-    const visible: ParsedCommunity[] = [];
-    for (const c of searchHitsRaw) {
-      if (hiddenCoords.has(c.aTag)) {
-        hidden += 1;
-        if (showHidden) visible.push(c);
-      } else {
-        visible.push(c);
-      }
-    }
-    return { searchHits: visible, searchHiddenCount: hidden };
-  }, [searchHitsRaw, orgModeration, showHidden]);
-
-  // The full kind-34550 fetch is only used by moderators — it feeds the
-  // "Hidden" collapsible section and the hidden-count badge inside the
-  // toolbar's filter menu. Non-moderators don't need it: the unified
-  // section renders moderator-featured groups directly (or relay
-  // search results when the user is actively browsing), so there's no
-  // "render everything, then filter for the Agora tag" round-trip and
-  // therefore no flash of unrelated groups before the curated set
-  // appears.
+  // Moderator-only: fetch the full kind-34550 universe so we can list
+  // hidden groups and surface a hidden-count badge on the toolbar.
+  // Non-moderators don't need this query — the section drives the
+  // public idle/active grids straight from featured + search.
   const { data: allOrgs, isLoading: allOrgsLoading } = useDiscoverCommunities({
     limit: 200,
     enabled: isMod,
   });
-  const { allHiddenCount, hiddenGroups } = useMemo(() => {
+  const { data: orgModeration } = useOrganizationModeration();
+  const { hiddenGroups, hiddenCount } = useMemo(() => {
     const hiddenCoords = orgModeration?.hiddenCoords ?? new Set<string>();
-    let hidden = 0;
-    const hiddenList: ParsedCommunity[] = [];
+    const list: ParsedCommunity[] = [];
     for (const org of allOrgs ?? []) {
-      if (hiddenCoords.has(org.aTag)) {
-        hidden += 1;
-        hiddenList.push(org);
-      }
+      if (hiddenCoords.has(org.aTag)) list.push(org);
     }
-    return { allHiddenCount: hidden, hiddenGroups: hiddenList };
+    return { hiddenGroups: list, hiddenCount: list.length };
   }, [allOrgs, orgModeration]);
-
-  // Featured groups — the curated list moderators publish. This is the
-  // entire idle-mode payload: no chronological fallback, no client-side
-  // tag filter, no "fetch everything and pick the Agora ones out of it"
-  // dance. Hidden coords are dropped (unless a moderator has flipped
-  // Show hidden on).
-  const {
-    data: featuredOrgs,
-    isLoading: featuredOrgsLoading,
-  } = useFeaturedOrganizations();
-  const featuredGroups = useMemo<ParsedCommunity[]>(() => {
-    if (!featuredOrgs) return [];
-    const hiddenCoords = orgModeration?.hiddenCoords ?? new Set<string>();
-    return featuredOrgs
-      .map((entry) => entry.community)
-      .filter((c) => (isMod && showHidden) || !hiddenCoords.has(c.aTag));
-  }, [featuredOrgs, orgModeration, isMod, showHidden]);
-
-  // Idle-render skeleton gate. `useFeaturedOrganizations` is internally
-  // gated on `moderationReady`, so while the moderation labels are
-  // still loading, the hook is *disabled* and reports `isLoading: false`
-  // / `data: undefined`. Treating that as "not loading" would render
-  // the empty state for a moment before the curated grid pops in;
-  // tracking moderation-readiness here keeps the skeleton on screen
-  // until we know what's featured.
-  const idleLoading = !orgModerationReady || featuredOrgsLoading || featuredOrgs === undefined;
-
-  // Search + sort + show-hidden cluster for the unified section.
-  const searchToolbar = (
-    <DiscoverySearchToolbar
-      query={searchInput}
-      onQueryChange={setSearchInput}
-      sort={sortMode}
-      onSortChange={setSortMode}
-      sortOptions={['top', 'new']}
-      searchPlaceholderKey="groups.list.searchPlaceholder"
-      searchAriaLabelKey="groups.list.searchAriaLabel"
-      showHidden={isMod ? {
-        value: showHidden,
-        onChange: setShowHidden,
-        count: isSearching ? searchHiddenCount : allHiddenCount,
-      } : undefined}
-    />
-  );
 
   return (
     <main className="min-h-screen pb-16 sidebar:pb-0">
       <CommunitiesHero onCreateCommunity={handleCreateCommunity} />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 space-y-10 sm:space-y-12 pb-8 pt-10 lg:pt-14">
-        <MyCommunitiesShelf
-          userOrganizations={userOrganizations}
+        <MyCommunitiesShelf userOrganizations={userOrganizations} />
+
+        <GroupsDiscoverySection
+          filterPersistence="url"
+          showHidden={
+            isMod
+              ? {
+                  value: showHidden,
+                  onChange: setShowHidden,
+                  count: hiddenCount,
+                }
+              : undefined
+          }
         />
-
-        {/* Unified Groups section.
-            - Idle (no search / no sort): renders ONLY moderator-featured
-              groups. No fallback to a chronological "all groups" grid —
-              that produced a brief flash of unrelated communities while
-              the relay returned every kind-34550 event before the
-              client-side Agora-tag filter ran. The skeleton is gated on
-              the featured query itself, so the idle view goes
-              skeleton → curated grid without any intermediate state.
-            - Active (search / Top / New): renders the full relay
-              search result set. */}
-        <section className="space-y-5">
-          <div className="flex flex-col items-stretch gap-4 sm:flex-row sm:items-end sm:justify-between">
-            <div>
-              <h2 className="text-2xl sm:text-3xl font-bold tracking-tight">
-                {trimmedSearch
-                  ? t('common.search')
-                  : t('groups.list.allGroups')}
-              </h2>
-              <p className="text-sm text-muted-foreground mt-1">
-                {isSearching && searchHits
-                  ? t('common.searchResultsCount', { count: searchHits.length })
-                  : t('groups.list.allGroupsTagline')}
-              </p>
-            </div>
-            {searchToolbar}
-          </div>
-
-          {isSearching ? (
-            <>
-              {isSearchFetching && !searchHits ? (
-                <CommunityGrid>
-                  {Array.from({ length: 8 }).map((_, i) => (
-                    <CommunityMiniCardSkeleton key={i} className="w-full" />
-                  ))}
-                </CommunityGrid>
-              ) : searchHits && searchHits.length > 0 ? (
-                <CommunityGrid>
-                  {searchHits.map((community) => (
-                    <CommunityMiniCard
-                      key={community.aTag}
-                      community={community}
-                      className="w-full"
-                    />
-                  ))}
-                </CommunityGrid>
-              ) : (
-                <Card className="border-dashed">
-                  <CardContent className="py-12 px-8 text-center space-y-2">
-                    {trimmedSearch ? (
-                      <>
-                        <p className="text-base font-medium">
-                          {t('groups.list.noMatch', { query: trimmedSearch })}
-                        </p>
-                        <p className="text-sm text-muted-foreground">
-                          {t('groups.list.noMatchHint')}
-                        </p>
-                      </>
-                    ) : (
-                      <p className="text-sm text-muted-foreground">
-                        {t('groups.list.noFeaturedBody', { appName: config.appName })}
-                      </p>
-                    )}
-                  </CardContent>
-                </Card>
-              )}
-            </>
-          ) : idleLoading ? (
-            <CommunityGrid>
-              {Array.from({ length: 8 }).map((_, i) => (
-                <CommunityMiniCardSkeleton key={i} className="w-full" />
-              ))}
-            </CommunityGrid>
-          ) : featuredGroups.length > 0 ? (
-            <CommunityGrid>
-              {featuredGroups.map((community) => (
-                <CommunityMiniCard
-                  key={community.aTag}
-                  community={community}
-                  className="w-full"
-                />
-              ))}
-            </CommunityGrid>
-          ) : (
-            <Card className="border-dashed">
-              <CardContent className="py-12 px-8 text-center space-y-2">
-                <p className="text-sm text-muted-foreground">
-                  {t('groups.list.noFeaturedBody', { appName: config.appName })}
-                </p>
-              </CardContent>
-            </Card>
-          )}
-        </section>
 
         {isMod && (
           <ModeratorCollapsibleSection
@@ -495,7 +317,7 @@ function CommunitiesHero({ onCreateCommunity }: CommunitiesHeroProps) {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// Community shelves
+// "My groups" shelf
 // ═══════════════════════════════════════════════════════════════════════════════
 
 type UserOrganizationsResult = ReturnType<typeof useUserOrganizations>;
@@ -508,15 +330,17 @@ function MyCommunitiesShelf({
   const { t } = useTranslation();
   const { user } = useCurrentUser();
   // "My organizations" = orgs the user founded, moderates, or follows.
-  // Sorting is founder first, moderator second, followed-only last, with
-  // newest community definition revisions first inside each bucket.
+  // Sorting is founder first, moderator second, followed-only last,
+  // with newest community definition revisions first inside each
+  // bucket.
   const { data: organizations } = userOrganizations;
   const [expanded, setExpanded] = useState(false);
 
   if (!user) return null;
-  // Suppress the entire section (header + tagline included) until at least
-  // one group is known. Rendering the header while the query is still
-  // pending causes a flash when the result resolves to an empty list.
+  // Suppress the entire section (header + tagline included) until at
+  // least one group is known. Rendering the header while the query is
+  // still pending causes a flash when the result resolves to an empty
+  // list.
   if (!organizations || organizations.length === 0) return null;
 
   const COLLAPSED_COUNT = 4;
@@ -570,7 +394,3 @@ function MyCommunitiesShelf({
     </section>
   );
 }
-
-
-
-

@@ -5,9 +5,8 @@ import { useTranslation } from 'react-i18next';
 import { ChevronDown, ChevronUp, EyeOff, HandHeart, PlusCircle } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
 import { CampaignCard, CampaignCardSkeleton } from '@/components/CampaignCard';
-import { DiscoverySearchToolbar } from '@/components/DiscoverySearchToolbar';
+import { CampaignsDiscoverySection } from '@/components/discovery/CampaignsDiscoverySection';
 import { HeroAtmosphere } from '@/components/HeroAtmosphere';
 import { HeroBanner } from '@/components/HeroBanner';
 import { ModeratorCollapsibleSection } from '@/components/moderation';
@@ -16,7 +15,6 @@ import { useAllCampaigns, type CampaignSort } from '@/hooks/useAllCampaigns';
 import { useCampaignModeration } from '@/hooks/useCampaignModeration';
 import { useCampaignModerators } from '@/hooks/useCampaignModerators';
 import { useAppContext } from '@/hooks/useAppContext';
-import { useDebounce } from '@/hooks/useDebounce';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { HOPE_PALETTE } from '@/lib/hopePalette';
 import { cn } from '@/lib/utils';
@@ -24,11 +22,9 @@ import type { Nip50Sort } from '@/hooks/useNip50Search';
 import type { ParsedCampaign } from '@/lib/campaign';
 
 /**
- * Type-guard for the `?sort=` URL param.
- *
- * - `top` and `new` map to the toolbar's active sort modes.
- * - Anything else (missing, empty, legacy values) collapses to
- *   `'default'`, the curated featured-first idle state.
+ * Type-guard mirroring the one in `useDiscoveryFilters`. Pulled out
+ * to keep the page's hidden-section derivation self-contained, since
+ * it needs to read the same URL params the section reads.
  */
 function parseSort(value: string | null): Nip50Sort {
   if (value === 'top') return 'top';
@@ -36,120 +32,68 @@ function parseSort(value: string | null): Nip50Sort {
   return 'default';
 }
 
-/**
- * Map the toolbar's sort vocabulary (`default` / `top` / `new`) to the
- * `useAllCampaigns` hook's vocabulary (`top` / `none`). `'new'` and
- * `'default'` both map to `'none'` (chronological) — the page handles
- * the "show featured only" framing on top of that.
- */
+/** Toolbar sort vocabulary → useAllCampaigns vocabulary. */
 const toQuerySort = (s: Nip50Sort): CampaignSort => (s === 'top' ? 'top' : 'none');
 
 /**
- * Lists every campaign found on relays. The page has two display modes:
+ * Lists every campaign found on relays.
  *
- * 1. **Idle** (no search, no sort, no country picked) — shows
- *    moderator-featured campaigns only. If there are no featured
- *    campaigns, falls back to the latest chronological grid so the page
- *    is never blank.
- * 2. **Active** (user typed a query, picked Top/New, or chose a
- *    country) — shows the full set, ranked by sats raised (Top) or
- *    chronological (New / search default).
+ * The page itself is a thin shell: hero, optional "Your campaigns"
+ * shelf, the shared {@link CampaignsDiscoverySection} (which owns
+ * search / sort / country + idle / active grids), and a
+ * moderator-only Hidden collapsible.
  *
- * Search filters across title, summary, story, location, and category
- * tags client-side.
- *
- * Hidden campaigns are excluded by default — flip the "Show hidden"
- * toggle (inside the toolbar's filter popover) to include them.
- *
- * URL state: `?sort=top|new&q=<search>&country=<iso>`. Default values
- * are stripped so the canonical URL stays clean. Useful for sharing
- * search results.
+ * URL state (`?q=&sort=&country=`) lives inside the section's
+ * `useDiscoveryFilters` hook so search results stay shareable. The
+ * page reads the same params independently to compute the Hidden
+ * collapsible's contents — TanStack Query dedupes the underlying
+ * `useAllCampaigns` call, so there's no extra network round-trip.
  */
 export function AllCampaignsPage() {
   const { t } = useTranslation();
   const { config } = useAppContext();
   const { user } = useCurrentUser();
 
-  // URL state — sort, query, and country live in the URL so results are
-  // shareable.
-  const [searchParams, setSearchParams] = useSearchParams();
+  const [searchParams] = useSearchParams();
   const sort = parseSort(searchParams.get('sort'));
   const urlQuery = searchParams.get('q') ?? '';
   const urlCountry = searchParams.get('country') ?? undefined;
 
-  // Search input is local-state so typing is responsive; we debounce to
-  // the URL + the query.
-  const [searchInput, setSearchInput] = useState(urlQuery);
-  const debouncedSearch = useDebounce(searchInput, 300);
-  const [showHidden, setShowHidden] = useState(false);
-
   const { data: moderators } = useCampaignModerators();
   const isMod = !!user && !!moderators && moderators.includes(user.pubkey);
+  const [showHidden, setShowHidden] = useState(false);
 
-  // Sync the debounced search → URL. Empty / default values are stripped
-  // so the canonical URL is `/campaigns/all` (not
-  // `/campaigns/all?sort=&q=`).
-  useEffect(() => {
-    const next = new URLSearchParams(searchParams);
-    const trimmed = debouncedSearch.trim();
-    if (trimmed) next.set('q', trimmed);
-    else next.delete('q');
-    // Only replace history when the params actually change, to avoid
-    // looping when the URL is already in sync.
-    if (next.toString() !== searchParams.toString()) {
-      setSearchParams(next, { replace: true });
-    }
-  }, [debouncedSearch, searchParams, setSearchParams]);
-
-  // Sync URL → input (e.g. browser back/forward or a deep link).
-  useEffect(() => {
-    if (urlQuery !== debouncedSearch) {
-      setSearchInput(urlQuery);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [urlQuery]);
-
-  const setSortFromToolbar = (value: Nip50Sort) => {
-    const next = new URLSearchParams(searchParams);
-    if (value === 'top') next.set('sort', 'top');
-    else if (value === 'new') next.set('sort', 'new');
-    else next.delete('sort');
-    setSearchParams(next, { replace: true });
-  };
-
-  // The country picker also rides the URL so country-scoped views are
-  // shareable / linkable.
-  const setCountry = (next: string | undefined) => {
-    const params = new URLSearchParams(searchParams);
-    if (next) params.set('country', next);
-    else params.delete('country');
-    setSearchParams(params, { replace: true });
-  };
-
-  const { data: campaigns, isLoading } = useAllCampaigns({
+  // Mirror the section's underlying query so the Hidden collapsible
+  // can list the exact set of hidden items matching the current
+  // search / sort / country. TanStack dedupes; this is a cache read
+  // on the same key the section uses.
+  const { data: campaigns } = useAllCampaigns({
     sort: toQuerySort(sort),
-    search: debouncedSearch.trim(),
+    search: urlQuery,
     countryCode: urlCountry,
     limit: 200,
   });
-  const { data: moderation, isReady: moderationReady } = useCampaignModeration();
+
+  const { data: moderation } = useCampaignModeration();
+
+  const { hiddenCount, hiddenCampaigns } = useMemo(() => {
+    const all = campaigns ?? [];
+    const hiddenCoords = moderation?.hiddenCoords ?? new Set<string>();
+    let count = 0;
+    const list: ParsedCampaign[] = [];
+    for (const c of all) {
+      if (hiddenCoords.has(c.aTag)) {
+        count += 1;
+        list.push(c);
+      }
+    }
+    return { hiddenCount: count, hiddenCampaigns: list };
+  }, [campaigns, moderation]);
+
   const { data: myCampaigns } = useCampaigns({
     authors: user ? [user.pubkey] : undefined,
     limit: 100,
     enabled: !!user,
-  });
-
-  const featuredCoords = useMemo(() => {
-    if (!moderationReady) return [] as string[];
-    return Array.from(moderation.featuredCoords)
-      .filter((coord) => !moderation.hiddenCoords.has(coord))
-      .sort((a, b) => (moderation.featuredOrder.get(b) ?? 0) - (moderation.featuredOrder.get(a) ?? 0));
-  }, [moderation, moderationReady]);
-
-  const { data: featuredCampaigns } = useCampaigns({
-    coordinates: featuredCoords,
-    limit: featuredCoords.length || 1,
-    enabled: moderationReady,
   });
 
   useSeoMeta({
@@ -157,62 +101,15 @@ export function AllCampaignsPage() {
     description: t('campaigns.all.description'),
   });
 
-  const activeQuery = debouncedSearch.trim();
-
-  // The unified section is in "active" mode when the user has expressed
-  // intent to browse the full set: typed a query, picked Top/New, or
-  // chosen a country. Otherwise it's the curated featured-first view.
-  const isActive = activeQuery !== '' || sort !== 'default' || !!urlCountry;
-
-  // Visible campaigns in the **active** branch: every campaign matching
-  // the search/sort/country, minus hidden (unless the moderator opted
-  // in to seeing hidden). Featured items are intentionally NOT pulled
-  // out of this list — when the user is actively browsing, they want a
-  // ranked or chronological grid, not the curated shelf.
-  const { visible, hiddenCount, hiddenCampaigns } = useMemo(() => {
-    const all = campaigns ?? [];
-    const hiddenCoords = moderation?.hiddenCoords ?? new Set<string>();
-    let hiddenCount = 0;
-    const visible: ParsedCampaign[] = [];
-    const hiddenCampaigns: ParsedCampaign[] = [];
-
-    for (const c of all) {
-      if (hiddenCoords.has(c.aTag)) {
-        hiddenCount += 1;
-        hiddenCampaigns.push(c);
-        if (isMod && showHidden) visible.push(c);
-      } else {
-        visible.push(c);
-      }
-    }
-
-    return { visible, hiddenCount, hiddenCampaigns };
-  }, [campaigns, isMod, moderation, showHidden]);
-
-  const orderedFeaturedCampaigns = useMemo(() => {
-    if (!featuredCampaigns) return [] as ParsedCampaign[];
-    return [...featuredCampaigns].sort(
-      (a, b) => (moderation.featuredOrder.get(b.aTag) ?? 0) - (moderation.featuredOrder.get(a.aTag) ?? 0),
-    );
-  }, [featuredCampaigns, moderation]);
-
-  // Idle-mode list: featured first; if none are featured, fall back to
-  // the latest chronological grid so the page never lands on an empty
-  // state when there's content to show.
-  const idleCampaigns = useMemo<ParsedCampaign[]>(() => {
-    if (orderedFeaturedCampaigns.length > 0) return orderedFeaturedCampaigns;
-    return visible;
-  }, [orderedFeaturedCampaigns, visible]);
-
   const DEFAULT_VISIBLE = 4;
   const [showAllMine, setShowAllMine] = useState(false);
-  const visibleMine = showAllMine ? (myCampaigns ?? []) : (myCampaigns ?? []).slice(0, DEFAULT_VISIBLE);
-
-  const showSkeleton = isLoading || !moderationReady;
+  const visibleMine = showAllMine
+    ? (myCampaigns ?? [])
+    : (myCampaigns ?? []).slice(0, DEFAULT_VISIBLE);
 
   return (
     <main className="min-h-screen pb-16">
-      <AllCampaignsHero campaignCount={visible.length} />
+      <AllCampaignsHero campaignCount={campaigns?.length ?? 0} />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-10 lg:py-14 space-y-8">
         {user && myCampaigns && myCampaigns.length > 0 && (
@@ -235,116 +132,38 @@ export function AllCampaignsPage() {
           </section>
         )}
 
-        {/* Unified Campaigns section.
-            - Idle (no search / no sort / no country): renders the
-              moderator-curated featured grid, or a chronological
-              fallback if nothing is featured yet.
-            - Active: renders the full search/sort/country result set. */}
-        <section className="space-y-5">
-          <div className="flex flex-col items-stretch gap-4 sm:flex-row sm:items-end sm:justify-between">
-            <div>
-              <h2 className="text-2xl sm:text-3xl font-bold tracking-tight">
-                {activeQuery
-                  ? t('common.search')
-                  : t('campaigns.all.title')}
-              </h2>
-              <p className="text-sm text-muted-foreground mt-1">
-                {activeQuery
-                  ? t('common.searchResultsCount', { count: visible.length })
-                  : t('campaigns.all.sectionTagline')}
-              </p>
-            </div>
-            <DiscoverySearchToolbar
-              query={searchInput}
-              onQueryChange={setSearchInput}
-              sort={sort}
-              onSortChange={setSortFromToolbar}
-              sortOptions={['top', 'new']}
-              searchPlaceholderKey="campaigns.all.searchPlaceholder"
-              searchAriaLabelKey="campaigns.all.searchAriaLabel"
-              showHidden={isMod ? {
-                value: showHidden,
-                onChange: setShowHidden,
-                count: hiddenCount,
-              } : undefined}
-              country={urlCountry}
-              onCountryChange={setCountry}
-            />
-          </div>
+        <CampaignsDiscoverySection
+          filterPersistence="url"
+          showHidden={
+            isMod
+              ? {
+                  value: showHidden,
+                  onChange: setShowHidden,
+                  count: hiddenCount,
+                }
+              : undefined
+          }
+        />
 
-          {/* Grid — widens to 3 columns at lg and 4 at xl so desktop
-              users can scan more campaigns at once, matching the Pledge
-              index's card density. Mobile and small tablets stay
-              single / double column so the cards keep their tappable
-              size. */}
-          {showSkeleton ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
-              {Array.from({ length: 8 }).map((_, i) => (
-                <CampaignCardSkeleton key={i} />
-              ))}
-            </div>
-          ) : (isActive ? visible : idleCampaigns).length === 0 ? (
-            <Card className="border-dashed">
-              <CardContent className="py-12 px-8 text-center space-y-4">
-                <HandHeart className="size-10 text-muted-foreground mx-auto" />
-                <div className="space-y-1.5">
-                  {activeQuery ? (
-                    <>
-                      <h2 className="text-lg font-semibold">
-                        {t('campaigns.all.noMatch', { query: activeQuery })}
-                      </h2>
-                      <p className="text-muted-foreground max-w-sm mx-auto">
-                        {t('campaigns.all.noMatchHint')}
-                      </p>
-                    </>
-                  ) : hiddenCount > 0 && !showHidden ? (
-                    <>
-                      <h2 className="text-lg font-semibold">{t('campaigns.all.allHidden')}</h2>
-                      <p className="text-muted-foreground max-w-sm mx-auto">
-                        {t('campaigns.all.allHiddenHint')}
-                      </p>
-                    </>
-                  ) : (
-                    <>
-                      <h2 className="text-lg font-semibold">{t('campaigns.all.empty')}</h2>
-                      <p className="text-muted-foreground max-w-sm mx-auto">
-                        {t('campaigns.all.emptyHint')}
-                      </p>
-                    </>
-                  )}
-                </div>
-                <Button asChild>
-                  <Link to="/campaigns/new">
-                    <PlusCircle className="size-4 mr-2" />
-                    {t('campaigns.all.startCampaign')}
-                  </Link>
-                </Button>
-              </CardContent>
-            </Card>
-          ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
-              {(isActive ? visible : idleCampaigns).map((campaign) => (
-                <CampaignCard key={campaign.aTag} campaign={campaign} />
-              ))}
-            </div>
-          )}
-        </section>
-
-        {/* Moderator-only: every hidden campaign on the network. Mirrors
-            the section on `/campaigns` so moderators see the same
-            "Hidden" affordance whether they're browsing the curated
-            home or the full index. */}
+        {/* Moderator-only: every hidden campaign on the network matching
+            the current section filters. The section drops hidden items
+            from its main grid unless the toolbar's Show-hidden switch
+            is on; this collapsible always exposes them so a moderator
+            can act on hidden coords without flipping the visibility
+            mode. */}
         {isMod && (
           <ModeratorCollapsibleSection
             icon={<EyeOff className="size-4" />}
             title={t('campaigns.home.hidden')}
             description={t('campaigns.home.hiddenDesc')}
             count={hiddenCampaigns.length}
-            isLoading={showSkeleton}
+            isLoading={!moderation}
             emptyText={t('campaigns.home.hiddenEmpty')}
             skeleton={
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
-                {Array.from({ length: 4 }).map((_, i) => <CampaignCardSkeleton key={i} />)}
+                {Array.from({ length: 4 }).map((_, i) => (
+                  <CampaignCardSkeleton key={i} />
+                ))}
               </div>
             }
           >
@@ -355,7 +174,6 @@ export function AllCampaignsPage() {
             </div>
           </ModeratorCollapsibleSection>
         )}
-
       </div>
     </main>
   );
@@ -485,7 +303,10 @@ function AllCampaignsHero({ campaignCount }: AllCampaignsHeroProps) {
           aria-live="polite"
         >
           <div className="flex items-center justify-center gap-3">
-            <HandHeart className="size-5 text-amber-200 shrink-0 drop-shadow" aria-hidden />
+            <HandHeart
+              className="size-5 text-amber-200 shrink-0 drop-shadow"
+              aria-hidden
+            />
             <span className="text-sm sm:text-base font-semibold tracking-tight text-white drop-shadow-[0_1px_4px_rgb(0_0_0/0.5)]">
               {campaignCount.toLocaleString()}
             </span>

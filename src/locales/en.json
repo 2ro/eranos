@@ -1128,8 +1128,6 @@
       "community": "Community Campaigns",
       "communityDesc": "Help fund the changes worth making.",
       "browseAll": "Browse all campaigns →",
-      "browseAllGroups": "Browse all groups →",
-      "browseAllPledges": "Browse all pledges →",
       "searchPlaceholder": "Search campaigns\u2026",
       "searchAriaLabel": "Search campaigns",
       "noMatch": "No campaigns match \u201c{{query}}\u201d",

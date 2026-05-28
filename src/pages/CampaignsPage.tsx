@@ -1,60 +1,33 @@
-import { useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { useSeoMeta } from '@unhead/react';
 import { Trans, useTranslation } from 'react-i18next';
 import { ArrowRight, PlusCircle } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
-import { Skeleton } from '@/components/ui/skeleton';
-import { CampaignCard, CampaignCardSkeleton } from '@/components/CampaignCard';
-import {
-  CommunityMiniCard,
-  CommunityMiniCardSkeleton,
-} from '@/components/discovery/CommunityMiniCard';
-import { CommunityGrid } from '@/components/discovery/CommunityGrid';
 import { HeroLightningMap } from '@/components/HeroLightningMap';
-import { PledgeCard } from '@/components/PledgeCard';
-import { useActions, type Action } from '@/hooks/useActions';
+import { CampaignsDiscoverySection } from '@/components/discovery/CampaignsDiscoverySection';
+import { GroupsDiscoverySection } from '@/components/discovery/GroupsDiscoverySection';
+import { PledgesDiscoverySection } from '@/components/discovery/PledgesDiscoverySection';
 import { useAppContext } from '@/hooks/useAppContext';
-import { useBtcPrice } from '@/hooks/useBtcPrice';
-import { useCampaigns } from '@/hooks/useCampaigns';
-import { useCampaignModeration } from '@/hooks/useCampaignModeration';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
-import { useFeaturedOrganizations } from '@/hooks/useFeaturedOrganizations';
-import { useOrganizationModeration } from '@/hooks/useOrganizationModeration';
-import { usePledgeModeration } from '@/hooks/usePledgeModeration';
-import type { ParsedCampaign } from '@/lib/campaign';
-import type { ParsedCommunity } from '@/lib/communityUtils';
-
-/** Cap on how many featured campaigns we render in the home-page row. */
-const MAX_FEATURED_CAMPAIGNS = 4;
-/**
- * Cap on featured groups and featured pledges in their respective home-page
- * sections. The dedicated pages render unlimited featured items; the home
- * page is a launchpad, not the canonical list.
- */
-const MAX_FEATURED_PER_SECTION = 8;
-
-function getPledgeCoord(action: Action) {
-  return `36639:${action.pubkey}:${action.id}`;
-}
 
 /**
  * Home page (`/`).
  *
- * A curated launchpad: hero on top, then three featured sections — campaigns,
- * groups, pledges — each capped to a digestible row and linking out to its
- * dedicated browse page (`/campaigns/all`, `/groups`, `/pledges`). The home
- * page intentionally does *not* show community/pending/hidden grids,
- * unmoderated streams, or per-viewer "your X" shelves — those live on the
- * dedicated pages so the home stays scannable on every visit.
+ * Hero on top, then the three discovery sections back-to-back —
+ * Campaigns, Groups, Pledges — each with the same title, tagline,
+ * and search/sort/country toolbar as its dedicated page. Filter
+ * state is purely local here (`filterPersistence="local"`):
+ * persisting three sets of `?q=&sort=&country=` would either
+ * collide (three sections want `?q=`) or pollute the URL with
+ * prefixed variants on every keystroke. Refreshing `/` always
+ * lands on the curated idle view, which matches what we want
+ * anyway. Users who want shareable / persistent filters go to
+ * `/campaigns/all`, `/groups`, or `/pledges`.
  *
- * Each section's "featured" set is derived from the same moderation labels
- * used on its dedicated page, so what surfaces here matches what surfaces
- * there (just truncated). Sections with no featured items collapse silently
- * rather than render an empty card; the page can degrade to "hero + one
- * section" without looking broken.
+ * The home page intentionally omits the moderator-only Hidden
+ * collapsibles and per-viewer "My X" shelves — those live on the
+ * dedicated pages so the home stays scannable on every visit.
  */
 export function CampaignsPage() {
   const { t } = useTranslation();
@@ -70,10 +43,13 @@ export function CampaignsPage() {
     <main className="min-h-screen pb-16">
       <Hero loggedIn={!!user} />
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-10 lg:py-14 space-y-12" id="featured">
-        <FeaturedCampaignsSection />
-        <FeaturedGroupsSection />
-        <FeaturedPledgesSection />
+      <div
+        className="max-w-7xl mx-auto px-4 sm:px-6 py-10 lg:py-14 space-y-12"
+        id="discover"
+      >
+        <CampaignsDiscoverySection filterPersistence="local" />
+        <GroupsDiscoverySection filterPersistence="local" />
+        <PledgesDiscoverySection filterPersistence="local" />
       </div>
     </main>
   );
@@ -189,7 +165,7 @@ function Hero({ loggedIn }: { loggedIn: boolean }) {
                 asChild
                 className="rounded-full h-12 px-6 text-base border-white/30 bg-white/5 text-white hover:bg-white/10 hover:text-white hover:border-white/50"
               >
-                <a href="#featured">{t('campaigns.home.exploreCampaigns')}</a>
+                <a href="#discover">{t('campaigns.home.exploreCampaigns')}</a>
               </Button>
             )}
           </div>
@@ -199,336 +175,4 @@ function Hero({ loggedIn }: { loggedIn: boolean }) {
   );
 }
 
-// ═══════════════════════════════════════════════════════════════════════════════
-// Section header
-// ═══════════════════════════════════════════════════════════════════════════════
-
-function SectionHeader({
-  title,
-  description,
-  browseLabel,
-  browseHref,
-}: {
-  title: string;
-  description: string;
-  browseLabel: string;
-  browseHref: string;
-}) {
-  return (
-    <div className="flex items-end justify-between gap-4">
-      <div>
-        <h2 className="text-2xl sm:text-3xl font-bold tracking-tight">{title}</h2>
-        <p className="text-sm text-muted-foreground mt-1">{description}</p>
-      </div>
-      <Button asChild variant="ghost" size="sm" className="shrink-0">
-        <Link to={browseHref}>
-          {browseLabel}
-          <ArrowRight className="size-4 ms-1 rtl:rotate-180" />
-        </Link>
-      </Button>
-    </div>
-  );
-}
-
-// ═══════════════════════════════════════════════════════════════════════════════
-// Featured Campaigns
-// ═══════════════════════════════════════════════════════════════════════════════
-
-function FeaturedCampaignsSection() {
-  const { t } = useTranslation();
-  const { config } = useAppContext();
-  const { data: moderation, isReady: moderationReady } = useCampaignModeration();
-
-  // Featured slot list — derived from moderation labels. Sorted newest-
-  // featured first, capped, and hidden coords removed so a
-  // featured-then-hidden campaign disappears from the row.
-  const featuredCoords = useMemo(() => {
-    if (!moderation) return [] as string[];
-    return Array.from(moderation.featuredCoords)
-      .filter((c) => !moderation.hiddenCoords.has(c))
-      .sort(
-        (a, b) =>
-          (moderation.featuredOrder.get(b) ?? 0) -
-          (moderation.featuredOrder.get(a) ?? 0),
-      )
-      .slice(0, MAX_FEATURED_CAMPAIGNS);
-  }, [moderation]);
-
-  const { data: featuredCampaigns, isLoading: featuredLoading } = useCampaigns(
-    moderationReady && featuredCoords.length > 0
-      ? { coordinates: featuredCoords, limit: MAX_FEATURED_CAMPAIGNS }
-      : { coordinates: [], limit: MAX_FEATURED_CAMPAIGNS },
-  );
-
-  // Sort the fetched featured campaigns to match the newest-label order.
-  // `useCampaigns` returns them in network order; we want the row to match
-  // the moderation-label ordering.
-  const orderedFeatured = useMemo<ParsedCampaign[]>(() => {
-    if (!moderation || !featuredCampaigns) return [];
-    const order = moderation.featuredOrder;
-    return [...featuredCampaigns]
-      .filter((c) => featuredCoords.includes(c.aTag))
-      .sort((a, b) => (order.get(b.aTag) ?? 0) - (order.get(a.aTag) ?? 0))
-      .slice(0, MAX_FEATURED_CAMPAIGNS);
-  }, [featuredCampaigns, featuredCoords, moderation]);
-
-  const isLoading = !moderationReady || featuredLoading;
-
-  // Once moderation is ready and there's nothing featured, collapse the
-  // section silently — the home page can degrade to "hero + the sections
-  // that have content".
-  if (moderationReady && featuredCoords.length === 0) return null;
-
-  return (
-    <section className="space-y-5">
-      <SectionHeader
-        title={t('campaigns.home.featured')}
-        description={t('campaigns.home.featuredDesc', { appName: config.appName })}
-        browseLabel={t('campaigns.home.browseAll')}
-        browseHref="/campaigns/all"
-      />
-
-      <FeaturedCampaignsRow
-        campaigns={orderedFeatured}
-        isLoading={isLoading}
-        expectedCount={featuredCoords.length}
-      />
-    </section>
-  );
-}
-
-/**
- * Returns the grid class string for an adaptive featured row.
- * Mobile stays 1-column; desktop expands to 2/3/4 columns based on count.
- * Tailwind JIT requires literal class strings, so we spell each variant
- * out rather than building the class name dynamically.
- */
-function featuredGridClass(n: number): string {
-  if (n <= 1) return 'grid grid-cols-1 gap-5';
-  if (n === 2) return 'grid grid-cols-1 md:grid-cols-2 gap-5';
-  if (n === 3) return 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5';
-  return 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5';
-}
-
-function FeaturedCampaignsRow({
-  campaigns,
-  isLoading,
-  expectedCount,
-}: {
-  campaigns: ParsedCampaign[];
-  isLoading: boolean;
-  /** How many featured slots we expect once data resolves. Drives the skeleton column count. */
-  expectedCount: number;
-}) {
-  if (isLoading && campaigns.length === 0) {
-    const skeletonCount = Math.max(
-      1,
-      Math.min(MAX_FEATURED_CAMPAIGNS, expectedCount || 2),
-    );
-    return (
-      <div className={featuredGridClass(skeletonCount)}>
-        {Array.from({ length: skeletonCount }).map((_, i) => (
-          <CampaignCardSkeleton
-            key={i}
-            variant={skeletonCount === 1 ? 'featured' : 'compact'}
-          />
-        ))}
-      </div>
-    );
-  }
-
-  if (campaigns.length === 0) {
-    // Defensive — the parent guards on `featuredCoords.length > 0`, but if
-    // a hidden-after-featured race leaves us with no campaigns to render,
-    // collapse silently rather than show an empty card.
-    return null;
-  }
-
-  // 1 featured campaign gets the hero `variant="featured"` treatment;
-  // 2-4 use the regular compact card sized to the dynamic grid.
-  const useFeaturedVariant = campaigns.length === 1;
-
-  return (
-    <div className={featuredGridClass(campaigns.length)}>
-      {campaigns.map((campaign) => (
-        <CampaignCard
-          key={campaign.aTag}
-          campaign={campaign}
-          variant={useFeaturedVariant ? 'featured' : 'compact'}
-        />
-      ))}
-    </div>
-  );
-}
-
-// ═══════════════════════════════════════════════════════════════════════════════
-// Featured Groups
-// ═══════════════════════════════════════════════════════════════════════════════
-
-function FeaturedGroupsSection() {
-  const { t } = useTranslation();
-  const { data: orgModeration, isReady: orgModerationReady } =
-    useOrganizationModeration();
-  const { data: featuredOrgs, isLoading: featuredOrgsLoading } =
-    useFeaturedOrganizations();
-
-  const featuredGroups = useMemo<ParsedCommunity[]>(() => {
-    if (!featuredOrgs) return [];
-    const hiddenCoords = orgModeration?.hiddenCoords ?? new Set<string>();
-    return featuredOrgs
-      .map((entry) => entry.community)
-      .filter((c) => !hiddenCoords.has(c.aTag))
-      .slice(0, MAX_FEATURED_PER_SECTION);
-  }, [featuredOrgs, orgModeration]);
-
-  // `useFeaturedOrganizations` is internally gated on moderation readiness,
-  // so while moderation labels are still resolving the underlying query is
-  // disabled and reports `isLoading: false` / `data: undefined`. Treat any
-  // of "moderation not ready / featured query in flight / featured data
-  // not yet defined" as loading so the skeleton stays on screen until we
-  // know what's featured.
-  const isLoading =
-    !orgModerationReady || featuredOrgsLoading || featuredOrgs === undefined;
-
-  if (!isLoading && featuredGroups.length === 0) return null;
-
-  return (
-    <section className="space-y-5">
-      <SectionHeader
-        title={t('groups.list.featuredGroups')}
-        description={t('groups.list.featuredGroupsTagline')}
-        browseLabel={t('campaigns.home.browseAllGroups')}
-        browseHref="/groups"
-      />
-
-      {isLoading ? (
-        <CommunityGrid>
-          {Array.from({ length: 8 }).map((_, i) => (
-            <CommunityMiniCardSkeleton key={i} className="w-full" />
-          ))}
-        </CommunityGrid>
-      ) : (
-        <CommunityGrid>
-          {featuredGroups.map((community) => (
-            <CommunityMiniCard
-              key={community.aTag}
-              community={community}
-              className="w-full"
-            />
-          ))}
-        </CommunityGrid>
-      )}
-    </section>
-  );
-}
-
-// ═══════════════════════════════════════════════════════════════════════════════
-// Featured Pledges
-// ═══════════════════════════════════════════════════════════════════════════════
-
-function FeaturedPledgesSection() {
-  const { t } = useTranslation();
-  const { config } = useAppContext();
-  const { data: btcPrice } = useBtcPrice();
-  const { data: pledgeModeration, isReady: pledgeModerationReady } =
-    usePledgeModeration();
-
-  const featuredPledgeCoords = useMemo(() => {
-    if (!pledgeModerationReady) return [] as string[];
-    return Array.from(pledgeModeration.featuredCoords)
-      .filter((coord) => !pledgeModeration.hiddenCoords.has(coord))
-      .sort(
-        (a, b) =>
-          (pledgeModeration.featuredOrder.get(b) ?? 0) -
-          (pledgeModeration.featuredOrder.get(a) ?? 0),
-      )
-      .slice(0, MAX_FEATURED_PER_SECTION);
-  }, [pledgeModeration, pledgeModerationReady]);
-
-  const { data: featuredPledges, isLoading: featuredPledgesLoading } = useActions({
-    coordinates: featuredPledgeCoords,
-    limit: featuredPledgeCoords.length || 1,
-    enabled: pledgeModerationReady && featuredPledgeCoords.length > 0,
-  });
-
-  const orderedFeaturedPledges = useMemo<Action[]>(() => {
-    if (!featuredPledges || !pledgeModerationReady) return [];
-    const order = pledgeModeration.featuredOrder;
-    return [...featuredPledges]
-      .sort((a, b) => {
-        const aCoord = getPledgeCoord(a);
-        const bCoord = getPledgeCoord(b);
-        return (order.get(bCoord) ?? 0) - (order.get(aCoord) ?? 0);
-      })
-      .slice(0, MAX_FEATURED_PER_SECTION);
-  }, [featuredPledges, pledgeModeration, pledgeModerationReady]);
-
-  const isLoading =
-    !pledgeModerationReady ||
-    (featuredPledgeCoords.length > 0 && featuredPledgesLoading);
-
-  // Same silent-collapse rule as the other two sections: once we know
-  // there's nothing featured, drop the heading rather than render an
-  // empty container.
-  if (pledgeModerationReady && featuredPledgeCoords.length === 0) return null;
-
-  return (
-    <section className="space-y-5">
-      <SectionHeader
-        title={t('pledges.list.featuredPledges')}
-        description={t('pledges.list.featuredPledgesTagline', {
-          appName: config.appName,
-        })}
-        browseLabel={t('campaigns.home.browseAllPledges')}
-        browseHref="/pledges"
-      />
-
-      {isLoading ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
-          {Array.from({
-            length: Math.max(
-              1,
-              Math.min(MAX_FEATURED_PER_SECTION, featuredPledgeCoords.length || 4),
-            ),
-          }).map((_, i) => (
-            <PledgeSkeleton key={i} />
-          ))}
-        </div>
-      ) : orderedFeaturedPledges.length > 0 ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
-          {orderedFeaturedPledges.map((action) => (
-            <PledgeCard
-              key={`${action.pubkey}:${action.id}`}
-              action={action}
-              btcPrice={btcPrice}
-              showAuthor
-              showTranslate
-            />
-          ))}
-        </div>
-      ) : (
-        // Defensive — featured coords resolved to a non-empty set but the
-        // events didn't come back (e.g. relay miss). Collapse silently.
-        null
-      )}
-    </section>
-  );
-}
-
-function PledgeSkeleton() {
-  return (
-    <Card className="overflow-hidden border-border/70 shadow-sm h-full flex flex-col">
-      <Skeleton className="aspect-[16/9] w-full rounded-none" />
-      <div className="flex-1 p-5 space-y-3">
-        <Skeleton className="h-5 w-3/4" />
-        <Skeleton className="h-4 w-full" />
-        <Skeleton className="h-4 w-4/5" />
-        <Skeleton className="h-2 w-full" />
-        <Skeleton className="h-4 w-2/3" />
-      </div>
-    </Card>
-  );
-}
-
-// Re-exported so AppRouter's lazy import shape stays identical.
 export default CampaignsPage;
