@@ -315,7 +315,7 @@ export function WalletPage() {
           <>
             <button
               onClick={() => setTxOpen((o) => !o)}
-              className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+              className="!mt-10 flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
             >
               {t('wallet.transactions')}
               <ChevronDown className={`size-3 transition-transform duration-200 ${txOpen ? 'rotate-180' : ''}`} />
