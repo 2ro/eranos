@@ -1081,6 +1081,25 @@ function CampaignWizard({
       <form
         className="flex-1 flex items-start sm:items-center justify-center px-6 pt-16 pb-12"
         onSubmit={onSubmit}
+        // Hitting Enter inside an <input> normally triggers the
+        // form's default submit — and on a non-terminal wizard step
+        // that would silently publish the campaign. Intercept Enter
+        // on non-terminal steps and treat it as "advance" instead, so
+        // keyboard users get the same flow as clicking Next.
+        //
+        // Textarea Enter (story step) is left alone — that's a
+        // legitimate newline character inside the field.
+        onKeyDown={(e) => {
+          if (e.key !== 'Enter') return;
+          if (isTerminal) return;
+          const target = e.target as HTMLElement;
+          if (target.tagName === 'TEXTAREA') return;
+          // IME composition still in progress — don't hijack.
+          if (e.nativeEvent.isComposing) return;
+          e.preventDefault();
+          if (submitting || !canAdvance) return;
+          setStep((s) => Math.min(s + 1, totalSteps));
+        }}
       >
         <div
           key={step}
@@ -1306,23 +1325,28 @@ function WalletPicker({
       ) : (
         <>
           {/* Header — name the current mode, then offer the swap back
-              on its own line beneath. Stacked (not side-by-side) so
-              the link doesn't compete with the title for the eye. */}
+              on its own line beneath. Each child is wrapped in a block
+              `<div>` so the two inline-flex pieces don't end up
+              side-by-side on a wide enough viewport. */}
           <div className="space-y-1">
-            <div className="inline-flex items-center gap-2 text-sm font-medium">
-              <span className="inline-flex size-7 shrink-0 items-center justify-center rounded-full bg-muted text-muted-foreground">
-                <Wallet className="size-3.5" />
-              </span>
-              {t('campaignsCreate.walletCustom')}
+            <div>
+              <div className="inline-flex items-center gap-2 text-sm font-medium">
+                <span className="inline-flex size-7 shrink-0 items-center justify-center rounded-full bg-muted text-muted-foreground">
+                  <Wallet className="size-3.5" />
+                </span>
+                {t('campaignsCreate.walletCustom')}
+              </div>
             </div>
-            <button
-              type="button"
-              onClick={() => onWalletSourceChange('mine')}
-              className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground underline-offset-2 hover:underline focus-visible:outline-none focus-visible:underline"
-            >
-              <ArrowLeft className="h-3 w-3 rtl:rotate-180" />
-              {t('campaignsCreate.walletUseMine')}
-            </button>
+            <div>
+              <button
+                type="button"
+                onClick={() => onWalletSourceChange('mine')}
+                className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground underline-offset-2 hover:underline focus-visible:outline-none focus-visible:underline"
+              >
+                <ArrowLeft className="h-3 w-3 rtl:rotate-180" />
+                {t('campaignsCreate.walletUseMine')}
+              </button>
+            </div>
           </div>
 
           <CustomWalletInput
