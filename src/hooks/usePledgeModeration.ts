@@ -118,7 +118,7 @@ export function usePledgeModeration() {
       queryClient.invalidateQueries({ queryKey: ['pledge-moderation'] });
       // Discovery queries that paint /pledges read from these caches;
       // invalidate so the change reflects immediately.
-      queryClient.invalidateQueries({ queryKey: ['actions'] });
+      queryClient.invalidateQueries({ queryKey: ['agora-actions'] });
       queryClient.invalidateQueries({ queryKey: ['organization-activity'] });
     },
   });

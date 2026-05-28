@@ -47,6 +47,10 @@ import {
 // Skeletons / Cards
 // ─────────────────────────────────────────────────────────────────────────────
 
+function getPledgeCoord(action: Action) {
+  return `36639:${action.pubkey}:${action.id}`;
+}
+
 function ActionSkeleton() {
   return (
     <Card className="overflow-hidden border-border/70 shadow-sm h-full flex flex-col">
@@ -118,7 +122,7 @@ function ActionShareMenu({ action, displayTitle }: { action: Action; displayTitl
         content: t('pledges.card.deletedContent'),
         tags: [
           ['e', action.event.id],
-          ['a', `36639:${action.pubkey}:${action.id}`],
+          ['a', getPledgeCoord(action)],
         ],
       });
       // Extract any organization `A` tag the pledge was associated with so
@@ -192,7 +196,7 @@ function ActionShareMenu({ action, displayTitle }: { action: Action; displayTitl
             bottom of non-mod dropdowns. */}
         {isMod && <DropdownMenuSeparator />}
         <ModerationMenuItems
-          coord={`36639:${action.pubkey}:${action.id}`}
+          coord={getPledgeCoord(action)}
           entityTitle={displayTitle}
           surface="pledge"
           axes={['hide', 'featured']}
@@ -263,27 +267,6 @@ export default function ActionsPage() {
   // Show-hidden switch. Computed here so the search hook stays
   // kind-agnostic.
   const { data: pledgeModeration, isReady: pledgeModerationReady } = usePledgeModeration();
-  const { searchHits, searchHiddenCount } = useMemo(() => {
-    if (!searchHitsRaw) return { searchHits: undefined, searchHiddenCount: 0 };
-    const hiddenCoords = pledgeModeration?.hiddenCoords ?? new Set<string>();
-    let hidden = 0;
-    const visible: Action[] = [];
-    for (const a of searchHitsRaw) {
-      const coord = `36639:${a.pubkey}:${a.id}`;
-      if (hiddenCoords.has(coord)) {
-        hidden += 1;
-        if (showHidden) visible.push(a);
-      } else {
-        visible.push(a);
-      }
-    }
-    return { searchHits: visible, searchHiddenCount: hidden };
-  }, [searchHitsRaw, pledgeModeration, showHidden]);
-
-  const { data: actions, isLoading: actionsLoading } = useActions({
-    countryCode: selectedCountry,
-    limit: 300,
-  });
 
   // Moderator gate. Reuses the campaign moderator pack (Team Soapbox) —
   // the pledge moderation namespace rides the same signer set as the
@@ -291,6 +274,48 @@ export default function ActionsPage() {
   // sections at the bottom of the page.
   const { data: moderators } = useCampaignModerators();
   const isMod = !!user && !!moderators && moderators.includes(user.pubkey);
+  const canShowHidden = isMod && showHidden;
+
+  const { searchHits, searchHiddenCount } = useMemo(() => {
+    if (!searchHitsRaw) return { searchHits: undefined, searchHiddenCount: 0 };
+    const hiddenCoords = pledgeModeration?.hiddenCoords ?? new Set<string>();
+    let hidden = 0;
+    const visible: Action[] = [];
+    for (const a of searchHitsRaw) {
+      const coord = getPledgeCoord(a);
+      if (hiddenCoords.has(coord)) {
+        hidden += 1;
+        if (canShowHidden) visible.push(a);
+      } else {
+        visible.push(a);
+      }
+    }
+    return { searchHits: visible, searchHiddenCount: hidden };
+  }, [searchHitsRaw, pledgeModeration, canShowHidden]);
+
+  const { data: rawActions, isLoading: actionsLoading } = useActions({
+    countryCode: selectedCountry,
+    limit: 300,
+  });
+
+  const { actions, listHiddenCount } = useMemo(() => {
+    if (!rawActions) return { actions: undefined, listHiddenCount: 0 };
+    const hiddenCoords = pledgeModeration?.hiddenCoords ?? new Set<string>();
+    let hidden = 0;
+    const visible: Action[] = [];
+
+    for (const action of rawActions) {
+      const coord = getPledgeCoord(action);
+      if (hiddenCoords.has(coord)) {
+        hidden += 1;
+        if (canShowHidden) visible.push(action);
+      } else {
+        visible.push(action);
+      }
+    }
+
+    return { actions: visible, listHiddenCount: hidden };
+  }, [rawActions, pledgeModeration, canShowHidden]);
 
   // For moderators we pull the full (unfiltered-by-country) pledge
   // stream so the review queue isn't blinkered to whatever country the
@@ -310,7 +335,7 @@ export default function ActionsPage() {
   const pendingPledges = useMemo<Action[]>(() => {
     if (!isMod || !pledgeModerationReady) return [];
     return (allPledgesForMods ?? []).filter((p) => {
-      const coord = `36639:${p.pubkey}:${p.id}`;
+      const coord = getPledgeCoord(p);
       return !pledgeModeration.featuredCoords.has(coord)
         && !pledgeModeration.hiddenCoords.has(coord);
     });
@@ -320,7 +345,7 @@ export default function ActionsPage() {
   const hiddenPledges = useMemo<Action[]>(() => {
     if (!isMod || !pledgeModerationReady) return [];
     return (allPledgesForMods ?? []).filter((p) => {
-      const coord = `36639:${p.pubkey}:${p.id}`;
+      const coord = getPledgeCoord(p);
       return pledgeModeration.hiddenCoords.has(coord);
     });
   }, [isMod, pledgeModerationReady, pledgeModeration, allPledgesForMods]);
@@ -343,7 +368,8 @@ export default function ActionsPage() {
     description: t('pledges.list.seoDescription'),
   });
 
-  const isLoading = actionsLoading;
+  const isLoading = actionsLoading || !pledgeModerationReady;
+  const isSearchLoading = isSearchFetching || !pledgeModerationReady;
 
   // Section split (parser already returns: current → upcoming → past).
   // We re-derive here so that local sorting can be applied per section.
@@ -396,11 +422,11 @@ export default function ActionsPage() {
       onSortChange={setSortMode}
       searchPlaceholderKey="pledges.list.searchPlaceholder"
       searchAriaLabelKey="pledges.list.searchAriaLabel"
-      showHidden={{
-        value: showHidden,
+      showHidden={isMod ? {
+        value: canShowHidden,
         onChange: setShowHidden,
-        count: searchHiddenCount,
-      }}
+        count: isSearching ? searchHiddenCount : listHiddenCount,
+      } : undefined}
       country={selectedCountry}
       onCountryChange={setSelectedCountry}
     />
@@ -435,7 +461,7 @@ export default function ActionsPage() {
               {headerControls}
             </div>
 
-            {isSearchFetching && !searchHits ? (
+            {isSearchLoading && !searchHits ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
                 {Array.from({ length: 8 }).map((_, i) => <ActionSkeleton key={i} />)}
               </div>
@@ -454,7 +480,7 @@ export default function ActionsPage() {
                     topRight={
                       <>
                         <ModerationOverlay
-                          coord={`36639:${action.pubkey}:${action.id}`}
+                          coord={getPledgeCoord(action)}
                           entityTitle={action.title}
                           surface="pledge"
                           axes={['hide', 'featured']}
@@ -636,7 +662,7 @@ export default function ActionsPage() {
                   topRight={
                     <>
                       <ModerationOverlay
-                        coord={`36639:${action.pubkey}:${action.id}`}
+                        coord={getPledgeCoord(action)}
                         entityTitle={action.title}
                         surface="pledge"
                         axes={['hide', 'featured']}
@@ -675,7 +701,7 @@ export default function ActionsPage() {
                   topRight={
                     <>
                       <ModerationOverlay
-                        coord={`36639:${action.pubkey}:${action.id}`}
+                        coord={getPledgeCoord(action)}
                         entityTitle={action.title}
                         surface="pledge"
                         axes={['hide', 'featured']}
@@ -849,7 +875,7 @@ function ActionSection({
             topRight={
               <>
                 <ModerationOverlay
-                  coord={`36639:${action.pubkey}:${action.id}`}
+                  coord={getPledgeCoord(action)}
                   entityTitle={action.title}
                   surface="pledge"
                   axes={['hide', 'featured']}
