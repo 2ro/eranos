@@ -3,6 +3,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 import { useNostrPublish } from './useNostrPublish';
 import { useCampaignModerators } from './useCampaignModerators';
+import { DITTO_RELAY } from '@/lib/appRelays';
 import { CAMPAIGN_KIND } from '@/lib/campaign';
 import {
   AGORA_MODERATION_NAMESPACE,
@@ -61,7 +62,8 @@ export function useCampaignModeration() {
       if (!moderators || moderators.length === 0) {
         return { ...EMPTY_MODERATION_DATA, moderators: [] };
       }
-      const events = await nostr.query(
+      const relay = nostr.relay(DITTO_RELAY);
+      const events = await relay.query(
         [
           {
             kinds: [LABEL_KIND],

@@ -3,6 +3,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 import { useNostrPublish } from './useNostrPublish';
 import { useCampaignModerators } from './useCampaignModerators';
+import { DITTO_RELAY } from '@/lib/appRelays';
 import {
   AGORA_MODERATION_NAMESPACE,
   EMPTY_MODERATION_DATA,
@@ -91,7 +92,8 @@ export function usePledgeModeration({ coordinates, enabled = true }: UsePledgeMo
         limit: coordinates ? Math.max(coordinates.length * 6, 100) : 2000,
       };
 
-      const events = await nostr.query(
+      const relay = nostr.relay(DITTO_RELAY);
+      const events = await relay.query(
         [filter],
         { signal: AbortSignal.any([signal, AbortSignal.timeout(8000)]) },
       );
