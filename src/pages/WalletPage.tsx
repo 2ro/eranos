@@ -378,6 +378,7 @@ function TxRow({ tx, btcPrice }: { tx: HdTransaction; btcPrice?: number }) {
   const { t, i18n } = useTranslation();
   const isReceive = tx.type === 'receive';
   const isSilent = tx.source === 'silent-payment';
+  const isPending = !tx.confirmed;
   return (
     <Link
       to={`/i/bitcoin:tx:${tx.txid}`}
@@ -406,7 +407,14 @@ function TxRow({ tx, btcPrice }: { tx: HdTransaction; btcPrice?: number }) {
               </span>
             )}
           </p>
-          <p className="text-xs text-muted-foreground">{formatTxDate(tx.timestamp, t, i18n.language)}</p>
+          {isPending ? (
+            <p className="text-xs text-orange-500 dark:text-orange-400 inline-flex items-center gap-1">
+              <RefreshCw className="size-3 animate-spin" />
+              {t('wallet.tx.pending')}
+            </p>
+          ) : (
+            <p className="text-xs text-muted-foreground">{formatTxDate(tx.timestamp, t, i18n.language)}</p>
+          )}
         </div>
       </div>
       <div className="text-right">

@@ -82,6 +82,21 @@ export interface AccountScanResult {
    * change).
    */
   rawTransactions: BlockbookTx[];
+  /**
+   * Pre-derived addresses past `firstUnusedIndex` on each chain. Lets
+   * `buildHdTransactions` attribute inflows to a freshly-advertised receive
+   * address whose first incoming payment is still in the mempool — Blockbook
+   * returns the mempool tx under the xpub (and bumps `unconfirmedBalance`),
+   * but the address itself may not appear in `tokens=used` until the tx
+   * confirms. Without this lookahead the pending receive would be silently
+   * dropped from the wallet-level tx list even though the headline pending
+   * balance reflects it.
+   *
+   * Size matches the BIP-44 gap-limit convention (20 per chain). The set is
+   * cheap to compute (one HMAC-SHA512 step per address) and adds no extra
+   * network traffic.
+   */
+  lookaheadAddresses: Set<string>;
 }
 
 /** Aggregated wallet-level transaction row. */
@@ -368,6 +383,28 @@ export async function scanAccount(
   const addressMap = new Map<string, DerivedAddress>();
   for (const sa of scannedByAddress.values()) addressMap.set(sa.derived.address, sa.derived);
 
+  // ── Lookahead address pre-derivation ─────────────────────────
+  //
+  // Blockbook's `tokens=used` list omits addresses whose only activity is
+  // an unconfirmed mempool credit (semantics vary by version; conservative
+  // assumption is that "used" means "has a confirmed transfer"). The
+  // account-level `unconfirmedBalance` still reflects that credit, so the
+  // wallet headline shows it as pending — but `buildHdTransactions` won't
+  // surface the row in the Transactions accordion because the destination
+  // address isn't in `ourAddresses`. To bridge that gap, pre-derive the
+  // next LOOKAHEAD addresses past `firstUnusedIndex` on each chain. The
+  // attribution step folds these into `ourAddresses` so a pending receive
+  // to a fresh address is attributed correctly without depending on
+  // Blockbook's tokens filter behaviour.
+  const LOOKAHEAD = 20;
+  const lookaheadAddresses = new Set<string>();
+  for (let i = 0; i < LOOKAHEAD; i++) {
+    const r = deriveAddress(account.receiveNode, RECEIVE_CHAIN, receive.firstUnusedIndex + i);
+    lookaheadAddresses.add(r.address);
+    const c = deriveAddress(account.changeNode, CHANGE_CHAIN, change.firstUnusedIndex + i);
+    lookaheadAddresses.add(c.address);
+  }
+
   const totalBalance =
     (Number(xpubResponse.balance) || 0) + (Number(xpubResponse.unconfirmedBalance) || 0);
   const pendingBalance = Number(xpubResponse.unconfirmedBalance) || 0;
@@ -380,6 +417,7 @@ export async function scanAccount(
     pendingBalance,
     addressMap,
     rawTransactions: xpubResponse.transactions ?? [],
+    lookaheadAddresses,
   };
 }
 
@@ -408,6 +446,11 @@ export function buildHdTransactions(
   const ourAddresses = new Set<string>();
   for (const sa of result.receive.used) ourAddresses.add(sa.derived.address);
   for (const sa of result.change.used) ourAddresses.add(sa.derived.address);
+  // Fold in the pre-derived lookahead window so pending receives to a
+  // freshly-advertised receive address (which Blockbook may omit from
+  // `tokens=used` while it's mempool-only) get attributed correctly. See
+  // the comment on `AccountScanResult.lookaheadAddresses`.
+  for (const addr of result.lookaheadAddresses) ourAddresses.add(addr);
 
   const out: HdTransaction[] = [];
   for (const tx of result.rawTransactions) {
