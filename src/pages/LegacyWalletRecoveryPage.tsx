@@ -98,6 +98,14 @@ export function LegacyWalletRecoveryPage() {
       badgeClass: 'bg-purple-500',
       badge: 'V1',
     },
+    {
+      id: 'double-tweak',
+      to: '/wallet/double-tweak-fix',
+      labelKey: 'walletLegacy.options.doubleTweak.label',
+      descriptionKey: 'walletLegacy.options.doubleTweak.description',
+      badgeClass: 'bg-sky-500',
+      badge: 'SP',
+    },
   ];
 
   // Was the V2 beta detection actually able to run? The hook reports a

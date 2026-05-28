@@ -52,6 +52,7 @@ const SearchPage = lazy(() => import("./pages/SearchPage").then(m => ({ default:
 const SettingsPage = lazy(() => import("./pages/SettingsPage").then(m => ({ default: m.SettingsPage })));
 const WalletPage = lazy(() => import("./pages/WalletPage").then(m => ({ default: m.WalletPage })));
 const WalletMigrateV1Page = lazy(() => import("./pages/WalletMigrateV1Page").then(m => ({ default: m.WalletMigrateV1Page })));
+const WalletDoubleTweakFixPage = lazy(() => import("./pages/WalletDoubleTweakFixPage").then(m => ({ default: m.WalletDoubleTweakFixPage })));
 const WalletRecoveryPage = lazy(() => import("./pages/WalletRecoveryPage").then(m => ({ default: m.WalletRecoveryPage })));
 const WalletSettingsPage = lazy(() => import("./pages/WalletSettingsPage").then(m => ({ default: m.WalletSettingsPage })));
 const LegacyWalletRecoveryPage = lazy(() => import("./pages/LegacyWalletRecoveryPage").then(m => ({ default: m.LegacyWalletRecoveryPage })));
@@ -165,6 +166,7 @@ export function AppRouter() {
           <Route path="/wallet/settings/legacy" element={<Navigate to="/wallet/legacy" replace />} />
           <Route path="/wallet/recovery" element={<WalletRecoveryPage />} />
           <Route path="/wallet/migrate-v1" element={<WalletMigrateV1Page />} />
+          <Route path="/wallet/double-tweak-fix" element={<WalletDoubleTweakFixPage />} />
           <Route path="/bitcoin" element={<Navigate to="/wallet" replace />} />
           {/* Legacy /help routes redirect to /about so existing links keep
               working. The About page and the two guides themselves live

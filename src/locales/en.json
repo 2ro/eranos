@@ -1359,6 +1359,10 @@
       "v1Breeze": {
         "label": "V1 Breeze Wallet",
         "description": "Sweep the on-chain balance from the legacy Lightning custody."
+      },
+      "doubleTweak": {
+        "label": "Double-tweak SP Fix",
+        "description": "Recover silent payments stranded by an earlier sending bug and sweep them back into your wallet."
       }
     },
     "footnote": "Each option is a one-way sweep into your current wallet. The legacy wallet itself is not restored — only the funds it held are recovered."
@@ -1493,6 +1497,69 @@
       "successTitle": "Migration complete",
       "successDesc": "{{sats}} sats moved to your new wallet."
     }
+  },
+  "walletDoubleTweak": {
+    "seoTitle": "Double-tweak SP Fix",
+    "seoDescription": "Recover silent payments stranded on-chain by an earlier sending bug and sweep them into your wallet.",
+    "title": "Double-tweak SP Fix",
+    "heading": "Recover stranded silent payments",
+    "subheading": "An earlier version of Agora encoded some silent-payment outputs to the wrong key, so they never showed up in your wallet. This tool re-scans the chain for those outputs and sweeps any it finds into your wallet.",
+    "back": "Back",
+    "loggedOut": "Log in with the Nostr identity that received the silent payments so they can be recovered.",
+    "unsupported": {
+      "title": "Wallet unavailable",
+      "description": "Recovery needs a wallet that can sign locally. Log in with your nsec to continue."
+    },
+    "noIndexer": {
+      "title": "No silent-payment indexer configured",
+      "description": "A BIP-352 indexer URL is required to scan for stranded payments. Set one in wallet settings and try again."
+    },
+    "scan": {
+      "title": "Scan for stranded payments",
+      "description": "Choose the block height to start scanning from. Recovery checks every block from there to the chain tip.",
+      "fromHeightLabel": "Start block height",
+      "tipHint": "Current chain tip: {{tip}}",
+      "start": "Scan",
+      "cancel": "Cancel scan",
+      "progress": "Scanning block {{current}} of {{to}} — {{found}} found",
+      "tipMissing": "Resolving chain tip…"
+    },
+    "noFunds": {
+      "title": "Nothing to recover",
+      "description": "No stranded silent payments were found in the scanned range. Try an earlier start height if you expected funds."
+    },
+    "found": {
+      "title": "Stranded payments found",
+      "description": "These outputs can be swept back into your wallet.",
+      "count": "Outputs",
+      "recoverable": "Recoverable"
+    },
+    "destination": {
+      "title": "Funds will be sent to",
+      "description": "A fresh receive address in your current wallet."
+    },
+    "sweepButton": "Recover funds",
+    "sweeping": "Recovering your funds…",
+    "dontClose": "Don't close this page until the recovery finishes.",
+    "success": {
+      "title": "Recovery complete",
+      "sent": "{{sats}} sats recovered to your wallet.",
+      "viewTx": "View transaction"
+    },
+    "error": {
+      "title": "Recovery failed",
+      "tryAgain": "Try again"
+    },
+    "errors": {
+      "noDestination": "No destination address available. Open your wallet first.",
+      "noBlockbook": "No Blockbook server configured. Set one in wallet settings.",
+      "sweepGeneric": "Could not complete the recovery sweep."
+    },
+    "toast": {
+      "successTitle": "Funds recovered",
+      "successDesc": "{{sats}} sats swept into your wallet."
+    },
+    "footnote": "This is a one-way sweep into your current wallet. Only affected silent payments are touched; nothing else changes."
   },
   "walletConnect": {
     "status": "Status",
