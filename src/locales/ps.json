@@ -356,7 +356,7 @@
       "featuredGroups": "ځانګړې ډلې",
       "featuredGroupsTagline": "ځانګړې ډلې چې ستاسو د پاملرنې وړ دي.",
       "allGroups": "ټولې ډلې",
-      "allGroupsTagline": "د {{appName}} ډلې وڅیړئ، یا د Nostr په هره ډله کې لټون وکړئ.",
+      "allGroupsTagline": "ډلې وڅیړئ یا لټون وکړئ.",
       "loginToSeeTitle": "د خپلو ډلو لیدلو لپاره ننوځئ",
       "loginToSeeBody": "هغه ډلې چې تاسو یې جوړې کړي یا یې اداره کوئ به دلته راڅرګندې شي.",
       "noGroupsTitle": "تر اوسه ډلې نشته",

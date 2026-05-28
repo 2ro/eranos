@@ -788,7 +788,7 @@
       "featuredGroups": "Избранные группы",
       "featuredGroupsTagline": "Заметные группы, достойные вашего внимания.",
       "allGroups": "Все группы",
-      "allGroupsTagline": "Просматривайте группы {{appName}} или ищите среди всех групп в Nostr.",
+      "allGroupsTagline": "Просматривайте группы или ищите.",
       "loginToSeeTitle": "Войдите, чтобы увидеть свои группы",
       "loginToSeeBody": "Группы, которые вы основали или модерируете, появятся здесь.",
       "noGroupsTitle": "Пока нет групп",

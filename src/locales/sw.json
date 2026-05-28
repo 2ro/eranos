@@ -787,7 +787,7 @@
       "featuredGroups": "Vikundi maarufu",
       "featuredGroupsTagline": "Vikundi vinavyojitokeza vinavyostahili usikivu wako.",
       "allGroups": "Vikundi vyote",
-      "allGroupsTagline": "Vinjari vikundi vya {{appName}}, au tafuta kati ya kila kikundi kwenye Nostr.",
+      "allGroupsTagline": "Vinjari vikundi au tafuta.",
       "loginToSeeTitle": "Ingia ili kuona vikundi vyako",
       "loginToSeeBody": "Vikundi ulivyounda au unavyosimamia vitaonekana hapa.",
       "noGroupsTitle": "Hakuna vikundi bado",

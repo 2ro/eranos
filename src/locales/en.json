@@ -780,7 +780,7 @@
       "featuredGroups": "Featured groups",
       "featuredGroupsTagline": "Standout groups worth your attention.",
       "allGroups": "All groups",
-      "allGroupsTagline": "Browse {{appName}} groups, or search across every group on Nostr.",
+      "allGroupsTagline": "Browse groups or search.",
       "searchPlaceholder": "Search groups\u2026",
       "searchAriaLabel": "Search groups",
       "noMatch": "No groups match \u201c{{query}}\u201d",

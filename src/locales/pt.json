@@ -788,7 +788,7 @@
       "featuredGroups": "Grupos em destaque",
       "featuredGroupsTagline": "Grupos que se destacam e merecem sua atenção.",
       "allGroups": "Todos os grupos",
-      "allGroupsTagline": "Explore os grupos do {{appName}} ou pesquise em todos os grupos do Nostr.",
+      "allGroupsTagline": "Explore os grupos ou pesquise.",
       "loginToSeeTitle": "Entre para ver seus grupos",
       "loginToSeeBody": "Grupos que você fundou ou modera aparecerão aqui.",
       "noGroupsTitle": "Nenhum grupo ainda",

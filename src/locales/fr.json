@@ -778,7 +778,7 @@
       "featuredGroups": "Groupes mis en avant",
       "featuredGroupsTagline": "Des groupes remarquables qui méritent votre attention.",
       "allGroups": "Tous les groupes",
-      "allGroupsTagline": "Parcourez les groupes {{appName}}, ou cherchez parmi tous les groupes de Nostr.",
+      "allGroupsTagline": "Parcourez les groupes ou recherchez.",
       "loginToSeeTitle": "Connectez-vous pour voir vos groupes",
       "loginToSeeBody": "Les groupes que vous avez fondés ou modérés apparaîtront ici.",
       "noGroupsTitle": "Aucun groupe pour l'instant",

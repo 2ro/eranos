@@ -788,7 +788,7 @@
       "featuredGroups": "Grup unggulan",
       "featuredGroupsTagline": "Grup menonjol yang layak Anda perhatikan.",
       "allGroups": "Semua grup",
-      "allGroupsTagline": "Jelajahi grup {{appName}}, atau cari di setiap grup di Nostr.",
+      "allGroupsTagline": "Jelajahi grup atau cari.",
       "loginToSeeTitle": "Masuk untuk melihat grup Anda",
       "loginToSeeBody": "Grup yang Anda dirikan atau moderasi akan muncul di sini.",
       "noGroupsTitle": "Belum ada grup",

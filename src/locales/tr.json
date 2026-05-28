@@ -787,7 +787,7 @@
       "featuredGroups": "Öne çıkan gruplar",
       "featuredGroupsTagline": "Dikkatinize değer öne çıkan gruplar.",
       "allGroups": "Tüm gruplar",
-      "allGroupsTagline": "{{appName}} gruplarına göz atın veya Nostr'daki her grup arasında arama yapın.",
+      "allGroupsTagline": "Gruplara göz atın veya arama yapın.",
       "loginToSeeTitle": "Gruplarınızı görmek için giriş yapın",
       "loginToSeeBody": "Kurduğunuz veya yönettiğiniz gruplar burada görünecek.",
       "noGroupsTitle": "Henüz grup yok",

@@ -788,7 +788,7 @@
       "featuredGroups": "फ़ीचर्ड ग्रुप",
       "featuredGroupsTagline": "आपके ध्यान के लायक ख़ास ग्रुप।",
       "allGroups": "सभी ग्रुप",
-      "allGroupsTagline": "{{appName}} ग्रुप ब्राउज़ करें, या Nostr के हर ग्रुप में खोजें।",
+      "allGroupsTagline": "ग्रुप ब्राउज़ करें या खोजें।",
       "loginToSeeTitle": "अपने ग्रुप देखने के लिए लॉग इन करें",
       "loginToSeeBody": "आपने जो ग्रुप बनाए या मॉडरेट किए हैं वे यहाँ दिखेंगे।",
       "noGroupsTitle": "अभी कोई ग्रुप नहीं",

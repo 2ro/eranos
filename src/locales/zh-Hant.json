@@ -356,7 +356,7 @@
       "featuredGroups": "精選群組",
       "featuredGroupsTagline": "值得你關注的出色群組。",
       "allGroups": "全部群組",
-      "allGroupsTagline": "瀏覽 {{appName}} 群組,或在 Nostr 上的每個群組中搜尋。",
+      "allGroupsTagline": "瀏覽群組或搜尋。",
       "loginToSeeTitle": "登入以檢視你的群組",
       "loginToSeeBody": "你建立或管理的群組會顯示在這裡。",
       "noGroupsTitle": "還沒有群組",

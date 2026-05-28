@@ -356,7 +356,7 @@
       "featuredGroups": "Grupos destacados",
       "featuredGroupsTagline": "Grupos destacados que merecen tu atención.",
       "allGroups": "Todos los grupos",
-      "allGroupsTagline": "Explora los grupos de {{appName}} o busca entre todos los grupos de Nostr.",
+      "allGroupsTagline": "Explora grupos o busca.",
       "loginToSeeTitle": "Inicia sesión para ver tus grupos",
       "loginToSeeBody": "Los grupos que fundaste o moderas aparecerán aquí.",
       "noGroupsTitle": "Aún no hay grupos",
