@@ -529,8 +529,15 @@ export function buildHdSpendPsbt(args: BuildHdSpendArgs): HdUnsignedPsbt {
       throw new Error('Silent-payment derivation returned unexpected number of outputs.');
     }
     const out: SpSenderOutput = outputs[0];
+    // `out.xOnlyPubKey` IS the final BIP-352 Taproot output key `P_k` and must
+    // be written to the output script verbatim (`OP_1 push32 <P_k>`). It must
+    // NOT be passed through `btc.p2tr()` / `addOutputAddress`, which treat the
+    // key as a Taproot *internal* key and apply the BIP-341 TapTweak again —
+    // producing `taproot_tweak(P_k)` on chain, a key the recipient's BIP-352
+    // scanner never derives (it scans for `P_k`). Build the raw P2TR script
+    // directly instead.
+    tx.addOutput({ script: spP2trScriptPubKey(out.xOnlyPubKey), amount: BigInt(amountSats) });
     resolvedRecipientAddress = out.address;
-    tx.addOutputAddress(out.address, BigInt(amountSats), HD_WALLET_NETWORK);
   }
 
   // ── Optional change ──────────────────────────────────────────

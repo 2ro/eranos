@@ -442,15 +442,24 @@ export function deriveSilentPaymentOutputs(
 
 /** Encode an x-only key as a P2TR address using `@scure/btc-signer`. */
 function encodeP2TR(xonly: Uint8Array, network: SilentPaymentNetwork): string {
+  if (xonly.length !== 32) {
+    throw new Error('Silent payment: P2TR key must be 32 bytes.');
+  }
   const net = network === 'mainnet' ? btc.NETWORK : btc.TEST_NETWORK;
-  // `p2tr(xonly)` here is given the **output** key directly; passing it
-  // without a script tree and reading `.address` yields the bech32m
-  // encoding of `OP_1 push32 <xonly>` for the chosen network.
-  const pay = btc.p2tr(xonly, undefined, net);
-  if (!pay.address) {
+  // `xonly` is the **final** BIP-352 output key `P_k` — it is already the
+  // Taproot output key and must be encoded verbatim as `OP_1 push32 <P_k>`.
+  // We must NOT call `btc.p2tr(xonly)`: that treats `xonly` as an *internal*
+  // key and applies the BIP-341 TapTweak, yielding `taproot_tweak(P_k)` —
+  // a different key the recipient's scanner never derives. Encoding the
+  // `tr` output script directly from the key applies no tweak.
+  // Fresh copy guarantees a plain `ArrayBuffer` backing (the encoder's type
+  // rejects `SharedArrayBuffer`-backed views).
+  const pubkey = new Uint8Array(xonly);
+  const addr = btc.Address(net).encode({ type: 'tr', pubkey });
+  if (!addr) {
     throw new Error('Silent payment: failed to encode P2TR address.');
   }
-  return pay.address;
+  return addr;
 }
 
 /**
