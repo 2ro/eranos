@@ -123,9 +123,18 @@ export function PledgesDiscoverySection({
     },
   });
 
+  // Chronological feed that backs the idle grid (and the
+  // featured-then-chronological fallback). Gated on `!isSearching`
+  // because the search branch renders `searchHits` instead and never
+  // reads `rawActions` / `actions` — leaving this query enabled during
+  // search burns a 300-event relay round-trip on every keystroke that
+  // activates the search view. The idle branch is the only consumer,
+  // and the idle branch only renders when `!isSearching`, so this
+  // gate strictly removes wasted work.
   const { data: rawActions, isLoading: actionsLoading } = useActions({
     countryCode: filters.country,
     limit: 300,
+    enabled: !isSearching,
   });
 
   const { data: pledgeModeration, isReady: pledgeModerationReady } =

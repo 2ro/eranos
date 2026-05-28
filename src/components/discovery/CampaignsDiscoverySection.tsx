@@ -124,7 +124,11 @@ export function CampaignsDiscoverySection({
   const { data: featuredCampaigns } = useCampaigns({
     coordinates: featuredCoords,
     limit: featuredCoords.length || 1,
-    enabled: moderationReady,
+    // Mirrors the pledges section's pattern: don't enable the query
+    // when there are no coords to fetch. `useCampaigns` already
+    // short-circuits internally on an empty `coordinates` array, so
+    // this is purely about not creating a meaningless cache entry.
+    enabled: moderationReady && featuredCoords.length > 0,
   });
 
   const showHiddenValue = showHiddenProp?.value ?? false;
