@@ -153,7 +153,7 @@ export async function fetchAddressData(
 // ---------------------------------------------------------------------------
 
 /** Convert satoshis to a BTC string with up to 8 decimal places. */
-function satsToBTC(sats: number): string {
+export function satsToBTC(sats: number): string {
   return (sats / 100_000_000).toFixed(8);
 }
 
@@ -269,7 +269,7 @@ export interface Transaction {
 // ---------------------------------------------------------------------------
 
 /** A single input in a full transaction. */
-interface TxInput {
+export interface TxInput {
   txid: string;
   vout: number;
   address?: string;
@@ -278,7 +278,7 @@ interface TxInput {
 }
 
 /** A single output in a full transaction. */
-interface TxOutput {
+export interface TxOutput {
   address?: string;
   value: number;
   scriptpubkeyType: string;
@@ -287,7 +287,7 @@ interface TxOutput {
 }
 
 /** Full transaction detail returned by the Esplora API. */
-interface TxDetail {
+export interface TxDetail {
   txid: string;
   version: number;
   locktime: number;

@@ -19,6 +19,7 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar.tsx';
 import { Skeleton } from '@/components/ui/skeleton.tsx';
 import { useLoggedInAccounts, type Account } from '@/hooks/useLoggedInAccounts';
+import { useAuthor } from '@/hooks/useAuthor';
 import { useFeedSettings } from '@/hooks/useFeedSettings';
 import { genUserName } from '@/lib/genUserName';
 
@@ -31,6 +32,16 @@ export function AccountSwitcher({ onAddAccountClick }: AccountSwitcherProps) {
   const { currentUser, otherUsers, isLoading, setLogin, removeLogin } = useLoggedInAccounts();
   const { orderedItems } = useFeedSettings();
   const [isOpen, setIsOpen] = useState(false);
+
+  // Fall back to useAuthor (IndexedDB-cached, longer-running query) when the
+  // useLoggedInAccounts query hasn't returned kind-0 metadata yet. Without this,
+  // a slow/empty relay response leaves currentUser.metadata as {} and the avatar
+  // shows the "A" / "Anonymous" fallback even though the user is logged in.
+  const authorFallback = useAuthor(currentUser?.pubkey);
+  const currentMetadata = {
+    ...(authorFallback.data?.metadata ?? {}),
+    ...(currentUser?.metadata ?? {}),
+  };
 
   if (!currentUser) return null;
 
@@ -47,6 +58,10 @@ export function AccountSwitcher({ onAddAccountClick }: AccountSwitcherProps) {
     return account.metadata.name || account.metadata.display_name || genUserName(account.pubkey);
   }
 
+  const currentDisplayName =
+    currentMetadata.name || currentMetadata.display_name || genUserName(currentUser.pubkey);
+  const currentPicture = currentMetadata.picture;
+
   return (
     <DropdownMenu modal={false} open={isOpen} onOpenChange={setIsOpen}>
       <DropdownMenuTrigger asChild>
@@ -55,8 +70,8 @@ export function AccountSwitcher({ onAddAccountClick }: AccountSwitcherProps) {
             <Skeleton className='w-8 h-8 rounded-full shrink-0' />
           ) : (
             <Avatar className='w-8 h-8'>
-              <AvatarImage src={currentUser.metadata.picture} alt={getDisplayName(currentUser)} />
-              <AvatarFallback>{getDisplayName(currentUser).charAt(0)}</AvatarFallback>
+              <AvatarImage src={currentPicture} alt={currentDisplayName} />
+              <AvatarFallback>{currentDisplayName.charAt(0)}</AvatarFallback>
             </Avatar>
           )}
           <ChevronDown className='w-4 h-4 text-muted-foreground motion-safe:transition-colors group-hover:text-foreground' />
