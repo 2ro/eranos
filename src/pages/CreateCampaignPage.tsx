@@ -9,10 +9,14 @@ import { nip19 } from 'nostr-tools';
 import {
   AlertTriangle,
   ArrowLeft,
+  Bitcoin,
   HandHeart,
   HelpCircle,
   Loader2,
   MapPin,
+  Pencil,
+  Radar,
+  Sparkles,
   Wallet,
   X,
 } from 'lucide-react';
@@ -27,23 +31,20 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
+import { Skeleton } from '@/components/ui/skeleton';
 import { Textarea } from '@/components/ui/textarea';
+import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { useAppContext } from '@/hooks/useAppContext';
 import { useAuthor } from '@/hooks/useAuthor';
+import { useBtcPrice } from '@/hooks/useBtcPrice';
 import { useCampaign } from '@/hooks/useCampaign';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useHdWallet } from '@/hooks/useHdWallet';
 import { useManageableOrganizations } from '@/hooks/useManageableOrganizations';
 import { useNostrPublish } from '@/hooks/useNostrPublish';
 import { useToast } from '@/hooks/useToast';
+import { formatBTC, satsToUSD } from '@/lib/bitcoin';
 import {
   CAMPAIGN_KIND,
   encodeCampaignNaddr,
@@ -655,6 +656,8 @@ export function CreateCampaignPage() {
         silentPaymentSupported={silentPaymentSupported}
         displayName={userDisplayName}
         picture={userMetadata?.picture}
+        totalBalance={hdWallet.totalBalance}
+        balanceLoading={hdWalletAvailable && hdWallet.isLoading}
         walletSource={walletSource}
         onWalletSourceChange={setWalletSource}
         mineAccept={mineAccept}
@@ -1160,27 +1163,31 @@ function CampaignWizard({
 /**
  * Wallet picker for the campaign form.
  *
- * For nsec users we render two dropdowns:
+ * Two modes selectable via a single inline toggle:
  *
- *  1. **Source** — "My wallet" (default) or "Custom".
- *  2. **Accept** — only shown when source is "My wallet". Picks which
- *     donation types the HD-wallet campaign accepts: all, public only,
- *     or private only.
+ *  1. **My wallet** (`'mine'`, default when nsec is available) — a
+ *     compact identity card shows the user's avatar, display name and
+ *     live USD/BTC balance, modelled on the wallet-page balance
+ *     treatment. A small pencil affordance to the right is the entry
+ *     point to swap into custom mode; mirror-link beneath the inputs
+ *     swaps back. The HD-wallet mode also surfaces a segmented
+ *     "Accept" picker (All / Public / Private) that picks which
+ *     donation types the campaign accepts.
+ *  2. **Custom** (`'custom'`) — two address inputs (on-chain + silent
+ *     payment). At least one must parse to a valid endpoint of its
+ *     mode.
  *
- * For users without nsec access (extension / bunker logins) the
- * dropdowns are skipped entirely and we show the two custom inputs
- * directly — that's the only path to a wallet endpoint for those
- * logins.
- *
- * When source is "Custom" the user can fill the on-chain address, the
- * silent-payment code, or both. At least one must parse to a valid
- * endpoint of its mode.
+ * Users without nsec access (extension / bunker logins) never see the
+ * "mine" branch — `hdWalletAvailable` is false and we drop straight
+ * to the custom inputs.
  */
 function WalletPicker({
   hdWalletAvailable,
   silentPaymentSupported,
   displayName,
   picture,
+  totalBalance,
+  balanceLoading,
   walletSource,
   onWalletSourceChange,
   mineAccept,
@@ -1196,6 +1203,10 @@ function WalletPicker({
   silentPaymentSupported: boolean;
   displayName: string;
   picture?: string;
+  /** Live HD-wallet balance in sats (confirmed + pending + SP). */
+  totalBalance: number;
+  /** True while the initial HD scan is still running — drives skeleton. */
+  balanceLoading: boolean;
   walletSource: 'mine' | 'custom';
   onWalletSourceChange: (value: 'mine' | 'custom') => void;
   mineAccept: 'all' | 'public' | 'private';
@@ -1208,85 +1219,122 @@ function WalletPicker({
   parsedCustomSp: ReturnType<typeof parseCampaignWallet>;
 }) {
   const { t } = useTranslation();
+  const { data: btcPrice } = useBtcPrice();
   const initial = displayName.charAt(0).toUpperCase() || '?';
   const myWalletLabel = displayName
     ? t('campaignsCreate.myWalletLabel', { name: displayName })
     : t('campaignsCreate.myWalletDefault');
 
-  return (
-    <div className="space-y-3">
-      {hdWalletAvailable ? (
-        <>
-          <Select value={walletSource} onValueChange={(v) => onWalletSourceChange(v as 'mine' | 'custom')}>
-            <SelectTrigger className="h-12">
-              <SelectValue placeholder={t('campaignsCreate.walletChoose')}>
-                {walletSource === 'custom' ? (
-                  <span className="inline-flex items-center gap-2">
-                    <span className="inline-flex size-7 shrink-0 items-center justify-center rounded-full bg-muted text-muted-foreground">
-                      <Wallet className="size-3.5" />
-                    </span>
-                    <span className="text-sm">{t('campaignsCreate.walletCustom')}</span>
-                  </span>
-                ) : (
-                  <span className="inline-flex items-center gap-2">
-                    <Avatar className="size-7 shrink-0">
-                      <AvatarImage src={picture} alt={displayName} />
-                      <AvatarFallback>{initial}</AvatarFallback>
-                    </Avatar>
-                    <span className="truncate text-sm">{myWalletLabel}</span>
-                  </span>
-                )}
-              </SelectValue>
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="mine">
-                <span className="inline-flex items-center gap-2">
-                  <Avatar className="size-7 shrink-0">
-                    <AvatarImage src={picture} alt={displayName} />
-                    <AvatarFallback>{initial}</AvatarFallback>
-                  </Avatar>
-                  <span className="text-sm">{myWalletLabel}</span>
-                </span>
-              </SelectItem>
-              <SelectItem value="custom">
-                <span className="inline-flex items-center gap-2">
-                  <span className="inline-flex size-7 shrink-0 items-center justify-center rounded-full bg-muted text-muted-foreground">
-                    <Wallet className="size-3.5" />
-                  </span>
-                  <span className="text-sm">{t('campaignsCreate.walletCustom')}</span>
-                </span>
-              </SelectItem>
-            </SelectContent>
-          </Select>
-
-          {walletSource === 'mine' && (
-            <Select
-              value={mineAccept}
-              onValueChange={(v) => onMineAcceptChange(v as 'all' | 'public' | 'private')}
-            >
-              <SelectTrigger className="h-10">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all" disabled={!silentPaymentSupported}>
-                  {t('campaignsCreate.acceptAll')}
-                </SelectItem>
-                <SelectItem value="public">{t('campaignsCreate.acceptPublic')}</SelectItem>
-                <SelectItem value="private" disabled={!silentPaymentSupported}>
-                  {t('campaignsCreate.acceptPrivate')}
-                </SelectItem>
-              </SelectContent>
-            </Select>
-          )}
-        </>
-      ) : (
+  // When no HD wallet is available (extension / bunker login) there's
+  // no "mine" branch to choose — render only the custom inputs with a
+  // short intro line so the user understands what's expected.
+  if (!hdWalletAvailable) {
+    return (
+      <div className="space-y-3">
         <p className="text-xs text-muted-foreground">
           {t('campaignsCreate.customWalletIntro')}
         </p>
-      )}
+        <CustomWalletInput
+          id="campaign-wallet-onchain"
+          label={t('campaignsCreate.bitcoinAddress')}
+          placeholder={t('campaignsCreate.bitcoinAddressPlaceholder')}
+          value={customOnchain}
+          onChange={onCustomOnchainChange}
+          parsed={parsedCustomOnchain}
+          expectedMode="onchain"
+        />
+        <CustomWalletInput
+          id="campaign-wallet-sp"
+          label={t('campaignsCreate.silentPaymentCode')}
+          placeholder={t('campaignsCreate.silentPaymentCodePlaceholder')}
+          value={customSp}
+          onChange={onCustomSpChange}
+          parsed={parsedCustomSp}
+          expectedMode="sp"
+        />
+      </div>
+    );
+  }
 
-      {walletSource === 'custom' && (
-        <div className="space-y-3 pt-1">
+  return (
+    <div className="space-y-4">
+      {walletSource === 'mine' ? (
+        <>
+          {/* Identity + balance card. Tapping the pencil swaps into the
+              custom-wallet inputs without changing wizard step. */}
+          <button
+            type="button"
+            onClick={() => onWalletSourceChange('custom')}
+            aria-label={t('campaignsCreate.walletEditAria')}
+            className="group w-full rounded-2xl border border-border bg-card p-4 text-left transition-colors hover:border-primary/50 hover:bg-card/80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+          >
+            <div className="flex items-center gap-3">
+              <Avatar className="size-10 shrink-0">
+                <AvatarImage src={picture} alt={displayName} />
+                <AvatarFallback>{initial}</AvatarFallback>
+              </Avatar>
+              <div className="min-w-0 flex-1">
+                <p className="truncate text-sm font-semibold">{myWalletLabel}</p>
+                {balanceLoading ? (
+                  <Skeleton className="mt-1 h-4 w-24" />
+                ) : btcPrice ? (
+                  <p className="text-xs text-muted-foreground tabular-nums">
+                    <span className="font-medium text-foreground">
+                      {satsToUSD(totalBalance, btcPrice)}
+                    </span>
+                    <span className="mx-1.5 opacity-60">·</span>
+                    <span>{formatBTC(totalBalance)} BTC</span>
+                  </p>
+                ) : (
+                  <p className="text-xs text-muted-foreground tabular-nums">
+                    {formatBTC(totalBalance)} BTC
+                  </p>
+                )}
+              </div>
+              <Pencil className="size-4 shrink-0 text-muted-foreground transition-colors group-hover:text-foreground" />
+            </div>
+          </button>
+
+          {/* "Use a custom wallet" sub-link — quieter affordance for the
+              same swap, since the pencil alone is easy to miss. */}
+          <button
+            type="button"
+            onClick={() => onWalletSourceChange('custom')}
+            className="text-xs text-muted-foreground hover:text-foreground underline-offset-2 hover:underline focus-visible:outline-none focus-visible:underline"
+          >
+            {t('campaignsCreate.walletUseCustom')}
+          </button>
+
+          {/* Accept-mode segmented picker. Default 'all' (HD + SP); the
+              non-SP options are only relevant if SP is unsupported. */}
+          <AcceptModePicker
+            value={mineAccept}
+            onChange={onMineAcceptChange}
+            silentPaymentSupported={silentPaymentSupported}
+          />
+        </>
+      ) : (
+        <>
+          {/* Header strip — name the current mode and offer the swap
+              back to the user's wallet. Mirrors the pencil card so
+              both directions of the toggle feel symmetric. */}
+          <div className="flex items-center justify-between gap-2">
+            <div className="inline-flex items-center gap-2 text-sm font-medium">
+              <span className="inline-flex size-7 shrink-0 items-center justify-center rounded-full bg-muted text-muted-foreground">
+                <Wallet className="size-3.5" />
+              </span>
+              {t('campaignsCreate.walletCustom')}
+            </div>
+            <button
+              type="button"
+              onClick={() => onWalletSourceChange('mine')}
+              className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground underline-offset-2 hover:underline focus-visible:outline-none focus-visible:underline"
+            >
+              <ArrowLeft className="h-3 w-3 rtl:rotate-180" />
+              {t('campaignsCreate.walletUseMine')}
+            </button>
+          </div>
+
           <CustomWalletInput
             id="campaign-wallet-onchain"
             label={t('campaignsCreate.bitcoinAddress')}
@@ -1305,8 +1353,79 @@ function WalletPicker({
             parsed={parsedCustomSp}
             expectedMode="sp"
           />
-        </div>
+        </>
       )}
+    </div>
+  );
+}
+
+/**
+ * Segmented "Accept" picker for the HD-wallet branch. Three pill
+ * buttons (All / Public / Private) with a one-line caption beneath
+ * that explains the current selection. Public is always available;
+ * the All and Private buttons disable when SP isn't supported
+ * (extension / bunker logins).
+ */
+function AcceptModePicker({
+  value,
+  onChange,
+  silentPaymentSupported,
+}: {
+  value: 'all' | 'public' | 'private';
+  onChange: (next: 'all' | 'public' | 'private') => void;
+  silentPaymentSupported: boolean;
+}) {
+  const { t } = useTranslation();
+
+  const caption = {
+    all: t('campaignsCreate.acceptAllHint'),
+    public: t('campaignsCreate.acceptPublicHint'),
+    private: t('campaignsCreate.acceptPrivateHint'),
+  }[value];
+
+  return (
+    <div className="space-y-2">
+      <ToggleGroup
+        type="single"
+        value={value}
+        // Radix ToggleGroup emits '' when the user toggles off the
+        // selected item. Required campaigns can never be in "no
+        // mode" state — coerce empty back to the previous value.
+        onValueChange={(next) => {
+          if (!next) return;
+          onChange(next as 'all' | 'public' | 'private');
+        }}
+        variant="outline"
+        className="grid w-full grid-cols-3 gap-1.5"
+      >
+        <ToggleGroupItem
+          value="all"
+          disabled={!silentPaymentSupported}
+          className="h-auto justify-center gap-1.5 rounded-full px-3 py-2 text-xs font-medium"
+          aria-label={t('campaignsCreate.acceptAll')}
+        >
+          <Sparkles className="h-3.5 w-3.5" />
+          {t('campaignsCreate.acceptAllShort')}
+        </ToggleGroupItem>
+        <ToggleGroupItem
+          value="public"
+          className="h-auto justify-center gap-1.5 rounded-full px-3 py-2 text-xs font-medium"
+          aria-label={t('campaignsCreate.acceptPublic')}
+        >
+          <Bitcoin className="h-3.5 w-3.5" />
+          {t('campaignsCreate.acceptPublicShort')}
+        </ToggleGroupItem>
+        <ToggleGroupItem
+          value="private"
+          disabled={!silentPaymentSupported}
+          className="h-auto justify-center gap-1.5 rounded-full px-3 py-2 text-xs font-medium"
+          aria-label={t('campaignsCreate.acceptPrivate')}
+        >
+          <Radar className="h-3.5 w-3.5" />
+          {t('campaignsCreate.acceptPrivateShort')}
+        </ToggleGroupItem>
+      </ToggleGroup>
+      <p className="text-xs text-muted-foreground">{caption}</p>
     </div>
   );
 }
