@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 
 import { ImageCropDialog } from '@/components/ImageCropDialog';
 import { Input } from '@/components/ui/input';
+import { useAppContext } from '@/hooks/useAppContext';
 import { useToast } from '@/hooks/useToast';
 import { useUploadFile } from '@/hooks/useUploadFile';
 import { sanitizeUrl } from '@/lib/sanitizeUrl';
@@ -48,6 +49,11 @@ interface CoverImageFieldProps {
    * Maximum long-edge size (px) of the cropped JPEG. Defaults to `1600`
    * — plenty for 2x retina at typical banner widths while keeping uploads
    * well under 1 MB at q=0.92. Pass `0` to disable the cap.
+   *
+   * Honored only when the user's `imageQuality` preference is
+   * `'compressed'` (the default). Users who opt into `'original'` via
+   * Network Settings get the full-resolution crop with no dimension cap,
+   * matching the behavior of ComposeBox / ImageUploadField.
    */
   cropMaxOutputSize?: number;
 }
@@ -70,6 +76,7 @@ interface CoverImageFieldProps {
  */
 export function CoverImageField({ value, onChange, onUploadingChange, onUploadComplete, templates, cropAspect = 3, cropMaxOutputSize = 1600 }: CoverImageFieldProps) {
   const { t } = useTranslation();
+  const { config } = useAppContext();
   const { mutateAsync: uploadFile, isPending: isUploading } = useUploadFile();
   const { toast } = useToast();
   const [isDragging, setIsDragging] = useState(false);
@@ -282,7 +289,7 @@ export function CoverImageField({ value, onChange, onUploadingChange, onUploadCo
           open
           imageSrc={cropImageSrc}
           aspect={cropAspect}
-          maxOutputSize={cropMaxOutputSize || undefined}
+          maxOutputSize={config.imageQuality === 'compressed' ? (cropMaxOutputSize || undefined) : undefined}
           title="Crop cover image"
           onCancel={handleCropCancel}
           onCrop={handleCropConfirm}
