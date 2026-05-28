@@ -81,7 +81,7 @@ export function CommunityMiniCard({ community, className }: CommunityMiniCardPro
             />
           ) : (
             <div className="absolute inset-0 flex items-center justify-center">
-              <Users className="size-10 text-primary/40" />
+              <Users className="size-10 text-primary" />
             </div>
           )}
           {/* Moderator overlay (Hidden badge + kebab). Renders `null` for

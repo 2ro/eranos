@@ -580,7 +580,7 @@ export function CreateCampaignPage() {
         <div className="max-w-2xl mx-auto px-4 sm:px-6 py-12">
           <Card>
             <CardContent className="py-12 px-8 text-center space-y-4">
-              <AlertTriangle className="size-10 text-muted-foreground/60 mx-auto" />
+              <AlertTriangle className="size-10 text-muted-foreground mx-auto" />
               <h2 className="text-xl font-semibold">{t('campaignsCreate.invalidEditTitle')}</h2>
               <p className="text-muted-foreground">
                 {t('campaignsCreate.invalidEditBody')}
@@ -616,7 +616,7 @@ export function CreateCampaignPage() {
         <div className="max-w-2xl mx-auto px-4 sm:px-6 py-12">
           <Card>
             <CardContent className="py-12 px-8 text-center space-y-4">
-              <AlertTriangle className="size-10 text-muted-foreground/60 mx-auto" />
+              <AlertTriangle className="size-10 text-muted-foreground mx-auto" />
               <h2 className="text-xl font-semibold">{t('campaignsCreate.cannotEditTitle')}</h2>
               <p className="text-muted-foreground">
                 {t('campaignsCreate.cannotEditBody')}

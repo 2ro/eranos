@@ -303,7 +303,7 @@ function WalletSummaryCard() {
           <Bitcoin className="size-4 text-orange-500" />
           Wallet
         </div>
-        <ChevronRight className="size-4 text-muted-foreground/50 group-hover:text-muted-foreground motion-safe:transition-colors" />
+        <ChevronRight className="size-4 text-muted-foreground group-hover:text-muted-foreground motion-safe:transition-colors" />
       </div>
 
       {!walletAvailable ? (
@@ -362,7 +362,7 @@ function NotificationCard() {
           <Bell className="size-4" />
           Notifications
         </div>
-        <ChevronRight className="size-4 text-muted-foreground/50 group-hover:text-muted-foreground motion-safe:transition-colors" />
+        <ChevronRight className="size-4 text-muted-foreground group-hover:text-muted-foreground motion-safe:transition-colors" />
       </div>
 
       {isLoading ? (
@@ -559,7 +559,7 @@ function CountriesSection({
         </div>
       ) : (
         <EmptyShelf
-          icon={<Globe2 className="size-7 text-primary/70" />}
+          icon={<Globe2 className="size-7 text-primary" />}
           title="No countries followed"
           body="Follow countries to stay updated on campaigns and conversations happening there."
           ctaLabel="Explore the world"
@@ -613,7 +613,7 @@ function CommunitiesSection({
         ) : (
           <div className="px-4 sm:px-0">
             <EmptyShelf
-              icon={<Users className="size-7 text-primary/70" />}
+              icon={<Users className="size-7 text-primary" />}
               title="No communities yet"
               body="Join a community or start your own to organize around a shared cause."
               ctaLabel="Browse communities"

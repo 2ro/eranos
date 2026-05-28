@@ -357,7 +357,7 @@ export function CampaignsPage() {
           <section className="space-y-5">
             <div>
               <h2 className="text-2xl sm:text-3xl font-bold tracking-tight inline-flex items-center gap-2">
-                <ShieldCheck className="size-6 text-primary/70" />
+                <ShieldCheck className="size-6 text-primary" />
                 {t('campaigns.home.yourCampaigns')}
               </h2>
               <p className="text-sm text-muted-foreground mt-1 max-w-2xl">

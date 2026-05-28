@@ -114,7 +114,7 @@ function TrackDetail({ event }: { event: NostrEvent }) {
             <img src={proxy(parsed.artwork, 320)} alt={parsed.title} className="w-full h-full object-cover" onError={() => setImgError(true)} />
           ) : (
             <div className="w-full h-full flex items-center justify-center bg-primary/10">
-              <Music className="size-12 text-primary/30" />
+              <Music className="size-12 text-primary" />
             </div>
           )}
         </div>
@@ -399,7 +399,7 @@ function PlaylistDetail({ event }: { event: NostrEvent }) {
             <img src={proxy(coverArt, 320)} alt={parsed?.title ?? ''} className="w-full h-full object-cover" onError={() => setImgError(true)} />
           ) : (
             <div className="w-full h-full flex items-center justify-center bg-primary/10">
-              <FallbackIcon className="size-12 text-primary/30" />
+              <FallbackIcon className="size-12 text-primary" />
             </div>
           )}
         </div>
@@ -575,7 +575,7 @@ function PlaylistTrackRow({
           <img src={proxy(parsed.artwork, 96)} alt={parsed.title} className="size-full object-cover" loading="lazy" onError={() => setImgError(true)} />
         ) : (
           <div className="size-full flex items-center justify-center bg-primary/10">
-            <Music className="size-5 text-primary/30" />
+            <Music className="size-5 text-primary" />
           </div>
         )}
       </div>

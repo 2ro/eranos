@@ -128,7 +128,7 @@ export function AwardBadgeDialog({ open, onOpenChange, badgeATag, badgeName }: A
                       </AvatarFallback>
                     </Avatar>
                     <span className="max-w-[100px] truncate">{name}</span>
-                    <X className="size-3 opacity-60" />
+                    <X className="size-3" />
                   </button>
                 );
               })}
@@ -154,12 +154,12 @@ export function AwardBadgeDialog({ open, onOpenChange, badgeATag, badgeName }: A
             </div>
           ) : query.trim().length > 0 ? (
             <div className="flex flex-col items-center justify-center py-10 text-muted-foreground text-sm">
-              <Search className="size-8 mb-2 opacity-30" />
+              <Search className="size-8 mb-2" />
               No users found
             </div>
           ) : (
             <div className="flex flex-col items-center justify-center py-10 text-muted-foreground text-sm">
-              <Search className="size-8 mb-2 opacity-30" />
+              <Search className="size-8 mb-2" />
               Search to find users
             </div>
           )}

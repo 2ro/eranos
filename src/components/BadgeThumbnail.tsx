@@ -84,7 +84,7 @@ export function BadgeThumbnail({ badge, size = 48, className }: BadgeThumbnailPr
           )}
           style={{ width: size, height: size }}
         >
-          <Award className="text-primary/30" style={{ width: size * 0.5, height: size * 0.5 }} />
+          <Award className="text-primary" style={{ width: size * 0.5, height: size * 0.5 }} />
         </div>
       )}
     </div>

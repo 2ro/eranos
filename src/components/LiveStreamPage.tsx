@@ -195,7 +195,7 @@ export function LiveStreamPage({ event }: LiveStreamPageProps) {
           ) : (
             <div className="aspect-video lg:rounded-2xl bg-muted flex items-center justify-center border-y lg:border border-border">
               <div className="text-center space-y-2">
-                <Radio className="size-8 text-muted-foreground/40 mx-auto" />
+                <Radio className="size-8 text-muted-foreground mx-auto" />
                 <p className="text-sm text-muted-foreground">
                   {status === 'planned' ? 'Stream has not started yet' : 'No stream URL available'}
                 </p>

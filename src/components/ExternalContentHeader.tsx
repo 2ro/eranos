@@ -486,7 +486,7 @@ export function BookContentHeader({ isbn }: { isbn: string }) {
             </div>
           ) : (
             <div className="shrink-0 w-[120px] sm:w-[140px] h-[180px] sm:h-[210px] rounded-lg bg-secondary flex items-center justify-center">
-              <BookOpen className="size-10 text-muted-foreground/40" />
+              <BookOpen className="size-10 text-muted-foreground" />
             </div>
           )}
 
@@ -873,7 +873,7 @@ export function CountryContentHeader({ code }: { code: string }) {
   if (!info) {
     return (
       <div className="rounded-2xl border border-border p-5 text-center mx-4">
-        <MapPin className="size-8 mx-auto mb-2 text-muted-foreground/40" />
+        <MapPin className="size-8 mx-auto mb-2 text-muted-foreground" />
         <p className="text-muted-foreground">Unknown country code: {code}</p>
       </div>
     );
@@ -1199,7 +1199,7 @@ function BookPreview({ isbn, link }: { isbn: string; link: string }) {
         />
       ) : (
         <div className="w-9 h-12 rounded bg-secondary flex items-center justify-center shrink-0">
-          <BookOpen className="size-4 text-muted-foreground/40" />
+          <BookOpen className="size-4 text-muted-foreground" />
         </div>
       )}
 
@@ -1312,7 +1312,7 @@ export function CommunityPreview({ addr }: { addr: { kind: number; pubkey: strin
         />
       ) : (
         <div className="size-12 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
-          <Users className="size-5 text-primary/50" />
+          <Users className="size-5 text-primary" />
         </div>
       )}
 
@@ -1390,4 +1390,3 @@ export function ProfilePreview({ pubkey }: { pubkey: string }) {
 // ---------------------------------------------------------------------------
 // Addressable event preview (vines, music, articles, etc.)
 // ---------------------------------------------------------------------------
-

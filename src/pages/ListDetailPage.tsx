@@ -184,7 +184,7 @@ function ListFeedTab({ list }: { list: UserList }) {
   if (list.pubkeys.length === 0) {
     return (
       <div className="py-16 text-center text-muted-foreground">
-        <Users className="size-8 mx-auto mb-2 opacity-50" />
+        <Users className="size-8 mx-auto mb-2" />
         <p className="text-sm">No members in this list yet.</p>
         <p className="text-xs mt-1">Add members to see their posts here.</p>
       </div>
@@ -250,7 +250,7 @@ function ListMembersTab({ list, isOwner }: { list: UserList; isOwner: boolean })
 
       {list.pubkeys.length === 0 ? (
         <div className="py-16 text-center text-muted-foreground">
-          <Users className="size-8 mx-auto mb-2 opacity-50" />
+          <Users className="size-8 mx-auto mb-2" />
           <p className="text-sm">No members yet.</p>
           {isOwner && (
             <p className="text-xs mt-1">Click "Add Members" to search for people.</p>

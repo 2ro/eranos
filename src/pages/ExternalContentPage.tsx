@@ -395,7 +395,7 @@ export function ExternalContentPage() {
           {content.type === 'isbn' && <BookContentHeader isbn={content.value} />}
           {content.type === 'unknown' && (
             <div className="rounded-2xl border border-border p-5 text-center">
-              <Globe className="size-8 mx-auto mb-2 text-muted-foreground/40" />
+              <Globe className="size-8 mx-auto mb-2 text-muted-foreground" />
               <p className="text-sm text-muted-foreground break-all">{content.value}</p>
             </div>
           )}
@@ -518,7 +518,7 @@ export function ExternalContentPage() {
                 </>
               ) : filteredPinnedPosts.length === 0 ? (
                 <div className="py-12 text-center text-muted-foreground text-sm border-t border-border">
-                  <MessageSquare className="size-12 mx-auto mb-4 opacity-30" />
+                  <MessageSquare className="size-12 mx-auto mb-4" />
                   <p className="text-lg font-medium mb-2">No comments yet</p>
                   <p>Be the first to share your thoughts about this!</p>
                 </div>
@@ -626,7 +626,7 @@ function CommentsSkeleton() {
 function CommentsEmptyState() {
   return (
     <div className="py-12 text-center text-muted-foreground text-sm">
-      <MessageSquare className="size-12 mx-auto mb-4 opacity-30" />
+      <MessageSquare className="size-12 mx-auto mb-4" />
       <p className="text-lg font-medium mb-2">No comments yet</p>
       <p>Be the first to share your thoughts about this!</p>
     </div>
@@ -700,7 +700,7 @@ function BookContentTabs({ isbn, commentRoot, orderedReplies, commentsLoading }:
             </FeedCard>
           ) : (
             <div className="py-12 text-center text-muted-foreground text-sm">
-              <Star className="size-12 mx-auto mb-4 opacity-30" />
+              <Star className="size-12 mx-auto mb-4" />
               <p className="text-lg font-medium mb-2">No reviews yet</p>
               <p>Be the first to review this book!</p>
             </div>

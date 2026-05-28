@@ -147,7 +147,7 @@ export function ImageUploadField({
             </>
           ) : (
             <div className="flex flex-col items-center gap-2 px-4 text-muted-foreground">
-              <Upload className="size-5 opacity-50" />
+              <Upload className="size-5" />
               <span className="text-xs">{uploadText}</span>
             </div>
           )}

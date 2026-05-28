@@ -471,7 +471,7 @@ export function EmojiPackDialog({ open, onOpenChange, editEvent }: EmojiPackDial
                 } ${emojis.length > 0 ? 'h-20' : 'h-28'} ${isSubmitting ? 'pointer-events-none opacity-50' : ''}`}
               >
                 <div className="flex flex-col items-center gap-1.5 text-muted-foreground">
-                  <Upload className="size-4 opacity-50" />
+                  <Upload className="size-4" />
                   <span className="text-xs text-center px-4">
                     Drop images or a folder here, or click to browse
                   </span>

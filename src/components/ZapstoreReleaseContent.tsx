@@ -330,7 +330,7 @@ export function ZapstoreReleaseContent({ event, compact }: ZapstoreReleaseConten
             />
           ) : (
             <div className="size-10 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
-              <Package className="size-5 text-primary/50" />
+              <Package className="size-5 text-primary" />
             </div>
           )}
           <div className="flex-1 min-w-0">
@@ -398,7 +398,7 @@ export function ZapstoreReleaseContent({ event, compact }: ZapstoreReleaseConten
           />
         ) : (
           <div className="size-14 rounded-2xl bg-primary/10 flex items-center justify-center shrink-0">
-            <Package className="size-7 text-primary/50" />
+            <Package className="size-7 text-primary" />
           </div>
         )}
 

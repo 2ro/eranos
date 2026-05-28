@@ -493,7 +493,7 @@ export function CreateCommunityPage() {
         <div className="max-w-2xl mx-auto px-4 sm:px-6 py-12">
           <Card>
             <CardContent className="py-12 px-8 text-center space-y-4">
-              <AlertTriangle className="size-10 text-muted-foreground/60 mx-auto" />
+              <AlertTriangle className="size-10 text-muted-foreground mx-auto" />
               <h2 className="text-xl font-semibold">{t('groups.create.invalidEditTitle')}</h2>
               <p className="text-muted-foreground">
                 {t('groups.create.invalidEditBody')}
@@ -532,7 +532,7 @@ export function CreateCommunityPage() {
         <div className="max-w-2xl mx-auto px-4 sm:px-6 py-12">
           <Card>
             <CardContent className="py-12 px-8 text-center space-y-4">
-              <AlertTriangle className="size-10 text-muted-foreground/60 mx-auto" />
+              <AlertTriangle className="size-10 text-muted-foreground mx-auto" />
               <h2 className="text-xl font-semibold">{t('groups.create.cannotEditTitle')}</h2>
               <p className="text-muted-foreground">
                 {t('groups.create.cannotEditBody')}

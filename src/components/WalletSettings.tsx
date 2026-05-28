@@ -140,7 +140,7 @@ export function WalletSettings() {
           {connections.length === 0 ? (
             <Card className="border-dashed">
               <CardContent className="py-10 text-center">
-                <WalletMinimal className="size-8 mx-auto mb-3 text-muted-foreground/50" />
+                <WalletMinimal className="size-8 mx-auto mb-3 text-muted-foreground" />
                 <p className="text-sm text-muted-foreground mb-1">{t('walletConnect.empty.title')}</p>
                 <p className="text-xs text-muted-foreground/70">{t('walletConnect.empty.description')}</p>
               </CardContent>

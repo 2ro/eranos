@@ -41,7 +41,7 @@ function GifThumbnail({ gif, onClick }: { gif: GifResult; onClick: (gif: GifResu
       {/* Error state */}
       {error && (
         <div className="absolute inset-0 flex items-center justify-center bg-muted rounded-lg">
-          <ImageOff className="size-5 text-muted-foreground/40" />
+          <ImageOff className="size-5 text-muted-foreground" />
         </div>
       )}
 
@@ -173,7 +173,7 @@ export function GifPicker({ onSelect }: GifPickerProps) {
           </div>
         ) : isError ? (
           <div className="flex flex-col items-center justify-center h-48 text-muted-foreground">
-            <ImageOff className="size-8 mb-2 opacity-40" />
+            <ImageOff className="size-8 mb-2" />
             <p className="text-sm">Failed to load GIFs</p>
             <p className="text-xs mt-1">Please try again</p>
           </div>
@@ -189,4 +189,3 @@ export function GifPicker({ onSelect }: GifPickerProps) {
     </div>
   );
 }
-

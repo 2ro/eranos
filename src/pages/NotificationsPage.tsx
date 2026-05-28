@@ -969,7 +969,7 @@ function BadgeAwardNotificationGroup({ group }: { group: GroupedNotificationItem
                   <BadgeThumbnail badge={badge} size={36} className="shrink-0" />
                 ) : (
                   <div className="shrink-0 size-9 rounded-lg border border-border bg-gradient-to-br from-primary/10 via-primary/5 to-transparent flex items-center justify-center">
-                    <Award className="size-4 text-primary/30" />
+                    <Award className="size-4 text-primary" />
                   </div>
                 )}
                 <div className="flex-1 min-w-0">

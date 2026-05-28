@@ -230,7 +230,7 @@ export function CalendarEventContent({ event, compact, className }: CalendarEven
         </div>
       ) : (
         <div className="flex items-center justify-center bg-gradient-to-br from-primary/10 via-primary/5 to-transparent py-8">
-          <CalendarDays className="h-10 w-10 text-primary/30" />
+          <CalendarDays className="h-10 w-10 text-primary" />
         </div>
       )}
 

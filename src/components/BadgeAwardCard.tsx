@@ -152,7 +152,7 @@ function BadgeShowcaseFallback({
   const body = (
     <div className="mt-3 rounded-2xl border border-dashed border-border py-10 px-6 flex flex-col items-center gap-3">
       <div className="size-20 rounded-2xl bg-gradient-to-br from-primary/10 via-primary/5 to-transparent flex items-center justify-center">
-        <Award className="size-8 text-primary/40" />
+        <Award className="size-8 text-primary" />
       </div>
       {name ? (
         <p className="text-sm font-semibold text-center">{name}</p>

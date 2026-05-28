@@ -270,7 +270,7 @@ export function ZapstoreAppContent({ event, compact }: ZapstoreAppContentProps) 
             />
           ) : (
             <div className="size-12 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
-              <Package className="size-6 text-primary/50" />
+              <Package className="size-6 text-primary" />
             </div>
           )}
 
@@ -341,7 +341,7 @@ export function ZapstoreAppContent({ event, compact }: ZapstoreAppContentProps) 
           />
         ) : (
           <div className="size-16 rounded-2xl bg-primary/10 flex items-center justify-center shrink-0">
-            <Package className="size-8 text-primary/50" />
+            <Package className="size-8 text-primary" />
           </div>
         )}
 
@@ -449,4 +449,3 @@ export function ZapstoreAppContent({ event, compact }: ZapstoreAppContentProps) 
     </div>
   );
 }
-

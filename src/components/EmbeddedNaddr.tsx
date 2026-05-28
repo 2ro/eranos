@@ -183,7 +183,7 @@ function EmbeddedBadgeCard({ event, className }: { event: NostrEvent; className?
             />
           ) : (
             <div className="size-20 rounded-xl bg-gradient-to-br from-primary/10 via-primary/5 to-transparent flex items-center justify-center">
-              <Award className="size-8 text-primary/30" />
+              <Award className="size-8 text-primary" />
             </div>
           )}
         </div>

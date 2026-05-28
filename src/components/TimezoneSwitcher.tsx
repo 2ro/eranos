@@ -136,7 +136,7 @@ export function TimezoneSwitcher({ value, onChange, className }: TimezoneSwitche
               )}
             </span>
           </div>
-          <ChevronDown className="h-4 w-4 opacity-50 shrink-0" />
+          <ChevronDown className="h-4 w-4 shrink-0" />
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-[320px] p-0" align="start" sideOffset={4}>

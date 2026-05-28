@@ -864,7 +864,7 @@ function BackupKeySection() {
 
   const heading = (
     <div className="flex items-center gap-2 pb-1">
-      <KeyRound className="size-4 text-primary/70" />
+      <KeyRound className="size-4 text-primary" />
       <h2 className="text-sm font-semibold">{t('profileSettings.key.heading')}</h2>
     </div>
   );

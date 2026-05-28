@@ -148,7 +148,7 @@ export function LiveStreamChat({ aTag, className }: LiveStreamChatProps) {
           </div>
         ) : messages.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-12 text-center">
-            <MessageCircle className="size-8 text-muted-foreground/40 mb-2" />
+            <MessageCircle className="size-8 text-muted-foreground mb-2" />
             <p className="text-sm text-muted-foreground">No messages yet</p>
             <p className="text-xs text-muted-foreground/60 mt-1">Be the first to say something!</p>
           </div>
