@@ -884,12 +884,6 @@ export function CreateCampaignPage() {
   }
 
   // ── Create-mode wizard ────────────────────────────────────────────────
-  // Step 1's "Next" is gated on a non-empty title so a user can't reach
-  // later steps with the required field still blank. The wallet field
-  // can't be cleanly gated client-side (it's a multi-mode picker with
-  // live parsing), so we let the submit-time validator catch it via
-  // `formError`.
-  const step1CanAdvance = title.trim().length > 0;
 
   // The org chip surfaces inside step 1 of the wizard so the captive
   // overlay doesn't lose the "publishing under <org>" context that
@@ -905,17 +899,57 @@ export function CreateCampaignPage() {
     />
   );
 
+  // Required-field gates for the wizard's Next buttons. Title is the
+  // only field we can cleanly gate client-side; the wallet picker is
+  // a multi-mode parser whose validity depends on which inputs the
+  // user touched, so we surface that error via the submit-time
+  // validator (formError) once they try to publish.
+  const titleProvided = title.trim().length > 0;
+
   return (
     <CampaignWizard
       orgChip={orgChip}
-      step1={<>{titleSection}{walletSection}</>}
-      step2={<>{bannerSection}{storySection}</>}
-      step3={goalDeadlineSection}
-      step4={<>{countrySection}{tagsSection}</>}
+      steps={[
+        {
+          title: t('campaignsCreate.wizard.titleStepTitle'),
+          subtitle: t('campaignsCreate.wizard.titleStepSubtitle'),
+          body: titleSection,
+        },
+        {
+          title: t('campaignsCreate.wizard.walletStepTitle'),
+          subtitle: t('campaignsCreate.wizard.walletStepSubtitle'),
+          body: walletSection,
+        },
+        {
+          title: t('campaignsCreate.wizard.bannerStepTitle'),
+          subtitle: t('campaignsCreate.wizard.bannerStepSubtitle'),
+          body: bannerSection,
+        },
+        {
+          title: t('campaignsCreate.wizard.storyStepTitle'),
+          subtitle: t('campaignsCreate.wizard.storyStepSubtitle'),
+          body: storySection,
+        },
+        {
+          title: t('campaignsCreate.wizard.goalStepTitle'),
+          subtitle: t('campaignsCreate.wizard.goalStepSubtitle'),
+          body: goalDeadlineSection,
+        },
+        {
+          title: t('campaignsCreate.wizard.tagsStepTitle'),
+          subtitle: t('campaignsCreate.wizard.tagsStepSubtitle'),
+          body: <>{countrySection}{tagsSection}</>,
+        },
+      ]}
+      canAdvanceFromStep={(s) => (s === 1 ? titleProvided : true)}
+      // The shortcut appears once the user has cleared the two
+      // required steps (title @ 1, wallet @ 2). Earlier steps don't
+      // even render the button because the wallet picker hasn't been
+      // shown yet — publishing without it would be a confusing error.
+      launchAvailableFromStep={3}
       errorAlert={errorAlert}
       submitButtonContent={submitButtonContent}
       submitting={submitMutation.isPending || coverUploading}
-      step1CanAdvance={step1CanAdvance}
       onSubmit={handleSubmit}
       onClose={() => navigate(-1)}
     />
@@ -923,6 +957,15 @@ export function CreateCampaignPage() {
 }
 
 // ─── Wizard wrapper ──────────────────────────────────────────────────────────
+
+interface WizardStep {
+  /** Centered heading at the top of the step. Concise — one short phrase. */
+  title: string;
+  /** Muted single-line subtitle beneath the heading. Optional. */
+  subtitle?: string;
+  /** The form fields for this step. */
+  body: ReactNode;
+}
 
 /**
  * Multi-step layout for creating a new campaign.
@@ -934,15 +977,16 @@ export function CreateCampaignPage() {
  * not "another page in the app."
  *
  * Visually it mirrors the captive onboarding: a sticky single-bar
- * progress fill across the top, a top-right X to escape, a centered
- * narrow column for each step, a centered title block, a big
- * rounded-full primary CTA, and a subtle text "Back" link.
+ * progress fill across the top, a top-right X to escape, a top-left
+ * back arrow from step 2 onward, a centered narrow column for each
+ * step, and a big rounded-full primary CTA.
  *
- * Step 1 holds the **required** fields (title + wallet). Once the
- * title is non-empty the user can advance to step 2 *or* publish right
- * then via the "Launch campaign" shortcut — every step from 1 onward
- * shows that shortcut so the rest of the wizard is opt-in. Step 4 is
- * terminal and surfaces "Launch campaign" as the only forward action.
+ * Step 1 holds the **required** title field; step 2 holds the
+ * **required** wallet picker. Once both are filled in, every step from
+ * {@link launchAvailableFromStep} onward surfaces a ghost "Skip Next &
+ * Launch" shortcut beneath the primary Next button so the rest of the
+ * wizard is opt-in. The last step is terminal: its only forward action
+ * is the primary launch button.
  *
  * The form lives in this wrapper (not the parent) so the publish
  * button — wherever it ends up in the wizard — submits the same form
@@ -950,63 +994,47 @@ export function CreateCampaignPage() {
  */
 function CampaignWizard({
   orgChip,
-  step1,
-  step2,
-  step3,
-  step4,
+  steps,
   errorAlert,
   submitButtonContent,
   submitting,
-  step1CanAdvance,
+  canAdvanceFromStep,
+  launchAvailableFromStep,
   onSubmit,
   onClose,
 }: {
   orgChip: ReactNode;
-  step1: ReactNode;
-  step2: ReactNode;
-  step3: ReactNode;
-  step4: ReactNode;
+  /** 1-indexed list of steps. Length determines the total. */
+  steps: WizardStep[];
   errorAlert: ReactNode;
   submitButtonContent: ReactNode;
   submitting: boolean;
-  step1CanAdvance: boolean;
+  /**
+   * Predicate gating forward progress from a given (1-indexed) step.
+   * Return `false` to disable Next on that step. Steps not gated by
+   * this fn are always allowed to advance.
+   */
+  canAdvanceFromStep: (step: number) => boolean;
+  /**
+   * 1-indexed step from which the "Skip Next & Launch" shortcut
+   * appears. Earlier steps render only the Next button — the user
+   * shouldn't be able to publish before the required fields are
+   * collected.
+   */
+  launchAvailableFromStep: number;
   onSubmit: (e: FormEvent) => void;
   onClose: () => void;
 }) {
   const { t } = useTranslation();
-  const [step, setStep] = useState<1 | 2 | 3 | 4>(1);
+  const [step, setStep] = useState(1);
+  const totalSteps = steps.length;
+  const current = steps[step - 1];
+  const isTerminal = step === totalSteps;
+  const progress = (step / totalSteps) * 100;
 
-  const stepTitles: Record<1 | 2 | 3 | 4, string> = {
-    1: t('campaignsCreate.wizard.step1Title'),
-    2: t('campaignsCreate.wizard.step2Title'),
-    3: t('campaignsCreate.wizard.step3Title'),
-    4: t('campaignsCreate.wizard.step4Title'),
-  };
-  const stepSubtitles: Record<1 | 2 | 3 | 4, string> = {
-    1: t('campaignsCreate.wizard.step1Subtitle'),
-    2: t('campaignsCreate.wizard.step2Subtitle'),
-    3: t('campaignsCreate.wizard.step3Subtitle'),
-    4: t('campaignsCreate.wizard.step4Subtitle'),
-  };
-  const stepBodies: Record<1 | 2 | 3 | 4, ReactNode> = {
-    1: (
-      <>
-        {orgChip}
-        {step1}
-      </>
-    ),
-    2: step2,
-    3: step3,
-    4: step4,
-  };
-
-  const progress = (step / 4) * 100;
-
-  // The required-field gate. Step 1 can't advance without it; later
-  // steps assume it's satisfied (the user couldn't have reached them
-  // otherwise) but we keep the same flag wired into the Launch
-  // shortcut for safety.
-  const canSubmit = step1CanAdvance && !submitting;
+  const launchVisible = step >= launchAvailableFromStep;
+  const canAdvance = canAdvanceFromStep(step);
+  const canSubmit = launchVisible && !submitting;
 
   return (
     <div
@@ -1042,7 +1070,7 @@ function CampaignWizard({
       {step > 1 && (
         <button
           type="button"
-          onClick={() => setStep((s) => Math.max(s - 1, 1) as 1 | 2 | 3 | 4)}
+          onClick={() => setStep((s) => Math.max(s - 1, 1))}
           disabled={submitting}
           aria-label={t('campaignsCreate.wizard.back')}
           className="absolute left-4 top-4 sm:left-6 sm:top-6 inline-flex h-9 w-9 items-center justify-center rounded-full text-muted-foreground hover:bg-muted hover:text-foreground transition-colors disabled:opacity-50"
@@ -1063,27 +1091,34 @@ function CampaignWizard({
               heading + muted subtitle, no progress eyebrow (the
               top-of-page bar carries that signal). */}
           <div className="space-y-2 text-center">
-            <h2 className="text-2xl font-bold tracking-tight">{stepTitles[step]}</h2>
-            <p className="text-sm text-muted-foreground">{stepSubtitles[step]}</p>
+            <h2 className="text-2xl font-bold tracking-tight">{current.title}</h2>
+            {current.subtitle && (
+              <p className="text-sm text-muted-foreground">{current.subtitle}</p>
+            )}
           </div>
 
-          {/* Step body. No card chrome — onboarding keeps the content
+          {/* Step body. The org chip rides along on step 1 so the
+              "publishing under <org>" context is the first thing the
+              user sees. No card chrome — onboarding keeps the content
               area visually quiet so the focus stays on the fields. */}
-          <div className="space-y-3">{stepBodies[step]}</div>
+          <div className="space-y-3">
+            {step === 1 && orgChip}
+            {current.body}
+          </div>
 
           {errorAlert}
 
           {/* Footer.
-            - Steps 1–3: primary "Next" (rounded-full h-12) advances the
-              wizard; a ghost "Skip Next & Launch" shortcut sits beneath
-              once the required fields validate, so the rest of the
+            - Non-terminal steps: primary "Next" advances the wizard.
+              From `launchAvailableFromStep` onward a ghost "Skip Next
+              & Launch" shortcut sits beneath it so the rest of the
               wizard is opt-in.
-            - Step 4: primary "Launch campaign" is the only forward
-              action.
+            - Terminal step: primary "Launch campaign" is the only
+              forward action.
             - Back navigation lives in the top-left header chrome, not
               here. */}
           <div className="space-y-3 pt-1">
-            {step === 4 ? (
+            {isTerminal ? (
               <Button
                 type="submit"
                 disabled={!canSubmit}
@@ -1095,20 +1130,22 @@ function CampaignWizard({
               <>
                 <Button
                   type="button"
-                  onClick={() => setStep((s) => Math.min(s + 1, 4) as 1 | 2 | 3 | 4)}
-                  disabled={submitting || (step === 1 && !step1CanAdvance)}
+                  onClick={() => setStep((s) => Math.min(s + 1, totalSteps))}
+                  disabled={submitting || !canAdvance}
                   className="w-full h-12 text-base rounded-full"
                 >
                   {t('campaignsCreate.wizard.next')}
                 </Button>
-                <Button
-                  type="submit"
-                  variant="ghost"
-                  disabled={!canSubmit}
-                  className="w-full"
-                >
-                  {submitting ? submitButtonContent : t('campaignsCreate.wizard.launchNow')}
-                </Button>
+                {launchVisible && (
+                  <Button
+                    type="submit"
+                    variant="ghost"
+                    disabled={!canSubmit}
+                    className="w-full"
+                  >
+                    {submitting ? submitButtonContent : t('campaignsCreate.wizard.launchNow')}
+                  </Button>
+                )}
               </>
             )}
           </div>
