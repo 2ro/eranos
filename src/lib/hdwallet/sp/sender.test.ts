@@ -1,6 +1,9 @@
 import { describe, expect, it } from 'vitest';
 import { hex } from '@scure/base';
 
+import { secp256k1 } from '@noble/curves/secp256k1.js';
+import { bytesToNumberBE } from '@noble/curves/utils.js';
+
 import {
   bip86TweakedPrivateKey,
   decodeSilentPaymentAddress,
@@ -9,6 +12,7 @@ import {
   validateSilentPaymentAddress,
   type SilentPaymentInput,
 } from './sender';
+import { derivePkAtIndex, pointMultiplyCompressed, taggedHash } from './crypto';
 
 import vectors from '../../../test/fixtures/bip352_taproot_vectors.json';
 
@@ -186,5 +190,99 @@ describe('deriveSilentPaymentOutputs — edge cases', () => {
       },
     ];
     expect(deriveSilentPaymentOutputs(inputs, [], { network: 'mainnet' })).toEqual([]);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Regression: Taproot inputs whose signing scalar has an odd-Y pubkey
+// ---------------------------------------------------------------------------
+//
+// A spent silent-payment UTXO contributes its signing scalar `d_k` to the
+// BIP-352 input sum. The recipient's indexer reconstructs `A` from each
+// input's on-chain x-only key lifted to **even-Y**, so the sender MUST
+// contribute the even-Y-normalised scalar (`-d_k` when `d_k·G` is odd-Y).
+// `deriveSilentPaymentOutputs` performs that normalisation only when the
+// input is flagged `isTaproot: true`.
+//
+// A historical bug passed SP inputs with `isTaproot: false`, skipping the
+// negation. The on-chain output then landed at a key the recipient never
+// derives, so the payment was invisible to the receiver. This test pins the
+// fix by running the full sender→receiver round-trip for an input whose
+// `d_k·G` is odd-Y, and asserting the receiver re-derives the output key.
+
+const { Point } = secp256k1;
+
+/** Find a 32-byte scalar whose pubkey has the requested Y parity. */
+function scalarWithParity(start: Uint8Array, oddY: boolean): Uint8Array {
+  const buf = new Uint8Array(start);
+  for (let i = 0; i < 256; i++) {
+    const pub = Point.BASE.multiply(bytesToNumberBE(buf)).toBytes(true);
+    if ((pub[0] === 0x03) === oddY) return buf;
+    buf[31] = (buf[31] + 1) & 0xff;
+  }
+  throw new Error('could not find scalar with requested parity');
+}
+
+describe('deriveSilentPaymentOutputs — odd-Y Taproot input round-trip', () => {
+  it('produces an output the receiver re-derives when d_k·G is odd-Y', () => {
+    // Sender's SP-input signing scalar, chosen so its pubkey has ODD Y.
+    const dk = scalarWithParity(
+      hex.decode('1111111111111111111111111111111111111111111111111111111111111111'),
+      true,
+    );
+    expect(Point.BASE.multiply(bytesToNumberBE(dk)).toBytes(true)[0]).toBe(0x03);
+
+    const input: SilentPaymentInput = {
+      txid: 'a3b1c2d4e5f60718293a4b5c6d7e8f90112233445566778899aabbccddeeff00',
+      vout: 0,
+      privateKey: dk,
+      isTaproot: true,
+    };
+
+    const [output] = deriveSilentPaymentOutputs(
+      [input],
+      [{ address: decodeSilentPaymentAddress(REFERENCE_SP), raw: REFERENCE_SP }],
+      { network: 'mainnet' },
+    );
+
+    // ── Receiver side: reconstruct A by lifting the input key to even-Y,
+    // compute the per-tx tweak, then derive P_0 from bscan/Bspend. ──
+    const decoded = decodeSilentPaymentAddress(REFERENCE_SP);
+    // We don't have bscan for the reference address, so instead verify the
+    // identity the receiver relies on: the sender's output must equal
+    // `B_spend + t_0·G` where `t_0` is derived from the shared secret
+    // `input_hash · a · B_scan`, with `a` the EVEN-Y-normalised scalar.
+    const aEven =
+      Point.BASE.multiply(bytesToNumberBE(dk)).toBytes(true)[0] === 0x03
+        ? (() => {
+            const n = secp256k1.Point.Fn.ORDER;
+            const neg = (n - bytesToNumberBE(dk)) % n;
+            return neg;
+          })()
+        : bytesToNumberBE(dk);
+    const A = Point.BASE.multiply(aEven).toBytes(true);
+
+    // outpoint_L = txid(LE) || vout(LE)
+    const txidLE = hex.decode(input.txid).reverse();
+    const voutLE = new Uint8Array(4);
+    new DataView(voutLE.buffer).setUint32(0, input.vout, true);
+    const outpoint = new Uint8Array(36);
+    outpoint.set(txidLE, 0);
+    outpoint.set(voutLE, 32);
+
+    const inputHash = taggedHash(
+      'BIP0352/Inputs',
+      Uint8Array.from([...outpoint, ...A]),
+    );
+    const n = secp256k1.Point.Fn.ORDER;
+    const combined = (bytesToNumberBE(inputHash) * aEven) % n;
+    // shared secret point = combined · B_scan
+    const shared = pointMultiplyCompressed(
+      decoded.scanPubKey,
+      hex.decode(combined.toString(16).padStart(64, '0')),
+    );
+    const { xonlyPk } = derivePkAtIndex(shared, decoded.spendPubKey, 0);
+
+    expect(hex.encode(output.xOnlyPubKey)).toBe(hex.encode(xonlyPk));
   });
 });

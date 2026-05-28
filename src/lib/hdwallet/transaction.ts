@@ -495,17 +495,21 @@ export function buildHdSpendPsbt(args: BuildHdSpendArgs): HdUnsignedPsbt {
       consumedSpUtxos.push({ txid: utxo.txid, vout: utxo.vout });
 
       if (recipient.kind === 'sp') {
-        // d_k is also the BIP-352 input scalar — it's already the actual
-        // signing scalar for the on-chain P_k output, with no further
-        // BIP-341 tweak to apply. Pass `isTaproot: false` so the sender
-        // module doesn't re-apply odd-Y negation (which would invert d_k).
+        // An SP UTXO's on-chain output `P_k` is an ordinary P2TR key, so this
+        // input is a Taproot input for BIP-352 purposes. The recipient's
+        // indexer reconstructs `A` by lifting each input's on-chain x-only key
+        // to its **even-Y** point, so the sender's contribution `a_i` must be
+        // the even-Y-normalised scalar: negate `d_k` when `d_k·G` has odd Y.
+        // `isTaproot: true` performs exactly that normalisation in
+        // `deriveSilentPaymentOutputs`. (This is independent of input signing,
+        // where BIP-340 handles parity on its own — see `signSpUtxoInput`.)
         const dk = deriveSpUtxoSigningKey(bSpend, tweak);
         wipeAfterBuild.push(dk);
         spSenderInputs.push({
           txid: utxo.txid,
           vout: utxo.vout,
           privateKey: dk,
-          isTaproot: false,
+          isTaproot: true,
         });
       }
     }
