@@ -126,6 +126,10 @@ interface UseActionsOptions {
   countryCode?: string;
   /** Maximum number of events to request from relays. */
   limit?: number;
+  /** Authors to fetch from, e.g. for a user's own pledges. */
+  authors?: string[];
+  /** Restrict to specific `36639:<pubkey>:<d>` coordinates. */
+  coordinates?: string[];
   /** When false, the underlying query never fires. Callers that gate
    *  the list on moderator status (or any other prerequisite) can pass
    *  `enabled: false` to skip the round-trip until the prerequisite
@@ -142,31 +146,60 @@ interface UseActionsOptions {
  * Pledges are user-generated. Country filtering only applies when a country
  * code is provided.
  */
-export function useActions({ countryCode, limit = 50, enabled = true }: UseActionsOptions = {}) {
+export function useActions({
+  countryCode,
+  limit = 50,
+  authors,
+  coordinates,
+  enabled = true,
+}: UseActionsOptions = {}) {
   const { nostr } = useNostr();
   const relay = nostr.relay(DITTO_RELAY);
+  const authorsKey = authors ? [...authors].sort().join(',') : undefined;
+  const coordinatesKey = coordinates ? [...coordinates].sort().join(',') : undefined;
 
   return useQuery({
-    queryKey: ['agora-actions', countryCode, limit],
+    queryKey: ['agora-actions', countryCode, limit, authorsKey, coordinatesKey],
     enabled,
     queryFn: async (c) => {
+      if (coordinates && coordinates.length === 0) return [] as Action[];
+
       const signal = AbortSignal.any([c.signal, AbortSignal.timeout(5000)]);
 
-      const queries: NostrFilter[] = countryCode
-        ? [{
-            kinds: [36639],
-            '#t': ['agora-action', 'pathos-challenge', 'agora-challenge'],
-            '#i': [
-              `iso3166:${countryCode.toUpperCase()}`,
-              `geo:${countryCode.toUpperCase()}`,
-            ],
-            limit,
-          }]
-        : [{
-            kinds: [36639],
-            '#t': ['agora-action', 'pathos-challenge', 'agora-challenge'],
-            limit,
-          }];
+      let queries: NostrFilter[];
+      const countryITags = countryCode
+        ? [`iso3166:${countryCode.toUpperCase()}`, `geo:${countryCode.toUpperCase()}`]
+        : undefined;
+
+      if (coordinates && coordinates.length > 0) {
+        const byAuthor = new Map<string, string[]>();
+        for (const coord of coordinates) {
+          const parts = coord.split(':');
+          if (parts.length < 3 || Number(parts[0]) !== 36639) continue;
+          const pubkey = parts[1];
+          const dTag = parts.slice(2).join(':');
+          if (!pubkey || !dTag) continue;
+          const dTags = byAuthor.get(pubkey) ?? [];
+          dTags.push(dTag);
+          byAuthor.set(pubkey, dTags);
+        }
+
+        queries = Array.from(byAuthor, ([author, dTags]) => {
+          const filter: NostrFilter = { kinds: [36639], authors: [author], '#d': dTags };
+          if (countryITags) filter['#i'] = countryITags;
+          return filter;
+        });
+        if (queries.length === 0) return [] as Action[];
+      } else {
+        const filter: NostrFilter = {
+          kinds: [36639],
+          '#t': ['agora-action', 'pathos-challenge', 'agora-challenge'],
+          limit,
+        };
+        if (countryITags) filter['#i'] = countryITags;
+        if (authors && authors.length > 0) filter.authors = authors;
+        queries = [filter];
+      }
 
       const allEvents = await relay.query(queries, { signal });
 

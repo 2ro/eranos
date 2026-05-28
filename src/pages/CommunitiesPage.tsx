@@ -2,18 +2,16 @@ import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useSeoMeta } from '@unhead/react';
 import { useTranslation } from 'react-i18next';
-import { ChevronDown, ChevronUp, EyeOff, Globe2, HandHeart, Hourglass, PlusCircle, Users } from 'lucide-react';
+import { ChevronDown, ChevronUp, Globe2, HandHeart, PlusCircle, Users } from 'lucide-react';
 
 import { HeroAtmosphere } from '@/components/HeroAtmosphere';
 import { HeroBanner } from '@/components/HeroBanner';
-import { LoginArea } from '@/components/auth/LoginArea';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { CommunityGrid } from '@/components/discovery/CommunityGrid';
 import { CommunityMiniCard, CommunityMiniCardSkeleton } from '@/components/discovery/CommunityMiniCard';
 import { DiscoverySearchToolbar } from '@/components/DiscoverySearchToolbar';
-import { ModeratorCollapsibleSection } from '@/components/moderation';
 import { COOL_PALETTE } from '@/lib/hopePalette';
 import { cn } from '@/lib/utils';
 import { useAppContext } from '@/hooks/useAppContext';
@@ -44,12 +42,7 @@ export function CommunitiesPage() {
 
   // Moderator gate. Reuses the campaign moderator pack (Team Soapbox) —
   // see useOrganizationModeration for why the same pack governs both
-  // surfaces. The `isMod` boolean drives the visibility of the two
-  // collapsible review sections at the bottom of the page; the heavy
-  // discovery + moderation queries that power them are themselves
-  // mounted INSIDE the moderator-only subtree so non-mod viewers don't
-  // pay the cost of fetching 200 orgs and folding labels just to never
-  // render anything.
+  // surfaces.
   const { data: moderators } = useCampaignModerators();
   const isMod = !!user && !!moderators && moderators.includes(user.pubkey);
 
@@ -127,10 +120,24 @@ export function CommunitiesPage() {
     return { searchHits: visible, searchHiddenCount: hidden };
   }, [searchHitsRaw, orgModeration, showHidden]);
 
-  // Search + sort + show-hidden cluster reused on both branches' top
-  // section row. Factored out so the "My groups" heading (curated
-  // layout) and the "Search / Top / New" heading (search-active layout)
-  // both render the same affordance without duplicating the prop list.
+  const { data: allOrgs, isLoading: allOrgsLoading } = useDiscoverCommunities({ limit: 200 });
+  const { allGroups, allHiddenCount } = useMemo(() => {
+    const hiddenCoords = orgModeration?.hiddenCoords ?? new Set<string>();
+    const featuredCoords = orgModeration?.featuredCoords ?? new Set<string>();
+    let hidden = 0;
+    const visible: ParsedCommunity[] = [];
+    for (const org of allOrgs ?? []) {
+      if (hiddenCoords.has(org.aTag)) {
+        hidden += 1;
+        if (isMod && showHidden) visible.push(org);
+      } else if (hasAgoraTag(org.tags) && !featuredCoords.has(org.aTag)) {
+        visible.push(org);
+      }
+    }
+    return { allGroups: visible, allHiddenCount: hidden };
+  }, [allOrgs, isMod, orgModeration, showHidden]);
+
+  // Search + sort + show-hidden cluster for the All section.
   const searchToolbar = (
     <DiscoverySearchToolbar
       query={searchInput}
@@ -139,11 +146,11 @@ export function CommunitiesPage() {
       onSortChange={setSortMode}
       searchPlaceholderKey="groups.list.searchPlaceholder"
       searchAriaLabelKey="groups.list.searchAriaLabel"
-      showHidden={{
+      showHidden={isMod ? {
         value: showHidden,
         onChange: setShowHidden,
-        count: searchHiddenCount,
-      }}
+        count: isSearching ? searchHiddenCount : allHiddenCount,
+      } : undefined}
     />
   );
 
@@ -151,213 +158,101 @@ export function CommunitiesPage() {
     <main className="min-h-screen pb-16 sidebar:pb-0">
       <CommunitiesHero onCreateCommunity={handleCreateCommunity} />
 
-      {isSearching ? (
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-10">
-          <section className="space-y-5">
-            <div className="flex flex-col items-stretch gap-4 sm:flex-row sm:items-end sm:justify-between">
-              <div>
-                <h2 className="text-2xl sm:text-3xl font-bold tracking-tight">
-                  {trimmedSearch
-                    ? t('common.search')
-                    : sortMode === 'top'
-                      ? t('common.sortTop')
-                      : t('common.sortNew')}
-                </h2>
-                {searchHits && (
-                  <p className="text-sm text-muted-foreground mt-1">
-                    {t('common.searchResultsCount', { count: searchHits.length })}
-                  </p>
-                )}
-              </div>
-              {searchToolbar}
-            </div>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 space-y-10 sm:space-y-12 pb-8 pt-10 lg:pt-14">
+        <MyCommunitiesShelf
+          userOrganizations={userOrganizations}
+        />
 
-            {isSearchFetching && !searchHits ? (
-              <CommunityGrid>
-                {Array.from({ length: 8 }).map((_, i) => (
-                  <CommunityMiniCardSkeleton key={i} className="w-full" />
-                ))}
-              </CommunityGrid>
-            ) : searchHits && searchHits.length > 0 ? (
-              <CommunityGrid>
-                {searchHits.map((community) => (
-                  <CommunityMiniCard
-                    key={community.aTag}
-                    community={community}
-                    className="w-full"
-                  />
-                ))}
-              </CommunityGrid>
-            ) : (
-              <Card className="border-dashed">
-                <CardContent className="py-12 px-8 text-center space-y-2">
-                  {trimmedSearch ? (
-                    <>
-                      <p className="text-base font-medium">
-                        {t('groups.list.noMatch', { query: trimmedSearch })}
-                      </p>
+        <FeaturedOrganizationsShelf />
+
+        <section className="space-y-5">
+          <div className="flex flex-col items-stretch gap-4 sm:flex-row sm:items-end sm:justify-between">
+            <div>
+              <h2 className="text-2xl sm:text-3xl font-bold tracking-tight">
+                {trimmedSearch
+                  ? t('common.search')
+                  : isSearching && sortMode === 'top'
+                    ? t('common.sortTop')
+                    : isSearching && sortMode === 'new'
+                      ? t('common.sortNew')
+                      : t('groups.list.allGroups')}
+              </h2>
+              <p className="text-sm text-muted-foreground mt-1">
+                {isSearching && searchHits
+                  ? t('common.searchResultsCount', { count: searchHits.length })
+                  : t('groups.list.allGroupsTagline')}
+              </p>
+            </div>
+            {searchToolbar}
+          </div>
+
+          {isSearching ? (
+            <>
+              {isSearchFetching && !searchHits ? (
+                <CommunityGrid>
+                  {Array.from({ length: 8 }).map((_, i) => (
+                    <CommunityMiniCardSkeleton key={i} className="w-full" />
+                  ))}
+                </CommunityGrid>
+              ) : searchHits && searchHits.length > 0 ? (
+                <CommunityGrid>
+                  {searchHits.map((community) => (
+                    <CommunityMiniCard
+                      key={community.aTag}
+                      community={community}
+                      className="w-full"
+                    />
+                  ))}
+                </CommunityGrid>
+              ) : (
+                <Card className="border-dashed">
+                  <CardContent className="py-12 px-8 text-center space-y-2">
+                    {trimmedSearch ? (
+                      <>
+                        <p className="text-base font-medium">
+                          {t('groups.list.noMatch', { query: trimmedSearch })}
+                        </p>
+                        <p className="text-sm text-muted-foreground">
+                          {t('groups.list.noMatchHint')}
+                        </p>
+                      </>
+                    ) : (
                       <p className="text-sm text-muted-foreground">
-                        {t('groups.list.noMatchHint')}
+                        {t('groups.list.noFeaturedBody', { appName: config.appName })}
                       </p>
-                    </>
-                  ) : (
-                    <p className="text-sm text-muted-foreground">
-                      {t('groups.list.noFeaturedBody', { appName: config.appName })}
-                    </p>
-                  )}
-                </CardContent>
-              </Card>
-            )}
-          </section>
-        </div>
-      ) : (
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 space-y-10 sm:space-y-12 pb-8 pt-10 lg:pt-14">
-          <section className="space-y-5">
-            <div className="flex flex-col items-stretch gap-4 sm:flex-row sm:items-end sm:justify-between">
-              <div>
-                <h2 className="text-2xl sm:text-3xl font-bold tracking-tight">
-                  {t('groups.list.myGroups')}
-                </h2>
-                <p className="text-sm text-muted-foreground mt-1">
-                  {t('groups.list.myGroupsTagline')}
+                    )}
+                  </CardContent>
+                </Card>
+              )}
+            </>
+          ) : allOrgsLoading ? (
+            <CommunityGrid>
+              {Array.from({ length: 8 }).map((_, i) => (
+                <CommunityMiniCardSkeleton key={i} className="w-full" />
+              ))}
+            </CommunityGrid>
+          ) : allGroups.length > 0 ? (
+            <CommunityGrid>
+              {allGroups.map((community) => (
+                <CommunityMiniCard
+                  key={community.aTag}
+                  community={community}
+                  className="w-full"
+                />
+              ))}
+            </CommunityGrid>
+          ) : (
+            <Card className="border-dashed">
+              <CardContent className="py-12 px-8 text-center space-y-2">
+                <p className="text-sm text-muted-foreground">
+                  {t('groups.list.noFeaturedBody', { appName: config.appName })}
                 </p>
-              </div>
-              {searchToolbar}
-            </div>
-            <MyCommunitiesShelf
-              userOrganizations={userOrganizations}
-              onCreateCommunity={handleCreateCommunity}
-            />
-          </section>
-
-          <section className="space-y-5">
-            <div className="flex flex-col items-stretch gap-4 sm:flex-row sm:items-end sm:justify-between">
-              <div>
-                <h2 className="text-2xl sm:text-3xl font-bold tracking-tight">
-                  {t('groups.list.featuredGroups')}
-                </h2>
-                <p className="text-sm text-muted-foreground mt-1">
-                  {t('groups.list.featuredGroupsTagline')}
-                </p>
-              </div>
-            </div>
-            <FeaturedOrganizationsShelf />
-          </section>
-
-          {/* Moderator-only review sections: "Needs review" and "Hidden".
-              Organizations have a two-axis moderation model (featured /
-              hidden — no approval gate), so anything not yet labelled
-              simply lives in the public Featured-or-not space. The Needs
-              review queue surfaces unlabelled Agora-tagged orgs so
-              moderators can pick what to feature or hide. */}
-          {isMod && <ModeratorReviewSections />}
-        </div>
-      )}
+              </CardContent>
+            </Card>
+          )}
+        </section>
+      </div>
     </main>
-  );
-}
-
-// ═══════════════════════════════════════════════════════════════════════════════
-// Moderator review sections
-// ═══════════════════════════════════════════════════════════════════════════════
-
-/**
- * Renders the "Needs review" and "Hidden" rails for moderators only.
- *
- * Organizations don't have an `approved` axis (unlike campaigns) — every
- * Agora-tagged org is publicly visible by default. Moderation reduces to:
- *
- * - **Needs review** — orgs minted through Agora (carry `t:agora`) that
- *   have no featured or hidden label yet. These are candidates for
- *   either lifting into Featured or suppressing with Hidden.
- * - **Hidden** — orgs whose latest hide-axis label is `hidden`.
- *
- * The component owns its own data fetches (discovery pool + moderation
- * rollup) so the page can mount it conditionally on `isMod` and skip
- * both queries entirely for the overwhelmingly common non-moderator
- * case. Mirrors the campaign side's `ModeratorSection` pattern
- * (collapsible, defaults to open when the list is short).
- */
-function ModeratorReviewSections() {
-  const { t } = useTranslation();
-  const { config } = useAppContext();
-  // Wider pull than the public discovery shelf so reviewers see deeper
-  // history. Bumping the limit further would just add network cost —
-  // anything truly old can be reviewed by visiting it directly.
-  const { data: allOrgs, isLoading } = useDiscoverCommunities({ limit: 200 });
-  const { data: moderation, isReady } = useOrganizationModeration();
-
-  const needsReviewOrgs = useMemo(() => {
-    if (!moderation || !allOrgs) return [] as ParsedCommunity[];
-    return allOrgs.filter(
-      (org) =>
-        // Restrict the review queue to orgs minted through Agora's create
-        // flow. Without this gate, every kind 34550 community on the
-        // network would appear here — including badge-gated NIP-72
-        // communities, music scenes, etc. — none of which Agora moderators
-        // should be expected to triage.
-        hasAgoraTag(org.tags) &&
-        !moderation.featuredCoords.has(org.aTag) &&
-        !moderation.hiddenCoords.has(org.aTag),
-    );
-  }, [moderation, allOrgs]);
-
-  const hiddenOrgs = useMemo(() => {
-    if (!moderation || !allOrgs) return [] as ParsedCommunity[];
-    return allOrgs.filter((org) => moderation.hiddenCoords.has(org.aTag));
-  }, [moderation, allOrgs]);
-
-  const sectionsLoading = isLoading || !isReady;
-
-  return (
-    <>
-      <ModeratorCollapsibleSection
-        icon={<Hourglass className="size-4" />}
-        title={t('groups.list.needsReview')}
-        description={t('groups.list.needsReviewDesc', { appName: config.appName })}
-        count={needsReviewOrgs.length}
-        isLoading={sectionsLoading}
-        emptyText={t('groups.list.needsReviewEmpty')}
-        size="compact"
-        triggerPaddingClassName="pb-3"
-        skeleton={
-          <CommunityGrid>
-            {Array.from({ length: 4 }).map((_, i) => (
-              <CommunityMiniCardSkeleton key={i} className="w-full" />
-            ))}
-          </CommunityGrid>
-        }
-      >
-        <CommunityGrid>
-          {needsReviewOrgs.map((org) => (
-            <CommunityMiniCard key={org.aTag} community={org} className="w-full" />
-          ))}
-        </CommunityGrid>
-      </ModeratorCollapsibleSection>
-      <ModeratorCollapsibleSection
-        icon={<EyeOff className="size-4" />}
-        title={t('groups.list.hidden')}
-        description={t('groups.list.hiddenDesc')}
-        count={hiddenOrgs.length}
-        isLoading={sectionsLoading}
-        emptyText={t('groups.list.hiddenEmpty')}
-        size="compact"
-        triggerPaddingClassName="pb-3"
-        skeleton={
-          <CommunityGrid>
-            {Array.from({ length: 4 }).map((_, i) => (
-              <CommunityMiniCardSkeleton key={i} className="w-full" />
-            ))}
-          </CommunityGrid>
-        }
-      >
-        <CommunityGrid>
-          {hiddenOrgs.map((org) => (
-            <CommunityMiniCard key={org.aTag} community={org} className="w-full" />
-          ))}
-        </CommunityGrid>
-      </ModeratorCollapsibleSection>
-    </>
   );
 }
 
@@ -541,39 +436,33 @@ type UserOrganizationsResult = ReturnType<typeof useUserOrganizations>;
 
 function MyCommunitiesShelf({
   userOrganizations,
-  onCreateCommunity,
 }: {
   userOrganizations: UserOrganizationsResult;
-  onCreateCommunity: () => void;
 }) {
   const { t } = useTranslation();
   const { user } = useCurrentUser();
 
-  if (!user) {
-    return (
-      <EmptyShelf
-        icon={<Users className="size-7 text-primary" />}
-        title={t('groups.list.loginToSeeTitle')}
-        body={t('groups.list.loginToSeeBody')}
-        action={<LoginArea className="max-w-60" />}
-      />
-    );
-  }
+  if (!user) return null;
 
   return (
-    <MyCommunitiesShelfContent
-      userOrganizations={userOrganizations}
-      onCreateCommunity={onCreateCommunity}
-    />
+    <section className="space-y-5">
+      <div>
+        <h2 className="text-2xl sm:text-3xl font-bold tracking-tight">
+          {t('groups.list.myGroups')}
+        </h2>
+        <p className="text-sm text-muted-foreground mt-1">
+          {t('groups.list.myGroupsTagline')}
+        </p>
+      </div>
+      <MyCommunitiesShelfContent userOrganizations={userOrganizations} />
+    </section>
   );
 }
 
 function MyCommunitiesShelfContent({
   userOrganizations,
-  onCreateCommunity,
 }: {
   userOrganizations: UserOrganizationsResult;
-  onCreateCommunity: () => void;
 }) {
   const { t } = useTranslation();
   // "My organizations" = orgs the user founded, moderates, or follows.
@@ -592,21 +481,7 @@ function MyCommunitiesShelfContent({
     );
   }
 
-  if (!organizations || organizations.length === 0) {
-    return (
-      <EmptyShelf
-        icon={<Users className="size-7 text-primary" />}
-        title={t('groups.list.noGroupsTitle')}
-        body={t('groups.list.noGroupsBody')}
-        action={(
-          <Button type="button" onClick={onCreateCommunity} className="rounded-full">
-            <PlusCircle className="size-4 mr-2" />
-            {t('groups.list.createGroup')}
-          </Button>
-        )}
-      />
-    );
-  }
+  if (!organizations || organizations.length === 0) return null;
 
   const COLLAPSED_COUNT = 4;
   const visible = expanded ? organizations : organizations.slice(0, COLLAPSED_COUNT);
@@ -651,66 +526,50 @@ function MyCommunitiesShelfContent({
 }
 
 function FeaturedOrganizationsShelf() {
-  const { t } = useTranslation();
-  const { config } = useAppContext();
   const { data: featured, isLoading, isPending } = useFeaturedOrganizations();
   const hasFeatured = !!featured && featured.length > 0;
 
   if ((isPending || isLoading) && !hasFeatured) {
     return (
-      <CommunityGrid>
-        {Array.from({ length: 8 }).map((_, i) => (
-          <CommunityMiniCardSkeleton key={i} className="w-full" />
-        ))}
-      </CommunityGrid>
+      <section className="space-y-5">
+        <FeaturedOrganizationsHeading />
+        <CommunityGrid>
+          {Array.from({ length: 8 }).map((_, i) => (
+            <CommunityMiniCardSkeleton key={i} className="w-full" />
+          ))}
+        </CommunityGrid>
+      </section>
     );
   }
 
-  if (!hasFeatured) {
-    return (
-      <EmptyShelf
-        icon={<Users className="size-7 text-primary" />}
-        title={t('groups.list.noFeaturedTitle')}
-        body={t('groups.list.noFeaturedBody', { appName: config.appName })}
-        action={null}
-      />
-    );
-  }
+  if (!hasFeatured) return null;
 
   return (
-    <CommunityGrid>
-      {featured.map((entry) => (
-        <CommunityMiniCard
-          key={entry.community.aTag}
-          community={entry.community}
-          className="w-full"
-        />
-      ))}
-    </CommunityGrid>
+    <section className="space-y-5">
+      <FeaturedOrganizationsHeading />
+      <CommunityGrid>
+        {featured.map((entry) => (
+          <CommunityMiniCard
+            key={entry.community.aTag}
+            community={entry.community}
+            className="w-full"
+          />
+        ))}
+      </CommunityGrid>
+    </section>
   );
 }
 
-function EmptyShelf({
-  icon,
-  title,
-  body,
-  action,
-}: {
-  icon: React.ReactNode;
-  title: string;
-  body: string;
-  action: React.ReactNode;
-}) {
+function FeaturedOrganizationsHeading() {
+  const { t } = useTranslation();
   return (
-    <Card className="border-dashed">
-      <CardContent className="py-10 px-6 text-center space-y-3 flex flex-col items-center">
-        <div className="p-3 rounded-full bg-primary/10">{icon}</div>
-        <div className="space-y-1">
-          <h3 className="text-base font-semibold">{title}</h3>
-          <p className="text-sm text-muted-foreground max-w-md mx-auto">{body}</p>
-        </div>
-        {action}
-      </CardContent>
-    </Card>
+    <div>
+      <h2 className="text-2xl sm:text-3xl font-bold tracking-tight">
+        {t('groups.list.featuredGroups')}
+      </h2>
+      <p className="text-sm text-muted-foreground mt-1">
+        {t('groups.list.featuredGroupsTagline')}
+      </p>
+    </div>
   );
 }

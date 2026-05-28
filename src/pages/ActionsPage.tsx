@@ -23,11 +23,7 @@ import { cn } from '@/lib/utils';
 import { DiscoverySearchToolbar } from '@/components/DiscoverySearchToolbar';
 import { HeroAtmosphere } from '@/components/HeroAtmosphere';
 import { HeroBanner } from '@/components/HeroBanner';
-import {
-  ModerationMenuItems,
-  ModerationOverlay,
-  ModeratorCollapsibleSection,
-} from '@/components/moderation';
+import { ModerationMenuItems, ModerationOverlay, ModeratorCollapsibleSection } from '@/components/moderation';
 import { PledgeCard } from '@/components/PledgeCard';
 
 import { Card } from '@/components/ui/card';
@@ -40,7 +36,7 @@ import {
 import {
   HandHeart, PlusCircle, ChevronDown, ChevronUp, Loader2,
   Link as LinkIcon, Check, MoreHorizontal, Trash2,
-  Megaphone, Hourglass, EyeOff,
+  Megaphone, Sparkles, EyeOff,
 } from 'lucide-react';
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -263,8 +259,7 @@ export default function ActionsPage() {
 
   // Moderator gate. Reuses the campaign moderator pack (Team Soapbox) —
   // the pledge moderation namespace rides the same signer set as the
-  // campaign and group surfaces. Drives the Pending and Hidden review
-  // sections at the bottom of the page.
+  // campaign and group surfaces.
   const { data: moderators } = useCampaignModerators();
   const isMod = !!user && !!moderators && moderators.includes(user.pubkey);
   const canShowHidden = isMod && showHidden;
@@ -274,35 +269,42 @@ export default function ActionsPage() {
     limit: 300,
   });
 
-  // For moderators we pull the full (unfiltered-by-country) pledge
-  // stream so the review queue isn't blinkered to whatever country the
-  // viewer happens to have selected. Same `agora-action` t-tag filter
-  // as the public list, just wider. Skipped entirely for non-mods so we
-  // don't pay the round-trip cost for everyone.
+  const { data: myPledges, isLoading: myPledgesLoading } = useActions({
+    authors: user ? [user.pubkey] : undefined,
+    limit: 100,
+    enabled: !!user,
+  });
   const { data: allPledgesForMods, isLoading: allPledgesLoading } = useActions({
     limit: 300,
     enabled: isMod,
   });
 
-  const moderationCoordSourcesLoaded = isSearching ? !!searchHitsRaw : !!rawActions;
-  const pledgeModerationCoords = useMemo(() => {
-    const coords = new Set<string>();
-    for (const action of rawActions ?? []) coords.add(getPledgeCoord(action));
-    for (const action of searchHitsRaw ?? []) coords.add(getPledgeCoord(action));
-    for (const action of allPledgesForMods ?? []) coords.add(getPledgeCoord(action));
-    return Array.from(coords);
-  }, [rawActions, searchHitsRaw, allPledgesForMods]);
+  const { data: pledgeModeration, isReady: pledgeModerationReady } = usePledgeModeration();
 
-  // Pledges now ride the same `agora.moderation` namespace as campaigns
-  // and organizations (two-axis: hide + featured). Unlike campaigns,
-  // pledges are public by default, so the page fetches the pledge stream
-  // first and then asks for moderation labels targeted to those pledge
-  // coordinates. Targeting `#a` avoids missing older hide labels when the
-  // global moderation stream grows beyond the broad query limit.
-  const { data: pledgeModeration, isReady: pledgeModerationReady } = usePledgeModeration({
-    coordinates: pledgeModerationCoords,
-    enabled: moderationCoordSourcesLoaded,
+  const featuredPledgeCoords = useMemo(() => {
+    if (!pledgeModerationReady) return [] as string[];
+    return Array.from(pledgeModeration.featuredCoords)
+      .filter((coord) => !pledgeModeration.hiddenCoords.has(coord))
+      .sort((a, b) => (pledgeModeration.featuredOrder.get(b) ?? 0) - (pledgeModeration.featuredOrder.get(a) ?? 0));
+  }, [pledgeModeration, pledgeModerationReady]);
+
+  const { data: featuredPledges, isLoading: featuredPledgesLoading } = useActions({
+    coordinates: featuredPledgeCoords,
+    limit: featuredPledgeCoords.length || 1,
+    enabled: pledgeModerationReady,
   });
+
+  const orderedFeaturedPledges = useMemo(() => {
+    if (!featuredPledges) return [] as Action[];
+    const order = pledgeModeration.featuredOrder;
+    return [...featuredPledges].sort((a, b) => {
+      const aCoord = getPledgeCoord(a);
+      const bCoord = getPledgeCoord(b);
+      return (order.get(bCoord) ?? 0) - (order.get(aCoord) ?? 0);
+    });
+  }, [featuredPledges, pledgeModeration]);
+
+  const featuredPledgeCoordSet = useMemo(() => new Set(featuredPledgeCoords), [featuredPledgeCoords]);
 
   const { searchHits, searchHiddenCount } = useMemo(() => {
     if (!searchHitsRaw) return { searchHits: undefined, searchHiddenCount: 0 };
@@ -340,29 +342,6 @@ export default function ActionsPage() {
     return { actions: visible, listHiddenCount: hidden };
   }, [rawActions, pledgeModeration, canShowHidden]);
 
-  // Pending (mod-only): pledges that haven't been featured or hidden.
-  // Mirrors the campaign/group "needs review" semantics — pledges have
-  // a two-axis model, so "pending" means "no curation decision yet".
-  // Gated on `pledgeModerationReady` so a cold load doesn't briefly
-  // dump every pledge into "Pending" before label folding completes.
-  const pendingPledges = useMemo<Action[]>(() => {
-    if (!isMod || !pledgeModerationReady) return [];
-    return (allPledgesForMods ?? []).filter((p) => {
-      const coord = getPledgeCoord(p);
-      return !pledgeModeration.featuredCoords.has(coord)
-        && !pledgeModeration.hiddenCoords.has(coord);
-    });
-  }, [isMod, pledgeModerationReady, pledgeModeration, allPledgesForMods]);
-
-  // Hidden (mod-only): pledges where the latest hide-axis label is `hidden`.
-  const hiddenPledges = useMemo<Action[]>(() => {
-    if (!isMod || !pledgeModerationReady) return [];
-    return (allPledgesForMods ?? []).filter((p) => {
-      const coord = getPledgeCoord(p);
-      return pledgeModeration.hiddenCoords.has(coord);
-    });
-  }, [isMod, pledgeModerationReady, pledgeModeration, allPledgesForMods]);
-
   // Route entry points for "Create pledge" all pass the currently-selected
   // country via ?country= so the dedicated page can pre-fill it, matching
   // the old modal's `countryCode` prop.
@@ -384,48 +363,22 @@ export default function ActionsPage() {
   const isLoading = actionsLoading || !pledgeModerationReady;
   const isSearchLoading = isSearchFetching || !pledgeModerationReady;
 
-  // Section split (parser already returns: current → upcoming → past).
-  // We re-derive here so that local sorting can be applied per section.
-  const now = Date.now() / 1000;
-  const currentUnsorted = actions?.filter((c) => {
-    const startTime = c.startTime ?? c.createdAt;
-    return startTime <= now && (!c.deadline || c.deadline > now);
-  }) ?? [];
-  const upcomingUnsorted = actions?.filter((c) => {
-    const startTime = c.startTime ?? c.createdAt;
-    return startTime > now;
-  }) ?? [];
-  const pastUnsorted = actions?.filter((c) => c.deadline && c.deadline <= now) ?? [];
-
-  // Within each lifecycle section we sort newest-first by `createdAt`.
-  // The page used to expose Recent / Bounty / Deadline as a dropdown,
-  // but those modes were superseded by the shared DiscoverySearchToolbar
-  // (Default / Top / New) which drives a relay-ranked search view —
-  // keeping a parallel client-side sort on top of the curated layout
-  // duplicated the affordance for no real gain.
-  const sortActions = (cs: Action[]) => [...cs].sort((a, b) => b.createdAt - a.createdAt);
-
-  const currentActions = sortActions(currentUnsorted);
-  const upcomingActions = sortActions(upcomingUnsorted);
-  const pastActions = sortActions(pastUnsorted);
-
   const DEFAULT_VISIBLE = 4;
-  const [showAllCurrent, setShowAllCurrent] = useState(false);
-  const [showAllUpcoming, setShowAllUpcoming] = useState(false);
-  const [showAllPast, setShowAllPast] = useState(false);
+  const [showAllMine, setShowAllMine] = useState(false);
+  const [showAllFeatured, setShowAllFeatured] = useState(false);
+  const [showAllPledges, setShowAllPledges] = useState(false);
 
-  const visibleCurrent = showAllCurrent ? currentActions : currentActions.slice(0, DEFAULT_VISIBLE);
-  const visibleUpcoming = showAllUpcoming ? upcomingActions : upcomingActions.slice(0, DEFAULT_VISIBLE);
-  const visiblePast = showAllPast ? pastActions : pastActions.slice(0, DEFAULT_VISIBLE);
-  const hasCurrent = currentActions.length > 0;
-  const hasUpcoming = upcomingActions.length > 0;
-  const primarySectionTitle = hasCurrent
-    ? t('pledges.list.sectionActive')
-    : hasUpcoming
-      ? t('pledges.list.sectionUpcoming')
-    : pastActions.length > 0
-        ? t('pledges.list.sectionPast')
-        : t('pledges.list.sectionDefault');
+  const allPledges = useMemo(
+    () => (actions ?? []).filter((action) => !featuredPledgeCoordSet.has(getPledgeCoord(action))),
+    [actions, featuredPledgeCoordSet],
+  );
+  const visibleMine = showAllMine ? (myPledges ?? []) : (myPledges ?? []).slice(0, DEFAULT_VISIBLE);
+  const visibleFeatured = showAllFeatured ? orderedFeaturedPledges : orderedFeaturedPledges.slice(0, DEFAULT_VISIBLE);
+  const visibleAllPledges = showAllPledges ? allPledges : allPledges.slice(0, DEFAULT_VISIBLE);
+  const hiddenPledges = useMemo<Action[]>(() => {
+    if (!isMod || !pledgeModerationReady) return [];
+    return (allPledgesForMods ?? []).filter((pledge) => pledgeModeration.hiddenCoords.has(getPledgeCoord(pledge)));
+  }, [allPledgesForMods, isMod, pledgeModeration, pledgeModerationReady]);
 
   const headerControls = (
     <DiscoverySearchToolbar
@@ -453,181 +406,152 @@ export default function ActionsPage() {
         onCreateAction={() => navigate(createActionHref)}
       />
 
-      {isSearching ? (
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-10 lg:py-14">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-10 lg:py-14 space-y-12">
+        {user && (myPledgesLoading || (myPledges && myPledges.length > 0)) && (
           <section className="space-y-5">
-            <div className="flex flex-col items-stretch gap-4 sm:flex-row sm:items-end sm:justify-between">
-              <div>
-                <h2 className="text-2xl sm:text-3xl font-bold tracking-tight">
-                  {trimmedSearch
-                    ? t('common.search')
-                    : sortMode === 'top'
-                      ? t('common.sortTop')
-                      : t('common.sortNew')}
-                </h2>
-                {searchHits && (
-                  <p className="text-sm text-muted-foreground mt-1">
-                    {t('common.searchResultsCount', { count: searchHits.length })}
-                  </p>
-                )}
-              </div>
-              {headerControls}
+            <div>
+              <h2 className="text-2xl sm:text-3xl font-bold tracking-tight">{t('pledges.list.myPledges')}</h2>
+              <p className="text-sm text-muted-foreground mt-1">{t('pledges.list.myPledgesTagline')}</p>
             </div>
-
-            {isSearchLoading && !searchHits ? (
+            {myPledgesLoading && !myPledges ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
-                {Array.from({ length: 8 }).map((_, i) => <ActionSkeleton key={i} />)}
-              </div>
-            ) : searchHits && searchHits.length > 0 ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
-                {searchHits.map((action) => (
-                  <PledgeCard
-                    key={`${action.pubkey}:${action.id}`}
-                    action={action}
-                    isExpired={
-                      action.deadline ? action.deadline <= Date.now() / 1000 : false
-                    }
-                    btcPrice={btcPrice}
-                    showAuthor
-                    showTranslate
-                    topRight={
-                      <>
-                        <ModerationOverlay
-                          coord={getPledgeCoord(action)}
-                          entityTitle={action.title}
-                          surface="pledge"
-                          axes={['hide', 'featured']}
-                          showMenu={false}
-                          className="flex items-center"
-                        />
-                        <ActionShareMenu action={action} displayTitle={action.title} />
-                      </>
-                    }
-                  />
-                ))}
+                {Array.from({ length: 4 }).map((_, i) => <ActionSkeleton key={i} />)}
               </div>
             ) : (
-              <Card className="border-dashed">
-                <div className="py-12 px-8 text-center space-y-2">
-                  {trimmedSearch ? (
-                    <>
-                      <p className="text-base font-medium">
-                        {t('pledges.list.noMatch', { query: trimmedSearch })}
-                      </p>
-                      <p className="text-sm text-muted-foreground">
-                        {t('pledges.list.noMatchHint')}
-                      </p>
-                    </>
-                  ) : (
-                    <p className="text-sm text-muted-foreground">
-                      {t('pledges.list.emptyTitle')}
-                    </p>
-                  )}
-                </div>
-              </Card>
+              <ActionSection
+                items={visibleMine}
+                total={myPledges?.length ?? 0}
+                visible={DEFAULT_VISIBLE}
+                showAll={showAllMine}
+                onToggle={() => setShowAllMine(!showAllMine)}
+                btcPrice={btcPrice}
+              />
             )}
           </section>
-        </div>
-      ) : (
+        )}
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-10 lg:py-14 space-y-12">
-        {isLoading ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
-            {Array.from({ length: 8 }).map((_, i) => <ActionSkeleton key={i} />)}
-          </div>
-        ) : (actions && actions.length > 0) ? (
-          <div className="space-y-8">
-            <div className="flex flex-col items-stretch gap-4 sm:flex-row sm:items-end sm:justify-between">
-              <div>
-                <h2 className="text-2xl sm:text-3xl font-bold tracking-tight">{primarySectionTitle}</h2>
-                <p className="text-sm text-muted-foreground mt-1">
-                  {t('pledges.list.sectionTagline')}
-                </p>
-              </div>
-              {headerControls}
+        {(featuredPledgesLoading || orderedFeaturedPledges.length > 0) && (
+          <section className="space-y-5">
+            <div>
+              <h2 className="text-2xl sm:text-3xl font-bold tracking-tight inline-flex items-center gap-2">
+                <Sparkles className="size-6 text-primary" />
+                {t('pledges.list.featuredPledges')}
+              </h2>
+              <p className="text-sm text-muted-foreground mt-1">{t('pledges.list.featuredPledgesTagline')}</p>
             </div>
-
-            {hasCurrent ? (
-              <ActionSection
-                items={visibleCurrent}
-                total={currentActions.length}
-                visible={DEFAULT_VISIBLE}
-                showAll={showAllCurrent}
-                onToggle={() => setShowAllCurrent(!showAllCurrent)}
-                isExpired={false}
-                btcPrice={btcPrice}
-              />
-            ) : hasUpcoming ? (
-              <ActionSection
-                items={visibleUpcoming}
-                total={upcomingActions.length}
-                visible={DEFAULT_VISIBLE}
-                showAll={showAllUpcoming}
-                onToggle={() => setShowAllUpcoming(!showAllUpcoming)}
-                isExpired={false}
-                btcPrice={btcPrice}
-              />
-            ) : pastActions.length > 0 ? (
-              <ActionSection
-                items={visiblePast}
-                total={pastActions.length}
-                visible={DEFAULT_VISIBLE}
-                showAll={showAllPast}
-                onToggle={() => setShowAllPast(!showAllPast)}
-                isExpired
-                btcPrice={btcPrice}
-              />
-            ) : null}
-
-            {hasCurrent && hasUpcoming && (
-              <SectionDivider title={t('pledges.list.dividerUpcoming')}>
-                <ActionSection
-                  items={visibleUpcoming}
-                  total={upcomingActions.length}
-                  visible={DEFAULT_VISIBLE}
-                  showAll={showAllUpcoming}
-                  onToggle={() => setShowAllUpcoming(!showAllUpcoming)}
-                  isExpired={false}
-                  btcPrice={btcPrice}
-                />
-              </SectionDivider>
-            )}
-
-            {pastActions.length > 0 && (hasCurrent || hasUpcoming) && (
-              <SectionDivider title={t('pledges.list.dividerPast')}>
-                <ActionSection
-                  items={visiblePast}
-                  total={pastActions.length}
-                  visible={DEFAULT_VISIBLE}
-                  showAll={showAllPast}
-                  onToggle={() => setShowAllPast(!showAllPast)}
-                  isExpired
-                  btcPrice={btcPrice}
-                />
-              </SectionDivider>
-            )}
-          </div>
-        ) : (
-          <>
-            <div className="flex flex-col items-stretch gap-4 sm:flex-row sm:items-end sm:justify-between mb-6">
-              <div>
-                <h2 className="text-2xl sm:text-3xl font-bold tracking-tight">{t('pledges.list.sectionActive')}</h2>
-                <p className="text-sm text-muted-foreground mt-1">
-                  {t('pledges.list.sectionTagline')}
-                </p>
+            {featuredPledgesLoading && orderedFeaturedPledges.length === 0 ? (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+                {Array.from({ length: 4 }).map((_, i) => <ActionSkeleton key={i} />)}
               </div>
-              {headerControls}
-            </div>
+            ) : (
+              <ActionSection
+                items={visibleFeatured}
+                total={orderedFeaturedPledges.length}
+                visible={DEFAULT_VISIBLE}
+                showAll={showAllFeatured}
+                onToggle={() => setShowAllFeatured(!showAllFeatured)}
+                btcPrice={btcPrice}
+              />
+            )}
+          </section>
+        )}
 
+        <section className="space-y-5">
+          <div className="flex flex-col items-stretch gap-4 sm:flex-row sm:items-end sm:justify-between">
+            <div>
+              <h2 className="text-2xl sm:text-3xl font-bold tracking-tight">
+                {trimmedSearch
+                  ? t('common.search')
+                  : isSearching && sortMode === 'top'
+                    ? t('common.sortTop')
+                    : isSearching && sortMode === 'new'
+                      ? t('common.sortNew')
+                      : t('pledges.list.allPledges')}
+              </h2>
+              <p className="text-sm text-muted-foreground mt-1">
+                {isSearching && searchHits
+                  ? t('common.searchResultsCount', { count: searchHits.length })
+                  : t('pledges.list.allPledgesTagline')}
+              </p>
+            </div>
+            {headerControls}
+          </div>
+
+          {isSearching ? (
+            <>
+              {isSearchLoading && !searchHits ? (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+                  {Array.from({ length: 8 }).map((_, i) => <ActionSkeleton key={i} />)}
+                </div>
+              ) : searchHits && searchHits.length > 0 ? (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+                  {searchHits.map((action) => (
+                    <PledgeCard
+                      key={`${action.pubkey}:${action.id}`}
+                      action={action}
+                      btcPrice={btcPrice}
+                      showAuthor
+                      showTranslate
+                      topRight={
+                        <>
+                          <ModerationOverlay
+                            coord={getPledgeCoord(action)}
+                            entityTitle={action.title}
+                            surface="pledge"
+                            axes={['hide', 'featured']}
+                            showMenu={false}
+                            className="flex items-center"
+                          />
+                          <ActionShareMenu action={action} displayTitle={action.title} />
+                        </>
+                      }
+                    />
+                  ))}
+                </div>
+              ) : (
+                <Card className="border-dashed">
+                  <div className="py-12 px-8 text-center space-y-2">
+                    {trimmedSearch ? (
+                      <>
+                        <p className="text-base font-medium">
+                          {t('pledges.list.noMatch', { query: trimmedSearch })}
+                        </p>
+                        <p className="text-sm text-muted-foreground">
+                          {t('pledges.list.noMatchHint')}
+                        </p>
+                      </>
+                    ) : (
+                      <p className="text-sm text-muted-foreground">
+                        {t('pledges.list.emptyTitle')}
+                      </p>
+                    )}
+                  </div>
+                </Card>
+              )}
+            </>
+          ) : isLoading ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+              {Array.from({ length: 8 }).map((_, i) => <ActionSkeleton key={i} />)}
+            </div>
+          ) : allPledges.length > 0 ? (
+            <ActionSection
+              items={visibleAllPledges}
+              total={allPledges.length}
+              visible={DEFAULT_VISIBLE}
+              showAll={showAllPledges}
+              onToggle={() => setShowAllPledges(!showAllPledges)}
+              btcPrice={btcPrice}
+            />
+          ) : (
             <Card className="border-dashed">
               <div className="py-12 px-8 text-center space-y-4">
                 <HandHeart className="size-10 text-muted-foreground mx-auto" />
-                <div className="space-y-1.5">
+                <div>
                   <h3 className="text-lg font-semibold">{t('pledges.list.emptyTitle')}</h3>
                   <p className="text-muted-foreground max-w-sm mx-auto">
-                  {selectedCountry
-                    ? t('pledges.list.emptyHintCountry', { country: selectedCountryName })
-                    : t('pledges.list.emptyHint')}
+                    {selectedCountry
+                      ? t('pledges.list.emptyHintCountry', { country: selectedCountryName })
+                      : t('pledges.list.emptyHint')}
                   </p>
                 </div>
                 {user && (
@@ -638,57 +562,10 @@ export default function ActionsPage() {
                 )}
               </div>
             </Card>
-          </>
-        )}
-      </div>
-      )}
+          )}
+        </section>
 
-      {/* Moderator-only review queues at the bottom of the page —
-          consistent with the campaigns and groups index pages so
-          reviewers see the same "Pending / Hidden" affordance
-          everywhere. Pulls the unfiltered-by-country pledge stream so
-          the queue isn't blinkered by the viewer's country filter. */}
-      {isMod && (
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 pb-10 lg:pb-14 space-y-12">
-          <ModeratorCollapsibleSection
-            icon={<Hourglass className="size-4" />}
-            title={t('pledges.list.needsReview')}
-            description={t('pledges.list.needsReviewDesc', { appName: config.appName })}
-            count={pendingPledges.length}
-            isLoading={allPledgesLoading || !pledgeModerationReady}
-            emptyText={t('pledges.list.needsReviewEmpty')}
-            skeleton={
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
-                {Array.from({ length: 4 }).map((_, i) => <ActionSkeleton key={i} />)}
-              </div>
-            }
-          >
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
-              {pendingPledges.map((action) => (
-                <PledgeCard
-                  key={`${action.pubkey}:${action.id}`}
-                  action={action}
-                  isExpired={action.deadline ? action.deadline <= Date.now() / 1000 : false}
-                  btcPrice={btcPrice}
-                  showAuthor
-                  showTranslate
-                  topRight={
-                    <>
-                      <ModerationOverlay
-                        coord={getPledgeCoord(action)}
-                        entityTitle={action.title}
-                        surface="pledge"
-                        axes={['hide', 'featured']}
-                        showMenu={false}
-                        className="flex items-center"
-                      />
-                      <ActionShareMenu action={action} displayTitle={action.title} />
-                    </>
-                  }
-                />
-              ))}
-            </div>
-          </ModeratorCollapsibleSection>
+        {isMod && (
           <ModeratorCollapsibleSection
             icon={<EyeOff className="size-4" />}
             title={t('pledges.list.hidden')}
@@ -707,7 +584,6 @@ export default function ActionsPage() {
                 <PledgeCard
                   key={`${action.pubkey}:${action.id}`}
                   action={action}
-                  isExpired={action.deadline ? action.deadline <= Date.now() / 1000 : false}
                   btcPrice={btcPrice}
                   showAuthor
                   showTranslate
@@ -728,8 +604,8 @@ export default function ActionsPage() {
               ))}
             </div>
           </ModeratorCollapsibleSection>
-        </div>
-      )}
+        )}
+      </div>
     </main>
   );
 }
@@ -869,9 +745,9 @@ function ActionsHero({ actionCount, canCreate, onCreateAction }: ActionsHeroProp
 }
 
 function ActionSection({
-  items, total, visible, showAll, onToggle, isExpired, btcPrice,
+  items, total, visible, showAll, onToggle, btcPrice,
 }: {
-  items: Action[]; total: number; visible: number; showAll: boolean; onToggle: () => void; isExpired: boolean; btcPrice: number | undefined;
+  items: Action[]; total: number; visible: number; showAll: boolean; onToggle: () => void; btcPrice: number | undefined;
 }) {
   const { t } = useTranslation();
   return (
@@ -881,7 +757,6 @@ function ActionSection({
           <PledgeCard
             key={`${action.pubkey}:${action.id}`}
             action={action}
-            isExpired={isExpired}
             btcPrice={btcPrice}
             showAuthor
             showTranslate
@@ -924,22 +799,6 @@ function ActionSection({
           </Button>
         </div>
       )}
-    </div>
-  );
-}
-
-function SectionDivider({
-  title, children,
-}: { title: string; children: React.ReactNode }) {
-  return (
-    <div className="space-y-4">
-      <div className="flex items-center gap-3">
-        <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
-          {title}
-        </h2>
-        <div className="flex-1 border-t border-border/50" />
-      </div>
-      {children}
     </div>
   );
 }

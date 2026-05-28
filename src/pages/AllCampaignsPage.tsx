@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { useSeoMeta } from '@unhead/react';
 import { useTranslation } from 'react-i18next';
-import { EyeOff, HandHeart, Hourglass, PlusCircle } from 'lucide-react';
+import { ChevronDown, ChevronUp, HandHeart, PlusCircle } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -10,7 +10,6 @@ import { CampaignCard, CampaignCardSkeleton } from '@/components/CampaignCard';
 import { DiscoverySearchToolbar } from '@/components/DiscoverySearchToolbar';
 import { HeroAtmosphere } from '@/components/HeroAtmosphere';
 import { HeroBanner } from '@/components/HeroBanner';
-import { ModeratorCollapsibleSection } from '@/components/moderation';
 import { useCampaigns } from '@/hooks/useCampaigns';
 import { useAllCampaigns, type CampaignSort } from '@/hooks/useAllCampaigns';
 import { useCampaignModeration } from '@/hooks/useCampaignModeration';
@@ -124,9 +123,23 @@ export function AllCampaignsPage() {
     limit: 200,
   });
   const { data: moderation, isReady: moderationReady } = useCampaignModeration();
-  const { data: allCampaignsForMods, isLoading: allCampaignsLoading } = useCampaigns({
-    limit: 200,
-    enabled: isMod,
+  const { data: myCampaigns, isLoading: myCampaignsLoading } = useCampaigns({
+    authors: user ? [user.pubkey] : undefined,
+    limit: 100,
+    enabled: !!user,
+  });
+
+  const featuredCoords = useMemo(() => {
+    if (!moderationReady) return [] as string[];
+    return Array.from(moderation.featuredCoords)
+      .filter((coord) => !moderation.hiddenCoords.has(coord))
+      .sort((a, b) => (moderation.featuredOrder.get(b) ?? 0) - (moderation.featuredOrder.get(a) ?? 0));
+  }, [moderation, moderationReady]);
+
+  const { data: featuredCampaigns, isLoading: featuredLoading } = useCampaigns({
+    coordinates: featuredCoords,
+    limit: featuredCoords.length || 1,
+    enabled: moderationReady,
   });
 
   useSeoMeta({
@@ -137,7 +150,7 @@ export function AllCampaignsPage() {
   const { visible, hiddenCount } = useMemo(() => {
     const all = campaigns ?? [];
     const hiddenCoords = moderation?.hiddenCoords ?? new Set<string>();
-    const featuredOrder = moderation?.featuredOrder ?? new Map<string, number>();
+    const featuredCoordSet = new Set(featuredCoords);
     let hiddenCount = 0;
     const visible: ParsedCampaign[] = [];
 
@@ -145,36 +158,26 @@ export function AllCampaignsPage() {
       if (hiddenCoords.has(c.aTag)) {
         hiddenCount += 1;
         if (isMod && showHidden) visible.push(c);
-      } else {
+      } else if (!featuredCoordSet.has(c.aTag)) {
         visible.push(c);
       }
     }
 
-    if (sort === 'top' && featuredOrder.size > 0) {
-      visible.sort((a, b) => {
-        const aFeaturedAt = featuredOrder.get(a.aTag) ?? 0;
-        const bFeaturedAt = featuredOrder.get(b.aTag) ?? 0;
-        if (aFeaturedAt && bFeaturedAt) return bFeaturedAt - aFeaturedAt;
-        if (aFeaturedAt) return -1;
-        if (bFeaturedAt) return 1;
-        return 0;
-      });
-    }
-
     return { visible, hiddenCount };
-  }, [campaigns, isMod, moderation, showHidden, sort]);
+  }, [campaigns, featuredCoords, isMod, moderation, showHidden]);
 
-  const pendingCampaigns = useMemo<ParsedCampaign[]>(() => {
-    if (!isMod || !moderationReady) return [];
-    return (allCampaignsForMods ?? []).filter(
-      (campaign) => !moderation.approvedCoords.has(campaign.aTag) && !moderation.hiddenCoords.has(campaign.aTag),
+  const orderedFeaturedCampaigns = useMemo(() => {
+    if (!featuredCampaigns) return [] as ParsedCampaign[];
+    return [...featuredCampaigns].sort(
+      (a, b) => (moderation.featuredOrder.get(b.aTag) ?? 0) - (moderation.featuredOrder.get(a.aTag) ?? 0),
     );
-  }, [allCampaignsForMods, isMod, moderation, moderationReady]);
+  }, [featuredCampaigns, moderation]);
 
-  const hiddenCampaigns = useMemo<ParsedCampaign[]>(() => {
-    if (!isMod || !moderationReady) return [];
-    return (allCampaignsForMods ?? []).filter((campaign) => moderation.hiddenCoords.has(campaign.aTag));
-  }, [allCampaignsForMods, isMod, moderation, moderationReady]);
+  const DEFAULT_VISIBLE = 4;
+  const [showAllMine, setShowAllMine] = useState(false);
+  const [showAllFeatured, setShowAllFeatured] = useState(false);
+  const visibleMine = showAllMine ? (myCampaigns ?? []) : (myCampaigns ?? []).slice(0, DEFAULT_VISIBLE);
+  const visibleFeatured = showAllFeatured ? orderedFeaturedCampaigns : orderedFeaturedCampaigns.slice(0, DEFAULT_VISIBLE);
 
   const showSkeleton = isLoading || !moderationReady;
   const activeQuery = debouncedSearch.trim();
@@ -185,6 +188,58 @@ export function AllCampaignsPage() {
       <AllCampaignsHero campaignCount={totalCampaigns} />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-10 lg:py-14 space-y-8">
+        {user && (myCampaignsLoading || (myCampaigns && myCampaigns.length > 0)) && (
+          <section className="space-y-5">
+            <div>
+              <h2 className="text-2xl sm:text-3xl font-bold tracking-tight">
+                {t('campaigns.home.yourCampaigns')}
+              </h2>
+              <p className="text-sm text-muted-foreground mt-1">
+                {t('campaigns.home.yourCampaignsDesc')}
+              </p>
+            </div>
+            {myCampaignsLoading && !myCampaigns ? (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+                {Array.from({ length: 4 }).map((_, i) => <CampaignCardSkeleton key={i} />)}
+              </div>
+            ) : (
+              <CampaignSection
+                campaigns={visibleMine}
+                total={myCampaigns?.length ?? 0}
+                visible={DEFAULT_VISIBLE}
+                showAll={showAllMine}
+                onToggle={() => setShowAllMine(!showAllMine)}
+              />
+            )}
+          </section>
+        )}
+
+        {(featuredLoading || orderedFeaturedCampaigns.length > 0) && (
+          <section className="space-y-5">
+            <div>
+              <h2 className="text-2xl sm:text-3xl font-bold tracking-tight">
+                {t('campaigns.home.featured')}
+              </h2>
+              <p className="text-sm text-muted-foreground mt-1">
+                {t('campaigns.home.featuredDesc', { appName: config.appName })}
+              </p>
+            </div>
+            {featuredLoading && orderedFeaturedCampaigns.length === 0 ? (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+                {Array.from({ length: 4 }).map((_, i) => <CampaignCardSkeleton key={i} />)}
+              </div>
+            ) : (
+              <CampaignSection
+                campaigns={visibleFeatured}
+                total={orderedFeaturedCampaigns.length}
+                visible={DEFAULT_VISIBLE}
+                showAll={showAllFeatured}
+                onToggle={() => setShowAllFeatured(!showAllFeatured)}
+              />
+            )}
+          </section>
+        )}
+
         {/* Section heading — matches the `/pledges` and `/groups` pages
             so the discovery surfaces all share the same large-bold
             section header pattern. Title switches between Search / Top /
@@ -196,9 +251,7 @@ export function AllCampaignsPage() {
             <h2 className="text-2xl sm:text-3xl font-bold tracking-tight">
               {activeQuery
                 ? t('common.search')
-                : sort === 'top'
-                  ? t('common.sortTop')
-                  : t('common.sortNew')}
+                : t('campaigns.all.title')}
             </h2>
             <p className="text-sm text-muted-foreground mt-1">
               {activeQuery
@@ -280,55 +333,60 @@ export function AllCampaignsPage() {
           </div>
         )}
 
-        {isMod && (
-          <ModeratorCollapsibleSection
-            icon={<Hourglass className="size-4" />}
-            title={t('campaigns.home.pending')}
-            description={t('campaigns.home.pendingDesc')}
-            count={pendingCampaigns.length}
-            isLoading={allCampaignsLoading || !moderationReady}
-            emptyText={t('campaigns.home.pendingEmpty')}
-            skeleton={
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
-                {Array.from({ length: 4 }).map((_, i) => <CampaignCardSkeleton key={i} />)}
-              </div>
-            }
-          >
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
-              {pendingCampaigns.map((campaign) => (
-                <CampaignCard key={campaign.aTag} campaign={campaign} />
-              ))}
-            </div>
-          </ModeratorCollapsibleSection>
-        )}
-
-        {isMod && (
-          <ModeratorCollapsibleSection
-            icon={<EyeOff className="size-4" />}
-            title={t('campaigns.home.hidden')}
-            description={t('campaigns.home.hiddenDesc')}
-            count={hiddenCampaigns.length}
-            isLoading={allCampaignsLoading || !moderationReady}
-            emptyText={t('campaigns.home.hiddenEmpty')}
-            skeleton={
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
-                {Array.from({ length: 4 }).map((_, i) => <CampaignCardSkeleton key={i} />)}
-              </div>
-            }
-          >
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
-              {hiddenCampaigns.map((campaign) => (
-                <CampaignCard key={campaign.aTag} campaign={campaign} />
-              ))}
-            </div>
-          </ModeratorCollapsibleSection>
-        )}
       </div>
     </main>
   );
 }
 
 export default AllCampaignsPage;
+
+function CampaignSection({
+  campaigns,
+  total,
+  visible,
+  showAll,
+  onToggle,
+}: {
+  campaigns: ParsedCampaign[];
+  total: number;
+  visible: number;
+  showAll: boolean;
+  onToggle: () => void;
+}) {
+  const { t } = useTranslation();
+  return (
+    <div className="space-y-5">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+        {campaigns.map((campaign) => (
+          <CampaignCard key={campaign.aTag} campaign={campaign} />
+        ))}
+      </div>
+      {total > visible && (
+        <div className="flex justify-center">
+          <Button
+            type="button"
+            variant="ghost"
+            onClick={onToggle}
+            className="rounded-full text-sm"
+            aria-expanded={showAll}
+          >
+            {showAll ? (
+              <>
+                <ChevronUp className="size-4 mr-1.5" />
+                {t('common.showLess')}
+              </>
+            ) : (
+              <>
+                <ChevronDown className="size-4 mr-1.5" />
+                {t('groups.list.showMore', { count: total - visible })}
+              </>
+            )}
+          </Button>
+        </div>
+      )}
+    </div>
+  );
+}
 
 // ═══════════════════════════════════════════════════════════════════════════════
 // Hero
