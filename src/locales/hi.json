@@ -1431,9 +1431,13 @@
     "notEnoughBitcoin": "पर्याप्त बिटकॉइन नहीं",
     "recipient": {
       "placeholder": "bc1…, sp1…",
-      "useSilentPayment": "इसके बजाय साइलेंट पेमेंट का उपयोग करें",
-      "useOnchain": "इसके बजाय ऑन-चेन एड्रेस का उपयोग करें",
-      "scan": "QR कोड स्कैन करें"
+      "scan": "QR कोड स्कैन करें",
+      "sendToOnchain": "Bitcoin एड्रेस पर भेजें",
+      "sendToSilentPayment": "साइलेंट पेमेंट एड्रेस पर भेजें",
+      "bitcoinAddress": "Bitcoin एड्रेस",
+      "silentPayment": "साइलेंट पेमेंट एड्रेस",
+      "toLabel": "किसे",
+      "clear": "प्राप्तकर्ता हटाएँ"
     },
     "feeSpeed": {
       "fastest": "~10 मिनट",
@@ -1449,10 +1453,9 @@
     },
     "errors": {
       "unavailable": "इस लॉगिन प्रकार के लिए HD वॉलेट उपलब्ध नहीं है।",
-      "enterRecipient": "एक Bitcoin एड्रेस, sp1… एड्रेस, या npub दर्ज करें।",
+      "enterRecipient": "एक Bitcoin एड्रेस या sp1… साइलेंट पेमेंट एड्रेस दर्ज करें।",
       "noSpendable": "इस वॉलेट में कोई ख़र्च-योग्य Bitcoin नहीं।",
       "feesNotLoaded": "Fee rates लोड नहीं हुईं।",
-      "cantSendToSelf": "आप ख़ुद को नहीं भेज सकते।",
       "enterAmount": "एक राशि दर्ज करें।",
       "insufficient": "इस राशि + नेटवर्क फ़ीस के लिए Bitcoin पर्याप्त नहीं।",
       "waitingPrice": "BTC दाम का इंतज़ार है…",
@@ -1460,6 +1463,10 @@
     },
     "toast": {
       "failedTitle": "Transaction विफल"
+    },
+    "scanError": {
+      "title": "वह QR कोड पढ़ा नहीं जा सका",
+      "description": "एक Bitcoin एड्रेस, साइलेंट पेमेंट एड्रेस (sp1…), या bitcoin: URI अपेक्षित था।"
     },
     "success": {
       "title": "Bitcoin भेज दिया",

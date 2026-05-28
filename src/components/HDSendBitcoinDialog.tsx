@@ -1,7 +1,6 @@
 import { useState, useCallback, useMemo, useRef, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { nip19 } from 'nostr-tools';
 import {
   AlertTriangle,
   Check,
@@ -25,8 +24,10 @@ import {
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { BitcoinAmountPicker } from '@/components/BitcoinAmountPicker';
 import { BitcoinPublicDisclaimer } from '@/components/BitcoinPublicDisclaimer';
-import { BitcoinRecipientInput } from '@/components/BitcoinRecipientInput';
-import { QrScannerDialog } from '@/components/QrScannerDialog';
+import {
+  BitcoinRecipientInput,
+  type ResolvedRecipient,
+} from '@/components/BitcoinRecipientInput';
 import { HelpTip } from '@/components/HelpTip';
 import { cn } from '@/lib/utils';
 
@@ -40,12 +41,7 @@ import {
   getUniqueBitcoinFeeSpeeds,
   type BitcoinFeeSpeed,
 } from '@/lib/bitcoinFeeSpeed';
-import {
-  isLargeAmount,
-  nostrPubkeyToBitcoinAddress,
-  parseBitcoinUri,
-  satsToUSD,
-} from '@/lib/bitcoin';
+import { isLargeAmount, satsToUSD } from '@/lib/bitcoin';
 import {
   broadcastBlockbookTx,
   fetchFeeRates,
@@ -56,7 +52,6 @@ import {
   type HdInput,
   type HdSpendableSpUtxo,
   type HdSpendableUtxo,
-  parseHdRecipient,
   previewHdFee,
   signHdPsbt,
 } from '@/lib/hdwallet/transaction';
@@ -71,74 +66,6 @@ const USD_PRESETS = [1, 5, 10, 25, 100];
 type FeeSpeed = BitcoinFeeSpeed;
 
 // ---------------------------------------------------------------------------
-// Recipient resolution
-// ---------------------------------------------------------------------------
-
-interface ResolvedRecipient {
-  /**
-   * Final P2TR/P2WPKH/etc. address used as the PSBT output.
-   *
-   * For silent-payment (`sp1…`) recipients this is the original `sp1…`
-   * string — the real on-chain `P_k` is derived at build time, after coin
-   * selection. The dialog never displays this value directly when
-   * `kind === 'sp'`; it's kept here so {@link buildHdSpendPsbt} can route
-   * by recipient kind.
-   */
-  address: string;
-  /** Optional Nostr pubkey when the recipient was an npub/nprofile. */
-  pubkey?: string;
-  /** Raw text the user typed (for re-display). */
-  raw: string;
-  /**
-   * Recipient kind. `'address'` for bare Bitcoin addresses (including
-   * Nostr-derived ones); `'sp'` for BIP-352 silent-payment addresses.
-   */
-  kind: 'address' | 'sp';
-}
-
-/**
- * Parse the recipient input as one of:
- *   - bare Bitcoin address (mainnet, any standard type)
- *   - silent-payment address (`sp1…`, mainnet, v0)
- *   - npub1… → P2TR derived from the Nostr pubkey
- *   - nprofile1… → P2TR derived from the encoded pubkey
- *
- * Returns `null` for unparseable input. The caller should treat `null` as
- * "input still in progress" rather than "error" until the user submits.
- */
-function resolveRecipient(input: string): ResolvedRecipient | null {
-  const trimmed = input.trim();
-  if (!trimmed) return null;
-
-  // Try bare Bitcoin / silent-payment via the unified parser.
-  const parsed = parseHdRecipient(trimmed);
-  if (parsed) {
-    if (parsed.kind === 'address') {
-      return { address: parsed.address, raw: trimmed, kind: 'address' };
-    }
-    return { address: parsed.spAddress, raw: trimmed, kind: 'sp' };
-  }
-
-  // Try NIP-19 npub / nprofile.
-  if (trimmed.startsWith('npub1') || trimmed.startsWith('nprofile1')) {
-    try {
-      const decoded = nip19.decode(trimmed);
-      if (decoded.type === 'npub') {
-        const address = nostrPubkeyToBitcoinAddress(decoded.data);
-        if (address) return { address, pubkey: decoded.data, raw: trimmed, kind: 'address' };
-      } else if (decoded.type === 'nprofile') {
-        const address = nostrPubkeyToBitcoinAddress(decoded.data.pubkey);
-        if (address) return { address, pubkey: decoded.data.pubkey, raw: trimmed, kind: 'address' };
-      }
-    } catch {
-      // fall through
-    }
-  }
-
-  return null;
-}
-
-// ---------------------------------------------------------------------------
 // Component
 // ---------------------------------------------------------------------------
 
@@ -148,30 +75,20 @@ interface HDSendBitcoinDialogProps {
   /** BTC/USD price — passed in to avoid duplicate fetches. */
   btcPrice?: number;
   /**
-   * Optional recipient (bare address, `sp1…` code, npub, or `bitcoin:` URI)
-   * to prefill the recipient field with when the dialog opens. Used by
-   * callers like the campaign detail page that already know the
-   * destination, so the donor only needs to enter an amount.
+   * Optional initial recipient string to prefill the recipient field. May
+   * be a bare on-chain address (`bc1…`), a silent payment address
+   * (`sp1…`), or a `bitcoin:` BIP-21 URI. When the URI carries both an
+   * on-chain path and an `sp=` parameter, the picker's dropdown surfaces
+   * both as separate rows so the donor explicitly picks which payment
+   * path to use (no separate "swap" toggle needed — picking happens in
+   * the dropdown).
    *
-   * The field stays editable — donors can clear and retype if they want
-   * to send somewhere else. The prefill applies on each open transition
-   * (false → true) so reopening after a successful send loads the same
-   * destination again.
+   * The prefill is re-applied on each open transition (false → true) so
+   * reopening after a successful send loads the same destination again,
+   * and is also re-applied when the user clears a previously-selected
+   * chip so they don't have to retype.
    */
   initialRecipient?: string;
-  /**
-   * Optional *alternate* recipient. When supplied alongside
-   * {@link initialRecipient}, the dialog shows a small "Use silent
-   * payment instead" / "Use on-chain address instead" toggle under the
-   * recipient field. Clicking it swaps the input between the two values
-   * so donors can pick whichever the campaign provides without leaving
-   * the modal.
-   *
-   * Campaign detail page wires the on-chain `bc1…` address as
-   * {@link initialRecipient} (default) and the silent-payment `sp1…`
-   * code as `initialRecipientAlt`.
-   */
-  initialRecipientAlt?: string;
 }
 
 interface SendResult {
@@ -196,7 +113,7 @@ interface SendResult {
  * the HD wallet's UTXO set across many addresses, signs with per-input HD-derived
  * keys, and emits change to a fresh internal address.
  */
-export function HDSendBitcoinDialog({ isOpen, onClose, btcPrice, initialRecipient, initialRecipientAlt }: HDSendBitcoinDialogProps) {
+export function HDSendBitcoinDialog({ isOpen, onClose, btcPrice, initialRecipient }: HDSendBitcoinDialogProps) {
   const { t } = useTranslation();
   const availability = useHdWalletAccess();
   const {
@@ -224,44 +141,18 @@ export function HDSendBitcoinDialog({ isOpen, onClose, btcPrice, initialRecipien
   );
 
   // ── Form state ───────────────────────────────────────────────
-  const [recipientInput, setRecipientInput] = useState('');
+  //
+  // The picker owns its input text internally and emits a resolved
+  // recipient (or null) to us. We only see the final picked destination.
+  const [recipient, setRecipient] = useState<ResolvedRecipient | null>(null);
   const [usdAmount, setUsdAmount] = useState<number | string>(5);
   const [feeSpeed, setFeeSpeed] = useState<FeeSpeed>('halfHour');
   const [error, setError] = useState('');
   const [feePopoverOpen, setFeePopoverOpen] = useState(false);
   const [success, setSuccess] = useState<SendResult | null>(null);
-  const [scannerOpen, setScannerOpen] = useState(false);
 
   const feeSpeedUserChanged = useRef(false);
 
-  const recipient = useMemo(() => resolveRecipient(recipientInput), [recipientInput]);
-
-  /**
-   * Interpret a freshly-scanned QR code and stuff it into the recipient
-   * input. A `bitcoin:bc1q…?sp=sp1q…` BIP-21 URI means "send via silent
-   * payment if you can; otherwise fall back to the on-chain address" — we
-   * prefer the `sp` parameter when it parses, and the swap toggle under the
-   * input lets the user fall back to the on-chain address if they want to.
-   * Anything else (bare address, `sp1…`, npub, nprofile) is dropped in
-   * verbatim and `resolveRecipient` does the rest.
-   */
-  const handleScan = useCallback((scanned: string) => {
-    setScannerOpen(false);
-    setError('');
-    const trimmed = scanned.trim();
-    const bip21 = parseBitcoinUri(trimmed);
-    if (bip21) {
-      if (bip21.sp && resolveRecipient(bip21.sp)) {
-        setRecipientInput(bip21.sp);
-        return;
-      }
-      if (bip21.address) {
-        setRecipientInput(bip21.address);
-        return;
-      }
-    }
-    setRecipientInput(trimmed);
-  }, []);
 
   // ── Fee rates ────────────────────────────────────────────────
   const { data: feeRates } = useQuery({
@@ -362,54 +253,26 @@ export function HDSendBitcoinDialog({ isOpen, onClose, btcPrice, initialRecipien
   // SP recipients (`sp1…`) produce a fresh, unlinkable Taproot output per
   // payment — they do NOT have the privacy concern of a reused on-chain
   // address. The public disclaimer is only needed for bare BTC addresses
-  // typed in directly (no Nostr identity attached, no SP).
-  const isRawAddress =
-    !!recipient && recipient.kind === 'address' && !recipient.pubkey;
+  // picked from the dropdown (no SP).
+  const isRawAddress = !!recipient && recipient.kind === 'address';
   const [confirmArmed, setConfirmArmed] = useState(false);
-
-  // Recipient swap target. When the caller supplied two alternate
-  // destinations (e.g. campaign detail page passing both `bc1…` and
-  // `sp1…` from the campaign's wallet endpoints) and the current input
-  // still matches one of them, expose a one-tap toggle to swap. If the
-  // donor manually edited the field to something else, the toggle hides
-  // itself so we don't trash their typed input.
-  //
-  // Lives next to `isRawAddress` so the render block can place the
-  // toggle adjacent to the privacy disclaimer (its natural home — both
-  // are about whether to expose a reusable on-chain address).
-  const recipientSwap = useMemo<{ swapTo: string; labelKey: string } | null>(() => {
-    if (!initialRecipient || !initialRecipientAlt) return null;
-    const trimmed = recipientInput.trim();
-    let swapTo: string | null = null;
-    if (trimmed === initialRecipient) swapTo = initialRecipientAlt;
-    else if (trimmed === initialRecipientAlt) swapTo = initialRecipient;
-    if (!swapTo) return null;
-    // The label tells the user *what they're switching to* — detect by
-    // prefix so an `sp1…` swap target advertises silent payment.
-    const labelKey = swapTo.toLowerCase().startsWith('sp1')
-      ? 'walletSend.recipient.useSilentPayment'
-      : 'walletSend.recipient.useOnchain';
-    return { swapTo, labelKey };
-  }, [initialRecipient, initialRecipientAlt, recipientInput]);
 
   useEffect(() => {
     setConfirmArmed(false);
   }, [amountSats, currentFeeRate, btcPrice, recipient?.address]);
 
-  // Prefill the recipient field on every dialog open transition (closed →
-  // open). Callers like the campaign donate column already know the
-  // destination, so the donor only needs to type an amount. The field
-  // stays editable; reopening after a send re-applies the prefill instead
-  // of remembering the cleared value. Tracked via a ref so reopens with a
-  // stable string still re-apply (the value alone can't tell us whether
-  // the dialog has reopened).
+  // Track open transitions so we can re-key the picker on each
+  // closed → open transition. Re-keying remounts the picker with a fresh
+  // `initialInput`, restoring the prefilled recipient after a successful
+  // send (which closes and reopens with the same prefill).
+  const [openCount, setOpenCount] = useState(0);
   const wasOpenRef = useRef(false);
   useEffect(() => {
-    if (isOpen && !wasOpenRef.current && initialRecipient) {
-      setRecipientInput(initialRecipient);
+    if (isOpen && !wasOpenRef.current) {
+      setOpenCount((c) => c + 1);
     }
     wasOpenRef.current = isOpen;
-  }, [isOpen, initialRecipient]);
+  }, [isOpen]);
 
   const requiresArm = isLarge || isRawAddress;
 
@@ -424,7 +287,6 @@ export function HDSendBitcoinDialog({ isOpen, onClose, btcPrice, initialRecipien
       if (!recipient) throw new Error(t('walletSend.errors.enterRecipient'));
       if (!ownedInputs.length) throw new Error(t('walletSend.errors.noSpendable'));
       if (!feeRates) throw new Error(t('walletSend.errors.feesNotLoaded'));
-      if (recipient.pubkey === availability.pubkey) throw new Error(t('walletSend.errors.cantSendToSelf'));
       if (amountSats <= 0) throw new Error(t('walletSend.errors.enterAmount'));
       if (insufficient) throw new Error(t('walletSend.errors.insufficient'));
 
@@ -488,7 +350,6 @@ export function HDSendBitcoinDialog({ isOpen, onClose, btcPrice, initialRecipien
       setError(t('walletSend.errors.unavailable')); return;
     }
     if (!recipient) { setError(t('walletSend.errors.enterRecipient')); return; }
-    if (recipient.pubkey === availability.pubkey) { setError(t('walletSend.errors.cantSendToSelf')); return; }
     if (!btcPrice) { setError(t('walletSend.errors.waitingPrice')); return; }
     if (amountSats <= 0) { setError(t('walletSend.errors.enterAmount')); return; }
     if (!ownedInputs.length) { setError(t('walletSend.errors.noneYet')); return; }
@@ -514,7 +375,7 @@ export function HDSendBitcoinDialog({ isOpen, onClose, btcPrice, initialRecipien
     onClose();
     // defer to allow exit animation
     setTimeout(() => {
-      setRecipientInput('');
+      setRecipient(null);
       setUsdAmount(5);
       setError('');
       setConfirmArmed(false);
@@ -548,7 +409,6 @@ export function HDSendBitcoinDialog({ isOpen, onClose, btcPrice, initialRecipien
 
   // ── Render ───────────────────────────────────────────────────
   return (
-    <>
     <Dialog open={isOpen} onOpenChange={(v) => { if (!v) handleClose(); }}>
       <DialogContent className="max-w-[425px] rounded-2xl p-0 gap-0 border-border overflow-hidden max-h-[95vh] [&>button]:hidden">
         <DialogTitle className="sr-only">{t('walletSend.title')}</DialogTitle>
@@ -586,39 +446,26 @@ export function HDSendBitcoinDialog({ isOpen, onClose, btcPrice, initialRecipien
                 onAmountChangeStart={() => setError('')}
               />
 
-              {/* Recipient */}
+              {/* Recipient — text input + Popover dropdown surfacing the
+                  BIP-21 candidates, with an inline QR-scanner button. The
+                  picker swaps itself out for a chip once a destination is
+                  selected; clicking the chip's X returns to the input. */}
               <BitcoinRecipientInput
-                value={recipientInput}
-                onChange={setRecipientInput}
+                key={openCount}
+                value={recipient}
+                onChange={(next) => {
+                  setRecipient(next);
+                  setError('');
+                }}
                 placeholder={t('walletSend.recipient.placeholder')}
-                resolvedPubkey={recipient?.pubkey}
-                onScanClick={() => setScannerOpen(true)}
-                scanLabel={t('walletSend.recipient.scan')}
+                initialInput={initialRecipient}
               />
 
-              {/* Privacy disclaimer for raw addresses + companion
-                  swap-to-silent-payment toggle. Both are about whether
-                  the donation will land on a reusable, publicly-tied
-                  address; grouping them lets a donor who reads the
-                  warning flip straight to SP without hunting for the
-                  control. When the disclaimer is absent (recipient is
-                  already SP or a Nostr identity), the toggle still
-                  renders so the donor can swap back to on-chain. */}
-              {(isRawAddress || recipientSwap) && (
-                <div className="grid gap-2">
-                  {isRawAddress && (
-                    <BitcoinPublicDisclaimer tone="soft" />
-                  )}
-                  {recipientSwap && (
-                    <button
-                      type="button"
-                      onClick={() => setRecipientInput(recipientSwap.swapTo)}
-                      className="self-start text-xs text-primary hover:underline motion-safe:transition-colors"
-                    >
-                      {t(recipientSwap.labelKey)}
-                    </button>
-                  )}
-                </div>
+              {/* Privacy disclaimer for raw on-chain addresses. SP
+                  recipients produce a fresh unlinkable output per payment
+                  and don't need the warning. */}
+              {isRawAddress && (
+                <BitcoinPublicDisclaimer tone="soft" />
               )}
 
               {/* Error */}
@@ -693,13 +540,6 @@ export function HDSendBitcoinDialog({ isOpen, onClose, btcPrice, initialRecipien
         )}
       </DialogContent>
     </Dialog>
-    <QrScannerDialog
-      isOpen={scannerOpen}
-      onClose={() => setScannerOpen(false)}
-      onScan={handleScan}
-      title={t('walletSend.recipient.scan')}
-    />
-    </>
   );
 }
 

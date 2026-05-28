@@ -1485,9 +1485,13 @@
     "notEnoughBitcoin": "Bitcoin insuffisant",
     "recipient": {
       "placeholder": "bc1…, sp1…",
-      "useSilentPayment": "Utiliser un paiement silencieux à la place",
-      "useOnchain": "Utiliser une adresse on-chain à la place",
-      "scan": "Scanner le QR code"
+      "scan": "Scanner le QR code",
+      "sendToOnchain": "Envoyer à une adresse Bitcoin",
+      "sendToSilentPayment": "Envoyer à une adresse de paiement silencieux",
+      "bitcoinAddress": "Adresse Bitcoin",
+      "silentPayment": "Adresse de paiement silencieux",
+      "toLabel": "À",
+      "clear": "Effacer le destinataire"
     },
     "feeSpeed": {
       "fastest": "~10 min",
@@ -1503,14 +1507,17 @@
     },
     "errors": {
       "unavailable": "Le portefeuille HD n'est pas disponible pour ce type de connexion.",
-      "enterRecipient": "Saisissez une adresse Bitcoin, une adresse sp1…, ou un npub.",
+      "enterRecipient": "Saisissez une adresse Bitcoin ou une adresse de paiement silencieux sp1….",
       "noSpendable": "Pas de Bitcoin dépensable dans ce portefeuille.",
       "feesNotLoaded": "Taux de frais non chargés.",
-      "cantSendToSelf": "Vous ne pouvez pas vous envoyer à vous-même.",
       "enterAmount": "Saisissez un montant.",
       "insufficient": "Pas assez de Bitcoin pour ce montant + frais réseau.",
       "waitingPrice": "En attente du prix BTC…",
       "noneYet": "Vous n'avez pas encore de Bitcoin."
+    },
+    "scanError": {
+      "title": "Impossible de lire ce QR code",
+      "description": "Une adresse Bitcoin, une adresse de paiement silencieux (sp1…), ou un URI bitcoin: était attendu."
     },
     "toast": {
       "failedTitle": "Échec de la transaction"

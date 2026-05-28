@@ -1063,9 +1063,13 @@
     "notEnoughBitcoin": "Bitcoin haina kukwana",
     "recipient": {
       "placeholder": "bc1…, sp1…",
-      "useSilentPayment": "Shandisa mubhadharo wakanyararira pachinzvimbo",
-      "useOnchain": "Shandisa kero yepacheni pachinzvimbo",
-      "scan": "Skena kodhi yeQR"
+      "scan": "Skena kodhi yeQR",
+      "sendToOnchain": "Tumira kukero yeBitcoin",
+      "sendToSilentPayment": "Tumira kukero yemubhadharo wakanyararira",
+      "bitcoinAddress": "Kero yeBitcoin",
+      "silentPayment": "Kero yemubhadharo wakanyararira",
+      "toLabel": "Kuna",
+      "clear": "Bvisa mugamuchiri"
     },
     "feeSpeed": {
       "fastest": "~10 maminitsi",
@@ -1081,10 +1085,9 @@
     },
     "errors": {
       "unavailable": "Chikwama cheHD hachiwanike pamhando yekupinda iyi.",
-      "enterRecipient": "Isa kero yeBitcoin, kero ye-sp1… kana npub.",
+      "enterRecipient": "Isa kero yeBitcoin kana kero yemubhadharo wakanyararira ye-sp1….",
       "noSpendable": "Hapana Bitcoin inogona kushandiswa muchikwama ichi.",
       "feesNotLoaded": "Migwagwa yemiripo haina kuloadwa.",
-      "cantSendToSelf": "Haukwanise kutumira kwauri.",
       "enterAmount": "Isa huwandu.",
       "insufficient": "Bitcoin haina kukwana pahuwandu uhwu + muripo wenetwork.",
       "waitingPrice": "Kumirira mutengo weBTC…",
@@ -1098,6 +1101,10 @@
       "satsAmount": "{{sats}} sats",
       "viewTransaction": "Tarisa chinoitwa",
       "done": "Zvapera"
+    },
+    "scanError": {
+      "title": "Hatina kukwanisa kuverenga kodhi yeQR iyoyo",
+      "description": "Yakanga yakatarisirwa kero yeBitcoin, kero yemubhadharo wakanyararira (sp1…), kana bitcoin: URI."
     }
   },
   "qrScanner": {

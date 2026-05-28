@@ -1063,9 +1063,13 @@
     "notEnoughBitcoin": "No hay suficiente Bitcoin",
     "recipient": {
       "placeholder": "bc1…, sp1…",
-      "useSilentPayment": "Usar pago silencioso en su lugar",
-      "useOnchain": "Usar dirección en cadena en su lugar",
-      "scan": "Escanear código QR"
+      "scan": "Escanear código QR",
+      "sendToOnchain": "Enviar a dirección de Bitcoin",
+      "sendToSilentPayment": "Enviar a dirección de pago silencioso",
+      "bitcoinAddress": "Dirección de Bitcoin",
+      "silentPayment": "Dirección de pago silencioso",
+      "toLabel": "Para",
+      "clear": "Borrar destinatario"
     },
     "feeSpeed": {
       "fastest": "~10 min",
@@ -1081,14 +1085,17 @@
     },
     "errors": {
       "unavailable": "La cartera HD no está disponible para este tipo de inicio de sesión.",
-      "enterRecipient": "Introduce una dirección de Bitcoin, una dirección sp1… o un npub.",
+      "enterRecipient": "Introduce una dirección de Bitcoin o una dirección de pago silencioso sp1….",
       "noSpendable": "No hay Bitcoin gastable en esta cartera.",
       "feesNotLoaded": "No se cargaron las tasas de comisión.",
-      "cantSendToSelf": "No puedes enviarte a ti mismo.",
       "enterAmount": "Introduce una cantidad.",
       "insufficient": "No hay Bitcoin suficiente para esta cantidad + la comisión de red.",
       "waitingPrice": "Esperando el precio del BTC…",
       "noneYet": "Aún no tienes Bitcoin."
+    },
+    "scanError": {
+      "title": "No se pudo leer ese código QR",
+      "description": "Se esperaba una dirección de Bitcoin, una dirección de pago silencioso (sp1…) o un URI bitcoin:."
     },
     "toast": {
       "failedTitle": "La transacción falló"

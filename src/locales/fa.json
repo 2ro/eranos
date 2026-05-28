@@ -1063,9 +1063,13 @@
     "notEnoughBitcoin": "بیت‌کوین کافی نیست",
     "recipient": {
       "placeholder": "bc1…، sp1…",
-      "useSilentPayment": "استفاده از پرداخت خاموش به جای آن",
-      "useOnchain": "استفاده از نشانی روی‌زنجیره به جای آن",
-      "scan": "اسکن کد QR"
+      "scan": "اسکن کد QR",
+      "sendToOnchain": "ارسال به نشانی بیت‌کوین",
+      "sendToSilentPayment": "ارسال به نشانی پرداخت خاموش",
+      "bitcoinAddress": "نشانی بیت‌کوین",
+      "silentPayment": "نشانی پرداخت خاموش",
+      "toLabel": "به",
+      "clear": "پاک کردن گیرنده"
     },
     "feeSpeed": {
       "fastest": "~۱۰ دقیقه",
@@ -1081,10 +1085,9 @@
     },
     "errors": {
       "unavailable": "کیف پول HD برای این روش ورود در دسترس نیست.",
-      "enterRecipient": "یک نشانی بیت‌کوین، نشانی sp1… یا npub وارد کنید.",
+      "enterRecipient": "یک نشانی بیت‌کوین یا نشانی پرداخت خاموش sp1… وارد کنید.",
       "noSpendable": "هیچ بیت‌کوین قابل خرجی در این کیف پول وجود ندارد.",
       "feesNotLoaded": "نرخ کارمزد بارگذاری نشده است.",
-      "cantSendToSelf": "نمی‌توانید به خودتان ارسال کنید.",
       "enterAmount": "یک مبلغ وارد کنید.",
       "insufficient": "بیت‌کوین کافی برای این مبلغ + کارمزد شبکه ندارید.",
       "waitingPrice": "در انتظار قیمت BTC…",
@@ -1098,6 +1101,10 @@
       "satsAmount": "{{sats}} ساتوشی",
       "viewTransaction": "مشاهدهٔ تراکنش",
       "done": "انجام شد"
+    },
+    "scanError": {
+      "title": "خواندن آن کد QR ممکن نشد",
+      "description": "یک نشانی بیت‌کوین، نشانی پرداخت خاموش (sp1…) یا URI با پیشوند bitcoin: انتظار می‌رفت."
     }
   },
   "qrScanner": {

@@ -1047,9 +1047,13 @@
     "notEnoughBitcoin": "لا يوجد بيتكوين كافٍ",
     "recipient": {
       "placeholder": "bc1…, sp1…",
-      "useSilentPayment": "استخدام الدفع الصامت بدلاً من ذلك",
-      "useOnchain": "استخدام عنوان على السلسلة بدلاً من ذلك",
-      "scan": "مسح رمز QR"
+      "scan": "مسح رمز QR",
+      "sendToOnchain": "الإرسال إلى عنوان بيتكوين",
+      "sendToSilentPayment": "الإرسال إلى عنوان دفع صامت",
+      "bitcoinAddress": "عنوان بيتكوين",
+      "silentPayment": "عنوان دفع صامت",
+      "toLabel": "إلى",
+      "clear": "مسح المستلم"
     },
     "feeSpeed": {
       "fastest": "~10 دقائق",
@@ -1065,10 +1069,9 @@
     },
     "errors": {
       "unavailable": "محفظة HD غير متاحة لنوع تسجيل الدخول هذا.",
-      "enterRecipient": "أدخل عنوان بيتكوين أو عنوان sp1… أو npub.",
+      "enterRecipient": "أدخل عنوان بيتكوين أو عنوان دفع صامت sp1….",
       "noSpendable": "لا يوجد بيتكوين قابل للإنفاق في هذه المحفظة.",
       "feesNotLoaded": "لم يتم تحميل معدلات الرسوم.",
-      "cantSendToSelf": "لا يمكنك الإرسال إلى نفسك.",
       "enterAmount": "أدخل مبلغاً.",
       "insufficient": "البيتكوين غير كافٍ لهذا المبلغ + رسوم الشبكة.",
       "waitingPrice": "في انتظار سعر BTC…",
@@ -1076,6 +1079,10 @@
     },
     "toast": {
       "failedTitle": "فشلت المعاملة"
+    },
+    "scanError": {
+      "title": "تعذّر قراءة رمز QR هذا",
+      "description": "يُتوقّع عنوان بيتكوين، أو عنوان دفع صامت (sp1…)، أو رابط bitcoin:."
     },
     "success": {
       "title": "تم إرسال البيتكوين",

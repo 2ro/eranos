@@ -1063,9 +1063,13 @@
     "notEnoughBitcoin": "មិនមាន Bitcoin គ្រប់គ្រាន់",
     "recipient": {
       "placeholder": "bc1…, sp1…",
-      "useSilentPayment": "ប្រើការទូទាត់ស្ងាត់ជំនួសវិញ",
-      "useOnchain": "ប្រើអាសយដ្ឋានលើខ្សែសង្វាក់ជំនួសវិញ",
-      "scan": "ស្កេនកូដ QR"
+      "scan": "ស្កេនកូដ QR",
+      "sendToOnchain": "ផ្ញើទៅអាសយដ្ឋាន Bitcoin",
+      "sendToSilentPayment": "ផ្ញើទៅអាសយដ្ឋានទូទាត់ស្ងាត់",
+      "bitcoinAddress": "អាសយដ្ឋាន Bitcoin",
+      "silentPayment": "អាសយដ្ឋានទូទាត់ស្ងាត់",
+      "toLabel": "ជូន",
+      "clear": "សម្អាតអ្នកទទួល"
     },
     "feeSpeed": {
       "fastest": "~១០ នាទី",
@@ -1081,14 +1085,17 @@
     },
     "errors": {
       "unavailable": "កាបូបលុយ HD មិនអាចប្រើបានសម្រាប់ប្រភេទចូលនេះទេ។",
-      "enterRecipient": "បញ្ចូលអាសយដ្ឋាន Bitcoin, អាសយដ្ឋាន sp1… ឬ npub។",
+      "enterRecipient": "បញ្ចូលអាសយដ្ឋាន Bitcoin ឬអាសយដ្ឋានទូទាត់ស្ងាត់ sp1…។",
       "noSpendable": "គ្មាន Bitcoin ដែលអាចចំណាយបាននៅក្នុងកាបូបលុយនេះទេ។",
       "feesNotLoaded": "អត្រាថ្លៃមិនបានផ្ទុក។",
-      "cantSendToSelf": "អ្នកមិនអាចផ្ញើទៅខ្លួនឯងបានទេ។",
       "enterAmount": "បញ្ចូលចំនួន។",
       "insufficient": "មិនមាន Bitcoin គ្រប់គ្រាន់សម្រាប់ចំនួននេះ + ថ្លៃបណ្តាញ។",
       "waitingPrice": "កំពុងរង់ចាំតម្លៃ BTC…",
       "noneYet": "អ្នកមិនទាន់មាន Bitcoin ទេ។"
+    },
+    "scanError": {
+      "title": "មិនអាចអានកូដ QR នេះបានទេ",
+      "description": "រំពឹងថានឹងមានអាសយដ្ឋាន Bitcoin, អាសយដ្ឋានទូទាត់ស្ងាត់ (sp1…) ឬ URI bitcoin:។"
     },
     "toast": {
       "failedTitle": "ប្រតិបត្តិការបរាជ័យ"

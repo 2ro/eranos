@@ -1063,9 +1063,13 @@
     "notEnoughBitcoin": "کافی بټکوین نشته",
     "recipient": {
       "placeholder": "bc1…، sp1…",
-      "useSilentPayment": "پر ځای يې د چوپې ورکړې وکاروئ",
-      "useOnchain": "پر ځای يې د زنځیر په پته وکاروئ",
-      "scan": "د QR کوډ سکن کړئ"
+      "scan": "د QR کوډ سکن کړئ",
+      "sendToOnchain": "د بټکوین پتې ته ولیږئ",
+      "sendToSilentPayment": "د چوپې ورکړې پتې ته ولیږئ",
+      "bitcoinAddress": "د بټکوین پته",
+      "silentPayment": "د چوپې ورکړې پته",
+      "toLabel": "ته",
+      "clear": "ترلاسه‌کوونکی پاک کړئ"
     },
     "feeSpeed": {
       "fastest": "~۱۰ دقیقې",
@@ -1081,14 +1085,17 @@
     },
     "errors": {
       "unavailable": "د دې ډول ننوتلو لپاره د HD والټ شته نه دی.",
-      "enterRecipient": "د بټکوین پته، د sp1… پته، یا npub دننه کړئ.",
+      "enterRecipient": "د بټکوین پته یا د sp1… چوپې ورکړې پته دننه کړئ.",
       "noSpendable": "په دې والټ کې د لګولو وړ بټکوین نشته.",
       "feesNotLoaded": "د فیس نرخونه نه دي لوډ شوي.",
-      "cantSendToSelf": "تاسو ځان ته نه شئ لیږلی.",
       "enterAmount": "یوه اندازه دننه کړئ.",
       "insufficient": "د دې اندازې او د شبکې فیس لپاره کافي بټکوین نشته.",
       "waitingPrice": "د BTC قیمت ته انتظار…",
       "noneYet": "تاسو لاهم هېڅ بټکوین نه لرئ."
+    },
+    "scanError": {
+      "title": "هغه QR کوډ ونه لوستل شو",
+      "description": "د بټکوین پته، د چوپې ورکړې پته (sp1…)، یا د bitcoin: URI تمه کېده."
     },
     "toast": {
       "failedTitle": "معامله ناکامه شوه"

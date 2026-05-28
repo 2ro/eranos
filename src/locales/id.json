@@ -1431,9 +1431,13 @@
     "notEnoughBitcoin": "Bitcoin tidak mencukupi",
     "recipient": {
       "placeholder": "bc1…, sp1…",
-      "useSilentPayment": "Gunakan silent payment saja",
-      "useOnchain": "Gunakan alamat on-chain saja",
-      "scan": "Pindai kode QR"
+      "scan": "Pindai kode QR",
+      "sendToOnchain": "Kirim ke alamat Bitcoin",
+      "sendToSilentPayment": "Kirim ke alamat silent payment",
+      "bitcoinAddress": "Alamat Bitcoin",
+      "silentPayment": "Alamat silent payment",
+      "toLabel": "Kepada",
+      "clear": "Hapus penerima"
     },
     "feeSpeed": {
       "fastest": "~10 menit",
@@ -1449,14 +1453,17 @@
     },
     "errors": {
       "unavailable": "Dompet HD tidak tersedia untuk jenis login ini.",
-      "enterRecipient": "Masukkan alamat Bitcoin, alamat sp1…, atau npub.",
+      "enterRecipient": "Masukkan alamat Bitcoin atau alamat silent payment sp1….",
       "noSpendable": "Tidak ada Bitcoin yang bisa dibelanjakan di dompet ini.",
       "feesNotLoaded": "Tarif biaya belum dimuat.",
-      "cantSendToSelf": "Anda tidak bisa mengirim ke diri sendiri.",
       "enterAmount": "Masukkan jumlah.",
       "insufficient": "Bitcoin tidak cukup untuk jumlah ini + biaya jaringan.",
       "waitingPrice": "Menunggu harga BTC…",
       "noneYet": "Anda belum punya Bitcoin."
+    },
+    "scanError": {
+      "title": "Tidak bisa membaca kode QR itu",
+      "description": "Diharapkan alamat Bitcoin, alamat silent payment (sp1…), atau URI bitcoin:."
     },
     "toast": {
       "failedTitle": "Transaksi gagal"

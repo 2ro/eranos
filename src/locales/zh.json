@@ -1063,9 +1063,13 @@
     "notEnoughBitcoin": "比特币不足",
     "recipient": {
       "placeholder": "bc1…、sp1…",
-      "useSilentPayment": "改用静默支付",
-      "useOnchain": "改用链上地址",
-      "scan": "扫描二维码"
+      "scan": "扫描二维码",
+      "sendToOnchain": "发送到比特币地址",
+      "sendToSilentPayment": "发送到静默支付地址",
+      "bitcoinAddress": "比特币地址",
+      "silentPayment": "静默支付地址",
+      "toLabel": "收件人",
+      "clear": "清除收件人"
     },
     "feeSpeed": {
       "fastest": "~10 分钟",
@@ -1081,14 +1085,17 @@
     },
     "errors": {
       "unavailable": "当前登录方式不支持 HD 钱包。",
-      "enterRecipient": "请输入比特币地址、sp1… 地址或 npub。",
+      "enterRecipient": "请输入比特币地址或 sp1… 静默支付地址。",
       "noSpendable": "此钱包中没有可花费的比特币。",
       "feesNotLoaded": "费率未加载。",
-      "cantSendToSelf": "不能向自己发送。",
       "enterAmount": "请输入金额。",
       "insufficient": "比特币不足以支付该金额和网络费用。",
       "waitingPrice": "正在等待 BTC 价格…",
       "noneYet": "你还没有任何比特币。"
+    },
+    "scanError": {
+      "title": "无法读取该二维码",
+      "description": "需要的是比特币地址、静默支付地址（sp1…）或 bitcoin: URI。"
     },
     "toast": {
       "failedTitle": "交易失败"

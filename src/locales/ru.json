@@ -1495,9 +1495,13 @@
     "notEnoughBitcoin": "Недостаточно биткоинов",
     "recipient": {
       "placeholder": "bc1…, sp1…",
-      "useSilentPayment": "Использовать тихий платёж",
-      "useOnchain": "Использовать адрес в блокчейне",
-      "scan": "Сканировать QR-код"
+      "scan": "Сканировать QR-код",
+      "sendToOnchain": "Отправить на Bitcoin-адрес",
+      "sendToSilentPayment": "Отправить на адрес тихого платежа",
+      "bitcoinAddress": "Bitcoin-адрес",
+      "silentPayment": "Адрес тихого платежа",
+      "toLabel": "Кому",
+      "clear": "Очистить получателя"
     },
     "feeSpeed": {
       "fastest": "~10 мин",
@@ -1513,14 +1517,17 @@
     },
     "errors": {
       "unavailable": "HD-кошелёк недоступен для этого типа входа.",
-      "enterRecipient": "Введите Bitcoin-адрес, адрес sp1… или npub.",
+      "enterRecipient": "Введите Bitcoin-адрес или адрес тихого платежа sp1…",
       "noSpendable": "В этом кошельке нет тратимого Bitcoin.",
       "feesNotLoaded": "Ставки комиссий не загружены.",
-      "cantSendToSelf": "Вы не можете отправить самому себе.",
       "enterAmount": "Введите сумму.",
       "insufficient": "Недостаточно Bitcoin для этой суммы + комиссии сети.",
       "waitingPrice": "Ожидание цены BTC…",
       "noneYet": "У вас пока нет Bitcoin."
+    },
+    "scanError": {
+      "title": "Не удалось прочитать этот QR-код",
+      "description": "Ожидался Bitcoin-адрес, адрес тихого платежа (sp1…) или bitcoin: URI."
     },
     "toast": {
       "failedTitle": "Транзакция не удалась"

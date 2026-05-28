@@ -1390,9 +1390,13 @@
     "notEnoughBitcoin": "Bitcoin haitoshi",
     "recipient": {
       "placeholder": "bc1…, sp1…",
-      "useSilentPayment": "Tumia malipo ya kimya badala yake",
-      "useOnchain": "Tumia anwani ya katika-mnyororo badala yake",
-      "scan": "Changanua msimbo wa QR"
+      "scan": "Changanua msimbo wa QR",
+      "sendToOnchain": "Tuma kwa anwani ya Bitcoin",
+      "sendToSilentPayment": "Tuma kwa anwani ya malipo ya kimya",
+      "bitcoinAddress": "Anwani ya Bitcoin",
+      "silentPayment": "Anwani ya malipo ya kimya",
+      "toLabel": "Kwa",
+      "clear": "Futa mpokeaji"
     },
     "feeSpeed": {
       "fastest": "~dakika 10",
@@ -1408,14 +1412,17 @@
     },
     "errors": {
       "unavailable": "Pochi ya HD haipatikani kwa aina hii ya kuingia.",
-      "enterRecipient": "Weka anwani ya Bitcoin, anwani ya sp1…, au npub.",
+      "enterRecipient": "Weka anwani ya Bitcoin au anwani ya malipo ya kimya ya sp1….",
       "noSpendable": "Hakuna Bitcoin inayoweza kutumika katika pochi hii.",
       "feesNotLoaded": "Viwango vya ada havijapakiwa.",
-      "cantSendToSelf": "Huwezi kujitumia mwenyewe.",
       "enterAmount": "Weka kiasi.",
       "insufficient": "Hakuna Bitcoin ya kutosha kwa kiasi hiki + ada ya mtandao.",
       "waitingPrice": "Inasubiri bei ya BTC…",
       "noneYet": "Bado huna Bitcoin yoyote."
+    },
+    "scanError": {
+      "title": "Imeshindwa kusoma msimbo huo wa QR",
+      "description": "Ilitarajiwa anwani ya Bitcoin, anwani ya malipo ya kimya (sp1…), au URI ya bitcoin:."
     },
     "toast": {
       "failedTitle": "Muamala umeshindikana"

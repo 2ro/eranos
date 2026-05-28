@@ -25,7 +25,7 @@
     "donors_one": "{{count}} bağışçı",
     "donors_other": "{{count}} bağışçı",
     "clearSearch": "Aramayı temizle",
-    "searching": "Aranıyor\u2026",
+    "searching": "Aranıyor…",
     "searchResultsCount_one": "{{count}} sonuç",
     "searchResultsCount_other": "{{count}} sonuç",
     "sortAriaLabel": "Sıralama düzeni",
@@ -620,9 +620,9 @@
       "emptyTitle": "Henüz taahhüt yok",
       "emptyHint": "Taahhüt oluşturan ilk kişi olun.",
       "emptyHintCountry": "{{country}} için taahhüt oluşturan ilk kişi olun.",
-      "searchPlaceholder": "Taahhüt ara\u2026",
+      "searchPlaceholder": "Taahhüt ara…",
       "searchAriaLabel": "Taahhütleri ara",
-      "noMatch": "\u201c{{query}}\u201d ile eşleşen taahhüt yok",
+      "noMatch": "“{{query}}” ile eşleşen taahhüt yok",
       "noMatchHint": "Farklı bir arama terimi deneyin ya da aramayı temizleyin.",
       "needsReview": "İncelemeyi bekliyor",
       "needsReviewDesc": "Henüz öne çıkarılmamış veya gizlenmemiş {{appName}} taahhütleri. Birini Öne Çıkan rafına yükseltin ya da Gizle ile gizleyin.",
@@ -754,9 +754,9 @@
       "tickerFeaturedGroups_other": "Nostr'da öne çıkan grup",
       "tickerCountries_one": "ülke bugün paylaşım yapıyor",
       "tickerCountries_other": "ülke bugün paylaşım yapıyor",
-      "searchPlaceholder": "Grup ara\u2026",
+      "searchPlaceholder": "Grup ara…",
       "searchAriaLabel": "Grupları ara",
-      "noMatch": "\u201c{{query}}\u201d ile eşleşen grup yok",
+      "noMatch": "“{{query}}” ile eşleşen grup yok",
       "noMatchHint": "Farklı bir arama terimi deneyin ya da aramayı temizleyin."
     },
     "create": {
@@ -1090,9 +1090,9 @@
       "yourCampaignsDesc": "Kampanyalarınız Nostr'da yayında ve bağışlar kampanya bağlantısıyla çalışır. Bir Team Soapbox moderatörü onayladığında ana sayfada görünürler.",
       "empty": "Henüz kampanya yok",
       "emptyHint": "{{appName}}'da fon toplama kampanyası başlatan ilk kişi olun. Hikayenizi anlatın, yararlanıcılarınızı seçin ve bağlantıyı paylaşın.",
-      "searchPlaceholder": "Kampanya ara\u2026",
+      "searchPlaceholder": "Kampanya ara…",
       "searchAriaLabel": "Kampanyaları ara",
-      "noMatch": "\u201c{{query}}\u201d ile eşleşen kampanya yok",
+      "noMatch": "“{{query}}” ile eşleşen kampanya yok",
       "noMatchHint": "Farklı bir arama terimi deneyin ya da aramayı temizleyin."
     },
     "all": {
@@ -1430,9 +1430,13 @@
     "notEnoughBitcoin": "Yetersiz Bitcoin",
     "recipient": {
       "placeholder": "bc1…, sp1…",
-      "useSilentPayment": "Bunun yerine sessiz ödeme kullan",
-      "useOnchain": "Bunun yerine zincir üstü adres kullan",
-      "scan": "QR kodu tara"
+      "scan": "QR kodu tara",
+      "sendToOnchain": "Bitcoin adresine gönder",
+      "sendToSilentPayment": "Sessiz ödeme adresine gönder",
+      "bitcoinAddress": "Bitcoin adresi",
+      "silentPayment": "Sessiz ödeme adresi",
+      "toLabel": "Alıcı",
+      "clear": "Alıcıyı temizle"
     },
     "feeSpeed": {
       "fastest": "~10 dk",
@@ -1448,10 +1452,9 @@
     },
     "errors": {
       "unavailable": "HD cüzdan bu giriş türü için kullanılamıyor.",
-      "enterRecipient": "Bir Bitcoin adresi, sp1… adresi ya da npub girin.",
+      "enterRecipient": "Bir Bitcoin adresi ya da sp1… sessiz ödeme adresi girin.",
       "noSpendable": "Bu cüzdanda harcanabilir Bitcoin yok.",
       "feesNotLoaded": "Ücret oranları yüklenmedi.",
-      "cantSendToSelf": "Kendinize gönderim yapamazsınız.",
       "enterAmount": "Bir tutar girin.",
       "insufficient": "Bu tutar + ağ ücreti için yeterli Bitcoin yok.",
       "waitingPrice": "BTC fiyatı bekleniyor…",
@@ -1465,6 +1468,10 @@
       "satsAmount": "{{sats}} sat",
       "viewTransaction": "İşlemi görüntüle",
       "done": "Tamam"
+    },
+    "scanError": {
+      "title": "Bu QR kodu okunamadı",
+      "description": "Bir Bitcoin adresi, sessiz ödeme adresi (sp1…) veya bitcoin: URI'si bekleniyordu."
     }
   },
   "qrScanner": {

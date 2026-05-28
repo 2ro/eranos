@@ -1487,9 +1487,13 @@
     "satPerVB": "{{rate}} sat/vB",
     "recipient": {
       "placeholder": "bc1…, sp1…",
-      "useSilentPayment": "Use silent payment instead",
-      "useOnchain": "Use on-chain address instead",
-      "scan": "Scan QR code"
+      "scan": "Scan QR code",
+      "sendToOnchain": "Send to Bitcoin address",
+      "sendToSilentPayment": "Send to silent payment address",
+      "bitcoinAddress": "Bitcoin address",
+      "silentPayment": "Silent payment address",
+      "toLabel": "To",
+      "clear": "Clear recipient"
     },
     "feeSpeed": {
       "fastest": "~10 min",
@@ -1505,14 +1509,17 @@
     },
     "errors": {
       "unavailable": "HD wallet is not available for this login type.",
-      "enterRecipient": "Enter a Bitcoin address, sp1… address, or npub.",
+      "enterRecipient": "Enter a Bitcoin address or sp1… silent payment address.",
       "noSpendable": "No spendable Bitcoin in this wallet.",
       "feesNotLoaded": "Fee rates not loaded.",
-      "cantSendToSelf": "You can't send to yourself.",
       "enterAmount": "Enter an amount.",
       "insufficient": "Not enough Bitcoin for this amount + network fee.",
       "waitingPrice": "Waiting for BTC price…",
       "noneYet": "You don't have any Bitcoin yet."
+    },
+    "scanError": {
+      "title": "Couldn't read that QR code",
+      "description": "Expected a Bitcoin address, a silent payment address (sp1…), or a bitcoin: URI."
     },
     "toast": {
       "failedTitle": "Transaction failed"

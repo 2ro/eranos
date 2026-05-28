@@ -999,9 +999,13 @@
     "notEnoughBitcoin": "比特幣不足",
     "recipient": {
       "placeholder": "bc1…、sp1…",
-      "useSilentPayment": "改用靜默支付",
-      "useOnchain": "改用鏈上地址",
-      "scan": "掃描 QR 碼"
+      "scan": "掃描 QR 碼",
+      "sendToOnchain": "傳送至比特幣地址",
+      "sendToSilentPayment": "傳送至靜默支付地址",
+      "bitcoinAddress": "比特幣地址",
+      "silentPayment": "靜默支付地址",
+      "toLabel": "收件人",
+      "clear": "清除收件人"
     },
     "feeSpeed": {
       "fastest": "~10 分鐘",
@@ -1017,14 +1021,17 @@
     },
     "errors": {
       "unavailable": "當前登入方式不支援 HD 錢包。",
-      "enterRecipient": "請輸入比特幣地址、sp1… 地址或 npub。",
+      "enterRecipient": "請輸入比特幣地址或 sp1… 靜默支付地址。",
       "noSpendable": "此錢包中沒有可花費的比特幣。",
       "feesNotLoaded": "費率未載入。",
-      "cantSendToSelf": "不能向自己傳送。",
       "enterAmount": "請輸入金額。",
       "insufficient": "比特幣不足以支付該金額和網路費用。",
       "waitingPrice": "正在等待 BTC 價格…",
       "noneYet": "你還沒有任何比特幣。"
+    },
+    "scanError": {
+      "title": "無法讀取該 QR 碼",
+      "description": "預期為比特幣地址、靜默支付地址（sp1…）或 bitcoin: URI。"
     },
     "toast": {
       "failedTitle": "交易失敗"

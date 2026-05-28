@@ -1214,8 +1214,17 @@ function DonateColumn({
           isOpen={sendOpen}
           onClose={() => setSendOpen(false)}
           btcPrice={btcPrice}
-          initialRecipient={campaign.wallets.onchain.value}
-          initialRecipientAlt={campaign.wallets.sp?.value}
+          /* When the campaign exposes both an on-chain address and a
+             silent-payment code, prefill with a combined `bitcoin:`
+             BIP-21 URI so the picker's dropdown surfaces both rows and
+             the donor explicitly picks privacy vs. compatibility.
+             Otherwise prefill with the single address; the picker
+             accepts bare `bc1…` / `sp1…` inputs directly. */
+          initialRecipient={
+            campaign.wallets.sp?.value
+              ? `bitcoin:${campaign.wallets.onchain.value}?sp=${campaign.wallets.sp.value}`
+              : campaign.wallets.onchain.value
+          }
         />
       )}
     </Card>
