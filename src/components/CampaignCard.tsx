@@ -9,6 +9,7 @@ import { Card } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { Skeleton } from '@/components/ui/skeleton';
 import { ModerationOverlay } from '@/components/moderation';
+import { useAuthor } from '@/hooks/useAuthor';
 import { useBtcPrice } from '@/hooks/useBtcPrice';
 import { useCampaignDonations } from '@/hooks/useCampaignDonations';
 import { useEventTranslation } from '@/hooks/useEventTranslation';
@@ -146,11 +147,15 @@ export function CampaignCard({ campaign, variant = 'compact', className, footerB
     buttonClassName: 'size-8 rounded-full p-0 text-muted-foreground hover:text-primary hover:bg-primary/10',
   });
   const displayCampaign = parseCampaign(translatedEvent) ?? campaign;
+  const author = useAuthor(campaign.pubkey);
   const { data: stats } = useCampaignDonations(campaign);
   const { data: btcPrice } = useBtcPrice();
 
   const naddr = useMemo(() => encodeCampaignNaddr(campaign), [campaign]);
-  const cover = sanitizeUrl(displayCampaign.banner);
+  const authorMetadata = author.data?.metadata;
+  const cover = sanitizeUrl(displayCampaign.banner)
+    ?? sanitizeUrl(authorMetadata?.banner)
+    ?? sanitizeUrl(authorMetadata?.picture);
   const deadline = campaign.deadline ? formatDeadline(campaign.deadline) : null;
   const raisedSats = stats?.totalSats ?? 0;
   const countryLabel = getCampaignCountryLabel(campaign);
