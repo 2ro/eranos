@@ -8,6 +8,7 @@ import type {
 } from '@nostrify/types';
 
 const eventRelaySources = new Map<string, string>();
+const addressRelaySources = new Map<string, string>();
 const raceWinners = new Map<string, string>();
 
 function summarizeFilters(filters: NostrFilter[]): string {
@@ -38,6 +39,28 @@ export function getEventRelaySource(eventId: string): string | undefined {
   return eventRelaySources.get(eventId);
 }
 
+export function getAddressRelaySource(address: string): string | undefined {
+  return addressRelaySources.get(address);
+}
+
+function getAddress(event: NostrEvent): string | undefined {
+  if (event.kind < 30000 || event.kind >= 40000) return undefined;
+  const d = event.tags.find(([name]) => name === 'd')?.[1];
+  if (!d) return undefined;
+  return `${event.kind}:${event.pubkey}:${d}`;
+}
+
+function recordRelaySource(event: NostrEvent, relay: string): void {
+  if (!eventRelaySources.has(event.id)) {
+    eventRelaySources.set(event.id, relay);
+  }
+
+  const address = getAddress(event);
+  if (address && !addressRelaySources.has(address)) {
+    addressRelaySources.set(address, relay);
+  }
+}
+
 export class DebugRelay implements NRelay {
   constructor(
     private readonly url: string,
@@ -62,9 +85,7 @@ export class DebugRelay implements NRelay {
       if (msg[0] === 'EVENT') {
         const event = msg[2];
         eventCount += 1;
-        if (!eventRelaySources.has(event.id)) {
-          eventRelaySources.set(event.id, this.url);
-        }
+        recordRelaySource(event, this.url);
         if (!loggedFirstEvent) {
           loggedFirstEvent = true;
           console.info('[nostr relay race:first-event]', {
@@ -115,9 +136,7 @@ export class DebugRelay implements NRelay {
     const startedAt = performance.now();
     const events = await this.relay.query(filters, opts);
     for (const event of events) {
-      if (!eventRelaySources.has(event.id)) {
-        eventRelaySources.set(event.id, this.url);
-      }
+      recordRelaySource(event, this.url);
     }
     console.info('[nostr relay query]', {
       relay: this.url,

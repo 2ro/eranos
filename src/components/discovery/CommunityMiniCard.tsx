@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Users } from 'lucide-react';
 import { nip19 } from 'nostr-tools';
@@ -7,6 +8,7 @@ import { ModerationOverlay } from '@/components/moderation';
 import { Card } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useEventTranslation } from '@/hooks/useEventTranslation';
+import { getAddressRelaySource } from '@/lib/relayDebug';
 import { sanitizeUrl } from '@/lib/sanitizeUrl';
 import { cn } from '@/lib/utils';
 import {
@@ -55,6 +57,16 @@ export function CommunityMiniCard({ community, className }: CommunityMiniCardPro
   });
   const displayCommunity = parseCommunityEvent(translatedEvent) ?? community;
   const banner = sanitizeUrl(displayCommunity.image);
+
+  useEffect(() => {
+    console.debug('[nostr group card render]', {
+      relay: getAddressRelaySource(community.aTag) ?? 'unknown',
+      kind: COMMUNITY_DEFINITION_KIND,
+      address: community.aTag,
+      name: community.name,
+      path: window.location.pathname,
+    });
+  }, [community.aTag, community.name]);
 
   const naddr = nip19.naddrEncode({
     kind: COMMUNITY_DEFINITION_KIND,
