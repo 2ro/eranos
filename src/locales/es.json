@@ -1068,9 +1068,6 @@
     "recipient": {
       "label": "Destinatario",
       "placeholder": "bc1…, sp1… o npub…",
-      "sendingSp": "Enviando mediante un pago silencioso: el destinatario recibe una dirección nueva y no enlazable en la cadena.",
-      "sendingNostr": "Enviando a la dirección en cadena de un usuario de Nostr.",
-      "sendingRaw": "Enviando a una dirección de Bitcoin sin asociar.",
       "useSilentPayment": "Usar pago silencioso en su lugar",
       "useOnchain": "Usar dirección en cadena en su lugar",
       "scan": "Escanear código QR"

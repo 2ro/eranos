@@ -602,15 +602,6 @@ export function HDSendBitcoinDialog({ isOpen, onClose, btcPrice, initialRecipien
                   onScanClick={() => setScannerOpen(true)}
                   scanLabel={t('walletSend.recipient.scan')}
                 />
-                {recipient && (
-                  <p className="text-xs text-muted-foreground">
-                    {recipient.kind === 'sp'
-                      ? t('walletSend.recipient.sendingSp')
-                      : recipient.pubkey
-                        ? t('walletSend.recipient.sendingNostr')
-                        : t('walletSend.recipient.sendingRaw')}
-                  </p>
-                )}
               </div>
 
               {/* Privacy disclaimer for raw addresses + companion

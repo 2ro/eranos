@@ -1004,9 +1004,6 @@
     "recipient": {
       "label": "收款方",
       "placeholder": "bc1…、sp1…或 npub…",
-      "sendingSp": "通過靜默支付傳送 — 收款方會收到一個新鮮、不可關聯的鏈上地址。",
-      "sendingNostr": "傳送到某個 Nostr 使用者的鏈上地址。",
-      "sendingRaw": "傳送到一個原始比特幣地址。",
       "useSilentPayment": "改用靜默支付",
       "useOnchain": "改用鏈上地址",
       "scan": "掃描 QR 碼"

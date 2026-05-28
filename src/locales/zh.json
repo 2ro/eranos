@@ -1068,9 +1068,6 @@
     "recipient": {
       "label": "收款方",
       "placeholder": "bc1…、sp1…或 npub…",
-      "sendingSp": "通过静默支付发送 — 收款方会收到一个新鲜、不可关联的链上地址。",
-      "sendingNostr": "发送到某个 Nostr 用户的链上地址。",
-      "sendingRaw": "发送到一个原始比特币地址。",
       "useSilentPayment": "改用静默支付",
       "useOnchain": "改用链上地址",
       "scan": "扫描二维码"

@@ -1490,9 +1490,6 @@
     "recipient": {
       "label": "Destinataire",
       "placeholder": "bc1…, sp1…, ou npub…",
-      "sendingSp": "Envoi via un paiement silencieux — le destinataire reçoit une nouvelle adresse on-chain non-traçable.",
-      "sendingNostr": "Envoi vers l'adresse on-chain d'un utilisateur Nostr.",
-      "sendingRaw": "Envoi vers une adresse Bitcoin brute.",
       "useSilentPayment": "Utiliser un paiement silencieux à la place",
       "useOnchain": "Utiliser une adresse on-chain à la place",
       "scan": "Scanner le QR code"

@@ -1491,9 +1491,6 @@
     "recipient": {
       "label": "Recipient",
       "placeholder": "bc1…, sp1…, or npub…",
-      "sendingSp": "Sending via a silent payment — the recipient gets a fresh, unlinkable on-chain address.",
-      "sendingNostr": "Sending to a Nostr user's on-chain address.",
-      "sendingRaw": "Sending to a raw Bitcoin address.",
       "useSilentPayment": "Use silent payment instead",
       "useOnchain": "Use on-chain address instead",
       "scan": "Scan QR code"

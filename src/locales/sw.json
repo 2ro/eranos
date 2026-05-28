@@ -1395,9 +1395,6 @@
     "recipient": {
       "label": "Mpokeaji",
       "placeholder": "bc1…, sp1…, au npub…",
-      "sendingSp": "Inatuma kupitia malipo ya kimya — mpokeaji anapata anwani mpya ya katika-mnyororo isiyounganika.",
-      "sendingNostr": "Inatuma kwa anwani ya katika-mnyororo ya mtumiaji wa Nostr.",
-      "sendingRaw": "Inatuma kwa anwani ghafi ya Bitcoin.",
       "useSilentPayment": "Tumia malipo ya kimya badala yake",
       "useOnchain": "Tumia anwani ya katika-mnyororo badala yake",
       "scan": "Changanua msimbo wa QR"

@@ -1435,9 +1435,6 @@
     "recipient": {
       "label": "Alıcı",
       "placeholder": "bc1…, sp1… ya da npub…",
-      "sendingSp": "Sessiz ödeme aracılığıyla gönderiliyor — alıcı yeni, izlenemez bir zincir üstü adres alır.",
-      "sendingNostr": "Bir Nostr kullanıcısının zincir üstü adresine gönderiliyor.",
-      "sendingRaw": "Ham bir Bitcoin adresine gönderiliyor.",
       "useSilentPayment": "Bunun yerine sessiz ödeme kullan",
       "useOnchain": "Bunun yerine zincir üstü adres kullan",
       "scan": "QR kodu tara"

@@ -1068,9 +1068,6 @@
     "recipient": {
       "label": "Mugamuchiri",
       "placeholder": "bc1…, sp1…, kana npub…",
-      "sendingSp": "Kutumira nemubhadharo wakanyararira — mugamuchiri anowana kero itsva, isingakwanise kubatanidzwa pacheni.",
-      "sendingNostr": "Kutumira kukero yepacheni yemushandisi weNostr.",
-      "sendingRaw": "Kutumira kukero yeBitcoin yakangosaina.",
       "useSilentPayment": "Shandisa mubhadharo wakanyararira pachinzvimbo",
       "useOnchain": "Shandisa kero yepacheni pachinzvimbo",
       "scan": "Skena kodhi yeQR"
