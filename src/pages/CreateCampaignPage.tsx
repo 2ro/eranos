@@ -10,6 +10,7 @@ import {
   AlertTriangle,
   ArrowLeft,
   HandHeart,
+  HelpCircle,
   Loader2,
   MapPin,
   Wallet,
@@ -34,6 +35,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { useAppContext } from '@/hooks/useAppContext';
 import { useAuthor } from '@/hooks/useAuthor';
 import { useCampaign } from '@/hooks/useCampaign';
@@ -762,7 +764,28 @@ export function CreateCampaignPage() {
 
           <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
             {/* Goal — integer USD */}
-            <FormSection title={t('campaignsCreate.goal')} requirement="Optional">
+            <FormSection
+              title={(
+                <span className="inline-flex items-center gap-1.5">
+                  {t('campaignsCreate.goal')}
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <button
+                        type="button"
+                        className="inline-flex text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                        aria-label={t('campaignsCreate.goalNote')}
+                      >
+                        <HelpCircle className="size-4" />
+                      </button>
+                    </TooltipTrigger>
+                    <TooltipContent side="top" className="max-w-64 text-xs leading-relaxed">
+                      {t('campaignsCreate.goalNote')}
+                    </TooltipContent>
+                  </Tooltip>
+                </span>
+              )}
+              requirement="Optional"
+            >
               <div className="relative">
                 <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">
                   $
@@ -780,9 +803,6 @@ export function CreateCampaignPage() {
                   USD
                 </span>
               </div>
-              <p className="text-xs text-muted-foreground">
-                {t('campaignsCreate.goalNote')}
-              </p>
             </FormSection>
 
             {/* Deadline */}
