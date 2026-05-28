@@ -912,20 +912,23 @@ export function CreateCampaignPage() {
 /**
  * Multi-step layout for creating a new campaign.
  *
- * Modelled on the {@link AuthDialog} signup flow: a single piece of
- * `useState<Step>` swaps the section that's currently rendered, with a
- * progress label at the top and a sticky-feeling footer at the bottom.
+ * Visually modelled on the captive {@link OnboardingGate} signup flow:
+ * a sticky single-bar progress indicator across the top, a centered
+ * narrow column for each step, a centered title block, a big
+ * rounded-full primary CTA, and a subtle text "back" link beneath it.
+ * Steps animate in from the bottom on transition so the swap feels
+ * like a navigation, not a re-render.
  *
- * Step 1 holds the **required** fields (title + wallet). Once those are
- * filled in, the user can either continue through the remaining steps or
- * tap "Launch campaign" right from step 1 and skip the rest — the parent
- * form's `handleSubmit` handles the rest. Steps 2 and 3 surface a
- * "Skip" button alongside Back/Next; step 4 is terminal and shows
- * "Launch campaign" as its primary action.
+ * Step 1 holds the **required** fields (title + wallet). Once the
+ * title is non-empty the user can advance to step 2 *or* publish
+ * right then via the "Launch campaign" shortcut — every step from 1
+ * onward shows that shortcut so the rest of the wizard is opt-in.
+ * Step 4 is terminal and surfaces "Launch campaign" as the only
+ * forward action.
  *
- * The form lives in this wrapper (not the parent) so the publish button
- * — wherever it ends up in the wizard — submits the same form and reuses
- * the parent's `handleSubmit`.
+ * The form lives in this wrapper (not the parent) so the publish
+ * button — wherever it ends up in the wizard — submits the same form
+ * and reuses the parent's `handleSubmit`.
  */
 function CampaignWizard({
   header,
@@ -965,103 +968,110 @@ function CampaignWizard({
     3: t('campaignsCreate.wizard.step3Subtitle'),
     4: t('campaignsCreate.wizard.step4Subtitle'),
   };
+  const stepBodies: Record<1 | 2 | 3 | 4, ReactNode> = {
+    1: step1,
+    2: step2,
+    3: step3,
+    4: step4,
+  };
+
+  const progress = (step / 4) * 100;
+
+  // The required-field gate. Step 1 can't advance without it; later
+  // steps assume it's satisfied (the user couldn't have reached them
+  // otherwise) but we keep the same flag wired into the Launch
+  // shortcut for safety.
+  const canSubmit = step1CanAdvance && !submitting;
 
   return (
     <main className="min-h-screen pb-16">
-      <form className="max-w-3xl mx-auto px-4 sm:px-6 py-8 lg:py-10 space-y-5" onSubmit={onSubmit}>
+      {/* Sticky single-bar progress indicator across the page, mirroring
+          the captive onboarding flow. Lives just below the top nav so
+          the user always sees how far through they are. */}
+      <div className="sticky top-0 z-10 h-1 bg-muted">
+        <div
+          className="h-full bg-primary transition-all duration-500 ease-out"
+          style={{ width: `${progress}%` }}
+        />
+      </div>
+
+      <form className="max-w-3xl mx-auto px-4 sm:px-6 py-6 lg:py-10 space-y-6" onSubmit={onSubmit}>
         {header}
 
-        {/* Progress indicator — text-only, mirrors CreateCommunityEventDialog. */}
-        <div className="space-y-3">
-          <div className="space-y-1">
-            <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-              {t('campaignsCreate.wizard.stepProgress', { current: step, total: 4 })}
-            </p>
-            <h2 className="text-lg font-semibold tracking-tight">{stepTitles[step]}</h2>
-            <p className="text-sm text-muted-foreground">{stepSubtitles[step]}</p>
-          </div>
-          {/* Progress bar */}
-          <div className="flex gap-1.5" aria-hidden>
-            {[1, 2, 3, 4].map((n) => (
-              <div
-                key={n}
-                className={cn(
-                  'h-1 flex-1 rounded-full motion-safe:transition-colors',
-                  n <= step ? 'bg-primary' : 'bg-muted',
-                )}
-              />
-            ))}
-          </div>
-        </div>
+        <div className="max-w-md mx-auto w-full">
+          <div
+            key={step}
+            className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-300"
+          >
+            {/* Centered title block — captive-onboarding cadence: small
+                "Step N of 4" eyebrow, large heading, muted subtitle. */}
+            <div className="space-y-2 text-center">
+              <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                {t('campaignsCreate.wizard.stepProgress', { current: step, total: 4 })}
+              </p>
+              <h2 className="text-2xl font-bold tracking-tight">{stepTitles[step]}</h2>
+              <p className="text-sm text-muted-foreground">{stepSubtitles[step]}</p>
+            </div>
 
-        <div className="rounded-2xl bg-card/50 p-2">
-          {step === 1 && step1}
-          {step === 2 && step2}
-          {step === 3 && step3}
-          {step === 4 && step4}
-        </div>
+            {/* Step body. No card chrome — onboarding keeps the content
+                area visually quiet so the focus stays on the fields. */}
+            <div className="space-y-3">{stepBodies[step]}</div>
 
-        {errorAlert}
+            {errorAlert}
 
-        {/* Footer — buttons vary per step. */}
-        <div className="space-y-2 pt-1">
-          {step === 1 ? (
-            <>
-              <Button type="submit" disabled={submitting} className="w-full">
-                {submitButtonContent}
-              </Button>
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => setStep(2)}
-                disabled={submitting || !step1CanAdvance}
-                className="w-full"
-              >
-                {t('campaignsCreate.wizard.next')}
-              </Button>
-            </>
-          ) : step === 4 ? (
-            <>
-              <Button type="submit" disabled={submitting} className="w-full">
-                {submitButtonContent}
-              </Button>
-              <Button
-                type="button"
-                variant="ghost"
-                onClick={() => setStep(3)}
-                disabled={submitting}
-                className="w-full"
-              >
-                {t('campaignsCreate.wizard.back')}
-              </Button>
-            </>
-          ) : (
-            // Steps 2 and 3 — three buttons: Back / Skip (publish now) / Next.
-            <>
-              <Button
-                type="button"
-                onClick={() => setStep((s) => (s === 2 ? 3 : 4) as 1 | 2 | 3 | 4)}
-                disabled={submitting}
-                className="w-full"
-              >
-                {t('campaignsCreate.wizard.next')}
-              </Button>
-              <div className="flex gap-2">
+            {/* Footer.
+              - Steps 1–3: primary "Next" (rounded-full h-12) advances the
+                wizard; a ghost "Launch campaign" shortcut sits beneath
+                once the required fields validate, so the rest of the
+                wizard is opt-in.
+              - Step 4: primary "Launch campaign" is the only forward
+                action.
+              - A subtle text "Back" link sits at the very bottom on every
+                step but the first; step 1's "Back" is a no-op (handled by
+                the page-level back arrow in the header). */}
+            <div className="space-y-3 pt-1">
+              {step === 4 ? (
                 <Button
-                  type="button"
-                  variant="ghost"
-                  onClick={() => setStep((s) => (s === 3 ? 2 : 1) as 1 | 2 | 3 | 4)}
-                  disabled={submitting}
-                  className="flex-1"
+                  type="submit"
+                  disabled={!canSubmit}
+                  className="w-full h-12 text-base rounded-full"
                 >
+                  {submitButtonContent}
+                </Button>
+              ) : (
+                <>
+                  <Button
+                    type="button"
+                    onClick={() => setStep((s) => Math.min(s + 1, 4) as 1 | 2 | 3 | 4)}
+                    disabled={submitting || (step === 1 && !step1CanAdvance)}
+                    className="w-full h-12 text-base rounded-full"
+                  >
+                    {t('campaignsCreate.wizard.next')}
+                  </Button>
+                  <Button
+                    type="submit"
+                    variant="ghost"
+                    disabled={!canSubmit}
+                    className="w-full"
+                  >
+                    {submitting ? submitButtonContent : t('campaignsCreate.wizard.launchNow')}
+                  </Button>
+                </>
+              )}
+
+              {step > 1 && (
+                <button
+                  type="button"
+                  onClick={() => setStep((s) => Math.max(s - 1, 1) as 1 | 2 | 3 | 4)}
+                  disabled={submitting}
+                  className="w-full text-sm text-muted-foreground hover:text-foreground inline-flex items-center justify-center gap-1.5 py-2 disabled:opacity-50"
+                >
+                  <ArrowLeft className="h-3.5 w-3.5 rtl:rotate-180" />
                   {t('campaignsCreate.wizard.back')}
-                </Button>
-                <Button type="submit" variant="outline" disabled={submitting} className="flex-1">
-                  {submitting ? submitButtonContent : t('campaignsCreate.wizard.launchNow')}
-                </Button>
-              </div>
-            </>
-          )}
+                </button>
+              )}
+            </div>
+          </div>
         </div>
       </form>
     </main>
