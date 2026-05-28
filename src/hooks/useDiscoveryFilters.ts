@@ -11,8 +11,14 @@ import type { Nip50Sort } from '@/hooks/useNip50Search';
  * - `'top'` and `'new'` map to the toolbar's active sort modes.
  * - Anything else (missing, empty, legacy values) collapses to
  *   `'default'`, the curated featured-first idle state.
+ *
+ * Exported because the dedicated discovery pages (`/campaigns/all`,
+ * `/pledges`) read `?sort=` independently from the section's hook to
+ * thread the value into ancillary derivations (hidden-list cache
+ * lookups, create-X href country prefills). One canonical parser
+ * keeps page-level and section-level reads in lockstep.
  */
-function parseSort(value: string | null): Nip50Sort {
+export function parseSort(value: string | null): Nip50Sort {
   if (value === 'top') return 'top';
   if (value === 'new') return 'new';
   return 'default';

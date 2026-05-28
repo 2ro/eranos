@@ -3,10 +3,9 @@ import { useTranslation } from 'react-i18next';
 
 import { ActionShareMenu } from '@/components/ActionShareMenu';
 import { Card } from '@/components/ui/card';
-import { Skeleton } from '@/components/ui/skeleton';
 import { DiscoverySearchToolbar } from '@/components/DiscoverySearchToolbar';
 import { ModerationOverlay } from '@/components/moderation';
-import { PledgeCard } from '@/components/PledgeCard';
+import { PledgeCard, PledgeCardSkeleton } from '@/components/PledgeCard';
 import { parseAction, useActions, type Action } from '@/hooks/useActions';
 import { useBtcPrice } from '@/hooks/useBtcPrice';
 import { useCampaignModerators } from '@/hooks/useCampaignModerators';
@@ -14,25 +13,7 @@ import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useDiscoveryFilters } from '@/hooks/useDiscoveryFilters';
 import { useNip50Search } from '@/hooks/useNip50Search';
 import { usePledgeModeration } from '@/hooks/usePledgeModeration';
-
-function getPledgeCoord(action: Action) {
-  return `36639:${action.pubkey}:${action.id}`;
-}
-
-function ActionSkeleton() {
-  return (
-    <Card className="overflow-hidden border-border/70 shadow-sm h-full flex flex-col">
-      <Skeleton className="aspect-[16/9] w-full rounded-none" />
-      <div className="flex-1 p-5 space-y-3">
-        <Skeleton className="h-5 w-3/4" />
-        <Skeleton className="h-4 w-full" />
-        <Skeleton className="h-4 w-4/5" />
-        <Skeleton className="h-2 w-full" />
-        <Skeleton className="h-4 w-2/3" />
-      </div>
-    </Card>
-  );
-}
+import { getPledgeCoord } from '@/lib/pledges';
 
 interface PledgesDiscoverySectionProps {
   /**
@@ -285,7 +266,7 @@ export function PledgesDiscoverySection({
           {isSearchLoading && !searchHits ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
               {Array.from({ length: 8 }).map((_, i) => (
-                <ActionSkeleton key={i} />
+                <PledgeCardSkeleton key={i} />
               ))}
             </div>
           ) : searchHits && searchHits.length > 0 ? (
@@ -316,7 +297,7 @@ export function PledgesDiscoverySection({
       ) : isLoading ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
           {Array.from({ length: 8 }).map((_, i) => (
-            <ActionSkeleton key={i} />
+            <PledgeCardSkeleton key={i} />
           ))}
         </div>
       ) : idlePledges.length > 0 ? (

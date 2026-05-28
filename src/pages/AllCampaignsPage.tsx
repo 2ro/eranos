@@ -11,29 +11,15 @@ import { HeroAtmosphere } from '@/components/HeroAtmosphere';
 import { HeroBanner } from '@/components/HeroBanner';
 import { ModeratorCollapsibleSection } from '@/components/moderation';
 import { useCampaigns } from '@/hooks/useCampaigns';
-import { useAllCampaigns, type CampaignSort } from '@/hooks/useAllCampaigns';
+import { useAllCampaigns, toQuerySort } from '@/hooks/useAllCampaigns';
 import { useCampaignModeration } from '@/hooks/useCampaignModeration';
 import { useCampaignModerators } from '@/hooks/useCampaignModerators';
 import { useAppContext } from '@/hooks/useAppContext';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
+import { parseSort } from '@/hooks/useDiscoveryFilters';
 import { HOPE_PALETTE } from '@/lib/hopePalette';
 import { cn } from '@/lib/utils';
-import type { Nip50Sort } from '@/hooks/useNip50Search';
 import type { ParsedCampaign } from '@/lib/campaign';
-
-/**
- * Type-guard mirroring the one in `useDiscoveryFilters`. Pulled out
- * to keep the page's hidden-section derivation self-contained, since
- * it needs to read the same URL params the section reads.
- */
-function parseSort(value: string | null): Nip50Sort {
-  if (value === 'top') return 'top';
-  if (value === 'new') return 'new';
-  return 'default';
-}
-
-/** Toolbar sort vocabulary → useAllCampaigns vocabulary. */
-const toQuerySort = (s: Nip50Sort): CampaignSort => (s === 'top' ? 'top' : 'none');
 
 /**
  * Lists every campaign found on relays.

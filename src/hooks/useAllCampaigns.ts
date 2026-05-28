@@ -5,9 +5,24 @@ import type { NostrEvent } from '@nostrify/nostrify';
 
 import { CAMPAIGN_KIND, type ParsedCampaign } from '@/lib/campaign';
 import { parseCampaignEvents } from '@/hooks/useCampaigns';
+import type { Nip50Sort } from '@/hooks/useNip50Search';
 
 /** Sort modes for the All Campaigns page. */
 export type CampaignSort = 'top' | 'none';
+
+/**
+ * Map the toolbar's sort vocabulary (`default` / `top` / `new`) onto
+ * `useAllCampaigns`'s vocabulary (`top` / `none`). `'new'` and `'default'`
+ * both map to `'none'` (chronological) — discovery sections apply the
+ * "show featured only when idle" framing on top of the chronological
+ * feed, so the underlying query doesn't need to distinguish them.
+ *
+ * Exported so the section component and any page-level consumer using
+ * the same hook stay aligned through one helper instead of two
+ * hand-rolled ternaries.
+ */
+export const toQuerySort = (s: Nip50Sort): CampaignSort =>
+  s === 'top' ? 'top' : 'none';
 
 interface UseAllCampaignsOptions {
   /** Sort mode. `top` ranks by total sats raised; `none` is chronological. */

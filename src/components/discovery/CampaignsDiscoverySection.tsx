@@ -7,22 +7,13 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { CampaignCard, CampaignCardSkeleton } from '@/components/CampaignCard';
 import { DiscoverySearchToolbar } from '@/components/DiscoverySearchToolbar';
-import { useAllCampaigns, type CampaignSort } from '@/hooks/useAllCampaigns';
+import { useAllCampaigns, toQuerySort } from '@/hooks/useAllCampaigns';
 import { useCampaignModeration } from '@/hooks/useCampaignModeration';
 import { useCampaignModerators } from '@/hooks/useCampaignModerators';
 import { useCampaigns } from '@/hooks/useCampaigns';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useDiscoveryFilters } from '@/hooks/useDiscoveryFilters';
-import type { Nip50Sort } from '@/hooks/useNip50Search';
 import type { ParsedCampaign } from '@/lib/campaign';
-
-/**
- * Map the toolbar's sort vocabulary (`default` / `top` / `new`) to the
- * `useAllCampaigns` hook's vocabulary (`top` / `none`). `'new'` and
- * `'default'` both map to `'none'` (chronological) — the section
- * handles the "show featured only" framing on top of that.
- */
-const toQuerySort = (s: Nip50Sort): CampaignSort => (s === 'top' ? 'top' : 'none');
 
 interface CampaignsDiscoverySectionProps {
   /**

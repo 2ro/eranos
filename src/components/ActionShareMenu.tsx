@@ -24,11 +24,8 @@ import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useNostrPublish } from '@/hooks/useNostrPublish';
 import { useShareOrigin } from '@/hooks/useShareOrigin';
 import { useToast } from '@/hooks/useToast';
+import { getPledgeCoord } from '@/lib/pledges';
 import type { Action } from '@/hooks/useActions';
-
-function getPledgeCoord(action: Action) {
-  return `36639:${action.pubkey}:${action.id}`;
-}
 
 /**
  * Per-card kebab menu for pledges. Surfaces:

@@ -21,6 +21,7 @@ import { usePledgeModeration } from '@/hooks/usePledgeModeration';
 import { getGeoDisplayName } from '@/lib/countries';
 import { DEFAULT_ACTION_COVERS } from '@/lib/defaultActionCovers';
 import { HOPE_PALETTE } from '@/lib/hopePalette';
+import { getPledgeCoord } from '@/lib/pledges';
 import { cn } from '@/lib/utils';
 import { HeroAtmosphere } from '@/components/HeroAtmosphere';
 import { HeroBanner } from '@/components/HeroBanner';
@@ -28,29 +29,8 @@ import {
   ModerationOverlay,
   ModeratorCollapsibleSection,
 } from '@/components/moderation';
-import { PledgeCard } from '@/components/PledgeCard';
-import { Card } from '@/components/ui/card';
+import { PledgeCard, PledgeCardSkeleton } from '@/components/PledgeCard';
 import { Button } from '@/components/ui/button';
-import { Skeleton } from '@/components/ui/skeleton';
-
-function getPledgeCoord(action: Action) {
-  return `36639:${action.pubkey}:${action.id}`;
-}
-
-function ActionSkeleton() {
-  return (
-    <Card className="overflow-hidden border-border/70 shadow-sm h-full flex flex-col">
-      <Skeleton className="aspect-[16/9] w-full rounded-none" />
-      <div className="flex-1 p-5 space-y-3">
-        <Skeleton className="h-5 w-3/4" />
-        <Skeleton className="h-4 w-full" />
-        <Skeleton className="h-4 w-4/5" />
-        <Skeleton className="h-2 w-full" />
-        <Skeleton className="h-4 w-2/3" />
-      </div>
-    </Card>
-  );
-}
 
 /**
  * Dedicated `/pledges` page.
@@ -187,7 +167,7 @@ export default function ActionsPage() {
             skeleton={
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
                 {Array.from({ length: 4 }).map((_, i) => (
-                  <ActionSkeleton key={i} />
+                  <PledgeCardSkeleton key={i} />
                 ))}
               </div>
             }

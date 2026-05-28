@@ -8,6 +8,7 @@ import { nip19 } from 'nostr-tools';
 import { AuthorByline } from '@/components/AuthorByline';
 import { Badge } from '@/components/ui/badge';
 import { Card } from '@/components/ui/card';
+import { Skeleton } from '@/components/ui/skeleton';
 import { useEventTranslation } from '@/hooks/useEventTranslation';
 import { parseAction, type Action } from '@/hooks/useActions';
 import { getGeoDisplayName } from '@/lib/countries';
@@ -170,5 +171,32 @@ export function PledgeCard({
         </div>
       </Card>
     </Link>
+  );
+}
+
+/**
+ * Loading placeholder that matches `PledgeCard`'s grid-variant shape:
+ * 16:9 cover, then title, two lines of body, a progress bar row, and
+ * a footer line. Sized to slot into the same `<DiscoveryGrid>` / 4-col
+ * grids as the real card so the skeleton row doesn't reflow when data
+ * arrives.
+ *
+ * Lives next to `PledgeCard` for parity with `CampaignCardSkeleton`
+ * and `CommunityMiniCardSkeleton`, which sit next to their cards too.
+ * Was duplicated as `ActionSkeleton` in `PledgesDiscoverySection` and
+ * `ActionsPage` before this consolidation.
+ */
+export function PledgeCardSkeleton() {
+  return (
+    <Card className="overflow-hidden border-border/70 shadow-sm h-full flex flex-col">
+      <Skeleton className="aspect-[16/9] w-full rounded-none" />
+      <div className="flex-1 p-5 space-y-3">
+        <Skeleton className="h-5 w-3/4" />
+        <Skeleton className="h-4 w-full" />
+        <Skeleton className="h-4 w-4/5" />
+        <Skeleton className="h-2 w-full" />
+        <Skeleton className="h-4 w-2/3" />
+      </div>
+    </Card>
   );
 }
