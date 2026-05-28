@@ -357,7 +357,7 @@ export function CampaignsPage() {
           <section className="space-y-5">
             <div>
               <h2 className="text-2xl sm:text-3xl font-bold tracking-tight inline-flex items-center gap-2">
-                <ShieldCheck className="size-6 text-primary/70" />
+                <ShieldCheck className="size-6 text-primary" />
                 {t('campaigns.home.yourCampaigns')}
               </h2>
               <p className="text-sm text-muted-foreground mt-1 max-w-2xl">
@@ -451,7 +451,7 @@ function EmptyState() {
   return (
     <Card className="border-dashed">
       <CardContent className="py-12 px-8 text-center space-y-4">
-        <HandHeart className="size-10 text-muted-foreground/60 mx-auto" />
+        <HandHeart className="size-10 text-muted-foreground mx-auto" />
         <div className="space-y-1.5">
           <h3 className="text-lg font-semibold">{t('campaigns.home.empty')}</h3>
           <p className="text-muted-foreground max-w-sm mx-auto">

@@ -126,7 +126,7 @@ export function AddMembersDialog({ open, onOpenChange, listId, listPubkeys }: Ad
         <div ref={listRef} className="overflow-y-auto flex-1">
           {!query.trim() ? (
             <div className="py-12 text-center text-muted-foreground text-sm">
-              <UserPlus className="size-8 mx-auto mb-2 opacity-50" />
+              <UserPlus className="size-8 mx-auto mb-2" />
               Search for people to add to this list.
             </div>
           ) : isLoading && !searchResults ? (

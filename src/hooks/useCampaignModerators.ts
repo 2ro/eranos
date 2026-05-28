@@ -2,6 +2,7 @@ import { useNostr } from '@nostrify/react';
 import { useQuery } from '@tanstack/react-query';
 
 import { TEAM_SOAPBOX } from '@/lib/agoraDefaults';
+import { DITTO_RELAY } from '@/lib/appRelays';
 
 /** A 64-character lowercase hex string. */
 const HEX_64_RE = /^[0-9a-f]{64}$/;
@@ -30,7 +31,11 @@ export function useCampaignModerators() {
   return useQuery({
     queryKey: ['campaign-moderators', TEAM_SOAPBOX.pubkey, TEAM_SOAPBOX.identifier],
     queryFn: async ({ signal }) => {
-      const events = await nostr.query(
+      // The home page gates campaign visibility on this pack. Query the
+      // canonical app relay directly so a fast empty EOSE from another relay
+      // cannot race the pack out and make the page render as empty.
+      const relay = nostr.relay(DITTO_RELAY);
+      const events = await relay.query(
         [
           {
             kinds: [TEAM_SOAPBOX.kind],

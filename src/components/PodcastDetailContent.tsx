@@ -112,7 +112,7 @@ function EpisodeDetail({ event }: { event: NostrEvent }) {
             <img src={proxy(parsed.artwork, 320)} alt={parsed.title} className="w-full h-full object-cover" />
           ) : (
             <div className="w-full h-full flex items-center justify-center bg-primary/10">
-              <Podcast className="size-12 text-primary/30" />
+              <Podcast className="size-12 text-primary" />
             </div>
           )}
         </div>
@@ -316,7 +316,7 @@ function TrailerDetail({ event }: { event: NostrEvent }) {
       <div className="px-4 flex gap-5 items-start">
         <div className="shrink-0 w-32 sm:w-40 aspect-square rounded-2xl overflow-hidden bg-muted shadow-lg">
           <div className="w-full h-full flex items-center justify-center bg-primary/10">
-            <Podcast className="size-12 text-primary/30" />
+            <Podcast className="size-12 text-primary" />
           </div>
         </div>
 

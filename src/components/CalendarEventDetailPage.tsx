@@ -418,7 +418,7 @@ export function CalendarEventDetailPage({ event }: { event: NostrEvent }) {
           <img src={image} alt="" className="absolute inset-0 size-full object-cover" />
         ) : (
           <div className="absolute inset-0 flex items-center justify-center">
-            <CalendarDays className="size-20 text-primary/40" />
+            <CalendarDays className="size-20 text-primary" />
           </div>
         )}
         <div aria-hidden className="absolute inset-x-0 bottom-0 top-[20%] bg-gradient-to-t from-black/95 via-black/80 to-transparent" />

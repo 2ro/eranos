@@ -45,7 +45,7 @@ function PackFeedTab({ pubkeys }: { pubkeys: string[] }) {
   if (pubkeys.length === 0) {
     return (
       <div className="py-16 text-center text-muted-foreground">
-        <Users className="size-8 mx-auto mb-2 opacity-50" />
+        <Users className="size-8 mx-auto mb-2" />
         <p className="text-sm">No members in this pack yet.</p>
       </div>
     );

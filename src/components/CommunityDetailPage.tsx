@@ -284,7 +284,7 @@ function CalendarEventShelfCard({ event }: { event: NostrEvent }) {
             />
           ) : (
             <div className="absolute inset-0 flex items-center justify-center">
-              <CalendarDays className="size-12 text-primary/40" />
+              <CalendarDays className="size-12 text-primary" />
             </div>
           )}
           {dateLabel && (
@@ -833,7 +833,7 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
             <img src={cover} alt="" className="absolute inset-0 size-full object-cover" />
           ) : (
             <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-primary/50 via-primary/25 to-secondary">
-              <Users className="size-20 text-primary/40" />
+              <Users className="size-20 text-primary" />
             </div>
           )}
           <div aria-hidden className="absolute inset-x-0 bottom-0 top-[18%] bg-gradient-to-t from-black/95 via-black/80 to-transparent" />

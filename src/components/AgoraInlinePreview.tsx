@@ -7,12 +7,14 @@ import { useTranslation } from 'react-i18next';
 
 import { useBtcPrice } from '@/hooks/useBtcPrice';
 import { useCampaignDonations } from '@/hooks/useCampaignDonations';
+import { useAuthor } from '@/hooks/useAuthor';
 import { parseAction } from '@/hooks/useActions';
 import { getGeoDisplayName } from '@/lib/countries';
 import { parseCampaign, getCampaignCountryLabel } from '@/lib/campaign';
 import { parseCommunityEvent } from '@/lib/communityUtils';
 import { formatCampaignAmount, formatUsdGoal, satsToUsd } from '@/lib/formatCampaignAmount';
 import { formatCompactPledgeDeadline, formatPledgeAmount } from '@/lib/pledges';
+import { sanitizeUrl } from '@/lib/sanitizeUrl';
 import { cn } from '@/lib/utils';
 
 function getDeadlineLabel(unixSeconds: number): { label: string; isPast: boolean } {
@@ -65,8 +67,13 @@ export function CampaignInlinePreview({ event }: { event: NostrEvent }) {
   const campaign = parseCampaign(event);
   const { data: btcPrice } = useBtcPrice();
   const { data: stats } = useCampaignDonations(campaign ?? undefined);
+  const author = useAuthor(event.pubkey);
   if (!campaign) return null;
 
+  const authorMetadata = author.data?.metadata;
+  const cover = sanitizeUrl(campaign.banner)
+    ?? sanitizeUrl(authorMetadata?.banner)
+    ?? sanitizeUrl(authorMetadata?.picture);
   const naddr = nip19.naddrEncode({ kind: event.kind, pubkey: event.pubkey, identifier: campaign.identifier });
   const countryLabel = getCampaignCountryLabel(campaign);
   const deadline = campaign.deadline ? getDeadlineLabel(campaign.deadline) : undefined;
@@ -82,10 +89,10 @@ export function CampaignInlinePreview({ event }: { event: NostrEvent }) {
   return (
     <Link to={`/${naddr}`} onClick={(e) => e.stopPropagation()} className="block rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background">
       <InlineShell
-        image={campaign.banner}
+        image={cover}
         fallbackIcon={<HandHeart className="size-12" />}
         title={campaign.title}
-        description={campaign.summary || campaign.story}
+        description={campaign.story}
         meta={(
           <div className="space-y-2 pt-1">
             {campaign.goalUsd && !isSilentPayment ? (

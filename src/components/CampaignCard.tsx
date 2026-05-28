@@ -9,6 +9,7 @@ import { Card } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { Skeleton } from '@/components/ui/skeleton';
 import { ModerationOverlay } from '@/components/moderation';
+import { useAuthor } from '@/hooks/useAuthor';
 import { useBtcPrice } from '@/hooks/useBtcPrice';
 import { useCampaignDonations } from '@/hooks/useCampaignDonations';
 import { useEventTranslation } from '@/hooks/useEventTranslation';
@@ -146,11 +147,15 @@ export function CampaignCard({ campaign, variant = 'compact', className, footerB
     buttonClassName: 'size-8 rounded-full p-0 text-muted-foreground hover:text-primary hover:bg-primary/10',
   });
   const displayCampaign = parseCampaign(translatedEvent) ?? campaign;
+  const author = useAuthor(campaign.pubkey);
   const { data: stats } = useCampaignDonations(campaign);
   const { data: btcPrice } = useBtcPrice();
 
   const naddr = useMemo(() => encodeCampaignNaddr(campaign), [campaign]);
-  const cover = sanitizeUrl(displayCampaign.banner);
+  const authorMetadata = author.data?.metadata;
+  const cover = sanitizeUrl(displayCampaign.banner)
+    ?? sanitizeUrl(authorMetadata?.banner)
+    ?? sanitizeUrl(authorMetadata?.picture);
   const deadline = campaign.deadline ? formatDeadline(campaign.deadline) : null;
   const raisedSats = stats?.totalSats ?? 0;
   const countryLabel = getCampaignCountryLabel(campaign);
@@ -196,7 +201,7 @@ export function CampaignCard({ campaign, variant = 'compact', className, footerB
             />
           ) : (
             <div className="absolute inset-0 flex items-center justify-center">
-              <HandHeart className="size-12 text-primary/40" />
+              <HandHeart className="size-12 text-primary" />
             </div>
           )}
 
@@ -249,7 +254,7 @@ export function CampaignCard({ campaign, variant = 'compact', className, footerB
         </div>
 
         {/* Body — deterministic structure: title (1 line, truncates) →
-            summary (1 line, truncates; non-breaking space placeholder
+            story (1 line, truncates; non-breaking space placeholder
             when absent) → progress (invisible-bar placeholder absorbs
             the no-goal case) → creator footer. Country, deadline,
             hidden badge, and moderation menu all live on the banner
@@ -272,7 +277,7 @@ export function CampaignCard({ campaign, variant = 'compact', className, footerB
                 isFeaturedVariant ? 'text-base' : 'text-sm',
               )}
             >
-              {displayCampaign.summary || '\u00A0'}
+              {displayCampaign.story || '\u00A0'}
             </p>
           </div>
 

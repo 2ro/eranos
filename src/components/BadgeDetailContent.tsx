@@ -131,7 +131,7 @@ export function BadgeDetailContent({ event }: { event: NostrEvent }) {
         <BadgeHero heroImage={heroImage} badgeName={badge.name} />
       ) : (
         <div className="flex items-center justify-center h-[180px]">
-          <Award className="size-16 text-primary/20" />
+          <Award className="size-16 text-primary" />
         </div>
       )}
 
@@ -286,7 +286,7 @@ function AwardedToTab({ awardedPubkeys, previewPubkeys, membersMap, membersLoadi
   if (awardedPubkeys.length === 0) {
     return (
       <div className="py-16 flex flex-col items-center gap-3 text-center px-8">
-        <Users className="size-8 text-muted-foreground/30" />
+        <Users className="size-8 text-muted-foreground" />
         <p className="text-sm text-muted-foreground">No one has been awarded this badge yet.</p>
       </div>
     );
@@ -387,7 +387,7 @@ function HoldersFeedTab({ awardedPubkeys, awardsLoading }: {
   if (awardedPubkeys.length === 0) {
     return (
       <div className="py-16 flex flex-col items-center gap-3 text-center px-8">
-        <Newspaper className="size-8 text-muted-foreground/30" />
+        <Newspaper className="size-8 text-muted-foreground" />
         <p className="text-sm text-muted-foreground">No one has been awarded this badge yet, so there's no feed to show.</p>
       </div>
     );
@@ -396,7 +396,7 @@ function HoldersFeedTab({ awardedPubkeys, awardsLoading }: {
   if (feedEvents.length === 0) {
     return (
       <div className="py-16 flex flex-col items-center gap-3 text-center px-8">
-        <Newspaper className="size-8 text-muted-foreground/30" />
+        <Newspaper className="size-8 text-muted-foreground" />
         <p className="text-sm text-muted-foreground">No posts from badge holders yet.</p>
       </div>
     );
@@ -436,7 +436,7 @@ function CommentsTab({ event, orderedReplies, commentsLoading }: {
         <FlatThreadedReplyList replies={orderedReplies} />
       ) : (
         <div className="py-16 flex flex-col items-center gap-3 text-center px-8">
-          <MessageCircle className="size-8 text-muted-foreground/30" />
+          <MessageCircle className="size-8 text-muted-foreground" />
           <p className="text-sm text-muted-foreground">No comments yet. Be the first to comment on this badge.</p>
         </div>
       )}

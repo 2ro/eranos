@@ -159,7 +159,7 @@ export function AppHandlerContent({ event, compact }: AppHandlerContentProps) {
                 />
               ) : (
                 <div className="size-14 rounded-xl bg-primary/10 flex items-center justify-center shrink-0 border-3 border-background shadow-sm">
-                  <Package className="size-6 text-primary/50" />
+                  <Package className="size-6 text-primary" />
                 </div>
               )}
             </div>
@@ -264,7 +264,7 @@ export function AppHandlerContent({ event, compact }: AppHandlerContentProps) {
               />
             ) : (
               <div className="size-20 rounded-2xl bg-primary/10 flex items-center justify-center shrink-0 border-4 border-background shadow-sm">
-                <Package className="size-8 text-primary/50" />
+                <Package className="size-8 text-primary" />
               </div>
             )}
           </div>
@@ -333,4 +333,3 @@ export function AppHandlerContent({ event, compact }: AppHandlerContentProps) {
     </div>
   );
 }
-

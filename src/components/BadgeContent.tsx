@@ -155,7 +155,7 @@ function BadgeImageTilt({ heroImage, badgeName }: { heroImage?: string; badgeNam
         />
       ) : (
         <div className="size-28 rounded-2xl bg-gradient-to-br from-primary/10 via-primary/5 to-transparent flex items-center justify-center">
-          <Award className="size-12 text-primary/30" />
+          <Award className="size-12 text-primary" />
         </div>
       )}
       {/* Specular glare overlay */}

@@ -143,7 +143,7 @@ export function AddToListDialog({ pubkey, displayName, open, onOpenChange }: Add
             </div>
           ) : !hasAny ? (
             <div className="py-8 px-4 text-center text-sm text-muted-foreground">
-              <List className="size-8 mx-auto mb-2 text-muted-foreground/40" />
+              <List className="size-8 mx-auto mb-2 text-muted-foreground" />
               No lists or packs yet. Create one below.
             </div>
           ) : (

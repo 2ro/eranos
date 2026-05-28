@@ -6,6 +6,7 @@ import type { NostrSigner } from '@nostrify/types';
 import { useAppContext } from '@/hooks/useAppContext';
 import { getEffectiveRelays, DITTO_RELAYS, DIVINE_RELAY, ZAPSTORE_RELAY } from '@/lib/appRelays';
 import { NostrBatcher } from '@/lib/NostrBatcher';
+import { DebugRelay } from '@/lib/relayDebug';
 
 interface NostrProviderProps {
   children: React.ReactNode;
@@ -71,7 +72,7 @@ const NostrProvider: React.FC<NostrProviderProps> = (props) => {
   if (!pool.current) {
     pool.current = new NPool({
       open(url: string) {
-        return new NRelay1(url, {
+        const relay = new NRelay1(url, {
           // NIP-42: Respond to relay AUTH challenges by signing a kind
           // 22242 ephemeral event with the current user's signer.
           auth: async (challenge: string) => {
@@ -90,6 +91,7 @@ const NostrProvider: React.FC<NostrProviderProps> = (props) => {
             });
           },
         });
+        return new DebugRelay(url, relay);
       },
       reqRouter(filters: NostrFilter[]): Map<URL['href'], NostrFilter[]> {
         const routes = new Map<string, NostrFilter[]>();

@@ -47,6 +47,10 @@ import {
 // Skeletons / Cards
 // ─────────────────────────────────────────────────────────────────────────────
 
+function getPledgeCoord(action: Action) {
+  return `36639:${action.pubkey}:${action.id}`;
+}
+
 function ActionSkeleton() {
   return (
     <Card className="overflow-hidden border-border/70 shadow-sm h-full flex flex-col">
@@ -118,7 +122,7 @@ function ActionShareMenu({ action, displayTitle }: { action: Action; displayTitl
         content: t('pledges.card.deletedContent'),
         tags: [
           ['e', action.event.id],
-          ['a', `36639:${action.pubkey}:${action.id}`],
+          ['a', getPledgeCoord(action)],
         ],
       });
       // Extract any organization `A` tag the pledge was associated with so
@@ -192,7 +196,7 @@ function ActionShareMenu({ action, displayTitle }: { action: Action; displayTitl
             bottom of non-mod dropdowns. */}
         {isMod && <DropdownMenuSeparator />}
         <ModerationMenuItems
-          coord={`36639:${action.pubkey}:${action.id}`}
+          coord={getPledgeCoord(action)}
           entityTitle={displayTitle}
           surface="pledge"
           axes={['hide', 'featured']}
@@ -257,40 +261,18 @@ export default function ActionsPage() {
     },
   });
 
-  // Pledges now ride the same `agora.moderation` namespace as campaigns
-  // and organizations (two-axis: hide + featured). Filter hidden pledges
-  // out of search results unless the moderator opts in via the
-  // Show-hidden switch. Computed here so the search hook stays
-  // kind-agnostic.
-  const { data: pledgeModeration, isReady: pledgeModerationReady } = usePledgeModeration();
-  const { searchHits, searchHiddenCount } = useMemo(() => {
-    if (!searchHitsRaw) return { searchHits: undefined, searchHiddenCount: 0 };
-    const hiddenCoords = pledgeModeration?.hiddenCoords ?? new Set<string>();
-    let hidden = 0;
-    const visible: Action[] = [];
-    for (const a of searchHitsRaw) {
-      const coord = `36639:${a.pubkey}:${a.id}`;
-      if (hiddenCoords.has(coord)) {
-        hidden += 1;
-        if (showHidden) visible.push(a);
-      } else {
-        visible.push(a);
-      }
-    }
-    return { searchHits: visible, searchHiddenCount: hidden };
-  }, [searchHitsRaw, pledgeModeration, showHidden]);
-
-  const { data: actions, isLoading: actionsLoading } = useActions({
-    countryCode: selectedCountry,
-    limit: 300,
-  });
-
   // Moderator gate. Reuses the campaign moderator pack (Team Soapbox) —
   // the pledge moderation namespace rides the same signer set as the
   // campaign and group surfaces. Drives the Pending and Hidden review
   // sections at the bottom of the page.
   const { data: moderators } = useCampaignModerators();
   const isMod = !!user && !!moderators && moderators.includes(user.pubkey);
+  const canShowHidden = isMod && showHidden;
+
+  const { data: rawActions, isLoading: actionsLoading } = useActions({
+    countryCode: selectedCountry,
+    limit: 300,
+  });
 
   // For moderators we pull the full (unfiltered-by-country) pledge
   // stream so the review queue isn't blinkered to whatever country the
@@ -302,6 +284,62 @@ export default function ActionsPage() {
     enabled: isMod,
   });
 
+  const moderationCoordSourcesLoaded = isSearching ? !!searchHitsRaw : !!rawActions;
+  const pledgeModerationCoords = useMemo(() => {
+    const coords = new Set<string>();
+    for (const action of rawActions ?? []) coords.add(getPledgeCoord(action));
+    for (const action of searchHitsRaw ?? []) coords.add(getPledgeCoord(action));
+    for (const action of allPledgesForMods ?? []) coords.add(getPledgeCoord(action));
+    return Array.from(coords);
+  }, [rawActions, searchHitsRaw, allPledgesForMods]);
+
+  // Pledges now ride the same `agora.moderation` namespace as campaigns
+  // and organizations (two-axis: hide + featured). Unlike campaigns,
+  // pledges are public by default, so the page fetches the pledge stream
+  // first and then asks for moderation labels targeted to those pledge
+  // coordinates. Targeting `#a` avoids missing older hide labels when the
+  // global moderation stream grows beyond the broad query limit.
+  const { data: pledgeModeration, isReady: pledgeModerationReady } = usePledgeModeration({
+    coordinates: pledgeModerationCoords,
+    enabled: moderationCoordSourcesLoaded,
+  });
+
+  const { searchHits, searchHiddenCount } = useMemo(() => {
+    if (!searchHitsRaw) return { searchHits: undefined, searchHiddenCount: 0 };
+    const hiddenCoords = pledgeModeration?.hiddenCoords ?? new Set<string>();
+    let hidden = 0;
+    const visible: Action[] = [];
+    for (const a of searchHitsRaw) {
+      const coord = getPledgeCoord(a);
+      if (hiddenCoords.has(coord)) {
+        hidden += 1;
+        if (canShowHidden) visible.push(a);
+      } else {
+        visible.push(a);
+      }
+    }
+    return { searchHits: visible, searchHiddenCount: hidden };
+  }, [searchHitsRaw, pledgeModeration, canShowHidden]);
+
+  const { actions, listHiddenCount } = useMemo(() => {
+    if (!rawActions) return { actions: undefined, listHiddenCount: 0 };
+    const hiddenCoords = pledgeModeration?.hiddenCoords ?? new Set<string>();
+    let hidden = 0;
+    const visible: Action[] = [];
+
+    for (const action of rawActions) {
+      const coord = getPledgeCoord(action);
+      if (hiddenCoords.has(coord)) {
+        hidden += 1;
+        if (canShowHidden) visible.push(action);
+      } else {
+        visible.push(action);
+      }
+    }
+
+    return { actions: visible, listHiddenCount: hidden };
+  }, [rawActions, pledgeModeration, canShowHidden]);
+
   // Pending (mod-only): pledges that haven't been featured or hidden.
   // Mirrors the campaign/group "needs review" semantics — pledges have
   // a two-axis model, so "pending" means "no curation decision yet".
@@ -310,7 +348,7 @@ export default function ActionsPage() {
   const pendingPledges = useMemo<Action[]>(() => {
     if (!isMod || !pledgeModerationReady) return [];
     return (allPledgesForMods ?? []).filter((p) => {
-      const coord = `36639:${p.pubkey}:${p.id}`;
+      const coord = getPledgeCoord(p);
       return !pledgeModeration.featuredCoords.has(coord)
         && !pledgeModeration.hiddenCoords.has(coord);
     });
@@ -320,7 +358,7 @@ export default function ActionsPage() {
   const hiddenPledges = useMemo<Action[]>(() => {
     if (!isMod || !pledgeModerationReady) return [];
     return (allPledgesForMods ?? []).filter((p) => {
-      const coord = `36639:${p.pubkey}:${p.id}`;
+      const coord = getPledgeCoord(p);
       return pledgeModeration.hiddenCoords.has(coord);
     });
   }, [isMod, pledgeModerationReady, pledgeModeration, allPledgesForMods]);
@@ -343,7 +381,8 @@ export default function ActionsPage() {
     description: t('pledges.list.seoDescription'),
   });
 
-  const isLoading = actionsLoading;
+  const isLoading = actionsLoading || !pledgeModerationReady;
+  const isSearchLoading = isSearchFetching || !pledgeModerationReady;
 
   // Section split (parser already returns: current → upcoming → past).
   // We re-derive here so that local sorting can be applied per section.
@@ -396,11 +435,11 @@ export default function ActionsPage() {
       onSortChange={setSortMode}
       searchPlaceholderKey="pledges.list.searchPlaceholder"
       searchAriaLabelKey="pledges.list.searchAriaLabel"
-      showHidden={{
-        value: showHidden,
+      showHidden={isMod ? {
+        value: canShowHidden,
         onChange: setShowHidden,
-        count: searchHiddenCount,
-      }}
+        count: isSearching ? searchHiddenCount : listHiddenCount,
+      } : undefined}
       country={selectedCountry}
       onCountryChange={setSelectedCountry}
     />
@@ -435,7 +474,7 @@ export default function ActionsPage() {
               {headerControls}
             </div>
 
-            {isSearchFetching && !searchHits ? (
+            {isSearchLoading && !searchHits ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
                 {Array.from({ length: 8 }).map((_, i) => <ActionSkeleton key={i} />)}
               </div>
@@ -454,7 +493,7 @@ export default function ActionsPage() {
                     topRight={
                       <>
                         <ModerationOverlay
-                          coord={`36639:${action.pubkey}:${action.id}`}
+                          coord={getPledgeCoord(action)}
                           entityTitle={action.title}
                           surface="pledge"
                           axes={['hide', 'featured']}
@@ -582,7 +621,7 @@ export default function ActionsPage() {
 
             <Card className="border-dashed">
               <div className="py-12 px-8 text-center space-y-4">
-                <HandHeart className="size-10 text-muted-foreground/60 mx-auto" />
+                <HandHeart className="size-10 text-muted-foreground mx-auto" />
                 <div className="space-y-1.5">
                   <h3 className="text-lg font-semibold">{t('pledges.list.emptyTitle')}</h3>
                   <p className="text-muted-foreground max-w-sm mx-auto">
@@ -636,7 +675,7 @@ export default function ActionsPage() {
                   topRight={
                     <>
                       <ModerationOverlay
-                        coord={`36639:${action.pubkey}:${action.id}`}
+                        coord={getPledgeCoord(action)}
                         entityTitle={action.title}
                         surface="pledge"
                         axes={['hide', 'featured']}
@@ -675,7 +714,7 @@ export default function ActionsPage() {
                   topRight={
                     <>
                       <ModerationOverlay
-                        coord={`36639:${action.pubkey}:${action.id}`}
+                        coord={getPledgeCoord(action)}
                         entityTitle={action.title}
                         surface="pledge"
                         axes={['hide', 'featured']}
@@ -849,7 +888,7 @@ function ActionSection({
             topRight={
               <>
                 <ModerationOverlay
-                  coord={`36639:${action.pubkey}:${action.id}`}
+                  coord={getPledgeCoord(action)}
                   entityTitle={action.title}
                   surface="pledge"
                   axes={['hide', 'featured']}

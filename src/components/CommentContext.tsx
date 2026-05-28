@@ -989,7 +989,7 @@ function IsbnCommentContext({ identifier, className, prefix }: { identifier: str
               />
             ) : (
               <div className="w-9 h-12 rounded bg-secondary flex items-center justify-center shrink-0">
-                <BookOpen className="size-4 text-muted-foreground/40" />
+                <BookOpen className="size-4 text-muted-foreground" />
               </div>
             )}
             <div className="flex-1 min-w-0">
@@ -1070,7 +1070,7 @@ function GathererCardCommentContext({
               />
             ) : (
               <div className="w-9 h-12 rounded bg-secondary flex items-center justify-center shrink-0">
-                <CardsIcon className="size-4 text-muted-foreground/40" />
+                <CardsIcon className="size-4 text-muted-foreground" />
               </div>
             )}
             <div className="flex-1 min-w-0">

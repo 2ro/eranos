@@ -237,7 +237,7 @@ export function GiveBadgeDialog({ open, onOpenChange, recipientPubkey, recipient
             </div>
           ) : (
             <div className="flex flex-col items-center justify-center py-10 text-muted-foreground text-sm">
-              <Award className="size-8 mb-2 opacity-30" />
+              <Award className="size-8 mb-2" />
               <p>You haven't created any badges yet.</p>
               <p className="text-xs mt-1">Create badges on the <a href="/badges" className="text-primary hover:underline">Badges page</a>.</p>
             </div>

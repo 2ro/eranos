@@ -88,7 +88,7 @@ export function MusicTrackContent({ event }: { event: NostrEvent }) {
         </div>
       ) : (
         <div className="relative flex items-center justify-center bg-gradient-to-br from-primary/10 via-primary/5 to-transparent h-[140px] cursor-pointer" onClick={handlePlay}>
-          <Music className="size-10 text-primary/20" />
+          <Music className="size-10 text-primary" />
           <div className="absolute inset-0 flex items-center justify-center">
             <PlayButton isPlaying={player.isPlaying} isActive={isNowPlaying} onClick={handlePlay} size="lg" />
           </div>
@@ -129,7 +129,7 @@ export function MusicPlaylistContent({ event }: { event: NostrEvent }) {
         </div>
       ) : (
         <div className="flex items-center justify-center bg-gradient-to-br from-primary/10 via-primary/5 to-transparent h-[100px]">
-          <ListMusic className="size-10 text-primary/20" />
+          <ListMusic className="size-10 text-primary" />
         </div>
       )}
 
@@ -193,7 +193,7 @@ export function PodcastEpisodeContent({ event }: { event: NostrEvent }) {
         </div>
       ) : (
         <div className="relative flex items-center justify-center bg-gradient-to-br from-primary/10 via-primary/5 to-transparent h-[140px] cursor-pointer" onClick={handlePlay}>
-          <Podcast className="size-10 text-primary/20" />
+          <Podcast className="size-10 text-primary" />
           <div className="absolute inset-0 flex items-center justify-center">
             <PlayButton isPlaying={player.isPlaying} isActive={isNowPlaying} onClick={handlePlay} size="lg" />
           </div>
@@ -252,7 +252,7 @@ export function PodcastTrailerContent({ event }: { event: NostrEvent }) {
     >
       {/* Compact header — clicking anywhere here plays/pauses */}
       <div className="flex items-center justify-center bg-gradient-to-br from-primary/10 via-primary/5 to-transparent h-[100px] relative cursor-pointer" onClick={handlePlay}>
-        <Podcast className="size-8 text-primary/20" />
+        <Podcast className="size-8 text-primary" />
         <div className="absolute inset-0 flex items-center justify-center">
           <PlayButton isPlaying={player.isPlaying} isActive={isNowPlaying} onClick={handlePlay} size="lg" />
         </div>

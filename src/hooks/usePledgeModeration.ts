@@ -3,6 +3,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 import { useNostrPublish } from './useNostrPublish';
 import { useCampaignModerators } from './useCampaignModerators';
+import { DITTO_RELAY } from '@/lib/appRelays';
 import {
   AGORA_MODERATION_NAMESPACE,
   EMPTY_MODERATION_DATA,
@@ -17,6 +18,13 @@ export const PLEDGE_KIND = 36639;
 
 /** Surface-scoped alias so call sites read naturally. */
 type PledgeModerationData = ModerationData;
+
+interface UsePledgeModerationOptions {
+  /** Restrict moderation lookup to known pledge coordinates. */
+  coordinates?: string[];
+  /** Allows pages to wait until their coordinate list has loaded. */
+  enabled?: boolean;
+}
 
 /**
  * Fetches and folds pledge-moderation label events authored by Team
@@ -53,7 +61,7 @@ type PledgeModerationData = ModerationData;
  * Callers MUST be in the moderator set or the relay-side `authors:`
  * filter on read will silently ignore the new event.
  */
-export function usePledgeModeration() {
+export function usePledgeModeration({ coordinates, enabled = true }: UsePledgeModerationOptions = {}) {
   const { nostr } = useNostr();
   const queryClient = useQueryClient();
   const { mutateAsync: publishEvent } = useNostrPublish();
@@ -63,23 +71,30 @@ export function usePledgeModeration() {
   // `authors:` filter, since that would return labels from any author
   // and break the trust model (see AGENTS.md `nostr-security`).
   const moderatorsKey = moderators ? [...moderators].sort().join(',') : '';
+  const coordinatesKey = coordinates ? [...coordinates].sort().join(',') : undefined;
 
   const moderationQuery = useQuery({
-    queryKey: ['pledge-moderation', moderatorsKey],
-    enabled: moderators !== undefined,
+    queryKey: ['pledge-moderation', moderatorsKey, coordinatesKey],
+    enabled: enabled && moderators !== undefined,
     queryFn: async ({ signal }): Promise<PledgeModerationData> => {
       if (!moderators || moderators.length === 0) {
         return { ...EMPTY_MODERATION_DATA, moderators: [] };
       }
-      const events = await nostr.query(
-        [
-          {
-            kinds: [LABEL_KIND],
-            authors: moderators,
-            '#L': [AGORA_MODERATION_NAMESPACE],
-            limit: 2000,
-          },
-        ],
+      if (coordinates && coordinates.length === 0) {
+        return { ...EMPTY_MODERATION_DATA, moderators };
+      }
+
+      const filter = {
+        kinds: [LABEL_KIND],
+        authors: moderators,
+        '#L': [AGORA_MODERATION_NAMESPACE],
+        ...(coordinates ? { '#a': coordinates } : {}),
+        limit: coordinates ? Math.max(coordinates.length * 6, 100) : 2000,
+      };
+
+      const relay = nostr.relay(DITTO_RELAY);
+      const events = await relay.query(
+        [filter],
         { signal: AbortSignal.any([signal, AbortSignal.timeout(8000)]) },
       );
       return foldModerationLabels(events, moderators, PLEDGE_KIND);
@@ -118,7 +133,7 @@ export function usePledgeModeration() {
       queryClient.invalidateQueries({ queryKey: ['pledge-moderation'] });
       // Discovery queries that paint /pledges read from these caches;
       // invalidate so the change reflects immediately.
-      queryClient.invalidateQueries({ queryKey: ['actions'] });
+      queryClient.invalidateQueries({ queryKey: ['agora-actions'] });
       queryClient.invalidateQueries({ queryKey: ['organization-activity'] });
     },
   });

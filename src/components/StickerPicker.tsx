@@ -34,7 +34,7 @@ export function StickerPicker({ customEmojis, onSelect, height = 350, autoFocus 
   if (customEmojis.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center text-muted-foreground gap-2" style={{ height }}>
-        <Sticker className="size-8 opacity-40" />
+        <Sticker className="size-8" />
         <p className="text-sm">No sticker packs yet</p>
         <p className="text-xs">Add emoji packs to your profile to use stickers</p>
       </div>

@@ -11,7 +11,7 @@ export function FormSection({
   requirement,
   children,
 }: {
-  title: string;
+  title: React.ReactNode;
   requirement: 'Required' | 'Recommended' | 'Optional';
   children: React.ReactNode;
 }) {

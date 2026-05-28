@@ -552,7 +552,7 @@ function MyCommunitiesShelf({
   if (!user) {
     return (
       <EmptyShelf
-        icon={<Users className="size-7 text-primary/70" />}
+        icon={<Users className="size-7 text-primary" />}
         title={t('groups.list.loginToSeeTitle')}
         body={t('groups.list.loginToSeeBody')}
         action={<LoginArea className="max-w-60" />}
@@ -595,7 +595,7 @@ function MyCommunitiesShelfContent({
   if (!organizations || organizations.length === 0) {
     return (
       <EmptyShelf
-        icon={<Users className="size-7 text-primary/70" />}
+        icon={<Users className="size-7 text-primary" />}
         title={t('groups.list.noGroupsTitle')}
         body={t('groups.list.noGroupsBody')}
         action={(
@@ -653,10 +653,10 @@ function MyCommunitiesShelfContent({
 function FeaturedOrganizationsShelf() {
   const { t } = useTranslation();
   const { config } = useAppContext();
-  const { data: featured, isLoading } = useFeaturedOrganizations();
+  const { data: featured, isLoading, isPending } = useFeaturedOrganizations();
   const hasFeatured = !!featured && featured.length > 0;
 
-  if (isLoading && !hasFeatured) {
+  if ((isPending || isLoading) && !hasFeatured) {
     return (
       <CommunityGrid>
         {Array.from({ length: 8 }).map((_, i) => (
@@ -669,7 +669,7 @@ function FeaturedOrganizationsShelf() {
   if (!hasFeatured) {
     return (
       <EmptyShelf
-        icon={<Users className="size-7 text-primary/70" />}
+        icon={<Users className="size-7 text-primary" />}
         title={t('groups.list.noFeaturedTitle')}
         body={t('groups.list.noFeaturedBody', { appName: config.appName })}
         action={null}

@@ -23,6 +23,7 @@ import { isEventMuted } from '@/lib/muteHelpers';
 import { SubHeaderBar } from '@/components/SubHeaderBar';
 import { TabButton } from '@/components/TabButton';
 import { cn } from '@/lib/utils';
+import { getEventRelaySource } from '@/lib/relayDebug';
 import type { FeedItem } from '@/lib/feedUtils';
 
 type CoreFeedTab = 'follows' | 'network' | 'global' | 'communities' | 'world' | 'agora';
@@ -185,6 +186,25 @@ export function Feed({ kinds, tagFilters, header, hideCompose, emptyMessage, fee
         return true;
       });
   }, [isHomeAgoraFeed, mixedFeed.items, rawData?.pages, muteItems]);
+
+  useEffect(() => {
+    if (feedItems.length === 0) return;
+
+    console.groupCollapsed('[nostr feed render]', {
+      feedId,
+      mode: isHomeAgoraFeed ? homeFeedMode : activeTab,
+      count: feedItems.length,
+    });
+    console.table(feedItems.map((item, index) => ({
+      index,
+      relay: getEventRelaySource(item.event.id) ?? 'unknown',
+      kind: item.event.kind,
+      id: item.event.id,
+      created_at: item.event.created_at,
+      repostedBy: item.repostedBy ?? '',
+    })));
+    console.groupEnd();
+  }, [feedId, isHomeAgoraFeed, homeFeedMode, activeTab, feedItems]);
 
   // Show skeletons while loading.
   const showSkeleton = isHomeAgoraFeed

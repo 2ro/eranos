@@ -72,7 +72,7 @@ export function ProfileActivityTab({ pubkey, displayName }: ProfileActivityTabPr
       <div className="px-4 sm:px-6 py-12">
         <Card className="border-dashed">
           <div className="py-12 px-8 text-center">
-            <Sparkles className="size-10 mx-auto mb-3 text-muted-foreground/40" />
+            <Sparkles className="size-10 mx-auto mb-3 text-muted-foreground" />
             <p className="text-muted-foreground max-w-sm mx-auto">
               {t('profile.activity.empty', { name: displayName })}
             </p>

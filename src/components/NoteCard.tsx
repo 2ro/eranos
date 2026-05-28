@@ -107,6 +107,7 @@ import { timeAgo } from "@/lib/timeAgo";
 import { formatNumber } from "@/lib/formatNumber";
 import { publishedAtAction } from "@/lib/publishedAtAction";
 import { getEffectiveStreamStatus } from "@/lib/streamStatus";
+import { getEventRelaySource } from "@/lib/relayDebug";
 import { cn } from "@/lib/utils";
 import { hasGoalZapSplits } from "@/lib/goalUtils";
 
@@ -423,6 +424,18 @@ export const NoteCard = memo(function NoteCard({
   const { data: btcPrice } = useBtcPrice();
   const [moreMenuOpen, setMoreMenuOpen] = useState(false);
   const [replyOpen, setReplyOpen] = useState(false);
+
+  useEffect(() => {
+    console.debug('[nostr note render]', {
+      relay: getEventRelaySource(event.id) ?? 'unknown',
+      kind: event.kind,
+      id: event.id,
+      actionRelay: actionEvent ? getEventRelaySource(actionEvent.id) ?? 'unknown' : undefined,
+      actionKind: actionEvent?.kind,
+      actionId: actionEvent?.id,
+      path: window.location.pathname,
+    });
+  }, [event.id, event.kind, actionEvent]);
 
   // Check if the current user can zap this event's author
   // TODO: Enable zapping split-recipient NIP-75 goals once zap split payments are supported.
@@ -899,7 +912,7 @@ export const NoteCard = memo(function NoteCard({
       <div className="flex-1" />
 
       <button
-        className="inline-flex items-center justify-center h-9 w-9 rounded-full text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors sidebar:hidden"
+        className="inline-flex items-center justify-center h-9 w-9 rounded-full text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors"
         title={t('feed.actions.share')}
         onClick={async (e) => {
           e.stopPropagation();

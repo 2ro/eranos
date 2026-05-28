@@ -201,7 +201,7 @@ export function AllCampaignsPage() {
         ) : visible.length === 0 ? (
           <Card className="border-dashed">
             <CardContent className="py-12 px-8 text-center space-y-4">
-              <HandHeart className="size-10 text-muted-foreground/60 mx-auto" />
+              <HandHeart className="size-10 text-muted-foreground mx-auto" />
               <div className="space-y-1.5">
                 {activeQuery ? (
                   <>

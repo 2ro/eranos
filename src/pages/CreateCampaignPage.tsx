@@ -10,6 +10,7 @@ import {
   AlertTriangle,
   ArrowLeft,
   HandHeart,
+  HelpCircle,
   Loader2,
   MapPin,
   Wallet,
@@ -34,6 +35,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { useAppContext } from '@/hooks/useAppContext';
 import { useAuthor } from '@/hooks/useAuthor';
 import { useCampaign } from '@/hooks/useCampaign';
@@ -131,7 +133,6 @@ export function CreateCampaignPage() {
     : '';
 
   const [title, setTitle] = useState('');
-  const [summary, setSummary] = useState('');
   const [story, setStory] = useState('');
   const [bannerUrl, setBannerUrl] = useState('');
   /** NIP-94-format tag pairs from the most recent banner upload, used to build the NIP-92 imeta tag on publish. */
@@ -274,7 +275,6 @@ export function CreateCampaignPage() {
     if (!editCampaign || prepopulatedEventId === editCampaign.event.id) return;
 
     setTitle(editCampaign.title);
-    setSummary(editCampaign.summary);
     setStory(editCampaign.story);
     setBannerUrl(editCampaign.banner ?? '');
     // We don't have NIP-94 tags for an existing event — the imeta is
@@ -433,7 +433,6 @@ export function CreateCampaignPage() {
         ['d', slug],
         ['title', trimmedTitle],
       ];
-      if (summary.trim()) tags.push(['summary', summary.trim()]);
       if (sanitizedBanner) {
         tags.push(['banner', sanitizedBanner]);
         // NIP-92 imeta pairs with the banner. Two sources, in priority order:
@@ -581,7 +580,7 @@ export function CreateCampaignPage() {
         <div className="max-w-2xl mx-auto px-4 sm:px-6 py-12">
           <Card>
             <CardContent className="py-12 px-8 text-center space-y-4">
-              <AlertTriangle className="size-10 text-muted-foreground/60 mx-auto" />
+              <AlertTriangle className="size-10 text-muted-foreground mx-auto" />
               <h2 className="text-xl font-semibold">{t('campaignsCreate.invalidEditTitle')}</h2>
               <p className="text-muted-foreground">
                 {t('campaignsCreate.invalidEditBody')}
@@ -617,7 +616,7 @@ export function CreateCampaignPage() {
         <div className="max-w-2xl mx-auto px-4 sm:px-6 py-12">
           <Card>
             <CardContent className="py-12 px-8 text-center space-y-4">
-              <AlertTriangle className="size-10 text-muted-foreground/60 mx-auto" />
+              <AlertTriangle className="size-10 text-muted-foreground mx-auto" />
               <h2 className="text-xl font-semibold">{t('campaignsCreate.cannotEditTitle')}</h2>
               <p className="text-muted-foreground">
                 {t('campaignsCreate.cannotEditBody')}
@@ -751,20 +750,8 @@ export function CreateCampaignPage() {
             />
           </FormSection>
 
-          {/* Summary */}
-          <FormSection title={t('campaignsCreate.summary')} requirement="Recommended">
-            <Textarea
-              id="campaign-summary"
-              value={summary}
-              onChange={(e) => setSummary(e.target.value)}
-              placeholder={t('campaignsCreate.summaryPlaceholder')}
-              rows={2}
-              maxLength={300}
-            />
-          </FormSection>
-
           {/* Story */}
-          <FormSection title={t('campaignsCreate.story')} requirement="Optional">
+          <FormSection title={t('campaignsCreate.story')} requirement="Recommended">
             <Textarea
               id="campaign-story"
               value={story}
@@ -777,7 +764,28 @@ export function CreateCampaignPage() {
 
           <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
             {/* Goal — integer USD */}
-            <FormSection title={t('campaignsCreate.goal')} requirement="Optional">
+            <FormSection
+              title={(
+                <span className="inline-flex items-center gap-1.5">
+                  {t('campaignsCreate.goal')}
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <button
+                        type="button"
+                        className="inline-flex text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                        aria-label={t('campaignsCreate.goalNote')}
+                      >
+                        <HelpCircle className="size-4" />
+                      </button>
+                    </TooltipTrigger>
+                    <TooltipContent side="top" className="max-w-64 text-xs leading-relaxed">
+                      {t('campaignsCreate.goalNote')}
+                    </TooltipContent>
+                  </Tooltip>
+                </span>
+              )}
+              requirement="Optional"
+            >
               <div className="relative">
                 <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">
                   $
@@ -795,9 +803,6 @@ export function CreateCampaignPage() {
                   USD
                 </span>
               </div>
-              <p className="text-xs text-muted-foreground">
-                {t('campaignsCreate.goalNote')}
-              </p>
             </FormSection>
 
             {/* Deadline */}
