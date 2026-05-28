@@ -891,9 +891,23 @@ export function CreateCampaignPage() {
   // `formError`.
   const step1CanAdvance = title.trim().length > 0;
 
+  // The org chip surfaces inside step 1 of the wizard so the captive
+  // overlay doesn't lose the "publishing under <org>" context that
+  // previously sat under the page header.
+  const orgChip = (
+    <OrganizationContextChip
+      aTag={isEditMode && organizationATag && !authorizedOrgForAttachedATag && !manageableOrgsLoading ? '' : organizationATag}
+      authorizedOrg={isEditMode ? authorizedOrgForAttachedATag : authorizedOrgFromParam}
+      param={orgParam}
+      paramDecoded={orgFromParam}
+      manageableLoading={manageableOrgsLoading}
+      isEditMode={isEditMode}
+    />
+  );
+
   return (
     <CampaignWizard
-      header={header}
+      orgChip={orgChip}
       step1={<>{titleSection}{walletSection}</>}
       step2={<>{storySection}{bannerSection}</>}
       step3={goalDeadlineSection}
@@ -903,6 +917,7 @@ export function CreateCampaignPage() {
       submitting={submitMutation.isPending || coverUploading}
       step1CanAdvance={step1CanAdvance}
       onSubmit={handleSubmit}
+      onClose={() => navigate(-1)}
     />
   );
 }
@@ -912,26 +927,29 @@ export function CreateCampaignPage() {
 /**
  * Multi-step layout for creating a new campaign.
  *
- * Visually modelled on the captive {@link OnboardingGate} signup flow:
- * a sticky single-bar progress indicator across the top, a centered
+ * Rendered as a **fullscreen captive overlay** (`fixed inset-0 z-50`)
+ * so it sits above the persistent TopNav — the same treatment Chad's
+ * {@link OnboardingGate} uses for the signup flow. From the user's
+ * perspective creating a campaign is a focused, distraction-free task,
+ * not "another page in the app."
+ *
+ * Visually it mirrors the captive onboarding: a sticky single-bar
+ * progress fill across the top, a top-right X to escape, a centered
  * narrow column for each step, a centered title block, a big
- * rounded-full primary CTA, and a subtle text "back" link beneath it.
- * Steps animate in from the bottom on transition so the swap feels
- * like a navigation, not a re-render.
+ * rounded-full primary CTA, and a subtle text "Back" link.
  *
  * Step 1 holds the **required** fields (title + wallet). Once the
- * title is non-empty the user can advance to step 2 *or* publish
- * right then via the "Launch campaign" shortcut — every step from 1
- * onward shows that shortcut so the rest of the wizard is opt-in.
- * Step 4 is terminal and surfaces "Launch campaign" as the only
- * forward action.
+ * title is non-empty the user can advance to step 2 *or* publish right
+ * then via the "Launch campaign" shortcut — every step from 1 onward
+ * shows that shortcut so the rest of the wizard is opt-in. Step 4 is
+ * terminal and surfaces "Launch campaign" as the only forward action.
  *
  * The form lives in this wrapper (not the parent) so the publish
  * button — wherever it ends up in the wizard — submits the same form
  * and reuses the parent's `handleSubmit`.
  */
 function CampaignWizard({
-  header,
+  orgChip,
   step1,
   step2,
   step3,
@@ -941,8 +959,9 @@ function CampaignWizard({
   submitting,
   step1CanAdvance,
   onSubmit,
+  onClose,
 }: {
-  header: ReactNode;
+  orgChip: ReactNode;
   step1: ReactNode;
   step2: ReactNode;
   step3: ReactNode;
@@ -952,6 +971,7 @@ function CampaignWizard({
   submitting: boolean;
   step1CanAdvance: boolean;
   onSubmit: (e: FormEvent) => void;
+  onClose: () => void;
 }) {
   const { t } = useTranslation();
   const [step, setStep] = useState<1 | 2 | 3 | 4>(1);
@@ -969,7 +989,12 @@ function CampaignWizard({
     4: t('campaignsCreate.wizard.step4Subtitle'),
   };
   const stepBodies: Record<1 | 2 | 3 | 4, ReactNode> = {
-    1: step1,
+    1: (
+      <>
+        {orgChip}
+        {step1}
+      </>
+    ),
     2: step2,
     3: step3,
     4: step4,
@@ -984,10 +1009,14 @@ function CampaignWizard({
   const canSubmit = step1CanAdvance && !submitting;
 
   return (
-    <main className="min-h-screen pb-16">
-      {/* Sticky single-bar progress indicator across the page, mirroring
-          the captive onboarding flow. Lives just below the top nav so
-          the user always sees how far through they are. */}
+    <div
+      className="fixed inset-0 z-50 bg-background overflow-y-auto flex flex-col"
+      role="dialog"
+      aria-modal="true"
+      aria-label={t('campaignsCreate.headingCreate')}
+    >
+      {/* Sticky single-bar progress indicator, mirroring the captive
+          onboarding flow. */}
       <div className="sticky top-0 z-10 h-1 bg-muted">
         <div
           className="h-full bg-primary transition-all duration-500 ease-out"
@@ -995,86 +1024,97 @@ function CampaignWizard({
         />
       </div>
 
-      <form className="max-w-3xl mx-auto px-4 sm:px-6 py-6 lg:py-10 space-y-6" onSubmit={onSubmit}>
-        {header}
+      {/* Top-right close. Lets users escape if they truly don't want to
+          continue — deliberately unobtrusive so casual taps don't drop
+          them out of the flow. */}
+      <button
+        type="button"
+        onClick={onClose}
+        aria-label={t('common.goBack')}
+        className="absolute right-4 top-4 sm:right-6 sm:top-6 inline-flex h-9 w-9 items-center justify-center rounded-full text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
+      >
+        <X className="h-5 w-5" />
+      </button>
 
-        <div className="max-w-md mx-auto w-full">
-          <div
-            key={step}
-            className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-300"
-          >
-            {/* Centered title block — captive-onboarding cadence: small
-                "Step N of 4" eyebrow, large heading, muted subtitle. */}
-            <div className="space-y-2 text-center">
-              <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-                {t('campaignsCreate.wizard.stepProgress', { current: step, total: 4 })}
-              </p>
-              <h2 className="text-2xl font-bold tracking-tight">{stepTitles[step]}</h2>
-              <p className="text-sm text-muted-foreground">{stepSubtitles[step]}</p>
-            </div>
+      <form
+        className="flex-1 flex items-start sm:items-center justify-center px-6 pt-16 pb-12"
+        onSubmit={onSubmit}
+      >
+        <div
+          key={step}
+          className="w-full max-w-md mx-auto space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-300"
+        >
+          {/* Centered title block — captive-onboarding cadence: small
+              "Step N of 4" eyebrow, large heading, muted subtitle. */}
+          <div className="space-y-2 text-center">
+            <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+              {t('campaignsCreate.wizard.stepProgress', { current: step, total: 4 })}
+            </p>
+            <h2 className="text-2xl font-bold tracking-tight">{stepTitles[step]}</h2>
+            <p className="text-sm text-muted-foreground">{stepSubtitles[step]}</p>
+          </div>
 
-            {/* Step body. No card chrome — onboarding keeps the content
-                area visually quiet so the focus stays on the fields. */}
-            <div className="space-y-3">{stepBodies[step]}</div>
+          {/* Step body. No card chrome — onboarding keeps the content
+              area visually quiet so the focus stays on the fields. */}
+          <div className="space-y-3">{stepBodies[step]}</div>
 
-            {errorAlert}
+          {errorAlert}
 
-            {/* Footer.
-              - Steps 1–3: primary "Next" (rounded-full h-12) advances the
-                wizard; a ghost "Launch campaign" shortcut sits beneath
-                once the required fields validate, so the rest of the
-                wizard is opt-in.
-              - Step 4: primary "Launch campaign" is the only forward
-                action.
-              - A subtle text "Back" link sits at the very bottom on every
-                step but the first; step 1's "Back" is a no-op (handled by
-                the page-level back arrow in the header). */}
-            <div className="space-y-3 pt-1">
-              {step === 4 ? (
+          {/* Footer.
+            - Steps 1–3: primary "Next" (rounded-full h-12) advances the
+              wizard; a ghost "Launch campaign" shortcut sits beneath
+              once the required fields validate, so the rest of the
+              wizard is opt-in.
+            - Step 4: primary "Launch campaign" is the only forward
+              action.
+            - A subtle text "Back" link sits at the very bottom on every
+              step but the first; step 1's escape route is the top-right
+              X. */}
+          <div className="space-y-3 pt-1">
+            {step === 4 ? (
+              <Button
+                type="submit"
+                disabled={!canSubmit}
+                className="w-full h-12 text-base rounded-full"
+              >
+                {submitButtonContent}
+              </Button>
+            ) : (
+              <>
                 <Button
-                  type="submit"
-                  disabled={!canSubmit}
+                  type="button"
+                  onClick={() => setStep((s) => Math.min(s + 1, 4) as 1 | 2 | 3 | 4)}
+                  disabled={submitting || (step === 1 && !step1CanAdvance)}
                   className="w-full h-12 text-base rounded-full"
                 >
-                  {submitButtonContent}
+                  {t('campaignsCreate.wizard.next')}
                 </Button>
-              ) : (
-                <>
-                  <Button
-                    type="button"
-                    onClick={() => setStep((s) => Math.min(s + 1, 4) as 1 | 2 | 3 | 4)}
-                    disabled={submitting || (step === 1 && !step1CanAdvance)}
-                    className="w-full h-12 text-base rounded-full"
-                  >
-                    {t('campaignsCreate.wizard.next')}
-                  </Button>
-                  <Button
-                    type="submit"
-                    variant="ghost"
-                    disabled={!canSubmit}
-                    className="w-full"
-                  >
-                    {submitting ? submitButtonContent : t('campaignsCreate.wizard.launchNow')}
-                  </Button>
-                </>
-              )}
-
-              {step > 1 && (
-                <button
-                  type="button"
-                  onClick={() => setStep((s) => Math.max(s - 1, 1) as 1 | 2 | 3 | 4)}
-                  disabled={submitting}
-                  className="w-full text-sm text-muted-foreground hover:text-foreground inline-flex items-center justify-center gap-1.5 py-2 disabled:opacity-50"
+                <Button
+                  type="submit"
+                  variant="ghost"
+                  disabled={!canSubmit}
+                  className="w-full"
                 >
-                  <ArrowLeft className="h-3.5 w-3.5 rtl:rotate-180" />
-                  {t('campaignsCreate.wizard.back')}
-                </button>
-              )}
-            </div>
+                  {submitting ? submitButtonContent : t('campaignsCreate.wizard.launchNow')}
+                </Button>
+              </>
+            )}
+
+            {step > 1 && (
+              <button
+                type="button"
+                onClick={() => setStep((s) => Math.max(s - 1, 1) as 1 | 2 | 3 | 4)}
+                disabled={submitting}
+                className="w-full text-sm text-muted-foreground hover:text-foreground inline-flex items-center justify-center gap-1.5 py-2 disabled:opacity-50"
+              >
+                <ArrowLeft className="h-3.5 w-3.5 rtl:rotate-180" />
+                {t('campaignsCreate.wizard.back')}
+              </button>
+            )}
           </div>
         </div>
       </form>
-    </main>
+    </div>
   );
 }
 
