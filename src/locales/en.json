@@ -73,6 +73,60 @@
     "logout": "Log out",
     "addAccount": "Add another account"
   },
+  "onboarding": {
+    "ariaLabel": "Account setup",
+    "close": "Close",
+    "back": "Back",
+    "role": {
+      "title": "What brings you here?",
+      "subtitle": "You can do both later. This just helps us tailor the next steps.",
+      "creator": {
+        "title": "Start a campaign",
+        "description": "Raise Bitcoin for a cause you care about.",
+        "finderNote": "Donors send sats directly to your wallet."
+      },
+      "donor": {
+        "title": "Give to campaigns",
+        "description": "Support causes with Bitcoin.",
+        "finderNote": "Your donation goes straight to the organizer's wallet."
+      }
+    },
+    "keygen": {
+      "title": "Your key is your identity",
+      "description": "We'll generate a secret key just for you. It's the only way to log in — no email, no password.",
+      "generatingTitle": "Creating your key…",
+      "generatingDescription": "This only takes a moment.",
+      "button": "Generate my key"
+    },
+    "secure": {
+      "title": "Save your key",
+      "subtitle": "Download the file and store it somewhere safe. A password manager works well.",
+      "couplingNote": "Your account and your wallet share this key. It signs your Nostr posts and opens your Bitcoin wallet on Agora.",
+      "permanenceHeadline": "There's no way to recover this key if you lose it.",
+      "permanenceBody": "No reset, no support line, no email recovery. Save it before continuing.",
+      "button": "Download & continue",
+      "downloadFailedTitle": "Download failed",
+      "downloadFailedDescription": "Could not download the key file. Please copy it manually."
+    },
+    "profile": {
+      "title": "Make it yours",
+      "subtitle": "Tell others a bit about yourself. All optional, change it any time.",
+      "nameLabel": "Display name",
+      "namePlaceholder": "Your name",
+      "aboutLabel": "Bio",
+      "aboutPlaceholder": "A little about you…",
+      "avatarLabel": "Avatar",
+      "uploadAvatar": "Upload avatar",
+      "finish": "Finish",
+      "saving": "Saving…",
+      "skip": "Skip for now",
+      "imageOnly": "Please select an image.",
+      "imageTooLarge": "Image too large (max 5MB).",
+      "uploadFailed": "Upload failed.",
+      "publishFailedTitle": "Profile setup failed",
+      "publishFailedDescription": "Your account was created but the profile could not be saved. You can update it later."
+    }
+  },
   "feed": {
     "indexTagline": "Your content. Your vibe. Your rules.",
     "compose": {

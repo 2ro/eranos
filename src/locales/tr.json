@@ -72,6 +72,60 @@
     "logout": "Çıkış yap",
     "addAccount": "Başka hesap ekle"
   },
+  "onboarding": {
+    "ariaLabel": "Hesap kurulumu",
+    "close": "Kapat",
+    "back": "Geri",
+    "role": {
+      "title": "Sizi buraya getiren ne?",
+      "subtitle": "İkisini de daha sonra yapabilirsiniz. Bu sadece sonraki adımları size göre uyarlamamıza yardımcı olur.",
+      "creator": {
+        "title": "Bir kampanya başlatın",
+        "description": "Önemsediğiniz bir dava için Bitcoin toplayın.",
+        "finderNote": "Bağışçılar satoshileri doğrudan cüzdanınıza gönderir."
+      },
+      "donor": {
+        "title": "Kampanyalara bağış yapın",
+        "description": "Davaları Bitcoin ile destekleyin.",
+        "finderNote": "Bağışınız doğrudan kampanya sahibinin cüzdanına gider."
+      }
+    },
+    "keygen": {
+      "title": "Anahtarınız sizin kimliğinizdir",
+      "description": "Size özel bir gizli anahtar oluşturacağız. Giriş yapmanın tek yolu budur — e-posta yok, parola yok.",
+      "generatingTitle": "Anahtarınız oluşturuluyor…",
+      "generatingDescription": "Bu sadece bir an sürer.",
+      "button": "Anahtarımı oluştur"
+    },
+    "secure": {
+      "title": "Anahtarınızı kaydedin",
+      "subtitle": "Dosyayı indirin ve güvenli bir yerde saklayın. Bir parola yöneticisi işe yarar.",
+      "couplingNote": "Hesabınız ve cüzdanınız bu anahtarı paylaşır. Nostr paylaşımlarınızı imzalar ve Agora üzerindeki Bitcoin cüzdanınızı açar.",
+      "permanenceHeadline": "Bu anahtarı kaybederseniz kurtarmanın bir yolu yoktur.",
+      "permanenceBody": "Sıfırlama yok, destek hattı yok, e-posta kurtarma yok. Devam etmeden önce kaydedin.",
+      "button": "İndir ve devam et",
+      "downloadFailedTitle": "İndirme başarısız",
+      "downloadFailedDescription": "Anahtar dosyası indirilemedi. Lütfen elle kopyalayın."
+    },
+    "profile": {
+      "title": "Profilinizi kişiselleştirin",
+      "subtitle": "Başkalarına kendiniz hakkında biraz bilgi verin. Hepsi isteğe bağlı, istediğiniz zaman değiştirebilirsiniz.",
+      "nameLabel": "Görünen ad",
+      "namePlaceholder": "Adınız",
+      "aboutLabel": "Hakkında",
+      "aboutPlaceholder": "Kendiniz hakkında birkaç söz…",
+      "avatarLabel": "Avatar",
+      "uploadAvatar": "Avatar yükle",
+      "finish": "Bitir",
+      "saving": "Kaydediliyor…",
+      "skip": "Şimdilik atla",
+      "imageOnly": "Lütfen bir resim seçin.",
+      "imageTooLarge": "Resim çok büyük (en fazla 5MB).",
+      "uploadFailed": "Yükleme başarısız.",
+      "publishFailedTitle": "Profil kurulumu başarısız",
+      "publishFailedDescription": "Hesabınız oluşturuldu ancak profil kaydedilemedi. Daha sonra güncelleyebilirsiniz."
+    }
+  },
   "feed": {
     "indexTagline": "İçeriğin senin. Tarzın senin. Kuralların senin.",
     "compose": {

@@ -72,6 +72,60 @@
     "logout": "Se déconnecter",
     "addAccount": "Ajouter un autre compte"
   },
+  "onboarding": {
+    "ariaLabel": "Configuration du compte",
+    "close": "Fermer",
+    "back": "Retour",
+    "role": {
+      "title": "Qu'est-ce qui vous amène ?",
+      "subtitle": "Vous pouvez faire les deux plus tard. Cela nous aide simplement à adapter les prochaines étapes.",
+      "creator": {
+        "title": "Lancer une campagne",
+        "description": "Collectez des Bitcoin pour une cause qui vous tient à cœur.",
+        "finderNote": "Les donateurs envoient des sats directement dans votre portefeuille."
+      },
+      "donor": {
+        "title": "Soutenir des campagnes",
+        "description": "Soutenez des causes avec Bitcoin.",
+        "finderNote": "Votre don va directement dans le portefeuille de l'organisateur."
+      }
+    },
+    "keygen": {
+      "title": "Votre clé est votre identité",
+      "description": "Nous allons générer une clé secrète rien que pour vous. C'est le seul moyen de se connecter — pas d'e-mail, pas de mot de passe.",
+      "generatingTitle": "Création de votre clé…",
+      "generatingDescription": "Cela ne prend qu'un instant.",
+      "button": "Générer ma clé"
+    },
+    "secure": {
+      "title": "Sauvegardez votre clé",
+      "subtitle": "Téléchargez le fichier et conservez-le en lieu sûr. Un gestionnaire de mots de passe fait l'affaire.",
+      "couplingNote": "Votre compte et votre portefeuille partagent cette clé. Elle signe vos publications Nostr et ouvre votre portefeuille Bitcoin sur Agora.",
+      "permanenceHeadline": "Cette clé est irrécupérable si vous la perdez.",
+      "permanenceBody": "Aucune réinitialisation, aucun service d'assistance, aucune récupération par e-mail. Enregistrez-la avant de continuer.",
+      "button": "Télécharger et continuer",
+      "downloadFailedTitle": "Échec du téléchargement",
+      "downloadFailedDescription": "Impossible de télécharger le fichier de clé. Veuillez le copier manuellement."
+    },
+    "profile": {
+      "title": "Personnalisez-le",
+      "subtitle": "Présentez-vous brièvement aux autres. Tout est facultatif, modifiable à tout moment.",
+      "nameLabel": "Nom affiché",
+      "namePlaceholder": "Votre nom",
+      "aboutLabel": "Bio",
+      "aboutPlaceholder": "Un mot sur vous…",
+      "avatarLabel": "Avatar",
+      "uploadAvatar": "Téléverser un avatar",
+      "finish": "Terminer",
+      "saving": "Enregistrement…",
+      "skip": "Passer pour l'instant",
+      "imageOnly": "Veuillez sélectionner une image.",
+      "imageTooLarge": "Image trop volumineuse (5 Mo max).",
+      "uploadFailed": "Échec du téléversement.",
+      "publishFailedTitle": "Échec de la configuration du profil",
+      "publishFailedDescription": "Votre compte a été créé mais le profil n'a pas pu être enregistré. Vous pourrez le mettre à jour plus tard."
+    }
+  },
   "feed": {
     "indexTagline": "Votre contenu. Votre ambiance. Vos règles.",
     "compose": {

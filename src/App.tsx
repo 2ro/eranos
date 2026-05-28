@@ -18,6 +18,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { useNsecPasteGuard } from "@/hooks/useNsecPasteGuard";
 import type { AppConfig } from "@/contexts/AppContext";
 import { NWCProvider } from "@/contexts/NWCContext";
+import { OnboardingProvider } from "@/contexts/OnboardingContext";
 import { BuildConfigSchema, type BuildConfig } from "@/lib/schemas";
 import { secureStorage } from "@/lib/secureStorage";
 import AppRouter from "./AppRouter";
@@ -207,9 +208,11 @@ export function App() {
                   <NativeNotifications />
 
                     <NWCProvider>
-                      <TooltipProvider>
-                        <AppRouter />
-                      </TooltipProvider>
+                      <OnboardingProvider>
+                        <TooltipProvider>
+                          <AppRouter />
+                        </TooltipProvider>
+                      </OnboardingProvider>
                   </NWCProvider>
                 </NostrProvider>
               </NostrLoginProvider>

@@ -72,6 +72,60 @@
     "logout": "Toka",
     "addAccount": "Ongeza akaunti nyingine"
   },
+  "onboarding": {
+    "ariaLabel": "Usanidi wa akaunti",
+    "close": "Funga",
+    "back": "Rudi",
+    "role": {
+      "title": "Nini kinachokuleta hapa?",
+      "subtitle": "Unaweza kufanya yote mawili baadaye. Hii inatusaidia tu kupanga hatua zinazofuata.",
+      "creator": {
+        "title": "Anzisha kampeni",
+        "description": "Kusanya Bitcoin kwa lengo unalolijali.",
+        "finderNote": "Wafadhili hutuma sats moja kwa moja kwenye pochi yako."
+      },
+      "donor": {
+        "title": "Changia kampeni",
+        "description": "Saidia malengo kwa Bitcoin.",
+        "finderNote": "Mchango wako huenda moja kwa moja kwenye pochi ya mratibu."
+      }
+    },
+    "keygen": {
+      "title": "Ufunguo wako ni utambulisho wako",
+      "description": "Tutakutengenezea ufunguo wa siri wako pekee. Ndio njia pekee ya kuingia — hakuna barua pepe, hakuna nenosiri.",
+      "generatingTitle": "Inatengeneza ufunguo wako…",
+      "generatingDescription": "Hii inachukua muda mfupi tu.",
+      "button": "Tengeneza ufunguo wangu"
+    },
+    "secure": {
+      "title": "Hifadhi ufunguo wako",
+      "subtitle": "Pakua faili na uihifadhi mahali salama. Msimamizi wa nenosiri unafaa vyema.",
+      "couplingNote": "Akaunti yako na pochi yako hushiriki ufunguo huu. Hutia saini machapisho yako ya Nostr na hufungua pochi yako ya Bitcoin kwenye Agora.",
+      "permanenceHeadline": "Hakuna njia ya kurejesha ufunguo huu ukiupoteza.",
+      "permanenceBody": "Hakuna kuweka upya, hakuna huduma ya msaada, hakuna urejeshaji kwa barua pepe. Uhifadhi kabla ya kuendelea.",
+      "button": "Pakua na uendelee",
+      "downloadFailedTitle": "Upakuaji umeshindikana",
+      "downloadFailedDescription": "Haikuweza kupakua faili la ufunguo. Tafadhali inakili mwenyewe."
+    },
+    "profile": {
+      "title": "Uifanye yako",
+      "subtitle": "Waambie wengine kidogo kukuhusu. Yote si lazima, ibadilishe wakati wowote.",
+      "nameLabel": "Jina la kuonyesha",
+      "namePlaceholder": "Jina lako",
+      "aboutLabel": "Wasifu mfupi",
+      "aboutPlaceholder": "Kidogo kukuhusu…",
+      "avatarLabel": "Avatari",
+      "uploadAvatar": "Pakia avatari",
+      "finish": "Maliza",
+      "saving": "Inahifadhi…",
+      "skip": "Ruka kwa sasa",
+      "imageOnly": "Tafadhali chagua picha.",
+      "imageTooLarge": "Picha ni kubwa sana (kiwango cha juu 5MB).",
+      "uploadFailed": "Upakiaji umeshindikana.",
+      "publishFailedTitle": "Usanidi wa wasifu umeshindikana",
+      "publishFailedDescription": "Akaunti yako iliundwa lakini wasifu haukuweza kuhifadhiwa. Unaweza kuusasisha baadaye."
+    }
+  },
   "feed": {
     "indexTagline": "Maudhui yako. Mtindo wako. Sheria zako.",
     "compose": {

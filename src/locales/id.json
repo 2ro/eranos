@@ -73,6 +73,60 @@
     "logout": "Keluar",
     "addAccount": "Tambah akun lain"
   },
+  "onboarding": {
+    "ariaLabel": "Penyiapan akun",
+    "close": "Tutup",
+    "back": "Kembali",
+    "role": {
+      "title": "Apa yang membawa Anda ke sini?",
+      "subtitle": "Anda bisa melakukan keduanya nanti. Ini hanya membantu kami menyesuaikan langkah selanjutnya.",
+      "creator": {
+        "title": "Mulai kampanye",
+        "description": "Galang Bitcoin untuk tujuan yang Anda pedulikan.",
+        "finderNote": "Donatur mengirim sats langsung ke dompet Anda."
+      },
+      "donor": {
+        "title": "Beri donasi untuk kampanye",
+        "description": "Dukung berbagai tujuan dengan Bitcoin.",
+        "finderNote": "Donasi Anda langsung masuk ke dompet penyelenggara."
+      }
+    },
+    "keygen": {
+      "title": "Kunci Anda adalah identitas Anda",
+      "description": "Kami akan membuat kunci rahasia khusus untuk Anda. Itu satu-satunya cara untuk masuk — tanpa email, tanpa kata sandi.",
+      "generatingTitle": "Membuat kunci Anda…",
+      "generatingDescription": "Hanya butuh sebentar.",
+      "button": "Buat kunci saya"
+    },
+    "secure": {
+      "title": "Simpan kunci Anda",
+      "subtitle": "Unduh berkas dan simpan di tempat yang aman. Pengelola kata sandi bisa digunakan.",
+      "couplingNote": "Akun dan dompet Anda berbagi kunci ini. Kunci ini menandatangani unggahan Nostr Anda dan membuka dompet Bitcoin Anda di Agora.",
+      "permanenceHeadline": "Tidak ada cara untuk memulihkan kunci ini jika hilang.",
+      "permanenceBody": "Tidak ada reset, tidak ada saluran dukungan, tidak ada pemulihan lewat email. Simpan sebelum melanjutkan.",
+      "button": "Unduh & lanjutkan",
+      "downloadFailedTitle": "Unduh gagal",
+      "downloadFailedDescription": "Tidak dapat mengunduh berkas kunci. Silakan salin secara manual."
+    },
+    "profile": {
+      "title": "Jadikan milik Anda",
+      "subtitle": "Beri tahu orang lain sedikit tentang diri Anda. Semua opsional, bisa diubah kapan saja.",
+      "nameLabel": "Nama tampilan",
+      "namePlaceholder": "Nama Anda",
+      "aboutLabel": "Bio",
+      "aboutPlaceholder": "Sedikit tentang Anda…",
+      "avatarLabel": "Avatar",
+      "uploadAvatar": "Unggah avatar",
+      "finish": "Selesai",
+      "saving": "Menyimpan…",
+      "skip": "Lewati dulu",
+      "imageOnly": "Silakan pilih gambar.",
+      "imageTooLarge": "Gambar terlalu besar (maks 5MB).",
+      "uploadFailed": "Unggah gagal.",
+      "publishFailedTitle": "Penyiapan profil gagal",
+      "publishFailedDescription": "Akun Anda telah dibuat tetapi profil tidak dapat disimpan. Anda bisa memperbaruinya nanti."
+    }
+  },
   "feed": {
     "indexTagline": "Konten Anda. Gaya Anda. Aturan Anda.",
     "compose": {

@@ -73,6 +73,60 @@
     "logout": "Cerrar sesión",
     "addAccount": "Agregar otra cuenta"
   },
+  "onboarding": {
+    "ariaLabel": "Configuración de la cuenta",
+    "close": "Cerrar",
+    "back": "Atrás",
+    "role": {
+      "title": "¿Qué te trae por aquí?",
+      "subtitle": "Puedes hacer ambas cosas más tarde. Esto solo nos ayuda a adaptar los siguientes pasos.",
+      "creator": {
+        "title": "Iniciar una campaña",
+        "description": "Recauda Bitcoin para una causa que te importa.",
+        "finderNote": "Los donantes envían sats directamente a tu cartera."
+      },
+      "donor": {
+        "title": "Donar a campañas",
+        "description": "Apoya causas con Bitcoin.",
+        "finderNote": "Tu donación va directamente a la cartera del organizador."
+      }
+    },
+    "keygen": {
+      "title": "Tu clave es tu identidad",
+      "description": "Generaremos una clave secreta solo para ti. Es la única forma de iniciar sesión — sin correo, sin contraseña.",
+      "generatingTitle": "Creando tu clave…",
+      "generatingDescription": "Esto solo toma un momento.",
+      "button": "Generar mi clave"
+    },
+    "secure": {
+      "title": "Guarda tu clave",
+      "subtitle": "Descarga el archivo y guárdalo en un lugar seguro. Un gestor de contraseñas funciona bien.",
+      "couplingNote": "Tu cuenta y tu cartera comparten esta clave. Firma tus publicaciones en Nostr y abre tu cartera de Bitcoin en Agora.",
+      "permanenceHeadline": "No hay forma de recuperar esta clave si la pierdes.",
+      "permanenceBody": "Sin restablecimiento, sin soporte, sin recuperación por correo. Guárdala antes de continuar.",
+      "button": "Descargar y continuar",
+      "downloadFailedTitle": "Error al descargar",
+      "downloadFailedDescription": "No se pudo descargar el archivo de la clave. Por favor, cópiala manualmente."
+    },
+    "profile": {
+      "title": "Hazlo tuyo",
+      "subtitle": "Cuéntales a los demás un poco sobre ti. Todo es opcional, puedes cambiarlo en cualquier momento.",
+      "nameLabel": "Nombre visible",
+      "namePlaceholder": "Tu nombre",
+      "aboutLabel": "Biografía",
+      "aboutPlaceholder": "Un poco sobre ti…",
+      "avatarLabel": "Avatar",
+      "uploadAvatar": "Subir avatar",
+      "finish": "Finalizar",
+      "saving": "Guardando…",
+      "skip": "Omitir por ahora",
+      "imageOnly": "Por favor, selecciona una imagen.",
+      "imageTooLarge": "La imagen es demasiado grande (máx. 5 MB).",
+      "uploadFailed": "Error al subir.",
+      "publishFailedTitle": "Error en la configuración del perfil",
+      "publishFailedDescription": "Tu cuenta se creó, pero no se pudo guardar el perfil. Puedes actualizarlo más tarde."
+    }
+  },
   "feed": {
     "indexTagline": "Tu contenido. Tu estilo. Tus reglas.",
     "compose": {

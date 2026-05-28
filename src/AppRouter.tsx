@@ -4,6 +4,7 @@ import { useTranslation } from "react-i18next";
 import { Loader2 } from "lucide-react";
 import { Toaster } from "./components/ui/toaster";
 import { TopNav } from "./components/TopNav";
+import { OnboardingGate } from "./components/OnboardingGate";
 import { ScrollToTop } from "./components/ScrollToTop";
 import { VersionCheck } from "./components/VersionCheck";
 import { useCurrentUser } from "./hooks/useCurrentUser";
@@ -130,7 +131,8 @@ export function AppRouter() {
       <Toaster />
       <VersionCheck />
       <ScrollToTop />
-      <Routes>
+      <OnboardingGate>
+        <Routes>
         {/* Narrow layout — `max-w-3xl` center column. The default for
             form/prose-style pages. */}
         <Route element={<FundraiserLayout narrow />}>
@@ -207,7 +209,8 @@ export function AppRouter() {
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Route>
-      </Routes>
+        </Routes>
+      </OnboardingGate>
     </BrowserRouter>
   );
 }

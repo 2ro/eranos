@@ -73,6 +73,60 @@
     "logout": "Sair",
     "addAccount": "Adicionar outra conta"
   },
+  "onboarding": {
+    "ariaLabel": "Configuração da conta",
+    "close": "Fechar",
+    "back": "Voltar",
+    "role": {
+      "title": "O que te trouxe aqui?",
+      "subtitle": "Você pode fazer os dois depois. Isso só nos ajuda a adaptar os próximos passos.",
+      "creator": {
+        "title": "Iniciar uma campanha",
+        "description": "Arrecade Bitcoin para uma causa em que você acredita.",
+        "finderNote": "Os doadores enviam sats diretamente para sua carteira."
+      },
+      "donor": {
+        "title": "Doar para campanhas",
+        "description": "Apoie causas com Bitcoin.",
+        "finderNote": "Sua doação vai direto para a carteira do organizador."
+      }
+    },
+    "keygen": {
+      "title": "Sua chave é sua identidade",
+      "description": "Vamos gerar uma chave secreta só para você. É a única forma de entrar — sem e-mail, sem senha.",
+      "generatingTitle": "Criando sua chave…",
+      "generatingDescription": "Isso leva só um instante.",
+      "button": "Gerar minha chave"
+    },
+    "secure": {
+      "title": "Salve sua chave",
+      "subtitle": "Baixe o arquivo e guarde em um lugar seguro. Um gerenciador de senhas funciona bem.",
+      "couplingNote": "Sua conta e sua carteira compartilham esta chave. Ela assina suas publicações no Nostr e abre sua carteira Bitcoin no Agora.",
+      "permanenceHeadline": "Não há como recuperar esta chave se você perdê-la.",
+      "permanenceBody": "Sem redefinição, sem suporte, sem recuperação por e-mail. Salve-a antes de continuar.",
+      "button": "Baixar e continuar",
+      "downloadFailedTitle": "Falha no download",
+      "downloadFailedDescription": "Não foi possível baixar o arquivo da chave. Por favor, copie-a manualmente."
+    },
+    "profile": {
+      "title": "Deixe do seu jeito",
+      "subtitle": "Conte um pouco sobre você. Tudo opcional, você pode alterar a qualquer momento.",
+      "nameLabel": "Nome de exibição",
+      "namePlaceholder": "Seu nome",
+      "aboutLabel": "Bio",
+      "aboutPlaceholder": "Um pouco sobre você…",
+      "avatarLabel": "Avatar",
+      "uploadAvatar": "Enviar avatar",
+      "finish": "Concluir",
+      "saving": "Salvando…",
+      "skip": "Pular por enquanto",
+      "imageOnly": "Por favor, selecione uma imagem.",
+      "imageTooLarge": "Imagem muito grande (máx. 5MB).",
+      "uploadFailed": "Falha no envio.",
+      "publishFailedTitle": "Falha na configuração do perfil",
+      "publishFailedDescription": "Sua conta foi criada, mas o perfil não pôde ser salvo. Você pode atualizá-lo depois."
+    }
+  },
   "feed": {
     "indexTagline": "Seu conteúdo. Seu estilo. Suas regras.",
     "compose": {

@@ -73,6 +73,60 @@
     "logout": "退出登入",
     "addAccount": "新增其他賬戶"
   },
+  "onboarding": {
+    "ariaLabel": "帳號設定",
+    "close": "關閉",
+    "back": "返回",
+    "role": {
+      "title": "你來這裡的目的是？",
+      "subtitle": "兩者你之後都可以做。這只是幫我們為你量身打造接下來的步驟。",
+      "creator": {
+        "title": "發起活動",
+        "description": "為你關心的議題募集 Bitcoin。",
+        "finderNote": "捐贈者會直接將 sats 傳送到你的錢包。"
+      },
+      "donor": {
+        "title": "捐助活動",
+        "description": "用 Bitcoin 支援各種議題。",
+        "finderNote": "你的捐款會直接進入發起人的錢包。"
+      }
+    },
+    "keygen": {
+      "title": "你的金鑰就是你的身分",
+      "description": "我們會為你產生一把專屬的秘密金鑰。這是唯一的登入方式——不需要電子郵件，也不需要密碼。",
+      "generatingTitle": "正在建立你的金鑰…",
+      "generatingDescription": "只需稍待片刻。",
+      "button": "為我產生金鑰"
+    },
+    "secure": {
+      "title": "儲存你的金鑰",
+      "subtitle": "下載檔案並存放在安全的地方。密碼管理員是個好選擇。",
+      "couplingNote": "你的帳號和錢包共用這把金鑰。它會簽署你的 Nostr 貼文，並開啟你在 Agora 上的 Bitcoin 錢包。",
+      "permanenceHeadline": "金鑰一旦遺失，便無法復原。",
+      "permanenceBody": "沒有重設、沒有客服、也無法透過電子郵件找回。請先妥善保存，再繼續下一步。",
+      "button": "下載並繼續",
+      "downloadFailedTitle": "下載失敗",
+      "downloadFailedDescription": "無法下載金鑰檔案。請手動複製。"
+    },
+    "profile": {
+      "title": "打造你的個人資料",
+      "subtitle": "向他人簡單介紹一下你自己。全部都是選填，隨時可以修改。",
+      "nameLabel": "顯示名稱",
+      "namePlaceholder": "你的名稱",
+      "aboutLabel": "個人簡介",
+      "aboutPlaceholder": "簡單介紹一下你自己…",
+      "avatarLabel": "頭像",
+      "uploadAvatar": "上傳頭像",
+      "finish": "完成",
+      "saving": "儲存中…",
+      "skip": "暫時略過",
+      "imageOnly": "請選擇圖片檔案。",
+      "imageTooLarge": "圖片過大（最大 5MB）。",
+      "uploadFailed": "上傳失敗。",
+      "publishFailedTitle": "個人資料設定失敗",
+      "publishFailedDescription": "你的帳號已建立，但個人資料無法儲存。你可以稍後再更新。"
+    }
+  },
   "feed": {
     "indexTagline": "你的內容。你的風格。你的規則。",
     "compose": {
