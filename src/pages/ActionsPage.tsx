@@ -288,7 +288,7 @@ export default function ActionsPage() {
       .sort((a, b) => (pledgeModeration.featuredOrder.get(b) ?? 0) - (pledgeModeration.featuredOrder.get(a) ?? 0));
   }, [pledgeModeration, pledgeModerationReady]);
 
-  const { data: featuredPledges, isLoading: featuredPledgesLoading } = useActions({
+  const { data: featuredPledges } = useActions({
     coordinates: featuredPledgeCoords,
     limit: featuredPledgeCoords.length || 1,
     enabled: pledgeModerationReady,
@@ -424,7 +424,7 @@ export default function ActionsPage() {
           </section>
         )}
 
-        {(featuredPledgesLoading || orderedFeaturedPledges.length > 0) && (
+        {orderedFeaturedPledges.length > 0 && (
           <section className="space-y-5">
             <div>
               <h2 className="text-2xl sm:text-3xl font-bold tracking-tight inline-flex items-center gap-2">
@@ -433,20 +433,14 @@ export default function ActionsPage() {
               </h2>
               <p className="text-sm text-muted-foreground mt-1">{t('pledges.list.featuredPledgesTagline')}</p>
             </div>
-            {featuredPledgesLoading && orderedFeaturedPledges.length === 0 ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
-                {Array.from({ length: 4 }).map((_, i) => <ActionSkeleton key={i} />)}
-              </div>
-            ) : (
-              <ActionSection
-                items={visibleFeatured}
-                total={orderedFeaturedPledges.length}
-                visible={DEFAULT_VISIBLE}
-                showAll={showAllFeatured}
-                onToggle={() => setShowAllFeatured(!showAllFeatured)}
-                btcPrice={btcPrice}
-              />
-            )}
+            <ActionSection
+              items={visibleFeatured}
+              total={orderedFeaturedPledges.length}
+              visible={DEFAULT_VISIBLE}
+              showAll={showAllFeatured}
+              onToggle={() => setShowAllFeatured(!showAllFeatured)}
+              btcPrice={btcPrice}
+            />
           </section>
         )}
 

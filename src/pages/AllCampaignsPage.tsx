@@ -137,7 +137,7 @@ export function AllCampaignsPage() {
       .sort((a, b) => (moderation.featuredOrder.get(b) ?? 0) - (moderation.featuredOrder.get(a) ?? 0));
   }, [moderation, moderationReady]);
 
-  const { data: featuredCampaigns, isLoading: featuredLoading } = useCampaigns({
+  const { data: featuredCampaigns } = useCampaigns({
     coordinates: featuredCoords,
     limit: featuredCoords.length || 1,
     enabled: moderationReady,
@@ -211,7 +211,7 @@ export function AllCampaignsPage() {
           </section>
         )}
 
-        {(featuredLoading || orderedFeaturedCampaigns.length > 0) && (
+        {orderedFeaturedCampaigns.length > 0 && (
           <section className="space-y-5">
             <div>
               <h2 className="text-2xl sm:text-3xl font-bold tracking-tight">
@@ -221,19 +221,13 @@ export function AllCampaignsPage() {
                 {t('campaigns.home.featuredDesc', { appName: config.appName })}
               </p>
             </div>
-            {featuredLoading && orderedFeaturedCampaigns.length === 0 ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
-                {Array.from({ length: 4 }).map((_, i) => <CampaignCardSkeleton key={i} />)}
-              </div>
-            ) : (
-              <CampaignSection
-                campaigns={visibleFeatured}
-                total={orderedFeaturedCampaigns.length}
-                visible={DEFAULT_VISIBLE}
-                showAll={showAllFeatured}
-                onToggle={() => setShowAllFeatured(!showAllFeatured)}
-              />
-            )}
+            <CampaignSection
+              campaigns={visibleFeatured}
+              total={orderedFeaturedCampaigns.length}
+              visible={DEFAULT_VISIBLE}
+              showAll={showAllFeatured}
+              onToggle={() => setShowAllFeatured(!showAllFeatured)}
+            />
           </section>
         )}
 
