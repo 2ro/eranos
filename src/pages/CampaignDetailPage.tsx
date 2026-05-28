@@ -50,6 +50,7 @@ import { NoteMoreMenu } from '@/components/NoteMoreMenu';
 import { Progress } from '@/components/ui/progress';
 import { ThreadedReplyList, type ReplyNode } from '@/components/ThreadedReplyList';
 import { useAppContext } from '@/hooks/useAppContext';
+import { useAuthor } from '@/hooks/useAuthor';
 import { useBtcPrice } from '@/hooks/useBtcPrice';
 import { useCampaign } from '@/hooks/useCampaign';
 import { useCampaignDonations } from '@/hooks/useCampaignDonations';
@@ -131,6 +132,7 @@ function CampaignDetailContent({ campaign }: { campaign: ParsedCampaign }) {
   const { t } = useTranslation();
   const { config } = useAppContext();
   const { user } = useCurrentUser();
+  const author = useAuthor(campaign.pubkey);
   const { data: btcPrice } = useBtcPrice();
   const { data: stats, isLoading: statsLoading } = useCampaignDonations(campaign);
   const navigate = useNavigate();
@@ -247,7 +249,8 @@ function CampaignDetailContent({ campaign }: { campaign: ParsedCampaign }) {
       .map((event): ReplyNode => ({ event, children: [] }));
   }, [feedEventsById, pinnedEvents, pinnedIds]);
 
-  const cover = sanitizeUrl(campaign.banner);
+  const authorMetadata = author.data?.metadata;
+  const cover = sanitizeUrl(campaign.banner) ?? sanitizeUrl(authorMetadata?.banner) ?? sanitizeUrl(authorMetadata?.picture);
 
   const deadline = campaign.deadline ? formatDeadline(campaign.deadline, t) : null;
   const countryLabel = getCampaignCountryLabel(campaign);
