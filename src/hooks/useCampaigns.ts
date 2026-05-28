@@ -73,6 +73,8 @@ interface UseCampaignsOptions {
   limit?: number;
   /** Authors to fetch from, e.g. for a profile's campaigns. */
   authors?: string[];
+  /** Disable the query while dependent state is unresolved. */
+  enabled?: boolean;
   /**
    * Restrict to a specific set of `33863:<pubkey>:<d>` coordinates.
    *
@@ -112,6 +114,7 @@ export function useCampaigns(options: UseCampaignsOptions = {}) {
     limit = 60,
     authors,
     coordinates,
+    enabled = true,
   } = options;
 
   // Stable cache key for the coordinates option; sort so order doesn't
@@ -123,6 +126,7 @@ export function useCampaigns(options: UseCampaignsOptions = {}) {
       'campaigns',
       { countryCode, limit, authors, coordinatesKey },
     ],
+    enabled,
     queryFn: async (c) => {
       // Sentinel: empty allowlist = empty result. Skip the relay entirely.
       if (coordinates && coordinates.length === 0) return [] as ParsedCampaign[];

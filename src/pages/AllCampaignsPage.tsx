@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { useSeoMeta } from '@unhead/react';
 import { useTranslation } from 'react-i18next';
-import { HandHeart, PlusCircle } from 'lucide-react';
+import { EyeOff, HandHeart, Hourglass, PlusCircle } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -10,10 +10,14 @@ import { CampaignCard, CampaignCardSkeleton } from '@/components/CampaignCard';
 import { DiscoverySearchToolbar } from '@/components/DiscoverySearchToolbar';
 import { HeroAtmosphere } from '@/components/HeroAtmosphere';
 import { HeroBanner } from '@/components/HeroBanner';
+import { ModeratorCollapsibleSection } from '@/components/moderation';
+import { useCampaigns } from '@/hooks/useCampaigns';
 import { useAllCampaigns, type CampaignSort } from '@/hooks/useAllCampaigns';
 import { useCampaignModeration } from '@/hooks/useCampaignModeration';
+import { useCampaignModerators } from '@/hooks/useCampaignModerators';
 import { useAppContext } from '@/hooks/useAppContext';
 import { useDebounce } from '@/hooks/useDebounce';
+import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { HOPE_PALETTE } from '@/lib/hopePalette';
 import { cn } from '@/lib/utils';
 import type { Nip50Sort } from '@/hooks/useNip50Search';
@@ -55,6 +59,7 @@ const toQuerySort = (s: Nip50Sort): CampaignSort => (s === 'new' ? 'none' : 'top
 export function AllCampaignsPage() {
   const { t } = useTranslation();
   const { config } = useAppContext();
+  const { user } = useCurrentUser();
 
   // URL state — sort, query, and country live in the URL so results are
   // shareable.
@@ -68,6 +73,9 @@ export function AllCampaignsPage() {
   const [searchInput, setSearchInput] = useState(urlQuery);
   const debouncedSearch = useDebounce(searchInput, 300);
   const [showHidden, setShowHidden] = useState(false);
+
+  const { data: moderators } = useCampaignModerators();
+  const isMod = !!user && !!moderators && moderators.includes(user.pubkey);
 
   // Sync the debounced search → URL. Empty / default values are stripped
   // so the canonical URL is `/campaigns/all` (not
@@ -116,6 +124,10 @@ export function AllCampaignsPage() {
     limit: 200,
   });
   const { data: moderation, isReady: moderationReady } = useCampaignModeration();
+  const { data: allCampaignsForMods, isLoading: allCampaignsLoading } = useCampaigns({
+    limit: 200,
+    enabled: isMod,
+  });
 
   useSeoMeta({
     title: `${t('campaigns.all.seoTitle')} | ${config.appName}`,
@@ -125,20 +137,44 @@ export function AllCampaignsPage() {
   const { visible, hiddenCount } = useMemo(() => {
     const all = campaigns ?? [];
     const hiddenCoords = moderation?.hiddenCoords ?? new Set<string>();
+    const featuredOrder = moderation?.featuredOrder ?? new Map<string, number>();
     let hiddenCount = 0;
     const visible: ParsedCampaign[] = [];
 
     for (const c of all) {
       if (hiddenCoords.has(c.aTag)) {
         hiddenCount += 1;
-        if (showHidden) visible.push(c);
+        if (isMod && showHidden) visible.push(c);
       } else {
         visible.push(c);
       }
     }
 
+    if (sort === 'top' && featuredOrder.size > 0) {
+      visible.sort((a, b) => {
+        const aFeaturedAt = featuredOrder.get(a.aTag) ?? 0;
+        const bFeaturedAt = featuredOrder.get(b.aTag) ?? 0;
+        if (aFeaturedAt && bFeaturedAt) return bFeaturedAt - aFeaturedAt;
+        if (aFeaturedAt) return -1;
+        if (bFeaturedAt) return 1;
+        return 0;
+      });
+    }
+
     return { visible, hiddenCount };
-  }, [campaigns, moderation, showHidden]);
+  }, [campaigns, isMod, moderation, showHidden, sort]);
+
+  const pendingCampaigns = useMemo<ParsedCampaign[]>(() => {
+    if (!isMod || !moderationReady) return [];
+    return (allCampaignsForMods ?? []).filter(
+      (campaign) => !moderation.approvedCoords.has(campaign.aTag) && !moderation.hiddenCoords.has(campaign.aTag),
+    );
+  }, [allCampaignsForMods, isMod, moderation, moderationReady]);
+
+  const hiddenCampaigns = useMemo<ParsedCampaign[]>(() => {
+    if (!isMod || !moderationReady) return [];
+    return (allCampaignsForMods ?? []).filter((campaign) => moderation.hiddenCoords.has(campaign.aTag));
+  }, [allCampaignsForMods, isMod, moderation, moderationReady]);
 
   const showSkeleton = isLoading || !moderationReady;
   const activeQuery = debouncedSearch.trim();
@@ -178,11 +214,11 @@ export function AllCampaignsPage() {
             sortOptions={['top', 'new']}
             searchPlaceholderKey="campaigns.all.searchPlaceholder"
             searchAriaLabelKey="campaigns.all.searchAriaLabel"
-            showHidden={{
+            showHidden={isMod ? {
               value: showHidden,
               onChange: setShowHidden,
               count: hiddenCount,
-            }}
+            } : undefined}
             country={urlCountry}
             onCountryChange={setCountry}
           />
@@ -242,6 +278,50 @@ export function AllCampaignsPage() {
               <CampaignCard key={campaign.aTag} campaign={campaign} />
             ))}
           </div>
+        )}
+
+        {isMod && (
+          <ModeratorCollapsibleSection
+            icon={<Hourglass className="size-4" />}
+            title={t('campaigns.home.pending')}
+            description={t('campaigns.home.pendingDesc')}
+            count={pendingCampaigns.length}
+            isLoading={allCampaignsLoading || !moderationReady}
+            emptyText={t('campaigns.home.pendingEmpty')}
+            skeleton={
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+                {Array.from({ length: 4 }).map((_, i) => <CampaignCardSkeleton key={i} />)}
+              </div>
+            }
+          >
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+              {pendingCampaigns.map((campaign) => (
+                <CampaignCard key={campaign.aTag} campaign={campaign} />
+              ))}
+            </div>
+          </ModeratorCollapsibleSection>
+        )}
+
+        {isMod && (
+          <ModeratorCollapsibleSection
+            icon={<EyeOff className="size-4" />}
+            title={t('campaigns.home.hidden')}
+            description={t('campaigns.home.hiddenDesc')}
+            count={hiddenCampaigns.length}
+            isLoading={allCampaignsLoading || !moderationReady}
+            emptyText={t('campaigns.home.hiddenEmpty')}
+            skeleton={
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+                {Array.from({ length: 4 }).map((_, i) => <CampaignCardSkeleton key={i} />)}
+              </div>
+            }
+          >
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+              {hiddenCampaigns.map((campaign) => (
+                <CampaignCard key={campaign.aTag} campaign={campaign} />
+              ))}
+            </div>
+          </ModeratorCollapsibleSection>
         )}
       </div>
     </main>
