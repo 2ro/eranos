@@ -1860,6 +1860,7 @@
     "pinCountry": "د هیواد فیډ کې پن کړئ",
     "unpinCountry": "د هیواد فیډ څخه پن لرې کړئ",
     "muteConversation": "خبرې اترې غلې کړئ",
+    "muteCampaign": "کمپاین غلی کړئ",
     "mute": "@{{name}} غلی کړئ",
     "unmute": "د @{{name}} غلی توب لرې کړئ",
     "report": "د @{{name}} راپور",

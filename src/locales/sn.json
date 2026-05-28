@@ -1860,6 +1860,7 @@
     "pinCountry": "Namira pakwete yenyika",
     "unpinCountry": "Bvisa pakunamira kwete yenyika",
     "muteConversation": "Nyararisa hurukuro",
+    "muteCampaign": "Nyararisa mushandirapamwe",
     "mute": "Nyararisa @{{name}}",
     "unmute": "Bvisa kunyararisa @{{name}}",
     "report": "Mhan'arira @{{name}}",

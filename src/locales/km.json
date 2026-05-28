@@ -1860,6 +1860,7 @@
     "pinCountry": "ខ្ទាស់ទៅ Feed ប្រទេស",
     "unpinCountry": "ដោះខ្ទាស់ពី Feed ប្រទេស",
     "muteConversation": "បិទសំឡេងការសន្ទនា",
+    "muteCampaign": "បិទសំឡេងយុទ្ធនាការ",
     "mute": "បិទសំឡេង @{{name}}",
     "unmute": "បើកសំឡេង @{{name}}",
     "report": "រាយការណ៍ @{{name}}",

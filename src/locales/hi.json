@@ -316,6 +316,7 @@
     "pinCountry": "देश फ़ीड पर पिन करें",
     "unpinCountry": "देश फ़ीड से अनपिन करें",
     "muteConversation": "बातचीत म्यूट करें",
+    "muteCampaign": "अभियान म्यूट करें",
     "mute": "@{{name}} को म्यूट करें",
     "unmute": "@{{name}} को अनम्यूट करें",
     "report": "@{{name}} की रिपोर्ट करें",

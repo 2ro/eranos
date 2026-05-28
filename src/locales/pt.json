@@ -316,6 +316,7 @@
     "pinCountry": "Fixar no feed do país",
     "unpinCountry": "Desafixar do feed do país",
     "muteConversation": "Silenciar conversa",
+    "muteCampaign": "Silenciar campanha",
     "mute": "Silenciar @{{name}}",
     "unmute": "Reativar @{{name}}",
     "report": "Denunciar @{{name}}",

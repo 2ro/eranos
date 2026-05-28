@@ -2,7 +2,9 @@ import { useEffect, useState } from 'react';
 import { ImagePlus, Loader2, X } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
+import { ImageCropDialog } from '@/components/ImageCropDialog';
 import { Input } from '@/components/ui/input';
+import { useAppContext } from '@/hooks/useAppContext';
 import { useToast } from '@/hooks/useToast';
 import { useUploadFile } from '@/hooks/useUploadFile';
 import { sanitizeUrl } from '@/lib/sanitizeUrl';
@@ -36,6 +38,24 @@ interface CoverImageFieldProps {
   onUploadComplete?: (nip94Tags: string[][]) => void;
   /** Optional template gallery shown between the dropzone and the URL input. */
   templates?: readonly CoverImageTemplate[];
+  /**
+   * Aspect ratio (width / height) the crop dialog enforces. Defaults to
+   * `3` (3:1 banner). Pass a different value for non-banner cover surfaces
+   * if/when one appears — for now every consumer (campaigns, events,
+   * communities, actions) renders the cover at roughly 3:1.
+   */
+  cropAspect?: number;
+  /**
+   * Maximum long-edge size (px) of the cropped JPEG. Defaults to `1600`
+   * — plenty for 2x retina at typical banner widths while keeping uploads
+   * well under 1 MB at q=0.92. Pass `0` to disable the cap.
+   *
+   * Honored only when the user's `imageQuality` preference is
+   * `'compressed'` (the default). Users who opt into `'original'` via
+   * Network Settings get the full-resolution crop with no dimension cap,
+   * matching the behavior of ComposeBox / ImageUploadField.
+   */
+  cropMaxOutputSize?: number;
 }
 
 /**
@@ -54,11 +74,16 @@ interface CoverImageFieldProps {
  * anything other than a well-formed https URL — that's deliberate, since
  * the same value is what gets published in the Nostr event's `image` tag.
  */
-export function CoverImageField({ value, onChange, onUploadingChange, onUploadComplete, templates }: CoverImageFieldProps) {
+export function CoverImageField({ value, onChange, onUploadingChange, onUploadComplete, templates, cropAspect = 3, cropMaxOutputSize = 1600 }: CoverImageFieldProps) {
   const { t } = useTranslation();
+  const { config } = useAppContext();
   const { mutateAsync: uploadFile, isPending: isUploading } = useUploadFile();
   const { toast } = useToast();
   const [isDragging, setIsDragging] = useState(false);
+  // Crop state holds the object URL of the user's source file while the
+  // dialog is open. We revoke it on every exit path (confirm, cancel,
+  // unmount) so blob: URLs don't leak across multiple picks.
+  const [cropImageSrc, setCropImageSrc] = useState<string | null>(null);
 
   const sanitized = sanitizeUrl(value);
 
@@ -67,11 +92,13 @@ export function CoverImageField({ value, onChange, onUploadingChange, onUploadCo
   }, [isUploading, onUploadingChange]);
 
   /**
-   * Shared upload path used by both the file-input change handler and
-   * the drag-and-drop handler. Validates the MIME type up front so a
-   * stray dragged-in PDF or video doesn't end up posted to Blossom.
+   * Shared entry point for both the file-input change handler and the
+   * drag-and-drop handler. Validates the MIME type up front so a stray
+   * dragged-in PDF or video doesn't open the cropper, then hands off to
+   * `ImageCropDialog`. The actual Blossom upload happens after the user
+   * confirms the crop in `handleCropConfirm`.
    */
-  const uploadCoverFile = async (file: File) => {
+  const handleSourceFile = (file: File) => {
     if (!/^image\/(png|jpeg|webp)$/.test(file.type)) {
       toast({
         title: 'Unsupported file type',
@@ -80,6 +107,18 @@ export function CoverImageField({ value, onChange, onUploadingChange, onUploadCo
       });
       return;
     }
+    // Discard any prior object URL before allocating a new one — picking
+    // a second file without confirming the first would otherwise leak.
+    if (cropImageSrc) URL.revokeObjectURL(cropImageSrc);
+    setCropImageSrc(URL.createObjectURL(file));
+  };
+
+  const handleCropConfirm = async (file: File) => {
+    const src = cropImageSrc;
+    setCropImageSrc(null);
+    if (src) URL.revokeObjectURL(src);
+    // The crop dialog hands back a fully-formed File (JPEG or PNG,
+    // whichever encoded smaller — see encodeImage in @/lib/resizeImage).
     try {
       const tags = await uploadFile(file);
       const [[, url]] = tags;
@@ -105,6 +144,20 @@ export function CoverImageField({ value, onChange, onUploadingChange, onUploadCo
     }
   };
 
+  const handleCropCancel = () => {
+    const src = cropImageSrc;
+    setCropImageSrc(null);
+    if (src) URL.revokeObjectURL(src);
+  };
+
+  // Revoke any lingering object URL on unmount so a navigation-away
+  // while the dialog is open doesn't leak the blob.
+  useEffect(() => {
+    return () => {
+      if (cropImageSrc) URL.revokeObjectURL(cropImageSrc);
+    };
+  }, [cropImageSrc]);
+
   const handleDragOver = (e: React.DragEvent<HTMLLabelElement>) => {
     // Without preventDefault, the browser navigates to the dropped file
     // instead of letting our onDrop handler claim it.
@@ -122,13 +175,13 @@ export function CoverImageField({ value, onChange, onUploadingChange, onUploadCo
     setIsDragging(false);
   };
 
-  const handleDrop = async (e: React.DragEvent<HTMLLabelElement>) => {
+  const handleDrop = (e: React.DragEvent<HTMLLabelElement>) => {
     e.preventDefault();
     setIsDragging(false);
     if (isUploading) return;
     const file = e.dataTransfer.files?.[0];
     if (!file) return;
-    await uploadCoverFile(file);
+    handleSourceFile(file);
   };
 
   return (
@@ -187,7 +240,7 @@ export function CoverImageField({ value, onChange, onUploadingChange, onUploadCo
           onChange={(e) => {
             const file = e.target.files?.[0];
             e.currentTarget.value = '';
-            if (file) void uploadCoverFile(file);
+            if (file) handleSourceFile(file);
           }}
         />
       </label>
@@ -230,6 +283,18 @@ export function CoverImageField({ value, onChange, onUploadingChange, onUploadCo
         value={value}
         onChange={(e) => onChange(e.target.value)}
       />
+
+      {cropImageSrc && (
+        <ImageCropDialog
+          open
+          imageSrc={cropImageSrc}
+          aspect={cropAspect}
+          maxOutputSize={config.imageQuality === 'compressed' ? (cropMaxOutputSize || undefined) : undefined}
+          title="Crop cover image"
+          onCancel={handleCropCancel}
+          onCrop={handleCropConfirm}
+        />
+      )}
     </>
   );
 }

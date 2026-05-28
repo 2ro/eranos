@@ -1796,6 +1796,7 @@
     "pinCountry": "置頂到國家 Feed",
     "unpinCountry": "取消置頂國家 Feed",
     "muteConversation": "靜音對話",
+    "muteCampaign": "靜音活動",
     "mute": "靜音 @{{name}}",
     "unmute": "取消靜音 @{{name}}",
     "report": "舉報 @{{name}}",

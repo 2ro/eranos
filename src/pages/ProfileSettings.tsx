@@ -551,13 +551,12 @@ export function ProfileSettings() {
     });
   };
 
-  const handleCropConfirm = async (blob: Blob) => {
+  const handleCropConfirm = async (file: File) => {
     if (!cropState) return;
     const { field, imageSrc } = cropState;
     URL.revokeObjectURL(imageSrc);
     setCropState(null);
     try {
-      const file = new File([blob], `${field}.jpg`, { type: 'image/jpeg' });
       const [[, url]] = await uploadFile(file);
       form.setValue(field, url, { shouldDirty: true });
       toast({ title: t('profileSettings.toast.uploaded'), description: field === 'picture' ? t('profileSettings.toast.profilePictureUpdated') : t('profileSettings.toast.bannerUpdated') });

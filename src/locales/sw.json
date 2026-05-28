@@ -315,6 +315,7 @@
     "pinCountry": "Bandika kwenye mlisho wa nchi",
     "unpinCountry": "Ondoa bandiko kwenye mlisho wa nchi",
     "muteConversation": "Nyamazisha mazungumzo",
+    "muteCampaign": "Nyamazisha kampeni",
     "mute": "Nyamazisha @{{name}}",
     "unmute": "Ondoa unyamavu wa @{{name}}",
     "report": "Ripoti @{{name}}",
