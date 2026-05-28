@@ -4,7 +4,6 @@ import { useSeoMeta } from '@unhead/react';
 import { useTranslation } from 'react-i18next';
 import {
   AlertTriangle,
-  ArrowLeft,
   CheckCircle2,
   Loader2,
   Search,
@@ -198,13 +197,6 @@ export function WalletDoubleTweakFixPage() {
       <PageHeader backTo="/wallet/legacy" alwaysShowBack title={t('walletDoubleTweak.title')} />
 
       <div className="px-4 py-6 space-y-6">
-        <Button variant="ghost" size="sm" asChild className="-ml-2">
-          <Link to="/wallet/legacy">
-            <ArrowLeft className="size-4 mr-1.5 rtl:rotate-180" />
-            {t('walletDoubleTweak.back')}
-          </Link>
-        </Button>
-
         <div className="space-y-2">
           <h2 className="text-2xl font-bold tracking-tight">{t('walletDoubleTweak.heading')}</h2>
           <p className="text-sm text-muted-foreground">{t('walletDoubleTweak.subheading')}</p>
