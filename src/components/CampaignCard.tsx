@@ -254,7 +254,7 @@ export function CampaignCard({ campaign, variant = 'compact', className, footerB
         </div>
 
         {/* Body — deterministic structure: title (1 line, truncates) →
-            summary (1 line, truncates; non-breaking space placeholder
+            story (1 line, truncates; non-breaking space placeholder
             when absent) → progress (invisible-bar placeholder absorbs
             the no-goal case) → creator footer. Country, deadline,
             hidden badge, and moderation menu all live on the banner
@@ -277,7 +277,7 @@ export function CampaignCard({ campaign, variant = 'compact', className, footerB
                 isFeaturedVariant ? 'text-base' : 'text-sm',
               )}
             >
-              {displayCampaign.summary || '\u00A0'}
+              {displayCampaign.story || '\u00A0'}
             </p>
           </div>
 

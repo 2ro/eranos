@@ -92,7 +92,7 @@ export function CampaignInlinePreview({ event }: { event: NostrEvent }) {
         image={cover}
         fallbackIcon={<HandHeart className="size-12" />}
         title={campaign.title}
-        description={campaign.summary || campaign.story}
+        description={campaign.story}
         meta={(
           <div className="space-y-2 pt-1">
             {campaign.goalUsd && !isSilentPayment ? (

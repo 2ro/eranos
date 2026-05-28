@@ -352,7 +352,7 @@ function CampaignDetailContent({ campaign }: { campaign: ParsedCampaign }) {
 
   return (
     <main className="min-h-screen pb-16">
-      {/* Full-bleed cover hero. Title, creator, meta, summary, and the
+      {/* Full-bleed cover hero. Title, creator, meta, and the
           back/admin buttons all live ON the image — the banner is the
           page's emotional entry point. */}
       <CampaignHero
@@ -743,7 +743,7 @@ function CampaignerBadge() {
 }
 
 // ─────────────────────────────────────────────────────────────────────
-// Hero — full-bleed cover with title, creator, meta, summary, and the
+// Hero — full-bleed cover with title, creator, meta, and the
 // back / admin controls all overlaid on the image. The banner is the
 // page's emotional entry point: the photo carries the campaign's story
 // at a glance, and the overlay text makes the pitch readable without
@@ -871,12 +871,6 @@ function CampaignHero({
           <h1 className="text-3xl sm:text-5xl lg:text-6xl font-bold leading-[1.05] tracking-tight text-white max-w-4xl">
             {campaign.title}
           </h1>
-
-          {campaign.summary && (
-            <p className="mt-4 text-base sm:text-lg lg:text-xl leading-relaxed text-white/90 max-w-2xl line-clamp-4 sm:line-clamp-none">
-              {campaign.summary}
-            </p>
-          )}
 
           <div className="mt-5">
             <AuthorByline pubkey={creatorPubkey} variant="hero" />
