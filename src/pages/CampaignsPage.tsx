@@ -451,7 +451,7 @@ function EmptyState() {
   return (
     <Card className="border-dashed">
       <CardContent className="py-12 px-8 text-center space-y-4">
-        <HandHeart className="size-10 text-muted-foreground/60 mx-auto" />
+        <HandHeart className="size-10 text-muted-foreground mx-auto" />
         <div className="space-y-1.5">
           <h3 className="text-lg font-semibold">{t('campaigns.home.empty')}</h3>
           <p className="text-muted-foreground max-w-sm mx-auto">

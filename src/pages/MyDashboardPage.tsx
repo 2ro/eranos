@@ -479,7 +479,7 @@ function CampaignsSection({
       {!isLoading && !hasCampaigns ? (
         <div className="pt-2">
           <EmptyShelf
-            icon={<HandHeart className="size-7 text-primary/70" />}
+            icon={<HandHeart className="size-7 text-primary" />}
             title="No campaigns yet"
             body="Start a fundraiser, tell your story, and share it with the world."
             ctaLabel="Start a campaign"

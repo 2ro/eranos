@@ -887,7 +887,7 @@ function CampaignHero({
           </>
         ) : (
           <div className="flex items-center justify-center aspect-[16/9] bg-gradient-to-br from-primary/30 via-primary/10 to-secondary">
-            <HandHeart className="size-20 text-primary/40" />
+            <HandHeart className="size-20 text-primary" />
           </div>
         )}
 

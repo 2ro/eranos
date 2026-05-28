@@ -201,7 +201,7 @@ export function CampaignCard({ campaign, variant = 'compact', className, footerB
             />
           ) : (
             <div className="absolute inset-0 flex items-center justify-center">
-              <HandHeart className="size-12 text-primary/40" />
+              <HandHeart className="size-12 text-primary" />
             </div>
           )}
 
