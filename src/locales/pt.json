@@ -1270,7 +1270,6 @@
       "title": "Receber Bitcoin",
       "description": "Compartilhe um endereço para receber bitcoin.",
       "addressIndex": "Endereço n.º {{index}}",
-      "newAddress": "Novo endereço",
       "scanForNew": "Verificar novos pagamentos"
     },
     "tx": {

@@ -838,7 +838,6 @@
       "title": "ទទួល Bitcoin",
       "description": "ចែករំលែកអាសយដ្ឋានដើម្បីទទួល Bitcoin។",
       "addressIndex": "អាសយដ្ឋាន #{{index}}",
-      "newAddress": "អាសយដ្ឋានថ្មី",
       "scanForNew": "ពិនិត្យមើលការទូទាត់ថ្មី"
     },
     "tx": {

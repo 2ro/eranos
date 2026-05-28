@@ -1269,7 +1269,6 @@
       "title": "Pokea Bitcoin",
       "description": "Shiriki anwani kupokea bitcoin.",
       "addressIndex": "Anwani #{{index}}",
-      "newAddress": "Anwani mpya",
       "scanForNew": "Angalia malipo mapya"
     },
     "tx": {

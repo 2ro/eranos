@@ -1262,7 +1262,6 @@
       "title": "Receive Bitcoin",
       "description": "Share an address to receive bitcoin.",
       "addressIndex": "Address #{{index}}",
-      "newAddress": "New address",
       "scanForNew": "Check for new payments"
     },
     "tx": {

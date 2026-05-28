@@ -1269,7 +1269,6 @@
       "title": "Bitcoin Al",
       "description": "Bitcoin almak için bir adres paylaşın.",
       "addressIndex": "Adres #{{index}}",
-      "newAddress": "Yeni adres",
       "scanForNew": "Yeni ödemeleri kontrol et"
     },
     "tx": {

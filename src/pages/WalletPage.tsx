@@ -51,7 +51,6 @@ export function WalletPage() {
     isFetching,
     error,
     refetch,
-    nextReceiveAddress,
   } = useHdWallet();
   const sp = useHdWalletSp();
   const { data: btcPrice } = useHdBtcPrice();
@@ -250,35 +249,23 @@ export function WalletPage() {
               </div>
             </div>
 
-            {/* Copyable row showing the full payment URI. Keep refresh and
-                copy as separate buttons so the row remains valid HTML. */}
-            <div className="w-[312px] flex items-center gap-2 rounded-lg border bg-muted/40 px-3 py-2.5 text-left hover:bg-muted/60 motion-safe:transition-colors">
-              {address && (
-                <button
-                  type="button"
-                  onClick={nextReceiveAddress}
-                  className="shrink-0 -ml-1 inline-flex items-center justify-center size-7 rounded-full text-muted-foreground hover:text-foreground hover:bg-muted motion-safe:transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary cursor-pointer"
-                  aria-label={t('wallet.receiveDialog.newAddress')}
-                  title={t('wallet.receiveDialog.newAddress')}
-                >
-                  <RefreshCw className="size-3.5" />
-                </button>
+            {/* Copyable row showing the full payment URI. The receive
+                address advances automatically once funds are detected, so
+                there is no manual "next address" affordance here. */}
+            <button
+              type="button"
+              onClick={copyPayload}
+              className="w-[312px] flex items-center gap-2 rounded-lg border bg-muted/40 px-3 py-2.5 text-left hover:bg-muted/60 motion-safe:transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary cursor-pointer"
+            >
+              <span className="flex-1 min-w-0 truncate font-mono text-xs" title={qrPayload}>
+                {qrPayload}
+              </span>
+              {copiedPayload ? (
+                <Check className="size-4 text-green-500 shrink-0" />
+              ) : (
+                <Copy className="size-4 text-muted-foreground shrink-0" />
               )}
-              <button
-                type="button"
-                onClick={copyPayload}
-                className="min-w-0 flex flex-1 items-center gap-2 rounded-sm text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary cursor-pointer"
-              >
-                <span className="flex-1 min-w-0 truncate font-mono text-xs" title={qrPayload}>
-                  {qrPayload}
-                </span>
-                {copiedPayload ? (
-                  <Check className="size-4 text-green-500 shrink-0" />
-                ) : (
-                  <Copy className="size-4 text-muted-foreground shrink-0" />
-                )}
-              </button>
-            </div>
+            </button>
           </div>
         )}
 

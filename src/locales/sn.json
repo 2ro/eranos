@@ -838,7 +838,6 @@
       "title": "Gamuchira Bitcoin",
       "description": "Govera kero yokugamuchira bitcoin.",
       "addressIndex": "Kero #{{index}}",
-      "newAddress": "Kero itsva",
       "scanForNew": "Tarisa mibhadharo mitsva"
     },
     "tx": {

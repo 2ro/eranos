@@ -1270,7 +1270,6 @@
       "title": "Terima Bitcoin",
       "description": "Bagikan alamat untuk menerima bitcoin.",
       "addressIndex": "Alamat #{{index}}",
-      "newAddress": "Alamat baru",
       "scanForNew": "Periksa pembayaran baru"
     },
     "tx": {
