@@ -969,7 +969,6 @@
     "deleteDialogTitle": "Bu kampanya silinsin mi?",
     "deleteDialogBody": "Bu, bir NIP-09 silme isteği yayımlar. Düzgün davranan röleler kampanyayı akışlardan ve doğrudan bağlantılardan kaldırır. Geçmiş bağış makbuzları yine zincir üstünde kalır. Bu işlem geri alınamaz — bağış almaya devam etmek için kampanyayı düzenleyin.",
     "storyHeading": "Hikaye",
-    "storyEmpty": "Düzenleyici henüz bu kampanya için bir hikaye yazmadı.",
     "campaignEnded": "Kampanya bitti",
     "donate": "Bağışla",
     "share": "Paylaş",

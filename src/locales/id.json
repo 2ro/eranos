@@ -970,7 +970,6 @@
     "deleteDialogTitle": "Hapus kampanye ini?",
     "deleteDialogBody": "Ini akan memublikasikan permintaan penghapusan NIP-09. Relay yang berperilaku baik akan menghapus kampanye dari feed dan tautan langsung. Tanda terima donasi sebelumnya tetap on-chain apa pun yang terjadi. Tindakan ini tidak dapat dibatalkan — untuk tetap menerima donasi, ubah kampanye sebagai gantinya.",
     "storyHeading": "Ceritanya",
-    "storyEmpty": "Penyelenggara belum menulis cerita untuk kampanye ini.",
     "campaignEnded": "Kampanye berakhir",
     "donate": "Donasi",
     "share": "Bagikan",

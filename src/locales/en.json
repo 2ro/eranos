@@ -961,7 +961,6 @@
     "deleteDialogTitle": "Delete this campaign?",
     "deleteDialogBody": "This publishes a NIP-09 deletion request. Well-behaved relays will drop the campaign from feeds and direct links. Past donation receipts stay on-chain regardless. This action cannot be undone — to keep accepting donations, edit the campaign instead.",
     "storyHeading": "The story",
-    "storyEmpty": "The organizer hasn't written a story for this campaign yet.",
     "campaignEnded": "Campaign ended",
     "donate": "Donate",
     "share": "Share",

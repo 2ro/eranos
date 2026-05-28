@@ -538,7 +538,6 @@
     "deleteDialogTitle": "¿Eliminar esta campaña?",
     "deleteDialogBody": "Esto publica una solicitud de eliminación NIP-09. Los relés que se comportan bien quitarán la campaña de los feeds y los enlaces directos. Los recibos de donaciones pasadas quedan en cadena de todos modos. Esta acción no se puede deshacer — para seguir aceptando donaciones, edita la campaña en su lugar.",
     "storyHeading": "La historia",
-    "storyEmpty": "El organizador todavía no ha escrito la historia para esta campaña.",
     "campaignEnded": "Campaña finalizada",
     "donate": "Donar",
     "share": "Compartir",

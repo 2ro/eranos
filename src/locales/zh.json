@@ -538,7 +538,6 @@
     "deleteDialogTitle": "删除此活动？",
     "deleteDialogBody": "这将发布一个 NIP-09 删除请求。行为良好的中继会将活动从信息流和直接链接中移除。过往的捐赠收据无论如何都会保留在链上。此操作无法撤销 — 若要继续接受捐赠，请改为编辑活动。",
     "storyHeading": "故事",
-    "storyEmpty": "组织者尚未为此活动撰写故事。",
     "campaignEnded": "活动已结束",
     "donate": "捐赠",
     "share": "分享",

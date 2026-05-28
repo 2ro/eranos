@@ -411,10 +411,9 @@ function CampaignDetailContent({ campaign }: { campaign: ParsedCampaign }) {
 
           {/* Main article column */}
           <div className="flex-1 min-w-0 space-y-8">
-            <CampaignStory
-              storyEvent={storyEvent}
-              hasContent={displayCampaign.story.trim().length > 0}
-            />
+            {displayCampaign.story.trim().length > 0 && (
+              <CampaignStory storyEvent={storyEvent} />
+            )}
 
             {/* Engagement counters above the comments. The action bar
                 itself lives in the hero overlay; these counters stay
@@ -921,19 +920,17 @@ function CampaignHero({
 
 function CampaignStory({
   storyEvent,
-  hasContent,
 }: {
   storyEvent: NostrEvent;
-  hasContent: boolean;
 }) {
   const { t } = useTranslation();
   return (
     <DetailStory
       event={storyEvent}
-      hasContent={hasContent}
+      hasContent
       heading={t('campaignsDetail.storyHeading')}
       headingId="campaign-story-heading"
-      emptyText={t('campaignsDetail.storyEmpty')}
+      emptyText=""
     />
   );
 }

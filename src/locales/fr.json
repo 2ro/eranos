@@ -960,7 +960,6 @@
     "deleteDialogTitle": "Supprimer cette campagne ?",
     "deleteDialogBody": "Cela publie une demande de suppression NIP-09. Les relais bien intentionnés retireront la campagne des fils et des liens directs. Les reçus de dons passés restent sur la chaîne quoi qu'il arrive. Cette action est irréversible — pour continuer à accepter les dons, modifiez la campagne à la place.",
     "storyHeading": "L'histoire",
-    "storyEmpty": "L'organisateur n'a pas encore écrit d'histoire pour cette campagne.",
     "campaignEnded": "Campagne terminée",
     "donate": "Faire un don",
     "share": "Partager",

@@ -970,7 +970,6 @@
     "deleteDialogTitle": "Excluir esta campanha?",
     "deleteDialogBody": "Isso publica uma solicitação de exclusão NIP-09. Relays bem-comportados retirarão a campanha dos feeds e links diretos. Recibos de doações passadas permanecem on-chain de qualquer forma. Esta ação não pode ser desfeita — para continuar aceitando doações, edite a campanha.",
     "storyHeading": "A história",
-    "storyEmpty": "O organizador ainda não escreveu uma história para esta campanha.",
     "campaignEnded": "Campanha encerrada",
     "donate": "Doar",
     "share": "Compartilhar",
