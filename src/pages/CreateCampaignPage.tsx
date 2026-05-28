@@ -9,14 +9,10 @@ import { nip19 } from 'nostr-tools';
 import {
   AlertTriangle,
   ArrowLeft,
-  Bitcoin,
   HandHeart,
   HelpCircle,
   Loader2,
   MapPin,
-  Pencil,
-  Radar,
-  Sparkles,
   Wallet,
   X,
 } from 'lucide-react';
@@ -1260,43 +1256,37 @@ function WalletPicker({
     <div className="space-y-4">
       {walletSource === 'mine' ? (
         <>
-          {/* Identity + balance card. Tapping the pencil swaps into the
-              custom-wallet inputs without changing wizard step. */}
-          <button
-            type="button"
-            onClick={() => onWalletSourceChange('custom')}
-            aria-label={t('campaignsCreate.walletEditAria')}
-            className="group w-full rounded-2xl border border-border bg-card p-4 text-left transition-colors hover:border-primary/50 hover:bg-card/80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-          >
-            <div className="flex items-center gap-3">
-              <Avatar className="size-10 shrink-0">
-                <AvatarImage src={picture} alt={displayName} />
-                <AvatarFallback>{initial}</AvatarFallback>
-              </Avatar>
-              <div className="min-w-0 flex-1">
-                <p className="truncate text-sm font-semibold">{myWalletLabel}</p>
-                {balanceLoading ? (
-                  <Skeleton className="mt-1 h-4 w-24" />
-                ) : btcPrice ? (
-                  <p className="text-xs text-muted-foreground tabular-nums">
-                    <span className="font-medium text-foreground">
-                      {satsToUSD(totalBalance, btcPrice)}
-                    </span>
-                    <span className="mx-1.5 opacity-60">·</span>
-                    <span>{formatBTC(totalBalance)} BTC</span>
-                  </p>
-                ) : (
-                  <p className="text-xs text-muted-foreground tabular-nums">
-                    {formatBTC(totalBalance)} BTC
-                  </p>
-                )}
-              </div>
-              <Pencil className="size-4 shrink-0 text-muted-foreground transition-colors group-hover:text-foreground" />
+          {/* Identity + balance row. Pure visual chrome — the swap to
+              custom mode is handled by the "Use a custom wallet"
+              sub-link below so the row reads as confirmation of the
+              destination, not as a tappable target. */}
+          <div className="flex items-center gap-3 px-1 py-2">
+            <Avatar className="size-10 shrink-0">
+              <AvatarImage src={picture} alt={displayName} />
+              <AvatarFallback>{initial}</AvatarFallback>
+            </Avatar>
+            <div className="min-w-0 flex-1">
+              <p className="truncate text-sm font-semibold">{myWalletLabel}</p>
+              {balanceLoading ? (
+                <Skeleton className="mt-1 h-4 w-24" />
+              ) : btcPrice ? (
+                <p className="text-xs text-muted-foreground tabular-nums">
+                  <span className="font-medium text-foreground">
+                    {satsToUSD(totalBalance, btcPrice)}
+                  </span>
+                  <span className="mx-1.5 opacity-60">·</span>
+                  <span>{formatBTC(totalBalance)} BTC</span>
+                </p>
+              ) : (
+                <p className="text-xs text-muted-foreground tabular-nums">
+                  {formatBTC(totalBalance)} BTC
+                </p>
+              )}
             </div>
-          </button>
+          </div>
 
-          {/* "Use a custom wallet" sub-link — quieter affordance for the
-              same swap, since the pencil alone is easy to miss. */}
+          {/* "Use a custom wallet" sub-link — the only affordance for
+              swapping to custom mode. */}
           <button
             type="button"
             onClick={() => onWalletSourceChange('custom')}
@@ -1315,10 +1305,10 @@ function WalletPicker({
         </>
       ) : (
         <>
-          {/* Header strip — name the current mode and offer the swap
-              back to the user's wallet. Mirrors the pencil card so
-              both directions of the toggle feel symmetric. */}
-          <div className="flex items-center justify-between gap-2">
+          {/* Header — name the current mode, then offer the swap back
+              on its own line beneath. Stacked (not side-by-side) so
+              the link doesn't compete with the title for the eye. */}
+          <div className="space-y-1">
             <div className="inline-flex items-center gap-2 text-sm font-medium">
               <span className="inline-flex size-7 shrink-0 items-center justify-center rounded-full bg-muted text-muted-foreground">
                 <Wallet className="size-3.5" />
@@ -1361,10 +1351,10 @@ function WalletPicker({
 
 /**
  * Segmented "Accept" picker for the HD-wallet branch. Three pill
- * buttons (All / Public / Private) with a one-line caption beneath
- * that explains the current selection. Public is always available;
- * the All and Private buttons disable when SP isn't supported
- * (extension / bunker logins).
+ * buttons (Accept All / Public Only / Private Only) with a one-line
+ * caption beneath that explains the current selection. Public is
+ * always available; the All and Private buttons disable when SP isn't
+ * supported (extension / bunker logins).
  */
 function AcceptModePicker({
   value,
@@ -1401,27 +1391,21 @@ function AcceptModePicker({
         <ToggleGroupItem
           value="all"
           disabled={!silentPaymentSupported}
-          className="h-auto justify-center gap-1.5 rounded-full px-3 py-2 text-xs font-medium"
-          aria-label={t('campaignsCreate.acceptAll')}
+          className="h-auto justify-center rounded-full px-3 py-2 text-xs font-medium"
         >
-          <Sparkles className="h-3.5 w-3.5" />
           {t('campaignsCreate.acceptAllShort')}
         </ToggleGroupItem>
         <ToggleGroupItem
           value="public"
-          className="h-auto justify-center gap-1.5 rounded-full px-3 py-2 text-xs font-medium"
-          aria-label={t('campaignsCreate.acceptPublic')}
+          className="h-auto justify-center rounded-full px-3 py-2 text-xs font-medium"
         >
-          <Bitcoin className="h-3.5 w-3.5" />
           {t('campaignsCreate.acceptPublicShort')}
         </ToggleGroupItem>
         <ToggleGroupItem
           value="private"
           disabled={!silentPaymentSupported}
-          className="h-auto justify-center gap-1.5 rounded-full px-3 py-2 text-xs font-medium"
-          aria-label={t('campaignsCreate.acceptPrivate')}
+          className="h-auto justify-center rounded-full px-3 py-2 text-xs font-medium"
         >
-          <Radar className="h-3.5 w-3.5" />
           {t('campaignsCreate.acceptPrivateShort')}
         </ToggleGroupItem>
       </ToggleGroup>
