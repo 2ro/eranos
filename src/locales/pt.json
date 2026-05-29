@@ -616,7 +616,10 @@
     "description": "Descrição",
     "timezone": "Fuso horário",
     "countrySearchPlaceholder": "Pesquisar países",
-    "imageDropzone": "Clique ou arraste uma imagem aqui"
+    "imageDropzone": "Clique ou arraste uma imagem aqui",
+    "countryClearAria": "Limpar país",
+    "flagOfAria": "Bandeira de {{name}}",
+    "countryHint": "Publica <0>i: iso3166:{{code}}</0> para ordenação por país."
   },
   "organizationContext": {
     "attachedToGroup": "Anexado ao grupo",
@@ -729,7 +732,18 @@
       "errorPledgeInvalid": "O valor da promessa deve ser um valor positivo em USD.",
       "errorPriceUnavailable": "Aguardando o preço BTC/USD para calcular o valor da promessa.",
       "errorCoverInvalid": "A imagem de capa deve ser uma URL https:// válida.",
-      "errorDeadlinePast": "O prazo não pode estar no passado."
+      "errorDeadlinePast": "O prazo não pode estar no passado.",
+      "wizard": {
+        "titleStepTitle": "Dê um nome à sua promessa",
+        "titleStepSubtitle": "Um pedido claro e uma breve explicação do que você vai financiar.",
+        "pledgeStepTitle": "Defina sua promessa",
+        "pledgeStepSubtitle": "Quanto você vai pagar, em USD, e um prazo opcional.",
+        "coverStepTitle": "Adicione uma imagem de capa",
+        "coverStepSubtitle": "Uma imagem representa a promessa em cada card.",
+        "tagsStepTitle": "País e categorias",
+        "tagsStepSubtitle": "Ajude as pessoas certas a encontrar sua promessa.",
+        "launchNow": "Pular Próximo e Lançar"
+      }
     },
     "detail": {
       "seoTitle": "{{title}} | Promessa {{appName}}",
@@ -854,7 +868,18 @@
       "errorNameInvalid": "O nome deve incluir letras ou números para que uma URL de grupo possa ser criada.",
       "errorEditLatestMissing": "Não foi possível encontrar a versão mais recente deste grupo para atualizar.",
       "errorCoverInvalid": "A imagem de capa deve ser uma URL https:// válida.",
-      "errorSlugCollision": "Você já tem um grupo com o identificador \"{{slug}}\". Escolha outro nome."
+      "errorSlugCollision": "Você já tem um grupo com o identificador \"{{slug}}\". Escolha outro nome.",
+      "wizard": {
+        "nameStepTitle": "Dê um nome ao seu grupo",
+        "nameStepSubtitle": "Um nome curto e claro que os membros vão reconhecer.",
+        "coverStepTitle": "Adicione uma imagem de capa",
+        "coverStepSubtitle": "Uma imagem representa o grupo em cada card.",
+        "moderatorsStepTitle": "Convide moderadores",
+        "moderatorsStepSubtitle": "Opcional — eles podem aprovar conteúdo e remover membros junto com você.",
+        "tagsStepTitle": "País e categorias",
+        "tagsStepSubtitle": "Ajude as pessoas certas a encontrar seu grupo.",
+        "launchNow": "Pular Próximo e Lançar"
+      }
     },
     "detail": {
       "by": "por",
@@ -928,6 +953,23 @@
     "countryPlaceholder": "Search countries",
     "tags": "Tags",
     "tagsPlaceholder": "defesa-juridica, ajuda-mutua, noticias-locais",
+    "categories": {
+      "adoption": "Adoção",
+      "animals": "Animais",
+      "church": "Igreja",
+      "community": "Comunidade",
+      "education": "Educação",
+      "emergency": "Emergência",
+      "event": "Evento",
+      "family": "Família",
+      "firstResponders": "Socorristas",
+      "legal": "Jurídico",
+      "medical": "Médico",
+      "memorial": "Memorial",
+      "mission": "Missão",
+      "nonProfit": "Sem fins lucrativos",
+      "political": "Político"
+    },
     "banner": "Imagem de banner",
     "story": "História",
     "storyPlaceholder": "Compartilhe o contexto, quem se beneficia e como os fundos serão usados.",

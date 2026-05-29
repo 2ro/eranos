@@ -184,7 +184,10 @@
     "description": "توضیح",
     "timezone": "منطقه زمانی",
     "countrySearchPlaceholder": "جستجوی کشورها",
-    "imageDropzone": "برای انتخاب تصویر کلیک کنید یا آن را اینجا بکشید"
+    "imageDropzone": "برای انتخاب تصویر کلیک کنید یا آن را اینجا بکشید",
+    "countryClearAria": "پاک کردن کشور",
+    "flagOfAria": "پرچم {{name}}",
+    "countryHint": "<0>i: iso3166:{{code}}</0> برای مرتب‌سازی بر اساس کشور منتشر می‌شود."
   },
   "organizationContext": {
     "attachedToGroup": "پیوست‌شده به گروه",
@@ -297,7 +300,18 @@
       "errorPledgeInvalid": "مبلغ تعهد باید یک مقدار مثبت به دلار باشد.",
       "errorPriceUnavailable": "در انتظار قیمت BTC/USD برای محاسبهٔ مبلغ تعهد.",
       "errorCoverInvalid": "تصویر جلد باید یک نشانی https:// معتبر باشد.",
-      "errorDeadlinePast": "مهلت نمی‌تواند در گذشته باشد."
+      "errorDeadlinePast": "مهلت نمی‌تواند در گذشته باشد.",
+      "wizard": {
+        "titleStepTitle": "به تعهدت نام بده",
+        "titleStepSubtitle": "درخواستی روشن و توضیحی کوتاه از آنچه تأمین مالی می‌کنی.",
+        "pledgeStepTitle": "تعهدت را تعیین کن",
+        "pledgeStepSubtitle": "چه مبلغی به دلار می‌پردازی و یک مهلت اختیاری.",
+        "coverStepTitle": "یک تصویر جلد اضافه کن",
+        "coverStepSubtitle": "یک تصویر، تعهد را روی هر کارت همراهی می‌کند.",
+        "tagsStepTitle": "کشور و دسته‌ها",
+        "tagsStepSubtitle": "کمک کن آدم‌های درست تعهدت را پیدا کنند.",
+        "launchNow": "رد کن و راه‌اندازی کن"
+      }
     },
     "detail": {
       "seoTitle": "{{title}} | تعهد {{appName}}",
@@ -422,7 +436,18 @@
       "errorNameInvalid": "نام باید شامل حروف یا اعداد باشد تا یک نشانی برای گروه ساخته شود.",
       "errorEditLatestMissing": "آخرین نسخهٔ این گروه برای به‌روزرسانی یافت نشد.",
       "errorCoverInvalid": "تصویر جلد باید یک نشانی https:// معتبر باشد.",
-      "errorSlugCollision": "از قبل گروهی با شناسهٔ «{{slug}}» داری. نام دیگری انتخاب کن."
+      "errorSlugCollision": "از قبل گروهی با شناسهٔ «{{slug}}» داری. نام دیگری انتخاب کن.",
+      "wizard": {
+        "nameStepTitle": "به گروهت نام بده",
+        "nameStepSubtitle": "نامی کوتاه و روشن که اعضا بشناسند.",
+        "coverStepTitle": "یک تصویر جلد اضافه کن",
+        "coverStepSubtitle": "یک تصویر، گروه را روی هر کارت همراهی می‌کند.",
+        "moderatorsStepTitle": "از مدیران دعوت کن",
+        "moderatorsStepSubtitle": "اختیاری — آن‌ها می‌توانند در کنار تو محتوا را تأیید و اعضا را حذف کنند.",
+        "tagsStepTitle": "کشور و دسته‌ها",
+        "tagsStepSubtitle": "کمک کن آدم‌های درست گروهت را پیدا کنند.",
+        "launchNow": "رد کن و راه‌اندازی کن"
+      }
     },
     "detail": {
       "by": "توسط",
@@ -496,6 +521,23 @@
     "countryPlaceholder": "جستجوی کشورها",
     "tags": "برچسب‌ها",
     "tagsPlaceholder": "دفاع-حقوقی، کمک-متقابل، اخبار-محلی",
+    "categories": {
+      "adoption": "فرزندخواندگی",
+      "animals": "حیوانات",
+      "church": "کلیسا",
+      "community": "اجتماع",
+      "education": "آموزش",
+      "emergency": "اضطراری",
+      "event": "رویداد",
+      "family": "خانواده",
+      "firstResponders": "نیروهای امدادی",
+      "legal": "حقوقی",
+      "medical": "پزشکی",
+      "memorial": "یادبود",
+      "mission": "مأموریت",
+      "nonProfit": "غیرانتفاعی",
+      "political": "سیاسی"
+    },
     "banner": "تصویر بنر",
     "story": "داستان",
     "storyPlaceholder": "پیشینه، ذی‌نفعان و نحوهٔ استفاده از منابع را بیان کن.",

@@ -606,7 +606,10 @@
     "description": "Description",
     "timezone": "Fuseau horaire",
     "countrySearchPlaceholder": "Rechercher des pays",
-    "imageDropzone": "Cliquez ou faites glisser une image ici"
+    "imageDropzone": "Cliquez ou faites glisser une image ici",
+    "countryClearAria": "Effacer le pays",
+    "flagOfAria": "Drapeau de {{name}}",
+    "countryHint": "Publie <0>i: iso3166:{{code}}</0> pour le tri par pays."
   },
   "organizationContext": {
     "attachedToGroup": "Attaché au groupe",
@@ -719,7 +722,18 @@
       "errorPledgeInvalid": "Le montant de la promesse doit être un montant positif en USD.",
       "errorPriceUnavailable": "En attente du prix BTC/USD pour calculer le montant de la promesse.",
       "errorCoverInvalid": "L'image de couverture doit être une URL https:// valide.",
-      "errorDeadlinePast": "L'échéance ne peut pas être dans le passé."
+      "errorDeadlinePast": "L'échéance ne peut pas être dans le passé.",
+      "wizard": {
+        "titleStepTitle": "Nommez votre promesse",
+        "titleStepSubtitle": "Une demande claire et une courte explication de ce que vous financerez.",
+        "pledgeStepTitle": "Définissez votre promesse",
+        "pledgeStepSubtitle": "Combien vous paierez, en USD, et une échéance facultative.",
+        "coverStepTitle": "Ajoutez une image de couverture",
+        "coverStepSubtitle": "Une image porte la promesse sur chaque carte.",
+        "tagsStepTitle": "Pays et catégories",
+        "tagsStepSubtitle": "Aidez les bonnes personnes à trouver votre promesse.",
+        "launchNow": "Passer et lancer"
+      }
     },
     "detail": {
       "seoTitle": "{{title}} | Promesse {{appName}}",
@@ -844,7 +858,18 @@
       "errorNameInvalid": "Le nom doit contenir des lettres ou des chiffres pour qu'une URL de groupe puisse être créée.",
       "errorEditLatestMissing": "Impossible de trouver la dernière version de ce groupe à mettre à jour.",
       "errorCoverInvalid": "L'image de couverture doit être une URL https:// valide.",
-      "errorSlugCollision": "Vous avez déjà un groupe avec l'identifiant « {{slug}} ». Choisissez un autre nom."
+      "errorSlugCollision": "Vous avez déjà un groupe avec l'identifiant « {{slug}} ». Choisissez un autre nom.",
+      "wizard": {
+        "nameStepTitle": "Nommez votre groupe",
+        "nameStepSubtitle": "Un nom court et clair que les membres reconnaîtront.",
+        "coverStepTitle": "Ajoutez une image de couverture",
+        "coverStepSubtitle": "Une image porte le groupe sur chaque carte.",
+        "moderatorsStepTitle": "Invitez des modérateurs",
+        "moderatorsStepSubtitle": "Facultatif — ils peuvent approuver le contenu et retirer des membres à vos côtés.",
+        "tagsStepTitle": "Pays et catégories",
+        "tagsStepSubtitle": "Aidez les bonnes personnes à trouver votre groupe.",
+        "launchNow": "Passer et lancer"
+      }
     },
     "detail": {
       "by": "par",
@@ -915,9 +940,26 @@
     "onchainInvalid": "Adresse Bitcoin mainnet non reconnue (bc1q… / bc1p…).",
     "spInvalid": "Code de paiement silencieux BIP-352 non reconnu (sp1…).",
     "country": "Pays",
-      "countryPlaceholder": "Rechercher des pays",
+    "countryPlaceholder": "Rechercher des pays",
     "tags": "Étiquettes",
     "tagsPlaceholder": "défense-juridique, entraide, actus-locales",
+    "categories": {
+      "adoption": "Adoption",
+      "animals": "Animaux",
+      "church": "Église",
+      "community": "Communauté",
+      "education": "Éducation",
+      "emergency": "Urgence",
+      "event": "Événement",
+      "family": "Famille",
+      "firstResponders": "Premiers secours",
+      "legal": "Juridique",
+      "medical": "Médical",
+      "memorial": "Mémorial",
+      "mission": "Mission",
+      "nonProfit": "À but non lucratif",
+      "political": "Politique"
+    },
     "banner": "Image de bannière",
     "story": "Histoire",
     "storyPlaceholder": "Partagez le contexte, qui en bénéficie et comment les fonds seront utilisés.",
@@ -2141,10 +2183,18 @@
   },
   "faq": {
     "categories": {
-      "getting-started": { "label": "À propos d'Agora" },
-      "payments": { "label": "Dons Bitcoin sur Agora" },
-      "about-nostr": { "label": "À propos de Nostr" },
-      "legacy": { "label": "Héritage" }
+      "getting-started": {
+        "label": "À propos d'Agora"
+      },
+      "payments": {
+        "label": "Dons Bitcoin sur Agora"
+      },
+      "about-nostr": {
+        "label": "À propos de Nostr"
+      },
+      "legacy": {
+        "label": "Héritage"
+      }
     },
     "items": {
       "what-is-ditto": {

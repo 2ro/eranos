@@ -184,7 +184,10 @@
     "description": "Tsananguro",
     "timezone": "Nguva yenzvimbo",
     "countrySearchPlaceholder": "Tsvaga nyika",
-    "imageDropzone": "Dzvanya kana kukwevera mufananidzo pano"
+    "imageDropzone": "Dzvanya kana kukwevera mufananidzo pano",
+    "countryClearAria": "Bvisa nyika",
+    "flagOfAria": "Mureza we{{name}}",
+    "countryHint": "Zvinoburitsa <0>i: iso3166:{{code}}</0> yekuronga nenyika."
   },
   "organizationContext": {
     "attachedToGroup": "Chakabatanidzwa kugroup",
@@ -297,7 +300,18 @@
       "errorPledgeInvalid": "Mari yechitsidziro inofanira kunge iri USD inopfuura zero.",
       "errorPriceUnavailable": "Kumirira mutengo weBTC/USD kuti ubatanidze mari yechitsidziro.",
       "errorCoverInvalid": "Mufananidzo wepamusoro unofanira kuva URL ye https:// chaiyo.",
-      "errorDeadlinePast": "Mugumo haungavi munguva yapfuura."
+      "errorDeadlinePast": "Mugumo haungavi munguva yapfuura.",
+      "wizard": {
+        "titleStepTitle": "Tumidza chitsidziro chako",
+        "titleStepSubtitle": "Chikumbiro chiri pachena nedudziro pfupi yezvauchatsigira.",
+        "pledgeStepTitle": "Misa chitsidziro chako",
+        "pledgeStepSubtitle": "Mari yauchabhadhara, muUSD, uye mugumo unosarudzwa.",
+        "coverStepTitle": "Wedzera mufananidzo wepamusoro",
+        "coverStepSubtitle": "Mufananidzo mumwe chete unotakura chitsidziro pakadhi rega rega.",
+        "tagsStepTitle": "Nyika nemapoka",
+        "tagsStepSubtitle": "Batsira vanhu vakakodzera kuwana chitsidziro chako.",
+        "launchNow": "Darika Inotevera & Vhura"
+      }
     },
     "detail": {
       "seoTitle": "{{title}} | Chitsidziro che{{appName}}",
@@ -422,7 +436,18 @@
       "errorNameInvalid": "Zita rinofanira kuva nemavara kana manhamba kuti URL yeboka igadzirike.",
       "errorEditLatestMissing": "Hatina kuwana shanduro yazvino yeboka iri kuti tirivandudze.",
       "errorCoverInvalid": "Mufananidzo wepamusoro unofanira kuva URL ye https:// chaiyo.",
-      "errorSlugCollision": "Une kare boka rine kupiwa zita kwe«{{slug}}». Sarudza rimwe zita."
+      "errorSlugCollision": "Une kare boka rine kupiwa zita kwe«{{slug}}». Sarudza rimwe zita.",
+      "wizard": {
+        "nameStepTitle": "Tumidza boka rako",
+        "nameStepSubtitle": "Zita pfupi, riri pachena, ravachaziva nhengo.",
+        "coverStepTitle": "Wedzera mufananidzo wepamusoro",
+        "coverStepSubtitle": "Mufananidzo mumwe chete unotakura boka pakadhi rega rega.",
+        "moderatorsStepTitle": "Kokera vatungamiri",
+        "moderatorsStepSubtitle": "Zvinosarudzwa — vanogona kutendera zvinyorwa nokubvisa nhengo pamwe newe.",
+        "tagsStepTitle": "Nyika nemapoka",
+        "tagsStepSubtitle": "Batsira vanhu vakakodzera kuwana boka rako.",
+        "launchNow": "Darika Inotevera & Vhura"
+      }
     },
     "detail": {
       "by": "na",
@@ -496,6 +521,23 @@
     "countryPlaceholder": "Tsvaga nyika",
     "tags": "Marebhuro",
     "tagsPlaceholder": "dziviriro-yekutonga, rubatsiro, nhau-dzomuno",
+    "categories": {
+      "adoption": "Kutora mwana",
+      "animals": "Mhuka",
+      "church": "Chechi",
+      "community": "Nharaunda",
+      "education": "Dzidzo",
+      "emergency": "Njodzi",
+      "event": "Chiitiko",
+      "family": "Mhuri",
+      "firstResponders": "Vatanga kupindura",
+      "legal": "Zvomutemo",
+      "medical": "Zveutano",
+      "memorial": "Chirangaridzo",
+      "mission": "Mishoni",
+      "nonProfit": "Isina kutsvaga purofiti",
+      "political": "Zvematongerwo enyika"
+    },
     "banner": "Mufananidzo webhana",
     "story": "Nyaya",
     "storyPlaceholder": "Govera nhoroondo, anobatsirwa, uye kuti mari ichashandiswa sei.",
@@ -2151,10 +2193,18 @@
   },
   "faq": {
     "categories": {
-      "getting-started": { "label": "Nezve Agora" },
-      "payments": { "label": "Zvipo zveBitcoin paAgora" },
-      "about-nostr": { "label": "Nezve Nostr" },
-      "legacy": { "label": "Zvekare" }
+      "getting-started": {
+        "label": "Nezve Agora"
+      },
+      "payments": {
+        "label": "Zvipo zveBitcoin paAgora"
+      },
+      "about-nostr": {
+        "label": "Nezve Nostr"
+      },
+      "legacy": {
+        "label": "Zvekare"
+      }
     },
     "items": {
       "what-is-ditto": {

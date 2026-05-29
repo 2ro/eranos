@@ -184,7 +184,10 @@
     "description": "描述",
     "timezone": "時區",
     "countrySearchPlaceholder": "搜尋國家/地區",
-    "imageDropzone": "點選或拖拽圖片到這裡"
+    "imageDropzone": "點選或拖拽圖片到這裡",
+    "countryClearAria": "清除國家",
+    "flagOfAria": "{{name}} 國旗",
+    "countryHint": "釋出 <0>i: iso3166:{{code}}</0> 用於按國家排序。"
   },
   "organizationContext": {
     "attachedToGroup": "已關聯到群組",
@@ -297,7 +300,18 @@
       "errorPledgeInvalid": "懸賞金額必須是正的 USD 金額。",
       "errorPriceUnavailable": "正在等待 BTC/USD 價格以計算懸賞金額。",
       "errorCoverInvalid": "封面圖片必須是有效的 https:// URL。",
-      "errorDeadlinePast": "截止日期不能在過去。"
+      "errorDeadlinePast": "截止日期不能在過去。",
+      "wizard": {
+        "titleStepTitle": "為你的懸賞命名",
+        "titleStepSubtitle": "明確的訴求,以及你將資助什麼的簡短說明。",
+        "pledgeStepTitle": "設定你的懸賞",
+        "pledgeStepSubtitle": "你將支付多少美元,以及可選的截止日期。",
+        "coverStepTitle": "新增封面圖片",
+        "coverStepSubtitle": "一張圖片,讓你的懸賞在每張卡片上脫穎而出。",
+        "tagsStepTitle": "國家與分類",
+        "tagsStepSubtitle": "幫助合適的人找到你的懸賞。",
+        "launchNow": "跳過後續並啟動"
+      }
     },
     "detail": {
       "seoTitle": "{{title}} | {{appName}} 懸賞",
@@ -422,7 +436,18 @@
       "errorNameInvalid": "名稱必須包含字母或數字，才能建立群組 URL。",
       "errorEditLatestMissing": "找不到此群組的最新版本以更新。",
       "errorCoverInvalid": "封面圖片必須是有效的 https:// URL。",
-      "errorSlugCollision": "你已有一個識別符號為「{{slug}}」的群組。請選擇其他名稱。"
+      "errorSlugCollision": "你已有一個識別符號為「{{slug}}」的群組。請選擇其他名稱。",
+      "wizard": {
+        "nameStepTitle": "為你的群組命名",
+        "nameStepSubtitle": "簡短、清晰,讓成員一眼就能認出。",
+        "coverStepTitle": "新增封面圖片",
+        "coverStepSubtitle": "一張圖片,讓你的群組在每張卡片上脫穎而出。",
+        "moderatorsStepTitle": "邀請管理員",
+        "moderatorsStepSubtitle": "可選 — 他們可以與你一起審核內容並移除成員。",
+        "tagsStepTitle": "國家與分類",
+        "tagsStepSubtitle": "幫助合適的人找到你的群組。",
+        "launchNow": "跳過後續並啟動"
+      }
     },
     "detail": {
       "by": "由",
@@ -496,6 +521,23 @@
     "countryPlaceholder": "搜尋國家/地區",
     "tags": "標籤",
     "tagsPlaceholder": "法律辯護, 互助, 本地新聞",
+    "categories": {
+      "adoption": "領養",
+      "animals": "動物",
+      "church": "教會",
+      "community": "社群",
+      "education": "教育",
+      "emergency": "緊急救助",
+      "event": "活動",
+      "family": "家庭",
+      "firstResponders": "緊急應變人員",
+      "legal": "法律",
+      "medical": "醫療",
+      "memorial": "紀念",
+      "mission": "宣教",
+      "nonProfit": "非營利",
+      "political": "政治"
+    },
     "banner": "橫幅圖片",
     "story": "故事",
     "storyPlaceholder": "分享背景、受益物件，以及資金的使用方式。",

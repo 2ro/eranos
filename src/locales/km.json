@@ -184,7 +184,10 @@
     "description": "ការពិពណ៌នា",
     "timezone": "តំបន់ពេលវេលា",
     "countrySearchPlaceholder": "ស្វែងរកប្រទេស",
-    "imageDropzone": "ចុច ឬអូសរូបភាពមកទីនេះ"
+    "imageDropzone": "ចុច ឬអូសរូបភាពមកទីនេះ",
+    "countryClearAria": "សម្អាតប្រទេស",
+    "flagOfAria": "ទង់ជាតិ {{name}}",
+    "countryHint": "ផ្សព្វផ្សាយ <0>i: iso3166:{{code}}</0> សម្រាប់តម្រៀបតាមប្រទេស។"
   },
   "organizationContext": {
     "attachedToGroup": "បានភ្ជាប់ទៅក្រុម",
@@ -297,7 +300,18 @@
       "errorPledgeInvalid": "ចំនួនការសន្យាត្រូវតែជាចំនួនវិជ្ជមានជា USD។",
       "errorPriceUnavailable": "កំពុងរង់ចាំតម្លៃ BTC/USD ដើម្បីគណនាចំនួនការសន្យា។",
       "errorCoverInvalid": "រូបភាពគម្របត្រូវតែជា URL https:// ត្រឹមត្រូវ។",
-      "errorDeadlinePast": "ពេលកំណត់មិនអាចស្ថិតក្នុងអតីតកាល។"
+      "errorDeadlinePast": "ពេលកំណត់មិនអាចស្ថិតក្នុងអតីតកាល។",
+      "wizard": {
+        "titleStepTitle": "ដាក់ឈ្មោះការសន្យារបស់អ្នក",
+        "titleStepSubtitle": "សំណើច្បាស់លាស់ និងការពន្យល់ខ្លីៗអំពីអ្វីដែលអ្នកនឹងផ្តល់មូលនិធិ។",
+        "pledgeStepTitle": "កំណត់ការសន្យារបស់អ្នក",
+        "pledgeStepSubtitle": "ចំនួនទឹកប្រាក់ដែលអ្នកនឹងបង់ ជា USD និងពេលកំណត់ស្រេចចិត្ត។",
+        "coverStepTitle": "បន្ថែមរូបភាពគម្រប",
+        "coverStepSubtitle": "រូបភាពមួយនាំការសន្យានៅលើកាតគ្រប់ទីកន្លែង។",
+        "tagsStepTitle": "ប្រទេស និងប្រភេទ",
+        "tagsStepSubtitle": "ជួយឱ្យមនុស្សត្រឹមត្រូវរកឃើញការសន្យារបស់អ្នក។",
+        "launchNow": "រំលងបន្ទាប់ ហើយចាប់ផ្តើម"
+      }
     },
     "detail": {
       "seoTitle": "{{title}} | ការសន្យារបស់ {{appName}}",
@@ -422,7 +436,18 @@
       "errorNameInvalid": "ឈ្មោះត្រូវតែមានអក្សរ ឬលេខ ដើម្បីបង្កើត URL ក្រុម។",
       "errorEditLatestMissing": "មិនអាចស្វែងរកកំណែចុងក្រោយរបស់ក្រុមនេះដើម្បីធ្វើបច្ចុប្បន្នភាព។",
       "errorCoverInvalid": "រូបភាពគម្របត្រូវតែជា URL https:// ត្រឹមត្រូវ។",
-      "errorSlugCollision": "អ្នកមានក្រុមដែលមានកំណត់អត្តសញ្ញាណ «{{slug}}» រួចហើយ។ ជ្រើសរើសឈ្មោះផ្សេង។"
+      "errorSlugCollision": "អ្នកមានក្រុមដែលមានកំណត់អត្តសញ្ញាណ «{{slug}}» រួចហើយ។ ជ្រើសរើសឈ្មោះផ្សេង។",
+      "wizard": {
+        "nameStepTitle": "ដាក់ឈ្មោះក្រុមរបស់អ្នក",
+        "nameStepSubtitle": "ឈ្មោះខ្លី ច្បាស់លាស់ ដែលសមាជិកនឹងស្គាល់។",
+        "coverStepTitle": "បន្ថែមរូបភាពគម្រប",
+        "coverStepSubtitle": "រូបភាពមួយនាំក្រុមនៅលើកាតគ្រប់ទីកន្លែង។",
+        "moderatorsStepTitle": "អញ្ជើញអ្នកសម្របសម្រួល",
+        "moderatorsStepSubtitle": "ស្រេចចិត្ត — ពួកគេអាចអនុម័តខ្លឹមសារ និងដកសមាជិករួមជាមួយអ្នក។",
+        "tagsStepTitle": "ប្រទេស និងប្រភេទ",
+        "tagsStepSubtitle": "ជួយឱ្យមនុស្សត្រឹមត្រូវរកឃើញក្រុមរបស់អ្នក។",
+        "launchNow": "រំលងបន្ទាប់ ហើយចាប់ផ្តើម"
+      }
     },
     "detail": {
       "by": "ដោយ",
@@ -496,6 +521,23 @@
     "countryPlaceholder": "ស្វែងរកប្រទេស",
     "tags": "ស្លាក",
     "tagsPlaceholder": "ការពារផ្នែកច្បាប់, ជំនួយគ្នាទៅវិញទៅមក, ព័ត៌មានក្នុងតំបន់",
+    "categories": {
+      "adoption": "ការទទួលយកកូនចិញ្ចឹម",
+      "animals": "សត្វ",
+      "church": "ព្រះវិហារ",
+      "community": "សហគមន៍",
+      "education": "ការអប់រំ",
+      "emergency": "អាសន្ន",
+      "event": "ព្រឹត្តិការណ៍",
+      "family": "គ្រួសារ",
+      "firstResponders": "អ្នកឆ្លើយតបបន្ទាន់",
+      "legal": "ផ្នែកច្បាប់",
+      "medical": "វេជ្ជសាស្ត្រ",
+      "memorial": "ការរំលឹក",
+      "mission": "បេសកកម្ម",
+      "nonProfit": "មិនរកប្រាក់ចំណេញ",
+      "political": "នយោបាយ"
+    },
     "banner": "រូបភាពបដា",
     "story": "រឿង",
     "storyPlaceholder": "ចែករំលែកប្រវត្តិ អ្នកទទួលផល និងរបៀបដែលថវិកានឹងត្រូវប្រើ។",

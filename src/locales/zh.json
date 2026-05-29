@@ -184,7 +184,10 @@
     "description": "描述",
     "timezone": "时区",
     "countrySearchPlaceholder": "搜索国家/地区",
-    "imageDropzone": "点击或拖拽图片到这里"
+    "imageDropzone": "点击或拖拽图片到这里",
+    "countryClearAria": "清除国家",
+    "flagOfAria": "{{name}} 国旗",
+    "countryHint": "发布 <0>i: iso3166:{{code}}</0> 用于按国家排序。"
   },
   "organizationContext": {
     "attachedToGroup": "已关联到群组",
@@ -297,7 +300,18 @@
       "errorPledgeInvalid": "悬赏金额必须是正的 USD 金额。",
       "errorPriceUnavailable": "正在等待 BTC/USD 价格以计算悬赏金额。",
       "errorCoverInvalid": "封面图片必须是有效的 https:// URL。",
-      "errorDeadlinePast": "截止日期不能在过去。"
+      "errorDeadlinePast": "截止日期不能在过去。",
+      "wizard": {
+        "titleStepTitle": "为你的悬赏起个名字",
+        "titleStepSubtitle": "清晰的诉求，加上一段简短说明，介绍你将资助什么。",
+        "pledgeStepTitle": "设置你的悬赏",
+        "pledgeStepSubtitle": "你将以 USD 支付多少，以及可选的截止日期。",
+        "coverStepTitle": "添加封面图片",
+        "coverStepSubtitle": "一张图片，让悬赏在每张卡片上脱颖而出。",
+        "tagsStepTitle": "国家和分类",
+        "tagsStepSubtitle": "帮助合适的人发现你的悬赏。",
+        "launchNow": "跳过并直接发布"
+      }
     },
     "detail": {
       "seoTitle": "{{title}} | {{appName}} 悬赏",
@@ -422,7 +436,18 @@
       "errorNameInvalid": "名称必须包含字母或数字，才能创建群组 URL。",
       "errorEditLatestMissing": "找不到此群组的最新版本以更新。",
       "errorCoverInvalid": "封面图片必须是有效的 https:// URL。",
-      "errorSlugCollision": "你已有一个标识符为「{{slug}}」的群组。请选择其他名称。"
+      "errorSlugCollision": "你已有一个标识符为「{{slug}}」的群组。请选择其他名称。",
+      "wizard": {
+        "nameStepTitle": "为你的群组起个名字",
+        "nameStepSubtitle": "一个简短清晰、成员易于辨识的名称。",
+        "coverStepTitle": "添加封面图片",
+        "coverStepSubtitle": "一张图片，让群组在每张卡片上脱颖而出。",
+        "moderatorsStepTitle": "邀请管理员",
+        "moderatorsStepSubtitle": "可选 — 他们可以与你一同审批内容和移除成员。",
+        "tagsStepTitle": "国家和分类",
+        "tagsStepSubtitle": "帮助合适的人发现你的群组。",
+        "launchNow": "跳过并直接发布"
+      }
     },
     "detail": {
       "by": "由",
@@ -496,6 +521,23 @@
     "countryPlaceholder": "搜索国家/地区",
     "tags": "标签",
     "tagsPlaceholder": "法律辩护, 互助, 本地新闻",
+    "categories": {
+      "adoption": "领养",
+      "animals": "动物",
+      "church": "教会",
+      "community": "社区",
+      "education": "教育",
+      "emergency": "紧急救助",
+      "event": "活动",
+      "family": "家庭",
+      "firstResponders": "急救人员",
+      "legal": "法律",
+      "medical": "医疗",
+      "memorial": "纪念",
+      "mission": "使命",
+      "nonProfit": "非营利",
+      "political": "政治"
+    },
     "banner": "横幅图片",
     "story": "故事",
     "storyPlaceholder": "分享背景、受益对象，以及资金的使用方式。",

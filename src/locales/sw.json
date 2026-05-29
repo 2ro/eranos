@@ -615,7 +615,10 @@
     "description": "Maelezo",
     "timezone": "Saa za eneo",
     "countrySearchPlaceholder": "Tafuta nchi",
-    "imageDropzone": "Bonyeza au buruta picha hapa"
+    "imageDropzone": "Bonyeza au buruta picha hapa",
+    "countryClearAria": "Futa nchi",
+    "flagOfAria": "Bendera ya {{name}}",
+    "countryHint": "Inachapisha <0>i: iso3166:{{code}}</0> kwa upangaji wa nchi."
   },
   "organizationContext": {
     "attachedToGroup": "Imeunganishwa na kikundi",
@@ -728,7 +731,18 @@
       "errorPledgeInvalid": "Kiasi cha ahadi kinapaswa kuwa kiasi chanya cha USD.",
       "errorPriceUnavailable": "Inasubiri bei ya BTC/USD ili kuhesabu kiasi cha ahadi.",
       "errorCoverInvalid": "Picha ya jalada lazima iwe URL halali ya https://.",
-      "errorDeadlinePast": "Tarehe ya mwisho haiwezi kuwa iliyopita."
+      "errorDeadlinePast": "Tarehe ya mwisho haiwezi kuwa iliyopita.",
+      "wizard": {
+        "titleStepTitle": "Ipe ahadi yako jina",
+        "titleStepSubtitle": "Ombi wazi na maelezo mafupi ya kile utakachofadhili.",
+        "pledgeStepTitle": "Weka ahadi yako",
+        "pledgeStepSubtitle": "Kiasi utakacholipa, kwa USD, na tarehe ya mwisho si lazima.",
+        "coverStepTitle": "Ongeza picha ya jalada",
+        "coverStepSubtitle": "Picha moja hubeba ahadi kwenye kila kadi.",
+        "tagsStepTitle": "Nchi na kategoria",
+        "tagsStepSubtitle": "Saidia watu sahihi kupata ahadi yako.",
+        "launchNow": "Ruka Inayofuata na Uzindue"
+      }
     },
     "detail": {
       "seoTitle": "{{title}} | Ahadi ya {{appName}}",
@@ -853,7 +867,18 @@
       "errorNameInvalid": "Jina lazima lijumuishe herufi au nambari ili URL ya kikundi iweze kuundwa.",
       "errorEditLatestMissing": "Haikuweza kupata toleo la hivi karibuni la kikundi hiki kusasisha.",
       "errorCoverInvalid": "Picha ya jalada lazima iwe URL halali ya https://.",
-      "errorSlugCollision": "Tayari una kikundi chenye kitambulisho \"{{slug}}\". Chagua jina lingine."
+      "errorSlugCollision": "Tayari una kikundi chenye kitambulisho \"{{slug}}\". Chagua jina lingine.",
+      "wizard": {
+        "nameStepTitle": "Ipe kikundi chako jina",
+        "nameStepSubtitle": "Jina fupi na wazi ambalo wanachama watalitambua.",
+        "coverStepTitle": "Ongeza picha ya jalada",
+        "coverStepSubtitle": "Picha moja hubeba kikundi kwenye kila kadi.",
+        "moderatorsStepTitle": "Alika wasimamizi",
+        "moderatorsStepSubtitle": "Si lazima — wanaweza kuidhinisha maudhui na kuondoa wanachama pamoja nawe.",
+        "tagsStepTitle": "Nchi na kategoria",
+        "tagsStepSubtitle": "Saidia watu sahihi kupata kikundi chako.",
+        "launchNow": "Ruka Inayofuata na Uzindue"
+      }
     },
     "detail": {
       "by": "na",
@@ -927,6 +952,23 @@
     "countryPlaceholder": "Tafuta nchi",
     "tags": "Lebo",
     "tagsPlaceholder": "utetezi-wa-kisheria, msaada-wa-pamoja, habari-za-ndani",
+    "categories": {
+      "adoption": "Kuasili",
+      "animals": "Wanyama",
+      "church": "Kanisa",
+      "community": "Jumuiya",
+      "education": "Elimu",
+      "emergency": "Dharura",
+      "event": "Tukio",
+      "family": "Familia",
+      "firstResponders": "Wajibu wa Kwanza",
+      "legal": "Kisheria",
+      "medical": "Matibabu",
+      "memorial": "Kumbukumbu",
+      "mission": "Misheni",
+      "nonProfit": "Isiyo ya Faida",
+      "political": "Kisiasa"
+    },
     "banner": "Picha ya bango",
     "story": "Hadithi",
     "storyPlaceholder": "Shiriki historia, ni nani anayenufaika, na jinsi fedha zitakavyotumika.",

@@ -616,7 +616,10 @@
     "description": "Описание",
     "timezone": "Часовой пояс",
     "countrySearchPlaceholder": "Поиск стран",
-    "imageDropzone": "Нажмите или перетащите изображение сюда"
+    "imageDropzone": "Нажмите или перетащите изображение сюда",
+    "countryClearAria": "Очистить страну",
+    "flagOfAria": "Флаг {{name}}",
+    "countryHint": "Публикует <0>i: iso3166:{{code}}</0> для сортировки по странам."
   },
   "organizationContext": {
     "attachedToGroup": "Прикреплено к группе",
@@ -729,7 +732,18 @@
       "errorPledgeInvalid": "Сумма обещания должна быть положительной суммой в USD.",
       "errorPriceUnavailable": "Ожидание цены BTC/USD для расчёта суммы обещания.",
       "errorCoverInvalid": "Обложка должна быть валидной URL https://.",
-      "errorDeadlinePast": "Срок не может быть в прошлом."
+      "errorDeadlinePast": "Срок не может быть в прошлом.",
+      "wizard": {
+        "titleStepTitle": "Назовите своё обещание",
+        "titleStepSubtitle": "Понятный запрос и краткое объяснение того, что вы профинансируете.",
+        "pledgeStepTitle": "Установите своё обещание",
+        "pledgeStepSubtitle": "Сколько вы заплатите в USD, и необязательный срок.",
+        "coverStepTitle": "Добавьте обложку",
+        "coverStepSubtitle": "Одно изображение представит обещание на каждой карточке.",
+        "tagsStepTitle": "Страна и категории",
+        "tagsStepSubtitle": "Помогите нужным людям найти ваше обещание.",
+        "launchNow": "Пропустить и запустить"
+      }
     },
     "detail": {
       "seoTitle": "{{title}} | Обещание {{appName}}",
@@ -854,7 +868,18 @@
       "errorNameInvalid": "Название должно содержать буквы или цифры, чтобы можно было создать URL группы.",
       "errorEditLatestMissing": "Не удалось найти последнюю версию этой группы для обновления.",
       "errorCoverInvalid": "Обложка должна быть валидной URL https://.",
-      "errorSlugCollision": "У вас уже есть группа с идентификатором «{{slug}}». Выберите другое название."
+      "errorSlugCollision": "У вас уже есть группа с идентификатором «{{slug}}». Выберите другое название.",
+      "wizard": {
+        "nameStepTitle": "Назовите свою группу",
+        "nameStepSubtitle": "Короткое и понятное название, которое узнают участники.",
+        "coverStepTitle": "Добавьте обложку",
+        "coverStepSubtitle": "Одно изображение представит группу на каждой карточке.",
+        "moderatorsStepTitle": "Пригласите модераторов",
+        "moderatorsStepSubtitle": "Необязательно — они смогут одобрять контент и удалять участников вместе с вами.",
+        "tagsStepTitle": "Страна и категории",
+        "tagsStepSubtitle": "Помогите нужным людям найти вашу группу.",
+        "launchNow": "Пропустить и запустить"
+      }
     },
     "detail": {
       "by": "от",
@@ -928,6 +953,23 @@
     "countryPlaceholder": "Search countries",
     "tags": "Теги",
     "tagsPlaceholder": "правовая-защита, взаимопомощь, местные-новости",
+    "categories": {
+      "adoption": "Усыновление",
+      "animals": "Животные",
+      "church": "Церковь",
+      "community": "Сообщество",
+      "education": "Образование",
+      "emergency": "Чрезвычайная ситуация",
+      "event": "Событие",
+      "family": "Семья",
+      "firstResponders": "Спасатели",
+      "legal": "Юридическая помощь",
+      "medical": "Медицина",
+      "memorial": "Память",
+      "mission": "Миссия",
+      "nonProfit": "Некоммерческое",
+      "political": "Политическое"
+    },
     "banner": "Баннер",
     "story": "История",
     "storyPlaceholder": "Поделитесь контекстом, кто получит выгоду и как будут использованы средства.",

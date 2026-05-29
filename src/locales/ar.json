@@ -180,7 +180,10 @@
     "description": "الوصف",
     "timezone": "المنطقة الزمنية",
     "countrySearchPlaceholder": "ابحث عن البلدان",
-    "imageDropzone": "انقر أو اسحب صورة هنا"
+    "imageDropzone": "انقر أو اسحب صورة هنا",
+    "countryClearAria": "مسح البلد",
+    "flagOfAria": "علم {{name}}",
+    "countryHint": "يُنشر <0>i: iso3166:{{code}}</0> للترتيب حسب البلد."
   },
   "organizationContext": {
     "attachedToGroup": "مرتبط بالمجموعة",
@@ -289,7 +292,18 @@
       "errorPledgeInvalid": "يجب أن يكون مبلغ التعهد مبلغًا موجبًا بالدولار.",
       "errorPriceUnavailable": "في انتظار سعر BTC/USD لحساب مبلغ التعهد.",
       "errorCoverInvalid": "يجب أن تكون صورة الغلاف رابط https:// صالحًا.",
-      "errorDeadlinePast": "لا يمكن أن يكون الموعد النهائي في الماضي."
+      "errorDeadlinePast": "لا يمكن أن يكون الموعد النهائي في الماضي.",
+      "wizard": {
+        "titleStepTitle": "سمِّ تعهدك",
+        "titleStepSubtitle": "طلب واضح وشرح موجز لما ستموّله.",
+        "pledgeStepTitle": "حدّد تعهدك",
+        "pledgeStepSubtitle": "المبلغ الذي ستدفعه، بالدولار الأمريكي، وموعد نهائي اختياري.",
+        "coverStepTitle": "أضف صورة غلاف",
+        "coverStepSubtitle": "صورة واحدة تُمثّل التعهد في كل بطاقة.",
+        "tagsStepTitle": "البلد والفئات",
+        "tagsStepSubtitle": "ساعد الأشخاص المناسبين على العثور على تعهدك.",
+        "launchNow": "تخطّي التالي والإطلاق"
+      }
     },
     "detail": {
       "seoTitle": "{{title}} | تعهد {{appName}}",
@@ -410,7 +424,18 @@
       "errorNameInvalid": "يجب أن يحتوي الاسم على حروف أو أرقام لإنشاء رابط للمجموعة.",
       "errorEditLatestMissing": "تعذّر العثور على أحدث نسخة لهذه المجموعة لتحديثها.",
       "errorCoverInvalid": "يجب أن تكون صورة الغلاف رابط https:// صالحًا.",
-      "errorSlugCollision": "لديك بالفعل مجموعة بالمعرّف «{{slug}}». اختر اسمًا آخر."
+      "errorSlugCollision": "لديك بالفعل مجموعة بالمعرّف «{{slug}}». اختر اسمًا آخر.",
+      "wizard": {
+        "nameStepTitle": "سمِّ مجموعتك",
+        "nameStepSubtitle": "اسم قصير وواضح يتعرّف عليه الأعضاء.",
+        "coverStepTitle": "أضف صورة غلاف",
+        "coverStepSubtitle": "صورة واحدة تُمثّل المجموعة في كل بطاقة.",
+        "moderatorsStepTitle": "ادعُ مشرفين",
+        "moderatorsStepSubtitle": "اختياري — يمكنهم اعتماد المحتوى وإزالة الأعضاء إلى جانبك.",
+        "tagsStepTitle": "البلد والفئات",
+        "tagsStepSubtitle": "ساعد الأشخاص المناسبين على العثور على مجموعتك.",
+        "launchNow": "تخطّي التالي والإطلاق"
+      }
     },
     "detail": {
       "by": "بواسطة",
@@ -484,6 +509,23 @@
     "countryPlaceholder": "ابحث عن البلدان",
     "tags": "الوسوم",
     "tagsPlaceholder": "دفاع-قانوني، تعاضد، أخبار-محلية",
+    "categories": {
+      "adoption": "التبنّي",
+      "animals": "الحيوانات",
+      "church": "الكنيسة",
+      "community": "المجتمع",
+      "education": "التعليم",
+      "emergency": "طوارئ",
+      "event": "فعالية",
+      "family": "العائلة",
+      "firstResponders": "المستجيبون الأوائل",
+      "legal": "قانوني",
+      "medical": "طبي",
+      "memorial": "تأبين",
+      "mission": "إرسالية",
+      "nonProfit": "غير ربحي",
+      "political": "سياسي"
+    },
     "banner": "صورة البانر",
     "story": "القصة",
     "storyPlaceholder": "شارك الخلفية والمستفيدين وكيفية استخدام الأموال.",

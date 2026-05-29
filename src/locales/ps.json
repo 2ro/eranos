@@ -184,7 +184,10 @@
     "description": "توضیح",
     "timezone": "وخت زون",
     "countrySearchPlaceholder": "هېوادونه ولټوئ",
-    "imageDropzone": "دلته انځور کلیک یا راکش کړئ"
+    "imageDropzone": "دلته انځور کلیک یا راکش کړئ",
+    "countryClearAria": "هیواد پاکول",
+    "flagOfAria": "د {{name}} بیرغ",
+    "countryHint": "د هیواد د ترتیب لپاره <0>i: iso3166:{{code}}</0> خپریږي."
   },
   "organizationContext": {
     "attachedToGroup": "له ډلې سره تړلی",
@@ -297,7 +300,18 @@
       "errorPledgeInvalid": "د ژمنې اندازه باید د ډالر په مثبته بڼه وي.",
       "errorPriceUnavailable": "د BTC/USD نرخ ته انتظار باسئ ترڅو د ژمنې اندازه محاسبه شي.",
       "errorCoverInvalid": "د پوښ انځور باید د https:// سمه نښه وي.",
-      "errorDeadlinePast": "وروستۍ نېټه نشي کولی په تېر وخت کې وي."
+      "errorDeadlinePast": "وروستۍ نېټه نشي کولی په تېر وخت کې وي.",
+      "wizard": {
+        "titleStepTitle": "خپلې ژمنې ته نوم ورکړئ",
+        "titleStepSubtitle": "روښانه غوښتنه او لنډه څرګندونه چې څه به تمویل کړئ.",
+        "pledgeStepTitle": "خپله ژمنه وټاکئ",
+        "pledgeStepSubtitle": "څومره به ورکړئ، په USD کې، او یوه اختیاري وروستۍ نېټه.",
+        "coverStepTitle": "د پوښ انځور اضافه کړئ",
+        "coverStepSubtitle": "یو انځور په هر کارت کې ژمنه ښیي.",
+        "tagsStepTitle": "هیواد او کټګورۍ",
+        "tagsStepSubtitle": "د دې سره مرسته وکړئ چې مناسب خلک ستاسو ژمنه ومومي.",
+        "launchNow": "تېر شئ او اوس یې پیل کړئ"
+      }
     },
     "detail": {
       "seoTitle": "{{title}} | د {{appName}} ژمنه",
@@ -422,7 +436,18 @@
       "errorNameInvalid": "نوم باید توري یا عددونه ولري ترڅو د ډلې لینک جوړ شي.",
       "errorEditLatestMissing": "د دې ډلې وروستۍ نسخه د تازه کولو لپاره ونه موندل شوه.",
       "errorCoverInvalid": "د پوښ انځور باید د https:// سمه نښه وي.",
-      "errorSlugCollision": "تاسو لا دمخه «{{slug}}» پېژندونکې ډله لرئ. بل نوم وټاکئ."
+      "errorSlugCollision": "تاسو لا دمخه «{{slug}}» پېژندونکې ډله لرئ. بل نوم وټاکئ.",
+      "wizard": {
+        "nameStepTitle": "خپلې ډلې ته نوم ورکړئ",
+        "nameStepSubtitle": "لنډ، روښانه نوم چې غړي یې وپېژني.",
+        "coverStepTitle": "د پوښ انځور اضافه کړئ",
+        "coverStepSubtitle": "یو انځور په هر کارت کې ډله ښیي.",
+        "moderatorsStepTitle": "منځګړي راوبلئ",
+        "moderatorsStepSubtitle": "اختیاري — هغوی کولی شي ستاسو سره یوځای محتوا ومني او غړي لرې کړي.",
+        "tagsStepTitle": "هیواد او کټګورۍ",
+        "tagsStepSubtitle": "د دې سره مرسته وکړئ چې مناسب خلک ستاسو ډله ومومي.",
+        "launchNow": "تېر شئ او اوس یې پیل کړئ"
+      }
     },
     "detail": {
       "by": "له خوا",
@@ -496,6 +521,23 @@
     "countryPlaceholder": "هېوادونه ولټوئ",
     "tags": "ټګونه",
     "tagsPlaceholder": "حقوقي-دفاع، ګډه-مرسته، محلي-خبرونه",
+    "categories": {
+      "adoption": "غېږې ته اخیستنه",
+      "animals": "څاروي",
+      "church": "کلیسا",
+      "community": "ټولنه",
+      "education": "زده‌کړه",
+      "emergency": "بیړنی حالت",
+      "event": "پېښه",
+      "family": "کورنۍ",
+      "firstResponders": "لومړني ځواب‌ویونکي",
+      "legal": "قانوني",
+      "medical": "طبي",
+      "memorial": "یادګار",
+      "mission": "ماموریت",
+      "nonProfit": "غیر انتفاعي",
+      "political": "سیاسي"
+    },
     "banner": "د بنر انځور",
     "story": "کیسه",
     "storyPlaceholder": "شالید، ګټه اخیستونکي، او د پیسو د کارولو طریقه ووایاست.",

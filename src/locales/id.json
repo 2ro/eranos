@@ -616,7 +616,10 @@
     "description": "Deskripsi",
     "timezone": "Zona waktu",
     "countrySearchPlaceholder": "Cari negara",
-    "imageDropzone": "Klik atau seret gambar ke sini"
+    "imageDropzone": "Klik atau seret gambar ke sini",
+    "countryClearAria": "Hapus negara",
+    "flagOfAria": "Bendera {{name}}",
+    "countryHint": "Memublikasikan <0>i: iso3166:{{code}}</0> untuk pengurutan negara."
   },
   "organizationContext": {
     "attachedToGroup": "Terlampir ke grup",
@@ -729,7 +732,18 @@
       "errorPledgeInvalid": "Jumlah ikrar harus berupa nilai USD positif.",
       "errorPriceUnavailable": "Menunggu harga BTC/USD untuk menghitung jumlah ikrar.",
       "errorCoverInvalid": "Gambar sampul harus berupa URL https:// yang valid.",
-      "errorDeadlinePast": "Tenggat tidak boleh di masa lalu."
+      "errorDeadlinePast": "Tenggat tidak boleh di masa lalu.",
+      "wizard": {
+        "titleStepTitle": "Beri nama ikrar Anda",
+        "titleStepSubtitle": "Permintaan yang jelas dan penjelasan singkat tentang apa yang akan Anda danai.",
+        "pledgeStepTitle": "Tetapkan ikrar Anda",
+        "pledgeStepSubtitle": "Berapa yang akan Anda bayar, dalam USD, dan tenggat opsional.",
+        "coverStepTitle": "Tambahkan gambar sampul",
+        "coverStepSubtitle": "Satu gambar membawa ikrar di setiap kartu.",
+        "tagsStepTitle": "Negara dan kategori",
+        "tagsStepSubtitle": "Bantu orang yang tepat menemukan ikrar Anda.",
+        "launchNow": "Lewati Berikutnya & Luncurkan"
+      }
     },
     "detail": {
       "seoTitle": "{{title}} | Ikrar {{appName}}",
@@ -854,7 +868,18 @@
       "errorNameInvalid": "Nama harus mengandung huruf atau angka agar URL grup bisa dibuat.",
       "errorEditLatestMissing": "Tidak dapat menemukan versi terbaru grup ini untuk diperbarui.",
       "errorCoverInvalid": "Gambar sampul harus berupa URL https:// yang valid.",
-      "errorSlugCollision": "Anda sudah memiliki grup dengan pengenal \"{{slug}}\". Pilih nama lain."
+      "errorSlugCollision": "Anda sudah memiliki grup dengan pengenal \"{{slug}}\". Pilih nama lain.",
+      "wizard": {
+        "nameStepTitle": "Beri nama grup Anda",
+        "nameStepSubtitle": "Nama singkat dan jelas yang mudah dikenali anggota.",
+        "coverStepTitle": "Tambahkan gambar sampul",
+        "coverStepSubtitle": "Satu gambar membawa grup di setiap kartu.",
+        "moderatorsStepTitle": "Undang moderator",
+        "moderatorsStepSubtitle": "Opsional — mereka dapat menyetujui konten dan menghapus anggota bersama Anda.",
+        "tagsStepTitle": "Negara dan kategori",
+        "tagsStepSubtitle": "Bantu orang yang tepat menemukan grup Anda.",
+        "launchNow": "Lewati Berikutnya & Luncurkan"
+      }
     },
     "detail": {
       "by": "oleh",
@@ -928,6 +953,23 @@
     "countryPlaceholder": "Cari negara",
     "tags": "Tag",
     "tagsPlaceholder": "pembelaan-hukum, bantuan-bersama, berita-lokal",
+    "categories": {
+      "adoption": "Adopsi",
+      "animals": "Hewan",
+      "church": "Gereja",
+      "community": "Komunitas",
+      "education": "Pendidikan",
+      "emergency": "Darurat",
+      "event": "Acara",
+      "family": "Keluarga",
+      "firstResponders": "Petugas Tanggap Darurat",
+      "legal": "Hukum",
+      "medical": "Medis",
+      "memorial": "Peringatan",
+      "mission": "Misi",
+      "nonProfit": "Nirlaba",
+      "political": "Politik"
+    },
     "banner": "Gambar banner",
     "story": "Cerita",
     "storyPlaceholder": "Bagikan latar belakang, siapa yang diuntungkan, dan bagaimana dana akan digunakan.",

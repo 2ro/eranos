@@ -616,7 +616,10 @@
     "description": "विवरण",
     "timezone": "टाइमज़ोन",
     "countrySearchPlaceholder": "देश खोजें",
-    "imageDropzone": "यहाँ क्लिक करें या इमेज खींचकर डालें"
+    "imageDropzone": "यहाँ क्लिक करें या इमेज खींचकर डालें",
+    "countryClearAria": "देश साफ़ करें",
+    "flagOfAria": "{{name}} का झंडा",
+    "countryHint": "देश के क्रम के लिए <0>i: iso3166:{{code}}</0> पब्लिश करता है।"
   },
   "organizationContext": {
     "attachedToGroup": "ग्रुप से जुड़ी",
@@ -729,7 +732,18 @@
       "errorPledgeInvalid": "प्लेज राशि एक धनात्मक USD राशि होनी चाहिए।",
       "errorPriceUnavailable": "प्लेज राशि की गणना के लिए BTC/USD दाम का इंतज़ार है।",
       "errorCoverInvalid": "कवर इमेज एक मान्य https:// URL होनी चाहिए।",
-      "errorDeadlinePast": "अंतिम तारीख़ बीते समय की नहीं हो सकती।"
+      "errorDeadlinePast": "अंतिम तारीख़ बीते समय की नहीं हो सकती।",
+      "wizard": {
+        "titleStepTitle": "अपने प्लेज को नाम दें",
+        "titleStepSubtitle": "एक स्पष्ट माँग और जो फंड करेंगे उसकी छोटी व्याख्या।",
+        "pledgeStepTitle": "अपना प्लेज तय करें",
+        "pledgeStepSubtitle": "आप कितना देंगे, USD में, और एक वैकल्पिक अंतिम तारीख़।",
+        "coverStepTitle": "एक कवर इमेज जोड़ें",
+        "coverStepSubtitle": "एक इमेज हर कार्ड पर प्लेज को आगे बढ़ाती है।",
+        "tagsStepTitle": "देश और श्रेणियाँ",
+        "tagsStepSubtitle": "सही लोगों को आपका प्लेज ढूँढने में मदद करें।",
+        "launchNow": "छोड़ें और लॉन्च करें"
+      }
     },
     "detail": {
       "seoTitle": "{{title}} | {{appName}} प्लेज",
@@ -854,7 +868,18 @@
       "errorNameInvalid": "नाम में अक्षर या अंक होने चाहिए ताकि ग्रुप URL बन सके।",
       "errorEditLatestMissing": "इस ग्रुप का सबसे नया संस्करण अपडेट करने के लिए नहीं मिला।",
       "errorCoverInvalid": "कवर इमेज एक मान्य https:// URL होनी चाहिए।",
-      "errorSlugCollision": "आपके पास पहले से \"{{slug}}\" पहचानकर्ता वाला ग्रुप है। दूसरा नाम चुनें।"
+      "errorSlugCollision": "आपके पास पहले से \"{{slug}}\" पहचानकर्ता वाला ग्रुप है। दूसरा नाम चुनें।",
+      "wizard": {
+        "nameStepTitle": "अपने ग्रुप को नाम दें",
+        "nameStepSubtitle": "एक छोटा, स्पष्ट नाम जिसे सदस्य पहचान सकें।",
+        "coverStepTitle": "एक कवर इमेज जोड़ें",
+        "coverStepSubtitle": "एक इमेज हर कार्ड पर ग्रुप को आगे बढ़ाती है।",
+        "moderatorsStepTitle": "मॉडरेटर आमंत्रित करें",
+        "moderatorsStepSubtitle": "वैकल्पिक — वे आपके साथ कंटेंट मंज़ूर कर सकते हैं और सदस्यों को हटा सकते हैं।",
+        "tagsStepTitle": "देश और श्रेणियाँ",
+        "tagsStepSubtitle": "सही लोगों को आपका ग्रुप ढूँढने में मदद करें।",
+        "launchNow": "छोड़ें और लॉन्च करें"
+      }
     },
     "detail": {
       "by": "द्वारा",
@@ -928,6 +953,23 @@
     "countryPlaceholder": "देश खोजें",
     "tags": "टैग",
     "tagsPlaceholder": "legal-defense, mutual-aid, local-news",
+    "categories": {
+      "adoption": "गोद लेना",
+      "animals": "पशु",
+      "church": "चर्च",
+      "community": "कम्युनिटी",
+      "education": "शिक्षा",
+      "emergency": "आपातकाल",
+      "event": "इवेंट",
+      "family": "परिवार",
+      "firstResponders": "प्रथम प्रत्युत्तरकर्ता",
+      "legal": "क़ानूनी",
+      "medical": "चिकित्सा",
+      "memorial": "स्मारक",
+      "mission": "मिशन",
+      "nonProfit": "ग़ैर-लाभकारी",
+      "political": "राजनीतिक"
+    },
     "banner": "बैनर इमेज",
     "story": "कहानी",
     "storyPlaceholder": "पृष्ठभूमि, किसे लाभ होगा, और फंड का उपयोग कैसे होगा, यह शेयर करें।",
