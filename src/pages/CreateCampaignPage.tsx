@@ -930,14 +930,15 @@ export function CreateCampaignPage() {
           body: storySection,
         },
         {
-          title: t('campaignsCreate.wizard.goalStepTitle'),
-          subtitle: t('campaignsCreate.wizard.goalStepSubtitle'),
-          body: goalDeadlineSection,
-        },
-        {
-          title: t('campaignsCreate.wizard.tagsStepTitle'),
-          subtitle: t('campaignsCreate.wizard.tagsStepSubtitle'),
-          body: <>{countrySection}{tagsSection}</>,
+          title: t('campaignsCreate.wizard.detailsStepTitle'),
+          subtitle: t('campaignsCreate.wizard.detailsStepSubtitle'),
+          body: (
+            <>
+              {goalDeadlineSection}
+              {countrySection}
+              {tagsSection}
+            </>
+          ),
         },
       ]}
       canAdvanceFromStep={(s) => (s === 1 ? titleProvided : true)}
