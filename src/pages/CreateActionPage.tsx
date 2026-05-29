@@ -475,13 +475,14 @@ export function CreateActionPage() {
         if (s === 2) return pledgeProvided;
         return true;
       }}
-      // The shortcut appears once the user has cleared both required
-      // gates (title+description @ 1, pledge amount @ 2). Steps 1 and
-      // 2 hide it because publishing without their fields would fail
-      // validation; once the user is on step 3, cover and
-      // country+tags are explicitly optional and a one-click launch
-      // is the desired escape hatch.
-      launchAvailableFromStep={3}
+      // The shortcut appears from step 2 onward. On step 2 it shares
+      // its disabled state with Next via canAdvanceFromStep — the
+      // button stays grayed out until the pledge amount resolves to
+      // a positive sats value, then lights up as the user's escape
+      // hatch out of the remaining optional steps. Step 1 hides it
+      // because publishing without a title or description would
+      // trip server-side validation.
+      launchAvailableFromStep={2}
       launchNowLabel={t('pledges.create.wizard.launchNow')}
       errorAlert={errorAlert}
       submitButtonContent={submitButtonContent}
