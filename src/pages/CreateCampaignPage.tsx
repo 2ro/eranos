@@ -55,7 +55,8 @@ import { createOrganizationAssociationTags, decodeOrganizationParam } from '@/li
 import { sanitizeUrl } from '@/lib/sanitizeUrl';
 import { withAgoraTag } from '@/lib/agoraNoteTags';
 import { getCountryInfo, searchCountries, type CountryEntry } from '@/lib/countries';
-import { getEditableContentTags, parseContentTagInput } from '@/lib/contentTags';
+import { getEditableContentTags } from '@/lib/contentTags';
+import { CAMPAIGN_CATEGORIES, CAMPAIGN_CATEGORY_SLUGS } from '@/lib/campaignCategories';
 import { createCountryIdentifier } from '@/lib/countryIdentifiers';
 import { cn } from '@/lib/utils';
 
@@ -174,7 +175,15 @@ export function CreateCampaignPage() {
   const [deadline, setDeadline] = useState('');
   const [countryQuery, setCountryQuery] = useState('');
   const [countryCode, setCountryCode] = useState('');
-  const [tagInput, setTagInput] = useState('');
+  /**
+   * Selected category slugs. Stored as a Set for O(1) toggle, but
+   * persisted to the event as ordinary `t` tags (one per slug) so the
+   * categories are indistinguishable from any other content tag at
+   * the protocol layer — that's deliberate, since a curated picker is
+   * just a UX shortcut on top of the same field that's always backed
+   * campaign tags.
+   */
+  const [selectedCategories, setSelectedCategories] = useState<Set<string>>(() => new Set());
   const [organizationATag, setOrganizationATag] = useState('');
   const [formError, setFormError] = useState('');
   const [prepopulatedEventId, setPrepopulatedEventId] = useState<string | null>(null);
@@ -292,7 +301,16 @@ export function CreateCampaignPage() {
     const editCountryCode = editCampaign.countryCode ?? '';
     setCountryCode(editCountryCode);
     setCountryQuery(editCountryCode ? (getCountryInfo(editCountryCode)?.subdivisionName ?? getCountryInfo(editCountryCode)?.name ?? editCountryCode) : '');
-    setTagInput(getEditableContentTags(editCampaign.event.tags).join(', '));
+    // Pull the existing `t` tags and intersect with the known
+    // category slugs — unknown tags (legacy free-form values written
+    // by older builds, or anything outside the curated picker) are
+    // currently dropped on edit. Once the picker is the only path to
+    // setting tags, every event going forward will only carry slugs
+    // the picker can round-trip.
+    const existingContentTags = getEditableContentTags(editCampaign.event.tags);
+    setSelectedCategories(
+      new Set(existingContentTags.filter((tag) => CAMPAIGN_CATEGORY_SLUGS.has(tag))),
+    );
     const existingOrgATag = editCampaign.event.tags.find(
       ([n, v]) => n === 'A' && typeof v === 'string' && v.startsWith('34550:'),
     )?.[1] ?? '';
@@ -395,7 +413,12 @@ export function CreateCampaignPage() {
       }
 
       const resolvedCountryCode = countryCode;
-      const contentTags = parseContentTagInput(tagInput);
+      // Iterate the canonical category list (not the Set) so the tag
+      // order on the event is stable and matches the picker's display
+      // order — easier to reason about in cross-client renderers.
+      const contentTags = CAMPAIGN_CATEGORIES
+        .map((c) => c.slug)
+        .filter((slug) => selectedCategories.has(slug));
 
       let prev: NostrEvent | null = null;
       if (isEditMode) {
@@ -695,11 +718,19 @@ export function CreateCampaignPage() {
 
   const tagsSection = (
     <FormSection title={t('forms.tags')} requirement="Optional">
-      <Input
-        id="campaign-tags"
-        value={tagInput}
-        onChange={(e) => setTagInput(e.target.value)}
-        placeholder={t('campaignsCreate.tagsPlaceholder')}
+      <CategoryPicker
+        selected={selectedCategories}
+        onToggle={(slug) => {
+          setSelectedCategories((prev) => {
+            const next = new Set(prev);
+            if (next.has(slug)) {
+              next.delete(slug);
+            } else {
+              next.add(slug);
+            }
+            return next;
+          });
+        }}
       />
     </FormSection>
   );
@@ -930,11 +961,15 @@ export function CreateCampaignPage() {
           body: storySection,
         },
         {
-          title: t('campaignsCreate.wizard.detailsStepTitle'),
-          subtitle: t('campaignsCreate.wizard.detailsStepSubtitle'),
+          title: t('campaignsCreate.wizard.goalStepTitle'),
+          subtitle: t('campaignsCreate.wizard.goalStepSubtitle'),
+          body: goalDeadlineSection,
+        },
+        {
+          title: t('campaignsCreate.wizard.tagsStepTitle'),
+          subtitle: t('campaignsCreate.wizard.tagsStepSubtitle'),
           body: (
             <>
-              {goalDeadlineSection}
               {countrySection}
               {tagsSection}
             </>
@@ -1612,6 +1647,59 @@ function CountrySelect({
           />
         </p>
       )}
+    </div>
+  );
+}
+
+/**
+ * Multi-select grid of curated campaign categories. Each chip renders
+ * an icon + label, and toggling it adds or removes that category's
+ * slug from the parent's selection set. Persisted to the event as
+ * ordinary `t` tags by the parent's submit handler — the picker has
+ * no protocol-level awareness, it just curates which tag slugs the
+ * form can produce.
+ *
+ * Layout is a 2-column grid on mobile, 3 columns at sm, and 4 columns
+ * at md+ to keep label truncation rare without sacrificing target
+ * size on small screens.
+ */
+function CategoryPicker({
+  selected,
+  onToggle,
+}: {
+  selected: Set<string>;
+  onToggle: (slug: string) => void;
+}) {
+  const { t } = useTranslation();
+  return (
+    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
+      {CAMPAIGN_CATEGORIES.map(({ slug, labelKey, Icon }) => {
+        const isSelected = selected.has(slug);
+        return (
+          <button
+            key={slug}
+            type="button"
+            onClick={() => onToggle(slug)}
+            aria-pressed={isSelected}
+            className={cn(
+              'group inline-flex items-center gap-2 rounded-xl border px-3 py-2.5 text-left text-sm transition-colors motion-safe:transition-shadow',
+              'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
+              isSelected
+                ? 'border-primary bg-primary/10 text-foreground shadow-sm'
+                : 'border-border bg-background hover:border-primary/40 hover:bg-primary/5 text-muted-foreground hover:text-foreground',
+            )}
+          >
+            <Icon
+              className={cn(
+                'size-4 shrink-0',
+                isSelected ? 'text-primary' : 'text-muted-foreground group-hover:text-foreground',
+              )}
+              aria-hidden="true"
+            />
+            <span className="truncate">{t(labelKey)}</span>
+          </button>
+        );
+      })}
     </div>
   );
 }
