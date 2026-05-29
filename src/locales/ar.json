@@ -179,8 +179,6 @@
     "coverImage": "صورة الغلاف",
     "description": "الوصف",
     "timezone": "المنطقة الزمنية",
-    "publishing": "جارٍ النشر…",
-    "uploadingCover": "جارٍ رفع الغلاف…",
     "countrySearchPlaceholder": "ابحث عن البلدان",
     "imageDropzone": "انقر أو اسحب صورة هنا"
   },
@@ -282,8 +280,6 @@
       "timezone": "المنطقة الزمنية",
       "timezoneNote": "سيتم تفسير أوقات البدء والموعد النهائي بهذه المنطقة الزمنية.",
       "submit": "إنشاء تعهد",
-      "publishing": "جارٍ النشر…",
-      "uploadingCover": "جارٍ رفع الغلاف…",
       "altText": "تعهد {{appName}}: {{title}}",
       "successToast": "تم إنشاء التعهد",
       "errorToast": "تعذّر إنشاء التعهد",

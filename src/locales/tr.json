@@ -614,8 +614,6 @@
     "coverImage": "Kapak resmi",
     "description": "Açıklama",
     "timezone": "Saat dilimi",
-    "publishing": "Yayımlanıyor…",
-    "uploadingCover": "Kapak yükleniyor…",
     "countrySearchPlaceholder": "Ülke ara",
     "imageDropzone": "Buraya tıklayın veya bir resim sürükleyin"
   },
@@ -721,8 +719,6 @@
       "timezone": "Saat dilimi",
       "timezoneNote": "Başlangıç ve son tarih bu saat diliminde yorumlanacak.",
       "submit": "Taahhüt oluştur",
-      "publishing": "Yayımlanıyor…",
-      "uploadingCover": "Kapak yükleniyor…",
       "altText": "{{appName}} taahhüdü: {{title}}",
       "successToast": "Taahhüt oluşturuldu",
       "errorToast": "Taahhüt oluşturulamadı",

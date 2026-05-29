@@ -183,8 +183,6 @@
     "coverImage": "រូបភាពគម្រប",
     "description": "ការពិពណ៌នា",
     "timezone": "តំបន់ពេលវេលា",
-    "publishing": "កំពុងផ្សព្វផ្សាយ…",
-    "uploadingCover": "កំពុងផ្ទុកគម្រប…",
     "countrySearchPlaceholder": "ស្វែងរកប្រទេស",
     "imageDropzone": "ចុច ឬអូសរូបភាពមកទីនេះ"
   },
@@ -290,8 +288,6 @@
       "timezone": "តំបន់ពេលវេលា",
       "timezoneNote": "ពេលវេលាចាប់ផ្តើម និងពេលកំណត់នឹងត្រូវបានបកស្រាយក្នុងតំបន់ពេលវេលានេះ។",
       "submit": "បង្កើតការសន្យា",
-      "publishing": "កំពុងផ្សព្វផ្សាយ…",
-      "uploadingCover": "កំពុងផ្ទុកគម្រប…",
       "altText": "ការសន្យា {{appName}}៖ {{title}}",
       "successToast": "បានបង្កើតការសន្យា",
       "errorToast": "មិនអាចបង្កើតការសន្យា",

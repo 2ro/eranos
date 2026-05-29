@@ -183,8 +183,6 @@
     "coverImage": "封面图片",
     "description": "描述",
     "timezone": "时区",
-    "publishing": "发布中…",
-    "uploadingCover": "正在上传封面…",
     "countrySearchPlaceholder": "搜索国家/地区",
     "imageDropzone": "点击或拖拽图片到这里"
   },
@@ -290,8 +288,6 @@
       "timezone": "时区",
       "timezoneNote": "开始时间和截止时间将以此时区解释。",
       "submit": "创建悬赏",
-      "publishing": "发布中……",
-      "uploadingCover": "上传封面中……",
       "altText": "{{appName}} 悬赏：{{title}}",
       "successToast": "已创建悬赏",
       "errorToast": "无法创建悬赏",

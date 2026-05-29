@@ -615,8 +615,6 @@
     "coverImage": "Imagem de capa",
     "description": "Descrição",
     "timezone": "Fuso horário",
-    "publishing": "Publicando…",
-    "uploadingCover": "Enviando capa…",
     "countrySearchPlaceholder": "Pesquisar países",
     "imageDropzone": "Clique ou arraste uma imagem aqui"
   },
@@ -722,8 +720,6 @@
       "timezone": "Fuso horário",
       "timezoneNote": "Os horários de início e prazo serão interpretados neste fuso horário.",
       "submit": "Criar promessa",
-      "publishing": "Publicando…",
-      "uploadingCover": "Enviando capa…",
       "altText": "Promessa {{appName}}: {{title}}",
       "successToast": "Promessa criada",
       "errorToast": "Não foi possível criar a promessa",

@@ -615,8 +615,6 @@
     "coverImage": "Обложка",
     "description": "Описание",
     "timezone": "Часовой пояс",
-    "publishing": "Публикация…",
-    "uploadingCover": "Загрузка обложки…",
     "countrySearchPlaceholder": "Поиск стран",
     "imageDropzone": "Нажмите или перетащите изображение сюда"
   },
@@ -722,8 +720,6 @@
       "timezone": "Часовой пояс",
       "timezoneNote": "Время начала и срока будет интерпретироваться в этом часовом поясе.",
       "submit": "Создать обещание",
-      "publishing": "Публикация…",
-      "uploadingCover": "Загрузка обложки…",
       "altText": "Обещание {{appName}}: {{title}}",
       "successToast": "Обещание создано",
       "errorToast": "Не удалось создать обещание",

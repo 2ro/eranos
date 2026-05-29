@@ -183,8 +183,6 @@
     "coverImage": "Imagen de portada",
     "description": "Descripción",
     "timezone": "Zona horaria",
-    "publishing": "Publicando…",
-    "uploadingCover": "Subiendo portada…",
     "countrySearchPlaceholder": "Buscar países",
     "imageDropzone": "Haz clic o arrastra una imagen aquí"
   },
@@ -290,8 +288,6 @@
       "timezone": "Zona horaria",
       "timezoneNote": "Las horas de inicio y plazo se interpretarán en esta zona horaria.",
       "submit": "Crear promesa",
-      "publishing": "Publicando…",
-      "uploadingCover": "Subiendo portada…",
       "altText": "Promesa en {{appName}}: {{title}}",
       "successToast": "Promesa creada",
       "errorToast": "No se pudo crear la promesa",

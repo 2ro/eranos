@@ -706,9 +706,6 @@
       "titlePlaceholder": "Document a beach cleanup",
       "country": "Country",
       "countryPlaceholder": "Search countries",
-      "countryClearAria": "Clear country",
-      "flagOfAria": "Flag of {{name}}",
-      "countryHint": "Publishes <0>i: iso3166:{{code}}</0> for country sorting.",
       "tags": "Tags",
       "tagsPlaceholder": "beach-cleanup, protest-documentation, internet-blackout",
       "coverImage": "Cover image",
@@ -720,8 +717,6 @@
       "timezone": "Timezone",
       "timezoneNote": "Start and deadline times will be interpreted in this timezone.",
       "submit": "Create pledge",
-      "publishing": "Publishing…",
-      "uploadingCover": "Uploading cover…",
       "altText": "{{appName}} pledge: {{title}}",
       "successToast": "Pledge created",
       "errorToast": "Could not create pledge",
@@ -732,7 +727,20 @@
       "errorPledgeInvalid": "Pledge amount must be a positive USD amount.",
       "errorPriceUnavailable": "Waiting for BTC/USD price to calculate the pledge amount.",
       "errorCoverInvalid": "Cover image must be a valid https:// URL.",
-      "errorDeadlinePast": "Deadline cannot be in the past."
+      "errorDeadlinePast": "Deadline cannot be in the past.",
+      "wizard": {
+        "titleStepTitle": "Name your pledge",
+        "titleStepSubtitle": "A clear ask and a short explanation of what you'll fund.",
+        "pledgeStepTitle": "Set your pledge",
+        "pledgeStepSubtitle": "How much you'll pay out for verified submissions, in USD.",
+        "coverStepTitle": "Add a cover image",
+        "coverStepSubtitle": "One image carries the pledge on every card.",
+        "deadlineStepTitle": "Set a deadline",
+        "deadlineStepSubtitle": "Optional — leave blank for an open-ended pledge.",
+        "tagsStepTitle": "Country and tags",
+        "tagsStepSubtitle": "Help the right people find your pledge.",
+        "launchNow": "Skip Next & Launch"
+      }
     },
     "detail": {
       "seoTitle": "{{title}} | {{appName}} Pledge",

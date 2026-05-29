@@ -615,8 +615,6 @@
     "coverImage": "Gambar sampul",
     "description": "Deskripsi",
     "timezone": "Zona waktu",
-    "publishing": "Memublikasikan…",
-    "uploadingCover": "Mengunggah sampul…",
     "countrySearchPlaceholder": "Cari negara",
     "imageDropzone": "Klik atau seret gambar ke sini"
   },
@@ -722,8 +720,6 @@
       "timezone": "Zona waktu",
       "timezoneNote": "Waktu mulai dan tenggat akan diinterpretasikan dalam zona waktu ini.",
       "submit": "Buat ikrar",
-      "publishing": "Memublikasikan…",
-      "uploadingCover": "Mengunggah sampul…",
       "altText": "Ikrar {{appName}}: {{title}}",
       "successToast": "Ikrar dibuat",
       "errorToast": "Tidak dapat membuat ikrar",

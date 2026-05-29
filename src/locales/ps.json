@@ -183,8 +183,6 @@
     "coverImage": "د پوښ انځور",
     "description": "توضیح",
     "timezone": "وخت زون",
-    "publishing": "خپرېږي…",
-    "uploadingCover": "پوښ پورته کېږي…",
     "countrySearchPlaceholder": "هېوادونه ولټوئ",
     "imageDropzone": "دلته انځور کلیک یا راکش کړئ"
   },
@@ -290,8 +288,6 @@
       "timezone": "د وخت زون",
       "timezoneNote": "د پیل او وروستۍ نېټې وختونه به په دې وخت زون کې تفسیر شي.",
       "submit": "ژمنه جوړول",
-      "publishing": "خپرول…",
-      "uploadingCover": "د پوښ پورته کول…",
       "altText": "د {{appName}} ژمنه: {{title}}",
       "successToast": "ژمنه جوړه شوه",
       "errorToast": "ژمنه نه جوړیږي",

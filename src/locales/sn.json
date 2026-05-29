@@ -183,8 +183,6 @@
     "coverImage": "Mufananidzo wepamusoro",
     "description": "Tsananguro",
     "timezone": "Nguva yenzvimbo",
-    "publishing": "Kuburitsa…",
-    "uploadingCover": "Kuisa mufananidzo wepamusoro…",
     "countrySearchPlaceholder": "Tsvaga nyika",
     "imageDropzone": "Dzvanya kana kukwevera mufananidzo pano"
   },
@@ -290,8 +288,6 @@
       "timezone": "Nzvimbo yenguva",
       "timezoneNote": "Nguva yekutanga neyemugumo zvichaverengerwa munzvimbo yenguva iyi.",
       "submit": "Gadzira chitsidziro",
-      "publishing": "Kuburitsa…",
-      "uploadingCover": "Kuisa mufananidzo…",
       "altText": "Chitsidziro che{{appName}}: {{title}}",
       "successToast": "Chitsidziro chagadzirwa",
       "errorToast": "Hachina kugadzirika chitsidziro",

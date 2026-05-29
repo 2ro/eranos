@@ -1,27 +1,18 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState, type FormEvent } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useSeoMeta } from '@unhead/react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { useTranslation, Trans } from 'react-i18next';
-import {
-  AlertTriangle,
-  ArrowLeft,
-  Clock,
-  Loader2,
-  MapPin,
-  Megaphone,
-  Plus,
-  X,
-} from 'lucide-react';
+import { useTranslation } from 'react-i18next';
+import { AlertTriangle, Clock, Loader2, Megaphone, Plus } from 'lucide-react';
 
+import { CountrySelect } from '@/components/CountrySelect';
 import { CoverImageField } from '@/components/CoverImageField';
-import { CountryFlag } from '@/components/CountryFlag';
 import { FormSection } from '@/components/FormSection';
 import { OrganizationContextChip } from '@/components/OrganizationContextChip';
 import { TimezoneSwitcher } from '@/components/TimezoneSwitcher';
+import { Wizard } from '@/components/Wizard';
 import { LoginArea } from '@/components/auth/LoginArea';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -32,14 +23,13 @@ import { useManageableOrganizations } from '@/hooks/useManageableOrganizations';
 import { useNostrPublish } from '@/hooks/useNostrPublish';
 import { useToast } from '@/hooks/useToast';
 import { usdToSats } from '@/lib/bitcoin';
-import { getCountryInfo, searchCountries, type CountryEntry } from '@/lib/countries';
+import { getCountryInfo } from '@/lib/countries';
 import { parseContentTagInput } from '@/lib/contentTags';
 import { createCountryIdentifier } from '@/lib/countryIdentifiers';
 import { getTodayDateInput } from '@/lib/dateInput';
 import { createOrganizationAssociationTags, decodeOrganizationParam } from '@/lib/organizationContext';
 import { sanitizeUrl } from '@/lib/sanitizeUrl';
 import { unixSecondsInTimezone } from '@/lib/timezone';
-import { cn } from '@/lib/utils';
 import { withAgoraTag } from '@/lib/agoraNoteTags';
 
 export function CreateActionPage() {
@@ -88,7 +78,13 @@ export function CreateActionPage() {
   const [coverImage, setCoverImage] = useState<string>('');
   const [coverUploading, setCoverUploading] = useState(false);
   const [countryCode, setCountryCode] = useState(pageCountryCode);
-  const [countryQuery, setCountryQuery] = useState(pageCountryCode ? (getCountryInfo(pageCountryCode)?.subdivisionName ?? getCountryInfo(pageCountryCode)?.name ?? pageCountryCode) : '');
+  const [countryQuery, setCountryQuery] = useState(
+    pageCountryCode
+      ? getCountryInfo(pageCountryCode)?.subdivisionName ??
+          getCountryInfo(pageCountryCode)?.name ??
+          pageCountryCode
+      : '',
+  );
   // Effective org coordinate to attach on publish. Sourced only from the
   // URL — never editable inside the form. Drops to '' when the user
   // isn't authorized for the param's org.
@@ -234,325 +230,249 @@ export function CreateActionPage() {
     );
   }
 
-  const canSubmit =
-    title.trim().length > 0 &&
-    description.trim().length > 0 &&
-    pledgeUsd.trim().length > 0 &&
-    pledgeSatsPreview > 0 &&
-    !coverUploading &&
-    !submitMutation.isPending;
+  // ─── Wizard step bodies ──────────────────────────────────────────────────
 
-  return (
-    <main className="min-h-screen pb-16">
-      <form
-        className="max-w-3xl mx-auto px-4 sm:px-6 py-8 lg:py-10 space-y-5"
-        onSubmit={(e) => {
-          e.preventDefault();
-          setFormError('');
-          submitMutation.mutate();
-        }}
-      >
-        <div>
-          <div className="flex items-center gap-2 -ml-2">
-            <button
-              type="button"
-              onClick={() => navigate(-1)}
-              className="p-2 rounded-full hover:bg-secondary motion-safe:transition-colors text-muted-foreground hover:text-foreground"
-              aria-label={t('common.goBack')}
-            >
-              <ArrowLeft className="size-5 rtl:rotate-180" />
-            </button>
-            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">
-              {t('pledges.create.heading')}
-            </h1>
-          </div>
-          <OrganizationContextChip
-            aTag={organizationATag}
-            authorizedOrg={authorizedOrgFromParam}
-            param={orgParam}
-            paramDecoded={orgFromParam}
-            manageableLoading={manageableOrgsLoading}
-          />
-        </div>
-
-        <div className="rounded-2xl bg-card/50 p-2">
-          {/* Title */}
-          <FormSection title={t('forms.title')} requirement="Required">
-            <Input
-              placeholder={t('pledges.create.titlePlaceholder')}
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              maxLength={200}
-              required
-            />
-          </FormSection>
-
-          {/* Country */}
-          <FormSection title={t('forms.country')} requirement="Recommended">
-            <CountrySelect
-              query={countryQuery}
-              selectedCode={countryCode}
-              onQueryChange={(value) => {
-                setCountryQuery(value);
-                const selectedCountry = countryCode ? getCountryInfo(countryCode) : undefined;
-                const selectedName = selectedCountry?.subdivisionName ?? selectedCountry?.name;
-                if (selectedCountry && value !== selectedName && value.toUpperCase() !== countryCode) {
-                  setCountryCode('');
-                }
-              }}
-              onSelect={(country) => {
-                setCountryCode(country.code);
-                setCountryQuery(country.name);
-              }}
-              onClear={() => {
-                setCountryCode('');
-                setCountryQuery('');
-              }}
-            />
-          </FormSection>
-
-          {/* Tags */}
-          <FormSection title={t('forms.tags')} requirement="Recommended">
-            <Input
-              id="pledge-tags"
-              value={tagInput}
-              onChange={(e) => setTagInput(e.target.value)}
-              placeholder={t('pledges.create.tagsPlaceholder')}
-            />
-          </FormSection>
-
-          {/* Cover image */}
-          <FormSection title={t('forms.coverImage')} requirement="Optional">
-            <CoverImageField
-              value={coverImage}
-              onChange={setCoverImage}
-              onUploadingChange={setCoverUploading}
-            />
-          </FormSection>
-
-          {/* Description */}
-          <FormSection title={t('forms.description')} requirement="Required">
-            <Textarea
-              placeholder={t('pledges.create.descriptionPlaceholder')}
-              rows={7}
-              className="font-mono text-base md:text-sm"
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-            />
-          </FormSection>
-
-          <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
-            {/* Pledge amount */}
-            <FormSection title={t('pledges.create.pledge')} requirement="Required">
-              <div className="relative">
-                <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">
-                  $
-                </span>
-                <Input
-                  type="text"
-                  inputMode="decimal"
-                  placeholder={t('pledges.create.pledgeAmountPlaceholder')}
-                  value={pledgeUsd}
-                  onChange={(e) => setPledgeUsd(e.target.value)}
-                  className="pl-7 pr-14"
-                />
-                <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-xs font-medium text-muted-foreground">
-                  USD
-                </span>
-              </div>
-            </FormSection>
-
-            {/* Deadline */}
-            <FormSection title={t('pledges.create.deadline')} requirement="Optional">
-              <Input
-                type="date"
-                min={minDeadline}
-                className="w-full min-w-0 [color-scheme:light] dark:[color-scheme:dark] dark:[&::-webkit-calendar-picker-indicator]:invert dark:[&::-webkit-calendar-picker-indicator]:opacity-80"
-                value={deadline}
-                onChange={(e) => setDeadline(e.target.value)}
-              />
-              {deadline && (
-                <Input
-                  type="time"
-                  className="w-full min-w-0 [color-scheme:light] dark:[color-scheme:dark] dark:[&::-webkit-calendar-picker-indicator]:invert dark:[&::-webkit-calendar-picker-indicator]:opacity-80"
-                  value={deadlineTime}
-                  onChange={(e) => setDeadlineTime(e.target.value)}
-                />
-              )}
-            </FormSection>
-          </div>
-
-          {deadline && (
-            <FormSection title={t('forms.timezone')} requirement="Required">
-              <div className="bg-muted/30 p-3 rounded-lg border border-border/50 space-y-2 animate-in slide-in-from-top-2 duration-200">
-                <div className="flex items-center gap-2 text-sm font-medium">
-                  <Clock className="h-4 w-4" /> {t('forms.timezone')}
-                </div>
-                <TimezoneSwitcher value={timezone} onChange={setTimezone} />
-                <p className="text-xs text-muted-foreground">
-                  {t('pledges.create.timezoneNote')}
-                </p>
-              </div>
-            </FormSection>
-          )}
-        </div>
-
-        {formError && (
-          <Alert variant="destructive">
-            <AlertTriangle className="size-4" />
-            <AlertDescription>{formError}</AlertDescription>
-          </Alert>
-        )}
-
-        <div className="pt-1">
-          <Button
-            type="submit"
-            disabled={!canSubmit}
-            className="w-full"
-          >
-            {submitMutation.isPending ? (
-              <>
-                <Loader2 className="size-4 mr-2 animate-spin" />
-                {t('forms.publishing')}
-              </>
-            ) : coverUploading ? (
-              <>
-                <Loader2 className="size-4 mr-2 animate-spin" />
-                {t('forms.uploadingCover')}
-              </>
-            ) : (
-              <>
-                <Plus className="size-4 mr-2" />
-                {t('pledges.create.submit')}
-              </>
-            )}
-          </Button>
-        </div>
-      </form>
-    </main>
-  );
-}
-
-function CountrySelect({
-  query,
-  selectedCode,
-  onQueryChange,
-  onSelect,
-  onClear,
-}: {
-  query: string;
-  selectedCode: string;
-  onQueryChange: (value: string) => void;
-  onSelect: (country: CountryEntry) => void;
-  onClear: () => void;
-}) {
-  const { t } = useTranslation();
-  const [open, setOpen] = useState(false);
-  const [selectedIndex, setSelectedIndex] = useState(0);
-  const selectedCountry = selectedCode ? getCountryInfo(selectedCode) : undefined;
-  const results = useMemo(() => searchCountries(query), [query]);
-  const showResults = open && results.length > 0;
-
-  const selectCountry = (country: CountryEntry) => {
-    onSelect(country);
-    setOpen(false);
-    setSelectedIndex(0);
-  };
-
-  return (
-    <div className="space-y-2">
-      <div className="relative">
-        <MapPin className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+  const titleDescriptionSection = (
+    <>
+      <FormSection title={t('forms.title')} requirement="Required">
         <Input
-          id="pledge-country"
-          value={query}
-          onChange={(e) => {
-            onQueryChange(e.target.value);
-            setOpen(true);
-            setSelectedIndex(0);
-          }}
-          onFocus={() => setOpen(true)}
-          onBlur={() => window.setTimeout(() => setOpen(false), 120)}
-          onKeyDown={(e) => {
-            if (!showResults) return;
-            if (e.key === 'ArrowDown') {
-              e.preventDefault();
-              setSelectedIndex((prev) => (prev + 1) % results.length);
-            } else if (e.key === 'ArrowUp') {
-              e.preventDefault();
-              setSelectedIndex((prev) => (prev - 1 + results.length) % results.length);
-            } else if (e.key === 'Enter') {
-              e.preventDefault();
-              selectCountry(results[selectedIndex]);
-            } else if (e.key === 'Escape') {
-              setOpen(false);
+          placeholder={t('pledges.create.titlePlaceholder')}
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+          maxLength={200}
+          required
+        />
+      </FormSection>
+
+      <FormSection title={t('forms.description')} requirement="Required">
+        <Textarea
+          placeholder={t('pledges.create.descriptionPlaceholder')}
+          rows={6}
+          className="font-mono text-base md:text-sm"
+          value={description}
+          onChange={(e) => setDescription(e.target.value)}
+        />
+      </FormSection>
+    </>
+  );
+
+  const pledgeAmountSection = (
+    <FormSection title={t('pledges.create.pledge')} requirement="Required">
+      <div className="relative">
+        <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">
+          $
+        </span>
+        <Input
+          type="text"
+          inputMode="decimal"
+          placeholder={t('pledges.create.pledgeAmountPlaceholder')}
+          value={pledgeUsd}
+          onChange={(e) => setPledgeUsd(e.target.value)}
+          className="pl-7 pr-14"
+        />
+        <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-xs font-medium text-muted-foreground">
+          USD
+        </span>
+      </div>
+    </FormSection>
+  );
+
+  const coverSection = (
+    <FormSection title={t('forms.coverImage')} requirement="Optional">
+      <CoverImageField
+        value={coverImage}
+        onChange={setCoverImage}
+        onUploadingChange={setCoverUploading}
+      />
+    </FormSection>
+  );
+
+  const deadlineSection = (
+    <>
+      <FormSection title={t('pledges.create.deadline')} requirement="Optional">
+        <Input
+          type="date"
+          min={minDeadline}
+          className="w-full min-w-0 [color-scheme:light] dark:[color-scheme:dark] dark:[&::-webkit-calendar-picker-indicator]:invert dark:[&::-webkit-calendar-picker-indicator]:opacity-80"
+          value={deadline}
+          onChange={(e) => setDeadline(e.target.value)}
+        />
+        {deadline && (
+          <Input
+            type="time"
+            className="w-full min-w-0 [color-scheme:light] dark:[color-scheme:dark] dark:[&::-webkit-calendar-picker-indicator]:invert dark:[&::-webkit-calendar-picker-indicator]:opacity-80"
+            value={deadlineTime}
+            onChange={(e) => setDeadlineTime(e.target.value)}
+          />
+        )}
+      </FormSection>
+
+      {deadline && (
+        <FormSection title={t('forms.timezone')} requirement="Required">
+          <div className="bg-muted/30 p-3 rounded-lg border border-border/50 space-y-2 animate-in slide-in-from-top-2 duration-200">
+            <div className="flex items-center gap-2 text-sm font-medium">
+              <Clock className="h-4 w-4" /> {t('forms.timezone')}
+            </div>
+            <TimezoneSwitcher value={timezone} onChange={setTimezone} />
+            <p className="text-xs text-muted-foreground">
+              {t('pledges.create.timezoneNote')}
+            </p>
+          </div>
+        </FormSection>
+      )}
+    </>
+  );
+
+  const countryTagsSection = (
+    <>
+      <FormSection title={t('forms.country')} requirement="Optional">
+        <CountrySelect
+          query={countryQuery}
+          selectedCode={countryCode}
+          onQueryChange={(value) => {
+            setCountryQuery(value);
+            const selectedCountry = countryCode ? getCountryInfo(countryCode) : undefined;
+            const selectedName =
+              selectedCountry?.subdivisionName ?? selectedCountry?.name;
+            if (
+              selectedCountry &&
+              value !== selectedName &&
+              value.toUpperCase() !== countryCode
+            ) {
+              setCountryCode('');
             }
           }}
-          className="h-9 rounded-full border-0 bg-secondary pl-10 pr-10 text-base md:text-sm focus-visible:ring-0 focus-visible:ring-offset-0"
-          placeholder={t('forms.countrySearchPlaceholder')}
-          autoComplete="off"
-          role="combobox"
-          aria-expanded={showResults}
-          aria-controls="pledge-country-results"
+          onSelect={(country) => {
+            setCountryCode(country.code);
+            setCountryQuery(country.name);
+          }}
+          onClear={() => {
+            setCountryCode('');
+            setCountryQuery('');
+          }}
         />
-        {(query || selectedCode) && (
-          <button
-            type="button"
-            onClick={onClear}
-            className="absolute right-2 top-1/2 rounded-full p-1 -translate-y-1/2 text-muted-foreground hover:bg-muted hover:text-foreground motion-safe:transition-colors"
-            aria-label={t('pledges.create.countryClearAria')}
-          >
-            <X className="size-4" />
-          </button>
-        )}
+      </FormSection>
 
-        {showResults && (
-          <div
-            id="pledge-country-results"
-            role="listbox"
-            className="absolute z-20 mt-2 max-h-[200px] w-full overflow-y-auto rounded-xl border border-border bg-popover py-1 shadow-lg"
-          >
-            {results.map((country, index) => (
-              <button
-                key={country.code}
-                type="button"
-                role="option"
-                aria-selected={index === selectedIndex}
-                onMouseDown={(e) => e.preventDefault()}
-                onClick={() => selectCountry(country)}
-                className={cn(
-                  'flex w-full cursor-pointer items-center gap-3 px-3 py-2 text-left transition-colors hover:bg-secondary/60',
-                  index === selectedIndex && 'bg-secondary/60',
-                )}
-              >
-                <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-secondary leading-none">
-                  <CountryFlag
-                    code={country.code}
-                    emoji={country.flag}
-                    label={t('pledges.create.flagOfAria', { name: country.name })}
-                    className="text-lg"
-                  />
-                </span>
-                <span className="min-w-0 flex-1">
-                  <span className="block truncate text-sm font-semibold">{country.name}</span>
-                  <span className="block text-xs text-muted-foreground">{country.code}</span>
-                </span>
-              </button>
-            ))}
-          </div>
-        )}
-      </div>
+      <FormSection title={t('forms.tags')} requirement="Optional">
+        <Input
+          id="pledge-tags"
+          value={tagInput}
+          onChange={(e) => setTagInput(e.target.value)}
+          placeholder={t('pledges.create.tagsPlaceholder')}
+        />
+      </FormSection>
+    </>
+  );
 
-      {selectedCountry && (
-        <p className="text-xs text-muted-foreground">
-          <Trans
-            i18nKey="pledges.create.countryHint"
-            values={{ code: selectedCode }}
-            components={{ 0: <span className="font-mono text-foreground" /> }}
-          />
-        </p>
-      )}
-    </div>
+  // ─── Submit + error chrome ───────────────────────────────────────────────
+
+  const handleSubmit = (e: FormEvent) => {
+    e.preventDefault();
+    setFormError('');
+    submitMutation.mutate();
+  };
+
+  // Required-field gates for the wizard's Next buttons. Title + description
+  // sit together on step 1, the pledge amount on step 2. The amount field
+  // also has to resolve to a positive sats value — without a BTC/USD price
+  // we can't compute the bounty and the publish will throw.
+  const titleProvided = title.trim().length > 0;
+  const descriptionProvided = description.trim().length > 0;
+  const pledgeProvided = pledgeUsd.trim().length > 0 && pledgeSatsPreview > 0;
+
+  const submitting = submitMutation.isPending || coverUploading;
+
+  const submitButtonContent = submitMutation.isPending ? (
+    <>
+      <Loader2 className="size-4 mr-2 animate-spin" />
+      {t('forms.publishing')}
+    </>
+  ) : coverUploading ? (
+    <>
+      <Loader2 className="size-4 mr-2 animate-spin" />
+      {t('forms.uploadingCover')}
+    </>
+  ) : (
+    <>
+      <Plus className="size-4 mr-2" />
+      {t('pledges.create.submit')}
+    </>
+  );
+
+  // The captive overlay swallows the page chrome, so the org context chip
+  // needs to ride along inside step 1. Same treatment the campaign wizard
+  // uses for its "publishing under <org>" affordance.
+  const orgChip = (
+    <OrganizationContextChip
+      aTag={organizationATag}
+      authorizedOrg={authorizedOrgFromParam}
+      param={orgParam}
+      paramDecoded={orgFromParam}
+      manageableLoading={manageableOrgsLoading}
+    />
+  );
+
+  const errorAlert = formError ? (
+    <Alert variant="destructive">
+      <AlertTriangle className="size-4" />
+      <AlertDescription>{formError}</AlertDescription>
+    </Alert>
+  ) : null;
+
+  return (
+    <Wizard
+      headingAriaLabel={t('pledges.create.heading')}
+      step1Lead={orgChip}
+      steps={[
+        {
+          title: t('pledges.create.wizard.titleStepTitle'),
+          subtitle: t('pledges.create.wizard.titleStepSubtitle'),
+          body: titleDescriptionSection,
+        },
+        {
+          title: t('pledges.create.wizard.pledgeStepTitle'),
+          subtitle: t('pledges.create.wizard.pledgeStepSubtitle'),
+          body: pledgeAmountSection,
+        },
+        {
+          title: t('pledges.create.wizard.coverStepTitle'),
+          subtitle: t('pledges.create.wizard.coverStepSubtitle'),
+          body: coverSection,
+        },
+        {
+          title: t('pledges.create.wizard.deadlineStepTitle'),
+          subtitle: t('pledges.create.wizard.deadlineStepSubtitle'),
+          body: deadlineSection,
+        },
+        {
+          title: t('pledges.create.wizard.tagsStepTitle'),
+          subtitle: t('pledges.create.wizard.tagsStepSubtitle'),
+          body: countryTagsSection,
+        },
+      ]}
+      // Step 1 gates on title + description (both required), step 2
+      // gates on the pledge amount (required, and must resolve to a
+      // positive sats value once the BTC/USD price is known). Every
+      // step after that is opt-in.
+      canAdvanceFromStep={(s) => {
+        if (s === 1) return titleProvided && descriptionProvided;
+        if (s === 2) return pledgeProvided;
+        return true;
+      }}
+      // The shortcut appears once the user has cleared both required
+      // gates (title+description @ 1, pledge amount @ 2). Steps 1 and
+      // 2 hide it because publishing without their fields would fail
+      // validation; once the user is on step 3, cover / deadline /
+      // country+tags are all explicitly optional and a one-click
+      // launch is the desired escape hatch.
+      launchAvailableFromStep={3}
+      launchNowLabel={t('pledges.create.wizard.launchNow')}
+      errorAlert={errorAlert}
+      submitButtonContent={submitButtonContent}
+      submitting={submitting}
+      onSubmit={handleSubmit}
+      onClose={() => navigate(-1)}
+    />
   );
 }
 

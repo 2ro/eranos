@@ -183,8 +183,6 @@
     "coverImage": "تصویر کاور",
     "description": "توضیح",
     "timezone": "منطقه زمانی",
-    "publishing": "در حال انتشار…",
-    "uploadingCover": "در حال بارگذاری کاور…",
     "countrySearchPlaceholder": "جستجوی کشورها",
     "imageDropzone": "برای انتخاب تصویر کلیک کنید یا آن را اینجا بکشید"
   },
@@ -290,8 +288,6 @@
       "timezone": "منطقهٔ زمانی",
       "timezoneNote": "زمان شروع و مهلت در این منطقهٔ زمانی تفسیر می‌شوند.",
       "submit": "ایجاد تعهد",
-      "publishing": "در حال انتشار…",
-      "uploadingCover": "در حال بارگذاری جلد…",
       "altText": "تعهد {{appName}}: {{title}}",
       "successToast": "تعهد ایجاد شد",
       "errorToast": "ایجاد تعهد ممکن نشد",

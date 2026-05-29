@@ -614,8 +614,6 @@
     "coverImage": "Picha ya jalada",
     "description": "Maelezo",
     "timezone": "Saa za eneo",
-    "publishing": "Inachapisha…",
-    "uploadingCover": "Inapakia jalada…",
     "countrySearchPlaceholder": "Tafuta nchi",
     "imageDropzone": "Bonyeza au buruta picha hapa"
   },
@@ -721,8 +719,6 @@
       "timezone": "Saa za eneo",
       "timezoneNote": "Nyakati za kuanza na za mwisho zitafasiriwa katika eneo hili la saa.",
       "submit": "Unda ahadi",
-      "publishing": "Inachapisha…",
-      "uploadingCover": "Inapakia jalada…",
       "altText": "Ahadi ya {{appName}}: {{title}}",
       "successToast": "Ahadi imeundwa",
       "errorToast": "Haikuweza kuunda ahadi",

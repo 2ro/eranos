@@ -605,8 +605,6 @@
     "coverImage": "Image de couverture",
     "description": "Description",
     "timezone": "Fuseau horaire",
-    "publishing": "Publication…",
-    "uploadingCover": "Téléversement de la couverture…",
     "countrySearchPlaceholder": "Rechercher des pays",
     "imageDropzone": "Cliquez ou faites glisser une image ici"
   },
@@ -712,8 +710,6 @@
       "timezone": "Fuseau horaire",
       "timezoneNote": "Les heures de début et d'échéance seront interprétées dans ce fuseau horaire.",
       "submit": "Créer la promesse",
-      "publishing": "Publication…",
-      "uploadingCover": "Téléversement de la couverture…",
       "altText": "Promesse {{appName}} : {{title}}",
       "successToast": "Promesse créée",
       "errorToast": "Impossible de créer la promesse",

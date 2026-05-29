@@ -183,8 +183,6 @@
     "coverImage": "封面圖片",
     "description": "描述",
     "timezone": "時區",
-    "publishing": "釋出中…",
-    "uploadingCover": "正在上傳封面…",
     "countrySearchPlaceholder": "搜尋國家/地區",
     "imageDropzone": "點選或拖拽圖片到這裡"
   },
@@ -290,8 +288,6 @@
       "timezone": "時區",
       "timezoneNote": "開始時間和截止時間將以此時區解釋。",
       "submit": "建立懸賞",
-      "publishing": "釋出中……",
-      "uploadingCover": "上傳封面中……",
       "altText": "{{appName}} 懸賞：{{title}}",
       "successToast": "已建立懸賞",
       "errorToast": "無法建立懸賞",

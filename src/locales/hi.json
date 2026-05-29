@@ -615,8 +615,6 @@
     "coverImage": "कवर इमेज",
     "description": "विवरण",
     "timezone": "टाइमज़ोन",
-    "publishing": "पब्लिश हो रहा है…",
-    "uploadingCover": "कवर अपलोड हो रहा है…",
     "countrySearchPlaceholder": "देश खोजें",
     "imageDropzone": "यहाँ क्लिक करें या इमेज खींचकर डालें"
   },
@@ -722,8 +720,6 @@
       "timezone": "टाइमज़ोन",
       "timezoneNote": "शुरू और अंतिम समय इसी टाइमज़ोन में समझे जाएँगे।",
       "submit": "प्लेज बनाएँ",
-      "publishing": "पब्लिश हो रहा है…",
-      "uploadingCover": "कवर अपलोड हो रहा है…",
       "altText": "{{appName}} प्लेज: {{title}}",
       "successToast": "प्लेज बन गया",
       "errorToast": "प्लेज नहीं बना सके",
