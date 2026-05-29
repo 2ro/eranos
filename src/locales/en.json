@@ -610,6 +610,9 @@
     "publishing": "Publishing…",
     "uploadingCover": "Uploading cover…",
     "countrySearchPlaceholder": "Search countries",
+    "countryClearAria": "Clear country",
+    "flagOfAria": "Flag of {{name}}",
+    "countryHint": "Publishes <0>i: iso3166:{{code}}</0> for country sorting.",
     "imageDropzone": "Click or drag an image here"
   },
   "organizationContext": {
@@ -831,9 +834,6 @@
       "descriptionPlaceholder": "What is this group about?",
       "country": "Country",
       "countryPlaceholder": "Search countries",
-      "countryClearAria": "Clear country",
-      "flagOfAria": "Flag of {{name}}",
-      "countryHint": "Publishes <0>i: iso3166:{{code}}</0> for country sorting.",
       "tags": "Tags",
       "tagsPlaceholder": "mutual-aid, local-news, digital-rights",
       "coverImage": "Cover image",
@@ -936,11 +936,8 @@
     "onchainInvalid": "Not a recognized mainnet Bitcoin address (bc1q… / bc1p…).",
     "spInvalid": "Not a recognized BIP-352 silent-payment code (sp1…).",
     "country": "Country",
-    "countryPlaceholder": "Search countries",
-    "countryClearAria": "Clear country",
-    "flagOfAria": "Flag of {{name}}",
-    "countryHint": "Publishes <0>i: iso3166:{{code}}</0> for country sorting.",
-    "tags": "Tags",
+      "countryPlaceholder": "Search countries",
+      "tags": "Tags",
     "tagsPlaceholder": "legal-defense, mutual-aid, local-news",
     "categories": {
       "adoption": "Adoption",
