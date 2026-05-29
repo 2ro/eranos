@@ -32,10 +32,10 @@ import { Skeleton } from '@/components/ui/skeleton';
 
 import { useAppContext } from '@/hooks/useAppContext';
 import { useAuthor } from '@/hooks/useAuthor';
-import { useBtcPrice } from '@/hooks/useBtcPrice';
 import { useCampaigns } from '@/hooks/useCampaigns';
 import { useCountryFollows } from '@/hooks/useCountryFollows';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
+import { useHdBtcPrice } from '@/hooks/useHdBtcPrice';
 import { useHdWallet } from '@/hooks/useHdWallet';
 import { useNotificationPreview } from '@/hooks/useNotificationPreview';
 import { useUserOrganizations, type UserOrganization } from '@/hooks/useUserOrganizations';
@@ -55,7 +55,7 @@ import type { ParsedCampaign } from '@/lib/campaign';
  *
  *  1. **Personal hero** — avatar, greeting, three stat tiles derived from
  *     already-loaded section data (zero extra queries).
- *  2. **Utility strip** — wallet balance snapshot (`useHdWallet` + `useBtcPrice`,
+ *  2. **Utility strip** — wallet balance snapshot (`useHdWallet` + `useHdBtcPrice`,
  *     Blockbook-backed, nsec-only; graceful fallback for other login types) +
  *     notification preview (`useNotificationPreview`, limit 3 one-shot query,
  *     no persistent subscription).
@@ -279,14 +279,16 @@ function StatTile({
 // ─── Zone 2: Wallet summary ─────────────────────────────────────────────────
 
 /**
- * Compact wallet balance card backed by `useHdWallet` (Blockbook) +
- * `useBtcPrice` (Esplora). The HD wallet requires an nsec login; for
- * extension / bunker logins the card shows a simple "View wallet" prompt
- * instead of a balance. The card always links to `/wallet`.
+ * Compact wallet balance card backed by `useHdWallet` +
+ * `useHdBtcPrice` (both Blockbook-sourced, matching `/wallet` and the
+ * top-nav balance pill so all three surfaces show the same USD figure).
+ * The HD wallet requires an nsec login; for extension / bunker logins the
+ * card shows a simple "View wallet" prompt instead of a balance. The card
+ * always links to `/wallet`.
  */
 function WalletSummaryCard() {
   const { availability, totalBalance, isLoading, error } = useHdWallet();
-  const { data: btcPrice } = useBtcPrice();
+  const { data: btcPrice } = useHdBtcPrice();
   const walletAvailable = availability.status === 'available';
 
   return (
